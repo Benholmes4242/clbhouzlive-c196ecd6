@@ -268,10 +268,10 @@
     "contextFriendsOne": "{{name1}} has played here",
     "contextFriendsTwo": "{{name1}} and {{name2}} have played here",
     "contextFriendsMany": "{{name1}}, {{name2}} and {{count}} more have played here",
-    "contextBucket_one": "{{count}} member has this on their list",
-    "contextBucket_other": "{{count}} members have this on their list",
-    "contextHidden_one": "Rated {{avg}} from just {{count}} member",
-    "contextHidden_other": "Rated {{avg}} from just {{count}} members"
+    "contextBucket_one": "{{count}} golfer has this on their list",
+    "contextBucket_other": "{{count}} golfers have this on their list",
+    "contextHidden_one": "Rated {{avg}} from just {{count}} golfer",
+    "contextHidden_other": "Rated {{avg}} from just {{count}} golfers"
   },
   "friends": {
     "signInTitle": "Sign in to see friends' courses",
@@ -351,22 +351,22 @@
       "easierThanLabel": "易しい"
     },
     "verdict": {
-      "higher": "Members rate {{course}} higher than its rank",
-      "lower": "Members rate {{course}} lower than its rank",
+      "higher": "Rated above its rank",
+      "lower": "Rated below its rank",
       "ratingRank": "{{position}} of {{poolSize}} rated courses on the {{listLabel}} Top 100",
       "ratingRankNoList": "{{position}} of {{poolSize}} rated courses on this list"
     },
     "verdictSheet": {
       "title": "How this compares",
-      "memberRating_one": "Member rating - {{count}} rating",
-      "memberRating_other": "Member rating - {{count}} ratings",
-      "explanation": "Published at #{{rank}}. Members who have played it rate it {{rating}} from {{ratingCount}} ratings. Across the Top 100 courses members have rated, one at #{{rank}} usually scores around {{expected}}. We show where those differ. We do not adjust the list.",
+      "memberRating_one": "Golfer rating - {{count}} rating",
+      "memberRating_other": "Golfer rating - {{count}} ratings",
+      "explanation": "Published at #{{rank}}. Golfers who have played it rate it {{rating}} from {{ratingCount}} ratings. Across the Top 100 courses golfers have rated, one at #{{rank}} usually scores around {{expected}}. We show where those differ. We do not adjust the list.",
       "listNote": "This is its {{listLabel}} rank. It sits at a different rank on other lists, so the comparison changes.",
-      "ratingRankLabel": "Member rating order",
+      "ratingRankLabel": "Golfer rating order",
       "ratingRank": "{{position}} of {{poolSize}} rated courses on this list",
-      "distribution": "How members scored it",
-      "distributionNote_one": "From 1 member rating so far.",
-      "distributionNote_other": "From {{count}} member ratings so far.",
+      "distribution": "How golfers scored it",
+      "distributionNote_one": "From 1 golfer rating so far.",
+      "distributionNote_other": "From {{count}} golfer ratings so far.",
       "rateCta": "Rate this course"
     },
     "progress": {

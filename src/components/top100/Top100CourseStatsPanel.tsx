@@ -6,9 +6,10 @@
  * at the top of the tab already carries that ask, and ninety-odd identical
  * prompts drown the courses that actually hold data.
  *
- * Row one is a centred three-up: rating (band-coloured), average to par and the
- * difficulty percentile. The four rating sub-scores that already live in course_rating_aggregates
- * follow as 2x2 bars, gated behind t100_subscore_min_ratings (default 3) so a
+ * Row one is ONE BASELINE: rating (band-coloured, with its sample size inline),
+ * average to par, and the difficulty phrase right-aligned. The four rating
+ * sub-scores that already live in course_rating_aggregates follow as ONE ROW OF
+ * FOUR quarter-width columns, gated behind t100_subscore_min_ratings (default 3) so a
  * single member's afternoon is never presented as analysis.
  *
  * This component NEVER fetches course data — everything arrives batched from
@@ -24,9 +25,9 @@ import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
-import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
-import { shortCourseName } from '@/features/courses/_shared/courseLabel';
-import { A, KICKER, StatRow, toParParts, type StatItem } from '@/features/courses/components/holes/analytical/tokens';
+import { SubScoreStack, bandColor } from '@/features/courses/_shared/scoreBands';
+import { A, CAPTION, LABEL, NUM, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+
 
 /** Deliberately colourless: this is an invitation, not a data value. */
 const NO_ROUNDS_INK = '#68707B';
@@ -35,35 +36,27 @@ const seenSubscores = new Set<string>();
 const seenNoRounds = new Set<string>();
 const seenDifficulty = new Set<string>();
 
-const headingStyle: React.CSSProperties = {
-  ...KICKER,
-  lineHeight: 1,
-  flex: 1,
-  minWidth: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-};
-
 interface Props {
   courseId: string;
-  /** Names the card this block belongs to. Null → the quiet label renders alone. */
+  /**
+   * Accepted for callsite compatibility but NO LONGER RENDERED: the short name
+   * repeated the photo caption above it (BRIEF_COURSE_META_CONDENSE §1.1).
+   */
   courseName?: string | null;
   rank: number | null;
   list: string;
   data: Top100Enrichment | undefined;
-  onRate: () => void;
+  /** Retained for callsite compatibility; the condensed row carries no CTA. */
+  onRate?: () => void;
 }
 
-export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, rank, list, data, onRate }) => {
+export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, data }) => {
 
   const { t } = useTranslation('courses');
   const { subscoreMinRatings, bandLow, bandHigh } = useTop100Config();
   const barsRef = useRef<HTMLDivElement | null>(null);
   const difficultyRef = useRef<HTMLDivElement | null>(null);
   const noRoundsRef = useRef<HTMLDivElement | null>(null);
-
-  const shortName = courseName ? shortCourseName(courseName) : '';
 
   const rating = data?.rating ?? null;
   const ratingCount = data?.ratingCount ?? 0;
@@ -155,63 +148,90 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, 
   if (!hasRating) return null;
 
   /**
-   * The stat row.
+   * THE STAT ROW — ONE BASELINE (BRIEF_COURSE_META_CONDENSE §2).
    *
-   * AVG TO PAR rounds FIRST, then branches, so a fractional under-par average
-   * never renders "-0.0" and level reads "E".
+   * Rating (with its sample size inline), a hairline, average to par, and the
+   * difficulty phrase right-aligned. Omission rules unchanged: the percentile
+   * disappears at the middle band, avg-to-par disappears when toParParts
+   * returns null, and the line rebalances with NO placeholder dashes.
    *
-   * The percentile inverts below par - a course playing under par reads
-   * EASIER THAN (100 - pct). At level par (the middle band) the cell is omitted
-   * entirely: a midpoint percentile says nothing. Null cells are omitted and
-   * the row rebalances. No placeholder dashes.
+   * AVG TO PAR still rounds first then branches (toParParts), so a fractional
+   * under-par average never renders "-0.0" and level reads "E".
    */
-  const buildItems = (): StatItem[] => {
-    const items: StatItem[] = [
-      {
-        label: t('top100.stats.ratingLabel'),
-        value: rating.toFixed(1),
-        tone: bandColor(rating),
-        sub: t('top100.stats.fromRatings', { count: ratingCount }),
-      },
-    ];
+  const toPar = toParParts(avgOverPar);
 
-    const toPar = toParParts(avgOverPar);
-    if (toPar) {
-      items.push({
-        label: t('top100.stats.avgToParLabel'),
-        value: toPar.text,
-        tone: toPar.tone,
-      });
+  let difficulty: { label: string; pct: number } | null = null;
+  if (harderPct != null) {
+    const pct = Math.round(harderPct);
+    const band: 'hard' | 'middle' | 'easy' =
+      pct >= bandHigh ? 'hard' : pct <= bandLow ? 'easy' : 'middle';
+    if (band !== 'middle') {
+      difficulty = {
+        label:
+          band === 'hard'
+            ? t('top100.stats.harderThanLabel')
+            : t('top100.stats.easierThanLabel'),
+        pct: band === 'hard' ? pct : 100 - pct,
+      };
     }
+  }
 
-    if (harderPct != null) {
-      const pct = Math.round(harderPct);
-      const band: 'hard' | 'middle' | 'easy' =
-        pct >= bandHigh ? 'hard' : pct <= bandLow ? 'easy' : 'middle';
-      if (band !== 'middle') {
-        items.push({
-          label:
-            band === 'hard'
-              ? t('top100.stats.harderThanLabel')
-              : t('top100.stats.easierThanLabel'),
-          value: `${band === 'hard' ? pct : 100 - pct}%`,
-          tone: A.INK,
-          sub: t('top100.stats.ofCourses'),
-        });
-      }
-    }
-
-    return items;
+  const microLabel: React.CSSProperties = {
+    ...LABEL,
+    fontSize: 8,
+    whiteSpace: 'nowrap',
   };
 
   return (
     <div style={{ paddingTop: 4 }}>
-      <header style={{ marginBottom: 10 }}>
-        {shortName ? <span style={headingStyle}>{shortName}</span> : null}
-      </header>
+      <div
+        ref={difficultyRef}
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 8,
+          minWidth: 0,
+        }}
+      >
+        {/* Rating — the figure carries its band colour and its sample size. */}
+        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, minWidth: 0 }}>
+          <span style={{ ...NUM, fontSize: 22, lineHeight: 1, color: bandColor(rating) }}>
+            {rating.toFixed(1)}
+          </span>
+          <span style={microLabel}>{t('top100.stats.fromRatings', { count: ratingCount })}</span>
+        </span>
 
-      <div ref={difficultyRef}>
-        <StatRow items={buildItems()} />
+        {toPar && (
+          <>
+            <span
+              aria-hidden
+              style={{ width: 1, alignSelf: 'stretch', background: A.HAIRLINE, flexShrink: 0 }}
+            />
+            <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, minWidth: 0 }}>
+              <span style={{ ...NUM, fontSize: 22, lineHeight: 1, color: toPar.tone }}>
+                {toPar.text}
+              </span>
+              <span style={microLabel}>{t('top100.stats.avgToParLabel')}</span>
+            </span>
+          </>
+        )}
+
+        {difficulty && (
+          <span
+            style={{
+              marginLeft: 'auto',
+              ...CAPTION,
+              textAlign: 'right',
+              lineHeight: 1.25,
+            }}
+          >
+            {difficulty.label}{' '}
+            <span style={{ ...NUM, fontSize: 11.5, fontWeight: 700, color: A.INK }}>
+              {difficulty.pct}%
+            </span>{' '}
+            {t('top100.stats.ofCourses')}
+          </span>
+        )}
       </div>
 
       {showNoRounds && (
@@ -222,38 +242,30 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, 
             fontWeight: 500,
             color: NO_ROUNDS_INK,
             lineHeight: 1.3,
-            marginTop: 10,
-            textAlign: 'center',
+            marginTop: 8,
           }}
         >
-          <div>{t('top100.stats.noRoundsTitle')}</div>
-          <div>{t('top100.stats.noRoundsCta')}</div>
+          {t('top100.stats.noRoundsTitle')} {t('top100.stats.noRoundsCta')}
         </div>
       )}
 
+      {/*
+        ONE ROW OF FOUR (§3). The observer div carries no height of its own, so a
+        course below the ratings gate leaves NO reserved space here.
+      */}
       <div ref={barsRef}>
         {showBars && subs && (
-          <div
-            style={{
-              marginTop: 16,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 6,
-            }}
-          >
-            <div style={{ display: 'flex', gap: 16 }}>
-              <SubScoreBar label={t('top100.stats.design')} score={subs.design as number} />
-              <SubScoreBar label={t('top100.stats.condition')} score={subs.condition as number} />
-            </div>
-            <div style={{ display: 'flex', gap: 16 }}>
-              <SubScoreBar label={t('top100.stats.facilities')} score={subs.facilities as number} />
-              <SubScoreBar label={t('top100.stats.clubhouse')} score={subs.clubhouse as number} />
-            </div>
+          <div style={{ marginTop: 10, display: 'flex', gap: 10 }}>
+            <SubScoreStack label={t('top100.stats.design')} score={subs.design as number} />
+            <SubScoreStack label={t('top100.stats.condition')} score={subs.condition as number} />
+            <SubScoreStack label={t('top100.stats.facilities')} score={subs.facilities as number} />
+            <SubScoreStack label={t('top100.stats.clubhouse')} score={subs.clubhouse as number} />
           </div>
         )}
       </div>
     </div>
   );
 };
+
 
 export default Top100CourseStatsPanel;

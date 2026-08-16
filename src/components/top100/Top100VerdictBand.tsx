@@ -1,12 +1,15 @@
 /**
  * Top100VerdictBand — the headline feature.
  *
- * Where members diverge from the published rank, a coloured band states the
- * disagreement and nothing more. Permitted copy is exactly "Members rate it
- * higher/lower than its rank suggests", with the course named so the claim
- * cannot be misread against the next card. No publication is named, no judgement
- * word is used, no formula is shown, and no figures are repeated here - the
- * rating and count sit in the panel directly beneath.
+ * Where golfers diverge from the published rank, a faintly tinted ONE-LINE
+ * panel states the disagreement and nothing more: arrow, "Rated above/below its
+ * rank", then the rating-order reference right-aligned in MUTE. No publication
+ * is named, no judgement word is used, no formula is shown, and no figures are
+ * repeated here - the rating and count sit in the row directly beneath.
+ *
+ * GREEN/RED STAY (BRIEF_COURSE_META_CONDENSE §4.4): a verdict with an arrow is
+ * a MOVEMENT, not a score, so green-above / red-below follows the standing rule.
+ * It was the heavy TINT that fought the block, not the hue.
  *
  * Suppression lives entirely in computeVerdict() — this component renders
  * whatever it is handed and renders nothing when handed null.
@@ -21,24 +24,24 @@ import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { shortenCourseName, type Verdict } from './verdict';
+import { type Verdict } from './verdict';
 import { FIGS } from '@/lib/tokens/type';
 
-const GREEN_BG = '#EDF7F0';
+/** A WHISPER of tint. The old solid fill + highlight + two shadows are gone. */
+const GREEN_TINT = 'rgba(30,122,70,0.07)';
 const GREEN_INK = '#0C7B40';
-const GREEN_LINE = 'rgba(15,143,74,0.14)';
-const GREEN_SHADOW = 'rgba(15,143,74,0.07)';
-const RED_BG = '#FDF1EF';
+const RED_TINT = 'rgba(179,38,30,0.06)';
 const RED_INK = '#B22F24';
-const RED_LINE = 'rgba(200,55,43,0.13)';
-const RED_SHADOW = 'rgba(200,55,43,0.07)';
+/** The rank reference is a reference point, not a claim: it stays neutral. */
+const MUTE_INK = '#68707B';
 
 /** Fires once per course per session, not per mount. */
 const seen = new Set<string>();
 const seenRank = new Set<string>();
 
-/** Minimum height only. The band WRAPS and never truncates. */
-export const VERDICT_BAND_HEIGHT = 30;
+/** Minimum height of the ONE-LINE band. Nothing reserves it for layout. */
+export const VERDICT_BAND_HEIGHT = 26;
+
 
 /** 1st / 2nd / 3rd / 4th ... */
 function ordinal(n: number): string {
@@ -63,7 +66,11 @@ export interface VerdictRatingRank {
 
 interface Props {
   courseId: string;
-  courseName: string;
+  /**
+   * Kept so the parent can still suppress the band when the name lookup misses;
+   * the condensed copy names no course (BRIEF_COURSE_META_CONDENSE §5.5).
+   */
+  courseName?: string;
   verdict: Verdict;
   /** Standing within the rated pool of the selected list, when known. */
   ratingRank?: VerdictRatingRank | null;
@@ -75,7 +82,6 @@ interface Props {
 
 export const Top100VerdictBand: React.FC<Props> = ({
   courseId,
-  courseName,
   verdict,
   ratingRank,
   list,
@@ -132,7 +138,6 @@ export const Top100VerdictBand: React.FC<Props> = ({
   }, [courseId, list, ratingRank, verdict.rank]);
 
   const ink = higher ? GREEN_INK : RED_INK;
-  const line2Ink = higher ? '#63A883' : '#C87C72';
   const Trend = higher ? TrendingUp : TrendingDown;
 
   return (
@@ -149,46 +154,44 @@ export const Top100VerdictBand: React.FC<Props> = ({
       }}
       style={{
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 7,
         width: '100%',
         minHeight: VERDICT_BAND_HEIGHT,
-        padding: '11px 14px',
-        borderRadius: 14,
+        padding: '7px 12px',
+        borderRadius: 12,
         textAlign: 'left',
-        background: higher ? GREEN_BG : RED_BG,
+        /* A WHISPER of tint. No inset highlight, no box-shadows (§4.3). */
+        background: higher ? GREEN_TINT : RED_TINT,
         border: 'none',
-        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.95), 0 0 0 0.5px ${higher ? GREEN_LINE : RED_LINE}, 0 1px 3px ${higher ? GREEN_SHADOW : RED_SHADOW}`,
+        boxShadow: 'none',
         color: ink,
       }}
     >
+      <Trend size={14} strokeWidth={2.5} color={ink} aria-hidden style={{ flexShrink: 0 }} />
+
       <span
         style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 7,
           fontSize: 11.5,
           fontWeight: 700,
           letterSpacing: '-0.005em',
-          lineHeight: 1.3,
+          lineHeight: 1.25,
+          whiteSpace: 'nowrap',
         }}
       >
-        {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower', {
-          course: shortenCourseName(courseName),
-        })}
-        <Trend size={16} strokeWidth={2.5} color={ink} aria-hidden />
+        {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower')}
       </span>
 
       {ratingRank && (
         <span
           style={{
             ...FIGS,
+            marginLeft: 'auto',
             fontSize: 10.5,
             fontWeight: 600,
-            lineHeight: 1.3,
-            marginTop: 2,
-            color: line2Ink,
+            lineHeight: 1.25,
+            textAlign: 'right',
+            color: MUTE_INK,
           }}
         >
           {listLabel && listLabel.trim()
@@ -206,6 +209,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
     </button>
   );
 };
+
 
 
 export default Top100VerdictBand;
