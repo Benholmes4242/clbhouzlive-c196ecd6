@@ -399,7 +399,7 @@ const EchoHistoryPage: React.FC = () => {
                   justifyContent: 'center',
                 }}
               >
-                <EchoWaveform size={28} active={false} />
+                <EchoWaveform size={28} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <span style={{ fontSize: 15, fontWeight: 600, color: INK }}>
@@ -698,10 +698,11 @@ const ChatRow: React.FC<{
           >
             {title}
           </span>
-          <span style={{ fontSize: 11, color: MUTED, flexShrink: 0 }}>
-            {relativeTime(chat.last_message_at)}
-          </span>
         </button>
+        {/* §8.2 the time sits BENEATH the question, never competing with it. */}
+        <span style={{ fontSize: 11, color: MUTED }}>
+          {relativeTime(chat.last_message_at)}
+        </span>
         {groupCount > 1 && onToggleGroup ? (
           <button
             type="button"
