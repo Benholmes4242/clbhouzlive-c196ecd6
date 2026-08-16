@@ -199,11 +199,8 @@ const InboxV2Page: React.FC = () => {
               </div>
             </div>
 
-            {stage.courseName ? (
-              <div style={{ ...MT.CONTEXT, marginTop: 4 }}>{stage.courseName}</div>
-            ) : null}
+            {/* §4.5 SEARCH ARRIVES AT EIGHT THREADS, not before. */}
 
-            {/* §2.5 SEARCH ARRIVES AT EIGHT THREADS, not before. */}
             {showSearch && searchOpen ? (
               <div
                 className="ec-glass--pill"
