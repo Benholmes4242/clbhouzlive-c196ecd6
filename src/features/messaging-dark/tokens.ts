@@ -14,7 +14,7 @@
  */
 
 import type React from 'react';
-import { EC } from '@/features/echo-caddie/tokens';
+import { EC } from '@/features/echo-chat/tokens';
 
 export const MSG = {
   /** The surface. Same near-black as the caddie stage. */
