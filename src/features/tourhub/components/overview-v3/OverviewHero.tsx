@@ -198,11 +198,10 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
   }
 
   const active = slides[Math.min(activeIndex, count - 1)];
-  const showCounter = count > 8;
 
-  // Chevron UI removed per micro-brief; swipe is the sole gesture and dots
-  // remain the affordance that more slides exist. goPrev/goNext are retained
-  // for keyboard/a11y and COMMAND-jump paths.
+  // Chevron UI removed per micro-brief; swipe is the sole gesture and
+  // goPrev/goNext are retained for keyboard/a11y and COMMAND-jump paths.
+
   void goPrev;
   void goNext;
 
