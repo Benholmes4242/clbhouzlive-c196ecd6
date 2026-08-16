@@ -115,12 +115,17 @@ export const RoundDetailSheet: React.FC<Props> = ({
     ? (userData.adjusted_gross ?? userData.actual_gross ?? null)
     : null;
   const toParVal = (grossVal != null && totalPar > 0) ? grossVal - totalPar : null;
+  // 'unavailable' stays reachable — but only once the query HAS run and
+  // returned nothing (deleted score, or RLS-blocked for this viewer).
   const emptyVariant: 'syncing' | 'nohbh' | 'unavailable' =
-    !isRoundLoading && userData == null
-      ? 'unavailable'
-      : userData?.hole_by_hole_fetched
-        ? 'nohbh'
-        : 'syncing';
+    !roundSettled
+      ? 'syncing'
+      : userData == null
+        ? 'unavailable'
+        : userData.hole_by_hole_fetched
+          ? 'nohbh'
+          : 'syncing';
+
 
   const eyebrowText = fmtDateEyebrow(userData?.play_date);
   const courseName = userData?.course?.name ?? '';
