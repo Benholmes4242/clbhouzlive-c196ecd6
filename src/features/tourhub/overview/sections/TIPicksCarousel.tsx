@@ -746,18 +746,33 @@ function CaseSheet({
 
       {/* Reasons */}
       <div style={{ marginTop: 20 }}>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: INK_45,
+            letterSpacing: '0.11em',
+            textTransform: 'uppercase',
+            marginBottom: 10,
+          }}
+        >
+          {t('overview.tiPicks.case.whyPicked')}
+        </div>
         {(pick.reasons ?? []).map((r, i) => (
           <div
             key={i}
             style={{
               display: 'flex',
               gap: 12,
-              marginTop: i === 0 ? 0 : 16,
+              paddingTop: i === 0 ? 0 : 12,
+              paddingBottom: 12,
+              borderBottom: `1px solid ${HAIR}`,
             }}
           >
-            <div style={{ fontSize: 11, fontWeight: 700, color: INK, minWidth: 22, letterSpacing: '0.06em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: INK_45, minWidth: 22, letterSpacing: '0.06em', fontVariantNumeric: 'tabular-nums lining-nums' }}>
               {String(i + 1).padStart(2, '0')}
             </div>
+
             <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'rgba(15,23,42,0.85)', lineHeight: 1.45 }}>
               {r}
             </div>
