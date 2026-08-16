@@ -7,18 +7,28 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { useEchoChats, type EchoChatRow } from '@/features/echo-v2/hooks/useEchoChats';
-import { AnimatedEchoWave } from '@/features/echo-v2/components/AnimatedEchoWave';
+import { EchoWaveform } from '@/features/echo-caddie/components/EchoWaveform';
+import '@/features/echo-caddie/echo-caddie.css';
 import { formatRelativeRounded } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { TITLE } from '@/lib/tokens/type';
 
-const CANVAS = '#F8FAFC';
-const INK = '#1F2428';
-const SUB = '#8A9099';
-const MUTED = '#AEB4BC';
-const AMBER = '#F7931E';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+/**
+ * BRIEF_ECHO_CADDIE §6.2 — NO LIGHT CANVAS SURVIVES ANYWHERE IN ECHO, history
+ * included. States 10 and 11 sit on the same dark surface as the caddie, and the
+ * mark here is STATIC (§6.1).
+ *
+ * §7 THREE SEPARATE SOLID INK VALUES — no tone is derived by reducing another
+ * element's opacity. AMBER IS GONE from this surface: it means Echo's mark and
+ * the member's own figures, and a pin marker is neither.
+ */
+const CANVAS = '#08090B';
+const INK = '#FFFFFF';
+const SUB = '#8B929C';
+const MUTED = '#8B929C';
+const PIN = '#C9CFD7';
+const HAIRLINE = 'rgba(255,255,255,0.10)';
 const BOTTOM_NAV_CLEAR = 'calc(env(safe-area-inset-bottom, 0px) + 32px)';
 
 const relativeTime = formatRelativeRounded;
@@ -271,13 +281,13 @@ const EchoHistoryPage: React.FC = () => {
                     borderBottom: `0.5px solid ${HAIRLINE}`,
                   }}
                 >
-                  <Skeleton variant="light" style={{ width: 12, height: 12, borderRadius: 6, flexShrink: 0 }} />
+                  <Skeleton variant="dark" style={{ width: 12, height: 12, borderRadius: 6, flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <Skeleton variant="light" style={{ width: '65%', height: 14, borderRadius: 7 }} />
-                    <Skeleton variant="light" style={{ width: '40%', height: 12, borderRadius: 6 }} />
+                    <Skeleton variant="dark" style={{ width: '65%', height: 14, borderRadius: 7 }} />
+                    <Skeleton variant="dark" style={{ width: '40%', height: 12, borderRadius: 6 }} />
                   </div>
-                  <Skeleton variant="light" style={{ width: 36, height: 11, borderRadius: 5, flexShrink: 0 }} />
-                  <Skeleton variant="light" style={{ width: 32, height: 32, borderRadius: 16, flexShrink: 0 }} />
+                  <Skeleton variant="dark" style={{ width: 36, height: 11, borderRadius: 5, flexShrink: 0 }} />
+                  <Skeleton variant="dark" style={{ width: 32, height: 32, borderRadius: 16, flexShrink: 0 }} />
                 </li>
               ))}
             </ul>
@@ -303,8 +313,8 @@ const EchoHistoryPage: React.FC = () => {
                 style={{
                   padding: '10px 18px',
                   borderRadius: 12,
-                  background: '#15171F',
-                  color: '#F5F6F7',
+                  background: '#FFFFFF',
+                  color: '#08090B',
                   border: 'none',
                   fontSize: 14,
                   fontWeight: 600,
@@ -330,13 +340,13 @@ const EchoHistoryPage: React.FC = () => {
                   width: 52,
                   height: 52,
                   borderRadius: 17,
-                  background: '#15171F',
+                  background: '#14181E',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <AnimatedEchoWave size={28} active={false} />
+                <EchoWaveform size={28} active={false} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <span style={{ fontSize: 15, fontWeight: 600, color: INK }}>
@@ -398,7 +408,7 @@ const EchoHistoryPage: React.FC = () => {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(15,23,42,0.35)',
+            background: 'rgba(4,5,7,0.62)',
             zIndex: 60,
             display: 'flex',
             alignItems: 'flex-end',
@@ -410,12 +420,12 @@ const EchoHistoryPage: React.FC = () => {
             style={{
               width: '100%',
               maxWidth: 620,
-              background: '#FFFFFF',
+              background: '#14181E',
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
               padding: '12px 16px',
               paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
-              boxShadow: '0 -8px 24px rgba(15,23,42,0.12)',
+              boxShadow: '0 -8px 24px rgba(0,0,0,0.45)',
             }}
           >
             <div
@@ -423,7 +433,7 @@ const EchoHistoryPage: React.FC = () => {
                 width: 36,
                 height: 4,
                 borderRadius: 999,
-                background: '#E2E8F0',
+                background: '#3A4048',
                 margin: '0 auto 16px',
               }}
             />
@@ -479,7 +489,7 @@ const EchoHistoryPage: React.FC = () => {
                     width: '100%',
                     padding: '12px',
                     borderRadius: 10,
-                    background: '#EDEFF2',
+                    background: '#1D222A',
                     border: 'none',
                     outline: 'none',
                     fontSize: 14,
@@ -494,8 +504,8 @@ const EchoHistoryPage: React.FC = () => {
                     width: '100%',
                     padding: '12px 14px',
                     borderRadius: 12,
-                    background: '#15171F',
-                    color: '#F5F6F7',
+                    background: '#FFFFFF',
+                    color: '#08090B',
                     border: 'none',
                     fontSize: 14,
                     fontWeight: 600,
@@ -526,7 +536,7 @@ const EchoHistoryPage: React.FC = () => {
                       flex: 1,
                       padding: '12px 14px',
                       borderRadius: 12,
-                      background: '#EDEFF2',
+                      background: '#1D222A',
                       color: INK,
                       border: 'none',
                       fontSize: 14,
@@ -543,7 +553,7 @@ const EchoHistoryPage: React.FC = () => {
                       flex: 1,
                       padding: '12px 14px',
                       borderRadius: 12,
-                      background: '#B42318',
+                      background: '#E5484D',
                       color: '#FFFFFF',
                       border: 'none',
                       fontSize: 14,
@@ -604,7 +614,7 @@ const ChatRow: React.FC<{
             cursor: 'pointer',
           }}
         >
-          {chat.pinned ? <Pin size={12} color={AMBER} style={{ flexShrink: 0 }} /> : null}
+          {chat.pinned ? <Pin size={12} color={PIN} style={{ flexShrink: 0 }} /> : null}
           <span
             style={{
               fontSize: 14,
@@ -687,7 +697,7 @@ const SheetRow: React.FC<{
       background: 'transparent',
       border: 'none',
       borderBottom: `0.5px solid ${HAIRLINE}`,
-      color: destructive ? '#B42318' : INK,
+      color: destructive ? '#E5484D' : INK,
       fontSize: 15,
       fontWeight: 500,
       textAlign: 'left',
