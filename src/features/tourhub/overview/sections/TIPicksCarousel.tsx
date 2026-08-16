@@ -415,7 +415,10 @@ function PickScrimBand({
           }}
         />
       ) : null}
-      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 11 }}>{children}</div>
+      <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 11 }}>
+        {children}
+      </div>
+
     </div>
   );
 }
