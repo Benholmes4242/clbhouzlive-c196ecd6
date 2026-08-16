@@ -341,17 +341,37 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
 }
 
 /**
- * PickScrimBand — the tile's head. A headshot behind a gradient that fades from
- * transparent to the tile's EXACT white (#FFFFFF); any near-white here would
- * ship as a horizontal band across every tile. The band NEVER collapses: with
- * no resolvable headshot it paints the gradient over a flat slate tone, so the
- * tile's shape is identical either way and the carousel stays even.
+ * PickScrimBand — the scrim head, shared by the TILE and by BOTH sheets so the
+ * chain hero → leaderboard → tile → sheet makes one move. A photo behind a
+ * gradient that fades from transparent to the surface's EXACT white (#FFFFFF);
+ * any near-white would ship as a horizontal band, worse on a full-width sheet
+ * than on a 300px tile. The band NEVER collapses: with no resolvable photo it
+ * paints the gradient over a flat slate tone, so the shape is identical either
+ * way and the carousel stays even.
  */
-function PickScrimBand({ candidates, children }: { candidates: string[]; children: React.ReactNode }) {
+function PickScrimBand({
+  candidates,
+  children,
+  minHeight = 96,
+  fadeStart = 26,
+  padding = '12px 15px 11px',
+  grabber = false,
+  objectPosition = '50% 12%',
+}: {
+  candidates: string[];
+  children: React.ReactNode;
+  minHeight?: number;
+  /** % down the band where the fade begins. */
+  fadeStart?: number;
+  padding?: string;
+  /** Sheets carry their grabber ON the band, in white so it survives the photo. */
+  grabber?: boolean;
+  objectPosition?: string;
+}) {
   const [idx, setIdx] = useState(0);
   const src = idx < candidates.length ? candidates[idx] : null;
   return (
-    <div style={{ position: 'relative', minHeight: 96, padding: '12px 15px 11px', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', minHeight, padding, overflow: 'hidden' }}>
       <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.10)' }} />
       {src ? (
         <img
@@ -368,7 +388,7 @@ function PickScrimBand({ candidates, children }: { candidates: string[]; childre
             objectFit: 'cover',
             // A headshot is a portrait crop in a wide band: bias to the TOP so
             // the face is never cut at the chin.
-            objectPosition: '50% 12%',
+            objectPosition,
           }}
         />
       ) : null}
@@ -377,14 +397,29 @@ function PickScrimBand({ candidates, children }: { candidates: string[]; childre
         style={{
           position: 'absolute',
           inset: 0,
-          background:
-            'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 26%, rgba(255,255,255,0.55) 58%, rgba(255,255,255,0.88) 82%, #FFFFFF 100%)',
+          background: `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) ${fadeStart}%, rgba(255,255,255,0.55) ${Math.round(fadeStart + (100 - fadeStart) * 0.5)}%, rgba(255,255,255,0.88) ${Math.round(fadeStart + (100 - fadeStart) * 0.78)}%, #FFFFFF 100%)`,
         }}
       />
+      {grabber ? (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 36,
+            height: 4,
+            borderRadius: 999,
+            background: 'rgba(255,255,255,0.5)',
+          }}
+        />
+      ) : null}
       <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 11 }}>{children}</div>
     </div>
   );
 }
+
 
 // ---- Card state slot: chip / neutral live / course fit line ----
 
