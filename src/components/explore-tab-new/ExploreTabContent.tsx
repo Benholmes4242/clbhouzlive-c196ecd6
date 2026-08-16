@@ -402,13 +402,7 @@ export default function ExploreTabContent({
         clips: c.clips,
         photos: c.photos,
       });
-      const seen = new Set<string>();
-      const posts = [] as Moment['post'][];
-      for (const m of c.moments) {
-        if (seen.has(m.post.id)) continue;
-        seen.add(m.post.id);
-        posts.push(m.post);
-      }
+      const posts = buildMomentQueue(c.moments);
       openWithOrigin({
         posts,
         index: 0,
