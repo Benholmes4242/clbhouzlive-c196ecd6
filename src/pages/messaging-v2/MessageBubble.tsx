@@ -11,15 +11,21 @@ import { getSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import { FIGS } from '@/lib/tokens/type';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
 
-const INK = '#1F2428';
-const SUB = '#8A9099';
-const HINT = '#AEB4BC';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+/**
+ * BRIEF_MESSAGES_ECHO_PALETTE §4.4 — YOUR MESSAGES ARE AMBER, because amber is
+ * the viewing member everywhere on this palette. Theirs are glass over the dark
+ * surface. §3.3 no faded colour: three solid ink values, no alpha on text.
+ */
+const INK = '#F5F7F8';
+const SUB = '#A8AFB4';
+const HINT = '#7C8489';
+const HAIRLINE = 'rgba(255,255,255,0.10)';
 
-// Pure white so the incoming bubble edge holds against the contour canvas.
-const IN_BG = '#FFFFFF';
-const OUT_BG = '#15171F';
-const OUT_FG = '#F5F6F7';
+// Incoming: flat fill base (blur is an enhancement, applied via .ec-glass).
+const IN_BG = 'rgba(255,255,255,0.10)';
+const OUT_BG = '#F7931E';
+const OUT_FG = '#151007';
+
 
 interface Props {
   message: ThreadMessage;
