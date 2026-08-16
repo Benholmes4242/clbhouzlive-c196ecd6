@@ -661,7 +661,7 @@ function CaseSheet({
           fontVariantNumeric: 'tabular-nums',
         }}
       >
-        {t('overview.tiPicks.case.eyebrowPick', { n: pick.rank })}
+        {t('overview.tiPicks.case.eyebrow')}
       </span>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
         <div
@@ -721,11 +721,12 @@ function CaseSheet({
     <SheetShell
       onClose={onClose}
       header={header}
-      scrim={{ candidates: headshots, minHeight: 168, fadeStart: 23, objectPosition: '50% 14%' }}
+      scrim={{ candidates: headshots, minHeight: 168, fadeStart: 23, treatment: 'portrait' }}
     >
 
-      {/* Verdict banner */}
-      <VerdictBanner v={v} state={state} live={live} t={t} />
+      {/* Verdict banner — the score lives in the HEAD, beside the name, so the
+          banner carries only what the head does not: position and THRU. */}
+      <VerdictBanner v={v} state={state} live={live} t={t} hideScore={headScore != null} />
 
       {/* Course fit meter */}
       {pick.courseFitScore != null && (
@@ -771,7 +772,7 @@ function CaseSheet({
             marginBottom: 10,
           }}
         >
-          {t('overview.tiPicks.case.whyPicked')}
+          {t('overview.tiPicks.case.whyWePicked')}
         </div>
         {(pick.reasons ?? []).map((r, i) => (
           <div
