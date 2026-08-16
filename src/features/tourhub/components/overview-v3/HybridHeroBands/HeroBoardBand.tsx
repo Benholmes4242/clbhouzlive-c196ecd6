@@ -254,6 +254,7 @@ export function HeroBoardSection({
         >
           {field && (
             <StatCell
+              align="left"
               label={t('overview.onTheCourse.fieldAverageToday')}
               value={formatToParAvg(field.avg)}
               color={tourFigColor(field.avg)}
@@ -262,6 +263,7 @@ export function HeroBoardSection({
           )}
           {low && (
             <StatCell
+              align="center"
               label={t('overview.onTheCourse.lowRoundLabel')}
               value={formatToPar(low.toPar)}
               color={tourFigColor(low.toPar)}
@@ -270,6 +272,7 @@ export function HeroBoardSection({
           )}
           {field && field.count > 0 && (
             <StatCell
+              align="right"
               label={t('overview.onTheCourse.underParTodayLabel')}
               value={t('overview.onTheCourse.underParTodayValue', {
                 n: field.underPar,
