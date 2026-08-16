@@ -997,20 +997,14 @@ function BannerRow({
   );
 }
 
+/** A figure with a label — no tinted capsule, no border. Alignment separates. */
 function StatTile({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div
-      style={{
-        background: '#FFFFFF',
-        border: `1px solid ${HAIR}`,
-        borderRadius: 12,
-        padding: '10px 12px',
-      }}
-    >
+    <div>
       <div
         style={{
-          fontSize: 18,
-          fontWeight: 700,
+          fontSize: 19,
+          fontWeight: 600,
           color: accent ? AMBER : INK,
           fontVariantNumeric: 'tabular-nums',
           letterSpacing: '-0.015em',
@@ -1021,7 +1015,7 @@ function StatTile({ label, value, accent }: { label: string; value: string; acce
       </div>
       <div
         style={{
-          marginTop: 6,
+          marginTop: 5,
           fontSize: 9,
           fontWeight: 700,
           color: INK_45,
@@ -1034,6 +1028,7 @@ function StatTile({ label, value, accent }: { label: string; value: string; acce
     </div>
   );
 }
+
 
 function Last5Block({
   loading,
