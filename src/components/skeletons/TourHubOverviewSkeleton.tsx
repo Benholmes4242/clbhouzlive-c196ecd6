@@ -18,7 +18,7 @@
  * which then does not appear is worse than no silhouette, because the page
  * collapses upward and everything below jumps.
  *
- *   CERTAIN     hero (always mounts, holds its own height), ComingUp (459) with
+ *   CERTAIN     hero (always mounts, holds its own height), ComingUp (459: 17 + 28 head, 399 table, 16 pager) with
  *               its tour-lens pill row (52), WorldRankings (353) — both boards
  *               are populated year-round for the default PGA lens and neither
  *               is gated on a live tournament.
@@ -86,6 +86,12 @@ function ComingUpBlock() {
               </div>
               <Bar style={{ height: 13, width: 30 }} />
             </div>
+          ))}
+        </div>
+        {/* The pager dots close the section: marginTop 10 over 6px dots. */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 10 }}>
+          {[0, 1, 2].map((i) => (
+            <Bar key={i} style={{ height: 6, width: 6, borderRadius: 999 }} />
           ))}
         </div>
       </div>
