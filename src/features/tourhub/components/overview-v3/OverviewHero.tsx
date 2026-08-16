@@ -198,11 +198,10 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
   }
 
   const active = slides[Math.min(activeIndex, count - 1)];
-  const showCounter = count > 8;
 
-  // Chevron UI removed per micro-brief; swipe is the sole gesture and dots
-  // remain the affordance that more slides exist. goPrev/goNext are retained
-  // for keyboard/a11y and COMMAND-jump paths.
+  // Chevron UI removed per micro-brief; swipe is the sole gesture and
+  // goPrev/goNext are retained for keyboard/a11y and COMMAND-jump paths.
+
   void goPrev;
   void goNext;
 
@@ -235,60 +234,10 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
 
 
 
-      {/* Dots / counter row — vertically centered in the 36px gap between the
-          champion tile (bottom of PhotoBand's lower-third) and the wire-ticker
-          top edge. One size smaller than the pre-launch treatment. */}
-      {count > 1 && (
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 43,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 5,
-            zIndex: 15,
-            pointerEvents: 'none',
-          }}
-        >
-          {showCounter ? (
-            <div
-              style={{
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                fontSize: 9.5,
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                color: '#fff',
-                background: 'rgba(10,14,20,0.55)',
-                backdropFilter: 'blur(6px)',
-                WebkitBackdropFilter: 'blur(6px)',
-                padding: '3px 8px',
-                borderRadius: 999,
-                fontVariantNumeric: 'tabular-nums',
-                pointerEvents: 'auto',
-              }}
-            >
-              {t('overview.hero.counter', { current: activeIndex + 1, total: count })}
-            </div>
-          ) : (
-            slides.map((_, i) => (
-              <span
-                key={i}
-                aria-hidden
-                style={{
-                  width: i === activeIndex ? 12 : 4,
-                  height: 4,
-                  borderRadius: 999,
-                  background: i === activeIndex ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.45)',
-                  transition: 'width 200ms ease, background 200ms ease',
-                }}
-              />
-            ))
-          )}
-        </div>
-      )}
+      {/* The live board EXTENDS the hero downward. It tracks the active slide and
+          cross-fades in place on swipe; on a results or upcoming slide it renders
+          nothing at all and the page below moves up. No collapse control. */}
+
     </div>
 
     {/* The live board EXTENDS the hero downward. It tracks the active slide and
