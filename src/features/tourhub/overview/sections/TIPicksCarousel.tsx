@@ -371,7 +371,7 @@ function PickScrimBand({
   const [idx, setIdx] = useState(0);
   const src = idx < candidates.length ? candidates[idx] : null;
   return (
-    <div style={{ position: 'relative', minHeight, padding, overflow: 'hidden' }}>
+    <div style={{ position: 'relative', minHeight, padding, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.10)' }} />
       {src ? (
         <img
