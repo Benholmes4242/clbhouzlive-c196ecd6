@@ -310,6 +310,32 @@ const ThreadV2Page: React.FC = () => {
     [messages, actor],
   );
 
+  // §4 / §4.2 the shared ground, from the RPC the compare sheet already uses.
+  const { user } = useSupabaseSession();
+  const isDirect = (detail?.type ?? conv?.type) === 'direct';
+  const rivalUserId = useMemo(() => {
+    if (!isDirect) return null;
+    const members = (detail?.members ?? []) as ConversationMember[];
+    const other =
+      members.find(
+        (m) => !(m.actor_type === actor?.actorType && m.actor_id === actor?.actorId),
+      ) ?? null;
+    if (other) return other.actor_type === 'personal' ? other.actor_id : null;
+    const p = (conv?.participants ?? []).find(
+      (x) => !(x.actor_type === actor?.actorType && x.actor_id === actor?.actorId),
+    );
+    return p?.actor_type === 'personal' ? p.actor_id : null;
+  }, [isDirect, detail, conv, actor]);
+
+  const { ground } = useSharedGroundOne(user?.id, rivalUserId);
+  const rivalFirstName = (header.name ?? '').trim().split(/\s+/)[0] || header.name;
+
+  // §2.6 the photograph: the course you last played together, else the member's
+  // most played course, else nothing at all.
+  const stage = useMessagesStagePhoto(ground.lastCourseName);
+  const [photoIn, setPhotoIn] = useState(false);
+
+
   return (
     <div
       className="messages-root flex flex-col"
