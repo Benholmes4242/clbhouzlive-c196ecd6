@@ -14,10 +14,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, PencilLine, Search, X, MessageCircle } from 'lucide-react';
+import { ChevronLeft, PencilLine, Search, X } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
+import InboxEmptyState from './InboxEmptyState';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSharedGroundBatch } from '@/hooks/messaging/useSharedGround';
@@ -70,6 +71,7 @@ const InboxV2Page: React.FC = () => {
   );
 
   const showSearch = speakable.length >= SEARCH_THRESHOLD;
+  const isEmptyInbox = hasActor && !isLoading && !error && speakable.length === 0 && !query.trim();
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -230,12 +232,18 @@ const InboxV2Page: React.FC = () => {
         </header>
 
         {/* ── The list ───────────────────────────────────────────────────── */}
+        {/* §3.2 when the inbox is empty the region does not scroll and carries
+            no bottom padding: the empty state owns the full height so its
+            action can pin to the foot with no dead black beneath it. */}
         <div
-          className="flex-1 overflow-y-auto"
+          className={isEmptyInbox ? 'flex-1' : 'flex-1 overflow-y-auto'}
           style={{
             WebkitOverflowScrolling: 'touch',
             background: MSG.BLACK,
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)',
+            minHeight: 0,
+            paddingBottom: isEmptyInbox
+              ? 0
+              : 'calc(env(safe-area-inset-bottom, 0px) + 32px)',
           }}
         >
           {!hasActor || isLoading ? (
@@ -267,45 +275,18 @@ const InboxV2Page: React.FC = () => {
                 {t('common:action.tryAgain')}
               </button>
             </div>
-          ) : visible.length === 0 ? (
+          ) : visible.length === 0 && query.trim() ? (
             <div
               className="flex flex-col items-center justify-center text-center"
-              style={{ padding: '72px 32px', gap: 16 }}
+              style={{ padding: '72px 32px' }}
             >
-              <MessageCircle size={26} color={MSG.INK_3} />
-              <div className="flex flex-col items-center" style={{ gap: 6 }}>
-                <p style={{ color: MSG.INK, fontSize: 19, fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>
-                  {query.trim()
-                    ? t('messaging:search.noResults')
-                    : t('messaging:empty.inboxTitle')}
-                </p>
-                {query.trim() ? null : (
-                  <p style={{ color: MSG.INK_3, fontSize: 14, lineHeight: 1.45, maxWidth: 250, margin: 0 }}>
-                    {t('messaging:empty.inboxBody')}
-                  </p>
-                )}
-              </div>
-              {query.trim() ? null : (
-                <button
-                  type="button"
-                  onClick={() => setComposeOpen(true)}
-                  className="ec-glass--pill active:opacity-70"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    color: MSG.INK,
-                    borderRadius: 999,
-                    padding: '11px 22px',
-                    fontSize: 13.5,
-                    fontWeight: 600,
-                  }}
-                >
-                  <PencilLine size={15} />
-                  {t('messaging:action.newMessage')}
-                </button>
-              )}
+              <p style={{ color: MSG.INK_2, fontSize: 14.5, fontWeight: 600, margin: 0 }}>
+                {t('messaging:search.noResults')}
+              </p>
             </div>
+          ) : visible.length === 0 ? (
+            /* ADDENDUM — THE EMPTY STATE IS THE COMPOSE LIST, INLINE. */
+            <InboxEmptyState onCompose={() => setComposeOpen(true)} />
           ) : (
             <div>
               {actor?.actorType === 'business' && !bannerDismissed && (

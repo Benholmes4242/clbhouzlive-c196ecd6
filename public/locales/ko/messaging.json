@@ -50,7 +50,16 @@
     "threadStartGroup": "This is the start of {{name}}.",
     "threadStartGroupGeneric": "This is the start of this group.",
     "threadStartWith": "This is the start of your conversation with {{name}}.",
-    "threadCommonGround": "회원님과 {{name}}님은 함께 {{count}}라운드를 플레이했습니다. 가장 최근은 {{course}}입니다."
+    "threadCommonGround": "회원님과 {{name}}님은 함께 {{count}}라운드를 플레이했습니다. 가장 최근은 {{course}}입니다.",
+    "startTitle": "아직 아무것도 없습니다",
+    "startPlayed": "함께 플레이한 골퍼부터 시작하세요.",
+    "startCircle": "내 서클의 골퍼부터 시작하세요.",
+    "inCircle": "내 서클",
+    "messageSomeoneElse": "다른 사람에게 메시지",
+    "messageSomeone": "메시지 보내기",
+    "bareTitle": "아직 대화가 없습니다",
+    "bareBody": "골퍼를 팔로우하면 여기에서 대화가 시작됩니다.",
+    "bareUnresolvedBody": "골퍼, 클럽 또는 비즈니스를 검색해 대화를 시작하세요."
   },
   "error": {
     "couldntLoadInbox": "Couldn't load messages",
