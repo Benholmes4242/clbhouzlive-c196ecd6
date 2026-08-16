@@ -50,61 +50,49 @@ function renderBody(text: string, actorName: string | null | undefined): React.R
   );
 }
 
-const AvatarSquircle: React.FC<{
-  url?: string | null;
-  name?: string | null;
-  size?: number;
-}> = ({ url, name, size = 40 }) => (
-  <div
-    style={{
-      width: size,
-      height: size,
-      borderRadius: '34%',
-      background: url ? `url(${url}) center/cover` : 'linear-gradient(135deg,#F7931E,#C97A10)',
-      border: `1px solid ${T.HAIR}`,
-      color: '#fff',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: size * 0.36,
-      fontWeight: 700,
-      flexShrink: 0,
-    }}
-  >
-    {!url && initialsOf(name)}
-  </div>
-);
-
-const StackedLikers: React.FC<{ urls: string[]; actorUrl?: string | null; actorName?: string | null }> = ({
-  urls,
-  actorUrl,
-  actorName,
-}) => {
+/**
+ * Stacked likers. The liker payload is URLS ONLY (`liker_avatar_urls`) — no ids
+ * or names — so a liker avatar can only ever be a PHOTO here. When the list is
+ * empty we fall back to the actor, and only then do we pass actor identity, so
+ * the initials can never belong to somebody other than the face they replace.
+ */
+const StackedLikers: React.FC<{
+  urls: string[];
+  actorUrl?: string | null;
+  actorName?: string | null;
+  actorUserId?: string | null;
+}> = ({ urls, actorUrl, actorName, actorUserId }) => {
   const list = urls.filter(Boolean).slice(0, 2);
+  const frontIsLiker = !!list[0];
   const front = list[0] ?? actorUrl ?? null;
   const back = list[1] ?? null;
   return (
     <div style={{ position: 'relative', width: 46, height: 40, flexShrink: 0 }}>
       {back && (
-        <div
-          style={{
-            position: 'absolute',
-            left: 12,
-            top: 3,
-            width: 34,
-            height: 34,
-            borderRadius: '34%',
-            background: `url(${back}) center/cover, #F1F5F9`,
-            border: '2px solid #F8FAFC',
-          }}
-        />
+        <div style={{ position: 'absolute', left: 12, top: 3 }}>
+          <SquircleAvatar
+            size={34}
+            src={back}
+            alt=""
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
+          />
+        </div>
       )}
       <div style={{ position: 'absolute', left: 0, top: 6 }}>
-        <AvatarSquircle url={front} name={actorName} size={34} />
+        <SquircleAvatar
+          size={34}
+          src={front}
+          alt={frontIsLiker ? '' : (actorName ?? '')}
+          userId={frontIsLiker ? null : actorUserId}
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
+        />
       </div>
     </div>
   );
 };
+
 
 const IconTile: React.FC<{ spec: NonNullable<KindSpec['tile']> }> = ({ spec }) => {
   const Icon = spec.icon;
