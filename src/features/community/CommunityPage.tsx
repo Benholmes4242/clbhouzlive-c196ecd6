@@ -110,7 +110,16 @@ export default function CommunityPage() {
   // unfiltered pool when the filtered pool has nothing inside 30 days.
   const lead = useMemo(() => featuredMoment(pool), [pool]);
 
-  // READ-ONLY viewer, exactly as Discover opens moments. The QUEUE IS WHAT THE
+  // NOTHING APPEARS TWICE: the lead is spent, so the grid beneath it never
+  // repeats it. Keyed on the moment key, not on position — the lead is now a
+  // video pick from anywhere in the ranked pool, not always the first item.
+  const gridMoments = useMemo(
+    () => (lead ? pool.filter((m) => m.key !== lead.key) : pool),
+    [pool, lead],
+  );
+
+  // The viewer opens with its full action rail, exactly as Discover does:
+  // this is a social browse surface. The QUEUE IS WHAT THE
   // MEMBER CAN SEE: under a filter it carries only filtered moments.
   const posts = useMemo(() => {
     const seen = new Set<string>();
@@ -139,7 +148,6 @@ export default function CommunityPage() {
         mediaIndex: m.mediaIndex ?? 0,
         mediaId: m.mediaId ?? null,
         openedFrom: 'community-page',
-        options: { readOnly: true },
       });
     },
     [posts],
@@ -268,7 +276,7 @@ export default function CommunityPage() {
             />
 
             <h2 style={HEADING_STYLE}>{t('community.everything', 'Everything')}</h2>
-            <CommunityEverythingGrid moments={pool} onTilePress={handleTile} />
+            <CommunityEverythingGrid moments={gridMoments} onTilePress={handleTile} />
           </>
         )}
       </main>

@@ -151,9 +151,17 @@ export function useCommunityRails({
  * (possibly filtered) pool is inside the window the lead is ABSENT — an older
  * moment dressed as the lead, or one from outside the active filter, would be a
  * lie about what the member is looking at.
+ *
+ * VIDEO LEADS. The lead is the BEST VIDEO inside the window, not the newest:
+ * this is a FILTER over the existing rank order, never a re-rank. When the
+ * in-window pool holds no video at all the lead falls back to the strongest
+ * moment whatever its type — a still hero beats no hero, and an empty block
+ * would be a claim about the data rather than a design choice.
  */
 export function featuredMoment(moments: Moment[]): Moment | null {
   if (moments.length === 0) return null;
   const since = Date.now() - FEATURED_WINDOW_DAYS * DAY;
-  return moments.find((m) => new Date(m.post.createdAt).getTime() >= since) ?? null;
+  const recent = moments.filter((m) => new Date(m.post.createdAt).getTime() >= since);
+  if (recent.length === 0) return null;
+  return recent.find((m) => m.mediaType === 'video') ?? recent[0];
 }
