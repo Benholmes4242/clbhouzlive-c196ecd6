@@ -11,6 +11,7 @@
 
 import React from 'react';
 import { EC, T } from '../tokens';
+import { parseEchoMarkdown, type Span } from '../lib/echoMarkdown';
 import { EchoWaveform } from './EchoWaveform';
 
 export const Asked: React.FC<{ q: string }> = ({ q }) => (
