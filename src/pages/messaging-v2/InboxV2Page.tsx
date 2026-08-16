@@ -14,10 +14,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, PencilLine, Search, X, MessageCircle } from 'lucide-react';
+import { ChevronLeft, PencilLine, Search, X } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
 import NewConversationSheet from './NewConversationSheet';
+import InboxEmptyState from './InboxEmptyState';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSharedGroundBatch } from '@/hooks/messaging/useSharedGround';
