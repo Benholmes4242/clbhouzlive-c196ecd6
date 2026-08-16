@@ -926,7 +926,7 @@ function VerdictBanner({
       <BannerRow
         left={v.label ?? ''}
         leftColor={GREEN_TX}
-        right={`${v.label}${v.score != null ? ` · ${v.score}` : ''}`}
+        right={v.score != null ? String(v.score) : ''}
         rightColor={GREEN_TX}
         background={GREEN_BG}
       />
@@ -936,12 +936,13 @@ function VerdictBanner({
     <BannerRow
       left={v.kind === 'mc' ? (v.label ?? 'MC') : (v.label ?? '')}
       leftColor={RED_TX}
-      right={v.kind === 'mc' ? (v.label ?? 'MC') : `${v.label}${v.score != null ? ` · ${v.score}` : ''}`}
+      right={v.kind === 'mc' ? '' : v.score != null ? String(v.score) : ''}
       rightColor={RED_TX}
       background={RED_BG}
     />
   );
 }
+
 
 
 function BannerRow({
