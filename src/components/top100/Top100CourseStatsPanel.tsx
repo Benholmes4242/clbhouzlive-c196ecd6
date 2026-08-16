@@ -155,63 +155,90 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, 
   if (!hasRating) return null;
 
   /**
-   * The stat row.
+   * THE STAT ROW — ONE BASELINE (BRIEF_COURSE_META_CONDENSE §2).
    *
-   * AVG TO PAR rounds FIRST, then branches, so a fractional under-par average
-   * never renders "-0.0" and level reads "E".
+   * Rating (with its sample size inline), a hairline, average to par, and the
+   * difficulty phrase right-aligned. Omission rules unchanged: the percentile
+   * disappears at the middle band, avg-to-par disappears when toParParts
+   * returns null, and the line rebalances with NO placeholder dashes.
    *
-   * The percentile inverts below par - a course playing under par reads
-   * EASIER THAN (100 - pct). At level par (the middle band) the cell is omitted
-   * entirely: a midpoint percentile says nothing. Null cells are omitted and
-   * the row rebalances. No placeholder dashes.
+   * AVG TO PAR still rounds first then branches (toParParts), so a fractional
+   * under-par average never renders "-0.0" and level reads "E".
    */
-  const buildItems = (): StatItem[] => {
-    const items: StatItem[] = [
-      {
-        label: t('top100.stats.ratingLabel'),
-        value: rating.toFixed(1),
-        tone: bandColor(rating),
-        sub: t('top100.stats.fromRatings', { count: ratingCount }),
-      },
-    ];
+  const toPar = toParParts(avgOverPar);
 
-    const toPar = toParParts(avgOverPar);
-    if (toPar) {
-      items.push({
-        label: t('top100.stats.avgToParLabel'),
-        value: toPar.text,
-        tone: toPar.tone,
-      });
+  let difficulty: { label: string; pct: number } | null = null;
+  if (harderPct != null) {
+    const pct = Math.round(harderPct);
+    const band: 'hard' | 'middle' | 'easy' =
+      pct >= bandHigh ? 'hard' : pct <= bandLow ? 'easy' : 'middle';
+    if (band !== 'middle') {
+      difficulty = {
+        label:
+          band === 'hard'
+            ? t('top100.stats.harderThanLabel')
+            : t('top100.stats.easierThanLabel'),
+        pct: band === 'hard' ? pct : 100 - pct,
+      };
     }
+  }
 
-    if (harderPct != null) {
-      const pct = Math.round(harderPct);
-      const band: 'hard' | 'middle' | 'easy' =
-        pct >= bandHigh ? 'hard' : pct <= bandLow ? 'easy' : 'middle';
-      if (band !== 'middle') {
-        items.push({
-          label:
-            band === 'hard'
-              ? t('top100.stats.harderThanLabel')
-              : t('top100.stats.easierThanLabel'),
-          value: `${band === 'hard' ? pct : 100 - pct}%`,
-          tone: A.INK,
-          sub: t('top100.stats.ofCourses'),
-        });
-      }
-    }
-
-    return items;
+  const microLabel: React.CSSProperties = {
+    ...LABEL,
+    fontSize: 8,
+    whiteSpace: 'nowrap',
   };
 
   return (
     <div style={{ paddingTop: 4 }}>
-      <header style={{ marginBottom: 10 }}>
-        {shortName ? <span style={headingStyle}>{shortName}</span> : null}
-      </header>
+      <div
+        ref={difficultyRef}
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 8,
+          minWidth: 0,
+        }}
+      >
+        {/* Rating — the figure carries its band colour and its sample size. */}
+        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, minWidth: 0 }}>
+          <span style={{ ...NUM, fontSize: 22, lineHeight: 1, color: bandColor(rating) }}>
+            {rating.toFixed(1)}
+          </span>
+          <span style={microLabel}>{t('top100.stats.fromRatings', { count: ratingCount })}</span>
+        </span>
 
-      <div ref={difficultyRef}>
-        <StatRow items={buildItems()} />
+        {toPar && (
+          <>
+            <span
+              aria-hidden
+              style={{ width: 1, alignSelf: 'stretch', background: A.HAIRLINE, flexShrink: 0 }}
+            />
+            <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, minWidth: 0 }}>
+              <span style={{ ...NUM, fontSize: 22, lineHeight: 1, color: toPar.tone }}>
+                {toPar.text}
+              </span>
+              <span style={microLabel}>{t('top100.stats.avgToParLabel')}</span>
+            </span>
+          </>
+        )}
+
+        {difficulty && (
+          <span
+            style={{
+              marginLeft: 'auto',
+              ...CAPTION,
+              textAlign: 'right',
+              lineHeight: 1.25,
+            }}
+          >
+            {difficulty.label}{' '}
+            <span style={{ ...NUM, fontSize: 11.5, fontWeight: 700, color: A.INK }}>
+              {difficulty.pct}%
+            </span>{' '}
+            {t('top100.stats.ofCourses')}
+          </span>
+        )}
       </div>
 
       {showNoRounds && (
@@ -222,38 +249,30 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, 
             fontWeight: 500,
             color: NO_ROUNDS_INK,
             lineHeight: 1.3,
-            marginTop: 10,
-            textAlign: 'center',
+            marginTop: 8,
           }}
         >
-          <div>{t('top100.stats.noRoundsTitle')}</div>
-          <div>{t('top100.stats.noRoundsCta')}</div>
+          {t('top100.stats.noRoundsTitle')} {t('top100.stats.noRoundsCta')}
         </div>
       )}
 
+      {/*
+        ONE ROW OF FOUR (§3). The observer div carries no height of its own, so a
+        course below the ratings gate leaves NO reserved space here.
+      */}
       <div ref={barsRef}>
         {showBars && subs && (
-          <div
-            style={{
-              marginTop: 16,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 6,
-            }}
-          >
-            <div style={{ display: 'flex', gap: 16 }}>
-              <SubScoreBar label={t('top100.stats.design')} score={subs.design as number} />
-              <SubScoreBar label={t('top100.stats.condition')} score={subs.condition as number} />
-            </div>
-            <div style={{ display: 'flex', gap: 16 }}>
-              <SubScoreBar label={t('top100.stats.facilities')} score={subs.facilities as number} />
-              <SubScoreBar label={t('top100.stats.clubhouse')} score={subs.clubhouse as number} />
-            </div>
+          <div style={{ marginTop: 10, display: 'flex', gap: 10 }}>
+            <SubScoreStack label={t('top100.stats.design')} score={subs.design as number} />
+            <SubScoreStack label={t('top100.stats.condition')} score={subs.condition as number} />
+            <SubScoreStack label={t('top100.stats.facilities')} score={subs.facilities as number} />
+            <SubScoreStack label={t('top100.stats.clubhouse')} score={subs.clubhouse as number} />
           </div>
         )}
       </div>
     </div>
   );
 };
+
 
 export default Top100CourseStatsPanel;
