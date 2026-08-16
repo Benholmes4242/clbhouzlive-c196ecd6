@@ -62,11 +62,11 @@ export function useMessagesStagePhoto(
 
   return useMemo(
     () => ({
-      imageUrl: card?.thumbnail_image ?? null,
+      imageUrl: card?.thumbnailImage ?? null,
       courseId: chosen?.course_id ?? null,
       courseName: chosen?.course_name ?? null,
       hasAnyRounds: rows.length > 0,
     }),
-    [card?.thumbnail_image, chosen?.course_id, chosen?.course_name, rows.length],
+    [card?.thumbnailImage, chosen?.course_id, chosen?.course_name, rows.length],
   );
 }
