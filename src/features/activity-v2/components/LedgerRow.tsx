@@ -15,6 +15,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { FIGURE } from '@/lib/tokens/type';
 import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
+import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSharePromptFor, type SharePromptCandidate } from '../hooks/useSharePrompt';
@@ -32,11 +33,6 @@ interface Props {
   onLongPress: (row: ActivityFeedRowV2) => void;
 }
 
-function initialsOf(name?: string | null): string {
-  if (!name) return '?';
-  const p = name.trim().split(/\s+/);
-  return ((p[0]?.[0] ?? '') + (p[1]?.[0] ?? '')).toUpperCase() || '?';
-}
 
 /** Bold the leading actor_display_name in a raw body string (prefix match). */
 function renderBody(text: string, actorName: string | null | undefined): React.ReactNode {
@@ -50,61 +46,49 @@ function renderBody(text: string, actorName: string | null | undefined): React.R
   );
 }
 
-const AvatarSquircle: React.FC<{
-  url?: string | null;
-  name?: string | null;
-  size?: number;
-}> = ({ url, name, size = 40 }) => (
-  <div
-    style={{
-      width: size,
-      height: size,
-      borderRadius: '34%',
-      background: url ? `url(${url}) center/cover` : 'linear-gradient(135deg,#F7931E,#C97A10)',
-      border: `1px solid ${T.HAIR}`,
-      color: '#fff',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: size * 0.36,
-      fontWeight: 700,
-      flexShrink: 0,
-    }}
-  >
-    {!url && initialsOf(name)}
-  </div>
-);
-
-const StackedLikers: React.FC<{ urls: string[]; actorUrl?: string | null; actorName?: string | null }> = ({
-  urls,
-  actorUrl,
-  actorName,
-}) => {
+/**
+ * Stacked likers. The liker payload is URLS ONLY (`liker_avatar_urls`) — no ids
+ * or names — so a liker avatar can only ever be a PHOTO here. When the list is
+ * empty we fall back to the actor, and only then do we pass actor identity, so
+ * the initials can never belong to somebody other than the face they replace.
+ */
+const StackedLikers: React.FC<{
+  urls: string[];
+  actorUrl?: string | null;
+  actorName?: string | null;
+  actorUserId?: string | null;
+}> = ({ urls, actorUrl, actorName, actorUserId }) => {
   const list = urls.filter(Boolean).slice(0, 2);
+  const frontIsLiker = !!list[0];
   const front = list[0] ?? actorUrl ?? null;
   const back = list[1] ?? null;
   return (
     <div style={{ position: 'relative', width: 46, height: 40, flexShrink: 0 }}>
       {back && (
-        <div
-          style={{
-            position: 'absolute',
-            left: 12,
-            top: 3,
-            width: 34,
-            height: 34,
-            borderRadius: '34%',
-            background: `url(${back}) center/cover, #F1F5F9`,
-            border: '2px solid #F8FAFC',
-          }}
-        />
+        <div style={{ position: 'absolute', left: 12, top: 3 }}>
+          <SquircleAvatar
+            size={34}
+            src={back}
+            alt=""
+            hairlineRing
+            ringColor={LIGHT_HAIRLINE}
+          />
+        </div>
       )}
       <div style={{ position: 'absolute', left: 0, top: 6 }}>
-        <AvatarSquircle url={front} name={actorName} size={34} />
+        <SquircleAvatar
+          size={34}
+          src={front}
+          alt={frontIsLiker ? '' : (actorName ?? '')}
+          userId={frontIsLiker ? null : actorUserId}
+          hairlineRing
+          ringColor={LIGHT_HAIRLINE}
+        />
       </div>
     </div>
   );
 };
+
 
 const IconTile: React.FC<{ spec: NonNullable<KindSpec['tile']> }> = ({ spec }) => {
   const Icon = spec.icon;
@@ -311,10 +295,27 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
     leftVisual = <IconTile spec={spec.tile} />;
   } else if (spec.left === 'stacked_likers') {
     const urls = Array.isArray(row.liker_avatar_urls) ? (row.liker_avatar_urls as string[]) : [];
-    leftVisual = <StackedLikers urls={urls} actorUrl={row.actor_avatar_url} actorName={row.actor_display_name} />;
+    leftVisual = (
+      <StackedLikers
+        urls={urls}
+        actorUrl={row.actor_avatar_url}
+        actorName={row.actor_display_name}
+        actorUserId={row.actor_user_id}
+      />
+    );
   } else {
-    leftVisual = <AvatarSquircle url={row.actor_avatar_url} name={row.actor_display_name} />;
+    leftVisual = (
+      <SquircleAvatar
+        size={40}
+        src={row.actor_avatar_url}
+        alt={row.actor_display_name ?? ''}
+        userId={row.actor_user_id}
+        hairlineRing
+        ringColor={LIGHT_HAIRLINE}
+      />
+    );
   }
+
 
   // ------- Right element -------
   let rightEl: React.ReactNode = null;
