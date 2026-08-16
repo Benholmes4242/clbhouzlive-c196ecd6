@@ -516,6 +516,8 @@ async function* streamPerplexity(
     "Always verify facts with fresh sources for schedules, rankings, results, and player status.",
     `Include "As of ${todayIso}" for time-sensitive information.`,
     "Be concise, structured, and provide specific dates/venues when discussing events.",
+    // §3 the live route streams straight to the member, so it carries the rule too.
+    OPENING_RULE,
   ].join(" ");
 
   // Ensure history ends on an assistant turn so we don't send consecutive users.
