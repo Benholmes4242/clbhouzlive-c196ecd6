@@ -35,16 +35,6 @@ const seenSubscores = new Set<string>();
 const seenNoRounds = new Set<string>();
 const seenDifficulty = new Set<string>();
 
-const headingStyle: React.CSSProperties = {
-  ...KICKER,
-  lineHeight: 1,
-  flex: 1,
-  minWidth: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-};
-
 interface Props {
   courseId: string;
   /** Names the card this block belongs to. Null → the quiet label renders alone. */
@@ -62,8 +52,6 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, 
   const barsRef = useRef<HTMLDivElement | null>(null);
   const difficultyRef = useRef<HTMLDivElement | null>(null);
   const noRoundsRef = useRef<HTMLDivElement | null>(null);
-
-  const shortName = courseName ? shortCourseName(courseName) : '';
 
   const rating = data?.rating ?? null;
   const ratingCount = data?.ratingCount ?? 0;
