@@ -13,7 +13,8 @@
  *   5. Insight line    — labelled editorial line (AI course insight / winner narrative)
  *   6. State pill      — LIVE · FINAL · UPCOMING (with round/countdown)
  *
- * The dots row (rendered by OverviewHero) sits above the wire ticker below.
+ * The lower-third stack now sits directly above the wire ticker; the removed
+ * dots row freed the gap, so the title, venue, and moment chip move down.
  */
 
 import React from 'react';
