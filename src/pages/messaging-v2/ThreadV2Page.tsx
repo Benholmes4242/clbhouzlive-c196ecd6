@@ -329,8 +329,9 @@ const ThreadV2Page: React.FC = () => {
   const { ground } = useSharedGroundOne(user?.id, rivalUserId);
   const rivalFirstName = (header.name ?? '').trim().split(/\s+/)[0] || header.name;
 
-  // §2.6 the photograph: the course you last played together, else the member's
-  // most played course, else nothing at all.
+  // §2.2 THE PHOTOGRAPH IS THE SHARED COURSE OR IT IS ABSENT. The fallback to
+  // the member's own most-played course is WITHDRAWN (BRIEF_MESSAGES_DARK §2.3):
+  // a thread with no shared golf gets the plain dark header.
   const stage = useMessagesStagePhoto(ground.lastCourseName);
   const [photoIn, setPhotoIn] = useState(false);
 
@@ -344,8 +345,9 @@ const ThreadV2Page: React.FC = () => {
         width: '100%',
       }}
     >
-      {/* §4 HEADER: photograph, avatar, name, and the golf you have played
-          together. The scrim carries legibility — never a darker glass (§3.2). */}
+      {/* §5 HEADER: the SHARED course photograph where one exists, avatar, name,
+          and the golf you have played together. The scrim only exists to carry
+          legibility over a photograph, so it renders only with one. */}
       <header
         style={{
           position: 'relative',
@@ -364,7 +366,7 @@ const ThreadV2Page: React.FC = () => {
             draggable={false}
           />
         ) : null}
-        <div className="msg-scrim" aria-hidden />
+        {stage.imageUrl ? <div className="msg-scrim" aria-hidden /> : null}
 
         <div style={{ position: 'relative' }}>
           <div
