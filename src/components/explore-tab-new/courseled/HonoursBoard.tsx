@@ -345,6 +345,7 @@ function LeaderFeatRow({
   return (
     <button
       type="button"
+      disabled={!tappable}
       onClick={tappable ? () => onPress?.(e) : undefined}
       style={{
         display: 'block',
@@ -355,9 +356,12 @@ function LeaderFeatRow({
         padding: '7px 0 0',
         borderTop: `1px solid ${GOLD_HAIR}`,
         cursor: tappable ? 'pointer' : 'default',
+        // A row with no score cannot open — render it visibly inert.
+        opacity: tappable ? 1 : 0.62,
         fontFamily: SANS,
       }}
     >
+
       <span
         style={{
           fontSize: 11.5,
