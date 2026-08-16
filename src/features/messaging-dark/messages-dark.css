@@ -98,3 +98,37 @@
     transition: none;
   }
 }
+
+/* Full-height dark canvas. The near-black is a SOLID value (§3.3): no faded
+   colour, no gradient over the list. */
+.messages-root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.msg-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: #F5F7F8;
+  caret-color: #F7931E;
+}
+.msg-input::placeholder { color: #7C8489; }
+
+/* Bubbles. A one-word message is a BUBBLE, not a disc (§5 of the audit, §4.3):
+   a floor on width and a radius that cannot round into a circle. */
+.msg-bubble {
+  position: relative;
+  min-width: 58px;
+  max-width: 78%;
+  padding: 8px 12px 8px;
+  border-radius: 16px;
+  overflow-wrap: anywhere;
+}
+.msg-bubble--mine { border-bottom-right-radius: 6px; }
+.msg-bubble--theirs { border-bottom-left-radius: 6px; }
