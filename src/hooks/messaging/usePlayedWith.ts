@@ -57,7 +57,7 @@ async function fetchPlayedWith(userId: string): Promise<PlayedWithMember[]> {
 
   const { data: profiles, error: profErr } = await supabase
     .from('user_profiles')
-    .select('id, display_name, username, avatar_url, verified')
+    .select('id, display_name, username, profile_photo_url, is_verified_golfer')
     .in('id', partnerIds);
   if (profErr) throw profErr;
 
@@ -67,8 +67,8 @@ async function fetchPlayedWith(userId: string): Promise<PlayedWithMember[]> {
       {
         name: (p.display_name as string) || (p.username as string) || 'Golfer',
         username: (p.username as string) ?? null,
-        avatarUrl: (p.avatar_url as string) ?? null,
-        verified: !!p.verified,
+        avatarUrl: (p.profile_photo_url as string) ?? null,
+        verified: !!p.is_verified_golfer,
       },
     ]),
   );

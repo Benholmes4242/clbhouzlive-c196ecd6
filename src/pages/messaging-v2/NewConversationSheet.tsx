@@ -14,6 +14,8 @@ import {
   type BusinessResult,
 } from '@/features/search-v2/hooks/useEntityPickerSearch';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
+import { usePlayedWith } from '@/hooks/messaging/usePlayedWith';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { canActorMessage } from '@/hooks/messaging/canActorMessage';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
@@ -46,6 +48,11 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
   const [selected, setSelected] = useState<Candidate[]>([]);
   const [title, setTitle] = useState('');
   const [busy, setBusy] = useState(false);
+
+  // §5 the sheet opens on golfers you have played with, so it must know who
+  // they are before the member types anything.
+  const { user } = useSupabaseSession();
+  const playedWith = usePlayedWith(user?.id, open);
 
   const { people, businesses, isLoading } = useEntityPickerSearch({
     query: debounced,
@@ -215,7 +222,6 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t('search.people')}
-            autoFocus
             style={{
               width: '100%',
               padding: '12px 14px',
