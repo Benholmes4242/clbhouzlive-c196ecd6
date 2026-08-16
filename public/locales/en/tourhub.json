@@ -341,7 +341,10 @@
         "worldRankTile": "WORLD",
         "winsTile": "WINS",
         "top10sTile": "TOP 10s",
-        "sgTotalTile": "SG TOTAL"
+        "sgTotalTile": "SG TOTAL",
+        "wonIt": "WON IT",
+        "mostRecentRight": "OLDEST → MOST RECENT",
+        "whyWePicked": "WHY WE PICKED HIM"
       },
       "sheet": {
         "picksHeader": "{{count}} PICKS · TAP FOR THE CASE",
