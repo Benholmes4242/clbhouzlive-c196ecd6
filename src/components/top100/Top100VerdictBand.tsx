@@ -66,7 +66,11 @@ export interface VerdictRatingRank {
 
 interface Props {
   courseId: string;
-  courseName: string;
+  /**
+   * Kept so the parent can still suppress the band when the name lookup misses;
+   * the condensed copy names no course (BRIEF_COURSE_META_CONDENSE §5.5).
+   */
+  courseName?: string;
   verdict: Verdict;
   /** Standing within the rated pool of the selected list, when known. */
   ratingRank?: VerdictRatingRank | null;
@@ -78,7 +82,6 @@ interface Props {
 
 export const Top100VerdictBand: React.FC<Props> = ({
   courseId,
-  courseName,
   verdict,
   ratingRank,
   list,
@@ -135,7 +138,6 @@ export const Top100VerdictBand: React.FC<Props> = ({
   }, [courseId, list, ratingRank, verdict.rank]);
 
   const ink = higher ? GREEN_INK : RED_INK;
-  const line2Ink = higher ? '#63A883' : '#C87C72';
   const Trend = higher ? TrendingUp : TrendingDown;
 
   return (
