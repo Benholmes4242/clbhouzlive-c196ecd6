@@ -619,19 +619,29 @@ function DarkScoreBlock({ live }: { live: PickLiveState }) {
 }
 
 
-function CourseFitLine({ score, t }: { score: number | null | undefined; t: TFunction }) {
+function CourseFitLine({
+  score,
+  t,
+  tone = 'light',
+}: {
+  score: number | null | undefined;
+  t: TFunction;
+  tone?: 'light' | 'dark';
+}) {
   if (score == null) return <div style={{ height: 16 }} />;
   return (
     <div
       style={{
         fontSize: 10,
         fontWeight: 700,
-        color: INK_45,
+        color: tone === 'dark' ? 'rgba(255,255,255,0.72)' : INK_45,
         letterSpacing: '0.08em',
         textTransform: 'uppercase',
         fontVariantNumeric: 'tabular-nums',
+        flexShrink: 0,
       }}
     >
+
       {t('overview.tiPicks.card.courseFit', { score: Math.round(score) })
         .split(String(Math.round(score)))
         .map((part, i, arr) =>
