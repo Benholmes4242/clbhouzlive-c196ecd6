@@ -840,7 +840,8 @@ function CaseSheet({
       {/* Last 5 starts */}
       <Last5Block loading={resultsLoading} results={results ?? []} t={t} />
 
-      {/* CTA */}
+      {/* CTA — OUTLINED, not filled. Reading the case is the purpose of this
+          sheet; tapping through to the profile is the exit, not the headline. */}
       <button
         onClick={() => onNavigatePlayer(pick.playerId)}
         style={{
@@ -848,17 +849,19 @@ function CaseSheet({
           width: '100%',
           padding: '13px 0',
           borderRadius: 14,
-          background: INK,
-          color: '#FFFFFF',
-          fontSize: 13.5,
+          background: 'transparent',
+          color: INK,
+          fontSize: 11.5,
           fontWeight: 700,
-          letterSpacing: 0.3,
-          border: 'none',
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          border: `1px solid ${HAIR}`,
           cursor: 'pointer',
         }}
       >
         {t('overview.tiPicks.case.viewPlayer')}
       </button>
+
     </SheetShell>
   );
 }
