@@ -6,9 +6,10 @@
  * at the top of the tab already carries that ask, and ninety-odd identical
  * prompts drown the courses that actually hold data.
  *
- * Row one is a centred three-up: rating (band-coloured), average to par and the
- * difficulty percentile. The four rating sub-scores that already live in course_rating_aggregates
- * follow as 2x2 bars, gated behind t100_subscore_min_ratings (default 3) so a
+ * Row one is ONE BASELINE: rating (band-coloured, with its sample size inline),
+ * average to par, and the difficulty phrase right-aligned. The four rating
+ * sub-scores that already live in course_rating_aggregates follow as ONE ROW OF
+ * FOUR quarter-width columns, gated behind t100_subscore_min_ratings (default 3) so a
  * single member's afternoon is never presented as analysis.
  *
  * This component NEVER fetches course data — everything arrives batched from
@@ -37,15 +38,19 @@ const seenDifficulty = new Set<string>();
 
 interface Props {
   courseId: string;
-  /** Names the card this block belongs to. Null → the quiet label renders alone. */
+  /**
+   * Accepted for callsite compatibility but NO LONGER RENDERED: the short name
+   * repeated the photo caption above it (BRIEF_COURSE_META_CONDENSE §1.1).
+   */
   courseName?: string | null;
   rank: number | null;
   list: string;
   data: Top100Enrichment | undefined;
-  onRate: () => void;
+  /** Retained for callsite compatibility; the condensed row carries no CTA. */
+  onRate?: () => void;
 }
 
-export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, courseName, rank, list, data, onRate }) => {
+export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, data }) => {
 
   const { t } = useTranslation('courses');
   const { subscoreMinRatings, bandLow, bandHigh } = useTop100Config();
