@@ -14,6 +14,8 @@ import {
   type BusinessResult,
 } from '@/features/search-v2/hooks/useEntityPickerSearch';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
+import { usePlayedWith } from '@/hooks/messaging/usePlayedWith';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { canActorMessage } from '@/hooks/messaging/canActorMessage';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
@@ -46,6 +48,11 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
   const [selected, setSelected] = useState<Candidate[]>([]);
   const [title, setTitle] = useState('');
   const [busy, setBusy] = useState(false);
+
+  // §5 the sheet opens on golfers you have played with, so it must know who
+  // they are before the member types anything.
+  const { user } = useSupabaseSession();
+  const playedWith = usePlayedWith(user?.id, open);
 
   const { people, businesses, isLoading } = useEntityPickerSearch({
     query: debounced,
@@ -215,7 +222,6 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t('search.people')}
-            autoFocus
             style={{
               width: '100%',
               padding: '12px 14px',
@@ -260,9 +266,110 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
           }}
         >
           {debounced.trim().length === 0 ? (
-            <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
-              {t('search.prompt')}
-            </div>
+            /* §5 NEW MESSAGE NO LONGER OPENS ONTO NOTHING. It opens on the
+               golfers you have actually played with, most shared rounds first. */
+            playedWith.isLoading ? (
+              <div style={{ padding: '8px 16px' }}>
+                {[0, 1, 2].map((i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0' }}>
+                    <Skeleton style={{ width: 44, height: 44, borderRadius: 16 }} />
+                    <Skeleton style={{ flex: 1, height: 12, borderRadius: 4 }} />
+                  </div>
+                ))}
+              </div>
+            ) : playedWith.members.length === 0 ? (
+              <div style={{ padding: '32px 16px', color: SUB, fontSize: 14, textAlign: 'center' }}>
+                {t('search.prompt')}
+              </div>
+            ) : (
+              <>
+                <div
+                  style={{
+                    padding: '12px 16px 6px',
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: SUB,
+                  }}
+                >
+                  {t('compose.playedWith', { defaultValue: 'Played with' })}
+                </div>
+                {playedWith.members.map((m) => {
+                  const candidate: Candidate = {
+                    actor_type: 'personal',
+                    actor_id: m.userId,
+                    name: m.name,
+                    avatar_url: m.avatarUrl,
+                    verified: m.verified,
+                  };
+                  const selectedRow = isSelected(candidate);
+                  return (
+                    <button
+                      key={m.userId}
+                      type="button"
+                      onClick={() => toggleSelect(candidate)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        width: '100%',
+                        padding: '12px 16px',
+                        background: 'transparent',
+                        border: 'none',
+                        borderBottom: `0.5px solid ${HAIRLINE}`,
+                        textAlign: 'left',
+                      }}
+                    >
+                      <SquircleAvatar
+                        src={m.avatarUrl ?? undefined}
+                        userId={m.userId}
+                        alt={m.name}
+                        size={44}
+                        hairlineRing
+                      />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div
+                          style={{
+                            color: INK,
+                            fontSize: 15,
+                            fontWeight: 500,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {m.name}
+                        </div>
+                        <div style={{ color: SUB, fontSize: 12, marginTop: 2 }}>
+                          {t('compose.roundsTogether', {
+                            count: m.sharedRounds,
+                            defaultValue: `${m.sharedRounds} rounds together`,
+                          })}
+                        </div>
+                      </div>
+                      <div
+                        aria-hidden
+                        style={{
+                          width: 22,
+                          height: 22,
+                          borderRadius: 999,
+                          border: `1.5px solid ${selectedRow ? INK : 'rgba(0,0,0,0.18)'}`,
+                          background: selectedRow ? INK : 'transparent',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#FFFFFF',
+                        }}
+                      >
+                        {selectedRow && <Check size={14} strokeWidth={2.5} />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </>
+            )
+
           ) : isLoading ? (
             <div style={{ padding: '8px 16px' }}>
               {[0, 1, 2].map((i) => (

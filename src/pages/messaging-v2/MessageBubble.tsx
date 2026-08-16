@@ -11,15 +11,21 @@ import { getSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import { FIGS } from '@/lib/tokens/type';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
 
-const INK = '#1F2428';
-const SUB = '#8A9099';
-const HINT = '#AEB4BC';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+/**
+ * BRIEF_MESSAGES_ECHO_PALETTE §4.4 — YOUR MESSAGES ARE AMBER, because amber is
+ * the viewing member everywhere on this palette. Theirs are glass over the dark
+ * surface. §3.3 no faded colour: three solid ink values, no alpha on text.
+ */
+const INK = '#F5F7F8';
+const SUB = '#A8AFB4';
+const HINT = '#7C8489';
+const HAIRLINE = 'rgba(255,255,255,0.10)';
 
-// Pure white so the incoming bubble edge holds against the contour canvas.
-const IN_BG = '#FFFFFF';
-const OUT_BG = '#15171F';
-const OUT_FG = '#F5F6F7';
+// Incoming: flat fill base (blur is an enhancement, applied via .ec-glass).
+const IN_BG = 'rgba(255,255,255,0.10)';
+const OUT_BG = '#F7931E';
+const OUT_FG = '#151007';
+
 
 interface Props {
   message: ThreadMessage;
@@ -100,9 +106,10 @@ export const MessageBubble: React.FC<Props> = ({
   const hugMedia = hasMedia && !hasBody && !message.reply_preview;
 
   const reply = message.reply_preview;
-  const replyRule = isOutgoing ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.25)';
-  const replyName = isOutgoing ? 'rgba(245,246,247,0.9)' : SUB;
-  const replySnippet = isOutgoing ? 'rgba(245,246,247,0.6)' : SUB;
+  const replyRule = isOutgoing ? 'rgba(21,16,7,0.38)' : 'rgba(255,255,255,0.28)';
+  const replyName = isOutgoing ? '#3A2C10' : SUB;
+  const replySnippet = isOutgoing ? '#5B4718' : HINT;
+
 
   const [showReport, setShowReport] = useState(false);
   const [viewer, setViewer] = useState<{ items: OrderedMediaItem[]; index: number } | null>(null);
@@ -151,13 +158,18 @@ export const MessageBubble: React.FC<Props> = ({
         </button>
       )}
       <div
+        className={!isOutgoing && !isDeleted && !hugMedia ? 'ec-glass' : undefined}
         style={{
           position: "relative",
           maxWidth: '78%',
+          /* §4.3 A ONE-WORD MESSAGE IS A BUBBLE, NOT A DISC. The floor plus the
+             fixed radius means "Hi" comes out as a short rounded rectangle. */
+          minWidth: isDeleted || hugMedia ? 0 : 58,
           background: isDeleted || hugMedia ? 'transparent' : bg,
           color: fg,
           borderRadius,
           padding: isDeleted ? '0' : hugMedia ? '0' : '8px 12px',
+
           border: isDeleted
             ? `0.5px dashed ${HAIRLINE}`
             : !isOutgoing && !hugMedia

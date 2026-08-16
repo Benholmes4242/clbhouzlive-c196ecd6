@@ -12,9 +12,7 @@ import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { MessageBubble } from './MessageBubble';
 import { Composer } from './Composer';
 import { ConversationSettingsSheet } from './ConversationSettingsSheet';
-import { Skeleton } from '@/components/ui/skeleton';
 import { FIGS } from '@/lib/tokens/type';
-import { ContourField } from '@/components/shared/ContourField';
 import type {
   ConversationDetail,
   ConversationMember,
@@ -22,14 +20,27 @@ import type {
   InboxParticipant,
   ThreadMessage,
 } from '@/types/messaging';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useSharedGroundOne } from '@/hooks/messaging/useSharedGround';
+import { useMessagesStagePhoto } from '@/hooks/messaging/useMessagesStagePhoto';
+import { SharedGroundStrip } from './SharedGroundStrip';
+import { MSG, MT } from '@/features/messaging-dark/tokens';
+import '@/features/messaging-dark/messages-dark.css';
 
 
-const CANVAS = '#F8FAFC';
-const INK = '#1F2428';
-const SUB = '#8A9099';
-const HINT = '#AEB4BC';
-const AMBER = '#F7931E';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+
+/**
+ * BRIEF_MESSAGES_ECHO_PALETTE §1 / §4 — the thread on Echo's palette.
+ * Near-black surface, course photograph behind the header, scrim for
+ * legibility, glass chrome, and AMBER reserved for the viewing member.
+ */
+const CANVAS = MSG.BLACK;
+const INK = MSG.INK;
+const SUB = MSG.INK_2;
+const HINT = MSG.INK_3;
+const AMBER = MSG.AMBER;
+const HAIRLINE = MSG.RULE;
+
 
 interface HeaderIdentity {
   name: string;
@@ -162,11 +173,12 @@ const SkeletonBubble: React.FC<{ side: 'left' | 'right'; w: number }> = ({ side,
     className="w-full flex"
     style={{ justifyContent: side === 'right' ? 'flex-end' : 'flex-start', marginTop: 10 }}
   >
-    <Skeleton
+    <div
       style={{
         width: `${w}%`,
         height: 34,
-        borderRadius: 18,
+        borderRadius: 16,
+        background: 'rgba(255,255,255,0.07)',
       }}
     />
   </div>
@@ -297,6 +309,32 @@ const ThreadV2Page: React.FC = () => {
     [messages, actor],
   );
 
+  // §4 / §4.2 the shared ground, from the RPC the compare sheet already uses.
+  const { user } = useSupabaseSession();
+  const isDirect = (detail?.type ?? conv?.type) === 'direct';
+  const rivalUserId = useMemo(() => {
+    if (!isDirect) return null;
+    const members = (detail?.members ?? []) as ConversationMember[];
+    const other =
+      members.find(
+        (m) => !(m.actor_type === actor?.actorType && m.actor_id === actor?.actorId),
+      ) ?? null;
+    if (other) return other.actor_type === 'personal' ? other.actor_id : null;
+    const p = (conv?.participants ?? []).find(
+      (x) => !(x.actor_type === actor?.actorType && x.actor_id === actor?.actorId),
+    );
+    return p?.actor_type === 'personal' ? p.actor_id : null;
+  }, [isDirect, detail, conv, actor]);
+
+  const { ground } = useSharedGroundOne(user?.id, rivalUserId);
+  const rivalFirstName = (header.name ?? '').trim().split(/\s+/)[0] || header.name;
+
+  // §2.6 the photograph: the course you last played together, else the member's
+  // most played course, else nothing at all.
+  const stage = useMessagesStagePhoto(ground.lastCourseName);
+  const [photoIn, setPhotoIn] = useState(false);
+
+
   return (
     <div
       className="messages-root flex flex-col"
@@ -306,94 +344,123 @@ const ThreadV2Page: React.FC = () => {
         width: '100%',
       }}
     >
+      {/* §4 HEADER: photograph, avatar, name, and the golf you have played
+          together. The scrim carries legibility — never a darker glass (§3.2). */}
       <header
         style={{
+          position: 'relative',
+          overflow: 'hidden',
           background: CANVAS,
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-          paddingBottom: 12,
-          paddingLeft: 6,
-          paddingRight: 6,
-          borderBottom: `0.5px solid ${HAIRLINE}`,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
           flexShrink: 0,
         }}
       >
-        <button
-          type="button"
-          aria-label={t('a11y.back')}
-          onClick={() => {
-            // Prefer real back so we don't push a duplicate /messages entry
-            // and trap the user in an inbox ↔ thread loop.
-            if (window.history.length > 1) navigate(-1);
-            else navigate('/messages', { replace: true });
-          }}
-          className="active:opacity-60"
-          style={{
-            width: 40,
-            height: 40,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 'none',
-            color: INK,
-          }}
-        >
-          <ChevronLeft size={24} />
-        </button>
-        <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          <SquircleAvatar
-            src={header.avatarUrl}
-            userId={header.userId}
-            alt={header.name}
-            size={34}
-            hairlineRing
+        {stage.imageUrl ? (
+          <img
+            src={stage.imageUrl}
+            alt=""
+            aria-hidden
+            className={`msg-photo${photoIn ? ' msg-photo--in' : ''}`}
+            onLoad={() => setPhotoIn(true)}
+            draggable={false}
           />
-          <div className="flex flex-col min-w-0" style={{ gap: 1 }}>
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span
-                className="truncate"
-                style={{ color: INK, fontSize: 15, fontWeight: 600, lineHeight: '18px' }}
-              >
-                {header.name}
-              </span>
-              {header.verified ? (
-                <BadgeCheck size={13} style={{ color: AMBER, flexShrink: 0 }} />
-              ) : null}
+        ) : null}
+        <div className="msg-scrim" aria-hidden />
+
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+              paddingBottom: 4,
+              paddingLeft: 6,
+              paddingRight: 6,
+            }}
+          >
+            <button
+              type="button"
+              aria-label={t('a11y.back')}
+              onClick={() => {
+                // Prefer real back so we don't push a duplicate /messages entry
+                // and trap the user in an inbox ↔ thread loop.
+                if (window.history.length > 1) navigate(-1);
+                else navigate('/messages', { replace: true });
+              }}
+              className="active:opacity-60"
+              style={{
+                width: 40,
+                height: 40,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'transparent',
+                border: 'none',
+                color: INK,
+              }}
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+              <SquircleAvatar
+                src={header.avatarUrl}
+                userId={header.userId}
+                alt={header.name}
+                size={38}
+                hairlineRing
+              />
+              <div className="flex flex-col min-w-0" style={{ gap: 1 }}>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span
+                    className="truncate"
+                    style={{ color: INK, fontSize: 16, fontWeight: 600, lineHeight: '19px', letterSpacing: '-0.012em' }}
+                  >
+                    {header.name}
+                  </span>
+                  {header.verified ? (
+                    <BadgeCheck size={13} style={{ color: SUB, flexShrink: 0 }} />
+                  ) : null}
+                </div>
+                {/* Rounds played together beats "last seen" every time. */}
+                <span style={{ ...MT.CONTEXT }}>
+                  {ground.count > 0
+                    ? t('messaging:header.roundsTogether', {
+                        count: ground.count,
+                        defaultValue: `${ground.count} rounds together`,
+                      })
+                    : header.secondary}
+                </span>
+              </div>
             </div>
-            {header.secondary ? (
-              <span style={{ ...FIGS, color: SUB, fontSize: 12, lineHeight: '14px' }}>
-                {header.secondary}
-              </span>
-            ) : null}
+            <button
+              type="button"
+              aria-label={t('a11y.more')}
+              className="active:opacity-60"
+              onClick={() => setSettingsOpen(true)}
+              style={{
+                width: 40,
+                height: 40,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'transparent',
+                border: 'none',
+                color: SUB,
+              }}
+            >
+              <MoreVertical size={20} />
+            </button>
           </div>
+
+          {/* §4.1 NO SHARED ROUNDS -> NO STRIP. */}
+          {isDirect ? (
+            <SharedGroundStrip ground={ground} rivalFirstName={rivalFirstName} />
+          ) : null}
         </div>
-        <button
-          type="button"
-          aria-label={t('a11y.more')}
-          className="active:opacity-60"
-          onClick={() => setSettingsOpen(true)}
-          style={{
-            width: 40,
-            height: 40,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 'none',
-            color: SUB,
-          }}
-        >
-          <MoreVertical size={20} />
-        </button>
       </header>
 
-      {/* Canvas: the contour field is pinned to this positioned parent so it
-          stays put while the message list scrolls over it. */}
       <div className="flex-1 min-h-0" style={{ position: 'relative', zIndex: 0 }}>
-        <ContourField opacity={0.06} />
+
         <div
           ref={scrollerRef}
           className="overflow-y-auto"
@@ -424,12 +491,13 @@ const ThreadV2Page: React.FC = () => {
             <button
               type="button"
               onClick={() => refetch()}
-              className="rounded-full"
+              className="rounded-full ec-glass--pill"
               style={{
-                background: AMBER,
-                color: '#FFFFFF',
+                /* §6 AMBER IS THE VIEWING MEMBER — not a retry button. */
+                color: INK,
                 fontSize: 14,
-                fontWeight: 500,
+                fontWeight: 600,
+
                 padding: '8px 20px',
                 border: 'none',
               }}
@@ -441,25 +509,37 @@ const ThreadV2Page: React.FC = () => {
           (() => {
             const isGroup = (detail?.type ?? conv?.type) === 'group';
             const hasName = header.name && header.name !== 'Conversation' && header.name !== 'Unknown';
-            const subtitle = isGroup
-              ? hasName
-                ? t('messaging:empty.threadStartGroup', { name: header.name })
-                : t('messaging:empty.threadStartGroupGeneric')
-              : hasName
-                ? t('messaging:empty.threadStartWith', { name: header.name })
-                : t('messaging:empty.threadStart');
+            // §4.5 THE EMPTY THREAD SAYS WHAT YOU HAVE IN COMMON. The golf you
+            // have already played together is a better opener than "say hello".
+            const commonGround =
+              !isGroup && ground.count > 0 && ground.lastCourseName
+                ? t('messaging:empty.threadCommonGround', {
+                    name: rivalFirstName,
+                    count: ground.count,
+                    course: ground.lastCourseName,
+                    defaultValue: `You and ${rivalFirstName} have played ${ground.count} rounds together, most recently at ${ground.lastCourseName}.`,
+                  })
+                : null;
+            const subtitle =
+              commonGround ??
+              (isGroup
+                ? hasName
+                  ? t('messaging:empty.threadStartGroup', { name: header.name })
+                  : t('messaging:empty.threadStartGroupGeneric')
+                : hasName
+                  ? t('messaging:empty.threadStartWith', { name: header.name })
+                  : t('messaging:empty.threadStart'));
             return (
               <div
                 className="flex flex-col items-center justify-center text-center"
                 style={{ padding: '80px 24px', gap: 12 }}
               >
                 <div
-                  className="thread-empty-squircle"
+                  className="thread-empty-squircle ec-glass"
                   style={{
                     width: 52,
                     height: 52,
                     borderRadius: 17,
-                    background: '#15171F',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -468,7 +548,8 @@ const ThreadV2Page: React.FC = () => {
                     willChange: 'transform',
                   }}
                 >
-                  <MessageCircle size={24} color="#FFFFFF" strokeWidth={2} />
+                  <MessageCircle size={24} color={INK} strokeWidth={2} />
+
                   <div
                     aria-hidden
                     className="thread-empty-sheen"
