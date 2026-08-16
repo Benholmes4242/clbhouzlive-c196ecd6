@@ -360,7 +360,9 @@
         "eyebrow": "{{n}} PICKS · TAP FOR THE CASE",
         "record": "{{inside}} OF {{total}} INSIDE THE TOP 20",
         "fit": "FIT {{score}}",
-        "methodology": "Picks generated before the first tee time from course DNA, current form and field strength. Verdicts settle with the final leaderboard."
+        "methodology": "Picks generated before the first tee time from course DNA, current form and field strength. Verdicts settle with the final leaderboard.",
+        "titleCount_one": "Our pick",
+        "titleCount_other": "Our {{count}} picks"
       },
       "live": {
         "thru": "THRU {{n}}",
