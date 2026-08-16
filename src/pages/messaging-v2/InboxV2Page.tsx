@@ -71,6 +71,7 @@ const InboxV2Page: React.FC = () => {
   );
 
   const showSearch = speakable.length >= SEARCH_THRESHOLD;
+  const isEmptyInbox = hasActor && !isLoading && !error && speakable.length === 0 && !query.trim();
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
