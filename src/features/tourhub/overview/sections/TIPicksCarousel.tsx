@@ -887,11 +887,14 @@ function VerdictBanner({
   state,
   live,
   t,
+  hideScore = false,
 }: {
   v: TiVerdict;
   state: EventState;
   live: PickLiveState | undefined;
   t: TFunction;
+  /** The head already carries the score: the banner must not repeat it. */
+  hideScore?: boolean;
 }) {
   const settled = state === 'completed';
   if (!settled && state !== 'live') return null;
@@ -899,6 +902,13 @@ function VerdictBanner({
   // In progress → neutral banner (only when we have a row)
   if (!settled) {
     if (!live || live.position == null) return null;
+    const posText = `${live.positionTied ? 'T' : ''}${live.position}`;
+    const thruLabel =
+      live.thru == null
+        ? null
+        : live.thru >= 18
+          ? t('overview.status.finished')
+          : t('overview.status.thru', { n: live.thru });
     return (
       <div
         style={{
@@ -911,27 +921,51 @@ function VerdictBanner({
           gap: 12,
         }}
       >
-        {/* No "ON THE COURSE" label — the position, score and thru say it. */}
-        <TourStatusBlock
-          score={live.score}
-          position={live.position}
-          positionTied={live.positionTied}
-          thru={live.thru}
-          status={live.status}
-          align="right"
-        />
+        {hideScore ? (
+          // POSITION and THRU only — the score sits beside the name above.
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ fontSize: 17, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
+              {posText}
+            </span>
+            {thruLabel ? (
+              <span
+                style={{
+                  fontSize: 7.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: INK_45,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {thruLabel}
+              </span>
+            ) : null}
+          </div>
+        ) : (
+          /* No "ON THE COURSE" label — the position, score and thru say it. */
+          <TourStatusBlock
+            score={live.score}
+            position={live.position}
+            positionTied={live.positionTied}
+            thru={live.thru}
+            status={live.status}
+            align="right"
+          />
+        )}
       </div>
     );
   }
 
   // Settled — the OUTCOME, never the word "Finished".
   if (v.kind === 'none') return null;
+  const scoreRight = (text: string) => (hideScore ? '' : text);
   if (v.kind === 'win') {
     return (
       <BannerRow
         left={t('overview.tiPicks.case.wonIt')}
         leftColor={GOLD_TX}
-        right={`${t('overview.tiPicks.verdict.won')}${v.score != null ? ` · ${v.score}` : ''}`}
+        right={scoreRight(`${t('overview.tiPicks.verdict.won')}${v.score != null ? ` · ${v.score}` : ''}`)}
         rightColor={GOLD_TX}
         background={GOLD_BG}
       />
@@ -942,7 +976,7 @@ function VerdictBanner({
       <BannerRow
         left={v.label ?? ''}
         leftColor={GREEN_TX}
-        right={v.score != null ? String(v.score) : ''}
+        right={scoreRight(v.score != null ? String(v.score) : '')}
         rightColor={GREEN_TX}
         background={GREEN_BG}
       />
@@ -952,12 +986,13 @@ function VerdictBanner({
     <BannerRow
       left={v.kind === 'mc' ? (v.label ?? 'MC') : (v.label ?? '')}
       leftColor={RED_TX}
-      right={v.kind === 'mc' ? '' : v.score != null ? String(v.score) : ''}
+      right={v.kind === 'mc' ? '' : scoreRight(v.score != null ? String(v.score) : '')}
       rightColor={RED_TX}
       background={RED_BG}
     />
   );
 }
+
 
 
 
