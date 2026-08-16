@@ -177,11 +177,12 @@ export function PhotoBand({
 
 
 
-      {/* Lower-third stack */}
+      {/* Lower-third stack — pulled down to the wire-ticker boundary now that
+          the carousel dots are removed. */}
       <div
         style={{
           position: 'absolute',
-          left: 20, right: 20, bottom: 18,
+          left: 20, right: 20, bottom: 8,
           zIndex: 3,
           display: 'flex', flexDirection: 'column', gap: 10,
         }}
