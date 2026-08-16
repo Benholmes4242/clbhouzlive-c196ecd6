@@ -230,12 +230,18 @@ const InboxV2Page: React.FC = () => {
         </header>
 
         {/* ── The list ───────────────────────────────────────────────────── */}
+        {/* §3.2 when the inbox is empty the region does not scroll and carries
+            no bottom padding: the empty state owns the full height so its
+            action can pin to the foot with no dead black beneath it. */}
         <div
-          className="flex-1 overflow-y-auto"
+          className={isEmptyInbox ? 'flex-1' : 'flex-1 overflow-y-auto'}
           style={{
             WebkitOverflowScrolling: 'touch',
             background: MSG.BLACK,
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)',
+            minHeight: 0,
+            paddingBottom: isEmptyInbox
+              ? 0
+              : 'calc(env(safe-area-inset-bottom, 0px) + 32px)',
           }}
         >
           {!hasActor || isLoading ? (
