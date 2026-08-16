@@ -149,46 +149,44 @@ export const Top100VerdictBand: React.FC<Props> = ({
       }}
       style={{
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 7,
         width: '100%',
         minHeight: VERDICT_BAND_HEIGHT,
-        padding: '11px 14px',
-        borderRadius: 14,
+        padding: '7px 12px',
+        borderRadius: 12,
         textAlign: 'left',
-        background: higher ? GREEN_BG : RED_BG,
+        /* A WHISPER of tint. No inset highlight, no box-shadows (§4.3). */
+        background: higher ? GREEN_TINT : RED_TINT,
         border: 'none',
-        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.95), 0 0 0 0.5px ${higher ? GREEN_LINE : RED_LINE}, 0 1px 3px ${higher ? GREEN_SHADOW : RED_SHADOW}`,
+        boxShadow: 'none',
         color: ink,
       }}
     >
+      <Trend size={14} strokeWidth={2.5} color={ink} aria-hidden style={{ flexShrink: 0 }} />
+
       <span
         style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 7,
           fontSize: 11.5,
           fontWeight: 700,
           letterSpacing: '-0.005em',
-          lineHeight: 1.3,
+          lineHeight: 1.25,
+          whiteSpace: 'nowrap',
         }}
       >
-        {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower', {
-          course: shortenCourseName(courseName),
-        })}
-        <Trend size={16} strokeWidth={2.5} color={ink} aria-hidden />
+        {t(higher ? 'top100.verdict.higher' : 'top100.verdict.lower')}
       </span>
 
       {ratingRank && (
         <span
           style={{
             ...FIGS,
+            marginLeft: 'auto',
             fontSize: 10.5,
             fontWeight: 600,
-            lineHeight: 1.3,
-            marginTop: 2,
-            color: line2Ink,
+            lineHeight: 1.25,
+            textAlign: 'right',
+            color: MUTE_INK,
           }}
         >
           {listLabel && listLabel.trim()
@@ -206,6 +204,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
     </button>
   );
 };
+
 
 
 export default Top100VerdictBand;
