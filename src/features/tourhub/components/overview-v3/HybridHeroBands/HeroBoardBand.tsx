@@ -69,14 +69,16 @@ function StatCell({
   value,
   color,
   sub,
+  align = 'left',
 }: {
   label: string;
   value: string;
   color?: string;
   sub?: string | null;
+  align?: 'left' | 'center' | 'right';
 }) {
   return (
-    <div style={{ flex: '1 1 0', minWidth: 0, textAlign: 'left' }}>
+    <div style={{ flex: '1 1 0', minWidth: 0, textAlign: align }}>
       <div
         style={{
           fontSize: 7.5,
@@ -252,6 +254,7 @@ export function HeroBoardSection({
         >
           {field && (
             <StatCell
+              align="left"
               label={t('overview.onTheCourse.fieldAverageToday')}
               value={formatToParAvg(field.avg)}
               color={tourFigColor(field.avg)}
@@ -260,6 +263,7 @@ export function HeroBoardSection({
           )}
           {low && (
             <StatCell
+              align="center"
               label={t('overview.onTheCourse.lowRoundLabel')}
               value={formatToPar(low.toPar)}
               color={tourFigColor(low.toPar)}
@@ -268,6 +272,7 @@ export function HeroBoardSection({
           )}
           {field && field.count > 0 && (
             <StatCell
+              align="right"
               label={t('overview.onTheCourse.underParTodayLabel')}
               value={t('overview.onTheCourse.underParTodayValue', {
                 n: field.underPar,
