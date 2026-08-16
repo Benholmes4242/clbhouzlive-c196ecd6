@@ -21,7 +21,7 @@ import type { EventState } from '@/features/tourhub/components/overview-v3/useTo
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { TourStatusBlock, TOUR_UNDER } from '../../_shared/TourStatusBlock';
-import { TOPAR_UNDER_LIGHT } from '../../_shared/tokens';
+import { TOPAR_UNDER_LIGHT, TOPAR_UNDER_DARK } from '../../_shared/tokens';
 
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
@@ -46,6 +46,10 @@ const RED_TX = '#B91C1C';
 const GOLD_BG = 'linear-gradient(135deg,#FDE68A 0%,#F7931E 100%)';
 const GOLD_TX = '#7C4A03';
 const GOLD_RING = 'rgba(247,147,30,0.45)';
+/** The winning-pick ring on the DARK band: 0.45 amber disappears over a photo,
+ *  so the dark tone takes near-solid amber gold at full strength. */
+const GOLD_RING_STRONG = 'rgba(250,176,74,0.95)';
+
 const GOLD_SHADOW = '0 2px 12px rgba(247,147,30,0.18)';
 const NEUTRAL_BG = 'rgba(15,23,42,0.06)';
 const FIT_TRACK = 'rgba(15,23,42,0.07)';
@@ -203,12 +207,19 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                       cursor: 'pointer',
                     }}
                   >
-                    {/* THE SCRIM BAND — the hero's move, at tile scale. All three
-                        tiles carry the SAME venue photograph: they are three picks
-                        for one tournament, and the repetition is what ties the
-                        section to the page. The avatar is the identity. The fade
-                        ENDS ON #FFFFFF, the tile's own white, so there is no seam. */}
-                    <PickScrimBand candidates={scrimCandidates}>
+                    {/* THE SCRIM BAND — DARK on the tile (the sheets stay light).
+                        All three tiles carry the SAME venue photograph: they are
+                        three picks for one tournament, and the repetition is what
+                        ties the section to the page. The dark gradient keeps the
+                        picture instead of bleaching it and gives the white name,
+                        score and reason somewhere solid to sit — the treatment the
+                        course cards already use. */}
+                    <PickScrimBand
+                      candidates={scrimCandidates}
+                      tone="dark"
+                      minHeight={168}
+                      padding="12px 15px 13px"
+                    >
                       <div
                         style={{
                           display: 'flex',
@@ -218,91 +229,88 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                           minHeight: 10,
                         }}
                       >
-                        <span style={{ ...PICK_META, color: 'rgba(255,255,255,0.78)' }}>
+                        <span style={{ ...PICK_META, color: 'rgba(255,255,255,0.75)' }}>
                           {t('overview.tiPicks.card.pickOf', { n: p.rank, total: pickTotal })}
                         </span>
-                        {/* The status tag keeps its ink tokens (untouched), so it
-                            rides a glass pill to stay legible over the photo. */}
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            borderRadius: 999,
-                            background: 'rgba(255,255,255,0.82)',
-                            padding: '2px 7px',
-                          }}
-                        >
-                          <PickStatusTag live={live} t={t} />
-                        </span>
+                        <PickStatusTag live={live} t={t} tone="dark" />
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 11 }}>
-                        <div
-                          role="link"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            goToPlayer(p.playerId);
-                          }}
-                          style={{ cursor: 'pointer', flexShrink: 0 }}
-                        >
-                          <SquircleAvatar
-                            size={52}
-                            srcCandidates={headshots}
-                            alt={p.playerName}
-                            userId={p.playerId}
-                            hairlineRing
-                            ringColor={LIGHT_HAIRLINE}
-                          />
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                          {/* The name carries the SAME amber mark as the hero board
-                              row, so a member reads the two as one statement. */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
-                            <span
-                              style={{
-                                fontSize: 15.5,
-                                fontWeight: 700,
-                                letterSpacing: '-0.02em',
-                                color: INK,
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                lineHeight: 1.2,
-                                minWidth: 0,
-                              }}
-                            >
-                              {p.playerName}
-                            </span>
-                            <ClbhouzPickMark size={12} label={t('overview.board.clbhouzPick')} />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 11 }}>
+                          <div
+                            role="link"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              goToPlayer(p.playerId);
+                            }}
+                            style={{ cursor: 'pointer', flexShrink: 0 }}
+                          >
+                            <SquircleAvatar
+                              size={46}
+                              srcCandidates={headshots}
+                              alt={p.playerName}
+                              userId={p.playerId}
+                              hairlineRing
+                              ringColor={isWin ? GOLD_RING_STRONG : 'rgba(255,255,255,0.55)'}
+                            />
                           </div>
-                          <CardStateSlot state={state} pick={p} live={live} settled={settled} v={v} t={t} />
+                          <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+                            {/* The name carries the SAME amber mark as the hero board
+                                row, so a member reads the two as one statement. */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0, flex: 1 }}>
+                              <span
+                                style={{
+                                  fontSize: 15.5,
+                                  fontWeight: 700,
+                                  letterSpacing: '-0.02em',
+                                  color: '#FFFFFF',
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  lineHeight: 1.2,
+                                  minWidth: 0,
+                                }}
+                              >
+                                {p.playerName}
+                              </span>
+                              <ClbhouzPickMark size={12} label={t('overview.board.clbhouzPick')} />
+                            </div>
+                            <CardStateSlot
+                              state={state}
+                              pick={p}
+                              live={live}
+                              settled={settled}
+                              v={v}
+                              t={t}
+                              tone="dark"
+                            />
+                          </div>
+                        </div>
+
+                        {/* The reason now lives INSIDE the photograph. */}
+                        <div
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 500,
+                            color: 'rgba(255,255,255,0.86)',
+                            lineHeight: 1.4,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {p.pulledQuote || p.reasons?.[0] || '—'}
                         </div>
                       </div>
                     </PickScrimBand>
 
-                    <div style={{ padding: '0 15px 14px' }}>
-                      <div
-                        style={{
-                          fontSize: 13.5,
-                          fontWeight: 500,
-                          color: 'rgba(15,23,42,0.78)',
-                          lineHeight: 1.45,
-                          minHeight: 39,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          margin: '4px 0 0',
-                        }}
-                      >
-                        {p.pulledQuote || p.reasons?.[0] || '—'}
-                      </div>
-
+                    {/* THE WHITE BODY — one row only. Everything else is on the photo. */}
+                    <div style={{ padding: '13px 15px 14px' }}>
                       {/* Affordance, not a control — the whole card is the tap target */}
                       <span
                         style={{
                           display: 'block',
-                          marginTop: 12,
                           fontSize: 9,
                           fontWeight: 700,
                           color: AMBER_DEEP,
@@ -313,6 +321,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                         {t('overview.tiPicks.card.theCase')}
                       </span>
                     </div>
+
                   </button>
                 );
               })}
@@ -385,6 +394,7 @@ function PickScrimBand({
   padding = '12px 15px 11px',
   grabber = false,
   objectPosition = '50% 45%',
+  tone = 'light',
 }: {
   candidates: string[];
   children: React.ReactNode;
@@ -395,12 +405,19 @@ function PickScrimBand({
   /** Sheets carry their grabber ON the band, in white so it survives the photo. */
   grabber?: boolean;
   objectPosition?: string;
+  /**
+   * TONE — a variant, not a fork (same pattern as TrajectoryLine's `surface`).
+   * 'light' fades to the sheet's #FFFFFF and is what BOTH sheets use.
+   * 'dark' keeps the photograph and gives white text a floor; the TILE only.
+   */
+  tone?: 'light' | 'dark';
 }) {
   const [idx, setIdx] = useState(0);
   const src = idx < candidates.length ? candidates[idx] : null;
+  const dark = tone === 'dark';
   return (
     <div style={{ position: 'relative', minHeight, padding, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.10)' }} />
+      <div aria-hidden style={{ position: 'absolute', inset: 0, background: dark ? 'rgba(10,14,10,0.55)' : 'rgba(15,23,42,0.10)' }} />
       {src ? (
         <img
           aria-hidden
@@ -421,11 +438,16 @@ function PickScrimBand({
       <div
         aria-hidden
         style={{
+          background: dark
+            ? // Starts at 0.12, NOT transparent — a bright sky needs a floor or
+              // the pick label at the top disappears.
+              'linear-gradient(180deg, rgba(10,14,10,0.12) 0%, rgba(10,14,10,0.50) 44%, rgba(10,14,10,0.92) 100%)'
+            : `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) ${fadeStart}%, rgba(255,255,255,0.55) ${Math.round(fadeStart + (100 - fadeStart) * 0.5)}%, rgba(255,255,255,0.88) ${Math.round(fadeStart + (100 - fadeStart) * 0.78)}%, #FFFFFF 100%)`,
           position: 'absolute',
           inset: 0,
-          background: `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) ${fadeStart}%, rgba(255,255,255,0.55) ${Math.round(fadeStart + (100 - fadeStart) * 0.5)}%, rgba(255,255,255,0.88) ${Math.round(fadeStart + (100 - fadeStart) * 0.78)}%, #FFFFFF 100%)`,
         }}
       />
+
 
       {grabber ? (
         <div
@@ -470,18 +492,51 @@ const DEMOTED_STATUS = new Set(['CUT', 'MC', 'MDF', 'WD', 'DQ', 'DNS']);
 /**
  * STILL OUT → 5px red dot + "THRU {n}" in MUTE. FINISHED → "FINISHED" in DIM.
  * The feed carries no explicit finished flag, so thru >= 18 is the signal.
+ * On the DARK tile band the chip rides a rgba(10,14,10,0.5) pill with a
+ * white-24 border; the live dot stays red either way.
  */
-function PickStatusTag({ live, t }: { live: PickLiveState | undefined; t: TFunction }) {
+function PickStatusTag({
+  live,
+  t,
+  tone = 'light',
+}: {
+  live: PickLiveState | undefined;
+  t: TFunction;
+  tone?: 'light' | 'dark';
+}) {
   if (!live || live.thru == null) return null;
   if (DEMOTED_STATUS.has((live.status ?? '').toUpperCase())) return null;
+  const dark = tone === 'dark';
+  const wrap = (children: React.ReactNode, color: string) => (
+    <span
+      style={{
+        ...PICK_META,
+        color,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
+        ...(dark
+          ? {
+              borderRadius: 999,
+              padding: '3px 8px',
+              background: 'rgba(10,14,10,0.5)',
+              border: '1px solid rgba(255,255,255,0.24)',
+            }
+          : null),
+      }}
+    >
+      {children}
+    </span>
+  );
   if (live.thru >= 18) {
-    return <span style={{ ...PICK_META, color: A.DIM }}>{t('overview.status.finished')}</span>;
+    return wrap(t('overview.status.finished'), dark ? 'rgba(255,255,255,0.72)' : A.DIM);
   }
-  return (
-    <span style={{ ...PICK_META, color: A.MUTE, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+  return wrap(
+    <>
       <span style={{ width: 5, height: 5, borderRadius: 999, background: TOUR_UNDER, flexShrink: 0 }} />
       {t('overview.status.thru', { n: live.thru })}
-    </span>
+    </>,
+    dark ? 'rgba(255,255,255,0.86)' : A.MUTE,
   );
 }
 
@@ -493,6 +548,7 @@ function CardStateSlot({
   settled,
   v,
   t,
+  tone = 'light',
 }: {
   state: EventState;
   pick: AITopContender;
@@ -500,18 +556,21 @@ function CardStateSlot({
   settled: boolean;
   v: TiVerdict;
   t: TFunction;
+  tone?: 'light' | 'dark';
 }) {
+  const dark = tone === 'dark';
   if (settled) {
     if (v.kind === 'none') {
       // Settled with no leaderboard row → show fit if present.
-      return <CourseFitLine score={pick.courseFitScore} t={t} />;
+      return <CourseFitLine score={pick.courseFitScore} t={t} tone={tone} />;
     }
     return <VerdictChip v={v} t={t} />;
   }
   if (state === 'live' && live) {
     const cutV = tiVerdict(live);
     if (cutV.kind === 'mc') return <VerdictChip v={cutV} t={t} />;
-    if (live.position != null)
+    if (live.position != null) {
+      if (dark) return <DarkScoreBlock live={live} />;
       return (
         <TourStatusBlock
           score={live.score}
@@ -522,24 +581,71 @@ function CardStateSlot({
           align="left"
         />
       );
+    }
   }
   // Pre-tournament (upcoming) or live-with-no-row → course fit
-  return <CourseFitLine score={pick.courseFitScore} t={t} />;
+  return <CourseFitLine score={pick.courseFitScore} t={t} tone={tone} />;
 }
 
-function CourseFitLine({ score, t }: { score: number | null | undefined; t: TFunction }) {
+/**
+ * DarkScoreBlock — score + position over the photograph, right-aligned.
+ * THE TOKEN SWITCHES: under par uses TOPAR_UNDER_DARK (#DC2626), because
+ * TOPAR_UNDER_LIGHT is tuned for ink on white and goes muddy on a photo.
+ * Level / over par become white-tinted (INK is invisible here).
+ */
+function DarkScoreBlock({ live }: { live: PickLiveState }) {
+  const score = live.score;
+  const scoreText = formatTiScore(score) ?? (score == null ? null : String(score));
+  const pos = formatTiPosition(live.position, live.positionTied);
+  const color =
+    score == null || !Number.isFinite(score)
+      ? 'rgba(255,255,255,0.86)'
+      : score < 0
+        ? TOPAR_UNDER_DARK
+        : score === 0
+          ? 'rgba(255,255,255,0.86)'
+          : 'rgba(255,255,255,0.7)';
+  if (!scoreText && !pos) return null;
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexShrink: 0 }}>
+      {scoreText ? (
+        <span style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color, fontVariantNumeric: 'tabular-nums' }}>
+          {scoreText}
+        </span>
+      ) : null}
+      {pos ? (
+        <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.6)', fontVariantNumeric: 'tabular-nums' }}>
+          {pos}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+
+function CourseFitLine({
+  score,
+  t,
+  tone = 'light',
+}: {
+  score: number | null | undefined;
+  t: TFunction;
+  tone?: 'light' | 'dark';
+}) {
   if (score == null) return <div style={{ height: 16 }} />;
   return (
     <div
       style={{
         fontSize: 10,
         fontWeight: 700,
-        color: INK_45,
+        color: tone === 'dark' ? 'rgba(255,255,255,0.72)' : INK_45,
         letterSpacing: '0.08em',
         textTransform: 'uppercase',
         fontVariantNumeric: 'tabular-nums',
+        flexShrink: 0,
       }}
     >
+
       {t('overview.tiPicks.card.courseFit', { score: Math.round(score) })
         .split(String(Math.round(score)))
         .map((part, i, arr) =>
