@@ -111,10 +111,10 @@ export default function CommunityPage() {
   const lead = useMemo(() => featuredMoment(pool), [pool]);
 
   // NOTHING APPEARS TWICE: the lead is spent, so the grid beneath it never
-  // repeats it. Keyed on the moment id, not on position — the lead is now a
+  // repeats it. Keyed on the moment key, not on position — the lead is now a
   // video pick from anywhere in the ranked pool, not always the first item.
   const gridMoments = useMemo(
-    () => (lead ? pool.filter((m) => m.id !== lead.id) : pool),
+    () => (lead ? pool.filter((m) => m.key !== lead.key) : pool),
     [pool, lead],
   );
 
