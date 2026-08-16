@@ -24,12 +24,18 @@ import type {
 } from '@/types/messaging';
 
 
-const CANVAS = '#F8FAFC';
-const INK = '#1F2428';
-const SUB = '#8A9099';
-const HINT = '#AEB4BC';
-const AMBER = '#F7931E';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+/**
+ * BRIEF_MESSAGES_ECHO_PALETTE §1 / §4 — the thread on Echo's palette.
+ * Near-black surface, course photograph behind the header, scrim for
+ * legibility, glass chrome, and AMBER reserved for the viewing member.
+ */
+const CANVAS = MSG.BLACK;
+const INK = MSG.INK;
+const SUB = MSG.INK_2;
+const HINT = MSG.INK_3;
+const AMBER = MSG.AMBER;
+const HAIRLINE = MSG.RULE;
+
 
 interface HeaderIdentity {
   name: string;
