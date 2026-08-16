@@ -106,9 +106,10 @@ export const MessageBubble: React.FC<Props> = ({
   const hugMedia = hasMedia && !hasBody && !message.reply_preview;
 
   const reply = message.reply_preview;
-  const replyRule = isOutgoing ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.25)';
-  const replyName = isOutgoing ? 'rgba(245,246,247,0.9)' : SUB;
-  const replySnippet = isOutgoing ? 'rgba(245,246,247,0.6)' : SUB;
+  const replyRule = isOutgoing ? 'rgba(21,16,7,0.38)' : 'rgba(255,255,255,0.28)';
+  const replyName = isOutgoing ? '#3A2C10' : SUB;
+  const replySnippet = isOutgoing ? '#5B4718' : HINT;
+
 
   const [showReport, setShowReport] = useState(false);
   const [viewer, setViewer] = useState<{ items: OrderedMediaItem[]; index: number } | null>(null);
