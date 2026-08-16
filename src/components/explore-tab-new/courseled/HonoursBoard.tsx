@@ -187,9 +187,16 @@ export function FeatPlaque({
   return (
     <button
       type="button"
+      disabled={!tappable}
       onClick={tappable ? () => onPress?.(e) : undefined}
-      style={{ ...PLAQUE_SHELL, cursor: tappable ? 'pointer' : 'default' }}
+      style={{
+        ...PLAQUE_SHELL,
+        cursor: tappable ? 'pointer' : 'default',
+        // A feat with no score genuinely cannot open — say so visually.
+        opacity: tappable ? 1 : 0.62,
+      }}
     >
+
       <span style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
         <HolderAvatar event={e} />
         {/* The date, and DIRECTLY UNDER IT the feat in words. */}
