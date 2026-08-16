@@ -1141,180 +1141,196 @@ function AllPicksSheet({
   const showRecord = settled && total > 0;
   const recordGood = insideCount >= Math.ceil(total / 2);
 
+  // The board's scrim carries the leading pick's headshot — the same photo the
+  // tile opened with, so the sheet reads as that section swelling upward.
+  const lead = ordered[0];
+  const scrimCandidates = lead
+    ? lead.photoUrl
+      ? [lead.photoUrl, ...getPlayerHeadshotCandidates(lead.playerName, tourCode)]
+      : getPlayerHeadshotCandidates(lead.playerName, tourCode)
+    : [];
+
   const header = (
-    <div style={{ marginBottom: 12 }}>
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: INK,
-          letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-          marginBottom: 6,
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {t('overview.tiPicks.board.eyebrow', { n: total })}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <div style={{ fontSize: 24, fontWeight: 700, color: INK, letterSpacing: '-0.02em', lineHeight: 1.05 }}>
-          {t('overview.tiPicks.board.title')}
+    <>
+      <div />
+      <div>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: INK,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            marginBottom: 5,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {t('overview.tiPicks.board.eyebrow', { n: total })}
         </div>
-        {showRecord ? (
-          <span
-            style={{
-              padding: '4px 10px',
-              borderRadius: 999,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: 0.3,
-              background: recordGood ? GREEN_BG : RED_BG,
-              color: recordGood ? GREEN_TX : RED_TX,
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {t('overview.tiPicks.board.record', { inside: insideCount, total })}
-          </span>
-        ) : null}
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ fontSize: 25, fontWeight: 700, color: INK, letterSpacing: '-0.02em', lineHeight: 1.02 }}>
+            {t('overview.tiPicks.board.title')}
+          </div>
+          {showRecord ? (
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: recordGood ? GREEN_TX : INK_45,
+                fontVariantNumeric: 'tabular-nums',
+                textAlign: 'right',
+                flexShrink: 0,
+              }}
+            >
+              {t('overview.tiPicks.board.record', { inside: insideCount, total })}
+            </span>
+          ) : null}
+        </div>
       </div>
-    </div>
+    </>
   );
 
   return (
-    <SheetShell onClose={onClose} header={header}>
-      <div style={{ marginTop: 4 }}>
+    <SheetShell
+      onClose={onClose}
+      header={header}
+      scrim={{ candidates: scrimCandidates, minHeight: 128, fadeStart: 18, objectPosition: '50% 14%' }}
+    >
+      <div style={{ marginTop: 2 }}>
         {ordered.map((p, i) => {
           const live = liveMap?.[p.playerId];
           const v = settled ? tiVerdict(live) : { kind: 'none' as const, label: null, score: null };
+          const figure =
+            settled || state === 'live' ? formatTiScore(live?.score) : null;
+          const sub =
+            live?.position != null && v.kind !== 'mc'
+              ? formatTiPosition(live.position, !!live.positionTied)
+              : v.kind === 'mc'
+                ? (v.label ?? 'MC')
+                : null;
+          const reason = p.pulledQuote || p.reasons?.[0] || null;
           return (
             <div
               key={p.playerId}
               role="button"
               onClick={() => onPick(p)}
               style={{
-                marginTop: i === 0 ? 0 : 22,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '13px 0',
+                borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
                 cursor: 'pointer',
               }}
             >
-              {/* Same grammar as the card: the pick with its denominator, then the state */}
-              <div
+              {/* Rank in the position slot a leaderboard would use */}
+              <span
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 8,
-                  marginBottom: 7,
-                  minHeight: 10,
+                  width: 16,
+                  flexShrink: 0,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: INK_45,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.01em',
                 }}
               >
-                <span style={{ ...PICK_META, color: A.DIM }}>
-                  {t('overview.tiPicks.card.pickOf', { n: p.rank, total })}
-                </span>
-                <PickStatusTag live={live} t={t} />
+                {p.rank}
+              </span>
+              <div
+                role="link"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onNavigatePlayer(p.playerId);
+                }}
+                style={{ flexShrink: 0, cursor: 'pointer' }}
+              >
+                <SquircleAvatar
+                  size={34}
+                  srcCandidates={
+                    p.photoUrl
+                      ? [p.photoUrl, ...getPlayerHeadshotCandidates(p.playerName, tourCode)]
+                      : getPlayerHeadshotCandidates(p.playerName, tourCode)
+                  }
+                  alt={p.playerName}
+                  userId={p.playerId}
+                  hairlineRing
+                  ringColor={LIGHT_HAIRLINE}
+                />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div
-                  role="link"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onNavigatePlayer(p.playerId);
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: INK,
+                    letterSpacing: '-0.02em',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   }}
-                  style={{ flexShrink: 0, cursor: 'pointer' }}
                 >
-                  <SquircleAvatar
-                    size={34}
-                    srcCandidates={
-                      p.photoUrl
-                        ? [p.photoUrl, ...getPlayerHeadshotCandidates(p.playerName, tourCode)]
-                        : getPlayerHeadshotCandidates(p.playerName, tourCode)
-                    }
-                    alt={p.playerName}
-                    userId={p.playerId}
-                    hairlineRing
-                    ringColor={LIGHT_HAIRLINE}
-                  />
+                  {p.playerName}
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
+                {reason ? (
                   <div
                     style={{
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: INK,
-                      letterSpacing: '-0.02em',
+                      marginTop: 2,
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      color: A.BODY,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    {p.playerName}
+                    {reason}
                   </div>
-                  {p.courseFitScore != null ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                      <div style={{ maxWidth: 110, flex: 1, height: 4, borderRadius: 2, background: FIT_TRACK, overflow: 'hidden' }}>
-                        <div
-                          style={{
-                            width: `${Math.max(0, Math.min(100, Math.round(p.courseFitScore)))}%`,
-                            height: '100%',
-                            background: AMBER,
-                            borderRadius: 2,
-                          }}
-                        />
-                      </div>
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          color: INK_45,
-                          letterSpacing: '0.06em',
-                          fontVariantNumeric: 'tabular-nums',
-                        }}
-                      >
-                        {t('overview.tiPicks.board.fit', { score: Math.round(p.courseFitScore) })}
-                      </span>
-                    </div>
-                  ) : null}
-                </div>
-                <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  {settled ? (
-                    <VerdictChip v={v} t={t} />
-                  ) : state === 'live' && live ? (
-                    tiVerdict(live).kind === 'mc' ? (
-                      <VerdictChip v={tiVerdict(live)} t={t} />
-                    ) : live.position != null ? (
-                      <TourStatusBlock
-                        score={live.score}
-                        position={live.position}
-                        positionTied={live.positionTied}
-                        status={live.status}
-
-                        align="right"
-                      />
-                    ) : null
-                  ) : null}
-                  <span style={{ fontSize: 14, fontWeight: 700, color: INK_45 }}>›</span>
-                </div>
+                ) : null}
               </div>
-              {(p.pulledQuote || p.reasons?.[0]) && (
-                <div
-                  style={{
-                    marginTop: 7,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: A.BODY,
-                    lineHeight: 1.45,
-                  }}
-                >
-                  “{p.pulledQuote || p.reasons?.[0]}”
-                </div>
-              )}
+              <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 40 }}>
+                {figure ? (
+                  <div
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: (live?.score ?? 0) < 0 ? TOPAR_UNDER_LIGHT : INK,
+                      fontVariantNumeric: 'tabular-nums',
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1.05,
+                    }}
+                  >
+                    {figure}
+                  </div>
+                ) : null}
+                {sub ? (
+                  <div
+                    style={{
+                      marginTop: 2,
+                      fontSize: 9,
+                      fontWeight: 700,
+                      color: INK_45,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {sub}
+                  </div>
+                ) : null}
+              </div>
+              <span style={{ flexShrink: 0, fontSize: 14, fontWeight: 700, color: INK_45 }}>›</span>
             </div>
           );
         })}
 
         <div
           style={{
-            marginTop: 26,
+            marginTop: 22,
+            paddingTop: 14,
+            borderTop: `1px solid ${HAIR}`,
             fontSize: 12,
             fontWeight: 600,
             color: A.BODY,
@@ -1327,3 +1343,4 @@ function AllPicksSheet({
     </SheetShell>
   );
 }
+
