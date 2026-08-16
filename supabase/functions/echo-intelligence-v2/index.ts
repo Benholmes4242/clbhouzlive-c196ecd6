@@ -574,6 +574,24 @@ async function* streamPerplexity(
 }
 
 // ─── Synthesis prompts (weights preserved from v1) ───────────────────────
+// §3 ECHO OPENS WITH THE ANSWER. Live text read on device opened with two
+// sentences before anything was said: "Great question, Benjamin - and living in
+// London you're not far from some of the best examples in the world, so this is
+// worth digging into properly." "Great question" is flattery, the member's name
+// is not information, and where he lives has nothing to do with the question.
+// A LINE ADVISES, IT DOES NOT NARRATE — the same rule the rest of the app runs
+// on. This block is appended to EVERY prompt that produces member-facing text,
+// including the synthesis prompts, because the synthesiser writes the words
+// that actually stream.
+const OPENING_RULE = [
+  "OPEN WITH THE ANSWER. The first sentence must carry the first real piece of information.",
+  "Never open with flattery (\"great question\", \"good one\", \"I love this question\").",
+  "Never open by addressing the member by name, and never use their name as a greeting.",
+  "Never restate or rephrase the question, and never announce what you are about to do (\"let's dig into\", \"here's the thing\", \"there are a few factors\").",
+  "Never mention where the member lives, their handicap or any other context unless it changes the answer.",
+  "No sign-off, no summary of what you just said. Advise; do not narrate.",
+].join("\n");
+
 function dualSynthesisPrompt(a: string, b: string): string {
   return `You are synthesising two golf assistant responses into one optimal answer.
 
@@ -581,12 +599,13 @@ Response A (weight 57%): ${a}
 
 Response B (weight 43%): ${b}
 
+${OPENING_RULE}
+
 Produce a single, coherent response that:
 - Weights A at 57% and B at 43%
 - Keeps the best specific details from both
 - Is concise and directly answers the user's question
 - Does not mention synthesis, models, or multiple sources
-- Uses the user's name if present in the context
 
 After your answer, on a NEW LINE, output exactly one machine-readable line:
 STRENGTH: 0.NN
@@ -603,13 +622,14 @@ Weights:
 - Source C (20%): ${c || "No response"}
 - Source D (5%, live data): ${d || "No response"}
 
+${OPENING_RULE}
+
 Produce a single, authoritative response that:
 - Weights each source proportionally to its weight above
 - Prioritises specific facts, names, and data points where sources agree
 - For disagreements, favours the higher-weighted source
 - Incorporates any real-time data from source D where relevant
 - Is well-structured and directly answers the user's question
-- Uses the user's name naturally where appropriate
 - Does not mention sources, models, or the synthesis process
 
 After your answer, on a NEW LINE, output exactly one machine-readable line:
@@ -925,13 +945,18 @@ serve(async (req: Request) => {
         const contextBlock = buildContextBlock(ctx.userContext, ctx.tournamentContext, ctx.courseContext, ctx.playerContext);
         const displayName = (ctx.userContext?.display_name as string) || null;
         const firstName = displayName ? displayName.split(" ")[0] : null;
-        const nameGreeting = firstName ? ` The user's name is ${firstName} — use it naturally.` : "";
+        // The name is available for a mid-answer reference at most; it is NEVER an
+        // opening and never a greeting (see OPENING_RULE).
+        const nameGreeting = firstName
+          ? ` The member is ${firstName}, but do not greet them or open with their name.`
+          : "";
         const enrichedSystemPrompt = [
           `You are Echo, a world-class personal golf caddie and advisor.${nameGreeting}`,
           `Today is ${todayDate}.`,
           `You have access to real Clbhouz platform data — course ratings, tournament predictions, and player statistics. Present it as your own knowledge.`,
           `Be conversational, specific, and practical. Speak like a knowledgeable caddie, not a search engine.`,
           `Never mention that multiple models or systems produced this answer — Echo is one voice.`,
+          OPENING_RULE,
           contextBlock,
         ].join("\n");
 
