@@ -1,29 +1,28 @@
 /**
- * BRIEF_ECHO_CADDIE §5.1 — THINKING NAMES ITS SOURCES. Not a spinner.
+ * BRIEF_ECHO_CHAT §5 — THINKING, AND IT BRANCHES.
  *
- * THE SOURCES NAMED MUST BE THE SOURCES ACTUALLY READ. A fabricated progress
- * list is worse than a spinner, so the caller passes only sources it knows the
- * request touched:
+ * 5.1 A DATA QUESTION names its sources as they resolve, each ticking as it
+ *     lands. THE SOURCES NAMED MUST BE THE SOURCES ACTUALLY READ — a fabricated
+ *     progress list is worse than a spinner, and it is what went wrong last
+ *     time. The caller passes only sources it knows fired.
  *
- *   "Your rounds here"  — `gam_user_courses` / `get_my_hole_performance`, read
- *                         client-side for the derived panels. Only listed when
- *                         the member actually has rounds at this course.
- *   "The hole data"     — `get_my_hole_performance` returned hole rows.
- *   "Course records"    — echo_get_course_context, only when a course is in play.
- *   "This week on tour" — echo_get_tournament_context, only when the question
- *                         mentions tour/tournament/player.
+ *     "the field's rounds" IS STRUCK. There is no field aggregate in
+ *     echo_get_*, so it can never be listed here.
  *
- * ECHO DOES NOT READ THE FIELD'S ROUNDS. There is no field aggregate in
- * `echo_get_*`, so "the field's rounds" is NEVER listed here. That line in the
- * brief's example is the one thing this state cannot honestly say.
+ * 5.2 A KNOWLEDGE QUESTION NAMES NOTHING: the word "Thinking" and nothing else.
+ *
+ * 5.3 ONE WAVEFORM, NEVER TWO. The mark lives on <Says>, which wraps this —
+ *     this component renders no wave of its own.
  */
 
 import React, { useEffect, useState } from 'react';
 import { Check } from 'lucide-react';
-import { EC, T } from '../tokens';
-import { EchoWaveform } from './EchoWaveform';
+import { EC } from '../tokens';
 
-export const ThinkingSources: React.FC<{ sources: string[] }> = ({ sources }) => {
+export const ThinkingSources: React.FC<{ sources: string[]; thinkingLabel: string }> = ({
+  sources,
+  thinkingLabel,
+}) => {
   const [done, setDone] = useState(0);
 
   useEffect(() => {
@@ -38,45 +37,36 @@ export const ThinkingSources: React.FC<{ sources: string[] }> = ({ sources }) =>
     return () => window.clearInterval(id);
   }, [sources.length]);
 
+  // §5.2 nothing was opened, so nothing is claimed.
+  if (sources.length === 0) {
+    return <div style={{ fontSize: 13.5, color: EC.INK_3, paddingTop: 1 }}>{thinkingLabel}</div>;
+  }
+
   return (
-    <div className="ec-glass ec-fade-in" style={{ borderRadius: 20, padding: 20, margin: '0 20px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        {/* The one moment the mark animates. */}
-        <EchoWaveform size={28} active />
-        <span style={T.EYEBROW}>Reading</span>
-      </div>
-      <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {sources.map((s, i) => {
-          const resolved = i < done;
-          return (
-            <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span
-                style={{
-                  width: 16,
-                  height: 16,
-                  borderRadius: 8,
-                  display: 'grid',
-                  placeItems: 'center',
-                  background: resolved ? EC.INK : 'transparent',
-                  border: resolved ? 'none' : `1px solid ${EC.INK_3}`,
-                  flex: '0 0 auto',
-                }}
-              >
-                {resolved && <Check size={10} strokeWidth={3} color={EC.BLACK} />}
-              </span>
-              <span
-                style={{
-                  ...T.ADVICE,
-                  fontSize: 15,
-                  color: resolved ? EC.INK : EC.INK_3,
-                }}
-              >
-                {s}
-              </span>
-            </div>
-          );
-        })}
-      </div>
+    <div style={{ display: 'grid', gap: 9 }}>
+      {sources.map((s, i) => {
+        const resolved = i < done;
+        return (
+          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+            <span
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: 7,
+                flex: '0 0 auto',
+                display: 'grid',
+                placeItems: 'center',
+                // §7 ticks are ink, never amber.
+                background: resolved ? EC.INK : 'transparent',
+                border: resolved ? 'none' : `1.5px solid ${EC.LINE}`,
+              }}
+            >
+              {resolved && <Check size={9} strokeWidth={3.2} color={EC.BLACK} />}
+            </span>
+            <span style={{ fontSize: 13.5, color: resolved ? EC.INK_2 : EC.INK_3 }}>{s}</span>
+          </div>
+        );
+      })}
     </div>
   );
 };
