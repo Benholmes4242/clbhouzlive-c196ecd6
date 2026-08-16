@@ -51,6 +51,7 @@ import {
 import { useUserStatsCourseMap } from '@/contexts/UserStatsCoursesContext';
 import { useMostPlayedThisWeek, type MostPlayedRow } from './courseled/hooks/useMostPlayedThisWeek';
 import type { TourWeekEvent } from './courseled/hooks/useTourThisWeek';
+import { buildMomentQueue } from '@/features/community/momentQueue';
 
 /**
  * Discover, COURSE-LED (BRIEF_DISCOVER_REBUILT_COURSE_LED).
