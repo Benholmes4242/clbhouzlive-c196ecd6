@@ -21,7 +21,6 @@ import NewConversationSheet from './NewConversationSheet';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSharedGroundBatch } from '@/hooks/messaging/useSharedGround';
-import { useMessagesStagePhoto } from '@/hooks/messaging/useMessagesStagePhoto';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { isSpeakableThread } from './messagePreview';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
@@ -56,7 +55,6 @@ const InboxV2Page: React.FC = () => {
   const actor = useMessagingActor();
   const { user } = useSupabaseSession();
   const [bannerDismissed, setBannerDismissed] = useState(false);
-  const [photoIn, setPhotoIn] = useState(false);
 
   useEffect(() => {
     if (!actor) return;
@@ -103,9 +101,6 @@ const InboxV2Page: React.FC = () => {
   );
   const { byUserId } = useSharedGroundBatch(user?.id, directUserIds);
 
-  // §2.6 the photograph: the member's most played course, or nothing.
-  const stage = useMessagesStagePhoto(null);
-
   const groundFor = (conversationIndex: number) => {
     const c = visible[conversationIndex];
     if (c.type !== 'direct') return undefined;
@@ -119,22 +114,11 @@ const InboxV2Page: React.FC = () => {
   return (
     <div className="messages-root" style={{ background: MSG.BLACK, color: MSG.INK }}>
       <div className="flex h-full w-full flex-col" style={{ background: MSG.BLACK }}>
-        {/* ── Header: photograph, scrim, chrome ─────────────────────────── */}
+        {/* ── Header: no photograph, no scrim (§2.1). Flat canvas. ──────── */}
         <header
           className="z-30 flex-shrink-0"
-          style={{ position: 'relative', overflow: 'hidden', background: MSG.BLACK }}
+          style={{ position: 'relative', background: MSG.BLACK }}
         >
-          {stage.imageUrl ? (
-            <img
-              src={stage.imageUrl}
-              alt=""
-              aria-hidden
-              className={`msg-photo${photoIn ? ' msg-photo--in' : ''}`}
-              onLoad={() => setPhotoIn(true)}
-              draggable={false}
-            />
-          ) : null}
-          <div className="msg-scrim" aria-hidden />
 
           <div
             style={{
