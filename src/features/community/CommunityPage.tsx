@@ -110,7 +110,8 @@ export default function CommunityPage() {
   // unfiltered pool when the filtered pool has nothing inside 30 days.
   const lead = useMemo(() => featuredMoment(pool), [pool]);
 
-  // READ-ONLY viewer, exactly as Discover opens moments. The QUEUE IS WHAT THE
+  // The viewer opens with its full action rail, exactly as Discover does:
+  // this is a social browse surface. The QUEUE IS WHAT THE
   // MEMBER CAN SEE: under a filter it carries only filtered moments.
   const posts = useMemo(() => {
     const seen = new Set<string>();
@@ -139,7 +140,6 @@ export default function CommunityPage() {
         mediaIndex: m.mediaIndex ?? 0,
         mediaId: m.mediaId ?? null,
         openedFrom: 'community-page',
-        options: { readOnly: true },
       });
     },
     [posts],

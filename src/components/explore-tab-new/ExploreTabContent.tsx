@@ -393,7 +393,6 @@ export default function ExploreTabContent({
         mediaIndex: m.mediaIndex ?? 0,
         mediaId: m.mediaId ?? null,
         openedFrom: 'discover-moments',
-        options: { readOnly: true },
       });
     },
     [momentPosts],
@@ -401,7 +400,8 @@ export default function ExploreTabContent({
 
 
   // THE WHOLE CARD OPENS THE VIEWER, seeded with that member's moments. Same
-  // readOnly path handleMoment uses, with a creator-scoped list passed to it.
+  // path handleMoment uses, with a creator-scoped list passed to it. Discover
+  // is social browse, so the viewer carries its full action rail.
   const handleCreator = useCallback(
     (c: CommunityCreator) => {
       analyticsEvents.track('discover_creator_card_tapped', {
@@ -424,7 +424,6 @@ export default function ExploreTabContent({
         mediaIndex: c.frame.mediaIndex ?? 0,
         mediaId: c.frame.mediaId ?? null,
         openedFrom: 'discover-moments',
-        options: { readOnly: true },
       });
     },
     [],
