@@ -1,4 +1,15 @@
-import React, { useCallback, useState } from 'react';
+/**
+ * BRIEF_MESSAGES_ECHO_PALETTE §2 — THE LIST.
+ *
+ * 68px, avatar 46, so twelve threads fit on a phone. Every row carries a
+ * preview (§2.1), unread is a WHITE count plus a brighter ink tier (§2.2), and
+ * the context line says where and when the two of you last played (§2.3).
+ *
+ * §2.4 NO "..." BUTTON. Mute / archive / delete now live behind a long press on
+ * the row itself — the same sheet, one fewer piece of furniture on every row.
+ */
+
+import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -6,7 +17,6 @@ import { toast } from '@/lib/toast';
 import {
   BellOff,
   BadgeCheck,
-  MoreHorizontal,
   Bell,
   Archive,
   ArchiveRestore,
@@ -19,18 +29,18 @@ import { SheetHeader } from '@/components/ui/SheetHeader';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { supabase } from '@/integrations/supabase/client';
 import type { InboxConversation, InboxParticipant } from '@/types/messaging';
-import { formatWeekdayShort, formatMonthShort } from '@/i18n/format';
-import { FIGURE, FIGS } from '@/lib/tokens/type';
+import { formatWeekdayShort, formatMonthShort, formatRelative } from '@/i18n/format';
+import { MSG, MT } from '@/features/messaging-dark/tokens';
+import { resolvePreview } from './messagePreview';
+import type { SharedGround } from '@/hooks/messaging/useSharedGround';
 
-const INK = '#1F2428';
-const SUB = '#8A9099';
-const HINT = '#AEB4BC';
-const AMBER = '#F7931E';
-const DANGER = '#DC2626';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+const SHEET_INK = '#1F2428';
+const SHEET_DANGER = '#DC2626';
 
 interface Props {
   conversation: InboxConversation;
+  /** Shared golf with the other member. Absent for groups and businesses. */
+  ground?: SharedGround;
 }
 
 interface Identity {
@@ -38,6 +48,7 @@ interface Identity {
   avatarUrl: string | null;
   userId: string;
   verified: boolean;
+  isBusiness: boolean;
 }
 
 function resolveIdentity(
@@ -51,6 +62,7 @@ function resolveIdentity(
       avatarUrl: c.avatar_url,
       userId: c.conversation_id,
       verified: false,
+      isBusiness: false,
     };
   }
   const others = c.participants.filter(
@@ -62,10 +74,11 @@ function resolveIdentity(
     avatarUrl: p?.avatar_url ?? null,
     userId: p?.actor_id ?? c.conversation_id,
     verified: !!p?.verified,
+    isBusiness: p?.actor_type === 'business',
   };
 }
 
-function formatRelative(iso: string | null): string {
+function formatStamp(iso: string | null): string {
   if (!iso) return '';
   const d = new Date(iso);
   if (isNaN(d.getTime())) return '';
@@ -79,20 +92,9 @@ function formatRelative(iso: string | null): string {
     const mm = String(d.getMinutes()).padStart(2, '0');
     return `${hh}:${mm}`;
   }
-  const yest = new Date(now);
-  yest.setDate(now.getDate() - 1);
-  const isYest =
-    d.getFullYear() === yest.getFullYear() &&
-    d.getMonth() === yest.getMonth() &&
-    d.getDate() === yest.getDate();
-  if (isYest) return 'Yesterday';
   const withinWeek = now.getTime() - d.getTime() < 7 * 24 * 60 * 60 * 1000;
-  if (withinWeek) {
-    return formatWeekdayShort(d);
-  }
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = formatMonthShort(d);
-  return `${day} ${month}`;
+  if (withinWeek) return formatWeekdayShort(d);
+  return `${String(d.getDate()).padStart(2, '0')} ${formatMonthShort(d)}`;
 }
 
 function farFutureIso(): string {
@@ -101,7 +103,32 @@ function farFutureIso(): string {
   return d.toISOString();
 }
 
-export const ConversationRow: React.FC<Props> = ({ conversation }) => {
+/** §2.3 "Sundridge Park · 3 days ago", or "Business", or nothing at all. */
+function resolveContext(
+  identity: Identity,
+  isGroup: boolean,
+  ground: SharedGround | undefined,
+  memberCount: number,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): string | null {
+  if (identity.isBusiness) return t('context.business', { defaultValue: 'Business' });
+  if (isGroup) {
+    return t('context.members', {
+      count: memberCount,
+      defaultValue: `${memberCount} members`,
+    });
+  }
+  if (!ground || ground.count === 0) return null;
+  if (ground.lastCourseName && ground.lastPlayDate) {
+    return `${ground.lastCourseName} · ${formatRelative(ground.lastPlayDate)}`;
+  }
+  return t('context.roundsTogether', {
+    count: ground.count,
+    defaultValue: `${ground.count} rounds together`,
+  });
+}
+
+export const ConversationRow: React.FC<Props> = ({ conversation, ground }) => {
   const { t } = useTranslation('messaging');
   const navigate = useNavigate();
   const actor = useMessagingActor();
@@ -113,11 +140,12 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
   );
 
   const unread = conversation.unread_count > 0;
-  const time = formatRelative(conversation.last_message_at);
-  const previewColor = unread ? INK : SUB;
-  const nameWeight = 500;
-  const previewWeight = unread ? 500 : 400;
-  const timeColor = unread ? AMBER : HINT;
+  const time = formatStamp(conversation.last_message_at);
+  const preview = resolvePreview(conversation, t as never);
+
+  // §2.2 UNREAD IS A BRIGHTER INK TIER. Three solid values, no alpha tricks.
+  const nameColor = unread ? MSG.INK : MSG.INK_2;
+  const previewColor = unread ? MSG.INK_2 : MSG.INK_3;
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -126,6 +154,13 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
   const isGroup = conversation.type === 'group';
   const muted = !!conversation.is_muted;
   const archived = !!conversation.is_archived;
+  const context = resolveContext(
+    identity,
+    isGroup,
+    ground,
+    conversation.participants.length,
+    t as never,
+  );
 
   const invalidateInbox = useCallback(() => {
     if (!actor) return;
@@ -200,13 +235,25 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
     }
   }, [actor, conversation.conversation_id, isGroup, invalidateInbox]);
 
-  const handleRowActivate = () => {
-    if (menuOpen) return;
-    navigate(`/messages/${conversation.conversation_id}`);
+  // §2.4 the row's own long press replaces the per-row "..." button.
+  const longPressRef = useRef<number | null>(null);
+  const longFiredRef = useRef(false);
+  const startPress = () => {
+    longFiredRef.current = false;
+    longPressRef.current = window.setTimeout(() => {
+      longFiredRef.current = true;
+      setConfirmLeave(false);
+      setMenuOpen(true);
+    }, 480);
+  };
+  const endPress = () => {
+    if (longPressRef.current) window.clearTimeout(longPressRef.current);
+    longPressRef.current = null;
   };
 
-  const stop = (e: React.SyntheticEvent) => {
-    e.stopPropagation();
+  const handleRowActivate = () => {
+    if (menuOpen || longFiredRef.current) return;
+    navigate(`/messages/${conversation.conversation_id}`);
   };
 
   return (
@@ -214,118 +261,76 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
       <div
         role="button"
         tabIndex={0}
+        className="msg-row"
         onClick={handleRowActivate}
+        onPointerDown={startPress}
+        onPointerUp={endPress}
+        onPointerCancel={endPress}
+        onPointerLeave={endPress}
+        onContextMenu={(e) => e.preventDefault()}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             handleRowActivate();
           }
         }}
-        className="w-full text-left flex items-center gap-3 active:bg-black/[0.03] transition-colors cursor-pointer"
-        style={{
-          padding: '12px 14px',
-          minHeight: 72,
-          borderBottom: `0.5px solid ${HAIRLINE}`,
-          background: 'transparent',
-        }}
       >
         <SquircleAvatar
           src={identity.avatarUrl}
           userId={identity.userId}
           alt={identity.name}
-          size={52}
+          size={46}
           hairlineRing
         />
-        <div className="flex-1 min-w-0 flex items-center gap-3">
-          <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span
-                className="truncate"
-                style={{
-                  color: INK,
-                  fontSize: 16,
-                  fontWeight: nameWeight,
-                  lineHeight: '20px',
-                  minWidth: 0,
-                }}
-              >
-                {identity.name}
-              </span>
-              {identity.verified ? (
-                <BadgeCheck size={14} style={{ color: AMBER, flexShrink: 0 }} />
-              ) : null}
-            </div>
+
+        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ gap: 2 }}>
+          <div className="flex items-center gap-1.5 min-w-0">
             <span
               className="truncate"
-              style={{
-                color: previewColor,
-                fontSize: 14,
-                lineHeight: '18px',
-                fontWeight: previewWeight,
-                minWidth: 0,
-              }}
+              style={{ ...MT.NAME, color: nameColor, minWidth: 0 }}
             >
-              {conversation.last_message_preview ?? ''}
+              {identity.name}
             </span>
-          </div>
-          <div
-            className="flex flex-col items-end justify-center gap-1"
-            style={{ flexShrink: 0, minWidth: 40 }}
-          >
-            <span
-              style={{
-                ...FIGS,
-                color: timeColor,
-                fontSize: 12,
-                lineHeight: '16px',
-                fontWeight: unread ? 500 : 400,
-              }}
-            >
-              {time}
-            </span>
-            {unread ? (
-              <span
-                className="inline-flex items-center justify-center rounded-full"
-                style={{
-                  ...FIGURE,
-                  background: AMBER,
-                  color: '#FFFFFF',
-                  fontSize: 12,
-                  minWidth: 20,
-                  height: 20,
-                  padding: '0 6px',
-                  lineHeight: '20px',
-                }}
-              >
-                {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
-              </span>
-            ) : conversation.is_muted ? (
-              <BellOff size={14} style={{ color: HINT }} />
+            {identity.verified ? (
+              <BadgeCheck size={13} style={{ color: MSG.INK_2, flexShrink: 0 }} />
             ) : null}
+            {muted ? <BellOff size={11} style={{ color: MSG.INK_3, flexShrink: 0 }} /> : null}
           </div>
-          <button
-            type="button"
-            onClick={(e) => {
-              stop(e);
-              setConfirmLeave(false);
-              setMenuOpen(true);
-            }}
-            onPointerDown={stop}
-            aria-label={t('a11y.conversationActions')}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: SUB,
-              padding: 6,
-              marginLeft: 2,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <MoreHorizontal size={18} />
-          </button>
+
+          <span className="truncate" style={{ ...MT.PREVIEW, color: previewColor, minWidth: 0 }}>
+            {preview}
+          </span>
+
+          {context ? (
+            <span className="truncate" style={{ ...MT.CONTEXT, minWidth: 0 }}>
+              {context}
+            </span>
+          ) : null}
+        </div>
+
+        <div
+          className="flex flex-col items-end justify-center"
+          style={{ flexShrink: 0, gap: 5, minWidth: 34 }}
+        >
+          <span style={MT.TIME}>{time}</span>
+          {unread ? (
+            <span
+              className="inline-flex items-center justify-center rounded-full"
+              style={{
+                ...MT.BADGE,
+                /* §2.2 WHITE, NOT AMBER. Amber is the viewing member, and an
+                   unread count is not the viewing member. */
+                background: MSG.INK,
+                color: MSG.BLACK,
+                minWidth: 18,
+                height: 18,
+                padding: '0 5px',
+                lineHeight: '18px',
+              }}
+            >
+              {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
+            </span>
+          ) : null}
         </div>
       </div>
 
@@ -340,7 +345,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
         <SheetHeader title={identity.name} onClose={() => setMenuOpen(false)} />
         <div style={{ background: '#F8FAFC', paddingBottom: 32 }}>
           <ActionRow
-            icon={muted ? <BellOff size={20} color={INK} /> : <Bell size={20} color={INK} />}
+            icon={muted ? <BellOff size={20} color={SHEET_INK} /> : <Bell size={20} color={SHEET_INK} />}
             label={muted ? 'Unmute' : 'Mute notifications'}
             onClick={() => void handleToggleMute()}
             disabled={busy}
@@ -348,9 +353,9 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
           <ActionRow
             icon={
               archived ? (
-                <ArchiveRestore size={20} color={INK} />
+                <ArchiveRestore size={20} color={SHEET_INK} />
               ) : (
-                <Archive size={20} color={INK} />
+                <Archive size={20} color={SHEET_INK} />
               )
             }
             label={archived ? 'Unarchive' : 'Archive'}
@@ -359,7 +364,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
           />
           {isGroup ? (
             <ActionRow
-              icon={<LogOut size={20} color={DANGER} />}
+              icon={<LogOut size={20} color={SHEET_DANGER} />}
               label={confirmLeave ? 'Tap again to confirm' : 'Leave group'}
               onClick={() => {
                 if (!confirmLeave) {
@@ -374,7 +379,7 @@ export const ConversationRow: React.FC<Props> = ({ conversation }) => {
             />
           ) : (
             <ActionRow
-              icon={<Trash2 size={20} color={DANGER} />}
+              icon={<Trash2 size={20} color={SHEET_DANGER} />}
               label={confirmLeave ? 'Tap again to confirm' : 'Delete conversation'}
               onClick={() => {
                 if (!confirmLeave) {
@@ -415,7 +420,7 @@ const ActionRow: React.FC<ActionRowProps> = ({ icon, label, onClick, disabled, d
       width: '100%',
       background: 'transparent',
       border: 'none',
-      color: danger ? DANGER : INK,
+      color: danger ? SHEET_DANGER : SHEET_INK,
       fontSize: 15,
       fontWeight: 500,
       textAlign: 'left',
