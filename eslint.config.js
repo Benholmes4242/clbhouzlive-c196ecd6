@@ -172,6 +172,7 @@ const settledPlugin = {
   },
 };
 
+const i18nLiteralOptions = {
 
   mode: "jsx-text-only",
   "should-validate-template": false,
