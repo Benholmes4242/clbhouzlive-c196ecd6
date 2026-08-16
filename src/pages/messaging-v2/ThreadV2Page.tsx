@@ -319,94 +319,123 @@ const ThreadV2Page: React.FC = () => {
         width: '100%',
       }}
     >
+      {/* §4 HEADER: photograph, avatar, name, and the golf you have played
+          together. The scrim carries legibility — never a darker glass (§3.2). */}
       <header
         style={{
+          position: 'relative',
+          overflow: 'hidden',
           background: CANVAS,
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-          paddingBottom: 12,
-          paddingLeft: 6,
-          paddingRight: 6,
-          borderBottom: `0.5px solid ${HAIRLINE}`,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
           flexShrink: 0,
         }}
       >
-        <button
-          type="button"
-          aria-label={t('a11y.back')}
-          onClick={() => {
-            // Prefer real back so we don't push a duplicate /messages entry
-            // and trap the user in an inbox ↔ thread loop.
-            if (window.history.length > 1) navigate(-1);
-            else navigate('/messages', { replace: true });
-          }}
-          className="active:opacity-60"
-          style={{
-            width: 40,
-            height: 40,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 'none',
-            color: INK,
-          }}
-        >
-          <ChevronLeft size={24} />
-        </button>
-        <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          <SquircleAvatar
-            src={header.avatarUrl}
-            userId={header.userId}
-            alt={header.name}
-            size={34}
-            hairlineRing
+        {stage.imageUrl ? (
+          <img
+            src={stage.imageUrl}
+            alt=""
+            aria-hidden
+            className={`msg-photo${photoIn ? ' msg-photo--in' : ''}`}
+            onLoad={() => setPhotoIn(true)}
+            draggable={false}
           />
-          <div className="flex flex-col min-w-0" style={{ gap: 1 }}>
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span
-                className="truncate"
-                style={{ color: INK, fontSize: 15, fontWeight: 600, lineHeight: '18px' }}
-              >
-                {header.name}
-              </span>
-              {header.verified ? (
-                <BadgeCheck size={13} style={{ color: AMBER, flexShrink: 0 }} />
-              ) : null}
+        ) : null}
+        <div className="msg-scrim" aria-hidden />
+
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+              paddingBottom: 4,
+              paddingLeft: 6,
+              paddingRight: 6,
+            }}
+          >
+            <button
+              type="button"
+              aria-label={t('a11y.back')}
+              onClick={() => {
+                // Prefer real back so we don't push a duplicate /messages entry
+                // and trap the user in an inbox ↔ thread loop.
+                if (window.history.length > 1) navigate(-1);
+                else navigate('/messages', { replace: true });
+              }}
+              className="active:opacity-60"
+              style={{
+                width: 40,
+                height: 40,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'transparent',
+                border: 'none',
+                color: INK,
+              }}
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+              <SquircleAvatar
+                src={header.avatarUrl}
+                userId={header.userId}
+                alt={header.name}
+                size={38}
+                hairlineRing
+              />
+              <div className="flex flex-col min-w-0" style={{ gap: 1 }}>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span
+                    className="truncate"
+                    style={{ color: INK, fontSize: 16, fontWeight: 600, lineHeight: '19px', letterSpacing: '-0.012em' }}
+                  >
+                    {header.name}
+                  </span>
+                  {header.verified ? (
+                    <BadgeCheck size={13} style={{ color: SUB, flexShrink: 0 }} />
+                  ) : null}
+                </div>
+                {/* Rounds played together beats "last seen" every time. */}
+                <span style={{ ...MT.CONTEXT }}>
+                  {ground.count > 0
+                    ? t('messaging:header.roundsTogether', {
+                        count: ground.count,
+                        defaultValue: `${ground.count} rounds together`,
+                      })
+                    : header.secondary}
+                </span>
+              </div>
             </div>
-            {header.secondary ? (
-              <span style={{ ...FIGS, color: SUB, fontSize: 12, lineHeight: '14px' }}>
-                {header.secondary}
-              </span>
-            ) : null}
+            <button
+              type="button"
+              aria-label={t('a11y.more')}
+              className="active:opacity-60"
+              onClick={() => setSettingsOpen(true)}
+              style={{
+                width: 40,
+                height: 40,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'transparent',
+                border: 'none',
+                color: SUB,
+              }}
+            >
+              <MoreVertical size={20} />
+            </button>
           </div>
+
+          {/* §4.1 NO SHARED ROUNDS -> NO STRIP. */}
+          {isDirect ? (
+            <SharedGroundStrip ground={ground} rivalFirstName={rivalFirstName} />
+          ) : null}
         </div>
-        <button
-          type="button"
-          aria-label={t('a11y.more')}
-          className="active:opacity-60"
-          onClick={() => setSettingsOpen(true)}
-          style={{
-            width: 40,
-            height: 40,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 'none',
-            color: SUB,
-          }}
-        >
-          <MoreVertical size={20} />
-        </button>
       </header>
 
-      {/* Canvas: the contour field is pinned to this positioned parent so it
-          stays put while the message list scrolls over it. */}
       <div className="flex-1 min-h-0" style={{ position: 'relative', zIndex: 0 }}>
-        <ContourField opacity={0.06} />
+
         <div
           ref={scrollerRef}
           className="overflow-y-auto"
