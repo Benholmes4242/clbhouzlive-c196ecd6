@@ -12,9 +12,7 @@ import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { MessageBubble } from './MessageBubble';
 import { Composer } from './Composer';
 import { ConversationSettingsSheet } from './ConversationSettingsSheet';
-import { Skeleton } from '@/components/ui/skeleton';
 import { FIGS } from '@/lib/tokens/type';
-import { ContourField } from '@/components/shared/ContourField';
 import type {
   ConversationDetail,
   ConversationMember,
@@ -175,11 +173,12 @@ const SkeletonBubble: React.FC<{ side: 'left' | 'right'; w: number }> = ({ side,
     className="w-full flex"
     style={{ justifyContent: side === 'right' ? 'flex-end' : 'flex-start', marginTop: 10 }}
   >
-    <Skeleton
+    <div
       style={{
         width: `${w}%`,
         height: 34,
-        borderRadius: 18,
+        borderRadius: 16,
+        background: 'rgba(255,255,255,0.07)',
       }}
     />
   </div>
