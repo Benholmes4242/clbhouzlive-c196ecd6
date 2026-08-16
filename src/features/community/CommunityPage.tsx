@@ -121,16 +121,10 @@ export default function CommunityPage() {
   // The viewer opens with its full action rail, exactly as Discover does:
   // this is a social browse surface. The QUEUE IS WHAT THE
   // MEMBER CAN SEE: under a filter it carries only filtered moments.
-  const posts = useMemo(() => {
-    const seen = new Set<string>();
-    const out = [] as Moment['post'][];
-    for (const m of pool) {
-      if (seen.has(m.post.id)) continue;
-      seen.add(m.post.id);
-      out.push(m.post);
-    }
-    return out;
-  }, [pool]);
+  // Each queued post LEADS with the media that earned its best-ranked tile, so
+  // swiping onto it mounts that clip (and autoplays) rather than the post's
+  // first media — the Clubhouse feed behaviour.
+  const posts = useMemo(() => buildMomentQueue(pool), [pool]);
 
   const handleTile = useCallback(
     (m: Moment) => {
