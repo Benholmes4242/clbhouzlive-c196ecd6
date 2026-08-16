@@ -49,7 +49,8 @@
     "threadStart": "This is the start of your conversation.",
     "threadStartGroup": "This is the start of {{name}}.",
     "threadStartGroupGeneric": "This is the start of this group.",
-    "threadStartWith": "This is the start of your conversation with {{name}}."
+    "threadStartWith": "This is the start of your conversation with {{name}}.",
+    "threadCommonGround": "Du und {{name}} habt {{count}} Runden zusammen gespielt, zuletzt in {{course}}."
   },
   "error": {
     "couldntLoadInbox": "Couldn't load messages",
@@ -69,12 +70,36 @@
     "people": "Search people or businesses",
     "peopleAnd": "Search people and businesses",
     "prompt": "Search for someone to message.",
-    "searching": "Searching…"
+    "searching": "Searching…",
+    "threads": "Unterhaltungen suchen"
   },
   "sheet": {
     "detailsTitle": "Details"
   },
   "title": {
     "inbox": "Messages"
+  },
+  "preview": {
+    "photo": "Foto",
+    "video": "Video",
+    "voice": "Sprachnachricht",
+    "attachment": "Anhang",
+    "empty": "Noch keine Nachrichten"
+  },
+  "context": {
+    "business": "Unternehmen",
+    "members": "{{count}} Mitglieder",
+    "roundsTogether": "{{count}} Runden zusammen"
+  },
+  "header": {
+    "roundsTogether": "{{count}} Runden zusammen"
+  },
+  "shared": {
+    "eyebrow": "Gespielt mit {{name}} · {{count}}",
+    "you": "Du"
+  },
+  "compose": {
+    "playedWith": "Zusammen gespielt",
+    "roundsTogether": "{{count}} Runden zusammen"
   }
 }

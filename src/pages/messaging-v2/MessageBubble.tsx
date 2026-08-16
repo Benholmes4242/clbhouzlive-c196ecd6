@@ -12,9 +12,11 @@ import { FIGS } from '@/lib/tokens/type';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
 
 /**
- * BRIEF_MESSAGES_ECHO_PALETTE §4.4 — YOUR MESSAGES ARE AMBER, because amber is
- * the viewing member everywhere on this palette. Theirs are glass over the dark
- * surface. §3.3 no faded colour: three solid ink values, no alpha on text.
+ * BRIEF_MESSAGES_DARK §6 — AMBER IS NARROWED TO MATCH ECHO. The member's own
+ * bubble is WHITE WITH BLACK TEXT (the amber bubble of the previous brief is
+ * WITHDRAWN); amber survives on this surface only on the member's own score on
+ * a shared-round card. Theirs are glass over the dark canvas.
+ * §2.4 no faded colour: three solid ink values, no alpha on text.
  */
 const INK = '#F5F7F8';
 const SUB = '#A8AFB4';
@@ -23,8 +25,8 @@ const HAIRLINE = 'rgba(255,255,255,0.10)';
 
 // Incoming: flat fill base (blur is an enhancement, applied via .ec-glass).
 const IN_BG = 'rgba(255,255,255,0.10)';
-const OUT_BG = '#F7931E';
-const OUT_FG = '#151007';
+const OUT_BG = '#F4F6F8';
+const OUT_FG = '#05070A';
 
 
 interface Props {

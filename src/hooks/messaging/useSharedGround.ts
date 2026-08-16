@@ -54,12 +54,21 @@ export function dedupeSharedRounds(rounds: SharedRoundResult[]): SharedRoundResu
   return out.sort((a, b) => (a.play_date < b.play_date ? 1 : -1));
 }
 
-function toGround(rounds: SharedRoundResult[]): SharedGround {
+/**
+ * BRIEF_MESSAGES_DARK §5.2 — THE COUNT MUST NOT DISAGREE WITH THE COMPARE
+ * SHEET'S. The compare sheet and the rivalry tiering both read the server's
+ * `shared_rounds_count`, which is PAIRING-BASED and NOT DEDUPED (a day where
+ * both players post two rounds counts four). So the displayed count is that
+ * server figure, verbatim; the dedupe is used ONLY to draw the strip's cards,
+ * where two identical cards for one day would be a visible fault.
+ * Fixing the pairing fault is a server change and its own brief.
+ */
+function toGround(rounds: SharedRoundResult[], serverCount?: number): SharedGround {
   const deduped = dedupeSharedRounds(rounds);
   if (deduped.length === 0) return EMPTY;
   return {
     rounds: deduped,
-    count: deduped.length,
+    count: serverCount ?? deduped.length,
     lastCourseName: deduped[0].course_name ?? null,
     lastPlayDate: deduped[0].play_date ?? null,
   };
@@ -118,7 +127,7 @@ export function useSharedGroundBatch(
     }
     detailIds.forEach((id, i) => {
       const rows = (details[i]?.data?.shared_round_results ?? []) as SharedRoundResult[];
-      if (rows.length > 0) out[id] = toGround(rows);
+      if (rows.length > 0) out[id] = toGround(rows, counts[id] ?? undefined);
     });
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -144,7 +153,11 @@ export function useSharedGroundOne(
   })[0];
 
   const ground = useMemo(
-    () => toGround((q.data?.shared_round_results ?? []) as SharedRoundResult[]),
+    () =>
+      toGround(
+        (q.data?.shared_round_results ?? []) as SharedRoundResult[],
+        typeof q.data?.shared_rounds_count === 'number' ? q.data.shared_rounds_count : undefined,
+      ),
     [q.data],
   );
 

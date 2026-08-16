@@ -49,7 +49,8 @@
     "threadStart": "[~~Ţĥíš íš ţĥé šţářţ őƒ ýőúř ĉőñṽéřšáţíőñ.~~]",
     "threadStartGroup": "[~~Ţĥíš íš ţĥé šţářţ őƒ {{name}}.~~]",
     "threadStartGroupGeneric": "[~~Ţĥíš íš ţĥé šţářţ őƒ ţĥíš ĝřőúƥ.~~]",
-    "threadStartWith": "[~~Ţĥíš íš ţĥé šţářţ őƒ ýőúř ĉőñṽéřšáţíőñ ŵíţĥ {{name}}.~~]"
+    "threadStartWith": "[~~Ţĥíš íš ţĥé šţářţ őƒ ýőúř ĉőñṽéřšáţíőñ ŵíţĥ {{name}}.~~]",
+    "threadCommonGround": "[Ýöû äñd {{name}} hävé pläyéd {{count}} röûñds tögéthér, möst récéñtly ät {{course}}.]"
   },
   "error": {
     "couldntLoadInbox": "[~~Ĉőúļđñ'ţ ļőáđ ɱéššáĝéš~~]",
@@ -69,12 +70,36 @@
     "people": "[~~Šéářĉĥ ƥéőƥļé őř ƀúšíñéššéš~~]",
     "peopleAnd": "[~~Šéářĉĥ ƥéőƥļé áñđ ƀúšíñéššéš~~]",
     "prompt": "[~~Šéářĉĥ ƒőř šőɱéőñé ţő ɱéššáĝé.~~]",
-    "searching": "[~~Šéářĉĥíñĝ…~~]"
+    "searching": "[~~Šéářĉĥíñĝ…~~]",
+    "threads": "[Séärçh çöñvérsätiöñs]"
   },
   "sheet": {
     "detailsTitle": "[~~Đéţáíļš~~]"
   },
   "title": {
     "inbox": "[~~Ṁéššáĝéš~~]"
+  },
+  "preview": {
+    "photo": "[Phötö]",
+    "video": "[Vidéö]",
+    "voice": "[Vöiçé méssägé]",
+    "attachment": "[Attächméñt]",
+    "empty": "[Nö méssägés yét]"
+  },
+  "context": {
+    "business": "[Bûsiñéss]",
+    "members": "[{{count}} mémbérs]",
+    "roundsTogether": "[{{count}} röûñds tögéthér]"
+  },
+  "header": {
+    "roundsTogether": "[{{count}} röûñds tögéthér]"
+  },
+  "shared": {
+    "eyebrow": "[Pläyéd with {{name}} · {{count}}]",
+    "you": "[Ýöû]"
+  },
+  "compose": {
+    "playedWith": "[Pläyéd with]",
+    "roundsTogether": "[{{count}} röûñds tögéthér]"
   }
 }

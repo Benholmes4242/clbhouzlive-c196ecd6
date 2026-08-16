@@ -2,7 +2,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
-import { X, Check, Sparkles } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -23,7 +23,6 @@ import type { Json } from '@/integrations/supabase/types';
 const CANVAS = '#F8FAFC';
 const INK = '#1F2428';
 const SUB = '#8A9099';
-const AMBER = '#F7931E';
 const HAIRLINE = 'rgba(0,0,0,0.07)';
 
 type Candidate = {
@@ -102,11 +101,8 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
     [selected],
   );
 
-  // Intro framing shown when the acting business is targeting any personal.
-  const showIntro = useMemo(() => {
-    if (!actor || actor.actorType !== 'business') return false;
-    return selected.some((s) => s.actor_type === 'personal');
-  }, [actor, selected]);
+
+
 
   const reset = useCallback(() => {
     setQuery('');
@@ -453,27 +449,6 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
             })
           )}
         </div>
-
-        {/* Early-access note for business -> personal */}
-        {showIntro && (
-          <div style={{ padding: '8px 16px 0' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '12px',
-                background: 'rgba(247,147,30,0.08)',
-                borderRadius: 11,
-              }}
-            >
-              <Sparkles size={16} color={AMBER} />
-              <span style={{ color: '#B45309', fontSize: 12.5, lineHeight: 1.4 }}>
-                
-              </span>
-            </div>
-          </div>
-        )}
 
         {/* Footer actions */}
         <div

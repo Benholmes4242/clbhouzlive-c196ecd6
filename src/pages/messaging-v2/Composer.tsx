@@ -7,9 +7,9 @@ import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles
 
 
 /**
- * BRIEF_MESSAGES_ECHO_PALETTE §1 / §3 — the composer on Echo's palette. Flat
- * fill base, no chat chrome, and the send key carries AMBER because sending is
- * the viewing member acting (§6).
+ * BRIEF_MESSAGES_DARK §3 / §6 — the composer on the Clubhouse canvas. Flat fill
+ * base, no chat chrome, and THE SEND KEY IS WHITE: it is chrome, not the member,
+ * so the amber it used to carry is withdrawn.
  */
 const INK = '#F5F7F8';
 const SUB = '#A8AFB4';
@@ -17,8 +17,8 @@ const HINT = '#7C8489';
 const HAIRLINE = 'rgba(255,255,255,0.07)';
 const COMPOSER_BG = '#0B0C0E';
 const COMPOSER_INPUT_BG = 'rgba(255,255,255,0.08)';
-const SEND_BG = '#F7931E';
-const SEND_FG = '#151007';
+const SEND_BG = '#F4F6F8';
+const SEND_FG = '#05070A';
 
 const LINE_HEIGHT = 20;
 const MAX_LINES = 5;
