@@ -1060,7 +1060,9 @@ function Last5Block({
           ? [0, 1, 2, 3, 4].map((i) => (
               <Skeleton key={i} style={{ flex: 1, height: 30, borderRadius: 10 }} />
             ))
-          : results.slice(0, 5).map((r, i) => {
+          : // usePlayerResults returns MOST RECENT FIRST. The direction label
+            // states "most recent on the right", so reverse to oldest → newest.
+            results.slice(0, 5).reverse().map((r, i) => {
               const v = verdictFromResult(r);
               const isWin = v.kind === 'win';
               const isMc = v.kind === 'mc';
