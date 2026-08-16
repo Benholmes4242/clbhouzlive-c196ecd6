@@ -21,6 +21,8 @@ import type { EventState } from '@/features/tourhub/components/overview-v3/useTo
 import { usePickLiveState, type PickLiveState } from '../data/usePickLiveState';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { TourStatusBlock, TOUR_UNDER } from '../../_shared/TourStatusBlock';
+import { TOPAR_UNDER_LIGHT } from '../../_shared/tokens';
+
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { useSinglePlayerStatistics } from '../../hooks/useTourHubData';
