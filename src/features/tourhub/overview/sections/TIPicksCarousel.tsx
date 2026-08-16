@@ -159,7 +159,11 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                 display: 'flex',
                 gap: 10,
                 overflowX: 'auto',
-                padding: '0 16px 10px',
+                // ASYMMETRIC GUTTER — padded left only, so the last tile bleeds
+                // off the right edge and the rail announces that it scrolls.
+                paddingLeft: 16,
+                paddingRight: 0,
+                paddingBottom: 10,
                 scrollPaddingLeft: 16,
                 scrollSnapType: 'x mandatory',
               }}
@@ -168,6 +172,10 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                 const live = liveMap?.[p.playerId];
                 const v = settled ? tiVerdict(live) : { kind: 'none' as const, label: null, score: null };
                 const isWin = v.kind === 'win';
+                // ONE resolution for both the avatar and the band behind it.
+                const headshots = p.photoUrl
+                  ? [p.photoUrl, ...getPlayerHeadshotCandidates(p.playerName, tourCode)]
+                  : getPlayerHeadshotCandidates(p.playerName, tourCode);
                 return (
                   <button
                     key={p.playerId}
@@ -180,110 +188,126 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                       border: isWin ? `1px solid ${GOLD_RING}` : `1px solid ${HAIR}`,
                       boxShadow: isWin ? GOLD_SHADOW : V4.cardShadow,
                       borderRadius: 16,
-                      padding: '14px 15px',
+                      padding: 0,
+                      overflow: 'hidden',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 0,
                       cursor: 'pointer',
                     }}
                   >
-                    {/* Top row: the pick with its denominator, opposite the live state */}
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: 8,
-                        marginBottom: 11,
-                        minHeight: 10,
-                      }}
-                    >
-                      <span style={{ ...PICK_META, color: A.DIM }}>
-                        {t('overview.tiPicks.card.pickOf', { n: p.rank, total: pickTotal })}
-                      </span>
-                      <PickStatusTag live={live} t={t} />
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 11 }}>
+                    {/* THE SCRIM BAND — the hero's move, at tile scale. The photo
+                        is atmosphere; the avatar is still the identity. The fade
+                        ENDS ON #FFFFFF, the tile's own white, so there is no seam. */}
+                    <PickScrimBand candidates={headshots}>
                       <div
-                        role="link"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          goToPlayer(p.playerId);
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: 8,
+                          minHeight: 10,
                         }}
-                        style={{ cursor: 'pointer', flexShrink: 0 }}
                       >
-                        <SquircleAvatar
-                          size={52}
-                          srcCandidates={
-                            p.photoUrl
-                              ? [p.photoUrl, ...getPlayerHeadshotCandidates(p.playerName, tourCode)]
-                              : getPlayerHeadshotCandidates(p.playerName, tourCode)
-                          }
-                          alt={p.playerName}
-                          userId={p.playerId}
-                          hairlineRing
-                          ringColor={LIGHT_HAIRLINE}
-                        />
+                        <span style={{ ...PICK_META, color: 'rgba(255,255,255,0.78)' }}>
+                          {t('overview.tiPicks.card.pickOf', { n: p.rank, total: pickTotal })}
+                        </span>
+                        {/* The status tag keeps its ink tokens (untouched), so it
+                            rides a glass pill to stay legible over the photo. */}
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            borderRadius: 999,
+                            background: 'rgba(255,255,255,0.82)',
+                            padding: '2px 7px',
+                          }}
+                        >
+                          <PickStatusTag live={live} t={t} />
+                        </span>
                       </div>
-                      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        {/* The name carries the SAME amber mark as the hero board
-                            row, so a member reads the two as one statement. */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
-                          <span
-                            style={{
-                              fontSize: 15.5,
-                              fontWeight: 700,
-                              letterSpacing: '-0.02em',
-                              color: INK,
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              lineHeight: 1.2,
-                              minWidth: 0,
-                            }}
-                          >
-                            {p.playerName}
-                          </span>
-                          <ClbhouzPickMark size={12} label={t('overview.board.clbhouzPick')} />
+
+                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 11 }}>
+                        <div
+                          role="link"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            goToPlayer(p.playerId);
+                          }}
+                          style={{ cursor: 'pointer', flexShrink: 0 }}
+                        >
+                          <SquircleAvatar
+                            size={52}
+                            srcCandidates={headshots}
+                            alt={p.playerName}
+                            userId={p.playerId}
+                            hairlineRing
+                            ringColor={LIGHT_HAIRLINE}
+                          />
                         </div>
-                        <CardStateSlot state={state} pick={p} live={live} settled={settled} v={v} t={t} />
+                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          {/* The name carries the SAME amber mark as the hero board
+                              row, so a member reads the two as one statement. */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+                            <span
+                              style={{
+                                fontSize: 15.5,
+                                fontWeight: 700,
+                                letterSpacing: '-0.02em',
+                                color: INK,
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                lineHeight: 1.2,
+                                minWidth: 0,
+                              }}
+                            >
+                              {p.playerName}
+                            </span>
+                            <ClbhouzPickMark size={12} label={t('overview.board.clbhouzPick')} />
+                          </div>
+                          <CardStateSlot state={state} pick={p} live={live} settled={settled} v={v} t={t} />
+                        </div>
                       </div>
-                    </div>
+                    </PickScrimBand>
 
-                    <div
-                      style={{
-                        fontSize: 13.5,
-                        fontWeight: 500,
-                        color: 'rgba(15,23,42,0.78)',
-                        lineHeight: 1.45,
-                        minHeight: 39,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        margin: '11px 0 0',
-                      }}
-                    >
-                      {p.pulledQuote || p.reasons?.[0] || '—'}
-                    </div>
+                    <div style={{ padding: '0 15px 14px' }}>
+                      <div
+                        style={{
+                          fontSize: 13.5,
+                          fontWeight: 500,
+                          color: 'rgba(15,23,42,0.78)',
+                          lineHeight: 1.45,
+                          minHeight: 39,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          margin: '4px 0 0',
+                        }}
+                      >
+                        {p.pulledQuote || p.reasons?.[0] || '—'}
+                      </div>
 
-                    {/* Affordance, not a control — the whole card is the tap target */}
-                    <span
-                      style={{
-                        marginTop: 12,
-                        fontSize: 9,
-                        fontWeight: 700,
-                        color: AMBER_DEEP,
-                        letterSpacing: '0.09em',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      {t('overview.tiPicks.card.theCase')}
-                    </span>
+                      {/* Affordance, not a control — the whole card is the tap target */}
+                      <span
+                        style={{
+                          display: 'block',
+                          marginTop: 12,
+                          fontSize: 9,
+                          fontWeight: 700,
+                          color: AMBER_DEEP,
+                          letterSpacing: '0.09em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {t('overview.tiPicks.card.theCase')}
+                      </span>
+                    </div>
                   </button>
                 );
               })}
+
 
             </div>
 
