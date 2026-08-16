@@ -30,12 +30,15 @@ import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
 import { supabase } from '@/integrations/supabase/client';
 import type { InboxConversation, InboxParticipant } from '@/types/messaging';
 import { formatWeekdayShort, formatMonthShort, formatRelative } from '@/i18n/format';
+import { EC } from '@/features/echo-chat/tokens';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
 import { resolvePreview } from './messagePreview';
 import type { SharedGround } from '@/hooks/messaging/useSharedGround';
 
-const SHEET_INK = '#1F2428';
-const SHEET_DANGER = '#DC2626';
+const SHEET_INK = MSG.INK;
+const SHEET_DANGER = MSG.DANGER;
+/* ADDENDUM §1.1 — the row menu is a dark sheet too: EC.PANEL over #05070A. */
+const SHEET_SURFACE = EC.PANEL;
 
 interface Props {
   conversation: InboxConversation;
@@ -341,9 +344,11 @@ export const ConversationRow: React.FC<Props> = ({ conversation, ground }) => {
           setConfirmLeave(false);
         }}
         zIndexBase={1500}
+        variant="dark"
+        surfaceColor={SHEET_SURFACE}
       >
-        <SheetHeader title={identity.name} onClose={() => setMenuOpen(false)} />
-        <div style={{ background: '#F8FAFC', paddingBottom: 32 }}>
+        <SheetHeader title={identity.name} onClose={() => setMenuOpen(false)} dark />
+        <div style={{ background: SHEET_SURFACE, paddingBottom: 32 }}>
           <ActionRow
             icon={muted ? <BellOff size={20} color={SHEET_INK} /> : <Bell size={20} color={SHEET_INK} />}
             label={muted ? 'Unmute' : 'Mute notifications'}
