@@ -563,7 +563,7 @@ function SheetShell({
   onClose: () => void;
   header?: React.ReactNode;
   children: React.ReactNode;
-  scrim?: { candidates: string[]; minHeight: number; fadeStart?: number; objectPosition?: string };
+  scrim?: { candidates: string[]; minHeight: number; fadeStart?: number; objectPosition?: string; treatment?: 'portrait' | 'scene' };
 }) {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}>
@@ -592,6 +592,7 @@ function SheetShell({
               minHeight={scrim.minHeight}
               fadeStart={scrim.fadeStart ?? 23}
               objectPosition={scrim.objectPosition}
+              treatment={scrim.treatment ?? 'portrait'}
               padding="14px 20px 12px"
               grabber
             >
