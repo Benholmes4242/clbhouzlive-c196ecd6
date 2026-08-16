@@ -3,6 +3,14 @@ import { supabase } from '@/integrations/supabase/client';
 
 export interface EchoMessageMeta {
   v?: string;
+  /**
+   * BRIEF_ECHO_CHAT §0.2 — THE QUESTION KIND, mapped server-side in
+   * echo-intelligence-v2 (mapIntentsToKind) and carried on the EXISTING `meta`
+   * event. The answer shape hangs off it. ABSENT means the client must fall
+   * back to the least claiming shape: prose only, no chart, no source list, no
+   * basis line.
+   */
+  kind?: 'your_golf' | 'course' | 'game';
   route?: 'single' | 'dual' | 'full' | 'live';
   strength?: number;
   engines?: number;
