@@ -110,6 +110,14 @@ export default function CommunityPage() {
   // unfiltered pool when the filtered pool has nothing inside 30 days.
   const lead = useMemo(() => featuredMoment(pool), [pool]);
 
+  // NOTHING APPEARS TWICE: the lead is spent, so the grid beneath it never
+  // repeats it. Keyed on the moment id, not on position — the lead is now a
+  // video pick from anywhere in the ranked pool, not always the first item.
+  const gridMoments = useMemo(
+    () => (lead ? pool.filter((m) => m.id !== lead.id) : pool),
+    [pool, lead],
+  );
+
   // The viewer opens with its full action rail, exactly as Discover does:
   // this is a social browse surface. The QUEUE IS WHAT THE
   // MEMBER CAN SEE: under a filter it carries only filtered moments.
