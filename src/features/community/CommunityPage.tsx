@@ -16,6 +16,7 @@ import { CommunityEverythingGrid } from './CommunityEverythingGrid';
 import { CommunityRail, clampAspect, HEADING_STYLE, SCROLLER_GUTTER } from './CommunityRail';
 import { CommunitySkeleton } from './CommunitySkeleton';
 import { featuredMoment, useCommunityRails } from './useCommunityRails';
+import { buildMomentQueue } from './momentQueue';
 
 /**
  * COMMUNITY PAGE — the destination that replaced the moments see-all sheet.
