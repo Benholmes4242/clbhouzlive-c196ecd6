@@ -25,7 +25,8 @@ import { TOPAR_UNDER_LIGHT } from '../../_shared/tokens';
 
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
-import { useSinglePlayerStatistics } from '../../hooks/useTourHubData';
+import { useSinglePlayerStatistics, useTourTournament, type TourTournament } from '../../hooks/useTourHubData';
+import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { usePlayerResults } from '../../hooks/usePlayerResults';
 import { useSeasonResultsSummary } from '../../hooks/useSeasonResultsSummary';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -316,6 +317,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
             {sheet?.kind === 'index' ? (
               <AllPicksSheet
                 picks={picks}
+                tournamentId={tournamentId}
                 state={state}
                 tourCode={tourCode}
                 liveMap={liveMap}
