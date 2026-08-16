@@ -83,6 +83,56 @@ function buildGroups(chats: EchoChatRow[]): ChatGroup[] {
   return out;
 }
 
+/**
+ * BRIEF_ECHO_CHAT §8.2 — HISTORY GROUPS BY DAY. The question leads each row and
+ * the time sits beneath it, because THE QUESTION IS WHAT A MEMBER SCANS FOR.
+ * Within a day, identically-titled chats still collapse under their most
+ * recent one (no chat is ever hidden, and pinned rows stand alone).
+ */
+interface DaySection {
+  key: string;
+  label: string;
+  groups: ChatGroup[];
+}
+
+function dayLabel(iso: string | null, t: (k: string, d: string) => string): string {
+  if (!iso) return t('history.today', 'Today');
+  const d = new Date(iso);
+  const today = new Date();
+  const startOf = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((startOf(today) - startOf(d)) / 86_400_000);
+  if (diff <= 0) return t('history.today', 'Today');
+  if (diff === 1) return t('history.yesterday', 'Yesterday');
+  return d.toLocaleDateString(undefined, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: d.getFullYear() === today.getFullYear() ? undefined : 'numeric',
+  });
+}
+
+function buildDaySections(
+  chats: EchoChatRow[],
+  t: (k: string, d: string) => string,
+): DaySection[] {
+  const buckets = new Map<string, EchoChatRow[]>();
+  const order: string[] = [];
+  for (const c of chats) {
+    const iso = c.last_message_at;
+    const key = iso ? iso.slice(0, 10) : 'unknown';
+    if (!buckets.has(key)) {
+      buckets.set(key, []);
+      order.push(key);
+    }
+    buckets.get(key)!.push(c);
+  }
+  return order.map((key) => ({
+    key,
+    label: dayLabel(buckets.get(key)![0].last_message_at, t),
+    groups: buildGroups(buckets.get(key)!),
+  }));
+}
+
 const EchoHistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -109,7 +159,10 @@ const EchoHistoryPage: React.FC = () => {
     return () => unlockBodyScroll();
   }, [sheetMode]);
 
-  const groups = useMemo(() => buildGroups(chats), [chats]);
+  const daySections = useMemo(
+    () => buildDaySections(chats, (k, d) => t(k, { defaultValue: d })),
+    [chats, t],
+  );
 
   const toggleGroup = useCallback((key: string) => {
     setExpandedKeys((prev) => {
@@ -366,7 +419,21 @@ const EchoHistoryPage: React.FC = () => {
             </div>
           ) : (
             <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-              {groups.map((g) => {
+              {daySections.map((section) => (
+                <React.Fragment key={section.key}>
+                  <li
+                    style={{
+                      padding: '16px 14px 7px',
+                      fontSize: 9,
+                      fontWeight: 700,
+                      letterSpacing: '0.16em',
+                      textTransform: 'uppercase',
+                      color: SUB,
+                    }}
+                  >
+                    {section.label}
+                  </li>
+                  {section.groups.map((g) => {
                 const expanded = expandedKeys.has(g.key);
                 const groupIds = [g.leader.id, ...g.rest.map((r) => r.id)];
                 return (
@@ -396,7 +463,9 @@ const EchoHistoryPage: React.FC = () => {
                       : null}
                   </React.Fragment>
                 );
-              })}
+                  })}
+                </React.Fragment>
+              ))}
             </ul>
           )}
         </div>
