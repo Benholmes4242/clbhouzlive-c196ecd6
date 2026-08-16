@@ -336,8 +336,41 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           break;
         }
       }
+      // Resume + speak explicitly. Role bookkeeping alone is not enough: when
+      // the promoted lane's id is unchanged for the card's InlineVideo, its
+      // play-effect deps don't change and no play() is issued, so the returned
+      // element stays paused. Issuing play + claiming audio focus here is the
+      // Clubhouse-equivalent end state (playing, unmuted if the session is).
+      const activeLane = feedLaneRoles.laneForRole('active');
+      VideoEngine.setAudioFocus(activeLane, 'feed');
+      void VideoEngine.play(activeLane, { callerPostId: target });
     } catch { /* engine not booted */ }
   }, [fsIsOpen]);
+
+  // v11 audio-focus — the profile feed must register its active lane exactly
+  // as the Clubhouse CardFeed does. Without this the reconciler resolves
+  // `whyNone: 'no-audio-focus'` and force-mutes every lane, so unmuting via
+  // the MuteButton produced no audio on personal or business profiles.
+  useEffect(() => {
+    if (fsIsOpen) return; // overlay branch owns the speaker while open
+    const post = posts[playingIdx];
+    if (!post) return;
+    const hasVideo = post.mediaItems?.some?.((m) => m?.type === 'video');
+    try {
+      if (hasVideo) {
+        VideoEngine.setAudioFocus(feedLaneRoles.laneForRole('active'), 'feed');
+      } else {
+        VideoEngine.setAudioFocus(null, 'feed');
+      }
+    } catch { /* engine may not be booted yet — safe to ignore */ }
+  }, [fsIsOpen, playingIdx, posts]);
+
+  useEffect(() => {
+    return () => {
+      try { VideoEngine.setAudioFocus(null, 'feed'); } catch { /* noop */ }
+    };
+  }, []);
+
 
 
 
