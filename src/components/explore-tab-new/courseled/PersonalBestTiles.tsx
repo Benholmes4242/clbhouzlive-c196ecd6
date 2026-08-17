@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 import { CourseImageFallback } from './CourseImageFallback';
-import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
+import { A, CARD_SHELL, NEW_CARD_RING, NUMF, SANS } from './tokens';
 import { TILE_SCRIM } from './StandoutTile';
 
 /**
