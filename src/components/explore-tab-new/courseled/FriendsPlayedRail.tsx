@@ -103,7 +103,11 @@ const GLASS_CSS = `
 
    THE AXIS IS NATURAL: MORE OVER PAR IS HIGHER. A dip is a good stretch.     */
 
-const SHAPE_H = 34;
+/* THE CURVE NEEDS AMPLITUDE (was 34). At 34px a plus-eight round and a level
+   round drew nearly the same flat line: the shape was unreadable, not compact.
+   60 is the smallest height where a two-shot swing is legible, and the tile has
+   the room — the body below is one insight line and a member row. */
+const SHAPE_H = 60;
 const SHAPE_PAD_X = 6;
 
 /* monotonePath now lives in @/lib/charts/monotonePath — ONE copy, shared with
