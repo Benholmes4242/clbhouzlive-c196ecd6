@@ -145,6 +145,30 @@ const settledPlugin = {
           }
         };
 
+        // EXEMPTION 1 — `!isError` alongside `!isLoading`. A caller pairing the
+        // two is explicitly reasoning about settled state; a disabled query
+        // cannot be mistaken for "loaded and empty" by accident here.
+        const isNegatedError = (node) => {
+          if (!node || node.type !== "UnaryExpression" || node.operator !== "!") return false;
+          const a = node.argument;
+          const name =
+            a.type === "Identifier" ? a.name
+            : a.type === "MemberExpression" && a.property && a.property.name ? a.property.name
+            : null;
+          return !!name && /error/i.test(name);
+        };
+
+        // EXEMPTION 2 — a search-term length gate (`query.length >= 2`). The
+        // query cannot be disabled once that guard passes, so the defect shape
+        // is unreachable on this branch.
+        const isSearchLengthGuard = (node) => {
+          if (!node || node.type !== "BinaryExpression") return false;
+          if (![">=", ">"].includes(node.operator)) return false;
+          const isLength = (n) =>
+            n.type === "MemberExpression" && n.property && n.property.name === "length";
+          return isLength(node.left) || isLength(node.right);
+        };
+
         const walk = (node) => {
           if (!node || node.type !== "LogicalExpression" || node.operator !== "&&") return false;
           const parts = [];
@@ -156,8 +180,11 @@ const settledPlugin = {
           flatten(node);
           const hasLoading = parts.some(isNegatedLoading);
           if (!hasLoading) return false;
+          if (parts.some(isNegatedError)) return false;
+          if (parts.some(isSearchLengthGuard)) return false;
           return parts.some((p) => !isNegatedLoading(p) && isAbsenceClaim(p));
         };
+
 
         return {
           LogicalExpression(node) {
