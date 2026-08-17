@@ -138,8 +138,6 @@ return (
             fontWeight: 500,
             padding: '7px 11px',
             borderRadius: 9,
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
           }}
         >
           <Camera size={13} strokeWidth={2.25} />

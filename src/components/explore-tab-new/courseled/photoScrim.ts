@@ -4,4 +4,4 @@
  * platform token out of a Discover sub-folder. This re-export exists so the
  * move lands in one step; new code imports from '@/styles/photoScrim'.
  */
-export { SCRIM_STANDOUT, CHIP_GLASS, CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
+export { SCRIM_STANDOUT, CHIP_GLASS, CHIP_GLASS_CLASS, CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
