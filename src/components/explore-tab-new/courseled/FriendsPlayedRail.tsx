@@ -582,21 +582,29 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                     )}
                   </span>
 
+                  {/* TWO LINES, CLAMPED. A single truncated line cut the
+                      parenthetical — "(East Course)" is the only thing telling
+                      one course at a club from another, so it must survive. The
+                      block sits in the photo's bottom-anchored overlay, so a
+                      second line grows UPWARD into the photograph and the tile
+                      height is unchanged. Type size is not reduced. */}
                   <span
                     style={{
-                      display: 'block',
+                      display: '-webkit-box',
+                      WebkitBoxOrient: 'vertical',
+                      WebkitLineClamp: 2,
                       marginTop: 5,
                       fontSize: 12,
                       fontWeight: 700,
                       color: '#fff',
                       letterSpacing: '-0.015em',
+                      lineHeight: 1.25,
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
                     }}
                   >
                     {m?.name ?? r.course_name ?? t('discover.unknownCourse', 'Course')}
                   </span>
+
                 </div>
               </CourseImageFallback>
 
