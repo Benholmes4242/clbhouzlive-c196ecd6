@@ -176,6 +176,35 @@ export function useLatestReviews(pageSize = LATEST_REVIEWS_PAGE_SIZE) {
         .map(mapRow)
         .filter((r): r is LatestReview => !!r);
 
+      /**
+       * NAME BACKFILL (CORRECTION_REVIEW_TILE_FINISHING §0). The embedded
+       * user_profiles join resolves only for readers that satisfy RLS on
+       * user_profiles ("Authenticated users can view active profiles"). Anything
+       * reading this section without an authenticated session — signed-out web,
+       * a session that has not hydrated yet — gets user_profiles: null on every
+       * row and every byline collapses to "A member". public_profiles is the
+       * anon-readable projection of the same rows, so we fill the gaps from it.
+       * The "A member" fallback stays for a genuinely missing profile.
+       */
+      const missing = Array.from(
+        new Set(rows.filter((r) => !r.reviewerName && r.userId).map((r) => r.userId as string)),
+      );
+      if (missing.length > 0) {
+        const { data: pub } = await supabase
+          .from('public_profiles')
+          .select('id, username, display_name, profile_photo_url')
+          .in('id', missing);
+        const byId = new Map((pub ?? []).map((p: any) => [p.id as string, p]));
+        for (const r of rows) {
+          const p = r.userId ? byId.get(r.userId) : null;
+          if (!p) continue;
+          r.reviewerName = String(p.display_name ?? p.username ?? '').trim();
+          r.reviewerUsername = r.reviewerUsername ?? p.username ?? null;
+          r.reviewerAvatar = r.reviewerAvatar ?? p.profile_photo_url ?? null;
+        }
+      }
+
+
       return { rows, page, total: count ?? null, rawLength: (data ?? []).length };
     },
     getNextPageParam: (last) => (last.rawLength < pageSize ? undefined : last.page + 1),

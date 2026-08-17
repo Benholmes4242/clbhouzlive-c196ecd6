@@ -8,7 +8,7 @@ import { ReactionAction } from './ReactionAction';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 import { A, SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
-import { bandColor, SubScoreBar } from '@/features/courses/_shared/scoreBands';
+import { bandColor, bandColorOnDark, SubScoreBar } from '@/features/courses/_shared/scoreBands';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import type { LatestReview } from './hooks/useLatestReviews';
 
