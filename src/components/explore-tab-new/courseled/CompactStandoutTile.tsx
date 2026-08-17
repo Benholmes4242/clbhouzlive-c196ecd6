@@ -230,53 +230,62 @@ export function CompactStandoutTile({
         </div>
       </div>
 
-      {(!!(who && detail) || !!trailing) && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            marginTop: 2,
-            minHeight: 20,
-          }}
-        >
-          <div
-            style={{
-              flex: 1,
-              minWidth: 0,
-              fontSize: 12,
-              fontWeight: 600,
-              lineHeight: 1.32,
-              color: A.MUTE,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {who ? detail : ''}
-          </div>
-          {trailing}
-        </div>
-      )}
+      {(() => {
+        const detailText = who ? detail : '';
+        const factText = detailText || subline || '';
+        const factIsSubline = !detailText && !!subline;
+        return (
+          <>
+            {(!!factText || !!trailing) && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  marginTop: factIsSubline ? 3 : 2,
+                  minHeight: 20,
+                }}
+              >
+                <div
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    fontSize: factIsSubline ? 11 : 12,
+                    fontWeight: 600,
+                    lineHeight: factIsSubline ? 1.3 : 1.32,
+                    color: factIsSubline ? 'rgba(104,112,123,0.78)' : A.MUTE,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {factText}
+                </div>
+                {trailing}
+              </div>
+            )}
 
-      {subline ? (
-        <div
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            lineHeight: 1.3,
-            color: 'rgba(104,112,123,0.78)',
-            marginTop: 3,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
-        >
-          {subline}
-        </div>
-      ) : null}
+            {subline && !factIsSubline ? (
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  lineHeight: 1.3,
+                  color: 'rgba(104,112,123,0.78)',
+                  marginTop: 3,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {subline}
+              </div>
+            ) : null}
+          </>
+        );
+      })()}
       </div>
     </div>
   );
