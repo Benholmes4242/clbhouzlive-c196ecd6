@@ -100,6 +100,12 @@ interface Options {
   limit?: number;
   /** When true (sheet mode), if there are few friends allow up to 3 rounds per friend. */
   allowMultiplePerFriend?: boolean;
+  /**
+   * THE SEE-ALL SHEET SHOWS THE CIRCLE ONLY
+   * (CORRECTION_WHOS_BEEN_PLAYING_RATIO §2.3) — a member tapping through is
+   * asking about their own people, not for more suggestions.
+   */
+  includeSuggested?: boolean;
 }
 
 const DAY_MS = 86_400_000;
@@ -107,10 +113,11 @@ const WINDOW_DAYS = 60;
 
 export function useCircleLatestRounds(
   userId: string | undefined,
-  { limit = 4, allowMultiplePerFriend = false }: Options = {},
+  { limit = 4, allowMultiplePerFriend = false, includeSuggested = true }: Options = {},
 ) {
   return useQuery({
-    queryKey: ['circle-latest-rounds', userId, limit, allowMultiplePerFriend],
+    queryKey: ['circle-latest-rounds', userId, limit, allowMultiplePerFriend, includeSuggested],
+
     queryFn: async (): Promise<CircleRoundRow[]> => {
       if (!userId) return [];
 
