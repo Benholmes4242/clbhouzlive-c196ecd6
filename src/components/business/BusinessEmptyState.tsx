@@ -203,26 +203,55 @@ export function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
   const coursesLive = data?.coursesTotal ?? null;
   const upLabel = (n: number) => t('business.emptyState.reach.up', { count: n });
 
+  /**
+   * FOUR EXAMPLES, ONE VENUE (§3.1). The photographs carry the argument: a
+   * fitting bay and a product shot look nothing like a green, and that visual
+   * distance is what says "any golf business".
+   *
+   * §3.3 — every label is read out of BUSINESS_CATEGORIES verbatim, so the word
+   * Ben sees here is the word he picks in the category list. `category()` throws
+   * nothing but returns '' if the list is ever edited, and an example with no
+   * resolvable category drops rather than showing an invented name.
+   *
+   * §3.6 — WHEN REAL BUSINESSES EXIST this becomes a DATA CHANGE, not a rebuild:
+   * ExampleSpec already carries the optional `name` (a real trading name) and
+   * `stats` (a real figure row) that a claimed account would supply. Swap this
+   * literal array for the rows of a `useExampleBusinesses()` query mapped into
+   * the same shape, drop `isExample` on those rows, and ExampleCard renders the
+   * real name and the stats row with no layout work.
+   */
+  const category = (value: string) => BUSINESS_CATEGORIES.find((c) => c === value) ?? '';
+
   const examples: ExampleSpec[] = [
     {
       id: 'club',
       src: clubPhoto.url,
-      name: t('business.emptyState.examples.club.name'),
+      category: category('Golf Club'),
       meta: t('business.emptyState.examples.club.meta'),
+      isExample: true,
     },
     {
-      id: 'range',
-      src: rangePhoto.url,
-      name: t('business.emptyState.examples.range.name'),
-      meta: t('business.emptyState.examples.range.meta'),
+      id: 'coach',
+      src: coachPhoto,
+      category: category('Coach / Instructor'),
+      meta: t('business.emptyState.examples.coach.meta'),
+      isExample: true,
     },
     {
-      id: 'shop',
-      src: shopPhoto.url,
-      name: t('business.emptyState.examples.shop.name'),
-      meta: t('business.emptyState.examples.shop.meta'),
+      id: 'fitter',
+      src: fitterPhoto,
+      category: category('Club Fitter'),
+      meta: t('business.emptyState.examples.fitter.meta'),
+      isExample: true,
     },
-  ];
+    {
+      id: 'brand',
+      src: brandPhoto,
+      category: category('Brand / Manufacturer'),
+      meta: t('business.emptyState.examples.brand.meta'),
+      isExample: true,
+    },
+  ].filter((spec) => spec.category !== '');
 
   const tabs = [
     t('business.emptyState.examples.tabs.home'),
