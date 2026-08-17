@@ -10,7 +10,7 @@ import { toast } from '@/lib/toast';
 import { MAX_MEDIA, type StageMediaItem } from '../hooks/useStageComposer';
 import SlideThumb from './SlideThumb';
 import { CT_DARK } from '@/features/_shared/composerTokens';
-import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER, SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 interface Props {
   media: StageMediaItem[];
