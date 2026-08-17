@@ -4,7 +4,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { TILE_SCRIM } from './StandoutTile';
-import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
+import { A, CARD_SHELL, NEW_CARD_RING, NUMF, SANS } from './tokens';
 
 /**
  * THE COMPACT STANDOUT TILE (BRIEF_FEAT_SECTIONS_HIERARCHY §1.7, §1.8).
@@ -30,8 +30,8 @@ import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
  *   PHOTO STRIP        78px, scrim + course name on it       = 78
  *   padding            11 top + 12 bottom                    = 23
  *   figure row         26px numeral at lineHeight 1           = 26
- *   WHO row            13/700 one line, matching the photo tile = 18
- *                                                         base = 145
+ *   WHO row            marginTop 9 + 18 (13/700 one line)      = 27
+ *                                                         base = 154
  *
  * The strip is why the course name and the hairline are gone from the text
  * panel: the name now sits on the photograph, exactly as on the full tile. A
@@ -48,7 +48,7 @@ import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
 /** The strip height (§2.3). */
 export const PHOTO_STRIP = 78;
 
-export const COMPACT_BASE = 145;
+export const COMPACT_BASE = 154;
 
 export function estimateCompactHeight(detail: string, subline: string): number {
   const lines = detail ? Math.min(2, Math.ceil(detail.length / 24)) : 0;
