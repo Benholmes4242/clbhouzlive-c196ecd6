@@ -16,7 +16,15 @@ export type ExploreLens = 'suggested' | 'top_100' | 'played' | 'worldwide';
 // Validation-only; intentionally not kept in display order (see ScopePills LENS_ORDER).
 const LENSES: ExploreLens[] = ['suggested', 'top_100', 'played', 'worldwide'];
 
-export const DEFAULT_LENS: ExploreLens = 'suggested';
+/**
+ * WORLDWIDE IS THE LANDING LENS (BRIEF_FEAT_BALANCE_AND_LENS_ORDER §3).
+ * Suggested is relevance-led and therefore narrower; on a small member base it
+ * leans toward a handful of familiar courses, and a discovery section that is
+ * empty for a new member is failing at the one job it has. The lens is
+ * URL-backed only (?lens=), so a member who has chosen one keeps it for as long
+ * as that URL lives; there is no per-member persistence.
+ */
+export const DEFAULT_LENS: ExploreLens = 'worldwide';
 
 export function useExploreLens() {
   const [params, setParams] = useSearchParams();

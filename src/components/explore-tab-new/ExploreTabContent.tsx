@@ -259,15 +259,17 @@ export default function ExploreTabContent({
   );
 
   /**
-   * RARITY FLOOR — WORLDWIDE only: a stranger's birdie haul at an unknown
-   * course is not news. Everything else (eagles, records, ratings, aces,
-   * albatrosses) survives. Tunable.
+   * NO RARITY FLOOR (BRIEF_FEAT_BALANCE_AND_LENS_ORDER §2). The old worldwide
+   * floor dropped birdie hauls so the commonest kind could not swamp an
+   * unfiltered view. THE KIND BUDGET NOW DOES THAT JOB — two tiles of eight is
+   * not swamping — and the floor would leave Worldwide (now the default lens)
+   * with only four kinds, forcing the budget to widen and show three or four
+   * crowns again. Ben's judgement, recorded: birdie hauls and bogey-free rounds
+   * are just as impressive. Do not reinstate it.
    */
-  const WORLDWIDE_RARITY_FLOOR: string[] = ['birdie_haul'];
-
   const events = useMemo(() => {
     if (lens === 'worldwide') {
-      return pool.filter((e) => !WORLDWIDE_RARITY_FLOOR.includes(e.kind));
+      return pool;
     }
     if (lens === 'played') {
       return pool.filter((e) => !!e.courseId && sets.played.has(e.courseId));
@@ -277,18 +279,12 @@ export default function ExploreTabContent({
     }
     /* SUGGESTED SORTS, IT DOES NOT FILTER (BRIEF_STANDOUT_ROUNDS_BACKFILL §1).
        Relevance decides ORDER, not membership: the whole pool is kept so the
-       section reaches eight tiles, and the rarity floor applies ONLY to the
-       backfill portion — their courses at any rarity, the world at high
-       rarity only. Ordering itself stays with priorityFor downstream. */
-    return pool.filter((e) => {
-      if (!e.courseId) return false;
-      const relevant =
-        isShortlisted(e.courseId) || sets.top100.has(e.courseId) || sets.played.has(e.courseId);
-      if (relevant) return true;
-      return !WORLDWIDE_RARITY_FLOOR.includes(e.kind);
-    });
+       section reaches eight tiles. Ordering itself stays with priorityFor
+       downstream. */
+    return pool.filter((e) => !!e.courseId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pool, lens, sets.played, sets.top100, isShortlisted]);
+
 
   /** FOR YOU order: shortlist, then Top 100, then played, then the rest. */
   const priorityFor = useCallback(

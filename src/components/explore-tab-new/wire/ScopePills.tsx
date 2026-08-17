@@ -11,7 +11,8 @@ import type { ExploreLens } from '../hooks/useExploreLens';
  * region pills it replaces.
  */
 
-export const LENS_ORDER: ExploreLens[] = ['suggested', 'worldwide', 'top_100', 'played'];
+// Display order (BRIEF_FEAT_BALANCE_AND_LENS_ORDER §3.1): Worldwide leads and is the default lens.
+export const LENS_ORDER: ExploreLens[] = ['worldwide', 'suggested', 'top_100', 'played'];
 
 interface Props {
   lens: ExploreLens;
