@@ -32,10 +32,6 @@ export const NUMF: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums lining-nums',
 };
 
-export const SCRIM_STRONG =
-  'linear-gradient(0deg, rgba(10,14,10,0.62) 0%, rgba(10,14,10,0) 55%)';
-export const SCRIM_SOFT =
-  'linear-gradient(0deg, rgba(10,14,10,0.6) 0%, rgba(10,14,10,0) 60%)';
 
 export const CARD_SHELL: React.CSSProperties = {
   background: A.PANEL,
