@@ -1019,7 +1019,12 @@
     },
     "pb": {
       "afterRounds": "{{count}}ラウンド目で達成",
-      "gain": "以前より{{count}}良化"
+      "gain": "以前より{{count}}良化",
+      "group": {
+        "firsts": "ここで初",
+        "best": "ここでの最高ラウンド",
+        "most": "1ラウンドの最多"
+      }
     }
   },
   "statBrowse": {

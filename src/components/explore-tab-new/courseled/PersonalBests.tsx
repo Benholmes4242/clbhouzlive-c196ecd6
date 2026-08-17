@@ -6,10 +6,10 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ATW_PHOTO_HEIGHTS, relativeWhen } from './AroundTheWorld';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { usePersonalBests, PERSONAL_BESTS_PER_MEMBER } from './hooks/usePersonalBests';
-import { createMasonryAssignment, placeStable } from './stableMasonry';
+import { createMasonryAssignment, placeStable, type MasonryAssignment } from './stableMasonry';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
-import { Eyebrow, LABEL } from './tokens';
+import { A, Eyebrow, LABEL, NUMF } from './tokens';
 import { StandoutTile } from './StandoutTile';
 import {
   EffortTile,
@@ -34,6 +34,39 @@ import {
  * cross-section member budget, and nothing else. `headline` and
  * `reference_line` are server strings and are never reworded here.
  */
+
+/**
+ * THE GROUPS (BRIEF_STANDOUT_KIND_BUDGET §3.3), for the six kinds
+ * get_personal_bests emits. Standout's names do NOT transfer: there is no
+ * course-record equivalent here, and every Personal Best is a milestone, so
+ * "Personal milestones" would name the whole section. Anything unmapped falls to
+ * "Firsts here".
+ */
+const PB_GROUPS = [
+  {
+    id: 'firsts',
+    kinds: ['first_sub_70_here', 'first_sub_80_here', 'first_double_free_here'],
+    key: 'discover.pb.group.firsts',
+    label: 'Firsts here',
+  },
+  {
+    id: 'best',
+    kinds: ['big_points_here'],
+    key: 'discover.pb.group.best',
+    label: 'Best rounds here',
+  },
+  {
+    id: 'most',
+    kinds: ['most_birdies_here', 'most_pars_here'],
+    key: 'discover.pb.group.most',
+    label: 'Most in a round',
+  },
+] as const;
+
+function pbGroupIdFor(kind: string | null): string {
+  for (const g of PB_GROUPS) if (kind && (g.kinds as readonly string[]).includes(kind)) return g.id;
+  return 'firsts';
+}
 
 /** Eight tiles maximum, matching PAGE = 8 in AroundTheWorld (§3.2). */
 const PAGE = 8;
@@ -71,7 +104,8 @@ export function PersonalBests({
   const budgetSource = heldCounts.current;
 
   /** Column memory, so a refetch never moves a tile the member has seen (§i). */
-  const masonry = useRef(createMasonryAssignment());
+  const masonry = useRef(new Map<string, MasonryAssignment>());
+
 
   /**
    * THE BUDGET WALK (§4.2 c-e). In the RPC's order, keep a row while its member
@@ -192,22 +226,22 @@ export function PersonalBests({
     };
   });
 
-  const { columns } = placeStable(tiles, masonry.current);
+  /**
+   * GROUPING (BRIEF_STANDOUT_KIND_BUDGET §3). The three treatments are
+   * unchanged; grouping only wraps them, and a group may hold any mix. Groups
+   * render in the fixed order below, an empty group renders nothing, a group of
+   * one keeps its heading, and one surviving group drops the heading.
+   */
+  const buckets = PB_GROUPS.map((def) => ({
+    id: def.id,
+    label: t(def.key, def.label),
+    items: tiles.filter((tt) => pbGroupIdFor(tt.r.feat_kind) === def.id),
+  })).filter((b) => b.items.length > 0);
 
-  return (
-    <section>
-      <Eyebrow aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}>
-        {t('discover.personalBests', 'Personal bests')}
-      </Eyebrow>
+  const renderTile = (tt: (typeof tiles)[number]) => {
+      const courseName =
 
-      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-        {columns.map((col, ci) => (
-          <div
-            key={ci}
-            style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}
-          >
-            {col.map((tt) => {
-              const courseName =
+
                 tt.m?.name ?? tt.r.course_name ?? t('discover.unknownCourse', 'Course');
               const who = tt.r.is_self
                 ? t('discover.wire.you', 'You')
@@ -329,12 +363,78 @@ export function PersonalBests({
                 trailing={trailing}
               />
               );
-            })}
-          </div>
-        ))}
+  };
+
+  return (
+    <section>
+      <Eyebrow aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}>
+        {t('discover.personalBests', 'Personal bests')}
+      </Eyebrow>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {buckets.map((b) => {
+          let asg = masonry.current.get(b.id);
+          if (!asg) {
+            asg = createMasonryAssignment();
+            masonry.current.set(b.id, asg);
+          }
+          const { columns } = placeStable(b.items, asg);
+
+          return (
+            <div key={b.id}>
+              {/* A single surviving group needs no heading — the section eyebrow
+                  already says what it is (§2.3). A group of ONE tile keeps its
+                  heading (§2.1). */}
+              {buckets.length > 1 ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    padding: '0 2px',
+                    marginBottom: 8,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      letterSpacing: '-0.02em',
+                      color: A.INK,
+                    }}
+                  >
+                    {b.label}
+                  </span>
+                  <span style={{ ...NUMF, fontSize: 12, fontWeight: 700, color: A.DIM }}>
+                    {b.items.length}
+                  </span>
+                </div>
+              ) : null}
+
+              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                {columns.map((col, ci) => (
+                  <div
+                    key={ci}
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 8,
+                    }}
+                  >
+                    {col.map((tt) => renderTile(tt))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
+
 }
 
 export default PersonalBests;
