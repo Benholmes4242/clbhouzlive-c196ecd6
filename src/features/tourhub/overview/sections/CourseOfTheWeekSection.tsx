@@ -13,6 +13,7 @@ import { useCourseOfTheWeek } from '../../hooks/useCourseOfTheWeek';
 import { SPACE } from '@/lib/spacing';
 import { useMyCourseBest } from '../../hooks/useMyCourseBest';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
 
 /** Stat cell for the Course of the Week panel. Amber is reserved for the member. */
 function CotwStat({
@@ -171,10 +172,8 @@ export function CourseOfTheWeekSection() {
                     gap: 6,
                     padding: '5px 10px',
                     borderRadius: 999,
-                    background: 'rgba(0,0,0,0.55)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255,255,255,0.15)',
+                    background: CHIP_GLASS_BG,
+                    border: CHIP_GLASS_BORDER,
                     color: '#FFFFFF',
                     fontSize: 10,
                     fontWeight: 700,
