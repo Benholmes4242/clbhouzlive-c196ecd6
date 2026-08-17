@@ -1062,9 +1062,9 @@
     },
     "feat": {
       "group": {
-        "records": "Récords del campo",
-        "firsts": "Primeras veces aquí",
-        "milestones": "Hitos personales"
+        "records": "Récords batidos",
+        "firsts": "Una vez en la vida",
+        "milestones": "Domando el campo"
       },
       "kind": {
         "ace": "Hoyo en uno",
@@ -1079,9 +1079,9 @@
       "afterRounds": "Después de {{count}} rondas",
       "gain": "{{count}} mejor que antes",
       "group": {
-        "firsts": "Primeras veces aquí",
-        "best": "Mejor puntuación aquí",
-        "most": "Más en una ronda"
+        "firsts": "Primera vez",
+        "best": "Gran botín",
+        "most": "Nuevos máximos"
       }
     }
   },

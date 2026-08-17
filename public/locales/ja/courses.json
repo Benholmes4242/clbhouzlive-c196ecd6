@@ -1007,9 +1007,9 @@
     },
     "feat": {
       "group": {
-        "records": "コースレコード",
-        "firsts": "ここで初",
-        "milestones": "自己の節目"
+        "records": "レコード更新",
+        "firsts": "一生に一度",
+        "milestones": "コースを攻略"
       },
       "kind": {
         "ace": "ホールインワン",
@@ -1024,9 +1024,9 @@
       "afterRounds": "{{count}}ラウンド目で達成",
       "gain": "以前より{{count}}良化",
       "group": {
-        "firsts": "ここで初",
-        "best": "ここでの最高得点",
-        "most": "1ラウンドの最多"
+        "firsts": "人生初",
+        "best": "大きな成果",
+        "most": "自己最多を更新"
       }
     }
   },

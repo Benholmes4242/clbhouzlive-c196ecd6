@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
 import { CourseImageFallback } from './CourseImageFallback';
-import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
+import { A, CARD_SHELL, NEW_CARD_RING, NUMF, SANS } from './tokens';
 import { TILE_SCRIM } from './StandoutTile';
 
 /**
@@ -12,8 +14,10 @@ import { TILE_SCRIM } from './StandoutTile';
  * of six kinds permanently photoless. The axis used instead is ALREADY IN THE
  * DATA: nearly every feat carries a BEFORE.
  *
- *   (a) PROGRESSION — the feat has a PREVIOUS BEST. No photo; the jump fills
- *       the space a photograph would have taken.
+ *   (a) PROGRESSION — WITHDRAWN (BRIEF_FEAT_SECTIONS_FINISHING §5.1). A feat
+ *       with a previous best now renders the STANDARD photo tile, with the
+ *       improvement inside the glass chip. `treatmentFor` still names the case
+ *       so the parse stays tested; PersonalBests maps it to StandoutTile.
  *   (b) EFFORT — the feat has an ATTEMPT COUNT and no previous best. A short
  *       74px photo strip, the figure, and the wait emphasised in the sentence.
  *   (c) PHOTO — neither. Unchanged, full height (StandoutTile).
@@ -59,20 +63,7 @@ export function treatmentFor(featKind: string, reference: string | null): PBTrea
 /**
  * HEIGHT ESTIMATES (§0.1, §2 acceptance P). Billed from the geometry written
  * below, string lengths only, no measurement.
- *
- * PROGRESSION, fixed chrome in render order:
- *   padding 12 + 13                                       = 25
- *   kicker 9/700 lineHeight 1, marginBottom 8              = 17
- *   jump row (30px numeral at lineHeight 1)                = 30
- *   bar marginTop 10 + 6 track                             = 16
- *   gain line marginTop 6 + 14 (11/600 at 1.3)             = 20
- *   course name marginTop 6 + 16 (13/700 at 1.2, 1 line)   = 22
- *   WHO row marginTop 9 + 18                               = 27
- *                                                     base = 157
- * Nothing in it wraps: the kicker is the server headline clamped to one line,
- * the gain line is a two-word figure, the course name is ellipsised.
  */
-export const PROGRESSION_HEIGHT = 157;
 
 /**
  * EFFORT:
@@ -142,14 +133,22 @@ function WhoRow({
   isOwn,
   trailing,
   marginTop = 9,
+  avatarUrl = null,
+  avatarUserId = null,
 }: {
   who: string;
   isOwn: boolean;
   trailing?: React.ReactNode;
   marginTop?: number;
+  /** §3: the fallback colour hashes the USER ID, never the display name. */
+  avatarUrl?: string | null;
+  avatarUserId?: string | null;
 }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop }}>
+      {who ? (
+        <SquircleAvatar src={avatarUrl} userId={avatarUserId} alt={who} size={20} hideRing />
+      ) : null}
       <div
         style={{
           flex: 1,
@@ -170,136 +169,6 @@ function WhoRow({
   );
 }
 
-/** (a) THE PROGRESSION TILE — old -> new, and the gain drawn beneath it. */
-export function ProgressionTile({
-  courseName,
-  who,
-  isOwn,
-  whenLabel,
-  trailing,
-  isNew,
-  onPress,
-  /** Server headline, verbatim, as the kicker. */
-  kicker,
-  previous,
-  figure,
-  unit,
-  gainLine,
-}: Shared & {
-  kicker: string;
-  previous: number;
-  figure: string | null;
-  unit?: string;
-  gainLine: string;
-}) {
-  const now = Number(figure ?? 0);
-  const total = Math.max(now, previous, 1);
-  const oldPct = Math.max(0, Math.min(100, (previous / total) * 100));
-
-  return (
-    <Shell isNew={isNew} onPress={onPress} padding="12px 13px 13px">
-      <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: 8 }}>
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            lineHeight: 1,
-            color: A.MUTE,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {kicker}
-        </span>
-        <span style={{ ...LABEL, fontSize: 6.5, marginLeft: 'auto', color: A.DIM }}>
-          {whenLabel}
-        </span>
-      </div>
-
-      {/* THE JUMP. This is what earns the missing photograph. */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, height: 30 }}>
-        <span style={{ ...NUMF, fontSize: 17, lineHeight: 1, color: A.DIM }}>{previous}</span>
-        <svg width="13" height="10" viewBox="0 0 13 10" fill="none" aria-hidden>
-          <path
-            d="M1 5h9.5M7.5 1.5 11 5l-3.5 3.5"
-            stroke={A.DIM}
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-        <span style={{ ...NUMF, fontSize: 30, fontWeight: 800, lineHeight: 1, color: A.INK }}>
-          {figure ?? '—'}
-        </span>
-        {unit ? (
-          <span
-            style={{
-              fontSize: 7,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              lineHeight: 1,
-              color: A.MUTE,
-            }}
-          >
-            {unit}
-          </span>
-        ) : null}
-      </div>
-
-      {/* TWO SEGMENTS: what they had, then the gain in ink. */}
-      <div
-        style={{
-          marginTop: 10,
-          height: 6,
-          borderRadius: 999,
-          background: A.BORDER,
-          overflow: 'hidden',
-          display: 'flex',
-        }}
-      >
-        <span style={{ width: `${oldPct}%`, background: '#D8DDE3' }} />
-        <span style={{ flex: 1, background: A.INK }} />
-      </div>
-
-      <div
-        style={{
-          marginTop: 6,
-          fontSize: 11,
-          fontWeight: 600,
-          lineHeight: 1.3,
-          color: A.MUTE,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {gainLine}
-      </div>
-
-      <div
-        style={{
-          marginTop: 6,
-          fontSize: 13,
-          fontWeight: 700,
-          letterSpacing: '-0.02em',
-          lineHeight: 1.2,
-          color: A.INK,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {courseName}
-      </div>
-
-      <WhoRow who={who} isOwn={isOwn} trailing={trailing} />
-    </Shell>
-  );
-}
-
 /** (b) THE EFFORT TILE — a 74px strip, then the wait emphasised in the line. */
 export function EffortTile({
   courseId,
@@ -316,6 +185,8 @@ export function EffortTile({
   headline,
   attemptPhrase,
   attempts,
+  avatarUrl,
+  avatarUserId,
 }: Shared & {
   courseId: string;
   imageUrl: string | null;
@@ -326,6 +197,8 @@ export function EffortTile({
   /** Localised "After 41 rounds"; the numeral inside it is emphasised. */
   attemptPhrase: string;
   attempts: number;
+  avatarUrl?: string | null;
+  avatarUserId?: string | null;
 }) {
   const marker = String(attempts);
   const at = attemptPhrase.indexOf(marker);
@@ -418,7 +291,13 @@ export function EffortTile({
           {after}
         </div>
 
-        <WhoRow who={who} isOwn={isOwn} trailing={trailing} />
+        <WhoRow
+          who={who}
+          isOwn={isOwn}
+          trailing={trailing}
+          avatarUrl={avatarUrl}
+          avatarUserId={avatarUserId}
+        />
       </div>
     </Shell>
   );

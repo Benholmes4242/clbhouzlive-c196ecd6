@@ -1504,9 +1504,9 @@
     },
     "feat": {
       "group": {
-        "records": "Course records",
-        "firsts": "Firsts here",
-        "milestones": "Personal milestones"
+        "records": "Records broken",
+        "firsts": "Once in a lifetime",
+        "milestones": "Beating the course"
       },
       "kind": {
         "ace": "Hole in one",
@@ -1521,9 +1521,9 @@
       "afterRounds": "After {{count}} rounds",
       "gain": "{{count}} better than before",
       "group": {
-        "firsts": "Firsts here",
-        "best": "Best scoring here",
-        "most": "Most in a round"
+        "firsts": "First time ever",
+        "best": "Big returns",
+        "most": "New personal highs"
       }
     }
   },
