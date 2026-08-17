@@ -1518,7 +1518,8 @@
         "firsts": "[Fírst tíme évér ]",
         "best": "[Bíg rétûrns ]",
         "most": "[Néw pérsönál híghs ]"
-      }
+      },
+      "after": "[Åƒtéér]"
     },
     "mostPlayedSheetCaption_one": "[~~{{count}} ĉőúřšé~~]",
     "mostPlayedSheetCaption_other": "[~~{{count}} ĉőúřšéš~~]"

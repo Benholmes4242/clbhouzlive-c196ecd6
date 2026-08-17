@@ -1027,7 +1027,8 @@
         "firsts": "생애 첫",
         "best": "큰 수확",
         "most": "새로운 최다 기록"
-      }
+      },
+      "after": "경과"
     },
     "mostPlayedAvgToParBy_other": "{{value}} · {{count}}명",
     "mostPlayedMembers_other": "{{count}}명",

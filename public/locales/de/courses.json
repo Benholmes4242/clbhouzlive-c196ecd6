@@ -1082,7 +1082,8 @@
         "firsts": "Zum ersten Mal",
         "best": "Große Ausbeute",
         "most": "Neue Bestwerte"
-      }
+      },
+      "after": "Nach"
     },
     "mostPlayedAvgToParBy_one": "Gespielt zu {{value}} von {{count}} Mitglied",
     "mostPlayedMembers_one": "{{count}} Mitglied",

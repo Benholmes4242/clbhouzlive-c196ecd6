@@ -89,6 +89,16 @@ interface Props {
    * previous best is beaten, so the delta is always positive (§5.7).
    */
   delta?: number | null;
+  /**
+   * THE WAIT (BRIEF_FEAT_SECOND_FIGURE §1.2, §3.3) — the rounds a first-ever
+   * feat took, drawn in the same chip slot as a delta but in WHITE, never
+   * green: nothing was beaten, so there is no "better" to report. Mutually
+   * exclusive with `delta` — a chip holds one second figure.
+   */
+  wait?: number | null;
+  /** The small-caps word before the wait ("After"), already localised. */
+  waitLabel?: string | null;
+
   /** New-since ring. */
   isNew?: boolean;
   onPress?: () => void;
@@ -115,6 +125,9 @@ export function StandoutTile({
   avatarUrl = null,
   avatarUserId = null,
   delta = null,
+  wait = null,
+  waitLabel = null,
+
   figureTone,
   nameSize,
   chipScale = 'md',
@@ -201,7 +214,11 @@ export function StandoutTile({
                 {unit}
               </span>
             )}
-            {delta != null && delta > 0 ? (
+            {/* THE SECOND FIGURE (BRIEF_FEAT_SECOND_FIGURE §3). One hairline,
+                then EITHER a delta or a wait — never both, and NO HAIRLINE AT
+                ALL when there is neither (§3.4), so a single-figure chip looks
+                deliberate rather than truncated. */}
+            {(delta != null && delta > 0) || (wait != null && wait > 0) ? (
               <>
                 <span
                   aria-hidden
@@ -219,28 +236,66 @@ export function StandoutTile({
                     gap: 3,
                   }}
                 >
-                  {/* A DRAWN TRIANGLE, NOT AN EMOJI (§5.5): an emoji fights the
-                      tabular figures and renders differently per platform. */}
-                  <svg width="7" height="6" viewBox="0 0 7 6" aria-hidden>
-                    <path d="M3.5 0 7 6H0z" fill="#4ADE80" />
-                  </svg>
-                  <span
-                    style={{
-                      ...NUMF,
-                      fontSize: 13,
-                      fontWeight: 800,
-                      lineHeight: 1,
-                      letterSpacing: '-0.02em',
-                      /* #4ADE80 survives a bright sky; BAND_GREEN #047857 does
-                         not (§5.9) — the review chip's problem. */
-                      color: '#4ADE80',
-                    }}
-                  >
-                    {delta}
-                  </span>
+                  {delta != null && delta > 0 ? (
+                    <>
+                      {/* A DRAWN TRIANGLE, NOT AN EMOJI (§3.2): an emoji fights
+                          the tabular figures and renders differently per
+                          platform. */}
+                      <svg width="7" height="6" viewBox="0 0 7 6" aria-hidden>
+                        <path d="M3.5 0 7 6H0z" fill="#4ADE80" />
+                      </svg>
+                      <span
+                        style={{
+                          ...NUMF,
+                          fontSize: 13,
+                          fontWeight: 800,
+                          lineHeight: 1,
+                          letterSpacing: '-0.02em',
+                          /* #4ADE80 survives a bright sky; BAND_GREEN #047857
+                             does not (§5.9) — the review chip's problem. */
+                          color: '#4ADE80',
+                        }}
+                      >
+                        {delta}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      {/* A WAIT IS NOT GREEN (§1.4, §3.3): green means BETTER
+                          THAN BEFORE, and a wait is neither better nor worse.
+                          Colouring it would turn green into "interesting". */}
+                      {waitLabel ? (
+                        <span
+                          style={{
+                            fontSize: 6.5,
+                            fontWeight: 700,
+                            letterSpacing: '0.14em',
+                            textTransform: 'uppercase',
+                            lineHeight: 1,
+                            color: 'rgba(255,255,255,0.6)',
+                          }}
+                        >
+                          {waitLabel}
+                        </span>
+                      ) : null}
+                      <span
+                        style={{
+                          ...NUMF,
+                          fontSize: 13,
+                          fontWeight: 800,
+                          lineHeight: 1,
+                          letterSpacing: '-0.02em',
+                          color: '#FFFFFF',
+                        }}
+                      >
+                        {wait}
+                      </span>
+                    </>
+                  )}
                 </span>
               </>
             ) : null}
+
           </span>
         )}
 
