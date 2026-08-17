@@ -398,15 +398,25 @@ export function LeaderBand({
 /** §1.8 — TWO rows on a card, then a "{{n}} more" row. */
 export const LEADER_ROWS_ON_CARD = 2;
 
-/** A feat row under a leader band. Same shape on the card and in the sheet. */
+/**
+ * A feat row under a leader band. Same shape on the card and in the sheet.
+ *
+ * `showKind` reinstates BRIEF_HONOURS_BOARD_REBUILD §1.7
+ * (CORRECTION_HONOURS_LEADERS_ROWS §1): when the member holds ONE kind the
+ * badge already says "2 aces", so repeating "ACE" on every row is the same fact
+ * twice — it comes off. When they hold BOTH the badge reads "2 feats" and these
+ * rows are the only thing saying which is which, so the label stays.
+ */
 export function LeaderFeatRow({
   event: e,
   onPress,
   divider = true,
+  showKind = true,
 }: {
   event: WireEvent;
   onPress?: (event: WireEvent) => void;
   divider?: boolean;
+  showKind?: boolean;
 }) {
   const { t } = useTranslation('courses');
   const holeDetail = useHoleDetail();
