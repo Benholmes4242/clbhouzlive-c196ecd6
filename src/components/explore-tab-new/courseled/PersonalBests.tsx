@@ -206,8 +206,8 @@ export function PersonalBests({
   })).filter((b) => b.items.length > 0);
 
   const renderTile = (tt: (typeof tiles)[number]) => {
-    {
       const courseName =
+
 
                 tt.m?.name ?? tt.r.course_name ?? t('discover.unknownCourse', 'Course');
               const who = tt.r.is_self
