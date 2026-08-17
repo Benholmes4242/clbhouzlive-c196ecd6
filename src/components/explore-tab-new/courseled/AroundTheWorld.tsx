@@ -1099,10 +1099,12 @@ export function AroundTheWorld({
           const rest = tiles.filter((tt) => tt !== hero);
 
           /**
-           * GROUPS (§1.5) in the brief's fixed order, then MERGED: a group of
-           * one is a heading with a single tile under it, which reads as a
-           * mistake. Ones fold DOWNWARD into the next surviving group, and a
-           * trailing one folds back upward.
+           * GROUPS (§1.5) in the brief's fixed order. MIN_GROUP IS ONE
+           * (BRIEF_STANDOUT_KIND_BUDGET §2): a group with a single tile KEEPS
+           * its heading, so the merge-down / merge-up fold that used to run here
+           * was REMOVED DELIBERATELY rather than left as dead code. An empty
+           * group renders nothing at all; the one-group rule below still drops
+           * the heading when only one group survives.
            */
           const buckets = FEAT_GROUPS.map((def) => ({
             id: def.id,
@@ -1110,13 +1112,6 @@ export function AroundTheWorld({
             items: rest.filter((tt) => groupIdFor(tt.kind) === def.id),
           })).filter((b) => b.items.length > 0);
 
-          for (let guard = 0; guard < FEAT_GROUPS.length && buckets.length > 1; guard += 1) {
-            const i = buckets.findIndex((b) => b.items.length < 2);
-            if (i < 0) break;
-            if (i < buckets.length - 1) buckets[i + 1].items.unshift(...buckets[i].items);
-            else buckets[i - 1].items.push(...buckets[i].items);
-            buckets.splice(i, 1);
-          }
 
           /**
            * A REPEATED COURSE LOSES ITS PHOTO (§1.8), decided in RENDER order —
