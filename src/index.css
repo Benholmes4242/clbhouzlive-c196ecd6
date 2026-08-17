@@ -128,21 +128,23 @@ body.lightbox-open {
   .review-tile-video { display: none !important; }
 }
 
-/* REVIEW TILE SCORE CHIP (BRIEF_REVIEW_TILE_BREAKDOWN §4a) — glass, matching
-   the friends rail, standout tiles and tour tiles. The flat, higher-opacity
-   fill is the BASE so the chip is legible over the brightest course photo even
-   where backdrop-filter is unavailable; the blur is the enhancement only. */
+/* REVIEW TILE SCORE CHIP (BRIEF_REVIEW_TILE_BREAKDOWN §4a, BRIEF_GLASS_BADGES_DARK)
+   — DARK glass in BOTH branches, the same values as `.standout-figure-chip`.
+   The flat, higher-opacity fill is the BASE so the chip is legible over the
+   brightest course photo even where backdrop-filter is unavailable; the blur is
+   the enhancement only. Never re-introduce a white fill under @supports. */
 .review-tile-chip {
-  background: rgba(10, 14, 10, 0.52);
+  background: rgba(24, 30, 26, 0.62);
   border: 1px solid rgba(255, 255, 255, 0.28);
 }
 @supports ((backdrop-filter: blur(16px)) or (-webkit-backdrop-filter: blur(16px))) {
   .review-tile-chip {
-    background: rgba(255, 255, 255, 0.17);
+    background: rgba(24, 30, 26, 0.4);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     backdrop-filter: blur(16px) saturate(180%);
   }
 }
+
 
 
 
