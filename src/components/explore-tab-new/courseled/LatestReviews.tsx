@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ReviewTile } from './ReviewTile';
+import { ReviewTile, reviewTier } from './ReviewTile';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { Eyebrow, InkAction } from './tokens';
@@ -50,7 +50,17 @@ export function LatestReviews({
 }: Props) {
   const { t } = useTranslation('courses');
 
-  const shown = reviews.slice(0, PAGE_CAP);
+  /* TIERS (BRIEF_REVIEW_TILE_TIERS §1/§2). At most ONE featured tile per
+     render: the MOST RECENT qualifier in the page's own window — the list is
+     created_at DESC, so that is simply the first. A second qualifier renders
+     as BARS in the grid. When a featured tile is lifted out, the grid still
+     carries PAGE_CAP tiles, so the two columns stay even. */
+  const pool = reviews.slice(0, PAGE_CAP);
+  const featured = pool.find((r) => reviewTier(r) === 'featured') ?? null;
+  const shown = featured
+    ? [featured, ...reviews.slice(0, PAGE_CAP + 1).filter((r) => r.reviewId !== featured.reviewId)]
+    : pool;
+  const grid = featured ? shown.slice(1) : shown;
 
   // REACTIONS — one read for the mosaic, keyed by review id.
   const reactionTargets = useMemo<ReactionTarget[]>(
@@ -83,8 +93,41 @@ export function LatestReviews({
         {t('discover.latestReviews', 'Latest reviews')}
       </Eyebrow>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {shown.map((r) => {
+      {featured && (() => {
+        const st = reactions.stateFor('review', featured.reviewId);
+        const own = !!viewerId && featured.userId === viewerId;
+        return (
+          <div style={{ marginBottom: 8 }}>
+            <ReviewTile
+              key={featured.reviewId}
+              review={featured}
+              isOwn={own}
+              isNew={isNewSince(featured.at, lastSeen)}
+              onPress={onTilePress}
+              tier="featured"
+              reactionHidden={!reactions.viewerId || reactions.unavailable}
+              reactionReadOnly={own}
+              reactionCount={st.count}
+              reacted={st.mine}
+              onToggleReaction={() => reactions.toggle('review', featured.reviewId)}
+            />
+          </div>
+        );
+      })()}
+
+      {/* PLAIN GRID, NOT A MEASURED MASONRY (§5.1) — no estimator here, so
+          variable tile heights cannot drift the columns. alignItems: 'start'
+          stops a compact tile stretching to its taller neighbour, which would
+          read as a gap under the figures rather than rhythm (§5.3). */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          alignItems: 'start',
+          gap: 8,
+        }}
+      >
+        {grid.map((r) => {
           const st = reactions.stateFor('review', r.reviewId);
           const own = !!viewerId && r.userId === viewerId;
           return (

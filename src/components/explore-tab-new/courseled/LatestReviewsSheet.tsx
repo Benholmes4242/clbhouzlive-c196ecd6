@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { ReviewTile } from './ReviewTile';
+import { ReviewTile, reviewTier } from './ReviewTile';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 
 import { A, KICKER, SANS, FIGS } from './tokens';
@@ -238,7 +238,20 @@ export function LatestReviewsSheet({
             </div>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          /* THE SHEET TIERS TOO (§6.2), with ONE departure: a featured review
+             renders in the BARS treatment here. The full-width lead is a
+             SECTION device — inside a two-column sheet of dozens of tiles a
+             recurring full-bleed tile would break the scan, and a quote on
+             every other tile stops being a reward. Compact still applies, so
+             the sheet keeps the same rhythm the section has. */
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              alignItems: 'start',
+              gap: 8,
+            }}
+          >
             {visible.map((r) => {
               const st = reactions.stateFor('review', r.reviewId);
               const own = !!viewerId && r.userId === viewerId;
@@ -248,6 +261,7 @@ export function LatestReviewsSheet({
                   review={r}
                   isOwn={own}
                   autoplayGroup="reviews-sheet"
+                  tier={reviewTier(r) === 'compact' ? 'compact' : 'bars'}
                   onPress={onTilePress}
                   reactionHidden={!reactions.viewerId || reactions.unavailable}
                   reactionReadOnly={own}

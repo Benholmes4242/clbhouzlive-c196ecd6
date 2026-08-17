@@ -16,7 +16,10 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * REVIEW TILE — mosaic tile (BRIEF_REVIEW_TILE_LIGHTER).
  *
  * Photo-led tile with its text on the photograph. The course name IS the
- * headline; the quote no longer appears here (it lives in the review sheet).
+ * headline. THE QUOTE RETURNS ON THE FEATURED TIER ONLY
+ * (BRIEF_REVIEW_TILE_TIERS §2.3), partly reversing the earlier decision that
+ * moved it into the review sheet: it is now a reward for a review that scored
+ * 9+ overall AND 9+ on every category it filled in, not a default.
  * The PHOTO is the same fixed height on every tile regardless of how the name
  * wraps. Beneath it sits the CATEGORY BREAKDOWN (BRIEF_REVIEW_TILE_BREAKDOWN):
  * one label/track/figure row per scored category, so two courses on 8.7 no
@@ -42,6 +45,36 @@ import type { LatestReview } from './hooks/useLatestReviews';
  */
 
 export const REVIEW_TILE_HEIGHT = 186;
+/** FEATURED photo height (§2.1). The tile is full width, so the photo is taller. */
+export const REVIEW_TILE_FEATURED_HEIGHT = 196;
+
+/**
+ * THE THREE TIERS (BRIEF_REVIEW_TILE_TIERS §1). Nothing about the tile's design
+ * changes — the tier only decides which treatment the breakdown block gets.
+ *
+ *   FEATURED  overall >= 9 AND every SCORED category >= 9  -> quote + bars
+ *   BARS      overall >= 9                                  -> today's tile
+ *   COMPACT   overall < 9                                   -> figures, no bars
+ *
+ * A review with NO categories can never be FEATURED: there is nothing to clear
+ * the bar. It falls to BARS or COMPACT on its overall alone and keeps its
+ * breakdown block absent in both, exactly as today (§1.3).
+ */
+export type ReviewTier = 'featured' | 'bars' | 'compact';
+
+const TIER_FLOOR = 9;
+
+export function reviewTier(r: LatestReview): ReviewTier {
+  if (r.rating < TIER_FLOOR) return 'compact';
+  const scored = [
+    r.breakdown?.design,
+    r.breakdown?.conditions,
+    r.breakdown?.clubhouse,
+    r.breakdown?.facilities,
+  ].filter((v): v is number => v != null && !Number.isNaN(Number(v)));
+  if (scored.length > 0 && scored.every((v) => v >= TIER_FLOOR)) return 'featured';
+  return 'bars';
+}
 
 const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 30%)';
 /** On-dark amber: the viewing member's own name. Not #F7931E on photography. */
@@ -92,6 +125,11 @@ interface Props {
    * Pass a stable key per surface ('discover-reviews' | 'reviews-sheet').
    */
   autoplayGroup?: string;
+  /**
+   * Treatment. Omitted = derived from the review itself, so a caller that does
+   * not care about tiers behaves exactly as before.
+   */
+  tier?: ReviewTier;
 }
 
 
@@ -108,9 +146,16 @@ export function ReviewTile({
   reacted = false,
   onToggleReaction,
   autoplayGroup = 'discover-reviews',
+  tier,
 }: Props) {
 
   const { t } = useTranslation('courses');
+
+  /* The tier decides the BREAKDOWN treatment and nothing else. */
+  const resolvedTier = tier ?? reviewTier(r);
+  const isFeatured = resolvedTier === 'featured';
+  const photoH =
+    isFeatured && height === REVIEW_TILE_HEIGHT ? REVIEW_TILE_FEATURED_HEIGHT : height;
 
   const isVideo = r.mediaType === 'video';
   const ownImage = isVideo ? r.posterUrl : r.mediaUrl;
@@ -200,7 +245,7 @@ export function ReviewTile({
     >
       <span
         data-testid="review-tile-photo"
-        style={{ position: 'relative', display: 'block', height }}
+        style={{ position: 'relative', display: 'block', height: photoH }}
       >
       <CourseImageFallback
         courseId={r.courseId}
@@ -288,11 +333,18 @@ export function ReviewTile({
             the blur is the @supports enhancement: this chip sits over a
             photograph and unreadable is the failure mode. */}
         <span
-          className="review-tile-chip"
           style={{
             position: 'absolute',
             top: 8,
             left: 8,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+        <span
+          className="review-tile-chip"
+          style={{
             display: 'inline-flex',
             alignItems: 'baseline',
             gap: 2,
@@ -313,6 +365,25 @@ export function ReviewTile({
             {r.rating.toFixed(1)}
           </span>
           <span style={{ ...LABEL, fontSize: 6.5, color: 'rgba(255,255,255,0.62)' }}>/10</span>
+        </span>
+
+        {/* THE FEATURED MARK (§2.5). In the 9+ green with white text — the only
+            tier badge on the page. */}
+        {isFeatured && (
+          <span
+            style={{
+              ...LABEL,
+              fontSize: 7,
+              color: '#FFFFFF',
+              background: bandColor(10),
+              borderRadius: 999,
+              padding: '4px 8px',
+              lineHeight: 1,
+            }}
+          >
+            {t('discover.reviews.featured', 'Featured')}
+          </span>
+        )}
         </span>
 
 
@@ -374,10 +445,85 @@ export function ReviewTile({
           metrics and the band colour come from there, not from this file.
           A null category RENDERS NO ROW; a review with no categories at all
           renders NO BLOCK and no gap. */}
-      {rows.length > 0 && (
+      {/* THE QUOTE — FEATURED ONLY (§2.2), three lines, beneath the photo and
+          above the bars. useLatestReviews rejects any review whose prose is
+          empty after trim, so every review here has words: no null case. */}
+      {isFeatured && r.quote && (
+        <div
+          style={{
+            padding: '10px 14px 0',
+            fontSize: 13,
+            fontWeight: 500,
+            lineHeight: 1.42,
+            letterSpacing: '-0.01em',
+            color: A.BODY,
+            ...clamp(3),
+          }}
+        >
+          {r.quote}
+        </div>
+      )}
+
+      {/* BREAKDOWN — the four category scores.
+          BARS / FEATURED: scoreBands' shipped SubScoreBar (the same component
+          the review composer uses), so the label/track/figure metrics and the
+          band colour come from there, not from this file. Featured renders the
+          same rows at the slightly looser scale the wider tile allows (§2.6).
+          COMPACT (§4.2): four equal columns, figure over label, NO track, NO
+          fill, NO band colour — a sub-9 review carries amber on most rows, and
+          reserving the coloured bars for 9+ is what makes them mean something.
+          A null category RENDERS NO ROW; a review with no categories at all
+          renders NO BLOCK and no gap. */}
+      {rows.length > 0 && resolvedTier === 'compact' && (
         <div
           data-testid="review-tile-breakdown"
-          style={{ padding: '8px 11px 9px', display: 'grid', rowGap: 6 }}
+          style={{
+            padding: '9px 11px 10px',
+            display: 'grid',
+            gridTemplateColumns: `repeat(${rows.length}, 1fr)`,
+            gap: 6,
+          }}
+        >
+          {rows.map((row) => (
+            <div key={row.key} style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                  color: A.INK,
+                  ...FIGS,
+                }}
+              >
+                {row.value.toFixed(1)}
+              </div>
+              <div
+                style={{
+                  ...LABEL,
+                  fontSize: 7,
+                  marginTop: 4,
+                  color: A.MUTE,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {row.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {rows.length > 0 && resolvedTier !== 'compact' && (
+        <div
+          data-testid="review-tile-breakdown"
+          style={
+            isFeatured
+              ? { padding: '10px 14px 12px', display: 'grid', rowGap: 8 }
+              : { padding: '8px 11px 9px', display: 'grid', rowGap: 6 }
+          }
         >
           {rows.map((row) => (
             <SubScoreBar key={row.key} label={row.label} score={row.value} />
