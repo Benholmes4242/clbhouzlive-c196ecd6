@@ -95,7 +95,7 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
             minWidth: 0,
           }}
         >
-          {/* 2. THE RING — solid light stroke, squircle geometry. */}
+          {/* 1. THE RING — solid light stroke, squircle geometry. */}
           <span
             style={{
               flexShrink: 0,
@@ -123,7 +123,7 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
           </span>
 
           <span style={{ minWidth: 0, flex: 1 }}>
-            {/* 3. THE CAPTION IS THE PERSON — no course name anywhere. */}
+            {/* 2. THE CAPTION IS THE PERSON — no course name anywhere. */}
             <span
               style={{
                 display: 'block',
