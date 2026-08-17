@@ -29,6 +29,7 @@ import {
 import { CompactStandoutTile, estimateCompactHeight } from './CompactStandoutTile';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW_ROW_BAR, NUMF, SANS, SCRIM_STRONG } from './tokens';
 import { StandoutTile } from './StandoutTile';
+import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
  * Section 2 — AROUND THE WORLD (BRIEF, section 2).
@@ -144,13 +145,17 @@ type ChipTier = 'gold' | 'green' | 'ink' | 'rating';
  * => ~25 chars a line); the longest live string is "First clean card here" at
  * 21 characters, so every current benchmark is one line.
  */
-function estimatePanelHeight(detail: string, margin: string): number {
+function estimatePanelHeight(detail: string, margin: string, who = ''): number {
   const lines = detail ? Math.min(2, Math.ceil(detail.length / 24)) : 0;
   const marginLines = margin ? Math.min(2, Math.ceil(margin.length / 25)) : 0;
+  // The name row wraps to a second line rather than truncating (~19 chars fit
+  // one line at 13/700), and the detail row now carries the reaction control,
+  // so it is billed at 20px minimum whether or not it holds text.
+  const whoLines = who ? Math.min(2, Math.ceil(who.length / 19)) : 1;
   return (
     23 +
-    18 +
-    (lines > 0 ? 2 + lines * 16 : 0) +
+    whoLines * 18 +
+    2 + Math.max(lines * 16, 20) +
     (marginLines > 0 ? 3 + marginLines * 15 : 0)
   );
 }
@@ -307,6 +312,18 @@ function chipTierFor(kind: WireEvent['kind'] | 'rating'): ChipTier {
 function detailAddsNothing(e: WireEvent, figure: string | null): boolean {
   if (!figure) return false;
   return e.kind === 'birdie_haul' || e.kind === 'bogey_free' || e.kind === 'under_par';
+}
+
+/**
+ * UNDER PAR IS RED, HERE TOO (the app-wide to-par convention). "Beating the
+ * course" is the one group whose figure IS a to-par score, so its chip carries
+ * TOPAR red instead of flat white — but only when the round actually went under
+ * par (a leading minus). Level or over par stays neutral.
+ */
+function figureToneFor(kind: WireEvent['kind'] | 'rating' | null, figure: string | null): string | undefined {
+  if (kind !== 'under_par') return undefined;
+  if (!figure || !figure.trim().startsWith('-')) return undefined;
+  return TOPAR_RED;
 }
 
 /** Legacy on-light figure tone — still used by the Course News sheet entries. */
@@ -993,7 +1010,7 @@ export function AroundTheWorld({
               avatarUserId: top?.userId ?? rating?.userId ?? null,
               reactTo,
               onPress,
-              height: photo + estimatePanelHeight(detailText, margin),
+              height: photo + estimatePanelHeight(detailText, margin, who),
             };
           });
 
@@ -1067,6 +1084,7 @@ export function AroundTheWorld({
               region={tt.m?.region ?? null}
               photo={opts?.photo ?? tt.photo}
               figure={tt.figure}
+              figureTone={figureToneFor(tt.kind, tt.figure)}
               unit={tt.unit}
               whenLabel={relativeWhen(tt.g.at, t)}
               who={tt.who}
@@ -1103,6 +1121,7 @@ export function AroundTheWorld({
               courseName={nameOf(tt)}
               region={tt.m?.region ?? null}
               figure={tt.figure}
+              figureTone={figureToneFor(tt.kind, tt.figure)}
               unit={tt.unit}
               whenLabel={relativeWhen(tt.g.at, t)}
               who={tt.who}
@@ -1200,7 +1219,7 @@ export function AroundTheWorld({
                       compact,
                       /* EVERY SHAPE BRINGS ITS OWN ESTIMATE (§0.1). */
                       height: compact
-                        ? estimateCompactHeight(detailOf(tt), tt.margin || '')
+                        ? estimateCompactHeight(detailOf(tt), tt.margin || '', tt.who)
                         : tt.height,
                     };
                   });
