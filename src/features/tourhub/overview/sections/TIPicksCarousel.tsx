@@ -579,6 +579,7 @@ function CardStateSlot({
   v,
   t,
   tone = 'light',
+  suppressWinChip = false,
 }: {
   state: EventState;
   pick: AITopContender;
@@ -587,6 +588,9 @@ function CardStateSlot({
   v: TiVerdict;
   t: TFunction;
   tone?: 'light' | 'dark';
+  /** The tile moves the win pill into the top-right status slot, so the inline
+   *  chip must not draw it a second time. */
+  suppressWinChip?: boolean;
 }) {
   const dark = tone === 'dark';
   if (settled) {
@@ -594,6 +598,8 @@ function CardStateSlot({
       // Settled with no leaderboard row → show fit if present.
       return <CourseFitLine score={pick.courseFitScore} t={t} tone={tone} />;
     }
+    if (suppressWinChip && v.kind === 'win') return null;
+
     return <VerdictChip v={v} t={t} />;
   }
   if (state === 'live' && live) {
