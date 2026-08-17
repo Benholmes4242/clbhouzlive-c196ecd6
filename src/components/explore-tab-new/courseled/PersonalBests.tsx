@@ -388,27 +388,14 @@ export function PersonalBests({
               {buckets.length > 1 ? (
                 <div
                   style={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    justifyContent: 'space-between',
-                    gap: 8,
+                    ...LABEL,
+                    fontSize: 9,
+                    color: A.MUTE,
                     padding: '0 2px',
                     marginBottom: 8,
                   }}
                 >
-                  <span
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 700,
-                      letterSpacing: '-0.02em',
-                      color: A.INK,
-                    }}
-                  >
-                    {b.label}
-                  </span>
-                  <span style={{ ...NUMF, fontSize: 12, fontWeight: 700, color: A.DIM }}>
-                    {b.items.length}
-                  </span>
+                  {b.label}
                 </div>
               ) : null}
 
