@@ -33,10 +33,13 @@ import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens'
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { usePlatformReach } from '@/hooks/usePlatformReach';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import heroPhoto from '@/assets/business/links-clubhouse.jpg.asset.json';
-import rangePhoto from '@/assets/business/driving-range.webp.asset.json';
-import shopPhoto from '@/assets/business/pro-shop.webp.asset.json';
+import { BUSINESS_CATEGORIES } from '@/types/profile';
+// HERO (§3.4) — a range at dusk, NOT a course: a links clubhouse said "venues".
+import heroPhoto from '@/assets/business/driving-range.webp.asset.json';
 import clubPhoto from '@/assets/business/club-green.webp.asset.json';
+import coachPhoto from '@/assets/business/coach-lesson.jpg';
+import fitterPhoto from '@/assets/business/fitting-bay.jpg';
+import brandPhoto from '@/assets/business/brand-product.jpg';
 
 interface BusinessEmptyStateProps {
   onCreate: () => void;
