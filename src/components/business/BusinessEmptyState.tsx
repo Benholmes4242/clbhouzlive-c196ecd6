@@ -114,11 +114,22 @@ const Delta = ({ delta, locale, label }: { delta: number | null; locale: string;
 
 /* ───────────────────────── example miniature ───────────────────────── */
 
+/**
+ * ExampleSpec is shaped for the DAY REAL ACCOUNTS EXIST (§3.6):
+ *   category  a verbatim BUSINESS_CATEGORIES entry — always the label shown
+ *             when there is no real trading name to show.
+ *   name      a REAL trading name, only ever set from a claimed account.
+ *   stats     a REAL figure row, likewise. Absent => nothing renders.
+ *   isExample tags the card EXAMPLE. A real account sets this false.
+ */
 interface ExampleSpec {
   id: string;
   src: string;
-  name: string;
+  category: string;
   meta: string;
+  name?: string;
+  stats?: string;
+  isExample: boolean;
 }
 
 function ExampleCard({ spec, tabs, tag }: { spec: ExampleSpec; tabs: string[]; tag: string }) {
