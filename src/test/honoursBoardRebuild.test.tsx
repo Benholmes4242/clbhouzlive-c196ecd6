@@ -5,6 +5,7 @@ import {
   HonoursBoard,
   groupLeaders,
   PLAQUE_W,
+  BAND_H,
 } from '@/components/explore-tab-new/courseled/HonoursBoard';
 import type { WireEvent } from '@/components/explore-tab-new/hooks/useDiscoverWire';
 
@@ -33,7 +34,8 @@ describe('BRIEF_HONOURS_BOARD_PLAQUE_RAIL', () => {
     expect(screen.getByText('Ace')).toBeTruthy();
     expect(container.textContent).toMatch(/Par 3/);
     expect(container.textContent).toMatch(/152/);
-    expect(PLAQUE_W).toBe(168);
+    expect(PLAQUE_W).toBe(212);
+    expect(BAND_H).toBe(132);
   });
 
   it('computes the headline, pluralises each part and omits a zero part', () => {
@@ -84,11 +86,9 @@ describe('BRIEF_HONOURS_BOARD_PLAQUE_RAIL', () => {
     expect(container.textContent).toBe('');
   });
 
-  it('groups the grid layout by year', () => {
+  it('prints the year on each recent card', () => {
     render(
       <HonoursBoard
-        layout="grid"
-        showHeader={false}
         events={[ev({ id: 'a', at: '2024-05-01T00:00:00Z' }), ev({ id: 'b', at: '2022-05-01T00:00:00Z' })]}
       />,
     );
@@ -96,3 +96,4 @@ describe('BRIEF_HONOURS_BOARD_PLAQUE_RAIL', () => {
     expect(screen.getAllByText('2022').length).toBeGreaterThan(0);
   });
 });
+

@@ -1003,7 +1003,9 @@
       "latestAt": "최근 {{year}} · {{course}}",
       "expandFeats": "{{count}}개 더",
       "expandFeats_one": "{{count}}개 더",
-      "collapseFeats": "접기"
+      "collapseFeats": "접기",
+      "countAces_other": "홀인원 {{count}}회",
+      "countAlbatrosses_other": "알바트로스 {{count}}회"
     },
     "feat": {
       "group": {
