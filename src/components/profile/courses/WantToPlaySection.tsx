@@ -11,6 +11,7 @@ import { useUserWantToPlay, WantToPlayCourse } from '@/hooks/useUserWantToPlay';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 interface WantToPlaySectionProps {
   userId: string;
@@ -110,7 +111,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                   backgroundPosition: 'center',
                 }}
               >
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(15,23,42,0.05) 0%, rgba(15,23,42,0) 35%, rgba(15,23,42,0.6) 100%)' }} />
+                <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
                 {isOwnProfile && (
                   <button
                     type="button"

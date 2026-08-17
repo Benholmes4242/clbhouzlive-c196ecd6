@@ -155,8 +155,7 @@ export function CourseOfTheWeekSection() {
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    background:
-                      'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 38%), linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.25) 45%, transparent 70%)',
+                    background: SCRIM_STANDOUT,
                     pointerEvents: 'none',
                   }}
                 />

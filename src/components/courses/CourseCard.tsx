@@ -11,6 +11,7 @@ import { useMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 interface Course {
   id: string;
@@ -214,8 +215,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
           />
         </div>
 
-        {/* Enhanced bottom gradient for better text readability */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none z-0" />
+        {/* THE canonical photo scrim — the card's only one. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{ background: SCRIM_STANDOUT }}
+        />
 
         {/* Frosted glass ranking badges */}
         {!hideRankingBadges && !badgesOnTop && (

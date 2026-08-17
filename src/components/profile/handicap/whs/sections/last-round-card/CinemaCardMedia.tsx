@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { formatWeekdayLongDayMonthLongGB } from '@/i18n/format';
 import FlagSilhouetteOverlay from '@/components/whs/FlagSilhouetteOverlay';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
@@ -18,8 +19,9 @@ const FALLBACK_GRADIENT = 'linear-gradient(135deg, #46665a 0%, #2f4a40 100%)';
 const ATMOSPHERIC =
   'radial-gradient(ellipse 80% 60% at 50% 90%, rgba(0,0,0,0.55) 0%, transparent 70%), radial-gradient(ellipse 60% 40% at 70% 25%, rgba(255,200,140,0.18) 0%, transparent 60%)';
 
-const LEGIBILITY_SCRIM =
-  'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%)';
+/** Renamed from LEGIBILITY_SCRIM — Tour Hub exports a token of that name and
+ *  the two must not be confused (BRIEF_APP_WIDE_SCRIM §4.4). */
+const CINEMA_LEGIBILITY = SCRIM_STANDOUT;
 
 export const CinemaCardMedia: React.FC<Props> = ({
   imageUrl,
@@ -67,7 +69,7 @@ export const CinemaCardMedia: React.FC<Props> = ({
       {/* z=1 atmospheric */}
       <div style={{ position: 'absolute', inset: 0, background: ATMOSPHERIC, pointerEvents: 'none' }} />
       {/* z=2 legibility */}
-      <div style={{ position: 'absolute', inset: 0, background: LEGIBILITY_SCRIM, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', inset: 0, background: CINEMA_LEGIBILITY, pointerEvents: 'none' }} />
 
       {/* z=3 eyebrow */}
       <div

@@ -1,4 +1,5 @@
 import React from 'react';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 interface CourseCardBackgroundProps {
   thumbnailImage?: string;
@@ -39,8 +40,9 @@ const CourseCardBackground: React.FC<CourseCardBackgroundProps> = ({
         decoding="async"
         onLoad={() => setIsLoaded(true)}
       />
-      {/* Gradient overlay for better text readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+      {/* NO SCRIM HERE — CourseCard paints the canonical SCRIM_STANDOUT over
+          this background, and it is never rendered standalone
+          (BRIEF_APP_WIDE_SCRIM §1.2). Two scrims stacked is the bug. */}
     </div>
   );
 };

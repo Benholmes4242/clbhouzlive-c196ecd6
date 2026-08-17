@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import type { WhsLastRound } from '@/lib/whs/types';
 import {
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
   COURSE_GRADIENT,
   COURSE_SCRIMS,
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
@@ -31,9 +32,8 @@ interface Props {
 
 const MEDIA_HEIGHT = 132;
 
-/** Two-stop scrim ramp so the course name reads on any photo. */
-const NAME_SCRIM =
-  'linear-gradient(180deg, rgba(15,18,25,0.02) 0%, rgba(15,18,25,0.20) 46%, rgba(15,18,25,0.62) 74%, rgba(15,18,25,0.86) 100%)';
+/** The canonical photo scrim (BRIEF_APP_WIDE_SCRIM §1). */
+const NAME_SCRIM = SCRIM_STANDOUT;
 
 const MediaBand: React.FC<{ src: string | null; course: string; meta: string | null }> = ({
   src,

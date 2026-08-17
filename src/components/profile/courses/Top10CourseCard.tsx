@@ -20,6 +20,7 @@ import { getScoreTier } from '@/utils/getScoreTier';
 import { useTopTenReactions, REACTION_CONFIG, ReactionType } from '@/hooks/useTopTenReactions';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 interface Top10CourseCardProps {
   course: TopTenCourse;
@@ -108,7 +109,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.7) 100%)',
+            background: SCRIM_STANDOUT,
           }}
         />
 
