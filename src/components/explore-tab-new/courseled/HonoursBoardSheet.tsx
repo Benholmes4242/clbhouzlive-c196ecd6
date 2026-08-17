@@ -190,18 +190,26 @@ function LeaderSection({
   onRowPress?: (event: WireEvent) => void;
   anchorRef?: (node: HTMLDivElement | null) => void;
 }) {
-  /* §2.6 — EXPANDED BY DEFAULT. Collapsing is how someone navigates a long
-     sheet, but the default must show everything. */
-  const [open, setOpen] = useState(true);
+  /* COLLAPSE IS GONE (CORRECTION_HONOURS_SHEET_TAP_TARGETS §2), overruling
+     BRIEF_HONOURS_BOARD_REBUILD §2.6: every member is expanded, always, with no
+     open state and no chevron. Tapping the photograph used to fold the record
+     away, which is what Ben saw when he meant to open a scorecard.
+
+     THE PHOTO'S JOB NOW DEPENDS ON THE RECORD (§1). One feat: the band opens
+     that feat's scorecard, because there is only one thing the tap could mean.
+     More than one: the band is INERT (§4/§5) — no press state, no cursor — since
+     the photo is the most recent feat but the card is about all of them, and the
+     rows are the only place that can say which round. */
+  const single = l.events.length === 1 ? l.events[0] : null;
+  const bandPress =
+    single && onRowPress && single.scoreId ? () => onRowPress(single) : undefined;
 
   return (
     <div ref={anchorRef} style={{ ...PANEL, scrollMarginTop: 12 }}>
-      <LeaderBand leader={l} onPress={() => setOpen((v) => !v)} ariaExpanded={open} />
-      {open
-        ? l.events.map((e, i) => (
-            <HonoursRow key={e.id} event={e} mode="leaders" onPress={onRowPress} divider={i > 0} />
-          ))
-        : null}
+      <LeaderBand leader={l} onPress={bandPress} />
+      {l.events.map((e, i) => (
+        <HonoursRow key={e.id} event={e} mode="leaders" onPress={onRowPress} divider={i > 0} />
+      ))}
     </div>
   );
 }

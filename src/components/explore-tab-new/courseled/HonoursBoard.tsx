@@ -326,11 +326,15 @@ export function groupLeaders(events: WireEvent[]): HonoursLeader[] {
 export function LeaderBand({
   leader: l,
   onPress,
-  ariaExpanded,
 }: {
   leader: HonoursLeader;
+  /**
+   * Present ONLY on a single-feat card in the sheet, where it opens that feat's
+   * scorecard (CORRECTION_HONOURS_SHEET_TAP_TARGETS §1/§3). Absent = the band is
+   * inert: no role, no tabIndex, no pointer cursor. The collapse handler that
+   * used to live here is gone (§2).
+   */
   onPress?: () => void;
-  ariaExpanded?: boolean;
 }) {
   const { t } = useTranslation('courses');
   const countLabel = useCountLabel();
@@ -378,7 +382,6 @@ export function LeaderBand({
     <div
       role={onPress ? 'button' : undefined}
       tabIndex={onPress ? 0 : undefined}
-      aria-expanded={ariaExpanded}
       onClick={onPress}
       style={{ cursor: onPress ? 'pointer' : 'default' }}
     >
