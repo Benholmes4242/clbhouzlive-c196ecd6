@@ -494,8 +494,10 @@ export function AroundTheWorld({
    * The fix mirrors get_personal_bests' `kinded` CTE: rank each candidate AMONG
    * FEATS OF ITS OWN KIND (kn), then order on (kn, precedence, recency). Every
    * kind places its best tile before any kind places a second, so the mix
-   * self-enforces Ben's max-of-three without a hard cap — and widens on its own
-   * when only one or two kinds exist.
+   * self-enforces AT MOST TWO PER KIND without a hard cap (eight slots, four or
+   * more kinds with material) — and widens on its own when supply is thin:
+   * 5 kinds -> 2,2,2,1,1 · 4 -> 2,2,2,2 · 3 -> 3,3,2 · 1 -> 8.
+   * (BRIEF_FEAT_BALANCE_AND_LENS_ORDER §1.)
    *
    * THE HERO IS CHOSEN FIRST AND IS EXEMPT (§1.6): the rarest feat leads
    * regardless of kind and is removed from the pool the budget spends.
