@@ -206,7 +206,6 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
         {rows.map((r) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
           const hasAce = r.feats.some((f) => f.key === 'holes_in_one');
-          const isNew = isNewSince(r.play_date, lastSeen);
           // A ROUND SCORE IS A SCORE, NOT A MOVEMENT: under par is TOPAR red,
           // over par is INK, level is muted. The index-delta pair
           // (A.IMPROVED / A.DRIFTED) means MOVEMENT and must never appear here.
