@@ -322,7 +322,11 @@ function detailAddsNothing(e: WireEvent, figure: string | null): boolean {
  */
 function figureToneFor(kind: WireEvent['kind'] | 'rating' | null, figure: string | null): string | undefined {
   if (kind !== 'under_par') return undefined;
-  if (!figure || !figure.trim().startsWith('-')) return undefined;
+  /* The figure is FORMATTED for display, so its minus can be a true minus
+     (U+2212) or an en dash, not only ASCII '-' — matching only ASCII left
+     every under-par chip black. */
+  const lead = figure?.trim().charAt(0) ?? '';
+  if (!'-\u2212\u2013'.includes(lead) || !lead) return undefined;
   return TOPAR_RED;
 }
 
