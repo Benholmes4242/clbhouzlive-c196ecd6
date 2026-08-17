@@ -219,7 +219,6 @@ export function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
   const [heroFailed, setHeroFailed] = useState(false);
 
   const courses = useCountUp(data?.coursesTotal ?? null, isSuccess);
-  const coursesLive = data?.coursesTotal ?? null;
   const upLabel = (n: number) => t('business.emptyState.reach.up', { count: n });
 
   /**
