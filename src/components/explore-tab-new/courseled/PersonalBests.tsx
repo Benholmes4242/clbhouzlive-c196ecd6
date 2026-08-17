@@ -330,12 +330,78 @@ export function PersonalBests({
                 trailing={trailing}
               />
               );
-            })}
-          </div>
-        ))}
+  };
+
+  return (
+    <section>
+      <Eyebrow aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}>
+        {t('discover.personalBests', 'Personal bests')}
+      </Eyebrow>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {buckets.map((b) => {
+          let asg = masonry.current.get(b.id);
+          if (!asg) {
+            asg = createMasonryAssignment();
+            masonry.current.set(b.id, asg);
+          }
+          const { columns } = placeStable(b.items, asg);
+
+          return (
+            <div key={b.id}>
+              {/* A single surviving group needs no heading — the section eyebrow
+                  already says what it is (§2.3). A group of ONE tile keeps its
+                  heading (§2.1). */}
+              {buckets.length > 1 ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    padding: '0 2px',
+                    marginBottom: 8,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      letterSpacing: '-0.02em',
+                      color: A.INK,
+                    }}
+                  >
+                    {b.label}
+                  </span>
+                  <span style={{ ...NUMF, fontSize: 12, fontWeight: 700, color: A.DIM }}>
+                    {b.items.length}
+                  </span>
+                </div>
+              ) : null}
+
+              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                {columns.map((col, ci) => (
+                  <div
+                    key={ci}
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 8,
+                    }}
+                  >
+                    {col.map((tt) => renderTile(tt))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
+
 }
 
 export default PersonalBests;
