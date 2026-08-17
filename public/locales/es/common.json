@@ -139,49 +139,49 @@
       },
       "hero": {
         "kicker": "PARA EMPRESAS",
-        "title": "Los golfistas ya hablan de ti.",
-        "body": "Reclama tu pagina y forma parte."
+        "title": "Los golfistas ya buscan lo que tú haces.",
+        "body": "Reclama tu página y está donde ellos están."
       },
       "numbers": {
-        "courses": "campos en clbhouz",
+        "courses": "campos que los golfistas exploran en clbhouz",
         "rounds": "RONDAS",
-        "reviews": "RESENAS",
-        "greenNote": "EL VERDE ES LOS ULTIMOS 30 DIAS"
+        "reviews": "RESEÑAS",
+        "greenNote": "EL VERDE ES LOS ÚLTIMOS 30 DÍAS"
       },
       "examples": {
-        "kicker": "ASI SE VE LA TUYA",
-        "heading": "Una pagina para cada negocio del golf",
+        "kicker": "ASÍ SE VE LA TUYA",
+        "heading": "Una página para cada tipo de negocio de golf",
         "tag": "EJEMPLO",
         "tabs": {
           "home": "INICIO",
-          "about": "INFO",
-          "reviews": "RESENAS"
+          "about": "ACERCA DE",
+          "reviews": "RESEÑAS"
         },
         "club": {
-          "name": "Club de golf",
-          "meta": "Club . 18 hoyos"
+          "meta": "Sede . Reseñas y rondas"
         },
-        "range": {
-          "name": "Campo de practicas",
-          "meta": "Practicas"
+        "coach": {
+          "meta": "Clases . Reservas y reseñas"
         },
-        "shop": {
-          "name": "Tienda pro",
-          "meta": "Retail . Fitting"
+        "fitter": {
+          "meta": "Fitting . Reservas y reseñas"
+        },
+        "brand": {
+          "meta": "Producto . Seguidores y publicaciones"
         }
       },
       "rows": {
         "found": {
-          "title": "Hazte visible",
-          "body": "Apareces en la busqueda y en el directorio, junto a los {{courses}} campos que los golfistas ya consultan."
+          "title": "Que te encuentren",
+          "body": "Apareces en la búsqueda y en el directorio, ante golfistas que ya usan clbhouz cada día."
         },
         "trusted": {
           "title": "Genera confianza",
-          "body": "Las resenas vienen de golfistas con rondas registradas, no de cuentas anonimas."
+          "body": "Las reseñas vienen de golfistas con rondas registradas, no de cuentas anónimas."
         },
         "reach": {
           "title": "Conoce tu alcance",
-          "body": "Vistas, seguidores e interaccion, contados en vivo."
+          "body": "Visitas, seguidores e interacción, contados en vivo."
         }
       }
     },

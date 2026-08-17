@@ -364,50 +364,50 @@
         }
       },
       "hero": {
-        "kicker": "[~~ƑŐŘ ƁÚŠÍÑÉŠŠÉŠ~~]",
-        "title": "[~~Ĝőļƒéřš ářé áļřéáđý ţáļǩíñĝ áƀőúţ ýőú.~~]",
-        "body": "[~~Ĉļáíɱ ýőúř ƥáĝé áñđ ƀé ƥářţ őƒ íţ.~~]"
+        "kicker": "[FOR BUSINESSES]",
+        "title": "[Golfers are already looking for what you do.]",
+        "body": "[Claim your page and be where they are.]"
       },
       "numbers": {
-        "courses": "[~~ĉőúřšéš őñ ĉļƀĥőúž~~]",
-        "rounds": "[~~ŘŐÚÑĐŠ~~]",
-        "reviews": "[~~ŘÉṼÍÉŴŠ~~]",
-        "greenNote": "[~~ĜŘÉÉÑ ÍŠ ĻÁŠŢ 30 ĐÁÝŠ~~]"
+        "courses": "[courses golfers browse on clbhouz]",
+        "rounds": "[ROUNDS]",
+        "reviews": "[REVIEWS]",
+        "greenNote": "[GREEN IS LAST 30 DAYS]"
       },
       "examples": {
-        "kicker": "[~~ŴĤÁŢ ÝŐÚŘŠ ĻŐŐǨŠ ĻÍǨÉ~~]",
-        "heading": "[~~Á ƥáĝé ƒőř éṽéřý ǩíñđ őƒ ĝőļƒ ƀúšíñéšš~~]",
-        "tag": "[~~ÉXÁɱƤĻÉ~~]",
+        "kicker": "[WHAT YOURS LOOKS LIKE]",
+        "heading": "[A page for every kind of golf business]",
+        "tag": "[EXAMPLE]",
         "tabs": {
-          "home": "[~~ĤŐɱÉ~~]",
-          "about": "[~~ÁƁŐÚŢ~~]",
-          "reviews": "[~~ŘÉṼÍÉŴŠ~~]"
+          "home": "[HOME]",
+          "about": "[ABOUT]",
+          "reviews": "[REVIEWS]"
         },
         "club": {
-          "name": "[~~Ĝőļƒ ĉļúƀ~~]",
-          "meta": "[~~Ĉļúƀ . 18 ĥőļéš~~]"
+          "meta": "[Venue . Reviews and rounds]"
         },
-        "range": {
-          "name": "[~~Đříṽíñĝ řáñĝé~~]",
-          "meta": "[~~Řáñĝé . Ƥřáĉţíĉé~~]"
+        "coach": {
+          "meta": "[Lessons . Bookings and reviews]"
         },
-        "shop": {
-          "name": "[~~Ƥřő šĥőƥ~~]",
-          "meta": "[~~Řéţáíļ . Ƒíţţíñĝ~~]"
+        "fitter": {
+          "meta": "[Fitting . Bookings and reviews]"
+        },
+        "brand": {
+          "meta": "[Product . Followers and posts]"
         }
       },
       "rows": {
         "found": {
-          "title": "[~~Ɓé ƒőúñđ~~]",
-          "body": "[~~Ýőú áƥƥéář íñ šéářĉĥ áñđ ţĥé ĉőúřšé đířéĉţőřý, áļőñĝšíđé ţĥé {{courses}} ĉőúřšéš.~~]"
+          "title": "[Be found]",
+          "body": "[You appear in search and the directory, in front of golfers already using clbhouz every day.]"
         },
         "trusted": {
-          "title": "[~~Ɓé ţřúšţéđ~~]",
-          "body": "[~~Řéṽíéŵš ĉőɱé ƒřőɱ ĝőļƒéřš ŵíţĥ ţřáĉǩéđ řőúñđš.~~]"
+          "title": "[Be trusted]",
+          "body": "[Reviews come from golfers with tracked rounds, not anonymous accounts.]"
         },
         "reach": {
-          "title": "[~~Ǩñőŵ ýőúř řéáĉĥ~~]",
-          "body": "[~~Ṽíéŵš, ƒőļļőŵš áñđ éñĝáĝéɱéñţ, ĉőúñţéđ ļíṽé.~~]"
+          "title": "[Know your reach]",
+          "body": "[Views, follows and engagement, counted live as they happen.]"
         }
       }
     },

@@ -137,50 +137,50 @@
         }
       },
       "hero": {
-        "kicker": "FOR BUSINESSES",
-        "title": "Gorufa wa sudeni anata no hanashi wo shiteimasu.",
-        "body": "Peji wo uketotte sanka shimasho."
+        "kicker": "ビジネス向け",
+        "title": "ゴルファーはすでに、あなたの提供するものを探しています。",
+        "body": "ページを取得して、彼らがいる場所に。"
       },
       "numbers": {
-        "courses": "clbhouz no kosu su",
-        "rounds": "ROUNDS",
-        "reviews": "REVIEWS",
-        "greenNote": "MIDORI WA KAKO 30 NICHI"
+        "courses": "clbhouzでゴルファーが見ているコース数",
+        "rounds": "ラウンド",
+        "reviews": "レビュー",
+        "greenNote": "緑は過去30日"
       },
       "examples": {
-        "kicker": "ANATA NO PEJI",
-        "heading": "Dono gorufu bijinesu nimo peji ga arimasu",
-        "tag": "REI",
+        "kicker": "あなたのページの例",
+        "heading": "あらゆるゴルフビジネスのためのページ",
+        "tag": "例",
         "tabs": {
-          "home": "HOME",
-          "about": "ABOUT",
-          "reviews": "REVIEWS"
+          "home": "ホーム",
+          "about": "概要",
+          "reviews": "レビュー"
         },
         "club": {
-          "name": "Gorufu kurabu",
-          "meta": "Kurabu . 18 hooru"
+          "meta": "施設 . レビューとラウンド"
         },
-        "range": {
-          "name": "Dorai bingu renji",
-          "meta": "Renji . Renshu"
+        "coach": {
+          "meta": "レッスン . 予約とレビュー"
         },
-        "shop": {
-          "name": "Puro shoppu",
-          "meta": "Hanbai . Fittingu"
+        "fitter": {
+          "meta": "フィッティング . 予約とレビュー"
+        },
+        "brand": {
+          "meta": "製品 . フォロワーと投稿"
         }
       },
       "rows": {
         "found": {
-          "title": "Mitsukete morau",
-          "body": "Kensaku to kosu direkutori ni hyoji saremasu. Gorufa ga sudeni miteiru {{courses}} kosu to narande."
+          "title": "見つけてもらう",
+          "body": "検索とディレクトリに表示され、毎日clbhouzを使うゴルファーの目に届きます。"
         },
         "trusted": {
-          "title": "Shinrai wo eru",
-          "body": "Rebyu wa raundo kiroku no aru gorufa kara - tokumei akaunto dewa arimasen."
+          "title": "信頼される",
+          "body": "レビューは記録されたラウンドを持つゴルファーによるもので、匿名アカウントではありません。"
         },
         "reach": {
-          "title": "Riichi wo shiru",
-          "body": "Hyoji, forou, engejimento wo raibu de shukei."
+          "title": "リーチを知る",
+          "body": "表示数、フォロー、エンゲージメントをリアルタイムで集計。"
         }
       }
     },

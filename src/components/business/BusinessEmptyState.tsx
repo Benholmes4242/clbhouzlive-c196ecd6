@@ -33,10 +33,13 @@ import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens'
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { usePlatformReach } from '@/hooks/usePlatformReach';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import heroPhoto from '@/assets/business/links-clubhouse.jpg.asset.json';
-import rangePhoto from '@/assets/business/driving-range.webp.asset.json';
-import shopPhoto from '@/assets/business/pro-shop.webp.asset.json';
+import { BUSINESS_CATEGORIES } from '@/types/profile';
+// HERO (§3.4) — a range at dusk, NOT a course: a links clubhouse said "venues".
+import heroPhoto from '@/assets/business/driving-range.webp.asset.json';
 import clubPhoto from '@/assets/business/club-green.webp.asset.json';
+import coachPhoto from '@/assets/business/coach-lesson.jpg';
+import fitterPhoto from '@/assets/business/fitting-bay.jpg';
+import brandPhoto from '@/assets/business/brand-product.jpg';
 
 interface BusinessEmptyStateProps {
   onCreate: () => void;
@@ -111,11 +114,22 @@ const Delta = ({ delta, locale, label }: { delta: number | null; locale: string;
 
 /* ───────────────────────── example miniature ───────────────────────── */
 
+/**
+ * ExampleSpec is shaped for the DAY REAL ACCOUNTS EXIST (§3.6):
+ *   category  a verbatim BUSINESS_CATEGORIES entry — always the label shown
+ *             when there is no real trading name to show.
+ *   name      a REAL trading name, only ever set from a claimed account.
+ *   stats     a REAL figure row, likewise. Absent => nothing renders.
+ *   isExample tags the card EXAMPLE. A real account sets this false.
+ */
 interface ExampleSpec {
   id: string;
   src: string;
-  name: string;
+  category: string;
   meta: string;
+  name?: string;
+  stats?: string;
+  isExample: boolean;
 }
 
 function ExampleCard({ spec, tabs, tag }: { spec: ExampleSpec; tabs: string[]; tag: string }) {
@@ -138,7 +152,7 @@ function ExampleCard({ spec, tabs, tag }: { spec: ExampleSpec; tabs: string[]; t
       <div style={{ position: 'relative', height: 118, background: A.TRACK }}>
         <img
           src={spec.src}
-          alt={spec.name}
+          alt={spec.name ?? spec.category}
           loading="lazy"
           onError={() => setFailed(true)}
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
@@ -157,15 +171,23 @@ function ExampleCard({ spec, tabs, tag }: { spec: ExampleSpec; tabs: string[]; t
             borderRadius: 4,
           }}
         >
-          {tag}
+          {spec.isExample ? tag : spec.category}
         </div>
         <div style={{ position: 'absolute', left: 10, right: 10, bottom: 8 }}>
+          {/* §3.3 — the CATEGORY is the subject, verbatim from BUSINESS_CATEGORIES,
+              unless a real claimed account supplies its own trading name. */}
           <div style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
-            {spec.name}
+            {spec.name ?? spec.category}
           </div>
           <div style={{ fontSize: 10.5, fontWeight: 600, color: 'rgba(255,255,255,0.76)', marginTop: 1 }}>
             {spec.meta}
           </div>
+          {/* §3.5 — a figure row ONLY when a real account supplies one. */}
+          {spec.stats ? (
+            <div style={{ ...LABEL, fontSize: 7.5, color: 'rgba(255,255,255,0.72)', marginTop: 4 }}>
+              {spec.stats}
+            </div>
+          ) : null}
         </div>
       </div>
       <div style={{ display: 'flex', gap: 12, padding: '9px 10px' }}>
@@ -197,29 +219,57 @@ export function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
   const [heroFailed, setHeroFailed] = useState(false);
 
   const courses = useCountUp(data?.coursesTotal ?? null, isSuccess);
-  const coursesLive = data?.coursesTotal ?? null;
   const upLabel = (n: number) => t('business.emptyState.reach.up', { count: n });
+
+  /**
+   * FOUR EXAMPLES, ONE VENUE (§3.1). The photographs carry the argument: a
+   * fitting bay and a product shot look nothing like a green, and that visual
+   * distance is what says "any golf business".
+   *
+   * §3.3 — every label is read out of BUSINESS_CATEGORIES verbatim, so the word
+   * Ben sees here is the word he picks in the category list. `category()` throws
+   * nothing but returns '' if the list is ever edited, and an example with no
+   * resolvable category drops rather than showing an invented name.
+   *
+   * §3.6 — WHEN REAL BUSINESSES EXIST this becomes a DATA CHANGE, not a rebuild:
+   * ExampleSpec already carries the optional `name` (a real trading name) and
+   * `stats` (a real figure row) that a claimed account would supply. Swap this
+   * literal array for the rows of a `useExampleBusinesses()` query mapped into
+   * the same shape, drop `isExample` on those rows, and ExampleCard renders the
+   * real name and the stats row with no layout work.
+   */
+  const category = (value: string) => BUSINESS_CATEGORIES.find((c) => c === value) ?? '';
 
   const examples: ExampleSpec[] = [
     {
       id: 'club',
       src: clubPhoto.url,
-      name: t('business.emptyState.examples.club.name'),
+      category: category('Golf Club'),
       meta: t('business.emptyState.examples.club.meta'),
+      isExample: true,
     },
     {
-      id: 'range',
-      src: rangePhoto.url,
-      name: t('business.emptyState.examples.range.name'),
-      meta: t('business.emptyState.examples.range.meta'),
+      id: 'coach',
+      src: coachPhoto,
+      category: category('Coach / Instructor'),
+      meta: t('business.emptyState.examples.coach.meta'),
+      isExample: true,
     },
     {
-      id: 'shop',
-      src: shopPhoto.url,
-      name: t('business.emptyState.examples.shop.name'),
-      meta: t('business.emptyState.examples.shop.meta'),
+      id: 'fitter',
+      src: fitterPhoto,
+      category: category('Club Fitter'),
+      meta: t('business.emptyState.examples.fitter.meta'),
+      isExample: true,
     },
-  ];
+    {
+      id: 'brand',
+      src: brandPhoto,
+      category: category('Brand / Manufacturer'),
+      meta: t('business.emptyState.examples.brand.meta'),
+      isExample: true,
+    },
+  ].filter((spec) => spec.category !== '');
 
   const tabs = [
     t('business.emptyState.examples.tabs.home'),
@@ -231,11 +281,11 @@ export function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
     {
       n: '01',
       title: t('business.emptyState.rows.found.title'),
-      body: t('business.emptyState.rows.found.body', {
-        count: coursesLive ?? 0,
-        courses: coursesLive == null ? '' : fmt(coursesLive, locale),
-      }),
-      hasFigure: coursesLive != null,
+      // §4.1 — NO course-count interpolation here. "Alongside the 23,293
+      // courses" implied the directory IS courses, which reads as venue-only to
+      // a coach or a fitter. The audience figure stays in the dark block.
+      body: t('business.emptyState.rows.found.body'),
+      hasFigure: true,
     },
     {
       n: '02',
