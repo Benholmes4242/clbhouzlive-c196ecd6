@@ -76,6 +76,8 @@ interface Props {
   courseName: string | null;
   region?: string | null;
   figure: string | null;
+  /** See StandoutTile: the glass chip numeral colour. Defaults to ink. */
+  figureTone?: string;
   unit?: string;
   whenLabel: string;
   who: string;
@@ -95,6 +97,7 @@ export function CompactStandoutTile({
   imageUrl = null,
   courseName,
   figure,
+  figureTone,
   unit,
   whenLabel,
   who,
@@ -177,7 +180,7 @@ export function CompactStandoutTile({
 
       <div style={{ padding: '11px 13px 12px' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, height: 26 }}>
-        <span style={{ ...NUMF, fontSize: 26, lineHeight: 1, color: A.INK }}>
+        <span style={{ ...NUMF, fontSize: 26, lineHeight: 1, color: figureTone ?? A.INK }}>
           {figure ?? '—'}
         </span>
         {unit ? (
@@ -196,6 +199,8 @@ export function CompactStandoutTile({
         ) : null}
       </div>
 
+      {/* NAME ROW — full width: the reaction moved down onto the detail line so
+          a long name wraps instead of truncating. */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 9 }}>
         {who ? (
           <SquircleAvatar
@@ -214,31 +219,44 @@ export function CompactStandoutTile({
             fontWeight: 700,
             letterSpacing: '-0.01em',
             color: isOwn ? A.AMBER_DEEP : A.INK,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {who || detail}
-        </div>
-        {trailing}
-      </div>
-
-      {!!who && !!detail && (
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 600,
-            lineHeight: 1.32,
-            color: A.MUTE,
-            marginTop: 2,
+            lineHeight: 1.2,
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
           }}
         >
-          {detail}
+          {who || detail}
+        </div>
+      </div>
+
+      {(!!(who && detail) || !!trailing) && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            marginTop: 2,
+            minHeight: 20,
+          }}
+        >
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: 12,
+              fontWeight: 600,
+              lineHeight: 1.32,
+              color: A.MUTE,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {who ? detail : ''}
+          </div>
+          {trailing}
         </div>
       )}
 
