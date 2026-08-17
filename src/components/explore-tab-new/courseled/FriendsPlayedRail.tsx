@@ -67,20 +67,21 @@ const RAIL_SCRIM = SCRIM_STANDOUT;
    no global stylesheet has to be edited for one section.                    */
 
 const GLASS_CSS = `
-.fpg-chip { background: rgba(255,255,255,0.24); border: 1px solid rgba(255,255,255,0.30); }
-.fpg-score { background: rgba(255,255,255,0.24); border: 1px solid rgba(255,255,255,0.28); }
+.fpg-chip { background: rgba(24,30,26,0.62); border: 1px solid rgba(255,255,255,0.28); }
+.fpg-score { background: rgba(24,30,26,0.62); border: 1px solid rgba(255,255,255,0.28); }
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .fpg-chip {
-    background: rgba(255,255,255,0.18);
-    -webkit-backdrop-filter: blur(14px) saturate(160%);
-    backdrop-filter: blur(14px) saturate(160%);
+    background: rgba(24,30,26,0.40);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
   }
   .fpg-score {
-    background: rgba(255,255,255,0.16);
+    background: rgba(24,30,26,0.40);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     backdrop-filter: blur(16px) saturate(180%);
   }
 }
+
 `;
 
 /* ───────────────────────────── THE SHAPE ─────────────────────────────────
