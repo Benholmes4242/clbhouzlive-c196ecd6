@@ -936,7 +936,8 @@
         "birdies_one": "{{count}} birdie",
         "eagles": "{{count}} eagles",
         "eagles_one": "{{count}} eagle"
-      }
+      },
+      "birdies_other": "バーディ{{count}}個"
     },
     "tour": {
       "round": "Round",

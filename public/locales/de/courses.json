@@ -983,7 +983,9 @@
         "birdies_one": "{{count}} birdie",
         "eagles": "{{count}} eagles",
         "eagles_one": "{{count}} eagle"
-      }
+      },
+      "birdies_one": "{{count}} Birdie",
+      "birdies_other": "{{count}} Birdies"
     },
     "tour": {
       "round": "Round",
