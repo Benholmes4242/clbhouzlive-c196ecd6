@@ -433,7 +433,7 @@ function ShapeMeta({ birdies }: { birdies: number }) {
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 8,
-        padding: '1px 11px 0',
+        padding: '0 11px',
         fontSize: 10,
         fontWeight: 700,
         letterSpacing: '0.02em',
