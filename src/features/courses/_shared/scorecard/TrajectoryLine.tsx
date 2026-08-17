@@ -460,10 +460,11 @@ export const TrajectoryLine: React.FC<Props> = ({
     return (
       <>
         {plot}
-        <TickRow ticks={ticks} holes={holes} m={m} x={x} w={w} T={T} />
+        {showTicks && <TickRow ticks={ticks} holes={holes} m={m} x={x} w={w} T={T} />}
       </>
     );
   }
+
 
   return (
     <>
