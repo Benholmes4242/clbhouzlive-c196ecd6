@@ -93,6 +93,7 @@ export default function SupportThreadPage() {
     );
   }
 
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
   if (!isLoading && !ticket) {
     return (
       <ManagePageShell title="Request">

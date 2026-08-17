@@ -293,6 +293,7 @@ const ClubhouseContent = () => {
   // Effect 2: Once feed is ready, gate on tournament card state.
   // Also restore nav on terminal empty/error states and skeleton timeout so
   // the user is never trapped when the feed produces zero posts.
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived with !activeFeed.isFetched above.
   const isTerminalEmpty = !isLoading && posts.length === 0;
   useEffect(() => {
     if (!skeletonVisible || isTerminalEmpty || skeletonTimedOut) {
@@ -444,6 +445,7 @@ const ClubhouseContent = () => {
   // sign-in/empty/error surface directly so no skeleton layer can cover it.
   // This fixes the Apple 2.1 cold-load symptom where skeletons never
   // resolved because hasPosts (posts.length > 0) was never true.
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived with !activeFeed.isFetched above.
   if (!isLoading && posts.length === 0) {
     return (
       <ClubhouseEmptyState

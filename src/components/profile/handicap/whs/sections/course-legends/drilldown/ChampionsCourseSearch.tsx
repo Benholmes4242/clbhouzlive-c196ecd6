@@ -160,6 +160,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
               Searching…
             </div>
           )}
+          {/* eslint-disable-next-line settled/no-not-loading-empty-check -- this branch renders only under showResults (term >= 2 chars), so the search query is enabled. */}
           {!isLoading && filtered.length === 0 && (
             <div
               style={{

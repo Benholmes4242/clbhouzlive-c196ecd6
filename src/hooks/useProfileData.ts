@@ -30,6 +30,7 @@ export const useProfileData = () => {
 
       return data;
     },
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- this is a query enabled: clause, not a decision about absent data.
     enabled: !sessionLoading && !!user?.id,
     staleTime: 0, // Always stale: with the global refetchOnMount: true this refetches on every mount
   });

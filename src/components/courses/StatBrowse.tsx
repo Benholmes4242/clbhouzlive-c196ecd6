@@ -509,6 +509,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
   const regionDisabled = !country || regionsForCountry.length <= 1;
   const remaining = Math.max(0, totalCount - rows.length);
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- useStatBrowseList owns a manual isLoading initialised to true, so it is never false before the first fetch.
   const showEmpty = !isLoading && rows.length === 0;
 
   /**

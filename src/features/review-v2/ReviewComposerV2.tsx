@@ -212,10 +212,12 @@ function InnerComposer() {
   const ready =
 
 
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- this is a readiness gate over composed loading flags, not a claim that data is absent.
     !!courseQ.data &&
     !sessionLoading &&
     (!userId
       ? true
+      // eslint-disable-next-line settled/no-not-loading-empty-check -- readiness gate: the branch already requires courseQ.data and a resolved userId.
       : !profileQ.isLoading && !existingQ.isLoading && (!existingQ.data || !existingMediaQ.isLoading));
 
   if (courseQ.isError) {

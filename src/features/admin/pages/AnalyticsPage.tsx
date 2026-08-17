@@ -378,6 +378,7 @@ function GrowthTab({ period }: { period: AnalyticsPeriod }) {
   const geoTop = geo.slice(0, 8);
   const geoMax = geoTop.reduce((m, g) => Math.max(m, g.userCount), 0) || 1;
 
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- the platform analytics queries are ungated (period only).
   const trendEmpty = !isLoading && !(platform.data?.signupTrend?.some(d => d.value > 0));
 
   return (
@@ -472,13 +473,13 @@ function EngagementTab({ period }: { period: AnalyticsPeriod }) {
       />
 
       <ChartCard title="Daily active users" subtitle={`Unique active users, last ${period}`} loading={isLoading}
-        isEmpty={!isLoading && !platform.data?.dau?.some(d => d.value > 0)}
+        isEmpty={/* eslint-disable-line settled/no-not-loading-empty-check -- the platform analytics queries are ungated (period only). */ !isLoading && !platform.data?.dau?.some(d => d.value > 0)}
         dataTable={(platform.data?.dau ?? []).map(d => ({ label: d.date, value: d.value }))}>
         <AreaTrend data={platform.data?.dau ?? []} />
       </ChartCard>
 
       <ChartCard title="Daily event volume" loading={isLoading}
-        isEmpty={!isLoading && (!eng.data || eng.data.totalEvents === 0)}
+        isEmpty={/* eslint-disable-line settled/no-not-loading-empty-check -- the engagement analytics queries are ungated (period only). */ !isLoading && (!eng.data || eng.data.totalEvents === 0)}
         dataTable={(eng.data?.dailyTrend ?? []).map(d => ({ label: d.date, value: d.value }))}>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={eng.data?.dailyTrend ?? []} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
@@ -492,7 +493,7 @@ function EngagementTab({ period }: { period: AnalyticsPeriod }) {
       </ChartCard>
 
       <ChartCard title="Busy hours" subtitle="Events by hour of day" loading={isLoading}
-        isEmpty={!isLoading && (!eng.data || eng.data.totalEvents === 0)}
+        isEmpty={/* eslint-disable-line settled/no-not-loading-empty-check -- the engagement analytics queries are ungated (period only). */ !isLoading && (!eng.data || eng.data.totalEvents === 0)}
         dataTable={(eng.data?.hourlyBreakdown ?? []).map(h => ({ label: `${h.hour}:00`, value: h.count }))}>
         <BarTrend data={(eng.data?.hourlyBreakdown ?? []).map(h => ({ date: `${h.hour}`, value: h.count }))} />
       </ChartCard>

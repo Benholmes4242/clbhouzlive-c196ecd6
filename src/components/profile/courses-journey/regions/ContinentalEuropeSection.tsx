@@ -156,6 +156,7 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
       </div>
       {!isLoading && courses.length > 0 ? (
         <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
+      // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading above is derived as !isFetched || fetching.
       ) : !isLoading && courses.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">

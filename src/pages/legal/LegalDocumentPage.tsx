@@ -47,6 +47,7 @@ const LegalDocumentPage: React.FC<Props> = ({ slug: slugProp }) => {
             </div>
           )}
 
+          {/* eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above. */}
           {!isLoading && (isError || !data) && (
             <div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#0F172A', marginBottom: 6 }}>

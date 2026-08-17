@@ -145,6 +145,7 @@ export function VideosFeedV2({ sort, category }: Props) {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Empty state.
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
   const isEmpty = !isLoading && !authLoading && rows.length === 0 && visiblePending.length === 0;
   const nonDefault = sort !== 'latest' || category != null;
 

@@ -264,6 +264,7 @@ export function HubVideoRow() {
     maxActive: 1,
   });
 
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
   if (!isLoading && !authLoading && rows.length === 0) return null;
 
   return (

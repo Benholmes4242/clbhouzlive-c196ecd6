@@ -56,6 +56,7 @@ export const AnimatedProgressBar = memo<AnimatedProgressBarProps>(({
   const clampedPercentage = Math.max(0, Math.min(100, percentage));
 
   useEffect(() => {
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- hasAnimated is local state, not query data.
     if (!isLoading && !hasAnimated) {
       setHasAnimated(true);
     }

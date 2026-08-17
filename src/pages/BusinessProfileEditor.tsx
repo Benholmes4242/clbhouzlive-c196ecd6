@@ -176,11 +176,13 @@ export default function BusinessProfileEditor() {
 
   /* ── auth gate ────────────────────────────────────── */
   useEffect(() => {
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- authLoading is the session flag, not a React Query.
     if (!authLoading && !user) navigate('/auth');
   }, [authLoading, user, navigate]);
 
   /* ── permission gate (edit) ───────────────────────── */
   useEffect(() => {
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- the branch requires membership to be present before reading canManage.
     if (mode === 'edit' && !membershipLoading && membership && !membership.canManage) {
       toast.error("You don't have permission to edit this business");
       navigate(`/business/${id}`);

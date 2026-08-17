@@ -115,6 +115,7 @@ export function useDiscoverPrompt(userId: string | undefined): {
     return sorted[0] ?? null;
   }, [playedUnrated]);
 
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- the same expression requires userId, so the upstream query is enabled whenever this evaluates.
   const needFinish = !!userId && !unratedLoading && !rateMatch;
   const missingDetail = useRatingsMissingDetail(userId, needFinish);
 
@@ -124,6 +125,7 @@ export function useDiscoverPrompt(userId: string | undefined): {
   );
 
   const needPhoto =
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- needFinish is the enable flag for missingDetail, so the query is running whenever this evaluates.
     needFinish && !missingDetail.isLoading && !finishMatch;
 
   const rounds = useCareerRounds(needPhoto ? userId : undefined);

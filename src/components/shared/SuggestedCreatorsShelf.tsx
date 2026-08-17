@@ -37,6 +37,7 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
   // Guard: don't render once the query HAS run and returned nothing. `isFetched`
   // (not !isLoading) — the query is gated on userId, so it reports isLoading:false
   // before it has ever run.
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
   if (!isLoading && (!creators || creators.length < 1)) return null;
 
 

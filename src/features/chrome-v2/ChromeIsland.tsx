@@ -280,6 +280,7 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
   const anyError = profileError || connError || trendError;
   const settled =
     anyError ||
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- the expression already requires profileFetched, connFetched and trendFetched.
     (!sessionLoading && profileFetched && connFetched && (!connection || trendFetched));
 
   if (!user) return null;

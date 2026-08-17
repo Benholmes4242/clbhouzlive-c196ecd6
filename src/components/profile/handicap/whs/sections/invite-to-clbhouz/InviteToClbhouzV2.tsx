@@ -48,6 +48,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
   const sentCount = invites?.length ?? 0;
 
   // Empty / no-invitable state
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- friendsLoading is derived as !friendsFetched || friendsFetching.
   if (!friendsLoading && invitable.length === 0) {
     return (
       <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>

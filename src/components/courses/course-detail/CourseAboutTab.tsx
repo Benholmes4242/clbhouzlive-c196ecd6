@@ -239,6 +239,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             nearby={nearbyPins}
           />
         )}
+        {/* eslint-disable-next-line settled/no-not-loading-empty-check -- coordsLoading comes from a plain geocode hook, not a gated React Query. */}
         {!coords && !coordsLoading && (
           <p style={{ fontSize: 13, color: A.DIM, margin: 0 }}>
             {t('courseDetail.about.locationUnavailable')}

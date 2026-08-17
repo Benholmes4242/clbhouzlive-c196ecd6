@@ -436,6 +436,7 @@ const BusinessInsightsPageV2 = () => {
   }, [business?.id, user?.id, isLoading]);
 
   useEffect(() => {
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- the branch already requires membershipFetched.
     if (membershipFetched && !membershipLoading && !membership?.canViewInsights && business) {
       navigate(`/business/${id}`, { replace: true });
     }
