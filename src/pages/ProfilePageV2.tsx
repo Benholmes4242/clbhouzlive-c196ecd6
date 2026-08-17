@@ -488,6 +488,7 @@ const ProfilePageV2Content: React.FC = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- authLoading is the session flag, not a React Query.
     if (!authLoading && !user) {
       navigate('/auth', { replace: true });
     }

@@ -82,13 +82,16 @@ export function VideosFeedV2({ sort, category }: Props) {
 
   const {
     data,
-    isLoading,
+    isLoading: fetching,
+    isFetched,
     isError,
     refetch,
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
   } = useVideosFeedV2({ userId, sort, category });
+  // SETTLED IS NOT "NOT LOADING": the feed query is gated on userId.
+  const isLoading = !isFetched || fetching;
 
   // Shared trending-clips pool for every interrupt shelf on the page.
   const { data: interruptClipsData } = useInterruptClips(userId);
@@ -142,6 +145,7 @@ export function VideosFeedV2({ sort, category }: Props) {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Empty state.
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
   const isEmpty = !isLoading && !authLoading && rows.length === 0 && visiblePending.length === 0;
   const nonDefault = sort !== 'latest' || category != null;
 

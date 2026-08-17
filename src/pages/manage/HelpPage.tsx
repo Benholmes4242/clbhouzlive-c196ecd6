@@ -125,6 +125,7 @@ export default function HelpPage() {
         )}
 
 
+        {/* eslint-disable-next-line settled/no-not-loading-empty-check -- useHelpArticles is ungated, and the branch also requires an active search term. */}
         {!isLoading && searching && matches.length === 0 && (
           <div
             className="rounded-2xl p-4 text-center"
@@ -153,6 +154,7 @@ export default function HelpPage() {
           </div>
         )}
 
+        {/* eslint-disable-next-line settled/no-not-loading-empty-check -- the branch requires data to be present. */}
         {!isLoading && !searching && data && (
           <div className="space-y-6">
             {categoryOrder.map((cat) => (

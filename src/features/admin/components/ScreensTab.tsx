@@ -215,7 +215,7 @@ export default function ScreensTab({ days }: { days: number }) {
         title="Screens"
         subtitle={`Last ${days} days - every active route, dead screens included`}
         loading={isLoading}
-        isEmpty={!isLoading && rows.length === 0}
+        isEmpty={/* eslint-disable-line settled/no-not-loading-empty-check -- useScreenAnalytics is ungated (period only), so it is never disabled. */ !isLoading && rows.length === 0}
         emptyTitle="No screen data yet"
         height="auto"
       >

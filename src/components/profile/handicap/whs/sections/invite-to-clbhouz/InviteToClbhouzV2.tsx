@@ -24,7 +24,10 @@ const T = {
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
-  const { data: friends, isLoading: friendsLoading } = useFriendLeaderboard(ownerUserId);
+  // SETTLED IS NOT "NOT LOADING": useFriendLeaderboard is gated on ownerUserId.
+  const { data: friends, isLoading: friendsFetching, isFetched: friendsFetched } =
+    useFriendLeaderboard(ownerUserId);
+  const friendsLoading = !friendsFetched || friendsFetching;
   const { data: invites } = useSentInvites();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -45,6 +48,7 @@ export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
   const sentCount = invites?.length ?? 0;
 
   // Empty / no-invitable state
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- friendsLoading is derived as !friendsFetched || friendsFetching.
   if (!friendsLoading && invitable.length === 0) {
     return (
       <section id="invite-to-clbhouz-section" style={{ marginTop: 32 }}>

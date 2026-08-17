@@ -441,6 +441,7 @@ export default function BusinessReviewsPage() {
 
   // Guard: Reviews are only available for course-linked businesses.
   // Brands / coaches / retailers without a claimed club have no course_ratings to show.
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- the branch requires businessProfile to be present.
   if (!profileLoading && businessProfile && !businessProfile.club_id) {
     return (
       <ManagePageShell title="Reviews">
@@ -613,6 +614,7 @@ export default function BusinessReviewsPage() {
             </div>
           )}
 
+          {/* eslint-disable-next-line settled/no-not-loading-empty-check -- canManage is a permission boolean, not query data. */}
           {!canManage && !isLoading && (
             <p className="mt-4 text-[11.5px] text-center" style={{ color: INK_45 }}>
               Only team members can reply to reviews.

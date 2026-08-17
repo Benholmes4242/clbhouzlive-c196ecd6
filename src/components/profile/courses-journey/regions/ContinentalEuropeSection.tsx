@@ -138,7 +138,9 @@ const ContinentalEuropeSection: React.FC<RegionSectionProps> = ({
 
 // Conditional Wrapper
 const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile, userDisplayName }) => {
-  const { data: courses = [], isLoading } = usePlayedCoursesWithRatings(userId || '', 'europe');
+  // SETTLED IS NOT "NOT LOADING": the query is gated on userId.
+  const { data: courses = [], isLoading: fetching, isFetched } = usePlayedCoursesWithRatings(userId || '', 'europe');
+  const isLoading = !isFetched || fetching;
 
   return (
     <>
@@ -154,6 +156,7 @@ const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = (
       </div>
       {!isLoading && courses.length > 0 ? (
         <ContinentalEuropeSection userId={userId} isOwnProfile={isOwnProfile} userDisplayName={userDisplayName} />
+      // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading above is derived as !isFetched || fetching.
       ) : !isLoading && courses.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">

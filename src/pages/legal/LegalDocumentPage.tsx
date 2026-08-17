@@ -25,7 +25,9 @@ interface Props {
 const LegalDocumentPage: React.FC<Props> = ({ slug: slugProp }) => {
   const params = useParams<{ slug: string }>();
   const slug = slugProp ?? params.slug;
-  const { data, isLoading, isError } = useLegalDocument(slug);
+  // SETTLED IS NOT "NOT LOADING": the document query is gated on slug.
+  const { data, isLoading: fetching, isFetched, isError } = useLegalDocument(slug);
+  const isLoading = !isFetched || fetching;
 
   const title = data?.title ?? (isLoading ? 'Loading…' : 'Not found');
   const effective = formatEffective(data?.effective_date ?? null);
@@ -45,6 +47,7 @@ const LegalDocumentPage: React.FC<Props> = ({ slug: slugProp }) => {
             </div>
           )}
 
+          {/* eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above. */}
           {!isLoading && (isError || !data) && (
             <div>
               <div style={{ fontSize: 15, fontWeight: 600, color: '#0F172A', marginBottom: 6 }}>

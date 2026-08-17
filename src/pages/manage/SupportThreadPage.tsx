@@ -34,7 +34,9 @@ export default function SupportThreadPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { data, isLoading, isError, refetch } = useMyRequestThread(id ?? null);
+  // SETTLED IS NOT "NOT LOADING": the thread query is gated on the route id.
+  const { data, isLoading: fetching, isFetched, isError, refetch } = useMyRequestThread(id ?? null);
+  const isLoading = !isFetched || fetching;
   const postReply = useMyRequestReply();
 
   const [body, setBody] = useState('');
@@ -91,6 +93,7 @@ export default function SupportThreadPage() {
     );
   }
 
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
   if (!isLoading && !ticket) {
     return (
       <ManagePageShell title="Request">

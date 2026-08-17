@@ -252,7 +252,9 @@ function SkeletonCard() {
 export function HubVideoRow() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useSupabaseSession();
-  const { data, isLoading } = useHubLongFormVideos(user?.id);
+  // SETTLED IS NOT "NOT LOADING": useHubLongFormVideos is gated on user?.id.
+  const { data, isLoading: fetching, isFetched } = useHubLongFormVideos(user?.id);
+  const isLoading = !isFetched || fetching;
 
   const rows = (data ?? []) as HubRpcRow[];
   const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);
@@ -262,6 +264,7 @@ export function HubVideoRow() {
     maxActive: 1,
   });
 
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
   if (!isLoading && !authLoading && rows.length === 0) return null;
 
   return (

@@ -83,6 +83,7 @@ export const RecentlyPlayedFeed: React.FC<Props> = ({ ownerUserId }) => {
   const items = data ?? [];
 
   // Nothing at all when the fortnight is empty.
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
   if (!isLoading && items.length === 0) return null;
 
   return (

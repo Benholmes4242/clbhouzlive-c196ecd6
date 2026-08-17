@@ -111,6 +111,9 @@ export function useSuggestedFeed(userId: string | undefined) {
   return {
     posts: allPosts,
     isLoading: query.isLoading,
+    // Settled flag — the query is gated on userId, so isLoading is false before
+    // it has ever run. Callers deciding "feed is empty" must read this.
+    isFetched: query.isFetched,
     isError: query.isError,
     hasNextPage: query.hasNextPage,
     isFetchingNextPage: query.isFetchingNextPage,

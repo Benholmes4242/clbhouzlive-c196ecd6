@@ -77,11 +77,13 @@ const MyBusinessesPage = () => {
 
   // Redirect to auth if not logged in
   useEffect(() => {
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- authLoading is the session flag, not a React Query.
     if (!authLoading && !user) {
       navigate('/auth');
     }
   }, [authLoading, user, navigate]);
 
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- authLoading is the session flag, not a React Query.
   if (!authLoading && !user) return null;
 
   const handleCreateBusiness = () => {

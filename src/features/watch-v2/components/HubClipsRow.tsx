@@ -178,7 +178,10 @@ function SkeletonTile() {
 export function HubClipsRow() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useSupabaseSession();
-  const { data, isLoading } = useHubQuickClips(user?.id);
+  // SETTLED IS NOT "NOT LOADING": useHubQuickClips is gated on user?.id, so a
+  // disabled query reports isLoading:false before it has ever run.
+  const { data, isLoading: fetching, isFetched } = useHubQuickClips(user?.id);
+  const isLoading = !isFetched || fetching;
 
   const rows = (data ?? []) as HubRpcRow[];
   const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);
@@ -188,6 +191,7 @@ export function HubClipsRow() {
     maxActive: 1,
   });
 
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
   if (!isLoading && !authLoading && rows.length === 0) return null;
 
   return (

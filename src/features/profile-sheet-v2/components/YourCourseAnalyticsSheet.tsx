@@ -676,12 +676,15 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
   const [q, setQ] = useState('');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
-  const { data: myCourses = [], isLoading } = useUserAnalyticsCourses({ enabled: open });
+  // SETTLED IS NOT "NOT LOADING": this query is disabled until the sheet opens.
+  const { data: myCourses = [], isLoading: fetching, isFetched } = useUserAnalyticsCourses({ enabled: open });
+  const isLoading = !isFetched || fetching;
   const { data: searchResults = [], isFetching: searching } = useCourseSearch(q);
   // ONE batched read for every course's trend — not one query per row.
   const { data: roundsByCourse } = useMyRoundsByCourse({ enabled: open });
 
 
+  // eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above.
   const showBuildingState = synced && !isLoading && myCourses.length === 0;
   const showList = myCourses.length > 0;
   const showSearchField = showList; // per brief: search only when list non-empty

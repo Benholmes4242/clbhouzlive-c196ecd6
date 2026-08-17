@@ -26,6 +26,7 @@ export default function LegalPage() {
           )}
 
 
+          {/* eslint-disable-next-line settled/no-not-loading-empty-check -- useLegalDocuments is ungated, so it is never disabled. */}
           {!isLoading && docs.length === 0 && (
             <div className="p-4 text-[14px]" style={{ color: A.MUTE }}>
               No legal documents are currently published.
