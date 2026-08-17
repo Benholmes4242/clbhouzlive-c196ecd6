@@ -31,7 +31,24 @@ export interface PersonalBestRow {
   reference_line: string | null;
   play_date: string;
   rarity: number;
+  /**
+   * THE SECOND FIGURE (BRIEF_FEAT_SECOND_FIGURE §2.6) — a NUMBER, never a
+   * sentence. The function supplies what the feat BEAT (shots better than the
+   * member's all-time best gross at that course, or strokes/pars/birdies over
+   * their previous mark) or what it TOOK (the rounds before a first
+   * double-free); the client composes the chip.
+   *
+   * NEVER PARSE `reference_line` TO GET THIS. A delta read out of
+   * "Previous best 9" breaks the moment the copy is edited or a locale renders
+   * the sentence differently — this column is the only source.
+   *
+   * NULL means there is no honest comparison (big_points_here), or the
+   * comparison was suppressed server-side (no prior round there, or a delta of
+   * zero). Null renders the count alone.
+   */
+  second_figure: number | null;
 }
+
 
 export const PERSONAL_BESTS_DAYS = 90;
 /** Deliberate over-fetch — see above. */
