@@ -16,7 +16,10 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * REVIEW TILE — mosaic tile (BRIEF_REVIEW_TILE_LIGHTER).
  *
  * Photo-led tile with its text on the photograph. The course name IS the
- * headline; the quote no longer appears here (it lives in the review sheet).
+ * headline. THE QUOTE RETURNS ON THE FEATURED TIER ONLY
+ * (BRIEF_REVIEW_TILE_TIERS §2.3), partly reversing the earlier decision that
+ * moved it into the review sheet: it is now a reward for a review that scored
+ * 9+ overall AND 9+ on every category it filled in, not a default.
  * The PHOTO is the same fixed height on every tile regardless of how the name
  * wraps. Beneath it sits the CATEGORY BREAKDOWN (BRIEF_REVIEW_TILE_BREAKDOWN):
  * one label/track/figure row per scored category, so two courses on 8.7 no
@@ -42,6 +45,36 @@ import type { LatestReview } from './hooks/useLatestReviews';
  */
 
 export const REVIEW_TILE_HEIGHT = 186;
+/** FEATURED photo height (§2.1). The tile is full width, so the photo is taller. */
+export const REVIEW_TILE_FEATURED_HEIGHT = 196;
+
+/**
+ * THE THREE TIERS (BRIEF_REVIEW_TILE_TIERS §1). Nothing about the tile's design
+ * changes — the tier only decides which treatment the breakdown block gets.
+ *
+ *   FEATURED  overall >= 9 AND every SCORED category >= 9  -> quote + bars
+ *   BARS      overall >= 9                                  -> today's tile
+ *   COMPACT   overall < 9                                   -> figures, no bars
+ *
+ * A review with NO categories can never be FEATURED: there is nothing to clear
+ * the bar. It falls to BARS or COMPACT on its overall alone and keeps its
+ * breakdown block absent in both, exactly as today (§1.3).
+ */
+export type ReviewTier = 'featured' | 'bars' | 'compact';
+
+const TIER_FLOOR = 9;
+
+export function reviewTier(r: LatestReview): ReviewTier {
+  if (r.rating < TIER_FLOOR) return 'compact';
+  const scored = [
+    r.breakdown?.design,
+    r.breakdown?.conditions,
+    r.breakdown?.clubhouse,
+    r.breakdown?.facilities,
+  ].filter((v): v is number => v != null && !Number.isNaN(Number(v)));
+  if (scored.length > 0 && scored.every((v) => v >= TIER_FLOOR)) return 'featured';
+  return 'bars';
+}
 
 const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 30%)';
 /** On-dark amber: the viewing member's own name. Not #F7931E on photography. */
@@ -92,6 +125,11 @@ interface Props {
    * Pass a stable key per surface ('discover-reviews' | 'reviews-sheet').
    */
   autoplayGroup?: string;
+  /**
+   * Treatment. Omitted = derived from the review itself, so a caller that does
+   * not care about tiers behaves exactly as before.
+   */
+  tier?: ReviewTier;
 }
 
 
@@ -108,6 +146,7 @@ export function ReviewTile({
   reacted = false,
   onToggleReaction,
   autoplayGroup = 'discover-reviews',
+  tier,
 }: Props) {
 
   const { t } = useTranslation('courses');
