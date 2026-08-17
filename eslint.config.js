@@ -463,7 +463,7 @@ export default tseslint.config(
     ignores: ["src/**/*.test.{ts,tsx}", "src/test/**", "src/mocks/**"],
     plugins: { settled: settledPlugin },
     rules: {
-      "settled/no-not-loading-empty-check": "warn",
+      "settled/no-not-loading-empty-check": "error",
     },
   }
 
