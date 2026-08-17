@@ -1518,7 +1518,7 @@
       "gain": "{{count}} better than before",
       "group": {
         "firsts": "Firsts here",
-        "best": "Best rounds here",
+        "best": "Best scoring here",
         "most": "Most in a round"
       }
     }

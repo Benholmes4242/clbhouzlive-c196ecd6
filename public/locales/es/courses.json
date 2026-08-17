@@ -1076,7 +1076,7 @@
       "gain": "{{count}} mejor que antes",
       "group": {
         "firsts": "Primeras veces aquí",
-        "best": "Mejores rondas aquí",
+        "best": "Mejor puntuación aquí",
         "most": "Más en una ronda"
       }
     }
