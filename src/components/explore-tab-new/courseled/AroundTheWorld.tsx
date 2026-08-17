@@ -1037,7 +1037,7 @@ export function AroundTheWorld({
 
           const photoTile = (
             tt: Tile,
-            opts?: { photo?: number; hero?: boolean },
+            opts?: { photo?: number; hero?: boolean; showKicker?: boolean },
           ) => (
             <StandoutTile
               key={tt.slotKey}
