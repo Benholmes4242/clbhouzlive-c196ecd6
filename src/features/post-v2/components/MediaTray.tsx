@@ -10,6 +10,7 @@ import { toast } from '@/lib/toast';
 import { MAX_MEDIA, type StageMediaItem } from '../hooks/useStageComposer';
 import SlideThumb from './SlideThumb';
 import { CT_DARK } from '@/features/_shared/composerTokens';
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
 
 interface Props {
   media: StageMediaItem[];
@@ -64,11 +65,11 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
               {/* Active slide carries a bottom scrim with the album position;
                   resting slides get a small numeral chip. */}
               {active ? (
-                <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '40%', background: 'linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0))', display: 'flex', alignItems: 'flex-end', padding: 7 }}>
+                <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '40%', background: SCRIM_STANDOUT, display: 'flex', alignItems: 'flex-end', padding: 7 }}>
                   <span style={{ fontSize: 12, fontWeight: 700, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
                 </span>
               ) : (
-                <span style={{ position: 'absolute', left: 6, bottom: 6, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.85)', background: 'rgba(0,0,0,0.35)', borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
+                <span style={{ position: 'absolute', left: 6, bottom: 6, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.85)', background: CHIP_GLASS_BG, border: CHIP_GLASS_BORDER, borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
               )}
               <button
                 onClick={(e) => { e.stopPropagation(); onRemove(i); }}
@@ -80,9 +81,9 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
                   width: 20,
                   height: 20,
                   borderRadius: 999,
-                  background: 'rgba(0,0,0,0.5)',
+                  background: CHIP_GLASS_BG,
                   color: '#fff',
-                  border: 0,
+                  border: CHIP_GLASS_BORDER,
                   fontSize: 12,
                   lineHeight: 1,
                   cursor: 'pointer',

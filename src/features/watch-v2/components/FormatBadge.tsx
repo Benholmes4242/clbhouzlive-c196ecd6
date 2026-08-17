@@ -1,3 +1,4 @@
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -19,9 +20,8 @@ export function FormatBadge({ format }: Props) {
         fontSize: 8.5,
         letterSpacing: '0.09em',
         fontFamily: FONT_FAMILY,
-        background: 'rgba(0,0,0,0.45)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
+        background: CHIP_GLASS_BG,
+        border: CHIP_GLASS_BORDER,
         color: isClip ? '#F7931E' : '#fff',
       }}
     >

@@ -4,6 +4,7 @@ import { Loader2, AlertCircle } from 'lucide-react';
 import { useSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { MessageAttachment } from '@/types/messaging';
+import { CHIP_GLASS_BG } from '@/styles/photoScrim';
 
 interface Props {
   attachment: MessageAttachment;
@@ -110,7 +111,7 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'rgba(0,0,0,0.15)',
+            background: CHIP_GLASS_BG,
             borderRadius: RADIUS,
           }}
         >

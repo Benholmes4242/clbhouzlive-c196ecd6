@@ -53,6 +53,7 @@ import { LABEL, DISPLAY_TRACKING } from '@/lib/tokens/type';
 import { SURFACE } from '@/lib/tokens/surface';
 import StageLoadingShell from './StageLoadingShell';
 import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
 
 interface Props {
   onClose: () => void;
@@ -865,7 +866,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
               {/* Slide counter — glass chip, top-right */}
               {state.media.length > 1 && (
-                <div style={{ position: 'absolute', right: 12, top: 12, padding: '4px 9px', borderRadius: 999, background: 'rgba(11,15,20,0.62)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', fontSize: 11, fontWeight: 700, color: CT_DARK.ink, fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ position: 'absolute', right: 12, top: 12, padding: '4px 9px', borderRadius: 999, background: CHIP_GLASS_BG, border: CHIP_GLASS_BORDER, fontSize: 11, fontWeight: 700, color: CT_DARK.ink, fontVariantNumeric: 'tabular-nums' }}>
                   {state.activeIndex + 1}/{state.media.length}
                 </div>
               )}

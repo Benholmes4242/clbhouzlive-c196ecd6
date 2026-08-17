@@ -2,6 +2,7 @@ import React, { useRef, useState, useCallback } from 'react';
 import { Camera } from 'lucide-react';
 import { ImageCropperModal } from './ImageCropperModal';
 import { PhotoActionSheet } from './PhotoActionSheet';
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
 
 
 
@@ -130,7 +131,8 @@ return (
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            background: 'rgba(0,0,0,0.45)',
+            background: CHIP_GLASS_BG,
+            border: CHIP_GLASS_BORDER,
             color: '#fff',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             fontSize: 12.5,
