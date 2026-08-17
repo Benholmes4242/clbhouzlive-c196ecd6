@@ -338,7 +338,13 @@ export function LeaderBand({
   const body = (
     <>
       <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
-      <span style={{ ...GLASS_CHIP, top: 8, right: 8 }}>{countLabel(l.events)}</span>
+      {/* THE COUNT CHIP SITS TOP-LEFT (CORRECTION_HONOURS_LEADERS_ROWS §2),
+          exactly where a Recent card carries its kind chip — same glass, same
+          8/8 offsets. Top-right stays EMPTY (§5): a Recent card puts the year
+          there, but a leader spans years and has nothing true for that slot.
+          Left-anchored it also cannot be clipped, which is what cut "1 albatro…"
+          when it hung off the right edge (§3). */}
+      <span style={{ ...GLASS_CHIP, top: 8, left: 8 }}>{countLabel(l.events)}</span>
       <span
         style={{
           position: 'absolute',
