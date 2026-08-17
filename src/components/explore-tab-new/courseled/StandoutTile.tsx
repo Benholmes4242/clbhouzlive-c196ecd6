@@ -52,10 +52,19 @@ interface Props {
   trailing?: React.ReactNode;
   /** Anything below the detail line ("+n more here"). */
   footer?: React.ReactNode;
+  /**
+   * HERO ONLY (BRIEF_FEAT_SECTIONS_HIERARCHY §1.1, §1.3): names the feat kind
+   * above the member row, and grows the course name and the figure chip. Every
+   * masonry tile leaves all three undefined and is byte-identical to before.
+   */
+  kicker?: string | null;
+  nameSize?: number;
+  chipScale?: 'md' | 'lg';
   /** New-since ring. */
   isNew?: boolean;
   onPress?: () => void;
 }
+
 
 export function StandoutTile({
   courseId,
