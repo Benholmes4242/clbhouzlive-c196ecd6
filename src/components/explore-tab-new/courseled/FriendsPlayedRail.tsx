@@ -25,7 +25,7 @@ import { useRoundHoleShapes } from './hooks/useRoundHoleShapes';
 import { RoundShape } from './RoundShape';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
-import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+import { countNewSince, useReportNewCount } from './newSince';
 import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
