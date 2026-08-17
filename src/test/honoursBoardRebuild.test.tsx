@@ -38,18 +38,12 @@ describe('BRIEF_HONOURS_BOARD_PLAQUE_RAIL', () => {
     expect(BAND_H).toBe(132);
   });
 
-  it('computes the headline, pluralises each part and omits a zero part', () => {
-    const { container, unmount } = render(
+  it('prints no feat-count headline or golfer count above the rail', () => {
+    const { container } = render(
       <HonoursBoard events={[ev({ id: 'a' }), ev({ id: 'b' })]} />,
     );
-    expect(container.textContent).toMatch(/2 aces\./);
-    expect(container.textContent).not.toMatch(/albatross/i);
-    unmount();
-
-    const { container: container2 } = render(
-      <HonoursBoard events={[ev({ id: 'c' }), ev({ id: 'd', kind: 'albatross' })]} />,
-    );
-    expect(container2.textContent).toMatch(/1 ace\. 1 albatross\./);
+    expect(container.textContent).not.toMatch(/2 aces/);
+    expect(container.textContent).not.toMatch(/golfer/i);
   });
 
   it('opens on RECENT with two aria-pressed buttons and switches mode', () => {
