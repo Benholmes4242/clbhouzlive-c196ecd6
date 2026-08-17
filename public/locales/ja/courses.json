@@ -1001,6 +1001,25 @@
       "expandFeats": "他 {{count}} 件",
       "expandFeats_one": "他 {{count}} 件",
       "collapseFeats": "閉じる"
+    },
+    "feat": {
+      "group": {
+        "records": "コースレコード",
+        "firsts": "ここで初",
+        "milestones": "自己の節目"
+      },
+      "kind": {
+        "ace": "ホールインワン",
+        "albatross": "アルバトロス",
+        "crown": "コースレコード",
+        "bogeyFree": "ボギーなしラウンド",
+        "underPar": "アンダーパーのラウンド",
+        "birdieHaul": "バーディ量産"
+      }
+    },
+    "pb": {
+      "afterRounds": "{{count}}ラウンド目で達成",
+      "gain": "以前より{{count}}良化"
     }
   },
   "statBrowse": {

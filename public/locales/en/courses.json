@@ -1497,6 +1497,25 @@
       "expandFeats": "{{count}} more",
       "expandFeats_one": "{{count}} more",
       "collapseFeats": "Less"
+    },
+    "feat": {
+      "group": {
+        "records": "Course records",
+        "firsts": "Firsts here",
+        "milestones": "Personal milestones"
+      },
+      "kind": {
+        "ace": "Hole in one",
+        "albatross": "Albatross",
+        "crown": "Course record",
+        "bogeyFree": "Bogey-free round",
+        "underPar": "Round under par",
+        "birdieHaul": "Birdie haul"
+      }
+    },
+    "pb": {
+      "afterRounds": "After {{count}} rounds",
+      "gain": "{{count}} better than before"
     }
   },
   "statBrowse": {

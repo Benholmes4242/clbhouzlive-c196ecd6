@@ -1055,6 +1055,25 @@
       "expandFeats": "{{count}} más",
       "expandFeats_one": "{{count}} más",
       "collapseFeats": "Menos"
+    },
+    "feat": {
+      "group": {
+        "records": "Récords del campo",
+        "firsts": "Primeras veces aquí",
+        "milestones": "Hitos personales"
+      },
+      "kind": {
+        "ace": "Hoyo en uno",
+        "albatross": "Albatros",
+        "crown": "Récord del campo",
+        "bogeyFree": "Ronda sin bogeys",
+        "underPar": "Ronda bajo par",
+        "birdieHaul": "Racha de birdies"
+      }
+    },
+    "pb": {
+      "afterRounds": "Después de {{count}} rondas",
+      "gain": "{{count}} mejor que antes"
     }
   },
   "statBrowse": {
