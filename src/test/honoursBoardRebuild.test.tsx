@@ -5,6 +5,7 @@ import {
   HonoursBoard,
   groupLeaders,
   PLAQUE_W,
+  BAND_H,
 } from '@/components/explore-tab-new/courseled/HonoursBoard';
 import type { WireEvent } from '@/components/explore-tab-new/hooks/useDiscoverWire';
 
@@ -33,7 +34,8 @@ describe('BRIEF_HONOURS_BOARD_PLAQUE_RAIL', () => {
     expect(screen.getByText('Ace')).toBeTruthy();
     expect(container.textContent).toMatch(/Par 3/);
     expect(container.textContent).toMatch(/152/);
-    expect(PLAQUE_W).toBe(168);
+    expect(PLAQUE_W).toBe(212);
+    expect(BAND_H).toBe(132);
   });
 
   it('computes the headline, pluralises each part and omits a zero part', () => {
