@@ -9,7 +9,7 @@ import { usePersonalBests, PERSONAL_BESTS_PER_MEMBER } from './hooks/usePersonal
 import { createMasonryAssignment, placeStable, type MasonryAssignment } from './stableMasonry';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
-import { A, Eyebrow, LABEL, NUMF } from './tokens';
+import { A, Eyebrow, LABEL } from './tokens';
 import { StandoutTile } from './StandoutTile';
 import {
   EffortTile,
@@ -53,7 +53,7 @@ const PB_GROUPS = [
     id: 'best',
     kinds: ['big_points_here'],
     key: 'discover.pb.group.best',
-    label: 'Best rounds here',
+    label: 'Best scoring here',
   },
   {
     id: 'most',
@@ -388,27 +388,14 @@ export function PersonalBests({
               {buckets.length > 1 ? (
                 <div
                   style={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    justifyContent: 'space-between',
-                    gap: 8,
+                    ...LABEL,
+                    fontSize: 9,
+                    color: A.MUTE,
                     padding: '0 2px',
                     marginBottom: 8,
                   }}
                 >
-                  <span
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 700,
-                      letterSpacing: '-0.02em',
-                      color: A.INK,
-                    }}
-                  >
-                    {b.label}
-                  </span>
-                  <span style={{ ...NUMF, fontSize: 12, fontWeight: 700, color: A.DIM }}>
-                    {b.items.length}
-                  </span>
+                  {b.label}
                 </div>
               ) : null}
 
