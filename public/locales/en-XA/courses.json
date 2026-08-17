@@ -1510,7 +1510,12 @@
     },
     "pb": {
       "afterRounds": "[Áftér {{count}} röûnds ]",
-      "gain": "[{{count}} béttér thán béföré ]"
+      "gain": "[{{count}} béttér thán béföré ]",
+      "group": {
+        "firsts": "[Fírsts hére ]",
+        "best": "[Bést röûnds hére ]",
+        "most": "[Möst ín á röûnd ]"
+      }
     }
   },
   "statBrowse": {

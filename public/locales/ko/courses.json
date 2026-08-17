@@ -1019,7 +1019,12 @@
     },
     "pb": {
       "afterRounds": "{{count}}라운드 만에",
-      "gain": "이전보다 {{count}} 향상"
+      "gain": "이전보다 {{count}} 향상",
+      "group": {
+        "firsts": "이곳에서 처음",
+        "best": "이곳 최고 라운드",
+        "most": "한 라운드 최다"
+      }
     }
   },
   "statBrowse": {

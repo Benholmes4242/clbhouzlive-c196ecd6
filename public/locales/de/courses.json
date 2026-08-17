@@ -1073,7 +1073,12 @@
     },
     "pb": {
       "afterRounds": "Nach {{count}} Runden",
-      "gain": "{{count}} besser als zuvor"
+      "gain": "{{count}} besser als zuvor",
+      "group": {
+        "firsts": "Erstmals hier",
+        "best": "Beste Runden hier",
+        "most": "Meiste in einer Runde"
+      }
     }
   },
   "statBrowse": {
