@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 /**
  * PHOTO SCRIM — the ONE canonical treatment for anything that puts white text
  * or a glass chip over a photograph (BRIEF_APP_WIDE_SCRIM).
@@ -25,7 +27,7 @@ export const SCRIM_STANDOUT =
 export const CHIP_GLASS_BG = 'rgba(24,30,26,0.62)';
 export const CHIP_GLASS_BORDER = '1px solid rgba(255,255,255,0.28)';
 
-export const CHIP_GLASS: React.CSSProperties = {
+export const CHIP_GLASS: CSSProperties = {
   background: CHIP_GLASS_BG,
   border: CHIP_GLASS_BORDER,
   color: '#FFFFFF',
