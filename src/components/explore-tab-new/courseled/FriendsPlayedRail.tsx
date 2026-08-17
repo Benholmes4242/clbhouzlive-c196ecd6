@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
 import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import {
   toParFor,
@@ -667,16 +669,33 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                 >
                   <span
                     style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: A.BODY,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
                       minWidth: 0,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
+                      flex: '1 1 auto',
                     }}
                   >
-                    {r.display_name}
+                    <SquircleAvatar
+                      src={r.profile_photo_url}
+                      userId={r.user_id}
+                      size={20}
+                      alt={r.display_name}
+                      hideRing
+                    />
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: A.BODY,
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {r.display_name}
+                    </span>
                   </span>
                   {/* THE FIXED-WIDTH TRAILING SLOT renders on every row whether
                       or not a control appears, so figures do not go ragged. */}
