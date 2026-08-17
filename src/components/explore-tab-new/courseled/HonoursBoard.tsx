@@ -338,7 +338,13 @@ export function LeaderBand({
   const body = (
     <>
       <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
-      <span style={{ ...GLASS_CHIP, top: 8, right: 8 }}>{countLabel(l.events)}</span>
+      {/* THE COUNT CHIP SITS TOP-LEFT (CORRECTION_HONOURS_LEADERS_ROWS §2),
+          exactly where a Recent card carries its kind chip — same glass, same
+          8/8 offsets. Top-right stays EMPTY (§5): a Recent card puts the year
+          there, but a leader spans years and has nothing true for that slot.
+          Left-anchored it also cannot be clipped, which is what cut "1 albatro…"
+          when it hung off the right edge (§3). */}
+      <span style={{ ...GLASS_CHIP, top: 8, left: 8 }}>{countLabel(l.events)}</span>
       <span
         style={{
           position: 'absolute',
@@ -392,15 +398,25 @@ export function LeaderBand({
 /** §1.8 — TWO rows on a card, then a "{{n}} more" row. */
 export const LEADER_ROWS_ON_CARD = 2;
 
-/** A feat row under a leader band. Same shape on the card and in the sheet. */
+/**
+ * A feat row under a leader band. Same shape on the card and in the sheet.
+ *
+ * `showKind` reinstates BRIEF_HONOURS_BOARD_REBUILD §1.7
+ * (CORRECTION_HONOURS_LEADERS_ROWS §1): when the member holds ONE kind the
+ * badge already says "2 aces", so repeating "ACE" on every row is the same fact
+ * twice — it comes off. When they hold BOTH the badge reads "2 feats" and these
+ * rows are the only thing saying which is which, so the label stays.
+ */
 export function LeaderFeatRow({
   event: e,
   onPress,
   divider = true,
+  showKind = true,
 }: {
   event: WireEvent;
   onPress?: (event: WireEvent) => void;
   divider?: boolean;
+  showKind?: boolean;
 }) {
   const { t } = useTranslation('courses');
   const holeDetail = useHoleDetail();
@@ -471,9 +487,11 @@ export function LeaderFeatRow({
           </span>
         ) : null}
       </span>
-      <span style={{ ...LABEL, fontSize: 8.5, color: A.BODY, flex: '0 0 auto' }}>
-        {kindLabel(e)}
-      </span>
+      {showKind ? (
+        <span style={{ ...LABEL, fontSize: 8.5, color: A.BODY, flex: '0 0 auto' }}>
+          {kindLabel(e)}
+        </span>
+      ) : null}
       <ChevronRight size={13} strokeWidth={2.5} color={A.DIM} style={{ flex: '0 0 auto' }} />
     </button>
   );
@@ -491,6 +509,10 @@ function LeaderCard({
   const { t } = useTranslation('courses');
   const hidden = Math.max(0, l.events.length - LEADER_ROWS_ON_CARD);
   const shown = l.events.slice(0, LEADER_ROWS_ON_CARD);
+  /* §1 — the row label earns its place ONLY when the badge cannot say the kind.
+     Computed over ALL the member's feats, not just the two shown, so the two
+     rows on a mixed card stay labelled even if both visible rows are aces. */
+  const mixedKinds = new Set(l.events.map((e) => e.kind)).size > 1;
 
   return (
     <div
@@ -505,7 +527,13 @@ function LeaderCard({
     >
       <LeaderBand leader={l} />
       {shown.map((e, i) => (
-        <LeaderFeatRow key={e.id} event={e} onPress={onPress} divider={i > 0} />
+        <LeaderFeatRow
+          key={e.id}
+          event={e}
+          onPress={onPress}
+          divider={i > 0}
+          showKind={mixedKinds}
+        />
       ))}
       {hidden > 0 ? (
         <button
