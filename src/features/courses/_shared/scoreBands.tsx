@@ -12,6 +12,18 @@ export const BAND_GREEN = '#047857';
 export const BAND_AMBER = '#F7931E';
 export const BAND_RED = '#DC2626';
 
+/**
+ * DARK-SURFACE VARIANTS (CORRECTION_REVIEW_TILE_FINISHING §1.3). BAND_GREEN and
+ * BAND_RED are tuned for INK ON WHITE and go muddy on the dark glass chips that
+ * sit over photography. Same pattern as TOPAR_UNDER_LIGHT / TOPAR_UNDER_DARK:
+ * the light values are untouched and remain correct for the sub-score bars, the
+ * course meta block and the verdict band. Amber needs no lift — it already
+ * clears the glass — so it is deliberately the same hex in both scales.
+ */
+export const BAND_GREEN_DARK = '#34D399';
+export const BAND_AMBER_DARK = BAND_AMBER;
+export const BAND_RED_DARK = '#FF6B6B';
+
 /** >= 9.0 green, >= 5.0 amber, below 5.0 red. */
 export function bandColor(score: number | null | undefined): string {
   if (score == null) return '#AEB4BC';
@@ -19,6 +31,15 @@ export function bandColor(score: number | null | undefined): string {
   if (score >= 5) return BAND_AMBER;
   return BAND_RED;
 }
+
+/** The same scale, legible on dark glass / photography. */
+export function bandColorOnDark(score: number | null | undefined): string {
+  if (score == null) return 'rgba(255,255,255,0.70)';
+  if (score >= 9) return BAND_GREEN_DARK;
+  if (score >= 5) return BAND_AMBER_DARK;
+  return BAND_RED_DARK;
+}
+
 
 const LABEL_INK = 'rgba(15,23,42,0.42)';
 const TRACK = 'rgba(15,23,42,0.08)';
