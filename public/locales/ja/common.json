@@ -135,6 +135,53 @@
           "claim": "Riichi wo miru",
           "tail": "hyoji, forou, engejimento"
         }
+      },
+      "hero": {
+        "kicker": "FOR BUSINESSES",
+        "title": "Gorufa wa sudeni anata no hanashi wo shiteimasu.",
+        "body": "Peji wo uketotte sanka shimasho."
+      },
+      "numbers": {
+        "courses": "clbhouz no kosu su",
+        "rounds": "ROUNDS",
+        "reviews": "REVIEWS",
+        "greenNote": "MIDORI WA KAKO 30 NICHI"
+      },
+      "examples": {
+        "kicker": "ANATA NO PEJI",
+        "heading": "Dono gorufu bijinesu nimo peji ga arimasu",
+        "tag": "REI",
+        "tabs": {
+          "home": "HOME",
+          "about": "ABOUT",
+          "reviews": "REVIEWS"
+        },
+        "club": {
+          "name": "Gorufu kurabu",
+          "meta": "Kurabu . 18 hooru"
+        },
+        "range": {
+          "name": "Dorai bingu renji",
+          "meta": "Renji . Renshu"
+        },
+        "shop": {
+          "name": "Puro shoppu",
+          "meta": "Hanbai . Fittingu"
+        }
+      },
+      "rows": {
+        "found": {
+          "title": "Mitsukete morau",
+          "body": "Kensaku to kosu direkutori ni hyoji saremasu. Gorufa ga sudeni miteiru {{courses}} kosu to narande."
+        },
+        "trusted": {
+          "title": "Shinrai wo eru",
+          "body": "Rebyu wa raundo kiroku no aru gorufa kara - tokumei akaunto dewa arimasen."
+        },
+        "reach": {
+          "title": "Riichi wo shiru",
+          "body": "Hyoji, forou, engejimento wo raibu de shukei."
+        }
       }
     },
     "card": {

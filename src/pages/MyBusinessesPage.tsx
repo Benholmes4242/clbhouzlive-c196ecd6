@@ -123,28 +123,26 @@ const MyBusinessesPage = () => {
         </div>
       )}
 
+      {/* Empty state — full-bleed cinematic sell, so it mounts OUTSIDE the
+          padded content column (BRIEF_BUSINESS_EMPTY_STATE §2.1). */}
+      {!isLoading && !hasBusinesses && <BusinessEmptyState onCreate={handleCreateBusiness} />}
+
       {/* Content */}
-      {!isLoading && (
+      {!isLoading && hasBusinesses && (
         <div className="flex flex-col gap-4 pt-4 px-4 max-w-xl mx-auto w-full pb-8">
-          {!hasBusinesses ? (
-            <BusinessEmptyState onCreate={handleCreateBusiness} />
+          <BusinessesAccordion
+            memberships={sortedBusinesses}
+            userId={user?.id || ''}
+            activeBusinessId={
+              activeActor?.type === 'business' ? activeActor?.id ?? null : null
+            }
+            onRequestDelete={handleRequestDelete}
+          />
 
-          ) : (
-            <>
-              <BusinessesAccordion
-                memberships={sortedBusinesses}
-                userId={user?.id || ''}
-                activeBusinessId={
-                  activeActor?.type === 'business' ? activeActor?.id ?? null : null
-                }
-                onRequestDelete={handleRequestDelete}
-              />
-
-              <AddBusinessCard onClick={handleCreateBusiness} />
-            </>
-          )}
+          <AddBusinessCard onClick={handleCreateBusiness} />
         </div>
       )}
+
 
       {/* Hoisted confirm-delete dialog — lives outside the accordion so the
           mutation's cache invalidation can evict the target card without

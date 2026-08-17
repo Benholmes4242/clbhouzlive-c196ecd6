@@ -135,6 +135,53 @@
           "claim": "Dodal beomwi hwagin",
           "tail": "jyohoe, palrou, chamyeo"
         }
+      },
+      "hero": {
+        "kicker": "FOR BUSINESSES",
+        "title": "Golpeodeureun imi dangsin iyagireul hago itseumnida.",
+        "body": "Peijireul deungnokhago hamkkehaseyo."
+      },
+      "numbers": {
+        "courses": "clbhouz ui koseu su",
+        "rounds": "ROUNDS",
+        "reviews": "REVIEWS",
+        "greenNote": "CHOROKSAEGEUN CHOEGEUN 30 IL"
+      },
+      "examples": {
+        "kicker": "DANGSIN UI PEIJI",
+        "heading": "Modeun golpeu bijeuniseu reul wihan peiji",
+        "tag": "YESI",
+        "tabs": {
+          "home": "HOME",
+          "about": "ABOUT",
+          "reviews": "REVIEWS"
+        },
+        "club": {
+          "name": "Golpeu keulleop",
+          "meta": "Keulleop . 18 hol"
+        },
+        "range": {
+          "name": "Deuraibing renji",
+          "meta": "Renji . Yeonseup"
+        },
+        "shop": {
+          "name": "Peuro syop",
+          "meta": "Ripeil . Piting"
+        }
+      },
+      "rows": {
+        "found": {
+          "title": "Balgyeondoege",
+          "body": "Geomsaekgwa koseu dirrekteori e noollimnida. Golpeoga imi boneun {{courses}} gae koseu wa hamkke."
+        },
+        "trusted": {
+          "title": "Sinroe eotgi",
+          "body": "Ribyuneun raundeu girogi inneun golpeoege seo omnida - ingmyeong gyejeongi animnida."
+        },
+        "reach": {
+          "title": "Dodal beomwi algi",
+          "body": "Jyohoe, palrou, chamyeoreul silsigan euro jipgye."
+        }
       }
     },
     "card": {
