@@ -8,7 +8,7 @@ import { ReactionAction } from './ReactionAction';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 import { A, SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
-import { bandColor, SubScoreBar } from '@/features/courses/_shared/scoreBands';
+import { bandColor, bandColorOnDark, SubScoreBar } from '@/features/courses/_shared/scoreBands';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import type { LatestReview } from './hooks/useLatestReviews';
 
@@ -356,7 +356,7 @@ export function ReviewTile({
             style={{
               fontSize: 16,
               fontWeight: 700,
-              color: bandColor(r.rating),
+              color: bandColorOnDark(r.rating),
               letterSpacing: '-0.02em',
               lineHeight: 1,
               ...FIGS,
@@ -366,32 +366,40 @@ export function ReviewTile({
           </span>
           <span style={{ ...LABEL, fontSize: 6.5, color: 'rgba(255,255,255,0.62)' }}>/10</span>
         </span>
-
-        {/* THE FEATURED MARK (§2.5). In the 9+ green with white text — the only
-            tier badge on the page. */}
-        {isFeatured && (
-          <span
-            style={{
-              ...LABEL,
-              fontSize: 7,
-              color: '#FFFFFF',
-              background: bandColor(10),
-              borderRadius: 999,
-              padding: '4px 8px',
-              lineHeight: 1,
-            }}
-          >
-            {t('discover.reviews.featured', 'Featured')}
-          </span>
-        )}
         </span>
 
 
 
-        {/* REACTION — glass corner, opposite the score chip. The count column
-            is RESERVED so the glyph lands on the same x on every tile,
-            including the tiles at zero. */}
-        <span style={{ position: 'absolute', top: 8, right: 10 }}>
+        {/* TOP RIGHT — the FEATURED mark and the reaction, side by side, badge
+            outermost (CORRECTION_REVIEW_TILE_FINISHING §2.2/§2.3). The badge
+            wears the SAME dark glass as the score chip so it reads as its
+            sibling rather than a sticker; the heart keeps its corner because it
+            is an action and a thumb expects it there. */}
+        <span
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 10,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          {isFeatured && (
+            <span
+              className="review-tile-chip"
+              style={{
+                ...LABEL,
+                fontSize: 7,
+                color: '#FFFFFF',
+                borderRadius: 999,
+                padding: '4px 8px',
+                lineHeight: 1,
+              }}
+            >
+              {t('discover.reviews.featured', 'Featured')}
+            </span>
+          )}
           <ReactionAction
             tone="glass"
             hidden={reactionHidden}
@@ -403,6 +411,7 @@ export function ReviewTile({
             label={t('discover.reactions.actionReview', 'Like this review')}
           />
         </span>
+
 
         {/* BOTTOM BLOCK — course name as headline (two lines maximum, so a long
             club name cannot crowd the byline), then the byline. */}
