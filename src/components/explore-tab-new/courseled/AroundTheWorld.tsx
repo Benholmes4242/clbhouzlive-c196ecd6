@@ -481,55 +481,66 @@ export function AroundTheWorld({
   }, [groups, priorityFor]);
 
   /**
-   * TILE SLOTS — TWO PASSES (BRIEF_ATW_BACKFILL).
+   * TILE SLOTS — THE KIND BUDGET (BRIEF_STANDOUT_KIND_BUDGET §1).
    *
-   * PASS 1: one tile per distinct course, in ranked order, each showing its
-   * headline event. Stop at PAGE. This is the old behaviour verbatim.
+   * The old two-pass walk ordered candidates by PRECEDENCE alone. With 208
+   * course records in the GB&I cache and eight slots, records outranked
+   * everything and took the whole section: the 49 bogey-free / under-par /
+   * birdie-haul feats never appeared, and with one surviving group the headings
+   * disappeared with them.
    *
-   * PASS 2 (only if pass 1 came up short): walk every event NOT yet shown, most
-   * notable first with newest as the tie-break, and give it its own tile until
-   * the section reaches PAGE or the events run out. MAX_TILES_PER_COURSE caps a
-   * course at 2 tiles — never a third, even with slots to spare. Never pad,
-   * never repeat an event.
+   * The fix mirrors get_personal_bests' `kinded` CTE: rank each candidate AMONG
+   * FEATS OF ITS OWN KIND (kn), then order on (kn, precedence, recency). Every
+   * kind places its best tile before any kind places a second, so the mix
+   * self-enforces Ben's max-of-three without a hard cap — and widens on its own
+   * when only one or two kinds exist.
    *
-   * The combined list is then re-sorted by the SAME comparator, so a backfilled
-   * tile can outrank another course's first tile and its photo height comes
-   * from final position like any other.
+   * THE HERO IS CHOSEN FIRST AND IS EXEMPT (§1.6): the rarest feat leads
+   * regardless of kind and is removed from the pool the budget spends.
+   *
+   * PRECEDENCE IS UNCHANGED as the notability order that drives tile size
+   * (§1.5) — only selection moved. MAX_TILES_PER_COURSE still caps a course at
+   * two tiles, and the final order is still the display comparator.
    */
   const slots = useMemo(() => {
     type Slot = { g: CourseGroup; top: WireEvent | undefined; key: string };
     const perCourse = new Map<string, number>();
-    const usedEventIds = new Set<string>();
     const out: Slot[] = [];
 
-    // PASS 1
-    for (const g of ranked) {
+    const candidates = ranked.flatMap((g) => g.events.map((e) => ({ g, e })));
+    const byRarity = (a: { e: WireEvent }, b: { e: WireEvent }) =>
+      notability(a.e) - notability(b.e) || (a.e.at < b.e.at ? 1 : -1);
+
+    const heroCand = [...candidates].sort(byRarity)[0];
+
+    const push = (c: { g: CourseGroup; e: WireEvent }) => {
+      perCourse.set(c.g.courseId, (perCourse.get(c.g.courseId) ?? 0) + 1);
+      out.push({ g: c.g, top: c.e, key: `${c.g.courseId}:${c.e.id}` });
+    };
+
+    if (heroCand) push(heroCand);
+
+    // kn — rank within kind, in precedence-then-recency order.
+    const perKind = new Map<string, number>();
+    const kinded = [...candidates]
+      .filter((c) => c.e.id !== heroCand?.e.id)
+      .sort(byRarity)
+      .map((c) => {
+        const k = c.e.kind ?? 'other';
+        const kn = perKind.get(k) ?? 0;
+        perKind.set(k, kn + 1);
+        return { ...c, kn };
+      })
+      .sort((a, b) => a.kn - b.kn || byRarity(a, b));
+
+    for (const c of kinded) {
       if (out.length >= PAGE) break;
-      const top = headlineOf(g.events);
-      if (top) usedEventIds.add(top.id);
-      perCourse.set(g.courseId, 1);
-      out.push({ g, top, key: `${g.courseId}:${top?.id ?? 'top'}` });
+      if ((perCourse.get(c.g.courseId) ?? 0) >= MAX_TILES_PER_COURSE) continue;
+      push(c);
     }
 
-    // PASS 2 — backfill
-    if (out.length < PAGE) {
-      const byId = new Map(ranked.map((g) => [g.courseId, g] as const));
-      const spare = ranked
-        .flatMap((g) => g.events)
-        .filter((e) => !usedEventIds.has(e.id))
-        .sort((a, b) => notability(a) - notability(b) || (a.at < b.at ? 1 : -1));
-      for (const e of spare) {
-        if (out.length >= PAGE) break;
-        const g = e.courseId ? byId.get(e.courseId) : undefined;
-        if (!g) continue;
-        if ((perCourse.get(g.courseId) ?? 0) >= MAX_TILES_PER_COURSE) continue;
-        perCourse.set(g.courseId, (perCourse.get(g.courseId) ?? 0) + 1);
-        usedEventIds.add(e.id);
-        out.push({ g, top: e, key: `${g.courseId}:${e.id}` });
-      }
-    }
-
-    // FINAL ORDER — the same comparator as `ranked`.
+    // FINAL ORDER — the display comparator, so photo size still follows
+    // relevance then precedence then recency.
     out.sort((a, b) => {
       if (priorityFor) {
         const d = priorityFor(a.g.courseId) - priorityFor(b.g.courseId);
@@ -543,6 +554,8 @@ export function AroundTheWorld({
 
     return { list: out, shownPerCourse: perCourse };
   }, [ranked, priorityFor]);
+
+
 
   /** Distinct courses on the page — meta, ratings and reactions read once each. */
   const shown = useMemo(() => {
