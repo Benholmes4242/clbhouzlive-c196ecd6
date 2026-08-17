@@ -53,7 +53,7 @@ const PB_GROUPS = [
     id: 'best',
     kinds: ['big_points_here'],
     key: 'discover.pb.group.best',
-    label: 'Best rounds here',
+    label: 'Best scoring here',
   },
   {
     id: 'most',
