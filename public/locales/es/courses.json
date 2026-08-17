@@ -1082,7 +1082,8 @@
         "firsts": "Primera vez",
         "best": "Gran botín",
         "most": "Nuevos máximos"
-      }
+      },
+      "after": "Tras"
     },
     "mostPlayedAvgToParBy_one": "Jugado a {{value}} por {{count}} miembro",
     "mostPlayedMembers_one": "{{count}} miembro",

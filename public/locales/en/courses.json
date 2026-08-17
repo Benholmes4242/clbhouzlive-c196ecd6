@@ -1523,7 +1523,8 @@
         "firsts": "First time ever",
         "best": "Big returns",
         "most": "New personal highs"
-      }
+      },
+      "after": "After"
     },
     "mostPlayedSheetCaption_one": "{{count}} course",
     "mostPlayedSheetCaption_other": "{{count}} courses"

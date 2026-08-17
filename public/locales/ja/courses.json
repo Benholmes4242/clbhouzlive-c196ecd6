@@ -1027,7 +1027,8 @@
         "firsts": "人生初",
         "best": "大きな成果",
         "most": "自己最多を更新"
-      }
+      },
+      "after": "経過"
     },
     "mostPlayedAvgToParBy_other": "{{value}}（{{count}}人）",
     "mostPlayedMembers_other": "{{count}}人",

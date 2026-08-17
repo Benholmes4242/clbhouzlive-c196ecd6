@@ -66,8 +66,22 @@ function pbGroupIdFor(kind: string | null): string {
   return 'firsts';
 }
 
+/**
+ * WHICH KINDS TAKE WHICH SECOND FIGURE (BRIEF_FEAT_SECOND_FIGURE §1-2). The
+ * server decides WHETHER there is a figure; these sets decide only how it reads.
+ * A kind in neither set shows the count alone.
+ */
+const DELTA_KINDS = new Set([
+  'first_sub_70_here',
+  'first_sub_80_here',
+  'most_birdies_here',
+  'most_pars_here',
+]);
+const WAIT_KINDS = new Set(['first_double_free_here']);
+
 /** Eight tiles maximum, matching PAGE = 8 in AroundTheWorld (§3.2). */
 const PAGE = 8;
+
 
 interface Props {
   userId: string | undefined;
