@@ -652,7 +652,11 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
 
                 <div
                   style={{
-                    marginTop: 9,
+                    /* marginTop AUTO, not a fixed gap: the footer rests on the
+                       tile's bottom edge whatever the meta row above contains.
+                       No placeholder and no fixed-height meta row — either would
+                       reinstate the gap the hole count left behind. */
+                    marginTop: 'auto',
                     borderTop: `1px solid ${A.BORDER}`,
                     paddingTop: 8,
                     display: 'flex',
