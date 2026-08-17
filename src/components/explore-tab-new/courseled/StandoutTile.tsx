@@ -82,11 +82,15 @@ export function StandoutTile({
   subline = null,
   trailing,
   footer,
+  kicker = null,
+  nameSize,
+  chipScale = 'md',
   isNew = false,
   onPress,
 }: Props) {
   const [pressed, setPressed] = useState(false);
   const tall = photo >= TALL;
+  const large = chipScale === 'lg';
 
   return (
     <div
@@ -132,14 +136,14 @@ export function StandoutTile({
               display: 'inline-flex',
               alignItems: 'baseline',
               gap: 4,
-              padding: '5px 10px',
-              borderRadius: 10,
+              padding: large ? '6px 12px' : '5px 10px',
+              borderRadius: large ? 12 : 10,
             }}
           >
             <span
               style={{
                 ...NUMF,
-                fontSize: 16,
+                fontSize: large ? 22 : 16,
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
                 /* The fill is now DARK glass (BRIEF_GLASS_BADGES_DARK), so the
@@ -153,7 +157,7 @@ export function StandoutTile({
             {unit && (
               <span
                 style={{
-                  fontSize: 6.5,
+                  fontSize: large ? 7.5 : 6.5,
                   fontWeight: 700,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
@@ -187,7 +191,7 @@ export function StandoutTile({
         <div style={{ position: 'absolute', left: 10, right: 10, bottom: 9 }}>
           <div
             style={{
-              fontSize: 14,
+              fontSize: nameSize ?? 14,
               fontWeight: 700,
               color: '#fff',
               letterSpacing: '-0.025em',
@@ -220,6 +224,23 @@ export function StandoutTile({
 
       {/* TEXT PANEL — no figure here. One figure per tile. */}
       <div style={{ padding: '11px 13px 12px' }}>
+        {/* HERO KICKER (§1.3) — the feat kind, so the hero says WHAT it is
+            before it says who did it. Ink, not amber: amber means the viewer. */}
+        {kicker ? (
+          <div
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              lineHeight: 1,
+              color: A.MUTE,
+              marginBottom: 7,
+            }}
+          >
+            {kicker}
+          </div>
+        ) : null}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <div
             style={{
