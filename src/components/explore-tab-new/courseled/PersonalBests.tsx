@@ -13,8 +13,6 @@ import { A, Eyebrow, LABEL } from './tokens';
 import { StandoutTile } from './StandoutTile';
 import {
   EffortTile,
-  PROGRESSION_HEIGHT,
-  ProgressionTile,
   estimateEffortHeight,
   parseAttempts,
   parsePreviousBest,
@@ -47,19 +45,19 @@ const PB_GROUPS = [
     id: 'firsts',
     kinds: ['first_sub_70_here', 'first_sub_80_here', 'first_double_free_here'],
     key: 'discover.pb.group.firsts',
-    label: 'Firsts here',
+    label: 'First time ever',
   },
   {
     id: 'best',
     kinds: ['big_points_here'],
     key: 'discover.pb.group.best',
-    label: 'Best scoring here',
+    label: 'Big returns',
   },
   {
     id: 'most',
     kinds: ['most_birdies_here', 'most_pars_here'],
     key: 'discover.pb.group.most',
-    label: 'Most in a round',
+    label: 'New personal highs',
   },
 ] as const;
 
@@ -189,13 +187,17 @@ export function PersonalBests({
       attempts !== null
         ? t('discover.pb.afterRounds', { defaultValue: 'After {{count}} rounds', count: attempts })
         : '';
-    const gainLine =
-      previous !== null
-        ? t('discover.pb.gain', {
-            defaultValue: '{{count}} better than before',
-            count: Math.max(0, Number(r.figure ?? 0) - previous),
-          })
-        : '';
+    /**
+     * THE IMPROVEMENT GOES INSIDE THE GLASS CHIP (BRIEF_FEAT_SECTIONS_FINISHING
+     * §5). The progression tile — the "9 -> 12" arrow with a bar beneath — is
+     * WITHDRAWN: the bar drew the gain as a proportion of the new total, with no
+     * denominator, so twelve pars rendered a quarter full. These rows now render
+     * the STANDARD photo tile, and the only trace of the previous best in the
+     * figure area is this delta beside the count. "Previous best N" still
+     * renders as the subline, because here beating it IS the achievement (§4.4).
+     */
+    const delta =
+      previous !== null ? Math.max(0, Number(r.figure ?? 0) - previous) : null;
 
     const photoHeight =
       photo +
@@ -214,15 +216,13 @@ export function PersonalBests({
       previous,
       attempts,
       attemptPhrase,
-      gainLine,
+      delta,
       slotKey: `${r.whs_score_id}:${r.feat_kind}`,
       // Deterministic height estimate, one per shape.
       height:
-        treatment === 'progression'
-          ? PROGRESSION_HEIGHT
-          : treatment === 'effort'
-            ? estimateEffortHeight(`${headline} \u00B7 ${attemptPhrase}`)
-            : photoHeight,
+        treatment === 'effort'
+          ? estimateEffortHeight(`${headline} \u00B7 ${attemptPhrase}`)
+          : photoHeight,
     };
   });
 
@@ -288,27 +288,6 @@ export function PersonalBests({
                 </ReactionSlot>
               );
 
-              if (tt.treatment === 'progression' && tt.previous !== null) {
-                return (
-                  <ProgressionTile
-                    key={tt.slotKey}
-                    courseName={courseName}
-                    who={who}
-                    isOwn={tt.r.is_self}
-                    whenLabel={relativeWhen(tt.r.play_date, t)}
-                    /* The server headline IS the feat kind; it renders verbatim
-                       as the kicker rather than being reworded (§2.6). */
-                    kicker={tt.headline}
-                    previous={tt.previous}
-                    figure={tt.r.figure}
-                    unit={(tt.r.figure_unit ?? '').toUpperCase()}
-                    gainLine={tt.gainLine}
-                    trailing={trailing}
-                    onPress={openRound}
-                  />
-                );
-              }
-
               if (tt.treatment === 'effort' && tt.attempts !== null) {
                 return (
                   <EffortTile
@@ -324,6 +303,8 @@ export function PersonalBests({
                     headline={tt.headline}
                     attemptPhrase={tt.attemptPhrase}
                     attempts={tt.attempts}
+                    avatarUrl={tt.r.profile_photo_url}
+                    avatarUserId={tt.r.user_id}
                     trailing={trailing}
                     onPress={openRound}
                   />
@@ -361,6 +342,12 @@ export function PersonalBests({
                    with no round id falls back to the course page. */
                 onPress={openRound}
                 trailing={trailing}
+                /* Positive only — most_pars_here / most_birdies_here fire only
+                   when the previous best is beaten, so no red state exists
+                   (§5.7). */
+                delta={tt.delta}
+                avatarUrl={tt.r.profile_photo_url}
+                avatarUserId={tt.r.user_id}
               />
               );
   };
