@@ -1083,7 +1083,18 @@
         "best": "Gran botín",
         "most": "Nuevos máximos"
       }
-    }
+    },
+    "mostPlayedAvgToParBy_one": "Jugado a {{value}} por {{count}} miembro",
+    "mostPlayedMembers_one": "{{count}} miembro",
+    "mostPlayedSheetCaption_one": "{{count}} campo",
+    "mostPlayedAvgToParBy_other": "Jugado a {{value}} por {{count}} miembros",
+    "mostPlayedMembers_other": "{{count}} miembros",
+    "mostPlayedSheetCaption_other": "{{count}} campos",
+    "mostPlayed": "Más jugados esta semana",
+    "mostPlayedAvgToPar": "Jugado a {{value}}",
+    "mostPlayedNew": "Nuevo",
+    "mostPlayedLevel": "Igual",
+    "trackedRounds": "Rondas registradas"
   },
   "statBrowse": {
     "colArea": "Zona",

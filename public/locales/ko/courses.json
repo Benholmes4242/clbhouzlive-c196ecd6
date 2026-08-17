@@ -1028,7 +1028,15 @@
         "best": "큰 수확",
         "most": "새로운 최다 기록"
       }
-    }
+    },
+    "mostPlayedAvgToParBy_other": "{{value}} · {{count}}명",
+    "mostPlayedMembers_other": "{{count}}명",
+    "mostPlayedSheetCaption_other": "{{count}}개 코스",
+    "mostPlayed": "이번 주 최다 플레이",
+    "mostPlayedAvgToPar": "{{value}}",
+    "mostPlayedNew": "신규",
+    "mostPlayedLevel": "변동 없음",
+    "trackedRounds": "기록된 라운드"
   },
   "statBrowse": {
     "colArea": "지역",

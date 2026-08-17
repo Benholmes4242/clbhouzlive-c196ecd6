@@ -1083,7 +1083,18 @@
         "best": "Große Ausbeute",
         "most": "Neue Bestwerte"
       }
-    }
+    },
+    "mostPlayedAvgToParBy_one": "Gespielt zu {{value}} von {{count}} Mitglied",
+    "mostPlayedMembers_one": "{{count}} Mitglied",
+    "mostPlayedSheetCaption_one": "{{count}} Platz",
+    "mostPlayedAvgToParBy_other": "Gespielt zu {{value}} von {{count}} Mitgliedern",
+    "mostPlayedMembers_other": "{{count}} Mitglieder",
+    "mostPlayedSheetCaption_other": "{{count}} Plätze",
+    "mostPlayed": "Diese Woche am meisten gespielt",
+    "mostPlayedAvgToPar": "Gespielt zu {{value}}",
+    "mostPlayedNew": "Neu",
+    "mostPlayedLevel": "Unverändert",
+    "trackedRounds": "Erfasste Runden"
   },
   "statBrowse": {
     "colArea": "Gebiet",

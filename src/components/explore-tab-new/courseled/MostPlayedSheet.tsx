@@ -45,9 +45,7 @@ export function MostPlayedSheet({ open, onClose, rows, onRowPress }: Props) {
         }}
       >
         <div style={{ ...LABEL, color: A.DIM, marginBottom: 5 }}>
-          {t('discover.mostPlayedSheetCaption', '{{count}} courses', {
-            count: rows.length,
-          })}
+          {t('discover.mostPlayedSheetCaption', { count: rows.length })}
         </div>
         <div
           id="courseled-mostplayed-title"

@@ -1340,7 +1340,6 @@
     "honoursCaptionCount": "[~~{{count}} áĉéš áñđ áļƀáţřőššéš őñ ţĥé ƀőářđ~~]",
     "honoursOnTheBoard": "[~~{{count}} őñ ţĥé ƀőářđ~~]",
     "honoursWhatItIs": "[~~Éṽéřý áĉé áñđ áļƀáţřőšš íñ ĉļƀĥőúž ĥíšţőřý~~]",
-    "mostPlayedSheetCaption": "[~~{{count}} ĉőúřšéš~~]",
     "honoursSeeAll": "[~~Šéé áļļ {{count}}~~]",
     "honoursSheetCaption": "[~~{{count}} éñţříéš~~]",
     "lens": {
@@ -1520,7 +1519,9 @@
         "best": "[Bíg rétûrns ]",
         "most": "[Néw pérsönál híghs ]"
       }
-    }
+    },
+    "mostPlayedSheetCaption_one": "[~~{{count}} ĉőúřšé~~]",
+    "mostPlayedSheetCaption_other": "[~~{{count}} ĉőúřšéš~~]"
   },
   "statBrowse": {
     "eyebrow": "[~~Ŵĥéřé ţĥíš ĉőɱɱúñíţý ƥļáýš~~]",

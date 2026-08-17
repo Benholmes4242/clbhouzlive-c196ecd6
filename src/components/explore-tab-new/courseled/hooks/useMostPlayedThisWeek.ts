@@ -18,13 +18,19 @@ import { supabase } from '@/integrations/supabase/client';
  *  - NO PRIOR WEEK: prev = 0 means the course is APPEARING, not growing. The
  *    delta would equal the count and print the same number twice, so it is
  *    null.
- *  - FLOOR: a single round in the window is not a leaderboard position, so
- *    courses under MIN_ROUNDS are dropped entirely. With none qualifying the
- *    list is empty and the section renders nothing.
+ *  - FLOOR: courses under MIN_ROUNDS are dropped entirely. With none qualifying
+ *    the list is empty and the section renders nothing.
  */
 
-/** A course needs at least this many rounds in the 7-day window to appear. */
-const MIN_ROUNDS = 2;
+/**
+ * A course needs at least this many rounds in the 7-day window to appear.
+ *
+ * ONE, NOT TWO (BRIEF_MOST_PLAYED_MIN_ONE §1.1): at this member base a single
+ * tracked round is still a course somebody played, and a floor of two was
+ * hiding three of the five courses played in the week. Five honest entries beat
+ * two "qualifying" ones.
+ */
+const MIN_ROUNDS = 1;
 
 /** Every outcome of the week-on-week comparison, none discarded. */
 export type MostPlayedMove = 'new' | 'up' | 'down' | 'level';
