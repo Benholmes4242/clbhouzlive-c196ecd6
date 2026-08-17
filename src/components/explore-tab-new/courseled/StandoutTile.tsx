@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
 import { CourseImageFallback } from './CourseImageFallback';
 import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
 
@@ -60,6 +62,26 @@ interface Props {
   kicker?: string | null;
   nameSize?: number;
   chipScale?: 'md' | 'lg';
+  /**
+   * THE MEMBER'S AVATAR (BRIEF_FEAT_SECTIONS_FINISHING §3) — 20px squircle to
+   * the left of the name, on EVERY tier. `avatarUserId` must be the member's
+   * user id: the deterministic fallback colour hashes it, so a photo-less
+   * member matches their own initials tile in the Clubhouse feed and the
+   * friends rail. Hashing the display name instead would still be stable but
+   * would NOT match, which is the whole point.
+   */
+  avatarUrl?: string | null;
+  avatarUserId?: string | null;
+  /**
+   * NEW PERSONAL HIGHS ONLY (§5): the improvement over the previous best, drawn
+   * INSIDE the one glass chip after a hairline. A figure with an ARROW is a
+   * MOVEMENT — green is better, red is worse — which is a different scale from
+   * a SCORE, where under par is red. Do not "correct" this to red.
+   *
+   * There is deliberately NO red branch: these kinds only fire when the
+   * previous best is beaten, so the delta is always positive (§5.7).
+   */
+  delta?: number | null;
   /** New-since ring. */
   isNew?: boolean;
   onPress?: () => void;
@@ -83,6 +105,9 @@ export function StandoutTile({
   trailing,
   footer,
   kicker = null,
+  avatarUrl = null,
+  avatarUserId = null,
+  delta = null,
   nameSize,
   chipScale = 'md',
   isNew = false,
@@ -168,6 +193,46 @@ export function StandoutTile({
                 {unit}
               </span>
             )}
+            {delta != null && delta > 0 ? (
+              <>
+                <span
+                  aria-hidden
+                  style={{
+                    alignSelf: 'stretch',
+                    width: 1,
+                    marginLeft: 2,
+                    background: 'rgba(255,255,255,0.24)',
+                  }}
+                />
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 3,
+                  }}
+                >
+                  {/* A DRAWN TRIANGLE, NOT AN EMOJI (§5.5): an emoji fights the
+                      tabular figures and renders differently per platform. */}
+                  <svg width="7" height="6" viewBox="0 0 7 6" aria-hidden>
+                    <path d="M3.5 0 7 6H0z" fill="#4ADE80" />
+                  </svg>
+                  <span
+                    style={{
+                      ...NUMF,
+                      fontSize: 13,
+                      fontWeight: 800,
+                      lineHeight: 1,
+                      letterSpacing: '-0.02em',
+                      /* #4ADE80 survives a bright sky; BAND_GREEN #047857 does
+                         not (§5.9) — the review chip's problem. */
+                      color: '#4ADE80',
+                    }}
+                  >
+                    {delta}
+                  </span>
+                </span>
+              </>
+            ) : null}
           </span>
         )}
 
@@ -242,6 +307,15 @@ export function StandoutTile({
           </div>
         ) : null}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          {who ? (
+            <SquircleAvatar
+              src={avatarUrl}
+              userId={avatarUserId}
+              alt={who}
+              size={20}
+              hideRing
+            />
+          ) : null}
           <div
             style={{
               flex: 1,
