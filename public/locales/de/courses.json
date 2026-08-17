@@ -1058,7 +1058,11 @@
       "latestAt": "Zuletzt {{year}} · {{course}}",
       "expandFeats": "{{count}} weitere",
       "expandFeats_one": "{{count}} weiterer",
-      "collapseFeats": "Weniger"
+      "collapseFeats": "Weniger",
+      "countAces_one": "{{count}} Ass",
+      "countAces_other": "{{count}} Asse",
+      "countAlbatrosses_one": "{{count}} Albatros",
+      "countAlbatrosses_other": "{{count}} Albatrosse"
     },
     "feat": {
       "group": {

@@ -40,7 +40,12 @@ import { OnTourThisWeek } from './courseled/OnTourThisWeek';
 import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
 import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
 import { MostPlayedSheet } from './courseled/MostPlayedSheet';
-import { HonoursBoard, sortHonours } from './courseled/HonoursBoard';
+import {
+  HonoursBoard,
+  sortHonours,
+  type HonoursLeader,
+  type HonoursMode,
+} from './courseled/HonoursBoard';
 import { HonoursBoardSheet } from './courseled/HonoursBoardSheet';
 import { useMomentsOfTheWeek, type Moment } from './courseled/hooks/useMomentsOfTheWeek';
 import { useFriendIdSet } from './courseled/hooks/useFriendIdSet';
@@ -133,6 +138,8 @@ export default function ExploreTabContent({
   const [findGolfers, setFindGolfers] = useState(false);
   const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
   const [honoursSheet, setHonoursSheet] = useState(false);
+  const [honoursMode, setHonoursMode] = useState<HonoursMode>('recent');
+  const [honoursFocus, setHonoursFocus] = useState<string | null>(null);
   const [reviewsSheet, setReviewsSheet] = useState(false);
 
   /**
@@ -433,8 +440,22 @@ export default function ExploreTabContent({
 
   const openHonoursSheet = useCallback(() => {
     analyticsEvents.track('discover_honours_sheet_open', { total: honours.length });
+    setHonoursMode('recent');
+    setHonoursFocus(null);
     setHonoursSheet(true);
   }, [honours.length]);
+
+  /* BRIEF_HONOURS_BOARD_REBUILD §1.9 — a leader card's "{{n}} more" opens the
+     SHEET in LEADERS mode, scrolled to that member. Nothing is hidden. */
+  const openHonoursLeader = useCallback((leader: HonoursLeader) => {
+    analyticsEvents.track('discover_honours_sheet_open', {
+      total: leader.total,
+      source: 'leader_more',
+    });
+    setHonoursMode('leaders');
+    setHonoursFocus(leader.userId);
+    setHonoursSheet(true);
+  }, []);
 
   return (
     <div style={{ background: A.CANVAS, minHeight: '100vh', fontFamily: SANS, ...FIGS }}>
@@ -587,6 +608,7 @@ export default function ExploreTabContent({
           onRowPress={handleHonoursRow}
           limit={20}
           onSeeAll={openHonoursSheet}
+          onSeeAllLeader={openHonoursLeader}
         />
 
         {/* Clears the floating bottom nav. Collapses to 16px on routes where
@@ -621,6 +643,8 @@ export default function ExploreTabContent({
         onClose={() => setHonoursSheet(false)}
         events={honours}
         onRowPress={handleHonoursRow}
+        initialMode={honoursMode}
+        focusUserId={honoursFocus}
       />
 
       <LatestReviewsSheet

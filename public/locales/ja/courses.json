@@ -1003,7 +1003,9 @@
       "latestAt": "最新 {{year}} · {{course}}",
       "expandFeats": "他 {{count}} 件",
       "expandFeats_one": "他 {{count}} 件",
-      "collapseFeats": "閉じる"
+      "collapseFeats": "閉じる",
+      "countAces_other": "ホールインワン {{count}}回",
+      "countAlbatrosses_other": "アルバトロス {{count}}回"
     },
     "feat": {
       "group": {

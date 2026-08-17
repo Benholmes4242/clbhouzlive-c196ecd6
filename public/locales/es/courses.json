@@ -1058,7 +1058,11 @@
       "latestAt": "Último {{year}} · {{course}}",
       "expandFeats": "{{count}} más",
       "expandFeats_one": "{{count}} más",
-      "collapseFeats": "Menos"
+      "collapseFeats": "Menos",
+      "countAces_one": "{{count}} hoyo en uno",
+      "countAces_other": "{{count}} hoyos en uno",
+      "countAlbatrosses_one": "{{count}} albatros",
+      "countAlbatrosses_other": "{{count}} albatros"
     },
     "feat": {
       "group": {
