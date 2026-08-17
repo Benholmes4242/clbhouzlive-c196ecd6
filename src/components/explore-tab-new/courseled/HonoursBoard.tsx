@@ -636,7 +636,6 @@ export function HonoursHeading({
   leaderCount: number;
 }) {
   const { t } = useTranslation('courses');
-  const headline = useHonoursHeadline(events);
 
   return (
     <>
@@ -646,26 +645,8 @@ export function HonoursHeading({
           <HonoursModeToggle mode={mode} onChange={onModeChange} />
         </span>
       </div>
-      <div
-        style={{
-          fontSize: 17,
-          fontWeight: 700,
-          letterSpacing: '-0.02em',
-          color: A.INK,
-          marginTop: 6,
-          fontVariantNumeric: 'tabular-nums lining-nums',
-        }}
-      >
-        {headline}
-      </div>
       <div style={{ fontSize: 12.5, fontWeight: 500, color: A.MUTE, marginTop: 3 }}>
-        {mode === 'recent'
-          ? t('discover.honours.subRecent', 'In clbhouz history')
-          : t('discover.honours.subLeaders', {
-              count: leaderCount,
-              defaultValue: '{{count}} golfers',
-              defaultValue_one: '{{count}} golfer',
-            })}
+        {mode === 'recent' ? t('discover.honours.subRecent', 'In clbhouz history') : null}
       </div>
     </>
   );
