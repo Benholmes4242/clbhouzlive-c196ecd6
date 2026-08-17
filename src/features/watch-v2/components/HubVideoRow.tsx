@@ -252,7 +252,9 @@ function SkeletonCard() {
 export function HubVideoRow() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useSupabaseSession();
-  const { data, isLoading } = useHubLongFormVideos(user?.id);
+  // SETTLED IS NOT "NOT LOADING": useHubLongFormVideos is gated on user?.id.
+  const { data, isLoading: fetching, isFetched } = useHubLongFormVideos(user?.id);
+  const isLoading = !isFetched || fetching;
 
   const rows = (data ?? []) as HubRpcRow[];
   const feedPosts = useMemo(() => toFeedPosts(rows), [rows]);

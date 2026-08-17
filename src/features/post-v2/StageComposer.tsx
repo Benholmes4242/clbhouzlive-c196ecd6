@@ -621,7 +621,8 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   }
 
   // Edit target failed to load or does not exist.
-  if (isEditMode && !editable.isLoading && !editable.data) {
+  // SETTLED IS NOT "NOT LOADING": useEditablePost is gated on postId + viewerId.
+  if (isEditMode && editable.isFetched && !editable.data) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
         <div style={{ fontSize: 16, fontWeight: 600, color: CT_DARK.ink }}>Couldn't load this post</div>

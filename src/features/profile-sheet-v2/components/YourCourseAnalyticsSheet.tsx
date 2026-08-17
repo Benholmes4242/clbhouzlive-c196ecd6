@@ -676,7 +676,9 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
   const [q, setQ] = useState('');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
-  const { data: myCourses = [], isLoading } = useUserAnalyticsCourses({ enabled: open });
+  // SETTLED IS NOT "NOT LOADING": this query is disabled until the sheet opens.
+  const { data: myCourses = [], isLoading: fetching, isFetched } = useUserAnalyticsCourses({ enabled: open });
+  const isLoading = !isFetched || fetching;
   const { data: searchResults = [], isFetching: searching } = useCourseSearch(q);
   // ONE batched read for every course's trend — not one query per row.
   const { data: roundsByCourse } = useMyRoundsByCourse({ enabled: open });

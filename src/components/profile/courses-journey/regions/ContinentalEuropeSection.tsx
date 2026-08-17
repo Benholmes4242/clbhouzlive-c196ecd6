@@ -138,7 +138,9 @@ const ContinentalEuropeSection: React.FC<RegionSectionProps> = ({
 
 // Conditional Wrapper
 const ContinentalEuropeConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOwnProfile, userDisplayName }) => {
-  const { data: courses = [], isLoading } = usePlayedCoursesWithRatings(userId || '', 'europe');
+  // SETTLED IS NOT "NOT LOADING": the query is gated on userId.
+  const { data: courses = [], isLoading: fetching, isFetched } = usePlayedCoursesWithRatings(userId || '', 'europe');
+  const isLoading = !isFetched || fetching;
 
   return (
     <>

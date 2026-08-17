@@ -254,7 +254,10 @@ const ClubhouseContent = () => {
 
   const skeletonShape: SkeletonShape = derivedShape ?? hintRef.current!;
 
-  const isLoading = activeFeed.isLoading || (posts.length > 0 && !roundsReady);
+  // SETTLED IS NOT "NOT LOADING": useSuggestedFeed is gated on user?.id, so the
+  // terminal-empty branches below must not fire before the query has run.
+  const isLoading =
+    !activeFeed.isFetched || activeFeed.isLoading || (posts.length > 0 && !roundsReady);
   const hasNextPage = activeFeed.hasNextPage ?? false;
   
   // Skeleton timing — first-content-ready contract

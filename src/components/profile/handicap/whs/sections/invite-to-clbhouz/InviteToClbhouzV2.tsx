@@ -24,7 +24,10 @@ const T = {
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export const InviteToClbhouzV2: React.FC<Props> = ({ ownerUserId }) => {
-  const { data: friends, isLoading: friendsLoading } = useFriendLeaderboard(ownerUserId);
+  // SETTLED IS NOT "NOT LOADING": useFriendLeaderboard is gated on ownerUserId.
+  const { data: friends, isLoading: friendsFetching, isFetched: friendsFetched } =
+    useFriendLeaderboard(ownerUserId);
+  const friendsLoading = !friendsFetched || friendsFetching;
   const { data: invites } = useSentInvites();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);

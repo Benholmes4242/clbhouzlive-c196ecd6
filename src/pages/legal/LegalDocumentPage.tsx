@@ -25,7 +25,9 @@ interface Props {
 const LegalDocumentPage: React.FC<Props> = ({ slug: slugProp }) => {
   const params = useParams<{ slug: string }>();
   const slug = slugProp ?? params.slug;
-  const { data, isLoading, isError } = useLegalDocument(slug);
+  // SETTLED IS NOT "NOT LOADING": the document query is gated on slug.
+  const { data, isLoading: fetching, isFetched, isError } = useLegalDocument(slug);
+  const isLoading = !isFetched || fetching;
 
   const title = data?.title ?? (isLoading ? 'Loading…' : 'Not found');
   const effective = formatEffective(data?.effective_date ?? null);
