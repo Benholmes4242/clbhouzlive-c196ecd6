@@ -36,6 +36,13 @@ interface Props {
   photo: number;
   /** Figure chip. Rendered only when `figure` is present. */
   figure: string | null;
+  /**
+   * FIGURE TONE — the glass chip's numeral colour. Defaults to flat white
+   * (BRIEF_GLASS_BADGES_DARK). "Beating the course" passes the app's TOPAR red
+   * so an under-par figure reads as under par here as it does everywhere else.
+   */
+  figureTone?: string;
+
   unit?: string;
   /** Relative age, top-right. */
   whenLabel: string;
