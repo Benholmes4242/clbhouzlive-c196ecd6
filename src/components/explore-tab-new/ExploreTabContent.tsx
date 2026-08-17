@@ -523,10 +523,18 @@ export default function ExploreTabContent({
           pills={
             // The pills belong to Around the World: 12px above (10 from the
             // eyebrow + 2), 14px below so they sit closer to their cards.
-            <div style={{ margin: '2px -14px 14px' }}>
-              <ScopePills lens={lens} onChange={handleLensChange} />
-            </div>
+            // NO WRAPPER DIV: the pills are position:sticky, and a wrapper of
+            // their exact height becomes their containing block and gives them
+            // zero travel. The margin rides on the sticky element itself so the
+            // section is the sticky container (pins at the top of the section,
+            // releases when the section scrolls past).
+            <ScopePills
+              lens={lens}
+              onChange={handleLensChange}
+              style={{ margin: '2px -14px 14px' }}
+            />
           }
+
           onCoursePress={(id) => goCourse(id, 'around_the_world')}
           onFeatPress={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)}
           lensLabel={lensLabel}
