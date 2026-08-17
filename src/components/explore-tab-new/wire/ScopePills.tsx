@@ -16,7 +16,14 @@ export const LENS_ORDER: ExploreLens[] = ['suggested', 'worldwide', 'top_100', '
 interface Props {
   lens: ExploreLens;
   onChange: (lens: ExploreLens) => void;
+  /** Outer margin applied to the sticky element itself. It must NOT be moved
+   *  onto a wrapper div: a wrapper is the pills' containing block and, being
+   *  exactly their height, gives position:sticky zero travel (the pills then
+   *  never pin). Keeping the margin here lets the owning <section> bound the
+   *  sticky range, so the pills release when the section scrolls past. */
+  style?: React.CSSProperties;
 }
+
 
 export function lensLabelKey(lens: ExploreLens): { key: string; fallback: string } {
   switch (lens) {
