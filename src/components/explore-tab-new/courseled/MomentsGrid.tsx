@@ -112,7 +112,6 @@ export function MomentsGrid({
       labelSize={10}
       // Inside the tile — the gutter does not touch it.
       labelInset={8}
-      scrimStop="45%"
       style={{
         height,
         ...extra,

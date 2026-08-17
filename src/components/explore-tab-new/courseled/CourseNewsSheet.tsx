@@ -7,7 +7,8 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { ShortlistGlassAction } from './ShortlistGlassAction';
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
-import { A, KICKER, NUMF, SANS, SCRIM_STRONG } from './tokens';
+import { A, KICKER, NUMF, SANS } from './tokens';
+import { SCRIM_STANDOUT } from './photoScrim';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**
@@ -175,7 +176,7 @@ export function CourseNewsSheet({
                   pending={metaPending}
                   style={{ height: 76 }}
                 >
-                  <div style={{ position: 'absolute', inset: 0, background: SCRIM_STRONG }} />
+                  <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
 
                   {/* FIGURE chip — top-left, wins the space on narrow cards. */}
                   {hasFigure && (

@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import type { CommunityCreator } from './hooks/useCommunityCreators';
-import { SCRIM_STRONG } from './tokens';
+import { SCRIM_STANDOUT } from './photoScrim';
 
 /**
  * CREATOR CARD — "B, frame overlay" (BRIEF_COMMUNITY_CREATOR_CARDS).
@@ -81,7 +81,7 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
         initialsSize={30}
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
       >
-        <div style={{ position: 'absolute', inset: 0, background: SCRIM_STRONG }} />
+        <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
 
         <div
           style={{

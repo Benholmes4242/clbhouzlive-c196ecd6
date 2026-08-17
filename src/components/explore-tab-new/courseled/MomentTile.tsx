@@ -5,6 +5,7 @@ import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 import { CourseImageFallback } from './CourseImageFallback';
+import { SCRIM_STANDOUT } from './photoScrim';
 import type { Moment } from './hooks/useMomentsOfTheWeek';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import { attachTileHls } from './tileHlsPlayer';
@@ -64,7 +65,6 @@ interface TileProps {
   initialsSize: number;
   labelSize: number;
   labelInset: number;
-  scrimStop: string;
   /**
    * FALSE drops the course label AND the scrim together — the scrim exists only
    * to keep the label legible, so without a label it is just a dark wash over a
@@ -95,7 +95,6 @@ export function MomentTile({
   initialsSize,
   labelSize,
   labelInset,
-  scrimStop,
   labelled = true,
   autoplayGroup = 'moments-page',
   autoplay = true,
@@ -238,7 +237,7 @@ export function MomentTile({
             style={{
               position: 'absolute',
               inset: 0,
-              background: `linear-gradient(0deg, rgba(10,14,10,0.6) 0%, rgba(10,14,10,0) ${scrimStop})`,
+              background: SCRIM_STANDOUT,
             }}
           />
         )}
