@@ -927,7 +927,8 @@
     "reviews": {
       "ratedChip": "Rated",
       "someone": "A member",
-      "sheetCaption": "{{count}} reviews"
+      "sheetCaption": "{{count}} reviews",
+      "featured": "Featured"
     },
     "prompt": {
       "whenPlayed": "Played {{when}}",
