@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import type { CommunityCreator } from './hooks/useCommunityCreators';
-import { SCRIM_STANDOUT } from './photoScrim';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 /**
  * CREATOR CARD — "B, frame overlay" (BRIEF_COMMUNITY_CREATOR_CARDS).

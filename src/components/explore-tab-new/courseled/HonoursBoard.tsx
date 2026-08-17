@@ -6,7 +6,7 @@ import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import { A, CARD_SHELL, KICKER, LABEL, NUMF, SANS } from './tokens';
-import { SCRIM_STANDOUT } from './photoScrim';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { CourseImageFallback } from './CourseImageFallback';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 

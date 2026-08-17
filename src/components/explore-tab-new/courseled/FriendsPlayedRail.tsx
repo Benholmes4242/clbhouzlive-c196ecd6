@@ -18,7 +18,7 @@ import {
 } from '../friendRoundParts';
 import { CourseImageFallback } from './CourseImageFallback';
 import { relativeDay } from './discoverWhen';
-import { SCRIM_STANDOUT } from './photoScrim';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';

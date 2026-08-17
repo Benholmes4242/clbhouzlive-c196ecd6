@@ -8,7 +8,7 @@ import { ShortlistGlassAction } from './ShortlistGlassAction';
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { A, KICKER, NUMF, SANS } from './tokens';
-import { SCRIM_STANDOUT } from './photoScrim';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**

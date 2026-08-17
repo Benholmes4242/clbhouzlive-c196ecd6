@@ -19,7 +19,7 @@ import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
  * passes nothing for it, so its tiles are byte-identical to before.
  */
 
-import { SCRIM_STANDOUT } from './photoScrim';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 /** The tile scrim, held once in ./photoScrim and shared with the photo rails. */
 export const TILE_SCRIM = SCRIM_STANDOUT;
