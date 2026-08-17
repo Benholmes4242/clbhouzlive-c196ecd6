@@ -2,8 +2,43 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { ReviewTile, reviewTier } from './ReviewTile';
+import { ReviewTile, reviewTier, REVIEW_TILE_HEIGHT } from './ReviewTile';
+import { splitMasonry } from './AroundTheWorld';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+
+/**
+ * DETERMINISTIC tile-height estimate for the masonry walk (§3.1) — a pure
+ * function of the review row, no DOM measurement, no refs, no reflow.
+ *
+ * THE BRIEF'S §3.2 IS WRONG ABOUT ONE THING, and it is the thing it flags as
+ * the risk: the course name and byline are NOT stacked beneath the photo, they
+ * are absolutely positioned INSIDE it (ReviewTile's bottom block), and the
+ * photo is a fixed REVIEW_TILE_HEIGHT. So the name's length contributes ZERO
+ * height and there is no wrap threshold to guess. What actually varies is the
+ * breakdown block, and it varies exactly:
+ *
+ *   BARS     padding 8 + 9, each SubScoreBar row 11 (10px label / 11px figure /
+ *            3px track, all lineHeight 1), rowGap 6  ->  17 + 11n + 6(n-1)
+ *   COMPACT  padding 9 + 10, figure 14, label 4 + 7  ->  44
+ *   NO SCORED CATEGORIES  no block at all, no gap     ->  0
+ *
+ * A featured review renders as BARS in this sheet (§4.1), so the quote block
+ * and the taller featured photo never appear here and are not billed.
+ */
+function estimateReviewTileHeight(r: LatestReview): number {
+  const scored = [
+    r.breakdown?.design,
+    r.breakdown?.conditions,
+    r.breakdown?.clubhouse,
+    r.breakdown?.facilities,
+  ].filter((v) => v != null && !Number.isNaN(Number(v))).length;
+
+  if (scored === 0) return REVIEW_TILE_HEIGHT;
+  const compact = reviewTier(r) === 'compact';
+  const block = compact ? 44 : 17 + 11 * scored + 6 * (scored - 1);
+  return REVIEW_TILE_HEIGHT + block;
+}
+
 
 import { A, KICKER, SANS, FIGS } from './tokens';
 import type { LatestReview } from './hooks/useLatestReviews';
@@ -92,6 +127,15 @@ export function LatestReviewsSheet({
     () => (region === 'all' ? reviews : reviews.filter((r) => regionOf(r) === region)),
     [reviews, region],
   );
+
+  /* MASONRY PLACEMENT (BRIEF_REVIEWS_SHEET_MASONRY §2). Two columns, each tile
+     dropped into whichever is currently shorter, order preserved down the left
+     then the right. splitMasonry is the shipped helper — no second copy. */
+  const { columns: reviewColumns } = useMemo(
+    () => splitMasonry(visible, (r) => estimateReviewTileHeight(r)),
+    [visible],
+  );
+
 
   // REACTIONS — one read for the loaded page set, keyed by review id.
   const reactionTargets = useMemo<ReactionTarget[]>(
@@ -244,34 +288,41 @@ export function LatestReviewsSheet({
              recurring full-bleed tile would break the scan, and a quote on
              every other tile stops being a reward. Compact still applies, so
              the sheet keeps the same rhythm the section has. */
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              alignItems: 'start',
-              gap: 8,
-            }}
-          >
-            {visible.map((r) => {
-              const st = reactions.stateFor('review', r.reviewId);
-              const own = !!viewerId && r.userId === viewerId;
-              return (
-                <ReviewTile
-                  key={r.reviewId}
-                  review={r}
-                  isOwn={own}
-                  autoplayGroup="reviews-sheet"
-                  tier={reviewTier(r) === 'compact' ? 'compact' : 'bars'}
-                  onPress={onTilePress}
-                  reactionHidden={!reactions.viewerId || reactions.unavailable}
-                  reactionReadOnly={own}
-                  reactionCount={st.count}
-                  reacted={st.mine}
-                  onToggleReaction={() => reactions.toggle('review', r.reviewId)}
-                />
-              );
-            })}
+          /* COLUMN-FLOW MASONRY, NOT A CSS GRID (BRIEF_REVIEWS_SHEET_MASONRY).
+             A grid lays out in ROWS and every row is as tall as its tallest
+             item, so a compact tile beside a bars tile left dead space beneath
+             it. splitMasonry places each tile in whichever column is currently
+             shorter — the same helper Standout Rounds and Personal Bests use.
+             The masonry PLACES, it does not re-rank. */
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+            {reviewColumns.map((col, ci) => (
+              <div
+                key={ci}
+                style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}
+              >
+                {col.map((r) => {
+                  const st = reactions.stateFor('review', r.reviewId);
+                  const own = !!viewerId && r.userId === viewerId;
+                  return (
+                    <ReviewTile
+                      key={r.reviewId}
+                      review={r}
+                      isOwn={own}
+                      autoplayGroup="reviews-sheet"
+                      tier={reviewTier(r) === 'compact' ? 'compact' : 'bars'}
+                      onPress={onTilePress}
+                      reactionHidden={!reactions.viewerId || reactions.unavailable}
+                      reactionReadOnly={own}
+                      reactionCount={st.count}
+                      reacted={st.mine}
+                      onToggleReaction={() => reactions.toggle('review', r.reviewId)}
+                    />
+                  );
+                })}
+              </div>
+            ))}
           </div>
+
         )}
 
         <div ref={sentinel} aria-hidden style={{ height: 24 }} />
