@@ -21,7 +21,6 @@ import { formatWeekdayShortGB, formatMonthShortGB } from '@/i18n/format';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
@@ -53,7 +52,6 @@ export const RoundDetailSheet: React.FC<Props> = ({
   open, onClose, scoreId, handicapDelta, profileUserId,
 }) => {
   const navigate = useNavigate();
-  const { resolve } = useMemberTapResolver();
   const { user } = useSupabaseSession();
   const openPostStudioForCourse = usePostStudioStore((st) => st.openPostStudioForCourse);
   const userQuery = useRoundDetail(scoreId, open);
