@@ -1108,11 +1108,17 @@ export function AroundTheWorld({
            * group renders nothing at all; the one-group rule below still drops
            * the heading when only one group survives.
            */
+          const heroGroupId = groupIdFor(hero.kind);
           const buckets = FEAT_GROUPS.map((def) => ({
             id: def.id,
             label: t(def.key, def.label),
             items: rest.filter((tt) => groupIdFor(tt.kind) === def.id),
-          })).filter((b) => b.items.length > 0);
+          }))
+            /* The hero's group survives even when the hero is its only tile. */
+            .filter((b) => b.items.length > 0 || b.id === heroGroupId)
+            /* §2.3: THE GROUP HOLDING THE HERO IS PROMOTED TO FIRST; the others
+               keep their relative order beneath it. */
+            .sort((a, b) => (a.id === heroGroupId ? -1 : b.id === heroGroupId ? 1 : 0));
 
 
           /**
@@ -1138,16 +1144,22 @@ export function AroundTheWorld({
            * surviving group runs full width — and only when that group still
            * holds MORE THAN TWO tiles after the pull, so a group is never left
            * as one wide tile and a single column.
+           *
+           * §4.2: the hero's group is always buckets[0] after promotion, so the
+           * second wide tile can never land in the hero's group — no group ever
+           * carries two full-width tiles.
            */
           const secondGroup = buckets[1];
           const wide =
             secondGroup && secondGroup.items.length - 1 > 2 ? secondGroup.items[0] : null;
 
+          /* §3.3: the kicker only survives when NO heading sits above the hero,
+             i.e. the one-group case where headings are dropped. */
+          const heroKicker = buckets.length === 1;
+
           return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {/* THE HERO — full width, photo 214, member and headline in the
-                  footer row beneath the photograph. */}
-              {photoTile(hero, { photo: HERO_PHOTO, hero: true })}
+
 
               {buckets.map((b, bi) => {
                 const isWide = (tt: Tile) => wide != null && tt.slotKey === wide.slotKey;
