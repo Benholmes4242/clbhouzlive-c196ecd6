@@ -20,7 +20,13 @@ import { CourseNewsSheet, type CourseNewsEntry } from './CourseNewsSheet';
 import { ShortlistGlassAction } from './ShortlistGlassAction';
 
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
-import { createMasonryAssignment, placeStable, rememberColumns } from './stableMasonry';
+import {
+  createMasonryAssignment,
+  placeStable,
+  rememberColumns,
+  type MasonryAssignment,
+} from './stableMasonry';
+import { CompactStandoutTile, estimateCompactHeight } from './CompactStandoutTile';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW_ROW_BAR, NUMF, SANS, SCRIM_STRONG } from './tokens';
 import { StandoutTile } from './StandoutTile';
 
@@ -182,6 +188,62 @@ export function splitMasonry<T>(items: T[], heightOf: (item: T, index: number) =
  * Eagles no longer reach this section, so they fall to the tail rather than
  * being given a rung of their own.
  */
+/**
+ * THE THREE GROUPS (BRIEF_FEAT_SECTIONS_HIERARCHY §1.5), in the order the brief
+ * fixes them. Anything not named falls to personal milestones, which is also
+ * where a rating-only tile lands — it has no feat kind at all.
+ *
+ * KNOWN AND ACCEPTED: the order is the brief's, not strictly rarity-descending,
+ * because an ace is rarer than a course record and sits in "Firsts here". The
+ * rarest feat on the page is lifted out as the HERO regardless (§1.2), so the
+ * rarest thing is never buried by this ordering.
+ */
+const FEAT_GROUPS = [
+  { id: 'records', kinds: ['crown'], key: 'discover.feat.group.records', label: 'Course records' },
+  {
+    id: 'firsts',
+    kinds: ['ace', 'albatross', 'bogey_free'],
+    key: 'discover.feat.group.firsts',
+    label: 'Firsts here',
+  },
+  {
+    id: 'milestones',
+    kinds: ['under_par', 'birdie_haul'],
+    key: 'discover.feat.group.milestones',
+    label: 'Personal milestones',
+  },
+] as const;
+
+function groupIdFor(kind: string | null): string {
+  for (const g of FEAT_GROUPS) if (kind && (g.kinds as readonly string[]).includes(kind)) return g.id;
+  return 'milestones';
+}
+
+/**
+ * THE FEAT KIND, NAMED (§1.3). Used by the hero kicker only — the tiles carry
+ * the wording in their detail line as before.
+ */
+const KIND_LABELS: Record<string, { key: string; label: string }> = {
+  ace: { key: 'discover.feat.kind.ace', label: 'Hole in one' },
+  albatross: { key: 'discover.feat.kind.albatross', label: 'Albatross' },
+  crown: { key: 'discover.feat.kind.crown', label: 'Course record' },
+  bogey_free: { key: 'discover.feat.kind.bogeyFree', label: 'Bogey-free round' },
+  under_par: { key: 'discover.feat.kind.underPar', label: 'Round under par' },
+  birdie_haul: { key: 'discover.feat.kind.birdieHaul', label: 'Birdie haul' },
+};
+
+/**
+ * THE TWO LEAST-RARE KINDS RENDER COMPACT (§1.7) — a round under par and a
+ * birdie haul are the floor of this section's scale, and a photograph on each is
+ * what made eight tiles read as wallpaper. A rating-only tile has no feat at all
+ * and follows the floor.
+ */
+const COMPACT_KINDS = new Set(['under_par', 'birdie_haul']);
+
+/** HERO GEOMETRY (§1.1) and the second wide tile (§1.9). */
+const HERO_PHOTO = 214;
+const WIDE_PHOTO = 168;
+
 function notability(e: WireEvent | undefined): number {
   switch (e?.kind) {
     case 'ace':
@@ -349,6 +411,13 @@ export function AroundTheWorld({
    * new events; it must not move tiles the member has already seen.
    */
   const masonry = useRef(createMasonryAssignment());
+  /**
+   * ONE COLUMN MEMORY PER GROUP (§1.5 with §4 of the refresh policy). The
+   * section is now several masonries, and `placeStable` rewrites its map from
+   * what it was given — so a single shared assignment would have each group
+   * erase the others' columns on every render.
+   */
+  const groupMasonry = useRef(new Map<string, MasonryAssignment>());
   const openReview = useReviewSheetStore((st) => st.open);
 
   const groups = useMemo<CourseGroup[]>(() => {
@@ -871,6 +940,9 @@ export function AroundTheWorld({
               g,
               m,
               slotKey,
+              kind: top?.kind ?? null,
+              at: top?.at ?? g.at,
+              rarity: notability(top),
               photo,
               tall,
               figure,
@@ -890,107 +962,256 @@ export function AroundTheWorld({
             };
           });
 
-          // Existing tiles hold the column they were given; only tiles new to
-          // this session are placed greedily. The de-clash pass may still swap
-          // a pair to keep two tiles of one course off consecutive rows, and
-          // the result is remembered so the repair itself never churns again.
-          const { columns } = (() => {
-            const placed = placeStable(tiles, masonry.current);
-            const declashed = deClashColumns(placed.columns);
-            rememberColumns(declashed.columns, masonry.current);
-            return declashed;
-          })();
+          type Tile = (typeof tiles)[number];
 
+          const detailOf = (tt: Tile) =>
+            /* ONE FACT, ONCE: where the chip carries the whole fact the line is
+               omitted — unless there is no name, in which case the wording IS
+               the title. */
+            tt.detailShown ? tt.detail : tt.who ? '' : tt.detail;
 
-          return (
-            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-              {columns.map((col, ci) => (
-                <div
-                  key={ci}
-                  style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}
-                >
-                  {col.map((tt) => {
-                    const { g, m } = tt;
+          const pressOf = (tt: Tile) => () => {
+            /* THE TAP OPENS THE ROUND (BRIEF_STANDOUT_TILE_TAP_AND_MORE §2). A
+               feat without a score id — a rating-only tile — falls back to the
+               course page rather than rendering a tile that does nothing. */
+            if (onFeatPress && tt.scoreId) {
+              analyticsEvents.track('discover_world_tile_tap', {
+                source: 'around_the_world',
+                /* BACKFILL MARKER (BRIEF_STANDOUT_ROUNDS_BACKFILL §4): priority
+                   3 means the tile arrived from the worldwide pool. */
+                backfilled: priorityFor ? priorityFor(tt.g.courseId) === 3 : false,
+              });
+              onFeatPress(tt.scoreId, tt.ownerId);
+              return;
+            }
+            onCoursePress(tt.g.courseId);
+          };
+
+          /* FIXED-WIDTH TRAILING SLOT — rendered whether or not a control
+             appears, so names never go ragged between a tile with a reaction and
+             one without. */
+          const trailingOf = (tt: Tile) => (
+            <ReactionSlot>
+              {tt.reactTo
+                ? (() => {
+                    const st = reactions.stateFor(tt.reactTo.type, tt.reactTo.id);
                     return (
-                      <StandoutTile
-                        key={tt.slotKey}
-                        courseId={g.courseId}
-                        courseName={m?.name ?? g.courseName ?? t('discover.unknownCourse', 'Course')}
-                        imageUrl={m?.imageUrl ?? g.courseImage}
-                        region={m?.region ?? null}
-                        photo={tt.photo}
-                        figure={tt.figure}
-                        unit={tt.unit}
-                        whenLabel={relativeWhen(g.at, t)}
-                        who={tt.who}
-                        isOwn={tt.isOwn}
-                        /* ONE FACT, ONCE: where the chip carries the whole fact the
-                           line is omitted — unless there is no name, in which case
-                           the wording IS the title. */
-                        detail={tt.detailShown ? tt.detail : tt.who ? '' : tt.detail}
-                        onDetailPress={tt.onPress}
-                        /* THE BENCHMARK, through the same `subline` slot Personal
-                           Bests uses for its reference_line. Verbatim; null
-                           renders nothing and bills nothing. */
-                        subline={tt.margin || null}
-                        isNew={isNewSince(g.at, lastSeen)}
-                        /* THE TAP OPENS THE ROUND (BRIEF_STANDOUT_TILE_TAP_AND_MORE
-                           §2). A feat without a score id — a rating-only tile —
-                           falls back to the course page rather than rendering a
-                           tile that does nothing. The course stays reachable from
-                           the scorecard sheet's own course link. */
-                        onPress={() => {
-                          if (onFeatPress && tt.scoreId) {
-                            analyticsEvents.track('discover_world_tile_tap', {
-                              source: 'around_the_world',
-                              /* BACKFILL MARKER (BRIEF_STANDOUT_ROUNDS_BACKFILL
-                                 §4): priority 3 means the tile arrived from the
-                                 worldwide pool, not from a course they know. */
-                              backfilled: priorityFor ? priorityFor(g.courseId) === 3 : false,
-                            });
-                            onFeatPress(tt.scoreId, tt.ownerId);
-                            return;
-                          }
-
-                          onCoursePress(g.courseId);
-                        }}
-                        trailing={
-                          /* FIXED-WIDTH TRAILING SLOT — rendered whether or not a
-                             control appears, so names never go ragged between a tile
-                             with a reaction and one without. */
-                          <ReactionSlot>
-                            {tt.reactTo
-                              ? (() => {
-                                  const st = reactions.stateFor(tt.reactTo.type, tt.reactTo.id);
-                                  return (
-                                    <ReactionAction
-                                      hidden={!reactions.viewerId || reactions.unavailable}
-                                      readOnly={tt.isOwn}
-                                      count={st.count}
-                                      reacted={st.mine}
-                                      /* The count column is reserved so the heart
-                                         itself lands on the same x down a column,
-                                         reacted or not (§5b). */
-                                      reserveCount
-                                      onToggle={() =>
-                                        reactions.toggle(tt.reactTo!.type, tt.reactTo!.id)
-                                      }
-                                      label={
-                                        tt.reactTo.type === 'round'
-                                          ? t('discover.reactions.action', 'Like this round')
-                                          : t('discover.reactions.actionReview', 'Like this review')
-                                      }
-                                    />
-                                  );
-                                })()
-                              : null}
-                          </ReactionSlot>
+                      <ReactionAction
+                        hidden={!reactions.viewerId || reactions.unavailable}
+                        readOnly={tt.isOwn}
+                        count={st.count}
+                        reacted={st.mine}
+                        /* The count column is reserved so the heart itself lands
+                           on the same x down a column, reacted or not (§5b). */
+                        reserveCount
+                        onToggle={() => reactions.toggle(tt.reactTo!.type, tt.reactTo!.id)}
+                        label={
+                          tt.reactTo.type === 'round'
+                            ? t('discover.reactions.action', 'Like this round')
+                            : t('discover.reactions.actionReview', 'Like this review')
                         }
                       />
                     );
-                  })}
-                </div>
-              ))}
+                  })()
+                : null}
+            </ReactionSlot>
+          );
+
+          const nameOf = (tt: Tile) =>
+            tt.m?.name ?? tt.g.courseName ?? t('discover.unknownCourse', 'Course');
+
+          const photoTile = (
+            tt: Tile,
+            opts?: { photo?: number; hero?: boolean },
+          ) => (
+            <StandoutTile
+              key={tt.slotKey}
+              courseId={tt.g.courseId}
+              courseName={nameOf(tt)}
+              imageUrl={tt.m?.imageUrl ?? tt.g.courseImage}
+              region={tt.m?.region ?? null}
+              photo={opts?.photo ?? tt.photo}
+              figure={tt.figure}
+              unit={tt.unit}
+              whenLabel={relativeWhen(tt.g.at, t)}
+              who={tt.who}
+              isOwn={tt.isOwn}
+              detail={detailOf(tt)}
+              onDetailPress={tt.onPress}
+              /* THE BENCHMARK, through the same `subline` slot Personal Bests
+                 uses for its reference_line. Verbatim; null renders nothing. */
+              subline={tt.margin || null}
+              isNew={isNewSince(tt.g.at, lastSeen)}
+              /* HERO ONLY: the feat kind names itself, the course name grows to
+                 21px and the figure chip takes its large size (§1.1, §1.3). */
+              kicker={
+                opts?.hero && tt.kind && KIND_LABELS[tt.kind]
+                  ? t(KIND_LABELS[tt.kind].key, KIND_LABELS[tt.kind].label)
+                  : null
+              }
+              nameSize={opts?.hero ? 21 : undefined}
+              chipScale={opts?.hero ? 'lg' : 'md'}
+              onPress={pressOf(tt)}
+              trailing={trailingOf(tt)}
+            />
+          );
+
+          const compactTile = (tt: Tile) => (
+            <CompactStandoutTile
+              key={tt.slotKey}
+              courseName={nameOf(tt)}
+              region={tt.m?.region ?? null}
+              figure={tt.figure}
+              unit={tt.unit}
+              whenLabel={relativeWhen(tt.g.at, t)}
+              who={tt.who}
+              isOwn={tt.isOwn}
+              detail={detailOf(tt)}
+              subline={tt.margin || null}
+              isNew={isNewSince(tt.g.at, lastSeen)}
+              onPress={pressOf(tt)}
+              trailing={trailingOf(tt)}
+            />
+          );
+
+          /**
+           * THE HERO (§1.1, §1.2): RARITY TIER FIRST, THEN MOST RECENT WITHIN
+           * IT. Not "the first tile" — rank order also carries the friends-first
+           * priority, so the top slot is frequently a birdie haul at a course
+           * the member knows while an ace sits third.
+           */
+          const hero = [...tiles].sort(
+            (a, b) => a.rarity - b.rarity || (a.at < b.at ? 1 : -1),
+          )[0];
+          const rest = tiles.filter((tt) => tt !== hero);
+
+          /**
+           * GROUPS (§1.5) in the brief's fixed order, then MERGED: a group of
+           * one is a heading with a single tile under it, which reads as a
+           * mistake. Ones fold DOWNWARD into the next surviving group, and a
+           * trailing one folds back upward.
+           */
+          const buckets = FEAT_GROUPS.map((def) => ({
+            id: def.id,
+            label: t(def.key, def.label),
+            items: rest.filter((tt) => groupIdFor(tt.kind) === def.id),
+          })).filter((b) => b.items.length > 0);
+
+          for (let guard = 0; guard < FEAT_GROUPS.length && buckets.length > 1; guard += 1) {
+            const i = buckets.findIndex((b) => b.items.length < 2);
+            if (i < 0) break;
+            if (i < buckets.length - 1) buckets[i + 1].items.unshift(...buckets[i].items);
+            else buckets[i - 1].items.push(...buckets[i].items);
+            buckets.splice(i, 1);
+          }
+
+          /**
+           * A REPEATED COURSE LOSES ITS PHOTO (§1.8), decided in RENDER order —
+           * hero first, then group by group — so the tile the member sees first
+           * is the one that keeps the photograph. §1.7 applies on top: the two
+           * least-rare kinds are compact wherever they sit.
+           */
+          const seenCourses = new Set<string>([hero.g.courseId]);
+          const compactKeys = new Set<string>();
+          for (const b of buckets) {
+            for (const tt of b.items) {
+              const repeated = seenCourses.has(tt.g.courseId);
+              seenCourses.add(tt.g.courseId);
+              if (repeated || COMPACT_KINDS.has(tt.kind ?? '') || !tt.kind) {
+                compactKeys.add(tt.slotKey);
+              }
+            }
+          }
+
+          /**
+           * A SECOND WIDE TILE further down (§1.9): the first tile of the SECOND
+           * surviving group runs full width — and only when that group still
+           * holds MORE THAN TWO tiles after the pull, so a group is never left
+           * as one wide tile and a single column.
+           */
+          const secondGroup = buckets[1];
+          const wide =
+            secondGroup && secondGroup.items.length - 1 > 2 ? secondGroup.items[0] : null;
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {/* THE HERO — full width, photo 214, member and headline in the
+                  footer row beneath the photograph. */}
+              {photoTile(hero, { photo: HERO_PHOTO, hero: true })}
+
+              {buckets.map((b, bi) => {
+                const isWide = (tt: Tile) => wide != null && tt.slotKey === wide.slotKey;
+                const laid = b.items
+                  .filter((tt) => !isWide(tt))
+                  .map((tt) => {
+                    const compact = compactKeys.has(tt.slotKey);
+                    return {
+                      ...tt,
+                      compact,
+                      /* EVERY SHAPE BRINGS ITS OWN ESTIMATE (§0.1). */
+                      height: compact
+                        ? estimateCompactHeight(detailOf(tt), tt.margin || '')
+                        : tt.height,
+                    };
+                  });
+
+                // Existing tiles hold the column they were given; only tiles new
+                // to this session are placed greedily. The de-clash pass may
+                // still swap a pair to keep two tiles of one course off
+                // consecutive rows, and the result is remembered so the repair
+                // itself never churns again.
+                let asg = groupMasonry.current.get(b.id);
+                if (!asg) {
+                  asg = createMasonryAssignment();
+                  groupMasonry.current.set(b.id, asg);
+                }
+                const placed = placeStable(laid, asg);
+                const declashed = deClashColumns(placed.columns);
+                rememberColumns(declashed.columns, asg);
+
+                return (
+                  <div key={b.id}>
+                    {/* A single surviving group needs no heading — the section
+                        eyebrow already says what it is. */}
+                    {buckets.length > 1 ? (
+                      <div
+                        style={{
+                          ...LABEL,
+                          fontSize: 9,
+                          color: A.MUTE,
+                          padding: '0 2px',
+                          marginBottom: 8,
+                        }}
+                      >
+                        {b.label}
+                      </div>
+                    ) : null}
+
+                    {wide && bi === 1 ? (
+                      <div style={{ marginBottom: 8 }}>
+                        {photoTile(wide, { photo: WIDE_PHOTO })}
+                      </div>
+                    ) : null}
+
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                      {declashed.columns.map((col, ci) => (
+                        <div
+                          key={ci}
+                          style={{
+                            flex: 1,
+                            minWidth: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 8,
+                          }}
+                        >
+                          {col.map((tt) => (tt.compact ? compactTile(tt) : photoTile(tt)))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           );
         })()}

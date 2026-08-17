@@ -1492,6 +1492,25 @@
       "expandFeats": "[{{count}} more]",
       "expandFeats_one": "[{{count}} more]",
       "collapseFeats": "[Less]"
+    },
+    "feat": {
+      "group": {
+        "records": "[Çöûrsé récörds ]",
+        "firsts": "[Fírsts hére ]",
+        "milestones": "[Pérsönál mílestönés ]"
+      },
+      "kind": {
+        "ace": "[Hölé ín öné ]",
+        "albatross": "[Álbátröss ]",
+        "crown": "[Çöûrsé récörd ]",
+        "bogeyFree": "[Bögéy-frée röûnd ]",
+        "underPar": "[Röûnd ûndér pár ]",
+        "birdieHaul": "[Bírdíé háûl ]"
+      }
+    },
+    "pb": {
+      "afterRounds": "[Áftér {{count}} röûnds ]",
+      "gain": "[{{count}} béttér thán béföré ]"
     }
   },
   "statBrowse": {

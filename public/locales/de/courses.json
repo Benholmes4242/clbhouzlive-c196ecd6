@@ -1055,6 +1055,25 @@
       "expandFeats": "{{count}} weitere",
       "expandFeats_one": "{{count}} weiterer",
       "collapseFeats": "Weniger"
+    },
+    "feat": {
+      "group": {
+        "records": "Platzrekorde",
+        "firsts": "Erstmals hier",
+        "milestones": "Persönliche Meilensteine"
+      },
+      "kind": {
+        "ace": "Hole in One",
+        "albatross": "Albatros",
+        "crown": "Platzrekord",
+        "bogeyFree": "Bogeyfreie Runde",
+        "underPar": "Runde unter Par",
+        "birdieHaul": "Birdie-Serie"
+      }
+    },
+    "pb": {
+      "afterRounds": "Nach {{count}} Runden",
+      "gain": "{{count}} besser als zuvor"
     }
   },
   "statBrowse": {

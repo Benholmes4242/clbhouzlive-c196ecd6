@@ -1001,6 +1001,25 @@
       "expandFeats": "{{count}}개 더",
       "expandFeats_one": "{{count}}개 더",
       "collapseFeats": "접기"
+    },
+    "feat": {
+      "group": {
+        "records": "코스 레코드",
+        "firsts": "이곳에서 처음",
+        "milestones": "개인 이정표"
+      },
+      "kind": {
+        "ace": "홀인원",
+        "albatross": "알바트로스",
+        "crown": "코스 레코드",
+        "bogeyFree": "보기 없는 라운드",
+        "underPar": "언더파 라운드",
+        "birdieHaul": "버디 러시"
+      }
+    },
+    "pb": {
+      "afterRounds": "{{count}}라운드 만에",
+      "gain": "이전보다 {{count}} 향상"
     }
   },
   "statBrowse": {
