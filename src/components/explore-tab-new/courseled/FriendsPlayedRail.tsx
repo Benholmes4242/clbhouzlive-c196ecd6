@@ -27,6 +27,7 @@ import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { monotonePath } from '@/lib/charts/monotonePath';
 import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SANS } from './tokens';
 
@@ -264,6 +265,20 @@ function RoundShape({ row, shape }: { row: CircleRoundRow; shape: HoleShape | nu
               <stop offset="100%" stopColor={UNDER_TONE} stopOpacity={0.03} />
             </linearGradient>
           )}
+          {strokeStops && (
+            <linearGradient
+              id={gradStroke}
+              gradientUnits="userSpaceOnUse"
+              x1={0}
+              y1={0}
+              x2={CARD_W}
+              y2={0}
+            >
+              {strokeStops.map((st, i) => (
+                <stop key={i} offset={`${(st.offset * 100).toFixed(4)}%`} stopColor={st.color} />
+              ))}
+            </linearGradient>
+          )}
         </defs>
 
         {wentUnder ? (
@@ -305,7 +320,19 @@ function RoundShape({ row, shape }: { row: CircleRoundRow; shape: HoleShape | nu
           vectorEffect="non-scaling-stroke"
         />
 
-        {wentUnder ? (
+        {strokeStops ? (
+          /* ONE path, graded hole by hole. No clip split is needed: the colour
+             already says where the round was good, and stacking a level-par
+             split on top of a heat gradient would double-encode it. */
+          <path
+            d={d}
+            fill="none"
+            stroke={`url(#${gradStroke})`}
+            strokeWidth={2.4}
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : wentUnder ? (
           <>
             <g clipPath={`url(#${clipAbove})`}>
               <path
