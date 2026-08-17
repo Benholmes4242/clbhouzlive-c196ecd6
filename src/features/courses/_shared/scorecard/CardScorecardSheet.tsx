@@ -265,10 +265,13 @@ const Legend: React.FC = () => {
   ];
   return (
     <div>
-      <div style={{ ...LABEL, fontSize: 8, color: A.INK, marginBottom: 8 }}>
+      {/* THE KEY IS CENTRED UNDER THE CARD (BRIEF_SCORECARD_CHART_ALIGNMENT §4).
+          Centre justification also centres the fifth item ("Double+") under the
+          four that wrapped above it, instead of leaving it hanging left. */}
+      <div style={{ ...LABEL, fontSize: 8, color: A.INK, marginBottom: 8, textAlign: 'center' }}>
         {t('courses:holes.scoringKey.title')}
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 16, rowGap: 10, flexWrap: 'wrap' }}>
         {keys.map((k) => (
           <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
             <ScoreMark strokes={k.strokes} par={4} size={22} surface="light" />
@@ -839,19 +842,21 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 </div>
 
                 {/*
-                  FULL BLEED (BRIEF_SCORECARD_TRAJECTORY_WHOOP §3): the plot must
-                  reach the card edges, so the chart breaks out of the Panel's
-                  16px horizontal padding. The value row and the tick row keep the
-                  inset — they carry it themselves.
+                  THE PLOT SITS IN THE TEXT COLUMN (BRIEF_SCORECARD_CHART_ALIGNMENT
+                  §1). This SUPERSEDES the full-bleed decision of
+                  BRIEF_SCORECARD_TRAJECTORY_WHOOP §3: the chart no longer breaks
+                  out of the Panel's 16px padding, so its left edge lands under the
+                  "H" of "How it unfolded" and its right edge under the chevron of
+                  "Full scorecard ›". One column, one x-scale — which is also what
+                  fixed the uneven tick spacing (§3): the tick row was remapping x
+                  against a plot 32px wider than itself.
 
                   The chart legend row that used to sit here is GONE (§8): the
                   field key had nothing left to point at once the field line was
                   removed, and a single-colour swatch cannot represent a stroke
                   graded per hole.
                 */}
-                <div style={{ margin: '0 -16px' }}>
-                  <TrajectoryLine holes={holes} interactive />
-                </div>
+                <TrajectoryLine holes={holes} interactive />
 
 
                 {(captions.length > 0 || fieldCaption) && (
