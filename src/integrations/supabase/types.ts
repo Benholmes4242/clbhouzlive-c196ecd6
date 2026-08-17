@@ -19887,6 +19887,7 @@ export type Database = {
           rarity: number
           reference_line: string
           region: string
+          second_figure: number
           user_id: string
           whs_score_id: string
         }[]
