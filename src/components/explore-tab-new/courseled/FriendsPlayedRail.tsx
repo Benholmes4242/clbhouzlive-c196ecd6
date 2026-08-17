@@ -157,6 +157,26 @@ function RoundShape({ row, shape }: { row: CircleRoundRow; shape: HoleShape | nu
 
   if (!values || values.length < 2) return null;
 
+  /* ONE CHART, THREE SURFACES. When the hole-by-hole data is present the tile
+     renders THE SAME TrajectoryLine the Clubhouse scorecard post and the
+     scorecard sheet render — same grades, same fill, same bead filter, same
+     halo — instead of a look-alike maintained here. Ticks are suppressed: the
+     band is 34px and carries its own meta row. */
+  if (shape) {
+    return (
+      <>
+        <TrajectoryLine
+          holes={shape.holes}
+          height={SHAPE_H}
+          surface="light"
+          showTicks={false}
+        />
+        <ShapeMeta birdies={birdies} />
+      </>
+    );
+  }
+
+
   // A round that never went under par gets NO red treatment. The cumulative
   // series STARTS at level by construction, so zero is already in the domain;
   // the old clamp only added a dead pink band below it.
