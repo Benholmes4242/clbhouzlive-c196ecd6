@@ -545,11 +545,15 @@ const TickRow: React.FC<{
           style={{
             position: 'absolute',
             /* The plot is FULL BLEED while this row keeps its 16px inset, so an
-               inset label resolves its x against the plot's width, not the row's. */
-            left: inset
+               inset label resolves its x against the plot's width, not the
+               row's — EXCEPT at the two edges. The last hole sits at the plot's
+               right edge, which is 16px OUTSIDE this row, so resolving it that
+               way hung "18" off the card. The edge labels pin to the row. */
+            left: edgeLeft ? 0 : edgeRight ? '100%' : inset
               ? `calc((100% + 32px) * ${frac.toFixed(5)} - 16px)`
               : `${(frac * 100).toFixed(3)}%`,
             transform: edgeLeft ? 'none' : edgeRight ? 'translateX(-100%)' : 'translateX(-50%)',
+
             ...LABEL,
             ...FIGS,
             fontSize: 8.5,
