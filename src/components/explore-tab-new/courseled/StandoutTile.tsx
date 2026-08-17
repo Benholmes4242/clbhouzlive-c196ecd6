@@ -89,6 +89,16 @@ interface Props {
    * previous best is beaten, so the delta is always positive (§5.7).
    */
   delta?: number | null;
+  /**
+   * THE WAIT (BRIEF_FEAT_SECOND_FIGURE §1.2, §3.3) — the rounds a first-ever
+   * feat took, drawn in the same chip slot as a delta but in WHITE, never
+   * green: nothing was beaten, so there is no "better" to report. Mutually
+   * exclusive with `delta` — a chip holds one second figure.
+   */
+  wait?: number | null;
+  /** The small-caps word before the wait ("After"), already localised. */
+  waitLabel?: string | null;
+
   /** New-since ring. */
   isNew?: boolean;
   onPress?: () => void;
