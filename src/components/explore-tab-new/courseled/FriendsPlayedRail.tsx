@@ -176,7 +176,7 @@ function RoundShape({ row, shape }: { row: CircleRoundRow; shape: HoleShape | nu
           height={SHAPE_H}
           surface="light"
           showTicks={false}
-          padY={2}
+          padY={1}
         />
         <ShapeMeta birdies={birdies} />
       </>
