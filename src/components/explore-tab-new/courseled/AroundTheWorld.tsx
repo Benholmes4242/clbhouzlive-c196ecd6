@@ -1209,6 +1209,19 @@ export function AroundTheWorld({
                       </div>
                     ) : null}
 
+                    {/* THE HERO (§1.1) — first and largest tile of its OWN
+                        group, above that group's masonry. */}
+                    {b.id === heroGroupId ? (
+                      <div style={{ marginBottom: 8 }}>
+                        {photoTile(hero, {
+                          photo: HERO_PHOTO,
+                          hero: true,
+                          showKicker: heroKicker,
+                        })}
+                      </div>
+                    ) : null}
+
+
                     {wide && bi === 1 ? (
                       <div style={{ marginBottom: 8 }}>
                         {photoTile(wide, { photo: WIDE_PHOTO })}
