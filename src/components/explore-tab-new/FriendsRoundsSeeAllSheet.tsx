@@ -3,13 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { FriendRoundRow } from './FriendRoundRow';
 import { buildInsightMap, referenceLine } from './friendRoundParts';
-import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
+import { relativeDay } from './courseled/discoverWhen';
+import { useRoundHoleShapes } from './courseled/hooks/useRoundHoleShapes';
+import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const SLATE_50 = '#F8FAFC';
 const INK = '#0F172A';
 const EYEBROW_INK = '#0E1216';
+const SLATE_400 = '#94A3B8';
 const HAIRLINE = '#E2E8F0';
 
 interface Props {
@@ -32,6 +35,25 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
   const total = rounds?.length ?? 0;
   // Insight resolution spans the whole list so one kind cannot flood the sheet.
   const insights = useMemo(() => buildInsightMap(rounds ?? [], t as never), [rounds, t]);
+
+  /* ONE BATCHED HOLE-SHAPE READ FOR THE WHOLE SHEET (§1.2). Thirty rows asking
+     for their own shape would be thirty round trips. */
+  const scoreIds = useMemo(() => (rounds ?? []).map((r) => r.score_id), [rounds]);
+  const holeShapes = useRoundHoleShapes(scoreIds);
+
+  /* GROUPED BY CALENDAR DAY of play_date, most recent first, order within a day
+     untouched (§2.4). The label comes from the ONE Discover relative-day helper
+     — beyond a week it reads "Last week" then "3w ago". */
+  const days = useMemo(() => {
+    const map = new Map<string, CircleRoundRow[]>();
+    for (const r of rounds ?? []) {
+      const key = String(r.play_date ?? '').slice(0, 10);
+      const list = map.get(key);
+      if (list) list.push(r);
+      else map.set(key, [r]);
+    }
+    return [...map.entries()].sort((a, b) => (a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : 0));
+  }, [rounds]);
 
   return (
     <BottomSheet
@@ -84,22 +106,58 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
           background: SLATE_50,
         }}
       >
-        {rounds && rounds.length > 0 ? (
-          rounds.map((r, i) => (
-            <FriendRoundRow
-              key={r.round_id}
-              row={r}
-              insight={insights.get(r.round_id)?.text ?? referenceLine(r, t)}
-              isLast={i === rounds.length - 1}
-              onPress={() => {
-                // Do NOT close the sheet — leaving it mounted beneath the
-                // scorecard lets the user return to their scroll position on
-                // dismiss. Matches TierSeeAllSheet.tsx.
-                onRowPress(r.score_id, r.user_id);
-              }}
-            />
-          ))
+        {days.length > 0 ? (
+          days.map(([key, list], dayIdx) => (
+            <div key={key || `day-${dayIdx}`}>
+              {/* STICKY DAY HEADER, carrying that day's round count (§2.1–2.2).
+                  It needs the sheet canvas as its own background or rows show
+                  through as they pass beneath (§4.2). */}
+              <div
+                style={{
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 1,
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  padding: '8px 16px 7px',
+                  background: SLATE_50,
+                  borderBottom: `1px solid ${HAIRLINE}`,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.09em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                <span style={{ color: EYEBROW_INK }}>
+                  {key ? relativeDay(key, t as never, 'long') : ''}
+                </span>
+                <span className="tabular-nums" style={{ color: SLATE_400 }}>
+                  {list.length}{' '}
+                  {list.length === 1
+                    ? t('discover.friendsRounds.entrySingular', 'ROUND')
+                    : t('discover.friendsRounds.entryPlural', 'ROUNDS')}
+                </span>
+              </div>
 
+              {list.map((r, i) => (
+                <FriendRoundRow
+                  key={r.round_id}
+                  row={r}
+                  insight={insights.get(r.round_id)?.text ?? referenceLine(r, t)}
+                  shape={holeShapes?.get(r.score_id ?? '') ?? null}
+                  isLast={i === list.length - 1}
+                  onPress={() => {
+                    // Do NOT close the sheet — leaving it mounted beneath the
+                    // scorecard lets the user return to their scroll position on
+                    // dismiss. Matches TierSeeAllSheet.tsx.
+                    onRowPress(r.score_id, r.user_id);
+                  }}
+                />
+              ))}
+            </div>
+          ))
         ) : (
           <div style={{ padding: '32px 16px', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
             {t('discover.friendsRounds.empty', 'No recent friend rounds yet.')}
