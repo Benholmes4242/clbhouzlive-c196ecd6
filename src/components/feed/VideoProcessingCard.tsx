@@ -8,7 +8,6 @@
  */
 import React from 'react';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
-import { CHIP_GLASS_BG } from '@/styles/photoScrim';
 
 interface Props {
   /** Optional dim/overlay mode — sits over a poster in fullscreen. */
@@ -20,7 +19,8 @@ export const VideoProcessingCard: React.FC<Props> = ({ overlay = false }) => {
     <div
       className="absolute inset-0 flex flex-col items-center justify-center"
       style={{
-        background: overlay ? CHIP_GLASS_BG : '#0A0E14',
+        // A STATE WASH, not a chip — excluded from CHIP_GLASS.
+        background: overlay ? 'rgba(0,0,0,0.45)' : '#0A0E14',
         zIndex: overlay ? 2 : undefined,
       }}
       aria-live="polite"

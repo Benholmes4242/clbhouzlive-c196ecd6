@@ -4,7 +4,7 @@ import { Loader2, AlertCircle } from 'lucide-react';
 import { useSignedUrl } from '@/hooks/messaging/useSignedUrl';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { MessageAttachment } from '@/types/messaging';
-import { CHIP_GLASS_BG } from '@/styles/photoScrim';
+import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 interface Props {
   attachment: MessageAttachment;
@@ -105,13 +105,13 @@ export const MessageImage: React.FC<Props> = ({ attachment, onOpen }) => {
 
       {uploading ? (
         <div
+          className={CHIP_GLASS_CLASS}
           style={{
             position: 'absolute',
             inset: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: CHIP_GLASS_BG,
             borderRadius: RADIUS,
           }}
         >

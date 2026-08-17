@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { formatFrostRating, splitCourseName } from '@/lib/frostPanel';
-import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
+import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 const FONTS = {
   sf: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -115,14 +115,13 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
     >
       {/* Verdict pill */}
       <div
+        className={CHIP_GLASS_CLASS}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
           gap: 7,
           padding: '5px 11px',
           borderRadius: 999,
-          background: CHIP_GLASS_BG,
-          border: CHIP_GLASS_BORDER,
           marginBottom: 11,
           fontFamily: FONTS.sf,
         }}
