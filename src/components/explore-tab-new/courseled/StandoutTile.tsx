@@ -419,7 +419,6 @@ export function StandoutTile({
             </>
           );
         })()}
-        ) : null}
 
         {footer}
       </div>
