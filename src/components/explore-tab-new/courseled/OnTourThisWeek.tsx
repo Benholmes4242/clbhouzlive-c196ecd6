@@ -151,14 +151,15 @@ function scoreColorOnGlass(score: number | null | undefined): string {
    blur-only version, which looks broken on the exact devices Ben's members
    use. Declared here only for the chips this section owns.                 */
 const GLASS_CSS = `
-.otw-chip { background: rgba(18,23,28,0.46); border: 1px solid rgba(255,255,255,0.28); }
+.otw-chip { background: rgba(24,30,26,0.62); border: 1px solid rgba(255,255,255,0.28); }
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .otw-chip {
-    background: rgba(255,255,255,0.17);
+    background: rgba(24,30,26,0.40);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     backdrop-filter: blur(16px) saturate(180%);
   }
 }
+
 `;
 
 /** A glass badge on the photograph. Condensed: 3/8 padding, radius 7. */
