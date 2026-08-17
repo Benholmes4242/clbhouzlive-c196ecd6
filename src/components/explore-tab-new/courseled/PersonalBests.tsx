@@ -71,7 +71,8 @@ export function PersonalBests({
   const budgetSource = heldCounts.current;
 
   /** Column memory, so a refetch never moves a tile the member has seen (§i). */
-  const masonry = useRef(createMasonryAssignment());
+  const masonry = useRef(new Map<string, MasonryAssignment>());
+
 
   /**
    * THE BUDGET WALK (§4.2 c-e). In the RPC's order, keep a row while its member
