@@ -1345,7 +1345,6 @@
     "honoursCaptionCount": "{{count}} aces and albatrosses on the board",
     "honoursOnTheBoard": "{{count}} on the board",
     "honoursWhatItIs": "Every ace and albatross in clbhouz history",
-    "mostPlayedSheetCaption": "{{count}} courses",
     "honoursSeeAll": "See all {{count}}",
     "honoursSheetCaption": "{{count}} entries",
     "lens": {
@@ -1525,7 +1524,9 @@
         "best": "Big returns",
         "most": "New personal highs"
       }
-    }
+    },
+    "mostPlayedSheetCaption_one": "{{count}} course",
+    "mostPlayedSheetCaption_other": "{{count}} courses"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",

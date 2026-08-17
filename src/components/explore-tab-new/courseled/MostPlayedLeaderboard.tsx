@@ -208,7 +208,11 @@ export function MostPlayedLeaderboard({
                     }}
                   >
                     {r.avgToPar != null && r.members > 0
-                      ? t('discover.mostPlayedAvgToParBy', 'Played to {{value}} by {{count}} members', {
+                      /* NO INLINE defaultValue ON A COUNTED STRING (§2.2): a single
+                         default gives i18next no plural to select, which is how
+                         "1 birdies" reached device. The _one/_other entries in
+                         courses.json carry it. */
+                      ? t('discover.mostPlayedAvgToParBy', {
                           value: formatToPar(r.avgToPar),
                           count: r.members,
                         })
@@ -216,7 +220,7 @@ export function MostPlayedLeaderboard({
                         ? t('discover.mostPlayedAvgToPar', 'Played to {{value}}', {
                             value: formatToPar(r.avgToPar),
                           })
-                        : t('discover.mostPlayedMembers', '{{count}} members', { count: r.members })}
+                        : t('discover.mostPlayedMembers', { count: r.members })}
                   </span>
                 )}
               </span>

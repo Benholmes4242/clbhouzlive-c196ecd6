@@ -1028,7 +1028,15 @@
         "best": "大きな成果",
         "most": "自己最多を更新"
       }
-    }
+    },
+    "mostPlayedAvgToParBy_other": "{{value}}（{{count}}人）",
+    "mostPlayedMembers_other": "{{count}}人",
+    "mostPlayedSheetCaption_other": "{{count}}コース",
+    "mostPlayed": "今週よくプレーされたコース",
+    "mostPlayedAvgToPar": "{{value}}",
+    "mostPlayedNew": "新規",
+    "mostPlayedLevel": "変動なし",
+    "trackedRounds": "記録ラウンド"
   },
   "statBrowse": {
     "colArea": "エリア",
