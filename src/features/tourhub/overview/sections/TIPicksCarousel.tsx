@@ -550,8 +550,8 @@ function PickStatusTag({
           ? {
               borderRadius: 999,
               padding: '3px 8px',
-              background: 'rgba(10,14,10,0.5)',
-              border: '1px solid rgba(255,255,255,0.24)',
+              background: CHIP_GLASS_BG,
+              border: CHIP_GLASS_BORDER,
             }
           : null),
       }}
