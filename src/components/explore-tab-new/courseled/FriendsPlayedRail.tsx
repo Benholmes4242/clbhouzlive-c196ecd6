@@ -221,7 +221,8 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
               onClick={() => onCardPress(r)}
               style={{
                 ...CARD_SHELL,
-                ...(isNew ? NEW_CARD_RING : null),
+                /* No new-card ring on this rail: the ink outline read as a
+                   stray black border on some cards and not others. */
                 width: CARD_W,
                 flexShrink: 0,
                 display: 'flex',
