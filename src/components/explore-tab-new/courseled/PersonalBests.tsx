@@ -6,7 +6,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ATW_PHOTO_HEIGHTS, relativeWhen } from './AroundTheWorld';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { usePersonalBests, PERSONAL_BESTS_PER_MEMBER } from './hooks/usePersonalBests';
-import { createMasonryAssignment, placeStable } from './stableMasonry';
+import { createMasonryAssignment, placeStable, type MasonryAssignment } from './stableMasonry';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { Eyebrow, LABEL } from './tokens';
