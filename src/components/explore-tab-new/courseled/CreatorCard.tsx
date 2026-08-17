@@ -8,13 +8,12 @@ import { SCRIM_STRONG } from './tokens';
  * CREATOR CARD — "B, frame overlay" (BRIEF_COMMUNITY_CREATOR_CARDS).
  *
  * The card is a MEDIA TILE: full-bleed frame from one of the creator's OWN
- * recent items, a real gradient scrim, overlaid identity. Only three things
- * separate it from the eight moments around it, so all three are LOAD-BEARING:
+ * recent items, a real gradient scrim, overlaid identity. Two things separate
+ * it from the eight moments around it, so both are LOAD-BEARING:
  *
- *   1. THE CREATOR CHIP, top left. Solid fill, never a tint, never conditional.
- *   2. THE AVATAR RING — a solid light stroke, so the avatar reads as a person
+ *   1. THE AVATAR RING — a solid light stroke, so the avatar reads as a person
  *      and not a logo burned into the photograph.
- *   3. THE CAPTION IS A PERSON. NO COURSE NAME ANYWHERE: every other tile is
+ *   2. THE CAPTION IS A PERSON. NO COURSE NAME ANYWHERE: every other tile is
  *      captioned with a place, and the moment this one is too it is
  *      indistinguishable.
  *
