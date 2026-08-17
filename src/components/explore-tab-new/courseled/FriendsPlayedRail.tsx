@@ -345,21 +345,19 @@ function RoundShape({ row, shape }: { row: CircleRoundRow; shape: HoleShape | nu
           }}
         >
           {/* ZERO OF SOMETHING GOOD READS AS A CRITICISM on another member's
-              round, so an empty left slot rather than "0 birdies". */}
+              round, so an empty left slot rather than "0 birdies".
+              THE PLURAL LIVES IN THE TRANSLATION (birdies_one / birdies_other),
+              never in a single inline defaultValue — one string gives i18next no
+              plural form and renders "1 birdies". */}
           <span style={{ ...FIGS, color: UNDER_TONE }}>
             {birdies > 0
-              ? `\u25CF ${t('discover.friendsRail.birdies', {
-                  defaultValue: '{{count}} birdies',
-                  count: birdies,
-                })}`
+              ? `\u25CF ${t('discover.friendsRail.birdies', { count: birdies })}`
               : ''}
           </span>
-          <span style={{ ...FIGS, color: A.DIM }}>
-            {t('discover.friendsRail.holes', {
-              defaultValue: '{{count}} holes',
-              count: holesPlayed,
-            })}
-          </span>
+          {/* NO HOLE COUNT. create_round_posts and useCircleLatestRounds both
+              require holes_played = 18, so the label could only ever say "18
+              holes" — a constant occupying half the meta row. */}
+
         </div>
       )}
     </>
