@@ -154,7 +154,7 @@ export const TrajectoryLine: React.FC<Props> = ({
   surface = 'light',
   interactive = false,
   showTicks = true,
-
+  padY = 10,
 }) => {
   const T = SURFACE_TOKENS[surface];
   const { t } = useTranslation(['courses']);
