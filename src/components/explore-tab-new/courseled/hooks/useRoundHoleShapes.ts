@@ -59,6 +59,12 @@ export interface HoleShape {
   played: number;
   /** Holes under par — the birdie count in the meta row. */
   birdies: number;
+  /**
+   * The raw played holes in TrajectoryLine's shape, so the rail can render THE
+   * SAME component the Clubhouse scorecard post and the scorecard sheet use
+   * instead of a look-alike of its own.
+   */
+  holes: { holeNo: number; par: number | null; strokes: number | null }[];
 }
 
 function buildShape(rows: Row[]): HoleShape | null {
@@ -81,8 +87,15 @@ function buildShape(rows: Row[]): HoleShape | null {
     if (bead) beads.push({ i: idx + 1, tone: bead.tone, r: bead.radius });
   });
 
-  return { series, beads, played: holes.length, birdies };
+  return {
+    series,
+    beads,
+    played: holes.length,
+    birdies,
+    holes: holes.map((h) => ({ holeNo: h.hole_no, par: h.par, strokes: h.actual_gross })),
+  };
 }
+
 
 export function useRoundHoleShapes(scoreIds: readonly (string | null | undefined)[]) {
   // Stable key: the sorted set of ids in the rail.

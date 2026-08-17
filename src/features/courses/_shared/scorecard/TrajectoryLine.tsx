@@ -121,7 +121,14 @@ interface Props {
    * passes true.
    */
   interactive?: boolean;
+  /**
+   * Hole-number tick row. Default TRUE (feed card + sheet). The Discover
+   * friends tile is 34px tall and has its own meta row, so it passes false —
+   * the CURVE is identical either way.
+   */
+  showTicks?: boolean;
 }
+
 
 let uidSeq = 0;
 
@@ -139,6 +146,8 @@ export const TrajectoryLine: React.FC<Props> = ({
   height = 150,
   surface = 'light',
   interactive = false,
+  showTicks = true,
+
 }) => {
   const T = SURFACE_TOKENS[surface];
   const { t } = useTranslation(['courses']);
@@ -451,10 +460,11 @@ export const TrajectoryLine: React.FC<Props> = ({
     return (
       <>
         {plot}
-        <TickRow ticks={ticks} holes={holes} m={m} x={x} w={w} T={T} />
+        {showTicks && <TickRow ticks={ticks} holes={holes} m={m} x={x} w={w} T={T} />}
       </>
     );
   }
+
 
   return (
     <>
