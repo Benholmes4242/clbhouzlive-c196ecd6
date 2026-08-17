@@ -125,6 +125,9 @@ export function StandoutTile({
   avatarUrl = null,
   avatarUserId = null,
   delta = null,
+  wait = null,
+  waitLabel = null,
+
   figureTone,
   nameSize,
   chipScale = 'md',
