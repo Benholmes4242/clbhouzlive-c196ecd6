@@ -188,16 +188,18 @@ export function splitMasonry<T>(items: T[], heightOf: (item: T, index: number) =
  * Eagles no longer reach this section, so they fall to the tail rather than
  * being given a rung of their own.
  */
-/**
+ /**
  * THE THREE GROUPS (BRIEF_FEAT_SECTIONS_HIERARCHY §1.5), in the order the brief
  * fixes them. Anything not named falls to personal milestones, which is also
  * where a rating-only tile lands — it has no feat kind at all.
  *
- * KNOWN AND ACCEPTED: the order is the brief's, not strictly rarity-descending,
- * because an ace is rarer than a course record and sits in "Firsts here". The
- * rarest feat on the page is lifted out as the HERO regardless (§1.2), so the
- * rarest thing is never buried by this ordering.
+ * THIS IS A RELATIVE ORDER, NOT AN ABSOLUTE ONE
+ * (CORRECTION_HERO_INSIDE_ITS_GROUP §2.3): the hero now renders INSIDE its own
+ * group, so the group holding it is PROMOTED TO FIRST and the rest keep this
+ * relative order beneath it. That is what stops an ace — which is rarer than a
+ * course record but sits in "Firsts here" — from being buried mid-section.
  */
+
 const FEAT_GROUPS = [
   { id: 'records', kinds: ['crown'], key: 'discover.feat.group.records', label: 'Course records' },
   {
