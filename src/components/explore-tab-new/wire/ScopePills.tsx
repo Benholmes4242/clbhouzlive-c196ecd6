@@ -39,7 +39,7 @@ export function lensLabelKey(lens: ExploreLens): { key: string; fallback: string
   }
 }
 
-export function ScopePills({ lens, onChange }: Props) {
+export function ScopePills({ lens, onChange, style }: Props) {
   const { t } = useTranslation('courses');
   return (
     <div
@@ -58,8 +58,10 @@ export function ScopePills({ lens, onChange }: Props) {
         display: 'flex',
         gap: 8,
         overflowX: 'auto',
+        ...style,
       }}
     >
+
       {LENS_ORDER.map((id) => {
         const active = id === lens;
         const { key, fallback } = lensLabelKey(id);
