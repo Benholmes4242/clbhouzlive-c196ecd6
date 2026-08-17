@@ -50,15 +50,25 @@ export const PHOTO_STRIP = 78;
 
 export const COMPACT_BASE = 154;
 
-export function estimateCompactHeight(detail: string, subline: string): number {
+export function estimateCompactHeight(
+  detail: string,
+  subline: string,
+  who = '',
+): number {
   const lines = detail ? Math.min(2, Math.ceil(detail.length / 24)) : 0;
   const subLines = subline ? Math.min(2, Math.ceil(subline.length / 25)) : 0;
+  // The name row now wraps to a second line rather than truncating (~19 chars
+  // fit one line at 13/700 in the ~151px inner width), and the detail row holds
+  // the reaction control, so it is never shorter than 20px.
+  const whoLines = who ? Math.min(2, Math.ceil(who.length / 19)) : 1;
   return (
     COMPACT_BASE +
-    (lines > 0 ? 2 + lines * 16 : 0) +
+    (whoLines - 1) * 18 +
+    2 + Math.max(lines * 16, 20) +
     (subLines > 0 ? 3 + subLines * 15 : 0)
   );
 }
+
 
 interface Props {
   courseId: string;
