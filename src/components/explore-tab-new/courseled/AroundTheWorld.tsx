@@ -20,7 +20,13 @@ import { CourseNewsSheet, type CourseNewsEntry } from './CourseNewsSheet';
 import { ShortlistGlassAction } from './ShortlistGlassAction';
 
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
-import { createMasonryAssignment, placeStable, rememberColumns } from './stableMasonry';
+import {
+  createMasonryAssignment,
+  placeStable,
+  rememberColumns,
+  type MasonryAssignment,
+} from './stableMasonry';
+import { CompactStandoutTile, estimateCompactHeight } from './CompactStandoutTile';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW_ROW_BAR, NUMF, SANS, SCRIM_STRONG } from './tokens';
 import { StandoutTile } from './StandoutTile';
 
@@ -182,6 +188,62 @@ export function splitMasonry<T>(items: T[], heightOf: (item: T, index: number) =
  * Eagles no longer reach this section, so they fall to the tail rather than
  * being given a rung of their own.
  */
+/**
+ * THE THREE GROUPS (BRIEF_FEAT_SECTIONS_HIERARCHY §1.5), in the order the brief
+ * fixes them. Anything not named falls to personal milestones, which is also
+ * where a rating-only tile lands — it has no feat kind at all.
+ *
+ * KNOWN AND ACCEPTED: the order is the brief's, not strictly rarity-descending,
+ * because an ace is rarer than a course record and sits in "Firsts here". The
+ * rarest feat on the page is lifted out as the HERO regardless (§1.2), so the
+ * rarest thing is never buried by this ordering.
+ */
+const FEAT_GROUPS = [
+  { id: 'records', kinds: ['crown'], key: 'discover.feat.group.records', label: 'Course records' },
+  {
+    id: 'firsts',
+    kinds: ['ace', 'albatross', 'bogey_free'],
+    key: 'discover.feat.group.firsts',
+    label: 'Firsts here',
+  },
+  {
+    id: 'milestones',
+    kinds: ['under_par', 'birdie_haul'],
+    key: 'discover.feat.group.milestones',
+    label: 'Personal milestones',
+  },
+] as const;
+
+function groupIdFor(kind: string | null): string {
+  for (const g of FEAT_GROUPS) if (kind && (g.kinds as readonly string[]).includes(kind)) return g.id;
+  return 'milestones';
+}
+
+/**
+ * THE FEAT KIND, NAMED (§1.3). Used by the hero kicker only — the tiles carry
+ * the wording in their detail line as before.
+ */
+const KIND_LABELS: Record<string, { key: string; label: string }> = {
+  ace: { key: 'discover.feat.kind.ace', label: 'Hole in one' },
+  albatross: { key: 'discover.feat.kind.albatross', label: 'Albatross' },
+  crown: { key: 'discover.feat.kind.crown', label: 'Course record' },
+  bogey_free: { key: 'discover.feat.kind.bogeyFree', label: 'Bogey-free round' },
+  under_par: { key: 'discover.feat.kind.underPar', label: 'Round under par' },
+  birdie_haul: { key: 'discover.feat.kind.birdieHaul', label: 'Birdie haul' },
+};
+
+/**
+ * THE TWO LEAST-RARE KINDS RENDER COMPACT (§1.7) — a round under par and a
+ * birdie haul are the floor of this section's scale, and a photograph on each is
+ * what made eight tiles read as wallpaper. A rating-only tile has no feat at all
+ * and follows the floor.
+ */
+const COMPACT_KINDS = new Set(['under_par', 'birdie_haul']);
+
+/** HERO GEOMETRY (§1.1) and the second wide tile (§1.9). */
+const HERO_PHOTO = 214;
+const WIDE_PHOTO = 168;
+
 function notability(e: WireEvent | undefined): number {
   switch (e?.kind) {
     case 'ace':
@@ -349,6 +411,13 @@ export function AroundTheWorld({
    * new events; it must not move tiles the member has already seen.
    */
   const masonry = useRef(createMasonryAssignment());
+  /**
+   * ONE COLUMN MEMORY PER GROUP (§1.5 with §4 of the refresh policy). The
+   * section is now several masonries, and `placeStable` rewrites its map from
+   * what it was given — so a single shared assignment would have each group
+   * erase the others' columns on every render.
+   */
+  const groupMasonry = useRef(new Map<string, MasonryAssignment>());
   const openReview = useReviewSheetStore((st) => st.open);
 
   const groups = useMemo<CourseGroup[]>(() => {
@@ -871,6 +940,9 @@ export function AroundTheWorld({
               g,
               m,
               slotKey,
+              kind: top?.kind ?? null,
+              at: top?.at ?? g.at,
+              rarity: notability(top),
               photo,
               tall,
               figure,
