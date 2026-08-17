@@ -645,9 +645,6 @@ export function HonoursHeading({
           <HonoursModeToggle mode={mode} onChange={onModeChange} />
         </span>
       </div>
-      <div style={{ fontSize: 12.5, fontWeight: 500, color: A.MUTE, marginTop: 3 }}>
-        {mode === 'recent' ? t('discover.honours.subRecent', 'In clbhouz history') : null}
-      </div>
     </>
   );
 }
