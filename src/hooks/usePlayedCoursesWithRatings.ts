@@ -123,7 +123,7 @@ function getRegionalSortedCourses(courses: any[]) {
 }
 
 export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
-  const { data: playedRows, isLoading: playedLoading, error: playedError } = useQuery({
+  const { data: playedRows, isLoading: playedLoading, isFetched: playedFetched, error: playedError } = useQuery({
     queryKey: ["played-courses-with-averages", userId], // Remove region from cache key to avoid cache misses
     queryFn: () => fetchPlayedWithAverages(userId),
     enabled: !!userId,
@@ -216,6 +216,9 @@ export function usePlayedCoursesWithRatings(userId: string, region: RegionKey) {
   return { 
     data: regionPlayed, 
     isLoading: playedLoading || ratingsLoading, 
+    // Settled flag — both queries are gated on userId, so isLoading is false
+    // before they have ever run.
+    isFetched: playedFetched, 
     error: playedError ?? ratingsError 
   };
 }
