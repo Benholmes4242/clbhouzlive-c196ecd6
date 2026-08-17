@@ -990,6 +990,7 @@ export function AroundTheWorld({
               /* §3.4: the USER ID drives the fallback colour, so it is passed
                  alongside the photo rather than the name being hashed. */
               avatarUrl: top?.actorAvatar ?? rating?.actorAvatar ?? null,
+              avatarUserId: top?.userId ?? rating?.userId ?? null,
               reactTo,
               onPress,
               height: photo + estimatePanelHeight(detailText, margin),
@@ -1086,7 +1087,7 @@ export function AroundTheWorld({
                   : null
               }
               avatarUrl={tt.avatarUrl}
-              avatarUserId={tt.ownerId}
+              avatarUserId={tt.avatarUserId}
               nameSize={opts?.hero ? 21 : undefined}
               chipScale={opts?.hero ? 'lg' : 'md'}
               onPress={pressOf(tt)}
@@ -1110,7 +1111,7 @@ export function AroundTheWorld({
               subline={tt.margin || null}
               isNew={isNewSince(tt.g.at, lastSeen)}
               avatarUrl={tt.avatarUrl}
-              avatarUserId={tt.ownerId}
+              avatarUserId={tt.avatarUserId}
               onPress={pressOf(tt)}
               trailing={trailingOf(tt)}
             />
