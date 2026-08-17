@@ -158,6 +158,15 @@ export function CompactStandoutTile({
         >
           {whenLabel}
         </span>
+        {/* COURSE NAME — TWO LINES, NOT ONE (BRIEF_STANDOUT_TILE_NAME_WRAP).
+            A single line with an ellipsis cut the parenthetical, which is the
+            only thing separating two courses at the same club ("Sundridge Park
+            Golf Club (West Course)"). Clamped at two so a pathological name
+            still truncates rather than growing. The block is ABSOLUTE inside
+            the fixed 78px strip, so the second line costs the tile no height —
+            the masonry estimate is unaffected. The text shadow is what carries
+            the second line: it rises above the scrim's fade (see the report),
+            and the scrim value itself is canonical app-wide. */}
         <div
           style={{
             position: 'absolute',
@@ -169,9 +178,11 @@ export function CompactStandoutTile({
             color: '#fff',
             letterSpacing: '-0.025em',
             lineHeight: 1.14,
-            whiteSpace: 'nowrap',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            textShadow: '0 1px 3px rgba(10,14,10,0.6)',
           }}
         >
           {courseName}
