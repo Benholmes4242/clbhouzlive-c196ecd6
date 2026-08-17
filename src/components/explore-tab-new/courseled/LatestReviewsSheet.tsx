@@ -93,6 +93,15 @@ export function LatestReviewsSheet({
     [reviews, region],
   );
 
+  /* MASONRY PLACEMENT (BRIEF_REVIEWS_SHEET_MASONRY §2). Two columns, each tile
+     dropped into whichever is currently shorter, order preserved down the left
+     then the right. splitMasonry is the shipped helper — no second copy. */
+  const { columns: reviewColumns } = useMemo(
+    () => splitMasonry(visible, (r) => estimateReviewTileHeight(r)),
+    [visible],
+  );
+
+
   // REACTIONS — one read for the loaded page set, keyed by review id.
   const reactionTargets = useMemo<ReactionTarget[]>(
     () => reviews.map((r) => ({ type: 'review' as const, id: r.reviewId })),
