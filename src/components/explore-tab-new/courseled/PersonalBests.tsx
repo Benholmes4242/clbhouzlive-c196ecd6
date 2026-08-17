@@ -188,16 +188,34 @@ export function PersonalBests({
         ? t('discover.pb.afterRounds', { defaultValue: 'After {{count}} rounds', count: attempts })
         : '';
     /**
-     * THE IMPROVEMENT GOES INSIDE THE GLASS CHIP (BRIEF_FEAT_SECTIONS_FINISHING
-     * §5). The progression tile — the "9 -> 12" arrow with a bar beneath — is
-     * WITHDRAWN: the bar drew the gain as a proportion of the new total, with no
-     * denominator, so twelve pars rendered a quarter full. These rows now render
-     * the STANDARD photo tile, and the only trace of the previous best in the
-     * figure area is this delta beside the count. "Previous best N" still
-     * renders as the subline, because here beating it IS the achievement (§4.4).
+     * THE SECOND FIGURE (BRIEF_FEAT_SECOND_FIGURE §1). Every kind that has an
+     * honest comparison now carries it as a NUMBER on the row —
+     * `second_figure` — and this file only decides which of the two treatments
+     * it takes. It is NEVER parsed out of `reference_line`: a number read from
+     * "Previous best 9" dies the moment that copy is edited or a locale renders
+     * the sentence differently.
+     *
+     *   DELTA  a prior mark was beaten — green triangle plus figure.
+     *   WAIT   nothing was beaten, but the rounds it took are the story —
+     *          "After 52" in muted white.
+     *
+     * ONLY THE DELTA IS GREEN, and that is not a style preference. Green means
+     * BETTER THAN BEFORE. A wait is neither better nor worse, so colouring it
+     * would make green mean "interesting" — a meaning this app cannot afford
+     * alongside under-par red and the viewing member's amber (§1.4).
+     *
+     * big_points_here, aces and albatrosses return NULL and show the count
+     * alone: an invented figure would cheapen the real ones (§4).
      */
-    const delta =
-      previous !== null ? Math.max(0, Number(r.figure ?? 0) - previous) : null;
+    const second = r.second_figure ?? null;
+    const delta = DELTA_KINDS.has(r.feat_kind) && second != null && second > 0 ? second : null;
+    const wait = WAIT_KINDS.has(r.feat_kind) && second != null && second > 0 ? second : null;
+    /**
+     * A ROW WITH A SECOND FIGURE TAKES THE GLASS CHIP, so the effort tile —
+     * which draws the wait into a sentence and has no chip — is stood down for
+     * those rows (§3.1). Rows with no second figure are untouched.
+     */
+    const chipped = delta != null || wait != null;
 
     const nameLen = (r.is_self ? 'You' : (r.display_name?.trim() ?? '')).length;
     const photoHeight =
@@ -220,14 +238,17 @@ export function PersonalBests({
       attempts,
       attemptPhrase,
       delta,
+      wait,
+      chipped,
       slotKey: `${r.whs_score_id}:${r.feat_kind}`,
       // Deterministic height estimate, one per shape.
       height:
-        treatment === 'effort'
+        treatment === 'effort' && !chipped
           ? estimateEffortHeight(`${headline} \u00B7 ${attemptPhrase}`)
           : photoHeight,
     };
   });
+
 
   /**
    * GROUPING (BRIEF_STANDOUT_KIND_BUDGET §3). The three treatments are
