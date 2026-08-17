@@ -121,7 +121,14 @@ interface Props {
    * passes true.
    */
   interactive?: boolean;
+  /**
+   * Hole-number tick row. Default TRUE (feed card + sheet). The Discover
+   * friends tile is 34px tall and has its own meta row, so it passes false —
+   * the CURVE is identical either way.
+   */
+  showTicks?: boolean;
 }
+
 
 let uidSeq = 0;
 
