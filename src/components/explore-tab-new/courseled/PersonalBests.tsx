@@ -326,7 +326,10 @@ export function PersonalBests({
                 </ReactionSlot>
               );
 
-              if (tt.treatment === 'effort' && tt.attempts !== null) {
+              /* A CHIPPED ROW TAKES THE PHOTO TILE (§3.1): the effort tile has
+                 no glass chip to put the second figure in. */
+              if (tt.treatment === 'effort' && tt.attempts !== null && !tt.chipped) {
+
                 return (
                   <EffortTile
                     key={tt.slotKey}
@@ -384,6 +387,11 @@ export function PersonalBests({
                    when the previous best is beaten, so no red state exists
                    (§5.7). */
                 delta={tt.delta}
+                /* THE WAIT, WHITE NOT GREEN (§1.4). Only ever set when `delta`
+                   is null — a chip holds one second figure. */
+                wait={tt.wait}
+                waitLabel={tt.wait != null ? t('discover.pb.after', 'After') : null}
+
                 avatarUrl={tt.r.profile_photo_url}
                 avatarUserId={tt.r.user_id}
               />
