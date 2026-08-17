@@ -55,11 +55,11 @@ export function LatestReviews({
      created_at DESC, so that is simply the first. A second qualifier renders
      as BARS in the grid. When a featured tile is lifted out, the grid still
      carries PAGE_CAP tiles, so the two columns stay even. */
-  const window = reviews.slice(0, PAGE_CAP);
-  const featured = window.find((r) => reviewTier(r) === 'featured') ?? null;
+  const pool = reviews.slice(0, PAGE_CAP);
+  const featured = pool.find((r) => reviewTier(r) === 'featured') ?? null;
   const shown = featured
     ? [featured, ...reviews.slice(0, PAGE_CAP + 1).filter((r) => r.reviewId !== featured.reviewId)]
-    : window;
+    : pool;
   const grid = featured ? shown.slice(1) : shown;
 
   // REACTIONS — one read for the mosaic, keyed by review id.
