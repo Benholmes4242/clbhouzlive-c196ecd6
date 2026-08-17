@@ -151,6 +151,12 @@ export function ReviewTile({
 
   const { t } = useTranslation('courses');
 
+  /* The tier decides the BREAKDOWN treatment and nothing else. */
+  const resolvedTier = tier ?? reviewTier(r);
+  const isFeatured = resolvedTier === 'featured';
+  const photoH =
+    isFeatured && height === REVIEW_TILE_HEIGHT ? REVIEW_TILE_FEATURED_HEIGHT : height;
+
   const isVideo = r.mediaType === 'video';
   const ownImage = isVideo ? r.posterUrl : r.mediaUrl;
   const imageUrl = ownImage ?? r.courseImage ?? null;
@@ -239,7 +245,7 @@ export function ReviewTile({
     >
       <span
         data-testid="review-tile-photo"
-        style={{ position: 'relative', display: 'block', height }}
+        style={{ position: 'relative', display: 'block', height: photoH }}
       >
       <CourseImageFallback
         courseId={r.courseId}
@@ -327,11 +333,18 @@ export function ReviewTile({
             the blur is the @supports enhancement: this chip sits over a
             photograph and unreadable is the failure mode. */}
         <span
-          className="review-tile-chip"
           style={{
             position: 'absolute',
             top: 8,
             left: 8,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+        <span
+          className="review-tile-chip"
+          style={{
             display: 'inline-flex',
             alignItems: 'baseline',
             gap: 2,
@@ -352,6 +365,25 @@ export function ReviewTile({
             {r.rating.toFixed(1)}
           </span>
           <span style={{ ...LABEL, fontSize: 6.5, color: 'rgba(255,255,255,0.62)' }}>/10</span>
+        </span>
+
+        {/* THE FEATURED MARK (§2.5). In the 9+ green with white text — the only
+            tier badge on the page. */}
+        {isFeatured && (
+          <span
+            style={{
+              ...LABEL,
+              fontSize: 7,
+              color: '#FFFFFF',
+              background: bandColor(10),
+              borderRadius: 999,
+              padding: '4px 8px',
+              lineHeight: 1,
+            }}
+          >
+            {t('discover.reviews.featured', 'Featured')}
+          </span>
+        )}
         </span>
 
 
