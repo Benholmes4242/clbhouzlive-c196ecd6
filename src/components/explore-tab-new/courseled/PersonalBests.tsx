@@ -9,7 +9,7 @@ import { usePersonalBests, PERSONAL_BESTS_PER_MEMBER } from './hooks/usePersonal
 import { createMasonryAssignment, placeStable, type MasonryAssignment } from './stableMasonry';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
-import { Eyebrow, LABEL } from './tokens';
+import { A, Eyebrow, LABEL, NUMF } from './tokens';
 import { StandoutTile } from './StandoutTile';
 import {
   EffortTile,
@@ -34,6 +34,39 @@ import {
  * cross-section member budget, and nothing else. `headline` and
  * `reference_line` are server strings and are never reworded here.
  */
+
+/**
+ * THE GROUPS (BRIEF_STANDOUT_KIND_BUDGET §3.3), for the six kinds
+ * get_personal_bests emits. Standout's names do NOT transfer: there is no
+ * course-record equivalent here, and every Personal Best is a milestone, so
+ * "Personal milestones" would name the whole section. Anything unmapped falls to
+ * "Firsts here".
+ */
+const PB_GROUPS = [
+  {
+    id: 'firsts',
+    kinds: ['first_sub_70_here', 'first_sub_80_here', 'first_double_free_here'],
+    key: 'discover.pb.group.firsts',
+    label: 'Firsts here',
+  },
+  {
+    id: 'best',
+    kinds: ['big_points_here'],
+    key: 'discover.pb.group.best',
+    label: 'Best rounds here',
+  },
+  {
+    id: 'most',
+    kinds: ['most_birdies_here', 'most_pars_here'],
+    key: 'discover.pb.group.most',
+    label: 'Most in a round',
+  },
+] as const;
+
+function pbGroupIdFor(kind: string | null): string {
+  for (const g of PB_GROUPS) if (kind && (g.kinds as readonly string[]).includes(kind)) return g.id;
+  return 'firsts';
+}
 
 /** Eight tiles maximum, matching PAGE = 8 in AroundTheWorld (§3.2). */
 const PAGE = 8;
