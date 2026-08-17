@@ -11,6 +11,15 @@ import { useContentReactions, type ReactionTarget } from './hooks/useContentReac
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { Eyebrow, LABEL } from './tokens';
 import { StandoutTile } from './StandoutTile';
+import {
+  EffortTile,
+  PROGRESSION_HEIGHT,
+  ProgressionTile,
+  estimateEffortHeight,
+  parseAttempts,
+  parsePreviousBest,
+  treatmentFor,
+} from './PersonalBestTiles';
 
 /**
  * PERSONAL BESTS (BRIEF_PERSONAL_BESTS_SECTION).
@@ -124,26 +133,62 @@ export function PersonalBests({
   // A member with no qualifying feats sees no section at all (§6.1).
   if (kept.length === 0) return null;
 
+  /**
+   * THREE TREATMENTS, NONE PHOTOLESS AS A CLASS (BRIEF_FEAT_SECTIONS_HIERARCHY
+   * §2). The axis is what the feat HAS, not how rare it is: a previous best
+   * makes it a progression, an attempt count makes it an effort, and a feat with
+   * neither keeps the full photograph it has today. Standout's rarity rules are
+   * deliberately NOT applied here (§0 preamble).
+   *
+   * Every shape carries its own deterministic estimate (§0.1); the photo tile's
+   * is unchanged.
+   */
   const tiles = kept.map((r, i) => {
     const m = meta?.get(r.course_id);
     const photo = ATW_PHOTO_HEIGHTS[Math.min(i, ATW_PHOTO_HEIGHTS.length - 1)];
     const headline = r.headline ?? '';
     const reference = r.reference_line ?? null;
+    const treatment = treatmentFor(r.feat_kind, reference);
+    const previous = parsePreviousBest(r.feat_kind, reference);
+    const attempts = parseAttempts(r.feat_kind, reference);
+    const attemptPhrase =
+      attempts !== null
+        ? t('discover.pb.afterRounds', { defaultValue: 'After {{count}} rounds', count: attempts })
+        : '';
+    const gainLine =
+      previous !== null
+        ? t('discover.pb.gain', {
+            defaultValue: '{{count}} better than before',
+            count: Math.max(0, Number(r.figure ?? 0) - previous),
+          })
+        : '';
+
+    const photoHeight =
+      photo +
+      23 +
+      18 +
+      (headline ? 2 + Math.min(2, Math.ceil(headline.length / 24)) * 16 : 0) +
+      (reference ? 3 + Math.min(2, Math.ceil(reference.length / 26)) * 14 : 0);
+
     return {
       r,
       m,
       photo,
       headline,
       reference,
+      treatment,
+      previous,
+      attempts,
+      attemptPhrase,
+      gainLine,
       slotKey: `${r.whs_score_id}:${r.feat_kind}`,
-      // Deterministic height estimate, same grammar as the sibling section:
-      // padding 23 + WHO 18 + detail lines (16) + reference lines (14).
+      // Deterministic height estimate, one per shape.
       height:
-        photo +
-        23 +
-        18 +
-        (headline ? 2 + Math.min(2, Math.ceil(headline.length / 24)) * 16 : 0) +
-        (reference ? 3 + Math.min(2, Math.ceil(reference.length / 26)) * 14 : 0),
+        treatment === 'progression'
+          ? PROGRESSION_HEIGHT
+          : treatment === 'effort'
+            ? estimateEffortHeight(`${headline} \u00B7 ${attemptPhrase}`)
+            : photoHeight,
     };
   });
 
@@ -161,13 +206,101 @@ export function PersonalBests({
             key={ci}
             style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}
           >
-            {col.map((tt) => (
+            {col.map((tt) => {
+              const courseName =
+                tt.m?.name ?? tt.r.course_name ?? t('discover.unknownCourse', 'Course');
+              const who = tt.r.is_self
+                ? t('discover.wire.you', 'You')
+                : (tt.r.display_name?.trim() ?? '');
+              const openRound = () => {
+                if (onFeatPress && tt.r.whs_score_id) {
+                  analyticsEvents.track('discover_personal_best_tap', {
+                    feat: tt.r.feat_kind,
+                    source: 'personal_bests',
+                  });
+                  onFeatPress(tt.r.whs_score_id, tt.r.user_id);
+                  return;
+                }
+                onCoursePress(tt.r.course_id);
+              };
+              /* FIXED-WIDTH TRAILING SLOT — rendered whether or not a control
+                 appears inside it, so member names never go ragged between a
+                 tile with a reaction and one without. The heart's 44px tap
+                 target is cancelled by a negative margin, so the WHO row
+                 (billed at 18 in every shape) does not grow. */
+              const trailing = (
+                <ReactionSlot>
+                  {tt.r.whs_score_id
+                    ? (() => {
+                        const st = reactions.stateFor('round', tt.r.whs_score_id);
+                        return (
+                          <ReactionAction
+                            hidden={!reactions.viewerId || reactions.unavailable}
+                            /* OWN FEAT: the count reads, the glyph is not
+                               tappable. `is_self` comes from the RPC and is
+                               never re-derived from the viewer id. */
+                            readOnly={tt.r.is_self}
+                            count={st.count}
+                            reacted={st.mine}
+                            /* Reserved count column so the glyph lands on the
+                               same x down a column, reacted or not. */
+                            reserveCount
+                            onToggle={() => reactions.toggle('round', tt.r.whs_score_id)}
+                            label={t('discover.reactions.action', 'Like this round')}
+                          />
+                        );
+                      })()
+                    : null}
+                </ReactionSlot>
+              );
+
+              if (tt.treatment === 'progression' && tt.previous !== null) {
+                return (
+                  <ProgressionTile
+                    key={tt.slotKey}
+                    courseName={courseName}
+                    who={who}
+                    isOwn={tt.r.is_self}
+                    whenLabel={relativeWhen(tt.r.play_date, t)}
+                    /* The server headline IS the feat kind; it renders verbatim
+                       as the kicker rather than being reworded (§2.6). */
+                    kicker={tt.headline}
+                    previous={tt.previous}
+                    figure={tt.r.figure}
+                    unit={(tt.r.figure_unit ?? '').toUpperCase()}
+                    gainLine={tt.gainLine}
+                    trailing={trailing}
+                    onPress={openRound}
+                  />
+                );
+              }
+
+              if (tt.treatment === 'effort' && tt.attempts !== null) {
+                return (
+                  <EffortTile
+                    key={tt.slotKey}
+                    courseId={tt.r.course_id}
+                    courseName={courseName}
+                    imageUrl={tt.m?.imageUrl ?? null}
+                    who={who}
+                    isOwn={tt.r.is_self}
+                    whenLabel={relativeWhen(tt.r.play_date, t)}
+                    figure={tt.r.figure}
+                    unit={(tt.r.figure_unit ?? '').toUpperCase()}
+                    headline={tt.headline}
+                    attemptPhrase={tt.attemptPhrase}
+                    attempts={tt.attempts}
+                    trailing={trailing}
+                    onPress={openRound}
+                  />
+                );
+              }
+
+              return (
               <StandoutTile
                 key={tt.slotKey}
                 courseId={tt.r.course_id}
-                courseName={
-                  tt.m?.name ?? tt.r.course_name ?? t('discover.unknownCourse', 'Course')
-                }
+                courseName={courseName}
                 imageUrl={tt.m?.imageUrl ?? null}
                 region={tt.m?.region ?? tt.r.region ?? null}
                 photo={tt.photo}
@@ -175,11 +308,7 @@ export function PersonalBests({
                 // THE UNIT IS NEVER HARDCODED (§3.4).
                 unit={(tt.r.figure_unit ?? '').toUpperCase()}
                 whenLabel={relativeWhen(tt.r.play_date, t)}
-                who={
-                  tt.r.is_self
-                    ? t('discover.wire.you', 'You')
-                    : (tt.r.display_name?.trim() ?? '')
-                }
+                who={who}
                 isOwn={tt.r.is_self}
                 detail={tt.headline}
                 subline={tt.reference}
@@ -196,50 +325,11 @@ export function PersonalBests({
                 /* THE TAP OPENS THE ROUND (BRIEF_STANDOUT_TILE_TAP_AND_MORE
                    §2), the same sheet onDetailPress already opened. Only a row
                    with no round id falls back to the course page. */
-                onPress={() => {
-                  if (onFeatPress && tt.r.whs_score_id) {
-                    analyticsEvents.track('discover_personal_best_tap', {
-                      feat: tt.r.feat_kind,
-                      source: 'personal_bests',
-                    });
-                    onFeatPress(tt.r.whs_score_id, tt.r.user_id);
-                    return;
-                  }
-                  onCoursePress(tt.r.course_id);
-                }}
-                trailing={
-                  /* FIXED-WIDTH TRAILING SLOT — rendered whether or not a
-                     control appears inside it, so member names never go ragged
-                     between a tile with a reaction and one without. The heart's
-                     44px tap target is cancelled by a negative margin, so the
-                     WHO row (billed at 18) does not grow: the estimate at :118
-                     is unchanged. */
-                  <ReactionSlot>
-                    {tt.r.whs_score_id
-                      ? (() => {
-                          const st = reactions.stateFor('round', tt.r.whs_score_id);
-                          return (
-                            <ReactionAction
-                              hidden={!reactions.viewerId || reactions.unavailable}
-                              /* OWN FEAT: the count reads, the glyph is not
-                                 tappable. `is_self` comes from the RPC and is
-                                 never re-derived from the viewer id. */
-                              readOnly={tt.r.is_self}
-                              count={st.count}
-                              reacted={st.mine}
-                              /* Reserved count column so the glyph lands on the
-                                 same x down a column, reacted or not. */
-                              reserveCount
-                              onToggle={() => reactions.toggle('round', tt.r.whs_score_id)}
-                              label={t('discover.reactions.action', 'Like this round')}
-                            />
-                          );
-                        })()
-                      : null}
-                  </ReactionSlot>
-                }
+                onPress={openRound}
+                trailing={trailing}
               />
-            ))}
+              );
+            })}
           </div>
         ))}
       </div>
