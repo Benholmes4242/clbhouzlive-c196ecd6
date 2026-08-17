@@ -74,7 +74,19 @@ function chipColors(kind: TiVerdictKind): React.CSSProperties {
   return { background: RED_BG, color: RED_TX };
 }
 
-function VerdictChip({ v, size = 'md', t }: { v: TiVerdict; size?: 'md' | 'lg'; t: TFunction }) {
+function VerdictChip({
+  v,
+  size = 'md',
+  t,
+  onDark = false,
+}: {
+  v: TiVerdict;
+  size?: 'md' | 'lg';
+  t: TFunction;
+  /** In the tile's top-right slot the pill sits on the DARK top of the scrim —
+   *  a bright sky can wash the gold, so it takes a hairline and a lift there. */
+  onDark?: boolean;
+}) {
   if (v.kind === 'none') return null;
   const big = size === 'lg';
   return (
@@ -89,7 +101,14 @@ function VerdictChip({ v, size = 'md', t }: { v: TiVerdict; size?: 'md' | 'lg'; 
         fontWeight: 700,
         letterSpacing: 0.4,
         fontVariantNumeric: 'tabular-nums',
+        flexShrink: 0,
         ...chipColors(v.kind),
+        ...(onDark
+          ? {
+              border: '1px solid rgba(255,255,255,0.5)',
+              boxShadow: '0 1px 8px rgba(10,14,10,0.45)',
+            }
+          : null),
       }}
     >
       {v.kind === 'win' && <span style={{ fontSize: big ? 14 : 12 }}>🏆</span>}
@@ -98,6 +117,7 @@ function VerdictChip({ v, size = 'md', t }: { v: TiVerdict; size?: 'md' | 'lg'; 
     </span>
   );
 }
+
 
 // ---- Root ----
 
@@ -232,7 +252,14 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                         <span style={{ ...PICK_META, color: 'rgba(255,255,255,0.75)' }}>
                           {t('overview.tiPicks.card.pickOf', { n: p.rank, total: pickTotal })}
                         </span>
-                        <PickStatusTag live={live} t={t} tone="dark" />
+                        {/* ONE STATUS SLOT. A win puts the gold pill HERE instead
+                            of "FINISHED" — never both, and never a second pill
+                            beside the name. */}
+                        {isWin ? (
+                          <VerdictChip v={v} t={t} onDark />
+                        ) : (
+                          <PickStatusTag live={live} t={t} tone="dark" />
+                        )}
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -283,7 +310,10 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                               v={v}
                               t={t}
                               tone="dark"
+                              // The win pill has moved to the status slot above.
+                              suppressWinChip
                             />
+
                           </div>
                         </div>
 
@@ -549,6 +579,7 @@ function CardStateSlot({
   v,
   t,
   tone = 'light',
+  suppressWinChip = false,
 }: {
   state: EventState;
   pick: AITopContender;
@@ -557,6 +588,9 @@ function CardStateSlot({
   v: TiVerdict;
   t: TFunction;
   tone?: 'light' | 'dark';
+  /** The tile moves the win pill into the top-right status slot, so the inline
+   *  chip must not draw it a second time. */
+  suppressWinChip?: boolean;
 }) {
   const dark = tone === 'dark';
   if (settled) {
@@ -564,6 +598,8 @@ function CardStateSlot({
       // Settled with no leaderboard row → show fit if present.
       return <CourseFitLine score={pick.courseFitScore} t={t} tone={tone} />;
     }
+    if (suppressWinChip && v.kind === 'win') return null;
+
     return <VerdictChip v={v} t={t} />;
   }
   if (state === 'live' && live) {
