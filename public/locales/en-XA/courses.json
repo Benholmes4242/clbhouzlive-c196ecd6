@@ -1499,9 +1499,9 @@
     },
     "feat": {
       "group": {
-        "records": "[Çöûrsé récörds ]",
-        "firsts": "[Fírsts hére ]",
-        "milestones": "[Pérsönál mílestönés ]"
+        "records": "[Récörds bröken ]",
+        "firsts": "[Öncé ín á lífétíme ]",
+        "milestones": "[Béátíng thé cöûrsé ]"
       },
       "kind": {
         "ace": "[Hölé ín öné ]",
@@ -1516,9 +1516,9 @@
       "afterRounds": "[Áftér {{count}} röûnds ]",
       "gain": "[{{count}} béttér thán béföré ]",
       "group": {
-        "firsts": "[Fírsts hére ]",
-        "best": "[Béšt ščőŕíñĝ héřé ]",
-        "most": "[Möst ín á röûnd ]"
+        "firsts": "[Fírst tíme évér ]",
+        "best": "[Bíg rétûrns ]",
+        "most": "[Néw pérsönál híghs ]"
       }
     }
   },

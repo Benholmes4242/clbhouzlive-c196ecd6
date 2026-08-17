@@ -1007,9 +1007,9 @@
     },
     "feat": {
       "group": {
-        "records": "코스 레코드",
-        "firsts": "이곳에서 처음",
-        "milestones": "개인 이정표"
+        "records": "레코드 경신",
+        "firsts": "일생에 한 번",
+        "milestones": "코스 정복"
       },
       "kind": {
         "ace": "홀인원",
@@ -1024,9 +1024,9 @@
       "afterRounds": "{{count}}라운드 만에",
       "gain": "이전보다 {{count}} 향상",
       "group": {
-        "firsts": "이곳에서 처음",
-        "best": "이곳 최고 득점",
-        "most": "한 라운드 최다"
+        "firsts": "생애 첫",
+        "best": "큰 수확",
+        "most": "새로운 최다 기록"
       }
     }
   },

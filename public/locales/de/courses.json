@@ -1062,9 +1062,9 @@
     },
     "feat": {
       "group": {
-        "records": "Platzrekorde",
-        "firsts": "Erstmals hier",
-        "milestones": "Persönliche Meilensteine"
+        "records": "Rekorde gebrochen",
+        "firsts": "Einmal im Leben",
+        "milestones": "Den Platz bezwingen"
       },
       "kind": {
         "ace": "Hole in One",
@@ -1079,9 +1079,9 @@
       "afterRounds": "Nach {{count}} Runden",
       "gain": "{{count}} besser als zuvor",
       "group": {
-        "firsts": "Erstmals hier",
-        "best": "Bestes Scoring hier",
-        "most": "Meiste in einer Runde"
+        "firsts": "Zum ersten Mal",
+        "best": "Große Ausbeute",
+        "most": "Neue Bestwerte"
       }
     }
   },
