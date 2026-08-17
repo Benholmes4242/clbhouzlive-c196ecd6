@@ -115,6 +115,7 @@ export function StandoutTile({
   avatarUrl = null,
   avatarUserId = null,
   delta = null,
+  figureTone,
   nameSize,
   chipScale = 'md',
   isNew = false,
@@ -181,7 +182,7 @@ export function StandoutTile({
                 /* The fill is now DARK glass (BRIEF_GLASS_BADGES_DARK), so the
                    figure carries itself — no shadow floor is needed against a
                    light tint any more. */
-                color: '#FFFFFF',
+                color: figureTone ?? '#FFFFFF',
               }}
             >
               {figure}
