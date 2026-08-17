@@ -203,16 +203,23 @@ export function useCircleLatestRounds(
         }
       }
       pickedRounds.sort((a, b) => b.play_date.localeCompare(a.play_date));
-      const circleWindow = pickedRounds.slice(0, limit);
 
-      // 4. SUGGESTED FILL (BRIEF_WHOS_BEEN_PLAYING §3). Circle rounds always
-      //    come first and are never displaced; suggested rounds only occupy the
-      //    shortfall, so they fall away on their own as the circle grows.
-      //    ONE ROUND PER MEMBER, feats first then most recent. Same window,
-      //    same holes_played, no `.in('user_id', …)` — RLS decides visibility.
-      const shortfall = limit - circleWindow.length;
+      /**
+       * SUGGESTED ROUNDS ARE INTERLEAVED AT A FIXED RATIO
+       * (CORRECTION_WHOS_BEEN_PLAYING_RATIO §1): ONE SUGGESTED ROUND AFTER
+       * EVERY FIVE CIRCLE ROUNDS — so positions 6 and 12 are suggested — and
+       * then any remaining slots are topped up with suggested as before.
+       *
+       * THIS REPLACES the old shortfall-only rule, under which a member with a
+       * deep circle saw none and discovery switched off for the members who use
+       * the app most. It DISPLACES rather than extends: `limit` is unchanged.
+       *
+       * ONE ROUND PER MEMBER, feats first then most recent. Same window, same
+       * holes_played, no `.in('user_id', …)` — RLS decides visibility.
+       */
+      const RATIO = 5;
       const suggestedWindow: Round[] = [];
-      if (shortfall > 0) {
+      if (includeSuggested) {
         const { data: pool } = await supabase
           .from('gam_round_stats' as never)
           .select(ROUND_COLS)
@@ -241,12 +248,41 @@ export function useCircleLatestRounds(
           if (fa !== fb) return fb - fa;
           return b.play_date.localeCompare(a.play_date);
         });
-        suggestedWindow.push(...ranked.slice(0, shortfall));
+        suggestedWindow.push(...ranked.slice(0, limit));
       }
 
-      const rowsWindow = [...circleWindow, ...suggestedWindow];
+      // ONE PASS: interleave first, then top up. Circle rounds keep their own
+      // order (§2.1) — the interleave only inserts between them.
+      const rowsWindow: Round[] = [];
+      const usedSuggested: Round[] = [];
+      let ci = 0;
+      let si = 0;
+      let sinceSuggested = 0;
+      while (rowsWindow.length < limit) {
+        if (sinceSuggested >= RATIO && suggestedWindow[si]) {
+          const s = suggestedWindow[si++];
+          rowsWindow.push(s);
+          usedSuggested.push(s);
+          sinceSuggested = 0;
+          continue;
+        }
+        if (pickedRounds[ci]) {
+          rowsWindow.push(pickedRounds[ci++]);
+          sinceSuggested += 1;
+          continue;
+        }
+        if (suggestedWindow[si]) {
+          const s = suggestedWindow[si++];
+          rowsWindow.push(s);
+          usedSuggested.push(s);
+          continue;
+        }
+        break;
+      }
+
       if (rowsWindow.length === 0) return [];
-      const suggestedIds = new Set(suggestedWindow.map((r) => r.whs_score_id ?? `${r.user_id}-${r.play_date}`));
+      const suggestedIds = new Set(usedSuggested.map((r) => r.whs_score_id ?? `${r.user_id}-${r.play_date}`));
+
 
       // 5. Profiles (name + avatar) — ONE read covering circle AND suggested.
       const surfacedUserIds = Array.from(new Set(rowsWindow.map((r) => r.user_id)));
