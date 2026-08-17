@@ -83,9 +83,9 @@ function TextBar({ w, h = 11 }: { w: number | string; h?: number }) {
 /**
  * Section 2 — friends rail. MEASURED off FriendsPlayedRail: 224 wide, a 104px
  * photograph (PHOTO_H) carrying the glass score chip, the full-bleed round
- * shape strip at 34 (SHAPE_H), then the body — two reserved insight lines
- * (INSIGHT_TWO_LINE_RESERVE ~30), a hairline, and the member/reaction row.
- * Total 222. Was 151 (99 + 52) against a tile that no longer exists.
+ * shape strip at 34 (SHAPE_H), then the body — ONE reserved insight line
+ * (INSIGHT_LINE_RESERVE ~15), a hairline, and the member/reaction row.
+ * Total 207. Was 222 when two insight lines were reserved.
  */
 export function FriendsRail() {
   return (
@@ -98,10 +98,10 @@ export function FriendsRail() {
             {/* The shape strip is full bleed and sits directly under the photo. */}
             <Bar style={{ borderRadius: 0, height: 34, width: '100%' }} />
             <div style={{ padding: '9px 11px 10px' }}>
-              <div style={{ minHeight: 30, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ minHeight: 15, display: 'flex', flexDirection: 'column' }}>
                 <TextBar w={'92%'} h={10} />
-                <TextBar w={'64%'} h={10} />
               </div>
+
               <div
                 style={{
                   marginTop: 9,
