@@ -2,7 +2,7 @@ import React, { useCallback, useState, useRef, useEffect, memo } from 'react';
 import { Play } from 'lucide-react';
 import CarouselDots from '@/components/media/CarouselDots';
 import type { MediaItem } from '@/components/media-system/types/media';
-import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
+import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 interface PostFeedCarouselProps {
   mediaItems: MediaItem[];
@@ -216,8 +216,7 @@ export const PostFeedCarousel = memo(function PostFeedCarousel({
               {isVideo && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center"
-                    style={{ background: CHIP_GLASS_BG, border: CHIP_GLASS_BORDER }}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center ${CHIP_GLASS_CLASS}`}
                   >
                     <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
                   </div>

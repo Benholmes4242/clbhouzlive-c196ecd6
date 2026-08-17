@@ -31,7 +31,7 @@ import { usePlayerResults } from '../../hooks/usePlayerResults';
 import { useSeasonResultsSummary } from '../../hooks/useSeasonResultsSummary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { CHIP_GLASS_BG, CHIP_GLASS_BORDER, SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 // ---- Design tokens (per approved TIRedesign) ----
 const INK = '#0E1013';
@@ -470,8 +470,11 @@ function PickScrimBand({
         aria-hidden
         style={{
           background: dark
-            ? // DARK BRANCH — the canonical photo scrim (BRIEF_APP_WIDE_SCRIM §1.3).
-              SCRIM_STANDOUT
+            ? // DARK BRANCH — EXCLUDED from the canonical scrim
+              // (CORRECTION_APP_WIDE_SCRIM §3): starts at 0.12, NOT
+              // transparent, because a bright sky swallows the pick label at
+              // the top (BRIEF_TI_TILE_DARK_SCRIM §2.1).
+              'linear-gradient(180deg, rgba(10,14,10,0.12) 0%, rgba(10,14,10,0.50) 44%, rgba(10,14,10,0.92) 100%)'
             : // LIGHT BRANCH — untouched: it fades to the sheet's #FFFFFF.
                `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) ${fadeStart}%, rgba(255,255,255,0.55) ${Math.round(fadeStart + (100 - fadeStart) * 0.5)}%, rgba(255,255,255,0.88) ${Math.round(fadeStart + (100 - fadeStart) * 0.78)}%, #FFFFFF 100%)`,
           position: 'absolute',
@@ -540,6 +543,7 @@ function PickStatusTag({
   const dark = tone === 'dark';
   const wrap = (children: React.ReactNode, color: string) => (
     <span
+      className={dark ? CHIP_GLASS_CLASS : undefined}
       style={{
         ...PICK_META,
         color,
@@ -550,8 +554,6 @@ function PickStatusTag({
           ? {
               borderRadius: 999,
               padding: '3px 8px',
-              background: CHIP_GLASS_BG,
-              border: CHIP_GLASS_BORDER,
             }
           : null),
       }}

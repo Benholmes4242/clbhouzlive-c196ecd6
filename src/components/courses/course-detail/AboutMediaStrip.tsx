@@ -12,7 +12,7 @@ import type { FeedPost, MediaItem } from '@/components/media-system/types/media'
 import { AMBER } from '@/features/courses/_shared/tokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Action, KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
-import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
+import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 
 interface AboutMediaStripProps {
@@ -362,10 +362,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                     pointerEvents: 'none',
                   }}
                 >
-                  <div style={{
+                  <div className={CHIP_GLASS_CLASS} style={{
                     width: 32, height: 32, borderRadius: '50%',
-                    background: CHIP_GLASS_BG,
-                    border: CHIP_GLASS_BORDER,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <Play size={14} color="#fff" fill="#fff" />

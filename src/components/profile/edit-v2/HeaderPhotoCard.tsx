@@ -2,7 +2,7 @@ import React, { useRef, useState, useCallback } from 'react';
 import { Camera } from 'lucide-react';
 import { ImageCropperModal } from './ImageCropperModal';
 import { PhotoActionSheet } from './PhotoActionSheet';
-import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
+import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 
 
@@ -124,6 +124,7 @@ return (
           />
         ) : null}
         <span
+          className={CHIP_GLASS_CLASS}
           style={{
             position: 'absolute',
             top: 10,
@@ -131,16 +132,12 @@ return (
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            background: CHIP_GLASS_BG,
-            border: CHIP_GLASS_BORDER,
             color: '#fff',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             fontSize: 12.5,
             fontWeight: 500,
             padding: '7px 11px',
             borderRadius: 9,
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
           }}
         >
           <Camera size={13} strokeWidth={2.25} />

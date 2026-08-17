@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Play, Camera } from 'lucide-react';
-import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
+import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 export interface ReviewMediaItem {
   id: string;
@@ -84,12 +84,11 @@ const ReviewMediaThumb: React.FC<{
       {isVideo && (
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div
+            className={CHIP_GLASS_CLASS}
             style={{
               width: 22,
               height: 22,
               borderRadius: '50%',
-              background: CHIP_GLASS_BG,
-              border: CHIP_GLASS_BORDER,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

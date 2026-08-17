@@ -10,7 +10,6 @@ import { ReviewOverlaySlot } from './ReviewOverlaySlot';
 import { formatRelative } from '@/i18n/format';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 interface FeedOverlayLayerProps {
   posts: FeedPost[];
@@ -195,8 +194,11 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           right: 0,
           bottom: 0,
           height: '42%',
+          // EXCLUDED from the canonical scrim (CORRECTION_APP_WIDE_SCRIM §2):
+          // a 42% band carrying the caption AND the action rail over full-bleed
+          // post media. SCRIM_STANDOUT's 32% stop is tuned for a ~150px card.
           background:
-            SCRIM_STANDOUT,
+            'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.28) 38%, rgba(0,0,0,0) 100%)',
           pointerEvents: 'none',
           zIndex: 0,
         }}

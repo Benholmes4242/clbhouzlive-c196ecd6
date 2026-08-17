@@ -10,7 +10,7 @@ import { toast } from '@/lib/toast';
 import { MAX_MEDIA, type StageMediaItem } from '../hooks/useStageComposer';
 import SlideThumb from './SlideThumb';
 import { CT_DARK } from '@/features/_shared/composerTokens';
-import { CHIP_GLASS_BG, CHIP_GLASS_BORDER, SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { CHIP_GLASS_CLASS, SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 interface Props {
   media: StageMediaItem[];
@@ -69,11 +69,12 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
                   <span style={{ fontSize: 12, fontWeight: 700, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
                 </span>
               ) : (
-                <span style={{ position: 'absolute', left: 6, bottom: 6, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.85)', background: CHIP_GLASS_BG, border: CHIP_GLASS_BORDER, borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
+                <span className={CHIP_GLASS_CLASS} style={{ position: 'absolute', left: 6, bottom: 6, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.85)', borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
               )}
               <button
                 onClick={(e) => { e.stopPropagation(); onRemove(i); }}
                 aria-label="Remove"
+                className={CHIP_GLASS_CLASS}
                 style={{
                   position: 'absolute',
                   top: 5,
@@ -81,9 +82,7 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
                   width: 20,
                   height: 20,
                   borderRadius: 999,
-                  background: CHIP_GLASS_BG,
                   color: '#fff',
-                  border: CHIP_GLASS_BORDER,
                   fontSize: 12,
                   lineHeight: 1,
                   cursor: 'pointer',
