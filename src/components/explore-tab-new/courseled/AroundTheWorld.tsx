@@ -188,16 +188,18 @@ export function splitMasonry<T>(items: T[], heightOf: (item: T, index: number) =
  * Eagles no longer reach this section, so they fall to the tail rather than
  * being given a rung of their own.
  */
-/**
+ /**
  * THE THREE GROUPS (BRIEF_FEAT_SECTIONS_HIERARCHY §1.5), in the order the brief
  * fixes them. Anything not named falls to personal milestones, which is also
  * where a rating-only tile lands — it has no feat kind at all.
  *
- * KNOWN AND ACCEPTED: the order is the brief's, not strictly rarity-descending,
- * because an ace is rarer than a course record and sits in "Firsts here". The
- * rarest feat on the page is lifted out as the HERO regardless (§1.2), so the
- * rarest thing is never buried by this ordering.
+ * THIS IS A RELATIVE ORDER, NOT AN ABSOLUTE ONE
+ * (CORRECTION_HERO_INSIDE_ITS_GROUP §2.3): the hero now renders INSIDE its own
+ * group, so the group holding it is PROMOTED TO FIRST and the rest keep this
+ * relative order beneath it. That is what stops an ace — which is rarer than a
+ * course record but sits in "Firsts here" — from being buried mid-section.
  */
+
 const FEAT_GROUPS = [
   { id: 'records', kinds: ['crown'], key: 'discover.feat.group.records', label: 'Course records' },
   {
@@ -1035,7 +1037,7 @@ export function AroundTheWorld({
 
           const photoTile = (
             tt: Tile,
-            opts?: { photo?: number; hero?: boolean },
+            opts?: { photo?: number; hero?: boolean; showKicker?: boolean },
           ) => (
             <StandoutTile
               key={tt.slotKey}
@@ -1055,10 +1057,12 @@ export function AroundTheWorld({
                  uses for its reference_line. Verbatim; null renders nothing. */
               subline={tt.margin || null}
               isNew={isNewSince(tt.g.at, lastSeen)}
-              /* HERO ONLY: the feat kind names itself, the course name grows to
-                 21px and the figure chip takes its large size (§1.1, §1.3). */
+              /* HERO ONLY: the course name grows to 21px and the figure chip
+                 takes its large size (§1.1). The kind kicker renders only when
+                 no group heading sits above the hero
+                 (CORRECTION_HERO_INSIDE_ITS_GROUP §3). */
               kicker={
-                opts?.hero && tt.kind && KIND_LABELS[tt.kind]
+                opts?.showKicker && tt.kind && KIND_LABELS[tt.kind]
                   ? t(KIND_LABELS[tt.kind].key, KIND_LABELS[tt.kind].label)
                   : null
               }
@@ -1106,11 +1110,17 @@ export function AroundTheWorld({
            * group renders nothing at all; the one-group rule below still drops
            * the heading when only one group survives.
            */
+          const heroGroupId = groupIdFor(hero.kind);
           const buckets = FEAT_GROUPS.map((def) => ({
             id: def.id,
             label: t(def.key, def.label),
             items: rest.filter((tt) => groupIdFor(tt.kind) === def.id),
-          })).filter((b) => b.items.length > 0);
+          }))
+            /* The hero's group survives even when the hero is its only tile. */
+            .filter((b) => b.items.length > 0 || b.id === heroGroupId)
+            /* §2.3: THE GROUP HOLDING THE HERO IS PROMOTED TO FIRST; the others
+               keep their relative order beneath it. */
+            .sort((a, b) => (a.id === heroGroupId ? -1 : b.id === heroGroupId ? 1 : 0));
 
 
           /**
@@ -1136,16 +1146,22 @@ export function AroundTheWorld({
            * surviving group runs full width — and only when that group still
            * holds MORE THAN TWO tiles after the pull, so a group is never left
            * as one wide tile and a single column.
+           *
+           * §4.2: the hero's group is always buckets[0] after promotion, so the
+           * second wide tile can never land in the hero's group — no group ever
+           * carries two full-width tiles.
            */
           const secondGroup = buckets[1];
           const wide =
             secondGroup && secondGroup.items.length - 1 > 2 ? secondGroup.items[0] : null;
 
+          /* §3.3: the kicker only survives when NO heading sits above the hero,
+             i.e. the one-group case where headings are dropped. */
+          const heroKicker = buckets.length === 1;
+
           return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {/* THE HERO — full width, photo 214, member and headline in the
-                  footer row beneath the photograph. */}
-              {photoTile(hero, { photo: HERO_PHOTO, hero: true })}
+
 
               {buckets.map((b, bi) => {
                 const isWide = (tt: Tile) => wide != null && tt.slotKey === wide.slotKey;
@@ -1194,6 +1210,19 @@ export function AroundTheWorld({
                         {b.label}
                       </div>
                     ) : null}
+
+                    {/* THE HERO (§1.1) — first and largest tile of its OWN
+                        group, above that group's masonry. */}
+                    {b.id === heroGroupId ? (
+                      <div style={{ marginBottom: 8 }}>
+                        {photoTile(hero, {
+                          photo: HERO_PHOTO,
+                          hero: true,
+                          showKicker: heroKicker,
+                        })}
+                      </div>
+                    ) : null}
+
 
                     {wide && bi === 1 ? (
                       <div style={{ marginBottom: 8 }}>
