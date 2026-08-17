@@ -201,18 +201,20 @@ export function splitMasonry<T>(items: T[], heightOf: (item: T, index: number) =
  */
 
 const FEAT_GROUPS = [
-  { id: 'records', kinds: ['crown'], key: 'discover.feat.group.records', label: 'Course records' },
+  /* NAMES DESCRIBE THE GOLF, NOT THE SCHEMA (BRIEF_FEAT_SECTIONS_FINISHING §1).
+     These defaults must stay in step with the six locale files. */
+  { id: 'records', kinds: ['crown'], key: 'discover.feat.group.records', label: 'Records broken' },
   {
     id: 'firsts',
     kinds: ['ace', 'albatross', 'bogey_free'],
     key: 'discover.feat.group.firsts',
-    label: 'Firsts here',
+    label: 'Once in a lifetime',
   },
   {
     id: 'milestones',
     kinds: ['under_par', 'birdie_haul'],
     key: 'discover.feat.group.milestones',
-    label: 'Personal milestones',
+    label: 'Beating the course',
   },
 ] as const;
 
@@ -946,7 +948,19 @@ export function AroundTheWorld({
              * `detailAddsNothing`'s principle extends here: if the benchmark and
              * the detail are one fact told twice, the BENCHMARK is dropped.
              */
-            const marginRaw = (top?.featMargin ?? '').trim();
+            /**
+             * THE SUBLINE STATES WHAT HAPPENED (BRIEF_FEAT_SECTIONS_FINISHING
+             * §4). It used to render the SERVER BENCHMARK (`featMargin`, e.g.
+             * "Best here -4"), which announced a good round and then corrected
+             * it: a -1 tile read as a criticism of itself. The benchmark is
+             * still on the payload and untouched in SQL — it is simply no longer
+             * rendered HERE. It stays on Personal Bests, where BEATING the prior
+             * mark is what earned the tile (§4.4).
+             */
+            const marginRaw =
+              top?.kind && KIND_LABELS[top.kind]
+                ? t(KIND_LABELS[top.kind].key, KIND_LABELS[top.kind].label)
+                : '';
             const detailText = who && detailShown ? detail : '';
             const margin =
               marginRaw && marginRaw.toLowerCase() === detailText.trim().toLowerCase()
@@ -973,6 +987,9 @@ export function AroundTheWorld({
               more,
               scoreId: top?.scoreId ?? null,
               ownerId: top?.userId ?? null,
+              /* §3.4: the USER ID drives the fallback colour, so it is passed
+                 alongside the photo rather than the name being hashed. */
+              avatarUrl: top?.actorAvatar ?? rating?.actorAvatar ?? null,
               reactTo,
               onPress,
               height: photo + estimatePanelHeight(detailText, margin),
@@ -1068,6 +1085,8 @@ export function AroundTheWorld({
                   ? t(KIND_LABELS[tt.kind].key, KIND_LABELS[tt.kind].label)
                   : null
               }
+              avatarUrl={tt.avatarUrl}
+              avatarUserId={tt.ownerId}
               nameSize={opts?.hero ? 21 : undefined}
               chipScale={opts?.hero ? 'lg' : 'md'}
               onPress={pressOf(tt)}
@@ -1078,6 +1097,8 @@ export function AroundTheWorld({
           const compactTile = (tt: Tile) => (
             <CompactStandoutTile
               key={tt.slotKey}
+              courseId={tt.g.courseId}
+              imageUrl={tt.m?.imageUrl ?? tt.g.courseImage}
               courseName={nameOf(tt)}
               region={tt.m?.region ?? null}
               figure={tt.figure}
@@ -1088,6 +1109,8 @@ export function AroundTheWorld({
               detail={detailOf(tt)}
               subline={tt.margin || null}
               isNew={isNewSince(tt.g.at, lastSeen)}
+              avatarUrl={tt.avatarUrl}
+              avatarUserId={tt.ownerId}
               onPress={pressOf(tt)}
               trailing={trailingOf(tt)}
             />
