@@ -3,8 +3,8 @@ import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useFriendRoundDetail } from '@/lib/whs/hooks';
 import type { WhsLastRound } from '@/lib/whs/types';
-import {
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
+import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';

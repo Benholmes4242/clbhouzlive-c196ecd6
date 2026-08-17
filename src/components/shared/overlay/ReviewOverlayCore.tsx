@@ -16,8 +16,8 @@ import React, { memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import {
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
+import {
   FROST,
   FROST_BLUR,
   FROST_SCORE_GRADIENT,
