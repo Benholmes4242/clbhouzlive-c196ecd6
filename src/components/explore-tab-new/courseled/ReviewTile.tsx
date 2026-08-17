@@ -445,10 +445,85 @@ export function ReviewTile({
           metrics and the band colour come from there, not from this file.
           A null category RENDERS NO ROW; a review with no categories at all
           renders NO BLOCK and no gap. */}
-      {rows.length > 0 && (
+      {/* THE QUOTE — FEATURED ONLY (§2.2), three lines, beneath the photo and
+          above the bars. useLatestReviews rejects any review whose prose is
+          empty after trim, so every review here has words: no null case. */}
+      {isFeatured && r.quote && (
+        <div
+          style={{
+            padding: '10px 14px 0',
+            fontSize: 13,
+            fontWeight: 500,
+            lineHeight: 1.42,
+            letterSpacing: '-0.01em',
+            color: A.BODY,
+            ...clamp(3),
+          }}
+        >
+          {r.quote}
+        </div>
+      )}
+
+      {/* BREAKDOWN — the four category scores.
+          BARS / FEATURED: scoreBands' shipped SubScoreBar (the same component
+          the review composer uses), so the label/track/figure metrics and the
+          band colour come from there, not from this file. Featured renders the
+          same rows at the slightly looser scale the wider tile allows (§2.6).
+          COMPACT (§4.2): four equal columns, figure over label, NO track, NO
+          fill, NO band colour — a sub-9 review carries amber on most rows, and
+          reserving the coloured bars for 9+ is what makes them mean something.
+          A null category RENDERS NO ROW; a review with no categories at all
+          renders NO BLOCK and no gap. */}
+      {rows.length > 0 && resolvedTier === 'compact' && (
         <div
           data-testid="review-tile-breakdown"
-          style={{ padding: '8px 11px 9px', display: 'grid', rowGap: 6 }}
+          style={{
+            padding: '9px 11px 10px',
+            display: 'grid',
+            gridTemplateColumns: `repeat(${rows.length}, 1fr)`,
+            gap: 6,
+          }}
+        >
+          {rows.map((row) => (
+            <div key={row.key} style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1,
+                  color: A.INK,
+                  ...FIGS,
+                }}
+              >
+                {row.value.toFixed(1)}
+              </div>
+              <div
+                style={{
+                  ...LABEL,
+                  fontSize: 7,
+                  marginTop: 4,
+                  color: A.MUTE,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {row.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {rows.length > 0 && resolvedTier !== 'compact' && (
+        <div
+          data-testid="review-tile-breakdown"
+          style={
+            isFeatured
+              ? { padding: '10px 14px 12px', display: 'grid', rowGap: 8 }
+              : { padding: '8px 11px 9px', display: 'grid', rowGap: 6 }
+          }
         >
           {rows.map((row) => (
             <SubScoreBar key={row.key} label={row.label} score={row.value} />
