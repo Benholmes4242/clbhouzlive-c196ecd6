@@ -252,7 +252,14 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                         <span style={{ ...PICK_META, color: 'rgba(255,255,255,0.75)' }}>
                           {t('overview.tiPicks.card.pickOf', { n: p.rank, total: pickTotal })}
                         </span>
-                        <PickStatusTag live={live} t={t} tone="dark" />
+                        {/* ONE STATUS SLOT. A win puts the gold pill HERE instead
+                            of "FINISHED" — never both, and never a second pill
+                            beside the name. */}
+                        {isWin ? (
+                          <VerdictChip v={v} t={t} onDark />
+                        ) : (
+                          <PickStatusTag live={live} t={t} tone="dark" />
+                        )}
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
