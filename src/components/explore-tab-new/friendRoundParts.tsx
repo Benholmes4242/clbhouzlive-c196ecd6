@@ -228,22 +228,23 @@ function ordinal(n: number): string {
   }
 }
 
-/** "Level" / "2 under" / "3 over" — the nine fragment. */
+/** "Level" / "-2" / "+3" — the nine fragment, as a figure, never a word. */
 function nineFragment(toPar: number, t: T): string {
   if (toPar === 0) return t('discover.friendsRail.insight.parLevel', { defaultValue: 'Level' });
   return toPar < 0
-    ? t('discover.friendsRail.insight.parUnder', { defaultValue: '{{n}} under', n: Math.abs(toPar) })
-    : t('discover.friendsRail.insight.parOver', { defaultValue: '{{n}} over', n: toPar });
+    ? t('discover.friendsRail.insight.parUnder', { defaultValue: '-{{n}}', n: Math.abs(toPar) })
+    : t('discover.friendsRail.insight.parOver', { defaultValue: '+{{n}}', n: toPar });
 }
 
 /**
  * THE ONE SHAPE SENTENCE (BRIEF_ROUND_POST_ENRICHMENT §4).
  *
- * "Two under after nine, then three over coming home." Generated HERE and
- * nowhere else: the friends rail's 'nines' insight calls it, and so does the
- * Clubhouse round post, so the two surfaces can never word the same round
- * differently. Returns null when the nines are absent or the spread is too
- * narrow to be a story — the caller then renders nothing at all.
+ * "+4 out, Level home." Generated HERE and nowhere else: the friends rail's
+ * 'nines' insight calls it, and so does the Clubhouse round post, so the two
+ * surfaces can never word the same round differently. Kept to one line — the
+ * rail's insight row does not wrap (BRIEF_FRIENDS_RAIL_ONE_LINE). Returns null
+ * when the nines are absent or the spread is too narrow to be a story — the
+ * caller then renders nothing at all.
  */
 export function shapeSentence(
   front: number | null | undefined,
@@ -253,11 +254,12 @@ export function shapeSentence(
   if (front == null || back == null || !Number.isFinite(front) || !Number.isFinite(back)) return null;
   if (Math.abs(front - back) < NINES_MIN_SPREAD) return null;
   return t('discover.friendsRail.insight.nines', {
-    defaultValue: '{{front}} after nine, then {{back}} coming home',
+    defaultValue: '{{front}} out, {{back}} home',
     front: nineFragment(front, t),
-    back: nineFragment(back, t).toLowerCase(),
+    back: nineFragment(back, t),
   });
 }
+
 
 /** Ordered candidate list for one round; the caller picks the first allowed. */
 function candidatesFor(row: CircleRoundRow, t: T): RoundInsight[] {
