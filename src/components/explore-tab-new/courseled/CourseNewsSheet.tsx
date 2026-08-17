@@ -366,9 +366,10 @@ export function CourseNewsSheet({
                     >
                       <SquircleAvatar
                         size={16}
-                        url={e.avatarUrl ?? null}
+                        src={e.avatarUrl ?? null}
                         userId={e.avatarUserId ?? null}
-                        name={e.who}
+                        alt={e.who}
+                        hideRing
                       />
                       {e.who && (
                         <span
