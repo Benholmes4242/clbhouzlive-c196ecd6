@@ -210,14 +210,16 @@ export function useDiscoverPrompt(userId: string | undefined): {
 
   if (friendIds.isLoading || circleRounds.isPending) return { prompt: null, resolved: false };
 
-  // 4 friends — LAST, and it STANDS DOWN while "Who's been playing" is showing
-  // suggested tiles (BRIEF_WHOS_BEEN_PLAYING 4.1/4.2). Its copy promises rounds
-  // that would then be visible directly beneath it, and two asks for the same
-  // thing on one screen is one too many. The kind, its copy and its route to
-  // the Find golfers sheet all remain: this is still the right prompt when the
-  // rail genuinely cannot fill.
-  const railRows = circleRounds.data ?? [];
-  if ((friendIds.data?.size ?? 0) === 0 && railRows.length === 0) {
+  // 4 friends — LAST, and it stands down only when the rail is showing
+  // suggested tiles BECAUSE THE CIRCLE IS EMPTY OR NEARLY SO
+  // (CORRECTION_WHOS_BEEN_PLAYING_RATIO §3.3). Suggested tiles are now always
+  // present by ratio, so gating on their presence would silence this prompt for
+  // everybody. We gate on the CIRCLE COUNT: fewer than three circle rounds on
+  // the rail and the ask is still honest.
+  const CIRCLE_PROMPT_FLOOR = 3;
+  const circleCount = (circleRounds.data ?? []).filter((r) => !r.suggested).length;
+  if ((friendIds.data?.size ?? 0) === 0 && circleCount < CIRCLE_PROMPT_FLOOR) {
+
     return {
       resolved: true,
       prompt: {
