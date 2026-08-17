@@ -612,12 +612,25 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   nothing when either nine is unmeasured. */}
               <RoundShape row={r} shape={holeShapes?.get(r.score_id ?? '') ?? null} />
 
-              <div style={{ padding: '9px 11px 10px' }}>
+              {/* THE LOWER BLOCK OWNS THE REMAINING HEIGHT. The rail stretches
+                  every tile to one height, so the block below the photo must be
+                  a column that FILLS what is left — otherwise a tile whose meta
+                  row is empty (a zero-birdie round) pulls its footer up and the
+                  name and reaction sit above their neighbours'. */}
+              <div
+                style={{
+                  padding: '9px 11px 10px',
+                  flex: 1,
+                  minHeight: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
                 {/* THE SUBLINE. Its wording is generated elsewhere and is
                     unchanged; the drawing above is built from the same two
                     figures, so the two can never disagree. Two lines of height
                     are reserved on every card so the rail holds one height. */}
-                <div style={{ minHeight: INSIGHT_TWO_LINE_RESERVE }}>
+                <div style={{ minHeight: INSIGHT_TWO_LINE_RESERVE, marginBottom: 9 }}>
                   {insight && (
                     <div
                       style={{
