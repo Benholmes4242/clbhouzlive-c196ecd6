@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 
 
 import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
@@ -22,15 +21,14 @@ import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
-import { useRoundHoleShapes, type HoleShape, type ShapeBead } from './hooks/useRoundHoleShapes';
+import { useRoundHoleShapes } from './hooks/useRoundHoleShapes';
+import { RoundShape } from './RoundShape';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { countNewSince, isNewSince, useReportNewCount } from './newSince';
 import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
-import { monotonePath } from '@/lib/charts/monotonePath';
 import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SANS } from './tokens';
 
 /**
@@ -107,8 +105,6 @@ const GLASS_CSS = `
    round drew nearly the same flat line: the shape was unreadable, not compact.
    60 is the smallest height where a two-shot swing is legible, and the tile has
    the room — the body below is one insight line and a member row. */
-const SHAPE_H = 60;
-const SHAPE_PAD_X = 6;
 
 /* monotonePath now lives in @/lib/charts/monotonePath — ONE copy, shared with
    the scorecard sheet's trajectory chart. */
@@ -124,8 +120,6 @@ const SHAPE_PAD_X = 6;
    so the CHIP'S under-par figure — and only that — uses a lighter red. */
 const GLASS_UNDER = '#FF8A80';
 
-const OVER_TONE = A.INK;
-const UNDER_TONE = TOPAR_RED;
 
 /**
  * THE ROUND'S SHAPE.
