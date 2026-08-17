@@ -26,6 +26,8 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
   const { data: rounds } = useCircleLatestRounds(userId, {
     limit: SHEET_LIMIT,
     allowMultiplePerFriend: true,
+    /* CIRCLE ONLY (CORRECTION_WHOS_BEEN_PLAYING_RATIO §2.3). */
+    includeSuggested: false,
   });
   const total = rounds?.length ?? 0;
   // Insight resolution spans the whole list so one kind cannot flood the sheet.
