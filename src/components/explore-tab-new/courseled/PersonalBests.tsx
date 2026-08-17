@@ -199,11 +199,14 @@ export function PersonalBests({
     const delta =
       previous !== null ? Math.max(0, Number(r.figure ?? 0) - previous) : null;
 
+    const nameLen = (r.is_self ? 'You' : (r.display_name?.trim() ?? '')).length;
     const photoHeight =
       photo +
       23 +
-      18 +
-      (headline ? 2 + Math.min(2, Math.ceil(headline.length / 24)) * 16 : 0) +
+      // The name row wraps to a second line instead of truncating, and the
+      // detail row below it now carries the reaction control (20px floor).
+      (nameLen ? Math.min(2, Math.ceil(nameLen / 19)) : 1) * 18 +
+      2 + Math.max(Math.min(2, Math.ceil((headline?.length ?? 0) / 24)) * 16, 20) +
       (reference ? 3 + Math.min(2, Math.ceil(reference.length / 26)) * 14 : 0);
 
     return {
