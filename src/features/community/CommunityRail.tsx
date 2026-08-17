@@ -86,7 +86,6 @@ export function CommunityRail({ moments, title, onTilePress, autoplayGroup }: Pr
             initialsSize={26}
             labelSize={10}
             labelInset={8}
-            scrimStop="45%"
             autoplayGroup={autoplayGroup}
             style={{
               height: RAIL_H,

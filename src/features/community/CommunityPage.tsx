@@ -245,7 +245,6 @@ export default function CommunityPage() {
                   initialsSize={34}
                   labelSize={11}
                   labelInset={12}
-                  scrimStop="40%"
                   autoplayGroup="community-lead"
                   style={{ height: leadHeight, width: '100%' }}
                 />

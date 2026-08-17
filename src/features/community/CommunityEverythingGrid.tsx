@@ -71,7 +71,6 @@ export function CommunityEverythingGrid({ moments, onTilePress }: Props) {
             initialsSize={18}
             labelSize={9}
             labelInset={6}
-            scrimStop="55%"
             // Too small for moving video to read — poster only.
             autoplay={false}
             // A square crop leaves no room for a course name to be legible;

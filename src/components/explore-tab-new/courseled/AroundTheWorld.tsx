@@ -27,6 +27,7 @@ import {
   type MasonryAssignment,
 } from './stableMasonry';
 import { CompactStandoutTile, estimateCompactHeight } from './CompactStandoutTile';
+import { SCRIM_STANDOUT } from './photoScrim';
 import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW_ROW_BAR, NUMF, SANS, SCRIM_STRONG } from './tokens';
 import { StandoutTile } from './StandoutTile';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
@@ -111,8 +112,8 @@ export const ATW_PHOTO_HEIGHTS = [198, 160, 138, 122, 114, 108, 104, 101] as con
 /** A photo at or above this height gets the larger chip and name sizes. */
 const TALL = 180;
 
-const TILE_SCRIM =
-  'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 32%)';
+/** Imported, never retyped (BRIEF_DISCOVER_SCRIM_AUDIT §2.4). */
+const TILE_SCRIM = SCRIM_STANDOUT;
 
 type ChipTier = 'gold' | 'green' | 'ink' | 'rating';
 

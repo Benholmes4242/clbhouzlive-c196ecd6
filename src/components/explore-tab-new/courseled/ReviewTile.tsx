@@ -3,6 +3,7 @@ import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from './CourseImageFallback';
+import { SCRIM_STANDOUT } from './photoScrim';
 import { ReactionAction } from './ReactionAction';
 
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -76,7 +77,8 @@ export function reviewTier(r: LatestReview): ReviewTier {
   return 'bars';
 }
 
-const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.88) 0%, rgba(10,14,10,0.06) 30%)';
+/** The one course-photo scrim (BRIEF_DISCOVER_SCRIM_AUDIT §2.1). Never local. */
+const SCRIM = SCRIM_STANDOUT;
 /** On-dark amber: the viewing member's own name. Not #F7931E on photography. */
 const AMBER_ON_DARK = '#FFB25E';
 
