@@ -36,6 +36,13 @@ interface Props {
   photo: number;
   /** Figure chip. Rendered only when `figure` is present. */
   figure: string | null;
+  /**
+   * FIGURE TONE — the glass chip's numeral colour. Defaults to flat white
+   * (BRIEF_GLASS_BADGES_DARK). "Beating the course" passes the app's TOPAR red
+   * so an under-par figure reads as under par here as it does everywhere else.
+   */
+  figureTone?: string;
+
   unit?: string;
   /** Relative age, top-right. */
   whenLabel: string;
@@ -108,6 +115,7 @@ export function StandoutTile({
   avatarUrl = null,
   avatarUserId = null,
   delta = null,
+  figureTone,
   nameSize,
   chipScale = 'md',
   isNew = false,
@@ -174,7 +182,7 @@ export function StandoutTile({
                 /* The fill is now DARK glass (BRIEF_GLASS_BADGES_DARK), so the
                    figure carries itself — no shadow floor is needed against a
                    light tint any more. */
-                color: '#FFFFFF',
+                color: figureTone ?? '#FFFFFF',
               }}
             >
               {figure}
@@ -306,6 +314,9 @@ export function StandoutTile({
             {kicker}
           </div>
         ) : null}
+        {/* THE NAME ROW owns the whole width now: the reaction control moved
+            DOWN onto the detail line, so a long member name wraps to a second
+            line instead of being cut off mid-word. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           {who ? (
             <SquircleAvatar
@@ -324,43 +335,60 @@ export function StandoutTile({
               fontWeight: 700,
               letterSpacing: '-0.01em',
               color: isOwn ? A.AMBER_DEEP : A.INK,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {who || detail}
-          </div>
-          {trailing}
-        </div>
-
-        {!!who && !!detail && (
-          <div
-            role={onDetailPress ? 'button' : undefined}
-            onClick={
-              onDetailPress
-                ? (ev) => {
-                    ev.stopPropagation();
-                    onDetailPress();
-                  }
-                : undefined
-            }
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              lineHeight: 1.32,
-              color: A.MUTE,
-              marginTop: 2,
+              lineHeight: 1.2,
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
-              cursor: onDetailPress ? 'pointer' : 'inherit',
             }}
           >
-            {detail}
+            {who || detail}
+          </div>
+        </div>
+
+        {/* THE DETAIL LINE, WITH THE REACTION ON IT. The slot renders even with
+            no detail text so the heart keeps its position down a column. */}
+        {(!!(who && detail) || !!trailing) && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              marginTop: 2,
+              minHeight: 20,
+            }}
+          >
+            <div
+              role={onDetailPress ? 'button' : undefined}
+              onClick={
+                onDetailPress
+                  ? (ev) => {
+                      ev.stopPropagation();
+                      onDetailPress();
+                    }
+                  : undefined
+              }
+              style={{
+                flex: 1,
+                minWidth: 0,
+                fontSize: 12,
+                fontWeight: 600,
+                lineHeight: 1.32,
+                color: A.MUTE,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                cursor: onDetailPress ? 'pointer' : 'inherit',
+              }}
+            >
+              {who ? detail : ''}
+            </div>
+            {trailing}
           </div>
         )}
+
+
 
         {/* THE REFERENCE LINE (§3.5). Quieter than the detail, never a
             placeholder when absent. */}
