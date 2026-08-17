@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { FriendRoundRow } from './FriendRoundRow';
-import { buildInsightMap } from './friendRoundParts';
+import { buildInsightMap, referenceLine } from './friendRoundParts';
 import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
@@ -89,7 +89,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
             <FriendRoundRow
               key={r.round_id}
               row={r}
-              insight={insights.get(r.round_id)?.text ?? null}
+              insight={insights.get(r.round_id)?.text ?? referenceLine(r, t)}
               isLast={i === rounds.length - 1}
               onPress={() => {
                 // Do NOT close the sheet — leaving it mounted beneath the

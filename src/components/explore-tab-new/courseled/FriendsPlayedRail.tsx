@@ -7,6 +7,7 @@ import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircl
 import {
   toParFor,
   buildInsightMap,
+  referenceLine,
   InsightGlyph,
   INSIGHT_FONT_SIZE,
   INSIGHT_LINE_HEIGHT,
@@ -445,7 +446,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
           // (A.IMPROVED / A.DRIFTED) means MOVEMENT and must never appear here.
           const toPar = toParFor(r);
           const toParUnder = toPar?.tone === TOPAR_RED;
-          const insight = insights.get(r.round_id)?.text ?? null;
+          const insight = insights.get(r.round_id)?.text ?? referenceLine(r, t);
 
           return (
             <button
