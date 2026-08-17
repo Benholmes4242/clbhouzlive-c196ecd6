@@ -127,6 +127,13 @@ interface Props {
    * the CURVE is identical either way.
    */
   showTicks?: boolean;
+  /**
+   * Vertical breathing room INSIDE the plot, in px per side. Default 10 (feed
+   * card + sheet, where the band is 150px tall). The Discover friends tile is
+   * 60px and sits flush under the photograph, so 10 + 10 ate a third of the
+   * band and read as dead space: it passes 5.
+   */
+  padY?: number;
 }
 
 
@@ -147,7 +154,7 @@ export const TrajectoryLine: React.FC<Props> = ({
   surface = 'light',
   interactive = false,
   showTicks = true,
-
+  padY = 10,
 }) => {
   const T = SURFACE_TOKENS[surface];
   const { t } = useTranslation(['courses']);
@@ -218,7 +225,6 @@ export const TrajectoryLine: React.FC<Props> = ({
 
   const w = 340;
   const padX = 0;
-  const padY = 10;
 
   /**
    * THE SCALE IS THE PLAYER'S OWN RANGE AND ZERO (§2). The field term is gone
