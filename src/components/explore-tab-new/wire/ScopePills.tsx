@@ -51,7 +51,7 @@ export function ScopePills({ lens, onChange, style }: Props) {
         position: 'sticky',
         top: 'var(--sat, 0px)',
         zIndex: 10,
-        background: '#F8FAFC',
+        background: A.CANVAS,
         borderBottom: `1px solid ${A.BORDER}`,
         padding: '12px 16px',
         display: 'flex',
