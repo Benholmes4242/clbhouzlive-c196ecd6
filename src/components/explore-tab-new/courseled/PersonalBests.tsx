@@ -9,7 +9,7 @@ import { usePersonalBests, PERSONAL_BESTS_PER_MEMBER } from './hooks/usePersonal
 import { createMasonryAssignment, placeStable, type MasonryAssignment } from './stableMasonry';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
-import { A, Eyebrow, LABEL, NUMF } from './tokens';
+import { A, Eyebrow, LABEL } from './tokens';
 import { StandoutTile } from './StandoutTile';
 import {
   EffortTile,
