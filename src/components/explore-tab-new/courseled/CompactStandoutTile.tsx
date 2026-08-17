@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
+import { CourseImageFallback } from './CourseImageFallback';
+import { TILE_SCRIM } from './StandoutTile';
 import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
 
 /**
@@ -21,14 +25,18 @@ import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
  */
 
 /**
- * Fixed chrome, in the order it renders:
+ * Fixed chrome, in the order it renders (BRIEF_FEAT_SECTIONS_FINISHING §2):
  *
+ *   PHOTO STRIP        78px, scrim + course name on it       = 78
  *   padding            11 top + 12 bottom                    = 23
  *   figure row         26px numeral at lineHeight 1           = 26
- *   course name        13/700 at lineHeight 1.2 (~16), mt 4   = 20
- *   hairline           1px rule with 9px either side          = 19
  *   WHO row            13/700 one line, matching the photo tile = 18
- *                                                         base = 106
+ *                                                         base = 145
+ *
+ * The strip is why the course name and the hairline are gone from the text
+ * panel: the name now sits on the photograph, exactly as on the full tile. A
+ * tile with no resolvable image still renders the strip at 78 (the gradient and
+ * initials), so the tier's height stays predictable (§2.5).
  *
  * Then, only when present:
  *   detail   marginTop 2 + 16 a line (12/600 at lineHeight 1.32), max 2 lines
@@ -37,7 +45,10 @@ import { A, CARD_SHELL, LABEL, NEW_CARD_RING, NUMF, SANS } from './tokens';
  * The line counts use the SAME ~151px inner-width character thresholds as
  * `estimatePanelHeight` in AroundTheWorld, so the two shapes bill text alike.
  */
-export const COMPACT_BASE = 106;
+/** The strip height (§2.3). */
+export const PHOTO_STRIP = 78;
+
+export const COMPACT_BASE = 145;
 
 export function estimateCompactHeight(detail: string, subline: string): number {
   const lines = detail ? Math.min(2, Math.ceil(detail.length / 24)) : 0;
@@ -50,6 +61,8 @@ export function estimateCompactHeight(detail: string, subline: string): number {
 }
 
 interface Props {
+  courseId: string;
+  imageUrl?: string | null;
   courseName: string | null;
   region?: string | null;
   figure: string | null;
@@ -61,10 +74,15 @@ interface Props {
   subline?: string | null;
   trailing?: React.ReactNode;
   isNew?: boolean;
+  /** See StandoutTile: 20px squircle left of the name, hashed on the USER ID. */
+  avatarUrl?: string | null;
+  avatarUserId?: string | null;
   onPress?: () => void;
 }
 
 export function CompactStandoutTile({
+  courseId,
+  imageUrl = null,
   courseName,
   figure,
   unit,
@@ -75,6 +93,8 @@ export function CompactStandoutTile({
   subline = null,
   trailing,
   isNew = false,
+  avatarUrl = null,
+  avatarUserId = null,
   onPress,
 }: Props) {
   const [pressed, setPressed] = useState(false);
@@ -91,7 +111,7 @@ export function CompactStandoutTile({
       style={{
         ...CARD_SHELL,
         ...(isNew ? NEW_CARD_RING : null),
-        padding: '11px 13px 12px',
+        padding: 0,
         textAlign: 'left',
         fontFamily: SANS,
         cursor: onPress ? 'pointer' : 'default',
@@ -99,9 +119,54 @@ export function CompactStandoutTile({
         transition: 'opacity 120ms ease',
       }}
     >
-      {/* FIGURE LEADS. The age sits on the same baseline row, right, where the
-          photo tile put it in the top-right corner. */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+      {/* THE PHOTO STRIP (§2.2) — same scrim, same course name treatment as the
+          full tile, at 78px so the tier stays shorter than a photo tile without
+          being photoless. */}
+      <CourseImageFallback
+        courseId={courseId}
+        courseName={courseName}
+        imageUrl={imageUrl}
+        initialsSize={18}
+        style={{ height: PHOTO_STRIP }}
+      >
+        <div style={{ position: 'absolute', inset: 0, background: TILE_SCRIM }} />
+        <span
+          style={{
+            position: 'absolute',
+            top: 7,
+            right: 9,
+            fontSize: 6.5,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.72)',
+            textShadow: '0 1px 2px rgba(10,14,10,0.55)',
+          }}
+        >
+          {whenLabel}
+        </span>
+        <div
+          style={{
+            position: 'absolute',
+            left: 10,
+            right: 10,
+            bottom: 8,
+            fontSize: 13,
+            fontWeight: 700,
+            color: '#fff',
+            letterSpacing: '-0.025em',
+            lineHeight: 1.14,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {courseName}
+        </div>
+      </CourseImageFallback>
+
+      <div style={{ padding: '11px 13px 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, height: 26 }}>
         <span style={{ ...NUMF, fontSize: 26, lineHeight: 1, color: A.INK }}>
           {figure ?? '—'}
         </span>
@@ -119,36 +184,18 @@ export function CompactStandoutTile({
             {unit}
           </span>
         ) : null}
-        <span style={{ ...LABEL, fontSize: 6.5, marginLeft: 'auto', color: A.DIM }}>
-          {whenLabel}
-        </span>
       </div>
 
-      <div
-        style={{
-          marginTop: 4,
-          fontSize: 13,
-          fontWeight: 700,
-          letterSpacing: '-0.02em',
-          lineHeight: 1.2,
-          color: A.INK,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {courseName}
-      </div>
-
-      <div
-        style={{
-          height: 1,
-          margin: '9px 0',
-          background: A.BORDER,
-        }}
-      />
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 9 }}>
+        {who ? (
+          <SquircleAvatar
+            src={avatarUrl}
+            userId={avatarUserId}
+            alt={who}
+            size={20}
+            hideRing
+          />
+        ) : null}
         <div
           style={{
             flex: 1,
@@ -202,6 +249,7 @@ export function CompactStandoutTile({
           {subline}
         </div>
       ) : null}
+      </div>
     </div>
   );
 }
