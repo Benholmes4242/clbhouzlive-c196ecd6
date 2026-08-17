@@ -22,7 +22,7 @@ import {
   TOPAR_EVEN_DARK,
 } from '@/features/tourhub/_shared/tokens';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { SCRIM_BASE, SCRIM_STANDOUT, SCRIM_TOP_BAND } from './photoScrim';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { CARD_SHELL, Eyebrow, InkAction, LABEL, NUMF, SANS } from './tokens';
 
 /**
@@ -658,12 +658,10 @@ function TourTile({
         initialsSize={30}
         style={{ position: 'absolute', inset: 0 }}
       >
-        {/* photoScrim's EXISTING layers, imported not rewritten. The scrim
-            carries the legibility under the panel — darkening the glass would
+        {/* ONE layer — the canonical SCRIM_STANDOUT, imported not rewritten.
+            It carries the legibility under the panel; darkening the glass would
             stop it being glass. */}
-        <div style={{ position: 'absolute', inset: 0, background: SCRIM_TOP_BAND }} />
         <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
-        <div style={{ position: 'absolute', inset: 0, background: SCRIM_BASE }} />
       </CourseImageFallback>
 
       {/* THE WHOLE TILE TAPS THROUGH TO THE TOURNAMENT, exactly as before. */}
