@@ -362,6 +362,53 @@
           "claim": "See your reach",
           "tail": "views, follows and engagement"
         }
+      },
+      "hero": {
+        "kicker": "FOR BUSINESSES",
+        "title": "Golfers are already talking about you.",
+        "body": "Claim your page and be part of it."
+      },
+      "numbers": {
+        "courses": "courses on clbhouz",
+        "rounds": "ROUNDS",
+        "reviews": "REVIEWS",
+        "greenNote": "GREEN IS LAST 30 DAYS"
+      },
+      "examples": {
+        "kicker": "WHAT YOURS LOOKS LIKE",
+        "heading": "A page for every kind of golf business",
+        "tag": "EXAMPLE",
+        "tabs": {
+          "home": "HOME",
+          "about": "ABOUT",
+          "reviews": "REVIEWS"
+        },
+        "club": {
+          "name": "Golf club",
+          "meta": "Club . 18 holes"
+        },
+        "range": {
+          "name": "Driving range",
+          "meta": "Range . Practice"
+        },
+        "shop": {
+          "name": "Pro shop",
+          "meta": "Retail . Fitting"
+        }
+      },
+      "rows": {
+        "found": {
+          "title": "Be found",
+          "body": "You appear in search and the course directory, alongside the {{courses}} courses golfers already browse."
+        },
+        "trusted": {
+          "title": "Be trusted",
+          "body": "Reviews come from golfers with tracked rounds - not anonymous accounts."
+        },
+        "reach": {
+          "title": "Know your reach",
+          "body": "Views, follows and engagement, counted live as they happen."
+        }
       }
     },
     "card": {

@@ -136,6 +136,53 @@
           "claim": "Mide tu alcance",
           "tail": "vistas, seguidores e interaccion"
         }
+      },
+      "hero": {
+        "kicker": "PARA EMPRESAS",
+        "title": "Los golfistas ya hablan de ti.",
+        "body": "Reclama tu pagina y forma parte."
+      },
+      "numbers": {
+        "courses": "campos en clbhouz",
+        "rounds": "RONDAS",
+        "reviews": "RESENAS",
+        "greenNote": "EL VERDE ES LOS ULTIMOS 30 DIAS"
+      },
+      "examples": {
+        "kicker": "ASI SE VE LA TUYA",
+        "heading": "Una pagina para cada negocio del golf",
+        "tag": "EJEMPLO",
+        "tabs": {
+          "home": "INICIO",
+          "about": "INFO",
+          "reviews": "RESENAS"
+        },
+        "club": {
+          "name": "Club de golf",
+          "meta": "Club . 18 hoyos"
+        },
+        "range": {
+          "name": "Campo de practicas",
+          "meta": "Practicas"
+        },
+        "shop": {
+          "name": "Tienda pro",
+          "meta": "Retail . Fitting"
+        }
+      },
+      "rows": {
+        "found": {
+          "title": "Hazte visible",
+          "body": "Apareces en la busqueda y en el directorio, junto a los {{courses}} campos que los golfistas ya consultan."
+        },
+        "trusted": {
+          "title": "Genera confianza",
+          "body": "Las resenas vienen de golfistas con rondas registradas, no de cuentas anonimas."
+        },
+        "reach": {
+          "title": "Conoce tu alcance",
+          "body": "Vistas, seguidores e interaccion, contados en vivo."
+        }
       }
     },
     "card": {
