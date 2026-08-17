@@ -1,5 +1,4 @@
 import React from 'react';
-import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 interface CourseCardBackgroundProps {
   thumbnailImage?: string;
