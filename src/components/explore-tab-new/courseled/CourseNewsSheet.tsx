@@ -1,45 +1,69 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChevronRight } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { CourseImageFallback } from './CourseImageFallback';
 import { ShortlistGlassAction } from './ShortlistGlassAction';
 
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
-import { A, KICKER, NUMF, SANS } from './tokens';
+import { A, KICKER, LABEL, NUMF, SANS } from './tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**
- * COURSE NEWS SHEET — the complete list of live courses behind Around the
- * World's "See all {n} courses" action (BRIEF_COURSE_NEWS_SHEET, the CARD GRID
- * amendment, the refinements brief, and the top-left figure-chip amendment).
+ * THE STANDOUT ROUNDS SHEET — the complete list of FEATS behind Around the
+ * World's see-all action (BRIEF_STANDOUT_SHEET_GROUPED_ROWS).
  *
- * Content is a 2-column grid of mini course cards: image top (76px, through the
- * CourseImageFallback chain) carrying TWO glass chips on the top edge — the
- * FIGURE chip top-left ("72 GROSS", "8.2 RATING", "4 BIRDIES") and the
- * when-chip top-right — with the course name clean across the bottom scrim.
- * Beneath the image, two clamped lines of the course's TOP event in the same
- * wording grammar as the on-page cards.
+ * §0 SETTLED: this is a FEAT LIST, not a course list. The old build collapsed
+ * each course to its single most notable event, which is why its header said
+ * "the courses" — but the section it serves shows feats, and the sheet is "the
+ * record" that must hold everything. One row per feat; a course with four
+ * standout rounds appears four times, distinguished by its two-line name.
  *
- * Taps: an entry that carries an opener (scorecard / review) opens that sheet
- * STACKED ABOVE this one; otherwise the card routes to the course page and
- * closes the sheet. Odd counts leave the last card alone in the left column.
+ * §1/§2 GROUPED ROWS. Rows sit under STICKY achievement headers in the same
+ * order as the section (Records broken / Once in a lifetime / Beating the
+ * course), each carrying its count. NO KIND BUDGET IS APPLIED HERE — with 208
+ * course records against 49 of everything else, the headers are the only thing
+ * that makes an ace findable, and the sheet must still show every feat.
+ *
+ * Taps are unchanged: an entry carrying an opener opens the scorecard / review
+ * STACKED ABOVE this sheet; otherwise the row routes to the course page and
+ * closes the sheet.
  */
 
 export interface CourseNewsEntry {
+  /** Stable per-FEAT key (event id) — courses repeat down the list. */
+  id: string;
   courseId: string;
   courseName: string | null;
   courseImage: string | null;
-  /** Most recent event time on the course — drives the when-chip. */
+  /** Group this feat belongs to, and its already-localised heading. */
+  groupId: string;
+  groupLabel: string;
+  /** Event time — drives the relative date on the member line. */
   at: string;
-  /** Wording for the course's top event: actor + feat, already composed. */
-  topLine: string;
-  /** Figure for the top event ("72", "8.2", "4"). Figureless events: no chip. */
+  /** The achievement, in the section's wording ("New course record"). */
+  featLine: string;
+  /** Member name, already resolved ("You" for the viewer). */
+  who: string;
+  isOwn: boolean;
+  avatarUrl?: string | null;
+  avatarUserId?: string | null;
+  /** Figure for the feat ("72", "8.2", "4"). Figureless feats: no chip. */
   figure?: string | null;
   /** Unit label beside the figure ("GROSS", "RATING", "BIRDIES"). */
   figureUnit?: string | null;
+  /** TOPAR red on an under-par score, as the tiles do it. */
+  figureTone?: string;
+  /**
+   * SECOND FIGURE (§6) — the wait on a first-ever feat, drawn in the same chip
+   * after a hairline. Null renders no hairline at all.
+   */
+  wait?: number | null;
+  waitLabel?: string | null;
   /** Opens the scorecard / review sheet stacked above this one, when available. */
   onPress?: () => void;
 }
@@ -52,18 +76,15 @@ interface Props {
   lensLabel: string;
   whenLabel: (iso: string) => string;
   onCoursePress: (courseId: string) => void;
-  /** Shortlist controls (BRIEF_DISCOVER_RELEVANCE part B). */
+  /**
+   * SHORTLIST (§7) — resolved by the caller as "signed in AND the member has
+   * NOT played this course". It is the want-to-play control, so a played or
+   * rated course never shows it; that is the rule behind its conditional
+   * appearance, and it is worth keeping.
+   */
   canShortlist?: (courseId: string) => boolean;
   isShortlisted?: (courseId: string) => boolean;
   onToggleShortlist?: (courseId: string) => void;
-}
-
-/** "3mo ago" -> "3MO", "Last week" -> "LAST WEEK" (used only when it fits). */
-function compactWhen(label: string): string {
-  return label
-    .replace(/\s*ago\s*$/i, '')
-    .replace(/\s+/g, '')
-    .toUpperCase();
 }
 
 export function CourseNewsSheet({
@@ -77,15 +98,33 @@ export function CourseNewsSheet({
   isShortlisted,
   onToggleShortlist,
 }: Props) {
-
   const { t } = useTranslation('courses');
-  const ids = useMemo(() => entries.map((e) => e.courseId), [entries]);
+
+  /** Distinct courses — meta reads once even when a course repeats. */
+  const ids = useMemo(
+    () => Array.from(new Set(entries.map((e) => e.courseId))),
+    [entries],
+  );
   const metaQuery = useCourseCardMeta(open ? ids : []);
   const meta = metaQuery.data;
-  // Meta feeds the card's NAME and IMAGE, so the tile is held whole while it is
-  // in flight (BRIEF_DISCOVER_LOADING_STATES, layer 2a) — the entry's own
-  // fallback name/image would only be rewritten a moment later.
   const metaPending = open && ids.length > 0 && metaQuery.isPending;
+
+  /**
+   * GROUPS in ARRIVAL ORDER — the entries are handed over already sorted in the
+   * section's group order, so nothing is re-ranked here.
+   */
+  const buckets = useMemo(() => {
+    const out: { id: string; label: string; items: CourseNewsEntry[] }[] = [];
+    for (const e of entries) {
+      let b = out.find((x) => x.id === e.groupId);
+      if (!b) {
+        b = { id: e.groupId, label: e.groupLabel, items: [] };
+        out.push(b);
+      }
+      b.items.push(e);
+    }
+    return out;
+  }, [entries]);
 
   return (
     <BottomSheet
@@ -111,15 +150,9 @@ export function CourseNewsSheet({
         }}
       >
         <div style={{ ...KICKER, color: A.DIM, marginBottom: 5 }}>
-          {t('discover.kickerCourses', 'The courses')}
+          {t('discover.kickerFeats', 'The record')}
         </div>
-        <div
-          id="courseled-news-title"
-          style={{
-            ...TITLE_METRICS,
-            color: A.INK,
-          }}
-        >
+        <div id="courseled-news-title" style={{ ...TITLE_METRICS, color: A.INK }}>
           {t('discover.aroundTheWorld', 'Standout rounds')}
         </div>
         <div style={{ fontSize: 11.5, color: A.MUTE, marginTop: 4 }}>
@@ -127,174 +160,243 @@ export function CourseNewsSheet({
         </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: 14 }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 8,
-            alignItems: 'start',
-          }}
-        >
-          {entries.map((e) => {
-            const m = meta?.get(e.courseId);
-            const hasFigure = !!e.figure;
-            const when = whenLabel(e.at);
-            return (
-              <button
-                key={e.courseId}
-                type="button"
-                onClick={() => {
-                  analyticsEvents.track('discover_news_card_tap', {
-                    courseId: e.courseId,
-                    target: e.onPress ? 'detail' : 'course',
-                  });
-                  if (e.onPress) {
-                    // Stacked above this sheet — the news sheet stays open.
-                    e.onPress();
-                    return;
-                  }
-                  onClose();
-                  onCoursePress(e.courseId);
-                }}
-                style={{
-                  background: A.PANEL,
-                  border: `1px solid ${A.BORDER}`,
-                  borderRadius: 14,
-                  overflow: 'hidden',
-                  padding: 0,
-                  textAlign: 'left',
-                  fontFamily: SANS,
-                  cursor: 'pointer',
-                }}
-              >
-                <CourseImageFallback
-                  courseId={e.courseId}
-                  courseName={m?.name ?? e.courseName}
-                  imageUrl={m?.imageUrl ?? e.courseImage}
-                  initialsSize={20}
-                  pending={metaPending}
-                  style={{ height: 76 }}
-                >
-                  <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
+      <div style={{ flex: 1, overflowY: 'auto' }}>
+        {buckets.map((b) => (
+          <section key={b.id}>
+            {/* STICKY HEADER — opaque canvas so rows never show through. */}
+            <div
+              style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 2,
+                display: 'flex',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
+                gap: 8,
+                padding: '8px 16px',
+                background: A.CANVAS,
+                borderBottom: `1px solid ${A.BORDER}`,
+              }}
+            >
+              <span style={{ ...LABEL, color: A.INK }}>{b.label}</span>
+              <span style={{ ...NUMF, fontSize: 11, color: A.MUTE }}>{b.items.length}</span>
+            </div>
 
-                  {/* FIGURE chip — top-left, wins the space on narrow cards. */}
-                  {hasFigure && (
-                    <span
+            {b.items.map((e) => {
+              const m = meta?.get(e.courseId);
+              const name = m?.name ?? e.courseName ?? t('discover.unknownCourse', 'Course');
+              const showShortlist = !!onToggleShortlist && !!canShortlist?.(e.courseId);
+              return (
+                <button
+                  key={e.id}
+                  type="button"
+                  onClick={() => {
+                    analyticsEvents.track('discover_news_card_tap', {
+                      courseId: e.courseId,
+                      target: e.onPress ? 'detail' : 'course',
+                    });
+                    if (e.onPress) {
+                      e.onPress();
+                      return;
+                    }
+                    onClose();
+                    onCoursePress(e.courseId);
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    width: '100%',
+                    padding: '10px 16px',
+                    background: A.CANVAS,
+                    border: 'none',
+                    borderBottom: `1px solid ${A.BORDER}`,
+                    textAlign: 'left',
+                    fontFamily: SANS,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {/* THE THUMB — 84x62, the figure chip on it. */}
+                  <div style={{ width: 84, flexShrink: 0 }}>
+                    <CourseImageFallback
+                      courseId={e.courseId}
+                      courseName={name}
+                      imageUrl={m?.imageUrl ?? e.courseImage}
+                      initialsSize={16}
+                      pending={metaPending}
+                      style={{ height: 62, borderRadius: 8, overflow: 'hidden' }}
+                    >
+                      <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
+                      {e.figure && (
+                        <span
+                          className="standout-figure-chip"
+                          style={{
+                            position: 'absolute',
+                            top: 6,
+                            left: 6,
+                            display: 'inline-flex',
+                            alignItems: 'baseline',
+                            gap: 3,
+                            padding: '3px 7px',
+                            borderRadius: 8,
+                            maxWidth: 'calc(100% - 12px)',
+                          }}
+                        >
+                          <span
+                            style={{
+                              ...NUMF,
+                              fontSize: 13,
+                              lineHeight: 1,
+                              color: e.figureTone ?? '#FFFFFF',
+                            }}
+                          >
+                            {e.figure}
+                          </span>
+                          {e.figureUnit && (
+                            <span
+                              style={{
+                                fontSize: 6.5,
+                                fontWeight: 700,
+                                letterSpacing: '0.12em',
+                                textTransform: 'uppercase',
+                                lineHeight: 1,
+                                color: 'rgba(255,255,255,0.9)',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {e.figureUnit}
+                            </span>
+                          )}
+                          {/* THE SECOND FIGURE (§6) — one hairline, then the
+                              wait. No hairline at all when there is none. */}
+                          {e.wait != null && e.wait > 0 ? (
+                            <>
+                              <span
+                                aria-hidden
+                                style={{
+                                  alignSelf: 'stretch',
+                                  width: 1,
+                                  marginLeft: 1,
+                                  background: 'rgba(255,255,255,0.24)',
+                                }}
+                              />
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'baseline',
+                                  gap: 2,
+                                }}
+                              >
+                                {e.waitLabel && (
+                                  <span
+                                    style={{
+                                      fontSize: 6.5,
+                                      fontWeight: 700,
+                                      letterSpacing: '0.12em',
+                                      textTransform: 'uppercase',
+                                      color: 'rgba(255,255,255,0.72)',
+                                    }}
+                                  >
+                                    {e.waitLabel}
+                                  </span>
+                                )}
+                                <span
+                                  style={{ ...NUMF, fontSize: 11, lineHeight: 1, color: '#FFFFFF' }}
+                                >
+                                  {e.wait}
+                                </span>
+                              </span>
+                            </>
+                          ) : null}
+                        </span>
+                      )}
+                      {showShortlist && (
+                        <ShortlistGlassAction
+                          shortlisted={!!isShortlisted?.(e.courseId)}
+                          onToggle={() => onToggleShortlist?.(e.courseId)}
+                          label={t('discover.shortlist.action', 'Add to your list')}
+                          size={22}
+                        />
+                      )}
+                    </CourseImageFallback>
+                  </div>
+
+                  {/* THE TEXT — course name over two lines, so two courses at
+                      one club stay distinguishable. */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
                       style={{
-                        position: 'absolute',
-                        top: 6,
-                        left: 6,
-                        display: 'inline-flex',
-                        alignItems: 'baseline',
-                        gap: 3,
-                        background: 'rgba(10,14,10,0.55)',
-                        backdropFilter: 'blur(6px)',
-                        WebkitBackdropFilter: 'blur(6px)',
-                        borderRadius: 999,
-                        padding: '3px 8px',
-                        maxWidth: 'calc(100% - 56px)',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        lineHeight: 1.25,
+                        color: A.INK,
+                        letterSpacing: '-0.01em',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                       }}
                     >
-                      <span style={{ ...NUMF, fontSize: 12, color: '#FFFFFF', lineHeight: 1 }}>
-                        {e.figure}
-                      </span>
-                      {e.figureUnit && (
+                      {name}
+                    </div>
+                    {e.featLine && (
+                      <div
+                        style={{
+                          fontSize: 11.5,
+                          fontWeight: 600,
+                          color: A.BODY,
+                          marginTop: 2,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {e.featLine}
+                      </div>
+                    )}
+                    {/* MEMBER LINE — avatar, name, and the date IN FULL (§4). */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        marginTop: 4,
+                        minWidth: 0,
+                      }}
+                    >
+                      <SquircleAvatar
+                        size={16}
+                        url={e.avatarUrl ?? null}
+                        userId={e.avatarUserId ?? null}
+                        name={e.who}
+                      />
+                      {e.who && (
                         <span
                           style={{
-                            fontSize: 7.5,
+                            fontSize: 11,
                             fontWeight: 700,
-                            letterSpacing: '0.1em',
-                            textTransform: 'uppercase',
-                            color: 'rgba(255,255,255,0.72)',
+                            color: e.isOwn ? A.AMBER : A.INK,
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
+                            maxWidth: 130,
                           }}
                         >
-                          {e.figureUnit}
+                          {e.who}
                         </span>
                       )}
-                    </span>
-                  )}
-
-                  {/* WHEN chip — top-right, truncates when a figure chip is present. */}
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: 6,
-                      right: 6,
-                      fontSize: 7.5,
-                      fontWeight: 700,
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      color: '#FFFFFF',
-                      background: 'rgba(10,14,10,0.55)',
-                      backdropFilter: 'blur(6px)',
-                      WebkitBackdropFilter: 'blur(6px)',
-                      borderRadius: 999,
-                      padding: '3px 8px',
-                      maxWidth: hasFigure ? 46 : 88,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {hasFigure ? compactWhen(when) : when}
-                  </span>
-
-                  {/* SHORTLIST — bottom-right; figure chip owns top-left and the
-                      when chip top-right, so no collision at 320dp. */}
-                  {onToggleShortlist && canShortlist?.(e.courseId) && (
-                    <ShortlistGlassAction
-                      shortlisted={!!isShortlisted?.(e.courseId)}
-                      onToggle={() => onToggleShortlist(e.courseId)}
-                      label={t('discover.shortlist.action', 'Add to your list')}
-                      size={24}
-                    />
-                  )}
-
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 8,
-                      right: onToggleShortlist && canShortlist?.(e.courseId) ? 36 : 8,
-                      bottom: 6,
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: '#fff',
-                      letterSpacing: '-0.01em',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {m?.name ?? e.courseName ?? t('discover.unknownCourse', 'Course')}
+                      <span style={{ fontSize: 10.5, color: A.MUTE, whiteSpace: 'nowrap' }}>
+                        {whenLabel(e.at)}
+                      </span>
+                    </div>
                   </div>
-                </CourseImageFallback>
 
-
-                <div
-                  style={{
-                    padding: '7px 9px',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    lineHeight: 1.35,
-                    color: A.BODY,
-                    minHeight: 42,
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {e.topLine}
-                </div>
-              </button>
-            );
-          })}
-        </div>
+                  <ChevronRight size={16} color={A.DIM} style={{ flexShrink: 0 }} />
+                </button>
+              );
+            })}
+          </section>
+        ))}
         <div aria-hidden style={{ height: 24 }} />
       </div>
     </BottomSheet>
