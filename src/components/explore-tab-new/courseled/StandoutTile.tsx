@@ -346,69 +346,79 @@ export function StandoutTile({
           </div>
         </div>
 
-        {/* THE DETAIL LINE, WITH THE REACTION ON IT. The slot renders even with
-            no detail text so the heart keeps its position down a column. */}
-        {(!!(who && detail) || !!trailing) && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              marginTop: 2,
-              minHeight: 20,
-            }}
-          >
-            <div
-              role={onDetailPress ? 'button' : undefined}
-              onClick={
-                onDetailPress
-                  ? (ev) => {
-                      ev.stopPropagation();
-                      onDetailPress();
+        {/* THE FACT LINE, WITH THE REACTION ON IT. The heart rides the LAST
+            wording line the tile renders — the detail ("Bogey-free round") when
+            there is one, otherwise the reference line — never a bare row of its
+            own between the name and the wording. */}
+        {(() => {
+          const detailText = who ? detail : '';
+          const factText = detailText || subline || '';
+          const factIsSubline = !detailText && !!subline;
+          const press = factIsSubline ? undefined : onDetailPress;
+          return (
+            <>
+              {(!!factText || !!trailing) && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    marginTop: factIsSubline ? 3 : 2,
+                    minHeight: 20,
+                  }}
+                >
+                  <div
+                    role={press ? 'button' : undefined}
+                    onClick={
+                      press
+                        ? (ev) => {
+                            ev.stopPropagation();
+                            press();
+                          }
+                        : undefined
                     }
-                  : undefined
-              }
-              style={{
-                flex: 1,
-                minWidth: 0,
-                fontSize: 12,
-                fontWeight: 600,
-                lineHeight: 1.32,
-                color: A.MUTE,
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                cursor: onDetailPress ? 'pointer' : 'inherit',
-              }}
-            >
-              {who ? detail : ''}
-            </div>
-            {trailing}
-          </div>
-        )}
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      fontSize: factIsSubline ? 11 : 12,
+                      fontWeight: 600,
+                      lineHeight: factIsSubline ? 1.3 : 1.32,
+                      color: factIsSubline ? 'rgba(104,112,123,0.78)' : A.MUTE,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      cursor: press ? 'pointer' : 'inherit',
+                    }}
+                  >
+                    {factText}
+                  </div>
+                  {trailing}
+                </div>
+              )}
 
-
-
-        {/* THE REFERENCE LINE (§3.5). Quieter than the detail, never a
-            placeholder when absent. */}
-        {subline ? (
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              lineHeight: 1.3,
-              color: 'rgba(104,112,123,0.78)',
-              marginTop: 3,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {subline}
-          </div>
-        ) : null}
+              {/* THE REFERENCE LINE (§3.5) — only when it did not already carry
+                  the reaction above. Never a placeholder when absent. */}
+              {subline && !factIsSubline ? (
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    lineHeight: 1.3,
+                    color: 'rgba(104,112,123,0.78)',
+                    marginTop: 3,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {subline}
+                </div>
+              ) : null}
+            </>
+          );
+        })()}
 
         {footer}
       </div>
