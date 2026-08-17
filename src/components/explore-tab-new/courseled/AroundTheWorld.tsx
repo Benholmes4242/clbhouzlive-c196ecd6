@@ -28,7 +28,7 @@ import {
 } from './stableMasonry';
 import { CompactStandoutTile, estimateCompactHeight } from './CompactStandoutTile';
 import { SCRIM_STANDOUT } from './photoScrim';
-import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW_ROW_BAR, NUMF, SANS, SCRIM_STRONG } from './tokens';
+import { A, CARD_SHELL, Eyebrow, ImageChip, InkAction, LABEL, NEW_CARD_RING, NEW_ROW_BAR, NUMF, SANS } from './tokens';
 import { StandoutTile } from './StandoutTile';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 
