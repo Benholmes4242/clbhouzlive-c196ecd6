@@ -193,22 +193,22 @@ export function PersonalBests({
     };
   });
 
-  const { columns } = placeStable(tiles, masonry.current);
+  /**
+   * GROUPING (BRIEF_STANDOUT_KIND_BUDGET §3). The three treatments are
+   * unchanged; grouping only wraps them, and a group may hold any mix. Groups
+   * render in the fixed order below, an empty group renders nothing, a group of
+   * one keeps its heading, and one surviving group drops the heading.
+   */
+  const buckets = PB_GROUPS.map((def) => ({
+    id: def.id,
+    label: t(def.key, def.label),
+    items: tiles.filter((tt) => pbGroupIdFor(tt.r.feat_kind) === def.id),
+  })).filter((b) => b.items.length > 0);
 
-  return (
-    <section>
-      <Eyebrow aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}>
-        {t('discover.personalBests', 'Personal bests')}
-      </Eyebrow>
+  const renderTile = (tt: (typeof tiles)[number]) => {
+    {
+      const courseName =
 
-      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-        {columns.map((col, ci) => (
-          <div
-            key={ci}
-            style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}
-          >
-            {col.map((tt) => {
-              const courseName =
                 tt.m?.name ?? tt.r.course_name ?? t('discover.unknownCourse', 'Course');
               const who = tt.r.is_self
                 ? t('discover.wire.you', 'You')
