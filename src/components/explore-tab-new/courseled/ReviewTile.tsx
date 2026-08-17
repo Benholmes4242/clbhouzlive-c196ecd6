@@ -485,7 +485,7 @@ export function ReviewTile({
           }}
         >
           {rows.map((row) => (
-            <div key={row.key} style={{ minWidth: 0 }}>
+            <div key={row.key} style={{ minWidth: 0, textAlign: 'center' }}>
               <div
                 style={{
                   fontSize: 14,
