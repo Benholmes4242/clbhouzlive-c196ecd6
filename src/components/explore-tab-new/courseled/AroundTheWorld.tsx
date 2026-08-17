@@ -1057,10 +1057,12 @@ export function AroundTheWorld({
                  uses for its reference_line. Verbatim; null renders nothing. */
               subline={tt.margin || null}
               isNew={isNewSince(tt.g.at, lastSeen)}
-              /* HERO ONLY: the feat kind names itself, the course name grows to
-                 21px and the figure chip takes its large size (§1.1, §1.3). */
+              /* HERO ONLY: the course name grows to 21px and the figure chip
+                 takes its large size (§1.1). The kind kicker renders only when
+                 no group heading sits above the hero
+                 (CORRECTION_HERO_INSIDE_ITS_GROUP §3). */
               kicker={
-                opts?.hero && tt.kind && KIND_LABELS[tt.kind]
+                opts?.showKicker && tt.kind && KIND_LABELS[tt.kind]
                   ? t(KIND_LABELS[tt.kind].key, KIND_LABELS[tt.kind].label)
                   : null
               }
