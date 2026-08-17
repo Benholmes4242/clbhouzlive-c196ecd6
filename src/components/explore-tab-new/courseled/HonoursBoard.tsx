@@ -509,6 +509,10 @@ function LeaderCard({
   const { t } = useTranslation('courses');
   const hidden = Math.max(0, l.events.length - LEADER_ROWS_ON_CARD);
   const shown = l.events.slice(0, LEADER_ROWS_ON_CARD);
+  /* §1 — the row label earns its place ONLY when the badge cannot say the kind.
+     Computed over ALL the member's feats, not just the two shown, so the two
+     rows on a mixed card stay labelled even if both visible rows are aces. */
+  const mixedKinds = new Set(l.events.map((e) => e.kind)).size > 1;
 
   return (
     <div
@@ -523,7 +527,13 @@ function LeaderCard({
     >
       <LeaderBand leader={l} />
       {shown.map((e, i) => (
-        <LeaderFeatRow key={e.id} event={e} onPress={onPress} divider={i > 0} />
+        <LeaderFeatRow
+          key={e.id}
+          event={e}
+          onPress={onPress}
+          divider={i > 0}
+          showKind={mixedKinds}
+        />
       ))}
       {hidden > 0 ? (
         <button
