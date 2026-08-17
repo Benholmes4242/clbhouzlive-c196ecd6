@@ -158,10 +158,16 @@ export function referenceLine(
             figure,
           });
     }
+    /* THE FOURTH STATE. Within a shot of their own average is not a difference
+       worth a figure, but it IS worth saying — a round landing on a member's own
+       par is the interesting thing. NO FIGURE, or the raised threshold is undone. */
+    return t('discover.friendsRail.onAvg', { defaultValue: 'Right on their average here' });
   }
 
+  /* STATE 5 STAYS REACHABLE: no history at this course, so no claim to make. */
   return null;
 }
+
 
 // ===========================================================================
 // THE INSIGHT SET (BRIEF_FRIENDS_INSIGHT_SET)
