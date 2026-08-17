@@ -487,9 +487,11 @@ export function LeaderFeatRow({
           </span>
         ) : null}
       </span>
-      <span style={{ ...LABEL, fontSize: 8.5, color: A.BODY, flex: '0 0 auto' }}>
-        {kindLabel(e)}
-      </span>
+      {showKind ? (
+        <span style={{ ...LABEL, fontSize: 8.5, color: A.BODY, flex: '0 0 auto' }}>
+          {kindLabel(e)}
+        </span>
+      ) : null}
       <ChevronRight size={13} strokeWidth={2.5} color={A.DIM} style={{ flex: '0 0 auto' }} />
     </button>
   );
