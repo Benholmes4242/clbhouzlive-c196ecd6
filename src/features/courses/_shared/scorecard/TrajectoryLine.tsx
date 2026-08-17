@@ -134,6 +134,15 @@ interface Props {
    * band and read as dead space: it passes 5.
    */
   padY?: number;
+  /**
+   * VIEWBOX WIDTH, in px (CORRECTION_SHEET_TRACE_HEIGHT §4). The svg scales its
+   * viewBox UNIFORMLY, so a 340-wide viewBox rendered into a 96px column shrank
+   * the vertical axis to 28% too — every round drew a near-flat line whatever
+   * its range. Narrow callers pass their OWN pixel width so the scale is 1:1 and
+   * the height they asked for is the height they get. Beads and strokes stay
+   * circular and true-width because the aspect is never distorted.
+   */
+  viewWidth?: number;
 }
 
 
@@ -155,6 +164,7 @@ export const TrajectoryLine: React.FC<Props> = ({
   interactive = false,
   showTicks = true,
   padY = 10,
+  viewWidth = 340,
 }) => {
   const T = SURFACE_TOKENS[surface];
   const { t } = useTranslation(['courses']);
@@ -223,7 +233,7 @@ export const TrajectoryLine: React.FC<Props> = ({
 
   if (m < 2 || allPts.length < 2) return null;
 
-  const w = 340;
+  const w = viewWidth;
   const padX = 0;
 
   /**

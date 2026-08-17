@@ -79,6 +79,11 @@ export function RoundShape({
           surface="light"
           showTicks={false}
           padY={1}
+          /* THE VIEWBOX MATCHES THE COLUMN (CORRECTION_SHEET_TRACE_HEIGHT §4):
+             at 96px wide a 340-wide viewBox scaled the whole chart to 28%, so a
+             38px band drew as an 11px flat squiggle and a -3 looked like a +14.
+             1:1 units mean the band is used in full and the beads stay round. */
+          viewWidth={width}
         />
         {showMeta && <ShapeMeta birdies={birdies} />}
       </>

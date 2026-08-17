@@ -47,9 +47,12 @@ const STAT_VALUE_SIZE = 21;
 const STAT_LABEL_SIZE = 6.5;
 /** Fixed score column: with no separators the grid is what aligns the sheet. */
 const SCORE_COL_W = 76;
-/** The trace, at row scale (§1.1). */
+/** The trace, at row scale (§1.1). Width unchanged; the band is TALLER
+    (CORRECTION_SHEET_TRACE_HEIGHT §1) — 22px could not tell a -3 from a +14,
+    which is the same finding FriendsPlayedRail already recorded. The row grows
+    with it (§3): text and avatar are NOT compressed to hold 56px. */
 const TRACE_W = 96;
-const TRACE_H = 22;
+const TRACE_H = 38;
 
 
 interface Props {
