@@ -83,30 +83,6 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
       >
         <div style={{ position: 'absolute', inset: 0, background: SCRIM_STRONG }} />
 
-        {/* 1. THE CHIP. Unconditional, readable over any frame. The substrate is
-            the platform's badge GLASS (`.standout-figure-chip`, the 77-gross
-            chip in Personal Bests): flat base fill plus hairline, blur only as
-            an @supports enhancement — never a tint of the photo. */}
-        <span
-          className="standout-figure-chip"
-          style={{
-            position: 'absolute',
-            top: 8,
-            left: 8,
-            color: '#FFFFFF',
-            fontSize: 8.5,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            borderRadius: 4,
-            padding: '3px 5px',
-            /* Dark glass now (BRIEF_GLASS_BADGES_DARK) — no shadow floor. */
-          }}
-        >
-          {t('discover.creator.chip', 'Creator')}
-        </span>
-
-
         <div
           style={{
             position: 'absolute',
