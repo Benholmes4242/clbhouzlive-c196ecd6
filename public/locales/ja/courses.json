@@ -917,6 +917,7 @@
       "bestHere": "Their best here, of {{count}} rounds",
       "betterThanAvg": "{{figure}} better than their average here",
       "worseThanAvg": "{{figure}} worse than their average here",
+      "onAvg": "ここでの平均どおり",
       "insight": {
         "record": "A new course record here",
         "ace": "A hole in one",
