@@ -152,7 +152,7 @@ function ExampleCard({ spec, tabs, tag }: { spec: ExampleSpec; tabs: string[]; t
       <div style={{ position: 'relative', height: 118, background: A.TRACK }}>
         <img
           src={spec.src}
-          alt={spec.name}
+          alt={spec.name ?? spec.category}
           loading="lazy"
           onError={() => setFailed(true)}
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
@@ -171,15 +171,23 @@ function ExampleCard({ spec, tabs, tag }: { spec: ExampleSpec; tabs: string[]; t
             borderRadius: 4,
           }}
         >
-          {tag}
+          {spec.isExample ? tag : spec.category}
         </div>
         <div style={{ position: 'absolute', left: 10, right: 10, bottom: 8 }}>
+          {/* §3.3 — the CATEGORY is the subject, verbatim from BUSINESS_CATEGORIES,
+              unless a real claimed account supplies its own trading name. */}
           <div style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
-            {spec.name}
+            {spec.name ?? spec.category}
           </div>
           <div style={{ fontSize: 10.5, fontWeight: 600, color: 'rgba(255,255,255,0.76)', marginTop: 1 }}>
             {spec.meta}
           </div>
+          {/* §3.5 — a figure row ONLY when a real account supplies one. */}
+          {spec.stats ? (
+            <div style={{ ...LABEL, fontSize: 7.5, color: 'rgba(255,255,255,0.72)', marginTop: 4 }}>
+              {spec.stats}
+            </div>
+          ) : null}
         </div>
       </div>
       <div style={{ display: 'flex', gap: 12, padding: '9px 10px' }}>
