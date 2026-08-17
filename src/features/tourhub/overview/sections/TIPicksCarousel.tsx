@@ -310,7 +310,10 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                               v={v}
                               t={t}
                               tone="dark"
+                              // The win pill has moved to the status slot above.
+                              suppressWinChip
                             />
+
                           </div>
                         </div>
 
