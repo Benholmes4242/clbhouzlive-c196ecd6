@@ -391,38 +391,40 @@ function RoundShape({ row, shape }: { row: CircleRoundRow; shape: HoleShape | nu
 
       </svg>
 
-      {holesPlayed != null && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 8,
-            padding: '4px 11px 0',
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.02em',
-          }}
-        >
-          {/* ZERO OF SOMETHING GOOD READS AS A CRITICISM on another member's
-              round, so an empty left slot rather than "0 birdies".
-              THE PLURAL LIVES IN THE TRANSLATION (birdies_one / birdies_other),
-              never in a single inline defaultValue — one string gives i18next no
-              plural form and renders "1 birdies". */}
-          <span style={{ ...FIGS, color: UNDER_TONE }}>
-            {birdies > 0
-              ? `\u25CF ${t('discover.friendsRail.birdies', { count: birdies })}`
-              : ''}
-          </span>
-          {/* NO HOLE COUNT. create_round_posts and useCircleLatestRounds both
-              require holes_played = 18, so the label could only ever say "18
-              holes" — a constant occupying half the meta row. */}
-
-        </div>
-      )}
+      {holesPlayed != null && <ShapeMeta birdies={birdies} />}
     </>
   );
 }
+
+/** Birdie count under the curve. Shared by the real chart and the fallback. */
+function ShapeMeta({ birdies }: { birdies: number }) {
+  const { t } = useTranslation('courses');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 8,
+        padding: '4px 11px 0',
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: '0.02em',
+      }}
+    >
+      {/* ZERO OF SOMETHING GOOD READS AS A CRITICISM on another member's
+          round, so an empty left slot rather than "0 birdies".
+          THE PLURAL LIVES IN THE TRANSLATION (birdies_one / birdies_other). */}
+      <span style={{ ...FIGS, color: UNDER_TONE }}>
+        {birdies > 0 ? `\u25CF ${t('discover.friendsRail.birdies', { count: birdies })}` : ''}
+      </span>
+      {/* NO HOLE COUNT. create_round_posts and useCircleLatestRounds both
+          require holes_played = 18, so the label could only ever say "18
+          holes" — a constant occupying half the meta row. */}
+    </div>
+  );
+}
+
 
 
 interface Props {
