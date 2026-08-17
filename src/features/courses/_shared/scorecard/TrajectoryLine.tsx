@@ -480,7 +480,6 @@ export const TrajectoryLine: React.FC<Props> = ({
           alignItems: 'flex-end',
           justifyContent: 'space-between',
           gap: 12,
-          padding: '0 16px',
           marginBottom: 4,
         }}
       >
@@ -513,7 +512,7 @@ export const TrajectoryLine: React.FC<Props> = ({
         {plot}
       </div>
 
-      <TickRow ticks={ticks} holes={holes} m={m} x={x} w={w} T={T} inset />
+      <TickRow ticks={ticks} holes={holes} m={m} x={x} w={w} T={T} />
     </>
   );
 };
@@ -531,14 +530,12 @@ const TickRow: React.FC<{
   x: (pos: number) => number;
   w: number;
   T: typeof SURFACE_TOKENS['light'] | typeof SURFACE_TOKENS['dark'];
-  inset?: boolean;
-}> = ({ ticks, holes, m, x, w, T, inset }) => (
+}> = ({ ticks, holes, m, x, w, T }) => (
   <div
     style={{
       position: 'relative',
       height: 12,
       margin: '2px 0 0',
-      padding: inset ? '0 16px' : 0,
     }}
   >
     {ticks.map((i) => {
@@ -550,14 +547,13 @@ const TickRow: React.FC<{
           key={i}
           style={{
             position: 'absolute',
-            /* The plot is FULL BLEED while this row keeps its 16px inset, so an
-               inset label resolves its x against the plot's width, not the
-               row's — EXCEPT at the two edges. The last hole sits at the plot's
-               right edge, which is 16px OUTSIDE this row, so resolving it that
-               way hung "18" off the card. The edge labels pin to the row. */
-            left: edgeLeft ? 0 : edgeRight ? '100%' : inset
-              ? `calc((100% + 32px) * ${frac.toFixed(5)} - 16px)`
-              : `${(frac * 100).toFixed(3)}%`,
+            /* ONE X-SCALE (BRIEF_SCORECARD_CHART_ALIGNMENT §3). The plot and
+               this row are now the SAME width everywhere, so a label is simply
+               its own fraction of the row — no 32px remap. That remap was the
+               uneven spacing: it shifted every interior label ~16px left, which
+               opened 1→5 and closed 14→18. Edge labels still pin inside the row
+               so hole 18 cannot hang off the card. */
+            left: edgeLeft ? 0 : edgeRight ? '100%' : `${(frac * 100).toFixed(3)}%`,
             transform: edgeLeft ? 'none' : edgeRight ? 'translateX(-100%)' : 'translateX(-50%)',
 
             ...LABEL,
