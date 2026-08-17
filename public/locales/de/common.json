@@ -138,50 +138,50 @@
         }
       },
       "hero": {
-        "kicker": "FUER UNTERNEHMEN",
-        "title": "Golfer sprechen schon ueber Sie.",
-        "body": "Sichern Sie sich Ihre Seite und seien Sie dabei."
+        "kicker": "FÜR UNTERNEHMEN",
+        "title": "Golfer suchen schon nach dem, was du machst.",
+        "body": "Sichere dir deine Seite und sei dort, wo sie sind."
       },
       "numbers": {
-        "courses": "Plaetze auf clbhouz",
+        "courses": "Plätze, die Golfer auf clbhouz durchsuchen",
         "rounds": "RUNDEN",
         "reviews": "BEWERTUNGEN",
-        "greenNote": "GRUEN IST DIE LETZTEN 30 TAGE"
+        "greenNote": "GRÜN IST DIE LETZTEN 30 TAGE"
       },
       "examples": {
-        "kicker": "SO SIEHT IHRE SEITE AUS",
-        "heading": "Eine Seite fuer jede Art von Golfbetrieb",
+        "kicker": "SO SIEHT DEINE AUS",
+        "heading": "Eine Seite für jede Art von Golfunternehmen",
         "tag": "BEISPIEL",
         "tabs": {
           "home": "START",
-          "about": "UEBER",
+          "about": "ÜBER",
           "reviews": "BEWERTUNGEN"
         },
         "club": {
-          "name": "Golfclub",
-          "meta": "Club . 18 Loecher"
+          "meta": "Anlage . Bewertungen und Runden"
         },
-        "range": {
-          "name": "Driving Range",
-          "meta": "Range . Training"
+        "coach": {
+          "meta": "Training . Buchungen und Bewertungen"
         },
-        "shop": {
-          "name": "Pro Shop",
-          "meta": "Handel . Fitting"
+        "fitter": {
+          "meta": "Fitting . Buchungen und Bewertungen"
+        },
+        "brand": {
+          "meta": "Produkt . Follower und Beiträge"
         }
       },
       "rows": {
         "found": {
           "title": "Gefunden werden",
-          "body": "Sie erscheinen in der Suche und im Platzverzeichnis, neben den {{courses}} Plaetzen, die Golfer schon durchsuchen."
+          "body": "Du erscheinst in der Suche und im Verzeichnis, vor Golfern, die clbhouz täglich nutzen."
         },
         "trusted": {
-          "title": "Vertrauen gewinnen",
-          "body": "Bewertungen kommen von Golfern mit erfassten Runden - nicht von anonymen Konten."
+          "title": "Vertrauen aufbauen",
+          "body": "Bewertungen kommen von Golfern mit erfassten Runden, nicht von anonymen Konten."
         },
         "reach": {
           "title": "Reichweite kennen",
-          "body": "Aufrufe, Follower und Interaktionen, live gezaehlt."
+          "body": "Aufrufe, Follower und Interaktionen, live gezählt."
         }
       }
     },

@@ -282,11 +282,11 @@ export function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
     {
       n: '01',
       title: t('business.emptyState.rows.found.title'),
-      body: t('business.emptyState.rows.found.body', {
-        count: coursesLive ?? 0,
-        courses: coursesLive == null ? '' : fmt(coursesLive, locale),
-      }),
-      hasFigure: coursesLive != null,
+      // §4.1 — NO course-count interpolation here. "Alongside the 23,293
+      // courses" implied the directory IS courses, which reads as venue-only to
+      // a coach or a fitter. The audience figure stays in the dark block.
+      body: t('business.emptyState.rows.found.body'),
+      hasFigure: true,
     },
     {
       n: '02',

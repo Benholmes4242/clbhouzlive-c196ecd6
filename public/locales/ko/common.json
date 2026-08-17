@@ -137,50 +137,50 @@
         }
       },
       "hero": {
-        "kicker": "FOR BUSINESSES",
-        "title": "Golpeodeureun imi dangsin iyagireul hago itseumnida.",
-        "body": "Peijireul deungnokhago hamkkehaseyo."
+        "kicker": "비즈니스용",
+        "title": "골퍼들은 이미 당신이 하는 일을 찾고 있습니다.",
+        "body": "페이지를 만들어 그들이 있는 곳에 자리하세요."
       },
       "numbers": {
-        "courses": "clbhouz ui koseu su",
-        "rounds": "ROUNDS",
-        "reviews": "REVIEWS",
-        "greenNote": "CHOROKSAEGEUN CHOEGEUN 30 IL"
+        "courses": "골퍼들이 clbhouz에서 둘러보는 코스",
+        "rounds": "라운드",
+        "reviews": "리뷰",
+        "greenNote": "초록색은 최근 30일"
       },
       "examples": {
-        "kicker": "DANGSIN UI PEIJI",
-        "heading": "Modeun golpeu bijeuniseu reul wihan peiji",
-        "tag": "YESI",
+        "kicker": "당신의 페이지 예시",
+        "heading": "모든 골프 비즈니스를 위한 페이지",
+        "tag": "예시",
         "tabs": {
-          "home": "HOME",
-          "about": "ABOUT",
-          "reviews": "REVIEWS"
+          "home": "홈",
+          "about": "소개",
+          "reviews": "리뷰"
         },
         "club": {
-          "name": "Golpeu keulleop",
-          "meta": "Keulleop . 18 hol"
+          "meta": "장소 . 리뷰와 라운드"
         },
-        "range": {
-          "name": "Deuraibing renji",
-          "meta": "Renji . Yeonseup"
+        "coach": {
+          "meta": "레슨 . 예약과 리뷰"
         },
-        "shop": {
-          "name": "Peuro syop",
-          "meta": "Ripeil . Piting"
+        "fitter": {
+          "meta": "피팅 . 예약과 리뷰"
+        },
+        "brand": {
+          "meta": "제품 . 팔로워와 게시물"
         }
       },
       "rows": {
         "found": {
-          "title": "Balgyeondoege",
-          "body": "Geomsaekgwa koseu dirrekteori e noollimnida. Golpeoga imi boneun {{courses}} gae koseu wa hamkke."
+          "title": "발견되기",
+          "body": "검색과 디렉터리에 노출되어, 매일 clbhouz를 쓰는 골퍼들 앞에 놓입니다."
         },
         "trusted": {
-          "title": "Sinroe eotgi",
-          "body": "Ribyuneun raundeu girogi inneun golpeoege seo omnida - ingmyeong gyejeongi animnida."
+          "title": "신뢰 얻기",
+          "body": "리뷰는 기록된 라운드를 가진 골퍼에게서 옵니다. 익명 계정이 아닙니다."
         },
         "reach": {
-          "title": "Dodal beomwi algi",
-          "body": "Jyohoe, palrou, chamyeoreul silsigan euro jipgye."
+          "title": "도달 파악하기",
+          "body": "조회, 팔로우, 참여를 실시간으로 집계합니다."
         }
       }
     },

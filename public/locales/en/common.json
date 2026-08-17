@@ -365,11 +365,11 @@
       },
       "hero": {
         "kicker": "FOR BUSINESSES",
-        "title": "Golfers are already talking about you.",
-        "body": "Claim your page and be part of it."
+        "title": "Golfers are already looking for what you do.",
+        "body": "Claim your page and be where they are."
       },
       "numbers": {
-        "courses": "courses on clbhouz",
+        "courses": "courses golfers browse on clbhouz",
         "rounds": "ROUNDS",
         "reviews": "REVIEWS",
         "greenNote": "GREEN IS LAST 30 DAYS"
@@ -384,26 +384,26 @@
           "reviews": "REVIEWS"
         },
         "club": {
-          "name": "Golf club",
-          "meta": "Club . 18 holes"
+          "meta": "Venue . Reviews and rounds"
         },
-        "range": {
-          "name": "Driving range",
-          "meta": "Range . Practice"
+        "coach": {
+          "meta": "Lessons . Bookings and reviews"
         },
-        "shop": {
-          "name": "Pro shop",
-          "meta": "Retail . Fitting"
+        "fitter": {
+          "meta": "Fitting . Bookings and reviews"
+        },
+        "brand": {
+          "meta": "Product . Followers and posts"
         }
       },
       "rows": {
         "found": {
           "title": "Be found",
-          "body": "You appear in search and the course directory, alongside the {{courses}} courses golfers already browse."
+          "body": "You appear in search and the directory, in front of golfers already using clbhouz every day."
         },
         "trusted": {
           "title": "Be trusted",
-          "body": "Reviews come from golfers with tracked rounds - not anonymous accounts."
+          "body": "Reviews come from golfers with tracked rounds, not anonymous accounts."
         },
         "reach": {
           "title": "Know your reach",
