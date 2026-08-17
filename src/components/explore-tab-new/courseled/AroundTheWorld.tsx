@@ -739,20 +739,26 @@ export function AroundTheWorld({
     return t('discover.row.labelScore', 'SCORE');
   };
 
-  /** Complete list for the sheet, notability first, newest as the tie-break. */
+  /**
+   * THE COMPLETE FEAT LIST for the sheet (BRIEF_STANDOUT_SHEET_GROUPED_ROWS §0).
+   * ONE ROW PER FEAT, not per course: the sheet is the record and must show
+   * everything, so NO KIND BUDGET is applied and a course repeats as often as
+   * it earned a standout round. Order: group order first (the section's fixed
+   * relative order), then notability, then recency.
+   */
   const newsEntries = useMemo<CourseNewsEntry[]>(() => {
-    return groups
-      .map((g) => {
-        const top = [...g.events].sort(
-          (a, b) => notability(a) - notability(b) || (a.at < b.at ? 1 : -1),
-        )[0];
+    const groupOrder = new Map<string, number>(FEAT_GROUPS.map((g, i) => [g.id as string, i]));
+    const rows = groups.flatMap((g) => {
+      const rating = ratings?.get(g.courseId);
+      const headline = headlineOf(g.events);
+      return g.events.map((e) => {
         const actor =
-          top && userId && top.userId && top.userId === userId
+          userId && e.userId && e.userId === userId
             ? t('discover.wire.you', 'You')
-            : (top?.actorName?.trim() ?? '');
-        const feat = top ? detailFor(top, true) : '';
-        const rating = ratings?.get(g.courseId);
-        const useRating = !top?.figure && !!rating;
+            : (e.actorName?.trim() ?? '');
+        /* A RATING ONLY STANDS IN for a figureless HEADLINE feat — otherwise the
+           same rating would be stamped on every one of the course's rows. */
+        const useRating = !e.figure && !!rating && e.id === headline?.id;
 
         let figure: string | null = null;
         let figureUnit: string | null = null;
@@ -778,12 +784,12 @@ export function AroundTheWorld({
               });
             };
           }
-        } else if (top) {
-          figure = top.figure ?? null;
-          figureUnit = top.figure ? figLabelFor(top) : null;
-          if (top.scoreId) {
-            const scoreId = top.scoreId;
-            const ownerId = top.userId;
+        } else {
+          figure = e.figure ?? null;
+          figureUnit = e.figure ? figLabelFor(e) : null;
+          if (e.scoreId) {
+            const scoreId = e.scoreId;
+            const ownerId = e.userId;
             onPress = () => {
               analyticsEvents.track('discover_world_row_tap', { kind: 'feat' });
               opener.openByScore(scoreId, null, ownerId);
@@ -791,45 +797,49 @@ export function AroundTheWorld({
           }
         }
 
-        const ratingLine =
-          useRating && rating
-            ? `${
-                userId && rating.userId && rating.userId === userId
-                  ? t('discover.wire.you', 'You')
-                  : (rating.actorName?.trim() ?? '')
-              }`
-            : '';
-
-        const line = useRating
-          ? ratingLine
-            ? `${ratingLine} \u00B7 ${t('discover.row.rated', 'Rated this course')}`
-            : t('discover.row.rated', 'Rated this course')
-          : actor
-            ? `${actor} \u00B7 ${feat}`
-            : feat;
+        const groupId = groupIdFor(e.kind);
+        const def = FEAT_GROUPS.find((x) => x.id === groupId) ?? FEAT_GROUPS[2];
 
         return {
+          id: e.id,
           courseId: g.courseId,
           courseName: g.courseName,
           courseImage: g.courseImage,
-          at: g.at,
-          topLine: line,
+          groupId,
+          groupLabel: t(def.key, def.label),
+          at: e.at,
+          featLine: useRating
+            ? t('discover.row.rated', 'Rated this course')
+            : detailFor(e, true),
+          who: useRating
+            ? userId && rating?.userId && rating.userId === userId
+              ? t('discover.wire.you', 'You')
+              : (rating?.actorName?.trim() ?? '')
+            : actor,
+          isOwn: useRating
+            ? !!userId && rating?.userId === userId
+            : !!userId && e.userId === userId,
+          avatarUrl: useRating ? (rating?.actorAvatar ?? null) : (e.actorAvatar ?? null),
+          avatarUserId: useRating ? (rating?.userId ?? null) : e.userId,
           figure,
           figureUnit,
+          figureTone: figureToneFor(e.kind, figure),
           onPress,
-          rank: top ? notability(top) : 5,
+          rank: notability(e),
         };
-      })
+      });
+    });
+
+    return rows
       .sort((a, b) => {
-        if (priorityFor) {
-          const d = priorityFor(a.courseId) - priorityFor(b.courseId);
-          if (d !== 0) return d;
-        }
+        const gd = (groupOrder.get(a.groupId) ?? 9) - (groupOrder.get(b.groupId) ?? 9);
+        if (gd !== 0) return gd;
         return a.rank - b.rank || (a.at < b.at ? 1 : -1);
       })
       .map(({ rank: _rank, ...rest }) => rest);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groups, ratings, userId, t, priorityFor]);
+
 
 
 
