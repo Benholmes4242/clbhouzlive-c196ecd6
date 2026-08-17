@@ -8,13 +8,12 @@ import { SCRIM_STRONG } from './tokens';
  * CREATOR CARD — "B, frame overlay" (BRIEF_COMMUNITY_CREATOR_CARDS).
  *
  * The card is a MEDIA TILE: full-bleed frame from one of the creator's OWN
- * recent items, a real gradient scrim, overlaid identity. Only three things
- * separate it from the eight moments around it, so all three are LOAD-BEARING:
+ * recent items, a real gradient scrim, overlaid identity. Two things separate
+ * it from the eight moments around it, so both are LOAD-BEARING:
  *
- *   1. THE CREATOR CHIP, top left. Solid fill, never a tint, never conditional.
- *   2. THE AVATAR RING — a solid light stroke, so the avatar reads as a person
+ *   1. THE AVATAR RING — a solid light stroke, so the avatar reads as a person
  *      and not a logo burned into the photograph.
- *   3. THE CAPTION IS A PERSON. NO COURSE NAME ANYWHERE: every other tile is
+ *   2. THE CAPTION IS A PERSON. NO COURSE NAME ANYWHERE: every other tile is
  *      captioned with a place, and the moment this one is too it is
  *      indistinguishable.
  *
@@ -84,30 +83,6 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
       >
         <div style={{ position: 'absolute', inset: 0, background: SCRIM_STRONG }} />
 
-        {/* 1. THE CHIP. Unconditional, readable over any frame. The substrate is
-            the platform's badge GLASS (`.standout-figure-chip`, the 77-gross
-            chip in Personal Bests): flat base fill plus hairline, blur only as
-            an @supports enhancement — never a tint of the photo. */}
-        <span
-          className="standout-figure-chip"
-          style={{
-            position: 'absolute',
-            top: 8,
-            left: 8,
-            color: '#FFFFFF',
-            fontSize: 8.5,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            borderRadius: 4,
-            padding: '3px 5px',
-            /* Dark glass now (BRIEF_GLASS_BADGES_DARK) — no shadow floor. */
-          }}
-        >
-          {t('discover.creator.chip', 'Creator')}
-        </span>
-
-
         <div
           style={{
             position: 'absolute',
@@ -120,7 +95,7 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
             minWidth: 0,
           }}
         >
-          {/* 2. THE RING — solid light stroke, squircle geometry. */}
+          {/* 1. THE RING — solid light stroke, squircle geometry. */}
           <span
             style={{
               flexShrink: 0,
@@ -148,7 +123,7 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
           </span>
 
           <span style={{ minWidth: 0, flex: 1 }}>
-            {/* 3. THE CAPTION IS THE PERSON — no course name anywhere. */}
+            {/* 2. THE CAPTION IS THE PERSON — no course name anywhere. */}
             <span
               style={{
                 display: 'block',
