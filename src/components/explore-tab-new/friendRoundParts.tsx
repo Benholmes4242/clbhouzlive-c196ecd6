@@ -25,15 +25,26 @@ export const MOVEMENT_FLOOR = 0.05;
  */
 export const INSIGHT_FONT_SIZE = 11.5;
 export const INSIGHT_LINE_HEIGHT = 1.3;
-export const INSIGHT_TWO_LINE_RESERVE = INSIGHT_FONT_SIZE * INSIGHT_LINE_HEIGHT * 2;
+/**
+ * ONE LINE, NOT TWO (BRIEF_FRIENDS_RAIL_ONE_LINE). Every insight state is
+ * written to fit a single line, so the reserve is one line high and no tile
+ * carries the dead band the two-line reserve left under the short states.
+ */
+export const INSIGHT_LINE_RESERVE = INSIGHT_FONT_SIZE * INSIGHT_LINE_HEIGHT;
+/** Back-compat alias — same one-line reserve. */
+export const INSIGHT_TWO_LINE_RESERVE = INSIGHT_LINE_RESERVE;
 
-/** Two-line clamp for the insight text — the third line is dropped by design. */
+/**
+ * Single-line clamp. A BACKSTOP, NOT THE FIX: the strings are short enough to
+ * fit, and this only guarantees a future state can never reintroduce the wrap.
+ * If a state ellipses in normal use, shorten that state — do not leave it cut.
+ */
 export const INSIGHT_CLAMP = {
-  display: '-webkit-box',
-  WebkitBoxOrient: 'vertical' as const,
-  WebkitLineClamp: 2,
+  whiteSpace: 'nowrap' as const,
+  textOverflow: 'ellipsis' as const,
   overflow: 'hidden',
 };
+
 
 /**
  * The insight line's CATEGORY MARKER — a single small inline glyph, one for
