@@ -84,11 +84,9 @@ describe('BRIEF_HONOURS_BOARD_PLAQUE_RAIL', () => {
     expect(container.textContent).toBe('');
   });
 
-  it('groups the grid layout by year', () => {
+  it('prints the year on each recent card', () => {
     render(
       <HonoursBoard
-        layout="grid"
-        showHeader={false}
         events={[ev({ id: 'a', at: '2024-05-01T00:00:00Z' }), ev({ id: 'b', at: '2022-05-01T00:00:00Z' })]}
       />,
     );
@@ -96,3 +94,4 @@ describe('BRIEF_HONOURS_BOARD_PLAQUE_RAIL', () => {
     expect(screen.getAllByText('2022').length).toBeGreaterThan(0);
   });
 });
+
