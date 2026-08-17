@@ -317,6 +317,11 @@ export function StandoutTile({
         </span>
 
         <div style={{ position: 'absolute', left: 10, right: 10, bottom: 9 }}>
+          {/* COURSE NAME — two lines (BRIEF_STANDOUT_TILE_NAME_WRAP). Already
+              clamped at two here; the shadow is new, because a second line can
+              rise past the scrim's 32% fade on the shorter photo tiers. The
+              block is ABSOLUTE over the photo, so a wrap costs no tile height
+              and estimatePanelHeight is unaffected. */}
           <div
             style={{
               fontSize: nameSize ?? 14,
@@ -328,6 +333,7 @@ export function StandoutTile({
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
+              textShadow: '0 1px 3px rgba(10,14,10,0.6)',
             }}
           >
             {courseName}
