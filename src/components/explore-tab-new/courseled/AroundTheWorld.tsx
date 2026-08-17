@@ -747,7 +747,7 @@ export function AroundTheWorld({
    * relative order), then notability, then recency.
    */
   const newsEntries = useMemo<CourseNewsEntry[]>(() => {
-    const groupOrder = new Map(FEAT_GROUPS.map((g, i) => [g.id, i] as const));
+    const groupOrder = new Map<string, number>(FEAT_GROUPS.map((g, i) => [g.id as string, i]));
     const rows = groups.flatMap((g) => {
       const rating = ratings?.get(g.courseId);
       const headline = headlineOf(g.events);
