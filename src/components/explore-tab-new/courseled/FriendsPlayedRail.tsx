@@ -10,7 +10,7 @@ import {
   InsightGlyph,
   INSIGHT_FONT_SIZE,
   INSIGHT_LINE_HEIGHT,
-  INSIGHT_TWO_LINE_RESERVE,
+  INSIGHT_LINE_RESERVE,
   INSIGHT_CLAMP,
 } from '../friendRoundParts';
 import { CourseImageFallback } from './CourseImageFallback';
@@ -632,7 +632,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                     unchanged; the drawing above is built from the same two
                     figures, so the two can never disagree. Two lines of height
                     are reserved on every card so the rail holds one height. */}
-                <div style={{ minHeight: INSIGHT_TWO_LINE_RESERVE, marginBottom: 9 }}>
+                <div style={{ minHeight: INSIGHT_LINE_RESERVE, marginBottom: 9 }}>
                   {insight && (
                     <div
                       style={{
