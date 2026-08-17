@@ -244,34 +244,41 @@ export function LatestReviewsSheet({
              recurring full-bleed tile would break the scan, and a quote on
              every other tile stops being a reward. Compact still applies, so
              the sheet keeps the same rhythm the section has. */
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              alignItems: 'start',
-              gap: 8,
-            }}
-          >
-            {visible.map((r) => {
-              const st = reactions.stateFor('review', r.reviewId);
-              const own = !!viewerId && r.userId === viewerId;
-              return (
-                <ReviewTile
-                  key={r.reviewId}
-                  review={r}
-                  isOwn={own}
-                  autoplayGroup="reviews-sheet"
-                  tier={reviewTier(r) === 'compact' ? 'compact' : 'bars'}
-                  onPress={onTilePress}
-                  reactionHidden={!reactions.viewerId || reactions.unavailable}
-                  reactionReadOnly={own}
-                  reactionCount={st.count}
-                  reacted={st.mine}
-                  onToggleReaction={() => reactions.toggle('review', r.reviewId)}
-                />
-              );
-            })}
+          /* COLUMN-FLOW MASONRY, NOT A CSS GRID (BRIEF_REVIEWS_SHEET_MASONRY).
+             A grid lays out in ROWS and every row is as tall as its tallest
+             item, so a compact tile beside a bars tile left dead space beneath
+             it. splitMasonry places each tile in whichever column is currently
+             shorter — the same helper Standout Rounds and Personal Bests use.
+             The masonry PLACES, it does not re-rank. */
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+            {reviewColumns.map((col, ci) => (
+              <div
+                key={ci}
+                style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}
+              >
+                {col.map((r) => {
+                  const st = reactions.stateFor('review', r.reviewId);
+                  const own = !!viewerId && r.userId === viewerId;
+                  return (
+                    <ReviewTile
+                      key={r.reviewId}
+                      review={r}
+                      isOwn={own}
+                      autoplayGroup="reviews-sheet"
+                      tier={reviewTier(r) === 'compact' ? 'compact' : 'bars'}
+                      onPress={onTilePress}
+                      reactionHidden={!reactions.viewerId || reactions.unavailable}
+                      reactionReadOnly={own}
+                      reactionCount={st.count}
+                      reacted={st.mine}
+                      onToggleReaction={() => reactions.toggle('review', r.reviewId)}
+                    />
+                  );
+                })}
+              </div>
+            ))}
           </div>
+
         )}
 
         <div ref={sentinel} aria-hidden style={{ height: 24 }} />
