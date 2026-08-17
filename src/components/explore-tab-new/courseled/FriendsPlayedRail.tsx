@@ -25,11 +25,11 @@ import { useRoundHoleShapes } from './hooks/useRoundHoleShapes';
 import { RoundShape } from './RoundShape';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
-import { countNewSince, isNewSince, useReportNewCount } from './newSince';
+import { countNewSince, useReportNewCount } from './newSince';
 import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, NEW_CARD_RING, GOLD, InkAction, NUMF, SANS } from './tokens';
+import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, GOLD, InkAction, NUMF, SANS } from './tokens';
 
 /**
  * Section 1 — WHO'S BEEN PLAYING (BRIEF_FRIENDS_PLAYED_TILE_GLASS +
@@ -206,7 +206,6 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
         {rows.map((r) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
           const hasAce = r.feats.some((f) => f.key === 'holes_in_one');
-          const isNew = isNewSince(r.play_date, lastSeen);
           // A ROUND SCORE IS A SCORE, NOT A MOVEMENT: under par is TOPAR red,
           // over par is INK, level is muted. The index-delta pair
           // (A.IMPROVED / A.DRIFTED) means MOVEMENT and must never appear here.
@@ -221,7 +220,8 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
               onClick={() => onCardPress(r)}
               style={{
                 ...CARD_SHELL,
-                ...(isNew ? NEW_CARD_RING : null),
+                /* No new-card ring on this rail: the ink outline read as a
+                   stray black border on some cards and not others. */
                 width: CARD_W,
                 flexShrink: 0,
                 display: 'flex',
