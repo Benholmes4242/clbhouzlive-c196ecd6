@@ -74,7 +74,19 @@ function chipColors(kind: TiVerdictKind): React.CSSProperties {
   return { background: RED_BG, color: RED_TX };
 }
 
-function VerdictChip({ v, size = 'md', t }: { v: TiVerdict; size?: 'md' | 'lg'; t: TFunction }) {
+function VerdictChip({
+  v,
+  size = 'md',
+  t,
+  onDark = false,
+}: {
+  v: TiVerdict;
+  size?: 'md' | 'lg';
+  t: TFunction;
+  /** In the tile's top-right slot the pill sits on the DARK top of the scrim —
+   *  a bright sky can wash the gold, so it takes a hairline and a lift there. */
+  onDark?: boolean;
+}) {
   if (v.kind === 'none') return null;
   const big = size === 'lg';
   return (
@@ -89,7 +101,14 @@ function VerdictChip({ v, size = 'md', t }: { v: TiVerdict; size?: 'md' | 'lg'; 
         fontWeight: 700,
         letterSpacing: 0.4,
         fontVariantNumeric: 'tabular-nums',
+        flexShrink: 0,
         ...chipColors(v.kind),
+        ...(onDark
+          ? {
+              border: '1px solid rgba(255,255,255,0.5)',
+              boxShadow: '0 1px 8px rgba(10,14,10,0.45)',
+            }
+          : null),
       }}
     >
       {v.kind === 'win' && <span style={{ fontSize: big ? 14 : 12 }}>🏆</span>}
@@ -98,6 +117,7 @@ function VerdictChip({ v, size = 'md', t }: { v: TiVerdict; size?: 'md' | 'lg'; 
     </span>
   );
 }
+
 
 // ---- Root ----
 
