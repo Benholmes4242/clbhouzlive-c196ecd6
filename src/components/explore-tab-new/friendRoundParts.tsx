@@ -112,6 +112,13 @@ export function IndexMovement({ row }: { row: CircleRoundRow }) {
   );
 }
 
+/* THE AVERAGE-DELTA FLOOR, ONE CONSTANT FOR BOTH CALL SITES.
+   An insight line is the one sentence a member reads about someone else's
+   round, so it must be true AND worth saying. Two tenths of a shot over
+   eighteen holes is rounding, not a difference: below a FULL SHOT the claim is
+   dropped and the cascade falls through to whatever resolves next. */
+export const AVG_DELTA_MIN = 1.0;
+
 /**
  * The personal reference sentence, first that resolves:
  *   a. their best here, of n rounds
@@ -139,7 +146,7 @@ export function referenceLine(
 
   if (avg_gross_here != null) {
     const d = Math.round((avg_gross_here - gross) * 10) / 10;
-    if (Math.abs(d) >= 0.05) {
+    if (Math.abs(d) >= AVG_DELTA_MIN) {
       const figure = Math.abs(d).toFixed(1);
       return d > 0
         ? t('discover.friendsRail.betterThanAvg', {
@@ -345,7 +352,7 @@ function candidatesFor(row: CircleRoundRow, t: T): RoundInsight[] {
   // 10. Against their own average here.
   if (row.gross != null && row.avg_gross_here != null && (row.rounds_here ?? 0) > 1) {
     const d = Math.round((row.avg_gross_here - row.gross) * 10) / 10;
-    if (Math.abs(d) >= 0.05) {
+    if (Math.abs(d) >= AVG_DELTA_MIN) {
       const figure = Math.abs(d).toFixed(1);
       push(
         'vs_avg',

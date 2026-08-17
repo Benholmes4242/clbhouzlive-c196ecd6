@@ -1415,7 +1415,9 @@
         "birdies_one": "[~~{{count}} ƀířđíé~~]",
         "eagles": "[~~{{count}} éáĝļéš~~]",
         "eagles_one": "[~~{{count}} éáĝļé~~]"
-      }
+      },
+      "birdies_one": "[~~{{count}} ƀířđíé~~]",
+      "birdies_other": "[~~{{count}} ƀířđíéš~~]"
     },
     "tour": {
       "round": "[~~Řőúñđ~~]",

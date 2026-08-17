@@ -345,21 +345,19 @@ function RoundShape({ row, shape }: { row: CircleRoundRow; shape: HoleShape | nu
           }}
         >
           {/* ZERO OF SOMETHING GOOD READS AS A CRITICISM on another member's
-              round, so an empty left slot rather than "0 birdies". */}
+              round, so an empty left slot rather than "0 birdies".
+              THE PLURAL LIVES IN THE TRANSLATION (birdies_one / birdies_other),
+              never in a single inline defaultValue — one string gives i18next no
+              plural form and renders "1 birdies". */}
           <span style={{ ...FIGS, color: UNDER_TONE }}>
             {birdies > 0
-              ? `\u25CF ${t('discover.friendsRail.birdies', {
-                  defaultValue: '{{count}} birdies',
-                  count: birdies,
-                })}`
+              ? `\u25CF ${t('discover.friendsRail.birdies', { count: birdies })}`
               : ''}
           </span>
-          <span style={{ ...FIGS, color: A.DIM }}>
-            {t('discover.friendsRail.holes', {
-              defaultValue: '{{count}} holes',
-              count: holesPlayed,
-            })}
-          </span>
+          {/* NO HOLE COUNT. create_round_posts and useCircleLatestRounds both
+              require holes_played = 18, so the label could only ever say "18
+              holes" — a constant occupying half the meta row. */}
+
         </div>
       )}
     </>
@@ -584,21 +582,29 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                     )}
                   </span>
 
+                  {/* TWO LINES, CLAMPED. A single truncated line cut the
+                      parenthetical — "(East Course)" is the only thing telling
+                      one course at a club from another, so it must survive. The
+                      block sits in the photo's bottom-anchored overlay, so a
+                      second line grows UPWARD into the photograph and the tile
+                      height is unchanged. Type size is not reduced. */}
                   <span
                     style={{
-                      display: 'block',
+                      display: '-webkit-box',
+                      WebkitBoxOrient: 'vertical',
+                      WebkitLineClamp: 2,
                       marginTop: 5,
                       fontSize: 12,
                       fontWeight: 700,
                       color: '#fff',
                       letterSpacing: '-0.015em',
+                      lineHeight: 1.25,
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
                     }}
                   >
                     {m?.name ?? r.course_name ?? t('discover.unknownCourse', 'Course')}
                   </span>
+
                 </div>
               </CourseImageFallback>
 
