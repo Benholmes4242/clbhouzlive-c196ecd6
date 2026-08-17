@@ -292,7 +292,7 @@ const FieldHero: React.FC<{
         Connect your handicap
       </button>
       <div style={{ marginTop: 8, textAlign: 'center', fontSize: 12, fontWeight: 500, color: A.MUTE }}>
-        About 30 seconds with your England Golf login
+        About 30 seconds with your official WHS handicap
       </div>
     </Panel>
   </div>
