@@ -8,6 +8,7 @@ import { Heart, MessageCircle, MapPin } from 'lucide-react';
 import { MomentPost } from './types';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
 
 interface MomentCardProps {
   moment: MomentPost;
@@ -71,9 +72,9 @@ export const MomentCard: React.FC<MomentCardProps> = ({
           <div
             className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
             style={{
-              background: 'rgba(0, 0, 0, 0.6)',
-              backdropFilter: 'blur(8px)',
-              color: 'var(--dgp-text-primary)',
+              background: CHIP_GLASS_BG,
+              border: CHIP_GLASS_BORDER,
+              color: '#FFFFFF',
             }}
           >
             <MapPin className="w-3 h-3" />

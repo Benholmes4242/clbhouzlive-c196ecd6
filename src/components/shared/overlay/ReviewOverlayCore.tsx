@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
   FROST,
   FROST_BLUR,
   FROST_SCORE_GRADIENT,
@@ -166,7 +167,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
         <>
           {/* Subtle gradients for legibility against varied photo backdrops */}
           <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 via-black/15 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 via-black/15 to-transparent" />
+          <div className="absolute inset-0" style={{ background: SCRIM_STANDOUT }} />
 
           <TappableWrapper
             className="absolute top-2 left-2 right-2 z-10"

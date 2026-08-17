@@ -10,6 +10,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Panel } from '@/features/courses/components/holes/analytical/tokens';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
 
 interface CourseMomentsProps {
   courseId: string;
@@ -139,7 +140,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={{
                     width: 22, height: 22, borderRadius: '50%',
-                    background: 'rgba(0,0,0,0.55)', display: 'flex',
+                    background: CHIP_GLASS_BG, border: CHIP_GLASS_BORDER, display: 'flex',
                     alignItems: 'center', justifyContent: 'center',
                   }}>
                     <Play style={{ width: 10, height: 10, color: '#fff', fill: '#fff' }} />
@@ -165,8 +166,8 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
               width: 80,
               height: 80,
               borderRadius: 10,
-              background: 'rgba(0,0,0,0.5)',
-              backdropFilter: 'blur(4px)',
+              background: CHIP_GLASS_BG,
+              border: CHIP_GLASS_BORDER,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

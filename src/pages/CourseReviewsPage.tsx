@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatRatingValue } from '@/utils/formatters';
 import { formatDateNumeric } from '@/i18n/format';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 const CourseReviewsPage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -105,8 +106,8 @@ const CourseReviewsPage: React.FC = () => {
             e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=400&fit=crop';
           }}
         />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20" />
+        {/* THE canonical photo scrim. */}
+        <div aria-hidden className="absolute inset-0" style={{ background: SCRIM_STANDOUT }} />
         
         {/* Back button */}
         <button

@@ -10,6 +10,7 @@ import { ReviewOverlaySlot } from './ReviewOverlaySlot';
 import { formatRelative } from '@/i18n/format';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 interface FeedOverlayLayerProps {
   posts: FeedPost[];
@@ -195,7 +196,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           bottom: 0,
           height: '42%',
           background:
-            'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.28) 38%, rgba(0,0,0,0) 100%)',
+            SCRIM_STANDOUT,
           pointerEvents: 'none',
           zIndex: 0,
         }}

@@ -5,7 +5,7 @@ import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 import { CourseImageFallback } from './CourseImageFallback';
-import { SCRIM_STANDOUT } from './photoScrim';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import type { Moment } from './hooks/useMomentsOfTheWeek';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import { attachTileHls } from './tileHlsPlayer';

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Play, Camera } from 'lucide-react';
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
 
 export interface ReviewMediaItem {
   id: string;
@@ -87,7 +88,8 @@ const ReviewMediaThumb: React.FC<{
               width: 22,
               height: 22,
               borderRadius: '50%',
-              background: 'rgba(0,0,0,0.55)',
+              background: CHIP_GLASS_BG,
+              border: CHIP_GLASS_BORDER,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

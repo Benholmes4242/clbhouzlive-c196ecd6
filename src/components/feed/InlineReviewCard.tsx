@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
 import { formatFrostRating, splitCourseName } from '@/lib/frostPanel';
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER } from '@/styles/photoScrim';
 
 const FONTS = {
   sf: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -120,10 +121,8 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           gap: 7,
           padding: '5px 11px',
           borderRadius: 999,
-          background: 'rgba(10,14,20,0.52)',
-          backdropFilter: 'blur(14px) saturate(150%)',
-          WebkitBackdropFilter: 'blur(14px) saturate(150%)',
-          border: '1px solid rgba(255,255,255,0.16)',
+          background: CHIP_GLASS_BG,
+          border: CHIP_GLASS_BORDER,
           marginBottom: 11,
           fontFamily: FONTS.sf,
         }}

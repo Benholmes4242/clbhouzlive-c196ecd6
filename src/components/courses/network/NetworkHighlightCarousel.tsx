@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import type { NetworkCourseHighlight } from '@/hooks/useNetworkActivity';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 interface NetworkHighlightCarouselProps {
   highlights: NetworkCourseHighlight[];
@@ -94,7 +95,7 @@ export const NetworkHighlightCarousel: React.FC<NetworkHighlightCarouselProps> =
               <div 
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)',
+                  background: SCRIM_STANDOUT,
                 }}
               />
 

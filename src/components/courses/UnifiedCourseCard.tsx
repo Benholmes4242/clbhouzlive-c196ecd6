@@ -9,6 +9,7 @@ import { YourStatsChip } from './YourStatsChip';
 import { useUserStatsRoundsForCourse } from '@/contexts/UserStatsCoursesContext';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 /**
  * UNIFIED COURSE CARD COMPONENT
@@ -208,7 +209,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
         <div
           className="pointer-events-none absolute inset-0"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.28) 45%, rgba(0,0,0,0.04) 100%)',
+            background: SCRIM_STANDOUT,
           }}
         />
 

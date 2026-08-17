@@ -31,6 +31,7 @@ import { usePlayerResults } from '../../hooks/usePlayerResults';
 import { useSeasonResultsSummary } from '../../hooks/useSeasonResultsSummary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER, SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 // ---- Design tokens (per approved TIRedesign) ----
 const INK = '#0E1013';
@@ -469,10 +470,10 @@ function PickScrimBand({
         aria-hidden
         style={{
           background: dark
-            ? // Starts at 0.12, NOT transparent — a bright sky needs a floor or
-              // the pick label at the top disappears.
-              'linear-gradient(180deg, rgba(10,14,10,0.12) 0%, rgba(10,14,10,0.50) 44%, rgba(10,14,10,0.92) 100%)'
-            : `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) ${fadeStart}%, rgba(255,255,255,0.55) ${Math.round(fadeStart + (100 - fadeStart) * 0.5)}%, rgba(255,255,255,0.88) ${Math.round(fadeStart + (100 - fadeStart) * 0.78)}%, #FFFFFF 100%)`,
+            ? // DARK BRANCH — the canonical photo scrim (BRIEF_APP_WIDE_SCRIM §1.3).
+              SCRIM_STANDOUT
+            : // LIGHT BRANCH — untouched: it fades to the sheet's #FFFFFF.
+               `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) ${fadeStart}%, rgba(255,255,255,0.55) ${Math.round(fadeStart + (100 - fadeStart) * 0.5)}%, rgba(255,255,255,0.88) ${Math.round(fadeStart + (100 - fadeStart) * 0.78)}%, #FFFFFF 100%)`,
           position: 'absolute',
           inset: 0,
         }}
@@ -549,8 +550,8 @@ function PickStatusTag({
           ? {
               borderRadius: 999,
               padding: '3px 8px',
-              background: 'rgba(10,14,10,0.5)',
-              border: '1px solid rgba(255,255,255,0.24)',
+              background: CHIP_GLASS_BG,
+              border: CHIP_GLASS_BORDER,
             }
           : null),
       }}

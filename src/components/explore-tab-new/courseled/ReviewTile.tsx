@@ -3,7 +3,7 @@ import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from './CourseImageFallback';
-import { SCRIM_STANDOUT } from './photoScrim';
+import { CHIP_GLASS_BG, CHIP_GLASS_BORDER, SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { ReactionAction } from './ReactionAction';
 
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -318,9 +318,8 @@ export function ReviewTile({
               width: 34,
               height: 34,
               borderRadius: 999,
-              background: 'rgba(10,14,10,0.46)',
-              backdropFilter: 'blur(4px)',
-              WebkitBackdropFilter: 'blur(4px)',
+              background: CHIP_GLASS_BG,
+              border: CHIP_GLASS_BORDER,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
