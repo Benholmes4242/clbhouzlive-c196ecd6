@@ -14,7 +14,7 @@ import { HONOURS_SHELL, GOLD_HAIR } from './honoursTokens';
  *
  * Every block below is MEASURED off the rendered component it stands in for,
  * not read off the JSX and added up:
- *   friends rail   224 x 222  (104 photo + 34 shape strip + 84 body)
+ *   friends rail   224 x 233  (104 photo + 60 shape strip + 69 body)
  *   tour rail      266 x 210  (OnTourThisWeek TILE_W / TILE_H, full-bleed)
  *   reviews        two columns, PAGE_CAP 4 tiles, 265 rendered each
  *   around world   masonry, six photo heights + 62 body
@@ -83,9 +83,9 @@ function TextBar({ w, h = 11 }: { w: number | string; h?: number }) {
 /**
  * Section 2 — friends rail. MEASURED off FriendsPlayedRail: 224 wide, a 104px
  * photograph (PHOTO_H) carrying the glass score chip, the full-bleed round
- * shape strip at 34 (SHAPE_H), then the body — ONE reserved insight line
+ * shape strip at 60 (SHAPE_H), then the body — ONE reserved insight line
  * (INSIGHT_LINE_RESERVE ~15), a hairline, and the member/reaction row.
- * Total 207. Was 222 when two insight lines were reserved.
+ * Total 233. The strip grew 34 -> 60 so the curve has amplitude.
  */
 export function FriendsRail() {
   return (
@@ -96,7 +96,7 @@ export function FriendsRail() {
           <div key={i} style={{ ...CARD_SHELL, width: 224, flexShrink: 0, padding: 0 }}>
             <Bar style={{ borderRadius: 0, height: 104, width: '100%' }} />
             {/* The shape strip is full bleed and sits directly under the photo. */}
-            <Bar style={{ borderRadius: 0, height: 34, width: '100%' }} />
+            <Bar style={{ borderRadius: 0, height: 60, width: '100%' }} />
             <div style={{ padding: '9px 11px 10px' }}>
               <div style={{ minHeight: 15, display: 'flex', flexDirection: 'column' }}>
                 <TextBar w={'92%'} h={10} />
