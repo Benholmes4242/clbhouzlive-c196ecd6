@@ -26,7 +26,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 import { SubScoreStack, bandColor } from '@/features/courses/_shared/scoreBands';
-import { A, LABEL, NUM, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { A, StatItem, StatRow, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 
 
 /** Deliberately colourless: this is an invitation, not a data value. */
