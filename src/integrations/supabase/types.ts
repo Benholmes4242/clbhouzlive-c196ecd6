@@ -12164,6 +12164,62 @@ export type Database = {
         }
         Relationships: []
       }
+      ti_generation_log: {
+        Row: {
+          created_at: string
+          detail: string | null
+          duration_ms: number | null
+          field_count: number | null
+          generated: boolean
+          id: string
+          outcome: string
+          run_id: string
+          start_date: string | null
+          tour_id: string | null
+          tour_name: string | null
+          tournament_id: string | null
+          tournament_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          duration_ms?: number | null
+          field_count?: number | null
+          generated?: boolean
+          id?: string
+          outcome: string
+          run_id: string
+          start_date?: string | null
+          tour_id?: string | null
+          tour_name?: string | null
+          tournament_id?: string | null
+          tournament_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          duration_ms?: number | null
+          field_count?: number | null
+          generated?: boolean
+          id?: string
+          outcome?: string
+          run_id?: string
+          start_date?: string | null
+          tour_id?: string | null
+          tour_name?: string | null
+          tournament_id?: string | null
+          tournament_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ti_generation_log_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       top_ten_reactions: {
         Row: {
           course_id: string
