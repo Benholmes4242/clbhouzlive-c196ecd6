@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { CheckCircle2, Mail, X } from 'lucide-react';
+import { CheckCircle2, Mail, ShieldOff, X } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import SectionTabs from './SectionTabs';
@@ -14,6 +14,11 @@ import {
   REVIEW_REASON_OPTIONS, reasonRequiresNote, reviewReasonLabel,
   type ReviewReason,
 } from '@/components/business/verification/reviewReasons';
+import {
+  GOLFER_REASON_OPTIONS, golferReasonLabel,
+  REVOCATION_REASON_OPTIONS, revocationReasonLabel,
+} from '@/components/business/verification/revocationReasons';
+import { confirmedSignals } from '@/components/business/verification/evidenceLine';
 import { BarVerdict, RawMetadataDisclosure, SignalsPanel, resolveSignals } from './VerificationSignals';
 
 /**
@@ -84,7 +89,7 @@ export function VerificationsTab({
   const [decision, setDecision] = useState<'approved' | 'rejected' | 'needs_more_info' | null>(null);
   // PHASE 4 §3 — the reason is part of the decision, so it lives beside it.
   const [reviewReason, setReviewReason] = useState<ReviewReason | null>(null);
-  const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
+  const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string; is_verified?: boolean; is_system_account?: boolean; verification_recheck_state?: string | null; verification_recheck_reason?: string | null; verification_recheck_due_at?: string | null } | null>(null);
   const [confirmApprove, setConfirmApprove] = useState(false);
   const { data: proofConflict } = useProofConflict(active);
 
@@ -94,7 +99,7 @@ export function VerificationsTab({
     if (active?.type === 'business' && active.businessId) {
       import('@/integrations/supabase/client').then(({ supabase }) =>
         supabase.from('business_accounts')
-          .select('name, category, location, website, email')
+          .select('name, category, location, website, email, is_verified, is_system_account, verification_recheck_state, verification_recheck_reason, verification_recheck_due_at')
           .eq('id', active.businessId!)
           .maybeSingle()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -267,7 +272,7 @@ export function VerificationDetailBody({
   reviewReason?: ReviewReason | null;
   setReviewReason?: (v: ReviewReason | null) => void;
 }) {
-  const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
+  const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string; is_verified?: boolean; is_system_account?: boolean; verification_recheck_state?: string | null; verification_recheck_reason?: string | null; verification_recheck_due_at?: string | null } | null>(null);
   const { data: proofConflict } = useProofConflict(row);
 
   useEffect(() => {
@@ -276,7 +281,7 @@ export function VerificationDetailBody({
     if (row.type === 'business' && row.businessId) {
       import('@/integrations/supabase/client').then(({ supabase }) =>
         supabase.from('business_accounts')
-          .select('name, category, location, website, email')
+          .select('name, category, location, website, email, is_verified, is_system_account, verification_recheck_state, verification_recheck_reason, verification_recheck_due_at')
           .eq('id', row.businessId!)
           .maybeSingle()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
