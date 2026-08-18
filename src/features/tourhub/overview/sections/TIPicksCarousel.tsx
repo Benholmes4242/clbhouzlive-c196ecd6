@@ -604,58 +604,11 @@ function PickStatusTag({
   );
 }
 
-function CardStateSlot({
+/* CardStateSlot is GONE (BRIEF_TI_TILE_STATUS_SLOT_AND_FIT S0.2). The tile was
+   its only caller: the settled verdict moved to the ONE top-right status slot,
+   the live score/position path is now inlined as DarkScoreBlock beside the name,
+   and the course fit became a permanent bar on the photograph. */
 
-  state,
-  pick,
-  live,
-  settled,
-  v,
-  t,
-  tone = 'light',
-  suppressWinChip = false,
-}: {
-  state: EventState;
-  pick: AITopContender;
-  live: PickLiveState | undefined;
-  settled: boolean;
-  v: TiVerdict;
-  t: TFunction;
-  tone?: 'light' | 'dark';
-  /** The tile moves the win pill into the top-right status slot, so the inline
-   *  chip must not draw it a second time. */
-  suppressWinChip?: boolean;
-}) {
-  const dark = tone === 'dark';
-  if (settled) {
-    if (v.kind === 'none') {
-      // Settled with no leaderboard row → show fit if present.
-      return <CourseFitLine score={pick.courseFitScore} t={t} tone={tone} />;
-    }
-    if (suppressWinChip && v.kind === 'win') return null;
-
-    return <VerdictChip v={v} t={t} />;
-  }
-  if (state === 'live' && live) {
-    const cutV = tiVerdict(live);
-    if (cutV.kind === 'mc') return <VerdictChip v={cutV} t={t} />;
-    if (live.position != null) {
-      if (dark) return <DarkScoreBlock live={live} />;
-      return (
-        <TourStatusBlock
-          score={live.score}
-          position={live.position}
-          positionTied={live.positionTied}
-          status={live.status}
-
-          align="left"
-        />
-      );
-    }
-  }
-  // Pre-tournament (upcoming) or live-with-no-row → course fit
-  return <CourseFitLine score={pick.courseFitScore} t={t} tone={tone} />;
-}
 
 /**
  * DarkScoreBlock — score + position over the photograph, right-aligned.
