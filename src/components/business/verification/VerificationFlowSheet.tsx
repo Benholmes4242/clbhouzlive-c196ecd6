@@ -201,13 +201,23 @@ export default function VerificationFlowSheet({
 
   // ---- validation & DB helpers ----
   const getProofData = () => {
+  /**
+   * Records WHAT THE APPLICANT ACTUALLY CHOSE. proof_value keeps the primary
+   * identifying value; proof_metadata keeps the method's own fields as
+   * structured JSON, so useProofConflict compares like with like.
+   */
+  const getProofData = () => {
     switch (selectedProof) {
       case 'official_website':
-        return { proof_value: proofWebsiteUrl.trim(), proof_metadata: {} as Record<string, unknown> };
+        return {
+          proof_value: proofWebsiteUrl.trim(),
+          proof_metadata: { website_url: proofWebsiteUrl.trim() } as Record<string, unknown>,
+        };
       case 'business_email':
         return {
           proof_value: proofEmail.trim(),
           proof_metadata: {
+            email: proofEmail.trim(),
             email_verified: otpEmailVerified,
           } as Record<string, unknown>,
         };
@@ -215,21 +225,31 @@ export default function VerificationFlowSheet({
         return {
           proof_value: proofCompanyNumber.trim() || proofRegistryUrl.trim(),
           proof_metadata: {
-            registry: proofRegistry,
+            registry_type: proofRegistry,
+            registry_name: proofRegistryName.trim() || null,
+            registration_number: proofCompanyNumber.trim() || null,
             registry_url: proofRegistryUrl.trim() || null,
           } as Record<string, unknown>,
         };
       case 'creator_business':
         return {
           proof_value: creatorContactType === 'email' ? creatorEmail.trim() : creatorPhone.trim(),
-          proof_metadata: { contact_type: creatorContactType } as Record<string, unknown>,
+          proof_metadata: {
+            contact_type: creatorContactType,
+            email: creatorContactType === 'email' ? creatorEmail.trim() : null,
+            phone: creatorContactType === 'phone' ? creatorPhone.trim() : null,
+          } as Record<string, unknown>,
         };
       case 'golf_course':
-        return { proof_value: golfCourseWebsite.trim(), proof_metadata: {} as Record<string, unknown> };
+        return {
+          proof_value: golfCourseWebsite.trim(),
+          proof_metadata: { website_url: golfCourseWebsite.trim() } as Record<string, unknown>,
+        };
       default:
         return { proof_value: '', proof_metadata: {} as Record<string, unknown> };
     }
   };
+
 
   const proofIsValid = useMemo(() => {
     if (!selectedProof) return false;
