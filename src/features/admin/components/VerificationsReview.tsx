@@ -10,6 +10,11 @@ import EmptyState from './EmptyState';
 import DetailDrawer from './DetailDrawer';
 import ConfirmDialog from './ConfirmDialog';
 import { useVerifications, useProofConflict, type VerificationRow } from '../hooks/useVerifications';
+import {
+  REVIEW_REASON_OPTIONS, reasonRequiresNote, reviewReasonLabel,
+  type ReviewReason,
+} from '@/components/business/verification/reviewReasons';
+import { BarVerdict, RawMetadataDisclosure, SignalsPanel, resolveSignals } from './VerificationSignals';
 
 /**
  * Extracted from UsersPage during the Members rebuild (D4). Behaviour and
@@ -23,14 +28,8 @@ function relTime(iso: string | null | undefined): string {
   catch { return '-'; }
 }
 
-const PROOF_LABELS: Record<string, string> = {
-  official_website: 'Official website',
-  business_email: 'Business email',
-  registered_business: 'Registered business',
-  creator_business: 'Creator / brand',
-  golf_course: 'Golf course / facility',
-};
-
+/* PROOF_LABELS retired in Phase 4: the drawer names signals, not proof methods.
+   PROOF_NOUNS survives because the duplicate warning still names the evidence. */
 const PROOF_NOUNS: Record<string, string> = {
   official_website: 'website',
   business_email: 'email address',
@@ -83,6 +82,8 @@ export function VerificationsTab({
   const [active, setActive] = useState<VerificationRow | null>(null);
   const [note, setNote] = useState('');
   const [decision, setDecision] = useState<'approved' | 'rejected' | 'needs_more_info' | null>(null);
+  // PHASE 4 §3 — the reason is part of the decision, so it lives beside it.
+  const [reviewReason, setReviewReason] = useState<ReviewReason | null>(null);
   const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
   const [confirmApprove, setConfirmApprove] = useState(false);
   const { data: proofConflict } = useProofConflict(active);
@@ -116,7 +117,7 @@ export function VerificationsTab({
     return entityFiltered.filter(r => r.status === 'pending');
   }, [entityFiltered, statusFilter]);
 
-  const close = () => { setActive(null); setNote(''); setDecision(null); setBizDetail(null); setConfirmApprove(false); };
+  const close = () => { setActive(null); setNote(''); setDecision(null); setReviewReason(null); setBizDetail(null); setConfirmApprove(false); };
 
   const doApprove = () => {
     if (!active) return;
@@ -128,9 +129,11 @@ export function VerificationsTab({
 
   const submit = (d: 'approved' | 'rejected' | 'needs_more_info') => {
     if (!active) return;
-    if ((d === 'rejected' || d === 'needs_more_info') && note.trim().length < 3) {
-      setDecision(d);
-      return;
+    if (d === 'rejected' || d === 'needs_more_info') {
+      // §3.2 — a refusal now needs a REASON. Free text is required only when the
+      // list cannot carry it ('other'); otherwise the reason names the cause.
+      if (!reviewReason) { setDecision(d); return; }
+      if (reasonRequiresNote(reviewReason) && note.trim().length < 3) { setDecision(d); return; }
     }
     if (active.type === 'golfer' && d === 'needs_more_info') return;
     if (d === 'approved' && proofConflict) {
@@ -139,14 +142,10 @@ export function VerificationsTab({
     }
     review.mutate(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { id: active.id, type: active.type, decision: d as any, adminNote: note },
+      { id: active.id, type: active.type, decision: d as any, adminNote: note, reviewReason },
       { onSuccess: close },
     );
   };
-
-  const proofMetaEntries = active?.proofMetadata
-    ? Object.entries(active.proofMetadata).filter(([, v]) => v !== null && v !== undefined && v !== '')
-    : [];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -220,6 +219,8 @@ export function VerificationsTab({
             note={note}
             setNote={setNote}
             decision={decision}
+            reviewReason={reviewReason}
+            setReviewReason={setReviewReason}
           />
         )}
       </DetailDrawer>
@@ -256,12 +257,15 @@ export default VerificationsTab;
  * decisions and reviewMutation.
  */
 export function VerificationDetailBody({
-  row, note, setNote, decision,
+  row, note, setNote, decision, reviewReason, setReviewReason,
 }: {
   row: VerificationRow;
   note: string;
   setNote: (v: string) => void;
   decision: 'approved' | 'rejected' | 'needs_more_info' | null;
+  /** PHASE 4 §3 — optional so callers that have not adopted reasons still compile. */
+  reviewReason?: ReviewReason | null;
+  setReviewReason?: (v: ReviewReason | null) => void;
 }) {
   const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
   const { data: proofConflict } = useProofConflict(row);
@@ -282,9 +286,7 @@ export function VerificationDetailBody({
     return () => { cancelled = true; };
   }, [row.id, row.businessId, row.type]);
 
-  const proofMetaEntries = row.proofMetadata
-    ? Object.entries(row.proofMetadata).filter(([, v]) => v !== null && v !== undefined && v !== '')
-    : [];
+  const resolved = useMemo(() => resolveSignals(row), [row]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -343,20 +345,8 @@ export function VerificationDetailBody({
         </div>
       )}
 
-      {row.type === 'business' && row.proofMethod && (
-        <Field label="Proof method" value={PROOF_LABELS[row.proofMethod] ?? row.proofMethod} />
-      )}
-      {row.type === 'business' && row.proofValue && (
-        <Field label="Proof value">
-          {/^https?:\/\//i.test(row.proofValue) ? (
-            <a href={row.proofValue} target="_blank" rel="noreferrer" style={{ color: t.brandText, fontSize: 13, wordBreak: 'break-all' }}>
-              {row.proofValue}
-            </a>
-          ) : (
-            <span style={{ fontSize: 13, color: t.ink, wordBreak: 'break-all' }}>{row.proofValue}</span>
-          )}
-        </Field>
-      )}
+      {/* PHASE 4 §2.3 — the CONFLICT comes before the evidence. A reviewer must
+          not form a view and then discover the proof belongs to someone else. */}
       {proofConflict && row.type === 'business' && (
         <div role="alert" style={{
           background: t.dangerSoft,
@@ -369,47 +359,33 @@ export function VerificationDetailBody({
         }}>
           <span style={{ fontSize: 16, lineHeight: 1 }} aria-hidden>!</span>
           <div style={{ fontSize: 13, color: t.dangerText, lineHeight: 1.45 }}>
-            <strong style={{ fontWeight: 700 }}>Duplicate proof</strong> - this{' '}
-            {PROOF_NOUNS[row.proofMethod ?? ''] ?? 'proof'} is already verified for{' '}
-            <strong style={{ fontWeight: 700 }}>{proofConflict.businessName}</strong>.
-            Approving will verify a second business with the same proof.
+            <strong style={{ fontWeight: 700 }}>Already verified elsewhere</strong> - this{' '}
+            {PROOF_NOUNS[row.proofMethod ?? ''] ?? 'evidence'} is verified for{' '}
+            <strong style={{ fontWeight: 700 }}>{proofConflict.businessName}</strong>
+            {proofConflict.approvedAt ? ` (${relTime(proofConflict.approvedAt)})` : ''}.
+            Approving verifies a second business on the same evidence.
           </div>
         </div>
       )}
 
-      {proofMetaEntries.length > 0 && (
-        <Field label="Proof metadata">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {proofMetaEntries.map(([k, v]) => (
-              <div key={k} style={{ fontSize: 12, color: t.ink, wordBreak: 'break-word' }}>
-                {/* PHASE 3 writes a nested `signals` object here. Stringify structured
-                    values so the drawer never renders "[object Object]". */}
-                <span style={{ color: t.inkMuted }}>{k}:</span>{' '}
-                {typeof v === 'object' ? JSON.stringify(v) : String(v)}
-              </div>
-            ))}
-
-          </div>
-        </Field>
-      )}
-      {row.domain && (
-        <Field label="Domain" value={`${row.domain}${row.domainConfirmed ? ' (confirmed)' : ' (unconfirmed)'}`} />
-      )}
-      {row.type === 'business' && row.proofMethod === 'business_email' && (
-        <Field label="Email verification">
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {(row.proofMetadata as any)?.email_verified || row.domainConfirmed ? (
-            <span style={{ fontSize: 12, fontWeight: 700, color: t.okText }}>Email verified (OTP)</span>
-          ) : (
-            <span style={{ fontSize: 12, fontWeight: 600, color: t.inkMuted }}>Email provided (unverified)</span>
+      {/* PHASE 4 §1 — SIGNALS, not a proof field. The verdict states itself first. */}
+      {row.type === 'business' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <BarVerdict claimed={resolved.claimed} />
+          {resolved.legacy && (
+            <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.4 }}>
+              Submitted before the signal model - signals below are inferred from the
+              original proof fields. The raw submission is under the disclosure.
+            </div>
           )}
-        </Field>
+          <SignalsPanel
+            signals={resolved.signals}
+            renderDocument={(path) => <SupportingDocLink path={path} />}
+          />
+          <RawMetadataDisclosure row={row} />
+        </div>
       )}
-      {row.type === 'business' && row.proofDocumentUrl && (
-        <Field label="Supporting document">
-          <SupportingDocLink path={row.proofDocumentUrl} />
-        </Field>
-      )}
+
       {row.type === 'business' && row.contactEmail && (
         <Field label="Applicant contact email" value={row.contactEmail} />
       )}
@@ -426,22 +402,98 @@ export function VerificationDetailBody({
         </Field>
       )}
       {row.inviteReason && <Field label="Reason" value={row.inviteReason} />}
-      {row.adminNote && <Field label="Admin note" value={row.adminNote} />}
+
+      {/* PHASE 4 §4 — a decision is a RECORD: who, when, on what grounds. */}
+      {row.status !== 'pending' && (
+        <div style={{
+          background: t.canvas, border: `1px solid ${t.line}`,
+          borderRadius: t.radius.md, padding: 10,
+          display: 'flex', flexDirection: 'column', gap: 6,
+        }}>
+          <div style={{ fontSize: 11, color: t.inkFaint, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            Decision
+          </div>
+          <div style={{ fontSize: 13, color: t.ink, lineHeight: 1.45 }}>
+            {row.status} {row.reviewerName ? `by ${row.reviewerName}` : row.reviewedBy ? `by ${row.reviewedBy.slice(0, 8)}` : ''}
+            {row.reviewedAt ? ` - ${relTime(row.reviewedAt)}` : ''}
+          </div>
+          {reviewReasonLabel(row.reviewReason) && (
+            <div style={{ fontSize: 13, color: t.ink }}>
+              <span style={{ color: t.inkMuted }}>Reason:</span> {reviewReasonLabel(row.reviewReason)}
+            </div>
+          )}
+          {row.adminNote && (
+            <div style={{ fontSize: 13, color: t.ink, lineHeight: 1.45 }}>
+              <span style={{ color: t.inkMuted }}>Note:</span> {row.adminNote}
+            </div>
+          )}
+          {(row.requiredApprovals ?? 1) > 1 && (
+            <div style={{ fontSize: 12, color: t.inkMuted }}>
+              Approvals {row.approvalCount ?? 0}/{row.requiredApprovals}
+            </div>
+          )}
+        </div>
+      )}
+      {row.status === 'pending' && row.adminNote && <Field label="Previous admin note" value={row.adminNote} />}
+      {row.status === 'pending' && (row.requiredApprovals ?? 1) > 1 && (
+        <div style={{ fontSize: 12, color: t.inkMuted }}>
+          Two-reviewer sign-off: {row.approvalCount ?? 0}/{row.requiredApprovals} recorded.
+          A second, different reviewer must approve to complete it.
+        </div>
+      )}
+
+      {/* PHASE 4 §3.2 — the reason is chosen from the published criteria, so the
+          applicant gets a cause and a remedy rather than a mood. */}
+      {row.status === 'pending' && setReviewReason && (decision === 'rejected' || decision === 'needs_more_info') && (
+        <div>
+          <label style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase' }}>
+            Reason <span style={{ color: t.danger }}>(required)</span>
+          </label>
+          <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {REVIEW_REASON_OPTIONS.map(opt => {
+              const on = reviewReason === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setReviewReason(on ? null : opt.value)}
+                  style={{
+                    textAlign: 'left', padding: '8px 10px',
+                    borderRadius: t.radius.md,
+                    border: `1px solid ${on ? t.brandText : t.line}`,
+                    background: on ? t.warnSoft : t.surface,
+                    cursor: 'pointer',
+                  }}
+                  aria-pressed={on}
+                >
+                  <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{opt.label}</div>
+                  <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.35 }}>{opt.hint}</div>
+                </button>
+              );
+            })}
+          </div>
+          {!reviewReason && (
+            <div style={{ fontSize: 12, color: t.dangerText, marginTop: 6 }}>
+              Choose the reason this request does not pass.
+            </div>
+          )}
+        </div>
+      )}
 
       {row.status === 'pending' && (
         <div>
           <label style={{ fontSize: 11, color: t.inkFaint, fontWeight: 600, textTransform: 'uppercase' }}>
-            Admin note {(decision === 'rejected' || decision === 'needs_more_info') && <span style={{ color: t.danger }}>(required, min 3 chars)</span>}
+            Admin note {reviewReason && reasonRequiresNote(reviewReason) && <span style={{ color: t.danger }}>(required, min 3 chars)</span>}
           </label>
           <textarea
             value={note}
             onChange={e => setNote(e.target.value)}
-            placeholder="Optional for approval, required for rejection or 'needs info'..."
+            placeholder="Adds detail to the reason. Required only for 'Other'."
             rows={3}
             style={{
               marginTop: 6, width: '100%',
               padding: 10, borderRadius: t.radius.md,
-              border: `1px solid ${(decision === 'rejected' || decision === 'needs_more_info') && note.trim().length < 3 ? t.danger : t.line}`,
+              border: `1px solid ${reviewReason && reasonRequiresNote(reviewReason) && note.trim().length < 3 ? t.danger : t.line}`,
               background: t.canvas, color: t.ink, fontSize: 13,
               outline: 'none', resize: 'vertical',
             }}

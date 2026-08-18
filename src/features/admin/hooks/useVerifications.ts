@@ -13,6 +13,14 @@ export interface VerificationRow {
   requestedBy: string | null;
   createdAt: string;
   reviewedAt: string | null;
+  /** PHASE 4 §4 — the audit trail. reviewed_by was already written by the RPCs. */
+  reviewedBy?: string | null;
+  reviewerName?: string | null;
+  /** PHASE 4 §3 — the structured decision reason. Null on pre-Phase-4 rows. */
+  reviewReason?: string | null;
+  /** PHASE 4 §5 — quorum state. required_approvals defaults to 1. */
+  approvalCount?: number | null;
+  requiredApprovals?: number | null;
   note: string | null;
   adminNote: string | null;
   businessId?: string;
@@ -48,7 +56,7 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
   const [biz, golfer, claims] = await Promise.all([
     supabase
       .from('business_verification_requests')
-      .select('id, status, requested_by, created_at, reviewed_at, note, admin_note, business_id, domain, domain_confirmed, proof_method, proof_value, proof_metadata, proof_document_url, contact_email, contact_role')
+      .select('id, status, requested_by, created_at, reviewed_at, reviewed_by, review_reason, approval_count, required_approvals, note, admin_note, business_id, domain, domain_confirmed, proof_method, proof_value, proof_metadata, proof_document_url, contact_email, contact_role')
       .order('created_at', { ascending: false }),
     supabase
       .from('golfer_verification_requests')
@@ -90,6 +98,10 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
     ...(biz.data ?? []).map((r: any) => ({
       id: r.id, type: 'business' as const, status: r.status,
       requestedBy: r.requested_by, createdAt: r.created_at, reviewedAt: r.reviewed_at,
+      reviewedBy: r.reviewed_by ?? null,
+      reviewReason: r.review_reason ?? null,
+      approvalCount: r.approval_count ?? 0,
+      requiredApprovals: r.required_approvals ?? 1,
       note: r.note, adminNote: r.admin_note, businessId: r.business_id,
       domain: r.domain, domainConfirmed: r.domain_confirmed,
       proofMethod: r.proof_method ?? null,
@@ -122,7 +134,12 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
     })),
   ];
 
-  const userIds = [...new Set(rows.map(r => r.requestedBy).filter(Boolean))] as string[];
+  // PHASE 4 §4.2 — resolve reviewers in the SAME profile read as applicants;
+  // "who decided" is worthless as a raw uuid.
+  const userIds = [...new Set([
+    ...rows.map(r => r.requestedBy),
+    ...rows.map(r => r.reviewedBy ?? null),
+  ].filter(Boolean))] as string[];
   if (userIds.length) {
     const { data: profiles } = await supabase
       .from('user_profiles')
@@ -134,6 +151,8 @@ export async function fetchVerifications(): Promise<VerificationRow[]> {
       r.displayName = p?.display_name ?? null;
       r.username = p?.username ?? null;
       r.avatarUrl = p?.profile_photo_url ?? null;
+      const rev = r.reviewedBy ? map.get(r.reviewedBy) : null;
+      r.reviewerName = rev?.display_name ?? rev?.username ?? null;
     }
   }
 
@@ -153,12 +172,17 @@ export function useVerifications() {
 
   const reviewMutation = useMutation({
     mutationFn: async ({
-      id, type, decision, adminNote,
+      id, type, decision, adminNote, reviewReason,
     }: {
       id: string;
       type: 'business' | 'golfer' | 'course_claim';
       decision: BusinessDecision | GolferDecision | CourseClaimDecision;
       adminNote: string;
+      /**
+       * PHASE 4 §3 — structured reason for reject / needs-more-info. Sent
+       * alongside admin_notes, never instead of it. Omitted for approvals.
+       */
+      reviewReason?: string | null;
     }) => {
       // Shared edge-function error classifier (used by business + course_claim)
       const classifyEdgeError = async (error: any) => {
@@ -182,7 +206,13 @@ export function useVerifications() {
           decision === 'rejected' ? 'verify-business-reject' :
           'verify-business-request-info';
         const { data, error } = await supabase.functions.invoke(fn, {
-          body: { request_id: id, admin_notes: adminNote || null },
+          body: {
+            request_id: id,
+            admin_notes: adminNote || null,
+            // Widening, not bypassing: the edge functions ignore an unknown
+            // reason and still work when it is absent.
+            ...(decision === 'approved' ? {} : { review_reason: reviewReason ?? null }),
+          },
         });
         if (error) throw await classifyEdgeError(error);
         if (!data?.ok) {
@@ -194,7 +224,7 @@ export function useVerifications() {
           }
           throw new Error(data?.error || 'Failed to update verification');
         }
-        return;
+        return { quorumPending: data?.completed === false, approvalCount: data?.approval_count, requiredApprovals: data?.required_approvals };
       }
 
       if (type === 'course_claim') {
@@ -237,7 +267,13 @@ export function useVerifications() {
         .eq('id', id);
       if (error) throw error;
     },
-    onSuccess: (_, { decision }) => {
+    onSuccess: (res: any, { decision }) => {
+      if (res?.quorumPending) {
+        toast.info(
+          `Approval recorded (${res.approvalCount}/${res.requiredApprovals}) - a second reviewer must confirm.`,
+        );
+        return;
+      }
       const label =
         decision === 'approved' ? 'approved' :
         decision === 'rejected' ? 'rejected' :
@@ -296,7 +332,7 @@ export function useProofConflict(active: VerificationRow | null) {
       if (!active?.proofMethod || !active.proofValue || !active.businessId) return null;
       const { data, error } = await supabase
         .from('business_verification_requests')
-        .select('business_id')
+        .select('business_id, reviewed_at, proof_value')
         .eq('proof_method', active.proofMethod)
         .eq('proof_value', active.proofValue)
         .eq('status', 'approved')
@@ -313,6 +349,9 @@ export function useProofConflict(active: VerificationRow | null) {
       return {
         businessId: conflictBusinessId,
         businessName: biz?.name ?? 'another business',
+        /** PHASE 4 §2.3 — WHEN it was approved, so the reviewer can judge. */
+        approvedAt: (data[0] as { reviewed_at?: string | null }).reviewed_at ?? null,
+        proofValue: (data[0] as { proof_value?: string | null }).proof_value ?? null,
       };
     },
     staleTime: 30_000,

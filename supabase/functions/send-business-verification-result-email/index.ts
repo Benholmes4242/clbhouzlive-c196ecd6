@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 import { corsFor } from '../_shared/cors.ts';
+import { REVIEW_REASON_APPLICANT } from '../_shared/verificationReviewReasons.ts';
 const supabaseAdmin = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -14,6 +15,8 @@ interface Payload {
   business_id: string;
   outcome: Outcome;
   admin_note?: string | null;
+  /** PHASE 4 §3.3 — the structured reason. Optional; older callers omit it. */
+  review_reason?: string | null;
 }
 
 async function resolveOwnerEmail(businessId: string, fallback: string | null): Promise<string | null> {
@@ -44,10 +47,20 @@ function renderEmail(opts: {
   outcome: Outcome;
   businessName: string;
   adminNote?: string | null;
+  reviewReason?: string | null;
   profileUrl: string;
   verificationUrl: string;
 }) {
-  const { outcome, businessName, adminNote, profileUrl, verificationUrl } = opts;
+  const { outcome, businessName, adminNote, reviewReason, profileUrl, verificationUrl } = opts;
+
+  // PHASE 4 §3.3 — the reason is a CAUSE and a REMEDY, not a generic decline.
+  const reason = reviewReason ? REVIEW_REASON_APPLICANT[reviewReason] : null;
+  const reasonCause = reason?.cause || '';
+  const reasonFix = reason?.fix || '';
+  const reasonText = reasonCause ? `${reasonCause}${reasonFix ? `\n${reasonFix}` : ''}\n\n` : '';
+  const reasonHtml = reasonCause
+    ? `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin:12px 0;color:#0f172a;"><strong>${escapeHtml(reasonCause)}</strong>${reasonFix ? `<br/><span style="color:#334155;">${escapeHtml(reasonFix)}</span>` : ''}</div>`
+    : '';
 
   if (outcome === "approved") {
     return {
@@ -71,11 +84,12 @@ View your profile: ${profileUrl}`,
       text:
 `We've reviewed your verification request for ${businessName} and weren't able to approve it at this time.
 
-${adminNote ? `Reason: ${adminNote}\n\n` : ""}You can update your details and reapply: ${verificationUrl}`,
+${reasonText}${adminNote ? `From the reviewer: ${adminNote}\n\n` : ""}You can update your details and reapply: ${verificationUrl}`,
       html: shell(`
         <h2 style="margin:0 0 8px;color:#0f172a;">Verification update</h2>
         <p style="margin:0 0 12px;color:#334155;">We've reviewed your verification request for <strong>${businessName}</strong> and weren't able to approve it at this time.</p>
-        ${adminNote ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin:12px 0;color:#7c2d12;"><strong>Reason</strong><br/>${escapeHtml(adminNote)}</div>` : ""}
+        ${reasonHtml}
+        ${adminNote ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin:12px 0;color:#7c2d12;"><strong>From the reviewer</strong><br/>${escapeHtml(adminNote)}</div>` : ""}
         <a class="cta" href="${verificationUrl}">Update and reapply</a>
       `),
     };
@@ -85,10 +99,11 @@ ${adminNote ? `Reason: ${adminNote}\n\n` : ""}You can update your details and re
     text:
 `Thanks for your verification request for ${businessName}. We need a bit more information before we can approve it.
 
-${adminNote ? `What we need: ${adminNote}\n\n` : ""}Continue your request: ${verificationUrl}`,
+${reasonText}${adminNote ? `What we need: ${adminNote}\n\n` : ""}Continue your request: ${verificationUrl}`,
     html: shell(`
       <h2 style="margin:0 0 8px;color:#0f172a;">More information needed</h2>
       <p style="margin:0 0 12px;color:#334155;">Thanks for your verification request for <strong>${businessName}</strong>. We need a bit more before we can approve it.</p>
+      ${reasonHtml}
       ${adminNote ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin:12px 0;color:#7c2d12;"><strong>What we need</strong><br/>${escapeHtml(adminNote)}</div>` : ""}
       <a class="cta" href="${verificationUrl}">Continue your request</a>
     `),
@@ -118,7 +133,7 @@ serve(async (req) => {
 
   try {
     const payload = (await req.json()) as Payload;
-    const { business_id, outcome, admin_note } = payload;
+    const { business_id, outcome, admin_note, review_reason } = payload;
     if (!business_id || !outcome) {
       return new Response(JSON.stringify({ ok: false, error: "Missing fields" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -153,6 +168,7 @@ serve(async (req) => {
       outcome,
       businessName: biz.name ?? "Your business",
       adminNote: admin_note ?? null,
+      reviewReason: review_reason ?? null,
       profileUrl,
       verificationUrl,
     });

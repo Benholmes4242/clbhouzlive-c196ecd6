@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 import { corsFor } from '../_shared/cors.ts';
+import { REVIEW_REASONS } from '../_shared/verificationReviewReasons.ts';
 const supabaseAdmin = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -90,7 +91,12 @@ serve(async (req) => {
       });
     }
 
-    const { request_id, admin_notes } = await req.json();
+    // PHASE 4: `review_reason` is the structured decision reason. OPTIONAL by
+    // design - a pre-Phase-4 client that omits it must still succeed.
+    const { request_id, admin_notes, review_reason } = await req.json();
+    const reviewReason = typeof review_reason === "string" && REVIEW_REASONS.includes(review_reason)
+      ? review_reason
+      : null;
 
     if (!request_id) {
       return new Response(JSON.stringify({ ok: false, error: "Missing request_id" }), {
@@ -136,6 +142,7 @@ serve(async (req) => {
     const { error: rpcErr } = await supabaseUser.rpc("reject_business_verification", {
       _request_id: request_id,
       _admin_note: admin_notes,
+      _review_reason: reviewReason,
     });
 
     if (rpcErr) {
@@ -147,7 +154,7 @@ serve(async (req) => {
 
     supabaseAdmin.functions
       .invoke("send-business-verification-result-email", {
-        body: { business_id: request.business_id, outcome: "rejected", admin_note: admin_notes },
+        body: { business_id: request.business_id, outcome: "rejected", admin_note: admin_notes, review_reason: reviewReason },
       })
       .catch((e) => console.error("[reject] result-email failed", e));
 

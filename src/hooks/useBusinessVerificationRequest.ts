@@ -13,6 +13,8 @@ export interface BusinessVerificationRequest {
   created_at: string;
   reviewed_at: string | null;
   admin_note: string | null;
+  /** PHASE 4 §3.3 — structured decision reason; null on pre-Phase-4 rows. */
+  review_reason: string | null;
   // admin-initiated flag; client never sets this. When true the owner must
   // complete the Domain step before an admin can approve the request.
   requires_domain_check: boolean;
@@ -34,7 +36,7 @@ export function useBusinessVerificationRequest(businessId: string | undefined) {
 
       const { data, error } = await supabase
         .from('business_verification_requests')
-        .select('id, business_id, status, requested_by, created_at, reviewed_at, admin_note, requires_domain_check, domain, domain_confirmed, contact_email, contact_role')
+        .select('id, business_id, status, requested_by, created_at, reviewed_at, admin_note, review_reason, requires_domain_check, domain, domain_confirmed, contact_email, contact_role')
         .eq('business_id', businessId)
         .order('created_at', { ascending: false })
         .limit(1)
