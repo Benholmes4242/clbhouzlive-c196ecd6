@@ -529,6 +529,9 @@ function PickScrimBand({
       <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 11 }}>
         {children}
       </div>
+      {footBar ?? null}
+
+
 
     </div>
   );
