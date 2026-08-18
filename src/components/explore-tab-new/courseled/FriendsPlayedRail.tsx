@@ -378,8 +378,13 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
               </CourseImageFallback>
 
               {/* THE SHAPE, full bleed, directly under the photo. Collapses to
-                  nothing when either nine is unmeasured. */}
-              <RoundShape row={r} shape={holeShapes?.get(r.score_id ?? '') ?? null} />
+                  nothing when either nine is unmeasured. THE 6px IS A REAL WHITE
+                  GAP between the photograph and the curve, and it lives OUT HERE:
+                  raising RoundShape's internal `top` would compress the plot
+                  instead, so the gap would vary with the shape of the round. */}
+              <div style={{ marginTop: 6 }}>
+                <RoundShape row={r} shape={holeShapes?.get(r.score_id ?? '') ?? null} />
+              </div>
 
               {/* THE LOWER BLOCK OWNS THE REMAINING HEIGHT. The rail stretches
                   every tile to one height, so the block below the photo must be

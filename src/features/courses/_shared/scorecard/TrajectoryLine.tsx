@@ -35,10 +35,11 @@ import { monotonePath } from '@/lib/charts/monotonePath';
  * AS DATA: it moves to the scrub readout, where the comparison is actually
  * decided per hole, and the sheet still carries it in prose and in the hero.
  *
- * Beads mark only the OUTLIERS (§6): d <= -2 and d >= 2. With a graded stroke a
- * birdie bead would say the same thing twice at the same point. The filter lives
- * HERE, at the call site — beadForScore is shared with the Clubhouse feed and is
- * not touched.
+ * Beads mark ONLY an ace or an albatross (BRIEF_ROUND_CURVE_BEADS_GOLD_ONLY).
+ * Every other outcome is carried by the graded stroke. The rule lives in
+ * beadForScore, which THIS component shares with the Discover tile's
+ * useRoundHoleShapes — the Clubhouse feed is not a separate consumer, because
+ * feed/PostRoundCard renders this very component.
  *
  * The to-par tokens come from `tourhub/_shared/tokens` so a member card and a
  * tour card colour the same score identically. Course difficulty (red harder /
@@ -209,11 +210,12 @@ export const TrajectoryLine: React.FC<Props> = ({
       current.push({ pos, cum: cumYou });
       scored.set(pos, { d, cum: cumYou });
 
-      // BEADS REDUCE TO THE OUTLIERS (§6) — filtered here, never in beadForScore.
-      if (d <= -2 || d >= 2) {
-        const bead = beadForScore(h.strokes, h.par, surface);
-        if (bead) beads.push({ pos, cum: cumYou, tone: bead.tone, r: bead.radius });
-      }
+      // The bead rule lives in beadForScore and nowhere else. It was filtered
+      // here once, when the two call sites wanted different thresholds; they no
+      // longer do, and a shared function whose meaning depends on its caller is
+      // not a shared function.
+      const bead = beadForScore(h.strokes, h.par, surface);
+      if (bead) beads.push({ pos, cum: cumYou, tone: bead.tone, r: bead.radius });
     });
     if (current && current.length >= 2) segments.push(current);
 
