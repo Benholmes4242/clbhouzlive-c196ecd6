@@ -248,3 +248,7 @@ verify_jwt = false
 
 [functions.generate-round-share-card]
 verify_jwt = false
+
+[functions.verification-document-purge]
+verify_jwt = false
+

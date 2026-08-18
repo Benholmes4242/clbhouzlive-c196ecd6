@@ -1,6 +1,13 @@
-# Verification document retention — PROPOSAL (not implemented)
+# Verification document retention — IMPLEMENTED
 
-BRIEF_VERIFICATION_PHASE_3 §4.3. Written down now, built later (Phase 4 or 5).
+BRIEF_VERIFICATION_PHASE_3 §4.3. Built as scoped: three SQL functions
+(`list_expired_verification_documents`, `mark_verification_document_purged`,
+`verification_documents_referenced`), the service-role edge function
+`verification-document-purge`, and two cron entries in
+`docs/sql/verification_document_purge_cron.sql` (daily retention sweep 03:15 UTC,
+weekly orphan sweep Sunday 03:45 UTC). The periods and mechanism below are what
+runs; "proposed" wording is retained for the reasoning.
+
 
 ## What is held
 
