@@ -43,6 +43,9 @@ const CATEGORIES: { key: string; label: string; sub: string; types: string[] }[]
   { key: 'analytics',    label: 'Course analytics',
     sub: "When your rounds update a course's analytics",
     types: ['course_analytics_updated'] },
+  { key: 'tour',         label: 'Tour roundups',
+    sub: 'Sunday final rounds and Thursday picks',
+    types: ['tour_roundup', 'tour_preview'] },
 
 ];
 
