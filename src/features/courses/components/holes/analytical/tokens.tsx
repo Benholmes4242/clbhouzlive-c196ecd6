@@ -359,18 +359,26 @@ export interface StatItem {
   subVariant?: 'label' | 'caption';
 }
 
-/** Label line-height used to reserve a consistent two-line label box. */
+/** Label line-height used to reserve a consistent label box. */
 const STATROW_LABEL_LH = 1.25;
-const statRowLabelBox = (fontSize: number): React.CSSProperties => ({
+const statRowLabelBox = (fontSize: number, lines: 1 | 2 = 2): React.CSSProperties => ({
   lineHeight: STATROW_LABEL_LH,
-  minHeight: `${fontSize * STATROW_LABEL_LH * 2}px`,
+  minHeight: `${fontSize * STATROW_LABEL_LH * lines}px`,
 });
 
 export const StatRow: React.FC<{
   items: StatItem[];
   size?: number;
   style?: React.CSSProperties;
-}> = ({ items, size = 22, style }) => {
+  /**
+   * labelLines - how many lines of label to RESERVE. 2 (default) keeps every
+   * value on one baseline when one cell's label wraps and the others do not.
+   * Pass 1 only where the labels are known short enough never to wrap at the
+   * narrowest supported width; it removes ~11px of dead space under a
+   * one-line label.
+   */
+  labelLines?: 1 | 2;
+}> = ({ items, size = 22, style, labelLines = 2 }) => {
   const anySub = items.some((it) => !!it.sub);
   return (
     <div
@@ -386,8 +394,9 @@ export const StatRow: React.FC<{
         const subFontSize = (subStyle.fontSize as number) ?? 8;
         return (
           <div key={it.label} style={{ textAlign: 'center', minWidth: 0 }}>
-            {/* Two-line reservation keeps every value on one baseline; labels stay top-aligned. */}
-            <div style={{ ...LABEL, ...statRowLabelBox(LABEL.fontSize as number) }}>{it.label}</div>
+            {/* Reservation keeps every value on one baseline; labels stay top-aligned. */}
+            <div style={{ ...LABEL, ...statRowLabelBox(LABEL.fontSize as number, labelLines) }}>{it.label}</div>
+
             <div style={{ ...NUM, fontSize: size, color: it.tone ?? A.INK, marginTop: 4, whiteSpace: 'nowrap' }}>
               {it.value}
             </div>

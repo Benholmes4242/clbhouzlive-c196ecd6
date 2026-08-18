@@ -178,10 +178,11 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
 
   const items: StatItem[] = [
     {
-      label: t('top100.stats.ratingLabel'),
+      // The sample size IS the label: a separate "RATING" word over a
+      // band-coloured figure says nothing the number does not.
+      label: t('top100.stats.fromRatings', { count: ratingCount }),
       value: rating.toFixed(1),
       tone: bandColor(rating),
-      sub: t('top100.stats.fromRatings', { count: ratingCount }),
     },
   ];
   if (toPar) {
@@ -202,8 +203,9 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
   return (
     <div style={{ paddingTop: 4 }}>
       <div ref={difficultyRef}>
-        <StatRow items={items} />
+        <StatRow items={items} labelLines={1} />
       </div>
+
 
 
       {showNoRounds && (
