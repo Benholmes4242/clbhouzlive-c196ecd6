@@ -181,11 +181,28 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
     }
   }
 
+  /**
+   * The label keeps whiteSpace:'nowrap' — what was missing was the overflow
+   * guard beside it, so a label too long for its third now ellipsises.
+   */
   const microLabel: React.CSSProperties = {
     ...LABEL,
     fontSize: 8,
     whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    marginTop: 6,
   };
+
+  const figure: React.CSSProperties = {
+    ...NUM,
+    fontSize: 22,
+    lineHeight: 1,
+    fontWeight: 700,
+    letterSpacing: '-0.03em',
+  };
+
+  const cell: React.CSSProperties = { flex: '1 1 0', minWidth: 0 };
 
   return (
     <div style={{ paddingTop: 4 }}>
@@ -193,51 +210,31 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
         ref={difficultyRef}
         style={{
           display: 'flex',
-          alignItems: 'baseline',
-          gap: 8,
+          gap: 10,
           minWidth: 0,
         }}
       >
-        {/* Rating — the figure carries its band colour and its sample size. */}
-        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, minWidth: 0 }}>
-          <span style={{ ...NUM, fontSize: 22, lineHeight: 1, color: bandColor(rating) }}>
-            {rating.toFixed(1)}
-          </span>
-          <span style={microLabel}>{t('top100.stats.fromRatings', { count: ratingCount })}</span>
-        </span>
+        {/* Rating — the figure carries its band colour, the label its sample size. */}
+        <div style={cell}>
+          <div style={{ ...figure, color: bandColor(rating) }}>{rating.toFixed(1)}</div>
+          <div style={microLabel}>{t('top100.stats.fromRatings', { count: ratingCount })}</div>
+        </div>
 
         {toPar && (
-          <>
-            <span
-              aria-hidden
-              style={{ width: 1, alignSelf: 'stretch', background: A.HAIRLINE, flexShrink: 0 }}
-            />
-            <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, minWidth: 0 }}>
-              <span style={{ ...NUM, fontSize: 22, lineHeight: 1, color: toPar.tone }}>
-                {toPar.text}
-              </span>
-              <span style={microLabel}>{t('top100.stats.avgToParLabel')}</span>
-            </span>
-          </>
+          <div style={cell}>
+            <div style={{ ...figure, color: toPar.tone }}>{toPar.text}</div>
+            <div style={microLabel}>{t('top100.stats.avgToParLabel')}</div>
+          </div>
         )}
 
         {difficulty && (
-          <span
-            style={{
-              marginLeft: 'auto',
-              ...CAPTION,
-              textAlign: 'right',
-              lineHeight: 1.25,
-            }}
-          >
-            {difficulty.label}{' '}
-            <span style={{ ...NUM, fontSize: 11.5, fontWeight: 700, color: A.INK }}>
-              {difficulty.pct}%
-            </span>{' '}
-            {t('top100.stats.ofCourses')}
-          </span>
+          <div style={cell}>
+            <div style={{ ...figure, color: A.INK }}>{difficulty.pct}%</div>
+            <div style={microLabel}>{difficulty.label}</div>
+          </div>
         )}
       </div>
+
 
       {showNoRounds && (
         <div
