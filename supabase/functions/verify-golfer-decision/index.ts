@@ -145,7 +145,7 @@ serve(async (req) => {
     console.log(`[golfer-decision] ${decision} for ${golferId} by ${adminUserId} (${reason ?? '-'})`);
 
     if (golferId) {
-      notifyGolfer(golferId, decision === "removed" ? "rejected" : decision, reason ?? null, admin_note ?? null)
+      notifyGolfer(golferId, decision, reason ?? null, admin_note ?? null)
         .catch((e) => console.error("[golfer-decision] notify failed", e));
     }
 
