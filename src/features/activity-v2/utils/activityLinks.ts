@@ -70,8 +70,19 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   }
 
   if (
+    type === 'streak_broken' || type === 'streak_at_risk' ||
+    type === 'streak_freeze_applied'
+  ) {
+    // Streaks have their own sheet, opened by ?gam=streaks. They were briefly
+    // routed to the Trophy Room with the other gam types; a broken-streak
+    // notification landing on the career record is the wrong destination -
+    // the member is being told about a streak, so a streak is what should
+    // open.
+    return '/handicap?gam=streaks';
+  }
+
+  if (
     type === 'level_up' || type === 'level_near' ||
-    type === 'streak_broken' || type === 'streak_at_risk' || type === 'streak_freeze_applied' ||
     type === 'status_at_risk' || type === 'status_reclaimed' ||
     type === 'badge_earned'
   ) {
@@ -81,6 +92,7 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     const badgeId = type === 'badge_earned' ? data.badge_id : null;
     return `/handicap?gam=trophies${badgeId ? `&badge=${encodeURIComponent(badgeId)}` : ''}`;
   }
+
 
 
   // --- discover reactions ---------------------------------------------

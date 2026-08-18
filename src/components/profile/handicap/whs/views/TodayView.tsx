@@ -10,7 +10,6 @@ import LastRoundCard from '../sections/LastRoundCard';
 
 import NextRoundWatch from '../sections/NextRoundWatch';
 import StreaksCard from '../../gam/streaks/StreaksCard';
-import { StreaksSheetMount } from '../../gam/streaks/StreaksSheetMount';
 import { LaunchSheetMount } from '../../gam/launch/LaunchSheetMount';
 import { PulseSection } from '../sections/PulseSection';
 
@@ -92,7 +91,7 @@ export const TodayView: React.FC<Props> = ({
 
 
 
-      {!readOnly && <StreaksSheetMount />}
+      {/* StreaksSheetMount now lives at page level in HandicapPage. */}
       <LaunchSheetMount userId={userId} />
     </div>
   );

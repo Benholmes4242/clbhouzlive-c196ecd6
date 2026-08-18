@@ -20,7 +20,9 @@ import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-
 import { ChevronRight, Trophy, Activity } from 'lucide-react';
 import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+import { openGamAchievements, openAllStreaks } from '@/components/profile/handicap/whs/gam/events';
+import { StreaksSheetMount } from '@/components/profile/handicap/gam/streaks/StreaksSheetMount';
+
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -421,6 +423,24 @@ const HandicapPage: React.FC = () => {
     return () => clearTimeout(id);
   }, [searchParams, setSearchParams, ownerUserId]);
 
+  // Deep-link: ?gam=streaks opens the Streaks sheet once on arrival. Same
+  // shape as the trophies effect: the setTimeout(0) lets StreaksSheetMount's
+  // subscription effect run before the emit in the same commit, and the
+  // ownerUserId gate is the mount precondition.
+  useEffect(() => {
+    if (searchParams.get('gam') !== 'streaks') return;
+    if (!ownerUserId) return;
+    const id = setTimeout(() => {
+      openAllStreaks();
+      const next = new URLSearchParams(searchParams);
+      next.delete('gam');
+      setSearchParams(next, { replace: true });
+    }, 0);
+    return () => clearTimeout(id);
+  }, [searchParams, setSearchParams, ownerUserId]);
+
+
+
 
 
   // Fetch profile for greeting/title.
@@ -593,6 +613,8 @@ const HandicapPage: React.FC = () => {
         )}
       </main>
       <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} ownerFirstName={displayName} readOnly={isFriendView} />
+      {!isFriendView && <StreaksSheetMount />}
+
       <CompareMount viewerUserId={user.id} />
       <RoundDetailSheet
         open={!!deepLinkScoreId}
