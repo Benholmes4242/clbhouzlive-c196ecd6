@@ -123,9 +123,13 @@ const MyBusinessesPage = () => {
         </div>
       )}
 
-      {/* Empty state — full-bleed cinematic sell, so it mounts OUTSIDE the
-          padded content column (BRIEF_BUSINESS_EMPTY_STATE §2.1). */}
-      {!isLoading && !hasBusinesses && <BusinessEmptyState onCreate={handleCreateBusiness} />}
+      {/* Empty state — V3 §1.5: with the full-bleed hero gone it returns INSIDE
+          the normal padded column, like every other /manage/* surface. */}
+      {!isLoading && !hasBusinesses && (
+        <div className="pt-4 px-4 max-w-xl mx-auto w-full pb-8">
+          <BusinessEmptyState onCreate={handleCreateBusiness} />
+        </div>
+      )}
 
       {/* Content */}
       {!isLoading && hasBusinesses && (
