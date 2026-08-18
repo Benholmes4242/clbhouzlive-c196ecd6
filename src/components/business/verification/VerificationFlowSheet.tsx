@@ -31,7 +31,7 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -57,6 +57,15 @@ import {
 } from '@/features/courses/components/holes/analytical/tokens';
 import DomainStep from './steps/DomainStep';
 import VerificationCriteriaLink from './VerificationCriteriaLink';
+import {
+  Group,
+  Row,
+  RowList,
+  Footnote,
+  FilledButton,
+  PlainButton,
+} from './manageRows';
+import { INK, INK_45, INK_30, INK_60, GREEN, HAIR, SF_STACK } from '@/components/manage/ui';
 import {
   PROOF_OPTIONS,
   REGISTRY_OPTIONS,
@@ -120,6 +129,7 @@ export default function VerificationFlowSheet({
   mode = 'submit',
 }: Props) {
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   // --- §2 eligibility ---
@@ -594,7 +604,7 @@ export default function VerificationFlowSheet({
             >
               <ChevronLeft size={18} strokeWidth={2.5} style={{ color: '#0F172A' }} />
             </button>
-            <h2 style={{ ...TITLE, color: '#0F172A', lineHeight: 1, margin: 0 }}>
+            <h2 style={{ fontFamily: SF_STACK, fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', color: INK, lineHeight: 1, margin: 0 }}>
               {showDomainMode ? 'Verify domain' : 'Get verified'}
             </h2>
             {!showDomainMode && !confirmation && (
@@ -641,140 +651,131 @@ export default function VerificationFlowSheet({
               {/* ================= STEP 1 — ELIGIBILITY ================= */}
               {page === 'eligibility' && (
                 <>
-                  <div
+                  <p
                     style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(2, minmax(0,1fr))',
-                      gap: 10,
-                      padding: '14px 16px',
-                      borderRadius: 14,
-                      background: A.PANEL,
-                      border: `1px solid ${A.BORDER}`,
+                      fontFamily: SF_STACK,
+                      fontSize: 15.5,
+                      fontWeight: 400,
+                      lineHeight: 1.45,
+                      color: INK_60,
+                      margin: '0 0 20px',
                     }}
                   >
-                    <div className="text-center" style={{ minWidth: 0 }}>
-                      <div style={BIZ_LABEL}>The bar</div>
-                      <div style={{ ...bizFigure(19), marginTop: 6 }}>2 of 3</div>
-                    </div>
-                    <div className="text-center" style={{ minWidth: 0 }}>
-                      <div style={BIZ_LABEL}>Reviewed</div>
-                      <div style={{ ...bizFigure(15), marginTop: 8 }}>By hand</div>
-                    </div>
-                  </div>
+                    Mark every signal you can provide. We only ask for the evidence you mark.
+                  </p>
 
-                  <SectionCard number={1} title="What can you show us?">
-                    <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '0 0 10px' }}>
-                      Mark every signal you can provide. You need two, and at least one must be a
-                      business domain or a document.
-                    </p>
-
+                  {/* §6.2 — the three signals as ONE group of toggle rows. */}
+                  <Group
+                    header="What can you show us?"
+                    footnote="Two of the three, and at least one a business domain or a document. An address on a personal mailbox provider — gmail, outlook, icloud and the like — is not a domain signal."
+                  >
                     <div role="group" aria-label="Signals you can provide">
-                      {SIGNALS.map((s) => {
+                      {SIGNALS.map((s, i) => {
                         const on = claimed[s.key];
-                        const Icon = s.icon;
                         return (
-                          <button
-                            key={s.key}
-                            type="button"
-                            role="checkbox"
-                            aria-checked={on}
-                            onClick={() => toggleSignal(s.key)}
-                            className="w-full flex items-start gap-3 text-left"
-                            style={{
-                              minHeight: 44,
-                              padding: '11px 0',
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            <span
-                              aria-hidden
-                              className="flex items-center justify-center shrink-0"
+                          <React.Fragment key={s.key}>
+                            {i > 0 && <div style={{ height: 1, background: HAIR, marginLeft: 14 }} />}
+                            <button
+                              type="button"
+                              role="checkbox"
+                              aria-checked={on}
+                              onClick={() => toggleSignal(s.key)}
+                              className="w-full flex items-center text-left active:opacity-60"
                               style={{
-                                width: 16,
-                                height: 16,
-                                marginTop: 2,
-                                borderRadius: 5,
-                                background: on ? A.INK : 'transparent',
-                                border: on ? 'none' : '1.5px solid #CBD2DA',
+                                gap: 12,
+                                minHeight: 44,
+                                padding: '12px 14px',
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontFamily: SF_STACK,
                               }}
                             >
-                              {on && <Check size={10} strokeWidth={3.25} style={{ color: '#FFFFFF' }} />}
-                            </span>
-                            <Icon size={14} className="shrink-0" style={{ color: A.MUTE, marginTop: 2 }} />
-                            <span className="flex-1 min-w-0">
                               <span
+                                aria-hidden
+                                className="flex items-center justify-center shrink-0"
                                 style={{
-                                  display: 'block',
-                                  fontSize: 13.5,
-                                  fontWeight: on ? 700 : 600,
-                                  color: A.INK,
-                                  lineHeight: 1.3,
+                                  width: 18,
+                                  height: 18,
+                                  borderRadius: 6,
+                                  background: on ? INK : 'transparent',
+                                  border: on ? 'none' : `1.5px solid ${INK_30}`,
                                 }}
                               >
-                                {s.label}
-                                {!s.qualifying && (
-                                  <span style={{ fontWeight: 500, color: A.MUTE }}> — never enough alone</span>
-                                )}
+                                {on && <Check size={11} strokeWidth={3} style={{ color: '#FFFFFF' }} />}
+                              </span>
+                              <span className="flex-1 min-w-0">
+                                <span
+                                  style={{
+                                    display: 'block',
+                                    fontSize: 17,
+                                    fontWeight: 400,
+                                    color: INK,
+                                    lineHeight: 1.25,
+                                    letterSpacing: '-0.01em',
+                                  }}
+                                >
+                                  {s.label}
+                                </span>
+                                <span
+                                  style={{
+                                    display: 'block',
+                                    fontSize: 13,
+                                    fontWeight: 400,
+                                    color: INK_45,
+                                    lineHeight: 1.35,
+                                    marginTop: 2,
+                                  }}
+                                >
+                                  {s.what}
+                                </span>
                               </span>
                               <span
                                 style={{
-                                  display: 'block',
-                                  fontSize: 12.5,
+                                  fontSize: 15.5,
                                   fontWeight: 400,
-                                  color: A.MUTE,
-                                  lineHeight: 1.35,
+                                  color: INK_45,
+                                  flexShrink: 0,
                                 }}
                               >
-                                {s.what}
+                                {s.qualifying ? 'Qualifying' : 'Supporting'}
                               </span>
-                            </span>
-                          </button>
+                            </button>
+                          </React.Fragment>
                         );
                       })}
                     </div>
+                  </Group>
 
-                    {/* §2.2 THE LIVE VERDICT */}
-                    <div
-                      role="status"
-                      aria-live="polite"
-                      className="mt-3 flex items-start gap-2.5 p-3"
-                      style={{
-                        borderRadius: 12,
-                        background: bar.met ? 'rgba(5,150,105,0.08)' : 'rgba(14,18,22,0.035)',
-                      }}
-                    >
-                      {bar.met ? (
-                        <CheckCircle2 size={15} style={{ color: '#059669', marginTop: 1 }} />
-                      ) : (
-                        <AlertTriangle size={15} style={{ color: A.MUTE, marginTop: 1 }} />
-                      )}
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: bar.met ? '#047857' : A.INK }}>
-                          {bar.met ? 'You meet the bar' : 'Not there yet'}
-                        </div>
-                        <div style={{ ...BIZ_BODY, fontSize: 12.5, marginTop: 2 }}>
-                          {bar.met
-                            ? 'Next we will ask only for the evidence you marked.'
-                            : bar.missing}
-                        </div>
-                      </div>
+                  {/* §6.3 THE LIVE VERDICT — a Status group, one row. */}
+                  <Group
+                    header="Status"
+                    footnote={bar.met ? undefined : bar.missing || undefined}
+                  >
+                    <div role="status" aria-live="polite">
+                      <Row
+                        label={bar.met ? 'You meet the bar' : 'Not there yet'}
+                        glyph={bar.met ? 'confirmed' : 'waiting'}
+                        value={`${bar.count} of 2`}
+                        tone={bar.met ? 'confirmed' : 'waiting'}
+                      />
                     </div>
+                  </Group>
 
-                    {/* §2.5 SOFT BLOCK — plain warning, never a refusal. */}
-                    {bar.count > 0 && !bar.met && (
-                      <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '10px 0 0' }}>
-                        You can still submit below the bar, but a reviewer will decline it for the
-                        reason above.
-                      </p>
-                    )}
-
-                    {/* §2.4 the criteria link belongs here now. */}
-                    <div className="mt-1">
-                      <VerificationCriteriaLink onNavigate={() => onOpenChange(false)} />
-                    </div>
-                  </SectionCard>
+                  {/* §5.4 — the criteria as a chevron row. */}
+                  <Group header="Before you start">
+                    <RowList>
+                      <Row label="Cost" value="Free" />
+                      <Row label="Reviewed by" value="A person" />
+                      <Row
+                        label="How verification works"
+                        onClick={() => {
+                          onOpenChange(false);
+                          navigate('/legal/business-verification');
+                        }}
+                      />
+                    </RowList>
+                  </Group>
                 </>
               )}
 
@@ -836,8 +837,18 @@ export default function VerificationFlowSheet({
                           go back and claim a document instead.
                         </p>
                       ) : (
-                        <p className="text-[11px]" style={{ color: BIZ.inkMute }}>
-                          Verifying the code now speeds up review.
+                        <p
+                          style={{
+                            fontFamily: SF_STACK,
+                            fontSize: 13,
+                            fontWeight: 400,
+                            marginTop: 6,
+                            color: domainReady ? GREEN : INK_45,
+                          }}
+                        >
+                          {domainReady
+                            ? `${emailDomain(proofEmail)} is a business domain, not a mailbox provider.`
+                            : 'Verifying the code now speeds up review.'}
                         </p>
                       )}
                     </FieldGroup>
@@ -1165,21 +1176,14 @@ export default function VerificationFlowSheet({
 
                   {/* §2.5 the warning follows them to the submit screen. */}
                   {!evidencedBar.met && (
-                    <div
-                      className="flex items-start gap-2.5 p-3"
-                      style={{ borderRadius: 12, background: 'rgba(185,28,28,0.06)' }}
-                    >
-                      <AlertTriangle size={15} style={{ color: '#B91C1C', marginTop: 1 }} />
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#B91C1C' }}>
-                          This will be declined
-                        </div>
-                        <div style={{ ...BIZ_BODY, fontSize: 12.5, marginTop: 2 }}>
-                          {evidencedBar.missing || 'The evidence attached does not meet the two-of-three bar.'}{' '}
-                          You can submit anyway, but a reviewer will decline it for that reason.
-                        </div>
-                      </div>
-                    </div>
+                    <Group header="Status">
+                      <Row
+                        label="Below the bar"
+                        glyph="waiting"
+                        value={`${evidencedBar.count} of 2`}
+                        tone="waiting"
+                      />
+                    </Group>
                   )}
                 </>
               )}
@@ -1222,8 +1226,14 @@ export default function VerificationFlowSheet({
               <Button
                 onClick={() => (isLast ? submitMutation.mutate() : setPageIndex(safeIndex + 1))}
                 disabled={submitMutation.isPending || !canContinue}
-                className="flex-1 h-12 text-white border-0 text-[15px]"
-                style={{ background: BIZ.ink, borderRadius: BIZ.rInner, fontWeight: 700 }}
+                className="flex-1 h-12 border-0 text-[15px]"
+                style={{
+                  background: isLast && !evidencedBar.met ? 'transparent' : INK,
+                  color: isLast && !evidencedBar.met ? INK : '#FFFFFF',
+                  border: isLast && !evidencedBar.met ? `1px solid ${HAIR}` : 'none',
+                  borderRadius: BIZ.rInner,
+                  fontWeight: isLast && !evidencedBar.met ? 400 : 600,
+                }}
               >
                 {submitMutation.isPending ? (
                   <span className="flex items-center gap-2">
@@ -1231,7 +1241,7 @@ export default function VerificationFlowSheet({
                     Submitting…
                   </span>
                 ) : isLast ? (
-                  'Submit for review'
+                  evidencedBar.met ? 'Submit for review' : 'Submit anyway'
                 ) : (
                   'Continue'
                 )}
@@ -1253,12 +1263,22 @@ const SectionCard = React.forwardRef<
   return (
     <div
       ref={ref}
-      className="rounded-2xl p-4"
-      style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
+      className="rounded-[14px] p-4"
+      style={{ background: '#ffffff', border: `1px solid ${HAIR}` }}
     >
       <div className="flex items-baseline gap-2.5 mb-3">
-        <span style={{ ...BIZ_LABEL, flexShrink: 0 }}>{`Step ${number}`}</span>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: A.INK, margin: 0, letterSpacing: '-0.01em' }}>
+        <span
+          style={{
+            fontFamily: SF_STACK,
+            fontSize: 13,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: INK_45,
+            flexShrink: 0,
+          }}
+        >{`Step ${number}`}</span>
+        <h3 style={{ fontFamily: SF_STACK, fontSize: 17, fontWeight: 600, color: INK, margin: 0, letterSpacing: '-0.01em' }}>
           {title}
         </h3>
       </div>
@@ -1284,19 +1304,24 @@ function DetailRow({
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '112px minmax(0,1fr)',
+        gridTemplateColumns: '130px minmax(0,1fr)',
         alignItems: 'baseline',
         gap: 12,
         padding: '8px 0',
       }}
     >
-      <span style={BIZ_LABEL}>{label}</span>
+      <span style={{ fontFamily: SF_STACK, fontSize: 15.5, fontWeight: 400, color: INK_60 }}>{label}</span>
       {missing ? (
-        <span className="text-[12px] text-destructive min-w-0 text-right">{missingMessage}</span>
+        <span
+          className="min-w-0 text-right"
+          style={{ fontFamily: SF_STACK, fontSize: 15.5, fontWeight: 400, color: INK_30 }}
+        >
+          {missingMessage}
+        </span>
       ) : (
         <span
           className="min-w-0 text-right overflow-hidden text-ellipsis whitespace-nowrap"
-          style={{ fontSize: 13.5, fontWeight: 600, color: A.INK }}
+          style={{ fontFamily: SF_STACK, fontSize: 15.5, fontWeight: 400, color: INK }}
         >
           {value || ''}
         </span>
@@ -1316,9 +1341,23 @@ function FieldGroup({
 }) {
   return (
     <div data-vf-field>
-      <div style={{ ...BIZ_LABEL, marginBottom: 6 }}>{label}</div>
+      <div
+        style={{
+          fontFamily: SF_STACK,
+          fontSize: 13,
+          fontWeight: 600,
+          color: INK_60,
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
       {children}
-      {hint && <div style={{ ...BIZ_LABEL, fontSize: 7.5, marginTop: 6 }}>{hint}</div>}
+      {hint && (
+        <div style={{ fontFamily: SF_STACK, fontSize: 13, fontWeight: 400, color: INK_45, marginTop: 6 }}>
+          {hint}
+        </div>
+      )}
     </div>
   );
 }
@@ -1338,15 +1377,12 @@ function ConfirmationView({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="text-center py-8"
+      className="py-6"
     >
-      <div
-        className="h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4"
-        style={{ background: 'rgba(5,150,105,0.10)' }}
+      <h2
+        className="mb-2"
+        style={{ fontFamily: SF_STACK, fontSize: 18, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}
       >
-        <CheckCircle2 className="h-8 w-8" style={{ color: '#059669' }} />
-      </div>
-      <h2 className="mb-2" style={{ ...TITLE, color: BIZ.ink }}>
         Request submitted
       </h2>
       <p className="text-[14px] max-w-xs mx-auto" style={{ color: BIZ.inkMute }}>
