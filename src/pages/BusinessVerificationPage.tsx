@@ -428,11 +428,20 @@ function RejectedState({
           what would fix it. The reviewer's own words sit BELOW it, not instead. */}
       <ApplicantReasonBlock reviewReason={reviewReason} adminNote={adminNote} noteLabel="From the reviewer" />
 
+      {/* PHASE 5B §4.4 — an appeal IS reapplying with better evidence. Saying so
+          is more honest than an appeals queue that would only ask for the same. */}
+      <p className="text-sm text-muted-foreground mb-4 max-w-sm mx-auto">
+        There is no separate appeal. If you disagree, or if you can now show
+        something the reviewer could not see, reapply with that evidence and it
+        will be looked at again.
+      </p>
+
       {reviewedAt && (
         <p className="text-xs text-muted-foreground/70 mb-8">
           Reviewed on {formatMonthDayYearShort(reviewedAt)}
         </p>
       )}
+
 
       <div className="space-y-3 max-w-xs mx-auto">
         <Button onClick={onReapply} className="w-full h-11 text-white border-0" style={{ background: BIZ.ink, borderRadius: BIZ.rInner }}>

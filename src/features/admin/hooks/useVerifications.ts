@@ -250,23 +250,32 @@ export function useVerifications() {
         return;
       }
 
-      // Golfer branch — keep direct table update (separate flow / no badge bug here)
+      /* PHASE 5B §5.2 — the golfer branch used to UPDATE the row from the
+         client: no gate, no audit entry, no email, no reason. It now goes
+         through the same shape as a business decision. §5.5: needs_more_info
+         is refused with a sentence, not an exception message. */
       if (decision === 'needs_more_info') {
-        throw new Error('needs_more_info not supported for golfer requests');
+        const e = new Error(
+          'An invited golfer has nothing further to supply, so “needs info” does not apply here.',
+        ) as Error & { notApplicable?: boolean };
+        e.notApplicable = true;
+        throw e;
       }
-      const now = new Date().toISOString();
-      const golferStatus = decision === 'approved' ? 'accepted' : 'declined';
-      const { error } = await supabase
-        .from('golfer_verification_requests' as any)
-        .update({
-          status: golferStatus,
-          admin_note: adminNote || null,
-          reviewed_at: now,
-          ...(decision === 'approved' ? { accepted_at: now } : { declined_at: now }),
-        } as any)
-        .eq('id', id);
-      if (error) throw error;
+      const { data, error } = await supabase.functions.invoke('verify-golfer-decision', {
+        body: { request_id: id, decision, reason: reviewReason ?? null, admin_note: adminNote || null },
+      });
+      if (error) throw await classifyEdgeError(error);
+      if (data && data.ok === false) {
+        const msg = String(data?.error || '').toLowerCase();
+        if (msg.includes('not pending') || msg.includes('already')) {
+          const e = new Error('already_actioned') as Error & { alreadyActioned?: boolean };
+          e.alreadyActioned = true;
+          throw e;
+        }
+        throw new Error(data?.error || 'Failed to update verification');
+      }
     },
+
     onSuccess: (res: any, { decision }) => {
       if (res?.quorumPending) {
         toast.info(
@@ -297,6 +306,53 @@ export function useVerifications() {
     },
   });
 
+  /**
+   * PHASE 5B §1 — REVOCATION. The RPC already existed and had run twice in
+   * production; it was simply unreachable from the console. This routes through
+   * an admin-gated edge function so the email and push fire with it.
+   */
+  const revokeMutation = useMutation({
+    mutationFn: async ({
+      businessId, reason, adminNote, bypassCooldown,
+    }: {
+      businessId: string;
+      reason: string;
+      adminNote?: string | null;
+      /** §1.3 — offered for system accounts only; the server enforces that too. */
+      bypassCooldown?: boolean;
+    }) => {
+      const { data, error } = await supabase.functions.invoke('verify-business-revoke', {
+        body: { business_id: businessId, reason, admin_note: adminNote || null, bypass_cooldown: !!bypassCooldown },
+      });
+      if (error) throw new Error(error.message || 'Failed to revoke verification');
+      if (data && data.ok === false) throw new Error(data.error || 'Failed to revoke verification');
+      return data;
+    },
+    onSuccess: () => toast.success('Verification revoked — the business has been notified.'),
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : 'Failed to revoke verification'),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] });
+      qc.invalidateQueries({ queryKey: ['business-account-verification-status'] });
+      qc.invalidateQueries({ queryKey: ['business-verification-request'] });
+      qc.invalidateQueries({ queryKey: ['business-verification-evidence'] });
+    },
+  });
+
+  /** PHASE 5B §5.4 — removing a golfer's badge, with a reason and a notification. */
+  const removeGolferMutation = useMutation({
+    mutationFn: async ({ userId, reason, adminNote }: { userId: string; reason: string; adminNote?: string | null }) => {
+      const { data, error } = await supabase.functions.invoke('verify-golfer-decision', {
+        body: { user_id: userId, decision: 'removed', reason, admin_note: adminNote || null },
+      });
+      if (error) throw new Error(error.message || 'Failed to remove verification');
+      if (data && data.ok === false) throw new Error(data.error || 'Failed to remove verification');
+      return data;
+    },
+    onSuccess: () => toast.success('Verification removed — the golfer has been notified.'),
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : 'Failed to remove verification'),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] }),
+  });
+
   const counts = {
     all: data.length,
     pending: data.filter(v => v.status === 'pending').length,
@@ -305,7 +361,8 @@ export function useVerifications() {
     courseClaim: data.filter(v => v.type === 'course_claim' && v.status === 'pending').length,
   };
 
-  return { data, isLoading, refetch, counts, reviewMutation };
+  return { data, isLoading, refetch, counts, reviewMutation, revokeMutation, removeGolferMutation };
+
 }
 
 /**

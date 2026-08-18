@@ -65,6 +65,7 @@ import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analyt
 import { BusinessCoursePanel, type BusinessClubCourse } from '@/components/business/BusinessCoursePanel';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
+import { useVerificationEvidence } from '@/components/business/verification/useVerificationEvidence';
 import { HeroPill, HeroGlassCircle } from '@/components/profile/hero/HeroShell';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -118,6 +119,8 @@ const BusinessProfilePage: React.FC = () => {
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
   const { data: teamMembers } = useBusinessTeam(business?.id);
   const { data: reviewStats } = useBusinessReviewStats(business?.id);
+  /* PHASE 5B §2 — the evidence line, derived from the approved request. */
+  const verificationEvidence = useVerificationEvidence(business?.id, business?.is_verified);
 
   // Club courses (club_id only): EVERY course under the business's club.
   // A 36-hole club has two and a resort may have more; returning one row
@@ -389,6 +392,7 @@ const BusinessProfilePage: React.FC = () => {
         coverUrl={heroUrl || clubCourseImage}
         fallbackKey={avatarFallbackKey}
         verified={business.is_verified}
+        evidenceLine={verificationEvidence.line}
         category={business.category}
         city={business.city}
         region={business.region}

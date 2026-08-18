@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { CheckCircle2, Mail, X } from 'lucide-react';
+import { CheckCircle2, Mail, ShieldOff, X } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import SectionTabs from './SectionTabs';
@@ -14,6 +14,11 @@ import {
   REVIEW_REASON_OPTIONS, reasonRequiresNote, reviewReasonLabel,
   type ReviewReason,
 } from '@/components/business/verification/reviewReasons';
+import {
+  GOLFER_REASON_OPTIONS, golferReasonLabel,
+  REVOCATION_REASON_OPTIONS, revocationReasonLabel,
+} from '@/components/business/verification/revocationReasons';
+import { confirmedSignals } from '@/components/business/verification/evidenceLine';
 import { BarVerdict, RawMetadataDisclosure, SignalsPanel, resolveSignals } from './VerificationSignals';
 
 /**
@@ -84,8 +89,16 @@ export function VerificationsTab({
   const [decision, setDecision] = useState<'approved' | 'rejected' | 'needs_more_info' | null>(null);
   // PHASE 4 §3 — the reason is part of the decision, so it lives beside it.
   const [reviewReason, setReviewReason] = useState<ReviewReason | null>(null);
-  const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
+  const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string; is_verified?: boolean; is_system_account?: boolean; verification_recheck_state?: string | null; verification_recheck_reason?: string | null; verification_recheck_due_at?: string | null } | null>(null);
   const [confirmApprove, setConfirmApprove] = useState(false);
+  // PHASE 5B §1.3 — revocation: a structured reason, then a confirmation that
+  // NAMES the business. The bypass is offered for system accounts only.
+  const [revokeOpen, setRevokeOpen] = useState(false);
+  const [revokeReason, setRevokeReason] = useState<string | null>(null);
+  const [revokeNote, setRevokeNote] = useState('');
+  const [revokeBypass, setRevokeBypass] = useState(false);
+  const [confirmRevoke, setConfirmRevoke] = useState(false);
+  const { revokeMutation } = useVerifications();
   const { data: proofConflict } = useProofConflict(active);
 
   useEffect(() => {
@@ -94,7 +107,7 @@ export function VerificationsTab({
     if (active?.type === 'business' && active.businessId) {
       import('@/integrations/supabase/client').then(({ supabase }) =>
         supabase.from('business_accounts')
-          .select('name, category, location, website, email')
+          .select('name, category, location, website, email, is_verified, is_system_account, verification_recheck_state, verification_recheck_reason, verification_recheck_due_at')
           .eq('id', active.businessId!)
           .maybeSingle()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -117,7 +130,20 @@ export function VerificationsTab({
     return entityFiltered.filter(r => r.status === 'pending');
   }, [entityFiltered, statusFilter]);
 
-  const close = () => { setActive(null); setNote(''); setDecision(null); setReviewReason(null); setBizDetail(null); setConfirmApprove(false); };
+  const close = () => {
+    setActive(null); setNote(''); setDecision(null); setReviewReason(null); setBizDetail(null); setConfirmApprove(false);
+    setRevokeOpen(false); setRevokeReason(null); setRevokeNote(''); setRevokeBypass(false); setConfirmRevoke(false);
+  };
+
+  const canRevoke = active?.type === 'business' && !!active.businessId && bizDetail?.is_verified === true;
+
+  const doRevoke = () => {
+    if (!active?.businessId || !revokeReason) return;
+    revokeMutation.mutate(
+      { businessId: active.businessId, reason: revokeReason, adminNote: revokeNote || null, bypassCooldown: revokeBypass },
+      { onSuccess: close },
+    );
+  };
 
   const doApprove = () => {
     if (!active) return;
@@ -203,7 +229,34 @@ export function VerificationsTab({
             ? `Course claim - requested by ${active.displayName ?? active.username ?? '-'} - ${relTime(active.createdAt)}`
             : `${active.type === 'business' ? 'Business' : 'Golfer'} - ${relTime(active.createdAt)}`
         ) : undefined}
-        footer={active && active.status === 'pending' ? (
+        footer={active && canRevoke ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+            {revokeOpen && (
+              <RevokePanel
+                reason={revokeReason}
+                setReason={setRevokeReason}
+                note={revokeNote}
+                setNote={setRevokeNote}
+                bypass={revokeBypass}
+                setBypass={setRevokeBypass}
+                allowBypass={bizDetail?.is_system_account === true}
+              />
+            )}
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              {revokeOpen && (
+                <DrawerBtn disabled={revokeMutation.isPending} onClick={() => { setRevokeOpen(false); setRevokeReason(null); setRevokeNote(''); }}>Cancel</DrawerBtn>
+              )}
+              <DrawerBtn
+                icon={<ShieldOff size={14} />}
+                tone="danger"
+                disabled={revokeMutation.isPending || (revokeOpen && (!revokeReason || (revokeReason === 'other' && revokeNote.trim().length < 3)))}
+                onClick={() => (revokeOpen ? setConfirmRevoke(true) : setRevokeOpen(true))}
+              >
+                {revokeOpen ? 'Revoke verification' : 'Revoke'}
+              </DrawerBtn>
+            </div>
+          </div>
+        ) : active && active.status === 'pending' ? (
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>Reject</DrawerBtn>
             {(active.type === 'business' || active.type === 'course_claim') && (
@@ -240,6 +293,19 @@ export function VerificationsTab({
         tone="danger"
         busy={review.isPending}
       />
+
+      {/* §1.3 — the confirmation NAMES the business, and states the consequence. */}
+      <ConfirmDialog
+        open={confirmRevoke}
+        onClose={() => setConfirmRevoke(false)}
+        onConfirm={() => { setConfirmRevoke(false); doRevoke(); }}
+        title={`Revoke verification for ${bizDetail?.name ?? active?.displayName ?? 'this business'}?`}
+        description={`The badge is removed immediately and ${bizDetail?.name ?? 'the business'} is notified. Reason: ${revocationReasonLabel(revokeReason) ?? '-'}.${revokeBypass ? ' The 7-day cooldown is bypassed.' : bizDetail?.is_system_account ? '' : ' A 7-day cooldown applies before they can reapply.'}`}
+        confirmLabel="Revoke"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={revokeMutation.isPending}
+      />
     </div>
   );
 }
@@ -267,7 +333,7 @@ export function VerificationDetailBody({
   reviewReason?: ReviewReason | null;
   setReviewReason?: (v: ReviewReason | null) => void;
 }) {
-  const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
+  const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string; is_verified?: boolean; is_system_account?: boolean; verification_recheck_state?: string | null; verification_recheck_reason?: string | null; verification_recheck_due_at?: string | null } | null>(null);
   const { data: proofConflict } = useProofConflict(row);
 
   useEffect(() => {
@@ -276,7 +342,7 @@ export function VerificationDetailBody({
     if (row.type === 'business' && row.businessId) {
       import('@/integrations/supabase/client').then(({ supabase }) =>
         supabase.from('business_accounts')
-          .select('name, category, location, website, email')
+          .select('name, category, location, website, email, is_verified, is_system_account, verification_recheck_state, verification_recheck_reason, verification_recheck_due_at')
           .eq('id', row.businessId!)
           .maybeSingle()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -417,9 +483,10 @@ export function VerificationDetailBody({
             {row.status} {row.reviewerName ? `by ${row.reviewerName}` : row.reviewedBy ? `by ${row.reviewedBy.slice(0, 8)}` : ''}
             {row.reviewedAt ? ` - ${relTime(row.reviewedAt)}` : ''}
           </div>
-          {reviewReasonLabel(row.reviewReason) && (
+          {(row.type === 'golfer' ? golferReasonLabel(row.reviewReason) : reviewReasonLabel(row.reviewReason)) && (
             <div style={{ fontSize: 13, color: t.ink }}>
-              <span style={{ color: t.inkMuted }}>Reason:</span> {reviewReasonLabel(row.reviewReason)}
+              <span style={{ color: t.inkMuted }}>Reason:</span>{' '}
+              {row.type === 'golfer' ? golferReasonLabel(row.reviewReason) : reviewReasonLabel(row.reviewReason)}
             </div>
           )}
           {row.adminNote && (
@@ -434,6 +501,35 @@ export function VerificationDetailBody({
           )}
         </div>
       )}
+      {/* PHASE 5B §5.5 — an invited golfer has nothing to supply, so the console
+          says so instead of offering a button that throws. */}
+      {row.type === 'golfer' && row.status === 'pending' && (
+        <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.45 }}>
+          Invite-only: a golfer is recognised, not assessed on evidence they submit.
+          There is no “needs info” here — approve the invitation or decline it with a reason.
+        </div>
+      )}
+
+      {/* PHASE 5B §2 / §3 — what the profile will state, and the re-check state. */}
+      {row.type === 'business' && (row.status === 'approved' || bizDetail?.is_verified) && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <Field
+            label="States on the profile"
+            value={
+              confirmedSignals(row.proofMetadata).length
+                ? `Verified · ${confirmedSignals(row.proofMetadata).map(k => k === 'domain' ? 'domain confirmed' : k === 'document' ? 'business registered' : 'listing matched').join(', ')}`
+                : 'Badge only — this approval predates the signal model, so nothing is claimed.'
+            }
+          />
+          {bizDetail?.verification_recheck_state && (
+            <Field
+              label="Annual re-check"
+              value={`${bizDetail.verification_recheck_state}${bizDetail.verification_recheck_reason ? ` — ${bizDetail.verification_recheck_reason}` : ''}`}
+            />
+          )}
+        </div>
+      )}
+
       {row.status === 'pending' && row.adminNote && <Field label="Previous admin note" value={row.adminNote} />}
       {row.status === 'pending' && (row.requiredApprovals ?? 1) > 1 && (
         <div style={{ fontSize: 12, color: t.inkMuted }}>
@@ -450,13 +546,13 @@ export function VerificationDetailBody({
             Reason <span style={{ color: t.danger }}>(required)</span>
           </label>
           <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {REVIEW_REASON_OPTIONS.map(opt => {
+            {(row.type === 'golfer' ? GOLFER_REASON_OPTIONS : REVIEW_REASON_OPTIONS).map(opt => {
               const on = reviewReason === opt.value;
               return (
                 <button
                   key={opt.value}
                   type="button"
-                  onClick={() => setReviewReason(on ? null : opt.value)}
+                  onClick={() => setReviewReason(on ? null : (opt.value as ReviewReason))}
                   style={{
                     textAlign: 'left', padding: '8px 10px',
                     borderRadius: t.radius.md,
@@ -644,5 +740,77 @@ function SupportingDocLink({ path }: { path: string }) {
     >
       {busy ? 'Opening...' : 'View supporting document'}
     </button>
+  );
+}
+
+
+/* ─────────────────────── PHASE 5B §1.3 — revoke panel ─────────────────────── */
+
+function RevokePanel({
+  reason, setReason, note, setNote, bypass, setBypass, allowBypass,
+}: {
+  reason: string | null;
+  setReason: (v: string | null) => void;
+  note: string;
+  setNote: (v: string) => void;
+  bypass: boolean;
+  setBypass: (v: boolean) => void;
+  /** §1.3 — the cooldown bypass exists for SYSTEM ACCOUNTS only. */
+  allowBypass: boolean;
+}) {
+  return (
+    <div style={{
+      background: t.canvas, border: `1px solid ${t.line}`,
+      borderRadius: t.radius.md, padding: 10,
+      display: 'flex', flexDirection: 'column', gap: 8,
+      maxHeight: '46vh', overflowY: 'auto',
+    }}>
+      <div style={{ fontSize: 11, color: t.inkFaint, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+        Reason for revoking <span style={{ color: t.danger }}>(required)</span>
+      </div>
+      <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.4 }}>
+        “Granted in error” reverses a mistaken approval — a decision is terminal, this is the way back.
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {REVOCATION_REASON_OPTIONS.map(opt => {
+          const on = reason === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setReason(on ? null : opt.value)}
+              aria-pressed={on}
+              style={{
+                textAlign: 'left', padding: '8px 10px',
+                borderRadius: t.radius.md,
+                border: `1px solid ${on ? t.danger : t.line}`,
+                background: on ? t.dangerSoft : t.surface,
+                cursor: 'pointer',
+              }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{opt.label}</div>
+              <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.35 }}>{opt.hint}</div>
+            </button>
+          );
+        })}
+      </div>
+      <textarea
+        value={note}
+        onChange={e => setNote(e.target.value)}
+        placeholder="Adds detail to the reason. Required only for 'Other'."
+        rows={2}
+        style={{
+          width: '100%', padding: 10, borderRadius: t.radius.md,
+          border: `1px solid ${reason === 'other' && note.trim().length < 3 ? t.danger : t.line}`,
+          background: t.surface, color: t.ink, fontSize: 13, outline: 'none', resize: 'vertical',
+        }}
+      />
+      {allowBypass && (
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: t.inkMuted }}>
+          <input type="checkbox" checked={bypass} onChange={e => setBypass(e.target.checked)} />
+          Bypass the 7-day cooldown (system account)
+        </label>
+      )}
+    </div>
   );
 }

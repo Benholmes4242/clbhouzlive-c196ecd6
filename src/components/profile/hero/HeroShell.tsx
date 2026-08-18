@@ -187,7 +187,8 @@ interface HeroShellProps {
   displayName: string;
   /** Verified badge or similar, inline after the name. */
   nameSuffix?: React.ReactNode;
-  subline?: string | null;
+  /** PHASE 5B §2 — a node, so the business hero can add its evidence line. */
+  subline?: React.ReactNode;
   /** Right-hand controls (EDIT / FOLLOW pill + glass circles). */
   action?: React.ReactNode;
   headline?: HeroHeadline | null;
