@@ -483,9 +483,10 @@ export function VerificationDetailBody({
             {row.status} {row.reviewerName ? `by ${row.reviewerName}` : row.reviewedBy ? `by ${row.reviewedBy.slice(0, 8)}` : ''}
             {row.reviewedAt ? ` - ${relTime(row.reviewedAt)}` : ''}
           </div>
-          {reviewReasonLabel(row.reviewReason) && (
+          {(row.type === 'golfer' ? golferReasonLabel(row.reviewReason) : reviewReasonLabel(row.reviewReason)) && (
             <div style={{ fontSize: 13, color: t.ink }}>
-              <span style={{ color: t.inkMuted }}>Reason:</span> {reviewReasonLabel(row.reviewReason)}
+              <span style={{ color: t.inkMuted }}>Reason:</span>{' '}
+              {row.type === 'golfer' ? golferReasonLabel(row.reviewReason) : reviewReasonLabel(row.reviewReason)}
             </div>
           )}
           {row.adminNote && (
@@ -500,6 +501,35 @@ export function VerificationDetailBody({
           )}
         </div>
       )}
+      {/* PHASE 5B §5.5 — an invited golfer has nothing to supply, so the console
+          says so instead of offering a button that throws. */}
+      {row.type === 'golfer' && row.status === 'pending' && (
+        <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.45 }}>
+          Invite-only: a golfer is recognised, not assessed on evidence they submit.
+          There is no “needs info” here — approve the invitation or decline it with a reason.
+        </div>
+      )}
+
+      {/* PHASE 5B §2 / §3 — what the profile will state, and the re-check state. */}
+      {row.type === 'business' && (row.status === 'approved' || bizDetail?.is_verified) && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <Field
+            label="States on the profile"
+            value={
+              confirmedSignals(row.proofMetadata).length
+                ? `Verified · ${confirmedSignals(row.proofMetadata).map(k => k === 'domain' ? 'domain confirmed' : k === 'document' ? 'business registered' : 'listing matched').join(', ')}`
+                : 'Badge only — this approval predates the signal model, so nothing is claimed.'
+            }
+          />
+          {bizDetail?.verification_recheck_state && (
+            <Field
+              label="Annual re-check"
+              value={`${bizDetail.verification_recheck_state}${bizDetail.verification_recheck_reason ? ` — ${bizDetail.verification_recheck_reason}` : ''}`}
+            />
+          )}
+        </div>
+      )}
+
       {row.status === 'pending' && row.adminNote && <Field label="Previous admin note" value={row.adminNote} />}
       {row.status === 'pending' && (row.requiredApprovals ?? 1) > 1 && (
         <div style={{ fontSize: 12, color: t.inkMuted }}>
@@ -516,13 +546,13 @@ export function VerificationDetailBody({
             Reason <span style={{ color: t.danger }}>(required)</span>
           </label>
           <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {REVIEW_REASON_OPTIONS.map(opt => {
+            {(row.type === 'golfer' ? GOLFER_REASON_OPTIONS : REVIEW_REASON_OPTIONS).map(opt => {
               const on = reviewReason === opt.value;
               return (
                 <button
                   key={opt.value}
                   type="button"
-                  onClick={() => setReviewReason(on ? null : opt.value)}
+                  onClick={() => setReviewReason(on ? null : (opt.value as ReviewReason))}
                   style={{
                     textAlign: 'left', padding: '8px 10px',
                     borderRadius: t.radius.md,
@@ -710,5 +740,77 @@ function SupportingDocLink({ path }: { path: string }) {
     >
       {busy ? 'Opening...' : 'View supporting document'}
     </button>
+  );
+}
+
+
+/* ─────────────────────── PHASE 5B §1.3 — revoke panel ─────────────────────── */
+
+function RevokePanel({
+  reason, setReason, note, setNote, bypass, setBypass, allowBypass,
+}: {
+  reason: string | null;
+  setReason: (v: string | null) => void;
+  note: string;
+  setNote: (v: string) => void;
+  bypass: boolean;
+  setBypass: (v: boolean) => void;
+  /** §1.3 — the cooldown bypass exists for SYSTEM ACCOUNTS only. */
+  allowBypass: boolean;
+}) {
+  return (
+    <div style={{
+      background: t.canvas, border: `1px solid ${t.line}`,
+      borderRadius: t.radius.md, padding: 10,
+      display: 'flex', flexDirection: 'column', gap: 8,
+      maxHeight: '46vh', overflowY: 'auto',
+    }}>
+      <div style={{ fontSize: 11, color: t.inkFaint, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+        Reason for revoking <span style={{ color: t.danger }}>(required)</span>
+      </div>
+      <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.4 }}>
+        “Granted in error” reverses a mistaken approval — a decision is terminal, this is the way back.
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {REVOCATION_REASON_OPTIONS.map(opt => {
+          const on = reason === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setReason(on ? null : opt.value)}
+              aria-pressed={on}
+              style={{
+                textAlign: 'left', padding: '8px 10px',
+                borderRadius: t.radius.md,
+                border: `1px solid ${on ? t.danger : t.line}`,
+                background: on ? t.dangerSoft : t.surface,
+                cursor: 'pointer',
+              }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{opt.label}</div>
+              <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.35 }}>{opt.hint}</div>
+            </button>
+          );
+        })}
+      </div>
+      <textarea
+        value={note}
+        onChange={e => setNote(e.target.value)}
+        placeholder="Adds detail to the reason. Required only for 'Other'."
+        rows={2}
+        style={{
+          width: '100%', padding: 10, borderRadius: t.radius.md,
+          border: `1px solid ${reason === 'other' && note.trim().length < 3 ? t.danger : t.line}`,
+          background: t.surface, color: t.ink, fontSize: 13, outline: 'none', resize: 'vertical',
+        }}
+      />
+      {allowBypass && (
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: t.inkMuted }}>
+          <input type="checkbox" checked={bypass} onChange={e => setBypass(e.target.checked)} />
+          Bypass the 7-day cooldown (system account)
+        </label>
+      )}
+    </div>
   );
 }
