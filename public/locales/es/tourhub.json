@@ -245,6 +245,7 @@
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
       "subline": "Our picks for the tournament",
+      "explainer": "Nuestra IA evalúa la adecuación al campo, cinco años de resultados aquí, la forma actual, las lesiones y la previsión - antes del primer golpe.",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",
@@ -304,7 +305,10 @@
         "finished": "F",
         "thruN": "thru {{n}}"
       },
-      "thruSep": " · {{value}}"
+      "thruSep": " · {{value}}",
+      "board": {
+        "methodology": "Las selecciones se cierran antes del primer golpe y no cambian nunca. Los veredictos se deciden con la clasificación final."
+      }
     },
     "collegeFranchise": {
       "eyebrow": "COLLEGE FRANCHISE",

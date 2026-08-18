@@ -241,6 +241,7 @@
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
       "subline": "Our picks for the tournament",
+      "explainer": "우리 AI는 코스 적합성, 이곳에서의 5년간 성적, 현재 폼, 부상, 일기예보를 종합합니다 - 첫 티샷 전에.",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",
@@ -300,7 +301,10 @@
         "finished": "F",
         "thruN": "thru {{n}}"
       },
-      "thruSep": " · {{value}}"
+      "thruSep": " · {{value}}",
+      "board": {
+        "methodology": "예측은 첫 티오프 전에 확정되며 이후 변경되지 않습니다. 판정은 최종 리더보드로 결정됩니다."
+      }
     },
     "collegeFranchise": {
       "eyebrow": "COLLEGE FRANCHISE",

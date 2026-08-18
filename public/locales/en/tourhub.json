@@ -279,6 +279,7 @@
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
       "subline": "Our picks for the tournament",
+      "explainer": "Our AI weighs course fit, five years of results here, current form, injuries and the forecast - before a shot is played.",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",
@@ -360,7 +361,7 @@
         "eyebrow": "{{n}} PICKS · TAP FOR THE CASE",
         "record": "{{inside}} OF {{total}} INSIDE THE TOP 20",
         "fit": "FIT {{score}}",
-        "methodology": "Picks generated before the first tee time from course DNA, current form and field strength. Verdicts settle with the final leaderboard.",
+        "methodology": "Picks are locked before the first tee time and never change. Verdicts settle with the final leaderboard.",
         "titleCount_one": "Our pick",
         "titleCount_other": "Our {{count}} picks"
       },
