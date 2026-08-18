@@ -17,6 +17,8 @@ import {
   type ActivityFilterV2,
   type ActivityFeedRowV2,
 } from './hooks/useActivityFeedV2';
+import { useRecordsUnreadCount } from './hooks/useRecordsUnreadCount';
+import { GAME_NOTIF_TYPES } from './components/ledgerKinds';
 import { FeaturedMomentCard, pickFeaturedRow } from './components/FeaturedMomentCard';
 import { FriendRequestsRail } from './components/FriendRequestsRail';
 import { FIGURE } from '@/lib/tokens/type';
@@ -275,6 +277,14 @@ export const ActivityPageV2: React.FC = () => {
   // Activity flipped every row read, so tapping the New chip (server predicate
   // is_read=false) returned nothing while the chip still counted the visit
   // snapshot. Marking read on view stays — it just happens when they LEAVE.
+  //
+  // SCOPE (BRIEF_RECORDS_TAB_COUNT_AND_READ_SCOPE §2): game-family types are
+  // swept ONLY IF the Records tab was actually viewed during this visit.
+  // The same principle that moved this to exit applies to the scope — a
+  // count the member never saw must not be cleared by a visit to a different
+  // tab. Records rows are excluded from every other chip server-side
+  // (get_activity_feed :107-108), so landing on Activity does not show them
+  // and must not read them.
   //
   // Signals: visibilitychange -> hidden (the dependable background signal in
   // the Median WebView, it fires before suspension so the write dispatches)
