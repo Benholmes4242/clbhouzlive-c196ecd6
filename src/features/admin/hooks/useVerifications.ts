@@ -250,23 +250,32 @@ export function useVerifications() {
         return;
       }
 
-      // Golfer branch — keep direct table update (separate flow / no badge bug here)
+      /* PHASE 5B §5.2 — the golfer branch used to UPDATE the row from the
+         client: no gate, no audit entry, no email, no reason. It now goes
+         through the same shape as a business decision. §5.5: needs_more_info
+         is refused with a sentence, not an exception message. */
       if (decision === 'needs_more_info') {
-        throw new Error('needs_more_info not supported for golfer requests');
+        const e: any = new Error(
+          'An invited golfer has nothing further to supply, so “needs info” does not apply here.',
+        );
+        e.notApplicable = true;
+        throw e;
       }
-      const now = new Date().toISOString();
-      const golferStatus = decision === 'approved' ? 'accepted' : 'declined';
-      const { error } = await supabase
-        .from('golfer_verification_requests' as any)
-        .update({
-          status: golferStatus,
-          admin_note: adminNote || null,
-          reviewed_at: now,
-          ...(decision === 'approved' ? { accepted_at: now } : { declined_at: now }),
-        } as any)
-        .eq('id', id);
-      if (error) throw error;
+      const { data, error } = await supabase.functions.invoke('verify-golfer-decision', {
+        body: { request_id: id, decision, reason: reviewReason ?? null, admin_note: adminNote || null },
+      });
+      if (error) throw await classifyEdgeError(error);
+      if (data && data.ok === false) {
+        const msg = String(data?.error || '').toLowerCase();
+        if (msg.includes('not pending') || msg.includes('already')) {
+          const e: any = new Error('already_actioned');
+          e.alreadyActioned = true;
+          throw e;
+        }
+        throw new Error(data?.error || 'Failed to update verification');
+      }
     },
+
     onSuccess: (res: any, { decision }) => {
       if (res?.quorumPending) {
         toast.info(
