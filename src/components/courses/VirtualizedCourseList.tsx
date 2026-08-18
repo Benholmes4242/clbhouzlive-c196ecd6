@@ -22,6 +22,13 @@ import { UnifiedCourseCard } from './UnifiedCourseCard';
 import { fromGolfCourse } from '@/lib/mappers/toCourseCardModel';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * The 5px band between cards. Same convention as the light feed, declared
+ * locally on purpose: that is a different feature and must not become a
+ * dependency of this one.
+ */
+const CARD_BAND = '#E5E7EA';
+
 interface Course {
   id: string;
   name: string;
@@ -89,7 +96,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   return (
     <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6">
-        {courses.map((course) => (
+        {courses.map((course, i) => (
           <div key={course.id} className="mb-0">
             <UnifiedCourseCard
               course={cardModelMap.get(course.id) ?? fromGolfCourse(course)}
@@ -101,6 +108,19 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
               onClick={() => handleCardClick(course.id)}
             />
             {renderEnrichment?.(course.id)}
+            {/*
+              BETWEEN items only — index against length, never :last-child,
+              because the list appends pages and a trailing band would flash
+              during load. Hidden from md up: a horizontal band under one cell
+              of a 2/3-column grid separates nothing.
+            */}
+            {i < courses.length - 1 && (
+              <div
+                aria-hidden
+                className="md:hidden"
+                style={{ height: 5, background: CARD_BAND }}
+              />
+            )}
           </div>
         ))}
       </div>

@@ -133,6 +133,13 @@ const LIST_LABEL: Record<string, string> = {
  * `display:-webkit-box` on our direct child span and kills its `flex` — the
  * icon then stacks ABOVE the label. Every trigger here re-asserts the row.
  */
+/**
+ * The 5px band between cards. Same convention as the light feed, declared
+ * locally on purpose: that is a different feature and must not become a
+ * dependency of this one.
+ */
+const CARD_BAND = '#E5E7EA';
+
 const TRIGGER_ROW =
   '[&>span]:!flex [&>span]:items-center [&>span]:gap-2 [&>span]:min-w-0';
 
@@ -982,6 +989,15 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                     }}
                     onRate={() => navigate(`/courses/${row.course_id}/rate`)}
                   />
+                )}
+                {/*
+                  BETWEEN items only — index against length, never :last-child,
+                  because this list appends pages and a trailing band would
+                  flash during load. Single stack at every width, so it is
+                  unconditional.
+                */}
+                {i < rows.length - 1 && (
+                  <div aria-hidden style={{ height: 5, background: CARD_BAND }} />
                 )}
               </div>
             );
