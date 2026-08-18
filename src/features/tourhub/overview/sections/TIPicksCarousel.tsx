@@ -467,6 +467,9 @@ function PickScrimBand({
    * and a surface that opens on a light photo may need it again.
    */
   tone?: 'light' | 'dark';
+  /** Absolutely positioned at the band's bottom edge, under the scrim's content.
+   *  The tile's permanent course-fit bar rides here; it may render null. */
+  footBar?: React.ReactNode;
 }) {
   const [idx, setIdx] = useState(0);
   const src = idx < candidates.length ? candidates[idx] : null;
