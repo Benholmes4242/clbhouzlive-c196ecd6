@@ -1762,6 +1762,32 @@ async function applyRivalryResults(userId: string, stats: any, whsScoreId: strin
 // ─────────────────────────────────────────────────────────────────────────────
 // enqueue_notification
 // ─────────────────────────────────────────────────────────────────────────────
+// MUST stay in sync with legendCategoryLabel in src/lib/gam/visuals.ts AND
+// public.gam_legend_category_label in the database. Three copies exist because
+// push has no client and the trigger has no TypeScript.
+const LEGEND_CATEGORY_LABEL: Record<string, string> = {
+  lowest_gross_90d:             'Gross Record',
+  lowest_gross_all_time:        'Gross Record',
+  lowest_gross:                 'Gross Record',      // legacy, pre 90d/all_time split
+  best_score_diff_90d:          'Score Legend',
+  best_score_diff_all_time:     'Score Legend',
+  best_score_diff:              'Score Legend',      // legacy, pre 90d/all_time split
+  most_birdies_90d:             'Birdies',
+  most_birdies_all_time:        'Birdies',
+  best_stableford_90d:          'Stableford',
+  best_stableford_all_time:     'Stableford',
+  most_eagles_90d:              'Eagles',
+  most_eagles_all_time:         'Eagles',
+  most_aces_90d:                'Aces',
+  most_aces_all_time:           'Aces',
+  most_albatrosses_90d:         'Albatross',
+  most_albatrosses_all_time:    'Albatross',
+  most_rounds_90d:              'Rounds',
+  most_rounds_all_time:         'Rounds',
+  lowest_gross_women_90d:       "Women's course record",
+  lowest_gross_women_all_time:  "Women's course record",
+};
+
 const URGENCY: Record<string, string> = {
   badge_earned: "low",
   legend_lost: "high",
