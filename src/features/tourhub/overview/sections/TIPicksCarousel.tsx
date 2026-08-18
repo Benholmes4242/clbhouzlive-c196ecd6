@@ -333,17 +333,14 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                               </span>
                               <ClbhouzPickMark size={12} label={t('overview.board.clbhouzPick')} />
                             </div>
-                            <CardStateSlot
-                              state={state}
-                              pick={p}
-                              live={live}
-                              settled={settled}
-                              v={v}
-                              t={t}
-                              tone="dark"
-                              // The win pill has moved to the status slot above.
-                              suppressWinChip
-                            />
+                            {/* LIVE ONLY. A settled tile shows NOTHING beside the
+                                name — its verdict lives in the top-right slot.
+                                During play the live score and position still ride
+                                here, because the THRU tag does not carry them. */}
+                            {!settled && state === 'live' && live && live.position != null ? (
+                              <DarkScoreBlock live={live} />
+                            ) : null}
+
 
                           </div>
                         </div>
