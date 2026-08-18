@@ -190,6 +190,12 @@ export const ActivityPageV2: React.FC = () => {
     return CHIPS.some((c) => c.key === f) ? (f as ChipKey) : 'all';
   })();
   const [chip, setChip] = useState<ChipKey>(initialChip);
+
+  // Records chip count — separate head query, see useRecordsUnreadCount (§2.1).
+  const { data: recordsUnread = 0 } = useRecordsUnreadCount(
+    recipientActorType,
+    recipientActorId,
+  );
   /**
    * ONE PREDICATE FOR "NEW" (BRIEF_ACTIVITY_NEW_TAB_AND_LIKE_COUNTS §1.3).
    *
