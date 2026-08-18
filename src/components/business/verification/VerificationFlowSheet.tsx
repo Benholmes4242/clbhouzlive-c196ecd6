@@ -853,10 +853,10 @@ export default function VerificationFlowSheet({
                             )}
                             {option.id === 'registered_business' && (
                               <div className="space-y-3">
-                                <FieldGroup label="Register">
+                                <FieldGroup label="Type of registration">
                                   <Select value={proofRegistry} onValueChange={setProofRegistry}>
                                     <SelectTrigger>
-                                      <SelectValue placeholder="Select register" />
+                                      <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {REGISTRY_OPTIONS.map((opt) => (
@@ -867,11 +867,20 @@ export default function VerificationFlowSheet({
                                     </SelectContent>
                                   </Select>
                                 </FieldGroup>
-                                <FieldGroup label="Company / registration number">
+                                {/* The applicant names their OWN registry - no jurisdiction is
+                                    assumed, so any country's register describes cleanly. */}
+                                <FieldGroup label="Name of register or authority">
+                                  <Input
+                                    value={proofRegistryName}
+                                    onChange={(e) => setProofRegistryName(e.target.value)}
+                                    placeholder="e.g. your national company register"
+                                  />
+                                </FieldGroup>
+                                <FieldGroup label="Registration number">
                                   <Input
                                     value={proofCompanyNumber}
                                     onChange={(e) => setProofCompanyNumber(e.target.value)}
-                                    placeholder="12345678"
+                                    placeholder="As it appears on your registration"
                                   />
                                 </FieldGroup>
                                 <FieldGroup
@@ -893,6 +902,7 @@ export default function VerificationFlowSheet({
                                 </FieldGroup>
                               </div>
                             )}
+
                             {option.id === 'creator_business' && (
                               <div className="space-y-3">
                                 <div className="flex gap-2">
