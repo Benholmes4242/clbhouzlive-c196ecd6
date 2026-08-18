@@ -110,6 +110,8 @@ export default function VerificationFlowSheet({
   const [proofWebsiteUrl, setProofWebsiteUrl] = useState('');
   const [proofEmail, setProofEmail] = useState('');
   const [proofRegistry, setProofRegistry] = useState('');
+  const [proofRegistryName, setProofRegistryName] = useState('');
+
   const [proofCompanyNumber, setProofCompanyNumber] = useState('');
   const [proofRegistryUrl, setProofRegistryUrl] = useState('');
   const [creatorContactType, setCreatorContactType] = useState<'email' | 'phone'>('email');
