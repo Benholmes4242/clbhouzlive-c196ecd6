@@ -22,6 +22,13 @@ import { UnifiedCourseCard } from './UnifiedCourseCard';
 import { fromGolfCourse } from '@/lib/mappers/toCourseCardModel';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * The 5px band between cards. Same convention as the light feed, declared
+ * locally on purpose: that is a different feature and must not become a
+ * dependency of this one.
+ */
+const CARD_BAND = '#E5E7EA';
+
 interface Course {
   id: string;
   name: string;

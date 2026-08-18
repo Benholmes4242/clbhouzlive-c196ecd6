@@ -983,6 +983,15 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                     onRate={() => navigate(`/courses/${row.course_id}/rate`)}
                   />
                 )}
+                {/*
+                  BETWEEN items only — index against length, never :last-child,
+                  because this list appends pages and a trailing band would
+                  flash during load. Single stack at every width, so it is
+                  unconditional.
+                */}
+                {i < rows.length - 1 && (
+                  <div aria-hidden style={{ height: 5, background: CARD_BAND }} />
+                )}
               </div>
             );
           })}
