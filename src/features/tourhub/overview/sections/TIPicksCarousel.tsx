@@ -49,12 +49,16 @@ const RED_BG = '#FEE2E2';
 const RED_TX = '#B91C1C';
 const GOLD_BG = 'linear-gradient(135deg,#FDE68A 0%,#F7931E 100%)';
 const GOLD_TX = '#7C4A03';
+/** the win chip's gold on dark glass - border and figure. Not GOLD_TX, which is a
+ *  dark gold for a light fill. */
+const GOLD_LIGHT = '#FDE68A';
 const GOLD_RING = 'rgba(247,147,30,0.45)';
 /** The winning-pick ring on the DARK band: 0.45 amber disappears over a photo,
  *  so the dark tone takes near-solid amber gold at full strength. */
 const GOLD_RING_STRONG = 'rgba(250,176,74,0.95)';
 
 const GOLD_SHADOW = '0 2px 12px rgba(247,147,30,0.18)';
+
 const NEUTRAL_BG = 'rgba(15,23,42,0.06)';
 const FIT_TRACK = 'rgba(15,23,42,0.07)';
 const FIT_FILL = 'linear-gradient(90deg,#FDBA5C,#F7931E)';
