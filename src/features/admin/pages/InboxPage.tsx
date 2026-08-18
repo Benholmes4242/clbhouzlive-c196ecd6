@@ -595,7 +595,7 @@ function VerificationInboxSheet({ row, onClose }: { row: VerificationRow | null;
           {row.type !== 'golfer' && (
             <button
               onClick={() => submit('needs_more_info')}
-              disabled={reviewMutation.isPending || !refusalReady}
+              disabled={reviewMutation.isPending}
               style={btnGhost()}
             >
               Needs info
@@ -603,7 +603,7 @@ function VerificationInboxSheet({ row, onClose }: { row: VerificationRow | null;
           )}
           <button
             onClick={() => submit('rejected')}
-            disabled={reviewMutation.isPending || !refusalReady}
+            disabled={reviewMutation.isPending}
             style={btnGhost()}
           >
             Reject
