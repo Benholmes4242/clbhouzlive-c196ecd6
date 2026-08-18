@@ -166,7 +166,7 @@ export default function VerificationFlowSheet({
   const [validationError, setValidationError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<{ requestId: string; method: ProofMethod } | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const mainRef = useRef<HTMLElement | null>(null);
+  const mainRef = useRef<HTMLDivElement | null>(null);
 
   // Reset the form each time the sheet is (re)opened.
   useEffect(() => {
@@ -386,12 +386,14 @@ export default function VerificationFlowSheet({
         status: 'pending',
         proof_method: 'business_email',
         proof_value: email,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         proof_metadata: { email_verified: false, otp_flow: true, signals: buildSignals() } as any,
         contact_email: contactEmail.trim() || business?.email || null,
         contact_role: role || null,
         note: notes || null,
         domain,
         requires_domain_check: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any)
       .select('id')
       .single();
@@ -507,6 +509,7 @@ export default function VerificationFlowSheet({
       if (requestId) {
         const { error } = await supabase
           .from('business_verification_requests')
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .update(payload as any)
           .eq('id', requestId);
         if (error) throw error;
@@ -518,6 +521,7 @@ export default function VerificationFlowSheet({
             requested_by: user.id,
             status: 'pending',
             ...payload,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any)
           .select('id')
           .single();
@@ -601,7 +605,7 @@ export default function VerificationFlowSheet({
           </div>
         </header>
 
-        <main ref={mainRef as any} className="flex-1 overflow-y-auto px-4 py-4 pb-32">
+        <main ref={mainRef} className="flex-1 overflow-y-auto px-4 py-4 pb-32">
           {showDomainMode ? (
             <DomainStep businessId={businessId} onDone={() => onOpenChange(false)} />
           ) : confirmation ? (
