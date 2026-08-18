@@ -107,6 +107,7 @@ export default function BusinessVerificationPage() {
         ) : state === 'needs_more_info' ? (
           <NeedsMoreInfoState
             adminNote={request?.admin_note}
+            reviewReason={request?.review_reason}
             reviewedAt={request?.reviewed_at}
             onAmend={() => openFlow('submit')}
           />
@@ -114,6 +115,7 @@ export default function BusinessVerificationPage() {
           <RejectedState
             reviewedAt={request?.reviewed_at}
             adminNote={request?.admin_note}
+            reviewReason={request?.review_reason}
             onReapply={() => openFlow('submit')}
             onUpdate={() => navigate(`/business/${id}/edit`)}
           />
@@ -357,14 +359,58 @@ function VerifiedState({ reviewedAt, onViewProfile }: { reviewedAt: string | nul
   );
 }
 
+/**
+ * PHASE 4 §3.3 — one block, two layers: the structured reason (cause + remedy)
+ * and, beneath it, whatever the reviewer typed. Pre-Phase-4 rows carry no
+ * reason, so the note alone still renders.
+ */
+function ApplicantReasonBlock({
+  reviewReason,
+  adminNote,
+  noteLabel,
+  tone = 'neutral',
+}: {
+  reviewReason?: string | null;
+  adminNote?: string | null;
+  noteLabel: string;
+  tone?: 'neutral' | 'amber';
+}) {
+  const reason = reviewReason ? REVIEW_REASON_APPLICANT[reviewReason] : null;
+  const cause = reason?.cause || '';
+  const fix = reason?.fix || '';
+  if (!cause && !adminNote) return null;
+
+  const border = tone === 'amber' ? BIZ.amberHair : 'rgba(15,23,42,0.10)';
+  const label = tone === 'amber' ? BIZ.amber : '#94A3B8';
+
+  return (
+    <div className="rounded-2xl p-4 mb-6 text-left" style={{ background: '#FFFFFF', border: `1px solid ${border}` }}>
+      {cause ? (
+        <>
+          <p className="text-sm font-semibold" style={{ color: BIZ.ink }}>{cause}</p>
+          {fix && <p className="text-sm mt-1" style={{ color: '#475569' }}>{fix}</p>}
+        </>
+      ) : null}
+      {adminNote ? (
+        <div style={{ marginTop: cause ? 12 : 0, paddingTop: cause ? 12 : 0, borderTop: cause ? `1px solid ${border}` : undefined }}>
+          <p className="text-xs font-medium mb-1" style={{ color: label }}>{noteLabel}</p>
+          <p className="text-sm" style={{ color: BIZ.ink }}>{adminNote}</p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function RejectedState({
   reviewedAt,
   adminNote,
+  reviewReason,
   onReapply,
   onUpdate,
 }: {
   reviewedAt?: string | null;
   adminNote?: string | null;
+  reviewReason?: string | null;
   onReapply: () => void;
   onUpdate: () => void;
 }) {
@@ -376,12 +422,9 @@ function RejectedState({
       <h2 className="text-xl font-bold mb-2" style={{ color: BIZ.ink }}>Verification not approved</h2>
       <p className="text-sm text-muted-foreground mb-4">We couldn't verify your business at this time.</p>
 
-      {adminNote && (
-        <div className="bg-muted/30 border border-border/50 rounded-sq-lg p-4 mb-6 text-left">
-          <p className="text-xs font-medium text-muted-foreground mb-1">Reason</p>
-          <p className="text-sm" style={{ color: BIZ.ink }}>{adminNote}</p>
-        </div>
-      )}
+      {/* PHASE 4 §3.3 — the structured reason names the signal that failed and
+          what would fix it. The reviewer's own words sit BELOW it, not instead. */}
+      <ApplicantReasonBlock reviewReason={reviewReason} adminNote={adminNote} noteLabel="From the reviewer" />
 
       {reviewedAt && (
         <p className="text-xs text-muted-foreground/70 mb-8">
@@ -405,10 +448,12 @@ function RejectedState({
 
 function NeedsMoreInfoState({
   adminNote,
+  reviewReason,
   reviewedAt,
   onAmend,
 }: {
   adminNote?: string | null;
+  reviewReason?: string | null;
   reviewedAt?: string | null;
   onAmend: () => void;
 }) {
@@ -424,12 +469,7 @@ function NeedsMoreInfoState({
         </p>
       </div>
 
-      {adminNote && (
-        <div className="rounded-2xl p-4 text-left" style={{ background: '#FFFFFF', border: `1px solid ${BIZ.amberHair}` }}>
-          <p className="text-xs font-medium mb-1" style={{ color: BIZ.amber }}>What we need</p>
-          <p className="text-sm" style={{ color: BIZ.ink }}>{adminNote}</p>
-        </div>
-      )}
+      <ApplicantReasonBlock reviewReason={reviewReason} adminNote={adminNote} noteLabel="What we need" tone="amber" />
 
       {reviewedAt && (
         <p className="text-xs text-muted-foreground/70 text-center">
