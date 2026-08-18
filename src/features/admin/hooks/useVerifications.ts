@@ -255,9 +255,9 @@ export function useVerifications() {
          through the same shape as a business decision. §5.5: needs_more_info
          is refused with a sentence, not an exception message. */
       if (decision === 'needs_more_info') {
-        const e: any = new Error(
+        const e = new Error(
           'An invited golfer has nothing further to supply, so “needs info” does not apply here.',
-        );
+        ) as Error & { notApplicable?: boolean };
         e.notApplicable = true;
         throw e;
       }
@@ -268,7 +268,7 @@ export function useVerifications() {
       if (data && data.ok === false) {
         const msg = String(data?.error || '').toLowerCase();
         if (msg.includes('not pending') || msg.includes('already')) {
-          const e: any = new Error('already_actioned');
+          const e = new Error('already_actioned') as Error & { alreadyActioned?: boolean };
           e.alreadyActioned = true;
           throw e;
         }
@@ -329,7 +329,7 @@ export function useVerifications() {
       return data;
     },
     onSuccess: () => toast.success('Verification revoked — the business has been notified.'),
-    onError: (e: any) => toast.error(e?.message || 'Failed to revoke verification'),
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : 'Failed to revoke verification'),
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] });
       qc.invalidateQueries({ queryKey: ['business-account-verification-status'] });
@@ -349,7 +349,7 @@ export function useVerifications() {
       return data;
     },
     onSuccess: () => toast.success('Verification removed — the golfer has been notified.'),
-    onError: (e: any) => toast.error(e?.message || 'Failed to remove verification'),
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : 'Failed to remove verification'),
     onSettled: () => qc.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] }),
   });
 
