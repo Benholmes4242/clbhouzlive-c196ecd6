@@ -31,6 +31,8 @@ import {
 import VerificationFlowSheet from '@/components/business/verification/VerificationFlowSheet';
 import { BIZ } from '@/components/business/businessTokens';
 import VerificationCriteriaLink from '@/components/business/verification/VerificationCriteriaLink';
+import { REVIEW_REASON_APPLICANT } from '@/components/business/verification/reviewReasons';
+
 
 export default function BusinessVerificationPage() {
   const navigate = useNavigate();
