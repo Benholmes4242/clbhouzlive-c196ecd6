@@ -613,6 +613,8 @@ const HandicapPage: React.FC = () => {
         )}
       </main>
       <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} ownerFirstName={displayName} readOnly={isFriendView} />
+      {!isFriendView && <StreaksSheetMount />}
+
       <CompareMount viewerUserId={user.id} />
       <RoundDetailSheet
         open={!!deepLinkScoreId}
