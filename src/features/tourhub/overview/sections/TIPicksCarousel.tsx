@@ -77,30 +77,23 @@ type SheetState =
 
 // ---- Shared verdict chip ----
 
-const CHIP_WON_CLASS = 'ti-won-chip';
-
-function chipColors(kind: TiVerdictKind): { className?: string; background?: string; color?: string; boxShadow?: string } {
-  if (kind === 'win') return { className: CHIP_WON_CLASS, color: '#FFFFFF' };
-  if (kind === 'top20') return { background: GREEN_BG, color: GREEN_TX };
-  return { background: RED_BG, color: RED_TX };
+/**
+ * MISS IS NEUTRAL, NOT RED. Red on a tour surface is a SCORE (under par).
+ * A red verdict chip beside a red -6 on the same card reads as two scores.
+ * Green survives because green is not a score colour here.
+ *
+ * The fill lives in the .ti-*-chip CSS family (one dark glass, three borders);
+ * this returns the class and the text colours only - never a background.
+ */
+function chipColors(kind: TiVerdictKind): { className: string; color: string; figureColor: string } {
+  if (kind === 'win') return { className: 'ti-won-chip', color: '#FFFFFF', figureColor: GOLD_LIGHT };
+  if (kind === 'top20') return { className: 'ti-top20-chip', color: '#FFFFFF', figureColor: GREEN_LIGHT };
+  return { className: 'ti-miss-chip', color: '#FFFFFF', figureColor: 'rgba(255,255,255,0.72)' };
 }
 
 
-function VerdictChip({
-  v,
-  size = 'md',
-  t,
-  onDark = false,
-}: {
-  v: TiVerdict;
-  size?: 'md' | 'lg';
-  t: TFunction;
-  /** In the tile's top-right slot the pill sits on the DARK top of the scrim —
-   *  a bright sky can wash the gold, so it takes a hairline and a lift there. */
-  onDark?: boolean;
-}) {
+function VerdictChip({ v, t }: { v: TiVerdict; t: TFunction }) {
   if (v.kind === 'none') return null;
-  const big = size === 'lg';
   const isWin = v.kind === 'win';
   const chip = chipColors(v.kind);
   return (
@@ -110,30 +103,26 @@ function VerdictChip({
         display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
-        padding: big ? '5px 12px' : '3px 9px',
+        padding: '4px 10px',
         borderRadius: 999,
-        fontSize: big ? 13 : 11,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: isWin ? '0.09em' : 0.4,
         textTransform: isWin ? 'uppercase' : undefined,
-        fontVariantNumeric: 'tabular-nums',
+        fontVariantNumeric: 'tabular-nums lining-nums',
         flexShrink: 0,
-        ...(chip.background ? { background: chip.background } : {}),
         color: chip.color,
-        ...(onDark && !isWin
-          ? {
-              border: '1px solid rgba(255,255,255,0.5)',
-              boxShadow: '0 1px 8px rgba(10,14,10,0.45)',
-            }
-          : null),
       }}
     >
-      {isWin && <span style={{ fontSize: big ? 14 : 12, lineHeight: 1 }}>🏆</span>}
+      {isWin && <span style={{ fontSize: 12, lineHeight: 1 }}>🏆</span>}
       {isWin ? t('overview.tiPicks.verdict.won') : v.label}
-      {v.score != null && <span style={{ fontWeight: 700, color: isWin ? GOLD_LIGHT : undefined }}>{v.score}</span>}
+      {v.score != null && (
+        <span style={{ fontSize: 12, fontWeight: 700, color: chip.figureColor }}>{v.score}</span>
+      )}
     </span>
   );
 }
+
 
 
 
