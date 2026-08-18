@@ -1,5 +1,4 @@
 import { Skeleton } from '@/components/ui/skeleton';
-import { TITLE } from '@/lib/tokens/type';
 /**
  * VerificationFlowSheet — BRIEF_VERIFICATION_PHASE_3.
  *
@@ -20,7 +19,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
-  AlertTriangle,
   Check,
   CheckCircle2,
   ChevronLeft,
@@ -53,10 +51,8 @@ import {
   A,
   BIZ_LABEL,
   BIZ_BODY,
-  bizFigure,
 } from '@/features/courses/components/holes/analytical/tokens';
 import DomainStep from './steps/DomainStep';
-import VerificationCriteriaLink from './VerificationCriteriaLink';
 import {
   Group,
   Row,
