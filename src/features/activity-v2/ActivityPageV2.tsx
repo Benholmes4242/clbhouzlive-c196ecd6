@@ -42,7 +42,14 @@ const CHIPS: { key: ChipKey; label: string }[] = [
   { key: 'friends', label: 'Friends' },
   // Game family (level ups, crowns, streaks). Server-side these types are
   // excluded from every other chip, so this is their only home in Activity.
-  { key: 'crowns', label: 'Crowns' },
+  //
+  // Label is Records, key is crowns. The key is the RPC's p_filter value and
+  // the ?filter=crowns deep link target — it is an API contract, not a
+  // display string. The family is thirteen types: level ups, tier
+  // near-misses, legends, crowns, three streak types, status changes, rivals
+  // and badges. 'Records' was chosen over 'Crowns' and 'Legends' because
+  // both of those name two of the thirteen.
+  { key: 'crowns', label: 'Records' },
 ];
 const chipToFilter = (c: ChipKey): ActivityFilterV2 =>
   c === 'all' ? null : (c as ActivityFilterV2);
@@ -53,7 +60,7 @@ const EMPTY_COPY: Record<ChipKey, { title: string; sub: string }> = {
   new: { title: 'All caught up', sub: 'Nothing new since your last visit.' },
   mentions: { title: 'No mentions yet', sub: 'When someone @-mentions you, it shows up here.' },
   friends: { title: 'No friend activity yet', sub: 'Follow people and their moves will appear here.' },
-  crowns: { title: 'No crowns yet', sub: 'Tiers, course crowns and streaks land here as you play.' },
+  crowns: { title: 'No records yet', sub: 'Course records, crowns, tiers and streaks land here as you play.' },
 };
 
 interface ChipProps {
@@ -212,6 +219,13 @@ export const ActivityPageV2: React.FC = () => {
   // this visit. Keeps them presented as "New" even after auto-read + a
   // realtime-triggered mid-visit refetch returns them with is_read=true.
   const visitUnreadIds = useRef<Set<string>>(new Set());
+
+  // Records read-scope (§3.1). A REF, not state: it must not re-render and must
+  // not reset on a mid-visit refetch. It resets on unmount — one visit.
+  const visitedRecordsRef = useRef(false);
+  useEffect(() => {
+    if (chip === 'crowns') visitedRecordsRef.current = true;
+  }, [chip]);
   useEffect(() => {
     for (const r of allRows) {
       if (!r.is_read) visitUnreadIds.current.add(r.notif_id);
@@ -245,6 +259,7 @@ export const ActivityPageV2: React.FC = () => {
 
     qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
     qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
+    qc.invalidateQueries({ queryKey: ['records-unread-count'] });
   };
 
   const openSheet = (row: ActivityFeedRowV2) => {
@@ -274,7 +289,7 @@ export const ActivityPageV2: React.FC = () => {
     if (!recipientActorId || !user?.id) return;
     const now = new Date().toISOString();
     void (async () => {
-      await supabase
+      let sweep = supabase
         .from('notifications')
         // Both columns, always — see §2. `read` is abandoned but must not
         // drift further apart from is_read.
@@ -284,6 +299,10 @@ export const ActivityPageV2: React.FC = () => {
         .eq('is_read', false)
         .neq('type', 'friend_request')
         .lte('created_at', now);
+      if (!visitedRecordsRef.current) {
+        sweep = sweep.not('type', 'in', `(${GAME_NOTIF_TYPES.join(',')})`);
+      }
+      await sweep;
       await supabase
         .from('user_profiles')
         .update({ last_notifications_seen_at: now })
@@ -291,6 +310,7 @@ export const ActivityPageV2: React.FC = () => {
         .or(`last_notifications_seen_at.is.null,last_notifications_seen_at.lt.${now}`);
       qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
       qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
+      qc.invalidateQueries({ queryKey: ['records-unread-count'] });
     })();
   };
 
@@ -332,10 +352,14 @@ export const ActivityPageV2: React.FC = () => {
     // Explicit "mark all read" is the ONE place the visit snapshot is dropped:
     // the member asked for the New marker to go, so the chip must fall to 0.
     visitUnreadIds.current.clear();
+    // Explicit mark-all clears Records too, so a later exit in this same visit
+    // cannot re-run a sweep that has nothing left to do (§3.4).
+    visitedRecordsRef.current = false;
     qc.invalidateQueries({ queryKey: ['activity-v2'] });
     qc.invalidateQueries({ queryKey: ['activity-feed'] });
     qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
     qc.invalidateQueries({ queryKey: ['actor-unread-counts'] });
+    qc.invalidateQueries({ queryKey: ['records-unread-count'] });
 
     toast.success('All caught up');
   };
@@ -370,7 +394,13 @@ export const ActivityPageV2: React.FC = () => {
           label={c.label}
           // "New" chip count equals the highlighted rows on screen (same
           // definition as bucketise -> !is_read) so the two never drift.
-          count={c.key === 'new' ? buckets.new.length : undefined}
+          count={
+            c.key === 'new'
+              ? buckets.new.length
+              : c.key === 'crowns'
+                ? recordsUnread
+                : undefined
+          }
           onClick={() => setChip(c.key)}
         />
       ))}
