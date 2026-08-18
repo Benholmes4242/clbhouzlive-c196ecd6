@@ -241,6 +241,7 @@
     "tiPicks": {
       "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",
       "subline": "[~~Óúr píçkš ƒőŕ ţĥé ţőúřñáméñţ~~]",
+      "explainer": "[~~Őúř ÁÍ ŵéíĝĥš ĉőúřšé ƒíţ, ƒíṽé ýéářš őƒ řéšúlţš ĥéřé, ĉúřřéñţ ƒőřm, íñĵúříéš áñđ ţĥé ƒőřéĉášţ - ƀéƒőřé á šĥőţ íš ƥláýéđ.~~]",
       "linkLabel": "[~~Áll píçkš~~]",
       "confidenceHigh": "[~~Ĥíĝĥ~~]",
       "confidenceSolid": "[~~Šőļíđ~~]",
@@ -303,7 +304,8 @@
       "thruSep": "[~~ · {{value}}~~]",
       "board": {
         "titleCount_one": "[~~Óúr píçk~~]",
-        "titleCount_other": "[~~Óúr {{count}} píçkš~~]"
+        "titleCount_other": "[~~Óúr {{count}} píçkš~~]",
+        "methodology": "[~~Ƥíĉǩš ářé lőĉǩéđ ƀéƒőřé ţĥé ƒířšţ ţéé ţímé áñđ ñéṽéř ĉĥáñĝé. Ṽéřđíĉţš šéţţlé ŵíţĥ ţĥé ƒíñál léáđéřƀőářđ.~~]"
       }
     },
     "collegeFranchise": {

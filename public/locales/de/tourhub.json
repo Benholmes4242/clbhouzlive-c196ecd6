@@ -245,6 +245,7 @@
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
       "subline": "Our picks for the tournament",
+      "explainer": "Unsere KI bewertet Platz-Eignung, fuenf Jahre Ergebnisse hier, aktuelle Form, Verletzungen und die Wettervorhersage - bevor der erste Schlag fällt.",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",
@@ -304,7 +305,10 @@
         "finished": "F",
         "thruN": "thru {{n}}"
       },
-      "thruSep": " · {{value}}"
+      "thruSep": " · {{value}}",
+      "board": {
+        "methodology": "Die Tipps werden vor dem ersten Abschlag festgelegt und ändern sich nie. Die Bewertung erfolgt mit der Endtabelle."
+      }
     },
     "collegeFranchise": {
       "eyebrow": "COLLEGE FRANCHISE",

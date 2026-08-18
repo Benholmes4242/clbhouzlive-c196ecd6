@@ -241,6 +241,7 @@
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
       "subline": "Our picks for the tournament",
+      "explainer": "AIがコース適性、この大会での過去5年の成績、現在の調子、故障、そして天候予報を分析します - 第1打が放たれる前に。",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",
@@ -300,7 +301,10 @@
         "finished": "F",
         "thruN": "thru {{n}}"
       },
-      "thruSep": " · {{value}}"
+      "thruSep": " · {{value}}",
+      "board": {
+        "methodology": "予想は第1打の前に確定し、その後変更されません。判定は最終リーダーボードで確定します。"
+      }
     },
     "collegeFranchise": {
       "eyebrow": "COLLEGE FRANCHISE",
