@@ -80,6 +80,34 @@
   }
 }
 
+/* ==========================================================================
+   TOURNAMENT INTELLIGENCE - THE WINNING PICK CHIP
+   (BRIEF_TI_WON_CHIP_GLASS S1)
+
+   The canonical dark-glass FILL, unchanged, with a GOLD border. A win is
+   announced by its edge, not by a slab: the chip sits in the tile's top-right
+   where the scrim is at its 0.12 floor, and a light fill there fails over a
+   bright sky. The gold lives in the border and the score; the word stays white
+   so it survives any photograph.
+
+   THE FALLBACK IS THE BASE, THE BLUR IS THE ENHANCEMENT - same reason as every
+   other rule in this file: backdrop-filter is the property most likely to no-op
+   on the Median WebView.
+   ========================================================================== */
+.ti-won-chip {
+  background: rgba(24, 30, 26, 0.62);
+  border: 1px solid rgba(253, 230, 138, 0.70);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .ti-won-chip {
+    background: rgba(24, 30, 26, 0.40);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
+  }
+}
+
+
 
 /* ============================================================================
    ON TOUR THIS WEEK — DARK GLASS PANEL + LOCKSTEP TICKER
