@@ -26,7 +26,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 import { SubScoreStack, bandColor } from '@/features/courses/_shared/scoreBands';
-import { A, CAPTION, LABEL, NUM, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { A, LABEL, NUM, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 
 
 /** Deliberately colourless: this is an invitation, not a data value. */
@@ -148,12 +148,17 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
   if (!hasRating) return null;
 
   /**
-   * THE STAT ROW — ONE BASELINE (BRIEF_COURSE_META_CONDENSE §2).
-   *
-   * Rating (with its sample size inline), a hairline, average to par, and the
-   * difficulty phrase right-aligned. Omission rules unchanged: the percentile
-   * disappears at the middle band, avg-to-par disappears when toParParts
-   * returns null, and the line rebalances with NO placeholder dashes.
+   * THE STAT ROW — THREE EVEN COLUMNS (BRIEF_COURSE_META_RESPONSIVE_AND_BAND
+   * §1). Rating, average to par and difficulty are three cells at flex: 1 1 0,
+   * each a figure over its own label. SUPERSEDES BRIEF_COURSE_META_CONDENSE
+   * §2's single baseline with the labels inline and the difficulty as a
+   * right-aligned sentence: that layout overlapped below roughly 340px, because
+   * minWidth:0 let the boxes shrink while whiteSpace:nowrap stopped the text
+   * shrinking with them. No cell can now claim more than a third, so the row is
+   * width-safe by construction rather than by breakpoint. The omission rules
+   * are UNCHANGED — the percentile still disappears at the middle band and
+   * avg-to-par still disappears when toParParts returns null; the row simply
+   * rebalances to two cells or one.
    *
    * AVG TO PAR still rounds first then branches (toParParts), so a fractional
    * under-par average never renders "-0.0" and level reads "E".
