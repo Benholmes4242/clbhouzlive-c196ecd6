@@ -18247,6 +18247,10 @@ export type Database = {
           holders: number
         }[]
       }
+      gam_legend_category_label: {
+        Args: { p_category: string }
+        Returns: string
+      }
       gam_lock_for_eval: { Args: { p_whs_score_id: string }; Returns: boolean }
       gam_mark_badge_seen: { Args: { p_badge_id: string }; Returns: undefined }
       gam_requeue_scores: { Args: { p_score_ids: string[] }; Returns: number }
