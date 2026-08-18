@@ -381,10 +381,14 @@ export function VerificationDetailBody({
         <Field label="Proof metadata">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {proofMetaEntries.map(([k, v]) => (
-              <div key={k} style={{ fontSize: 12, color: t.ink }}>
-                <span style={{ color: t.inkMuted }}>{k}:</span> {String(v)}
+              <div key={k} style={{ fontSize: 12, color: t.ink, wordBreak: 'break-word' }}>
+                {/* PHASE 3 writes a nested `signals` object here. Stringify structured
+                    values so the drawer never renders "[object Object]". */}
+                <span style={{ color: t.inkMuted }}>{k}:</span>{' '}
+                {typeof v === 'object' ? JSON.stringify(v) : String(v)}
               </div>
             ))}
+
           </div>
         </Field>
       )}
