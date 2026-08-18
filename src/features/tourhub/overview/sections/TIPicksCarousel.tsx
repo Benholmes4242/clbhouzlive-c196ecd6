@@ -594,9 +594,7 @@ function PickStatusTag({
       {children}
     </span>
   );
-  if (live.thru >= 18) {
-    return wrap(t('overview.status.finished'), dark ? 'rgba(255,255,255,0.72)' : A.DIM);
-  }
+  if (live.thru >= 18) return null;
   return wrap(
     <>
       <span style={{ width: 5, height: 5, borderRadius: 999, background: TOUR_UNDER, flexShrink: 0 }} />
