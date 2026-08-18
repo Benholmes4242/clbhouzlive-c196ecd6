@@ -209,11 +209,12 @@ export const TrajectoryLine: React.FC<Props> = ({
       current.push({ pos, cum: cumYou });
       scored.set(pos, { d, cum: cumYou });
 
-      // BEADS REDUCE TO THE OUTLIERS (§6) — filtered here, never in beadForScore.
-      if (d <= -2 || d >= 2) {
-        const bead = beadForScore(h.strokes, h.par, surface);
-        if (bead) beads.push({ pos, cum: cumYou, tone: bead.tone, r: bead.radius });
-      }
+      // The bead rule lives in beadForScore and nowhere else. It was filtered
+      // here once, when the two call sites wanted different thresholds; they no
+      // longer do, and a shared function whose meaning depends on its caller is
+      // not a shared function.
+      const bead = beadForScore(h.strokes, h.par, surface);
+      if (bead) beads.push({ pos, cum: cumYou, tone: bead.tone, r: bead.radius });
     });
     if (current && current.length >= 2) segments.push(current);
 
