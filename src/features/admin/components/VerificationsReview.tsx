@@ -91,6 +91,14 @@ export function VerificationsTab({
   const [reviewReason, setReviewReason] = useState<ReviewReason | null>(null);
   const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string; is_verified?: boolean; is_system_account?: boolean; verification_recheck_state?: string | null; verification_recheck_reason?: string | null; verification_recheck_due_at?: string | null } | null>(null);
   const [confirmApprove, setConfirmApprove] = useState(false);
+  // PHASE 5B §1.3 — revocation: a structured reason, then a confirmation that
+  // NAMES the business. The bypass is offered for system accounts only.
+  const [revokeOpen, setRevokeOpen] = useState(false);
+  const [revokeReason, setRevokeReason] = useState<string | null>(null);
+  const [revokeNote, setRevokeNote] = useState('');
+  const [revokeBypass, setRevokeBypass] = useState(false);
+  const [confirmRevoke, setConfirmRevoke] = useState(false);
+  const { revokeMutation } = useVerifications();
   const { data: proofConflict } = useProofConflict(active);
 
   useEffect(() => {
@@ -122,7 +130,20 @@ export function VerificationsTab({
     return entityFiltered.filter(r => r.status === 'pending');
   }, [entityFiltered, statusFilter]);
 
-  const close = () => { setActive(null); setNote(''); setDecision(null); setReviewReason(null); setBizDetail(null); setConfirmApprove(false); };
+  const close = () => {
+    setActive(null); setNote(''); setDecision(null); setReviewReason(null); setBizDetail(null); setConfirmApprove(false);
+    setRevokeOpen(false); setRevokeReason(null); setRevokeNote(''); setRevokeBypass(false); setConfirmRevoke(false);
+  };
+
+  const canRevoke = active?.type === 'business' && !!active.businessId && bizDetail?.is_verified === true;
+
+  const doRevoke = () => {
+    if (!active?.businessId || !revokeReason) return;
+    revokeMutation.mutate(
+      { businessId: active.businessId, reason: revokeReason, adminNote: revokeNote || null, bypassCooldown: revokeBypass },
+      { onSuccess: close },
+    );
+  };
 
   const doApprove = () => {
     if (!active) return;
@@ -208,7 +229,34 @@ export function VerificationsTab({
             ? `Course claim - requested by ${active.displayName ?? active.username ?? '-'} - ${relTime(active.createdAt)}`
             : `${active.type === 'business' ? 'Business' : 'Golfer'} - ${relTime(active.createdAt)}`
         ) : undefined}
-        footer={active && active.status === 'pending' ? (
+        footer={active && canRevoke ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+            {revokeOpen && (
+              <RevokePanel
+                reason={revokeReason}
+                setReason={setRevokeReason}
+                note={revokeNote}
+                setNote={setRevokeNote}
+                bypass={revokeBypass}
+                setBypass={setRevokeBypass}
+                allowBypass={bizDetail?.is_system_account === true}
+              />
+            )}
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              {revokeOpen && (
+                <DrawerBtn disabled={revokeMutation.isPending} onClick={() => { setRevokeOpen(false); setRevokeReason(null); setRevokeNote(''); }}>Cancel</DrawerBtn>
+              )}
+              <DrawerBtn
+                icon={<ShieldOff size={14} />}
+                tone="danger"
+                disabled={revokeMutation.isPending || (revokeOpen && (!revokeReason || (revokeReason === 'other' && revokeNote.trim().length < 3)))}
+                onClick={() => (revokeOpen ? setConfirmRevoke(true) : setRevokeOpen(true))}
+              >
+                {revokeOpen ? 'Revoke verification' : 'Revoke'}
+              </DrawerBtn>
+            </div>
+          </div>
+        ) : active && active.status === 'pending' ? (
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <DrawerBtn icon={<X size={14} />} tone="danger" disabled={review.isPending} onClick={() => submit('rejected')}>Reject</DrawerBtn>
             {(active.type === 'business' || active.type === 'course_claim') && (
@@ -244,6 +292,19 @@ export function VerificationsTab({
         cancelLabel="Cancel"
         tone="danger"
         busy={review.isPending}
+      />
+
+      {/* §1.3 — the confirmation NAMES the business, and states the consequence. */}
+      <ConfirmDialog
+        open={confirmRevoke}
+        onClose={() => setConfirmRevoke(false)}
+        onConfirm={() => { setConfirmRevoke(false); doRevoke(); }}
+        title={`Revoke verification for ${bizDetail?.name ?? active?.displayName ?? 'this business'}?`}
+        description={`The badge is removed immediately and ${bizDetail?.name ?? 'the business'} is notified. Reason: ${revocationReasonLabel(revokeReason) ?? '-'}.${revokeBypass ? ' The 7-day cooldown is bypassed.' : bizDetail?.is_system_account ? '' : ' A 7-day cooldown applies before they can reapply.'}`}
+        confirmLabel="Revoke"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={revokeMutation.isPending}
       />
     </div>
   );
