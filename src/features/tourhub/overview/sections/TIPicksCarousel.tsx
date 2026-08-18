@@ -448,6 +448,7 @@ function PickScrimBand({
   grabber = false,
   objectPosition = '50% 45%',
   tone = 'light',
+  footBar,
 }: {
   candidates: string[];
   children: React.ReactNode;
