@@ -78,11 +78,12 @@ type SheetState =
 
 const CHIP_WON_CLASS = 'ti-won-chip';
 
-function chipColors(kind: TiVerdictKind): { className?: string; color?: string; boxShadow?: string } {
+function chipColors(kind: TiVerdictKind): { className?: string; background?: string; color?: string; boxShadow?: string } {
   if (kind === 'win') return { className: CHIP_WON_CLASS, color: '#FFFFFF' };
   if (kind === 'top20') return { background: GREEN_BG, color: GREEN_TX };
   return { background: RED_BG, color: RED_TX };
 }
+
 
 function VerdictChip({
   v,
