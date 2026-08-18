@@ -218,6 +218,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
               <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
                 {t('overview.tiPicks.subline')}
               </span>
+              <ChevronRight size={18} strokeWidth={2} color={INK_60} style={{ marginLeft: 'auto', flexShrink: 0 }} aria-hidden />
             </button>
             <div
               style={{
