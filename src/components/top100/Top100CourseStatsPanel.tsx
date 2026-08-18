@@ -178,10 +178,11 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
 
   const items: StatItem[] = [
     {
-      label: t('top100.stats.ratingLabel'),
+      // The sample size IS the label: a separate "RATING" word over a
+      // band-coloured figure says nothing the number does not.
+      label: t('top100.stats.fromRatings', { count: ratingCount }),
       value: rating.toFixed(1),
       tone: bandColor(rating),
-      sub: t('top100.stats.fromRatings', { count: ratingCount }),
     },
   ];
   if (toPar) {
@@ -202,8 +203,16 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
   return (
     <div style={{ paddingTop: 4 }}>
       <div ref={difficultyRef}>
+        {/*
+          labelLines is intentionally left at its default 2 - see S3 STOP:
+          "FROM 12 RATINGS" wraps at 320px in a third-width column (98.7px vs
+          98.9px of text), so one line of reservation would drop this figure
+          below the other two. Revisit if the label shortens.
+        */}
         <StatRow items={items} />
+
       </div>
+
 
 
       {showNoRounds && (
