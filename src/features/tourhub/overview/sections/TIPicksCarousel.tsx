@@ -194,19 +194,34 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
           transition={{ duration: 0.25, ease: 'easeOut' }}
           style={{ overflow: 'hidden' }}
         >
-          <SectionShell
-            eyebrow={t('overview.tiPicks.eyebrow')}
-            linkLabel={t('overview.tiPicks.linkLabel')}
-            onLinkClick={() => setSheet({ kind: 'index' })}
-          >
-            <div style={{ padding: '0 16px 10px' }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-                {t('overview.tiPicks.subline')}
-              </div>
-              {/* Explainer - prose, not a link. No CTA, no chevron. */}
-              <div style={{ fontSize: 11.5, fontWeight: 400, color: V4.inkMute, lineHeight: 1.45, marginTop: 6 }}>
-                {t('overview.tiPicks.explainer')}
-              </div>
+          <SectionShell eyebrow={t('overview.tiPicks.eyebrow')}>
+            <div style={{ padding: '0 16px' }}>
+              {/* The heading IS the control (BRIEF_TI_HEADER_CTA_AND_METHOD_SHEET S1).
+                  The explainer that briefly sat here has moved into the sheet: it is a
+                  paragraph, and a paragraph above a carousel costs the first tile its
+                  place on screen. */}
+              <button
+                type="button"
+                onClick={() => setSheet({ kind: 'index' })}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'transparent',
+                  border: 'none',
+                  margin: 0,
+                  padding: '8px 0 10px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                }}
+              >
+                <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
+                  {t('overview.tiPicks.subline')}
+                </span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: V4.inkFaint, lineHeight: 1 }} aria-hidden="true">
+                  {'\u203A'}
+                </span>
+              </button>
             </div>
             <div
               style={{
