@@ -447,16 +447,16 @@ export const TrajectoryLine: React.FC<Props> = ({
 
   /* ---------------------------------------------------------- value row */
 
-  const figure = hoveredScored
-    ? String(hovered?.strokes ?? '')
-    : fmtRel(finalToPar);
+  // TONE FOR A RUNNING TO-PAR TOTAL: shared by the resting final figure and the
+  // hovered cumulative figure. The dot above still uses gradeFor(hole.d) because
+  // the dot marks a single stroke; the figure tracks the cumulative curve.
+  const toneForCum = (cum: number) =>
+    cum < 0 ? T.under : cum === 0 ? T.gradeEven : T.over;
+
+  const figure = hoveredScored ? fmtRel(hoveredScored.cum) : fmtRel(finalToPar);
   const figureTone = hoveredScored
-    ? gradeFor(hoveredScored.d)
-    : finalToPar < 0
-      ? T.under
-      : finalToPar === 0
-        ? T.gradeEven
-        : T.over;
+    ? toneForCum(hoveredScored.cum)
+    : toneForCum(finalToPar);
 
   const subParts: string[] = [];
   if (hover != null && hovered) {
@@ -470,12 +470,11 @@ export const TrajectoryLine: React.FC<Props> = ({
     subParts.push(t('courses:scorecard.trajThrough', { n: lastScored }));
   }
 
+  // rightText is a whole-round fact; it deliberately empties during a scrub.
   const rightText =
-    hoveredScored != null
-      ? fmtRel(hoveredScored.cum)
-      : beatField != null
-        ? t('courses:scorecard.trajBeatField', { n: beatField })
-        : '';
+    beatField != null
+      ? t('courses:scorecard.trajBeatField', { n: beatField })
+      : '';
 
   if (!interactive) {
     return (
