@@ -76,8 +76,10 @@ type SheetState =
 
 // ---- Shared verdict chip ----
 
-function chipColors(kind: TiVerdictKind): React.CSSProperties {
-  if (kind === 'win') return { background: GOLD_BG, color: GOLD_TX, boxShadow: '0 1px 6px rgba(247,147,30,0.35)' };
+const CHIP_WON_CLASS = 'ti-won-chip';
+
+function chipColors(kind: TiVerdictKind): { className?: string; color?: string; boxShadow?: string } {
+  if (kind === 'win') return { className: CHIP_WON_CLASS, color: '#FFFFFF' };
   if (kind === 'top20') return { background: GREEN_BG, color: GREEN_TX };
   return { background: RED_BG, color: RED_TX };
 }
@@ -97,21 +99,26 @@ function VerdictChip({
 }) {
   if (v.kind === 'none') return null;
   const big = size === 'lg';
+  const isWin = v.kind === 'win';
+  const chip = chipColors(v.kind);
   return (
     <span
+      className={chip.className}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 5,
+        gap: 6,
         padding: big ? '5px 12px' : '3px 9px',
         borderRadius: 999,
         fontSize: big ? 13 : 11,
         fontWeight: 700,
-        letterSpacing: 0.4,
+        letterSpacing: isWin ? '0.09em' : 0.4,
+        textTransform: isWin ? 'uppercase' : undefined,
         fontVariantNumeric: 'tabular-nums',
         flexShrink: 0,
-        ...chipColors(v.kind),
-        ...(onDark
+        ...(chip.background ? { background: chip.background } : {}),
+        color: chip.color,
+        ...(onDark && !isWin
           ? {
               border: '1px solid rgba(255,255,255,0.5)',
               boxShadow: '0 1px 8px rgba(10,14,10,0.45)',
@@ -119,12 +126,13 @@ function VerdictChip({
           : null),
       }}
     >
-      {v.kind === 'win' && <span style={{ fontSize: big ? 14 : 12 }}>🏆</span>}
-      {v.kind === 'win' ? t('overview.tiPicks.verdict.won') : v.label}
-      {v.score != null && <span style={{ fontWeight: 700, opacity: 0.75 }}>{v.score}</span>}
+      {isWin && <span style={{ fontSize: big ? 14 : 12, lineHeight: 1 }}>🏆</span>}
+      {isWin ? t('overview.tiPicks.verdict.won') : v.label}
+      {v.score != null && <span style={{ fontWeight: 700, color: isWin ? GOLD_LIGHT : undefined }}>{v.score}</span>}
     </span>
   );
 }
+
 
 
 // ---- Root ----
