@@ -52,6 +52,7 @@ import {
   bizFigure,
 } from '@/features/courses/components/holes/analytical/tokens';
 import DomainStep from './steps/DomainStep';
+import VerificationCriteriaLink from './VerificationCriteriaLink';
 import {
   PROOF_OPTIONS,
   REGISTRY_OPTIONS,
@@ -638,6 +639,10 @@ export default function VerificationFlowSheet({
                   <div style={{ ...bizFigure(15), marginTop: 8 }}>By hand</div>
                 </div>
               </div>
+
+              {/* §3.1 — persistent, above the proof choice: the applicant can read
+                  the two-of-three bar BEFORE picking a method. */}
+              <VerificationCriteriaLink onNavigate={() => onOpenChange(false)} />
 
               {/* SECTION 1 */}
               <SectionCard ref={detailsRef} number={1} title="Confirm your details">

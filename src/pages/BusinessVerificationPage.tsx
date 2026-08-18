@@ -30,6 +30,7 @@ import {
 } from '@/hooks/useBusinessVerificationRequest';
 import VerificationFlowSheet from '@/components/business/verification/VerificationFlowSheet';
 import { BIZ } from '@/components/business/businessTokens';
+import VerificationCriteriaLink from '@/components/business/verification/VerificationCriteriaLink';
 
 export default function BusinessVerificationPage() {
   const navigate = useNavigate();
@@ -133,7 +134,9 @@ export default function BusinessVerificationPage() {
 
 const BENEFITS: Array<{ claim: string; tail: string }> = [
   { claim: 'Build trust', tail: 'golfers can see the business is legitimate' },
-  { claim: 'Stand out in search', tail: 'the badge shows next to your name wherever you appear' },
+  // NOT a discovery claim: the badge is shown wherever the name is, it does not
+  // change where the name appears. Nothing in search or the directory reads is_verified.
+  { claim: 'Recognisable everywhere', tail: 'the badge shows next to your name wherever you appear' },
   { claim: 'Professional presence', tail: 'alongside other verified clubs and coaches' },
 ];
 
@@ -214,6 +217,8 @@ function NoneState({ onStart }: { onStart: () => void }) {
               </div>
             ))}
           </div>
+          {/* §3 — read the bar before starting. */}
+          <VerificationCriteriaLink className="pt-2" />
         </div>
       </div>
 
@@ -289,7 +294,8 @@ function PendingState({
         </div>
         <h2 className="text-xl font-bold mb-2" style={{ color: BIZ.ink }}>Verification under review</h2>
         <p className="text-sm text-muted-foreground">
-          We're reviewing your request. This usually takes 1–3 days.
+          {/* NO SLA. Phase 1 missed this line; a review time was never committed to. */}
+          A person is reading your request. You'll be notified when a decision is made.
         </p>
         {requestedAt && (
           <p className="text-xs text-muted-foreground/70 mt-3">
@@ -324,6 +330,8 @@ function PendingState({
           <li className="flex items-start gap-2"><span className="text-muted-foreground/60 mt-1">•</span><span>You'll get an in-app notification when the review is complete</span></li>
           <li className="flex items-start gap-2"><span className="text-muted-foreground/60 mt-1">•</span><span>Approved profiles receive a verified badge across Clbhouz</span></li>
         </ul>
+        {/* §3.4 — what is being assessed, while you wait. */}
+        <VerificationCriteriaLink tone="mute" />
       </div>
     </motion.div>
   );
@@ -388,6 +396,8 @@ function RejectedState({
         <Button variant="outline" onClick={onUpdate} className="w-full">
           Update business details
         </Button>
+        {/* §3.2 — the criteria are what the request was assessed against. */}
+        <VerificationCriteriaLink align="center" />
       </div>
     </motion.div>
   );
@@ -430,6 +440,7 @@ function NeedsMoreInfoState({
       <Button onClick={onAmend} className="w-full h-11 text-white border-0" style={{ background: BIZ.ink, borderRadius: BIZ.rInner }}>
         Amend and resubmit
       </Button>
+      <VerificationCriteriaLink align="center" />
     </motion.div>
   );
 }
