@@ -1885,20 +1885,30 @@ function activityCopy(
         entity_type: null,
         entity_id: null,
       };
-    case "legend_earned":
+    case "legend_earned": {
+      const label = LEGEND_CATEGORY_LABEL[p?.category as string];
       return {
         title: "Course legend",
-        message: `You are now the legend at ${course}.`,
+        message: label
+          ? `You are now the ${label} leader at ${course}.`
+          : `You are now the legend at ${course}.`,
         entity_type: "course",
         entity_id: courseId,
       };
-    case "legend_lost":
+    }
+    case "legend_lost": {
+      const label = LEGEND_CATEGORY_LABEL[p?.category as string];
+      const taker = (p?.taker_name as string | null) ?? "Someone";
       return {
-        title: "Crown lost",
-        message: `${p?.taker_name ?? "Someone"} took your legend title at ${course}.`,
+        title: "Legend lost",
+        message: label
+          ? `${taker} beat your ${label} at ${course}.`
+          : `${taker} took your legend title at ${course}.`,
         entity_type: "course",
         entity_id: courseId,
       };
+    }
+
     case "crown_taken":
       return {
         title: "Crown taken",
