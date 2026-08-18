@@ -53,6 +53,9 @@ const GOLD_TX = '#7C4A03';
 /** the win chip's gold on dark glass - border and figure. Not GOLD_TX, which is a
  *  dark gold for a light fill. */
 const GOLD_LIGHT = '#FDE68A';
+/** the verdict chip's green on dark glass. NOT GREEN_TX #166534, which is a
+ *  dark green for a light chip and disappears on a photograph. */
+const GREEN_LIGHT = '#8FE9B4';
 const GOLD_RING = 'rgba(247,147,30,0.45)';
 /** The winning-pick ring on the DARK band: 0.45 amber disappears over a photo,
  *  so the dark tone takes near-solid amber gold at full strength. */
