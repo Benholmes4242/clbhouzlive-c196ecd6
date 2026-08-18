@@ -65,6 +65,7 @@ import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analyt
 import { BusinessCoursePanel, type BusinessClubCourse } from '@/components/business/BusinessCoursePanel';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
+import { useVerificationEvidence } from '@/components/business/verification/useVerificationEvidence';
 import { HeroPill, HeroGlassCircle } from '@/components/profile/hero/HeroShell';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -389,6 +390,7 @@ const BusinessProfilePage: React.FC = () => {
         coverUrl={heroUrl || clubCourseImage}
         fallbackKey={avatarFallbackKey}
         verified={business.is_verified}
+        evidenceLine={verificationEvidence.line}
         category={business.category}
         city={business.city}
         region={business.region}
