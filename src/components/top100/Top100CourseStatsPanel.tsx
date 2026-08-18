@@ -204,12 +204,12 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
     <div style={{ paddingTop: 4 }}>
       <div ref={difficultyRef}>
         {/*
-          labelLines is intentionally left at its default 2 - see S3 STOP:
-          "FROM 12 RATINGS" wraps at 320px in a third-width column (98.7px vs
-          98.9px of text), so one line of reservation would drop this figure
-          below the other two. Revisit if the label shortens.
+          labelLines={1}: no reserved second label line, so the figure sits
+          right under its label. Labels/values are grid rows in that mode, so a
+          label that wraps at the narrowest width still keeps all three figures
+          on one baseline.
         */}
-        <StatRow items={items} />
+        <StatRow items={items} labelLines={1} />
 
       </div>
 

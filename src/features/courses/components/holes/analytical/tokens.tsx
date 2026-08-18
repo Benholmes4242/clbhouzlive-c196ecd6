@@ -380,7 +380,46 @@ export const StatRow: React.FC<{
   labelLines?: 1 | 2;
 }> = ({ items, size = 22, style, labelLines = 2 }) => {
   const anySub = items.some((it) => !!it.sub);
+
+  /**
+   * labelLines === 1 reserves NO dead line under a one-line label. Labels and
+   * values are laid out as GRID ROWS rather than per-cell stacks, so a label
+   * that does wrap grows its whole row and every figure stays on one baseline.
+   */
+  if (labelLines === 1) {
+    const cols = `repeat(${items.length}, minmax(0, 1fr))`;
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: cols, alignItems: 'end', ...style }}>
+        {items.map((it) => (
+          <div
+            key={`l-${it.label}`}
+            style={{ ...LABEL, lineHeight: STATROW_LABEL_LH, textAlign: 'center', minWidth: 0 }}
+          >
+            {it.label}
+          </div>
+        ))}
+        {items.map((it) => (
+          <div
+            key={`v-${it.label}`}
+            style={{
+              ...NUM,
+              fontSize: size,
+              color: it.tone ?? A.INK,
+              marginTop: 4,
+              textAlign: 'center',
+              whiteSpace: 'nowrap',
+              minWidth: 0,
+            }}
+          >
+            {it.value}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
+
     <div
       style={{
         display: 'grid',
