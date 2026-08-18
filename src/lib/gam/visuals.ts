@@ -28,9 +28,14 @@ export const rarityColorSoft: Record<BadgeRarity, string> = {
 };
 
 /**
- * Display labels for legend categories. 90D and all-time variants share
- * the same display name — the time window is implied by section context,
- * not card-level metadata.
+ * Display labels for legend categories, ALSO read inside notification
+ * sentences ('the X leader', 'beat your X') — which is why every label is
+ * a plain noun and none contains 'Leading' or 'Legend' as a suffix.
+ * Stableford was 'Leading Stableford' until Aug 2026; it doubled the noun
+ * in copy. MUST stay in sync with public.gam_legend_category_label in the
+ * database and the label map in supabase/functions/gam-evaluator/index.ts.
+ * 90D and all-time variants share a label — the window is implied by
+ * section context.
  */
 export const legendCategoryLabel: Record<LegendCategory, string> = {
   lowest_gross_90d:         'Gross Record',
@@ -39,8 +44,9 @@ export const legendCategoryLabel: Record<LegendCategory, string> = {
   best_score_diff_all_time: 'Score Legend',
   most_birdies_90d:         'Birdies',
   most_birdies_all_time:    'Birdies',
-  best_stableford_90d:      'Leading Stableford',
-  best_stableford_all_time: 'Leading Stableford',
+  best_stableford_90d:      'Stableford',
+  best_stableford_all_time: 'Stableford',
+
   most_eagles_90d:          'Eagles',
   most_eagles_all_time:     'Eagles',
   most_aces_90d:            'Aces',
