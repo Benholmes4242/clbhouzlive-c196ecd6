@@ -30,7 +30,7 @@ import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { usePlayerResults } from '../../hooks/usePlayerResults';
 import { useSeasonResultsSummary } from '../../hooks/useSeasonResultsSummary';
 import { Skeleton } from '@/components/ui/skeleton';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 // ---- Design tokens (per approved TIRedesign) ----
@@ -194,19 +194,36 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
           transition={{ duration: 0.25, ease: 'easeOut' }}
           style={{ overflow: 'hidden' }}
         >
-          <SectionShell
-            eyebrow={t('overview.tiPicks.eyebrow')}
-            linkLabel={t('overview.tiPicks.linkLabel')}
-            onLinkClick={() => setSheet({ kind: 'index' })}
-          >
-            <div style={{ padding: '0 16px 10px' }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-                {t('overview.tiPicks.subline')}
-              </div>
-              {/* Explainer - prose, not a link. No CTA, no chevron. */}
-              <div style={{ fontSize: 11.5, fontWeight: 400, color: V4.inkMute, lineHeight: 1.45, marginTop: 6 }}>
-                {t('overview.tiPicks.explainer')}
-              </div>
+          <SectionShell eyebrow={t('overview.tiPicks.eyebrow')}>
+            <div style={{ padding: '0 16px' }}>
+              {/* The heading IS the control (BRIEF_TI_HEADER_CTA_AND_METHOD_SHEET S1).
+                  The explainer that briefly sat here has moved into the sheet: it is a
+                  paragraph, and a paragraph above a carousel costs the first tile its
+                  place on screen. */}
+              <button
+                type="button"
+                onClick={() => setSheet({ kind: 'index' })}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'transparent',
+                  border: 'none',
+                  margin: 0,
+                  // S1.5 requires 44px. The brief's 8/10 leaves 35.5px around a
+                  // 17.5px line, so the padding grows rather than shipping short.
+                  padding: '13px 0 14px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                }}
+              >
+                <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
+                  {t('overview.tiPicks.subline')}
+                </span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: V4.inkFaint, lineHeight: 1 }} aria-hidden="true">
+                  {'\u203A'}
+                </span>
+              </button>
             </div>
             <div
               style={{
@@ -1345,6 +1362,99 @@ function Last5Block({
 
 // ---- Board sheet ----
 
+/**
+ * TIMethodSection - "How we pick", rendered BELOW the pick rows inside the
+ * picks sheet. Editorial groupings of real inputs; counts come from the locale
+ * lists, not from the pipeline at runtime. No model names, no model count, no
+ * accuracy figure, no gambling language.
+ */
+function TIMethodSection({ t }: { t: TFunction }) {
+  const groups: { label: string; items: string[] }[] = [
+    {
+      label: t('overview.tiPicks.method.playerLabel'),
+      items: t('overview.tiPicks.method.playerItems', { returnObjects: true }) as unknown as string[],
+    },
+    {
+      label: t('overview.tiPicks.method.courseLabel'),
+      items: t('overview.tiPicks.method.courseItems', { returnObjects: true }) as unknown as string[],
+    },
+    {
+      label: t('overview.tiPicks.method.weekLabel'),
+      items: t('overview.tiPicks.method.weekItems', { returnObjects: true }) as unknown as string[],
+    },
+  ];
+
+  const rules = t('overview.tiPicks.method.rules', { returnObjects: true }) as unknown as string[];
+
+  return (
+    <div style={{ paddingTop: 20 }}>
+      <div style={{ borderTop: `1px solid ${HAIR}` }} />
+      <div style={{ ...LABEL, color: A.DIM, marginTop: 14 }}>
+        {t('overview.tiPicks.method.heading')}
+      </div>
+      <div style={{ marginTop: 8, fontSize: 13.5, fontWeight: 400, color: A.BODY, lineHeight: 1.55 }}>
+        {t('overview.tiPicks.method.lede')}
+      </div>
+
+      {groups.map((g) => (
+        <div key={g.label} style={{ marginTop: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+            <span style={{ ...LABEL, color: A.DIM }}>{g.label}</span>
+            <span
+              style={{
+                fontSize: 15,
+                fontWeight: 700,
+                color: AMBER_DEEP,
+                letterSpacing: '-0.03em',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {Array.isArray(g.items) ? g.items.length : 0}
+            </span>
+          </div>
+          <div style={{ marginTop: 6 }}>
+            {(Array.isArray(g.items) ? g.items : []).map((item, i) => (
+              <div
+                key={item}
+                style={{
+                  padding: '7px 0',
+                  borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: INK,
+                }}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${HAIR}` }}>
+        {(Array.isArray(rules) ? rules : []).map((rule, i) => (
+          <div
+            key={rule}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: i === 0 ? 0 : 9 }}
+          >
+            <span
+              style={{ width: 5, height: 5, borderRadius: 999, background: AMBER_DEEP, flexShrink: 0 }}
+              aria-hidden="true"
+            />
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: INK }}>
+              {rule}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: 16, fontSize: 11.5, fontWeight: 400, color: A.MUTE, lineHeight: 1.5 }}>
+        {t('overview.tiPicks.method.closing')}
+      </div>
+    </div>
+  );
+}
+
 function AllPicksSheet({
   picks,
   state,
@@ -1562,19 +1672,10 @@ function AllPicksSheet({
           );
         })}
 
-        <div
-          style={{
-            marginTop: 22,
-            paddingTop: 14,
-            borderTop: `1px solid ${HAIR}`,
-            fontSize: 12,
-            fontWeight: 600,
-            color: A.BODY,
-            lineHeight: 1.5,
-          }}
-        >
-          {t('overview.tiPicks.board.methodology')}
-        </div>
+        {/* THE METHOD, below the picks. The subject is the picks; the method is
+            what a member reads once they want to know whether to believe them. */}
+        <TIMethodSection t={t} />
+
       </div>
     </SheetShell>
   );

@@ -17905,6 +17905,17 @@ export type Database = {
           tour_name: string
         }[]
       }
+      build_tour_thursday_message: {
+        Args: { p_as_of?: string }
+        Returns: {
+          body: string
+          event_count: number
+          is_major: boolean
+          lead_tournament: string
+          title: string
+          tour_name: string
+        }[]
+      }
       calculate_user_division: {
         Args: { p_courses_logged: number }
         Returns: string

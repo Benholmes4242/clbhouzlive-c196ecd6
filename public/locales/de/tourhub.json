@@ -308,6 +308,44 @@
       "thruSep": " · {{value}}",
       "board": {
         "methodology": "Die Tipps werden vor dem ersten Abschlag festgelegt und ändern sich nie. Die Bewertung erfolgt mit der Endtabelle."
+      },
+      "method": {
+        "heading": "So wählen wir aus",
+        "lede": "Unsere KI liest das Feld, bevor gespielt wird. Sie bewertet die bisherigen Leistungen auf diesem Platz, die aktuelle Form, Meldungen zu Verletzungen, das Wetter und Spielerwerte wie Abschlagslänge, Genauigkeit und kurzes Spiel, um ihre Tipps für die Woche zu ermitteln.",
+        "playerLabel": "Der Spieler",
+        "playerItems": [
+          "Abschlagslänge",
+          "Abschlaggenauigkeit",
+          "Grüns in Regulation",
+          "Scrambling",
+          "Putten",
+          "Strokes Gained: Abschlag",
+          "Strokes Gained: Annäherung",
+          "Strokes Gained: um das Grün",
+          "Strokes Gained: Putten",
+          "Strokes Gained: gesamt",
+          "Birdies pro Runde",
+          "Schnitt pro Runde"
+        ],
+        "courseLabel": "Der Platz",
+        "courseItems": [
+          "Fünf Jahre Ergebnisse an diesem Ort",
+          "Was hier tatsächlich gewonnen hat",
+          "Par, Länge und Platztyp"
+        ],
+        "weekLabel": "Diese Woche",
+        "weekItems": [
+          "Form der letzten vier Turniere",
+          "Bestätigte Rückzüge und Verletzungen",
+          "Wind- und Regenprognose",
+          "Stärke des Feldes"
+        ],
+        "rules": [
+          "Vor dem ersten Abschlag festgelegt",
+          "Niemals nachträglich geändert",
+          "Bewertet nach der Endtabelle"
+        ],
+        "closing": "Tournament Intelligence ist Analyse, keine Empfehlung."
       }
     },
     "collegeFranchise": {

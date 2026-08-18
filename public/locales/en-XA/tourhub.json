@@ -306,6 +306,44 @@
         "titleCount_one": "[~~Óúr píçk~~]",
         "titleCount_other": "[~~Óúr {{count}} píçkš~~]",
         "methodology": "[~~Ƥíĉǩš ářé lőĉǩéđ ƀéƒőřé ţĥé ƒířšţ ţéé ţímé áñđ ñéṽéř ĉĥáñĝé. Ṽéřđíĉţš šéţţlé ŵíţĥ ţĥé ƒíñál léáđéřƀőářđ.~~]"
+      },
+      "method": {
+        "heading": "[~~Hów wé píçk~~]",
+        "lede": "[~~Óúr ÁÍ réádš thé fíéld béfóré pláy bégíñš. Ít wéíghš híštóríçál pérfórmáñçé át thé çóúršé, çúrréñt fórm, íñjúry ñéwš, wéáthér áñd pláyér štátš šúçh áš drívíñg díštáñçé, áççúráçy áñd šhórt gámé, tó prójéçt ítš píçkš fór thé wéék.~~]",
+        "playerLabel": "[~~Thé pláyér~~]",
+        "playerItems": [
+          "[~~Drívíñg díštáñçé~~]",
+          "[~~Drívíñg áççúráçy~~]",
+          "[~~Grééñš íñ régúlátíóñ~~]",
+          "[~~Sçrámblíñg~~]",
+          "[~~Púttíñg~~]",
+          "[~~Strókéš gáíñéd: óff thé téé~~]",
+          "[~~Strókéš gáíñéd: áppróáçh~~]",
+          "[~~Strókéš gáíñéd: áróúñd thé grééñ~~]",
+          "[~~Strókéš gáíñéd: púttíñg~~]",
+          "[~~Strókéš gáíñéd: tótál~~]",
+          "[~~Bírdíéš pér róúñd~~]",
+          "[~~Sçóríñg ávérágé~~]"
+        ],
+        "courseLabel": "[~~Thé çóúršé~~]",
+        "courseItems": [
+          "[~~Fívé yéárš óf réšúltš héré~~]",
+          "[~~Whát háš áçtúálly wóñ át thíš véñúé~~]",
+          "[~~Pár, léñgth áñd çóúršé typé~~]"
+        ],
+        "weekLabel": "[~~Thíš wéék~~]",
+        "weekItems": [
+          "[~~Fórm óvér thé lášt fóúr évéñtš~~]",
+          "[~~Cóñfírméd wíthdráwálš áñd íñjúríéš~~]",
+          "[~~Wíñd áñd ráíñ fóréçášt~~]",
+          "[~~Stréñgth óf thé fíéld~~]"
+        ],
+        "rules": [
+          "[~~Lóçkéd béfóré thé fíršt téé~~]",
+          "[~~Névér édítéd~~]",
+          "[~~Grádéd óñ thé fíñál léádérbóárd~~]"
+        ],
+        "closing": "[~~Tóúrñáméñt Íñtéllígéñçé íš áñályšíš, ñót ádvíçé.~~]"
       }
     },
     "collegeFranchise": {

@@ -308,6 +308,44 @@
       "thruSep": " · {{value}}",
       "board": {
         "methodology": "Las selecciones se cierran antes del primer golpe y no cambian nunca. Los veredictos se deciden con la clasificación final."
+      },
+      "method": {
+        "heading": "Cómo elegimos",
+        "lede": "Nuestra IA lee el campo de juego antes de que empiece la competición. Evalúa el rendimiento histórico en este campo, la forma actual, las noticias sobre lesiones, el tiempo y datos del jugador como la distancia con el driver, la precisión y el juego corto, para proyectar sus selecciones de la semana.",
+        "playerLabel": "El jugador",
+        "playerItems": [
+          "Distancia con el driver",
+          "Precisión con el driver",
+          "Greens en regulación",
+          "Scrambling",
+          "Putt",
+          "Strokes gained: salida",
+          "Strokes gained: aproximación",
+          "Strokes gained: alrededor del green",
+          "Strokes gained: putt",
+          "Strokes gained: total",
+          "Birdies por vuelta",
+          "Media de golpes"
+        ],
+        "courseLabel": "El campo",
+        "courseItems": [
+          "Cinco años de resultados aquí",
+          "Lo que de verdad ha ganado en esta sede",
+          "Par, longitud y tipo de campo"
+        ],
+        "weekLabel": "Esta semana",
+        "weekItems": [
+          "Forma en los últimos cuatro torneos",
+          "Retiradas y lesiones confirmadas",
+          "Previsión de viento y lluvia",
+          "Nivel del campo de juego"
+        ],
+        "rules": [
+          "Cerradas antes del primer golpe",
+          "Nunca se editan",
+          "Evaluadas con la clasificación final"
+        ],
+        "closing": "Tournament Intelligence es análisis, no un consejo."
       }
     },
     "collegeFranchise": {
