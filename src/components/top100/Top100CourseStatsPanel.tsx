@@ -6,9 +6,9 @@
  * at the top of the tab already carries that ask, and ninety-odd identical
  * prompts drown the courses that actually hold data.
  *
- * Row one is ONE BASELINE: rating (band-coloured, with its sample size inline),
- * average to par, and the difficulty phrase right-aligned. The four rating
- * sub-scores that already live in course_rating_aggregates follow as ONE ROW OF
+ * Row one is three equal centred columns: rating (band-coloured, with its sample
+ * size as a sub-line), average to par, and the difficulty percentile. The four
+ * rating sub-scores that already live in course_rating_aggregates follow as ONE ROW OF
  * FOUR quarter-width columns, gated behind t100_subscore_min_ratings (default 3) so a
  * single member's afternoon is never presented as analysis.
  *
