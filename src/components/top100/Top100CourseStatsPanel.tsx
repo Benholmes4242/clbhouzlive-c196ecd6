@@ -148,17 +148,12 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
   if (!hasRating) return null;
 
   /**
-   * THE STAT ROW — THREE EVEN COLUMNS (BRIEF_COURSE_META_RESPONSIVE_AND_BAND
-   * §1). Rating, average to par and difficulty are three cells at flex: 1 1 0,
-   * each a figure over its own label. SUPERSEDES BRIEF_COURSE_META_CONDENSE
-   * §2's single baseline with the labels inline and the difficulty as a
-   * right-aligned sentence: that layout overlapped below roughly 340px, because
-   * minWidth:0 let the boxes shrink while whiteSpace:nowrap stopped the text
-   * shrinking with them. No cell can now claim more than a third, so the row is
-   * width-safe by construction rather than by breakpoint. The omission rules
-   * are UNCHANGED — the percentile still disappears at the middle band and
-   * avg-to-par still disappears when toParParts returns null; the row simply
-   * rebalances to two cells or one.
+   * THE STAT ROW IS THE SHARED StatRow (analytical/tokens). It was briefly a
+   * local copy; that copy is deleted. StatRow already gives equal grid
+   * columns with centred cells AND a reserved two-line label box, which the
+   * copy did not - so a wrapping label like 'Harder than' no longer pushes
+   * its figure off the baseline the other two sit on. ALWAYS CHECK FOR AN
+   * EXISTING COMPONENT BEFORE STYLING A SECOND ONE.
    *
    * AVG TO PAR still rounds first then branches (toParParts), so a fractional
    * under-par average never renders "-0.0" and level reads "E".
@@ -181,58 +176,33 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
     }
   }
 
-  /**
-   * The label keeps whiteSpace:'nowrap' — what was missing was the overflow
-   * guard beside it, so a label too long for its third now ellipsises.
-   */
-  const microLabel: React.CSSProperties = {
-    ...LABEL,
-    fontSize: 8,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    marginTop: 6,
-  };
-
-  const figure: React.CSSProperties = {
-    ...NUM,
-    fontSize: 22,
-    lineHeight: 1,
-    fontWeight: 700,
-    letterSpacing: '-0.03em',
-  };
-
-  const cell: React.CSSProperties = { flex: '1 1 0', minWidth: 0 };
+  const items: StatItem[] = [
+    {
+      label: t('top100.stats.ratingLabel'),
+      value: rating.toFixed(1),
+      tone: bandColor(rating),
+      sub: t('top100.stats.fromRatings', { count: ratingCount }),
+    },
+  ];
+  if (toPar) {
+    items.push({
+      label: t('top100.stats.avgToParLabel'),
+      value: toPar.text,
+      tone: toPar.tone,
+    });
+  }
+  if (difficulty) {
+    items.push({
+      label: difficulty.label,
+      value: `${difficulty.pct}%`,
+      tone: A.INK,
+    });
+  }
 
   return (
     <div style={{ paddingTop: 4 }}>
-      <div
-        ref={difficultyRef}
-        style={{
-          display: 'flex',
-          gap: 10,
-          minWidth: 0,
-        }}
-      >
-        {/* Rating — the figure carries its band colour, the label its sample size. */}
-        <div style={cell}>
-          <div style={{ ...figure, color: bandColor(rating) }}>{rating.toFixed(1)}</div>
-          <div style={microLabel}>{t('top100.stats.fromRatings', { count: ratingCount })}</div>
-        </div>
-
-        {toPar && (
-          <div style={cell}>
-            <div style={{ ...figure, color: toPar.tone }}>{toPar.text}</div>
-            <div style={microLabel}>{t('top100.stats.avgToParLabel')}</div>
-          </div>
-        )}
-
-        {difficulty && (
-          <div style={cell}>
-            <div style={{ ...figure, color: A.INK }}>{difficulty.pct}%</div>
-            <div style={microLabel}>{difficulty.label}</div>
-          </div>
-        )}
+      <div ref={difficultyRef}>
+        <StatRow items={items} />
       </div>
 
 
