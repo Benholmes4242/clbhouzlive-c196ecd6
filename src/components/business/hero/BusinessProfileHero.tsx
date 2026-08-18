@@ -44,6 +44,11 @@ interface Props {
   coverUrl?: string | null;
   fallbackKey?: string | null;
   verified?: boolean;
+  /**
+   * PHASE 5B §2 — what was actually confirmed, in plain words. Rendered UNDER
+   * the badge on the profile only; null for a pre-Phase-3 approval (§2.5).
+   */
+  evidenceLine?: string | null;
   category?: string | null;
   city?: string | null;
   region?: string | null;
@@ -68,6 +73,7 @@ export const BusinessProfileHero: React.FC<Props> = ({
   coverUrl,
   fallbackKey,
   verified,
+  evidenceLine,
   category,
   city,
   region,
@@ -86,13 +92,27 @@ export const BusinessProfileHero: React.FC<Props> = ({
   const { t } = useTranslation();
   const initials = getInitialsFromName(name) || 'B';
 
-  const subline = React.useMemo(() => {
+  const metaLine = React.useMemo(() => {
     const bits: string[] = [];
     if (category) bits.push(sentenceCase(category));
     const place = city || region || country || null;
     if (place) bits.push(place);
     return bits.length ? bits.join(' \u00B7 ') : null;
   }, [category, city, region, country]);
+
+  /* §2.1 — one badge, and beneath it what was confirmed. §2.4 keeps this on the
+     profile: the badge travels, the evidence line stays home. */
+  const showEvidence = !!verified && !!evidenceLine;
+  const subline: React.ReactNode = (metaLine || showEvidence) ? (
+    <>
+      {metaLine && <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{metaLine}</div>}
+      {showEvidence && (
+        <div style={{ marginTop: 1, color: DARK_BAND_AMBER, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {evidenceLine}
+        </div>
+      )}
+    </>
+  ) : null;
 
   const tap = (stat: BusinessHeroStat) => () => {
     void analyticsEvents.track('business_hero_stat_tap', { stat });
