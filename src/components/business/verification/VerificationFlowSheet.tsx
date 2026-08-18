@@ -632,10 +632,10 @@ export default function VerificationFlowSheet({
                   <div style={{ ...bizFigure(19), marginTop: 6 }}>2 min</div>
                 </div>
                 <div className="text-center" style={{ minWidth: 0 }}>
-                  <div style={BIZ_LABEL}>We review in</div>
-                  {/* No SLA exists in the codebase - the existing prose stands rather than
-                      inventing a number the business would be held to. */}
-                  <div style={{ ...bizFigure(15), marginTop: 8 }}>A few days</div>
+                  <div style={BIZ_LABEL}>Reviewed</div>
+                  {/* NO SLA EXISTS. The flow says what is true - a person reads every
+                      request - rather than inventing a number nobody committed to. */}
+                  <div style={{ ...bizFigure(15), marginTop: 8 }}>By hand</div>
                 </div>
               </div>
 
@@ -1139,7 +1139,7 @@ export default function VerificationFlowSheet({
                     </Select>
                     {role === 'owner' && (
                       <p style={{ ...BIZ_LABEL, fontSize: 7.5, color: A.MUTE, margin: '6px 0 0' }}>
-                        Owners are typically verified fastest.
+                        Owners can usually answer our questions fastest.
                       </p>
                     )}
                   </FieldGroup>
@@ -1312,8 +1312,7 @@ function ConfirmationView({
         Request submitted
       </h2>
       <p className="text-[14px] max-w-xs mx-auto" style={{ color: BIZ.inkMute }}>
-        We'll review your request, usually within a few days, and let you know by notification
-        and email.
+        We review every request by hand, and let you know by notification and email.
       </p>
       <div
         className="mt-6 mx-auto max-w-xs rounded-2xl p-4 text-left"

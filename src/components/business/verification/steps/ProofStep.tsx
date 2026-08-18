@@ -127,10 +127,10 @@ function ProofInputs(props: Props & { proof: ProofMethod }) {
       return (
         <div className="space-y-4 mt-4 pl-7">
           <div className="space-y-2">
-            <Label className="text-sm text-foreground">Register</Label>
+            <Label className="text-sm text-foreground">Type of registration</Label>
             <Select value={props.proofRegistry} onValueChange={props.setProofRegistry}>
               <SelectTrigger>
-                <SelectValue placeholder="Select register" />
+                <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
                 {REGISTRY_OPTIONS.map((opt) => (
@@ -142,11 +142,11 @@ function ProofInputs(props: Props & { proof: ProofMethod }) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="text-sm text-foreground">Company / registration number</Label>
+            <Label className="text-sm text-foreground">Registration number</Label>
             <Input
               value={props.proofCompanyNumber}
               onChange={(e) => props.setProofCompanyNumber(e.target.value)}
-              placeholder="12345678"
+              placeholder="As it appears on your registration"
             />
           </div>
           <div className="space-y-2">

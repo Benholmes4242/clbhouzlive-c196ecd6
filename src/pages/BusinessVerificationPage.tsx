@@ -133,13 +133,13 @@ export default function BusinessVerificationPage() {
 
 const BENEFITS: Array<{ claim: string; tail: string }> = [
   { claim: 'Build trust', tail: 'golfers can see the business is legitimate' },
-  { claim: 'Stand out in search', tail: 'verified businesses rank higher in discovery' },
+  { claim: 'Stand out in search', tail: 'the badge shows next to your name wherever you appear' },
   { claim: 'Professional presence', tail: 'alongside other verified clubs and coaches' },
 ];
 
 const HOW_IT_WORKS: Array<{ label: string; sub: string }> = [
   { label: 'Submit', sub: 'with proof' },
-  { label: 'We review', sub: 'a few days' },
+  { label: 'We review', sub: 'by hand' },
   { label: 'Verified', sub: 'badge added' },
 ];
 
@@ -320,7 +320,7 @@ function PendingState({
       <div className="space-y-3">
         <SectionHeader tier="standard" kicker="WHAT HAPPENS NEXT" />
         <ul className="space-y-1.5 text-sm text-muted-foreground">
-          <li className="flex items-start gap-2"><span className="text-muted-foreground/60 mt-1">•</span><span>We'll review your business details and proof of legitimacy</span></li>
+          <li className="flex items-start gap-2"><span className="text-muted-foreground/60 mt-1">•</span><span>A person reviews your business details and proof of legitimacy</span></li>
           <li className="flex items-start gap-2"><span className="text-muted-foreground/60 mt-1">•</span><span>You'll get an in-app notification when the review is complete</span></li>
           <li className="flex items-start gap-2"><span className="text-muted-foreground/60 mt-1">•</span><span>Approved profiles receive a verified badge across Clbhouz</span></li>
         </ul>

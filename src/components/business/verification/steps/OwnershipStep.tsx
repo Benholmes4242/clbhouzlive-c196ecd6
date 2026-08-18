@@ -69,7 +69,7 @@ export default function OwnershipStep({
           </Select>
           {role === 'owner' && (
             <p className="text-[10px] font-medium" style={{ color: '#F7931E' }}>
-              Owners are typically verified fastest.
+              Owners can usually answer our questions fastest.
             </p>
           )}
         </div>
