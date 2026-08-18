@@ -30,7 +30,7 @@ import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { usePlayerResults } from '../../hooks/usePlayerResults';
 import { useSeasonResultsSummary } from '../../hooks/useSeasonResultsSummary';
 import { Skeleton } from '@/components/ui/skeleton';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 // ---- Design tokens (per approved TIRedesign) ----
@@ -1361,6 +1361,99 @@ function Last5Block({
 }
 
 // ---- Board sheet ----
+
+/**
+ * TIMethodSection - "How we pick", rendered BELOW the pick rows inside the
+ * picks sheet. Editorial groupings of real inputs; counts come from the locale
+ * lists, not from the pipeline at runtime. No model names, no model count, no
+ * accuracy figure, no gambling language.
+ */
+function TIMethodSection({ t }: { t: TFunction }) {
+  const groups: { label: string; items: string[] }[] = [
+    {
+      label: t('overview.tiPicks.method.playerLabel'),
+      items: t('overview.tiPicks.method.playerItems', { returnObjects: true }) as unknown as string[],
+    },
+    {
+      label: t('overview.tiPicks.method.courseLabel'),
+      items: t('overview.tiPicks.method.courseItems', { returnObjects: true }) as unknown as string[],
+    },
+    {
+      label: t('overview.tiPicks.method.weekLabel'),
+      items: t('overview.tiPicks.method.weekItems', { returnObjects: true }) as unknown as string[],
+    },
+  ];
+
+  const rules = t('overview.tiPicks.method.rules', { returnObjects: true }) as unknown as string[];
+
+  return (
+    <div style={{ paddingTop: 20 }}>
+      <div style={{ borderTop: `1px solid ${HAIR}` }} />
+      <div style={{ ...LABEL, color: A.DIM, marginTop: 14 }}>
+        {t('overview.tiPicks.method.heading')}
+      </div>
+      <div style={{ marginTop: 8, fontSize: 13.5, fontWeight: 400, color: A.BODY, lineHeight: 1.55 }}>
+        {t('overview.tiPicks.method.lede')}
+      </div>
+
+      {groups.map((g) => (
+        <div key={g.label} style={{ marginTop: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+            <span style={{ ...LABEL, color: A.DIM }}>{g.label}</span>
+            <span
+              style={{
+                fontSize: 15,
+                fontWeight: 700,
+                color: AMBER_DEEP,
+                letterSpacing: '-0.03em',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {Array.isArray(g.items) ? g.items.length : 0}
+            </span>
+          </div>
+          <div style={{ marginTop: 6 }}>
+            {(Array.isArray(g.items) ? g.items : []).map((item, i) => (
+              <div
+                key={item}
+                style={{
+                  padding: '7px 0',
+                  borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: INK,
+                }}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${HAIR}` }}>
+        {(Array.isArray(rules) ? rules : []).map((rule, i) => (
+          <div
+            key={rule}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: i === 0 ? 0 : 9 }}
+          >
+            <span
+              style={{ width: 5, height: 5, borderRadius: 999, background: AMBER_DEEP, flexShrink: 0 }}
+              aria-hidden="true"
+            />
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: INK }}>
+              {rule}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: 16, fontSize: 11.5, fontWeight: 400, color: A.MUTE, lineHeight: 1.5 }}>
+        {t('overview.tiPicks.method.closing')}
+      </div>
+    </div>
+  );
+}
 
 function AllPicksSheet({
   picks,
