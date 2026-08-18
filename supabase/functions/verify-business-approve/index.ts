@@ -132,14 +132,44 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } }, auth: { persistSession: false } }
     );
 
-    // RPC atomically updates business_verification_requests AND business_accounts.is_verified
-    const { error: rpcErr } = await supabaseUser.rpc("approve_business_verification", {
+    // PHASE 4 QUORUM. The RPC records THIS reviewer's approval and only flips
+    // is_verified once approval_count >= required_approvals. required_approvals
+    // defaults to 1, so single-reviewer behaviour is unchanged: one call, verified.
+    // A second approval from the SAME reviewer cannot complete a quorum - the
+    // ledger's unique (request_id, reviewer_id) constraint refuses it.
+    const { data: rpcResult, error: rpcErr } = await supabaseUser.rpc("approve_business_verification", {
       _request_id: request_id,
+      _admin_note: admin_notes ?? null,
     });
 
     if (rpcErr) {
       console.error("approve_business_verification RPC failed:", rpcErr);
       throw new Error(rpcErr.message || "Failed to approve request");
+    }
+
+    const quorum = (rpcResult ?? {}) as {
+      completed?: boolean;
+      approval_count?: number;
+      required_approvals?: number;
+    };
+    const completed = quorum.completed !== false;
+
+    if (!completed) {
+      // Still pending: no badge, no email, no push. A DIFFERENT reviewer must
+      // approve to complete it.
+      console.log(
+        `Request ${request_id} approved by ${adminUserId} - awaiting quorum ` +
+        `(${quorum.approval_count}/${quorum.required_approvals})`,
+      );
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          completed: false,
+          approval_count: quorum.approval_count ?? 1,
+          required_approvals: quorum.required_approvals ?? 1,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
+      );
     }
 
     console.log(`Business ${request.business_id} verified by admin ${adminUserId}`);
@@ -157,6 +187,7 @@ serve(async (req) => {
       body: "Your business has been verified on clbhouz.",
       data: { type: "business_verification_result", outcome: "approved", business_id: request.business_id },
     }).catch((e) => console.error("[approve] push queue failed", e));
+
 
 
 
