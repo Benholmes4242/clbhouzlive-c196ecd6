@@ -332,7 +332,7 @@ export function useProofConflict(active: VerificationRow | null) {
       if (!active?.proofMethod || !active.proofValue || !active.businessId) return null;
       const { data, error } = await supabase
         .from('business_verification_requests')
-        .select('business_id')
+        .select('business_id, reviewed_at, proof_value')
         .eq('proof_method', active.proofMethod)
         .eq('proof_value', active.proofValue)
         .eq('status', 'approved')
@@ -349,6 +349,9 @@ export function useProofConflict(active: VerificationRow | null) {
       return {
         businessId: conflictBusinessId,
         businessName: biz?.name ?? 'another business',
+        /** PHASE 4 §2.3 — WHEN it was approved, so the reviewer can judge. */
+        approvedAt: (data[0] as { reviewed_at?: string | null }).reviewed_at ?? null,
+        proofValue: (data[0] as { proof_value?: string | null }).proof_value ?? null,
       };
     },
     staleTime: 30_000,
