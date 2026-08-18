@@ -7068,6 +7068,24 @@ export type Database = {
         }
         Relationships: []
       }
+      major_tournaments: {
+        Row: {
+          enabled: boolean
+          label: string
+          parent_id: string
+        }
+        Insert: {
+          enabled?: boolean
+          label: string
+          parent_id: string
+        }
+        Update: {
+          enabled?: boolean
+          label?: string
+          parent_id?: string
+        }
+        Relationships: []
+      }
       mentions: {
         Row: {
           created_at: string
