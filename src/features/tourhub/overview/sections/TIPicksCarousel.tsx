@@ -194,37 +194,11 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
           transition={{ duration: 0.25, ease: 'easeOut' }}
           style={{ overflow: 'hidden' }}
         >
-          <SectionShell eyebrow={t('overview.tiPicks.eyebrow')}>
-            <div style={{ padding: '0 16px' }}>
-              {/* The heading IS the control (BRIEF_TI_HEADER_CTA_AND_METHOD_SHEET S1).
-                  The explainer that briefly sat here has moved into the sheet: it is a
-                  paragraph, and a paragraph above a carousel costs the first tile its
-                  place on screen. */}
-              <button
-                type="button"
-                onClick={() => setSheet({ kind: 'index' })}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  background: 'transparent',
-                  border: 'none',
-                  margin: 0,
-                  // S1.5 requires 44px. The brief's 8/10 leaves 35.5px around a
-                  // 17.5px line, so the padding grows rather than shipping short.
-                  padding: '13px 0 14px',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                }}
-              >
-                <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-                  {t('overview.tiPicks.subline')}
-                </span>
-                <span style={{ fontSize: 15, fontWeight: 700, color: V4.inkFaint, lineHeight: 1 }} aria-hidden="true">
-                  {'\u203A'}
-                </span>
-              </button>
-            </div>
+          <SectionShell
+            eyebrow={t('overview.tiPicks.eyebrow')}
+            subline={t('overview.tiPicks.subline')}
+            onHeaderClick={() => setSheet({ kind: 'index' })}
+          >
             <div
               style={{
                 display: 'flex',
@@ -239,6 +213,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                 scrollSnapType: 'x mandatory',
               }}
             >
+
               {picks.slice(0, 8).map((p) => {
                 const live = liveMap?.[p.playerId];
                 const v = settled ? tiVerdict(live) : { kind: 'none' as const, label: null, score: null };
