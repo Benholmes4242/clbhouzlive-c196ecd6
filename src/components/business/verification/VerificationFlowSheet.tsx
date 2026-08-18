@@ -161,6 +161,7 @@ export default function VerificationFlowSheet({
     setProofWebsiteUrl('');
     setProofEmail('');
     setProofRegistry('');
+    setProofRegistryName('');
     setProofCompanyNumber('');
     setProofRegistryUrl('');
     setCreatorContactType('email');
@@ -963,7 +964,7 @@ export default function VerificationFlowSheet({
                                     <Input
                                       value={creatorPhone}
                                       onChange={(e) => setCreatorPhone(e.target.value)}
-                                      placeholder="+44 7xxx xxxxxx"
+                                      placeholder="Include your country code"
                                       type="tel"
                                     />
                                   </FieldGroup>

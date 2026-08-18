@@ -207,7 +207,7 @@ function ProofInputs(props: Props & { proof: ProofMethod }) {
               <Input
                 value={props.creatorPhone}
                 onChange={(e) => props.setCreatorPhone(e.target.value)}
-                placeholder="+44 7xxx xxxxxx"
+                placeholder="Include your country code"
                 type="tel"
               />
             </div>
