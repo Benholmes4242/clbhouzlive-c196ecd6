@@ -210,7 +210,9 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                   background: 'transparent',
                   border: 'none',
                   margin: 0,
-                  padding: '8px 0 10px',
+                  // S1.5 requires 44px. The brief's 8/10 leaves 35.5px around a
+                  // 17.5px line, so the padding grows rather than shipping short.
+                  padding: '13px 0 14px',
                   textAlign: 'left',
                   cursor: 'pointer',
                 }}
