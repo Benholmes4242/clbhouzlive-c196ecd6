@@ -20,7 +20,9 @@ import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-
 import { ChevronRight, Trophy, Activity } from 'lucide-react';
 import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+import { openGamAchievements, openAllStreaks } from '@/components/profile/handicap/whs/gam/events';
+import { StreaksSheetMount } from '@/components/profile/handicap/gam/streaks/StreaksSheetMount';
+
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
