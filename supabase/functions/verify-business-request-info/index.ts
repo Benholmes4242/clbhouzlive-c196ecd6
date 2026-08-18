@@ -92,11 +92,22 @@ serve(async (req) => {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    if (!admin_notes || String(admin_notes).trim().length < 3) {
-      return new Response(JSON.stringify({ ok: false, error: "admin_notes required (min 3 characters)" }), {
+    // PHASE 4 §6: the structured reason is the required field. A note is only
+    // required when the reason cannot carry the decision on its own ('other'),
+    // or when no valid reason was supplied (legacy client). Mirrors the guard in
+    // request_info_business_verification so Postgres never raises raw.
+    const noteOk = Boolean(admin_notes) && String(admin_notes).trim().length >= 3;
+    if ((!reviewReason || reviewReason === "other") && !noteOk) {
+      return new Response(JSON.stringify({
+        ok: false,
+        error: reviewReason === "other"
+          ? "A note of at least 3 characters is required when the reason is \"Other\""
+          : "A decision reason is required",
+      }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
     const { data: request, error: reqErr } = await supabaseAdmin
       .from("business_verification_requests")
