@@ -19,7 +19,6 @@ export function SectionShell({
   children,
   eyebrowColor,
   rightMeta,
-  onHeaderClick,
 }: {
   eyebrow: string;
   subline?: string;
@@ -28,75 +27,39 @@ export function SectionShell({
   children: ReactNode;
   eyebrowColor?: string;
   rightMeta?: ReactNode;
-  onHeaderClick?: () => void;
 }) {
-  const header = (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
-        padding: `0 ${SPACE.pagePadX}px`,
-        marginBottom: SPACE.sectionHeaderContent,
-        minHeight: onHeaderClick ? 44 : undefined,
-      }}
-    >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <span style={{ ...KICKER, color: eyebrowColor ?? A.INK }}>
-          {eyebrow}
-        </span>
-
-        {subline && (
-          <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-            {subline}
-          </span>
-        )}
-      </div>
-      {rightMeta ? (
-        <span style={{ color: V4.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontVariantNumeric: 'tabular-nums' }}>
-          {rightMeta}
-        </span>
-      ) : linkLabel ? (
-        <button
-          onClick={onLinkClick}
-          style={{ background: 'transparent', border: 'none', color: V4.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: '0.02em', cursor: 'pointer', padding: 0 }}
-        >
-          {linkLabel} ›
-        </button>
-      ) : onHeaderClick ? (
-        <span style={{ fontSize: 15, fontWeight: 700, color: V4.inkFaint, lineHeight: 1, marginTop: 2 }} aria-hidden="true">
-          {'\u203A'}
-        </span>
-      ) : null}
-    </div>
-  );
-
   return (
     <section style={{ padding: '0 0 4px' }}>
-      {onHeaderClick ? (
-        <button
-          type="button"
-          onClick={onHeaderClick}
-          style={{
-            display: 'block',
-            width: '100%',
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            margin: 0,
-            cursor: 'pointer',
-            textAlign: 'left',
-          }}
-        >
-          {header}
-        </button>
-      ) : (
-        header
-      )}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: `0 ${SPACE.pagePadX}px`, marginBottom: SPACE.sectionHeaderContent }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <span style={{ ...KICKER, color: eyebrowColor ?? A.INK }}>
+            {eyebrow}
+          </span>
+
+          {subline && (
+            <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
+              {subline}
+            </span>
+          )}
+        </div>
+        {rightMeta ? (
+          <span style={{ color: V4.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontVariantNumeric: 'tabular-nums' }}>
+            {rightMeta}
+          </span>
+        ) : linkLabel ? (
+          <button
+            onClick={onLinkClick}
+            style={{ background: 'transparent', border: 'none', color: V4.inkFaint, fontSize: 11, fontWeight: 700, letterSpacing: '0.02em', cursor: 'pointer', padding: 0 }}
+          >
+            {linkLabel} ›
+          </button>
+        ) : null}
+      </div>
       {children}
     </section>
   );
 }
+
 
 
 export function V4Card({ children, style }: { children: ReactNode; style?: React.CSSProperties }) {
