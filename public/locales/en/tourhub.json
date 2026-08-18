@@ -326,7 +326,8 @@
         "theCase": "The case ›",
         "pickLabel": "Pick {{rank}}",
         "courseFit": "COURSE FIT {{score}}",
-        "pickOf": "Pick {{n}} of {{total}}"
+        "pickOf": "Pick {{n}} of {{total}}",
+        "courseFitLabel": "Course fit"
       },
       "case": {
         "eyebrow": "THE CASE FOR",

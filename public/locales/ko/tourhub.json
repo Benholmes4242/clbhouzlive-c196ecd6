@@ -286,7 +286,8 @@
       "card": {
         "theCase": "The case ›",
         "pickLabel": "Pick {{rank}}",
-        "pickOf": "픽 {{n}} / {{total}}"
+        "pickOf": "픽 {{n}} / {{total}}",
+        "courseFitLabel": "Course fit"
       },
       "case": {
         "eyebrow": "The case for",

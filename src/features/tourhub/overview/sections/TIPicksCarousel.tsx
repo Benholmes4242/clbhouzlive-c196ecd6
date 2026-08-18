@@ -53,6 +53,9 @@ const GOLD_TX = '#7C4A03';
 /** the win chip's gold on dark glass - border and figure. Not GOLD_TX, which is a
  *  dark gold for a light fill. */
 const GOLD_LIGHT = '#FDE68A';
+/** the verdict chip's green on dark glass. NOT GREEN_TX #166534, which is a
+ *  dark green for a light chip and disappears on a photograph. */
+const GREEN_LIGHT = '#8FE9B4';
 const GOLD_RING = 'rgba(247,147,30,0.45)';
 /** The winning-pick ring on the DARK band: 0.45 amber disappears over a photo,
  *  so the dark tone takes near-solid amber gold at full strength. */
@@ -77,30 +80,23 @@ type SheetState =
 
 // ---- Shared verdict chip ----
 
-const CHIP_WON_CLASS = 'ti-won-chip';
-
-function chipColors(kind: TiVerdictKind): { className?: string; background?: string; color?: string; boxShadow?: string } {
-  if (kind === 'win') return { className: CHIP_WON_CLASS, color: '#FFFFFF' };
-  if (kind === 'top20') return { background: GREEN_BG, color: GREEN_TX };
-  return { background: RED_BG, color: RED_TX };
+/**
+ * MISS IS NEUTRAL, NOT RED. Red on a tour surface is a SCORE (under par).
+ * A red verdict chip beside a red -6 on the same card reads as two scores.
+ * Green survives because green is not a score colour here.
+ *
+ * The fill lives in the .ti-*-chip CSS family (one dark glass, three borders);
+ * this returns the class and the text colours only - never a background.
+ */
+function chipColors(kind: TiVerdictKind): { className: string; color: string; figureColor: string } {
+  if (kind === 'win') return { className: 'ti-won-chip', color: '#FFFFFF', figureColor: GOLD_LIGHT };
+  if (kind === 'top20') return { className: 'ti-top20-chip', color: '#FFFFFF', figureColor: GREEN_LIGHT };
+  return { className: 'ti-miss-chip', color: '#FFFFFF', figureColor: 'rgba(255,255,255,0.72)' };
 }
 
 
-function VerdictChip({
-  v,
-  size = 'md',
-  t,
-  onDark = false,
-}: {
-  v: TiVerdict;
-  size?: 'md' | 'lg';
-  t: TFunction;
-  /** In the tile's top-right slot the pill sits on the DARK top of the scrim —
-   *  a bright sky can wash the gold, so it takes a hairline and a lift there. */
-  onDark?: boolean;
-}) {
+function VerdictChip({ v, t }: { v: TiVerdict; t: TFunction }) {
   if (v.kind === 'none') return null;
-  const big = size === 'lg';
   const isWin = v.kind === 'win';
   const chip = chipColors(v.kind);
   return (
@@ -110,30 +106,26 @@ function VerdictChip({
         display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
-        padding: big ? '5px 12px' : '3px 9px',
+        padding: '4px 10px',
         borderRadius: 999,
-        fontSize: big ? 13 : 11,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: isWin ? '0.09em' : 0.4,
         textTransform: isWin ? 'uppercase' : undefined,
-        fontVariantNumeric: 'tabular-nums',
+        fontVariantNumeric: 'tabular-nums lining-nums',
         flexShrink: 0,
-        ...(chip.background ? { background: chip.background } : {}),
         color: chip.color,
-        ...(onDark && !isWin
-          ? {
-              border: '1px solid rgba(255,255,255,0.5)',
-              boxShadow: '0 1px 8px rgba(10,14,10,0.45)',
-            }
-          : null),
       }}
     >
-      {isWin && <span style={{ fontSize: big ? 14 : 12, lineHeight: 1 }}>🏆</span>}
+      {isWin && <span style={{ fontSize: 12, lineHeight: 1 }}>🏆</span>}
       {isWin ? t('overview.tiPicks.verdict.won') : v.label}
-      {v.score != null && <span style={{ fontWeight: 700, color: isWin ? GOLD_LIGHT : undefined }}>{v.score}</span>}
+      {v.score != null && (
+        <span style={{ fontSize: 12, fontWeight: 700, color: chip.figureColor }}>{v.score}</span>
+      )}
     </span>
   );
 }
+
 
 
 
@@ -275,8 +267,13 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                       candidates={scrimCandidates}
                       tone="dark"
                       minHeight={168}
-                      padding="12px 15px 13px"
+                      // THE BAND'S BOTTOM PADDING opens to 34 when the fit bar
+                      // renders, so the reason text never collides with it. A null
+                      // score keeps 13 — nothing reserved, no gap.
+                      padding={p.courseFitScore == null ? '12px 15px 13px' : '12px 15px 34px'}
+                      footBar={<CourseFitBar score={p.courseFitScore} t={t} />}
                     >
+
                       <div
                         style={{
                           display: 'flex',
@@ -289,14 +286,16 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                         <span style={{ ...PICK_META, color: 'rgba(255,255,255,0.75)' }}>
                           {t('overview.tiPicks.card.pickOf', { n: p.rank, total: pickTotal })}
                         </span>
-                        {/* ONE STATUS SLOT. A win puts the gold pill HERE instead
-                            of "FINISHED" — never both, and never a second pill
-                            beside the name. */}
-                        {isWin ? (
-                          <VerdictChip v={v} t={t} onDark />
-                        ) : (
+                        {/* ONE STATUS SLOT, EVERY OUTCOME. Settled → the verdict
+                            chip. Live → the THRU tag. Never both, never a second
+                            pill beside the name, and never "FINISHED" — a label
+                            identical on every card at the same moment carries no
+                            information. */}
+                        {settled && v.kind !== 'none' ? (
+                          <VerdictChip v={v} t={t} />
+                        ) : state === 'live' ? (
                           <PickStatusTag live={live} t={t} tone="dark" />
-                        )}
+                        ) : null}
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -339,17 +338,14 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                               </span>
                               <ClbhouzPickMark size={12} label={t('overview.board.clbhouzPick')} />
                             </div>
-                            <CardStateSlot
-                              state={state}
-                              pick={p}
-                              live={live}
-                              settled={settled}
-                              v={v}
-                              t={t}
-                              tone="dark"
-                              // The win pill has moved to the status slot above.
-                              suppressWinChip
-                            />
+                            {/* LIVE ONLY. A settled tile shows NOTHING beside the
+                                name — its verdict lives in the top-right slot.
+                                During play the live score and position still ride
+                                here, because the THRU tag does not carry them. */}
+                            {!settled && state === 'live' && live && live.position != null ? (
+                              <DarkScoreBlock live={live} />
+                            ) : null}
+
 
                           </div>
                         </div>
@@ -372,22 +368,12 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                       </div>
                     </PickScrimBand>
 
-                    {/* THE WHITE BODY — one row only. Everything else is on the photo. */}
-                    <div style={{ padding: '13px 15px 14px' }}>
-                      {/* Affordance, not a control — the whole card is the tap target */}
-                      <span
-                        style={{
-                          display: 'block',
-                          fontSize: 9,
-                          fontWeight: 700,
-                          color: AMBER_DEEP,
-                          letterSpacing: '0.09em',
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {t('overview.tiPicks.card.theCase')}
-                      </span>
-                    </div>
+                    {/* NO WHITE FOOTER. The old "THE CASE ›" band was ~40px of a
+                        ~240px card — a white interruption of a photographic object
+                        for a hint that duplicates the gesture the section heading's
+                        chevron already teaches. The whole card is the tap target;
+                        the card ends at the photograph. Do not re-add it. */}
+
 
                   </button>
                 );
@@ -462,6 +448,7 @@ function PickScrimBand({
   grabber = false,
   objectPosition = '50% 45%',
   tone = 'light',
+  footBar,
 }: {
   candidates: string[];
   children: React.ReactNode;
@@ -480,6 +467,9 @@ function PickScrimBand({
    * and a surface that opens on a light photo may need it again.
    */
   tone?: 'light' | 'dark';
+  /** Absolutely positioned at the band's bottom edge, under the scrim's content.
+   *  The tile's permanent course-fit bar rides here; it may render null. */
+  footBar?: React.ReactNode;
 }) {
   const [idx, setIdx] = useState(0);
   const src = idx < candidates.length ? candidates[idx] : null;
@@ -539,6 +529,9 @@ function PickScrimBand({
       <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 11 }}>
         {children}
       </div>
+      {footBar ?? null}
+
+
 
     </div>
   );
@@ -562,10 +555,12 @@ const PICK_META: React.CSSProperties = {
 const DEMOTED_STATUS = new Set(['CUT', 'MC', 'MDF', 'WD', 'DQ', 'DNS']);
 
 /**
- * STILL OUT → 5px red dot + "THRU {n}" in MUTE. FINISHED → "FINISHED" in DIM.
- * The feed carries no explicit finished flag, so thru >= 18 is the signal.
+ * STILL OUT → 5px red dot + "THRU {n}" in MUTE. There is NO "FINISHED" branch:
+ * a label identical on every card at the same moment carries no information.
+ * Thru >= 18 renders nothing here. The red dot is a LIVENESS indicator, not a
+ * verdict and not a score, so it stays red.
  * On the DARK tile band the chip rides a rgba(10,14,10,0.5) pill with a
- * white-24 border; the live dot stays red either way.
+ * white-24 border.
  */
 function PickStatusTag({
   live,
@@ -599,9 +594,7 @@ function PickStatusTag({
       {children}
     </span>
   );
-  if (live.thru >= 18) {
-    return wrap(t('overview.status.finished'), dark ? 'rgba(255,255,255,0.72)' : A.DIM);
-  }
+  if (live.thru >= 18) return null;
   return wrap(
     <>
       <span style={{ width: 5, height: 5, borderRadius: 999, background: TOUR_UNDER, flexShrink: 0 }} />
@@ -611,58 +604,11 @@ function PickStatusTag({
   );
 }
 
-function CardStateSlot({
+/* CardStateSlot is GONE (BRIEF_TI_TILE_STATUS_SLOT_AND_FIT S0.2). The tile was
+   its only caller: the settled verdict moved to the ONE top-right status slot,
+   the live score/position path is now inlined as DarkScoreBlock beside the name,
+   and the course fit became a permanent bar on the photograph. */
 
-  state,
-  pick,
-  live,
-  settled,
-  v,
-  t,
-  tone = 'light',
-  suppressWinChip = false,
-}: {
-  state: EventState;
-  pick: AITopContender;
-  live: PickLiveState | undefined;
-  settled: boolean;
-  v: TiVerdict;
-  t: TFunction;
-  tone?: 'light' | 'dark';
-  /** The tile moves the win pill into the top-right status slot, so the inline
-   *  chip must not draw it a second time. */
-  suppressWinChip?: boolean;
-}) {
-  const dark = tone === 'dark';
-  if (settled) {
-    if (v.kind === 'none') {
-      // Settled with no leaderboard row → show fit if present.
-      return <CourseFitLine score={pick.courseFitScore} t={t} tone={tone} />;
-    }
-    if (suppressWinChip && v.kind === 'win') return null;
-
-    return <VerdictChip v={v} t={t} />;
-  }
-  if (state === 'live' && live) {
-    const cutV = tiVerdict(live);
-    if (cutV.kind === 'mc') return <VerdictChip v={cutV} t={t} />;
-    if (live.position != null) {
-      if (dark) return <DarkScoreBlock live={live} />;
-      return (
-        <TourStatusBlock
-          score={live.score}
-          position={live.position}
-          positionTied={live.positionTied}
-          status={live.status}
-
-          align="left"
-        />
-      );
-    }
-  }
-  // Pre-tournament (upcoming) or live-with-no-row → course fit
-  return <CourseFitLine score={pick.courseFitScore} t={t} tone={tone} />;
-}
 
 /**
  * DarkScoreBlock — score + position over the photograph, right-aligned.
@@ -700,44 +646,58 @@ function DarkScoreBlock({ live }: { live: PickLiveState }) {
 }
 
 
-function CourseFitLine({
-  score,
-  t,
-  tone = 'light',
-}: {
-  score: number | null | undefined;
-  t: TFunction;
-  tone?: 'light' | 'dark';
-}) {
-  if (score == null) return <div style={{ height: 16 }} />;
+/**
+ * CourseFitBar — the fit is PERMANENT now, not a slot that the verdict evicts.
+ * It sits flush at the bottom edge of the scrim band: a label/figure row, then a
+ * 3px FULL-BLEED track with square ends. It is an edge, not a pill.
+ *
+ * NULL RENDERS NOTHING AT ALL — no track, no 0% fill, no placeholder, no
+ * reserved height. The photograph simply ends. (CourseFitLine's old
+ * `return <div style={{ height: 16 }} />` is exactly the pattern removed here.)
+ */
+function CourseFitBar({ score, t }: { score: number | null | undefined; t: TFunction }) {
+  if (score == null) return null;
   return (
-    <div
-      style={{
-        fontSize: 10,
-        fontWeight: 700,
-        color: tone === 'dark' ? 'rgba(255,255,255,0.72)' : INK_45,
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        fontVariantNumeric: 'tabular-nums',
-        flexShrink: 0,
-      }}
-    >
-
-      {t('overview.tiPicks.card.courseFit', { score: Math.round(score) })
-        .split(String(Math.round(score)))
-        .map((part, i, arr) =>
-          i === arr.length - 1 ? (
-            <span key={i}>{part}</span>
-          ) : (
-            <span key={i}>
-              {part}
-              <span style={{ color: AMBER }}>{Math.round(score)}</span>
-            </span>
-          ),
-        )}
+    <div aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          padding: '0 15px 6px',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 8.5,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.62)',
+          }}
+        >
+          {t('overview.tiPicks.card.courseFitLabel')}
+        </span>
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: AMBER,
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+        >
+          {Math.round(score)}
+        </span>
+      </div>
+      <div style={{ height: 3, background: 'rgba(255,255,255,0.16)' }}>
+        {/* WIDTH uses the UNROUNDED value; only the figure rounds. */}
+        <div style={{ height: '100%', width: `${Math.max(0, Math.min(100, score))}%`, background: FIT_FILL }} />
+      </div>
     </div>
   );
 }
+
 
 // ---- Sheet shell ----
 

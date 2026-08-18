@@ -286,7 +286,8 @@
       "card": {
         "theCase": "[~~Thé çášé ›~~]",
         "pickLabel": "[~~Píçk {{rank}}~~]",
-        "pickOf": "[Pîçk {{n}} öf {{total}}]"
+        "pickOf": "[Pîçk {{n}} öf {{total}}]",
+        "courseFitLabel": "[~~Çóúršé fít~~]"
       },
       "case": {
         "eyebrow": "[~~Thé çášé fór~~]",

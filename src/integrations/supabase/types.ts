@@ -18264,6 +18264,10 @@ export type Database = {
           streaks_deleted: number
         }[]
       }
+      gam_streak_type_label: {
+        Args: { p_streak_type: string }
+        Returns: string
+      }
       gam_top100_threshold_distribution: {
         Args: { p_thresholds?: number[] }
         Returns: {
