@@ -205,10 +205,11 @@ export function BarVerdict({ claimed }: { claimed: ClaimedSignals }) {
 /** §1.1 — three signals, each PASS or NOT CLAIMED, evidence beneath. */
 export function SignalsPanel({
   signals,
-  onOpenDocument,
+  renderDocument,
 }: {
   signals: ResolvedSignal[];
-  onOpenDocument?: (path: string) => void;
+  /** The document opens through the existing signed-URL link, not a raw path. */
+  renderDocument?: (path: string) => React.ReactNode;
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -261,18 +262,8 @@ export function SignalsPanel({
               </div>
             )}
 
-            {s.documentPath && onOpenDocument && (
-              <button
-                type="button"
-                onClick={() => onOpenDocument(s.documentPath!)}
-                style={{
-                  marginTop: 8, fontSize: 12, fontWeight: 600,
-                  color: t.brandText, background: 'transparent',
-                  border: 'none', padding: 0, textDecoration: 'underline', cursor: 'pointer',
-                }}
-              >
-                Open document
-              </button>
+            {s.documentPath && renderDocument && (
+              <div style={{ marginTop: 8 }}>{renderDocument(s.documentPath)}</div>
             )}
 
             {s.caveat && (

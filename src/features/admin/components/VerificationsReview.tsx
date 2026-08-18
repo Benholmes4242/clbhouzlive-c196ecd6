@@ -10,6 +10,11 @@ import EmptyState from './EmptyState';
 import DetailDrawer from './DetailDrawer';
 import ConfirmDialog from './ConfirmDialog';
 import { useVerifications, useProofConflict, type VerificationRow } from '../hooks/useVerifications';
+import {
+  REVIEW_REASON_OPTIONS, reasonRequiresNote, reviewReasonLabel,
+  type ReviewReason,
+} from '@/components/business/verification/reviewReasons';
+import { BarVerdict, RawMetadataDisclosure, SignalsPanel, resolveSignals } from './VerificationSignals';
 
 /**
  * Extracted from UsersPage during the Members rebuild (D4). Behaviour and
@@ -83,6 +88,8 @@ export function VerificationsTab({
   const [active, setActive] = useState<VerificationRow | null>(null);
   const [note, setNote] = useState('');
   const [decision, setDecision] = useState<'approved' | 'rejected' | 'needs_more_info' | null>(null);
+  // PHASE 4 §3 — the reason is part of the decision, so it lives beside it.
+  const [reviewReason, setReviewReason] = useState<ReviewReason | null>(null);
   const [bizDetail, setBizDetail] = useState<{ name?: string; category?: string; location?: string; website?: string; email?: string } | null>(null);
   const [confirmApprove, setConfirmApprove] = useState(false);
   const { data: proofConflict } = useProofConflict(active);
@@ -116,7 +123,7 @@ export function VerificationsTab({
     return entityFiltered.filter(r => r.status === 'pending');
   }, [entityFiltered, statusFilter]);
 
-  const close = () => { setActive(null); setNote(''); setDecision(null); setBizDetail(null); setConfirmApprove(false); };
+  const close = () => { setActive(null); setNote(''); setDecision(null); setReviewReason(null); setBizDetail(null); setConfirmApprove(false); };
 
   const doApprove = () => {
     if (!active) return;
@@ -128,9 +135,11 @@ export function VerificationsTab({
 
   const submit = (d: 'approved' | 'rejected' | 'needs_more_info') => {
     if (!active) return;
-    if ((d === 'rejected' || d === 'needs_more_info') && note.trim().length < 3) {
-      setDecision(d);
-      return;
+    if (d === 'rejected' || d === 'needs_more_info') {
+      // §3.2 — a refusal now needs a REASON. Free text is required only when the
+      // list cannot carry it ('other'); otherwise the reason names the cause.
+      if (!reviewReason) { setDecision(d); return; }
+      if (reasonRequiresNote(reviewReason) && note.trim().length < 3) { setDecision(d); return; }
     }
     if (active.type === 'golfer' && d === 'needs_more_info') return;
     if (d === 'approved' && proofConflict) {
@@ -139,7 +148,7 @@ export function VerificationsTab({
     }
     review.mutate(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { id: active.id, type: active.type, decision: d as any, adminNote: note },
+      { id: active.id, type: active.type, decision: d as any, adminNote: note, reviewReason },
       { onSuccess: close },
     );
   };
@@ -220,6 +229,8 @@ export function VerificationsTab({
             note={note}
             setNote={setNote}
             decision={decision}
+            reviewReason={reviewReason}
+            setReviewReason={setReviewReason}
           />
         )}
       </DetailDrawer>
