@@ -35,20 +35,15 @@ async function isAdmin(userId: string): Promise<boolean> {
 async function notifyGolfer(userId: string, decision: string, reason: string | null, note: string | null) {
   const approved = decision === "approved";
   const cause = reason ? GOLFER_REASON_LABEL[reason] ?? "" : "";
-  const subject = approved ? "You're verified on Clbhouz" : "About your Clbhouz verification";
   const body = approved
     ? "Your verified badge is now live across Clbhouz."
     : [cause || "Your verification was not granted.", note].filter(Boolean).join(" ");
 
   // Email, if we can resolve one. A missing address must not fail the decision.
   try {
-    const { data: u } = await supabaseAdmin.auth.admin.getUserById(userId);
-    const email = u?.user?.email;
-    if (email) {
-      await supabaseAdmin.functions.invoke("send-transactional-email", {
-        body: { to: email, subject, text: body, html: `<p>${body}</p>` },
-      });
-    }
+    await supabaseAdmin.functions.invoke("send-golfer-verification-result-email", {
+      body: { user_id: userId, outcome: decision, reason, admin_note: note },
+    });
   } catch (e) {
     console.error("[golfer-decision] email failed", e);
   }
