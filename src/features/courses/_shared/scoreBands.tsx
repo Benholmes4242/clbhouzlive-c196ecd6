@@ -108,6 +108,7 @@ export const SubScoreStack: React.FC<{ label: string; score: number }> = ({ labe
       style={{
         display: 'flex',
         alignItems: 'baseline',
+        justifyContent: 'center',
         gap: 4,
         marginTop: 4,
         minWidth: 0,
