@@ -279,7 +279,7 @@
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
       "subline": "Our picks for the tournament",
-      "explainer": "Our AI weighs course fit, five years of results here, current form, injuries and the forecast - before a shot is played.",
+      "explainer": "Our AI reads the field before play begins. It weighs historical performance at the course, current form, injury news, weather and player stats such as driving distance, accuracy and short game, to project its picks for the week.",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",

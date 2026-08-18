@@ -241,7 +241,7 @@
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
       "subline": "Our picks for the tournament",
-      "explainer": "AIがコース適性、この大会での過去5年の成績、現在の調子、故障、そして天候予報を分析します - 第1打が放たれる前に。",
+      "explainer": "AIは競技が始まる前にフィールドを読み解きます。このコースでの過去の成績、現在の調子、故障に関する報道、天候、そしてドライバーの飛距離、正確性、ショートゲームといった選手データを分析し、その週の予想を導き出します。",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",

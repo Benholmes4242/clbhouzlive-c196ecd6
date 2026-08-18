@@ -245,7 +245,7 @@
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
       "subline": "Our picks for the tournament",
-      "explainer": "Nuestra IA evalúa la adecuación al campo, cinco años de resultados aquí, la forma actual, las lesiones y la previsión - antes del primer golpe.",
+      "explainer": "Nuestra IA lee el campo de juego antes de que empiece la competición. Evalúa el rendimiento histórico en este campo, la forma actual, las noticias sobre lesiones, el tiempo y datos del jugador como la distancia con el driver, la precisión y el juego corto, para proyectar sus selecciones de la semana.",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",

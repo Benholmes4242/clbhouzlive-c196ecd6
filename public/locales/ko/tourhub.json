@@ -241,7 +241,7 @@
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
       "subline": "Our picks for the tournament",
-      "explainer": "우리 AI는 코스 적합성, 이곳에서의 5년간 성적, 현재 폼, 부상, 일기예보를 종합합니다 - 첫 티샷 전에.",
+      "explainer": "AI는 경기가 시작되기 전에 출전 선수단을 분석합니다. 이 코스에서의 과거 성적, 현재 폼, 부상 관련 소식, 날씨, 그리고 드라이버 비거리와 정확도, 쇼트 게임 같은 선수 지표를 종합해 그 주의 예상을 도출합니다.",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",

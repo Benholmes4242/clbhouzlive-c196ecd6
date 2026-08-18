@@ -245,7 +245,7 @@
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
       "subline": "Our picks for the tournament",
-      "explainer": "Unsere KI bewertet Platz-Eignung, fuenf Jahre Ergebnisse hier, aktuelle Form, Verletzungen und die Wettervorhersage - bevor der erste Schlag fällt.",
+      "explainer": "Unsere KI liest das Feld, bevor gespielt wird. Sie bewertet die bisherigen Leistungen auf diesem Platz, die aktuelle Form, Meldungen zu Verletzungen, das Wetter und Spielerwerte wie Abschlagslänge, Genauigkeit und kurzes Spiel, um ihre Tipps für die Woche zu ermitteln.",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",
