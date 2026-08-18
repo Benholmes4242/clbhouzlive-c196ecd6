@@ -840,6 +840,10 @@ export type Database = {
           social_links: Json | null
           updated_at: string | null
           verification_cooldown_until: string | null
+          verification_recheck_at: string | null
+          verification_recheck_due_at: string | null
+          verification_recheck_reason: string | null
+          verification_recheck_state: string | null
           verified_at: string | null
           verified_by: string | null
           website: string | null
@@ -886,6 +890,10 @@ export type Database = {
           social_links?: Json | null
           updated_at?: string | null
           verification_cooldown_until?: string | null
+          verification_recheck_at?: string | null
+          verification_recheck_due_at?: string | null
+          verification_recheck_reason?: string | null
+          verification_recheck_state?: string | null
           verified_at?: string | null
           verified_by?: string | null
           website?: string | null
@@ -932,6 +940,10 @@ export type Database = {
           social_links?: Json | null
           updated_at?: string | null
           verification_cooldown_until?: string | null
+          verification_recheck_at?: string | null
+          verification_recheck_due_at?: string | null
+          verification_recheck_reason?: string | null
+          verification_recheck_state?: string | null
           verified_at?: string | null
           verified_by?: string | null
           website?: string | null
@@ -6560,7 +6572,9 @@ export type Database = {
           note: string | null
           requested_at: string | null
           required_approvals: number
+          review_reason: string | null
           reviewed_at: string | null
+          reviewed_by: string | null
           second_approval_bypass_note: string | null
           second_approval_bypassed: boolean
           second_approval_bypassed_at: string | null
@@ -6582,7 +6596,9 @@ export type Database = {
           note?: string | null
           requested_at?: string | null
           required_approvals?: number
+          review_reason?: string | null
           reviewed_at?: string | null
+          reviewed_by?: string | null
           second_approval_bypass_note?: string | null
           second_approval_bypassed?: boolean
           second_approval_bypassed_at?: string | null
@@ -6604,7 +6620,9 @@ export type Database = {
           note?: string | null
           requested_at?: string | null
           required_approvals?: number
+          review_reason?: string | null
           reviewed_at?: string | null
+          reviewed_by?: string | null
           second_approval_bypass_note?: string | null
           second_approval_bypassed?: boolean
           second_approval_bypassed_at?: string | null
@@ -18044,6 +18062,15 @@ export type Database = {
       }
       create_round_posts: { Args: never; Returns: number }
       current_auth_uid: { Args: never; Returns: string }
+      decide_golfer_verification: {
+        Args: {
+          p_decision: string
+          p_note?: string
+          p_reason?: string
+          p_request_id: string
+        }
+        Returns: undefined
+      }
       decline_golfer_verification_invite: {
         Args: { p_note?: string; p_request_id: string }
         Returns: Json
@@ -18206,6 +18233,10 @@ export type Database = {
         Returns: {
           user_id: string
         }[]
+      }
+      flag_verification_recheck: {
+        Args: { p_business_id: string; p_reason?: string; p_state: string }
+        Returns: undefined
       }
       friend_content_nightly: { Args: never; Returns: Json }
       gam_badge_population_share: {
@@ -22178,7 +22209,7 @@ export type Database = {
         Returns: Json
       }
       remove_golfer_verification: {
-        Args: { p_note?: string; p_user_id: string }
+        Args: { p_note?: string; p_reason?: string; p_user_id: string }
         Returns: undefined
       }
       reorder_after_removal: {
@@ -22232,6 +22263,7 @@ export type Database = {
           p_admin_id: string
           p_business_id: string
           p_bypass_cooldown?: boolean
+          p_note?: string
           p_reason?: string
         }
         Returns: undefined
