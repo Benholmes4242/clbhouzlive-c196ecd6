@@ -81,31 +81,37 @@
 }
 
 /* ==========================================================================
-   TOURNAMENT INTELLIGENCE - THE WINNING PICK CHIP
-   (BRIEF_TI_WON_CHIP_GLASS S1)
+   TOURNAMENT INTELLIGENCE - VERDICT CHIPS
+   (BRIEF_TI_TILE_STATUS_SLOT_AND_FIT S1)
 
-   The canonical dark-glass FILL, unchanged, with a GOLD border. A win is
-   announced by its edge, not by a slab: the chip sits in the tile's top-right
-   where the scrim is at its 0.12 floor, and a light fill there fails over a
-   bright sky. The gold lives in the border and the score; the word stays white
-   so it survives any photograph.
+   One dark-glass fill, three borders. The chip sits in the tile's top-right
+   where the scrim is at its 0.12 floor - the lightest part of the gradient -
+   so a light FILL fails over a bright sky. The hue lives in the border and
+   the figure; the label stays white so it survives any photograph.
 
-   THE FALLBACK IS THE BASE, THE BLUR IS THE ENHANCEMENT - same reason as every
-   other rule in this file: backdrop-filter is the property most likely to no-op
-   on the Median WebView.
+   Miss is NEUTRAL, not red: red on a tour surface is a score.
+
+   THE FALLBACK IS THE BASE, THE BLUR IS THE ENHANCEMENT - backdrop-filter is
+   the property most likely to no-op on the Median WebView.
    ========================================================================== */
-.ti-won-chip {
-  background: rgba(24, 30, 26, 0.62);
-  border: 1px solid rgba(253, 230, 138, 0.70);
-}
+.ti-won-chip,
+.ti-top20-chip,
+.ti-miss-chip { background: rgba(24, 30, 26, 0.62); }
+
+.ti-won-chip   { border: 1px solid rgba(253, 230, 138, 0.70); }
+.ti-top20-chip { border: 1px solid rgba(143, 233, 180, 0.70); }
+.ti-miss-chip  { border: 1px solid rgba(226, 232, 240, 0.45); }
 
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .ti-won-chip {
+  .ti-won-chip,
+  .ti-top20-chip,
+  .ti-miss-chip {
     background: rgba(24, 30, 26, 0.40);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     backdrop-filter: blur(16px) saturate(180%);
   }
 }
+
 
 
 
