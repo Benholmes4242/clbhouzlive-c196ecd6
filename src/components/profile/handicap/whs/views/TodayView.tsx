@@ -92,7 +92,7 @@ export const TodayView: React.FC<Props> = ({
 
 
 
-      {!readOnly && <StreaksSheetMount />}
+      {/* StreaksSheetMount now lives at page level in HandicapPage. */}
       <LaunchSheetMount userId={userId} />
     </div>
   );
