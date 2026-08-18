@@ -22290,6 +22290,7 @@ export type Database = {
         Args: { p_target_business_id: string }
         Returns: undefined
       }
+      send_tour_sunday_push: { Args: never; Returns: number }
       send_user_ping: { Args: { p_recipient_id: string }; Returns: undefined }
       send_whs_connection_nudge: {
         Args: { p_recipient_id: string }
