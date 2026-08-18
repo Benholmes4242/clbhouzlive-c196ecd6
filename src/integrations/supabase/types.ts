@@ -21761,6 +21761,17 @@ export type Database = {
           venue_name: string
         }[]
       }
+      list_expired_verification_documents: {
+        Args: { p_limit?: number }
+        Returns: {
+          business_id: string
+          decided_at: string
+          document_path: string
+          request_id: string
+          retention_days: number
+          status: string
+        }[]
+      }
       log_user_achievement: {
         Args: { p_event: string; p_metadata: Json; p_user_id: string }
         Returns: undefined
@@ -21780,6 +21791,14 @@ export type Database = {
         Returns: string
       }
       mark_today_visited: { Args: never; Returns: undefined }
+      mark_verification_document_purged: {
+        Args: {
+          p_document_path: string
+          p_error?: string
+          p_request_id: string
+        }
+        Returns: undefined
+      }
       match_tour_rankings_players: { Args: never; Returns: undefined }
       match_whs_course_to_golf_course: {
         Args: { p_country_code?: string; p_whs_name: string }
@@ -23246,6 +23265,12 @@ export type Database = {
       }
       vault_decrypt_secret: { Args: { secret_id: string }; Returns: string }
       vault_delete_secret: { Args: { secret_id: string }; Returns: undefined }
+      verification_documents_referenced: {
+        Args: { p_paths: string[] }
+        Returns: {
+          document_path: string
+        }[]
+      }
       verify_domain_code: {
         Args: { p_code: string; p_verification_id: string }
         Returns: Json
