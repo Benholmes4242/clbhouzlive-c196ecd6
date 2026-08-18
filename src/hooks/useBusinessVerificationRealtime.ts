@@ -80,7 +80,7 @@ export function useAdminVerificationQueueRealtime() {
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'business_verification_reviews',
+          table: 'business_verification_approvals',
         },
         () => {
           queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
