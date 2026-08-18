@@ -12308,6 +12308,27 @@ export type Database = {
           },
         ]
       }
+      tour_push_rotation: {
+        Row: {
+          enabled: boolean
+          last_led_on: string | null
+          tour_full_name: string
+          tour_name: string
+        }
+        Insert: {
+          enabled?: boolean
+          last_led_on?: string | null
+          tour_full_name: string
+          tour_name: string
+        }
+        Update: {
+          enabled?: boolean
+          last_led_on?: string | null
+          tour_full_name?: string
+          tour_name?: string
+        }
+        Relationships: []
+      }
       tour_season_rankings: {
         Row: {
           country: string | null
