@@ -22,6 +22,8 @@ export interface BusinessVerificationRequest {
   domain_confirmed: boolean;
   contact_email: string | null;
   contact_role: string | null;
+  /** PHASE 3 signals object; read-only here, drives the evidence line. */
+  proof_metadata: unknown;
 }
 
 /**
@@ -36,7 +38,7 @@ export function useBusinessVerificationRequest(businessId: string | undefined) {
 
       const { data, error } = await supabase
         .from('business_verification_requests')
-        .select('id, business_id, status, requested_by, created_at, reviewed_at, admin_note, review_reason, requires_domain_check, domain, domain_confirmed, contact_email, contact_role')
+        .select('id, business_id, status, requested_by, created_at, reviewed_at, admin_note, review_reason, requires_domain_check, domain, domain_confirmed, contact_email, contact_role, proof_metadata')
         .eq('business_id', businessId)
         .order('created_at', { ascending: false })
         .limit(1)
