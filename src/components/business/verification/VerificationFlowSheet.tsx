@@ -200,7 +200,6 @@ export default function VerificationFlowSheet({
   }, [business?.email]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---- validation & DB helpers ----
-  const getProofData = () => {
   /**
    * Records WHAT THE APPLICANT ACTUALLY CHOSE. proof_value keeps the primary
    * identifying value; proof_metadata keeps the method's own fields as
