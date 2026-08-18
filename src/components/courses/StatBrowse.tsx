@@ -924,7 +924,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           </div>
         )
       ) : (
-        <div className="mt-4 -mx-4 space-y-2 sm:space-y-6">
+        <div className="mt-4 -mx-4">
           {rows.map((row, i) => {
             const model = fromStatBrowseRow(row);
             const rank = row.global_rank ?? row.regional_rank ?? null;

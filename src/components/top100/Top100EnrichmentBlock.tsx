@@ -45,7 +45,7 @@ export const Top100EnrichmentBlock: React.FC<Props> = ({
   if (!hasRating) return null;
 
   return (
-    <div className="px-3 sm:px-0" style={{ paddingTop: 8 }}>
+    <div className="px-3 sm:px-0" style={{ paddingTop: 8, paddingBottom: 12 }}>
       {verdict && courseName && (
         <div style={{ marginBottom: 6 }}>
           <Top100VerdictBand
