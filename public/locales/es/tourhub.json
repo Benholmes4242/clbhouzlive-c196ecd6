@@ -290,7 +290,8 @@
       "card": {
         "theCase": "The case ›",
         "pickLabel": "Pick {{rank}}",
-        "pickOf": "Elección {{n}} de {{total}}"
+        "pickOf": "Elección {{n}} de {{total}}",
+        "courseFitLabel": "Course fit"
       },
       "case": {
         "eyebrow": "The case for",
