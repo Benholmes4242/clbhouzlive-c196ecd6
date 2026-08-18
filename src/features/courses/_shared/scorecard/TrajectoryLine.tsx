@@ -432,6 +432,9 @@ export const TrajectoryLine: React.FC<Props> = ({
               cx={x(hover)}
               cy={y(hoveredScored.cum)}
               r={4}
+              // The dot is graded per HOLE (stroke against par). The figure is a
+              // RUNNING to-par total, so its tone is computed separately. Do NOT
+              // merge these two rules; each quantity is coloured by its own logic.
               fill={gradeFor(hoveredScored.d)}
               stroke={T.halo}
               strokeWidth={1.5}
