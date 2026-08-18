@@ -646,44 +646,58 @@ function DarkScoreBlock({ live }: { live: PickLiveState }) {
 }
 
 
-function CourseFitLine({
-  score,
-  t,
-  tone = 'light',
-}: {
-  score: number | null | undefined;
-  t: TFunction;
-  tone?: 'light' | 'dark';
-}) {
-  if (score == null) return <div style={{ height: 16 }} />;
+/**
+ * CourseFitBar — the fit is PERMANENT now, not a slot that the verdict evicts.
+ * It sits flush at the bottom edge of the scrim band: a label/figure row, then a
+ * 3px FULL-BLEED track with square ends. It is an edge, not a pill.
+ *
+ * NULL RENDERS NOTHING AT ALL — no track, no 0% fill, no placeholder, no
+ * reserved height. The photograph simply ends. (CourseFitLine's old
+ * `return <div style={{ height: 16 }} />` is exactly the pattern removed here.)
+ */
+function CourseFitBar({ score, t }: { score: number | null | undefined; t: TFunction }) {
+  if (score == null) return null;
   return (
-    <div
-      style={{
-        fontSize: 10,
-        fontWeight: 700,
-        color: tone === 'dark' ? 'rgba(255,255,255,0.72)' : INK_45,
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        fontVariantNumeric: 'tabular-nums',
-        flexShrink: 0,
-      }}
-    >
-
-      {t('overview.tiPicks.card.courseFit', { score: Math.round(score) })
-        .split(String(Math.round(score)))
-        .map((part, i, arr) =>
-          i === arr.length - 1 ? (
-            <span key={i}>{part}</span>
-          ) : (
-            <span key={i}>
-              {part}
-              <span style={{ color: AMBER }}>{Math.round(score)}</span>
-            </span>
-          ),
-        )}
+    <div aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          padding: '0 15px 6px',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 8.5,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.62)',
+          }}
+        >
+          {t('overview.tiPicks.card.courseFitLabel')}
+        </span>
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: AMBER,
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+        >
+          {Math.round(score)}
+        </span>
+      </div>
+      <div style={{ height: 3, background: 'rgba(255,255,255,0.16)' }}>
+        {/* WIDTH uses the UNROUNDED value; only the figure rounds. */}
+        <div style={{ height: '100%', width: `${Math.max(0, Math.min(100, score))}%`, background: FIT_FILL }} />
+      </div>
     </div>
   );
 }
+
 
 // ---- Sheet shell ----
 
