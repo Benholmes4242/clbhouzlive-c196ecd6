@@ -196,9 +196,27 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
         >
           <SectionShell
             eyebrow={t('overview.tiPicks.eyebrow')}
-            subline={t('overview.tiPicks.subline')}
-            onHeaderClick={() => setSheet({ kind: 'index' })}
           >
+            <button
+              type="button"
+              onClick={() => setSheet({ kind: 'index' })}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                width: '100%',
+                height: 44,
+                padding: '0 16px',
+                marginBottom: -12,
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
+                {t('overview.tiPicks.subline')}
+              </span>
+            </button>
             <div
               style={{
                 display: 'flex',
@@ -213,6 +231,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                 scrollSnapType: 'x mandatory',
               }}
             >
+
 
               {picks.slice(0, 8).map((p) => {
                 const live = liveMap?.[p.playerId];
