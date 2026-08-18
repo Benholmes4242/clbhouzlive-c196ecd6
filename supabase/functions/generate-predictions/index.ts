@@ -1057,10 +1057,15 @@ ${researchResults[3]?.trim() || 'No weather forecast available.'}
         },
         research_context: researchContext ? { raw: researchContext, fetched_at: new Date().toISOString() } : null,
         generated_at: new Date().toISOString(),
-        expires_at: new Date(tournament.start_date).toISOString(),
-      }, {
-        onConflict: 'tournament_id',
+        expires_at: new Date(tournament.end_date + 'T00:00:00Z').getTime() + 24 * 60 * 60 * 1000 === new Date(tournament.end_date + 'T00:00:00Z').getTime()
+          ? new Date(tournament.end_date).toISOString()
+          : (() => {
+            const d = new Date(tournament.end_date + 'T00:00:00Z');
+            d.setUTCDate(d.getUTCDate() + 1);
+            return d.toISOString();
+          })(),
       });
+
 
     if (upsertError) {
       console.error('[generate-predictions] Failed to store:', upsertError);
