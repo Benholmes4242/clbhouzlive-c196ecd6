@@ -42,6 +42,9 @@ const AMBER = '#F7931E';
 const AMBER_DEEP = '#C2620A';
 const GREEN_BG = '#DCFCE7';
 const GREEN_TX = '#166534';
+/** the record line's green on the scrim band; GREEN_TX is a light-surface value
+ *  and fails here */
+const GREEN_ON_DARK = '#5BD98D';
 const RED_BG = '#FEE2E2';
 const RED_TX = '#B91C1C';
 const GOLD_BG = 'linear-gradient(135deg,#FDE68A 0%,#F7931E 100%)';
@@ -183,8 +186,14 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
             linkLabel={t('overview.tiPicks.linkLabel')}
             onLinkClick={() => setSheet({ kind: 'index' })}
           >
-            <div style={{ padding: '0 16px 10px', fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-              {t('overview.tiPicks.subline')}
+            <div style={{ padding: '0 16px 10px' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
+                {t('overview.tiPicks.subline')}
+              </div>
+              {/* Explainer - prose, not a link. No CTA, no chevron. */}
+              <div style={{ fontSize: 11.5, fontWeight: 400, color: V4.inkMute, lineHeight: 1.45, marginTop: 6 }}>
+                {t('overview.tiPicks.explainer')}
+              </div>
             </div>
             <div
               style={{
@@ -438,8 +447,10 @@ function PickScrimBand({
   objectPosition?: string;
   /**
    * TONE — a variant, not a fork (same pattern as TrajectoryLine's `surface`).
-   * 'light' fades to the sheet's #FFFFFF and is what BOTH sheets use.
-   * 'dark' keeps the photograph and gives white text a floor; the TILE only.
+   * 'dark' keeps the photograph and gives white text a floor. The TILE and
+   * BOTH SHEETS use it - one chain, hero to tile to sheet. 'light' is now
+   * unused by any caller; it is kept because the band is a shared primitive
+   * and a surface that opens on a light photo may need it again.
    */
   tone?: 'light' | 'dark';
 }) {
@@ -750,6 +761,7 @@ function SheetShell({
               objectPosition={scrim.objectPosition}
               padding="14px 20px 12px"
               grabber
+              tone="dark"
             >
               {header}
             </PickScrimBand>
@@ -835,7 +847,7 @@ function CaseSheet({
             alt={pick.playerName}
             userId={pick.playerId}
             hairlineRing
-            ringColor={LIGHT_HAIRLINE}
+            ringColor="rgba(255,255,255,0.55)"
           />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -844,7 +856,7 @@ function CaseSheet({
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                color: INK,
+                color: '#FFFFFF',
                 margin: 0,
                 letterSpacing: '-0.024em',
                 lineHeight: 1.12,
@@ -867,7 +879,7 @@ function CaseSheet({
               fontWeight: 700,
               letterSpacing: '-0.01em',
               fontVariantNumeric: 'tabular-nums',
-              color: headScore < 0 ? TOPAR_UNDER_LIGHT : headScore > 0 ? INK : INK_60,
+              color: headScore < 0 ? TOPAR_UNDER_DARK : headScore > 0 ? '#FFFFFF' : 'rgba(255,255,255,0.70)',
             }}
           >
             {formatTiScore(headScore)}
@@ -1368,7 +1380,7 @@ function AllPicksSheet({
           style={{
             fontSize: 10,
             fontWeight: 700,
-            color: INK,
+            color: 'rgba(255,255,255,0.82)',
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             marginBottom: 5,
@@ -1378,7 +1390,7 @@ function AllPicksSheet({
           {t('overview.tiPicks.eyebrow')}
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
-          <div style={{ fontSize: 25, fontWeight: 700, color: INK, letterSpacing: '-0.02em', lineHeight: 1.02 }}>
+          <div style={{ fontSize: 25, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.02 }}>
             {t('overview.tiPicks.board.titleCount', { count: total })}
           </div>
           {showRecord ? (
@@ -1388,7 +1400,7 @@ function AllPicksSheet({
                 fontWeight: 700,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                color: recordGood ? GREEN_TX : INK_45,
+                color: recordGood ? GREEN_ON_DARK : 'rgba(255,255,255,0.70)',
                 fontVariantNumeric: 'tabular-nums',
                 textAlign: 'right',
                 flexShrink: 0,
