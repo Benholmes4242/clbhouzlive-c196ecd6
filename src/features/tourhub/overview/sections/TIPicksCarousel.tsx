@@ -267,8 +267,13 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                       candidates={scrimCandidates}
                       tone="dark"
                       minHeight={168}
-                      padding="12px 15px 13px"
+                      // THE BAND'S BOTTOM PADDING opens to 34 when the fit bar
+                      // renders, so the reason text never collides with it. A null
+                      // score keeps 13 — nothing reserved, no gap.
+                      padding={p.courseFitScore == null ? '12px 15px 13px' : '12px 15px 34px'}
+                      footBar={<CourseFitBar score={p.courseFitScore} t={t} />}
                     >
+
                       <div
                         style={{
                           display: 'flex',
