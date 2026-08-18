@@ -12,6 +12,7 @@ import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
 import type { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
 import { useAIPredictions, type AITopContender } from '../../hooks/useAIPredictions';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
