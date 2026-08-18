@@ -1579,19 +1579,10 @@ function AllPicksSheet({
           );
         })}
 
-        <div
-          style={{
-            marginTop: 22,
-            paddingTop: 14,
-            borderTop: `1px solid ${HAIR}`,
-            fontSize: 12,
-            fontWeight: 600,
-            color: A.BODY,
-            lineHeight: 1.5,
-          }}
-        >
-          {t('overview.tiPicks.board.methodology')}
-        </div>
+        {/* THE METHOD, below the picks. The subject is the picks; the method is
+            what a member reads once they want to know whether to believe them. */}
+        <TIMethodSection t={t} />
+
       </div>
     </SheetShell>
   );
