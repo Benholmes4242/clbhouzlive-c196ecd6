@@ -302,8 +302,8 @@ export function RoundShape({
 
         {/* THE BEADS come from the SHARED beadForScore rule, positioned on the
             CUMULATIVE value AFTER the hole — identical tones and radii to the
-            scorecard sheet (BRIEF_UNIFY_ROUND_CURVE_BEADS §2). GOLD NOW APPEARS
-            ON THE CURVE for an ace or albatross. */}
+            scorecard sheet. GOLD ONLY. Every other outcome is carried by the
+            graded stroke. */}
         {beads.map((b) =>
           pts[b.i] ? (
             <circle
