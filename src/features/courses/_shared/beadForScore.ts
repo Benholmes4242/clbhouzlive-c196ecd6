@@ -1,24 +1,32 @@
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
-import { TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT } from '@/features/tourhub/_shared/tokens';
 
 /**
- * beadForScore — the ONE trajectory-bead rule (CORRECTION_ONE_SCORING_MARK §5).
+ * beadForScore — the ONE trajectory-bead rule.
  *
- * Shared by the sheet trajectory (scorecard/TrajectoryLine) and the Clubhouse
- * feed trajectory (PostRoundCard) so identical scores plot identically.
+ *   ace / albatross   solid GOLD bead
+ *   EVERYTHING ELSE   no bead
  *
- *   ace / albatross   solid GOLD bead, larger
- *   eagle             red bead, larger
- *   birdie            red bead
- *   par               no bead
- *   bogey             NO BEAD (deliberate — see §5b)
- *   double or worse   over-par ink bead, surface-dependent
+ * BEADS MARK THE EXTRAORDINARY; COLOUR MARKS THE ORDINARY. Both curves that use
+ * this are GRADED HOLE BY HOLE — gradeFor() in scorecard/TrajectoryLine and
+ * courseled/RoundShape paints each hole's segment red under par, the even tone
+ * at par, mute at bogey and ink at double-or-worse. A red bead on a red segment
+ * and an ink bead on an ink segment were the same fact drawn twice.
  *
- * Concessions to a ~4px bead: an eagle is a larger red bead (not concentric
- * rings) and an ace/albatross is a solid gold bead (not a gold ring). The
- * 26px card mark keeps the ring — same grammar, adapted to the space.
+ * WHY GOLD SURVIVES: gradeFor returns UNDER_TONE for anything d <= -1, so an
+ * ace, an albatross, an eagle and a birdie all render as the SAME red segment.
+ * The stroke genuinely cannot distinguish them. Gold also is not a to-par colour
+ * at all — SC_FILL_GOLD is broadcast gold, a separate family — so it does not
+ * compete with the ramp the stroke is using.
+ *
+ * WHY EAGLES DO NOT: a good player makes several a season, and a bead that
+ * appears a few times a round stops reading as an event and starts reading as
+ * chart furniture, which is the thing this change removes. The eagle is in the
+ * scorecard for anyone who wants the inventory.
+ *
+ * THE CONSUMERS ARE TWO: TrajectoryLine (which serves the scorecard sheet AND
+ * the Clubhouse feed — feed/PostRoundCard renders TrajectoryLine itself, so it
+ * is not a third implementation) and useRoundHoleShapes (the Discover tile).
  */
-
 export const BEAD_OVER_DARK = '#F2F4F7';
 
 export interface Bead {
@@ -29,16 +37,14 @@ export interface Bead {
 export function beadForScore(
   strokes: number | null | undefined,
   par: number | null | undefined,
-  surface: 'light' | 'dark' = 'light',
+  /** UNUSED: gold reads the same on light and dark. KEPT DELIBERATELY — both
+   *  call sites pass it, and it is the seam where a dark variant would return
+   *  if one is ever needed. */
+  _surface: 'light' | 'dark' = 'light',
 ): Bead | null {
   if (strokes == null || par == null || strokes <= 0) return null;
   const d = strokes - par;
   if (strokes === 1 || d <= -3) return { tone: SC_FILL_GOLD, radius: 5 };
-  if (d === -2) return { tone: TOPAR_UNDER_LIGHT, radius: 5 };
-  if (d === -1) return { tone: TOPAR_UNDER_LIGHT, radius: 3.6 };
-  if (d >= 2) {
-    return { tone: surface === 'dark' ? BEAD_OVER_DARK : TOPAR_OVER_LIGHT, radius: 3.6 };
-  }
   return null;
 }
 
