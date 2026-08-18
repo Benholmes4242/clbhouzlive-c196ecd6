@@ -1592,65 +1592,6 @@ export type Database = {
           },
         ]
       }
-      business_verification_events: {
-        Row: {
-          action: string
-          actor_user_id: string | null
-          business_profile_id: string
-          created_at: string
-          id: string
-          metadata: Json | null
-          reason: string | null
-        }
-        Insert: {
-          action: string
-          actor_user_id?: string | null
-          business_profile_id: string
-          created_at?: string
-          id?: string
-          metadata?: Json | null
-          reason?: string | null
-        }
-        Update: {
-          action?: string
-          actor_user_id?: string | null
-          business_profile_id?: string
-          created_at?: string
-          id?: string
-          metadata?: Json | null
-          reason?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "business_verification_events_business_profile_id_fkey"
-            columns: ["business_profile_id"]
-            isOneToOne: false
-            referencedRelation: "gam_friend_handicap_leaderboard_view"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "business_verification_events_business_profile_id_fkey"
-            columns: ["business_profile_id"]
-            isOneToOne: false
-            referencedRelation: "public_golfer_blurbs"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "business_verification_events_business_profile_id_fkey"
-            columns: ["business_profile_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "business_verification_events_business_profile_id_fkey"
-            columns: ["business_profile_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       business_verification_requests: {
         Row: {
           admin_note: string | null
@@ -1736,41 +1677,6 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "business_accounts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      business_verification_reviews: {
-        Row: {
-          created_at: string
-          decision: string
-          id: string
-          note: string | null
-          request_id: string
-          reviewer_id: string
-        }
-        Insert: {
-          created_at?: string
-          decision: string
-          id?: string
-          note?: string | null
-          request_id: string
-          reviewer_id: string
-        }
-        Update: {
-          created_at?: string
-          decision?: string
-          id?: string
-          note?: string | null
-          request_id?: string
-          reviewer_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "business_verification_reviews_request_id_fkey"
-            columns: ["request_id"]
-            isOneToOne: false
-            referencedRelation: "business_verification_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -21765,12 +21671,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
-      invite_golfer_to_verification:
-        | { Args: { _note?: string; _user_id: string }; Returns: string }
-        | {
-            Args: { _invite_reason?: string; _note?: string; _user_id: string }
-            Returns: string
-          }
+      invite_golfer_to_verification: {
+        Args: { _invite_reason?: string; _note?: string; _user_id: string }
+        Returns: string
+      }
       is_admin: { Args: never; Returns: boolean }
       is_business_owner:
         | { Args: { _business_id: string }; Returns: boolean }
@@ -22239,20 +22143,15 @@ export type Database = {
         Returns: undefined
       }
       refresh_whs_handicap_distribution: { Args: never; Returns: undefined }
-      reinvite_golfer_verification_request:
-        | {
-            Args: { p_admin_id: string; p_note?: string; p_request_id: string }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_admin_id: string
-              p_invite_reason?: string
-              p_note?: string
-              p_request_id: string
-            }
-            Returns: Json
-          }
+      reinvite_golfer_verification_request: {
+        Args: {
+          p_admin_id: string
+          p_invite_reason?: string
+          p_note?: string
+          p_request_id: string
+        }
+        Returns: Json
+      }
       reject_business_verification: {
         Args: {
           _admin_note: string
@@ -22324,25 +22223,19 @@ export type Database = {
         Args: { _admin_note: string; _request_id: string }
         Returns: undefined
       }
-      reset_golfer_verification_test_user: {
-        Args: { p_user_id: string }
-        Returns: undefined
-      }
       reset_watch_personalization: {
         Args: { p_user_id: string }
         Returns: undefined
       }
-      revoke_business_verification:
-        | { Args: { _business_id: string; _reason?: string }; Returns: Json }
-        | {
-            Args: {
-              p_admin_id: string
-              p_business_id: string
-              p_bypass_cooldown?: boolean
-              p_reason?: string
-            }
-            Returns: undefined
-          }
+      revoke_business_verification: {
+        Args: {
+          p_admin_id: string
+          p_business_id: string
+          p_bypass_cooldown?: boolean
+          p_reason?: string
+        }
+        Returns: undefined
+      }
       rotate_championship_seasons: { Args: never; Returns: undefined }
       rpc_explore_trending: {
         Args: { p_limit?: number; p_region_key?: string }
@@ -23069,21 +22962,6 @@ export type Database = {
         Returns: unknown
       }
       stat_browse_total_categories: { Args: never; Returns: number }
-      submit_business_verification_review:
-        | {
-            Args: { _decision: string; _note?: string; _request_id: string }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_bypass_cooldown?: boolean
-              p_decision: string
-              p_note?: string
-              p_request_id: string
-              p_reviewer_id: string
-            }
-            Returns: Json
-          }
       submit_course_review_v2: {
         Args: {
           p_clubhouse: number
