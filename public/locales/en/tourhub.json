@@ -368,6 +368,44 @@
       "live": {
         "thru": "THRU {{n}}",
         "finished": "F"
+      },
+      "method": {
+        "heading": "How we pick",
+        "lede": "Our AI reads the field before play begins. It weighs historical performance at the course, current form, injury news, weather and player stats such as driving distance, accuracy and short game, to project its picks for the week.",
+        "playerLabel": "The player",
+        "playerItems": [
+          "Driving distance",
+          "Driving accuracy",
+          "Greens in regulation",
+          "Scrambling",
+          "Putting",
+          "Strokes gained: off the tee",
+          "Strokes gained: approach",
+          "Strokes gained: around the green",
+          "Strokes gained: putting",
+          "Strokes gained: total",
+          "Birdies per round",
+          "Scoring average"
+        ],
+        "courseLabel": "The course",
+        "courseItems": [
+          "Five years of results here",
+          "What has actually won at this venue",
+          "Par, length and course type"
+        ],
+        "weekLabel": "This week",
+        "weekItems": [
+          "Form over the last four events",
+          "Confirmed withdrawals and injuries",
+          "Wind and rain forecast",
+          "Strength of the field"
+        ],
+        "rules": [
+          "Locked before the first tee",
+          "Never edited",
+          "Graded on the final leaderboard"
+        ],
+        "closing": "Tournament Intelligence is analysis, not advice."
       }
     },
     "collegeFranchise": {
