@@ -205,7 +205,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                 alignItems: 'flex-start',
                 width: '100%',
                 height: 44,
-                padding: '0 16px',
+                padding: '1.5px 16px 0',
                 marginBottom: -12,
                 background: 'transparent',
                 border: 'none',
@@ -213,6 +213,7 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                 textAlign: 'left',
               }}
             >
+
               <span style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
                 {t('overview.tiPicks.subline')}
               </span>
