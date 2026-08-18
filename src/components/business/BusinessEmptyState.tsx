@@ -34,6 +34,7 @@ import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { usePlatformReach } from '@/hooks/usePlatformReach';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { BUSINESS_CATEGORIES } from '@/types/profile';
+import VerificationCriteriaLink from '@/components/business/verification/VerificationCriteriaLink';
 // HERO (§3.4) — a range at dusk, NOT a course: a links clubhouse said "venues".
 import heroPhoto from '@/assets/business/driving-range.webp.asset.json';
 import clubPhoto from '@/assets/business/club-green.webp.asset.json';
@@ -476,6 +477,11 @@ export function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
             </div>
           </div>
         ))}
+        {/* §3.3 — verification is decided before a profile exists, so the bar is
+            readable here too. */}
+        <div style={{ borderTop: `1px solid ${A.BORDER}`, paddingTop: 6 }}>
+          <VerificationCriteriaLink tone="mute" />
+        </div>
       </div>
 
       {/* ── STICKY CTA — the only filled button on the page ── */}
