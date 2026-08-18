@@ -96,7 +96,7 @@ function Figure({
   );
 }
 
-export default function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
+export function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
   const { i18n } = useTranslation();
   const locale = i18n.language || 'en';
   const { data: reach, isLoading } = usePlatformReach();
@@ -232,3 +232,5 @@ export default function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps
     </div>
   );
 }
+
+export default BusinessEmptyState;
