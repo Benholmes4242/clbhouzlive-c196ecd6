@@ -1588,14 +1588,26 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
 
   const newTopUser = arr[0]?.user_id ?? null;
   if (newTopUser !== prevTopUser) {
+    // Course name is needed by BOTH sides (legend_lost and legend_earned), so
+    // it is resolved once here. golf_courses ONLY — never read
+    // whs_friends/whs_friend_matches, those hold England Golf PII. Degrades to
+    // null so the dispatcher can fall back to generic copy; a failed lookup
+    // must never abort a crowning.
+    let courseName: string | null = null;
+    try {
+      const { data: course } = await supabase
+        .from('golf_courses')
+        .select('name')
+        .eq('id', courseId)
+        .maybeSingle();
+      courseName = course?.name?.trim() || null;
+    } catch { /* non-fatal */ }
+
     if (prevTopUser) {
       if (newTopUser) {
-        // Look up taker display name + course name from user_profiles /
-        // golf_courses ONLY. Never read whs_friends/whs_friend_matches — those
-        // hold England Golf PII. Both lookups degrade gracefully to null so
-        // the dispatcher can fall back to generic copy.
+        // Look up taker display name from user_profiles ONLY. Same PII rule as
+        // above; degrades to null. Loser side only — meaningless to the gainer.
         let takerName: string | null = null;
-        let courseName: string | null = null;
         try {
           const { data: takerProfile } = await supabase
             .from('user_profiles')
@@ -1603,14 +1615,6 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
             .eq('id', newTopUser)
             .maybeSingle();
           takerName = (takerProfile?.display_name?.trim() || takerProfile?.username?.trim() || null);
-        } catch { /* non-fatal */ }
-        try {
-          const { data: course } = await supabase
-            .from('golf_courses')
-            .select('name')
-            .eq('id', courseId)
-            .maybeSingle();
-          courseName = course?.name?.trim() || null;
         } catch { /* non-fatal */ }
 
         // NOTE: the DB trigger gam_legend_pulse_emit (on gam_course_legends
@@ -1631,7 +1635,12 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
       await recomputeLegendTitles(prevTopUser);
     }
     if (newTopUser) {
-      await enqueueNotification(newTopUser, "legend_earned", { course_id: courseId, category: cfg.category });
+      await enqueueNotification(newTopUser, "legend_earned", {
+        course_id: courseId,
+        category: cfg.category,
+        course_name: courseName,
+      });
+
       // Gainer side: single code path for the tiered badge + milestone.
       await recomputeLegendTitles(newTopUser);
     }
