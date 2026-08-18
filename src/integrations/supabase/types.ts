@@ -22328,6 +22328,7 @@ export type Database = {
         Returns: undefined
       }
       send_tour_sunday_push: { Args: never; Returns: number }
+      send_tour_thursday_push: { Args: never; Returns: number }
       send_user_ping: { Args: { p_recipient_id: string }; Returns: undefined }
       send_whs_connection_nudge: {
         Args: { p_recipient_id: string }
