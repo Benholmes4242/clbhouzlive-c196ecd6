@@ -110,6 +110,8 @@ export default function VerificationFlowSheet({
   const [proofWebsiteUrl, setProofWebsiteUrl] = useState('');
   const [proofEmail, setProofEmail] = useState('');
   const [proofRegistry, setProofRegistry] = useState('');
+  const [proofRegistryName, setProofRegistryName] = useState('');
+
   const [proofCompanyNumber, setProofCompanyNumber] = useState('');
   const [proofRegistryUrl, setProofRegistryUrl] = useState('');
   const [creatorContactType, setCreatorContactType] = useState<'email' | 'phone'>('email');
@@ -159,6 +161,7 @@ export default function VerificationFlowSheet({
     setProofWebsiteUrl('');
     setProofEmail('');
     setProofRegistry('');
+    setProofRegistryName('');
     setProofCompanyNumber('');
     setProofRegistryUrl('');
     setCreatorContactType('email');
@@ -198,14 +201,23 @@ export default function VerificationFlowSheet({
   }, [business?.email]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---- validation & DB helpers ----
+  /**
+   * Records WHAT THE APPLICANT ACTUALLY CHOSE. proof_value keeps the primary
+   * identifying value; proof_metadata keeps the method's own fields as
+   * structured JSON, so useProofConflict compares like with like.
+   */
   const getProofData = () => {
     switch (selectedProof) {
       case 'official_website':
-        return { proof_value: proofWebsiteUrl.trim(), proof_metadata: {} as Record<string, unknown> };
+        return {
+          proof_value: proofWebsiteUrl.trim(),
+          proof_metadata: { website_url: proofWebsiteUrl.trim() } as Record<string, unknown>,
+        };
       case 'business_email':
         return {
           proof_value: proofEmail.trim(),
           proof_metadata: {
+            email: proofEmail.trim(),
             email_verified: otpEmailVerified,
           } as Record<string, unknown>,
         };
@@ -213,21 +225,31 @@ export default function VerificationFlowSheet({
         return {
           proof_value: proofCompanyNumber.trim() || proofRegistryUrl.trim(),
           proof_metadata: {
-            registry: proofRegistry,
+            registry_type: proofRegistry,
+            registry_name: proofRegistryName.trim() || null,
+            registration_number: proofCompanyNumber.trim() || null,
             registry_url: proofRegistryUrl.trim() || null,
           } as Record<string, unknown>,
         };
       case 'creator_business':
         return {
           proof_value: creatorContactType === 'email' ? creatorEmail.trim() : creatorPhone.trim(),
-          proof_metadata: { contact_type: creatorContactType } as Record<string, unknown>,
+          proof_metadata: {
+            contact_type: creatorContactType,
+            email: creatorContactType === 'email' ? creatorEmail.trim() : null,
+            phone: creatorContactType === 'phone' ? creatorPhone.trim() : null,
+          } as Record<string, unknown>,
         };
       case 'golf_course':
-        return { proof_value: golfCourseWebsite.trim(), proof_metadata: {} as Record<string, unknown> };
+        return {
+          proof_value: golfCourseWebsite.trim(),
+          proof_metadata: { website_url: golfCourseWebsite.trim() } as Record<string, unknown>,
+        };
       default:
         return { proof_value: '', proof_metadata: {} as Record<string, unknown> };
     }
   };
+
 
   const proofIsValid = useMemo(() => {
     if (!selectedProof) return false;
@@ -610,10 +632,10 @@ export default function VerificationFlowSheet({
                   <div style={{ ...bizFigure(19), marginTop: 6 }}>2 min</div>
                 </div>
                 <div className="text-center" style={{ minWidth: 0 }}>
-                  <div style={BIZ_LABEL}>We review in</div>
-                  {/* No SLA exists in the codebase - the existing prose stands rather than
-                      inventing a number the business would be held to. */}
-                  <div style={{ ...bizFigure(15), marginTop: 8 }}>A few days</div>
+                  <div style={BIZ_LABEL}>Reviewed</div>
+                  {/* NO SLA EXISTS. The flow says what is true - a person reads every
+                      request - rather than inventing a number nobody committed to. */}
+                  <div style={{ ...bizFigure(15), marginTop: 8 }}>By hand</div>
                 </div>
               </div>
 
@@ -853,10 +875,10 @@ export default function VerificationFlowSheet({
                             )}
                             {option.id === 'registered_business' && (
                               <div className="space-y-3">
-                                <FieldGroup label="Register">
+                                <FieldGroup label="Type of registration">
                                   <Select value={proofRegistry} onValueChange={setProofRegistry}>
                                     <SelectTrigger>
-                                      <SelectValue placeholder="Select register" />
+                                      <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {REGISTRY_OPTIONS.map((opt) => (
@@ -867,11 +889,20 @@ export default function VerificationFlowSheet({
                                     </SelectContent>
                                   </Select>
                                 </FieldGroup>
-                                <FieldGroup label="Company / registration number">
+                                {/* The applicant names their OWN registry - no jurisdiction is
+                                    assumed, so any country's register describes cleanly. */}
+                                <FieldGroup label="Name of register or authority">
+                                  <Input
+                                    value={proofRegistryName}
+                                    onChange={(e) => setProofRegistryName(e.target.value)}
+                                    placeholder="e.g. your national company register"
+                                  />
+                                </FieldGroup>
+                                <FieldGroup label="Registration number">
                                   <Input
                                     value={proofCompanyNumber}
                                     onChange={(e) => setProofCompanyNumber(e.target.value)}
-                                    placeholder="12345678"
+                                    placeholder="As it appears on your registration"
                                   />
                                 </FieldGroup>
                                 <FieldGroup
@@ -893,6 +924,7 @@ export default function VerificationFlowSheet({
                                 </FieldGroup>
                               </div>
                             )}
+
                             {option.id === 'creator_business' && (
                               <div className="space-y-3">
                                 <div className="flex gap-2">
@@ -932,7 +964,7 @@ export default function VerificationFlowSheet({
                                     <Input
                                       value={creatorPhone}
                                       onChange={(e) => setCreatorPhone(e.target.value)}
-                                      placeholder="+44 7xxx xxxxxx"
+                                      placeholder="Include your country code"
                                       type="tel"
                                     />
                                   </FieldGroup>
@@ -1107,7 +1139,7 @@ export default function VerificationFlowSheet({
                     </Select>
                     {role === 'owner' && (
                       <p style={{ ...BIZ_LABEL, fontSize: 7.5, color: A.MUTE, margin: '6px 0 0' }}>
-                        Owners are typically verified fastest.
+                        Owners can usually answer our questions fastest.
                       </p>
                     )}
                   </FieldGroup>
@@ -1280,8 +1312,7 @@ function ConfirmationView({
         Request submitted
       </h2>
       <p className="text-[14px] max-w-xs mx-auto" style={{ color: BIZ.inkMute }}>
-        We'll review your request, usually within a few days, and let you know by notification
-        and email.
+        We review every request by hand, and let you know by notification and email.
       </p>
       <div
         className="mt-6 mx-auto max-w-xs rounded-2xl p-4 text-left"
