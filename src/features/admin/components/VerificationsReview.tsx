@@ -28,14 +28,8 @@ function relTime(iso: string | null | undefined): string {
   catch { return '-'; }
 }
 
-const PROOF_LABELS: Record<string, string> = {
-  official_website: 'Official website',
-  business_email: 'Business email',
-  registered_business: 'Registered business',
-  creator_business: 'Creator / brand',
-  golf_course: 'Golf course / facility',
-};
-
+/* PROOF_LABELS retired in Phase 4: the drawer names signals, not proof methods.
+   PROOF_NOUNS survives because the duplicate warning still names the evidence. */
 const PROOF_NOUNS: Record<string, string> = {
   official_website: 'website',
   business_email: 'email address',

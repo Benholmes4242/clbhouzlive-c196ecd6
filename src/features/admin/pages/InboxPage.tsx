@@ -27,6 +27,7 @@ import { panelCan } from '@/lib/panelCan';
 import { supabase } from '@/integrations/supabase/client';
 import { useVerifications, type VerificationRow } from '../hooks/useVerifications';
 import { VerificationDetailBody } from '../components/VerificationsReview';
+import { reasonRequiresNote, type ReviewReason } from '@/components/business/verification/reviewReasons';
 import type { ModerationQueueRow } from '../hooks/useModerationQueue';
 import type { AppealRow } from '../hooks/useAppeals';
 import type { AdminRequestRow } from '../hooks/useAdminActionRequests';
@@ -560,16 +561,20 @@ function VerificationInboxSheet({ row, onClose }: { row: VerificationRow | null;
   const { reviewMutation } = useVerifications();
   const [note, setNote] = useState('');
   const [decision, setDecision] = useState<'approved' | 'rejected' | 'needs_more_info' | null>(null);
-  useEffect(() => { if (!row) { setNote(''); setDecision(null); } }, [row]);
+  // PHASE 4 §3.2 — the same gate as the Verifications tab: a refusal carries a reason.
+  const [reviewReason, setReviewReason] = useState<ReviewReason | null>(null);
+  useEffect(() => { if (!row) { setNote(''); setDecision(null); setReviewReason(null); } }, [row]);
 
   if (!row) return null;
 
+  const refusalReady = !!reviewReason && (!reasonRequiresNote(reviewReason) || note.trim().length >= 3);
+
   const submit = (d: 'approved' | 'rejected' | 'needs_more_info') => {
-    if (d !== 'approved' && note.trim().length < 3) { setDecision(d); return; }
+    if (d !== 'approved' && !refusalReady) { setDecision(d); return; }
     if (row.type === 'golfer' && d === 'needs_more_info') return;
     reviewMutation.mutate(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { id: row.id, type: row.type, decision: d as any, adminNote: note },
+      { id: row.id, type: row.type, decision: d as any, adminNote: note, reviewReason: d === 'approved' ? null : reviewReason },
       { onSuccess: onClose },
     );
   };
@@ -590,7 +595,7 @@ function VerificationInboxSheet({ row, onClose }: { row: VerificationRow | null;
           {row.type !== 'golfer' && (
             <button
               onClick={() => submit('needs_more_info')}
-              disabled={reviewMutation.isPending || note.trim().length < 3}
+              disabled={reviewMutation.isPending || !refusalReady}
               style={btnGhost()}
             >
               Needs info
@@ -598,7 +603,7 @@ function VerificationInboxSheet({ row, onClose }: { row: VerificationRow | null;
           )}
           <button
             onClick={() => submit('rejected')}
-            disabled={reviewMutation.isPending || note.trim().length < 3}
+            disabled={reviewMutation.isPending || !refusalReady}
             style={btnGhost()}
           >
             Reject
@@ -613,7 +618,14 @@ function VerificationInboxSheet({ row, onClose }: { row: VerificationRow | null;
         </div>
       }
     >
-      <VerificationDetailBody row={row} note={note} setNote={setNote} decision={decision} />
+      <VerificationDetailBody
+        row={row}
+        note={note}
+        setNote={setNote}
+        decision={decision}
+        reviewReason={reviewReason}
+        setReviewReason={setReviewReason}
+      />
     </AdminSheet>
   );
 }
