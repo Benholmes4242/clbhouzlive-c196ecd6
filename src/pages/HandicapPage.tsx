@@ -423,6 +423,24 @@ const HandicapPage: React.FC = () => {
     return () => clearTimeout(id);
   }, [searchParams, setSearchParams, ownerUserId]);
 
+  // Deep-link: ?gam=streaks opens the Streaks sheet once on arrival. Same
+  // shape as the trophies effect: the setTimeout(0) lets StreaksSheetMount's
+  // subscription effect run before the emit in the same commit, and the
+  // ownerUserId gate is the mount precondition.
+  useEffect(() => {
+    if (searchParams.get('gam') !== 'streaks') return;
+    if (!ownerUserId) return;
+    const id = setTimeout(() => {
+      openAllStreaks();
+      const next = new URLSearchParams(searchParams);
+      next.delete('gam');
+      setSearchParams(next, { replace: true });
+    }, 0);
+    return () => clearTimeout(id);
+  }, [searchParams, setSearchParams, ownerUserId]);
+
+
+
 
 
   // Fetch profile for greeting/title.
