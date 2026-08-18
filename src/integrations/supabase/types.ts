@@ -1560,6 +1560,38 @@ export type Database = {
           },
         ]
       }
+      business_verification_approvals: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          request_id: string
+          reviewer_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          request_id: string
+          reviewer_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          request_id?: string
+          reviewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_verification_approvals_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "business_verification_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_verification_events: {
         Row: {
           action: string
@@ -1639,6 +1671,7 @@ export type Database = {
           requested_by: string
           required_approvals: number
           requires_domain_check: boolean
+          review_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
@@ -1664,6 +1697,7 @@ export type Database = {
           requested_by: string
           required_approvals?: number
           requires_domain_check?: boolean
+          review_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -1689,6 +1723,7 @@ export type Database = {
           requested_by?: string
           required_approvals?: number
           requires_domain_check?: boolean
+          review_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -17857,8 +17892,8 @@ export type Database = {
         Returns: undefined
       }
       approve_business_verification: {
-        Args: { _request_id: string }
-        Returns: undefined
+        Args: { _admin_note?: string; _request_id: string }
+        Returns: Json
       }
       approve_course_claim: {
         Args: { _request_id: string }
@@ -22163,7 +22198,11 @@ export type Database = {
             Returns: Json
           }
       reject_business_verification: {
-        Args: { _admin_note: string; _request_id: string }
+        Args: {
+          _admin_note: string
+          _request_id: string
+          _review_reason?: string
+        }
         Returns: undefined
       }
       reject_course_claim: {
@@ -22218,7 +22257,11 @@ export type Database = {
         Returns: Json
       }
       request_info_business_verification: {
-        Args: { _admin_note: string; _request_id: string }
+        Args: {
+          _admin_note: string
+          _request_id: string
+          _review_reason?: string
+        }
         Returns: undefined
       }
       request_info_course_claim: {
