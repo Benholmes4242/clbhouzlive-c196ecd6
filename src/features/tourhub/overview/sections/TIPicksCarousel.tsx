@@ -363,22 +363,12 @@ export function TIPicksCarousel({ tournamentId, state, tourCode = 'pga' }: Props
                       </div>
                     </PickScrimBand>
 
-                    {/* THE WHITE BODY — one row only. Everything else is on the photo. */}
-                    <div style={{ padding: '13px 15px 14px' }}>
-                      {/* Affordance, not a control — the whole card is the tap target */}
-                      <span
-                        style={{
-                          display: 'block',
-                          fontSize: 9,
-                          fontWeight: 700,
-                          color: AMBER_DEEP,
-                          letterSpacing: '0.09em',
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {t('overview.tiPicks.card.theCase')}
-                      </span>
-                    </div>
+                    {/* NO WHITE FOOTER. The old "THE CASE ›" band was ~40px of a
+                        ~240px card — a white interruption of a photographic object
+                        for a hint that duplicates the gesture the section heading's
+                        chevron already teaches. The whole card is the tap target;
+                        the card ends at the photograph. Do not re-add it. */}
+
 
                   </button>
                 );
