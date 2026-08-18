@@ -27,7 +27,9 @@ import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
  * the Clubhouse feed — feed/PostRoundCard renders TrajectoryLine itself, so it
  * is not a third implementation) and useRoundHoleShapes (the Discover tile).
  */
-export const BEAD_OVER_DARK = '#F2F4F7';
+
+/* BEAD_OVER_DARK is GONE: it was the double-bogey bead's dark-surface tone and
+   nothing else imported it. */
 
 export interface Bead {
   tone: string;
