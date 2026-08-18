@@ -103,12 +103,8 @@ export function resolveSignals(row: VerificationRow): {
   const domainEvidence: ResolvedSignal['evidence'] = [];
   if (domainEmail) domainEvidence.push({ label: 'Address', value: domainEmail, href: `mailto:${domainEmail}` });
   if (domainName) domainEvidence.push({ label: 'Domain', value: domainName });
-  domainEvidence.push({
-    label: 'Code confirmed',
-    value: otpConfirmed
-      ? row.domainConfirmedAt ? `Yes — ${row.domainConfirmedAt}` : 'Yes'
-      : 'No',
-  });
+  domainEvidence.push({ label: 'Code confirmed', value: otpConfirmed ? 'Yes' : 'No' });
+
 
   /* ── DOCUMENT ── */
   const docPath = str(documentMeta.document_path) ?? str(row.proofDocumentUrl);
