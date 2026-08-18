@@ -555,10 +555,12 @@ const PICK_META: React.CSSProperties = {
 const DEMOTED_STATUS = new Set(['CUT', 'MC', 'MDF', 'WD', 'DQ', 'DNS']);
 
 /**
- * STILL OUT → 5px red dot + "THRU {n}" in MUTE. FINISHED → "FINISHED" in DIM.
- * The feed carries no explicit finished flag, so thru >= 18 is the signal.
+ * STILL OUT → 5px red dot + "THRU {n}" in MUTE. There is NO "FINISHED" branch:
+ * a label identical on every card at the same moment carries no information.
+ * Thru >= 18 renders nothing here. The red dot is a LIVENESS indicator, not a
+ * verdict and not a score, so it stays red.
  * On the DARK tile band the chip rides a rgba(10,14,10,0.5) pill with a
- * white-24 border; the live dot stays red either way.
+ * white-24 border.
  */
 function PickStatusTag({
   live,
