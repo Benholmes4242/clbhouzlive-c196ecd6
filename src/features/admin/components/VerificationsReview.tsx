@@ -153,10 +153,6 @@ export function VerificationsTab({
     );
   };
 
-  const proofMetaEntries = active?.proofMetadata
-    ? Object.entries(active.proofMetadata).filter(([, v]) => v !== null && v !== undefined && v !== '')
-    : [];
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <SectionTabs
