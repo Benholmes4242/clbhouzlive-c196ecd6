@@ -95,6 +95,19 @@ export const SECTION_TITLE: React.CSSProperties = {
 };
 
 /**
+ * THREE TIERS (BRIEF_DISCOVER_HIERARCHY §1). The heading SIZE is the whole
+ * mechanism: tier 1 is the answer (one section only), tier 2 is the body at
+ * today's size, tier 3 is reference material — smaller and in the muted ink
+ * tier, so a reader who stops after tier 2 has had the page.
+ */
+export const TIER_TITLE: Record<1 | 2 | 3, React.CSSProperties> = {
+  1: { ...SECTION_TITLE, fontSize: 21 },
+  2: SECTION_TITLE,
+  3: { ...SECTION_TITLE, fontSize: 12.5, color: A.MUTE },
+};
+
+
+/**
  * PADDING IS `0 2px` BECAUSE CALLERS OWN THEIR GUTTER. A caller that renders
  * this bare will look pushed left — wrap it in the same horizontal padding as
  * the content beneath it (see the /community call sites).
