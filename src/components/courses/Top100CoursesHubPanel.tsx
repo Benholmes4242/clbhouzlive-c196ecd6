@@ -19,13 +19,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import { useTop100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 import { useTop100Movers, type MoverRange } from '@/hooks/top100/useTop100Movers';
-import { useUserTop100Progress, type Top100ListProgress } from '@/hooks/top100/useUserTop100Progress';
+
 import { computeVerdict, type Verdict } from '@/components/top100/verdict';
 import { Top100EnrichmentBlock } from '@/components/top100/Top100EnrichmentBlock';
-import { Top100ProgressPanel } from '@/components/top100/Top100ProgressPanel';
-import { analyticsEvents } from '@/utils/analyticsEvents';
+
 import { Top100MoversSection } from '@/components/top100/Top100MoversSection';
-import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { Top100MoversSheet } from '@/components/top100/sheets/Top100MoversSheet';
 import { Top100VerdictExplainerSheet } from '@/components/top100/sheets/Top100VerdictExplainerSheet';
 
@@ -196,12 +194,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     // Stable scope, never a hash of the id set: list slug + active search.
     `${selectedList}|${searchTerm.trim().toLowerCase()}`,
   );
-  const { data: progressLists = [] } = useUserTop100Progress(user?.id);
-
   const [moverRange, setMoverRange] = useState<MoverRange>('this_month');
   const { data: movers = [] } = useTop100Movers(moverRange);
 
-  const [progressSheet, setProgressSheet] = useState<Top100ListProgress | null>(null);
   const [moversSheetOpen, setMoversSheetOpen] = useState(false);
   const [verdictSheet, setVerdictSheet] = useState<
     {
@@ -226,14 +221,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     }
     return map;
   }, [allCourses, selectedList]);
-
-  const ratedCourseIds = React.useMemo(() => {
-    const set = new Set<string>();
-    enrichment.forEach((value, id) => {
-      if (value.ratedByYou) set.add(id);
-    });
-    return set;
-  }, [enrichment]);
 
   const courseNameById = React.useMemo(() => {
     const map = new Map<string, string>();
@@ -335,33 +322,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
   const totalCoursesInActiveList =
     listSummaries.find(l => l.slug === selectedList)?.total_courses ?? allCourses.length;
 
-  // Progress is scoped to the active list only. When the member has no row for
-  // that list yet we synthesise a zero row so the panel still renders.
-  const activeProgress: Top100ListProgress = React.useMemo(() => {
-    const match = progressLists.find((l) => l.list_slug === selectedList);
-    if (match) return match;
-    const fallbackName =
-      listOptions.find((o) => o.value === selectedList)?.label ?? 'Top 100';
-    return {
-      list_id: selectedList,
-      list_slug: selectedList,
-      list_name: fallbackName,
-      total: totalCoursesInActiveList,
-      played: 0,
-      rated: 0,
-    };
-  }, [progressLists, selectedList, totalCoursesInActiveList, listOptions]);
-
-  // Below the configured threshold the progress panel is suppressed entirely.
-  const progressHidden = activeProgress.played < verdictConfig.minPlayed;
-  useEffect(() => {
-    if (!progressHidden) return;
-    analyticsEvents.track('t100_progress_hidden', {
-      list: selectedList,
-      played: activeProgress.played,
-      min_played: verdictConfig.minPlayed,
-    });
-  }, [progressHidden, selectedList, activeProgress.played, verdictConfig.minPlayed]);
 
   return (
     <div>
@@ -490,12 +450,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             </div>
           )}
 
-          {/* Member context — progress across lists, then where opinion moved */}
+          {/* Member context — where opinion moved */}
           {!searchTerm && !isLoading && !isError && (
             <div className="flex flex-col gap-3">
-              {activeProgress.played >= verdictConfig.minPlayed && (
-                <Top100ProgressPanel list={activeProgress} onOpenList={setProgressSheet} />
-              )}
               <Top100MoversSection movers={movers} onViewAll={() => setMoversSheetOpen(true)} />
             </div>
           )}
@@ -593,17 +550,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
         />
       </div>
 
-      <Top100ListProgressSheet
-        open={!!progressSheet}
-        onClose={() => setProgressSheet(null)}
-        listSlug={progressSheet?.list_slug ?? ''}
-        listName={progressSheet?.list_name ?? ''}
-        played={progressSheet?.played ?? 0}
-        total={progressSheet?.total ?? 0}
-        rated={progressSheet?.rated ?? 0}
-        userId={user?.id}
-        ratedCourseIds={ratedCourseIds}
-      />
 
       <Top100MoversSheet
         open={moversSheetOpen}
