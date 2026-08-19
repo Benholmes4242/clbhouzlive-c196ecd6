@@ -4,7 +4,7 @@ project_id = "ybxkehyomcakqjvuhnna"
 verify_jwt = false
 
 [functions.admin-invite-manage]
-verify_jwt = true
+verify_jwt = false
 
 [functions.lookup-user-by-email]
 verify_jwt = true
@@ -25,7 +25,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.process-season-pass]
-verify_jwt = true
+verify_jwt = false
 
 [functions.refresh-season-shop]
 verify_jwt = false
@@ -55,25 +55,25 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.bypass-second-approval]
-verify_jwt = true
+verify_jwt = false
 
 [functions.bypass-golfer-approval]
-verify_jwt = true
+verify_jwt = false
 
 [functions.cloudflare-stream-delete]
-verify_jwt = true
+verify_jwt = false
 
 [functions.admin-testlab-business-access]
-verify_jwt = true
+verify_jwt = false
 
 [functions.business-access-request-decide]
-verify_jwt = true
+verify_jwt = false
 
 [functions.delete-account]
-verify_jwt = true
+verify_jwt = false
 
 [functions.register-push-device]
-verify_jwt = true
+verify_jwt = false
 
 [functions.verify-bulk]
 verify_jwt = false
@@ -118,13 +118,13 @@ verify_jwt = false
 
 
 [functions.smart-compilation]
-verify_jwt = true
+verify_jwt = false
 
 [functions.cleanup-review-videos]
 verify_jwt = false
 
 [functions.delete-review-video]
-verify_jwt = true
+verify_jwt = false
 
 
 [functions.create-join-request]
@@ -197,7 +197,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.generate-handicap-insights]
-verify_jwt = true
+verify_jwt = false
 
 [functions.geocode-club]
 verify_jwt = false
@@ -216,7 +216,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.request-course]
-verify_jwt = true
+verify_jwt = false
 
 [functions.request-course-claim]
 verify_jwt = false
@@ -238,7 +238,7 @@ verify_jwt = false
 verify_jwt = true
 
 [functions.echo-intelligence-v2]
-verify_jwt = true
+verify_jwt = false
 
 [functions.sync-whs-due]
 verify_jwt = false
