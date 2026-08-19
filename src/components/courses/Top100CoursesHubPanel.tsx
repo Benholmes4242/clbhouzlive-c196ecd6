@@ -194,6 +194,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     // Stable scope, never a hash of the id set: list slug + active search.
     `${selectedList}|${searchTerm.trim().toLowerCase()}`,
   );
+  const [moverRange, setMoverRange] = useState<MoverRange>('this_month');
   const { data: movers = [] } = useTop100Movers(moverRange);
 
   const [moversSheetOpen, setMoversSheetOpen] = useState(false);
@@ -449,12 +450,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             </div>
           )}
 
-          {/* Member context — progress across lists, then where opinion moved */}
+          {/* Member context — where opinion moved */}
           {!searchTerm && !isLoading && !isError && (
             <div className="flex flex-col gap-3">
-              {activeProgress.played >= verdictConfig.minPlayed && (
-                <Top100ProgressPanel list={activeProgress} onOpenList={setProgressSheet} />
-              )}
               <Top100MoversSection movers={movers} onViewAll={() => setMoversSheetOpen(true)} />
             </div>
           )}
