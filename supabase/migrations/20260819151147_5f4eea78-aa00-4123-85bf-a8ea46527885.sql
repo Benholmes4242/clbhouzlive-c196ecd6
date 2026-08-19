@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.get_course_pro_hole_analysis(uuid) FROM anon;
