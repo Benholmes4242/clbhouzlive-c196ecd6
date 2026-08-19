@@ -21,6 +21,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { resolveGateState } from './gate/gateRoutes';
 import { useGateContext } from './gate/useGateContext';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
+import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
 
 const CANVAS = '#15171F';
 const INK = '#FFFFFF';
