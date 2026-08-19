@@ -202,36 +202,10 @@ export const HeldGauge: React.FC<{
   notchPct: number | null;
   nearestLabel: string;
   holdLabel: string;
-}> = ({ notchPct, nearestLabel, holdLabel }) => {
-  const n = notchPct == null ? null : Math.max(2, Math.min(97, notchPct));
+}> = ({ nearestLabel, holdLabel }) => {
   return (
     <div style={{ margin: '18px 0 2px', fontFamily: SANS }}>
-      <div style={{ height: 6, background: A.TRACK, borderRadius: 3, position: 'relative' }}>
-        <span
-          style={{
-            display: 'block',
-            height: 6,
-            borderRadius: 3,
-            width: '100%',
-            background: A.AMBER,
-          }}
-        />
-        {n != null && (
-          <span
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: -2,
-              left: `calc(${n}% - 1px)`,
-              width: 2,
-              height: 10,
-              background: A.INK,
-              borderRadius: 1,
-            }}
-          />
-        )}
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 7 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
         <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining-nums' }}>{nearestLabel}</span>
         <span style={{ ...LABEL, color: A.AMBER }}>{holdLabel}</span>
       </div>
