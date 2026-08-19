@@ -10,8 +10,8 @@
  *     tinted row background anywhere
  *   - rank is a plain figure in every position, including 1st - no chip,
  *     no crown glyph substituting for the number
- *   - the gauge has been removed; a bar implies a scale, and these boards
- *     carry their meaning in the figures and labels instead
+ *   - progress bars and their labels have been removed; a bar implies a scale,
+ *     and these boards carry their meaning in the figures instead
  */
 import React from 'react';
 import { A, LABEL, NUM, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -158,25 +158,6 @@ export const BoardHeaderRow: React.FC<{
   </div>
 );
 
-/**
- * Label pair beneath the chase stat row. The track has been removed: a bar
- * implies a scale, and these categories have no labelled ends.
- */
-export const CrownGauge: React.FC<{
-  pct: number;
-  level: boolean;
-  youLabel: string;
-  crownLabel: string;
-}> = ({ pct: _pct, level: _level, youLabel, crownLabel }) => {
-  return (
-    <div style={{ margin: '18px 0 2px', fontFamily: SANS }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
-        <span style={LABEL}>{youLabel}</span>
-        <span style={LABEL}>{crownLabel}</span>
-      </div>
-    </div>
-  );
-};
 
 /** English ordinal suffix. Supplied by the callsite, never built inside a translated string. */
 export function ordinalSuffix(n: number): string {

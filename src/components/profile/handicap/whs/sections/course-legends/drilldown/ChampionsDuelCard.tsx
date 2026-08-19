@@ -29,7 +29,6 @@ import {
 import {
   BoardHeaderRow,
   BoardRow,
-  CrownGauge,
   HeldGauge,
   ordinalSuffix,
 } from './_shared/boardParts';
@@ -116,12 +115,6 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
 
   const gapRaw = selfRow && champion ? selfRow.value - champion.value : null;
   const level = selfRow != null && champion != null && Math.abs(gapRaw ?? 0) < 0.005;
-
-  // Direction: chaseProgress is category-aware (count categories use the
-  // ratio, value categories use the gap closing toward the champion), so a
-  // gross record of 71 against 65 reads as a partial gauge, never 109%.
-  const pct =
-    selfRow && champion ? chaseProgress(category, champion.value, selfRow.value) * 100 : 0;
 
   // The gap string comes from the shared helper — never computed inline here.
   const gapSigned =
@@ -224,24 +217,15 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           />
         )}
 
-        {holdsIt && runnerUp ? (
+        {holdsIt && runnerUp && (
           <HeldGauge
             notchPct={notchPct}
             nearestLabel={t('champions.nearest', { value: runnerUp.valueDisplay })}
             holdLabel={t('champions.youHoldIt')}
           />
-        ) : (
-          selfRow && champion && (
-            <CrownGauge
-              pct={pct}
-              level={level}
-              youLabel={t('champions.you')}
-              crownLabel={t('champions.crown')}
-            />
-          )
         )}
 
-        <div style={{ marginTop: (holdsIt && runnerUp) || (selfRow && champion) ? 14 : 18 }}>
+        <div style={{ marginTop: holdsIt && runnerUp ? 14 : 18 }}>
           <BoardHeaderRow
             rankLabel={t('champions.colRank')}
             memberLabel={t('champions.colMember')}
