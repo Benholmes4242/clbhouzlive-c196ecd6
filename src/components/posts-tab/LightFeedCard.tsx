@@ -592,7 +592,7 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
             />
             <FooterButton icon={Share} onClick={() => onShare(post)} />
             {/* No mute control here: InlineVideo already renders the canonical
-                MuteButton bottom-right of the active video tile (parity with
+                MuteButton bottom-left of the active video tile (parity with
                 Clubhouse). A second one in the action row was a duplicate. */}
 
 
