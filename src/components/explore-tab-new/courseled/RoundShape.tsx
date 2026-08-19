@@ -1,12 +1,10 @@
-import { useTranslation } from 'react-i18next';
-
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { monotonePath } from '@/lib/charts/monotonePath';
-import { A, FIGS } from './tokens';
+import { A } from './tokens';
 
 /**
  * RoundShape — THE ONE round-shape renderer for the Discover friends surfaces
@@ -40,7 +38,6 @@ export function RoundShape({
   /** The birdie meta row. Rail only — the sheet row has no space for it. */
   showMeta?: boolean;
 }) {
-  const { t } = useTranslation('courses');
   const front = row.front_nine_to_par;
   const back = row.back_nine_to_par;
 
@@ -335,9 +332,10 @@ export function RoundShape({
   );
 }
 
-/** Birdie count under the curve. Shared by the real chart and the fallback. */
+/** Birdie count under the curve — now suppressed (WHO'S PLAYING no longer shows
+ * the "X birdies" text). The structural div is retained so the row height and
+ * padding stay unchanged for neighbouring tiles. */
 function ShapeMeta({ birdies }: { birdies: number }) {
-  const { t } = useTranslation('courses');
   return (
     <div
       style={{
@@ -350,17 +348,7 @@ function ShapeMeta({ birdies }: { birdies: number }) {
         fontWeight: 700,
         letterSpacing: '0.02em',
       }}
-    >
-      {/* ZERO OF SOMETHING GOOD READS AS A CRITICISM on another member's
-          round, so an empty left slot rather than "0 birdies".
-          THE PLURAL LIVES IN THE TRANSLATION (birdies_one / birdies_other). */}
-      <span style={{ ...FIGS, color: UNDER_TONE }}>
-        {birdies > 0 ? `\u25CF ${t('discover.friendsRail.birdies', { count: birdies })}` : ''}
-      </span>
-      {/* NO HOLE COUNT. create_round_posts and useCircleLatestRounds both
-          require holes_played = 18, so the label could only ever say "18
-          holes" — a constant occupying half the meta row. */}
-    </div>
+    />
   );
 }
 
