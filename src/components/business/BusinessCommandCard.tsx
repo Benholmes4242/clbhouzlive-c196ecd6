@@ -102,6 +102,14 @@ export function BusinessCommandCard({
   const verificationState = deriveVerificationState(business.is_verified, verificationRequest);
   const isVerified = verificationState === 'verified';
 
+  /**
+   * BRIEF_CLUB_ANALYTICS_TAB §2 — the entry point appears for VERIFIED GOLF
+   * CLUBS with a club link only. This is the cheap pre-check: it cannot know
+   * whether the claim resolves to a specific COURSE, so the page carries the
+   * full gate and reports honestly when the link is missing or ambiguous.
+   */
+  const showClubAnalytics = mayHaveClubAnalytics(business.category, isVerified, business.club_id);
+
   // Domain-verification requirement (admin-initiated).
   const needsDomainVerification =
     verificationRequest?.requires_domain_check && !verificationRequest?.domain_confirmed;
