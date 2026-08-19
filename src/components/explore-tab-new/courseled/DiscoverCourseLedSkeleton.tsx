@@ -15,7 +15,7 @@ import { CARD_SHELL } from './tokens';
  * not read off the JSX and added up:
  *   friends rail   224 x 233  (104 photo + 60 shape strip + 69 body)
  *   tour rail      266 x 210  (OnTourThisWeek TILE_W / TILE_H, full-bleed)
- *   reviews        two columns, PAGE_CAP 4 tiles, 265 rendered each
+ *   reviews        two columns, GRID_CAP 2 tiles, 265 rendered each
  *   around world   masonry, six photo heights + 62 body
  *   moments        two 220 blocks + a trailing 109 shorts row (cap 8)
  *   most played    panel of 60px rows
@@ -181,16 +181,21 @@ export function TourRail() {
 
 /**
  * Slot 3 — LATEST REVIEWS mosaic. MEASURED on the rendered section: two
- * columns with an 8px gap, PAGE_CAP = 4 tiles (LatestReviews.tsx:27), each
+ * columns with an 8px gap, GRID_CAP = 2 tiles (LatestReviews.tsx), each
  * measuring 265 tall — REVIEW_TILE_HEIGHT (186) is the PHOTO, not the tile, so
  * the old 172 x 6 shell was both the wrong height and the wrong count.
+ *
+ * There is NO featured shell: the skeleton cannot know whether a featured review
+ * exists, and a shell for one that never arrives would be a bigger visual jump
+ * than the one being fixed. Two bars is the floor; content growing by one tile
+ * is the acceptable direction.
  */
 export function ReviewsMosaic() {
   return (
     <section>
       <EyebrowBar w={126} aside />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {[0, 1, 2, 3].map((i) => (
+        {[0, 1].map((i) => (
           <Bar key={i} style={{ height: 265, borderRadius: 14 }} />
         ))}
       </div>
