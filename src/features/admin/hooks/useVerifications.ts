@@ -334,11 +334,12 @@ export function useVerifications() {
     },
     onSuccess: () => toast.success('Verification revoked — the business has been notified.'),
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : 'Failed to revoke verification'),
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] });
-      qc.invalidateQueries({ queryKey: ['business-account-verification-status'] });
-      qc.invalidateQueries({ queryKey: ['business-verification-request'] });
-      qc.invalidateQueries({ queryKey: ['business-verification-evidence'] });
+    onSettled: async () => {
+      await refreshAdminQueues(qc, [
+        ['business-account-verification-status'],
+        ['business-verification-request'],
+        ['business-verification-evidence'],
+      ]);
     },
   });
 
