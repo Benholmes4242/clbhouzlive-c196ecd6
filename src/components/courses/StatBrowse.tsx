@@ -1142,6 +1142,18 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           onRate={() => navigate(`/courses/${verdictSheet.courseId}/rate`)}
         />
       )}
+
+      {/* The SHIPPED reviews sheet, reused from Discover unchanged. Opened by
+          a slot's see-all and by tapping a review in a slot. It carries the
+          scoped pool, so a filtered browse opens a filtered sheet. */}
+      <LatestReviewsSheet
+        open={reviewsSheet}
+        onClose={() => setReviewsSheet(false)}
+        reviews={reviewPool}
+        totalCount={reviewPool.length}
+        viewerId={user?.id}
+        onTilePress={handleReviewTile}
+      />
     </div>
   );
 };
