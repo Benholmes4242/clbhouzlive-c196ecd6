@@ -43,13 +43,20 @@ serve(async (req) => {
     // exists, so a missing invite and a foreign invite both answer the same way.
     if (!invite) return forbidden(corsHeaders);
 
-    const { data: canManage, error: manageErr } = await supabase
-      .rpc("can_manage_business_as", { _business_id: invite.business_id, _user_id: caller.id });
+    const { data: membership, error: manageErr } = await supabase
+      .from("business_members")
+      .select("role")
+      .eq("business_id", invite.business_id)
+      .eq("user_profile_id", caller.id)
+      .maybeSingle();
     if (manageErr) {
       console.error("[send-business-invite] membership check failed", manageErr);
       return forbidden(corsHeaders);
     }
-    if (canManage !== true) return forbidden(corsHeaders);
+    if (!membership || !["owner", "admin"].includes(membership.role as string)) {
+      return forbidden(corsHeaders);
+    }
+
 
     if (invite.status !== "pending") {
       return new Response(JSON.stringify({ success: true, skipped: "not_pending" }), {
