@@ -341,7 +341,13 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                       </span>
                     )}
                     {movement && (
-                      <>
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'baseline',
+                          gap: 0,
+                        }}
+                      >
                         {/* A figure with an ARROW is a MOVEMENT; the signed
                             figure next to it is a SCORE. Under-par score is
                             RED, a falling index is GREEN - opposite conventions,
@@ -365,7 +371,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                         >
                           {movement.arrow}{movement.figure}
                         </span>
-                      </>
+                      </span>
                     )}
                   </span>
 
