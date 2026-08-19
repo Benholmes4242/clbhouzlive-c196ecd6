@@ -365,6 +365,7 @@ const ReviewComposerOverlay: React.FC = () => {
 
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
 const BusinessInsightsPageV2 = lazy(() => import("./pages/BusinessInsightsPageV2"));
+const ClubAnalyticsPage = lazy(() => import("./pages/ClubAnalyticsPage"));
 const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
 
 const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
@@ -612,6 +613,8 @@ function AppRoutes() {
         
         <Route path="/business/create" element={<Suspense fallback={<ManagePageSkeleton />}><BusinessProfileEditor /></Suspense>} />
         <Route path="/business/:id/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPageV2 /></Suspense>} />
+        {/* Club Analytics — verified Golf Clubs only; the page carries the gate. */}
+        <Route path="/business/:id/course" element={<Suspense fallback={<GenericPageSkeleton />}><ClubAnalyticsPage /></Suspense>} />
         <Route path="/business/:id/edit" element={<Suspense fallback={<ManagePageSkeleton />}><BusinessProfileEditor /></Suspense>} />
 
         <Route path="/business/success" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfileLiveSuccessPage /></Suspense>} />

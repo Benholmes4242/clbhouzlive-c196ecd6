@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, ShieldCheck, Clock, CheckCircle, Users, ChevronRight, ChevronDown, MapPin, Star,
+  MoreHorizontal, Eye, Pencil, BarChart3, Flag, Trash2, ShieldCheck, Clock, CheckCircle, Users, ChevronRight, ChevronDown, MapPin, Star,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -24,6 +24,7 @@ import { useBusinessReviews } from '@/hooks/useBusinessReviews';
 import { getCityCountry } from '@/lib/locationDisplay';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 import { BIZ } from './businessTokens';
+import { mayHaveClubAnalytics } from '@/features/business/clubAnalytics/useClubCourseLink';
 
 interface BusinessCommandCardProps {
   membership: BusinessMembership;
@@ -101,6 +102,14 @@ export function BusinessCommandCard({
   // Derive verification state
   const verificationState = deriveVerificationState(business.is_verified, verificationRequest);
   const isVerified = verificationState === 'verified';
+
+  /**
+   * BRIEF_CLUB_ANALYTICS_TAB §2 — the entry point appears for VERIFIED GOLF
+   * CLUBS with a club link only. This is the cheap pre-check: it cannot know
+   * whether the claim resolves to a specific COURSE, so the page carries the
+   * full gate and reports honestly when the link is missing or ambiguous.
+   */
+  const showClubAnalytics = mayHaveClubAnalytics(business.category, isVerified, business.club_id);
 
   // Domain-verification requirement (admin-initiated).
   const needsDomainVerification =
@@ -251,6 +260,15 @@ export function BusinessCommandCard({
                   <BarChart3 className="h-4 w-4" style={{ color: BIZ.inkMute }} />
                   Insights
                 </DropdownMenuItem>
+                {showClubAnalytics && (
+                  <DropdownMenuItem
+                    onClick={(e) => { e.stopPropagation(); goto('/course'); }}
+                    className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
+                  >
+                    <Flag className="h-4 w-4" style={{ color: BIZ.inkMute }} />
+                    Your course
+                  </DropdownMenuItem>
+                )}
                 {hasCourse && (
                   <DropdownMenuItem
                     onClick={(e) => { e.stopPropagation(); goto('/reviews'); }}
@@ -441,6 +459,9 @@ export function BusinessCommandCard({
                   </div>
                   <ActionRow icon={Pencil} label={t('business.card.actions.edit')} onClick={() => goto('/edit')} />
                   <ActionRow icon={BarChart3} label={t('business.card.actions.insights')} onClick={() => goto('/insights')} />
+                  {showClubAnalytics && (
+                    <ActionRow icon={Flag} label="Your course" onClick={() => goto('/course')} />
+                  )}
                   {hasCourse && (
                     <ActionRow
                       icon={Star}
