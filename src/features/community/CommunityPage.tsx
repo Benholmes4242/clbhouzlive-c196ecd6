@@ -2,21 +2,19 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clapperboard, Film, Image as ImageIcon } from 'lucide-react';
 
-import {
-  CommunityClipTile,
-  CommunityVideoTile,
-} from '@/components/explore-tab-new/courseled/CommunityMediaTiles';
+import { CommunityVideoTile } from '@/components/explore-tab-new/courseled/CommunityMediaTiles';
 import {
   useCommunityLibrary,
   type CommunityLibraryItem,
 } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
-import { Eyebrow } from '@/components/explore-tab-new/courseled/tokens';
+import { Eyebrow, InkAction } from '@/components/explore-tab-new/courseled/tokens';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
+import { CommunityClipMosaic } from './CommunityClipMosaic';
 import { CommunityCourseIndex } from './CommunityCourseIndex';
-import { CommunityPhotoMosaic } from './CommunityPhotoMosaic';
+import { CommunityPhotoMosaic, PHOTO_MOSAIC_STEP } from './CommunityPhotoMosaic';
 import { CommunitySkeleton } from './CommunitySkeleton';
 import { CommunityVideoRow } from './CommunityVideoRow';
 
@@ -69,8 +67,17 @@ const CANVAS = '#F8FAFC';
 
 /** Long video rows mounted. Past this the page is a feed, not a section. */
 const VIDEO_ROWS_CAP = 24;
-/** Clips grid tiles mounted — multiples of three keep whole rows. */
-const CLIPS_CAP = 30;
+/**
+ * A SECTION ON THE EVERYTHING VIEW IS A SAMPLE WITH A WAY IN; A CHIP VIEW IS
+ * THE FULL THING (BRIEF_COMMUNITY_PAGE_CORRECTIONS S3.3, S5.4). Anything
+ * unbounded on Everything makes the sections beneath it unreachable, and a
+ * section that cannot be reached does not exist.
+ *
+ * 12 on Everything so the sections below are reachable; 60 on the Clips chip,
+ * where there is nothing below to reach.
+ */
+const CLIPS_CAP_EVERYTHING = 12;
+const CLIPS_CAP_CHIP = 60;
 
 type ChipId = 'all' | 'clips' | 'videos' | 'photos';
 
@@ -101,6 +108,17 @@ export default function CommunityPage() {
   const showClips = chip === 'all' || chip === 'clips';
   const showVideos = chip === 'all' || chip === 'videos';
   const showPhotos = chip === 'all' || chip === 'photos';
+  /** Course pages, not media: out of place under a video-only view (S6.2). */
+  const showClubs = chip === 'all' || chip === 'photos';
+
+  const clipsCap = chip === 'clips' ? CLIPS_CAP_CHIP : CLIPS_CAP_EVERYTHING;
+  const clips = useMemo(() => clipsPool.slice(0, clipsCap), [clipsPool, clipsCap]);
+  /** Everything samples one page of photos; the Photos chip is the whole wall. */
+  const photos = useMemo(
+    () => (chip === 'photos' ? photosPool : photosPool.slice(0, PHOTO_MOSAIC_STEP)),
+    [photosPool, chip],
+  );
+
 
   /**
    * THE QUEUE IS WHAT THE MEMBER CAN SEE. Under a chip it carries only the
@@ -110,11 +128,11 @@ export default function CommunityPage() {
   const visible = useMemo<CommunityLibraryItem[]>(() => {
     const out: CommunityLibraryItem[] = [];
     if (showFilm && featured) out.push(featured);
-    if (showClips) out.push(...clipsPool.slice(0, CLIPS_CAP));
+    if (showClips) out.push(...clips);
     if (showVideos) out.push(...videoRows.slice(0, VIDEO_ROWS_CAP));
-    if (showPhotos) out.push(...photosPool);
+    if (showPhotos) out.push(...photos);
     return out;
-  }, [showFilm, featured, showClips, clipsPool, showVideos, videoRows, showPhotos, photosPool]);
+  }, [showFilm, featured, showClips, clips, showVideos, videoRows, showPhotos, photos]);
 
   const posts = useMemo(() => visible.map((i) => i.post), [visible]);
 
@@ -149,29 +167,18 @@ export default function CommunityPage() {
 
   return (
     <PageRoot style={{ background: CANVAS, minHeight: '100dvh' }}>
-      {/* MASTHEAD — the destination's own header: kicker, then the title at
-          full editorial size. It sits BELOW the floating island row, so the
-          back arrow never lands on top of the words. */}
+      {/* MASTHEAD — the title at full editorial size. NO "clbhouz" KICKER: the
+          page is inside the app, so naming the app above one of its own pages
+          says nothing. It sits BELOW the floating island row, so the back arrow
+          never lands on top of the words. */}
       <div
         style={{
           padding: 'calc(env(safe-area-inset-top, 0px) + 58px) 16px 14px',
         }}
       >
-
-        <div
-          style={{
-            fontSize: 9.5,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: MUTE,
-          }}
-        >
-          clbhouz
-        </div>
         <h1
           style={{
-            margin: '4px 0 0',
+            margin: 0,
             fontSize: 26,
             fontWeight: 700,
             letterSpacing: '-0.035em',
@@ -250,41 +257,40 @@ export default function CommunityPage() {
 
             {showClips && clipsPool.length > 0 && (
               <section style={{ marginBottom: 26 }}>
-                <Eyebrow
-                  icon={Film}
-                  subline={t('community.sections.clips.subline', 'Under three minutes')}
-                >
-                  {t('community.sections.clips.title', 'Clips')}
-                </Eyebrow>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: 6,
-                    padding: '0 16px',
-                  }}
-                >
-                  {clipsPool.slice(0, CLIPS_CAP).map((item) => (
-                    <CommunityClipTile
-                      key={item.key}
-                      item={item}
-                      railVisible
-                      onPress={handlePress}
-                      width="100%"
-                    />
-                  ))}
+                {/* 14, NOT 16: Eyebrow carries its own 0 2px, so 14 + 2 puts
+                    the glyph on the exact left edge of the first tile below
+                    (S2.2). Same reasoning at every heading on this page. */}
+                <div style={{ padding: '0 14px' }}>
+                  <Eyebrow
+                    icon={Film}
+                    subline={t('community.sections.clips.subline', 'Under three minutes')}
+                    aside={
+                      chip === 'all' && clipsPool.length > clipsCap ? (
+                        <InkAction onClick={() => setChip('clips')}>
+                          {t('community.seeAll', 'See all')}
+                        </InkAction>
+                      ) : undefined
+                    }
+                  >
+                    {t('community.sections.clips.title', 'Clips')}
+                  </Eyebrow>
+                </div>
+                <div style={{ padding: '0 16px' }}>
+                  <CommunityClipMosaic items={clips} onPress={handlePress} />
                 </div>
               </section>
             )}
 
             {showVideos && videoRows.length > 0 && (
               <section style={{ marginBottom: 26 }}>
-                <Eyebrow
-                  icon={Clapperboard}
-                  subline={t('community.sections.videos.subline', 'Three minutes and over')}
-                >
-                  {t('community.sections.videos.title', 'Latest videos')}
-                </Eyebrow>
+                <div style={{ padding: '0 14px' }}>
+                  <Eyebrow
+                    icon={Clapperboard}
+                    subline={t('community.sections.videos.subline', 'Three minutes and over')}
+                  >
+                    {t('community.sections.videos.title', 'Latest videos')}
+                  </Eyebrow>
+                </div>
                 <div
                   style={{
                     padding: '0 16px',
@@ -305,28 +311,47 @@ export default function CommunityPage() {
 
             {showPhotos && photosPool.length > 0 && (
               <section style={{ marginBottom: 26 }}>
-                <Eyebrow
-                  icon={ImageIcon}
-                  subline={t('community.sections.photos.subline', 'From the courses')}
-                >
-                  {t('community.sections.photos.title', 'Photos')}
-                </Eyebrow>
+                <div style={{ padding: '0 14px' }}>
+                  <Eyebrow
+                    icon={ImageIcon}
+                    subline={t('community.sections.photos.subline', 'From the courses')}
+                    aside={
+                      chip === 'all' && photosPool.length > photos.length ? (
+                        <InkAction onClick={() => setChip('photos')}>
+                          {t('community.seeAll', 'See all')}
+                        </InkAction>
+                      ) : undefined
+                    }
+                  >
+                    {t('community.sections.photos.title', 'Photos')}
+                  </Eyebrow>
+                </div>
                 <div style={{ padding: '0 16px' }}>
-                  <CommunityPhotoMosaic items={photosPool} onPress={handlePress} />
+                  {/* Infinite only on the Photos chip: on Everything an endless
+                      wall makes Browse by club unreachable. */}
+                  <CommunityPhotoMosaic
+                    items={photos}
+                    onPress={handlePress}
+                    infinite={chip === 'photos'}
+                  />
                 </div>
               </section>
             )}
 
-            {/* BROWSE BY CLUB ALWAYS RENDERS, and last: it covers only tagged
-                content, so its subline says so rather than looking broken. */}
-            <CommunityCourseIndex
-              items={all}
-              title={t('community.sections.clubs.title', 'Browse by club')}
-              subline={t('community.sections.clubs.subline', 'Only where a course was tagged')}
-              countLabel={(n) =>
-                t('community.count', { defaultValue: '{{count}} posts', count: n })
-              }
-            />
+            {/* BROWSE BY CLUB IS LAST, and only on Everything and Photos: it
+                links to course pages, not media, so it is out of place under a
+                video-only view. It covers only tagged content, so its subline
+                says so rather than looking broken. */}
+            {showClubs && (
+              <CommunityCourseIndex
+                items={all}
+                title={t('community.sections.clubs.title', 'Browse by club')}
+                subline={t('community.sections.clubs.subline', 'Only where a course was tagged')}
+                countLabel={(n) =>
+                  t('community.count', { defaultValue: '{{count}} posts', count: n })
+                }
+              />
+            )}
           </>
         )}
       </main>

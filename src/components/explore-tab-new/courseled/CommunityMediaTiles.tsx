@@ -201,6 +201,12 @@ interface TileProps {
    * clips grid). Absent = the shipped rail width, so Discover is unchanged.
    */
   width?: number | string;
+  /**
+   * OPTIONAL aspect (width / height) for the clip tile. The /community clip
+   * mosaic passes the media's TRUE aspect so a landscape clip renders
+   * landscape. Absent = the shipped 9/16 rail shape, so Discover is unchanged.
+   */
+  aspect?: number;
 }
 
 export function CommunityVideoTile({ item, railVisible, onPress, width }: TileProps) {
@@ -352,7 +358,7 @@ export function CommunityVideoTile({ item, railVisible, onPress, width }: TilePr
   );
 }
 
-export function CommunityClipTile({ item, railVisible, onPress, width }: TileProps) {
+export function CommunityClipTile({ item, railVisible, onPress, width, aspect }: TileProps) {
   return (
     <button
       type="button"
@@ -361,7 +367,7 @@ export function CommunityClipTile({ item, railVisible, onPress, width }: TilePro
         flex: width === undefined ? `0 0 ${CLIP_TILE_W}px` : '1 1 auto',
         width: width ?? CLIP_TILE_W,
         minWidth: 0,
-        aspectRatio: '9 / 16',
+        aspectRatio: aspect ? `${aspect}` : '9 / 16',
         padding: 0,
         border: 'none',
         background: 'transparent',

@@ -19,10 +19,17 @@ import type { CommunityLibraryItem } from '@/components/explore-tab-new/coursele
  *
  * INCREMENTAL, NOT PAGED: the pool is already in memory, so the sentinel only
  * governs how many tiles are MOUNTED.
+ *
+ * INFINITE ONLY WHERE THERE IS NOTHING BELOW (BRIEF_COMMUNITY_PAGE_CORRECTIONS
+ * S5): on the Everything view the wall stops at STEP and the section carries a
+ * "See all" into the Photos chip, otherwise Browse by club sits under an
+ * endless list and does not exist. On the Photos chip `infinite` is true and the
+ * sentinel behaviour is exactly as shipped.
  */
 
 /** Tiles mounted initially and per reveal. Even = whole rows across two cols. */
-const STEP = 30;
+export const PHOTO_MOSAIC_STEP = 30;
+const STEP = PHOTO_MOSAIC_STEP;
 const PANEL = '#EDF0F3';
 /** Height steps, px. Cycled by index so a tile's height is stable. */
 const HEIGHTS = [240, 132, 148, 160, 128, 176];
@@ -30,9 +37,11 @@ const HEIGHTS = [240, 132, 148, 160, 128, 176];
 interface Props {
   items: CommunityLibraryItem[];
   onPress: (item: CommunityLibraryItem) => void;
+  /** False on Everything: the wall stops at one page. Default true (Photos chip). */
+  infinite?: boolean;
 }
 
-export function CommunityPhotoMosaic({ items, onPress }: Props) {
+export function CommunityPhotoMosaic({ items, onPress, infinite = true }: Props) {
   const [shown, setShown] = useState(STEP);
   const sentinel = useRef<HTMLDivElement | null>(null);
 
@@ -41,7 +50,7 @@ export function CommunityPhotoMosaic({ items, onPress }: Props) {
 
   useEffect(() => {
     const el = sentinel.current;
-    if (!el || shown >= items.length) return;
+    if (!infinite || !el || shown >= items.length) return;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) setShown((n) => Math.min(n + STEP, items.length));
@@ -50,7 +59,7 @@ export function CommunityPhotoMosaic({ items, onPress }: Props) {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [shown, items.length]);
+  }, [shown, items.length, infinite]);
 
   /** Alternating fill keeps both columns growing together without measuring. */
   const columns = useMemo(() => {
