@@ -743,34 +743,50 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
-      {/* AMATEURS / PROS - a segmented control in the tab's own pill shape. */}
+      {/* GOLFERS / TOUR PROS — a segmented control in the tab's own pill shape. */}
       {hasPro && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {(['members', 'pros'] as const).map((k) => {
-            const on = activeView === k;
-            return (
-              <button
-                key={k}
-                type="button"
-                onClick={() => setView(k)}
-                aria-pressed={on}
-                style={{
-                  appearance: 'none',
-                  padding: '7px 15px',
-                  borderRadius: 999,
-                  border: on ? '1px solid transparent' : `1px solid ${A.BORDER}`,
-                  background: on ? A.INK : A.PANEL,
-                  color: on ? A.PANEL : '#64748B',
-                  fontSize: 12.5,
-                  fontWeight: on ? 700 : 600,
-                  lineHeight: 1,
-                  cursor: 'pointer',
-                }}
-              >
-                {t(`courses:courseDetail.proView.${k}`)}
-              </button>
-            );
-          })}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {(['members', 'pros'] as const).map((k) => {
+              const on = activeView === k;
+              return (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setView(k)}
+                  aria-pressed={on}
+                  style={{
+                    appearance: 'none',
+                    padding: '7px 15px',
+                    borderRadius: 999,
+                    border: on ? '1px solid transparent' : `1px solid ${A.BORDER}`,
+                    background: on ? A.INK : A.PANEL,
+                    color: on ? A.PANEL : '#64748B',
+                    fontSize: 12.5,
+                    fontWeight: on ? 700 : 600,
+                    lineHeight: 1,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {t(`courses:courseDetail.proView.${k}`)}
+                </button>
+              );
+            })}
+          </div>
+          <div
+            style={{
+              fontSize: 10.5,
+              fontWeight: 600,
+              lineHeight: 1.3,
+              color: A.BODY,
+            }}
+          >
+            {t(
+              activeView === 'pros'
+                ? 'courses:courseDetail.proView.prosSub'
+                : 'courses:courseDetail.proView.membersSub',
+            )}
+          </div>
         </div>
       )}
 

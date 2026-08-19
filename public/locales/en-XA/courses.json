@@ -1084,8 +1084,10 @@
       "keyField": "Bar is the field average over par."
     },
     "proView": {
-      "members": "[~~Ṁéṁƀéŕš~~]",
-      "pros": "[~~Ƥŕóš~~]",
+      "members": "[~~Ĝóļƒéŕš~~]",
+      "pros": "[~~Ťóúŕ ƥŕóš~~]",
+      "membersSub": "[~~Évéŕý ŕóúñď ţŕáćķéđ ĥéŕé ƀý ćļƀĥóúž ĝóļƒéŕš~~]",
+      "prosSub": "[~~Ĥóŵ ţĥé ƥŕóƒéššíóñáļ ƒíéļď ƥļáýéđ íť~~]",
       "proBasis_one": "[~~{{tournaments}} ťóúŕñáṁéñť · {{rounds}} ƥļáýéŕ-ŕóúñđš~~]",
       "proBasis_other": "[~~{{tournaments}} ťóúŕñáṁéñťš · {{rounds}} ƥļáýéŕ-ŕóúñđš~~]",
       "proTournaments_one": "{{tournaments}} tournament tracked",
