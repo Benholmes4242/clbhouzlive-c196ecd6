@@ -15,8 +15,9 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
+import { CommunityClipMosaic } from './CommunityClipMosaic';
 import { CommunityCourseIndex } from './CommunityCourseIndex';
-import { CommunityPhotoMosaic } from './CommunityPhotoMosaic';
+import { CommunityPhotoMosaic, PHOTO_MOSAIC_STEP } from './CommunityPhotoMosaic';
 import { CommunitySkeleton } from './CommunitySkeleton';
 import { CommunityVideoRow } from './CommunityVideoRow';
 
