@@ -517,38 +517,19 @@ export default function ExploreTabContent({
           onSeeAll={() => setFriendsSheet(true)}
         />
 
-        {/* LATEST VIDEOS + ON TOUR THIS WEEK — paired with the eyebrow-to-card
-            10px gap so the user's name in the last video tile sits the same
-            distance from the On tour eyebrow as the Latest videos eyebrow sits
-            from its own tiles. */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <LatestVideosRail
-            items={communityVideos.data?.videos ?? []}
-            onTilePress={() => navigate('/community')}
-            onSeeAll={() => navigate('/community')}
-          />
-
-          <OnTourThisWeek
-            lastSeen={lastSeen}
-            onTournamentPress={handleTournament}
-            onMediaPress={handleTourMedia}
-            onTourHub={() => navigate('/tourhub')}
-          />
-        </div>
-
-        {/* Slot 3, deliberately: this mosaic and the Moments mosaic read alike,
-            so Around the world sits between them. Never adjacent to Moments. */}
-        <LatestReviews
-          reviews={latestReviews.reviews}
-          totalCount={latestReviews.total}
-          isPending={latestReviews.isPending}
-          viewerId={userId}
-          lastSeen={lastSeen}
-          onTilePress={handleReviewTile}
-          onSeeAll={openReviewsSheet}
+        {/* LATEST VIDEOS. ON TOUR THIS WEEK left this page
+            (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL S1): it was the only
+            section here that is not about the member's world, and its content
+            already owns a bottom-nav tab, so it duplicated a top-level
+            destination. The component and its hook are intact — unmounted, not
+            deleted. LATEST REVIEWS left too (S2), moved to the Courses browse
+            where a review is decision content rather than entertainment.
+            NOTHING MOVED UP to fill either gap. */}
+        <LatestVideosRail
+          items={communityVideos.data?.videos ?? []}
+          onTilePress={() => navigate('/community')}
+          onSeeAll={() => navigate('/community')}
         />
-
-
 
         <AroundTheWorld
           events={events}
