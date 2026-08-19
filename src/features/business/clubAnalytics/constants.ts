@@ -44,3 +44,15 @@ export const PCT_MIN_N = 20;
  * magnitude; the BAR carries the presence. Zero gets no bar at all.
  */
 export const MIN_BAR_PCT = 1.5;
+
+/**
+ * §4.2 (v2) — WHEN ONE TEE DOMINATES. At or above this share of measured
+ * rounds, the verdict is SCOPED to that set and says so; below it the verdict is
+ * ADJUSTED across sets and says that instead. Either way the member is told.
+ *
+ * A simple majority is the line: once more than half the rounds sit on one set,
+ * ranking that set alone is both the truer measurement and the one the club
+ * recognises. MEASURED: Sundridge East 473 of 714 rounds (66%) sit on 6,476
+ * yards, so Sundridge is scoped; Hanbury's 116 of 215 (54%) also clears it.
+ */
+export const TEE_DOMINANT_SHARE = 0.5;
