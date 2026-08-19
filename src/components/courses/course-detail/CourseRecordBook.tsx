@@ -38,8 +38,8 @@ const UNIT_KEY: Record<string, string> = {
   best_score_diff_all_time: 'diff',
 };
 
-/**
-
+/** Amber at 6% - the held-board plate. */
+const PLATE_BG = 'rgba(247, 147, 30, 0.06)';
 
 interface Props {
   courseId: string;
