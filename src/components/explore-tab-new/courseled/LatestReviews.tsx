@@ -67,6 +67,8 @@ export function LatestReviews({
   const grid = reviews
     .filter((r) => r.reviewId !== featured?.reviewId)
     .slice(0, GRID_CAP);
+  const shown = featured ? [featured, ...grid] : grid;
+
 
 
   // REACTIONS — one read for the mosaic, keyed by review id.
