@@ -356,7 +356,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                             width: 1,
                             alignSelf: 'stretch',
                             background: 'rgba(255,255,255,0.28)',
-                            marginRight: 9,
+                            marginRight: 7,
                           }}
                         />
                         <span
