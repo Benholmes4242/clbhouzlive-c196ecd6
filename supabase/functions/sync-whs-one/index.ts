@@ -104,7 +104,8 @@ Deno.serve(async (req) => {
       conn.id,
       userDetails.HandicapIndex,
     );
-    const scoresUpserted = await upsertScores(admin, conn.id, scoresPage.Scores);
+    const scoreUpsert = await upsertScores(admin, conn.id, scoresPage.Scores);
+    const scoresUpserted = scoreUpsert.written;
     const friendsUpserted = await upsertFriends(admin, conn.id, friendsPage.Friends);
 
     // Enrich any newly-imported scores with hole detail (cheap — usually 0-2 scores)
