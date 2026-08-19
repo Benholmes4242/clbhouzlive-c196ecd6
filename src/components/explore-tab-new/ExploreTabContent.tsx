@@ -517,23 +517,24 @@ export default function ExploreTabContent({
           onSeeAll={() => setFriendsSheet(true)}
         />
 
-        {/* LATEST VIDEOS — after Who's been playing, before On tour this week.
-            Every tile and both actions open /community for now; the clips
-            surface is a later brief. */}
-        <LatestVideosRail
-          items={communityVideos.data?.videos ?? []}
-          onTilePress={() => navigate('/community')}
-          onSeeAll={() => navigate('/community')}
-        />
+        {/* LATEST VIDEOS + ON TOUR THIS WEEK — paired with the eyebrow-to-card
+            10px gap so the user's name in the last video tile sits the same
+            distance from the On tour eyebrow as the Latest videos eyebrow sits
+            from its own tiles. */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <LatestVideosRail
+            items={communityVideos.data?.videos ?? []}
+            onTilePress={() => navigate('/community')}
+            onSeeAll={() => navigate('/community')}
+          />
 
-
-
-        <OnTourThisWeek
-          lastSeen={lastSeen}
-          onTournamentPress={handleTournament}
-          onMediaPress={handleTourMedia}
-          onTourHub={() => navigate('/tourhub')}
-        />
+          <OnTourThisWeek
+            lastSeen={lastSeen}
+            onTournamentPress={handleTournament}
+            onMediaPress={handleTourMedia}
+            onTourHub={() => navigate('/tourhub')}
+          />
+        </div>
 
         {/* Slot 3, deliberately: this mosaic and the Moments mosaic read alike,
             so Around the world sits between them. Never adjacent to Moments. */}
