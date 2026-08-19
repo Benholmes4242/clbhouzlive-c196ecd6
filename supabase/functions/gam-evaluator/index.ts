@@ -247,12 +247,27 @@ async function processSingle(whsScoreId: string) {
     holes = hRows ?? [];
   }
 
+  // delta_index — read the member's score ladder so this round's movement can
+  // be computed. Non-fatal, exactly as the courseName lookup is: a ladder read
+  // failure leaves delta_index null and the evaluation continues.
+  let ladder: ScoreLadderRow[] = [];
+  let ladderIdx = -1;
+  let deltaIndexForThis: number | null = null;
+  try {
+    ladder = await loadMemberScoreLadder(userId);
+    ladderIdx = ladder.findIndex((r) => r.id === whsScoreId);
+    if (ladderIdx >= 0) deltaIndexForThis = deltaAtLadderIndex(ladder, ladderIdx);
+  } catch (e) {
+    console.warn("[delta_index] ladder", (e as Error).message);
+  }
+
   // Compute
   const stats = computeRoundStats(scoreRow, holes, {
     user_id: userId,
     course_id: clbhouzCourseId,
     course_name: clbhouzCourseName,
     course_par: clbhouzCoursePar,
+    delta_index: deltaIndexForThis,
   });
 
   // Persist gam_round_stats
@@ -260,6 +275,26 @@ async function processSingle(whsScoreId: string) {
     .from("gam_round_stats")
     .upsert(stats, { onConflict: "whs_score_id" });
   if (upErr) throw upErr;
+
+  // PREVIOUS-ROUND BACKFILL. The round being evaluated usually has no next
+  // score yet, so its own movement is unknowable on this pass. But the round
+  // BEFORE it now has a next score — this one — so its movement is knowable.
+  // ONE column on an existing row: no requeue, no recompute, no badges,
+  // streaks or notifications. Non-fatal.
+  if (ladderIdx > 0) {
+    try {
+      const prev = ladder[ladderIdx - 1];
+      const prevDelta = deltaAtLadderIndex(ladder, ladderIdx - 1);
+      const { error: prevErr } = await supabase
+        .from("gam_round_stats")
+        .update({ delta_index: prevDelta })
+        .eq("whs_score_id", prev.id);
+      if (prevErr) throw prevErr;
+    } catch (e) {
+      console.warn("[delta_index] prev_backfill", (e as Error).message);
+    }
+  }
+
 
   // Idempotency guard for counter-style state changes
   const alreadyAtVersion = (scoreRow.evaluator_version_last ?? 0) >= EVALUATOR_VERSION;
