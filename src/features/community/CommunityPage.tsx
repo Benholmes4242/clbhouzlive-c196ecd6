@@ -170,29 +170,18 @@ export default function CommunityPage() {
 
   return (
     <PageRoot style={{ background: CANVAS, minHeight: '100dvh' }}>
-      {/* MASTHEAD — the destination's own header: kicker, then the title at
-          full editorial size. It sits BELOW the floating island row, so the
-          back arrow never lands on top of the words. */}
+      {/* MASTHEAD — the title at full editorial size. NO "clbhouz" KICKER: the
+          page is inside the app, so naming the app above one of its own pages
+          says nothing. It sits BELOW the floating island row, so the back arrow
+          never lands on top of the words. */}
       <div
         style={{
           padding: 'calc(env(safe-area-inset-top, 0px) + 58px) 16px 14px',
         }}
       >
-
-        <div
-          style={{
-            fontSize: 9.5,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: MUTE,
-          }}
-        >
-          clbhouz
-        </div>
         <h1
           style={{
-            margin: '4px 0 0',
+            margin: 0,
             fontSize: 26,
             fontWeight: 700,
             letterSpacing: '-0.035em',
