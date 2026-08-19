@@ -332,23 +332,6 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                         {toPar.text}
                       </span>
                     )}
-                    {r.course_par != null && (
-                      <span
-                        style={{
-                          fontSize: 8,
-                          fontWeight: 700,
-                          letterSpacing: '0.1em',
-                          textTransform: 'uppercase',
-                          color: 'rgba(255,255,255,0.66)',
-                          lineHeight: 1,
-                        }}
-                      >
-                        {t('discover.friendsRail.par', {
-                          defaultValue: 'Par {{par}}',
-                          par: r.course_par,
-                        })}
-                      </span>
-                    )}
                   </span>
 
                   {/* TWO LINES, CLAMPED. A single truncated line cut the
