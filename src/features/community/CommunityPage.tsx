@@ -2,10 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clapperboard, Film, Image as ImageIcon } from 'lucide-react';
 
-import {
-  CommunityClipTile,
-  CommunityVideoTile,
-} from '@/components/explore-tab-new/courseled/CommunityMediaTiles';
+import { CommunityVideoTile } from '@/components/explore-tab-new/courseled/CommunityMediaTiles';
 import {
   useCommunityLibrary,
   type CommunityLibraryItem,
