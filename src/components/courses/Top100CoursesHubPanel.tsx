@@ -22,7 +22,7 @@ import { useTop100Movers, type MoverRange } from '@/hooks/top100/useTop100Movers
 
 import { computeVerdict, type Verdict } from '@/components/top100/verdict';
 import { Top100EnrichmentBlock } from '@/components/top100/Top100EnrichmentBlock';
-import { analyticsEvents } from '@/utils/analyticsEvents';
+
 import { Top100MoversSection } from '@/components/top100/Top100MoversSection';
 import { Top100MoversSheet } from '@/components/top100/sheets/Top100MoversSheet';
 import { Top100VerdictExplainerSheet } from '@/components/top100/sheets/Top100VerdictExplainerSheet';
