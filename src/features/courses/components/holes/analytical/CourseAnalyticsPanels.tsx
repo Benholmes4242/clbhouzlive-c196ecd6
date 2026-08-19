@@ -698,9 +698,24 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
     });
   };
 
-  if (!courseId || !data?.available || holes.length === 0 || !stats) return null;
+  const sourceAvailable = activeView === 'pros' ? hasPro : Boolean(data?.available);
+  if (!courseId || !sourceAvailable || holes.length === 0 || !stats) return null;
 
-  const totalRounds = data.total_rounds;
+  const totalRounds =
+    activeView === 'pros' ? (pro?.total_rounds ?? 0) : (data?.total_rounds ?? 0);
+  /* THE BASIS LINE states what was pooled - tournaments and player-rounds. */
+  const basis =
+    activeView === 'pros'
+      ? t('courses:courseDetail.proView.proBasis', {
+          count: pro?.total_tournaments ?? 0,
+          tournaments: formatNumber(pro?.total_tournaments ?? 0),
+          rounds: formatNumber(totalRounds),
+        })
+      : t('courses:courseDetail.plays.rounds', {
+          count: totalRounds,
+          rounds: formatNumber(totalRounds),
+        });
+
   const field = toParParts(stats.fieldAvg);
   const you = toParParts(stats.yourAvg);
   const beastFig = toParParts(stats.hardest.avg_to_par);
