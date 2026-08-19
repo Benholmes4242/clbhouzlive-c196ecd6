@@ -270,6 +270,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
           /* non-fatal */
         }
 
+        // DIAGNOSTIC (MICRO_BRIEF_APPLE_RESPONSE_DIAGNOSTIC) - remove once the Apple name-capture fix has shipped.
+        const responseForLog = { ...(response ?? {}) } as Record<string, unknown>;
+        if ('idToken' in responseForLog) responseForLog.idToken = '[REDACTED]';
+        console.log('[apple-auth] raw response keys:', Object.keys(response ?? {}));
+        console.log('[apple-auth] raw response:', JSON.stringify(responseForLog));
+
         const { data, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
           token: idToken,
