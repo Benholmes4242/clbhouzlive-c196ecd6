@@ -28,6 +28,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { A, KICKER, LABEL, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -68,11 +69,6 @@ function formatIndex(v: number): string {
   return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
 }
 
-function formatDelta(v: number): string {
-  const r = Math.round(v * 10) / 10;
-  if (r === 0) return '0.0';
-  return r > 0 ? `+${r.toFixed(1)}` : `\u2212${Math.abs(r).toFixed(1)}`;
-}
 
 /** Smooth polyline through points using cubic Bezier splines.
  *  Replaces sharp changes of direction with rounded corners while keeping the
@@ -418,6 +414,9 @@ const TrendCard: React.FC<{
                 fontWeight: 700,
                 letterSpacing: '-0.01em',
                 ...FIGS,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)',
                 background:
@@ -437,7 +436,14 @@ const TrendCard: React.FC<{
                 boxShadow: `0 2px 8px ${deltaTone}26`,
               }}
             >
-              {formatDelta(delta)}
+              {Math.abs(delta) >= 0.05 && (
+                <IndexMovementTriangle
+                  direction={delta < 0 ? 'down' : 'up'}
+                  color={deltaTone}
+                  size={7}
+                />
+              )}
+              {Math.abs(delta).toFixed(1)}
             </span>
           )}
         </>

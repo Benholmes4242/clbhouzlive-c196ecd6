@@ -109,7 +109,7 @@ export function Eyebrow({
   /** True when this section contains anything new since the last visit. */
   dot?: boolean;
   /** Optional lucide component. Absent renders NOTHING — no reserved width. */
-  icon?: React.ComponentType<{ size?: number | string; strokeWidth?: number; color?: string }>;
+  icon?: React.ComponentType<{ size?: number | string; strokeWidth?: number | string; color?: string }>;
   /** Optional one-line description, indented under the heading text. */
   subline?: React.ReactNode;
 }) {
