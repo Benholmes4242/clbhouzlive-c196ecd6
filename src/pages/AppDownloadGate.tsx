@@ -21,6 +21,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { resolveGateState } from './gate/gateRoutes';
 import { useGateContext } from './gate/useGateContext';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
+import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
 
 const CANVAS = '#15171F';
 const INK = '#FFFFFF';
@@ -101,17 +102,18 @@ const AppDownloadGate: React.FC = () => {
           style={{ display: 'block', width: 72, height: 72 }}
           draggable={false}
         />
-        <div
+        <img
+          src={wordmark.url}
+          alt="clbhouz"
           style={{
+            display: 'block',
             marginTop: 18,
-            fontSize: 26,
-            fontWeight: 500,
-            letterSpacing: '-0.035em',
-            color: INK,
+            height: 26,
+            width: 'auto',
+            filter: 'invert(1)',
           }}
-        >
-          clbhouz
-        </div>
+          draggable={false}
+        />
 
         {/* band 2 — copy */}
         <h1
