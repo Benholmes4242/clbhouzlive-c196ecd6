@@ -43,7 +43,7 @@ export function CommunitySkeleton() {
           }}
         >
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} style={{ aspectRatio: '9 / 16', background: BLOCK, borderRadius: 10 }} />
+            <div key={i} style={{ aspectRatio: '9 / 16', background: BLOCK, borderRadius: 14 }} />
           ))}
         </div>
       </div>
@@ -72,7 +72,7 @@ export function CommunitySkeleton() {
           }}
         >
           {Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} style={{ aspectRatio: '1 / 1', background: BLOCK, borderRadius: 4 }} />
+            <div key={i} style={{ aspectRatio: '1 / 1', background: BLOCK, borderRadius: 14 }} />
           ))}
         </div>
       </div>
