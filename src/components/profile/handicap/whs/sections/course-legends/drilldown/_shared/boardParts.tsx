@@ -10,8 +10,8 @@
  *     tinted row background anywhere
  *   - rank is a plain figure in every position, including 1st - no chip,
  *     no crown glyph substituting for the number
- *   - the gauge has been removed; a bar implies a scale, and these boards
- *     carry their meaning in the figures and labels instead
+ *   - progress bars and their labels have been removed; a bar implies a scale,
+ *     and these boards carry their meaning in the figures instead
  */
 import React from 'react';
 import { A, LABEL, NUM, SANS } from '@/features/courses/components/holes/analytical/tokens';
