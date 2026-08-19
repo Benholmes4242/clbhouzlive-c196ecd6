@@ -1092,12 +1092,20 @@ export function AroundTheWorld({
             </ReactionSlot>
           );
 
+          /* THE CATEGORY LIVES ON THE CARD (§2.3). It describes THAT card, not
+             a group of them, and these cards appear on surfaces where no group
+             heading exists — so it travels with the card. */
+          const categoryOf = (tt: Tile) =>
+            tt.kind && KIND_LABELS[tt.kind]
+              ? t(KIND_LABELS[tt.kind].key, KIND_LABELS[tt.kind].label)
+              : null;
+
           const nameOf = (tt: Tile) =>
             tt.m?.name ?? tt.g.courseName ?? t('discover.unknownCourse', 'Course');
 
           const photoTile = (
             tt: Tile,
-            opts?: { photo?: number; hero?: boolean; showKicker?: boolean },
+            opts?: { photo?: number; hero?: boolean },
           ) => (
             <StandoutTile
               key={tt.slotKey}
@@ -1114,19 +1122,12 @@ export function AroundTheWorld({
               isOwn={tt.isOwn}
               detail={detailOf(tt)}
               onDetailPress={tt.onPress}
-              /* THE BENCHMARK, through the same `subline` slot Personal Bests
-                 uses for its reference_line. Verbatim; null renders nothing. */
-              subline={tt.margin || null}
+              subline={null}
               isNew={isNewSince(tt.g.at, lastSeen)}
-              /* HERO ONLY: the course name grows to 21px and the figure chip
-                 takes its large size (§1.1). The kind kicker renders only when
-                 no group heading sits above the hero
-                 (CORRECTION_HERO_INSIDE_ITS_GROUP §3). */
-              kicker={
-                opts?.showKicker && tt.kind && KIND_LABELS[tt.kind]
-                  ? t(KIND_LABELS[tt.kind].key, KIND_LABELS[tt.kind].label)
-                  : null
-              }
+              /* EVERY CARD CARRIES ITS OWN CATEGORY (§2.3), not just the hero:
+                 the six sub-headings are gone, so this is where the reader is
+                 told what the feat is. */
+              kicker={categoryOf(tt)}
               avatarUrl={tt.avatarUrl}
               avatarUserId={tt.avatarUserId}
               nameSize={opts?.hero ? 21 : undefined}
