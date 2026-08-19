@@ -285,22 +285,19 @@ export default function CommunityPage() {
                 </Eyebrow>
                 <div
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 16,
                     padding: '0 16px',
                   }}
                 >
-                  {videoRows.slice(0, VIDEO_ROWS_CAP).map((item) => (
-                    <CommunityVideoTile
+                  {videoRows.slice(0, VIDEO_ROWS_CAP).map((item, i) => (
+                    <CommunityVideoRow
                       key={item.key}
                       item={item}
-                      railVisible
+                      first={i === 0}
                       onPress={handlePress}
-                      width="100%"
                     />
                   ))}
                 </div>
+
               </section>
             )}
 
