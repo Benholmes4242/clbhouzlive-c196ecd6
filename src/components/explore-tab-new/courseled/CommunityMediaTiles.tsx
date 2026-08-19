@@ -195,9 +195,15 @@ interface TileProps {
   item: CommunityVideo;
   railVisible: boolean;
   onPress: (item: CommunityVideo) => void;
+  /**
+   * OPTIONAL width override for the /community destination, where the same tiles
+   * run full width (the featured film, the video rows) or fill a grid cell (the
+   * clips grid). Absent = the shipped rail width, so Discover is unchanged.
+   */
+  width?: number | string;
 }
 
-export function CommunityVideoTile({ item, railVisible, onPress }: TileProps) {
+export function CommunityVideoTile({ item, railVisible, onPress, width }: TileProps) {
   // WHEN content IS EMPTY the poster's name takes the title slot and the meta
   // row drops the duplicate name, keeping the time and the likes.
   const hasTitle = item.title.length > 0;
@@ -217,8 +223,9 @@ export function CommunityVideoTile({ item, railVisible, onPress }: TileProps) {
         }
       }}
       style={{
-        flex: `0 0 ${VIDEO_TILE_W}px`,
-        width: VIDEO_TILE_W,
+        flex: width === undefined ? `0 0 ${VIDEO_TILE_W}px` : '1 1 auto',
+        width: width ?? VIDEO_TILE_W,
+        minWidth: 0,
         padding: 0,
         border: 'none',
         background: 'transparent',
@@ -345,14 +352,15 @@ export function CommunityVideoTile({ item, railVisible, onPress }: TileProps) {
   );
 }
 
-export function CommunityClipTile({ item, railVisible, onPress }: TileProps) {
+export function CommunityClipTile({ item, railVisible, onPress, width }: TileProps) {
   return (
     <button
       type="button"
       onClick={() => onPress(item)}
       style={{
-        flex: `0 0 ${CLIP_TILE_W}px`,
-        width: CLIP_TILE_W,
+        flex: width === undefined ? `0 0 ${CLIP_TILE_W}px` : '1 1 auto',
+        width: width ?? CLIP_TILE_W,
+        minWidth: 0,
         aspectRatio: '9 / 16',
         padding: 0,
         border: 'none',

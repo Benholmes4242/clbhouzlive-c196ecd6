@@ -1084,8 +1084,8 @@
     "ratedHeading": "Recently rated"
   },
   "community": {
-    "count": "{{count}} moments",
-    "count_one": "{{count}} moment",
+    "count": "{{count}} posts",
+    "count_one": "{{count}} post",
     "everything": "Everything",
     "empty": "No member media yet.",
     "rails": {
@@ -1100,6 +1100,32 @@
       "all": "All",
       "video": "Video",
       "played": "Played"
+    },
+    "heading": "From the community",
+    "subline": "Everything members have filmed and photographed",
+    "chips": {
+      "everything": "Everything",
+      "clips": "Clips",
+      "videos": "Videos",
+      "photos": "Photos"
+    },
+    "sections": {
+      "clips": {
+        "title": "Clips",
+        "subline": "Short and vertical"
+      },
+      "videos": {
+        "title": "Latest videos",
+        "subline": "Three minutes and over"
+      },
+      "photos": {
+        "title": "Photos",
+        "subline": "Stills from members"
+      },
+      "clubs": {
+        "title": "Browse by club",
+        "subline": "Only where a course was tagged"
+      }
     }
   },
   "teeCard": {

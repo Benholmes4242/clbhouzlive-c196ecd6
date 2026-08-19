@@ -1,11 +1,10 @@
 /**
- * COMMUNITY SKELETON — flat row/block placeholders (Dispatch skeleton canon):
- * no shimmer, no cards, no rounded pills beyond the chip row's own shape. It
- * holds the SHAPE the settled page takes (featured lead, three rails, the club
- * rail, the grid's first rows) so the first paint does not jump.
+ * COMMUNITY SKELETON — flat block placeholders (Dispatch skeleton canon): no
+ * shimmer, no cards. It holds the SHAPE the rebuilt page settles into —
+ * featured film 16:9, the 3-up clips grid, two landscape video rows, the photo
+ * mosaic, the club rail — so the first paint does not jump.
  *
- * The header itself is real from the first frame, so it is not drawn here — only
- * the body below it.
+ * The masthead is real from the first frame, so it is not drawn here.
  */
 
 const BLOCK = '#EDF0F3';
@@ -14,20 +13,12 @@ function Block({ h, w = '100%', r = 8 }: { h: number; w?: number | string; r?: n
   return <div style={{ height: h, width: w, borderRadius: r, background: BLOCK }} />;
 }
 
-/** One rail shell: heading line then a run of true-aspect-ish tiles. */
-function RailShell({ widths }: { widths: number[] }) {
+/** Heading shell: glyph square then the 15.5px title line. */
+function HeadingShell({ w = 130 }: { w?: number }) {
   return (
-    <div style={{ marginBottom: 26 }}>
-      <div style={{ padding: '0 16px 9px' }}>
-        <Block h={13} w={140} r={2} />
-      </div>
-      <div style={{ display: 'flex', gap: 6, paddingLeft: 16, overflow: 'hidden' }}>
-        {widths.map((w, i) => (
-          <div key={i} style={{ flex: 'none' }}>
-            <Block h={200} w={w} />
-          </div>
-        ))}
-      </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '0 16px 9px' }}>
+      <div style={{ width: 15, height: 15, borderRadius: 3, background: BLOCK }} />
+      <Block h={14} w={w} r={2} />
     </div>
   );
 }
@@ -35,20 +26,60 @@ function RailShell({ widths }: { widths: number[] }) {
 export function CommunitySkeleton() {
   return (
     <div aria-hidden style={{ paddingBottom: 24 }}>
-      {/* Featured lead. */}
+      {/* Featured film, 16:9 full width. */}
       <div style={{ padding: '0 16px 22px' }}>
-        <Block h={320} r={10} />
+        <div style={{ aspectRatio: '16 / 9', background: BLOCK, borderRadius: 10 }} />
       </div>
 
-      <RailShell widths={[150, 112, 200, 150]} />
-      <RailShell widths={[112, 200, 150, 112]} />
-      <RailShell widths={[200, 150, 112, 200]} />
+      {/* Clips: 3-up grid of verticals. */}
+      <div style={{ marginBottom: 26 }}>
+        <HeadingShell w={64} />
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 6,
+            padding: '0 16px',
+          }}
+        >
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} style={{ aspectRatio: '9 / 16', background: BLOCK, borderRadius: 10 }} />
+          ))}
+        </div>
+      </div>
+
+      {/* Latest videos: landscape rows. */}
+      <div style={{ marginBottom: 26 }}>
+        <HeadingShell w={112} />
+        <div
+          style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '0 16px' }}
+        >
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} style={{ aspectRatio: '16 / 9', background: BLOCK, borderRadius: 10 }} />
+          ))}
+        </div>
+      </div>
+
+      {/* Photos mosaic. */}
+      <div style={{ marginBottom: 26 }}>
+        <HeadingShell w={72} />
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 2,
+            padding: '0 16px',
+          }}
+        >
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} style={{ aspectRatio: '1 / 1', background: BLOCK, borderRadius: 4 }} />
+          ))}
+        </div>
+      </div>
 
       {/* Browse by club. */}
-      <div style={{ marginBottom: 26 }}>
-        <div style={{ padding: '0 16px 9px' }}>
-          <Block h={13} w={120} r={2} />
-        </div>
+      <div>
+        <HeadingShell w={120} />
         <div style={{ display: 'flex', gap: 8, paddingLeft: 16, overflow: 'hidden' }}>
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} style={{ flex: 'none', width: 118 }}>
@@ -62,23 +93,6 @@ export function CommunitySkeleton() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Everything grid. */}
-      <div style={{ padding: '0 16px 9px' }}>
-        <Block h={13} w={92} r={2} />
-      </div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 2,
-          padding: '0 16px',
-        }}
-      >
-        {Array.from({ length: 9 }).map((_, i) => (
-          <div key={i} style={{ aspectRatio: '1 / 1', background: BLOCK, borderRadius: 4 }} />
-        ))}
       </div>
     </div>
   );
