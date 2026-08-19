@@ -22,7 +22,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { ordinalSuffix } from '@/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/boardParts';
+
 import type { LegendCategory } from '@/lib/gam/types';
 import { A, EmptyState, FIGS, LABEL, NUM, Panel, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -112,18 +112,6 @@ export const CourseRecordBook: React.FC<Props> = ({
     // The gap comes from useCourseRecordSummary as an UNSIGNED magnitude with
     // `behind` owning the direction (lower-is-better boards invert). Never
     // re-derived here, never signed.
-    const rank = standing.row.rank;
-    const total = standing.row.total_count_in_category ?? null;
-    const rankLabel =
-      rank > 0
-        ? total && total > 0
-          ? t('courseDetail.records.youRankOf', {
-              rank,
-              suffix: ordinalSuffix(rank),
-              count: total,
-            })
-          : t('courseDetail.records.youRank', { rank, suffix: ordinalSuffix(rank) })
-        : null;
     return (
       <div style={{ marginTop: 3 }}>
         {/* TWO facts, not one phrase: the member's own value, then the gap. The
@@ -140,13 +128,6 @@ export const CourseRecordBook: React.FC<Props> = ({
               : t('courseDetail.records.youAhead')}
           </span>
         </div>
-        {rankLabel && (
-          <div style={{ marginTop: 4 }}>
-            <span style={{ ...LABEL, fontSize: 7.5, color: A.MUTE, ...FIGS, whiteSpace: 'nowrap' }}>
-              {rankLabel}
-            </span>
-          </div>
-        )}
       </div>
     );
   };
