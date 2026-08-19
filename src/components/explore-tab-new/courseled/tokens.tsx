@@ -94,6 +94,12 @@ export const SECTION_TITLE: React.CSSProperties = {
   lineHeight: 1.2,
 };
 
+/**
+ * PADDING IS `0 2px` BECAUSE CALLERS OWN THEIR GUTTER. A caller that renders
+ * this bare will look pushed left — wrap it in the same horizontal padding as
+ * the content beneath it (see the /community call sites).
+ */
+
 /** §1.5 — indent that puts the subline under the WORDS, not under the glyph. */
 const SUBLINE_INDENT = 22;
 
