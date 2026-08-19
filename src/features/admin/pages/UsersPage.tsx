@@ -536,8 +536,19 @@ function egStatusView(conn: { last_sync_status: string | null; last_synced_at: s
       when: conn.last_synced_at ? `last synced ${relTime(conn.last_synced_at)}` : null,
     };
   }
+  // A partial run DID sync - it authenticated, refreshed the handicap and
+  // advanced last_synced_at; some score rows were rejected. Keep the synced
+  // time, and never label it as needing re-authentication.
+  if (status === 'partial') {
+    return {
+      tone: 'warn' as const,
+      label: 'Linked - partial sync',
+      when: conn.last_synced_at ? `last synced ${relTime(conn.last_synced_at)}` : null,
+    };
+  }
   return { tone: 'warn' as const, label: 'Needs re-auth', when: null };
 }
+
 
 function Member360Sheet({
   userId, detail, loading, error, onRetry, onClose, onUpdateRole, roleUpdating,

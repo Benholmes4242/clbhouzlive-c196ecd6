@@ -547,13 +547,20 @@ export async function upsertScores(
       course_id: courseRows.get(s.Course?.CourseId ?? -1) ?? null,
       play_date: egPlayDateToLocal(s.PlayDate),
       capture_date: s.CaptureDate,
-      // England Golf returns some scores with TotalHoles 0 and Holes null. The
-      // cause is not isolated — it is NOT simply "played abroad", since overseas
-      // rounds from eight countries store correctly. `?? 18` did not catch the
-      // zero, which reached a `total_holes > 0` check constraint and rejected the
-      // WHOLE 30-score batch every six hours. Two members had no working score
-      // sync from the day they connected. Resolve explicitly from IsNineHole, and
-      // never from Holes.length.
+      // TotalHoles is 0 on SUMMARY-ONLY ROUNDS - club-entered totals where
+      // individual hole scores were not captured. Most common on overseas
+      // rounds, where players hand their card to their home club to record, but
+      // the cause is the ENTRY METHOD, not the location: overseas rounds from
+      // eight countries store correctly. These rounds are real and count for
+      // handicap; they simply lack hole detail. Resolve from IsNineHole.
+      //
+      // THIS MAPPER IS THE ONLY ONE. connect-whs had a private copy that was
+      // fixed here in May 2026 and not there, which left two members with no
+      // working incremental sync from the day they connected.
+      //
+      // `?? 18` did not catch the zero, which reached the `total_holes > 0`
+      // check constraint and rejected the WHOLE 30-score batch every six
+      // hours. Resolve explicitly from IsNineHole, never from Holes.length.
       total_holes:
         s.TotalHoles && s.TotalHoles > 0 ? s.TotalHoles
           : (s.IsNineHole ? 9 : 18),
