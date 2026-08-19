@@ -112,11 +112,21 @@ describe('LatestReviews mosaic', () => {
     expect(grid.style.gridTemplateColumns).toBe('1fr 1fr');
   });
 
-  it('keeps all rendered tiles at the same height', () => {
-    const reviews = [makeFeatured(0), makeCompact(1), makeCompact(2)];
+  it('keeps all rendered grid tiles at the same height', () => {
+    const reviews = [makeBars(0), makeBars(1), makeCompact(2)];
     render(<LatestReviews reviews={reviews} totalCount={3} onTilePress={() => {}} onSeeAll={() => {}} />);
     const photos = screen.getAllByTestId('review-tile-photo');
     for (const photo of photos) expect(photo.style.height).toBe(`${REVIEW_TILE_HEIGHT}px`);
+  });
+
+  it('renders the featured tile at its taller height', () => {
+    const reviews = [makeFeatured(0), makeCompact(1), makeCompact(2)];
+    render(<LatestReviews reviews={reviews} totalCount={3} onTilePress={() => {}} onSeeAll={() => {}} />);
+    const photos = screen.getAllByTestId('review-tile-photo');
+    // The featured tile is full-width and taller; the two grid tiles stay at the standard height.
+    expect(photos[0].style.height).toBe(`${REVIEW_TILE_FEATURED_HEIGHT}px`);
+    expect(photos[1].style.height).toBe(`${REVIEW_TILE_HEIGHT}px`);
+    expect(photos[2].style.height).toBe(`${REVIEW_TILE_HEIGHT}px`);
   });
 
   it('renders the viewing member name in on-dark amber', () => {
