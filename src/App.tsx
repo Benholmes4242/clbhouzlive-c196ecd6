@@ -365,6 +365,7 @@ const ReviewComposerOverlay: React.FC = () => {
 
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
 const BusinessInsightsPageV2 = lazy(() => import("./pages/BusinessInsightsPageV2"));
+const ClubAnalyticsPage = lazy(() => import("./pages/ClubAnalyticsPage"));
 const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
 
 const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
