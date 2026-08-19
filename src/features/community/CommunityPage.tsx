@@ -152,11 +152,10 @@ export default function CommunityPage() {
           back arrow never lands on top of the words. */}
       <div
         style={{
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 58px)',
-          padding: '0 16px 14px',
-          paddingBlockStart: 'calc(env(safe-area-inset-top, 0px) + 58px)',
+          padding: 'calc(env(safe-area-inset-top, 0px) + 58px) 16px 14px',
         }}
       >
+
         <div
           style={{
             fontSize: 9.5,
