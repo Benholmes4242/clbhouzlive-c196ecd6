@@ -31,7 +31,7 @@ import {
 import { useClubCourseLink } from '@/features/business/clubAnalytics/useClubCourseLink';
 import { useClubCourseAnalytics } from '@/features/business/clubAnalytics/useClubCourseAnalytics';
 import {
-  VerdictSection, HowItPlaysSection, ScoringSection, BusynessSection, WhoPlaysSection,
+  VerdictSection, HowItPlaysSection, ScoringSection, TeesSection, BusynessSection, WhoPlaysSection,
 } from '@/features/business/clubAnalytics/sections';
 import { EARLY_DATA_FLOOR } from '@/features/business/clubAnalytics/constants';
 
@@ -204,10 +204,12 @@ export default function ClubAnalyticsPage() {
           </p>
         </div>
 
-        {/* §4 — the five sections, in order. */}
+        {/* §5 — the six sections, in order. TeesSection is v2's addition, and
+            it also CORRECTS the verdict above it (§4.1). */}
         <VerdictSection data={data} />
         <HowItPlaysSection data={data} />
         <ScoringSection data={data} />
+        <TeesSection data={data} />
         <BusynessSection data={data} />
         <WhoPlaysSection data={data} />
 

@@ -47,6 +47,39 @@ export interface ClubAnalyticsMonth {
   rounds: number;
 }
 
+/**
+ * §4 (v2) — ONE MEASURED TEE. Recovered from distance_yards: the yardage is the
+ * SUM OF A ROUND'S 18 HOLE DISTANCES, which fingerprints the tee that round was
+ * played off. THERE IS NO NAME HERE ON PURPOSE (§4.4) — we know the yardage, not
+ * whether the club calls it white, yellow or blue.
+ */
+export interface ClubAnalyticsTee {
+  /** 18-hole total for the set, in yards. */
+  yards: number;
+  /** Rounds played off this set. */
+  rounds: number;
+  /** Mean (actual_gross - par) per hole on this set. */
+  avg_to_par: number;
+}
+
+/**
+ * §4.2 — WHICH TEES THE VERDICT IS ABOUT. Never absent from the screen.
+ *   'scoped'   one set carries the majority; the ranking is taken off it alone
+ *   'adjusted' rounds are spread; each hole is ranked WITHIN its own set and
+ *              those rankings are combined, weighted by rounds
+ */
+export interface ClubAnalyticsVerdictScope {
+  mode: 'scoped' | 'adjusted';
+  /** The set the verdict is scoped to. Null when adjusted. */
+  tee_yards: number | null;
+  /** Rounds behind the scoped set, or behind the whole adjustment. */
+  tee_rounds: number;
+  /** Share of measured rounds the scoped set carries, 0-1. */
+  tee_share: number;
+  /** Distinct measured yardages on this course. */
+  tee_count: number;
+}
+
 export interface ClubAnalyticsBand {
   /** e.g. "Scratch to 4.9" — the band label is the RPC's, not the client's. */
   label: string;
@@ -65,6 +98,15 @@ export interface ClubCourseAnalytics {
   /** Total scored holes behind `outcomes` — the denominator for every share. */
   outcomes_total: number;
   months: ClubAnalyticsMonth[];
+  /** §4.3 — every measured yardage with its round count and mean over par. */
+  tees: ClubAnalyticsTee[];
+  /**
+   * §4.1/4.2 — how `holes` was corrected for tee, and therefore what the
+   * verdict is a verdict ABOUT. Null only from an older RPC that predates the
+   * tee correction; the client then says the ranking spans every yardage
+   * rather than pretending it was scoped.
+   */
+  verdict_scope: ClubAnalyticsVerdictScope | null;
   /** From whs_scores.handicap_index_at_time (§4.3), never today's index. */
   handicap_bands: ClubAnalyticsBand[];
   /** Rounds carrying an index at the time of play. */
