@@ -29,7 +29,6 @@ import {
 import {
   BoardHeaderRow,
   BoardRow,
-  CrownGauge,
   HeldGauge,
   ordinalSuffix,
 } from './_shared/boardParts';
