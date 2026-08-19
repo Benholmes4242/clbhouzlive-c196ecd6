@@ -20,6 +20,11 @@ serve(async (req) => {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Without a caller check this is an open mail relay: any inviteId handed to
+    // it sends a branded invite. Identify the caller BEFORE reading the invite.
+    const caller = await resolveCaller(req);
+    if (!caller) return unauthorized(corsHeaders);
+
     const { inviteId } = (await req.json()) as Payload;
     if (!inviteId) {
       return new Response(JSON.stringify({ error: "inviteId required" }), {
@@ -34,12 +39,24 @@ serve(async (req) => {
       .maybeSingle();
 
     if (inviteErr) throw inviteErr;
-    if (!invite) throw new Error("Invite not found");
+    // A caller who cannot manage the business must not learn whether an invite
+    // exists, so a missing invite and a foreign invite both answer the same way.
+    if (!invite) return forbidden(corsHeaders);
+
+    const { data: canManage, error: manageErr } = await supabase
+      .rpc("can_manage_business_as", { _business_id: invite.business_id, _user_id: caller.id });
+    if (manageErr) {
+      console.error("[send-business-invite] membership check failed", manageErr);
+      return forbidden(corsHeaders);
+    }
+    if (canManage !== true) return forbidden(corsHeaders);
+
     if (invite.status !== "pending") {
       return new Response(JSON.stringify({ success: true, skipped: "not_pending" }), {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
     // Resolve destination email — either the raw invitee_email or the linked user's auth email
     let toEmail = invite.invitee_email as string | null;
