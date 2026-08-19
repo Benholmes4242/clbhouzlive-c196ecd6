@@ -453,10 +453,10 @@ export default function ExploreTabContent({
       {/* ONE SECTION RHYTHM: 28px between a section's content and the next
           section's eyebrow. Eyebrows own their own 10px to their content. */}
       <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
-        {/* The first three sections share a tighter rhythm, but the gap from the
-            Who's Been Playing tiles to the Latest Videos eyebrow is opened to
-            16px so the two rails read as distinct sections. */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* The first three sections share a tighter 10px rhythm so the gap from
+            the bottom of a rail tile to the next section's eyebrow matches the
+            gap from the previous tile's bottom to the current eyebrow. */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <FriendsPlayedRail
             userId={userId}
             lastSeen={lastSeen}
