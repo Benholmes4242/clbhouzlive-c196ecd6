@@ -59,10 +59,11 @@ import { CommunitySkeleton } from './CommunitySkeleton';
  */
 
 const INK = '#0E1216';
+const BODY = '#3D4550';
 const MUTE = '#A2A9B2';
 const BORDER = '#E2E7EC';
 const CANVAS = '#F8FAFC';
-const HAIR = '#EDF0F3';
+
 
 /** Long video rows mounted. Past this the page is a feed, not a section. */
 const VIDEO_ROWS_CAP = 24;
