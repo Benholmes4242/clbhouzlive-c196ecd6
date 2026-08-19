@@ -999,6 +999,32 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                 {i < rows.length - 1 && (
                   <div aria-hidden style={{ height: 5, background: CARD_BAND }} />
                 )}
+
+                {/*
+                  REVIEW SLOT (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL §3).
+                  Full-bleed between two 5px bands: the band above is the one
+                  the card just drew, the band below is drawn here, so the
+                  list's rhythm is unbroken. Only rendered when a card follows,
+                  for the same reason the band is.
+                */}
+                {i < rows.length - 1 && reviewSlots.get(i + 1) ? (
+                  <>
+                    {reviewSlots.get(i + 1)!.kind === 'rail' ? (
+                      <ReviewRailSlot
+                        reviews={reviewSlots.get(i + 1)!.reviews}
+                        onReviewPress={openReviewsSheet}
+                        onSeeAll={openReviewsSheet}
+                      />
+                    ) : (
+                      <ReviewFeaturedSlot
+                        review={reviewSlots.get(i + 1)!.reviews[0]}
+                        onReviewPress={openReviewsSheet}
+                        onSeeAll={openReviewsSheet}
+                      />
+                    )}
+                    <div aria-hidden style={{ height: 5, background: CARD_BAND }} />
+                  </>
+                ) : null}
               </div>
             );
           })}
