@@ -632,17 +632,27 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   const { user } = useSupabaseSession();
   const { data: connection } = useWhsConnection(user?.id);
   const { data } = useCourseHoleAnalysis(courseId);
+  const { data: pro } = useCourseProHoleAnalysis(courseId);
   const { data: myPerf } = useMyHolePerformance(user?.id, courseId, {
     enabled: Boolean(user?.id && courseId && connection),
   });
 
   const [holesSheetOpen, setHolesSheetOpen] = useState(false);
   const [openHoles, setOpenHoles] = useState<Set<number>>(() => new Set());
+  /* The toggle exists only where pro data resolves and passes the par guard. */
+  const proHoles = pro?.available ? (pro.holes ?? []) : [];
+  const hasPro = proHoles.length > 0;
+  const [view, setView] = useState<'members' | 'pros'>('members');
+  const activeView = hasPro ? view : 'members';
 
   const holes = useMemo(
-    () => [...(data?.holes ?? [])].sort((a, b) => a.hole_no - b.hole_no),
-    [data?.holes],
+    () =>
+      activeView === 'pros'
+        ? ([...proHoles] as unknown as CourseHole[]).sort((a, b) => a.hole_no - b.hole_no)
+        : [...(data?.holes ?? [])].sort((a, b) => a.hole_no - b.hole_no),
+    [data?.holes, proHoles, activeView],
   );
+
   const myByHole = useMemo(() => {
     const m = new Map<number, MyHolePerformanceRow>();
     (myPerf ?? []).forEach((r) => m.set(r.hole_no, r));
