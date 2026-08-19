@@ -367,15 +367,11 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                               gap: 3,
                             }}
                           >
-                            {movement.arrow === '\u2193' ? (
-                              <svg width="7" height="6" viewBox="0 0 7 6" aria-hidden>
-                                <path d="M0 0h7L3.5 6z" fill={INDEX_DARK_FELL} />
-                              </svg>
-                            ) : (
-                              <svg width="7" height="6" viewBox="0 0 7 6" aria-hidden>
-                                <path d="M3.5 0 7 6H0z" fill={INDEX_DARK_ROSE} />
-                              </svg>
-                            )}
+                            <IndexMovementTriangle
+                              direction={movement.arrow === '\u2193' ? 'down' : 'up'}
+                              color={movement.arrow === '\u2193' ? INDEX_DARK_FELL : INDEX_DARK_ROSE}
+                              size={7}
+                            />
                             <span
                               style={{
                                 ...NUMF,
