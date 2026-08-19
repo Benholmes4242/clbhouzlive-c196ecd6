@@ -584,6 +584,17 @@ export default function ExploreTabContent({
           onRenderedMembers={handleStandoutMembers}
         />
 
+        {/* CLIPS — after Around the world, before Personal bests. It reads the
+            whole library, so the scope pills (which live inside Around the
+            world's own subtree) do not and must not filter it. */}
+        <ClipsRail
+          items={communityVideos.data?.clips ?? []}
+          onTilePress={() => navigate('/community')}
+          onSeeAll={() => navigate('/community')}
+        />
+
+
+
         {/* PERSONAL BESTS — the second tier, feats measured against the member's
             OWN history. Directly below its sibling, and NOT a fifth lens: the
             lenses filter courses, this changes whose history the bar comes from. */}
