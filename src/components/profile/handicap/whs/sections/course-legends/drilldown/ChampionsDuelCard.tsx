@@ -223,21 +223,12 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           />
         )}
 
-        {holdsIt && runnerUp ? (
+        {holdsIt && runnerUp && (
           <HeldGauge
             notchPct={notchPct}
             nearestLabel={t('champions.nearest', { value: runnerUp.valueDisplay })}
             holdLabel={t('champions.youHoldIt')}
           />
-        ) : (
-          selfRow && champion && (
-            <CrownGauge
-              pct={pct}
-              level={level}
-              youLabel={t('champions.you')}
-              crownLabel={t('champions.crown')}
-            />
-          )
         )}
 
         <div style={{ marginTop: (holdsIt && runnerUp) || (selfRow && champion) ? 14 : 18 }}>
