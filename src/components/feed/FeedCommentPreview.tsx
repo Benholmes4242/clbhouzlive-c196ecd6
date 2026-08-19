@@ -11,8 +11,19 @@
  * finished conversation, one comment with an invitation beneath it reads as an
  * open one — and most commented posts here carry one or two.
  *
- * INK: three SOLID tiers, composited from the card's own #F8FAFC ramp over the
- * card surface #10151C so no tone here is produced by opacity.
+ * ONE COMPONENT, TWO SURFACES (addendum). This block is shared by FeedCard
+ * (dark, #10151C) and LightFeedCard (light, #F8FAFC). Two copies would drift
+ * the first time either was touched, and the rules attached here — render from
+ * the comment not the count, "view all" only at two or more, replies and
+ * non-post targets filtered upstream, business actors resolved as the business
+ * — are exactly the kind that must not be kept in step by hand.
+ *
+ * INK: three SOLID tiers per surface, and the component TAKES ITS TONES FROM
+ * THE CARD IT IS IN rather than declaring one palette. Each tier is the card's
+ * own alpha ramp composited against that card's background, so no tone here is
+ * produced by opacity on either surface:
+ *   dark  (#F8FAFC ramp over #10151C): 1.00 #F8FAFC, 0.65 #A7AAAE, 0.45 #787C81
+ *   light (#0F172A ramp over #F8FAFC): 1.00 #0F172A, 0.60 #6C727E, 0.42 #969BA4
  */
 import React from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -21,10 +32,31 @@ import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { isEmojiOnly } from '@/features/comments-v2/lib/emojiOnly';
 import type { FeedCommentPreview as PreviewData } from '@/hooks/feed/useFeedCommentPreview';
 
-const INK = '#F8FAFC';   // strong tier
-const MID = '#A7AAAE';   // body tier (0.65 ramp, flattened)
-const DIM = '#787C81';   // quietest legible tier (0.45 ramp, flattened)
-const LINE = 'rgba(255,255,255,0.08)';
+export type CommentPreviewSurface = 'dark' | 'light';
+
+interface Tones { ink: string; mid: string; dim: string; line: string }
+
+/**
+ * Flattened, not faded. dark = card's #F8FAFC ramp over #10151C; light = the
+ * light card's own T100/T60/T40 (#0F172A at 1 / 0.60 / 0.42) over #F8FAFC.
+ * Rounded to the nearest sRGB byte, so these render identically to the ramps
+ * the two cards already ship — with no alpha in the preview itself.
+ */
+const TONES: Record<CommentPreviewSurface, Tones> = {
+  dark: {
+    ink: '#F8FAFC',
+    mid: '#A7AAAE',
+    dim: '#787C81',
+    line: 'rgba(255,255,255,0.08)',
+  },
+  light: {
+    ink: '#0F172A',
+    mid: '#6C727E',
+    dim: '#969BA4',
+    // The light card's shipped divider, not a computed one.
+    line: '#E5E7EA',
+  },
+};
 
 interface Props {
   preview?: PreviewData | null;
@@ -34,6 +66,8 @@ interface Props {
   /** Viewing member's avatar for the prompt row. */
   viewerAvatarUrl?: string | null;
   viewerName?: string | null;
+  /** Which card this block is sitting in. Decides the ink tiers, nothing else. */
+  surface?: CommentPreviewSurface;
 }
 
 export const FeedCommentPreview: React.FC<Props> = ({
@@ -42,7 +76,9 @@ export const FeedCommentPreview: React.FC<Props> = ({
   onOpenComments,
   viewerAvatarUrl,
   viewerName,
+  surface = 'dark',
 }) => {
+  const { ink: INK, mid: MID, dim: DIM, line: LINE } = TONES[surface];
   const body = preview?.content?.trim() || '';
   const hasComment = !!preview && (!!body || false);
   // "View all n" only above TWO OR MORE. At exactly one, a line pointing at a

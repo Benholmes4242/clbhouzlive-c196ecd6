@@ -42,6 +42,8 @@ import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { PostRoundShell } from '@/components/feed/PostRoundShell';
 import { PostRoundDegraded } from '@/components/feed/PostRoundDegraded';
+import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
+import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 
 
 // Light palette — cards sit on the page background (#F8FAFC); dividers are
@@ -105,6 +107,14 @@ export interface LightFeedCardProps {
   postRoundMissing?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
+  /**
+   * Newest top-level comment, resolved in ONE batched read at page level
+   * (LightCardFeed) — the same hook and the same two reads the Clubhouse card
+   * uses. Absent means NO preview, whatever commentCount says.
+   */
+  commentPreview?: FeedCommentPreviewData | null;
+  /** Ships the preview block. Off leaves the card exactly as it was. */
+  commentPreviewEnabled?: boolean;
 }
 
 interface CaptionBlockProps {
@@ -242,6 +252,8 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   postRoundPending,
   postRoundMissing,
   onRoundTap,
+  commentPreview,
+  commentPreviewEnabled = false,
 }) => {
   const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
@@ -628,6 +640,20 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
           </>
         );
       })()}
+
+      {/* Comment preview + add-a-comment prompt — the SAME component the
+          Clubhouse card renders, on the light surface. A member seeing this in
+          the Clubhouse and not here would read it as a bug, not a choice. */}
+      {commentPreviewEnabled && (
+        <FeedCommentPreview
+          surface="light"
+          preview={commentPreview ?? null}
+          commentCount={commentCount}
+          onOpenComments={() => onComment(post, effectiveActor)}
+          viewerAvatarUrl={effectiveActor?.avatarUrl ?? null}
+          viewerName={effectiveActor?.name ?? null}
+        />
+      )}
     </article>
   );
 };
