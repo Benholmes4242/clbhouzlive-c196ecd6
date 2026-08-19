@@ -1,4 +1,5 @@
 import { Clapperboard, Film } from 'lucide-react';
+import type { CSSProperties } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -57,7 +58,7 @@ interface Props {
   onTilePress: (item: CommunityVideo) => void;
   onSeeAll: () => void;
   /** Optional outer spacing override (the caller owns the section seam). */
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
 
 export function LatestVideosRail({ items, onTilePress, onSeeAll, style }: Props) {
