@@ -170,6 +170,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const scrollerElRef = useRef<HTMLElement | null>(null);
 
+  // ONE comments_v2 read per loaded page for the inline comment preview.
+  const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
+  const commentPreview = useFeedCommentPreview(feedPostIds, 'clubhouse:cards');
+
   // Snapshot Virtuoso state per-tab. Keep `onSnapshot` in a ref so the
   // imperative capture never depends on identity churn.
   const onSnapshotRef = useRef(onSnapshot);
