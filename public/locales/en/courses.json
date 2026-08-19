@@ -1532,7 +1532,11 @@
       "after": "After"
     },
     "mostPlayedSheetCaption_one": "{{count}} course",
-    "mostPlayedSheetCaption_other": "{{count}} courses"
+    "mostPlayedSheetCaption_other": "{{count}} courses",
+    "videosHeading": "Latest videos",
+    "videosAction": "All videos",
+    "clipsHeading": "Clips",
+    "clipsAction": "See all"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",
