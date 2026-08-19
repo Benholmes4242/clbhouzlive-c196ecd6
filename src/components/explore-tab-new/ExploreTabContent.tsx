@@ -30,13 +30,8 @@ import { OneThingRow } from './courseled/OneThingRow';
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { AroundTheWorld } from './courseled/AroundTheWorld';
 import { PersonalBests } from './courseled/PersonalBests';
-import { LatestReviews } from './courseled/LatestReviews';
-import { LatestReviewsSheet } from './courseled/LatestReviewsSheet';
-import { useLatestReviews, type LatestReview } from './courseled/hooks/useLatestReviews';
-import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 
 
-import { OnTourThisWeek } from './courseled/OnTourThisWeek';
 import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
 import { ClipsRail, LatestVideosRail } from './courseled/CommunityMediaRails';
 import { useCommunityVideos } from './courseled/hooks/useCommunityVideos';
@@ -147,7 +142,6 @@ export default function ExploreTabContent({
   const [honoursSheet, setHonoursSheet] = useState(false);
   const [honoursMode, setHonoursMode] = useState<HonoursMode>('recent');
   const [honoursFocus, setHonoursFocus] = useState<string | null>(null);
-  const [reviewsSheet, setReviewsSheet] = useState(false);
 
   /**
    * THE SHARED MEMBER BUDGET (BRIEF_PERSONAL_BESTS_SECTION §4). Standout Rounds
@@ -160,46 +154,12 @@ export default function ExploreTabContent({
     setStandoutCounts(counts);
   }, []);
 
-  // LATEST REVIEWS (slot 3): one paginated query, media batched in the same
-  // read. No window — "latest" means latest.
-  const latestReviews = useLatestReviews();
-  const openReviewSheet = useReviewSheetStore((s) => s.open);
-
-  const handleReviewTile = useCallback(
-    (r: LatestReview) => {
-      analyticsEvents.track('discover_review_tile_tap', {
-        review_id: r.reviewId,
-        course_id: r.courseId,
-        has_media: !!r.mediaUrl,
-      });
-      openReviewSheet({
-        user: {
-          id: r.userId ?? '',
-          name: r.reviewerName,
-          username: r.reviewerUsername ?? undefined,
-          avatar: r.reviewerAvatar,
-        },
-        courseId: r.courseId,
-        courseName: r.courseName,
-        rating: r.rating,
-        reviewId: r.reviewId,
-        courseCountry: r.courseCountry,
-        courseRegion: r.courseRegion,
-        courseSubCountry: r.courseSubCountry,
-        reviewText: r.quote,
-        breakdown: r.breakdown,
-      });
-    },
-    [openReviewSheet],
-  );
-
-  const openReviewsSheet = useCallback(() => {
-    analyticsEvents.track('discover_reviews_sheet_open', {
-      total: latestReviews.total ?? latestReviews.reviews.length,
-    });
-    setReviewsSheet(true);
-  }, [latestReviews.total, latestReviews.reviews.length]);
-
+  /**
+   * LATEST REVIEWS LEFT THIS PAGE (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL
+   * S2). The section, its pool hook and the see-all trigger are all gone from
+   * Discover; LatestReviewsSheet itself is untouched and is now opened from the
+   * Courses browse, where the review pool is country/region scoped.
+   */
 
   const momentList = useMemo(() => moments ?? [], [moments]);
   // PAGE mosaic: one tile per course. The sheet keeps the full ranked list.
@@ -352,23 +312,7 @@ export default function ExploreTabContent({
     [navigate, opener],
   );
 
-  const handleTournament = useCallback(
-    (e: TourWeekEvent) => {
-      analyticsEvents.track('discover_tour_card_tapped', { tournament_id: e.id });
-      navigate(`/tourhub/tournament/${e.id}`);
-    },
-    [navigate],
-  );
 
-  // The media chip deep-links straight to the course Media tab — GolfClubView
-  // already reads ?tab=media through asTabId, so no new plumbing is needed.
-  const handleTourMedia = useCallback(
-    (courseId: string) => {
-      analyticsEvents.track('discover_tour_media_tapped', { course_id: courseId });
-      navigate(`/courses/${courseId}?tab=media`);
-    },
-    [navigate],
-  );
 
   // Both surfaces (mosaic + sheet) share this handler, so the tapped media's
   // identity must travel with the post — otherwise every tile of a multi-media
@@ -658,17 +602,6 @@ export default function ExploreTabContent({
         focusUserId={honoursFocus}
       />
 
-      <LatestReviewsSheet
-        open={reviewsSheet}
-        onClose={() => setReviewsSheet(false)}
-        reviews={latestReviews.reviews}
-        totalCount={latestReviews.total}
-        viewerId={userId}
-        onTilePress={handleReviewTile}
-        hasNextPage={latestReviews.hasNextPage}
-        isFetchingNextPage={latestReviews.isFetchingNextPage}
-        onLoadMore={() => void latestReviews.fetchNextPage()}
-      />
 
 
 
