@@ -1,6 +1,6 @@
 import { Clapperboard, Film } from 'lucide-react';
 import type { CSSProperties } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Eyebrow, InkAction } from './tokens';
