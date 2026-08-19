@@ -329,10 +329,43 @@ export const InlineVideo: React.FC<Props> = ({
 
       {isProcessing && <VideoProcessingCard />}
 
+      {/* ONE VIDEO CHROME (BRIEF_VIDEO_CHROME_AND_FEED_LENGTH §1): mute is a
+          CONTROL and sits bottom-LEFT; duration is a LABEL and owns
+          bottom-RIGHT, where every video product puts it and where the
+          Discover rails already put it. Two things cannot own one corner. */}
       {isActive && !isProcessing && (
-        <div style={{ position: 'absolute', right: 6, bottom: 6, zIndex: 30 }}>
+        <div style={{ position: 'absolute', left: 6, bottom: 6, zIndex: 30 }}>
           <MuteButton size="sm" />
         </div>
+      )}
+
+      {/* NO DURATION, NO CHIP — an unknown length renders nothing at all. */}
+      {!isProcessing && !!item.duration && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            right: 6,
+            bottom: 6,
+            zIndex: 30,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: '3px 7px',
+            borderRadius: 7,
+            background: 'rgba(10,14,10,0.72)',
+            color: '#FFFFFF',
+            fontSize: 10.5,
+            fontWeight: 700,
+            lineHeight: 1.1,
+            fontVariantNumeric: 'tabular-nums lining-nums',
+            // NOT A CONTROL: it must never intercept the tap that opens the video.
+            pointerEvents: 'none',
+          }}
+        >
+          {showVideo && <PlayingBars />}
+          {formatDuration(item.duration)}
+        </span>
       )}
     </div>
   );
