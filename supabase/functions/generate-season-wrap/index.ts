@@ -1,6 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 import { corsFor } from '../_shared/cors.ts';
+import { forbidden, isPanelAdmin, resolveCaller, unauthorized } from '../_shared/callerAuth.ts';
+
 interface WrapCard {
   type: string;
   title: string;
