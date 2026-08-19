@@ -23,7 +23,7 @@
  * own alpha ramp composited against that card's background, so no tone here is
  * produced by opacity on either surface:
  *   dark  (#F8FAFC ramp over #10151C): 1.00 #F8FAFC, 0.65 #A7AAAE, 0.45 #787C81
- *   light (#0F172A ramp over #F8FAFC): 1.00 #0F172A, 0.60 #6E747F, 0.42 #969BA4
+ *   light (#0F172A ramp over #F8FAFC): 1.00 #0F172A, 0.60 #6C727E, 0.42 #969BA4
  */
 import React from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -51,7 +51,7 @@ const TONES: Record<CommentPreviewSurface, Tones> = {
   },
   light: {
     ink: '#0F172A',
-    mid: '#6E747F',
+    mid: '#6C727E',
     dim: '#969BA4',
     // The light card's shipped divider, not a computed one.
     line: '#E5E7EA',
