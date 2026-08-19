@@ -38,7 +38,6 @@ export function RoundShape({
   /** The birdie meta row. Rail only — the sheet row has no space for it. */
   showMeta?: boolean;
 }) {
-  const { t } = useTranslation('courses');
   const front = row.front_nine_to_par;
   const back = row.back_nine_to_par;
 
