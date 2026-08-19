@@ -453,61 +453,66 @@ export default function ExploreTabContent({
       {/* ONE SECTION RHYTHM: 28px between a section's content and the next
           section's eyebrow. Eyebrows own their own 10px to their content. */}
       <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
-        <FriendsPlayedRail
-          userId={userId}
-          lastSeen={lastSeen}
-          onCardPress={handleFriendCard}
-          onSeeAll={() => setFriendsSheet(true)}
-        />
+        {/* The first three sections share a tighter 10px rhythm so the gap from
+            the bottom of a rail tile to the next section's eyebrow matches the
+            gap from the previous tile's bottom to the current eyebrow. */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <FriendsPlayedRail
+            userId={userId}
+            lastSeen={lastSeen}
+            onCardPress={handleFriendCard}
+            onSeeAll={() => setFriendsSheet(true)}
+          />
 
-        {/* LATEST VIDEOS. ON TOUR THIS WEEK left this page
-            (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL S1): it was the only
-            section here that is not about the member's world, and its content
-            already owns a bottom-nav tab, so it duplicated a top-level
-            destination. The component and its hook are intact — unmounted, not
-            deleted. LATEST REVIEWS left too (S2), moved to the Courses browse
-            where a review is decision content rather than entertainment.
-            NOTHING MOVED UP to fill either gap. */}
-        <LatestVideosRail
-          items={communityVideos.data?.videos ?? []}
-          onTilePress={() => navigate('/community')}
-          onSeeAll={() => navigate('/community')}
-        />
+          {/* LATEST VIDEOS. ON TOUR THIS WEEK left this page
+              (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL S1): it was the only
+              section here that is not about the member's world, and its content
+              already owns a bottom-nav tab, so it duplicated a top-level
+              destination. The component and its hook are intact — unmounted, not
+              deleted. LATEST REVIEWS left too (S2), moved to the Courses browse
+              where a review is decision content rather than entertainment.
+              NOTHING MOVED UP to fill either gap. */}
+          <LatestVideosRail
+            items={communityVideos.data?.videos ?? []}
+            onTilePress={() => navigate('/community')}
+            onSeeAll={() => navigate('/community')}
+          />
 
-        <AroundTheWorld
-          events={events}
-          isPending={wireLoading}
-          userId={userId}
-          lastSeen={lastSeen}
-          scopeKey={lens}
-          pills={
-            // The pills belong to Around the World: 12px above (10 from the
-            // eyebrow + 2), 14px below so they sit closer to their cards.
-            // NO WRAPPER DIV: the pills are position:sticky, and a wrapper of
-            // their exact height becomes their containing block and gives them
-            // zero travel. The margin rides on the sticky element itself so the
-            // section is the sticky container (pins at the top of the section,
-            // releases when the section scrolls past).
-            <ScopePills
-              lens={lens}
-              onChange={handleLensChange}
-              style={{ margin: '2px -14px 14px' }}
-            />
-          }
+          <AroundTheWorld
+            events={events}
+            isPending={wireLoading}
+            userId={userId}
+            lastSeen={lastSeen}
+            scopeKey={lens}
+            pills={
+              // The pills belong to Around the World: 12px above (10 from the
+              // eyebrow + 2), 14px below so they sit closer to their cards.
+              // NO WRAPPER DIV: the pills are position:sticky, and a wrapper of
+              // their exact height becomes their containing block and gives them
+              // zero travel. The margin rides on the sticky element itself so the
+              // section is the sticky container (pins at the top of the section,
+              // releases when the section scrolls past).
+              <ScopePills
+                lens={lens}
+                onChange={handleLensChange}
+                style={{ margin: '2px -14px 14px' }}
+              />
+            }
 
-          onCoursePress={(id) => goCourse(id, 'around_the_world')}
-          onFeatPress={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)}
-          lensLabel={lensLabel}
-          emptyCopy={lensEmptyCopy}
-          priorityFor={priorityFor}
-          canShortlist={canShortlistCourse}
-          isShortlisted={isShortlisted}
-          onToggleShortlist={handleToggleShortlist}
-          onExpand={(revealed) =>
-            analyticsEvents.track('discover_courses_expanded', { revealed })
-          }
-          onRenderedMembers={handleStandoutMembers}
-        />
+            onCoursePress={(id) => goCourse(id, 'around_the_world')}
+            onFeatPress={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)}
+            lensLabel={lensLabel}
+            emptyCopy={lensEmptyCopy}
+            priorityFor={priorityFor}
+            canShortlist={canShortlistCourse}
+            isShortlisted={isShortlisted}
+            onToggleShortlist={handleToggleShortlist}
+            onExpand={(revealed) =>
+              analyticsEvents.track('discover_courses_expanded', { revealed })
+            }
+            onRenderedMembers={handleStandoutMembers}
+          />
+        </div>
 
         {/* CLIPS — after Around the world, before Personal bests. It reads the
             whole library, so the scope pills (which live inside Around the
