@@ -29,7 +29,7 @@ const GRID_CAP = 2;   // how many tiles the grid renders
 
 interface Props {
   reviews: LatestReview[];
-  /** Total qualifying reviews behind the sheet (the mosaic is capped at four). */
+  /** Total qualifying reviews behind the sheet (the mosaic is capped at three). */
   totalCount?: number | null;
   /** TRUE while the reviews query has not settled — the shell holds the slot. */
   isPending?: boolean;
