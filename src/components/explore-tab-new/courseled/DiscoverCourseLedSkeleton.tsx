@@ -28,9 +28,6 @@ import { CARD_SHELL } from './tokens';
  * are intact by instruction (S1.2), and a shell deleted out from under a live
  * component is a worse problem than an unreached one.
  */
- * so the loaded page lands on its own outline with no section boundary
- * shifting.
- */
 
 
 
