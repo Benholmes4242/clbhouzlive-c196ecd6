@@ -20,6 +20,7 @@ import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 import { HeroShell, HeroPill, W_35, W_40 } from './HeroShell';
 
 const GREEN = INDEX_DELTA.dark.improved;
