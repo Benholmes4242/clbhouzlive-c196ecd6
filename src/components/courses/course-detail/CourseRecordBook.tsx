@@ -22,7 +22,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { ordinalSuffix } from '@/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/boardParts';
+
 import type { LegendCategory } from '@/lib/gam/types';
 import { A, EmptyState, FIGS, LABEL, NUM, Panel, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
