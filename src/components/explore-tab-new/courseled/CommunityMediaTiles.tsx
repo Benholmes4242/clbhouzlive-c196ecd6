@@ -365,7 +365,9 @@ export function CommunityVideoTile({ item, railVisible, onPress, width }: TilePr
   );
 }
 
-export function CommunityClipTile({ item, railVisible, onPress, width, aspect }: TileProps) {
+export function CommunityClipTile({ item, railVisible, onPress, width, aspect, square }: TileProps) {
+  const radius = square ? 0 : RADIUS;
+  const overlayInset = square ? 10 : 8;
   return (
     <button
       type="button"
@@ -378,11 +380,11 @@ export function CommunityClipTile({ item, railVisible, onPress, width, aspect }:
         padding: 0,
         border: 'none',
         background: 'transparent',
-        borderRadius: RADIUS,
+        borderRadius: radius,
         cursor: 'pointer',
       }}
     >
-      <TileMedia item={item} railVisible={railVisible} radius={RADIUS}>
+      <TileMedia item={item} railVisible={railVisible} radius={radius}>
         {(playing) => (
           <>
             {/* The scrim gains a TOP stop so the course tag stays legible on a
@@ -400,9 +402,9 @@ export function CommunityClipTile({ item, railVisible, onPress, width, aspect }:
             <span
               style={{
                 position: 'absolute',
-                left: 8,
-                right: 8,
-                bottom: 8,
+                left: overlayInset,
+                right: overlayInset,
+                bottom: overlayInset,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,

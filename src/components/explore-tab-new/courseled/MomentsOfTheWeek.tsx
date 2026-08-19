@@ -80,7 +80,7 @@ export function MomentsOfTheWeek({
         cap={PAGE_CAP}
         gap={2}
         tall={220}
-        radius={8}
+        radius={0}
         lastSeen={lastSeen}
         onTilePress={onTilePress}
         autoplayGroup="moments-page"
