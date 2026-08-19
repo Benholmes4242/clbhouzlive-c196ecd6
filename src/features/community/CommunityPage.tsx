@@ -252,7 +252,7 @@ export default function CommunityPage() {
               <section style={{ marginBottom: 26 }}>
                 <Eyebrow
                   icon={Film}
-                  subline={t('community.sections.clips.subline', 'Short and vertical')}
+                  subline={t('community.sections.clips.subline', 'Under three minutes')}
                 >
                   {t('community.sections.clips.title', 'Clips')}
                 </Eyebrow>
@@ -307,7 +307,7 @@ export default function CommunityPage() {
               <section style={{ marginBottom: 26 }}>
                 <Eyebrow
                   icon={ImageIcon}
-                  subline={t('community.sections.photos.subline', 'Stills from members')}
+                  subline={t('community.sections.photos.subline', 'From the courses')}
                 >
                   {t('community.sections.photos.title', 'Photos')}
                 </Eyebrow>
