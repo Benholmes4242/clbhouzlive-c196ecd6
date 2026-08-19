@@ -345,7 +345,8 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                         style={{
                           display: 'inline-flex',
                           alignItems: 'baseline',
-                          gap: 0,
+                          flex: 1,
+                          minWidth: 44,
                         }}
                       >
                         {/* A figure with an ARROW is a MOVEMENT; the signed
@@ -367,6 +368,8 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                             fontWeight: 700,
                             color: movement.arrow === '\u2193' ? INDEX_DARK_FELL : INDEX_DARK_ROSE,
                             lineHeight: 1,
+                            marginLeft: 'auto',
+                            marginRight: 'auto',
                           }}
                         >
                           {movement.arrow}{movement.figure}
