@@ -37,7 +37,7 @@ function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
     : drifted
       ? 'var(--hcp-bad)'
       : 'var(--hcp-t-40)';
-  const arrow = improved ? '↓ ' : drifted ? '↑ ' : '';
+  const triangleDir = improved ? 'down' : drifted ? 'up' : null;
   return (
     <div
       style={{
@@ -65,9 +65,18 @@ function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
           fontVariantNumeric: 'tabular-nums lining-nums',
           letterSpacing: '-0.01em',
           lineHeight: 1,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
         }}
       >
-        {arrow}
+        {triangleDir && (
+          <IndexMovementTriangle
+            direction={triangleDir}
+            color={color}
+            size={7}
+          />
+        )}
         {formatDelta(delta)}
       </div>
       <div
