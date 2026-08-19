@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 import { corsFor } from '../_shared/cors.ts';
+import { forbidden, isPanelAdmin, resolveCaller, unauthorized } from '../_shared/callerAuth.ts';
+
 const ALLOWED_ORIGINS = new Set([
   "https://clbhouz.com",
   "https://www.clbhouz.com",
