@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Medal } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, CARD_SHELL, KICKER, LABEL, NUMF, SANS, SECTION_TITLE } from './tokens';
+import { A, CARD_SHELL, KICKER, LABEL, NUMF, SANS, TIER_TITLE } from './tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { CourseImageFallback } from './CourseImageFallback';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
@@ -673,8 +673,7 @@ export function HonoursHeading({
       <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
         {/* BRIEF_DISCOVER_SECTION_HIERARCHY §3.1 — section glyph, then the
             heading at section rank (15.5 sentence case). */}
-        <Medal size={15} strokeWidth={2.2} color={A.INK} />
-        <span style={SECTION_TITLE}>{t('discover.honoursTitle', 'The honours board')}</span>
+        <span style={TIER_TITLE[3]}>{t('discover.honoursTitle', 'The honours board')}</span>
         <span style={{ marginLeft: 'auto' }}>
           <HonoursModeToggle mode={mode} onChange={onModeChange} />
         </span>

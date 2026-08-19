@@ -1,4 +1,3 @@
-import { Users } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -202,7 +201,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
     <section>
       <style>{GLASS_CSS}</style>
       <Eyebrow
-        icon={Users}
+        tier={1}
         dot={newCount > 0}
         aside={<InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>}
       >

@@ -1,4 +1,3 @@
-import { MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { MomentsGrid } from './MomentsGrid';
@@ -64,7 +63,6 @@ export function MomentsOfTheWeek({
   return (
     <section>
       <Eyebrow
-        icon={MapPin}
         dot={newCount > 0}
         aside={
           (totalCount ?? moments.length) > PAGE_CAP ? (
