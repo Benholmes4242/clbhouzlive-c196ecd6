@@ -37,20 +37,25 @@ const SCROLLER: React.CSSProperties = {
   scrollbarWidth: 'none',
 };
 
+/**
+ * THE RAIL NODE IS TRACKED IN STATE, not in a plain ref: the rail returns null
+ * until supply arrives, so a mount-time ref read would observe nothing and the
+ * rail would stay `visible: false` forever (no autoplay on Discover). A callback
+ * ref re-runs the observer effect the moment the section actually exists.
+ */
 function useRailVisible<T extends HTMLElement>() {
-  const ref = useRef<T | null>(null);
+  const [node, setNode] = useState<T | null>(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    if (!node) return;
     const io = new IntersectionObserver(
       ([entry]) => setVisible(entry.isIntersecting && entry.intersectionRatio > 0.1),
       { threshold: [0, 0.1, 0.3] },
     );
-    io.observe(el);
+    io.observe(node);
     return () => io.disconnect();
-  }, []);
-  return { ref, visible };
+  }, [node]);
+  return { ref: setNode, visible };
 }
 
 interface Props {
