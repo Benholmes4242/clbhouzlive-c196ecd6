@@ -257,10 +257,10 @@ export default function CommunityPage() {
 
             {showClips && clipsPool.length > 0 && (
               <section style={{ marginBottom: 26 }}>
-                {/* Eyebrow's padding is 0 2px because callers own their gutter,
-                    so this page supplies the 16px and the icon lands on the
-                    first tile's left edge. */}
-                <div style={{ padding: '0 16px' }}>
+                {/* 14, NOT 16: Eyebrow carries its own 0 2px, so 14 + 2 puts
+                    the glyph on the exact left edge of the first tile below
+                    (S2.2). Same reasoning at every heading on this page. */}
+                <div style={{ padding: '0 14px' }}>
                   <Eyebrow
                     icon={Film}
                     subline={t('community.sections.clips.subline', 'Under three minutes')}
