@@ -753,6 +753,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                   return !!sid && !postRoundMap?.get(sid);
                 })()}
                 onRoundTap={onRoundTap}
+                commentPreviewEnabled
+                commentPreview={commentPreview.map.get(post.id) ?? null}
               />
             )}
           </FeedItemGate>
