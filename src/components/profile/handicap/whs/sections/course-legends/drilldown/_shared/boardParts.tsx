@@ -168,38 +168,10 @@ export const CrownGauge: React.FC<{
   level: boolean;
   youLabel: string;
   crownLabel: string;
-}> = ({ pct, level, youLabel, crownLabel }) => {
-  const p = level ? 100 : Math.max(2, Math.min(96, pct));
-  const fill = level ? A.AMBER : A.INK;
+}> = ({ youLabel, crownLabel }) => {
   return (
     <div style={{ margin: '18px 0 2px', fontFamily: SANS }}>
-      <div style={{ height: 6, background: A.TRACK, borderRadius: 3, position: 'relative' }}>
-        <span
-          style={{
-            display: 'block',
-            height: 6,
-            borderRadius: 3,
-            width: `${p}%`,
-            background: fill,
-            transition: 'width 400ms cubic-bezier(.2,.8,.2,1)',
-          }}
-        />
-        <span
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: -3,
-            left: `calc(${p}% - 6px)`,
-            width: 12,
-            height: 12,
-            borderRadius: '50%',
-            background: A.PANEL,
-            border: `3px solid ${fill}`,
-            transition: 'left 400ms cubic-bezier(.2,.8,.2,1)',
-          }}
-        />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 7 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
         <span style={LABEL}>{youLabel}</span>
         <span style={LABEL}>{crownLabel}</span>
       </div>
