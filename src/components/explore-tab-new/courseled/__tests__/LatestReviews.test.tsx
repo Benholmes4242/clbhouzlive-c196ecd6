@@ -189,7 +189,8 @@ describe('LatestReviews mosaic', () => {
     render(
       <LatestReviews
         reviews={[
-          make(1, { rating: 4.2, breakdown: { design: 9.4, conditions: 6.1, clubhouse: 4.2, facilities: null } }),
+          // A bars review (overall >= 9 but not every scored category >= 9) renders the coloured tracks.
+          make(1, { rating: 9.0, breakdown: { design: 9.4, conditions: 6.1, clubhouse: 4.2, facilities: null } }),
         ]}
         onTilePress={() => {}}
         onSeeAll={() => {}}
