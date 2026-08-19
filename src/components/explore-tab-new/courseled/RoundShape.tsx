@@ -147,23 +147,28 @@ export function RoundShape({
   const gradeFor = (dh: number) =>
     dh <= -1 ? UNDER_TONE : dh === 0 ? TOPAR_EVEN_LIGHT : dh === 1 ? A.MUTE : A.INK;
 
+  /* STOP PLACEMENT IS LOAD-BEARING. Hole i's segment runs from pts[i-1] to
+     pts[i] — position i is the cumulative AFTER hole i — so hole i's colour
+     spans those two offsets and no others. It was previously pinned at pts[i]
+     and held to pts[i+1], which painted every grade on the FOLLOWING hole:
+     a birdie tinted the segment where the line rose. Two coincident stops at a
+     boundary give the hard edge; no epsilon.
+     The plot IS horizontally inset (SHAPE_PAD_X), so pts[0].x !== 0 and
+     pts[last].x !== width — the offset-0 primer and the offset-1 trailing stop
+     STAY, or the padded edges render uncoloured. */
   const strokeStops = (() => {
     if (!shape) return null;
     const out: { offset: number; color: string }[] = [];
     for (let i = 1; i < values.length; i += 1) {
       const c = gradeFor(values[i] - values[i - 1]);
-      // Each hole's colour is pinned to its OWN x fraction and held flat until
-      // just before the next hole, or the grades slide off the holes they
-      // describe (STOP PLACEMENT IS LOAD-BEARING).
-      const o = pts[i].x / width;
-      const next = i + 1 < pts.length ? pts[i + 1].x / width : 1;
       if (i === 1) out.push({ offset: 0, color: c });
-      out.push({ offset: o, color: c });
-      out.push({ offset: Math.max(o, next - 0.0001), color: c });
+      out.push({ offset: pts[i - 1].x / width, color: c });
+      out.push({ offset: pts[i].x / width, color: c });
     }
     if (out.length > 0) out.push({ offset: 1, color: out[out.length - 1].color });
     return out;
   })();
+
 
 
   return (
