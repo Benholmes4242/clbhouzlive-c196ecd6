@@ -15,6 +15,7 @@ import {
   INSIGHT_LINE_RESERVE,
   INSIGHT_CLAMP,
   movementFor,
+  IndexMovementTriangle,
 } from '../friendRoundParts';
 import { CourseImageFallback } from './CourseImageFallback';
 import { relativeDay } from './discoverWhen';
