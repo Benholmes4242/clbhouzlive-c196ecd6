@@ -257,6 +257,55 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     region,
   });
 
+  /* ── Review slots (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL) ───── */
+  /**
+   * A review is decision content, so it lives where the decision is made. The
+   * pool follows COUNTRY and REGION only — the lens is an ordering and a review
+   * is not ordered by toughness, so changing the lens must not change which
+   * reviews appear. Placement and consumption are pure (reviewSlots.ts): the
+   * same list length yields the same slots in the same places on every load,
+   * which is what keeps scroll restoration honest.
+   */
+  const { pool: reviewPool } = useBrowseReviews(country, region);
+  const reviewSlots = useMemo(
+    () => allocateReviewSlots(reviewPool, rows.length),
+    [reviewPool, rows.length],
+  );
+  const [reviewsSheet, setReviewsSheet] = useState(false);
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
+  const openReviewsSheet = useCallback(() => {
+    analyticsEvents.track('stat_browse_reviews_sheet_open', {
+      country,
+      region,
+      pool: reviewPool.length,
+    });
+    setReviewsSheet(true);
+  }, [country, region, reviewPool.length]);
+  /** Inside the sheet a tile opens the single review, exactly as on Discover. */
+  const handleReviewTile = useCallback(
+    (r: LatestReview) => {
+      openReviewSheet({
+        user: {
+          id: r.userId ?? '',
+          name: r.reviewerName,
+          username: r.reviewerUsername ?? undefined,
+          avatar: r.reviewerAvatar,
+        },
+        courseId: r.courseId,
+        courseName: r.courseName,
+        rating: r.rating,
+        reviewId: r.reviewId,
+        courseCountry: r.courseCountry,
+        courseRegion: r.courseRegion,
+        courseSubCountry: r.courseSubCountry,
+        reviewText: r.quote,
+        breakdown: r.breakdown,
+      });
+    },
+    [openReviewSheet],
+  );
+
+
   /* ── Top 100 enrichment (ranked rows only) ─────────────────────── */
   /**
    * Only rows carrying a published rank get the verdict band + COURSE STATS
