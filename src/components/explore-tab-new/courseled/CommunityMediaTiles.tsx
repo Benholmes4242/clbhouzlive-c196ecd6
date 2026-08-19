@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Heart } from 'lucide-react';
 
-import { MuteButton } from '@/audio/MuteButton';
-
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { formatRelativeRounded } from '@/i18n/format';
