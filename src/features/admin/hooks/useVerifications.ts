@@ -355,7 +355,7 @@ export function useVerifications() {
     },
     onSuccess: () => toast.success('Verification removed — the golfer has been notified.'),
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : 'Failed to remove verification'),
-    onSettled: () => qc.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] }),
+    onSettled: async () => { await refreshAdminQueues(qc); },
   });
 
   const counts = {
