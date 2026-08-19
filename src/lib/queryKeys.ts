@@ -166,6 +166,10 @@ export const feedKeys = {
    */
   postCourseContext: (scope: string, viewer: ViewerId, digest: string) =>
     batchKey('post-course-context', scope, viewer, digest),
+
+  /** post_id -> newest top-level comment for the loaded page (feed preview). */
+  postCommentPreview: (scope: string, viewer: ViewerId, digest: string) =>
+    batchKey('post-comment-preview', scope, viewer, digest),
 } as const;
 
 

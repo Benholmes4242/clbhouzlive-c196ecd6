@@ -33,6 +33,7 @@ import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 
+import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
 import { FeedCard } from './FeedCard';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
@@ -169,6 +170,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const scrollerElRef = useRef<HTMLElement | null>(null);
+
+  // ONE comments_v2 read per loaded page for the inline comment preview.
+  const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
+  const commentPreview = useFeedCommentPreview(feedPostIds, 'clubhouse:cards');
 
   // Snapshot Virtuoso state per-tab. Keep `onSnapshot` in a ref so the
   // imperative capture never depends on identity churn.
@@ -748,6 +753,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                   return !!sid && !postRoundMap?.get(sid);
                 })()}
                 onRoundTap={onRoundTap}
+                commentPreviewEnabled
+                commentPreview={commentPreview.map.get(post.id) ?? null}
               />
             )}
           </FeedItemGate>
@@ -780,6 +787,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       postScoreIdMap,
       postRoundsSettled,
       onRoundTap,
+      commentPreview.map,
     ],
   );
 

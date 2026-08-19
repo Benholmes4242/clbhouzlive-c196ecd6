@@ -24,6 +24,8 @@ import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
+import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
 import { formatRatingValue } from '@/utils/formatters';
@@ -143,6 +145,17 @@ export interface FeedCardProps {
   postRoundMissing?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
+  /**
+   * Newest top-level comment for this post (batched by the host feed).
+   * RENDERS FROM THE COMMENT, NEVER FROM comment_count — absent means no
+   * preview row, whatever the counter says.
+   */
+  commentPreview?: FeedCommentPreviewData | null;
+  /**
+   * Host opts the card into the comment block (preview + add-a-comment prompt).
+   * Grid hosts that do not batch comment data leave it off.
+   */
+  commentPreviewEnabled?: boolean;
 }
 
 interface CaptionBlockProps {
@@ -286,6 +299,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   postRoundPending,
   postRoundMissing,
   onRoundTap,
+  commentPreview,
+  commentPreviewEnabled = false,
 }) => {
   
   const { activeActor, setActiveActor } = useActiveActor();
@@ -822,6 +837,19 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           </>
         );
       })()}
+
+      {/* Comment preview + add-a-comment prompt. Sits BETWEEN the action row
+          and nothing else: one comment with an invitation beneath it reads as
+          an OPEN conversation. Ships as one block — never half of it. */}
+      {commentPreviewEnabled && (
+        <FeedCommentPreview
+          preview={commentPreview ?? null}
+          commentCount={commentCount}
+          onOpenComments={() => onComment(post, effectiveActor)}
+          viewerAvatarUrl={effectiveActor?.avatarUrl ?? null}
+          viewerName={effectiveActor?.name ?? null}
+        />
+      )}
       </div>
     </article>
   );
