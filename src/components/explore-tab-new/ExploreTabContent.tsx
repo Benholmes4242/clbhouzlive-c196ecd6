@@ -531,18 +531,6 @@ export default function ExploreTabContent({
 
 
 
-        {/* PERSONAL BESTS — the second tier, feats measured against the member's
-            OWN history. Directly below its sibling, and NOT a fifth lens: the
-            lenses filter courses, this changes whose history the bar comes from. */}
-        <PersonalBests
-          userId={userId}
-          standoutCounts={standoutCounts}
-          onCoursePress={(id) => goCourse(id, 'personal_bests')}
-          onFeatPress={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)}
-        />
-
-
-
         <MomentsOfTheWeek
           moments={momentMosaic}
           totalCount={momentList.length}
@@ -567,6 +555,27 @@ export default function ExploreTabContent({
           onSeeAll={mostPlayedList.length > 5 ? () => setMostPlayedSheet(true) : undefined}
         />
 
+        {/* THE ONE RULE ON THE PAGE (BRIEF_DISCOVER_HIERARCHY §1.1). Everything
+            below it is TIER 3 — reference material, always true, quieter. It is
+            what makes the tier legible: a reader who stops here has had the
+            page, and scrolling past the appendix costs them nothing. */}
+        <div
+          aria-hidden="true"
+          style={{ height: 1, background: A.BORDER, margin: '0 0 -4px' }}
+        />
+
+        {/* PERSONAL BESTS — tier 3, and now a RAIL (§3.2). It used to sit
+            directly beneath Around the world as a second vertical grid, which is
+            where the page felt endless. Feats measured against the member's OWN
+            history, and NOT a fifth lens: the lenses filter courses, this
+            changes whose history the bar comes from. */}
+        <PersonalBests
+          userId={userId}
+          standoutCounts={standoutCounts}
+          onCoursePress={(id) => goCourse(id, 'personal_bests')}
+          onFeatPress={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)}
+        />
+
         <HonoursBoard
           events={honours}
           isPending={wireLoading}
@@ -575,6 +584,7 @@ export default function ExploreTabContent({
           onSeeAll={openHonoursSheet}
           onSeeAllLeader={openHonoursLeader}
         />
+
 
         {/* Clears the floating bottom nav. Collapses to 16px on routes where
             the nav hides, because the nav publishes --bottom-nav-height: 0px. */}
