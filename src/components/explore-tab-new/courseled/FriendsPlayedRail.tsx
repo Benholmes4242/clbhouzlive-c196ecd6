@@ -14,6 +14,7 @@ import {
   INSIGHT_LINE_HEIGHT,
   INSIGHT_LINE_RESERVE,
   INSIGHT_CLAMP,
+  movementFor,
 } from '../friendRoundParts';
 import { CourseImageFallback } from './CourseImageFallback';
 import { relativeDay } from './discoverWhen';
@@ -120,6 +121,12 @@ const GLASS_CSS = `
    so the CHIP'S under-par figure — and only that — uses a lighter red. */
 const GLASS_UNDER = '#FF8A80';
 
+/* THE INDEX-DELTA PAIR ON DARK GLASS. NOT A.IMPROVED / A.DRIFTED, which are
+   light-surface values and fail over a photograph. Same colours, different
+   substrate - see the same split on TOPAR_UNDER_LIGHT / TOPAR_UNDER_DARK. */
+const INDEX_DARK_FELL = '#7BE8A6';
+const INDEX_DARK_ROSE = '#FF8A7A';
+
 
 /**
  * THE ROUND'S SHAPE.
@@ -211,6 +218,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
           // (A.IMPROVED / A.DRIFTED) means MOVEMENT and must never appear here.
           const toPar = toParFor(r);
           const toParUnder = toPar?.tone === TOPAR_RED;
+          const movement = movementFor(r);
           const insight = insights.get(r.round_id)?.text ?? referenceLine(r, t);
 
           return (
@@ -330,6 +338,39 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                         }}
                       >
                         {toPar.text}
+                      </span>
+                    )}
+                    {movement && (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'baseline',
+                          gap: 0,
+                        }}
+                      >
+                        {/* A figure with an ARROW is a MOVEMENT; the signed
+                            figure next to it is a SCORE. Under-par score is
+                            RED, a falling index is GREEN - opposite conventions,
+                            both legible on dark glass. */}
+                        <span
+                          style={{
+                            width: 1,
+                            alignSelf: 'stretch',
+                            background: 'rgba(255,255,255,0.28)',
+                            margin: '0 2px',
+                          }}
+                        />
+                        <span
+                          style={{
+                            ...NUMF,
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: movement.arrow === '\u2193' ? INDEX_DARK_FELL : INDEX_DARK_ROSE,
+                            lineHeight: 1,
+                          }}
+                        >
+                          {movement.arrow}{movement.figure}
+                        </span>
                       </span>
                     )}
                   </span>
