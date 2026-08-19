@@ -37,9 +37,11 @@ const HEIGHTS = [240, 132, 148, 160, 128, 176];
 interface Props {
   items: CommunityLibraryItem[];
   onPress: (item: CommunityLibraryItem) => void;
+  /** False on Everything: the wall stops at one page. Default true (Photos chip). */
+  infinite?: boolean;
 }
 
-export function CommunityPhotoMosaic({ items, onPress }: Props) {
+export function CommunityPhotoMosaic({ items, onPress, infinite = true }: Props) {
   const [shown, setShown] = useState(STEP);
   const sentinel = useRef<HTMLDivElement | null>(null);
 
@@ -48,7 +50,7 @@ export function CommunityPhotoMosaic({ items, onPress }: Props) {
 
   useEffect(() => {
     const el = sentinel.current;
-    if (!el || shown >= items.length) return;
+    if (!infinite || !el || shown >= items.length) return;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) setShown((n) => Math.min(n + STEP, items.length));
