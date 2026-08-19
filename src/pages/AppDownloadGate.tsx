@@ -101,17 +101,18 @@ const AppDownloadGate: React.FC = () => {
           style={{ display: 'block', width: 72, height: 72 }}
           draggable={false}
         />
-        <div
+        <img
+          src={wordmark.url}
+          alt="clbhouz"
           style={{
+            display: 'block',
             marginTop: 18,
-            fontSize: 26,
-            fontWeight: 500,
-            letterSpacing: '-0.035em',
-            color: INK,
+            height: 26,
+            width: 'auto',
+            filter: 'invert(1)',
           }}
-        >
-          clbhouz
-        </div>
+          draggable={false}
+        />
 
         {/* band 2 — copy */}
         <h1
