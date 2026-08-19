@@ -186,22 +186,15 @@ export function ordinalSuffix(n: number): string {
 }
 
 /**
- * HELD GAUGE (BRIEF_MOVEMENT_RED_AND_HELD_BOARD).
- *
- * When the member holds the crown there is no gap to close, so the track stops
- * being a chase and becomes a LEAD: full amber, with a 2px ink notch at the
- * runner-up's position on the member's own scale. A tie at the top draws NO
- * notch - a notch at 100% is indistinguishable from the end of the track.
- *
- * Amber here means the viewing member, the same rule as everywhere else on
- * this surface.
+ * Label pair beneath the held stat row. The amber lead track has been removed:
+ * a bar implies a scale, and "you hold it" is already stated by the label.
  */
 export const HeldGauge: React.FC<{
   /** Runner-up's position on the member's scale, 0-100. Null = tie, no notch. */
   notchPct: number | null;
   nearestLabel: string;
   holdLabel: string;
-}> = ({ nearestLabel, holdLabel }) => {
+}> = ({ notchPct: _notchPct, nearestLabel, holdLabel }) => {
   return (
     <div style={{ margin: '18px 0 2px', fontFamily: SANS }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
