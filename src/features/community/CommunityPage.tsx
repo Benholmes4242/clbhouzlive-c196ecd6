@@ -325,28 +325,47 @@ export default function CommunityPage() {
 
             {showPhotos && photosPool.length > 0 && (
               <section style={{ marginBottom: 26 }}>
-                <Eyebrow
-                  icon={ImageIcon}
-                  subline={t('community.sections.photos.subline', 'From the courses')}
-                >
-                  {t('community.sections.photos.title', 'Photos')}
-                </Eyebrow>
                 <div style={{ padding: '0 16px' }}>
-                  <CommunityPhotoMosaic items={photosPool} onPress={handlePress} />
+                  <Eyebrow
+                    icon={ImageIcon}
+                    subline={t('community.sections.photos.subline', 'From the courses')}
+                    aside={
+                      chip === 'all' && photosPool.length > photos.length ? (
+                        <InkAction onClick={() => setChip('photos')}>
+                          {t('community.seeAll', 'See all')}
+                        </InkAction>
+                      ) : undefined
+                    }
+                  >
+                    {t('community.sections.photos.title', 'Photos')}
+                  </Eyebrow>
+                </div>
+                <div style={{ padding: '0 16px' }}>
+                  {/* Infinite only on the Photos chip: on Everything an endless
+                      wall makes Browse by club unreachable. */}
+                  <CommunityPhotoMosaic
+                    items={photos}
+                    onPress={handlePress}
+                    infinite={chip === 'photos'}
+                  />
                 </div>
               </section>
             )}
 
-            {/* BROWSE BY CLUB ALWAYS RENDERS, and last: it covers only tagged
-                content, so its subline says so rather than looking broken. */}
-            <CommunityCourseIndex
-              items={all}
-              title={t('community.sections.clubs.title', 'Browse by club')}
-              subline={t('community.sections.clubs.subline', 'Only where a course was tagged')}
-              countLabel={(n) =>
-                t('community.count', { defaultValue: '{{count}} posts', count: n })
-              }
-            />
+            {/* BROWSE BY CLUB IS LAST, and only on Everything and Photos: it
+                links to course pages, not media, so it is out of place under a
+                video-only view. It covers only tagged content, so its subline
+                says so rather than looking broken. */}
+            {showClubs && (
+              <CommunityCourseIndex
+                items={all}
+                title={t('community.sections.clubs.title', 'Browse by club')}
+                subline={t('community.sections.clubs.subline', 'Only where a course was tagged')}
+                countLabel={(n) =>
+                  t('community.count', { defaultValue: '{{count}} posts', count: n })
+                }
+              />
+            )}
           </>
         )}
       </main>
