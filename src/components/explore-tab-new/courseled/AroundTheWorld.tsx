@@ -1,3 +1,4 @@
+import { Crown } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -855,6 +856,7 @@ export function AroundTheWorld({
     <>
     <section>
       <Eyebrow
+        icon={Crown}
         dot={newGroupCount > 0}
         aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}
       >

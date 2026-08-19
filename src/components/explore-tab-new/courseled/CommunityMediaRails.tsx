@@ -1,3 +1,4 @@
+import { Clapperboard, Film } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -66,6 +67,7 @@ export function LatestVideosRail({ items, onTilePress, onSeeAll }: Props) {
     <section ref={ref}>
       {/* NO COUNT IN THE HEADING — thin supply must not advertise itself. */}
       <Eyebrow
+        icon={Clapperboard}
         aside={<InkAction onClick={onSeeAll}>{t('discover.videosAction', 'All videos')}</InkAction>}
       >
         {t('discover.videosHeading', 'Latest videos')}
@@ -93,6 +95,7 @@ export function ClipsRail({ items, onTilePress, onSeeAll }: Props) {
   return (
     <section ref={ref}>
       <Eyebrow
+        icon={Film}
         aside={<InkAction onClick={onSeeAll}>{t('discover.clipsAction', 'See all')}</InkAction>}
       >
         {t('discover.clipsHeading', 'Clips')}
