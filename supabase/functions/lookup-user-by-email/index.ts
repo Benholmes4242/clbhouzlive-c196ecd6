@@ -35,6 +35,15 @@ serve(async (req: Request) => {
   }
 
   try {
+    // This function turns an email into a user id, so an unauthenticated
+    // caller would be an account-enumeration oracle. Admins only, fail-closed.
+    const caller = await resolveCaller(req);
+    if (!caller) return unauthorized(headers as Record<string, string>);
+    if (!(await isPanelAdmin(caller.id))) {
+      return forbidden(headers as Record<string, string>);
+    }
+
+
     const { email } = await req.json().catch(() => ({}));
     if (!email || typeof email !== "string") {
       return new Response(JSON.stringify({ error: "email required" }), {
