@@ -1,0 +1,1 @@
+ALTER VIEW public.sr_tournament_course_resolution SET (security_invoker = on);
