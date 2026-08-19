@@ -205,6 +205,15 @@ interface TileProps {
    * landscape. Absent = the shipped 9/16 rail shape, so Discover is unchanged.
    */
   aspect?: number;
+  /**
+   * SQUARE CORNERS IN A GRID (BRIEF_MOSAIC_CONSISTENCY §2). At a 2px gutter,
+   * four radiused corners leave a diamond of background at every junction, so
+   * the wall reads as separate cards floating close together. Rails KEEP the
+   * radius — each rail card is its own object — so this is opt-in and only the
+   * /community clip mosaic sets it. The overlay gains 2px of inset padding to
+   * compensate for the text sitting nearer a square edge.
+   */
+  square?: boolean;
 }
 
 export function CommunityVideoTile({ item, railVisible, onPress, width }: TileProps) {
@@ -356,7 +365,9 @@ export function CommunityVideoTile({ item, railVisible, onPress, width }: TilePr
   );
 }
 
-export function CommunityClipTile({ item, railVisible, onPress, width, aspect }: TileProps) {
+export function CommunityClipTile({ item, railVisible, onPress, width, aspect, square }: TileProps) {
+  const radius = square ? 0 : RADIUS;
+  const overlayInset = square ? 10 : 8;
   return (
     <button
       type="button"
@@ -369,11 +380,11 @@ export function CommunityClipTile({ item, railVisible, onPress, width, aspect }:
         padding: 0,
         border: 'none',
         background: 'transparent',
-        borderRadius: RADIUS,
+        borderRadius: radius,
         cursor: 'pointer',
       }}
     >
-      <TileMedia item={item} railVisible={railVisible} radius={RADIUS}>
+      <TileMedia item={item} railVisible={railVisible} radius={radius}>
         {(playing) => (
           <>
             {/* The scrim gains a TOP stop so the course tag stays legible on a
@@ -391,9 +402,9 @@ export function CommunityClipTile({ item, railVisible, onPress, width, aspect }:
             <span
               style={{
                 position: 'absolute',
-                left: 8,
-                right: 8,
-                bottom: 8,
+                left: overlayInset,
+                right: overlayInset,
+                bottom: overlayInset,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,

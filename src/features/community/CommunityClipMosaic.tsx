@@ -77,6 +77,7 @@ export function CommunityClipMosaic({ items, onPress }: Props) {
               onPress={onPress}
               width="100%"
               aspect={aspect}
+              square
             />
           ))}
         </div>
