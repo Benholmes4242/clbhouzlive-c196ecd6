@@ -359,36 +359,34 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                             marginRight: 7,
                           }}
                         />
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'baseline',
-                            gap: 3,
-                          }}
-                        >
                           <span
                             style={{
-                              ...NUMF,
-                              fontSize: 11,
-                              fontWeight: 700,
-                              color: movement.arrow === '\u2193' ? INDEX_DARK_FELL : INDEX_DARK_ROSE,
-                              lineHeight: 1,
+                              display: 'inline-flex',
+                              alignItems: 'baseline',
+                              gap: 3,
                             }}
                           >
-                            {movement.arrow}
+                            {movement.arrow === '\u2193' ? (
+                              <svg width="7" height="6" viewBox="0 0 7 6" aria-hidden>
+                                <path d="M0 0h7L3.5 6z" fill={INDEX_DARK_FELL} />
+                              </svg>
+                            ) : (
+                              <svg width="7" height="6" viewBox="0 0 7 6" aria-hidden>
+                                <path d="M3.5 0 7 6H0z" fill={INDEX_DARK_ROSE} />
+                              </svg>
+                            )}
+                            <span
+                              style={{
+                                ...NUMF,
+                                fontSize: 11,
+                                fontWeight: 700,
+                                color: movement.arrow === '\u2193' ? INDEX_DARK_FELL : INDEX_DARK_ROSE,
+                                lineHeight: 1,
+                              }}
+                            >
+                              {movement.figure}
+                            </span>
                           </span>
-                          <span
-                            style={{
-                              ...NUMF,
-                              fontSize: 11,
-                              fontWeight: 700,
-                              color: movement.arrow === '\u2193' ? INDEX_DARK_FELL : INDEX_DARK_ROSE,
-                              lineHeight: 1,
-                            }}
-                          >
-                            {movement.figure}
-                          </span>
-                        </span>
                       </span>
                     )}
                   </span>
