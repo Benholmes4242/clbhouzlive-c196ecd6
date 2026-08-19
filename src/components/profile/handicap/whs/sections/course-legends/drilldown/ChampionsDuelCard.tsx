@@ -116,12 +116,6 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   const gapRaw = selfRow && champion ? selfRow.value - champion.value : null;
   const level = selfRow != null && champion != null && Math.abs(gapRaw ?? 0) < 0.005;
 
-  // Direction: chaseProgress is category-aware (count categories use the
-  // ratio, value categories use the gap closing toward the champion), so a
-  // gross record of 71 against 65 reads as a partial gauge, never 109%.
-  const pct =
-    selfRow && champion ? chaseProgress(category, champion.value, selfRow.value) * 100 : 0;
-
   // The gap string comes from the shared helper — never computed inline here.
   const gapSigned =
     selfRow && champion ? formatGapFromChampion(category, selfRow.value, champion.value) : null;
