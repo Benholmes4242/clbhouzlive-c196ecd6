@@ -57,6 +57,13 @@ import {
 
 } from './useStatBrowse';
 import { KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
+import { ReviewRailSlot } from './ReviewRailSlot';
+import { ReviewFeaturedSlot } from './ReviewFeaturedSlot';
+import { allocateReviewSlots } from './reviewSlots';
+import { useBrowseReviews } from './useBrowseReviews';
+import { LatestReviewsSheet } from '@/components/explore-tab-new/courseled/LatestReviewsSheet';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import {
   AMBER,
   HAIRLINE_INK_8,
