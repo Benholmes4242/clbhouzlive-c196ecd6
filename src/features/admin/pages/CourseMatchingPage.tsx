@@ -11,6 +11,8 @@ import AdminAccessDenied from '../components/AdminAccessDenied';
 import AdminErrorState from '../components/AdminErrorState';
 import AdminSheet from '../components/AdminSheet';
 import ConfirmDialog from '../components/ConfirmDialog';
+import ProHoleDataQueue from '../components/ProHoleDataQueue';
+
 import {
   ignoreUnmatchedCourse,
   markUnmatchedNeedsCatalogue,
