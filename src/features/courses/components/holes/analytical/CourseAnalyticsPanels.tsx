@@ -860,14 +860,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           label: t('courses:holes.preview.seeAllShort', { count: holes.length }),
           onClick: () => setHolesSheetOpen(true),
         }}
-        aside={
-          totalRounds > 0
-            ? t('courses:courseDetail.plays.rounds', {
-                count: totalRounds,
-                rounds: formatNumber(totalRounds),
-              })
-            : undefined
-        }
+        aside={totalRounds > 0 ? basis : undefined}
+
         headerGap={10}
         style={{ padding: '18px 16px 12px' }}
       >
