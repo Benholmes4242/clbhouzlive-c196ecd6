@@ -59,7 +59,7 @@ export function CommunityPhotoMosaic({ items, onPress, infinite = true }: Props)
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [shown, items.length]);
+  }, [shown, items.length, infinite]);
 
   /** Alternating fill keeps both columns growing together without measuring. */
   const columns = useMemo(() => {
