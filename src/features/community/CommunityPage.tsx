@@ -271,41 +271,40 @@ export default function CommunityPage() {
 
             {showClips && clipsPool.length > 0 && (
               <section style={{ marginBottom: 26 }}>
-                <Eyebrow
-                  icon={Film}
-                  subline={t('community.sections.clips.subline', 'Under three minutes')}
-                >
-                  {t('community.sections.clips.title', 'Clips')}
-                </Eyebrow>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: 6,
-                    padding: '0 16px',
-                  }}
-                >
-                  {clipsPool.slice(0, CLIPS_CAP).map((item) => (
-                    <CommunityClipTile
-                      key={item.key}
-                      item={item}
-                      railVisible
-                      onPress={handlePress}
-                      width="100%"
-                    />
-                  ))}
+                {/* Eyebrow's padding is 0 2px because callers own their gutter,
+                    so this page supplies the 16px and the icon lands on the
+                    first tile's left edge. */}
+                <div style={{ padding: '0 16px' }}>
+                  <Eyebrow
+                    icon={Film}
+                    subline={t('community.sections.clips.subline', 'Under three minutes')}
+                    aside={
+                      chip === 'all' && clipsPool.length > clipsCap ? (
+                        <InkAction onClick={() => setChip('clips')}>
+                          {t('community.seeAll', 'See all')}
+                        </InkAction>
+                      ) : undefined
+                    }
+                  >
+                    {t('community.sections.clips.title', 'Clips')}
+                  </Eyebrow>
+                </div>
+                <div style={{ padding: '0 16px' }}>
+                  <CommunityClipMosaic items={clips} onPress={handlePress} />
                 </div>
               </section>
             )}
 
             {showVideos && videoRows.length > 0 && (
               <section style={{ marginBottom: 26 }}>
-                <Eyebrow
-                  icon={Clapperboard}
-                  subline={t('community.sections.videos.subline', 'Three minutes and over')}
-                >
-                  {t('community.sections.videos.title', 'Latest videos')}
-                </Eyebrow>
+                <div style={{ padding: '0 16px' }}>
+                  <Eyebrow
+                    icon={Clapperboard}
+                    subline={t('community.sections.videos.subline', 'Three minutes and over')}
+                  >
+                    {t('community.sections.videos.title', 'Latest videos')}
+                  </Eyebrow>
+                </div>
                 <div
                   style={{
                     padding: '0 16px',
