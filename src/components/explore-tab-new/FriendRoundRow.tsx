@@ -12,6 +12,7 @@ import {
   InsightGlyph,
   INSIGHT_FONT_SIZE,
   INSIGHT_LINE_HEIGHT,
+  IndexMovementTriangle,
 } from './friendRoundParts';
 
 /**
