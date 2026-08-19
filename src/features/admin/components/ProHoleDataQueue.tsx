@@ -121,8 +121,9 @@ const Row: React.FC<{ left: React.ReactNode; right?: React.ReactNode; last?: boo
   </div>
 );
 
-const ProHoleDataQueue: React.FC = () => {
-  const { data, isLoading, error } = useQuery<Queue>({
+/** Shared query - the page reads it for the tab count, the panel for its rows. */
+export function useProHoleDataQueue() {
+  return useQuery<Queue>({
     queryKey: ['admin-pro-hole-data-queue'],
     queryFn: async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -132,6 +133,22 @@ const ProHoleDataQueue: React.FC = () => {
     },
     staleTime: 300_000,
   });
+}
+
+/** Item count for the tab badge: queued tournaments across every sub-group. */
+export function proHoleQueueCount(q: Queue | undefined): number {
+  if (!q) return 0;
+  const sum = (rows: Array<{ tournaments: number }>) =>
+    rows.reduce((n, r) => n + (r.tournaments ?? 0), 0);
+  return (
+    sum(q.unresolved_venues ?? []) +
+    sum(q.ambiguous_venues ?? []) +
+    sum(q.unresolved_course_names ?? [])
+  );
+}
+
+const ProHoleDataQueue: React.FC = () => {
+  const { data, isLoading, error } = useProHoleDataQueue();
 
   if (isLoading) return null;
   if (error) {
@@ -158,18 +175,6 @@ const ProHoleDataQueue: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-          color: t.inkFaint,
-        }}
-      >
-        Pro hole data
-      </div>
-
       <Case
         title="Venue unresolved"
         note="These tournament venues have no mapping row, so no course can show a Pros view of its holes."
