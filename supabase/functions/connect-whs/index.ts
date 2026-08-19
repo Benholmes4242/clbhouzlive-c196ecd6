@@ -22,7 +22,6 @@ import {
   upsertScores,
   insertHandicapSnapshotIfChanged,
   EgApiError,
-  type EgScore,
   type EgFriend,
 } from "../_shared/eg-api.ts";
 
