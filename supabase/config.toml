@@ -7,7 +7,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.lookup-user-by-email]
-verify_jwt = true
+verify_jwt = false
 
 [functions.secure-site-access]
 verify_jwt = false
@@ -40,13 +40,13 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.generate-season-wrap]
-verify_jwt = true
+verify_jwt = false
 
 [functions.location-search]
 verify_jwt = false
 
 [functions.compute-golfer-eligibility-signals]
-verify_jwt = true
+verify_jwt = false
 
 [functions.verify-business-approve]
 verify_jwt = false
@@ -235,7 +235,7 @@ verify_jwt = false
 
 
 [functions.send-business-invite]
-verify_jwt = true
+verify_jwt = false
 
 [functions.echo-intelligence-v2]
 verify_jwt = false
