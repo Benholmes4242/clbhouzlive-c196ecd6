@@ -1082,6 +1082,12 @@
       "holesN_other": "{{count}} holes",
       "keyBoth": "Bar is the field. Tick is you.",
       "keyField": "Bar is the field average over par."
+    },
+    "proView": {
+      "members": "Members",
+      "pros": "Pros",
+      "proBasis_one": "{{tournaments}} tournament · {{rounds}} player-rounds",
+      "proBasis_other": "{{tournaments}} tournaments · {{rounds}} player-rounds"
     }
   },
   "network": {

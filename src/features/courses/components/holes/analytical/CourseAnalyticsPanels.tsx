@@ -16,6 +16,8 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
+import { useCourseProHoleAnalysis } from '@/hooks/gam/useCourseProHoleAnalysis';
+
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
@@ -632,17 +634,27 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   const { user } = useSupabaseSession();
   const { data: connection } = useWhsConnection(user?.id);
   const { data } = useCourseHoleAnalysis(courseId);
+  const { data: pro } = useCourseProHoleAnalysis(courseId);
   const { data: myPerf } = useMyHolePerformance(user?.id, courseId, {
     enabled: Boolean(user?.id && courseId && connection),
   });
 
   const [holesSheetOpen, setHolesSheetOpen] = useState(false);
   const [openHoles, setOpenHoles] = useState<Set<number>>(() => new Set());
+  /* The toggle exists only where pro data resolves and passes the par guard. */
+  const proHoles = pro?.available ? (pro.holes ?? []) : [];
+  const hasPro = proHoles.length > 0;
+  const [view, setView] = useState<'members' | 'pros'>('members');
+  const activeView = hasPro ? view : 'members';
 
   const holes = useMemo(
-    () => [...(data?.holes ?? [])].sort((a, b) => a.hole_no - b.hole_no),
-    [data?.holes],
+    () =>
+      activeView === 'pros'
+        ? ([...proHoles] as unknown as CourseHole[]).sort((a, b) => a.hole_no - b.hole_no)
+        : [...(data?.holes ?? [])].sort((a, b) => a.hole_no - b.hole_no),
+    [data?.holes, proHoles, activeView],
   );
+
   const myByHole = useMemo(() => {
     const m = new Map<number, MyHolePerformanceRow>();
     (myPerf ?? []).forEach((r) => m.set(r.hole_no, r));
@@ -686,9 +698,24 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
     });
   };
 
-  if (!courseId || !data?.available || holes.length === 0 || !stats) return null;
+  const sourceAvailable = activeView === 'pros' ? hasPro : Boolean(data?.available);
+  if (!courseId || !sourceAvailable || holes.length === 0 || !stats) return null;
 
-  const totalRounds = data.total_rounds;
+  const totalRounds =
+    activeView === 'pros' ? (pro?.total_rounds ?? 0) : (data?.total_rounds ?? 0);
+  /* THE BASIS LINE states what was pooled - tournaments and player-rounds. */
+  const basis =
+    activeView === 'pros'
+      ? t('courses:courseDetail.proView.proBasis', {
+          count: pro?.total_tournaments ?? 0,
+          tournaments: formatNumber(pro?.total_tournaments ?? 0),
+          rounds: formatNumber(totalRounds),
+        })
+      : t('courses:courseDetail.plays.rounds', {
+          count: totalRounds,
+          rounds: formatNumber(totalRounds),
+        });
+
   const field = toParParts(stats.fieldAvg);
   const you = toParParts(stats.yourAvg);
   const beastFig = toParParts(stats.hardest.avg_to_par);
@@ -720,16 +747,43 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
+      {/* MEMBERS / PROS - text-only register, shown only where pro data resolves. */}
+      {hasPro && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          {(['members', 'pros'] as const).map((k) => {
+            const on = activeView === k;
+            return (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setView(k)}
+                aria-pressed={on}
+                style={{
+                  appearance: 'none',
+                  border: 0,
+                  background: 'transparent',
+                  padding: 0,
+                  fontSize: 13,
+                  fontWeight: on ? 700 : 600,
+                  color: on ? A.INK : '#94A3B8',
+                  cursor: 'pointer',
+                }}
+              >
+                {t(`courses:courseDetail.proView.${k}`)}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Block 2 - How it plays: the chart leads, the figures support it. */}
       <Panel
         kicker={t('courses:courseDetail.blocks.howItPlays')}
-        aside={t('courses:courseDetail.plays.rounds', {
-          count: totalRounds,
-          rounds: formatNumber(totalRounds),
-        })}
+        aside={basis}
         headerGap={12}
         style={{ padding: '14px 13px 11px' }}
       >
+
         <ShapeChart
           holes={holes}
           myByHole={myByHole}
@@ -806,14 +860,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           label: t('courses:holes.preview.seeAllShort', { count: holes.length }),
           onClick: () => setHolesSheetOpen(true),
         }}
-        aside={
-          totalRounds > 0
-            ? t('courses:courseDetail.plays.rounds', {
-                count: totalRounds,
-                rounds: formatNumber(totalRounds),
-              })
-            : undefined
-        }
+        aside={totalRounds > 0 ? basis : undefined}
+
         headerGap={10}
         style={{ padding: '18px 16px 12px' }}
       >
@@ -862,13 +910,9 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
             {/* THE ROUNDS COUNT IS META (§B2), right-aligned, the same treatment
                 every other panel's sample size takes - not a sentence. */}
             {totalRounds > 0 && (
-              <div style={{ ...LABEL, ...FIGS }}>
-                {t('courses:courseDetail.plays.rounds', {
-                  count: totalRounds,
-                  rounds: formatNumber(totalRounds),
-                })}
-              </div>
+              <div style={{ ...LABEL, ...FIGS }}>{basis}</div>
             )}
+
           </div>
           <h2
             id="course-holes-sheet-title"
