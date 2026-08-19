@@ -10,8 +10,8 @@
  *     tinted row background anywhere
  *   - rank is a plain figure in every position, including 1st - no chip,
  *     no crown glyph substituting for the number
- *   - the gauge carries ONE marker and no faces; a bar with photographs on
- *     it cannot be read as a scale
+ *   - the gauge has been removed; a bar implies a scale, and these boards
+ *     carry their meaning in the figures and labels instead
  */
 import React from 'react';
 import { A, LABEL, NUM, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -159,47 +159,18 @@ export const BoardHeaderRow: React.FC<{
 );
 
 /**
- * A gauge, not a race track: one filled portion, one marker at the member's
- * position. `pct` is already direction-corrected by the caller via
- * chaseProgress / isLowerBetterCategory.
+ * Label pair beneath the chase stat row. The track has been removed: a bar
+ * implies a scale, and these categories have no labelled ends.
  */
 export const CrownGauge: React.FC<{
   pct: number;
   level: boolean;
   youLabel: string;
   crownLabel: string;
-}> = ({ pct, level, youLabel, crownLabel }) => {
-  const p = level ? 100 : Math.max(2, Math.min(96, pct));
-  const fill = level ? A.AMBER : A.INK;
+}> = ({ pct: _pct, level: _level, youLabel, crownLabel }) => {
   return (
     <div style={{ margin: '18px 0 2px', fontFamily: SANS }}>
-      <div style={{ height: 6, background: A.TRACK, borderRadius: 3, position: 'relative' }}>
-        <span
-          style={{
-            display: 'block',
-            height: 6,
-            borderRadius: 3,
-            width: `${p}%`,
-            background: fill,
-            transition: 'width 400ms cubic-bezier(.2,.8,.2,1)',
-          }}
-        />
-        <span
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: -3,
-            left: `calc(${p}% - 6px)`,
-            width: 12,
-            height: 12,
-            borderRadius: '50%',
-            background: A.PANEL,
-            border: `3px solid ${fill}`,
-            transition: 'left 400ms cubic-bezier(.2,.8,.2,1)',
-          }}
-        />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 7 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
         <span style={LABEL}>{youLabel}</span>
         <span style={LABEL}>{crownLabel}</span>
       </div>
@@ -215,51 +186,18 @@ export function ordinalSuffix(n: number): string {
 }
 
 /**
- * HELD GAUGE (BRIEF_MOVEMENT_RED_AND_HELD_BOARD).
- *
- * When the member holds the crown there is no gap to close, so the track stops
- * being a chase and becomes a LEAD: full amber, with a 2px ink notch at the
- * runner-up's position on the member's own scale. A tie at the top draws NO
- * notch - a notch at 100% is indistinguishable from the end of the track.
- *
- * Amber here means the viewing member, the same rule as everywhere else on
- * this surface.
+ * Label pair beneath the held stat row. The amber lead track has been removed:
+ * a bar implies a scale, and "you hold it" is already stated by the label.
  */
 export const HeldGauge: React.FC<{
   /** Runner-up's position on the member's scale, 0-100. Null = tie, no notch. */
   notchPct: number | null;
   nearestLabel: string;
   holdLabel: string;
-}> = ({ notchPct, nearestLabel, holdLabel }) => {
-  const n = notchPct == null ? null : Math.max(2, Math.min(97, notchPct));
+}> = ({ notchPct: _notchPct, nearestLabel, holdLabel }) => {
   return (
     <div style={{ margin: '18px 0 2px', fontFamily: SANS }}>
-      <div style={{ height: 6, background: A.TRACK, borderRadius: 3, position: 'relative' }}>
-        <span
-          style={{
-            display: 'block',
-            height: 6,
-            borderRadius: 3,
-            width: '100%',
-            background: A.AMBER,
-          }}
-        />
-        {n != null && (
-          <span
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: -2,
-              left: `calc(${n}% - 1px)`,
-              width: 2,
-              height: 10,
-              background: A.INK,
-              borderRadius: 1,
-            }}
-          />
-        )}
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 7 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
         <span style={{ ...LABEL, fontVariantNumeric: 'tabular-nums lining-nums' }}>{nearestLabel}</span>
         <span style={{ ...LABEL, color: A.AMBER }}>{holdLabel}</span>
       </div>

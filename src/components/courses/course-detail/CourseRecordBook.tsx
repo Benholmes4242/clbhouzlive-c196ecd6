@@ -40,81 +40,6 @@ const UNIT_KEY: Record<string, string> = {
 
 /** Amber at 6% - the held-board plate. */
 const PLATE_BG = 'rgba(247, 147, 30, 0.06)';
-/** Amber at 18% - the gap fill between the champion's mark and the viewer's dot. */
-const GAP_FILL = 'rgba(247, 147, 30, 0.18)';
-
-/**
- * The standing track. TWO POINTS, NOT A RANGE: the champion holds the left end
- * and the viewer the right, because ViewerStanding carries the gap and the
- * viewer's rank but NOT the board's spread - there is no worst value, so any
- * marker floating at a position along a range would be invented.
- *
- * held = the viewer IS the champion: one full amber track. An empty or
- * near-empty track would read as zero, which is the opposite of the truth.
- */
-const StandingTrack: React.FC<{ held?: boolean }> = ({ held = false }) => (
-  <div
-    style={{
-      position: 'relative',
-      height: 7,
-      flex: 1,
-      minWidth: 34,
-      display: 'flex',
-      alignItems: 'center',
-    }}
-    aria-hidden="true"
-  >
-    {/* The track itself is NEUTRAL on a chased board - amber is the member. */}
-    <div
-      style={{
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        height: 3,
-        borderRadius: 2,
-        background: held ? A.AMBER : A.TRACK,
-      }}
-    />
-    {!held && (
-      <>
-        {/* the gap, amber at 18% */}
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            height: 3,
-            borderRadius: 2,
-            background: GAP_FILL,
-          }}
-        />
-        {/* the champion: a 3px ink mark at the left end */}
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            width: 3,
-            height: 7,
-            borderRadius: 1,
-            background: A.INK,
-          }}
-        />
-        {/* the viewer: an amber dot at the right end */}
-        <div
-          style={{
-            position: 'absolute',
-            right: 0,
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: A.AMBER,
-          }}
-        />
-      </>
-    )}
-  </div>
-);
-
 
 interface Props {
   courseId: string;
@@ -167,10 +92,10 @@ export const CourseRecordBook: React.FC<Props> = ({
   }
 
   /**
-   * Where the viewer stands: they hold it (full amber track), they are on the
-   * board (two-point track, their value, the gap and their rank), or NOTHING
-   * AT ALL when they have no entry. A track with no marker would read as "you
-   * are last", which is not what "no entry" means - so there is no track.
+   * Where the viewer stands: they hold it, they are on the board (their value,
+   * the gap and their rank), or NOTHING AT ALL when they have no entry. The
+   * progress bars have been removed; a bar implies a scale, and these boards
+   * carry their figures in the labels instead.
    */
   const viewerLine = (category: LegendCategory, isYou: boolean) => {
     if (isYou) {
@@ -178,9 +103,6 @@ export const CourseRecordBook: React.FC<Props> = ({
         <div style={{ marginTop: 4 }}>
           <div style={{ ...LABEL, fontSize: 7.5, color: A.AMBER_DEEP }}>
             {t('courseDetail.records.youHold')}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
-            <StandingTrack held />
           </div>
         </div>
       );
@@ -218,14 +140,13 @@ export const CourseRecordBook: React.FC<Props> = ({
               : t('courseDetail.records.youAhead')}
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-          <StandingTrack />
-          {rankLabel && (
+        {rankLabel && (
+          <div style={{ marginTop: 4 }}>
             <span style={{ ...LABEL, fontSize: 7.5, color: A.MUTE, ...FIGS, whiteSpace: 'nowrap' }}>
               {rankLabel}
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   };
