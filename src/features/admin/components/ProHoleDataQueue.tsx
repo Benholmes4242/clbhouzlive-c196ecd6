@@ -4,11 +4,11 @@
  * (the venue mapping, or the tournament data itself), so this states what is
  * blocked and why, and nothing else.
  *
- *   1 Venue unresolved      - tournament venue has no mapping row.
- *   2 Venue ambiguous       - mapping resolves to nothing, or the venue hosts
- *                             more than one course and the mapping names none.
- *   3 Par disagreement      - pooled tournaments disagree on a hole's par, so
- *                             the guard withholds the whole course.
+ *   1 Venue unresolved       - tournament venue has no mapping row.
+ *   2 Venue ambiguous        - the venue hosts more than one course and the
+ *                              tournament's course name resolves none of them.
+ *   3 Course name unresolved - the tournament names a course we do not map
+ *                              (played away from the venue's traditional home).
  */
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -18,30 +18,27 @@ import { adminTheme as t } from '../theme';
 interface UnresolvedVenue {
   venue_name: string;
   venue_course_name: string | null;
-  venue_city: string | null;
-  venue_country: string | null;
   tournaments: number;
 }
 
 interface AmbiguousVenue {
   venue_name: string;
-  mapped_course_name: string | null;
-  golf_course_id: string | null;
-  tournament_course_names: (string | null)[];
+  course_names: (string | null)[];
+  tournaments: number;
 }
 
-interface ParDisagreement {
-  golf_course_id: string;
-  course_name: string;
-  bad_holes: number;
-  holes: { hole_no: number; pars: number[] }[];
+interface UnresolvedCourseName {
+  venue_name: string;
+  venue_course_name: string;
+  tournaments: number;
 }
 
 interface Queue {
   unresolved_venues: UnresolvedVenue[];
   ambiguous_venues: AmbiguousVenue[];
-  par_disagreements: ParDisagreement[];
+  unresolved_course_names: UnresolvedCourseName[];
 }
+
 
 const Count: React.FC<{ n: number }> = ({ n }) => (
   <span
