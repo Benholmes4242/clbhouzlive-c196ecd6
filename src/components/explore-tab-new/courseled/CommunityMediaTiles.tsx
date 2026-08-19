@@ -205,6 +205,15 @@ interface TileProps {
    * landscape. Absent = the shipped 9/16 rail shape, so Discover is unchanged.
    */
   aspect?: number;
+  /**
+   * SQUARE CORNERS IN A GRID (BRIEF_MOSAIC_CONSISTENCY §2). At a 2px gutter,
+   * four radiused corners leave a diamond of background at every junction, so
+   * the wall reads as separate cards floating close together. Rails KEEP the
+   * radius — each rail card is its own object — so this is opt-in and only the
+   * /community clip mosaic sets it. The overlay gains 2px of inset padding to
+   * compensate for the text sitting nearer a square edge.
+   */
+  square?: boolean;
 }
 
 export function CommunityVideoTile({ item, railVisible, onPress, width }: TileProps) {
