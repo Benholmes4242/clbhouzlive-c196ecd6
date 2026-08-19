@@ -432,7 +432,12 @@ function computeRoundStats(score: any, holes: any[], meta: any) {
     sub_100: is18 && grossScore != null ? grossScore < 100 : false,
     clean_card: false,
     is_counter: score.is_counter ?? false,
-    delta_index: null,
+    // Movement the round produced, computed by the caller from the member's
+    // score ladder (see deltaAtLadderIndex). NULL only when genuinely
+    // unknowable — no next score yet, a null index on either side, or the
+    // guard rejecting an administrative recalculation. A round that moved
+    // nothing stores 0.0, which is a fact about the round, not missing data.
+    delta_index: meta.delta_index ?? null,
     evaluator_version: EVALUATOR_VERSION,
   };
 
