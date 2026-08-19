@@ -299,6 +299,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   postRoundPending,
   postRoundMissing,
   onRoundTap,
+  commentPreview,
+  commentPreviewEnabled = false,
 }) => {
   
   const { activeActor, setActiveActor } = useActiveActor();
