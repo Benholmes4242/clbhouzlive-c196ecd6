@@ -110,6 +110,17 @@ export default function CommunityPage() {
   const showClips = chip === 'all' || chip === 'clips';
   const showVideos = chip === 'all' || chip === 'videos';
   const showPhotos = chip === 'all' || chip === 'photos';
+  /** Course pages, not media: out of place under a video-only view (S6.2). */
+  const showClubs = chip === 'all' || chip === 'photos';
+
+  const clipsCap = chip === 'clips' ? CLIPS_CAP_CHIP : CLIPS_CAP_EVERYTHING;
+  const clips = useMemo(() => clipsPool.slice(0, clipsCap), [clipsPool, clipsCap]);
+  /** Everything samples one page of photos; the Photos chip is the whole wall. */
+  const photos = useMemo(
+    () => (chip === 'photos' ? photosPool : photosPool.slice(0, PHOTO_MOSAIC_STEP)),
+    [photosPool, chip],
+  );
+
 
   /**
    * THE QUEUE IS WHAT THE MEMBER CAN SEE. Under a chip it carries only the
