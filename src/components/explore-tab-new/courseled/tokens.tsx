@@ -122,6 +122,7 @@ export function Eyebrow({
   dot = false,
   icon: Icon,
   subline,
+  tier = 2,
 }: {
   children: React.ReactNode;
   aside?: React.ReactNode;
@@ -131,6 +132,8 @@ export function Eyebrow({
   icon?: React.ComponentType<{ size?: number | string; strokeWidth?: number | string; color?: string }>;
   /** Optional one-line description, indented under the heading text. */
   subline?: React.ReactNode;
+  /** §1 — 1 the answer, 2 the body (default), 3 reference. */
+  tier?: 1 | 2 | 3;
 }) {
   return (
     <div style={{ padding: '0 2px', marginBottom: 10 }}>
@@ -147,7 +150,7 @@ export function Eyebrow({
         {Icon ? (
           <Icon size={15} strokeWidth={2.2} color={A.INK} />
         ) : null}
-        <span style={SECTION_TITLE}>
+        <span style={TIER_TITLE[tier]}>
           {children}
           {dot ? <NewDot /> : null}
         </span>
@@ -172,6 +175,7 @@ export function Eyebrow({
 
   );
 }
+
 
 export function Aside({ children }: { children: React.ReactNode }) {
   return <span style={LABEL}>{children}</span>;
