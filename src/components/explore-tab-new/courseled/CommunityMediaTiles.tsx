@@ -311,6 +311,7 @@ export function CommunityVideoTile({ item, railVisible, onPress }: TileProps) {
         )}
         <span
           style={{
+            flex: 1,
             fontSize: 11.5,
             color: A.MUTE,
             minWidth: 0,
