@@ -18247,6 +18247,7 @@ export type Database = {
           holders: number
         }[]
       }
+      gam_delta_index_guard: { Args: { p_move: number }; Returns: number }
       gam_legend_category_label: {
         Args: { p_category: string }
         Returns: string
