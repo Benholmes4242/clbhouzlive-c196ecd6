@@ -10,7 +10,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 import { LatestReviews } from '@/components/explore-tab-new/courseled/LatestReviews';
-import { REVIEW_TILE_HEIGHT } from '@/components/explore-tab-new/courseled/ReviewTile';
+import { REVIEW_TILE_HEIGHT, REVIEW_TILE_FEATURED_HEIGHT } from '@/components/explore-tab-new/courseled/ReviewTile';
 import { BAND_GREEN, BAND_AMBER, BAND_RED } from '@/features/courses/_shared/scoreBands';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
