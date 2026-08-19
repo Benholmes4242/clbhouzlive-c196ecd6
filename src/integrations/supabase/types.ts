@@ -492,6 +492,13 @@ export type Database = {
             foreignKeyName: "ai_prediction_accuracy_tournament_id_fkey"
             columns: ["tournament_id"]
             isOneToOne: true
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
+          {
+            foreignKeyName: "ai_prediction_accuracy_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
             referencedRelation: "sr_tournaments"
             referencedColumns: ["id"]
           },
@@ -544,6 +551,13 @@ export type Database = {
           tournament_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "ai_predictions_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
           {
             foreignKeyName: "ai_predictions_tournament_id_fkey"
             columns: ["tournament_id"]
@@ -4706,6 +4720,13 @@ export type Database = {
             foreignKeyName: "event_moments_tournament_id_fkey"
             columns: ["tournament_id"]
             isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
+          {
+            foreignKeyName: "event_moments_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
             referencedRelation: "sr_tournaments"
             referencedColumns: ["id"]
           },
@@ -4832,6 +4853,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "sr_players"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_winners_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
           },
           {
             foreignKeyName: "event_winners_tournament_id_fkey"
@@ -7798,6 +7826,13 @@ export type Database = {
             foreignKeyName: "player_course_history_tournament_id_fkey"
             columns: ["tournament_id"]
             isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
+          {
+            foreignKeyName: "player_course_history_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
             referencedRelation: "sr_tournaments"
             referencedColumns: ["id"]
           },
@@ -8731,6 +8766,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ai_predictions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prediction_audit_log_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
           },
           {
             foreignKeyName: "prediction_audit_log_tournament_id_fkey"
@@ -10415,6 +10457,13 @@ export type Database = {
             foreignKeyName: "sr_hole_statistics_tournament_id_fkey"
             columns: ["tournament_id"]
             isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
+          {
+            foreignKeyName: "sr_hole_statistics_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
             referencedRelation: "sr_tournaments"
             referencedColumns: ["id"]
           },
@@ -10467,6 +10516,13 @@ export type Database = {
           tournament_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "sr_leaderboard_history_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
           {
             foreignKeyName: "sr_leaderboard_history_tournament_id_fkey"
             columns: ["tournament_id"]
@@ -10572,6 +10628,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "sr_teams"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sr_leaderboards_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
           },
           {
             foreignKeyName: "sr_leaderboards_tournament_id_fkey"
@@ -11022,6 +11085,13 @@ export type Database = {
             foreignKeyName: "sr_scorecards_tournament_id_fkey"
             columns: ["tournament_id"]
             isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
+          {
+            foreignKeyName: "sr_scorecards_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
             referencedRelation: "sr_tournaments"
             referencedColumns: ["id"]
           },
@@ -11183,6 +11253,13 @@ export type Database = {
             foreignKeyName: "sr_teams_tournament_id_fkey"
             columns: ["tournament_id"]
             isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
+          {
+            foreignKeyName: "sr_teams_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
             referencedRelation: "sr_tournaments"
             referencedColumns: ["id"]
           },
@@ -11266,6 +11343,13 @@ export type Database = {
             foreignKeyName: "sr_tee_times_tournament_id_fkey"
             columns: ["tournament_id"]
             isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
+          {
+            foreignKeyName: "sr_tee_times_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
             referencedRelation: "sr_tournaments"
             referencedColumns: ["id"]
           },
@@ -11324,6 +11408,13 @@ export type Database = {
           wind_speed?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sr_tournament_summaries_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
           {
             foreignKeyName: "sr_tournament_summaries_tournament_id_fkey"
             columns: ["tournament_id"]
@@ -12139,6 +12230,13 @@ export type Database = {
             foreignKeyName: "ti_generation_log_tournament_id_fkey"
             columns: ["tournament_id"]
             isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
+          {
+            foreignKeyName: "ti_generation_log_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
             referencedRelation: "sr_tournaments"
             referencedColumns: ["id"]
           },
@@ -12332,6 +12430,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tour_hub_dispatch_moments_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
           {
             foreignKeyName: "tour_hub_dispatch_moments_tournament_id_fkey"
             columns: ["tournament_id"]
@@ -12812,6 +12917,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "round_post_like_count_drift"
             referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "tournament_result_meta_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
           },
           {
             foreignKeyName: "tournament_result_meta_tournament_id_fkey"
@@ -17272,6 +17384,16 @@ export type Database = {
           season_slug: string | null
           total_xp: number | null
           user_id: string | null
+        }
+        Relationships: []
+      }
+      sr_tournament_course_resolution: {
+        Row: {
+          golf_course_id: string | null
+          resolution: string | null
+          tournament_id: string | null
+          venue_course_name: string | null
+          venue_name: string | null
         }
         Relationships: []
       }
