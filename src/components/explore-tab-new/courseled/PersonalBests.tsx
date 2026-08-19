@@ -11,8 +11,6 @@ import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { A, Eyebrow, LABEL } from './tokens';
 import { StandoutTile } from './StandoutTile';
 import {
-  EffortTile,
-  estimateEffortHeight,
   parseAttempts,
   parsePreviousBest,
   treatmentFor,
@@ -334,33 +332,10 @@ export function PersonalBests({
                 </ReactionSlot>
               );
 
-              /* THE EFFORT TILE IS STOOD DOWN IN THE RAIL (§3.2): a rail of one
-                 width and one photo height cannot carry a second anatomy. The
-                 component itself is untouched. */
-              if (false) {
-
-                return (
-                  <EffortTile
-                    key={tt.slotKey}
-                    courseId={tt.r.course_id}
-                    courseName={courseName}
-                    imageUrl={tt.m?.imageUrl ?? null}
-                    who={who}
-                    isOwn={tt.r.is_self}
-                    whenLabel={relativeWhen(tt.r.play_date, t)}
-                    figure={tt.r.figure}
-                    unit={(tt.r.figure_unit ?? '').toUpperCase()}
-                    headline={tt.headline}
-                    attemptPhrase={tt.attemptPhrase}
-                    attempts={tt.attempts}
-                    avatarUrl={tt.r.profile_photo_url}
-                    avatarUserId={tt.r.user_id}
-                    trailing={trailing}
-                    onPress={openRound}
-                  />
-                );
-              }
-
+              /* ONE SHAPE IN THE RAIL (§3.2): a rail of one width and one
+                 photo height cannot carry the effort tile's second anatomy, so
+                 every row renders as the photo tile. EffortTile itself is
+                 untouched and still used by its other caller surfaces. */
               return (
               <StandoutTile
                 key={tt.slotKey}
