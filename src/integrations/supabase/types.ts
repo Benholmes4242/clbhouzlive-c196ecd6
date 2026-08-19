@@ -18941,6 +18941,10 @@ export type Database = {
           thumbnail_image: string
         }[]
       }
+      get_course_pro_hole_analysis: {
+        Args: { p_course_id: string }
+        Returns: Json
+      }
       get_course_rating_standing: {
         Args: { p_course_id: string; p_list_slug?: string }
         Returns: {
@@ -20122,6 +20126,7 @@ export type Database = {
         }[]
       }
       get_post_tags_jsonb: { Args: { p_post_id: string }; Returns: Json }
+      get_pro_hole_data_queue: { Args: never; Returns: Json }
       get_profile_posts: {
         Args: {
           p_actor_id: string
