@@ -24,7 +24,7 @@ export interface CourseProHole extends Omit<CourseHole, 'stroke_index' | 'dist'>
 
 export interface CourseProHoleAnalysis {
   available: boolean;
-  /** Why the pro view is unavailable - 'no_pro_history' | 'par_disagreement' | 'hole_count'. */
+  /** Why the pro view is unavailable - 'no_pro_history' | 'hole_count' | 'no_course'. */
   reason?: string;
   /** Player-rounds pooled (the busiest hole's outcome total). */
   total_rounds?: number;
