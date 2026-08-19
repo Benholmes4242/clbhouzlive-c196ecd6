@@ -194,9 +194,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     // Stable scope, never a hash of the id set: list slug + active search.
     `${selectedList}|${searchTerm.trim().toLowerCase()}`,
   );
-  const { data: progressLists = [] } = useUserTop100Progress(user?.id);
-
-  const [moverRange, setMoverRange] = useState<MoverRange>('this_month');
   const { data: movers = [] } = useTop100Movers(moverRange);
 
   const [moversSheetOpen, setMoversSheetOpen] = useState(false);
@@ -224,15 +221,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     return map;
   }, [allCourses, selectedList]);
 
-  const ratedCourseIds = React.useMemo(() => {
-    const set = new Set<string>();
-    enrichment.forEach((value, id) => {
-      if (value.ratedByYou) set.add(id);
-    });
-    return set;
-  }, [enrichment]);
-
-  const courseNameById = React.useMemo(() => {
     const map = new Map<string, string>();
     for (const course of allCourses) map.set(course.id, course.name);
     return map;
