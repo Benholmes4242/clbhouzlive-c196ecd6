@@ -66,9 +66,9 @@ export function CommunityClipMosaic({ items, onPress }: Props) {
   if (items.length === 0) return null;
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
       {columns.map((col, ci) => (
-        <div key={ci} style={{ display: 'grid', gap: 6, alignContent: 'start' }}>
+        <div key={ci} style={{ display: 'grid', gap: 2, alignContent: 'start' }}>
           {col.map(({ item, aspect }) => (
             <CommunityClipTile
               key={item.key}
