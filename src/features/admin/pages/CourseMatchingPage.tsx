@@ -11,7 +11,7 @@ import AdminAccessDenied from '../components/AdminAccessDenied';
 import AdminErrorState from '../components/AdminErrorState';
 import AdminSheet from '../components/AdminSheet';
 import ConfirmDialog from '../components/ConfirmDialog';
-import ProHoleDataQueue from '../components/ProHoleDataQueue';
+import ProHoleDataQueue, { useProHoleDataQueue, proHoleQueueCount } from '../components/ProHoleDataQueue';
 
 import {
   ignoreUnmatchedCourse,
@@ -260,6 +260,21 @@ export default function CourseMatchingPage() {
     }
   };
 
+  // Two queues, two source systems, two tabs. Each carries its own count so
+  // you can see where the work is without opening either.
+  const { data: proQueue } = useProHoleDataQueue();
+  const proCount = proHoleQueueCount(proQueue);
+  const whsCount = data.length;
+
+  const [tab, setTab] = useState<'whs' | 'pro' | null>(null);
+  useEffect(() => {
+    if (tab !== null || isLoading) return;
+    // WHS first when both carry work (it affects members' own rounds); Pro when
+    // WHS is clear; WHS with its empty state when both are clear.
+    setTab(whsCount > 0 ? 'whs' : proCount > 0 ? 'pro' : 'whs');
+  }, [tab, isLoading, whsCount, proCount]);
+  const active_tab = tab ?? 'whs';
+
   if (!caps.viewUsers) return <AdminAccessDenied />;
 
   return (
@@ -274,36 +289,76 @@ export default function CourseMatchingPage() {
         </div>
       </div>
 
-      {isLoading ? (
-        <div style={{ color: t.inkMuted, fontSize: 13, padding: 24 }}>Loading queue...</div>
-      ) : isError ? (
-        <AdminErrorState
-          title="Couldn't load matching queue"
-          message={(error as any)?.message ?? 'The request failed. Try again.'}
-          onRetry={() => refetch()}
-          retrying={isFetching}
-        />
-      ) : data.length === 0 ? (
-        <EmptyState
-          icon={<CheckCircle2 size={28} />}
-          title="Queue clear"
-          subtitle="Every scored course is matched."
-        />
+      <div style={{ display: 'flex', gap: 18, borderBottom: `1px solid ${t.line}`, marginTop: 2 }}>
+        {([
+          { key: 'whs' as const, label: 'WHS', count: whsCount },
+          { key: 'pro' as const, label: 'Pro hole data', count: proCount },
+        ]).map((tb) => {
+          const on = active_tab === tb.key;
+          return (
+            <button
+              key={tb.key}
+              type="button"
+              onClick={() => setTab(tb.key)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 7,
+                background: 'transparent', border: 'none', cursor: 'pointer',
+                padding: '0 0 8px', marginBottom: -1,
+                borderBottom: `2px solid ${on ? t.ink : 'transparent'}`,
+                color: on ? t.ink : t.inkMuted,
+                fontSize: 13.5, fontWeight: on ? 700 : 600,
+              }}
+            >
+              {tb.label}
+              <span
+                style={{
+                  display: 'inline-flex', padding: '2px 8px', borderRadius: 999,
+                  background: t.neutralSoft, color: on ? t.ink : t.inkMuted,
+                  fontSize: 11, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {tb.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {active_tab === 'whs' ? (
+        isLoading ? (
+          <div style={{ color: t.inkMuted, fontSize: 13, padding: 24 }}>Loading queue...</div>
+        ) : isError ? (
+          <AdminErrorState
+            title="Couldn't load matching queue"
+            message={(error as any)?.message ?? 'The request failed. Try again.'}
+            onRetry={() => refetch()}
+            retrying={isFetching}
+          />
+        ) : data.length === 0 ? (
+          <EmptyState
+            icon={<CheckCircle2 size={28} />}
+            title="Queue clear"
+            subtitle="Every scored course is matched."
+          />
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {data.map((row) => (
+              <QueueCard
+                key={row.whs_course_id}
+                row={row}
+                expanded={expanded.has(row.whs_course_id)}
+                onToggle={() => toggleExpand(row.whs_course_id)}
+                onResolve={() => setActive(row)}
+                onIgnore={() => setConfirmIgnore(row)}
+                onNeedsCatalogue={() => void doNeedsCatalogue(row)}
+                busy={triageBusy}
+              />
+            ))}
+          </div>
+        )
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {data.map((row) => (
-            <QueueCard
-              key={row.whs_course_id}
-              row={row}
-              expanded={expanded.has(row.whs_course_id)}
-              onToggle={() => toggleExpand(row.whs_course_id)}
-              onResolve={() => setActive(row)}
-              onIgnore={() => setConfirmIgnore(row)}
-              onNeedsCatalogue={() => void doNeedsCatalogue(row)}
-              busy={triageBusy}
-            />
-          ))}
-        </div>
+        /* The cases that block a course's PROS hole view. Read-only. */
+        <ProHoleDataQueue />
       )}
 
       {triageErr && (
@@ -331,9 +386,6 @@ export default function CourseMatchingPage() {
           setActive(null);
         }}
       />
-
-      {/* The three cases that block a course's PROS hole view. Read-only. */}
-      <ProHoleDataQueue />
     </div>
 
   );
