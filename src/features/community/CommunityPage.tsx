@@ -18,6 +18,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { CommunityCourseIndex } from './CommunityCourseIndex';
 import { CommunityPhotoMosaic } from './CommunityPhotoMosaic';
 import { CommunitySkeleton } from './CommunitySkeleton';
+import { CommunityVideoRow } from './CommunityVideoRow';
+
 
 /**
  * COMMUNITY PAGE — the destination the Discover video rails and the mosaic's
