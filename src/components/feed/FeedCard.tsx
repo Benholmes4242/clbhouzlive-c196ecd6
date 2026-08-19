@@ -24,6 +24,8 @@ import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
+import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
 import { formatRatingValue } from '@/utils/formatters';
