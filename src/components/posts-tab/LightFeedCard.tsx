@@ -42,6 +42,8 @@ import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { PostRoundShell } from '@/components/feed/PostRoundShell';
 import { PostRoundDegraded } from '@/components/feed/PostRoundDegraded';
+import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
+import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 
 
 // Light palette — cards sit on the page background (#F8FAFC); dividers are
@@ -105,6 +107,14 @@ export interface LightFeedCardProps {
   postRoundMissing?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
+  /**
+   * Newest top-level comment, resolved in ONE batched read at page level
+   * (LightCardFeed) — the same hook and the same two reads the Clubhouse card
+   * uses. Absent means NO preview, whatever commentCount says.
+   */
+  commentPreview?: FeedCommentPreviewData | null;
+  /** Ships the preview block. Off leaves the card exactly as it was. */
+  commentPreviewEnabled?: boolean;
 }
 
 interface CaptionBlockProps {
