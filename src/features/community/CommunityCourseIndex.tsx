@@ -67,17 +67,20 @@ export function CommunityCourseIndex({ items, title, subline, countLabel }: Prop
 
   return (
     <section style={{ marginBottom: 26 }}>
-      <Eyebrow icon={MapPin} subline={subline}>
-        {title}
-      </Eyebrow>
+      {/* Eyebrow's own padding is 0 2px because Discover callers own their
+          gutter. Rendered bare it looks pushed left, so this page supplies the
+          16px itself and the icon lands on the first tile's left edge. */}
+      <div style={{ padding: '0 16px' }}>
+        <Eyebrow icon={MapPin} subline={subline}>
+          {title}
+        </Eyebrow>
+      </div>
 
       <div
         style={{
           display: 'flex',
           gap: 8,
-          paddingBottom: 2,
           overflowX: 'auto',
-          margin: '0 -16px',
           padding: '0 16px 2px',
           willChange: 'transform',
           WebkitOverflowScrolling: 'touch',
