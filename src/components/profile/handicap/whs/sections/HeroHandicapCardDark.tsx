@@ -8,6 +8,7 @@ import type { WhsConnection } from '@/lib/whs/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { IndexChart, type IndexPoint } from '../charts';
 import { formatDayMonthShortGB } from '@/i18n/format';
+import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 
 interface Props {
   connection: WhsConnection;
