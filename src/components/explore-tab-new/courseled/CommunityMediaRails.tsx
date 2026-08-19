@@ -56,15 +56,17 @@ interface Props {
   items: CommunityVideo[];
   onTilePress: (item: CommunityVideo) => void;
   onSeeAll: () => void;
+  /** Optional outer spacing override (the caller owns the section seam). */
+  style?: React.CSSProperties;
 }
 
-export function LatestVideosRail({ items, onTilePress, onSeeAll }: Props) {
+export function LatestVideosRail({ items, onTilePress, onSeeAll, style }: Props) {
   const { t } = useTranslation('courses');
   const { ref, visible } = useRailVisible<HTMLElement>();
   if (items.length < MIN_RAIL_TILES) return null;
 
   return (
-    <section ref={ref}>
+    <section ref={ref} style={style}>
       {/* NO COUNT IN THE HEADING — thin supply must not advertise itself. */}
       <Eyebrow
         icon={Clapperboard}
