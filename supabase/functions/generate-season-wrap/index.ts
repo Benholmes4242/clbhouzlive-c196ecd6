@@ -27,6 +27,16 @@ Deno.serve(async (req) => {
       );
     }
 
+    // userId comes from the body, so without this a caller could generate a
+    // wrap for any member. You may only target yourself unless you're an admin.
+    const caller = await resolveCaller(req);
+    if (!caller) return unauthorized(corsHeaders);
+    if (caller.id !== userId && !(await isPanelAdmin(caller.id))) {
+      return forbidden(corsHeaders);
+    }
+
+
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
