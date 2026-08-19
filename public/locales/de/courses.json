@@ -1121,6 +1121,12 @@
       "title": "Suchst du woanders?",
       "body": "Das vollständige Verzeichnis enthält {{total}} weitere Plätze.",
       "cta": "Vollständiges Verzeichnis ansehen"
+    },
+    "reviews": {
+      "heading": "Was Mitglieder sagen",
+      "actionRail": "Alle ansehen",
+      "actionFeatured": "Alle Bewertungen",
+      "outOfTen": "von 10"
     }
   },
   "directorySheet": {

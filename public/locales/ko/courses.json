@@ -1061,6 +1061,12 @@
       "title": "다른 곳을 찾고 있나요?",
       "body": "전체 코스 목록에는 {{total}}개의 코스가 더 있습니다.",
       "cta": "전체 코스 목록 보기"
+    },
+    "reviews": {
+      "heading": "회원들의 평가",
+      "actionRail": "모두 보기",
+      "actionFeatured": "전체 리뷰",
+      "outOfTen": "10점 만점"
     }
   },
   "directorySheet": {

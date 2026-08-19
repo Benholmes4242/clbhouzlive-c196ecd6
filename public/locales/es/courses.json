@@ -1121,6 +1121,12 @@
       "title": "¿Buscas otro lugar?",
       "body": "El directorio completo incluye {{total}} campos más.",
       "cta": "Ver el directorio completo"
+    },
+    "reviews": {
+      "heading": "Lo que dicen los miembros",
+      "actionRail": "Ver todo",
+      "actionFeatured": "Todas las resenas",
+      "outOfTen": "de 10"
     }
   },
   "directorySheet": {

@@ -1632,6 +1632,12 @@
       "longest": "No tee data",
       "chase": "All crowns claimed",
       "nothing": "Nothing tracked"
+    },
+    "reviews": {
+      "heading": "What members say",
+      "actionRail": "See all",
+      "actionFeatured": "All reviews",
+      "outOfTen": "out of 10"
     }
   },
   "directorySheet": {
