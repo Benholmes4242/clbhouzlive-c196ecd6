@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import { useTop100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 import { useTop100Movers, type MoverRange } from '@/hooks/top100/useTop100Movers';
-import { useUserTop100Progress, type Top100ListProgress } from '@/hooks/top100/useUserTop100Progress';
+
 import { computeVerdict, type Verdict } from '@/components/top100/verdict';
 import { Top100EnrichmentBlock } from '@/components/top100/Top100EnrichmentBlock';
 import { analyticsEvents } from '@/utils/analyticsEvents';
