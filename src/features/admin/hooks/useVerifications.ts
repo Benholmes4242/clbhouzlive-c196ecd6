@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
+import { refreshAdminQueues } from '@/features/admin/lib/adminQueueRefresh';
 
 export type BusinessDecision = 'approved' | 'rejected' | 'needs_more_info';
 export type GolferDecision = 'approved' | 'rejected';
@@ -296,13 +297,16 @@ export function useVerifications() {
       }
       toast.error(e?.message || 'Failed to update verification');
     },
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] });
-      qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard', 'queue'] });
-      qc.invalidateQueries({ queryKey: ['business-verification-request'] });
-      qc.invalidateQueries({ queryKey: ['business-account-verification-status'] });
-      qc.invalidateQueries({ queryKey: ['course-claim'] });
-      qc.invalidateQueries({ queryKey: ['course-claim-status'] });
+    // Approve, reject and needs-more-info all land here, so all three refresh
+    // identically. Awaited so the mutation is not "settled" until the queue,
+    // the tab counts and the member-facing status have actually refetched.
+    onSettled: async () => {
+      await refreshAdminQueues(qc, [
+        ['business-verification-request'],
+        ['business-account-verification-status'],
+        ['course-claim'],
+        ['course-claim-status'],
+      ]);
     },
   });
 
@@ -330,11 +334,12 @@ export function useVerifications() {
     },
     onSuccess: () => toast.success('Verification revoked — the business has been notified.'),
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : 'Failed to revoke verification'),
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] });
-      qc.invalidateQueries({ queryKey: ['business-account-verification-status'] });
-      qc.invalidateQueries({ queryKey: ['business-verification-request'] });
-      qc.invalidateQueries({ queryKey: ['business-verification-evidence'] });
+    onSettled: async () => {
+      await refreshAdminQueues(qc, [
+        ['business-account-verification-status'],
+        ['business-verification-request'],
+        ['business-verification-evidence'],
+      ]);
     },
   });
 
@@ -350,7 +355,7 @@ export function useVerifications() {
     },
     onSuccess: () => toast.success('Verification removed — the golfer has been notified.'),
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : 'Failed to remove verification'),
-    onSettled: () => qc.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] }),
+    onSettled: async () => { await refreshAdminQueues(qc); },
   });
 
   const counts = {
