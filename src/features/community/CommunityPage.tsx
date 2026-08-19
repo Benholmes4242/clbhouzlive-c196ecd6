@@ -146,83 +146,83 @@ export default function CommunityPage() {
 
   return (
     <PageRoot style={{ background: CANVAS, minHeight: '100dvh' }}>
-      {/* MASTHEAD — sticky, real from the first frame. The title sits on the
-          island back arrow's row, inset past the capsule. */}
+      {/* MASTHEAD — the destination's own header: kicker, then the title at
+          full editorial size. It sits BELOW the floating island row, so the
+          back arrow never lands on top of the words. */}
       <div
         style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 2,
-          background: CANVAS,
-          borderBottom: `0.5px solid ${HAIR}`,
-          padding: '0 0 8px',
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 58px)',
+          padding: '0 16px 14px',
+          paddingBlockStart: 'calc(env(safe-area-inset-top, 0px) + 58px)',
         }}
       >
         <div
           style={{
-            minHeight: 44,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            padding: '0 16px 0 60px',
+            fontSize: 9.5,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: MUTE,
           }}
         >
-          <h1
-            style={{
-              fontSize: 15.5,
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-              color: INK,
-              margin: 0,
-            }}
-          >
-            {t('community.heading', 'From the community')}
-          </h1>
-          <div style={{ fontSize: 11.5, fontWeight: 700, color: MUTE, marginTop: 1 }}>
-            {t('community.subline', 'Everything members have filmed and photographed')}
-          </div>
+          clbhouz
         </div>
-
-        <div
+        <h1
           style={{
-            display: 'flex',
-            gap: 6,
-            overflowX: 'auto',
-            padding: '8px 16px 0',
-            scrollbarWidth: 'none',
+            margin: '4px 0 0',
+            fontSize: 26,
+            fontWeight: 700,
+            letterSpacing: '-0.035em',
+            color: INK,
+            lineHeight: 1.05,
           }}
         >
-          {chips.map((c) => {
-            const on = c.id === chip;
-            return (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setChip(c.id)}
-                style={{
-                  flex: 'none',
-                  padding: '6px 12px',
-                  borderRadius: 999,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  letterSpacing: '-0.01em',
-                  background: on ? INK : '#FFFFFF',
-                  color: on ? '#FFFFFF' : MUTE,
-                  border: on ? '1px solid transparent' : `1px solid ${BORDER}`,
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {c.label}
-              </button>
-            );
-          })}
+          {t('community.heading', 'From the community')}
+        </h1>
+        <div style={{ marginTop: 5, fontSize: 12.5, color: BODY, lineHeight: 1.5 }}>
+          {t('community.subline', 'Everything members have filmed and photographed')}
         </div>
       </div>
 
+      <div
+        style={{
+          display: 'flex',
+          gap: 7,
+          overflowX: 'auto',
+          padding: '0 16px 18px',
+          scrollbarWidth: 'none',
+        }}
+      >
+        {chips.map((c) => {
+          const on = c.id === chip;
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => setChip(c.id)}
+              style={{
+                flex: 'none',
+                padding: '8px 14px',
+                borderRadius: 999,
+                fontSize: 12.5,
+                fontWeight: 700,
+                letterSpacing: '-0.01em',
+                background: on ? INK : '#FFFFFF',
+                color: on ? '#FFFFFF' : BODY,
+                border: on ? '1px solid transparent' : `1px solid ${BORDER}`,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {c.label}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Nav-visible page: flat 88 bottom per spacing canon. */}
-      <main style={{ paddingTop: 16, paddingBottom: 88 }}>
+      <main style={{ paddingBottom: 88 }}>
+
         {isPending ? (
           <CommunitySkeleton />
         ) : all.length === 0 ? (
