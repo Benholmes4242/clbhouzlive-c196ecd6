@@ -277,25 +277,32 @@ export const TrajectoryLine: React.FC<Props> = ({
     d <= -1 ? T.gradeUnder : d === 0 ? T.gradeEven : d === 1 ? T.gradeBogey : T.gradeOver;
 
   /**
-   * STOP PLACEMENT IS LOAD-BEARING (§4): each stop sits at that hole's OWN x
-   * fraction with a hard second stop just before the next hole's offset. Even
-   * intervals would slide every colour change off the hole it describes.
+   * STOP PLACEMENT IS LOAD-BEARING. Hole i's segment runs from pts[i-1] to
+   * pts[i] — position i is the cumulative AFTER hole i — so hole i's colour
+   * spans those two offsets and no others. It was previously pinned at pts[i]
+   * and held to pts[i+1], which painted every grade on the FOLLOWING hole:
+   * a birdie tinted the segment where the line rose. Two coincident stops at a
+   * boundary give the hard edge; no epsilon.
+   * A GAP (unplayed hole) stretches the preceding colour across it — the line
+   * there crosses unplayed ground and has no grade of its own.
    */
   const strokeStops = (() => {
     const positions = [...scored.keys()].sort((a, b) => a - b);
     const out: { offset: number; color: string }[] = [];
     positions.forEach((pos, i) => {
-      const d = scored.get(pos)!.d;
-      const c = gradeFor(d);
-      const o = x(pos) / w;
-      const next = positions[i + 1] != null ? x(positions[i + 1]) / w : 1;
-      if (i === 0) out.push({ offset: 0, color: c });
-      out.push({ offset: o, color: c });
-      out.push({ offset: Math.max(o, next - 0.0001), color: c });
+      const c = gradeFor(scored.get(pos)!.d);
+      // padX is 0, so x(0) === 0: the first scored hole runs from the tee.
+      const from = i === 0 ? 0 : x(positions[i - 1]) / w;
+      out.push({ offset: from, color: c });
+      out.push({ offset: x(pos) / w, color: c });
     });
-    if (out.length > 0) out.push({ offset: 1, color: out[out.length - 1].color });
+    // x(m) === w, so a full round already reaches 1; a round whose LAST hole is
+    // unplayed does not — hold the last grade to the right edge in that case.
+    const last = out[out.length - 1];
+    if (last && last.offset < 1) out.push({ offset: 1, color: last.color });
     return out;
   })();
+
 
   // TICKS INDEX `holes` — the leading point is not a hole, so every tick
   // resolves to holes[i].holeNo (1 / 5 / 10 / 14 / 18 on a full round).
