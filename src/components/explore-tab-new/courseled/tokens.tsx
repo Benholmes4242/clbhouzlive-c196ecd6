@@ -95,19 +95,6 @@ export const SECTION_TITLE: React.CSSProperties = {
 };
 
 /**
- * THREE TIERS (BRIEF_DISCOVER_HIERARCHY §1). The heading SIZE is the whole
- * mechanism: tier 1 is the answer (one section only), tier 2 is the body at
- * today's size, tier 3 is reference material — smaller and in the muted ink
- * tier, so a reader who stops after tier 2 has had the page.
- */
-export const TIER_TITLE: Record<1 | 2 | 3, React.CSSProperties> = {
-  1: { ...SECTION_TITLE, fontSize: 21 },
-  2: SECTION_TITLE,
-  3: { ...SECTION_TITLE, fontSize: 12.5, color: A.MUTE },
-};
-
-
-/**
  * PADDING IS `0 2px` BECAUSE CALLERS OWN THEIR GUTTER. A caller that renders
  * this bare will look pushed left — wrap it in the same horizontal padding as
  * the content beneath it (see the /community call sites).
@@ -122,7 +109,6 @@ export function Eyebrow({
   dot = false,
   icon: Icon,
   subline,
-  tier = 2,
 }: {
   children: React.ReactNode;
   aside?: React.ReactNode;
@@ -132,8 +118,6 @@ export function Eyebrow({
   icon?: React.ComponentType<{ size?: number | string; strokeWidth?: number | string; color?: string }>;
   /** Optional one-line description, indented under the heading text. */
   subline?: React.ReactNode;
-  /** §1 — 1 the answer, 2 the body (default), 3 reference. */
-  tier?: 1 | 2 | 3;
 }) {
   return (
     <div style={{ padding: '0 2px', marginBottom: 10 }}>
@@ -150,7 +134,7 @@ export function Eyebrow({
         {Icon ? (
           <Icon size={15} strokeWidth={2.2} color={A.INK} />
         ) : null}
-        <span style={TIER_TITLE[tier]}>
+        <span style={SECTION_TITLE}>
           {children}
           {dot ? <NewDot /> : null}
         </span>
@@ -175,7 +159,6 @@ export function Eyebrow({
 
   );
 }
-
 
 export function Aside({ children }: { children: React.ReactNode }) {
   return <span style={LABEL}>{children}</span>;

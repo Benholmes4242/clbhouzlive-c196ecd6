@@ -236,17 +236,6 @@ export function AroundTheWorldCard({ pills }: { pills?: React.ReactNode } = {}) 
       </div>
       )}
 
-      {/* THE HERO, FULL WIDTH (BRIEF_DISCOVER_HIERARCHY §2.1): one continuous
-          grid now, hero first then pairs, and NO sub-heading bars. */}
-      <div style={{ ...CARD_SHELL, padding: 0, marginBottom: 8 }}>
-        <Bar style={{ borderRadius: 0, height: 232, width: '100%' }} />
-        <div style={{ padding: '11px 12px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <TextBar w={78} h={9} />
-          <TextBar w={150} h={15} />
-          <TextBar w={188} h={11} />
-        </div>
-      </div>
-
       {/* MASONRY SHELL — same two columns, same six photo heights and the same
           shortest-column walk as the live section, so the swap does not move
           the page. Unresolved is not absent. */}
@@ -270,7 +259,6 @@ export function AroundTheWorldCard({ pills }: { pills?: React.ReactNode } = {}) 
                   <div key={i} style={{ ...CARD_SHELL, padding: 0 }}>
                     <Bar style={{ borderRadius: 0, height: h, width: '100%' }} />
                     <div style={{ padding: '9px 10px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-                      <TextBar w={70} h={9} />
                       <TextBar w={96} h={12} />
                       <TextBar w={128} h={10} />
                     </div>
@@ -413,37 +401,6 @@ export function HonoursPanel() {
 }
 
 
-/**
- * PERSONAL BESTS — A RAIL, NOT A GRID (BRIEF_DISCOVER_HIERARCHY §3.2, acceptance
- * H). A skeleton drawing a grid where a rail renders is the fault this app has
- * shipped before, so the shape ships with the section: 224-wide cards, a 128px
- * photograph, then the category eyebrow, name, figure and reference lines.
- */
-export function PersonalBestsRail() {
-  return (
-    <section>
-      <EyebrowBar w={116} aside />
-      <div style={{ display: 'flex', gap: 8, margin: '0 -14px', padding: '0 14px', overflow: 'hidden' }}>
-        {[0, 1, 2].map((i) => (
-          <div key={i} style={{ ...CARD_SHELL, width: 224, flexShrink: 0, padding: 0 }}>
-            <Bar style={{ borderRadius: 0, height: 128, width: '100%' }} />
-            <div style={{ padding: '9px 10px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <TextBar w={70} h={9} />
-              <TextBar w={104} h={12} />
-              <TextBar w={140} h={10} />
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/** The single hairline that opens tier 3 (§1.1). */
-function TierRule() {
-  return <div style={{ height: 1, background: A.BORDER, margin: '0 0 -4px' }} />;
-}
-
 export default function DiscoverCourseLedSkeleton() {
   return (
     <div
@@ -468,16 +425,13 @@ export default function DiscoverCourseLedSkeleton() {
 
 
       <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
-        {/* THE PAGE'S ACTUAL ORDER (BRIEF_DISCOVER_HIERARCHY §1). TourRail and
-            ReviewsMosaic stay exported for their own surfaces but are no longer
-            drawn here — those sections are unmounted from Discover, and a
-            skeleton for an absent section is a phantom block. */}
         <FriendsRail />
+        <TourRail />
+        <ReviewsMosaic />
         <AroundTheWorldCard />
+
         <MomentsMosaic />
         <MostPlayedPanel />
-        <TierRule />
-        <PersonalBestsRail />
         <HonoursPanel />
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { Target } from 'lucide-react';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -6,11 +7,14 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ATW_PHOTO_HEIGHTS, relativeWhen } from './AroundTheWorld';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { usePersonalBests, PERSONAL_BESTS_PER_MEMBER } from './hooks/usePersonalBests';
+import { createMasonryAssignment, placeStable, type MasonryAssignment } from './stableMasonry';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { A, Eyebrow, LABEL } from './tokens';
 import { StandoutTile } from './StandoutTile';
 import {
+  EffortTile,
+  estimateEffortHeight,
   parseAttempts,
   parsePreviousBest,
   treatmentFor,
@@ -64,17 +68,6 @@ function pbGroupIdFor(kind: string | null): string {
 }
 
 /**
- * THE CATEGORY, PER CARD (BRIEF_DISCOVER_HIERARCHY §2.3). The three group names
- * did not disappear with the sub-headings — they moved onto the card they
- * describe, so a card explains itself on every surface it appears on.
- */
-function pbCategoryLabel(kind: string | null, t: (k: string, d: string) => string): string | null {
-  const id = pbGroupIdFor(kind);
-  const def = PB_GROUPS.find((g) => g.id === id);
-  return def ? t(def.key, def.label) : null;
-}
-
-/**
  * WHICH KINDS TAKE WHICH SECOND FIGURE (BRIEF_FEAT_SECOND_FIGURE §1-2). The
  * server decides WHETHER there is a figure; these sets decide only how it reads.
  * A kind in neither set shows the count alone.
@@ -89,18 +82,6 @@ const WAIT_KINDS = new Set(['first_double_free_here']);
 
 /** Eight tiles maximum, matching PAGE = 8 in AroundTheWorld (§3.2). */
 const PAGE = 8;
-
-/**
- * A RAIL, NOT A GRID (BRIEF_DISCOVER_HIERARCHY §3.2). This section is the
- * second tier and must not carry the same weight as the vertical anchor above
- * it: two vertical grids back to back is where the page was heaviest. A rail
- * says browsable rather than required.
- *
- * ONE CARD WIDTH AND ONE PHOTO HEIGHT — a rail with masonry heights reads as a
- * broken grid, so every card is identical and the eye runs sideways.
- */
-const RAIL_CARD_W = 224;
-const RAIL_PHOTO = 128;
 
 
 interface Props {
@@ -135,6 +116,8 @@ export function PersonalBests({
   }
   const budgetSource = heldCounts.current;
 
+  /** Column memory, so a refetch never moves a tile the member has seen (§i). */
+  const masonry = useRef(new Map<string, MasonryAssignment>());
 
 
   /**
@@ -273,14 +256,26 @@ export function PersonalBests({
       wait,
       chipped,
       slotKey: `${r.whs_score_id}:${r.feat_kind}`,
-      /* THE RAIL IS UNIFORM (§3.2), so no per-shape estimate is needed and no
-         masonry walk runs here any more. Kept as the photo-tile height for any
-         caller that still reasons about card size. */
-      height: photoHeight,
-
+      // Deterministic height estimate, one per shape.
+      height:
+        treatment === 'effort' && !chipped
+          ? estimateEffortHeight(`${headline} \u00B7 ${attemptPhrase}`)
+          : photoHeight,
     };
   });
 
+
+  /**
+   * GROUPING (BRIEF_STANDOUT_KIND_BUDGET §3). The three treatments are
+   * unchanged; grouping only wraps them, and a group may hold any mix. Groups
+   * render in the fixed order below, an empty group renders nothing, a group of
+   * one keeps its heading, and one surviving group drops the heading.
+   */
+  const buckets = PB_GROUPS.map((def) => ({
+    id: def.id,
+    label: t(def.key, def.label),
+    items: tiles.filter((tt) => pbGroupIdFor(tt.r.feat_kind) === def.id),
+  })).filter((b) => b.items.length > 0);
 
   const renderTile = (tt: (typeof tiles)[number]) => {
       const courseName =
@@ -332,10 +327,32 @@ export function PersonalBests({
                 </ReactionSlot>
               );
 
-              /* ONE SHAPE IN THE RAIL (§3.2): a rail of one width and one
-                 photo height cannot carry the effort tile's second anatomy, so
-                 every row renders as the photo tile. EffortTile itself is
-                 untouched and still used by its other caller surfaces. */
+              /* A CHIPPED ROW TAKES THE PHOTO TILE (§3.1): the effort tile has
+                 no glass chip to put the second figure in. */
+              if (tt.treatment === 'effort' && tt.attempts !== null && !tt.chipped) {
+
+                return (
+                  <EffortTile
+                    key={tt.slotKey}
+                    courseId={tt.r.course_id}
+                    courseName={courseName}
+                    imageUrl={tt.m?.imageUrl ?? null}
+                    who={who}
+                    isOwn={tt.r.is_self}
+                    whenLabel={relativeWhen(tt.r.play_date, t)}
+                    figure={tt.r.figure}
+                    unit={(tt.r.figure_unit ?? '').toUpperCase()}
+                    headline={tt.headline}
+                    attemptPhrase={tt.attemptPhrase}
+                    attempts={tt.attempts}
+                    avatarUrl={tt.r.profile_photo_url}
+                    avatarUserId={tt.r.user_id}
+                    trailing={trailing}
+                    onPress={openRound}
+                  />
+                );
+              }
+
               return (
               <StandoutTile
                 key={tt.slotKey}
@@ -343,7 +360,7 @@ export function PersonalBests({
                 courseName={courseName}
                 imageUrl={tt.m?.imageUrl ?? null}
                 region={tt.m?.region ?? tt.r.region ?? null}
-                photo={RAIL_PHOTO}
+                photo={tt.photo}
                 figure={tt.r.figure}
                 // THE UNIT IS NEVER HARDCODED (§3.4).
                 unit={(tt.r.figure_unit ?? '').toUpperCase()}
@@ -352,9 +369,6 @@ export function PersonalBests({
                 isOwn={tt.r.is_self}
                 detail={tt.headline}
                 subline={tt.reference}
-                /* THE CATEGORY, ON THE CARD (§2.3) — the three sub-headings are
-                   gone, so each card names its own kind of best. */
-                kicker={pbCategoryLabel(tt.r.feat_kind, t)}
                 onDetailPress={
                   onFeatPress
                     ? () => {
@@ -387,36 +401,57 @@ export function PersonalBests({
 
   return (
     <section>
-      <Eyebrow
-        tier={3}
-        aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}
-      >
+      <Eyebrow icon={Target} aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}>
         {t('discover.personalBests', 'Personal bests')}
       </Eyebrow>
 
-      {/* THE RAIL — bled to the page edge so a card is visibly cut off and
-          the row reads as scrollable. No sub-headings (§2.2). */}
-      <div
-        style={{
-          display: 'flex',
-          gap: 8,
-          alignItems: 'flex-start',
-          overflowX: 'auto',
-          scrollSnapType: 'x proximity',
-          margin: '0 -14px',
-          padding: '0 14px',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-        }}
-      >
-        {tiles.map((tt) => (
-          <div
-            key={tt.slotKey}
-            style={{ width: RAIL_CARD_W, flex: 'none', scrollSnapAlign: 'start' }}
-          >
-            {renderTile(tt)}
-          </div>
-        ))}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {buckets.map((b) => {
+          let asg = masonry.current.get(b.id);
+          if (!asg) {
+            asg = createMasonryAssignment();
+            masonry.current.set(b.id, asg);
+          }
+          const { columns } = placeStable(b.items, asg);
+
+          return (
+            <div key={b.id}>
+              {/* A single surviving group needs no heading — the section eyebrow
+                  already says what it is (§2.3). A group of ONE tile keeps its
+                  heading (§2.1). */}
+              {buckets.length > 1 ? (
+                <div
+                  style={{
+                    ...LABEL,
+                    fontSize: 9,
+                    color: A.MUTE,
+                    padding: '0 2px',
+                    marginBottom: 8,
+                  }}
+                >
+                  {b.label}
+                </div>
+              ) : null}
+
+              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                {columns.map((col, ci) => (
+                  <div
+                    key={ci}
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 8,
+                    }}
+                  >
+                    {col.map((tt) => renderTile(tt))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );

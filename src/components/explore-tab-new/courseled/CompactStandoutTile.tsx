@@ -84,12 +84,6 @@ interface Props {
   isOwn: boolean;
   detail?: string;
   subline?: string | null;
-  /**
-   * THE CATEGORY EYEBROW (BRIEF_DISCOVER_HIERARCHY §2.3) — the same 9px
-   * uppercase slot StandoutTile carries, so a compact tile explains itself
-   * wherever it appears. Null renders nothing.
-   */
-  kicker?: string | null;
   trailing?: React.ReactNode;
   isNew?: boolean;
   /** See StandoutTile: 20px squircle left of the name, hashed on the USER ID. */
@@ -110,7 +104,6 @@ export function CompactStandoutTile({
   isOwn,
   detail = '',
   subline = null,
-  kicker = null,
   trailing,
   isNew = false,
   avatarUrl = null,
@@ -197,21 +190,6 @@ export function CompactStandoutTile({
       </CourseImageFallback>
 
       <div style={{ padding: '11px 13px 12px' }}>
-      {kicker ? (
-        <div
-          style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            lineHeight: 1,
-            color: A.MUTE,
-            marginBottom: 7,
-          }}
-        >
-          {kicker}
-        </div>
-      ) : null}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, height: 26 }}>
         <span style={{ ...NUMF, fontSize: 26, lineHeight: 1, color: figureTone ?? A.INK }}>
           {figure ?? '—'}
