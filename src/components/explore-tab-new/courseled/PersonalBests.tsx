@@ -1,4 +1,3 @@
-import { Target } from 'lucide-react';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -7,7 +6,6 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ATW_PHOTO_HEIGHTS, relativeWhen } from './AroundTheWorld';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { usePersonalBests, PERSONAL_BESTS_PER_MEMBER } from './hooks/usePersonalBests';
-import { createMasonryAssignment, placeStable, type MasonryAssignment } from './stableMasonry';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { A, Eyebrow, LABEL } from './tokens';
@@ -82,6 +80,18 @@ const WAIT_KINDS = new Set(['first_double_free_here']);
 
 /** Eight tiles maximum, matching PAGE = 8 in AroundTheWorld (§3.2). */
 const PAGE = 8;
+
+/**
+ * A RAIL, NOT A GRID (BRIEF_DISCOVER_HIERARCHY §3.2). This section is the
+ * second tier and must not carry the same weight as the vertical anchor above
+ * it: two vertical grids back to back is where the page was heaviest. A rail
+ * says browsable rather than required.
+ *
+ * ONE CARD WIDTH AND ONE PHOTO HEIGHT — a rail with masonry heights reads as a
+ * broken grid, so every card is identical and the eye runs sideways.
+ */
+const RAIL_CARD_W = 224;
+const RAIL_PHOTO = 128;
 
 
 interface Props {
@@ -327,9 +337,10 @@ export function PersonalBests({
                 </ReactionSlot>
               );
 
-              /* A CHIPPED ROW TAKES THE PHOTO TILE (§3.1): the effort tile has
-                 no glass chip to put the second figure in. */
-              if (tt.treatment === 'effort' && tt.attempts !== null && !tt.chipped) {
+              /* THE EFFORT TILE IS STOOD DOWN IN THE RAIL (§3.2): a rail of one
+                 width and one photo height cannot carry a second anatomy. The
+                 component itself is untouched. */
+              if (false) {
 
                 return (
                   <EffortTile
@@ -360,7 +371,7 @@ export function PersonalBests({
                 courseName={courseName}
                 imageUrl={tt.m?.imageUrl ?? null}
                 region={tt.m?.region ?? tt.r.region ?? null}
-                photo={tt.photo}
+                photo={RAIL_PHOTO}
                 figure={tt.r.figure}
                 // THE UNIT IS NEVER HARDCODED (§3.4).
                 unit={(tt.r.figure_unit ?? '').toUpperCase()}
@@ -369,6 +380,9 @@ export function PersonalBests({
                 isOwn={tt.r.is_self}
                 detail={tt.headline}
                 subline={tt.reference}
+                /* THE CATEGORY, ON THE CARD (§2.3) — the three sub-headings are
+                   gone, so each card names its own kind of best. */
+                kicker={pbCategoryLabel(tt.r.feat_kind, t)}
                 onDetailPress={
                   onFeatPress
                     ? () => {
@@ -401,57 +415,36 @@ export function PersonalBests({
 
   return (
     <section>
-      <Eyebrow icon={Target} aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}>
+      <Eyebrow
+        tier={3}
+        aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}
+      >
         {t('discover.personalBests', 'Personal bests')}
       </Eyebrow>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {buckets.map((b) => {
-          let asg = masonry.current.get(b.id);
-          if (!asg) {
-            asg = createMasonryAssignment();
-            masonry.current.set(b.id, asg);
-          }
-          const { columns } = placeStable(b.items, asg);
-
-          return (
-            <div key={b.id}>
-              {/* A single surviving group needs no heading — the section eyebrow
-                  already says what it is (§2.3). A group of ONE tile keeps its
-                  heading (§2.1). */}
-              {buckets.length > 1 ? (
-                <div
-                  style={{
-                    ...LABEL,
-                    fontSize: 9,
-                    color: A.MUTE,
-                    padding: '0 2px',
-                    marginBottom: 8,
-                  }}
-                >
-                  {b.label}
-                </div>
-              ) : null}
-
-              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                {columns.map((col, ci) => (
-                  <div
-                    key={ci}
-                    style={{
-                      flex: 1,
-                      minWidth: 0,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 8,
-                    }}
-                  >
-                    {col.map((tt) => renderTile(tt))}
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+      {/* THE RAIL — bled to the page edge so a card is visibly cut off and
+          the row reads as scrollable. No sub-headings (§2.2). */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          alignItems: 'flex-start',
+          overflowX: 'auto',
+          scrollSnapType: 'x proximity',
+          margin: '0 -14px',
+          padding: '0 14px',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+        }}
+      >
+        {tiles.map((tt) => (
+          <div
+            key={tt.slotKey}
+            style={{ width: RAIL_CARD_W, flex: 'none', scrollSnapAlign: 'start' }}
+          >
+            {renderTile(tt)}
+          </div>
+        ))}
       </div>
     </section>
   );
