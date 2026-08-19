@@ -837,6 +837,19 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           </>
         );
       })()}
+
+      {/* Comment preview + add-a-comment prompt. Sits BETWEEN the action row
+          and nothing else: one comment with an invitation beneath it reads as
+          an OPEN conversation. Ships as one block — never half of it. */}
+      {commentPreviewEnabled && (
+        <FeedCommentPreview
+          preview={commentPreview ?? null}
+          commentCount={commentCount}
+          onOpenComments={() => onComment(post, effectiveActor)}
+          viewerAvatarUrl={effectiveActor?.avatarUrl ?? null}
+          viewerName={effectiveActor?.name ?? null}
+        />
+      )}
       </div>
     </article>
   );
