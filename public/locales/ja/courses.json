@@ -1061,6 +1061,12 @@
       "title": "他の場所をお探しですか？",
       "body": "コース一覧全体には、さらに{{total}}件のコースがあります。",
       "cta": "コース一覧をすべて見る"
+    },
+    "reviews": {
+      "heading": "メンバーの声",
+      "actionRail": "すべて見る",
+      "actionFeatured": "すべてのレビュー",
+      "outOfTen": "10点満点"
     }
   },
   "directorySheet": {

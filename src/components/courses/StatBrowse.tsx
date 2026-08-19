@@ -57,6 +57,13 @@ import {
 
 } from './useStatBrowse';
 import { KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
+import { ReviewRailSlot } from './ReviewRailSlot';
+import { ReviewFeaturedSlot } from './ReviewFeaturedSlot';
+import { allocateReviewSlots } from './reviewSlots';
+import { useBrowseReviews } from './useBrowseReviews';
+import { LatestReviewsSheet } from '@/components/explore-tab-new/courseled/LatestReviewsSheet';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import {
   AMBER,
   HAIRLINE_INK_8,
@@ -249,6 +256,55 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     country,
     region,
   });
+
+  /* ── Review slots (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL) ───── */
+  /**
+   * A review is decision content, so it lives where the decision is made. The
+   * pool follows COUNTRY and REGION only — the lens is an ordering and a review
+   * is not ordered by toughness, so changing the lens must not change which
+   * reviews appear. Placement and consumption are pure (reviewSlots.ts): the
+   * same list length yields the same slots in the same places on every load,
+   * which is what keeps scroll restoration honest.
+   */
+  const { pool: reviewPool } = useBrowseReviews(country, region);
+  const reviewSlots = useMemo(
+    () => allocateReviewSlots(reviewPool, rows.length),
+    [reviewPool, rows.length],
+  );
+  const [reviewsSheet, setReviewsSheet] = useState(false);
+  const openReviewSheet = useReviewSheetStore((s) => s.open);
+  const openReviewsSheet = useCallback(() => {
+    analyticsEvents.track('stat_browse_reviews_sheet_open', {
+      country,
+      region,
+      pool: reviewPool.length,
+    });
+    setReviewsSheet(true);
+  }, [country, region, reviewPool.length]);
+  /** Inside the sheet a tile opens the single review, exactly as on Discover. */
+  const handleReviewTile = useCallback(
+    (r: LatestReview) => {
+      openReviewSheet({
+        user: {
+          id: r.userId ?? '',
+          name: r.reviewerName,
+          username: r.reviewerUsername ?? undefined,
+          avatar: r.reviewerAvatar,
+        },
+        courseId: r.courseId,
+        courseName: r.courseName,
+        rating: r.rating,
+        reviewId: r.reviewId,
+        courseCountry: r.courseCountry,
+        courseRegion: r.courseRegion,
+        courseSubCountry: r.courseSubCountry,
+        reviewText: r.quote,
+        breakdown: r.breakdown,
+      });
+    },
+    [openReviewSheet],
+  );
+
 
   /* ── Top 100 enrichment (ranked rows only) ─────────────────────── */
   /**
@@ -999,6 +1055,32 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                 {i < rows.length - 1 && (
                   <div aria-hidden style={{ height: 5, background: CARD_BAND }} />
                 )}
+
+                {/*
+                  REVIEW SLOT (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL §3).
+                  Full-bleed between two 5px bands: the band above is the one
+                  the card just drew, the band below is drawn here, so the
+                  list's rhythm is unbroken. Only rendered when a card follows,
+                  for the same reason the band is.
+                */}
+                {i < rows.length - 1 && reviewSlots.get(i + 1) ? (
+                  <>
+                    {reviewSlots.get(i + 1)!.kind === 'rail' ? (
+                      <ReviewRailSlot
+                        reviews={reviewSlots.get(i + 1)!.reviews}
+                        onReviewPress={openReviewsSheet}
+                        onSeeAll={openReviewsSheet}
+                      />
+                    ) : (
+                      <ReviewFeaturedSlot
+                        review={reviewSlots.get(i + 1)!.reviews[0]}
+                        onReviewPress={openReviewsSheet}
+                        onSeeAll={openReviewsSheet}
+                      />
+                    )}
+                    <div aria-hidden style={{ height: 5, background: CARD_BAND }} />
+                  </>
+                ) : null}
               </div>
             );
           })}
@@ -1060,6 +1142,18 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           onRate={() => navigate(`/courses/${verdictSheet.courseId}/rate`)}
         />
       )}
+
+      {/* The SHIPPED reviews sheet, reused from Discover unchanged. Opened by
+          a slot's see-all and by tapping a review in a slot. It carries the
+          scoped pool, so a filtered browse opens a filtered sheet. */}
+      <LatestReviewsSheet
+        open={reviewsSheet}
+        onClose={() => setReviewsSheet(false)}
+        reviews={reviewPool}
+        totalCount={reviewPool.length}
+        viewerId={user?.id}
+        onTilePress={handleReviewTile}
+      />
     </div>
   );
 };

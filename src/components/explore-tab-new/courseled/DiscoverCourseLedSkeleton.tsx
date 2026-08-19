@@ -14,14 +14,19 @@ import { CARD_SHELL } from './tokens';
  * Every block below is MEASURED off the rendered component it stands in for,
  * not read off the JSX and added up:
  *   friends rail   224 x 233  (104 photo + 60 shape strip + 69 body)
- *   tour rail      266 x 210  (OnTourThisWeek TILE_W / TILE_H, full-bleed)
- *   reviews        two columns, GRID_CAP 2 tiles, 265 rendered each
  *   around world   masonry, six photo heights + 62 body
  *   moments        two 220 blocks + a trailing 109 shorts row (cap 8)
  *   most played    panel of 60px rows
  *   honours        rail of 168 x 178 plaques (HonoursBoard PLAQUE_W / PLAQUE_H)
  * so the loaded page lands on its own outline with no section boundary
  * shifting.
+ *
+ * NO LONGER REACHED FROM DISCOVER (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL):
+ * TourRail and ReviewsMosaic. Both sections were unmounted from this page, so
+ * neither shell can appear on it any more. The exports STAY because they are
+ * rendered by OnTourThisWeek and LatestReviews themselves — those components
+ * are intact by instruction (S1.2), and a shell deleted out from under a live
+ * component is a worse problem than an unreached one.
  */
 
 
