@@ -293,10 +293,22 @@ export const ProfileHero: React.FC<Props> = ({
                           }}
                         >
                           <span
-                            style={{ color: down ? GREEN : up ? RED : W_40 }}
+                            style={{
+                              color: down ? GREEN : up ? RED : W_40,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 5,
+                            }}
                           >
+                            {(down || up) && (
+                              <IndexMovementTriangle
+                                direction={down ? 'down' : 'up'}
+                                color={down ? GREEN : up ? RED : W_40}
+                                size={7}
+                              />
+                            )}
                             {down || up
-                              ? `${down ? '\u2193' : '\u2191'} ${Math.abs(l.delta).toFixed(1)}`
+                              ? Math.abs(l.delta).toFixed(1)
                               : t('hero.trendLevel', 'Level')}
                           </span>
                           <span
