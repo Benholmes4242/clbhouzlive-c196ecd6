@@ -273,11 +273,11 @@ export function PersonalBests({
       wait,
       chipped,
       slotKey: `${r.whs_score_id}:${r.feat_kind}`,
-      // Deterministic height estimate, one per shape.
-      height:
-        treatment === 'effort' && !chipped
-          ? estimateEffortHeight(`${headline} \u00B7 ${attemptPhrase}`)
-          : photoHeight,
+      /* THE RAIL IS UNIFORM (§3.2), so no per-shape estimate is needed and no
+         masonry walk runs here any more. Kept as the photo-tile height for any
+         caller that still reasons about card size. */
+      height: photoHeight,
+
     };
   });
 
