@@ -372,6 +372,62 @@ async function markDone(whsScoreId: string) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// delta_index — the handicap movement a round produced
+// ─────────────────────────────────────────────────────────────────────────────
+// handicap_index_at_time is the index the member PLAYED OFF, so a round's
+// consequence appears on the NEXT score. delta_index for a round is therefore
+// (index carried by the next score) − (index carried by this score).
+//
+// MUST stay in sync with public.gam_delta_index_guard in the database. Two
+// copies exist because the backfill is SQL and the live write is TypeScript.
+const DELTA_INDEX_MAX_MOVE = 2.0;
+
+// Pre-WHS records carry CONGU exact handicaps, and the Nov 2020 transition
+// produced single-revision jumps of up to 7.5 — re-ratings, not golf. Anything
+// beyond the ceiling is stored as null rather than read as a round result.
+function guardDeltaIndex(move: number | null): number | null {
+  if (move == null || !Number.isFinite(move)) return null;
+  if (Math.abs(move) > DELTA_INDEX_MAX_MOVE) return null;
+  // Match pg round(numeric, 1): half away from zero, one decimal.
+  const sign = move < 0 ? -1 : 1;
+  return (sign * Math.round(Math.abs(move) * 10 + 1e-9)) / 10;
+}
+
+type ScoreLadderRow = { id: string; play_date: string | null; handicap_index_at_time: number | null };
+
+// The member's scores in the same order the SQL backfill used: play_date, then
+// score id. NOT created_at — scores arrive out of order.
+async function loadMemberScoreLadder(userId: string): Promise<ScoreLadderRow[]> {
+  const { data: conns, error: cErr } = await supabase
+    .from("whs_connections")
+    .select("id")
+    .eq("user_id", userId);
+  if (cErr) throw cErr;
+  const connIds = (conns ?? []).map((c: any) => c.id);
+  if (connIds.length === 0) return [];
+  const { data, error } = await supabase
+    .from("whs_scores")
+    .select("id, play_date, handicap_index_at_time")
+    .in("connection_id", connIds)
+    .order("play_date", { ascending: true })
+    .order("id", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as ScoreLadderRow[];
+}
+
+// Movement produced by ladder[i]. A no-move round returns 0.0 — the subtraction
+// is only skipped when an index is missing or no next score exists.
+function deltaAtLadderIndex(ladder: ScoreLadderRow[], i: number): number | null {
+  const cur = ladder[i];
+  const next = ladder[i + 1];
+  if (!cur || !next) return null;
+  if (cur.handicap_index_at_time == null || next.handicap_index_at_time == null) return null;
+  return guardDeltaIndex(Number(next.handicap_index_at_time) - Number(cur.handicap_index_at_time));
+}
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 // compute_round_stats
 // ─────────────────────────────────────────────────────────────────────────────
 function computeRoundStats(score: any, holes: any[], meta: any) {
