@@ -705,16 +705,28 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
     activeView === 'pros' ? (pro?.total_rounds ?? 0) : (data?.total_rounds ?? 0);
   /* THE BASIS LINE states what was pooled - tournaments and player-rounds. */
   const basis =
-    activeView === 'pros'
-      ? t('courses:courseDetail.proView.proBasis', {
-          count: pro?.total_tournaments ?? 0,
-          tournaments: formatNumber(pro?.total_tournaments ?? 0),
-          rounds: formatNumber(totalRounds),
-        })
-      : t('courses:courseDetail.plays.rounds', {
-          count: totalRounds,
-          rounds: formatNumber(totalRounds),
-        });
+    activeView === 'pros' ? (
+      /* Two facts, two lines - tournaments tracked, then pro rounds pooled. */
+      <span style={{ display: 'block', textAlign: 'right' }}>
+        <span style={{ display: 'block' }}>
+          {t('courses:courseDetail.proView.proTournaments', {
+            count: pro?.total_tournaments ?? 0,
+            tournaments: formatNumber(pro?.total_tournaments ?? 0),
+          })}
+        </span>
+        <span style={{ display: 'block' }}>
+          {t('courses:courseDetail.proView.proRounds', {
+            count: totalRounds,
+            rounds: formatNumber(totalRounds),
+          })}
+        </span>
+      </span>
+    ) : (
+      t('courses:courseDetail.plays.rounds', {
+        count: totalRounds,
+        rounds: formatNumber(totalRounds),
+      })
+    );
 
   const field = toParParts(stats.fieldAvg);
   const you = toParParts(stats.yourAvg);
@@ -747,9 +759,9 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
-      {/* MEMBERS / PROS - text-only register, shown only where pro data resolves. */}
+      {/* AMATEURS / PROS - a segmented control in the tab's own pill shape. */}
       {hasPro && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {(['members', 'pros'] as const).map((k) => {
             const on = activeView === k;
             return (
@@ -760,12 +772,14 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
                 aria-pressed={on}
                 style={{
                   appearance: 'none',
-                  border: 0,
-                  background: 'transparent',
-                  padding: 0,
-                  fontSize: 13,
+                  padding: '7px 15px',
+                  borderRadius: 999,
+                  border: on ? '1px solid transparent' : `1px solid ${A.BORDER}`,
+                  background: on ? A.INK : A.PANEL,
+                  color: on ? A.PANEL : '#64748B',
+                  fontSize: 12.5,
                   fontWeight: on ? 700 : 600,
-                  color: on ? A.INK : '#94A3B8',
+                  lineHeight: 1,
                   cursor: 'pointer',
                 }}
               >
@@ -795,6 +809,21 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           hasYou={hasYou}
         />
 
+
+        {/* THE COMPRESSION IS THE FINDING (Pros only): the chart is not rescaled,
+            so a line states what the flatness means, derived from the average. */}
+        {activeView === 'pros' && (
+          <div style={{ ...LABEL, fontSize: 8, marginTop: 8, textTransform: 'none', letterSpacing: 0 }}>
+            {Math.abs(stats.fieldAvg) <= 0.05
+              ? t('courses:courseDetail.proView.fieldLevel')
+              : t(
+                  stats.fieldAvg > 0
+                    ? 'courses:courseDetail.proView.fieldOver'
+                    : 'courses:courseDetail.proView.fieldUnder',
+                  { figure: field ? field.text : '' },
+                )}
+          </div>
+        )}
 
         {/* Legend: the bar ramp, and - only when there is one - the member line. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 8 }}>

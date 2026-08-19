@@ -1084,10 +1084,17 @@
       "keyField": "Bar is the field average over par."
     },
     "proView": {
-      "members": "Members",
+      "members": "Amateurs",
       "pros": "Pros",
       "proBasis_one": "{{tournaments}} tournament · {{rounds}} player-rounds",
-      "proBasis_other": "{{tournaments}} tournaments · {{rounds}} player-rounds"
+      "proBasis_other": "{{tournaments}} tournaments · {{rounds}} player-rounds",
+      "proTournaments_one": "{{tournaments}} tournament tracked",
+      "proTournaments_other": "{{tournaments}} tournaments tracked",
+      "proRounds_one": "{{rounds}} pro round",
+      "proRounds_other": "{{rounds}} pro rounds",
+      "fieldLevel": "The field plays this course close to level par.",
+      "fieldOver": "The field plays this course over par, at {{figure}}.",
+      "fieldUnder": "The field plays this course under par, at {{figure}}."
     }
   },
   "network": {
