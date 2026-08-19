@@ -519,12 +519,18 @@ export default function VerificationFlowSheet({
 
       let requestId = otpRequestId;
       if (requestId) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('business_verification_requests')
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .update(payload as any)
-          .eq('id', requestId);
+          .eq('id', requestId)
+          .select('id');
         if (error) throw error;
+        // An update that matches nothing is a FAILURE, not a success. Without
+        // this the sheet would report a submission that never landed.
+        if (!data || data.length === 0) {
+          throw new Error('We could not save your request. Please try again.');
+        }
       } else {
         const { data, error } = await supabase
           .from('business_verification_requests')
@@ -561,14 +567,24 @@ export default function VerificationFlowSheet({
       queryClient.invalidateQueries({ queryKey: ['business-account'] });
       queryClient.invalidateQueries({ queryKey: ['business-account-verification-status'] });
       queryClient.invalidateQueries({ queryKey: ['admin-v2', 'verifications'] });
+      // Pressing submit ALWAYS lands somewhere the member can see: the
+      // confirmation screen plus a toast, so the outcome is never ambiguous.
+      toast.success('Verification request submitted');
       setConfirmation(result);
     },
     onError: (error: unknown) => {
-      const message = (error as Error).message || 'Failed to submit verification request';
-      if (message === '__validation__') return;
+      const err = error as Error & { isValidation?: boolean };
+      const message = err?.message || 'Failed to submit verification request';
       if (message.toLowerCase().includes('already linked')) setExclusivityError(message);
+      // Validation stops used to be swallowed entirely — the member pressed
+      // submit and nothing moved. Now every stop toasts and scrolls into view.
       toast.error(message);
+      requestAnimationFrame(() => {
+        const el = mainRef.current;
+        if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+      });
     },
+
   });
 
   // ---- render ----
