@@ -472,11 +472,17 @@ export default function ExploreTabContent({
               deleted. LATEST REVIEWS left too (S2), moved to the Courses browse
               where a review is decision content rather than entertainment.
               NOTHING MOVED UP to fill either gap. */}
+          {/* The 10px section rhythm reads TIGHT here because the tile above
+              ends on a hard card edge, while the gap BELOW this rail is padded
+              by the caption's line box. +16px matches the two optically. */}
           <LatestVideosRail
             items={communityVideos.data?.videos ?? []}
             onTilePress={() => navigate('/community')}
             onSeeAll={() => navigate('/community')}
+            style={{ marginTop: 16 }}
           />
+
+
 
           <AroundTheWorld
             events={events}
