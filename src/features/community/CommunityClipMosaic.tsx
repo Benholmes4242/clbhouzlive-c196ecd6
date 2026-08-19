@@ -66,7 +66,7 @@ export function CommunityClipMosaic({ items, onPress }: Props) {
   if (items.length === 0) return null;
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
       {columns.map((col, ci) => (
         <div key={ci} style={{ display: 'grid', gap: 2, alignContent: 'start' }}>
           {col.map(({ item, aspect }) => (
@@ -77,7 +77,6 @@ export function CommunityClipMosaic({ items, onPress }: Props) {
               onPress={onPress}
               width="100%"
               aspect={aspect}
-              square
             />
           ))}
         </div>

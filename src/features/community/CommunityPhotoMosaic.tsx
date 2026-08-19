@@ -88,7 +88,7 @@ export function CommunityPhotoMosaic({ items, onPress, infinite = true }: Props)
                   width: '100%',
                   padding: 0,
                   border: 'none',
-                  borderRadius: 0,
+                  borderRadius: 14,
                   overflow: 'hidden',
                   background: PANEL,
                   cursor: 'pointer',
