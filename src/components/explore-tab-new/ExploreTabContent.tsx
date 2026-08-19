@@ -475,13 +475,13 @@ export default function ExploreTabContent({
           {/* The 10px section rhythm reads TIGHT here because the tile above
               ends on a hard card edge, while the gap BELOW this rail is padded
               by the caption's line box. +16px matches the two optically. */}
-          <div style={{ marginTop: 16, display: 'contents' }}>
-            <LatestVideosRail
-              items={communityVideos.data?.videos ?? []}
-              onTilePress={() => navigate('/community')}
-              onSeeAll={() => navigate('/community')}
-            />
-          </div>
+          <LatestVideosRail
+            items={communityVideos.data?.videos ?? []}
+            onTilePress={() => navigate('/community')}
+            onSeeAll={() => navigate('/community')}
+            style={{ marginTop: 16 }}
+          />
+
 
 
           <AroundTheWorld
