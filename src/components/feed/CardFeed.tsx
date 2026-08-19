@@ -787,6 +787,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       postScoreIdMap,
       postRoundsSettled,
       onRoundTap,
+      commentPreview.map,
     ],
   );
 
