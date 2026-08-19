@@ -122,11 +122,15 @@ function InboxListPage() {
   const qc = useQueryClient();
   const workbenchCount = useWorkbenchCount(canUsers);
 
-  // Refresh
+  // Refresh — manual refresh, plus queue changes made in another admin tab.
   useEffect(() => {
-    const handler = () => qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox'] });
+    const handler = () => { void invalidateAdminQueues(qc); };
     window.addEventListener('admin-v2:refetch', handler);
-    return () => window.removeEventListener('admin-v2:refetch', handler);
+    const unsubscribe = subscribeAdminQueueChanges(handler);
+    return () => {
+      window.removeEventListener('admin-v2:refetch', handler);
+      unsubscribe();
+    };
   }, [qc]);
 
   // Drawer states
