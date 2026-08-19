@@ -1,3 +1,4 @@
+import { Target } from 'lucide-react';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -400,7 +401,7 @@ export function PersonalBests({
 
   return (
     <section>
-      <Eyebrow aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}>
+      <Eyebrow icon={Target} aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}>
         {t('discover.personalBests', 'Personal bests')}
       </Eyebrow>
 

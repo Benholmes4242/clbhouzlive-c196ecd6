@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Medal } from 'lucide-react';
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
