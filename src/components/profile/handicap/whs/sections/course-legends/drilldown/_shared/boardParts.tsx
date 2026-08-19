@@ -159,16 +159,15 @@ export const BoardHeaderRow: React.FC<{
 );
 
 /**
- * A gauge, not a race track: one filled portion, one marker at the member's
- * position. `pct` is already direction-corrected by the caller via
- * chaseProgress / isLowerBetterCategory.
+ * Label pair beneath the chase stat row. The track has been removed: a bar
+ * implies a scale, and these categories have no labelled ends.
  */
 export const CrownGauge: React.FC<{
   pct: number;
   level: boolean;
   youLabel: string;
   crownLabel: string;
-}> = ({ youLabel, crownLabel }) => {
+}> = ({ pct: _pct, level: _level, youLabel, crownLabel }) => {
   return (
     <div style={{ margin: '18px 0 2px', fontFamily: SANS }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
