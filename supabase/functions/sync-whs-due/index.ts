@@ -49,6 +49,7 @@ interface SyncResult {
   ok: boolean;
   status: string;
   scoresUpserted?: number;
+  scoresRejected?: number;
   friendsUpserted?: number;
   handicapChanged?: boolean;
   holesEnriched?: number;
