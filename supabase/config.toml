@@ -49,10 +49,10 @@ verify_jwt = false
 verify_jwt = true
 
 [functions.verify-business-approve]
-verify_jwt = true
+verify_jwt = false
 
 [functions.verify-business-reject]
-verify_jwt = true
+verify_jwt = false
 
 [functions.bypass-second-approval]
 verify_jwt = true
@@ -76,7 +76,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.verify-bulk]
-verify_jwt = true
+verify_jwt = false
 
 [functions.tourhub-scoreboard]
 verify_jwt = false
@@ -219,16 +219,16 @@ verify_jwt = false
 verify_jwt = true
 
 [functions.request-course-claim]
-verify_jwt = true
+verify_jwt = false
 
 [functions.approve-course-claim]
-verify_jwt = true
+verify_jwt = false
 
 [functions.reject-course-claim]
-verify_jwt = true
+verify_jwt = false
 
 [functions.request-info-course-claim]
-verify_jwt = true
+verify_jwt = false
 
 [functions.send-course-claim-result-email]
 verify_jwt = false
@@ -252,3 +252,5 @@ verify_jwt = false
 [functions.verification-document-purge]
 verify_jwt = false
 
+[functions.verify-business-request-info]
+verify_jwt = false
