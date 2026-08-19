@@ -68,7 +68,7 @@ function CourseTag({ name }: { name: string }) {
         fontSize: 9.5,
         fontWeight: 700,
         letterSpacing: '0.06em',
-        textTransform: 'uppercase',
+        textTransform: 'lowercase',
         color: '#FFFFFF',
         textShadow: '0 1px 6px rgba(0,0,0,0.55)',
         whiteSpace: 'nowrap',
