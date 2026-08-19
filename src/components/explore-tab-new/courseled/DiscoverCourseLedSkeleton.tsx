@@ -294,19 +294,19 @@ export function MomentsMosaic() {
             <Bar
               style={{
                 height: 220,
-                borderRadius: 0,
+                borderRadius: 14,
                 gridColumn: b % 2 === 0 ? 1 : 2,
                 gridRow: '1 / span 2',
               }}
             />
-            <Bar style={{ height: 109, borderRadius: 0, gridColumn: b % 2 === 0 ? 2 : 1, gridRow: 1 }} />
-            <Bar style={{ height: 109, borderRadius: 0, gridColumn: b % 2 === 0 ? 2 : 1, gridRow: 2 }} />
+            <Bar style={{ height: 109, borderRadius: 14, gridColumn: b % 2 === 0 ? 2 : 1, gridRow: 1 }} />
+            <Bar style={{ height: 109, borderRadius: 14, gridColumn: b % 2 === 0 ? 2 : 1, gridRow: 2 }} />
           </div>
         ))}
         {/* The trailing shorts row: cap 8 never divides into whole blocks. */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-          <Bar style={{ height: 109, borderRadius: 0 }} />
-          <Bar style={{ height: 109, borderRadius: 0 }} />
+          <Bar style={{ height: 109, borderRadius: 14 }} />
+          <Bar style={{ height: 109, borderRadius: 14 }} />
         </div>
       </div>
     </section>
