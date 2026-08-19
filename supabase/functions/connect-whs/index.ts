@@ -19,6 +19,7 @@ import {
   egGetUserDetails,
   egListScores,
   egListFriends,
+  upsertScores,
   insertHandicapSnapshotIfChanged,
   EgApiError,
   type EgScore,
@@ -133,6 +134,8 @@ async function storeVaultSecret(
 interface SyncResult {
   scoresImported: number;
   friendsImported: number;
+  scoresRejected: number;
+  firstRejectedUid: string | null;
 }
 
 async function runInitialSync(
@@ -157,10 +160,18 @@ async function runInitialSync(
   }
 
   // 2. First page of scores (most recent 30)
+  //    Uses the SHARED mapper in _shared/eg-api.ts — the only score mapper.
+  //    That brings row-by-row degradation to the initial import too: one
+  //    unstorable row can no longer lose the member's entire history.
   let scoresImported = 0;
+  let scoresRejected = 0;
+  let firstRejectedUid: string | null = null;
   try {
     const { Scores } = await egListScores(egToken, passportId, 1, 300);
-    scoresImported = await upsertScores(client, connectionId, Scores);
+    const upsert = await upsertScores(client, connectionId, Scores);
+    scoresImported = upsert.written;
+    scoresRejected = upsert.rejected;
+    firstRejectedUid = upsert.failures[0]?.whsScoreUid ?? null;
   } catch (err) {
     console.error("[connect-whs] initial score sync failed:", err);
     // Non-fatal — connection is still useful without scores; sync will retry
@@ -176,126 +187,31 @@ async function runInitialSync(
     // Non-fatal
   }
 
-  // 4. Mark initial sync complete + record timestamp
+  // 4. Mark initial sync complete + record timestamp.
+  //    If the import rejected any rows we must NOT report a clean success —
+  //    a first import that silently dropped rounds is the worst version of
+  //    this bug. Mirror sync-whs-due: status "partial", count and first
+  //    offending WHSScoreUID in last_sync_error. consecutive_failures stays
+  //    at 0: the connection authenticated and synced fine.
+  const isPartial = scoresRejected > 0;
+  const partialError = isPartial
+    ? `initial import rejected ${scoresRejected} score row(s); first uid=${firstRejectedUid ?? "unknown"}`.slice(0, 500)
+    : null;
+
   await client
     .from("whs_connections")
     .update({
       initial_sync_complete: true,
       last_synced_at: new Date().toISOString(),
-      last_sync_status: "ok",
+      last_sync_status: isPartial ? "partial" : "ok",
+      last_sync_error: partialError,
       consecutive_failures: 0,
     })
     .eq("id", connectionId);
 
-  return { scoresImported, friendsImported };
-}
+  if (isPartial) console.warn(`[connect-whs] partial initial import for ${connectionId}: ${partialError}`);
 
-async function upsertScores(
-  client: SupabaseClient,
-  connectionId: string,
-  scores: EgScore[],
-): Promise<number> {
-  // _overseas_fix_applied — 2026-05-17
-  // EG returns TotalHoles=0 for summary-only rounds (club-entered totals where
-  // individual hole scores aren't captured). This is most common for overseas
-  // rounds where players hand their scorecards to their home club to record.
-  // These rounds are real and count for handicap; they just lack hole-by-hole
-  // detail. We default TotalHoles=0 to 9 (if IsNineHole) or 18 (full round)
-  // and preserve the score. hole_by_hole_fetched flag elsewhere handles the
-  // "no hole detail available" state correctly.
-  const validScores: EgScore[] = scores.map((s) => {
-    const raw = s.TotalHoles;
-    if (raw == null || raw === 0) {
-      const inferred = s.IsNineHole ? 9 : 18;
-      return { ...s, TotalHoles: inferred };
-    }
-    return s;
-  });
-
-  if (validScores.length === 0) return 0;
-
-  // Upsert courses first so we can reference them
-  const courseRows = await upsertCoursesFromScores(client, validScores);
-
-  const rows = validScores.map((s) => ({
-    connection_id: connectionId,
-    upstream_score_id: s.ScoreId,
-    whs_score_uid: s.WHSScoreUID,
-    course_id: courseRows.get(s.Course?.CourseId ?? -1) ?? null,
-    play_date: s.PlayDate.split("T")[0], // ISO date portion only
-    capture_date: s.CaptureDate,
-    total_holes: s.TotalHoles ?? 18,
-    is_nine_hole: s.IsNineHole ?? false,
-    actual_gross: s.ActualGross,
-    adjusted_gross: s.AdjustedGross,
-    stableford_points: s.StablefordPoints,
-    course_rating: s.CourseRating ?? s.Marker?.CourseRating ?? null,
-    slope_rating: s.SlopeRating ?? s.Marker?.SlopeRating ?? null,
-    pcc: s.Pcc,
-    marker_name: s.Marker?.Name ?? null,
-    course_handicap: s.CourseHandicap,
-    handicap_differential: s.HandicapDifferential,
-    handicap_index_at_time: s.HandicapIndex,
-    is_counter: s.IsCounter ?? false,
-    is_considered: s.IsConsidered ?? false,
-    is_competition_score: s.IsCompetitionScore ?? false,
-    is_penalty_score: s.IsPenaltyScore ?? false,
-    is_eligible_for_handicapping: s.IsEligibleForHandicapping ?? true,
-    all_holes_attempted: s.AllHolesAttempted ?? true,
-    permalink_url: s.PermalinkURL,
-    raw_payload: s,
-  }));
-
-  const { error } = await client
-    .from("whs_scores")
-    .upsert(rows, { onConflict: "connection_id,whs_score_uid", ignoreDuplicates: false });
-  if (error) {
-    console.error("[connect-whs] upsert scores failed:", error);
-    return 0;
-  }
-  return rows.length;
-}
-
-async function upsertCoursesFromScores(
-  client: SupabaseClient,
-  scores: EgScore[],
-): Promise<Map<number, string>> {
-  // Collect unique courses
-  const seen = new Map<number, EgScore>();
-  for (const s of scores) {
-    if (s.Course?.CourseId != null && !seen.has(s.Course.CourseId)) {
-      seen.set(s.Course.CourseId, s);
-    }
-  }
-  if (seen.size === 0) return new Map();
-
-  const rows = Array.from(seen.values()).map((s) => ({
-    provider: "england_golf" as const,
-    upstream_course_id: s.Course!.CourseId!,
-    name: s.Course!.Name ?? s.Course!.CourseName ?? "Unknown course",
-    country_code: s.Course!.Country?.Code ?? null,
-    country_name: s.Course!.Country?.Name ?? null,
-    is_linked_to_multi_course_club: s.Course!.IsLinkedToMultiCourseClub ?? false,
-    last_seen_course_rating: s.CourseRating ?? s.Marker?.CourseRating ?? null,
-    last_seen_slope_rating: s.SlopeRating ?? s.Marker?.SlopeRating ?? null,
-    last_seen_marker_name: s.Marker?.Name ?? null,
-  }));
-
-  const { data, error } = await client
-    .from("whs_courses")
-    .upsert(rows, { onConflict: "provider,upstream_course_id" })
-    .select("id, upstream_course_id");
-
-  if (error) {
-    console.error("[connect-whs] upsert courses failed:", error);
-    return new Map();
-  }
-
-  const idMap = new Map<number, string>();
-  for (const row of data ?? []) {
-    idMap.set(row.upstream_course_id as number, row.id as string);
-  }
-  return idMap;
+  return { scoresImported, friendsImported, scoresRejected, firstRejectedUid };
 }
 
 async function upsertFriends(
@@ -512,7 +428,7 @@ Deno.serve(async (req) => {
   }
 
   // 8. Initial sync (handicap snapshot + scores + friends)
-  let syncResult: SyncResult = { scoresImported: 0, friendsImported: 0 };
+  let syncResult: SyncResult = { scoresImported: 0, friendsImported: 0, scoresRejected: 0, firstRejectedUid: null };
   try {
     syncResult = await runInitialSync(
       admin,
