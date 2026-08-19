@@ -24,7 +24,8 @@ import type { LatestReview } from './hooks/useLatestReviews';
  * panel), so the page's 28px section rhythm collapses cleanly.
  */
 
-const PAGE_CAP = 4;
+const SEARCH_CAP = 4; // how far down the list we look for a featured review
+const GRID_CAP = 2;   // how many tiles the grid renders
 
 interface Props {
   reviews: LatestReview[];
@@ -53,14 +54,20 @@ export function LatestReviews({
   /* TIERS (BRIEF_REVIEW_TILE_TIERS §1/§2). At most ONE featured tile per
      render: the MOST RECENT qualifier in the page's own window — the list is
      created_at DESC, so that is simply the first. A second qualifier renders
-     as BARS in the grid. When a featured tile is lifted out, the grid still
-     carries PAGE_CAP tiles, so the two columns stay even. */
-  const pool = reviews.slice(0, PAGE_CAP);
+     as BARS in the grid.
+
+     The grid carries GRID_CAP tiles so the two columns stay even, whether or
+     not a featured tile was lifted out. GRID_CAP is 2 - one row - because
+     Discover now carries two video rails and this section was taking four rows
+     of a scroll it no longer owns. SEARCH_CAP stays wider than GRID_CAP on
+     purpose: a featured review is the best thing this section has and it
+     should still be found when it is third or fourth newest. */
+  const pool = reviews.slice(0, SEARCH_CAP);
   const featured = pool.find((r) => reviewTier(r) === 'featured') ?? null;
-  const shown = featured
-    ? [featured, ...reviews.slice(0, PAGE_CAP + 1).filter((r) => r.reviewId !== featured.reviewId)]
-    : pool;
-  const grid = featured ? shown.slice(1) : shown;
+  const grid = reviews
+    .filter((r) => r.reviewId !== featured?.reviewId)
+    .slice(0, GRID_CAP);
+
 
   // REACTIONS — one read for the mosaic, keyed by review id.
   const reactionTargets = useMemo<ReactionTarget[]>(
