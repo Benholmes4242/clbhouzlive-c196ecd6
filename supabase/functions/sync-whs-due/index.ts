@@ -49,6 +49,7 @@ interface SyncResult {
   ok: boolean;
   status: string;
   scoresUpserted?: number;
+  scoresRejected?: number;
   friendsUpserted?: number;
   handicapChanged?: boolean;
   holesEnriched?: number;
@@ -190,8 +191,24 @@ async function syncOneConnection(
     console.warn(`[sync] pre-upsert snapshot failed for ${conn.id} (non-fatal):`, err);
   }
 
-  const scoresUpserted = scores ? await upsertScores(admin, conn.id, scores.Scores) : 0;
+  const scoreUpsert = scores
+    ? await upsertScores(admin, conn.id, scores.Scores)
+    : { written: 0, rejected: 0, failures: [] as Array<{ whsScoreUid: string | null }> };
+  const scoresUpserted = scoreUpsert.written;
   const friendsUpserted = friends ? await upsertFriends(admin, conn.id, friends.Friends) : 0;
+
+  // Partial detection. A run is only "ok" when every upstream call succeeded AND
+  // every score row stored. Previously any of these failed silently and the
+  // connection still recorded "ok" — which is why two members went months with
+  // no working score sync.
+  const partialReasons: string[] = [];
+  if (scores == null) partialReasons.push("list-scores failed");
+  if (friends == null) partialReasons.push("list-friends failed");
+  if (scoreUpsert.rejected > 0) {
+    partialReasons.push(
+      `${scoreUpsert.rejected} score row(s) rejected, first uid=${scoreUpsert.failures[0]?.whsScoreUid ?? "unknown"}`,
+    );
+  }
 
   // Enrich newly-imported scores with hole-by-hole detail. This mirrors what
   // sync-whs-one does. Without it, the cron leaves friend round detail sheets
@@ -240,22 +257,36 @@ async function syncOneConnection(
     console.error(`[sync] analytics-push detection failed for ${conn.id} (non-fatal):`, err);
   }
 
-  // Mark success
+  // Mark success or partial.
+  //
+  // A partial does NOT increment consecutive_failures (the connection is healthy;
+  // the data is not — incrementing would eventually disable a working connection)
+  // and does NOT hold back next_sync_after (a partial must still schedule the next
+  // run, otherwise one bad row stops the connection entirely).
+  const isPartial = partialReasons.length > 0;
+  const partialError = isPartial ? partialReasons.join("; ").slice(0, 500) : null;
+
   await admin
     .from("whs_connections")
     .update({
       last_synced_at: new Date().toISOString(),
-      last_sync_status: "ok",
-      last_sync_error: null,
+      last_sync_status: isPartial ? "partial" : "ok",
+      last_sync_error: partialError,
       consecutive_failures: 0,
       next_sync_after: computeNextSyncAfter("ok", 0),
       initial_sync_complete: true,
     })
     .eq("id", conn.id);
 
+  if (isPartial) {
+    console.warn(`[sync] partial for ${conn.id}: ${partialError}`);
+  }
+
   result.ok = true;
-  result.status = "ok";
+  result.status = isPartial ? "partial" : "ok";
+  if (partialError) result.error = partialError;
   result.scoresUpserted = scoresUpserted;
+  result.scoresRejected = scoreUpsert.rejected;
   result.friendsUpserted = friendsUpserted;
   result.handicapChanged = handicapChanged;
   result.holesEnriched = holesEnriched;

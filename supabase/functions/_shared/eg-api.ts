@@ -509,16 +509,32 @@ export async function upsertCoursesFromScores(
   return idMap;
 }
 
+export interface ScoreUpsertRejection {
+  whsScoreUid: string | null;
+  playDate: string | null;
+  constraint: string | null;
+  message: string;
+}
+
+export interface ScoreUpsertResult {
+  written: number;
+  rejected: number;
+  failures: ScoreUpsertRejection[];
+}
+
 /**
  * Upsert scores for a connection. Existing scores get updated, new scores get inserted.
- * Returns the number of rows touched.
+ * Fast path is a single batch statement. If that statement fails, we retry row by
+ * row so ONE unstorable score can never lose the other 29 — and every rejection is
+ * reported back to the caller rather than swallowed.
  */
 export async function upsertScores(
   client: SupabaseClient,
   connectionId: string,
   scores: EgScore[],
-): Promise<number> {
-  if (scores.length === 0) return 0;
+): Promise<ScoreUpsertResult> {
+  const empty: ScoreUpsertResult = { written: 0, rejected: 0, failures: [] };
+  if (scores.length === 0) return empty;
 
   const courseRows = await upsertCoursesFromScores(client, scores);
 
@@ -531,7 +547,16 @@ export async function upsertScores(
       course_id: courseRows.get(s.Course?.CourseId ?? -1) ?? null,
       play_date: egPlayDateToLocal(s.PlayDate),
       capture_date: s.CaptureDate,
-      total_holes: s.TotalHoles ?? 18,
+      // England Golf returns some scores with TotalHoles 0 and Holes null. The
+      // cause is not isolated — it is NOT simply "played abroad", since overseas
+      // rounds from eight countries store correctly. `?? 18` did not catch the
+      // zero, which reached a `total_holes > 0` check constraint and rejected the
+      // WHOLE 30-score batch every six hours. Two members had no working score
+      // sync from the day they connected. Resolve explicitly from IsNineHole, and
+      // never from Holes.length.
+      total_holes:
+        s.TotalHoles && s.TotalHoles > 0 ? s.TotalHoles
+          : (s.IsNineHole ? 9 : 18),
       is_nine_hole: s.IsNineHole ?? false,
       actual_gross: s.ActualGross,
       adjusted_gross: s.AdjustedGross,
@@ -553,17 +578,50 @@ export async function upsertScores(
       raw_payload: s,
     }));
 
-  if (rows.length === 0) return 0;
+  if (rows.length === 0) return empty;
 
   const { error } = await client
     .from("whs_scores")
     .upsert(rows, { onConflict: "connection_id,whs_score_uid" });
 
-  if (error) {
-    console.error("[eg-api] upsert scores failed:", error);
-    return 0;
+  if (!error) {
+    return { written: rows.length, rejected: 0, failures: [] };
   }
-  return rows.length;
+
+  // Batch failed — one or more rows are unstorable. Retry individually so the
+  // good rounds still land, and log each bad row precisely.
+  console.error(
+    `[eg-api] batch upsert scores failed for ${connectionId} (${rows.length} rows), retrying row by row:`,
+    error.message,
+  );
+
+  let written = 0;
+  const failures: ScoreUpsertRejection[] = [];
+  for (const row of rows) {
+    const { error: rowErr } = await client
+      .from("whs_scores")
+      .upsert([row], { onConflict: "connection_id,whs_score_uid" });
+    if (!rowErr) {
+      written++;
+      continue;
+    }
+    const constraintName =
+      (rowErr as any).details?.match?.(/constraint "([^"]+)"/)?.[1] ??
+      (rowErr.message ?? "").match(/constraint "([^"]+)"/)?.[1] ??
+      (rowErr as any).code ??
+      null;
+    failures.push({
+      whsScoreUid: (row.whs_score_uid as string | null) ?? null,
+      playDate: (row.play_date as string | null) ?? null,
+      constraint: constraintName,
+      message: rowErr.message,
+    });
+    console.error(
+      `[eg-api] score rejected conn=${connectionId} uid=${row.whs_score_uid} play_date=${row.play_date} constraint=${constraintName}: ${rowErr.message}`,
+    );
+  }
+
+  return { written, rejected: failures.length, failures };
 }
 
 /**
