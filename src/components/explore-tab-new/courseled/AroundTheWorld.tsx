@@ -1174,154 +1174,79 @@ export function AroundTheWorld({
           const rest = tiles.filter((tt) => tt !== hero);
 
           /**
-           * GROUPS (§1.5) in the brief's fixed order. MIN_GROUP IS ONE
-           * (BRIEF_STANDOUT_KIND_BUDGET §2): a group with a single tile KEEPS
-           * its heading, so the merge-down / merge-up fold that used to run here
-           * was REMOVED DELIBERATELY rather than left as dead code. An empty
-           * group renders nothing at all; the one-group rule below still drops
-           * the heading when only one group survives.
+           * ONE CONTINUOUS GRID (BRIEF_DISCOVER_HIERARCHY §2.1). The three group
+           * sub-headings are GONE: a reader was holding two levels of hierarchy
+           * at once, and the sub-headings looked identical to the section
+           * heading above them. The categories survive per card (§2.3) and,
+           * grouped, inside "See all" (§2.4) — the sheet is untouched.
            */
-          const heroGroupId = groupIdFor(hero.kind);
-          const buckets = FEAT_GROUPS.map((def) => ({
-            id: def.id,
-            label: t(def.key, def.label),
-            items: rest.filter((tt) => groupIdFor(tt.kind) === def.id),
-          }))
-            /* The hero's group survives even when the hero is its only tile. */
-            .filter((b) => b.items.length > 0 || b.id === heroGroupId)
-            /* §2.3: THE GROUP HOLDING THE HERO IS PROMOTED TO FIRST; the others
-               keep their relative order beneath it. */
-            .sort((a, b) => (a.id === heroGroupId ? -1 : b.id === heroGroupId ? 1 : 0));
-
 
           /**
            * A REPEATED COURSE LOSES ITS PHOTO (§1.8), decided in RENDER order —
-           * hero first, then group by group — so the tile the member sees first
+           * hero first, then down the grid — so the tile the member sees first
            * is the one that keeps the photograph. §1.7 applies on top: the two
            * least-rare kinds are compact wherever they sit.
            */
           const seenCourses = new Set<string>([hero.g.courseId]);
           const compactKeys = new Set<string>();
-          for (const b of buckets) {
-            for (const tt of b.items) {
-              const repeated = seenCourses.has(tt.g.courseId);
-              seenCourses.add(tt.g.courseId);
-              if (repeated || COMPACT_KINDS.has(tt.kind ?? '') || !tt.kind) {
-                compactKeys.add(tt.slotKey);
-              }
+          for (const tt of rest) {
+            const repeated = seenCourses.has(tt.g.courseId);
+            seenCourses.add(tt.g.courseId);
+            if (repeated || COMPACT_KINDS.has(tt.kind ?? '') || !tt.kind) {
+              compactKeys.add(tt.slotKey);
             }
           }
 
-          /**
-           * A SECOND WIDE TILE further down (§1.9): the first tile of the SECOND
-           * surviving group runs full width — and only when that group still
-           * holds MORE THAN TWO tiles after the pull, so a group is never left
-           * as one wide tile and a single column.
-           *
-           * §4.2: the hero's group is always buckets[0] after promotion, so the
-           * second wide tile can never land in the hero's group — no group ever
-           * carries two full-width tiles.
-           */
-          const secondGroup = buckets[1];
-          const wide =
-            secondGroup && secondGroup.items.length - 1 > 2 ? secondGroup.items[0] : null;
+          const laid = rest.map((tt) => {
+            const compact = compactKeys.has(tt.slotKey);
+            return {
+              ...tt,
+              compact,
+              /* EVERY SHAPE BRINGS ITS OWN ESTIMATE (§0.1). The category moved
+                 to the card eyebrow, so the subline is billed at zero and the
+                 16px eyebrow is billed instead. */
+              height: compact
+                ? estimateCompactHeight(detailOf(tt), '', tt.who) + 16
+                : tt.height,
+            };
+          });
 
-          /* §3.3: the kicker only survives when NO heading sits above the hero,
-             i.e. the one-group case where headings are dropped. */
-          const heroKicker = buckets.length === 1;
+          // ONE column memory for the whole grid now that the groups are gone.
+          let asg = groupMasonry.current.get('all');
+          if (!asg) {
+            asg = createMasonryAssignment();
+            groupMasonry.current.set('all', asg);
+          }
+          const placed = placeStable(laid, asg);
+          const declashed = deClashColumns(placed.columns);
+          rememberColumns(declashed.columns, asg);
 
           return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div>
+              {/* THE HERO STAYS (§2.1): a full-width card first, then pairs. */}
+              <div style={{ marginBottom: 8 }}>
+                {photoTile(hero, { photo: HERO_PHOTO, hero: true })}
+              </div>
 
-
-              {buckets.map((b, bi) => {
-                const isWide = (tt: Tile) => wide != null && tt.slotKey === wide.slotKey;
-                const laid = b.items
-                  .filter((tt) => !isWide(tt))
-                  .map((tt) => {
-                    const compact = compactKeys.has(tt.slotKey);
-                    return {
-                      ...tt,
-                      compact,
-                      /* EVERY SHAPE BRINGS ITS OWN ESTIMATE (§0.1). */
-                      height: compact
-                        ? estimateCompactHeight(detailOf(tt), tt.margin || '', tt.who)
-                        : tt.height,
-                    };
-                  });
-
-                // Existing tiles hold the column they were given; only tiles new
-                // to this session are placed greedily. The de-clash pass may
-                // still swap a pair to keep two tiles of one course off
-                // consecutive rows, and the result is remembered so the repair
-                // itself never churns again.
-                let asg = groupMasonry.current.get(b.id);
-                if (!asg) {
-                  asg = createMasonryAssignment();
-                  groupMasonry.current.set(b.id, asg);
-                }
-                const placed = placeStable(laid, asg);
-                const declashed = deClashColumns(placed.columns);
-                rememberColumns(declashed.columns, asg);
-
-                return (
-                  <div key={b.id}>
-                    {/* A single surviving group needs no heading — the section
-                        eyebrow already says what it is. */}
-                    {buckets.length > 1 ? (
-                      <div
-                        style={{
-                          ...LABEL,
-                          fontSize: 9,
-                          color: A.MUTE,
-                          padding: '0 2px',
-                          marginBottom: 8,
-                        }}
-                      >
-                        {b.label}
-                      </div>
-                    ) : null}
-
-                    {/* THE HERO (§1.1) — first and largest tile of its OWN
-                        group, above that group's masonry. */}
-                    {b.id === heroGroupId ? (
-                      <div style={{ marginBottom: 8 }}>
-                        {photoTile(hero, {
-                          photo: HERO_PHOTO,
-                          hero: true,
-                          showKicker: heroKicker,
-                        })}
-                      </div>
-                    ) : null}
-
-
-                    {wide && bi === 1 ? (
-                      <div style={{ marginBottom: 8 }}>
-                        {photoTile(wide, { photo: WIDE_PHOTO })}
-                      </div>
-                    ) : null}
-
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                      {declashed.columns.map((col, ci) => (
-                        <div
-                          key={ci}
-                          style={{
-                            flex: 1,
-                            minWidth: 0,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 8,
-                          }}
-                        >
-                          {col.map((tt) => (tt.compact ? compactTile(tt) : photoTile(tt)))}
-                        </div>
-                      ))}
-                    </div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                {declashed.columns.map((col, ci) => (
+                  <div
+                    key={ci}
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 8,
+                    }}
+                  >
+                    {col.map((tt) => (tt.compact ? compactTile(tt) : photoTile(tt)))}
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
           );
+
         })()}
 
 
