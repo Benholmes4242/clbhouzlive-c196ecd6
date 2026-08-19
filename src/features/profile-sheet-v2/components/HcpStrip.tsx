@@ -28,6 +28,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { A, KICKER, LABEL, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
