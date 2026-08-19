@@ -363,7 +363,7 @@ export function CommunityVideoTile({ item, railVisible, onPress }: TileProps) {
           </span>
         )}
       </div>
-    </button>
+    </div>
   );
 }
 
