@@ -910,13 +910,9 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
             {/* THE ROUNDS COUNT IS META (§B2), right-aligned, the same treatment
                 every other panel's sample size takes - not a sentence. */}
             {totalRounds > 0 && (
-              <div style={{ ...LABEL, ...FIGS }}>
-                {t('courses:courseDetail.plays.rounds', {
-                  count: totalRounds,
-                  rounds: formatNumber(totalRounds),
-                })}
-              </div>
+              <div style={{ ...LABEL, ...FIGS }}>{basis}</div>
             )}
+
           </div>
           <h2
             id="course-holes-sheet-title"
