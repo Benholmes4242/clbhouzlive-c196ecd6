@@ -21,7 +21,7 @@ import { useCourseProHoleAnalysis } from '@/hooks/gam/useCourseProHoleAnalysis';
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { A, DIFFICULTY_HARD_HEX, DIFFICULTY_RAMP, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
+import { A, DIFFICULTY_HARD_HEX, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
 import {
   DistributionStrip,
   HoleRowV2,
@@ -433,23 +433,6 @@ const ShapeChart: React.FC<{
 };
 
 /**
- * Bar-ramp legend: easier -> harder, as DISCRETE SWATCHES (§5). A smooth
- * gradient advertised colours the bars can never take; the key now shows the
- * ramp's actual six stops, which is what a bar can be.
- */
-const RampLegend: React.FC<{ easier: string; harder: string }> = ({ easier, harder }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-    <span style={{ ...LABEL, fontSize: 7 }}>{easier}</span>
-    <i aria-hidden="true" style={{ display: 'inline-flex', gap: 1.5 }}>
-      {DIFFICULTY_RAMP.map((tone) => (
-        <i key={tone} style={{ width: 6, height: 5, borderRadius: 1, background: tone }} />
-      ))}
-    </i>
-    <span style={{ ...LABEL, fontSize: 7 }}>{harder}</span>
-  </span>
-);
-
-/**
  * HOW EACH PAR PLAYS (§A4) - one row per par type PRESENT at this course.
  *
  * The bar is the FIELD's mean shots over par for that par type, on the demanding
@@ -458,6 +441,7 @@ const RampLegend: React.FC<{ easier: string; harder: string }> = ({ easier, hard
  * new query, no hook, no SQL.
  *
  * COMMENSURABILITY: the viewer's tick renders ONLY where the viewer has an
+
  * average for EVERY hole of that par type, so the two sides derive identically
  * over the same holes. A par 6 or par 2 gets its own row and is never folded in.
  * A member with no rounds here sees the field alone - the course's own shape is
@@ -825,23 +809,18 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           </div>
         )}
 
-        {/* Legend: the bar ramp, and - only when there is one - the member line. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 8 }}>
-          <RampLegend
-            easier={t('courses:courseDetail.plays.legendEasier')}
-            harder={t('courses:courseDetail.plays.legendHarder')}
-          />
-          {hasYou && (
+        {/* Legend: member line only. */}
+        {hasYou && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 8 }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
               <i style={{ width: 12, height: 2, borderRadius: 1, background: A.AMBER }} />
               <span style={{ ...LABEL, fontSize: 7 }}>
                 {t('courses:courseDetail.plays.legendYou')}
               </span>
             </span>
-          )}
-        </div>
+          </div>
+        )}
 
-        <Hairline style={{ margin: '11px 0 9px' }} />
 
         {/* THE HARDEST / EASIEST SUMMARY LINE IS GONE (§A2) - both figures now sit
             on their own bars in the chart above, so the figures beneath carry only

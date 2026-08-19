@@ -1080,7 +1080,7 @@
       "kicker": "HOW EACH PAR PLAYS",
       "holesN_one": "{{count}} hole",
       "holesN_other": "{{count}} holes",
-      "keyBoth": "Bar is the field. Tick is you.",
+      "keyBoth": "Bar is the field. Line is you.",
       "keyField": "Bar is the field average over par."
     },
     "proView": {
