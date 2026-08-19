@@ -143,6 +143,17 @@ export interface FeedCardProps {
   postRoundMissing?: boolean;
   /** Opens the attached round's scorecard. */
   onRoundTap?: (post: FeedPost, round: PostRound) => void;
+  /**
+   * Newest top-level comment for this post (batched by the host feed).
+   * RENDERS FROM THE COMMENT, NEVER FROM comment_count — absent means no
+   * preview row, whatever the counter says.
+   */
+  commentPreview?: FeedCommentPreviewData | null;
+  /**
+   * Host opts the card into the comment block (preview + add-a-comment prompt).
+   * Grid hosts that do not batch comment data leave it off.
+   */
+  commentPreviewEnabled?: boolean;
 }
 
 interface CaptionBlockProps {
