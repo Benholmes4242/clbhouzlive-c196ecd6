@@ -243,7 +243,8 @@ export const Panel: React.FC<{
   kicker?: string;
   /** Panel-level heading (13/700 INK). Used where a panel titles itself. */
   title?: string;
-  aside?: string;
+  /** Meta on the heading row. A node so a basis can run to two lines. */
+  aside?: React.ReactNode;
   footer?: string;
   onOpen?: () => void;
   /**
