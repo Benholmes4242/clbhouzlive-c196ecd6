@@ -21,7 +21,7 @@ import { useCourseProHoleAnalysis } from '@/hooks/gam/useCourseProHoleAnalysis';
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { A, DIFFICULTY_HARD_HEX, DIFFICULTY_RAMP, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
+import { A, DIFFICULTY_HARD_HEX, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
 import {
   DistributionStrip,
   HoleRowV2,
