@@ -285,15 +285,35 @@ async function processSingle(whsScoreId: string) {
     try {
       const prev = ladder[ladderIdx - 1];
       const prevDelta = deltaAtLadderIndex(ladder, ladderIdx - 1);
+
+      // WAS-IT-NULL GUARD. Read the stored value immediately before writing it.
+      // A non-null value means the index streaks were already applied for that
+      // round (or it is one of Ben's backfilled rows, which must never replay).
+      const { data: prevRow, error: prevReadErr } = await supabase
+        .from("gam_round_stats")
+        .select("whs_score_id, delta_index")
+        .eq("whs_score_id", prev.id)
+        .maybeSingle();
+      if (prevReadErr) throw prevReadErr;
+      const wasNull = !!prevRow && prevRow.delta_index == null;
+
       const { error: prevErr } = await supabase
         .from("gam_round_stats")
         .update({ delta_index: prevDelta })
         .eq("whs_score_id", prev.id);
       if (prevErr) throw prevErr;
+
+      // DEFERRED INDEX STREAKS. The two index-dependent streak conditions can
+      // only be judged once the following round exists, which is now. Runs
+      // BEFORE this round's applyStreaks so the sequence stays chronological.
+      if (wasNull) {
+        await applyIndexStreaks(userId, { whs_score_id: prev.id, delta_index: prevDelta });
+      }
     } catch (e) {
       console.warn("[delta_index] prev_backfill", (e as Error).message);
     }
   }
+
 
 
   // Idempotency guard for counter-style state changes
