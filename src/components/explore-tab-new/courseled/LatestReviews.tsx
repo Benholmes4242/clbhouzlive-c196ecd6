@@ -129,6 +129,7 @@ export function LatestReviews({
           stops a compact tile stretching to its taller neighbour, which would
           read as a gap under the figures rather than rhythm (§5.3). */}
       <div
+        data-testid="latest-reviews-grid"
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
