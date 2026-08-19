@@ -252,6 +252,8 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
   postRoundPending,
   postRoundMissing,
   onRoundTap,
+  commentPreview,
+  commentPreviewEnabled = false,
 }) => {
   const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
@@ -638,6 +640,20 @@ const LightFeedCardImpl: React.FC<LightFeedCardProps> = ({
           </>
         );
       })()}
+
+      {/* Comment preview + add-a-comment prompt — the SAME component the
+          Clubhouse card renders, on the light surface. A member seeing this in
+          the Clubhouse and not here would read it as a bug, not a choice. */}
+      {commentPreviewEnabled && (
+        <FeedCommentPreview
+          surface="light"
+          preview={commentPreview ?? null}
+          commentCount={commentCount}
+          onOpenComments={() => onComment(post, effectiveActor)}
+          viewerAvatarUrl={effectiveActor?.avatarUrl ?? null}
+          viewerName={effectiveActor?.name ?? null}
+        />
+      )}
     </article>
   );
 };
