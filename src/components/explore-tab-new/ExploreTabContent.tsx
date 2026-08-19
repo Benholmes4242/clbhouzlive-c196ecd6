@@ -517,6 +517,17 @@ export default function ExploreTabContent({
           onSeeAll={() => setFriendsSheet(true)}
         />
 
+        {/* LATEST VIDEOS — after Who's been playing, before On tour this week.
+            Every tile and both actions open /community for now; the clips
+            surface is a later brief. */}
+        <LatestVideosRail
+          items={communityVideos.data?.videos ?? []}
+          onTilePress={() => navigate('/community')}
+          onSeeAll={() => navigate('/community')}
+        />
+
+
+
         <OnTourThisWeek
           lastSeen={lastSeen}
           onTournamentPress={handleTournament}
