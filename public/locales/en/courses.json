@@ -1084,8 +1084,10 @@
       "keyField": "Bar is the field average over par."
     },
     "proView": {
-      "members": "Amateurs",
-      "pros": "Pros",
+      "members": "Golfers",
+      "pros": "Tour pros",
+      "membersSub": "Every round tracked here by clbhouz golfers",
+      "prosSub": "How the professional field played it",
       "proBasis_one": "{{tournaments}} tournament · {{rounds}} player-rounds",
       "proBasis_other": "{{tournaments}} tournaments · {{rounds}} player-rounds",
       "proTournaments_one": "{{tournaments}} tournament tracked",
