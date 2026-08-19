@@ -90,10 +90,40 @@ export function movementFor(
   };
 }
 
+/**
+ * 7×6 index-movement triangle. Replaces every Unicode arrow / Lucide chevron
+ * so the same shape reads across Discover, Pulse, Handicap and Profile.
+ * Pass the literal fill that matches the target surface.
+ */
+export function IndexMovementTriangle({
+  direction,
+  color,
+  size = 7,
+}: {
+  direction: 'down' | 'up';
+  color: string;
+  size?: number;
+}) {
+  const h = Math.round((size * 6) / 7);
+  if (direction === 'down') {
+    return (
+      <svg width={size} height={h} viewBox="0 0 7 6" aria-hidden>
+        <path d="M0 0h7L3.5 6z" fill={color} />
+      </svg>
+    );
+  }
+  return (
+    <svg width={size} height={h} viewBox="0 0 7 6" aria-hidden>
+      <path d="M3.5 0 7 6H0z" fill={color} />
+    </svg>
+  );
+}
+
 export function IndexMovement({ row }: { row: CircleRoundRow }) {
   const { t } = useTranslation('courses');
   const mv = movementFor(row);
   if (!mv) return null;
+  const direction = mv.arrow === '\u2193' ? 'down' : 'up';
   return (
     <span
       style={{
@@ -105,7 +135,8 @@ export function IndexMovement({ row }: { row: CircleRoundRow }) {
       }}
     >
       <span style={{ ...FIGS, fontSize: 12.5, fontWeight: 700, color: mv.tone }}>
-        {mv.arrow}{mv.figure}
+        <IndexMovementTriangle direction={direction} color={mv.tone} size={7} />
+        {mv.figure}
       </span>
       <span
         style={{
