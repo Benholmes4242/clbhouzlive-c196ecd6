@@ -44,6 +44,20 @@ function make(i: number, over: Partial<LatestReview> = {}): LatestReview {
   };
 }
 
+const featuredBreakdown = { design: 9.1, conditions: 9.2, clubhouse: 9.3, facilities: 9.4 };
+
+function makeFeatured(i: number, over: Partial<LatestReview> = {}): LatestReview {
+  return make(i, { rating: 9.5, breakdown: featuredBreakdown, ...over });
+}
+
+function makeCompact(i: number, over: Partial<LatestReview> = {}): LatestReview {
+  return make(i, { rating: 7.5, ...over });
+}
+
+function makeBars(i: number, over: Partial<LatestReview> = {}): LatestReview {
+  return make(i, { rating: 9.0, breakdown: { design: 8.5, conditions: null, clubhouse: null, facilities: null }, ...over });
+}
+
 describe('LatestReviews mosaic', () => {
   it('renders nothing with no qualifying reviews', () => {
     const { container } = render(
@@ -52,11 +66,56 @@ describe('LatestReviews mosaic', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('caps the page at four tiles of identical height', () => {
-    const reviews = Array.from({ length: 9 }, (_, i) => make(i));
-    render(<LatestReviews reviews={reviews} totalCount={9} onTilePress={() => {}} onSeeAll={() => {}} />);
+  it('renders a featured tile plus two grid tiles when a featured review exists', () => {
+    const reviews = [makeFeatured(0), makeCompact(1), makeCompact(2), makeCompact(3)];
+    render(<LatestReviews reviews={reviews} totalCount={4} onTilePress={() => {}} onSeeAll={() => {}} />);
     const photos = screen.getAllByTestId('review-tile-photo');
-    expect(photos).toHaveLength(4);
+    expect(photos).toHaveLength(3);
+    const grid = screen.getByTestId('latest-reviews-grid');
+    expect(grid.children).toHaveLength(2);
+    expect(screen.getByText('Quote number 0')).toBeTruthy();
+  });
+
+  it('renders two grid tiles when no featured review qualifies', () => {
+    const reviews = [makeCompact(0), makeBars(1), makeCompact(2)];
+    render(<LatestReviews reviews={reviews} totalCount={3} onTilePress={() => {}} onSeeAll={() => {}} />);
+    const photos = screen.getAllByTestId('review-tile-photo');
+    expect(photos).toHaveLength(2);
+    const grid = screen.getByTestId('latest-reviews-grid');
+    expect(grid.children).toHaveLength(2);
+  });
+
+  it('still lifts a featured review sitting third or fourth newest', () => {
+    // A featured review at index 2 must be found even though the search pool is wider than the grid.
+    const reviews = [
+      makeCompact(0),
+      makeCompact(1),
+      makeFeatured(2, { quote: 'Featured at three' }),
+      makeCompact(3),
+      makeCompact(4),
+    ];
+    render(<LatestReviews reviews={reviews} totalCount={5} onTilePress={() => {}} onSeeAll={() => {}} />);
+    const photos = screen.getAllByTestId('review-tile-photo');
+    expect(photos).toHaveLength(3);
+    expect(screen.getByText('Featured at three')).toBeTruthy();
+    const grid = screen.getByTestId('latest-reviews-grid');
+    expect(grid.children).toHaveLength(2);
+  });
+
+  it('renders a single left-aligned tile without stretching it across the grid', () => {
+    const reviews = [makeCompact(0, { courseName: 'Solo course' })];
+    render(<LatestReviews reviews={reviews} onTilePress={() => {}} onSeeAll={() => {}} />);
+    const photos = screen.getAllByTestId('review-tile-photo');
+    expect(photos).toHaveLength(1);
+    const grid = screen.getByTestId('latest-reviews-grid');
+    expect(grid.children).toHaveLength(1);
+    expect(grid.style.gridTemplateColumns).toBe('1fr 1fr');
+  });
+
+  it('keeps all rendered tiles at the same height', () => {
+    const reviews = [makeFeatured(0), makeCompact(1), makeCompact(2)];
+    render(<LatestReviews reviews={reviews} totalCount={3} onTilePress={() => {}} onSeeAll={() => {}} />);
+    const photos = screen.getAllByTestId('review-tile-photo');
     for (const photo of photos) expect(photo.style.height).toBe(`${REVIEW_TILE_HEIGHT}px`);
   });
 
