@@ -69,8 +69,17 @@ const CANVAS = '#F8FAFC';
 
 /** Long video rows mounted. Past this the page is a feed, not a section. */
 const VIDEO_ROWS_CAP = 24;
-/** Clips grid tiles mounted — multiples of three keep whole rows. */
-const CLIPS_CAP = 30;
+/**
+ * A SECTION ON THE EVERYTHING VIEW IS A SAMPLE WITH A WAY IN; A CHIP VIEW IS
+ * THE FULL THING (BRIEF_COMMUNITY_PAGE_CORRECTIONS S3.3, S5.4). Anything
+ * unbounded on Everything makes the sections beneath it unreachable, and a
+ * section that cannot be reached does not exist.
+ *
+ * 12 on Everything so the sections below are reachable; 60 on the Clips chip,
+ * where there is nothing below to reach.
+ */
+const CLIPS_CAP_EVERYTHING = 12;
+const CLIPS_CAP_CHIP = 60;
 
 type ChipId = 'all' | 'clips' | 'videos' | 'photos';
 
