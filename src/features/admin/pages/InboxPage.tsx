@@ -756,9 +756,7 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
   if (!row) return null;
 
   const refresh = () => {
-    qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox'] });
-    qc.invalidateQueries({ queryKey: UNMATCHED_COURSES_KEY });
-    qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard', 'triage-counts'] });
+    void refreshAdminQueues(qc, [UNMATCHED_COURSES_KEY as unknown as unknown[]]);
   };
 
   const doLink = async () => {
