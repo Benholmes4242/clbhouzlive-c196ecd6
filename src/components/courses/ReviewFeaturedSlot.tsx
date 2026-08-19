@@ -36,33 +36,17 @@ const FIGS: React.CSSProperties = {
 interface Props {
   review: LatestReview;
   onReviewPress: (r: LatestReview) => void;
-  onSeeAll: () => void;
 }
 
-export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress, onSeeAll }) => {
+export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }) => {
   const { t } = useTranslation('courses');
   const b = r.breakdown;
   const name = r.reviewerName || t('discover.reviews.member', 'A member');
 
   return (
     <section style={{ background: SURFACE, padding: '16px 16px 18px' }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 10,
-        }}
-      >
-        <div style={LABEL}>{t('statBrowse.reviews.heading')}</div>
-        <button
-          type="button"
-          onClick={onSeeAll}
-          style={{ ...LABEL, color: INK_MUTE, background: 'none', border: 0, padding: 0 }}
-        >
-          {t('statBrowse.reviews.actionFeatured')}
-        </button>
-      </div>
+      <div style={LABEL}>{t('statBrowse.reviews.heading')}</div>
+
 
       <button
         type="button"
