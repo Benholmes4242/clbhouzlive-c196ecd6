@@ -257,22 +257,36 @@ async function syncOneConnection(
     console.error(`[sync] analytics-push detection failed for ${conn.id} (non-fatal):`, err);
   }
 
-  // Mark success
+  // Mark success or partial.
+  //
+  // A partial does NOT increment consecutive_failures (the connection is healthy;
+  // the data is not — incrementing would eventually disable a working connection)
+  // and does NOT hold back next_sync_after (a partial must still schedule the next
+  // run, otherwise one bad row stops the connection entirely).
+  const isPartial = partialReasons.length > 0;
+  const partialError = isPartial ? partialReasons.join("; ").slice(0, 500) : null;
+
   await admin
     .from("whs_connections")
     .update({
       last_synced_at: new Date().toISOString(),
-      last_sync_status: "ok",
-      last_sync_error: null,
+      last_sync_status: isPartial ? "partial" : "ok",
+      last_sync_error: partialError,
       consecutive_failures: 0,
       next_sync_after: computeNextSyncAfter("ok", 0),
       initial_sync_complete: true,
     })
     .eq("id", conn.id);
 
+  if (isPartial) {
+    console.warn(`[sync] partial for ${conn.id}: ${partialError}`);
+  }
+
   result.ok = true;
-  result.status = "ok";
+  result.status = isPartial ? "partial" : "ok";
+  if (partialError) result.error = partialError;
   result.scoresUpserted = scoresUpserted;
+  result.scoresRejected = scoreUpsert.rejected;
   result.friendsUpserted = friendsUpserted;
   result.handicapChanged = handicapChanged;
   result.holesEnriched = holesEnriched;
