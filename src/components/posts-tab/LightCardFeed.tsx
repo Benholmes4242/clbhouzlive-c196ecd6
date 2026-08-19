@@ -14,6 +14,7 @@
  * Clubhouse `CardFeed`/`FeedCard` are untouched.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
 import { Virtuoso } from 'react-virtuoso';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { ActiveActor } from '@/types/actor';
@@ -113,6 +114,14 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   onRoundTap,
 }) => {
   // ── Active-card tracking (ported from CardFeed) ──
+  /**
+   * ONE comments_v2 read per loaded page for the inline comment preview — the
+   * SAME hook CardFeed calls, keyed on the post ids this feed has loaded. A
+   * second hook would be a second copy of the target_type/parent_id rules.
+   */
+  const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
+  const commentPreview = useFeedCommentPreview(feedPostIds, 'posts:cards');
+
   const [activeIdx, setActiveIdx] = useState(0);
   const [playingIdx, setPlayingIdx] = useState(0);
   const [earlyIdx, setEarlyIdx] = useState<number>(-1);
@@ -546,6 +555,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                   return !!sid && !postRoundMap?.get(sid);
                 })()}
                 onRoundTap={onRoundTap}
+                commentPreviewEnabled
+                commentPreview={commentPreview.map.get(post.id) ?? null}
               />
             )}
           </LightItemGate>
@@ -577,6 +588,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       postRoundMap,
       postRoundsSettled,
       onRoundTap,
+      commentPreview.map,
     ],
   );
 
