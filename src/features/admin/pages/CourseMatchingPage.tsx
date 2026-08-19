@@ -329,7 +329,11 @@ export default function CourseMatchingPage() {
           setActive(null);
         }}
       />
+
+      {/* The three cases that block a course's PROS hole view. Read-only. */}
+      <ProHoleDataQueue />
     </div>
+
   );
 }
 
