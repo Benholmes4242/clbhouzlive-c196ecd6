@@ -201,6 +201,12 @@ interface TileProps {
    * clips grid). Absent = the shipped rail width, so Discover is unchanged.
    */
   width?: number | string;
+  /**
+   * OPTIONAL aspect (width / height) for the clip tile. The /community clip
+   * mosaic passes the media's TRUE aspect so a landscape clip renders
+   * landscape. Absent = the shipped 9/16 rail shape, so Discover is unchanged.
+   */
+  aspect?: number;
 }
 
 export function CommunityVideoTile({ item, railVisible, onPress, width }: TileProps) {
