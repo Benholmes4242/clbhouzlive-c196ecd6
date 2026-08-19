@@ -140,14 +140,13 @@ export const CourseRecordBook: React.FC<Props> = ({
               : t('courseDetail.records.youAhead')}
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-          <StandingTrack />
-          {rankLabel && (
+        {rankLabel && (
+          <div style={{ marginTop: 4 }}>
             <span style={{ ...LABEL, fontSize: 7.5, color: A.MUTE, ...FIGS, whiteSpace: 'nowrap' }}>
               {rankLabel}
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   };
