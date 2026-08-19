@@ -78,31 +78,79 @@ export const NEW_ROW_BAR: React.CSSProperties = {
   flexShrink: 0,
 };
 
+/**
+ * SECTION HEADING (BRIEF_DISCOVER_SECTION_HIERARCHY §1.3) — 15.5 / 700 /
+ * -0.02em / SENTENCE CASE / INK. Sub-sections keep the 9.5px uppercase label
+ * treatment, so the two ranks read as different KINDS, not two sizes of label.
+ * No colour accent, no tile, no background: colour still means over par, under
+ * par or the viewing member.
+ */
+export const SECTION_TITLE: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: 15.5,
+  fontWeight: 700,
+  letterSpacing: '-0.02em',
+  color: A.INK,
+  lineHeight: 1.2,
+};
+
+/** §1.5 — indent that puts the subline under the WORDS, not under the glyph. */
+const SUBLINE_INDENT = 22;
+
 export function Eyebrow({
   children,
   aside,
   dot = false,
+  icon: Icon,
+  subline,
 }: {
   children: React.ReactNode;
   aside?: React.ReactNode;
   /** True when this section contains anything new since the last visit. */
   dot?: boolean;
+  /** Optional lucide component. Absent renders NOTHING — no reserved width. */
+  icon?: React.ComponentType<{ size?: number | string; strokeWidth?: number; color?: string }>;
+  /** Optional one-line description, indented under the heading text. */
+  subline?: React.ReactNode;
 }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'baseline',
-        padding: '0 2px',
-        marginBottom: 10,
-      }}
-    >
-      <span style={KICKER}>
-        {children}
-        {dot ? <NewDot /> : null}
-      </span>
-      {aside ? <span style={{ marginLeft: 'auto' }}>{aside}</span> : null}
+    <div style={{ padding: '0 2px', marginBottom: 10 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 7,
+          /* §4.3 — at 320px the action wraps below rather than the heading
+             shrinking. */
+          flexWrap: 'wrap',
+        }}
+      >
+        {Icon ? (
+          <Icon size={15} strokeWidth={2.2} color={A.INK} />
+        ) : null}
+        <span style={SECTION_TITLE}>
+          {children}
+          {dot ? <NewDot /> : null}
+        </span>
+        {aside ? <span style={{ marginLeft: 'auto' }}>{aside}</span> : null}
+      </div>
+      {subline ? (
+        <div
+          style={{
+            marginLeft: Icon ? SUBLINE_INDENT : 0,
+            marginTop: 3,
+            fontFamily: SANS,
+            fontSize: 11.5,
+            fontWeight: 500,
+            lineHeight: 1.4,
+            color: A.MUTE,
+          }}
+        >
+          {subline}
+        </div>
+      ) : null}
     </div>
+
   );
 }
 
