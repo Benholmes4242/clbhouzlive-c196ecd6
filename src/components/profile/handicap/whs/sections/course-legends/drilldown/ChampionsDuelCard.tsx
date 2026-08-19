@@ -231,7 +231,7 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
           />
         )}
 
-        <div style={{ marginTop: (holdsIt && runnerUp) || (selfRow && champion) ? 14 : 18 }}>
+        <div style={{ marginTop: holdsIt && runnerUp ? 14 : 18 }}>
           <BoardHeaderRow
             rankLabel={t('champions.colRank')}
             memberLabel={t('champions.colMember')}
