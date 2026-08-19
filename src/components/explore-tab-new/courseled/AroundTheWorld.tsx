@@ -48,8 +48,13 @@ import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens
 /** Deep gold: 8px bright gold fails contrast on a light wash. */
 const GOLD_TEXT = '#A87718';
 
-/** Eight courses, one event each (BRIEF_SHEET_CAPS_ATW_AND_REVIEW §2). */
-const PAGE = 8;
+/**
+ * SEVEN TILES: THE HERO PLUS THREE ROWS (BRIEF_DISCOVER_HIERARCHY §3.1). This
+ * section is the page's ONE vertical anchor, so it stays vertical — but it was
+ * running to five rows before the next section began, which is where the page
+ * felt endless. Everything beyond seven lives behind "See all".
+ */
+const PAGE = 7;
 
 /**
  * A course may hold at most TWO tiles, and only via backfill when pass 1 left
@@ -856,7 +861,6 @@ export function AroundTheWorld({
     <>
     <section>
       <Eyebrow
-        icon={Crown}
         dot={newGroupCount > 0}
         aside={<span style={LABEL}>{t('discover.last90', 'Last 90 days')}</span>}
       >
@@ -1027,7 +1031,10 @@ export function AroundTheWorld({
               avatarUserId: top?.userId ?? rating?.userId ?? null,
               reactTo,
               onPress,
-              height: photo + estimatePanelHeight(detailText, margin, who),
+              /* THE CATEGORY IS NOW AN EYEBROW ON THE CARD (§2.3), not a
+                 subline: 9px uppercase plus a 7px gap = 16px of panel. The
+                 subline slot is therefore billed at zero here. */
+              height: photo + estimatePanelHeight(detailText, '', who) + 16,
             };
           });
 
