@@ -173,7 +173,13 @@ export default function CommunityPage() {
           never lands on top of the words. */}
       <div
         style={{
-          padding: 'calc(env(safe-area-inset-top, 0px) + 58px) 16px 14px',
+          /* NO env(safe-area-inset-top) HERE. /community is a NON-immersive
+             route, so .app-shell already pays padding-top: var(--sat). A
+             second snapshot of the inset on the page doubled it and pushed
+             this masthead visibly below Discover's. The fix is to DELETE the
+             page's own inset, never to halve it. 70px matches Discover's
+             clearance below the floating island row. */
+          padding: '70px 16px 14px',
         }}
       >
         <h1
