@@ -104,9 +104,6 @@ export const CourseRecordBook: React.FC<Props> = ({
           <div style={{ ...LABEL, fontSize: 7.5, color: A.AMBER_DEEP }}>
             {t('courseDetail.records.youHold')}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
-            <StandingTrack held />
-          </div>
         </div>
       );
     }
