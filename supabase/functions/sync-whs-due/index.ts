@@ -191,8 +191,24 @@ async function syncOneConnection(
     console.warn(`[sync] pre-upsert snapshot failed for ${conn.id} (non-fatal):`, err);
   }
 
-  const scoresUpserted = scores ? await upsertScores(admin, conn.id, scores.Scores) : 0;
+  const scoreUpsert = scores
+    ? await upsertScores(admin, conn.id, scores.Scores)
+    : { written: 0, rejected: 0, failures: [] as Array<{ whsScoreUid: string | null }> };
+  const scoresUpserted = scoreUpsert.written;
   const friendsUpserted = friends ? await upsertFriends(admin, conn.id, friends.Friends) : 0;
+
+  // Partial detection. A run is only "ok" when every upstream call succeeded AND
+  // every score row stored. Previously any of these failed silently and the
+  // connection still recorded "ok" — which is why two members went months with
+  // no working score sync.
+  const partialReasons: string[] = [];
+  if (scores == null) partialReasons.push("list-scores failed");
+  if (friends == null) partialReasons.push("list-friends failed");
+  if (scoreUpsert.rejected > 0) {
+    partialReasons.push(
+      `${scoreUpsert.rejected} score row(s) rejected, first uid=${scoreUpsert.failures[0]?.whsScoreUid ?? "unknown"}`,
+    );
+  }
 
   // Enrich newly-imported scores with hole-by-hole detail. This mirrors what
   // sync-whs-one does. Without it, the cron leaves friend round detail sheets
