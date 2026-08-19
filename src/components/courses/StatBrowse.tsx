@@ -1068,16 +1068,15 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                     {reviewSlots.get(i + 1)!.kind === 'rail' ? (
                       <ReviewRailSlot
                         reviews={reviewSlots.get(i + 1)!.reviews}
-                        onReviewPress={openReviewsSheet}
-                        onSeeAll={openReviewsSheet}
+                        onReviewPress={handleReviewTile}
                       />
                     ) : (
                       <ReviewFeaturedSlot
                         review={reviewSlots.get(i + 1)!.reviews[0]}
-                        onReviewPress={openReviewsSheet}
-                        onSeeAll={openReviewsSheet}
+                        onReviewPress={handleReviewTile}
                       />
                     )}
+
                     <div aria-hidden style={{ height: 5, background: CARD_BAND }} />
                   </>
                 ) : null}
