@@ -38,8 +38,11 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 
 import { OnTourThisWeek } from './courseled/OnTourThisWeek';
 import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
+import { ClipsRail, LatestVideosRail } from './courseled/CommunityMediaRails';
+import { useCommunityVideos } from './courseled/hooks/useCommunityVideos';
 import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
 import { MostPlayedSheet } from './courseled/MostPlayedSheet';
+
 import {
   HonoursBoard,
   sortHonours,
