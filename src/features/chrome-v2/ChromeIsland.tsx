@@ -319,7 +319,7 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
     const direction = lastMove;
     const showArrow = direction === 'improving' || direction === 'drifting';
     const arrowColor = direction === 'improving' ? HCP_IMPROVING : HCP_DRIFTING;
-    const ArrowIcon = direction === 'improving' ? TrendingDown : TrendingUp;
+    const triangleDir = direction === 'improving' ? 'down' : 'up';
 
     return (
       <button
@@ -349,7 +349,11 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
           {indexValue}
         </span>
         {showArrow && (
-          <ArrowIcon size={8} color={arrowColor} strokeWidth={3} />
+          <IndexMovementTriangle
+            direction={triangleDir}
+            color={arrowColor}
+            size={7}
+          />
         )}
       </button>
     );
