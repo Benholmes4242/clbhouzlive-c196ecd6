@@ -452,17 +452,23 @@ export default function VerificationFlowSheet({
     mutationFn: async () => {
       if (!user?.id) throw new Error('Not authenticated');
 
+      // A validation stop must be VISIBLE. It sets the inline message, is
+      // surfaced as a toast, and is tagged so onError can scroll it into view.
+      const stop = (msg: string) => {
+        setValidationError(msg);
+        const e: any = new Error(msg);
+        e.isValidation = true;
+        throw e;
+      };
+
       if (bar.count === 0) {
-        setValidationError('Mark at least one signal you can provide.');
-        throw new Error('__validation__');
+        stop('Mark at least one signal you can provide.');
       }
       if (!contactEmail.trim() || !isValidEmail(contactEmail) || !role) {
-        setValidationError(
-          'Add your contact email and role so we can confirm you represent this business.',
-        );
-        throw new Error('__validation__');
+        stop('Add your contact email and role so we can confirm you represent this business.');
       }
       setValidationError(null);
+
 
       const proof_value = primaryProofValue();
       if (!proof_value) throw new Error('Please complete the evidence for the signals you marked.');
