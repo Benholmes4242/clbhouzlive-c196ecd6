@@ -207,10 +207,19 @@ export function CommunityVideoTile({ item, railVisible, onPress }: TileProps) {
   const when = formatRelativeRounded(item.createdAt);
   const meta = hasTitle ? `${item.displayName} · ${when}` : when;
 
+  // A DIV, NOT A BUTTON: the meta row now hosts the MuteButton, and a button
+  // inside a button is invalid HTML that browsers resolve unpredictably.
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => onPress(item)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onPress(item);
+        }
+      }}
       style={{
         flex: `0 0 ${VIDEO_TILE_W}px`,
         width: VIDEO_TILE_W,
