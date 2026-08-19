@@ -433,23 +433,6 @@ const ShapeChart: React.FC<{
 };
 
 /**
- * Bar-ramp legend: easier -> harder, as DISCRETE SWATCHES (§5). A smooth
- * gradient advertised colours the bars can never take; the key now shows the
- * ramp's actual six stops, which is what a bar can be.
- */
-const RampLegend: React.FC<{ easier: string; harder: string }> = ({ easier, harder }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-    <span style={{ ...LABEL, fontSize: 7 }}>{easier}</span>
-    <i aria-hidden="true" style={{ display: 'inline-flex', gap: 1.5 }}>
-      {DIFFICULTY_RAMP.map((tone) => (
-        <i key={tone} style={{ width: 6, height: 5, borderRadius: 1, background: tone }} />
-      ))}
-    </i>
-    <span style={{ ...LABEL, fontSize: 7 }}>{harder}</span>
-  </span>
-);
-
-/**
  * HOW EACH PAR PLAYS (§A4) - one row per par type PRESENT at this course.
  *
  * The bar is the FIELD's mean shots over par for that par type, on the demanding
@@ -458,6 +441,7 @@ const RampLegend: React.FC<{ easier: string; harder: string }> = ({ easier, hard
  * new query, no hook, no SQL.
  *
  * COMMENSURABILITY: the viewer's tick renders ONLY where the viewer has an
+
  * average for EVERY hole of that par type, so the two sides derive identically
  * over the same holes. A par 6 or par 2 gets its own row and is never folded in.
  * A member with no rounds here sees the field alone - the course's own shape is
