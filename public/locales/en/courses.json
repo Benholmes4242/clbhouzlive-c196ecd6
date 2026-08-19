@@ -1715,7 +1715,7 @@
     "sections": {
       "clips": {
         "title": "Clips",
-        "subline": "Short and vertical"
+        "subline": "Under three minutes"
       },
       "videos": {
         "title": "Latest videos",
@@ -1723,7 +1723,7 @@
       },
       "photos": {
         "title": "Photos",
-        "subline": "Stills from members"
+        "subline": "From the courses"
       },
       "clubs": {
         "title": "Browse by club",
