@@ -69,11 +69,6 @@ function formatIndex(v: number): string {
   return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
 }
 
-function formatDelta(v: number): string {
-  const r = Math.round(v * 10) / 10;
-  if (r === 0) return '0.0';
-  return r > 0 ? `+${r.toFixed(1)}` : `\u2212${Math.abs(r).toFixed(1)}`;
-}
 
 /** Smooth polyline through points using cubic Bezier splines.
  *  Replaces sharp changes of direction with rounded corners while keeping the
