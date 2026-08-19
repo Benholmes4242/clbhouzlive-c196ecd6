@@ -12,6 +12,7 @@ import {
   InsightGlyph,
   INSIGHT_FONT_SIZE,
   INSIGHT_LINE_HEIGHT,
+  IndexMovementTriangle,
 } from './friendRoundParts';
 
 /**
@@ -261,15 +262,11 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight, shape = 
                 letterSpacing: '-0.01em',
               }}
             >
-              {movement.arrow === '\u2193' ? (
-                <svg width="7" height="6" viewBox="0 0 7 6" aria-hidden>
-                  <path d="M0 0h7L3.5 6z" fill={movement.tone} />
-                </svg>
-              ) : (
-                <svg width="7" height="6" viewBox="0 0 7 6" aria-hidden>
-                  <path d="M3.5 0 7 6H0z" fill={movement.tone} />
-                </svg>
-              )}
+              <IndexMovementTriangle
+                direction={movement.arrow === '\u2193' ? 'down' : 'up'}
+                color={movement.tone}
+                size={7}
+              />
               <span>{movement.figure}</span>
             </div>
           )}

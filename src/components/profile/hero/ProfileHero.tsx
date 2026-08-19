@@ -20,6 +20,7 @@ import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 import { HeroShell, HeroPill, W_35, W_40 } from './HeroShell';
 
 const GREEN = INDEX_DELTA.dark.improved;
@@ -292,10 +293,22 @@ export const ProfileHero: React.FC<Props> = ({
                           }}
                         >
                           <span
-                            style={{ color: down ? GREEN : up ? RED : W_40 }}
+                            style={{
+                              color: down ? GREEN : up ? RED : W_40,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 5,
+                            }}
                           >
+                            {(down || up) && (
+                              <IndexMovementTriangle
+                                direction={down ? 'down' : 'up'}
+                                color={down ? GREEN : up ? RED : W_40}
+                                size={7}
+                              />
+                            )}
                             {down || up
-                              ? `${down ? '\u2193' : '\u2191'} ${Math.abs(l.delta).toFixed(1)}`
+                              ? Math.abs(l.delta).toFixed(1)
                               : t('hero.trendLevel', 'Level')}
                           </span>
                           <span
