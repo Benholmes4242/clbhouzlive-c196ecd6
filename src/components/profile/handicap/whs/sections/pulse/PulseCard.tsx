@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowUp, ArrowDown } from 'lucide-react';
 import type { PulseFriend } from '@/hooks/gam/usePulseFriends';
 import { Sparkline, indexTone, toneColor } from '../../charts';
 import { useMemberTapResolver } from '@/components/friend-sheet/useMemberTapResolver';
+import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
