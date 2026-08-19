@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Heart } from 'lucide-react';
 
+import { MuteButton } from '@/audio/MuteButton';
+
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { formatRelativeRounded } from '@/i18n/format';
@@ -205,10 +207,19 @@ export function CommunityVideoTile({ item, railVisible, onPress }: TileProps) {
   const when = formatRelativeRounded(item.createdAt);
   const meta = hasTitle ? `${item.displayName} · ${when}` : when;
 
+  // A DIV, NOT A BUTTON: the meta row now hosts the MuteButton, and a button
+  // inside a button is invalid HTML that browsers resolve unpredictably.
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => onPress(item)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onPress(item);
+        }
+      }}
       style={{
         flex: `0 0 ${VIDEO_TILE_W}px`,
         width: VIDEO_TILE_W,
@@ -276,6 +287,25 @@ export function CommunityVideoTile({ item, railVisible, onPress }: TileProps) {
           marginTop: 6,
         }}
       >
+        {/* MUTE IS THE CANONICAL SESSION WRITER (§2.2): reused, never forked.
+            Mute state is SESSION state, not per-tile — unmuting here unmutes
+            whichever tile plays next, which matches the feed and is correct.
+            The 44px hit box is scaled into the 16px row so the row height is
+            unchanged; MuteButton itself stops propagation, so muting never
+            navigates to the Community page. */}
+        <span
+          style={{
+            width: 18,
+            height: 16,
+            flexShrink: 0,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'visible',
+          }}
+        >
+          <MuteButton size="sm" style={{ transform: 'scale(0.41)', flexShrink: 0 }} />
+        </span>
         {item.avatarUrl ? (
           <img
             src={item.avatarUrl}
@@ -333,7 +363,7 @@ export function CommunityVideoTile({ item, railVisible, onPress }: TileProps) {
           </span>
         )}
       </div>
-    </button>
+    </div>
   );
 }
 

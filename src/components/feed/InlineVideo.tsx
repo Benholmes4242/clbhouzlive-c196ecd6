@@ -27,6 +27,8 @@ import { feedLaneRoles, type FeedRole } from '@/video/feedLaneRoles';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteButton } from '@/audio/MuteButton';
+import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import '@/styles/media-rail-bars.css';
 import { VideoProcessingCard } from './VideoProcessingCard';
 import {
   vperfMarkEarlyStarted,
@@ -39,6 +41,17 @@ import {
   vperfHandoverFrame,
 } from '@/perf/vperf';
 import { isPerfEnabled } from '@/perf/navTiming';
+
+/** Three animated bars — the playing marker, shared with the Discover rails. */
+function PlayingBars() {
+  return (
+    <span className="media-rail-bars" aria-hidden>
+      <i />
+      <i />
+      <i />
+    </span>
+  );
+}
 
 interface Props {
   item: MediaItem;
@@ -329,10 +342,43 @@ export const InlineVideo: React.FC<Props> = ({
 
       {isProcessing && <VideoProcessingCard />}
 
+      {/* ONE VIDEO CHROME (BRIEF_VIDEO_CHROME_AND_FEED_LENGTH §1): mute is a
+          CONTROL and sits bottom-LEFT; duration is a LABEL and owns
+          bottom-RIGHT, where every video product puts it and where the
+          Discover rails already put it. Two things cannot own one corner. */}
       {isActive && !isProcessing && (
-        <div style={{ position: 'absolute', right: 6, bottom: 6, zIndex: 30 }}>
+        <div style={{ position: 'absolute', left: 6, bottom: 6, zIndex: 30 }}>
           <MuteButton size="sm" />
         </div>
+      )}
+
+      {/* NO DURATION, NO CHIP — an unknown length renders nothing at all. */}
+      {!isProcessing && !!item.duration && (
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            right: 6,
+            bottom: 6,
+            zIndex: 30,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: '3px 7px',
+            borderRadius: 7,
+            background: 'rgba(10,14,10,0.72)',
+            color: '#FFFFFF',
+            fontSize: 10.5,
+            fontWeight: 700,
+            lineHeight: 1.1,
+            fontVariantNumeric: 'tabular-nums lining-nums',
+            // NOT A CONTROL: it must never intercept the tap that opens the video.
+            pointerEvents: 'none',
+          }}
+        >
+          {showVideo && <PlayingBars />}
+          {formatDuration(item.duration)}
+        </span>
       )}
     </div>
   );
