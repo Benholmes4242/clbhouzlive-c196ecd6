@@ -34,7 +34,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
-import { A, DIFFICULTY_RAMP, FIGS, Hairline, LABEL, RAMP_TOPAR, SANS, difficultyRampColor, difficultyRampStop, toParParts } from './tokens';
+import { A, FIGS, Hairline, LABEL, RAMP_TOPAR, SANS, difficultyRampColor, toParParts } from './tokens';
 
 
 /** HOLE / PAR / SI / ramp / figures. Load-bearing: columns never size to content. */
@@ -585,82 +585,6 @@ export const HoleRowV2: React.FC<{
 
           <Hairline style={{ margin: '12px 0 10px' }} />
 
-          {/*
-            THE DIFFICULTY SCALE IS A FILLED TRACK (BRIEF_COURSE_TAB_NO_FADED_COLOUR
-            §6.2), at the SAME HEIGHT as the distribution bar directly above, in the
-            same solid neutral, filled FROM THE EASY END to this hole's difficulty
-            rank in that rank's ramp value.
-
-            A tick on a hairline asked the member to judge a position against
-            invisible ends; the LENGTH OF THE FILL is the reading. It was also the
-            worst faded surface on the tab - a 0.3-opacity gradient on a panel whose
-            whole subject is difficulty.
-
-            The two to-par markers that used to sit here are gone: the axis is now
-            rank, not to-par, so plotting a to-par value on it would be a false
-            position. Both figures survive - the field average on the collapsed row,
-            the member's gap in the figures below.
-
-            Below the rounds floor the rank is withheld and the track stays neutral.
-          */}
-          <div>
-            <div style={{ ...MICRO, fontSize: 8, marginBottom: 6 }}>
-              {t('courses:courseDetail.holes.scaleLabel')}
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 7,
-              }}
-            >
-              <span style={{ ...MICRO, fontSize: 7.5, flexShrink: 0 }}>
-                {t('courses:courseDetail.card.rampEasier')}
-              </span>
-              <span
-                style={{
-                  position: 'relative',
-                  flex: 1,
-                  minWidth: 0,
-                  height: 8,
-                  borderRadius: 4,
-                  background: A.TRACK,
-                  overflow: 'hidden',
-                  display: 'block',
-                }}
-              >
-                {rank != null && scale.gradeDifficulty && (
-                  <i
-                    aria-hidden="true"
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: `${
-                        (Math.max(1, totalHoles - rank + 1) / Math.max(1, totalHoles)) * 100
-                      }%`,
-                      borderRadius: 4,
-                      background: difficultyRampStop(
-                        totalHoles > 1
-                          ? ((totalHoles - rank) / (totalHoles - 1)) * (DIFFICULTY_RAMP.length - 1)
-                          : DIFFICULTY_RAMP.length - 1,
-                      ),
-                      display: 'block',
-                    }}
-                  />
-                )}
-              </span>
-              <span style={{ ...MICRO, fontSize: 7.5, flexShrink: 0 }}>
-                {t('courses:courseDetail.card.rampHarder')}
-              </span>
-            </div>
-            {/* scaleCaption DELETED (§B1). The track is FILLED from the easier end,
-                so the length of the fill is the reading; a sentence telling the
-                member which way the bar runs narrated the bar above it. */}
-
-          </div>
-
-
-          <Hairline style={{ margin: '12px 0 10px' }} />
 
           <div
             style={{
