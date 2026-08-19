@@ -311,7 +311,7 @@ export default function CommunityPage() {
 
             {showPhotos && photosPool.length > 0 && (
               <section style={{ marginBottom: 26 }}>
-                <div style={{ padding: '0 16px' }}>
+                <div style={{ padding: '0 14px' }}>
                   <Eyebrow
                     icon={ImageIcon}
                     subline={t('community.sections.photos.subline', 'From the courses')}
