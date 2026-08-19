@@ -199,7 +199,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
   const [moverRange, setMoverRange] = useState<MoverRange>('this_month');
   const { data: movers = [] } = useTop100Movers(moverRange);
 
-  const [progressSheet, setProgressSheet] = useState<Top100ListProgress | null>(null);
   const [moversSheetOpen, setMoversSheetOpen] = useState(false);
   const [verdictSheet, setVerdictSheet] = useState<
     {
