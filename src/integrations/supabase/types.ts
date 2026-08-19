@@ -19563,6 +19563,36 @@ export type Database = {
           total_players: number
         }[]
       }
+      get_handicap_cuts:
+        | {
+            Args: { p_days?: number; p_limit?: number; p_points?: number }
+            Returns: {
+              current_index: number
+              display_name: string
+              move: number
+              previous_index: number
+              profile_photo_url: string
+              series: number[]
+              user_id: string
+            }[]
+          }
+        | {
+            Args: {
+              p_days?: number
+              p_limit?: number
+              p_min_points?: number
+              p_points?: number
+            }
+            Returns: {
+              current_index: number
+              display_name: string
+              move: number
+              previous_index: number
+              profile_photo_url: string
+              series: number[]
+              user_id: string
+            }[]
+          }
       get_handicap_improvement_leaderboard: {
         Args: {
           p_club_id?: string
