@@ -180,6 +180,13 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Batch maintenance job, not a member-facing endpoint: guard with the shared
+  // internal secret rather than a user JWT. Fail-closed if the secret is unset.
+  const gate = requireInternalSecret(req, corsHeaders);
+  if (gate) return gate;
+
+
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
