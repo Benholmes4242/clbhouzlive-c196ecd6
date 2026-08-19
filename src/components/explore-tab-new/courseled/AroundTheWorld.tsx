@@ -1151,7 +1151,9 @@ export function AroundTheWorld({
               who={tt.who}
               isOwn={tt.isOwn}
               detail={detailOf(tt)}
-              subline={tt.margin || null}
+              subline={null}
+              kicker={categoryOf(tt)}
+
               isNew={isNewSince(tt.g.at, lastSeen)}
               avatarUrl={tt.avatarUrl}
               avatarUserId={tt.avatarUserId}
