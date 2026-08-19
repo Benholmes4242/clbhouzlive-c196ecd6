@@ -662,7 +662,7 @@ function MatchInboxSheet({ row, onClose }: { row: MatchRequestRow | null; onClos
     setBusy(false);
     const msg = (error as any)?.message || (data as any)?.error;
     if (msg) { setErr(String(msg)); return; }
-    qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox'] });
+    await refreshAdminQueues(qc);
     onClose();
   };
 
