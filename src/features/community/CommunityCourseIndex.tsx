@@ -1,22 +1,19 @@
 import { useMemo } from 'react';
+import { MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import type { Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
-import { countByCourse } from './useCommunityRails';
-import { HEADING_STYLE, SCROLLER_GUTTER } from './CommunityRail';
+import { Eyebrow } from '@/components/explore-tab-new/courseled/tokens';
+import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
 
 /**
- * BROWSE BY CLUB — a horizontal rail of at most TWELVE clubs.
+ * BROWSE BY CLUB — LAST on the page now (BRIEF_COMMUNITY_PAGE_REBUILD S2.1,
+ * S5.4). It covers only TAGGED content, which is six posts in 242, so it sits
+ * beneath everything and carries an honest subline rather than pretending to be
+ * an index of the library.
  *
- * WAS a vertical directory of every club with media, sub-grouped by country. At
- * 57 clubs that list was longer than the rest of the page combined, and the app
- * already has a searchable course directory on the Courses tab. This page must
- * not be a second one, so the twelve cards here are a SUGGESTION, not an index:
- * no country headers, no expander, no "show all".
- *
- * ORDER is moment count desc, name breaking the tie so the order is stable.
- * THUMBNAIL is the club's top-ranked moment — the pool arrives rank-ordered, so
- * the first moment seen for a course is that club's best.
+ * At most TWELVE clubs, count desc with name breaking the tie so the order is
+ * stable. The thumbnail is the newest media seen for that club — the pool
+ * arrives newest-first.
  */
 
 const INK = '#0E1216';
@@ -28,8 +25,9 @@ const MAX_CLUBS = 12;
 const CARD_W = 118;
 
 interface Props {
-  moments: Moment[];
+  items: CommunityLibraryItem[];
   title: string;
+  subline: string;
   countLabel: (n: number) => string;
 }
 
@@ -40,39 +38,52 @@ interface ClubCard {
   thumbnail: string | null;
 }
 
-export function CommunityCourseIndex({ moments, title, countLabel }: Props) {
+export function CommunityCourseIndex({ items, title, subline, countLabel }: Props) {
   const navigate = useNavigate();
 
   const clubs = useMemo<ClubCard[]>(() => {
-    const counts = countByCourse(moments);
-    const best = new Map<string, Moment>();
-    for (const m of moments) if (!best.has(m.courseId)) best.set(m.courseId, m);
-
-    const rows: ClubCard[] = [];
-    for (const [courseId, count] of counts) {
-      const top = best.get(courseId);
-      // No name = nothing legible to put on a card.
-      if (!top?.courseName) continue;
-      rows.push({
-        courseId,
-        name: top.courseName,
-        count,
-        thumbnail: top.thumbnail ?? null,
+    const byCourse = new Map<string, ClubCard>();
+    for (const item of items) {
+      // No id or no legible name = nothing to put on a card.
+      if (!item.courseId || !item.courseName) continue;
+      const existing = byCourse.get(item.courseId);
+      if (existing) {
+        existing.count += 1;
+        continue;
+      }
+      byCourse.set(item.courseId, {
+        courseId: item.courseId,
+        name: item.courseName,
+        count: 1,
+        thumbnail: item.thumbnail ?? null,
       });
     }
-
-    return rows
+    return [...byCourse.values()]
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
       .slice(0, MAX_CLUBS);
-  }, [moments]);
+  }, [items]);
 
   if (clubs.length === 0) return null;
 
   return (
     <section style={{ marginBottom: 26 }}>
-      <h2 style={HEADING_STYLE}>{title}</h2>
+      <Eyebrow icon={MapPin} subline={subline}>
+        {title}
+      </Eyebrow>
 
-      <div style={{ display: 'flex', gap: 8, paddingBottom: 2, ...SCROLLER_GUTTER }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          paddingBottom: 2,
+          overflowX: 'auto',
+          margin: '0 -16px',
+          padding: '0 16px 2px',
+          willChange: 'transform',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+        }}
+      >
         {clubs.map((c) => (
           <button
             key={c.courseId}
