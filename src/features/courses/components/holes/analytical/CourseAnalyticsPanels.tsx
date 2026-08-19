@@ -809,23 +809,18 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           </div>
         )}
 
-        {/* Legend: the bar ramp, and - only when there is one - the member line. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 8 }}>
-          <RampLegend
-            easier={t('courses:courseDetail.plays.legendEasier')}
-            harder={t('courses:courseDetail.plays.legendHarder')}
-          />
-          {hasYou && (
+        {/* Legend: member line only. */}
+        {hasYou && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 8 }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
               <i style={{ width: 12, height: 2, borderRadius: 1, background: A.AMBER }} />
               <span style={{ ...LABEL, fontSize: 7 }}>
                 {t('courses:courseDetail.plays.legendYou')}
               </span>
             </span>
-          )}
-        </div>
+          </div>
+        )}
 
-        <Hairline style={{ margin: '11px 0 9px' }} />
 
         {/* THE HARDEST / EASIEST SUMMARY LINE IS GONE (§A2) - both figures now sit
             on their own bars in the chart above, so the figures beneath carry only
