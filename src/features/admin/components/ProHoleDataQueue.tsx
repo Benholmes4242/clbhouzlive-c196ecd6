@@ -150,7 +150,11 @@ const ProHoleDataQueue: React.FC = () => {
     );
   }
 
-  const q: Queue = data ?? { unresolved_venues: [], ambiguous_venues: [], par_disagreements: [] };
+  const q: Queue = data ?? {
+    unresolved_venues: [],
+    ambiguous_venues: [],
+    unresolved_course_names: [],
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -180,10 +184,6 @@ const ProHoleDataQueue: React.FC = () => {
                 {v.venue_course_name ? (
                   <span style={{ color: t.inkMuted }}> · {v.venue_course_name}</span>
                 ) : null}
-                <span style={{ color: t.inkMuted }}>
-                  {' '}
-                  · {[v.venue_city, v.venue_country].filter(Boolean).join(', ') || '—'}
-                </span>
               </>
             }
             right={`${v.tournaments} ${v.tournaments === 1 ? 'tournament' : 'tournaments'}`}
@@ -194,7 +194,7 @@ const ProHoleDataQueue: React.FC = () => {
 
       <Case
         title="Venue ambiguous"
-        note="The mapping row resolves to nothing, or the venue hosts more than one course and the mapping names none - pro data cannot be attributed."
+        note="The venue hosts more than one course and the tournament's course name resolves none of them - pro data cannot be attributed."
         count={q.ambiguous_venues.length}
       >
         {q.ambiguous_venues.map((v, i, arr) => (
@@ -205,43 +205,36 @@ const ProHoleDataQueue: React.FC = () => {
                 <span style={{ fontWeight: 600 }}>{v.venue_name}</span>
                 <span style={{ color: t.inkMuted }}>
                   {' '}
-                  · {v.golf_course_id ? 'course names differ' : 'no course linked'}
+                  · {v.course_names.filter(Boolean).join(' / ') || 'no course named'}
                 </span>
               </>
             }
-            right={v.tournament_course_names.filter(Boolean).join(' / ') || undefined}
+            right={`${v.tournaments} ${v.tournaments === 1 ? 'tournament' : 'tournaments'}`}
             last={i === arr.length - 1}
           />
         ))}
       </Case>
 
       <Case
-        title="Par disagreement"
-        note="Pooled tournaments disagree on a hole's par. The guard withholds the whole course rather than average two different holes."
-        count={q.par_disagreements.length}
+        title="Course name unresolved"
+        note="The tournament names a course we do not map - the event was played away from the venue's traditional home, so nothing is attributed."
+        count={q.unresolved_course_names.length}
       >
-        {q.par_disagreements.map((c, i, arr) => (
+        {q.unresolved_course_names.map((c, i, arr) => (
           <Row
-            key={c.golf_course_id}
+            key={`${c.venue_name}-${c.venue_course_name}`}
             left={
               <>
-                <span style={{ fontWeight: 600 }}>{c.course_name}</span>
-                <span style={{ color: t.inkMuted }}>
-                  {' '}
-                  ·{' '}
-                  {c.holes
-                    .slice(0, 4)
-                    .map((h) => `${h.hole_no}: ${h.pars.join('/')}`)
-                    .join(', ')}
-                  {c.holes.length > 4 ? '…' : ''}
-                </span>
+                <span style={{ fontWeight: 600 }}>{c.venue_course_name}</span>
+                <span style={{ color: t.inkMuted }}> · listed at {c.venue_name}</span>
               </>
             }
-            right={`${c.bad_holes} ${c.bad_holes === 1 ? 'hole' : 'holes'}`}
+            right={`${c.tournaments} ${c.tournaments === 1 ? 'tournament' : 'tournaments'}`}
             last={i === arr.length - 1}
           />
         ))}
       </Case>
+
     </div>
   );
 };
