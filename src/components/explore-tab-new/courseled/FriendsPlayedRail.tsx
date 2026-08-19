@@ -345,8 +345,6 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                         style={{
                           display: 'inline-flex',
                           alignItems: 'baseline',
-                          flex: 1,
-                          minWidth: 44,
                         }}
                       >
                         {/* A figure with an ARROW is a MOVEMENT; the signed
@@ -358,21 +356,38 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                             width: 1,
                             alignSelf: 'stretch',
                             background: 'rgba(255,255,255,0.28)',
-                            margin: '0 2px',
+                            marginRight: 9,
                           }}
                         />
                         <span
                           style={{
-                            ...NUMF,
-                            fontSize: 11,
-                            fontWeight: 700,
-                            color: movement.arrow === '\u2193' ? INDEX_DARK_FELL : INDEX_DARK_ROSE,
-                            lineHeight: 1,
-                            marginLeft: 'auto',
-                            marginRight: 'auto',
+                            display: 'inline-flex',
+                            alignItems: 'baseline',
+                            gap: 3,
                           }}
                         >
-                          {movement.arrow}{movement.figure}
+                          <span
+                            style={{
+                              ...NUMF,
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: movement.arrow === '\u2193' ? INDEX_DARK_FELL : INDEX_DARK_ROSE,
+                              lineHeight: 1,
+                            }}
+                          >
+                            {movement.arrow}
+                          </span>
+                          <span
+                            style={{
+                              ...NUMF,
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: movement.arrow === '\u2193' ? INDEX_DARK_FELL : INDEX_DARK_ROSE,
+                              lineHeight: 1,
+                            }}
+                          >
+                            {movement.figure}
+                          </span>
                         </span>
                       </span>
                     )}
