@@ -10,7 +10,7 @@ import {
   useCommunityLibrary,
   type CommunityLibraryItem,
 } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
-import { Eyebrow } from '@/components/explore-tab-new/courseled/tokens';
+import { Eyebrow, InkAction } from '@/components/explore-tab-new/courseled/tokens';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
