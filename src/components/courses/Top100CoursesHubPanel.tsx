@@ -221,6 +221,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
     return map;
   }, [allCourses, selectedList]);
 
+  const courseNameById = React.useMemo(() => {
     const map = new Map<string, string>();
     for (const course of allCourses) map.set(course.id, course.name);
     return map;
@@ -320,33 +321,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
   const totalCoursesInActiveList =
     listSummaries.find(l => l.slug === selectedList)?.total_courses ?? allCourses.length;
 
-  // Progress is scoped to the active list only. When the member has no row for
-  // that list yet we synthesise a zero row so the panel still renders.
-  const activeProgress: Top100ListProgress = React.useMemo(() => {
-    const match = progressLists.find((l) => l.list_slug === selectedList);
-    if (match) return match;
-    const fallbackName =
-      listOptions.find((o) => o.value === selectedList)?.label ?? 'Top 100';
-    return {
-      list_id: selectedList,
-      list_slug: selectedList,
-      list_name: fallbackName,
-      total: totalCoursesInActiveList,
-      played: 0,
-      rated: 0,
-    };
-  }, [progressLists, selectedList, totalCoursesInActiveList, listOptions]);
-
-  // Below the configured threshold the progress panel is suppressed entirely.
-  const progressHidden = activeProgress.played < verdictConfig.minPlayed;
-  useEffect(() => {
-    if (!progressHidden) return;
-    analyticsEvents.track('t100_progress_hidden', {
-      list: selectedList,
-      played: activeProgress.played,
-      min_played: verdictConfig.minPlayed,
-    });
-  }, [progressHidden, selectedList, activeProgress.played, verdictConfig.minPlayed]);
 
   return (
     <div>
@@ -578,17 +552,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
         />
       </div>
 
-      <Top100ListProgressSheet
-        open={!!progressSheet}
-        onClose={() => setProgressSheet(null)}
-        listSlug={progressSheet?.list_slug ?? ''}
-        listName={progressSheet?.list_name ?? ''}
-        played={progressSheet?.played ?? 0}
-        total={progressSheet?.total ?? 0}
-        rated={progressSheet?.rated ?? 0}
-        userId={user?.id}
-        ratedCourseIds={ratedCourseIds}
-      />
 
       <Top100MoversSheet
         open={moversSheetOpen}
