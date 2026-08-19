@@ -33,6 +33,7 @@ import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 
+import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
 import { FeedCard } from './FeedCard';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
