@@ -1,6 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 import { corsFor } from '../_shared/cors.ts';
+import { forbidden, isPanelAdmin, resolveCaller, unauthorized } from '../_shared/callerAuth.ts';
+
 interface WrapCard {
   type: string;
   title: string;
@@ -24,6 +26,16 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // userId comes from the body, so without this a caller could generate a
+    // wrap for any member. You may only target yourself unless you're an admin.
+    const caller = await resolveCaller(req);
+    if (!caller) return unauthorized(corsHeaders);
+    if (caller.id !== userId && !(await isPanelAdmin(caller.id))) {
+      return forbidden(corsHeaders);
+    }
+
+
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',

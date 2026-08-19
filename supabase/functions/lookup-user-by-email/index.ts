@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 import { corsFor } from '../_shared/cors.ts';
+import { forbidden, isPanelAdmin, resolveCaller, unauthorized } from '../_shared/callerAuth.ts';
+
 const ALLOWED_ORIGINS = new Set([
   "https://clbhouz.com",
   "https://www.clbhouz.com",
@@ -33,6 +35,15 @@ serve(async (req: Request) => {
   }
 
   try {
+    // This function turns an email into a user id, so an unauthenticated
+    // caller would be an account-enumeration oracle. Admins only, fail-closed.
+    const caller = await resolveCaller(req);
+    if (!caller) return unauthorized(headers as Record<string, string>);
+    if (!(await isPanelAdmin(caller.id))) {
+      return forbidden(headers as Record<string, string>);
+    }
+
+
     const { email } = await req.json().catch(() => ({}));
     if (!email || typeof email !== "string") {
       return new Response(JSON.stringify({ error: "email required" }), {

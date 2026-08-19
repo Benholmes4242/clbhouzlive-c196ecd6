@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 import { corsFor } from '../_shared/cors.ts';
+import { requireInternalSecret } from '../_shared/internalAuth.ts';
+
 type Profile = {
   id: string;
   username: string | null;
@@ -179,6 +181,13 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Batch maintenance job, not a member-facing endpoint: guard with the shared
+  // internal secret rather than a user JWT. Fail-closed if the secret is unset.
+  const gate = requireInternalSecret(req, corsHeaders);
+  if (gate) return gate;
+
+
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
