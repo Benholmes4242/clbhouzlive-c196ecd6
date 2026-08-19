@@ -562,17 +562,6 @@ export const HoleRowV2: React.FC<{
                         display: 'block',
                       }}
                     />
-                    <i
-                      style={{
-                        position: 'absolute',
-                        top: -2,
-                        bottom: -2,
-                        left: `${Math.min(100, (courseShare / shareDomain) * 100)}%`,
-                        width: 1,
-                        background: A.INK,
-                        display: 'block',
-                      }}
-                    />
                   </span>
                 )}
                 <span
@@ -590,11 +579,7 @@ export const HoleRowV2: React.FC<{
               );
             })}
           </div>
-          {courseShares && (
-            <div style={{ ...MICRO, fontSize: 7, marginTop: 6 }}>
-              {t('courses:courseDetail.holes.courseAverageMark')}
-            </div>
-          )}
+
 
 
 
