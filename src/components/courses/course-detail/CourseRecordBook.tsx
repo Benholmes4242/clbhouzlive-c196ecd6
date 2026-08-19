@@ -92,10 +92,10 @@ export const CourseRecordBook: React.FC<Props> = ({
   }
 
   /**
-   * Where the viewer stands: they hold it (full amber track), they are on the
-   * board (two-point track, their value, the gap and their rank), or NOTHING
-   * AT ALL when they have no entry. A track with no marker would read as "you
-   * are last", which is not what "no entry" means - so there is no track.
+   * Where the viewer stands: they hold it, they are on the board (their value,
+   * the gap and their rank), or NOTHING AT ALL when they have no entry. The
+   * progress bars have been removed; a bar implies a scale, and these boards
+   * carry their figures in the labels instead.
    */
   const viewerLine = (category: LegendCategory, isYou: boolean) => {
     if (isYou) {
