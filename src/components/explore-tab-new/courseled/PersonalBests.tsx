@@ -66,6 +66,17 @@ function pbGroupIdFor(kind: string | null): string {
 }
 
 /**
+ * THE CATEGORY, PER CARD (BRIEF_DISCOVER_HIERARCHY §2.3). The three group names
+ * did not disappear with the sub-headings — they moved onto the card they
+ * describe, so a card explains itself on every surface it appears on.
+ */
+function pbCategoryLabel(kind: string | null, t: (k: string, d: string) => string): string | null {
+  const id = pbGroupIdFor(kind);
+  const def = PB_GROUPS.find((g) => g.id === id);
+  return def ? t(def.key, def.label) : null;
+}
+
+/**
  * WHICH KINDS TAKE WHICH SECOND FIGURE (BRIEF_FEAT_SECOND_FIGURE §1-2). The
  * server decides WHETHER there is a figure; these sets decide only how it reads.
  * A kind in neither set shows the count alone.
@@ -126,8 +137,6 @@ export function PersonalBests({
   }
   const budgetSource = heldCounts.current;
 
-  /** Column memory, so a refetch never moves a tile the member has seen (§i). */
-  const masonry = useRef(new Map<string, MasonryAssignment>());
 
 
   /**
@@ -274,18 +283,6 @@ export function PersonalBests({
     };
   });
 
-
-  /**
-   * GROUPING (BRIEF_STANDOUT_KIND_BUDGET §3). The three treatments are
-   * unchanged; grouping only wraps them, and a group may hold any mix. Groups
-   * render in the fixed order below, an empty group renders nothing, a group of
-   * one keeps its heading, and one surviving group drops the heading.
-   */
-  const buckets = PB_GROUPS.map((def) => ({
-    id: def.id,
-    label: t(def.key, def.label),
-    items: tiles.filter((tt) => pbGroupIdFor(tt.r.feat_kind) === def.id),
-  })).filter((b) => b.items.length > 0);
 
   const renderTile = (tt: (typeof tiles)[number]) => {
       const courseName =
