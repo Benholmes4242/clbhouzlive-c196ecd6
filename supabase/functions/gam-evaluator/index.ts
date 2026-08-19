@@ -1249,15 +1249,24 @@ const STREAK_BADGE_MAP: Record<string, string> = {
 };
 
 async function applyStreaks(userId: string, stats: any) {
-  const dIdx = stats.delta_index;
-  await updateRoundStreak(userId, stats, "no_up", dIdx != null && dIdx <= 0);
-  await updateRoundStreak(userId, stats, "cutting", dIdx != null && dIdx < 0);
   await updateRoundStreak(userId, stats, "counter", !!stats.is_counter);
   await updateRoundStreak(userId, stats, "sub_80", !!stats.sub_80);
   await updateRoundStreak(userId, stats, "sub_par", !!stats.beat_par);
   await updateRoundStreak(userId, stats, "birdie_round", stats.birdies > 0);
   await updateRoundPlayedStreak(userId, stats);
 }
+
+// The two INDEX-DEPENDENT streaks. Their input — delta_index — is only knowable
+// once the member's NEXT score exists, so they are applied against the PREVIOUS
+// round during the following round's evaluation. Same helper, same conditions,
+// same dedup: only the moment it runs differs. A null delta_index (guard
+// rejected an over-2.0 move) breaks both streaks, which is correct.
+async function applyIndexStreaks(userId: string, prevStats: any) {
+  const dIdx = prevStats.delta_index;
+  await updateRoundStreak(userId, prevStats, "no_up", dIdx != null && dIdx <= 0);
+  await updateRoundStreak(userId, prevStats, "cutting", dIdx != null && dIdx < 0);
+}
+
 
 async function ensureStreakRow(userId: string, streakType: string, unit: string, freezeCredits = 0) {
   const { data } = await supabase
