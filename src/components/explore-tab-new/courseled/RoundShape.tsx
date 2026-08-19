@@ -1,12 +1,10 @@
-import { useTranslation } from 'react-i18next';
-
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { monotonePath } from '@/lib/charts/monotonePath';
-import { A, FIGS } from './tokens';
+import { A } from './tokens';
 
 /**
  * RoundShape — THE ONE round-shape renderer for the Discover friends surfaces
