@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 
 import { corsFor } from '../_shared/cors.ts';
+import { forbidden, resolveCaller, unauthorized } from '../_shared/callerAuth.ts';
+
 const APP_URL = Deno.env.get("APP_URL") || "https://www.clbhouz.co.uk";
 
 interface Payload {
