@@ -53,7 +53,6 @@ import {
 } from './courseled/hooks/useCommunityCreators';
 import { useUserStatsCourseMap } from '@/contexts/UserStatsCoursesContext';
 import { useMostPlayedThisWeek, type MostPlayedRow } from './courseled/hooks/useMostPlayedThisWeek';
-import type { TourWeekEvent } from './courseled/hooks/useTourThisWeek';
 import { buildMomentQueue } from '@/features/community/momentQueue';
 
 /**
