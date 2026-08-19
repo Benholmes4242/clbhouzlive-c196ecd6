@@ -419,6 +419,9 @@ const TrendCard: React.FC<{
                 fontWeight: 700,
                 letterSpacing: '-0.01em',
                 ...FIGS,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)',
                 background:
@@ -438,7 +441,14 @@ const TrendCard: React.FC<{
                 boxShadow: `0 2px 8px ${deltaTone}26`,
               }}
             >
-              {formatDelta(delta)}
+              {Math.abs(delta) >= 0.05 && (
+                <IndexMovementTriangle
+                  direction={delta < 0 ? 'down' : 'up'}
+                  color={deltaTone}
+                  size={7}
+                />
+              )}
+              {Math.abs(delta).toFixed(1)}
             </span>
           )}
         </>
