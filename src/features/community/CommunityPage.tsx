@@ -283,7 +283,7 @@ export default function CommunityPage() {
 
             {showVideos && videoRows.length > 0 && (
               <section style={{ marginBottom: 26 }}>
-                <div style={{ padding: '0 16px' }}>
+                <div style={{ padding: '0 14px' }}>
                   <Eyebrow
                     icon={Clapperboard}
                     subline={t('community.sections.videos.subline', 'Three minutes and over')}
