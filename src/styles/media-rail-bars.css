@@ -1,0 +1,47 @@
+/**
+ * PLAYING MARKER — three animated bars (BRIEF_DISCOVER_MEDIA_RAILS §3.5).
+ * Sits inside the duration chip on a video tile and alone, bottom-right, on a
+ * clip tile. It has to read as "this is playing" without sound.
+ */
+
+.media-rail-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1.5px;
+  height: 8px;
+}
+
+.media-rail-bars i {
+  display: block;
+  width: 2px;
+  height: 100%;
+  border-radius: 1px;
+  background: #ffffff;
+  transform-origin: bottom center;
+  animation: media-rail-bar 900ms ease-in-out infinite;
+}
+
+.media-rail-bars i:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.media-rail-bars i:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes media-rail-bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-rail-bars i {
+    animation: none;
+    transform: scaleY(0.6);
+  }
+}
