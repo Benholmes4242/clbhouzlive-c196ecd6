@@ -747,16 +747,43 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
+      {/* MEMBERS / PROS - text-only register, shown only where pro data resolves. */}
+      {hasPro && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          {(['members', 'pros'] as const).map((k) => {
+            const on = activeView === k;
+            return (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setView(k)}
+                aria-pressed={on}
+                style={{
+                  appearance: 'none',
+                  border: 0,
+                  background: 'transparent',
+                  padding: 0,
+                  fontSize: 13,
+                  fontWeight: on ? 700 : 600,
+                  color: on ? A.INK : '#94A3B8',
+                  cursor: 'pointer',
+                }}
+              >
+                {t(`courses:courseDetail.proView.${k}`)}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Block 2 - How it plays: the chart leads, the figures support it. */}
       <Panel
         kicker={t('courses:courseDetail.blocks.howItPlays')}
-        aside={t('courses:courseDetail.plays.rounds', {
-          count: totalRounds,
-          rounds: formatNumber(totalRounds),
-        })}
+        aside={basis}
         headerGap={12}
         style={{ padding: '14px 13px 11px' }}
       >
+
         <ShapeChart
           holes={holes}
           myByHole={myByHole}
