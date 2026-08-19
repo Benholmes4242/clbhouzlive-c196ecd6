@@ -130,11 +130,11 @@ export default function CommunityPage() {
   const visible = useMemo<CommunityLibraryItem[]>(() => {
     const out: CommunityLibraryItem[] = [];
     if (showFilm && featured) out.push(featured);
-    if (showClips) out.push(...clipsPool.slice(0, CLIPS_CAP));
+    if (showClips) out.push(...clips);
     if (showVideos) out.push(...videoRows.slice(0, VIDEO_ROWS_CAP));
-    if (showPhotos) out.push(...photosPool);
+    if (showPhotos) out.push(...photos);
     return out;
-  }, [showFilm, featured, showClips, clipsPool, showVideos, videoRows, showPhotos, photosPool]);
+  }, [showFilm, featured, showClips, clips, showVideos, videoRows, showPhotos, photos]);
 
   const posts = useMemo(() => visible.map((i) => i.post), [visible]);
 
