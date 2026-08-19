@@ -38,8 +38,11 @@ import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 
 import { OnTourThisWeek } from './courseled/OnTourThisWeek';
 import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
+import { ClipsRail, LatestVideosRail } from './courseled/CommunityMediaRails';
+import { useCommunityVideos } from './courseled/hooks/useCommunityVideos';
 import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
 import { MostPlayedSheet } from './courseled/MostPlayedSheet';
+
 import {
   HonoursBoard,
   sortHonours,
@@ -131,7 +134,11 @@ export default function ExploreTabContent({
 
   const momentsQuery = useMomentsOfTheWeek();
   const moments = momentsQuery.data;
+  // THE MEDIA RAILS ARE NOT COURSE-LED (BRIEF_DISCOVER_MEDIA_RAILS §0.2): this
+  // reads the whole media library, unfiltered by course tag and by `lens`.
+  const communityVideos = useCommunityVideos();
   const mostPlayedQuery = useMostPlayedThisWeek();
+
   const mostPlayed = mostPlayedQuery.data;
 
   const [friendsSheet, setFriendsSheet] = useState(false);
@@ -510,6 +517,17 @@ export default function ExploreTabContent({
           onSeeAll={() => setFriendsSheet(true)}
         />
 
+        {/* LATEST VIDEOS — after Who's been playing, before On tour this week.
+            Every tile and both actions open /community for now; the clips
+            surface is a later brief. */}
+        <LatestVideosRail
+          items={communityVideos.data?.videos ?? []}
+          onTilePress={() => navigate('/community')}
+          onSeeAll={() => navigate('/community')}
+        />
+
+
+
         <OnTourThisWeek
           lastSeen={lastSeen}
           onTournamentPress={handleTournament}
@@ -565,6 +583,17 @@ export default function ExploreTabContent({
           }
           onRenderedMembers={handleStandoutMembers}
         />
+
+        {/* CLIPS — after Around the world, before Personal bests. It reads the
+            whole library, so the scope pills (which live inside Around the
+            world's own subtree) do not and must not filter it. */}
+        <ClipsRail
+          items={communityVideos.data?.clips ?? []}
+          onTilePress={() => navigate('/community')}
+          onSeeAll={() => navigate('/community')}
+        />
+
+
 
         {/* PERSONAL BESTS — the second tier, feats measured against the member's
             OWN history. Directly below its sibling, and NOT a fifth lens: the

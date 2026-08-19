@@ -1100,7 +1100,11 @@
     "mostPlayedAvgToPar": "Jugado a {{value}}",
     "mostPlayedNew": "Nuevo",
     "mostPlayedLevel": "Igual",
-    "trackedRounds": "Rondas registradas"
+    "trackedRounds": "Rondas registradas",
+    "videosHeading": "Videos recientes",
+    "videosAction": "Todos los videos",
+    "clipsHeading": "Clips",
+    "clipsAction": "Ver todo"
   },
   "statBrowse": {
     "colArea": "Zona",

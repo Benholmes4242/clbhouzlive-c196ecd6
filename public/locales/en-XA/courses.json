@@ -1527,7 +1527,11 @@
       "after": "[Åƒtéér]"
     },
     "mostPlayedSheetCaption_one": "[~~{{count}} ĉőúřšé~~]",
-    "mostPlayedSheetCaption_other": "[~~{{count}} ĉőúřšéš~~]"
+    "mostPlayedSheetCaption_other": "[~~{{count}} ĉőúřšéš~~]",
+    "videosHeading": "Latest videos",
+    "videosAction": "All videos",
+    "clipsHeading": "Clips",
+    "clipsAction": "See all"
   },
   "statBrowse": {
     "eyebrow": "[~~Ŵĥéřé ţĥíš ĉőɱɱúñíţý ƥļáýš~~]",
