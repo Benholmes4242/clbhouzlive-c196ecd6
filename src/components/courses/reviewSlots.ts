@@ -88,18 +88,24 @@ export function allocateReviewSlots(
     return picked;
   };
 
-  let index = 0;
-  for (let after = FIRST_SLOT_AFTER; after <= rowsLoaded; after += SLOT_STRIDE) {
+  /**
+   * 2, 20, 40, 60, ... — the stride is measured from card 20, not from card 2:
+   * the first slot is pulled forward so two cards land before any voice, and
+   * only the SECOND step is short.
+   */
+  const positions: number[] = [FIRST_SLOT_AFTER];
+  for (let after = SLOT_STRIDE; after <= rowsLoaded; after += SLOT_STRIDE) {
+    positions.push(after);
+  }
+
+  positions.forEach((after, index) => {
+    if (after > rowsLoaded) return;
+    if (index > 0 && !slots.has(positions[index - 1])) return; // slots stopped
     const kind: ReviewSlotKind = index % 2 === 0 ? 'rail' : 'featured';
     const reviews = take(kind, kind === 'rail' ? RAIL_COUNT : 1);
-    if (reviews.length === 0) break; // pool exhausted for this kind — stop.
+    if (reviews.length === 0) return; // pool exhausted for this kind — stop.
     slots.set(after, { after, kind, reviews });
-    index += 1;
-    if (after !== FIRST_SLOT_AFTER) continue;
-    // The stride is measured from the first slot's card, not from card 0:
-    // 2, 20, 40, 60 — so the second step is short by design.
-    after = 0;
-  }
+  });
 
   return slots;
 }
