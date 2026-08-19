@@ -70,7 +70,7 @@ export function CommunityCourseIndex({ items, title, subline, countLabel }: Prop
       {/* Eyebrow's own padding is 0 2px because Discover callers own their
           gutter. Rendered bare it looks pushed left, so this page supplies the
           16px itself and the icon lands on the first tile's left edge. */}
-      <div style={{ padding: '0 16px' }}>
+      <div style={{ padding: '0 14px' }}>
         <Eyebrow icon={MapPin} subline={subline}>
           {title}
         </Eyebrow>
