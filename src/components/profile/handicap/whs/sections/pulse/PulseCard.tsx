@@ -193,12 +193,15 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
                 fontVariantNumeric: 'tabular-nums lining-nums',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 2,
+                gap: 3,
                 lineHeight: 1,
               }}
             >
-              {isUp && <ArrowUp size={9} strokeWidth={3} />}
-              {isDown && <ArrowDown size={9} strokeWidth={3} />}
+              <IndexMovementTriangle
+                direction={isDown ? 'down' : 'up'}
+                color={deltaColor}
+                size={7}
+              />
               {Math.abs(friend.delta90 as number).toFixed(1)}
             </span>
           )}
