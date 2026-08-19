@@ -26,7 +26,8 @@
 
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Search, ArrowLeft, TrendingDown, TrendingUp } from 'lucide-react';
+import { Search, ArrowLeft } from 'lucide-react';
+import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 import { resolveChrome, type ChromeSpec, type ChromeTone } from './registry';
 import { useChromeLeftOverride, useChromeLeftSlot, useChromeSuppressed } from './leftOverride';
 import { Z } from '@/config/zIndex';
