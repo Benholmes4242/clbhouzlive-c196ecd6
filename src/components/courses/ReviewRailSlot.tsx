@@ -86,33 +86,18 @@ function Reviewer({ r }: { r: LatestReview }) {
 interface Props {
   reviews: LatestReview[];
   onReviewPress: (r: LatestReview) => void;
-  onSeeAll: () => void;
 }
 
-export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress, onSeeAll }) => {
+export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
   const { t } = useTranslation('courses');
   if (reviews.length === 0) return null;
 
   return (
     <section style={{ background: SLATE_50, padding: '14px 0 16px' }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 10,
-          padding: '0 16px 10px',
-        }}
-      >
+      <div style={{ padding: '0 16px 10px' }}>
         <div style={LABEL}>{t('statBrowse.reviews.heading')}</div>
-        <button
-          type="button"
-          onClick={onSeeAll}
-          style={{ ...LABEL, color: INK_MUTE, background: 'none', border: 0, padding: 0 }}
-        >
-          {t('statBrowse.reviews.actionRail')}
-        </button>
       </div>
+
 
       <div
         style={{
