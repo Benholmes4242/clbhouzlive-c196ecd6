@@ -15825,6 +15825,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           initial_sync_complete: boolean
+          last_attempted_at: string | null
           last_sync_error: string | null
           last_sync_status: string | null
           last_synced_at: string | null
@@ -15842,6 +15843,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           initial_sync_complete?: boolean
+          last_attempted_at?: string | null
           last_sync_error?: string | null
           last_sync_status?: string | null
           last_synced_at?: string | null
@@ -15859,6 +15861,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           initial_sync_complete?: boolean
+          last_attempted_at?: string | null
           last_sync_error?: string | null
           last_sync_status?: string | null
           last_synced_at?: string | null

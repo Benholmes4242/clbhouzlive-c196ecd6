@@ -103,6 +103,19 @@ interface CallOpts {
   bearer: string;            // either the pre-auth token (login only) or the user JWT (everything else)
 }
 
+/**
+ * Hard ceiling on every outbound EG call.
+ *
+ * WHY THIS EXISTS: EG can accept a connection and then never respond. Deno's
+ * fetch has no default timeout, so a single hung call consumed the whole
+ * invocation of the sync-whs-due sweep — the platform killed the worker before
+ * anything was logged or written, and because the queue was ordered by
+ * last_synced_at the same connection led the queue on the next run. That
+ * head-of-line block froze eighteen of nineteen connections for two days
+ * (18–20 Aug 2026). No unbounded awaits against EG. Ever.
+ */
+const EG_CALL_TIMEOUT_MS = Number(Deno.env.get("EG_CALL_TIMEOUT_MS") ?? "20000");
+
 async function call<T>(opts: CallOpts): Promise<T> {
   const headers: Record<string, string> = {
     ...COMMON_HEADERS,
@@ -112,34 +125,60 @@ async function call<T>(opts: CallOpts): Promise<T> {
     headers["Content-Type"] = "application/json; charset=utf-8";
   }
 
-  let res: Response;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), EG_CALL_TIMEOUT_MS);
+
+  // The timer covers the BODY READ as well as the connection: EG has been seen
+  // to hold a response open and stream nothing.
   try {
-    res = await fetch(`${EG_BASE}${opts.path}`, {
-      method: opts.method,
-      headers,
-      body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-    });
-  } catch (err) {
-    // Network-level failure — DNS, TLS, timeout, etc.
-    throw new EgApiError(
-      "transient_error",
-      0,
-      `Network error calling ${opts.method} ${opts.path}: ${err instanceof Error ? err.message : String(err)}`,
-    );
+    let res: Response;
+    try {
+      res = await fetch(`${EG_BASE}${opts.path}`, {
+        method: opts.method,
+        headers,
+        body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+        signal: controller.signal,
+      });
+    } catch (err) {
+      const aborted = controller.signal.aborted ||
+        (err instanceof Error && err.name === "AbortError");
+      throw new EgApiError(
+        "transient_error",
+        0,
+        aborted
+          ? `Timed out after ${EG_CALL_TIMEOUT_MS}ms calling ${opts.method} ${opts.path}`
+          : `Network error calling ${opts.method} ${opts.path}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new EgApiError(
+        classifyResponse(res.status, text),
+        res.status,
+        `${opts.method} ${opts.path} returned ${res.status} ${res.statusText}`,
+        text,
+      );
+    }
+
+    // EG returns JSON for everything we care about
+    try {
+      return await res.json() as T;
+    } catch (err) {
+      const aborted = controller.signal.aborted ||
+        (err instanceof Error && err.name === "AbortError");
+      throw new EgApiError(
+        "transient_error",
+        res.status,
+        aborted
+          ? `Timed out after ${EG_CALL_TIMEOUT_MS}ms reading ${opts.method} ${opts.path}`
+          : `Unreadable body from ${opts.method} ${opts.path}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  } finally {
+    clearTimeout(timer);
   }
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new EgApiError(
-      classifyResponse(res.status, text),
-      res.status,
-      `${opts.method} ${opts.path} returned ${res.status} ${res.statusText}`,
-      text,
-    );
-  }
-
-  // EG returns JSON for everything we care about
-  return await res.json() as T;
 }
 
 // =============================================================================

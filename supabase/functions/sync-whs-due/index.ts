@@ -392,67 +392,201 @@ async function markFailure(
 // =============================================================================
 // HTTP handler
 // =============================================================================
+//
+// STRUCTURAL RULES — do not weaken any of these. Between 18 and 20 Aug 2026 a
+// single hung EG call on the oldest connection consumed the entire invocation:
+// the worker was killed by the platform before it logged or wrote anything, and
+// because the queue was ordered by last_synced_at the same row led the queue on
+// every subsequent run. Eighteen of nineteen connections froze for two days
+// while every row still read last_sync_status = 'ok'.
+//
+// 1. Bounded EG calls (20s, enforced in _shared/eg-api.ts).
+// 2. Per-connection try/catch — one failure never ends the sweep.
+// 3. Claim (last_attempted_at) written BEFORE the attempt, not after success.
+// 4. Queue ordered by last_attempted_at — a failing row goes to the back.
+// 5. Overall budget — exit cleanly with a summary before the platform kill.
+// 6. Honest status on every attempt, including 'failed' and 'timeout'.
+// 7. Summary logged as the FIRST and LAST statement of every invocation.
+
+const OVERALL_BUDGET_MS = 90_000;  // platform limit ~150s; leave 60s headroom
+const POISON_THRESHOLD = 5;        // consecutive_failures at or above this is skipped
 
 Deno.serve(async (req) => {
-  // Auth: require CRON_SECRET in either header or query param
-  const cronSecret = Deno.env.get("CRON_SECRET");
-  if (!cronSecret) {
-    return Response.json({ ok: false, error: "CRON_SECRET not configured" }, { status: 500 });
+  const startedAt = Date.now();
+  const runId = crypto.randomUUID().slice(0, 8);
+  console.log(`[sync-due ${runId}] START at ${new Date(startedAt).toISOString()}`);
+
+  const summary = {
+    runId,
+    attempted: 0,
+    succeeded: 0,
+    partial: 0,
+    failed: 0,
+    timedOut: 0,
+    skippedPoisoned: 0,
+    skippedBudget: 0,
+    durationMs: 0,
+    budgetReached: false,
+  };
+  const logSummary = (extra?: string) => {
+    summary.durationMs = Date.now() - startedAt;
+    console.log(`[sync-due ${runId}] END ${JSON.stringify(summary)}${extra ? ` ${extra}` : ""}`);
+  };
+
+  try {
+    // Auth: require CRON_SECRET in either header or query param
+    const cronSecret = Deno.env.get("CRON_SECRET");
+    if (!cronSecret) {
+      logSummary("abort=CRON_SECRET_missing");
+      return Response.json({ ok: false, error: "CRON_SECRET not configured" }, { status: 500 });
+    }
+    const url = new URL(req.url);
+    const provided = req.headers.get("x-cron-secret") ?? url.searchParams.get("secret");
+    if (provided !== cronSecret) {
+      logSummary("abort=unauthorized");
+      return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    const force = url.searchParams.get("force") === "true";
+    const drain = url.searchParams.get("drain") === "true";
+    const includePoisoned = url.searchParams.get("includePoisoned") === "true";
+    const admin = adminClient();
+
+    // Find due connections.
+    //
+    // Gate retries by consecutive_failures and next_sync_after only — DO NOT
+    // exclude auth_failed connections. The most common cause of auth_failed is
+    // our shared EG_PREAUTH_TOKEN expiring, which simultaneously 401s every
+    // connection; excluding them by status would prevent auto-recovery on the
+    // next cron after the token is refreshed.
+    //
+    // ORDER BY last_attempted_at, NOT last_synced_at: a row that cannot be
+    // synced must move to the back of the queue rather than blocking it.
+    const nowIso = new Date().toISOString();
+    let query = admin
+      .from("whs_connections")
+      .select("id, user_id, passport_id, membership_number, vault_secret_id, consecutive_failures, initial_sync_complete")
+      .is("deleted_at", null)
+      .lt("consecutive_failures", MAX_CONSECUTIVE_FAILURES)
+      .order("last_attempted_at", { ascending: true, nullsFirst: true })
+      .order("last_synced_at", { ascending: true, nullsFirst: true })
+      .limit(BATCH_SIZE);
+
+    if (!force) {
+      query = query.or(`next_sync_after.is.null,next_sync_after.lte.${nowIso}`);
+    }
+    if (!includePoisoned) {
+      query = query.lt("consecutive_failures", POISON_THRESHOLD);
+    }
+
+    const { data: connections, error: fetchErr } = await query;
+    if (fetchErr) {
+      console.error(`[sync-due ${runId}] fetch due failed:`, fetchErr);
+      logSummary("abort=fetch_failed");
+      return Response.json({ ok: false, error: fetchErr.message }, { status: 500 });
+    }
+
+    // Poisoned rows are surfaced for admin rather than silently omitted.
+    let poisoned: string[] = [];
+    if (!includePoisoned) {
+      const { data: poisonRows } = await admin
+        .from("whs_connections")
+        .select("id")
+        .is("deleted_at", null)
+        .gte("consecutive_failures", POISON_THRESHOLD)
+        .lt("consecutive_failures", MAX_CONSECUTIVE_FAILURES);
+      poisoned = (poisonRows ?? []).map((r: any) => r.id as string);
+      summary.skippedPoisoned = poisoned.length;
+    }
+
+    const queue = (connections ?? []) as ConnectionRow[];
+    console.log(`[sync-due ${runId}] queue=${queue.length} poisoned=${summary.skippedPoisoned} force=${force} drain=${drain}`);
+
+    // Process sequentially to avoid hammering EG with parallel auth calls.
+    const results: SyncResult[] = [];
+    for (const conn of queue) {
+      const elapsed = Date.now() - startedAt;
+      if (elapsed > OVERALL_BUDGET_MS) {
+        summary.budgetReached = true;
+        summary.skippedBudget = queue.length - results.length;
+        console.warn(`[sync-due ${runId}] budget reached at ${elapsed}ms — ${summary.skippedBudget} connection(s) deferred to the next run`);
+        break;
+      }
+
+      // CLAIM FIRST. If this invocation dies mid-connection, the row still
+      // moves to the back of the queue on the next run.
+      try {
+        await admin
+          .from("whs_connections")
+          .update({ last_attempted_at: new Date().toISOString() })
+          .eq("id", conn.id);
+      } catch (err) {
+        console.error(`[sync-due ${runId}] claim write failed for ${conn.id}:`, err);
+      }
+
+      summary.attempted++;
+
+      // PER-CONNECTION ISOLATION. Nothing in here may end the sweep.
+      try {
+        const r = await syncOneConnection(admin, conn, drain);
+        results.push(r);
+        if (r.ok && r.status === "partial") summary.partial++;
+        else if (r.ok) summary.succeeded++;
+        else summary.failed++;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        const timedOut = /timed out|AbortError/i.test(message);
+        if (timedOut) summary.timedOut++; else summary.failed++;
+        console.error(`[sync-due ${runId}] unhandled failure for ${conn.id} (${timedOut ? "timeout" : "failed"}):`, message);
+
+        // HONEST STATUS. A stale 'ok' on an untouched row is what hid the
+        // 18–20 Aug outage for two days.
+        try {
+          const failures = conn.consecutive_failures + 1;
+          await admin
+            .from("whs_connections")
+            .update({
+              last_sync_status: timedOut ? "timeout" : "failed",
+              last_sync_error: message.slice(0, 500),
+              consecutive_failures: failures,
+              next_sync_after: computeNextSyncAfter("unknown_error", failures),
+            })
+            .eq("id", conn.id);
+        } catch (writeErr) {
+          console.error(`[sync-due ${runId}] status write failed for ${conn.id}:`, writeErr);
+        }
+
+        results.push({
+          connectionId: conn.id,
+          ok: false,
+          status: timedOut ? "timeout" : "failed",
+          error: message,
+        });
+      }
+    }
+
+    logSummary();
+    return Response.json({
+      ok: true,
+      processed: results.length,
+      succeeded: summary.succeeded,
+      partial: summary.partial,
+      failed: summary.failed + summary.timedOut,
+      timedOut: summary.timedOut,
+      skippedPoisoned: summary.skippedPoisoned,
+      poisonedIds: poisoned,
+      skippedBudget: summary.skippedBudget,
+      budgetReached: summary.budgetReached,
+      durationMs: summary.durationMs,
+      runId,
+      results,
+    });
+  } catch (err) {
+    // A throw on the startup path is what would otherwise produce a silent run.
+    const message = err instanceof Error ? `${err.message}\n${err.stack ?? ""}` : String(err);
+    console.error(`[sync-due ${runId}] FATAL:`, message);
+    logSummary("abort=fatal");
+    return Response.json({ ok: false, runId, error: message }, { status: 500 });
   }
-  const url = new URL(req.url);
-  const provided = req.headers.get("x-cron-secret") ?? url.searchParams.get("secret");
-  if (provided !== cronSecret) {
-    return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  const force = url.searchParams.get("force") === "true";
-  const drain = url.searchParams.get("drain") === "true";
-  const admin = adminClient();
-
-  // Find due connections.
-  //
-  // Gate retries by consecutive_failures and next_sync_after only — DO NOT
-  // exclude auth_failed connections. The most common cause of auth_failed is
-  // our shared EG_PREAUTH_TOKEN expiring, which simultaneously 401s every
-  // connection; excluding them by status would prevent auto-recovery on the
-  // next cron after the token is refreshed.
-  const nowIso = new Date().toISOString();
-  let query = admin
-    .from("whs_connections")
-    .select("id, user_id, passport_id, membership_number, vault_secret_id, consecutive_failures, initial_sync_complete")
-    .is("deleted_at", null)
-    .lt("consecutive_failures", MAX_CONSECUTIVE_FAILURES)
-    .order("last_synced_at", { ascending: true, nullsFirst: true })
-    .limit(BATCH_SIZE);
-
-  if (!force) {
-    query = query.or(`next_sync_after.is.null,next_sync_after.lte.${nowIso}`);
-  }
-
-  const { data: connections, error: fetchErr } = await query;
-  if (fetchErr) {
-    console.error("[sync] fetch due failed:", fetchErr);
-    return Response.json({ ok: false, error: fetchErr.message }, { status: 500 });
-  }
-
-  if (!connections || connections.length === 0) {
-    return Response.json({ ok: true, processed: 0, results: [] });
-  }
-
-  // Process sequentially to avoid hammering EG with parallel auth calls.
-  // 25 connections × ~3s each = ~75s, well under Edge Function 150s timeout.
-  const results: SyncResult[] = [];
-  for (const conn of connections as ConnectionRow[]) {
-    const r = await syncOneConnection(admin, conn, drain);
-    results.push(r);
-  }
-
-  const okCount = results.filter((r) => r.ok).length;
-  return Response.json({
-    ok: true,
-    processed: results.length,
-    succeeded: okCount,
-    failed: results.length - okCount,
-    results,
-  });
 });
+
