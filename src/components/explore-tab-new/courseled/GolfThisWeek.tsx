@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
@@ -55,7 +54,7 @@ import { A, CARD_SHELL, Eyebrow, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } fr
 
 const CARD_W = 236;
 const PHOTO_H = 108;
-const SHAPE_H = 54;
+const SHAPE_H = 60;
 
 /** The rail scrim of record — imported, never retyped. */
 const CARD_SCRIM = SCRIM_STANDOUT;
@@ -338,12 +337,15 @@ function GolfThisWeekCard({
             minWidth: 0,
           }}
         >
+          {/* THE AVATAR IS THE FRIENDS RAIL'S AVATAR: 20px, no ring (§7). */}
           <SquircleAvatar
-            src={row.profile_photo_url ?? undefined}
-            alt=""
-            size={22}
-            fallback={getInitialsFromName(row.display_name)}
+            src={row.profile_photo_url}
+            userId={row.user_id}
+            alt={row.display_name}
+            size={20}
+            hideRing
           />
+
           <span
             style={{
               flex: 1,
@@ -361,12 +363,13 @@ function GolfThisWeekCard({
           {showFollow && <FollowButton targetUserId={row.user_id} />}
         </div>
 
-        {/* THE SHAPE — the friends rail's component at this size (§4.1). */}
+        {/* THE SHAPE — the friends rail's band, same height, full bleed (§4.1). */}
         <div style={{ marginTop: 8, marginLeft: -11, marginRight: -11 }}>
           <ShapeReveal>
             <RoundShape row={row} shape={shape} width={CARD_W} height={SHAPE_H} showMeta={false} />
           </ShapeReveal>
         </div>
+
 
         {insight && (
           <div
