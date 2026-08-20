@@ -26,7 +26,7 @@
  *   light (#0F172A ramp over #F8FAFC): 1.00 #0F172A, 0.60 #6C727E, 0.42 #969BA4
  */
 import React from 'react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { MentionText } from '@/components/mentions/MentionText';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { isEmojiOnly } from '@/features/comments-v2/lib/emojiOnly';
@@ -111,9 +111,16 @@ export const FeedCommentPreview: React.FC<Props> = ({
       )}
 
       {hasComment && (
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           onClick={onOpenComments}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onOpenComments();
+            }
+          }}
           style={{
             display: 'flex',
             width: '100%',
@@ -123,6 +130,7 @@ export const FeedCommentPreview: React.FC<Props> = ({
             border: 'none',
             padding: 0,
             textAlign: 'left',
+            cursor: 'pointer',
           }}
         >
           <SquircleAvatar
@@ -154,14 +162,14 @@ export const FeedCommentPreview: React.FC<Props> = ({
                   fontSize: emoji ? 16 : undefined,
                 }}
               >
-                {body}
+                <MentionText text={body} />
               </span>
             </span>
             <span style={{ display: 'block', color: DIM, fontSize: 10.5, fontWeight: 600, marginTop: 2 }}>
               {timeAgo(preview!.created_at)}
             </span>
           </span>
-        </button>
+        </div>
       )}
 
       <button
