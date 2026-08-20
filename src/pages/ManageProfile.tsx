@@ -256,7 +256,12 @@ export default function ManageProfile() {
         return;
       }
     }
-    const result = await save(form, { isOnboarding: isNewUser.current });
+    // A connected account's handicap comes from the federation, full stop —
+    // the save must not carry a manual figure for them.
+    const result = await save(form, {
+      isOnboarding: isNewUser.current,
+      hasWhsConnection,
+    });
     if (result === 'username_taken') {
       setUsernameStatus('taken');
       toast.error('That username was just taken - please choose another.');
@@ -830,7 +835,7 @@ function HandicapRow({
             fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
           }}>
             <CheckCircle2 size={12} strokeWidth={2.6} />
-            Synced with England Golf
+            {value != null ? 'Synced with England Golf' : 'Syncing with England Golf'}
           </span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -843,6 +848,7 @@ function HandicapRow({
               fontSize: 14, fontWeight: 600, color: INK, fontFamily: SF_STACK, cursor: 'pointer',
             }}
           >
+
             View full stats
             <ArrowRight size={16} strokeWidth={2.4} color={INK_55} />
           </button>

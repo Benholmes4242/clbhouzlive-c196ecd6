@@ -12,6 +12,7 @@ import {
   egListFriends,
   EgApiError,
   insertHandicapSnapshotIfChanged,
+  syncProfileHandicapIndex,
   upsertScores,
   upsertFriends,
   decryptVaultSecret,
@@ -104,6 +105,9 @@ Deno.serve(async (req) => {
       conn.id,
       userDetails.HandicapIndex,
     );
+    // Unconditional: the sync is the ONLY writer of eg_handicap_index and must
+    // write it on every successful sync, changed index or not.
+    await syncProfileHandicapIndex(admin, conn.id, userDetails.HandicapIndex);
     const scoreUpsert = await upsertScores(admin, conn.id, scoresPage.Scores);
     const scoresUpserted = scoreUpsert.written;
     const friendsUpserted = await upsertFriends(admin, conn.id, friendsPage.Friends);

@@ -18,9 +18,9 @@ export function useProfileSave(userId: string) {
 
   const save = async (
     form: ProfileFormData,
-    opts: { isOnboarding?: boolean } = {}
+    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean } = {}
   ): Promise<boolean | 'username_taken'> => {
-    const { isOnboarding = false } = opts;
+    const { isOnboarding = false, hasWhsConnection = false } = opts;
     setIsSaving(true);
     try {
       // 1. Upload profile photo if changed
@@ -67,6 +67,7 @@ export function useProfileSave(userId: string) {
         // Write to manual_handicap_index ONLY. eg_handicap_index is owned
         // exclusively by the WHS connect/sync edge functions.
         manual_handicap_index: parseHcpFormString(form.handicapIndex),
+
         home_club_visibility: form.homeClubVisibility,
         additional_clubs_visibility: form.additionalClubsVisibility,
         show_additional_home_clubs: form.additionalClubsVisibility !== 'private',
@@ -82,6 +83,11 @@ export function useProfileSave(userId: string) {
         has_completed_onboarding: true,
         updated_at: new Date().toISOString(),
       };
+
+      // Manual handicap entry does not exist for connected members: England
+      // Golf owns their figure. Never let a profile save carry (or null) a
+      // handicap column for them.
+      if (hasWhsConnection) delete updatePayload.manual_handicap_index;
 
       // Drop nulls so we never blow away trigger-seeded display_name / names with blanks.
       if (updatePayload.display_name == null) delete updatePayload.display_name;
