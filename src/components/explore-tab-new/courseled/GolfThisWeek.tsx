@@ -445,9 +445,10 @@ interface Props {
   pills?: React.ReactNode;
   onCardPress: (r: CircleRoundRow) => void;
   onSeeAll: () => void;
+  style?: React.CSSProperties;
 }
 
-export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Props) {
+export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll, style }: Props) {
   const { t } = useTranslation('courses');
   const roundsQuery = useGolfThisWeek(userId);
   const all = roundsQuery.data ?? [];
@@ -613,7 +614,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
 
 
   return (
-    <section>
+    <section style={style}>
       {/* HEADER CONSTRUCTION: heading left, live count right-aligned on the
           SAME line. The "See all" action lives under the first card, not here. */}
       <Eyebrow
