@@ -131,6 +131,78 @@ export function FriendsRail() {
 }
 
 /**
+ * GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK acceptance M). MEASURED off
+ * GolfThisWeek.tsx: 236 wide, a 108px photograph carrying the course name, then
+ * the body — score row 24, member row 22, the full-bleed shape strip at 54
+ * (SHAPE_H), one insight line. Above the rail: eyebrow + subline, the live count
+ * line, the pills row and the best-of-week band, all of which the live section
+ * renders before its first card and none of which may appear later.
+ */
+export function GolfThisWeekRail() {
+  return (
+    <section>
+      <EyebrowBar w={132} aside />
+      <div style={{ height: 15, display: 'flex', alignItems: 'center', padding: '0 2px', marginBottom: 10 }}>
+        <Bar style={{ height: 9, width: 118 }} />
+      </div>
+      <div style={{ display: 'flex', gap: 8, padding: '2px 0 14px' }}>
+        {[64, 74, 60, 56].map((w, i) => (
+          <Bar key={i} style={{ height: 34, width: w, borderRadius: 999 }} />
+        ))}
+      </div>
+      <div
+        style={{
+          borderTop: `1px solid ${A.BORDER}`,
+          borderBottom: `1px solid ${A.BORDER}`,
+          padding: '9px 0 10px',
+          marginBottom: 12,
+          display: 'flex',
+          gap: 8,
+        }}
+      >
+        <Bar style={{ height: 10, width: 82 }} />
+        <Bar style={{ height: 10, width: 150 }} />
+      </div>
+      <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
+        {[0, 1, 2].map((i) => (
+          <div key={i} style={{ ...CARD_SHELL, width: 236, flexShrink: 0, padding: 0 }}>
+            <Bar style={{ borderRadius: 0, height: 108, width: '100%' }} />
+            <div style={{ padding: '10px 11px 11px' }}>
+              <div style={{ height: 24, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <TextBar w={46} h={18} />
+                <TextBar w={26} h={12} />
+                <div style={{ marginLeft: 'auto' }}>
+                  <TextBar w={38} h={12} />
+                </div>
+              </div>
+              <div
+                style={{
+                  marginTop: 9,
+                  height: 22,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 7,
+                }}
+              >
+                <Bar style={{ height: 22, width: 22, borderRadius: '34%' }} />
+                <TextBar w={92} h={11} />
+              </div>
+              <div style={{ marginTop: 8, marginLeft: -11, marginRight: -11 }}>
+                <Bar style={{ borderRadius: 0, height: 54, width: '100%' }} />
+              </div>
+              <div style={{ marginTop: 6, height: 15, display: 'flex', alignItems: 'center' }}>
+                <TextBar w={'88%'} h={10} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
+
  * Section 3 — tour rail: FULL-BLEED photograph tiles, 266x210, with the dark
  * glass leaderboard panel inset 8px from the left, right and bottom
  * (OnTourThisWeek TILE_W / TILE_H). Was 272x174 (100 image + 56 stat row + 18
