@@ -505,6 +505,47 @@ export async function insertHandicapSnapshotIfChanged(
 }
 
 /**
+ * Write the federation index onto the member's profile on EVERY successful
+ * sync, unconditionally.
+ *
+ * The old path relied solely on the whs_handicap_snapshots insert trigger, so a
+ * profile whose eg_handicap_index had been nulled by an unrelated write stayed
+ * null forever whenever the index hadn't changed (snapshots are deduped). This
+ * is the idempotent repair: the sync is the only writer of eg_handicap_index,
+ * and it writes it every time. It also clears any manual figure, because a
+ * connected account's handicap comes from the federation, full stop.
+ */
+export async function syncProfileHandicapIndex(
+  client: SupabaseClient,
+  connectionId: string,
+  handicapIndex: number,
+): Promise<void> {
+  const { data: conn, error: connError } = await client
+    .from("whs_connections")
+    .select("user_id")
+    .eq("id", connectionId)
+    .maybeSingle();
+
+  if (connError || !conn?.user_id) {
+    console.error("[eg-api] profile handicap write skipped, no connection:", connError);
+    return;
+  }
+
+  const { error } = await client
+    .from("user_profiles")
+    .update({
+      eg_handicap_index: handicapIndex,
+      manual_handicap_index: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", conn.user_id);
+
+  if (error) {
+    console.error("[eg-api] profile handicap write failed:", error);
+  }
+}
+
+/**
  * Upsert courses for the given scores. Returns a Map of upstream_course_id → DB UUID.
  */
 export async function upsertCoursesFromScores(

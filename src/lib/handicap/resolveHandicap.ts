@@ -1,10 +1,13 @@
 /**
  * Resolve which handicap to DISPLAY.
  *
- * WHS (eg_handicap_index, owned exclusively by the connect-whs / sync edge
- * functions) wins whenever a WHS connection is active. Otherwise we fall back
- * to the user's manually-entered handicap (manual_handicap_index, written from
- * the edit-profile form). If neither exists we return null.
+ * A CONNECTED account's handicap comes from the federation, full stop. When a
+ * WHS connection is active we return eg_handicap_index and NEVER fall back to
+ * manual_handicap_index — a stale manual figure surfacing for a connected
+ * member is the exact failure mode this rule eliminates. A null eg value on a
+ * connected account means "not synced yet", not "use the manual number".
+ *
+ * Manual entry survives only for members with no connection.
  */
 export interface ResolveHandicapInput {
   egHandicapIndex: number | null | undefined;
@@ -18,11 +21,14 @@ export interface ResolvedHandicap {
 }
 
 export function resolveDisplayHandicap(args: ResolveHandicapInput): ResolvedHandicap {
-  if (args.hasWhsConnection && args.egHandicapIndex != null) {
-    return { value: args.egHandicapIndex, source: 'whs' };
+  if (args.hasWhsConnection) {
+    return args.egHandicapIndex != null
+      ? { value: args.egHandicapIndex, source: 'whs' }
+      : { value: null, source: 'whs' };
   }
   if (args.manualHandicapIndex != null) {
     return { value: args.manualHandicapIndex, source: 'manual' };
   }
   return { value: null, source: 'none' };
 }
+
