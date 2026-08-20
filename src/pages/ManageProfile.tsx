@@ -835,7 +835,7 @@ function HandicapRow({
             fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
           }}>
             <CheckCircle2 size={12} strokeWidth={2.6} />
-            Synced with England Golf
+            {value != null ? 'Synced with England Golf' : 'Syncing with England Golf'}
           </span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -848,6 +848,7 @@ function HandicapRow({
               fontSize: 14, fontWeight: 600, color: INK, fontFamily: SF_STACK, cursor: 'pointer',
             }}
           >
+
             View full stats
             <ArrowRight size={16} strokeWidth={2.4} color={INK_55} />
           </button>

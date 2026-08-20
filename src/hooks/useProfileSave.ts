@@ -84,6 +84,11 @@ export function useProfileSave(userId: string) {
         updated_at: new Date().toISOString(),
       };
 
+      // Manual handicap entry does not exist for connected members: England
+      // Golf owns their figure. Never let a profile save carry (or null) a
+      // handicap column for them.
+      if (hasWhsConnection) delete updatePayload.manual_handicap_index;
+
       // Drop nulls so we never blow away trigger-seeded display_name / names with blanks.
       if (updatePayload.display_name == null) delete updatePayload.display_name;
       if (updatePayload.first_name == null) delete updatePayload.first_name;
