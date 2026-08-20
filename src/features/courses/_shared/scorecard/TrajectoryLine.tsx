@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { A, LABEL, FIGS, NUM, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { beadForScore } from '@/features/courses/_shared/beadForScore';
-import { monotonePath } from '@/lib/charts/monotonePath';
+import { smoothPath } from '@/lib/charts/smoothPath';
 
 /**
  * Cumulative to-par across the round.
@@ -49,9 +49,18 @@ import { monotonePath } from '@/lib/charts/monotonePath';
 /**
  * SURFACE TOKENS (BRIEF_TRAJECTORY_CONTINUITY_AND_REUSE §2.3). The component
  * used to hardcode the light surface, so the dark feed card drew ink on
- * near-black and a white halo over a dark panel. Both surfaces now come from
- * one map and `surface` defaults to 'light', so every existing caller is
- * unchanged. THE HALO IS THE PANEL COLOUR, NEVER WHITE ON DARK.
+ * near-black. Both surfaces now come from one map and `surface` defaults to
+ * 'light', so every existing caller is unchanged.
+ *
+ * `halo` NO LONGER STROKES THE CURVE (BRIEF_ROUND_CURVE_REFINEMENT §S0.2); it
+ * survives only as the PANEL colour used to ring the beads and the scrub dot.
+ * IT MUST NEVER BE WHITE ON DARK — that was a real bug.
+ *
+ * SOLID FILL TONES, PRE-MIXED ON THE SURFACE (§2.1 / §2.4). NOT the to-par
+ * colours at an alpha — a tint reads as failed, a solid tone at the same
+ * lightness reads as deliberate. Opaque, so the fill never interacts with
+ * whatever sits behind the card. The dark pair is derived the same way, mixed
+ * on the panel colour #0B0D10 instead of white.
  */
 const SURFACE_TOKENS = {
   light: {
@@ -59,7 +68,6 @@ const SURFACE_TOKENS = {
     over: A.INK,
     under: TOPAR_RED,
     halo: '#FFFFFF',
-    haloOpacity: 0.85,
     beadStroke: '#FFFFFF',
     tickInk: A.INK,
     tickDim: A.DIM,
@@ -71,16 +79,15 @@ const SURFACE_TOKENS = {
     gradeEven: TOPAR_EVEN_LIGHT,
     gradeBogey: A.MUTE,
     gradeOver: A.INK,
-    // The signed-off LIGHT values, now in the vibrant register (§3).
-    fillAbove: 0.5,
-    fillBelow: 0.55,
+    // SOLID, OPAQUE. Pre-mixed on WHITE.
+    fillOver: '#E8E9EB',
+    fillUnder: '#FBE9EA',
   },
   dark: {
     baseline: 'rgba(255,255,255,0.18)',
     over: '#E8EDF2',
     under: '#FF6B60',
     halo: '#0B0D10',
-    haloOpacity: 0.7,
     beadStroke: '#0B0D10',
     tickInk: 'rgba(255,255,255,0.82)',
     tickDim: 'rgba(255,255,255,0.40)',
@@ -91,10 +98,13 @@ const SURFACE_TOKENS = {
     gradeEven: 'rgba(255,255,255,0.40)',
     gradeBogey: 'rgba(255,255,255,0.68)',
     gradeOver: '#E8EDF2',
-    fillAbove: 0.5,
-    fillBelow: 0.55,
+    // SOLID, OPAQUE. Pre-mixed on the PANEL #0B0D10, same lightness step the
+    // light pair takes off white. NEVER the light values on dark.
+    fillOver: '#212327',
+    fillUnder: '#231618',
   },
 } as const;
+
 
 export interface TrajectoryHole {
   holeNo: number;
@@ -257,10 +267,14 @@ export const TrajectoryLine: React.FC<Props> = ({
   const zeroY = y(0);
 
   const toPts = (seg: Pt[]) => seg.map((p) => ({ x: x(p.pos), y: y(p.cum) }));
-  // MONOTONE CUBIC ONLY: a basis spline would dip the curve below par across a
-  // run of pars.
-  const lineDs = segments.map((seg) => monotonePath(toPts(seg)));
-  // THE FILL IS BUILT FROM THE PLAYER SERIES ONLY, one closed shape per segment.
+  /* THE SHARED TANGENT CUBIC (tension 0.25), the same helper HcpStrip and
+     RoundShape use. It PASSES THROUGH EVERY POINT and a flat run of pars draws
+     flat; a basis spline does not interpolate and would draw a member under par
+     on a hole they bogeyed. */
+  const lineDs = segments.map((seg) => smoothPath(toPts(seg)));
+  // THE FILL IS BUILT FROM THE SMOOTHED PLAYER PATH, one closed shape per
+  // segment — never from a straight-edged copy, or the fill's corners poke
+  // through the smoothed stroke.
   const fillDs = segments.map((seg, i) => {
     const pts = toPts(seg);
     return `${lineDs[i]} L${pts[pts.length - 1].x.toFixed(2)},${zeroY.toFixed(2)} L${pts[0].x.toFixed(2)},${zeroY.toFixed(2)} Z`;
@@ -269,22 +283,25 @@ export const TrajectoryLine: React.FC<Props> = ({
   const uid = `traj-${(uidSeq = (uidSeq + 1) % 100000)}`;
   const clipAbove = `${uid}-ca`;
   const clipBelow = `${uid}-cb`;
-  const gradAbove = `${uid}-ga`;
-  const gradBelow = `${uid}-gb`;
   const gradStroke = `${uid}-gs`;
 
   const gradeFor = (d: number) =>
     d <= -1 ? T.gradeUnder : d === 0 ? T.gradeEven : d === 1 ? T.gradeBogey : T.gradeOver;
 
   /**
-   * STOP PLACEMENT IS LOAD-BEARING. Hole i's segment runs from pts[i-1] to
-   * pts[i] — position i is the cumulative AFTER hole i — so hole i's colour
-   * spans those two offsets and no others. It was previously pinned at pts[i]
-   * and held to pts[i+1], which painted every grade on the FOLLOWING hole:
-   * a birdie tinted the segment where the line rose. Two coincident stops at a
-   * boundary give the hard edge; no epsilon.
-   * A GAP (unplayed hole) stretches the preceding colour across it — the line
-   * there crosses unplayed ground and has no grade of its own.
+   * ONE STOP PER HOLE at its segment MIDPOINT, linearly interpolated. The
+   * colour is now an IMPRESSION of how the round went, not a per-hole reading —
+   * a hole's grade is pure at one point and blends into both neighbours. That is
+   * a deliberate trade: the scorecard grid below carries the hole-by-hole truth,
+   * and this curve is read at a glance. DO NOT 'restore' hard stops.
+   *
+   * STOP PLACEMENT IS STILL LOAD-BEARING. Hole i owns the SEGMENT pts[i-1] to
+   * pts[i] — position i is the cumulative AFTER hole i — and the midpoint is
+   * computed from those two. A blend placed on the wrong segment is the old
+   * off-by-one bug with soft edges. NO EPSILON, NO COINCIDENT STOPS: adjacent
+   * stops at different offsets interpolate, which is the point.
+   * A GAP (unplayed hole) simply widens the blend across it — the line there
+   * crosses unplayed ground and has no grade of its own.
    */
   const strokeStops = (() => {
     const positions = [...scored.keys()].sort((a, b) => a - b);
@@ -292,16 +309,18 @@ export const TrajectoryLine: React.FC<Props> = ({
     positions.forEach((pos, i) => {
       const c = gradeFor(scored.get(pos)!.d);
       // padX is 0, so x(0) === 0: the first scored hole runs from the tee.
-      const from = i === 0 ? 0 : x(positions[i - 1]) / w;
-      out.push({ offset: from, color: c });
-      out.push({ offset: x(pos) / w, color: c });
+      const from = i === 0 ? 0 : x(positions[i - 1]);
+      // ANCHOR at offset 0 with the first hole's colour, so the left end does
+      // not fade to nothing.
+      if (i === 0) out.push({ offset: 0, color: c });
+      out.push({ offset: (from + x(pos)) / 2 / w, color: c });
     });
-    // x(m) === w, so a full round already reaches 1; a round whose LAST hole is
-    // unplayed does not — hold the last grade to the right edge in that case.
+    // ANCHOR at offset 1 with the last hole's colour, same reason.
     const last = out[out.length - 1];
-    if (last && last.offset < 1) out.push({ offset: 1, color: last.color });
+    if (last) out.push({ offset: 1, color: last.color });
     return out;
   })();
+
 
 
   // TICKS INDEX `holes` — the leading point is not a hole, so every tick
@@ -339,18 +358,6 @@ export const TrajectoryLine: React.FC<Props> = ({
             <rect x={0} y={zeroY} width={w} height={Math.max(height - zeroY, 0)} />
           </clipPath>
         )}
-        {/* ABOVE LEVEL: density at the TOP, fading down to the level rule. */}
-        <linearGradient id={gradAbove} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={T.over} stopOpacity={T.fillAbove} />
-          <stop offset="100%" stopColor={T.over} stopOpacity={0.02} />
-        </linearGradient>
-        {wentUnder && (
-          /* BELOW LEVEL: density at the LOW POINT, fading UP to the rule. */
-          <linearGradient id={gradBelow} x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor={T.under} stopOpacity={T.fillBelow} />
-            <stop offset="100%" stopColor={T.under} stopOpacity={0.02} />
-          </linearGradient>
-        )}
         {/* THE GRADED STROKE — userSpaceOnUse so the offsets are fractions of the
             PLOT, not of the path's bounding box. */}
         <linearGradient id={gradStroke} gradientUnits="userSpaceOnUse" x1={0} y1={0} x2={w} y2={0}>
@@ -360,12 +367,15 @@ export const TrajectoryLine: React.FC<Props> = ({
         </linearGradient>
       </defs>
 
-      {/* fill to the level line */}
+      {/* THE FILL IS ONE SOLID OPAQUE TONE, to the level line. No gradient, no
+          fillOpacity, no rgba. THE LEVEL-PAR SPLIT KEEPS ITS STRUCTURE: each
+          side of zero takes its own solid tone through its own clip, and RED IS
+          EARNED — the under-par tone only appears when the round went under. */}
       {fillDs.map((d, i) => (
         <React.Fragment key={`fill-${i}`}>
-          <path d={d} fill={`url(#${gradAbove})`} stroke="none" clipPath={`url(#${clipAbove})`} />
+          <path d={d} fill={T.fillOver} stroke="none" clipPath={`url(#${clipAbove})`} />
           {wentUnder && (
-            <path d={d} fill={`url(#${gradBelow})`} stroke="none" clipPath={`url(#${clipBelow})`} />
+            <path d={d} fill={T.fillUnder} stroke="none" clipPath={`url(#${clipBelow})`} />
           )}
         </React.Fragment>
       ))}
@@ -382,20 +392,11 @@ export const TrajectoryLine: React.FC<Props> = ({
         strokeDasharray="3 4"
       />
 
-      {/* HALO — drawn ONCE per segment, unclipped. Without it the stroke
-          disappears into its own fill. */}
-      {lineDs.map((d, i) => (
-        <path
-          key={`halo-${i}`}
-          d={d}
-          fill="none"
-          stroke={T.halo}
-          strokeOpacity={T.haloOpacity}
-          strokeWidth={3.2 + 3.5}
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      ))}
+      {/* No halo. It existed so a 2.4px stroke read on top of a graduated fill.
+          At 1.8px over a SOLID flat fill there is nothing to separate from, and
+          a 5px halo under a thin line reads as a glow. If a halo is ever
+          reintroduced it must be the PANEL colour, never white on dark — that
+          was a real bug. */}
 
       {/* the player, graded per hole */}
       {lineDs.map((d, i) => (
@@ -404,11 +405,12 @@ export const TrajectoryLine: React.FC<Props> = ({
           d={d}
           fill="none"
           stroke={`url(#${gradStroke})`}
-          strokeWidth={3.2}
+          strokeWidth={1.8}
           strokeLinejoin="round"
           strokeLinecap="round"
         />
       ))}
+
 
       {/* beads last, so they sit on top */}
       {beads.map((b) => (
