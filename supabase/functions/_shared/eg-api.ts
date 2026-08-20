@@ -128,41 +128,57 @@ async function call<T>(opts: CallOpts): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), EG_CALL_TIMEOUT_MS);
 
-  let res: Response;
+  // The timer covers the BODY READ as well as the connection: EG has been seen
+  // to hold a response open and stream nothing.
   try {
-    res = await fetch(`${EG_BASE}${opts.path}`, {
-      method: opts.method,
-      headers,
-      body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-      signal: controller.signal,
-    });
-  } catch (err) {
-    const aborted = controller.signal.aborted ||
-      (err instanceof Error && err.name === "AbortError");
-    throw new EgApiError(
-      "transient_error",
-      0,
-      aborted
-        ? `Timed out after ${EG_CALL_TIMEOUT_MS}ms calling ${opts.method} ${opts.path}`
-        : `Network error calling ${opts.method} ${opts.path}: ${err instanceof Error ? err.message : String(err)}`,
-    );
+    let res: Response;
+    try {
+      res = await fetch(`${EG_BASE}${opts.path}`, {
+        method: opts.method,
+        headers,
+        body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+        signal: controller.signal,
+      });
+    } catch (err) {
+      const aborted = controller.signal.aborted ||
+        (err instanceof Error && err.name === "AbortError");
+      throw new EgApiError(
+        "transient_error",
+        0,
+        aborted
+          ? `Timed out after ${EG_CALL_TIMEOUT_MS}ms calling ${opts.method} ${opts.path}`
+          : `Network error calling ${opts.method} ${opts.path}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new EgApiError(
+        classifyResponse(res.status, text),
+        res.status,
+        `${opts.method} ${opts.path} returned ${res.status} ${res.statusText}`,
+        text,
+      );
+    }
+
+    // EG returns JSON for everything we care about
+    try {
+      return await res.json() as T;
+    } catch (err) {
+      const aborted = controller.signal.aborted ||
+        (err instanceof Error && err.name === "AbortError");
+      throw new EgApiError(
+        "transient_error",
+        res.status,
+        aborted
+          ? `Timed out after ${EG_CALL_TIMEOUT_MS}ms reading ${opts.method} ${opts.path}`
+          : `Unreadable body from ${opts.method} ${opts.path}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   } finally {
     clearTimeout(timer);
   }
 
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new EgApiError(
-      classifyResponse(res.status, text),
-      res.status,
-      `${opts.method} ${opts.path} returned ${res.status} ${res.statusText}`,
-      text,
-    );
-  }
-
-  // EG returns JSON for everything we care about
-  return await res.json() as T;
 }
 
 // =============================================================================
