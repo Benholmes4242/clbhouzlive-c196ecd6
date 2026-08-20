@@ -528,33 +528,21 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
 
   return (
     <section>
-      {/* HEADER CONSTRUCTION MATCHES ITS NEIGHBOURS: heading left, live count and
-          See all right-aligned on the SAME line (Eyebrow's aside slot). */}
+      {/* HEADER CONSTRUCTION: heading left, live count right-aligned on the
+          SAME line. The "See all" action lives under the first card, not here. */}
       <Eyebrow
-        subline={t(
-          'discover.golfThisWeek.subline',
-          "Everywhere clbhouz golfers played, and how it went.",
-        )}
         aside={
-          <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ ...KICKER, color: A.MUTE }}>
-              {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
-                rounds: counts.rounds,
-                courses: counts.courses,
-              })}
-            </span>
-            {counts.rounds > rows.length && (
-              <InkAction onClick={onSeeAll}>
-                {t('discover.golfThisWeek.seeAll', 'See all {{count}} rounds', {
-                  count: counts.rounds,
-                })}
-              </InkAction>
-            )}
+          <span style={{ ...KICKER, color: A.MUTE }}>
+            {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
+              rounds: counts.rounds,
+              courses: counts.courses,
+            })}
           </span>
         }
       >
         {t('discover.golfThisWeek.heading', 'Golf this week')}
       </Eyebrow>
+
 
       {pills}
 
