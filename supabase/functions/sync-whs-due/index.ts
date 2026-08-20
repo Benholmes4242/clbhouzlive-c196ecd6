@@ -19,6 +19,7 @@ import {
   egListFriends,
   EgApiError,
   insertHandicapSnapshotIfChanged,
+  syncProfileHandicapIndex,
   upsertScores,
   upsertFriends,
   decryptVaultSecret,
@@ -174,6 +175,8 @@ async function syncOneConnection(
   let handicapChanged = false;
   if (handicapIndex != null) {
     handicapChanged = await insertHandicapSnapshotIfChanged(admin, conn.id, handicapIndex);
+    // Unconditional profile write — see syncProfileHandicapIndex.
+    await syncProfileHandicapIndex(admin, conn.id, handicapIndex);
   }
 
   // Snapshot existing upstream_score_ids BEFORE upsert so we can detect
