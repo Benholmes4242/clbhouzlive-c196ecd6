@@ -63,10 +63,11 @@ import { A, CARD_SHELL, Eyebrow, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } fr
  */
 
 
-/* Original Golf This Week tile geometry (236×108, 54px shape). */
+/* Condensed tile geometry — ~12% shorter than the first pass, with the insight
+   line still at one consistent height across the rail. */
 const CARD_W = 236;
-const PHOTO_H = 108;
-const SHAPE_H = 54;
+const PHOTO_H = 92;
+const SHAPE_H = 48;
 
 /** The rail scrim of record — imported, never retyped. */
 const CARD_SCRIM = SCRIM_STANDOUT;
