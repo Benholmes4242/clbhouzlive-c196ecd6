@@ -57,7 +57,8 @@ import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, GOLD, InkAction, NUMF, SANS } fro
 
 export const RAIL_CAP = 10;
 const CARD_W = 224;
-const PHOTO_H = 104;
+const PHOTO_H = 90;
+const SHAPE_H = 52;
 
 /* Rail scrim — THE STANDOUT-TILE SCRIM. The three-layer base/hotspot/top stack
    is gone: this rail now paints the same single bottom-weighted layer as the
