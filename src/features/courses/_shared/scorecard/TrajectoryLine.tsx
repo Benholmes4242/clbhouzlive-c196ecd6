@@ -80,8 +80,8 @@ const SURFACE_TOKENS = {
     gradeBogey: A.MUTE,
     gradeOver: A.INK,
     // SOLID, OPAQUE. Pre-mixed on WHITE.
-    fillOver: '#E8E9EB',
-    fillUnder: '#FBE9EA',
+    fillOver: '#DEE1E6',
+    fillUnder: '#EFC6C3',
   },
   dark: {
     baseline: 'rgba(255,255,255,0.18)',
@@ -100,8 +100,8 @@ const SURFACE_TOKENS = {
     gradeOver: '#E8EDF2',
     // SOLID, OPAQUE. Pre-mixed on the PANEL #0B0D10, same lightness step the
     // light pair takes off white. NEVER the light values on dark.
-    fillOver: '#212327',
-    fillUnder: '#231618',
+    fillOver: '#31353C',
+    fillUnder: '#3C2225',
   },
 } as const;
 
