@@ -732,7 +732,38 @@ export function GolfThisWeek({
 
 
 
-      {pills}
+      {/* SCOPE PILLS AND THE AREA DROPDOWN — one row, this section's own (§S2/§S3). */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          marginBottom: 12,
+          minWidth: 0,
+        }}
+      >
+        <WeekScopePills scope={scope} onChange={(s) => onScopeChange?.(s)} style={{ flex: 1 }} />
+        <RegionDropdown
+          regions={regions}
+          selection={region}
+          onChange={(sel) => onRegionChange?.(sel)}
+        />
+      </div>
+
+      {/* AN HONEST EMPTY ANSWER (§S2.5): the filters stay, the sentence explains. */}
+      {rows.length === 0 && (
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: A.MUTE,
+            fontFamily: SANS,
+            padding: '10px 0 4px',
+          }}
+        >
+          {t(scopeEmptyKey(scope).key, scopeEmptyKey(scope).fallback)}
+        </div>
+      )}
 
       {bandTiles.length > 0 && (
         <div
