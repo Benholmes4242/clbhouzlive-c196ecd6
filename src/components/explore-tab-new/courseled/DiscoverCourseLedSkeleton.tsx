@@ -484,21 +484,14 @@ export default function DiscoverCourseLedSkeleton() {
       aria-hidden="true"
       style={{ background: A.CANVAS, minHeight: '100vh', fontFamily: SANS }}
     >
-      {/* Header block — the live kicker line box is 15px, the h1's is 39px, so
-          the bars sit inside boxes of those heights and the title lands put. */}
+      {/* Header spacer — the live page title was removed; the top padding is
+          the only thing that separates the first section from the floating header. */}
       <div
         style={{
-          padding: '0 16px 12px',
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 52px)',
+          padding: '0 16px 0',
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
         }}
-      >
-        <div style={{ height: 15, display: 'flex', alignItems: 'center' }}>
-          <Bar style={{ height: 10, width: 96 }} />
-        </div>
-        <div style={{ height: 39, marginTop: 7, display: 'flex', alignItems: 'center' }}>
-          <Bar style={{ height: 26, width: 232 }} />
-        </div>
-      </div>
+      />
 
 
       <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
