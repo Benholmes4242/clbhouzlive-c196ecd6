@@ -48,11 +48,19 @@ export function computePushChip(push: ReturnType<typeof usePushHealth>): ChipSta
 export function computeEgChip(eg: ReturnType<typeof useDashboard>['egSyncHealth']): ChipState {
   if (eg.isLoading) return { tone: 'idle', label: 'EG sync', detail: 'Loading' };
   if (eg.isError || !eg.data) return { tone: 'warn', label: 'EG sync', detail: 'Unavailable' };
-  const d = eg.data;
+  const d = eg.data as any;
+  // Freshness first. The 18-20 Aug 2026 outage was invisible for two days
+  // because every frozen row still read last_sync_status = 'ok'; only the age
+  // of the newest sync in the estate tells the truth.
+  const fresh = d.freshest_hours_ago as number | null | undefined;
+  if (fresh == null) return { tone: 'danger', label: 'EG sync', detail: 'never synced' };
+  if (fresh > 12) return { tone: 'danger', label: 'EG sync', detail: `${Math.round(fresh)}h stale` };
   if (d.status === 'red') return { tone: 'danger', label: 'EG sync', detail: `${d.auth_failed} re-auth` };
+  if ((d.stale_12h_count ?? 0) > 0) return { tone: 'warn', label: 'EG sync', detail: `${d.stale_12h_count} stale` };
   if (d.auth_failed > 0) return { tone: 'warn', label: 'EG sync', detail: `${d.auth_failed} re-auth` };
   if (d.eg_unavailable > 0) return { tone: 'warn', label: 'EG sync', detail: `${d.eg_unavailable} unavailable` };
   return { tone: 'ok', label: 'EG sync', detail: `${d.status_ok_count}/${d.total_connected} ok` };
+
 }
 
 export function computeCronChip(eg: ReturnType<typeof useDashboard>['egSyncHealth']): ChipState {

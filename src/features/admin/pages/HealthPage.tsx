@@ -603,7 +603,10 @@ function EgSyncDetail({ eg }: { eg: ReturnType<typeof useDashboard>['egSyncHealt
       { label: 'Re-auth',     value: d.auth_failed ?? 0, bad: (d.auth_failed ?? 0) > 0 },
       { label: 'Unavailable', value: d.eg_unavailable ?? 0, bad: (d.eg_unavailable ?? 0) > 0 },
       { label: 'Consec fails', value: d.consecutive_failures_total ?? 0, bad: (d.consecutive_failures_total ?? 0) > 2 },
-      { label: 'Last attempt', value: age(d.last_attempt_at) },
+      { label: 'Freshest',    value: age(d.freshest_sync_at ?? d.last_attempt_at),
+        bad: d.freshest_hours_ago == null || d.freshest_hours_ago > 12 },
+      { label: 'Stale >12h',  value: d.stale_12h_count ?? 0, bad: (d.stale_12h_count ?? 0) > 0 },
+      { label: 'Poisoned',    value: d.poisoned_count ?? 0, bad: (d.poisoned_count ?? 0) > 0 },
     ]} />
   );
 }
