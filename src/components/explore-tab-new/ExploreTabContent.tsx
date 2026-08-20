@@ -324,19 +324,16 @@ export default function ExploreTabContent({
 
       {/* The chrome island floats over the page, so the header clears the notch
           plus the island itself — Discover no longer sits under a hero.
-          The title block is replaced by the rate nudge when a course is
-          available; otherwise Your Circle (friends rail) owns this spot. */}
+          The top slot is owned by the existing rate/one-thing prompt when one
+          exists; otherwise Your Circle (friends rail) owns this spot. */}
       <div
         style={{
           padding: '0 14px',
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
         }}
       >
-        {showRateNudge ? (
-          <RateNudge
-            userId={userId ?? ''}
-            onEmptyFallback={() => navigate('/courses')}
-          />
+        {hasPrompt ? (
+          <OneThingRow userId={userId} onFindGolfers={() => setFindGolfers(true)} />
         ) : (
           <FriendsPlayedRail
             userId={userId}
@@ -346,12 +343,6 @@ export default function ExploreTabContent({
           />
         )}
       </div>
-
-
-
-      {/* ONE THING (BRIEF_DISCOVER_ONE_THING): one row, one action, session
-          dismissible. Renders nothing when there is nothing to ask. */}
-      <OneThingRow userId={userId} onFindGolfers={() => setFindGolfers(true)} />
 
       {/* ONE SECTION RHYTHM: 28px between a section's content and the next
           section's eyebrow. Eyebrows own their own 10px to their content. */}
