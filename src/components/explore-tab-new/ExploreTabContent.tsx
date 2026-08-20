@@ -19,7 +19,6 @@ import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/rou
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
-import { OneThingRow } from './courseled/OneThingRow';
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { GolfThisWeek } from './courseled/GolfThisWeek';
 import {
