@@ -7,7 +7,6 @@ import {
   useDiscoverLastSeen,
   useMarkDiscoverSeenOnExit,
 } from '@/hooks/useDiscoverLastSeen';
-import { useExploreLens, type ExploreLens } from './hooks/useExploreLens';
 
 import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
 import { ScopePills } from './wire/ScopePills';
@@ -22,7 +21,6 @@ import { FriendsRoundsSeeAllSheet } from './FriendsRoundsSeeAllSheet';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
-import { FriendsPlayedRail } from './courseled/FriendsPlayedRail';
 import { OneThingRow } from './courseled/OneThingRow';
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { GolfThisWeek } from './courseled/GolfThisWeek';
@@ -101,7 +99,12 @@ export default function ExploreTabContent({
 
   useMarkDiscoverSeenOnExit(markSeen);
 
-  const { lens, setLens } = useExploreLens();
+  /* ONE ROUNDS SECTION (BRIEF_MERGE_CIRCLE_AND_GOLF_THIS_WEEK §S1). Your Circle
+     and Golf this week were the same section shown twice; the merged rail keeps
+     its scope and area here so the see-all sheet inherits both. Component state,
+     not the URL: a filter tap must not enter the back stack. */
+  const [weekScope, setWeekScope] = useState<WeekScope>(DEFAULT_WEEK_SCOPE);
+  const [weekRegion, setWeekRegion] = useState<RegionSelection | null>(null);
 
   // Sticky-bar veil: mirrors CoursesContent so the notch strip paints the
   // moment the pills pin (no gap, no colour seam).
@@ -173,15 +176,16 @@ export default function ExploreTabContent({
   });
   const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
 
-  const handleLensChange = useCallback(
-    (next: ExploreLens) => {
-      if (next === lens) return;
+  const handleScopeChange = useCallback(
+    (next: WeekScope) => {
+      if (next === weekScope) return;
       analyticsEvents.track('discover_lens_change', { lens: next });
-      // NO scroll: the lens is a client-side filter over an already-fetched
-      // pool, so the cards change under the member's scroll position.
-      setLens(next);
+      /* A SCOPE CHANGE RESETS THE AREA (§S3.5): the counts belong to the scope,
+         so an area holding nothing under the new pill must not survive it. */
+      setWeekScope(next);
+      setWeekRegion(null);
     },
-    [lens, setLens],
+    [weekScope],
   );
 
   /**
@@ -335,11 +339,14 @@ export default function ExploreTabContent({
         {hasPrompt ? (
           <OneThingRow userId={userId} onFindGolfers={() => setFindGolfers(true)} />
         ) : (
-          <FriendsPlayedRail
+          <GolfThisWeek
             userId={userId}
-            lastSeen={lastSeen}
+            scope={weekScope}
+            onScopeChange={handleScopeChange}
+            region={weekRegion}
+            onRegionChange={setWeekRegion}
             onCardPress={handleFriendCard}
-            onSeeAll={() => setFriendsSheet(true)}
+            onSeeAll={() => setGolfWeekSheet(true)}
           />
         )}
       </div>
@@ -353,12 +360,17 @@ export default function ExploreTabContent({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {/* When the one-thing prompt owns the top slot, Your Circle renders
               below it as a normal section. Otherwise it is already the top slot. */}
+          {/* When the one-thing prompt owns the top slot, the rounds section
+              renders here instead (§S1.1 — it is the ONLY rounds section). */}
           {hasPrompt && (
-            <FriendsPlayedRail
+            <GolfThisWeek
               userId={userId}
-              lastSeen={lastSeen}
+              scope={weekScope}
+              onScopeChange={handleScopeChange}
+              region={weekRegion}
+              onRegionChange={setWeekRegion}
               onCardPress={handleFriendCard}
-              onSeeAll={() => setFriendsSheet(true)}
+              onSeeAll={() => setGolfWeekSheet(true)}
             />
           )}
 
@@ -382,25 +394,6 @@ export default function ExploreTabContent({
           />
 
 
-
-          <GolfThisWeek
-            userId={userId}
-            lens={lens}
-            /* THE PILLS BELONG TO THIS SECTION NOW (§3). NO WRAPPER DIV: they
-               are position:sticky and a wrapper of their exact height becomes
-               their containing block, giving them zero travel. */
-            pills={
-              <ScopePills
-                lens={lens}
-                onChange={handleLensChange}
-                style={{ margin: '2px -14px 14px' }}
-              />
-            }
-            onCardPress={handleFriendCard}
-            onSeeAll={() => setGolfWeekSheet(true)}
-            style={{ marginTop: 24 }}
-          />
-        </div>
 
         {/* CLIPS — after Around the world, before Personal bests. It reads the
             whole library, so the scope pills (which live inside Around the
@@ -468,8 +461,9 @@ export default function ExploreTabContent({
         open={golfWeekSheet}
         onClose={() => setGolfWeekSheet(false)}
         userId={userId}
-        lens={lens}
-        onLensChange={handleLensChange}
+        scope={weekScope}
+        onScopeChange={handleScopeChange}
+        region={weekRegion}
         onRowPress={(scoreId, uid) => {
           if (scoreId) opener.openByScore(scoreId, null, uid);
           else opener.openProfile(uid);
