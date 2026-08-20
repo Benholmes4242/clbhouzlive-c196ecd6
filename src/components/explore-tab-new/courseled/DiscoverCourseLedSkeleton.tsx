@@ -13,7 +13,7 @@ import { CARD_SHELL } from './tokens';
  *
  * Every block below is MEASURED off the rendered component it stands in for,
  * not read off the JSX and added up:
- *   friends rail   224 x 233  (104 photo + 60 shape strip + 69 body)
+ *   rounds rail    merged Golf this week: heading + scope pills + band + tiles
  *   around world   masonry, six photo heights + 62 body
  *   moments        two 220 blocks + a trailing 109 shorts row (cap 8)
  *   most played    panel of 60px rows
@@ -27,7 +27,13 @@ import { CARD_SHELL } from './tokens';
  * rendered by OnTourThisWeek and LatestReviews themselves — those components
  * are intact by instruction (S1.2), and a shell deleted out from under a live
  * component is a worse problem than an unreached one.
+ *
+ * ALSO NO LONGER REACHED (MICRO_BRIEF_REMOVE_ONE_THING_ROW): the page header
+ * block (title removed) and FriendsRail (merged into the rounds rail). The rate
+ * prompt never had a shell here, so nothing had to be deleted for it. The
+ * merged rounds rail now LEADS the shell and owns the safe-area padding.
  */
+
 
 
 
@@ -484,27 +490,31 @@ export default function DiscoverCourseLedSkeleton() {
       aria-hidden="true"
       style={{ background: A.CANVAS, minHeight: '100vh', fontFamily: SANS }}
     >
-      {/* Header block — the live kicker line box is 15px, the h1's is 39px, so
-          the bars sit inside boxes of those heights and the title lands put. */}
+      {/* THE MERGED ROUNDS SECTION LEADS THE PAGE
+          (MICRO_BRIEF_REMOVE_ONE_THING_ROW S1.3 / S2.2): the rate prompt and the
+          page title are both gone, so the first shell is the rounds rail and it
+          carries the live page's padding verbatim — the floating header sits at
+          sat + 10 and is 44px tall, so sat + 70 gives 16px of clearance on
+          notched and non-notched devices alike. */}
       <div
         style={{
-          padding: '0 16px 12px',
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 52px)',
+          padding: '0 14px',
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
         }}
       >
-        <div style={{ height: 15, display: 'flex', alignItems: 'center' }}>
-          <Bar style={{ height: 10, width: 96 }} />
-        </div>
-        <div style={{ height: 39, marginTop: 7, display: 'flex', alignItems: 'center' }}>
-          <Bar style={{ height: 26, width: 232 }} />
-        </div>
+        <GolfThisWeekRail />
       </div>
 
+      <div
+        style={{
+          padding: '0 14px',
+          marginTop: 28,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 28,
+        }}
+      >
 
-      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
-        <FriendsRail />
-        <TourRail />
-        <GolfThisWeekRail />
 
         <MomentsMosaic />
         <MostPlayedPanel />
