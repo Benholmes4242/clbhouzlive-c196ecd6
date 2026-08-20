@@ -52,7 +52,7 @@ function fmtToPar(n: number | null): string {
 function toParColor(n: number | null): string {
   if (n == null) return MUTE;
   if (n === 0) return INK;
-  return n < 0 ? RED : MUTE;
+  return n < 0 ? HCP_DRIFTING : MUTE;
 }
 
 function dateKicker(playDate: string | null): string | null {
