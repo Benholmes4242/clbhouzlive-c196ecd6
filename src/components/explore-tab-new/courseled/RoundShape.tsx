@@ -26,8 +26,8 @@ const UNDER_TONE = TOPAR_RED;
    NOT the to-par colours at an alpha — a tint reads as failed, a solid tone at
    the same lightness reads as deliberate. Opaque, so the fill never interacts
    with whatever sits behind the tile. */
-const FILL_UNDER_LIGHT = '#FBE9EA'; // went under par
-const FILL_OVER_LIGHT = '#E8E9EB'; // stayed over par
+const FILL_UNDER_LIGHT = '#EFC6C3'; // went under par
+const FILL_OVER_LIGHT = '#DEE1E6'; // stayed over par
 
 
 export function RoundShape({
