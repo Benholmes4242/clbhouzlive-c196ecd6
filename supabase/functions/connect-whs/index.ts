@@ -283,19 +283,82 @@ function errResponse(error: ConnectError, status = 400): Response {
   return Response.json(error, { status, headers: CORS_HEADERS });
 }
 
+/**
+ * Record the attempt so support can read the failure reason WITHOUT log access —
+ * edge logs retain roughly an hour, which is shorter than the time it takes a
+ * member to report a problem.
+ */
+async function recordAttempt(
+  admin: SupabaseClient,
+  userId: string,
+): Promise<string | null> {
+  try {
+    const { data, error } = await admin
+      .from("whs_connect_attempts")
+      .insert({ user_id: userId, provider: "england_golf", outcome: "started" })
+      .select("id")
+      .single();
+    if (error) throw error;
+    return data.id as string;
+  } catch (err) {
+    console.error(JSON.stringify({ fn: "connect-whs", event: "attempt_insert_failed", detail: String(err) }));
+    return null;
+  }
+}
+
+async function finishAttempt(
+  admin: SupabaseClient,
+  attemptId: string | null,
+  fields: {
+    outcome: "success" | "failure";
+    error_code?: string | null;
+    failure_reason?: string | null;
+    eg_status?: number | null;
+    connection_id?: string | null;
+    duration_ms: number;
+  },
+): Promise<void> {
+  if (!attemptId) return;
+  try {
+    await admin
+      .from("whs_connect_attempts")
+      .update({
+        outcome: fields.outcome,
+        error_code: fields.error_code ?? null,
+        failure_reason: fields.failure_reason ? String(fields.failure_reason).slice(0, 500) : null,
+        eg_status: fields.eg_status ?? null,
+        connection_id: fields.connection_id ?? null,
+        duration_ms: fields.duration_ms,
+        finished_at: new Date().toISOString(),
+      })
+      .eq("id", attemptId);
+  } catch (err) {
+    console.error(JSON.stringify({ fn: "connect-whs", event: "attempt_update_failed", detail: String(err) }));
+  }
+}
+
 Deno.serve(async (req) => {
+  const runId = crypto.randomUUID().slice(0, 8);
+  const startedAt = Date.now();
+
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
   }
   if (req.method !== "POST") {
+    logLine("warn", runId, "rejected", { reason: "method_not_allowed", method: req.method });
     return errResponse({ ok: false, error_code: "invalid_request", message: "POST only" }, 405);
   }
 
   // 1. Authenticate the Clbhouz user
   const user = await getAuthenticatedUser(req);
   if (!user) {
+    logLine("error", runId, "outcome", { ok: false, error_code: "not_authenticated", ms: Date.now() - startedAt });
     return errResponse({ ok: false, error_code: "not_authenticated", message: "Sign in to Clbhouz first" }, 401);
   }
+
+  // ATTEMPT line — user id only, never the membership number or password.
+  logLine("info", runId, "attempt", { user_id: user.id, provider: "england_golf" });
+
 
   // 2. Parse request body
   let body: ConnectRequest;
