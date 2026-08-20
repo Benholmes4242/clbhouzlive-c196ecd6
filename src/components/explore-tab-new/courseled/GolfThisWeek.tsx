@@ -236,6 +236,9 @@ interface CardProps {
   region: string | null;
   imageUrl: string | null;
   showFollow: boolean;
+  /** §2.2 — read from the SAME cached following-id set that drives showFollow. */
+  isFollowed: boolean;
+  viewerUserId: string | undefined;
   onPress: () => void;
 }
 
