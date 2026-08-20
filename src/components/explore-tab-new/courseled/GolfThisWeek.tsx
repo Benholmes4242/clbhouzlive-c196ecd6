@@ -15,8 +15,12 @@ import {
   referenceLine,
   INSIGHT_FONT_SIZE,
   INSIGHT_LINE_HEIGHT,
+  INSIGHT_LINE_RESERVE,
+  INSIGHT_CLAMP,
+  InsightGlyph,
   IndexMovementTriangle,
 } from '../friendRoundParts';
+import { FIGS } from '@/features/courses/components/holes/analytical/tokens';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { relativeDay } from './discoverWhen';
@@ -52,8 +56,9 @@ import { A, CARD_SHELL, Eyebrow, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } fr
  * lifetime. Chevrons appear on navigation only.
  */
 
-const CARD_W = 236;
-const PHOTO_H = 108;
+/* ONE TILE GEOMETRY ACROSS DISCOVER: identical to Who's been playing. */
+const CARD_W = 224;
+const PHOTO_H = 104;
 const SHAPE_H = 60;
 
 /** The rail scrim of record — imported, never retyped. */
@@ -384,23 +389,27 @@ function GolfThisWeekCard({
         </div>
 
 
-        {insight && (
-          <div
-            style={{
-              marginTop: 6,
-              fontSize: INSIGHT_FONT_SIZE,
-              lineHeight: INSIGHT_LINE_HEIGHT,
-              fontWeight: 600,
-              color: A.MUTE,
-              display: '-webkit-box',
-              WebkitBoxOrient: 'vertical',
-              WebkitLineClamp: 2,
-              overflow: 'hidden',
-            }}
-          >
-            {insight}
-          </div>
-        )}
+        {/* THE SUBLINE IS THE FRIENDS RAIL'S SUBLINE (§4.2): same glyph, same
+            figure font, same body ink, ONE line of reserved height. */}
+        <div style={{ minHeight: INSIGHT_LINE_RESERVE, marginTop: 6 }}>
+          {insight && (
+            <div
+              style={{
+                ...FIGS,
+                fontSize: INSIGHT_FONT_SIZE,
+                lineHeight: INSIGHT_LINE_HEIGHT,
+                fontWeight: 600,
+                color: A.BODY,
+                ...INSIGHT_CLAMP,
+              }}
+            >
+              <span style={{ display: 'inline' }}>
+                <InsightGlyph />
+                {insight}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
     </button>
   );
