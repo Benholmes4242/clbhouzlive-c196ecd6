@@ -570,13 +570,24 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
               key={tile.key}
               style={{
                 ...CARD_SHELL,
-                flex: '0 0 auto',
-                width: 158,
+                flex: '1 1 0',
+                minWidth: 0,
                 padding: '9px 10px 10px',
                 fontFamily: SANS,
               }}
             >
-              <div style={{ ...LABEL, color: A.MUTE }}>{tile.label}</div>
+              <div
+                style={{
+                  ...LABEL,
+                  color: A.MUTE,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
+              >
+                <span style={{ lineHeight: 1 }}>{tile.emoji}</span>
+                {tile.label}
+              </div>
               <div
                 style={{
                   ...NUMF,
@@ -635,6 +646,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
           ))}
         </div>
       )}
+
 
 
       {/* Cards only in the horizontal rail; the See-all action sits below the
