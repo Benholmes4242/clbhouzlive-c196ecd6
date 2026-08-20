@@ -11,7 +11,7 @@ import { toast } from '@/lib/toast';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
-import type { ExploreLens } from '../hooks/useExploreLens';
+
 import {
   toParFor,
   buildInsightMap,
@@ -29,15 +29,20 @@ import { CourseImageFallback } from './CourseImageFallback';
 import { relativeDay } from './discoverWhen';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
-import { useDiscoverLensSets } from './hooks/useDiscoverLensSets';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
 import {
+  DEFAULT_WEEK_SCOPE,
   GOLF_WEEK_RAIL_CAP,
   bestOfWeek,
-  orderForLens,
+  orderForWeek,
+  usePlayedCourseIds,
   useGolfThisWeek,
   useWeekCounts,
+  useWeekScopeCourses,
+  type WeekScope,
 } from './hooks/useGolfThisWeek';
+import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegionCounts';
+import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
 import { RoundShape } from './RoundShape';
 import { GolfThisWeekRail as GolfThisWeekShell } from './DiscoverCourseLedSkeleton';
 import { A, CARD_SHELL, Eyebrow, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
@@ -508,33 +513,57 @@ function GolfThisWeekCard({
 
 interface Props {
   userId: string | undefined;
-  lens: ExploreLens;
-  /** The scope pills, owned by this section now (§3). Rendered under the eyebrow. */
-  pills?: React.ReactNode;
+  /** THE ONE ROUNDS SECTION (§S1): scope and region are owned above, so the
+   *  see-all sheet inherits exactly what the rail is showing. */
+  scope?: WeekScope;
+  onScopeChange?: (s: WeekScope) => void;
+  region?: RegionSelection | null;
+  onRegionChange?: (sel: RegionSelection | null) => void;
   onCardPress: (r: CircleRoundRow) => void;
   onSeeAll: () => void;
   style?: React.CSSProperties;
 }
 
-export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll, style }: Props) {
+export function GolfThisWeek({
+  userId,
+  scope = DEFAULT_WEEK_SCOPE,
+  onScopeChange,
+  region = null,
+  onRegionChange,
+  onCardPress,
+  onSeeAll,
+  style,
+}: Props) {
   const { t } = useTranslation('courses');
-  const roundsQuery = useGolfThisWeek(userId);
+  /* THE SCOPE FILTERS AT THE QUERY (§E): Top 100 and Played resolve to a course
+     allow-list that goes into SQL. `undefined` means not yet resolved. */
+  const scopeCourses = useWeekScopeCourses(userId, scope);
+  const roundsQuery = useGolfThisWeek(userId, scope, scopeCourses.courseIds);
   const all = roundsQuery.data ?? [];
 
   const courseIds = useMemo(
     () => all.map((r) => r.course_id).filter((v): v is string => !!v),
     [all],
   );
-  const sets = useDiscoverLensSets(userId, courseIds);
+  const played = usePlayedCourseIds(userId);
+  const playedSet = useMemo(() => new Set(played.ids), [played.ids]);
   const following = useFollowingIdSet(userId);
-
-  const ordered = useMemo(() => orderForLens(all, lens, sets), [all, lens, sets]);
-  const counts = useWeekCounts(ordered);
-  const best = useMemo(() => bestOfWeek(ordered), [ordered]);
-  const rows = useMemo(() => ordered.slice(0, GOLF_WEEK_RAIL_CAP), [ordered]);
 
   const metaQuery = useCourseCardMeta(courseIds);
   const meta = metaQuery.data;
+
+  /* COUNTS RESPECT THE ACTIVE PILL (§S3.6): the region list is grouped from the
+     rounds THIS scope returned, and needs no query of its own (§S3.7). */
+  const regions = useWeekRegionCounts(all, meta);
+  const inRegion = useMemo(
+    () => all.filter((r) => regions.matches(r, region)),
+    [all, regions, region],
+  );
+
+  const ordered = useMemo(() => orderForWeek(inRegion, playedSet), [inRegion, playedSet]);
+  const counts = useWeekCounts(ordered);
+  const best = useMemo(() => bestOfWeek(ordered), [ordered]);
+  const rows = useMemo(() => ordered.slice(0, GOLF_WEEK_RAIL_CAP), [ordered]);
 
   /* ONE batched hole-shape read for the whole rail — never one per card. */
   const scoreIds = useMemo(() => rows.map((r) => r.score_id), [rows]);
@@ -544,10 +573,8 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll, style
      repetition cap can see its neighbours. Never per card. */
   const insights = useMemo(() => buildInsightMap(rows, t as never), [rows, t]);
 
-  const pending = !!userId && roundsQuery.isPending;
+  const pending = !!userId && (roundsQuery.isPending || !scopeCourses.ready);
   if (pending) return <GolfThisWeekShell />;
-  /* §5.3 — NO ROUNDS, NO SECTION. No empty state, no placeholder. */
-  if (rows.length === 0) return null;
 
   const bestToPar = best == null ? null : best.toPar === 0
     ? 'E'
