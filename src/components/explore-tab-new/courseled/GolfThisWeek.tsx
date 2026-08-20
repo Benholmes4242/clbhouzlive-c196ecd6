@@ -95,8 +95,16 @@ function ShapeReveal({ children }: { children: React.ReactNode }) {
       { threshold: 0.4 },
     );
     io.observe(el);
-    return () => io.disconnect();
+    /* A CURVE MUST NEVER BE PERMANENTLY INVISIBLE. If the observer is starved
+       for any reason (clipping, containment, a rail measured at zero), the
+       shape reveals itself anyway. */
+    const failsafe = window.setTimeout(() => setDrawn(true), 1500);
+    return () => {
+      io.disconnect();
+      window.clearTimeout(failsafe);
+    };
   }, [reduced]);
+
 
   const complete = reduced || drawn;
   /* THE OBSERVED ELEMENT MUST NOT BE THE CLIPPED ELEMENT. A self-clipped node
