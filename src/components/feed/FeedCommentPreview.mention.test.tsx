@@ -5,7 +5,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { FeedCommentPreview } from './FeedCommentPreview';
 
 vi.mock('@/components/ui/SquircleAvatar', () => ({
-  SquircleAvatar: ({ alt }: { alt?: string }) => <div data-testid="avatar">{alt}</div>,
+  SquircleAvatar: ({ alt }: { alt?: string }) => <div data-testid="avatar">{alt ?? 'avatar'}</div>,
 }));
 vi.mock('@/components/ui/VerifiedBadge', () => ({
   VerifiedBadge: () => <span data-testid="verified">✓</span>,
