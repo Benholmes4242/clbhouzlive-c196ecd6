@@ -742,7 +742,11 @@ export function GolfThisWeek({
           minWidth: 0,
         }}
       >
-        <WeekScopePills scope={scope} onChange={(s) => onScopeChange?.(s)} style={{ flex: 1 }} />
+        <WeekScopePills
+          scope={scope}
+          onChange={(s) => onScopeChange?.(s)}
+          style={{ flex: '1 1 auto', minWidth: 0 }}
+        />
         <RegionDropdown
           regions={regions}
           selection={region}

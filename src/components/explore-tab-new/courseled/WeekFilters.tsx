@@ -46,6 +46,7 @@ export function WeekScopePills({
         display: 'flex',
         gap: 8,
         overflowX: 'auto',
+        minWidth: 0,
         ...style,
       }}
     >
@@ -144,7 +145,7 @@ export function RegionDropdown({
     : t('discover.week.allRegions', 'Everywhere');
 
   return (
-    <div style={style}>
+    <div style={{ flex: 'none', ...style }}>
       <Select
         value={value}
         onValueChange={(v) => {
@@ -164,7 +165,10 @@ export function RegionDropdown({
           <span className="flex min-w-0 items-center gap-1.5">
             <MapPin size={13} strokeWidth={2} />
             <span className="truncate">{triggerLabel}</span>
-            <span style={{ ...LABEL, color: A.MUTE }}>
+            <span
+              className="tabular-nums"
+              style={{ ...LABEL, color: A.MUTE, marginLeft: 4 }}
+            >
               {selection ? countFor(regions, selection) : regions.total}
             </span>
           </span>
