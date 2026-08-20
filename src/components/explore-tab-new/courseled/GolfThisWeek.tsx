@@ -457,8 +457,11 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
   /* §5.3 — NO ROUNDS, NO SECTION. No empty state, no placeholder. */
   if (rows.length === 0) return null;
 
-  const fmtToPar = (n: number) =>
-    n === 0 ? 'E' : n < 0 ? `\u2212${Math.abs(n)}` : `+${n}`;
+  const bestToPar = best == null ? null : best.toPar === 0
+    ? 'E'
+    : best.toPar < 0
+      ? `\u2212${Math.abs(best.toPar)}`
+      : `+${best.toPar}`;
   const courseNameFor = (r: CircleRoundRow) =>
     meta?.get(r.course_id ?? '')?.name ?? r.course_name ?? '';
 
