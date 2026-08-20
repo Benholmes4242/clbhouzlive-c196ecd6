@@ -614,7 +614,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll, style
 
 
   return (
-    <section>
+    <section style={style}>
       {/* HEADER CONSTRUCTION: heading left, live count right-aligned on the
           SAME line. The "See all" action lives under the first card, not here. */}
       <Eyebrow
