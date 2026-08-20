@@ -423,7 +423,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   raising RoundShape's internal `top` would compress the plot
                   instead, so the gap would vary with the shape of the round. */}
               <div style={{ marginTop: 6 }}>
-                <RoundShape row={r} shape={holeShapes?.get(r.score_id ?? '') ?? null} />
+                <RoundShape row={r} shape={holeShapes?.get(r.score_id ?? '') ?? null} height={SHAPE_H} />
               </div>
 
               {/* THE LOWER BLOCK OWNS THE REMAINING HEIGHT. The rail stretches
