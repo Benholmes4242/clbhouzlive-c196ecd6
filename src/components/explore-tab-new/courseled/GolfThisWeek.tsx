@@ -445,9 +445,10 @@ interface Props {
   pills?: React.ReactNode;
   onCardPress: (r: CircleRoundRow) => void;
   onSeeAll: () => void;
+  style?: React.CSSProperties;
 }
 
-export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Props) {
+export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll, style }: Props) {
   const { t } = useTranslation('courses');
   const roundsQuery = useGolfThisWeek(userId);
   const all = roundsQuery.data ?? [];
