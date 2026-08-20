@@ -1551,7 +1551,20 @@
     "videosHeading": "Latest videos",
     "videosAction": "All videos",
     "clipsHeading": "Clips",
-    "clipsAction": "See all"
+    "clipsAction": "See all",
+    "golfThisWeek": {
+      "heading": "Golf this week",
+      "subline": "Everywhere clbhouz golfers played, and how it went.",
+      "count": "{{rounds}} rounds · {{courses}} courses",
+      "seeAll": "See all {{count}} rounds",
+      "bestLabel": "BEST THIS WEEK",
+      "overline": "THIS WEEK",
+      "follow": "FOLLOW",
+      "following": "FOLLOWING",
+      "ace": "ACE",
+      "albatross": "ALBATROSS",
+      "unknownCourse": "A course"
+    }
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",
