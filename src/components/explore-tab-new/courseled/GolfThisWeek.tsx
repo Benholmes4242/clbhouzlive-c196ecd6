@@ -457,95 +457,185 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
   /* §5.3 — NO ROUNDS, NO SECTION. No empty state, no placeholder. */
   if (rows.length === 0) return null;
 
-  const bestToPar =
-    best == null
-      ? null
-      : best.toPar === 0
-        ? 'E'
-        : best.toPar < 0
-          ? `\u2212${Math.abs(best.toPar)}`
-          : `+${best.toPar}`;
+  const fmtToPar = (n: number) =>
+    n === 0 ? 'E' : n < 0 ? `\u2212${Math.abs(n)}` : `+${n}`;
+  const courseNameFor = (r: CircleRoundRow) =>
+    meta?.get(r.course_id ?? '')?.name ?? r.course_name ?? '';
+
+  /* THE BAND IS THREE COMPARISONS OF EQUAL WEIGHT (§1, move 2) — tiles, not a
+     sentence with footnotes. Each is self-contained: label, figure, who, where. */
+  const withDelta = ordered.filter(
+    (r) => r.delta_index != null && Number.isFinite(r.delta_index),
+  );
+  const biggestMove = withDelta.reduce<CircleRoundRow | null>(
+    (acc, r) =>
+      !acc || Math.abs(r.delta_index as number) > Math.abs(acc.delta_index as number) ? r : acc,
+    null,
+  );
+  const mostImproved = withDelta.reduce<CircleRoundRow | null>(
+    (acc, r) =>
+      (r.delta_index as number) < 0 &&
+      (!acc || (r.delta_index as number) < (acc.delta_index as number))
+        ? r
+        : acc,
+    null,
+  );
+
+  const bandTiles: {
+    key: string;
+    label: string;
+    figure: string;
+    tone: string;
+    row: CircleRoundRow;
+    sub: string;
+  }[] = [];
+
+  if (best) {
+    bandTiles.push({
+      key: 'best',
+      label: t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK'),
+      figure: String(best.row.gross ?? '\u2014'),
+      tone: best.toPar < 0 ? TOPAR_RED : A.INK,
+      row: best.row,
+      sub: `${bestToPar ?? ''} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(best.row)}`.trim(),
+    });
+  }
+  if (biggestMove) {
+    const d = biggestMove.delta_index as number;
+    bandTiles.push({
+      key: 'move',
+      label: t('discover.golfThisWeek.moveLabel', 'BIGGEST MOVE'),
+      figure: `${d < 0 ? '\u2212' : '+'}${Math.abs(d).toFixed(1)}`,
+      tone: Math.abs(d) < 0.05 ? A.MUTE : d < 0 ? A.IMPROVED : A.DRIFTED,
+      row: biggestMove,
+      sub: `${t('discover.friendsRail.index', 'HCP')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(biggestMove)}`,
+    });
+  }
+  if (mostImproved) {
+    const d = mostImproved.delta_index as number;
+    bandTiles.push({
+      key: 'improved',
+      label: t('discover.golfThisWeek.improvedLabel', 'MOST IMPROVED'),
+      figure: `\u2212${Math.abs(d).toFixed(1)}`,
+      tone: A.IMPROVED,
+      row: mostImproved,
+      sub: `${t('discover.friendsRail.index', 'HCP')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(mostImproved)}`,
+    });
+  }
 
   return (
     <section>
+      {/* HEADER CONSTRUCTION MATCHES ITS NEIGHBOURS: heading left, live count and
+          See all right-aligned on the SAME line (Eyebrow's aside slot). */}
       <Eyebrow
         subline={t(
           'discover.golfThisWeek.subline',
           "Everywhere clbhouz golfers played, and how it went.",
         )}
         aside={
-          counts.rounds > rows.length ? (
-            <InkAction onClick={onSeeAll}>
-              {t('discover.golfThisWeek.seeAll', 'See all {{count}} rounds', {
-                count: counts.rounds,
+          <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ ...KICKER, color: A.MUTE }}>
+              {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
+                rounds: counts.rounds,
+                courses: counts.courses,
               })}
-            </InkAction>
-          ) : undefined
+            </span>
+            {counts.rounds > rows.length && (
+              <InkAction onClick={onSeeAll}>
+                {t('discover.golfThisWeek.seeAll', 'See all {{count}} rounds', {
+                  count: counts.rounds,
+                })}
+              </InkAction>
+            )}
+          </span>
         }
       >
         {t('discover.golfThisWeek.heading', 'Golf this week')}
       </Eyebrow>
 
-      {/* THE LIVE COUNT IS THE POINT (§1): the course count is the boast because
-          it is the figure that varies from visit to visit. */}
-      <div style={{ ...KICKER, color: A.MUTE, padding: '0 2px', marginBottom: 10 }}>
-        {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
-          rounds: counts.rounds,
-          courses: counts.courses,
-        })}
-      </div>
-
       {pills}
 
-      {/* THE RELATIVE BAND (§1, move 2). A comparison always has a winner, so
-          in a thin February week it names February's best rather than nothing. */}
-      {best && (
+      {bandTiles.length > 0 && (
         <div
+          className="scrollbar-hide"
           style={{
             display: 'flex',
-            alignItems: 'baseline',
             gap: 8,
-            padding: '9px 0 10px',
-            borderTop: `1px solid ${A.BORDER}`,
-            borderBottom: `1px solid ${A.BORDER}`,
+            overflowX: 'auto',
             marginBottom: 12,
           }}
         >
-          <span style={{ ...LABEL, color: A.MUTE, flexShrink: 0 }}>
-            {t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK')}
-          </span>
-          <span
-            style={{
-              flex: 1,
-              minWidth: 0,
-              fontSize: 12.5,
-              fontWeight: 600,
-              color: A.INK,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {best.row.display_name}
-            {' \u00B7 '}
-            <span style={{ ...NUMF, fontWeight: 700 }}>{best.row.gross}</span>
-            {bestToPar ? (
-              <span
+          {bandTiles.map((tile) => (
+            <div
+              key={tile.key}
+              style={{
+                ...CARD_SHELL,
+                flex: '0 0 auto',
+                width: 158,
+                padding: '9px 10px 10px',
+                fontFamily: SANS,
+              }}
+            >
+              <div style={{ ...LABEL, color: A.MUTE }}>{tile.label}</div>
+              <div
                 style={{
                   ...NUMF,
-                  fontWeight: 700,
-                  color: best.toPar < 0 ? TOPAR_RED : A.INK,
+                  marginTop: 4,
+                  fontSize: 22,
+                  lineHeight: 1,
+                  color: tile.tone,
                 }}
               >
-                {' '}
-                {bestToPar}
-              </span>
-            ) : null}
-            {' \u00B7 '}
-            {meta?.get(best.row.course_id ?? '')?.name ?? best.row.course_name ?? ''}
-          </span>
+                {tile.figure}
+              </div>
+              <div
+                style={{
+                  marginTop: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  minWidth: 0,
+                }}
+              >
+                <SquircleAvatar
+                  src={tile.row.profile_photo_url}
+                  userId={tile.row.user_id}
+                  alt={tile.row.display_name}
+                  size={20}
+                  hideRing
+                />
+                <span
+                  style={{
+                    minWidth: 0,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: A.BODY,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {tile.row.display_name}
+                </span>
+              </div>
+              <div
+                style={{
+                  marginTop: 5,
+                  fontSize: 10.5,
+                  fontWeight: 500,
+                  color: A.MUTE,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {tile.sub}
+              </div>
+            </div>
+          ))}
         </div>
       )}
+
 
       <div
         className="scrollbar-hide"
