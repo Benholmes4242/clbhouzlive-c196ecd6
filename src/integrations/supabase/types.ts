@@ -15797,6 +15797,48 @@ export type Database = {
           },
         ]
       }
+      whs_connect_attempts: {
+        Row: {
+          connection_id: string | null
+          created_at: string
+          duration_ms: number | null
+          eg_status: number | null
+          error_code: string | null
+          failure_reason: string | null
+          finished_at: string | null
+          id: string
+          outcome: string
+          provider: string
+          user_id: string
+        }
+        Insert: {
+          connection_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          eg_status?: number | null
+          error_code?: string | null
+          failure_reason?: string | null
+          finished_at?: string | null
+          id?: string
+          outcome?: string
+          provider?: string
+          user_id: string
+        }
+        Update: {
+          connection_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          eg_status?: number | null
+          error_code?: string | null
+          failure_reason?: string | null
+          finished_at?: string | null
+          id?: string
+          outcome?: string
+          provider?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       whs_connection_nudges: {
         Row: {
           id: string
