@@ -23,7 +23,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import { SC_BIRDIE_DARK } from '@/features/courses/components/holes/_constants';
-import { shapeSentence, IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
+import { shapeSentence, IndexMovementTriangle, movementFor } from '@/components/explore-tab-new/friendRoundParts';
+import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { formatWeekdayShortGB, formatDayMonthShortGB } from '@/i18n/format';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 
