@@ -12,7 +12,9 @@ import { useExploreLens, type ExploreLens } from './hooks/useExploreLens';
 import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
 import { ScopePills } from './wire/ScopePills';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
-import { A, KICKER, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import RateNudge from '@/components/courses/RateNudge';
+import { useRateNudgeCourse } from '@/hooks/useRateNudgeCourse';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useScorecardOpener } from './useScorecardOpener';
@@ -95,6 +97,9 @@ export default function ExploreTabContent({
   // NEW SINCE (BRIEF_DISCOVER_NEW_SINCE): one baseline for the whole visit,
   // written back only on EXIT so markers survive scrolling and tapping.
   const { lastSeen, markSeen } = useDiscoverLastSeen(userId);
+  const { course: nudgeCourse, loading: nudgeLoading } = useRateNudgeCourse(userId);
+  const showRateNudge = nudgeLoading || !!nudgeCourse;
+
   useMarkDiscoverSeenOnExit(markSeen);
 
   const { lens, setLens } = useExploreLens();
@@ -319,33 +324,28 @@ export default function ExploreTabContent({
       <div ref={lensSentinelRef} style={{ height: 1 }} aria-hidden />
 
       {/* The chrome island floats over the page, so the header clears the notch
-          plus the island itself — Discover no longer sits under a hero. */}
+          plus the island itself — Discover no longer sits under a hero.
+          The title block is replaced by the rate nudge when a course is
+          available; otherwise Your Circle (friends rail) owns this spot. */}
       <div
         style={{
-          // The header block owns NO trailing space: the prompt row owns the
-          // 16px above it and the 20px below it, and when the row is absent it
-          // collapses to a single 24px gap of its own.
-          padding: '0 16px 0',
-          // ISLANDS -> EYEBROW = exactly 16px. The island is fixed at
-          // sat + 10px and is 44px tall, so its bottom edge is sat + 54px.
-          // The old max(sat,47) + 68 formula gave 14px on a notch and 61px
-          // without one; sat + 70 gives 16px everywhere.
+          padding: '0 14px',
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
-
         }}
       >
-        <div style={KICKER}>{t('discover.kickerCourses', 'The courses')}</div>
-        <h1
-          style={{
-            margin: '4px 0 0',
-            fontSize: 26,
-            fontWeight: 700,
-            color: A.INK,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          {t('discover.headlineCourses', "Where it's happening")}
-        </h1>
+        {showRateNudge ? (
+          <RateNudge
+            userId={userId ?? ''}
+            onEmptyFallback={() => navigate('/courses')}
+          />
+        ) : (
+          <FriendsPlayedRail
+            userId={userId}
+            lastSeen={lastSeen}
+            onCardPress={handleFriendCard}
+            onSeeAll={() => setFriendsSheet(true)}
+          />
+        )}
       </div>
 
 
@@ -361,12 +361,15 @@ export default function ExploreTabContent({
             the bottom of a rail tile to the next section's eyebrow matches the
             gap from the previous tile's bottom to the current eyebrow. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <FriendsPlayedRail
-            userId={userId}
-            lastSeen={lastSeen}
-            onCardPress={handleFriendCard}
-            onSeeAll={() => setFriendsSheet(true)}
-          />
+          {showRateNudge && (
+            <FriendsPlayedRail
+              userId={userId}
+              lastSeen={lastSeen}
+              onCardPress={handleFriendCard}
+              onSeeAll={() => setFriendsSheet(true)}
+            />
+          )}
+
 
           {/* LATEST VIDEOS. ON TOUR THIS WEEK left this page
               (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL S1): it was the only
