@@ -562,6 +562,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
   if (bestStableford) {
     bandTiles.push({
       key: 'stableford',
+      emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
       label: t('discover.golfThisWeek.stablefordLabel', 'Best stableford'),
       figure: String(bestStableford.stableford_points),
       tone: A.INK,
@@ -572,6 +573,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
   if (mostBirdies) {
     bandTiles.push({
       key: 'birdies',
+      emoji: '\uD83D\uDC26', // BIRD
       label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
       figure: String(mostBirdies.birdies),
       tone: A.INK,
