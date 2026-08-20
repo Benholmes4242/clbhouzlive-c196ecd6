@@ -499,8 +499,7 @@ export default function DiscoverCourseLedSkeleton() {
       <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
         <FriendsRail />
         <TourRail />
-        <ReviewsMosaic />
-        <AroundTheWorldCard />
+        <GolfThisWeekRail />
 
         <MomentsMosaic />
         <MostPlayedPanel />
