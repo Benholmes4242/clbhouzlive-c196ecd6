@@ -96,8 +96,8 @@ export default function ExploreTabContent({
   // NEW SINCE (BRIEF_DISCOVER_NEW_SINCE): one baseline for the whole visit,
   // written back only on EXIT so markers survive scrolling and tapping.
   const { lastSeen, markSeen } = useDiscoverLastSeen(userId);
-  const { course: nudgeCourse, loading: nudgeLoading } = useRateNudgeCourse(userId);
-  const showRateNudge = nudgeLoading || !!nudgeCourse;
+  const { prompt: topPrompt, resolved: promptResolved } = useDiscoverPrompt(userId);
+  const hasPrompt = promptResolved && !!topPrompt;
 
   useMarkDiscoverSeenOnExit(markSeen);
 
