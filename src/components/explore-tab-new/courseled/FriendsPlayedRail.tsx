@@ -253,8 +253,9 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
               >
                 <div style={{ position: 'absolute', inset: 0, background: RAIL_SCRIM }} />
 
-                {/* THE WHEN-CHIP, GLASS. The GOLD ring for a hole in one is the
-                    only gold on the card and is unchanged. */}
+                {/* TOP-RIGHT CHROME: date pill on circle rounds, Suggested
+                    pill on suggested rounds. Same class, same sizing, so the
+                    pill never changes shape when the source flips. */}
                 <span
                   className="fpg-chip"
                   style={{
@@ -271,7 +272,9 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                     ...(hasAce ? { border: `1px solid ${GOLD}` } : null),
                   }}
                 >
-                  {relativeDay(r.play_date, t)}
+                  {r.suggested
+                    ? t('discover.suggestedMark', 'SUGGESTED')
+                    : relativeDay(r.play_date, t)}
                 </span>
 
                 {/* THE GLASS SCORE CHIP. Moved to the top-left of the photo so
