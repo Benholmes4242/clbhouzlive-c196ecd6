@@ -433,7 +433,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   name and reaction sit above their neighbours'. */}
               <div
                 style={{
-                  padding: '9px 11px 10px',
+                  padding: '7px 11px 8px',
                   flex: 1,
                   minHeight: 0,
                   display: 'flex',
