@@ -12,6 +12,8 @@ import { ScopePills } from './wire/ScopePills';
 import type { ExploreLens } from './hooks/useExploreLens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
 
 /**
  * GOLF THIS WEEK — SEE ALL (BRIEF_GOLF_THIS_WEEK §5.2).
@@ -115,9 +117,28 @@ export function GolfThisWeekSheet({
         </div>
       </div>
 
-      {/* THE LENS CARRIES THROUGH (§5.2). Sticky is harmless inside the sheet's
-          own scroll container and keeps the pills reachable in a long week. */}
-      <ScopePills lens={lens} onChange={onLensChange} style={{ position: 'static' }} />
+      {/* THE LENS CARRIES THROUGH (§5.2). Wrapper keeps the pill row flush to
+          the sheet edges and prevents the first pill being clipped by a
+          non-stretching flex item. */}
+      <div
+        style={{
+          background: A.CANVAS,
+          borderBottom: `1px solid ${A.BORDER}`,
+        }}
+      >
+        <ScopePills
+          lens={lens}
+          onChange={onLensChange}
+          style={{
+            position: 'static',
+            background: 'transparent',
+            borderBottom: 'none',
+            width: '100%',
+            boxSizing: 'border-box',
+          }}
+        />
+      </div>
+
 
       <div
         style={{
