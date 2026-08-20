@@ -23,18 +23,16 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import { SC_BIRDIE_DARK } from '@/features/courses/components/holes/_constants';
-import { shapeSentence } from '@/components/explore-tab-new/friendRoundParts';
+import { shapeSentence, IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 import { formatWeekdayShortGB, formatDayMonthShortGB } from '@/i18n/format';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
-import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
-
 
 const INK = '#F4F7F9';
 const MUTE = 'rgba(255,255,255,0.62)';
 const DIM = 'rgba(255,255,255,0.40)';
 const AMBER = '#F7931E';
-const GREEN = INDEX_DELTA.dark.improved;
-const RED = '#FF6B60';
+const HCP_IMPROVING = '#16a34a';
+const HCP_DRIFTING = '#dc2626';
 const HAIRLINE = 'rgba(255,255,255,0.08)';
 
 const NUM: React.CSSProperties = {
@@ -53,7 +51,7 @@ function fmtToPar(n: number | null): string {
 function toParColor(n: number | null): string {
   if (n == null) return MUTE;
   if (n === 0) return INK;
-  return n < 0 ? RED : MUTE;
+  return n < 0 ? HCP_DRIFTING : MUTE;
 }
 
 function dateKicker(playDate: string | null): string | null {
@@ -573,12 +571,16 @@ export const PostRoundCard: React.FC<Props> = ({
               </span>
             )}
             {round.deltaIndex != null && (
-              <span style={{ color: DIM, marginLeft: 'auto' }}>
-                Index{' '}
-                <span style={{ ...NUM, color: round.deltaIndex < 0 ? GREEN : INK }}>
-                  {round.deltaIndex > 0 ? '+' : ''}
+              <span style={{ color: DIM, marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ color: DIM }}>Index</span>
+                <span style={{ ...NUM, color: round.deltaIndex < 0 ? HCP_IMPROVING : HCP_DRIFTING, fontWeight: 700 }}>
                   {round.deltaIndex.toFixed(1)}
                 </span>
+                <IndexMovementTriangle
+                  direction={round.deltaIndex < 0 ? 'down' : 'up'}
+                  color={round.deltaIndex < 0 ? HCP_IMPROVING : HCP_DRIFTING}
+                  size={7}
+                />
               </span>
             )}
           </div>
