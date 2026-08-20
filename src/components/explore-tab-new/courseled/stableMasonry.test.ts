@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { splitMasonry } from '@/components/explore-tab-new/courseled/AroundTheWorld';
+import { splitMasonry } from '@/components/explore-tab-new/courseled/stableMasonry';
 import { createMasonryAssignment, placeStable } from '@/components/explore-tab-new/courseled/stableMasonry';
 
 const H = [206, 168, 146, 130, 122, 116];
