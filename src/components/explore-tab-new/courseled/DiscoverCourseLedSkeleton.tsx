@@ -85,11 +85,12 @@ function TextBar({ w, h = 11 }: { w: number | string; h?: number }) {
 }
 
 /**
- * Section 2 — friends rail. MEASURED off FriendsPlayedRail: 224 wide, a 104px
+ * Section 2 — friends rail. MEASURED off FriendsPlayedRail: 224 wide, a 90px
  * photograph (PHOTO_H) carrying the glass score chip, the full-bleed round
- * shape strip at 60 (SHAPE_H), then the body — ONE reserved insight line
+ * shape strip at 52 (SHAPE_H), then the body — ONE reserved insight line
  * (INSIGHT_LINE_RESERVE ~15), a hairline, and the member/reaction row.
- * Total 233. The strip grew 34 -> 60 so the curve has amplitude.
+ * Total 208. The strip grew 34 -> 60 -> 52 so the curve stays legible while the
+ * tile is condensed.
  */
 export function FriendsRail() {
   return (
