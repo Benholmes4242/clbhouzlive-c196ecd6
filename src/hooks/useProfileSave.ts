@@ -67,6 +67,7 @@ export function useProfileSave(userId: string) {
         // Write to manual_handicap_index ONLY. eg_handicap_index is owned
         // exclusively by the WHS connect/sync edge functions.
         manual_handicap_index: parseHcpFormString(form.handicapIndex),
+
         home_club_visibility: form.homeClubVisibility,
         additional_clubs_visibility: form.additionalClubsVisibility,
         show_additional_home_clubs: form.additionalClubsVisibility !== 'private',
