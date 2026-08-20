@@ -9,7 +9,6 @@ import {
 } from '@/hooks/useDiscoverLastSeen';
 
 import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
-import { ScopePills } from './wire/ScopePills';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
@@ -17,13 +16,17 @@ import { useDiscoverPrompt } from './courseled/hooks/useDiscoverPrompt';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { FriendsRoundsSeeAllSheet } from './FriendsRoundsSeeAllSheet';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { OneThingRow } from './courseled/OneThingRow';
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { GolfThisWeek } from './courseled/GolfThisWeek';
+import {
+  DEFAULT_WEEK_SCOPE,
+  type WeekScope,
+} from './courseled/hooks/useGolfThisWeek';
+import type { RegionSelection } from './courseled/hooks/useWeekRegionCounts';
 import { GolfThisWeekSheet } from './GolfThisWeekSheet';
 
 
@@ -138,7 +141,6 @@ export default function ExploreTabContent({
 
   const mostPlayed = mostPlayedQuery.data;
 
-  const [friendsSheet, setFriendsSheet] = useState(false);
   const [golfWeekSheet, setGolfWeekSheet] = useState(false);
   const [findGolfers, setFindGolfers] = useState(false);
   const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
@@ -446,16 +448,6 @@ export default function ExploreTabContent({
           style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }}
         />
       </div>
-
-      <FriendsRoundsSeeAllSheet
-        open={friendsSheet}
-        onClose={() => setFriendsSheet(false)}
-        userId={userId}
-        onRowPress={(scoreId, uid) => {
-          if (scoreId) opener.openByScore(scoreId, null, uid);
-          else opener.openProfile(uid);
-        }}
-      />
 
       <GolfThisWeekSheet
         open={golfWeekSheet}
