@@ -32,7 +32,7 @@ import { countNewSince, useReportNewCount } from './newSince';
 import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, GOLD, InkAction, NUMF, SANS } from './tokens';
+import { A, FIGS, CARD_SHELL, Eyebrow, GOLD, InkAction, NUMF, SANS } from './tokens';
 
 /**
  * Section 1 — WHO'S BEEN PLAYING (BRIEF_FRIENDS_PLAYED_TILE_GLASS +
