@@ -162,10 +162,18 @@ function FollowButton({
   const { activeActor } = useActiveActor();
   const toggle = useToggleFollow();
 
+  /* THE VIEWER IS THE AUTH USER ID, not a field on the actor. ActiveActor has
+     no `userId` — reading it always yielded undefined and useToggleFollow threw
+     "missing viewer identity". This is the Clubhouse derivation verbatim
+     (FriendsEmptyState): actor id for the ACTOR, auth id for the USER. */
+  const viewerActorType = activeActor?.type === 'business' ? 'business' : 'personal';
+  const viewerActorId = activeActor?.id ?? viewerUserId;
+
   const onClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
       if (toggle.isPending) return;
+      if (!viewerUserId || !viewerActorId) return;
 
       const key = ['courseled', 'following-ids', viewerUserId] as const;
       const previous = queryClient.getQueryData<Set<string>>(key);
@@ -183,17 +191,17 @@ function FollowButton({
           targetActorType: 'personal',
           targetActorId: targetUserId,
           targetUserId,
-          viewerActorType: activeActor?.type === 'business' ? 'business' : 'personal',
-          viewerActorId:
-            activeActor?.type === 'business' ? activeActor.id : activeActor?.userId,
-          viewerUserId: activeActor?.userId,
+          viewerActorType,
+          viewerActorId,
+          viewerUserId,
           isFollowing: isFollowed,
         },
         {
-          /* ROLL BACK to exactly what was there before the tap. */
+          /* ROLL BACK to exactly what was there before the tap, and SAY SO. */
           onError: () => {
             if (previous) queryClient.setQueryData<Set<string>>(key, new Set(previous));
             else void queryClient.invalidateQueries({ queryKey: ['courseled', 'following-ids'] });
+            toast.error('Could not update follow status. Please try again.');
           },
           onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: ['courseled', 'following-ids'] });
@@ -201,8 +209,17 @@ function FollowButton({
         },
       );
     },
-    [activeActor, isFollowed, queryClient, targetUserId, toggle, viewerUserId],
+    [
+      isFollowed,
+      queryClient,
+      targetUserId,
+      toggle,
+      viewerActorId,
+      viewerActorType,
+      viewerUserId,
+    ],
   );
+
 
   return (
     <button
