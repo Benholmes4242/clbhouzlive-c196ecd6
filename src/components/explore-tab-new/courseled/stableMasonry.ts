@@ -80,3 +80,23 @@ export function rememberColumns<T extends { slotKey: string }>(
   assignment.byKey.clear();
   columns.forEach((col, ci) => col.forEach((tile) => assignment.byKey.set(tile.slotKey, ci)));
 }
+
+/**
+ * SHORTEST-COLUMN PLACEMENT. Walk the ranked list in order, put each tile in
+ * whichever column is currently shorter by TOTAL rendered height (photo +
+ * panel + the 8px gap), tie to the left. Pure and deterministic.
+ *
+ * KNOWN AND ACCEPTED: visual order is therefore not strictly rank order. That
+ * is inherent to masonry. Alternating strictly left/right instead would leave
+ * one column consistently longer on every render.
+ */
+export function splitMasonry<T>(items: T[], heightOf: (item: T, index: number) => number) {
+  const cols: T[][] = [[], []];
+  const totals = [0, 0];
+  items.forEach((item, i) => {
+    const c = totals[0] <= totals[1] ? 0 : 1;
+    cols[c].push(item);
+    totals[c] += heightOf(item, i) + (cols[c].length > 1 ? 8 : 0);
+  });
+  return { columns: cols, totals };
+}

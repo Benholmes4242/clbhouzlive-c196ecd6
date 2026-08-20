@@ -8,10 +8,6 @@ import {
   useMarkDiscoverSeenOnExit,
 } from '@/hooks/useDiscoverLastSeen';
 import { useExploreLens, type ExploreLens } from './hooks/useExploreLens';
-import { useDiscoverLensSets } from './courseled/hooks/useDiscoverLensSets';
-import { useWantToPlayToggle } from '@/hooks/useWantToPlayToggle';
-import { lensLabelKey } from './wire/ScopePills';
-import { toast } from '@/lib/toast';
 
 import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
 import { ScopePills } from './wire/ScopePills';
@@ -28,8 +24,8 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { FriendsPlayedRail } from './courseled/FriendsPlayedRail';
 import { OneThingRow } from './courseled/OneThingRow';
 import { FindGolfersSheet } from './FindGolfersSheet';
-import { AroundTheWorld } from './courseled/AroundTheWorld';
-import { PersonalBests } from './courseled/PersonalBests';
+import { GolfThisWeek } from './courseled/GolfThisWeek';
+import { GolfThisWeekSheet } from './GolfThisWeekSheet';
 
 
 import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
@@ -136,22 +132,12 @@ export default function ExploreTabContent({
   const mostPlayed = mostPlayedQuery.data;
 
   const [friendsSheet, setFriendsSheet] = useState(false);
+  const [golfWeekSheet, setGolfWeekSheet] = useState(false);
   const [findGolfers, setFindGolfers] = useState(false);
   const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
   const [honoursSheet, setHonoursSheet] = useState(false);
   const [honoursMode, setHonoursMode] = useState<HonoursMode>('recent');
   const [honoursFocus, setHonoursFocus] = useState<string | null>(null);
-
-  /**
-   * THE SHARED MEMBER BUDGET (BRIEF_PERSONAL_BESTS_SECTION §4). Standout Rounds
-   * reports who it is ACTUALLY rendering once its tiles settle; Personal Bests
-   * spends two appearances per member across both sections. `null` means not yet
-   * settled, and the lower section renders nothing until it is.
-   */
-  const [standoutCounts, setStandoutCounts] = useState<Map<string, number> | null>(null);
-  const handleStandoutMembers = useCallback((counts: Map<string, number>) => {
-    setStandoutCounts(counts);
-  }, []);
 
   /**
    * LATEST REVIEWS LEFT THIS PAGE (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL
@@ -194,96 +180,14 @@ export default function ExploreTabContent({
     [lens, setLens],
   );
 
-  // === RELEVANCE LENSES (BRIEF_DISCOVER_RELEVANCE) =========================
-  // Membership sets are resolved ONCE for the whole pool — no per-card query.
-  const poolCourseIds = useMemo(
-    () => [...new Set(pool.map((e) => e.courseId).filter(Boolean))] as string[],
-    [pool],
-  );
-  const sets = useDiscoverLensSets(userId, poolCourseIds);
-  const { toggle: toggleWantToPlay, canShortlist: signedIn } = useWantToPlayToggle();
-
-  // Optimistic shortlist overlay: the lens and the glyph read through it, so a
-  // tap lands instantly and rolls back on failure.
-  const [shortlistOverlay, setShortlistOverlay] = useState<Record<string, boolean>>({});
-  const isShortlisted = useCallback(
-    (courseId: string) => shortlistOverlay[courseId] ?? sets.shortlist.has(courseId),
-    [shortlistOverlay, sets.shortlist],
-  );
-
-  const handleToggleShortlist = useCallback(
-    (courseId: string) => {
-      const next = !isShortlisted(courseId);
-      setShortlistOverlay((prev) => ({ ...prev, [courseId]: next }));
-      analyticsEvents.track('discover_shortlist_toggle', { course_id: courseId, added: next });
-      void toggleWantToPlay({ courseId, want: next }).catch(() => {
-        setShortlistOverlay((prev) => ({ ...prev, [courseId]: !next }));
-        toast.error(t('discover.shortlist.failed', 'Could not update your list'));
-      });
-    },
-    [isShortlisted, toggleWantToPlay, t],
-  );
-
-  // A played/rated course is never a want-to-play course, so the control is
-  // hidden there (same resolution the course page's status toggle applies).
-  const canShortlistCourse = useCallback(
-    (courseId: string) => signedIn && !sets.played.has(courseId),
-    [signedIn, sets.played],
-  );
-
   /**
-   * NO RARITY FLOOR (BRIEF_FEAT_BALANCE_AND_LENS_ORDER §2). The old worldwide
-   * floor dropped birdie hauls so the commonest kind could not swamp an
-   * unfiltered view. THE KIND BUDGET NOW DOES THAT JOB — two tiles of eight is
-   * not swamping — and the floor would leave Worldwide (now the default lens)
-   * with only four kinds, forcing the budget to widen and show three or four
-   * crowns again. Ben's judgement, recorded: birdie hauls and bogey-free rounds
-   * are just as impressive. Do not reinstate it.
+   * THE LENS MACHINERY MOVED INTO THE SECTION (BRIEF_GOLF_THIS_WEEK §3). The
+   * pool filters, priority ordering, shortlist overlay and lens empty copy all
+   * belonged to Around the world, which is deleted; Golf this week resolves its
+   * own membership sets over the course ids of the rounds it actually holds, and
+   * the pills are rendered into it. `useDiscoverWire` survives here only for the
+   * honours board's `legendary` list.
    */
-  const events = useMemo(() => {
-    if (lens === 'worldwide') {
-      return pool;
-    }
-    if (lens === 'played') {
-      return pool.filter((e) => !!e.courseId && sets.played.has(e.courseId));
-    }
-    if (lens === 'top_100') {
-      return pool.filter((e) => !!e.courseId && sets.top100.has(e.courseId));
-    }
-    /* SUGGESTED SORTS, IT DOES NOT FILTER (BRIEF_STANDOUT_ROUNDS_BACKFILL §1).
-       Relevance decides ORDER, not membership: the whole pool is kept so the
-       section reaches eight tiles. Ordering itself stays with priorityFor
-       downstream. */
-    return pool.filter((e) => !!e.courseId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pool, lens, sets.played, sets.top100, isShortlisted]);
-
-
-  /** FOR YOU order: shortlist, then Top 100, then played, then the rest. */
-  const priorityFor = useCallback(
-    (courseId: string) => {
-      if (lens !== 'suggested') return 0;
-      if (isShortlisted(courseId)) return 0;
-      if (sets.top100.has(courseId)) return 1;
-      if (sets.played.has(courseId)) return 2;
-      return 3;
-    },
-    [lens, isShortlisted, sets.top100, sets.played],
-  );
-
-  const lensMeta = lensLabelKey(lens);
-  const lensLabel = t(lensMeta.key, lensMeta.fallback);
-  /* SUGGESTED IS EMPTY ONLY WHEN THE WHOLE POOL IS (§3): the old
-     "rate a course" copy became unreachable and untrue with the backfill. */
-  const lensEmptyCopy =
-    lens === 'top_100'
-      ? t('discover.lens.emptyTop100', 'No Top 100 news in the last 90 days.')
-      : lens === 'played'
-        ? t('discover.lens.emptyPlayed', 'Nothing at your courses in the last 90 days.')
-        : t('discover.emptyPool', 'Nothing logged anywhere in the last 90 days.');
-
-
-
 
   // Every course-led surface ROUTES to the course page: it is a different
   // surface with its own job. Sheets are only for bounded sets.
@@ -484,39 +388,21 @@ export default function ExploreTabContent({
 
 
 
-          <AroundTheWorld
-            events={events}
-            isPending={wireLoading}
+          <GolfThisWeek
             userId={userId}
-            lastSeen={lastSeen}
-            scopeKey={lens}
+            lens={lens}
+            /* THE PILLS BELONG TO THIS SECTION NOW (§3). NO WRAPPER DIV: they
+               are position:sticky and a wrapper of their exact height becomes
+               their containing block, giving them zero travel. */
             pills={
-              // The pills belong to Around the World: 12px above (10 from the
-              // eyebrow + 2), 14px below so they sit closer to their cards.
-              // NO WRAPPER DIV: the pills are position:sticky, and a wrapper of
-              // their exact height becomes their containing block and gives them
-              // zero travel. The margin rides on the sticky element itself so the
-              // section is the sticky container (pins at the top of the section,
-              // releases when the section scrolls past).
               <ScopePills
                 lens={lens}
                 onChange={handleLensChange}
                 style={{ margin: '2px -14px 14px' }}
               />
             }
-
-            onCoursePress={(id) => goCourse(id, 'around_the_world')}
-            onFeatPress={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)}
-            lensLabel={lensLabel}
-            emptyCopy={lensEmptyCopy}
-            priorityFor={priorityFor}
-            canShortlist={canShortlistCourse}
-            isShortlisted={isShortlisted}
-            onToggleShortlist={handleToggleShortlist}
-            onExpand={(revealed) =>
-              analyticsEvents.track('discover_courses_expanded', { revealed })
-            }
-            onRenderedMembers={handleStandoutMembers}
+            onCardPress={handleFriendCard}
+            onSeeAll={() => setGolfWeekSheet(true)}
           />
         </div>
 
@@ -527,18 +413,6 @@ export default function ExploreTabContent({
           items={communityVideos.data?.clips ?? []}
           onTilePress={() => navigate('/community')}
           onSeeAll={() => navigate('/community')}
-        />
-
-
-
-        {/* PERSONAL BESTS — the second tier, feats measured against the member's
-            OWN history. Directly below its sibling, and NOT a fifth lens: the
-            lenses filter courses, this changes whose history the bar comes from. */}
-        <PersonalBests
-          userId={userId}
-          standoutCounts={standoutCounts}
-          onCoursePress={(id) => goCourse(id, 'personal_bests')}
-          onFeatPress={(scoreId, ownerId) => opener.openByScore(scoreId, null, ownerId)}
         />
 
 
@@ -588,6 +462,18 @@ export default function ExploreTabContent({
         open={friendsSheet}
         onClose={() => setFriendsSheet(false)}
         userId={userId}
+        onRowPress={(scoreId, uid) => {
+          if (scoreId) opener.openByScore(scoreId, null, uid);
+          else opener.openProfile(uid);
+        }}
+      />
+
+      <GolfThisWeekSheet
+        open={golfWeekSheet}
+        onClose={() => setGolfWeekSheet(false)}
+        userId={userId}
+        lens={lens}
+        onLensChange={handleLensChange}
         onRowPress={(scoreId, uid) => {
           if (scoreId) opener.openByScore(scoreId, null, uid);
           else opener.openProfile(uid);

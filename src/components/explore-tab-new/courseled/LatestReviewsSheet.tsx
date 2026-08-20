@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { ReviewTile, reviewTier, REVIEW_TILE_HEIGHT } from './ReviewTile';
-import { splitMasonry } from './AroundTheWorld';
+import { splitMasonry } from './stableMasonry';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 
 /**

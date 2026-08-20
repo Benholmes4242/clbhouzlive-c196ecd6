@@ -90,6 +90,16 @@ export interface CircleRoundRow {
    * tile marks it; the tap behaves identically.
    */
   suggested: boolean;
+  /** TRUE when the round belongs to the viewing member. */
+  is_self: boolean;
+  /**
+   * THE HANDICAP MOVEMENT THIS ROUND PRODUCED (BRIEF_GOLF_THIS_WEEK §1.3).
+   * gam_round_stats.delta_index, written by gam-evaluator: the index carried by
+   * the NEXT score minus the index carried by THIS one. Negative = improved.
+   * Distinct from `hcp_delta`, which is "current index vs the index at the
+   * time" and is a drift figure, not this round's consequence.
+   */
+  delta_index: number | null;
 }
 
 
@@ -106,6 +116,16 @@ interface Options {
    * asking about their own people, not for more suggestions.
    */
   includeSuggested?: boolean;
+  /**
+   * 'circle'   — the friends rail: circle rounds, one per member, suggested
+   *              interleaved at a fixed ratio. UNCHANGED, and the default.
+   * 'everyone' — GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK §1): EVERY visible round
+   *              in the window, no per-member cap, no feat threshold, newest
+   *              first. RLS still decides what is visible.
+   */
+  scope?: 'circle' | 'everyone';
+  /** Lookback in days. Golf this week passes 7; the rail keeps 60. */
+  windowDays?: number;
 }
 
 const DAY_MS = 86_400_000;
@@ -113,10 +133,25 @@ const WINDOW_DAYS = 60;
 
 export function useCircleLatestRounds(
   userId: string | undefined,
-  { limit = 4, allowMultiplePerFriend = false, includeSuggested = true }: Options = {},
+  {
+    limit = 4,
+    allowMultiplePerFriend = false,
+    includeSuggested = true,
+    scope = 'circle',
+    windowDays = WINDOW_DAYS,
+  }: Options = {},
 ) {
   return useQuery({
-    queryKey: ['circle-latest-rounds', userId, limit, allowMultiplePerFriend, includeSuggested],
+    queryKey: [
+      'circle-latest-rounds',
+      userId,
+      limit,
+      allowMultiplePerFriend,
+      includeSuggested,
+      scope,
+      windowDays,
+    ],
+
 
     queryFn: async (): Promise<CircleRoundRow[]> => {
       if (!userId) return [];
@@ -167,15 +202,16 @@ export function useCircleLatestRounds(
         longest_birdie_run: number | null;
         longest_par_or_better_run: number | null;
         sub_80: boolean | null;
+        delta_index: number | string | null;
       };
 
       const ROUND_COLS =
-        'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80';
+        'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80, delta_index';
 
-      // 2. Circle rounds — WINDOW_DAYS lookback, ordered newest first.
-      const windowStartIso = new Date(Date.now() - WINDOW_DAYS * DAY_MS).toISOString().slice(0, 10);
+      // 2. Circle rounds — windowDays lookback, ordered newest first.
+      const windowStartIso = new Date(Date.now() - windowDays * DAY_MS).toISOString().slice(0, 10);
       let circleRounds: Round[] = [];
-      if (circleIds.length > 0) {
+      if (scope === 'circle' && circleIds.length > 0) {
         const { data: rounds } = await supabase
           .from('gam_round_stats' as never)
           .select(ROUND_COLS)
@@ -212,6 +248,27 @@ export function useCircleLatestRounds(
       pickedRounds.sort((a, b) => b.play_date.localeCompare(a.play_date));
 
       /**
+       * SCOPE 'EVERYONE' (BRIEF_GOLF_THIS_WEEK §1, move 1): EVERY round anyone
+       * played in the window, newest first — no circle predicate, no per-member
+       * cap and NO FEAT THRESHOLD. One read replaces the two above; the whole
+       * enrichment pipeline below is shared, which is why this lives here rather
+       * than in a second hook that would have to re-derive nines, records,
+       * histories and index movement.
+       */
+      if (scope === 'everyone') {
+        const { data: all } = await supabase
+          .from('gam_round_stats' as never)
+          .select(ROUND_COLS)
+          .gte('play_date', windowStartIso)
+          .eq('holes_played', 18)
+          .order('play_date', { ascending: false })
+          .limit(limit);
+        pickedRounds.length = 0;
+        pickedRounds.push(...(((all ?? []) as unknown) as Round[]));
+      }
+
+
+      /**
        * SUGGESTED ROUNDS ARE INTERLEAVED AT A FIXED RATIO
        * (CORRECTION_WHOS_BEEN_PLAYING_RATIO §1): ONE SUGGESTED ROUND AFTER
        * EVERY FIVE CIRCLE ROUNDS — so positions 6 and 12 are suggested — and
@@ -226,7 +283,7 @@ export function useCircleLatestRounds(
        */
       const RATIO = 5;
       const suggestedWindow: Round[] = [];
-      if (includeSuggested) {
+      if (includeSuggested && scope === 'circle') {
         const { data: pool } = await supabase
           .from('gam_round_stats' as never)
           .select(ROUND_COLS)
@@ -549,7 +606,12 @@ export function useCircleLatestRounds(
           is_course_record: !!r.whs_score_id && recordScoreIds.has(r.whs_score_id),
           is_first_sub_80:
             r.sub_80 === true && firstSub80ByUser.get(r.user_id) === r.play_date,
-          suggested: suggestedIds.has(r.whs_score_id ?? `${r.user_id}-${r.play_date}`),
+          suggested:
+            scope === 'everyone'
+              ? r.user_id !== userId && !circleSet.has(r.user_id)
+              : suggestedIds.has(r.whs_score_id ?? `${r.user_id}-${r.play_date}`),
+          is_self: r.user_id === userId,
+          delta_index: r.delta_index == null ? null : Number(r.delta_index),
 
         };
 

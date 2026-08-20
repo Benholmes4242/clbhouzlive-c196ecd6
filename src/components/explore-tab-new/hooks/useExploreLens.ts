@@ -17,14 +17,14 @@ export type ExploreLens = 'suggested' | 'top_100' | 'played' | 'worldwide';
 const LENSES: ExploreLens[] = ['suggested', 'top_100', 'played', 'worldwide'];
 
 /**
- * WORLDWIDE IS THE LANDING LENS (BRIEF_FEAT_BALANCE_AND_LENS_ORDER §3).
- * Suggested is relevance-led and therefore narrower; on a small member base it
- * leans toward a handful of familiar courses, and a discovery section that is
- * empty for a new member is failing at the one job it has. The lens is
- * URL-backed only (?lens=), so a member who has chosen one keeps it for as long
- * as that URL lives; there is no per-member persistence.
+ * SUGGESTED IS THE LANDING LENS (BRIEF_GOLF_THIS_WEEK §3). The old objection to
+ * it — that a relevance lens can come back empty — no longer applies: on Golf
+ * this week SUGGESTED ORDERS AND NEVER FILTERS, so the section holds the same
+ * rounds under it as under Worldwide, in the order that spreads courses and
+ * faces widest. With a median of four follows per member, the app choosing on
+ * their behalf is the correct default. Still URL-backed only (?lens=).
  */
-export const DEFAULT_LENS: ExploreLens = 'worldwide';
+export const DEFAULT_LENS: ExploreLens = 'suggested';
 
 export function useExploreLens() {
   const [params, setParams] = useSearchParams();
