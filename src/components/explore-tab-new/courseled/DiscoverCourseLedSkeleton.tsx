@@ -99,24 +99,24 @@ export function FriendsRail() {
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
           <div key={i} style={{ ...CARD_SHELL, width: 224, flexShrink: 0, padding: 0 }}>
-            <Bar style={{ borderRadius: 0, height: 104, width: '100%' }} />
+            <Bar style={{ borderRadius: 0, height: 90, width: '100%' }} />
             {/* The shape strip is full bleed and sits directly under the photo. */}
-            <Bar style={{ borderRadius: 0, height: 60, width: '100%' }} />
-            <div style={{ padding: '9px 11px 10px' }}>
+            <Bar style={{ borderRadius: 0, height: 52, width: '100%' }} />
+            <div style={{ padding: '7px 11px 8px' }}>
               <div style={{ minHeight: 15, display: 'flex', flexDirection: 'column' }}>
                 <TextBar w={'92%'} h={10} />
               </div>
 
               <div
                 style={{
-                  marginTop: 9,
+                  marginTop: 6,
                   borderTop: `1px solid ${A.BORDER}`,
-                  paddingTop: 8,
+                  paddingTop: 6,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: 8,
-                  height: 25,
+                  height: 22,
                   boxSizing: 'border-box',
                 }}
               >
