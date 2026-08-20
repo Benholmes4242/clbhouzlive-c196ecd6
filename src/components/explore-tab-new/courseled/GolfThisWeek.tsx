@@ -139,19 +139,45 @@ function ShapeReveal({ children }: { children: React.ReactNode }) {
 
 }
 
-/** §2.2 — a REAL follow button, the highest-value tap on the page. */
-function FollowButton({ targetUserId }: { targetUserId: string }) {
+/**
+ * §2.2 — a REAL follow button, the highest-value tap on the page, and the ONLY
+ * <button> inside the tile (the tile itself is a role="button" div, because a
+ * button nested in a button is invalid HTML and WebKit swallows the inner tap).
+ *
+ * IT HOLDS NO STATE, exactly like FeedFollowPill in the Clubhouse card: the
+ * truth is the cached following-id set, so optimism survives a remount and
+ * every tile for the same member flips together.
+ */
+function FollowButton({
+  targetUserId,
+  isFollowed,
+  viewerUserId,
+}: {
+  targetUserId: string;
+  isFollowed: boolean;
+  viewerUserId: string | undefined;
+}) {
   const { t } = useTranslation('courses');
   const queryClient = useQueryClient();
   const { activeActor } = useActiveActor();
   const toggle = useToggleFollow();
-  const [done, setDone] = useState(false);
 
   const onClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      if (toggle.isPending || done) return;
-      setDone(true);
+      if (toggle.isPending) return;
+
+      const key = ['courseled', 'following-ids', viewerUserId] as const;
+      const previous = queryClient.getQueryData<Set<string>>(key);
+      /* OPTIMISM LIVES IN THE CACHE, not in a local flag. A new Set, so the
+         query's referential identity changes and every reader re-renders. */
+      queryClient.setQueryData<Set<string>>(key, (old) => {
+        const next = new Set(old ?? []);
+        if (isFollowed) next.delete(targetUserId);
+        else next.add(targetUserId);
+        return next;
+      });
+
       toggle.mutate(
         {
           targetActorType: 'personal',
@@ -161,36 +187,41 @@ function FollowButton({ targetUserId }: { targetUserId: string }) {
           viewerActorId:
             activeActor?.type === 'business' ? activeActor.id : activeActor?.userId,
           viewerUserId: activeActor?.userId,
-          isFollowing: false,
+          isFollowing: isFollowed,
         },
         {
-          onError: () => setDone(false),
+          /* ROLL BACK to exactly what was there before the tap. */
+          onError: () => {
+            if (previous) queryClient.setQueryData<Set<string>>(key, new Set(previous));
+            else void queryClient.invalidateQueries({ queryKey: ['courseled', 'following-ids'] });
+          },
           onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: ['courseled', 'following-ids'] });
           },
         },
       );
     },
-    [activeActor, done, queryClient, targetUserId, toggle],
+    [activeActor, isFollowed, queryClient, targetUserId, toggle, viewerUserId],
   );
 
   return (
     <button
       type="button"
       onClick={onClick}
+      aria-label={isFollowed ? 'Unfollow' : 'Follow'}
       style={{
         ...LABEL,
         flexShrink: 0,
         fontFamily: SANS,
-        color: done ? A.MUTE : A.PANEL,
-        background: done ? 'transparent' : A.INK,
-        border: `1px solid ${done ? A.BORDER : A.INK}`,
+        color: isFollowed ? A.MUTE : A.PANEL,
+        background: isFollowed ? 'transparent' : A.INK,
+        border: `1px solid ${isFollowed ? A.BORDER : A.INK}`,
         borderRadius: 999,
         padding: '5px 10px',
         cursor: 'pointer',
       }}
     >
-      {done
+      {isFollowed
         ? t('discover.golfThisWeek.following', 'FOLLOWING')
         : t('discover.golfThisWeek.follow', 'FOLLOW')}
     </button>
