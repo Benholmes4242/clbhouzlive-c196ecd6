@@ -67,14 +67,14 @@ import { buildMomentQueue } from '@/features/community/momentQueue';
  * comment documented six with "Around the world" second, which the code had
  * never matched.
  *
- *   1 Where your friends played   rail        (hidden with no friend rounds)
+ *   TOP SLOT: Rate nudge when available, otherwise Your Circle
+ *   1 Your Circle                 rail        (hidden when promoted to top slot)
  *   2 On tour this week           facts rail  (next-up fallback off-week)
  *   3 Latest reviews              mosaic
  *   4 Around the world            feed        region pills live here
  *   5 From the community          mosaic      read-only viewer
  *   6 Most played this week       leaderboard
  *   7 The honours board           board       never windowed
-
  *
  * The "This week on clbhouz" pulse band from the signed-off mock is REMOVED per
  * the brief and must not be reinstated.
