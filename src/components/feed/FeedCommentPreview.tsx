@@ -26,6 +26,7 @@
  *   light (#0F172A ramp over #F8FAFC): 1.00 #0F172A, 0.60 #6C727E, 0.42 #969BA4
  */
 import React from 'react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
