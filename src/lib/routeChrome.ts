@@ -1,4 +1,6 @@
 import {
+  CANVAS_DARK_CANVAS,
+  isCanvasDarkRoute,
   isDarkChromeRoute,
   isImmersiveRoute,
   isLightImmersiveRoute,
@@ -82,12 +84,22 @@ export function applyRouteChrome(pathname: string, force = false): void {
   const isAuth = pathname.startsWith('/auth');
   const lightImmersive = isLightImmersiveRoute(pathname);
 
-  const surface = darkChrome
+  // Echo / Messages: the near-black canvas owns the notch and the home
+  // indicator band. Chrome matches #05070A instead of the light default.
+  const canvasDark = isCanvasDarkRoute(pathname);
+
+  const surface = canvasDark
+    ? CANVAS_DARK_CANVAS
+    : darkChrome
     ? '#15171F'
     : immersive
       ? (lightImmersive ? '#F8FAFC' : '#0F172A')
       : '#F8FAFC';
-  const shieldColor = immersive ? 'transparent' : (darkChrome ? '#15171F' : '#F8FAFC');
+  const shieldColor = canvasDark
+    ? CANVAS_DARK_CANVAS
+    : immersive
+      ? 'transparent'
+      : (darkChrome ? '#15171F' : '#F8FAFC');
 
   // Status bar icon intent (see useMedianStatusBar for the inverted mapping):
   //   'dark'  intent = DARK icons  (for a LIGHT background)
@@ -96,7 +108,9 @@ export function applyRouteChrome(pathname: string, force = false): void {
   // - darkChrome only (auth/signup/handicap)  -> opaque charcoal, white icons
   // - immersive light/dark (hero photo behind) -> transparent, dark icons
   // - default light (#F8FAFC notch)            -> opaque light, dark icons
-  const statusBar = darkChrome
+  const statusBar = canvasDark
+    ? { style: 'light' as const, color: 'FF05070A' }
+    : darkChrome
     ? (immersive
         ? { style: 'light' as const, color: '00000000' }
         : { style: 'light' as const, color: 'FF15171F' })

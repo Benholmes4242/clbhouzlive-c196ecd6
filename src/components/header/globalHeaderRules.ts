@@ -120,3 +120,24 @@ export function isDarkChromeRoute(pathname: string): boolean {
     || pathname.startsWith('/auth/')
     || pathname.startsWith('/handicap');
 }
+
+/**
+ * NEAR-BLACK CANVAS ROUTES — Echo and Messages.
+ *
+ * These pages render a `position: fixed; inset: 0` root (`.ec-root`,
+ * `.messages-root`) on #05070A, so they already bleed under the notch. What
+ * painted the white band above them was ROUTE CHROME, not layout: the default
+ * branch of applyRouteChrome gave them the light surface (#F8FAFC) on
+ * html/body, the #safe-area-shield (fixed, z-index 55) and the native status
+ * bar. Chrome for these routes must be the same near-black as the canvas.
+ */
+export const CANVAS_DARK_CANVAS = '#05070A';
+
+export function isCanvasDarkRoute(pathname: string): boolean {
+  return (
+    pathname === '/echo' ||
+    pathname.startsWith('/echo/') ||
+    pathname === '/messages' ||
+    pathname.startsWith('/messages/')
+  );
+}
