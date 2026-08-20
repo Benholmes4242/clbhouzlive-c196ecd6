@@ -234,7 +234,7 @@ function GolfThisWeekCard({
       onClick={onPress}
       style={{
         ...CARD_SHELL,
-        border: `1px solid ${row.is_self ? AMBER : A.BORDER}`,
+        border: `1px solid ${A.BORDER}`,
         width: CARD_W,
         flexShrink: 0,
         display: 'flex',
