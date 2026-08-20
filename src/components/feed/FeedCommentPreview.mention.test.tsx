@@ -86,8 +86,8 @@ describe('FeedCommentPreview mention integration', () => {
     const row = within(container.querySelector('[role="button"]') as HTMLElement);
     expect(row.getByText('Bob')).toHaveStyle({ color: '#0F172A' });
     // The MID tone wrapper carries the color; the <MentionText> span inherits it.
-    const mentionWrapper = container.querySelector('[data-mention-type="user"]')?.parentElement;
-    expect(mentionWrapper).toHaveStyle({ color: '#6C727E' });
+    const mention = container.querySelector('[data-mention-type="user"]');
+    expect(mention?.parentElement?.parentElement).toHaveStyle({ color: '#6C727E' });
   });
 
   it('uses dark-surface tones when surface is dark', () => {
@@ -96,7 +96,7 @@ describe('FeedCommentPreview mention integration', () => {
     );
     const row = within(container.querySelector('[role="button"]') as HTMLElement);
     expect(row.getByText('Bob')).toHaveStyle({ color: '#F8FAFC' });
-    const mentionWrapper = container.querySelector('[data-mention-type="user"]')?.parentElement;
-    expect(mentionWrapper).toHaveStyle({ color: '#A7AAAE' });
+    const mention = container.querySelector('[data-mention-type="user"]');
+    expect(mention?.parentElement?.parentElement).toHaveStyle({ color: '#A7AAAE' });
   });
 });
