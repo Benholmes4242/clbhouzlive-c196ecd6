@@ -534,6 +534,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
       {/* HEADER CONSTRUCTION: heading left, live count right-aligned on the
           SAME line. The "See all" action lives under the first card, not here. */}
       <Eyebrow
+        icon={CalendarDays}
         subline={t(
           'discover.golfThisWeek.subline',
           "Everywhere clbhouz golfers played, and how it went."
@@ -549,6 +550,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
       >
         {t('discover.golfThisWeek.heading', 'Golf this week')}
       </Eyebrow>
+
 
 
       {pills}
