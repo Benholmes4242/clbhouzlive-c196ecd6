@@ -56,10 +56,10 @@ import { A, CARD_SHELL, Eyebrow, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } fr
  * lifetime. Chevrons appear on navigation only.
  */
 
-/* ONE TILE GEOMETRY ACROSS DISCOVER: identical to Who's been playing. */
-const CARD_W = 224;
-const PHOTO_H = 104;
-const SHAPE_H = 60;
+/* Original Golf This Week tile geometry (236×108, 54px shape). */
+const CARD_W = 236;
+const PHOTO_H = 108;
+const SHAPE_H = 54;
 
 /** The rail scrim of record — imported, never retyped. */
 const CARD_SCRIM = SCRIM_STANDOUT;
@@ -628,13 +628,15 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
       )}
 
 
+      {/* Cards only in the horizontal rail; the See-all action sits below the
+          first card in a fixed position and does NOT scroll with the carousel. */}
       <div
         className="scrollbar-hide"
         style={{ display: 'flex', alignItems: 'stretch', gap: 10, overflowX: 'auto' }}
       >
-        {rows.map((r, i) => {
+        {rows.map((r) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
-          const card = (
+          return (
             <GolfThisWeekCard
               key={r.round_id}
               row={r}
@@ -654,32 +656,18 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
               onPress={() => onCardPress(r)}
             />
           );
-
-          if (i !== 0 || counts.rounds <= rows.length) return card;
-
-          /* SEE ALL lives under the first card in a fixed position, never in the
-             header row. It is a column so it scrolls with the rail as one unit. */
-          return (
-            <div
-              key={`${r.round_id}-lead`}
-              style={{
-                width: CARD_W,
-                flexShrink: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8,
-              }}
-            >
-              {card}
-              <InkAction onClick={onSeeAll}>
-                {t('discover.golfThisWeek.seeAll', 'See all {{count}} rounds', {
-                  count: counts.rounds,
-                })}
-              </InkAction>
-            </div>
-          );
         })}
       </div>
+
+      {counts.rounds > rows.length && (
+        <div style={{ marginTop: 8, width: CARD_W }}>
+          <InkAction onClick={onSeeAll}>
+            {t('discover.golfThisWeek.seeAll', 'See all {{count}} rounds', {
+              count: counts.rounds,
+            })}
+          </InkAction>
+        </div>
+      )}
 
     </section>
   );

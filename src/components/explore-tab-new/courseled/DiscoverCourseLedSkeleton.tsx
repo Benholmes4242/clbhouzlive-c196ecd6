@@ -197,6 +197,10 @@ export function GolfThisWeekRail() {
           </div>
         ))}
       </div>
+      {/* See-all placeholder sits below the first card and does NOT scroll. */}
+      <div style={{ marginTop: 8, width: 236 }}>
+        <TextBar w={110} h={10} />
+      </div>
     </section>
   );
 }
