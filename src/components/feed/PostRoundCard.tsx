@@ -572,12 +572,16 @@ export const PostRoundCard: React.FC<Props> = ({
               </span>
             )}
             {round.deltaIndex != null && (
-              <span style={{ color: DIM, marginLeft: 'auto' }}>
-                Index{' '}
-                <span style={{ ...NUM, color: round.deltaIndex < 0 ? GREEN : INK }}>
-                  {round.deltaIndex > 0 ? '+' : ''}
+              <span style={{ color: DIM, marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ color: DIM }}>Index</span>
+                <span style={{ ...NUM, color: round.deltaIndex < 0 ? HCP_IMPROVING : HCP_DRIFTING, fontWeight: 700 }}>
                   {round.deltaIndex.toFixed(1)}
                 </span>
+                <IndexMovementTriangle
+                  direction={round.deltaIndex < 0 ? 'down' : 'up'}
+                  color={round.deltaIndex < 0 ? HCP_IMPROVING : HCP_DRIFTING}
+                  size={7}
+                />
               </span>
             )}
           </div>
