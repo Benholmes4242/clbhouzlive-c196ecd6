@@ -6,10 +6,20 @@ import { FriendRoundRow } from './FriendRoundRow';
 import { buildInsightMap, referenceLine } from './friendRoundParts';
 import { relativeDay } from './courseled/discoverWhen';
 import { useRoundHoleShapes } from './courseled/hooks/useRoundHoleShapes';
-import { useDiscoverLensSets } from './courseled/hooks/useDiscoverLensSets';
-import { orderForLens, useGolfThisWeek } from './courseled/hooks/useGolfThisWeek';
-import { ScopePills } from './wire/ScopePills';
-import type { ExploreLens } from './hooks/useExploreLens';
+import {
+  DEFAULT_WEEK_SCOPE,
+  orderForWeek,
+  usePlayedCourseIds,
+  useGolfThisWeek,
+  useWeekScopeCourses,
+  type WeekScope,
+} from './courseled/hooks/useGolfThisWeek';
+import { useCourseCardMeta } from './courseled/hooks/useCourseCardMeta';
+import {
+  useWeekRegionCounts,
+  type RegionSelection,
+} from './courseled/hooks/useWeekRegionCounts';
+import { WeekScopePills } from './courseled/WeekFilters';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -35,8 +45,10 @@ interface Props {
   open: boolean;
   onClose: () => void;
   userId: string | undefined;
-  lens: ExploreLens;
-  onLensChange: (lens: ExploreLens) => void;
+  /** THE SHEET INHERITS THE RAIL'S SCOPE AND AREA — never its own filter state. */
+  scope?: WeekScope;
+  onScopeChange?: (scope: WeekScope) => void;
+  region?: RegionSelection | null;
   onRowPress: (scoreId: string | null, userId: string) => void;
 }
 
@@ -44,19 +56,27 @@ export function GolfThisWeekSheet({
   open,
   onClose,
   userId,
-  lens,
-  onLensChange,
+  scope = DEFAULT_WEEK_SCOPE,
+  onScopeChange,
+  region = null,
   onRowPress,
 }: Props) {
   const { t } = useTranslation('courses');
-  const roundsQuery = useGolfThisWeek(userId);
+  const scopeCourses = useWeekScopeCourses(userId, scope);
+  const roundsQuery = useGolfThisWeek(userId, scope, scopeCourses.courseIds);
   const all = roundsQuery.data ?? [];
   const courseIds = useMemo(
     () => all.map((r) => r.course_id).filter((v): v is string => !!v),
     [all],
   );
-  const sets = useDiscoverLensSets(userId, courseIds);
-  const rounds = useMemo(() => orderForLens(all, lens, sets), [all, lens, sets]);
+  const played = usePlayedCourseIds(userId);
+  const playedSet = useMemo(() => new Set(played.ids), [played.ids]);
+  const meta = useCourseCardMeta(courseIds).data;
+  const regions = useWeekRegionCounts(all, meta);
+  const rounds = useMemo(
+    () => orderForWeek(all.filter((r) => regions.matches(r, region)), playedSet),
+    [all, regions, region, playedSet],
+  );
   const total = rounds.length;
 
   const insights = useMemo(() => buildInsightMap(rounds, t as never), [rounds, t]);
@@ -126,16 +146,10 @@ export function GolfThisWeekSheet({
           borderBottom: `1px solid ${A.BORDER}`,
         }}
       >
-        <ScopePills
-          lens={lens}
-          onChange={onLensChange}
-          style={{
-            position: 'static',
-            background: 'transparent',
-            borderBottom: 'none',
-            width: '100%',
-            boxSizing: 'border-box',
-          }}
+        <WeekScopePills
+          scope={scope}
+          onChange={(s) => onScopeChange?.(s)}
+          style={{ padding: '12px 16px', width: '100%', boxSizing: 'border-box' }}
         />
       </div>
 

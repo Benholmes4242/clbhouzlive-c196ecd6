@@ -7,10 +7,8 @@ import {
   useDiscoverLastSeen,
   useMarkDiscoverSeenOnExit,
 } from '@/hooks/useDiscoverLastSeen';
-import { useExploreLens, type ExploreLens } from './hooks/useExploreLens';
 
 import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
-import { ScopePills } from './wire/ScopePills';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
@@ -18,14 +16,17 @@ import { useDiscoverPrompt } from './courseled/hooks/useDiscoverPrompt';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { FriendsRoundsSeeAllSheet } from './FriendsRoundsSeeAllSheet';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
-import { FriendsPlayedRail } from './courseled/FriendsPlayedRail';
 import { OneThingRow } from './courseled/OneThingRow';
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { GolfThisWeek } from './courseled/GolfThisWeek';
+import {
+  DEFAULT_WEEK_SCOPE,
+  type WeekScope,
+} from './courseled/hooks/useGolfThisWeek';
+import type { RegionSelection } from './courseled/hooks/useWeekRegionCounts';
 import { GolfThisWeekSheet } from './GolfThisWeekSheet';
 
 
@@ -101,7 +102,12 @@ export default function ExploreTabContent({
 
   useMarkDiscoverSeenOnExit(markSeen);
 
-  const { lens, setLens } = useExploreLens();
+  /* ONE ROUNDS SECTION (BRIEF_MERGE_CIRCLE_AND_GOLF_THIS_WEEK §S1). Your Circle
+     and Golf this week were the same section shown twice; the merged rail keeps
+     its scope and area here so the see-all sheet inherits both. Component state,
+     not the URL: a filter tap must not enter the back stack. */
+  const [weekScope, setWeekScope] = useState<WeekScope>(DEFAULT_WEEK_SCOPE);
+  const [weekRegion, setWeekRegion] = useState<RegionSelection | null>(null);
 
   // Sticky-bar veil: mirrors CoursesContent so the notch strip paints the
   // moment the pills pin (no gap, no colour seam).
@@ -135,7 +141,6 @@ export default function ExploreTabContent({
 
   const mostPlayed = mostPlayedQuery.data;
 
-  const [friendsSheet, setFriendsSheet] = useState(false);
   const [golfWeekSheet, setGolfWeekSheet] = useState(false);
   const [findGolfers, setFindGolfers] = useState(false);
   const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
@@ -173,15 +178,16 @@ export default function ExploreTabContent({
   });
   const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
 
-  const handleLensChange = useCallback(
-    (next: ExploreLens) => {
-      if (next === lens) return;
+  const handleScopeChange = useCallback(
+    (next: WeekScope) => {
+      if (next === weekScope) return;
       analyticsEvents.track('discover_lens_change', { lens: next });
-      // NO scroll: the lens is a client-side filter over an already-fetched
-      // pool, so the cards change under the member's scroll position.
-      setLens(next);
+      /* A SCOPE CHANGE RESETS THE AREA (§S3.5): the counts belong to the scope,
+         so an area holding nothing under the new pill must not survive it. */
+      setWeekScope(next);
+      setWeekRegion(null);
     },
-    [lens, setLens],
+    [weekScope],
   );
 
   /**
@@ -335,11 +341,14 @@ export default function ExploreTabContent({
         {hasPrompt ? (
           <OneThingRow userId={userId} onFindGolfers={() => setFindGolfers(true)} />
         ) : (
-          <FriendsPlayedRail
+          <GolfThisWeek
             userId={userId}
-            lastSeen={lastSeen}
+            scope={weekScope}
+            onScopeChange={handleScopeChange}
+            region={weekRegion}
+            onRegionChange={setWeekRegion}
             onCardPress={handleFriendCard}
-            onSeeAll={() => setFriendsSheet(true)}
+            onSeeAll={() => setGolfWeekSheet(true)}
           />
         )}
       </div>
@@ -351,14 +360,17 @@ export default function ExploreTabContent({
             the bottom of a rail tile to the next section's eyebrow matches the
             gap from the previous tile's bottom to the current eyebrow. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {/* When the one-thing prompt owns the top slot, Your Circle renders
-              below it as a normal section. Otherwise it is already the top slot. */}
+          {/* When the one-thing prompt owns the top slot, the rounds section
+              renders here instead (§S1.1 — it is the ONLY rounds section). */}
           {hasPrompt && (
-            <FriendsPlayedRail
+            <GolfThisWeek
               userId={userId}
-              lastSeen={lastSeen}
+              scope={weekScope}
+              onScopeChange={handleScopeChange}
+              region={weekRegion}
+              onRegionChange={setWeekRegion}
               onCardPress={handleFriendCard}
-              onSeeAll={() => setFriendsSheet(true)}
+              onSeeAll={() => setGolfWeekSheet(true)}
             />
           )}
 
@@ -379,26 +391,6 @@ export default function ExploreTabContent({
             onTilePress={() => navigate('/community')}
             onSeeAll={() => navigate('/community')}
             style={{ marginTop: 16 }}
-          />
-
-
-
-          <GolfThisWeek
-            userId={userId}
-            lens={lens}
-            /* THE PILLS BELONG TO THIS SECTION NOW (§3). NO WRAPPER DIV: they
-               are position:sticky and a wrapper of their exact height becomes
-               their containing block, giving them zero travel. */
-            pills={
-              <ScopePills
-                lens={lens}
-                onChange={handleLensChange}
-                style={{ margin: '2px -14px 14px' }}
-              />
-            }
-            onCardPress={handleFriendCard}
-            onSeeAll={() => setGolfWeekSheet(true)}
-            style={{ marginTop: 24 }}
           />
         </div>
 
@@ -454,22 +446,13 @@ export default function ExploreTabContent({
         />
       </div>
 
-      <FriendsRoundsSeeAllSheet
-        open={friendsSheet}
-        onClose={() => setFriendsSheet(false)}
-        userId={userId}
-        onRowPress={(scoreId, uid) => {
-          if (scoreId) opener.openByScore(scoreId, null, uid);
-          else opener.openProfile(uid);
-        }}
-      />
-
       <GolfThisWeekSheet
         open={golfWeekSheet}
         onClose={() => setGolfWeekSheet(false)}
         userId={userId}
-        lens={lens}
-        onLensChange={handleLensChange}
+        scope={weekScope}
+        onScopeChange={handleScopeChange}
+        region={weekRegion}
         onRowPress={(scoreId, uid) => {
           if (scoreId) opener.openByScore(scoreId, null, uid);
           else opener.openProfile(uid);

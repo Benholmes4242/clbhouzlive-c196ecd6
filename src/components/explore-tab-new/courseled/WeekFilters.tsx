@@ -1,0 +1,234 @@
+import { useTranslation } from 'react-i18next';
+import { MapPin } from 'lucide-react';
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+} from '@/components/ui/select';
+import { A, LABEL, SANS } from './tokens';
+import { WEEK_SCOPES, type WeekScope } from './hooks/useGolfThisWeek';
+import type { RegionSelection, WeekRegions } from './hooks/useWeekRegionCounts';
+
+/**
+ * THE ROUNDS SECTION'S FILTERS (BRIEF_MERGE_CIRCLE_AND_GOLF_THIS_WEEK §S2/§S3).
+ *
+ * SCOPE IS PILLS, GEOGRAPHY IS A DROPDOWN. Two axes, two controls, one row: the
+ * scope is a short closed list a member flicks through, geography is a long list
+ * where the honest answer is usually "nowhere this week" and so must carry its
+ * COUNT on every row (§S3.2) with zero rows greyed and unselectable (§S3.3).
+ *
+ * Both are the existing chrome: the pills are the retired ScopePills' pill, the
+ * dropdown is the Courses browse's shadcn Select. Nothing new is designed.
+ */
+
+const ALL = '__all__';
+
+export function WeekScopePills({
+  scope,
+  onChange,
+  style,
+}: {
+  scope: WeekScope;
+  onChange: (s: WeekScope) => void;
+  style?: React.CSSProperties;
+}) {
+  const { t } = useTranslation('courses');
+  return (
+    <div
+      role="tablist"
+      aria-label={t('discover.week.scopeAria', 'Rounds scope')}
+      className="scrollbar-hide"
+      style={{
+        display: 'flex',
+        gap: 8,
+        overflowX: 'auto',
+        minWidth: 0,
+        ...style,
+      }}
+    >
+      {WEEK_SCOPES.map((id) => {
+        const active = id === scope;
+        return (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(id)}
+            style={{
+              flex: 'none',
+              border: `1px solid ${active ? A.INK : A.BORDER}`,
+              background: active ? A.INK : A.PANEL,
+              color: active ? A.PANEL : A.INK,
+              borderRadius: 999,
+              padding: '8px 14px',
+              fontSize: 12.5,
+              fontWeight: 700,
+              fontFamily: SANS,
+              whiteSpace: 'nowrap',
+              cursor: 'pointer',
+            }}
+          >
+            {t(scopeLabelKey(id).key, scopeLabelKey(id).fallback)}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function scopeLabelKey(scope: WeekScope): { key: string; fallback: string } {
+  switch (scope) {
+    case 'circle':
+      return { key: 'discover.week.scope.circle', fallback: 'Your Circle' };
+    case 'suggested':
+      return { key: 'discover.week.scope.suggested', fallback: 'Suggested' };
+    case 'top_100':
+      return { key: 'discover.week.scope.top100', fallback: 'Top 100' };
+    case 'played':
+      return { key: 'discover.week.scope.played', fallback: 'Played' };
+    case 'worldwide':
+    default:
+      return { key: 'discover.week.scope.worldwide', fallback: 'Worldwide' };
+  }
+}
+
+/** "No rounds from your circle this week." — one honest sentence per scope (§S2.5). */
+export function scopeEmptyKey(scope: WeekScope): { key: string; fallback: string } {
+  switch (scope) {
+    case 'circle':
+      return {
+        key: 'discover.week.empty.circle',
+        fallback: 'No rounds from your circle this week.',
+      };
+    case 'suggested':
+      return {
+        key: 'discover.week.empty.suggested',
+        fallback: 'No suggested rounds this week.',
+      };
+    case 'top_100':
+      return {
+        key: 'discover.week.empty.top100',
+        fallback: 'No Top 100 rounds this week.',
+      };
+    case 'played':
+      return {
+        key: 'discover.week.empty.played',
+        fallback: 'No rounds at your courses this week.',
+      };
+    case 'worldwide':
+    default:
+      return { key: 'discover.week.empty.worldwide', fallback: 'No rounds this week.' };
+  }
+}
+
+export function RegionDropdown({
+  regions,
+  selection,
+  onChange,
+  style,
+}: {
+  regions: WeekRegions;
+  selection: RegionSelection | null;
+  onChange: (sel: RegionSelection | null) => void;
+  style?: React.CSSProperties;
+}) {
+  const { t } = useTranslation('courses');
+
+  const value = selection ? `${selection.kind}:${selection.value}` : ALL;
+  const triggerLabel = selection
+    ? selection.value
+    : t('discover.week.allRegions', 'Everywhere');
+
+  return (
+    <div style={{ flex: 'none', ...style }}>
+      <Select
+        value={value}
+        onValueChange={(v) => {
+          if (v === ALL) {
+            onChange(null);
+            return;
+          }
+          const [kind, ...rest] = v.split(':');
+          onChange({ kind: kind as RegionSelection['kind'], value: rest.join(':') });
+        }}
+      >
+        <SelectTrigger
+          className="h-9 w-auto gap-2 rounded-full border bg-transparent px-3 text-[12.5px] font-bold"
+          style={{ borderColor: A.BORDER, color: A.INK, fontFamily: SANS }}
+          aria-label={t('discover.week.selectRegionA11y', 'Filter rounds by area')}
+        >
+          <span className="flex min-w-0 items-center gap-1.5">
+            <MapPin size={13} strokeWidth={2} />
+            <span className="truncate">{triggerLabel}</span>
+            <span
+              className="tabular-nums"
+              style={{ ...LABEL, color: A.MUTE, marginLeft: 4 }}
+            >
+              {selection ? countFor(regions, selection) : regions.total}
+            </span>
+          </span>
+        </SelectTrigger>
+
+        <SelectContent className="bg-card border-border z-50 max-h-[60vh] rounded-sq-sm shadow-lg">
+          <SelectItem value={ALL}>
+            <span className="flex w-full items-center justify-between gap-3">
+              <span className="truncate">{t('discover.week.allRegions', 'Everywhere')}</span>
+              <span style={{ ...LABEL, color: A.MUTE }}>{regions.total}</span>
+            </span>
+          </SelectItem>
+
+          {regions.groups.map((g) => (
+            <SelectGroup key={g.country}>
+              <SelectLabel className="py-2 pl-8 pr-2">
+                <span style={{ ...LABEL, color: A.MUTE }}>
+                  {t('discover.week.areaLabel', 'Area')}
+                </span>
+              </SelectLabel>
+              {/* THE MACRO AREA IS SELECTABLE — "Britain & Ireland 16". */}
+              <SelectItem value={`country:${g.country}`} disabled={g.count === 0}>
+                <span className="flex w-full items-center justify-between gap-3">
+                  <span className="truncate">{g.country}</span>
+                  <span style={{ ...LABEL, color: A.MUTE }}>{g.count}</span>
+                </span>
+              </SelectItem>
+              {g.subs.map((s) => (
+                <SelectItem
+                  key={`${g.country}:${s.sub_country}`}
+                  value={`sub_country:${s.sub_country}`}
+                  /* ZERO IS GREYED AND UNSELECTABLE (§S3.3) — it stays on the
+                     list because its absence is the answer. */
+                  disabled={s.count === 0}
+                >
+                  <span className="flex w-full items-center justify-between gap-3">
+                    <span className="truncate pl-2" style={{ color: A.BODY }}>
+                      {s.sub_country}
+                    </span>
+                    <span style={{ ...LABEL, color: A.MUTE }}>{s.count}</span>
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function countFor(regions: WeekRegions, sel: RegionSelection): number {
+  if (sel.kind === 'country') {
+    return regions.groups.find((g) => g.country === sel.value)?.count ?? 0;
+  }
+  for (const g of regions.groups) {
+    const hit = g.subs.find((s) => s.sub_country === sel.value);
+    if (hit) return hit.count;
+  }
+  return 0;
+}
+
+export default WeekScopePills;

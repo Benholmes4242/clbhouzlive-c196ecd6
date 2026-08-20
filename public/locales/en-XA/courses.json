@@ -1551,6 +1551,26 @@
       "stablefordLabel": "[Bèst stàblefôrd]",
       "birdiesLabel": "[Mòst bìrdiés]",
       "stablefordUnit": "[pôints]"
+    },
+    "week": {
+      "scopeAria": "Rounds scope",
+      "allRegions": "Everywhere",
+      "selectRegionA11y": "Filter rounds by area",
+      "areaLabel": "Area",
+      "scope": {
+        "circle": "Your Circle",
+        "suggested": "Suggested",
+        "top100": "Top 100",
+        "played": "Played",
+        "worldwide": "Worldwide"
+      },
+      "empty": {
+        "circle": "No rounds from your circle this week.",
+        "suggested": "No suggested rounds this week.",
+        "top100": "No Top 100 rounds this week.",
+        "played": "No rounds at your courses this week.",
+        "worldwide": "No rounds this week."
+      }
     }
   },
   "statBrowse": {

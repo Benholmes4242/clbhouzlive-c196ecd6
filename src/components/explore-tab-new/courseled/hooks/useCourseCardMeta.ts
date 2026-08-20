@@ -12,6 +12,10 @@ export interface CourseCardMeta {
   name: string;
   /** "Kent", "Perthshire" — the tightest place name we hold. */
   region: string | null;
+  /** Macro area, the Courses browse vocabulary: "Britain & Ireland". */
+  country: string | null;
+  /** Nation: "Scotland", "England". */
+  subCountry: string | null;
   imageUrl: string | null;
 }
 
@@ -39,6 +43,8 @@ export function useCourseCardMeta(courseIds: string[]) {
           id: c.id,
           name: c.name,
           region: c.region || c.sub_country || c.country || null,
+          country: c.country || null,
+          subCountry: c.sub_country || null,
           imageUrl: c.thumbnail_image ?? null,
         });
       }

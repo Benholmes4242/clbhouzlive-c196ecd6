@@ -1,82 +1,135 @@
 import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
+import { supabase } from '@/integrations/supabase/client';
+import { useUserJourneyCourses } from '@/hooks/useUserJourneyCourses';
+import { usePlayedUnratedCourses } from '@/hooks/usePlayedUnratedCourses';
 import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
-import type { DiscoverLensSets } from './useDiscoverLensSets';
-import type { ExploreLens } from '../../hooks/useExploreLens';
 
 /**
- * GOLF THIS WEEK — the data layer (BRIEF_GOLF_THIS_WEEK §1).
+ * GOLF THIS WEEK — the data layer (BRIEF_GOLF_THIS_WEEK §1, extended by
+ * BRIEF_MERGE_CIRCLE_AND_GOLF_THIS_WEEK §S2).
  *
- * ONE READ, NO FEAT THRESHOLD. Standout Rounds and Personal Bests both asked
- * "what was remarkable?" and, at sixteen rounds a week, threw three quarters of
- * the supply away and then padded the gap with a month of history. This asks
- * "what was played?" — every round in a seven-day window, newest first, and the
- * comparison band at the top is what supplies the "best" claim those sections
- * used to need a threshold for.
+ * ONE READ, NO FEAT THRESHOLD, SEVEN DAYS FOR EVERY SCOPE. Your Circle and Golf
+ * this week were one section shown twice; they are now one rail whose SCOPE is a
+ * pill. The scope is answered by the DATABASE — Top 100 and Played are course
+ * allow-lists passed into the query, never a client-side discard of rows the app
+ * already paid to enrich.
  *
- * The read is `useCircleLatestRounds` in `scope: 'everyone'`, so the whole
- * existing enrichment pipeline — nines, course records, per-course history,
- * feats, index movement — is shared rather than duplicated. RLS decides
- * visibility; there is no circle predicate.
+ * The read is `useCircleLatestRounds`, so the whole existing enrichment pipeline
+ * — nines, course records, per-course history, feats, index movement — is shared
+ * rather than duplicated. RLS decides visibility.
  */
 
-/** Seven days. "This week" is the section's entire claim — do not widen it. */
+/** Seven days. "This week" is the section's entire claim — do not widen it (§F). */
 export const GOLF_WEEK_DAYS = 7;
 
 /** The rail shows ten (§5.1); the fetch must cover the TRUE total for the count. */
 export const GOLF_WEEK_FETCH = 60;
 export const GOLF_WEEK_RAIL_CAP = 10;
 
-export function useGolfThisWeek(userId: string | undefined) {
-  return useCircleLatestRounds(userId, {
-    scope: 'everyone',
-    windowDays: GOLF_WEEK_DAYS,
-    limit: GOLF_WEEK_FETCH,
-    includeSuggested: false,
+/** The five scopes (§S2.1). Your Circle leads and is the default. */
+export type WeekScope = 'circle' | 'suggested' | 'top_100' | 'played' | 'worldwide';
+export const WEEK_SCOPES: WeekScope[] = [
+  'circle',
+  'suggested',
+  'top_100',
+  'played',
+  'worldwide',
+];
+export const DEFAULT_WEEK_SCOPE: WeekScope = 'circle';
+
+/** Every course id on an ACTIVE published Top 100 list. Cached for the session. */
+export function useTop100CourseIds() {
+  return useQuery({
+    queryKey: ['courseled', 'top100-course-ids'],
+    staleTime: 30 * 60_000,
+    gcTime: 60 * 60_000,
+    queryFn: async (): Promise<string[]> => {
+      const { data, error } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id, top100_lists!inner(is_active)')
+        .eq('top100_lists.is_active', true);
+      if (error) throw error;
+      return [...new Set((data ?? []).map((r) => r.course_id as string))];
+    },
   });
 }
 
+/** Courses this member has played: rated rounds UNION tracked-but-unrated. */
+export function usePlayedCourseIds(userId: string | undefined) {
+  const journey = useUserJourneyCourses(userId);
+  const { courses: playedUnrated, loading } = usePlayedUnratedCourses(userId);
+  const ids = useMemo(() => {
+    const s = new Set<string>();
+    for (const c of journey.data?.played ?? []) if (c.id) s.add(c.id);
+    for (const c of playedUnrated) if (c.course_id) s.add(c.course_id);
+    return [...s];
+  }, [journey.data, playedUnrated]);
+  return { ids, ready: !journey.isPending && !loading };
+}
+
 /**
- * THE LENS (§3). Suggested is the DEFAULT and is an ORDERING, not a filter: a
- * member following four people must never be shown an empty section because the
- * lens they did not choose excluded everything. Top 100 and Played DO filter —
- * both are explicit questions with an honest empty answer.
- *
- * Suggested's order maximises the spread of COURSES and faces, which is the
- * variable this section is built on:
- *   1. the viewer's own round (§2.3, always first)
- *   2. rounds at courses the viewer has NEVER played
+ * THE SCOPE'S COURSE ALLOW-LIST. `null` = no course predicate (Circle,
+ * Suggested, Worldwide). `undefined` = not resolved yet, so the rounds query must
+ * wait rather than run unfiltered and flash a wrong set.
+ */
+export function useWeekScopeCourses(userId: string | undefined, scope: WeekScope) {
+  const top100 = useTop100CourseIds();
+  const played = usePlayedCourseIds(userId);
+
+  if (scope === 'top_100') {
+    return { courseIds: top100.data ?? undefined, ready: !top100.isPending };
+  }
+  if (scope === 'played') {
+    return { courseIds: played.ready ? played.ids : undefined, ready: played.ready };
+  }
+  return { courseIds: null as string[] | null, ready: true };
+}
+
+/**
+ * THE ROUNDS FOR A SCOPE. Seven days in every case; the per-member cap is off,
+ * because a section that says "16 rounds" must show sixteen rounds (§S1.4).
+ */
+export function useGolfThisWeek(
+  userId: string | undefined,
+  scope: WeekScope = DEFAULT_WEEK_SCOPE,
+  courseIds: string[] | null | undefined = null,
+) {
+  const hookScope =
+    scope === 'circle' ? 'circle' : scope === 'suggested' ? 'suggested' : 'everyone';
+  const query = useCircleLatestRounds(courseIds === undefined ? undefined : userId, {
+    scope: hookScope,
+    windowDays: GOLF_WEEK_DAYS,
+    limit: GOLF_WEEK_FETCH,
+    includeSuggested: scope === 'suggested',
+    oneRoundPerMember: false,
+    courseIds: courseIds ?? null,
+  });
+  return query;
+}
+
+/**
+ * THE ORDER (§3). Filtering happens in SQL, so this only ORDERS:
+ *   1. the viewer's own round, always first
+ *   2. rounds at courses the viewer has never played (widest spread)
  *   3. recency
  * then a single adjacency pass so the same course never renders twice in a row.
  */
-export function orderForLens(
+export function orderForWeek(
   rows: readonly CircleRoundRow[],
-  lens: ExploreLens,
-  sets: DiscoverLensSets,
+  playedIds: ReadonlySet<string>,
 ): CircleRoundRow[] {
-  const filtered =
-    lens === 'top_100'
-      ? rows.filter((r) => !!r.course_id && sets.top100.has(r.course_id))
-      : lens === 'played'
-        ? rows.filter((r) => !!r.course_id && sets.played.has(r.course_id))
-        : [...rows];
-
   const byRecency = (a: CircleRoundRow, b: CircleRoundRow) =>
     String(b.play_date).localeCompare(String(a.play_date));
 
-  const ranked =
-    lens === 'suggested'
-      ? [...filtered].sort((a, b) => {
-          if (a.is_self !== b.is_self) return a.is_self ? -1 : 1;
-          const aNew = !a.course_id || !sets.played.has(a.course_id);
-          const bNew = !b.course_id || !sets.played.has(b.course_id);
-          if (aNew !== bNew) return aNew ? -1 : 1;
-          return byRecency(a, b);
-        })
-      : [...filtered].sort((a, b) => {
-          if (a.is_self !== b.is_self) return a.is_self ? -1 : 1;
-          return byRecency(a, b);
-        });
+  const ranked = [...rows].sort((a, b) => {
+    if (a.is_self !== b.is_self) return a.is_self ? -1 : 1;
+    const aNew = !a.course_id || !playedIds.has(a.course_id);
+    const bNew = !b.course_id || !playedIds.has(b.course_id);
+    if (aNew !== bNew) return aNew ? -1 : 1;
+    return byRecency(a, b);
+  });
 
   return spreadCourses(ranked);
 }
@@ -127,7 +180,7 @@ export function bestOfWeek(rows: readonly CircleRoundRow[]): WeekBest | null {
     const toPar = r.gross - r.course_par;
     /* TIES GO TO THE MOST RECENT ROUND (BRIEF_GOLF_THIS_WEEK_BAND §2.5): lower
        to-par, then lower gross, then the later play_date — never first-seen,
-       because the caller's array is lens-ordered rather than date-ordered. */
+       because the caller's array is scope-ordered rather than date-ordered. */
     const tie =
       !!best && toPar === best.toPar && (r.gross ?? 0) === (best.row.gross ?? 0);
     if (

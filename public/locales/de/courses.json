@@ -1124,6 +1124,26 @@
       "stablefordLabel": "Bestes Stableford",
       "birdiesLabel": "Meiste Birdies",
       "stablefordUnit": "Punkte"
+    },
+    "week": {
+      "scopeAria": "Runden-Bereich",
+      "allRegions": "Überall",
+      "selectRegionA11y": "Runden nach Region filtern",
+      "areaLabel": "Region",
+      "scope": {
+        "circle": "Dein Kreis",
+        "suggested": "Vorgeschlagen",
+        "top100": "Top 100",
+        "played": "Gespielt",
+        "worldwide": "Weltweit"
+      },
+      "empty": {
+        "circle": "Diese Woche keine Runden aus deinem Kreis.",
+        "suggested": "Diese Woche keine vorgeschlagenen Runden.",
+        "top100": "Diese Woche keine Top-100-Runden.",
+        "played": "Diese Woche keine Runden auf deinen Plätzen.",
+        "worldwide": "Diese Woche keine Runden."
+      }
     }
   },
   "statBrowse": {
