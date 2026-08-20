@@ -12,7 +12,7 @@ import { useExploreLens, type ExploreLens } from './hooks/useExploreLens';
 import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
 import { ScopePills } from './wire/ScopePills';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
-import { A, KICKER, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useScorecardOpener } from './useScorecardOpener';
@@ -322,9 +322,9 @@ export default function ExploreTabContent({
           plus the island itself — Discover no longer sits under a hero. */}
       <div
         style={{
-          // The header block owns NO trailing space: the prompt row owns the
-          // 16px above it and the 20px below it, and when the row is absent it
-          // collapses to a single 24px gap of its own.
+          // The header block owns NO trailing space; the first section eyebrow
+          // starts at this padding offset, and OneThingRow renders nothing when
+          // it has no prompt so the offset is preserved.
           padding: '0 16px 0',
           // ISLANDS -> EYEBROW = exactly 16px. The island is fixed at
           // sat + 10px and is 44px tall, so its bottom edge is sat + 54px.
@@ -334,18 +334,8 @@ export default function ExploreTabContent({
 
         }}
       >
-        <div style={KICKER}>{t('discover.kickerCourses', 'The courses')}</div>
-        <h1
-          style={{
-            margin: '4px 0 0',
-            fontSize: 26,
-            fontWeight: 700,
-            color: A.INK,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          {t('discover.headlineCourses', "Where it's happening")}
-        </h1>
+        {/* The page title has been removed; this spacer owns the top padding
+            that keeps the first section clear of the floating header. */}
       </div>
 
 

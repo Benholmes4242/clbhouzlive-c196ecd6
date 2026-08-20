@@ -274,28 +274,11 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   {relativeDay(r.play_date, t)}
                 </span>
 
-                {/* THE SUGGESTED MARK (BRIEF_WHOS_BEEN_PLAYING 3.5). A round
-                    from outside the circle says so, in the KICKER token, inside
-                    the tile's EXISTING chrome — the same glass chip the when
-                    label uses, so it stays legible over a bright sky where a
-                    bare white label would disappear. No follow button: this
-                    card's whole job is to show a round. */}
-                {r.suggested && (
-                  <span
-                    className="fpg-chip"
-                    style={{
-                      ...KICKER,
-                      position: 'absolute',
-                      top: 8,
-                      left: 8,
-                      color: '#FFFFFF',
-                      borderRadius: 999,
-                      padding: '3px 7px',
-                    }}
-                  >
-                    {t('discover.suggestedMark', 'SUGGESTED')}
-                  </span>
-                )}
+                {/* SUGGESTED sits in the white block, not on the photograph. It explains
+                     WHY a member is seeing this round rather than stating a fact about the
+                     round, so it belongs with the member row. It was over the image and
+                     collided with the score chip whenever a two-line course name grew the
+                     block upward. */}
 
 
                 {/* THE GLASS SCORE CHIP. Lifting the score onto the photo makes
@@ -509,6 +492,11 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                     >
                       {r.display_name}
                     </span>
+                    {r.suggested && (
+                      <span style={{ ...KICKER, color: A.DIM, flexShrink: 0 }}>
+                        {t('discover.suggestedMark', 'SUGGESTED')}
+                      </span>
+                    )}
                   </span>
                   {/* THE FIXED-WIDTH TRAILING SLOT renders on every row whether
                       or not a control appears, so figures do not go ragged. */}

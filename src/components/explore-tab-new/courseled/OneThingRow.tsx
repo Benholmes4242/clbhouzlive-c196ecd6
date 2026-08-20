@@ -76,12 +76,12 @@ export function OneThingRow({ userId, onFindGolfers }: Props) {
     setDismissed(true);
   }, [prompt]);
 
-  // NOTHING TO ASK: the row collapses to the single 24px gap the page owes
-  // between the title and the first section eyebrow — no orphaned space.
+  // NOTHING TO ASK: the row collapses to nothing so the first section eyebrow
+  // starts at the same offset as the page title's former kicker.
   const shown = prompt;
 
   if (!resolved || !shown || dismissed) {
-    return <div aria-hidden style={{ height: 24 }} />;
+    return null;
   }
 
   // THE STATUS NO LONGER RESTATES THE ACTION. "not rated yet" beside RATE named
