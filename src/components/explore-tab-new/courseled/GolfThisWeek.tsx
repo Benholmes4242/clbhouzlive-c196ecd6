@@ -528,33 +528,21 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
 
   return (
     <section>
-      {/* HEADER CONSTRUCTION MATCHES ITS NEIGHBOURS: heading left, live count and
-          See all right-aligned on the SAME line (Eyebrow's aside slot). */}
+      {/* HEADER CONSTRUCTION: heading left, live count right-aligned on the
+          SAME line. The "See all" action lives under the first card, not here. */}
       <Eyebrow
-        subline={t(
-          'discover.golfThisWeek.subline',
-          "Everywhere clbhouz golfers played, and how it went.",
-        )}
         aside={
-          <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ ...KICKER, color: A.MUTE }}>
-              {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
-                rounds: counts.rounds,
-                courses: counts.courses,
-              })}
-            </span>
-            {counts.rounds > rows.length && (
-              <InkAction onClick={onSeeAll}>
-                {t('discover.golfThisWeek.seeAll', 'See all {{count}} rounds', {
-                  count: counts.rounds,
-                })}
-              </InkAction>
-            )}
+          <span style={{ ...KICKER, color: A.MUTE }}>
+            {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
+              rounds: counts.rounds,
+              courses: counts.courses,
+            })}
           </span>
         }
       >
         {t('discover.golfThisWeek.heading', 'Golf this week')}
       </Eyebrow>
+
 
       {pills}
 
@@ -644,9 +632,9 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
         className="scrollbar-hide"
         style={{ display: 'flex', alignItems: 'stretch', gap: 10, overflowX: 'auto' }}
       >
-        {rows.map((r) => {
+        {rows.map((r, i) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
-          return (
+          const card = (
             <GolfThisWeekCard
               key={r.round_id}
               row={r}
@@ -666,8 +654,33 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
               onPress={() => onCardPress(r)}
             />
           );
+
+          if (i !== 0 || counts.rounds <= rows.length) return card;
+
+          /* SEE ALL lives under the first card in a fixed position, never in the
+             header row. It is a column so it scrolls with the rail as one unit. */
+          return (
+            <div
+              key={`${r.round_id}-lead`}
+              style={{
+                width: CARD_W,
+                flexShrink: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              }}
+            >
+              {card}
+              <InkAction onClick={onSeeAll}>
+                {t('discover.golfThisWeek.seeAll', 'See all {{count}} rounds', {
+                  count: counts.rounds,
+                })}
+              </InkAction>
+            </div>
+          );
         })}
       </div>
+
     </section>
   );
 }
