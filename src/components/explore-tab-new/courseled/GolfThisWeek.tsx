@@ -390,7 +390,7 @@ function GolfThisWeekCard({
         </div>
 
         {/* THE SHAPE — the friends rail's band, same height, full bleed (§4.1). */}
-        <div style={{ marginTop: 8, marginLeft: -11, marginRight: -11 }}>
+        <div style={{ marginTop: 6, marginLeft: -11, marginRight: -11 }}>
           <ShapeReveal>
             <RoundShape row={row} shape={shape} width={CARD_W} height={SHAPE_H} showMeta={false} />
           </ShapeReveal>
