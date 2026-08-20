@@ -330,27 +330,27 @@ export default function ExploreTabContent({
 
       {/* The chrome island floats over the page, so the header clears the notch
           plus the island itself — Discover no longer sits under a hero.
-          The top slot is owned by the existing rate/one-thing prompt when one
-          exists; otherwise Your Circle (friends rail) owns this spot. */}
+          SAFE-AREA PADDING, RE-HOMED (MICRO_BRIEF_REMOVE_ONE_THING_ROW S2.2):
+          the floating header sits at sat + 10 and is 44px tall, so sat + 70
+          gives 16px of clearance on notched AND non-notched devices. It lives on
+          whatever leads the page — now the merged rounds section.
+          The rate prompt was removed from Discover deliberately. Nothing prompts
+          a rating anywhere now - watch the review rate. */}
       <div
         style={{
           padding: '0 14px',
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
         }}
       >
-        {hasPrompt ? (
-          <OneThingRow userId={userId} onFindGolfers={() => setFindGolfers(true)} />
-        ) : (
-          <GolfThisWeek
-            userId={userId}
-            scope={weekScope}
-            onScopeChange={handleScopeChange}
-            region={weekRegion}
-            onRegionChange={setWeekRegion}
-            onCardPress={handleFriendCard}
-            onSeeAll={() => setGolfWeekSheet(true)}
-          />
-        )}
+        <GolfThisWeek
+          userId={userId}
+          scope={weekScope}
+          onScopeChange={handleScopeChange}
+          region={weekRegion}
+          onRegionChange={setWeekRegion}
+          onCardPress={handleFriendCard}
+          onSeeAll={() => setGolfWeekSheet(true)}
+        />
       </div>
 
       {/* ONE SECTION RHYTHM: 28px between a section's content and the next
@@ -360,19 +360,7 @@ export default function ExploreTabContent({
             the bottom of a rail tile to the next section's eyebrow matches the
             gap from the previous tile's bottom to the current eyebrow. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {/* When the one-thing prompt owns the top slot, the rounds section
-              renders here instead (§S1.1 — it is the ONLY rounds section). */}
-          {hasPrompt && (
-            <GolfThisWeek
-              userId={userId}
-              scope={weekScope}
-              onScopeChange={handleScopeChange}
-              region={weekRegion}
-              onRegionChange={setWeekRegion}
-              onCardPress={handleFriendCard}
-              onSeeAll={() => setGolfWeekSheet(true)}
-            />
-          )}
+
 
 
           {/* LATEST VIDEOS. ON TOUR THIS WEEK left this page
