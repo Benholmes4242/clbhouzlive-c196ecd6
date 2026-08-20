@@ -356,7 +356,7 @@ function GolfThisWeekCard({
         {/* THE PLAYER IS SECONDARY, beneath the score (§2). */}
         <div
           style={{
-            marginTop: 9,
+            marginTop: 7,
             display: 'flex',
             alignItems: 'center',
             gap: 7,
