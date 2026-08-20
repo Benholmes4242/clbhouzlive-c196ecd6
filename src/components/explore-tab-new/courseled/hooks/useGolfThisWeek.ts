@@ -125,10 +125,17 @@ export function bestOfWeek(rows: readonly CircleRoundRow[]): WeekBest | null {
   for (const r of rows) {
     if (r.gross == null || r.course_par == null) continue;
     const toPar = r.gross - r.course_par;
+    /* TIES GO TO THE MOST RECENT ROUND (BRIEF_GOLF_THIS_WEEK_BAND §2.5): lower
+       to-par, then lower gross, then the later play_date — never first-seen,
+       because the caller's array is lens-ordered rather than date-ordered. */
+    const tie =
+      !!best && toPar === best.toPar && (r.gross ?? 0) === (best.row.gross ?? 0);
     if (
       !best ||
       toPar < best.toPar ||
-      (toPar === best.toPar && (r.gross ?? 0) < (best.row.gross ?? 0))
+      (toPar === best.toPar && (r.gross ?? 0) < (best.row.gross ?? 0)) ||
+      (tie &&
+        String(r.play_date).localeCompare(String(best!.row.play_date)) > 0)
     ) {
       best = { row: r, toPar };
     }

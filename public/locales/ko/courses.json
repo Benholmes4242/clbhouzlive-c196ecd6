@@ -1059,7 +1059,12 @@
     "videosHeading": "최신 영상",
     "videosAction": "모든 영상",
     "clipsHeading": "클립",
-    "clipsAction": "전체 보기"
+    "clipsAction": "전체 보기",
+    "golfThisWeek": {
+      "stablefordLabel": "최고 스테이블포드",
+      "birdiesLabel": "버디 최다",
+      "stablefordUnit": "포인트"
+    }
   },
   "statBrowse": {
     "colArea": "지역",

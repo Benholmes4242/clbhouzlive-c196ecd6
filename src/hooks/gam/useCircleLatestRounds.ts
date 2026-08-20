@@ -100,6 +100,13 @@ export interface CircleRoundRow {
    * time" and is a drift figure, not this round's consequence.
    */
   delta_index: number | null;
+  /**
+   * gam_round_stats.stableford_points (BRIEF_GOLF_THIS_WEEK_BAND §1.2). NET, so
+   * a 15-handicap playing well outscores a 3-handicap playing badly. NULL IS
+   * COMMON AND IS NOT A ZERO — a round with no Stableford recorded must fail a
+   * filter rather than contribute 0, same discipline as delta_index.
+   */
+  stableford_points: number | null;
 }
 
 
@@ -203,10 +210,11 @@ export function useCircleLatestRounds(
         longest_par_or_better_run: number | null;
         sub_80: boolean | null;
         delta_index: number | string | null;
+        stableford_points: number | string | null;
       };
 
       const ROUND_COLS =
-        'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80, delta_index';
+        'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80, delta_index, stableford_points';
 
       // 2. Circle rounds — windowDays lookback, ordered newest first.
       const windowStartIso = new Date(Date.now() - windowDays * DAY_MS).toISOString().slice(0, 10);
@@ -612,6 +620,8 @@ export function useCircleLatestRounds(
               : suggestedIds.has(r.whs_score_id ?? `${r.user_id}-${r.play_date}`),
           is_self: r.user_id === userId,
           delta_index: r.delta_index == null ? null : Number(r.delta_index),
+          stableford_points:
+            r.stableford_points == null ? null : Number(r.stableford_points),
 
         };
 
