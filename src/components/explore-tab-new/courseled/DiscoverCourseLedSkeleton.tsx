@@ -167,8 +167,8 @@ export function GolfThisWeekRail() {
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
           <div key={i} style={{ ...CARD_SHELL, width: 236, flexShrink: 0, padding: 0 }}>
-            <Bar style={{ borderRadius: 0, height: 108, width: '100%' }} />
-            <div style={{ padding: '10px 11px 11px' }}>
+            <Bar style={{ borderRadius: 0, height: 92, width: '100%' }} />
+            <div style={{ padding: '9px 11px 9px' }}>
               <div style={{ height: 24, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <TextBar w={46} h={18} />
                 <TextBar w={26} h={12} />
@@ -178,7 +178,7 @@ export function GolfThisWeekRail() {
               </div>
               <div
                 style={{
-                  marginTop: 9,
+                  marginTop: 7,
                   height: 22,
                   display: 'flex',
                   alignItems: 'center',
@@ -188,10 +188,10 @@ export function GolfThisWeekRail() {
                 <Bar style={{ height: 22, width: 22, borderRadius: '34%' }} />
                 <TextBar w={92} h={11} />
               </div>
-              <div style={{ marginTop: 8, marginLeft: -11, marginRight: -11 }}>
-                <Bar style={{ borderRadius: 0, height: 54, width: '100%' }} />
+              <div style={{ marginTop: 6, marginLeft: -11, marginRight: -11 }}>
+                <Bar style={{ borderRadius: 0, height: 48, width: '100%' }} />
               </div>
-              <div style={{ marginTop: 6, height: 15, display: 'flex', alignItems: 'center' }}>
+              <div style={{ marginTop: 4, height: 15, display: 'flex', alignItems: 'flex-end' }}>
                 <TextBar w={'88%'} h={10} />
               </div>
             </div>
