@@ -630,8 +630,11 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
               key={tile.key}
               style={{
                 ...CARD_SHELL,
-                flex: '1 1 0',
-                minWidth: 0,
+                /* FOUR TILES DO NOT SHRINK (§3.1): the figure is the content, so
+                   the band scrolls at 320px instead. With one, two or three the
+                   basis grows and the row fills the width. */
+                flex: '1 0 148px',
+                minWidth: 148,
                 padding: '9px 10px 10px',
                 fontFamily: SANS,
               }}
@@ -645,9 +648,10 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
                   gap: 4,
                 }}
               >
-                <span style={{ lineHeight: 1 }}>{tile.emoji}</span>
+                {tile.emoji ? <span style={{ lineHeight: 1 }}>{tile.emoji}</span> : null}
                 {tile.label}
               </div>
+
               <div
                 style={{
                   ...NUMF,
