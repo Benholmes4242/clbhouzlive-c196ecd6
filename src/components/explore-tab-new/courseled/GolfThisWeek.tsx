@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
@@ -55,7 +54,7 @@ import { A, CARD_SHELL, Eyebrow, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } fr
 
 const CARD_W = 236;
 const PHOTO_H = 108;
-const SHAPE_H = 54;
+const SHAPE_H = 60;
 
 /** The rail scrim of record — imported, never retyped. */
 const CARD_SCRIM = SCRIM_STANDOUT;
