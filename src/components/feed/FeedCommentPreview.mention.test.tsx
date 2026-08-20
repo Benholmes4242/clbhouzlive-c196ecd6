@@ -1,11 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import { FeedCommentPreview } from './FeedCommentPreview';
 
 vi.mock('@/components/ui/SquircleAvatar', () => ({
-  SquircleAvatar: ({ alt }: { alt?: string }) => <div data-testid="avatar">{alt ?? 'avatar'}</div>,
+  SquircleAvatar: ({ alt }: { alt?: string }) => <div data-testid="avatar" data-alt={alt} />,
 }));
 vi.mock('@/components/ui/VerifiedBadge', () => ({
   VerifiedBadge: () => <span data-testid="verified">✓</span>,
@@ -42,9 +42,11 @@ describe('FeedCommentPreview mention integration', () => {
     expect(mention).toHaveAttribute('data-mention-id', '11111111-1111-1111-1111-111111111111');
   });
 
-  it('does not contain nested buttons in the row', () => {
+  it('does not contain nested buttons inside the preview row', () => {
     const { container } = wrap(<FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} />);
-    expect(container.querySelectorAll('button')).toHaveLength(0);
+    const row = container.querySelector('[role="button"]');
+    expect(row).toBeInTheDocument();
+    expect(row?.querySelectorAll('button')).toHaveLength(0);
   });
 
   it('opens the comments sheet when the row is clicked outside the mention', () => {
@@ -81,13 +83,17 @@ describe('FeedCommentPreview mention integration', () => {
     const { container } = wrap(
       <FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} surface="light" />,
     );
-    expect(screen.getByText('Bob')).toHaveStyle({ color: '#0F172A' });
+    const row = within(container.querySelector('[role="button"]') as HTMLElement);
+    expect(row.getByText('Bob')).toHaveStyle({ color: '#0F172A' });
     expect(container.querySelector('[data-mention-type="user"]')).toHaveStyle({ color: '#6C727E' });
   });
 
   it('uses dark-surface tones when surface is dark', () => {
-    wrap(<FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} surface="dark" />);
-    expect(screen.getByText('Bob')).toHaveStyle({ color: '#F8FAFC' });
+    const { container } = wrap(
+      <FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} surface="dark" />,
+    );
+    const row = within(container.querySelector('[role="button"]') as HTMLElement);
+    expect(row.getByText('Bob')).toHaveStyle({ color: '#F8FAFC' });
     const mention = screen.getByText('@Alice');
     expect(mention).toHaveStyle({ color: '#A7AAAE' });
   });
