@@ -12,6 +12,8 @@ import { ScopePills } from './wire/ScopePills';
 import type { ExploreLens } from './hooks/useExploreLens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
 
 /**
  * GOLF THIS WEEK — SEE ALL (BRIEF_GOLF_THIS_WEEK §5.2).
