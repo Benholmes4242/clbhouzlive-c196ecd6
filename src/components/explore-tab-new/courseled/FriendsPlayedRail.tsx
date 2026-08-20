@@ -32,7 +32,7 @@ import { countNewSince, useReportNewCount } from './newSince';
 import { FriendsRail as FriendsRailShell } from './DiscoverCourseLedSkeleton';
 
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, GOLD, InkAction, NUMF, SANS } from './tokens';
+import { A, FIGS, CARD_SHELL, Eyebrow, GOLD, InkAction, NUMF, SANS } from './tokens';
 
 /**
  * Section 1 — WHO'S BEEN PLAYING (BRIEF_FRIENDS_PLAYED_TILE_GLASS +
@@ -274,39 +274,14 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   {relativeDay(r.play_date, t)}
                 </span>
 
-                {/* THE SUGGESTED MARK (BRIEF_WHOS_BEEN_PLAYING 3.5). A round
-                    from outside the circle says so, in the KICKER token, inside
-                    the tile's EXISTING chrome — the same glass chip the when
-                    label uses, so it stays legible over a bright sky where a
-                    bare white label would disappear. No follow button: this
-                    card's whole job is to show a round. */}
-                {r.suggested && (
-                  <span
-                    className="fpg-chip"
-                    style={{
-                      ...KICKER,
-                      position: 'absolute',
-                      top: 8,
-                      left: 8,
-                      color: '#FFFFFF',
-                      borderRadius: 999,
-                      padding: '3px 7px',
-                    }}
-                  >
-                    {t('discover.suggestedMark', 'SUGGESTED')}
-                  </span>
-                )}
-
-
-                {/* THE GLASS SCORE CHIP. Lifting the score onto the photo makes
-                    the photo carry data rather than decoration, and gives the
-                    white block entirely to the shape. */}
+                {/* THE GLASS SCORE CHIP. Moved to the top-left of the photo so
+                    it sits where the SUGGESTED badge used to live, matching the
+                    score placement in the other tiles. */}
                 <div
                   style={{
                     position: 'absolute',
-                    left: 10,
-                    right: 10,
-                    bottom: 8,
+                    top: 8,
+                    left: 8,
                   }}
                 >
                   <span
@@ -390,7 +365,16 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                       </span>
                     )}
                   </span>
+                </div>
 
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 10,
+                    right: 10,
+                    bottom: 8,
+                  }}
+                >
                   {/* TWO LINES, CLAMPED. A single truncated line cut the
                       parenthetical — "(East Course)" is the only thing telling
                       one course at a club from another, so it must survive. The
@@ -402,7 +386,6 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                       display: '-webkit-box',
                       WebkitBoxOrient: 'vertical',
                       WebkitLineClamp: 2,
-                      marginTop: 5,
                       fontSize: 12,
                       fontWeight: 700,
                       color: '#fff',
@@ -413,7 +396,6 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   >
                     {m?.name ?? r.course_name ?? t('discover.unknownCourse', 'Course')}
                   </span>
-
                 </div>
               </CourseImageFallback>
 
