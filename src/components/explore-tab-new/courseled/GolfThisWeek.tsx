@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
+import { CalendarDays } from 'lucide-react';
+
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
@@ -51,10 +53,15 @@ import { A, CARD_SHELL, Eyebrow, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } fr
  *
  * THIS SECTION ASKS "WHERE". The friends rail above asks "WHO" and is untouched.
  *
- * NO DECORATION: no emoji, no section glyph, no badges. The single exception is
- * an ace or an albatross, which get one gold marker because they are once in a
- * lifetime. Chevrons appear on navigation only.
+ * DECORATION RULES:
+ *   - The section heading carries the same outline Lucide icon as the other
+ *     Discover sections (CalendarDays) — part of a system, no emoji there.
+ *   - The band tiles are small celebratory stat tiles; a single emoji marker
+ *     before the label is allowed there, like the trophy on the WON chip.
+ *   - The only coloured bitmap is the ace/albatross gold marker on a round card.
+ *   - Chevrons appear on navigation only.
  */
+
 
 /* Original Golf This Week tile geometry (236×108, 54px shape). */
 const CARD_W = 236;
@@ -465,15 +472,18 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
   const courseNameFor = (r: CircleRoundRow) =>
     meta?.get(r.course_id ?? '')?.name ?? r.course_name ?? '';
 
-  /* THE BAND IS THREE COMPARISONS OF EQUAL WEIGHT (§1, move 2) — tiles, not a
-     sentence with footnotes. Each is self-contained: label, figure, who, where. */
+  /* THE BAND IS TWO COMPARISONS OF EQUAL WEIGHT (§1, move 2) — tiles, not a
+     sentence with footnotes. Each is self-contained: label, figure, who, where.
+
+     The third comparison, BIGGEST MOVE, was deleted because it returned the same
+     round as MOST IMPROVED whenever the largest absolute delta_index was a cut
+     (roughly half of weeks). The alternative, "biggest rise", would celebrate a
+     member's worst week, which is a strange thing to put on Discover. A small
+     celebratory emoji marker is permitted on these stat tiles because it is
+     label decoration, not part of the section-heading icon system.
+  */
   const withDelta = ordered.filter(
     (r) => r.delta_index != null && Number.isFinite(r.delta_index),
-  );
-  const biggestMove = withDelta.reduce<CircleRoundRow | null>(
-    (acc, r) =>
-      !acc || Math.abs(r.delta_index as number) > Math.abs(acc.delta_index as number) ? r : acc,
-    null,
   );
   const mostImproved = withDelta.reduce<CircleRoundRow | null>(
     (acc, r) =>
@@ -486,6 +496,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
 
   const bandTiles: {
     key: string;
+    emoji: string;
     label: string;
     figure: string;
     tone: string;
@@ -496,6 +507,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
   if (best) {
     bandTiles.push({
       key: 'best',
+      emoji: '\uD83D\uDD25', // FIRE
       label: t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK'),
       figure: String(best.row.gross ?? '\u2014'),
       tone: best.toPar < 0 ? TOPAR_RED : A.INK,
@@ -503,21 +515,11 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
       sub: `${bestToPar ?? ''} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(best.row)}`.trim(),
     });
   }
-  if (biggestMove) {
-    const d = biggestMove.delta_index as number;
-    bandTiles.push({
-      key: 'move',
-      label: t('discover.golfThisWeek.moveLabel', 'BIGGEST MOVE'),
-      figure: `${d < 0 ? '\u2212' : '+'}${Math.abs(d).toFixed(1)}`,
-      tone: Math.abs(d) < 0.05 ? A.MUTE : d < 0 ? A.IMPROVED : A.DRIFTED,
-      row: biggestMove,
-      sub: `${t('discover.friendsRail.index', 'HCP')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(biggestMove)}`,
-    });
-  }
   if (mostImproved) {
     const d = mostImproved.delta_index as number;
     bandTiles.push({
       key: 'improved',
+      emoji: '\uD83D\uDCAA', // FLEXED ARM
       label: t('discover.golfThisWeek.improvedLabel', 'MOST IMPROVED'),
       figure: `\u2212${Math.abs(d).toFixed(1)}`,
       tone: A.IMPROVED,
@@ -526,11 +528,13 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
     });
   }
 
+
   return (
     <section>
       {/* HEADER CONSTRUCTION: heading left, live count right-aligned on the
           SAME line. The "See all" action lives under the first card, not here. */}
       <Eyebrow
+        icon={CalendarDays}
         subline={t(
           'discover.golfThisWeek.subline',
           "Everywhere clbhouz golfers played, and how it went."
@@ -546,6 +550,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
       >
         {t('discover.golfThisWeek.heading', 'Golf this week')}
       </Eyebrow>
+
 
 
       {pills}
@@ -565,13 +570,24 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
               key={tile.key}
               style={{
                 ...CARD_SHELL,
-                flex: '0 0 auto',
-                width: 158,
+                flex: '1 1 0',
+                minWidth: 0,
                 padding: '9px 10px 10px',
                 fontFamily: SANS,
               }}
             >
-              <div style={{ ...LABEL, color: A.MUTE }}>{tile.label}</div>
+              <div
+                style={{
+                  ...LABEL,
+                  color: A.MUTE,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
+              >
+                <span style={{ lineHeight: 1 }}>{tile.emoji}</span>
+                {tile.label}
+              </div>
               <div
                 style={{
                   ...NUMF,
@@ -630,6 +646,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
           ))}
         </div>
       )}
+
 
 
       {/* Cards only in the horizontal rail; the See-all action sits below the
