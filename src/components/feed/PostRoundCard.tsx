@@ -23,7 +23,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import { SC_BIRDIE_DARK } from '@/features/courses/components/holes/_constants';
-import { shapeSentence, IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
+import { shapeSentence, IndexMovementTriangle, movementFor } from '@/components/explore-tab-new/friendRoundParts';
+import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { formatWeekdayShortGB, formatDayMonthShortGB } from '@/i18n/format';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 
@@ -570,11 +571,16 @@ export const PostRoundCard: React.FC<Props> = ({
                 Slope <span style={{ ...NUM, color: INK }}>{round.slopeRating}</span>
               </span>
             )}
-            {round.deltaIndex != null && (
+            {/* INDEX MOVEMENT — arrow = direction, colour = good or bad, figure =
+                magnitude. The figure is ABSOLUTE: a signed number beside an arrow
+                states direction twice. Gated by the SHARED movementFor floor
+                (0.05), so a 0.0 (or a 0.04 that rounds to it) renders nothing at
+                all — no label, no figure, no arrow, no reserved space. */}
+            {movementFor({ hcp_delta: round.deltaIndex } as CircleRoundRow) && round.deltaIndex != null && (
               <span style={{ color: DIM, marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ color: DIM }}>Index</span>
                 <span style={{ ...NUM, color: round.deltaIndex < 0 ? HCP_IMPROVING : HCP_DRIFTING, fontWeight: 700 }}>
-                  {round.deltaIndex.toFixed(1)}
+                  {Math.abs(round.deltaIndex).toFixed(1)}
                 </span>
                 <IndexMovementTriangle
                   direction={round.deltaIndex < 0 ? 'down' : 'up'}
