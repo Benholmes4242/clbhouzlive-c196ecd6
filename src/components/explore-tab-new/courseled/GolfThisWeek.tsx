@@ -398,8 +398,17 @@ function GolfThisWeekCard({
 
 
         {/* THE SUBLINE IS THE FRIENDS RAIL'S SUBLINE (§4.2): same glyph, same
-            figure font, same body ink, ONE line of reserved height. */}
-        <div style={{ minHeight: INSIGHT_LINE_RESERVE, marginTop: 6 }}>
+            figure font, same body ink, ONE line of reserved height. Aligned to
+            the bottom of the reserve so the gap lives above the line, not below
+            it, and every tile's line sits at the same height. */}
+        <div
+          style={{
+            minHeight: INSIGHT_LINE_RESERVE,
+            marginTop: 4,
+            display: 'flex',
+            alignItems: 'flex-end',
+          }}
+        >
           {insight && (
             <div
               style={{
