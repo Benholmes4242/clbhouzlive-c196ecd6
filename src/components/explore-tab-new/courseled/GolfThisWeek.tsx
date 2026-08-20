@@ -53,10 +53,15 @@ import { A, CARD_SHELL, Eyebrow, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } fr
  *
  * THIS SECTION ASKS "WHERE". The friends rail above asks "WHO" and is untouched.
  *
- * NO DECORATION: no emoji, no section glyph, no badges. The single exception is
- * an ace or an albatross, which get one gold marker because they are once in a
- * lifetime. Chevrons appear on navigation only.
+ * DECORATION RULES:
+ *   - The section heading carries the same outline Lucide icon as the other
+ *     Discover sections (CalendarDays) — part of a system, no emoji there.
+ *   - The band tiles are small celebratory stat tiles; a single emoji marker
+ *     before the label is allowed there, like the trophy on the WON chip.
+ *   - The only coloured bitmap is the ace/albatross gold marker on a round card.
+ *   - Chevrons appear on navigation only.
  */
+
 
 /* Original Golf This Week tile geometry (236×108, 54px shape). */
 const CARD_W = 236;
