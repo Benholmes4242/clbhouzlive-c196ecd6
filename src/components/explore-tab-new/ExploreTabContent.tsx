@@ -403,6 +403,7 @@ export default function ExploreTabContent({
             }
             onCardPress={handleFriendCard}
             onSeeAll={() => setGolfWeekSheet(true)}
+            style={{ marginTop: 24 }}
           />
         </div>
 
