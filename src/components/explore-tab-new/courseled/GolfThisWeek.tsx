@@ -255,6 +255,8 @@ function GolfThisWeekCard({
   region,
   imageUrl,
   showFollow,
+  isFollowed,
+  viewerUserId,
   onPress,
 }: CardProps) {
   const { t } = useTranslation('courses');
@@ -271,9 +273,19 @@ function GolfThisWeekCard({
   const deltaTone = deltaZero ? A.MUTE : (delta as number) < 0 ? A.IMPROVED : A.DRIFTED;
 
   return (
-    <button
-      type="button"
+    /* NOT A <button> (§S1.1): FollowButton is a real button and a button inside
+       a button is invalid HTML — WebKit commonly never delivers the inner tap.
+       Div + role="button" + Enter/Space keeps the whole tile operable. */
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onPress}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+          e.preventDefault();
+          onPress();
+        }
+      }}
       style={{
         ...CARD_SHELL,
         border: `1px solid ${A.BORDER}`,
@@ -389,7 +401,11 @@ function GolfThisWeekCard({
           )}
           {showFollow && (
             <span style={{ marginLeft: hasDelta ? 8 : 'auto', flexShrink: 0, display: 'inline-flex' }}>
-              <FollowButton targetUserId={row.user_id} />
+              <FollowButton
+                targetUserId={row.user_id}
+                isFollowed={isFollowed}
+                viewerUserId={viewerUserId}
+              />
             </span>
           )}
         </div>
@@ -468,7 +484,7 @@ function GolfThisWeekCard({
           )}
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -790,12 +806,9 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll, style
               imageUrl={m?.imageUrl ?? null}
               /* §2.2 — never on the member's own round, never on someone already
                  followed, and never before the follow set has resolved. */
-              showFollow={
-                !r.is_self &&
-                !!userId &&
-                !!following.data &&
-                !following.data.has(r.user_id)
-              }
+              showFollow={!r.is_self && !!userId && !!following.data}
+              isFollowed={!!following.data?.has(r.user_id)}
+              viewerUserId={userId}
               onPress={() => onCardPress(r)}
             />
           );
