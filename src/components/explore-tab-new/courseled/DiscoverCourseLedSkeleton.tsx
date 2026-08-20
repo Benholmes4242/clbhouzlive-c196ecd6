@@ -13,7 +13,7 @@ import { CARD_SHELL } from './tokens';
  *
  * Every block below is MEASURED off the rendered component it stands in for,
  * not read off the JSX and added up:
- *   friends rail   224 x 233  (104 photo + 60 shape strip + 69 body)
+ *   rounds rail    merged Golf this week: heading + scope pills + band + tiles
  *   around world   masonry, six photo heights + 62 body
  *   moments        two 220 blocks + a trailing 109 shorts row (cap 8)
  *   most played    panel of 60px rows
@@ -27,7 +27,13 @@ import { CARD_SHELL } from './tokens';
  * rendered by OnTourThisWeek and LatestReviews themselves — those components
  * are intact by instruction (S1.2), and a shell deleted out from under a live
  * component is a worse problem than an unreached one.
+ *
+ * ALSO NO LONGER REACHED (MICRO_BRIEF_REMOVE_ONE_THING_ROW): the page header
+ * block (title removed) and FriendsRail (merged into the rounds rail). The rate
+ * prompt never had a shell here, so nothing had to be deleted for it. The
+ * merged rounds rail now LEADS the shell and owns the safe-area padding.
  */
+
 
 
 
