@@ -202,15 +202,16 @@ export function useCircleLatestRounds(
         longest_birdie_run: number | null;
         longest_par_or_better_run: number | null;
         sub_80: boolean | null;
+        delta_index: number | string | null;
       };
 
       const ROUND_COLS =
-        'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80';
+        'user_id, whs_score_id, play_date, gross_score, course_par, course_name, course_id, hcp_at_time, holes_played, birdies, eagles, albatrosses, holes_in_one, beat_par, clean_card, longest_birdie_run, longest_par_or_better_run, sub_80, delta_index';
 
-      // 2. Circle rounds — WINDOW_DAYS lookback, ordered newest first.
-      const windowStartIso = new Date(Date.now() - WINDOW_DAYS * DAY_MS).toISOString().slice(0, 10);
+      // 2. Circle rounds — windowDays lookback, ordered newest first.
+      const windowStartIso = new Date(Date.now() - windowDays * DAY_MS).toISOString().slice(0, 10);
       let circleRounds: Round[] = [];
-      if (circleIds.length > 0) {
+      if (scope === 'circle' && circleIds.length > 0) {
         const { data: rounds } = await supabase
           .from('gam_round_stats' as never)
           .select(ROUND_COLS)
@@ -245,6 +246,27 @@ export function useCircleLatestRounds(
         }
       }
       pickedRounds.sort((a, b) => b.play_date.localeCompare(a.play_date));
+
+      /**
+       * SCOPE 'EVERYONE' (BRIEF_GOLF_THIS_WEEK §1, move 1): EVERY round anyone
+       * played in the window, newest first — no circle predicate, no per-member
+       * cap and NO FEAT THRESHOLD. One read replaces the two above; the whole
+       * enrichment pipeline below is shared, which is why this lives here rather
+       * than in a second hook that would have to re-derive nines, records,
+       * histories and index movement.
+       */
+      if (scope === 'everyone') {
+        const { data: all } = await supabase
+          .from('gam_round_stats' as never)
+          .select(ROUND_COLS)
+          .gte('play_date', windowStartIso)
+          .eq('holes_played', 18)
+          .order('play_date', { ascending: false })
+          .limit(limit);
+        pickedRounds.length = 0;
+        pickedRounds.push(...(((all ?? []) as unknown) as Round[]));
+      }
+
 
       /**
        * SUGGESTED ROUNDS ARE INTERLEAVED AT A FIXED RATIO
