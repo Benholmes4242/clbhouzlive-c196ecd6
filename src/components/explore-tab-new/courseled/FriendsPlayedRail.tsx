@@ -473,7 +473,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                        reinstate the gap the hole count left behind. */
                     marginTop: 'auto',
                     borderTop: `1px solid ${A.BORDER}`,
-                    paddingTop: 8,
+                    paddingTop: 6,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
