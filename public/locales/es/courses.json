@@ -1119,7 +1119,12 @@
     "videosHeading": "Videos recientes",
     "videosAction": "Todos los videos",
     "clipsHeading": "Clips",
-    "clipsAction": "Ver todo"
+    "clipsAction": "Ver todo",
+    "golfThisWeek": {
+      "stablefordLabel": "Mejor stableford",
+      "birdiesLabel": "Más birdies",
+      "stablefordUnit": "puntos"
+    }
   },
   "statBrowse": {
     "colArea": "Zona",

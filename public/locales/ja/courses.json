@@ -1059,7 +1059,12 @@
     "videosHeading": "最新の動画",
     "videosAction": "すべての動画",
     "clipsHeading": "クリップ",
-    "clipsAction": "すべて見る"
+    "clipsAction": "すべて見る",
+    "golfThisWeek": {
+      "stablefordLabel": "ベストステーブルフォード",
+      "birdiesLabel": "バーディー最多",
+      "stablefordUnit": "ポイント"
+    }
   },
   "statBrowse": {
     "colArea": "エリア",

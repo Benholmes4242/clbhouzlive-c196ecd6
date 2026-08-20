@@ -1546,7 +1546,12 @@
     "videosHeading": "Latest videos",
     "videosAction": "All videos",
     "clipsHeading": "Clips",
-    "clipsAction": "See all"
+    "clipsAction": "See all",
+    "golfThisWeek": {
+      "stablefordLabel": "[Bèst stàblefôrd]",
+      "birdiesLabel": "[Mòst bìrdiés]",
+      "stablefordUnit": "[pôints]"
+    }
   },
   "statBrowse": {
     "eyebrow": "[~~Ŵĥéřé ţĥíš ĉőɱɱúñíţý ƥļáýš~~]",
