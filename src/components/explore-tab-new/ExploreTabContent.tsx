@@ -12,7 +12,6 @@ import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
-import { useDiscoverPrompt } from './courseled/hooks/useDiscoverPrompt';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
@@ -96,8 +95,6 @@ export default function ExploreTabContent({
   // NEW SINCE (BRIEF_DISCOVER_NEW_SINCE): one baseline for the whole visit,
   // written back only on EXIT so markers survive scrolling and tapping.
   const { lastSeen, markSeen } = useDiscoverLastSeen(userId);
-  const { prompt: topPrompt, resolved: promptResolved } = useDiscoverPrompt(userId);
-  const hasPrompt = promptResolved && !!topPrompt;
 
   useMarkDiscoverSeenOnExit(markSeen);
 
