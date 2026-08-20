@@ -1483,7 +1483,7 @@
     "mostPlayedAvgToParBy_other": "Played to {{value}} by {{count}} members",
     "mostPlayedMembers_one": "{{count}} member",
     "mostPlayedMembers_other": "{{count}} members",
-    "whosBeenPlaying": "Who's been playing",
+    "whosBeenPlaying": "Your Circle",
     "suggestedMark": "SUGGESTED",
     "creator": {
       "chip": "Creator",
