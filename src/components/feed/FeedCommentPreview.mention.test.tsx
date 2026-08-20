@@ -79,6 +79,22 @@ describe('FeedCommentPreview mention integration', () => {
     expect(screen.getByText('Hi @[[Bad](u:bad)')).toBeInTheDocument();
   });
 
+  it('keeps the single-line clamp on a long comment with a trailing mention', () => {
+    const long =
+      'This is a really long comment that would definitely wrap if the clamp were not in place ' +
+      'and it ends with a mention at the very end @[@Alice](u:11111111-1111-1111-1111-111111111111) there.';
+    const { container } = wrap(
+      <FeedCommentPreview preview={{ ...preview, content: long }} commentCount={1} onOpenComments={() => {}} />,
+    );
+    const clamp = container.querySelector('span[style*="white-space: nowrap"]');
+    expect(clamp).toHaveStyle({
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    });
+    expect(clamp).toContainElement(container.querySelector('[data-mention-type="user"]') as HTMLElement);
+  });
+
   it('uses light-surface tones when surface is light', () => {
     const { container } = wrap(
       <FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} surface="light" />,
