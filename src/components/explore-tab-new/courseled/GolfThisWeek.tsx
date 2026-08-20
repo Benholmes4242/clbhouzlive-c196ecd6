@@ -7,6 +7,7 @@ import { CalendarDays } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { toast } from '@/lib/toast';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
