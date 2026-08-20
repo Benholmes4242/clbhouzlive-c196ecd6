@@ -15,6 +15,7 @@ import missionHillsHaikou from '@/assets/courses/mission-hills-haikou.jpg';
 import hazeltineNational from '@/assets/courses/hazeltine-national-golf-club.jpg.asset.json';
 import sedgefieldCC from '@/assets/courses/sedgefield-country-club.jpg.asset.json';
 import clubAtIndianCreek from '@/assets/courses/club-at-indian-creek.jpg.asset.json';
+import canyonMeadowsGCC from '@/assets/courses/canyon-meadows-gcc.jpg.asset.json';
 
 /**
  * Static venue image overrides for courses not yet in the database.
@@ -29,6 +30,8 @@ const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
   'Hazeltine National Golf Club': hazeltineNational.url,
   'Sedgefield Country Club': sedgefieldCC.url,
   'The Club at Indian Creek': clubAtIndianCreek.url,
+  'Canyon Meadows G&CC': canyonMeadowsGCC.url,
+  'Canyon Meadows Golf & Country Club': canyonMeadowsGCC.url,
 };
 
 export interface BatchImageMap {
