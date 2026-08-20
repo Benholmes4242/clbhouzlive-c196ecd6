@@ -1124,6 +1124,26 @@
       "stablefordLabel": "Mejor stableford",
       "birdiesLabel": "Más birdies",
       "stablefordUnit": "puntos"
+    },
+    "week": {
+      "scopeAria": "Ámbito de rondas",
+      "allRegions": "En todas partes",
+      "selectRegionA11y": "Filtrar rondas por zona",
+      "areaLabel": "Zona",
+      "scope": {
+        "circle": "Tu círculo",
+        "suggested": "Sugeridas",
+        "top100": "Top 100",
+        "played": "Jugados",
+        "worldwide": "Mundial"
+      },
+      "empty": {
+        "circle": "Esta semana no hay rondas de tu círculo.",
+        "suggested": "Esta semana no hay rondas sugeridas.",
+        "top100": "Esta semana no hay rondas del Top 100.",
+        "played": "Esta semana no hay rondas en tus campos.",
+        "worldwide": "Esta semana no hay rondas."
+      }
     }
   },
   "statBrowse": {

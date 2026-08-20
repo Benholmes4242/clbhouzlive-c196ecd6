@@ -1064,6 +1064,26 @@
       "stablefordLabel": "ベストステーブルフォード",
       "birdiesLabel": "バーディー最多",
       "stablefordUnit": "ポイント"
+    },
+    "week": {
+      "scopeAria": "ラウンドの範囲",
+      "allRegions": "すべての地域",
+      "selectRegionA11y": "地域でラウンドを絞り込む",
+      "areaLabel": "地域",
+      "scope": {
+        "circle": "サークル",
+        "suggested": "おすすめ",
+        "top100": "トップ100",
+        "played": "プレー済み",
+        "worldwide": "世界"
+      },
+      "empty": {
+        "circle": "今週はサークルのラウンドがありません。",
+        "suggested": "今週はおすすめのラウンドがありません。",
+        "top100": "今週はトップ100のラウンドがありません。",
+        "played": "今週はあなたのコースでのラウンドがありません。",
+        "worldwide": "今週はラウンドがありません。"
+      }
     }
   },
   "statBrowse": {

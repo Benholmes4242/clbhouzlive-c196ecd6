@@ -1064,6 +1064,26 @@
       "stablefordLabel": "최고 스테이블포드",
       "birdiesLabel": "버디 최다",
       "stablefordUnit": "포인트"
+    },
+    "week": {
+      "scopeAria": "라운드 범위",
+      "allRegions": "전체 지역",
+      "selectRegionA11y": "지역으로 라운드 필터",
+      "areaLabel": "지역",
+      "scope": {
+        "circle": "내 서클",
+        "suggested": "추천",
+        "top100": "톱 100",
+        "played": "플레이한 코스",
+        "worldwide": "전 세계"
+      },
+      "empty": {
+        "circle": "이번 주 서클 라운드가 없습니다.",
+        "suggested": "이번 주 추천 라운드가 없습니다.",
+        "top100": "이번 주 톱 100 라운드가 없습니다.",
+        "played": "이번 주 내 코스 라운드가 없습니다.",
+        "worldwide": "이번 주 라운드가 없습니다."
+      }
     }
   },
   "statBrowse": {
