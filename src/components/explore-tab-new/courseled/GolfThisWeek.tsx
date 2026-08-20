@@ -338,12 +338,15 @@ function GolfThisWeekCard({
             minWidth: 0,
           }}
         >
+          {/* THE AVATAR IS THE FRIENDS RAIL'S AVATAR: 20px, no ring (§7). */}
           <SquircleAvatar
-            src={row.profile_photo_url ?? undefined}
-            alt=""
-            size={22}
-            fallback={getInitialsFromName(row.display_name)}
+            src={row.profile_photo_url}
+            userId={row.user_id}
+            alt={row.display_name}
+            size={20}
+            hideRing
           />
+
           <span
             style={{
               flex: 1,
