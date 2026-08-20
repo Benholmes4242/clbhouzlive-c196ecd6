@@ -124,15 +124,30 @@ interface Options {
    */
   includeSuggested?: boolean;
   /**
-   * 'circle'   — the friends rail: circle rounds, one per member, suggested
-   *              interleaved at a fixed ratio. UNCHANGED, and the default.
-   * 'everyone' — GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK §1): EVERY visible round
-   *              in the window, no per-member cap, no feat threshold, newest
-   *              first. RLS still decides what is visible.
+   * 'circle'    — the friends rail: circle rounds, suggested interleaved at a
+   *               fixed ratio. UNCHANGED, and the default.
+   * 'everyone'  — EVERY visible round in the window, no per-member cap, no feat
+   *               threshold, newest first. RLS still decides what is visible.
+   * 'suggested' — ONLY rounds from OUTSIDE the circle (the suggested pool the
+   *               'circle' scope interleaves), one per member.
    */
-  scope?: 'circle' | 'everyone';
+  scope?: 'circle' | 'everyone' | 'suggested';
   /** Lookback in days. Golf this week passes 7; the rail keeps 60. */
   windowDays?: number;
+  /**
+   * BRIEF_MERGE_CIRCLE_AND_GOLF_THIS_WEEK §S2.2 — QUERY-LEVEL COURSE FILTER.
+   * The Top 100 and Played scopes are answered by the DATABASE (`.in('course_id',
+   * …)`) rather than by discarding rows the client already paid to enrich.
+   * `undefined`/`null` = no filter. An EMPTY ARRAY is an honest empty answer and
+   * short-circuits to zero rows.
+   */
+  courseIds?: string[] | null;
+  /**
+   * The friends rail shows the NEWEST round per member so twelve tiles are
+   * twelve faces. A rounds section counting "16 rounds" must show all sixteen,
+   * so it passes false.
+   */
+  oneRoundPerMember?: boolean;
 }
 
 const DAY_MS = 86_400_000;
@@ -146,8 +161,11 @@ export function useCircleLatestRounds(
     includeSuggested = true,
     scope = 'circle',
     windowDays = WINDOW_DAYS,
+    courseIds = null,
+    oneRoundPerMember = true,
   }: Options = {},
 ) {
+  const courseFilter = courseIds == null ? null : Array.from(new Set(courseIds)).sort();
   return useQuery({
     queryKey: [
       'circle-latest-rounds',
@@ -157,11 +175,17 @@ export function useCircleLatestRounds(
       includeSuggested,
       scope,
       windowDays,
+      courseFilter == null ? 'all-courses' : courseFilter.join('|'),
+      oneRoundPerMember,
     ],
 
 
     queryFn: async (): Promise<CircleRoundRow[]> => {
       if (!userId) return [];
+      // An empty allow-list is a real answer, not a missing one.
+      if (courseFilter != null && courseFilter.length === 0) return [];
+
+
 
       // 1. THE CIRCLE = accepted friendships (bidirectional) UNION the people
       //    the member FOLLOWS. Outbound follows only: following is a choice the
@@ -218,17 +242,26 @@ export function useCircleLatestRounds(
 
       // 2. Circle rounds — windowDays lookback, ordered newest first.
       const windowStartIso = new Date(Date.now() - windowDays * DAY_MS).toISOString().slice(0, 10);
+
+      /** The scope's course allow-list, applied IN SQL (§S2.2) or not at all. */
+      type Filterable = { in: (column: string, values: string[]) => Filterable };
+      const scoped = (q: unknown): unknown =>
+        courseFilter == null ? q : (q as Filterable).in('course_id', courseFilter);
+
       let circleRounds: Round[] = [];
       if (scope === 'circle' && circleIds.length > 0) {
-        const { data: rounds } = await supabase
-          .from('gam_round_stats' as never)
-          .select(ROUND_COLS)
-          .in('user_id', circleIds)
-          .gte('play_date', windowStartIso)
-          .eq('holes_played', 18)
-          .order('play_date', { ascending: false });
+        const { data: rounds } = (await scoped(
+          supabase
+            .from('gam_round_stats' as never)
+            .select(ROUND_COLS)
+            .in('user_id', circleIds)
+            .gte('play_date', windowStartIso)
+            .eq('holes_played', 18)
+            .order('play_date', { ascending: false }),
+        )) as { data: unknown };
         circleRounds = ((rounds ?? []) as unknown) as Round[];
       }
+
 
       // 3. Pick rounds per circle member. Default: newest round each.
       // Sheet-mode fallback: if fewer than `limit` members have any rounds,
@@ -242,7 +275,11 @@ export function useCircleLatestRounds(
 
       const pickedRounds: Round[] = [];
       const membersWithRounds = Array.from(byMember.keys());
-      if (allowMultiplePerFriend && membersWithRounds.length > 0 && membersWithRounds.length < limit) {
+      if (!oneRoundPerMember) {
+        /* EVERY ROUND (§S1.4): the count in the heading and the tiles in the
+           rail must be the same set, so no per-member cap applies. */
+        pickedRounds.push(...circleRounds);
+      } else if (allowMultiplePerFriend && membersWithRounds.length > 0 && membersWithRounds.length < limit) {
         for (const fid of membersWithRounds) {
           const list = byMember.get(fid) ?? [];
           pickedRounds.push(...list.slice(0, 3));
@@ -264,16 +301,20 @@ export function useCircleLatestRounds(
        * histories and index movement.
        */
       if (scope === 'everyone') {
-        const { data: all } = await supabase
-          .from('gam_round_stats' as never)
-          .select(ROUND_COLS)
-          .gte('play_date', windowStartIso)
-          .eq('holes_played', 18)
-          .order('play_date', { ascending: false })
-          .limit(limit);
+        const { data: all } = (await scoped(
+          supabase
+            .from('gam_round_stats' as never)
+            .select(ROUND_COLS)
+            .gte('play_date', windowStartIso)
+            .eq('holes_played', 18)
+            .order('play_date', { ascending: false })
+            .limit(limit),
+        )) as { data: unknown };
+
         pickedRounds.length = 0;
         pickedRounds.push(...(((all ?? []) as unknown) as Round[]));
       }
+
 
 
       /**
@@ -291,14 +332,20 @@ export function useCircleLatestRounds(
        */
       const RATIO = 5;
       const suggestedWindow: Round[] = [];
-      if (includeSuggested && scope === 'circle') {
-        const { data: pool } = await supabase
-          .from('gam_round_stats' as never)
-          .select(ROUND_COLS)
-          .gte('play_date', windowStartIso)
-          .eq('holes_played', 18)
-          .order('play_date', { ascending: false })
-          .limit(400);
+      /* Scope 'suggested' IS this pool and nothing else — the same code path, so
+         the two scopes can never disagree about who is outside the circle. */
+      if ((includeSuggested && scope === 'circle') || scope === 'suggested') {
+        const { data: pool } = (await scoped(
+          supabase
+            .from('gam_round_stats' as never)
+            .select(ROUND_COLS)
+            .gte('play_date', windowStartIso)
+            .eq('holes_played', 18)
+            .order('play_date', { ascending: false })
+            .limit(400),
+        )) as { data: unknown };
+
+
         const excluded = new Set<string>([userId, ...circleIds]);
         const bestByMember = new Map<string, Round>();
         for (const r of ((pool ?? []) as unknown) as Round[]) {
