@@ -3,7 +3,7 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
-import { monotonePath } from '@/lib/charts/monotonePath';
+import { smoothPath } from '@/lib/charts/smoothPath';
 import { A } from './tokens';
 
 /**
@@ -21,6 +21,14 @@ const SHAPE_PAD_X = 6;
 
 const OVER_TONE = A.INK;
 const UNDER_TONE = TOPAR_RED;
+
+/* SOLID FILL TONES, PRE-MIXED ON WHITE (BRIEF_ROUND_CURVE_REFINEMENT §2.1).
+   NOT the to-par colours at an alpha — a tint reads as failed, a solid tone at
+   the same lightness reads as deliberate. Opaque, so the fill never interacts
+   with whatever sits behind the tile. */
+const FILL_UNDER_LIGHT = '#FBE9EA'; // went under par
+const FILL_OVER_LIGHT = '#E8E9EB'; // stayed over par
+
 
 export function RoundShape({
   row,
@@ -64,9 +72,9 @@ export function RoundShape({
 
   /* ONE CHART, THREE SURFACES. When the hole-by-hole data is present the tile
      renders THE SAME TrajectoryLine the Clubhouse scorecard post and the
-     scorecard sheet render — same grades, same fill, same bead filter, same
-     halo — instead of a look-alike maintained here. Ticks are suppressed: the
-     band is 34px and carries its own meta row. */
+     scorecard sheet render — same grades, same solid fill, same bead filter,
+     same 1.8px stroke and no halo — instead of a look-alike maintained here.
+     Ticks are suppressed: the band carries its own meta row. */
   if (shape) {
     return (
       <>
@@ -120,7 +128,10 @@ export function RoundShape({
     y: yFor(v),
   }));
 
-  const d = monotonePath(pts);
+  /* THE SHARED TANGENT CUBIC (tension 0.25). The fill path is built from THIS
+     smoothed d, never from a straight-edged copy — a smoothed stroke over a
+     straight fill shows the fill's corners poking through. */
+  const d = smoothPath(pts);
   // THE FILL RUNS FLAT TO BOTH CARD EDGES so the colour stays full bleed,
   // while the POINTS are inset so the terminal dot cannot clip.
   const fillD = `M0,${height} L0,${pts[0].y.toFixed(2)} L${d.slice(1)} L${width},${pts[pts.length - 1].y.toFixed(2)} L${width},${height} Z`;
@@ -130,8 +141,6 @@ export function RoundShape({
   const uid = `fps-${String(row.round_id).replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const clipAbove = `${uid}-ca`;
   const clipBelow = `${uid}-cb`;
-  const gradAbove = `${uid}-ga`;
-  const gradBelow = `${uid}-gb`;
   const gradStroke = `${uid}-gs`;
 
   /* ── THE HEAT-GRADED STROKE (same concept as the handicap index tile and the
@@ -144,27 +153,30 @@ export function RoundShape({
   const gradeFor = (dh: number) =>
     dh <= -1 ? UNDER_TONE : dh === 0 ? TOPAR_EVEN_LIGHT : dh === 1 ? A.MUTE : A.INK;
 
-  /* STOP PLACEMENT IS LOAD-BEARING. Hole i's segment runs from pts[i-1] to
-     pts[i] — position i is the cumulative AFTER hole i — so hole i's colour
-     spans those two offsets and no others. It was previously pinned at pts[i]
-     and held to pts[i+1], which painted every grade on the FOLLOWING hole:
-     a birdie tinted the segment where the line rose. Two coincident stops at a
-     boundary give the hard edge; no epsilon.
-     The plot IS horizontally inset (SHAPE_PAD_X), so pts[0].x !== 0 and
-     pts[last].x !== width — the offset-0 primer and the offset-1 trailing stop
-     STAY, or the padded edges render uncoloured. */
+  /* ONE STOP PER HOLE at its segment MIDPOINT, linearly interpolated. The
+     colour is now an IMPRESSION of how the round went, not a per-hole reading —
+     a hole's grade is pure at one point and blends into both neighbours. That
+     is a deliberate trade: the scorecard grid below carries the hole-by-hole
+     truth, and this curve is read at a glance. DO NOT 'restore' hard stops.
+
+     STOP PLACEMENT IS STILL LOAD-BEARING. Hole i owns the SEGMENT pts[i-1] to
+     pts[i] — position i is the cumulative AFTER hole i — and the midpoint is
+     computed from those two points. A blend placed on the wrong segment is the
+     old off-by-one bug with soft edges.
+     The plot IS horizontally inset (SHAPE_PAD_X), so the offset-0 anchor and
+     the offset-1 anchor STAY, or the padded ends fade to nothing. */
   const strokeStops = (() => {
     if (!shape) return null;
     const out: { offset: number; color: string }[] = [];
     for (let i = 1; i < values.length; i += 1) {
       const c = gradeFor(values[i] - values[i - 1]);
       if (i === 1) out.push({ offset: 0, color: c });
-      out.push({ offset: pts[i - 1].x / width, color: c });
-      out.push({ offset: pts[i].x / width, color: c });
+      out.push({ offset: (pts[i - 1].x + pts[i].x) / 2 / width, color: c });
     }
     if (out.length > 0) out.push({ offset: 1, color: out[out.length - 1].color });
     return out;
   })();
+
 
 
 
@@ -189,18 +201,6 @@ export function RoundShape({
               </clipPath>
             </>
           )}
-          <linearGradient id={gradAbove} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={OVER_TONE} stopOpacity={0.26} />
-            <stop offset="100%" stopColor={OVER_TONE} stopOpacity={0.02} />
-          </linearGradient>
-          {wentUnder && (
-            // BOTTOM to top, so the density sits at the low point rather than
-            // at the level line.
-            <linearGradient id={gradBelow} x1="0" y1="1" x2="0" y2="0">
-              <stop offset="0%" stopColor={UNDER_TONE} stopOpacity={0.3} />
-              <stop offset="100%" stopColor={UNDER_TONE} stopOpacity={0.03} />
-            </linearGradient>
-          )}
           {strokeStops && (
             <linearGradient
               id={gradStroke}
@@ -217,13 +217,17 @@ export function RoundShape({
           )}
         </defs>
 
+        {/* THE FILL IS ONE SOLID OPAQUE TONE — no gradient, no fillOpacity.
+            THE LEVEL-PAR SPLIT KEEPS ITS STRUCTURE: each side of zero takes its
+            own solid tone through its own clip. RED IS EARNED — the under-par
+            tone only appears when the round actually went under. */}
         {wentUnder ? (
           <>
             <g clipPath={`url(#${clipAbove})`}>
-              <path d={fillD} fill={`url(#${gradAbove})`} />
+              <path d={fillD} fill={FILL_OVER_LIGHT} />
             </g>
             <g clipPath={`url(#${clipBelow})`}>
-              <path d={fillD} fill={`url(#${gradBelow})`} />
+              <path d={fillD} fill={FILL_UNDER_LIGHT} />
             </g>
 
             {/* THE LEVEL-PAR RULE. Without it the red has nothing to be under.
@@ -241,20 +245,14 @@ export function RoundShape({
             />
           </>
         ) : (
-          <path d={fillD} fill={`url(#${gradAbove})`} />
+          <path d={fillD} fill={FILL_OVER_LIGHT} />
         )}
 
-        {/* THE WHITE HALO, drawn ONCE and UNCLIPPED, underneath both strokes —
-            it is what stops the band looking flat against the fill. */}
-        <path
-          d={d}
-          fill="none"
-          stroke="#FFFFFF"
-          strokeOpacity={0.75}
-          strokeWidth={5}
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-        />
+        {/* No halo. It existed so a 2.4px stroke read on top of a graduated
+            fill. At 1.8px over a SOLID flat fill there is nothing to separate
+            from, and a 5px halo under a thin line reads as a glow. If a halo is
+            ever reintroduced it must be the PANEL colour, never white on dark —
+            that was a real bug. */}
 
         {strokeStops ? (
           /* ONE path, graded hole by hole. No clip split is needed: the colour
@@ -264,8 +262,9 @@ export function RoundShape({
             d={d}
             fill="none"
             stroke={`url(#${gradStroke})`}
-            strokeWidth={2.4}
+            strokeWidth={1.8}
             strokeLinecap="round"
+            strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
         ) : wentUnder ? (
@@ -275,8 +274,9 @@ export function RoundShape({
                 d={d}
                 fill="none"
                 stroke={OVER_TONE}
-                strokeWidth={2.2}
+                strokeWidth={1.8}
                 strokeLinecap="round"
+                strokeLinejoin="round"
                 vectorEffect="non-scaling-stroke"
               />
             </g>
@@ -285,8 +285,9 @@ export function RoundShape({
                 d={d}
                 fill="none"
                 stroke={UNDER_TONE}
-                strokeWidth={2.2}
+                strokeWidth={1.8}
                 strokeLinecap="round"
+                strokeLinejoin="round"
                 vectorEffect="non-scaling-stroke"
               />
             </g>
@@ -296,11 +297,13 @@ export function RoundShape({
             d={d}
             fill="none"
             stroke={OVER_TONE}
-            strokeWidth={2.2}
+            strokeWidth={1.8}
             strokeLinecap="round"
+            strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
         )}
+
 
         {/* THE BEADS come from the SHARED beadForScore rule, positioned on the
             CUMULATIVE value AFTER the hole — identical tones and radii to the
