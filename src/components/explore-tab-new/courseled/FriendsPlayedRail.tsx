@@ -445,7 +445,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                     never disagree. ONE line of height on every card — every
                     insight state is written to fit it (BRIEF_FRIENDS_RAIL_ONE_LINE). */}
 
-                <div style={{ minHeight: INSIGHT_LINE_RESERVE, marginBottom: 9 }}>
+                <div style={{ minHeight: INSIGHT_LINE_RESERVE, marginBottom: 6 }}>
                   {insight && (
                     <div
                       style={{
