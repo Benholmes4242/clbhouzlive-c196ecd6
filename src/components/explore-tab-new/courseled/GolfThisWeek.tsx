@@ -364,12 +364,13 @@ function GolfThisWeekCard({
           {showFollow && <FollowButton targetUserId={row.user_id} />}
         </div>
 
-        {/* THE SHAPE — the friends rail's component at this size (§4.1). */}
+        {/* THE SHAPE — the friends rail's band, same height, full bleed (§4.1). */}
         <div style={{ marginTop: 8, marginLeft: -11, marginRight: -11 }}>
           <ShapeReveal>
             <RoundShape row={row} shape={shape} width={CARD_W} height={SHAPE_H} showMeta={false} />
           </ShapeReveal>
         </div>
+
 
         {insight && (
           <div
