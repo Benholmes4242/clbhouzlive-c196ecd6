@@ -484,27 +484,31 @@ export default function DiscoverCourseLedSkeleton() {
       aria-hidden="true"
       style={{ background: A.CANVAS, minHeight: '100vh', fontFamily: SANS }}
     >
-      {/* Header block — the live kicker line box is 15px, the h1's is 39px, so
-          the bars sit inside boxes of those heights and the title lands put. */}
+      {/* THE MERGED ROUNDS SECTION LEADS THE PAGE
+          (MICRO_BRIEF_REMOVE_ONE_THING_ROW S1.3 / S2.2): the rate prompt and the
+          page title are both gone, so the first shell is the rounds rail and it
+          carries the live page's padding verbatim — the floating header sits at
+          sat + 10 and is 44px tall, so sat + 70 gives 16px of clearance on
+          notched and non-notched devices alike. */}
       <div
         style={{
-          padding: '0 16px 12px',
-          paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 52px)',
+          padding: '0 14px',
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
         }}
       >
-        <div style={{ height: 15, display: 'flex', alignItems: 'center' }}>
-          <Bar style={{ height: 10, width: 96 }} />
-        </div>
-        <div style={{ height: 39, marginTop: 7, display: 'flex', alignItems: 'center' }}>
-          <Bar style={{ height: 26, width: 232 }} />
-        </div>
+        <GolfThisWeekRail />
       </div>
 
+      <div
+        style={{
+          padding: '0 14px',
+          marginTop: 28,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 28,
+        }}
+      >
 
-      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
-        <FriendsRail />
-        <TourRail />
-        <GolfThisWeekRail />
 
         <MomentsMosaic />
         <MostPlayedPanel />
