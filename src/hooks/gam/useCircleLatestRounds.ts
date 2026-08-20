@@ -283,7 +283,7 @@ export function useCircleLatestRounds(
        */
       const RATIO = 5;
       const suggestedWindow: Round[] = [];
-      if (includeSuggested) {
+      if (includeSuggested && scope === 'circle') {
         const { data: pool } = await supabase
           .from('gam_round_stats' as never)
           .select(ROUND_COLS)
@@ -606,7 +606,12 @@ export function useCircleLatestRounds(
           is_course_record: !!r.whs_score_id && recordScoreIds.has(r.whs_score_id),
           is_first_sub_80:
             r.sub_80 === true && firstSub80ByUser.get(r.user_id) === r.play_date,
-          suggested: suggestedIds.has(r.whs_score_id ?? `${r.user_id}-${r.play_date}`),
+          suggested:
+            scope === 'everyone'
+              ? r.user_id !== userId && !circleSet.has(r.user_id)
+              : suggestedIds.has(r.whs_score_id ?? `${r.user_id}-${r.play_date}`),
+          is_self: r.user_id === userId,
+          delta_index: r.delta_index == null ? null : Number(r.delta_index),
 
         };
 
