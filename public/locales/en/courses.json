@@ -1563,7 +1563,10 @@
       "following": "FOLLOWING",
       "ace": "ACE",
       "albatross": "ALBATROSS",
-      "unknownCourse": "A course"
+      "unknownCourse": "A course",
+      "stablefordLabel": "Best stableford",
+      "birdiesLabel": "Most birdies",
+      "stablefordUnit": "points"
     }
   },
   "statBrowse": {
