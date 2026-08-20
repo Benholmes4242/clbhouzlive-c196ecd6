@@ -90,6 +90,16 @@ export interface CircleRoundRow {
    * tile marks it; the tap behaves identically.
    */
   suggested: boolean;
+  /** TRUE when the round belongs to the viewing member. */
+  is_self: boolean;
+  /**
+   * THE HANDICAP MOVEMENT THIS ROUND PRODUCED (BRIEF_GOLF_THIS_WEEK §1.3).
+   * gam_round_stats.delta_index, written by gam-evaluator: the index carried by
+   * the NEXT score minus the index carried by THIS one. Negative = improved.
+   * Distinct from `hcp_delta`, which is "current index vs the index at the
+   * time" and is a drift figure, not this round's consequence.
+   */
+  delta_index: number | null;
 }
 
 
@@ -106,6 +116,16 @@ interface Options {
    * asking about their own people, not for more suggestions.
    */
   includeSuggested?: boolean;
+  /**
+   * 'circle'   — the friends rail: circle rounds, one per member, suggested
+   *              interleaved at a fixed ratio. UNCHANGED, and the default.
+   * 'everyone' — GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK §1): EVERY visible round
+   *              in the window, no per-member cap, no feat threshold, newest
+   *              first. RLS still decides what is visible.
+   */
+  scope?: 'circle' | 'everyone';
+  /** Lookback in days. Golf this week passes 7; the rail keeps 60. */
+  windowDays?: number;
 }
 
 const DAY_MS = 86_400_000;
@@ -113,10 +133,25 @@ const WINDOW_DAYS = 60;
 
 export function useCircleLatestRounds(
   userId: string | undefined,
-  { limit = 4, allowMultiplePerFriend = false, includeSuggested = true }: Options = {},
+  {
+    limit = 4,
+    allowMultiplePerFriend = false,
+    includeSuggested = true,
+    scope = 'circle',
+    windowDays = WINDOW_DAYS,
+  }: Options = {},
 ) {
   return useQuery({
-    queryKey: ['circle-latest-rounds', userId, limit, allowMultiplePerFriend, includeSuggested],
+    queryKey: [
+      'circle-latest-rounds',
+      userId,
+      limit,
+      allowMultiplePerFriend,
+      includeSuggested,
+      scope,
+      windowDays,
+    ],
+
 
     queryFn: async (): Promise<CircleRoundRow[]> => {
       if (!userId) return [];
