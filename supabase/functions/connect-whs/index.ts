@@ -21,9 +21,39 @@ import {
   egListFriends,
   upsertScores,
   insertHandicapSnapshotIfChanged,
+  syncProfileHandicapIndex,
   EgApiError,
   type EgFriend,
 } from "../_shared/eg-api.ts";
+
+// =============================================================================
+// Structured logging — mirrors sync-whs-due. Every run prints an ATTEMPT line at
+// entry and exactly one OUTCOME line as its final statement, so a run that logs
+// nothing at all is itself a diagnosis (the function never entered the handler).
+// Credentials NEVER appear in a log line: only the user id, the EG status and a
+// classified reason.
+// =============================================================================
+
+type Level = "info" | "warn" | "error";
+
+function logLine(level: Level, runId: string, event: string, fields: Record<string, unknown>) {
+  const payload = JSON.stringify({ fn: "connect-whs", run: runId, event, ...fields });
+  if (level === "error") console.error(payload);
+  else if (level === "warn") console.warn(payload);
+  else console.log(payload);
+}
+
+/** Classify a thrown error into a stable reason + upstream status for logs. */
+function classify(err: unknown): { kind: string; status: number | null; detail: string } {
+  if (err instanceof EgApiError) {
+    return { kind: err.kind, status: err.status ?? null, detail: err.message };
+  }
+  if (err instanceof Error) {
+    const isAbort = err.name === "AbortError" || /timeout|timed out/i.test(err.message);
+    return { kind: isAbort ? "timeout" : "unknown_error", status: null, detail: err.message };
+  }
+  return { kind: "unknown_error", status: null, detail: String(err) };
+}
 
 // =============================================================================
 // Request / response shapes
