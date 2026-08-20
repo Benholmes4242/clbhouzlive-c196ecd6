@@ -393,7 +393,6 @@ function GolfThisWeekCard({
           >
             {row.display_name}
           </span>
-          {showFollow && <FollowButton targetUserId={row.user_id} />}
         </div>
 
         {/* THE SHAPE — the friends rail's band, same height, full bleed (§4.1). */}
