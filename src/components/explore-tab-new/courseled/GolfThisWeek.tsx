@@ -472,31 +472,70 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
   const courseNameFor = (r: CircleRoundRow) =>
     meta?.get(r.course_id ?? '')?.name ?? r.course_name ?? '';
 
-  /* THE BAND IS TWO COMPARISONS OF EQUAL WEIGHT (§1, move 2) — tiles, not a
-     sentence with footnotes. Each is self-contained: label, figure, who, where.
+  /* THE BAND IS FOUR COMPARISONS OF EQUAL WEIGHT (§2) — tiles, not a sentence
+     with footnotes. Each is self-contained: label, figure, who, where.
 
-     The third comparison, BIGGEST MOVE, was deleted because it returned the same
-     round as MOST IMPROVED whenever the largest absolute delta_index was a cut
-     (roughly half of weeks). The alternative, "biggest rise", would celebrate a
-     member's worst week, which is a strange thing to put on Discover. A small
-     celebratory emoji marker is permitted on these stat tiles because it is
-     label decoration, not part of the section-heading icon system.
-  */
+     BIGGEST MOVE WAS DELETED (reducer and tile) because it returned the same
+     round as MOST IMPROVED whenever the largest absolute delta_index was a cut,
+     which is roughly half of all weeks. "Biggest rise" would always be distinct
+     but would put a member's worst week on Discover.
+
+     BEST STABLEFORD is the reason the band is worth a data change: gross is won
+     by the same two or three low handicappers every week, Stableford is NET, so
+     the whole membership can enter. It is not `net` — net is ruined by one
+     blow-up hole, Stableford charges that hole and nothing more.
+
+     TIES GO TO THE MOST RECENT ROUND in every tile: `ordered` is lens-ordered,
+     not date-ordered, so recency is compared explicitly rather than relying on
+     a reducer keeping its first-seen row.
+
+     A small celebratory emoji marker is permitted on these stat tiles because
+     it is label decoration, like the trophy on the WON chip. A SECTION HEADING
+     glyph is part of a system — outline lucide icons in ink across every
+     Discover section — and an emoji there would be the only coloured bitmap
+     among them. */
+  const newer = (a: CircleRoundRow, b: CircleRoundRow) =>
+    String(a.play_date).localeCompare(String(b.play_date)) > 0;
+
   const withDelta = ordered.filter(
     (r) => r.delta_index != null && Number.isFinite(r.delta_index),
   );
-  const mostImproved = withDelta.reduce<CircleRoundRow | null>(
-    (acc, r) =>
-      (r.delta_index as number) < 0 &&
-      (!acc || (r.delta_index as number) < (acc.delta_index as number))
-        ? r
-        : acc,
-    null,
-  );
+  const mostImproved = withDelta.reduce<CircleRoundRow | null>((acc, r) => {
+    const d = r.delta_index as number;
+    if (d >= 0) return acc;
+    if (!acc) return r;
+    const cur = acc.delta_index as number;
+    if (d < cur) return r;
+    if (d === cur && newer(r, acc)) return r;
+    return acc;
+  }, null);
+
+  /* NULL STABLEFORD FAILS THE FILTER, never contributes a 0 (§1.3). FLOOR 36 —
+     the par-equivalent every club golfer knows. */
+  const bestStableford = ordered.reduce<CircleRoundRow | null>((acc, r) => {
+    const p = r.stableford_points;
+    if (p == null || !Number.isFinite(p) || p < 36) return acc;
+    if (!acc) return r;
+    const cur = acc.stableford_points as number;
+    if (p > cur) return r;
+    if (p === cur && newer(r, acc)) return r;
+    return acc;
+  }, null);
+
+  /* FLOOR 3 — "1 birdie" is not a comparison, and a two-way tie on 1 is worse. */
+  const mostBirdies = ordered.reduce<CircleRoundRow | null>((acc, r) => {
+    const b = r.birdies;
+    if (b == null || !Number.isFinite(b) || b < 3) return acc;
+    if (!acc) return r;
+    const cur = acc.birdies as number;
+    if (b > cur) return r;
+    if (b === cur && newer(r, acc)) return r;
+    return acc;
+  }, null);
 
   const bandTiles: {
     key: string;
-    emoji: string;
+    emoji?: string;
     label: string;
     figure: string;
     tone: string;
@@ -515,6 +554,26 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
       sub: `${bestToPar ?? ''} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(best.row)}`.trim(),
     });
   }
+  if (bestStableford) {
+    bandTiles.push({
+      key: 'stableford',
+      label: t('discover.golfThisWeek.stablefordLabel', 'Best stableford'),
+      figure: String(bestStableford.stableford_points),
+      tone: A.INK,
+      row: bestStableford,
+      sub: `${t('discover.golfThisWeek.stablefordUnit', 'points')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(bestStableford)}`,
+    });
+  }
+  if (mostBirdies) {
+    bandTiles.push({
+      key: 'birdies',
+      label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
+      figure: String(mostBirdies.birdies),
+      tone: A.INK,
+      row: mostBirdies,
+      sub: `${t('discover.friendsRail.birdies', 'birdies')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(mostBirdies)}`,
+    });
+  }
   if (mostImproved) {
     const d = mostImproved.delta_index as number;
     bandTiles.push({
@@ -527,6 +586,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
       sub: `${t('discover.friendsRail.index', 'HCP')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(mostImproved)}`,
     });
   }
+
 
 
   return (
