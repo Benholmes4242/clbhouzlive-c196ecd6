@@ -651,11 +651,11 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
                   ...LABEL,
                   color: A.MUTE,
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'baseline',
                   gap: 4,
                 }}
               >
-                {tile.emoji ? <span style={{ lineHeight: 1 }}>{tile.emoji}</span> : null}
+                <span style={{ lineHeight: 1 }}>{tile.emoji}</span>
                 {tile.label}
               </div>
 
