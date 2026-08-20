@@ -26,15 +26,14 @@ import { SC_BIRDIE_DARK } from '@/features/courses/components/holes/_constants';
 import { shapeSentence } from '@/components/explore-tab-new/friendRoundParts';
 import { formatWeekdayShortGB, formatDayMonthShortGB } from '@/i18n/format';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
-import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
-
+import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 
 const INK = '#F4F7F9';
 const MUTE = 'rgba(255,255,255,0.62)';
 const DIM = 'rgba(255,255,255,0.40)';
 const AMBER = '#F7931E';
-const GREEN = INDEX_DELTA.dark.improved;
-const RED = '#FF6B60';
+const HCP_IMPROVING = '#16a34a';
+const HCP_DRIFTING = '#dc2626';
 const HAIRLINE = 'rgba(255,255,255,0.08)';
 
 const NUM: React.CSSProperties = {
