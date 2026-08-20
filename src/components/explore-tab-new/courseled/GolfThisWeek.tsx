@@ -302,8 +302,10 @@ function GolfThisWeekCard({
       </CourseImageFallback>
 
       <div style={{ padding: '9px 11px 9px' }}>
-        {/* GROSS AND TO-PAR, index movement right-aligned (§2.1). */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+        {/* GROSS AND TO-PAR, with index movement right-aligned (§2.1).
+            The follow button sits on the same row as the score, not the member
+            name, so the highest-value action is visible at the top of the tile. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span
             style={{
               ...NUMF,
@@ -351,6 +353,11 @@ function GolfThisWeekCard({
               </span>
             </span>
           )}
+          {showFollow && (
+            <span style={{ marginLeft: hasDelta ? 8 : 'auto', flexShrink: 0, display: 'inline-flex' }}>
+              <FollowButton targetUserId={row.user_id} />
+            </span>
+          )}
         </div>
 
         {/* THE PLAYER IS SECONDARY, beneath the score (§2). */}
@@ -386,7 +393,6 @@ function GolfThisWeekCard({
           >
             {row.display_name}
           </span>
-          {showFollow && <FollowButton targetUserId={row.user_id} />}
         </div>
 
         {/* THE SHAPE — the friends rail's band, same height, full bleed (§4.1). */}
