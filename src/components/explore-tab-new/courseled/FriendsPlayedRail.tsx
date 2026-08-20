@@ -57,7 +57,8 @@ import { A, FIGS, KICKER, CARD_SHELL, Eyebrow, GOLD, InkAction, NUMF, SANS } fro
 
 export const RAIL_CAP = 10;
 const CARD_W = 224;
-const PHOTO_H = 104;
+const PHOTO_H = 90;
+const SHAPE_H = 52;
 
 /* Rail scrim — THE STANDOUT-TILE SCRIM. The three-layer base/hotspot/top stack
    is gone: this rail now paints the same single bottom-weighted layer as the
@@ -422,7 +423,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   raising RoundShape's internal `top` would compress the plot
                   instead, so the gap would vary with the shape of the round. */}
               <div style={{ marginTop: 6 }}>
-                <RoundShape row={r} shape={holeShapes?.get(r.score_id ?? '') ?? null} />
+                <RoundShape row={r} shape={holeShapes?.get(r.score_id ?? '') ?? null} height={SHAPE_H} />
               </div>
 
               {/* THE LOWER BLOCK OWNS THE REMAINING HEIGHT. The rail stretches
@@ -432,7 +433,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                   name and reaction sit above their neighbours'. */}
               <div
                 style={{
-                  padding: '9px 11px 10px',
+                  padding: '7px 11px 8px',
                   flex: 1,
                   minHeight: 0,
                   display: 'flex',
@@ -444,7 +445,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                     never disagree. ONE line of height on every card — every
                     insight state is written to fit it (BRIEF_FRIENDS_RAIL_ONE_LINE). */}
 
-                <div style={{ minHeight: INSIGHT_LINE_RESERVE, marginBottom: 9 }}>
+                <div style={{ minHeight: INSIGHT_LINE_RESERVE, marginBottom: 6 }}>
                   {insight && (
                     <div
                       style={{
@@ -472,7 +473,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                        reinstate the gap the hole count left behind. */
                     marginTop: 'auto',
                     borderTop: `1px solid ${A.BORDER}`,
-                    paddingTop: 8,
+                    paddingTop: 6,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',

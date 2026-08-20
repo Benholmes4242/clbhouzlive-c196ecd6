@@ -63,10 +63,11 @@ import { A, CARD_SHELL, Eyebrow, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } fr
  */
 
 
-/* Original Golf This Week tile geometry (236×108, 54px shape). */
+/* Condensed tile geometry — ~12% shorter than the first pass, with the insight
+   line still at one consistent height across the rail. */
 const CARD_W = 236;
-const PHOTO_H = 108;
-const SHAPE_H = 54;
+const PHOTO_H = 92;
+const SHAPE_H = 48;
 
 /** The rail scrim of record — imported, never retyped. */
 const CARD_SCRIM = SCRIM_STANDOUT;
@@ -300,7 +301,7 @@ function GolfThisWeekCard({
         </div>
       </CourseImageFallback>
 
-      <div style={{ padding: '10px 11px 11px' }}>
+      <div style={{ padding: '9px 11px 9px' }}>
         {/* GROSS AND TO-PAR, index movement right-aligned (§2.1). */}
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
           <span
@@ -355,7 +356,7 @@ function GolfThisWeekCard({
         {/* THE PLAYER IS SECONDARY, beneath the score (§2). */}
         <div
           style={{
-            marginTop: 9,
+            marginTop: 7,
             display: 'flex',
             alignItems: 'center',
             gap: 7,
@@ -389,7 +390,7 @@ function GolfThisWeekCard({
         </div>
 
         {/* THE SHAPE — the friends rail's band, same height, full bleed (§4.1). */}
-        <div style={{ marginTop: 8, marginLeft: -11, marginRight: -11 }}>
+        <div style={{ marginTop: 6, marginLeft: -11, marginRight: -11 }}>
           <ShapeReveal>
             <RoundShape row={row} shape={shape} width={CARD_W} height={SHAPE_H} showMeta={false} />
           </ShapeReveal>
@@ -397,8 +398,17 @@ function GolfThisWeekCard({
 
 
         {/* THE SUBLINE IS THE FRIENDS RAIL'S SUBLINE (§4.2): same glyph, same
-            figure font, same body ink, ONE line of reserved height. */}
-        <div style={{ minHeight: INSIGHT_LINE_RESERVE, marginTop: 6 }}>
+            figure font, same body ink, ONE line of reserved height. Aligned to
+            the bottom of the reserve so the gap lives above the line, not below
+            it, and every tile's line sits at the same height. */}
+        <div
+          style={{
+            minHeight: INSIGHT_LINE_RESERVE,
+            marginTop: 4,
+            display: 'flex',
+            alignItems: 'flex-end',
+          }}
+        >
           {insight && (
             <div
               style={{

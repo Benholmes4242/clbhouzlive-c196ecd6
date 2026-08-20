@@ -85,11 +85,12 @@ function TextBar({ w, h = 11 }: { w: number | string; h?: number }) {
 }
 
 /**
- * Section 2 — friends rail. MEASURED off FriendsPlayedRail: 224 wide, a 104px
+ * Section 2 — friends rail. MEASURED off FriendsPlayedRail: 224 wide, a 90px
  * photograph (PHOTO_H) carrying the glass score chip, the full-bleed round
- * shape strip at 60 (SHAPE_H), then the body — ONE reserved insight line
+ * shape strip at 52 (SHAPE_H), then the body — ONE reserved insight line
  * (INSIGHT_LINE_RESERVE ~15), a hairline, and the member/reaction row.
- * Total 233. The strip grew 34 -> 60 so the curve has amplitude.
+ * Total 208. The strip grew 34 -> 60 -> 52 so the curve stays legible while the
+ * tile is condensed.
  */
 export function FriendsRail() {
   return (
@@ -98,24 +99,24 @@ export function FriendsRail() {
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
           <div key={i} style={{ ...CARD_SHELL, width: 224, flexShrink: 0, padding: 0 }}>
-            <Bar style={{ borderRadius: 0, height: 104, width: '100%' }} />
+            <Bar style={{ borderRadius: 0, height: 90, width: '100%' }} />
             {/* The shape strip is full bleed and sits directly under the photo. */}
-            <Bar style={{ borderRadius: 0, height: 60, width: '100%' }} />
-            <div style={{ padding: '9px 11px 10px' }}>
+            <Bar style={{ borderRadius: 0, height: 52, width: '100%' }} />
+            <div style={{ padding: '7px 11px 8px' }}>
               <div style={{ minHeight: 15, display: 'flex', flexDirection: 'column' }}>
                 <TextBar w={'92%'} h={10} />
               </div>
 
               <div
                 style={{
-                  marginTop: 9,
+                  marginTop: 6,
                   borderTop: `1px solid ${A.BORDER}`,
-                  paddingTop: 8,
+                  paddingTop: 6,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: 8,
-                  height: 25,
+                  height: 22,
                   boxSizing: 'border-box',
                 }}
               >
@@ -132,8 +133,8 @@ export function FriendsRail() {
 
 /**
  * GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK acceptance M). MEASURED off
- * GolfThisWeek.tsx: 236 wide, a 108px photograph carrying the course name, then
- * the body — score row 24, member row 22, the full-bleed shape strip at 54
+ * GolfThisWeek.tsx: 236 wide, a 92px photograph carrying the course name, then
+ * the body — score row 24, member row 22, the full-bleed shape strip at 48
  * (SHAPE_H), one insight line. Above the rail: eyebrow + subline, the live count
  * line, the pills row and the best-of-week band, all of which the live section
  * renders before its first card and none of which may appear later.
@@ -166,8 +167,8 @@ export function GolfThisWeekRail() {
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
           <div key={i} style={{ ...CARD_SHELL, width: 236, flexShrink: 0, padding: 0 }}>
-            <Bar style={{ borderRadius: 0, height: 108, width: '100%' }} />
-            <div style={{ padding: '10px 11px 11px' }}>
+            <Bar style={{ borderRadius: 0, height: 92, width: '100%' }} />
+            <div style={{ padding: '9px 11px 9px' }}>
               <div style={{ height: 24, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <TextBar w={46} h={18} />
                 <TextBar w={26} h={12} />
@@ -177,7 +178,7 @@ export function GolfThisWeekRail() {
               </div>
               <div
                 style={{
-                  marginTop: 9,
+                  marginTop: 7,
                   height: 22,
                   display: 'flex',
                   alignItems: 'center',
@@ -187,10 +188,10 @@ export function GolfThisWeekRail() {
                 <Bar style={{ height: 22, width: 22, borderRadius: '34%' }} />
                 <TextBar w={92} h={11} />
               </div>
-              <div style={{ marginTop: 8, marginLeft: -11, marginRight: -11 }}>
-                <Bar style={{ borderRadius: 0, height: 54, width: '100%' }} />
+              <div style={{ marginTop: 6, marginLeft: -11, marginRight: -11 }}>
+                <Bar style={{ borderRadius: 0, height: 48, width: '100%' }} />
               </div>
-              <div style={{ marginTop: 6, height: 15, display: 'flex', alignItems: 'center' }}>
+              <div style={{ marginTop: 4, height: 15, display: 'flex', alignItems: 'flex-end' }}>
                 <TextBar w={'88%'} h={10} />
               </div>
             </div>
