@@ -18,9 +18,9 @@ export function useProfileSave(userId: string) {
 
   const save = async (
     form: ProfileFormData,
-    opts: { isOnboarding?: boolean } = {}
+    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean } = {}
   ): Promise<boolean | 'username_taken'> => {
-    const { isOnboarding = false } = opts;
+    const { isOnboarding = false, hasWhsConnection = false } = opts;
     setIsSaving(true);
     try {
       // 1. Upload profile photo if changed

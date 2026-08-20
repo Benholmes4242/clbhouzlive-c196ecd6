@@ -256,7 +256,12 @@ export default function ManageProfile() {
         return;
       }
     }
-    const result = await save(form, { isOnboarding: isNewUser.current });
+    // A connected account's handicap comes from the federation, full stop —
+    // the save must not carry a manual figure for them.
+    const result = await save(form, {
+      isOnboarding: isNewUser.current,
+      hasWhsConnection,
+    });
     if (result === 'username_taken') {
       setUsernameStatus('taken');
       toast.error('That username was just taken - please choose another.');
