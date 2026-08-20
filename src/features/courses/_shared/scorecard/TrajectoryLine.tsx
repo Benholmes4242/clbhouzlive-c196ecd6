@@ -449,7 +449,7 @@ export const TrajectoryLine: React.FC<Props> = ({
               strokeWidth={1.5}
             />
           )}
-        </>
+        </g>
       )}
     </svg>
   );
