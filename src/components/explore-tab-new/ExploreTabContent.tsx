@@ -13,9 +13,8 @@ import { useDiscoverWire, type WireEvent } from './hooks/useDiscoverWire';
 import { ScopePills } from './wire/ScopePills';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import RateNudge from '@/components/courses/RateNudge';
-import { useRateNudgeCourse } from '@/hooks/useRateNudgeCourse';
 import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
+import { useDiscoverPrompt } from './courseled/hooks/useDiscoverPrompt';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
@@ -67,7 +66,7 @@ import { buildMomentQueue } from '@/features/community/momentQueue';
  * comment documented six with "Around the world" second, which the code had
  * never matched.
  *
- *   TOP SLOT: Rate nudge when available, otherwise Your Circle
+ *   TOP SLOT: existing one-thing prompt when available, otherwise Your Circle
  *   1 Your Circle                 rail        (hidden when promoted to top slot)
  *   2 On tour this week           facts rail  (next-up fallback off-week)
  *   3 Latest reviews              mosaic
@@ -97,8 +96,8 @@ export default function ExploreTabContent({
   // NEW SINCE (BRIEF_DISCOVER_NEW_SINCE): one baseline for the whole visit,
   // written back only on EXIT so markers survive scrolling and tapping.
   const { lastSeen, markSeen } = useDiscoverLastSeen(userId);
-  const { course: nudgeCourse, loading: nudgeLoading } = useRateNudgeCourse(userId);
-  const showRateNudge = nudgeLoading || !!nudgeCourse;
+  const { prompt: topPrompt, resolved: promptResolved } = useDiscoverPrompt(userId);
+  const hasPrompt = promptResolved && !!topPrompt;
 
   useMarkDiscoverSeenOnExit(markSeen);
 
@@ -325,19 +324,16 @@ export default function ExploreTabContent({
 
       {/* The chrome island floats over the page, so the header clears the notch
           plus the island itself — Discover no longer sits under a hero.
-          The title block is replaced by the rate nudge when a course is
-          available; otherwise Your Circle (friends rail) owns this spot. */}
+          The top slot is owned by the existing rate/one-thing prompt when one
+          exists; otherwise Your Circle (friends rail) owns this spot. */}
       <div
         style={{
           padding: '0 14px',
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
         }}
       >
-        {showRateNudge ? (
-          <RateNudge
-            userId={userId ?? ''}
-            onEmptyFallback={() => navigate('/courses')}
-          />
+        {hasPrompt ? (
+          <OneThingRow userId={userId} onFindGolfers={() => setFindGolfers(true)} />
         ) : (
           <FriendsPlayedRail
             userId={userId}
@@ -348,12 +344,6 @@ export default function ExploreTabContent({
         )}
       </div>
 
-
-
-      {/* ONE THING (BRIEF_DISCOVER_ONE_THING): one row, one action, session
-          dismissible. Renders nothing when there is nothing to ask. */}
-      <OneThingRow userId={userId} onFindGolfers={() => setFindGolfers(true)} />
-
       {/* ONE SECTION RHYTHM: 28px between a section's content and the next
           section's eyebrow. Eyebrows own their own 10px to their content. */}
       <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
@@ -361,7 +351,9 @@ export default function ExploreTabContent({
             the bottom of a rail tile to the next section's eyebrow matches the
             gap from the previous tile's bottom to the current eyebrow. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {showRateNudge && (
+          {/* When the one-thing prompt owns the top slot, Your Circle renders
+              below it as a normal section. Otherwise it is already the top slot. */}
+          {hasPrompt && (
             <FriendsPlayedRail
               userId={userId}
               lastSeen={lastSeen}
