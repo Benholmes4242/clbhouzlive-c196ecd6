@@ -301,7 +301,7 @@ function GolfThisWeekCard({
         </div>
       </CourseImageFallback>
 
-      <div style={{ padding: '10px 11px 11px' }}>
+      <div style={{ padding: '9px 11px 9px' }}>
         {/* GROSS AND TO-PAR, index movement right-aligned (§2.1). */}
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
           <span
