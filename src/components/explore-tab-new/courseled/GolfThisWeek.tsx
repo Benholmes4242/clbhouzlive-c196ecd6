@@ -632,9 +632,9 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
         className="scrollbar-hide"
         style={{ display: 'flex', alignItems: 'stretch', gap: 10, overflowX: 'auto' }}
       >
-        {rows.map((r) => {
+        {rows.map((r, i) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
-          return (
+          const card = (
             <GolfThisWeekCard
               key={r.round_id}
               row={r}
@@ -654,8 +654,33 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
               onPress={() => onCardPress(r)}
             />
           );
+
+          if (i !== 0 || counts.rounds <= rows.length) return card;
+
+          /* SEE ALL lives under the first card in a fixed position, never in the
+             header row. It is a column so it scrolls with the rail as one unit. */
+          return (
+            <div
+              key={`${r.round_id}-lead`}
+              style={{
+                width: CARD_W,
+                flexShrink: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              }}
+            >
+              {card}
+              <InkAction onClick={onSeeAll}>
+                {t('discover.golfThisWeek.seeAll', 'See all {{count}} rounds', {
+                  count: counts.rounds,
+                })}
+              </InkAction>
+            </div>
+          );
         })}
       </div>
+
     </section>
   );
 }
