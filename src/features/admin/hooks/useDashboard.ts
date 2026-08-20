@@ -21,6 +21,14 @@ export interface EgSyncHealth {
   auth_failed: number;
   eg_unavailable: number;
   consecutive_failures_total: number;
+  /** consecutive_failures >= 5: skipped by the normal sweep, surfaced here. */
+  poisoned_count: number;
+  /** Newest last_synced_at across all non-deleted connections. */
+  freshest_sync_at: string | null;
+  /** Age of that newest sync. Red above 12h — this is the outage detector. */
+  freshest_hours_ago: number | null;
+  /** Connections whose own last_synced_at is older than 12h. */
+  stale_12h_count: number;
   last_attempt_at: string | null;
   cron_last_run_at: string | null;
   cron_last_status: string | null;
