@@ -1,11 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { describe, it, expect, vi } from 'vitest';
 import { FeedCommentPreview } from './FeedCommentPreview';
 
-// Mock heavy / side-effectful UI dependencies so the test stays fast and
-// deterministic. The component's own logic (preview gate, surface tones,
-// MentionText integration, row click behaviour) is what we are verifying.
 vi.mock('@/components/ui/SquircleAvatar', () => ({
   SquircleAvatar: ({ alt }: { alt?: string }) => <div data-testid="avatar">{alt}</div>,
 }));
@@ -36,8 +34,7 @@ function wrap(ui: React.ReactElement) {
 describe('FeedCommentPreview mention integration', () => {
   it('renders the tagged name in bold, not raw markup', () => {
     wrap(<FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} />);
-    const text = screen.getByText('Nice shot');
-    expect(text).toBeInTheDocument();
+    expect(screen.getByText('Nice shot')).toBeInTheDocument();
     const mention = screen.getByText('@Alice');
     expect(mention).toBeInTheDocument();
     expect(mention.tagName).toBe('SPAN');
@@ -47,8 +44,7 @@ describe('FeedCommentPreview mention integration', () => {
 
   it('does not contain nested buttons in the row', () => {
     const { container } = wrap(<FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} />);
-    const buttons = container.querySelectorAll('button');
-    expect(buttons).toHaveLength(0);
+    expect(container.querySelectorAll('button')).toHaveLength(0);
   });
 
   it('opens the comments sheet when the row is clicked outside the mention', () => {
@@ -85,18 +81,14 @@ describe('FeedCommentPreview mention integration', () => {
     const { container } = wrap(
       <FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} surface="light" />,
     );
-    const name = screen.getByText('Bob');
-    expect(name).toHaveStyle({ color: '#0F172A' });
-    // The MID tone on the light surface is #6C727E.
+    expect(screen.getByText('Bob')).toHaveStyle({ color: '#0F172A' });
     expect(container.querySelector('[data-mention-type="user"]')).toHaveStyle({ color: '#6C727E' });
   });
 
   it('uses dark-surface tones when surface is dark', () => {
     wrap(<FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} surface="dark" />);
-    const name = screen.getByText('Bob');
-    expect(name).toHaveStyle({ color: '#F8FAFC' });
+    expect(screen.getByText('Bob')).toHaveStyle({ color: '#F8FAFC' });
     const mention = screen.getByText('@Alice');
-    // MID on dark is #A7AAAE; bold MID should still read as a mention.
     expect(mention).toHaveStyle({ color: '#A7AAAE' });
   });
 });
