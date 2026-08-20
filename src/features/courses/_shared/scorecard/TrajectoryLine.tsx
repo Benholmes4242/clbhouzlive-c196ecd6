@@ -372,12 +372,12 @@ export const TrajectoryLine: React.FC<Props> = ({
           side of zero takes its own solid tone through its own clip, and RED IS
           EARNED — the under-par tone only appears when the round went under. */}
       {fillDs.map((d, i) => (
-        <React.Fragment key={`fill-${i}`}>
+        <g key={`fill-${i}`}>
           <path d={d} fill={T.fillOver} stroke="none" clipPath={`url(#${clipAbove})`} />
           {wentUnder && (
             <path d={d} fill={T.fillUnder} stroke="none" clipPath={`url(#${clipBelow})`} />
           )}
-        </React.Fragment>
+        </g>
       ))}
 
       {/* level par — unconditional: the fill and the earned-red rule both
@@ -427,7 +427,7 @@ export const TrajectoryLine: React.FC<Props> = ({
 
       {/* THE SCRUB MARKER — rule plus a point on the curve, gone on release. */}
       {hover != null && (
-        <>
+        <g>
           <line
             x1={x(hover)}
             x2={x(hover)}
