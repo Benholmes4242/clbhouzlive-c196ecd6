@@ -360,8 +360,6 @@ export default function ExploreTabContent({
             the bottom of a rail tile to the next section's eyebrow matches the
             gap from the previous tile's bottom to the current eyebrow. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {/* When the one-thing prompt owns the top slot, Your Circle renders
-              below it as a normal section. Otherwise it is already the top slot. */}
           {/* When the one-thing prompt owns the top slot, the rounds section
               renders here instead (§S1.1 — it is the ONLY rounds section). */}
           {hasPrompt && (
@@ -394,8 +392,7 @@ export default function ExploreTabContent({
             onSeeAll={() => navigate('/community')}
             style={{ marginTop: 16 }}
           />
-
-
+        </div>
 
         {/* CLIPS — after Around the world, before Personal bests. It reads the
             whole library, so the scope pills (which live inside Around the
