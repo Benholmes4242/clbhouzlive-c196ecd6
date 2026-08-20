@@ -66,7 +66,7 @@ import { buildMomentQueue } from '@/features/community/momentQueue';
  * comment documented six with "Around the world" second, which the code had
  * never matched.
  *
- *   TOP SLOT: Rate nudge when available, otherwise Your Circle
+ *   TOP SLOT: existing one-thing prompt when available, otherwise Your Circle
  *   1 Your Circle                 rail        (hidden when promoted to top slot)
  *   2 On tour this week           facts rail  (next-up fallback off-week)
  *   3 Latest reviews              mosaic
