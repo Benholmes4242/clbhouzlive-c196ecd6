@@ -139,19 +139,45 @@ function ShapeReveal({ children }: { children: React.ReactNode }) {
 
 }
 
-/** §2.2 — a REAL follow button, the highest-value tap on the page. */
-function FollowButton({ targetUserId }: { targetUserId: string }) {
+/**
+ * §2.2 — a REAL follow button, the highest-value tap on the page, and the ONLY
+ * <button> inside the tile (the tile itself is a role="button" div, because a
+ * button nested in a button is invalid HTML and WebKit swallows the inner tap).
+ *
+ * IT HOLDS NO STATE, exactly like FeedFollowPill in the Clubhouse card: the
+ * truth is the cached following-id set, so optimism survives a remount and
+ * every tile for the same member flips together.
+ */
+function FollowButton({
+  targetUserId,
+  isFollowed,
+  viewerUserId,
+}: {
+  targetUserId: string;
+  isFollowed: boolean;
+  viewerUserId: string | undefined;
+}) {
   const { t } = useTranslation('courses');
   const queryClient = useQueryClient();
   const { activeActor } = useActiveActor();
   const toggle = useToggleFollow();
-  const [done, setDone] = useState(false);
 
   const onClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      if (toggle.isPending || done) return;
-      setDone(true);
+      if (toggle.isPending) return;
+
+      const key = ['courseled', 'following-ids', viewerUserId] as const;
+      const previous = queryClient.getQueryData<Set<string>>(key);
+      /* OPTIMISM LIVES IN THE CACHE, not in a local flag. A new Set, so the
+         query's referential identity changes and every reader re-renders. */
+      queryClient.setQueryData<Set<string>>(key, (old) => {
+        const next = new Set(old ?? []);
+        if (isFollowed) next.delete(targetUserId);
+        else next.add(targetUserId);
+        return next;
+      });
+
       toggle.mutate(
         {
           targetActorType: 'personal',
@@ -161,36 +187,41 @@ function FollowButton({ targetUserId }: { targetUserId: string }) {
           viewerActorId:
             activeActor?.type === 'business' ? activeActor.id : activeActor?.userId,
           viewerUserId: activeActor?.userId,
-          isFollowing: false,
+          isFollowing: isFollowed,
         },
         {
-          onError: () => setDone(false),
+          /* ROLL BACK to exactly what was there before the tap. */
+          onError: () => {
+            if (previous) queryClient.setQueryData<Set<string>>(key, new Set(previous));
+            else void queryClient.invalidateQueries({ queryKey: ['courseled', 'following-ids'] });
+          },
           onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: ['courseled', 'following-ids'] });
           },
         },
       );
     },
-    [activeActor, done, queryClient, targetUserId, toggle],
+    [activeActor, isFollowed, queryClient, targetUserId, toggle, viewerUserId],
   );
 
   return (
     <button
       type="button"
       onClick={onClick}
+      aria-label={isFollowed ? 'Unfollow' : 'Follow'}
       style={{
         ...LABEL,
         flexShrink: 0,
         fontFamily: SANS,
-        color: done ? A.MUTE : A.PANEL,
-        background: done ? 'transparent' : A.INK,
-        border: `1px solid ${done ? A.BORDER : A.INK}`,
+        color: isFollowed ? A.MUTE : A.PANEL,
+        background: isFollowed ? 'transparent' : A.INK,
+        border: `1px solid ${isFollowed ? A.BORDER : A.INK}`,
         borderRadius: 999,
         padding: '5px 10px',
         cursor: 'pointer',
       }}
     >
-      {done
+      {isFollowed
         ? t('discover.golfThisWeek.following', 'FOLLOWING')
         : t('discover.golfThisWeek.follow', 'FOLLOW')}
     </button>
@@ -205,6 +236,9 @@ interface CardProps {
   region: string | null;
   imageUrl: string | null;
   showFollow: boolean;
+  /** §2.2 — read from the SAME cached following-id set that drives showFollow. */
+  isFollowed: boolean;
+  viewerUserId: string | undefined;
   onPress: () => void;
 }
 
@@ -221,6 +255,8 @@ function GolfThisWeekCard({
   region,
   imageUrl,
   showFollow,
+  isFollowed,
+  viewerUserId,
   onPress,
 }: CardProps) {
   const { t } = useTranslation('courses');
@@ -237,9 +273,19 @@ function GolfThisWeekCard({
   const deltaTone = deltaZero ? A.MUTE : (delta as number) < 0 ? A.IMPROVED : A.DRIFTED;
 
   return (
-    <button
-      type="button"
+    /* NOT A <button> (§S1.1): FollowButton is a real button and a button inside
+       a button is invalid HTML — WebKit commonly never delivers the inner tap.
+       Div + role="button" + Enter/Space keeps the whole tile operable. */
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onPress}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+          e.preventDefault();
+          onPress();
+        }
+      }}
       style={{
         ...CARD_SHELL,
         border: `1px solid ${A.BORDER}`,
@@ -355,7 +401,11 @@ function GolfThisWeekCard({
           )}
           {showFollow && (
             <span style={{ marginLeft: hasDelta ? 8 : 'auto', flexShrink: 0, display: 'inline-flex' }}>
-              <FollowButton targetUserId={row.user_id} />
+              <FollowButton
+                targetUserId={row.user_id}
+                isFollowed={isFollowed}
+                viewerUserId={viewerUserId}
+              />
             </span>
           )}
         </div>
@@ -434,7 +484,7 @@ function GolfThisWeekCard({
           )}
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -756,12 +806,9 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll, style
               imageUrl={m?.imageUrl ?? null}
               /* §2.2 — never on the member's own round, never on someone already
                  followed, and never before the follow set has resolved. */
-              showFollow={
-                !r.is_self &&
-                !!userId &&
-                !!following.data &&
-                !following.data.has(r.user_id)
-              }
+              showFollow={!r.is_self && !!userId && !!following.data}
+              isFollowed={!!following.data?.has(r.user_id)}
+              viewerUserId={userId}
               onPress={() => onCardPress(r)}
             />
           );
