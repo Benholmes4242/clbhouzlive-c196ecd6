@@ -95,22 +95,35 @@ function ShapeReveal({ children }: { children: React.ReactNode }) {
       { threshold: 0.4 },
     );
     io.observe(el);
-    return () => io.disconnect();
+    /* A CURVE MUST NEVER BE PERMANENTLY INVISIBLE. If the observer is starved
+       for any reason (clipping, containment, a rail measured at zero), the
+       shape reveals itself anyway. */
+    const failsafe = window.setTimeout(() => setDrawn(true), 1500);
+    return () => {
+      io.disconnect();
+      window.clearTimeout(failsafe);
+    };
   }, [reduced]);
 
+
   const complete = reduced || drawn;
+  /* THE OBSERVED ELEMENT MUST NOT BE THE CLIPPED ELEMENT. A self-clipped node
+     (inset(0 100% 0 0)) reports a zero-area intersection rect in Chrome, so the
+     observer never fires and the curve stays hidden forever — the defect this
+     splits apart. Outer node = measured, inner node = clipped. */
   return (
-    <div
-      ref={ref}
-      style={{
-        // Reduced motion: the line simply appears complete.
-        clipPath: complete ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
-        transition: reduced ? undefined : `clip-path ${DRAW_MS}ms ${DRAW_EASE}`,
-      }}
-    >
-      {children}
+    <div ref={ref}>
+      <div
+        style={{
+          clipPath: complete ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
+          transition: reduced ? undefined : `clip-path ${DRAW_MS}ms ${DRAW_EASE}`,
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
+
 }
 
 /** §2.2 — a REAL follow button, the highest-value tap on the page. */
