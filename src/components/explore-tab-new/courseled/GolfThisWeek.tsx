@@ -473,27 +473,32 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
     meta?.get(r.course_id ?? '')?.name ?? r.course_name ?? '';
 
   /* THE BAND IS FOUR COMPARISONS OF EQUAL WEIGHT (§2) — tiles, not a sentence
-     with footnotes. Each is self-contained: label, figure, who, where.
+      with footnotes. Each is self-contained: label, figure, who, where.
 
-     BIGGEST MOVE WAS DELETED (reducer and tile) because it returned the same
-     round as MOST IMPROVED whenever the largest absolute delta_index was a cut,
-     which is roughly half of all weeks. "Biggest rise" would always be distinct
-     but would put a member's worst week on Discover.
+      BIGGEST MOVE WAS DELETED (reducer and tile) because it returned the same
+      round as MOST IMPROVED whenever the largest absolute delta_index was a cut,
+      which is roughly half of all weeks. "Biggest rise" would always be distinct
+      but would put a member's worst week on Discover.
 
-     BEST STABLEFORD is the reason the band is worth a data change: gross is won
-     by the same two or three low handicappers every week, Stableford is NET, so
-     the whole membership can enter. It is not `net` — net is ruined by one
-     blow-up hole, Stableford charges that hole and nothing more.
+      BEST STABLEFORD is the reason the band is worth a data change: gross is won
+      by the same two or three low handicappers every week, Stableford is NET, so
+      the whole membership can enter. It is not `net` — net is ruined by one
+      blow-up hole, Stableford charges that hole and nothing more.
 
-     TIES GO TO THE MOST RECENT ROUND in every tile: `ordered` is lens-ordered,
-     not date-ordered, so recency is compared explicitly rather than relying on
-     a reducer keeping its first-seen row.
+      TIES GO TO THE MOST RECENT ROUND in every tile: `ordered` is lens-ordered,
+      not date-ordered, so recency is compared explicitly rather than relying on
+      a reducer keeping its first-seen row.
 
-     A small celebratory emoji marker is permitted on these stat tiles because
-     it is label decoration, like the trophy on the WON chip. A SECTION HEADING
-     glyph is part of a system — outline lucide icons in ink across every
-     Discover section — and an emoji there would be the only coloured bitmap
-     among them. */
+      All four tiles carry a marker. They are four comparisons of EQUAL WEIGHT,
+      so marking some and not others reads as an omission rather than as emphasis.
+      A SECTION HEADING glyph is part of a system — outline lucide icons in ink
+      across every Discover section — and an emoji there would be the only
+      coloured bitmap among them. */
+
+  /* Each tile is strictly the top of its own category. One member CAN hold
+     several — a good round is low gross, high Stableford and birdie-rich at
+     once. Deduping by member was rejected: showing second place in a tile
+     labelled 'best' is a bug to the member who actually holds it. */
   const newer = (a: CircleRoundRow, b: CircleRoundRow) =>
     String(a.play_date).localeCompare(String(b.play_date)) > 0;
 
@@ -557,6 +562,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
   if (bestStableford) {
     bandTiles.push({
       key: 'stableford',
+      emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
       label: t('discover.golfThisWeek.stablefordLabel', 'Best stableford'),
       figure: String(bestStableford.stableford_points),
       tone: A.INK,
@@ -567,6 +573,7 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
   if (mostBirdies) {
     bandTiles.push({
       key: 'birdies',
+      emoji: '\uD83D\uDC26', // BIRD
       label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
       figure: String(mostBirdies.birdies),
       tone: A.INK,
@@ -644,11 +651,11 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
                   ...LABEL,
                   color: A.MUTE,
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'baseline',
                   gap: 4,
                 }}
               >
-                {tile.emoji ? <span style={{ lineHeight: 1 }}>{tile.emoji}</span> : null}
+                <span style={{ lineHeight: 1 }}>{tile.emoji}</span>
                 {tile.label}
               </div>
 
