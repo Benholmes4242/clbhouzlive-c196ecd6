@@ -531,6 +531,10 @@ export function GolfThisWeek({ userId, lens, pills, onCardPress, onSeeAll }: Pro
       {/* HEADER CONSTRUCTION: heading left, live count right-aligned on the
           SAME line. The "See all" action lives under the first card, not here. */}
       <Eyebrow
+        subline={t(
+          'discover.golfThisWeek.subline',
+          "Everywhere clbhouz golfers played, and how it went."
+        )}
         aside={
           <span style={{ ...KICKER, color: A.MUTE }}>
             {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
