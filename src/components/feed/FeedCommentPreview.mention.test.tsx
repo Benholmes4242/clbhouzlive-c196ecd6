@@ -116,4 +116,14 @@ describe('FeedCommentPreview mention integration', () => {
     expect(mention).toHaveAttribute('data-mention-type', 'business');
     expect(mention).toHaveAttribute('data-mention-id', '22222222-2222-2222-2222-222222222222');
   });
+
+  it('uses dark-surface tones when surface is dark', () => {
+    const { container } = wrap(
+      <FeedCommentPreview preview={preview} commentCount={1} onOpenComments={() => {}} surface="dark" />,
+    );
+    const row = within(container.querySelector('[role="button"]') as HTMLElement);
+    expect(row.getByText('Bob')).toHaveStyle({ color: '#F8FAFC' });
+    const mention = container.querySelector('[data-mention-type="user"]');
+    expect(mention?.parentElement?.parentElement).toHaveStyle({ color: '#A7AAAE' });
+  });
 });
