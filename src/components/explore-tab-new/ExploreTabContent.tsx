@@ -128,8 +128,9 @@ export default function ExploreTabContent({
     crownCategoryLabel,
   );
 
-  const momentsQuery = useMomentsOfTheWeek();
-  const moments = momentsQuery.data;
+  // THE MOMENTS MOSAIC LEFT THIS PAGE (MICRO_BRIEF_REMOVE_MOMENTS_FROM_DISCOVER):
+  // useMomentsOfTheWeek is no longer read here. It still serves the Community page.
+
   // THE MEDIA RAILS ARE NOT COURSE-LED (BRIEF_DISCOVER_MEDIA_RAILS §0.2): this
   // reads the whole media library, unfiltered by course tag and by `lens`.
   const communityVideos = useCommunityVideos();
