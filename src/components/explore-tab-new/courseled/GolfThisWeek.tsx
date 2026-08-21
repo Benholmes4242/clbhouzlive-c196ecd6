@@ -543,71 +543,11 @@ function GolfThisWeekCard({
 
 
       <div style={{ padding: '9px 11px 9px' }}>
-        {/* GROSS AND TO-PAR, with index movement right-aligned (§2.1).
-            The follow button sits on the same row as the score, not the member
-            name, so the highest-value action is visible at the top of the tile. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span
-            style={{
-              ...NUMF,
-              fontSize: 24,
-              lineHeight: 1,
-              color: A.INK,
-            }}
-          >
-            {row.gross ?? '\u2014'}
-          </span>
-          {toPar && (
-            <span style={{ ...NUMF, fontSize: 12.5, color: toPar.tone, lineHeight: 1 }}>
-              {toPar.text}
-            </span>
-          )}
-          {legendary && (
-            <span style={{ ...LABEL, color: GOLD }}>
-              {(row.holes_in_one ?? 0) > 0
-                ? t('discover.golfThisWeek.ace', 'ACE')
-                : t('discover.golfThisWeek.albatross', 'ALBATROSS')}
-            </span>
-          )}
-          {hasDelta && (
-            <span
-              style={{
-                marginLeft: 'auto',
-                display: 'inline-flex',
-                alignItems: 'baseline',
-                gap: 3,
-                flexShrink: 0,
-              }}
-            >
-              {!deltaZero && (
-                <IndexMovementTriangle
-                  direction={(delta as number) < 0 ? 'down' : 'up'}
-                  color={deltaTone}
-                  size={7}
-                />
-              )}
-              <span style={{ ...NUMF, fontSize: 12, color: deltaTone, lineHeight: 1 }}>
-                {Math.abs(delta as number).toFixed(1)}
-              </span>
-              <span style={{ ...LABEL, color: A.DIM }}>
-                {t('discover.friendsRail.index', 'HCP')}
-              </span>
-            </span>
-          )}
-          {showFollow && (
-            <FollowButton
-              targetUserId={row.user_id}
-              isFollowed={isFollowed}
-              viewerUserId={viewerUserId}
-              align={hasDelta ? 'gap' : 'auto'}
-            />
-          )}
-        </div>
-
-        {/* THE PLAYER IS SECONDARY, beneath the score (§2). */}
+        {/* THE MEMBER ROW SITS DIRECTLY UNDER THE PHOTOGRAPH (§S3.1): the score
+            moved onto the image, so the name gets the room. The follow control
+            stays right-aligned here in whichever of its three states applies. */}
         <div
           style={{
-            marginTop: 7,
             display: 'flex',
             alignItems: 'center',
             gap: 7,
@@ -637,7 +577,25 @@ function GolfThisWeekCard({
           >
             {row.display_name}
           </span>
+
+          {legendary && (
+            <span style={{ ...LABEL, color: GOLD, flexShrink: 0 }}>
+              {(row.holes_in_one ?? 0) > 0
+                ? t('discover.golfThisWeek.ace', 'ACE')
+                : t('discover.golfThisWeek.albatross', 'ALBATROSS')}
+            </span>
+          )}
+
+          {showFollow && (
+            <FollowButton
+              targetUserId={row.user_id}
+              isFollowed={isFollowed}
+              viewerUserId={viewerUserId}
+              align="gap"
+            />
+          )}
         </div>
+
 
         {/* THE SHAPE — the friends rail's band, same height, full bleed (§4.1).
             showMeta TRUE: this tile is the surviving rounds tile after the Your
