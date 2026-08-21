@@ -774,7 +774,7 @@ function GolfThisWeekCard({
       </div>
 
 
-      <div style={{ padding: '8px 10px 10px' }}>
+      <div style={{ padding: '8px 10px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* THE MEMBER ROW CARRIES THE SCORE (§S4.1): gross, to-par and this
             round's index movement, all LITERAL — under par red, over par ink. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
