@@ -307,46 +307,50 @@ export function HeroBoardSection({
         overflow: 'hidden',
       }}
     >
-      <MiniBoard
-        tournamentId={tournamentId}
-        entries={entries}
-        limit={HERO_BOARD_ROWS}
-        currentRound={currentRound}
-        theme="dark"
-        pickPlayerIds={pickPlayerIds}
-        onRowTap={onRowTap}
-      />
+      {hasBoard && (
+        <MiniBoard
+          tournamentId={tournamentId}
+          entries={entries}
+          limit={HERO_BOARD_ROWS}
+          currentRound={currentRound as number}
+          theme="dark"
+          pickPlayerIds={pickPlayerIds}
+          onRowTap={onRowTap}
+        />
+      )}
 
-      <button
-        type="button"
-        onClick={onFullLeaderboard}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-          padding: '10px 16px',
-          background: 'transparent',
-          border: 'none',
-          borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
-          fontFamily: FONT,
-          cursor: 'pointer',
-        }}
-        className="active:bg-white/[0.06] transition-colors"
-      >
-        <span
+      {hasBoard && (
+        <button
+          type="button"
+          onClick={onFullLeaderboard}
           style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            color: WHITE_ALPHA_65,
-            textTransform: 'uppercase',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '100%',
+            padding: '10px 16px',
+            background: 'transparent',
+            border: 'none',
+            borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
+            fontFamily: FONT,
+            cursor: 'pointer',
           }}
+          className="active:bg-white/[0.06] transition-colors"
         >
-          {t('overview.ticker.fullLeaderboard')}
-        </span>
-        <ChevronRight size={14} color="#FFFFFF" strokeWidth={2.5} />
-      </button>
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: '0.16em',
+              color: WHITE_ALPHA_65,
+              textTransform: 'uppercase',
+            }}
+          >
+            {t('overview.ticker.fullLeaderboard')}
+          </span>
+          <ChevronRight size={14} color="#FFFFFF" strokeWidth={2.5} />
+        </button>
+      )}
 
       {hasStrip && (
         <div
