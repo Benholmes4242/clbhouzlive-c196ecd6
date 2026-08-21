@@ -12,14 +12,14 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
-import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { TOPAR_UNDER_DARK, TOPAR_OVER_DARK } from '@/features/tourhub/_shared/tokens';
-import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
+import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
 import {
+  COURSE_GRADIENT,
+  COURSE_SCRIMS,
   HERO_TOP_SCRIM,
   HERO_BOTTOM_SCRIM,
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
@@ -45,7 +45,6 @@ import { MiniScorecard } from './RoundShape';
 import {
   selectMoment,
   type Moment,
-  type MomentKind,
 } from './roundMoment';
 
 import { GolfThisWeekRail as GolfThisWeekShell } from './DiscoverCourseLedSkeleton';
@@ -55,6 +54,19 @@ import { A, CARD_SHELL, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
 /**
  * GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK). Replaces Around the world (standout
  * feats) and Personal bests, both deleted.
+ *
+ * THE HERO'S COLOUR LAW (BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §0, from PhotoBand
+ * itself): ON THIS HERO, EVERY VALUE IS WHITE OR WHITE-AT-ALPHA. THE ONLY
+ * EXCEPTION IS A SCORE, WHICH TAKES THE CANONICAL TO-PAR GRAMMAR ON DARK
+ * (getScoreColor(delta, 'dark', 'standard') — never a hand-picked hex).
+ * ONE DELIBERATE DIVERGENCE: AMBER, and only as the viewing member's marker.
+ *
+ * WHAT THAT COSTS, ON PURPOSE: the seven moments are now distinguished ONLY BY
+ * THEIR WORDS. MOMENT_TONE survives in exactly one place — the tinted band
+ * behind marked holes in the WELL. Do NOT reintroduce a coloured eyebrow, a
+ * tinted corner, an accent rule, a left border or a per-kind gradient to tell
+ * them apart. If the moments need distinguishing again that is Ben's decision,
+ * not a forgotten detail.
  *
  * EVERY ROUND GETS A CARD. There is no feat threshold anywhere in this file:
  * the interest comes from the COURSE (the variable — a member following four
@@ -467,35 +479,22 @@ function FollowButton({
  */
 const FIGURE_PLACEHOLDER = '{n}';
 
-/** §S2.1 — the hero gradient, no photograph. */
-const HERO_BASE = 'linear-gradient(170deg, #2E3A32 0%, #181F1B 60%, #0D110E 100%)';
-
 /**
- * §S2.2 — THE GLOW is a radial wash of the moment's tone at 15%, top right.
- * A PLAIN ROUND'S GLOW IS WHITE AT 13%. THAT IS THE WHOLE HIERARCHY: colour
- * means something happened, white means a round was played. Same shape, same
- * weight, different temperature — so a plain round still holds its own in the
- * rail without claiming to be a story.
- */
-function heroBackground(kind: MomentKind, tone: string) {
-  const alpha = kind === 'plain' ? '21' /* 13% */ : '26' /* 15% */;
-  return `radial-gradient(118% 88% at 86% 4%, ${tone}${alpha} 0%, rgba(0,0,0,0) 64%), ${HERO_BASE}`;
-}
-
-/**
- * BRIEF_ROUND_TILE_COURSE_PHOTO — the course thumbnail sits BEHIND the hero as
- * atmosphere. The recipe is the shipped Tour Overview hero's
- * (HERO_TOP_SCRIM / HERO_BOTTOM_SCRIM), but the GEOMETRY is scaled: those are
- * tuned at 80px / 260px against a ~380px hero, and on a 156px tile a 260px
- * bottom scrim would blacken the whole photograph.
+ * BRIEF_ROUND_TILE_COURSE_PHOTO + BRIEF_ROUND_TILE_HERO_TOUR_COLOUR — the course
+ * thumbnail sits BEHIND the hero as atmosphere, and the whole recipe is now the
+ * Tour Overview hero's, imported unmodified: COURSE_GRADIENT as the base,
+ * COURSE_SCRIMS, HERO_BOTTOM_SCRIM, HERO_TOP_SCRIM.
  *
- * COURSE_SCRIMS' green radial at 30% 20% is DROPPED: two radials in a 156px box
- * compete, and the moment glow — the thing that names the card — must win.
- * A flat veil replaces its darkening half so a blown-out sky cannot reach the
- * course name.
+ * ONLY THE GEOMETRY IS SCALED. The tour's stops are tuned at 80px / 260px
+ * against a ~380px hero; on a 156px tile a 260px bottom scrim would blacken the
+ * whole photograph. The same stops at tile scale is what "match" means here.
  *
- * LAYER ORDER MATCHES PhotoBand: base gradient, image, veil, bottom scrim,
- * top scrim — then the moment glow above all of it.
+ * COURSE_SCRIMS' GREEN RADIAL IS BACK. It was dropped, and a flat veil put in
+ * its place, only because it competed with the moment glow. THE MOMENT GLOW IS
+ * GONE (§4), so that reason is gone with it and the veil is deleted.
+ *
+ * LAYER ORDER MATCHES PhotoBand: base gradient, image, COURSE_SCRIMS, bottom
+ * scrim, top scrim.
  */
 const PHOTO_TOP_SCRIM_H = 48;
 /* THE BOTTOM SCRIM IS ANCHORED TO THE BOTTOM OF THE DARK REGION, WHICH IS NOW
@@ -511,7 +510,6 @@ const PHOTO_TOP_SCRIM_H = 48;
    there is now ONE edge (region -> well) where there were TWO (hero -> white
    row, row -> well). */
 const PHOTO_BOTTOM_SCRIM_H = 159;
-const PHOTO_VEIL = 'rgba(10,14,10,0.26)';
 /** Photo only on the first N tiles: the rail renders every round (§4.2). */
 const PHOTO_TILE_LIMIT = 6;
 
@@ -786,13 +784,14 @@ function GolfThisWeekCard({
              context; only applied when there IS an image so the no-image tile
              is byte-identical. */
           isolation: imageUrl ? 'isolate' : undefined,
-          /* NO IMAGE -> PIXEL-IDENTICAL TO BEFORE (§2.3): the same single
-             composed background, and not one extra layer. */
-          background: imageUrl ? HERO_BASE : heroBackground(moment.kind, moment.tone),
+          /* §2 — THE TOUR'S BASE. An imaged tile and a non-imaged tile now
+             differ only by the presence of the photograph, which is what the
+             tour does. */
+          background: COURSE_GRADIENT,
         }}
       >
         {imageUrl && (
-          /* zIndex -1 keeps every layer ABOVE the element's own HERO_BASE
+          /* zIndex -1 keeps every layer ABOVE the element's own base
              background and BELOW the in-flow content, so the content stack is
              untouched. */
           <>
@@ -814,7 +813,8 @@ function GolfThisWeekCard({
             />
             <div
               aria-hidden="true"
-              style={{ position: 'absolute', inset: 0, background: PHOTO_VEIL, zIndex: -1 }}
+              /* §3 — COURSE_SCRIMS, in PhotoBand's position in the stack. */
+              style={{ position: 'absolute', inset: 0, background: COURSE_SCRIMS, zIndex: -1 }}
             />
             <div
               aria-hidden="true"
