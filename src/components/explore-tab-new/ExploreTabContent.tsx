@@ -384,24 +384,11 @@ export default function ExploreTabContent({
           onSeeAll={() => navigate('/community')}
         />
 
+        {/* From the community was removed from Discover deliberately. Discover
+            now shows no member photographs; the Community page still holds
+            them, but every route to it from here is labelled video. */}
 
 
-        <MomentsOfTheWeek
-          moments={momentMosaic}
-          totalCount={momentList.length}
-          isPending={momentsQuery.isPending}
-          lastSeen={lastSeen}
-          creators={creators}
-          onCreatorPress={handleCreator}
-          onTilePress={handleMoment}
-          onSeeAll={() => {
-            analyticsEvents.track('community_page_open', {
-              source: 'discover_see_all',
-              moment_count: momentList.length,
-            });
-            navigate('/community');
-          }}
-        />
 
         <MostPlayedLeaderboard
           rows={mostPlayedList}
