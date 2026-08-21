@@ -1570,48 +1570,31 @@
       "birdiesLabel": "Most birdies",
       "stablefordUnit": "points",
       "moment": {
+        "theCard": "The card",
         "fullScorecard": "Full scorecard",
-        "chart": {
-          "strip": "Every hole",
-          "trajectory": "The round",
-          "lastSix": "Holes 13–18",
-          "scorecard": "The card"
+        "label": {
+          "eagle": "EAGLE",
+          "ace": "ACE",
+          "albatross": "ALBATROSS",
+          "inRed": "IN RED",
+          "finish": "THE FINISH",
+          "run": "THE RUN",
+          "grind": "THE GRIND"
         },
-        "eagle": {
-          "meta": "Hole",
-          "ace": "Ace",
-          "albatross": "Albatross",
-          "eagle": "Eagle",
-          "sub": "The shot of the round",
-          "sentence": "{{0}} on hole {{1}}, a par {{2}}."
+        "figure": {
+          "hole": "HOLE {{n}}",
+          "holes": "{{n}} HOLES",
+          "inThree": "{{n}} IN THREE",
+          "inARow": "{{n}} IN A ROW"
         },
-        "run": {
-          "meta": "Holes",
-          "word": "The run",
-          "sub": "Par or better, back to back",
-          "sentence": "{{0}} holes in a row at par or better, from {{1}} to {{2}}."
-        },
-        "collapse": {
-          "meta": "Hole",
-          "word": "Hole {{0}}",
-          "sub": "Where the round turned",
-          "sentence": "{{0}} shots dropped on hole {{1}}; the other holes came to {{2}}."
-        },
-        "finish": {
-          "meta": "Birdies",
-          "word": "The finish",
-          "sub": "The closing three",
-          "sentence": "{{0}} birdies in the last three holes to finish on {{1}}."
-        },
-        "grind": {
-          "meta": "Holes",
-          "word": "The grind",
-          "sub": "Par or better",
-          "sentenceClean": "{{0}} of {{1}} holes at par or better, with no birdies and no doubles.",
-          "sentenceNoDoubles": "{{0}} of {{1}} holes at par or better, and not a double all day.",
-          "sentenceNoBirdies": "{{0}} of {{1}} holes at par or better, with no birdies.",
-          "sentencePlain": "{{0}} of {{1}} holes at par or better.",
-          "sentenceNoHoles": "A round played. The hole by hole detail was not recorded."
+        "sentence": {
+          "eagle": "A {{0}} on a par {{1}}.",
+          "inRed": "The round went under par and finished on {{0}}.",
+          "finish": "Birdie or better coming home, to finish on {{0}}.",
+          "run": "Par or better from {{0}} through {{1}}.",
+          "grind": "Nothing worse than a bogey all the way round.",
+          "plain": "{{0}} of {{1}} holes at par or better.",
+          "noHoles": "A round played. The hole by hole detail was not recorded."
         }
       }
     },

@@ -1125,48 +1125,31 @@
       "birdiesLabel": "Meiste Birdies",
       "stablefordUnit": "Punkte",
       "moment": {
+        "theCard": "Die Karte",
         "fullScorecard": "Ganze Scorekarte",
-        "chart": {
-          "strip": "Jedes Loch",
-          "trajectory": "Die Runde",
-          "lastSix": "Loch 13–18",
-          "scorecard": "Die Karte"
+        "label": {
+          "eagle": "EAGLE",
+          "ace": "ACE",
+          "albatross": "ALBATROSS",
+          "inRed": "UNTER PAR",
+          "finish": "DER SCHLUSS",
+          "run": "DIE SERIE",
+          "grind": "DIE ARBEIT"
         },
-        "eagle": {
-          "meta": "Loch",
-          "ace": "Ace",
-          "albatross": "Albatross",
-          "eagle": "Eagle",
-          "sub": "Der Schlag der Runde",
-          "sentence": "{{0}} an Loch {{1}}, einem Par {{2}}."
+        "figure": {
+          "hole": "LOCH {{n}}",
+          "holes": "{{n}} LÖCHER",
+          "inThree": "{{n}} VON DREI",
+          "inARow": "{{n}} IN FOLGE"
         },
-        "run": {
-          "meta": "Löcher",
-          "word": "Die Serie",
-          "sub": "Par oder besser, in Folge",
-          "sentence": "{{0}} Löcher in Folge mit Par oder besser, von {{1}} bis {{2}}."
-        },
-        "collapse": {
-          "meta": "Loch",
-          "word": "Loch {{0}}",
-          "sub": "Hier kippte die Runde",
-          "sentence": "{{0}} Schläge verloren an Loch {{1}}; die übrigen Löcher ergaben {{2}}."
-        },
-        "finish": {
-          "meta": "Birdies",
-          "word": "Das Finish",
-          "sub": "Die letzten drei",
-          "sentence": "{{0}} Birdies auf den letzten drei Löchern, Abschluss bei {{1}}."
-        },
-        "grind": {
-          "meta": "Löcher",
-          "word": "Die Arbeitsrunde",
-          "sub": "Par oder besser",
-          "sentenceClean": "{{0}} von {{1}} Löchern mit Par oder besser, ohne Birdie und ohne Doppelbogey.",
-          "sentenceNoDoubles": "{{0}} von {{1}} Löchern mit Par oder besser, und kein Doppelbogey.",
-          "sentenceNoBirdies": "{{0}} von {{1}} Löchern mit Par oder besser, ohne Birdie.",
-          "sentencePlain": "{{0}} von {{1}} Löchern mit Par oder besser.",
-          "sentenceNoHoles": "Eine gespielte Runde. Die Details pro Loch wurden nicht erfasst."
+        "sentence": {
+          "eagle": "Eine {{0}} auf einem Par {{1}}.",
+          "inRed": "Die Runde lag unter Par und endete bei {{0}}.",
+          "finish": "Birdie oder besser auf den Schlusslöchern, Endstand {{0}}.",
+          "run": "Par oder besser von {{0}} bis {{1}}.",
+          "grind": "Nichts schlechter als ein Bogey auf der ganzen Runde.",
+          "plain": "{{0}} von {{1}} Löchern auf Par oder besser.",
+          "noHoles": "Eine gespielte Runde. Die Details Loch für Loch wurden nicht erfasst."
         }
       }
     },
