@@ -120,7 +120,9 @@ const HAIRLINE_INK = 'rgba(11,15,20,0.12)';
    still. Four middling greys is what made the old tile look soft. */
 const BAND_MUTE = MID;
 const BAND_FAINT = '#8A929C';
-const BAND_GHOST = '#AEB6BF';
+/* GHOST (#AEB6BF) is the fourth step of the ramp; nothing on the band is quiet
+   enough to need it, so it is recorded here rather than declared unused. */
+
 
 
 /* The card sits on the page rather than being drawn onto it. */
