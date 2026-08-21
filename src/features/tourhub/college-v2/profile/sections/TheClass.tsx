@@ -10,8 +10,8 @@
  *   - No champion tint, no crown chip, no per-row SEASON label, no
  *     placeholder tour chip, no row hairlines, no chevron.
  *
- * Country flags remain the leaderboard/countryFlag approach here; the
- * three-approach flag inconsistency is recorded, not fixed, in this brief.
+ * Country flags use the single app-wide CountryFlag (SVG) system
+ * (BRIEF_TOUR_FLAGS_ONE_SYSTEM).
  */
 
 import { useTranslation } from 'react-i18next';
@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatEarnings } from '@/features/tourhub/_shared/formatEarnings';
-import { countryFlag, countryFallback } from '@/features/tourhub/leaderboard/countryFlag';
+import CountryFlag from '@/components/ui/country-flag';
 import { playerRoute } from '@/features/tourhub/routes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useLivePlayerIds } from '@/features/tourhub/players-v2/data/useLivePlayerIds';
