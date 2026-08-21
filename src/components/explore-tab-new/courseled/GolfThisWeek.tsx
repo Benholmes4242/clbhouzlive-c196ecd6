@@ -12,6 +12,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
+import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
@@ -166,24 +167,21 @@ const AMBER = '#F7931E';
 const INDEX_FELL = '#1B7F4B';
 const INDEX_ROSE = '#C8102E';
 
-/* ===================== THE MEMBER ROW ON DARK (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §2)
-   The row now sits INSIDE the dark region, over a scrimmed photograph, so every
-   colour it carries needs its dark counterpart. EVERY VALUE BELOW IS AN EXISTING
-   APP TOKEN — nothing is invented here, and the light values above stay put
-   because the band tiles and the well still use them.
-   AMBER is deliberately absent: #F7931E holds on dark and means the same thing,
-   so the self marker is unchanged (§2.1, ACCEPTANCE D). */
+/* ===================== THE MEMBER ROW ON DARK (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §2,
+   RECOLOURED BY BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §5.3)
+   The row sits INSIDE the dark region, over the tour's gradient and scrims, so
+   it obeys the hero's colour law: WHITE OR WHITE-AT-ALPHA, and a SCORE takes the
+   canonical to-par grammar on dark. The light values above stay put because the
+   band tiles and the well still use them. */
 /** Names and grosses: the hero's own white, so one white runs down the block. */
 const ROW_DARK_INK = 'rgba(255,255,255,0.94)';
-/** Under par on dark. TOPAR_RED (#C8102E) is the light-surface red and goes
-    muddy on a photograph; this is the app's single dark under-par red. */
-const ROW_DARK_TOPAR_UNDER = TOPAR_UNDER_DARK;
-/** Over/level par on dark: a white at reduced alpha, never a grey. */
-const ROW_DARK_TOPAR_OVER = TOPAR_OVER_DARK;
-/** MOVEMENT, not a score: the shared INDEX_DELTA token's DARK pair. The
-    direction rule is untouched — a falling index is green, a rising one red. */
-const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
-const ROW_DARK_INDEX_ROSE = INDEX_DELTA.dark.drifted;
+/** Over/level par, and INDEX MOVEMENT. An index movement is NOT a to-par score,
+    so it gets no colour at all: the TRIANGLE, which still points down on a
+    falling index, is what carries the direction. PhotoBand's own quiet value. */
+const ROW_DARK_QUIET = 'rgba(255,255,255,0.62)';
+/** UNDER PAR RESOLVES THROUGH getScoreColor — no hand-picked hex. TOPAR_RED
+    (#C8102E) is the LIGHT-surface red and goes muddy on a scrimmed photograph. */
+const ROW_DARK_TOPAR_UNDER = getScoreColor(-1, 'dark', 'standard');
 
 
 
@@ -622,7 +620,14 @@ function FigureLine({
     fontWeight: 800,
     lineHeight: 1,
     letterSpacing: '-0.06em',
-    color: moment.figureRole === 'score' ? moment.tone : '#FFFFFF',
+    /* §5.2 — THE RULE IS UNCHANGED, THE SOURCE OF THE COLOUR IS NOT: a
+       score-role figure resolves through getScoreColor, the same call PhotoBand
+       makes, and never through moment.tone. They may render the same red today;
+       only one of them is the to-par grammar. A QUANTITY stays white. */
+    color:
+      moment.figureRole === 'score' && moment.figure != null
+        ? getScoreColor(moment.figure, 'dark', 'standard')
+        : '#FFFFFF',
   };
 
   const wordStyle: React.CSSProperties = {
@@ -922,7 +927,10 @@ function GolfThisWeekCard({
               textTransform: 'uppercase',
               lineHeight: 1,
               marginBottom: 5,
-              color: moment.tone,
+              /* §5.1 — the moment eyebrow loses its tone: PhotoBand's own label
+                 white-at-alpha, not a new value. The moments are distinguished
+                 by their WORDS now. */
+              color: 'rgba(255,255,255,0.65)',
             }}
           >
             {label}
@@ -982,7 +990,12 @@ function GolfThisWeekCard({
               flex: '0 1 auto',
               fontSize: 12,
               fontWeight: 600,
-              /* §2.1 — AMBER unchanged, INK -> the region's white. */
+              /* AMBER IS THE ONE DELIBERATE DIVERGENCE FROM PhotoBand's
+                 "never amber" (§5.4). That rule governs a CTA, and a tour hero
+                 has no concept of "you"; amber means THE VIEWING MEMBER
+                 app-wide and this rail is substantially the member's own
+                 rounds. Do not remove it as an oversight, and do not copy it
+                 into the tour. Everything else here is white. */
               color: row.is_self ? AMBER : ROW_DARK_INK,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -1011,9 +1024,9 @@ function GolfThisWeekCard({
                   ...NUMF,
                   fontSize: 10.5,
                   lineHeight: 1,
-                  /* §2.3 — the dark under-par red, and a white at reduced
-                     alpha for over/level. Never TOPAR_RED, never a grey. */
-                  color: toParUnder ? ROW_DARK_TOPAR_UNDER : ROW_DARK_TOPAR_OVER,
+                  /* §5.3 — the canonical dark under-par red via getScoreColor,
+                     white-at-alpha for over/level. Never TOPAR_RED, never grey. */
+                  color: toParUnder ? ROW_DARK_TOPAR_UNDER : ROW_DARK_QUIET,
                 }}
               >
                 {toPar.text}
@@ -1023,7 +1036,8 @@ function GolfThisWeekCard({
               <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
                 <IndexMovementTriangle
                   direction={(delta as number) < 0 ? 'down' : 'up'}
-                  color={(delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE}
+                  /* §5.3 — the DIRECTION is unchanged; only the colour goes. */
+                  color={ROW_DARK_QUIET}
                   size={7}
                 />
                 <span
@@ -1031,8 +1045,7 @@ function GolfThisWeekCard({
                     ...NUMF,
                     fontSize: 10.5,
                     lineHeight: 1,
-                    /* §2.4 — INDEX_DELTA's DARK pair. Direction rule unchanged. */
-                    color: (delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE,
+                    color: ROW_DARK_QUIET,
                   }}
                 >
                   {Math.abs(delta as number).toFixed(1)}
