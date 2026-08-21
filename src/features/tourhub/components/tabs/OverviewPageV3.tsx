@@ -64,10 +64,10 @@ export function OverviewPageV3() {
             See OverviewHero.tsx. */}
         <OverviewHero />
 
-        {/* Cohesion unit: OTC + TI sit in a tight 14px group directly under
-            the hero, keyed to viewingTournamentId so they crossfade together
-            in step with the hero. The larger sectionSection gap that follows
-            is what makes this unit read as one. */}
+        {/* Cohesion unit: VenueRecordBand + Schedule sit in a tight 14px
+            group directly under the hero, keyed to viewingTournamentId so they
+            crossfade together in step with the hero. The larger sectionSection
+            gap that follows is what makes this unit read as one. */}
         <AnimatePresence mode="wait">
           <motion.div
             key={viewingTournamentId ?? 'none'}
