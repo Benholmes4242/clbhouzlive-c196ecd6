@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
+import { Check } from 'lucide-react';
+
+/** ~1.2s: long enough to register, short enough not to be a state (§S3.4). */
+const CONFIRM_MS = 1200;
 
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -498,13 +502,12 @@ function GolfThisWeekCard({
             </span>
           )}
           {showFollow && (
-            <span style={{ marginLeft: hasDelta ? 8 : 'auto', flexShrink: 0, display: 'inline-flex' }}>
-              <FollowButton
-                targetUserId={row.user_id}
-                isFollowed={isFollowed}
-                viewerUserId={viewerUserId}
-              />
-            </span>
+            <FollowButton
+              targetUserId={row.user_id}
+              isFollowed={isFollowed}
+              viewerUserId={viewerUserId}
+              align={hasDelta ? 'gap' : 'auto'}
+            />
           )}
         </div>
 
