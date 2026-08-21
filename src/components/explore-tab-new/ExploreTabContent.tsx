@@ -151,28 +151,8 @@ export default function ExploreTabContent({
    * Courses browse, where the review pool is country/region scoped.
    */
 
-  const momentList = useMemo(() => moments ?? [], [moments]);
-  // PAGE mosaic: one tile per course. The sheet keeps the full ranked list.
-  const momentMosaic = useMemo(() => momentList.filter((m) => m.isCourseLead), [momentList]);
-
-  // === CREATOR CARDS (BRIEF_COMMUNITY_CREATOR_CARDS) ======================
-  // Aggregated CLIENT-SIDE over the pool the section already holds. Both inputs
-  // to the relevance order are already-cached reads: the friend id set (the
-  // same query Around the world uses) and the member's played-course map from
-  // the stats context. No new query, no per-card fetch.
-  const friendIdsQuery = useFriendIdSet(userId);
-  const playedCourseMap = useUserStatsCourseMap();
-  const playedCourseIds = useMemo(
-    () => new Set(playedCourseMap.keys()),
-    [playedCourseMap],
-  );
-  const creators = useCommunityCreators({
-    pool: momentList,
-    viewerId: userId,
-    friendIds: friendIdsQuery.data,
-    playedCourseIds,
-  });
   const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
+
 
   const handleScopeChange = useCallback(
     (next: WeekScope) => {
