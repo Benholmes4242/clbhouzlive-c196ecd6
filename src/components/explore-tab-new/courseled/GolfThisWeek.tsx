@@ -717,29 +717,45 @@ export function GolfThisWeek({
 
   return (
     <section style={style}>
-      {/* HEADER CONSTRUCTION: heading left, live count right-aligned on the
-          SAME line. The "See all" action lives under the first card, not here. */}
-      <Eyebrow
-        icon={CalendarDays}
-        subline={t(
-          'discover.golfThisWeek.subline',
-          "Everywhere clbhouz golfers played, and how it went."
-        )}
-        aside={
-          <span style={{ ...KICKER, color: A.MUTE }}>
-            {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
-              rounds: counts.rounds,
-              courses: counts.courses,
-            })}
-          </span>
-        }
+      {/* No heading. This section leads the page, directly under the chrome
+          island, and its pills state its scope more clearly than a title would.
+          Every section below it keeps the glyph-and-heading treatment — that rule
+          is intact, this is the one exception and it is because it is first. */}
+
+      {/* THE FILTER'S READOUT ROW. The count and the region control are the
+          section's top edge; without them the pills would sit bare under the
+          chrome island. */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 8,
+          /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
+             gives 16px of clearance everywhere. */
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
+          marginBottom: 12,
+          minWidth: 0,
+        }}
       >
-        {t('discover.golfThisWeek.heading', 'Golf this week')}
-      </Eyebrow>
+        {/* Not a label - the filter's readout. It is the only thing on screen
+            that responds when a pill or a region changes, so it must always
+            describe what is CURRENTLY rendered. */}
+        <span style={{ ...KICKER, color: A.MUTE, flex: '0 0 auto' }}>
+          {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
+            rounds: counts.rounds,
+            courses: counts.courses,
+          })}
+        </span>
+        <RegionDropdown
+          regions={regions}
+          selection={region}
+          onChange={(sel) => onRegionChange?.(sel)}
+        />
+      </div>
 
-
-
-      {/* SCOPE PILLS AND THE AREA DROPDOWN — one row, this section's own (§S2/§S3). */}
+      {/* SCOPE PILLS — one row beneath the readout. */}
       <div
         style={{
           display: 'flex',
@@ -753,11 +769,6 @@ export function GolfThisWeek({
           scope={scope}
           onChange={(s) => onScopeChange?.(s)}
           style={{ flex: '1 1 auto', minWidth: 0 }}
-        />
-        <RegionDropdown
-          regions={regions}
-          selection={region}
-          onChange={(sel) => onRegionChange?.(sel)}
         />
       </div>
 
