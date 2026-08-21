@@ -82,7 +82,7 @@ export function OverviewPageV3() {
             style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: viewingIsLive ? 24 : 12 }}
           >
             <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
-            <TISlot />
+            <ComingUpSlot />
           </motion.div>
 
         </AnimatePresence>
@@ -92,9 +92,6 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 88 }}>
-            <LazySection minHeight={400}>
-              <ComingUpSlot />
-            </LazySection>
             <LazySection minHeight={400}>
               <WorldRankingsSlot />
             </LazySection>
