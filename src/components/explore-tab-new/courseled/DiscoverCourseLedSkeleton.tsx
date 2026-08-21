@@ -683,16 +683,14 @@ export default function DiscoverCourseLedSkeleton() {
     >
       {/* THE MERGED ROUNDS SECTION LEADS THE PAGE
           (MICRO_BRIEF_REMOVE_ONE_THING_ROW S1.3 / S2.2): the rate prompt and the
-          page title are both gone, so the first shell is the rounds rail and it
-          carries the live page's padding verbatim — the floating header sits at
-          sat + 10 and is 44px tall, so sat + 70 gives 16px of clearance on
-          notched and non-notched devices alike. */}
-      <div
-        style={{
-          padding: '0 14px',
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
-        }}
-      >
+          page title are both gone, so the first shell is the rounds rail.
+          NO VERTICAL PADDING HERE (BRIEF_DISCOVER_SKELETON_RESYNC §2). This
+          mirrors ExploreTabContent's wrapper, which is `padding: '0 14px'`; the
+          safe-area padding belongs to GolfThisWeekRail's first row, exactly as
+          the live page keeps it inside GolfThisWeek. Applying it in both places
+          started the shell ~70px low and settled the page UPWARD. */}
+      <div style={{ padding: '0 14px' }}>
+
         <GolfThisWeekRail />
       </div>
 
