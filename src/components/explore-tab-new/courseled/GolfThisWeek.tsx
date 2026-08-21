@@ -116,10 +116,11 @@ const WELL_INNER = CARD_W - WELL_PAD_X * 2;
 /* THE INK DOES THE HIERARCHY (§S2). One genuinely dark ink and three greys that
    are clearly different from each other, replacing four middling greys. A
    DARKER INK ON FEWER ELEMENTS reads sharper than four greys everywhere. */
-const INK = '#0B0F14';   // scores, totals, the insight line's figures
+const INK = '#0B0F14';   // scores, totals, the insight line
 const MID = '#5A6673';   // secondary text
-const FAINT = '#9AA5B1'; // eyebrows, labels
-const GHOST = '#C8D0D8'; // hole numbers, the level-par grade
+/* FAINT #9AA5B1 (labels) and GHOST #C8D0D8 (hole numbers) are declared where
+   they are used, in RoundShape's mini grid, as MINI_FAINT and MINI_GHOST. */
+const HAIRLINE_INK = 'rgba(11,15,20,0.12)';
 
 /* The card sits on the page rather than being drawn onto it (§S1.5). */
 const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
@@ -355,10 +356,12 @@ function FollowButton({
             alignItems: 'center',
             gap: 4,
             fontFamily: SANS,
-            color: A.MUTE,
-            border: `1px solid ${A.BORDER}`,
+            /* §S4.5 — the pill tightens to 4px 11px at 9.5px, in the new ink. */
+            fontSize: 9.5,
+            color: MID,
+            border: `1px solid ${HAIRLINE_INK}`,
             borderRadius: 999,
-            padding: '5px 10px',
+            padding: '4px 11px',
             pointerEvents: 'none',
           }}
         >
@@ -379,11 +382,12 @@ function FollowButton({
           ...LABEL,
           flexShrink: 0,
           fontFamily: SANS,
-          color: A.PANEL,
-          background: A.INK,
-          border: `1px solid ${A.INK}`,
+          fontSize: 9.5,
+          color: '#FFFFFF',
+          background: INK,
+          border: `1px solid ${INK}`,
           borderRadius: 999,
-          padding: '5px 10px',
+          padding: '4px 11px',
           cursor: 'pointer',
         }}
       >
