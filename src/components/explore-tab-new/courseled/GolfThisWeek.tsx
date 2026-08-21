@@ -208,7 +208,7 @@ function ShapeReveal({ children }: { children: React.ReactNode }) {
              RING 3px OUTSIDE their own box — so a settled card was shaving the
              bottom of the bottom row's circles and boxes. A wipe needs no clip
              once it has finished, so there is none. */
-          clipPath: complete ? undefined : 'inset(0 100% 0 0)',
+          clipPath: complete ? 'inset(-8px -8px -8px -8px)' : 'inset(-8px 100% -8px -8px)',
           transition: reduced ? undefined : `clip-path ${DRAW_MS}ms ${DRAW_EASE}`,
         }}
       >
