@@ -242,8 +242,7 @@ export function RoundShape({
 
 
 
-  return (
-    <>
+  return withChrome(
       <svg
         width="100%"
         height={height}
