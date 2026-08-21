@@ -46,7 +46,7 @@ import {
 } from './hooks/useGolfThisWeek';
 import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegionCounts';
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
-import { RoundShape } from './RoundShape';
+import { MiniScorecard, RoundShape } from './RoundShape';
 import { GolfThisWeekRail as GolfThisWeekShell } from './DiscoverCourseLedSkeleton';
 import { A, CARD_SHELL, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
 
@@ -80,7 +80,9 @@ const PHOTO_H = 92;
    (BRIEF_FRIENDS_TILE_SHAPE_AND_BUCKETS §1). At 48/52 a plus-eight round and a
    level round drew nearly the same flat line: 60 is the smallest height where a
    two-shot swing is legible. Do NOT reduce it again. */
-const SHAPE_H = 60;
+/* SHAPE_H 40 — the trajectory is the SUMMARY now (BRIEF_ROUND_TILE_MINI_SCORECARD
+   §S2.2); the hole grid beneath it carries the detail 60px used to have to. */
+const SHAPE_H = 40;
 
 /** The rail scrim of record — imported, never retyped. */
 const CARD_SCRIM = SCRIM_STANDOUT;
