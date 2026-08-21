@@ -32,7 +32,6 @@ export const INSIGHT_LINE_HEIGHT = 1.3;
  */
 export const INSIGHT_LINE_RESERVE = INSIGHT_FONT_SIZE * INSIGHT_LINE_HEIGHT;
 /** Back-compat alias — same one-line reserve. */
-export const INSIGHT_TWO_LINE_RESERVE = INSIGHT_LINE_RESERVE;
 
 /**
  * Single-line clamp. A BACKSTOP, NOT THE FIX: the strings are short enough to

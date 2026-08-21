@@ -194,6 +194,11 @@ export function RoundShape({
   // MORE OVER PAR IS HIGHER: the larger value maps to the SMALLER y.
   const yFor = (v: number) => bottom - ((v - lo) / span) * (bottom - top);
   const zeroY = wentUnder ? yFor(0) : 0;
+  /* §2 THE LEVEL-PAR RULE'S y. ONE derivation, reused — the clip uses zeroY and
+     the rule uses this, both out of yFor(0). The cumulative series starts at 0
+     by construction, so zero is ALWAYS inside the domain; the clamp is a guard,
+     not a live case. */
+  const baselineY = Math.min(height - 0.5, Math.max(0.5, yFor(0)));
 
   const innerW = width - SHAPE_PAD_X * 2;
   const pts = values.map((v, i) => ({
@@ -301,23 +306,27 @@ export function RoundShape({
             <g clipPath={`url(#${clipBelow})`}>
               <path d={fillD} fill={FILL_UNDER_LIGHT} />
             </g>
-
-            {/* THE LEVEL-PAR RULE. Without it the red has nothing to be under.
-                The only gridline on the tile. */}
-            <line
-              x1={0}
-              x2={width}
-              y1={zeroY}
-              y2={zeroY}
-              stroke={A.DIM}
-              strokeOpacity={0.7}
-              strokeWidth={1}
-              strokeDasharray="2 3"
-              vectorEffect="non-scaling-stroke"
-            />
           </>
         ) : (
           <path d={fillD} fill={FILL_OVER_LIGHT} />
+        )}
+
+        {/* §2 THE LEVEL-PAR RULE, NOW UNCONDITIONAL. The curve's whole colour
+            rule is "below this line red, above it ink"; on a round that never
+            went under there is no red at all, so without the rule the drawing
+            has no reference point. Behind the stroke and behind the beads —
+            never the top layer. */}
+        {showBaseline && (
+          <line
+            x1={0}
+            x2={width}
+            y1={baselineY}
+            y2={baselineY}
+            stroke={A.HAIRLINE}
+            strokeWidth={1}
+            strokeDasharray="3 3"
+            vectorEffect="non-scaling-stroke"
+          />
         )}
 
         {/* No halo. It existed so a 2.4px stroke read on top of a graduated
