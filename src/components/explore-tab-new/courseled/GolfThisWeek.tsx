@@ -611,50 +611,23 @@ function GolfThisWeekCard({
   const toParUnder =
     row.gross != null && row.course_par != null && row.gross - row.course_par < 0;
 
-  /* THE SELECTOR IS PURE AND LIVES IN ITS OWN MODULE (§S1.6). A round with no
-     hole data returns the GRIND with no counts, and the well renders empty. */
+  /* THE SELECTOR IS PURE AND LIVES IN ITS OWN MODULE (§S1.8). A round with no
+     hole data returns PLAIN with no counts, and the well renders empty (§S1.7). */
   const moment = useMemo(() => selectMoment(shape?.holes ?? []), [shape]);
-  const copy = momentCopy(moment, t as never);
-  const litHoles = useMemo(() => new Set(moment.holes), [moment.holes]);
+  const label = momentLabel(moment, t as TFn);
+  const sentence = momentSentence(moment, t as TFn);
+  const marked = useMemo(() => new Set(moment.markedHoles), [moment.markedHoles]);
 
   const delta = row.delta_index;
   const hasMovement =
     delta != null && Number.isFinite(delta) && Math.abs(delta as number) >= 0.05;
 
-  const chart = (() => {
-    if (!shape) return null;
-    if (moment.chart === 'scorecard') return <MiniScorecard shape={shape} well={WELL} />;
-    if (moment.chart === 'strip') {
-      return (
-        <MomentStrip
-          holes={shape.holes}
-          tone={moment.tone}
-          highlight={litHoles}
-          width={WELL_INNER}
-          height={CHART_H}
-        />
-      );
-    }
-    /* THE CURVE. LAST SIX ONLY for the finish (§S2.1): the claim is about the
-       END, so the end is shown at size rather than the whole round at a
-       distance. TrajectoryLine keeps the tangent-cubic smoothing and draws the
-       dashed level-par rule only when zero is in range (§S2.4). */
-    const holes =
-      moment.chart === 'trajectoryLastSix'
-        ? shape.holes.filter((h) => h.holeNo >= 13)
-        : shape.holes;
-    return (
-      <TrajectoryLine
-        holes={holes}
-        height={CHART_H}
-        surface="light"
-        showTicks={false}
-        padY={6}
-        viewWidth={WELL_INNER}
-        strokeWidth={1.8}
-      />
-    );
-  })();
+  /* ONE CHART ONLY (§S0.3): the scorecard. `shape === null` renders NOTHING and
+     the well keeps its height — never a placeholder grid (§S1.7). */
+  const grid = shape ? (
+    <MiniScorecard shape={shape} well={WELL} marked={marked} markTone={moment.tone} />
+  ) : null;
+
 
   return (
     /* NOT A <button> (§S1.1): FollowButton is a real button and a button inside
