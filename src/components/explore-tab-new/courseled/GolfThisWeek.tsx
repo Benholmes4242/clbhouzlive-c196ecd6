@@ -925,7 +925,7 @@ function GolfThisWeekCard({
                NOT a darker fill (the markers use `well` as their ring spacer) and
                NOT an outer shadow (the CARD already carries CARD_SHADOW). */
             boxShadow: `inset 0 0 0 1px ${WELL_RULE}`,
-            borderRadius: `${WELL_RADIUS}px ${WELL_RADIUS}px 16px 16px`,
+            borderRadius: `0 0 16px 16px`,
             padding: `6px ${WELL_PAD_X}px 9px`,
             boxSizing: 'border-box',
           }}
