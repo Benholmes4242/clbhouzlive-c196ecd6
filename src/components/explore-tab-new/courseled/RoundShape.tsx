@@ -605,11 +605,13 @@ function NineRow({
   from,
   to,
   label,
+  well,
 }: {
   holes: HoleShape['holes'];
   from: number;
   to: number;
   label: string;
+  well: string;
 }) {
   const byHole = new Map(holes.map((h) => [h.holeNo, h]));
   const totals = nineTotals(holes, from, to);
@@ -618,15 +620,9 @@ function NineRow({
 
   return (
     <div>
-      {/* THE NINE HEADER — PORTED from CardScorecardSheet's totals line
-          (BRIEF_MINI_SCORECARD_NINE_HEADER §S1.5): the caps label left, the
-          nine's gross and its to-par right, on their own line above the cells.
-          Same object at two sizes — the sheet's 8px LABEL caps and right-aligned
-          NUM figures, scaled to the tile.
-
-          OUT and IN sit on their own line with the nine total, as the Clubhouse
-          scorecard does. They were removed once to buy horizontal space; that was
-          wrong — the TOTALS were what overflowed the row, not the labels. */}
+      {/* THE NINE HEADER STAYS as ported from CardScorecardSheet's totals line
+          (§S3.4): the caps label left, the nine's gross and its to-par right, on
+          its own line above the cells. */}
       <div
         style={{
           display: 'flex',
@@ -642,20 +638,20 @@ function NineRow({
             fontWeight: 700,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: A.MUTE,
+            color: MINI_FAINT,
           }}
         >
           {label}
         </span>
         <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 700, color: A.INK, ...FIGS }}>
+          <span style={{ fontSize: 10.5, fontWeight: 700, color: MINI_INK, ...FIGS }}>
             {totals?.strokes ?? ''}
           </span>
           <span
             style={{
               fontSize: 8.5,
               fontWeight: 700,
-              color: totals && totals.toPar < 0 ? TOPAR_RED : A.DIM,
+              color: totals && totals.toPar < 0 ? UNDER_INK : MINI_FAINT,
               ...FIGS,
             }}
           >
@@ -664,8 +660,9 @@ function NineRow({
         </span>
       </div>
 
-      {/* THE CELLS TAKE THE FULL INNER WIDTH — nothing shares their row now. */}
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      {/* FIXED CELLS, FIXED GAPS, CENTRED ROW (§S3.2). NOT space-between: the
+          edge margin must be the remainder, not the leftovers of a division. */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: GAP }}>
         {Array.from({ length: to - from + 1 }, (_, i) => {
           const holeNo = from + i;
           const h = byHole.get(holeNo);
@@ -673,27 +670,34 @@ function NineRow({
           return (
             <div
               key={holeNo}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
             >
-              {/* §S2.5 — HOLE NUMBERS STAY. A grid that cannot be indexed by
-                  hole is a texture, which is why option C was rejected. */}
-              <span style={{ fontSize: 7.5, fontWeight: 700, color: A.DIM, ...FIGS }}>
+              {/* HOLE NUMBERS STAY, at 7px in GHOST (§S3.5). Findable, not read —
+                  a grid that cannot be indexed by hole is a texture. */}
+              <span
+                style={{
+                  fontSize: 7,
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  marginBottom: 2.5,
+                  color: MINI_GHOST,
+                  ...FIGS,
+                }}
+              >
                 {holeNo}
               </span>
-              <span style={markerStyle(m)}>
-                {/* §S4.1 — AN UNPLAYED HOLE IS EMPTY, never a zero: a zero
-                    would read as an extraordinary score. */}
+              <span style={markerStyle(m, well)}>
+                {/* AN UNPLAYED HOLE IS EMPTY, never a zero: a zero would read as
+                    an extraordinary score. */}
                 <span
                   style={{
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: '-0.04em',
-                    /* CENTRED, NOT NEARLY (§S2) — lineHeight 1 collapses the
-                       digit's line box to the glyph so the flex centring of the
-                       fixed marker actually lands. The 0.5px translate is the
-                       OPTICAL correction: tabular lining numerals sit above the
-                       geometric centre of their box, so mathematical centre
-                       reads high. Deliberate, not a fudge. */
+                    /* lineHeight 1 collapses the digit's line box to the glyph so
+                       the flex centring of the fixed marker lands; the 0.5px
+                       translate is the OPTICAL correction, since tabular lining
+                       numerals sit above the geometric centre of their box. */
                     lineHeight: 1,
                     transform: 'translateY(0.5px)',
                     display: 'block',
@@ -716,13 +720,20 @@ function NineRow({
  * `shape === null` for the three-point fallback and this returns null, with no
  * placeholder and no reserved height.
  */
-export function MiniScorecard({ shape }: { shape: HoleShape | null }) {
+export function MiniScorecard({
+  shape,
+  well = MINI_WELL,
+}: {
+  shape: HoleShape | null;
+  /** The tinted well behind the grid — the outer rings take it (§S3.6). */
+  well?: string;
+}) {
   const { t } = useTranslation(['courses']);
   if (!shape || shape.holes.length === 0) return null;
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} />
-      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} well={well} />
+      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} well={well} />
     </div>
   );
 }
