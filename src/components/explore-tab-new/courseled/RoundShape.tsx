@@ -558,12 +558,10 @@ function nineTotals(holes: HoleShape['holes'], from: number, to: number) {
 
 function NineRow({
   holes,
-  label,
   from,
   to,
 }: {
   holes: HoleShape['holes'];
-  label: string;
   from: number;
   to: number;
 }) {
