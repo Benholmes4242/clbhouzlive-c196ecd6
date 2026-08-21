@@ -514,53 +514,81 @@ export function MostPlayedPanel() {
 }
 
 /**
- * Section 7 — honours board (BRIEF_HONOURS_BOARD_REBUILD): CANVAS-NATIVE. No
- * gold wash, no gold hairline, no tinted panel — a kicker line with the mode
- * toggle top right, headline, subline, then a RAIL of photo-band cards bled off
- * the right edge. Values are literals here on purpose: HonoursBoard imports this
- * shell, so this leaf must not import back from it (card 212 x 132 band + footer).
+ * Section 7 — honours board (BRIEF_HONOURS_BOARD_THE_HOLE): heading, the rarity
+ * subline, then a RAIL OF EQUAL CARDS bled off the right edge. NO MODE TOGGLE —
+ * the toggle moved into the see-all sheet — and NO PHOTO BAND: the card leads
+ * with the yardage over a tinted head. Values are literals here on purpose:
+ * HonoursBoard imports this shell, so this leaf must not import back from it
+ * (card 206 x 164, head 96).
  */
-const SK_CARD_W = 212;
-const SK_BAND_H = 132;
+const SK_CARD_W = 206;
+const SK_CARD_H = 164;
+const SK_HEAD_H = 96;
 
 export function HonoursPanel() {
   return (
     <section>
       <div style={{ padding: '0 2px', marginBottom: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <TextBar w={128} h={10} />
+          <TextBar w={148} h={14} />
           <div style={{ marginLeft: 'auto' }}>
-            <Bar style={{ height: 24, width: 118, borderRadius: 999 }} />
+            <TextBar w={44} h={10} />
           </div>
         </div>
-        <div style={{ marginTop: 6 }}>
-          <TextBar w={166} h={16} />
+        <div style={{ marginTop: 5, marginLeft: 22 }}>
+          <TextBar w={228} h={11} />
         </div>
-        <div style={{ marginTop: 3 }}>
-          <TextBar w={112} h={11} />
+        <div style={{ marginTop: 4, marginLeft: 22 }}>
+          <TextBar w={172} h={11} />
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 10, paddingLeft: 2, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', gap: 10, padding: '3px 0 6px 2px', overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
           <div
             key={i}
             style={{
               width: SK_CARD_W,
+              height: SK_CARD_H,
               flex: 'none',
-              borderRadius: 16,
-              border: `1px solid ${A.BORDER}`,
+              borderRadius: 15,
               background: '#FFFFFF',
+              boxShadow: '0 1px 3px rgba(11,15,20,0.06)',
               overflow: 'hidden',
               boxSizing: 'border-box',
             }}
           >
-            <Bar style={{ height: SK_BAND_H, width: '100%', borderRadius: 0 }} />
             <div
-              style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '9px 10px' }}
+              style={{
+                height: SK_HEAD_H,
+                background: '#F4F6F9',
+                padding: '11px 12px 12px',
+                boxSizing: 'border-box',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                gap: 6,
+              }}
             >
-              <Bar style={{ height: 20, width: 20, borderRadius: 7, flexShrink: 0 }} />
-              <TextBar w={94} h={12} />
+              <Bar style={{ height: 26, width: 96, borderRadius: 6 }} />
+              <TextBar w={78} h={11} />
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                gap: 8,
+                height: SK_CARD_H - SK_HEAD_H,
+                padding: '0 12px',
+                boxSizing: 'border-box',
+              }}
+            >
+              <TextBar w={112} h={13} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <Bar style={{ height: 20, width: 20, borderRadius: 7, flexShrink: 0 }} />
+                <TextBar w={84} h={12} />
+              </div>
             </div>
           </div>
         ))}
@@ -568,6 +596,7 @@ export function HonoursPanel() {
     </section>
   );
 }
+
 
 
 export default function DiscoverCourseLedSkeleton() {
