@@ -19,9 +19,7 @@ import {
   toParFor,
   buildInsightMap,
   referenceLine,
-  INSIGHT_FONT_SIZE,
   INSIGHT_LINE_HEIGHT,
-  INSIGHT_LINE_RESERVE,
   INSIGHT_CLAMP,
   InsightGlyph,
   IndexMovementTriangle,
@@ -125,6 +123,11 @@ const GHOST = '#C8D0D8'; // hole numbers, the level-par grade
 
 /* The card sits on the page rather than being drawn onto it (§S1.5). */
 const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
+
+/* §S4.4 — 10.5px, down from the shared 11.5 the friends rail uses, with the
+   reserve recomputed from it so the line still lands at one height per rail. */
+const INSIGHT_SM = 10.5;
+const INSIGHT_LINE_RESERVE_SM = INSIGHT_SM * INSIGHT_LINE_HEIGHT;
 
 /**
  * TILE HEIGHT FLOOR. Measured in the browser on a tile with the full grid:
