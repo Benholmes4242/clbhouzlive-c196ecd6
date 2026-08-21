@@ -790,11 +790,14 @@ function GolfThisWeekCard({
           background: COURSE_GRADIENT,
         }}
       >
-        {imageUrl && (
-          /* zIndex -1 keeps every layer ABOVE the element's own base
-             background and BELOW the in-flow content, so the content stack is
-             untouched. */
-          <>
+        {/* THE SCRIM STACK RENDERS WITH OR WITHOUT A PHOTOGRAPH (ACCEPTANCE A):
+            COURSE_GRADIENT is a bright green-to-sand, so the white content stack
+            needs the same scrims over the bare gradient that it needs over an
+            image. Only the <img> is conditional.
+            zIndex -1 keeps every layer ABOVE the element's own background and
+            BELOW the in-flow content, so the content stack is untouched. */}
+        <>
+          {imageUrl && (
             <img
               src={imageUrl}
               alt=""
@@ -837,16 +840,6 @@ function GolfThisWeekCard({
                 top: 0,
                 height: PHOTO_TOP_SCRIM_H,
                 background: HERO_TOP_SCRIM,
-                zIndex: -1,
-              }}
-            />
-            {/* THE MOMENT GLOW STILL WINS (§2.2) — same position, radius, tone. */}
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: heroBackground(moment.kind, moment.tone).split(`, ${HERO_BASE}`)[0],
                 zIndex: -1,
               }}
             />
