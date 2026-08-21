@@ -271,11 +271,17 @@ export function HeroBoardSection({
   const closedFigure = useMemo(() => {
     if (picks.length === 0) return null;
 
-    /* LIVE — the BEST-PLACED pick. A pick with no board line (withdrawn, missed
-       cut, not in the field) simply cannot be the best-placed one, so it is
-       skipped; when NONE of the picks has a live line the row falls back to the
-       PRE treatment rather than printing a blank figure. */
-    if (phase === 'live') {
+    /* LIVE and COMPLETE — the BEST-PLACED pick. A pick with no board line
+       (withdrawn, missed cut, not in the field) simply cannot be the best-placed
+       one, so it is skipped; when NONE of the picks has a line the row falls
+       back to the PRE treatment rather than printing a blank figure.
+
+       AMENDMENT 1 §CHANGE 1 — THE LIVE ROW DROPS THE POSITION. The leaderboard
+       sits directly above this row, so -7 reads against a visible leader on -9
+       without repeating the position: two tokens scan in one beat, three do not.
+       COMPLETE IS THE EXCEPTION AND KEEPS IT — on a finished tournament the
+       position IS the receipt ("T4" says how the pick did; "-7" does not). */
+    if (phase === 'live' || phase === 'completed') {
       let best: { pick: AITopContender; position: number; tied: boolean; score: number | null } | null = null;
       for (const p of picks) {
         const line = boardByPlayer.get(String(p.playerId));
@@ -287,7 +293,7 @@ export function HeroBoardSection({
       if (best) {
         return {
           name: surnameOf(best.pick.playerName),
-          right: `${best.tied ? 'T' : ''}${best.position}`,
+          right: phase === 'completed' ? `${best.tied ? 'T' : ''}${best.position}` : null,
           figure: best.score == null ? null : formatToPar(best.score),
           figureColor: tourFigColor(best.score),
         };
