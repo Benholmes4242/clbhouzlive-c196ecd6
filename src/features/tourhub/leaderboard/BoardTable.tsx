@@ -32,7 +32,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
-import { countryFlag, countryFallback } from './countryFlag';
+import CountryFlag from '@/components/ui/country-flag';
 import { getScoreColor } from '../_shared/scoreColor';
 import { TREND_UP, TREND_DOWN, AMBER } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
@@ -475,30 +475,11 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
             >
               {e.player?.full_name || t('board.unknownPlayer')}
             </span>
-            {cc && (() => {
-              const flag = countryFlag(cc);
-              return flag ? (
-                <span
-                  style={{ fontSize: 10.5, opacity: 0.75, marginLeft: 5, lineHeight: 1 }}
-                  aria-label={cc}
-                >
-                  {flag}
-                </span>
-              ) : (
-                <span
-                  style={{
-                    fontSize: 8,
-                    fontWeight: 700,
-                    color: MUTED,
-                    opacity: 0.75,
-                    marginLeft: 5,
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  {countryFallback(cc)}
-                </span>
-              );
-            })()}
+            {cc && (
+              <span style={{ marginLeft: 5, display: 'inline-flex', alignItems: 'center', lineHeight: 1 }}>
+                <CountryFlag country={cc} size="sm" />
+              </span>
+            )}
           </div>
 
           {/* TOT — the answer column, right edge, largest figure in the row. */}

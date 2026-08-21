@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { countryFlag, countryFallback } from '../../leaderboard/countryFlag';
+import CountryFlag from '@/components/ui/country-flag';
 import { todayFromEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
@@ -120,7 +120,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             : r.position == null ? BLANK
             : `${r.position_tied ? 'T' : ''}${r.position}`;
           const cc = r.player?.country_code ?? r.player?.country ?? null;
-          const flag = cc ? countryFlag(cc) : null;
+          const flag = null;
           const today = todayFromEntry(r as unknown as Parameters<typeof todayFromEntry>[0], currentRound);
           return (
             <button
