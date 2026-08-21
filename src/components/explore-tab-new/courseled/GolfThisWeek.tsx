@@ -13,7 +13,6 @@ import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
@@ -37,12 +36,11 @@ import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegion
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
 import { MiniScorecard } from './RoundShape';
 import {
-  grindSentenceKey,
   selectMoment,
   type Moment,
-  type MomentHole,
   type MomentKind,
 } from './roundMoment';
+
 import { GolfThisWeekRail as GolfThisWeekShell } from './DiscoverCourseLedSkeleton';
 import { A, CARD_SHELL, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
 
@@ -70,31 +68,35 @@ import { A, CARD_SHELL, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
 
 
 /* =============================================================================
-   THE TILE'S GEOMETRY (BRIEF_ROUND_TILE_THE_MOMENT §S4.1).
+   THE TILE'S GEOMETRY (BRIEF_ROUND_TILE_THE_MOMENT v2).
 
-   THE TILE IS A HERO, A ROW AND A WELL: hero 178 / member row with the score /
-   the well, whose CHART REGION IS A FIXED HEIGHT whatever chart it holds. That
-   fixed region is the whole reason the rail stays uniform while its CONTENTS
-   differ (§S2.2, ACCEPTANCE G) — do not let a chart size the well.
+   THE TILE IS A HERO, A MEMBER ROW AND A SCORECARD WELL: gradient hero 156 /
+   member row with the score / a tinted well holding TWO ROWS OF NINE.
 
-   THE PHOTOGRAPH IS GONE (§S4.6). PHOTO_H, SHAPE_H, the scrim and the glass chip
-   tokens went with it; the hero gradient carries the top of the card now. */
+   ONE CHART ONLY — THE SCORECARD (§S0.3). The trajectory variant was designed
+   and CUT: two chart types meant two heights, two sets of axis rules and a
+   selector deciding presentation as well as content. The hero already says what
+   to look for, so the card simply shows it.
+
+   THE PHOTOGRAPH IS GONE (§S0.4). PHOTO_H, the scrim and the glass chip tokens
+   went with it; the hero gradient carries the top of the card. */
 
 const CARD_W = 256;
 
-/** §S4.1 — the hero. */
-const HERO_H = 178;
+/** §S2.1 — the gradient hero. */
+const HERO_H = 156;
 
-/* THE CHART REGION. 88px is what the two nines of the mini scorecard need at the
-   settled 17px cell / 9px gap geometry (two headers, two hole-number rows, two
-   marker rows and the 4px gap between the nines). THE STRIP AND THE CURVE TAKE
-   THE SAME 88 — a rail whose frames differ reads as broken. */
-const CHART_H = 88;
+/* THE GRID REGION. 88px is what two nines need at the settled 17px cell / 9px
+   gap geometry (two nine-headers, two hole-number rows, two marker rows and the
+   4px gap between the nines). IT IS FIXED, so every well is the same height even
+   when a round has no hole data and the well is empty (§S1.7, ACCEPTANCE K). */
+const GRID_H = 88;
 
-/* NO TINT IN THE WELL. WELL stays as the colour the marker outer rings trace
-   against, and that colour is the card itself, so a double's ring reads as a gap
-   rather than a grey halo. */
-const WELL = '#FFFFFF';
+/* §S4.1 — A TINTED WELL, NO BORDER. The tone separates it from the card and an
+   outline would be a second signal for one edge. The marker outer rings trace
+   against THIS colour (§S4.7), never white — a white ring on a tinted well
+   haloes. */
+const WELL = '#F2F5F8';
 const WELL_RADIUS = 12;
 /* 6, not 10 — see WELL_INNER. */
 const WELL_PAD_X = 6;
@@ -107,6 +109,8 @@ const WELL_RULE = 'rgba(11,15,20,0.07)';
    10 the inner width falls to 236 and a leading double box sits 2.7px from the
    well edge, which is the clipping fault that geometry exists to fix. */
 const WELL_INNER = CARD_W - WELL_PAD_X * 2;
+/* Recorded so a future reader does not have to re-derive it. */
+void WELL_INNER;
 
 /* THE INK DOES THE HIERARCHY. One genuinely dark ink and greys that are clearly
    different from each other, not four middling greys. */
@@ -114,14 +118,11 @@ const INK = '#0B0F14';   // scores and totals
 const MID = '#5A6673';   // secondary text
 const HAIRLINE_INK = 'rgba(11,15,20,0.12)';
 
-/* THREE CLEARLY DIFFERENT GREYS FOR THE BAND (§S4.2). A.FAINT and A.GHOST do
-   not exist on the shared ramp, so the band names them here against the same
-   ink: MUTE for the course, FAINT for the label and the unit, GHOST quieter
-   still. Four middling greys is what made the old tile look soft. */
+/* THREE CLEARLY DIFFERENT GREYS FOR THE BAND (§S4.2 of the band brief). A.FAINT
+   and A.GHOST do not exist on the shared ramp, so the band names them here
+   against the same ink. THE BAND TILES ARE NOT TOUCHED BY THIS BRIEF. */
 const BAND_MUTE = MID;
 const BAND_FAINT = '#8A929C';
-/* GHOST (#AEB6BF) is the fourth step of the ramp; nothing on the band is quiet
-   enough to need it, so it is recorded here rather than declared unused. */
 
 
 
@@ -129,11 +130,13 @@ const BAND_FAINT = '#8A929C';
 const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 
 /**
- * TILE HEIGHT. hero 178 + 8 pad + 20 member row + 8 + well header 14 + 7 + 88
- * chart + 10 pad = 333. EVERY TREATMENT LANDS ON IT because the chart region is
- * fixed, including a round with NO HOLE DATA, whose well is simply empty (§S1.5).
+ * TILE HEIGHT. hero 156 + 8 pad + 20 member row + 8 + well (6 header + 6 +
+ * 1 rule + 7 + 88 grid + 8 pad = 116) + 10 pad = 318. EVERY KIND LANDS ON IT
+ * because the grid region is fixed, INCLUDING a round with NO HOLE DATA, whose
+ * well is simply empty (§S1.7, ACCEPTANCE Q).
  */
-const CARD_MIN_H = 333;
+const WELL_H = 116;
+const CARD_MIN_H = 318;
 
 /** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
@@ -142,6 +145,7 @@ const AMBER = '#F7931E';
  *  rise is not, and the ARROW is what separates it from the to-par beside it. */
 const INDEX_FELL = '#1B7F4B';
 const INDEX_ROSE = '#C8102E';
+
 
 
 
@@ -391,226 +395,180 @@ function FollowButton({
 
 
 /* =============================================================================
-   COLOUR — THE RULE THAT KEEPS IT HONEST (BRIEF_ROUND_TILE_THE_MOMENT §S3.4).
+   COLOUR — THE RULE THAT KEEPS IT HONEST (BRIEF_ROUND_TILE_THE_MOMENT v2 §S5).
    READ THIS BEFORE CHANGING ANY COLOUR ON THIS CARD.
 
-   §S3.1  THE HERO IS EXPRESSIVE. The moment's tone (#FFC93C eagle, #22D07A run,
-          #FF5A4E collapse, #3B9DFF finish, #F7931E grind) is a CELEBRATION
-          ACCENT and NOTHING UP THERE IS MEASURED.
+   §S5.1  THE HERO IS EXPRESSIVE. The moment's tone (#FFC93C eagle, #C8102E in
+          red, #3B9DFF the finish, #22D07A the run, #F7931E the grind, #FFFFFF
+          plain) is a CELEBRATION ACCENT and NOTHING UP THERE IS MEASURED.
 
-   §S3.2  THE DATA REGION IS LITERAL. RED IS UNDER PAR, INK IS OVER, ALWAYS.
+   §S5.2  THE SCORECARD IS LITERAL. RED IS UNDER PAR, INK IS OVER, ALWAYS.
 
-   §S3.3  THE ONLY EXCEPTION is the moment's OWN holes, which take the hero tone
+   §S5.3  THE ONLY EXCEPTION is the moment's OWN holes, which take the hero tone
           so the two halves of the card point at each other.
 
-   WITHOUT THIS RULE the moment palette leaks into the charts within a month and
+   WITHOUT THIS RULE the moment palette leaks into the grid within a month and
    red stops meaning under par — which every other scoring surface in the app
-   depends on. Do not tint a bar, a marker or a curve with a moment tone unless
-   that hole is in `moment.holes`.
+   depends on. Do not tint a marker with a moment tone unless that hole is in
+   `moment.markedHoles`.
    ========================================================================== */
 
-/** THE HERO'S GRADIENTS. The collapse takes the COOLER one (§S3.6): its word is
- *  neutral and the figure does the talking — never a joke at a member's
- *  expense, and never a red wash over somebody's bad hole. */
-const HERO_BASE = 'linear-gradient(158deg, #141A21 0%, #0B0F14 74%)';
-const HERO_COOL = 'linear-gradient(150deg, #1C2531 0%, #0C1116 72%)';
+/**
+ * A LABEL ABOVE A FIGURE IS READ AS NAMING THAT FIGURE (§S2.6).
+ * If the figure is an IDENTITY the prefix is the noun (HOLE 13); if it is a
+ * QUANTITY the noun follows it (14 HOLES). NEVER ABOVE.
+ *
+ * This was a real defect found on device: "HOLES" set over "14" read as
+ * "hole 14". The figure phrase is therefore ONE translatable template with a
+ * {n} placeholder (SINGLE braces, deliberately: i18next owns {{...}} and would
+ * try to interpolate it), split at render time so the number takes 46px and the words
+ * around it take 13px ON THE SAME LINE.
+ */
+const FIGURE_PLACEHOLDER = '{n}';
 
+/** §S2.1 — the hero gradient, no photograph. */
+const HERO_BASE = 'linear-gradient(170deg, #2E3A32 0%, #181F1B 60%, #0D110E 100%)';
+
+/**
+ * §S2.2 — THE GLOW is a radial wash of the moment's tone at 15%, top right.
+ * A PLAIN ROUND'S GLOW IS WHITE AT 13%. THAT IS THE WHOLE HIERARCHY: colour
+ * means something happened, white means a round was played. Same shape, same
+ * weight, different temperature — so a plain round still holds its own in the
+ * rail without claiming to be a story.
+ */
 function heroBackground(kind: MomentKind, tone: string) {
-  if (kind === 'collapse') return HERO_COOL;
-  return `radial-gradient(122% 92% at 86% 4%, ${tone}3D 0%, rgba(0,0,0,0) 62%), ${HERO_BASE}`;
+  const alpha = kind === 'plain' ? '21' /* 13% */ : '26' /* 15% */;
+  return `radial-gradient(118% 88% at 86% 4%, ${tone}${alpha} 0%, rgba(0,0,0,0) 64%), ${HERO_BASE}`;
 }
 
 const fmtRel = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
 
 /**
- * THE SENTENCE (§S4.3) — THE HIGHEST-RISK ELEMENT ON THE CARD. It is built from
- * a FIXED TEMPLATE PER KIND with figures interpolated into NUMBERED
- * placeholders, so a translator can reorder them (§S5.2). NEVER free text, and
- * nothing here can read as sarcasm on a bad round.
+ * THE COPY (§S6) — THE SENTENCE IS THE HIGHEST-RISK ELEMENT ON THE CARD. Every
+ * label, figure phrase and sentence is a FIXED TEMPLATE PER KIND with figures
+ * interpolated into NUMBERED placeholders so a translator can reorder them
+ * (§S6.3). NEVER free text, never anything that could read as sarcastic, and
+ * THE SENTENCE NEVER REPEATS THE FIGURE (§S2.8) — the figure states, the
+ * sentence explains.
+ *
+ * EAGLE / ACE / ALBATROSS stay untranslated in English (§S6.4).
  */
-function momentCopy(m: Moment, t: (k: string, d?: string, o?: object) => string) {
+const MK = 'discover.golfThisWeek.moment';
+
+const LABEL_FALLBACK: Record<string, string> = {
+  eagle: 'EAGLE',
+  ace: 'ACE',
+  albatross: 'ALBATROSS',
+  inRed: 'IN RED',
+  finish: 'THE FINISH',
+  run: 'THE RUN',
+  grind: 'THE GRIND',
+};
+
+const FIGURE_FALLBACK: Record<string, string> = {
+  hole: `HOLE ${FIGURE_PLACEHOLDER}`,
+  holes: `${FIGURE_PLACEHOLDER} HOLES`,
+  inThree: `${FIGURE_PLACEHOLDER} IN THREE`,
+  inARow: `${FIGURE_PLACEHOLDER} IN A ROW`,
+};
+
+const SENTENCE_FALLBACK: Record<string, string> = {
+  eagle: 'A {{0}} on a par {{1}}.',
+  inRed: 'The round went under par and finished on {{0}}.',
+  finish: 'Birdie or better coming home, to finish on {{0}}.',
+  run: 'Par or better from {{0}} through {{1}}.',
+  grind: 'Nothing worse than a bogey all the way round.',
+  plain: '{{0}} of {{1}} holes at par or better.',
+  noHoles: 'A round played. The hole by hole detail was not recorded.',
+};
+
+type TFn = (k: string, d?: string, o?: object) => string;
+
+function momentLabel(m: Moment, t: TFn): string | null {
+  if (!m.labelKey) return null;
+  return t(`${MK}.label.${m.labelKey}`, LABEL_FALLBACK[m.labelKey]);
+}
+
+function momentSentence(m: Moment, t: TFn): string {
   const f = m.facts;
-  const K = 'discover.golfThisWeek.moment';
-
-  if (m.kind === 'eagle') {
-    const word =
-      m.feat === 'ace'
-        ? t(`${K}.eagle.ace`, 'Ace')
-        : m.feat === 'albatross'
-          ? t(`${K}.eagle.albatross`, 'Albatross')
-          : t(`${K}.eagle.eagle`, 'Eagle');
-    return {
-      meta: t(`${K}.eagle.meta`, 'Hole'),
-      word,
-      sub: t(`${K}.eagle.sub`, 'The shot of the round'),
-      sentence: t(`${K}.eagle.sentence`, '{{0}} on hole {{1}}, a par {{2}}.', {
-        0: f.strokes,
-        1: f.holeNo,
-        2: f.par,
-      }),
-      chartLabel: t(`${K}.chart.strip`, 'Every hole'),
-    };
+  const key = `${MK}.sentence.${m.sentenceKey}`;
+  const fb = SENTENCE_FALLBACK[m.sentenceKey];
+  switch (m.sentenceKey) {
+    case 'eagle':
+      return t(key, fb, { 0: f.strokes, 1: f.par });
+    case 'inRed':
+    case 'finish':
+      return t(key, fb, { 0: fmtRel(f.toPar ?? 0) });
+    case 'run':
+      return t(key, fb, { 0: f.from, 1: f.to });
+    case 'plain':
+      return t(key, fb, { 0: f.parOrBetter, 1: f.played });
+    default:
+      return t(key, fb);
   }
-  if (m.kind === 'run') {
-    return {
-      meta: t(`${K}.run.meta`, 'Holes'),
-      word: t(`${K}.run.word`, 'The run'),
-      sub: t(`${K}.run.sub`, 'Par or better, back to back'),
-      sentence: t(
-        `${K}.run.sentence`,
-        '{{0}} holes in a row at par or better, from {{1}} to {{2}}.',
-        { 0: f.count, 1: f.from, 2: f.to },
-      ),
-      chartLabel: t(`${K}.chart.strip`, 'Every hole'),
-    };
-  }
-  if (m.kind === 'collapse') {
-    return {
-      meta: t(`${K}.collapse.meta`, 'Hole'),
-      word: t(`${K}.collapse.word`, 'Hole {{0}}', { 0: f.holeNo }),
-      sub: t(`${K}.collapse.sub`, 'Where the round turned'),
-      sentence: t(
-        `${K}.collapse.sentence`,
-        '{{0}} shots dropped on hole {{1}}; the other holes came to {{2}}.',
-        { 0: f.dropped, 1: f.holeNo, 2: fmtRel(f.restToPar ?? 0) },
-      ),
-      chartLabel: t(`${K}.chart.trajectory`, 'The round'),
-    };
-  }
-  if (m.kind === 'finish') {
-    return {
-      meta: t(`${K}.finish.meta`, 'Birdies'),
-      word: t(`${K}.finish.word`, 'The finish'),
-      sub: t(`${K}.finish.sub`, 'The closing three'),
-      sentence: t(
-        `${K}.finish.sentence`,
-        '{{0}} birdies in the last three holes to finish on {{1}}.',
-        { 0: f.count, 1: fmtRel(f.toPar ?? 0) },
-      ),
-      chartLabel: t(`${K}.chart.lastSix`, 'Holes 13\u201318'),
-    };
-  }
-
-  /* THE GRIND. FOUR TEMPLATES, CHOSEN — never concatenated (§S1.4, §S5.2). */
-  const which = grindSentenceKey(m);
-  const grindSentences: Record<string, [string, string]> = {
-    clean: [
-      `${K}.grind.sentenceClean`,
-      '{{0}} of {{1}} holes at par or better, with no birdies and no doubles.',
-    ],
-    noDoubles: [
-      `${K}.grind.sentenceNoDoubles`,
-      '{{0}} of {{1}} holes at par or better, and not a double all day.',
-    ],
-    noBirdies: [
-      `${K}.grind.sentenceNoBirdies`,
-      '{{0}} of {{1}} holes at par or better, with no birdies.',
-    ],
-    plain: [`${K}.grind.sentencePlain`, '{{0}} of {{1}} holes at par or better.'],
-    noHoles: [
-      `${K}.grind.sentenceNoHoles`,
-      'A round played. The hole by hole detail was not recorded.',
-    ],
-  };
-  const [key, fallback] = grindSentences[which];
-  return {
-    meta: t(`${K}.grind.meta`, 'Holes'),
-    word: t(`${K}.grind.word`, 'The grind'),
-    sub: t(`${K}.grind.sub`, 'Par or better'),
-    sentence: t(key, fallback, { 0: f.parOrBetter, 1: f.played }),
-    chartLabel: t(`${K}.chart.scorecard`, 'The card'),
-  };
 }
 
 /**
- * THE STRIP (§S2.3) — eighteen bars, height by outcome, the moment's holes in
- * the hero tone and EVERYTHING ELSE LITERAL (§S3.2): under par red, over par
- * ink, par a recessed stub on the level-par rule.
- *
- * IT IS NOT INTERCHANGEABLE WITH THE CURVE. The eagle's claim is ONE HOLE and
- * the run's is a SPAN, and only a per-hole row shows a span AS a span.
+ * THE FIGURE LINE. The template is split on {{n}}: the words before and after
+ * render at 13px / 700 / 0.14em at 50% white, the number at 46px / 800, ALL ON
+ * ONE BASELINE (§S2.4, §S2.6). A PLAIN round has no template — its figure is the
+ * gross with the to-par beside it (§S2.7).
  */
-function MomentStrip({
-  holes,
-  tone,
-  highlight,
-  width,
-  height,
+function FigureLine({
+  moment,
+  gross,
+  toParText,
+  t,
 }: {
-  holes: MomentHole[];
-  tone: string;
-  highlight: ReadonlySet<number>;
-  width: number;
-  height: number;
+  moment: Moment;
+  gross: number | null;
+  toParText: string | null;
+  t: TFn;
 }) {
-  const count = 18;
-  const gap = 2;
-  const barW = Math.max(4, (width - gap * (count - 1)) / count);
-  /* THE LEVEL-PAR RULE sits low, because damage is the common case: over par
-     grows UP from it, under par hangs BELOW it. */
-  const baseline = Math.round(height * 0.7);
-  const unit = 11;
-  const byHole = new Map(holes.map((h) => [h.holeNo, h]));
+  const numStyle: React.CSSProperties = {
+    ...NUMF,
+    fontSize: 46,
+    fontWeight: 800,
+    lineHeight: 1,
+    letterSpacing: '-0.06em',
+    color: '#FFFFFF',
+  };
+  const wordStyle: React.CSSProperties = {
+    fontSize: 13,
+    fontWeight: 700,
+    letterSpacing: '0.14em',
+    lineHeight: 1,
+    textTransform: 'uppercase',
+    color: 'rgba(255,255,255,0.5)',
+  };
+
+  if (moment.figureKey == null || moment.figure == null) {
+    /* PLAIN: the gross, with the to-par beside it on the same line. */
+    return (
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, minWidth: 0 }}>
+        <span style={numStyle}>{gross ?? '\u2014'}</span>
+        {toParText && <span style={{ ...wordStyle, letterSpacing: '0.06em' }}>{toParText}</span>}
+      </div>
+    );
+  }
+
+  const template = t(
+    `${MK}.figure.${moment.figureKey}`,
+    FIGURE_FALLBACK[moment.figureKey],
+  );
+  const idx = template.indexOf(FIGURE_PLACEHOLDER);
+  const before = idx >= 0 ? template.slice(0, idx).trim() : '';
+  const after = idx >= 0 ? template.slice(idx + FIGURE_PLACEHOLDER.length).trim() : template;
 
   return (
-    <div style={{ position: 'relative', height, width }}>
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: baseline,
-          height: 1,
-          background: 'rgba(11,15,20,0.14)',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          gap,
-          alignItems: 'flex-start',
-        }}
-      >
-        {Array.from({ length: count }, (_, i) => {
-          const holeNo = i + 1;
-          const h = byHole.get(holeNo);
-          const d =
-            h && h.par != null && h.strokes != null ? h.strokes - h.par : null;
-          const lit = highlight.has(holeNo);
-          if (d == null) {
-            return (
-              <div key={holeNo} style={{ width: barW, height: '100%', position: 'relative' }} />
-            );
-          }
-          const over = d > 0;
-          const under = d < 0;
-          const mag = Math.min(Math.abs(d), 4);
-          const len = d === 0 ? 3 : Math.max(4, mag * unit);
-          const colour = lit ? tone : under ? TOPAR_RED : d === 0 ? '#C8D0D8' : INK;
-          return (
-            <div key={holeNo} style={{ width: barW, height: '100%', position: 'relative' }}>
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  width: barW,
-                  borderRadius: 2,
-                  background: colour,
-                  ...(over || d === 0
-                    ? { bottom: height - baseline, height: len }
-                    : { top: baseline + 1, height: len }),
-                }}
-              />
-            </div>
-          );
-        })}
-      </div>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, minWidth: 0 }}>
+      {before && <span style={wordStyle}>{before}</span>}
+      <span style={numStyle}>{moment.figure}</span>
+      {after && <span style={wordStyle}>{after}</span>}
     </div>
   );
 }
+
 
 interface CardProps {
   row: CircleRoundRow;
@@ -652,50 +610,23 @@ function GolfThisWeekCard({
   const toParUnder =
     row.gross != null && row.course_par != null && row.gross - row.course_par < 0;
 
-  /* THE SELECTOR IS PURE AND LIVES IN ITS OWN MODULE (§S1.6). A round with no
-     hole data returns the GRIND with no counts, and the well renders empty. */
+  /* THE SELECTOR IS PURE AND LIVES IN ITS OWN MODULE (§S1.8). A round with no
+     hole data returns PLAIN with no counts, and the well renders empty (§S1.7). */
   const moment = useMemo(() => selectMoment(shape?.holes ?? []), [shape]);
-  const copy = momentCopy(moment, t as never);
-  const litHoles = useMemo(() => new Set(moment.holes), [moment.holes]);
+  const label = momentLabel(moment, t as TFn);
+  const sentence = momentSentence(moment, t as TFn);
+  const marked = useMemo(() => new Set(moment.markedHoles), [moment.markedHoles]);
 
   const delta = row.delta_index;
   const hasMovement =
     delta != null && Number.isFinite(delta) && Math.abs(delta as number) >= 0.05;
 
-  const chart = (() => {
-    if (!shape) return null;
-    if (moment.chart === 'scorecard') return <MiniScorecard shape={shape} well={WELL} />;
-    if (moment.chart === 'strip') {
-      return (
-        <MomentStrip
-          holes={shape.holes}
-          tone={moment.tone}
-          highlight={litHoles}
-          width={WELL_INNER}
-          height={CHART_H}
-        />
-      );
-    }
-    /* THE CURVE. LAST SIX ONLY for the finish (§S2.1): the claim is about the
-       END, so the end is shown at size rather than the whole round at a
-       distance. TrajectoryLine keeps the tangent-cubic smoothing and draws the
-       dashed level-par rule only when zero is in range (§S2.4). */
-    const holes =
-      moment.chart === 'trajectoryLastSix'
-        ? shape.holes.filter((h) => h.holeNo >= 13)
-        : shape.holes;
-    return (
-      <TrajectoryLine
-        holes={holes}
-        height={CHART_H}
-        surface="light"
-        showTicks={false}
-        padY={6}
-        viewWidth={WELL_INNER}
-        strokeWidth={1.8}
-      />
-    );
-  })();
+  /* ONE CHART ONLY (§S0.3): the scorecard. `shape === null` renders NOTHING and
+     the well keeps its height — never a placeholder grid (§S1.7). */
+  const grid = shape ? (
+    <MiniScorecard shape={shape} well={WELL} marked={marked} markTone={moment.tone} />
+  ) : null;
+
 
   return (
     /* NOT A <button> (§S1.1): FollowButton is a real button and a button inside
@@ -729,7 +660,7 @@ function GolfThisWeekCard({
         cursor: 'pointer',
       }}
     >
-      {/* ===================== THE HERO (§S4.2) ===================== */}
+      {/* ===================== THE HERO (§S2) ===================== */}
       <div
         style={{
           height: HERO_H,
@@ -741,11 +672,12 @@ function GolfThisWeekCard({
           flexDirection: 'column',
         }}
       >
+        {/* §S2.3 — course, region beneath, the day top-right. */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
               style={{
-                fontSize: 11.5,
+                fontSize: 12.5,
                 fontWeight: 700,
                 lineHeight: 1.15,
                 letterSpacing: '-0.01em',
@@ -764,7 +696,7 @@ function GolfThisWeekCard({
                   fontSize: 9.5,
                   fontWeight: 600,
                   lineHeight: 1,
-                  color: 'rgba(255,255,255,0.56)',
+                  color: 'rgba(255,255,255,0.52)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -780,7 +712,7 @@ function GolfThisWeekCard({
               fontSize: 8.5,
               fontWeight: 700,
               lineHeight: 1,
-              letterSpacing: '0.06em',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: 'rgba(255,255,255,0.62)',
             }}
@@ -791,76 +723,55 @@ function GolfThisWeekCard({
 
         <div style={{ flex: 1 }} />
 
-        {/* THE FIGURE AT 56 — a hole number or a count, and the moment word in
-            its tone beside it. NOTHING UP HERE IS MEASURED (§S3.1). */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 9, minWidth: 0 }}>
-          <div style={{ flexShrink: 0 }}>
-            <div
-              style={{
-                ...LABEL,
-                fontSize: 8.5,
-                color: 'rgba(255,255,255,0.5)',
-                marginBottom: 2,
-              }}
-            >
-              {copy.meta}
-            </div>
-            <div
-              style={{
-                ...NUMF,
-                fontSize: 56,
-                lineHeight: 0.82,
-                letterSpacing: '-0.05em',
-                color: '#FFFFFF',
-              }}
-            >
-              {moment.facts.played === 0 ? '\u2014' : moment.figure}
-            </div>
+        {/* §S2.4 — THREE STACKED LINES, read top to bottom.
+            THE LABEL IS AN EYEBROW, NOT A CLAUSE (§S2.5). It previously sat
+            ALONGSIDE the sentence and the two read as one run-on — "THE RUN Par
+            or better". A label is a heading, so it sits on its own line above
+            the figure and the sentence sits below it.
+            THE PLAIN CARD HAS NO LABEL AT ALL (§S2.7). */}
+        {label && (
+          <div
+            style={{
+              fontSize: 9.5,
+              fontWeight: 800,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              lineHeight: 1,
+              marginBottom: 5,
+              color: moment.tone,
+            }}
+          >
+            {label}
           </div>
-          <div style={{ minWidth: 0, paddingBottom: 3 }}>
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.09em',
-                textTransform: 'uppercase',
-                lineHeight: 1.1,
-                color: moment.tone,
-              }}
-            >
-              {copy.word}
-            </div>
-            <div
-              style={{
-                marginTop: 3,
-                fontSize: 10,
-                fontWeight: 600,
-                lineHeight: 1.2,
-                color: 'rgba(255,255,255,0.58)',
-              }}
-            >
-              {copy.sub}
-            </div>
-          </div>
-        </div>
+        )}
 
-        {/* ONE SENTENCE, from a fixed template (§S4.3). */}
+        <FigureLine
+          moment={moment}
+          gross={row.gross ?? null}
+          toParText={toPar?.text ?? null}
+          t={t as TFn}
+        />
+
+        {/* THE SENTENCE, at the very bottom of the hero, from a fixed template.
+            IT NEVER REPEATS THE FIGURE (§S2.8): the figure states, the sentence
+            explains. */}
         <div
           style={{
-            marginTop: 9,
+            marginTop: 7,
             fontSize: 10.5,
             fontWeight: 500,
-            lineHeight: 1.32,
-            color: 'rgba(255,255,255,0.74)',
+            lineHeight: 1.3,
+            color: 'rgba(255,255,255,0.82)',
             display: '-webkit-box',
             WebkitBoxOrient: 'vertical',
             WebkitLineClamp: 2,
             overflow: 'hidden',
           }}
         >
-          {copy.sentence}
+          {sentence}
         </div>
       </div>
+
 
       <div style={{ padding: '8px 10px 10px' }}>
         {/* THE MEMBER ROW CARRIES THE SCORE (§S4.1): gross, to-par and this
@@ -943,17 +854,21 @@ function GolfThisWeekCard({
           )}
         </div>
 
-        {/* ===================== THE WELL (§S2.2, §S4.4) =====================
-            ALL FOUR CHARTS RENDER IN THE SAME WELL AT THE SAME HEIGHT. A rail
-            where the frames differ reads as broken; a rail where the CONTENTS
-            differ reads as alive. */}
+        {/* ===================== THE SCORECARD WELL (§S4) =====================
+            A TINTED WELL, #F2F5F8, radius 12, NO BORDER (§S4.1) — the tone
+            separates it from the card and an outline would be a second signal
+            for one edge. ITS HEIGHT IS FIXED whatever it holds, so an empty well
+            keeps the rail level (ACCEPTANCE K, Q). */}
         <div
           style={{
             marginTop: 8,
             marginLeft: -10,
             marginRight: -10,
+            height: WELL_H,
+            background: WELL,
             borderRadius: WELL_RADIUS,
-            padding: `0 ${WELL_PAD_X}px`,
+            padding: `6px ${WELL_PAD_X}px 8px`,
+            boxSizing: 'border-box',
           }}
         >
           <div
@@ -967,10 +882,10 @@ function GolfThisWeekCard({
             }}
           >
             <span style={{ ...LABEL, fontSize: 8, color: '#9AA5B1' }}>
-              {copy.chartLabel}
+              {t('discover.golfThisWeek.moment.theCard', 'The card')}
             </span>
-            {/* THE TAP AFFORDANCE, ON EVERY TREATMENT (§S4.4). A hero card with
-                a hidden scorecard is a card nobody taps. */}
+            {/* THE TAP AFFORDANCE, ON EVERY CARD (§S4.2). A hero with a hidden
+                scorecard is a card nobody taps. */}
             <span
               style={{
                 ...LABEL,
@@ -988,18 +903,20 @@ function GolfThisWeekCard({
 
           <div
             style={{
-              height: CHART_H,
+              height: GRID_H,
               marginTop: 7,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
             }}
           >
-            {/* A ROUND WITH NO HOLE DATA RENDERS AN EMPTY WELL (§S1.5, F) — the
-                height is held so the rail stays level. */}
-            <ShapeReveal>{chart}</ShapeReveal>
+            {/* A ROUND WITH NO HOLE DATA RENDERS AN EMPTY WELL (§S1.7, Q) — the
+                height is held so the rail stays level, and there is no
+                placeholder grid. */}
+            <ShapeReveal>{grid}</ShapeReveal>
           </div>
         </div>
+
       </div>
     </div>
   );

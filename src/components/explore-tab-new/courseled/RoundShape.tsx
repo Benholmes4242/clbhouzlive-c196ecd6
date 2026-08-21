@@ -532,8 +532,15 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
  *  occupying layout, so a double never shifts its neighbours.
  *
  *  THE OUTER RING TAKES THE SURFACE COLOUR the grid sits on, so it never haloes:
- *  pass the card or sheet background in, never a fixed grey. */
-function markerStyle(m: Marker | null, well: string): CSSProperties {
+ *  pass the card or sheet background in, never a fixed grey
+ *  (BRIEF_ROUND_TILE_THE_MOMENT v2 §S4.7 — on a tinted well a WHITE ring
+ *  haloes).
+ *
+ *  `markTone` IS THE MOMENT'S OWN HOLES AND NOTHING ELSE (§S4.6, §S5.3): the
+ *  hero names something and the card shows it, so the eye goes straight from one
+ *  to the other. It reuses the SAME outer-ring geometry as a double box (2px of
+ *  well then 1px of tone), so a marked hole cannot change the clear-air table. */
+function markerStyle(m: Marker | null, well: string, markTone?: string): CSSProperties {
   const base: CSSProperties = {
     width: CELL,
     height: CELL,
@@ -544,22 +551,29 @@ function markerStyle(m: Marker | null, well: string): CSSProperties {
     flexShrink: 0,
     color: MINI_INK,
   };
+  const ring = (c: string) => `0 0 0 2px ${well}, 0 0 0 3px ${c}`;
+  const outer = markTone ?? null;
   switch (m) {
     case 'ace':
-      return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: `0 0 0 2px ${well}, 0 0 0 3px ${ACE_GOLD}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: ring(outer ?? ACE_GOLD) };
     case 'eagle':
-      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, boxShadow: `0 0 0 2px ${well}, 0 0 0 3px ${UNDER_INK}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, boxShadow: ring(outer ?? UNDER_INK) };
     case 'birdie':
-      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK };
+      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, ...(outer ? { boxShadow: ring(outer) } : null) };
     case 'bogey':
-      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}` };
+      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}`, ...(outer ? { boxShadow: ring(outer) } : null) };
     case 'double':
-      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}`, boxShadow: `0 0 0 2px ${well}, 0 0 0 3px ${MINI_INK}` };
+      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}`, boxShadow: ring(outer ?? MINI_INK) };
     default:
-      /* PAR IS BARE INK — no ring, no box, no tint. The baseline recedes. */
-      return base;
+      /* PAR IS BARE INK — no ring, no box, no tint. The baseline recedes. A
+         MARKED par takes the tone ring on a round cell so the stretch reads as
+         one run. */
+      return outer
+        ? { ...base, borderRadius: 999, border: `1px solid ${outer}`, boxShadow: ring(outer) }
+        : base;
   }
 }
+
 
 /* =============================================================================
    PIN THE GAP, NOT THE CELL (BRIEF_ROUND_TILE_LIGHT_REFINEMENT §S3.1–§S3.3).
@@ -606,12 +620,17 @@ function NineRow({
   to,
   label,
   well,
+  marked,
+  markTone,
 }: {
   holes: HoleShape['holes'];
   from: number;
   to: number;
   label: string;
   well: string;
+  /** The moment's OWN holes — the only holes allowed the moment tone (§S5.3). */
+  marked?: ReadonlySet<number>;
+  markTone?: string;
 }) {
   const byHole = new Map(holes.map((h) => [h.holeNo, h]));
   const totals = nineTotals(holes, from, to);
@@ -686,7 +705,7 @@ function NineRow({
               >
                 {holeNo}
               </span>
-              <span style={markerStyle(m, well)}>
+              <span style={markerStyle(m, well, marked?.has(holeNo) ? markTone : undefined)}>
                 {/* AN UNPLAYED HOLE IS EMPTY, never a zero: a zero would read as
                     an extraordinary score. */}
                 <span
@@ -731,17 +750,23 @@ function NineRow({
 export function MiniScorecard({
   shape,
   well = MINI_WELL,
+  marked,
+  markTone,
 }: {
   shape: HoleShape | null;
-  /** The tinted well behind the grid — the outer rings take it (§S3.6). */
+  /** The tinted well behind the grid — the outer rings take it (§S4.7). */
   well?: string;
+  /** THE MOMENT'S HOLES (§S4.6): a ring for a single hole, every hole in the
+   *  range for a stretch. Nothing else in the grid may take a moment tone. */
+  marked?: ReadonlySet<number>;
+  markTone?: string;
 }) {
   const { t } = useTranslation(['courses']);
   if (!shape || shape.holes.length === 0) return null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} well={well} />
-      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} well={well} />
+      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} well={well} marked={marked} markTone={markTone} />
+      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} well={well} marked={marked} markTone={markTone} />
     </div>
   );
 }

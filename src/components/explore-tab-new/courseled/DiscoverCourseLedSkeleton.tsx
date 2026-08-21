@@ -139,10 +139,10 @@ export function FriendsRail() {
 
 /**
  * GOLF THIS WEEK. MEASURED off GolfThisWeek.tsx after BRIEF_ROUND_TILE_THE_MOMENT:
- * 256 wide, no border and a 1px shadow, a 178px HERO (no photograph any more —
+ * 256 wide, no border and a 1px shadow, a 156px HERO (no photograph any more —
  * the gradient and the moment carry the top of the card), then the member row
- * with the score, then the well: its 14px header rule and a FIXED 88px chart
- * region whatever chart the live card ends up drawing. Above the rail: the
+ * with the score, then the TINTED WELL (#F2F5F8) at a FIXED 116px: its header
+ * rule and the 88px two-rows-of-nine scorecard. Above the rail: the
  * count/region readout row, the pills row and the best-of-week band, all of
  * which the live section renders before its first card and none of which may
  * appear later.
@@ -207,9 +207,9 @@ export function GolfThisWeekRail() {
               boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
             }}
           >
-            {/* THE HERO, 178. No photograph: the live card draws a gradient with
-                the moment figure and its sentence on it. */}
-            <Bar style={{ borderRadius: 0, height: 178, width: '100%' }} />
+            {/* THE HERO, 156. No photograph: the live card draws a gradient with
+                the moment label, its figure and its sentence on it. */}
+            <Bar style={{ borderRadius: 0, height: 156, width: '100%' }} />
             <div style={{ padding: '8px 10px 10px' }}>
               {/* The member row carries the score. */}
               <div style={{ height: 19, display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -217,15 +217,18 @@ export function GolfThisWeekRail() {
                 <TextBar w={92} h={11} />
                 <Bar style={{ height: 12, width: 34, marginLeft: 'auto' }} />
               </div>
-              {/* THE WELL: header, its one rule, and the FIXED 88px chart
-                  region — the same height on every card, whatever it holds. */}
+              {/* THE TINTED WELL: header, its one rule, and the FIXED 88px
+                  scorecard region — the same height on every card. */}
               <div
                 style={{
                   marginTop: 8,
                   marginLeft: -10,
                   marginRight: -10,
+                  height: 116,
+                  background: '#F2F5F8',
                   borderRadius: 12,
-                  padding: '0 6px',
+                  padding: '6px 6px 8px',
+                  boxSizing: 'border-box',
                 }}
               >
                 <div
@@ -245,17 +248,36 @@ export function GolfThisWeekRail() {
                     height: 88,
                     marginTop: 7,
                     display: 'flex',
-                    alignItems: 'flex-end',
-                    justifyContent: 'space-between',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    gap: 4,
                   }}
                 >
-                  {Array.from({ length: 18 }, (_, c) => (
-                    <Bar
-                      key={c}
-                      style={{ height: 22 + ((c * 7) % 34), width: 9, borderRadius: 2 }}
-                    />
+                  {/* TWO ROWS OF NINE at the live 17px cell / 9px gap. */}
+                  {[0, 1].map((nine) => (
+                    <div key={nine}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          marginBottom: 4,
+                        }}
+                      >
+                        <Bar style={{ height: 8, width: 20 }} />
+                        <Bar style={{ height: 8, width: 34 }} />
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: 9 }}>
+                        {Array.from({ length: 9 }, (_, c) => (
+                          <Bar
+                            key={c}
+                            style={{ height: 17, width: 17, borderRadius: 3 }}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
+
               </div>
             </div>
 

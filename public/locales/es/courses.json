@@ -1125,48 +1125,31 @@
       "birdiesLabel": "Más birdies",
       "stablefordUnit": "puntos",
       "moment": {
+        "theCard": "La tarjeta",
         "fullScorecard": "Tarjeta completa",
-        "chart": {
-          "strip": "Cada hoyo",
-          "trajectory": "La vuelta",
-          "lastSix": "Hoyos 13–18",
-          "scorecard": "La tarjeta"
+        "label": {
+          "eagle": "EAGLE",
+          "ace": "ACE",
+          "albatross": "ALBATROSS",
+          "inRed": "BAJO PAR",
+          "finish": "EL FINAL",
+          "run": "LA RACHA",
+          "grind": "EL OFICIO"
         },
-        "eagle": {
-          "meta": "Hoyo",
-          "ace": "Ace",
-          "albatross": "Albatross",
-          "eagle": "Eagle",
-          "sub": "El golpe de la vuelta",
-          "sentence": "{{0}} en el hoyo {{1}}, un par {{2}}."
+        "figure": {
+          "hole": "HOYO {n}",
+          "holes": "{n} HOYOS",
+          "inThree": "{n} DE TRES",
+          "inARow": "{n} SEGUIDOS"
         },
-        "run": {
-          "meta": "Hoyos",
-          "word": "La racha",
-          "sub": "Par o mejor, seguidos",
-          "sentence": "{{0}} hoyos seguidos en par o mejor, del {{1}} al {{2}}."
-        },
-        "collapse": {
-          "meta": "Hoyo",
-          "word": "Hoyo {{0}}",
-          "sub": "Donde cambió la vuelta",
-          "sentence": "{{0}} golpes perdidos en el hoyo {{1}}; el resto de hoyos sumó {{2}}."
-        },
-        "finish": {
-          "meta": "Birdies",
-          "word": "El final",
-          "sub": "Los tres últimos",
-          "sentence": "{{0}} birdies en los tres últimos hoyos para terminar en {{1}}."
-        },
-        "grind": {
-          "meta": "Hoyos",
-          "word": "El oficio",
-          "sub": "Par o mejor",
-          "sentenceClean": "{{0}} de {{1}} hoyos en par o mejor, sin birdies y sin dobles.",
-          "sentenceNoDoubles": "{{0}} de {{1}} hoyos en par o mejor, y ni un doble en todo el día.",
-          "sentenceNoBirdies": "{{0}} de {{1}} hoyos en par o mejor, sin birdies.",
-          "sentencePlain": "{{0}} de {{1}} hoyos en par o mejor.",
-          "sentenceNoHoles": "Vuelta jugada. No se registró el detalle hoyo a hoyo."
+        "sentence": {
+          "eagle": "Un {{0}} en un par {{1}}.",
+          "inRed": "La vuelta estuvo bajo par y terminó en {{0}}.",
+          "finish": "Birdie o mejor en la vuelta a casa, para acabar en {{0}}.",
+          "run": "Par o mejor del {{0}} al {{1}}.",
+          "grind": "Nada peor que un bogey en toda la vuelta.",
+          "plain": "{{0}} de {{1}} hoyos en par o mejor.",
+          "noHoles": "Una vuelta jugada. No se registró el detalle hoyo por hoyo."
         }
       }
     },
