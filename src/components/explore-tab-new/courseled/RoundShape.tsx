@@ -83,13 +83,11 @@ export function RoundShape({
   let values: number[] | null = null;
   let beads: ShapeBead[] = [];
   let holesPlayed: number | null = null;
-  let birdies = 0;
 
   if (shape) {
     values = shape.series;
     beads = shape.beads;
     holesPlayed = shape.played;
-    birdies = shape.birdies;
   } else if (
     front != null &&
     back != null &&
