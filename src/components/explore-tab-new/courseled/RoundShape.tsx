@@ -99,30 +99,63 @@ export function RoundShape({
 
   if (!values || values.length < 2) return null;
 
+  /* THE BUCKETS AND THE CHROME ARE SHARED BY BOTH PATHS. A tile with no hole
+     data (the three-point fallback) gets NEITHER the bar NOR the count line —
+     there is nothing to count — so its meta row stays exactly as today. */
+  const buckets = shape ? bucketsFor(shape.series) : null;
+  const figure = toParFor(row);
+
+  const withChrome = (plot: ReactNode) => (
+    <>
+      <div style={{ position: 'relative' }}>
+        {plot}
+        {/* §3 THE TO-PAR FIGURE ON THE BAND. It repeats the glass chip's value
+            deliberately: the chip belongs to the photograph, this belongs to the
+            shape. Body-surface tones, never the glass ones. */}
+        {showMeta && figure && (
+          <span
+            style={{
+              position: 'absolute',
+              top: 4,
+              right: 8,
+              fontSize: 10.5,
+              fontWeight: 700,
+              lineHeight: 1,
+              ...FIGS,
+              color: figure.value < 0 ? TOPAR_RED : figure.value > 0 ? A.MUTE : A.DIM,
+            }}
+          >
+            {figure.text}
+          </span>
+        )}
+      </div>
+      {showMeta && buckets && <BucketBar buckets={buckets} />}
+      {showMeta && shape && <ShapeMeta buckets={buckets} />}
+    </>
+  );
+
   /* ONE CHART, THREE SURFACES. When the hole-by-hole data is present the tile
      renders THE SAME TrajectoryLine the Clubhouse scorecard post and the
      scorecard sheet render — same grades, same solid fill, same bead filter,
      same 1.8px stroke and no halo — instead of a look-alike maintained here.
      Ticks are suppressed: the band carries its own meta row. */
   if (shape) {
-    return (
-      <>
-        <TrajectoryLine
-          holes={shape.holes}
-          height={height}
-          surface="light"
-          showTicks={false}
-          padY={1}
-          /* THE VIEWBOX MATCHES THE COLUMN (CORRECTION_SHEET_TRACE_HEIGHT §4):
-             at 96px wide a 340-wide viewBox scaled the whole chart to 28%, so a
-             38px band drew as an 11px flat squiggle and a -3 looked like a +14.
-             1:1 units mean the band is used in full and the beads stay round. */
-          viewWidth={width}
-        />
-        {showMeta && <ShapeMeta birdies={birdies} />}
-      </>
+    return withChrome(
+      <TrajectoryLine
+        holes={shape.holes}
+        height={height}
+        surface="light"
+        showTicks={false}
+        padY={1}
+        /* THE VIEWBOX MATCHES THE COLUMN (CORRECTION_SHEET_TRACE_HEIGHT §4):
+           at 96px wide a 340-wide viewBox scaled the whole chart to 28%, so a
+           38px band drew as an 11px flat squiggle and a -3 looked like a +14.
+           1:1 units mean the band is used in full and the beads stay round. */
+        viewWidth={width}
+      />,
     );
   }
+
 
 
   // A round that never went under par gets NO red treatment. The cumulative
