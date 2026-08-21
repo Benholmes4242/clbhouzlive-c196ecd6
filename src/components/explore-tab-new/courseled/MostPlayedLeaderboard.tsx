@@ -11,7 +11,6 @@ import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 
 /**
@@ -88,21 +87,19 @@ const FACE_CAP = 6;
 /** Beyond twelve the expansion navigates instead of growing (§S2.5). */
 const LIST_CAP = 12;
 
-/** Amber means the viewing member and nothing else (§S1.3). */
-function ringFor(isOwn: boolean): string {
-  return isOwn ? A.AMBER : A.PANEL;
-}
+/* NO VIEWER MARKING IN THIS SECTION. Ben's call (BRIEF_SCORECARD_WIDTH_AND_
+ * VIEWER_RING §S2) - the amber ring and the "You" substitution were both removed
+ * deliberately. Amber still means the viewing member EVERYWHERE ELSE in the app;
+ * this section simply does not mark them. Every face takes the PANEL ring. */
 
 /** A face that opens its member's profile and never toggles the row (§S2.7). */
 function MemberFace({
   player,
   size,
-  isOwn,
   onOpen,
 }: {
   player: MostPlayedPlayer;
   size: number;
-  isOwn: boolean;
   onOpen: (userId: string) => void;
 }) {
   return (
@@ -122,9 +119,8 @@ function MemberFace({
         borderRadius: '34%',
         cursor: 'pointer',
         flex: 'none',
-        // THE RING READS THEM APART: 1.5px of the panel colour, or amber for
-        // the viewer (§S1.1/§S1.3).
-        boxShadow: `0 0 0 1.5px ${ringFor(isOwn)}`,
+        // THE RING READS THEM APART: 1.5px of the panel colour, on EVERY face.
+        boxShadow: `0 0 0 1.5px ${A.PANEL}`,
       }}
     >
       <SquircleAvatar
@@ -141,11 +137,9 @@ function MemberFace({
 /** §S1 — the collapsed face row, plus "best NN" on the right. */
 function FaceRow({
   row,
-  viewerId,
   onOpenMember,
 }: {
   row: MostPlayedRow;
-  viewerId: string | null;
   onOpenMember: (userId: string) => void;
 }) {
   const { t } = useTranslation('courses');
@@ -167,12 +161,7 @@ function FaceRow({
       <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
         {faces.map((p, idx) => (
           <span key={p.userId} style={{ marginLeft: idx === 0 ? 0 : -8, display: 'block' }}>
-            <MemberFace
-              player={p}
-              size={26}
-              isOwn={!!viewerId && p.userId === viewerId}
-              onOpen={onOpenMember}
-            />
+            <MemberFace player={p} size={26} onOpen={onOpenMember} />
           </span>
         ))}
         {/* ONE MEMBER SHOWS ONE FACE — no "+0", no placeholder (§S1.6). */}
@@ -220,12 +209,10 @@ function FaceRow({
  */
 function MemberList({
   row,
-  viewerId,
   onOpenMember,
   onSeeAllAtCourse,
 }: {
   row: MostPlayedRow;
-  viewerId: string | null;
   onOpenMember: (userId: string) => void;
   onSeeAllAtCourse: () => void;
 }) {
@@ -236,10 +223,9 @@ function MemberList({
   return (
     <div style={{ paddingLeft: NAME_INDENT, paddingBottom: 12, display: 'grid', gap: 8 }}>
       {listed.map((p) => {
-        const isOwn = !!viewerId && p.userId === viewerId;
         return (
           <div key={p.userId} style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            <MemberFace player={p} size={22} isOwn={isOwn} onOpen={onOpenMember} />
+            <MemberFace player={p} size={22} onOpen={onOpenMember} />
             <button
               type="button"
               onClick={(e) => {
@@ -256,16 +242,16 @@ function MemberList({
                 cursor: 'pointer',
                 fontFamily: SANS,
                 fontSize: 12,
-                // THE VIEWER'S OWN ROW, as the round tiles do (§S2.6).
-                fontWeight: isOwn ? 700 : 600,
+                // EVERY NAME RENDERS THE SAME - no bold, no amber, no "You".
+                fontWeight: 600,
                 letterSpacing: '-0.015em',
-                color: isOwn ? A.AMBER_DEEP : A.INK,
+                color: A.INK,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
               }}
             >
-              {isOwn ? t('discover.wire.you', 'You') : p.name}
+              {p.name}
             </button>
             {p.gross != null && (
               <span
@@ -273,7 +259,7 @@ function MemberList({
                   ...NUMF,
                   fontSize: 12,
                   flex: 'none',
-                  color: isOwn ? A.AMBER_DEEP : A.INK,
+                  color: A.INK,
                 }}
               >
                 {formatNumber(p.gross)}
@@ -319,8 +305,6 @@ export function MostPlayedLeaderboard({
 }: Props) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
-  const viewerId = user?.id ?? null;
   /** ONE ROW OPEN AT A TIME (§S2.3) — a single id, never a set. */
   const [openId, setOpenId] = useState<string | null>(null);
   const shown = rows.slice(0, limit);
@@ -505,12 +489,11 @@ export function MostPlayedLeaderboard({
               {open ? (
                 <MemberList
                   row={r}
-                  viewerId={viewerId}
                   onOpenMember={openMember}
                   onSeeAllAtCourse={() => onRowPress(r)}
                 />
               ) : (
-                <FaceRow row={r} viewerId={viewerId} onOpenMember={openMember} />
+                <FaceRow row={r} onOpenMember={openMember} />
               )}
             </div>
           );

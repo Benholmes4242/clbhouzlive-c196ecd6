@@ -479,8 +479,9 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
 
 /* ===========================================================================
    THE MINI SCORECARD (BRIEF_ROUND_TILE_MINI_SCORECARD) — the Clubhouse card's
-   grid at rail scale: two rows of nine, hole numbers above each cell, OUT / IN
-   labels left, the nine's total and to-par right.
+   grid at rail scale: two rows of nine, hole numbers above each cell, the nine's
+   total and to-par right. No OUT / IN labels (BRIEF_SCORECARD_WIDTH) — the width
+   went to the cells instead.
 
    PAR IS NOT PRINTED. The MARKER is the par statement — circle birdie, box
    bogey, double box double-or-worse — so a par row would be the same fact
@@ -558,12 +559,10 @@ function nineTotals(holes: HoleShape['holes'], from: number, to: number) {
 
 function NineRow({
   holes,
-  label,
   from,
   to,
 }: {
   holes: HoleShape['holes'];
-  label: string;
   from: number;
   to: number;
 }) {
@@ -574,19 +573,11 @@ function NineRow({
 
   return (
     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
-      <span
-        style={{
-          width: 17,
-          flexShrink: 0,
-          fontSize: 7.5,
-          fontWeight: 700,
-          letterSpacing: '0.06em',
-          color: A.DIM,
-          paddingBottom: 2,
-        }}
-      >
-        {label}
-      </span>
+      {/* NO OUT / IN LABELS. The hole numbers above each cell already say which
+          nine it is, and the row-end total is positioned to make it obvious. The
+          label was a third statement of the same fact and the grid needed the
+          20px more than it needed the word. */}
+
 
       <div style={{ display: 'flex', flex: 1, minWidth: 0, justifyContent: 'space-between' }}>
         {Array.from({ length: to - from + 1 }, (_, i) => {
@@ -659,8 +650,8 @@ export function MiniScorecard({ shape }: { shape: HoleShape | null }) {
   if (!shape || shape.holes.length === 0) return null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-      <NineRow holes={shape.holes} label="OUT" from={1} to={9} />
-      <NineRow holes={shape.holes} label="IN" from={10} to={18} />
+      <NineRow holes={shape.holes} from={1} to={9} />
+      <NineRow holes={shape.holes} from={10} to={18} />
     </div>
   );
 }

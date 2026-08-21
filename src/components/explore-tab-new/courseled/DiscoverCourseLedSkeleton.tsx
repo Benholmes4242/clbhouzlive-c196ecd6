@@ -139,7 +139,7 @@ export function FriendsRail() {
 
 /**
  * GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK acceptance M). MEASURED off
- * GolfThisWeek.tsx: 236 wide, a 92px photograph carrying the course name, then
+ * GolfThisWeek.tsx: 256 wide, a 92px photograph carrying the course name, then
  * the body — score row 24, member row 22, the full-bleed shape strip at 60
  * (SHAPE_H), one insight line. Above the rail: the count/region readout row,
  * the pills row and the best-of-week band, all of which the live section
@@ -188,7 +188,7 @@ export function GolfThisWeekRail() {
       </div>
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
-          <div key={i} style={{ ...CARD_SHELL, width: 236, flexShrink: 0, padding: 0 }}>
+          <div key={i} style={{ ...CARD_SHELL, width: 256, flexShrink: 0, padding: 0 }}>
             <Bar style={{ borderRadius: 0, height: 92, width: '100%' }} />
             <div style={{ padding: '9px 11px 9px' }}>
               <div style={{ height: 24, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -239,7 +239,7 @@ export function GolfThisWeekRail() {
         ))}
       </div>
       {/* See-all placeholder sits below the first card and does NOT scroll. */}
-      <div style={{ marginTop: 8, width: 236 }}>
+      <div style={{ marginTop: 8, width: 256 }}>
         <TextBar w={110} h={10} />
       </div>
     </section>
