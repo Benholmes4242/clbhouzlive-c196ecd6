@@ -120,7 +120,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             : r.position == null ? BLANK
             : `${r.position_tied ? 'T' : ''}${r.position}`;
           const cc = r.player?.country_code ?? r.player?.country ?? null;
-          const flag = null;
+          
           const today = todayFromEntry(r as unknown as Parameters<typeof todayFromEntry>[0], currentRound);
           return (
             <button
@@ -151,11 +151,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 {posText}
               </div>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 8 }}>
-                {flag ? (
-                  <span style={{ fontSize: 11, flexShrink: 0, lineHeight: 1 }} aria-label={cc ?? undefined}>{flag}</span>
-                ) : cc ? (
-                  <span style={{ fontSize: 10, fontWeight: 700, color: T.faint, letterSpacing: '0.04em' }}>{countryFallback(cc)}</span>
-                ) : null}
+                {cc ? <CountryFlag country={cc} size="sm" /> : null}
                 <span style={{ fontSize: 13, fontWeight: 700, color: T.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {r.player?.full_name ?? BLANK}
                 </span>
