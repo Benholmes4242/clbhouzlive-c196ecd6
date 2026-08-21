@@ -5,6 +5,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
+import {
+  handleEngagementNotification,
+  type NotificationRealtimeRow,
+} from '@/lib/postEngagementRealtime';
+
 
 interface NotificationData {
   conversation_id?: string;
