@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowDown, ArrowUp, Trophy } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowDown, ArrowUp, ChevronDown, Trophy } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
-import type { MostPlayedRow } from './hooks/useMostPlayedThisWeek';
+import type { MostPlayedPlayer, MostPlayedRow } from './hooks/useMostPlayedThisWeek';
 import { A, CARD_SHELL, Eyebrow, InkAction, LABEL, NUMF, SANS } from './tokens';
 import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+
 
 /**
  * Section 5 — MOST PLAYED THIS WEEK (BRIEF, section 5).
@@ -74,6 +78,237 @@ function MoveMark({
   );
 }
 
+/* ─────────────────────────── WHO PLAYED (§S1/§S2) ─────────────────────────
+ * NAME INDENT: the face row aligns with the COURSE NAME, not the rank
+ * (§S1.1) — rank 13 + gap 11 + thumbnail 52 + gap 11 = 87.
+ */
+const NAME_INDENT = 87;
+/** Six faces, then "+N" (§S1.2). */
+const FACE_CAP = 6;
+/** Beyond twelve the expansion navigates instead of growing (§S2.5). */
+const LIST_CAP = 12;
+
+/** Amber means the viewing member and nothing else (§S1.3). */
+function ringFor(isOwn: boolean): string {
+  return isOwn ? A.AMBER : A.PANEL;
+}
+
+/** A face that opens its member's profile and never toggles the row (§S2.7). */
+function MemberFace({
+  player,
+  size,
+  isOwn,
+  onOpen,
+}: {
+  player: MostPlayedPlayer;
+  size: number;
+  isOwn: boolean;
+  onOpen: (userId: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        // STOP, OR THE ROW TOGGLES BEHIND THE NAVIGATION (§S2.7).
+        e.stopPropagation();
+        onOpen(player.userId);
+      }}
+      aria-label={player.name}
+      style={{
+        display: 'block',
+        padding: 0,
+        border: 'none',
+        background: 'transparent',
+        borderRadius: '34%',
+        cursor: 'pointer',
+        flex: 'none',
+        // THE RING READS THEM APART: 1.5px of the panel colour, or amber for
+        // the viewer (§S1.1/§S1.3).
+        boxShadow: `0 0 0 1.5px ${ringFor(isOwn)}`,
+      }}
+    >
+      <SquircleAvatar
+        size={size}
+        src={player.avatarUrl}
+        alt={player.name}
+        userId={player.userId}
+        hairlineRing
+      />
+    </button>
+  );
+}
+
+/** §S1 — the collapsed face row, plus "best NN" on the right. */
+function FaceRow({
+  row,
+  viewerId,
+  onOpenMember,
+}: {
+  row: MostPlayedRow;
+  viewerId: string | null;
+  onOpenMember: (userId: string) => void;
+}) {
+  const { t } = useTranslation('courses');
+  if (row.players.length === 0) return null;
+  const faces = row.players.slice(0, FACE_CAP);
+  const overflow = row.players.length - faces.length;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        paddingLeft: NAME_INDENT,
+        paddingBottom: 12,
+        minWidth: 0,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+        {faces.map((p, idx) => (
+          <span key={p.userId} style={{ marginLeft: idx === 0 ? 0 : -8, display: 'block' }}>
+            <MemberFace
+              player={p}
+              size={26}
+              isOwn={!!viewerId && p.userId === viewerId}
+              onOpen={onOpenMember}
+            />
+          </span>
+        ))}
+        {/* ONE MEMBER SHOWS ONE FACE — no "+0", no placeholder (§S1.6). */}
+        {overflow > 0 && (
+          <span
+            style={{
+              ...LABEL,
+              fontSize: 9,
+              color: A.MUTE,
+              marginLeft: 6,
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}
+          >
+            +{formatNumber(overflow)}
+          </span>
+        )}
+      </div>
+      {row.bestGross != null && (
+        <span
+          style={{
+            ...LABEL,
+            fontSize: 9,
+            color: A.MUTE,
+            marginLeft: 'auto',
+            flex: 'none',
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+        >
+          {t('discover.mostPlayedBest', 'best')}{' '}
+          <span style={{ color: A.INK }}>{formatNumber(row.bestGross)}</span>
+        </span>
+      )}
+    </div>
+  );
+}
+
+/**
+ * §S2 — the expanded list. NO INTERNAL SCROLL, AND THAT IS DELIBERATE (§S2.4):
+ * "No nested scroll. The largest course this week has NINE members, so a
+ *  ten-row scroll would never engage — and a scrollable panel inside a
+ *  scrolling page is a real fault on a phone: a finger that lands on the list
+ *  scrolls the list instead of the page, and a member cannot tell why the page
+ *  stopped moving. The expansion is member-initiated, so its height is
+ *  consented to."
+ */
+function MemberList({
+  row,
+  viewerId,
+  onOpenMember,
+  onSeeAllAtCourse,
+}: {
+  row: MostPlayedRow;
+  viewerId: string | null;
+  onOpenMember: (userId: string) => void;
+  onSeeAllAtCourse: () => void;
+}) {
+  const { t } = useTranslation('courses');
+  const listed = row.players.slice(0, LIST_CAP);
+  const hidden = row.players.length - listed.length;
+
+  return (
+    <div style={{ paddingLeft: NAME_INDENT, paddingBottom: 12, display: 'grid', gap: 8 }}>
+      {listed.map((p) => {
+        const isOwn = !!viewerId && p.userId === viewerId;
+        return (
+          <div key={p.userId} style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            <MemberFace player={p} size={22} isOwn={isOwn} onOpen={onOpenMember} />
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenMember(p.userId);
+              }}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                border: 'none',
+                background: 'transparent',
+                padding: 0,
+                textAlign: 'left',
+                cursor: 'pointer',
+                fontFamily: SANS,
+                fontSize: 12,
+                // THE VIEWER'S OWN ROW, as the round tiles do (§S2.6).
+                fontWeight: isOwn ? 700 : 600,
+                letterSpacing: '-0.015em',
+                color: isOwn ? A.AMBER_DEEP : A.INK,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {isOwn ? t('discover.wire.you', 'You') : p.name}
+            </button>
+            {p.gross != null && (
+              <span
+                style={{
+                  ...NUMF,
+                  fontSize: 12,
+                  flex: 'none',
+                  color: isOwn ? A.AMBER_DEEP : A.INK,
+                }}
+              >
+                {formatNumber(p.gross)}
+              </span>
+            )}
+          </div>
+        );
+      })}
+      {/* A NAVIGATION, NEVER A SCROLL TRAP (§S2.5). */}
+      {hidden > 0 && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSeeAllAtCourse();
+          }}
+          style={{
+            ...LABEL,
+            fontSize: 9,
+            color: A.INK,
+            border: 'none',
+            background: 'transparent',
+            padding: '2px 0',
+            textAlign: 'left',
+            cursor: 'pointer',
+          }}
+        >
+          {t('discover.mostPlayedSeeAllAtCourse', 'See all at this course')}
+        </button>
+      )}
+    </div>
+  );
+}
+
+
 export function MostPlayedLeaderboard({
   rows,
   limit = 5,
@@ -83,6 +318,11 @@ export function MostPlayedLeaderboard({
   showEyebrow = true,
 }: Props) {
   const { t } = useTranslation('courses');
+  const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+  const viewerId = user?.id ?? null;
+  /** ONE ROW OPEN AT A TIME (§S2.3) — a single id, never a set. */
+  const [openId, setOpenId] = useState<string | null>(null);
   const shown = rows.slice(0, limit);
   const metaQuery = useCourseCardMeta(shown.map((r) => r.courseId));
   const meta = metaQuery.data;
@@ -90,6 +330,8 @@ export function MostPlayedLeaderboard({
   // gam_round_stats, so only the THUMBNAIL waits — the shimmer sits in that slot
   // while the rest of the row reads straight away.
   const thumbPending = shown.length > 0 && metaQuery.isPending;
+
+  const openMember = (userId: string) => navigate(`/profile/${userId}`);
 
   if (isPending) return <MostPlayedPanelShell />;
   if (shown.length === 0) return null;
@@ -116,133 +358,164 @@ export function MostPlayedLeaderboard({
         {shown.map((r, i) => {
           const m = meta?.get(r.courseId);
           const name = m?.name ?? r.courseName ?? t('discover.unknownCourse', 'Course');
+          const open = openId === r.courseId;
+          const toggle = () => setOpenId(open ? null : r.courseId);
           return (
-            <button
+            <div
               key={r.courseId}
-              type="button"
-              onClick={() => onRowPress(r)}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 11,
-                width: '100%',
-                padding: '12px 0',
-                border: 'none',
-                background: 'transparent',
                 borderBottom: i === shown.length - 1 ? 'none' : `1px solid ${A.BORDER}`,
-                textAlign: 'left',
-                fontFamily: SANS,
-                cursor: 'pointer',
               }}
             >
-              <span
+              {/* NO BUTTON INSIDE A BUTTON (§S2.8). The row is a div carrying
+                  role="button", tabIndex and Enter/Space; the faces, the names
+                  and the "see all" action inside it stay REAL buttons, each
+                  stopping propagation so a name tap navigates without toggling. */}
+              <div
+                role="button"
+                tabIndex={0}
+                aria-expanded={open}
+                onClick={toggle}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                    e.preventDefault();
+                    toggle();
+                  }
+                }}
                 style={{
-                  ...LABEL,
-                  fontSize: 9,
-                  color: A.DIM,
-                  width: 13,
-                  flexShrink: 0,
-                  fontVariantNumeric: 'tabular-nums lining-nums',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 11,
+                  width: '100%',
+                  padding: '12px 0',
+                  background: 'transparent',
+                  textAlign: 'left',
+                  fontFamily: SANS,
+                  cursor: 'pointer',
                 }}
               >
-                {formatNumber(i + 1)}
-              </span>
-              <CourseImageFallback
-                courseId={r.courseId}
-                courseName={name}
-                imageUrl={m?.imageUrl}
-                initialsSize={13}
-                pending={thumbPending}
-                style={{ width: 52, height: 52, borderRadius: 13, flexShrink: 0 }}
-              />
-              <span style={{ flex: 1, minWidth: 0 }}>
-                {/* TWO LINES, NOT A TRUNCATION: the parenthetical on a
-                    two-course club is the only thing telling the two apart. */}
                 <span
                   style={{
-                    display: '-webkit-box',
-                    WebkitBoxOrient: 'vertical',
-                    WebkitLineClamp: 2,
-                    fontSize: 13.5,
-                    fontWeight: 700,
-                    color: A.INK,
-                    letterSpacing: '-0.015em',
-                    lineHeight: 1.2,
-                    overflow: 'hidden',
+                    ...LABEL,
+                    fontSize: 9,
+                    color: A.DIM,
+                    width: 13,
+                    flexShrink: 0,
+                    fontVariantNumeric: 'tabular-nums lining-nums',
                   }}
                 >
-                  {name}
+                  {formatNumber(i + 1)}
                 </span>
-                {/* REGION on its own line. */}
-                {m?.region && (
+                <CourseImageFallback
+                  courseId={r.courseId}
+                  courseName={name}
+                  imageUrl={m?.imageUrl}
+                  initialsSize={13}
+                  pending={thumbPending}
+                  style={{ width: 52, height: 52, borderRadius: 13, flexShrink: 0 }}
+                />
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  {/* TWO LINES, NOT A TRUNCATION: the parenthetical on a
+                      two-course club is the only thing telling the two apart. */}
                   <span
                     style={{
-                      ...LABEL,
-                      display: 'block',
-                      fontSize: 9,
-                      color: A.DIM,
-                      marginTop: 3,
+                      display: '-webkit-box',
+                      WebkitBoxOrient: 'vertical',
+                      WebkitLineClamp: 2,
+                      fontSize: 13.5,
+                      fontWeight: 700,
+                      color: A.INK,
+                      letterSpacing: '-0.015em',
+                      lineHeight: 1.2,
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
                     }}
                   >
-                    {m.region}
+                    {name}
                   </span>
-                )}
-                {/* SCORING LINE — its own row where the volume bar used to sit.
-                    A SCORE, NOT A MOVEMENT: to-par convention, BODY ink, never
-                    the movement green beside it. The count on the right is
-                    ROUNDS, so the member count is what this line adds. */}
-                {(r.avgToPar != null || r.members > 0) && (
+                  {/* REGION on its own line. */}
+                  {m?.region && (
+                    <span
+                      style={{
+                        ...LABEL,
+                        display: 'block',
+                        fontSize: 9,
+                        color: A.DIM,
+                        marginTop: 3,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {m.region}
+                    </span>
+                  )}
+                  {/* SCORING LINE — a SCORE, not a movement: to-par convention,
+                      BODY ink. "BY N MEMBERS" IS GONE (§S3.2): the faces below
+                      say who, and the list states the count. The "played to"
+                      figure stays. */}
+                  {r.avgToPar != null && (
+                    <span
+                      style={{
+                        ...LABEL,
+                        display: 'block',
+                        fontSize: 9,
+                        color: A.BODY,
+                        marginTop: 4,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        fontVariantNumeric: 'tabular-nums lining-nums',
+                      }}
+                    >
+                      {t('discover.mostPlayedAvgToPar', 'Played to {{value}}', {
+                        value: formatToPar(r.avgToPar),
+                      })}
+                    </span>
+                  )}
+                </span>
+                <span style={{ flexShrink: 0, textAlign: 'right', minWidth: 34 }}>
                   <span
                     style={{
-                      ...LABEL,
+                      ...NUMF,
                       display: 'block',
-                      fontSize: 9,
-                      color: A.BODY,
-                      marginTop: 4,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      fontVariantNumeric: 'tabular-nums lining-nums',
+                      fontSize: 20,
+                      letterSpacing: '-0.03em',
+                      lineHeight: 1,
+                      color: A.INK,
                     }}
                   >
-                    {r.avgToPar != null && r.members > 0
-                      /* NO INLINE defaultValue ON A COUNTED STRING (§2.2): a single
-                         default gives i18next no plural to select, which is how
-                         "1 birdies" reached device. The _one/_other entries in
-                         courses.json carry it. */
-                      ? t('discover.mostPlayedAvgToParBy', {
-                          value: formatToPar(r.avgToPar),
-                          count: r.members,
-                        })
-                      : r.avgToPar != null
-                        ? t('discover.mostPlayedAvgToPar', 'Played to {{value}}', {
-                            value: formatToPar(r.avgToPar),
-                          })
-                        : t('discover.mostPlayedMembers', { count: r.members })}
+                    {formatNumber(r.count)}
                   </span>
-                )}
-              </span>
-              <span style={{ flexShrink: 0, textAlign: 'right', minWidth: 34 }}>
-                <span
+                  <MoveMark row={r} t={t} />
+                </span>
+                {/* WITHOUT IT NOTHING SAYS THE ROW OPENS (§S2.2). */}
+                <ChevronDown
+                  size={14}
+                  strokeWidth={2.4}
+                  aria-hidden
                   style={{
-                    ...NUMF,
-                    display: 'block',
-                    fontSize: 20,
-                    letterSpacing: '-0.03em',
-                    lineHeight: 1,
-                    color: A.INK,
+                    flexShrink: 0,
+                    color: A.DIM,
+                    transform: open ? 'rotate(180deg)' : 'none',
+                    transition: 'transform 160ms ease',
                   }}
-                >
-                  {formatNumber(r.count)}
-                </span>
-                <MoveMark row={r} t={t} />
-              </span>
-            </button>
+                />
+              </div>
+
+              {open ? (
+                <MemberList
+                  row={r}
+                  viewerId={viewerId}
+                  onOpenMember={openMember}
+                  onSeeAllAtCourse={() => onRowPress(r)}
+                />
+              ) : (
+                <FaceRow row={r} viewerId={viewerId} onOpenMember={openMember} />
+              )}
+            </div>
           );
         })}
+
       </div>
 
 

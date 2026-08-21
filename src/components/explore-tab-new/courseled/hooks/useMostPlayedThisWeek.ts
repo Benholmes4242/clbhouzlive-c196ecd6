@@ -48,7 +48,14 @@ export interface MostPlayedRow {
   /**
    * DISTINCT members with a tracked round here in the CURRENT seven days.
    * The count on the right is ROUNDS, so this is the figure that says
-   * "4 rounds, by 3 members". No avatars, no profile join — a count.
+   * "4 rounds, by 3 members".
+   *
+   * AMENDED (BRIEF_MOST_PLAYED_WHO_PLAYED §S0.2): the Set behind this count is
+   * still built the same way from the same 14-day read — but it is no longer
+   * thrown away. `players` below resolves those very ids through ONE profile
+   * select, so the row can say WHO played rather than only how many. The last
+   * clause of this comment ("No avatars, no profile join — a count") is the
+   * only part that is now wrong.
    */
   members: number;
   /**
@@ -56,7 +63,31 @@ export interface MostPlayedRow {
    * only. Null when the course has no comparable scored round this week.
    */
   avgToPar: number | null;
+  /**
+   * THE MEMBERS BEHIND THE COUNT, lowest gross first (§S1.4). One entry per
+   * DISTINCT member — a member who played twice appears once, carrying their
+   * BEST gross (§S4.2). A member whose profile cannot be resolved (deleted
+   * account, RLS) is dropped rather than drawn as a blank circle (§S4.4), so
+   * `players.length` can be lower than `members`.
+   */
+  players: MostPlayedPlayer[];
+  /**
+   * LOWEST GROSS at this course in the current seven days, over every tracked
+   * round — independent of whether that member's profile resolved. Null when no
+   * round this week carried a gross.
+   */
+  bestGross: number | null;
 }
+
+/** One resolved member on a most-played row. */
+export interface MostPlayedPlayer {
+  userId: string;
+  name: string;
+  avatarUrl: string | null;
+  /** That member's BEST (lowest) gross at this course this week. */
+  gross: number | null;
+}
+
 
 const DAY = 86_400_000;
 
@@ -95,6 +126,11 @@ export function useMostPlayedThisWeek(limit = 25) {
       const par = new Map<string, { sum: number; n: number }>();
       /** DISTINCT members per course, CURRENT week only. */
       const members = new Map<string, Set<string>>();
+      /** BEST (lowest) gross per `${courseId}|${userId}`, CURRENT week only. */
+      const bestByMember = new Map<string, number>();
+      /** BEST (lowest) gross per course, CURRENT week only. */
+      const bestByCourse = new Map<string, number>();
+
       for (const r of rows) {
         if (!r.course_id) continue;
         names.set(r.course_id, r.course_name ?? names.get(r.course_id) ?? null);
@@ -105,6 +141,18 @@ export function useMostPlayedThisWeek(limit = 25) {
           const set = members.get(r.course_id) ?? new Set<string>();
           set.add(r.user_id);
           members.set(r.course_id, set);
+          // BEST, NOT LATEST (§S4.2): the Set already deduplicates the member,
+          // so the gross is folded into a per-(course, member) minimum. Two
+          // rounds in the week collapse to the better one — the join below
+          // cannot re-multiply what is already keyed by member id.
+          if (r.gross_score != null) {
+            const key = `${r.course_id}|${r.user_id}`;
+            const held = bestByMember.get(key);
+            if (held == null || r.gross_score < held) bestByMember.set(key, r.gross_score);
+            const courseBest = bestByCourse.get(r.course_id);
+            if (courseBest == null || r.gross_score < courseBest)
+              bestByCourse.set(r.course_id, r.gross_score);
+          }
         }
         if (
           isCurrent &&
@@ -119,7 +167,7 @@ export function useMostPlayedThisWeek(limit = 25) {
         }
       }
 
-      return [...cur.entries()]
+      const base = [...cur.entries()]
         .filter(([, count]) => count >= MIN_ROUNDS)
         .map(([courseId, count]) => {
           const before = prev.get(courseId) ?? 0;
@@ -133,16 +181,78 @@ export function useMostPlayedThisWeek(limit = 25) {
             change,
             // FOUR STATES, NONE DISCARDED: a drop and a first appearance are
             // both reportable facts about the week.
-            move:
-              before === 0 ? 'new' : change > 0 ? 'up' : change < 0 ? 'down' : 'level',
+            move: (before === 0
+              ? 'new'
+              : change > 0
+                ? 'up'
+                : change < 0
+                  ? 'down'
+                  : 'level') as MostPlayedMove,
             avgToPar: agg && agg.n > 0 ? agg.sum / agg.n : null,
             members: members.get(courseId)?.size ?? 0,
-          } satisfies MostPlayedRow;
+            bestGross: bestByCourse.get(courseId) ?? null,
+            players: [] as MostPlayedPlayer[],
+          };
         })
         .sort((a, b) => b.count - a.count || (a.courseName ?? '').localeCompare(b.courseName ?? ''))
         .slice(0, limit);
+
+      /**
+       * THE PROFILE JOIN (§S0.1/§S0.3). ONE select over user_profiles keyed by
+       * the ids the Sets above already hold — NOT a second read of
+       * gam_round_stats, and nothing about how the leaderboard is computed,
+       * ordered or capped moved. Only the rows that survive the slice are
+       * resolved. public_profiles backfills anything RLS withheld (the same
+       * pattern useLatestReviews uses for signed-out readers).
+       */
+      const wanted = Array.from(
+        new Set(base.flatMap((r) => [...(members.get(r.courseId) ?? [])])),
+      );
+      const byId = new Map<string, { name: string; avatarUrl: string | null }>();
+      if (wanted.length > 0) {
+        const { data: profs } = await supabase
+          .from('user_profiles')
+          .select('id, username, display_name, profile_photo_url')
+          .in('id', wanted);
+        for (const p of (profs ?? []) as any[]) {
+          const name = String(p.display_name ?? p.username ?? '').trim();
+          if (name) byId.set(p.id as string, { name, avatarUrl: p.profile_photo_url ?? null });
+        }
+        const missing = wanted.filter((id) => !byId.has(id));
+        if (missing.length > 0) {
+          const { data: pub } = await supabase
+            .from('public_profiles')
+            .select('id, username, display_name, profile_photo_url')
+            .in('id', missing);
+          for (const p of (pub ?? []) as any[]) {
+            const name = String(p.display_name ?? p.username ?? '').trim();
+            if (name) byId.set(p.id as string, { name, avatarUrl: p.profile_photo_url ?? null });
+          }
+        }
+      }
+
+      for (const row of base) {
+        row.players = [...(members.get(row.courseId) ?? [])]
+          // A ROUND WITH NO RESOLVABLE MEMBER DRAWS NOTHING (§S4.4).
+          .filter((userId) => byId.has(userId))
+          .map((userId) => ({
+            userId,
+            name: byId.get(userId)!.name,
+            avatarUrl: byId.get(userId)!.avatarUrl,
+            gross: bestByMember.get(`${row.courseId}|${userId}`) ?? null,
+          }))
+          // LOWEST GROSS FIRST (§S1.4); a member with no gross sorts last.
+          .sort(
+            (a, b) =>
+              (a.gross ?? Number.POSITIVE_INFINITY) - (b.gross ?? Number.POSITIVE_INFINITY) ||
+              a.name.localeCompare(b.name),
+          );
+      }
+
+      return base satisfies MostPlayedRow[];
     },
     staleTime: 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
   });
+
 }
