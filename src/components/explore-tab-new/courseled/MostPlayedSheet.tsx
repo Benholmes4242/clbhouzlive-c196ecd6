@@ -16,9 +16,11 @@ interface Props {
   onClose: () => void;
   rows: MostPlayedRow[];
   onRowPress: (row: MostPlayedRow) => void;
+  /** Passed straight through: a board row opens that round's scorecard. */
+  onPlayerPress?: (player: MostPlayedPlayer) => void;
 }
 
-export function MostPlayedSheet({ open, onClose, rows, onRowPress }: Props) {
+export function MostPlayedSheet({ open, onClose, rows, onRowPress, onPlayerPress }: Props) {
   const { t } = useTranslation('courses');
 
   return (
@@ -64,6 +66,7 @@ export function MostPlayedSheet({ open, onClose, rows, onRowPress }: Props) {
           rows={rows}
           limit={rows.length}
           onRowPress={onRowPress}
+          onPlayerPress={onPlayerPress}
           showEyebrow={false}
         />
         <div aria-hidden style={{ height: 24 }} />
