@@ -13,6 +13,9 @@ import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { TOPAR_UNDER_DARK, TOPAR_OVER_DARK } from '@/features/tourhub/_shared/tokens';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
+import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
@@ -150,6 +153,25 @@ const AMBER = '#F7931E';
  *  rise is not, and the ARROW is what separates it from the to-par beside it. */
 const INDEX_FELL = '#1B7F4B';
 const INDEX_ROSE = '#C8102E';
+
+/* ===================== THE MEMBER ROW ON DARK (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §2)
+   The row now sits INSIDE the dark region, over a scrimmed photograph, so every
+   colour it carries needs its dark counterpart. EVERY VALUE BELOW IS AN EXISTING
+   APP TOKEN — nothing is invented here, and the light values above stay put
+   because the band tiles and the well still use them.
+   AMBER is deliberately absent: #F7931E holds on dark and means the same thing,
+   so the self marker is unchanged (§2.1, ACCEPTANCE D). */
+/** Names and grosses: the hero's own white, so one white runs down the block. */
+const ROW_DARK_INK = 'rgba(255,255,255,0.94)';
+/** Under par on dark. TOPAR_RED (#C8102E) is the light-surface red and goes
+    muddy on a photograph; this is the app's single dark under-par red. */
+const ROW_DARK_TOPAR_UNDER = TOPAR_UNDER_DARK;
+/** Over/level par on dark: a white at reduced alpha, never a grey. */
+const ROW_DARK_TOPAR_OVER = TOPAR_OVER_DARK;
+/** MOVEMENT, not a score: the shared INDEX_DELTA token's DARK pair. The
+    direction rule is untouched — a falling index is green, a rising one red. */
+const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
+const ROW_DARK_INDEX_ROSE = INDEX_DELTA.dark.drifted;
 
 
 
@@ -476,7 +498,19 @@ function heroBackground(kind: MomentKind, tone: string) {
  * top scrim — then the moment glow above all of it.
  */
 const PHOTO_TOP_SCRIM_H = 48;
-const PHOTO_BOTTOM_SCRIM_H = 124;
+/* THE BOTTOM SCRIM IS ANCHORED TO THE BOTTOM OF THE DARK REGION, WHICH IS NOW
+   THE MEMBER ROW'S BOTTOM EDGE, NOT THE HERO'S
+   (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §1). The region grew by 35px
+   (8 pad + 19 row + 8 pad), so the scrim grows with it: 124 + 35 = 159. It
+   reaches HERO_BOTTOM_SCRIM's heaviest value (0.92) exactly at the region's
+   bottom edge, so the boundary into the light well is a clean horizontal line
+   rather than a gradient petering out mid-photograph.
+   THIS TILE CANNOT BE SEAMLESS AND DOES NOT CLAIM TO BE: PhotoBand can end its
+   scrim ON the board below because that board is also dark. Under this row sits
+   the LIGHT well (#F2F5F8), so a dark-to-light edge must exist. The gain is that
+   there is now ONE edge (region -> well) where there were TWO (hero -> white
+   row, row -> well). */
+const PHOTO_BOTTOM_SCRIM_H = 159;
 const PHOTO_VEIL = 'rgba(10,14,10,0.26)';
 /** Photo only on the first N tiles: the rail renders every round (§4.2). */
 const PHOTO_TILE_LIMIT = 6;
@@ -733,13 +767,18 @@ function GolfThisWeekCard({
         cursor: 'pointer',
       }}
     >
-      {/* ===================== THE HERO (§S2) ===================== */}
+      {/* ============ THE DARK REGION: HERO + MEMBER ROW (§1) ============
+          ONE image, ONE scrim stack, both taller. The hero content and the
+          member row are composed OVER it, so the photograph runs unbroken from
+          the top of the tile to the bottom of the member row. A second stack
+          behind the row could never be made to line up with this one. */}
       <div
         style={{
-          height: HERO_H,
           flexShrink: 0,
           position: 'relative',
           overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
           /* THE LAYERS SIT AT zIndex -1, WHICH ONLY WORKS INSIDE A STACKING
              CONTEXT. position:relative with z-index auto is NOT one, so the
              photo painted BEHIND the element's own background and the tile
@@ -750,9 +789,6 @@ function GolfThisWeekCard({
           /* NO IMAGE -> PIXEL-IDENTICAL TO BEFORE (§2.3): the same single
              composed background, and not one extra layer. */
           background: imageUrl ? HERO_BASE : heroBackground(moment.kind, moment.tone),
-          padding: '11px 12px 11px',
-          display: 'flex',
-          flexDirection: 'column',
         }}
       >
         {imageUrl && (
@@ -816,6 +852,17 @@ function GolfThisWeekCard({
             />
           </>
         )}
+        {/* THE HERO'S OWN CONTENT BOX. HERO_H is unchanged (156) — §1 extends
+            the dark REGION, not the hero's content box. */}
+        <div
+          style={{
+            height: HERO_H,
+            flexShrink: 0,
+            padding: '11px 12px 11px',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
         {/* §S2.3 — course, region beneath, the day top-right. */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -914,19 +961,27 @@ function GolfThisWeekCard({
         >
           {sentence}
         </div>
-      </div>
+        </div>
 
-
-      <div style={{ padding: '8px 10px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        {/* THE MEMBER ROW CARRIES THE SCORE (§S4.1): gross, to-par and this
-            round's index movement, all LITERAL — under par red, over par ink. */}
+        {/* THE MEMBER ROW, NOW INSIDE THE DARK REGION (§1, §2). Its STRUCTURE,
+            sizes, weights, padding and 7px gap are untouched — only the colours
+            take their dark counterparts. The 8px above and 8px below are the
+            same 8s it had as a white row, so the tile's total height is
+            unchanged (ACCEPTANCE G). */}
+        <div style={{ padding: '8px 10px 8px', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+          {/* §2.5 — THE RING COMES BACK ON DARK. hideRing was right on white,
+              where the avatar's own edge read against the card; over a scrimmed
+              photograph a dark avatar dissolves into the scrim. The canonical
+              DARK_HAIRLINE (white @ 22%) traces it at 0.5px — the same ring
+              every avatar on a dark surface carries. */}
           <SquircleAvatar
             src={row.profile_photo_url}
             userId={row.user_id}
             alt={row.display_name}
             size={19}
-            hideRing
+            hairlineRing
+            ringColor={DARK_HAIRLINE}
           />
           <span
             style={{
@@ -934,7 +989,8 @@ function GolfThisWeekCard({
               flex: '0 1 auto',
               fontSize: 12,
               fontWeight: 600,
-              color: row.is_self ? AMBER : INK,
+              /* §2.1 — AMBER unchanged, INK -> the region's white. */
+              color: row.is_self ? AMBER : ROW_DARK_INK,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -952,7 +1008,8 @@ function GolfThisWeekCard({
               flexShrink: 0,
             }}
           >
-            <span style={{ ...NUMF, fontSize: 14, lineHeight: 1, color: INK }}>
+            {/* §2.2 — the gross: INK -> white. */}
+            <span style={{ ...NUMF, fontSize: 14, lineHeight: 1, color: ROW_DARK_INK }}>
               {row.gross ?? '\u2014'}
             </span>
             {toPar && (
@@ -961,7 +1018,9 @@ function GolfThisWeekCard({
                   ...NUMF,
                   fontSize: 10.5,
                   lineHeight: 1,
-                  color: toParUnder ? TOPAR_RED : MID,
+                  /* §2.3 — the dark under-par red, and a white at reduced
+                     alpha for over/level. Never TOPAR_RED, never a grey. */
+                  color: toParUnder ? ROW_DARK_TOPAR_UNDER : ROW_DARK_TOPAR_OVER,
                 }}
               >
                 {toPar.text}
@@ -971,7 +1030,7 @@ function GolfThisWeekCard({
               <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
                 <IndexMovementTriangle
                   direction={(delta as number) < 0 ? 'down' : 'up'}
-                  color={(delta as number) < 0 ? INDEX_FELL : INDEX_ROSE}
+                  color={(delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE}
                   size={7}
                 />
                 <span
@@ -979,7 +1038,8 @@ function GolfThisWeekCard({
                     ...NUMF,
                     fontSize: 10.5,
                     lineHeight: 1,
-                    color: (delta as number) < 0 ? INDEX_FELL : INDEX_ROSE,
+                    /* §2.4 — INDEX_DELTA's DARK pair. Direction rule unchanged. */
+                    color: (delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE,
                   }}
                 >
                   {Math.abs(delta as number).toFixed(1)}
@@ -997,7 +1057,12 @@ function GolfThisWeekCard({
             />
           )}
         </div>
+        </div>
+      </div>
 
+      {/* THE LIGHT HALF. The well keeps its own container so it still bleeds to
+          the card edges. */}
+      <div style={{ padding: '0 10px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* ===================== THE SCORECARD WELL (§S4) =====================
             A TINTED WELL, #F2F5F8, NO BORDER (§S4.1) — the tone separates it
             from the card and an outline would be a second signal for one edge.
@@ -1008,7 +1073,11 @@ function GolfThisWeekCard({
             (ACCEPTANCE K, Q). */}
         <div
           style={{
-            marginTop: 8,
+            /* THE WELL'S 8px OFFSET MOVED UP INTO THE DARK REGION'S BOTTOM
+               PADDING (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §1) — the row's 8/8
+               now sits inside the dark block, so keeping a margin here as well would
+               add 8px to the tile. The total height is unchanged. */
+            marginTop: 0,
             marginLeft: -10,
             marginRight: -10,
             marginBottom: 0,
