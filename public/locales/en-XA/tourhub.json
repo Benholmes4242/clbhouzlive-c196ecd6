@@ -236,7 +236,11 @@
       "finishedLabel": "[Fïnïshéd]",
       "todaySuffix": "[{{value}} tódáý]",
       "fieldAverageWaiting": "[Field average once {{n}} rounds are in]",
-      "courseShapeLabel": "[Çöûrsé shåpé]"
+      "courseShapeLabel": "[Çöûrsé shåpé]",
+      "ourPicksLabel": "[Our picks]",
+      "ourPicksAll": "[All picks and the case for each]",
+      "ourPicksProvenance": "[Model confidence {{confidence}}%]",
+      "ourPicksStale": "[Being refreshed]"
     },
     "tiPicks": {
       "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",

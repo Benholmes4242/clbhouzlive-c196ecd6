@@ -150,6 +150,18 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
   const boardEntries = boardTournamentId ? (boardLeaderboard ?? []) : [];
   const boardRound = viewingLive ? (activeSlide?.tournament.currentRound ?? null) : null;
 
+  /**
+   * BRIEF_HERO_PICKS_ROW §1 — THE BAND MUST SURVIVE AN UPCOMING TOURNAMENT.
+   * The old gate (board id + round + entries) deleted Tournament Intelligence
+   * on upcoming slides, which is the phase where the picks matter most. The
+   * band now mounts for ANY slide and decides for itself: with no board it
+   * renders the picks row alone, and with neither a board nor picks it returns
+   * null — no placeholder, no reserved height (HeroBoardBand).
+   */
+  const bandTournamentId = viewingTid;
+  const bandPhase = (activeSlide?.type ?? 'upcoming') as 'live' | 'upcoming' | 'completed';
+
+
   // DEBOUNCED display reporting (4G guard). One trailing-edge write 250ms after
   // the last swipe/jump — rapid multi-slide sweeps no longer fire pulse/OTC/TI
   // fetches per intermediate slide.
@@ -240,30 +252,37 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
 
     </div>
 
-    {/* The live board EXTENDS the hero downward. It tracks the active slide and
-        cross-fades in place on swipe; on a results or upcoming slide it renders
-        nothing at all and the page below moves up. No collapse control. */}
+    {/* The band EXTENDS the hero downward. It tracks the active slide and
+        cross-fades in place on swipe. On a live slide it carries the board; on
+        an upcoming or completed slide it carries the picks row ALONE, and when
+        there are no picks either it renders nothing at all and the page below
+        moves up (§1). */}
     <AnimatePresence mode="wait" initial={false}>
-      {boardTournamentId && boardRound != null && boardEntries.length > 0 && (
+      {bandTournamentId && (
         <motion.div
-          key={boardTournamentId}
+          key={bandTournamentId}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
           <HeroBoardSection
-            tournamentId={boardTournamentId}
+            tournamentId={bandTournamentId}
             entries={boardEntries as any[]}
             currentRound={boardRound}
+            phase={bandPhase}
             onFullLeaderboard={() => {
-              const target = tournamentRoute(boardTournamentId, { kind: 'overview' });
+              const target = tournamentRoute(bandTournamentId, { kind: 'overview' });
+              navigate(target.to, { state: target.state });
+            }}
+            onFullPicks={() => {
+              const target = tournamentRoute(bandTournamentId, { kind: 'overview' });
               navigate(target.to, { state: target.state });
             }}
             onRowTap={(playerId) =>
               analyticsEvents.track('hero_board_row_tap', {
-                tournament_id: boardTournamentId,
-                round: boardRound,
+                tournament_id: bandTournamentId,
+                round: boardRound ?? 0,
                 player_id: playerId,
               })
             }
