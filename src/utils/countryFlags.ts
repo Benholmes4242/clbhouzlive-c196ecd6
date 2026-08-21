@@ -234,7 +234,7 @@ export const UNMAPPED_REGIONS = [
 // ---------------------------------------------------------------------------
 export const threeLetterToFlagCode: Record<string, string> = {
   // Home nations — subdivision codes, all four SVGs are served.
-  ENG: 'GB-ENG', SCO: 'GB-SCT', WAL: 'GB-WLS', NIR: 'IE',
+  ENG: 'GB-ENG', SCO: 'GB-SCT', WAL: 'GB-WLS', NIR: 'GB-NIR',
   GBR: 'GB', IRL: 'IE',
 
   // North America / Caribbean
