@@ -26,10 +26,12 @@ export const countryToFlagCode: Record<string, string> = {
   'WALES': 'GB-WLS',
   'Wales': 'GB-WLS',
   
-  // Editorial decision (BRIEF_TOUR_FLAGS_ONE_SYSTEM §3): Northern Ireland is
-  // marked with the Irish tricolour, not the Ulster Banner or the Union Flag.
-  'NORTHERN IRELAND': 'IE',
-  'Northern Ireland': 'IE',
+  // Northern Ireland is a nationality distinct from both Ireland and the UK in
+  // sr_players.country, exactly as the golf bodies record it. GB-NIR is the only
+  // mark that denotes what the data says — no Union Flag, no tricolour. Treated
+  // exactly like the other three home nations, with no special-case branch.
+  'NORTHERN IRELAND': 'GB-NIR',
+  'Northern Ireland': 'GB-NIR',
   
   'IRELAND': 'IE',
   'Ireland': 'IE',
@@ -232,7 +234,7 @@ export const UNMAPPED_REGIONS = [
 // ---------------------------------------------------------------------------
 export const threeLetterToFlagCode: Record<string, string> = {
   // Home nations — subdivision codes, all four SVGs are served.
-  ENG: 'GB-ENG', SCO: 'GB-SCT', WAL: 'GB-WLS', NIR: 'IE',
+  ENG: 'GB-ENG', SCO: 'GB-SCT', WAL: 'GB-WLS', NIR: 'GB-NIR',
   GBR: 'GB', IRL: 'IE',
 
   // North America / Caribbean
@@ -340,8 +342,7 @@ export const getFlagCode = (country: string | null | undefined): string | null =
 
 /**
  * countryShortCode — the three-letter mark used inside the fallback chip when
- * no SVG can be resolved (or when policy withholds a national flag, as for
- * Northern Ireland). Never returns an empty string for a non-empty input.
+ * no SVG can be resolved. Never returns an empty string for a non-empty input.
  */
 export function countryShortCode(country: string | null | undefined): string {
   if (!country) return '';
