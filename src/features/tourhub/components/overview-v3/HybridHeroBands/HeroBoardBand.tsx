@@ -580,12 +580,15 @@ function surnameOf(full: string | null | undefined): string {
  */
 function PicksPanel({
   picks,
+  tourCode,
   phase,
   boardByPlayer,
   predictions,
   onFullPicks,
 }: {
   picks: AITopContender[];
+  /** §CHANGE 2 — the event's tour, for the shared headshot resolver. */
+  tourCode: string;
   phase: 'live' | 'upcoming' | 'completed';
   boardByPlayer: Map<string, { position: number | null; tied: boolean; score: number | null }>;
   predictions: { isAIPowered?: boolean; isStale?: boolean; confidence?: number; editorialFraming?: string | null } | null;
