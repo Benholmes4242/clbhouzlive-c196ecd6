@@ -79,11 +79,19 @@ interface Props {
 
 type Hole = NonNullable<PostRound['holeShape']>[number];
 
-const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | null }> = ({
-  label,
-  total,
-  toPar,
-}) => (
+const LabelRow: React.FC<{
+  label: string;
+  total: number | null;
+  toPar: number | null;
+  /**
+   * BRIEF_POST_TRAJECTORY_ENDPOINT_DISAGREES §2 — when the nine total is
+   * SUPPRESSED (a played hole with no score), the slot the figure would have
+   * taken carries the REASON instead. Never a number, never a dash, never the
+   * partial sum: the suppression rule (BRIEF_ROUND_STRIP_PARTIAL_HOLES §3.1)
+   * stands, it just stops being silent.
+   */
+  note?: string | null;
+}> = ({ label, total, toPar, note }) => (
   <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 4 }}>
     <span
       style={{
@@ -96,7 +104,22 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
     >
       {label}
     </span>
-    {total == null ? null : (
+    {total == null ? (
+      note ? (
+        <span
+          style={{
+            fontSize: 9.5,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: DIM,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {note}
+        </span>
+      ) : null
+    ) : (
       <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
         <span style={{ ...NUM, fontSize: 12.5, fontWeight: 700, color: INK }}>{total}</span>
         <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: toParColor(toPar) }}>
@@ -106,6 +129,7 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
     )}
   </div>
 );
+
 
 
 
