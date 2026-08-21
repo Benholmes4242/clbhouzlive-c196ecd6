@@ -55,7 +55,7 @@ export interface Moment {
   tone: string;
   /** i18n key suffix for the eyebrow. `null` on PLAIN: it has no label (§S2.7). */
   labelKey: string | null;
-  /** i18n key suffix for the figure template, e.g. 'holes' -> "{{n}} HOLES". */
+  /** i18n key suffix for the figure template, e.g. 'holes' -> "{n} HOLES". */
   figureKey: string | null;
   figureRole: FigureRole;
   /** The number in the 46px figure. `null` on PLAIN — the card uses the gross. */
