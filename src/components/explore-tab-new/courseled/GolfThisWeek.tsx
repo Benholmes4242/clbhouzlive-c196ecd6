@@ -13,6 +13,9 @@ import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { TOPAR_UNDER_DARK, TOPAR_OVER_DARK } from '@/features/tourhub/_shared/tokens';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
+import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
@@ -150,6 +153,25 @@ const AMBER = '#F7931E';
  *  rise is not, and the ARROW is what separates it from the to-par beside it. */
 const INDEX_FELL = '#1B7F4B';
 const INDEX_ROSE = '#C8102E';
+
+/* ===================== THE MEMBER ROW ON DARK (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §2)
+   The row now sits INSIDE the dark region, over a scrimmed photograph, so every
+   colour it carries needs its dark counterpart. EVERY VALUE BELOW IS AN EXISTING
+   APP TOKEN — nothing is invented here, and the light values above stay put
+   because the band tiles and the well still use them.
+   AMBER is deliberately absent: #F7931E holds on dark and means the same thing,
+   so the self marker is unchanged (§2.1, ACCEPTANCE D). */
+/** Names and grosses: the hero's own white, so one white runs down the block. */
+const ROW_DARK_INK = 'rgba(255,255,255,0.94)';
+/** Under par on dark. TOPAR_RED (#C8102E) is the light-surface red and goes
+    muddy on a photograph; this is the app's single dark under-par red. */
+const ROW_DARK_TOPAR_UNDER = TOPAR_UNDER_DARK;
+/** Over/level par on dark: a white at reduced alpha, never a grey. */
+const ROW_DARK_TOPAR_OVER = TOPAR_OVER_DARK;
+/** MOVEMENT, not a score: the shared INDEX_DELTA token's DARK pair. The
+    direction rule is untouched — a falling index is green, a rising one red. */
+const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
+const ROW_DARK_INDEX_ROSE = INDEX_DELTA.dark.drifted;
 
 
 
@@ -476,7 +498,19 @@ function heroBackground(kind: MomentKind, tone: string) {
  * top scrim — then the moment glow above all of it.
  */
 const PHOTO_TOP_SCRIM_H = 48;
-const PHOTO_BOTTOM_SCRIM_H = 124;
+/* THE BOTTOM SCRIM IS ANCHORED TO THE BOTTOM OF THE DARK REGION, WHICH IS NOW
+   THE MEMBER ROW'S BOTTOM EDGE, NOT THE HERO'S
+   (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §1). The region grew by 35px
+   (8 pad + 19 row + 8 pad), so the scrim grows with it: 124 + 35 = 159. It
+   reaches HERO_BOTTOM_SCRIM's heaviest value (0.92) exactly at the region's
+   bottom edge, so the boundary into the light well is a clean horizontal line
+   rather than a gradient petering out mid-photograph.
+   THIS TILE CANNOT BE SEAMLESS AND DOES NOT CLAIM TO BE: PhotoBand can end its
+   scrim ON the board below because that board is also dark. Under this row sits
+   the LIGHT well (#F2F5F8), so a dark-to-light edge must exist. The gain is that
+   there is now ONE edge (region -> well) where there were TWO (hero -> white
+   row, row -> well). */
+const PHOTO_BOTTOM_SCRIM_H = 159;
 const PHOTO_VEIL = 'rgba(10,14,10,0.26)';
 /** Photo only on the first N tiles: the rail renders every round (§4.2). */
 const PHOTO_TILE_LIMIT = 6;
