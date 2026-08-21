@@ -537,6 +537,8 @@ export default function DiscoverCourseLedSkeleton() {
           flexDirection: 'column',
           gap: 28,
         }}
+      >
+
 
         {/* MomentsMosaic is NO LONGER REACHED FROM DISCOVER
             (MICRO_BRIEF_REMOVE_MOMENTS_FROM_DISCOVER): the section was
