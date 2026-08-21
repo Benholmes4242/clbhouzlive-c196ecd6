@@ -1229,10 +1229,19 @@ export function GolfThisWeek({
           className="tabular-nums"
           style={{ ...KICKER, color: A.MUTE, flex: '0 0 auto' }}
         >
-          {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
-            rounds: counts.rounds,
-            courses: counts.courses,
-          })}
+          {/* The window is a THIRD SEGMENT OF THE SAME TEMPLATE so a translator
+              can reorder all three. It is FIXED at seven days — never derived
+              from the oldest round, which would make the window look like it
+              moves on a quiet week. */}
+          {t(
+            'discover.golfThisWeek.count',
+            '{{rounds}} rounds \u00B7 {{courses}} courses \u00B7 {{days}} days',
+            {
+              rounds: counts.rounds,
+              courses: counts.courses,
+              days: 7,
+            },
+          )}
         </span>
         <RegionDropdown
           regions={regions}

@@ -429,11 +429,18 @@ export function MostPlayedLeaderboard({
             )
           }
         >
-          {/* §S1.1 — the heading DESCRIBES WHAT THE SECTION SHOWS rather than
-              asserting a ranking that 11 / 2 / 1 / 1 does not support. The old
-              'discover.mostPlayed' key is now unused and STAYS in all six
-              locale files (§S4.1). */}
-          {t('discover.whereTheyPlayed', 'Where they played this week')}
+          {/* BRIEF_DISCOVER_ORDER_AND_LABELS §2 — the heading NAMES THE RANKING
+              again, on 'discover.mostPlayed'.
+              COUNTER-ARGUMENT ON RECORD (the old §S1.1 rule this overturns):
+              "the heading DESCRIBES WHAT THE SECTION SHOWS rather than asserting
+              a ranking that 11 / 2 / 1 / 1 does not support."
+              BEN HEARD IT AND CHOSE THIS: "Most played courses this week" names
+              the SET the section contains, it does not claim each row is heavily
+              played; and the old heading did not tell anyone what the section
+              was. Do not silently reverse this again.
+              'discover.whereTheyPlayed' is now unused and STAYS in all six
+              locale files, the treatment §S4.1 gave the key it replaced. */}
+          {t('discover.mostPlayed', 'Most played courses this week')}
         </Eyebrow>
       )}
 

@@ -1057,7 +1057,7 @@
     "mostPlayedAvgToParBy_other": "{{value}} · {{count}}명",
     "mostPlayedMembers_other": "{{count}}명",
     "mostPlayedSheetCaption_other": "{{count}}개 코스",
-    "mostPlayed": "이번 주 최다 플레이",
+    "mostPlayed": "이번 주 최다 플레이 코스",
     "whereTheyPlayed": "이번 주 플레이한 곳",
     "mostPlayedRoundCount": "{{count}} 라운드",
     "mostPlayedRoundCount_other": "{{count}} 라운드",
@@ -1104,7 +1104,8 @@
           "birdieHaul": "{{1}} 홀에서 버디 {{0}}개.",
           "strongFinish": "마지막 세 홀에서 버디 이상, {{0}}로 마무리."
         }
-      }
+      },
+      "count": "{{rounds}} 라운드 · {{courses}} 코스 · {{days}}일"
     },
     "week": {
       "scopeAria": "라운드 범위",

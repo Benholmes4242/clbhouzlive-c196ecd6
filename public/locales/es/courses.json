@@ -1119,7 +1119,7 @@
     "mostPlayedAvgToParBy_other": "Jugado a {{value}} por {{count}} miembros",
     "mostPlayedMembers_other": "{{count}} miembros",
     "mostPlayedSheetCaption_other": "{{count}} campos",
-    "mostPlayed": "Más jugados esta semana",
+    "mostPlayed": "Campos más jugados esta semana",
     "whereTheyPlayed": "Dónde jugaron esta semana",
     "mostPlayedRoundCount": "{{count}} vuelta",
     "mostPlayedRoundCount_other": "{{count}} vueltas",
@@ -1166,7 +1166,8 @@
           "birdieHaul": "{{0}} birdies en {{1}} hoyos.",
           "strongFinish": "Birdie o mejor en la vuelta a casa, para acabar en {{0}}."
         }
-      }
+      },
+      "count": "{{rounds}} rondas · {{courses}} campos · {{days}} días"
     },
     "week": {
       "scopeAria": "Ámbito de rondas",
