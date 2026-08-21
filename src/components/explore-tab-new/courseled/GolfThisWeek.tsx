@@ -1147,7 +1147,7 @@ export function GolfThisWeek({
          asks for THE RUN's "8" and BIRDIE HAUL's "5" to stay white. */
       tone: INK,
       qual: bestToPar ?? undefined,
-      qualTone: best.toPar < 0 ? TOPAR_RED : BAND_MUTE,
+      qualTone: best.toPar < 0 ? TOPAR_RED : INK,
       row: best.row,
       course: courseNameFor(best.row),
     });
@@ -1160,7 +1160,7 @@ export function GolfThisWeek({
       figure: String(bestStableford.stableford_points),
       tone: INK,
       qual: t('discover.golfThisWeek.stablefordUnit', 'points'),
-      qualTone: BAND_FAINT,
+      qualTone: INK,
       row: bestStableford,
       course: courseNameFor(bestStableford),
     });
@@ -1174,7 +1174,7 @@ export function GolfThisWeek({
       figure: String(mostBirdies.birdies),
       tone: TOPAR_RED,
       qual: t('discover.friendsRail.birdies', 'birdies'),
-      qualTone: BAND_FAINT,
+      qualTone: INK,
       row: mostBirdies,
       course: courseNameFor(mostBirdies),
     });
@@ -1189,7 +1189,7 @@ export function GolfThisWeek({
       figure: `\u2193${Math.abs(d).toFixed(1)}`,
       tone: A.IMPROVED,
       qual: t('discover.friendsRail.index', 'HCP'),
-      qualTone: BAND_FAINT,
+      qualTone: INK,
       row: mostImproved,
       course: courseNameFor(mostImproved),
     });
@@ -1371,11 +1371,11 @@ export function GolfThisWeek({
                 {tile.qual ? (
                   <span
                     style={{
-                      fontSize: 13,
-                      fontWeight: 800,
+                      fontSize: 12,
+                      fontWeight: 700,
                       lineHeight: 1,
                       fontVariantNumeric: 'tabular-nums lining-nums',
-                      color: tile.qualTone ?? BAND_FAINT,
+                      color: tile.qualTone ?? INK,
                       whiteSpace: 'nowrap',
                     }}
                   >
@@ -1419,9 +1419,9 @@ export function GolfThisWeek({
               <div
                 style={{
                   marginTop: 5,
-                  fontSize: 10.5,
-                  fontWeight: 500,
-                  color: BAND_MUTE,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: INK,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
