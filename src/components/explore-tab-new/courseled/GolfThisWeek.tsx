@@ -814,9 +814,10 @@ function GolfThisWeekCard({
                 zIndex: -1,
               }}
             />
+          )}
+            {/* §3 — COURSE_SCRIMS, in PhotoBand's position in the stack. */}
             <div
               aria-hidden="true"
-              /* §3 — COURSE_SCRIMS, in PhotoBand's position in the stack. */
               style={{ position: 'absolute', inset: 0, background: COURSE_SCRIMS, zIndex: -1 }}
             />
             <div
@@ -843,8 +844,7 @@ function GolfThisWeekCard({
                 zIndex: -1,
               }}
             />
-          </>
-        )}
+        </>
         {/* THE HERO'S OWN CONTENT BOX. HERO_H is unchanged (156) — §1 extends
             the dark REGION, not the hero's content box. */}
         <div
