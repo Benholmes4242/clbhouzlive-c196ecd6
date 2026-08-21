@@ -900,7 +900,7 @@ export function GolfThisWeek({
           flexWrap: 'wrap',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: 8,
+          gap: 12,
           /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
              gives 16px of clearance everywhere. */
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
