@@ -88,6 +88,13 @@ const CARD_SCRIM = SCRIM_STANDOUT;
 /** Amber is the viewing member, on their own card border and nowhere else (§7). */
 const AMBER = '#F7931E';
 
+/** ON-DARK TONES FOR THE GLASS CHIP (§S2.4, §S2.5) — the light-surface
+ *  under-par red and the body index pair both fail over a photograph. */
+const GLASS_UNDER = '#FF8A80';
+const INDEX_DARK_FELL = '#7BE8A6';
+const INDEX_DARK_ROSE = '#FF8A7A';
+
+
 /**
  * §6.1 — the shape draws itself once on arrival, ~600ms, the round replaying.
  * ONE easing, taken from the existing draw animations in this feature family
