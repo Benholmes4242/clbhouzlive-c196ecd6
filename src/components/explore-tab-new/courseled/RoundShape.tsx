@@ -5,7 +5,7 @@ import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
-import { toParFor } from '../friendRoundParts';
+
 import { A } from './tokens';
 
 /**
@@ -110,36 +110,19 @@ export function RoundShape({
      data (the three-point fallback) gets NEITHER the bar NOR the count line —
      there is nothing to count — so its meta row stays exactly as today. */
   const buckets = shape ? bucketsFor(shape.series) : null;
-  const figure = toParFor(row);
-  /* The figure's SIGN, from the same two fields toParFor reads, so the tone and
-     the text can never disagree. */
-  const figureDelta =
-    row.gross != null && row.course_par != null ? row.gross - row.course_par : 0;
+
+
 
   const withChrome = (plot: ReactNode) => (
     <>
       <div style={{ position: 'relative' }}>
         {plot}
-        {/* §3 THE TO-PAR FIGURE ON THE BAND. It repeats the glass chip's value
-            deliberately: the chip belongs to the photograph, this belongs to the
-            shape. Body-surface tones, never the glass ones. */}
-        {showMeta && figure && (
-          <span
-            style={{
-              position: 'absolute',
-              top: 4,
-              right: 8,
-              fontSize: 10.5,
-              fontWeight: 700,
-              lineHeight: 1,
-              ...FIGS,
-              color: figureDelta < 0 ? TOPAR_RED : figureDelta > 0 ? A.MUTE : A.DIM,
-            }}
-          >
-            {figure.text}
-          </span>
-        )}
+        {/* NO TO-PAR LABEL ON THE BAND (BRIEF_ROUND_TILE_GLASS_CHIP §S1.1). It
+            restated the score chip's own figure and competed for the top-right
+            corner with an over-par curve's endpoint. The chip on the photograph
+            is the single statement of the round's to-par. */}
       </div>
+
       {showMeta && buckets && <BucketBar buckets={buckets} />}
       {showMeta && shape && <ShapeMeta buckets={buckets} />}
     </>

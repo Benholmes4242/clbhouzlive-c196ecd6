@@ -11,7 +11,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
-import { SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { CHIP_GLASS_CLASS, SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
@@ -87,6 +87,13 @@ const CARD_SCRIM = SCRIM_STANDOUT;
 
 /** Amber is the viewing member, on their own card border and nowhere else (§7). */
 const AMBER = '#F7931E';
+
+/** ON-DARK TONES FOR THE GLASS CHIP (§S2.4, §S2.5) — the light-surface
+ *  under-par red and the body index pair both fail over a photograph. */
+const GLASS_UNDER = '#FF8A80';
+const INDEX_DARK_FELL = '#7BE8A6';
+const INDEX_DARK_ROSE = '#FF8A7A';
+
 
 /**
  * §6.1 — the shape draws itself once on arrival, ~600ms, the round replaying.
@@ -345,10 +352,16 @@ interface CardProps {
 }
 
 /**
- * THE CARD LEADS WITH THE COURSE (§2). Order is fixed: course image and name /
- * gross and to-par with the index movement right-aligned / player row / the
- * shape / the insight line.
+ * THE CARD LEADS WITH THE COURSE (§2).
+ *
+ * Order: course image with the score chip over it / player row / the shape /
+ * the strip / the insight line. The gross, to-par and index movement sit in a
+ * glass chip ON the photograph — they belong to the round, not to the block,
+ * and moving them freed the row beneath for the member. The to-par label that
+ * sat on the curve was the same figure twice and collided with an over-par
+ * curve's endpoint.
  */
+
 function GolfThisWeekCard({
   row,
   shape,
@@ -363,16 +376,19 @@ function GolfThisWeekCard({
 }: CardProps) {
   const { t } = useTranslation('courses');
   const toPar = toParFor(row);
+  /* §S2.4 — the sign, from the same two fields toParFor reads. */
+  const toParUnder =
+    row.gross != null && row.course_par != null && row.gross - row.course_par < 0;
   /* §6.3 — the ONLY marker on this section, and only for these two feats. */
   const legendary = (row.holes_in_one ?? 0) > 0 || (row.albatrosses ?? 0) > 0;
-  /* §1.3 / §7 — THIS round's index movement. delta_index is stored and has never
-     been shown; improved is GREEN and drifted RED because a movement's axis is
-     direction of travel, not golf quality. Exactly zero is a real answer and
-     renders with no colour claim. */
+  /* §S2.5 / §S2.6 — THIS round's index movement, on the glass chip. A fall is
+     green and a rise is red because a movement's axis is direction of travel;
+     the ARROW is what distinguishes it from the to-par figure beside it. Below
+     the 0.05 floor there is no movement and no hairline. */
   const delta = row.delta_index;
-  const hasDelta = delta != null && Number.isFinite(delta);
-  const deltaZero = hasDelta && Math.abs(delta as number) < 0.05;
-  const deltaTone = deltaZero ? A.MUTE : (delta as number) < 0 ? A.IMPROVED : A.DRIFTED;
+  const hasMovement =
+    delta != null && Number.isFinite(delta) && Math.abs(delta as number) >= 0.05;
+
 
   return (
     /* NOT A <button> (§S1.1): FollowButton is a real button and a button inside
@@ -417,7 +433,10 @@ function GolfThisWeekCard({
               overflow: 'hidden',
               fontSize: 14,
               fontWeight: 700,
-              lineHeight: 1.2,
+              /* 1.1 / 1, not 1.2 / normal (§S3.6): a two-line name grows
+                 UPWARD from bottom 8 and the tightened leading is what keeps its
+                 first line clear of the score chip's 37px bottom edge. */
+              lineHeight: 1.1,
               letterSpacing: '-0.01em',
               color: '#FFFFFF',
             }}
@@ -431,6 +450,7 @@ function GolfThisWeekCard({
               alignItems: 'center',
               gap: 6,
               fontSize: 10.5,
+              lineHeight: 1,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.82)',
             }}
@@ -447,74 +467,94 @@ function GolfThisWeekCard({
             <span style={{ opacity: 0.7 }}>{relativeDay(row.play_date, t)}</span>
           </div>
         </div>
-      </CourseImageFallback>
 
-      <div style={{ padding: '9px 11px 9px' }}>
-        {/* GROSS AND TO-PAR, with index movement right-aligned (§2.1).
-            The follow button sits on the same row as the score, not the member
-            name, so the highest-value action is visible at the top of the tile. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        {/* THE SCORE CHIP ON THE PHOTOGRAPH (§S2). .standout-figure-chip carries
+            the fill, the border and the @supports blur — the flat fill is the
+            base so the chip stays legible with backdrop-filter disabled. NO
+            inline background here, ever. */}
+        <span
+          className={CHIP_GLASS_CLASS}
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            display: 'inline-flex',
+            alignItems: 'baseline',
+            gap: 6,
+            borderRadius: 10,
+            padding: '5px 10px',
+          }}
+        >
           <span
             style={{
               ...NUMF,
-              fontSize: 24,
-              lineHeight: 1,
-              color: A.INK,
+              fontSize: 21,
+              fontWeight: 700,
+              letterSpacing: '-0.04em',
+              lineHeight: 0.85,
+              color: '#FFFFFF',
             }}
           >
             {row.gross ?? '\u2014'}
           </span>
           {toPar && (
-            <span style={{ ...NUMF, fontSize: 12.5, color: toPar.tone, lineHeight: 1 }}>
+            <span
+              style={{
+                ...NUMF,
+                fontSize: 12.5,
+                fontWeight: 700,
+                lineHeight: 1,
+                /* §S2.4 — the light-surface under-par red dies on a photograph. */
+                color: toParUnder ? GLASS_UNDER : 'rgba(255,255,255,0.92)',
+              }}
+            >
               {toPar.text}
             </span>
           )}
-          {legendary && (
-            <span style={{ ...LABEL, color: GOLD }}>
-              {(row.holes_in_one ?? 0) > 0
-                ? t('discover.golfThisWeek.ace', 'ACE')
-                : t('discover.golfThisWeek.albatross', 'ALBATROSS')}
-            </span>
-          )}
-          {hasDelta && (
-            <span
-              style={{
-                marginLeft: 'auto',
-                display: 'inline-flex',
-                alignItems: 'baseline',
-                gap: 3,
-                flexShrink: 0,
-              }}
-            >
-              {!deltaZero && (
+          {/* §S2.6 — NO MOVEMENT, NO HAIRLINE: a divider with nothing after it
+              reads as a truncation. */}
+          {hasMovement && (
+            <>
+              <span
+                style={{
+                  width: 1,
+                  alignSelf: 'stretch',
+                  background: 'rgba(255,255,255,0.28)',
+                  marginLeft: 2,
+                  marginRight: 2,
+                }}
+              />
+              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
+                {/* Arrow = direction, colour = good or bad, figure ABSOLUTE. */}
                 <IndexMovementTriangle
                   direction={(delta as number) < 0 ? 'down' : 'up'}
-                  color={deltaTone}
+                  color={(delta as number) < 0 ? INDEX_DARK_FELL : INDEX_DARK_ROSE}
                   size={7}
                 />
-              )}
-              <span style={{ ...NUMF, fontSize: 12, color: deltaTone, lineHeight: 1 }}>
-                {Math.abs(delta as number).toFixed(1)}
+                <span
+                  style={{
+                    ...NUMF,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    color: (delta as number) < 0 ? INDEX_DARK_FELL : INDEX_DARK_ROSE,
+                  }}
+                >
+                  {Math.abs(delta as number).toFixed(1)}
+                </span>
               </span>
-              <span style={{ ...LABEL, color: A.DIM }}>
-                {t('discover.friendsRail.index', 'HCP')}
-              </span>
-            </span>
+            </>
           )}
-          {showFollow && (
-            <FollowButton
-              targetUserId={row.user_id}
-              isFollowed={isFollowed}
-              viewerUserId={viewerUserId}
-              align={hasDelta ? 'gap' : 'auto'}
-            />
-          )}
-        </div>
+        </span>
+      </CourseImageFallback>
 
-        {/* THE PLAYER IS SECONDARY, beneath the score (§2). */}
+
+      <div style={{ padding: '9px 11px 9px' }}>
+        {/* THE MEMBER ROW SITS DIRECTLY UNDER THE PHOTOGRAPH (§S3.1): the score
+            moved onto the image, so the name gets the room. The follow control
+            stays right-aligned here in whichever of its three states applies. */}
         <div
           style={{
-            marginTop: 7,
             display: 'flex',
             alignItems: 'center',
             gap: 7,
@@ -544,7 +584,25 @@ function GolfThisWeekCard({
           >
             {row.display_name}
           </span>
+
+          {legendary && (
+            <span style={{ ...LABEL, color: GOLD, flexShrink: 0 }}>
+              {(row.holes_in_one ?? 0) > 0
+                ? t('discover.golfThisWeek.ace', 'ACE')
+                : t('discover.golfThisWeek.albatross', 'ALBATROSS')}
+            </span>
+          )}
+
+          {showFollow && (
+            <FollowButton
+              targetUserId={row.user_id}
+              isFollowed={isFollowed}
+              viewerUserId={viewerUserId}
+              align="gap"
+            />
+          )}
         </div>
+
 
         {/* THE SHAPE — the friends rail's band, same height, full bleed (§4.1).
             showMeta TRUE: this tile is the surviving rounds tile after the Your
