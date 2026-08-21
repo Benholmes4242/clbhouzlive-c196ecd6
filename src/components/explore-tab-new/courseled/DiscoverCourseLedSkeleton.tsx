@@ -141,8 +141,8 @@ export function FriendsRail() {
  * GOLF THIS WEEK. MEASURED off GolfThisWeek.tsx after
  * BRIEF_ROUND_TILE_LIGHT_REFINEMENT: 256 wide, no border and a 1px shadow, a
  * 76px photograph (the score chip and the date ride on it), then the body —
- * member row 19, ONE #EEF2F5 well holding the 40px trajectory, a single
- * hairline and the two nines, then one reserved insight line. Above the rail:
+ * member row 19, then the 40px trajectory, a single hairline and the two nines
+ * on the white card surface, then one reserved insight line. Above the rail:
  * the count/region readout row, the pills row and the best-of-week band, all of
  * which the live section renders before its first card and none of which may
  * appear later.
@@ -215,14 +215,14 @@ export function GolfThisWeekRail() {
                 <Bar style={{ height: 19, width: 19, borderRadius: '34%' }} />
                 <TextBar w={92} h={11} />
               </div>
-              {/* ONE WELL: the trajectory (40) and the two nines inside a single
-                  #EEF2F5 block with one hairline between them, no border. */}
+              {/* ONE BLOCK on the white card: the trajectory (40) and the two
+                  nines with a single hairline between them — no fill, no
+                  border. */}
               <div
                 style={{
                   marginTop: 8,
                   marginLeft: -10,
                   marginRight: -10,
-                  background: '#EEF2F5',
                   borderRadius: 12,
                   padding: '8px 6px 10px',
                 }}
