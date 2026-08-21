@@ -554,14 +554,15 @@ function GolfThisWeekCard({
             display: 'inline-flex',
             alignItems: 'baseline',
             gap: 6,
-            borderRadius: 10,
-            padding: '5px 10px',
+            /* §S4.2 — the chip TIGHTENS. Hairline and index movement kept. */
+            borderRadius: 9,
+            padding: '4px 9px',
           }}
         >
           <span
             style={{
               ...NUMF,
-              fontSize: 21,
+              fontSize: 19,
               fontWeight: 700,
               letterSpacing: '-0.04em',
               lineHeight: 0.85,
@@ -574,7 +575,7 @@ function GolfThisWeekCard({
             <span
               style={{
                 ...NUMF,
-                fontSize: 12.5,
+                fontSize: 11.5,
                 fontWeight: 700,
                 lineHeight: 1,
                 /* §S2.4 — the light-surface under-par red dies on a photograph. */
