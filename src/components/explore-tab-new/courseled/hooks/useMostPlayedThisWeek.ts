@@ -126,6 +126,11 @@ export function useMostPlayedThisWeek(limit = 25) {
       const par = new Map<string, { sum: number; n: number }>();
       /** DISTINCT members per course, CURRENT week only. */
       const members = new Map<string, Set<string>>();
+      /** BEST (lowest) gross per `${courseId}|${userId}`, CURRENT week only. */
+      const bestByMember = new Map<string, number>();
+      /** BEST (lowest) gross per course, CURRENT week only. */
+      const bestByCourse = new Map<string, number>();
+
       for (const r of rows) {
         if (!r.course_id) continue;
         names.set(r.course_id, r.course_name ?? names.get(r.course_id) ?? null);
