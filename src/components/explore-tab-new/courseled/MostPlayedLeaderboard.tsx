@@ -94,20 +94,33 @@ function MoveMark({
   );
 }
 
-/* ─────────────────────────── WHO PLAYED (§S1/§S2) ─────────────────────────
- * NAME INDENT: the face row aligns with the COURSE NAME, not the rank
- * (§S1.1) — rank 13 + gap 11 + thumbnail 52 + gap 11 = 87.
+/* ───────────────────────── THE BOARD (§S2) ─────────────────────────
+ * FULL WIDTH, NO INDENT (§S2.3). The name column takes all remaining space; the
+ * NAME_INDENT that used to align this list with the course name is DELETED —
+ * that indent was fault §S0.1.
  */
-const NAME_INDENT = 87;
-/** Six faces, then "+N" (§S1.2). */
-const FACE_CAP = 6;
-/** Beyond twelve the expansion navigates instead of growing (§S2.5). */
+
+/** Beyond twelve the expansion navigates instead of growing (§S2.5, unchanged). */
 const LIST_CAP = 12;
 
-/* NO VIEWER MARKING IN THIS SECTION. Ben's call (BRIEF_SCORECARD_WIDTH_AND_
- * VIEWER_RING §S2) - the amber ring and the "You" substitution were both removed
- * deliberately. Amber still means the viewing member EVERYWHERE ELSE in the app;
- * this section simply does not mark them. Every face takes the PANEL ring. */
+/** Ink ramp of the round tiles, shared so the board reads as one family. */
+const INK = '#0B0F14';
+const MID = '#5A6673';
+const FAINT = '#8A929C';
+const GHOST = '#C8D0D8';
+
+/** §S2.8 — the viewing member's row takes a 4.5% amber tint. NO RING, NO "You". */
+const VIEWER_TINT = 'rgba(247,147,30,0.045)';
+
+/** §S2.5 — every gross in a board aligns on its right edge. */
+const GROSS_COL = 30;
+/** §S2.2 — position first, in a fixed column so names start on one line. */
+const POS_COL = 17;
+
+/* NO VIEWER MARKING ON THE COURSE HEADER. Ben's call
+ * (BRIEF_SCORECARD_WIDTH_AND_VIEWER_RING §S2) — the amber ring and the "You"
+ * substitution were both removed deliberately, and §S2.8 keeps that: the board
+ * marks the viewer with a TINT ONLY. Amber still means the viewing member. */
 
 /** A face that opens its member's profile and never toggles the row (§S2.7). */
 function MemberFace({
@@ -151,98 +164,78 @@ function MemberFace({
   );
 }
 
-/** §S1 — the collapsed face row, plus "best NN" on the right. */
-function FaceRow({
-  row,
-  onOpenMember,
-}: {
-  row: MostPlayedRow;
-  onOpenMember: (userId: string) => void;
-}) {
-  const { t } = useTranslation('courses');
-  if (row.players.length === 0) return null;
-  const faces = row.players.slice(0, FACE_CAP);
-  const overflow = row.players.length - faces.length;
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        paddingLeft: NAME_INDENT,
-        paddingBottom: 12,
-        minWidth: 0,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
-        {faces.map((p, idx) => (
-          <span key={p.userId} style={{ marginLeft: idx === 0 ? 0 : -8, display: 'block' }}>
-            <MemberFace player={p} size={26} onOpen={onOpenMember} />
-          </span>
-        ))}
-        {/* ONE MEMBER SHOWS ONE FACE — no "+0", no placeholder (§S1.6). */}
-        {overflow > 0 && (
-          <span
-            style={{
-              ...LABEL,
-              fontSize: 9,
-              color: A.MUTE,
-              marginLeft: 6,
-              fontVariantNumeric: 'tabular-nums lining-nums',
-            }}
-          >
-            +{formatNumber(overflow)}
-          </span>
-        )}
-      </div>
-      {row.bestGross != null && (
-        <span
-          style={{
-            ...LABEL,
-            fontSize: 9,
-            color: A.MUTE,
-            marginLeft: 'auto',
-            flex: 'none',
-            fontVariantNumeric: 'tabular-nums lining-nums',
-          }}
-        >
-          {t('discover.mostPlayedBest', 'best')}{' '}
-          <span style={{ color: A.INK }}>{formatNumber(row.bestGross)}</span>
-        </span>
-      )}
-    </div>
-  );
-}
+/* §S3.1 — THE COLLAPSED FACE ROW IS DELETED, and with it "BEST 68" (§S3.3).
+ * The board answers "who played here" far better than six overlapping faces
+ * did, and the board's FIRST ROW IS THE BEST SCORE — so a separate best figure
+ * was the same fact twice. Keeping either would show the same members twice on
+ * one card. Do not reinstate them. */
 
 /**
- * §S2 — the expanded list. NO INTERNAL SCROLL, AND THAT IS DELIBERATE (§S2.4):
- * "No nested scroll. The largest course this week has NINE members, so a
- *  ten-row scroll would never engage — and a scrollable panel inside a
- *  scrolling page is a real fault on a phone: a finger that lands on the list
- *  scrolls the list instead of the page, and a member cannot tell why the page
- *  stopped moving. The expansion is member-initiated, so its height is
- *  consented to."
+ * §S2 — THE TOURNAMENT BOARD.
+ *
+ *   position | avatar | name over home club | to-par | gross
+ *
+ * NO INTERNAL SCROLL, AND THAT IS DELIBERATE (carried from §S2.4 of the previous
+ * brief): "a scrollable panel inside a scrolling page is a real fault on a
+ * phone: a finger that lands on the list scrolls the list instead of the page,
+ * and a member cannot tell why the page stopped moving. The expansion is
+ * member-initiated, so its height is consented to."
+ *
+ * A MEMBER WHO PLAYED TWICE APPEARS ONCE with their BEST round (§S2.9) — the
+ * hook already collapses them by (course, member) minimum gross.
  */
-function MemberList({
+function MemberBoard({
   row,
+  viewerId,
   onOpenMember,
   onSeeAllAtCourse,
 }: {
   row: MostPlayedRow;
+  viewerId: string | null;
   onOpenMember: (userId: string) => void;
   onSeeAllAtCourse: () => void;
 }) {
   const { t } = useTranslation('courses');
   const listed = row.players.slice(0, LIST_CAP);
   const hidden = row.players.length - listed.length;
+  if (listed.length === 0) return null;
 
   return (
-    <div style={{ paddingLeft: NAME_INDENT, paddingBottom: 12, display: 'grid', gap: 8 }}>
+    <div style={{ paddingBottom: 10 }}>
       {listed.map((p) => {
+        const isViewer = viewerId != null && p.userId === viewerId;
+        const under = p.toPar != null && p.toPar < 0;
         return (
-          <div key={p.userId} style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            <MemberFace player={p} size={22} onOpen={onOpenMember} />
+          <div
+            key={p.userId}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 9,
+              // FULL WIDTH (§S2.3): the tint bleeds to the card's own padding
+              // rather than starting at a thumbnail-width indent.
+              margin: '0 -14px',
+              padding: '7px 14px',
+              minWidth: 0,
+              // §S2.8 — TINT ONLY.
+              background: isViewer ? VIEWER_TINT : 'transparent',
+            }}
+          >
+            {/* §S2.2 — POSITION FIRST. The leader's position is INK; the rest
+                are GHOST, so the board has one focal point per course. */}
+            <span
+              style={{
+                ...NUMF,
+                flex: 'none',
+                width: POS_COL,
+                fontSize: 11,
+                lineHeight: 1,
+                color: p.position === 1 ? INK : GHOST,
+              }}
+            >
+              {formatNumber(p.position)}
+            </span>
+            <MemberFace player={p} size={24} onOpen={onOpenMember} />
             <button
               type="button"
               onClick={(e) => {
@@ -250,6 +243,7 @@ function MemberList({
                 onOpenMember(p.userId);
               }}
               style={{
+                // ALL REMAINING SPACE (§S2.3).
                 flex: 1,
                 minWidth: 0,
                 border: 'none',
@@ -258,30 +252,76 @@ function MemberList({
                 textAlign: 'left',
                 cursor: 'pointer',
                 fontFamily: SANS,
-                fontSize: 12,
-                // EVERY NAME RENDERS THE SAME - no bold, no amber, no "You".
-                fontWeight: 600,
-                letterSpacing: '-0.015em',
-                color: A.INK,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
               }}
             >
-              {p.name}
-            </button>
-            {p.gross != null && (
               <span
                 style={{
-                  ...NUMF,
-                  fontSize: 12,
-                  flex: 'none',
-                  color: A.INK,
+                  display: 'block',
+                  fontSize: 12.5,
+                  // EVERY NAME RENDERS THE SAME — no bold on the viewer, no
+                  // amber text, no "You" (§S2.8).
+                  fontWeight: 600,
+                  letterSpacing: '-0.015em',
+                  lineHeight: 1.25,
+                  color: INK,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                {formatNumber(p.gross)}
+                {p.name}
               </span>
-            )}
+              {/* §S2.4 — THE HOME CLUB UNDER THE NAME. A member with none
+                  renders NOTHING: no placeholder, no "No club". The row does not
+                  change height because nothing here reserves space for it. */}
+              {p.homeClub && (
+                <span
+                  style={{
+                    display: 'block',
+                    fontSize: 10,
+                    fontWeight: 500,
+                    letterSpacing: '-0.005em',
+                    lineHeight: 1.25,
+                    color: FAINT,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {p.homeClub}
+                </span>
+              )}
+            </button>
+            {/* §S2.5 — THE TO-PAR: 12px, A.MID, RED WHEN UNDER PAR, in the SAME
+                token as the mini scorecard and the superlative band. */}
+            <span
+              style={{
+                ...NUMF,
+                flex: 'none',
+                fontSize: 12,
+                lineHeight: 1,
+                color: under ? TOPAR_RED : MID,
+              }}
+            >
+              {p.toPar != null ? formatRelInt(p.toPar) : ''}
+            </span>
+            {/* §S2.5 — THE GROSS LAST, right-aligned in a FIXED column so every
+                score in the board aligns on its right edge. */}
+            <span
+              style={{
+                ...NUMF,
+                flex: 'none',
+                width: GROSS_COL,
+                textAlign: 'right',
+                fontSize: 17,
+                fontWeight: 800,
+                letterSpacing: '-0.03em',
+                lineHeight: 1,
+                color: INK,
+              }}
+            >
+              {p.gross != null ? formatNumber(p.gross) : '\u2014'}
+            </span>
           </div>
         );
       })}
@@ -296,10 +336,10 @@ function MemberList({
           style={{
             ...LABEL,
             fontSize: 9,
-            color: A.INK,
+            color: INK,
             border: 'none',
             background: 'transparent',
-            padding: '2px 0',
+            padding: '6px 0 0',
             textAlign: 'left',
             cursor: 'pointer',
           }}
