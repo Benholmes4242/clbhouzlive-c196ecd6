@@ -268,16 +268,48 @@ export function GolfThisWeekRail() {
               boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
             }}
           >
-            {/* THE HERO, 156. No photograph: the live card draws a gradient with
-                the moment label, its figure and its sentence on it. */}
-            <Bar style={{ borderRadius: 0, height: 156, width: '100%' }} />
-            <div style={{ padding: '8px 10px 0' }}>
-              {/* The member row carries the score. */}
+            {/* THE DARK REGION, 191 = the 156 hero + the member row's 8/19/8
+                (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §4). The live tile's
+                photograph and scrim now run behind the row, so the shell's dark
+                block extends and the row's bars sit ON it rather than below it.
+                A skeleton updated later is a skeleton that is already wrong. */}
+            <div
+              style={{
+                height: 191,
+                width: '100%',
+                background: '#181F1B',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                padding: '8px 10px 8px',
+                boxSizing: 'border-box',
+              }}
+            >
+              {/* The member row carries the score. A.TRACK would vanish on this
+                  fill, so the bars take a white at 16%. */}
               <div style={{ height: 19, display: 'flex', alignItems: 'center', gap: 7 }}>
-                <Bar style={{ height: 19, width: 19, borderRadius: '34%' }} />
-                <TextBar w={92} h={11} />
-                <Bar style={{ height: 12, width: 34, marginLeft: 'auto' }} />
+                <Bar
+                  style={{
+                    height: 19,
+                    width: 19,
+                    borderRadius: '34%',
+                    backgroundColor: 'rgba(255,255,255,0.16)',
+                  }}
+                />
+                <Bar
+                  style={{ height: 11, width: 92, backgroundColor: 'rgba(255,255,255,0.16)' }}
+                />
+                <Bar
+                  style={{
+                    height: 12,
+                    width: 34,
+                    marginLeft: 'auto',
+                    backgroundColor: 'rgba(255,255,255,0.16)',
+                  }}
+                />
               </div>
+            </div>
+            <div style={{ padding: '0 10px 0' }}>
               {/* THE TINTED WELL: header, its one rule, and the FIXED 96px
                   scorecard region — the same height on every card, running to
                   the card's bottom edge. */}
