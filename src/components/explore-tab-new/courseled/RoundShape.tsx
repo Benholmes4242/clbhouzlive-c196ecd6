@@ -530,17 +530,17 @@ function markerStyle(m: Marker | null): CSSProperties {
   };
   switch (m) {
     case 'ace':
-      return { ...base, borderRadius: 999, border: `1px solid ${GOLD_ACE}`, color: GOLD_ACE, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${GOLD_ACE}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${ACE_GOLD}` };
     case 'eagle':
-      return { ...base, borderRadius: 999, border: `1px solid ${A.INK}`, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${A.INK}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${UNDER_INK}` };
     case 'birdie':
-      return { ...base, borderRadius: 999, border: `1px solid ${A.INK}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK };
     case 'bogey':
       return { ...base, borderRadius: 2, border: `1px solid ${A.INK}` };
     case 'double':
       return { ...base, borderRadius: 2, border: `1px solid ${A.INK}`, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${A.INK}` };
     default:
-      /* PAR IS BARE — no ring, no box. */
+      /* PAR IS BARE INK — no ring, no box, no tint (S1.3). The baseline recedes. */
       return base;
   }
 }
