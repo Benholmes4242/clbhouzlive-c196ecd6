@@ -1402,6 +1402,7 @@ export function GolfThisWeek({
                 />
                 <span
                   style={{
+                    flex: 1,
                     minWidth: 0,
                     fontSize: 12,
                     fontWeight: 700,
@@ -1413,22 +1414,29 @@ export function GolfThisWeek({
                 >
                   {tile.row.display_name}
                 </span>
+                {/* §1.3 (BRIEF_DISCOVER_FINISHING_PASS) — THE MISSING SIGN FOR AN
+                    AFFORDANCE THAT ALREADY EXISTS. The chip is role="button" with
+                    an onClick; nothing signalled it. Same glyph, size, stroke and
+                    tone as the well's "Full scorecard" chevron. flexShrink 0 so
+                    the name's ellipsis still works. */}
+                <ChevronRight
+                  size={9}
+                  strokeWidth={3}
+                  color={MID}
+                  style={{ flexShrink: 0 }}
+                />
               </div>
-              {/* §S2 — the last line is the COURSE and nothing else, on every
-                  tile, one line, ellipsis, never wrapping. */}
-              <div
-                style={{
-                  marginTop: 5,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: INK,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {tile.course}
-              </div>
+              {/* §1.1/§1.2 (BRIEF_DISCOVER_FINISHING_PASS) — THE COURSE LINE IS
+                  GONE. This OVERTURNS §S2 above and BRIEF_BAND_TILES_REFINEMENT
+                  ("the bottom line is the COURSE on every tile"), which are kept
+                  on the record rather than deleted.
+                  WHY: at 12/700 the line truncates before the informative part —
+                  "Sundridge Park Gol..." does not separate East from West, the
+                  one thing a member needs from it. 11px of chip for a prefix is
+                  worse than no line. The chip is tappable and the sheet it opens
+                  leads with the course in full.
+                  THE COST: the chip no longer says WHERE, so across a multi-course
+                  week the figure is a weaker fact than it was. */}
             </div>
           ))}
         </div>
