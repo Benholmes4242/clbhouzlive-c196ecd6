@@ -664,7 +664,11 @@ function GolfThisWeekCard({
         <div
           style={{
             minHeight: INSIGHT_LINE_RESERVE,
-            marginTop: 4,
+            /* §S3 — 10px above the insight line, matching the trajectory→grid gap
+               above. The grid reads as a block, the line as a comment on it. The
+               whole-block margin means a card with NO grid (no hole data) keeps
+               the same 10px there, so every tile stays level. */
+            marginTop: 10,
             display: 'flex',
             alignItems: 'flex-end',
           }}
