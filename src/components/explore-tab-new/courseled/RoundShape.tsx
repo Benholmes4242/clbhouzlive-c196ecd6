@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { CSSProperties, ReactNode } from 'react';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
