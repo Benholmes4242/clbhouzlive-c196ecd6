@@ -86,6 +86,37 @@ export interface MostPlayedPlayer {
   avatarUrl: string | null;
   /** That member's BEST (lowest) gross at this course this week. */
   gross: number | null;
+  /**
+   * TO PAR for that same best round (gross - course_par), null when the round
+   * carried no par. BRIEF_MOST_PLAYED_LEADERBOARD §S2.5 — the board shows BOTH
+   * the to-par and the gross, so the to-par has to travel with the gross it
+   * belongs to rather than being recomputed against a different round.
+   */
+  toPar: number | null;
+  /**
+   * THE MEMBER'S HOME CLUB (§S2.4). A tournament board has always carried a
+   * player's club, so it reads as native — and it answers "who is this person?"
+   * for the members the Worldwide and Suggested scopes surface, who the viewer
+   * does not know.
+   *
+   * SOURCE: user_home_clubs -> golf_clubs.name, preferring the row that matches
+   * user_profiles.primary_club_id; user_profiles.home_club (free text) backfills
+   * a member who typed a club that is not in golf_clubs.
+   *
+   * PRIVACY: withheld unless home_club_visibility is 'public'. The brief said
+   * only "join it"; 'followers' and 'friends' are real settings on this column
+   * and a Discover board is neither. See the report.
+   *
+   * `null` when there is none — the row renders NO second line, no placeholder,
+   * and does not change height (§S2.4).
+   */
+  homeClub: string | null;
+  /**
+   * BOARD POSITION, 1-based, TIES SHARING (§S2.7): two 76s are both 2nd and the
+   * next is 4th. Computed here beside the sort so the board never invents an
+   * order between equal scores.
+   */
+  position: number;
 }
 
 
@@ -126,8 +157,9 @@ export function useMostPlayedThisWeek(limit = 25) {
       const par = new Map<string, { sum: number; n: number }>();
       /** DISTINCT members per course, CURRENT week only. */
       const members = new Map<string, Set<string>>();
-      /** BEST (lowest) gross per `${courseId}|${userId}`, CURRENT week only. */
-      const bestByMember = new Map<string, number>();
+      /** BEST (lowest) gross per `${courseId}|${userId}`, CURRENT week only,
+       *  carrying the par of THAT round so the to-par matches the gross. */
+      const bestByMember = new Map<string, { gross: number; par: number | null }>();
       /** BEST (lowest) gross per course, CURRENT week only. */
       const bestByCourse = new Map<string, number>();
 
@@ -148,7 +180,8 @@ export function useMostPlayedThisWeek(limit = 25) {
           if (r.gross_score != null) {
             const key = `${r.course_id}|${r.user_id}`;
             const held = bestByMember.get(key);
-            if (held == null || r.gross_score < held) bestByMember.set(key, r.gross_score);
+            if (held == null || r.gross_score < held.gross)
+              bestByMember.set(key, { gross: r.gross_score, par: r.course_par ?? null });
             const courseBest = bestByCourse.get(r.course_id);
             if (courseBest == null || r.gross_score < courseBest)
               bestByCourse.set(r.course_id, r.gross_score);
@@ -208,45 +241,145 @@ export function useMostPlayedThisWeek(limit = 25) {
       const wanted = Array.from(
         new Set(base.flatMap((r) => [...(members.get(r.courseId) ?? [])])),
       );
-      const byId = new Map<string, { name: string; avatarUrl: string | null }>();
+      const byId = new Map<
+        string,
+        {
+          name: string;
+          avatarUrl: string | null;
+          homeClub: string | null;
+          primaryClubId: string | null;
+          /** TRUE when the member's home_club_visibility is not 'public'. */
+          clubHidden: boolean;
+        }
+      >();
       if (wanted.length > 0) {
         const { data: profs } = await supabase
           .from('user_profiles')
-          .select('id, username, display_name, profile_photo_url')
+          .select('id, username, display_name, profile_photo_url, home_club, home_club_visibility, primary_club_id')
           .in('id', wanted);
         for (const p of (profs ?? []) as any[]) {
           const name = String(p.display_name ?? p.username ?? '').trim();
-          if (name) byId.set(p.id as string, { name, avatarUrl: p.profile_photo_url ?? null });
+          if (!name) continue;
+          // PUBLIC ONLY. 'followers' / 'friends' are live values on this column
+          // and Discover is neither relationship.
+          const visible = (p.home_club_visibility ?? 'public') === 'public';
+          const typed = String(p.home_club ?? '').trim();
+          byId.set(p.id as string, {
+            name,
+            avatarUrl: p.profile_photo_url ?? null,
+            homeClub: visible && typed ? typed : null,
+            primaryClubId: (p.primary_club_id as string | null) ?? null,
+            clubHidden: !visible,
+          });
         }
         const missing = wanted.filter((id) => !byId.has(id));
         if (missing.length > 0) {
           const { data: pub } = await supabase
             .from('public_profiles')
-            .select('id, username, display_name, profile_photo_url')
+            .select('id, username, display_name, profile_photo_url, home_club, primary_club_id')
             .in('id', missing);
           for (const p of (pub ?? []) as any[]) {
             const name = String(p.display_name ?? p.username ?? '').trim();
-            if (name) byId.set(p.id as string, { name, avatarUrl: p.profile_photo_url ?? null });
+            // public_profiles ALREADY APPLIES VISIBILITY — anything it hands
+            // back is public by construction, so no second gate here.
+            if (name)
+              byId.set(p.id as string, {
+                name,
+                avatarUrl: p.profile_photo_url ?? null,
+                homeClub: String(p.home_club ?? '').trim() || null,
+                primaryClubId: (p.primary_club_id as string | null) ?? null,
+                clubHidden: false,
+              });
+          }
+        }
+
+        /**
+         * THE HOME-CLUB JOIN (§S2.4). ONE select over user_home_clubs with its
+         * golf_clubs name, for the same ids. It OVERRIDES the free-text
+         * user_profiles.home_club when it resolves, because a real club record
+         * is the better name; the free text stays as the backfill for a member
+         * whose club is not in golf_clubs. A member with neither keeps null and
+         * the board draws no second line.
+         */
+        const resolvable = wanted.filter((id) => byId.get(id)?.clubHidden === false);
+        if (resolvable.length > 0) {
+          const { data: links } = await supabase
+            .from('user_home_clubs')
+            .select('user_profile_id, club_id, golf_clubs:club_id(name)')
+            .in('user_profile_id', resolvable);
+          const picked = new Map<string, string>();
+          type Link = {
+            user_profile_id: string;
+            club_id: string | null;
+            golf_clubs: { name: string | null } | { name: string | null }[] | null;
+          };
+          for (const l of ((links ?? []) as unknown as Link[])) {
+            const uid = l.user_profile_id;
+            // PostgREST returns an OBJECT for a to-one embed and an ARRAY when it
+            // cannot prove the relationship is to-one. Handle both or the club
+            // silently never renders.
+            const club = Array.isArray(l.golf_clubs) ? l.golf_clubs[0] : l.golf_clubs;
+            const clubName = String(club?.name ?? '').trim();
+            if (!clubName) continue;
+            const entry = byId.get(uid);
+            if (!entry) continue;
+            if (entry.primaryClubId == null) {
+              // NO PRIMARY DECLARED: the first resolvable club speaks for them.
+              if (!picked.has(uid)) picked.set(uid, clubName);
+            } else if (entry.primaryClubId === l.club_id) {
+              // A PRIMARY EXISTS: only that club may speak for the member.
+              picked.set(uid, clubName);
+            }
+          }
+          for (const [uid, clubName] of picked) {
+            const entry = byId.get(uid);
+            if (entry) entry.homeClub = clubName;
           }
         }
       }
 
       for (const row of base) {
-        row.players = [...(members.get(row.courseId) ?? [])]
+        const sorted = [...(members.get(row.courseId) ?? [])]
           // A ROUND WITH NO RESOLVABLE MEMBER DRAWS NOTHING (§S4.4).
           .filter((userId) => byId.has(userId))
-          .map((userId) => ({
-            userId,
-            name: byId.get(userId)!.name,
-            avatarUrl: byId.get(userId)!.avatarUrl,
-            gross: bestByMember.get(`${row.courseId}|${userId}`) ?? null,
-          }))
-          // LOWEST GROSS FIRST (§S1.4); a member with no gross sorts last.
+          .map((userId) => {
+            const prof = byId.get(userId)!;
+            const best = bestByMember.get(`${row.courseId}|${userId}`) ?? null;
+            return {
+              userId,
+              name: prof.name,
+              avatarUrl: prof.avatarUrl,
+              homeClub: prof.homeClub,
+              gross: best?.gross ?? null,
+              toPar: best && best.par != null ? best.gross - best.par : null,
+              position: 0,
+            };
+          })
+          // ORDER BY GROSS, LOWEST FIRST (§S2.6); a member with no gross sorts
+          // last. Ties keep a STABLE alphabetical order so the board does not
+          // reshuffle between renders — but they SHARE a position below, which
+          // is not the same thing as inventing an order between them.
           .sort(
             (a, b) =>
               (a.gross ?? Number.POSITIVE_INFINITY) - (b.gross ?? Number.POSITIVE_INFINITY) ||
               a.name.localeCompare(b.name),
           );
+
+        // TIES SHARE A POSITION AND THE NEXT POSITION SKIPS (§S2.7): two 76s
+        // are both 2nd and the next is 4th, as a real board does it.
+        let lastGross: number | null | undefined;
+        let lastPos = 0;
+        sorted.forEach((p, idx) => {
+          if (idx > 0 && p.gross != null && p.gross === lastGross) {
+            p.position = lastPos;
+          } else {
+            p.position = idx + 1;
+            lastPos = p.position;
+          }
+          lastGross = p.gross;
+        });
+
+        row.players = sorted;
       }
 
       return base satisfies MostPlayedRow[];

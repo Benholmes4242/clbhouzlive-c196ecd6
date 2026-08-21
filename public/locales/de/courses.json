@@ -1112,6 +1112,10 @@
     "mostPlayedMembers_other": "{{count}} Mitglieder",
     "mostPlayedSheetCaption_other": "{{count}} Plätze",
     "mostPlayed": "Diese Woche am meisten gespielt",
+    "whereTheyPlayed": "Wo diese Woche gespielt wurde",
+    "mostPlayedRoundCount": "{{count}} Runde",
+    "mostPlayedRoundCount_other": "{{count}} Runden",
+    "mostPlayedPlayedToLabel": "Gespielt zu",
     "mostPlayedAvgToPar": "Gespielt zu {{value}}",
     "mostPlayedNew": "Neu",
     "mostPlayedLevel": "Unverändert",
@@ -1172,7 +1176,8 @@
         "played": "Diese Woche keine Runden auf deinen Plätzen.",
         "worldwide": "Diese Woche keine Runden."
       }
-    }
+    },
+    "mostPlayedSeeAllAtCourse": "Alle auf diesem Platz ansehen"
   },
   "statBrowse": {
     "colArea": "Gebiet",
