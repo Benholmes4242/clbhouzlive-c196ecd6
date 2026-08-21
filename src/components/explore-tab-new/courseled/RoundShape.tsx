@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
@@ -510,8 +510,8 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
 
 /** THE DOUBLE RING IS A BOX-SHADOW (§S4.3): it paints outside the border box
  *  without occupying layout, so a double never shifts its neighbours. */
-function markerStyle(m: Marker | null): React.CSSProperties {
-  const base: React.CSSProperties = {
+function markerStyle(m: Marker | null): CSSProperties {
+  const base: CSSProperties = {
     width: CELL,
     height: CELL,
     display: 'flex',
