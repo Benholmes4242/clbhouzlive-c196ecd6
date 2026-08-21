@@ -436,6 +436,309 @@ export function HeroBoardSection({
       )}
 
       {shape.usable && shapeOpen && <CourseShapePanel rows={shape.rows} />}
+
+      {/* ===================== OUR PICKS (§2, §3) =====================
+          A second disclosure row, DIRECTLY BELOW COURSE SHAPE, copied from the
+          course-shape control above so the two cannot drift. The label is "OUR
+          PICKS", never "OUR AI PICKS": isAIPowered can be FALSE, so a fixed AI
+          label would be untrue on those tournaments. The AI claim lives on the
+          provenance line inside the open panel, next to a confidence figure.
+          NO AMBER anywhere here — amber is the viewing member, and the pick
+          mark is the shipped ClbhouzPickMark, not a coloured glyph. */}
+      {closedFigure && (
+        <button
+          type="button"
+          onClick={() => setPicksOpen((v) => !v)}
+          aria-expanded={picksOpen}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
+            width: '100%',
+            padding: '10px 16px',
+            background: 'transparent',
+            border: 'none',
+            borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
+            fontFamily: FONT,
+            cursor: 'pointer',
+          }}
+          className="active:bg-white/[0.06] transition-colors"
+        >
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: '0.16em',
+              color: WHITE_ALPHA_65,
+              textTransform: 'uppercase',
+              flexShrink: 0,
+            }}
+          >
+            {t('overview.onTheCourse.ourPicksLabel')}
+          </span>
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              minWidth: 0,
+              marginLeft: 'auto',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: '#FFFFFF',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {closedFigure.name}
+            </span>
+            {closedFigure.right && (
+              <span style={{ fontSize: 10.5, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>
+                {closedFigure.right}
+              </span>
+            )}
+            {closedFigure.figure && (
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: closedFigure.figureColor,
+                  ...FIGS,
+                }}
+              >
+                {closedFigure.figure}
+              </span>
+            )}
+          </span>
+          <ChevronDown
+            size={14}
+            color="#FFFFFF"
+            strokeWidth={2.5}
+            style={{ transform: picksOpen ? 'rotate(180deg)' : 'none', transition: 'transform 160ms ease' }}
+          />
+        </button>
+      )}
+
+      {closedFigure && picksOpen && (
+        <PicksPanel
+          picks={picks}
+          phase={phase}
+          boardByPlayer={boardByPlayer}
+          predictions={predictions ?? null}
+          onFullPicks={onFullPicks}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Surname only — the closed row and the panel figures both read this way. */
+function surnameOf(full: string | null | undefined): string {
+  const s = (full ?? '').trim();
+  if (!s) return '';
+  const parts = s.split(/\s+/);
+  return parts[parts.length - 1];
+}
+
+/**
+ * §3 — THE OPEN PANEL. THREE pick rows, an optional editorial line above them,
+ * a provenance line GATED ON isAIPowered, then the mandatory route out. FIXED
+ * height content: exactly three rows, never internally scrollable.
+ */
+function PicksPanel({
+  picks,
+  phase,
+  boardByPlayer,
+  predictions,
+  onFullPicks,
+}: {
+  picks: AITopContender[];
+  phase: 'live' | 'upcoming' | 'completed';
+  boardByPlayer: Map<string, { position: number | null; tied: boolean; score: number | null }>;
+  predictions: { isAIPowered?: boolean; isStale?: boolean; confidence?: number; editorialFraming?: string | null } | null;
+  onFullPicks?: () => void;
+}) {
+  const { t } = useTranslation('tourhub');
+  const rows = picks.slice(0, 3);
+
+  return (
+    <div style={{ background: HERO_BOARD_SURFACE_SOFT, borderTop: `0.5px solid ${WHITE_ALPHA_12}` }}>
+      {/* Editorial framing when populated — and NO empty row when it is not. */}
+      {predictions?.editorialFraming ? (
+        <div
+          style={{
+            padding: '10px 16px 0',
+            fontSize: 11,
+            fontWeight: 500,
+            lineHeight: 1.35,
+            color: WHITE_ALPHA_65,
+          }}
+        >
+          {predictions.editorialFraming}
+        </div>
+      ) : null}
+
+      <div style={{ padding: '10px 16px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {rows.map((p, i) => {
+          const line = boardByPlayer.get(String(p.playerId));
+          const live = phase === 'live' && line && line.position != null;
+          const figure = live
+            ? (line!.score == null ? null : formatToPar(line!.score))
+            : p.winProbability != null
+              ? `${Math.round(p.winProbability)}%`
+              : null;
+          const figureColor = live ? tourFigColor(line!.score) : '#FFFFFF';
+          const pull = p.pulledQuote || p.reasons?.[0] || null;
+
+          return (
+            <div key={p.playerId || i} style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+              <span
+                style={{
+                  width: 12,
+                  flexShrink: 0,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: WHITE_ALPHA_65,
+                  ...FIGS,
+                }}
+              >
+                {p.rank ?? i + 1}
+              </span>
+              {p.photoUrl ? (
+                <img
+                  src={p.photoUrl}
+                  alt=""
+                  width={22}
+                  height={22}
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: '34%',
+                    objectFit: 'cover',
+                    flexShrink: 0,
+                    background: HERO_BOARD_SURFACE,
+                  }}
+                />
+              ) : (
+                <span
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: '34%',
+                    flexShrink: 0,
+                    background: HERO_BOARD_SURFACE,
+                  }}
+                />
+              )}
+              <span style={{ minWidth: 0, flex: 1 }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: '#FFFFFF',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {p.playerName}
+                  </span>
+                  <ClbhouzPickMark size={10} label={t('overview.onTheCourse.ourPicksLabel')} />
+                  {live && (
+                    <span style={{ fontSize: 10, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>
+                      {`${line!.tied ? 'T' : ''}${line!.position}`}
+                    </span>
+                  )}
+                </span>
+                {pull && (
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: 10.5,
+                      fontWeight: 500,
+                      color: WHITE_ALPHA_65,
+                      marginTop: 1,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {pull}
+                  </span>
+                )}
+              </span>
+              {figure && (
+                <span style={{ flexShrink: 0, fontSize: 12.5, fontWeight: 700, color: figureColor, ...FIGS }}>
+                  {figure}
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* PROVENANCE — here, not in the label, and only when the payload really
+          is AI-powered. Staleness rides the same line. */}
+      {predictions?.isAIPowered && (
+        <div
+          style={{
+            padding: '10px 16px 0',
+            fontSize: 9,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: WHITE_ALPHA_65,
+          }}
+        >
+          {t('overview.onTheCourse.ourPicksProvenance', {
+            confidence: Math.round((predictions.confidence ?? 0) * 100),
+          })}
+          {predictions.isStale ? ` · ${t('overview.onTheCourse.ourPicksStale')}` : ''}
+        </div>
+      )}
+
+      {/* THE ROUTE OUT IS MANDATORY (§3) — the section header's chevron
+          destination survives the merge as the panel's last row. */}
+      <button
+        type="button"
+        onClick={onFullPicks}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          marginTop: 10,
+          padding: '10px 16px',
+          background: 'transparent',
+          border: 'none',
+          borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
+          fontFamily: FONT,
+          cursor: 'pointer',
+        }}
+        className="active:bg-white/[0.06] transition-colors"
+      >
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            color: WHITE_ALPHA_65,
+            textTransform: 'uppercase',
+          }}
+        >
+          {t('overview.onTheCourse.ourPicksAll')}
+        </span>
+        <ChevronRight size={14} color="#FFFFFF" strokeWidth={2.5} />
+      </button>
     </div>
   );
 }
