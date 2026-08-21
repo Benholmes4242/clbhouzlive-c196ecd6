@@ -640,26 +640,22 @@ function PicksPanel({
               >
                 {p.rank ?? i + 1}
               </span>
-              {/* photoUrl is already enriched from sr_players (useAIPredictions
-                  :203-220); the silhouette is the shipped fallback so a pick
-                  with no headshot is a figure, not an empty hole. */}
-              <img
-                src={p.photoUrl || PLAYER_SILHOUETTE_URL}
-                alt=""
-                width={22}
-                height={22}
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = PLAYER_SILHOUETTE_URL;
-                }}
-                style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: '34%',
-                  objectFit: 'cover',
-                  flexShrink: 0,
-                  background: HERO_BOARD_SURFACE,
-                }}
-              />
+              {/* §CHANGE 2 — THE SAME RESOLVER THE REST OF TOUR HUB USES.
+                  AITopContender.photoUrl comes from sr_players.photo_url only,
+                  which is null for most players, so this row rendered
+                  silhouettes beside a carousel showing real faces for the same
+                  three players. PlayerAvatar wraps getPlayerHeadshotCandidates
+                  and walks the folder chain itself — no third resolver, no new
+                  query. photoUrl is still passed: it is tried FIRST when present. */}
+              <span style={{ flexShrink: 0, display: 'inline-flex' }}>
+                <PlayerAvatar
+                  playerId={String(p.playerId ?? '')}
+                  playerName={p.playerName}
+                  tourCode={tourCode}
+                  photoUrl={p.photoUrl ?? null}
+                  size="xs"
+                />
+              </span>
               <span style={{ minWidth: 0, flex: 1 }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
                   <span
