@@ -916,6 +916,8 @@ function GolfThisWeekCard({
             style={{
               height: GRID_H,
               marginTop: 7,
+              paddingBottom: 4,
+              boxSizing: 'border-box',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
