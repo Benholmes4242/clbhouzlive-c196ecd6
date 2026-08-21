@@ -162,10 +162,11 @@ const CARD_MIN_H = 331;
 /** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
 
-/** THE INDEX MOVEMENT IN THE DATA REGION IS LITERAL (§S3.2): a fall is good, a
- *  rise is not, and the ARROW is what separates it from the to-par beside it. */
-const INDEX_FELL = '#1B7F4B';
-const INDEX_ROSE = '#C8102E';
+/* THE LIGHT-SURFACE INDEX MOVEMENT PAIR IS GONE FROM THIS FILE
+   (BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §5.3): the only movement figure on this
+   surface is the member row's, it now sits on the dark hero, and an index
+   movement is not a to-par score — so it is white-at-alpha and the TRIANGLE
+   carries the direction. */
 
 /* ===================== THE MEMBER ROW ON DARK (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §2,
    RECOLOURED BY BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §5.3)
