@@ -109,20 +109,20 @@ describe('mention inside a reply', () => {
   });
 
   it('navigates from a reply rendered THROUGH CommentCard, the sheet path', () => {
-    const parent: CommentV2 = {
+    const parent = {
       ...base,
       id: 'c1',
       parent_id: null,
       content: 'Any trades?',
       reply_count: 1,
-    } as CommentV2;
+      replies: [base],
+    } as unknown as CommentV2;
     const onClose = vi.fn();
     wrap(
       <CommentCard
         comment={parent}
         isFirst
         currentUserId="me"
-        replies={[base]}
         onReply={() => {}}
         onLike={() => {}}
         onMore={() => {}}
@@ -133,4 +133,5 @@ describe('mention inside a reply', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('path').textContent).toBe(`/profile/${DANNY}`);
   });
+
 });
