@@ -70,31 +70,35 @@ import { A, CARD_SHELL, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
 
 
 /* =============================================================================
-   THE TILE'S GEOMETRY (BRIEF_ROUND_TILE_THE_MOMENT §S4.1).
+   THE TILE'S GEOMETRY (BRIEF_ROUND_TILE_THE_MOMENT v2).
 
-   THE TILE IS A HERO, A ROW AND A WELL: hero 178 / member row with the score /
-   the well, whose CHART REGION IS A FIXED HEIGHT whatever chart it holds. That
-   fixed region is the whole reason the rail stays uniform while its CONTENTS
-   differ (§S2.2, ACCEPTANCE G) — do not let a chart size the well.
+   THE TILE IS A HERO, A MEMBER ROW AND A SCORECARD WELL: gradient hero 156 /
+   member row with the score / a tinted well holding TWO ROWS OF NINE.
 
-   THE PHOTOGRAPH IS GONE (§S4.6). PHOTO_H, SHAPE_H, the scrim and the glass chip
-   tokens went with it; the hero gradient carries the top of the card now. */
+   ONE CHART ONLY — THE SCORECARD (§S0.3). The trajectory variant was designed
+   and CUT: two chart types meant two heights, two sets of axis rules and a
+   selector deciding presentation as well as content. The hero already says what
+   to look for, so the card simply shows it.
+
+   THE PHOTOGRAPH IS GONE (§S0.4). PHOTO_H, the scrim and the glass chip tokens
+   went with it; the hero gradient carries the top of the card. */
 
 const CARD_W = 256;
 
-/** §S4.1 — the hero. */
-const HERO_H = 178;
+/** §S2.1 — the gradient hero. */
+const HERO_H = 156;
 
-/* THE CHART REGION. 88px is what the two nines of the mini scorecard need at the
-   settled 17px cell / 9px gap geometry (two headers, two hole-number rows, two
-   marker rows and the 4px gap between the nines). THE STRIP AND THE CURVE TAKE
-   THE SAME 88 — a rail whose frames differ reads as broken. */
-const CHART_H = 88;
+/* THE GRID REGION. 88px is what two nines need at the settled 17px cell / 9px
+   gap geometry (two nine-headers, two hole-number rows, two marker rows and the
+   4px gap between the nines). IT IS FIXED, so every well is the same height even
+   when a round has no hole data and the well is empty (§S1.7, ACCEPTANCE K). */
+const GRID_H = 88;
 
-/* NO TINT IN THE WELL. WELL stays as the colour the marker outer rings trace
-   against, and that colour is the card itself, so a double's ring reads as a gap
-   rather than a grey halo. */
-const WELL = '#FFFFFF';
+/* §S4.1 — A TINTED WELL, NO BORDER. The tone separates it from the card and an
+   outline would be a second signal for one edge. The marker outer rings trace
+   against THIS colour (§S4.7), never white — a white ring on a tinted well
+   haloes. */
+const WELL = '#F2F5F8';
 const WELL_RADIUS = 12;
 /* 6, not 10 — see WELL_INNER. */
 const WELL_PAD_X = 6;
@@ -107,6 +111,8 @@ const WELL_RULE = 'rgba(11,15,20,0.07)';
    10 the inner width falls to 236 and a leading double box sits 2.7px from the
    well edge, which is the clipping fault that geometry exists to fix. */
 const WELL_INNER = CARD_W - WELL_PAD_X * 2;
+/* Recorded so a future reader does not have to re-derive it. */
+void WELL_INNER;
 
 /* THE INK DOES THE HIERARCHY. One genuinely dark ink and greys that are clearly
    different from each other, not four middling greys. */
@@ -114,14 +120,11 @@ const INK = '#0B0F14';   // scores and totals
 const MID = '#5A6673';   // secondary text
 const HAIRLINE_INK = 'rgba(11,15,20,0.12)';
 
-/* THREE CLEARLY DIFFERENT GREYS FOR THE BAND (§S4.2). A.FAINT and A.GHOST do
-   not exist on the shared ramp, so the band names them here against the same
-   ink: MUTE for the course, FAINT for the label and the unit, GHOST quieter
-   still. Four middling greys is what made the old tile look soft. */
+/* THREE CLEARLY DIFFERENT GREYS FOR THE BAND (§S4.2 of the band brief). A.FAINT
+   and A.GHOST do not exist on the shared ramp, so the band names them here
+   against the same ink. THE BAND TILES ARE NOT TOUCHED BY THIS BRIEF. */
 const BAND_MUTE = MID;
 const BAND_FAINT = '#8A929C';
-/* GHOST (#AEB6BF) is the fourth step of the ramp; nothing on the band is quiet
-   enough to need it, so it is recorded here rather than declared unused. */
 
 
 
@@ -129,11 +132,13 @@ const BAND_FAINT = '#8A929C';
 const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 
 /**
- * TILE HEIGHT. hero 178 + 8 pad + 20 member row + 8 + well header 14 + 7 + 88
- * chart + 10 pad = 333. EVERY TREATMENT LANDS ON IT because the chart region is
- * fixed, including a round with NO HOLE DATA, whose well is simply empty (§S1.5).
+ * TILE HEIGHT. hero 156 + 8 pad + 20 member row + 8 + well (6 header + 6 +
+ * 1 rule + 7 + 88 grid + 8 pad = 116) + 10 pad = 318. EVERY KIND LANDS ON IT
+ * because the grid region is fixed, INCLUDING a round with NO HOLE DATA, whose
+ * well is simply empty (§S1.7, ACCEPTANCE Q).
  */
-const CARD_MIN_H = 333;
+const WELL_H = 116;
+const CARD_MIN_H = 318;
 
 /** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
@@ -142,6 +147,7 @@ const AMBER = '#F7931E';
  *  rise is not, and the ARROW is what separates it from the to-par beside it. */
 const INDEX_FELL = '#1B7F4B';
 const INDEX_ROSE = '#C8102E';
+
 
 
 
