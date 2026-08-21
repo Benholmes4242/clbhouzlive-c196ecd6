@@ -1073,7 +1073,11 @@ function GolfThisWeekCard({
             (ACCEPTANCE K, Q). */}
         <div
           style={{
-            marginTop: 8,
+            /* THE WELL'S 8px OFFSET MOVED UP INTO THE DARK REGION'S BOTTOM
+               PADDING (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §1) — the row's 8/8
+               now sits inside the dark block, so keeping a margin here as well would
+               add 8px to the tile. The total height is unchanged. */
+            marginTop: 0,
             marginLeft: -10,
             marginRight: -10,
             marginBottom: 0,
