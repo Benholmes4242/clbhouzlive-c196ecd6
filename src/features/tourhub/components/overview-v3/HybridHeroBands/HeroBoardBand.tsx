@@ -43,6 +43,7 @@ import { ChevronRight, ChevronDown } from 'lucide-react';
 
 import { FONT, HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
+import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { ClbhouzPickMark } from '../../../_shared/ClbhouzPickMark';
 import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
 import { CourseShapePanel, useCourseShapeRows } from './CourseShapePanel';
@@ -612,32 +613,26 @@ function PicksPanel({
               >
                 {p.rank ?? i + 1}
               </span>
-              {p.photoUrl ? (
-                <img
-                  src={p.photoUrl}
-                  alt=""
-                  width={22}
-                  height={22}
-                  style={{
-                    width: 22,
-                    height: 22,
-                    borderRadius: '34%',
-                    objectFit: 'cover',
-                    flexShrink: 0,
-                    background: HERO_BOARD_SURFACE,
-                  }}
-                />
-              ) : (
-                <span
-                  style={{
-                    width: 22,
-                    height: 22,
-                    borderRadius: '34%',
-                    flexShrink: 0,
-                    background: HERO_BOARD_SURFACE,
-                  }}
-                />
-              )}
+              {/* photoUrl is already enriched from sr_players (useAIPredictions
+                  :203-220); the silhouette is the shipped fallback so a pick
+                  with no headshot is a figure, not an empty hole. */}
+              <img
+                src={p.photoUrl || PLAYER_SILHOUETTE_URL}
+                alt=""
+                width={22}
+                height={22}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = PLAYER_SILHOUETTE_URL;
+                }}
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: '34%',
+                  objectFit: 'cover',
+                  flexShrink: 0,
+                  background: HERO_BOARD_SURFACE,
+                }}
+              />
               <span style={{ minWidth: 0, flex: 1 }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
                   <span
