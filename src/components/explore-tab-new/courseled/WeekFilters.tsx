@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { MapPin } from 'lucide-react';
+import { ChevronDown, MapPin } from 'lucide-react';
 
 import {
   Select,
