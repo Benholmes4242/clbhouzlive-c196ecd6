@@ -1123,7 +1123,52 @@
     "golfThisWeek": {
       "stablefordLabel": "Bestes Stableford",
       "birdiesLabel": "Meiste Birdies",
-      "stablefordUnit": "Punkte"
+      "stablefordUnit": "Punkte",
+      "moment": {
+        "fullScorecard": "Ganze Scorekarte",
+        "chart": {
+          "strip": "Jedes Loch",
+          "trajectory": "Die Runde",
+          "lastSix": "Loch 13–18",
+          "scorecard": "Die Karte"
+        },
+        "eagle": {
+          "meta": "Loch",
+          "ace": "Ace",
+          "albatross": "Albatross",
+          "eagle": "Eagle",
+          "sub": "Der Schlag der Runde",
+          "sentence": "{{0}} an Loch {{1}}, einem Par {{2}}."
+        },
+        "run": {
+          "meta": "Löcher",
+          "word": "Die Serie",
+          "sub": "Par oder besser, in Folge",
+          "sentence": "{{0}} Löcher in Folge mit Par oder besser, von {{1}} bis {{2}}."
+        },
+        "collapse": {
+          "meta": "Loch",
+          "word": "Loch {{0}}",
+          "sub": "Hier kippte die Runde",
+          "sentence": "{{0}} Schläge verloren an Loch {{1}}; die übrigen Löcher ergaben {{2}}."
+        },
+        "finish": {
+          "meta": "Birdies",
+          "word": "Das Finish",
+          "sub": "Die letzten drei",
+          "sentence": "{{0}} Birdies auf den letzten drei Löchern, Abschluss bei {{1}}."
+        },
+        "grind": {
+          "meta": "Löcher",
+          "word": "Die Arbeitsrunde",
+          "sub": "Par oder besser",
+          "sentenceClean": "{{0}} von {{1}} Löchern mit Par oder besser, ohne Birdie und ohne Doppelbogey.",
+          "sentenceNoDoubles": "{{0}} von {{1}} Löchern mit Par oder besser, und kein Doppelbogey.",
+          "sentenceNoBirdies": "{{0}} von {{1}} Löchern mit Par oder besser, ohne Birdie.",
+          "sentencePlain": "{{0}} von {{1}} Löchern mit Par oder besser.",
+          "sentenceNoHoles": "Eine gespielte Runde. Die Details pro Loch wurden nicht erfasst."
+        }
+      }
     },
     "week": {
       "scopeAria": "Runden-Bereich",

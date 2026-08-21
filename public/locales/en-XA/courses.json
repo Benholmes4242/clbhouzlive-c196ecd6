@@ -1550,7 +1550,52 @@
     "golfThisWeek": {
       "stablefordLabel": "[Bèst stàblefôrd]",
       "birdiesLabel": "[Mòst bìrdiés]",
-      "stablefordUnit": "[pôints]"
+      "stablefordUnit": "[pôints]",
+      "moment": {
+        "fullScorecard": "[Fùll scôrècàrd]",
+        "chart": {
+          "strip": "[Èvèry hôlè]",
+          "trajectory": "[Thè rôùnd]",
+          "lastSix": "[Hôlès 13–18]",
+          "scorecard": "[Thè càrd]"
+        },
+        "eagle": {
+          "meta": "[Hôlè]",
+          "ace": "[Àcè]",
+          "albatross": "[Àlbàtrôss]",
+          "eagle": "[Èàglè]",
+          "sub": "[Thè shôt ôf thè rôùnd]",
+          "sentence": "[{{0}} ôn hôlè {{1}}, à pàr {{2}}.]"
+        },
+        "run": {
+          "meta": "[Hôlès]",
+          "word": "[Thè rùn]",
+          "sub": "[Pàr ôr bèttèr, bàck tô bàck]",
+          "sentence": "[{{0}} hôlès ìn à rôw àt pàr ôr bèttèr, frôm {{1}} tô {{2}}.]"
+        },
+        "collapse": {
+          "meta": "[Hôlè]",
+          "word": "[Hôlè {{0}}]",
+          "sub": "[Whèrè thè rôùnd tùrnèd]",
+          "sentence": "[{{0}} shôts drôppèd ôn hôlè {{1}}; thè ôthèr hôlès càmè tô {{2}}.]"
+        },
+        "finish": {
+          "meta": "[Bìrdìès]",
+          "word": "[Thè fìnìsh]",
+          "sub": "[Thè clôsìng thrèè]",
+          "sentence": "[{{0}} bìrdìès ìn thè làst thrèè hôlès tô fìnìsh ôn {{1}}.]"
+        },
+        "grind": {
+          "meta": "[Hôlès]",
+          "word": "[Thè grìnd]",
+          "sub": "[Pàr ôr bèttèr]",
+          "sentenceClean": "[{{0}} ôf {{1}} hôlès àt pàr ôr bèttèr, wìth nô bìrdìès ànd nô dôùblès.]",
+          "sentenceNoDoubles": "[{{0}} ôf {{1}} hôlès àt pàr ôr bèttèr, ànd nôt à dôùblè àll dày.]",
+          "sentenceNoBirdies": "[{{0}} ôf {{1}} hôlès àt pàr ôr bèttèr, wìth nô bìrdìès.]",
+          "sentencePlain": "[{{0}} ôf {{1}} hôlès àt pàr ôr bèttèr.]",
+          "sentenceNoHoles": "[À rôùnd plàyèd. Thè hôlè by hôlè dètàìl wàs nôt rècôrdèd.]"
+        }
+      }
     },
     "week": {
       "scopeAria": "Rounds scope",

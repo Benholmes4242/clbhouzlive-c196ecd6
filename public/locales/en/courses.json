@@ -1568,7 +1568,52 @@
       "unknownCourse": "A course",
       "stablefordLabel": "Best stableford",
       "birdiesLabel": "Most birdies",
-      "stablefordUnit": "points"
+      "stablefordUnit": "points",
+      "moment": {
+        "fullScorecard": "Full scorecard",
+        "chart": {
+          "strip": "Every hole",
+          "trajectory": "The round",
+          "lastSix": "Holes 13–18",
+          "scorecard": "The card"
+        },
+        "eagle": {
+          "meta": "Hole",
+          "ace": "Ace",
+          "albatross": "Albatross",
+          "eagle": "Eagle",
+          "sub": "The shot of the round",
+          "sentence": "{{0}} on hole {{1}}, a par {{2}}."
+        },
+        "run": {
+          "meta": "Holes",
+          "word": "The run",
+          "sub": "Par or better, back to back",
+          "sentence": "{{0}} holes in a row at par or better, from {{1}} to {{2}}."
+        },
+        "collapse": {
+          "meta": "Hole",
+          "word": "Hole {{0}}",
+          "sub": "Where the round turned",
+          "sentence": "{{0}} shots dropped on hole {{1}}; the other holes came to {{2}}."
+        },
+        "finish": {
+          "meta": "Birdies",
+          "word": "The finish",
+          "sub": "The closing three",
+          "sentence": "{{0}} birdies in the last three holes to finish on {{1}}."
+        },
+        "grind": {
+          "meta": "Holes",
+          "word": "The grind",
+          "sub": "Par or better",
+          "sentenceClean": "{{0}} of {{1}} holes at par or better, with no birdies and no doubles.",
+          "sentenceNoDoubles": "{{0}} of {{1}} holes at par or better, and not a double all day.",
+          "sentenceNoBirdies": "{{0}} of {{1}} holes at par or better, with no birdies.",
+          "sentencePlain": "{{0}} of {{1}} holes at par or better.",
+          "sentenceNoHoles": "A round played. The hole by hole detail was not recorded."
+        }
+      }
     },
     "week": {
       "scopeAria": "Rounds scope",
