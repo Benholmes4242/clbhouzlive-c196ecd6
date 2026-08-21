@@ -152,8 +152,6 @@ interface HeroBoardSectionProps {
   phase: 'live' | 'upcoming' | 'completed';
   onFullLeaderboard: () => void;
   onRowTap?: (playerId: string) => void;
-  /** §3 — the mandatory route out of the open picks panel. */
-  onFullPicks?: () => void;
 }
 
 export function HeroBoardSection({
@@ -163,7 +161,6 @@ export function HeroBoardSection({
   phase,
   onFullLeaderboard,
   onRowTap,
-  onFullPicks,
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
   const [shapeOpen, setShapeOpen] = useState(false);
