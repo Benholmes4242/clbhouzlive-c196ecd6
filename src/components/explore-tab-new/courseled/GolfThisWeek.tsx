@@ -13,13 +13,14 @@ import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { TOPAR_UNDER_DARK, TOPAR_OVER_DARK } from '@/features/tourhub/_shared/tokens';
-import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
+import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
 import {
+  COURSE_GRADIENT,
+  COURSE_SCRIMS,
   HERO_TOP_SCRIM,
   HERO_BOTTOM_SCRIM,
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
@@ -45,7 +46,6 @@ import { MiniScorecard } from './RoundShape';
 import {
   selectMoment,
   type Moment,
-  type MomentKind,
 } from './roundMoment';
 
 import { GolfThisWeekRail as GolfThisWeekShell } from './DiscoverCourseLedSkeleton';
@@ -55,6 +55,19 @@ import { A, CARD_SHELL, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
 /**
  * GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK). Replaces Around the world (standout
  * feats) and Personal bests, both deleted.
+ *
+ * THE HERO'S COLOUR LAW (BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §0, from PhotoBand
+ * itself): ON THIS HERO, EVERY VALUE IS WHITE OR WHITE-AT-ALPHA. THE ONLY
+ * EXCEPTION IS A SCORE, WHICH TAKES THE CANONICAL TO-PAR GRAMMAR ON DARK
+ * (getScoreColor(delta, 'dark', 'standard') — never a hand-picked hex).
+ * ONE DELIBERATE DIVERGENCE: AMBER, and only as the viewing member's marker.
+ *
+ * WHAT THAT COSTS, ON PURPOSE: the seven moments are now distinguished ONLY BY
+ * THEIR WORDS. MOMENT_TONE survives in exactly one place — the tinted band
+ * behind marked holes in the WELL. Do NOT reintroduce a coloured eyebrow, a
+ * tinted corner, an accent rule, a left border or a per-kind gradient to tell
+ * them apart. If the moments need distinguishing again that is Ben's decision,
+ * not a forgotten detail.
  *
  * EVERY ROUND GETS A CARD. There is no feat threshold anywhere in this file:
  * the interest comes from the COURSE (the variable — a member following four
@@ -149,29 +162,27 @@ const CARD_MIN_H = 331;
 /** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
 
-/** THE INDEX MOVEMENT IN THE DATA REGION IS LITERAL (§S3.2): a fall is good, a
- *  rise is not, and the ARROW is what separates it from the to-par beside it. */
-const INDEX_FELL = '#1B7F4B';
-const INDEX_ROSE = '#C8102E';
+/* THE LIGHT-SURFACE INDEX MOVEMENT PAIR IS GONE FROM THIS FILE
+   (BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §5.3): the only movement figure on this
+   surface is the member row's, it now sits on the dark hero, and an index
+   movement is not a to-par score — so it is white-at-alpha and the TRIANGLE
+   carries the direction. */
 
-/* ===================== THE MEMBER ROW ON DARK (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §2)
-   The row now sits INSIDE the dark region, over a scrimmed photograph, so every
-   colour it carries needs its dark counterpart. EVERY VALUE BELOW IS AN EXISTING
-   APP TOKEN — nothing is invented here, and the light values above stay put
-   because the band tiles and the well still use them.
-   AMBER is deliberately absent: #F7931E holds on dark and means the same thing,
-   so the self marker is unchanged (§2.1, ACCEPTANCE D). */
+/* ===================== THE MEMBER ROW ON DARK (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §2,
+   RECOLOURED BY BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §5.3)
+   The row sits INSIDE the dark region, over the tour's gradient and scrims, so
+   it obeys the hero's colour law: WHITE OR WHITE-AT-ALPHA, and a SCORE takes the
+   canonical to-par grammar on dark. The light values above stay put because the
+   band tiles and the well still use them. */
 /** Names and grosses: the hero's own white, so one white runs down the block. */
 const ROW_DARK_INK = 'rgba(255,255,255,0.94)';
-/** Under par on dark. TOPAR_RED (#C8102E) is the light-surface red and goes
-    muddy on a photograph; this is the app's single dark under-par red. */
-const ROW_DARK_TOPAR_UNDER = TOPAR_UNDER_DARK;
-/** Over/level par on dark: a white at reduced alpha, never a grey. */
-const ROW_DARK_TOPAR_OVER = TOPAR_OVER_DARK;
-/** MOVEMENT, not a score: the shared INDEX_DELTA token's DARK pair. The
-    direction rule is untouched — a falling index is green, a rising one red. */
-const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
-const ROW_DARK_INDEX_ROSE = INDEX_DELTA.dark.drifted;
+/** Over/level par, and INDEX MOVEMENT. An index movement is NOT a to-par score,
+    so it gets no colour at all: the TRIANGLE, which still points down on a
+    falling index, is what carries the direction. PhotoBand's own quiet value. */
+const ROW_DARK_QUIET = 'rgba(255,255,255,0.62)';
+/** UNDER PAR RESOLVES THROUGH getScoreColor — no hand-picked hex. TOPAR_RED
+    (#C8102E) is the LIGHT-surface red and goes muddy on a scrimmed photograph. */
+const ROW_DARK_TOPAR_UNDER = getScoreColor(-1, 'dark', 'standard');
 
 
 
@@ -467,35 +478,22 @@ function FollowButton({
  */
 const FIGURE_PLACEHOLDER = '{n}';
 
-/** §S2.1 — the hero gradient, no photograph. */
-const HERO_BASE = 'linear-gradient(170deg, #2E3A32 0%, #181F1B 60%, #0D110E 100%)';
-
 /**
- * §S2.2 — THE GLOW is a radial wash of the moment's tone at 15%, top right.
- * A PLAIN ROUND'S GLOW IS WHITE AT 13%. THAT IS THE WHOLE HIERARCHY: colour
- * means something happened, white means a round was played. Same shape, same
- * weight, different temperature — so a plain round still holds its own in the
- * rail without claiming to be a story.
- */
-function heroBackground(kind: MomentKind, tone: string) {
-  const alpha = kind === 'plain' ? '21' /* 13% */ : '26' /* 15% */;
-  return `radial-gradient(118% 88% at 86% 4%, ${tone}${alpha} 0%, rgba(0,0,0,0) 64%), ${HERO_BASE}`;
-}
-
-/**
- * BRIEF_ROUND_TILE_COURSE_PHOTO — the course thumbnail sits BEHIND the hero as
- * atmosphere. The recipe is the shipped Tour Overview hero's
- * (HERO_TOP_SCRIM / HERO_BOTTOM_SCRIM), but the GEOMETRY is scaled: those are
- * tuned at 80px / 260px against a ~380px hero, and on a 156px tile a 260px
- * bottom scrim would blacken the whole photograph.
+ * BRIEF_ROUND_TILE_COURSE_PHOTO + BRIEF_ROUND_TILE_HERO_TOUR_COLOUR — the course
+ * thumbnail sits BEHIND the hero as atmosphere, and the whole recipe is now the
+ * Tour Overview hero's, imported unmodified: COURSE_GRADIENT as the base,
+ * COURSE_SCRIMS, HERO_BOTTOM_SCRIM, HERO_TOP_SCRIM.
  *
- * COURSE_SCRIMS' green radial at 30% 20% is DROPPED: two radials in a 156px box
- * compete, and the moment glow — the thing that names the card — must win.
- * A flat veil replaces its darkening half so a blown-out sky cannot reach the
- * course name.
+ * ONLY THE GEOMETRY IS SCALED. The tour's stops are tuned at 80px / 260px
+ * against a ~380px hero; on a 156px tile a 260px bottom scrim would blacken the
+ * whole photograph. The same stops at tile scale is what "match" means here.
  *
- * LAYER ORDER MATCHES PhotoBand: base gradient, image, veil, bottom scrim,
- * top scrim — then the moment glow above all of it.
+ * COURSE_SCRIMS' GREEN RADIAL IS BACK. It was dropped, and a flat veil put in
+ * its place, only because it competed with the moment glow. THE MOMENT GLOW IS
+ * GONE (§4), so that reason is gone with it and the veil is deleted.
+ *
+ * LAYER ORDER MATCHES PhotoBand: base gradient, image, COURSE_SCRIMS, bottom
+ * scrim, top scrim.
  */
 const PHOTO_TOP_SCRIM_H = 48;
 /* THE BOTTOM SCRIM IS ANCHORED TO THE BOTTOM OF THE DARK REGION, WHICH IS NOW
@@ -511,7 +509,6 @@ const PHOTO_TOP_SCRIM_H = 48;
    there is now ONE edge (region -> well) where there were TWO (hero -> white
    row, row -> well). */
 const PHOTO_BOTTOM_SCRIM_H = 159;
-const PHOTO_VEIL = 'rgba(10,14,10,0.26)';
 /** Photo only on the first N tiles: the rail renders every round (§4.2). */
 const PHOTO_TILE_LIMIT = 6;
 
@@ -624,7 +621,14 @@ function FigureLine({
     fontWeight: 800,
     lineHeight: 1,
     letterSpacing: '-0.06em',
-    color: moment.figureRole === 'score' ? moment.tone : '#FFFFFF',
+    /* §5.2 — THE RULE IS UNCHANGED, THE SOURCE OF THE COLOUR IS NOT: a
+       score-role figure resolves through getScoreColor, the same call PhotoBand
+       makes, and never through moment.tone. They may render the same red today;
+       only one of them is the to-par grammar. A QUANTITY stays white. */
+    color:
+      moment.figureRole === 'score' && moment.figure != null
+        ? getScoreColor(moment.figure, 'dark', 'standard')
+        : '#FFFFFF',
   };
 
   const wordStyle: React.CSSProperties = {
@@ -786,16 +790,20 @@ function GolfThisWeekCard({
              context; only applied when there IS an image so the no-image tile
              is byte-identical. */
           isolation: imageUrl ? 'isolate' : undefined,
-          /* NO IMAGE -> PIXEL-IDENTICAL TO BEFORE (§2.3): the same single
-             composed background, and not one extra layer. */
-          background: imageUrl ? HERO_BASE : heroBackground(moment.kind, moment.tone),
+          /* §2 — THE TOUR'S BASE. An imaged tile and a non-imaged tile now
+             differ only by the presence of the photograph, which is what the
+             tour does. */
+          background: COURSE_GRADIENT,
         }}
       >
-        {imageUrl && (
-          /* zIndex -1 keeps every layer ABOVE the element's own HERO_BASE
-             background and BELOW the in-flow content, so the content stack is
-             untouched. */
-          <>
+        {/* THE SCRIM STACK RENDERS WITH OR WITHOUT A PHOTOGRAPH (ACCEPTANCE A):
+            COURSE_GRADIENT is a bright green-to-sand, so the white content stack
+            needs the same scrims over the bare gradient that it needs over an
+            image. Only the <img> is conditional.
+            zIndex -1 keeps every layer ABOVE the element's own background and
+            BELOW the in-flow content, so the content stack is untouched. */}
+        <>
+          {imageUrl && (
             <img
               src={imageUrl}
               alt=""
@@ -812,9 +820,11 @@ function GolfThisWeekCard({
                 zIndex: -1,
               }}
             />
+          )}
+            {/* §3 — COURSE_SCRIMS, in PhotoBand's position in the stack. */}
             <div
               aria-hidden="true"
-              style={{ position: 'absolute', inset: 0, background: PHOTO_VEIL, zIndex: -1 }}
+              style={{ position: 'absolute', inset: 0, background: COURSE_SCRIMS, zIndex: -1 }}
             />
             <div
               aria-hidden="true"
@@ -840,18 +850,7 @@ function GolfThisWeekCard({
                 zIndex: -1,
               }}
             />
-            {/* THE MOMENT GLOW STILL WINS (§2.2) — same position, radius, tone. */}
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: heroBackground(moment.kind, moment.tone).split(`, ${HERO_BASE}`)[0],
-                zIndex: -1,
-              }}
-            />
-          </>
-        )}
+        </>
         {/* THE HERO'S OWN CONTENT BOX. HERO_H is unchanged (156) — §1 extends
             the dark REGION, not the hero's content box. */}
         <div
@@ -929,7 +928,10 @@ function GolfThisWeekCard({
               textTransform: 'uppercase',
               lineHeight: 1,
               marginBottom: 5,
-              color: moment.tone,
+              /* §5.1 — the moment eyebrow loses its tone: PhotoBand's own label
+                 white-at-alpha, not a new value. The moments are distinguished
+                 by their WORDS now. */
+              color: 'rgba(255,255,255,0.65)',
             }}
           >
             {label}
@@ -989,7 +991,12 @@ function GolfThisWeekCard({
               flex: '0 1 auto',
               fontSize: 12,
               fontWeight: 600,
-              /* §2.1 — AMBER unchanged, INK -> the region's white. */
+              /* AMBER IS THE ONE DELIBERATE DIVERGENCE FROM PhotoBand's
+                 "never amber" (§5.4). That rule governs a CTA, and a tour hero
+                 has no concept of "you"; amber means THE VIEWING MEMBER
+                 app-wide and this rail is substantially the member's own
+                 rounds. Do not remove it as an oversight, and do not copy it
+                 into the tour. Everything else here is white. */
               color: row.is_self ? AMBER : ROW_DARK_INK,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -1018,9 +1025,9 @@ function GolfThisWeekCard({
                   ...NUMF,
                   fontSize: 10.5,
                   lineHeight: 1,
-                  /* §2.3 — the dark under-par red, and a white at reduced
-                     alpha for over/level. Never TOPAR_RED, never a grey. */
-                  color: toParUnder ? ROW_DARK_TOPAR_UNDER : ROW_DARK_TOPAR_OVER,
+                  /* §5.3 — the canonical dark under-par red via getScoreColor,
+                     white-at-alpha for over/level. Never TOPAR_RED, never grey. */
+                  color: toParUnder ? ROW_DARK_TOPAR_UNDER : ROW_DARK_QUIET,
                 }}
               >
                 {toPar.text}
@@ -1030,7 +1037,8 @@ function GolfThisWeekCard({
               <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
                 <IndexMovementTriangle
                   direction={(delta as number) < 0 ? 'down' : 'up'}
-                  color={(delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE}
+                  /* §5.3 — the DIRECTION is unchanged; only the colour goes. */
+                  color={ROW_DARK_QUIET}
                   size={7}
                 />
                 <span
@@ -1038,8 +1046,7 @@ function GolfThisWeekCard({
                     ...NUMF,
                     fontSize: 10.5,
                     lineHeight: 1,
-                    /* §2.4 — INDEX_DELTA's DARK pair. Direction rule unchanged. */
-                    color: (delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE,
+                    color: ROW_DARK_QUIET,
                   }}
                 >
                   {Math.abs(delta as number).toFixed(1)}
