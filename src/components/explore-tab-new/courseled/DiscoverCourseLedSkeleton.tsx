@@ -248,17 +248,36 @@ export function GolfThisWeekRail() {
                     height: 88,
                     marginTop: 7,
                     display: 'flex',
-                    alignItems: 'flex-end',
-                    justifyContent: 'space-between',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    gap: 4,
                   }}
                 >
-                  {Array.from({ length: 18 }, (_, c) => (
-                    <Bar
-                      key={c}
-                      style={{ height: 22 + ((c * 7) % 34), width: 9, borderRadius: 2 }}
-                    />
+                  {/* TWO ROWS OF NINE at the live 17px cell / 9px gap. */}
+                  {[0, 1].map((nine) => (
+                    <div key={nine}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          marginBottom: 4,
+                        }}
+                      >
+                        <Bar style={{ height: 8, width: 20 }} />
+                        <Bar style={{ height: 8, width: 34 }} />
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: 9 }}>
+                        {Array.from({ length: 9 }, (_, c) => (
+                          <Bar
+                            key={c}
+                            style={{ height: 17, width: 17, borderRadius: 3 }}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
+
               </div>
             </div>
 
