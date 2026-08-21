@@ -1116,7 +1116,8 @@
         "played": "今週はあなたのコースでのラウンドがありません。",
         "worldwide": "今週はラウンドがありません。"
       }
-    }
+    },
+    "mostPlayedSeeAllAtCourse": "このコースの全員を見る"
   },
   "statBrowse": {
     "colArea": "エリア",

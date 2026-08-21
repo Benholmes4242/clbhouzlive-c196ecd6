@@ -1176,7 +1176,8 @@
         "played": "Esta semana no hay rondas en tus campos.",
         "worldwide": "Esta semana no hay rondas."
       }
-    }
+    },
+    "mostPlayedSeeAllAtCourse": "Ver todos en este campo"
   },
   "statBrowse": {
     "colArea": "Zona",

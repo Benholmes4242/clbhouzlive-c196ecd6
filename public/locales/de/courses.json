@@ -1176,7 +1176,8 @@
         "played": "Diese Woche keine Runden auf deinen Plätzen.",
         "worldwide": "Diese Woche keine Runden."
       }
-    }
+    },
+    "mostPlayedSeeAllAtCourse": "Alle auf diesem Platz ansehen"
   },
   "statBrowse": {
     "colArea": "Gebiet",

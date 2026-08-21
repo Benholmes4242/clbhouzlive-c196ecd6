@@ -1116,7 +1116,8 @@
         "played": "이번 주 내 코스 라운드가 없습니다.",
         "worldwide": "이번 주 라운드가 없습니다."
       }
-    }
+    },
+    "mostPlayedSeeAllAtCourse": "이 코스의 전체 보기"
   },
   "statBrowse": {
     "colArea": "지역",
