@@ -1138,7 +1138,13 @@ export function GolfThisWeek({
       emoji: '\uD83D\uDD25', // FIRE
       label: t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK'),
       figure: String(best.row.gross ?? '\u2014'),
-      /* §S1.4 — the figure itself stays INK; only the to-par is coloured. */
+      /* §S1.4 — the figure itself stays INK; only the to-par is coloured.
+         STILL TRUE, AND IT IS THE REASON FOR the hero figure rule
+         (BRIEF_ROUND_TILE_MARK_AND_FIGURE §1): what gets coloured is the
+         TO-PAR, never the count. Here the figure is a GROSS beside its own
+         to-par, so the gross stays ink. In the hero, FINISHED IN THE RED's
+         figure IS the to-par, so §S1.4 asks for it to be coloured there — and
+         asks for THE RUN's "8" and BIRDIE HAUL's "5" to stay white. */
       tone: INK,
       qual: bestToPar ?? undefined,
       qualTone: best.toPar < 0 ? TOPAR_RED : BAND_MUTE,
