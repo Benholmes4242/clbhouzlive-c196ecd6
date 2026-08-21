@@ -481,7 +481,6 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
         src={l.lead.actorAvatar}
         alt={l.lead.actorName}
         size={28}
-        own={l.isOwn}
       />
       <span
         style={{
