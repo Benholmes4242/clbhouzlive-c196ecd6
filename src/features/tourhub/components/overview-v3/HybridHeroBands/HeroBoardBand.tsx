@@ -210,7 +210,7 @@ export function HeroBoardSection({
    * never disagree with the figure above it.
    */
   const holders = useMemo(() => {
-    if (!low) return [] as string[];
+    if (!low || currentRound == null) return [] as string[];
     const key = ['round_1', 'round_2', 'round_3', 'round_4'][currentRound - 1];
     if (!key) return [] as string[];
     const names: string[] = [];
@@ -234,6 +234,70 @@ export function HeroBoardSection({
   // no field average at all — the strip renders the cells it can and omits the
   // rest rather than averaging six players.
   const hasStrip = !!field || !!low;
+
+  /**
+   * §2 — THE CLOSED ROW'S FIGURE, FOR THE PHASE. Everything here comes from the
+   * predictions cache read above joined against `entries`, which is already a
+   * prop (§4). No fetch, no RPC change.
+   */
+  const picks = (predictions?.topContenders ?? []) as AITopContender[];
+  const boardByPlayer = useMemo(() => {
+    const m = new Map<string, { position: number | null; tied: boolean; score: number | null }>();
+    for (const e of entries as any[]) {
+      const id = e?.player?.id;
+      if (!id) continue;
+      m.set(String(id), {
+        position: e?.position ?? null,
+        tied: !!e?.position_tied,
+        score: e?.score ?? null,
+      });
+    }
+    return m;
+  }, [entries]);
+
+  const closedFigure = useMemo(() => {
+    if (picks.length === 0) return null;
+
+    /* LIVE — the BEST-PLACED pick. A pick with no board line (withdrawn, missed
+       cut, not in the field) simply cannot be the best-placed one, so it is
+       skipped; when NONE of the picks has a live line the row falls back to the
+       PRE treatment rather than printing a blank figure. */
+    if (phase === 'live') {
+      let best: { pick: AITopContender; position: number; tied: boolean; score: number | null } | null = null;
+      for (const p of picks) {
+        const line = boardByPlayer.get(String(p.playerId));
+        if (!line || line.position == null) continue;
+        if (!best || line.position < best.position) {
+          best = { pick: p, position: line.position, tied: line.tied, score: line.score };
+        }
+      }
+      if (best) {
+        return {
+          name: surnameOf(best.pick.playerName),
+          right: `${best.tied ? 'T' : ''}${best.position}`,
+          figure: best.score == null ? null : formatToPar(best.score),
+          figureColor: tourFigColor(best.score),
+        };
+      }
+    }
+
+    /* PRE — and the fallback for every phase §2 cannot serve: the TOP-RANKED
+       pick and its win probability. COMPLETE lands here too: see the report —
+       a finishing position is not reachable from anything already in scope. */
+    const top = [...picks].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))[0];
+    if (!top) return null;
+    return {
+      name: surnameOf(top.playerName),
+      right: null,
+      figure: top.winProbability != null ? `${Math.round(top.winProbability)}%` : null,
+      figureColor: '#FFFFFF',
+    };
+  }, [picks, phase, boardByPlayer]);
+
+  /* §1 / ACCEPTANCE D — with neither a board nor picks there is nothing to
+     render, and no reserved height for the absence. */
+  if (!hasBoard && picks.length === 0) return null;
+
 
   return (
     <div
