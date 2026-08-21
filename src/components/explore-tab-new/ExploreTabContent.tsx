@@ -272,47 +272,12 @@ export default function ExploreTabContent({
       {/* ONE SECTION RHYTHM: 28px between a section's content and the next
           section's eyebrow. Eyebrows own their own 10px to their content. */}
       <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
-        {/* The first three sections share a tighter 10px rhythm so the gap from
-            the bottom of a rail tile to the next section's eyebrow matches the
-            gap from the previous tile's bottom to the current eyebrow. */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-
-
-
-          {/* LATEST VIDEOS. ON TOUR THIS WEEK left this page
-              (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL S1): it was the only
-              section here that is not about the member's world, and its content
-              already owns a bottom-nav tab, so it duplicated a top-level
-              destination. The component and its hook are intact — unmounted, not
-              deleted. LATEST REVIEWS left too (S2), moved to the Courses browse
-              where a review is decision content rather than entertainment.
-              NOTHING MOVED UP to fill either gap. */}
-          {/* The 10px section rhythm reads TIGHT here because the tile above
-              ends on a hard card edge, while the gap BELOW this rail is padded
-              by the caption's line box. +16px matches the two optically. */}
-          <LatestVideosRail
-            items={communityVideos.data?.videos ?? []}
-            onTilePress={() => navigate('/community')}
-            onSeeAll={() => navigate('/community')}
-            style={{ marginTop: 16 }}
-          />
-        </div>
-
-        {/* CLIPS — after Around the world, before Personal bests. It reads the
-            whole library, so the scope pills (which live inside Around the
-            world's own subtree) do not and must not filter it. */}
-        <ClipsRail
-          items={communityVideos.data?.clips ?? []}
-          onTilePress={() => navigate('/community')}
-          onSeeAll={() => navigate('/community')}
-        />
-
-        {/* From the community was removed from Discover deliberately. Discover
-            now shows no member photographs; the Community page still holds
-            them, but every route to it from here is labelled video. */}
-
-
-
+        {/* BRIEF_DISCOVER_ORDER_AND_LABELS §1 — the two RANKED sections now
+            precede the two MEDIA rails. The old 10px "first group" wrapper and
+            the videos rail's +16px correction were both tuned for the rail
+            sitting directly under the round tiles' hard card edge. It no longer
+            does, so both are GONE and every adjacent pair sits on the one 28px
+            rhythm. The rhythm itself is unchanged. */}
         <MostPlayedLeaderboard
           rows={mostPlayedList}
           isPending={mostPlayedQuery.isPending}
@@ -328,6 +293,33 @@ export default function ExploreTabContent({
           limit={20}
           onSeeAll={openHonoursSheet}
         />
+
+        {/* LATEST VIDEOS. ON TOUR THIS WEEK left this page
+            (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL S1): it was the only
+            section here that is not about the member's world, and its content
+            already owns a bottom-nav tab, so it duplicated a top-level
+            destination. The component and its hook are intact — unmounted, not
+            deleted. LATEST REVIEWS left too (S2), moved to the Courses browse
+            where a review is decision content rather than entertainment.
+            NOTHING MOVED UP to fill either gap. */}
+        <LatestVideosRail
+          items={communityVideos.data?.videos ?? []}
+          onTilePress={() => navigate('/community')}
+          onSeeAll={() => navigate('/community')}
+        />
+
+        {/* CLIPS — last content section. It reads the whole library, so the
+            scope pills (which live inside the rounds section's own subtree) do
+            not and must not filter it. */}
+        <ClipsRail
+          items={communityVideos.data?.clips ?? []}
+          onTilePress={() => navigate('/community')}
+          onSeeAll={() => navigate('/community')}
+        />
+
+        {/* From the community was removed from Discover deliberately. Discover
+            now shows no member photographs; the Community page still holds
+            them, but every route to it from here is labelled video. */}
 
         {/* Clears the floating bottom nav. Collapses to 16px on routes where
             the nav hides, because the nav publishes --bottom-nav-height: 0px. */}
