@@ -44,6 +44,7 @@ import { ChevronRight, ChevronDown } from 'lucide-react';
 import { FONT, HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { useTourSelection } from '../../../context/TourSelectionContext';
 import { ClbhouzPickMark } from '../../../_shared/ClbhouzPickMark';
 import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
 import { CourseShapePanel, useCourseShapeRows } from './CourseShapePanel';
@@ -196,7 +197,18 @@ export function HeroBoardSection({
   // topContenders (it exposes `predictions`). The overview's TI picks come from
   // useAIPredictions(tournamentId), which TIPicksCarousel already calls with the
   // same key, so this is a cache read and not a new query.
-  const { data: predictions } = useAIPredictions(tournamentId);
+  /**
+   * ZERO NEW REQUESTS (§4) DEPENDS ON THE KEY MATCHING TISlot's EXACTLY. TISlot
+   * reads the DEBOUNCED viewing id from TourSelection, so the band reads the
+   * same id rather than the active slide's: with the active id the two
+   * components hold different keys for 250ms after a swipe and React Query
+   * fires a SECOND fetch for the same tournament (measured: 4 ai_predictions
+   * requests per slide instead of 2). The cost is that the picks row lags the
+   * photograph by the same 250ms as the rest of the reporting.
+   */
+  const { viewingTournamentId } = useTourSelection();
+  const picksTid = viewingTournamentId ?? tournamentId;
+  const { data: predictions } = useAIPredictions(picksTid);
   const pickPlayerIds = useMemo(() => {
     const ids = new Set<string>();
     for (const p of (predictions?.topContenders ?? []) as any[]) {
