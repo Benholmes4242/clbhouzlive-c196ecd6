@@ -23,10 +23,9 @@ const chipTextPx: Record<'sm' | 'md' | 'lg', number> = {
 /**
  * Flag codes we deliberately do NOT render as a national flag.
  *
- * Currently empty. Northern Ireland resolves to the Irish tricolour by
- * editorial decision (BRIEF_TOUR_FLAGS_ONE_SYSTEM §3); the Ulster Banner
- * (gb-nir.svg) is never rendered. Add a code here to withhold its flag and
- * fall back to the neutral three-letter chip.
+ * Empty by design. Every country the map resolves gets its flag, including all
+ * four home nations (GB-ENG, GB-SCT, GB-WLS, GB-NIR) — there is no
+ * Northern-Ireland-specific branch anywhere in the view layer.
  */
 const WITHHELD_FLAG_CODES = new Set<string>();
 

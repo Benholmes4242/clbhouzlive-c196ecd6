@@ -26,10 +26,12 @@ export const countryToFlagCode: Record<string, string> = {
   'WALES': 'GB-WLS',
   'Wales': 'GB-WLS',
   
-  // Editorial decision (BRIEF_TOUR_FLAGS_ONE_SYSTEM §3): Northern Ireland is
-  // marked with the Irish tricolour, not the Ulster Banner or the Union Flag.
-  'NORTHERN IRELAND': 'IE',
-  'Northern Ireland': 'IE',
+  // Northern Ireland is a nationality distinct from both Ireland and the UK in
+  // sr_players.country, exactly as the golf bodies record it. GB-NIR is the only
+  // mark that denotes what the data says — no Union Flag, no tricolour. Treated
+  // exactly like the other three home nations, with no special-case branch.
+  'NORTHERN IRELAND': 'GB-NIR',
+  'Northern Ireland': 'GB-NIR',
   
   'IRELAND': 'IE',
   'Ireland': 'IE',
