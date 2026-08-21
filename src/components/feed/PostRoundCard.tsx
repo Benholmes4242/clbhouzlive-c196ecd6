@@ -108,9 +108,9 @@ const LabelRow: React.FC<{
       note ? (
         <span
           style={{
-            fontSize: 9.5,
+            fontSize: 12,
             fontWeight: 700,
-            letterSpacing: '0.08em',
+            letterSpacing: '0.06em',
             textTransform: 'uppercase',
             color: DIM,
             whiteSpace: 'nowrap',
