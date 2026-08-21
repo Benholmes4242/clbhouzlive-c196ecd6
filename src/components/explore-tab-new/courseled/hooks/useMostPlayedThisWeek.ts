@@ -243,7 +243,14 @@ export function useMostPlayedThisWeek(limit = 25) {
       );
       const byId = new Map<
         string,
-        { name: string; avatarUrl: string | null; homeClub: string | null; primaryClubId: string | null }
+        {
+          name: string;
+          avatarUrl: string | null;
+          homeClub: string | null;
+          primaryClubId: string | null;
+          /** TRUE when the member's home_club_visibility is not 'public'. */
+          clubHidden: boolean;
+        }
       >();
       if (wanted.length > 0) {
         const { data: profs } = await supabase
@@ -261,7 +268,8 @@ export function useMostPlayedThisWeek(limit = 25) {
             name,
             avatarUrl: p.profile_photo_url ?? null,
             homeClub: visible && typed ? typed : null,
-            primaryClubId: visible ? ((p.primary_club_id as string | null) ?? null) : null,
+            primaryClubId: (p.primary_club_id as string | null) ?? null,
+            clubHidden: !visible,
           });
         }
         const missing = wanted.filter((id) => !byId.has(id));
@@ -280,6 +288,7 @@ export function useMostPlayedThisWeek(limit = 25) {
                 avatarUrl: p.profile_photo_url ?? null,
                 homeClub: String(p.home_club ?? '').trim() || null,
                 primaryClubId: (p.primary_club_id as string | null) ?? null,
+                clubHidden: false,
               });
           }
         }
@@ -292,7 +301,7 @@ export function useMostPlayedThisWeek(limit = 25) {
          * whose club is not in golf_clubs. A member with neither keeps null and
          * the board draws no second line.
          */
-        const resolvable = wanted.filter((id) => byId.get(id)?.primaryClubId !== undefined && byId.has(id));
+        const resolvable = wanted.filter((id) => byId.get(id)?.clubHidden === false);
         if (resolvable.length > 0) {
           const { data: links } = await supabase
             .from('user_home_clubs')
@@ -304,15 +313,14 @@ export function useMostPlayedThisWeek(limit = 25) {
             const clubName = String(l.golf_clubs?.name ?? '').trim();
             if (!clubName) continue;
             const entry = byId.get(uid);
-            if (!entry || entry.primaryClubId === null) {
-              // NO PRIMARY DECLARED: first resolvable club wins, and only if
-              // the member has not hidden their club.
-              if (entry && entry.homeClub === null && entry.primaryClubId === null) continue;
+            if (!entry) continue;
+            if (entry.primaryClubId == null) {
+              // NO PRIMARY DECLARED: the first resolvable club speaks for them.
               if (!picked.has(uid)) picked.set(uid, clubName);
-              continue;
+            } else if (entry.primaryClubId === l.club_id) {
+              // A PRIMARY EXISTS: only that club may speak for the member.
+              picked.set(uid, clubName);
             }
-            // A PRIMARY EXISTS: only that club may speak for the member.
-            if (entry.primaryClubId === l.club_id) picked.set(uid, clubName);
           }
           for (const [uid, clubName] of picked) {
             const entry = byId.get(uid);
