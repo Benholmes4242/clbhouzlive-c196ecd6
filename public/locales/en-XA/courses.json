@@ -1333,7 +1333,7 @@
     "defending": "[~~Đéƒéñđíñĝ~~]",
     "nPhotos": "[~~{{count}} ƥĥőţőš~~]",
     "nPhotos_one": "[~~{{count}} ƥĥőţő~~]",
-    "mostPlayed": "[~~Ṁőšţ ƥļáýéđ ţĥíš ŵééǩ~~]",
+    "mostPlayed": "[~~Ṁőšţ ƥļáýéđ çőúřšéš ţĥíš ŵééǩ~~]",
     "whereTheyPlayed": "[Ẃĥéŕé ţĥéý ṗļàýéð ţĥíś ŵééķ one]",
     "mostPlayedRoundCount": "[{{count}} ŕóûñð one]",
     "mostPlayedRoundCount_other": "[{{count}} ŕóûñðś one]",
@@ -1593,7 +1593,8 @@
           "birdieHaul": "{{0}} birdies across {{1}} holes.",
           "strongFinish": "Birdie or better coming home, to finish on {{0}}."
         }
-      }
+      },
+      "count": "[~~{{rounds}} řőúñđš · {{courses}} çőúřšéš · {{days}} đáýš~~]"
     },
     "week": {
       "scopeAria": "Rounds scope",

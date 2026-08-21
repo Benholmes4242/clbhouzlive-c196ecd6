@@ -1057,7 +1057,7 @@
     "mostPlayedAvgToParBy_other": "{{value}}（{{count}}人）",
     "mostPlayedMembers_other": "{{count}}人",
     "mostPlayedSheetCaption_other": "{{count}}コース",
-    "mostPlayed": "今週よくプレーされたコース",
+    "mostPlayed": "今週最もプレーされたコース",
     "whereTheyPlayed": "今週プレーした場所",
     "mostPlayedRoundCount": "{{count}} ラウンド",
     "mostPlayedRoundCount_other": "{{count}} ラウンド",
@@ -1104,7 +1104,8 @@
           "birdieHaul": "{{1}} ホールで {{0}} バーディー。",
           "strongFinish": "上がり3ホールでバーディー以上、{{0}} でフィニッシュ。"
         }
-      }
+      },
+      "count": "{{rounds}} ラウンド · {{courses}} コース · {{days}}日間"
     },
     "week": {
       "scopeAria": "ラウンドの範囲",

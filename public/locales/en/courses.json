@@ -1338,7 +1338,7 @@
     "defending": "Defending",
     "nPhotos": "{{count}} photos",
     "nPhotos_one": "{{count}} photo",
-    "mostPlayed": "Most played this week",
+    "mostPlayed": "Most played courses this week",
     "whereTheyPlayed": "Where they played this week",
     "mostPlayedRoundCount": "{{count}} round",
     "mostPlayedRoundCount_other": "{{count}} rounds",
@@ -1569,7 +1569,7 @@
     "golfThisWeek": {
       "heading": "Golf this week",
       "subline": "Everywhere clbhouz golfers played, and how it went.",
-      "count": "{{rounds}} rounds · {{courses}} courses",
+      "count": "{{rounds}} rounds · {{courses}} courses · {{days}} days",
       "seeAll": "See all {{count}} rounds",
       "bestLabel": "BEST THIS WEEK",
       "overline": "THIS WEEK",
