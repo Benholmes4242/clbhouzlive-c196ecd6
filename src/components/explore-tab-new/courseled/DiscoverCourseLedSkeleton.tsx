@@ -13,13 +13,22 @@ import { CARD_SHELL } from './tokens';
  *
  * Every block below is MEASURED off the rendered component it stands in for,
  * not read off the JSX and added up:
- *   rounds rail    merged Golf this week: heading + scope pills + band + tiles
- *   around world   masonry, six photo heights + 62 body
- *   most played    panel of 60px rows
-
- *   honours        rail of 168 x 178 plaques (HonoursBoard PLAQUE_W / PLAQUE_H)
+ *   rounds rail    merged Golf this week: readout + region, scope pills, the
+ *                  LEADER BAND (three 154px chips, 123 tall, 9px gap) and the
+ *                  round tiles
+ *   most played    four cards at 10px gaps, 52px thumbnail
+ *   honours        rail of 206 x 164 cards over a 96px head
+ *                  (SK_CARD_W / SK_CARD_H / SK_HEAD_H)
  * so the loaded page lands on its own outline with no section boundary
  * shifting.
+ *
+ * WHAT THIS SHELL COVERS, AND WHAT IT DELIBERATELY DOES NOT
+ * (BRIEF_DISCOVER_SKELETON_RESYNC §0b): it draws the rounds rail, Most played
+ * and the Honours board — a correct PREFIX of the live page. LATEST VIDEOS and
+ * CLIPS get NO SHELL ON PURPOSE. They are the last two sections and sit below
+ * the fold, and a shell with FEWER sections than the page can only ever expand
+ * DOWNWARD, which is the one direction a loading state is allowed to move.
+
  *
  * NO LONGER REACHED FROM DISCOVER (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL):
  * TourRail and ReviewsMosaic. Both sections were unmounted from this page, so
@@ -161,15 +170,24 @@ export function GolfThisWeekRail() {
           flexWrap: 'wrap',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: 8,
+          gap: 12,
           /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
-             gives 16px of clearance everywhere. */
+             gives 16px of clearance everywhere. THIS IS THE ONLY PLACE THE SHELL
+             APPLIES IT — the default export's wrapper used to apply it again
+             (BRIEF_DISCOVER_SKELETON_RESYNC §2), which started the shell ~70px
+             LOW and made the page settle UPWARD. It lives here because that is
+             where the live page puts it (GolfThisWeek, MICRO_BRIEF_ROUNDS_
+             SECTION_CHROME S1.4), and GolfThisWeek renders this shell itself. */
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
           marginBottom: 12,
           minWidth: 0,
         }}
       >
-        <Bar style={{ height: 9, width: 118 }} />
+
+        {/* THE READOUT: "12 rounds · 4 courses · 7 days" at KICKER (10 / 700 /
+            0.16em / uppercase) MEASURES 208 at 524px. The old 118 modelled the
+            two-part string that BRIEF_DISCOVER_ORDER_AND_LABELS replaced. */}
+        <Bar style={{ height: 9, width: 206 }} />
         <Bar style={{ height: 34, width: 100, borderRadius: 999 }} />
       </div>
       <div style={{ display: 'flex', gap: 8, padding: '2px 0 14px' }}>
@@ -177,19 +195,64 @@ export function GolfThisWeekRail() {
           <Bar key={i} style={{ height: 34, width: w, borderRadius: 999 }} />
         ))}
       </div>
-      <div
-        style={{
-          borderTop: `1px solid ${A.BORDER}`,
-          borderBottom: `1px solid ${A.BORDER}`,
-          padding: '9px 0 10px',
-          marginBottom: 12,
-          display: 'flex',
-          gap: 8,
-        }}
-      >
-        <Bar style={{ height: 10, width: 82 }} />
-        <Bar style={{ height: 10, width: 150 }} />
+      {/* THE LEADER BAND IS THREE CHIPS, NOT A BORDERED STRIP
+          (BRIEF_DISCOVER_SKELETON_RESYNC §1). The strip this replaced was the
+          band as it stood BEFORE BRIEF_BAND_TILES_REFINEMENT made it cards, and
+          it was ~21px against a live chip MEASURED at 123 — so every cold load
+          dropped the round tiles by ~100px when the band resolved.
+          MEASURED off the live chip after BRIEF_BAND_TILE_TYPE_SCALE:
+            flex 1 0 154px, 9px rail gap, CARD_SHELL's shadow, padding 11/12/12
+            row 1  eyebrow      line box 13, bar 8
+            row 2  marginTop 5, figure 30 with its 12px qualifier
+            row 3  marginTop 9, avatar 20 + 12px name
+            row 4  marginTop 5, course 12
+          11 + 13 + 5 + 30 + 9 + 20 + 5 + 18 + 12 = 123.
+          THREE, NOT FOUR: MOST IMPROVED renders only when a falling index
+          exists, and a skeleton is never larger than the smallest settled state. */}
+      <div style={{ display: 'flex', alignItems: 'stretch', gap: 9, marginBottom: 12 }}>
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            style={{
+              background: A.PANEL,
+              border: 'none',
+              borderRadius: 14,
+              boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
+              overflow: 'hidden',
+              flex: '1 0 154px',
+              minWidth: 154,
+              padding: '11px 12px 12px',
+              boxSizing: 'border-box',
+            }}
+          >
+            <div style={{ height: 13, display: 'flex', alignItems: 'center' }}>
+              <Bar style={{ height: 8, width: 66 }} />
+            </div>
+            <div
+              style={{
+                marginTop: 5,
+                height: 30,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+              }}
+            >
+              <Bar style={{ height: 22, width: 42 }} />
+              <Bar style={{ height: 12, width: 20 }} />
+            </div>
+            <div
+              style={{ marginTop: 9, height: 20, display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              <Bar style={{ height: 20, width: 20, borderRadius: '34%' }} />
+              <Bar style={{ height: 12, width: 72 }} />
+            </div>
+            <div style={{ marginTop: 5, height: 18, display: 'flex', alignItems: 'center' }}>
+              <Bar style={{ height: 12, width: 96 }} />
+            </div>
+          </div>
+        ))}
       </div>
+
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
           <div
