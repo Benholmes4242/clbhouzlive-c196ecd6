@@ -540,10 +540,17 @@ export function MostPlayedLeaderboard({
                       treatment the leader chips on this same page took in
                       BRIEF_BAND_TILE_TYPE_SCALE. Two sections on one page
                       agreeing beats each solving one problem differently.
-                      Region casing comes from the data (verified sentence case
-                       at source), so there is no textTransform here. The
-                       casing is natural sentence/title case — "North
-                       Rhine-Westphalia", not "north rhine-westphalia". */}
+                      REGION CASING IS WHATEVER golf_courses.region STORES, and
+                      that is NOT uniformly sentence case — the earlier claim
+                      here ("verified sentence case at source") was wrong: with
+                      no transform the page renders KENT, so the stored value is
+                      "KENT". THERE IS STILL NO textTransform HERE, and that is
+                      deliberate (BRIEF_DISCOVER_FINISHING_PASS §4): a
+                      toLowerCase or a titleCase helper breaks "Isle of Man",
+                      "Co. Down", "North Rhine-Westphalia" and every accented
+                      form, and would have to be repeated on every surface that
+                      renders a region. THE FIX BELONGS IN THE DATA, as a
+                      hand-written normalisation of the upper-case values. */}
                   <span
                     style={{
                       display: 'flex',

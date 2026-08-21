@@ -14,7 +14,7 @@ import { CARD_SHELL } from './tokens';
  * Every block below is MEASURED off the rendered component it stands in for,
  * not read off the JSX and added up:
  *   rounds rail    merged Golf this week: readout + region, scope pills, the
- *                  LEADER BAND (three 154px chips, 123 tall, 9px gap) and the
+ *                  LEADER BAND (three 154px chips, 100 tall, 9px gap) and the
  *                  round tiles
  *   most played    four cards at 10px gaps, 52px thumbnail
  *   honours        rail of 206 x 164 cards over a 96px head
@@ -204,9 +204,10 @@ export function GolfThisWeekRail() {
             flex 1 0 154px, 9px rail gap, CARD_SHELL's shadow, padding 11/12/12
             row 1  eyebrow      line box 13, bar 8
             row 2  marginTop 5, figure 30 with its 12px qualifier
-            row 3  marginTop 9, avatar 20 + 12px name
-            row 4  marginTop 5, course 12
-          11 + 13 + 5 + 30 + 9 + 20 + 5 + 18 + 12 = 123.
+            row 3  marginTop 9, avatar 20 + 12px name + chevron
+          RE-MEASURED after BRIEF_DISCOVER_FINISHING_PASS §1, which DELETED the
+          course line and its marginTop and put a chevron on the member row:
+          11 + 13 + 5 + 30 + 9 + 20 + 12 = 100.
           THREE, NOT FOUR: MOST IMPROVED renders only when a falling index
           exists, and a skeleton is never larger than the smallest settled state. */}
       <div style={{ display: 'flex', alignItems: 'stretch', gap: 9, marginBottom: 12 }}>
@@ -245,9 +246,6 @@ export function GolfThisWeekRail() {
             >
               <Bar style={{ height: 20, width: 20, borderRadius: '34%' }} />
               <Bar style={{ height: 12, width: 72 }} />
-            </div>
-            <div style={{ marginTop: 5, height: 18, display: 'flex', alignItems: 'center' }}>
-              <Bar style={{ height: 12, width: 96 }} />
             </div>
           </div>
         ))}
