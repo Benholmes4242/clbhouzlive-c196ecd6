@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
@@ -40,6 +41,12 @@ const FILL_OVER_LIGHT = '#DEE1E6'; // stayed over par
  */
 const BUCKET_ORDER = ['birdie', 'par', 'bogey', 'double'] as const;
 type BucketKey = (typeof BUCKET_ORDER)[number];
+const BUCKET_LABEL: Record<BucketKey, string> = {
+  birdie: 'BIRDIE+',
+  par: 'PAR',
+  bogey: 'BOGEY',
+  double: 'DOUBLE+',
+};
 
 function bucketsFor(series: number[]): Record<BucketKey, number> {
   const out: Record<BucketKey, number> = { birdie: 0, par: 0, bogey: 0, double: 0 };
@@ -104,6 +111,10 @@ export function RoundShape({
      there is nothing to count — so its meta row stays exactly as today. */
   const buckets = shape ? bucketsFor(shape.series) : null;
   const figure = toParFor(row);
+  /* The figure's SIGN, from the same two fields toParFor reads, so the tone and
+     the text can never disagree. */
+  const figureDelta =
+    row.gross != null && row.course_par != null ? row.gross - row.course_par : 0;
 
   const withChrome = (plot: ReactNode) => (
     <>
@@ -122,7 +133,7 @@ export function RoundShape({
               fontWeight: 700,
               lineHeight: 1,
               ...FIGS,
-              color: figure.value < 0 ? TOPAR_RED : figure.value > 0 ? A.MUTE : A.DIM,
+              color: figureDelta < 0 ? TOPAR_RED : figureDelta > 0 ? A.MUTE : A.DIM,
             }}
           >
             {figure.text}
@@ -420,7 +431,7 @@ function BucketBar({ buckets }: { buckets: Record<BucketKey, number> }) {
 }
 
 /**
- * THE MET  A ROW carries the four-bucket count line (§4.3). It replaced the
+ * THE META ROW carries the four-bucket count line (§4.3). It replaced the
  * suppressed "X birdies" text, spending exactly the height that div was already
  * holding open — which is why this addition costs the card almost nothing.
  * A zero count takes A.DIM rather than its bucket colour: nothing happened.
