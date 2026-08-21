@@ -1477,6 +1477,8 @@
     "momentsCount": "{{count}} moments",
     "momentsCount_one": "{{count}} moment",
     "mostPlayedAvgToPar": "Played to {{value}}",
+    "mostPlayedBest": "best",
+    "mostPlayedSeeAllAtCourse": "See all at this course",
     "mostPlayedNew": "New",
     "mostPlayedLevel": "Level",
     "mostPlayedAvgToParBy_one": "Played to {{value}} by {{count}} member",
