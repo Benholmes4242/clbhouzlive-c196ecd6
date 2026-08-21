@@ -163,8 +163,8 @@ export function RegionDropdown({
             belong on the list rows, before the tap, where they inform the
             choice. Pin, label and chevron share one baseline (§S1.1). */}
         <SelectTrigger
-          className="h-auto w-auto gap-1 border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:h-[13px] [&>svg]:w-[13px] [&>svg]:opacity-100"
-          style={{ color: A.INK, fontFamily: SANS }}
+          className="h-auto w-auto gap-1 border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:h-[13px] [&>svg]:w-[13px] [&>svg]:opacity-100 [&>svg]:text-[color:var(--week-chev)]"
+          style={{ color: A.INK, fontFamily: SANS, ['--week-chev' as string]: A.DIM } as React.CSSProperties}
           aria-label={t('discover.week.selectRegionA11y', 'Filter rounds by area')}
         >
           <span className="flex min-w-0 items-center gap-1">
@@ -223,17 +223,6 @@ export function RegionDropdown({
       </Select>
     </div>
   );
-}
-
-function countFor(regions: WeekRegions, sel: RegionSelection): number {
-  if (sel.kind === 'country') {
-    return regions.groups.find((g) => g.country === sel.value)?.count ?? 0;
-  }
-  for (const g of regions.groups) {
-    const hit = g.subs.find((s) => s.sub_country === sel.value);
-    if (hit) return hit.count;
-  }
-  return 0;
 }
 
 export default WeekScopePills;
