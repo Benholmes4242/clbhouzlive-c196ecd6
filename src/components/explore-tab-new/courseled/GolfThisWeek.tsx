@@ -208,7 +208,7 @@ function FollowButton({
   const onClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      if (toggle.isPending) return;
+      if (toggle.isPending || confirming) return;
       if (!viewerUserId || !viewerActorId) return;
 
       const key = ['courseled', 'following-ids', viewerUserId] as const;
@@ -217,11 +217,15 @@ function FollowButton({
          query's referential identity changes and every reader re-renders. */
       queryClient.setQueryData<Set<string>>(key, (old) => {
         const next = new Set(old ?? []);
-        if (isFollowed) next.delete(targetUserId);
-        else next.add(targetUserId);
+        next.add(targetUserId);
         return next;
       });
+      setConfirming(true);
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = setTimeout(() => setConfirming(false), CONFIRM_MS);
 
+      /* THE VIEWER-IDENTITY FIX (MICRO_BRIEF_FOLLOW_VIEWER_IDENTITY) IS PASSED
+         THROUGH UNCHANGED — do not re-derive these arguments here. */
       toggle.mutate(
         {
           targetActorType: 'personal',
@@ -230,11 +234,15 @@ function FollowButton({
           viewerActorType,
           viewerActorId,
           viewerUserId,
-          isFollowing: isFollowed,
+          isFollowing: false,
         },
         {
-          /* ROLL BACK to exactly what was there before the tap, and SAY SO. */
+          /* ROLL BACK to exactly what was there before the tap, DROP the
+             confirmation, and SAY SO — a failed follow must return to FOLLOW
+             (§S3.6), never to nothing. */
           onError: () => {
+            if (timer.current) clearTimeout(timer.current);
+            setConfirming(false);
             if (previous) queryClient.setQueryData<Set<string>>(key, new Set(previous));
             else void queryClient.invalidateQueries({ queryKey: ['courseled', 'following-ids'] });
             toast.error('Could not update follow status. Please try again.');
@@ -246,7 +254,7 @@ function FollowButton({
       );
     },
     [
-      isFollowed,
+      confirming,
       queryClient,
       targetUserId,
       toggle,
@@ -256,30 +264,67 @@ function FollowButton({
     ],
   );
 
+  /* THE FOLLOWED STATE RENDERS NOTHING AND RESERVES NOTHING (§S3.3) — no
+     wrapper, no placeholder, no gap. The member name takes the freed width. */
+  if (isFollowed && !confirming) return null;
+
+  const wrapper: React.CSSProperties = {
+    marginLeft: align === 'gap' ? 8 : 'auto',
+    flexShrink: 0,
+    display: 'inline-flex',
+  };
+
+  if (confirming) {
+    /* NOT A BUTTON (§S3.5): the action is done and there is nothing left to
+       press, so this is a static span with no handler and no role. */
+    return (
+      <span style={wrapper}>
+        <span
+          aria-live="polite"
+          style={{
+            ...LABEL,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            fontFamily: SANS,
+            color: A.MUTE,
+            border: `1px solid ${A.BORDER}`,
+            borderRadius: 999,
+            padding: '5px 10px',
+            pointerEvents: 'none',
+          }}
+        >
+          {t('discover.golfThisWeek.following', 'FOLLOWING')}
+          <Check size={11} strokeWidth={3} />
+        </span>
+      </span>
+    );
+  }
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={isFollowed ? 'Unfollow' : 'Follow'}
-      style={{
-        ...LABEL,
-        flexShrink: 0,
-        fontFamily: SANS,
-        color: isFollowed ? A.MUTE : A.PANEL,
-        background: isFollowed ? 'transparent' : A.INK,
-        border: `1px solid ${isFollowed ? A.BORDER : A.INK}`,
-        borderRadius: 999,
-        padding: '5px 10px',
-        cursor: 'pointer',
-      }}
-    >
-      {isFollowed
-        ? t('discover.golfThisWeek.following', 'FOLLOWING')
-        : t('discover.golfThisWeek.follow', 'FOLLOW')}
-    </button>
+    <span style={wrapper}>
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label="Follow"
+        style={{
+          ...LABEL,
+          flexShrink: 0,
+          fontFamily: SANS,
+          color: A.PANEL,
+          background: A.INK,
+          border: `1px solid ${A.INK}`,
+          borderRadius: 999,
+          padding: '5px 10px',
+          cursor: 'pointer',
+        }}
+      >
+        {t('discover.golfThisWeek.follow', 'FOLLOW')}
+      </button>
+    </span>
   );
 }
+
 
 interface CardProps {
   row: CircleRoundRow;
