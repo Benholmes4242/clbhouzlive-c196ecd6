@@ -223,61 +223,6 @@ export default function ExploreTabContent({
 
 
 
-  // Both surfaces (mosaic + sheet) share this handler, so the tapped media's
-  // identity must travel with the post — otherwise every tile of a multi-media
-  // post opens the post's first media, and swiping onto that post in the viewer
-  // shows a photo instead of the clip that earned the tile (no autoplay). The
-  // queue leads each post with its best-ranked moment's media.
-  const momentPosts = useMemo(() => buildMomentQueue(momentList), [momentList]);
-
-  const handleMoment = useCallback(
-    (m: Moment) => {
-      analyticsEvents.track('discover_moment_tapped', {
-        course_id: m.courseId,
-        post_id: m.post.id,
-        media_index: m.mediaIndex ?? 0,
-      });
-      const index = Math.max(
-        0,
-        momentPosts.findIndex((p) => p.id === m.post.id),
-      );
-      openWithOrigin({
-        posts: momentPosts,
-        index,
-        originEl: null,
-        posterUrl: m.thumbnail,
-        mediaIndex: m.mediaIndex ?? 0,
-        mediaId: m.mediaId ?? null,
-        openedFrom: 'discover-moments',
-      });
-    },
-    [momentPosts],
-  );
-
-
-  // THE WHOLE CARD OPENS THE VIEWER, seeded with that member's moments. Same
-  // path handleMoment uses, with a creator-scoped list passed to it. Discover
-  // is social browse, so the viewer carries its full action rail.
-  const handleCreator = useCallback(
-    (c: CommunityCreator) => {
-      analyticsEvents.track('discover_creator_card_tapped', {
-        creator_id: c.userId,
-        clips: c.clips,
-        photos: c.photos,
-      });
-      const posts = buildMomentQueue(c.moments);
-      openWithOrigin({
-        posts,
-        index: 0,
-        originEl: null,
-        posterUrl: c.frame.thumbnail,
-        mediaIndex: c.frame.mediaIndex ?? 0,
-        mediaId: c.frame.mediaId ?? null,
-        openedFrom: 'discover-moments',
-      });
-    },
-    [],
-  );
 
   const handleMostPlayed = useCallback(
     (r: MostPlayedRow) => goCourse(r.courseId, 'most_played'),
