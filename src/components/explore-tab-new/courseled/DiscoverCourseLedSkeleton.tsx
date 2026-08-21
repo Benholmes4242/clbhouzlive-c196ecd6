@@ -493,13 +493,19 @@ export function MostPlayedPanel() {
               borderBottom: i === 2 ? 'none' : `1px solid ${A.BORDER}`,
             }}
           >
-            <TextBar w={14} h={12} />
-            <Bar style={{ height: 40, width: 40, borderRadius: 11, flexShrink: 0 }} />
+            {/* NO RANK BAR (BRIEF_MOST_PLAYED_LEADERBOARD §S1.2) and a 52px
+                thumbnail to match the shipped header row. */}
+            <Bar style={{ height: 52, width: 52, borderRadius: 13, flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
               <TextBar w={130} h={13} />
-              <TextBar w={72} h={11} />
+              <TextBar w={86} h={9} />
             </div>
-            <TextBar w={26} h={15} />
+            {/* §S1.5 — the promoted PLAYED TO figure over its 8px label. */}
+            <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+              <TextBar w={30} h={17} />
+              <TextBar w={34} h={8} />
+            </div>
+
           </div>
         ))}
       </div>
