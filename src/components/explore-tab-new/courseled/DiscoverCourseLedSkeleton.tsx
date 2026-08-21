@@ -140,9 +140,9 @@ export function FriendsRail() {
 /**
  * GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK acceptance M). MEASURED off
  * GolfThisWeek.tsx: 236 wide, a 92px photograph carrying the course name, then
- * the body — score row 24, member row 22, the full-bleed shape strip at 48
- * (SHAPE_H), one insight line. Above the rail: eyebrow + subline, the live count
- * line, the pills row and the best-of-week band, all of which the live section
+ * the body — score row 24, member row 22, the full-bleed shape strip at 60
+ * (SHAPE_H), one insight line. Above the rail: the count/region readout row,
+ * the pills row and the best-of-week band, all of which the live section
  * renders before its first card and none of which may appear later.
  */
 export function GolfThisWeekRail() {
