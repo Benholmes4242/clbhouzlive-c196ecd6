@@ -150,6 +150,18 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
   const boardEntries = boardTournamentId ? (boardLeaderboard ?? []) : [];
   const boardRound = viewingLive ? (activeSlide?.tournament.currentRound ?? null) : null;
 
+  /**
+   * BRIEF_HERO_PICKS_ROW §1 — THE BAND MUST SURVIVE AN UPCOMING TOURNAMENT.
+   * The old gate (board id + round + entries) deleted Tournament Intelligence
+   * on upcoming slides, which is the phase where the picks matter most. The
+   * band now mounts for ANY slide and decides for itself: with no board it
+   * renders the picks row alone, and with neither a board nor picks it returns
+   * null — no placeholder, no reserved height (HeroBoardBand).
+   */
+  const bandTournamentId = viewingTid;
+  const bandPhase = (activeSlide?.type ?? 'upcoming') as 'live' | 'upcoming' | 'completed';
+
+
   // DEBOUNCED display reporting (4G guard). One trailing-edge write 250ms after
   // the last swipe/jump — rapid multi-slide sweeps no longer fire pulse/OTC/TI
   // fetches per intermediate slide.
