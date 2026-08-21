@@ -91,12 +91,13 @@ const SHAPE_H = 40;
 
 /**
  * TILE HEIGHT FLOOR. Measured on a tile with the full grid: photograph 92,
- * member row, 40px trajectory, two nines of 15px cells with their hole numbers,
- * insight line, 9px padding. Holds the rail level when a round has no hole data
- * and therefore prints no grid at all. 264 = the 258 grid state + the 6px the
- * grid→insight gap grew (MICRO_BRIEF_SCORECARD_COLOUR_AND_ALIGNMENT §S3).
+ * member row, 40px trajectory, two nines of 17px cells with their hole numbers
+ * AND their own header line (label + nine total), insight line, 9px padding.
+ * Holds the rail level when a round has no hole data and therefore prints no
+ * grid at all. 292 = the 264 state + ~14px per nine for the header line and the
+ * 15→17px cell (BRIEF_MINI_SCORECARD_NINE_HEADER §S2.1).
  */
-const CARD_MIN_H = 264;
+const CARD_MIN_H = 292;
 
 
 
