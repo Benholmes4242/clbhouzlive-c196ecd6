@@ -649,8 +649,8 @@ export function MiniScorecard({ shape }: { shape: HoleShape | null }) {
   if (!shape || shape.holes.length === 0) return null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-      <NineRow holes={shape.holes} label="OUT" from={1} to={9} />
-      <NineRow holes={shape.holes} label="IN" from={10} to={18} />
+      <NineRow holes={shape.holes} from={1} to={9} />
+      <NineRow holes={shape.holes} from={10} to={18} />
     </div>
   );
 }
