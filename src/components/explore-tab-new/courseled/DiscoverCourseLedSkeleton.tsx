@@ -1,6 +1,27 @@
 import React from 'react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { CARD_SHELL } from './tokens';
+import {
+  COURSE_GRADIENT,
+  COURSE_SCRIMS,
+  HERO_TOP_SCRIM,
+  HERO_BOTTOM_SCRIM,
+} from '@/features/tourhub/components/overview-v3/HybridHero.constants';
+
+/**
+ * THE ROUND TILE'S DARK REGION, MODELLED WITH THE LIVE TILE'S OWN CONSTANTS
+ * (BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §6). The tile's fallback is no longer the
+ * near-black HERO_BASE — it is the TOUR'S COURSE_GRADIENT under COURSE_SCRIMS
+ * and the two scaled scrims. A shell still painted near-black would model a
+ * colour the page no longer has, so it composes the same stack at the same
+ * heights (48 top, 159 bottom) rather than approximating it with a hex.
+ */
+const SK_ROUND_HERO_BG = [
+  `${HERO_TOP_SCRIM} top / 100% 48px no-repeat`,
+  `${HERO_BOTTOM_SCRIM} bottom / 100% 159px no-repeat`,
+  COURSE_SCRIMS,
+  COURSE_GRADIENT,
+].join(', ');
 
 /**
  * DISCOVER, COURSE-LED — loading silhouette.
@@ -148,9 +169,9 @@ export function FriendsRail() {
 
 /**
  * GOLF THIS WEEK. MEASURED off GolfThisWeek.tsx after BRIEF_ROUND_TILE_THE_MOMENT:
- * 256 wide, no border and a 1px shadow, a 156px HERO (no photograph any more —
- * the gradient and the moment carry the top of the card), then the member row
- * with the score, then the TINTED WELL (#F2F5F8) at a FIXED 135px running to the
+ * 256 wide, no border and a 1px shadow, then a 191px DARK REGION — the 156px
+ * hero plus the member row, which now sits ON the photograph and its scrims
+ * (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW, BRIEF_ROUND_TILE_HERO_TOUR_COLOUR), then the TINTED WELL (#F2F5F8) at a FIXED 135px running to the
  * card's bottom edge: its header rule and the 96px two-rows-of-nine scorecard. Above the rail: the
  * count/region readout row, the pills row and the best-of-week band, all of
  * which the live section renders before its first card and none of which may
@@ -277,7 +298,7 @@ export function GolfThisWeekRail() {
               style={{
                 height: 191,
                 width: '100%',
-                background: '#181F1B',
+                background: SK_ROUND_HERO_BG,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'flex-end',
