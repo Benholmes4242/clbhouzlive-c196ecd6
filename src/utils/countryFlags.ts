@@ -342,8 +342,7 @@ export const getFlagCode = (country: string | null | undefined): string | null =
 
 /**
  * countryShortCode — the three-letter mark used inside the fallback chip when
- * no SVG can be resolved (or when policy withholds a national flag, as for
- * Northern Ireland). Never returns an empty string for a non-empty input.
+ * no SVG can be resolved. Never returns an empty string for a non-empty input.
  */
 export function countryShortCode(country: string | null | undefined): string {
   if (!country) return '';
