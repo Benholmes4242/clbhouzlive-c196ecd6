@@ -1,30 +1,39 @@
 /**
- * THE ROUND'S MOMENT — the pure selector (BRIEF_ROUND_TILE_THE_MOMENT §S1).
+ * THE ROUND'S MOMENT — the pure selector (BRIEF_ROUND_TILE_THE_MOMENT v2 §S1).
+ *
+ * SUPERSEDES v1 IN FULL. The chart vocabulary is gone (there is ONE chart now,
+ * the scorecard — §S0.3), the moment list changed, and the hero layout changed.
  *
  * IT RUNS ON `holes: { holeNo, par, strokes }[]` AND NOTHING ELSE (§S1.1) — the
- * exact array useRoundHoleShapes already returns. No query, no new field, no
- * field average. Do not add one: this module is tuned against live data and must
- * stay testable without rendering a tile (§S1.6).
+ * exact array useRoundHoleShapes already returns. No query, no new hook, no new
+ * field, no field average. Do not add one: this module is tuned against live
+ * data and must stay testable without rendering a tile (§S1.8).
  *
- * FIVE KINDS, FIRST MATCH WINS (§S1.2):
- *   1 EAGLE     any hole 2+ under par, or a hole in one.   strip
- *   2 RUN       7+ consecutive holes at par or better.     strip
- *   3 COLLAPSE  a single hole 3+ over par.                 trajectory
- *   4 FINISH    birdie or better on 2 of holes 16/17/18.   trajectory, last six
- *   5 GRIND     THE DEFAULT.                               mini scorecard
+ * SIX KINDS, FIRST MATCH WINS (§S1.2):
+ *   1 EAGLE    any hole 2+ under par, or a hole in one.        #FFC93C
+ *   2 IN RED   cumulative to-par went BELOW ZERO at any point. #C8102E
+ *   3 FINISH   birdie or better on 2 of holes 16 / 17 / 18.    #3B9DFF
+ *   4 RUN      7+ CONSECUTIVE holes at par or better.          #22D07A
+ *   5 GRIND    12+ at par or better, nothing worse than bogey. #F7931E
+ *   6 PLAIN    THE DEFAULT. Everything else.                   #FFFFFF
  *
- * "THE ESCAPE" WAS DESIGNED AND DROPPED (§S1.3). Ben's call. Do not build it.
+ * IN RED SITS ABOVE THE FINISH AND THE RUN DELIBERATELY (§S1.5): a round that
+ * spent time under par is the better story, and it is rarer.
  *
- * THE GRIND IS THE MOST IMPORTANT OF THE FIVE (§S1.4):
- *   "The grind is the DEFAULT and therefore the most-seen card. Its moment is
- *    the ABSENCE of a moment — no birdies, no doubles, fifteen holes taken care
- *    of. If this card is weak the whole surface is weak."
+ * "THE COLLAPSE" / "THE TURN" WAS DESIGNED AND CUT (§S1.3). Ben's call:
+ *   "Every moment is something a member would be pleased to see. A collapse
+ *    card was designed and cut — the grind and the plain card are the honest
+ *    neutral floor, and nothing on this surface tells anyone they played badly."
+ * "THE ESCAPE" was cut in v1 (§S1.4). Do not build either, and do not add any
+ * other negative kind.
+ *
+ * THE PLAIN CARD IS THE MOST IMPORTANT OF THE SIX (§S1.6). MOST ROUNDS ARE
+ * PLAIN. It is the one most likely to be treated as a fallback and built
+ * carelessly. It must look deliberate — it gets the same hero, the same well and
+ * the same scorecard, and only its GLOW is different (white, §S2.2).
  */
 
-export type MomentKind = 'eagle' | 'run' | 'collapse' | 'finish' | 'grind';
-
-/** Which chart PROVES this kind of claim (§S2.1). Never picked for variety. */
-export type MomentChart = 'strip' | 'trajectory' | 'trajectoryLastSix' | 'scorecard';
+export type MomentKind = 'eagle' | 'inRed' | 'finish' | 'run' | 'grind' | 'plain';
 
 export interface MomentHole {
   holeNo: number;
@@ -32,19 +41,32 @@ export interface MomentHole {
   strokes: number | null;
 }
 
+/**
+ * HOW THE FIGURE READS (§S2.6). An IDENTITY figure takes a noun BEFORE it
+ * (HOLE 13); a QUANTITY figure takes the noun AFTER it (14 HOLES). The renderer
+ * derives both from ONE translatable template, so a translator can reorder.
+ */
+export type FigureRole = 'identity' | 'quantity' | 'score';
+
 export interface Moment {
   kind: MomentKind;
-  /** §S3.5 — the celebration accent. Never used in the data region except on
-   *  the moment's own holes. */
+  /** §S5.1 — the celebration accent. Expressive in the hero, and in the grid
+   *  ONLY on the moment's own holes (§S5.3). */
   tone: string;
-  chart: MomentChart;
-  /** The moment's OWN holes, the only holes allowed to take the tone (§S3.3). */
-  holes: number[];
-  /** EAGLE only: which feat it actually is. Golf terms, untranslated (§S5.3). */
+  /** i18n key suffix for the eyebrow. `null` on PLAIN: it has no label (§S2.7). */
+  labelKey: string | null;
+  /** i18n key suffix for the figure template, e.g. 'holes' -> "{{n}} HOLES". */
+  figureKey: string | null;
+  figureRole: FigureRole;
+  /** The number in the 46px figure. `null` on PLAIN — the card uses the gross. */
+  figure: number | null;
+  /** i18n key suffix for the sentence. NEVER free text (§S6.2). */
+  sentenceKey: string;
+  /** The holes the grid marks in the tone (§S4.6). */
+  markedHoles: number[];
+  /** EAGLE only: which feat it is. Untranslated golf words (§S6.4). */
   feat?: 'ace' | 'albatross' | 'eagle';
-  /** The hero figure at 56px: a hole number or a count (§S4.2). */
-  figure: number;
-  /** Figures the copy interpolates. Never free text (§S4.3). */
+  /** Figures the sentence templates interpolate. Numbers only. */
   facts: {
     holeNo?: number;
     par?: number;
@@ -52,41 +74,31 @@ export interface Moment {
     count?: number;
     from?: number;
     to?: number;
-    dropped?: number;
-    /** The round's to-par WITHOUT the collapse hole — the neutral counterweight. */
-    restToPar?: number;
     parOrBetter?: number;
     played?: number;
-    birdies?: number;
-    doubles?: number;
     toPar?: number;
   };
 }
 
 export const MOMENT_TONE: Record<MomentKind, string> = {
   eagle: '#FFC93C',
-  run: '#22D07A',
-  collapse: '#FF5A4E',
+  inRed: '#C8102E',
   finish: '#3B9DFF',
-  /* THE EVERYDAY ROUND GETS THE HOUSE COLOUR (§S3.5). */
+  run: '#22D07A',
   grind: '#F7931E',
-};
-
-const MOMENT_CHART: Record<MomentKind, MomentChart> = {
-  eagle: 'strip',
-  run: 'strip',
-  collapse: 'trajectory',
-  finish: 'trajectoryLastSix',
-  grind: 'scorecard',
+  /* A PLAIN ROUND'S ACCENT IS WHITE (§S2.2): colour means something happened,
+     white means a round was played. Same shape, same weight, different
+     temperature — so a plain round still holds its own in the rail without
+     claiming to be a story. */
+  plain: '#FFFFFF',
 };
 
 /** THE RUN'S THRESHOLD. Six is a good stretch; seven is a story. */
 export const RUN_MIN = 7;
-/** THE COLLAPSE'S THRESHOLD: a triple or worse on one hole. */
-export const COLLAPSE_MIN = 3;
-/** BEN TIGHTENED THE FINISH: one birdie on the last is a nice finish, not a
- *  story. TWO of the last three, or it is a grind. */
+/** TWO of the last three, or it is not a finish. */
 export const FINISH_MIN = 2;
+/** THE GRIND: twelve holes taken care of and nothing worse than a bogey. */
+export const GRIND_MIN = 12;
 
 interface Scored {
   holeNo: number;
@@ -109,18 +121,19 @@ function scored(holes: readonly MomentHole[]): Scored[] {
 }
 
 /**
- * A ROUND WITH NO HOLE DATA CANNOT BE SELECTED ON (§S1.5): it returns the GRIND
- * with no holes and no counts, and the card renders the grind layout with an
- * empty well. Never a blank hero.
+ * A ROUND WITH NO HOLE DATA CANNOT BE SELECTED ON (§S1.7): it returns PLAIN with
+ * no marked holes and no counts, and the card renders the plain hero with an
+ * EMPTY well. Never a blank hero, never a placeholder grid.
  */
 export function selectMoment(holes: readonly MomentHole[] | null | undefined): Moment {
   const hs = scored(holes ?? []);
-  if (hs.length === 0) return grind([], 0);
+  if (hs.length === 0) return plain([], 0);
 
   const played = hs.length;
   const toPar = hs.reduce((s, h) => s + h.d, 0);
 
-  /* 1 — EAGLE. An ACE outranks an eagle; an ALBATROSS outranks both. */
+  /* 1 — EAGLE. An ACE outranks an eagle; an ALBATROSS outranks both. Same
+     treatment, different word (§S1.2). */
   const feats = hs.filter((h) => h.strokes === 1 || h.d <= -2);
   if (feats.length > 0) {
     const rank = (h: Scored) => (h.strokes === 1 ? 3 : h.d <= -3 ? 2 : 1);
@@ -130,21 +143,57 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
     return {
       kind: 'eagle',
       tone: MOMENT_TONE.eagle,
-      chart: MOMENT_CHART.eagle,
-      holes: [best.holeNo],
-      feat,
+      labelKey: feat,
+      figureKey: 'hole',
+      figureRole: 'identity',
       figure: best.holeNo,
-      facts: {
-        holeNo: best.holeNo,
-        par: best.par,
-        strokes: best.strokes,
-        toPar,
-        played,
-      },
+      sentenceKey: 'eagle',
+      markedHoles: [best.holeNo],
+      feat,
+      facts: { holeNo: best.holeNo, par: best.par, strokes: best.strokes, toPar, played },
     };
   }
 
-  /* 2 — THE RUN. Consecutive by HOLE NUMBER, so a missing hole breaks it. */
+  /* 2 — IN RED. The CUMULATIVE to-par went below zero at any point. The marked
+     holes are every hole the round was under par AFTER — the stretch the story
+     is about, not a single hole. */
+  const underHoles: number[] = [];
+  let cum = 0;
+  for (const h of hs) {
+    cum += h.d;
+    if (cum < 0) underHoles.push(h.holeNo);
+  }
+  if (underHoles.length > 0) {
+    return {
+      kind: 'inRed',
+      tone: MOMENT_TONE.inRed,
+      labelKey: 'inRed',
+      figureKey: 'holes',
+      figureRole: 'quantity',
+      figure: underHoles.length,
+      sentenceKey: 'inRed',
+      markedHoles: underHoles,
+      facts: { count: underHoles.length, toPar, played },
+    };
+  }
+
+  /* 3 — THE FINISH. Birdie or better on at least two of 16, 17, 18. */
+  const closing = hs.filter((h) => h.holeNo >= 16 && h.holeNo <= 18 && h.d <= -1);
+  if (closing.length >= FINISH_MIN) {
+    return {
+      kind: 'finish',
+      tone: MOMENT_TONE.finish,
+      labelKey: 'finish',
+      figureKey: 'inThree',
+      figureRole: 'quantity',
+      figure: closing.length,
+      sentenceKey: 'finish',
+      markedHoles: closing.map((h) => h.holeNo),
+      facts: { count: closing.length, toPar, played },
+    };
+  }
+
+  /* 4 — THE RUN. Consecutive by HOLE NUMBER, so a missing hole breaks it. */
   let bestRun: Scored[] = [];
   let cur: Scored[] = [];
   for (const h of hs) {
@@ -157,9 +206,12 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
     return {
       kind: 'run',
       tone: MOMENT_TONE.run,
-      chart: MOMENT_CHART.run,
-      holes: bestRun.map((h) => h.holeNo),
+      labelKey: 'run',
+      figureKey: 'inARow',
+      figureRole: 'quantity',
       figure: bestRun.length,
+      sentenceKey: 'run',
+      markedHoles: bestRun.map((h) => h.holeNo),
       facts: {
         count: bestRun.length,
         from: bestRun[0].holeNo,
@@ -170,70 +222,45 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
     };
   }
 
-  /* 3 — THE COLLAPSE. The worst hole; ties go to the LATER hole, which is the
-     one the member remembers. Its word is neutral and the figure talks (§S3.6). */
-  const bad = hs.filter((h) => h.d >= COLLAPSE_MIN);
-  if (bad.length > 0) {
-    const worst = bad.reduce((a, b) => (b.d >= a.d ? b : a));
-    return {
-      kind: 'collapse',
-      tone: MOMENT_TONE.collapse,
-      chart: MOMENT_CHART.collapse,
-      holes: [worst.holeNo],
-      figure: worst.holeNo,
-      facts: {
-        holeNo: worst.holeNo,
-        par: worst.par,
-        strokes: worst.strokes,
-        dropped: worst.d,
-        restToPar: toPar - worst.d,
-        toPar,
-        played,
-      },
-    };
-  }
-
-  /* 4 — THE FINISH. Two of 16, 17, 18 under par. */
-  const closing = hs.filter((h) => h.holeNo >= 16 && h.holeNo <= 18 && h.d <= -1);
-  if (closing.length >= FINISH_MIN) {
-    return {
-      kind: 'finish',
-      tone: MOMENT_TONE.finish,
-      chart: MOMENT_CHART.finish,
-      holes: closing.map((h) => h.holeNo),
-      figure: closing.length,
-      facts: { count: closing.length, toPar, played },
-    };
-  }
-
-  /* 5 — THE GRIND. The default, and the card members see most. */
-  return grind(hs, toPar);
-}
-
-function grind(hs: Scored[], toPar: number): Moment {
+  /* 5 — THE GRIND. Twelve or more at par or better AND no hole worse than a
+     bogey. NOTHING IS MARKED: the claim is about the WHOLE round, and marking
+     twelve of eighteen holes would mark the card rather than a moment. */
   const parOrBetter = hs.filter((h) => h.d <= 0).length;
-  const birdies = hs.filter((h) => h.d <= -1).length;
-  const doubles = hs.filter((h) => h.d >= 2).length;
-  return {
-    kind: 'grind',
-    tone: MOMENT_TONE.grind,
-    chart: MOMENT_CHART.grind,
-    /* NOTHING IS HIGHLIGHTED: an absence cannot be shown by highlighting
-       anything, so THE EVIDENCE IS EVERY HOLE (§S2.1). */
-    holes: [],
-    figure: parOrBetter,
-    facts: { parOrBetter, played: hs.length, birdies, doubles, toPar },
-  };
+  const worstOverBogey = hs.some((h) => h.d >= 2);
+  if (parOrBetter >= GRIND_MIN && !worstOverBogey) {
+    return {
+      kind: 'grind',
+      tone: MOMENT_TONE.grind,
+      labelKey: 'grind',
+      figureKey: 'holes',
+      figureRole: 'quantity',
+      figure: parOrBetter,
+      sentenceKey: 'grind',
+      markedHoles: [],
+      facts: { parOrBetter, played, toPar },
+    };
+  }
+
+  /* 6 — PLAIN. The default, and the card members see most (§S1.6). */
+  return plain(hs, toPar);
 }
 
-/** Which sentence template a grind takes — chosen, never concatenated (§S5.2). */
-export function grindSentenceKey(m: Moment): 'clean' | 'noDoubles' | 'noBirdies' | 'plain' | 'noHoles' {
-  const { played = 0, birdies = 0, doubles = 0 } = m.facts;
-  if (played === 0) return 'noHoles';
-  if (birdies === 0 && doubles === 0) return 'clean';
-  if (doubles === 0) return 'noDoubles';
-  if (birdies === 0) return 'noBirdies';
-  return 'plain';
+function plain(hs: Scored[], toPar: number): Moment {
+  const parOrBetter = hs.filter((h) => h.d <= 0).length;
+  return {
+    kind: 'plain',
+    tone: MOMENT_TONE.plain,
+    /* NO LABEL (§S2.7). Its figure is the GROSS with the to-par beside it, which
+       on an ordinary round is the right headline because it is the only thing
+       that happened. */
+    labelKey: null,
+    figureKey: null,
+    figureRole: 'score',
+    figure: null,
+    sentenceKey: hs.length === 0 ? 'noHoles' : 'plain',
+    markedHoles: [],
+    facts: { parOrBetter, played: hs.length, toPar },
+  };
 }
 
 export default selectMoment;
