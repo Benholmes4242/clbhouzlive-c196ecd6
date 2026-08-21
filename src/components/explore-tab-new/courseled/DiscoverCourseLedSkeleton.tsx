@@ -482,16 +482,22 @@ export function MostPlayedPanel() {
   return (
     <section>
       <EyebrowBar w={152} aside />
-      <div style={{ ...CARD_SHELL, padding: '4px 14px' }}>
-        {[0, 1, 2].map((i) => (
+      {/* CORRECTION_MOST_PLAYED_COURSE_HEADERS §S4.4 — FOUR SEPARATE CARDS with
+          the same 10px gap, or the section settles from one panel into four on
+          every cold load. */}
+      <div>
+        {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 11,
-              padding: '12px 0',
-              borderBottom: i === 2 ? 'none' : `1px solid ${A.BORDER}`,
+              padding: '12px 14px',
+              background: A.PANEL,
+              borderRadius: 16,
+              boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
+              marginBottom: 10,
             }}
           >
             {/* NO RANK BAR (BRIEF_MOST_PLAYED_LEADERBOARD §S1.2) and a 52px
