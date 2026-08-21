@@ -623,10 +623,10 @@ function GolfThisWeekCard({
       </CourseImageFallback>
 
 
-      <div style={{ padding: '9px 11px 9px' }}>
-        {/* THE MEMBER ROW SITS DIRECTLY UNDER THE PHOTOGRAPH (§S3.1): the score
-            moved onto the image, so the name gets the room. The follow control
-            stays right-aligned here in whichever of its three states applies. */}
+      <div style={{ padding: '8px 10px 10px' }}>
+        {/* THE MEMBER ROW SITS DIRECTLY UNDER THE PHOTOGRAPH: the score is on the
+            image, so the name gets the room. The follow control stays
+            right-aligned here in whichever of its three states applies. */}
         <div
           style={{
             display: 'flex',
@@ -635,12 +635,12 @@ function GolfThisWeekCard({
             minWidth: 0,
           }}
         >
-          {/* THE AVATAR IS THE FRIENDS RAIL'S AVATAR: 20px, no ring (§7). */}
+          {/* 19px, no ring (§S4.5). */}
           <SquircleAvatar
             src={row.profile_photo_url}
             userId={row.user_id}
             alt={row.display_name}
-            size={20}
+            size={19}
             hideRing
           />
 
@@ -648,9 +648,9 @@ function GolfThisWeekCard({
             style={{
               flex: 1,
               minWidth: 0,
-              fontSize: 12.5,
+              fontSize: 12,
               fontWeight: 600,
-              color: row.is_self ? AMBER : A.BODY,
+              color: row.is_self ? AMBER : INK,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -677,48 +677,65 @@ function GolfThisWeekCard({
           )}
         </div>
 
+        {/* =====================================================================
+            ONE WELL, NO BORDER (§S1.1–§S1.4). The trajectory and the scorecard
+            were two framed objects; they are now one tinted object, and that is
+            where most of the height comes back. The well bleeds to the card
+            edges so the scorecard gets its measured 244px inner width.
 
-        {/* THE TRAJECTORY IS NOW THE SUMMARY (§S2.2): 40px tall, 1.6px stroke,
-            full bleed. It no longer has to carry both the shape and the detail —
-            the grid beneath is the detail — so it does not take the height it
-            took when it was the only record of the round. Everything else about
-            the curve is unchanged: graded stroke, solid opaque fill, tangent
-            cubic, natural axis, gold-only beads.
-            showMeta FALSE: the birdie/par/bogey/double strip is DELETED (§S3.1) —
-            the grid says what it said, hole by hole rather than as four totals. */}
-        <div style={{ marginTop: 6, marginLeft: -11, marginRight: -11 }}>
+            NO BORDER HERE, EVER. The tint carries the separation; an outline on
+            top of it is the fussiness this brief removes. */}
+        <div
+          style={{
+            marginTop: 8,
+            marginLeft: -10,
+            marginRight: -10,
+            background: WELL,
+            borderRadius: WELL_RADIUS,
+            padding: `${WELL_PAD_TOP}px ${WELL_PAD_X}px ${WELL_PAD_BOTTOM}px`,
+          }}
+        >
+          {/* THE TRAJECTORY: unchanged curve — graded stroke, full opaque blend,
+              dashed level-par baseline, tangent-cubic smoothing, natural axis,
+              gold-only beads. showMeta FALSE keeps the B/P/B strip deleted. */}
           <ShapeReveal>
             <RoundShape
               row={row}
               shape={shape}
-              width={CARD_W}
+              width={WELL_INNER}
               height={SHAPE_H}
               showMeta={false}
               strokeWidth={1.6}
             />
           </ShapeReveal>
+
+          {/* THE ONE HAIRLINE INSIDE THE WELL (§S1.4), full-bleed to its edges.
+              It is the ONLY rule in here. */}
+          <div
+            aria-hidden
+            style={{
+              height: 1,
+              background: WELL_RULE,
+              marginLeft: -WELL_PAD_X,
+              marginRight: -WELL_PAD_X,
+              marginTop: 6,
+              marginBottom: 7,
+            }}
+          />
+
+          {/* THE SCORECARD. A round with no hole data renders NOTHING here, not a
+              placeholder and not reserved height — the card's minHeight holds the
+              rail level instead. The outer rings take the WELL colour (§S3.6). */}
+          <MiniScorecard shape={shape} well={WELL} />
         </div>
 
-        {/* THE SCORECARD — two rows of nine (§S2.4). A round with no hole data
-            renders NOTHING here, not a placeholder and not reserved height. */}
-        <div style={{ marginTop: 7, marginLeft: -9, marginRight: -9 }}>
-          <MiniScorecard shape={shape} />
-        </div>
-
-
-
-        {/* THE SUBLINE IS THE FRIENDS RAIL'S SUBLINE (§4.2): same glyph, same
-            figure font, same body ink, ONE line of reserved height. Aligned to
-            the bottom of the reserve so the gap lives above the line, not below
-            it, and every tile's line sits at the same height. */}
+        {/* THE INSIGHT LINE sits BELOW the well (§S4.4), 10.5px in MID with its
+            glyph, on ONE line of reserved height so every tile's line lands at
+            the same place. */}
         <div
           style={{
-            minHeight: INSIGHT_LINE_RESERVE,
-            /* §S3 — 10px above the insight line, matching the trajectory→grid gap
-               above. The grid reads as a block, the line as a comment on it. The
-               whole-block margin means a card with NO grid (no hole data) keeps
-               the same 10px there, so every tile stays level. */
-            marginTop: 10,
+            minHeight: INSIGHT_LINE_RESERVE_SM,
+            marginTop: 8,
             display: 'flex',
             alignItems: 'flex-end',
           }}
@@ -727,10 +744,10 @@ function GolfThisWeekCard({
             <div
               style={{
                 ...FIGS,
-                fontSize: INSIGHT_FONT_SIZE,
+                fontSize: INSIGHT_SM,
                 lineHeight: INSIGHT_LINE_HEIGHT,
                 fontWeight: 600,
-                color: A.BODY,
+                color: MID,
                 ...INSIGHT_CLAMP,
               }}
             >
