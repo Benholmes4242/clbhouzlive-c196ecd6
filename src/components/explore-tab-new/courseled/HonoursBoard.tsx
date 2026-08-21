@@ -183,23 +183,18 @@ function MemberAvatar({
   src,
   alt,
   size = AVATAR,
-  own = false,
 }: {
   userId: string | null;
   src: string | null;
   alt: string;
   size?: number;
-  own?: boolean;
 }) {
   return (
     <span
       style={{
         flex: '0 0 auto',
         display: 'block',
-        /* §S5.1 — the viewing member's own feat takes an AMBER ring. Amber means
-           the viewer here exactly as it does everywhere else. */
         borderRadius: '34%',
-        boxShadow: own ? `0 0 0 1.5px ${A.AMBER}` : undefined,
       }}
     >
       <SquircleAvatar size={size} src={src} alt={alt} userId={userId} hairlineRing />
@@ -389,7 +384,6 @@ export function FeatCard({
             userId={e.userId}
             src={e.actorAvatar}
             alt={e.actorName}
-            own={!!e.isOwn}
           />
           {/* NO "YOU" SUBSTITUTION (§S5.2) — this is a record, and a record
               carries names. Amber says whose it is. */}
@@ -487,7 +481,6 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
         src={l.lead.actorAvatar}
         alt={l.lead.actorName}
         size={28}
-        own={l.isOwn}
       />
       <span
         style={{
