@@ -491,7 +491,7 @@ function GolfThisWeekCard({
               fontSize: 21,
               fontWeight: 700,
               letterSpacing: '-0.04em',
-              lineHeight: 0.9,
+              lineHeight: 0.85,
               color: '#FFFFFF',
             }}
           >
