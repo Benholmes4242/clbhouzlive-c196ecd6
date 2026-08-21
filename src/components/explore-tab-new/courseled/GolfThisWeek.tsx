@@ -509,6 +509,8 @@ const PHOTO_TOP_SCRIM_H = 48;
    there is now ONE edge (region -> well) where there were TWO (hero -> white
    row, row -> well). */
 const PHOTO_BOTTOM_SCRIM_H = 159;
+/** Photo only on the first N tiles: the rail renders every round (§4.2). */
+const PHOTO_TILE_LIMIT = 6;
 
 
 const fmtRel = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
@@ -1647,10 +1649,9 @@ export function GolfThisWeek({
               shape={holeShapes?.get(r.score_id ?? '') ?? null}
               courseName={m?.name ?? r.course_name}
               region={m?.region ?? null}
-              /* §4.2 — every tile carries its course photograph. The <img> is
-                 loading="lazy", so tiles off the rail's viewport do not fetch
-                 until they are scrolled into view. */
-              imageUrl={m?.imageUrl ?? null}
+              /* §4.2 — the photo is limited to the leading tiles so the rail
+                 does not fire one image request per round on cold load. */
+              imageUrl={i < PHOTO_TILE_LIMIT ? m?.imageUrl ?? null : null}
               /* §2.2 — never on the member's own round, never on someone already
                  followed, and never before the follow set has resolved. */
               showFollow={!r.is_self && !!userId && !!following.data}
