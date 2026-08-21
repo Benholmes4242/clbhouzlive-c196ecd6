@@ -1078,7 +1078,15 @@
       "countAces_one": "{{count}} Ass",
       "countAces_other": "{{count}} Asse",
       "countAlbatrosses_one": "{{count}} Albatros",
-      "countAlbatrosses_other": "{{count}} Albatrosse"
+      "countAlbatrosses_other": "{{count}} Albatrosse",
+      "yards": "YARDS",
+      "holeAndPar": "{{hole}} · Par {{par}}",
+      "sublineAces_one": "{{count}} Ace",
+      "sublineAces_other": "{{count}} Aces",
+      "sublineAlbatrosses_one": "{{count}} Albatross",
+      "sublineAlbatrosses_other": "{{count}} Albatrosses",
+      "sublineBoth": "{{aces}} und {{albatrosses}}, insgesamt. Ein Ace wird üblicherweise mit 12.500 zu 1 angegeben.",
+      "sublineOne": "{{feats}}, insgesamt. Ein Ace wird üblicherweise mit 12.500 zu 1 angegeben."
     },
     "feat": {
       "group": {

@@ -36,7 +36,6 @@ import { MostPlayedSheet } from './courseled/MostPlayedSheet';
 import {
   HonoursBoard,
   sortHonours,
-  type HonoursLeader,
   type HonoursMode,
 } from './courseled/HonoursBoard';
 import { HonoursBoardSheet } from './courseled/HonoursBoardSheet';
@@ -223,17 +222,9 @@ export default function ExploreTabContent({
     setHonoursSheet(true);
   }, [honours.length]);
 
-  /* BRIEF_HONOURS_BOARD_REBUILD §1.9 — a leader card's "{{n}} more" opens the
-     SHEET in LEADERS mode, scrolled to that member. Nothing is hidden. */
-  const openHonoursLeader = useCallback((leader: HonoursLeader) => {
-    analyticsEvents.track('discover_honours_sheet_open', {
-      total: leader.total,
-      source: 'leader_more',
-    });
-    setHonoursMode('leaders');
-    setHonoursFocus(leader.userId);
-    setHonoursSheet(true);
-  }, []);
+  /* BRIEF_HONOURS_BOARD_THE_HOLE §S4.1 — the rail no longer groups by member,
+     so there is no "{{n}} more" affordance and no leader-focused open. The
+     sheet still accepts a focus id; nothing on this page supplies one. */
 
   return (
     <div style={{ background: A.CANVAS, minHeight: '100vh', fontFamily: SANS, ...FIGS }}>
@@ -321,7 +312,6 @@ export default function ExploreTabContent({
           onRowPress={handleHonoursRow}
           limit={20}
           onSeeAll={openHonoursSheet}
-          onSeeAllLeader={openHonoursLeader}
         />
 
         {/* Clears the floating bottom nav. Collapses to 16px on routes where

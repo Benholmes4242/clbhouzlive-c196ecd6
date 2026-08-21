@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import {
   HonoursBoard,
   groupLeaders,
   PLAQUE_W,
-  BAND_H,
+  CARD_H,
 } from '@/components/explore-tab-new/courseled/HonoursBoard';
 import type { WireEvent } from '@/components/explore-tab-new/hooks/useDiscoverWire';
 
@@ -28,34 +28,63 @@ function ev(over: Partial<WireEvent> & { id: string }): WireEvent {
   } as unknown as WireEvent;
 }
 
-describe('BRIEF_HONOURS_BOARD_PLAQUE_RAIL', () => {
-  it('names the feat in words on every plaque and prints the hole detail', () => {
+describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
+  it('leads each card with the yardage and puts the hole and par beneath', () => {
     const { container } = render(<HonoursBoard events={[ev({ id: 'a' })]} />);
-    expect(screen.getByText('Ace')).toBeTruthy();
-    expect(container.textContent).toMatch(/Par 3/);
     expect(container.textContent).toMatch(/152/);
-    expect(PLAQUE_W).toBe(212);
-    expect(BAND_H).toBe(132);
+    expect(container.textContent).toMatch(/YARDS/i);
+    expect(container.textContent).toMatch(/Par 3/);
+    expect(screen.getByText('Ace')).toBeTruthy();
+    expect(PLAQUE_W).toBe(206);
   });
 
-  it('prints no feat-count headline or golfer count above the rail', () => {
+  it('states the computed totals and the hedged rarity once, in the subline', () => {
     const { container } = render(
-      <HonoursBoard events={[ev({ id: 'a' }), ev({ id: 'b' })]} />,
+      <HonoursBoard
+        events={[ev({ id: 'a' }), ev({ id: 'b' }), ev({ id: 'c', kind: 'albatross' })]}
+      />,
     );
-    expect(container.textContent).not.toMatch(/2 aces/);
-    expect(container.textContent).not.toMatch(/golfer/i);
+    expect(container.textContent).toMatch(/2 aces/);
+    expect(container.textContent).toMatch(/1 albatross/);
+    expect(container.textContent).toMatch(/all time/);
+    expect(container.textContent).toMatch(/commonly quoted at 12,500 to 1/);
+    /* E — no card carries the odds: it is said once, above the rail. */
+    expect(container.textContent!.match(/12,500/g)).toHaveLength(1);
   });
 
-  it('opens on RECENT with two aria-pressed buttons and switches mode', () => {
+  it('carries NO recent / leaders toggle on the section', () => {
     render(<HonoursBoard events={[ev({ id: 'a' })]} />);
-    const recent = screen.getByRole('button', { name: /Recent/i });
-    const leaders = screen.getByRole('button', { name: /Leaders/i });
-    expect(recent.getAttribute('aria-pressed')).toBe('true');
-    fireEvent.click(leaders);
-    expect(leaders.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.queryByRole('button', { name: /Leaders/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Recent$/i })).toBeNull();
   });
 
-  it('ranks leaders by total, then albatrosses, then recency', () => {
+  it('gives every card in the rail the same declared height and width', () => {
+    const { container } = render(
+      <HonoursBoard
+        events={[ev({ id: 'a', userId: 'u1' }), ev({ id: 'b', userId: 'u1' })]}
+      />,
+    );
+    /* H — a member with two feats appears twice, in two identical cards. */
+    const cards = [...container.querySelectorAll('button')];
+    expect(cards).toHaveLength(2);
+    for (const c of cards) {
+      expect((c as HTMLElement).style.height).toBe(`${CARD_H}px`);
+      expect((c as HTMLElement).style.width).toBe(`${PLAQUE_W}px`);
+    }
+  });
+
+  it('shows no photograph on any card', () => {
+    const { container } = render(<HonoursBoard events={[ev({ id: 'a' })]} />);
+    expect(container.querySelectorAll('img')).toHaveLength(0);
+  });
+
+  it('renders the member name with no "You" substitution', () => {
+    render(<HonoursBoard events={[ev({ id: 'a', isOwn: true })]} />);
+    expect(screen.getByText('Sam Fairway')).toBeTruthy();
+    expect(screen.queryByText('You')).toBeNull();
+  });
+
+  it('still ranks leaders for the sheet: total, then albatrosses, then recency', () => {
     const leaders = groupLeaders([
       ev({ id: 'a', userId: 'u1', at: '2020-01-01T00:00:00Z' }),
       ev({ id: 'b', userId: 'u1', at: '2021-01-01T00:00:00Z' }),
@@ -79,15 +108,4 @@ describe('BRIEF_HONOURS_BOARD_PLAQUE_RAIL', () => {
     const { container } = render(<HonoursBoard events={[]} />);
     expect(container.textContent).toBe('');
   });
-
-  it('prints the year on each recent card', () => {
-    render(
-      <HonoursBoard
-        events={[ev({ id: 'a', at: '2024-05-01T00:00:00Z' }), ev({ id: 'b', at: '2022-05-01T00:00:00Z' })]}
-      />,
-    );
-    expect(screen.getAllByText('2024').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('2022').length).toBeGreaterThan(0);
-  });
 });
-

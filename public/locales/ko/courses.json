@@ -1021,7 +1021,13 @@
       "expandFeats_one": "{{count}}개 더",
       "collapseFeats": "접기",
       "countAces_other": "홀인원 {{count}}회",
-      "countAlbatrosses_other": "알바트로스 {{count}}회"
+      "countAlbatrosses_other": "알바트로스 {{count}}회",
+      "yards": "야드",
+      "holeAndPar": "{{hole}} · 파 {{par}}",
+      "sublineAces_other": "홀인원 {{count}}회",
+      "sublineAlbatrosses_other": "알바트로스 {{count}}회",
+      "sublineBoth": "역대 {{aces}}, {{albatrosses}}. 홀인원 확률은 보통 12,500 대 1로 알려져 있습니다.",
+      "sublineOne": "역대 {{feats}}. 홀인원 확률은 보통 12,500 대 1로 알려져 있습니다."
     },
     "feat": {
       "group": {

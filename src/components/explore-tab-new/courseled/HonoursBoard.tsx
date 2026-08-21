@@ -1,48 +1,71 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Medal } from 'lucide-react';
+import { Medal } from 'lucide-react';
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, CARD_SHELL, KICKER, LABEL, NUMF, SANS, SECTION_TITLE } from './tokens';
-import { SCRIM_STANDOUT } from '@/styles/photoScrim';
-import { CourseImageFallback } from './CourseImageFallback';
+import { A, LABEL, NUMF, SANS, SECTION_TITLE, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 
 /**
- * Section 7 — THE HONOURS BOARD (light mode; no dark values on this page).
+ * Section 7 — THE HONOURS BOARD (BRIEF_HONOURS_BOARD_THE_HOLE).
  *
- * BRIEF_HONOURS_BOARD_REBUILD — THE PARCHMENT IS GONE. No cream wash, no gold
- * border, no gold hairline, no gold lettering: the section sits on the app
- * canvas with a kicker, a headline and a rail, exactly like Standout Rounds and
- * Latest Reviews, and lets its CONTENT carry the weight.
+ * THE HOLE LEADS BECAUSE THE HOLE IS WHAT VARIES (§S1.2). The feat name is the
+ * same word on every card of its kind; the odds are the same number. The
+ * yardage, the hole and the course are the only things that differ between one
+ * ace and the next. So the card opens with the YARDAGE at size, the hole and
+ * par beneath it, and the feat name reduced to a small label.
  *
- * RECENT: the subject is the FEAT, and a feat is about a HOLE — so the card
- * leads with the hole's photograph, the course name and "7th - Par 3 - 165 yds"
- * ON the photograph, the kind in a glass chip top-left, the year top-right, and
- * the member in a white footer beneath.
+ * TWO EARLIER ANSWERS WERE DESIGNED AND CUT (§S0.5) — do not revisit them:
+ *   A DARK CLUBHOUSE BOARD (gold on lacquer) read as a foreign object parked in
+ *   a light scroll.
+ *   AN ODDS-LED CARD ("1 IN 12,500" as the hero) put the one constant per feat
+ *   type in the largest type on the card: six cards that looked like one card
+ *   six times. The odds are now said ONCE, in the section subline (§S3).
  *
- * LEADERS: the subject is the PERSON. A member with two aces at two courses has
- * two hole photos and no honest way to pick one, so the member leads: their most
- * recent feat's photo carries their avatar and name IN THE SCRIM, a glass chip
- * top-right carries the count, and their feats list beneath as rows — capped at
- * TWO plus a "{{n}} more" row, because a horizontal rail takes the height of its
- * tallest item and one prolific member would leave every other card in a column
- * of dead space. "{{n}} more" opens the SHEET in leaders mode at that member:
- * nothing is hidden, it is deferred.
+ * NO PHOTOGRAPHY (§S0.4 / acceptance K). The stock course image was of
+ * somewhere else on the property; the hole it never showed is the subject.
+ *
+ * THE RAIL IS A SAMPLE, THE SHEET IS THE RECORD (§S4): one card per feat,
+ * newest first, EVERY CARD THE SAME WIDTH AND HEIGHT. Grouping by person was
+ * cut because a member's nested feats made some cards taller than others; a
+ * member with two feats simply APPEARS TWICE, which is its own signal. The
+ * RECENT / LEADERS toggle lives only in the see-all sheet.
  */
 
-/** The rail card. One width for both modes, so the rail reads as one thing. */
-export const PLAQUE_W = 212;
-export const BAND_H = 132;
+/** §S1.5 — one card geometry, and it is fixed so the rail cannot go ragged. */
+export const PLAQUE_W = 206;
+export const CARD_RADIUS = 15;
+export const CARD_SHADOW = '0 1px 3px rgba(11,15,20,0.06)';
+/** The tinted head, then the course + member foot. Both fixed. */
+export const HEAD_H = 96;
+export const CARD_H = 164;
 const PLAQUE_GAP = 10;
-/** Footer / scrim avatar — 20px squircle, canonical component, member userId. */
 const AVATAR = 20;
+
+/**
+ * GOLD IS THE ACE (§S2), AND IT IS NOT A RARITY JUDGEMENT — AN ALBATROSS IS THE
+ * RARER SHOT. Gold already means an ace in this app: the scorecard's scoring key
+ * shows a gold circle for one and `beadForScore` returns SC_FILL_GOLD for it.
+ * The honours board was contradicting the scorecard, so the ace takes the gold
+ * ground and the albatross takes the neutral well. Do NOT swap these on rarity
+ * grounds: whoever does that is right about the rarity and wrong about the
+ * convention.
+ *
+ * ONE GOLD, NOT TWO (§S2.3). SC_FILL_GOLD is #FFD200 — the scorecard's bead
+ * FILL, which is a fill value and illegible as 8px lettering on cream. ACE_GOLD
+ * below is that same gold taken to text weight; the ground is its wash. No
+ * second gold hue is introduced on this surface.
+ */
+const ACE_GROUND = '#F5EBD2';
+const ACE_GOLD = '#B8860B';
+const NEUTRAL_GROUND = '#F4F6F9';
+const GHOST = '#C8D0D8';
 
 export type HonoursMode = 'recent' | 'leaders';
 
-/** Rarest first everywhere on this surface. */
+/** Newest first everywhere on this surface (§S4.2). */
 export function sortHonours(events: WireEvent[]): WireEvent[] {
   return [...events].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
 }
@@ -51,7 +74,23 @@ const at = (e: WireEvent) => new Date(e.at).getTime();
 
 /* ──────────────────────────── shared wording ─────────────────────────── */
 
-/** The hole, middot joined and BUILT FROM PRESENT PARTS. */
+/** The hole and its par, built from present parts only. */
+export function useHoleAndPar() {
+  const { t } = useTranslation('courses');
+  return (e: WireEvent) => {
+    const hole = e.holeNo != null ? formatOrdinal(e.holeNo) : null;
+    if (hole && e.holePar != null)
+      return t('discover.honours.holeAndPar', '{{hole}} · Par {{par}}', {
+        hole,
+        par: e.holePar,
+      });
+    if (hole) return hole;
+    if (e.holePar != null) return t('holes.parLabel', 'Par {{par}}', { par: e.holePar });
+    return '';
+  };
+}
+
+/** Kept for the sheet's rows, which still name the feat in a column. */
 export function useHoleDetail() {
   const { t } = useTranslation('courses');
   return (e: WireEvent) =>
@@ -72,10 +111,6 @@ export function useKindLabel() {
       : t('discover.honours.badgeAlbatross', 'Albatross');
 }
 
-/**
- * THE COUNT CHIP ADAPTS (§1.7): "2 aces" only when every feat is the same kind.
- * An ace and an albatross is "2 feats" — "2 aces" would simply be wrong.
- */
 export function useCountLabel() {
   const { t } = useTranslation('courses');
   return (events: WireEvent[]) => {
@@ -101,59 +136,80 @@ export function useCountLabel() {
   };
 }
 
-/* ───────────────────────────── glass chrome ──────────────────────────── */
-
 /**
- * The dark glass chip every Discover photo badge now uses
- * (BRIEF_GLASS_BADGES_DARK): a SOLID dark fill, flat white figure, no blur —
- * a static backdrop-filter costs a compositing layer per card on mobile.
+ * §S3 — THE RARITY, SAID ONCE. The totals are COMPUTED from the feats on the
+ * board, so "Four aces and an albatross" changes the moment someone makes one.
+ *
+ * "COMMONLY QUOTED AT" IS DELIBERATE AND MUST NOT BE TIGHTENED (§S3.3): the
+ * 12,500 figure is folklore rather than a measured statistic and the app should
+ * not assert it as fact.
+ *
+ * The sentence takes the two totals as SEPARATE PLACEHOLDERS (§S6.3) because
+ * "four aces and an albatross" does not concatenate in every language.
  */
-const GLASS_CHIP: React.CSSProperties = {
-  position: 'absolute',
-  ...LABEL,
-  fontSize: 8.5,
-  lineHeight: 1,
-  color: '#FFFFFF',
-  background: 'rgba(24,30,26,0.62)',
-  borderRadius: 999,
-  padding: '5px 8px',
-  whiteSpace: 'nowrap',
-  fontVariantNumeric: 'tabular-nums lining-nums',
-};
+export function useHonoursSubline(events: WireEvent[]) {
+  const { t } = useTranslation('courses');
+  const aces = events.filter((e) => e.kind === 'ace').length;
+  const albatrosses = events.length - aces;
 
-const OVERLAY_YEAR: React.CSSProperties = {
-  position: 'absolute',
-  top: 9,
-  right: 10,
-  fontSize: 7,
-  fontWeight: 700,
-  letterSpacing: '0.14em',
-  color: 'rgba(255,255,255,0.78)',
-  textShadow: '0 1px 2px rgba(10,14,10,0.55)',
-  fontVariantNumeric: 'tabular-nums lining-nums',
-};
+  const acePart = t('discover.honours.sublineAces', {
+    count: aces,
+    defaultValue: '{{count}} aces',
+    defaultValue_one: '{{count}} ace',
+  });
+  const albatrossPart = t('discover.honours.sublineAlbatrosses', {
+    count: albatrosses,
+    defaultValue: '{{count}} albatrosses',
+    defaultValue_one: '{{count}} albatross',
+  });
+
+  if (aces > 0 && albatrosses > 0)
+    return t(
+      'discover.honours.sublineBoth',
+      '{{aces}} and {{albatrosses}}, all time. An ace is commonly quoted at 12,500 to 1.',
+      { aces: acePart, albatrosses: albatrossPart },
+    );
+  if (aces > 0 || albatrosses > 0)
+    return t(
+      'discover.honours.sublineOne',
+      '{{feats}}, all time. An ace is commonly quoted at 12,500 to 1.',
+      { feats: aces > 0 ? acePart : albatrossPart },
+    );
+  return '';
+}
 
 function MemberAvatar({
   userId,
   src,
   alt,
   size = AVATAR,
+  own = false,
 }: {
   userId: string | null;
   src: string | null;
   alt: string;
   size?: number;
+  own?: boolean;
 }) {
   return (
-    <span style={{ flex: '0 0 auto', display: 'block' }}>
+    <span
+      style={{
+        flex: '0 0 auto',
+        display: 'block',
+        /* §S5.1 — the viewing member's own feat takes an AMBER ring. Amber means
+           the viewer here exactly as it does everywhere else. */
+        borderRadius: '34%',
+        boxShadow: own ? `0 0 0 1.5px ${A.AMBER}` : undefined,
+      }}
+    >
       <SquircleAvatar size={size} src={src} alt={alt} userId={userId} hairlineRing />
     </span>
   );
 }
 
-/* ──────────────────────────── the recent card ────────────────────────── */
+/* ───────────────────────────── the feat card ─────────────────────────── */
 
-/** §1.3 — one card per FEAT, led by the hole. */
+/** §S1 — one card per FEAT, led by the yardage. */
 export function FeatCard({
   event: e,
   onPress,
@@ -164,10 +220,11 @@ export function FeatCard({
   width?: number | string;
 }) {
   const { t } = useTranslation('courses');
-  const holeDetail = useHoleDetail();
+  const holeAndPar = useHoleAndPar();
   const kindLabel = useKindLabel();
   const tappable = !!onPress && !!e.scoreId;
-  const detail = holeDetail(e);
+  const ace = e.kind === 'ace';
+  const line = holeAndPar(e);
 
   return (
     <button
@@ -175,88 +232,180 @@ export function FeatCard({
       disabled={!tappable}
       onClick={tappable ? () => onPress?.(e) : undefined}
       style={{
-        ...CARD_SHELL,
         width,
+        height: CARD_H,
         flex: 'none',
+        display: 'flex',
+        flexDirection: 'column',
         padding: 0,
+        border: 'none',
+        borderRadius: CARD_RADIUS,
+        background: A.PANEL,
+        boxShadow: CARD_SHADOW,
+        overflow: 'hidden',
         textAlign: 'left',
         fontFamily: SANS,
         boxSizing: 'border-box',
         cursor: tappable ? 'pointer' : 'default',
-        // A feat with no score genuinely cannot open — say so visually.
+        /* A feat with no score genuinely cannot open — say so visually. */
         opacity: tappable ? 1 : 0.62,
       }}
     >
-      <CourseImageFallback
-        courseId={e.courseId}
-        courseName={e.courseName}
-        imageUrl={e.courseImage}
-        initialsSize={24}
-        style={{ height: BAND_H }}
+      {/* THE TINTED HEAD — gold for an ace, the neutral well for an albatross. */}
+      <span
+        style={{
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          height: HEAD_H,
+          flex: '0 0 auto',
+          background: ace ? ACE_GROUND : NEUTRAL_GROUND,
+          padding: '11px 12px 12px',
+          boxSizing: 'border-box',
+        }}
       >
-        <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
+        <span
+          style={{
+            position: 'absolute',
+            top: 11,
+            left: 12,
+            ...LABEL,
+            fontSize: 8,
+            fontWeight: 800,
+            letterSpacing: '0.18em',
+            color: ace ? ACE_GOLD : A.INK,
+          }}
+        >
+          {kindLabel(e)}
+        </span>
+        <span
+          style={{
+            position: 'absolute',
+            top: 11,
+            right: 12,
+            ...LABEL,
+            fontSize: 8,
+            fontWeight: 800,
+            letterSpacing: '0.18em',
+            color: GHOST,
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+        >
+          {formatYearNumeric(e.at)}
+        </span>
 
-        <span style={{ ...GLASS_CHIP, top: 8, left: 8 }}>{kindLabel(e)}</span>
-        <span style={OVERLAY_YEAR}>{formatYearNumeric(e.at)}</span>
-
-        <span style={{ position: 'absolute', left: 10, right: 10, bottom: 9, display: 'block' }}>
-          <span
-            style={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              fontSize: 14,
-              fontWeight: 700,
-              letterSpacing: '-0.025em',
-              lineHeight: 1.14,
-              color: '#FFFFFF',
-            }}
-          >
-            {e.courseName ?? t('discover.unknownCourse', 'Course')}
-          </span>
-          {detail ? (
+        {/* THE YARDAGE IS THE HERO (§S1.1). A card with no yardage on record
+            falls back to the hole line at the same rank rather than printing an
+            empty figure. */}
+        {e.holeYards != null ? (
+          <span style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+            <span
+              style={{
+                ...NUMF,
+                fontSize: 32,
+                fontWeight: 800,
+                letterSpacing: '-0.05em',
+                lineHeight: 1,
+                color: A.INK,
+              }}
+            >
+              {e.holeYards}
+            </span>
             <span
               style={{
                 ...LABEL,
-                fontSize: 8.5,
-                display: 'block',
-                marginTop: 4,
-                color: 'rgba(255,255,255,0.84)',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
+                fontSize: 8,
+                fontWeight: 800,
+                letterSpacing: '0.18em',
+                color: A.MUTE,
               }}
             >
-              {detail}
+              {t('discover.honours.yards', 'YARDS')}
             </span>
-          ) : null}
-        </span>
-      </CourseImageFallback>
+          </span>
+        ) : (
+          <span
+            style={{
+              ...NUMF,
+              fontSize: 24,
+              fontWeight: 800,
+              letterSpacing: '-0.04em',
+              lineHeight: 1,
+              color: A.INK,
+            }}
+          >
+            {line || t('discover.honours.badgeAce', 'Ace')}
+          </span>
+        )}
 
-      {/* THE MEMBER — a white footer, not the subject of the card. */}
+        {e.holeYards != null && line ? (
+          <span
+            style={{
+              display: 'block',
+              marginTop: 6,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '-0.01em',
+              color: A.BODY,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {line}
+          </span>
+        ) : null}
+      </span>
+
+      {/* THE COURSE, THEN THE MEMBER (§S1.4). One line each — a rail card that
+          wraps is a rail card that changes height. */}
       <span
         style={{
           display: 'flex',
-          alignItems: 'center',
-          gap: 7,
-          padding: '9px 10px',
-          background: A.PANEL,
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: 8,
+          flex: 1,
+          padding: '0 12px',
         }}
       >
-        <MemberAvatar userId={e.userId} src={e.actorAvatar} alt={e.actorName} />
         <span
           style={{
-            fontSize: 12.5,
+            display: 'block',
+            fontSize: 13,
             fontWeight: 700,
-            letterSpacing: '-0.015em',
-            color: e.isOwn ? A.AMBER_DEEP : A.INK,
+            letterSpacing: '-0.02em',
+            color: A.INK,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}
         >
-          {e.isOwn ? t('discover.wire.you', 'You') : e.actorName}
+          {e.courseName ?? t('discover.unknownCourse', 'Course')}
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+          <MemberAvatar
+            userId={e.userId}
+            src={e.actorAvatar}
+            alt={e.actorName}
+            own={!!e.isOwn}
+          />
+          {/* NO "YOU" SUBSTITUTION (§S5.2) — this is a record, and a record
+              carries names. Amber says whose it is. */}
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: '-0.015em',
+              color: e.isOwn ? A.AMBER_DEEP : A.BODY,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {e.actorName}
+          </span>
         </span>
       </span>
     </button>
@@ -277,11 +426,11 @@ export interface HonoursLeader {
 }
 
 /**
- * §5.3 — THE RANKING, STATED SO IT IS REPRODUCIBLE:
- *   total feats DESC, then ALBATROSSES DESC, then most recent.
- * Albatross breaks the tie because it is the rarer feat. Grouping is by the
- * STABLE MEMBER ID and never by display name; an event with no id is its own
- * leader, keyed by the event id.
+ * THE RANKING, STATED SO IT IS REPRODUCIBLE: total feats DESC, then
+ * ALBATROSSES DESC, then most recent. Albatross breaks the tie because it is the
+ * rarer feat. Grouping is by the STABLE MEMBER ID and never by display name.
+ *
+ * This now serves the SHEET ONLY (§S4.1): the section rail does not group.
  */
 export function groupLeaders(events: WireEvent[]): HonoursLeader[] {
   const byMember = new Map<string, HonoursLeader>();
@@ -318,292 +467,65 @@ export function groupLeaders(events: WireEvent[]): HonoursLeader[] {
 }
 
 /**
- * THE LEADER BAND (§1.6 / §2.5) — the member IN the scrim over their most
- * recent feat's hole photo, with the count chip top-right. The SHEET renders
- * the SAME band full width, so the two surfaces are recognisably the same
- * thing.
+ * THE LEADER HEAD — the member, their count, and NO PHOTOGRAPH (acceptance K).
+ * Rendered in the sheet only; the section rail is one card per feat.
  */
-export function LeaderBand({
-  leader: l,
-  onPress,
-}: {
-  leader: HonoursLeader;
-  /**
-   * Present ONLY on a single-feat card in the sheet, where it opens that feat's
-   * scorecard (CORRECTION_HONOURS_SHEET_TAP_TARGETS §1/§3). Absent = the band is
-   * inert: no role, no tabIndex, no pointer cursor. The collapse handler that
-   * used to live here is gone (§2).
-   */
-  onPress?: () => void;
-}) {
-  const { t } = useTranslation('courses');
+export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
   const countLabel = useCountLabel();
-
-  const body = (
-    <>
-      <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
-      {/* THE COUNT CHIP SITS TOP-LEFT (CORRECTION_HONOURS_LEADERS_ROWS §2),
-          exactly where a Recent card carries its kind chip — same glass, same
-          8/8 offsets. Top-right stays EMPTY (§5): a Recent card puts the year
-          there, but a leader spans years and has nothing true for that slot.
-          Left-anchored it also cannot be clipped, which is what cut "1 albatro…"
-          when it hung off the right edge (§3). */}
-      <span style={{ ...GLASS_CHIP, top: 8, left: 8 }}>{countLabel(l.events)}</span>
-      <span
-        style={{
-          position: 'absolute',
-          left: 10,
-          right: 10,
-          bottom: 9,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 7,
-        }}
-      >
-        <MemberAvatar userId={l.userId} src={l.lead.actorAvatar} alt={l.lead.actorName} size={24} />
-        <span
-          style={{
-            fontSize: 14,
-            fontWeight: 700,
-            letterSpacing: '-0.025em',
-            color: '#FFFFFF',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {l.isOwn ? t('discover.wire.you', 'You') : l.lead.actorName}
-        </span>
-      </span>
-    </>
-  );
-
   return (
     <div
-      role={onPress ? 'button' : undefined}
-      tabIndex={onPress ? 0 : undefined}
-      onClick={onPress}
-      style={{ cursor: onPress ? 'pointer' : 'default' }}
-    >
-      <CourseImageFallback
-        courseId={l.lead.courseId}
-        courseName={l.lead.courseName}
-        imageUrl={l.lead.courseImage}
-        initialsSize={24}
-        style={{ height: BAND_H }}
-      >
-        {body}
-      </CourseImageFallback>
-    </div>
-  );
-}
-
-/** §1.8 — TWO rows on a card, then a "{{n}} more" row. */
-export const LEADER_ROWS_ON_CARD = 2;
-
-/**
- * A feat row under a leader band. Same shape on the card and in the sheet.
- *
- * `showKind` reinstates BRIEF_HONOURS_BOARD_REBUILD §1.7
- * (CORRECTION_HONOURS_LEADERS_ROWS §1): when the member holds ONE kind the
- * badge already says "2 aces", so repeating "ACE" on every row is the same fact
- * twice — it comes off. When they hold BOTH the badge reads "2 feats" and these
- * rows are the only thing saying which is which, so the label stays.
- */
-export function LeaderFeatRow({
-  event: e,
-  onPress,
-  divider = true,
-  showKind = true,
-}: {
-  event: WireEvent;
-  onPress?: (event: WireEvent) => void;
-  divider?: boolean;
-  showKind?: boolean;
-}) {
-  const { t } = useTranslation('courses');
-  const holeDetail = useHoleDetail();
-  const kindLabel = useKindLabel();
-  const tappable = !!onPress && !!e.scoreId;
-  const detail = holeDetail(e);
-
-  return (
-    <button
-      type="button"
-      disabled={!tappable}
-      onClick={tappable ? () => onPress?.(e) : undefined}
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
-        width: '100%',
-        textAlign: 'left',
-        border: 'none',
-        borderTop: divider ? `1px solid ${A.BORDER}` : 'none',
-        background: 'transparent',
-        padding: '8px 10px',
-        cursor: tappable ? 'pointer' : 'default',
-        opacity: tappable ? 1 : 0.62,
-        fontFamily: SANS,
+        gap: 9,
+        padding: '11px 12px',
+        background: l.events.some((e) => e.kind === 'ace') ? ACE_GROUND : NEUTRAL_GROUND,
       }}
     >
+      <MemberAvatar
+        userId={l.userId}
+        src={l.lead.actorAvatar}
+        alt={l.lead.actorName}
+        size={28}
+        own={l.isOwn}
+      />
       <span
         style={{
-          ...NUMF,
-          fontSize: 11,
-          color: A.MUTE,
-          flex: '0 0 auto',
-          width: 28,
+          fontSize: 13.5,
+          fontWeight: 700,
+          letterSpacing: '-0.02em',
+          color: l.isOwn ? A.AMBER_DEEP : A.INK,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          minWidth: 0,
+          flex: 1,
         }}
       >
-        {formatYearNumeric(e.at)}
+        {l.lead.actorName}
       </span>
-      <span style={{ minWidth: 0, flex: 1 }}>
-        <span
-          style={{
-            display: 'block',
-            fontSize: 12.5,
-            fontWeight: 700,
-            letterSpacing: '-0.015em',
-            color: A.INK,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {e.courseName ?? t('discover.unknownCourse', 'Course')}
-        </span>
-        {detail ? (
-          <span
-            style={{
-              ...LABEL,
-              fontSize: 8.5,
-              color: A.MUTE,
-              display: 'block',
-              marginTop: 2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {detail}
-          </span>
-        ) : null}
+      <span
+        style={{
+          ...LABEL,
+          fontSize: 8,
+          letterSpacing: '0.18em',
+          color: A.BODY,
+          flex: '0 0 auto',
+          fontVariantNumeric: 'tabular-nums lining-nums',
+        }}
+      >
+        {countLabel(l.events)}
       </span>
-      {showKind ? (
-        <span style={{ ...LABEL, fontSize: 8.5, color: A.BODY, flex: '0 0 auto' }}>
-          {kindLabel(e)}
-        </span>
-      ) : null}
-      <ChevronRight size={13} strokeWidth={2.5} color={A.DIM} style={{ flex: '0 0 auto' }} />
-    </button>
-  );
-}
-
-function LeaderCard({
-  leader: l,
-  onPress,
-  onSeeAllLeader,
-}: {
-  leader: HonoursLeader;
-  onPress?: (event: WireEvent) => void;
-  onSeeAllLeader?: (leader: HonoursLeader) => void;
-}) {
-  const { t } = useTranslation('courses');
-  const hidden = Math.max(0, l.events.length - LEADER_ROWS_ON_CARD);
-  const shown = l.events.slice(0, LEADER_ROWS_ON_CARD);
-  /* §1 — the row label earns its place ONLY when the badge cannot say the kind.
-     Computed over ALL the member's feats, not just the two shown, so the two
-     rows on a mixed card stay labelled even if both visible rows are aces. */
-  const mixedKinds = new Set(l.events.map((e) => e.kind)).size > 1;
-
-  return (
-    <div
-      style={{
-        ...CARD_SHELL,
-        width: PLAQUE_W,
-        flex: 'none',
-        padding: 0,
-        boxSizing: 'border-box',
-        fontFamily: SANS,
-      }}
-    >
-      <LeaderBand leader={l} />
-      {shown.map((e, i) => (
-        <LeaderFeatRow
-          key={e.id}
-          event={e}
-          onPress={onPress}
-          divider={i > 0}
-          showKind={mixedKinds}
-        />
-      ))}
-      {hidden > 0 ? (
-        <button
-          type="button"
-          onClick={() => onSeeAllLeader?.(l)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 3,
-            width: '100%',
-            ...LABEL,
-            fontSize: 9,
-            color: A.INK,
-            padding: '8px 10px',
-            border: 'none',
-            borderTop: `1px solid ${A.BORDER}`,
-            background: 'transparent',
-            cursor: 'pointer',
-            fontFamily: SANS,
-          }}
-        >
-          {t('discover.honours.expandFeats', {
-            count: hidden,
-            defaultValue: '{{count}} more',
-            defaultValue_one: '{{count}} more',
-          })}
-          <ChevronRight size={11} strokeWidth={2.5} />
-        </button>
-      ) : null}
     </div>
   );
 }
 
-/* ────────────────────────── header and the toggle ────────────────────── */
+/* ─────────────────────────── header and the toggle ───────────────────── */
 
 /**
- * §4 — the headline is COMPUTED and each part is its OWN interpolated,
- * independently pluralised string. A zero part is OMITTED.
- */
-export function useHonoursHeadline(events: WireEvent[]) {
-  const { t } = useTranslation('courses');
-  const aces = events.filter((e) => e.kind === 'ace').length;
-  const albatrosses = events.length - aces;
-  const parts: string[] = [];
-  if (aces > 0)
-    parts.push(
-      t('discover.honours.headlineAces', {
-        count: aces,
-        defaultValue: '{{count}} aces.',
-        defaultValue_one: '{{count}} ace.',
-      }),
-    );
-  if (albatrosses > 0)
-    parts.push(
-      t('discover.honours.headlineAlbatrosses', {
-        count: albatrosses,
-        defaultValue: '{{count}} albatrosses.',
-        defaultValue_one: '{{count}} albatross.',
-      }),
-    );
-  return parts.join(' ');
-}
-
-/**
- * §1.10 — THE APP'S STANDARD PILL TREATMENT: an INK pill on a
- * rgba(15,23,42,0.05) track. The amber segmented control this replaced was a
- * meaningful part of what dated the section.
+ * §S4.1 — THE TOGGLE LIVES IN THE SHEET AND NOWHERE ELSE. On a list of five it
+ * asked a member to choose between a list of FEATS and a list of PEOPLE before
+ * seeing either; in the sheet both orderings have room to mean something.
  */
 export function HonoursModeToggle({
   mode,
@@ -654,31 +576,39 @@ export function HonoursModeToggle({
   );
 }
 
-/** The kicker / headline / subline block, shared with the sheet header. */
+/** The heading block: glyph, title, quiet see-all, then the rarity subline. */
 export function HonoursHeading({
   events,
-  mode,
-  onModeChange,
-  leaderCount,
+  aside,
 }: {
   events: WireEvent[];
-  mode: HonoursMode;
-  onModeChange: (m: HonoursMode) => void;
-  leaderCount: number;
+  aside?: React.ReactNode;
 }) {
   const { t } = useTranslation('courses');
+  const subline = useHonoursSubline(events);
 
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-        {/* BRIEF_DISCOVER_SECTION_HIERARCHY §3.1 — section glyph, then the
-            heading at section rank (15.5 sentence case). */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
         <Medal size={15} strokeWidth={2.2} color={A.INK} />
         <span style={SECTION_TITLE}>{t('discover.honoursTitle', 'The honours board')}</span>
-        <span style={{ marginLeft: 'auto' }}>
-          <HonoursModeToggle mode={mode} onChange={onModeChange} />
-        </span>
+        {aside ? <span style={{ marginLeft: 'auto' }}>{aside}</span> : null}
       </div>
+      {subline ? (
+        <div
+          style={{
+            marginLeft: 22,
+            marginTop: 3,
+            fontFamily: SANS,
+            fontSize: 11.5,
+            fontWeight: 500,
+            lineHeight: 1.4,
+            color: A.MUTE,
+          }}
+        >
+          {subline}
+        </div>
+      ) : null}
     </>
   );
 }
@@ -694,8 +624,6 @@ interface Props {
   showHeader?: boolean;
   onRowPress?: (event: WireEvent) => void;
   onSeeAll?: () => void;
-  /** §1.9 — "{{n}} more" opens the sheet in LEADERS mode at that member. */
-  onSeeAllLeader?: (leader: HonoursLeader) => void;
 }
 
 export function HonoursBoard({
@@ -705,31 +633,26 @@ export function HonoursBoard({
   showHeader = true,
   onRowPress,
   onSeeAll,
-  onSeeAllLeader,
 }: Props) {
   const { t } = useTranslation('courses');
-  /* The mode does NOT persist across mounts; the section opens on RECENT. */
-  const [mode, setMode] = useState<HonoursMode>('recent');
-
-  const leaders = useMemo(() => groupLeaders(events), [events]);
   const feats = useMemo(() => sortHonours(events), [events]);
 
   if (isPending) return <HonoursPanelShell />;
   if (events.length === 0) return null;
 
   const featShown = limit ? feats.slice(0, limit) : feats;
-  const leaderShown = limit ? leaders.slice(0, limit) : leaders;
 
   const railStyle: React.CSSProperties = {
     display: 'flex',
-    alignItems: 'flex-start',
+    /* STRETCH, NOT flex-start: every card declares CARD_H, so the rail cannot
+       go ragged (acceptance G). */
+    alignItems: 'stretch',
     gap: PLAQUE_GAP,
     overflowX: 'auto',
     /* Asymmetric gutters: the first card shares the heading's left edge, the
-       last bleeds off the right so the rail announces that it scrolls. */
-    paddingLeft: 2,
-    paddingRight: 0,
-    paddingBottom: 4,
+       last bleeds off the right so the rail announces that it scrolls. The
+       vertical padding is the shadow's room. */
+    padding: '3px 0 6px 2px',
     scrollPaddingLeft: 2,
     willChange: 'transform',
     WebkitOverflowScrolling: 'touch',
@@ -742,47 +665,21 @@ export function HonoursBoard({
         <div style={{ padding: '0 2px', marginBottom: 10 }}>
           <HonoursHeading
             events={events}
-            mode={mode}
-            onModeChange={setMode}
-            leaderCount={leaders.length}
+            aside={
+              onSeeAll ? (
+                <InkAction onClick={onSeeAll}>
+                  {t('discover.honoursSeeAllPlain', 'See all')}
+                </InkAction>
+              ) : null
+            }
           />
-          {onSeeAll ? (
-            <button
-              type="button"
-              onClick={onSeeAll}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 3,
-                ...LABEL,
-                fontSize: 9.5,
-                color: A.INK,
-                marginTop: 8,
-                padding: 0,
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                fontFamily: SANS,
-              }}
-            >
-              {t('discover.honoursSeeAllPlain', 'See all')}
-              <ChevronRight size={12} strokeWidth={2.5} />
-            </button>
-          ) : null}
         </div>
       ) : null}
 
       <div style={railStyle}>
-        {mode === 'recent'
-          ? featShown.map((e) => <FeatCard key={e.id} event={e} onPress={onRowPress} />)
-          : leaderShown.map((l) => (
-              <LeaderCard
-                key={l.key}
-                leader={l}
-                onPress={onRowPress}
-                onSeeAllLeader={onSeeAllLeader}
-              />
-            ))}
+        {featShown.map((e) => (
+          <FeatCard key={e.id} event={e} onPress={onRowPress} />
+        ))}
       </div>
     </section>
   );

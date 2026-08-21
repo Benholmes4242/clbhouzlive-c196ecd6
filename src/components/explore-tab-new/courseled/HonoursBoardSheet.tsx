@@ -8,7 +8,8 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import {
   HonoursHeading,
-  LeaderBand,
+  HonoursModeToggle,
+  LeaderHead,
   groupLeaders,
   sortHonours,
   useHoleDetail,
@@ -206,7 +207,7 @@ function LeaderSection({
 
   return (
     <div ref={anchorRef} style={{ ...PANEL, scrollMarginTop: 12 }}>
-      <LeaderBand leader={l} onPress={bandPress} />
+      <LeaderHead leader={l} />
       {l.events.map((e, i) => (
         <HonoursRow key={e.id} event={e} mode="leaders" onPress={onRowPress} divider={i > 0} />
       ))}
@@ -287,11 +288,10 @@ export function HonoursBoardSheet({
         }}
       >
         <div id="courseled-honours-title">
+          {/* §S4.1 — THE ONLY RECENT / LEADERS TOGGLE IN THE APP LIVES HERE. */}
           <HonoursHeading
             events={events}
-            mode={mode}
-            onModeChange={setMode}
-            leaderCount={leaders.length}
+            aside={<HonoursModeToggle mode={mode} onChange={setMode} />}
           />
         </div>
       </div>
