@@ -551,14 +551,22 @@ function FigureLine({
   toParText: string | null;
   t: TFn;
 }) {
+  /* THE FIGURE TAKES THE MOMENT'S TONE IF AND ONLY IF IT IS A SCORE
+     (BRIEF_ROUND_TILE_MARK_AND_FIGURE §1). A QUANTITY is a count, not a score:
+     "8 IN A ROW" in green would be decoration, and §S1.4 exists to stop exactly
+     that. A SCORE carries a to-par meaning — on FINISHED IN THE RED the figure
+     IS the round's to-par — so colouring it is the same rule that puts the red
+     on BEST THIS WEEK's -3. PLAIN's tone is white, so it is unchanged. The
+     NOUN and the sentence stay as they are. */
   const numStyle: React.CSSProperties = {
     ...NUMF,
     fontSize: 46,
     fontWeight: 800,
     lineHeight: 1,
     letterSpacing: '-0.06em',
-    color: '#FFFFFF',
+    color: moment.figureRole === 'score' ? moment.tone : '#FFFFFF',
   };
+
   const wordStyle: React.CSSProperties = {
     fontSize: 13,
     fontWeight: 700,
