@@ -551,14 +551,22 @@ function FigureLine({
   toParText: string | null;
   t: TFn;
 }) {
+  /* THE FIGURE TAKES THE MOMENT'S TONE IF AND ONLY IF IT IS A SCORE
+     (BRIEF_ROUND_TILE_MARK_AND_FIGURE §1). A QUANTITY is a count, not a score:
+     "8 IN A ROW" in green would be decoration, and §S1.4 exists to stop exactly
+     that. A SCORE carries a to-par meaning — on FINISHED IN THE RED the figure
+     IS the round's to-par — so colouring it is the same rule that puts the red
+     on BEST THIS WEEK's -3. PLAIN's tone is white, so it is unchanged. The
+     NOUN and the sentence stay as they are. */
   const numStyle: React.CSSProperties = {
     ...NUMF,
     fontSize: 46,
     fontWeight: 800,
     lineHeight: 1,
     letterSpacing: '-0.06em',
-    color: '#FFFFFF',
+    color: moment.figureRole === 'score' ? moment.tone : '#FFFFFF',
   };
+
   const wordStyle: React.CSSProperties = {
     fontSize: 13,
     fontWeight: 700,
@@ -660,7 +668,7 @@ function GolfThisWeekCard({
   /* ONE CHART ONLY (§S0.3): the scorecard. `shape === null` renders NOTHING and
      the well keeps its height — never a placeholder grid (§S1.7). */
   const grid = shape ? (
-    <MiniScorecard shape={shape} well={WELL} marked={marked} markTone={moment.tone} />
+    <MiniScorecard shape={shape} well={WELL} marked={marked} momentTone={moment.tone} />
   ) : null;
 
 
@@ -1130,7 +1138,13 @@ export function GolfThisWeek({
       emoji: '\uD83D\uDD25', // FIRE
       label: t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK'),
       figure: String(best.row.gross ?? '\u2014'),
-      /* §S1.4 — the figure itself stays INK; only the to-par is coloured. */
+      /* §S1.4 — the figure itself stays INK; only the to-par is coloured.
+         STILL TRUE, AND IT IS THE REASON FOR the hero figure rule
+         (BRIEF_ROUND_TILE_MARK_AND_FIGURE §1): what gets coloured is the
+         TO-PAR, never the count. Here the figure is a GROSS beside its own
+         to-par, so the gross stays ink. In the hero, FINISHED IN THE RED's
+         figure IS the to-par, so §S1.4 asks for it to be coloured there — and
+         asks for THE RUN's "8" and BIRDIE HAUL's "5" to stay white. */
       tone: INK,
       qual: bestToPar ?? undefined,
       qualTone: best.toPar < 0 ? TOPAR_RED : BAND_MUTE,
