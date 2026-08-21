@@ -28,7 +28,6 @@ import type { RegionSelection } from './courseled/hooks/useWeekRegionCounts';
 import { GolfThisWeekSheet } from './GolfThisWeekSheet';
 
 
-import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
 import { ClipsRail, LatestVideosRail } from './courseled/CommunityMediaRails';
 import { useCommunityVideos } from './courseled/hooks/useCommunityVideos';
 import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
@@ -41,15 +40,8 @@ import {
   type HonoursMode,
 } from './courseled/HonoursBoard';
 import { HonoursBoardSheet } from './courseled/HonoursBoardSheet';
-import { useMomentsOfTheWeek, type Moment } from './courseled/hooks/useMomentsOfTheWeek';
-import { useFriendIdSet } from './courseled/hooks/useFriendIdSet';
-import {
-  useCommunityCreators,
-  type CommunityCreator,
-} from './courseled/hooks/useCommunityCreators';
-import { useUserStatsCourseMap } from '@/contexts/UserStatsCoursesContext';
 import { useMostPlayedThisWeek, type MostPlayedRow } from './courseled/hooks/useMostPlayedThisWeek';
-import { buildMomentQueue } from '@/features/community/momentQueue';
+
 
 /**
  * Discover, COURSE-LED (BRIEF_DISCOVER_REBUILT_COURSE_LED).
