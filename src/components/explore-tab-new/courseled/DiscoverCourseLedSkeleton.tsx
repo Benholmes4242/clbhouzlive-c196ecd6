@@ -537,11 +537,13 @@ export default function DiscoverCourseLedSkeleton() {
           flexDirection: 'column',
           gap: 28,
         }}
-      >
 
-
-        <MomentsMosaic />
+        {/* MomentsMosaic is NO LONGER REACHED FROM DISCOVER
+            (MICRO_BRIEF_REMOVE_MOMENTS_FROM_DISCOVER): the section was
+            unmounted from the page. The export STAYS — MomentsOfTheWeek still
+            renders it as its own pending shell on the Community page. */}
         <MostPlayedPanel />
+
         <HonoursPanel />
       </div>
     </div>
