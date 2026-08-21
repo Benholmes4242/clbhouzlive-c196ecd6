@@ -509,8 +509,6 @@ const PHOTO_TOP_SCRIM_H = 48;
    there is now ONE edge (region -> well) where there were TWO (hero -> white
    row, row -> well). */
 const PHOTO_BOTTOM_SCRIM_H = 159;
-/** Photo only on the first N tiles: the rail renders every round (§4.2). */
-const PHOTO_TILE_LIMIT = 6;
 
 
 const fmtRel = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
