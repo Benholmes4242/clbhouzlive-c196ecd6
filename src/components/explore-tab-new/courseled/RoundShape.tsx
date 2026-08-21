@@ -737,7 +737,9 @@ function NineRow({
             fontWeight: 700,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: MINI_FAINT,
+            /* §3 (BRIEF_DISCOVER_FINISHING_PASS) — the nine labels are the
+               card's chrome and darken to the card's ink. */
+            color: MINI_INK,
           }}
         >
           {label}
@@ -750,7 +752,9 @@ function NineRow({
             style={{
               fontSize: 8.5,
               fontWeight: 700,
-              color: totals && totals.toPar < 0 ? UNDER_INK : MINI_FAINT,
+              /* §3 — the nine's to-par keeps the tour colour rule: red under
+                 par, INK at level or over. Colour only where it means something. */
+              color: totals && totals.toPar < 0 ? UNDER_INK : MINI_INK,
               ...FIGS,
             }}
           >
@@ -806,7 +810,15 @@ function NineRow({
               }}
             >
               {/* HOLE NUMBERS STAY, at 7px in GHOST (§S3.5). Findable, not read —
-                  a grid that cannot be indexed by hole is a texture. */}
+                  a grid that cannot be indexed by hole is a texture.
+                  §3 (BRIEF_DISCOVER_FINISHING_PASS) DELIBERATELY DOES NOT DARKEN
+                  THEM while darkening every other piece of chrome: the numbers are
+                  an AXIS, not data. Eighteen ink figures directly above eighteen
+                  ink scores doubles the grid's weight and makes the scores — the
+                  only thing this row exists to show — harder to find. Being
+                  PRESENT (§S2.5) and being QUIET are the same requirement from two
+                  sides. Asked for and declined; if it changes it is this one
+                  value. */}
               <span
                 style={{
                   fontSize: 7,
