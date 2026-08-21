@@ -141,8 +141,8 @@ export function FriendsRail() {
  * GOLF THIS WEEK. MEASURED off GolfThisWeek.tsx after BRIEF_ROUND_TILE_THE_MOMENT:
  * 256 wide, no border and a 1px shadow, a 156px HERO (no photograph any more —
  * the gradient and the moment carry the top of the card), then the member row
- * with the score, then the TINTED WELL (#F2F5F8) at a FIXED 116px: its header
- * rule and the 88px two-rows-of-nine scorecard. Above the rail: the
+ * with the score, then the TINTED WELL (#F2F5F8) at a FIXED 135px running to the
+ * card's bottom edge: its header rule and the 96px two-rows-of-nine scorecard. Above the rail: the
  * count/region readout row, the pills row and the best-of-week band, all of
  * which the live section renders before its first card and none of which may
  * appear later.
@@ -210,24 +210,25 @@ export function GolfThisWeekRail() {
             {/* THE HERO, 156. No photograph: the live card draws a gradient with
                 the moment label, its figure and its sentence on it. */}
             <Bar style={{ borderRadius: 0, height: 156, width: '100%' }} />
-            <div style={{ padding: '8px 10px 10px' }}>
+            <div style={{ padding: '8px 10px 0' }}>
               {/* The member row carries the score. */}
               <div style={{ height: 19, display: 'flex', alignItems: 'center', gap: 7 }}>
                 <Bar style={{ height: 19, width: 19, borderRadius: '34%' }} />
                 <TextBar w={92} h={11} />
                 <Bar style={{ height: 12, width: 34, marginLeft: 'auto' }} />
               </div>
-              {/* THE TINTED WELL: header, its one rule, and the FIXED 88px
-                  scorecard region — the same height on every card. */}
+              {/* THE TINTED WELL: header, its one rule, and the FIXED 96px
+                  scorecard region — the same height on every card, running to
+                  the card's bottom edge. */}
               <div
                 style={{
                   marginTop: 8,
                   marginLeft: -10,
                   marginRight: -10,
-                  height: 116,
+                  height: 135,
                   background: '#F2F5F8',
-                  borderRadius: 12,
-                  padding: '6px 6px 8px',
+                  borderRadius: '12px 12px 16px 16px',
+                  padding: '6px 6px 9px',
                   boxSizing: 'border-box',
                 }}
               >
@@ -245,7 +246,7 @@ export function GolfThisWeekRail() {
                 </div>
                 <div
                   style={{
-                    height: 88,
+                    height: 96,
                     marginTop: 7,
                     display: 'flex',
                     flexDirection: 'column',
