@@ -1135,14 +1135,22 @@ export function GolfThisWeek({
     return acc;
   }, null);
 
+  /* BRIEF_BAND_TILES_REFINEMENT — the bottom line is the COURSE on every tile,
+     and anything QUALIFYING the figure (a to-par, a unit) sits beside it on the
+     figure's baseline. Colour appears only where it MEANS something: red on an
+     under-par to-par, red on a birdie count, green on a falling index. The emoji
+     marks the category; nothing else needs to. No accent bar, no tint. */
   const bandTiles: {
     key: string;
     emoji?: string;
     label: string;
     figure: string;
     tone: string;
+    /** Qualifier on the figure's baseline: a to-par or a unit. Never a course. */
+    qual?: string;
+    qualTone?: string;
     row: CircleRoundRow;
-    sub: string;
+    course: string;
   }[] = [];
 
   if (best) {
@@ -1151,9 +1159,12 @@ export function GolfThisWeek({
       emoji: '\uD83D\uDD25', // FIRE
       label: t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK'),
       figure: String(best.row.gross ?? '\u2014'),
-      tone: best.toPar < 0 ? TOPAR_RED : A.INK,
+      /* §S1.4 — the figure itself stays INK; only the to-par is coloured. */
+      tone: INK,
+      qual: bestToPar ?? undefined,
+      qualTone: best.toPar < 0 ? TOPAR_RED : BAND_MUTE,
       row: best.row,
-      sub: `${bestToPar ?? ''} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(best.row)}`.trim(),
+      course: courseNameFor(best.row),
     });
   }
   if (bestStableford) {
@@ -1162,9 +1173,11 @@ export function GolfThisWeek({
       emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
       label: t('discover.golfThisWeek.stablefordLabel', 'Best stableford'),
       figure: String(bestStableford.stableford_points),
-      tone: A.INK,
+      tone: INK,
+      qual: t('discover.golfThisWeek.stablefordUnit', 'points'),
+      qualTone: BAND_FAINT,
       row: bestStableford,
-      sub: `${t('discover.golfThisWeek.stablefordUnit', 'points')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(bestStableford)}`,
+      course: courseNameFor(bestStableford),
     });
   }
   if (mostBirdies) {
@@ -1172,10 +1185,13 @@ export function GolfThisWeek({
       key: 'birdies',
       emoji: '\uD83D\uDC26', // BIRD
       label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
+      /* A birdie count IS a count of under-par holes, so the red is literal. */
       figure: String(mostBirdies.birdies),
-      tone: A.INK,
+      tone: TOPAR_RED,
+      qual: t('discover.friendsRail.birdies', 'birdies'),
+      qualTone: BAND_FAINT,
       row: mostBirdies,
-      sub: `${t('discover.friendsRail.birdies', 'birdies')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(mostBirdies)}`,
+      course: courseNameFor(mostBirdies),
     });
   }
   if (mostImproved) {
@@ -1184,12 +1200,16 @@ export function GolfThisWeek({
       key: 'improved',
       emoji: '\uD83D\uDCAA', // FLEXED ARM
       label: t('discover.golfThisWeek.improvedLabel', 'MOST IMPROVED'),
-      figure: `\u2212${Math.abs(d).toFixed(1)}`,
+      /* A falling index IS better — the index-delta scale, with a down arrow. */
+      figure: `\u2193${Math.abs(d).toFixed(1)}`,
       tone: A.IMPROVED,
+      qual: t('discover.friendsRail.index', 'HCP'),
+      qualTone: BAND_FAINT,
       row: mostImproved,
-      sub: `${t('discover.friendsRail.index', 'HCP')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(mostImproved)}`,
+      course: courseNameFor(mostImproved),
     });
   }
+
 
 
 
