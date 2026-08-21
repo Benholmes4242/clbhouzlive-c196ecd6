@@ -39,7 +39,7 @@ import {
   type HonoursMode,
 } from './courseled/HonoursBoard';
 import { HonoursBoardSheet } from './courseled/HonoursBoardSheet';
-import { useMostPlayedThisWeek, type MostPlayedRow } from './courseled/hooks/useMostPlayedThisWeek';
+import { useMostPlayedThisWeek, type MostPlayedPlayer, type MostPlayedRow } from './courseled/hooks/useMostPlayedThisWeek';
 
 
 /**
@@ -201,6 +201,20 @@ export default function ExploreTabContent({
     [goCourse],
   );
 
+  /* A BOARD ROW IS A ROUND: it opens the scorecard bottom sheet, the same one
+     the round tiles and the honours board open. The row carries the score id of
+     the exact round the board is showing, and the component only calls this when
+     that id exists. */
+  const handleMostPlayedPlayer = useCallback(
+    (p: MostPlayedPlayer) => {
+      analyticsEvents.track('discover_most_played_row_tapped', {
+        has_score: !!p.scoreId,
+      });
+      if (p.scoreId) opener.openByScore(p.scoreId, null, p.userId);
+    },
+    [opener],
+  );
+
   const honours = useMemo(() => sortHonours(legendary), [legendary]);
 
   const handleHonoursRow = useCallback(
@@ -303,6 +317,7 @@ export default function ExploreTabContent({
           rows={mostPlayedList}
           isPending={mostPlayedQuery.isPending}
           onRowPress={handleMostPlayed}
+          onPlayerPress={handleMostPlayedPlayer}
           onSeeAll={mostPlayedList.length > 5 ? () => setMostPlayedSheet(true) : undefined}
         />
 
@@ -342,6 +357,7 @@ export default function ExploreTabContent({
         onClose={() => setMostPlayedSheet(false)}
         rows={mostPlayedList}
         onRowPress={handleMostPlayed}
+        onPlayerPress={handleMostPlayedPlayer}
       />
 
       <HonoursBoardSheet

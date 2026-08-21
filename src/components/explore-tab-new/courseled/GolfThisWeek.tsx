@@ -1273,7 +1273,21 @@ export function GolfThisWeek({
           {bandTiles.map((tile) => (
             <div
               key={tile.key}
+              /* EVERY BAND TILE IS ITS OWN ROUND, so tapping one opens THAT
+                 round's scorecard — the same sheet the round tiles open. Not a
+                 <button>: these tiles sit in the same family as the round tiles,
+                 which cannot be buttons (a follow button lives inside them). */
+              role="button"
+              tabIndex={0}
+              onClick={() => onCardPress(tile.row)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                  e.preventDefault();
+                  onCardPress(tile.row);
+                }
+              }}
               style={{
+                cursor: 'pointer',
                 /* §S4.3 — the card loses its border and takes a shadow. Same
                    treatment as the round tiles: it sits on the page rather than
                    being drawn onto it. */

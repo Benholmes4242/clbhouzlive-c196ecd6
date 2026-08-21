@@ -112,6 +112,12 @@ export interface MostPlayedPlayer {
    */
   homeClub: string | null;
   /**
+   * THE WHS SCORE ID OF THAT BEST ROUND. It is what opens the scorecard bottom
+   * sheet when the row is tapped; `null` (an untracked or unresolved round)
+   * falls back to the member's profile.
+   */
+  scoreId: string | null;
+  /**
    * BOARD POSITION, 1-based, TIES SHARING (§S2.7): two 76s are both 2nd and the
    * next is 4th. Computed here beside the sort so the board never invents an
    * order between equal scores.
@@ -135,12 +141,13 @@ export function useMostPlayedThisWeek(limit = 25) {
       // keeps nine-hole cards out of that average only.
       const { data, error } = await supabase
         .from('gam_round_stats' as never)
-        .select('course_id, course_name, play_date, gross_score, course_par, holes_played, user_id')
+        .select('whs_score_id, course_id, course_name, play_date, gross_score, course_par, holes_played, user_id')
         .gte('play_date', startPrev)
         .not('course_id', 'is', null);
       if (error) throw error;
 
       const rows = ((data ?? []) as unknown) as Array<{
+        whs_score_id: string | null;
         course_id: string | null;
         course_name: string | null;
         play_date: string;
@@ -159,7 +166,10 @@ export function useMostPlayedThisWeek(limit = 25) {
       const members = new Map<string, Set<string>>();
       /** BEST (lowest) gross per `${courseId}|${userId}`, CURRENT week only,
        *  carrying the par of THAT round so the to-par matches the gross. */
-      const bestByMember = new Map<string, { gross: number; par: number | null }>();
+      const bestByMember = new Map<
+        string,
+        { gross: number; par: number | null; scoreId: string | null }
+      >();
       /** BEST (lowest) gross per course, CURRENT week only. */
       const bestByCourse = new Map<string, number>();
 
@@ -181,7 +191,14 @@ export function useMostPlayedThisWeek(limit = 25) {
             const key = `${r.course_id}|${r.user_id}`;
             const held = bestByMember.get(key);
             if (held == null || r.gross_score < held.gross)
-              bestByMember.set(key, { gross: r.gross_score, par: r.course_par ?? null });
+              bestByMember.set(key, {
+                gross: r.gross_score,
+                par: r.course_par ?? null,
+                /* THE SCORE ID TRAVELS WITH THE GROSS IT BELONGS TO, so tapping
+                   a board row opens THAT round's scorecard and not the
+                   member's most recent one. */
+                scoreId: r.whs_score_id ?? null,
+              });
             const courseBest = bestByCourse.get(r.course_id);
             if (courseBest == null || r.gross_score < courseBest)
               bestByCourse.set(r.course_id, r.gross_score);
@@ -352,6 +369,7 @@ export function useMostPlayedThisWeek(limit = 25) {
               homeClub: prof.homeClub,
               gross: best?.gross ?? null,
               toPar: best && best.par != null ? best.gross - best.par : null,
+              scoreId: best?.scoreId ?? null,
               position: 0,
             };
           })
