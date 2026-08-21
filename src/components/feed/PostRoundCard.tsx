@@ -259,20 +259,33 @@ const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, 
       strokes: h.lineGross,
       played: h.played,
     }));
-    // The final cumulative, computed from the same values the line draws. When a
-    // played hole has neither value the line genuinely breaks, and the endpoint
-    // is not the round's to-par — fall back to the score row's figure (§4.2).
+    // The final cumulative, computed from the same values the line draws — but
+    // the FIGURE may only claim a to-par the cells support
+    // (BRIEF_POST_TRAJECTORY_ENDPOINT_DISAGREES §1).
+    //
+    // Testing `lineGross == null` is INSUFFICIENT: §1.2 defines lineGross as
+    // `gross ?? adjusted_gross`, so it is essentially never null and the old
+    // guard was close to dead code. A picked-up hole has no gross but does have
+    // an adjusted_gross, so `cum` counted it at a value the header's submitted
+    // gross does not imply — two to-par figures for one round, 200px apart.
+    //
+    // So `broken` ALSO fires on the same test NineGrid uses for suppression,
+    // `h.played && h.gross == null`. The LINE is untouched and still draws
+    // through lineGross: drawing through an adjusted value is honest, PRINTING
+    // it as the round's to-par is not. When broken, the endpoint falls back to
+    // the score row's figure (§4.2), so panel and header always agree.
     let cum = 0;
     let broken = false;
     for (const h of holes) {
       if (h.played === false) continue;
-      if (h.lineGross == null || h.par == null) {
+      if (h.gross == null || h.lineGross == null || h.par == null) {
         broken = true;
         continue;
       }
       cum += h.lineGross - h.par;
     }
     return { series: s, endpoint: broken ? toPar : cum };
+
   }, [holes, toPar]);
 
   const scored = series.filter((h) => h.played !== false && h.strokes != null && h.par != null);
