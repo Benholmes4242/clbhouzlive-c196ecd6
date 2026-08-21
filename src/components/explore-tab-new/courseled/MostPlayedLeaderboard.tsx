@@ -269,12 +269,11 @@ function MemberBoard({
                 style={{
                   display: 'block',
                   fontSize: 12.5,
-                  // EVERY NAME RENDERS THE SAME — no bold on the viewer, no
-                  // amber text, no "You" (§S2.8).
+                  // §S2.8 — VIEWER NAME MATCHES THE HONOURS BOARD SHEET.
                   fontWeight: 600,
                   letterSpacing: '-0.015em',
                   lineHeight: 1.25,
-                  color: INK,
+                  color: isViewer ? A.AMBER_DEEP : INK,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
