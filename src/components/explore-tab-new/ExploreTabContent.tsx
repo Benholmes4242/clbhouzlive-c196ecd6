@@ -51,19 +51,20 @@ import { useMostPlayedThisWeek, type MostPlayedPlayer, type MostPlayedRow } from
  *
  * Vertical space is curated and capped; horizontal rails absorb volume, so a
  * heavy week grows sideways rather than pushing the discovery feed off screen.
- * SEVEN sections, seven different anatomies — rail, facts rail, mosaic, feed,
- * mosaic, leaderboard, board. THIS LIST IS THE RENDER ORDER; the previous
- * comment documented six with "Around the world" second, which the code had
- * never matched.
  *
- *   TOP SLOT: existing one-thing prompt when available, otherwise Your Circle
- *   1 Your Circle                 rail        (hidden when promoted to top slot)
- *   2 On tour this week           facts rail  (next-up fallback off-week)
- *   3 Latest reviews              mosaic
- *   4 Around the world            feed        region pills live here
- *   5 From the community          mosaic      read-only viewer
- *   6 Most played this week       leaderboard
- *   7 The honours board           board       never windowed
+ * RENDER ORDER (BRIEF_DISCOVER_ORDER_AND_LABELS §1): the RANKED sections come
+ * before the MEDIA rails.
+ *
+ *   1 the tab pills
+ *   2 Golf this week              rounds rail   headless, owns the safe area
+ *   3 Most played courses         leaderboard
+ *   4 The honours board           board         never windowed
+ *   5 Latest videos               rail
+ *   6 Clips                       rail
+ *   7 the bottom-nav spacer
+ *
+ * ON TOUR THIS WEEK, LATEST REVIEWS, the rate prompt and FROM THE COMMUNITY
+ * were each removed from this page deliberately.
  *
  * The "This week on clbhouz" pulse band from the signed-off mock is REMOVED per
  * the brief and must not be reinstated.
