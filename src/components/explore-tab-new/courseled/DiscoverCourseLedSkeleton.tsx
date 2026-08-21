@@ -138,15 +138,16 @@ export function FriendsRail() {
 }
 
 /**
- * GOLF THIS WEEK. MEASURED off GolfThisWeek.tsx after
- * BRIEF_ROUND_TILE_LIGHT_REFINEMENT: 256 wide, no border and a 1px shadow, a
- * 76px photograph (the score chip and the date ride on it), then the body —
- * member row 19, then the 40px trajectory, a single hairline and the two nines
- * on the white card surface, then one reserved insight line. Above the rail:
- * the count/region readout row, the pills row and the best-of-week band, all of
+ * GOLF THIS WEEK. MEASURED off GolfThisWeek.tsx after BRIEF_ROUND_TILE_THE_MOMENT:
+ * 256 wide, no border and a 1px shadow, a 178px HERO (no photograph any more —
+ * the gradient and the moment carry the top of the card), then the member row
+ * with the score, then the well: its 14px header rule and a FIXED 88px chart
+ * region whatever chart the live card ends up drawing. Above the rail: the
+ * count/region readout row, the pills row and the best-of-week band, all of
  * which the live section renders before its first card and none of which may
  * appear later.
  */
+
 
 export function GolfThisWeekRail() {
   return (
