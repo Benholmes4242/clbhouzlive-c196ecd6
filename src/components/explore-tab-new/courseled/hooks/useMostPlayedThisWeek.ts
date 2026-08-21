@@ -308,9 +308,18 @@ export function useMostPlayedThisWeek(limit = 25) {
             .select('user_profile_id, club_id, golf_clubs:club_id(name)')
             .in('user_profile_id', resolvable);
           const picked = new Map<string, string>();
-          for (const l of (links ?? []) as any[]) {
-            const uid = l.user_profile_id as string;
-            const clubName = String(l.golf_clubs?.name ?? '').trim();
+          type Link = {
+            user_profile_id: string;
+            club_id: string | null;
+            golf_clubs: { name: string | null } | { name: string | null }[] | null;
+          };
+          for (const l of ((links ?? []) as unknown as Link[])) {
+            const uid = l.user_profile_id;
+            // PostgREST returns an OBJECT for a to-one embed and an ARRAY when it
+            // cannot prove the relationship is to-one. Handle both or the club
+            // silently never renders.
+            const club = Array.isArray(l.golf_clubs) ? l.golf_clubs[0] : l.golf_clubs;
+            const clubName = String(club?.name ?? '').trim();
             if (!clubName) continue;
             const entry = byId.get(uid);
             if (!entry) continue;
