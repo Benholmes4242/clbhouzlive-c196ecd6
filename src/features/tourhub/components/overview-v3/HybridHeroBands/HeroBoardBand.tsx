@@ -43,8 +43,8 @@ import { ChevronRight, ChevronDown } from 'lucide-react';
 
 import { FONT, HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
-import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { useTourSelection } from '../../../context/TourSelectionContext';
+import { PlayerAvatar } from '../../PlayerAvatar';
 import { ClbhouzPickMark } from '../../../_shared/ClbhouzPickMark';
 import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
 import { CourseShapePanel, useCourseShapeRows } from './CourseShapePanel';
@@ -206,7 +206,11 @@ export function HeroBoardSection({
    * requests per slide instead of 2). The cost is that the picks row lags the
    * photograph by the same 250ms as the rest of the reporting.
    */
-  const { viewingTournamentId } = useTourSelection();
+  /* AMENDMENT 1 §CHANGE 2 — the TOUR CODE comes off the SAME selection context
+     this band already reads for the tournament id, exactly as TISlot derives it
+     (`viewingTourSlug ?? 'pga'`). No new prop, no new query. */
+  const { viewingTournamentId, viewingTourSlug } = useTourSelection();
+  const pickTourCode = viewingTourSlug ?? 'pga';
   const picksTid = viewingTournamentId ?? tournamentId;
   const { data: predictions } = useAIPredictions(picksTid);
   const pickPlayerIds = useMemo(() => {
@@ -271,11 +275,17 @@ export function HeroBoardSection({
   const closedFigure = useMemo(() => {
     if (picks.length === 0) return null;
 
-    /* LIVE — the BEST-PLACED pick. A pick with no board line (withdrawn, missed
-       cut, not in the field) simply cannot be the best-placed one, so it is
-       skipped; when NONE of the picks has a live line the row falls back to the
-       PRE treatment rather than printing a blank figure. */
-    if (phase === 'live') {
+    /* LIVE and COMPLETE — the BEST-PLACED pick. A pick with no board line
+       (withdrawn, missed cut, not in the field) simply cannot be the best-placed
+       one, so it is skipped; when NONE of the picks has a line the row falls
+       back to the PRE treatment rather than printing a blank figure.
+
+       AMENDMENT 1 §CHANGE 1 — THE LIVE ROW DROPS THE POSITION. The leaderboard
+       sits directly above this row, so -7 reads against a visible leader on -9
+       without repeating the position: two tokens scan in one beat, three do not.
+       COMPLETE IS THE EXCEPTION AND KEEPS IT — on a finished tournament the
+       position IS the receipt ("T4" says how the pick did; "-7" does not). */
+    if (phase === 'live' || phase === 'completed') {
       let best: { pick: AITopContender; position: number; tied: boolean; score: number | null } | null = null;
       for (const p of picks) {
         const line = boardByPlayer.get(String(p.playerId));
@@ -287,7 +297,7 @@ export function HeroBoardSection({
       if (best) {
         return {
           name: surnameOf(best.pick.playerName),
-          right: `${best.tied ? 'T' : ''}${best.position}`,
+          right: phase === 'completed' ? `${best.tied ? 'T' : ''}${best.position}` : null,
           figure: best.score == null ? null : formatToPar(best.score),
           figureColor: tourFigColor(best.score),
         };
@@ -543,6 +553,7 @@ export function HeroBoardSection({
       {closedFigure && picksOpen && (
         <PicksPanel
           picks={picks}
+          tourCode={pickTourCode}
           phase={phase}
           boardByPlayer={boardByPlayer}
           predictions={predictions ?? null}
@@ -568,12 +579,15 @@ function surnameOf(full: string | null | undefined): string {
  */
 function PicksPanel({
   picks,
+  tourCode,
   phase,
   boardByPlayer,
   predictions,
   onFullPicks,
 }: {
   picks: AITopContender[];
+  /** §CHANGE 2 — the event's tour, for the shared headshot resolver. */
+  tourCode: string;
   phase: 'live' | 'upcoming' | 'completed';
   boardByPlayer: Map<string, { position: number | null; tied: boolean; score: number | null }>;
   predictions: { isAIPowered?: boolean; isStale?: boolean; confidence?: number; editorialFraming?: string | null } | null;
@@ -625,26 +639,22 @@ function PicksPanel({
               >
                 {p.rank ?? i + 1}
               </span>
-              {/* photoUrl is already enriched from sr_players (useAIPredictions
-                  :203-220); the silhouette is the shipped fallback so a pick
-                  with no headshot is a figure, not an empty hole. */}
-              <img
-                src={p.photoUrl || PLAYER_SILHOUETTE_URL}
-                alt=""
-                width={22}
-                height={22}
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = PLAYER_SILHOUETTE_URL;
-                }}
-                style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: '34%',
-                  objectFit: 'cover',
-                  flexShrink: 0,
-                  background: HERO_BOARD_SURFACE,
-                }}
-              />
+              {/* §CHANGE 2 — THE SAME RESOLVER THE REST OF TOUR HUB USES.
+                  AITopContender.photoUrl comes from sr_players.photo_url only,
+                  which is null for most players, so this row rendered
+                  silhouettes beside a carousel showing real faces for the same
+                  three players. PlayerAvatar wraps getPlayerHeadshotCandidates
+                  and walks the folder chain itself — no third resolver, no new
+                  query. photoUrl is still passed: it is tried FIRST when present. */}
+              <span style={{ flexShrink: 0, display: 'inline-flex' }}>
+                <PlayerAvatar
+                  playerId={String(p.playerId ?? '')}
+                  playerName={p.playerName}
+                  tourCode={tourCode}
+                  photoUrl={p.photoUrl ?? null}
+                  size="xs"
+                />
+              </span>
               <span style={{ minWidth: 0, flex: 1 }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
                   <span
