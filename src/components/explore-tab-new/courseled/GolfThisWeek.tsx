@@ -509,27 +509,37 @@ function GolfThisWeekCard({
           <div
             style={{
               marginTop: 2,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
               fontSize: 10.5,
               lineHeight: 1,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.82)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
-            <span
-              style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {region ?? ''}
-            </span>
-            <span style={{ opacity: 0.7 }}>{relativeDay(row.play_date, t)}</span>
+            {region ?? ''}
           </div>
         </div>
+
+        {/* THE DATE SITS TOP-RIGHT (§S4.3), out of the subline it used to share
+            with the region — the same figure, moved, not added. */}
+        <span
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 9,
+            fontSize: 8.5,
+            fontWeight: 700,
+            lineHeight: 1,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.85)',
+          }}
+        >
+          {relativeDay(row.play_date, t)}
+        </span>
+
 
         {/* THE SCORE CHIP ON THE PHOTOGRAPH (§S2). .standout-figure-chip carries
             the fill, the border and the @supports blur — the flat fill is the
