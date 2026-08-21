@@ -481,9 +481,11 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
 
 /* ===========================================================================
    THE MINI SCORECARD (BRIEF_ROUND_TILE_MINI_SCORECARD) — the Clubhouse card's
-   grid at rail scale: two rows of nine, hole numbers above each cell, the nine's
-   total and to-par right. No OUT / IN labels (BRIEF_SCORECARD_WIDTH) — the width
-   went to the cells instead.
+   grid at rail scale: two rows of nine, hole numbers above each cell, and per
+   nine a HEADER LINE carrying the label left and the nine's total + to-par right
+   (BRIEF_MINI_SCORECARD_NINE_HEADER), ported from CardScorecardSheet. The cells
+   own their row outright, which is where their width came from.
+
 
    PAR IS NOT PRINTED. The MARKER is the par statement — circle birdie, box
    bogey, double box double-or-worse — so a par row would be the same fact
