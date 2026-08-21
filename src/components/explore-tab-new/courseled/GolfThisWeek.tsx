@@ -915,6 +915,16 @@ function GolfThisWeekCard({
             minHeight: WELL_H,
             flex: 1,
             background: WELL,
+            /* §2 (BRIEF_DISCOVER_FINISHING_PASS) — THE WELL GETS AN EDGE. WELL is
+               two points off A.CANVAS, so without a boundary the card's lower half
+               read as page rather than card. The rule is WELL_RULE, the token that
+               already exists for the header line — not a second rule colour.
+               INSET BOX-SHADOW, NOT A BORDER: the well is box-sizing: border-box
+               with a fixed minHeight, so a 1px border would take 2px off the inner
+               height and move the grid. An inset shadow costs no layout.
+               NOT a darker fill (the markers use `well` as their ring spacer) and
+               NOT an outer shadow (the CARD already carries CARD_SHADOW). */
+            boxShadow: `inset 0 0 0 1px ${WELL_RULE}`,
             borderRadius: `${WELL_RADIUS}px ${WELL_RADIUS}px 16px 16px`,
             padding: `6px ${WELL_PAD_X}px 9px`,
             boxSizing: 'border-box',
@@ -930,7 +940,9 @@ function GolfThisWeekCard({
               borderBottom: `1px solid ${WELL_RULE}`,
             }}
           >
-            <span style={{ ...LABEL, fontSize: 8, color: '#9AA5B1' }}>
+            {/* §3 — the row label darkens to the card's ink with the rest of the
+                chrome. */}
+            <span style={{ ...LABEL, fontSize: 8, color: INK }}>
               {t('discover.golfThisWeek.moment.theCard', 'The card')}
             </span>
             {/* THE TAP AFFORDANCE, ON EVERY CARD (§S4.2). A hero with a hidden
@@ -939,7 +951,8 @@ function GolfThisWeekCard({
               style={{
                 ...LABEL,
                 fontSize: 8,
-                color: MID,
+                /* §3 — the action and its chevron darken to the card's ink. */
+                color: INK,
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 2,
@@ -1422,7 +1435,7 @@ export function GolfThisWeek({
                 <ChevronRight
                   size={9}
                   strokeWidth={3}
-                  color={MID}
+                  color={INK}
                   style={{ flexShrink: 0 }}
                 />
               </div>

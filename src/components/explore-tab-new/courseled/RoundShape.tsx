@@ -505,6 +505,10 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
    Clubhouse scorecard sheet keeps its own tokens untouched. */
 const MINI_INK = '#0B0F14';
 const MINI_FAINT = '#9AA5B1';
+/* Kept on the ramp but no longer used by the nine header: §3 of
+   BRIEF_DISCOVER_FINISHING_PASS darkened the labels and level/over to-par to
+   MINI_INK. Retained so the ramp stays legible to a reader. */
+void MINI_FAINT;
 const MINI_GHOST = '#C8D0D8';
 const ACE_GOLD = '#C99700';
 const UNDER_INK = '#C8102E';
