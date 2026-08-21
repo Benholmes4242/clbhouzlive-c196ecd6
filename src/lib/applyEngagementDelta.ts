@@ -17,7 +17,17 @@ export interface EngagementDelta {
   likeCountDelta?: number;
   /** Apply +1 / -1 to comment count. Omit to leave unchanged. */
   commentCountDelta?: number;
+  /**
+   * ABSOLUTE like count, read from the database. Wins over `likeCountDelta`.
+   * A delta is only correct for the member who tapped; a realtime notification
+   * about SOMEONE ELSE'S like can arrive twice (post owner + mentioned member)
+   * or out of order, so that path sets truth rather than incrementing.
+   */
+  likeCount?: number;
+  /** ABSOLUTE comment count, read from the database. Wins over the delta. */
+  commentCount?: number;
 }
+
 
 export function applyEngagementDelta<T extends Record<string, any>>(
   post: T,
