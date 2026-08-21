@@ -154,6 +154,13 @@ interface Props {
    * circular and true-width because the aspect is never distorted.
    */
   viewWidth?: number;
+  /**
+   * CURVE STROKE WIDTH. Default 1.8 — the feed card and the sheet are UNCHANGED.
+   * The Discover rail tile passes 1.6 (BRIEF_ROUND_TILE_MINI_SCORECARD §S2.2):
+   * the curve there is now the SUMMARY and the hole grid beneath it is the
+   * detail, so it draws shorter and thinner.
+   */
+  strokeWidth?: number;
 }
 
 
@@ -176,7 +183,9 @@ export const TrajectoryLine: React.FC<Props> = ({
   showTicks = true,
   padY = 10,
   viewWidth = 340,
+  strokeWidth = 1.8,
 }) => {
+
   const T = SURFACE_TOKENS[surface];
   const { t } = useTranslation(['courses']);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -405,7 +414,7 @@ export const TrajectoryLine: React.FC<Props> = ({
           d={d}
           fill="none"
           stroke={`url(#${gradStroke})`}
-          strokeWidth={1.8}
+          strokeWidth={strokeWidth}
           strokeLinejoin="round"
           strokeLinecap="round"
         />

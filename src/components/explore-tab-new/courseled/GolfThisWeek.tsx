@@ -46,7 +46,7 @@ import {
 } from './hooks/useGolfThisWeek';
 import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegionCounts';
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
-import { RoundShape } from './RoundShape';
+import { MiniScorecard, RoundShape } from './RoundShape';
 import { GolfThisWeekRail as GolfThisWeekShell } from './DiscoverCourseLedSkeleton';
 import { A, CARD_SHELL, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
 
@@ -80,7 +80,19 @@ const PHOTO_H = 92;
    (BRIEF_FRIENDS_TILE_SHAPE_AND_BUCKETS §1). At 48/52 a plus-eight round and a
    level round drew nearly the same flat line: 60 is the smallest height where a
    two-shot swing is legible. Do NOT reduce it again. */
-const SHAPE_H = 60;
+/* SHAPE_H 40 — the trajectory is the SUMMARY now (BRIEF_ROUND_TILE_MINI_SCORECARD
+   §S2.2); the hole grid beneath it carries the detail 60px used to have to. */
+const SHAPE_H = 40;
+
+/**
+ * TILE HEIGHT FLOOR. Measured on a tile with the full grid: photograph 92,
+ * member row, 40px trajectory, two nines of 15px cells with their hole numbers,
+ * insight line, 9px padding. Holds the rail level when a round has no hole data
+ * and therefore prints no grid at all.
+ */
+const CARD_MIN_H = 258;
+
+
 
 /** The rail scrim of record — imported, never retyped. */
 const CARD_SCRIM = SCRIM_STANDOUT;
@@ -408,6 +420,12 @@ function GolfThisWeekCard({
         ...CARD_SHELL,
         border: `1px solid ${A.BORDER}`,
         width: CARD_W,
+        /* §S4.5 / ACCEPTANCE K vs G — the brief asks BOTH for no reserved height
+           when there is no hole data AND for a uniform rail. Those cannot both
+           hold per element, so the reserve lives on the CARD: a no-grid tile
+           renders no grid and no gap, and the card's minHeight keeps the rail
+           level. CARD_MIN_H is the measured height of a tile WITH the grid. */
+        minHeight: CARD_MIN_H,
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
@@ -416,6 +434,7 @@ function GolfThisWeekCard({
         fontFamily: SANS,
         cursor: 'pointer',
       }}
+
     >
       <CourseImageFallback
         courseId={row.course_id}
@@ -604,16 +623,33 @@ function GolfThisWeekCard({
         </div>
 
 
-        {/* THE SHAPE — the friends rail's band, same height, full bleed (§4.1).
-            showMeta TRUE: this tile is the surviving rounds tile after the Your
-            Circle / Golf this week merge, so it carries the band's to-par figure,
-            the four-bucket bar and the count row. The 96x22 sheet trace still
-            passes showMeta={false} and that gate is what excludes it. */}
+        {/* THE TRAJECTORY IS NOW THE SUMMARY (§S2.2): 40px tall, 1.6px stroke,
+            full bleed. It no longer has to carry both the shape and the detail —
+            the grid beneath is the detail — so it does not take the height it
+            took when it was the only record of the round. Everything else about
+            the curve is unchanged: graded stroke, solid opaque fill, tangent
+            cubic, natural axis, gold-only beads.
+            showMeta FALSE: the birdie/par/bogey/double strip is DELETED (§S3.1) —
+            the grid says what it said, hole by hole rather than as four totals. */}
         <div style={{ marginTop: 6, marginLeft: -11, marginRight: -11 }}>
           <ShapeReveal>
-            <RoundShape row={row} shape={shape} width={CARD_W} height={SHAPE_H} />
+            <RoundShape
+              row={row}
+              shape={shape}
+              width={CARD_W}
+              height={SHAPE_H}
+              showMeta={false}
+              strokeWidth={1.6}
+            />
           </ShapeReveal>
         </div>
+
+        {/* THE SCORECARD — two rows of nine (§S2.4). A round with no hole data
+            renders NOTHING here, not a placeholder and not reserved height. */}
+        <div style={{ marginTop: 7 }}>
+          <MiniScorecard shape={shape} />
+        </div>
+
 
 
         {/* THE SUBLINE IS THE FRIENDS RAIL'S SUBLINE (§4.2): same glyph, same
