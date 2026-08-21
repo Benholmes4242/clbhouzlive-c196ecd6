@@ -697,20 +697,22 @@ function NineRow({
   label,
   well,
   marked,
-  markTone,
+  momentTone,
 }: {
   holes: HoleShape['holes'];
   from: number;
   to: number;
   label: string;
   well: string;
-  /** The moment's OWN holes. They get a RULE BENEATH the cell (§4) — never a
-   *  ring, a border or a tint on the cell itself (§S5.3). */
+  /** The moment's OWN holes. They get a TINTED BAND BEHIND the cell (§3) — never
+   *  a ring, a border or a tint ON the cell itself (§S5.3). */
   marked?: ReadonlySet<number>;
-  /** The moment tone, used ONLY for that rule. */
-  markTone?: string;
+  /** The moment tone, used ONLY for that band and its blended well. */
+  momentTone?: string;
 }) {
   const byHole = new Map(holes.map((h) => [h.holeNo, h]));
+  const bandTone = marked && marked.size > 0 ? momentTone : undefined;
+  const bandWell = bandTone ? blend(bandTone, well, BAND_ALPHA) : undefined;
   const totals = nineTotals(holes, from, to);
   const rel =
     totals == null ? '' : totals.toPar === 0 ? 'E' : totals.toPar > 0 ? `+${totals.toPar}` : `\u2212${Math.abs(totals.toPar)}`;
@@ -864,22 +866,22 @@ export function MiniScorecard({
   shape,
   well = MINI_WELL,
   marked,
-  markTone,
+  momentTone,
 }: {
   shape: HoleShape | null;
   /** The tinted well behind the grid — the outer rings take it (§S4.7). */
   well?: string;
-  /** THE MOMENT'S HOLES (§3): underlined with a continuous 2px rule in the
-   *  moment tone (§4). Nothing in the grid may take a moment tone on a CELL. */
+  /** THE MOMENT'S HOLES (§3): a TINTED BAND BEHIND the cells in the moment tone.
+   *  Nothing in the grid may take a moment tone ON a CELL. */
   marked?: ReadonlySet<number>;
-  markTone?: string;
+  momentTone?: string;
 }) {
   const { t } = useTranslation(['courses']);
   if (!shape || shape.holes.length === 0) return null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: NINE_GAP }}>
-      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} well={well} marked={marked} markTone={markTone} />
-      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} well={well} marked={marked} markTone={markTone} />
+      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} well={well} marked={marked} momentTone={momentTone} />
+      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} well={well} marked={marked} momentTone={momentTone} />
     </div>
   );
 }

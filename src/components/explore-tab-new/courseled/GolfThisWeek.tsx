@@ -660,7 +660,7 @@ function GolfThisWeekCard({
   /* ONE CHART ONLY (§S0.3): the scorecard. `shape === null` renders NOTHING and
      the well keeps its height — never a placeholder grid (§S1.7). */
   const grid = shape ? (
-    <MiniScorecard shape={shape} well={WELL} marked={marked} markTone={moment.tone} />
+    <MiniScorecard shape={shape} well={WELL} marked={marked} momentTone={moment.tone} />
   ) : null;
 
 
