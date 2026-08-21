@@ -67,6 +67,7 @@ export function RoundShape({
   height = 60,
   showMeta = true,
   showBaseline = true,
+  strokeWidth = 1.8,
 }: {
   row: CircleRoundRow;
   shape: HoleShape | null;
@@ -83,7 +84,11 @@ export function RoundShape({
    * where the rule was computed to clip the fill and never drawn.
    */
   showBaseline?: boolean;
+  /** Curve stroke. 1.8 by default; the rail tile passes 1.6 now that the
+   *  MiniScorecard beneath it carries the hole-by-hole detail (§S2.2). */
+  strokeWidth?: number;
 }) {
+
   const front = row.front_nine_to_par;
   const back = row.back_nine_to_par;
 
