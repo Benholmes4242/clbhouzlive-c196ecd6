@@ -528,13 +528,23 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
   return 'double';
 }
 
-/** THE DOUBLE RING IS A BOX-SHADOW: it paints outside the border box without
- *  occupying layout, so a double never shifts its neighbours.
+/** THE DOUBLE RING IS DRAWN INSET (BRIEF_ROUND_TILE_MARK_AND_FIGURE §2). It used
+ *  to be an OUTWARD box-shadow — `0 0 0 2px well, 0 0 0 3px c` — which painted
+ *  3px past a 17px box. Box-shadow does not participate in layout, so nothing
+ *  reserved that space and the hole number 2.5px above was crowded by every
+ *  boxed and doubled figure. Now EVERY marker — bare, circle, box, double,
+ *  eagle, ace — paints a footprint of exactly CELL x CELL: the outer ring is the
+ *  1px BORDER at the box edge, then a 1px spacer inboard of it, then the inner
+ *  ring. Both are inset shadows, so the cell can never paint outside itself.
  *
- *  THE OUTER RING TAKES THE SURFACE COLOUR the grid sits on, so it never haloes:
+ *  THE SPACER TAKES THE SURFACE COLOUR the cell sits on, so it never haloes:
  *  pass the card or sheet background in, never a fixed grey
  *  (BRIEF_ROUND_TILE_THE_MOMENT v2 §S4.7 — on a tinted well a WHITE ring
- *  haloes).
+ *  haloes). §S4.7 IS NEWLY LOAD-BEARING: a cell INSIDE a moment band must be
+ *  passed the BLENDED well (the tone composited over the well at the band's
+ *  opacity), or its spacer draws the plain well against a tinted background —
+ *  a pale halo inside the ring, which is the exact fault §S4.7 prevents. See
+ *  bandWell in NineRow.
  *
  *  IT TAKES NO MOMENT TONE (BRIEF_ROUND_MOMENTS_V3 §1). It used to accept
  *  `markTone` and thread it into every branch as the outer ring, which made a
@@ -557,7 +567,9 @@ function markerStyle(m: Marker | null, well: string): CSSProperties {
     flexShrink: 0,
     color: MINI_INK,
   };
-  const ring = (c: string) => `0 0 0 2px ${well}, 0 0 0 3px ${c}`;
+  /* INSET: 1px of `well` as the spacer, then 1px of the ring colour, both
+     INSIDE the 17x17 box. The BORDER is the outer ring. */
+  const ring = (c: string) => `inset 0 0 0 1px ${well}, inset 0 0 0 2px ${c}`;
   switch (m) {
     case 'ace':
       return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: ring(ACE_GOLD) };
@@ -601,13 +613,68 @@ function markerStyle(m: Marker | null, well: string): CSSProperties {
    being fixed here. Do not "recover" width by widening the gap. */
 const CELL = 17;
 const GAP = 9;
-/** THE MOMENT RULE (§4): 2px of colour, 2px below the cell. CELL, the gap and
- *  the digit are all untouched — the room comes from the space BETWEEN the two
- *  nines, which was 4px and is now 8px, leaving 4px of clearance between the
- *  rule and the IN nine's header line. */
-const RULE_H = 2;
-const RULE_GAP = 2;
+/** THE SPACE BETWEEN THE TWO NINES. 8, not 4: the band drops 3px below the cell
+ *  row, and 8 keeps 5px clear of the IN nine's header line. */
 const NINE_GAP = 8;
+
+/* =============================================================================
+   THE MOMENT'S MARK IS A TINTED BAND BEHIND THE CELLS
+   (BRIEF_ROUND_TILE_MARK_AND_FIGURE §3 — reference view "B", rings inset).
+
+   THE 2px UNDERLINE IS DELETED. Ben chose the band over it, over end caps and
+   over no mark at all. THE REASON A BAND AND NOT A RULE: a SINGLE-HOLE group is
+   a normal case — a birdie haul is scattered by nature — and a lone tinted
+   square reads as deliberate where a lone 2px dash reads as a typo.
+
+   IT IS GROUPED BY CONSECUTIVE RUN WITHIN A NINE and NEVER crosses the OUT / IN
+   boundary: holes 9 and 10 are on different rows, so a run spanning them draws
+   two bands. It sits BEHIND everything — never over a marker, a digit or a hole
+   number — and it is absolutely positioned, so it adds NO height to the row.
+
+   A MOMENT STILL NEVER DRAWS A CLOSED SHAPE AROUND A DIGIT (§S5.3): markerStyle
+   takes no tone, and the band is behind the cell rather than on it. */
+/** Start at 13% (§3.3). Any lower and the run tone disappears on the well. */
+const BAND_ALPHA = 0.13;
+/** 2px above the cell, 3px below it (§3.3). */
+const BAND_ABOVE = 2;
+const BAND_BELOW = 3;
+const BAND_RADIUS = 4;
+/** The hole number's own box: 7px of line, then its 2.5px margin. The band's top
+ *  edge sits BAND_ABOVE above the cell, so the clearance to the number's box is
+ *  2.5 - BAND_ABOVE = 0.5px, and to the rendered glyph ~1.5px. */
+const NUM_BLOCK = 7 + 2.5;
+
+/** Composite a hex tone over a hex surface at `alpha` — the BLENDED WELL (§3.4).
+ *  A cell inside a band is handed this instead of the plain well so its 1px
+ *  spacer matches the tint behind it. */
+function blend(tone: string, surface: string, alpha: number): string {
+  const hex = (h: string) => {
+    const v = h.replace('#', '');
+    const full = v.length === 3 ? v.split('').map((c) => c + c).join('') : v;
+    return [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16));
+  };
+  const a = hex(tone);
+  const b = hex(surface);
+  const mix = a.map((c, i) => Math.round(c * alpha + b[i] * (1 - alpha)));
+  return `#${mix.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** Consecutive runs of marked holes WITHIN one nine, as [startIndex, length]. */
+function bandRuns(
+  marked: ReadonlySet<number> | undefined,
+  from: number,
+  to: number,
+): Array<{ start: number; len: number }> {
+  if (!marked || marked.size === 0) return [];
+  const runs: Array<{ start: number; len: number }> = [];
+  for (let holeNo = from; holeNo <= to; holeNo += 1) {
+    if (!marked.has(holeNo)) continue;
+    const last = runs[runs.length - 1];
+    if (last && last.start + last.len === holeNo - from) last.len += 1;
+    else runs.push({ start: holeNo - from, len: 1 });
+  }
+  return runs;
+}
 
 function nineTotals(holes: HoleShape['holes'], from: number, to: number) {
   let strokes = 0;
