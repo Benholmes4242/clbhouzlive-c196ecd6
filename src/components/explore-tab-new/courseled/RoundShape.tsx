@@ -620,12 +620,17 @@ function NineRow({
   to,
   label,
   well,
+  marked,
+  markTone,
 }: {
   holes: HoleShape['holes'];
   from: number;
   to: number;
   label: string;
   well: string;
+  /** The moment's OWN holes — the only holes allowed the moment tone (§S5.3). */
+  marked?: ReadonlySet<number>;
+  markTone?: string;
 }) {
   const byHole = new Map(holes.map((h) => [h.holeNo, h]));
   const totals = nineTotals(holes, from, to);
@@ -700,7 +705,7 @@ function NineRow({
               >
                 {holeNo}
               </span>
-              <span style={markerStyle(m, well)}>
+              <span style={markerStyle(m, well, marked?.has(holeNo) ? markTone : undefined)}>
                 {/* AN UNPLAYED HOLE IS EMPTY, never a zero: a zero would read as
                     an extraordinary score. */}
                 <span
@@ -745,17 +750,23 @@ function NineRow({
 export function MiniScorecard({
   shape,
   well = MINI_WELL,
+  marked,
+  markTone,
 }: {
   shape: HoleShape | null;
-  /** The tinted well behind the grid — the outer rings take it (§S3.6). */
+  /** The tinted well behind the grid — the outer rings take it (§S4.7). */
   well?: string;
+  /** THE MOMENT'S HOLES (§S4.6): a ring for a single hole, every hole in the
+   *  range for a stretch. Nothing else in the grid may take a moment tone. */
+  marked?: ReadonlySet<number>;
+  markTone?: string;
 }) {
   const { t } = useTranslation(['courses']);
   if (!shape || shape.holes.length === 0) return null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} well={well} />
-      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} well={well} />
+      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} well={well} marked={marked} markTone={markTone} />
+      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} well={well} marked={marked} markTone={markTone} />
     </div>
   );
 }
