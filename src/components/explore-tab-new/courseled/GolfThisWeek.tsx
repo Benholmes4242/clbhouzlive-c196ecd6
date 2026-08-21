@@ -423,7 +423,10 @@ function GolfThisWeekCard({
               overflow: 'hidden',
               fontSize: 14,
               fontWeight: 700,
-              lineHeight: 1.2,
+              /* 1.15 / 1, not 1.2 / normal (§S3.6): a two-line name grows
+                 UPWARD from bottom 8 and the tightened leading is what keeps its
+                 first line clear of the score chip's 37px bottom edge. */
+              lineHeight: 1.15,
               letterSpacing: '-0.01em',
               color: '#FFFFFF',
             }}
@@ -437,6 +440,7 @@ function GolfThisWeekCard({
               alignItems: 'center',
               gap: 6,
               fontSize: 10.5,
+              lineHeight: 1,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.82)',
             }}
@@ -453,7 +457,87 @@ function GolfThisWeekCard({
             <span style={{ opacity: 0.7 }}>{relativeDay(row.play_date, t)}</span>
           </div>
         </div>
+
+        {/* THE SCORE CHIP ON THE PHOTOGRAPH (§S2). .standout-figure-chip carries
+            the fill, the border and the @supports blur — the flat fill is the
+            base so the chip stays legible with backdrop-filter disabled. NO
+            inline background here, ever. */}
+        <span
+          className={CHIP_GLASS_CLASS}
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            display: 'inline-flex',
+            alignItems: 'baseline',
+            gap: 6,
+            borderRadius: 10,
+            padding: '5px 10px',
+          }}
+        >
+          <span
+            style={{
+              ...NUMF,
+              fontSize: 21,
+              fontWeight: 700,
+              letterSpacing: '-0.04em',
+              lineHeight: 0.9,
+              color: '#FFFFFF',
+            }}
+          >
+            {row.gross ?? '\u2014'}
+          </span>
+          {toPar && (
+            <span
+              style={{
+                ...NUMF,
+                fontSize: 12.5,
+                fontWeight: 700,
+                lineHeight: 1,
+                /* §S2.4 — the light-surface under-par red dies on a photograph. */
+                color: toParUnder ? GLASS_UNDER : 'rgba(255,255,255,0.92)',
+              }}
+            >
+              {toPar.text}
+            </span>
+          )}
+          {/* §S2.6 — NO MOVEMENT, NO HAIRLINE: a divider with nothing after it
+              reads as a truncation. */}
+          {hasMovement && (
+            <>
+              <span
+                style={{
+                  width: 1,
+                  alignSelf: 'stretch',
+                  background: 'rgba(255,255,255,0.28)',
+                  marginLeft: 2,
+                  marginRight: 2,
+                }}
+              />
+              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
+                {/* Arrow = direction, colour = good or bad, figure ABSOLUTE. */}
+                <IndexMovementTriangle
+                  direction={(delta as number) < 0 ? 'down' : 'up'}
+                  color={(delta as number) < 0 ? INDEX_DARK_FELL : INDEX_DARK_ROSE}
+                  size={7}
+                />
+                <span
+                  style={{
+                    ...NUMF,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    color: (delta as number) < 0 ? INDEX_DARK_FELL : INDEX_DARK_ROSE,
+                  }}
+                >
+                  {Math.abs(delta as number).toFixed(1)}
+                </span>
+              </span>
+            </>
+          )}
+        </span>
       </CourseImageFallback>
+
 
       <div style={{ padding: '9px 11px 9px' }}>
         {/* GROSS AND TO-PAR, with index movement right-aligned (§2.1).
