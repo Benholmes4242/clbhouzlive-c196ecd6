@@ -570,8 +570,15 @@ function surnameOf(full: string | null | undefined): string {
 
 /**
  * §3 — THE OPEN PANEL. THREE pick rows, an optional editorial line above them,
- * a provenance line GATED ON isAIPowered, then the mandatory route out. FIXED
- * height content: exactly three rows, never internally scrollable.
+ * a provenance line GATED ON isAIPowered, and nothing below. FIXED height
+ * content: exactly three rows, never internally scrollable.
+ *
+ * DEPENDENCY: This panel used to carry a mandatory "See all picks" route out.
+ * That row was removed per AMENDMENT 2 to BRIEF_HERO_PICKS_ROW. The full picks
+ * page is now reachable ONLY via the TIPicksCarousel rendered further down the
+ * overview page (it has its own header chevron to the same destination). If
+ * that carousel is ever removed, the full picks page becomes unreachable from
+ * the overview entirely — re-add a route here or keep the carousel alive.
  */
 function PicksPanel({
   picks,
@@ -579,7 +586,6 @@ function PicksPanel({
   phase,
   boardByPlayer,
   predictions,
-  onFullPicks,
 }: {
   picks: AITopContender[];
   /** §CHANGE 2 — the event's tour, for the shared headshot resolver. */
@@ -587,10 +593,10 @@ function PicksPanel({
   phase: 'live' | 'upcoming' | 'completed';
   boardByPlayer: Map<string, { position: number | null; tied: boolean; score: number | null }>;
   predictions: { isAIPowered?: boolean; isStale?: boolean; confidence?: number; editorialFraming?: string | null } | null;
-  onFullPicks?: () => void;
 }) {
   const { t } = useTranslation('tourhub');
   const rows = picks.slice(0, 3);
+  const hasConfidence = predictions?.isAIPowered;
 
   return (
     <div style={{ background: HERO_BOARD_SURFACE_SOFT, borderTop: `0.5px solid ${WHITE_ALPHA_12}` }}>
@@ -609,7 +615,14 @@ function PicksPanel({
         </div>
       ) : null}
 
-      <div style={{ padding: '10px 16px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div
+        style={{
+          padding: hasConfidence ? '10px 16px 0' : '10px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 10,
+        }}
+      >
         {rows.map((p, i) => {
           const line = boardByPlayer.get(String(p.playerId));
           const live = phase === 'live' && line && line.position != null;
@@ -700,11 +713,12 @@ function PicksPanel({
       </div>
 
       {/* PROVENANCE — here, not in the label, and only when the payload really
-          is AI-powered. Staleness rides the same line. */}
-      {predictions?.isAIPowered && (
+          is AI-powered. Staleness rides the same line. This is the panel's LAST
+          element when it renders; its bottom padding closes the panel cleanly. */}
+      {hasConfidence && (
         <div
           style={{
-            padding: '10px 16px 0',
+            padding: '10px 16px',
             fontSize: 9,
             fontWeight: 600,
             letterSpacing: '0.06em',
@@ -718,40 +732,6 @@ function PicksPanel({
           {predictions.isStale ? ` · ${t('overview.onTheCourse.ourPicksStale')}` : ''}
         </div>
       )}
-
-      {/* THE ROUTE OUT IS MANDATORY (§3) — the section header's chevron
-          destination survives the merge as the panel's last row. */}
-      <button
-        type="button"
-        onClick={onFullPicks}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-          marginTop: 10,
-          padding: '10px 16px',
-          background: 'transparent',
-          border: 'none',
-          borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
-          fontFamily: FONT,
-          cursor: 'pointer',
-        }}
-        className="active:bg-white/[0.06] transition-colors"
-      >
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            color: WHITE_ALPHA_65,
-            textTransform: 'uppercase',
-          }}
-        >
-          {t('overview.onTheCourse.ourPicksAll')}
-        </span>
-        <ChevronRight size={14} color="#FFFFFF" strokeWidth={2.5} />
-      </button>
     </div>
   );
 }
