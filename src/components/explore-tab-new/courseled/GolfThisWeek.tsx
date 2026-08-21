@@ -74,7 +74,12 @@ import { A, CARD_SHELL, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } from './tok
 
 /* Condensed tile geometry — ~12% shorter than the first pass, with the insight
    line still at one consistent height across the rail. */
-const CARD_W = 236;
+/* CARD_W 256 (was 236) — BRIEF_SCORECARD_WIDTH_AND_VIEWER_RING §S1.4. Dropping
+   the OUT / IN gutter bought 21px and it was still not enough: a double box
+   paints its outer ring 3px OUTSIDE its cell, so two doubles side by side need
+   ~10px between cell edges before a gap is visible. 256 is the narrowest width
+   that clears it; the markers were NOT shrunk. */
+const CARD_W = 256;
 const PHOTO_H = 92;
 /* SHAPE_H 60 — the shared renderer's own documented default
    (BRIEF_FRIENDS_TILE_SHAPE_AND_BUCKETS §1). At 48/52 a plus-eight round and a
