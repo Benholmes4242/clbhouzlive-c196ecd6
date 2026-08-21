@@ -78,6 +78,237 @@ function MoveMark({
   );
 }
 
+/* ─────────────────────────── WHO PLAYED (§S1/§S2) ─────────────────────────
+ * NAME INDENT: the face row aligns with the COURSE NAME, not the rank
+ * (§S1.1) — rank 13 + gap 11 + thumbnail 52 + gap 11 = 87.
+ */
+const NAME_INDENT = 87;
+/** Six faces, then "+N" (§S1.2). */
+const FACE_CAP = 6;
+/** Beyond twelve the expansion navigates instead of growing (§S2.5). */
+const LIST_CAP = 12;
+
+/** Amber means the viewing member and nothing else (§S1.3). */
+function ringFor(isOwn: boolean): string {
+  return isOwn ? A.AMBER : A.PANEL;
+}
+
+/** A face that opens its member's profile and never toggles the row (§S2.7). */
+function MemberFace({
+  player,
+  size,
+  isOwn,
+  onOpen,
+}: {
+  player: MostPlayedPlayer;
+  size: number;
+  isOwn: boolean;
+  onOpen: (userId: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        // STOP, OR THE ROW TOGGLES BEHIND THE NAVIGATION (§S2.7).
+        e.stopPropagation();
+        onOpen(player.userId);
+      }}
+      aria-label={player.name}
+      style={{
+        display: 'block',
+        padding: 0,
+        border: 'none',
+        background: 'transparent',
+        borderRadius: '34%',
+        cursor: 'pointer',
+        flex: 'none',
+        // THE RING READS THEM APART: 1.5px of the panel colour, or amber for
+        // the viewer (§S1.1/§S1.3).
+        boxShadow: `0 0 0 1.5px ${ringFor(isOwn)}`,
+      }}
+    >
+      <SquircleAvatar
+        size={size}
+        src={player.avatarUrl}
+        alt={player.name}
+        userId={player.userId}
+        hairlineRing
+      />
+    </button>
+  );
+}
+
+/** §S1 — the collapsed face row, plus "best NN" on the right. */
+function FaceRow({
+  row,
+  viewerId,
+  onOpenMember,
+}: {
+  row: MostPlayedRow;
+  viewerId: string | null;
+  onOpenMember: (userId: string) => void;
+}) {
+  const { t } = useTranslation('courses');
+  if (row.players.length === 0) return null;
+  const faces = row.players.slice(0, FACE_CAP);
+  const overflow = row.players.length - faces.length;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        paddingLeft: NAME_INDENT,
+        paddingBottom: 12,
+        minWidth: 0,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+        {faces.map((p, idx) => (
+          <span key={p.userId} style={{ marginLeft: idx === 0 ? 0 : -8, display: 'block' }}>
+            <MemberFace
+              player={p}
+              size={26}
+              isOwn={!!viewerId && p.userId === viewerId}
+              onOpen={onOpenMember}
+            />
+          </span>
+        ))}
+        {/* ONE MEMBER SHOWS ONE FACE — no "+0", no placeholder (§S1.6). */}
+        {overflow > 0 && (
+          <span
+            style={{
+              ...LABEL,
+              fontSize: 9,
+              color: A.MUTE,
+              marginLeft: 6,
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}
+          >
+            +{formatNumber(overflow)}
+          </span>
+        )}
+      </div>
+      {row.bestGross != null && (
+        <span
+          style={{
+            ...LABEL,
+            fontSize: 9,
+            color: A.MUTE,
+            marginLeft: 'auto',
+            flex: 'none',
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+        >
+          {t('discover.mostPlayedBest', 'best')}{' '}
+          <span style={{ color: A.INK }}>{formatNumber(row.bestGross)}</span>
+        </span>
+      )}
+    </div>
+  );
+}
+
+/**
+ * §S2 — the expanded list. NO INTERNAL SCROLL, AND THAT IS DELIBERATE (§S2.4):
+ * "No nested scroll. The largest course this week has NINE members, so a
+ *  ten-row scroll would never engage — and a scrollable panel inside a
+ *  scrolling page is a real fault on a phone: a finger that lands on the list
+ *  scrolls the list instead of the page, and a member cannot tell why the page
+ *  stopped moving. The expansion is member-initiated, so its height is
+ *  consented to."
+ */
+function MemberList({
+  row,
+  viewerId,
+  onOpenMember,
+  onSeeAllAtCourse,
+}: {
+  row: MostPlayedRow;
+  viewerId: string | null;
+  onOpenMember: (userId: string) => void;
+  onSeeAllAtCourse: () => void;
+}) {
+  const { t } = useTranslation('courses');
+  const listed = row.players.slice(0, LIST_CAP);
+  const hidden = row.players.length - listed.length;
+
+  return (
+    <div style={{ paddingLeft: NAME_INDENT, paddingBottom: 12, display: 'grid', gap: 8 }}>
+      {listed.map((p) => {
+        const isOwn = !!viewerId && p.userId === viewerId;
+        return (
+          <div key={p.userId} style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            <MemberFace player={p} size={22} isOwn={isOwn} onOpen={onOpenMember} />
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenMember(p.userId);
+              }}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                border: 'none',
+                background: 'transparent',
+                padding: 0,
+                textAlign: 'left',
+                cursor: 'pointer',
+                fontFamily: SANS,
+                fontSize: 12,
+                // THE VIEWER'S OWN ROW, as the round tiles do (§S2.6).
+                fontWeight: isOwn ? 700 : 600,
+                letterSpacing: '-0.015em',
+                color: isOwn ? A.AMBER_DEEP : A.INK,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {isOwn ? t('discover.wire.you', 'You') : p.name}
+            </button>
+            {p.gross != null && (
+              <span
+                style={{
+                  ...NUMF,
+                  fontSize: 12,
+                  flex: 'none',
+                  color: isOwn ? A.AMBER_DEEP : A.INK,
+                }}
+              >
+                {formatNumber(p.gross)}
+              </span>
+            )}
+          </div>
+        );
+      })}
+      {/* A NAVIGATION, NEVER A SCROLL TRAP (§S2.5). */}
+      {hidden > 0 && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSeeAllAtCourse();
+          }}
+          style={{
+            ...LABEL,
+            fontSize: 9,
+            color: A.INK,
+            border: 'none',
+            background: 'transparent',
+            padding: '2px 0',
+            textAlign: 'left',
+            cursor: 'pointer',
+          }}
+        >
+          {t('discover.mostPlayedSeeAllAtCourse', 'See all at this course')}
+        </button>
+      )}
+    </div>
+  );
+}
+
+
 export function MostPlayedLeaderboard({
   rows,
   limit = 5,
