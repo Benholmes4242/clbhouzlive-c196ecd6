@@ -275,10 +275,6 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
               const target = tournamentRoute(bandTournamentId, { kind: 'overview' });
               navigate(target.to, { state: target.state });
             }}
-            onFullPicks={() => {
-              const target = tournamentRoute(bandTournamentId, { kind: 'overview' });
-              navigate(target.to, { state: target.state });
-            }}
             onRowTap={(playerId) =>
               analyticsEvents.track('hero_board_row_tap', {
                 tournament_id: bandTournamentId,

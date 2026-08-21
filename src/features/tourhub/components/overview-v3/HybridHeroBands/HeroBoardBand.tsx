@@ -554,7 +554,6 @@ export function HeroBoardSection({
           phase={phase}
           boardByPlayer={boardByPlayer}
           predictions={predictions ?? null}
-          onFullPicks={onFullPicks}
         />
       )}
     </div>
