@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { Check } from 'lucide-react';
+import { Check, ChevronRight } from 'lucide-react';
+
 
 /** ~1.2s: long enough to register, short enough not to be a state (§S3.4). */
 const CONFIRM_MS = 1200;
@@ -11,22 +12,12 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
-import { CHIP_GLASS_CLASS, SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
-import {
-  toParFor,
-  buildInsightMap,
-  referenceLine,
-  INSIGHT_LINE_HEIGHT,
-  INSIGHT_CLAMP,
-  InsightGlyph,
-  IndexMovementTriangle,
-} from '../friendRoundParts';
-import { FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
 
-import { CourseImageFallback } from './CourseImageFallback';
 import { relativeDay } from './discoverWhen';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
@@ -44,9 +35,17 @@ import {
 } from './hooks/useGolfThisWeek';
 import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegionCounts';
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
-import { MiniScorecard, RoundShape } from './RoundShape';
+import { MiniScorecard } from './RoundShape';
+import {
+  grindSentenceKey,
+  selectMoment,
+  type Moment,
+  type MomentHole,
+  type MomentKind,
+} from './roundMoment';
 import { GolfThisWeekRail as GolfThisWeekShell } from './DiscoverCourseLedSkeleton';
-import { A, CARD_SHELL, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
+import { A, CARD_SHELL, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
+
 
 /**
  * GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK). Replaces Around the world (standout
@@ -71,91 +70,68 @@ import { A, CARD_SHELL, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } from './tok
 
 
 /* =============================================================================
-   THE TILE'S GEOMETRY AND ITS INK (BRIEF_ROUND_TILE_LIGHT_REFINEMENT).
+   THE TILE'S GEOMETRY (BRIEF_ROUND_TILE_THE_MOMENT §S4.1).
 
-   WHY THE OLD TILE LOOKED FUSSY, AND IT WAS NOT THE CONTENT: it carried FOUR
-   outline systems — card border, chart panel border, marker borders, row
-   hairlines — and the chart panel was #F7F9FA on #FFFFFF, a two percent tone
-   difference propped up by a 1px border because the tone could not carry the
-   separation alone. On dark, separation is free. On light it has to come from
-   TONE, and reaching for borders instead is also why the tile was TALL: much of
-   the height was padding compensating for weak separation.
+   THE TILE IS A HERO, A ROW AND A WELL: hero 178 / member row with the score /
+   the well, whose CHART REGION IS A FIXED HEIGHT whatever chart it holds. That
+   fixed region is the whole reason the rail stays uniform while its CONTENTS
+   differ (§S2.2, ACCEPTANCE G) — do not let a chart size the well.
 
-   SO: ONE tinted well holds the trajectory AND the scorecard, with no border and
-   exactly one hairline inside it; the card drops its border for a shadow. */
+   THE PHOTOGRAPH IS GONE (§S4.6). PHOTO_H, SHAPE_H, the scrim and the glass chip
+   tokens went with it; the hero gradient carries the top of the card now. */
 
 const CARD_W = 256;
 
-/* 92 -> 76 (§S4.1). It is a tile whose content is data; 76 is still a
-   photograph. */
-const PHOTO_H = 76;
+/** §S4.1 — the hero. */
+const HERO_H = 178;
 
-/* SHAPE_H 40 — the trajectory is the SUMMARY (BRIEF_ROUND_TILE_MINI_SCORECARD
-   §S2.2); the hole grid beneath it carries the detail 60px used to have to. */
-const SHAPE_H = 40;
+/* THE CHART REGION. 88px is what the two nines of the mini scorecard need at the
+   settled 17px cell / 9px gap geometry (two headers, two hole-number rows, two
+   marker rows and the 4px gap between the nines). THE STRIP AND THE CURVE TAKE
+   THE SAME 88 — a rail whose frames differ reads as broken. */
+const CHART_H = 88;
 
-/* NO TINT. The trajectory and the scorecard sit on the WHITE card surface —
-   the grouping is spacing and the single hairline, nothing else. WELL stays as
-   the colour the marker outer rings trace against, and that colour is the card
-   itself, so the double/eagle ring reads as a gap rather than a grey halo. */
+/* NO TINT IN THE WELL. WELL stays as the colour the marker outer rings trace
+   against, and that colour is the card itself, so a double's ring reads as a gap
+   rather than a grey halo. */
 const WELL = '#FFFFFF';
 const WELL_RADIUS = 12;
-const WELL_PAD_TOP = 8;
-/* 6, not the reference's 10 — see WELL_INNER. */
+/* 6, not 10 — see WELL_INNER. */
 const WELL_PAD_X = 6;
-const WELL_PAD_BOTTOM = 10;
-/* THE ONE RULE INSIDE THE WELL, full-bleed to its edges by negative margin. */
+/* THE ONE RULE IN THE WELL: under its header. */
 const WELL_RULE = 'rgba(11,15,20,0.07)';
 
 /* THE WELL BLEEDS TO THE CARD EDGES, so its inner width is 244px — the width the
    marker/gap measurement table in RoundShape is measured at. That table is the
-   binding constraint on the scorecard, so the x padding is 6 rather than the
-   reference's 10: at 10 the inner width falls to 236 and a leading double box
-   sits 2.7px from the well edge, which is precisely the clipping fault §S3
-   exists to fix. Everything else in §S1.3 is as written. */
+   binding constraint on the scorecard, so the x padding is 6 rather than 10: at
+   10 the inner width falls to 236 and a leading double box sits 2.7px from the
+   well edge, which is the clipping fault that geometry exists to fix. */
 const WELL_INNER = CARD_W - WELL_PAD_X * 2;
 
-/* THE INK DOES THE HIERARCHY (§S2). One genuinely dark ink and three greys that
-   are clearly different from each other, replacing four middling greys. A
-   DARKER INK ON FEWER ELEMENTS reads sharper than four greys everywhere. */
-const INK = '#0B0F14';   // scores, totals, the insight line
+/* THE INK DOES THE HIERARCHY. One genuinely dark ink and greys that are clearly
+   different from each other, not four middling greys. */
+const INK = '#0B0F14';   // scores and totals
 const MID = '#5A6673';   // secondary text
-/* FAINT #9AA5B1 (labels) and GHOST #C8D0D8 (hole numbers) are declared where
-   they are used, in RoundShape's mini grid, as MINI_FAINT and MINI_GHOST. */
 const HAIRLINE_INK = 'rgba(11,15,20,0.12)';
 
-/* The card sits on the page rather than being drawn onto it (§S1.5). */
+/* The card sits on the page rather than being drawn onto it. */
 const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 
-/* §S4.4 — 10.5px, down from the shared 11.5 the friends rail uses, with the
-   reserve recomputed from it so the line still lands at one height per rail. */
-const INSIGHT_SM = 10.5;
-const INSIGHT_LINE_RESERVE_SM = INSIGHT_SM * INSIGHT_LINE_HEIGHT;
-
 /**
- * TILE HEIGHT FLOOR. Measured in the browser on a tile with the full grid:
- * photograph 76, member row, the well (40px trajectory + hairline + two nines of
- * 17px markers with their headers), insight line, padding. Holds the rail level
- * when a round has no hole data and therefore prints no grid at all.
+ * TILE HEIGHT. hero 178 + 8 pad + 20 member row + 8 + well header 14 + 7 + 88
+ * chart + 10 pad = 333. EVERY TREATMENT LANDS ON IT because the chart region is
+ * fixed, including a round with NO HOLE DATA, whose well is simply empty (§S1.5).
  */
-/* Re-measured for the one-well tile: 76 photo + 8 pad + 19 member + 8 + 155
-   well + 8 + 14 insight + 10 pad. A card with NO hole data draws no grid, so
-   this is what keeps the rail level. */
-const CARD_MIN_H = 298;
+const CARD_MIN_H = 333;
 
-
-
-/** The rail scrim of record — imported, never retyped. */
-const CARD_SCRIM = SCRIM_STANDOUT;
-
-/** Amber is the viewing member, on their own card border and nowhere else (§7). */
+/** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
 
-/** ON-DARK TONES FOR THE GLASS CHIP (§S2.4, §S2.5) — the light-surface
- *  under-par red and the body index pair both fail over a photograph. */
-const GLASS_UNDER = '#FF8A80';
-const INDEX_DARK_FELL = '#7BE8A6';
-const INDEX_DARK_ROSE = '#FF8A7A';
+/** THE INDEX MOVEMENT IN THE DATA REGION IS LITERAL (§S3.2): a fall is good, a
+ *  rise is not, and the ARROW is what separates it from the to-par beside it. */
+const INDEX_FELL = '#1B7F4B';
+const INDEX_ROSE = '#C8102E';
+
 
 
 /**
@@ -403,13 +379,233 @@ function FollowButton({
 }
 
 
+/* =============================================================================
+   COLOUR — THE RULE THAT KEEPS IT HONEST (BRIEF_ROUND_TILE_THE_MOMENT §S3.4).
+   READ THIS BEFORE CHANGING ANY COLOUR ON THIS CARD.
+
+   §S3.1  THE HERO IS EXPRESSIVE. The moment's tone (#FFC93C eagle, #22D07A run,
+          #FF5A4E collapse, #3B9DFF finish, #F7931E grind) is a CELEBRATION
+          ACCENT and NOTHING UP THERE IS MEASURED.
+
+   §S3.2  THE DATA REGION IS LITERAL. RED IS UNDER PAR, INK IS OVER, ALWAYS.
+
+   §S3.3  THE ONLY EXCEPTION is the moment's OWN holes, which take the hero tone
+          so the two halves of the card point at each other.
+
+   WITHOUT THIS RULE the moment palette leaks into the charts within a month and
+   red stops meaning under par — which every other scoring surface in the app
+   depends on. Do not tint a bar, a marker or a curve with a moment tone unless
+   that hole is in `moment.holes`.
+   ========================================================================== */
+
+/** THE HERO'S GRADIENTS. The collapse takes the COOLER one (§S3.6): its word is
+ *  neutral and the figure does the talking — never a joke at a member's
+ *  expense, and never a red wash over somebody's bad hole. */
+const HERO_BASE = 'linear-gradient(158deg, #141A21 0%, #0B0F14 74%)';
+const HERO_COOL = 'linear-gradient(150deg, #1C2531 0%, #0C1116 72%)';
+
+function heroBackground(kind: MomentKind, tone: string) {
+  if (kind === 'collapse') return HERO_COOL;
+  return `radial-gradient(122% 92% at 86% 4%, ${tone}3D 0%, rgba(0,0,0,0) 62%), ${HERO_BASE}`;
+}
+
+const fmtRel = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
+
+/**
+ * THE SENTENCE (§S4.3) — THE HIGHEST-RISK ELEMENT ON THE CARD. It is built from
+ * a FIXED TEMPLATE PER KIND with figures interpolated into NUMBERED
+ * placeholders, so a translator can reorder them (§S5.2). NEVER free text, and
+ * nothing here can read as sarcasm on a bad round.
+ */
+function momentCopy(m: Moment, t: (k: string, d?: string, o?: object) => string) {
+  const f = m.facts;
+  const K = 'discover.golfThisWeek.moment';
+
+  if (m.kind === 'eagle') {
+    const word =
+      m.feat === 'ace'
+        ? t(`${K}.eagle.ace`, 'Ace')
+        : m.feat === 'albatross'
+          ? t(`${K}.eagle.albatross`, 'Albatross')
+          : t(`${K}.eagle.eagle`, 'Eagle');
+    return {
+      meta: t(`${K}.eagle.meta`, 'Hole'),
+      word,
+      sub: t(`${K}.eagle.sub`, 'The shot of the round'),
+      sentence: t(`${K}.eagle.sentence`, '{{0}} on hole {{1}}, a par {{2}}.', {
+        0: f.strokes,
+        1: f.holeNo,
+        2: f.par,
+      }),
+      chartLabel: t(`${K}.chart.strip`, 'Every hole'),
+    };
+  }
+  if (m.kind === 'run') {
+    return {
+      meta: t(`${K}.run.meta`, 'Holes'),
+      word: t(`${K}.run.word`, 'The run'),
+      sub: t(`${K}.run.sub`, 'Par or better, back to back'),
+      sentence: t(
+        `${K}.run.sentence`,
+        '{{0}} holes in a row at par or better, from {{1}} to {{2}}.',
+        { 0: f.count, 1: f.from, 2: f.to },
+      ),
+      chartLabel: t(`${K}.chart.strip`, 'Every hole'),
+    };
+  }
+  if (m.kind === 'collapse') {
+    return {
+      meta: t(`${K}.collapse.meta`, 'Hole'),
+      word: t(`${K}.collapse.word`, 'Hole {{0}}', { 0: f.holeNo }),
+      sub: t(`${K}.collapse.sub`, 'Where the round turned'),
+      sentence: t(
+        `${K}.collapse.sentence`,
+        '{{0}} shots dropped on hole {{1}}; the other holes came to {{2}}.',
+        { 0: f.dropped, 1: f.holeNo, 2: fmtRel(f.restToPar ?? 0) },
+      ),
+      chartLabel: t(`${K}.chart.trajectory`, 'The round'),
+    };
+  }
+  if (m.kind === 'finish') {
+    return {
+      meta: t(`${K}.finish.meta`, 'Birdies'),
+      word: t(`${K}.finish.word`, 'The finish'),
+      sub: t(`${K}.finish.sub`, 'The closing three'),
+      sentence: t(
+        `${K}.finish.sentence`,
+        '{{0}} birdies in the last three holes to finish on {{1}}.',
+        { 0: f.count, 1: fmtRel(f.toPar ?? 0) },
+      ),
+      chartLabel: t(`${K}.chart.lastSix`, 'Holes 13\u201318'),
+    };
+  }
+
+  /* THE GRIND. FOUR TEMPLATES, CHOSEN — never concatenated (§S1.4, §S5.2). */
+  const which = grindSentenceKey(m);
+  const grindSentences: Record<string, [string, string]> = {
+    clean: [
+      `${K}.grind.sentenceClean`,
+      '{{0}} of {{1}} holes at par or better, with no birdies and no doubles.',
+    ],
+    noDoubles: [
+      `${K}.grind.sentenceNoDoubles`,
+      '{{0}} of {{1}} holes at par or better, and not a double all day.',
+    ],
+    noBirdies: [
+      `${K}.grind.sentenceNoBirdies`,
+      '{{0}} of {{1}} holes at par or better, with no birdies.',
+    ],
+    plain: [`${K}.grind.sentencePlain`, '{{0}} of {{1}} holes at par or better.'],
+    noHoles: [
+      `${K}.grind.sentenceNoHoles`,
+      'A round played. The hole by hole detail was not recorded.',
+    ],
+  };
+  const [key, fallback] = grindSentences[which];
+  return {
+    meta: t(`${K}.grind.meta`, 'Holes'),
+    word: t(`${K}.grind.word`, 'The grind'),
+    sub: t(`${K}.grind.sub`, 'Par or better'),
+    sentence: t(key, fallback, { 0: f.parOrBetter, 1: f.played }),
+    chartLabel: t(`${K}.chart.scorecard`, 'The card'),
+  };
+}
+
+/**
+ * THE STRIP (§S2.3) — eighteen bars, height by outcome, the moment's holes in
+ * the hero tone and EVERYTHING ELSE LITERAL (§S3.2): under par red, over par
+ * ink, par a recessed stub on the level-par rule.
+ *
+ * IT IS NOT INTERCHANGEABLE WITH THE CURVE. The eagle's claim is ONE HOLE and
+ * the run's is a SPAN, and only a per-hole row shows a span AS a span.
+ */
+function MomentStrip({
+  holes,
+  tone,
+  highlight,
+  width,
+  height,
+}: {
+  holes: MomentHole[];
+  tone: string;
+  highlight: ReadonlySet<number>;
+  width: number;
+  height: number;
+}) {
+  const count = 18;
+  const gap = 2;
+  const barW = Math.max(4, (width - gap * (count - 1)) / count);
+  /* THE LEVEL-PAR RULE sits low, because damage is the common case: over par
+     grows UP from it, under par hangs BELOW it. */
+  const baseline = Math.round(height * 0.7);
+  const unit = 11;
+  const byHole = new Map(holes.map((h) => [h.holeNo, h]));
+
+  return (
+    <div style={{ position: 'relative', height, width }}>
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: baseline,
+          height: 1,
+          background: 'rgba(11,15,20,0.14)',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          gap,
+          alignItems: 'flex-start',
+        }}
+      >
+        {Array.from({ length: count }, (_, i) => {
+          const holeNo = i + 1;
+          const h = byHole.get(holeNo);
+          const d =
+            h && h.par != null && h.strokes != null ? h.strokes - h.par : null;
+          const lit = highlight.has(holeNo);
+          if (d == null) {
+            return (
+              <div key={holeNo} style={{ width: barW, height: '100%', position: 'relative' }} />
+            );
+          }
+          const over = d > 0;
+          const under = d < 0;
+          const mag = Math.min(Math.abs(d), 4);
+          const len = d === 0 ? 3 : Math.max(4, mag * unit);
+          const colour = lit ? tone : under ? TOPAR_RED : d === 0 ? '#C8D0D8' : INK;
+          return (
+            <div key={holeNo} style={{ width: barW, height: '100%', position: 'relative' }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  width: barW,
+                  borderRadius: 2,
+                  background: colour,
+                  ...(over || d === 0
+                    ? { bottom: height - baseline, height: len }
+                    : { top: baseline + 1, height: len }),
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 interface CardProps {
   row: CircleRoundRow;
   shape: HoleShape | null;
-  insight: string | null;
   courseName: string | null;
   region: string | null;
-  imageUrl: string | null;
   showFollow: boolean;
   /** §2.2 — read from the SAME cached following-id set that drives showFollow. */
   isFollowed: boolean;
@@ -418,23 +614,23 @@ interface CardProps {
 }
 
 /**
- * THE CARD LEADS WITH THE COURSE (§2).
+ * THE ROUND TILE IS A STORY, NOT A REPORT (BRIEF_ROUND_TILE_THE_MOMENT).
  *
- * Order: course image with the score chip over it / player row / the shape /
- * the strip / the insight line. The gross, to-par and index movement sit in a
- * glass chip ON the photograph — they belong to the round, not to the block,
- * and moving them freed the row beneath for the member. The to-par label that
- * sat on the curve was the same figure twice and collided with an over-par
- * curve's endpoint.
+ * Top to bottom (§S4.1): HERO 178 / member row with the score / THE WELL.
+ *
+ * IT GIVES UP COMPLETENESS DELIBERATELY (§S0.3). No treatment except the grind
+ * shows all eighteen holes, because THE SCORECARD IS ONE TAP AWAY AND DOES IT
+ * PROPERLY, and a rail tile that tries to be the scorecard ends up as a small
+ * unreadable scorecard — which is exactly what shipped before this.
+ *
+ * THE PHOTOGRAPH IS GONE (§S4.6): the hero gradient replaces it, so the course
+ * is named in words at the top of the hero.
  */
-
 function GolfThisWeekCard({
   row,
   shape,
-  insight,
   courseName,
   region,
-  imageUrl,
   showFollow,
   isFollowed,
   viewerUserId,
@@ -442,24 +638,59 @@ function GolfThisWeekCard({
 }: CardProps) {
   const { t } = useTranslation('courses');
   const toPar = toParFor(row);
-  /* §S2.4 — the sign, from the same two fields toParFor reads. */
   const toParUnder =
     row.gross != null && row.course_par != null && row.gross - row.course_par < 0;
-  /* §6.3 — the ONLY marker on this section, and only for these two feats. */
-  const legendary = (row.holes_in_one ?? 0) > 0 || (row.albatrosses ?? 0) > 0;
-  /* §S2.5 / §S2.6 — THIS round's index movement, on the glass chip. A fall is
-     green and a rise is red because a movement's axis is direction of travel;
-     the ARROW is what distinguishes it from the to-par figure beside it. Below
-     the 0.05 floor there is no movement and no hairline. */
+
+  /* THE SELECTOR IS PURE AND LIVES IN ITS OWN MODULE (§S1.6). A round with no
+     hole data returns the GRIND with no counts, and the well renders empty. */
+  const moment = useMemo(() => selectMoment(shape?.holes ?? []), [shape]);
+  const copy = momentCopy(moment, t as never);
+  const litHoles = useMemo(() => new Set(moment.holes), [moment.holes]);
+
   const delta = row.delta_index;
   const hasMovement =
     delta != null && Number.isFinite(delta) && Math.abs(delta as number) >= 0.05;
 
+  const chart = (() => {
+    if (!shape) return null;
+    if (moment.chart === 'scorecard') return <MiniScorecard shape={shape} well={WELL} />;
+    if (moment.chart === 'strip') {
+      return (
+        <MomentStrip
+          holes={shape.holes}
+          tone={moment.tone}
+          highlight={litHoles}
+          width={WELL_INNER}
+          height={CHART_H}
+        />
+      );
+    }
+    /* THE CURVE. LAST SIX ONLY for the finish (§S2.1): the claim is about the
+       END, so the end is shown at size rather than the whole round at a
+       distance. TrajectoryLine keeps the tangent-cubic smoothing and draws the
+       dashed level-par rule only when zero is in range (§S2.4). */
+    const holes =
+      moment.chart === 'trajectoryLastSix'
+        ? shape.holes.filter((h) => h.holeNo >= 13)
+        : shape.holes;
+    return (
+      <TrajectoryLine
+        holes={holes}
+        height={CHART_H}
+        surface="light"
+        showTicks={false}
+        padY={6}
+        viewWidth={WELL_INNER}
+        strokeWidth={1.8}
+      />
+    );
+  })();
 
   return (
     /* NOT A <button> (§S1.1): FollowButton is a real button and a button inside
        a button is invalid HTML — WebKit commonly never delivers the inner tap.
-       Div + role="button" + Enter/Space keeps the whole tile operable. */
+       Div + role="button" + Enter/Space keeps the whole tile operable, and
+       THE WHOLE TILE OPENS THE SCORECARD SHEET (§S4.5). */
     <div
       role="button"
       tabIndex={0}
@@ -472,15 +703,11 @@ function GolfThisWeekCard({
       }}
       style={{
         ...CARD_SHELL,
-        /* THE CARD LOSES ITS BORDER AND TAKES A SHADOW (§S1.5). */
         border: 'none',
         boxShadow: CARD_SHADOW,
         width: CARD_W,
-        /* §S4.5 / ACCEPTANCE K vs G — the brief asks BOTH for no reserved height
-           when there is no hole data AND for a uniform rail. Those cannot both
-           hold per element, so the reserve lives on the CARD: a no-grid tile
-           renders no grid and no gap, and the card's minHeight keeps the rail
-           level. CARD_MIN_H is the measured height of a tile WITH the grid. */
+        /* EVERY TILE IS THE SAME SIZE (ACCEPTANCE G): the well is a FIXED height
+           whatever it holds, and an empty well (no hole data) keeps it. */
         minHeight: CARD_MIN_H,
         flexShrink: 0,
         display: 'flex',
@@ -490,164 +717,144 @@ function GolfThisWeekCard({
         fontFamily: SANS,
         cursor: 'pointer',
       }}
-
     >
-      <CourseImageFallback
-        courseId={row.course_id}
-        courseName={courseName ?? row.course_name}
-        imageUrl={imageUrl}
-        style={{ height: PHOTO_H, flexShrink: 0 }}
+      {/* ===================== THE HERO (§S4.2) ===================== */}
+      <div
+        style={{
+          height: HERO_H,
+          flexShrink: 0,
+          position: 'relative',
+          background: heroBackground(moment.kind, moment.tone),
+          padding: '11px 12px 11px',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
       >
-        <div style={{ position: 'absolute', inset: 0, background: CARD_SCRIM }} />
-        <div style={{ position: 'absolute', left: 10, right: 10, bottom: 8 }}>
-          <div
-            style={{
-              display: '-webkit-box',
-              WebkitBoxOrient: 'vertical',
-              WebkitLineClamp: 2,
-              overflow: 'hidden',
-              fontSize: 14,
-              fontWeight: 700,
-              /* 1.1 / 1, not 1.2 / normal (§S3.6): a two-line name grows
-                 UPWARD from bottom 8 and the tightened leading is what keeps its
-                 first line clear of the score chip's 37px bottom edge. */
-              lineHeight: 1.1,
-              letterSpacing: '-0.01em',
-              color: '#FFFFFF',
-            }}
-          >
-            {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 11.5,
+                fontWeight: 700,
+                lineHeight: 1.15,
+                letterSpacing: '-0.01em',
+                color: 'rgba(255,255,255,0.94)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
+            </div>
+            {region && (
+              <div
+                style={{
+                  marginTop: 2,
+                  fontSize: 9.5,
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  color: 'rgba(255,255,255,0.56)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {region}
+              </div>
+            )}
           </div>
-          <div
+          <span
             style={{
-              marginTop: 2,
-              fontSize: 10.5,
+              flexShrink: 0,
+              fontSize: 8.5,
+              fontWeight: 700,
               lineHeight: 1,
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.82)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.62)',
             }}
           >
-            {region ?? ''}
+            {relativeDay(row.play_date, t)}
+          </span>
+        </div>
+
+        <div style={{ flex: 1 }} />
+
+        {/* THE FIGURE AT 56 — a hole number or a count, and the moment word in
+            its tone beside it. NOTHING UP HERE IS MEASURED (§S3.1). */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 9, minWidth: 0 }}>
+          <div style={{ flexShrink: 0 }}>
+            <div
+              style={{
+                ...LABEL,
+                fontSize: 8.5,
+                color: 'rgba(255,255,255,0.5)',
+                marginBottom: 2,
+              }}
+            >
+              {copy.meta}
+            </div>
+            <div
+              style={{
+                ...NUMF,
+                fontSize: 56,
+                lineHeight: 0.82,
+                letterSpacing: '-0.05em',
+                color: '#FFFFFF',
+              }}
+            >
+              {moment.facts.played === 0 ? '\u2014' : moment.figure}
+            </div>
+          </div>
+          <div style={{ minWidth: 0, paddingBottom: 3 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.09em',
+                textTransform: 'uppercase',
+                lineHeight: 1.1,
+                color: moment.tone,
+              }}
+            >
+              {copy.word}
+            </div>
+            <div
+              style={{
+                marginTop: 3,
+                fontSize: 10,
+                fontWeight: 600,
+                lineHeight: 1.2,
+                color: 'rgba(255,255,255,0.58)',
+              }}
+            >
+              {copy.sub}
+            </div>
           </div>
         </div>
 
-        {/* THE DATE SITS TOP-RIGHT (§S4.3), out of the subline it used to share
-            with the region — the same figure, moved, not added. */}
-        <span
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 9,
-            fontSize: 8.5,
-            fontWeight: 700,
-            lineHeight: 1,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.85)',
-          }}
-        >
-          {relativeDay(row.play_date, t)}
-        </span>
-
-
-        {/* THE SCORE CHIP ON THE PHOTOGRAPH (§S2). .standout-figure-chip carries
-            the fill, the border and the @supports blur — the flat fill is the
-            base so the chip stays legible with backdrop-filter disabled. NO
-            inline background here, ever. */}
-        <span
-          className={CHIP_GLASS_CLASS}
-          style={{
-            position: 'absolute',
-            top: 8,
-            left: 8,
-            display: 'inline-flex',
-            alignItems: 'baseline',
-            gap: 6,
-            /* §S4.2 — the chip TIGHTENS. Hairline and index movement kept. */
-            borderRadius: 9,
-            padding: '4px 9px',
-          }}
-        >
-          <span
-            style={{
-              ...NUMF,
-              fontSize: 19,
-              fontWeight: 700,
-              letterSpacing: '-0.04em',
-              lineHeight: 0.85,
-              color: '#FFFFFF',
-            }}
-          >
-            {row.gross ?? '\u2014'}
-          </span>
-          {toPar && (
-            <span
-              style={{
-                ...NUMF,
-                fontSize: 11.5,
-                fontWeight: 700,
-                lineHeight: 1,
-                /* §S2.4 — the light-surface under-par red dies on a photograph. */
-                color: toParUnder ? GLASS_UNDER : 'rgba(255,255,255,0.92)',
-              }}
-            >
-              {toPar.text}
-            </span>
-          )}
-          {/* §S2.6 — NO MOVEMENT, NO HAIRLINE: a divider with nothing after it
-              reads as a truncation. */}
-          {hasMovement && (
-            <>
-              <span
-                style={{
-                  width: 1,
-                  alignSelf: 'stretch',
-                  background: 'rgba(255,255,255,0.28)',
-                  marginLeft: 2,
-                  marginRight: 2,
-                }}
-              />
-              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
-                {/* Arrow = direction, colour = good or bad, figure ABSOLUTE. */}
-                <IndexMovementTriangle
-                  direction={(delta as number) < 0 ? 'down' : 'up'}
-                  color={(delta as number) < 0 ? INDEX_DARK_FELL : INDEX_DARK_ROSE}
-                  size={7}
-                />
-                <span
-                  style={{
-                    ...NUMF,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    lineHeight: 1,
-                    color: (delta as number) < 0 ? INDEX_DARK_FELL : INDEX_DARK_ROSE,
-                  }}
-                >
-                  {Math.abs(delta as number).toFixed(1)}
-                </span>
-              </span>
-            </>
-          )}
-        </span>
-      </CourseImageFallback>
-
-
-      <div style={{ padding: '8px 10px 10px' }}>
-        {/* THE MEMBER ROW SITS DIRECTLY UNDER THE PHOTOGRAPH: the score is on the
-            image, so the name gets the room. The follow control stays
-            right-aligned here in whichever of its three states applies. */}
+        {/* ONE SENTENCE, from a fixed template (§S4.3). */}
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 7,
-            minWidth: 0,
+            marginTop: 9,
+            fontSize: 10.5,
+            fontWeight: 500,
+            lineHeight: 1.32,
+            color: 'rgba(255,255,255,0.74)',
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: 2,
+            overflow: 'hidden',
           }}
         >
-          {/* 19px, no ring (§S4.5). */}
+          {copy.sentence}
+        </div>
+      </div>
+
+      <div style={{ padding: '8px 10px 10px' }}>
+        {/* THE MEMBER ROW CARRIES THE SCORE (§S4.1): gross, to-par and this
+            round's index movement, all LITERAL — under par red, over par ink. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
           <SquircleAvatar
             src={row.profile_photo_url}
             userId={row.user_id}
@@ -655,11 +862,10 @@ function GolfThisWeekCard({
             size={19}
             hideRing
           />
-
           <span
             style={{
-              flex: 1,
               minWidth: 0,
+              flex: '0 1 auto',
               fontSize: 12,
               fontWeight: 600,
               color: row.is_self ? AMBER : INK,
@@ -671,13 +877,50 @@ function GolfThisWeekCard({
             {row.display_name}
           </span>
 
-          {legendary && (
-            <span style={{ ...LABEL, color: GOLD, flexShrink: 0 }}>
-              {(row.holes_in_one ?? 0) > 0
-                ? t('discover.golfThisWeek.ace', 'ACE')
-                : t('discover.golfThisWeek.albatross', 'ALBATROSS')}
+          <span
+            style={{
+              marginLeft: 'auto',
+              display: 'inline-flex',
+              alignItems: 'baseline',
+              gap: 5,
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ ...NUMF, fontSize: 14, lineHeight: 1, color: INK }}>
+              {row.gross ?? '\u2014'}
             </span>
-          )}
+            {toPar && (
+              <span
+                style={{
+                  ...NUMF,
+                  fontSize: 10.5,
+                  lineHeight: 1,
+                  color: toParUnder ? TOPAR_RED : MID,
+                }}
+              >
+                {toPar.text}
+              </span>
+            )}
+            {hasMovement && (
+              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
+                <IndexMovementTriangle
+                  direction={(delta as number) < 0 ? 'down' : 'up'}
+                  color={(delta as number) < 0 ? INDEX_FELL : INDEX_ROSE}
+                  size={7}
+                />
+                <span
+                  style={{
+                    ...NUMF,
+                    fontSize: 10.5,
+                    lineHeight: 1,
+                    color: (delta as number) < 0 ? INDEX_FELL : INDEX_ROSE,
+                  }}
+                >
+                  {Math.abs(delta as number).toFixed(1)}
+                </span>
+              </span>
+            )}
+          </span>
 
           {showFollow && (
             <FollowButton
@@ -689,90 +932,68 @@ function GolfThisWeekCard({
           )}
         </div>
 
-        {/* =====================================================================
-            ONE BLOCK, NO BORDER AND NO FILL. The trajectory and the scorecard
-            were two framed objects; they are now one tinted object, and that is
-            where most of the height comes back. The well bleeds to the card
-            edges so the scorecard gets its measured 244px inner width.
-
-            NO BORDER HERE, EVER. The tint carries the separation; an outline on
-            top of it is the fussiness this brief removes. */}
+        {/* ===================== THE WELL (§S2.2, §S4.4) =====================
+            ALL FOUR CHARTS RENDER IN THE SAME WELL AT THE SAME HEIGHT. A rail
+            where the frames differ reads as broken; a rail where the CONTENTS
+            differ reads as alive. */}
         <div
           style={{
             marginTop: 8,
             marginLeft: -10,
             marginRight: -10,
             borderRadius: WELL_RADIUS,
-            padding: `${WELL_PAD_TOP}px ${WELL_PAD_X}px ${WELL_PAD_BOTTOM}px`,
+            padding: `0 ${WELL_PAD_X}px`,
           }}
         >
-          {/* THE TRAJECTORY: unchanged curve — graded stroke, full opaque blend,
-              dashed level-par baseline, tangent-cubic smoothing, natural axis,
-              gold-only beads. showMeta FALSE keeps the B/P/B strip deleted. */}
-          <ShapeReveal>
-            <RoundShape
-              row={row}
-              shape={shape}
-              width={WELL_INNER}
-              height={SHAPE_H}
-              showMeta={false}
-              strokeWidth={1.6}
-            />
-          </ShapeReveal>
-
-          {/* THE ONE HAIRLINE INSIDE THE WELL (§S1.4), full-bleed to its edges.
-              It is the ONLY rule in here. */}
           <div
-            aria-hidden
             style={{
-              height: 1,
-              background: WELL_RULE,
-              marginLeft: -WELL_PAD_X,
-              marginRight: -WELL_PAD_X,
-              marginTop: 6,
-              marginBottom: 7,
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              gap: 6,
+              paddingBottom: 6,
+              borderBottom: `1px solid ${WELL_RULE}`,
             }}
-          />
-
-          {/* THE SCORECARD. A round with no hole data renders NOTHING here, not a
-              placeholder and not reserved height — the card's minHeight holds the
-              rail level instead. The outer rings trace against the card white. */}
-          <MiniScorecard shape={shape} well={WELL} />
-        </div>
-
-        {/* THE INSIGHT LINE sits BELOW the well (§S4.4), 10.5px in MID with its
-            glyph, on ONE line of reserved height so every tile's line lands at
-            the same place. */}
-        <div
-          style={{
-            minHeight: INSIGHT_LINE_RESERVE_SM,
-            marginTop: 8,
-            display: 'flex',
-            alignItems: 'flex-end',
-          }}
-        >
-          {insight && (
-            <div
+          >
+            <span style={{ ...LABEL, fontSize: 8, color: '#9AA5B1' }}>
+              {copy.chartLabel}
+            </span>
+            {/* THE TAP AFFORDANCE, ON EVERY TREATMENT (§S4.4). A hero card with
+                a hidden scorecard is a card nobody taps. */}
+            <span
               style={{
-                ...FIGS,
-                fontSize: INSIGHT_SM,
-                lineHeight: INSIGHT_LINE_HEIGHT,
-                fontWeight: 600,
+                ...LABEL,
+                fontSize: 8,
                 color: MID,
-                ...INSIGHT_CLAMP,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 2,
               }}
             >
-              <span style={{ display: 'inline' }}>
-                <InsightGlyph />
-                {insight}
-              </span>
-            </div>
-          )}
+              {t('discover.golfThisWeek.moment.fullScorecard', 'Full scorecard')}
+              <ChevronRight size={9} strokeWidth={3} />
+            </span>
+          </div>
+
+          <div
+            style={{
+              height: CHART_H,
+              marginTop: 7,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            {/* A ROUND WITH NO HOLE DATA RENDERS AN EMPTY WELL (§S1.5, F) — the
+                height is held so the rail stays level. */}
+            <ShapeReveal>{chart}</ShapeReveal>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
 
 interface Props {
   userId: string | undefined;
@@ -832,9 +1053,10 @@ export function GolfThisWeek({
   const scoreIds = useMemo(() => rows.map((r) => r.score_id), [rows]);
   const holeShapes = useRoundHoleShapes(scoreIds);
 
-  /* §4.2 — the insight map is resolved for the WHOLE rail so buildInsightMap's
-     repetition cap can see its neighbours. Never per card. */
-  const insights = useMemo(() => buildInsightMap(rows, t as never), [rows, t]);
+  /* NO INSIGHT MAP. The tile's prose is the MOMENT SENTENCE, generated from a
+     fixed template per kind inside the card (BRIEF_ROUND_TILE_THE_MOMENT §S4.3).
+     buildInsightMap survives for the see-all sheet, which still renders rows. */
+
 
   const pending = !!userId && (roundsQuery.isPending || !scopeCourses.ready);
   if (pending) return <GolfThisWeekShell />;
@@ -1157,10 +1379,8 @@ export function GolfThisWeek({
               key={r.round_id}
               row={r}
               shape={holeShapes?.get(r.score_id ?? '') ?? null}
-              insight={insights.get(r.round_id)?.text ?? referenceLine(r, t)}
               courseName={m?.name ?? r.course_name}
               region={m?.region ?? null}
-              imageUrl={m?.imageUrl ?? null}
               /* §2.2 — never on the member's own round, never on someone already
                  followed, and never before the follow set has resolved. */
               showFollow={!r.is_self && !!userId && !!following.data}
@@ -1170,6 +1390,7 @@ export function GolfThisWeek({
             />
           );
         })}
+
       </div>
 
       {counts.rounds > rows.length && (
