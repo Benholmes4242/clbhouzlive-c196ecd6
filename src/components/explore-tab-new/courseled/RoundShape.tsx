@@ -390,30 +390,82 @@ export function RoundShape({
             The curve simply ends, exactly as it does on the scorecard sheet.
             If hole 18 earned a bead, beadForScore already drew one above. */}
 
-      </svg>
-
-      {showMeta && holesPlayed != null && <ShapeMeta birdies={birdies} />}
-    </>
+      </svg>,
   );
 }
 
-/** Birdie count under the curve — now suppressed (WHO'S PLAYING no longer shows
- * the "X birdies" text). The structural div is retained so the row height and
- * padding stay unchanged for neighbouring tiles. */
-function ShapeMeta({ birdies }: { birdies: number }) {
+/** §4.2 THE DISTRIBUTION BAR. Sits directly under the band with a 7px gap,
+ *  5px tall, bucket order birdie+ / par / bogey / double+, widths proportional
+ *  to the counts, 1.5px gutters, and NO zero-width slivers. */
+function BucketBar({ buckets }: { buckets: Record<BucketKey, number> }) {
+  const live = BUCKET_ORDER.filter((k) => buckets[k] > 0);
+  const total = live.reduce((s, k) => s + buckets[k], 0);
+  if (total <= 0) return null;
+  return (
+    <div style={{ padding: '7px 11px 0' }}>
+      <div style={{ display: 'flex', gap: 1.5, height: 5 }}>
+        {live.map((k) => (
+          <div
+            key={k}
+            style={{
+              flexGrow: buckets[k],
+              flexBasis: 0,
+              background: RAMP_TOPAR[k],
+              borderRadius: 3,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * THE MET  A ROW carries the four-bucket count line (§4.3). It replaced the
+ * suppressed "X birdies" text, spending exactly the height that div was already
+ * holding open — which is why this addition costs the card almost nothing.
+ * A zero count takes A.DIM rather than its bucket colour: nothing happened.
+ */
+function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
   return (
     <div
       style={{
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'baseline',
         justifyContent: 'space-between',
         gap: 8,
-        padding: '0 11px',
+        padding: '4px 11px 0',
         fontSize: 10,
         fontWeight: 700,
         letterSpacing: '0.02em',
       }}
-    />
+    >
+      {buckets &&
+        BUCKET_ORDER.map((k) => (
+          <span key={k} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
+            <span
+              style={{
+                fontSize: 7.5,
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                color: A.DIM,
+              }}
+            >
+              {BUCKET_LABEL[k]}
+            </span>
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 700,
+                ...FIGS,
+                color: buckets[k] > 0 ? RAMP_TOPAR[k] : A.DIM,
+              }}
+            >
+              {buckets[k]}
+            </span>
+          </span>
+        ))}
+    </div>
   );
 }
 
