@@ -16,6 +16,10 @@ import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
+import {
+  HERO_TOP_SCRIM,
+  HERO_BOTTOM_SCRIM,
+} from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 import { relativeDay } from './discoverWhen';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
@@ -456,6 +460,28 @@ function heroBackground(kind: MomentKind, tone: string) {
   return `radial-gradient(118% 88% at 86% 4%, ${tone}${alpha} 0%, rgba(0,0,0,0) 64%), ${HERO_BASE}`;
 }
 
+/**
+ * BRIEF_ROUND_TILE_COURSE_PHOTO — the course thumbnail sits BEHIND the hero as
+ * atmosphere. The recipe is the shipped Tour Overview hero's
+ * (HERO_TOP_SCRIM / HERO_BOTTOM_SCRIM), but the GEOMETRY is scaled: those are
+ * tuned at 80px / 260px against a ~380px hero, and on a 156px tile a 260px
+ * bottom scrim would blacken the whole photograph.
+ *
+ * COURSE_SCRIMS' green radial at 30% 20% is DROPPED: two radials in a 156px box
+ * compete, and the moment glow — the thing that names the card — must win.
+ * A flat veil replaces its darkening half so a blown-out sky cannot reach the
+ * course name.
+ *
+ * LAYER ORDER MATCHES PhotoBand: base gradient, image, veil, bottom scrim,
+ * top scrim — then the moment glow above all of it.
+ */
+const PHOTO_TOP_SCRIM_H = 48;
+const PHOTO_BOTTOM_SCRIM_H = 124;
+const PHOTO_VEIL = 'rgba(10,14,10,0.26)';
+/** Photo only on the first N tiles: the rail renders every round (§4.2). */
+const PHOTO_TILE_LIMIT = 6;
+
+
 const fmtRel = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
 
 /**
@@ -619,6 +645,8 @@ interface CardProps {
   shape: HoleShape | null;
   courseName: string | null;
   region: string | null;
+  /** Course thumbnail, already fetched by useCourseCardMeta. May be null. */
+  imageUrl?: string | null;
   showFollow: boolean;
   /** §2.2 — read from the SAME cached following-id set that drives showFollow. */
   isFollowed: boolean;
@@ -644,6 +672,7 @@ function GolfThisWeekCard({
   shape,
   courseName,
   region,
+  imageUrl = null,
   showFollow,
   isFollowed,
   viewerUserId,
@@ -710,12 +739,83 @@ function GolfThisWeekCard({
           height: HERO_H,
           flexShrink: 0,
           position: 'relative',
-          background: heroBackground(moment.kind, moment.tone),
+          overflow: 'hidden',
+          /* THE LAYERS SIT AT zIndex -1, WHICH ONLY WORKS INSIDE A STACKING
+             CONTEXT. position:relative with z-index auto is NOT one, so the
+             photo painted BEHIND the element's own background and the tile
+             looked unchanged. `isolation: isolate` makes the hero a stacking
+             context; only applied when there IS an image so the no-image tile
+             is byte-identical. */
+          isolation: imageUrl ? 'isolate' : undefined,
+          /* NO IMAGE -> PIXEL-IDENTICAL TO BEFORE (§2.3): the same single
+             composed background, and not one extra layer. */
+          background: imageUrl ? HERO_BASE : heroBackground(moment.kind, moment.tone),
           padding: '11px 12px 11px',
           display: 'flex',
           flexDirection: 'column',
         }}
       >
+        {imageUrl && (
+          /* zIndex -1 keeps every layer ABOVE the element's own HERO_BASE
+             background and BELOW the in-flow content, so the content stack is
+             untouched. */
+          <>
+            <img
+              src={imageUrl}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: '50% 55%',
+                zIndex: -1,
+              }}
+            />
+            <div
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, background: PHOTO_VEIL, zIndex: -1 }}
+            />
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: PHOTO_BOTTOM_SCRIM_H,
+                background: HERO_BOTTOM_SCRIM,
+                zIndex: -1,
+              }}
+            />
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: 0,
+                height: PHOTO_TOP_SCRIM_H,
+                background: HERO_TOP_SCRIM,
+                zIndex: -1,
+              }}
+            />
+            {/* THE MOMENT GLOW STILL WINS (§2.2) — same position, radius, tone. */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: heroBackground(moment.kind, moment.tone).split(`, ${HERO_BASE}`)[0],
+                zIndex: -1,
+              }}
+            />
+          </>
+        )}
         {/* §S2.3 — course, region beneath, the day top-right. */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -1464,7 +1564,7 @@ export function GolfThisWeek({
         className="scrollbar-hide"
         style={{ display: 'flex', alignItems: 'stretch', gap: 10, overflowX: 'auto' }}
       >
-        {rows.map((r) => {
+        {rows.map((r, i) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
           return (
             <GolfThisWeekCard
@@ -1473,6 +1573,9 @@ export function GolfThisWeek({
               shape={holeShapes?.get(r.score_id ?? '') ?? null}
               courseName={m?.name ?? r.course_name}
               region={m?.region ?? null}
+              /* §4.2 — the photo is limited to the leading tiles so the rail
+                 does not fire one image request per round on cold load. */
+              imageUrl={i < PHOTO_TILE_LIMIT ? m?.imageUrl ?? null : null}
               /* §2.2 — never on the member's own round, never on someone already
                  followed, and never before the follow set has resolved. */
               showFollow={!r.is_self && !!userId && !!following.data}
