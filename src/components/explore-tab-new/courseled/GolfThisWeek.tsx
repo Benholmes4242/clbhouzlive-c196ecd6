@@ -856,19 +856,24 @@ function GolfThisWeekCard({
         </div>
 
         {/* ===================== THE SCORECARD WELL (§S4) =====================
-            A TINTED WELL, #F2F5F8, radius 12, NO BORDER (§S4.1) — the tone
-            separates it from the card and an outline would be a second signal
-            for one edge. ITS HEIGHT IS FIXED whatever it holds, so an empty well
-            keeps the rail level (ACCEPTANCE K, Q). */}
+            A TINTED WELL, #F2F5F8, NO BORDER (§S4.1) — the tone separates it
+            from the card and an outline would be a second signal for one edge.
+            IT RUNS TO THE CARD'S BOTTOM EDGE: the tint finishing 10px short of
+            the tile read as an unfinished panel, so the bottom corners take the
+            CARD's radius and the card has no padding beneath it. Its height is
+            fixed whatever it holds, so an empty well keeps the rail level
+            (ACCEPTANCE K, Q). */}
         <div
           style={{
             marginTop: 8,
             marginLeft: -10,
             marginRight: -10,
-            height: WELL_H,
+            marginBottom: 0,
+            minHeight: WELL_H,
+            flex: 1,
             background: WELL,
-            borderRadius: WELL_RADIUS,
-            padding: `6px ${WELL_PAD_X}px 8px`,
+            borderRadius: `${WELL_RADIUS}px ${WELL_RADIUS}px 16px 16px`,
+            padding: `6px ${WELL_PAD_X}px 9px`,
             boxSizing: 'border-box',
           }}
         >
