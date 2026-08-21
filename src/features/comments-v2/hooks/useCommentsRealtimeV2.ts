@@ -18,6 +18,25 @@ export function useCommentsRealtimeV2(
 
   useEffect(() => {
     if (!enabled || !targetId) return;
+
+    /**
+     * KEY DRIFT, FIXED (BRIEF_REALTIME_COUNTS_AND_MENTION_TAP, report item 7).
+     * This hook invalidated `['comments-v2', targetType, targetId]`, but every
+     * READ in useCommentsV2 is keyed through `commentsKeys`, whose second
+     * segment is the SCOPE STRING `"<targetType>:<targetId>:<secondary>"`. The
+     * two never prefix-matched, so the sheet's realtime path has been
+     * invalidating nothing at all. The scope, the filters and the `isOpen` gate
+     * are untouched — only the key is corrected, through the factory.
+     */
+    const scopePrefix = `${targetType}:${targetId}:`;
+    const invalidateThread = () =>
+      qc.invalidateQueries({
+        predicate: (q) =>
+          q.queryKey[0] === 'comments-v2' &&
+          typeof q.queryKey[1] === 'string' &&
+          (q.queryKey[1] as string).startsWith(scopePrefix),
+      });
+
     const channelName = `comments-v2:${targetType}:${targetId}`;
     const channel = supabase
       .channel(channelName)
@@ -32,7 +51,7 @@ export function useCommentsRealtimeV2(
         (payload) => {
           const row = (payload.new ?? {}) as { target_type?: string };
           if (row.target_type !== targetType) return;
-          qc.invalidateQueries({ queryKey: ['comments-v2', targetType, targetId] });
+          invalidateThread();
         }
       )
       .on(
@@ -44,10 +63,11 @@ export function useCommentsRealtimeV2(
           filter: `target_id=eq.${targetId}`,
         },
         () => {
-          qc.invalidateQueries({ queryKey: ['comments-v2', targetType, targetId] });
+          invalidateThread();
         }
       )
       .subscribe();
+
 
     return () => {
       supabase.removeChannel(channel);
