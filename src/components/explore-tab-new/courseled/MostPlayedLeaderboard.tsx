@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowDown, ArrowUp, Trophy } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowDown, ArrowUp, ChevronDown, Trophy } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
-import type { MostPlayedRow } from './hooks/useMostPlayedThisWeek';
+import type { MostPlayedPlayer, MostPlayedRow } from './hooks/useMostPlayedThisWeek';
 import { A, CARD_SHELL, Eyebrow, InkAction, LABEL, NUMF, SANS } from './tokens';
 import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+
 
 /**
  * Section 5 — MOST PLAYED THIS WEEK (BRIEF, section 5).
