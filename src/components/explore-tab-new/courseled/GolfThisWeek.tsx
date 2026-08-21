@@ -72,30 +72,65 @@ import { A, CARD_SHELL, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } from './tok
  */
 
 
-/* Condensed tile geometry — ~12% shorter than the first pass, with the insight
-   line still at one consistent height across the rail. */
-/* CARD_W 256 (was 236) — BRIEF_SCORECARD_WIDTH_AND_VIEWER_RING §S1.4. Dropping
-   the OUT / IN gutter bought 21px and it was still not enough: a double box
-   paints its outer ring 3px OUTSIDE its cell, so two doubles side by side need
-   ~10px between cell edges before a gap is visible. 256 is the narrowest width
-   that clears it; the markers were NOT shrunk. */
+/* =============================================================================
+   THE TILE'S GEOMETRY AND ITS INK (BRIEF_ROUND_TILE_LIGHT_REFINEMENT).
+
+   WHY THE OLD TILE LOOKED FUSSY, AND IT WAS NOT THE CONTENT: it carried FOUR
+   outline systems — card border, chart panel border, marker borders, row
+   hairlines — and the chart panel was #F7F9FA on #FFFFFF, a two percent tone
+   difference propped up by a 1px border because the tone could not carry the
+   separation alone. On dark, separation is free. On light it has to come from
+   TONE, and reaching for borders instead is also why the tile was TALL: much of
+   the height was padding compensating for weak separation.
+
+   SO: ONE tinted well holds the trajectory AND the scorecard, with no border and
+   exactly one hairline inside it; the card drops its border for a shadow. */
+
 const CARD_W = 256;
-const PHOTO_H = 92;
-/* SHAPE_H 60 — the shared renderer's own documented default
-   (BRIEF_FRIENDS_TILE_SHAPE_AND_BUCKETS §1). At 48/52 a plus-eight round and a
-   level round drew nearly the same flat line: 60 is the smallest height where a
-   two-shot swing is legible. Do NOT reduce it again. */
-/* SHAPE_H 40 — the trajectory is the SUMMARY now (BRIEF_ROUND_TILE_MINI_SCORECARD
+
+/* 92 -> 76 (§S4.1). It is a tile whose content is data; 76 is still a
+   photograph. */
+const PHOTO_H = 76;
+
+/* SHAPE_H 40 — the trajectory is the SUMMARY (BRIEF_ROUND_TILE_MINI_SCORECARD
    §S2.2); the hole grid beneath it carries the detail 60px used to have to. */
 const SHAPE_H = 40;
 
+/* THE WELL (§S1). Tint far enough from the #FFFFFF card that the tone separates
+   it and an outline is REDUNDANT — the border is DELETED, not softened. */
+const WELL = '#EEF2F5';
+const WELL_RADIUS = 12;
+const WELL_PAD_TOP = 8;
+/* 6, not the reference's 10 — see WELL_INNER. */
+const WELL_PAD_X = 6;
+const WELL_PAD_BOTTOM = 10;
+/* THE ONE RULE INSIDE THE WELL, full-bleed to its edges by negative margin. */
+const WELL_RULE = 'rgba(11,15,20,0.07)';
+
+/* THE WELL BLEEDS TO THE CARD EDGES, so its inner width is 244px — the width the
+   marker/gap measurement table in RoundShape is measured at. That table is the
+   binding constraint on the scorecard, so the x padding is 6 rather than the
+   reference's 10: at 10 the inner width falls to 236 and a leading double box
+   sits 2.7px from the well edge, which is precisely the clipping fault §S3
+   exists to fix. Everything else in §S1.3 is as written. */
+const WELL_INNER = CARD_W - WELL_PAD_X * 2;
+
+/* THE INK DOES THE HIERARCHY (§S2). One genuinely dark ink and three greys that
+   are clearly different from each other, replacing four middling greys. A
+   DARKER INK ON FEWER ELEMENTS reads sharper than four greys everywhere. */
+const INK = '#0B0F14';   // scores, totals, the insight line's figures
+const MID = '#5A6673';   // secondary text
+const FAINT = '#9AA5B1'; // eyebrows, labels
+const GHOST = '#C8D0D8'; // hole numbers, the level-par grade
+
+/* The card sits on the page rather than being drawn onto it (§S1.5). */
+const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
+
 /**
- * TILE HEIGHT FLOOR. Measured on a tile with the full grid: photograph 92,
- * member row, 40px trajectory, two nines of 17px cells with their hole numbers
- * AND their own header line (label + nine total), insight line, 9px padding.
- * Holds the rail level when a round has no hole data and therefore prints no
- * grid at all. 292 = the 264 state + ~14px per nine for the header line and the
- * 15→17px cell (BRIEF_MINI_SCORECARD_NINE_HEADER §S2.1).
+ * TILE HEIGHT FLOOR. Measured in the browser on a tile with the full grid:
+ * photograph 76, member row, the well (40px trajectory + hairline + two nines of
+ * 17px markers with their headers), insight line, padding. Holds the rail level
+ * when a round has no hole data and therefore prints no grid at all.
  */
 const CARD_MIN_H = 292;
 
