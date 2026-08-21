@@ -211,7 +211,9 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
         label={label}
         total={showTotals ? total : null}
         toPar={showTotals ? total - par : null}
+        note={any && hasGap ? 'No total \u00B7 picked up' : null}
       />
+
       <div style={{ display: 'flex', gap: 3 }}>
         {holes.map((h) => (
           <div
