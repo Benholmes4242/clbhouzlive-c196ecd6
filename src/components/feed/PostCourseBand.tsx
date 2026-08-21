@@ -51,7 +51,7 @@ const TONES: Record<CourseBandTone, ToneMap> = {
     hairline: 'rgba(255,255,255,0.10)',
     over: '#EF4444',
     under: '#5EE9A6',
-    bestFigure: '#F7931E',
+    bestFigure: '#F8FAFC',
   },
   light: {
     ink: '#0E1216',
