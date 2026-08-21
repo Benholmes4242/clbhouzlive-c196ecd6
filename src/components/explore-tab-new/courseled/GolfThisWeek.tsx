@@ -410,6 +410,12 @@ function GolfThisWeekCard({
         ...CARD_SHELL,
         border: `1px solid ${A.BORDER}`,
         width: CARD_W,
+        /* §S4.5 / ACCEPTANCE K vs G — the brief asks BOTH for no reserved height
+           when there is no hole data AND for a uniform rail. Those cannot both
+           hold per element, so the reserve lives on the CARD: a no-grid tile
+           renders no grid and no gap, and the card's minHeight keeps the rail
+           level. CARD_MIN_H is the measured height of a tile WITH the grid. */
+        minHeight: CARD_MIN_H,
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
@@ -418,6 +424,7 @@ function GolfThisWeekCard({
         fontFamily: SANS,
         cursor: 'pointer',
       }}
+
     >
       <CourseImageFallback
         courseId={row.course_id}
