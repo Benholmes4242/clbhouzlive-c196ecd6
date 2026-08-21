@@ -528,17 +528,25 @@ export function MostPlayedLeaderboard({
                   </span>
                   {/* §S1.4 / CORRECTION §S2 — THE META LINE IS THREE THINGS,
                       NOT ONE STRING: region caption, a dot, the round count,
-                      then the movement marker.
+                      then the movement marker. That still holds.
 
-                      RECORDED (§S2.2): "The round count is A.MID and the region
-                      is A.FAINT on the same line, on purpose. One is a fact and
-                      one is a caption." Rendering both in the same dim grey is
-                      why the count sat weakly under the course name. */}
+                      SUPERSEDED (BRIEF_MOST_PLAYED_META_LINE): §S2.2 recorded
+                      "the round count is A.MID and the region is A.FAINT on the
+                      same line, on purpose. One is a fact and one is a caption."
+                      That reasoning was sound — it fixed a line where BOTH were
+                      dim grey and the count vanished — but it is out of date.
+                      The same problem is now solved the other way: the WHOLE
+                      line sits in A.INK at ONE size (11 / 700), matching the
+                      treatment the leader chips on this same page took in
+                      BRIEF_BAND_TILE_TYPE_SCALE. Two sections on one page
+                      agreeing beats each solving one problem differently.
+                      Region casing comes from the data (verified sentence case
+                      at source), so there is no textTransform here. */}
                   <span
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      marginTop: 4,
+                      marginTop: 2,
                       minWidth: 0,
                       fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
@@ -548,10 +556,10 @@ export function MostPlayedLeaderboard({
                         <span
                           style={{
                             ...LABEL,
-                            fontSize: 9.5,
-                            letterSpacing: '0.13em',
-                            textTransform: 'uppercase',
-                            color: FAINT,
+                            fontSize: 11,
+                            fontWeight: 700,
+                            letterSpacing: 0,
+                            color: A.INK,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
@@ -580,10 +588,10 @@ export function MostPlayedLeaderboard({
                       style={{
                         ...NUMF,
                         flex: 'none',
-                        fontSize: 10.5,
+                        fontSize: 11,
                         fontWeight: 700,
                         lineHeight: 1,
-                        color: MID,
+                        color: A.INK,
                         marginRight: 7,
                       }}
                     >
@@ -591,6 +599,7 @@ export function MostPlayedLeaderboard({
                         count: r.count,
                       })}
                     </span>
+
                     {/* §S1.6 / §S2.3 — THE MOVEMENT MARKER KEEPS ITS EXISTING
                         TONES: green on a rise, amber on NEW, ghost on LEVEL. */}
                     <MoveMark row={r} t={t} />
