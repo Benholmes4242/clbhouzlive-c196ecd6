@@ -759,20 +759,49 @@ function NineRow({
 
       {/* FIXED CELLS, FIXED GAPS, CENTRED ROW (§S3.2). NOT space-between: the
           edge margin must be the remainder, not the leftovers of a division. */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: GAP }}>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        {/* THE STRIP IS ITS OWN POSITIONING CONTEXT so the bands can be measured
+            in cells and gaps rather than guessed from the well's width. */}
+        <div style={{ position: 'relative', display: 'flex', gap: GAP }}>
+        {/* THE BANDS, BEHIND EVERYTHING (§3.3). One per consecutive run within
+            this nine; a single-hole run is one cell wide, which is intended. */}
+        {bandTone
+          ? bandRuns(marked, from, to).map(({ start, len }) => (
+              <span
+                key={`band-${start}`}
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  left: start * (CELL + GAP),
+                  width: (len - 1) * (CELL + GAP) + CELL,
+                  top: NUM_BLOCK - BAND_ABOVE,
+                  height: CELL + BAND_ABOVE + BAND_BELOW,
+                  borderRadius: BAND_RADIUS,
+                  background: bandTone,
+                  opacity: BAND_ALPHA,
+                  zIndex: 0,
+                }}
+              />
+            ))
+          : null}
         {Array.from({ length: to - from + 1 }, (_, i) => {
           const holeNo = from + i;
           const h = byHole.get(holeNo);
           const m = markerFor(h?.strokes ?? null, h?.par ?? null);
           const isMarked = !!marked?.has(holeNo);
-          /* A STRETCH THAT CROSSES THE OUT / IN BOUNDARY cannot be joined: hole
-             9 and hole 10 are on different rows, so each row's rule simply ends
-             at its own edge. `holeNo < to` guarantees that. */
-          const joinsNext = isMarked && holeNo < to && !!marked?.has(holeNo + 1);
+          /* A CELL INSIDE A BAND IS HANDED THE BLENDED WELL (§3.4) so an inset
+             ring's 1px spacer matches the tint behind it instead of haloing. */
+          const cellWell = isMarked && bandWell ? bandWell : well;
           return (
             <div
               key={holeNo}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                position: 'relative',
+                zIndex: 1,
+              }}
             >
               {/* HOLE NUMBERS STAY, at 7px in GHOST (§S3.5). Findable, not read —
                   a grid that cannot be indexed by hole is a texture. */}
@@ -788,31 +817,7 @@ function NineRow({
               >
                 {holeNo}
               </span>
-              <span style={{ ...markerStyle(m, well), position: 'relative' }}>
-                {/* THE MOMENT'S MARK (§4): a 2px CONTINUOUS RULE beneath the
-                    marked cells, spanning the cells AND the gaps between
-                    consecutive ones, ~2px below the cell. Not a ring, not a
-                    tint, and never a change to the digit's ink — the digit is
-                    red when and only when the hole was under par.
-                    It is drawn per cell and extended by one GAP when the NEXT
-                    hole is also marked, so a run of adjacent holes renders as
-                    ONE unbroken rule and a scattered haul renders as one rule
-                    per run of adjacent holes. It is absolutely positioned, so it
-                    never moves a cell. */}
-                {isMarked && markTone && (
-                  <span
-                    aria-hidden
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: CELL + RULE_GAP,
-                      width: joinsNext ? CELL + GAP : CELL,
-                      height: RULE_H,
-                      borderRadius: 1,
-                      background: markTone,
-                    }}
-                  />
-                )}
+              <span style={{ ...markerStyle(m, cellWell), position: 'relative' }}>
                 {/* AN UNPLAYED HOLE IS EMPTY, never a zero: a zero would read as
                     an extraordinary score. */}
                 <span
@@ -844,6 +849,7 @@ function NineRow({
             </div>
           );
         })}
+        </div>
       </div>
     </div>
   );
