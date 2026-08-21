@@ -86,11 +86,11 @@ const CARD_W = 256;
 /** §S2.1 — the gradient hero. */
 const HERO_H = 156;
 
-/* THE GRID REGION. 88px is what two nines need at the settled 17px cell / 9px
-   gap geometry (two nine-headers, two hole-number rows, two marker rows and the
-   4px gap between the nines). IT IS FIXED, so every well is the same height even
+/* THE GRID REGION. 96px, not 88: at 88 the two marker rows and their outer
+   rings did not fit the region and the bottom row's circles and boxes were
+   clipped by the card. IT IS FIXED, so every well is the same height even
    when a round has no hole data and the well is empty (§S1.7, ACCEPTANCE K). */
-const GRID_H = 88;
+const GRID_H = 96;
 
 /* §S4.1 — A TINTED WELL, NO BORDER. The tone separates it from the card and an
    outline would be a second signal for one edge. The marker outer rings trace
@@ -131,12 +131,13 @@ const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 
 /**
  * TILE HEIGHT. hero 156 + 8 pad + 20 member row + 8 + well (6 header + 6 +
- * 1 rule + 7 + 88 grid + 8 pad = 116) + 10 pad = 318. EVERY KIND LANDS ON IT
- * because the grid region is fixed, INCLUDING a round with NO HOLE DATA, whose
- * well is simply empty (§S1.7, ACCEPTANCE Q).
+ * 1 rule + 7 + 96 grid + 9 pad = 135) = 327. THE WELL RUNS TO THE CARD'S
+ * BOTTOM EDGE — there is no card padding beneath it, so the tint finishes the
+ * tile instead of stopping 10px short. EVERY KIND LANDS ON IT because the grid
+ * region is fixed, INCLUDING a round with NO HOLE DATA (§S1.7, ACCEPTANCE Q).
  */
-const WELL_H = 116;
-const CARD_MIN_H = 318;
+const WELL_H = 135;
+const CARD_MIN_H = 327;
 
 /** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
@@ -773,7 +774,7 @@ function GolfThisWeekCard({
       </div>
 
 
-      <div style={{ padding: '8px 10px 10px' }}>
+      <div style={{ padding: '8px 10px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* THE MEMBER ROW CARRIES THE SCORE (§S4.1): gross, to-par and this
             round's index movement, all LITERAL — under par red, over par ink. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
@@ -855,19 +856,24 @@ function GolfThisWeekCard({
         </div>
 
         {/* ===================== THE SCORECARD WELL (§S4) =====================
-            A TINTED WELL, #F2F5F8, radius 12, NO BORDER (§S4.1) — the tone
-            separates it from the card and an outline would be a second signal
-            for one edge. ITS HEIGHT IS FIXED whatever it holds, so an empty well
-            keeps the rail level (ACCEPTANCE K, Q). */}
+            A TINTED WELL, #F2F5F8, NO BORDER (§S4.1) — the tone separates it
+            from the card and an outline would be a second signal for one edge.
+            IT RUNS TO THE CARD'S BOTTOM EDGE: the tint finishing 10px short of
+            the tile read as an unfinished panel, so the bottom corners take the
+            CARD's radius and the card has no padding beneath it. Its height is
+            fixed whatever it holds, so an empty well keeps the rail level
+            (ACCEPTANCE K, Q). */}
         <div
           style={{
             marginTop: 8,
             marginLeft: -10,
             marginRight: -10,
-            height: WELL_H,
+            marginBottom: 0,
+            minHeight: WELL_H,
+            flex: 1,
             background: WELL,
-            borderRadius: WELL_RADIUS,
-            padding: `6px ${WELL_PAD_X}px 8px`,
+            borderRadius: `${WELL_RADIUS}px ${WELL_RADIUS}px 16px 16px`,
+            padding: `6px ${WELL_PAD_X}px 9px`,
             boxSizing: 'border-box',
           }}
         >
