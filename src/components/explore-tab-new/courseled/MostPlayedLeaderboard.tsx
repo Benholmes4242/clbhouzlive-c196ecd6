@@ -541,7 +541,9 @@ export function MostPlayedLeaderboard({
                       BRIEF_BAND_TILE_TYPE_SCALE. Two sections on one page
                       agreeing beats each solving one problem differently.
                       Region casing comes from the data (verified sentence case
-                      at source), so there is no textTransform here. */}
+                       at source), so there is no textTransform here. The
+                       casing is natural sentence/title case — "North
+                       Rhine-Westphalia", not "north rhine-westphalia". */}
                   <span
                     style={{
                       display: 'flex',
