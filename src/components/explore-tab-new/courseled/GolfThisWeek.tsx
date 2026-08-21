@@ -203,7 +203,12 @@ function ShapeReveal({ children }: { children: React.ReactNode }) {
     <div ref={ref}>
       <div
         style={{
-          clipPath: complete ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
+          /* THE CLIP IS RELEASED WHEN THE DRAW ENDS. inset(0 0 0 0) still clips
+             at the border box, and the mini-grid's markers paint their outer
+             RING 3px OUTSIDE their own box — so a settled card was shaving the
+             bottom of the bottom row's circles and boxes. A wipe needs no clip
+             once it has finished, so there is none. */
+          clipPath: complete ? undefined : 'inset(0 100% 0 0)',
           transition: reduced ? undefined : `clip-path ${DRAW_MS}ms ${DRAW_EASE}`,
         }}
       >
