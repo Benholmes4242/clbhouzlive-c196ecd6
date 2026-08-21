@@ -37,12 +37,11 @@ import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegion
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
 import { MiniScorecard } from './RoundShape';
 import {
-  grindSentenceKey,
   selectMoment,
   type Moment,
-  type MomentHole,
   type MomentKind,
 } from './roundMoment';
+
 import { GolfThisWeekRail as GolfThisWeekShell } from './DiscoverCourseLedSkeleton';
 import { A, CARD_SHELL, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
 
