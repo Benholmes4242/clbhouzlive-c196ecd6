@@ -1302,7 +1302,8 @@ export function GolfThisWeek({
           className="scrollbar-hide"
           style={{
             display: 'flex',
-            gap: 8,
+            alignItems: 'stretch',
+            gap: 9,
             overflowX: 'auto',
             marginBottom: 12,
           }}
@@ -1311,43 +1312,82 @@ export function GolfThisWeek({
             <div
               key={tile.key}
               style={{
-                ...CARD_SHELL,
+                /* §S4.3 — the card loses its border and takes a shadow. Same
+                   treatment as the round tiles: it sits on the page rather than
+                   being drawn onto it. */
+                background: A.PANEL,
+                border: 'none',
+                borderRadius: 14,
+                boxShadow: CARD_SHADOW,
+                overflow: 'hidden',
                 /* FOUR TILES DO NOT SHRINK (§3.1): the figure is the content, so
-                   the band scrolls at 320px instead. With one, two or three the
-                   basis grows and the row fills the width. */
-                flex: '1 0 148px',
-                minWidth: 148,
-                padding: '9px 10px 10px',
+                   the band scrolls at 320px instead. */
+                flex: '1 0 154px',
+                minWidth: 154,
+                padding: '11px 12px 12px',
                 fontFamily: SANS,
               }}
             >
               <div
                 style={{
-                  ...LABEL,
-                  color: A.MUTE,
+                  fontSize: 8,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: BAND_FAINT,
                   display: 'flex',
                   alignItems: 'baseline',
                   gap: 4,
                 }}
               >
-                <span style={{ lineHeight: 1 }}>{tile.emoji}</span>
+                {/* §S3.3 — 11px with lineHeight 1 keeps the emoji on the label's
+                    baseline across all four tiles. */}
+                <span style={{ fontSize: 11, lineHeight: 1 }}>{tile.emoji}</span>
                 {tile.label}
+              </div>
+
+              {/* §S1.2 — the qualifier is a PROPERTY OF THE FIGURE, so it shares
+                  the figure's baseline, 5px after it. */}
+              <div
+                style={{
+                  marginTop: 5,
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 5,
+                  minWidth: 0,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 30,
+                    fontWeight: 800,
+                    letterSpacing: '-0.05em',
+                    lineHeight: 1,
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                    color: tile.tone,
+                  }}
+                >
+                  {tile.figure}
+                </span>
+                {tile.qual ? (
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 800,
+                      lineHeight: 1,
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                      color: tile.qualTone ?? BAND_FAINT,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {tile.qual}
+                  </span>
+                ) : null}
               </div>
 
               <div
                 style={{
-                  ...NUMF,
-                  marginTop: 4,
-                  fontSize: 22,
-                  lineHeight: 1,
-                  color: tile.tone,
-                }}
-              >
-                {tile.figure}
-              </div>
-              <div
-                style={{
-                  marginTop: 8,
+                  marginTop: 9,
                   display: 'flex',
                   alignItems: 'center',
                   gap: 6,
@@ -1365,8 +1405,8 @@ export function GolfThisWeek({
                   style={{
                     minWidth: 0,
                     fontSize: 12,
-                    fontWeight: 600,
-                    color: A.BODY,
+                    fontWeight: 700,
+                    color: INK,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -1375,23 +1415,26 @@ export function GolfThisWeek({
                   {tile.row.display_name}
                 </span>
               </div>
+              {/* §S2 — the last line is the COURSE and nothing else, on every
+                  tile, one line, ellipsis, never wrapping. */}
               <div
                 style={{
                   marginTop: 5,
                   fontSize: 10.5,
                   fontWeight: 500,
-                  color: A.MUTE,
+                  color: BAND_MUTE,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                 }}
               >
-                {tile.sub}
+                {tile.course}
               </div>
             </div>
           ))}
         </div>
       )}
+
 
 
 
