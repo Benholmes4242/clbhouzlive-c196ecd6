@@ -690,18 +690,26 @@ function NineRow({
                     an extraordinary score. */}
                 <span
                   style={{
+                    /* ABSOLUTE CENTRING INSIDE THE SHAPE: the digit is its own
+                       flex-centred box filling the marker's inner area, so the
+                       circle or the box centres the figure — NOT a nudge. The
+                       0.5px translate is DELETED: that offset is what pushed
+                       every figure towards the bottom of its shape. The trailing
+                       letter-space is given back with textIndent so a two-digit
+                       figure stays centred rather than drifting left. */
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: '-0.04em',
-                    /* lineHeight 1 collapses the digit's line box to the glyph so
-                       the flex centring of the fixed marker lands; the 0.5px
-                       translate is the OPTICAL correction, since tabular lining
-                       numerals sit above the geometric centre of their box. */
+                    textIndent: '0.04em',
                     lineHeight: 1,
-                    transform: 'translateY(0.5px)',
-                    display: 'block',
                     ...FIGS,
                   }}
+
                 >
                   {h?.strokes ?? ''}
                 </span>
