@@ -79,11 +79,19 @@ interface Props {
 
 type Hole = NonNullable<PostRound['holeShape']>[number];
 
-const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | null }> = ({
-  label,
-  total,
-  toPar,
-}) => (
+const LabelRow: React.FC<{
+  label: string;
+  total: number | null;
+  toPar: number | null;
+  /**
+   * BRIEF_POST_TRAJECTORY_ENDPOINT_DISAGREES §2 — when the nine total is
+   * SUPPRESSED (a played hole with no score), the slot the figure would have
+   * taken carries the REASON instead. Never a number, never a dash, never the
+   * partial sum: the suppression rule (BRIEF_ROUND_STRIP_PARTIAL_HOLES §3.1)
+   * stands, it just stops being silent.
+   */
+  note?: string | null;
+}> = ({ label, total, toPar, note }) => (
   <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 4 }}>
     <span
       style={{
@@ -96,7 +104,22 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
     >
       {label}
     </span>
-    {total == null ? null : (
+    {total == null ? (
+      note ? (
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: DIM,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {note}
+        </span>
+      ) : null
+    ) : (
       <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
         <span style={{ ...NUM, fontSize: 12.5, fontWeight: 700, color: INK }}>{total}</span>
         <span style={{ ...NUM, fontSize: 12, fontWeight: 700, color: toParColor(toPar) }}>
@@ -106,6 +129,7 @@ const LabelRow: React.FC<{ label: string; total: number | null; toPar: number | 
     )}
   </div>
 );
+
 
 
 
@@ -187,7 +211,9 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
         label={label}
         total={showTotals ? total : null}
         toPar={showTotals ? total - par : null}
+        note={any && hasGap ? 'No total \u00B7 picked up' : null}
       />
+
       <div style={{ display: 'flex', gap: 3 }}>
         {holes.map((h) => (
           <div
@@ -233,20 +259,33 @@ const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, 
       strokes: h.lineGross,
       played: h.played,
     }));
-    // The final cumulative, computed from the same values the line draws. When a
-    // played hole has neither value the line genuinely breaks, and the endpoint
-    // is not the round's to-par — fall back to the score row's figure (§4.2).
+    // The final cumulative, computed from the same values the line draws — but
+    // the FIGURE may only claim a to-par the cells support
+    // (BRIEF_POST_TRAJECTORY_ENDPOINT_DISAGREES §1).
+    //
+    // Testing `lineGross == null` is INSUFFICIENT: §1.2 defines lineGross as
+    // `gross ?? adjusted_gross`, so it is essentially never null and the old
+    // guard was close to dead code. A picked-up hole has no gross but does have
+    // an adjusted_gross, so `cum` counted it at a value the header's submitted
+    // gross does not imply — two to-par figures for one round, 200px apart.
+    //
+    // So `broken` ALSO fires on the same test NineGrid uses for suppression,
+    // `h.played && h.gross == null`. The LINE is untouched and still draws
+    // through lineGross: drawing through an adjusted value is honest, PRINTING
+    // it as the round's to-par is not. When broken, the endpoint falls back to
+    // the score row's figure (§4.2), so panel and header always agree.
     let cum = 0;
     let broken = false;
     for (const h of holes) {
       if (h.played === false) continue;
-      if (h.lineGross == null || h.par == null) {
+      if (h.gross == null || h.lineGross == null || h.par == null) {
         broken = true;
         continue;
       }
       cum += h.lineGross - h.par;
     }
     return { series: s, endpoint: broken ? toPar : cum };
+
   }, [holes, toPar]);
 
   const scored = series.filter((h) => h.played !== false && h.strokes != null && h.par != null);
