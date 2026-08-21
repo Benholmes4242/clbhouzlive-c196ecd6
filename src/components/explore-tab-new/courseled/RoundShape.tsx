@@ -110,11 +110,8 @@ export function RoundShape({
      data (the three-point fallback) gets NEITHER the bar NOR the count line —
      there is nothing to count — so its meta row stays exactly as today. */
   const buckets = shape ? bucketsFor(shape.series) : null;
-  const figure = toParFor(row);
-  /* The figure's SIGN, from the same two fields toParFor reads, so the tone and
-     the text can never disagree. */
-  const figureDelta =
-    row.gross != null && row.course_par != null ? row.gross - row.course_par : 0;
+
+
 
   const withChrome = (plot: ReactNode) => (
     <>
