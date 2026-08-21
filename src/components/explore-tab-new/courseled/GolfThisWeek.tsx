@@ -131,12 +131,13 @@ const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 
 /**
  * TILE HEIGHT. hero 156 + 8 pad + 20 member row + 8 + well (6 header + 6 +
- * 1 rule + 7 + 88 grid + 8 pad = 116) + 10 pad = 318. EVERY KIND LANDS ON IT
- * because the grid region is fixed, INCLUDING a round with NO HOLE DATA, whose
- * well is simply empty (§S1.7, ACCEPTANCE Q).
+ * 1 rule + 7 + 96 grid + 9 pad = 135) = 327. THE WELL RUNS TO THE CARD'S
+ * BOTTOM EDGE — there is no card padding beneath it, so the tint finishes the
+ * tile instead of stopping 10px short. EVERY KIND LANDS ON IT because the grid
+ * region is fixed, INCLUDING a round with NO HOLE DATA (§S1.7, ACCEPTANCE Q).
  */
-const WELL_H = 116;
-const CARD_MIN_H = 318;
+const WELL_H = 135;
+const CARD_MIN_H = 327;
 
 /** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
