@@ -11,7 +11,6 @@ import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 
 /**
