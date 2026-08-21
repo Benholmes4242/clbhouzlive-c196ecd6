@@ -4,6 +4,7 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { SC_FILL_GOLD, SC_FILL_BIRDIE } from '@/features/courses/components/holes/_constants';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
 import { A } from './tokens';
@@ -492,7 +493,13 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
    room for a legend.
    =========================================================================== */
 
-const GOLD_ACE = '#D8A93C';
+/* THE MINI GRID TAKES THE SHEET'S COLOURS (MICRO_BRIEF_SCORECARD_COLOUR_AND_
+   ALIGNMENT §S1) — SC_FILL_BIRDIE (= TOPAR_UNDER_LIGHT #D2222D, the same red the
+   curve and the glass chip use) for under par, SC_FILL_GOLD (#FFD200) for an ace,
+   A.INK for over par and for a bare par. No new hex values: these are the exact
+   tokens ScoreMark paints the full scorecard with. */
+const ACE_GOLD = SC_FILL_GOLD;
+const UNDER_INK = SC_FILL_BIRDIE;
 
 /** §S1.3 — the Clubhouse card's own key, not a second vocabulary. */
 type Marker = 'ace' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double';
@@ -523,17 +530,17 @@ function markerStyle(m: Marker | null): CSSProperties {
   };
   switch (m) {
     case 'ace':
-      return { ...base, borderRadius: 999, border: `1px solid ${GOLD_ACE}`, color: GOLD_ACE, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${GOLD_ACE}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${ACE_GOLD}` };
     case 'eagle':
-      return { ...base, borderRadius: 999, border: `1px solid ${A.INK}`, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${A.INK}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${UNDER_INK}` };
     case 'birdie':
-      return { ...base, borderRadius: 999, border: `1px solid ${A.INK}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK };
     case 'bogey':
       return { ...base, borderRadius: 2, border: `1px solid ${A.INK}` };
     case 'double':
       return { ...base, borderRadius: 2, border: `1px solid ${A.INK}`, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${A.INK}` };
     default:
-      /* PAR IS BARE — no ring, no box. */
+      /* PAR IS BARE INK — no ring, no box, no tint (S1.3). The baseline recedes. */
       return base;
   }
 }
@@ -602,7 +609,15 @@ function NineRow({
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: '-0.04em',
+                    /* CENTRED, NOT NEARLY (§S2) — lineHeight 1 collapses the
+                       digit's line box to the glyph so the flex centring of the
+                       fixed 15x15 marker actually lands. The 0.5px translate is
+                       the OPTICAL correction: tabular lining numerals sit above
+                       the geometric centre of their box, so mathematical centre
+                       reads high. Deliberate, not a fudge. */
                     lineHeight: 1,
+                    transform: 'translateY(0.5px)',
+                    display: 'block',
                     ...FIGS,
                   }}
                 >
