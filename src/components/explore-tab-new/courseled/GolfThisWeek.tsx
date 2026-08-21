@@ -345,10 +345,16 @@ interface CardProps {
 }
 
 /**
- * THE CARD LEADS WITH THE COURSE (§2). Order is fixed: course image and name /
- * gross and to-par with the index movement right-aligned / player row / the
- * shape / the insight line.
+ * THE CARD LEADS WITH THE COURSE (§2).
+ *
+ * Order: course image with the score chip over it / player row / the shape /
+ * the strip / the insight line. The gross, to-par and index movement sit in a
+ * glass chip ON the photograph — they belong to the round, not to the block,
+ * and moving them freed the row beneath for the member. The to-par label that
+ * sat on the curve was the same figure twice and collided with an over-par
+ * curve's endpoint.
  */
+
 function GolfThisWeekCard({
   row,
   shape,
