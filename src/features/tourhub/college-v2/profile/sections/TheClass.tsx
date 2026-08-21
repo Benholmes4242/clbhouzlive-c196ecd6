@@ -145,7 +145,7 @@ export function TheClass({ slug, collegeName }: Props) {
         sorted.map((a, idx) => {
           const live = liveMap[a.id];
           const hasEarnings = (a.earnings ?? 0) > 0;
-          const flag = countryFlag(a.country) ?? (a.country ? countryFallback(a.country) : null);
+          
 
           const segments: string[] = [];
           if (a.worldRanking && a.worldRanking > 0) {
