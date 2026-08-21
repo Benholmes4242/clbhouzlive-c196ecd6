@@ -326,16 +326,13 @@ export default function ExploreTabContent({
 
       {/* The chrome island floats over the page, so the header clears the notch
           plus the island itself — Discover no longer sits under a hero.
-          SAFE-AREA PADDING, RE-HOMED (MICRO_BRIEF_REMOVE_ONE_THING_ROW S2.2):
-          the floating header sits at sat + 10 and is 44px tall, so sat + 70
-          gives 16px of clearance on notched AND non-notched devices. It lives on
-          whatever leads the page — now the merged rounds section.
+          The safe-area padding now lives inside GolfThisWeek's first row
+          (MICRO_BRIEF_ROUNDS_SECTION_CHROME S1.4).
           The rate prompt was removed from Discover deliberately. Nothing prompts
           a rating anywhere now - watch the review rate. */}
       <div
         style={{
           padding: '0 14px',
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
         }}
       >
         <GolfThisWeek

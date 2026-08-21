@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { CalendarDays } from 'lucide-react';
 
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -45,7 +44,7 @@ import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegion
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
 import { RoundShape } from './RoundShape';
 import { GolfThisWeekRail as GolfThisWeekShell } from './DiscoverCourseLedSkeleton';
-import { A, CARD_SHELL, Eyebrow, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
+import { A, CARD_SHELL, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
 
 /**
  * GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK). Replaces Around the world (standout
