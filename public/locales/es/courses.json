@@ -1143,25 +1143,28 @@
           "eagle": "EAGLE",
           "ace": "ACE",
           "albatross": "ALBATROSS",
-          "inRed": "BAJO PAR",
-          "finish": "EL FINAL",
           "run": "LA RACHA",
-          "grind": "EL OFICIO"
+          "grind": "EL OFICIO",
+          "finishedInRed": "TERMINÓ BAJO PAR",
+          "birdieHaul": "COSECHA DE BIRDIES",
+          "strongFinish": "GRAN FINAL"
         },
         "figure": {
           "hole": "HOYO {n}",
           "holes": "{n} HOYOS",
           "inThree": "{n} DE TRES",
-          "inARow": "{n} SEGUIDOS"
+          "inARow": "{n} SEGUIDOS",
+          "birdies": "{n} BIRDIES"
         },
         "sentence": {
           "eagle": "Un {{0}} en un par {{1}}.",
-          "inRed": "La vuelta estuvo bajo par y terminó en {{0}}.",
-          "finish": "Birdie o mejor en la vuelta a casa, para acabar en {{0}}.",
           "run": "Par o mejor del {{0}} al {{1}}.",
           "grind": "Nada peor que un bogey en toda la vuelta.",
           "plain": "{{0}} de {{1}} hoyos en par o mejor.",
-          "noHoles": "Una vuelta jugada. No se registró el detalle hoyo por hoyo."
+          "noHoles": "Una vuelta jugada. No se registró el detalle hoyo por hoyo.",
+          "finishedInRed": "Dieciocho hoyos terminados bajo par.",
+          "birdieHaul": "{{0}} birdies en {{1}} hoyos.",
+          "strongFinish": "Birdie o mejor en la vuelta a casa, para acabar en {{0}}."
         }
       }
     },
