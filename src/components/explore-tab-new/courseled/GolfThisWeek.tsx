@@ -661,7 +661,7 @@ function GolfThisWeekCard({
         cursor: 'pointer',
       }}
     >
-      {/* ===================== THE HERO (§S4.2) ===================== */}
+      {/* ===================== THE HERO (§S2) ===================== */}
       <div
         style={{
           height: HERO_H,
@@ -673,11 +673,12 @@ function GolfThisWeekCard({
           flexDirection: 'column',
         }}
       >
+        {/* §S2.3 — course, region beneath, the day top-right. */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
               style={{
-                fontSize: 11.5,
+                fontSize: 12.5,
                 fontWeight: 700,
                 lineHeight: 1.15,
                 letterSpacing: '-0.01em',
@@ -696,7 +697,7 @@ function GolfThisWeekCard({
                   fontSize: 9.5,
                   fontWeight: 600,
                   lineHeight: 1,
-                  color: 'rgba(255,255,255,0.56)',
+                  color: 'rgba(255,255,255,0.52)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -712,7 +713,7 @@ function GolfThisWeekCard({
               fontSize: 8.5,
               fontWeight: 700,
               lineHeight: 1,
-              letterSpacing: '0.06em',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: 'rgba(255,255,255,0.62)',
             }}
@@ -723,76 +724,55 @@ function GolfThisWeekCard({
 
         <div style={{ flex: 1 }} />
 
-        {/* THE FIGURE AT 56 — a hole number or a count, and the moment word in
-            its tone beside it. NOTHING UP HERE IS MEASURED (§S3.1). */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 9, minWidth: 0 }}>
-          <div style={{ flexShrink: 0 }}>
-            <div
-              style={{
-                ...LABEL,
-                fontSize: 8.5,
-                color: 'rgba(255,255,255,0.5)',
-                marginBottom: 2,
-              }}
-            >
-              {copy.meta}
-            </div>
-            <div
-              style={{
-                ...NUMF,
-                fontSize: 56,
-                lineHeight: 0.82,
-                letterSpacing: '-0.05em',
-                color: '#FFFFFF',
-              }}
-            >
-              {moment.facts.played === 0 ? '\u2014' : moment.figure}
-            </div>
+        {/* §S2.4 — THREE STACKED LINES, read top to bottom.
+            THE LABEL IS AN EYEBROW, NOT A CLAUSE (§S2.5). It previously sat
+            ALONGSIDE the sentence and the two read as one run-on — "THE RUN Par
+            or better". A label is a heading, so it sits on its own line above
+            the figure and the sentence sits below it.
+            THE PLAIN CARD HAS NO LABEL AT ALL (§S2.7). */}
+        {label && (
+          <div
+            style={{
+              fontSize: 9.5,
+              fontWeight: 800,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              lineHeight: 1,
+              marginBottom: 5,
+              color: moment.tone,
+            }}
+          >
+            {label}
           </div>
-          <div style={{ minWidth: 0, paddingBottom: 3 }}>
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.09em',
-                textTransform: 'uppercase',
-                lineHeight: 1.1,
-                color: moment.tone,
-              }}
-            >
-              {copy.word}
-            </div>
-            <div
-              style={{
-                marginTop: 3,
-                fontSize: 10,
-                fontWeight: 600,
-                lineHeight: 1.2,
-                color: 'rgba(255,255,255,0.58)',
-              }}
-            >
-              {copy.sub}
-            </div>
-          </div>
-        </div>
+        )}
 
-        {/* ONE SENTENCE, from a fixed template (§S4.3). */}
+        <FigureLine
+          moment={moment}
+          gross={row.gross ?? null}
+          toParText={toPar?.text ?? null}
+          t={t as TFn}
+        />
+
+        {/* THE SENTENCE, at the very bottom of the hero, from a fixed template.
+            IT NEVER REPEATS THE FIGURE (§S2.8): the figure states, the sentence
+            explains. */}
         <div
           style={{
-            marginTop: 9,
+            marginTop: 7,
             fontSize: 10.5,
             fontWeight: 500,
-            lineHeight: 1.32,
-            color: 'rgba(255,255,255,0.74)',
+            lineHeight: 1.3,
+            color: 'rgba(255,255,255,0.82)',
             display: '-webkit-box',
             WebkitBoxOrient: 'vertical',
             WebkitLineClamp: 2,
             overflow: 'hidden',
           }}
         >
-          {copy.sentence}
+          {sentence}
         </div>
       </div>
+
 
       <div style={{ padding: '8px 10px 10px' }}>
         {/* THE MEMBER ROW CARRIES THE SCORE (§S4.1): gross, to-par and this
