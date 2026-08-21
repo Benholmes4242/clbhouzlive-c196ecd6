@@ -817,7 +817,10 @@ export function GolfThisWeek({
         {/* Not a label - the filter's readout. It is the only thing on screen
             that responds when a pill or a region changes, so it must always
             describe what is CURRENTLY rendered. */}
-        <span style={{ ...KICKER, color: A.MUTE, flex: '0 0 auto' }}>
+        <span
+          className="tabular-nums"
+          style={{ ...KICKER, color: A.MUTE, flex: '0 0 auto' }}
+        >
           {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
             rounds: counts.rounds,
             courses: counts.courses,
