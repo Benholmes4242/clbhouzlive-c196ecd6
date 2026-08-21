@@ -26,8 +26,10 @@ export const countryToFlagCode: Record<string, string> = {
   'WALES': 'GB-WLS',
   'Wales': 'GB-WLS',
   
-  'NORTHERN IRELAND': 'GB-NIR',
-  'Northern Ireland': 'GB-NIR',
+  // Editorial decision (BRIEF_TOUR_FLAGS_ONE_SYSTEM §3): Northern Ireland is
+  // marked with the Irish tricolour, not the Ulster Banner or the Union Flag.
+  'NORTHERN IRELAND': 'IE',
+  'Northern Ireland': 'IE',
   
   'IRELAND': 'IE',
   'Ireland': 'IE',
