@@ -397,226 +397,179 @@ function FollowButton({
 
 
 /* =============================================================================
-   COLOUR — THE RULE THAT KEEPS IT HONEST (BRIEF_ROUND_TILE_THE_MOMENT §S3.4).
+   COLOUR — THE RULE THAT KEEPS IT HONEST (BRIEF_ROUND_TILE_THE_MOMENT v2 §S5).
    READ THIS BEFORE CHANGING ANY COLOUR ON THIS CARD.
 
-   §S3.1  THE HERO IS EXPRESSIVE. The moment's tone (#FFC93C eagle, #22D07A run,
-          #FF5A4E collapse, #3B9DFF finish, #F7931E grind) is a CELEBRATION
-          ACCENT and NOTHING UP THERE IS MEASURED.
+   §S5.1  THE HERO IS EXPRESSIVE. The moment's tone (#FFC93C eagle, #C8102E in
+          red, #3B9DFF the finish, #22D07A the run, #F7931E the grind, #FFFFFF
+          plain) is a CELEBRATION ACCENT and NOTHING UP THERE IS MEASURED.
 
-   §S3.2  THE DATA REGION IS LITERAL. RED IS UNDER PAR, INK IS OVER, ALWAYS.
+   §S5.2  THE SCORECARD IS LITERAL. RED IS UNDER PAR, INK IS OVER, ALWAYS.
 
-   §S3.3  THE ONLY EXCEPTION is the moment's OWN holes, which take the hero tone
+   §S5.3  THE ONLY EXCEPTION is the moment's OWN holes, which take the hero tone
           so the two halves of the card point at each other.
 
-   WITHOUT THIS RULE the moment palette leaks into the charts within a month and
+   WITHOUT THIS RULE the moment palette leaks into the grid within a month and
    red stops meaning under par — which every other scoring surface in the app
-   depends on. Do not tint a bar, a marker or a curve with a moment tone unless
-   that hole is in `moment.holes`.
+   depends on. Do not tint a marker with a moment tone unless that hole is in
+   `moment.markedHoles`.
    ========================================================================== */
 
-/** THE HERO'S GRADIENTS. The collapse takes the COOLER one (§S3.6): its word is
- *  neutral and the figure does the talking — never a joke at a member's
- *  expense, and never a red wash over somebody's bad hole. */
-const HERO_BASE = 'linear-gradient(158deg, #141A21 0%, #0B0F14 74%)';
-const HERO_COOL = 'linear-gradient(150deg, #1C2531 0%, #0C1116 72%)';
+/**
+ * A LABEL ABOVE A FIGURE IS READ AS NAMING THAT FIGURE (§S2.6).
+ * If the figure is an IDENTITY the prefix is the noun (HOLE 13); if it is a
+ * QUANTITY the noun follows it (14 HOLES). NEVER ABOVE.
+ *
+ * This was a real defect found on device: "HOLES" set over "14" read as
+ * "hole 14". The figure phrase is therefore ONE translatable template with a
+ * {{n}} placeholder, split at render time so the number takes 46px and the words
+ * around it take 13px ON THE SAME LINE.
+ */
+const FIGURE_PLACEHOLDER = '{{n}}';
 
+/** §S2.1 — the hero gradient, no photograph. */
+const HERO_BASE = 'linear-gradient(170deg, #2E3A32 0%, #181F1B 60%, #0D110E 100%)';
+
+/**
+ * §S2.2 — THE GLOW is a radial wash of the moment's tone at 15%, top right.
+ * A PLAIN ROUND'S GLOW IS WHITE AT 13%. THAT IS THE WHOLE HIERARCHY: colour
+ * means something happened, white means a round was played. Same shape, same
+ * weight, different temperature — so a plain round still holds its own in the
+ * rail without claiming to be a story.
+ */
 function heroBackground(kind: MomentKind, tone: string) {
-  if (kind === 'collapse') return HERO_COOL;
-  return `radial-gradient(122% 92% at 86% 4%, ${tone}3D 0%, rgba(0,0,0,0) 62%), ${HERO_BASE}`;
+  const alpha = kind === 'plain' ? '21' /* 13% */ : '26' /* 15% */;
+  return `radial-gradient(118% 88% at 86% 4%, ${tone}${alpha} 0%, rgba(0,0,0,0) 64%), ${HERO_BASE}`;
 }
 
 const fmtRel = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
 
 /**
- * THE SENTENCE (§S4.3) — THE HIGHEST-RISK ELEMENT ON THE CARD. It is built from
- * a FIXED TEMPLATE PER KIND with figures interpolated into NUMBERED
- * placeholders, so a translator can reorder them (§S5.2). NEVER free text, and
- * nothing here can read as sarcasm on a bad round.
+ * THE COPY (§S6) — THE SENTENCE IS THE HIGHEST-RISK ELEMENT ON THE CARD. Every
+ * label, figure phrase and sentence is a FIXED TEMPLATE PER KIND with figures
+ * interpolated into NUMBERED placeholders so a translator can reorder them
+ * (§S6.3). NEVER free text, never anything that could read as sarcastic, and
+ * THE SENTENCE NEVER REPEATS THE FIGURE (§S2.8) — the figure states, the
+ * sentence explains.
+ *
+ * EAGLE / ACE / ALBATROSS stay untranslated in English (§S6.4).
  */
-function momentCopy(m: Moment, t: (k: string, d?: string, o?: object) => string) {
+const MK = 'discover.golfThisWeek.moment';
+
+const LABEL_FALLBACK: Record<string, string> = {
+  eagle: 'EAGLE',
+  ace: 'ACE',
+  albatross: 'ALBATROSS',
+  inRed: 'IN RED',
+  finish: 'THE FINISH',
+  run: 'THE RUN',
+  grind: 'THE GRIND',
+};
+
+const FIGURE_FALLBACK: Record<string, string> = {
+  hole: `HOLE ${FIGURE_PLACEHOLDER}`,
+  holes: `${FIGURE_PLACEHOLDER} HOLES`,
+  inThree: `${FIGURE_PLACEHOLDER} IN THREE`,
+  inARow: `${FIGURE_PLACEHOLDER} IN A ROW`,
+};
+
+const SENTENCE_FALLBACK: Record<string, string> = {
+  eagle: 'A {{0}} on a par {{1}}.',
+  inRed: 'The round went under par and finished on {{0}}.',
+  finish: 'Birdie or better coming home, to finish on {{0}}.',
+  run: 'Par or better from {{0}} through {{1}}.',
+  grind: 'Nothing worse than a bogey all the way round.',
+  plain: '{{0}} of {{1}} holes at par or better.',
+  noHoles: 'A round played. The hole by hole detail was not recorded.',
+};
+
+type TFn = (k: string, d?: string, o?: object) => string;
+
+function momentLabel(m: Moment, t: TFn): string | null {
+  if (!m.labelKey) return null;
+  return t(`${MK}.label.${m.labelKey}`, LABEL_FALLBACK[m.labelKey]);
+}
+
+function momentSentence(m: Moment, t: TFn): string {
   const f = m.facts;
-  const K = 'discover.golfThisWeek.moment';
-
-  if (m.kind === 'eagle') {
-    const word =
-      m.feat === 'ace'
-        ? t(`${K}.eagle.ace`, 'Ace')
-        : m.feat === 'albatross'
-          ? t(`${K}.eagle.albatross`, 'Albatross')
-          : t(`${K}.eagle.eagle`, 'Eagle');
-    return {
-      meta: t(`${K}.eagle.meta`, 'Hole'),
-      word,
-      sub: t(`${K}.eagle.sub`, 'The shot of the round'),
-      sentence: t(`${K}.eagle.sentence`, '{{0}} on hole {{1}}, a par {{2}}.', {
-        0: f.strokes,
-        1: f.holeNo,
-        2: f.par,
-      }),
-      chartLabel: t(`${K}.chart.strip`, 'Every hole'),
-    };
+  const key = `${MK}.sentence.${m.sentenceKey}`;
+  const fb = SENTENCE_FALLBACK[m.sentenceKey];
+  switch (m.sentenceKey) {
+    case 'eagle':
+      return t(key, fb, { 0: f.strokes, 1: f.par });
+    case 'inRed':
+    case 'finish':
+      return t(key, fb, { 0: fmtRel(f.toPar ?? 0) });
+    case 'run':
+      return t(key, fb, { 0: f.from, 1: f.to });
+    case 'plain':
+      return t(key, fb, { 0: f.parOrBetter, 1: f.played });
+    default:
+      return t(key, fb);
   }
-  if (m.kind === 'run') {
-    return {
-      meta: t(`${K}.run.meta`, 'Holes'),
-      word: t(`${K}.run.word`, 'The run'),
-      sub: t(`${K}.run.sub`, 'Par or better, back to back'),
-      sentence: t(
-        `${K}.run.sentence`,
-        '{{0}} holes in a row at par or better, from {{1}} to {{2}}.',
-        { 0: f.count, 1: f.from, 2: f.to },
-      ),
-      chartLabel: t(`${K}.chart.strip`, 'Every hole'),
-    };
-  }
-  if (m.kind === 'collapse') {
-    return {
-      meta: t(`${K}.collapse.meta`, 'Hole'),
-      word: t(`${K}.collapse.word`, 'Hole {{0}}', { 0: f.holeNo }),
-      sub: t(`${K}.collapse.sub`, 'Where the round turned'),
-      sentence: t(
-        `${K}.collapse.sentence`,
-        '{{0}} shots dropped on hole {{1}}; the other holes came to {{2}}.',
-        { 0: f.dropped, 1: f.holeNo, 2: fmtRel(f.restToPar ?? 0) },
-      ),
-      chartLabel: t(`${K}.chart.trajectory`, 'The round'),
-    };
-  }
-  if (m.kind === 'finish') {
-    return {
-      meta: t(`${K}.finish.meta`, 'Birdies'),
-      word: t(`${K}.finish.word`, 'The finish'),
-      sub: t(`${K}.finish.sub`, 'The closing three'),
-      sentence: t(
-        `${K}.finish.sentence`,
-        '{{0}} birdies in the last three holes to finish on {{1}}.',
-        { 0: f.count, 1: fmtRel(f.toPar ?? 0) },
-      ),
-      chartLabel: t(`${K}.chart.lastSix`, 'Holes 13\u201318'),
-    };
-  }
-
-  /* THE GRIND. FOUR TEMPLATES, CHOSEN — never concatenated (§S1.4, §S5.2). */
-  const which = grindSentenceKey(m);
-  const grindSentences: Record<string, [string, string]> = {
-    clean: [
-      `${K}.grind.sentenceClean`,
-      '{{0}} of {{1}} holes at par or better, with no birdies and no doubles.',
-    ],
-    noDoubles: [
-      `${K}.grind.sentenceNoDoubles`,
-      '{{0}} of {{1}} holes at par or better, and not a double all day.',
-    ],
-    noBirdies: [
-      `${K}.grind.sentenceNoBirdies`,
-      '{{0}} of {{1}} holes at par or better, with no birdies.',
-    ],
-    plain: [`${K}.grind.sentencePlain`, '{{0}} of {{1}} holes at par or better.'],
-    noHoles: [
-      `${K}.grind.sentenceNoHoles`,
-      'A round played. The hole by hole detail was not recorded.',
-    ],
-  };
-  const [key, fallback] = grindSentences[which];
-  return {
-    meta: t(`${K}.grind.meta`, 'Holes'),
-    word: t(`${K}.grind.word`, 'The grind'),
-    sub: t(`${K}.grind.sub`, 'Par or better'),
-    sentence: t(key, fallback, { 0: f.parOrBetter, 1: f.played }),
-    chartLabel: t(`${K}.chart.scorecard`, 'The card'),
-  };
 }
 
 /**
- * THE STRIP (§S2.3) — eighteen bars, height by outcome, the moment's holes in
- * the hero tone and EVERYTHING ELSE LITERAL (§S3.2): under par red, over par
- * ink, par a recessed stub on the level-par rule.
- *
- * IT IS NOT INTERCHANGEABLE WITH THE CURVE. The eagle's claim is ONE HOLE and
- * the run's is a SPAN, and only a per-hole row shows a span AS a span.
+ * THE FIGURE LINE. The template is split on {{n}}: the words before and after
+ * render at 13px / 700 / 0.14em at 50% white, the number at 46px / 800, ALL ON
+ * ONE BASELINE (§S2.4, §S2.6). A PLAIN round has no template — its figure is the
+ * gross with the to-par beside it (§S2.7).
  */
-function MomentStrip({
-  holes,
-  tone,
-  highlight,
-  width,
-  height,
+function FigureLine({
+  moment,
+  gross,
+  toParText,
+  t,
 }: {
-  holes: MomentHole[];
-  tone: string;
-  highlight: ReadonlySet<number>;
-  width: number;
-  height: number;
+  moment: Moment;
+  gross: number | null;
+  toParText: string | null;
+  t: TFn;
 }) {
-  const count = 18;
-  const gap = 2;
-  const barW = Math.max(4, (width - gap * (count - 1)) / count);
-  /* THE LEVEL-PAR RULE sits low, because damage is the common case: over par
-     grows UP from it, under par hangs BELOW it. */
-  const baseline = Math.round(height * 0.7);
-  const unit = 11;
-  const byHole = new Map(holes.map((h) => [h.holeNo, h]));
+  const numStyle: React.CSSProperties = {
+    ...NUMF,
+    fontSize: 46,
+    fontWeight: 800,
+    lineHeight: 1,
+    letterSpacing: '-0.06em',
+    color: '#FFFFFF',
+  };
+  const wordStyle: React.CSSProperties = {
+    fontSize: 13,
+    fontWeight: 700,
+    letterSpacing: '0.14em',
+    lineHeight: 1,
+    textTransform: 'uppercase',
+    color: 'rgba(255,255,255,0.5)',
+  };
+
+  if (moment.figureKey == null || moment.figure == null) {
+    /* PLAIN: the gross, with the to-par beside it on the same line. */
+    return (
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, minWidth: 0 }}>
+        <span style={numStyle}>{gross ?? '\u2014'}</span>
+        {toParText && <span style={{ ...wordStyle, letterSpacing: '0.06em' }}>{toParText}</span>}
+      </div>
+    );
+  }
+
+  const template = t(
+    `${MK}.figure.${moment.figureKey}`,
+    FIGURE_FALLBACK[moment.figureKey],
+  );
+  const idx = template.indexOf(FIGURE_PLACEHOLDER);
+  const before = idx >= 0 ? template.slice(0, idx).trim() : '';
+  const after = idx >= 0 ? template.slice(idx + FIGURE_PLACEHOLDER.length).trim() : template;
 
   return (
-    <div style={{ position: 'relative', height, width }}>
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: baseline,
-          height: 1,
-          background: 'rgba(11,15,20,0.14)',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          gap,
-          alignItems: 'flex-start',
-        }}
-      >
-        {Array.from({ length: count }, (_, i) => {
-          const holeNo = i + 1;
-          const h = byHole.get(holeNo);
-          const d =
-            h && h.par != null && h.strokes != null ? h.strokes - h.par : null;
-          const lit = highlight.has(holeNo);
-          if (d == null) {
-            return (
-              <div key={holeNo} style={{ width: barW, height: '100%', position: 'relative' }} />
-            );
-          }
-          const over = d > 0;
-          const under = d < 0;
-          const mag = Math.min(Math.abs(d), 4);
-          const len = d === 0 ? 3 : Math.max(4, mag * unit);
-          const colour = lit ? tone : under ? TOPAR_RED : d === 0 ? '#C8D0D8' : INK;
-          return (
-            <div key={holeNo} style={{ width: barW, height: '100%', position: 'relative' }}>
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  width: barW,
-                  borderRadius: 2,
-                  background: colour,
-                  ...(over || d === 0
-                    ? { bottom: height - baseline, height: len }
-                    : { top: baseline + 1, height: len }),
-                }}
-              />
-            </div>
-          );
-        })}
-      </div>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, minWidth: 0 }}>
+      {before && <span style={wordStyle}>{before}</span>}
+      <span style={numStyle}>{moment.figure}</span>
+      {after && <span style={wordStyle}>{after}</span>}
     </div>
   );
 }
+
 
 interface CardProps {
   row: CircleRoundRow;
