@@ -767,13 +767,18 @@ function GolfThisWeekCard({
         cursor: 'pointer',
       }}
     >
-      {/* ===================== THE HERO (§S2) ===================== */}
+      {/* ============ THE DARK REGION: HERO + MEMBER ROW (§1) ============
+          ONE image, ONE scrim stack, both taller. The hero content and the
+          member row are composed OVER it, so the photograph runs unbroken from
+          the top of the tile to the bottom of the member row. A second stack
+          behind the row could never be made to line up with this one. */
       <div
         style={{
-          height: HERO_H,
           flexShrink: 0,
           position: 'relative',
           overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
           /* THE LAYERS SIT AT zIndex -1, WHICH ONLY WORKS INSIDE A STACKING
              CONTEXT. position:relative with z-index auto is NOT one, so the
              photo painted BEHIND the element's own background and the tile
@@ -784,9 +789,6 @@ function GolfThisWeekCard({
           /* NO IMAGE -> PIXEL-IDENTICAL TO BEFORE (§2.3): the same single
              composed background, and not one extra layer. */
           background: imageUrl ? HERO_BASE : heroBackground(moment.kind, moment.tone),
-          padding: '11px 12px 11px',
-          display: 'flex',
-          flexDirection: 'column',
         }}
       >
         {imageUrl && (
@@ -850,6 +852,17 @@ function GolfThisWeekCard({
             />
           </>
         )}
+        {/* THE HERO'S OWN CONTENT BOX. HERO_H is unchanged (156) — §1 extends
+            the dark REGION, not the hero's content box. */}
+        <div
+          style={{
+            height: HERO_H,
+            flexShrink: 0,
+            padding: '11px 12px 11px',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
         {/* §S2.3 — course, region beneath, the day top-right. */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
