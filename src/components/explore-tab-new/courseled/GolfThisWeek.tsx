@@ -19,9 +19,7 @@ import {
   toParFor,
   buildInsightMap,
   referenceLine,
-  INSIGHT_FONT_SIZE,
   INSIGHT_LINE_HEIGHT,
-  INSIGHT_LINE_RESERVE,
   INSIGHT_CLAMP,
   InsightGlyph,
   IndexMovementTriangle,
@@ -72,32 +70,76 @@ import { A, CARD_SHELL, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } from './tok
  */
 
 
-/* Condensed tile geometry — ~12% shorter than the first pass, with the insight
-   line still at one consistent height across the rail. */
-/* CARD_W 256 (was 236) — BRIEF_SCORECARD_WIDTH_AND_VIEWER_RING §S1.4. Dropping
-   the OUT / IN gutter bought 21px and it was still not enough: a double box
-   paints its outer ring 3px OUTSIDE its cell, so two doubles side by side need
-   ~10px between cell edges before a gap is visible. 256 is the narrowest width
-   that clears it; the markers were NOT shrunk. */
+/* =============================================================================
+   THE TILE'S GEOMETRY AND ITS INK (BRIEF_ROUND_TILE_LIGHT_REFINEMENT).
+
+   WHY THE OLD TILE LOOKED FUSSY, AND IT WAS NOT THE CONTENT: it carried FOUR
+   outline systems — card border, chart panel border, marker borders, row
+   hairlines — and the chart panel was #F7F9FA on #FFFFFF, a two percent tone
+   difference propped up by a 1px border because the tone could not carry the
+   separation alone. On dark, separation is free. On light it has to come from
+   TONE, and reaching for borders instead is also why the tile was TALL: much of
+   the height was padding compensating for weak separation.
+
+   SO: ONE tinted well holds the trajectory AND the scorecard, with no border and
+   exactly one hairline inside it; the card drops its border for a shadow. */
+
 const CARD_W = 256;
-const PHOTO_H = 92;
-/* SHAPE_H 60 — the shared renderer's own documented default
-   (BRIEF_FRIENDS_TILE_SHAPE_AND_BUCKETS §1). At 48/52 a plus-eight round and a
-   level round drew nearly the same flat line: 60 is the smallest height where a
-   two-shot swing is legible. Do NOT reduce it again. */
-/* SHAPE_H 40 — the trajectory is the SUMMARY now (BRIEF_ROUND_TILE_MINI_SCORECARD
+
+/* 92 -> 76 (§S4.1). It is a tile whose content is data; 76 is still a
+   photograph. */
+const PHOTO_H = 76;
+
+/* SHAPE_H 40 — the trajectory is the SUMMARY (BRIEF_ROUND_TILE_MINI_SCORECARD
    §S2.2); the hole grid beneath it carries the detail 60px used to have to. */
 const SHAPE_H = 40;
 
+/* THE WELL (§S1). Tint far enough from the #FFFFFF card that the tone separates
+   it and an outline is REDUNDANT — the border is DELETED, not softened. */
+const WELL = '#EEF2F5';
+const WELL_RADIUS = 12;
+const WELL_PAD_TOP = 8;
+/* 6, not the reference's 10 — see WELL_INNER. */
+const WELL_PAD_X = 6;
+const WELL_PAD_BOTTOM = 10;
+/* THE ONE RULE INSIDE THE WELL, full-bleed to its edges by negative margin. */
+const WELL_RULE = 'rgba(11,15,20,0.07)';
+
+/* THE WELL BLEEDS TO THE CARD EDGES, so its inner width is 244px — the width the
+   marker/gap measurement table in RoundShape is measured at. That table is the
+   binding constraint on the scorecard, so the x padding is 6 rather than the
+   reference's 10: at 10 the inner width falls to 236 and a leading double box
+   sits 2.7px from the well edge, which is precisely the clipping fault §S3
+   exists to fix. Everything else in §S1.3 is as written. */
+const WELL_INNER = CARD_W - WELL_PAD_X * 2;
+
+/* THE INK DOES THE HIERARCHY (§S2). One genuinely dark ink and three greys that
+   are clearly different from each other, replacing four middling greys. A
+   DARKER INK ON FEWER ELEMENTS reads sharper than four greys everywhere. */
+const INK = '#0B0F14';   // scores, totals, the insight line
+const MID = '#5A6673';   // secondary text
+/* FAINT #9AA5B1 (labels) and GHOST #C8D0D8 (hole numbers) are declared where
+   they are used, in RoundShape's mini grid, as MINI_FAINT and MINI_GHOST. */
+const HAIRLINE_INK = 'rgba(11,15,20,0.12)';
+
+/* The card sits on the page rather than being drawn onto it (§S1.5). */
+const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
+
+/* §S4.4 — 10.5px, down from the shared 11.5 the friends rail uses, with the
+   reserve recomputed from it so the line still lands at one height per rail. */
+const INSIGHT_SM = 10.5;
+const INSIGHT_LINE_RESERVE_SM = INSIGHT_SM * INSIGHT_LINE_HEIGHT;
+
 /**
- * TILE HEIGHT FLOOR. Measured on a tile with the full grid: photograph 92,
- * member row, 40px trajectory, two nines of 17px cells with their hole numbers
- * AND their own header line (label + nine total), insight line, 9px padding.
- * Holds the rail level when a round has no hole data and therefore prints no
- * grid at all. 292 = the 264 state + ~14px per nine for the header line and the
- * 15→17px cell (BRIEF_MINI_SCORECARD_NINE_HEADER §S2.1).
+ * TILE HEIGHT FLOOR. Measured in the browser on a tile with the full grid:
+ * photograph 76, member row, the well (40px trajectory + hairline + two nines of
+ * 17px markers with their headers), insight line, padding. Holds the rail level
+ * when a round has no hole data and therefore prints no grid at all.
  */
-const CARD_MIN_H = 292;
+/* Re-measured for the one-well tile: 76 photo + 8 pad + 19 member + 8 + 155
+   well + 8 + 14 insight + 10 pad. A card with NO hole data draws no grid, so
+   this is what keeps the rail level. */
+const CARD_MIN_H = 298;
 
 
 
@@ -317,10 +359,12 @@ function FollowButton({
             alignItems: 'center',
             gap: 4,
             fontFamily: SANS,
-            color: A.MUTE,
-            border: `1px solid ${A.BORDER}`,
+            /* §S4.5 — the pill tightens to 4px 11px at 9.5px, in the new ink. */
+            fontSize: 9.5,
+            color: MID,
+            border: `1px solid ${HAIRLINE_INK}`,
             borderRadius: 999,
-            padding: '5px 10px',
+            padding: '4px 11px',
             pointerEvents: 'none',
           }}
         >
@@ -341,11 +385,12 @@ function FollowButton({
           ...LABEL,
           flexShrink: 0,
           fontFamily: SANS,
-          color: A.PANEL,
-          background: A.INK,
-          border: `1px solid ${A.INK}`,
+          fontSize: 9.5,
+          color: '#FFFFFF',
+          background: INK,
+          border: `1px solid ${INK}`,
           borderRadius: 999,
-          padding: '5px 10px',
+          padding: '4px 11px',
           cursor: 'pointer',
         }}
       >
@@ -425,7 +470,9 @@ function GolfThisWeekCard({
       }}
       style={{
         ...CARD_SHELL,
-        border: `1px solid ${A.BORDER}`,
+        /* THE CARD LOSES ITS BORDER AND TAKES A SHADOW (§S1.5). */
+        border: 'none',
+        boxShadow: CARD_SHADOW,
         width: CARD_W,
         /* §S4.5 / ACCEPTANCE K vs G — the brief asks BOTH for no reserved height
            when there is no hole data AND for a uniform rail. Those cannot both
@@ -472,27 +519,37 @@ function GolfThisWeekCard({
           <div
             style={{
               marginTop: 2,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
               fontSize: 10.5,
               lineHeight: 1,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.82)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
-            <span
-              style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {region ?? ''}
-            </span>
-            <span style={{ opacity: 0.7 }}>{relativeDay(row.play_date, t)}</span>
+            {region ?? ''}
           </div>
         </div>
+
+        {/* THE DATE SITS TOP-RIGHT (§S4.3), out of the subline it used to share
+            with the region — the same figure, moved, not added. */}
+        <span
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 9,
+            fontSize: 8.5,
+            fontWeight: 700,
+            lineHeight: 1,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.85)',
+          }}
+        >
+          {relativeDay(row.play_date, t)}
+        </span>
+
 
         {/* THE SCORE CHIP ON THE PHOTOGRAPH (§S2). .standout-figure-chip carries
             the fill, the border and the @supports blur — the flat fill is the
@@ -507,14 +564,15 @@ function GolfThisWeekCard({
             display: 'inline-flex',
             alignItems: 'baseline',
             gap: 6,
-            borderRadius: 10,
-            padding: '5px 10px',
+            /* §S4.2 — the chip TIGHTENS. Hairline and index movement kept. */
+            borderRadius: 9,
+            padding: '4px 9px',
           }}
         >
           <span
             style={{
               ...NUMF,
-              fontSize: 21,
+              fontSize: 19,
               fontWeight: 700,
               letterSpacing: '-0.04em',
               lineHeight: 0.85,
@@ -527,7 +585,7 @@ function GolfThisWeekCard({
             <span
               style={{
                 ...NUMF,
-                fontSize: 12.5,
+                fontSize: 11.5,
                 fontWeight: 700,
                 lineHeight: 1,
                 /* §S2.4 — the light-surface under-par red dies on a photograph. */
@@ -575,10 +633,10 @@ function GolfThisWeekCard({
       </CourseImageFallback>
 
 
-      <div style={{ padding: '9px 11px 9px' }}>
-        {/* THE MEMBER ROW SITS DIRECTLY UNDER THE PHOTOGRAPH (§S3.1): the score
-            moved onto the image, so the name gets the room. The follow control
-            stays right-aligned here in whichever of its three states applies. */}
+      <div style={{ padding: '8px 10px 10px' }}>
+        {/* THE MEMBER ROW SITS DIRECTLY UNDER THE PHOTOGRAPH: the score is on the
+            image, so the name gets the room. The follow control stays
+            right-aligned here in whichever of its three states applies. */}
         <div
           style={{
             display: 'flex',
@@ -587,12 +645,12 @@ function GolfThisWeekCard({
             minWidth: 0,
           }}
         >
-          {/* THE AVATAR IS THE FRIENDS RAIL'S AVATAR: 20px, no ring (§7). */}
+          {/* 19px, no ring (§S4.5). */}
           <SquircleAvatar
             src={row.profile_photo_url}
             userId={row.user_id}
             alt={row.display_name}
-            size={20}
+            size={19}
             hideRing
           />
 
@@ -600,9 +658,9 @@ function GolfThisWeekCard({
             style={{
               flex: 1,
               minWidth: 0,
-              fontSize: 12.5,
+              fontSize: 12,
               fontWeight: 600,
-              color: row.is_self ? AMBER : A.BODY,
+              color: row.is_self ? AMBER : INK,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -629,48 +687,65 @@ function GolfThisWeekCard({
           )}
         </div>
 
+        {/* =====================================================================
+            ONE WELL, NO BORDER (§S1.1–§S1.4). The trajectory and the scorecard
+            were two framed objects; they are now one tinted object, and that is
+            where most of the height comes back. The well bleeds to the card
+            edges so the scorecard gets its measured 244px inner width.
 
-        {/* THE TRAJECTORY IS NOW THE SUMMARY (§S2.2): 40px tall, 1.6px stroke,
-            full bleed. It no longer has to carry both the shape and the detail —
-            the grid beneath is the detail — so it does not take the height it
-            took when it was the only record of the round. Everything else about
-            the curve is unchanged: graded stroke, solid opaque fill, tangent
-            cubic, natural axis, gold-only beads.
-            showMeta FALSE: the birdie/par/bogey/double strip is DELETED (§S3.1) —
-            the grid says what it said, hole by hole rather than as four totals. */}
-        <div style={{ marginTop: 6, marginLeft: -11, marginRight: -11 }}>
+            NO BORDER HERE, EVER. The tint carries the separation; an outline on
+            top of it is the fussiness this brief removes. */}
+        <div
+          style={{
+            marginTop: 8,
+            marginLeft: -10,
+            marginRight: -10,
+            background: WELL,
+            borderRadius: WELL_RADIUS,
+            padding: `${WELL_PAD_TOP}px ${WELL_PAD_X}px ${WELL_PAD_BOTTOM}px`,
+          }}
+        >
+          {/* THE TRAJECTORY: unchanged curve — graded stroke, full opaque blend,
+              dashed level-par baseline, tangent-cubic smoothing, natural axis,
+              gold-only beads. showMeta FALSE keeps the B/P/B strip deleted. */}
           <ShapeReveal>
             <RoundShape
               row={row}
               shape={shape}
-              width={CARD_W}
+              width={WELL_INNER}
               height={SHAPE_H}
               showMeta={false}
               strokeWidth={1.6}
             />
           </ShapeReveal>
+
+          {/* THE ONE HAIRLINE INSIDE THE WELL (§S1.4), full-bleed to its edges.
+              It is the ONLY rule in here. */}
+          <div
+            aria-hidden
+            style={{
+              height: 1,
+              background: WELL_RULE,
+              marginLeft: -WELL_PAD_X,
+              marginRight: -WELL_PAD_X,
+              marginTop: 6,
+              marginBottom: 7,
+            }}
+          />
+
+          {/* THE SCORECARD. A round with no hole data renders NOTHING here, not a
+              placeholder and not reserved height — the card's minHeight holds the
+              rail level instead. The outer rings take the WELL colour (§S3.6). */}
+          <MiniScorecard shape={shape} well={WELL} />
         </div>
 
-        {/* THE SCORECARD — two rows of nine (§S2.4). A round with no hole data
-            renders NOTHING here, not a placeholder and not reserved height. */}
-        <div style={{ marginTop: 7, marginLeft: -9, marginRight: -9 }}>
-          <MiniScorecard shape={shape} />
-        </div>
-
-
-
-        {/* THE SUBLINE IS THE FRIENDS RAIL'S SUBLINE (§4.2): same glyph, same
-            figure font, same body ink, ONE line of reserved height. Aligned to
-            the bottom of the reserve so the gap lives above the line, not below
-            it, and every tile's line sits at the same height. */}
+        {/* THE INSIGHT LINE sits BELOW the well (§S4.4), 10.5px in MID with its
+            glyph, on ONE line of reserved height so every tile's line lands at
+            the same place. */}
         <div
           style={{
-            minHeight: INSIGHT_LINE_RESERVE,
-            /* §S3 — 10px above the insight line, matching the trajectory→grid gap
-               above. The grid reads as a block, the line as a comment on it. The
-               whole-block margin means a card with NO grid (no hole data) keeps
-               the same 10px there, so every tile stays level. */
-            marginTop: 10,
+            minHeight: INSIGHT_LINE_RESERVE_SM,
+            marginTop: 8,
             display: 'flex',
             alignItems: 'flex-end',
           }}
@@ -679,10 +754,10 @@ function GolfThisWeekCard({
             <div
               style={{
                 ...FIGS,
-                fontSize: INSIGHT_FONT_SIZE,
+                fontSize: INSIGHT_SM,
                 lineHeight: INSIGHT_LINE_HEIGHT,
                 fontWeight: 600,
-                color: A.BODY,
+                color: MID,
                 ...INSIGHT_CLAMP,
               }}
             >

@@ -5,7 +5,6 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
-import { SC_FILL_GOLD, SC_FILL_BIRDIE } from '@/features/courses/components/holes/_constants';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
 import { A } from './tokens';
@@ -496,13 +495,22 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
    room for a legend.
    =========================================================================== */
 
-/* THE MINI GRID TAKES THE SHEET'S COLOURS (MICRO_BRIEF_SCORECARD_COLOUR_AND_
-   ALIGNMENT §S1) — SC_FILL_BIRDIE (= TOPAR_UNDER_LIGHT #D2222D, the same red the
-   curve and the glass chip use) for under par, SC_FILL_GOLD (#FFD200) for an ace,
-   A.INK for over par and for a bare par. No new hex values: these are the exact
-   tokens ScoreMark paints the full scorecard with. */
-const ACE_GOLD = SC_FILL_GOLD;
-const UNDER_INK = SC_FILL_BIRDIE;
+/* THE MINI GRID'S OWN INK, from BRIEF_ROUND_TILE_LIGHT_REFINEMENT §S2. ONE
+   genuinely dark ink and greys that are clearly different from each other, not
+   four middling greys. The under-par red DEEPENS to #C8102E and the ace gold to
+   #C99700: the previous values (SC_FILL_BIRDIE / SC_FILL_GOLD) were tuned
+   against a near-white panel and go weak on the tinted well.
+
+   LOCAL to this grid, which only the Discover round tile renders — the
+   Clubhouse scorecard sheet keeps its own tokens untouched. */
+const MINI_INK = '#0B0F14';
+const MINI_FAINT = '#9AA5B1';
+const MINI_GHOST = '#C8D0D8';
+const ACE_GOLD = '#C99700';
+const UNDER_INK = '#C8102E';
+
+/** The well the grid sits in (§S3.6) — default is the tile's well tint. */
+export const MINI_WELL = '#EEF2F5';
 
 /** §S1.3 — the Clubhouse card's own key, not a second vocabulary. */
 type Marker = 'ace' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double';
@@ -519,9 +527,12 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
   return 'double';
 }
 
-/** THE DOUBLE RING IS A BOX-SHADOW (§S4.3): it paints outside the border box
- *  without occupying layout, so a double never shifts its neighbours. */
-function markerStyle(m: Marker | null): CSSProperties {
+/** THE DOUBLE RING IS A BOX-SHADOW: it paints outside the border box without
+ *  occupying layout, so a double never shifts its neighbours.
+ *
+ *  THE OUTER RING TAKES THE WELL COLOUR, NEVER WHITE (§S3.6): the grid sits on
+ *  a tinted well now and a white separator ring would halo around the marker. */
+function markerStyle(m: Marker | null, well: string): CSSProperties {
   const base: CSSProperties = {
     width: CELL,
     height: CELL,
@@ -529,31 +540,50 @@ function markerStyle(m: Marker | null): CSSProperties {
     alignItems: 'center',
     justifyContent: 'center',
     boxSizing: 'border-box',
-    color: A.INK,
+    flexShrink: 0,
+    color: MINI_INK,
   };
   switch (m) {
     case 'ace':
-      return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${ACE_GOLD}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: `0 0 0 2px ${well}, 0 0 0 3px ${ACE_GOLD}` };
     case 'eagle':
-      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${UNDER_INK}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, boxShadow: `0 0 0 2px ${well}, 0 0 0 3px ${UNDER_INK}` };
     case 'birdie':
       return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK };
     case 'bogey':
-      return { ...base, borderRadius: 2, border: `1px solid ${A.INK}` };
+      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}` };
     case 'double':
-      return { ...base, borderRadius: 2, border: `1px solid ${A.INK}`, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${A.INK}` };
+      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}`, boxShadow: `0 0 0 2px ${well}, 0 0 0 3px ${MINI_INK}` };
     default:
-      /* PAR IS BARE INK — no ring, no box, no tint (S1.3). The baseline recedes. */
+      /* PAR IS BARE INK — no ring, no box, no tint. The baseline recedes. */
       return base;
   }
 }
 
-/** 17px cells (BRIEF_MINI_SCORECARD_NINE_HEADER §S1.2/§S1.4). The totals moved
- *  off the marker row onto the nine header, so the cells take the FULL inner
- *  width and grew instead of shrinking: nine 17px markers across a 252px block
- *  leave 12.4px between adjacent cell edges, which clears the double box's 3px
- *  outboard ring on both sides with 6.4px of air. */
+/* =============================================================================
+   PIN THE GAP, NOT THE CELL (BRIEF_ROUND_TILE_LIGHT_REFINEMENT §S3.1–§S3.3).
+
+   The row used to be nine equal columns across the inner width, so the EDGE
+   margin was whatever the division left over and could reach zero — which is
+   why markers kept clipping. Now the markers are a FIXED 17px, the gaps a FIXED
+   9px, and the row is CENTRED: the edge margin is the remainder and can never
+   vanish.
+
+   MEASURED AT 244px WELL INNER WIDTH:
+
+     gap    row width   edge margin   clear air between two DOUBLES
+      8px     217px       13.5px            2.4px
+      9px     225px        9.5px            3.4px   <- chosen
+     10px     233px        5.5px            4.4px
+
+   THE DOUBLE BOX IS THE ONLY CONSTRAINT THAT MATTERS. It paints its outer ring
+   2.8px OUTSIDE its own footprint on each side, so two adjacent doubles eat
+   5.6px of any gap and a LEADING double eats 2.8px of the edge margin. Any
+   layout that spaces on NOMINAL width rather than RENDERED width fails on that
+   case: at gap 10 a leading double sits 2.7px from the edge, which is the fault
+   being fixed here. Do not "recover" width by widening the gap. */
 const CELL = 17;
+const GAP = 9;
 
 function nineTotals(holes: HoleShape['holes'], from: number, to: number) {
   let strokes = 0;
@@ -574,11 +604,13 @@ function NineRow({
   from,
   to,
   label,
+  well,
 }: {
   holes: HoleShape['holes'];
   from: number;
   to: number;
   label: string;
+  well: string;
 }) {
   const byHole = new Map(holes.map((h) => [h.holeNo, h]));
   const totals = nineTotals(holes, from, to);
@@ -587,15 +619,9 @@ function NineRow({
 
   return (
     <div>
-      {/* THE NINE HEADER — PORTED from CardScorecardSheet's totals line
-          (BRIEF_MINI_SCORECARD_NINE_HEADER §S1.5): the caps label left, the
-          nine's gross and its to-par right, on their own line above the cells.
-          Same object at two sizes — the sheet's 8px LABEL caps and right-aligned
-          NUM figures, scaled to the tile.
-
-          OUT and IN sit on their own line with the nine total, as the Clubhouse
-          scorecard does. They were removed once to buy horizontal space; that was
-          wrong — the TOTALS were what overflowed the row, not the labels. */}
+      {/* THE NINE HEADER STAYS as ported from CardScorecardSheet's totals line
+          (§S3.4): the caps label left, the nine's gross and its to-par right, on
+          its own line above the cells. */}
       <div
         style={{
           display: 'flex',
@@ -611,20 +637,20 @@ function NineRow({
             fontWeight: 700,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: A.MUTE,
+            color: MINI_FAINT,
           }}
         >
           {label}
         </span>
         <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 700, color: A.INK, ...FIGS }}>
+          <span style={{ fontSize: 10.5, fontWeight: 700, color: MINI_INK, ...FIGS }}>
             {totals?.strokes ?? ''}
           </span>
           <span
             style={{
               fontSize: 8.5,
               fontWeight: 700,
-              color: totals && totals.toPar < 0 ? TOPAR_RED : A.DIM,
+              color: totals && totals.toPar < 0 ? UNDER_INK : MINI_FAINT,
               ...FIGS,
             }}
           >
@@ -633,8 +659,9 @@ function NineRow({
         </span>
       </div>
 
-      {/* THE CELLS TAKE THE FULL INNER WIDTH — nothing shares their row now. */}
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      {/* FIXED CELLS, FIXED GAPS, CENTRED ROW (§S3.2). NOT space-between: the
+          edge margin must be the remainder, not the leftovers of a division. */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: GAP }}>
         {Array.from({ length: to - from + 1 }, (_, i) => {
           const holeNo = from + i;
           const h = byHole.get(holeNo);
@@ -642,27 +669,34 @@ function NineRow({
           return (
             <div
               key={holeNo}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
             >
-              {/* §S2.5 — HOLE NUMBERS STAY. A grid that cannot be indexed by
-                  hole is a texture, which is why option C was rejected. */}
-              <span style={{ fontSize: 7.5, fontWeight: 700, color: A.DIM, ...FIGS }}>
+              {/* HOLE NUMBERS STAY, at 7px in GHOST (§S3.5). Findable, not read —
+                  a grid that cannot be indexed by hole is a texture. */}
+              <span
+                style={{
+                  fontSize: 7,
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  marginBottom: 2.5,
+                  color: MINI_GHOST,
+                  ...FIGS,
+                }}
+              >
                 {holeNo}
               </span>
-              <span style={markerStyle(m)}>
-                {/* §S4.1 — AN UNPLAYED HOLE IS EMPTY, never a zero: a zero
-                    would read as an extraordinary score. */}
+              <span style={markerStyle(m, well)}>
+                {/* AN UNPLAYED HOLE IS EMPTY, never a zero: a zero would read as
+                    an extraordinary score. */}
                 <span
                   style={{
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: '-0.04em',
-                    /* CENTRED, NOT NEARLY (§S2) — lineHeight 1 collapses the
-                       digit's line box to the glyph so the flex centring of the
-                       fixed marker actually lands. The 0.5px translate is the
-                       OPTICAL correction: tabular lining numerals sit above the
-                       geometric centre of their box, so mathematical centre
-                       reads high. Deliberate, not a fudge. */
+                    /* lineHeight 1 collapses the digit's line box to the glyph so
+                       the flex centring of the fixed marker lands; the 0.5px
+                       translate is the OPTICAL correction, since tabular lining
+                       numerals sit above the geometric centre of their box. */
                     lineHeight: 1,
                     transform: 'translateY(0.5px)',
                     display: 'block',
@@ -685,13 +719,20 @@ function NineRow({
  * `shape === null` for the three-point fallback and this returns null, with no
  * placeholder and no reserved height.
  */
-export function MiniScorecard({ shape }: { shape: HoleShape | null }) {
+export function MiniScorecard({
+  shape,
+  well = MINI_WELL,
+}: {
+  shape: HoleShape | null;
+  /** The tinted well behind the grid — the outer rings take it (§S3.6). */
+  well?: string;
+}) {
   const { t } = useTranslation(['courses']);
   if (!shape || shape.holes.length === 0) return null;
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} />
-      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} well={well} />
+      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} well={well} />
     </div>
   );
 }
