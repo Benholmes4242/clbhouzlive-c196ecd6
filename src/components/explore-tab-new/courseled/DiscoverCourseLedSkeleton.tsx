@@ -566,9 +566,15 @@ export function MostPlayedPanel() {
             {/* NO RANK BAR (BRIEF_MOST_PLAYED_LEADERBOARD §S1.2) and a 52px
                 thumbnail to match the shipped header row. */}
             <Bar style={{ height: 52, width: 52, borderRadius: 13, flexShrink: 0 }} />
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {/* BRIEF_MOST_PLAYED_META_LINE: the meta line is 11px and sits 2px
+                under the name, not 4px at 9px. The name stays 14px on a two-line
+                clamp, and ONE bar is right: the longest current name
+                ("Sundridge Park Golf Club (East Course)", 258px) still fits the
+                358px text column, so nothing in the current data wraps. */}
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
               <TextBar w={130} h={13} />
-              <TextBar w={86} h={9} />
+              <TextBar w={86} h={11} />
+
             </div>
             {/* §S1.5 — the promoted PLAYED TO figure over its 8px label. */}
             <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
