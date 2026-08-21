@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { formatTimeHm } from '@/i18n/format';
 import type { TeeGroup } from '../data/useTeeTimesAll';
 import type { BoardEntry } from '../../leaderboard/BoardTable';
-import { countryFlag, countryFallback } from '../../leaderboard/countryFlag';
+import CountryFlag from '@/components/ui/country-flag';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { FONT, INK, INK_MUTE, INK_FAINT } from '../../_shared/tokens';
@@ -85,7 +85,7 @@ export function TeeTimesFirstGroups({ groups, limit, entries, onPlayerTap }: Pro
           <div style={{ gridColumn: '2 / 4', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
             {g.players.map((p, pi) => {
               const cc = p.country ?? null;
-              const flag = cc ? countryFlag(cc) : null;
+              
               const entry = p.id ? byPlayer.get(p.id) : undefined;
               const score = entry?.score ?? null;
               const hasScore = score != null;
@@ -98,23 +98,7 @@ export function TeeTimesFirstGroups({ groups, limit, entries, onPlayerTap }: Pro
               const inner = (
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                    {flag ? (
-                      <span style={{ fontSize: 12, flexShrink: 0, lineHeight: 1 }} aria-label={cc ?? undefined}>
-                        {flag}
-                      </span>
-                    ) : cc ? (
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          color: INK_FAINT,
-                          letterSpacing: '0.04em',
-                          flexShrink: 0,
-                        }}
-                      >
-                        {countryFallback(cc)}
-                      </span>
-                    ) : null}
+                    {cc ? <CountryFlag country={cc} size="sm" /> : null}
                     <span
                       style={{
                         fontSize: 13,

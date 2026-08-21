@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { getFlagCode } from '@/utils/countryFlags';
+import { getFlagCode, countryShortCode } from '@/utils/countryFlags';
 
 interface CountryFlagProps {
   country: string | null | undefined;
@@ -8,41 +7,81 @@ interface CountryFlagProps {
   className?: string;
 }
 
-const CountryFlag: React.FC<CountryFlagProps> = ({ 
-  country, 
-  size = 'md', 
-  className = '' 
-}) => {
-  const flagCode = getFlagCode(country);
-  
-  // Don't render anything if we can't determine the flag
-  if (!flagCode) {
-    return null;
-  }
-  
-  const sizeClasses = {
-    sm: 'w-4 h-3',
-    md: 'w-6 h-4',
-    lg: 'w-9 h-6'
-  };
+const sizeClasses: Record<'sm' | 'md' | 'lg', string> = {
+  sm: 'w-4 h-3',
+  md: 'w-6 h-4',
+  lg: 'w-9 h-6',
+};
 
-  // Use flag-icons CSS library approach with inline SVG data
-  const getFlagImageUrl = (code: string) => {
-    // Using flag-icons.css approach - we'll use SVG flags from a CDN
-    return `https://flagicons.lipis.dev/flags/4x3/${code.toLowerCase()}.svg`;
-  };
+/** Chip text sizes, tuned to the largest that fits each flag rectangle. */
+const chipTextPx: Record<'sm' | 'md' | 'lg', number> = {
+  sm: 6,
+  md: 7.5,
+  lg: 9.5,
+};
+
+/**
+ * Flag codes we deliberately do NOT render as a national flag.
+ *
+ * GB-NIR is the Ulster Banner, which has had no official status since 1973 and
+ * is identified with one community in Northern Ireland. Pending an editorial
+ * decision, Northern Ireland renders the neutral three-letter chip instead.
+ * Removing 'GB-NIR' from this set is the whole change required to switch to a
+ * flag later.
+ */
+const WITHHELD_FLAG_CODES = new Set<string>(['GB-NIR']);
+
+/**
+ * CountryFlag — the single flag system for the app (BRIEF_TOUR_FLAGS_ONE_SYSTEM).
+ * Resolves an SVG flag when it can; otherwise draws a chip at exactly the flag
+ * dimensions carrying the three-letter code. It never renders nothing when a
+ * country string was supplied — silent absence reads as "no nationality"
+ * rather than "no asset".
+ */
+const CountryFlag: React.FC<CountryFlagProps> = ({
+  country,
+  size = 'md',
+  className = '',
+}) => {
+  const [failed, setFailed] = React.useState(false);
+  const flagCode = getFlagCode(country);
+
+  React.useEffect(() => { setFailed(false); }, [flagCode]);
+
+  if (!country || !String(country).trim()) return null;
+
+  const useChip = !flagCode || WITHHELD_FLAG_CODES.has(flagCode) || failed;
+
+  if (useChip) {
+    const short = countryShortCode(country);
+    if (!short) return null;
+    return (
+      <span
+        role="img"
+        aria-label={String(country)}
+        title={String(country)}
+        className={`inline-flex items-center justify-center shrink-0 rounded-sm border border-border bg-muted text-muted-foreground ${sizeClasses[size]} ${className}`}
+        style={{
+          fontSize: chipTextPx[size],
+          fontWeight: 700,
+          letterSpacing: '0.02em',
+          lineHeight: 1,
+        }}
+      >
+        {short}
+      </span>
+    );
+  }
 
   return (
     <img
-      src={getFlagImageUrl(flagCode)}
+      src={`https://flagicons.lipis.dev/flags/4x3/${flagCode.toLowerCase()}.svg`}
       alt={`${country} flag`}
-      className={`inline-block ${sizeClasses[size]} ${className} rounded-sm object-cover`}
-      title={country || ''}
-      onError={(e) => {
-        // Hide flag if it fails to load
-        const target = e.target as HTMLImageElement;
-        target.style.display = 'none';
-      }}
+      loading="lazy"
+      decoding="async"
+      className={`inline-block shrink-0 ${sizeClasses[size]} ${className} rounded-sm object-cover`}
+      title={String(country)}
+      onError={() => setFailed(true)}
     />
   );
 };

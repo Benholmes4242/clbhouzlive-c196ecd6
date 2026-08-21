@@ -221,32 +221,135 @@ export const UNMAPPED_REGIONS = [
   'Rest of World',
 ] as const;
 
+// ---------------------------------------------------------------------------
+// Three-letter (IOC / FIFA / ISO-3) codes -> flag code.
+// BRIEF_TOUR_FLAGS_ONE_SYSTEM §2: the SVG path previously keyed only on full
+// country NAMES, so any row supplying a code resolved to null and rendered
+// nothing at all. Mapping lifted from features/tourhub/leaderboard/countryFlag.ts,
+// which had the more complete table.
+// ---------------------------------------------------------------------------
+export const threeLetterToFlagCode: Record<string, string> = {
+  // Home nations — subdivision codes, all four SVGs are served.
+  ENG: 'GB-ENG', SCO: 'GB-SCT', WAL: 'GB-WLS', NIR: 'GB-NIR',
+  GBR: 'GB', IRL: 'IE',
+
+  // North America / Caribbean
+  USA: 'US', CAN: 'CA', MEX: 'MX', PUR: 'PR', PRI: 'PR', DOM: 'DO',
+  CRC: 'CR', PAN: 'PA', BAH: 'BS', BER: 'BM', BAR: 'BB', CAY: 'KY',
+  JAM: 'JM', TRI: 'TT', CUB: 'CU', ESA: 'SV', NCA: 'NI', GUA: 'GT',
+  HON: 'HN',
+
+  // South America
+  ARG: 'AR', BRA: 'BR', CHI: 'CL', CHL: 'CL', COL: 'CO', VEN: 'VE',
+  PER: 'PE', PAR: 'PY', URU: 'UY', ECU: 'EC', BOL: 'BO', SUR: 'SR',
+
+  // Europe
+  FRA: 'FR', GER: 'DE', DEU: 'DE', ESP: 'ES', ITA: 'IT', SWE: 'SE',
+  NOR: 'NO', DEN: 'DK', DNK: 'DK', NED: 'NL', NLD: 'NL', BEL: 'BE',
+  AUT: 'AT', SUI: 'CH', CHE: 'CH', FIN: 'FI', POL: 'PL', CZE: 'CZ',
+  POR: 'PT', PRT: 'PT', SVK: 'SK', SVN: 'SI', EST: 'EE', LAT: 'LV',
+  LVA: 'LV', LTU: 'LT', UKR: 'UA', RUS: 'RU', ALB: 'AL', ARM: 'AM',
+  TUR: 'TR', GRE: 'GR', GRC: 'GR', HUN: 'HU', ROU: 'RO', CRO: 'HR',
+  SRB: 'RS', BUL: 'BG', ISL: 'IS', LUX: 'LU', MLT: 'MT', CYP: 'CY',
+  GEO: 'GE',
+
+  // Asia
+  KOR: 'KR', JPN: 'JP', CHN: 'CN', TPE: 'TW', TWN: 'TW', HKG: 'HK',
+  MAC: 'MO', IND: 'IN', THA: 'TH', PHI: 'PH', PHL: 'PH', MAS: 'MY',
+  MYS: 'MY', SGP: 'SG', SIN: 'SG', BAN: 'BD', BGD: 'BD', PAK: 'PK',
+  SRI: 'LK', LKA: 'LK', NEP: 'NP', VIE: 'VN', VNM: 'VN', CAM: 'KH',
+  MYA: 'MM', MGL: 'MN', INA: 'ID', IDN: 'ID', KAZ: 'KZ', UZB: 'UZ',
+
+  // Middle East
+  BRN: 'BH', BHR: 'BH', UAE: 'AE', ARE: 'AE', QAT: 'QA', KSA: 'SA',
+  SAU: 'SA', ISR: 'IL', LBN: 'LB', JOR: 'JO', IRQ: 'IQ', IRI: 'IR',
+  KUW: 'KW', OMA: 'OM',
+
+  // Africa
+  RSA: 'ZA', ZAF: 'ZA', KEN: 'KE', ZIM: 'ZW', ZWE: 'ZW', UGA: 'UG',
+  MAR: 'MA', MRI: 'MU', MUS: 'MU', NGA: 'NG', NGR: 'NG', RWA: 'RW',
+  MWI: 'MW', BOT: 'BW', ZAM: 'ZM', TAN: 'TZ', ETH: 'ET', TUN: 'TN',
+  ALG: 'DZ', EGY: 'EG', NAM: 'NA', MOZ: 'MZ', CIV: 'CI', CMR: 'CM',
+  GHA: 'GH', SEN: 'SN', SEY: 'SC', GAM: 'GM', CPV: 'CV', ANG: 'AO',
+
+  // Oceania
+  AUS: 'AU', NZL: 'NZ', FIJ: 'FJ', FJI: 'FJ', SAM: 'WS', WSM: 'WS',
+  TGA: 'TO', PNG: 'PG', GUM: 'GU',
+};
+
+// Full names the original map was missing — every remaining sr_players value.
+const EXTRA_NAME_TO_FLAG_CODE: Record<string, string> = {
+  ALBANIA: 'AL', ARMENIA: 'AM', SLOVENIA: 'SI', SLOVAKIA: 'SK',
+  ESTONIA: 'EE', LATVIA: 'LV', LITHUANIA: 'LT', UKRAINE: 'UA',
+  RUSSIA: 'RU', GEORGIA: 'GE', CROATIA: 'HR', SERBIA: 'RS',
+  BULGARIA: 'BG', ICELAND: 'IS', LUXEMBOURG: 'LU', MALTA: 'MT',
+  CYPRUS: 'CY',
+  BARBADOS: 'BB', 'CAYMAN ISLANDS': 'KY', 'DOMINICAN REPUBLIC': 'DO',
+  'COSTA RICA': 'CR', JAMAICA: 'JM', 'TRINIDAD AND TOBAGO': 'TT',
+  CUBA: 'CU', 'EL SALVADOR': 'SV', NICARAGUA: 'NI', GUATEMALA: 'GT',
+  HONDURAS: 'HN', PANAMA: 'PA', BELIZE: 'BZ',
+  PERU: 'PE', URUGUAY: 'UY', ECUADOR: 'EC', BOLIVIA: 'BO',
+  SURINAME: 'SR',
+  PAKISTAN: 'PK', 'SRI LANKA': 'LK', BANGLADESH: 'BD', NEPAL: 'NP',
+  VIETNAM: 'VN', CAMBODIA: 'KH', MYANMAR: 'MM', MONGOLIA: 'MN',
+  MACAU: 'MO', KAZAKHSTAN: 'KZ', UZBEKISTAN: 'UZ',
+  LEBANON: 'LB', JORDAN: 'JO', IRAQ: 'IQ', IRAN: 'IR', KUWAIT: 'KW',
+  OMAN: 'OM', YEMEN: 'YE', AFGHANISTAN: 'AF',
+  SAMOA: 'WS', TONGA: 'TO', 'PAPUA NEW GUINEA': 'PG', GUAM: 'GU',
+};
+
 export const getFlagCode = (country: string | null | undefined): string | null => {
   if (!country) return null;
-  
+
   // Try exact match first
   if (countryToFlagCode[country]) {
     return countryToFlagCode[country];
   }
-  
-  // Try uppercase
-  const upperCase = country.toUpperCase();
+
+  // Normalised uppercase form (also the key shape for codes / extras)
+  const upperCase = country.trim().toUpperCase().replace(/\s+/g, ' ');
   if (countryToFlagCode[upperCase]) {
     return countryToFlagCode[upperCase];
   }
-  
+  if (EXTRA_NAME_TO_FLAG_CODE[upperCase]) {
+    return EXTRA_NAME_TO_FLAG_CODE[upperCase];
+  }
+
+  // Three-letter code form (rows that pass country_code rather than a name)
+  if (upperCase.length === 3 && threeLetterToFlagCode[upperCase]) {
+    return threeLetterToFlagCode[upperCase];
+  }
+
   // Try title case
-  const titleCase = country.split(' ').map(w => 
+  const titleCase = upperCase.split(' ').map(w =>
     w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
   ).join(' ');
   if (countryToFlagCode[titleCase]) {
     return countryToFlagCode[titleCase];
   }
-  
+
   // Log unknown countries for debugging (only in development)
   if (process.env.NODE_ENV === 'development') {
     console.warn(`Unknown country for flag: ${country}`);
   }
-  
+
   return null; // Return null instead of defaulting to GB
 };
+
+/**
+ * countryShortCode — the three-letter mark used inside the fallback chip when
+ * no SVG can be resolved (or when policy withholds a national flag, as for
+ * Northern Ireland). Never returns an empty string for a non-empty input.
+ */
+export function countryShortCode(country: string | null | undefined): string {
+  if (!country) return '';
+  const key = country.trim().toUpperCase().replace(/\s+/g, ' ');
+  if (!key) return '';
+  if (key === 'NORTHERN IRELAND' || key === 'NIR') return 'NIR';
+  if (key.length <= 3) return key;
+  // Multi-word names read better as initials (e.g. UNITED ARAB EMIRATES -> UAE)
+  const words = key.split(' ').filter(Boolean);
+  if (words.length >= 3) return words.map(w => w[0]).join('').slice(0, 3);
+  return key.slice(0, 3);
+}
+
