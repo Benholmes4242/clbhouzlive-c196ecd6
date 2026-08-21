@@ -76,8 +76,8 @@ export function OverviewPageV3() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             /* On a live slide the dark hero block ends with a straight edge
-               directly above this — the canvas must BREATHE before Tournament
-               Intelligence, so the gap is real (24), not the old 2px seam. */
+               directly above this — the canvas must BREATHE before the Schedule,
+               so the gap is real (24), not the old 2px seam. */
             style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: viewingIsLive ? 24 : 12 }}
           >
             <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
