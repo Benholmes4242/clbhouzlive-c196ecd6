@@ -496,13 +496,22 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
    room for a legend.
    =========================================================================== */
 
-/* THE MINI GRID TAKES THE SHEET'S COLOURS (MICRO_BRIEF_SCORECARD_COLOUR_AND_
-   ALIGNMENT §S1) — SC_FILL_BIRDIE (= TOPAR_UNDER_LIGHT #D2222D, the same red the
-   curve and the glass chip use) for under par, SC_FILL_GOLD (#FFD200) for an ace,
-   A.INK for over par and for a bare par. No new hex values: these are the exact
-   tokens ScoreMark paints the full scorecard with. */
-const ACE_GOLD = SC_FILL_GOLD;
-const UNDER_INK = SC_FILL_BIRDIE;
+/* THE MINI GRID'S OWN INK, from BRIEF_ROUND_TILE_LIGHT_REFINEMENT §S2. ONE
+   genuinely dark ink and greys that are clearly different from each other, not
+   four middling greys. The under-par red DEEPENS to #C8102E and the ace gold to
+   #C99700: the previous values (SC_FILL_BIRDIE / SC_FILL_GOLD) were tuned
+   against a near-white panel and go weak on the tinted well.
+
+   LOCAL to this grid, which only the Discover round tile renders — the
+   Clubhouse scorecard sheet keeps its own tokens untouched. */
+const MINI_INK = '#0B0F14';
+const MINI_FAINT = '#9AA5B1';
+const MINI_GHOST = '#C8D0D8';
+const ACE_GOLD = '#C99700';
+const UNDER_INK = '#C8102E';
+
+/** The well the grid sits in (§S3.6) — default is the tile's well tint. */
+export const MINI_WELL = '#EEF2F5';
 
 /** §S1.3 — the Clubhouse card's own key, not a second vocabulary. */
 type Marker = 'ace' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double';
@@ -519,9 +528,12 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
   return 'double';
 }
 
-/** THE DOUBLE RING IS A BOX-SHADOW (§S4.3): it paints outside the border box
- *  without occupying layout, so a double never shifts its neighbours. */
-function markerStyle(m: Marker | null): CSSProperties {
+/** THE DOUBLE RING IS A BOX-SHADOW: it paints outside the border box without
+ *  occupying layout, so a double never shifts its neighbours.
+ *
+ *  THE OUTER RING TAKES THE WELL COLOUR, NEVER WHITE (§S3.6): the grid sits on
+ *  a tinted well now and a white separator ring would halo around the marker. */
+function markerStyle(m: Marker | null, well: string): CSSProperties {
   const base: CSSProperties = {
     width: CELL,
     height: CELL,
@@ -529,31 +541,50 @@ function markerStyle(m: Marker | null): CSSProperties {
     alignItems: 'center',
     justifyContent: 'center',
     boxSizing: 'border-box',
-    color: A.INK,
+    flexShrink: 0,
+    color: MINI_INK,
   };
   switch (m) {
     case 'ace':
-      return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${ACE_GOLD}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: `0 0 0 2px ${well}, 0 0 0 3px ${ACE_GOLD}` };
     case 'eagle':
-      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${UNDER_INK}` };
+      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, boxShadow: `0 0 0 2px ${well}, 0 0 0 3px ${UNDER_INK}` };
     case 'birdie':
       return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK };
     case 'bogey':
-      return { ...base, borderRadius: 2, border: `1px solid ${A.INK}` };
+      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}` };
     case 'double':
-      return { ...base, borderRadius: 2, border: `1px solid ${A.INK}`, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${A.INK}` };
+      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}`, boxShadow: `0 0 0 2px ${well}, 0 0 0 3px ${MINI_INK}` };
     default:
-      /* PAR IS BARE INK — no ring, no box, no tint (S1.3). The baseline recedes. */
+      /* PAR IS BARE INK — no ring, no box, no tint. The baseline recedes. */
       return base;
   }
 }
 
-/** 17px cells (BRIEF_MINI_SCORECARD_NINE_HEADER §S1.2/§S1.4). The totals moved
- *  off the marker row onto the nine header, so the cells take the FULL inner
- *  width and grew instead of shrinking: nine 17px markers across a 252px block
- *  leave 12.4px between adjacent cell edges, which clears the double box's 3px
- *  outboard ring on both sides with 6.4px of air. */
+/* =============================================================================
+   PIN THE GAP, NOT THE CELL (BRIEF_ROUND_TILE_LIGHT_REFINEMENT §S3.1–§S3.3).
+
+   The row used to be nine equal columns across the inner width, so the EDGE
+   margin was whatever the division left over and could reach zero — which is
+   why markers kept clipping. Now the markers are a FIXED 17px, the gaps a FIXED
+   9px, and the row is CENTRED: the edge margin is the remainder and can never
+   vanish.
+
+   MEASURED AT 244px WELL INNER WIDTH:
+
+     gap    row width   edge margin   clear air between two DOUBLES
+      8px     217px       13.5px            2.4px
+      9px     225px        9.5px            3.4px   <- chosen
+     10px     233px        5.5px            4.4px
+
+   THE DOUBLE BOX IS THE ONLY CONSTRAINT THAT MATTERS. It paints its outer ring
+   2.8px OUTSIDE its own footprint on each side, so two adjacent doubles eat
+   5.6px of any gap and a LEADING double eats 2.8px of the edge margin. Any
+   layout that spaces on NOMINAL width rather than RENDERED width fails on that
+   case: at gap 10 a leading double sits 2.7px from the edge, which is the fault
+   being fixed here. Do not "recover" width by widening the gap. */
 const CELL = 17;
+const GAP = 9;
 
 function nineTotals(holes: HoleShape['holes'], from: number, to: number) {
   let strokes = 0;
