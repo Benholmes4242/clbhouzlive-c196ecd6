@@ -240,7 +240,11 @@
       "finishedLabel": "Finalizado",
       "todaySuffix": "{{value}} hoy",
       "fieldAverageWaiting": "Promedio del campo cuando haya {{n}} rondas",
-      "courseShapeLabel": "Perfil del campo"
+      "courseShapeLabel": "Perfil del campo",
+      "ourPicksLabel": "Nuestras apuestas",
+      "ourPicksAll": "Todas las apuestas y sus razones",
+      "ourPicksProvenance": "Confianza del modelo {{confidence}}%",
+      "ourPicksStale": "Actualizándose"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

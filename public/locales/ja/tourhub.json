@@ -236,7 +236,11 @@
       "finishedLabel": "終了",
       "todaySuffix": "本日 {{value}}",
       "fieldAverageWaiting": "{{n}}ラウンドが揃い次第、フィールド平均を表示",
-      "courseShapeLabel": "コースの傾向"
+      "courseShapeLabel": "コースの傾向",
+      "ourPicksLabel": "注目選手",
+      "ourPicksAll": "すべての注目選手と根拠",
+      "ourPicksProvenance": "モデル信頼度 {{confidence}}%",
+      "ourPicksStale": "更新中"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

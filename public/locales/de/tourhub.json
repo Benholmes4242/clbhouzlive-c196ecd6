@@ -240,7 +240,11 @@
       "finishedLabel": "Beendet",
       "todaySuffix": "{{value}} heute",
       "fieldAverageWaiting": "Feld-Durchschnitt, sobald {{n}} Runden vorliegen",
-      "courseShapeLabel": "Platzprofil"
+      "courseShapeLabel": "Platzprofil",
+      "ourPicksLabel": "Unsere Tipps",
+      "ourPicksAll": "Alle Tipps und die Begründung",
+      "ourPicksProvenance": "Modellvertrauen {{confidence}}%",
+      "ourPicksStale": "Wird aktualisiert"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

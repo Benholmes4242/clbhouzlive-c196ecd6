@@ -274,7 +274,11 @@
       "finishedLabel": "Finished",
       "todaySuffix": "{{value}} today",
       "fieldAverageWaiting": "Field average once {{n}} rounds are in",
-      "courseShapeLabel": "Course shape"
+      "courseShapeLabel": "Course shape",
+      "ourPicksLabel": "Our picks",
+      "ourPicksAll": "All picks and the case for each",
+      "ourPicksProvenance": "Model confidence {{confidence}}%",
+      "ourPicksStale": "Being refreshed"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",

@@ -236,7 +236,11 @@
       "finishedLabel": "종료",
       "todaySuffix": "오늘 {{value}}",
       "fieldAverageWaiting": "{{n}}라운드가 모이면 필드 평균 표시",
-      "courseShapeLabel": "코스 난이도"
+      "courseShapeLabel": "코스 난이도",
+      "ourPicksLabel": "주목 선수",
+      "ourPicksAll": "모든 주목 선수와 근거",
+      "ourPicksProvenance": "모델 신뢰도 {{confidence}}%",
+      "ourPicksStale": "업데이트 중"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
