@@ -477,4 +477,193 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
   );
 }
 
+/* ===========================================================================
+   THE MINI SCORECARD (BRIEF_ROUND_TILE_MINI_SCORECARD) — the Clubhouse card's
+   grid at rail scale: two rows of nine, hole numbers above each cell, OUT / IN
+   labels left, the nine's total and to-par right.
+
+   PAR IS NOT PRINTED. The MARKER is the par statement — circle birdie, box
+   bogey, double box double-or-worse — so a par row would be the same fact
+   twice. The full Clubhouse card prints par because it has the room and because
+   it IS a scorecard; this is a summary.
+
+   NO SCORING KEY: the shapes are conventional to golfers and a rail tile has no
+   room for a legend.
+   =========================================================================== */
+
+const GOLD_ACE = '#D8A93C';
+
+/** §S1.3 — the Clubhouse card's own key, not a second vocabulary. */
+type Marker = 'ace' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double';
+
+function markerFor(strokes: number | null, par: number | null): Marker | null {
+  if (strokes == null || !Number.isFinite(strokes)) return null;
+  if (strokes === 1) return 'ace';
+  if (par == null) return 'par';
+  const d = strokes - par;
+  if (d <= -2) return 'eagle';
+  if (d === -1) return 'birdie';
+  if (d === 0) return 'par';
+  if (d === 1) return 'bogey';
+  return 'double';
+}
+
+/** THE DOUBLE RING IS A BOX-SHADOW (§S4.3): it paints outside the border box
+ *  without occupying layout, so a double never shifts its neighbours. */
+function markerStyle(m: Marker | null): React.CSSProperties {
+  const base: React.CSSProperties = {
+    width: CELL,
+    height: CELL,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxSizing: 'border-box',
+    color: A.INK,
+  };
+  switch (m) {
+    case 'ace':
+      return { ...base, borderRadius: 999, border: `1px solid ${GOLD_ACE}`, color: GOLD_ACE, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${GOLD_ACE}` };
+    case 'eagle':
+      return { ...base, borderRadius: 999, border: `1px solid ${A.INK}`, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${A.INK}` };
+    case 'birdie':
+      return { ...base, borderRadius: 999, border: `1px solid ${A.INK}` };
+    case 'bogey':
+      return { ...base, borderRadius: 2, border: `1px solid ${A.INK}` };
+    case 'double':
+      return { ...base, borderRadius: 2, border: `1px solid ${A.INK}`, boxShadow: `0 0 0 2px #FFFFFF, 0 0 0 3px ${A.INK}` };
+    default:
+      /* PAR IS BARE — no ring, no box. */
+      return base;
+  }
+}
+
+/** 15px cells: the smallest width where a TWO-DIGIT score (a 10 on a par 3
+ *  happens) still fits inside a circle without touching it — the figure is
+ *  10px with -0.04em tracking and the cell never grows to accommodate it. */
+const CELL = 15;
+
+function nineTotals(holes: HoleShape['holes'], from: number, to: number) {
+  let strokes = 0;
+  let toPar = 0;
+  let any = false;
+  for (const h of holes) {
+    if (h.holeNo < from || h.holeNo > to) continue;
+    if (h.strokes == null) continue;
+    any = true;
+    strokes += h.strokes;
+    if (h.par != null) toPar += h.strokes - h.par;
+  }
+  return any ? { strokes, toPar } : null;
+}
+
+function NineRow({
+  holes,
+  label,
+  from,
+  to,
+}: {
+  holes: HoleShape['holes'];
+  label: string;
+  from: number;
+  to: number;
+}) {
+  const byHole = new Map(holes.map((h) => [h.holeNo, h]));
+  const totals = nineTotals(holes, from, to);
+  const rel =
+    totals == null ? '' : totals.toPar === 0 ? 'E' : totals.toPar > 0 ? `+${totals.toPar}` : `\u2212${Math.abs(totals.toPar)}`;
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
+      <span
+        style={{
+          width: 17,
+          flexShrink: 0,
+          fontSize: 7.5,
+          fontWeight: 700,
+          letterSpacing: '0.06em',
+          color: A.DIM,
+          paddingBottom: 2,
+        }}
+      >
+        {label}
+      </span>
+
+      <div style={{ display: 'flex', flex: 1, minWidth: 0, justifyContent: 'space-between' }}>
+        {Array.from({ length: to - from + 1 }, (_, i) => {
+          const holeNo = from + i;
+          const h = byHole.get(holeNo);
+          const m = markerFor(h?.strokes ?? null, h?.par ?? null);
+          return (
+            <div
+              key={holeNo}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}
+            >
+              {/* §S2.5 — HOLE NUMBERS STAY. A grid that cannot be indexed by
+                  hole is a texture, which is why option C was rejected. */}
+              <span style={{ fontSize: 7.5, fontWeight: 700, color: A.DIM, ...FIGS }}>
+                {holeNo}
+              </span>
+              <span style={markerStyle(m)}>
+                {/* §S4.1 — AN UNPLAYED HOLE IS EMPTY, never a zero: a zero
+                    would read as an extraordinary score. */}
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1,
+                    ...FIGS,
+                  }}
+                >
+                  {h?.strokes ?? ''}
+                </span>
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      <span
+        style={{
+          flexShrink: 0,
+          display: 'inline-flex',
+          alignItems: 'baseline',
+          gap: 3,
+          paddingBottom: 1,
+        }}
+      >
+        <span style={{ fontSize: 10.5, fontWeight: 700, color: A.INK, ...FIGS }}>
+          {totals?.strokes ?? ''}
+        </span>
+        <span
+          style={{
+            fontSize: 8.5,
+            fontWeight: 700,
+            color: totals && totals.toPar < 0 ? TOPAR_RED : A.DIM,
+            ...FIGS,
+          }}
+        >
+          {rel}
+        </span>
+      </span>
+    </div>
+  );
+}
+
+/**
+ * A ROUND WITH NO HOLE DATA RENDERS NO GRID (§S0.2) — the caller passes
+ * `shape === null` for the three-point fallback and this returns null, with no
+ * placeholder and no reserved height.
+ */
+export function MiniScorecard({ shape }: { shape: HoleShape | null }) {
+  if (!shape || shape.holes.length === 0) return null;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+      <NineRow holes={shape.holes} label="OUT" from={1} to={9} />
+      <NineRow holes={shape.holes} label="IN" from={10} to={18} />
+    </div>
+  );
+}
+
+
 export default RoundShape;
