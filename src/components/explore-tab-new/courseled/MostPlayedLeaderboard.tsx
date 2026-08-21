@@ -561,7 +561,6 @@ export function MostPlayedLeaderboard({
                             fontSize: 11,
                             fontWeight: 700,
                             letterSpacing: 0,
-                            textTransform: 'lowercase',
                             color: A.INK,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
