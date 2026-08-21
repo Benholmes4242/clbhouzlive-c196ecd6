@@ -489,7 +489,7 @@ export function MostPlayedPanel() {
               display: 'flex',
               alignItems: 'center',
               gap: 11,
-              padding: '10px 0',
+              padding: '12px 0',
               borderBottom: i === 2 ? 'none' : `1px solid ${A.BORDER}`,
             }}
           >
