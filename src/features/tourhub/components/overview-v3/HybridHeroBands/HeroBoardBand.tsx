@@ -207,7 +207,11 @@ export function HeroBoardSection({
    * requests per slide instead of 2). The cost is that the picks row lags the
    * photograph by the same 250ms as the rest of the reporting.
    */
-  const { viewingTournamentId } = useTourSelection();
+  /* AMENDMENT 1 §CHANGE 2 — the TOUR CODE comes off the SAME selection context
+     this band already reads for the tournament id, exactly as TISlot derives it
+     (`viewingTourSlug ?? 'pga'`). No new prop, no new query. */
+  const { viewingTournamentId, viewingTourSlug } = useTourSelection();
+  const pickTourCode = viewingTourSlug ?? 'pga';
   const picksTid = viewingTournamentId ?? tournamentId;
   const { data: predictions } = useAIPredictions(picksTid);
   const pickPlayerIds = useMemo(() => {
