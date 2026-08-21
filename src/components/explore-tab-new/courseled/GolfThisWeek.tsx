@@ -771,7 +771,7 @@ function GolfThisWeekCard({
           ONE image, ONE scrim stack, both taller. The hero content and the
           member row are composed OVER it, so the photograph runs unbroken from
           the top of the tile to the bottom of the member row. A second stack
-          behind the row could never be made to line up with this one. */
+          behind the row could never be made to line up with this one. */}
       <div
         style={{
           flexShrink: 0,
