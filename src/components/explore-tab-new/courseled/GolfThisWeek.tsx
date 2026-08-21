@@ -410,8 +410,17 @@ function FollowButton({
 
    §S5.2  THE SCORECARD IS LITERAL. RED IS UNDER PAR, INK IS OVER, ALWAYS.
 
-   §S5.3  THE ONLY EXCEPTION is the moment's OWN holes, which take the hero tone
-          so the two halves of the card point at each other.
+   §S5.3  A SCORE MARKER IS A CLOSED SHAPE AROUND THE DIGIT. A MOMENT NEVER
+          DRAWS ONE, IN ANY TONE, ON ANY HOLE (BRIEF_ROUND_MOMENTS_V3 §1).
+          The previous exception — "the moment's own holes take the hero tone" —
+          is OVERTURNED because it defeated §S5.2: the in-red tone and the
+          under-par ink are THE SAME STRING (#C8102E), so a marked par rendered
+          as an eagle. markerStyle no longer accepts a tone at all.
+          A marked hole is instead a 2px RULE BENEATH the cells in the moment's
+          tone (§4). An open line below the digit can never be confused with a
+          closed shape around it, whatever the tone, and it expresses the
+          continuity a per-cell mark cannot — which is the whole point of THE
+          RUN.
 
    WITHOUT THIS RULE the moment palette leaks into the grid within a month and
    red stops meaning under par — which every other scoring surface in the app
@@ -465,8 +474,9 @@ const LABEL_FALLBACK: Record<string, string> = {
   eagle: 'EAGLE',
   ace: 'ACE',
   albatross: 'ALBATROSS',
-  inRed: 'IN RED',
-  finish: 'THE FINISH',
+  finishedInRed: 'FINISHED IN THE RED',
+  birdieHaul: 'BIRDIE HAUL',
+  strongFinish: 'STRONG FINISH',
   run: 'THE RUN',
   grind: 'THE GRIND',
 };
@@ -476,12 +486,17 @@ const FIGURE_FALLBACK: Record<string, string> = {
   holes: `${FIGURE_PLACEHOLDER} HOLES`,
   inThree: `${FIGURE_PLACEHOLDER} IN THREE`,
   inARow: `${FIGURE_PLACEHOLDER} IN A ROW`,
+  /* A QUANTITY TAKES ITS NOUN AFTER THE FIGURE (§S2.6). */
+  birdies: `${FIGURE_PLACEHOLDER} BIRDIES`,
 };
 
 const SENTENCE_FALLBACK: Record<string, string> = {
   eagle: 'A {{0}} on a par {{1}}.',
-  inRed: 'The round went under par and finished on {{0}}.',
-  finish: 'Birdie or better coming home, to finish on {{0}}.',
+  /* THE NEW RULE IS THE FINISHING SCORE (§2.1), so the sentence states that and
+     nothing about going under par along the way. */
+  finishedInRed: 'Eighteen holes finished under par.',
+  birdieHaul: '{{0}} birdies across {{1}} holes.',
+  strongFinish: 'Birdie or better coming home, to finish on {{0}}.',
   run: 'Par or better from {{0}} through {{1}}.',
   grind: 'Nothing worse than a bogey all the way round.',
   plain: '{{0}} of {{1}} holes at par or better.',
@@ -502,8 +517,13 @@ function momentSentence(m: Moment, t: TFn): string {
   switch (m.sentenceKey) {
     case 'eagle':
       return t(key, fb, { 0: f.strokes, 1: f.par });
-    case 'inRed':
-    case 'finish':
+    case 'finishedInRed':
+      /* THE SENTENCE NEVER REPEATS THE FIGURE (§S2.8) and the figure IS the
+         to-par here, so the sentence carries no number at all. */
+      return t(key, fb);
+    case 'birdieHaul':
+      return t(key, fb, { 0: f.count, 1: f.played });
+    case 'strongFinish':
       return t(key, fb, { 0: fmtRel(f.toPar ?? 0) });
     case 'run':
       return t(key, fb, { 0: f.from, 1: f.to });
@@ -547,6 +567,16 @@ function FigureLine({
     textTransform: 'uppercase',
     color: 'rgba(255,255,255,0.5)',
   };
+
+  if (moment.figureRole === 'score' && moment.figure != null) {
+    /* FINISHED IN THE RED: the round's to-par IS the figure, with a true minus
+       (§5). No template, no noun — the eyebrow already said it. */
+    return (
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, minWidth: 0 }}>
+        <span style={numStyle}>{fmtRel(moment.figure)}</span>
+      </div>
+    );
+  }
 
   if (moment.figureKey == null || moment.figure == null) {
     /* PLAIN: the gross, with the to-par beside it on the same line. */

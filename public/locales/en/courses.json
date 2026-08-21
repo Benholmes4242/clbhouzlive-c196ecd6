@@ -1588,25 +1588,28 @@
           "eagle": "EAGLE",
           "ace": "ACE",
           "albatross": "ALBATROSS",
-          "inRed": "IN RED",
-          "finish": "THE FINISH",
           "run": "THE RUN",
-          "grind": "THE GRIND"
+          "grind": "THE GRIND",
+          "finishedInRed": "FINISHED IN THE RED",
+          "birdieHaul": "BIRDIE HAUL",
+          "strongFinish": "STRONG FINISH"
         },
         "figure": {
           "hole": "HOLE {n}",
           "holes": "{n} HOLES",
           "inThree": "{n} IN THREE",
-          "inARow": "{n} IN A ROW"
+          "inARow": "{n} IN A ROW",
+          "birdies": "{n} BIRDIES"
         },
         "sentence": {
           "eagle": "A {{0}} on a par {{1}}.",
-          "inRed": "The round went under par and finished on {{0}}.",
-          "finish": "Birdie or better coming home, to finish on {{0}}.",
           "run": "Par or better from {{0}} through {{1}}.",
           "grind": "Nothing worse than a bogey all the way round.",
           "plain": "{{0}} of {{1}} holes at par or better.",
-          "noHoles": "A round played. The hole by hole detail was not recorded."
+          "noHoles": "A round played. The hole by hole detail was not recorded.",
+          "finishedInRed": "Eighteen holes finished under par.",
+          "birdieHaul": "{{0}} birdies across {{1}} holes.",
+          "strongFinish": "Birdie or better coming home, to finish on {{0}}."
         }
       }
     },

@@ -1,39 +1,75 @@
 /**
- * THE ROUND'S MOMENT — the pure selector (BRIEF_ROUND_TILE_THE_MOMENT v2 §S1).
+ * THE ROUND'S MOMENT — the pure selector (BRIEF_ROUND_MOMENTS_V3 §2).
  *
- * SUPERSEDES v1 IN FULL. The chart vocabulary is gone (there is ONE chart now,
- * the scorecard — §S0.3), the moment list changed, and the hero layout changed.
+ * SUPERSEDES the v2 six-kind list IN FULL. There is still ONE chart (the
+ * scorecard) and the hero layout is untouched.
  *
  * IT RUNS ON `holes: { holeNo, par, strokes }[]` AND NOTHING ELSE (§S1.1) — the
  * exact array useRoundHoleShapes already returns. No query, no new hook, no new
  * field, no field average. Do not add one: this module is tuned against live
  * data and must stay testable without rendering a tile (§S1.8).
  *
- * SIX KINDS, FIRST MATCH WINS (§S1.2):
- *   1 EAGLE    any hole 2+ under par, or a hole in one.        #FFC93C
- *   2 IN RED   cumulative to-par went BELOW ZERO at any point. #C8102E
- *   3 FINISH   birdie or better on 2 of holes 16 / 17 / 18.    #3B9DFF
- *   4 RUN      7+ CONSECUTIVE holes at par or better.          #22D07A
- *   5 GRIND    12+ at par or better, nothing worse than bogey. #F7931E
- *   6 PLAIN    THE DEFAULT. Everything else.                   #FFFFFF
+ * SEVEN KINDS, FIRST MATCH WINS (§2 — was six):
+ *   1 EAGLE           any hole 2+ under par, or a 1.               #FFC93C
+ *   2 FINISHED IN RED the round's TOTAL to-par is BELOW ZERO.      #C8102E
+ *   3 BIRDIE HAUL     4 or more birdies (d === -1 exactly).        PROVISIONAL
+ *   4 STRONG FINISH   birdie or better on 2 of holes 16 / 17 / 18. #3B9DFF
+ *   5 RUN             7+ CONSECUTIVE holes at par or better.       #22D07A
+ *   6 GRIND           12+ at par or better, nothing worse than a
+ *                     bogey.                                      #F7931E
+ *   7 PLAIN           THE DEFAULT. Everything else.                #FFFFFF
  *
- * IN RED SITS ABOVE THE FINISH AND THE RUN DELIBERATELY (§S1.5): a round that
- * spent time under par is the better story, and it is rarer.
+ * `inRed` WAS RENAMED `finishedInRed` AND ITS RULE CHANGED (§2.1). It used to
+ * fire when the CUMULATIVE to-par went below zero at ANY point. Ben's reasoning
+ * for the change: a round could go under par on the first hole and finish twenty
+ * over, and the old rule called that in red. `toPar < 0` is a claim the card can
+ * stand behind. The cumulative `underHoles` loop is DELETED and nothing else
+ * needed it.
  *
- * "THE COLLAPSE" / "THE TURN" WAS DESIGNED AND CUT (§S1.3). Ben's call:
- *   "Every moment is something a member would be pleased to see. A collapse
- *    card was designed and cut — the grind and the plain card are the honest
- *    neutral floor, and nothing on this surface tells anyone they played badly."
- * "THE ESCAPE" was cut in v1 (§S1.4). Do not build either, and do not add any
- * other negative kind.
+ * IT KEEPS POSITION 2 (§0c): finishing under par is rarer than merely spending
+ * time under par, so it still outranks the haul, the finish and the run.
  *
- * THE PLAIN CARD IS THE MOST IMPORTANT OF THE SIX (§S1.6). MOST ROUNDS ARE
+ * `finish` WAS RENAMED `strongFinish` (§2.2). Rule, tone, figure and FINISH_MIN
+ * are unchanged.
+ *
+ * BIRDIE HAUL SITS AT POSITION 3 AND MUST NOT BE MOVED WITHOUT THOUGHT (§2.3):
+ * BELOW finishedInRed because most under-par rounds also carry four birdies and
+ * the finishing score is the bigger claim; ABOVE strongFinish and run because a
+ * haul of birdies is a better story than two good closing holes or a stretch of
+ * pars. Its most valuable case is the round that made five birdies and did NOT
+ * finish under par — which before v3 fell all the way through to PLAIN. A hole
+ * at −2 or better is NOT counted here: that round is already the eagle at
+ * position 1 and never reaches this rule.
+ *
+ * NO NEGATIVE MOMENTS (§S1.3, upheld). "THE COLLAPSE" / "THE TURN" / "THE
+ * ESCAPE" were designed and cut. Ben's call: "Every moment is something a member
+ * would be pleased to see." BIRDIE HAUL is positive. Do not add a negative kind.
+ *
+ * THE PLAIN CARD IS THE MOST IMPORTANT OF THE SEVEN (§S1.6). MOST ROUNDS ARE
  * PLAIN. It is the one most likely to be treated as a fallback and built
- * carelessly. It must look deliberate — it gets the same hero, the same well and
- * the same scorecard, and only its GLOW is different (white, §S2.2).
+ * carelessly. It must look deliberate — same hero, same well, same scorecard,
+ * and only its GLOW is different (white).
+ *
+ * WHICH KINDS MARK HOLES (§3): ONLY birdieHaul, strongFinish and run.
+ *   eagle          nothing — the feat hole already carries the loudest marker on
+ *                  the card, and a second mark on it is redundant.
+ *   finishedInRed  nothing — a WHOLE-ROUND claim, exactly like the grind. This
+ *                  alone removes the reported "par drawn as an eagle" bug.
+ *   run            THE ONLY KIND WHERE MARKING ADDS ANYTHING: a stretch of pars
+ *                  is bare ink, so without the mark there is nothing to see.
+ *   grind / plain  nothing, unchanged.
+ * A MARKED HOLE IS DRAWN AS A RULE BENEATH THE CELLS, NEVER AS A RING (§4 and
+ * the new §S5.3). markerStyle no longer takes a tone at all.
  */
 
-export type MomentKind = 'eagle' | 'inRed' | 'finish' | 'run' | 'grind' | 'plain';
+export type MomentKind =
+  | 'eagle'
+  | 'finishedInRed'
+  | 'birdieHaul'
+  | 'strongFinish'
+  | 'run'
+  | 'grind'
+  | 'plain';
 
 export interface MomentHole {
   holeNo: number;
@@ -43,15 +79,16 @@ export interface MomentHole {
 
 /**
  * HOW THE FIGURE READS (§S2.6). An IDENTITY figure takes a noun BEFORE it
- * (HOLE 13); a QUANTITY figure takes the noun AFTER it (14 HOLES). The renderer
- * derives both from ONE translatable template, so a translator can reorder.
+ * (HOLE 13); a QUANTITY figure takes the noun AFTER it (14 HOLES, 5 BIRDIES).
+ * The renderer derives both from ONE translatable template, so a translator can
+ * reorder.
  */
 export type FigureRole = 'identity' | 'quantity' | 'score';
 
 export interface Moment {
   kind: MomentKind;
-  /** §S5.1 — the celebration accent. Expressive in the hero, and in the grid
-   *  ONLY on the moment's own holes (§S5.3). */
+  /** §S5.1 — the celebration accent. Expressive in the hero. In the grid it may
+   *  only ever appear as the RULE BENEATH marked cells (§4), never on a cell. */
   tone: string;
   /** i18n key suffix for the eyebrow. `null` on PLAIN: it has no label (§S2.7). */
   labelKey: string | null;
@@ -62,7 +99,7 @@ export interface Moment {
   figure: number | null;
   /** i18n key suffix for the sentence. NEVER free text (§S6.2). */
   sentenceKey: string;
-  /** The holes the grid marks in the tone (§S4.6). */
+  /** The holes the grid underlines in the tone (§3, §4). */
   markedHoles: number[];
   /** EAGLE only: which feat it is. Untranslated golf words (§S6.4). */
   feat?: 'ace' | 'albatross' | 'eagle';
@@ -80,10 +117,20 @@ export interface Moment {
   };
 }
 
+/**
+ * BIRDIE HAUL'S TONE IS NOT YET CHOSEN (§2.4). Ben picks it; the candidates and
+ * their contrast against the hero's dark ground were reported with this brief.
+ * THIS VALUE IS PROVISIONAL and is the only thing in v3 awaiting a decision.
+ * It is clear of every other tone in the table and of #C8102E, which birdie
+ * cells already ink.
+ */
+export const BIRDIE_HAUL_TONE_PROVISIONAL = '#B58CFF';
+
 export const MOMENT_TONE: Record<MomentKind, string> = {
   eagle: '#FFC93C',
-  inRed: '#C8102E',
-  finish: '#3B9DFF',
+  finishedInRed: '#C8102E',
+  birdieHaul: BIRDIE_HAUL_TONE_PROVISIONAL,
+  strongFinish: '#3B9DFF',
   run: '#22D07A',
   grind: '#F7931E',
   /* A PLAIN ROUND'S ACCENT IS WHITE (§S2.2): colour means something happened,
@@ -99,6 +146,10 @@ export const RUN_MIN = 7;
 export const FINISH_MIN = 2;
 /** THE GRIND: twelve holes taken care of and nothing worse than a bogey. */
 export const GRIND_MIN = 12;
+/** FOUR BIRDIES: three is a good day for most members and common enough to be
+ *  unremarkable; four is the point at which the birdies, not the score, are the
+ *  story of the round. */
+export const BIRDIE_HAUL_MIN = 4;
 
 interface Scored {
   holeNo: number;
@@ -133,7 +184,8 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
   const toPar = hs.reduce((s, h) => s + h.d, 0);
 
   /* 1 — EAGLE. An ACE outranks an eagle; an ALBATROSS outranks both. Same
-     treatment, different word (§S1.2). */
+     treatment, different word (§S1.2). NOTHING IS MARKED (§3): the feat hole
+     already carries the loudest marker on the card. */
   const feats = hs.filter((h) => h.strokes === 1 || h.d <= -2);
   if (feats.length > 0) {
     const rank = (h: Scored) => (h.strokes === 1 ? 3 : h.d <= -3 ? 2 : 1);
@@ -148,52 +200,63 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
       figureRole: 'identity',
       figure: best.holeNo,
       sentenceKey: 'eagle',
-      markedHoles: [best.holeNo],
+      markedHoles: [],
       feat,
       facts: { holeNo: best.holeNo, par: best.par, strokes: best.strokes, toPar, played },
     };
   }
 
-  /* 2 — IN RED. The CUMULATIVE to-par went below zero at any point. The marked
-     holes are every hole the round was under par AFTER — the stretch the story
-     is about, not a single hole. */
-  const underHoles: number[] = [];
-  let cum = 0;
-  for (const h of hs) {
-    cum += h.d;
-    if (cum < 0) underHoles.push(h.holeNo);
-  }
-  if (underHoles.length > 0) {
+  /* 2 — FINISHED IN THE RED. The round's TOTAL to-par is below zero (§2.1).
+     NOTHING IS MARKED: the claim is about the whole round. */
+  if (toPar < 0) {
     return {
-      kind: 'inRed',
-      tone: MOMENT_TONE.inRed,
-      labelKey: 'inRed',
-      figureKey: 'holes',
-      figureRole: 'quantity',
-      figure: underHoles.length,
-      sentenceKey: 'inRed',
-      markedHoles: underHoles,
-      facts: { count: underHoles.length, toPar, played },
+      kind: 'finishedInRed',
+      tone: MOMENT_TONE.finishedInRed,
+      labelKey: 'finishedInRed',
+      figureKey: null,
+      figureRole: 'score',
+      figure: toPar,
+      sentenceKey: 'finishedInRed',
+      markedHoles: [],
+      facts: { toPar, played },
     };
   }
 
-  /* 3 — THE FINISH. Birdie or better on at least two of 16, 17, 18. */
+  /* 3 — BIRDIE HAUL. A birdie is d === -1 EXACTLY (§2.3). Anything better has
+     already been taken by the eagle above. The birdie holes ARE marked: they
+     are scattered by nature and worth grouping. */
+  const birdies = hs.filter((h) => h.d === -1);
+  if (birdies.length >= BIRDIE_HAUL_MIN) {
+    return {
+      kind: 'birdieHaul',
+      tone: MOMENT_TONE.birdieHaul,
+      labelKey: 'birdieHaul',
+      figureKey: 'birdies',
+      figureRole: 'quantity',
+      figure: birdies.length,
+      sentenceKey: 'birdieHaul',
+      markedHoles: birdies.map((h) => h.holeNo),
+      facts: { count: birdies.length, toPar, played },
+    };
+  }
+
+  /* 4 — THE STRONG FINISH. Birdie or better on at least two of 16, 17, 18. */
   const closing = hs.filter((h) => h.holeNo >= 16 && h.holeNo <= 18 && h.d <= -1);
   if (closing.length >= FINISH_MIN) {
     return {
-      kind: 'finish',
-      tone: MOMENT_TONE.finish,
-      labelKey: 'finish',
+      kind: 'strongFinish',
+      tone: MOMENT_TONE.strongFinish,
+      labelKey: 'strongFinish',
       figureKey: 'inThree',
       figureRole: 'quantity',
       figure: closing.length,
-      sentenceKey: 'finish',
+      sentenceKey: 'strongFinish',
       markedHoles: closing.map((h) => h.holeNo),
       facts: { count: closing.length, toPar, played },
     };
   }
 
-  /* 4 — THE RUN. Consecutive by HOLE NUMBER, so a missing hole breaks it. */
+  /* 5 — THE RUN. Consecutive by HOLE NUMBER, so a missing hole breaks it. */
   let bestRun: Scored[] = [];
   let cur: Scored[] = [];
   for (const h of hs) {
@@ -222,7 +285,7 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
     };
   }
 
-  /* 5 — THE GRIND. Twelve or more at par or better AND no hole worse than a
+  /* 6 — THE GRIND. Twelve or more at par or better AND no hole worse than a
      bogey. NOTHING IS MARKED: the claim is about the WHOLE round, and marking
      twelve of eighteen holes would mark the card rather than a moment. */
   const parOrBetter = hs.filter((h) => h.d <= 0).length;
@@ -241,7 +304,7 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
     };
   }
 
-  /* 6 — PLAIN. The default, and the card members see most (§S1.6). */
+  /* 7 — PLAIN. The default, and the card members see most (§S1.6). */
   return plain(hs, toPar);
 }
 

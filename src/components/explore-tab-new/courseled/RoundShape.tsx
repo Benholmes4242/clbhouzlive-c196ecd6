@@ -536,11 +536,17 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
  *  (BRIEF_ROUND_TILE_THE_MOMENT v2 §S4.7 — on a tinted well a WHITE ring
  *  haloes).
  *
- *  `markTone` IS THE MOMENT'S OWN HOLES AND NOTHING ELSE (§S4.6, §S5.3): the
- *  hero names something and the card shows it, so the eye goes straight from one
- *  to the other. It reuses the SAME outer-ring geometry as a double box (2px of
- *  well then 1px of tone), so a marked hole cannot change the clear-air table. */
-function markerStyle(m: Marker | null, well: string, markTone?: string): CSSProperties {
+ *  IT TAKES NO MOMENT TONE (BRIEF_ROUND_MOMENTS_V3 §1). It used to accept
+ *  `markTone` and thread it into every branch as the outer ring, which made a
+ *  marked par byte-for-byte identical to an eagle — and on an in-red round in
+ *  the identical colour, because the in-red tone and the under-par ink are the
+ *  same string. A marked birdie read as an eagle, a marked bogey as a double,
+ *  and a marked ace drew a gold border inside a red ring.
+ *
+ *  A SCORE MARKER IS A CLOSED SHAPE AROUND THE DIGIT; A MOMENT NEVER DRAWS ONE,
+ *  IN ANY TONE, ON ANY HOLE. The moment is a RULE BENEATH the cells instead
+ *  (§4), drawn in NineRow. Do not reintroduce a tone parameter here. */
+function markerStyle(m: Marker | null, well: string): CSSProperties {
   const base: CSSProperties = {
     width: CELL,
     height: CELL,
@@ -552,25 +558,21 @@ function markerStyle(m: Marker | null, well: string, markTone?: string): CSSProp
     color: MINI_INK,
   };
   const ring = (c: string) => `0 0 0 2px ${well}, 0 0 0 3px ${c}`;
-  const outer = markTone ?? null;
   switch (m) {
     case 'ace':
-      return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: ring(outer ?? ACE_GOLD) };
+      return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: ring(ACE_GOLD) };
     case 'eagle':
-      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, boxShadow: ring(outer ?? UNDER_INK) };
+      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, boxShadow: ring(UNDER_INK) };
     case 'birdie':
-      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, ...(outer ? { boxShadow: ring(outer) } : null) };
+      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK };
     case 'bogey':
-      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}`, ...(outer ? { boxShadow: ring(outer) } : null) };
+      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}` };
     case 'double':
-      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}`, boxShadow: ring(outer ?? MINI_INK) };
+      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}`, boxShadow: ring(MINI_INK) };
     default:
-      /* PAR IS BARE INK — no ring, no box, no tint. The baseline recedes. A
-         MARKED par takes the tone ring on a round cell so the stretch reads as
-         one run. */
-      return outer
-        ? { ...base, borderRadius: 999, border: `1px solid ${outer}`, boxShadow: ring(outer) }
-        : base;
+      /* PAR IS BARE INK — no ring, no box, no tint, MARKED OR NOT. The baseline
+         recedes. */
+      return base;
   }
 }
 
@@ -599,6 +601,13 @@ function markerStyle(m: Marker | null, well: string, markTone?: string): CSSProp
    being fixed here. Do not "recover" width by widening the gap. */
 const CELL = 17;
 const GAP = 9;
+/** THE MOMENT RULE (§4): 2px of colour, 2px below the cell. CELL, the gap and
+ *  the digit are all untouched — the room comes from the space BETWEEN the two
+ *  nines, which was 4px and is now 8px, leaving 4px of clearance between the
+ *  rule and the IN nine's header line. */
+const RULE_H = 2;
+const RULE_GAP = 2;
+const NINE_GAP = 8;
 
 function nineTotals(holes: HoleShape['holes'], from: number, to: number) {
   let strokes = 0;
@@ -628,8 +637,10 @@ function NineRow({
   to: number;
   label: string;
   well: string;
-  /** The moment's OWN holes — the only holes allowed the moment tone (§S5.3). */
+  /** The moment's OWN holes. They get a RULE BENEATH the cell (§4) — never a
+   *  ring, a border or a tint on the cell itself (§S5.3). */
   marked?: ReadonlySet<number>;
+  /** The moment tone, used ONLY for that rule. */
   markTone?: string;
 }) {
   const byHole = new Map(holes.map((h) => [h.holeNo, h]));
@@ -686,6 +697,11 @@ function NineRow({
           const holeNo = from + i;
           const h = byHole.get(holeNo);
           const m = markerFor(h?.strokes ?? null, h?.par ?? null);
+          const isMarked = !!marked?.has(holeNo);
+          /* A STRETCH THAT CROSSES THE OUT / IN BOUNDARY cannot be joined: hole
+             9 and hole 10 are on different rows, so each row's rule simply ends
+             at its own edge. `holeNo < to` guarantees that. */
+          const joinsNext = isMarked && holeNo < to && !!marked?.has(holeNo + 1);
           return (
             <div
               key={holeNo}
@@ -705,7 +721,31 @@ function NineRow({
               >
                 {holeNo}
               </span>
-              <span style={markerStyle(m, well, marked?.has(holeNo) ? markTone : undefined)}>
+              <span style={{ ...markerStyle(m, well), position: 'relative' }}>
+                {/* THE MOMENT'S MARK (§4): a 2px CONTINUOUS RULE beneath the
+                    marked cells, spanning the cells AND the gaps between
+                    consecutive ones, ~2px below the cell. Not a ring, not a
+                    tint, and never a change to the digit's ink — the digit is
+                    red when and only when the hole was under par.
+                    It is drawn per cell and extended by one GAP when the NEXT
+                    hole is also marked, so a run of adjacent holes renders as
+                    ONE unbroken rule and a scattered haul renders as one rule
+                    per run of adjacent holes. It is absolutely positioned, so it
+                    never moves a cell. */}
+                {isMarked && markTone && (
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      left: 0,
+                      top: CELL + RULE_GAP,
+                      width: joinsNext ? CELL + GAP : CELL,
+                      height: RULE_H,
+                      borderRadius: 1,
+                      background: markTone,
+                    }}
+                  />
+                )}
                 {/* AN UNPLAYED HOLE IS EMPTY, never a zero: a zero would read as
                     an extraordinary score. */}
                 <span
@@ -756,15 +796,15 @@ export function MiniScorecard({
   shape: HoleShape | null;
   /** The tinted well behind the grid — the outer rings take it (§S4.7). */
   well?: string;
-  /** THE MOMENT'S HOLES (§S4.6): a ring for a single hole, every hole in the
-   *  range for a stretch. Nothing else in the grid may take a moment tone. */
+  /** THE MOMENT'S HOLES (§3): underlined with a continuous 2px rule in the
+   *  moment tone (§4). Nothing in the grid may take a moment tone on a CELL. */
   marked?: ReadonlySet<number>;
   markTone?: string;
 }) {
   const { t } = useTranslation(['courses']);
   if (!shape || shape.holes.length === 0) return null;
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: NINE_GAP }}>
       <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} well={well} marked={marked} markTone={markTone} />
       <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} well={well} marked={marked} markTone={markTone} />
     </div>

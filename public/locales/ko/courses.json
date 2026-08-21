@@ -1081,25 +1081,28 @@
           "eagle": "EAGLE",
           "ace": "ACE",
           "albatross": "ALBATROSS",
-          "inRed": "언더파",
-          "finish": "마무리",
           "run": "연속",
-          "grind": "버텨낸 라운드"
+          "grind": "버텨낸 라운드",
+          "finishedInRed": "언더파로 마감",
+          "birdieHaul": "버디 사냥",
+          "strongFinish": "강한 마무리"
         },
         "figure": {
           "hole": "{n}번 홀",
           "holes": "{n} 홀",
           "inThree": "3홀 중 {n}",
-          "inARow": "{n} 연속"
+          "inARow": "{n} 연속",
+          "birdies": "버디 {n}개"
         },
         "sentence": {
           "eagle": "파 {{1}} 홀에서 {{0}}.",
-          "inRed": "언더파에 들어섰고 {{0}}로 마쳤습니다.",
-          "finish": "마지막 세 홀에서 버디 이상, {{0}}로 마무리.",
           "run": "{{0}}번부터 {{1}}번까지 파 이상.",
           "grind": "라운드 내내 보기보다 나쁜 홀이 없었습니다.",
           "plain": "{{1}} 홀 중 {{0}} 홀을 파 이상.",
-          "noHoles": "라운드는 기록되었지만 홀별 상세는 없습니다."
+          "noHoles": "라운드는 기록되었지만 홀별 상세는 없습니다.",
+          "finishedInRed": "18홀을 언더파로 마쳤습니다.",
+          "birdieHaul": "{{1}} 홀에서 버디 {{0}}개.",
+          "strongFinish": "마지막 세 홀에서 버디 이상, {{0}}로 마무리."
         }
       }
     },

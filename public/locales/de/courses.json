@@ -1143,25 +1143,28 @@
           "eagle": "EAGLE",
           "ace": "ACE",
           "albatross": "ALBATROSS",
-          "inRed": "UNTER PAR",
-          "finish": "DER SCHLUSS",
           "run": "DIE SERIE",
-          "grind": "DIE ARBEIT"
+          "grind": "DIE ARBEIT",
+          "finishedInRed": "UNTER PAR BEENDET",
+          "birdieHaul": "BIRDIE-AUSBEUTE",
+          "strongFinish": "STARKER SCHLUSS"
         },
         "figure": {
           "hole": "LOCH {n}",
           "holes": "{n} LÖCHER",
           "inThree": "{n} VON DREI",
-          "inARow": "{n} IN FOLGE"
+          "inARow": "{n} IN FOLGE",
+          "birdies": "{n} BIRDIES"
         },
         "sentence": {
           "eagle": "Eine {{0}} auf einem Par {{1}}.",
-          "inRed": "Die Runde lag unter Par und endete bei {{0}}.",
-          "finish": "Birdie oder besser auf den Schlusslöchern, Endstand {{0}}.",
           "run": "Par oder besser von {{0}} bis {{1}}.",
           "grind": "Nichts schlechter als ein Bogey auf der ganzen Runde.",
           "plain": "{{0}} von {{1}} Löchern auf Par oder besser.",
-          "noHoles": "Eine gespielte Runde. Die Details Loch für Loch wurden nicht erfasst."
+          "noHoles": "Eine gespielte Runde. Die Details Loch für Loch wurden nicht erfasst.",
+          "finishedInRed": "Achtzehn Löcher unter Par beendet.",
+          "birdieHaul": "{{0}} Birdies auf {{1}} Löchern.",
+          "strongFinish": "Birdie oder besser auf den Schlusslöchern, Endstand {{0}}."
         }
       }
     },
