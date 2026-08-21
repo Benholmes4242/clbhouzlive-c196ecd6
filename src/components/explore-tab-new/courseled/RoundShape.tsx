@@ -151,6 +151,7 @@ export function RoundShape({
            38px band drew as an 11px flat squiggle and a -3 looked like a +14.
            1:1 units mean the band is used in full and the beads stay round. */
         viewWidth={width}
+        strokeWidth={strokeWidth}
       />,
     );
   }
@@ -331,7 +332,7 @@ export function RoundShape({
             d={d}
             fill="none"
             stroke={`url(#${gradStroke})`}
-            strokeWidth={1.8}
+            strokeWidth={strokeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
@@ -343,7 +344,7 @@ export function RoundShape({
                 d={d}
                 fill="none"
                 stroke={OVER_TONE}
-                strokeWidth={1.8}
+                strokeWidth={strokeWidth}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 vectorEffect="non-scaling-stroke"
@@ -354,7 +355,7 @@ export function RoundShape({
                 d={d}
                 fill="none"
                 stroke={UNDER_TONE}
-                strokeWidth={1.8}
+                strokeWidth={strokeWidth}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 vectorEffect="non-scaling-stroke"
@@ -366,7 +367,7 @@ export function RoundShape({
             d={d}
             fill="none"
             stroke={OVER_TONE}
-            strokeWidth={1.8}
+            strokeWidth={strokeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
