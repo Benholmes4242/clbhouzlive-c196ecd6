@@ -572,19 +572,11 @@ function NineRow({
 
   return (
     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
-      <span
-        style={{
-          width: 17,
-          flexShrink: 0,
-          fontSize: 7.5,
-          fontWeight: 700,
-          letterSpacing: '0.06em',
-          color: A.DIM,
-          paddingBottom: 2,
-        }}
-      >
-        {label}
-      </span>
+      {/* NO OUT / IN LABELS. The hole numbers above each cell already say which
+          nine it is, and the row-end total is positioned to make it obvious. The
+          label was a third statement of the same fact and the grid needed the
+          20px more than it needed the word. */}
+
 
       <div style={{ display: 'flex', flex: 1, minWidth: 0, justifyContent: 'space-between' }}>
         {Array.from({ length: to - from + 1 }, (_, i) => {
