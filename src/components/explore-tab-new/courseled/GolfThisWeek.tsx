@@ -114,6 +114,17 @@ const INK = '#0B0F14';   // scores and totals
 const MID = '#5A6673';   // secondary text
 const HAIRLINE_INK = 'rgba(11,15,20,0.12)';
 
+/* THREE CLEARLY DIFFERENT GREYS FOR THE BAND (§S4.2). A.FAINT and A.GHOST do
+   not exist on the shared ramp, so the band names them here against the same
+   ink: MUTE for the course, FAINT for the label and the unit, GHOST quieter
+   still. Four middling greys is what made the old tile look soft. */
+const BAND_MUTE = MID;
+const BAND_FAINT = '#8A929C';
+/* GHOST (#AEB6BF) is the fourth step of the ramp; nothing on the band is quiet
+   enough to need it, so it is recorded here rather than declared unused. */
+
+
+
 /* The card sits on the page rather than being drawn onto it. */
 const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 
@@ -1135,14 +1146,22 @@ export function GolfThisWeek({
     return acc;
   }, null);
 
+  /* BRIEF_BAND_TILES_REFINEMENT — the bottom line is the COURSE on every tile,
+     and anything QUALIFYING the figure (a to-par, a unit) sits beside it on the
+     figure's baseline. Colour appears only where it MEANS something: red on an
+     under-par to-par, red on a birdie count, green on a falling index. The emoji
+     marks the category; nothing else needs to. No accent bar, no tint. */
   const bandTiles: {
     key: string;
     emoji?: string;
     label: string;
     figure: string;
     tone: string;
+    /** Qualifier on the figure's baseline: a to-par or a unit. Never a course. */
+    qual?: string;
+    qualTone?: string;
     row: CircleRoundRow;
-    sub: string;
+    course: string;
   }[] = [];
 
   if (best) {
@@ -1151,9 +1170,12 @@ export function GolfThisWeek({
       emoji: '\uD83D\uDD25', // FIRE
       label: t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK'),
       figure: String(best.row.gross ?? '\u2014'),
-      tone: best.toPar < 0 ? TOPAR_RED : A.INK,
+      /* §S1.4 — the figure itself stays INK; only the to-par is coloured. */
+      tone: INK,
+      qual: bestToPar ?? undefined,
+      qualTone: best.toPar < 0 ? TOPAR_RED : BAND_MUTE,
       row: best.row,
-      sub: `${bestToPar ?? ''} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(best.row)}`.trim(),
+      course: courseNameFor(best.row),
     });
   }
   if (bestStableford) {
@@ -1162,9 +1184,11 @@ export function GolfThisWeek({
       emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
       label: t('discover.golfThisWeek.stablefordLabel', 'Best stableford'),
       figure: String(bestStableford.stableford_points),
-      tone: A.INK,
+      tone: INK,
+      qual: t('discover.golfThisWeek.stablefordUnit', 'points'),
+      qualTone: BAND_FAINT,
       row: bestStableford,
-      sub: `${t('discover.golfThisWeek.stablefordUnit', 'points')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(bestStableford)}`,
+      course: courseNameFor(bestStableford),
     });
   }
   if (mostBirdies) {
@@ -1172,10 +1196,13 @@ export function GolfThisWeek({
       key: 'birdies',
       emoji: '\uD83D\uDC26', // BIRD
       label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
+      /* A birdie count IS a count of under-par holes, so the red is literal. */
       figure: String(mostBirdies.birdies),
-      tone: A.INK,
+      tone: TOPAR_RED,
+      qual: t('discover.friendsRail.birdies', 'birdies'),
+      qualTone: BAND_FAINT,
       row: mostBirdies,
-      sub: `${t('discover.friendsRail.birdies', 'birdies')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(mostBirdies)}`,
+      course: courseNameFor(mostBirdies),
     });
   }
   if (mostImproved) {
@@ -1184,12 +1211,16 @@ export function GolfThisWeek({
       key: 'improved',
       emoji: '\uD83D\uDCAA', // FLEXED ARM
       label: t('discover.golfThisWeek.improvedLabel', 'MOST IMPROVED'),
-      figure: `\u2212${Math.abs(d).toFixed(1)}`,
+      /* A falling index IS better — the index-delta scale, with a down arrow. */
+      figure: `\u2193${Math.abs(d).toFixed(1)}`,
       tone: A.IMPROVED,
+      qual: t('discover.friendsRail.index', 'HCP'),
+      qualTone: BAND_FAINT,
       row: mostImproved,
-      sub: `${t('discover.friendsRail.index', 'HCP')} ${t('discover.golfThisWeek.at', 'at')} ${courseNameFor(mostImproved)}`,
+      course: courseNameFor(mostImproved),
     });
   }
+
 
 
 
@@ -1273,7 +1304,8 @@ export function GolfThisWeek({
           className="scrollbar-hide"
           style={{
             display: 'flex',
-            gap: 8,
+            alignItems: 'stretch',
+            gap: 9,
             overflowX: 'auto',
             marginBottom: 12,
           }}
@@ -1282,43 +1314,82 @@ export function GolfThisWeek({
             <div
               key={tile.key}
               style={{
-                ...CARD_SHELL,
+                /* §S4.3 — the card loses its border and takes a shadow. Same
+                   treatment as the round tiles: it sits on the page rather than
+                   being drawn onto it. */
+                background: A.PANEL,
+                border: 'none',
+                borderRadius: 14,
+                boxShadow: CARD_SHADOW,
+                overflow: 'hidden',
                 /* FOUR TILES DO NOT SHRINK (§3.1): the figure is the content, so
-                   the band scrolls at 320px instead. With one, two or three the
-                   basis grows and the row fills the width. */
-                flex: '1 0 148px',
-                minWidth: 148,
-                padding: '9px 10px 10px',
+                   the band scrolls at 320px instead. */
+                flex: '1 0 154px',
+                minWidth: 154,
+                padding: '11px 12px 12px',
                 fontFamily: SANS,
               }}
             >
               <div
                 style={{
-                  ...LABEL,
-                  color: A.MUTE,
+                  fontSize: 8,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: BAND_FAINT,
                   display: 'flex',
                   alignItems: 'baseline',
                   gap: 4,
                 }}
               >
-                <span style={{ lineHeight: 1 }}>{tile.emoji}</span>
+                {/* §S3.3 — 11px with lineHeight 1 keeps the emoji on the label's
+                    baseline across all four tiles. */}
+                <span style={{ fontSize: 11, lineHeight: 1 }}>{tile.emoji}</span>
                 {tile.label}
+              </div>
+
+              {/* §S1.2 — the qualifier is a PROPERTY OF THE FIGURE, so it shares
+                  the figure's baseline, 5px after it. */}
+              <div
+                style={{
+                  marginTop: 5,
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 5,
+                  minWidth: 0,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 30,
+                    fontWeight: 800,
+                    letterSpacing: '-0.05em',
+                    lineHeight: 1,
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                    color: tile.tone,
+                  }}
+                >
+                  {tile.figure}
+                </span>
+                {tile.qual ? (
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 800,
+                      lineHeight: 1,
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                      color: tile.qualTone ?? BAND_FAINT,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {tile.qual}
+                  </span>
+                ) : null}
               </div>
 
               <div
                 style={{
-                  ...NUMF,
-                  marginTop: 4,
-                  fontSize: 22,
-                  lineHeight: 1,
-                  color: tile.tone,
-                }}
-              >
-                {tile.figure}
-              </div>
-              <div
-                style={{
-                  marginTop: 8,
+                  marginTop: 9,
                   display: 'flex',
                   alignItems: 'center',
                   gap: 6,
@@ -1336,8 +1407,8 @@ export function GolfThisWeek({
                   style={{
                     minWidth: 0,
                     fontSize: 12,
-                    fontWeight: 600,
-                    color: A.BODY,
+                    fontWeight: 700,
+                    color: INK,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -1346,23 +1417,26 @@ export function GolfThisWeek({
                   {tile.row.display_name}
                 </span>
               </div>
+              {/* §S2 — the last line is the COURSE and nothing else, on every
+                  tile, one line, ellipsis, never wrapping. */}
               <div
                 style={{
                   marginTop: 5,
                   fontSize: 10.5,
                   fontWeight: 500,
-                  color: A.MUTE,
+                  color: BAND_MUTE,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                 }}
               >
-                {tile.sub}
+                {tile.course}
               </div>
             </div>
           ))}
         </div>
       )}
+
 
 
 
