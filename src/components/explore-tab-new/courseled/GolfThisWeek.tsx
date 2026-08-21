@@ -651,7 +651,7 @@ function GolfThisWeekCard({
 
         {/* THE SCORECARD — two rows of nine (§S2.4). A round with no hole data
             renders NOTHING here, not a placeholder and not reserved height. */}
-        <div style={{ marginTop: 7 }}>
+        <div style={{ marginTop: 7, marginLeft: -9, marginRight: -9 }}>
           <MiniScorecard shape={shape} />
         </div>
 
