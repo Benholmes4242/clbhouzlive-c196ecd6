@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { CSSProperties, ReactNode } from 'react';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
@@ -480,9 +481,11 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
 
 /* ===========================================================================
    THE MINI SCORECARD (BRIEF_ROUND_TILE_MINI_SCORECARD) — the Clubhouse card's
-   grid at rail scale: two rows of nine, hole numbers above each cell, the nine's
-   total and to-par right. No OUT / IN labels (BRIEF_SCORECARD_WIDTH) — the width
-   went to the cells instead.
+   grid at rail scale: two rows of nine, hole numbers above each cell, and per
+   nine a HEADER LINE carrying the label left and the nine's total + to-par right
+   (BRIEF_MINI_SCORECARD_NINE_HEADER), ported from CardScorecardSheet. The cells
+   own their row outright, which is where their width came from.
+
 
    PAR IS NOT PRINTED. The MARKER is the par statement — circle birdie, box
    bogey, double box double-or-worse — so a par row would be the same fact
@@ -545,10 +548,12 @@ function markerStyle(m: Marker | null): CSSProperties {
   }
 }
 
-/** 15px cells: the smallest width where a TWO-DIGIT score (a 10 on a par 3
- *  happens) still fits inside a circle without touching it — the figure is
- *  10px with -0.04em tracking and the cell never grows to accommodate it. */
-const CELL = 15;
+/** 17px cells (BRIEF_MINI_SCORECARD_NINE_HEADER §S1.2/§S1.4). The totals moved
+ *  off the marker row onto the nine header, so the cells take the FULL inner
+ *  width and grew instead of shrinking: nine 17px markers across a 252px block
+ *  leave 12.4px between adjacent cell edges, which clears the double box's 3px
+ *  outboard ring on both sides with 6.4px of air. */
+const CELL = 17;
 
 function nineTotals(holes: HoleShape['holes'], from: number, to: number) {
   let strokes = 0;
@@ -568,10 +573,12 @@ function NineRow({
   holes,
   from,
   to,
+  label,
 }: {
   holes: HoleShape['holes'];
   from: number;
   to: number;
+  label: string;
 }) {
   const byHole = new Map(holes.map((h) => [h.holeNo, h]));
   const totals = nineTotals(holes, from, to);
@@ -579,14 +586,55 @@ function NineRow({
     totals == null ? '' : totals.toPar === 0 ? 'E' : totals.toPar > 0 ? `+${totals.toPar}` : `\u2212${Math.abs(totals.toPar)}`;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
-      {/* NO OUT / IN LABELS. The hole numbers above each cell already say which
-          nine it is, and the row-end total is positioned to make it obvious. The
-          label was a third statement of the same fact and the grid needed the
-          20px more than it needed the word. */}
+    <div>
+      {/* THE NINE HEADER — PORTED from CardScorecardSheet's totals line
+          (BRIEF_MINI_SCORECARD_NINE_HEADER §S1.5): the caps label left, the
+          nine's gross and its to-par right, on their own line above the cells.
+          Same object at two sizes — the sheet's 8px LABEL caps and right-aligned
+          NUM figures, scaled to the tile.
 
+          OUT and IN sit on their own line with the nine total, as the Clubhouse
+          scorecard does. They were removed once to buy horizontal space; that was
+          wrong — the TOTALS were what overflowed the row, not the labels. */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 6,
+          marginBottom: 2,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 8,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: A.MUTE,
+          }}
+        >
+          {label}
+        </span>
+        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
+          <span style={{ fontSize: 10.5, fontWeight: 700, color: A.INK, ...FIGS }}>
+            {totals?.strokes ?? ''}
+          </span>
+          <span
+            style={{
+              fontSize: 8.5,
+              fontWeight: 700,
+              color: totals && totals.toPar < 0 ? TOPAR_RED : A.DIM,
+              ...FIGS,
+            }}
+          >
+            {rel}
+          </span>
+        </span>
+      </div>
 
-      <div style={{ display: 'flex', flex: 1, minWidth: 0, justifyContent: 'space-between' }}>
+      {/* THE CELLS TAKE THE FULL INNER WIDTH — nothing shares their row now. */}
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         {Array.from({ length: to - from + 1 }, (_, i) => {
           const holeNo = from + i;
           const h = byHole.get(holeNo);
@@ -611,9 +659,9 @@ function NineRow({
                     letterSpacing: '-0.04em',
                     /* CENTRED, NOT NEARLY (§S2) — lineHeight 1 collapses the
                        digit's line box to the glyph so the flex centring of the
-                       fixed 15x15 marker actually lands. The 0.5px translate is
-                       the OPTICAL correction: tabular lining numerals sit above
-                       the geometric centre of their box, so mathematical centre
+                       fixed marker actually lands. The 0.5px translate is the
+                       OPTICAL correction: tabular lining numerals sit above the
+                       geometric centre of their box, so mathematical centre
                        reads high. Deliberate, not a fudge. */
                     lineHeight: 1,
                     transform: 'translateY(0.5px)',
@@ -628,30 +676,6 @@ function NineRow({
           );
         })}
       </div>
-
-      <span
-        style={{
-          flexShrink: 0,
-          display: 'inline-flex',
-          alignItems: 'baseline',
-          gap: 3,
-          paddingBottom: 1,
-        }}
-      >
-        <span style={{ fontSize: 10.5, fontWeight: 700, color: A.INK, ...FIGS }}>
-          {totals?.strokes ?? ''}
-        </span>
-        <span
-          style={{
-            fontSize: 8.5,
-            fontWeight: 700,
-            color: totals && totals.toPar < 0 ? TOPAR_RED : A.DIM,
-            ...FIGS,
-          }}
-        >
-          {rel}
-        </span>
-      </span>
     </div>
   );
 }
@@ -662,11 +686,12 @@ function NineRow({
  * placeholder and no reserved height.
  */
 export function MiniScorecard({ shape }: { shape: HoleShape | null }) {
+  const { t } = useTranslation(['courses']);
   if (!shape || shape.holes.length === 0) return null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-      <NineRow holes={shape.holes} from={1} to={9} />
-      <NineRow holes={shape.holes} from={10} to={18} />
+      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} />
+      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} />
     </div>
   );
 }

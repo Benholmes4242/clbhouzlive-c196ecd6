@@ -210,26 +210,37 @@ export function GolfThisWeekRail() {
                 <Bar style={{ height: 22, width: 22, borderRadius: '34%' }} />
                 <TextBar w={92} h={11} />
               </div>
-              {/* Trajectory 40 (SHAPE_H), then the MINI SCORECARD: two rows of
-                  nine 15px cells with a 7.5px hole number above each and a 5px
-                  row gap. The birdie/par/bogey strip is GONE from the live tile
-                  (BRIEF_ROUND_TILE_MINI_SCORECARD §S3.1) so it is gone here. */}
+              {/* Trajectory 40 (SHAPE_H), then the MINI SCORECARD: per nine a
+                  header line (OUT / IN left, nine total right) above nine 17px
+                  cells with a 7.5px hole number above each, 5px row gap
+                  (BRIEF_MINI_SCORECARD_NINE_HEADER). The birdie/par/bogey strip
+                  is GONE from the live tile so it is gone here. */}
               <div style={{ marginTop: 6, marginLeft: -11, marginRight: -11 }}>
                 <Bar style={{ borderRadius: 0, height: 40, width: '100%' }} />
               </div>
               <div style={{ marginTop: 7, display: 'flex', flexDirection: 'column', gap: 5 }}>
                 {[0, 1].map((r) => (
-                  <div key={r} style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
-                    <Bar style={{ height: 8, width: 17, flexShrink: 0 }} />
-                    <div style={{ display: 'flex', flex: 1, minWidth: 0, justifyContent: 'space-between' }}>
+                  <div key={r}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: 2,
+                      }}
+                    >
+                      <Bar style={{ height: 8, width: 17 }} />
+                      <Bar style={{ height: 9, width: 26 }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       {Array.from({ length: 9 }, (_, c) => (
-                        <Bar key={c} style={{ height: 25, width: 13, borderRadius: 2 }} />
+                        <Bar key={c} style={{ height: 27, width: 15, borderRadius: 2 }} />
                       ))}
                     </div>
-                    <Bar style={{ height: 10, width: 26, flexShrink: 0 }} />
                   </div>
                 ))}
               </div>
+
 
               <div style={{ marginTop: 4, height: 15, display: 'flex', alignItems: 'flex-end' }}>
                 <TextBar w={'88%'} h={10} />
