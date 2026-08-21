@@ -460,7 +460,9 @@ function GolfThisWeekCard({
       }}
       style={{
         ...CARD_SHELL,
-        border: `1px solid ${A.BORDER}`,
+        /* THE CARD LOSES ITS BORDER AND TAKES A SHADOW (§S1.5). */
+        border: 'none',
+        boxShadow: CARD_SHADOW,
         width: CARD_W,
         /* §S4.5 / ACCEPTANCE K vs G — the brief asks BOTH for no reserved height
            when there is no hole data AND for a uniform rail. Those cannot both
