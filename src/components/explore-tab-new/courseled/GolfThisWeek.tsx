@@ -114,6 +114,15 @@ const INK = '#0B0F14';   // scores and totals
 const MID = '#5A6673';   // secondary text
 const HAIRLINE_INK = 'rgba(11,15,20,0.12)';
 
+/* THREE CLEARLY DIFFERENT GREYS FOR THE BAND (§S4.2). A.FAINT and A.GHOST do
+   not exist on the shared ramp, so the band names them here against the same
+   ink: MUTE for the course, FAINT for the label and the unit, GHOST quieter
+   still. Four middling greys is what made the old tile look soft. */
+const BAND_MUTE = MID;
+const BAND_FAINT = '#8A929C';
+const BAND_GHOST = '#AEB6BF';
+
+
 /* The card sits on the page rather than being drawn onto it. */
 const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 
