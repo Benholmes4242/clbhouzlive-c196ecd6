@@ -413,17 +413,29 @@ export function MostPlayedLeaderboard({
         </Eyebrow>
       )}
 
-      <div style={{ ...CARD_SHELL, padding: '4px 14px', fontFamily: SANS }}>
-        {shown.map((r, i) => {
+      <div style={{ fontFamily: SANS }}>
+        {shown.map((r) => {
           const m = meta?.get(r.courseId);
           const name = m?.name ?? r.courseName ?? t('discover.unknownCourse', 'Course');
           const open = openId === r.courseId;
           const toggle = () => setOpenId(open ? null : r.courseId);
           return (
+            /* CORRECTION_MOST_PLAYED_COURSE_HEADERS §S1 — ONE CARD PER COURSE,
+               10px apart, NOT four rows divided inside one panel. Each course is
+               its own board with its own expansion, and an object that opens and
+               closes independently should be its own object (§S1.2). The
+               dividers BETWEEN courses are gone; the gap separates them (§S1.4).
+               The 14px horizontal padding stays on the card so the expanded
+               board's `margin: 0 -14px` bleed lands exactly where it did. */
             <div
               key={r.courseId}
               style={{
-                borderBottom: i === shown.length - 1 ? 'none' : `1px solid ${A.BORDER}`,
+                background: A.PANEL,
+                borderRadius: 16,
+                overflow: 'hidden',
+                boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
+                marginBottom: 10,
+                padding: '0 14px',
               }}
             >
               {/* NO BUTTON INSIDE A BUTTON (§S2.8). The row is a div carrying
@@ -473,51 +485,83 @@ export function MostPlayedLeaderboard({
                       display: '-webkit-box',
                       WebkitBoxOrient: 'vertical',
                       WebkitLineClamp: 2,
-                      fontSize: 13.5,
+                      fontSize: 14,
                       fontWeight: 700,
                       color: A.INK,
-                      letterSpacing: '-0.015em',
+                      letterSpacing: '-0.02em',
                       lineHeight: 1.2,
                       overflow: 'hidden',
                     }}
                   >
                     {name}
                   </span>
-                  {/* §S1.4 — THE META LINE: region, then the round count,
-                      then the movement marker. "KENT · 11 ROUNDS · ▲6". The
-                      count is CONTEXT HERE, NOT A SCORE — that is the whole
-                      point of moving it off the right-hand figure. */}
+                  {/* §S1.4 / CORRECTION §S2 — THE META LINE IS THREE THINGS,
+                      NOT ONE STRING: region caption, a dot, the round count,
+                      then the movement marker.
+
+                      RECORDED (§S2.2): "The round count is A.MID and the region
+                      is A.FAINT on the same line, on purpose. One is a fact and
+                      one is a caption." Rendering both in the same dim grey is
+                      why the count sat weakly under the course name. */}
                   <span
                     style={{
-                      ...LABEL,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 5,
-                      fontSize: 9,
-                      color: A.DIM,
                       marginTop: 4,
                       minWidth: 0,
                       fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
                   >
+                    {m?.region && (
+                      <>
+                        <span
+                          style={{
+                            ...LABEL,
+                            fontSize: 9.5,
+                            letterSpacing: '0.13em',
+                            textTransform: 'uppercase',
+                            color: FAINT,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            minWidth: 0,
+                          }}
+                        >
+                          {m.region}
+                        </span>
+                        <span
+                          aria-hidden
+                          style={{
+                            flex: 'none',
+                            width: 2.5,
+                            height: 2.5,
+                            borderRadius: '50%',
+                            background: GHOST,
+                            margin: '0 7px',
+                          }}
+                        />
+                      </>
+                    )}
+                    {/* §S4.2 — A PLURAL RULE, NEVER A CONCATENATION: i18next
+                        count pluralisation, so "1 round" / "11 rounds" and
+                        every language's own rule both work. */}
                     <span
                       style={{
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        minWidth: 0,
+                        ...NUMF,
+                        flex: 'none',
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        lineHeight: 1,
+                        color: MID,
+                        marginRight: 7,
                       }}
                     >
-                      {m?.region ? `${m.region} \u00B7 ` : ''}
-                      {/* §S4.2 — A PLURAL RULE, NEVER A CONCATENATION: i18next
-                          count pluralisation, so "1 round" / "11 rounds" and
-                          every language's own rule both work. */}
                       {t('discover.mostPlayedRoundCount', '{{count}} round', {
                         count: r.count,
                       })}
                     </span>
-                    {/* §S1.6 — THE MOVEMENT MARKER KEEPS ITS EXISTING TONES. It
-                        is the one genuinely comparative thing on the header. */}
+                    {/* §S1.6 / §S2.3 — THE MOVEMENT MARKER KEEPS ITS EXISTING
+                        TONES: green on a rise, amber on NEW, ghost on LEVEL. */}
                     <MoveMark row={r} t={t} />
                   </span>
                 </span>
@@ -534,7 +578,8 @@ export function MostPlayedLeaderboard({
                         display: 'block',
                         fontSize: 19,
                         fontWeight: 800,
-                        letterSpacing: '-0.03em',
+                        // CORRECTION §S3.2 — -0.04em (found at -0.03em).
+                        letterSpacing: '-0.04em',
                         lineHeight: 1,
                         color: INK,
                       }}
@@ -546,6 +591,7 @@ export function MostPlayedLeaderboard({
                         ...LABEL,
                         display: 'block',
                         fontSize: 8,
+                        letterSpacing: '0.14em',
                         color: FAINT,
                         marginTop: 4,
                       }}
@@ -556,20 +602,24 @@ export function MostPlayedLeaderboard({
                 )}
                 {/* WITHOUT IT NOTHING SAYS THE ROW OPENS (§S2.2). */}
                 <ChevronDown
-                  size={14}
+                  size={15}
                   strokeWidth={2.4}
                   aria-hidden
                   style={{
                     flexShrink: 0,
-                    color: A.DIM,
+                    // CORRECTION §S3.4 — GHOST, and it sits after played-to.
+                    color: GHOST,
                     transform: open ? 'rotate(180deg)' : 'none',
                     transition: 'transform 160ms ease',
                   }}
                 />
               </div>
+              {open && <div style={{ height: 1, margin: '0 -14px', background: A.BORDER }} />}
 
               {/* §S3.2 — THE COLLAPSED ROW IS JUST THE HEADER: thumbnail, name,
                   meta line, played-to, chevron. Shorter than what shipped. */}
+              {/* §S1.5 — the divider between a header and ITS OWN expanded
+                  board stays: that one is inside a single object. */}
               {open && (
                 <MemberBoard
                   row={r}
