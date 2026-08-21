@@ -554,6 +554,7 @@ export function HeroBoardSection({
       {closedFigure && picksOpen && (
         <PicksPanel
           picks={picks}
+          tourCode={pickTourCode}
           phase={phase}
           boardByPlayer={boardByPlayer}
           predictions={predictions ?? null}
