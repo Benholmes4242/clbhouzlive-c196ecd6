@@ -47,6 +47,14 @@ interface Props {
   /** TRUE while the rounds aggregate has not settled — shell holds the slot. */
   isPending?: boolean;
   onRowPress: (row: MostPlayedRow) => void;
+  /**
+   * A TAP ON A PLAYER'S ROW OPENS THAT ROUND'S SCORECARD. The row carries the
+   * score id of the exact round the board is showing (their best at this course
+   * this week), so the sheet and the board can never disagree. The FACE still
+   * opens the member's profile (§S2.7) — a board row is about the round, an
+   * avatar is about the person. Omitted, the row falls back to the profile.
+   */
+  onPlayerPress?: (player: MostPlayedPlayer) => void;
   onSeeAll?: () => void;
   showEyebrow?: boolean;
 }
@@ -199,11 +207,14 @@ function MemberBoard({
   row,
   viewerId,
   onOpenMember,
+  onOpenRound,
   onSeeAllAtCourse,
 }: {
   row: MostPlayedRow;
   viewerId: string | null;
   onOpenMember: (userId: string) => void;
+  /** Opens the scorecard bottom sheet for that player's round. */
+  onOpenRound: (player: MostPlayedPlayer) => void;
   onSeeAllAtCourse: () => void;
 }) {
   const { t } = useTranslation('courses');
@@ -219,7 +230,20 @@ function MemberBoard({
         return (
           <div
             key={p.userId}
+            /* THE WHOLE ROW OPENS THE SCORECARD. Not a <button>: the face inside
+               is a real button and a button inside a button is invalid HTML —
+               WebKit commonly never delivers the inner tap. */
+            role="button"
+            tabIndex={0}
+            onClick={() => onOpenRound(p)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault();
+                onOpenRound(p);
+              }
+            }}
             style={{
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: 9,
@@ -247,21 +271,14 @@ function MemberBoard({
               {formatNumber(p.position)}
             </span>
             <MemberFace player={p} size={24} onOpen={onOpenMember} />
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenMember(p.userId);
-              }}
+            {/* THE NAME IS NOT ITS OWN CONTROL ANY MORE: the row it sits in
+                opens the scorecard, and the face beside it opens the profile.
+                Two different destinations from one line of text was the fault. */}
+            <div
               style={{
                 // ALL REMAINING SPACE (§S2.3).
                 flex: 1,
                 minWidth: 0,
-                border: 'none',
-                background: 'transparent',
-                padding: 0,
-                textAlign: 'left',
-                cursor: 'pointer',
                 fontFamily: SANS,
               }}
             >
@@ -301,7 +318,7 @@ function MemberBoard({
                   {p.homeClub}
                 </span>
               )}
-            </button>
+            </div>
             {/* §S2.5 — THE TO-PAR: 12px, A.MID, RED WHEN UNDER PAR, in the SAME
                 token as the mini scorecard and the superlative band. */}
             <span
@@ -367,6 +384,7 @@ export function MostPlayedLeaderboard({
   limit = 5,
   isPending = false,
   onRowPress,
+  onPlayerPress,
   onSeeAll,
   showEyebrow = true,
 }: Props) {
@@ -386,6 +404,13 @@ export function MostPlayedLeaderboard({
   const thumbPending = shown.length > 0 && metaQuery.isPending;
 
   const openMember = (userId: string) => navigate(`/profile/${userId}`);
+
+  /* NO SCORE ID (an untracked round, or one the read could not resolve) FALLS
+     BACK TO THE PROFILE rather than opening an empty sheet. */
+  const openRound = (p: MostPlayedPlayer) => {
+    if (p.scoreId && onPlayerPress) onPlayerPress(p);
+    else openMember(p.userId);
+  };
 
   if (isPending) return <MostPlayedPanelShell />;
   if (shown.length === 0) return null;
@@ -624,6 +649,7 @@ export function MostPlayedLeaderboard({
                   row={r}
                   viewerId={viewerId}
                   onOpenMember={openMember}
+                  onOpenRound={openRound}
                   onSeeAllAtCourse={() => onRowPress(r)}
                 />
               )}
