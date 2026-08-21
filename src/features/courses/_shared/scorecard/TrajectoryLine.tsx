@@ -414,7 +414,7 @@ export const TrajectoryLine: React.FC<Props> = ({
           d={d}
           fill="none"
           stroke={`url(#${gradStroke})`}
-          strokeWidth={1.8}
+          strokeWidth={strokeWidth}
           strokeLinejoin="round"
           strokeLinecap="round"
         />
