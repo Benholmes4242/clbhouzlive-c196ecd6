@@ -137,25 +137,55 @@ function StatCell({
 interface HeroBoardSectionProps {
   tournamentId: string;
   entries: any[];
-  /** Active round — REQUIRED. TODAY is meaningless without it. */
-  currentRound: number;
+  /**
+   * Active round. NULL on an upcoming (or completed) slide, where the band
+   * exists only to carry the picks row — TODAY is meaningless without it.
+   */
+  currentRound: number | null;
+  /**
+   * The lifecycle phase of the slide, read off the hero carousel's own
+   * `slide.type` (§2). NO NEW QUERY: the pulse hook would be one, and the
+   * carousel already knows.
+   */
+  phase: 'live' | 'upcoming' | 'completed';
   onFullLeaderboard: () => void;
   onRowTap?: (playerId: string) => void;
+  /** §3 — the mandatory route out of the open picks panel. */
+  onFullPicks?: () => void;
 }
 
 export function HeroBoardSection({
   tournamentId,
   entries,
   currentRound,
+  phase,
   onFullLeaderboard,
   onRowTap,
+  onFullPicks,
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
   const [shapeOpen, setShapeOpen] = useState(false);
-  const shape = useCourseShapeRows(tournamentId, currentRound);
+  const [picksOpen, setPicksOpen] = useState(false);
 
-  const field = useMemo(() => fieldAverageToday(entries as any, currentRound), [entries, currentRound]);
-  const low = useMemo(() => lowRoundToday(entries as any, currentRound), [entries, currentRound]);
+  /**
+   * §1 — THE BOARD HALF OF THE BAND IS CONDITIONAL. With no entries there are
+   * no rows, no full-leaderboard row, no stat strip and no course shape, and
+   * nothing reserves height for them. The picks row is then the only content.
+   */
+  const hasBoard = currentRound != null && entries.length > 0;
+
+  /* Passing an empty id keeps the hole-averages query DISABLED on a slide with
+     no board, so widening the gate costs zero requests. */
+  const shape = useCourseShapeRows(hasBoard ? tournamentId : '', currentRound ?? 1);
+
+  const field = useMemo(
+    () => (hasBoard ? fieldAverageToday(entries as any, currentRound as number) : null),
+    [entries, currentRound, hasBoard],
+  );
+  const low = useMemo(
+    () => (hasBoard ? lowRoundToday(entries as any, currentRound as number) : null),
+    [entries, currentRound, hasBoard],
+  );
 
   /**
    * Tournament Intelligence picks. NO NEW QUERY — the overview already makes
