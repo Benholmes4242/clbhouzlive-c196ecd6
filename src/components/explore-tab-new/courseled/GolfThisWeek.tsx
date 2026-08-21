@@ -86,11 +86,11 @@ const CARD_W = 256;
 /** §S2.1 — the gradient hero. */
 const HERO_H = 156;
 
-/* THE GRID REGION. 88px is what two nines need at the settled 17px cell / 9px
-   gap geometry (two nine-headers, two hole-number rows, two marker rows and the
-   4px gap between the nines). IT IS FIXED, so every well is the same height even
+/* THE GRID REGION. 96px, not 88: at 88 the two marker rows and their outer
+   rings did not fit the region and the bottom row's circles and boxes were
+   clipped by the card. IT IS FIXED, so every well is the same height even
    when a round has no hole data and the well is empty (§S1.7, ACCEPTANCE K). */
-const GRID_H = 88;
+const GRID_H = 96;
 
 /* §S4.1 — A TINTED WELL, NO BORDER. The tone separates it from the card and an
    outline would be a second signal for one edge. The marker outer rings trace
