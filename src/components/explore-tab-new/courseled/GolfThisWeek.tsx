@@ -369,16 +369,19 @@ function GolfThisWeekCard({
 }: CardProps) {
   const { t } = useTranslation('courses');
   const toPar = toParFor(row);
+  /* §S2.4 — the sign, from the same two fields toParFor reads. */
+  const toParUnder =
+    row.gross != null && row.course_par != null && row.gross - row.course_par < 0;
   /* §6.3 — the ONLY marker on this section, and only for these two feats. */
   const legendary = (row.holes_in_one ?? 0) > 0 || (row.albatrosses ?? 0) > 0;
-  /* §1.3 / §7 — THIS round's index movement. delta_index is stored and has never
-     been shown; improved is GREEN and drifted RED because a movement's axis is
-     direction of travel, not golf quality. Exactly zero is a real answer and
-     renders with no colour claim. */
+  /* §S2.5 / §S2.6 — THIS round's index movement, on the glass chip. A fall is
+     green and a rise is red because a movement's axis is direction of travel;
+     the ARROW is what distinguishes it from the to-par figure beside it. Below
+     the 0.05 floor there is no movement and no hairline. */
   const delta = row.delta_index;
-  const hasDelta = delta != null && Number.isFinite(delta);
-  const deltaZero = hasDelta && Math.abs(delta as number) < 0.05;
-  const deltaTone = deltaZero ? A.MUTE : (delta as number) < 0 ? A.IMPROVED : A.DRIFTED;
+  const hasMovement =
+    delta != null && Number.isFinite(delta) && Math.abs(delta as number) >= 0.05;
+
 
   return (
     /* NOT A <button> (§S1.1): FollowButton is a real button and a button inside
