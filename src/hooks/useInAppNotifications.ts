@@ -165,7 +165,7 @@ export function useInAppNotifications() {
           );
         },
       )
-      // Personal-recipient notification inserts → refresh badges
+      // Personal-recipient notification inserts → refresh badges AND the post
       .on(
         'postgres_changes',
         {
@@ -174,10 +174,13 @@ export function useInAppNotifications() {
           table: 'notifications',
           filter: `user_id=eq.${user.id}`,
         },
-        () => invalidateUnread(),
+        (payload) => {
+          invalidateUnread();
+          refreshNotifiedPost(payload.new);
+        },
       );
 
-    // Business-recipient notification inserts (shared inbox) → refresh badges
+    // Business-recipient notification inserts (shared inbox) → same two halves
     if (businessActorIds.length > 0) {
       channel.on(
         'postgres_changes',
@@ -187,9 +190,13 @@ export function useInAppNotifications() {
           table: 'notifications',
           filter: `recipient_actor_id=in.(${businessActorIds.join(',')})`,
         },
-        () => invalidateUnread(),
+        (payload) => {
+          invalidateUnread();
+          refreshNotifiedPost(payload.new);
+        },
       );
     }
+
 
     channel.subscribe();
     subscriptionRef.current = channel;
