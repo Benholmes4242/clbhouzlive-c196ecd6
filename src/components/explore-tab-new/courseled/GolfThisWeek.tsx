@@ -855,17 +855,21 @@ function GolfThisWeekCard({
           )}
         </div>
 
-        {/* ===================== THE WELL (§S2.2, §S4.4) =====================
-            ALL FOUR CHARTS RENDER IN THE SAME WELL AT THE SAME HEIGHT. A rail
-            where the frames differ reads as broken; a rail where the CONTENTS
-            differ reads as alive. */}
+        {/* ===================== THE SCORECARD WELL (§S4) =====================
+            A TINTED WELL, #F2F5F8, radius 12, NO BORDER (§S4.1) — the tone
+            separates it from the card and an outline would be a second signal
+            for one edge. ITS HEIGHT IS FIXED whatever it holds, so an empty well
+            keeps the rail level (ACCEPTANCE K, Q). */}
         <div
           style={{
             marginTop: 8,
             marginLeft: -10,
             marginRight: -10,
+            height: WELL_H,
+            background: WELL,
             borderRadius: WELL_RADIUS,
-            padding: `0 ${WELL_PAD_X}px`,
+            padding: `6px ${WELL_PAD_X}px 8px`,
+            boxSizing: 'border-box',
           }}
         >
           <div
@@ -879,10 +883,10 @@ function GolfThisWeekCard({
             }}
           >
             <span style={{ ...LABEL, fontSize: 8, color: '#9AA5B1' }}>
-              {copy.chartLabel}
+              {t('discover.golfThisWeek.moment.theCard', 'The card')}
             </span>
-            {/* THE TAP AFFORDANCE, ON EVERY TREATMENT (§S4.4). A hero card with
-                a hidden scorecard is a card nobody taps. */}
+            {/* THE TAP AFFORDANCE, ON EVERY CARD (§S4.2). A hero with a hidden
+                scorecard is a card nobody taps. */}
             <span
               style={{
                 ...LABEL,
@@ -900,18 +904,20 @@ function GolfThisWeekCard({
 
           <div
             style={{
-              height: CHART_H,
+              height: GRID_H,
               marginTop: 7,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
             }}
           >
-            {/* A ROUND WITH NO HOLE DATA RENDERS AN EMPTY WELL (§S1.5, F) — the
-                height is held so the rail stays level. */}
-            <ShapeReveal>{chart}</ShapeReveal>
+            {/* A ROUND WITH NO HOLE DATA RENDERS AN EMPTY WELL (§S1.7, Q) — the
+                height is held so the rail stays level, and there is no
+                placeholder grid. */}
+            <ShapeReveal>{grid}</ShapeReveal>
           </div>
         </div>
+
       </div>
     </div>
   );
