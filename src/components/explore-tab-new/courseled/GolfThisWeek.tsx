@@ -90,7 +90,7 @@ const HERO_H = 156;
    rings did not fit the region and the bottom row's circles and boxes were
    clipped by the card. IT IS FIXED, so every well is the same height even
    when a round has no hole data and the well is empty (§S1.7, ACCEPTANCE K). */
-const GRID_H = 96;
+const GRID_H = 100;
 
 /* §S4.1 — A TINTED WELL, NO BORDER. The tone separates it from the card and an
    outline would be a second signal for one edge. The marker outer rings trace
@@ -136,8 +136,8 @@ const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
  * tile instead of stopping 10px short. EVERY KIND LANDS ON IT because the grid
  * region is fixed, INCLUDING a round with NO HOLE DATA (§S1.7, ACCEPTANCE Q).
  */
-const WELL_H = 135;
-const CARD_MIN_H = 327;
+const WELL_H = 139;
+const CARD_MIN_H = 331;
 
 /** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
