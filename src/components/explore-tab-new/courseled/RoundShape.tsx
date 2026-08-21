@@ -31,12 +31,35 @@ const FILL_UNDER_LIGHT = '#EFC6C3'; // went under par
 const FILL_OVER_LIGHT = '#DEE1E6'; // stayed over par
 
 
+/**
+ * THE FOUR BUCKETS (BRIEF_FRIENDS_TILE_SHAPE_AND_BUCKETS §4). Derived by
+ * DIFFERENCING the cumulative series the curve is already drawn from — one
+ * client-side pass over data the tile has fetched, NO new query — and coloured
+ * from RAMP_TOPAR, the shared red/grey four-bucket distribution ramp. NOT the
+ * blue SC_BOGEY / SC_DOUBLE scale, which belongs to the Stableford card.
+ */
+const BUCKET_ORDER = ['birdie', 'par', 'bogey', 'double'] as const;
+type BucketKey = (typeof BUCKET_ORDER)[number];
+
+function bucketsFor(series: number[]): Record<BucketKey, number> {
+  const out: Record<BucketKey, number> = { birdie: 0, par: 0, bogey: 0, double: 0 };
+  for (let i = 0; i + 1 < series.length; i += 1) {
+    const d = series[i + 1] - series[i];
+    if (d <= -1) out.birdie += 1;
+    else if (d === 0) out.par += 1;
+    else if (d === 1) out.bogey += 1;
+    else out.double += 1;
+  }
+  return out;
+}
+
 export function RoundShape({
   row,
   shape,
   width = 224,
   height = 60,
   showMeta = true,
+  showBaseline = true,
 }: {
   row: CircleRoundRow;
   shape: HoleShape | null;
@@ -44,8 +67,15 @@ export function RoundShape({
   width?: number;
   /** Band height. Rail tile 60; sheet row 22. */
   height?: number;
-  /** The birdie meta row. Rail only — the sheet row has no space for it. */
+  /** The meta row (bar + bucket counts) and the to-par figure. Rail only. */
   showMeta?: boolean;
+  /**
+   * The dashed level-par rule (§2). Default TRUE. The hole-series path renders
+   * TrajectoryLine, which has drawn this rule unconditionally since
+   * BRIEF_SCORECARD_TRAJECTORY_WHOOP; the flag governs the three-point fallback,
+   * where the rule was computed to clip the fill and never drawn.
+   */
+  showBaseline?: boolean;
 }) {
   const front = row.front_nine_to_par;
   const back = row.back_nine_to_par;
