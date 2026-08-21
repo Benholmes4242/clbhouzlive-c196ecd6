@@ -16,9 +16,20 @@
  * STRAIGHT bottom edge — the page canvas breathes below it, it does not tuck
  * under a radius.
  *
- * There is NO collapse control on the board: on a live slide it is always on;
- * on a results or upcoming slide it renders nothing at all (no placeholder, no
- * reserved height). The COURSE SHAPE panel is the only thing that opens.
+ * COLLAPSE CONTROLS (BRIEF_HERO_PICKS_ROW §0a — this OVERTURNS the previous
+ * rule in both halves, which read: "There is NO collapse control on the board:
+ * on a live slide it is always on; on a results or upcoming slide it renders
+ * nothing at all. The COURSE SHAPE panel is the only thing that opens."):
+ *   - TWO panels now open — COURSE SHAPE and OUR PICKS. The original objection
+ *     stands and is not violated: a vertical scroller under a horizontal pager
+ *     is still forbidden, and this adds one 37px collapsed row opening to a
+ *     FIXED three-row panel that never scrolls internally.
+ *   - The band now renders on UPCOMING slides too, because that is the phase
+ *     where the picks are most worth reading. With no board there are no rows,
+ *     no full-leaderboard row, no stat strip and no course shape — and NO
+ *     placeholder or reserved height for any of them (§1). §0b is NOT
+ *     overturned: the band being a section rather than a card is exactly what
+ *     lets it render at its own height here.
  *
  * Six rows, fixed, never internally scrollable — a vertical scroller under a
  * horizontal pager is a gesture trap. The full-leaderboard row is the route to
@@ -30,9 +41,10 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
-import { FONT, HERO_BOARD_SURFACE, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { FONT, HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
-import { useAIPredictions } from '../../../hooks/useAIPredictions';
+import { ClbhouzPickMark } from '../../../_shared/ClbhouzPickMark';
+import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
 import { CourseShapePanel, useCourseShapeRows } from './CourseShapePanel';
 import {
   fieldAverageToday,
