@@ -31,7 +31,6 @@ export const INSIGHT_LINE_HEIGHT = 1.3;
  * carries the dead band the two-line reserve left under the short states.
  */
 export const INSIGHT_LINE_RESERVE = INSIGHT_FONT_SIZE * INSIGHT_LINE_HEIGHT;
-/** Back-compat alias — same one-line reserve. */
 
 /**
  * Single-line clamp. A BACKSTOP, NOT THE FIX: the strings are short enough to
