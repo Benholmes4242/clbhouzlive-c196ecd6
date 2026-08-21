@@ -148,9 +148,25 @@ export function FriendsRail() {
 export function GolfThisWeekRail() {
   return (
     <section>
-      <EyebrowBar w={132} aside />
-      <div style={{ height: 15, display: 'flex', alignItems: 'center', padding: '0 2px', marginBottom: 10 }}>
+      {/* No heading. This section leads the page, directly under the chrome
+          island, and its pills state its scope more clearly than a title would.
+          Every section below it keeps the glyph-and-heading treatment. */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 8,
+          /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
+             gives 16px of clearance everywhere. */
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
+          marginBottom: 12,
+          minWidth: 0,
+        }}
+      >
         <Bar style={{ height: 9, width: 118 }} />
+        <Bar style={{ height: 34, width: 100, borderRadius: 999 }} />
       </div>
       <div style={{ display: 'flex', gap: 8, padding: '2px 0 14px' }}>
         {[64, 74, 60, 56].map((w, i) => (
