@@ -120,26 +120,12 @@ export function RoundShape({
     <>
       <div style={{ position: 'relative' }}>
         {plot}
-        {/* §3 THE TO-PAR FIGURE ON THE BAND. It repeats the glass chip's value
-            deliberately: the chip belongs to the photograph, this belongs to the
-            shape. Body-surface tones, never the glass ones. */}
-        {showMeta && figure && (
-          <span
-            style={{
-              position: 'absolute',
-              top: 4,
-              right: 8,
-              fontSize: 10.5,
-              fontWeight: 700,
-              lineHeight: 1,
-              ...FIGS,
-              color: figureDelta < 0 ? TOPAR_RED : figureDelta > 0 ? A.MUTE : A.DIM,
-            }}
-          >
-            {figure.text}
-          </span>
-        )}
+        {/* NO TO-PAR LABEL ON THE BAND (BRIEF_ROUND_TILE_GLASS_CHIP §S1.1). It
+            restated the score chip's own figure and competed for the top-right
+            corner with an over-par curve's endpoint. The chip on the photograph
+            is the single statement of the round's to-par. */}
       </div>
+
       {showMeta && buckets && <BucketBar buckets={buckets} />}
       {showMeta && shape && <ShapeMeta buckets={buckets} />}
     </>
