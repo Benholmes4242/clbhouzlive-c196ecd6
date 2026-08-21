@@ -93,9 +93,10 @@ const SHAPE_H = 40;
  * TILE HEIGHT FLOOR. Measured on a tile with the full grid: photograph 92,
  * member row, 40px trajectory, two nines of 15px cells with their hole numbers,
  * insight line, 9px padding. Holds the rail level when a round has no hole data
- * and therefore prints no grid at all.
+ * and therefore prints no grid at all. 264 = the 258 grid state + the 6px the
+ * grid→insight gap grew (MICRO_BRIEF_SCORECARD_COLOUR_AND_ALIGNMENT §S3).
  */
-const CARD_MIN_H = 258;
+const CARD_MIN_H = 264;
 
 
 
