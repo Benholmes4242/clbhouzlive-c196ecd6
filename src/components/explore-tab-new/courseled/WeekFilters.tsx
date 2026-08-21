@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { MapPin } from 'lucide-react';
+import { ChevronDown, MapPin } from 'lucide-react';
 
 import {
   Select,
@@ -159,24 +159,37 @@ export function RegionDropdown({
       >
         {/* A QUIET INLINE CONTROL, NOT A FIELD (§S1.3): no border, no
             background, no padding box. And NO COUNT (§S1.2) — the readout to
-            its left already states how many rounds are rendered; the counts
-            belong on the list rows, before the tap, where they inform the
-            choice. Pin, label and chevron share one baseline (§S1.1). */}
+            its left already states how many rounds are rendered.
+
+            WHY THE FIRST ATTEMPT DID NOT LAND (CORRECTION §S1.4): shadcn's
+            SelectTrigger base class carries TWO rules that beat a child's own
+            styles —
+              justify-between   pushed its built-in chevron to the far right,
+                                detached from the label; and
+              [&>span]:line-clamp-1  sets the direct child span to
+                                -webkit-box, which OVERRODE our flex and stacked
+                                the pin above the label.
+            So the fix is not a wrapper: the base chevron is HIDDEN
+            ([&>svg]:hidden), justify-start replaces justify-between, and the
+            inner span is forced back to flex. Pin, label and chevron are then
+            three children of ONE inline flex line, 4px apart, sharing a
+            baseline — no absolute positioning, no marginLeft auto. */}
         <SelectTrigger
-          className="h-auto w-auto gap-1 border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:h-[13px] [&>svg]:w-[13px] [&>svg]:opacity-100 [&>svg]:text-[color:var(--week-chev)]"
-          style={{ color: A.INK, fontFamily: SANS, ['--week-chev' as string]: A.DIM } as React.CSSProperties}
+          className="inline-flex h-auto w-auto justify-start gap-0 whitespace-nowrap border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
+          style={{ color: A.INK, fontFamily: SANS, padding: '4px 0' }}
           aria-label={t('discover.week.selectRegionA11y', 'Filter rounds by area')}
         >
-          <span className="flex min-w-0 items-center gap-1">
-            <MapPin size={12} strokeWidth={2} style={{ color: A.INK, flex: 'none' }} />
+          <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
+            <MapPin size={12} strokeWidth={2.4} style={{ color: A.INK, flex: 'none' }} />
             <span
-              className="truncate"
               style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}
             >
               {triggerLabel}
             </span>
+            <ChevronDown size={13} strokeWidth={2.4} style={{ color: A.DIM, flex: 'none' }} />
           </span>
         </SelectTrigger>
+
 
 
         <SelectContent className="bg-card border-border z-50 max-h-[60vh] rounded-sq-sm shadow-lg">
