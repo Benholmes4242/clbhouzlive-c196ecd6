@@ -14,7 +14,6 @@ import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHa
 import { LazySection } from '../overview-v3/LazySection';
 
 import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
-import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
 import { StatWatchSlot } from '../overview-v3/StatWatchSlot';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
