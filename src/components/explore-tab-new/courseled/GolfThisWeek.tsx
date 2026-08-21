@@ -94,9 +94,11 @@ const PHOTO_H = 76;
    §S2.2); the hole grid beneath it carries the detail 60px used to have to. */
 const SHAPE_H = 40;
 
-/* THE WELL (§S1). Tint far enough from the #FFFFFF card that the tone separates
-   it and an outline is REDUNDANT — the border is DELETED, not softened. */
-const WELL = '#EEF2F5';
+/* NO TINT. The trajectory and the scorecard sit on the WHITE card surface —
+   the grouping is spacing and the single hairline, nothing else. WELL stays as
+   the colour the marker outer rings trace against, and that colour is the card
+   itself, so the double/eagle ring reads as a gap rather than a grey halo. */
+const WELL = '#FFFFFF';
 const WELL_RADIUS = 12;
 const WELL_PAD_TOP = 8;
 /* 6, not the reference's 10 — see WELL_INNER. */
@@ -688,7 +690,7 @@ function GolfThisWeekCard({
         </div>
 
         {/* =====================================================================
-            ONE WELL, NO BORDER (§S1.1–§S1.4). The trajectory and the scorecard
+            ONE BLOCK, NO BORDER AND NO FILL. The trajectory and the scorecard
             were two framed objects; they are now one tinted object, and that is
             where most of the height comes back. The well bleeds to the card
             edges so the scorecard gets its measured 244px inner width.
@@ -700,7 +702,6 @@ function GolfThisWeekCard({
             marginTop: 8,
             marginLeft: -10,
             marginRight: -10,
-            background: WELL,
             borderRadius: WELL_RADIUS,
             padding: `${WELL_PAD_TOP}px ${WELL_PAD_X}px ${WELL_PAD_BOTTOM}px`,
           }}
@@ -735,7 +736,7 @@ function GolfThisWeekCard({
 
           {/* THE SCORECARD. A round with no hole data renders NOTHING here, not a
               placeholder and not reserved height — the card's minHeight holds the
-              rail level instead. The outer rings take the WELL colour (§S3.6). */}
+              rail level instead. The outer rings trace against the card white. */}
           <MiniScorecard shape={shape} well={WELL} />
         </div>
 

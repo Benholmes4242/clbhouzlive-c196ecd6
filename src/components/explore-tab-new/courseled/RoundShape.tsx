@@ -509,8 +509,9 @@ const MINI_GHOST = '#C8D0D8';
 const ACE_GOLD = '#C99700';
 const UNDER_INK = '#C8102E';
 
-/** The well the grid sits in (§S3.6) — default is the tile's well tint. */
-export const MINI_WELL = '#EEF2F5';
+/** The surface the grid sits on. NO TINT: it is the white card, and the marker
+ *  outer rings trace against exactly that, so a ring reads as clear air. */
+export const MINI_WELL = '#FFFFFF';
 
 /** §S1.3 — the Clubhouse card's own key, not a second vocabulary. */
 type Marker = 'ace' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double';
@@ -530,8 +531,8 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
 /** THE DOUBLE RING IS A BOX-SHADOW: it paints outside the border box without
  *  occupying layout, so a double never shifts its neighbours.
  *
- *  THE OUTER RING TAKES THE WELL COLOUR, NEVER WHITE (§S3.6): the grid sits on
- *  a tinted well now and a white separator ring would halo around the marker. */
+ *  THE OUTER RING TAKES THE SURFACE COLOUR the grid sits on, so it never haloes:
+ *  pass the card or sheet background in, never a fixed grey. */
 function markerStyle(m: Marker | null, well: string): CSSProperties {
   const base: CSSProperties = {
     width: CELL,
@@ -690,18 +691,26 @@ function NineRow({
                     an extraordinary score. */}
                 <span
                   style={{
+                    /* ABSOLUTE CENTRING INSIDE THE SHAPE: the digit is its own
+                       flex-centred box filling the marker's inner area, so the
+                       circle or the box centres the figure — NOT a nudge. The
+                       0.5px translate is DELETED: that offset is what pushed
+                       every figure towards the bottom of its shape. The trailing
+                       letter-space is given back with textIndent so a two-digit
+                       figure stays centred rather than drifting left. */
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: '-0.04em',
-                    /* lineHeight 1 collapses the digit's line box to the glyph so
-                       the flex centring of the fixed marker lands; the 0.5px
-                       translate is the OPTICAL correction, since tabular lining
-                       numerals sit above the geometric centre of their box. */
+                    textIndent: '0.04em',
                     lineHeight: 1,
-                    transform: 'translateY(0.5px)',
-                    display: 'block',
                     ...FIGS,
                   }}
+
                 >
                   {h?.strokes ?? ''}
                 </span>
