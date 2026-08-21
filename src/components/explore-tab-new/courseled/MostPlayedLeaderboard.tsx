@@ -540,17 +540,20 @@ export function MostPlayedLeaderboard({
                       treatment the leader chips on this same page took in
                       BRIEF_BAND_TILE_TYPE_SCALE. Two sections on one page
                       agreeing beats each solving one problem differently.
-                      REGION CASING IS WHATEVER golf_courses.region STORES, and
-                      that is NOT uniformly sentence case — the earlier claim
-                      here ("verified sentence case at source") was wrong: with
-                      no transform the page renders KENT, so the stored value is
-                      "KENT". THERE IS STILL NO textTransform HERE, and that is
-                      deliberate (BRIEF_DISCOVER_FINISHING_PASS §4): a
-                      toLowerCase or a titleCase helper breaks "Isle of Man",
-                      "Co. Down", "North Rhine-Westphalia" and every accented
-                      form, and would have to be repeated on every surface that
-                      renders a region. THE FIX BELONGS IN THE DATA, as a
-                      hand-written normalisation of the upper-case values. */}
+                      CORRECTION_REGION_CASING — THE DATA WAS NEVER WRONG.
+                      golf_courses.region is sentence case throughout ("Kent",
+                      "Baden-Württemberg", "Angus & Dundee"); the only upper-case
+                      country value is "USA", an acronym. The page rendered KENT
+                      because this span SPREAD LABEL, and LABEL carries
+                      textTransform: 'uppercase'. Every other LABEL property was
+                      already overridden here, so the spread bought nothing and
+                      silently supplied the one property nobody wanted.
+                      THEREFORE THIS SPAN DECLARES ITS OWN TYPE and deliberately
+                      does not spread LABEL: adding textTransform: 'none' on top
+                      would leave a shared token cancelled property by property,
+                      and the next property added to LABEL would leak in here the
+                      same way. LABEL itself is unchanged — uppercase is right
+                      for genuine labels; a place name is not a label. */}
                   <span
                     style={{
                       display: 'flex',
@@ -564,16 +567,15 @@ export function MostPlayedLeaderboard({
                       <>
                         <span
                           style={{
-                            ...LABEL,
                             fontSize: 11,
                             fontWeight: 700,
-                            letterSpacing: 0,
                             color: A.INK,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
                             minWidth: 0,
                           }}
+
 
                         >
                           {m.region}
