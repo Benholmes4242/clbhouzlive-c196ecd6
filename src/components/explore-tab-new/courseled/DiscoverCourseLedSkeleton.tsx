@@ -694,6 +694,10 @@ export default function DiscoverCourseLedSkeleton() {
         <GolfThisWeekRail />
       </div>
 
+      {/* THE LIVE PAGE ENDS ON A FLAT 28 (BRIEF_DISCOVER_ORDER_AND_LABELS): the
+          rounds section carries marginBottom 28 and ExploreTabContent's column
+          runs on gap 28, with the old 10px first group and the videos rail's
+          +16px correction both removed. So this flat 28 already matches. */}
       <div
         style={{
           padding: '0 14px',
@@ -703,6 +707,7 @@ export default function DiscoverCourseLedSkeleton() {
           gap: 28,
         }}
       >
+
 
 
         {/* MomentsMosaic is NO LONGER REACHED FROM DISCOVER
