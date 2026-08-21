@@ -149,27 +149,54 @@ function ShapeReveal({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * §2.2 — a REAL follow button, the highest-value tap on the page, and the ONLY
- * <button> inside the tile (the tile itself is a role="button" div, because a
- * button nested in a button is invalid HTML and WebKit swallows the inner tap).
+ * §S3 — THREE STATES, ONE OF THEM EMPTY:
  *
- * IT HOLDS NO STATE, exactly like FeedFollowPill in the Clubhouse card: the
- * truth is the cached following-id set, so optimism survives a remount and
- * every tile for the same member flips together.
+ *   not followed   FOLLOW            ink pill
+ *   just tapped    FOLLOWING + tick  ~1.2s, then removed
+ *   followed       NOTHING AT ALL    no pill, no placeholder, no gap
+ *
+ * THIS OVERTURNS THE PERSISTENT "FOLLOWING" PILL specified in
+ * BRIEF_GOLF_THIS_WEEK_FOLLOW:
+ *   "A persistent FOLLOWING pill is a LABEL PRETENDING TO BE A CONTROL. On
+ *    Your Circle it appeared on every tile, saying what the pill row had
+ *    already said. The button now exists only where there is something to do."
+ *
+ * THERE IS NO WAY TO UNFOLLOW FROM THIS SURFACE, and that is deliberate. The
+ * profile page owns unfollowing — a rail tile is a glance, not an account
+ * control, and an accidental unfollow here would be silent and unrecoverable.
+ *
+ * IT HOLDS NO FOLLOW STATE: the truth is the cached following-id set, so
+ * optimism survives a remount and every tile for the same member flips
+ * together. The only local state is the ~1.2s confirmation, which is a
+ * transient acknowledgement of THIS tap and nothing more.
  */
 function FollowButton({
   targetUserId,
   isFollowed,
   viewerUserId,
+  align,
 }: {
   targetUserId: string;
   isFollowed: boolean;
   viewerUserId: string | undefined;
+  /** Where the control sits on the score row when it renders at all. */
+  align: 'auto' | 'gap';
 }) {
   const { t } = useTranslation('courses');
   const queryClient = useQueryClient();
   const { activeActor } = useActiveActor();
   const toggle = useToggleFollow();
+  /* THE CONFIRMATION (§S3.4). Not decoration: without it the button vanishes on
+     tap with no acknowledgement, which reads as a mis-tap. */
+  const [confirming, setConfirming] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+
 
   /* THE VIEWER IS THE AUTH USER ID, not a field on the actor. ActiveActor has
      no `userId` — reading it always yielded undefined and useToggleFollow threw
