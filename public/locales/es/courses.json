@@ -1078,7 +1078,15 @@
       "countAces_one": "{{count}} hoyo en uno",
       "countAces_other": "{{count}} hoyos en uno",
       "countAlbatrosses_one": "{{count}} albatros",
-      "countAlbatrosses_other": "{{count}} albatros"
+      "countAlbatrosses_other": "{{count}} albatros",
+      "yards": "YARDAS",
+      "holeAndPar": "{{hole}} · Par {{par}}",
+      "sublineAces_one": "{{count}} ace",
+      "sublineAces_other": "{{count}} aces",
+      "sublineAlbatrosses_one": "{{count}} albatros",
+      "sublineAlbatrosses_other": "{{count}} albatros",
+      "sublineBoth": "{{aces}} y {{albatrosses}}, en toda la historia. Un ace se cita habitualmente en 12.500 a 1.",
+      "sublineOne": "{{feats}}, en toda la historia. Un ace se cita habitualmente en 12.500 a 1."
     },
     "feat": {
       "group": {
