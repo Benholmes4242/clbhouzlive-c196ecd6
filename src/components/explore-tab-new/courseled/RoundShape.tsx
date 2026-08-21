@@ -1,9 +1,11 @@
+import type { ReactNode } from 'react';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
-import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
+import { toParFor } from '../friendRoundParts';
 import { A } from './tokens';
 
 /**
@@ -30,12 +32,41 @@ const FILL_UNDER_LIGHT = '#EFC6C3'; // went under par
 const FILL_OVER_LIGHT = '#DEE1E6'; // stayed over par
 
 
+/**
+ * THE FOUR BUCKETS (BRIEF_FRIENDS_TILE_SHAPE_AND_BUCKETS §4). Derived by
+ * DIFFERENCING the cumulative series the curve is already drawn from — one
+ * client-side pass over data the tile has fetched, NO new query — and coloured
+ * from RAMP_TOPAR, the shared red/grey four-bucket distribution ramp. NOT the
+ * blue SC_BOGEY / SC_DOUBLE scale, which belongs to the Stableford card.
+ */
+const BUCKET_ORDER = ['birdie', 'par', 'bogey', 'double'] as const;
+type BucketKey = (typeof BUCKET_ORDER)[number];
+const BUCKET_LABEL: Record<BucketKey, string> = {
+  birdie: 'BIRDIE+',
+  par: 'PAR',
+  bogey: 'BOGEY',
+  double: 'DOUBLE+',
+};
+
+function bucketsFor(series: number[]): Record<BucketKey, number> {
+  const out: Record<BucketKey, number> = { birdie: 0, par: 0, bogey: 0, double: 0 };
+  for (let i = 0; i + 1 < series.length; i += 1) {
+    const d = series[i + 1] - series[i];
+    if (d <= -1) out.birdie += 1;
+    else if (d === 0) out.par += 1;
+    else if (d === 1) out.bogey += 1;
+    else out.double += 1;
+  }
+  return out;
+}
+
 export function RoundShape({
   row,
   shape,
   width = 224,
   height = 60,
   showMeta = true,
+  showBaseline = true,
 }: {
   row: CircleRoundRow;
   shape: HoleShape | null;
@@ -43,8 +74,15 @@ export function RoundShape({
   width?: number;
   /** Band height. Rail tile 60; sheet row 22. */
   height?: number;
-  /** The birdie meta row. Rail only — the sheet row has no space for it. */
+  /** The meta row (bar + bucket counts) and the to-par figure. Rail only. */
   showMeta?: boolean;
+  /**
+   * The dashed level-par rule (§2). Default TRUE. The hole-series path renders
+   * TrajectoryLine, which has drawn this rule unconditionally since
+   * BRIEF_SCORECARD_TRAJECTORY_WHOOP; the flag governs the three-point fallback,
+   * where the rule was computed to clip the fill and never drawn.
+   */
+  showBaseline?: boolean;
 }) {
   const front = row.front_nine_to_par;
   const back = row.back_nine_to_par;
@@ -52,13 +90,11 @@ export function RoundShape({
   let values: number[] | null = null;
   let beads: ShapeBead[] = [];
   let holesPlayed: number | null = null;
-  let birdies = 0;
 
   if (shape) {
     values = shape.series;
     beads = shape.beads;
     holesPlayed = shape.played;
-    birdies = shape.birdies;
   } else if (
     front != null &&
     back != null &&
@@ -70,30 +106,67 @@ export function RoundShape({
 
   if (!values || values.length < 2) return null;
 
+  /* THE BUCKETS AND THE CHROME ARE SHARED BY BOTH PATHS. A tile with no hole
+     data (the three-point fallback) gets NEITHER the bar NOR the count line —
+     there is nothing to count — so its meta row stays exactly as today. */
+  const buckets = shape ? bucketsFor(shape.series) : null;
+  const figure = toParFor(row);
+  /* The figure's SIGN, from the same two fields toParFor reads, so the tone and
+     the text can never disagree. */
+  const figureDelta =
+    row.gross != null && row.course_par != null ? row.gross - row.course_par : 0;
+
+  const withChrome = (plot: ReactNode) => (
+    <>
+      <div style={{ position: 'relative' }}>
+        {plot}
+        {/* §3 THE TO-PAR FIGURE ON THE BAND. It repeats the glass chip's value
+            deliberately: the chip belongs to the photograph, this belongs to the
+            shape. Body-surface tones, never the glass ones. */}
+        {showMeta && figure && (
+          <span
+            style={{
+              position: 'absolute',
+              top: 4,
+              right: 8,
+              fontSize: 10.5,
+              fontWeight: 700,
+              lineHeight: 1,
+              ...FIGS,
+              color: figureDelta < 0 ? TOPAR_RED : figureDelta > 0 ? A.MUTE : A.DIM,
+            }}
+          >
+            {figure.text}
+          </span>
+        )}
+      </div>
+      {showMeta && buckets && <BucketBar buckets={buckets} />}
+      {showMeta && shape && <ShapeMeta buckets={buckets} />}
+    </>
+  );
+
   /* ONE CHART, THREE SURFACES. When the hole-by-hole data is present the tile
      renders THE SAME TrajectoryLine the Clubhouse scorecard post and the
      scorecard sheet render — same grades, same solid fill, same bead filter,
      same 1.8px stroke and no halo — instead of a look-alike maintained here.
      Ticks are suppressed: the band carries its own meta row. */
   if (shape) {
-    return (
-      <>
-        <TrajectoryLine
-          holes={shape.holes}
-          height={height}
-          surface="light"
-          showTicks={false}
-          padY={1}
-          /* THE VIEWBOX MATCHES THE COLUMN (CORRECTION_SHEET_TRACE_HEIGHT §4):
-             at 96px wide a 340-wide viewBox scaled the whole chart to 28%, so a
-             38px band drew as an 11px flat squiggle and a -3 looked like a +14.
-             1:1 units mean the band is used in full and the beads stay round. */
-          viewWidth={width}
-        />
-        {showMeta && <ShapeMeta birdies={birdies} />}
-      </>
+    return withChrome(
+      <TrajectoryLine
+        holes={shape.holes}
+        height={height}
+        surface="light"
+        showTicks={false}
+        padY={1}
+        /* THE VIEWBOX MATCHES THE COLUMN (CORRECTION_SHEET_TRACE_HEIGHT §4):
+           at 96px wide a 340-wide viewBox scaled the whole chart to 28%, so a
+           38px band drew as an 11px flat squiggle and a -3 looked like a +14.
+           1:1 units mean the band is used in full and the beads stay round. */
+        viewWidth={width}
+      />,
     );
   }
+
 
 
   // A round that never went under par gets NO red treatment. The cumulative
@@ -121,6 +194,11 @@ export function RoundShape({
   // MORE OVER PAR IS HIGHER: the larger value maps to the SMALLER y.
   const yFor = (v: number) => bottom - ((v - lo) / span) * (bottom - top);
   const zeroY = wentUnder ? yFor(0) : 0;
+  /* §2 THE LEVEL-PAR RULE'S y. ONE derivation, reused — the clip uses zeroY and
+     the rule uses this, both out of yFor(0). The cumulative series starts at 0
+     by construction, so zero is ALWAYS inside the domain; the clamp is a guard,
+     not a live case. */
+  const baselineY = Math.min(height - 0.5, Math.max(0.5, yFor(0)));
 
   const innerW = width - SHAPE_PAD_X * 2;
   const pts = values.map((v, i) => ({
@@ -180,8 +258,7 @@ export function RoundShape({
 
 
 
-  return (
-    <>
+  return withChrome(
       <svg
         width="100%"
         height={height}
@@ -229,23 +306,27 @@ export function RoundShape({
             <g clipPath={`url(#${clipBelow})`}>
               <path d={fillD} fill={FILL_UNDER_LIGHT} />
             </g>
-
-            {/* THE LEVEL-PAR RULE. Without it the red has nothing to be under.
-                The only gridline on the tile. */}
-            <line
-              x1={0}
-              x2={width}
-              y1={zeroY}
-              y2={zeroY}
-              stroke={A.DIM}
-              strokeOpacity={0.7}
-              strokeWidth={1}
-              strokeDasharray="2 3"
-              vectorEffect="non-scaling-stroke"
-            />
           </>
         ) : (
           <path d={fillD} fill={FILL_OVER_LIGHT} />
+        )}
+
+        {/* §2 THE LEVEL-PAR RULE, NOW UNCONDITIONAL. The curve's whole colour
+            rule is "below this line red, above it ink"; on a round that never
+            went under there is no red at all, so without the rule the drawing
+            has no reference point. Behind the stroke and behind the beads —
+            never the top layer. */}
+        {showBaseline && (
+          <line
+            x1={0}
+            x2={width}
+            y1={baselineY}
+            y2={baselineY}
+            stroke={A.HAIRLINE}
+            strokeWidth={1}
+            strokeDasharray="3 3"
+            vectorEffect="non-scaling-stroke"
+          />
         )}
 
         {/* No halo. It existed so a 2.4px stroke read on top of a graduated
@@ -328,30 +409,82 @@ export function RoundShape({
             The curve simply ends, exactly as it does on the scorecard sheet.
             If hole 18 earned a bead, beadForScore already drew one above. */}
 
-      </svg>
-
-      {showMeta && holesPlayed != null && <ShapeMeta birdies={birdies} />}
-    </>
+      </svg>,
   );
 }
 
-/** Birdie count under the curve — now suppressed (WHO'S PLAYING no longer shows
- * the "X birdies" text). The structural div is retained so the row height and
- * padding stay unchanged for neighbouring tiles. */
-function ShapeMeta({ birdies }: { birdies: number }) {
+/** §4.2 THE DISTRIBUTION BAR. Sits directly under the band with a 7px gap,
+ *  5px tall, bucket order birdie+ / par / bogey / double+, widths proportional
+ *  to the counts, 1.5px gutters, and NO zero-width slivers. */
+function BucketBar({ buckets }: { buckets: Record<BucketKey, number> }) {
+  const live = BUCKET_ORDER.filter((k) => buckets[k] > 0);
+  const total = live.reduce((s, k) => s + buckets[k], 0);
+  if (total <= 0) return null;
+  return (
+    <div style={{ padding: '7px 11px 0' }}>
+      <div style={{ display: 'flex', gap: 1.5, height: 5 }}>
+        {live.map((k) => (
+          <div
+            key={k}
+            style={{
+              flexGrow: buckets[k],
+              flexBasis: 0,
+              background: RAMP_TOPAR[k],
+              borderRadius: 3,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * THE META ROW carries the four-bucket count line (§4.3). It replaced the
+ * suppressed "X birdies" text, spending exactly the height that div was already
+ * holding open — which is why this addition costs the card almost nothing.
+ * A zero count takes A.DIM rather than its bucket colour: nothing happened.
+ */
+function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
   return (
     <div
       style={{
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'baseline',
         justifyContent: 'space-between',
         gap: 8,
-        padding: '0 11px',
+        padding: '4px 11px 0',
         fontSize: 10,
         fontWeight: 700,
         letterSpacing: '0.02em',
       }}
-    />
+    >
+      {buckets &&
+        BUCKET_ORDER.map((k) => (
+          <span key={k} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
+            <span
+              style={{
+                fontSize: 7.5,
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                color: A.DIM,
+              }}
+            >
+              {BUCKET_LABEL[k]}
+            </span>
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 700,
+                ...FIGS,
+                color: buckets[k] > 0 ? RAMP_TOPAR[k] : A.DIM,
+              }}
+            >
+              {buckets[k]}
+            </span>
+          </span>
+        ))}
+    </div>
   );
 }
 

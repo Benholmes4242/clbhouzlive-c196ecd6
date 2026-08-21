@@ -31,8 +31,6 @@ export const INSIGHT_LINE_HEIGHT = 1.3;
  * carries the dead band the two-line reserve left under the short states.
  */
 export const INSIGHT_LINE_RESERVE = INSIGHT_FONT_SIZE * INSIGHT_LINE_HEIGHT;
-/** Back-compat alias — same one-line reserve. */
-export const INSIGHT_TWO_LINE_RESERVE = INSIGHT_LINE_RESERVE;
 
 /**
  * Single-line clamp. A BACKSTOP, NOT THE FIX: the strings are short enough to
@@ -181,7 +179,7 @@ export function referenceLine(
 
   if (best_here != null && gross <= best_here) {
     return t('discover.friendsRail.bestHere', {
-      defaultValue: 'Their best here, of {{count}} rounds',
+      defaultValue: 'Their best of {{count}} here',
       count: rounds_here,
     });
   }
@@ -192,18 +190,18 @@ export function referenceLine(
       const figure = Math.abs(d).toFixed(1);
       return d > 0
         ? t('discover.friendsRail.betterThanAvg', {
-            defaultValue: '{{figure}} better than their average here',
+            defaultValue: '{{figure}} better than average',
             figure,
           })
         : t('discover.friendsRail.worseThanAvg', {
-            defaultValue: '{{figure}} worse than their average here',
+            defaultValue: '{{figure}} worse than average',
             figure,
           });
     }
     /* THE FOURTH STATE. Within a shot of their own average is not a difference
        worth a figure, but it IS worth saying — a round landing on a member's own
        par is the interesting thing. NO FIGURE, or the raised threshold is undone. */
-    return t('discover.friendsRail.onAvg', { defaultValue: 'Right on their average here' });
+    return t('discover.friendsRail.onAvg', { defaultValue: 'Right on their average' });
   }
 
   /* STATE 5 STAYS REACHABLE: no history at this course, so no claim to make. */
@@ -355,7 +353,7 @@ function candidatesFor(row: CircleRoundRow, t: T): RoundInsight[] {
     row.gross <= row.best_here
   ) {
     push('best_here', t('discover.friendsRail.bestHere', {
-      defaultValue: 'Their best here, of {{count}} rounds',
+      defaultValue: 'Their best of {{count}} here',
       count: row.rounds_here,
     }));
   }
@@ -408,11 +406,11 @@ function candidatesFor(row: CircleRoundRow, t: T): RoundInsight[] {
         'vs_avg',
         d > 0
           ? t('discover.friendsRail.betterThanAvg', {
-              defaultValue: '{{figure}} better than their average here',
+              defaultValue: '{{figure}} better than average',
               figure,
             })
           : t('discover.friendsRail.worseThanAvg', {
-              defaultValue: '{{figure}} worse than their average here',
+              defaultValue: '{{figure}} worse than average',
               figure,
             }),
       );

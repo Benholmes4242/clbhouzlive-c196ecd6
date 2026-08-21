@@ -73,7 +73,11 @@ import { A, CARD_SHELL, Eyebrow, GOLD, InkAction, KICKER, LABEL, NUMF, SANS } fr
    line still at one consistent height across the rail. */
 const CARD_W = 236;
 const PHOTO_H = 92;
-const SHAPE_H = 48;
+/* SHAPE_H 60 — the shared renderer's own documented default
+   (BRIEF_FRIENDS_TILE_SHAPE_AND_BUCKETS §1). At 48/52 a plus-eight round and a
+   level round drew nearly the same flat line: 60 is the smallest height where a
+   two-shot swing is legible. Do NOT reduce it again. */
+const SHAPE_H = 60;
 
 /** The rail scrim of record — imported, never retyped. */
 const CARD_SCRIM = SCRIM_STANDOUT;
@@ -468,10 +472,14 @@ function GolfThisWeekCard({
           </span>
         </div>
 
-        {/* THE SHAPE — the friends rail's band, same height, full bleed (§4.1). */}
+        {/* THE SHAPE — the friends rail's band, same height, full bleed (§4.1).
+            showMeta TRUE: this tile is the surviving rounds tile after the Your
+            Circle / Golf this week merge, so it carries the band's to-par figure,
+            the four-bucket bar and the count row. The 96x22 sheet trace still
+            passes showMeta={false} and that gate is what excludes it. */}
         <div style={{ marginTop: 6, marginLeft: -11, marginRight: -11 }}>
           <ShapeReveal>
-            <RoundShape row={row} shape={shape} width={CARD_W} height={SHAPE_H} showMeta={false} />
+            <RoundShape row={row} shape={shape} width={CARD_W} height={SHAPE_H} />
           </ShapeReveal>
         </div>
 

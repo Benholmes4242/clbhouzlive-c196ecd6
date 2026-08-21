@@ -195,7 +195,15 @@ export function GolfThisWeekRail() {
                 <TextBar w={92} h={11} />
               </div>
               <div style={{ marginTop: 6, marginLeft: -11, marginRight: -11 }}>
-                <Bar style={{ borderRadius: 0, height: 48, width: '100%' }} />
+                <Bar style={{ borderRadius: 0, height: 60, width: '100%' }} />
+                <div style={{ padding: '7px 11px 0' }}>
+                  <Bar style={{ height: 5, width: '100%', borderRadius: 3 }} />
+                </div>
+                <div style={{ padding: '4px 11px 0', height: 13, display: 'flex', gap: 8, justifyContent: 'space-between' }}>
+                  {[30, 22, 26, 32].map((w) => (
+                    <Bar key={w} style={{ height: 9, width: w }} />
+                  ))}
+                </div>
               </div>
               <div style={{ marginTop: 4, height: 15, display: 'flex', alignItems: 'flex-end' }}>
                 <TextBar w={'88%'} h={10} />

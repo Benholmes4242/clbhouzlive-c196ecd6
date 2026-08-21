@@ -58,7 +58,11 @@ import { A, FIGS, CARD_SHELL, Eyebrow, GOLD, InkAction, NUMF, SANS } from './tok
 export const RAIL_CAP = 10;
 const CARD_W = 224;
 const PHOTO_H = 90;
-const SHAPE_H = 52;
+/* SHAPE_H 60, the shared renderer's own documented default. At 52 (introduced
+   alongside the PHOTO_H 104->90 condense) a plus-eight round and a level round
+   drew nearly the same flat line: 60 is the smallest height where a two-shot
+   swing is legible. Do NOT reduce it again. */
+const SHAPE_H = 60;
 
 /* Rail scrim — THE STANDOUT-TILE SCRIM. The three-layer base/hotspot/top stack
    is gone: this rail now paints the same single bottom-weighted layer as the
