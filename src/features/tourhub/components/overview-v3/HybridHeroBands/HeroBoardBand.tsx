@@ -208,7 +208,7 @@ export function HeroBoardSection({
    */
   const { viewingTournamentId } = useTourSelection();
   const picksTid = viewingTournamentId ?? tournamentId;
-  const { data: predictions } = useAIPredictions(picksTid);
+  const { data: predictions } = useAIPredictions(null);
   const pickPlayerIds = useMemo(() => {
     const ids = new Set<string>();
     for (const p of (predictions?.topContenders ?? []) as any[]) {
