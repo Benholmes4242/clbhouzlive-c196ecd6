@@ -970,16 +970,16 @@ function GolfThisWeekCard({
             unchanged (ACCEPTANCE G). */}
         <div style={{ padding: '8px 10px 8px', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+          {/* §2.5 — THE RING COMES BACK ON DARK. hideRing was right on white,
+              where the avatar's own edge read against the card; over a scrimmed
+              photograph a dark avatar dissolves into the scrim. The canonical
+              DARK_HAIRLINE (white @ 22%) traces it at 0.5px — the same ring
+              every avatar on a dark surface carries. */}
           <SquircleAvatar
             src={row.profile_photo_url}
             userId={row.user_id}
             alt={row.display_name}
             size={19}
-            /* §2.5 — THE RING COMES BACK ON DARK. hideRing was right on white,
-               where the avatar's own edge reads against the card; over a
-               scrimmed photograph a dark avatar dissolves into the scrim. The
-               canonical DARK_HAIRLINE (white @ 22%) traces it at 0.5px, which is
-               the same ring every avatar on a dark surface carries. */
             hairlineRing
             ringColor={DARK_HAIRLINE}
           />
