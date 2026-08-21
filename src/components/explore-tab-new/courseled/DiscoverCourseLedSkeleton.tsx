@@ -15,8 +15,8 @@ import { CARD_SHELL } from './tokens';
  * not read off the JSX and added up:
  *   rounds rail    merged Golf this week: heading + scope pills + band + tiles
  *   around world   masonry, six photo heights + 62 body
- *   moments        two 220 blocks + a trailing 109 shorts row (cap 8)
  *   most played    panel of 60px rows
+
  *   honours        rail of 168 x 178 plaques (HonoursBoard PLAQUE_W / PLAQUE_H)
  * so the loaded page lands on its own outline with no section boundary
  * shifting.
@@ -540,8 +540,12 @@ export default function DiscoverCourseLedSkeleton() {
       >
 
 
-        <MomentsMosaic />
+        {/* MomentsMosaic is NO LONGER REACHED FROM DISCOVER
+            (MICRO_BRIEF_REMOVE_MOMENTS_FROM_DISCOVER): the section was
+            unmounted from the page. The export STAYS — MomentsOfTheWeek still
+            renders it as its own pending shell on the Community page. */}
         <MostPlayedPanel />
+
         <HonoursPanel />
       </div>
     </div>

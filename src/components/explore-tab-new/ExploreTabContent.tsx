@@ -15,7 +15,7 @@ import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { openWithOrigin } from '@/lib/openWithOrigin';
+
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { FindGolfersSheet } from './FindGolfersSheet';
@@ -28,7 +28,6 @@ import type { RegionSelection } from './courseled/hooks/useWeekRegionCounts';
 import { GolfThisWeekSheet } from './GolfThisWeekSheet';
 
 
-import { MomentsOfTheWeek } from './courseled/MomentsOfTheWeek';
 import { ClipsRail, LatestVideosRail } from './courseled/CommunityMediaRails';
 import { useCommunityVideos } from './courseled/hooks/useCommunityVideos';
 import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
@@ -41,15 +40,8 @@ import {
   type HonoursMode,
 } from './courseled/HonoursBoard';
 import { HonoursBoardSheet } from './courseled/HonoursBoardSheet';
-import { useMomentsOfTheWeek, type Moment } from './courseled/hooks/useMomentsOfTheWeek';
-import { useFriendIdSet } from './courseled/hooks/useFriendIdSet';
-import {
-  useCommunityCreators,
-  type CommunityCreator,
-} from './courseled/hooks/useCommunityCreators';
-import { useUserStatsCourseMap } from '@/contexts/UserStatsCoursesContext';
 import { useMostPlayedThisWeek, type MostPlayedRow } from './courseled/hooks/useMostPlayedThisWeek';
-import { buildMomentQueue } from '@/features/community/momentQueue';
+
 
 /**
  * Discover, COURSE-LED (BRIEF_DISCOVER_REBUILT_COURSE_LED).
@@ -94,7 +86,7 @@ export default function ExploreTabContent({
 
   // NEW SINCE (BRIEF_DISCOVER_NEW_SINCE): one baseline for the whole visit,
   // written back only on EXIT so markers survive scrolling and tapping.
-  const { lastSeen, markSeen } = useDiscoverLastSeen(userId);
+  const { markSeen } = useDiscoverLastSeen(userId);
 
   useMarkDiscoverSeenOnExit(markSeen);
 
@@ -128,8 +120,9 @@ export default function ExploreTabContent({
     crownCategoryLabel,
   );
 
-  const momentsQuery = useMomentsOfTheWeek();
-  const moments = momentsQuery.data;
+  // THE MOMENTS MOSAIC LEFT THIS PAGE (MICRO_BRIEF_REMOVE_MOMENTS_FROM_DISCOVER):
+  // useMomentsOfTheWeek is no longer read here. It still serves the Community page.
+
   // THE MEDIA RAILS ARE NOT COURSE-LED (BRIEF_DISCOVER_MEDIA_RAILS §0.2): this
   // reads the whole media library, unfiltered by course tag and by `lens`.
   const communityVideos = useCommunityVideos();
@@ -151,28 +144,8 @@ export default function ExploreTabContent({
    * Courses browse, where the review pool is country/region scoped.
    */
 
-  const momentList = useMemo(() => moments ?? [], [moments]);
-  // PAGE mosaic: one tile per course. The sheet keeps the full ranked list.
-  const momentMosaic = useMemo(() => momentList.filter((m) => m.isCourseLead), [momentList]);
-
-  // === CREATOR CARDS (BRIEF_COMMUNITY_CREATOR_CARDS) ======================
-  // Aggregated CLIENT-SIDE over the pool the section already holds. Both inputs
-  // to the relevance order are already-cached reads: the friend id set (the
-  // same query Around the world uses) and the member's played-course map from
-  // the stats context. No new query, no per-card fetch.
-  const friendIdsQuery = useFriendIdSet(userId);
-  const playedCourseMap = useUserStatsCourseMap();
-  const playedCourseIds = useMemo(
-    () => new Set(playedCourseMap.keys()),
-    [playedCourseMap],
-  );
-  const creators = useCommunityCreators({
-    pool: momentList,
-    viewerId: userId,
-    friendIds: friendIdsQuery.data,
-    playedCourseIds,
-  });
   const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
+
 
   const handleScopeChange = useCallback(
     (next: WeekScope) => {
@@ -223,61 +196,6 @@ export default function ExploreTabContent({
 
 
 
-  // Both surfaces (mosaic + sheet) share this handler, so the tapped media's
-  // identity must travel with the post — otherwise every tile of a multi-media
-  // post opens the post's first media, and swiping onto that post in the viewer
-  // shows a photo instead of the clip that earned the tile (no autoplay). The
-  // queue leads each post with its best-ranked moment's media.
-  const momentPosts = useMemo(() => buildMomentQueue(momentList), [momentList]);
-
-  const handleMoment = useCallback(
-    (m: Moment) => {
-      analyticsEvents.track('discover_moment_tapped', {
-        course_id: m.courseId,
-        post_id: m.post.id,
-        media_index: m.mediaIndex ?? 0,
-      });
-      const index = Math.max(
-        0,
-        momentPosts.findIndex((p) => p.id === m.post.id),
-      );
-      openWithOrigin({
-        posts: momentPosts,
-        index,
-        originEl: null,
-        posterUrl: m.thumbnail,
-        mediaIndex: m.mediaIndex ?? 0,
-        mediaId: m.mediaId ?? null,
-        openedFrom: 'discover-moments',
-      });
-    },
-    [momentPosts],
-  );
-
-
-  // THE WHOLE CARD OPENS THE VIEWER, seeded with that member's moments. Same
-  // path handleMoment uses, with a creator-scoped list passed to it. Discover
-  // is social browse, so the viewer carries its full action rail.
-  const handleCreator = useCallback(
-    (c: CommunityCreator) => {
-      analyticsEvents.track('discover_creator_card_tapped', {
-        creator_id: c.userId,
-        clips: c.clips,
-        photos: c.photos,
-      });
-      const posts = buildMomentQueue(c.moments);
-      openWithOrigin({
-        posts,
-        index: 0,
-        originEl: null,
-        posterUrl: c.frame.thumbnail,
-        mediaIndex: c.frame.mediaIndex ?? 0,
-        mediaId: c.frame.mediaId ?? null,
-        openedFrom: 'discover-moments',
-      });
-    },
-    [],
-  );
 
   const handleMostPlayed = useCallback(
     (r: MostPlayedRow) => goCourse(r.courseId, 'most_played'),
@@ -384,24 +302,11 @@ export default function ExploreTabContent({
           onSeeAll={() => navigate('/community')}
         />
 
+        {/* From the community was removed from Discover deliberately. Discover
+            now shows no member photographs; the Community page still holds
+            them, but every route to it from here is labelled video. */}
 
 
-        <MomentsOfTheWeek
-          moments={momentMosaic}
-          totalCount={momentList.length}
-          isPending={momentsQuery.isPending}
-          lastSeen={lastSeen}
-          creators={creators}
-          onCreatorPress={handleCreator}
-          onTilePress={handleMoment}
-          onSeeAll={() => {
-            analyticsEvents.track('community_page_open', {
-              source: 'discover_see_all',
-              moment_count: momentList.length,
-            });
-            navigate('/community');
-          }}
-        />
 
         <MostPlayedLeaderboard
           rows={mostPlayedList}
