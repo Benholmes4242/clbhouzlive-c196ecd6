@@ -545,10 +545,12 @@ function markerStyle(m: Marker | null): CSSProperties {
   }
 }
 
-/** 15px cells: the smallest width where a TWO-DIGIT score (a 10 on a par 3
- *  happens) still fits inside a circle without touching it — the figure is
- *  10px with -0.04em tracking and the cell never grows to accommodate it. */
-const CELL = 15;
+/** 17px cells (BRIEF_MINI_SCORECARD_NINE_HEADER §S1.2/§S1.4). The totals moved
+ *  off the marker row onto the nine header, so the cells take the FULL inner
+ *  width and grew instead of shrinking: nine 17px markers across a 252px block
+ *  leave 12.4px between adjacent cell edges, which clears the double box's 3px
+ *  outboard ring on both sides with 6.4px of air. */
+const CELL = 17;
 
 function nineTotals(holes: HoleShape['holes'], from: number, to: number) {
   let strokes = 0;
