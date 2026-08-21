@@ -104,7 +104,7 @@ export function ClipsRail({ items, onTilePress, onSeeAll }: Props) {
     <section ref={ref}>
       <Eyebrow
         icon={Film}
-        aside={<InkAction onClick={onSeeAll}>{t('discover.clipsAction', 'See all')}</InkAction>}
+        aside={<InkAction onClick={onSeeAll}>{t('discover.clipsAction', 'All clips')}</InkAction>}
       >
         {t('discover.clipsHeading', 'Clips')}
       </Eyebrow>

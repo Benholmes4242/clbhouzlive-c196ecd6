@@ -1275,7 +1275,7 @@ export function GolfThisWeek({
             fontWeight: 600,
             color: A.MUTE,
             fontFamily: SANS,
-            padding: '10px 0 4px',
+            padding: '10px 0 0',
           }}
         >
           {t(scopeEmptyKey(scope).key, scopeEmptyKey(scope).fallback)}
