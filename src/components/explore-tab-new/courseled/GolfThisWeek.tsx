@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
+import { Check } from 'lucide-react';
+
+/** ~1.2s: long enough to register, short enough not to be a state (§S3.4). */
+const CONFIRM_MS = 1200;
 
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -149,27 +153,54 @@ function ShapeReveal({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * §2.2 — a REAL follow button, the highest-value tap on the page, and the ONLY
- * <button> inside the tile (the tile itself is a role="button" div, because a
- * button nested in a button is invalid HTML and WebKit swallows the inner tap).
+ * §S3 — THREE STATES, ONE OF THEM EMPTY:
  *
- * IT HOLDS NO STATE, exactly like FeedFollowPill in the Clubhouse card: the
- * truth is the cached following-id set, so optimism survives a remount and
- * every tile for the same member flips together.
+ *   not followed   FOLLOW            ink pill
+ *   just tapped    FOLLOWING + tick  ~1.2s, then removed
+ *   followed       NOTHING AT ALL    no pill, no placeholder, no gap
+ *
+ * THIS OVERTURNS THE PERSISTENT "FOLLOWING" PILL specified in
+ * BRIEF_GOLF_THIS_WEEK_FOLLOW:
+ *   "A persistent FOLLOWING pill is a LABEL PRETENDING TO BE A CONTROL. On
+ *    Your Circle it appeared on every tile, saying what the pill row had
+ *    already said. The button now exists only where there is something to do."
+ *
+ * THERE IS NO WAY TO UNFOLLOW FROM THIS SURFACE, and that is deliberate. The
+ * profile page owns unfollowing — a rail tile is a glance, not an account
+ * control, and an accidental unfollow here would be silent and unrecoverable.
+ *
+ * IT HOLDS NO FOLLOW STATE: the truth is the cached following-id set, so
+ * optimism survives a remount and every tile for the same member flips
+ * together. The only local state is the ~1.2s confirmation, which is a
+ * transient acknowledgement of THIS tap and nothing more.
  */
 function FollowButton({
   targetUserId,
   isFollowed,
   viewerUserId,
+  align,
 }: {
   targetUserId: string;
   isFollowed: boolean;
   viewerUserId: string | undefined;
+  /** Where the control sits on the score row when it renders at all. */
+  align: 'auto' | 'gap';
 }) {
   const { t } = useTranslation('courses');
   const queryClient = useQueryClient();
   const { activeActor } = useActiveActor();
   const toggle = useToggleFollow();
+  /* THE CONFIRMATION (§S3.4). Not decoration: without it the button vanishes on
+     tap with no acknowledgement, which reads as a mis-tap. */
+  const [confirming, setConfirming] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+
 
   /* THE VIEWER IS THE AUTH USER ID, not a field on the actor. ActiveActor has
      no `userId` — reading it always yielded undefined and useToggleFollow threw
@@ -181,7 +212,7 @@ function FollowButton({
   const onClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      if (toggle.isPending) return;
+      if (toggle.isPending || confirming) return;
       if (!viewerUserId || !viewerActorId) return;
 
       const key = ['courseled', 'following-ids', viewerUserId] as const;
@@ -190,11 +221,15 @@ function FollowButton({
          query's referential identity changes and every reader re-renders. */
       queryClient.setQueryData<Set<string>>(key, (old) => {
         const next = new Set(old ?? []);
-        if (isFollowed) next.delete(targetUserId);
-        else next.add(targetUserId);
+        next.add(targetUserId);
         return next;
       });
+      setConfirming(true);
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = setTimeout(() => setConfirming(false), CONFIRM_MS);
 
+      /* THE VIEWER-IDENTITY FIX (MICRO_BRIEF_FOLLOW_VIEWER_IDENTITY) IS PASSED
+         THROUGH UNCHANGED — do not re-derive these arguments here. */
       toggle.mutate(
         {
           targetActorType: 'personal',
@@ -203,11 +238,15 @@ function FollowButton({
           viewerActorType,
           viewerActorId,
           viewerUserId,
-          isFollowing: isFollowed,
+          isFollowing: false,
         },
         {
-          /* ROLL BACK to exactly what was there before the tap, and SAY SO. */
+          /* ROLL BACK to exactly what was there before the tap, DROP the
+             confirmation, and SAY SO — a failed follow must return to FOLLOW
+             (§S3.6), never to nothing. */
           onError: () => {
+            if (timer.current) clearTimeout(timer.current);
+            setConfirming(false);
             if (previous) queryClient.setQueryData<Set<string>>(key, new Set(previous));
             else void queryClient.invalidateQueries({ queryKey: ['courseled', 'following-ids'] });
             toast.error('Could not update follow status. Please try again.');
@@ -219,7 +258,7 @@ function FollowButton({
       );
     },
     [
-      isFollowed,
+      confirming,
       queryClient,
       targetUserId,
       toggle,
@@ -229,30 +268,67 @@ function FollowButton({
     ],
   );
 
+  /* THE FOLLOWED STATE RENDERS NOTHING AND RESERVES NOTHING (§S3.3) — no
+     wrapper, no placeholder, no gap. The member name takes the freed width. */
+  if (isFollowed && !confirming) return null;
+
+  const wrapper: React.CSSProperties = {
+    marginLeft: align === 'gap' ? 8 : 'auto',
+    flexShrink: 0,
+    display: 'inline-flex',
+  };
+
+  if (confirming) {
+    /* NOT A BUTTON (§S3.5): the action is done and there is nothing left to
+       press, so this is a static span with no handler and no role. */
+    return (
+      <span style={wrapper}>
+        <span
+          aria-live="polite"
+          style={{
+            ...LABEL,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            fontFamily: SANS,
+            color: A.MUTE,
+            border: `1px solid ${A.BORDER}`,
+            borderRadius: 999,
+            padding: '5px 10px',
+            pointerEvents: 'none',
+          }}
+        >
+          {t('discover.golfThisWeek.following', 'FOLLOWING')}
+          <Check size={11} strokeWidth={3} />
+        </span>
+      </span>
+    );
+  }
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={isFollowed ? 'Unfollow' : 'Follow'}
-      style={{
-        ...LABEL,
-        flexShrink: 0,
-        fontFamily: SANS,
-        color: isFollowed ? A.MUTE : A.PANEL,
-        background: isFollowed ? 'transparent' : A.INK,
-        border: `1px solid ${isFollowed ? A.BORDER : A.INK}`,
-        borderRadius: 999,
-        padding: '5px 10px',
-        cursor: 'pointer',
-      }}
-    >
-      {isFollowed
-        ? t('discover.golfThisWeek.following', 'FOLLOWING')
-        : t('discover.golfThisWeek.follow', 'FOLLOW')}
-    </button>
+    <span style={wrapper}>
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label="Follow"
+        style={{
+          ...LABEL,
+          flexShrink: 0,
+          fontFamily: SANS,
+          color: A.PANEL,
+          background: A.INK,
+          border: `1px solid ${A.INK}`,
+          borderRadius: 999,
+          padding: '5px 10px',
+          cursor: 'pointer',
+        }}
+      >
+        {t('discover.golfThisWeek.follow', 'FOLLOW')}
+      </button>
+    </span>
   );
 }
+
 
 interface CardProps {
   row: CircleRoundRow;
@@ -426,13 +502,12 @@ function GolfThisWeekCard({
             </span>
           )}
           {showFollow && (
-            <span style={{ marginLeft: hasDelta ? 8 : 'auto', flexShrink: 0, display: 'inline-flex' }}>
-              <FollowButton
-                targetUserId={row.user_id}
-                isFollowed={isFollowed}
-                viewerUserId={viewerUserId}
-              />
-            </span>
+            <FollowButton
+              targetUserId={row.user_id}
+              isFollowed={isFollowed}
+              viewerUserId={viewerUserId}
+              align={hasDelta ? 'gap' : 'auto'}
+            />
           )}
         </div>
 
@@ -742,7 +817,10 @@ export function GolfThisWeek({
         {/* Not a label - the filter's readout. It is the only thing on screen
             that responds when a pill or a region changes, so it must always
             describe what is CURRENTLY rendered. */}
-        <span style={{ ...KICKER, color: A.MUTE, flex: '0 0 auto' }}>
+        <span
+          className="tabular-nums"
+          style={{ ...KICKER, color: A.MUTE, flex: '0 0 auto' }}
+        >
           {t('discover.golfThisWeek.count', '{{rounds}} rounds \u00B7 {{courses}} courses', {
             rounds: counts.rounds,
             courses: counts.courses,

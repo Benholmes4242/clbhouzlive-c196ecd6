@@ -157,22 +157,27 @@ export function RegionDropdown({
           onChange({ kind: kind as RegionSelection['kind'], value: rest.join(':') });
         }}
       >
+        {/* A QUIET INLINE CONTROL, NOT A FIELD (§S1.3): no border, no
+            background, no padding box. And NO COUNT (§S1.2) — the readout to
+            its left already states how many rounds are rendered; the counts
+            belong on the list rows, before the tap, where they inform the
+            choice. Pin, label and chevron share one baseline (§S1.1). */}
         <SelectTrigger
-          className="h-9 w-auto gap-2 rounded-full border bg-transparent px-3 text-[12.5px] font-bold"
-          style={{ borderColor: A.BORDER, color: A.INK, fontFamily: SANS }}
+          className="h-auto w-auto gap-1 border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:h-[13px] [&>svg]:w-[13px] [&>svg]:opacity-100 [&>svg]:text-[color:var(--week-chev)]"
+          style={{ color: A.INK, fontFamily: SANS, ['--week-chev' as string]: A.DIM } as React.CSSProperties}
           aria-label={t('discover.week.selectRegionA11y', 'Filter rounds by area')}
         >
-          <span className="flex min-w-0 items-center gap-1.5">
-            <MapPin size={13} strokeWidth={2} />
-            <span className="truncate">{triggerLabel}</span>
+          <span className="flex min-w-0 items-center gap-1">
+            <MapPin size={12} strokeWidth={2} style={{ color: A.INK, flex: 'none' }} />
             <span
-              className="tabular-nums"
-              style={{ ...LABEL, color: A.MUTE, marginLeft: 4 }}
+              className="truncate"
+              style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}
             >
-              {selection ? countFor(regions, selection) : regions.total}
+              {triggerLabel}
             </span>
           </span>
         </SelectTrigger>
+
 
         <SelectContent className="bg-card border-border z-50 max-h-[60vh] rounded-sq-sm shadow-lg">
           <SelectItem value={ALL}>
@@ -218,17 +223,6 @@ export function RegionDropdown({
       </Select>
     </div>
   );
-}
-
-function countFor(regions: WeekRegions, sel: RegionSelection): number {
-  if (sel.kind === 'country') {
-    return regions.groups.find((g) => g.country === sel.value)?.count ?? 0;
-  }
-  for (const g of regions.groups) {
-    const hit = g.subs.find((s) => s.sub_country === sel.value);
-    if (hit) return hit.count;
-  }
-  return 0;
 }
 
 export default WeekScopePills;
