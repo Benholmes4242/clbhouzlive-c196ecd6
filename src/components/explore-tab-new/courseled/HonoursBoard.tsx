@@ -384,7 +384,6 @@ export function FeatCard({
             userId={e.userId}
             src={e.actorAvatar}
             alt={e.actorName}
-            own={!!e.isOwn}
           />
           {/* NO "YOU" SUBSTITUTION (§S5.2) — this is a record, and a record
               carries names. Amber says whose it is. */}
