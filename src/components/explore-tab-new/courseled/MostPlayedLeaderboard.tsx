@@ -14,12 +14,29 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 
 /**
- * Section 5 — MOST PLAYED THIS WEEK (BRIEF, section 5).
+ * Section 5 — WHERE THEY PLAYED THIS WEEK
+ * (BRIEF_MOST_PLAYED_LEADERBOARD, SUPERSEDES BRIEF_MOST_PLAYED_WHO_PLAYED).
  *
- * Frequency is the inclusive metric: every tracked round contributes. The count
- * is the point of the section. A delta only appears when the hook found a real
- * prior-week comparison, and it renders as a PLAIN DIM FIGURE — no capsule, no
- * tint, no green (green means under par or the viewing member, never volume).
+ * FOUR FAULTS THIS FIXES (§S0):
+ *   §S0.1 the expanded list was INDENTED under the thumbnail and narrow, with a
+ *         lake of white between a name and its number. It is now a FULL-WIDTH
+ *         board and nothing is indented.
+ *   §S0.2 the RANK NUMBER is gone from the course rows. Live counts were
+ *         11 / 2 / 1 / 1 — three effective ties, so the badge was decoration
+ *         inviting a member to read a contest into a list of places.
+ *   §S0.3 "PLAYED TO" was a grey small-caps caption and is now the row's
+ *         HEADLINE FIGURE on the right.
+ *   §S0.4 the section stopped being a leaderboard of COURSES when the content is
+ *         PLAYERS. Nobody needs to know a course was played eleven times; they
+ *         want to know WHO, and how they went.
+ *
+ * THE ORDERING IS UNCHANGED (§S1.3) — still most rounds first. The count moved
+ * into the meta line as CONTEXT, not a score (§S1.4). The movement marker stays
+ * in its existing tones: it is the one genuinely comparative thing here (§S1.6).
+ *
+ * POSITION FIRST, SCORE LAST (§S2.2). That is the order every golfer has read on
+ * every board they have ever stood in front of, and it is why the format needs
+ * no explaining.
  */
 
 interface Props {
