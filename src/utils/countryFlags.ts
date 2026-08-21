@@ -26,8 +26,10 @@ export const countryToFlagCode: Record<string, string> = {
   'WALES': 'GB-WLS',
   'Wales': 'GB-WLS',
   
-  'NORTHERN IRELAND': 'GB-NIR',
-  'Northern Ireland': 'GB-NIR',
+  // Editorial decision (BRIEF_TOUR_FLAGS_ONE_SYSTEM §3): Northern Ireland is
+  // marked with the Irish tricolour, not the Ulster Banner or the Union Flag.
+  'NORTHERN IRELAND': 'IE',
+  'Northern Ireland': 'IE',
   
   'IRELAND': 'IE',
   'Ireland': 'IE',
@@ -230,7 +232,7 @@ export const UNMAPPED_REGIONS = [
 // ---------------------------------------------------------------------------
 export const threeLetterToFlagCode: Record<string, string> = {
   // Home nations — subdivision codes, all four SVGs are served.
-  ENG: 'GB-ENG', SCO: 'GB-SCT', WAL: 'GB-WLS', NIR: 'GB-NIR',
+  ENG: 'GB-ENG', SCO: 'GB-SCT', WAL: 'GB-WLS', NIR: 'IE',
   GBR: 'GB', IRL: 'IE',
 
   // North America / Caribbean

@@ -23,13 +23,12 @@ const chipTextPx: Record<'sm' | 'md' | 'lg', number> = {
 /**
  * Flag codes we deliberately do NOT render as a national flag.
  *
- * GB-NIR is the Ulster Banner, which has had no official status since 1973 and
- * is identified with one community in Northern Ireland. Pending an editorial
- * decision, Northern Ireland renders the neutral three-letter chip instead.
- * Removing 'GB-NIR' from this set is the whole change required to switch to a
- * flag later.
+ * Currently empty. Northern Ireland resolves to the Irish tricolour by
+ * editorial decision (BRIEF_TOUR_FLAGS_ONE_SYSTEM §3); the Ulster Banner
+ * (gb-nir.svg) is never rendered. Add a code here to withhold its flag and
+ * fall back to the neutral three-letter chip.
  */
-const WITHHELD_FLAG_CODES = new Set<string>(['GB-NIR']);
+const WITHHELD_FLAG_CODES = new Set<string>();
 
 /**
  * CountryFlag — the single flag system for the app (BRIEF_TOUR_FLAGS_ONE_SYSTEM).
