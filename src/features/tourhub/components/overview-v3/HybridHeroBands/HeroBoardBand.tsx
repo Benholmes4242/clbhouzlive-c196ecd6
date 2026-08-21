@@ -45,6 +45,7 @@ import { FONT, HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT, WHITE_ALPHA_12, WHIT
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { useTourSelection } from '../../../context/TourSelectionContext';
+import { PlayerAvatar } from '../../PlayerAvatar';
 import { ClbhouzPickMark } from '../../../_shared/ClbhouzPickMark';
 import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
 import { CourseShapePanel, useCourseShapeRows } from './CourseShapePanel';
