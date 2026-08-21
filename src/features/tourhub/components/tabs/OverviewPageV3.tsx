@@ -13,7 +13,7 @@ import { CourseOfTheWeekSection } from '../../overview/sections/CourseOfTheWeekS
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 import { LazySection } from '../overview-v3/LazySection';
 
-import { TISlot } from '../overview-v3/TISlot';
+import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
 import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
 import { StatWatchSlot } from '../overview-v3/StatWatchSlot';
 
