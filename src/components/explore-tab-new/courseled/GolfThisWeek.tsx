@@ -84,6 +84,16 @@ const PHOTO_H = 92;
    §S2.2); the hole grid beneath it carries the detail 60px used to have to. */
 const SHAPE_H = 40;
 
+/**
+ * TILE HEIGHT FLOOR. Measured on a tile with the full grid: photograph 92,
+ * member row, 40px trajectory, two nines of 15px cells with their hole numbers,
+ * insight line, 9px padding. Holds the rail level when a round has no hole data
+ * and therefore prints no grid at all.
+ */
+const CARD_MIN_H = 258;
+
+
+
 /** The rail scrim of record — imported, never retyped. */
 const CARD_SCRIM = SCRIM_STANDOUT;
 
