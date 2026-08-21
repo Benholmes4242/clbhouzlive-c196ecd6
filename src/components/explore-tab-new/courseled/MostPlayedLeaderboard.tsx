@@ -11,6 +11,8 @@ import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 
 
 /**
@@ -47,6 +49,15 @@ interface Props {
   onRowPress: (row: MostPlayedRow) => void;
   onSeeAll?: () => void;
   showEyebrow?: boolean;
+}
+
+/**
+ * A WHOLE-NUMBER to-par, TRUE MINUS, "E" at level — for a single round's score
+ * on the board, which is always an integer.
+ */
+function formatRelInt(v: number): string {
+  if (v === 0) return 'E';
+  return `${v > 0 ? '+' : '\u2212'}${formatNumber(Math.abs(v))}`;
 }
 
 /** One decimal, TRUE MINUS, "E" at level. */
@@ -362,7 +373,10 @@ export function MostPlayedLeaderboard({
 }: Props) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
-  /** ONE ROW OPEN AT A TIME (§S2.3) — a single id, never a set. */
+  const { user } = useSupabaseSession();
+  /** §S2.8 — the viewing member, marked by TINT ONLY. */
+  const viewerId = user?.id ?? null;
+  /** ONE COURSE OPEN AT A TIME (§S2.10) — a single id, never a set. */
   const [openId, setOpenId] = useState<string | null>(null);
   const shown = rows.slice(0, limit);
   const metaQuery = useCourseCardMeta(shown.map((r) => r.courseId));
@@ -391,7 +405,11 @@ export function MostPlayedLeaderboard({
             )
           }
         >
-          {t('discover.mostPlayed', 'Most played this week')}
+          {/* §S1.1 — the heading DESCRIBES WHAT THE SECTION SHOWS rather than
+              asserting a ranking that 11 / 2 / 1 / 1 does not support. The old
+              'discover.mostPlayed' key is now unused and STAYS in all six
+              locale files (§S4.1). */}
+          {t('discover.whereTheyPlayed', 'Where they played this week')}
         </Eyebrow>
       )}
 
@@ -435,18 +453,10 @@ export function MostPlayedLeaderboard({
                   cursor: 'pointer',
                 }}
               >
-                <span
-                  style={{
-                    ...LABEL,
-                    fontSize: 9,
-                    color: A.DIM,
-                    width: 13,
-                    flexShrink: 0,
-                    fontVariantNumeric: 'tabular-nums lining-nums',
-                  }}
-                >
-                  {formatNumber(i + 1)}
-                </span>
+                {/* §S1.2 — NO RANK NUMBER. With three rows tied at one or two
+                    rounds it was decoration, and it invited a member to read a
+                    contest into a list of places people happened to play. The
+                    ORDER is unchanged (§S1.3); only the badge is gone. */}
                 <CourseImageFallback
                   courseId={r.courseId}
                   courseName={name}
@@ -473,62 +483,77 @@ export function MostPlayedLeaderboard({
                   >
                     {name}
                   </span>
-                  {/* REGION on its own line. */}
-                  {m?.region && (
-                    <span
-                      style={{
-                        ...LABEL,
-                        display: 'block',
-                        fontSize: 9,
-                        color: A.DIM,
-                        marginTop: 3,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {m.region}
-                    </span>
-                  )}
-                  {/* SCORING LINE — a SCORE, not a movement: to-par convention,
-                      BODY ink. "BY N MEMBERS" IS GONE (§S3.2): the faces below
-                      say who, and the list states the count. The "played to"
-                      figure stays. */}
-                  {r.avgToPar != null && (
-                    <span
-                      style={{
-                        ...LABEL,
-                        display: 'block',
-                        fontSize: 9,
-                        color: A.BODY,
-                        marginTop: 4,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        fontVariantNumeric: 'tabular-nums lining-nums',
-                      }}
-                    >
-                      {t('discover.mostPlayedAvgToPar', 'Played to {{value}}', {
-                        value: formatToPar(r.avgToPar),
-                      })}
-                    </span>
-                  )}
-                </span>
-                <span style={{ flexShrink: 0, textAlign: 'right', minWidth: 34 }}>
+                  {/* §S1.4 — THE META LINE: region, then the round count,
+                      then the movement marker. "KENT · 11 ROUNDS · ▲6". The
+                      count is CONTEXT HERE, NOT A SCORE — that is the whole
+                      point of moving it off the right-hand figure. */}
                   <span
                     style={{
-                      ...NUMF,
-                      display: 'block',
-                      fontSize: 20,
-                      letterSpacing: '-0.03em',
-                      lineHeight: 1,
-                      color: A.INK,
+                      ...LABEL,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      fontSize: 9,
+                      color: A.DIM,
+                      marginTop: 4,
+                      minWidth: 0,
+                      fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
                   >
-                    {formatNumber(r.count)}
+                    <span
+                      style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        minWidth: 0,
+                      }}
+                    >
+                      {m?.region ? `${m.region} \u00B7 ` : ''}
+                      {/* §S4.2 — A PLURAL RULE, NEVER A CONCATENATION: i18next
+                          count pluralisation, so "1 round" / "11 rounds" and
+                          every language's own rule both work. */}
+                      {t('discover.mostPlayedRoundCount', '{{count}} round', {
+                        count: r.count,
+                      })}
+                    </span>
+                    {/* §S1.6 — THE MOVEMENT MARKER KEEPS ITS EXISTING TONES. It
+                        is the one genuinely comparative thing on the header. */}
+                    <MoveMark row={r} t={t} />
                   </span>
-                  <MoveMark row={r} t={t} />
                 </span>
+                {/* §S1.5 — "PLAYED TO" IS PROMOTED: 19px / 800 on the right of
+                    the header with an 8px label beneath. It is the row's
+                    HEADLINE FIGURE, because it is the only figure on the row
+                    that describes the GOLF (§S0.3). A course with no comparable
+                    scored round this week renders neither figure nor label. */}
+                {r.avgToPar != null && (
+                  <span style={{ flexShrink: 0, textAlign: 'right', minWidth: 40 }}>
+                    <span
+                      style={{
+                        ...NUMF,
+                        display: 'block',
+                        fontSize: 19,
+                        fontWeight: 800,
+                        letterSpacing: '-0.03em',
+                        lineHeight: 1,
+                        color: INK,
+                      }}
+                    >
+                      {formatToPar(r.avgToPar)}
+                    </span>
+                    <span
+                      style={{
+                        ...LABEL,
+                        display: 'block',
+                        fontSize: 8,
+                        color: FAINT,
+                        marginTop: 4,
+                      }}
+                    >
+                      {t('discover.mostPlayedPlayedToLabel', 'Played to')}
+                    </span>
+                  </span>
+                )}
                 {/* WITHOUT IT NOTHING SAYS THE ROW OPENS (§S2.2). */}
                 <ChevronDown
                   size={14}
@@ -543,14 +568,15 @@ export function MostPlayedLeaderboard({
                 />
               </div>
 
-              {open ? (
-                <MemberList
+              {/* §S3.2 — THE COLLAPSED ROW IS JUST THE HEADER: thumbnail, name,
+                  meta line, played-to, chevron. Shorter than what shipped. */}
+              {open && (
+                <MemberBoard
                   row={r}
+                  viewerId={viewerId}
                   onOpenMember={openMember}
                   onSeeAllAtCourse={() => onRowPress(r)}
                 />
-              ) : (
-                <FaceRow row={r} onOpenMember={openMember} />
               )}
             </div>
           );
