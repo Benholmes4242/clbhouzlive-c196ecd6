@@ -420,10 +420,11 @@ function FollowButton({
  *
  * This was a real defect found on device: "HOLES" set over "14" read as
  * "hole 14". The figure phrase is therefore ONE translatable template with a
- * {{n}} placeholder, split at render time so the number takes 46px and the words
+ * {n} placeholder (SINGLE braces, deliberately: i18next owns {{...}} and would
+ * try to interpolate it), split at render time so the number takes 46px and the words
  * around it take 13px ON THE SAME LINE.
  */
-const FIGURE_PLACEHOLDER = '{{n}}';
+const FIGURE_PLACEHOLDER = '{n}';
 
 /** §S2.1 — the hero gradient, no photograph. */
 const HERO_BASE = 'linear-gradient(170deg, #2E3A32 0%, #181F1B 60%, #0D110E 100%)';

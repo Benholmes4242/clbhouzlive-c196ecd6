@@ -1077,10 +1077,10 @@
           "grind": "버텨낸 라운드"
         },
         "figure": {
-          "hole": "{{n}}번 홀",
-          "holes": "{{n}} 홀",
-          "inThree": "3홀 중 {{n}}",
-          "inARow": "{{n}} 연속"
+          "hole": "{n}번 홀",
+          "holes": "{n} 홀",
+          "inThree": "3홀 중 {n}",
+          "inARow": "{n} 연속"
         },
         "sentence": {
           "eagle": "파 {{1}} 홀에서 {{0}}.",

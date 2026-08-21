@@ -1137,10 +1137,10 @@
           "grind": "DIE ARBEIT"
         },
         "figure": {
-          "hole": "LOCH {{n}}",
-          "holes": "{{n}} LÖCHER",
-          "inThree": "{{n}} VON DREI",
-          "inARow": "{{n}} IN FOLGE"
+          "hole": "LOCH {n}",
+          "holes": "{n} LÖCHER",
+          "inThree": "{n} VON DREI",
+          "inARow": "{n} IN FOLGE"
         },
         "sentence": {
           "eagle": "Eine {{0}} auf einem Par {{1}}.",

@@ -1077,10 +1077,10 @@
           "grind": "我慢のゴルフ"
         },
         "figure": {
-          "hole": "{{n}} 番ホール",
-          "holes": "{{n}} ホール",
-          "inThree": "3ホールで {{n}}",
-          "inARow": "{{n}} 連続"
+          "hole": "{n} 番ホール",
+          "holes": "{n} ホール",
+          "inThree": "3ホールで {n}",
+          "inARow": "{n} 連続"
         },
         "sentence": {
           "eagle": "パー{{1}}で{{0}}。",

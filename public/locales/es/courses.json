@@ -1137,10 +1137,10 @@
           "grind": "EL OFICIO"
         },
         "figure": {
-          "hole": "HOYO {{n}}",
-          "holes": "{{n}} HOYOS",
-          "inThree": "{{n}} DE TRES",
-          "inARow": "{{n}} SEGUIDOS"
+          "hole": "HOYO {n}",
+          "holes": "{n} HOYOS",
+          "inThree": "{n} DE TRES",
+          "inARow": "{n} SEGUIDOS"
         },
         "sentence": {
           "eagle": "Un {{0}} en un par {{1}}.",

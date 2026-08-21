@@ -1582,10 +1582,10 @@
           "grind": "THE GRIND"
         },
         "figure": {
-          "hole": "HOLE {{n}}",
-          "holes": "{{n}} HOLES",
-          "inThree": "{{n}} IN THREE",
-          "inARow": "{{n}} IN A ROW"
+          "hole": "HOLE {n}",
+          "holes": "{n} HOLES",
+          "inThree": "{n} IN THREE",
+          "inARow": "{n} IN A ROW"
         },
         "sentence": {
           "eagle": "A {{0}} on a par {{1}}.",
