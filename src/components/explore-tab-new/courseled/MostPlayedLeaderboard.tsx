@@ -306,8 +306,6 @@ export function MostPlayedLeaderboard({
 }: Props) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
-  const viewerId = user?.id ?? null;
   /** ONE ROW OPEN AT A TIME (§S2.3) — a single id, never a set. */
   const [openId, setOpenId] = useState<string | null>(null);
   const shown = rows.slice(0, limit);
