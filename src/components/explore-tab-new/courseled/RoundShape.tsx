@@ -609,7 +609,15 @@ function NineRow({
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: '-0.04em',
+                    /* CENTRED, NOT NEARLY (§S2) — lineHeight 1 collapses the
+                       digit's line box to the glyph so the flex centring of the
+                       fixed 15x15 marker actually lands. The 0.5px translate is
+                       the OPTICAL correction: tabular lining numerals sit above
+                       the geometric centre of their box, so mathematical centre
+                       reads high. Deliberate, not a fudge. */
                     lineHeight: 1,
+                    transform: 'translateY(0.5px)',
+                    display: 'block',
                     ...FIGS,
                   }}
                 >
