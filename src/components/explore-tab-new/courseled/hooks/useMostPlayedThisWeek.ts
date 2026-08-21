@@ -48,7 +48,14 @@ export interface MostPlayedRow {
   /**
    * DISTINCT members with a tracked round here in the CURRENT seven days.
    * The count on the right is ROUNDS, so this is the figure that says
-   * "4 rounds, by 3 members". No avatars, no profile join — a count.
+   * "4 rounds, by 3 members".
+   *
+   * AMENDED (BRIEF_MOST_PLAYED_WHO_PLAYED §S0.2): the Set behind this count is
+   * still built the same way from the same 14-day read — but it is no longer
+   * thrown away. `players` below resolves those very ids through ONE profile
+   * select, so the row can say WHO played rather than only how many. The last
+   * clause of this comment ("No avatars, no profile join — a count") is the
+   * only part that is now wrong.
    */
   members: number;
   /**
@@ -56,7 +63,31 @@ export interface MostPlayedRow {
    * only. Null when the course has no comparable scored round this week.
    */
   avgToPar: number | null;
+  /**
+   * THE MEMBERS BEHIND THE COUNT, lowest gross first (§S1.4). One entry per
+   * DISTINCT member — a member who played twice appears once, carrying their
+   * BEST gross (§S4.2). A member whose profile cannot be resolved (deleted
+   * account, RLS) is dropped rather than drawn as a blank circle (§S4.4), so
+   * `players.length` can be lower than `members`.
+   */
+  players: MostPlayedPlayer[];
+  /**
+   * LOWEST GROSS at this course in the current seven days, over every tracked
+   * round — independent of whether that member's profile resolved. Null when no
+   * round this week carried a gross.
+   */
+  bestGross: number | null;
 }
+
+/** One resolved member on a most-played row. */
+export interface MostPlayedPlayer {
+  userId: string;
+  name: string;
+  avatarUrl: string | null;
+  /** That member's BEST (lowest) gross at this course this week. */
+  gross: number | null;
+}
+
 
 const DAY = 86_400_000;
 
