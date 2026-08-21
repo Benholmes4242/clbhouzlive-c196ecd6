@@ -570,10 +570,12 @@ function NineRow({
   holes,
   from,
   to,
+  label,
 }: {
   holes: HoleShape['holes'];
   from: number;
   to: number;
+  label: string;
 }) {
   const byHole = new Map(holes.map((h) => [h.holeNo, h]));
   const totals = nineTotals(holes, from, to);
@@ -581,14 +583,55 @@ function NineRow({
     totals == null ? '' : totals.toPar === 0 ? 'E' : totals.toPar > 0 ? `+${totals.toPar}` : `\u2212${Math.abs(totals.toPar)}`;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
-      {/* NO OUT / IN LABELS. The hole numbers above each cell already say which
-          nine it is, and the row-end total is positioned to make it obvious. The
-          label was a third statement of the same fact and the grid needed the
-          20px more than it needed the word. */}
+    <div>
+      {/* THE NINE HEADER — PORTED from CardScorecardSheet's totals line
+          (BRIEF_MINI_SCORECARD_NINE_HEADER §S1.5): the caps label left, the
+          nine's gross and its to-par right, on their own line above the cells.
+          Same object at two sizes — the sheet's 8px LABEL caps and right-aligned
+          NUM figures, scaled to the tile.
 
+          OUT and IN sit on their own line with the nine total, as the Clubhouse
+          scorecard does. They were removed once to buy horizontal space; that was
+          wrong — the TOTALS were what overflowed the row, not the labels. */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 6,
+          marginBottom: 2,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 8,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: A.MUTE,
+          }}
+        >
+          {label}
+        </span>
+        <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
+          <span style={{ fontSize: 10.5, fontWeight: 700, color: A.INK, ...FIGS }}>
+            {totals?.strokes ?? ''}
+          </span>
+          <span
+            style={{
+              fontSize: 8.5,
+              fontWeight: 700,
+              color: totals && totals.toPar < 0 ? TOPAR_RED : A.DIM,
+              ...FIGS,
+            }}
+          >
+            {rel}
+          </span>
+        </span>
+      </div>
 
-      <div style={{ display: 'flex', flex: 1, minWidth: 0, justifyContent: 'space-between' }}>
+      {/* THE CELLS TAKE THE FULL INNER WIDTH — nothing shares their row now. */}
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         {Array.from({ length: to - from + 1 }, (_, i) => {
           const holeNo = from + i;
           const h = byHole.get(holeNo);
@@ -613,9 +656,9 @@ function NineRow({
                     letterSpacing: '-0.04em',
                     /* CENTRED, NOT NEARLY (§S2) — lineHeight 1 collapses the
                        digit's line box to the glyph so the flex centring of the
-                       fixed 15x15 marker actually lands. The 0.5px translate is
-                       the OPTICAL correction: tabular lining numerals sit above
-                       the geometric centre of their box, so mathematical centre
+                       fixed marker actually lands. The 0.5px translate is the
+                       OPTICAL correction: tabular lining numerals sit above the
+                       geometric centre of their box, so mathematical centre
                        reads high. Deliberate, not a fudge. */
                     lineHeight: 1,
                     transform: 'translateY(0.5px)',
@@ -630,30 +673,6 @@ function NineRow({
           );
         })}
       </div>
-
-      <span
-        style={{
-          flexShrink: 0,
-          display: 'inline-flex',
-          alignItems: 'baseline',
-          gap: 3,
-          paddingBottom: 1,
-        }}
-      >
-        <span style={{ fontSize: 10.5, fontWeight: 700, color: A.INK, ...FIGS }}>
-          {totals?.strokes ?? ''}
-        </span>
-        <span
-          style={{
-            fontSize: 8.5,
-            fontWeight: 700,
-            color: totals && totals.toPar < 0 ? TOPAR_RED : A.DIM,
-            ...FIGS,
-          }}
-        >
-          {rel}
-        </span>
-      </span>
     </div>
   );
 }
