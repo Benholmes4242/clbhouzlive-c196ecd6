@@ -433,10 +433,10 @@ function GolfThisWeekCard({
               overflow: 'hidden',
               fontSize: 14,
               fontWeight: 700,
-              /* 1.15 / 1, not 1.2 / normal (§S3.6): a two-line name grows
+              /* 1.1 / 1, not 1.2 / normal (§S3.6): a two-line name grows
                  UPWARD from bottom 8 and the tightened leading is what keeps its
                  first line clear of the score chip's 37px bottom edge. */
-              lineHeight: 1.15,
+              lineHeight: 1.1,
               letterSpacing: '-0.01em',
               color: '#FFFFFF',
             }}
