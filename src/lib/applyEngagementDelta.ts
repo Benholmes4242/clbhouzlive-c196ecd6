@@ -17,7 +17,17 @@ export interface EngagementDelta {
   likeCountDelta?: number;
   /** Apply +1 / -1 to comment count. Omit to leave unchanged. */
   commentCountDelta?: number;
+  /**
+   * ABSOLUTE like count, read from the database. Wins over `likeCountDelta`.
+   * A delta is only correct for the member who tapped; a realtime notification
+   * about SOMEONE ELSE'S like can arrive twice (post owner + mentioned member)
+   * or out of order, so that path sets truth rather than incrementing.
+   */
+  likeCount?: number;
+  /** ABSOLUTE comment count, read from the database. Wins over the delta. */
+  commentCount?: number;
 }
+
 
 export function applyEngagementDelta<T extends Record<string, any>>(
   post: T,
@@ -38,7 +48,15 @@ export function applyEngagementDelta<T extends Record<string, any>>(
     patched.has_liked = delta.isLikedByMe;
   }
 
-  if (delta.likeCountDelta !== undefined) {
+  /* ABSOLUTE FIRST, THEN THE DELTA. Truth from the database cannot double-count
+     and cannot drift on a duplicate realtime event; a delta can do both. */
+  if (delta.likeCount !== undefined) {
+    const next = Math.max(0, delta.likeCount);
+    patched.likeCount = next;
+    patched.like_count = next;
+    patched.likesCount = next;
+    patched.likes_count = next;
+  } else if (delta.likeCountDelta !== undefined) {
     const current =
       patched.likeCount ??
       patched.like_count ??
@@ -52,7 +70,13 @@ export function applyEngagementDelta<T extends Record<string, any>>(
     patched.likes_count = next;
   }
 
-  if (delta.commentCountDelta !== undefined) {
+  if (delta.commentCount !== undefined) {
+    const next = Math.max(0, delta.commentCount);
+    patched.commentCount = next;
+    patched.comment_count = next;
+    patched.commentsCount = next;
+    patched.comments_count = next;
+  } else if (delta.commentCountDelta !== undefined) {
     const current =
       patched.commentCount ??
       patched.comment_count ??
@@ -65,6 +89,7 @@ export function applyEngagementDelta<T extends Record<string, any>>(
     patched.commentsCount = next;
     patched.comments_count = next;
   }
+
 
   return patched as T;
 }

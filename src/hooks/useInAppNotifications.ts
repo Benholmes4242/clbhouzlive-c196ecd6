@@ -5,6 +5,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
+import {
+  handleEngagementNotification,
+  type NotificationRealtimeRow,
+} from '@/lib/postEngagementRealtime';
+
 
 interface NotificationData {
   conversation_id?: string;
@@ -125,6 +130,21 @@ export function useInAppNotifications() {
       queryClient.invalidateQueries({ queryKey: ['activity-v2'], exact: false });
     };
 
+    /**
+     * THE CONTENT HALF OF THE SAME EVENT (BRIEF_REALTIME_COUNTS_AND_MENTION_TAP
+     * §A1). `invalidateUnread` refreshes the BADGES; this refreshes the POST the
+     * notification is about, on the channel that already exists — no per-post
+     * subscription, so a feed of thirty cards still opens zero extra channels.
+     *
+     * CAVEAT (§A3): the counts are written straight into the caches, so they
+     * move whether or not the feed query is mounted; the comment-list
+     * invalidation inside `refreshPostEngagement` only acts on a MOUNTED query,
+     * because `refetchOnMount: false` is app-wide and is not this brief's job.
+     */
+    const refreshNotifiedPost = (row: unknown) =>
+      handleEngagementNotification(queryClient, (row ?? {}) as NotificationRealtimeRow);
+
+
 
     const channel = supabase
       .channel(`inapp_notifications_${user.id}`)
@@ -150,7 +170,7 @@ export function useInAppNotifications() {
           );
         },
       )
-      // Personal-recipient notification inserts → refresh badges
+      // Personal-recipient notification inserts → refresh badges AND the post
       .on(
         'postgres_changes',
         {
@@ -159,10 +179,13 @@ export function useInAppNotifications() {
           table: 'notifications',
           filter: `user_id=eq.${user.id}`,
         },
-        () => invalidateUnread(),
+        (payload) => {
+          invalidateUnread();
+          refreshNotifiedPost(payload.new);
+        },
       );
 
-    // Business-recipient notification inserts (shared inbox) → refresh badges
+    // Business-recipient notification inserts (shared inbox) → same two halves
     if (businessActorIds.length > 0) {
       channel.on(
         'postgres_changes',
@@ -172,9 +195,13 @@ export function useInAppNotifications() {
           table: 'notifications',
           filter: `recipient_actor_id=in.(${businessActorIds.join(',')})`,
         },
-        () => invalidateUnread(),
+        (payload) => {
+          invalidateUnread();
+          refreshNotifiedPost(payload.new);
+        },
       );
     }
+
 
     channel.subscribe();
     subscriptionRef.current = channel;
