@@ -246,9 +246,9 @@ export function TheClass({ slug, collegeName }: Props) {
                   >
                     {a.fullName}
                   </span>
-                  {flag && (
-                    <span style={{ fontSize: 11, lineHeight: 1, flexShrink: 0 }} aria-hidden>
-                      {flag}
+                  {a.country && (
+                    <span style={{ lineHeight: 1, flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>
+                      <CountryFlag country={a.country} size="sm" />
                     </span>
                   )}
                 </div>
