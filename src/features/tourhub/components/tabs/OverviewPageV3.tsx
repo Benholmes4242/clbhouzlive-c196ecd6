@@ -13,7 +13,6 @@ import { CourseOfTheWeekSection } from '../../overview/sections/CourseOfTheWeekS
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 import { LazySection } from '../overview-v3/LazySection';
 
-import { TISlot } from '../overview-v3/TISlot';
 import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
 import { StatWatchSlot } from '../overview-v3/StatWatchSlot';
 
@@ -29,7 +28,7 @@ import { SPACE } from '@/lib/spacing';
 export function OverviewPageV3() {
   const { t } = useTranslation('tourhub');
   const { isOnline } = useNetworkStatus();
-  // READ-ONLY: keyed here purely to drive the OTC + TI synchronized fade so
+  // READ-ONLY: keyed here purely to drive the OTC + Schedule synchronized fade so
   // the hero-lensed unit visibly changes together. Must not write back.
   const { viewingTournamentId, viewingIsLive } = useTourSelection();
 
@@ -65,10 +64,10 @@ export function OverviewPageV3() {
             See OverviewHero.tsx. */}
         <OverviewHero />
 
-        {/* Cohesion unit: OTC + TI sit in a tight 14px group directly under
-            the hero, keyed to viewingTournamentId so they crossfade together
-            in step with the hero. The larger sectionSection gap that follows
-            is what makes this unit read as one. */}
+        {/* Cohesion unit: VenueRecordBand + Schedule sit in a tight 14px
+            group directly under the hero, keyed to viewingTournamentId so they
+            crossfade together in step with the hero. The larger sectionSection
+            gap that follows is what makes this unit read as one. */}
         <AnimatePresence mode="wait">
           <motion.div
             key={viewingTournamentId ?? 'none'}
@@ -77,12 +76,12 @@ export function OverviewPageV3() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             /* On a live slide the dark hero block ends with a straight edge
-               directly above this — the canvas must BREATHE before Tournament
-               Intelligence, so the gap is real (24), not the old 2px seam. */
+               directly above this — the canvas must BREATHE before the Schedule,
+               so the gap is real (24), not the old 2px seam. */
             style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: viewingIsLive ? 24 : 12 }}
           >
             <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
-            <TISlot />
+            <ComingUpSlot />
           </motion.div>
 
         </AnimatePresence>
@@ -92,9 +91,6 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 88 }}>
-            <LazySection minHeight={400}>
-              <ComingUpSlot />
-            </LazySection>
             <LazySection minHeight={400}>
               <WorldRankingsSlot />
             </LazySection>
