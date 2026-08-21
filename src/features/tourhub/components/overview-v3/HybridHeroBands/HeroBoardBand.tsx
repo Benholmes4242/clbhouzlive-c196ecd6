@@ -196,7 +196,7 @@ export function HeroBoardSection({
   // topContenders (it exposes `predictions`). The overview's TI picks come from
   // useAIPredictions(tournamentId), which TIPicksCarousel already calls with the
   // same key, so this is a cache read and not a new query.
-  const { data: predictions } = useAIPredictions(null);
+  const { data: predictions } = useAIPredictions(tournamentId);
   const pickPlayerIds = useMemo(() => {
     const ids = new Set<string>();
     for (const p of (predictions?.topContenders ?? []) as any[]) {
