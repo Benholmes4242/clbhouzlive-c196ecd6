@@ -1063,7 +1063,52 @@
     "golfThisWeek": {
       "stablefordLabel": "ベストステーブルフォード",
       "birdiesLabel": "バーディー最多",
-      "stablefordUnit": "ポイント"
+      "stablefordUnit": "ポイント",
+      "moment": {
+        "fullScorecard": "スコアカード全体",
+        "chart": {
+          "strip": "全ホール",
+          "trajectory": "このラウンド",
+          "lastSix": "13〜18番",
+          "scorecard": "スコアカード"
+        },
+        "eagle": {
+          "meta": "ホール",
+          "ace": "Ace",
+          "albatross": "Albatross",
+          "eagle": "Eagle",
+          "sub": "このラウンドの一撃",
+          "sentence": "パー{{2}}の{{1}}番で{{0}}。"
+        },
+        "run": {
+          "meta": "ホール",
+          "word": "連続",
+          "sub": "パー以上が連続",
+          "sentence": "{{1}}番から{{2}}番まで、{{0}}ホール連続でパー以上。"
+        },
+        "collapse": {
+          "meta": "ホール",
+          "word": "{{0}}番",
+          "sub": "流れが変わった場面",
+          "sentence": "{{1}}番で{{0}}打を落とし、他のホールは{{2}}。"
+        },
+        "finish": {
+          "meta": "バーディー",
+          "word": "フィニッシュ",
+          "sub": "最終３ホール",
+          "sentence": "最終３ホールで{{0}}バーディー、{{1}}でフィニッシュ。"
+        },
+        "grind": {
+          "meta": "ホール",
+          "word": "迍んだラウンド",
+          "sub": "パー以上",
+          "sentenceClean": "{{1}}ホール中{{0}}ホールでパー以上。バーディーもダブルボギーもなし。",
+          "sentenceNoDoubles": "{{1}}ホール中{{0}}ホールでパー以上。ダブルボギーはなし。",
+          "sentenceNoBirdies": "{{1}}ホール中{{0}}ホールでパー以上。バーディーはなし。",
+          "sentencePlain": "{{1}}ホール中{{0}}ホールでパー以上。",
+          "sentenceNoHoles": "ラウンドは記録済み。ホール別の詳細はありません。"
+        }
+      }
     },
     "week": {
       "scopeAria": "ラウンドの範囲",

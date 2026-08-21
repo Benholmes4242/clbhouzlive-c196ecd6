@@ -1063,7 +1063,52 @@
     "golfThisWeek": {
       "stablefordLabel": "최고 스테이블포드",
       "birdiesLabel": "버디 최다",
-      "stablefordUnit": "포인트"
+      "stablefordUnit": "포인트",
+      "moment": {
+        "fullScorecard": "전재 스곴카드",
+        "chart": {
+          "strip": "모든 홀",
+          "trajectory": "이 라운드",
+          "lastSix": "13–18번 홀",
+          "scorecard": "스곴카드"
+        },
+        "eagle": {
+          "meta": "홀",
+          "ace": "Ace",
+          "albatross": "Albatross",
+          "eagle": "Eagle",
+          "sub": "이 라운드의 한 방",
+          "sentence": "파 {{2}}의 {{1}}번 홀에서 {{0}}타."
+        },
+        "run": {
+          "meta": "홀",
+          "word": "연속 행진",
+          "sub": "파 이상 연속",
+          "sentence": "{{1}}번홀부터 {{2}}번홀까지 {{0}}개 홀 연속 파 이상."
+        },
+        "collapse": {
+          "meta": "홀",
+          "word": "{{0}}번 홀",
+          "sub": "라운드가 바뀐 지점",
+          "sentence": "{{1}}번 홀에서 {{0}}타를 잃었고, 나머지 홀은 {{2}}."
+        },
+        "finish": {
+          "meta": "버다",
+          "word": "마무리",
+          "sub": "마지막 세 홀",
+          "sentence": "마지막 세 홀에서 버다 {{0}}개, {{1}}로 마무리."
+        },
+        "grind": {
+          "meta": "홀",
+          "word": "버텰 라운드",
+          "sub": "파 이상",
+          "sentenceClean": "{{1}}개 홀 중 {{0}}개를 파 이상으로. 버다도 더바도 없었습니다.",
+          "sentenceNoDoubles": "{{1}}개 홀 중 {{0}}개를 파 이상으로. 더바는 없었습니다.",
+          "sentenceNoBirdies": "{{1}}개 홀 중 {{0}}개를 파 이상으로. 버다는 없었습니다.",
+          "sentencePlain": "{{1}}개 홀 중 {{0}}개를 파 이상으로.",
+          "sentenceNoHoles": "라운드 기록은 있으나 홀별 상세는 없습니다."
+        }
+      }
     },
     "week": {
       "scopeAria": "라운드 범위",
