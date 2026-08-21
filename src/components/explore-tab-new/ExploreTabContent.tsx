@@ -15,7 +15,7 @@ import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useScorecardOpener } from './useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { openWithOrigin } from '@/lib/openWithOrigin';
+
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { FindGolfersSheet } from './FindGolfersSheet';
