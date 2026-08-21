@@ -683,11 +683,12 @@ function NineRow({
  * placeholder and no reserved height.
  */
 export function MiniScorecard({ shape }: { shape: HoleShape | null }) {
+  const { t } = useTranslation(['courses']);
   if (!shape || shape.holes.length === 0) return null;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-      <NineRow holes={shape.holes} from={1} to={9} />
-      <NineRow holes={shape.holes} from={10} to={18} />
+      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} />
+      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} />
     </div>
   );
 }
