@@ -136,7 +136,10 @@ const INSIGHT_LINE_RESERVE_SM = INSIGHT_SM * INSIGHT_LINE_HEIGHT;
  * 17px markers with their headers), insight line, padding. Holds the rail level
  * when a round has no hole data and therefore prints no grid at all.
  */
-const CARD_MIN_H = 292;
+/* Re-measured for the one-well tile: 76 photo + 8 pad + 19 member + 8 + 155
+   well + 8 + 14 insight + 10 pad. A card with NO hole data draws no grid, so
+   this is what keeps the rail level. */
+const CARD_MIN_H = 298;
 
 
 
