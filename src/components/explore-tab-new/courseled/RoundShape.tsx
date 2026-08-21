@@ -492,7 +492,13 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
    room for a legend.
    =========================================================================== */
 
-const GOLD_ACE = '#D8A93C';
+/* THE MINI GRID TAKES THE SHEET'S COLOURS (MICRO_BRIEF_SCORECARD_COLOUR_AND_
+   ALIGNMENT §S1) — SC_FILL_BIRDIE (= TOPAR_UNDER_LIGHT #D2222D, the same red the
+   curve and the glass chip use) for under par, SC_FILL_GOLD (#FFD200) for an ace,
+   A.INK for over par and for a bare par. No new hex values: these are the exact
+   tokens ScoreMark paints the full scorecard with. */
+const ACE_GOLD = SC_FILL_GOLD;
+const UNDER_INK = SC_FILL_BIRDIE;
 
 /** §S1.3 — the Clubhouse card's own key, not a second vocabulary. */
 type Marker = 'ace' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double';
