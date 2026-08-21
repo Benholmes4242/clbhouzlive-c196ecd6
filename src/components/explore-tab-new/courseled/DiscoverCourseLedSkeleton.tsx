@@ -225,7 +225,7 @@ export function GolfThisWeekRail() {
                   marginTop: 8,
                   marginLeft: -10,
                   marginRight: -10,
-                  height: 135,
+                  height: 139,
                   background: '#F2F5F8',
                   borderRadius: '12px 12px 16px 16px',
                   padding: '6px 6px 9px',
