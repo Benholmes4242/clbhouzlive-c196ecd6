@@ -100,8 +100,8 @@ describe('BRIEF_BAND_TILES_TOP_THREE', () => {
     expect(chip.textContent).toMatch(/Alpha/);
     const runners = runnerRows(chip);
     expect(runners).toHaveLength(2);
-    expect(runners[0].textContent).toMatch(/2Bravo76/);
-    expect(runners[1].textContent).toMatch(/3Charlie78/);
+    expect(runners[0].textContent).toMatch(/^2B?Bravo76$/);
+    expect(runners[1].textContent).toMatch(/^3C?Charlie78$/);
     expect(chip.textContent).not.toMatch(/Delta/);
   });
 
@@ -195,9 +195,11 @@ describe('BRIEF_BAND_TILES_TOP_THREE', () => {
     const chip = chipFor(container, /BEST THIS WEEK/i);
     expect(chip.style.minWidth).toBe('230px');
     expect(chip.style.flex).toBe('1 0 230px');
-    const sizes = [...runnerRows(chip)[0].querySelectorAll('span')].map(
-      (s) => (s as HTMLElement).style.fontSize,
-    );
-    for (const s of sizes) expect(['8px', '12px', '']).toContain(s);
+    /* Only the spans THIS row declares — the avatar's own initial glyph is the
+       avatar component's business, not the band's type scale. */
+    const sizes = [...runnerRows(chip)[0].children]
+      .filter((c) => c.tagName === 'SPAN')
+      .map((c) => (c as HTMLElement).style.fontSize);
+    expect(sizes).toEqual(['8px', '12px', '12px']);
   });
 });
