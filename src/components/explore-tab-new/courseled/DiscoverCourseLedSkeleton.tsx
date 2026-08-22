@@ -686,7 +686,9 @@ export function MostPlayedPanel() {
               alignItems: 'center',
               gap: 11,
               padding: '12px 14px',
-              height: 97,
+              /* Browser-measured against the live collapsed card at 320px:
+                 124px when the two-line course-name allowance is exercised. */
+              height: 124,
               boxSizing: 'border-box',
               background: A.PANEL,
               borderRadius: 16,
