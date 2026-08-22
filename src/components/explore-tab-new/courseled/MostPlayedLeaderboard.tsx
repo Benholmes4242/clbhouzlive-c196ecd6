@@ -447,7 +447,7 @@ function MemberBoard({
             cursor: 'pointer',
           }}
         >
-          {t('discover.mostPlayedSeeAllAtCourse', 'See all at this course')}
+          {t('discover.mostPlayedSeeAllAtCourse', 'Visit this course')}
         </button>
       )}
     </div>
@@ -516,7 +516,7 @@ export function MostPlayedLeaderboard({
               was. Do not silently reverse this again.
               'discover.whereTheyPlayed' is now unused and STAYS in all six
               locale files, the treatment §S4.1 gave the key it replaced. */}
-          {t('discover.mostPlayed', 'Most played courses this week')}
+          {t('discover.mostPlayed', 'Courses played this week')}
         </Eyebrow>
       )}
 
