@@ -237,12 +237,19 @@ export function GolfThisWeekRail() {
             width  1 0 230px, mirroring the live flex rule rather than a
                    hard-coded px.
             height 11 pad
-                   + 13 eyebrow line box
+                   + 12 eyebrow line box
                    + 8  ladder marginTop
-                   + 40 leader row   (2 top pad + 30 figure + 8 bottom pad)
-                   + 33 second row   (1px rule + 8 + 16 avatar + 8)
-                   + 33 third row
-                   + 12 pad         = 150.
+                   + 36 leader row   (6 pad + 24 name line box + 6 pad)
+                   + 41 second row   (1px rule + 8 + 24 name line box + 8)
+                   + 41 third row
+                   + 12 pad         = 161.
+                   RE-MEASURED IN THE BROWSER for LADDER_TIGHTEN: the row height
+                   is set by the NAME's inherited 24px line box, NOT by the
+                   avatar (20/16) and no longer by the figure — which is why the
+                   leader's row only lost 4px when its figure dropped from 30 to
+                   12, and why the previous shell's 13/40/33/33 under-measured
+                   the live chip by 11px.
+
           WHY THREE ROWS AND NOT ONE, given the shell models the SMALLEST
           plausible state: the rail levels every chip to the TALLEST, so the
           settled height of EVERY chip is the tallest tile's. In the current data
@@ -271,7 +278,7 @@ export function GolfThisWeekRail() {
             {/* The eyebrow row: label left, unit right (§2). */}
             <div
               style={{
-                height: 13,
+                height: 12,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -282,13 +289,18 @@ export function GolfThisWeekRail() {
             </div>
 
             {/* THE LADDER. Same columns on every row — rank, figure, avatar,
-                name, chevron — with the first row taller, exactly as the live
-                chip renders it. */}
+                name, chevron. BRIEF_BAND_TILES_LADDER_TIGHTEN §5: the leader's
+                figure is now ROW SIZE, so the leader's row is 36 not 40 — it is
+                shorter than the runners by their 1px rule, and it carries
+                the same ~3.5% ink ground the live chip gives first place. */}
             <div style={{ marginTop: 8 }}>
               <div
                 style={{
-                  height: 40,
-                  padding: '2px 0 8px',
+                  height: 36,
+                  padding: '6px 12px',
+                  margin: '0 -12px',
+                  background: 'rgba(11,15,20,0.035)',
+                  borderRadius: 6,
                   boxSizing: 'border-box',
                   display: 'flex',
                   alignItems: 'center',
@@ -296,15 +308,16 @@ export function GolfThisWeekRail() {
                 }}
               >
                 <Bar style={{ height: 8, width: 7 }} />
-                <Bar style={{ height: 22, width: 42 }} />
+                <Bar style={{ height: 12, width: 33 }} />
                 <Bar style={{ height: 20, width: 20, borderRadius: '34%' }} />
                 <Bar style={{ height: 12, width: 72 }} />
               </div>
+
               {[0, 1].map((j) => (
                 <div
                   key={j}
                   style={{
-                    height: 33,
+                    height: 41,
                     padding: '8px 0',
                     borderTop: '1px solid rgba(11,15,20,0.07)',
                     boxSizing: 'border-box',
