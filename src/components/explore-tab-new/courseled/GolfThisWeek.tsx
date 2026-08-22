@@ -129,11 +129,23 @@ const HERO_H = 156;
    when a round has no hole data and the well is empty (§S1.7, ACCEPTANCE K). */
 const GRID_H = 100;
 
-/* §S4.1 — A TINTED WELL, NO BORDER. The tone separates it from the card and an
-   outline would be a second signal for one edge. The marker outer rings trace
+/* §S4.1 OVERTURNED BY BRIEF_ROUND_TILE_WHITE_WELL §0 — A WHITE WELL WITH A RULE.
+   §S4.1 read: "A TINTED WELL, NO BORDER. The tone separates it from the card and
+   an outline would be a second signal for one edge. The marker outer rings trace
    against THIS colour (§S4.7), never white — a white ring on a tinted well
-   haloes. */
-const WELL = '#F2F5F8';
+   haloes."
+   WHY IT NO LONGER HOLDS: the tint was chosen INSTEAD OF a border, to separate
+   the well from the card. The well is now the card's own colour, so there is
+   nothing to separate and the job passes to the rule §S4.1 rejected only because
+   the tint was already doing it. And the tint was failing anyway — #F2F5F8
+   against a page canvas of #F4F6F9 is three points of grey, so the well never
+   read as a card edge; white against #F4F6F9 does. The well matches the leader
+   chips exactly.
+   THE SECOND HALF SURVIVES AND GETS EASIER: the marker spacer still takes the
+   WELL's colour (§S4.7) — that colour simply happens to be white now, so a
+   spacer outside a moment band is invisible, which is what a spacer wants. */
+const WELL = '#FFFFFF';
+
 const WELL_RADIUS = 12;
 /* 6, not 10 — see WELL_INNER. */
 const WELL_PAD_X = 6;
@@ -1136,13 +1148,16 @@ function GolfThisWeekCard({
           the card edges. */}
       <div style={{ padding: '0 10px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* ===================== THE SCORECARD WELL (§S4) =====================
-            A TINTED WELL, #F2F5F8, NO BORDER (§S4.1) — the tone separates it
-            from the card and an outline would be a second signal for one edge.
-            IT RUNS TO THE CARD'S BOTTOM EDGE: the tint finishing 10px short of
+            A WHITE WELL WITH A HAIRLINE (BRIEF_ROUND_TILE_WHITE_WELL §1/§2) — the
+            well is now the card's own #FFFFFF and matches the leader chips, so
+            the boundary is DRAWN rather than implied by a tone. The tint and the
+            border are ALTERNATIVES, not additions.
+            IT RUNS TO THE CARD'S BOTTOM EDGE: the well finishing 10px short of
             the tile read as an unfinished panel, so the bottom corners take the
             CARD's radius and the card has no padding beneath it. Its height is
             fixed whatever it holds, so an empty well keeps the rail level
             (ACCEPTANCE K, Q). */}
+
         <div
           style={{
             /* THE WELL'S 8px OFFSET MOVED UP INTO THE DARK REGION'S BOTTOM
@@ -1156,16 +1171,19 @@ function GolfThisWeekCard({
             minHeight: WELL_H,
             flex: 1,
             background: WELL,
-            /* §2 (BRIEF_DISCOVER_FINISHING_PASS) — THE WELL GETS AN EDGE. WELL is
-               two points off A.CANVAS, so without a boundary the card's lower half
-               read as page rather than card. The rule is WELL_RULE, the token that
+            /* §2 (BRIEF_ROUND_TILE_WHITE_WELL, superseding §2 of
+               BRIEF_DISCOVER_FINISHING_PASS) — THE WELL'S EDGE IS DRAWN ON ALL
+               FOUR SIDES. WELL is now the card's colour, so without a boundary the
+               well has no edge at all. The rule is WELL_RULE, the token that
                already exists for the header line — not a second rule colour.
                INSET BOX-SHADOW, NOT A BORDER: the well is box-sizing: border-box
                with a fixed minHeight, so a 1px border would take 2px off the inner
-               height and move the grid. An inset shadow costs no layout.
+               height AND 2px off the 244px inner width the marker/gap table in
+               RoundShape is measured at. An inset shadow costs no layout.
                NOT a darker fill (the markers use `well` as their ring spacer) and
                NOT an outer shadow (the CARD already carries CARD_SHADOW). */
             boxShadow: `inset 0 0 0 1px ${WELL_RULE}`,
+
             borderRadius: `0 0 16px 16px`,
             padding: `6px ${WELL_PAD_X}px 9px`,
             boxSizing: 'border-box',

@@ -541,14 +541,15 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
  *  1px BORDER at the box edge, then a 1px spacer inboard of it, then the inner
  *  ring. Both are inset shadows, so the cell can never paint outside itself.
  *
- *  THE SPACER TAKES THE SURFACE COLOUR the cell sits on, so it never haloes:
- *  pass the card or sheet background in, never a fixed grey
- *  (BRIEF_ROUND_TILE_THE_MOMENT v2 §S4.7 — on a tinted well a WHITE ring
- *  haloes). §S4.7 IS NEWLY LOAD-BEARING: a cell INSIDE a moment band must be
- *  passed the BLENDED well (the tone composited over the well at the band's
- *  opacity), or its spacer draws the plain well against a tinted background —
- *  a pale halo inside the ring, which is the exact fault §S4.7 prevents. See
- *  bandWell in NineRow.
+ *  THE SPACER TAKES THE SURFACE COLOUR the cell sits on — that is the rule, and
+ *  it holds whatever that colour is: pass the card, sheet or well background in,
+ *  never a fixed grey. Since BRIEF_ROUND_TILE_WHITE_WELL the round tile's well is
+ *  #FFFFFF, so outside a band the spacer is invisible, which is exactly what a
+ *  spacer wants to be. THE RULE IS STILL LOAD-BEARING INSIDE A MOMENT BAND: a
+ *  cell there must be passed the BLENDED well (the tone composited over the well
+ *  at the band's opacity), or its spacer draws the plain well against a tinted
+ *  background — a pale halo inside the ring. See bandWell in NineRow.
+
  *
  *  IT TAKES NO MOMENT TONE (BRIEF_ROUND_MOMENTS_V3 §1). It used to accept
  *  `markTone` and thread it into every branch as the outer ring, which made a
