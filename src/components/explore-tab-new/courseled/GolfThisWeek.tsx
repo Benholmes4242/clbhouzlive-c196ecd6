@@ -1628,10 +1628,18 @@ export function GolfThisWeek({
                 boxShadow: CARD_SHADOW,
                 overflow: 'hidden',
                 /* FOUR TILES DO NOT SHRINK (§3.1): the figure is the content, so
-                   the band scrolls at 320px instead. */
-                flex: '1 0 154px',
-                minWidth: 154,
+                   the band scrolls at 320px instead.
+                   230, NOT 154 (BRIEF_BAND_TILES_TOP_THREE §4). 154 was set when
+                   the chip held three lines; it now holds up to seven. At 154 a
+                   real account name — "Notascratchgolfer", ~112px at 12/700 —
+                   leaves no room for a rank, an avatar and a figure on one line
+                   in ANY order. The WIDTH was out of date, not the row. About
+                   2.2 chips fit across instead of 3, and the partly visible
+                   third also signals that the rail scrolls. */
+                flex: '1 0 230px',
+                minWidth: 230,
                 padding: '11px 12px 12px',
+
                 fontFamily: SANS,
               }}
             >
