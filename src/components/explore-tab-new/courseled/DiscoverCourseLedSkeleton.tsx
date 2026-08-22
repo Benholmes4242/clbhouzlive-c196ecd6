@@ -44,7 +44,8 @@ const SK_ROUND_HERO_BG = [
  *   rounds rail    merged Golf this week: readout + region, scope pills, the
  *                  LEADER BAND (three 230px chips, 163 tall, 9px gap) and the
  *                  round tiles
- *   most played    four cards at 10px gaps, 52px thumbnail
+ *   most played    four collapsed cards at 10px gaps, 52px thumbnail, with
+ *                  separate region/count lines and the resolved-player BEST row
  *   honours        rail of 206 x 164 cards over a 96px head
  *                  (SK_CARD_W / SK_CARD_H / SK_HEAD_H)
  * so the loaded page lands on its own outline with no section boundary
@@ -668,7 +669,7 @@ export function MomentsMosaic() {
   );
 }
 
-/** Section 6 — most played: panel of rows (rank + 40px thumb + bars + figure). */
+/** Section 6 — Most Played. This models the COLLAPSED card, never its board. */
 export function MostPlayedPanel() {
   return (
     <section>
@@ -694,15 +695,28 @@ export function MostPlayedPanel() {
             {/* NO RANK BAR (BRIEF_MOST_PLAYED_LEADERBOARD §S1.2) and a 52px
                 thumbnail to match the shipped header row. */}
             <Bar style={{ height: 52, width: 52, borderRadius: 13, flexShrink: 0 }} />
-            {/* BRIEF_MOST_PLAYED_META_LINE: the meta line is 11px and sits 2px
-                under the name, not 4px at 9px. The name stays 14px on a two-line
-                clamp, and ONE bar is right: the longest current name
-                ("Sundridge Park Golf Club (East Course)", 258px) still fits the
-                358px text column, so nothing in the current data wraps. */}
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* BRIEF_COURSE_CARD_REGION_AND_BEST §4: the shell remains the
+                COLLAPSED state. Region and counts are separate 11px lines; the
+                BEST line sits below the same hairline as the live card. */}
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
               <TextBar w={130} h={13} />
-              <TextBar w={86} h={11} />
-
+              <div style={{ marginTop: 2 }}><TextBar w={92} h={11} /></div>
+              <div style={{ marginTop: 2 }}><TextBar w={116} h={11} /></div>
+              <div
+                style={{
+                  marginTop: 6,
+                  paddingTop: 6,
+                  borderTop: `1px solid ${A.HAIRLINE}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <TextBar w={27} h={9} />
+                <TextBar w={16} h={12} />
+                <TextBar w={14} h={10} />
+                <TextBar w={48} h={12} />
+              </div>
             </div>
             {/* §S1.5 — the promoted PLAYED TO figure over its 8px label. */}
             <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
