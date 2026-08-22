@@ -1264,11 +1264,6 @@ export function GolfThisWeek({
   const pending = !!userId && (roundsQuery.isPending || !scopeCourses.ready);
   if (pending) return <GolfThisWeekShell />;
 
-  const bestToPar = best == null ? null : best.toPar === 0
-    ? 'E'
-    : best.toPar < 0
-      ? `\u2212${Math.abs(best.toPar)}`
-      : `+${best.toPar}`;
   const courseNameFor = (r: CircleRoundRow) =>
     meta?.get(r.course_id ?? '')?.name ?? r.course_name ?? '';
 
@@ -1403,6 +1398,23 @@ export function GolfThisWeek({
   const mostBirdies = birdiesRanked[0] ?? null;
   const mostImproved = improvedRanked[0] ?? null;
 
+  /* BRIEF_BAND_TILES_LADDER §0 — WHY THE HERO BLOCK WAS DISSOLVED. The chip
+     carried TWO grammars, a hero block then a list, and four faults followed
+     from that. Do not put it back:
+       1. THE FIGURES DID NOT SHARE A COLUMN. 68 far left at 30px; 73 and 77 far
+          right at 12px. Three numbers in two positions cannot be scanned, and
+          scanning is what a ranking is for.
+       2. THERE WAS A 2 AND A 3 BUT NO 1. Hero treatment implies first — until
+          explicit ranks appear beneath it, when the absence reads as an omission.
+       3. THE CHEVRON WAS ONLY ON THE LEADER, while all three rows were
+          tappable, so it looked like that member's mark, not the card's.
+       4. THE RUNNERS LOST THEIR QUALIFIER. The leader showed "68 -3", the
+          others bare 73 and 77 — and on BEST THIS WEEK the to-par IS the
+          comparison.
+     All four are fixed by one ladder: one figure column, a rank on every row, a
+     chevron on every row, and the qualifier either per-row (best) or once on
+     the eyebrow as a column header (§2).
+
   /* BRIEF_BAND_TILES_REFINEMENT — the bottom line is the COURSE on every tile,
      and anything QUALIFYING the figure (a to-par, a unit) sits beside it on the
      figure's baseline. Colour appears only where it MEANS something: red on an
@@ -1412,42 +1424,55 @@ export function GolfThisWeek({
     key: string;
     emoji?: string;
     label: string;
-    figure: string;
-    tone: string;
-    /** Qualifier on the figure's baseline: a to-par or a unit. Never a course. */
-    qual?: string;
-    qualTone?: string;
+    /** §2 — the UNIT, printed once on the eyebrow row as a column header.
+        Absent on BEST THIS WEEK, whose qualifier is data and stays per-row. */
+    unit?: string;
     row: CircleRoundRow;
     course: string;
     /** §2 — places 2 and 3, member-capped. Empty is a normal week. */
     runners: CircleRoundRow[];
-    /** The same comparison the tile ranks on, rendered at row scale. */
-    figureOf: (r: CircleRoundRow) => { text: string; tone: string };
+    /** The tile's comparison for ONE row: the figure, and — only where the
+        qualifier varies by round — that row's qualifier. */
+    figureOf: (r: CircleRoundRow) => {
+      text: string;
+      tone: string;
+      qual?: string;
+      qualTone?: string;
+    };
   }[] = [];
 
+  /* §2 — BEST THIS WEEK's to-par is DATA, not a unit: it differs per round, so
+     it is the one qualifier that stays beside every figure in the ladder. */
+  const toParOf = (r: CircleRoundRow) => {
+    if (r.gross == null || r.course_par == null) return null;
+    const d = (r.gross as number) - (r.course_par as number);
+    return {
+      text: d === 0 ? 'E' : d < 0 ? `\u2212${Math.abs(d)}` : `+${d}`,
+      tone: d < 0 ? TOPAR_RED : A.MUTE,
+    };
+  };
 
   if (best) {
     bandTiles.push({
       key: 'best',
       emoji: '\uD83D\uDD25', // FIRE
       label: t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK'),
-      figure: String(best.row.gross ?? '\u2014'),
-      /* §S1.4 — the figure itself stays INK; only the to-par is coloured.
-         STILL TRUE, AND IT IS THE REASON FOR the hero figure rule
-         (BRIEF_ROUND_TILE_MARK_AND_FIGURE §1): what gets coloured is the
-         TO-PAR, never the count. Here the figure is a GROSS beside its own
-         to-par, so the gross stays ink. In the hero, FINISHED IN THE RED's
-         figure IS the to-par, so §S1.4 asks for it to be coloured there — and
-         asks for THE RUN's "8" and BIRDIE HAUL's "5" to stay white. */
-      tone: INK,
-      qual: bestToPar ?? undefined,
-      qualTone: best.toPar < 0 ? TOPAR_RED : INK,
       row: best.row,
       course: courseNameFor(best.row),
       /* The hero is `bestOfWeek`'s winner, unchanged; the sort's first place is
          the same row, so the runners are places 2 and 3 of that same list. */
       runners: bestRanked.slice(1),
-      figureOf: (r) => ({ text: String(r.gross ?? '\u2014'), tone: INK }),
+      /* §S1.4 — the figure itself stays INK; only the to-par is coloured. What
+         gets coloured is the TO-PAR, never the count. */
+      figureOf: (r) => {
+        const tp = toParOf(r);
+        return {
+          text: String(r.gross ?? '\u2014'),
+          tone: INK,
+          qual: tp?.text,
+          qualTone: tp?.tone,
+        };
+      },
     });
   }
   if (bestStableford) {
@@ -1455,10 +1480,7 @@ export function GolfThisWeek({
       key: 'stableford',
       emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
       label: t('discover.golfThisWeek.stablefordLabel', 'Best stableford'),
-      figure: String(bestStableford.stableford_points),
-      tone: INK,
-      qual: t('discover.golfThisWeek.stablefordUnit', 'points'),
-      qualTone: INK,
+      unit: t('discover.golfThisWeek.stablefordUnit', 'points'),
       row: bestStableford,
       course: courseNameFor(bestStableford),
       runners: stablefordRanked.slice(1),
@@ -1470,37 +1492,31 @@ export function GolfThisWeek({
       key: 'birdies',
       emoji: '\uD83D\uDC26', // BIRD
       label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
-      /* A birdie count IS a count of under-par holes, so the red is literal. */
-      figure: String(mostBirdies.birdies),
-      tone: TOPAR_RED,
-      qual: t('discover.friendsRail.birdies', 'birdies'),
-      qualTone: INK,
+      unit: t('discover.friendsRail.birdies', 'birdies'),
       row: mostBirdies,
       course: courseNameFor(mostBirdies),
       runners: birdiesRanked.slice(1),
+      /* A birdie count IS a count of under-par holes, so the red is literal. */
       figureOf: (r) => ({ text: String(r.birdies), tone: TOPAR_RED }),
     });
   }
   if (mostImproved) {
-    const d = mostImproved.delta_index as number;
     bandTiles.push({
       key: 'improved',
       emoji: '\uD83D\uDCAA', // FLEXED ARM
       label: t('discover.golfThisWeek.improvedLabel', 'MOST IMPROVED'),
-      /* A falling index IS better — the index-delta scale, with a down arrow. */
-      figure: `\u2193${Math.abs(d).toFixed(1)}`,
-      tone: A.IMPROVED,
-      qual: t('discover.friendsRail.index', 'HCP'),
-      qualTone: INK,
+      unit: t('discover.friendsRail.index', 'HCP'),
       row: mostImproved,
       course: courseNameFor(mostImproved),
       runners: improvedRanked.slice(1),
+      /* A falling index IS better — the index-delta scale, with a down arrow. */
       figureOf: (r) => ({
         text: `\u2193${Math.abs(r.delta_index as number).toFixed(1)}`,
         tone: A.IMPROVED,
       }),
     });
   }
+
 
 
 
@@ -1643,6 +1659,12 @@ export function GolfThisWeek({
                 fontFamily: SANS,
               }}
             >
+              {/* THE EYEBROW ROW CARRIES THE UNIT (§2), right-aligned opposite
+                  the label. Once three rows share one figure column, printing
+                  "points" three times is noise — printed once at the top it is
+                  a COLUMN HEADER, which is what it always was. BEST THIS WEEK
+                  shows no unit: its to-par varies by round, so it is data and
+                  stays beside every figure. */}
               <div
                 style={{
                   fontSize: 8,
@@ -1659,207 +1681,176 @@ export function GolfThisWeek({
                     baseline across all four tiles. */}
                 <span style={{ fontSize: 11, lineHeight: 1 }}>{tile.emoji}</span>
                 {tile.label}
-              </div>
-
-              {/* §S1.2 — the qualifier is a PROPERTY OF THE FIGURE, so it shares
-                  the figure's baseline, 5px after it. */}
-              <div
-                style={{
-                  marginTop: 5,
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  gap: 5,
-                  minWidth: 0,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 30,
-                    fontWeight: 800,
-                    letterSpacing: '-0.05em',
-                    lineHeight: 1,
-                    fontVariantNumeric: 'tabular-nums lining-nums',
-                    color: tile.tone,
-                  }}
-                >
-                  {tile.figure}
-                </span>
-                {tile.qual ? (
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      lineHeight: 1,
-                      fontVariantNumeric: 'tabular-nums lining-nums',
-                      color: tile.qualTone ?? INK,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {tile.qual}
-                  </span>
+                {tile.unit ? (
+                  <span style={{ marginLeft: 'auto' }}>{tile.unit}</span>
                 ) : null}
               </div>
 
+              {/* ONE LADDER (§1). The hero block is DISSOLVED: every row —
+                  including the leader's — has the same columns in the same
+                  order, RANK, FIGURE, AVATAR, NAME, CHEVRON, and the figure
+                  column is FIXED WIDTH and LEFT-ALIGNED so 68 / 73 / 77 stack
+                  down one edge. The leader's row is BIGGER, NOT DIFFERENT:
+                  30/800 figure, 20px avatar. Nothing else separates it — the
+                  row dividers are uniform and there is no heavier rule between
+                  the leader and the rest. */}
               <div
                 style={{
-                  marginTop: 9,
+                  marginTop: 8,
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  minWidth: 0,
+                  flexDirection: 'column',
                 }}
               >
-                <SquircleAvatar
-                  src={tile.row.profile_photo_url}
-                  userId={tile.row.user_id}
-                  alt={tile.row.display_name}
-                  size={20}
-                  hideRing
-                />
-                <span
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: INK,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {tile.row.display_name}
-                </span>
-                {/* §1.3 (BRIEF_DISCOVER_FINISHING_PASS) — THE MISSING SIGN FOR AN
-                    AFFORDANCE THAT ALREADY EXISTS. The chip is role="button" with
-                    an onClick; nothing signalled it. Same glyph, size, stroke and
-                    tone as the well's "Full scorecard" chevron. flexShrink 0 so
-                    the name's ellipsis still works. */}
-                <ChevronRight
-                  size={9}
-                  strokeWidth={3}
-                  color={INK}
-                  style={{ flexShrink: 0 }}
-                />
-              </div>
-              {/* §1.1/§1.2 (BRIEF_DISCOVER_FINISHING_PASS) — THE COURSE LINE IS
-                  GONE. This OVERTURNS §S2 above and BRIEF_BAND_TILES_REFINEMENT
-                  ("the bottom line is the COURSE on every tile"), which are kept
-                  on the record rather than deleted.
-                  WHY: at 12/700 the line truncates before the informative part —
-                  "Sundridge Park Gol..." does not separate East from West, the
-                  one thing a member needs from it. 11px of chip for a prefix is
-                  worse than no line. The chip is tappable and the sheet it opens
-                  leads with the course in full.
-                  THE COST: the chip no longer says WHERE, so across a multi-course
-                  week the figure is a weaker fact than it was. */}
-
-              {/* PLACES 2 AND 3 (BRIEF_BAND_TILES_TOP_THREE §4/§5) — the SAME
-                  reading order as the hero's member row: rank, avatar, name,
-                  figure, on one line. No new type sizes: 8 for the rank, 12/700
-                  for the name and the figure, exactly the scale
-                  BRIEF_BAND_TILE_TYPE_SCALE fixed.
-                  ABSENT IS ABSENT (§3): no dash, no placeholder, no reserved
-                  height. The rail's `alignItems: 'stretch'` already levels every
-                  chip to the tallest, so a one-qualifier tile simply carries an
-                  empty area (§6) — nothing fills it. */}
-              {tile.runners.length > 0 ? (
-                <div
-                  style={{
-                    marginTop: 10,
-                    paddingTop: 8,
-                    borderTop: `1px solid ${WELL_RULE}`,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 8,
-                  }}
-                >
-                  {tile.runners.map((r, i) => {
-                    const f = tile.figureOf(r);
-                    return (
-                      <div
-                        key={r.round_id}
-                        /* §5 — THE NESTING IS THE RISK. The chip around this row
-                           is itself role="button" with an onClick and an
-                           Enter/Space handler, so without stopPropagation a tap
-                           here would ALSO open the leader's scorecard. */
-                        role="button"
-                        tabIndex={0}
-                        onClick={(e) => {
+                {[tile.row, ...tile.runners].map((r, i) => {
+                  const f = tile.figureOf(r);
+                  const lead = i === 0;
+                  return (
+                    <div
+                      key={r.round_id}
+                      /* §3 — EVERY ROW IS TAPPABLE, INCLUDING THE LEADER'S, and
+                         the chip around them is itself role="button" with an
+                         onClick and an Enter/Space handler. Without
+                         stopPropagation a row tap would open TWO scorecards. */
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCardPress(r);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                          e.preventDefault();
                           e.stopPropagation();
                           onCardPress(r);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onCardPress(r);
-                          }
-                        }}
+                        }
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        minWidth: 0,
+                        cursor: 'pointer',
+                        /* UNIFORM DIVIDERS (§1): the same hairline between every
+                           pair of rows, none above the leader. */
+                        borderTop: lead ? 'none' : `1px solid ${WELL_RULE}`,
+                        padding: lead ? '2px 0 8px' : '8px 0',
+                      }}
+                    >
+                      {/* EVERY ROW CARRIES ITS RANK (§1) — the leader's 1 is
+                          PRESENT, not implied. It sits in its own 7px column at
+                          the ladder's left edge so all three digits align, and
+                          at 8/700 it does not compete with a 30px figure. */}
+                      <span
                         style={{
+                          fontSize: 8,
+                          fontWeight: 700,
+                          lineHeight: 1,
+                          color: BAND_FAINT,
+                          fontVariantNumeric: 'tabular-nums lining-nums',
+                          width: 7,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {i + 1}
+                      </span>
+
+                      {/* THE FIGURE COLUMN — fixed width, left-aligned. This is
+                          what makes the ranking visible rather than merely
+                          stated. Its width is set once per tile from the widest
+                          figure the tile can hold, not per row. */}
+                      <div
+                        style={{
+                          width: tile.unit ? 40 : 56,
+                          flexShrink: 0,
                           display: 'flex',
-                          alignItems: 'center',
-                          gap: 6,
+                          alignItems: 'baseline',
+                          gap: 4,
                           minWidth: 0,
-                          height: 18,
-                          cursor: 'pointer',
                         }}
                       >
                         <span
                           style={{
-                            fontSize: 8,
-                            fontWeight: 700,
+                            fontSize: lead ? 30 : 12,
+                            fontWeight: lead ? 800 : 700,
+                            letterSpacing: lead ? '-0.05em' : undefined,
                             lineHeight: 1,
-                            color: BAND_FAINT,
                             fontVariantNumeric: 'tabular-nums lining-nums',
-                            width: 7,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {i + 2}
-                        </span>
-                        <SquircleAvatar
-                          src={r.profile_photo_url}
-                          userId={r.user_id}
-                          alt={r.display_name}
-                          size={18}
-                          hideRing
-                        />
-                        <span
-                          style={{
-                            flex: 1,
-                            minWidth: 0,
-                            fontSize: 12,
-                            fontWeight: 700,
-                            color: INK,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {r.display_name}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: 12,
-                            fontWeight: 700,
                             color: f.tone,
-                            fontVariantNumeric: 'tabular-nums lining-nums',
-                            flexShrink: 0,
                           }}
                         >
                           {f.text}
                         </span>
+                        {f.qual ? (
+                          <span
+                            style={{
+                              fontSize: 12,
+                              fontWeight: 700,
+                              lineHeight: 1,
+                              fontVariantNumeric: 'tabular-nums lining-nums',
+                              color: f.qualTone ?? A.MUTE,
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {f.qual}
+                          </span>
+                        ) : null}
                       </div>
-                    );
-                  })}
-                </div>
-              ) : null}
+
+                      <SquircleAvatar
+                        src={r.profile_photo_url}
+                        userId={r.user_id}
+                        alt={r.display_name}
+                        size={lead ? 20 : 16}
+                        hideRing
+                      />
+                      <span
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: INK,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {r.display_name}
+                      </span>
+                      {/* THE CHEVRON IS ON EVERY ROW (§0.3). On the leader alone
+                          it read as that member's mark rather than the card's
+                          affordance, while all three rows were tappable. */}
+                      <ChevronRight
+                        size={9}
+                        strokeWidth={3}
+                        color={INK}
+                        style={{ flexShrink: 0 }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              {/* §1.1/§1.2 (BRIEF_DISCOVER_FINISHING_PASS) — THE COURSE LINE IS
+                  GONE. This OVERTURNS BRIEF_BAND_TILES_REFINEMENT ("the bottom
+                  line is the COURSE on every tile"), kept on the record rather
+                  than deleted.
+                  WHY: at 12/700 the line truncates before the informative part —
+                  "Sundridge Park Gol..." does not separate East from West, the
+                  one thing a member needs from it. The chip is tappable and the
+                  sheet it opens leads with the course in full.
+                  THE COST: the chip no longer says WHERE.
+
+                  ABSENT IS ABSENT (BRIEF_BAND_TILES_TOP_THREE §3): fewer than
+                  three qualifiers renders fewer rows — no dash, no placeholder,
+                  no reserved height. The rail's `alignItems: 'stretch'` levels
+                  every chip to the tallest, so a short tile simply carries an
+                  empty area and nothing fills it. */}
 
             </div>
           ))}
         </div>
       )}
+
 
 
 
