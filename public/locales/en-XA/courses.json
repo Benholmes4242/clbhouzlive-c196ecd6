@@ -1333,7 +1333,7 @@
     "defending": "[~~Đéƒéñđíñĝ~~]",
     "nPhotos": "[~~{{count}} ƥĥőţőš~~]",
     "nPhotos_one": "[~~{{count}} ƥĥőţő~~]",
-    "mostPlayed": "[~~Ṁőšţ ƥļáýéđ çőúřšéš ţĥíš ŵééǩ~~]",
+    "mostPlayed": "[~~Çőúřšéš ƥļáýéđ ţĥíš ŵééǩ~~]",
     "whereTheyPlayed": "[Ẃĥéŕé ţĥéý ṗļàýéð ţĥíś ŵééķ one]",
     "mostPlayedRoundCount": "[{{count}} ŕóûñð one]",
     "mostPlayedRoundCount_other": "[{{count}} ŕóûñðś one]",
@@ -1618,7 +1618,7 @@
         "worldwide": "No rounds this week."
       }
     },
-    "mostPlayedSeeAllAtCourse": "[Śéé àļļ àţ ţĥíś çóûŕśé one]"
+    "mostPlayedSeeAllAtCourse": "[Ṿíśíţ ţĥíś çóûŕśé one]"
   },
   "statBrowse": {
     "eyebrow": "[~~Ŵĥéřé ţĥíš ĉőɱɱúñíţý ƥļáýš~~]",

@@ -1057,7 +1057,7 @@
     "mostPlayedAvgToParBy_other": "{{value}}（{{count}}人）",
     "mostPlayedMembers_other": "{{count}}人",
     "mostPlayedSheetCaption_other": "{{count}}コース",
-    "mostPlayed": "今週最もプレーされたコース",
+    "mostPlayed": "今週プレーされたコース",
     "whereTheyPlayed": "今週プレーした場所",
     "mostPlayedRoundCount": "{{count}} ラウンド",
     "mostPlayedRoundCount_other": "{{count}} ラウンド",
@@ -1129,7 +1129,7 @@
         "worldwide": "今週はラウンドがありません。"
       }
     },
-    "mostPlayedSeeAllAtCourse": "このコースの全員を見る"
+    "mostPlayedSeeAllAtCourse": "このコースを見る"
   },
   "statBrowse": {
     "colArea": "エリア",

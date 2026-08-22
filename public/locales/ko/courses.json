@@ -1057,7 +1057,7 @@
     "mostPlayedAvgToParBy_other": "{{value}} · {{count}}명",
     "mostPlayedMembers_other": "{{count}}명",
     "mostPlayedSheetCaption_other": "{{count}}개 코스",
-    "mostPlayed": "이번 주 최다 플레이 코스",
+    "mostPlayed": "이번 주 플레이한 코스",
     "whereTheyPlayed": "이번 주 플레이한 곳",
     "mostPlayedRoundCount": "{{count}} 라운드",
     "mostPlayedRoundCount_other": "{{count}} 라운드",
@@ -1129,7 +1129,7 @@
         "worldwide": "이번 주 라운드가 없습니다."
       }
     },
-    "mostPlayedSeeAllAtCourse": "이 코스의 전체 보기"
+    "mostPlayedSeeAllAtCourse": "이 코스 방문하기"
   },
   "statBrowse": {
     "colArea": "지역",
