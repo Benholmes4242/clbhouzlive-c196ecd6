@@ -228,29 +228,29 @@ export function GolfThisWeekRail() {
           band as it stood BEFORE BRIEF_BAND_TILES_REFINEMENT made it cards, and
           it was ~21px against a live chip MEASURED at 123 — so every cold load
           dropped the round tiles by ~100px when the band resolved.
-          MEASURED off the live chip after BRIEF_BAND_TILE_TYPE_SCALE:
-            flex 1 0 154px, 9px rail gap, CARD_SHELL's shadow, padding 11/12/12
-            row 1  eyebrow      line box 13, bar 8
-            row 2  marginTop 5, figure 30 with its 12px qualifier
-            row 3  marginTop 9, avatar 20 + 12px name + chevron
-          RE-MEASURED after BRIEF_DISCOVER_FINISHING_PASS §1, which DELETED the
-          course line and its marginTop and put a chevron on the member row:
-          11 + 13 + 5 + 30 + 9 + 20 + 12 = 100.
-          RE-MEASURED AGAIN after BRIEF_BAND_TILES_TOP_THREE (§7):
+          RE-MEASURED at each pass since: 100 after BRIEF_DISCOVER_FINISHING_PASS
+          deleted the course line, then 163 after BRIEF_BAND_TILES_TOP_THREE
+          added a hero plus two runner rows.
+          RE-MEASURED AGAIN for BRIEF_BAND_TILES_LADDER (§5): the hero block is
+          GONE and the chip is ONE LADDER of three rows, the first taller than
+          the other two.
             width  1 0 230px, mirroring the live flex rule rather than a
-                   hard-coded px — the chip widened to fit rank + avatar + name
-                   + figure on one line.
-            height the hero block is unchanged at 100; the runner block adds
-                   marginTop 10 + 1px rule + paddingTop 8 + two 18px rows with an
-                   8px gap = 63, so 163.
-          WHY TWO RUNNER ROWS AND NOT ZERO, given the shell models the SMALLEST
-          plausible state: the rail levels every chip to the TALLEST (§6), so the
-          settled height of EVERY chip is the tallest tile's height. In the
-          current data three of the four categories clear their floor with three
-          or more distinct members, so the smallest plausible SETTLED height is
-          hero + two runners. A hero-only shell would under-measure by 63px and
-          strand the band exactly as the old strip did.
-          THREE, NOT FOUR: MOST IMPROVED renders only when a falling index
+                   hard-coded px.
+            height 11 pad
+                   + 13 eyebrow line box
+                   + 8  ladder marginTop
+                   + 40 leader row   (2 top pad + 30 figure + 8 bottom pad)
+                   + 33 second row   (1px rule + 8 + 16 avatar + 8)
+                   + 33 third row
+                   + 12 pad         = 150.
+          WHY THREE ROWS AND NOT ONE, given the shell models the SMALLEST
+          plausible state: the rail levels every chip to the TALLEST, so the
+          settled height of EVERY chip is the tallest tile's. In the current data
+          three of the four categories clear their floor with three or more
+          distinct members, so the smallest plausible SETTLED height is a full
+          ladder. A one-row shell would under-measure by 66px and strand the band
+          exactly as the old strip did.
+          THREE CHIPS, NOT FOUR: MOST IMPROVED renders only when a falling index
           exists, and a skeleton is never larger than the smallest settled state. */}
       <div style={{ display: 'flex', alignItems: 'stretch', gap: 9, marginBottom: 12 }}>
         {[0, 1, 2].map((i) => (
@@ -268,46 +268,54 @@ export function GolfThisWeekRail() {
               boxSizing: 'border-box',
             }}
           >
-            <div style={{ height: 13, display: 'flex', alignItems: 'center' }}>
-              <Bar style={{ height: 8, width: 66 }} />
-            </div>
+            {/* The eyebrow row: label left, unit right (§2). */}
             <div
               style={{
-                marginTop: 5,
-                height: 30,
+                height: 13,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 5,
+                justifyContent: 'space-between',
               }}
             >
-              <Bar style={{ height: 22, width: 42 }} />
-              <Bar style={{ height: 12, width: 20 }} />
+              <Bar style={{ height: 8, width: 66 }} />
+              <Bar style={{ height: 8, width: 26 }} />
             </div>
-            <div
-              style={{ marginTop: 9, height: 20, display: 'flex', alignItems: 'center', gap: 6 }}
-            >
-              <Bar style={{ height: 20, width: 20, borderRadius: '34%' }} />
-              <Bar style={{ height: 12, width: 72 }} />
-            </div>
-            {/* The runner block: the same 1px rule, the same 10/8 offsets and the
-                same 18px rows the live chip renders. */}
-            <div
-              style={{
-                marginTop: 10,
-                paddingTop: 8,
-                borderTop: '1px solid rgba(11,15,20,0.07)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8,
-              }}
-            >
+
+            {/* THE LADDER. Same columns on every row — rank, figure, avatar,
+                name, chevron — with the first row taller, exactly as the live
+                chip renders it. */}
+            <div style={{ marginTop: 8 }}>
+              <div
+                style={{
+                  height: 40,
+                  padding: '2px 0 8px',
+                  boxSizing: 'border-box',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Bar style={{ height: 8, width: 7 }} />
+                <Bar style={{ height: 22, width: 42 }} />
+                <Bar style={{ height: 20, width: 20, borderRadius: '34%' }} />
+                <Bar style={{ height: 12, width: 72 }} />
+              </div>
               {[0, 1].map((j) => (
                 <div
                   key={j}
-                  style={{ height: 18, display: 'flex', alignItems: 'center', gap: 6 }}
+                  style={{
+                    height: 33,
+                    padding: '8px 0',
+                    borderTop: '1px solid rgba(11,15,20,0.07)',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
                 >
                   <Bar style={{ height: 8, width: 7 }} />
-                  <Bar style={{ height: 18, width: 18, borderRadius: '34%' }} />
+                  <Bar style={{ height: 12, width: 22 }} />
+                  <Bar style={{ height: 16, width: 16, borderRadius: '34%' }} />
                   <Bar style={{ height: 12, width: j === 0 ? 84 : 66 }} />
                 </div>
               ))}
@@ -315,6 +323,7 @@ export function GolfThisWeekRail() {
           </div>
         ))}
       </div>
+
 
 
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
