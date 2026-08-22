@@ -9,6 +9,7 @@ import {
 import {
   HAIRLINE_INK_12,
   INK_TINT_06,
+  SURFACE,
   TOPAR_UNDER_DARK,
   WHITE_ALPHA_08,
   WHITE_ALPHA_18,
@@ -82,13 +83,9 @@ export interface ScoreMarkProps {
   showStroke?: boolean;
   /** Override colour resolution (rarely used - forces numeral colour). */
   colourOverride?: string;
-  /** Custom font for the numeral. */
-  fontFamily?: string;
   /** Surface the mark lives on. Defaults to 'light'. */
   surface?: 'light' | 'dark';
 }
-
-const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export const ScoreMark: React.FC<ScoreMarkProps> = ({
   strokes,
@@ -96,7 +93,6 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   size = 38,
   showStroke = true,
   colourOverride,
-  fontFamily = FONT_SF,
   surface = 'light',
 }) => {
   const variant = variantFor(strokes, par);
@@ -127,7 +123,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   if (colourOverride) numColour = colourOverride;
   else if (variant === 'empty') numColour = emptyInk;
   else if (variant === 'par') numColour = parInk;
-  else if (under) numColour = '#FFFFFF';
+  else if (under) numColour = SURFACE;
   else numColour = overInk;
 
   const numWeight = 700;
