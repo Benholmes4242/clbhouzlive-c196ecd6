@@ -5,7 +5,6 @@ import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
   HERO_TOP_SCRIM,
-  HERO_BOTTOM_SCRIM,
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 /**
@@ -14,11 +13,19 @@ import {
  * near-black HERO_BASE — it is the TOUR'S COURSE_GRADIENT under COURSE_SCRIMS
  * and the two scaled scrims. A shell still painted near-black would model a
  * colour the page no longer has, so it composes the same stack at the same
- * heights (48 top, 159 bottom) rather than approximating it with a hex.
+ * heights rather than approximating it with a hex.
+ *
+ * BRIEF_ROUND_TILE_HERO_TOUR_MATCH §7: the heights are now the TOUR'S
+ * PROPORTIONS against the 191px dark region (28.0% -> 53, 90.9% -> 174), and
+ * the bottom layer is the tile's own inline gradient ending at FULL opacity —
+ * NOT the exported HERO_BOTTOM_SCRIM, which stops at 0.92 and lets
+ * COURSE_GRADIENT's sand bottom stop cast through.
  */
+const SK_TILE_BOTTOM_SCRIM =
+  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,1) 100%)';
 const SK_ROUND_HERO_BG = [
-  `${HERO_TOP_SCRIM} top / 100% 48px no-repeat`,
-  `${HERO_BOTTOM_SCRIM} bottom / 100% 159px no-repeat`,
+  `${HERO_TOP_SCRIM} top / 100% 53px no-repeat`,
+  `${SK_TILE_BOTTOM_SCRIM} bottom / 100% 174px no-repeat`,
   COURSE_SCRIMS,
   COURSE_GRADIENT,
 ].join(', ');
