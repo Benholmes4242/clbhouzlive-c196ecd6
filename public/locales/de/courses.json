@@ -1119,7 +1119,7 @@
     "mostPlayedAvgToParBy_other": "Gespielt zu {{value}} von {{count}} Mitgliedern",
     "mostPlayedMembers_other": "{{count}} Mitglieder",
     "mostPlayedSheetCaption_other": "{{count}} Plätze",
-    "mostPlayed": "Meistgespielte Plätze diese Woche",
+    "mostPlayed": "Diese Woche gespielte Plätze",
     "whereTheyPlayed": "Wo diese Woche gespielt wurde",
     "mostPlayedRoundCount": "{{count}} Runde",
     "mostPlayedRoundCount_other": "{{count}} Runden",
@@ -1191,7 +1191,7 @@
         "worldwide": "Diese Woche keine Runden."
       }
     },
-    "mostPlayedSeeAllAtCourse": "Alle auf diesem Platz ansehen"
+    "mostPlayedSeeAllAtCourse": "Diesen Platz besuchen"
   },
   "statBrowse": {
     "colArea": "Gebiet",
