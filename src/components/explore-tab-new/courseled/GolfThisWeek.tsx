@@ -1809,9 +1809,9 @@ export function GolfThisWeek({
                         /* UNIFORM DIVIDERS (§1): the same hairline between every
                            pair of rows, none above the leader. */
                         borderTop: lead ? 'none' : `1px solid ${WELL_RULE}`,
-                        /* AMBER HIGHLIGHT for first place: a subtle brand tint
+                        /* LIGHT INK GROUND for first place: a subtle gray tint
                            that bleeds to the chip's padding edges. */
-                        background: lead ? 'rgba(247,147,30,0.12)' : undefined,
+                        background: lead ? 'rgba(11,15,20,0.035)' : undefined,
                         borderRadius: lead ? 6 : undefined,
                         margin: lead ? '0 -12px' : undefined,
                         padding: lead ? '6px 12px' : '8px 0',
