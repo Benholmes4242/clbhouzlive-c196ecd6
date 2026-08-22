@@ -673,6 +673,44 @@ export function MostPlayedLeaderboard({
                       })}
                     </span>
 
+                    {/* §1 — THE GOLFER COUNT, a SECOND FACT ON THE SAME LINE in
+                        the same 11 / 700 / A.INK and the same dot separator.
+                        IT IS `players.length`, NOT `members`: members counts ids
+                        the board cannot render (deleted account, RLS — §S4.4),
+                        so it would reintroduce the very mismatch this fixes.
+                        "11 rounds · 9 golfers" reads as two golfers who played
+                        twice, not a board missing two entries. */}
+                    {r.players.length > 0 && (
+                      <>
+                        <span
+                          aria-hidden
+                          style={{
+                            flex: 'none',
+                            width: 2.5,
+                            height: 2.5,
+                            borderRadius: '50%',
+                            background: GHOST,
+                            marginRight: 7,
+                          }}
+                        />
+                        <span
+                          style={{
+                            ...NUMF,
+                            flex: 'none',
+                            fontSize: 11,
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            color: A.INK,
+                            marginRight: 7,
+                          }}
+                        >
+                          {t('discover.mostPlayedGolferCount', '{{count}} golfer', {
+                            count: r.players.length,
+                          })}
+                        </span>
+                      </>
+                    )}
+
                     {/* §S1.6 / §S2.3 — THE MOVEMENT MARKER KEEPS ITS EXISTING
                         TONES: green on a rise, amber on NEW, ghost on LEVEL. */}
                     <MoveMark row={r} t={t} />
