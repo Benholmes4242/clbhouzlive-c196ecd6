@@ -394,8 +394,27 @@ function MemberBoard({
           </div>
         );
       })}
-      {/* A NAVIGATION, NEVER A SCROLL TRAP (§S2.5). */}
-      {hidden > 0 && (
+      </div>
+      {/* §2 — THE BOTTOM FADE: transparent to the card's own colour, and it
+          removes itself once the list is at its end so it never looks like a
+          cut edge. Not a scrollbar. */}
+      {scrolls && !atEnd && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: -14,
+            right: -14,
+            bottom: 10,
+            height: 28,
+            pointerEvents: 'none',
+            background: `linear-gradient(to bottom, rgba(255,255,255,0), ${A.PANEL})`,
+          }}
+        />
+      )}
+      {/* THE SEE-ALL ROW STAYS (§2): it opens the course's own sheet, which is
+          a different destination from a longer list. */}
+      {onSeeAllAtCourse && (
         <button
           type="button"
           onClick={(e) => {
