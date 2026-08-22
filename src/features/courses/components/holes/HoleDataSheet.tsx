@@ -1124,13 +1124,13 @@ const HoleCard: React.FC<{
                 boxShadow: CARD_SHADOW,
               }}
             >
+              {/* Pill grammar: a birdie is a SOLID RED disc. Gold is rarity only. */}
               <div
                 style={{
                   width: 11,
                   height: 11,
                   borderRadius: 999,
-                  border: `1.5px solid ${GOLD}`,
-                  background: 'transparent',
+                  background: SC_FILL_BIRDIE,
                 }}
               />
             </div>
