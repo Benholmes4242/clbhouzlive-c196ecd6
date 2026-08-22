@@ -167,6 +167,35 @@ const BAND_FAINT = '#8A929C';
 const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 
 /**
+ * §3 (BRIEF_BAND_TILES_LADDER_TIGHTEN) — THE FIGURE COLUMN IS MEASURED.
+ * Tabular lining figures have a fixed advance, so the column can be derived
+ * arithmetically from the strings a tile actually prints: 0.6em per figure,
+ * sign or arrow glyph, 0.3em for a decimal point. A tile must not reserve
+ * space for a qualifier it never shows (BEST STABLEFORD's old 40px gap).
+ */
+const BAND_FIG_SIZE = 12;
+const BAND_QUAL_SIZE = 9;
+const BAND_QUAL_GAP = 2;
+const bandGlyphEm = (ch: string) =>
+  /[0-9+\u2212\u2193\u2014-]/.test(ch) ? 0.6 : ch === '.' ? 0.3 : 0.28;
+const bandTextWidth = (s: string, size: number) =>
+  [...s].reduce((w, ch) => w + bandGlyphEm(ch) * size, 0);
+export const bandFigureColumnWidth = (
+  figures: { text: string; qual?: string }[],
+) =>
+  Math.ceil(
+    Math.max(
+      9,
+      ...figures.map(
+        (f) =>
+          bandTextWidth(f.text, BAND_FIG_SIZE) +
+          (f.qual ? BAND_QUAL_GAP + bandTextWidth(f.qual, BAND_QUAL_SIZE) : 0),
+      ),
+    ),
+  );
+
+
+/**
  * TILE HEIGHT. hero 156 + 8 pad + 20 member row + 8 + well (6 header + 6 +
  * 1 rule + 7 + 96 grid + 9 pad = 135) = 327. THE WELL RUNS TO THE CARD'S
  * BOTTOM EDGE — there is no card padding beneath it, so the tint finishes the
@@ -1439,7 +1468,12 @@ export function GolfThisWeek({
       qual?: string;
       qualTone?: string;
     };
+    /** §3 — the tile's WORST-CASE figure, so the measured column has a stable
+        floor and does not jitter one digit when the scope pill changes the
+        data under it. The column is max(measured rows, this). */
+    figureFloor?: { text: string; qual?: string };
   }[] = [];
+
 
   /* §2 — BEST THIS WEEK's to-par is DATA, not a unit: it differs per round, so
      it is the one qualifier that stays beside every figure in the ladder. */
@@ -1473,6 +1507,7 @@ export function GolfThisWeek({
           qualTone: tp?.tone,
         };
       },
+      figureFloor: { text: '77', qual: '+16' },
     });
   }
   if (bestStableford) {
@@ -1485,6 +1520,7 @@ export function GolfThisWeek({
       course: courseNameFor(bestStableford),
       runners: stablefordRanked.slice(1),
       figureOf: (r) => ({ text: String(r.stableford_points), tone: INK }),
+      figureFloor: { text: '41' },
     });
   }
   if (mostBirdies) {
@@ -1498,6 +1534,7 @@ export function GolfThisWeek({
       runners: birdiesRanked.slice(1),
       /* A birdie count IS a count of under-par holes, so the red is literal. */
       figureOf: (r) => ({ text: String(r.birdies), tone: TOPAR_RED }),
+      figureFloor: { text: '5' },
     });
   }
   if (mostImproved) {
@@ -1514,8 +1551,10 @@ export function GolfThisWeek({
         text: `\u2193${Math.abs(r.delta_index as number).toFixed(1)}`,
         tone: A.IMPROVED,
       }),
+      figureFloor: { text: '\u21930.4' },
     });
   }
+
 
 
 
@@ -1690,10 +1729,11 @@ export function GolfThisWeek({
                   including the leader's — has the same columns in the same
                   order, RANK, FIGURE, AVATAR, NAME, CHEVRON, and the figure
                   column is FIXED WIDTH and LEFT-ALIGNED so 68 / 73 / 77 stack
-                  down one edge. The leader's row is BIGGER, NOT DIFFERENT:
-                  30/800 figure, 20px avatar. Nothing else separates it — the
-                  row dividers are uniform and there is no heavier rule between
-                  the leader and the rest. */}
+                  down one edge (its width MEASURED per tile, §3). The leader's
+                  row is not BIGGER: BRIEF_BAND_TILES_LADDER_TIGHTEN drops its
+                  figure to row size and marks first place three ways instead —
+                  weight 800, an inked rank digit and a light ground on the row.
+                  Its avatar stays 20 against 16; it costs no column width. */}
               <div
                 style={{
                   marginTop: 8,
@@ -1704,6 +1744,17 @@ export function GolfThisWeek({
                 {[tile.row, ...tile.runners].map((r, i) => {
                   const f = tile.figureOf(r);
                   const lead = i === 0;
+                  /* §3 — MEASURED, NOT GUESSED. The column takes this tile's own
+                     widest printed figure (plus its to-par where it has one) at
+                     the new sizes, floored by the tile's worst case so the
+                     ladder cannot shift a digit's width when the scope pill
+                     changes the data. Rows 2 and 3 no longer pay for a leader's
+                     size, and a tile without a qualifier reserves no room for
+                     one — which is what closed the gap on BEST STABLEFORD. */
+                  const figCol = bandFigureColumnWidth([
+                    ...[tile.row, ...tile.runners].map(tile.figureOf),
+                    ...(tile.figureFloor ? [tile.figureFloor] : []),
+                  ]);
                   return (
                     <div
                       key={r.round_id}
@@ -1733,19 +1784,28 @@ export function GolfThisWeek({
                         /* UNIFORM DIVIDERS (§1): the same hairline between every
                            pair of rows, none above the leader. */
                         borderTop: lead ? 'none' : `1px solid ${WELL_RULE}`,
-                        padding: lead ? '2px 0 8px' : '8px 0',
+                        /* §4.3 — FIRST PLACE TAKES THE GROUND, not a bigger
+                           figure: ~3.5% ink, bled to the chip's padding edges by
+                           the negative margin so it reads as a band. It is the
+                           one mark that works on MOST BIRDIES, where the figures
+                           are single digits. */
+                        background: lead ? 'rgba(11,15,20,0.035)' : undefined,
+                        borderRadius: lead ? 6 : undefined,
+                        margin: lead ? '0 -12px' : undefined,
+                        padding: lead ? '6px 12px' : '8px 0',
                       }}
                     >
                       {/* EVERY ROW CARRIES ITS RANK (§1) — the leader's 1 is
                           PRESENT, not implied. It sits in its own 7px column at
-                          the ladder's left edge so all three digits align, and
-                          at 8/700 it does not compete with a 30px figure. */}
+                          the ladder's left edge so all three digits align.
+                          §4.2 — the leader's digit takes INK; 2 and 3 stay
+                          faint. */}
                       <span
                         style={{
                           fontSize: 8,
                           fontWeight: 700,
                           lineHeight: 1,
-                          color: BAND_FAINT,
+                          color: lead ? INK : BAND_FAINT,
                           fontVariantNumeric: 'tabular-nums lining-nums',
                           width: 7,
                           flexShrink: 0,
@@ -1754,25 +1814,31 @@ export function GolfThisWeek({
                         {i + 1}
                       </span>
 
-                      {/* THE FIGURE COLUMN — fixed width, left-aligned. This is
-                          what makes the ranking visible rather than merely
-                          stated. Its width is set once per tile from the widest
-                          figure the tile can hold, not per row. */}
+                      {/* THE FIGURE COLUMN — measured width, left-aligned, one
+                          width for the whole tile so the three figures stack on
+                          a single left edge. */}
                       <div
                         style={{
-                          width: tile.unit ? 40 : 56,
+                          width: figCol,
                           flexShrink: 0,
+                          /* §2 — the to-par is BOTTOM-ALIGNED with the gross, so
+                              its foot sits level and it reads as tucked under the
+                              gross's right shoulder rather than as a second
+                              column on the same baseline. */
                           display: 'flex',
-                          alignItems: 'baseline',
-                          gap: 4,
+                          alignItems: 'flex-end',
+                          gap: BAND_QUAL_GAP,
                           minWidth: 0,
                         }}
                       >
+                        {/* §1 — EVERY FIGURE IS ROW SIZE. The leader is BOLD, not
+                            BIG: 800 against 700 at the same 12px. Charging the
+                            leader's size to every name in the tile is what made
+                            real account names truncate. */}
                         <span
                           style={{
-                            fontSize: lead ? 30 : 12,
+                            fontSize: BAND_FIG_SIZE,
                             fontWeight: lead ? 800 : 700,
-                            letterSpacing: lead ? '-0.05em' : undefined,
                             lineHeight: 1,
                             fontVariantNumeric: 'tabular-nums lining-nums',
                             color: f.tone,
@@ -1783,7 +1849,7 @@ export function GolfThisWeek({
                         {f.qual ? (
                           <span
                             style={{
-                              fontSize: 12,
+                              fontSize: BAND_QUAL_SIZE,
                               fontWeight: 700,
                               lineHeight: 1,
                               fontVariantNumeric: 'tabular-nums lining-nums',
@@ -1795,6 +1861,7 @@ export function GolfThisWeek({
                           </span>
                         ) : null}
                       </div>
+
 
                       <SquircleAvatar
                         src={r.profile_photo_url}

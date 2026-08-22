@@ -239,10 +239,11 @@ export function GolfThisWeekRail() {
             height 11 pad
                    + 13 eyebrow line box
                    + 8  ladder marginTop
-                   + 40 leader row   (2 top pad + 30 figure + 8 bottom pad)
+                   + 32 leader row   (6 pad + 20 avatar + 6 pad)
                    + 33 second row   (1px rule + 8 + 16 avatar + 8)
                    + 33 third row
-                   + 12 pad         = 150.
+                   + 12 pad         = 142.
+
           WHY THREE ROWS AND NOT ONE, given the shell models the SMALLEST
           plausible state: the rail levels every chip to the TALLEST, so the
           settled height of EVERY chip is the tallest tile's. In the current data
@@ -282,13 +283,18 @@ export function GolfThisWeekRail() {
             </div>
 
             {/* THE LADDER. Same columns on every row — rank, figure, avatar,
-                name, chevron — with the first row taller, exactly as the live
-                chip renders it. */}
+                name, chevron. BRIEF_BAND_TILES_LADDER_TIGHTEN §5: the leader's
+                figure is now ROW SIZE, so the leader's row is 32 not 40 — it is
+                taller than the runners only by its 20px avatar, and it carries
+                the same ~3.5% ink ground the live chip gives first place. */}
             <div style={{ marginTop: 8 }}>
               <div
                 style={{
-                  height: 40,
-                  padding: '2px 0 8px',
+                  height: 32,
+                  padding: '6px 12px',
+                  margin: '0 -12px',
+                  background: 'rgba(11,15,20,0.035)',
+                  borderRadius: 6,
                   boxSizing: 'border-box',
                   display: 'flex',
                   alignItems: 'center',
@@ -296,10 +302,11 @@ export function GolfThisWeekRail() {
                 }}
               >
                 <Bar style={{ height: 8, width: 7 }} />
-                <Bar style={{ height: 22, width: 42 }} />
+                <Bar style={{ height: 12, width: 33 }} />
                 <Bar style={{ height: 20, width: 20, borderRadius: '34%' }} />
                 <Bar style={{ height: 12, width: 72 }} />
               </div>
+
               {[0, 1].map((j) => (
                 <div
                   key={j}

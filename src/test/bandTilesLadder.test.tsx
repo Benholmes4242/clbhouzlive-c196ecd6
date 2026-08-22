@@ -107,7 +107,7 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
     expect(chip.textContent).not.toMatch(/Delta/);
   });
 
-  it('shares ONE fixed-width figure column across every row (a, §1)', () => {
+  it('shares ONE MEASURED figure column across every row (a, §1, §3)', () => {
     rows.push(
       row({ round_id: 'a', user_id: 'a', display_name: 'Alpha', gross: 74 }),
       row({ round_id: 'b', user_id: 'b', display_name: 'Bravo', gross: 76 }),
@@ -116,7 +116,9 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
     const cols = ladderRows(chipFor(container, /BEST THIS WEEK/i)).map(
       (r) => (r.children[1] as HTMLElement).style.width,
     );
-    expect(cols).toEqual(['56px', '56px']);
+    /* MEASURED, NOT 56 (LADDER_TIGHTEN §3): "77 +6" at 12/9 is 33px, and rows
+       2 and 3 no longer pay for a leader's size. */
+    expect(cols).toEqual(['33px', '33px']);
   });
 
   it('prints the unit ONCE on the eyebrow row, and never per row (e, §2)', () => {
@@ -151,7 +153,7 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
     expect(quals[1].color).toBe(quals[2].color);
   });
 
-  it('keeps the leader at 30/800 and the runners at 12/700 (g, §1)', () => {
+  it('keeps every figure at 12px and the leader BOLD not BIG (a, §1)', () => {
     rows.push(
       row({ round_id: 'a', user_id: 'a', display_name: 'Alpha', gross: 74 }),
       row({ round_id: 'b', user_id: 'b', display_name: 'Bravo', gross: 76 }),
@@ -161,7 +163,7 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
       const f = (r.children[1] as HTMLElement).children[0] as HTMLElement;
       return [f.style.fontSize, f.style.fontWeight];
     });
-    expect(figs[0]).toEqual(['30px', '800']);
+    expect(figs[0]).toEqual(['12px', '800']);
     expect(figs[1]).toEqual(['12px', '700']);
   });
 
@@ -246,8 +248,9 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
     const chip = chipFor(container, /BEST THIS WEEK/i);
     expect(chip.style.minWidth).toBe('230px');
     expect(chip.style.flex).toBe('1 0 230px');
-    /* THREE SIZES EXACTLY — 8, 12 and 30. The avatar's own initial glyph is the
-       avatar component's business, not the band's scale. */
+    /* THREE SIZES EXACTLY — 8, 9 (the to-par, §2) and 12. Nothing is big any
+       more. The avatar's own initial glyph is the avatar component's business,
+       not the band's scale. */
     const sizes = new Set<string>();
     for (const rowEl of ladderRows(chip)) {
       sizes.add((rowEl.children[0] as HTMLElement).style.fontSize);
@@ -256,6 +259,6 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
       }
       sizes.add((rowEl.querySelector('span[style*="ellipsis"]') as HTMLElement).style.fontSize);
     }
-    expect([...sizes].sort()).toEqual(['12px', '30px', '8px']);
+    expect([...sizes].sort()).toEqual(['12px', '8px', '9px']);
   });
 });
