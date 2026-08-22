@@ -36,7 +36,12 @@ vi.mock('@/components/explore-tab-new/courseled/hooks/useFollowingIdSet', () => 
   useFollowingIdSet: () => ({ data: new Set<string>() }),
 }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useWeekRegionCounts', () => ({
-  useWeekRegionCounts: () => ({ matches: () => true, list: [], total: rows.length }),
+  useWeekRegionCounts: () => ({
+    matches: () => true,
+    groups: [],
+    list: [],
+    total: rows.length,
+  }),
 }));
 vi.mock('@/hooks/useToggleFollow', () => ({ useToggleFollow: () => ({ mutate: () => {} }) }));
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ actor: null }) }));
