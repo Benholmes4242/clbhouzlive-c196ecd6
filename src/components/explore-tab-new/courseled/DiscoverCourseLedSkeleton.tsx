@@ -398,9 +398,13 @@ export function GolfThisWeekRail() {
               </div>
             </div>
             <div style={{ padding: '0 10px 0' }}>
-              {/* THE TINTED WELL: header, its one rule, and the FIXED 96px
-                  scorecard region — the same height on every card, running to
-                  the card's bottom edge. */}
+              {/* THE WHITE WELL (BRIEF_ROUND_TILE_WHITE_WELL §4): header, its one
+                  rule, and the FIXED 96px scorecard region — the same height on
+                  every card, running to the card's bottom edge. It is #FFFFFF
+                  with a WELL_RULE hairline inset on all four sides, exactly as
+                  the live tile draws it; the shell's bars stay A.TRACK (#E9EDF1),
+                  which is a point of contrast BETTER on white than it was on the
+                  old #F2F5F8 tint. */}
               <div
                 style={{
                   /* THE WELL'S 8px OFFSET MOVED UP INTO THE DARK REGION'S BOTTOM
@@ -411,12 +415,14 @@ export function GolfThisWeekRail() {
                   marginLeft: -10,
                   marginRight: -10,
                   height: 139,
-                  background: '#F2F5F8',
+                  background: '#FFFFFF',
+                  boxShadow: 'inset 0 0 0 1px rgba(11,15,20,0.07)',
                   borderRadius: '0 0 16px 16px',
                   padding: '6px 6px 9px',
                   boxSizing: 'border-box',
                 }}
               >
+
                 <div
                   style={{
                     display: 'flex',
