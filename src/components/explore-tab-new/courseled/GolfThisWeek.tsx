@@ -54,11 +54,29 @@ import { A, CARD_SHELL, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
  * GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK). Replaces Around the world (standout
  * feats) and Personal bests, both deleted.
  *
- * THE HERO'S COLOUR LAW (BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §0, from PhotoBand
- * itself): ON THIS HERO, EVERY VALUE IS WHITE OR WHITE-AT-ALPHA. THE ONLY
- * EXCEPTION IS A SCORE, WHICH TAKES THE CANONICAL TO-PAR GRAMMAR ON DARK
- * (getScoreColor(delta, 'dark', 'standard') — never a hand-picked hex).
- * ONE DELIBERATE DIVERGENCE: AMBER, and only as the viewing member's marker.
+ * THE HERO'S COLOUR LAW (BRIEF_HERO_TEXT_FLOOR_AND_DELTA §2, correcting
+ * BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §0): EVERY VALUE IN THE HERO IS WHITE OR
+ * WHITE-AT-ALPHA **EXCEPT WHERE COLOUR CARRIES MEANING** — a to-par score
+ * (canonical getScoreColor(delta, 'dark', 'standard'), never a hand-picked hex),
+ * an INDEX MOVEMENT (INDEX_DELTA.dark), and the AMBER that marks the viewing
+ * member.
+ *
+ * TEXT ALPHA FLOOR — NOTHING IN THE HERO OR THE MEMBER ROW BELOW 0.72
+ * (BRIEF_HERO_TEXT_FLOOR_AND_DELTA §1). Half-transparent white at 9.5px over a
+ * photograph is not legible, and raising the scrim further would erase the
+ * photograph to fix a type problem. The LADDER survives — course name 0.94 leads,
+ * sentence 0.82, everything else 0.78 — do NOT add a hero text value below 0.72.
+ *
+ * THE THREE DELIBERATE DIVERGENCES FROM THE TOUR HERO (§3). All three exist
+ * because the TILE CARRIES SOMETHING THE TOUR DOES NOT:
+ *   1. AMBER marks the viewing member — the tour hero has no concept of "you".
+ *   2. THE INDEX DELTA IS GREEN/RED (INDEX_DELTA.dark) — the tour hero has no
+ *      index movement, so PhotoBand's "colour only on a score" never faced this
+ *      case. A falling index is better and is green; a rising one is worse and
+ *      is red. That direction rule is correct and must not be "fixed".
+ *   3. THE BOTTOM SCRIM'S FINAL STOP REACHES FULL OPACITY rather than
+ *      HERO_BOARD_SURFACE — the tile's next band is light, the tour's is dark.
+
  *
  * WHAT THAT COSTS, ON PURPOSE: the seven moments are now distinguished ONLY BY
  * THEIR WORDS. MOMENT_TONE survives in exactly one place — the tinted band
