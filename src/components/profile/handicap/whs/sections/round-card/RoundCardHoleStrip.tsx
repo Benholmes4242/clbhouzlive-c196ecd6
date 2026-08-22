@@ -33,7 +33,7 @@ const HoleCell: React.FC<{
     <ScoreMark strokes={score} par={par} size={size} surface="light" />
   </div>
 );
-};
+
 
 const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }) => {
   const total = holes.reduce(
