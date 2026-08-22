@@ -1753,6 +1753,109 @@ export function GolfThisWeek({
                   leads with the course in full.
                   THE COST: the chip no longer says WHERE, so across a multi-course
                   week the figure is a weaker fact than it was. */}
+
+              {/* PLACES 2 AND 3 (BRIEF_BAND_TILES_TOP_THREE §4/§5) — the SAME
+                  reading order as the hero's member row: rank, avatar, name,
+                  figure, on one line. No new type sizes: 8 for the rank, 12/700
+                  for the name and the figure, exactly the scale
+                  BRIEF_BAND_TILE_TYPE_SCALE fixed.
+                  ABSENT IS ABSENT (§3): no dash, no placeholder, no reserved
+                  height. The rail's `alignItems: 'stretch'` already levels every
+                  chip to the tallest, so a one-qualifier tile simply carries an
+                  empty area (§6) — nothing fills it. */}
+              {tile.runners.length > 0 ? (
+                <div
+                  style={{
+                    marginTop: 10,
+                    paddingTop: 8,
+                    borderTop: `1px solid ${WELL_RULE}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 8,
+                  }}
+                >
+                  {tile.runners.map((r, i) => {
+                    const f = tile.figureOf(r);
+                    return (
+                      <div
+                        key={r.round_id}
+                        /* §5 — THE NESTING IS THE RISK. The chip around this row
+                           is itself role="button" with an onClick and an
+                           Enter/Space handler, so without stopPropagation a tap
+                           here would ALSO open the leader's scorecard. */
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCardPress(r);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onCardPress(r);
+                          }
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          minWidth: 0,
+                          height: 18,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 8,
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            color: BAND_FAINT,
+                            fontVariantNumeric: 'tabular-nums lining-nums',
+                            width: 7,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {i + 2}
+                        </span>
+                        <SquircleAvatar
+                          src={r.profile_photo_url}
+                          userId={r.user_id}
+                          alt={r.display_name}
+                          size={18}
+                          hideRing
+                        />
+                        <span
+                          style={{
+                            flex: 1,
+                            minWidth: 0,
+                            fontSize: 12,
+                            fontWeight: 700,
+                            color: INK,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {r.display_name}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 700,
+                            color: f.tone,
+                            fontVariantNumeric: 'tabular-nums lining-nums',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {f.text}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+
             </div>
           ))}
         </div>
