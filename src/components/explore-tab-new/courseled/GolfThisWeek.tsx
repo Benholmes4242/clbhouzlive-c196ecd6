@@ -1298,45 +1298,110 @@ export function GolfThisWeek({
   /* Each tile is strictly the top of its own category. One member CAN hold
      several — a good round is low gross, high Stableford and birdie-rich at
      once. Deduping by member was rejected: showing second place in a tile
-     labelled 'best' is a bug to the member who actually holds it. */
-  const newer = (a: CircleRoundRow, b: CircleRoundRow) =>
-    String(a.play_date).localeCompare(String(b.play_date)) > 0;
+     labelled 'best' is a bug to the member who actually holds it.
 
-  const withDelta = ordered.filter(
-    (r) => r.delta_index != null && Number.isFinite(r.delta_index),
+     THAT RULE IS ABOUT THE FOUR TILES AND IT STILL STANDS — nothing here
+     dedupes ACROSS tiles, and a member may hold first place in all four at
+     once.
+
+     WITHIN A SINGLE TILE THE ANSWER IS THE OPPOSITE (BRIEF_BAND_TILES_TOP_THREE
+     §2), and the two rules read as contradictory only until the question is
+     read: a tile now shows a TOP THREE, so the question is no longer "who is
+     best at this" but "who else is worth seeing". A MEMBER APPEARS AT MOST ONCE
+     IN ANY ONE TILE; where they hold several qualifying rounds we keep their
+     best and drop the rest.
+     WHY: in Ben's own data danny.akers1 played four times in the window and
+     holds first AND second in two tiles. Uncapped, the chip becomes one
+     member's week rather than the circle's — less engaging than the single
+     winner it replaces, not more. The point of the change is showing more
+     PEOPLE.
+     THE COST, PLAINLY: the third row is then NOT literally the third-best
+     round. The tile is a top three OF MEMBERS, not of rounds. That is the same
+     objection the paragraph above raised about deduping, answered differently
+     because the question is different.
+     THE HERO IS ALWAYS THE OUTRIGHT WINNER — the cap only affects places 2
+     and 3. */
+
+  /* TIES GO TO THE MOST RECENT ROUND in every tile (unchanged): `ordered` is
+     lens-ordered, not date-ordered, so recency is compared explicitly. The
+     reducers this replaced applied exactly this tiebreak; a sort with the same
+     comparison returns the same winner and, additionally, the places behind
+     it (§1). NO QUERY, NO RPC, NO NEW FIELD — every place is derived from
+     `ordered`, and a place that cannot be derived does not exist. */
+  const byDateDesc = (a: CircleRoundRow, b: CircleRoundRow) =>
+    String(b.play_date).localeCompare(String(a.play_date));
+
+  /** §2 — one place per member, best kept, at most three places. */
+  const topThree = (rows: CircleRoundRow[]) => {
+    const seen = new Set<string>();
+    const out: CircleRoundRow[] = [];
+    for (const r of rows) {
+      if (seen.has(r.user_id)) continue;
+      seen.add(r.user_id);
+      out.push(r);
+      if (out.length === 3) break;
+    }
+    return out;
+  };
+
+  /* THE FLOORS APPLY TO EVERY PLACE (§3): a runner-up clears the same floor as
+     the winner, so a tile with one qualifier shows the hero and NOTHING else —
+     no second row, no dash, no placeholder. That is a normal week. */
+  const bestRanked = topThree(
+    ordered
+      .filter((r) => r.gross != null && r.course_par != null)
+      .sort((a, b) => {
+        const at = (a.gross as number) - (a.course_par as number);
+        const bt = (b.gross as number) - (b.course_par as number);
+        if (at !== bt) return at - bt;
+        if (a.gross !== b.gross) return (a.gross as number) - (b.gross as number);
+        return byDateDesc(a, b);
+      }),
   );
-  const mostImproved = withDelta.reduce<CircleRoundRow | null>((acc, r) => {
-    const d = r.delta_index as number;
-    if (d >= 0) return acc;
-    if (!acc) return r;
-    const cur = acc.delta_index as number;
-    if (d < cur) return r;
-    if (d === cur && newer(r, acc)) return r;
-    return acc;
-  }, null);
+
+  const improvedRanked = topThree(
+    ordered
+      .filter(
+        (r) =>
+          r.delta_index != null &&
+          Number.isFinite(r.delta_index) &&
+          (r.delta_index as number) < 0,
+      )
+      .sort(
+        (a, b) =>
+          (a.delta_index as number) - (b.delta_index as number) || byDateDesc(a, b),
+      ),
+  );
 
   /* NULL STABLEFORD FAILS THE FILTER, never contributes a 0 (§1.3). FLOOR 36 —
      the par-equivalent every club golfer knows. */
-  const bestStableford = ordered.reduce<CircleRoundRow | null>((acc, r) => {
-    const p = r.stableford_points;
-    if (p == null || !Number.isFinite(p) || p < 36) return acc;
-    if (!acc) return r;
-    const cur = acc.stableford_points as number;
-    if (p > cur) return r;
-    if (p === cur && newer(r, acc)) return r;
-    return acc;
-  }, null);
+  const stablefordRanked = topThree(
+    ordered
+      .filter(
+        (r) =>
+          r.stableford_points != null &&
+          Number.isFinite(r.stableford_points) &&
+          (r.stableford_points as number) >= 36,
+      )
+      .sort(
+        (a, b) =>
+          (b.stableford_points as number) - (a.stableford_points as number) ||
+          byDateDesc(a, b),
+      ),
+  );
 
   /* FLOOR 3 — "1 birdie" is not a comparison, and a two-way tie on 1 is worse. */
-  const mostBirdies = ordered.reduce<CircleRoundRow | null>((acc, r) => {
-    const b = r.birdies;
-    if (b == null || !Number.isFinite(b) || b < 3) return acc;
-    if (!acc) return r;
-    const cur = acc.birdies as number;
-    if (b > cur) return r;
-    if (b === cur && newer(r, acc)) return r;
-    return acc;
-  }, null);
+  const birdiesRanked = topThree(
+    ordered
+      .filter(
+        (r) => r.birdies != null && Number.isFinite(r.birdies) && (r.birdies as number) >= 3,
+      )
+      .sort((a, b) => (b.birdies as number) - (a.birdies as number) || byDateDesc(a, b)),
+  );
+
+  const bestStableford = stablefordRanked[0] ?? null;
+  const mostBirdies = birdiesRanked[0] ?? null;
+  const mostImproved = improvedRanked[0] ?? null;
 
   /* BRIEF_BAND_TILES_REFINEMENT — the bottom line is the COURSE on every tile,
      and anything QUALIFYING the figure (a to-par, a unit) sits beside it on the
@@ -1354,7 +1419,12 @@ export function GolfThisWeek({
     qualTone?: string;
     row: CircleRoundRow;
     course: string;
+    /** §2 — places 2 and 3, member-capped. Empty is a normal week. */
+    runners: CircleRoundRow[];
+    /** The same comparison the tile ranks on, rendered at row scale. */
+    figureOf: (r: CircleRoundRow) => { text: string; tone: string };
   }[] = [];
+
 
   if (best) {
     bandTiles.push({
@@ -1374,6 +1444,10 @@ export function GolfThisWeek({
       qualTone: best.toPar < 0 ? TOPAR_RED : INK,
       row: best.row,
       course: courseNameFor(best.row),
+      /* The hero is `bestOfWeek`'s winner, unchanged; the sort's first place is
+         the same row, so the runners are places 2 and 3 of that same list. */
+      runners: bestRanked.slice(1),
+      figureOf: (r) => ({ text: String(r.gross ?? '\u2014'), tone: INK }),
     });
   }
   if (bestStableford) {
@@ -1387,6 +1461,8 @@ export function GolfThisWeek({
       qualTone: INK,
       row: bestStableford,
       course: courseNameFor(bestStableford),
+      runners: stablefordRanked.slice(1),
+      figureOf: (r) => ({ text: String(r.stableford_points), tone: INK }),
     });
   }
   if (mostBirdies) {
@@ -1401,6 +1477,8 @@ export function GolfThisWeek({
       qualTone: INK,
       row: mostBirdies,
       course: courseNameFor(mostBirdies),
+      runners: birdiesRanked.slice(1),
+      figureOf: (r) => ({ text: String(r.birdies), tone: TOPAR_RED }),
     });
   }
   if (mostImproved) {
@@ -1416,8 +1494,14 @@ export function GolfThisWeek({
       qualTone: INK,
       row: mostImproved,
       course: courseNameFor(mostImproved),
+      runners: improvedRanked.slice(1),
+      figureOf: (r) => ({
+        text: `\u2193${Math.abs(r.delta_index as number).toFixed(1)}`,
+        tone: A.IMPROVED,
+      }),
     });
   }
+
 
 
 
@@ -1544,10 +1628,18 @@ export function GolfThisWeek({
                 boxShadow: CARD_SHADOW,
                 overflow: 'hidden',
                 /* FOUR TILES DO NOT SHRINK (§3.1): the figure is the content, so
-                   the band scrolls at 320px instead. */
-                flex: '1 0 154px',
-                minWidth: 154,
+                   the band scrolls at 320px instead.
+                   230, NOT 154 (BRIEF_BAND_TILES_TOP_THREE §4). 154 was set when
+                   the chip held three lines; it now holds up to seven. At 154 a
+                   real account name — "Notascratchgolfer", ~112px at 12/700 —
+                   leaves no room for a rank, an avatar and a figure on one line
+                   in ANY order. The WIDTH was out of date, not the row. About
+                   2.2 chips fit across instead of 3, and the partly visible
+                   third also signals that the rail scrolls. */
+                flex: '1 0 230px',
+                minWidth: 230,
                 padding: '11px 12px 12px',
+
                 fontFamily: SANS,
               }}
             >
@@ -1661,6 +1753,109 @@ export function GolfThisWeek({
                   leads with the course in full.
                   THE COST: the chip no longer says WHERE, so across a multi-course
                   week the figure is a weaker fact than it was. */}
+
+              {/* PLACES 2 AND 3 (BRIEF_BAND_TILES_TOP_THREE §4/§5) — the SAME
+                  reading order as the hero's member row: rank, avatar, name,
+                  figure, on one line. No new type sizes: 8 for the rank, 12/700
+                  for the name and the figure, exactly the scale
+                  BRIEF_BAND_TILE_TYPE_SCALE fixed.
+                  ABSENT IS ABSENT (§3): no dash, no placeholder, no reserved
+                  height. The rail's `alignItems: 'stretch'` already levels every
+                  chip to the tallest, so a one-qualifier tile simply carries an
+                  empty area (§6) — nothing fills it. */}
+              {tile.runners.length > 0 ? (
+                <div
+                  style={{
+                    marginTop: 10,
+                    paddingTop: 8,
+                    borderTop: `1px solid ${WELL_RULE}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 8,
+                  }}
+                >
+                  {tile.runners.map((r, i) => {
+                    const f = tile.figureOf(r);
+                    return (
+                      <div
+                        key={r.round_id}
+                        /* §5 — THE NESTING IS THE RISK. The chip around this row
+                           is itself role="button" with an onClick and an
+                           Enter/Space handler, so without stopPropagation a tap
+                           here would ALSO open the leader's scorecard. */
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCardPress(r);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onCardPress(r);
+                          }
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          minWidth: 0,
+                          height: 18,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 8,
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            color: BAND_FAINT,
+                            fontVariantNumeric: 'tabular-nums lining-nums',
+                            width: 7,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {i + 2}
+                        </span>
+                        <SquircleAvatar
+                          src={r.profile_photo_url}
+                          userId={r.user_id}
+                          alt={r.display_name}
+                          size={18}
+                          hideRing
+                        />
+                        <span
+                          style={{
+                            flex: 1,
+                            minWidth: 0,
+                            fontSize: 12,
+                            fontWeight: 700,
+                            color: INK,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {r.display_name}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 700,
+                            color: f.tone,
+                            fontVariantNumeric: 'tabular-nums lining-nums',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {f.text}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+
             </div>
           ))}
         </div>

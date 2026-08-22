@@ -42,7 +42,7 @@ const SK_ROUND_HERO_BG = [
  * Every block below is MEASURED off the rendered component it stands in for,
  * not read off the JSX and added up:
  *   rounds rail    merged Golf this week: readout + region, scope pills, the
- *                  LEADER BAND (three 154px chips, 100 tall, 9px gap) and the
+ *                  LEADER BAND (three 230px chips, 163 tall, 9px gap) and the
  *                  round tiles
  *   most played    four cards at 10px gaps, 52px thumbnail
  *   honours        rail of 206 x 164 cards over a 96px head
@@ -236,6 +236,20 @@ export function GolfThisWeekRail() {
           RE-MEASURED after BRIEF_DISCOVER_FINISHING_PASS §1, which DELETED the
           course line and its marginTop and put a chevron on the member row:
           11 + 13 + 5 + 30 + 9 + 20 + 12 = 100.
+          RE-MEASURED AGAIN after BRIEF_BAND_TILES_TOP_THREE (§7):
+            width  1 0 230px, mirroring the live flex rule rather than a
+                   hard-coded px — the chip widened to fit rank + avatar + name
+                   + figure on one line.
+            height the hero block is unchanged at 100; the runner block adds
+                   marginTop 10 + 1px rule + paddingTop 8 + two 18px rows with an
+                   8px gap = 63, so 163.
+          WHY TWO RUNNER ROWS AND NOT ZERO, given the shell models the SMALLEST
+          plausible state: the rail levels every chip to the TALLEST (§6), so the
+          settled height of EVERY chip is the tallest tile's height. In the
+          current data three of the four categories clear their floor with three
+          or more distinct members, so the smallest plausible SETTLED height is
+          hero + two runners. A hero-only shell would under-measure by 63px and
+          strand the band exactly as the old strip did.
           THREE, NOT FOUR: MOST IMPROVED renders only when a falling index
           exists, and a skeleton is never larger than the smallest settled state. */}
       <div style={{ display: 'flex', alignItems: 'stretch', gap: 9, marginBottom: 12 }}>
@@ -248,8 +262,8 @@ export function GolfThisWeekRail() {
               borderRadius: 14,
               boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
               overflow: 'hidden',
-              flex: '1 0 154px',
-              minWidth: 154,
+              flex: '1 0 230px',
+              minWidth: 230,
               padding: '11px 12px 12px',
               boxSizing: 'border-box',
             }}
@@ -275,9 +289,33 @@ export function GolfThisWeekRail() {
               <Bar style={{ height: 20, width: 20, borderRadius: '34%' }} />
               <Bar style={{ height: 12, width: 72 }} />
             </div>
+            {/* The runner block: the same 1px rule, the same 10/8 offsets and the
+                same 18px rows the live chip renders. */}
+            <div
+              style={{
+                marginTop: 10,
+                paddingTop: 8,
+                borderTop: '1px solid rgba(11,15,20,0.07)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              }}
+            >
+              {[0, 1].map((j) => (
+                <div
+                  key={j}
+                  style={{ height: 18, display: 'flex', alignItems: 'center', gap: 6 }}
+                >
+                  <Bar style={{ height: 8, width: 7 }} />
+                  <Bar style={{ height: 18, width: 18, borderRadius: '34%' }} />
+                  <Bar style={{ height: 12, width: j === 0 ? 84 : 66 }} />
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
+
 
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
