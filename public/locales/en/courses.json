@@ -1342,6 +1342,8 @@
     "whereTheyPlayed": "Where they played this week",
     "mostPlayedRoundCount": "{{count}} round",
     "mostPlayedRoundCount_other": "{{count}} rounds",
+    "mostPlayedGolferCount": "{{count}} golfer",
+    "mostPlayedGolferCount_other": "{{count}} golfers",
     "mostPlayedPlayedToLabel": "Played to",
     "trackedRounds": "Tracked rounds",
     "roundsLabel": "Rounds",
