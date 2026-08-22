@@ -6,28 +6,40 @@ import {
   SC_PAR,
   SC_PAR_DARK,
 } from '@/features/courses/components/holes/_constants';
+import {
+  HAIRLINE_INK_12,
+  INK_TINT_06,
+  TOPAR_UNDER_DARK,
+  WHITE_ALPHA_08,
+  WHITE_ALPHA_18,
+} from '@/features/tourhub/_shared/tokens';
 
 /**
  * ScoreMark - the universal scoring-mark renderer.
  *
- * House grammar is OUTLINES, not fills (CORRECTION_ONE_SCORING_MARK).
+ * SCORE MARK PILL — one grammar, three independent channels.
+ *
+ * Commit f9eb4521 (2 Aug 2026) removed the old “World Feed” filled-chip
+ * system: red birdie, GOLD eagle, BLUE bogey and NAVY double, with hue carrying
+ * magnitude and fills shared across light/dark. CORRECTION_ONE_SCORING_MARK
+ * made the outline scorecard grammar universal. This treatment keeps that
+ * correction's semantic rule — RED means under par, INK means over par, GOLD
+ * means rarity only — while deliberately replacing outlines with fills.
+ * Magnitude now has one symmetrical signal: a ring whenever |score - par| >= 2.
+ *
+ * Fills are explicitly NOT shared across surfaces. Over-par grounds invert
+ * from ink-alpha on light to light-alpha on dark, and under-par uses the
+ * surface-specific canonical red. The ring gap is transparent, exposing the
+ * actual host surface rather than assuming white.
  * Shared across:
  *  - Card scorecard sheet (CardScorecardSheet)
  *  - Handicap personal scorecard
  *  - Course Holes tab legend
  *  - Clubhouse feed round card (surface="dark")
  *
- * Grammar:
- *  - birdie (-1)        circle,        under-par red
- *  - eagle (-2)         double circle, under-par red
- *  - albatross (-3)     double circle, under-par red, + outer GOLD ring
- *  - hole in one (1)    double circle, under-par red, + outer GOLD ring
- *  - par (0)            bare numeral, no mark
- *  - bogey (+1)         square,        over-par ink
- *  - double or worse    double square, over-par ink
- *  - no score           bare dot
- *
- * Only the over-par mark and the par numeral vary by surface. Red reads on both.
+ * Every mark is circular. Solid fill says under; ground says over; bare says
+ * par. Ring says two-or-more from par on either side. Ace/albatross remain RED
+ * filled with a GOLD rarity ring — never a gold fill.
  */
 
 type Variant =
@@ -54,6 +66,12 @@ const variantFor = (strokes: number | null | undefined, par: number): Variant =>
 
 const OVER_INK_LIGHT = INK;
 const OVER_INK_DARK = '#F2F4F7';
+
+/** Existing semantic surface tokens only — no locally invented colours. */
+const LIGHT_BOGEY_GROUND = INK_TINT_06;
+const LIGHT_DOUBLE_GROUND = HAIRLINE_INK_12;
+const DARK_BOGEY_GROUND = WHITE_ALPHA_08;
+const DARK_DOUBLE_GROUND = WHITE_ALPHA_18;
 
 export interface ScoreMarkProps {
   strokes: number | null | undefined;
@@ -85,24 +103,23 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
 
   const under = variant === 'birdie' || variant === 'eagle' || variant === 'alba' || variant === 'hio';
   const over = variant === 'bogey' || variant === 'doub';
-  const shape: 'circle' | 'square' | null = under ? 'circle' : over ? 'square' : null;
-  const doubleMark = variant === 'eagle' || variant === 'alba' || variant === 'hio' || variant === 'doub';
+  const hasMark = under || over;
+  const magnitudeRing = variant === 'eagle' || variant === 'alba' || variant === 'hio' || variant === 'doub';
   const goldRing = variant === 'alba' || variant === 'hio';
 
   const overInk = surface === 'dark' ? OVER_INK_DARK : OVER_INK_LIGHT;
   const parInk = surface === 'dark' ? SC_PAR_DARK : SC_PAR;
   const emptyInk = surface === 'dark' ? 'rgba(242,244,247,0.35)' : '#CBD5E1';
-
-  const tone = under ? SC_FILL_BIRDIE : overInk;
+  const underRed = surface === 'dark' ? TOPAR_UNDER_DARK : SC_FILL_BIRDIE;
+  const overGround = variant === 'doub'
+    ? surface === 'dark' ? DARK_DOUBLE_GROUND : LIGHT_DOUBLE_GROUND
+    : surface === 'dark' ? DARK_BOGEY_GROUND : LIGHT_BOGEY_GROUND;
+  const fill = under ? underRed : over ? overGround : 'transparent';
+  const ringTone = goldRing ? SC_FILL_GOLD : under ? underRed : overInk;
 
   const STROKE = Math.max(1.3, size * (1.5 / 26));
-  const OUTER_R = shape === 'square' ? Math.max(3, size * 0.12) : '50%';
-  const INNER_INSET = Math.max(2, size * 0.09);
-  const INNER_R = shape === 'square' ? Math.max(2, size * 0.09) : '50%';
-
-  // Gold rarity ring sits outside the mark; inset the mark to make room.
-  const RING_GAP = Math.max(1.6, size * (2.5 / 38));
-  const MARK_INSET = goldRing ? STROKE + RING_GAP : 0;
+  const RING_GAP = Math.max(1, size * (1.5 / 26));
+  const DISC_INSET = magnitudeRing ? STROKE + RING_GAP : 0;
 
   const numeral = strokes == null || strokes <= 0 ? '\u00B7' : strokes;
 
@@ -110,9 +127,10 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   if (colourOverride) numColour = colourOverride;
   else if (variant === 'empty') numColour = emptyInk;
   else if (variant === 'par') numColour = parInk;
-  else numColour = tone;
+  else if (under) numColour = '#FFFFFF';
+  else numColour = overInk;
 
-  const numWeight = variant === 'par' || variant === 'empty' ? 700 : 800;
+  const numWeight = 700;
 
   return (
     <span
@@ -128,38 +146,26 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
         overflow: 'visible',
       }}
     >
-      {goldRing && (
+      {magnitudeRing && (
         <span
           aria-hidden="true"
           style={{
             position: 'absolute',
             inset: 0,
             borderRadius: '50%',
-            border: `${STROKE}px solid ${SC_FILL_GOLD}`,
+            border: `${STROKE}px solid ${ringTone}`,
             pointerEvents: 'none',
           }}
         />
       )}
-      {shape && (
+      {hasMark && (
         <span
           aria-hidden="true"
           style={{
             position: 'absolute',
-            inset: MARK_INSET,
-            borderRadius: OUTER_R,
-            border: `${STROKE}px solid ${tone}`,
-            pointerEvents: 'none',
-          }}
-        />
-      )}
-      {shape && doubleMark && (
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: MARK_INSET + INNER_INSET,
-            borderRadius: INNER_R,
-            border: `${STROKE}px solid ${tone}`,
+            inset: DISC_INSET,
+            borderRadius: '50%',
+            background: fill,
             pointerEvents: 'none',
           }}
         />
@@ -168,7 +174,6 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
         <span
           style={{
             position: 'relative',
-            fontFamily,
             fontSize: Math.round(size * 0.42),
             fontWeight: numWeight,
             lineHeight: 1,

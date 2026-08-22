@@ -4,7 +4,7 @@ import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryL
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { HAIRLINE_INK_12, INK_TINT_06, TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
 import { A } from './tokens';
@@ -486,8 +486,8 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
    own their row outright, which is where their width came from.
 
 
-   PAR IS NOT PRINTED. The MARKER is the par statement — circle birdie, box
-   bogey, double box double-or-worse — so a par row would be the same fact
+   PAR IS NOT PRINTED. The MARKER is the par statement — solid-red birdie,
+   ink-ground bogey, ringed double-or-worse — so a par row would be the same fact
    twice. The full Clubhouse card prints par because it has the room and because
    it IS a scorecard; this is a summary.
 
@@ -512,34 +512,35 @@ void MINI_FAINT;
 const MINI_GHOST = '#C8D0D8';
 const ACE_GOLD = '#C99700';
 const UNDER_INK = '#C8102E';
+const BOGEY_GROUND = INK_TINT_06;
+const DOUBLE_GROUND = HAIRLINE_INK_12;
 
 /** The surface the grid sits on. NO TINT: it is the white card, and the marker
  *  outer rings trace against exactly that, so a ring reads as clear air. */
 export const MINI_WELL = '#FFFFFF';
 
 /** §S1.3 — the Clubhouse card's own key, not a second vocabulary. */
-type Marker = 'ace' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double';
+type Marker = 'ace' | 'albatross' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double';
 
 function markerFor(strokes: number | null, par: number | null): Marker | null {
   if (strokes == null || !Number.isFinite(strokes)) return null;
   if (strokes === 1) return 'ace';
   if (par == null) return 'par';
   const d = strokes - par;
-  if (d <= -2) return 'eagle';
+  if (d <= -3) return 'albatross';
+  if (d === -2) return 'eagle';
   if (d === -1) return 'birdie';
   if (d === 0) return 'par';
   if (d === 1) return 'bogey';
   return 'double';
 }
 
-/** THE DOUBLE RING IS DRAWN INSET (BRIEF_ROUND_TILE_MARK_AND_FIGURE §2). It used
- *  to be an OUTWARD box-shadow — `0 0 0 2px well, 0 0 0 3px c` — which painted
- *  3px past a 17px box. Box-shadow does not participate in layout, so nothing
- *  reserved that space and the hole number 2.5px above was crowded by every
- *  boxed and doubled figure. Now EVERY marker — bare, circle, box, double,
- *  eagle, ace — paints a footprint of exactly CELL x CELL: the outer ring is the
- *  1px BORDER at the box edge, then a 1px spacer inboard of it, then the inner
- *  ring. Both are inset shadows, so the cell can never paint outside itself.
+/** THE PILL GRAMMAR AT 17PX. Every event mark is circular. Under par is a solid
+ *  red disc with white ink; over par is an ink-alpha ground with ink. A ring is
+ *  symmetrical magnitude — eagle and double both get one — while gold is
+ *  reserved for the ace/albatross ring. The outer 1px border is the ring and
+ *  the inset 1px `well` shadow is its surface-aware gap; nothing paints outside
+ *  CELL x CELL.
  *
  *  THE SPACER TAKES THE SURFACE COLOUR the cell sits on — that is the rule, and
  *  it holds whatever that colour is: pass the card, sheet or well background in,
@@ -572,20 +573,27 @@ function markerStyle(m: Marker | null, well: string): CSSProperties {
     flexShrink: 0,
     color: MINI_INK,
   };
-  /* INSET: 1px of `well` as the spacer, then 1px of the ring colour, both
-     INSIDE the 17x17 box. The BORDER is the outer ring. */
-  const ring = (c: string) => `inset 0 0 0 1px ${well}, inset 0 0 0 2px ${c}`;
+  const filled: CSSProperties = { borderRadius: '50%' };
+  const magnitude = (ringTone: string, ground: string, color: string): CSSProperties => ({
+    ...base,
+    ...filled,
+    border: `1px solid ${ringTone}`,
+    boxShadow: `inset 0 0 0 1px ${well}`,
+    background: ground,
+    color,
+  });
   switch (m) {
     case 'ace':
-      return { ...base, borderRadius: 999, border: `1px solid ${ACE_GOLD}`, color: ACE_GOLD, boxShadow: ring(ACE_GOLD) };
+    case 'albatross':
+      return magnitude(ACE_GOLD, UNDER_INK, MINI_WELL);
     case 'eagle':
-      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK, boxShadow: ring(UNDER_INK) };
+      return magnitude(UNDER_INK, UNDER_INK, MINI_WELL);
     case 'birdie':
-      return { ...base, borderRadius: 999, border: `1px solid ${UNDER_INK}`, color: UNDER_INK };
+      return { ...base, ...filled, background: UNDER_INK, color: MINI_WELL };
     case 'bogey':
-      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}` };
+      return { ...base, ...filled, background: BOGEY_GROUND };
     case 'double':
-      return { ...base, borderRadius: 2, border: `1px solid ${MINI_INK}`, boxShadow: ring(MINI_INK) };
+      return magnitude(MINI_INK, DOUBLE_GROUND, MINI_INK);
     default:
       /* PAR IS BARE INK — no ring, no box, no tint, MARKED OR NOT. The baseline
          recedes. */
