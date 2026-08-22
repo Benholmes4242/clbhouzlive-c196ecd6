@@ -24,9 +24,16 @@ import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircl
 /** Seven days. "This week" is the section's entire claim — do not widen it (§F). */
 export const GOLF_WEEK_DAYS = 7;
 
-/** The rail shows ten (§5.1); the fetch must cover the TRUE total for the count. */
+/**
+ * THE ONLY BOUND (BRIEF_GOLF_THIS_WEEK_UNCAP §1/§3). The rail renders EVERY
+ * round the fetch returns for the selected scope — there is no client-side rail
+ * cap. So "unlimited" means UP TO 60: the fetch is the single bound, and the
+ * readout is true only while a scope's real seven-day total stays under it.
+ * Measured at ship time: worldwide = 15 rounds in the window, so every scope is
+ * well inside 60. Raising this is a different brief (60 heavy tiles is a lot).
+ */
 export const GOLF_WEEK_FETCH = 60;
-export const GOLF_WEEK_RAIL_CAP = 10;
+
 
 /** The five scopes (§S2.1). Your Circle leads and is the default. */
 export type WeekScope = 'circle' | 'suggested' | 'top_100' | 'played' | 'worldwide';
