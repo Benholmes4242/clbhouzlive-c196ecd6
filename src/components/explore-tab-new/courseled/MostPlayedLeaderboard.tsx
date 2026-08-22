@@ -119,8 +119,23 @@ function MoveMark({
  * that indent was fault §S0.1.
  */
 
-/** Beyond twelve the expansion navigates instead of growing (§S2.5, unchanged). */
-const LIST_CAP = 12;
+/* OVERTURNED (BRIEF_MOST_PLAYED_COUNTS_AND_SCROLL §2). The rule was:
+ * "Beyond twelve the expansion navigates instead of growing (§S2.5, unchanged)"
+ *   const LIST_CAP = 12;
+ * NEW RULE: EVERY RESOLVED PLAYER IS RENDERED. The list carries a MAX HEIGHT of
+ * a whole number of rows and scrolls inside it.
+ * WHY THE OLD OBJECTION NO LONGER APPLIES: §S2.5 refused an internal scroller
+ * because a vertical scroller inside a vertically scrolling page CHAINS — a
+ * finger that lands on the list scrolls the list and the page feels stuck.
+ * `overscroll-behavior: contain` on the scroller stops the chaining at the
+ * list's own boundary, which is the whole difference. One property.
+ * NOTE: nothing was ever truncated by twelve in current data — the list is
+ * PEOPLE (one entry per distinct member, §S1.4) and the count is ROUNDS. */
+
+/** §2 — a whole number of rows, so a partial row shows there is more. */
+const BOARD_ROW_H = 43;
+const BOARD_MAX_ROWS = 8.5;
+const BOARD_MAX_H = Math.round(BOARD_ROW_H * BOARD_MAX_ROWS);
 
 /** Ink ramp of the round tiles, shared so the board reads as one family. */
 const INK = '#0B0F14';
