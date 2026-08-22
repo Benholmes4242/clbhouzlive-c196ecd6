@@ -1148,13 +1148,16 @@ function GolfThisWeekCard({
           the card edges. */}
       <div style={{ padding: '0 10px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* ===================== THE SCORECARD WELL (§S4) =====================
-            A TINTED WELL, #F2F5F8, NO BORDER (§S4.1) — the tone separates it
-            from the card and an outline would be a second signal for one edge.
-            IT RUNS TO THE CARD'S BOTTOM EDGE: the tint finishing 10px short of
+            A WHITE WELL WITH A HAIRLINE (BRIEF_ROUND_TILE_WHITE_WELL §1/§2) — the
+            well is now the card's own #FFFFFF and matches the leader chips, so
+            the boundary is DRAWN rather than implied by a tone. The tint and the
+            border are ALTERNATIVES, not additions.
+            IT RUNS TO THE CARD'S BOTTOM EDGE: the well finishing 10px short of
             the tile read as an unfinished panel, so the bottom corners take the
             CARD's radius and the card has no padding beneath it. Its height is
             fixed whatever it holds, so an empty well keeps the rail level
             (ACCEPTANCE K, Q). */}
+
         <div
           style={{
             /* THE WELL'S 8px OFFSET MOVED UP INTO THE DARK REGION'S BOTTOM
