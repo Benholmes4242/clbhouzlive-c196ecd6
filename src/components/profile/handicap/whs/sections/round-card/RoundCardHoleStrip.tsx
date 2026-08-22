@@ -121,14 +121,6 @@ export const RoundCardHoleStrip: React.FC<{ holes: HoleRow[] }> = ({ holes }) =>
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <svg width={0} height={0} style={{ position: 'absolute' }} aria-hidden>
-        <defs>
-          <linearGradient id="hsAmberGoldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#F7931E" />
-            <stop offset="100%" stopColor="#FBBC2E" />
-          </linearGradient>
-        </defs>
-      </svg>
       <NineRow label="OUT" holes={front9} />
       {back9.length > 0 && <NineRow label="IN" holes={back9} />}
     </div>
