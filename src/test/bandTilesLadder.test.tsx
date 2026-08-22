@@ -116,9 +116,9 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
     const cols = ladderRows(chipFor(container, /BEST THIS WEEK/i)).map(
       (r) => (r.children[1] as HTMLElement).style.width,
     );
-    /* MEASURED, NOT 56 (LADDER_TIGHTEN §3): "77 +6" at 12/9 is 33px, and rows
+    /* MEASURED, NOT 56 (LADDER_TIGHTEN §3): "77 +6" at 12/8 is 31px, and rows
        2 and 3 no longer pay for a leader's size. */
-    expect(cols).toEqual(['33px', '33px']);
+    expect(cols).toEqual(['31px', '31px']);
   });
 
   it('prints the unit ONCE on the eyebrow row, and never per row (e, §2)', () => {
@@ -248,9 +248,9 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
     const chip = chipFor(container, /BEST THIS WEEK/i);
     expect(chip.style.minWidth).toBe('230px');
     expect(chip.style.flex).toBe('1 0 230px');
-    /* THREE SIZES EXACTLY — 8, 9 (the to-par, §2) and 12. Nothing is big any
-       more. The avatar's own initial glyph is the avatar component's business,
-       not the band's scale. */
+    /* TWO SIZES EXACTLY — 8 (the to-par, §2) and 12. Nothing is big any more.
+       The avatar's own initial glyph is the avatar component's business, not the
+       band's scale. */
     const sizes = new Set<string>();
     for (const rowEl of ladderRows(chip)) {
       sizes.add((rowEl.children[0] as HTMLElement).style.fontSize);
@@ -259,6 +259,6 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
       }
       sizes.add((rowEl.querySelector('span[style*="ellipsis"]') as HTMLElement).style.fontSize);
     }
-    expect([...sizes].sort()).toEqual(['12px', '8px', '9px']);
+    expect([...sizes].sort()).toEqual(['12px', '8px']);
   });
 });
