@@ -781,10 +781,10 @@ export function MostPlayedLeaderboard({
                          }}
                        >
                          {bestPlayer.name}
+                       </span>
                      </span>
                    )}
                  </span>
-                </span>
                 {/* §S1.5 — "PLAYED TO" IS PROMOTED: 19px / 800 on the right of
                     the header with an 8px label beneath. It is the row's
                     HEADLINE FIGURE, because it is the only figure on the row
