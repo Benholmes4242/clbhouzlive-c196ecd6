@@ -42,7 +42,7 @@ const SK_ROUND_HERO_BG = [
  * Every block below is MEASURED off the rendered component it stands in for,
  * not read off the JSX and added up:
  *   rounds rail    merged Golf this week: readout + region, scope pills, the
- *                  LEADER BAND (three 154px chips, 100 tall, 9px gap) and the
+ *                  LEADER BAND (three 230px chips, 163 tall, 9px gap) and the
  *                  round tiles
  *   most played    four cards at 10px gaps, 52px thumbnail
  *   honours        rail of 206 x 164 cards over a 96px head
