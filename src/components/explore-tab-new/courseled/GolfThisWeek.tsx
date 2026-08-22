@@ -174,7 +174,7 @@ const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
  * space for a qualifier it never shows (BEST STABLEFORD's old 40px gap).
  */
 const BAND_FIG_SIZE = 12;
-const BAND_QUAL_SIZE = 9;
+const BAND_QUAL_SIZE = 8;
 const BAND_QUAL_GAP = 2;
 const bandGlyphEm = (ch: string) =>
   /[0-9+\u2212\u2193\u2014-]/.test(ch) ? 0.6 : ch === '.' ? 0.3 : 0.28;
@@ -1784,12 +1784,9 @@ export function GolfThisWeek({
                         /* UNIFORM DIVIDERS (§1): the same hairline between every
                            pair of rows, none above the leader. */
                         borderTop: lead ? 'none' : `1px solid ${WELL_RULE}`,
-                        /* §4.3 — FIRST PLACE TAKES THE GROUND, not a bigger
-                           figure: ~3.5% ink, bled to the chip's padding edges by
-                           the negative margin so it reads as a band. It is the
-                           one mark that works on MOST BIRDIES, where the figures
-                           are single digits. */
-                        background: lead ? 'rgba(11,15,20,0.035)' : undefined,
+                        /* AMBER HIGHLIGHT for first place: a subtle brand tint
+                           that bleeds to the chip's padding edges. */
+                        background: lead ? 'rgba(247,147,30,0.12)' : undefined,
                         borderRadius: lead ? 6 : undefined,
                         margin: lead ? '0 -12px' : undefined,
                         padding: lead ? '6px 12px' : '8px 0',
@@ -1867,7 +1864,7 @@ export function GolfThisWeek({
                         src={r.profile_photo_url}
                         userId={r.user_id}
                         alt={r.display_name}
-                        size={lead ? 20 : 16}
+                        size={16}
                         hideRing
                       />
                       <span
