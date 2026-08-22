@@ -480,7 +480,7 @@ const FIGURE_PLACEHOLDER = '{n}';
  * BRIEF_ROUND_TILE_COURSE_PHOTO + BRIEF_ROUND_TILE_HERO_TOUR_COLOUR — the course
  * thumbnail sits BEHIND the hero as atmosphere, and the whole recipe is now the
  * Tour Overview hero's, imported unmodified: COURSE_GRADIENT as the base,
- * COURSE_SCRIMS, HERO_BOTTOM_SCRIM, HERO_TOP_SCRIM.
+ * COURSE_SCRIMS, HERO_TOP_SCRIM and the tile-local bottom scrim (§4.2).
  *
  * ONLY THE GEOMETRY IS SCALED. The tour's stops are tuned at 80px / 260px
  * against a ~380px hero; on a 156px tile a 260px bottom scrim would blacken the
