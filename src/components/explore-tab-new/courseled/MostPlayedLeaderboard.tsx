@@ -257,14 +257,27 @@ function MemberBoard({
             ? {
                 maxHeight: BOARD_MAX_H,
                 overflowY: 'auto',
+                // §1 — THE X AXIS IS LOCKED. With overflow-y:auto the spec
+                // promotes a visible x axis to auto, which is where the
+                // sideways drag came from.
+                overflowX: 'hidden',
                 // THE ONE PROPERTY §S2.5's OBJECTION TURNED ON: the scroll
                 // chain stops here, so a swipe that begins on the page keeps
                 // moving the page and the page can never feel stuck.
                 overscrollBehavior: 'contain',
+                // No horizontal swipe on the list can start a back gesture.
+                overscrollBehaviorX: 'none',
                 WebkitOverflowScrolling: 'touch',
+                // §2 — THE CAUSE: the rows used to bleed with margin 0 -14px,
+                // which made the CONTENT 28px wider than this box (14px of it
+                // reachable to the right, taking the gross with it). The bleed
+                // now lives on the scroller, so rows fit exactly and nothing
+                // is clipped once x is hidden.
+                margin: '0 -14px',
               }
             : undefined
         }
+
       >
       {listed.map((p) => {
         const isViewer = viewerId != null && p.userId === viewerId;
@@ -291,7 +304,9 @@ function MemberBoard({
               gap: 9,
               // FULL WIDTH (§S2.3): the tint bleeds to the card's own padding
               // rather than starting at a thumbnail-width indent.
-              margin: '0 -14px',
+              // The bleed lives on the scroller when the list scrolls, so the
+              // row must NOT widen past it or hiding x would clip the gross.
+              margin: scrolls ? 0 : '0 -14px',
               padding: '7px 14px',
               minWidth: 0,
               // §S2.8 — TINT ONLY.
