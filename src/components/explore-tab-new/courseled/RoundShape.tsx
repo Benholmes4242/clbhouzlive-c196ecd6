@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { CSSProperties, ReactNode } from 'react';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
+import { SC_FILL_BIRDIE, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
@@ -497,9 +498,8 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
 
 /* THE MINI GRID'S OWN INK, from BRIEF_ROUND_TILE_LIGHT_REFINEMENT §S2. ONE
    genuinely dark ink and greys that are clearly different from each other, not
-   four middling greys. The under-par red DEEPENS to #C8102E and the ace gold to
-   #C99700: the previous values (SC_FILL_BIRDIE / SC_FILL_GOLD) were tuned
-   against a near-white panel and go weak on the tinted well.
+   four middling greys. Score-event red and rarity gold now come from the same
+   shared tokens as ScoreMark so 17px and 22px are one visual dialect.
 
    LOCAL to this grid, which only the Discover round tile renders — the
    Clubhouse scorecard sheet keeps its own tokens untouched. */
@@ -510,8 +510,8 @@ const MINI_FAINT = '#9AA5B1';
    MINI_INK. Retained so the ramp stays legible to a reader. */
 void MINI_FAINT;
 const MINI_GHOST = '#C8D0D8';
-const ACE_GOLD = '#C99700';
-const UNDER_INK = '#C8102E';
+const ACE_GOLD = SC_FILL_GOLD;
+const UNDER_INK = SC_FILL_BIRDIE;
 const BOGEY_GROUND = INK_TINT_06;
 const DOUBLE_GROUND = HAIRLINE_INK_12;
 
