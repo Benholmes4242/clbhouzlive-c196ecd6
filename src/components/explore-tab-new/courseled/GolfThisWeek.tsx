@@ -22,7 +22,6 @@ import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
   HERO_TOP_SCRIM,
-  HERO_BOTTOM_SCRIM,
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 import { relativeDay } from './discoverWhen';
@@ -846,7 +845,7 @@ function GolfThisWeekCard({
                 right: 0,
                 bottom: 0,
                 height: PHOTO_BOTTOM_SCRIM_H,
-                background: HERO_BOTTOM_SCRIM,
+                background: TILE_BOTTOM_SCRIM,
                 zIndex: -1,
               }}
             />
