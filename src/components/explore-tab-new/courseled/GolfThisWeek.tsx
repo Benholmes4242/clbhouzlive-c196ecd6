@@ -1007,8 +1007,12 @@ function GolfThisWeekCard({
               marginBottom: 5,
               /* §5.1 — the moment eyebrow loses its tone: PhotoBand's own label
                  white-at-alpha, not a new value. The moments are distinguished
-                 by their WORDS now. */
-              color: 'rgba(255,255,255,0.78)',
+                 by their WORDS now. EXCEPTION: THE RUN carries the same green
+                 as a falling handicap index delta — a run is a positive move. */
+              color:
+                moment.kind === 'run'
+                  ? ROW_DARK_INDEX_FELL
+                  : 'rgba(255,255,255,0.78)',
             }}
           >
             {label}
