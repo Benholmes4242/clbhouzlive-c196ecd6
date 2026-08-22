@@ -673,7 +673,7 @@ function FigureLine({
     letterSpacing: '0.14em',
     lineHeight: 1,
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.78)',
   };
 
   if (moment.figureRole === 'score' && moment.figure != null) {
@@ -922,7 +922,7 @@ function GolfThisWeekCard({
                   fontSize: 9.5,
                   fontWeight: 600,
                   lineHeight: 1,
-                  color: 'rgba(255,255,255,0.52)',
+                  color: 'rgba(255,255,255,0.78)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -940,7 +940,7 @@ function GolfThisWeekCard({
               lineHeight: 1,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.62)',
+              color: 'rgba(255,255,255,0.78)',
             }}
           >
             {relativeDay(row.play_date, t)}
@@ -967,7 +967,7 @@ function GolfThisWeekCard({
               /* §5.1 — the moment eyebrow loses its tone: PhotoBand's own label
                  white-at-alpha, not a new value. The moments are distinguished
                  by their WORDS now. */
-              color: 'rgba(255,255,255,0.65)',
+              color: 'rgba(255,255,255,0.78)',
             }}
           >
             {label}
@@ -1073,8 +1073,8 @@ function GolfThisWeekCard({
               <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
                 <IndexMovementTriangle
                   direction={(delta as number) < 0 ? 'down' : 'up'}
-                  /* §5.3 — the DIRECTION is unchanged; only the colour goes. */
-                  color={ROW_DARK_QUIET}
+                  /* §2 — the DIRECTION rule is unchanged and the COLOUR is back. */
+                  color={(delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE}
                   size={7}
                 />
                 <span
@@ -1082,7 +1082,7 @@ function GolfThisWeekCard({
                     ...NUMF,
                     fontSize: 10.5,
                     lineHeight: 1,
-                    color: ROW_DARK_QUIET,
+                    color: (delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE,
                   }}
                 >
                   {Math.abs(delta as number).toFixed(1)}
