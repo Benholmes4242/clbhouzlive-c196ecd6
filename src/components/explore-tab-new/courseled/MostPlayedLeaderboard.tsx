@@ -234,12 +234,38 @@ function MemberBoard({
   onSeeAllAtCourse: () => void;
 }) {
   const { t } = useTranslation('courses');
-  const listed = row.players.slice(0, LIST_CAP);
-  const hidden = row.players.length - listed.length;
+  /** §2 — NO CAP. Every resolved player is rendered. */
+  const listed = row.players;
+  const scrolls = listed.length > BOARD_MAX_ROWS;
+  const scrollerRef = React.useRef<HTMLDivElement | null>(null);
+  /** The fade hides itself at the end, so it never reads as a cut-off edge. */
+  const [atEnd, setAtEnd] = useState(false);
+  const onScroll = () => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    setAtEnd(el.scrollTop + el.clientHeight >= el.scrollHeight - 2);
+  };
   if (listed.length === 0) return null;
 
   return (
-    <div style={{ paddingBottom: 10 }}>
+    <div style={{ paddingBottom: 10, position: 'relative' }}>
+      <div
+        ref={scrollerRef}
+        onScroll={scrolls ? onScroll : undefined}
+        style={
+          scrolls
+            ? {
+                maxHeight: BOARD_MAX_H,
+                overflowY: 'auto',
+                // THE ONE PROPERTY §S2.5's OBJECTION TURNED ON: the scroll
+                // chain stops here, so a swipe that begins on the page keeps
+                // moving the page and the page can never feel stuck.
+                overscrollBehavior: 'contain',
+                WebkitOverflowScrolling: 'touch',
+              }
+            : undefined
+        }
+      >
       {listed.map((p) => {
         const isViewer = viewerId != null && p.userId === viewerId;
         const under = p.toPar != null && p.toPar < 0;
