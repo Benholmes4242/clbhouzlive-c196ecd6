@@ -178,7 +178,7 @@ export function FriendsRail() {
  * GOLF THIS WEEK. MEASURED off GolfThisWeek.tsx after BRIEF_ROUND_TILE_THE_MOMENT:
  * 256 wide, no border and a 1px shadow, then a 191px DARK REGION — the 156px
  * hero plus the member row, which now sits ON the photograph and its scrims
- * (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW, BRIEF_ROUND_TILE_HERO_TOUR_COLOUR), then the TINTED WELL (#F2F5F8) at a FIXED 135px running to the
+ * (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW, BRIEF_ROUND_TILE_HERO_TOUR_COLOUR), then the WHITE WELL (#FFFFFF, hairline on all four sides — BRIEF_ROUND_TILE_WHITE_WELL) at a FIXED 135px running to the
  * card's bottom edge: its header rule and the 96px two-rows-of-nine scorecard. Above the rail: the
  * count/region readout row, the pills row and the best-of-week band, all of
  * which the live section renders before its first card and none of which may
