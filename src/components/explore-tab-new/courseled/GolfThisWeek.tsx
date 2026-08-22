@@ -14,6 +14,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
@@ -54,11 +55,29 @@ import { A, CARD_SHELL, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
  * GOLF THIS WEEK (BRIEF_GOLF_THIS_WEEK). Replaces Around the world (standout
  * feats) and Personal bests, both deleted.
  *
- * THE HERO'S COLOUR LAW (BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §0, from PhotoBand
- * itself): ON THIS HERO, EVERY VALUE IS WHITE OR WHITE-AT-ALPHA. THE ONLY
- * EXCEPTION IS A SCORE, WHICH TAKES THE CANONICAL TO-PAR GRAMMAR ON DARK
- * (getScoreColor(delta, 'dark', 'standard') — never a hand-picked hex).
- * ONE DELIBERATE DIVERGENCE: AMBER, and only as the viewing member's marker.
+ * THE HERO'S COLOUR LAW (BRIEF_HERO_TEXT_FLOOR_AND_DELTA §2, correcting
+ * BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §0): EVERY VALUE IN THE HERO IS WHITE OR
+ * WHITE-AT-ALPHA **EXCEPT WHERE COLOUR CARRIES MEANING** — a to-par score
+ * (canonical getScoreColor(delta, 'dark', 'standard'), never a hand-picked hex),
+ * an INDEX MOVEMENT (INDEX_DELTA.dark), and the AMBER that marks the viewing
+ * member.
+ *
+ * TEXT ALPHA FLOOR — NOTHING IN THE HERO OR THE MEMBER ROW BELOW 0.72
+ * (BRIEF_HERO_TEXT_FLOOR_AND_DELTA §1). Half-transparent white at 9.5px over a
+ * photograph is not legible, and raising the scrim further would erase the
+ * photograph to fix a type problem. The LADDER survives — course name 0.94 leads,
+ * sentence 0.82, everything else 0.78 — do NOT add a hero text value below 0.72.
+ *
+ * THE THREE DELIBERATE DIVERGENCES FROM THE TOUR HERO (§3). All three exist
+ * because the TILE CARRIES SOMETHING THE TOUR DOES NOT:
+ *   1. AMBER marks the viewing member — the tour hero has no concept of "you".
+ *   2. THE INDEX DELTA IS GREEN/RED (INDEX_DELTA.dark) — the tour hero has no
+ *      index movement, so PhotoBand's "colour only on a score" never faced this
+ *      case. A falling index is better and is green; a rising one is worse and
+ *      is red. That direction rule is correct and must not be "fixed".
+ *   3. THE BOTTOM SCRIM'S FINAL STOP REACHES FULL OPACITY rather than
+ *      HERO_BOARD_SURFACE — the tile's next band is light, the tour's is dark.
+
  *
  * WHAT THAT COSTS, ON PURPOSE: the seven moments are now distinguished ONLY BY
  * THEIR WORDS. MOMENT_TONE survives in exactly one place — the tinted band
@@ -174,10 +193,16 @@ const AMBER = '#F7931E';
    band tiles and the well still use them. */
 /** Names and grosses: the hero's own white, so one white runs down the block. */
 const ROW_DARK_INK = 'rgba(255,255,255,0.94)';
-/** Over/level par, and INDEX MOVEMENT. An index movement is NOT a to-par score,
-    so it gets no colour at all: the TRIANGLE, which still points down on a
-    falling index, is what carries the direction. PhotoBand's own quiet value. */
-const ROW_DARK_QUIET = 'rgba(255,255,255,0.62)';
+/** Over/level par, and every quiet value on dark. FLOORED AT 0.78
+    (BRIEF_HERO_TEXT_FLOOR_AND_DELTA §1): PhotoBand's 0.62 is unreadable at
+    10.5px over a photograph. The INDEX MOVEMENT no longer uses this — see below. */
+const ROW_DARK_QUIET = 'rgba(255,255,255,0.78)';
+/** THE INDEX MOVEMENT KEEPS ITS COLOUR (§2). Colour where it means something:
+    a falling index is better (green), a rising one is worse (red). The tour hero
+    has no index movement, so PhotoBand's "colour only on a score" never governed
+    this figure. Applies to the TRIANGLE and its FIGURE alike. */
+const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
+const ROW_DARK_INDEX_ROSE = INDEX_DELTA.dark.drifted;
 /** UNDER PAR RESOLVES THROUGH getScoreColor — no hand-picked hex. TOPAR_RED
     (#C8102E) is the LIGHT-surface red and goes muddy on a scrimmed photograph. */
 const ROW_DARK_TOPAR_UNDER = getScoreColor(-1, 'dark', 'standard');
@@ -648,7 +673,7 @@ function FigureLine({
     letterSpacing: '0.14em',
     lineHeight: 1,
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.78)',
   };
 
   if (moment.figureRole === 'score' && moment.figure != null) {
@@ -897,7 +922,7 @@ function GolfThisWeekCard({
                   fontSize: 9.5,
                   fontWeight: 600,
                   lineHeight: 1,
-                  color: 'rgba(255,255,255,0.52)',
+                  color: 'rgba(255,255,255,0.78)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -915,7 +940,7 @@ function GolfThisWeekCard({
               lineHeight: 1,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.62)',
+              color: 'rgba(255,255,255,0.78)',
             }}
           >
             {relativeDay(row.play_date, t)}
@@ -942,7 +967,7 @@ function GolfThisWeekCard({
               /* §5.1 — the moment eyebrow loses its tone: PhotoBand's own label
                  white-at-alpha, not a new value. The moments are distinguished
                  by their WORDS now. */
-              color: 'rgba(255,255,255,0.65)',
+              color: 'rgba(255,255,255,0.78)',
             }}
           >
             {label}
@@ -1048,8 +1073,8 @@ function GolfThisWeekCard({
               <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
                 <IndexMovementTriangle
                   direction={(delta as number) < 0 ? 'down' : 'up'}
-                  /* §5.3 — the DIRECTION is unchanged; only the colour goes. */
-                  color={ROW_DARK_QUIET}
+                  /* §2 — the DIRECTION rule is unchanged and the COLOUR is back. */
+                  color={(delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE}
                   size={7}
                 />
                 <span
@@ -1057,7 +1082,7 @@ function GolfThisWeekCard({
                     ...NUMF,
                     fontSize: 10.5,
                     lineHeight: 1,
-                    color: ROW_DARK_QUIET,
+                    color: (delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE,
                   }}
                 >
                   {Math.abs(delta as number).toFixed(1)}
