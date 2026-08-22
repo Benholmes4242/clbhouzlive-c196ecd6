@@ -193,10 +193,16 @@ const AMBER = '#F7931E';
    band tiles and the well still use them. */
 /** Names and grosses: the hero's own white, so one white runs down the block. */
 const ROW_DARK_INK = 'rgba(255,255,255,0.94)';
-/** Over/level par, and INDEX MOVEMENT. An index movement is NOT a to-par score,
-    so it gets no colour at all: the TRIANGLE, which still points down on a
-    falling index, is what carries the direction. PhotoBand's own quiet value. */
-const ROW_DARK_QUIET = 'rgba(255,255,255,0.62)';
+/** Over/level par, and every quiet value on dark. FLOORED AT 0.78
+    (BRIEF_HERO_TEXT_FLOOR_AND_DELTA §1): PhotoBand's 0.62 is unreadable at
+    10.5px over a photograph. The INDEX MOVEMENT no longer uses this — see below. */
+const ROW_DARK_QUIET = 'rgba(255,255,255,0.78)';
+/** THE INDEX MOVEMENT KEEPS ITS COLOUR (§2). Colour where it means something:
+    a falling index is better (green), a rising one is worse (red). The tour hero
+    has no index movement, so PhotoBand's "colour only on a score" never governed
+    this figure. Applies to the TRIANGLE and its FIGURE alike. */
+const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
+const ROW_DARK_INDEX_ROSE = INDEX_DELTA.dark.drifted;
 /** UNDER PAR RESOLVES THROUGH getScoreColor — no hand-picked hex. TOPAR_RED
     (#C8102E) is the LIGHT-surface red and goes muddy on a scrimmed photograph. */
 const ROW_DARK_TOPAR_UNDER = getScoreColor(-1, 'dark', 'standard');
