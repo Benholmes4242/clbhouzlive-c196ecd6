@@ -31,7 +31,6 @@ import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
 import {
   DEFAULT_WEEK_SCOPE,
-  GOLF_WEEK_RAIL_CAP,
   bestOfWeek,
   orderForWeek,
   usePlayedCourseIds,
@@ -509,8 +508,12 @@ const PHOTO_TOP_SCRIM_H = 48;
    there is now ONE edge (region -> well) where there were TWO (hero -> white
    row, row -> well). */
 const PHOTO_BOTTOM_SCRIM_H = 159;
-/** Photo only on the first N tiles: the rail renders every round (§4.2). */
-const PHOTO_TILE_LIMIT = 6;
+/* NO PHOTO CAP (BRIEF_GOLF_THIS_WEEK_UNCAP §2). Every tile carries its course
+   photograph. The old six-tile limit saved requests that were never going to
+   fire — the images are loading="lazy" / decoding="async", so in a horizontal
+   rail only tiles at or near the viewport fetch anything — while costing the
+   treatment its consistency (the seventh tile read as a different card). Do not
+   reintroduce it on that reasoning. */
 
 
 const fmtRel = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
@@ -1215,7 +1218,6 @@ export function GolfThisWeek({
   const ordered = useMemo(() => orderForWeek(inRegion, playedSet), [inRegion, playedSet]);
   const counts = useWeekCounts(ordered);
   const best = useMemo(() => bestOfWeek(ordered), [ordered]);
-  const rows = useMemo(() => ordered.slice(0, GOLF_WEEK_RAIL_CAP), [ordered]);
 
   /* ONE batched hole-shape read for the whole rail — never one per card. */
   const scoreIds = useMemo(() => rows.map((r) => r.score_id), [rows]);
@@ -1640,7 +1642,7 @@ export function GolfThisWeek({
         className="scrollbar-hide"
         style={{ display: 'flex', alignItems: 'stretch', gap: 10, overflowX: 'auto' }}
       >
-        {rows.map((r, i) => {
+        {ordered.map((r) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
           return (
             <GolfThisWeekCard
@@ -1649,9 +1651,7 @@ export function GolfThisWeek({
               shape={holeShapes?.get(r.score_id ?? '') ?? null}
               courseName={m?.name ?? r.course_name}
               region={m?.region ?? null}
-              /* §4.2 — the photo is limited to the leading tiles so the rail
-                 does not fire one image request per round on cold load. */
-              imageUrl={i < PHOTO_TILE_LIMIT ? m?.imageUrl ?? null : null}
+              imageUrl={m?.imageUrl ?? null}
               /* §2.2 — never on the member's own round, never on someone already
                  followed, and never before the follow set has resolved. */
               showFollow={!r.is_self && !!userId && !!following.data}
