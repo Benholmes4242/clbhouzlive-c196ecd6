@@ -1007,12 +1007,15 @@ function GolfThisWeekCard({
               marginBottom: 5,
               /* §5.1 — the moment eyebrow loses its tone: PhotoBand's own label
                  white-at-alpha, not a new value. The moments are distinguished
-                 by their WORDS now. EXCEPTION: THE RUN carries the same green
-                 as a falling handicap index delta — a run is a positive move. */
+                 by their WORDS now. TWO EXCEPTIONS: THE RUN carries the same
+                 green as a falling handicap index delta; FINISHED IN THE RED
+                 carries the same under-par red as the tile's to-par figure. */
               color:
                 moment.kind === 'run'
                   ? ROW_DARK_INDEX_FELL
-                  : 'rgba(255,255,255,0.78)',
+                  : moment.kind === 'finishedInRed'
+                    ? ROW_DARK_TOPAR_UNDER
+                    : 'rgba(255,255,255,0.78)',
             }}
           >
             {label}
