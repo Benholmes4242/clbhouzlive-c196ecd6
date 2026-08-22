@@ -735,6 +735,7 @@ export function MostPlayedLeaderboard({
                            fontWeight: 700,
                            lineHeight: 1,
                            letterSpacing: '0.14em',
+                           textTransform: 'uppercase',
                            color: FAINT,
                          }}
                        >

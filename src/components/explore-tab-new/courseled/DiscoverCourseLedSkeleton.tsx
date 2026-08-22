@@ -703,8 +703,17 @@ export function MostPlayedPanel() {
                 COLLAPSED state. Region and counts are separate 11px lines; the
                 BEST line sits below the same hairline as the live card. */}
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-              <div style={{ height: 17, display: 'flex', alignItems: 'center' }}>
+              <div
+                style={{
+                  height: 34,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  gap: 4,
+                }}
+              >
                 <TextBar w={130} h={13} />
+                <TextBar w={92} h={13} />
               </div>
               <div style={{ height: 15, display: 'flex', alignItems: 'center' }}>
                 <TextBar w={92} h={11} />
