@@ -1444,6 +1444,10 @@ export function GolfThisWeek({
       qualTone: best.toPar < 0 ? TOPAR_RED : INK,
       row: best.row,
       course: courseNameFor(best.row),
+      /* The hero is `bestOfWeek`'s winner, unchanged; the sort's first place is
+         the same row, so the runners are places 2 and 3 of that same list. */
+      runners: bestRanked.slice(1),
+      figureOf: (r) => ({ text: String(r.gross ?? '\u2014'), tone: INK }),
     });
   }
   if (bestStableford) {
@@ -1457,6 +1461,8 @@ export function GolfThisWeek({
       qualTone: INK,
       row: bestStableford,
       course: courseNameFor(bestStableford),
+      runners: stablefordRanked.slice(1),
+      figureOf: (r) => ({ text: String(r.stableford_points), tone: INK }),
     });
   }
   if (mostBirdies) {
@@ -1471,6 +1477,8 @@ export function GolfThisWeek({
       qualTone: INK,
       row: mostBirdies,
       course: courseNameFor(mostBirdies),
+      runners: birdiesRanked.slice(1),
+      figureOf: (r) => ({ text: String(r.birdies), tone: TOPAR_RED }),
     });
   }
   if (mostImproved) {
@@ -1486,8 +1494,14 @@ export function GolfThisWeek({
       qualTone: INK,
       row: mostImproved,
       course: courseNameFor(mostImproved),
+      runners: improvedRanked.slice(1),
+      figureOf: (r) => ({
+        text: `\u2193${Math.abs(r.delta_index as number).toFixed(1)}`,
+        tone: A.IMPROVED,
+      }),
     });
   }
+
 
 
 
