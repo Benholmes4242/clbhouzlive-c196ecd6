@@ -1412,42 +1412,55 @@ export function GolfThisWeek({
     key: string;
     emoji?: string;
     label: string;
-    figure: string;
-    tone: string;
-    /** Qualifier on the figure's baseline: a to-par or a unit. Never a course. */
-    qual?: string;
-    qualTone?: string;
+    /** §2 — the UNIT, printed once on the eyebrow row as a column header.
+        Absent on BEST THIS WEEK, whose qualifier is data and stays per-row. */
+    unit?: string;
     row: CircleRoundRow;
     course: string;
     /** §2 — places 2 and 3, member-capped. Empty is a normal week. */
     runners: CircleRoundRow[];
-    /** The same comparison the tile ranks on, rendered at row scale. */
-    figureOf: (r: CircleRoundRow) => { text: string; tone: string };
+    /** The tile's comparison for ONE row: the figure, and — only where the
+        qualifier varies by round — that row's qualifier. */
+    figureOf: (r: CircleRoundRow) => {
+      text: string;
+      tone: string;
+      qual?: string;
+      qualTone?: string;
+    };
   }[] = [];
 
+  /* §2 — BEST THIS WEEK's to-par is DATA, not a unit: it differs per round, so
+     it is the one qualifier that stays beside every figure in the ladder. */
+  const toParOf = (r: CircleRoundRow) => {
+    if (r.gross == null || r.course_par == null) return null;
+    const d = (r.gross as number) - (r.course_par as number);
+    return {
+      text: d === 0 ? 'E' : d < 0 ? `\u2212${Math.abs(d)}` : `+${d}`,
+      tone: d < 0 ? TOPAR_RED : A.MUTE,
+    };
+  };
 
   if (best) {
     bandTiles.push({
       key: 'best',
       emoji: '\uD83D\uDD25', // FIRE
       label: t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK'),
-      figure: String(best.row.gross ?? '\u2014'),
-      /* §S1.4 — the figure itself stays INK; only the to-par is coloured.
-         STILL TRUE, AND IT IS THE REASON FOR the hero figure rule
-         (BRIEF_ROUND_TILE_MARK_AND_FIGURE §1): what gets coloured is the
-         TO-PAR, never the count. Here the figure is a GROSS beside its own
-         to-par, so the gross stays ink. In the hero, FINISHED IN THE RED's
-         figure IS the to-par, so §S1.4 asks for it to be coloured there — and
-         asks for THE RUN's "8" and BIRDIE HAUL's "5" to stay white. */
-      tone: INK,
-      qual: bestToPar ?? undefined,
-      qualTone: best.toPar < 0 ? TOPAR_RED : INK,
       row: best.row,
       course: courseNameFor(best.row),
       /* The hero is `bestOfWeek`'s winner, unchanged; the sort's first place is
          the same row, so the runners are places 2 and 3 of that same list. */
       runners: bestRanked.slice(1),
-      figureOf: (r) => ({ text: String(r.gross ?? '\u2014'), tone: INK }),
+      /* §S1.4 — the figure itself stays INK; only the to-par is coloured. What
+         gets coloured is the TO-PAR, never the count. */
+      figureOf: (r) => {
+        const tp = toParOf(r);
+        return {
+          text: String(r.gross ?? '\u2014'),
+          tone: INK,
+          qual: tp?.text,
+          qualTone: tp?.tone,
+        };
+      },
     });
   }
   if (bestStableford) {
@@ -1455,10 +1468,7 @@ export function GolfThisWeek({
       key: 'stableford',
       emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
       label: t('discover.golfThisWeek.stablefordLabel', 'Best stableford'),
-      figure: String(bestStableford.stableford_points),
-      tone: INK,
-      qual: t('discover.golfThisWeek.stablefordUnit', 'points'),
-      qualTone: INK,
+      unit: t('discover.golfThisWeek.stablefordUnit', 'points'),
       row: bestStableford,
       course: courseNameFor(bestStableford),
       runners: stablefordRanked.slice(1),
@@ -1470,37 +1480,31 @@ export function GolfThisWeek({
       key: 'birdies',
       emoji: '\uD83D\uDC26', // BIRD
       label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
-      /* A birdie count IS a count of under-par holes, so the red is literal. */
-      figure: String(mostBirdies.birdies),
-      tone: TOPAR_RED,
-      qual: t('discover.friendsRail.birdies', 'birdies'),
-      qualTone: INK,
+      unit: t('discover.friendsRail.birdies', 'birdies'),
       row: mostBirdies,
       course: courseNameFor(mostBirdies),
       runners: birdiesRanked.slice(1),
+      /* A birdie count IS a count of under-par holes, so the red is literal. */
       figureOf: (r) => ({ text: String(r.birdies), tone: TOPAR_RED }),
     });
   }
   if (mostImproved) {
-    const d = mostImproved.delta_index as number;
     bandTiles.push({
       key: 'improved',
       emoji: '\uD83D\uDCAA', // FLEXED ARM
       label: t('discover.golfThisWeek.improvedLabel', 'MOST IMPROVED'),
-      /* A falling index IS better — the index-delta scale, with a down arrow. */
-      figure: `\u2193${Math.abs(d).toFixed(1)}`,
-      tone: A.IMPROVED,
-      qual: t('discover.friendsRail.index', 'HCP'),
-      qualTone: INK,
+      unit: t('discover.friendsRail.index', 'HCP'),
       row: mostImproved,
       course: courseNameFor(mostImproved),
       runners: improvedRanked.slice(1),
+      /* A falling index IS better — the index-delta scale, with a down arrow. */
       figureOf: (r) => ({
         text: `\u2193${Math.abs(r.delta_index as number).toFixed(1)}`,
         tone: A.IMPROVED,
       }),
     });
   }
+
 
 
 
