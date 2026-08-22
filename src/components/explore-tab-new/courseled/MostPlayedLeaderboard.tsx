@@ -738,7 +738,7 @@ export function MostPlayedLeaderboard({
                            color: FAINT,
                          }}
                        >
-                         BEST
+                         {t('discover.mostPlayedBest', 'best')}
                        </span>
                        <span
                          style={{
