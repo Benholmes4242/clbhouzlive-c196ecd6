@@ -2,23 +2,17 @@
  * RoundCardHoleStrip — hole-by-hole strip for light-themed round cards.
  * Used by both LastRoundCard (own) and FriendsYesterdayCard (enriched).
  *
- * Verdict grammar (ink-on-white):
- *   eagle/HIO  → amber double-ring circle
- *   birdie     → amber circle
- *   par        → grey square (0.20 ink)
- *   bogey      → darker square (0.55 ink)
- *   double+    → darkest double-ring square (0.85 ink)
+ * The marks are NOT drawn here any more. They are `ScoreMark`, the app's one
+ * scoring-mark renderer (SCORE MARK PILL grammar): solid red under par, ink
+ * ground over par, bare par, ring at two-or-more from par, gold only on an ace
+ * or albatross. This file used to hold a fourth private copy of an older
+ * amber-circle / ink-square vocabulary; that copy is gone.
  */
 import React from 'react';
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 
-const INK = 'var(--hcp-t-100)';
-const INK_20 = 'var(--hcp-t-20)';
-const INK_55 = 'var(--hcp-t-60)';
-const INK_85 = 'rgba(15,23,42,0.85)';
-const AMBER_INK = '#C97211';
-const AMBER_GRAD = 'url(#hsAmberGoldStroke)';
 const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const STRIP_STROKE = 1.4;
+
 
 export interface HoleRow {
   hole_no: number;
