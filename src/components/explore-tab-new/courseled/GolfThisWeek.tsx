@@ -1171,16 +1171,19 @@ function GolfThisWeekCard({
             minHeight: WELL_H,
             flex: 1,
             background: WELL,
-            /* §2 (BRIEF_DISCOVER_FINISHING_PASS) — THE WELL GETS AN EDGE. WELL is
-               two points off A.CANVAS, so without a boundary the card's lower half
-               read as page rather than card. The rule is WELL_RULE, the token that
+            /* §2 (BRIEF_ROUND_TILE_WHITE_WELL, superseding §2 of
+               BRIEF_DISCOVER_FINISHING_PASS) — THE WELL'S EDGE IS DRAWN ON ALL
+               FOUR SIDES. WELL is now the card's colour, so without a boundary the
+               well has no edge at all. The rule is WELL_RULE, the token that
                already exists for the header line — not a second rule colour.
                INSET BOX-SHADOW, NOT A BORDER: the well is box-sizing: border-box
                with a fixed minHeight, so a 1px border would take 2px off the inner
-               height and move the grid. An inset shadow costs no layout.
+               height AND 2px off the 244px inner width the marker/gap table in
+               RoundShape is measured at. An inset shadow costs no layout.
                NOT a darker fill (the markers use `well` as their ring spacer) and
                NOT an outer shadow (the CARD already carries CARD_SHADOW). */
             boxShadow: `inset 0 0 0 1px ${WELL_RULE}`,
+
             borderRadius: `0 0 16px 16px`,
             padding: `6px ${WELL_PAD_X}px 9px`,
             boxSizing: 'border-box',
