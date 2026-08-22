@@ -1264,11 +1264,6 @@ export function GolfThisWeek({
   const pending = !!userId && (roundsQuery.isPending || !scopeCourses.ready);
   if (pending) return <GolfThisWeekShell />;
 
-  const bestToPar = best == null ? null : best.toPar === 0
-    ? 'E'
-    : best.toPar < 0
-      ? `\u2212${Math.abs(best.toPar)}`
-      : `+${best.toPar}`;
   const courseNameFor = (r: CircleRoundRow) =>
     meta?.get(r.course_id ?? '')?.name ?? r.course_name ?? '';
 
@@ -1402,6 +1397,23 @@ export function GolfThisWeek({
   const bestStableford = stablefordRanked[0] ?? null;
   const mostBirdies = birdiesRanked[0] ?? null;
   const mostImproved = improvedRanked[0] ?? null;
+
+  /* BRIEF_BAND_TILES_LADDER §0 — WHY THE HERO BLOCK WAS DISSOLVED. The chip
+     carried TWO grammars, a hero block then a list, and four faults followed
+     from that. Do not put it back:
+       1. THE FIGURES DID NOT SHARE A COLUMN. 68 far left at 30px; 73 and 77 far
+          right at 12px. Three numbers in two positions cannot be scanned, and
+          scanning is what a ranking is for.
+       2. THERE WAS A 2 AND A 3 BUT NO 1. Hero treatment implies first — until
+          explicit ranks appear beneath it, when the absence reads as an omission.
+       3. THE CHEVRON WAS ONLY ON THE LEADER, while all three rows were
+          tappable, so it looked like that member's mark, not the card's.
+       4. THE RUNNERS LOST THEIR QUALIFIER. The leader showed "68 -3", the
+          others bare 73 and 77 — and on BEST THIS WEEK the to-par IS the
+          comparison.
+     All four are fixed by one ladder: one figure column, a rank on every row, a
+     chevron on every row, and the qualifier either per-row (best) or once on
+     the eyebrow as a column header (§2).
 
   /* BRIEF_BAND_TILES_REFINEMENT — the bottom line is the COURSE on every tile,
      and anything QUALIFYING the figure (a to-par, a unit) sits beside it on the
