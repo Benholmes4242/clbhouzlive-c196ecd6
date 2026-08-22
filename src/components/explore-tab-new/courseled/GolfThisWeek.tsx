@@ -494,20 +494,29 @@ const FIGURE_PLACEHOLDER = '{n}';
  * LAYER ORDER MATCHES PhotoBand: base gradient, image, COURSE_SCRIMS, bottom
  * scrim, top scrim.
  */
-const PHOTO_TOP_SCRIM_H = 48;
-/* THE BOTTOM SCRIM IS ANCHORED TO THE BOTTOM OF THE DARK REGION, WHICH IS NOW
-   THE MEMBER ROW'S BOTTOM EDGE, NOT THE HERO'S
-   (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §1). The region grew by 35px
-   (8 pad + 19 row + 8 pad), so the scrim grows with it: 124 + 35 = 159. It
-   reaches HERO_BOTTOM_SCRIM's heaviest value (0.92) exactly at the region's
-   bottom edge, so the boundary into the light well is a clean horizontal line
-   rather than a gradient petering out mid-photograph.
-   THIS TILE CANNOT BE SEAMLESS AND DOES NOT CLAIM TO BE: PhotoBand can end its
-   scrim ON the board below because that board is also dark. Under this row sits
-   the LIGHT well (#F2F5F8), so a dark-to-light edge must exist. The gain is that
-   there is now ONE edge (region -> well) where there were TWO (hero -> white
-   row, row -> well). */
-const PHOTO_BOTTOM_SCRIM_H = 159;
+/* THE PROPORTIONS ARE THE TOUR'S, RE-DERIVED AGAINST THE MEASURED DARK REGION
+   (BRIEF_ROUND_TILE_HERO_TOUR_MATCH §4.3). The tour: band 286, top 80 (28.0%),
+   bottom 260 (90.9%). The tile's dark region is 191 (156 hero + 8 pad + 19
+   member row + 8 pad), so 28.0% -> 53 and 90.9% -> 174. The old 48 / 159 were
+   proportionally lighter (25% / 83%) while carrying MORE text than the tour's
+   band — course, region, eyebrow, figure, sentence and the whole member row. */
+const DARK_REGION_H = 191;
+const PHOTO_TOP_SCRIM_H = Math.round(DARK_REGION_H * 0.28);      // 53
+const PHOTO_BOTTOM_SCRIM_H = Math.round(DARK_REGION_H * 0.909);  // 174
+
+/* §4.2 — THE BOTTOM SCRIM IS INLINE, NOT THE EXPORTED HERO_BOTTOM_SCRIM.
+   PhotoBand does NOT render the exported constant either: it takes the first
+   three stops and ends the last one on the colour of the band BELOW, so the
+   seam is invisible and the green base cannot bleed through as a cast.
+   THE PRINCIPLE, NOT THE VALUE: the tile's next band is the LIGHT well
+   (#F2F5F8), and ending on that would blow a pale band across the bottom of
+   the photograph. So the tour's first three stops EXACTLY, and a final stop at
+   FULL opacity on the tile's own darkest point instead of 0.92 — at 0.92
+   COURSE_GRADIENT's sand bottom stop (#d4c89c) casts beneath the member row.
+   The exported constant is untouched; other surfaces use it. */
+const TILE_BOTTOM_SCRIM =
+  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,1) 100%)';
+
 /* NO PHOTO CAP (BRIEF_GOLF_THIS_WEEK_UNCAP §2). Every tile carries its course
    photograph. The old six-tile limit saved requests that were never going to
    fire — the images are loading="lazy" / decoding="async", so in a horizontal
