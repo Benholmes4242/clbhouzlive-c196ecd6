@@ -1123,6 +1123,8 @@
     "whereTheyPlayed": "Wo diese Woche gespielt wurde",
     "mostPlayedRoundCount": "{{count}} Runde",
     "mostPlayedRoundCount_other": "{{count}} Runden",
+    "mostPlayedGolferCount": "{{count}} Golfer",
+    "mostPlayedGolferCount_other": "{{count}} Golfer",
     "mostPlayedPlayedToLabel": "Gespielt zu",
     "mostPlayedAvgToPar": "Gespielt zu {{value}}",
     "mostPlayedNew": "Neu",

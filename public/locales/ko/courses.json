@@ -1061,6 +1061,8 @@
     "whereTheyPlayed": "이번 주 플레이한 곳",
     "mostPlayedRoundCount": "{{count}} 라운드",
     "mostPlayedRoundCount_other": "{{count}} 라운드",
+    "mostPlayedGolferCount": "{{count}}명",
+    "mostPlayedGolferCount_other": "{{count}}명",
     "mostPlayedPlayedToLabel": "기록",
     "mostPlayedAvgToPar": "{{value}}",
     "mostPlayedNew": "신규",

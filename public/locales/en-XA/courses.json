@@ -1337,6 +1337,8 @@
     "whereTheyPlayed": "[Ẃĥéŕé ţĥéý ṗļàýéð ţĥíś ŵééķ one]",
     "mostPlayedRoundCount": "[{{count}} ŕóûñð one]",
     "mostPlayedRoundCount_other": "[{{count}} ŕóûñðś one]",
+    "mostPlayedGolferCount": "[{{count}} gôlfér one]",
+    "mostPlayedGolferCount_other": "[{{count}} gôlférś one]",
     "mostPlayedPlayedToLabel": "[Þļàýéð ţó one]",
     "trackedRounds": "[~~Ţřáĉǩéđ řőúñđš~~]",
     "roundsLabel": "[~~Řőúñđš~~]",

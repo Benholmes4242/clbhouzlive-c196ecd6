@@ -119,8 +119,23 @@ function MoveMark({
  * that indent was fault §S0.1.
  */
 
-/** Beyond twelve the expansion navigates instead of growing (§S2.5, unchanged). */
-const LIST_CAP = 12;
+/* OVERTURNED (BRIEF_MOST_PLAYED_COUNTS_AND_SCROLL §2). The rule was:
+ * "Beyond twelve the expansion navigates instead of growing (§S2.5, unchanged)"
+ *   const LIST_CAP = 12;
+ * NEW RULE: EVERY RESOLVED PLAYER IS RENDERED. The list carries a MAX HEIGHT of
+ * a whole number of rows and scrolls inside it.
+ * WHY THE OLD OBJECTION NO LONGER APPLIES: §S2.5 refused an internal scroller
+ * because a vertical scroller inside a vertically scrolling page CHAINS — a
+ * finger that lands on the list scrolls the list and the page feels stuck.
+ * `overscroll-behavior: contain` on the scroller stops the chaining at the
+ * list's own boundary, which is the whole difference. One property.
+ * NOTE: nothing was ever truncated by twelve in current data — the list is
+ * PEOPLE (one entry per distinct member, §S1.4) and the count is ROUNDS. */
+
+/** §2 — a whole number of rows, so a partial row shows there is more. */
+const BOARD_ROW_H = 43;
+const BOARD_MAX_ROWS = 8.5;
+const BOARD_MAX_H = Math.round(BOARD_ROW_H * BOARD_MAX_ROWS);
 
 /** Ink ramp of the round tiles, shared so the board reads as one family. */
 const INK = '#0B0F14';
@@ -194,11 +209,12 @@ function MemberFace({
  *
  *   position | avatar | name over home club | to-par | gross
  *
- * NO INTERNAL SCROLL, AND THAT IS DELIBERATE (carried from §S2.4 of the previous
- * brief): "a scrollable panel inside a scrolling page is a real fault on a
+ * IT NOW SCROLLS INTERNALLY (§2, BRIEF_MOST_PLAYED_COUNTS_AND_SCROLL). The old
+ * rule read: "a scrollable panel inside a scrolling page is a real fault on a
  * phone: a finger that lands on the list scrolls the list instead of the page,
- * and a member cannot tell why the page stopped moving. The expansion is
- * member-initiated, so its height is consented to."
+ * and a member cannot tell why the page stopped moving." That fault is real and
+ * is prevented by `overscroll-behavior: contain`, which stops the scroll chain
+ * at the list's boundary; a bottom fade says there is more below.
  *
  * A MEMBER WHO PLAYED TWICE APPEARS ONCE with their BEST round (§S2.9) — the
  * hook already collapses them by (course, member) minimum gross.
@@ -218,12 +234,38 @@ function MemberBoard({
   onSeeAllAtCourse: () => void;
 }) {
   const { t } = useTranslation('courses');
-  const listed = row.players.slice(0, LIST_CAP);
-  const hidden = row.players.length - listed.length;
+  /** §2 — NO CAP. Every resolved player is rendered. */
+  const listed = row.players;
+  const scrolls = listed.length > BOARD_MAX_ROWS;
+  const scrollerRef = React.useRef<HTMLDivElement | null>(null);
+  /** The fade hides itself at the end, so it never reads as a cut-off edge. */
+  const [atEnd, setAtEnd] = useState(false);
+  const onScroll = () => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    setAtEnd(el.scrollTop + el.clientHeight >= el.scrollHeight - 2);
+  };
   if (listed.length === 0) return null;
 
   return (
-    <div style={{ paddingBottom: 10 }}>
+    <div style={{ paddingBottom: 10, position: 'relative' }}>
+      <div
+        ref={scrollerRef}
+        onScroll={scrolls ? onScroll : undefined}
+        style={
+          scrolls
+            ? {
+                maxHeight: BOARD_MAX_H,
+                overflowY: 'auto',
+                // THE ONE PROPERTY §S2.5's OBJECTION TURNED ON: the scroll
+                // chain stops here, so a swipe that begins on the page keeps
+                // moving the page and the page can never feel stuck.
+                overscrollBehavior: 'contain',
+                WebkitOverflowScrolling: 'touch',
+              }
+            : undefined
+        }
+      >
       {listed.map((p) => {
         const isViewer = viewerId != null && p.userId === viewerId;
         const under = p.toPar != null && p.toPar < 0;
@@ -352,8 +394,27 @@ function MemberBoard({
           </div>
         );
       })}
-      {/* A NAVIGATION, NEVER A SCROLL TRAP (§S2.5). */}
-      {hidden > 0 && (
+      </div>
+      {/* §2 — THE BOTTOM FADE: transparent to the card's own colour, and it
+          removes itself once the list is at its end so it never looks like a
+          cut edge. Not a scrollbar. */}
+      {scrolls && !atEnd && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: -14,
+            right: -14,
+            bottom: 10,
+            height: 28,
+            pointerEvents: 'none',
+            background: `linear-gradient(to bottom, rgba(255,255,255,0), ${A.PANEL})`,
+          }}
+        />
+      )}
+      {/* THE SEE-ALL ROW STAYS (§2): it opens the course's own sheet, which is
+          a different destination from a longer list. */}
+      {onSeeAllAtCourse && (
         <button
           type="button"
           onClick={(e) => {
@@ -611,6 +672,44 @@ export function MostPlayedLeaderboard({
                         count: r.count,
                       })}
                     </span>
+
+                    {/* §1 — THE GOLFER COUNT, a SECOND FACT ON THE SAME LINE in
+                        the same 11 / 700 / A.INK and the same dot separator.
+                        IT IS `players.length`, NOT `members`: members counts ids
+                        the board cannot render (deleted account, RLS — §S4.4),
+                        so it would reintroduce the very mismatch this fixes.
+                        "11 rounds · 9 golfers" reads as two golfers who played
+                        twice, not a board missing two entries. */}
+                    {r.players.length > 0 && (
+                      <>
+                        <span
+                          aria-hidden
+                          style={{
+                            flex: 'none',
+                            width: 2.5,
+                            height: 2.5,
+                            borderRadius: '50%',
+                            background: GHOST,
+                            marginRight: 7,
+                          }}
+                        />
+                        <span
+                          style={{
+                            ...NUMF,
+                            flex: 'none',
+                            fontSize: 11,
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            color: A.INK,
+                            marginRight: 7,
+                          }}
+                        >
+                          {t('discover.mostPlayedGolferCount', '{{count}} golfer', {
+                            count: r.players.length,
+                          })}
+                        </span>
+                      </>
+                    )}
 
                     {/* §S1.6 / §S2.3 — THE MOVEMENT MARKER KEEPS ITS EXISTING
                         TONES: green on a rise, amber on NEW, ghost on LEVEL. */}
