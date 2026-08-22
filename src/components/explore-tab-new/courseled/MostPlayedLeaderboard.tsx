@@ -209,11 +209,12 @@ function MemberFace({
  *
  *   position | avatar | name over home club | to-par | gross
  *
- * NO INTERNAL SCROLL, AND THAT IS DELIBERATE (carried from §S2.4 of the previous
- * brief): "a scrollable panel inside a scrolling page is a real fault on a
+ * IT NOW SCROLLS INTERNALLY (§2, BRIEF_MOST_PLAYED_COUNTS_AND_SCROLL). The old
+ * rule read: "a scrollable panel inside a scrolling page is a real fault on a
  * phone: a finger that lands on the list scrolls the list instead of the page,
- * and a member cannot tell why the page stopped moving. The expansion is
- * member-initiated, so its height is consented to."
+ * and a member cannot tell why the page stopped moving." That fault is real and
+ * is prevented by `overscroll-behavior: contain`, which stops the scroll chain
+ * at the list's boundary; a bottom fade says there is more below.
  *
  * A MEMBER WHO PLAYED TWICE APPEARS ONCE with their BEST round (§S2.9) — the
  * hook already collapses them by (course, member) minimum gross.
