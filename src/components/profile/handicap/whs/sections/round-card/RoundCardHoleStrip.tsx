@@ -23,151 +23,16 @@ export interface HoleRow {
   hole_alias?: string | null;
 }
 
-type Shape = 'circle' | 'square' | 'empty';
-
-const ShapePath: React.FC<{
-  kind: 'circle' | 'square';
-  inset: number;
-  stroke: string;
-  size: number;
-}> = ({ kind, inset, stroke, size }) => {
-  if (kind === 'circle') {
-    const r = size / 2 - inset - STRIP_STROKE / 2;
-    if (r <= 0) return null;
-    return (
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill="none"
-        stroke={stroke}
-        strokeWidth={STRIP_STROKE}
-        vectorEffect="non-scaling-stroke"
-      />
-    );
-  }
-  const dim = size - 2 * inset - STRIP_STROKE;
-  if (dim <= 0) return null;
-  return (
-    <rect
-      x={inset + STRIP_STROKE / 2}
-      y={inset + STRIP_STROKE / 2}
-      width={dim}
-      height={dim}
-      rx={2}
-      ry={2}
-      fill="none"
-      stroke={stroke}
-      strokeWidth={STRIP_STROKE}
-      vectorEffect="non-scaling-stroke"
-    />
-  );
-};
-
+/** One cell = one ScoreMark at the strip's existing 20px geometry. */
 const HoleCell: React.FC<{
   score: number | null;
   par: number;
   size?: number;
-}> = ({ score, par, size = 20 }) => {
-  let shape: Shape = 'empty';
-  let depth: 1 | 2 = 1;
-  let stroke = INK_20;
-  let numeralColor: string = INK;
-
-  if (score != null) {
-    const diff = score - par;
-    if (score === 1 || diff <= -2) {
-      shape = 'circle'; depth = 2; stroke = AMBER_GRAD; numeralColor = INK;
-    } else if (diff === -1) {
-      shape = 'circle'; depth = 1; stroke = AMBER_GRAD; numeralColor = INK;
-    } else if (diff === 0) {
-      shape = 'square'; depth = 1; stroke = INK_20;
-    } else if (diff === 1) {
-      shape = 'square'; depth = 1; stroke = INK_55;
-    } else {
-      shape = 'square'; depth = 2; stroke = INK_85;
-    }
-  }
-
-  const showNumeral = score != null && score < 10;
-  const showOverflowMarker = score != null && score >= 10;
-
-  return (
-    <div
-      style={{
-        position: 'relative',
-        width: size,
-        height: size,
-        flex: '0 0 auto',
-      }}
-    >
-      {shape !== 'empty' && (
-        <>
-          <svg
-            width={size}
-            height={size}
-            viewBox={`0 0 ${size} ${size}`}
-            style={{ position: 'absolute', inset: 0, display: 'block' }}
-          >
-            <ShapePath kind={shape} inset={0.5} stroke={stroke} size={size} />
-            {depth >= 2 && (
-              <ShapePath kind={shape} inset={3} stroke={stroke} size={size} />
-            )}
-          </svg>
-          {showNumeral && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 10,
-                fontWeight: 700,
-                color: numeralColor,
-                fontVariantNumeric: 'tabular-nums lining-nums',
-                lineHeight: 1,
-                fontFamily: FONT_SF,
-              }}
-            >
-              {score}
-            </div>
-          )}
-          {showOverflowMarker && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 11,
-                fontWeight: 700,
-                color: numeralColor,
-                lineHeight: 1,
-              }}
-            >
-              +
-            </div>
-          )}
-        </>
-      )}
-      {shape === 'empty' && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            width: 3,
-            height: 3,
-            borderRadius: '50%',
-            background: INK_20,
-            transform: 'translate(-50%, -50%)',
-          }}
-        />
-      )}
-    </div>
-  );
+}> = ({ score, par, size = 20 }) => (
+  <div style={{ position: 'relative', width: size, height: size, flex: '0 0 auto' }}>
+    <ScoreMark strokes={score} par={par} size={size} surface="light" />
+  </div>
+);
 };
 
 const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }) => {
