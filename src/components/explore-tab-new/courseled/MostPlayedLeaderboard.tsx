@@ -95,7 +95,6 @@ function MoveMark({
     justifyContent: 'flex-end',
     gap: 2,
     fontSize: 9,
-    marginTop: 4,
     fontVariantNumeric: 'tabular-nums lining-nums',
   };
   if (row.move === 'new')
@@ -198,11 +197,12 @@ function MemberFace({
   );
 }
 
-/* §S3.1 — THE COLLAPSED FACE ROW IS DELETED, and with it "BEST 68" (§S3.3).
- * The board answers "who played here" far better than six overlapping faces
- * did, and the board's FIRST ROW IS THE BEST SCORE — so a separate best figure
- * was the same fact twice. Keeping either would show the same members twice on
- * one card. Do not reinstate them. */
+/* BRIEF_COURSE_CARD_REGION_AND_BEST overturns the old rule that removed the
+ * collapsed BEST fact. It is intentionally descriptive, not interactive: the
+ * whole collapsed header remains the disclosure target, and the same round is
+ * available as an individual target after expansion. Gross, to-par and member
+ * name must all come from players[0]; bestGross can belong to an unresolved
+ * profile and must never be attributed to this resolved member. */
 
 /**
  * §S2 — THE TOURNAMENT BOARD.
@@ -524,6 +524,7 @@ export function MostPlayedLeaderboard({
         {shown.map((r) => {
           const m = meta?.get(r.courseId);
           const name = m?.name ?? r.courseName ?? t('discover.unknownCourse', 'Course');
+          const bestPlayer = r.players[0];
           const open = openId === r.courseId;
           const toggle = () => setOpenId(open ? null : r.courseId);
           return (
@@ -602,9 +603,32 @@ export function MostPlayedLeaderboard({
                   >
                     {name}
                   </span>
-                  {/* §S1.4 / CORRECTION §S2 — THE META LINE IS THREE THINGS,
-                      NOT ONE STRING: region caption, a dot, the round count,
-                      then the movement marker. That still holds.
+                   {/* BRIEF_COURSE_CARD_REGION_AND_BEST §1 — REGION OWNS THIS
+                       LINE. It deliberately declares every type property rather
+                       than spreading LABEL, whose uppercase transform previously
+                       changed sentence-case database values such as "Kent". */}
+                   {m?.region && (
+                     <span
+                       style={{
+                         display: 'block',
+                         marginTop: 2,
+                         minWidth: 0,
+                         fontSize: 11,
+                         fontWeight: 700,
+                         lineHeight: 1.2,
+                         letterSpacing: 0,
+                         color: A.INK,
+                         overflow: 'hidden',
+                         textOverflow: 'ellipsis',
+                         whiteSpace: 'nowrap',
+                       }}
+                     >
+                       {m.region}
+                     </span>
+                   )}
+
+                   {/* THE THIRD LINE IS COUNTS + MOVEMENT ONLY. The count dot,
+                       pluralisation and players.length source are unchanged.
 
                       SUPERSEDED (BRIEF_MOST_PLAYED_META_LINE): §S2.2 recorded
                       "the round count is A.MID and the region is A.FAINT on the
@@ -616,20 +640,7 @@ export function MostPlayedLeaderboard({
                       treatment the leader chips on this same page took in
                       BRIEF_BAND_TILE_TYPE_SCALE. Two sections on one page
                       agreeing beats each solving one problem differently.
-                      CORRECTION_REGION_CASING — THE DATA WAS NEVER WRONG.
-                      golf_courses.region is sentence case throughout ("Kent",
-                      "Baden-Württemberg", "Angus & Dundee"); the only upper-case
-                      country value is "USA", an acronym. The page rendered KENT
-                      because this span SPREAD LABEL, and LABEL carries
-                      textTransform: 'uppercase'. Every other LABEL property was
-                      already overridden here, so the spread bought nothing and
-                      silently supplied the one property nobody wanted.
-                      THEREFORE THIS SPAN DECLARES ITS OWN TYPE and deliberately
-                      does not spread LABEL: adding textTransform: 'none' on top
-                      would leave a shared token cancelled property by property,
-                      and the next property added to LABEL would leak in here the
-                      same way. LABEL itself is unchanged — uppercase is right
-                      for genuine labels; a place name is not a label. */}
+                       The region now sits alone above this line. */}
                   <span
                     style={{
                       display: 'flex',
@@ -639,36 +650,6 @@ export function MostPlayedLeaderboard({
                       fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
                   >
-                    {m?.region && (
-                      <>
-                        <span
-                          style={{
-                            fontSize: 11,
-                            fontWeight: 700,
-                            color: A.INK,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            minWidth: 0,
-                          }}
-
-
-                        >
-                          {m.region}
-                        </span>
-                        <span
-                          aria-hidden
-                          style={{
-                            flex: 'none',
-                            width: 2.5,
-                            height: 2.5,
-                            borderRadius: '50%',
-                            background: GHOST,
-                            margin: '0 7px',
-                          }}
-                        />
-                      </>
-                    )}
                     {/* §S4.2 — A PLURAL RULE, NEVER A CONCATENATION: i18next
                         count pluralisation, so "1 round" / "11 rounds" and
                         every language's own rule both work. */}
@@ -730,7 +711,81 @@ export function MostPlayedLeaderboard({
                         TONES: green on a rise, amber on NEW, ghost on LEVEL. */}
                     <MoveMark row={r} t={t} />
                   </span>
-                </span>
+
+                   {/* §2 — A SINGLE-SOURCE BEST FACT. Do not substitute
+                       r.bestGross: that may belong to a member whose profile did
+                       not resolve, while every value and the name here belong to
+                       players[0]. No player means no line and no reserved space. */}
+                   {bestPlayer && (
+                     <span
+                       style={{
+                         display: 'flex',
+                         alignItems: 'baseline',
+                         gap: 6,
+                         minWidth: 0,
+                         marginTop: 6,
+                         paddingTop: 6,
+                         borderTop: `1px solid ${A.HAIRLINE}`,
+                       }}
+                     >
+                       <span
+                         style={{
+                           flex: 'none',
+                           fontSize: 9,
+                           fontWeight: 700,
+                           lineHeight: 1,
+                           letterSpacing: '0.14em',
+                           textTransform: 'uppercase',
+                           color: FAINT,
+                         }}
+                       >
+                         {t('discover.mostPlayedBest', 'best')}
+                       </span>
+                       <span
+                         style={{
+                           flex: 'none',
+                           fontSize: 12,
+                           fontWeight: 700,
+                           lineHeight: 1.2,
+                           color: A.INK,
+                           fontVariantNumeric: 'tabular-nums lining-nums',
+                         }}
+                       >
+                         {bestPlayer.gross != null ? formatNumber(bestPlayer.gross) : ''}
+                       </span>
+                       <span
+                         style={{
+                           flex: 'none',
+                           fontSize: 10,
+                           fontWeight: 700,
+                           lineHeight: 1.2,
+                           color:
+                             bestPlayer.toPar != null && bestPlayer.toPar < 0
+                               ? TOPAR_RED
+                               : MID,
+                           fontVariantNumeric: 'tabular-nums lining-nums',
+                         }}
+                       >
+                         {bestPlayer.toPar != null ? formatRelInt(bestPlayer.toPar) : ''}
+                       </span>
+                       <span
+                         style={{
+                           flex: 1,
+                           minWidth: 0,
+                           fontSize: 12,
+                           fontWeight: 700,
+                           lineHeight: 1.2,
+                           color: A.INK,
+                           overflow: 'hidden',
+                           textOverflow: 'ellipsis',
+                           whiteSpace: 'nowrap',
+                         }}
+                       >
+                         {bestPlayer.name}
+                       </span>
+                     </span>
+                   )}
+                 </span>
                 {/* §S1.5 — "PLAYED TO" IS PROMOTED: 19px / 800 on the right of
                     the header with an 8px label beneath. It is the row's
                     HEADLINE FIGURE, because it is the only figure on the row
@@ -782,8 +837,8 @@ export function MostPlayedLeaderboard({
               </div>
               {open && <div style={{ height: 1, margin: '0 -14px', background: A.BORDER }} />}
 
-              {/* §S3.2 — THE COLLAPSED ROW IS JUST THE HEADER: thumbnail, name,
-                  meta line, played-to, chevron. Shorter than what shipped. */}
+              {/* The BEST line is part of this disclosure header and has no
+                  nested target. A tap anywhere here expands the board. */}
               {/* §S1.5 — the divider between a header and ITS OWN expanded
                   board stays: that one is inside a single object. */}
               {open && (
