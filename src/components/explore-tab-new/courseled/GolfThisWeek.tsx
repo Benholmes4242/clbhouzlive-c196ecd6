@@ -1220,7 +1220,7 @@ export function GolfThisWeek({
   const best = useMemo(() => bestOfWeek(ordered), [ordered]);
 
   /* ONE batched hole-shape read for the whole rail — never one per card. */
-  const scoreIds = useMemo(() => rows.map((r) => r.score_id), [rows]);
+  const scoreIds = useMemo(() => ordered.map((r) => r.score_id), [ordered]);
   const holeShapes = useRoundHoleShapes(scoreIds);
 
   /* NO INSIGHT MAP. The tile's prose is the MOMENT SENTENCE, generated from a
@@ -1459,7 +1459,7 @@ export function GolfThisWeek({
       </div>
 
       {/* AN HONEST EMPTY ANSWER (§S2.5): the filters stay, the sentence explains. */}
-      {rows.length === 0 && (
+      {ordered.length === 0 && (
         <div
           style={{
             fontSize: 13,
@@ -1664,7 +1664,11 @@ export function GolfThisWeek({
 
       </div>
 
-      {counts.rounds > rows.length && (
+      {/* THE SEE-ALL ROW STAYS (§4.2). With the rail uncapped it no longer holds
+          back rounds, so the condition is simply "there is something to open" —
+          the sheet's value is its row form, day grouping and scope pills, and
+          whether it still earns its place is Ben's call, not this brief's. */}
+      {ordered.length > 0 && (
         <div style={{ marginTop: 8, width: CARD_W }}>
           <InkAction onClick={onSeeAll}>
             {t('discover.golfThisWeek.seeAll', 'See all {{count}} rounds', {
