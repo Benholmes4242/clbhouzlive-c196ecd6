@@ -2,23 +2,17 @@
  * RoundCardHoleStrip — hole-by-hole strip for light-themed round cards.
  * Used by both LastRoundCard (own) and FriendsYesterdayCard (enriched).
  *
- * Verdict grammar (ink-on-white):
- *   eagle/HIO  → amber double-ring circle
- *   birdie     → amber circle
- *   par        → grey square (0.20 ink)
- *   bogey      → darker square (0.55 ink)
- *   double+    → darkest double-ring square (0.85 ink)
+ * The marks are NOT drawn here any more. They are `ScoreMark`, the app's one
+ * scoring-mark renderer (SCORE MARK PILL grammar): solid red under par, ink
+ * ground over par, bare par, ring at two-or-more from par, gold only on an ace
+ * or albatross. This file used to hold a fourth private copy of an older
+ * amber-circle / ink-square vocabulary; that copy is gone.
  */
 import React from 'react';
+import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 
-const INK = 'var(--hcp-t-100)';
-const INK_20 = 'var(--hcp-t-20)';
-const INK_55 = 'var(--hcp-t-60)';
-const INK_85 = 'rgba(15,23,42,0.85)';
-const AMBER_INK = '#C97211';
-const AMBER_GRAD = 'url(#hsAmberGoldStroke)';
 const FONT_SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const STRIP_STROKE = 1.4;
+
 
 export interface HoleRow {
   hole_no: number;
@@ -29,152 +23,17 @@ export interface HoleRow {
   hole_alias?: string | null;
 }
 
-type Shape = 'circle' | 'square' | 'empty';
-
-const ShapePath: React.FC<{
-  kind: 'circle' | 'square';
-  inset: number;
-  stroke: string;
-  size: number;
-}> = ({ kind, inset, stroke, size }) => {
-  if (kind === 'circle') {
-    const r = size / 2 - inset - STRIP_STROKE / 2;
-    if (r <= 0) return null;
-    return (
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill="none"
-        stroke={stroke}
-        strokeWidth={STRIP_STROKE}
-        vectorEffect="non-scaling-stroke"
-      />
-    );
-  }
-  const dim = size - 2 * inset - STRIP_STROKE;
-  if (dim <= 0) return null;
-  return (
-    <rect
-      x={inset + STRIP_STROKE / 2}
-      y={inset + STRIP_STROKE / 2}
-      width={dim}
-      height={dim}
-      rx={2}
-      ry={2}
-      fill="none"
-      stroke={stroke}
-      strokeWidth={STRIP_STROKE}
-      vectorEffect="non-scaling-stroke"
-    />
-  );
-};
-
+/** One cell = one ScoreMark at the strip's existing 20px geometry. */
 const HoleCell: React.FC<{
   score: number | null;
   par: number;
   size?: number;
-}> = ({ score, par, size = 20 }) => {
-  let shape: Shape = 'empty';
-  let depth: 1 | 2 = 1;
-  let stroke = INK_20;
-  let numeralColor: string = INK;
+}> = ({ score, par, size = 20 }) => (
+  <div style={{ position: 'relative', width: size, height: size, flex: '0 0 auto' }}>
+    <ScoreMark strokes={score} par={par} size={size} surface="light" />
+  </div>
+);
 
-  if (score != null) {
-    const diff = score - par;
-    if (score === 1 || diff <= -2) {
-      shape = 'circle'; depth = 2; stroke = AMBER_GRAD; numeralColor = INK;
-    } else if (diff === -1) {
-      shape = 'circle'; depth = 1; stroke = AMBER_GRAD; numeralColor = INK;
-    } else if (diff === 0) {
-      shape = 'square'; depth = 1; stroke = INK_20;
-    } else if (diff === 1) {
-      shape = 'square'; depth = 1; stroke = INK_55;
-    } else {
-      shape = 'square'; depth = 2; stroke = INK_85;
-    }
-  }
-
-  const showNumeral = score != null && score < 10;
-  const showOverflowMarker = score != null && score >= 10;
-
-  return (
-    <div
-      style={{
-        position: 'relative',
-        width: size,
-        height: size,
-        flex: '0 0 auto',
-      }}
-    >
-      {shape !== 'empty' && (
-        <>
-          <svg
-            width={size}
-            height={size}
-            viewBox={`0 0 ${size} ${size}`}
-            style={{ position: 'absolute', inset: 0, display: 'block' }}
-          >
-            <ShapePath kind={shape} inset={0.5} stroke={stroke} size={size} />
-            {depth >= 2 && (
-              <ShapePath kind={shape} inset={3} stroke={stroke} size={size} />
-            )}
-          </svg>
-          {showNumeral && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 10,
-                fontWeight: 700,
-                color: numeralColor,
-                fontVariantNumeric: 'tabular-nums lining-nums',
-                lineHeight: 1,
-                fontFamily: FONT_SF,
-              }}
-            >
-              {score}
-            </div>
-          )}
-          {showOverflowMarker && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 11,
-                fontWeight: 700,
-                color: numeralColor,
-                lineHeight: 1,
-              }}
-            >
-              +
-            </div>
-          )}
-        </>
-      )}
-      {shape === 'empty' && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            width: 3,
-            height: 3,
-            borderRadius: '50%',
-            background: INK_20,
-            transform: 'translate(-50%, -50%)',
-          }}
-        />
-      )}
-    </div>
-  );
-};
 
 const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }) => {
   const total = holes.reduce(
@@ -262,14 +121,6 @@ export const RoundCardHoleStrip: React.FC<{ holes: HoleRow[] }> = ({ holes }) =>
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <svg width={0} height={0} style={{ position: 'absolute' }} aria-hidden>
-        <defs>
-          <linearGradient id="hsAmberGoldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#F7931E" />
-            <stop offset="100%" stopColor="#FBBC2E" />
-          </linearGradient>
-        </defs>
-      </svg>
       <NineRow label="OUT" holes={front9} />
       {back9.length > 0 && <NineRow label="IN" holes={back9} />}
     </div>

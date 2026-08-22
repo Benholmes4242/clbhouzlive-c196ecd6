@@ -1,93 +1,72 @@
 /**
- * HoleGlyph — the canonical scorecard glyph vocabulary, extracted so the
- * Course Hole Data Sheet, the round-card hole strip, and the notation
- * key all render byte-identical shapes.
+ * HoleGlyph — the Holes-area renderer of the SCORE MARK PILL grammar.
  *
- * Grammar (ink-on-white):
- *   eagle-or-better / ace → double gold-gradient ring circle
- *   birdie                → single gold-gradient ring circle
- *   par                   → 20% ink square
- *   bogey                 → 55% ink square
- *   double+               → 85% ink double-ring square
+ * This file no longer owns a vocabulary. The grammar is BRIEF_SCORE_MARKS_PILL
+ * §1/§2, authored in `ScoreMark.tsx`; HoleGlyph is only the SVG expression of it
+ * for the Course Hole Data Sheet and the notation key.
  *
- * A single global <defs> block (HoleGlyphDefs) must be mounted once per
- * surface so the "hsAmberGoldStroke" gradient id resolves.
+ * Grammar (light surfaces only — the Holes area is white):
+ *   EVERY MARK IS A CIRCLE. Nothing is square.
+ *   FILL   solid = under par · ground = over par · bare = par
+ *   TONE   RED = under · INK = over · GOLD = ace / albatross ONLY
+ *   RING   present when |strokes - par| >= 2, either direction
+ *
+ *   ace / albatross  solid RED + GOLD ring
+ *   eagle            solid RED + RED ring
+ *   birdie           solid RED
+ *   par              BARE
+ *   bogey            SOFT ink ground
+ *   double+          DEEP ink ground + INK ring
+ *
+ * The old amber gradient stroke (url(#hsAmberGoldStroke)) is gone: gold now
+ * appears a handful of times a year and uses the flat SC_FILL_GOLD token that
+ * ScoreMark uses, so the two renderers cannot drift on the one colour they
+ * still share. `HoleGlyphDefs` is kept as a no-op export for its existing mount
+ * point and can be removed once that mount is retired.
  */
 import React from 'react';
+import { INK, SC_FILL_GOLD, SC_FILL_BIRDIE } from './_constants';
+import { HAIRLINE_INK_12, INK_TINT_06 } from '@/features/tourhub/_shared/tokens';
 
 export type HoleGlyphKind =
+  /** Kept for the callers that cannot yet tell an eagle from an ace: RED ring. */
   | 'eagle-or-better'
+  /** Rarity only. Gold lives here and nowhere else. */
+  | 'ace-or-albatross'
+  | 'eagle'
   | 'birdie'
   | 'par'
   | 'bogey'
   | 'double-plus';
 
-const INK_20 = 'rgba(15,23,42,0.20)';
-const INK_55 = 'rgba(15,23,42,0.55)';
-const INK_85 = 'rgba(15,23,42,0.85)';
-const AMBER_GRAD = 'url(#hsAmberGoldStroke)';
+const BOGEY_GROUND = INK_TINT_06;
+const DOUBLE_GROUND = HAIRLINE_INK_12;
 const STRIP_STROKE = 1.4;
-
-interface ShapePathProps {
-  kind: 'circle' | 'square';
-  inset: number;
-  stroke: string;
-  size: number;
-}
-
-const ShapePath: React.FC<ShapePathProps> = ({ kind, inset, stroke, size }) => {
-  if (kind === 'circle') {
-    const r = size / 2 - inset - STRIP_STROKE / 2;
-    if (r <= 0) return null;
-    return (
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill="none"
-        stroke={stroke}
-        strokeWidth={STRIP_STROKE}
-        vectorEffect="non-scaling-stroke"
-      />
-    );
-  }
-  const dim = size - 2 * inset - STRIP_STROKE;
-  if (dim <= 0) return null;
-  return (
-    <rect
-      x={inset + STRIP_STROKE / 2}
-      y={inset + STRIP_STROKE / 2}
-      width={dim}
-      height={dim}
-      rx={2}
-      ry={2}
-      fill="none"
-      stroke={stroke}
-      strokeWidth={STRIP_STROKE}
-      vectorEffect="non-scaling-stroke"
-    />
-  );
-};
 
 export const HoleGlyph: React.FC<{ kind: HoleGlyphKind; size?: number }> = ({
   kind,
   size = 20,
 }) => {
-  let shape: 'circle' | 'square' = 'square';
-  let depth: 1 | 2 = 1;
-  let stroke = INK_20;
-  switch (kind) {
-    case 'eagle-or-better':
-      shape = 'circle'; depth = 2; stroke = AMBER_GRAD; break;
-    case 'birdie':
-      shape = 'circle'; depth = 1; stroke = AMBER_GRAD; break;
-    case 'par':
-      shape = 'square'; depth = 1; stroke = INK_20; break;
-    case 'bogey':
-      shape = 'square'; depth = 1; stroke = INK_55; break;
-    case 'double-plus':
-      shape = 'square'; depth = 2; stroke = INK_85; break;
-  }
+  const under = kind === 'birdie' || kind === 'eagle' || kind === 'eagle-or-better' || kind === 'ace-or-albatross';
+  const over = kind === 'bogey' || kind === 'double-plus';
+  const ring =
+    kind === 'eagle' || kind === 'eagle-or-better' || kind === 'ace-or-albatross' || kind === 'double-plus';
+  const goldRing = kind === 'ace-or-albatross';
+
+  const fill = under
+    ? SC_FILL_BIRDIE
+    : kind === 'double-plus'
+      ? DOUBLE_GROUND
+      : kind === 'bogey'
+        ? BOGEY_GROUND
+        : 'none';
+  const ringTone = goldRing ? SC_FILL_GOLD : under ? SC_FILL_BIRDIE : INK;
+
+  const RING_GAP = 1.4;
+  const discInset = ring ? STRIP_STROKE + RING_GAP : 0;
+  const discR = size / 2 - discInset;
+  const ringR = size / 2 - STRIP_STROKE / 2 - 0.5;
+
   return (
     <svg
       width={size}
@@ -96,20 +75,26 @@ export const HoleGlyph: React.FC<{ kind: HoleGlyphKind; size?: number }> = ({
       style={{ display: 'block' }}
       aria-hidden
     >
-      <ShapePath kind={shape} inset={0.5} stroke={stroke} size={size} />
-      {depth >= 2 && <ShapePath kind={shape} inset={3} stroke={stroke} size={size} />}
+      {ring && ringR > 0 && (
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={ringR}
+          fill="none"
+          stroke={ringTone}
+          strokeWidth={STRIP_STROKE}
+          vectorEffect="non-scaling-stroke"
+        />
+      )}
+      {fill !== 'none' && discR > 0 && (
+        <circle cx={size / 2} cy={size / 2} r={discR} fill={fill} />
+      )}
     </svg>
   );
 };
 
-/** Mount once per surface so the AMBER_GRAD gradient id resolves. */
-export const HoleGlyphDefs: React.FC = () => (
-  <svg width={0} height={0} style={{ position: 'absolute' }} aria-hidden>
-    <defs>
-      <linearGradient id="hsAmberGoldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#F7931E" />
-        <stop offset="100%" stopColor="#FBBC2E" />
-      </linearGradient>
-    </defs>
-  </svg>
-);
+/**
+ * No-op. The gradient this used to declare is gone (§2). Kept so the existing
+ * mount in HoleDataSheet stays valid until that mount is removed.
+ */
+export const HoleGlyphDefs: React.FC = () => null;

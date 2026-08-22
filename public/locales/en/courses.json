@@ -141,7 +141,7 @@
       "bodySignedOut_other": "Built from {{rounds}} rounds with hole-by-hole detail — the community's scoring on every hole."
     },
     "holeByHole": "Hole by hole",
-    "birdieRingNote": "A gold ring by a hole number means you've birdied it.",
+    "birdieRingNote": "A red dot by a hole number means you've birdied it.",
     "shapeOfCourse": "The shape of the course",
     "legendEveryone": "Everyone",
     "legendYou": "You",
