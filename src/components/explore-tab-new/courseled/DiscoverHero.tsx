@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { animate, useReducedMotion } from 'framer-motion';
 
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
@@ -147,8 +146,8 @@ export function DiscoverHero({
 
   const isScore = moment.figureRole === 'score' && moment.figure != null;
   const figure = moment.figure ?? 0;
-  /* §1.3 — SCORE takes the to-par grammar, QUANTITY and IDENTITY stay white. */
-  const figureColor = isScore ? getScoreColor(figure, 'dark', 'standard') : '#FFFFFF';
+  /* The hero figure and its adjacent noun share the course-name white. */
+  const figureColor = DISCOVER_FACT;
 
   return (
     <div

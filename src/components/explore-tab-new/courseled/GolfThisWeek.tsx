@@ -12,7 +12,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
-import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { WHITE_ALPHA_08, WHITE_ALPHA_12 } from '@/features/tourhub/_shared/tokens';
@@ -696,14 +695,11 @@ export function momentSentence(m: Moment, t: TFn): string {
 function FigureLine({
   moment,
   gross,
-  grossToPar,
   toParText,
   t,
 }: {
   moment: Moment;
   gross: number | null;
-  /** The gross's own to-par. Drives §2's colour on the PLAIN card. */
-  grossToPar: number | null;
   toParText: string | null;
   t: TFn;
 }) {
@@ -1049,9 +1045,6 @@ function GolfThisWeekCard({
         <FigureLine
           moment={moment}
           gross={row.gross ?? null}
-          grossToPar={
-            row.gross != null && row.course_par != null ? row.gross - row.course_par : null
-          }
           toParText={toPar?.text ?? null}
           t={t as TFn}
         />
