@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
@@ -116,7 +117,7 @@ function PhotoTile({
   const impressionRef = useMediaImpression(track);
   return (
               <button
-                ref={impressionRef as unknown as React.Ref<HTMLButtonElement>}
+                ref={impressionRef as unknown as Ref<HTMLButtonElement>}
                 type="button"
                 onClick={() => {
                   analyticsEvents.media.opened(track);

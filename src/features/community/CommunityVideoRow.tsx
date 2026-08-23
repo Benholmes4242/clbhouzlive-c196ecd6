@@ -3,6 +3,8 @@ import { Heart } from 'lucide-react';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { formatRelativeRounded } from '@/i18n/format';
 import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useMediaImpression, type MediaTrackTarget } from '@/utils/mediaEngagement';
 
 /**
  * LATEST VIDEOS ROW (BRIEF_COMMUNITY_PAGE_REBUILD, reference frame).
@@ -26,9 +28,16 @@ interface Props {
   item: CommunityLibraryItem;
   first: boolean;
   onPress: (item: CommunityLibraryItem) => void;
+  /** Media engagement target. Absent = the row reports nothing. */
+  track?: MediaTrackTarget;
 }
 
-export function CommunityVideoRow({ item, first, onPress }: Props) {
+export function CommunityVideoRow({ item, first, onPress, track }: Props) {
+  const impressionRef = useMediaImpression(track);
+  const open = () => {
+    if (track) analyticsEvents.media.opened(track);
+    onPress(item);
+  };
   const hasTitle = item.title.length > 0;
   const title = hasTitle ? item.title : item.displayName;
   const when = formatRelativeRounded(item.createdAt);
@@ -36,13 +45,14 @@ export function CommunityVideoRow({ item, first, onPress }: Props) {
 
   return (
     <div
+      ref={impressionRef}
       role="button"
       tabIndex={0}
-      onClick={() => onPress(item)}
+      onClick={open}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          onPress(item);
+          open();
         }
       }}
       style={{
