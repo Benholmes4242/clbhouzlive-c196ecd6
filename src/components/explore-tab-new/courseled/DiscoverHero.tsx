@@ -146,8 +146,14 @@ export function DiscoverHero({
 
   const isScore = moment.figureRole === 'score' && moment.figure != null;
   const figure = moment.figure ?? 0;
-  /* The hero figure and its adjacent noun share the course-name white. */
-  const figureColor = DISCOVER_FACT;
+  /* The hero figure and its adjacent noun share the course-name white — EXCEPT
+     THE RUN, which carries the falling-index green through figure and noun, the
+     same rule the round tile's MomentFigure applies. */
+  const isRun = moment.kind === 'run';
+  const figureColor = isRun ? ROW_DARK_INDEX_FELL : DISCOVER_FACT;
+  const wordStyle: React.CSSProperties = isRun
+    ? { ...heroWordStyle, color: ROW_DARK_INDEX_FELL }
+    : heroWordStyle;
 
   return (
     <div
