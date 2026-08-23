@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
+import { A, CARD_RADIUS, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 
 /**
@@ -35,7 +35,6 @@ import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 
 /** §S1.5 — one card geometry, and it is fixed so the rail cannot go ragged. */
 export const PLAQUE_W = 206;
-export const CARD_RADIUS = 15;
 export const CARD_SHADOW = '0 1px 3px rgba(11,15,20,0.06)';
 /** The tinted head, then the course + member foot. Both fixed. */
 export const HEAD_H = 96;

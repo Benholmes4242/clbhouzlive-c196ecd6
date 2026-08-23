@@ -6,7 +6,7 @@ import { ArrowUp, ChevronDown } from 'lucide-react';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import type { MostPlayedPlayer, MostPlayedRow } from './hooks/useMostPlayedThisWeek';
-import { A, Eyebrow, InkAction, LABEL, NUMF, SANS } from './tokens';
+import { A, CARD_RADIUS, Eyebrow, InkAction, LABEL, NUMF, SANS, THUMBNAIL_RADIUS } from './tokens';
 import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
@@ -535,7 +535,7 @@ export function MostPlayedLeaderboard({
               key={r.courseId}
               style={{
                 background: A.PANEL,
-                borderRadius: 16,
+                borderRadius: CARD_RADIUS,
                 overflow: 'hidden',
                 boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
                 marginBottom: 10,
@@ -579,7 +579,7 @@ export function MostPlayedLeaderboard({
                   imageUrl={m?.imageUrl}
                   initialsSize={13}
                   pending={thumbPending}
-                  style={{ width: 52, height: 52, borderRadius: 13, flexShrink: 0 }}
+                  style={{ width: 52, height: 52, borderRadius: THUMBNAIL_RADIUS, flexShrink: 0 }}
                 />
                 <span style={{ flex: 1, minWidth: 0 }}>
                   {/* TWO LINES, NOT A TRUNCATION: the parenthetical on a

@@ -9,7 +9,7 @@ import {
   SelectLabel,
   SelectTrigger,
 } from '@/components/ui/select';
-import { A, LABEL, SANS } from './tokens';
+import { A, LABEL, SANS, SCOPE_PILL_RADIUS } from './tokens';
 import { WEEK_SCOPES, type WeekScope } from './hooks/useGolfThisWeek';
 import type { RegionSelection, WeekRegions } from './hooks/useWeekRegionCounts';
 
@@ -64,7 +64,7 @@ export function WeekScopePills({
               border: `1px solid ${active ? A.INK : A.BORDER}`,
               background: active ? A.INK : A.PANEL,
               color: active ? A.PANEL : A.INK,
-              borderRadius: 999,
+              borderRadius: SCOPE_PILL_RADIUS,
               padding: '8px 14px',
               fontSize: 12.5,
               fontWeight: 700,
