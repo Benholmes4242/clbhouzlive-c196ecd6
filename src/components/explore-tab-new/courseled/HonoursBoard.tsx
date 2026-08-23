@@ -6,7 +6,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 
 /**
  * Section 7 — THE HONOURS BOARD (BRIEF_HONOURS_BOARD_THE_HOLE).
@@ -44,21 +43,20 @@ const PLAQUE_GAP = 10;
 const AVATAR = 20;
 
 /**
- * GOLD IS THE ACE (§S2), AND IT IS NOT A RARITY JUDGEMENT — AN ALBATROSS IS THE
- * RARER SHOT. Gold already means an ace in this app: the scorecard's scoring key
- * shows a gold circle for one and `beadForScore` returns SC_FILL_GOLD for it.
- * The honours board was contradicting the scorecard, so the ace takes the gold
- * ground and the albatross takes the neutral well. Do NOT swap these on rarity
- * grounds: whoever does that is right about the rarity and wrong about the
- * convention.
+ * TWO SURFACES, TWO JOBS. A scorecard IDENTIFIES a score, so an ace and an
+ * albatross deliberately share its red disc with a gold ring: both mean “rarer
+ * than an eagle”. The honours board RANKS rarity, so it deliberately separates
+ * the roughly 500× rarer albatross (platinum) from the ace (gold). Do not make
+ * either surface match the other; the difference is semantic, not accidental.
  *
- * BROADCAST GOLD, NOT ACHIEVEMENT GOLD. SC_FILL_GOLD is the scorecard rarity
- * family. It is mixed over the panel for celebration but never used for the
- * 8px lettering, where it is illegible; the dark ink ramp carries all copy.
+ * Metal is confined to the feat block. The light top-left stop and deeper final
+ * stop make each ground resolve as material rather than a flat colour wash.
  */
-const ACE_GROUND = `linear-gradient(135deg, color-mix(in srgb, ${SC_FILL_GOLD} 30%, ${A.PANEL}), color-mix(in srgb, ${SC_FILL_GOLD} 18%, ${A.PANEL}))`;
-const NEUTRAL_GROUND = A.PANEL;
-const GHOST = DISCOVER_QUIET;
+export const PLATINUM_GROUND = 'linear-gradient(145deg, #FAFCFF 0%, #D7DEE8 52%, #929EAD 100%)';
+export const ACE_GROUND = 'linear-gradient(145deg, #FFF1A8 0%, #FFD200 52%, #C98700 100%)';
+export const METAL_INK = '#0F172A';
+/** 68% preserves a quiet year tier while remaining AA at the darkest metal stop. */
+export const METAL_YEAR = 'rgba(15,23,42,0.68)';
 
 export type HonoursMode = 'recent' | 'leaders';
 
@@ -243,8 +241,9 @@ export function FeatCard({
         opacity: 1,
       }}
     >
-      {/* THE TINTED HEAD — gold for an ace, the neutral well for an albatross. */}
+      {/* THE METAL FEAT BLOCK — platinum ranks above gold; the panel foot stays dark. */}
       <span
+        data-honours-feat-block={ace ? 'ace' : 'albatross'}
         style={{
           position: 'relative',
           display: 'flex',
@@ -252,7 +251,7 @@ export function FeatCard({
           justifyContent: 'flex-end',
           height: HEAD_H,
           flex: '0 0 auto',
-          background: ace ? ACE_GROUND : NEUTRAL_GROUND,
+          background: ace ? ACE_GROUND : PLATINUM_GROUND,
           padding: '11px 12px 12px',
           boxSizing: 'border-box',
         }}
@@ -266,7 +265,7 @@ export function FeatCard({
             fontSize: 8,
             fontWeight: 800,
             letterSpacing: '0.18em',
-             color: DISCOVER_FACT,
+             color: METAL_INK,
           }}
         >
           {kindLabel(e)}
@@ -280,7 +279,7 @@ export function FeatCard({
             fontSize: 8,
             fontWeight: 800,
             letterSpacing: '0.18em',
-            color: GHOST,
+            color: METAL_YEAR,
             fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
@@ -299,7 +298,7 @@ export function FeatCard({
                 fontWeight: 800,
                 letterSpacing: '-0.05em',
                 lineHeight: 1,
-                 color: DISCOVER_FACT,
+                 color: METAL_INK,
               }}
             >
               {e.holeYards}
@@ -310,7 +309,7 @@ export function FeatCard({
                 fontSize: 8,
                 fontWeight: 800,
                 letterSpacing: '0.18em',
-                color: DISCOVER_QUIET,
+                color: METAL_INK,
               }}
             >
               {t('discover.honours.yards', 'YARDS')}
@@ -324,7 +323,7 @@ export function FeatCard({
               fontWeight: 800,
               letterSpacing: '-0.04em',
               lineHeight: 1,
-               color: DISCOVER_FACT,
+               color: METAL_INK,
             }}
           >
             {line || t('discover.honours.badgeAce', 'Ace')}
@@ -339,7 +338,7 @@ export function FeatCard({
               fontSize: 11,
               fontWeight: 700,
               letterSpacing: '-0.01em',
-              color: DISCOVER_FACT,
+              color: METAL_INK,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -470,7 +469,7 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
         alignItems: 'center',
         gap: 9,
         padding: '11px 12px',
-        background: l.events.some((e) => e.kind === 'ace') ? ACE_GROUND : NEUTRAL_GROUND,
+        background: A.PANEL,
       }}
     >
       <MemberAvatar

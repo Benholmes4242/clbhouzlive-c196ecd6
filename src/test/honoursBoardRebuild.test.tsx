@@ -6,6 +6,10 @@ import {
   groupLeaders,
   PLAQUE_W,
   CARD_H,
+  ACE_GROUND,
+  PLATINUM_GROUND,
+  METAL_INK,
+  METAL_YEAR,
 } from '@/components/explore-tab-new/courseled/HonoursBoard';
 import type { WireEvent } from '@/components/explore-tab-new/hooks/useDiscoverWire';
 
@@ -71,6 +75,36 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
       expect((c as HTMLElement).style.height).toBe(`${CARD_H}px`);
       expect((c as HTMLElement).style.width).toBe(`${PLAQUE_W}px`);
     }
+  });
+
+  it('ranks albatross above ace with platinum and gold feat blocks only', () => {
+    const { container } = render(
+      <HonoursBoard
+        events={[
+          ev({ id: 'albatross', kind: 'albatross', at: '2024-06-03T00:00:00Z' }),
+          ev({ id: 'ace-1', at: '2024-06-02T00:00:00Z' }),
+          ev({ id: 'ace-2', at: '2024-06-01T00:00:00Z' }),
+        ]}
+      />,
+    );
+    const platinum = container.querySelector<HTMLElement>('[data-honours-feat-block="albatross"]');
+    const gold = [...container.querySelectorAll<HTMLElement>('[data-honours-feat-block="ace"]')];
+    expect(platinum?.style.background).toBe(PLATINUM_GROUND);
+    expect(gold).toHaveLength(2);
+    expect(gold.every((head) => head.style.background === ACE_GROUND)).toBe(true);
+    expect(platinum?.parentElement?.style.background).not.toBe(PLATINUM_GROUND);
+    expect(gold[0].parentElement?.style.background).not.toBe(ACE_GROUND);
+  });
+
+  it('uses full ink for feat copy and a measured quiet ink for the year', () => {
+    const { container } = render(<HonoursBoard events={[ev({ id: 'a' })]} />);
+    const head = container.querySelector<HTMLElement>('[data-honours-feat-block="ace"]');
+    expect(head).toBeTruthy();
+    expect(screen.getByText('Ace').style.color).toBe(METAL_INK);
+    expect(screen.getByText('152').style.color).toBe(METAL_INK);
+    expect(screen.getByText('YARDS').style.color).toBe(METAL_INK);
+    expect(screen.getByText(/Par 3/).style.color).toBe(METAL_INK);
+    expect(screen.getByText('2024').style.color).toBe(METAL_YEAR);
   });
 
   it('shows no photograph on any card', () => {
