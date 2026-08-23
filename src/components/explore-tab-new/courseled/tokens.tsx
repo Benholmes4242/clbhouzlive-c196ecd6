@@ -100,23 +100,31 @@ export const SECTION_TITLE: React.CSSProperties = {
  * the content beneath it (see the /community call sites).
  */
 
-/** §1.5 — indent that puts the subline under the WORDS, not under the glyph. */
-const SUBLINE_INDENT = 22;
+/**
+ * BRIEF_DISCOVER_EYEBROWS §1 — the eyebrow is now the SAME treatment as the
+ * readout above the scope pills ("6 ROUNDS · 3 COURSES · 7 DAYS"), which is
+ * KICKER: 10 / 700 / 0.16em / uppercase. The readout takes MUTE; a section name
+ * takes INK so the aside (FAINT/DIM) stays distinguishable beside it (§4).
+ * SECTION_TITLE is left untouched at source.
+ */
+export const EYEBROW_TEXT: React.CSSProperties = {
+  fontFamily: SANS,
+  ...KICKER,
+  color: A.INK,
+  lineHeight: 1,
+};
 
 export function Eyebrow({
   children,
   aside,
   dot = false,
-  icon: Icon,
   subline,
 }: {
   children: React.ReactNode;
   aside?: React.ReactNode;
   /** True when this section contains anything new since the last visit. */
   dot?: boolean;
-  /** Optional lucide component. Absent renders NOTHING — no reserved width. */
-  icon?: React.ComponentType<{ size?: number | string; strokeWidth?: number | string; color?: string }>;
-  /** Optional one-line description, indented under the heading text. */
+  /** Optional one-line description, aligned to the eyebrow's left edge. */
   subline?: React.ReactNode;
 }) {
   return (
