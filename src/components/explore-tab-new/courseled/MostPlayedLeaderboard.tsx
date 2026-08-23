@@ -381,7 +381,7 @@ function MemberBoard({
                 flex: 'none',
                 fontSize: 12,
                 lineHeight: 1,
-                color: under ? TOPAR_RED : MID,
+                color: under ? TOPAR_RED : INK,
               }}
             >
               {p.toPar != null ? formatRelInt(p.toPar) : ''}
@@ -779,7 +779,7 @@ export function MostPlayedLeaderboard({
                    <span style={{ flex: 'none', fontSize: 12, fontWeight: 700, lineHeight: 1.2, color: DISCOVER_FACT, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {bestPlayer.gross != null ? formatNumber(bestPlayer.gross) : ''}
                   </span>
-                  <span style={{ flex: 'none', fontSize: 10, fontWeight: 700, lineHeight: 1.2, color: bestPlayer.toPar != null && bestPlayer.toPar < 0 ? TOPAR_RED : MID, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  <span style={{ flex: 'none', fontSize: 10, fontWeight: 700, lineHeight: 1.2, color: bestPlayer.toPar != null && bestPlayer.toPar < 0 ? TOPAR_RED : INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {bestPlayer.toPar != null ? formatRelInt(bestPlayer.toPar) : ''}
                   </span>
                    <span style={{ flex: 'none', minWidth: 0, fontSize: 12, fontWeight: 700, lineHeight: 1.2, color: DISCOVER_FACT }}>

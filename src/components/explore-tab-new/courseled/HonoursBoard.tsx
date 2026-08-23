@@ -310,7 +310,7 @@ export function FeatCard({
                 fontSize: 8,
                 fontWeight: 800,
                 letterSpacing: '0.18em',
-                color: A.BODY,
+                color: DISCOVER_QUIET,
               }}
             >
               {t('discover.honours.yards', 'YARDS')}
@@ -339,7 +339,7 @@ export function FeatCard({
               fontSize: 11,
               fontWeight: 700,
               letterSpacing: '-0.01em',
-              color: A.BODY,
+              color: DISCOVER_FACT,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -368,7 +368,7 @@ export function FeatCard({
             fontSize: 13,
             fontWeight: 700,
             letterSpacing: '-0.02em',
-            color: A.INK,
+            color: DISCOVER_FACT,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -499,7 +499,7 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
           ...LABEL,
           fontSize: 8,
           letterSpacing: '0.18em',
-          color: A.BODY,
+          color: DISCOVER_QUIET,
           flex: '0 0 auto',
           fontVariantNumeric: 'tabular-nums lining-nums',
         }}

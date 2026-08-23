@@ -19,9 +19,9 @@ import { selectMoment, type Moment } from '../roundMoment';
  *
  * IT SHOWS THE BEST STORY, NOT THE BEST SCORE. The lowest gross is row 1 of the
  * BEST THIS WEEK chip immediately beneath the hero, and a hero that repeats the
- * chip under it is a bigger version of nothing. So the hero surfaces the round
- * whose MOMENT ranks highest and the chips keep the numbers — two different
- * questions, no duplication (§1.1, ACCEPTANCE b).
+ * chip under it is a bigger version of nothing. So the hero surfaces the most
+ * recent notable round and the chips keep the numbers — two different questions,
+ * no duplication. Ace/albatross rarity alone can hold against a newer moment.
  *
  * ZERO NEW NETWORK REQUESTS (§1.4, ACCEPTANCE k). Every hook below is the SAME
  * hook GolfThisWeek calls with the SAME arguments, so every read resolves out of
@@ -29,9 +29,8 @@ import { selectMoment, type Moment } from '../roundMoment';
  * seven-day rounds, the course meta and the ONE batched hole-shape read. There is
  * no query, no RPC and no field here that the section did not already fetch.
  *
- * THE RANK IS READ, NOT REDEFINED (§1.1, WHAT DOES NOT CHANGE). selectMoment
- * already orders the seven kinds by first-match; this only names that order so a
- * WINNER can be picked ACROSS rounds. Change roundMoment.ts and this follows.
+ * MOMENT detection remains in roundMoment.ts. This hook only chooses between
+ * already-classified rounds by recency and the explicit rarity exception.
  */
 
 type HeroCandidate = { row: CircleRoundRow; moment: Moment };

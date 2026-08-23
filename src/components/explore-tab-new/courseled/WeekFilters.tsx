@@ -9,7 +9,7 @@ import {
   SelectLabel,
   SelectTrigger,
 } from '@/components/ui/select';
-import { A, LABEL, SANS, SCOPE_PILL_RADIUS } from './tokens';
+import { A, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, SCOPE_PILL_RADIUS } from './tokens';
 import { WEEK_SCOPES, type WeekScope } from './hooks/useGolfThisWeek';
 import type { RegionSelection, WeekRegions } from './hooks/useWeekRegionCounts';
 
@@ -176,17 +176,17 @@ export function RegionDropdown({
             baseline — no absolute positioning, no marginLeft auto. */}
         <SelectTrigger
           className="inline-flex h-auto w-auto justify-start gap-0 whitespace-nowrap border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
-          style={{ color: A.INK, fontFamily: SANS, padding: '4px 0' }}
+          style={{ color: DISCOVER_QUIET, fontFamily: SANS, padding: '4px 0' }}
           aria-label={t('discover.week.selectRegionA11y', 'Filter rounds by area')}
         >
           <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
-            <MapPin size={12} strokeWidth={2.4} style={{ color: A.INK, flex: 'none' }} />
+            <MapPin size={12} strokeWidth={2.4} style={{ color: DISCOVER_QUIET, flex: 'none' }} />
             <span
-              style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}
+              style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.01em', color: DISCOVER_QUIET }}
             >
               {triggerLabel}
             </span>
-            <ChevronDown size={13} strokeWidth={2.4} style={{ color: A.DIM, flex: 'none' }} />
+            <ChevronDown size={13} strokeWidth={2.4} style={{ color: DISCOVER_QUIET, flex: 'none' }} />
           </span>
         </SelectTrigger>
 
@@ -194,27 +194,27 @@ export function RegionDropdown({
 
         <SelectContent
           className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg"
-          style={{ background: A.PANEL, borderColor: A.BORDER, color: A.INK }}
+          style={{ background: A.PANEL, borderColor: A.BORDER, color: DISCOVER_FACT }}
         >
-          <SelectItem value={ALL} style={{ color: A.INK }}>
+          <SelectItem value={ALL} style={{ color: DISCOVER_FACT }}>
             <span className="flex w-full items-center justify-between gap-3">
               <span className="truncate">{t('discover.week.allRegions', 'Everywhere')}</span>
-              <span style={{ ...LABEL, color: A.MUTE }}>{regions.total}</span>
+              <span style={{ ...LABEL, color: DISCOVER_QUIET }}>{regions.total}</span>
             </span>
           </SelectItem>
 
           {regions.groups.map((g) => (
             <SelectGroup key={g.country}>
               <SelectLabel className="py-2 pl-8 pr-2">
-                <span style={{ ...LABEL, color: A.MUTE }}>
+                <span style={{ ...LABEL, color: DISCOVER_QUIET }}>
                   {t('discover.week.areaLabel', 'Area')}
                 </span>
               </SelectLabel>
               {/* THE MACRO AREA IS SELECTABLE — "Britain & Ireland 16". */}
-              <SelectItem value={`country:${g.country}`} disabled={g.count === 0} style={{ color: A.INK }}>
+              <SelectItem value={`country:${g.country}`} disabled={g.count === 0} style={{ color: DISCOVER_FACT }}>
                 <span className="flex w-full items-center justify-between gap-3">
                   <span className="truncate">{g.country}</span>
-                  <span style={{ ...LABEL, color: A.MUTE }}>{g.count}</span>
+                  <span style={{ ...LABEL, color: DISCOVER_QUIET }}>{g.count}</span>
                 </span>
               </SelectItem>
               {g.subs.map((s) => (
@@ -224,13 +224,13 @@ export function RegionDropdown({
                   /* ZERO IS GREYED AND UNSELECTABLE (§S3.3) — it stays on the
                      list because its absence is the answer. */
                   disabled={s.count === 0}
-                  style={{ color: A.BODY }}
+                  style={{ color: DISCOVER_FACT }}
                 >
                   <span className="flex w-full items-center justify-between gap-3">
-                    <span className="truncate pl-2" style={{ color: A.BODY }}>
+                    <span className="truncate pl-2" style={{ color: DISCOVER_FACT }}>
                       {s.sub_country}
                     </span>
-                    <span style={{ ...LABEL, color: A.MUTE }}>{s.count}</span>
+                    <span style={{ ...LABEL, color: DISCOVER_QUIET }}>{s.count}</span>
                   </span>
                 </SelectItem>
               ))}

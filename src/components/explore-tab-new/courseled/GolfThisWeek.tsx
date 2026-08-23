@@ -1250,7 +1250,7 @@ function GolfThisWeekCard({
           >
             {/* §3 — the row label darkens to the card's ink with the rest of the
                 chrome. */}
-            <span style={{ ...LABEL, fontSize: 8, color: INK }}>
+            <span style={{ ...LABEL, fontSize: 8, color: DISCOVER_QUIET }}>
               {t('discover.golfThisWeek.moment.theCard', 'The card')}
             </span>
             {/* THE TAP AFFORDANCE, ON EVERY CARD (§S4.2). A hero with a hidden
@@ -1260,7 +1260,7 @@ function GolfThisWeekCard({
                 ...LABEL,
                 fontSize: 8,
                 /* §3 — the action and its chevron darken to the card's ink. */
-                color: INK,
+                color: DISCOVER_QUIET,
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 2,
@@ -1672,7 +1672,7 @@ export function GolfThisWeek({
             describe what is CURRENTLY rendered. */}
         <span
           className="tabular-nums"
-          style={{ ...KICKER, color: A.MUTE, flex: '0 0 auto' }}
+          style={{ ...KICKER, color: DISCOVER_QUIET, flex: '0 0 auto' }}
         >
           {/* The window is a THIRD SEGMENT OF THE SAME TEMPLATE so a translator
               can reorder all three. It is FIXED at seven days — never derived
@@ -1718,7 +1718,7 @@ export function GolfThisWeek({
           style={{
             fontSize: 13,
             fontWeight: 600,
-            color: A.MUTE,
+            color: DISCOVER_QUIET,
             fontFamily: SANS,
             padding: '10px 0 0',
           }}
@@ -1827,7 +1827,7 @@ export function GolfThisWeek({
                     style={{
                       position: 'relative',
                       opacity: 1,
-                      color: A.INK,
+                      color: DISCOVER_FACT,
                       WebkitTextFillColor: 'initial',
                       fontFamily:
                         '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
