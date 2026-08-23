@@ -10,7 +10,6 @@ import {
   PLATINUM_GROUND,
   METAL_INK,
   METAL_YEAR,
-  METAL_SUPPORT,
   sortHonoursRail,
 } from '@/components/explore-tab-new/courseled/HonoursBoard';
 import type { WireEvent } from '@/components/explore-tab-new/hooks/useDiscoverWire';
