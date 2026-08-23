@@ -1,4 +1,3 @@
-import { MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { MomentsGrid } from './MomentsGrid';

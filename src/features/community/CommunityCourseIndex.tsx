@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Eyebrow } from '@/components/explore-tab-new/courseled/tokens';
