@@ -1302,10 +1302,7 @@ function GolfThisWeekCard({
               and the fills mixed on the well (§A5).
               NOT "ENERGY", NOT "POWER", NOT "FORM" — THE SHAPE. */}
           <div style={{ height: SHAPE_BLOCK_H, boxSizing: 'border-box', paddingTop: 4 }}>
-            <span style={{ ...LABEL, fontSize: 8.5, letterSpacing: '0.14em', color: DISCOVER_QUIET }}>
-              {t('discover.golfThisWeek.moment.theShape', 'The shape')}
-            </span>
-            <div style={{ height: SHAPE_H, marginTop: 4, position: 'relative' }}>
+            <div style={{ height: SHAPE_H, position: 'relative' }}>
               {/* THE LEVEL-PAR BASELINE, dashed, at the domain's zero. */}
               <div
                 aria-hidden="true"
