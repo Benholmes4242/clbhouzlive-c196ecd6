@@ -12,11 +12,10 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
-import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { WHITE_ALPHA_04, WHITE_ALPHA_08 } from '@/features/tourhub/_shared/tokens';
+import { WHITE_ALPHA_08, WHITE_ALPHA_12 } from '@/features/tourhub/_shared/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
@@ -1548,7 +1547,11 @@ export function GolfThisWeek({
     const d = (r.gross as number) - (r.course_par as number);
     return {
       text: d === 0 ? 'E' : d < 0 ? `\u2212${Math.abs(d)}` : `+${d}`,
-      tone: d < 0 ? TOPAR_RED : A.MUTE,
+      /* §3.2 (BRIEF_DISCOVER_WORLD_CLASS) — THE DARK RED, NOT TOPAR_RED. The
+         chips sit on A.PANEL, and TOPAR_RED (#C8102E) is the LIGHT-surface red:
+         at 12px on a dark panel it goes muddy and stops reading as red at all.
+         Same canonical call the hero and the member row make. */
+      tone: d < 0 ? ROW_DARK_TOPAR_UNDER : A.MUTE,
     };
   };
 
@@ -1599,7 +1602,7 @@ export function GolfThisWeek({
       course: courseNameFor(mostBirdies),
       runners: birdiesRanked.slice(1),
       /* A birdie count IS a count of under-par holes, so the red is literal. */
-      figureOf: (r) => ({ text: String(r.birdies), tone: TOPAR_RED }),
+      figureOf: (r) => ({ text: String(r.birdies), tone: ROW_DARK_TOPAR_UNDER }),
       figureFloor: { text: '5' },
     });
   }
@@ -1888,9 +1891,18 @@ export function GolfThisWeek({
                         /* UNIFORM DIVIDERS (§1): the same hairline between every
                            pair of rows, none above the leader. */
                         borderTop: lead ? 'none' : `1px solid ${WELL_RULE}`,
-                        /* LIGHT INK GROUND for first place: a subtle gray tint
-                           that bleeds to the chip's padding edges. */
-                        background: lead ? WHITE_ALPHA_04 : undefined,
+                        /* §3.1 (BRIEF_DISCOVER_WORLD_CLASS) — THE LEADER'S
+                           GROUND WAS RAISED FROM WHITE_ALPHA_04 TO
+                           WHITE_ALPHA_12. The 4% value was tuned on the retired
+                           white canvas: composited over A.PANEL (#1B1E27) it
+                           lands on #24272F, a relative-luminance step of
+                           0.0136 -> 0.0187 — about 0.5:1 of contrast, which is
+                           to say none. 12% lands on #36393F, L 0.0136 -> 0.0416,
+                           roughly a 3x step and plainly the top row at arm's
+                           length. Same converted-value / unconverted-relationship
+                           fault Part C §1 found on the bogey ground. It is an
+                           EXISTING token — no new value. */
+                        background: lead ? WHITE_ALPHA_12 : undefined,
                         borderRadius: lead ? CHIP_RADIUS : undefined,
                         margin: lead ? '0 -12px' : undefined,
                         padding: lead ? '6px 12px' : '8px 0',
