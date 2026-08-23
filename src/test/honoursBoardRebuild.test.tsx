@@ -89,9 +89,9 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     );
     const platinum = container.querySelector<HTMLElement>('[data-honours-feat-block="albatross"]');
     const gold = [...container.querySelectorAll<HTMLElement>('[data-honours-feat-block="ace"]')];
-    expect(platinum?.style.background).toBe(PLATINUM_GROUND);
+    expect(platinum?.dataset.honoursMetal).toBe(PLATINUM_GROUND);
     expect(gold).toHaveLength(2);
-    expect(gold.every((head) => head.style.background === ACE_GROUND)).toBe(true);
+    expect(gold.every((head) => head.dataset.honoursMetal === ACE_GROUND)).toBe(true);
     expect(platinum?.parentElement?.style.background).not.toBe(PLATINUM_GROUND);
     expect(gold[0].parentElement?.style.background).not.toBe(ACE_GROUND);
   });
@@ -100,10 +100,11 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     const { container } = render(<HonoursBoard events={[ev({ id: 'a' })]} />);
     const head = container.querySelector<HTMLElement>('[data-honours-feat-block="ace"]');
     expect(head).toBeTruthy();
-    expect(screen.getByText('Ace').style.color).toBe(METAL_INK);
-    expect(screen.getByText('152').style.color).toBe(METAL_INK);
-    expect(screen.getByText('YARDS').style.color).toBe(METAL_INK);
-    expect(screen.getByText(/Par 3/).style.color).toBe(METAL_INK);
+    const ink = 'rgb(15, 23, 42)';
+    expect(screen.getByText('Ace').style.color).toBe(ink);
+    expect(screen.getByText('152').style.color).toBe(ink);
+    expect(screen.getByText('YARDS').style.color).toBe(ink);
+    expect(screen.getByText(/Par 3/).style.color).toBe(ink);
     expect(screen.getByText('2024').style.color).toBe(METAL_YEAR);
   });
 

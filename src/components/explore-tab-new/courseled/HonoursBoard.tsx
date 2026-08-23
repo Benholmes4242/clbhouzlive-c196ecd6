@@ -55,8 +55,8 @@ const AVATAR = 20;
 export const PLATINUM_GROUND = 'linear-gradient(145deg, #FAFCFF 0%, #D7DEE8 52%, #929EAD 100%)';
 export const ACE_GROUND = 'linear-gradient(145deg, #FFF1A8 0%, #FFD200 52%, #C98700 100%)';
 export const METAL_INK = '#0F172A';
-/** 68% preserves a quiet year tier while remaining AA at the darkest metal stop. */
-export const METAL_YEAR = 'rgba(15,23,42,0.68)';
+/** 80% is the lowest quiet tier that remains AA at the darkest gold stop. */
+export const METAL_YEAR = 'rgba(15,23,42,0.80)';
 
 export type HonoursMode = 'recent' | 'leaders';
 
@@ -244,6 +244,7 @@ export function FeatCard({
       {/* THE METAL FEAT BLOCK — platinum ranks above gold; the panel foot stays dark. */}
       <span
         data-honours-feat-block={ace ? 'ace' : 'albatross'}
+        data-honours-metal={ace ? ACE_GROUND : PLATINUM_GROUND}
         style={{
           position: 'relative',
           display: 'flex',
