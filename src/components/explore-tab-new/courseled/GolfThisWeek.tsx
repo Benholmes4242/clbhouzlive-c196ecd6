@@ -16,6 +16,7 @@ import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { WHITE_ALPHA_04 } from '@/features/tourhub/_shared/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
@@ -155,12 +156,12 @@ const GRID_H = 100;
    THE SECOND HALF SURVIVES AND GETS EASIER: the marker spacer still takes the
    WELL's colour (§S4.7) — that colour simply happens to be white now, so a
    spacer outside a moment band is invisible, which is what a spacer wants. */
-const WELL = '#FFFFFF';
+const WELL = 'rgba(11,13,16,0.66)';
 
 /* 6, not 10 — see WELL_INNER. */
 const WELL_PAD_X = 6;
 /* THE ONE RULE IN THE WELL: under its header. */
-const WELL_RULE = 'rgba(11,15,20,0.07)';
+const WELL_RULE = A.HAIRLINE;
 
 /* THE WELL BLEEDS TO THE CARD EDGES, so its inner width is 244px — the width the
    marker/gap measurement table in RoundShape is measured at. That table is the
@@ -173,15 +174,15 @@ void WELL_INNER;
 
 /* THE INK DOES THE HIERARCHY. One genuinely dark ink and greys that are clearly
    different from each other, not four middling greys. */
-const INK = '#0B0F14';   // scores and totals
-const MID = '#5A6673';   // secondary text
-const HAIRLINE_INK = 'rgba(11,15,20,0.12)';
+const INK = A.INK;   // scores and totals
+const MID = A.MUTE;   // secondary text
+const HAIRLINE_INK = A.HAIRLINE;
 
 /* THREE CLEARLY DIFFERENT GREYS FOR THE BAND (§S4.2 of the band brief). A.FAINT
    and A.GHOST do not exist on the shared ramp, so the band names them here
    against the same ink. THE BAND TILES ARE NOT TOUCHED BY THIS BRIEF. */
 const BAND_MUTE = MID;
-const BAND_FAINT = '#8A929C';
+const BAND_FAINT = A.DIM;
 
 
 
@@ -1821,7 +1822,7 @@ export function GolfThisWeek({
                         borderTop: lead ? 'none' : `1px solid ${WELL_RULE}`,
                         /* LIGHT INK GROUND for first place: a subtle gray tint
                            that bleeds to the chip's padding edges. */
-                        background: lead ? 'rgba(11,15,20,0.035)' : undefined,
+                        background: lead ? WHITE_ALPHA_04 : undefined,
                         borderRadius: lead ? CHIP_RADIUS : undefined,
                         margin: lead ? '0 -12px' : undefined,
                         padding: lead ? '6px 12px' : '8px 0',

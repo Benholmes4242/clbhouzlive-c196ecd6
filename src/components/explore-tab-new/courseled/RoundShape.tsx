@@ -5,7 +5,7 @@ import { SC_FILL_BIRDIE, SC_FILL_GOLD } from '@/features/courses/components/hole
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { HAIRLINE_INK_12, INK_TINT_06, TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { HAIRLINE_INK_12, INK_TINT_06, TOPAR_EVEN_LIGHT, WHITE_ALPHA_08, WHITE_ALPHA_18 } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
 import { A, CHIP_RADIUS } from './tokens';
@@ -503,21 +503,21 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
 
    LOCAL to this grid, which only the Discover round tile renders — the
    Clubhouse scorecard sheet keeps its own tokens untouched. */
-const MINI_INK = '#0B0F14';
-const MINI_FAINT = '#9AA5B1';
+const MINI_INK = A.INK;
+const MINI_FAINT = A.MUTE;
 /* Kept on the ramp but no longer used by the nine header: §3 of
    BRIEF_DISCOVER_FINISHING_PASS darkened the labels and level/over to-par to
    MINI_INK. Retained so the ramp stays legible to a reader. */
 void MINI_FAINT;
-const MINI_GHOST = '#C8D0D8';
+const MINI_GHOST = A.DIM;
 const ACE_GOLD = SC_FILL_GOLD;
 const UNDER_INK = SC_FILL_BIRDIE;
-const BOGEY_GROUND = INK_TINT_06;
-const DOUBLE_GROUND = HAIRLINE_INK_12;
+const BOGEY_GROUND = WHITE_ALPHA_08;
+const DOUBLE_GROUND = WHITE_ALPHA_18;
 
 /** The surface the grid sits on. NO TINT: it is the white card, and the marker
  *  outer rings trace against exactly that, so a ring reads as clear air. */
-export const MINI_WELL = '#FFFFFF';
+export const MINI_WELL = A.PANEL;
 
 /** §S1.3 — the Clubhouse card's own key, not a second vocabulary. */
 type Marker = 'ace' | 'albatross' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double';
@@ -661,15 +661,7 @@ const NUM_BLOCK = 7 + 2.5;
  *  A cell inside a band is handed this instead of the plain well so its 1px
  *  spacer matches the tint behind it. */
 function blend(tone: string, surface: string, alpha: number): string {
-  const hex = (h: string) => {
-    const v = h.replace('#', '');
-    const full = v.length === 3 ? v.split('').map((c) => c + c).join('') : v;
-    return [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16));
-  };
-  const a = hex(tone);
-  const b = hex(surface);
-  const mix = a.map((c, i) => Math.round(c * alpha + b[i] * (1 - alpha)));
-  return `#${mix.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+  return `color-mix(in srgb, ${tone} ${alpha * 100}%, ${surface})`;
 }
 
 /** Consecutive runs of marked holes WITHIN one nine, as [startIndex, length]. */

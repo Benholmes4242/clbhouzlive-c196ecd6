@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, CARD_RADIUS, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
+import { A, CARD_RADIUS, GOLD, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
+import { GOLD_TINT_10 } from '@/features/tourhub/_shared/tokens';
 
 /**
  * Section 7 — THE HONOURS BOARD (BRIEF_HONOURS_BOARD_THE_HOLE).
@@ -56,10 +57,10 @@ const AVATAR = 20;
  * below is that same gold taken to text weight; the ground is its wash. No
  * second gold hue is introduced on this surface.
  */
-const ACE_GROUND = '#F5EBD2';
-const ACE_GOLD = '#B8860B';
-const NEUTRAL_GROUND = '#F4F6F9';
-const GHOST = '#C8D0D8';
+const ACE_GROUND = GOLD_TINT_10;
+const ACE_GOLD = GOLD;
+const NEUTRAL_GROUND = A.PANEL;
+const GHOST = A.DIM;
 
 export type HonoursMode = 'recent' | 'leaders';
 
