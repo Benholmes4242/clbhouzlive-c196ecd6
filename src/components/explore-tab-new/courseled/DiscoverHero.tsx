@@ -162,7 +162,12 @@ export function DiscoverHero({
       }}
       style={{
         position: 'relative',
-        height: HERO_H,
+        /* Match Course Detail's immersive hero contract: escape the centred app
+           column, start at physical y=0, and add the notch to the visual height
+           rather than taking it out of the 372px composition. */
+        width: '100dvw',
+        marginLeft: 'calc(50% - 50dvw)',
+        height: `calc(${HERO_H}px + env(safe-area-inset-top, 0px))`,
         /* `isolation` makes this a stacking context so the zIndex -1 layers sit
            ABOVE the element's own background and BELOW the in-flow content — the
            same construction the round tile uses. */
