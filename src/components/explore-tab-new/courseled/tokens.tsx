@@ -139,10 +139,7 @@ export function Eyebrow({
           flexWrap: 'wrap',
         }}
       >
-        {Icon ? (
-          <Icon size={15} strokeWidth={2.2} color={A.INK} />
-        ) : null}
-        <span style={SECTION_TITLE}>
+        <span style={EYEBROW_TEXT}>
           {children}
           {dot ? <NewDot /> : null}
         </span>
@@ -151,7 +148,7 @@ export function Eyebrow({
       {subline ? (
         <div
           style={{
-            marginLeft: Icon ? SUBLINE_INDENT : 0,
+            marginTop: 3,
             marginTop: 3,
             fontFamily: SANS,
             fontSize: 11.5,
