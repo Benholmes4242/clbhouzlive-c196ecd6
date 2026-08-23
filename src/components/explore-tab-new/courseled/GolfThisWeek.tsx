@@ -14,7 +14,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { WHITE_ALPHA_08, WHITE_ALPHA_12 } from '@/features/tourhub/_shared/tokens';
+import { WHITE_ALPHA_08 } from '@/features/tourhub/_shared/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
@@ -181,35 +181,6 @@ const BAND_FAINT = DISCOVER_QUIET;
 
 /* The card sits on the page rather than being drawn onto it. */
 const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
-
-/**
- * §3 (BRIEF_BAND_TILES_LADDER_TIGHTEN) — THE FIGURE COLUMN IS MEASURED.
- * Tabular lining figures have a fixed advance, so the column can be derived
- * arithmetically from the strings a tile actually prints: 0.6em per figure,
- * sign or arrow glyph, 0.3em for a decimal point. A tile must not reserve
- * space for a qualifier it never shows (BEST STABLEFORD's old 40px gap).
- */
-const BAND_FIG_SIZE = 12;
-const BAND_QUAL_SIZE = 8;
-const BAND_QUAL_GAP = 2;
-const bandGlyphEm = (ch: string) =>
-  /[0-9+\u2212\u2193\u2014-]/.test(ch) ? 0.6 : ch === '.' ? 0.3 : 0.28;
-const bandTextWidth = (s: string, size: number) =>
-  [...s].reduce((w, ch) => w + bandGlyphEm(ch) * size, 0);
-export const bandFigureColumnWidth = (
-  figures: { text: string; qual?: string }[],
-) =>
-  Math.ceil(
-    Math.max(
-      9,
-      ...figures.map(
-        (f) =>
-          bandTextWidth(f.text, BAND_FIG_SIZE) +
-          (f.qual ? BAND_QUAL_GAP + bandTextWidth(f.qual, BAND_QUAL_SIZE) : 0),
-      ),
-    ),
-  );
-
 
 /**
  * TILE HEIGHT. hero 156 + 8 pad + 20 member row + 8 + well (6 header + 6 +
@@ -1354,9 +1325,6 @@ export function GolfThisWeek({
   const pending = !!userId && (roundsQuery.isPending || !scopeCourses.ready);
   if (pending) return <GolfThisWeekShell />;
 
-  const courseNameFor = (r: CircleRoundRow) =>
-    meta?.get(r.course_id ?? '')?.name ?? r.course_name ?? '';
-
   /* THE BAND IS FOUR COMPARISONS OF EQUAL WEIGHT (§2) — tiles, not a sentence
       with footnotes. Each is self-contained: label, figure, who, where.
 
@@ -1767,6 +1735,7 @@ export function GolfThisWeek({
           {bandTiles.map((tile) => (
             <div
               key={tile.key}
+              data-band-podium={tile.key}
               /* EVERY BAND TILE IS ITS OWN ROUND, so tapping one opens THAT
                  round's scorecard — the same sheet the round tiles open. Not a
                  <button>: these tiles sit in the same family as the round tiles,
@@ -1891,6 +1860,7 @@ export function GolfThisWeek({
                   return (
                     <>
                       <div
+                        data-podium-row="leader"
                         role="button"
                         tabIndex={0}
                         onClick={(e) => {
@@ -1915,12 +1885,10 @@ export function GolfThisWeek({
                       >
                         <span
                           style={{
+                            position: 'relative',
                             width: 40,
-                            height: 40,
-                            padding: 3.5,
-                            boxSizing: 'border-box',
+                            aspectRatio: '1 / 1.05',
                             borderRadius: '34%',
-                            background: tile.accent,
                             display: 'inline-flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -1930,8 +1898,18 @@ export function GolfThisWeek({
                             src={tile.row.profile_photo_url}
                             userId={tile.row.user_id}
                             alt={tile.row.display_name}
-                            size={33}
+                            size={40}
                             hideRing
+                          />
+                          <span
+                            aria-hidden
+                            style={{
+                              position: 'absolute',
+                              inset: 0,
+                              borderRadius: '34%',
+                              boxShadow: `inset 0 0 0 3.5px ${tile.accent}`,
+                              pointerEvents: 'none',
+                            }}
                           />
                         </span>
                         <span style={{ minWidth: 0 }}>
@@ -2016,6 +1994,7 @@ export function GolfThisWeek({
                             return (
                               <div
                                 key={r.round_id}
+                                data-podium-row="chaser"
                                 role="button"
                                 tabIndex={0}
                                 onClick={(e) => {

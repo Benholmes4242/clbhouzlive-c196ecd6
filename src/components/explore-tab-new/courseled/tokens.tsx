@@ -1,6 +1,8 @@
 import React from 'react';
 import { A, SANS, KICKER as KICKER_LEGACY, LABEL as LABEL_LEGACY, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { SURFACE } from '@/lib/tokens/surface';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
 /**
  * Course-led Discover — shared tokens and the three chrome primitives
@@ -43,8 +45,8 @@ export const GOLD = '#D8A93C';
 export const PODIUM_ACCENT = {
   gold: GOLD,
   white: DISCOVER_FACT,
-  red: '#FF6B60',
-  green: '#4ADE80',
+  red: TOPAR_UNDER_DARK,
+  green: INDEX_DELTA.dark.improved,
 } as const;
 
 /** Low-alpha grounds used only by podium margin chips. */
