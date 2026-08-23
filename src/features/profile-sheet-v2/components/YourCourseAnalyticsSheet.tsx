@@ -112,8 +112,8 @@ function fmtBucketPct(pct: number, pctExact: number, count: number): string {
  * border to heavier ink - no colour, no shadow, no scale.
  */
 const CARD = (open = false): React.CSSProperties => ({
-  background: '#FFFFFF',
-  border: `1px solid ${open ? 'rgba(14,18,22,0.16)' : A.BORDER}`,
+  background: A.PANEL,
+  border: `1px solid ${open ? A.INK : A.BORDER}`,
   borderRadius: 14,
   overflow: 'hidden',
 });
@@ -815,6 +815,8 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
       ariaLabelledBy="your-course-analytics-title"
       zIndexBase={10000}
       maxHeight="85dvh"
+      variant="dark"
+      surfaceColor={A.CANVAS}
       // Make the sheet panel a flex column so we can pin the header and
       // scroll only the list. `overflow: hidden` keeps the rounded top
       // corners clipping the scroll region.
@@ -855,7 +857,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
                 display: 'flex',
                 alignItems: 'center',
                 gap: 7,
-                background: '#FFFFFF',
+                background: A.TRACK,
                 border: `0.5px solid ${A.BORDER}`,
                 borderRadius: 18,
                 padding: '8px 13px',
@@ -900,7 +902,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
             <div style={{ padding: '4px 20px 20px' }}>
               <div
                 style={{
-                  background: '#fff',
+                  background: A.PANEL,
                   border: `1px solid ${A.BORDER}`,
                   borderRadius: 16,
                   padding: 20,
@@ -965,8 +967,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
                   <div
                     style={{
                       height: '100%',
-                      background:
-                        'linear-gradient(90deg, rgba(15,23,42,0.03), rgba(15,23,42,0.06), rgba(15,23,42,0.03))',
+                      background: A.TRACK,
                     }}
                   />
                 </div>

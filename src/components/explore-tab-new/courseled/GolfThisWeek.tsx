@@ -16,7 +16,7 @@ import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { WHITE_ALPHA_04 } from '@/features/tourhub/_shared/tokens';
+import { WHITE_ALPHA_04, WHITE_ALPHA_08 } from '@/features/tourhub/_shared/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
@@ -1741,9 +1741,33 @@ export function GolfThisWeek({
                   gap: 4,
                 }}
               >
-                {/* §S3.3 — 11px with lineHeight 1 keeps the emoji on the label's
-                    baseline across all four tiles. */}
-                <span style={{ fontSize: 11, lineHeight: 1 }}>{tile.emoji}</span>
+                {/* Emoji remain deliberate on celebratory band tiles. Their
+                    platform-owned colours get a neutral local surface rather
+                    than an unpredictable filter or shadow. */}
+                <span
+                  style={{
+                    position: 'relative',
+                    width: 11,
+                    height: 11,
+                    flex: '0 0 11px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 11,
+                    lineHeight: 1,
+                  }}
+                >
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      inset: -2,
+                      borderRadius: '50%',
+                      background: WHITE_ALPHA_08,
+                    }}
+                  />
+                  <span style={{ position: 'relative' }}>{tile.emoji}</span>
+                </span>
                 {tile.label}
                 {tile.unit ? (
                   <span style={{ marginLeft: 'auto' }}>{tile.unit}</span>

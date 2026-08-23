@@ -10,7 +10,7 @@
  */
 
 import React from 'react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -118,7 +118,7 @@ export default function ActorCards({
                 position: 'relative',
                 flexShrink: 0,
                 width: 220,
-                background: '#fff',
+                background: A.PANEL,
                 borderRadius: 16,
                 padding: active ? 13 : 14,
                 display: 'flex',
@@ -142,7 +142,7 @@ export default function ActorCards({
                     src={p.avatarUrl}
                     alt={p.name}
                     hairlineRing
-                    ringColor={LIGHT_HAIRLINE}
+                    ringColor={DARK_HAIRLINE}
                   />
                 ) : (
                   <div style={{ position: 'relative', width: 42, height: 42, flexShrink: 0 }}>
@@ -163,7 +163,7 @@ export default function ActorCards({
                     >
                       {initial}
                     </div>
-                    {/* Canonical 1px traced hairline (light surface) */}
+                    {/* Canonical 1px traced hairline on the dark actor card. */}
                     <div
                       aria-hidden
                       style={{
@@ -247,7 +247,7 @@ export default function ActorCards({
             style={{
               flexShrink: 0,
               width: 92,
-              border: '1.5px dashed rgba(15,23,42,0.15)',
+              border: `1.5px dashed ${A.BORDER}`,
               borderRadius: 16,
               display: 'flex',
               flexDirection: 'column',

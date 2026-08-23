@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, CARD_RADIUS, GOLD, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
+import { A, CARD_RADIUS, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
-import { GOLD_TINT_10 } from '@/features/tourhub/_shared/tokens';
+import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 
 /**
  * Section 7 — THE HONOURS BOARD (BRIEF_HONOURS_BOARD_THE_HOLE).
@@ -52,15 +52,13 @@ const AVATAR = 20;
  * grounds: whoever does that is right about the rarity and wrong about the
  * convention.
  *
- * ONE GOLD, NOT TWO (§S2.3). SC_FILL_GOLD is #FFD200 — the scorecard's bead
- * FILL, which is a fill value and illegible as 8px lettering on cream. ACE_GOLD
- * below is that same gold taken to text weight; the ground is its wash. No
- * second gold hue is introduced on this surface.
+ * BROADCAST GOLD, NOT ACHIEVEMENT GOLD. SC_FILL_GOLD is the scorecard rarity
+ * family. It is mixed over the panel for celebration but never used for the
+ * 8px lettering, where it is illegible; the dark ink ramp carries all copy.
  */
-const ACE_GROUND = GOLD_TINT_10;
-const ACE_GOLD = GOLD;
+const ACE_GROUND = `linear-gradient(135deg, color-mix(in srgb, ${SC_FILL_GOLD} 30%, ${A.PANEL}), color-mix(in srgb, ${SC_FILL_GOLD} 18%, ${A.PANEL}))`;
 const NEUTRAL_GROUND = A.PANEL;
-const GHOST = A.DIM;
+const GHOST = A.BODY;
 
 export type HonoursMode = 'recent' | 'leaders';
 
@@ -241,8 +239,8 @@ export function FeatCard({
         fontFamily: SANS,
         boxSizing: 'border-box',
         cursor: tappable ? 'pointer' : 'default',
-        /* A feat with no score genuinely cannot open — say so visually. */
-        opacity: tappable ? 1 : 0.62,
+        /* Disabled changes interaction only; rarity copy must keep full contrast. */
+        opacity: 1,
       }}
     >
       {/* THE TINTED HEAD — gold for an ace, the neutral well for an albatross. */}
@@ -268,7 +266,7 @@ export function FeatCard({
             fontSize: 8,
             fontWeight: 800,
             letterSpacing: '0.18em',
-            color: ace ? ACE_GOLD : A.INK,
+            color: A.INK,
           }}
         >
           {kindLabel(e)}
@@ -312,7 +310,7 @@ export function FeatCard({
                 fontSize: 8,
                 fontWeight: 800,
                 letterSpacing: '0.18em',
-                color: A.MUTE,
+                color: A.BODY,
               }}
             >
               {t('discover.honours.yards', 'YARDS')}

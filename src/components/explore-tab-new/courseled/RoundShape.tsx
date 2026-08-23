@@ -5,7 +5,7 @@ import { SC_FILL_BIRDIE, SC_FILL_GOLD } from '@/features/courses/components/hole
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { HAIRLINE_INK_12, INK_TINT_06, TOPAR_EVEN_LIGHT, WHITE_ALPHA_08, WHITE_ALPHA_18 } from '@/features/tourhub/_shared/tokens';
+import { HAIRLINE_INK_12, INK_TINT_06, TOPAR_EVEN_LIGHT, WHITE_ALPHA_18 } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
 import { A, CHIP_RADIUS } from './tokens';
@@ -512,7 +512,10 @@ void MINI_FAINT;
 const MINI_GHOST = A.DIM;
 const ACE_GOLD = SC_FILL_GOLD;
 const UNDER_INK = SC_FILL_BIRDIE;
-const BOGEY_GROUND = WHITE_ALPHA_08;
+/* Match ScoreMark exactly on dark: both over-par marks use WHITE_ALPHA_18.
+   At this 17px size the double's 1px ring is the entire magnitude distinction;
+   do not soften it without reopening the shared contrast decision. */
+const BOGEY_GROUND = WHITE_ALPHA_18;
 const DOUBLE_GROUND = WHITE_ALPHA_18;
 
 /** Dark-only fallback for the surface the grid sits on. Callers pass their
