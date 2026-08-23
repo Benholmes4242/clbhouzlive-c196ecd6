@@ -12,8 +12,8 @@ import { SURFACE } from '@/lib/tokens/surface';
  * the canonical scale — nothing on Discover renders at 800. The legacy
  * analytical LABEL is 9/800 and must not be edited at source, so it is
  * re-weighted to 700 here. SIZES ARE UNCHANGED (LABEL stays 9, not the
- * canonical 8) to keep the page from reflowing; colours are untouched and are
- * the same values SURFACE.light records.
+ * canonical 8) to keep the page from reflowing; colours now resolve through
+ * the canonical dark-only surface ramp.
  */
 
 /** Dark ink ramp of record for this area. Identical to A.INK / BODY / MUTE / DIM. */
