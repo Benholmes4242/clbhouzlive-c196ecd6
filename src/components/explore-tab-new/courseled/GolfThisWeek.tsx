@@ -243,11 +243,11 @@ const ROW_DARK_QUIET = 'rgba(255,255,255,0.78)';
     a falling index is better (green), a rising one is worse (red). The tour hero
     has no index movement, so PhotoBand's "colour only on a score" never governed
     this figure. Applies to the TRIANGLE and its FIGURE alike. */
-const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
+export const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
 const ROW_DARK_INDEX_ROSE = INDEX_DELTA.dark.drifted;
 /** UNDER PAR RESOLVES THROUGH getScoreColor — no hand-picked hex. TOPAR_RED
     (#C8102E) is the LIGHT-surface red and goes muddy on a scrimmed photograph. */
-const ROW_DARK_TOPAR_UNDER = getScoreColor(-1, 'dark', 'standard');
+export const ROW_DARK_TOPAR_UNDER = getScoreColor(-1, 'dark', 'standard');
 
 
 
@@ -662,7 +662,7 @@ export function momentFigureParts(m: Moment, t: TFn): { before: string; after: s
   };
 }
 
-function momentSentence(m: Moment, t: TFn): string {
+export function momentSentence(m: Moment, t: TFn): string {
   const f = m.facts;
   const key = `${MK}.sentence.${m.sentenceKey}`;
   const fb = SENTENCE_FALLBACK[m.sentenceKey];
