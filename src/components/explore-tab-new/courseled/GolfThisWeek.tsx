@@ -1896,9 +1896,9 @@ export function GolfThisWeek({
                             aria-hidden
                             style={{
                               position: 'absolute',
-                              inset: 0,
+                              inset: 2,
                               borderRadius: '34%',
-                              boxShadow: `inset 0 0 0 3.5px ${tile.accent}`,
+                              boxShadow: `inset 0 0 0 1px ${tile.accent}`,
                               pointerEvents: 'none',
                             }}
                           />
