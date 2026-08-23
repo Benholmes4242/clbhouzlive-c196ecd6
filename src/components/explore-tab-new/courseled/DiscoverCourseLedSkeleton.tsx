@@ -8,7 +8,6 @@ import {
   THUMBNAIL_RADIUS,
   WELL_RADIUS,
 } from './tokens';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
@@ -749,6 +748,8 @@ export function MostPlayedPanel() {
 const SK_CARD_W = 206;
 const SK_CARD_H = 148;
 const SK_HEAD_H = 104;
+const SK_PLATINUM_GROUND = 'linear-gradient(145deg, #FAFCFF 0%, #D7DEE8 52%, #929EAD 100%)';
+const SK_GOLD_GROUND = 'linear-gradient(145deg, #FFF1A8 0%, #FFD200 52%, #C98700 100%)';
 
 export function HonoursPanel() {
   return (
@@ -786,9 +787,8 @@ export function HonoursPanel() {
             <div
               style={{
                 height: SK_HEAD_H,
-                background: i === 0
-                  ? `linear-gradient(135deg, color-mix(in srgb, ${SC_FILL_GOLD} 30%, ${A.PANEL}), color-mix(in srgb, ${SC_FILL_GOLD} 18%, ${A.PANEL}))`
-                  : A.PANEL,
+                position: 'relative',
+                background: i === 0 ? SK_PLATINUM_GROUND : SK_GOLD_GROUND,
                 padding: '11px 12px 12px',
                 boxSizing: 'border-box',
                 display: 'flex',
@@ -797,6 +797,19 @@ export function HonoursPanel() {
                 gap: 6,
               }}
             >
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 11,
+                  left: 12,
+                  right: 12,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Bar style={{ height: 8, width: i === 0 ? 58 : 24 }} />
+                <Bar style={{ height: 8, width: 26 }} />
+              </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Bar style={{ height: 46, width: 44, borderRadius: '34%', flexShrink: 0 }} />
                 <div>
