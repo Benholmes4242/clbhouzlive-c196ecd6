@@ -57,8 +57,13 @@ export const METAL_AVATAR_RING = 'rgba(15,23,42,0.28)';
 
 export type HonoursMode = 'recent' | 'leaders';
 
-/** The rail's stated order: rarity first, then most recent within each rarity. */
+/** The sheet's Recent mode remains chronological. */
 export function sortHonours(events: WireEvent[]): WireEvent[] {
+  return [...events].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+}
+
+/** The page rail's stated order: rarity first, then most recent within rarity. */
+export function sortHonoursRail(events: WireEvent[]): WireEvent[] {
   return [...events].sort((a, b) => {
     const rarity = Number(b.kind === 'albatross') - Number(a.kind === 'albatross');
     return rarity || new Date(b.at).getTime() - new Date(a.at).getTime();
@@ -583,7 +588,7 @@ export function HonoursBoard({
   onSeeAll,
 }: Props) {
   const { t } = useTranslation('courses');
-  const feats = useMemo(() => sortHonours(events), [events]);
+  const feats = useMemo(() => sortHonoursRail(events), [events]);
 
   if (isPending) return <HonoursPanelShell />;
   if (events.length === 0) return null;

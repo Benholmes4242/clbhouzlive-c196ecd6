@@ -11,7 +11,7 @@ import {
   METAL_INK,
   METAL_YEAR,
   METAL_SUPPORT,
-  sortHonours,
+  sortHonoursRail,
 } from '@/components/explore-tab-new/courseled/HonoursBoard';
 import type { WireEvent } from '@/components/explore-tab-new/hooks/useDiscoverWire';
 
@@ -108,12 +108,14 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     const ink = 'rgb(15, 23, 42)';
     expect(screen.getByText('Ace').style.color).toBe(ink);
     expect(screen.getByText('Sam Fairway').style.color).toBe(ink);
-    expect(screen.getByText(/Par 3/).style.color).toBe(METAL_SUPPORT);
+    expect(screen.getByText(/Par 3/).style.color).toBe('rgba(15, 23, 42, 0.8)');
     expect(screen.getByText('2024').style.color).toBe('rgba(15, 23, 42, 0.8)');
   });
 
   it('uses a lazy-loaded 44px squircle avatar on every card', () => {
-    const { container } = render(<HonoursBoard events={[ev({ id: 'a' })]} />);
+    const { container } = render(
+      <HonoursBoard events={[ev({ id: 'a', actorAvatar: 'https://example.com/avatar.jpg' })]} />,
+    );
     const avatar = container.querySelector('img');
     expect(avatar?.getAttribute('loading')).toBe('lazy');
     expect(avatar?.parentElement?.style.width).toBe('44px');
@@ -126,7 +128,7 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
   });
 
   it('orders rarity first, then most recent within each rarity', () => {
-    const ordered = sortHonours([
+    const ordered = sortHonoursRail([
       ev({ id: 'new-ace', at: '2025-01-01T00:00:00Z' }),
       ev({ id: 'old-albatross', kind: 'albatross', at: '2020-01-01T00:00:00Z' }),
       ev({ id: 'new-albatross', kind: 'albatross', at: '2024-01-01T00:00:00Z' }),
