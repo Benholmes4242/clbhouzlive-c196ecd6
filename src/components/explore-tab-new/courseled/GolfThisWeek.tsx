@@ -830,10 +830,14 @@ interface CardProps {
  *
  * Top to bottom (§S4.1): HERO 178 / member row with the score / THE WELL.
  *
- * IT GIVES UP COMPLETENESS DELIBERATELY (§S0.3). No treatment except the grind
- * shows all eighteen holes, because THE SCORECARD IS ONE TAP AWAY AND DOES IT
- * PROPERLY, and a rail tile that tries to be the scorecard ends up as a small
- * unreadable scorecard — which is exactly what shipped before this.
+ * THIS CLAIM IS NO LONGER TRUE AND IS CORRECTED, NOT DELETED (AMENDMENT 1 §A3):
+ * it read "IT GIVES UP COMPLETENESS DELIBERATELY (§S0.3) — no treatment except
+ * the grind shows all eighteen holes". The mini scorecard already draws eighteen
+ * marks, and THE SHAPE now draws the same eighteen numbers cumulatively, so the
+ * tile is complete twice over.
+ * WHAT SURVIVES OF THE ORIGINAL WARNING: a rail tile must not try to BE the
+ * scorecard — no figures per hole, no columns, no yardages. THE SCORECARD IS
+ * STILL ONE TAP AWAY and still does it properly.
  *
  * THE PHOTOGRAPH IS GONE (§S4.6): the hero gradient replaces it, so the course
  * is named in words at the top of the hero.
