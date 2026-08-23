@@ -256,7 +256,6 @@ export default function ExploreTabContent({
       <div>{shellTabs}</div>
 
       <GlassHeaderPlate visible={tabsStuck} />
-      <div ref={lensSentinelRef} style={{ height: 1 }} aria-hidden />
 
       {/* The chrome island floats over the page, so the header clears the notch
           plus the island itself — Discover no longer sits under a hero.
@@ -273,6 +272,10 @@ export default function ExploreTabContent({
           onPress={() => handleFriendCard(hero.subject!.row)}
         />
       )}
+      {/* Match Course Detail's immersive order: hero first, then the sentinel.
+          This keeps the image at physical y=0 and raises the notch veil only
+          after the hero has scrolled away. */}
+      <div ref={lensSentinelRef} style={{ height: 1 }} aria-hidden />
 
       <div
         style={{
