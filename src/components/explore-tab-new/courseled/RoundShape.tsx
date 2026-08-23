@@ -585,11 +585,11 @@ function markerStyle(m: Marker | null, well: string): CSSProperties {
   switch (m) {
     case 'ace':
     case 'albatross':
-      return magnitude(ACE_GOLD, UNDER_INK, MINI_WELL);
+      return magnitude(ACE_GOLD, UNDER_INK, A.INK);
     case 'eagle':
-      return magnitude(UNDER_INK, UNDER_INK, MINI_WELL);
+      return magnitude(UNDER_INK, UNDER_INK, A.INK);
     case 'birdie':
-      return { ...base, ...filled, background: UNDER_INK, color: MINI_WELL };
+      return { ...base, ...filled, background: UNDER_INK, color: A.INK };
     case 'bogey':
       return { ...base, ...filled, background: BOGEY_GROUND };
     case 'double':

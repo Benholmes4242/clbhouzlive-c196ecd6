@@ -8,6 +8,7 @@ import {
   THUMBNAIL_RADIUS,
   WELL_RADIUS,
 } from './tokens';
+import { GOLD_TINT_10, WHITE_ALPHA_04 } from '@/features/tourhub/_shared/tokens';
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
@@ -314,7 +315,7 @@ export function GolfThisWeekRail() {
                   height: 36,
                   padding: '6px 12px',
                   margin: '0 -12px',
-                  background: 'rgba(11,15,20,0.035)',
+                  background: WHITE_ALPHA_04,
                   borderRadius: CHIP_RADIUS,
                   boxSizing: 'border-box',
                   display: 'flex',
@@ -430,8 +431,8 @@ export function GolfThisWeekRail() {
                   marginLeft: -10,
                   marginRight: -10,
                   height: 139,
-                  background: '#FFFFFF',
-                  boxShadow: 'inset 0 0 0 1px rgba(11,15,20,0.07)',
+                  background: 'rgba(11,13,16,0.66)',
+                  boxShadow: `inset 0 0 0 1px ${A.HAIRLINE}`,
                    borderRadius: `0 0 ${WELL_RADIUS}px ${WELL_RADIUS}px`,
                   padding: '6px 6px 9px',
                   boxSizing: 'border-box',
@@ -444,7 +445,7 @@ export function GolfThisWeekRail() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     paddingBottom: 6,
-                    borderBottom: '1px solid rgba(11,15,20,0.07)',
+                    borderBottom: `1px solid ${A.HAIRLINE}`,
                   }}
                 >
                   <Bar style={{ height: 8, width: 54 }} />
@@ -803,7 +804,7 @@ export function HonoursPanel() {
               height: SK_CARD_H,
               flex: 'none',
               borderRadius: CARD_RADIUS,
-              background: '#FFFFFF',
+              background: A.PANEL,
               boxShadow: '0 1px 3px rgba(11,15,20,0.06)',
               overflow: 'hidden',
               boxSizing: 'border-box',
@@ -812,7 +813,7 @@ export function HonoursPanel() {
             <div
               style={{
                 height: SK_HEAD_H,
-                background: '#F4F6F9',
+                background: i === 0 ? GOLD_TINT_10 : A.PANEL,
                 padding: '11px 12px 12px',
                 boxSizing: 'border-box',
                 display: 'flex',
