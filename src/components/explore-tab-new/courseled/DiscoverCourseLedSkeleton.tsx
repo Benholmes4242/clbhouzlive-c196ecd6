@@ -711,9 +711,9 @@ export function MostPlayedPanel() {
               </div>
               <Bar style={{ height: 15, width: 15, marginLeft: 'auto', flexShrink: 0 }} />
             </div>
-            <div style={{ marginTop: 10, paddingTop: 8, borderTop: `1px solid ${A.HAIRLINE}`, display: 'grid', gridTemplateColumns: '69px minmax(0,1fr) 34px', alignItems: 'center', gap: 10 }}>
+            <div style={{ marginTop: 10, paddingTop: 8, borderTop: `1px solid ${A.HAIRLINE}`, display: 'grid', gridTemplateColumns: '102px minmax(0,1fr) 34px', alignItems: 'center', gap: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                {[0, 1, 2, 3].map((face) => (
+                {[0, 1, 2, 3, 4].map((face) => (
                   <Bar key={face} style={{ width: 26, height: 26, marginLeft: face === 0 ? 0 : -7, borderRadius: '34%', boxShadow: `0 0 0 ${face === 0 ? 2 : 1.5}px ${A.PANEL}` }} />
                 ))}
               </div>
