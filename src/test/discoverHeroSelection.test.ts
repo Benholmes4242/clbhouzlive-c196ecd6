@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { selectDiscoverHeroCandidate } from '@/components/explore-tab-new/courseled/hooks/useDiscoverHero';
 import { selectMoment, type Moment } from '@/components/explore-tab-new/courseled/roundMoment';
+import { SC_BIRDIE_DARK } from '@/features/courses/components/holes/_constants';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 const row = (id: string, playDate: string) =>
@@ -45,5 +48,11 @@ describe('Discover hero amendment 1', () => {
   it('detects ace and albatross rarity from existing hole shapes', () => {
     expect(selectMoment([{ holeNo: 4, par: 3, strokes: 1 }]).feat).toBe('ace');
     expect(selectMoment([{ holeNo: 7, par: 5, strokes: 2 }]).feat).toBe('albatross');
+  });
+
+  it('uses one bright red for every dark under-par token', () => {
+    expect(TOPAR_UNDER_DARK).toBe('#FF6B60');
+    expect(SC_BIRDIE_DARK).toBe(TOPAR_UNDER_DARK);
+    expect(A.RED).toBe(TOPAR_UNDER_DARK);
   });
 });
