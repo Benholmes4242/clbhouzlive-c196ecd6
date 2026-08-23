@@ -11,6 +11,8 @@ import { autoplayBlocked } from './reviewVideoAutoplay';
 import { registerRailVideo } from './mediaRailAutoplay';
 import { attachTileHls } from './tileHlsPlayer';
 import type { CommunityVideo } from './hooks/useCommunityVideos';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useMediaImpression, type MediaTrackTarget } from '@/utils/mediaEngagement';
 
 import '@/styles/media-rail-bars.css';
 
@@ -219,6 +221,13 @@ interface TileProps {
   radius?: number;
   /** Discover-only badge geometry; Community retains its existing default. */
   badgeRadius?: number;
+  /**
+   * MEDIA ENGAGEMENT TARGET (BRIEF_MEDIA_TRACKING_MINIMUM). Present = this tile
+   * reports an impression at 50%/1s and an open on deliberate activation.
+   * ABSENT = the tile is silent, so an unwired surface cannot half-report and
+   * skew a ratio. Autoplay fires NEITHER event — election is the app's decision.
+   */
+  track?: MediaTrackTarget;
 }
 
 export function CommunityVideoTile({
@@ -228,7 +237,13 @@ export function CommunityVideoTile({
   width,
   radius = RADIUS,
   badgeRadius = 6,
+  track,
 }: TileProps) {
+  const impressionRef = useMediaImpression(track);
+  const open = () => {
+    if (track) analyticsEvents.media.opened(track);
+    onPress(item);
+  };
   // WHEN content IS EMPTY the poster's name takes the title slot and the meta
   // row drops the duplicate name, keeping the time and the likes.
   const hasTitle = item.title.length > 0;
