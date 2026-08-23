@@ -1937,8 +1937,7 @@ export function GolfThisWeek({
                               <span
                                 style={{
                                   ...NUMF,
-                                  paddingBottom: 2,
-                                  fontSize: 11,
+                                  fontSize: 13,
                                   lineHeight: 1,
                                   color: tile.accent,
                                 }}
