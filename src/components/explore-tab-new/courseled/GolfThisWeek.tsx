@@ -638,11 +638,28 @@ const SENTENCE_FALLBACK: Record<string, string> = {
   noHoles: 'A round played. The hole by hole detail was not recorded.',
 };
 
-type TFn = (k: string, d?: string, o?: object) => string;
+export type TFn = (k: string, d?: string, o?: object) => string;
 
-function momentLabel(m: Moment, t: TFn): string | null {
+export function momentLabel(m: Moment, t: TFn): string | null {
   if (!m.labelKey) return null;
   return t(`${MK}.label.${m.labelKey}`, LABEL_FALLBACK[m.labelKey]);
+}
+
+/**
+ * THE FIGURE'S WORDS, split off the ONE translatable template so a second
+ * surface (the page hero, BRIEF_DISCOVER_WORLD_CLASS §1) can print the same
+ * noun placement without owning a second copy of the templates. The rule is
+ * unchanged: an IDENTITY figure takes its noun BEFORE, a QUANTITY after.
+ */
+export function momentFigureParts(m: Moment, t: TFn): { before: string; after: string } {
+  if (m.figureKey == null) return { before: '', after: '' };
+  const template = t(`${MK}.figure.${m.figureKey}`, FIGURE_FALLBACK[m.figureKey]);
+  const idx = template.indexOf(FIGURE_PLACEHOLDER);
+  if (idx < 0) return { before: '', after: template };
+  return {
+    before: template.slice(0, idx).trim(),
+    after: template.slice(idx + FIGURE_PLACEHOLDER.length).trim(),
+  };
 }
 
 function momentSentence(m: Moment, t: TFn): string {
