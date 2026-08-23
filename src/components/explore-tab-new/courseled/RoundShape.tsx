@@ -8,7 +8,7 @@ import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes
 import { HAIRLINE_INK_12, INK_TINT_06, TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
-import { A } from './tokens';
+import { A, CHIP_RADIUS } from './tokens';
 
 /**
  * RoundShape — THE ONE round-shape renderer for the Discover friends surfaces
@@ -651,7 +651,7 @@ const BAND_ALPHA = 0.13;
 /** 2px above the cell, 3px below it (§3.3). */
 const BAND_ABOVE = 2;
 const BAND_BELOW = 3;
-const BAND_RADIUS = 4;
+const BAND_RADIUS = CHIP_RADIUS;
 /** The hole number's own box: 7px of line, then its 2.5px margin. The band's top
  *  edge sits BAND_ABOVE above the cell, so the clearance to the number's box is
  *  2.5 - BAND_ABOVE = 0.5px, and to the rendered glyph ~1.5px. */

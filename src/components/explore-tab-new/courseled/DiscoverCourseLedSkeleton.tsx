@@ -1,6 +1,13 @@
 import React from 'react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { CARD_SHELL } from './tokens';
+import {
+  CARD_RADIUS,
+  CARD_SHELL,
+  CHIP_RADIUS,
+  SCOPE_PILL_RADIUS,
+  THUMBNAIL_RADIUS,
+  WELL_RADIUS,
+} from './tokens';
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
@@ -228,7 +235,7 @@ export function GolfThisWeekRail() {
       </div>
       <div style={{ display: 'flex', gap: 8, padding: '2px 0 14px' }}>
         {[64, 74, 60, 56].map((w, i) => (
-          <Bar key={i} style={{ height: 34, width: w, borderRadius: 999 }} />
+          <Bar key={i} style={{ height: 34, width: w, borderRadius: SCOPE_PILL_RADIUS }} />
         ))}
       </div>
       {/* THE LEADER BAND IS THREE CHIPS, NOT A BORDERED STRIP
@@ -274,7 +281,7 @@ export function GolfThisWeekRail() {
             style={{
               background: A.PANEL,
               border: 'none',
-              borderRadius: 14,
+              borderRadius: CARD_RADIUS,
               boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
               overflow: 'hidden',
               flex: '1 0 230px',
@@ -308,7 +315,7 @@ export function GolfThisWeekRail() {
                   padding: '6px 12px',
                   margin: '0 -12px',
                   background: 'rgba(11,15,20,0.035)',
-                  borderRadius: 6,
+                  borderRadius: CHIP_RADIUS,
                   boxSizing: 'border-box',
                   display: 'flex',
                   alignItems: 'center',
@@ -425,7 +432,7 @@ export function GolfThisWeekRail() {
                   height: 139,
                   background: '#FFFFFF',
                   boxShadow: 'inset 0 0 0 1px rgba(11,15,20,0.07)',
-                  borderRadius: '0 0 16px 16px',
+                   borderRadius: `0 0 ${WELL_RADIUS}px ${WELL_RADIUS}px`,
                   padding: '6px 6px 9px',
                   boxSizing: 'border-box',
                 }}
@@ -470,7 +477,7 @@ export function GolfThisWeekRail() {
                         {Array.from({ length: 9 }, (_, c) => (
                           <Bar
                             key={c}
-                            style={{ height: 17, width: 17, borderRadius: 3 }}
+                            style={{ height: 17, width: 17, borderRadius: 999 }}
                           />
                         ))}
                       </div>
@@ -698,14 +705,14 @@ export function MostPlayedPanel() {
               height: 124,
               boxSizing: 'border-box',
               background: A.PANEL,
-              borderRadius: 16,
+              borderRadius: CARD_RADIUS,
               boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
               marginBottom: 10,
             }}
           >
             {/* NO RANK BAR (BRIEF_MOST_PLAYED_LEADERBOARD §S1.2) and a 52px
                 thumbnail to match the shipped header row. */}
-            <Bar style={{ height: 52, width: 52, borderRadius: 13, flexShrink: 0 }} />
+            <Bar style={{ height: 52, width: 52, borderRadius: THUMBNAIL_RADIUS, flexShrink: 0 }} />
             {/* BRIEF_COURSE_CARD_REGION_AND_BEST §4: the shell remains the
                 COLLAPSED state. Region and counts are separate 11px lines; the
                 BEST line sits below the same hairline as the live card. */}
@@ -795,7 +802,7 @@ export function HonoursPanel() {
               width: SK_CARD_W,
               height: SK_CARD_H,
               flex: 'none',
-              borderRadius: 15,
+              borderRadius: CARD_RADIUS,
               background: '#FFFFFF',
               boxShadow: '0 1px 3px rgba(11,15,20,0.06)',
               overflow: 'hidden',

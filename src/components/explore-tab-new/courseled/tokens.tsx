@@ -62,7 +62,7 @@ export function NewDot() {
         display: 'inline-block',
         width: 6,
         height: 6,
-        borderRadius: CHIP_RADIUS,
+        borderRadius: 999,
         background: A.INK,
         marginLeft: 6,
         verticalAlign: 'middle',
@@ -253,7 +253,7 @@ export function ImageChip({
         color: '#FFFFFF',
         background: 'rgba(10,14,10,0.55)',
         border: gold ? `1px solid ${GOLD}` : '1px solid transparent',
-        borderRadius: 999,
+        borderRadius: CHIP_RADIUS,
         padding: '3px 7px',
       }}
     >
