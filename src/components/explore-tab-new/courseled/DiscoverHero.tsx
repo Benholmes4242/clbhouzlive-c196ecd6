@@ -295,7 +295,7 @@ export function DiscoverHero({
             from the ONE translatable template — before an IDENTITY, after a
             QUANTITY — so a translator can still reorder. */}
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, minWidth: 0 }}>
-          {parts.before && <span style={heroWordStyle}>{parts.before}</span>}
+          {parts.before && <span style={wordStyle}>{parts.before}</span>}
           <CountUpFigure
             value={figure}
             format={isScore ? fmtRel : (n) => String(n)}
@@ -308,7 +308,7 @@ export function DiscoverHero({
               color: figureColor,
             }}
           />
-          {parts.after && <span style={heroWordStyle}>{parts.after}</span>}
+          {parts.after && <span style={wordStyle}>{parts.after}</span>}
         </div>
 
         <div
