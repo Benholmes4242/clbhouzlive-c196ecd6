@@ -1638,6 +1638,29 @@ export function GolfThisWeek({
     });
   }
 
+  const podiumGap = (tile: (typeof bandTiles)[number], gap: number) => {
+    if (gap === 0) return t('discover.golfThisWeek.gap.tied', 'TIED');
+    if (tile.gapKind === 'shots') {
+      return t('discover.golfThisWeek.gap.shots', '{{count}} SHOTS CLEAR', { count: gap });
+    }
+    if (tile.gapKind === 'points') {
+      return t('discover.golfThisWeek.gap.points', '{{count}} POINTS CLEAR', { count: gap });
+    }
+    return t('discover.golfThisWeek.gap.clear', '{{count}} CLEAR', { count: gap });
+  };
+
+  const podiumDeficit = (
+    tile: (typeof bandTiles)[number],
+    row: CircleRoundRow,
+  ) => {
+    const leaderValue = tile.valueOf(tile.row);
+    const rowValue = tile.valueOf(row);
+    const gap = tile.lowerWins ? rowValue - leaderValue : leaderValue - rowValue;
+    const precision = tile.key === 'improved' ? 1 : 0;
+    const magnitude = Math.abs(gap).toFixed(precision);
+    return `${tile.lowerWins ? '+' : '\u2212'}${magnitude}`;
+  };
+
 
 
 
@@ -1848,183 +1871,217 @@ export function GolfThisWeek({
                 ) : null}
               </div>
 
-              {/* ONE LADDER (§1). The hero block is DISSOLVED: every row —
-                  including the leader's — has the same columns in the same
-                  order, RANK, FIGURE, AVATAR, NAME, CHEVRON, and the figure
-                  column is FIXED WIDTH and LEFT-ALIGNED so 68 / 73 / 77 stack
-                  down one edge (its width MEASURED per tile, §3). The leader's
-                  row is not BIGGER: BRIEF_BAND_TILES_LADDER_TIGHTEN drops its
-                  figure to row size and marks first place three ways instead —
-                  weight 800, an inked rank digit and a light ground on the row.
-                  Its avatar stays 20 against 16; it costs no column width. */}
+              {/* BRIEF_BAND_TILES_PODIUM — one leader with a face, the margin,
+                  then up to two chasers. No field-relative progress bar: the
+                  exact deficit is the comparison. */}
               <div
                 style={{
                   marginTop: 8,
                   display: 'flex',
                   flexDirection: 'column',
+                  alignItems: 'stretch',
                 }}
               >
-                {[tile.row, ...tile.runners].map((r, i) => {
-                  const f = tile.figureOf(r);
-                  const lead = i === 0;
-                  /* §3 — MEASURED, NOT GUESSED. The column takes this tile's own
-                     widest printed figure (plus its to-par where it has one) at
-                     the new sizes, floored by the tile's worst case so the
-                     ladder cannot shift a digit's width when the scope pill
-                     changes the data. Rows 2 and 3 no longer pay for a leader's
-                     size, and a tile without a qualifier reserves no room for
-                     one — which is what closed the gap on BEST STABLEFORD. */
-                  const figCol = bandFigureColumnWidth([
-                    ...[tile.row, ...tile.runners].map(tile.figureOf),
-                    ...(tile.figureFloor ? [tile.figureFloor] : []),
-                  ]);
+                {(() => {
+                  const leaderFigure = tile.figureOf(tile.row);
+                  const second = tile.runners[0];
+                  const gap = second
+                    ? Math.abs(tile.valueOf(tile.row) - tile.valueOf(second))
+                    : null;
                   return (
-                    <div
-                      key={r.round_id}
-                      /* §3 — EVERY ROW IS TAPPABLE, INCLUDING THE LEADER'S, and
-                         the chip around them is itself role="button" with an
-                         onClick and an Enter/Space handler. Without
-                         stopPropagation a row tap would open TWO scorecards. */
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onCardPress(r);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          onCardPress(r);
-                        }
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        minWidth: 0,
-                        cursor: 'pointer',
-                        /* UNIFORM DIVIDERS (§1): the same hairline between every
-                           pair of rows, none above the leader. */
-                        borderTop: lead ? 'none' : `1px solid ${WELL_RULE}`,
-                        /* §3.1 (BRIEF_DISCOVER_WORLD_CLASS) — THE LEADER'S
-                           GROUND WAS RAISED FROM WHITE_ALPHA_04 TO
-                           WHITE_ALPHA_12. The 4% value was tuned on the retired
-                           white canvas: composited over A.PANEL (#1B1E27) it
-                           lands on #24272F, a relative-luminance step of
-                           0.0136 -> 0.0187 — about 0.5:1 of contrast, which is
-                           to say none. 12% lands on #36393F, L 0.0136 -> 0.0416,
-                           roughly a 3x step and plainly the top row at arm's
-                           length. Same converted-value / unconverted-relationship
-                           fault Part C §1 found on the bogey ground. It is an
-                           EXISTING token — no new value. */
-                        background: lead ? WHITE_ALPHA_12 : undefined,
-                        borderRadius: lead ? CHIP_RADIUS : undefined,
-                        margin: lead ? '0 -12px' : undefined,
-                        padding: lead ? '6px 12px' : '8px 0',
-                      }}
-                    >
-                      {/* EVERY ROW CARRIES ITS RANK (§1) — the leader's 1 is
-                          PRESENT, not implied. It sits in its own 7px column at
-                          the ladder's left edge so all three digits align.
-                          §4.2 — the leader's digit takes INK; 2 and 3 stay
-                          faint. */}
-                      <span
-                        style={{
-                          fontSize: 8,
-                          fontWeight: 700,
-                          lineHeight: 1,
-                          color: lead ? INK : BAND_FAINT,
-                          fontVariantNumeric: 'tabular-nums lining-nums',
-                          width: 7,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {i + 1}
-                      </span>
-
-                      {/* THE FIGURE COLUMN — measured width, left-aligned, one
-                          width for the whole tile so the three figures stack on
-                          a single left edge. */}
+                    <>
                       <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCardPress(tile.row);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onCardPress(tile.row);
+                          }
+                        }}
                         style={{
-                          width: figCol,
-                          flexShrink: 0,
-                          /* §2 — the to-par is BOTTOM-ALIGNED with the gross, so
-                              its foot sits level and it reads as tucked under the
-                              gross's right shoulder rather than as a second
-                              column on the same baseline. */
-                          display: 'flex',
-                          alignItems: 'flex-end',
-                          gap: BAND_QUAL_GAP,
-                          minWidth: 0,
+                          display: 'grid',
+                          gridTemplateColumns: '40px minmax(0, 1fr)',
+                          alignItems: 'center',
+                          columnGap: 10,
+                          minHeight: 64,
+                          cursor: 'pointer',
                         }}
                       >
-                        {/* §1 — EVERY FIGURE IS ROW SIZE. The leader is BOLD, not
-                            BIG: 800 against 700 at the same 12px. Charging the
-                            leader's size to every name in the tile is what made
-                            real account names truncate. */}
                         <span
                           style={{
-                            fontSize: BAND_FIG_SIZE,
-                            fontWeight: lead ? 800 : 700,
-                            lineHeight: 1,
-                            fontVariantNumeric: 'tabular-nums lining-nums',
-                            color: f.tone,
+                            width: 40,
+                            height: 40,
+                            padding: 3.5,
+                            boxSizing: 'border-box',
+                            borderRadius: '34%',
+                            background: tile.accent,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                           }}
                         >
-                          {f.text}
+                          <SquircleAvatar
+                            src={tile.row.profile_photo_url}
+                            userId={tile.row.user_id}
+                            alt={tile.row.display_name}
+                            size={33}
+                            hideRing
+                          />
                         </span>
-                        {f.qual ? (
+                        <span style={{ minWidth: 0 }}>
                           <span
                             style={{
-                              fontSize: BAND_QUAL_SIZE,
-                              fontWeight: 700,
-                              lineHeight: 1,
-                              fontVariantNumeric: 'tabular-nums lining-nums',
-                              color: f.qualTone ?? A.MUTE,
-                              whiteSpace: 'nowrap',
+                              display: 'flex',
+                              alignItems: 'flex-end',
+                              gap: 4,
+                              color: tile.accent,
                             }}
                           >
-                            {f.qual}
+                            <span
+                              style={{
+                                ...NUMF,
+                                fontSize: 34,
+                                fontWeight: 700,
+                                lineHeight: 0.92,
+                                color: tile.accent,
+                              }}
+                            >
+                              {leaderFigure.text}
+                            </span>
+                            {leaderFigure.qual ? (
+                              <span
+                                style={{
+                                  ...NUMF,
+                                  paddingBottom: 2,
+                                  fontSize: 11,
+                                  lineHeight: 1,
+                                  color: tile.accent,
+                                }}
+                              >
+                                {leaderFigure.qual}
+                              </span>
+                            ) : null}
                           </span>
-                        ) : null}
+                          <span
+                            style={{
+                              display: 'block',
+                              marginTop: 5,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              fontSize: 12,
+                              fontWeight: 700,
+                              lineHeight: 1,
+                              color: tile.row.is_self ? AMBER : INK,
+                            }}
+                          >
+                            {tile.row.display_name}
+                          </span>
+                        </span>
                       </div>
 
-
-                      <SquircleAvatar
-                        src={r.profile_photo_url}
-                        userId={r.user_id}
-                        alt={r.display_name}
-                        size={16}
-                        hideRing
-                      />
-                      <span
-                        style={{
-                          flex: 1,
-                          minWidth: 0,
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: INK,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {r.display_name}
-                      </span>
-                      {/* THE CHEVRON IS ON EVERY ROW (§0.3). On the leader alone
-                          it read as that member's mark rather than the card's
-                          affordance, while all three rows were tappable. */}
-                      <ChevronRight
-                        size={9}
-                        strokeWidth={3}
-                        color={INK}
-                        style={{ flexShrink: 0 }}
-                      />
-                    </div>
+                      {gap != null ? (
+                        <>
+                          <div style={{ marginTop: 8 }}>
+                            <span
+                              className="tabular-nums"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                minHeight: 20,
+                                padding: '4px 7px',
+                                boxSizing: 'border-box',
+                                borderRadius: CHIP_RADIUS,
+                                background: gap === 0 ? PODIUM_GROUND.tie : tile.chipGround,
+                                color: gap === 0 ? DISCOVER_QUIET : tile.accent,
+                                fontSize: 8,
+                                fontWeight: 700,
+                                lineHeight: 1,
+                                letterSpacing: '0.08em',
+                                textTransform: 'uppercase',
+                              }}
+                            >
+                              {podiumGap(tile, gap)}
+                            </span>
+                          </div>
+                          <div style={{ height: 1, background: WELL_RULE, margin: '12px 0 0' }} />
+                          {tile.runners.map((r, i) => {
+                            const figure = tile.figureOf(r);
+                            return (
+                              <div
+                                key={r.round_id}
+                                role="button"
+                                tabIndex={0}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onCardPress(r);
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onCardPress(r);
+                                  }
+                                }}
+                                style={{
+                                  display: 'grid',
+                                  gridTemplateColumns: '12px 16px minmax(0, 1fr) auto auto',
+                                  alignItems: 'center',
+                                  gap: 6,
+                                  minHeight: 34,
+                                  borderTop: i === 0 ? 'none' : `1px solid ${WELL_RULE}`,
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                <span style={{ fontSize: 8, fontWeight: 700, color: BAND_FAINT }}>
+                                  {i + 2}
+                                </span>
+                                <SquircleAvatar
+                                  src={r.profile_photo_url}
+                                  userId={r.user_id}
+                                  alt={r.display_name}
+                                  size={16}
+                                  hideRing
+                                />
+                                <span
+                                  style={{
+                                    minWidth: 0,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    color: r.is_self ? AMBER : INK,
+                                  }}
+                                >
+                                  {r.display_name}
+                                </span>
+                                <span
+                                  className="tabular-nums"
+                                  style={{ fontSize: 11, fontWeight: 700, color: tile.accent }}
+                                >
+                                  {figure.text}
+                                </span>
+                                <span
+                                  className="tabular-nums"
+                                  style={{ fontSize: 10, fontWeight: 700, color: DISCOVER_QUIET }}
+                                >
+                                  {podiumDeficit(tile, r)}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </>
+                      ) : null}
+                    </>
                   );
-                })}
+                })()}
               </div>
               {/* §1.1/§1.2 (BRIEF_DISCOVER_FINISHING_PASS) — THE COURSE LINE IS
                   GONE. This OVERTURNS BRIEF_BAND_TILES_REFINEMENT ("the bottom
