@@ -5,7 +5,7 @@ import { Medal } from 'lucide-react';
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, LABEL, NUMF, SANS, SECTION_TITLE, InkAction } from './tokens';
+import { A, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 
 /**
