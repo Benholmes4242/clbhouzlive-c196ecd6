@@ -117,7 +117,7 @@ function EyebrowBar({ w = 150, aside = false }: { w?: number; aside?: boolean })
           display: 'flex',
           alignItems: 'center',
           padding: '0 2px',
-          height: 10,
+          height: 20,
         }}
       >
         <Bar style={{ height: 9, width: w }} />

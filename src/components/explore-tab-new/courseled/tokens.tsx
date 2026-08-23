@@ -170,7 +170,7 @@ export function Eyebrow({
 }
 
 export function Aside({ children }: { children: React.ReactNode }) {
-  return <span style={LABEL}>{children}</span>;
+  return <span style={{ ...LABEL, lineHeight: 1 }}>{children}</span>;
 }
 
 export function InkAction({
@@ -190,6 +190,7 @@ export function InkAction({
         gap: 4,
         ...LABEL,
         fontSize: 10,
+        lineHeight: 1,
         color: A.INK,
         background: 'transparent',
         border: 'none',
