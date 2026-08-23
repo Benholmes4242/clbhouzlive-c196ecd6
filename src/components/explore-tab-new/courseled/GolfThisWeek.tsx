@@ -219,24 +219,6 @@ const WELL_H = 139 + SHAPE_BLOCK_H;
 const CARD_MIN_H = 331 + SHAPE_BLOCK_H;
 
 /**
- * THE RAIL SCALE — NOT A CHART DEFAULT (AMENDMENT 1 §A2).
- *
- * −6 … +20, passed as TrajectoryLine's `yDomain` by THIS RAIL ONLY. A sixth
- * caller must not inherit it by accident: the constant is local, the prop is
- * optional and absent means self-scaling exactly as before.
- *
- * WHY ASYMMETRIC: measured over 3,270 rounds (2026-08-23), the worst round runs
- * to +36 and the best to −8, so a symmetric domain spends nearly half the plot
- * on ground no round has ever occupied — which flattens every good round, the
- * same failure self-scaling produces from the other direction. The brief's
- * suggested ±12 clamped 25.4% of rounds. −6 … +20 clamps 4.3% high and 0.15%
- * low, and a clamped round draws to the ceiling rather than rescaling the rail.
- *
- * RE-MEASURE ANNUALLY, or whenever the member base changes shape.
- */
-const RAIL_Y_DOMAIN: [number, number] = [-6, 20];
-
-/**
  * THE FILLS ARE MIXED ON THE WELL, NOT ON THE PANEL (§A5). TrajectoryLine's dark
  * fillOver/fillUnder are solids pre-mixed on #0B0D10 and are CORRECT on the four
  * surfaces that use them; the well is rgba(11,13,16,0.66) over the card, a
@@ -1297,23 +1279,13 @@ function GolfThisWeekCard({
               THE EXISTING TrajectoryLine, IMPORTED — not a second curve. Its own
               colour rules govern and are not overridden: the graded stroke, the
               level-par fill split, earned red, and gold-only beads. THE WINNER'S
-              GOLD DOES NOT RECOLOUR IT. The only things this caller supplies are
-              geometry (height, viewWidth, no ticks), the RAIL's fixed y domain,
-              and the fills mixed on the well (§A5).
+              GOLD DOES NOT RECOLOUR IT. It uses TrajectoryLine's native
+              per-round self-scaling, matching Clubhouse. The only things this
+              caller supplies are geometry (height, viewWidth, no ticks) and the
+              fills mixed on the well (§A5).
               NOT "ENERGY", NOT "POWER", NOT "FORM" — THE SHAPE. */}
           <div style={{ height: SHAPE_BLOCK_H, boxSizing: 'border-box', paddingTop: 4 }}>
             <div style={{ height: SHAPE_H, position: 'relative' }}>
-              {/* THE LEVEL-PAR BASELINE, dashed, at the domain's zero. */}
-              <div
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  top: `${(RAIL_Y_DOMAIN[1] / (RAIL_Y_DOMAIN[1] - RAIL_Y_DOMAIN[0])) * 100}%`,
-                  borderTop: `1px dashed ${A.HAIRLINE}`,
-                }}
-              />
               {shape && (
                 <TrajectoryLine
                   holes={shape.holes}
@@ -1323,7 +1295,6 @@ function GolfThisWeekCard({
                   showTicks={false}
                   padY={0}
                   strokeWidth={1.6}
-                  yDomain={RAIL_Y_DOMAIN}
                   fillOverColor={SHAPE_FILL_OVER}
                   fillUnderColor={SHAPE_FILL_UNDER}
                 />
