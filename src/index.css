@@ -2596,29 +2596,29 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   /* Clubhouse now inherits the global light tokens — no dark overrides. */
 
-  /* Light theme reset - forces light mode for components that need it regardless of page theme */
-  /* Used by Post Wizard, Review Wizard, and other modals that should always be light */
+  /* Legacy forced-theme scope. Dark-only keeps the selector for compatibility,
+     but its semantic roles now resolve to the global dark palette. */
   .light,
   .light * {
-    --background: 210 40% 98%;
-    --foreground: 210 13% 18%;
-    --card: 0 0% 100%;
-    --card-foreground: 210 13% 18%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 13% 18%;
-    --primary: 210 13% 18%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 210 13% 18%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 210 13% 18%;
+    --background: 225 11% 10%;
+    --foreground: 210 40% 98%;
+    --card: 227 18% 13%;
+    --card-foreground: 210 40% 98%;
+    --popover: 227 18% 13%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 31 93% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 17% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 17% 18%;
+    --muted-foreground: 210 40% 98% / 0.62;
+    --accent: 31 93% 54%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 210 13% 18%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 100% / 0.10;
+    --input: 0 0% 100% / 0.10;
+    --ring: 31 93% 54%;
   }
 
   body.route-hub,
@@ -2835,26 +2835,26 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 
   .dark {
-    /* Dark mode tokens (currently disabled - app is dark-only) */
-    --background: 210 20% 96%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 7.8%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 10.2%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
+    /* Legacy dark scope now matches the dark-only semantic baseline. */
+    --background: 225 11% 10%;
+    --foreground: 210 40% 98%;
+    --card: 227 18% 13%;
+    --card-foreground: 210 40% 98%;
+    --popover: 227 18% 13%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 31 93% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 17% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 17% 18%;
+    --muted-foreground: 210 40% 98% / 0.62;
     --accent: 31 93% 54%;
-    --accent-foreground: 210 20% 98%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 14.9%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 100% / 0.10;
+    --input: 0 0% 100% / 0.10;
+    --ring: 31 93% 54%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
