@@ -19,15 +19,15 @@ import { SURFACE } from '@/lib/tokens/surface';
 /** Dark ink ramp of record for this area. Identical to A.INK / BODY / MUTE / DIM. */
 export const INK = SURFACE.dark;
 
+/** Amendment 1: Discover content is white; interface labels are one quiet tier. */
+export const DISCOVER_FACT = '#FFFFFF';
+export const DISCOVER_QUIET = 'rgba(255,255,255,0.70)';
+
 export const KICKER: React.CSSProperties = { ...KICKER_LEGACY, fontWeight: 700, color: DISCOVER_QUIET };
 export const LABEL: React.CSSProperties = { ...LABEL_LEGACY, fontWeight: 700, color: DISCOVER_QUIET };
 
 export const GOLD = '#D8A93C';
 export { A, SANS, FIGS };
-
-/** Amendment 1: Discover content is white; interface labels are one quiet tier. */
-export const DISCOVER_FACT = '#FFFFFF';
-export const DISCOVER_QUIET = 'rgba(255,255,255,0.70)';
 
 /** Discover content geometry: one master, all subordinate radii derived. */
 export const CARD_RADIUS = 8;
