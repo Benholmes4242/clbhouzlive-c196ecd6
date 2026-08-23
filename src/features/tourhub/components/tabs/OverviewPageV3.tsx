@@ -58,10 +58,8 @@ export function OverviewPageV3() {
             See OverviewHero.tsx. */}
         <OverviewHero />
 
-        {/* Cohesion unit: VenueRecordBand + Schedule sit in a tight 14px
-            group directly under the hero, keyed to viewingTournamentId so they
-            crossfade together in step with the hero. The larger sectionSection
-            gap that follows is what makes this unit read as one. */}
+        {/* Cohesion unit: VenueRecordBand sits directly under the hero, keyed
+            to viewingTournamentId so it crossfades in step with the hero. */}
         <AnimatePresence mode="wait">
           <motion.div
             key={viewingTournamentId ?? 'none'}
@@ -69,15 +67,10 @@ export function OverviewPageV3() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            /* On a live slide the dark hero block ends with a straight edge
-               directly above this — the canvas must BREATHE before the Schedule,
-               so the gap is real (24), not the old 2px seam. */
             style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: viewingIsLive ? 24 : 12 }}
           >
             <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
-            <ComingUpSlot />
           </motion.div>
-
         </AnimatePresence>
 
         <div
