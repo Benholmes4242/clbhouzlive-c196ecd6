@@ -24,6 +24,7 @@ import YourCourseAnalyticsSheet from './components/YourCourseAnalyticsSheet';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Profile {
   id: string;
@@ -53,8 +54,8 @@ export interface ProfileSheetV2Props {
   isLoading?: boolean;
 }
 
-const SHEET_BG = '#F8FAFC';
-const SKELETON_TILE = 'rgba(0,0,0,0.06)';
+const SHEET_BG = A.CANVAS;
+const SKELETON_TILE = A.TRACK;
 
 function SheetSkeleton() {
   const block = (h: number, style: React.CSSProperties = {}) => (
@@ -270,7 +271,7 @@ export default function ProfileSheetV2({
                 width: 40,
                 height: 4.5,
                 borderRadius: 999,
-                background: 'rgba(15,23,42,0.15)',
+                background: A.BORDER,
               }}
             />
           </div>

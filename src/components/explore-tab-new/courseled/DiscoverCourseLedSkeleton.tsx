@@ -8,7 +8,8 @@ import {
   THUMBNAIL_RADIUS,
   WELL_RADIUS,
 } from './tokens';
-import { GOLD_TINT_10, WHITE_ALPHA_04 } from '@/features/tourhub/_shared/tokens';
+import { WHITE_ALPHA_04 } from '@/features/tourhub/_shared/tokens';
+import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
@@ -810,7 +811,9 @@ export function HonoursPanel() {
             <div
               style={{
                 height: SK_HEAD_H,
-                background: i === 0 ? GOLD_TINT_10 : A.PANEL,
+                background: i === 0
+                  ? `linear-gradient(135deg, color-mix(in srgb, ${SC_FILL_GOLD} 30%, ${A.PANEL}), color-mix(in srgb, ${SC_FILL_GOLD} 18%, ${A.PANEL}))`
+                  : A.PANEL,
                 padding: '11px 12px 12px',
                 boxSizing: 'border-box',
                 display: 'flex',
