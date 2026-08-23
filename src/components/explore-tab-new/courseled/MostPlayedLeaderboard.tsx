@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ArrowDown, ArrowUp, ChevronDown, Trophy } from 'lucide-react';
+import { ArrowUp, ChevronDown, Trophy } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
@@ -77,9 +77,9 @@ function formatToPar(v: number): string {
 }
 
 /**
- * MOVEMENT — a MOVEMENT, not a score: INDEX_DELTA.light green up / red down.
- * NEW is amber (the absence of a prior week), LEVEL is dim. Absolute figures
- * only; a percentage at this volume would lie (see §5).
+ * MOVEMENT IS AN EVENTS-ONLY SLOT: more rounds than last week, or a course
+ * nobody played last week. Down and level are silent; neither is evidence of
+ * somebody doing worse, and silence is the default. Absolute figures only.
  */
 function MoveMark({
   row,
@@ -96,17 +96,14 @@ function MoveMark({
     gap: 2,
     fontSize: 9,
     fontVariantNumeric: 'tabular-nums lining-nums',
+    marginRight: 7,
   };
   if (row.move === 'new')
     return <span style={{ ...base, color: A.AMBER }}>{t('discover.mostPlayedNew', 'New')}</span>;
-  if (row.move === 'level')
-    return <span style={{ ...base, color: A.DIM }}>{t('discover.mostPlayedLevel', 'Level')}</span>;
-  const up = row.move === 'up';
-  const color = up ? INDEX_DELTA.light.improved : INDEX_DELTA.light.drifted;
-  const Icon = up ? ArrowUp : ArrowDown;
+  if (row.move !== 'up') return null;
   return (
-    <span style={{ ...base, color }}>
-      <Icon size={9} strokeWidth={2.75} />
+    <span style={{ ...base, color: INDEX_DELTA.light.improved }}>
+      <ArrowUp size={9} strokeWidth={2.75} />
       {formatNumber(Math.abs(row.change))}
     </span>
   );
@@ -669,6 +666,11 @@ export function MostPlayedLeaderboard({
                       })}
                     </span>
 
+                     {/* Week-on-week events modify the round count, so this
+                         slot belongs before the separator. Down and level
+                         return null and reserve no width. */}
+                     <MoveMark row={r} t={t} />
+
                     {/* §1 — THE GOLFER COUNT, a SECOND FACT ON THE SAME LINE in
                         the same 11 / 700 / A.INK and the same dot separator.
                         IT IS `players.length`, NOT `members`: members counts ids
@@ -707,84 +709,7 @@ export function MostPlayedLeaderboard({
                       </>
                     )}
 
-                    {/* §S1.6 / §S2.3 — THE MOVEMENT MARKER KEEPS ITS EXISTING
-                        TONES: green on a rise, amber on NEW, ghost on LEVEL. */}
-                    <MoveMark row={r} t={t} />
                   </span>
-
-                   {/* §2 — A SINGLE-SOURCE BEST FACT. Do not substitute
-                       r.bestGross: that may belong to a member whose profile did
-                       not resolve, while every value and the name here belong to
-                       players[0]. No player means no line and no reserved space. */}
-                   {bestPlayer && (
-                     <span
-                       style={{
-                         display: 'flex',
-                         alignItems: 'baseline',
-                         gap: 6,
-                         minWidth: 0,
-                         marginTop: 6,
-                         paddingTop: 6,
-                         borderTop: `1px solid ${A.HAIRLINE}`,
-                       }}
-                     >
-                       <span
-                         style={{
-                           flex: 'none',
-                           fontSize: 9,
-                           fontWeight: 700,
-                           lineHeight: 1,
-                           letterSpacing: '0.14em',
-                           textTransform: 'uppercase',
-                           color: FAINT,
-                         }}
-                       >
-                         {t('discover.mostPlayedBest', 'best')}
-                       </span>
-                       <span
-                         style={{
-                           flex: 'none',
-                           fontSize: 12,
-                           fontWeight: 700,
-                           lineHeight: 1.2,
-                           color: A.INK,
-                           fontVariantNumeric: 'tabular-nums lining-nums',
-                         }}
-                       >
-                         {bestPlayer.gross != null ? formatNumber(bestPlayer.gross) : ''}
-                       </span>
-                       <span
-                         style={{
-                           flex: 'none',
-                           fontSize: 10,
-                           fontWeight: 700,
-                           lineHeight: 1.2,
-                           color:
-                             bestPlayer.toPar != null && bestPlayer.toPar < 0
-                               ? TOPAR_RED
-                               : MID,
-                           fontVariantNumeric: 'tabular-nums lining-nums',
-                         }}
-                       >
-                         {bestPlayer.toPar != null ? formatRelInt(bestPlayer.toPar) : ''}
-                       </span>
-                       <span
-                         style={{
-                           flex: 1,
-                           minWidth: 0,
-                           fontSize: 12,
-                           fontWeight: 700,
-                           lineHeight: 1.2,
-                           color: A.INK,
-                           overflow: 'hidden',
-                           textOverflow: 'ellipsis',
-                           whiteSpace: 'nowrap',
-                         }}
-                       >
-                         {bestPlayer.name}
-                       </span>
-                     </span>
-                   )}
                  </span>
                 {/* §S1.5 — "PLAYED TO" IS PROMOTED: 19px / 800 on the right of
                     the header with an 8px label beneath. It is the row's
@@ -835,9 +760,37 @@ export function MostPlayedLeaderboard({
                   }}
                 />
               </div>
+              {/* LOW summarises the whole card, so it spans beneath the entire
+                  header rather than being constrained by thumbnail and score. */}
+              {bestPlayer && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 6,
+                    minWidth: 0,
+                    padding: '7px 0 10px',
+                    borderTop: `1px solid ${A.HAIRLINE}`,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span style={{ flex: 'none', fontSize: 9, fontWeight: 700, lineHeight: 1, letterSpacing: '0.14em', textTransform: 'uppercase', color: FAINT }}>
+                    {t('discover.mostPlayedLow', 'Low')}
+                  </span>
+                  <span style={{ flex: 'none', fontSize: 12, fontWeight: 700, lineHeight: 1.2, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                    {bestPlayer.gross != null ? formatNumber(bestPlayer.gross) : ''}
+                  </span>
+                  <span style={{ flex: 'none', fontSize: 10, fontWeight: 700, lineHeight: 1.2, color: bestPlayer.toPar != null && bestPlayer.toPar < 0 ? TOPAR_RED : MID, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                    {bestPlayer.toPar != null ? formatRelInt(bestPlayer.toPar) : ''}
+                  </span>
+                  <span style={{ flex: 'none', minWidth: 0, fontSize: 12, fontWeight: 700, lineHeight: 1.2, color: A.INK }}>
+                    {bestPlayer.name}
+                  </span>
+                </div>
+              )}
               {open && <div style={{ height: 1, margin: '0 -14px', background: A.BORDER }} />}
 
-              {/* The BEST line is part of this disclosure header and has no
+              {/* The LOW line is part of this disclosure header and has no
                   nested target. A tap anywhere here expands the board. */}
               {/* §S1.5 — the divider between a header and ITS OWN expanded
                   board stays: that one is inside a single object. */}
