@@ -97,7 +97,7 @@ function Bar({
   return (
     <div
       className={`clb-shimmer-light ${className ?? ''}`}
-      style={{ backgroundColor: A.TRACK, borderRadius: 6, ...style }}
+      style={{ backgroundColor: A.TRACK, borderRadius: CHIP_RADIUS, ...style }}
     />
   );
 }
@@ -821,7 +821,7 @@ export function HonoursPanel() {
                 gap: 6,
               }}
             >
-              <Bar style={{ height: 26, width: 96, borderRadius: 6 }} />
+              <Bar style={{ height: 26, width: 96, borderRadius: CHIP_RADIUS }} />
               <TextBar w={78} h={11} />
             </div>
             <div
@@ -837,7 +837,7 @@ export function HonoursPanel() {
             >
               <TextBar w={112} h={13} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                <Bar style={{ height: 20, width: 20, borderRadius: 7, flexShrink: 0 }} />
+                <Bar style={{ height: 20, width: 20, borderRadius: '34%', flexShrink: 0 }} />
                 <TextBar w={84} h={12} />
               </div>
             </div>
