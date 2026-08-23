@@ -105,7 +105,7 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     expect(screen.getByText('152').style.color).toBe(ink);
     expect(screen.getByText('YARDS').style.color).toBe(ink);
     expect(screen.getByText(/Par 3/).style.color).toBe(ink);
-    expect(screen.getByText('2024').style.color).toBe(METAL_YEAR);
+    expect(screen.getByText('2024').style.color).toBe('rgba(15, 23, 42, 0.8)');
   });
 
   it('shows no photograph on any card', () => {
