@@ -593,7 +593,7 @@ const FIGURE_FALLBACK: Record<string, string> = {
   hole: `HOLE ${FIGURE_PLACEHOLDER}`,
   holes: `${FIGURE_PLACEHOLDER} HOLES`,
   inThree: `${FIGURE_PLACEHOLDER} IN THREE`,
-  inARow: `${FIGURE_PLACEHOLDER} IN A ROW`,
+  inARow: `${FIGURE_PLACEHOLDER} PARS IN A ROW`,
   /* A QUANTITY TAKES ITS NOUN AFTER THE FIGURE (§S2.6). */
   birdies: `${FIGURE_PLACEHOLDER} BIRDIES`,
 };
@@ -689,6 +689,12 @@ function FigureLine({
      resolves through the SAME getScoreColor call, so under par is the dark
      under-par red and level/over is ink-on-dark. No new value, no new rule; the
      member row's figures directly beneath already did this and are untouched. */
+  /* THE RUN'S FIGURE AND NOUN ARE GREEN (BRIEF_RUN_GREEN_FIGURE). The run is a
+     positive streak, so its quantity figure and the surrounding words take the
+     same falling-index green as the eyebrow — the one moment where a quantity
+     carries the moment's own colour. */
+  const runGreen = moment.kind === 'run' ? ROW_DARK_INDEX_FELL : null;
+
   const numStyle: React.CSSProperties = {
     ...NUMF,
     fontSize: 46,
@@ -696,13 +702,14 @@ function FigureLine({
     lineHeight: 1,
     letterSpacing: '-0.06em',
     /* Tile-hero figures are white to match the course name above, EXCEPT a
-       score figure that carries to-par meaning. FINISHED IN THE RED's figure
-       IS the round's to-par, so it shares the same under-par red as the label
-       and the birdie circles in the well. */
+       score figure that carries to-par meaning (under-par red) and a RUN
+       figure (green). FINISHED IN THE RED's figure IS the round's to-par, so
+       it shares the same under-par red as the label and the birdie circles. */
     color:
-      moment.figureRole === 'score' && moment.figure != null && moment.figure < 0
+      runGreen ??
+      (moment.figureRole === 'score' && moment.figure != null && moment.figure < 0
         ? FINISHED_IN_RED_TONE
-        : DISCOVER_FACT,
+        : DISCOVER_FACT),
   };
 
   const wordStyle: React.CSSProperties = {
@@ -711,7 +718,7 @@ function FigureLine({
     letterSpacing: '0.14em',
     lineHeight: 1,
     textTransform: 'uppercase',
-    color: DISCOVER_FACT,
+    color: runGreen ?? DISCOVER_FACT,
   };
 
   if (moment.figureRole === 'score' && moment.figure != null) {

@@ -1103,7 +1103,7 @@
           "hole": "{n}번 홀",
           "holes": "{n} 홀",
           "inThree": "3홀 중 {n}",
-          "inARow": "{n} 연속",
+          "inARow": "{n} 파 연속",
           "birdies": "버디 {n}개"
         },
         "sentence": {
