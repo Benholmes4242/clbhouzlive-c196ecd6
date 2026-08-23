@@ -1,3 +1,5 @@
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+
 /**
  * THE ROUND'S MOMENT — the pure selector (BRIEF_ROUND_MOMENTS_V3 §2).
  *
@@ -124,8 +126,6 @@ export interface Moment {
  * It is clear of every other tone in the table and of the canonical birdie red.
  */
 export const BIRDIE_HAUL_TONE_PROVISIONAL = '#B58CFF';
-
-import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
 /** Exact shared red used by filled birdie circles on Clubhouse dark scorecards. */
 export const FINISHED_IN_RED_TONE = TOPAR_UNDER_DARK;
