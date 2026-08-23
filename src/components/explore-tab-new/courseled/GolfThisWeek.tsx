@@ -695,11 +695,14 @@ export function momentSentence(m: Moment, t: TFn): string {
 function FigureLine({
   moment,
   gross,
+  grossToPar,
   toParText,
   t,
 }: {
   moment: Moment;
   gross: number | null;
+  /** The gross's own to-par. Drives §2's colour on the PLAIN card. */
+  grossToPar: number | null;
   toParText: string | null;
   t: TFn;
 }) {
@@ -708,8 +711,14 @@ function FigureLine({
      "8 IN A ROW" in green would be decoration, and §S1.4 exists to stop exactly
      that. A SCORE carries a to-par meaning — on FINISHED IN THE RED the figure
      IS the round's to-par — so colouring it is the same rule that puts the red
-     on BEST THIS WEEK's -3. PLAIN's tone is white, so it is unchanged. The
-     NOUN and the sentence stay as they are. */
+     on BEST THIS WEEK's -3. The NOUN and the sentence stay as they are.
+
+     BRIEF_DISCOVER_WORLD_CLASS §2 EXTENDS THIS TO THE PLAIN CARD'S GROSS. A
+     gross IS a score — 83 and 78 were the largest numerals on the page and both
+     rendered the same white, so a +12 looked exactly as good as a −3. It now
+     resolves through the SAME getScoreColor call, so under par is the dark
+     under-par red and level/over is ink-on-dark. No new value, no new rule; the
+     member row's figures directly beneath already did this and are untouched. */
   const numStyle: React.CSSProperties = {
     ...NUMF,
     fontSize: 46,
@@ -746,10 +755,22 @@ function FigureLine({
   }
 
   if (moment.figureKey == null || moment.figure == null) {
-    /* PLAIN: the gross, with the to-par beside it on the same line. */
+    /* PLAIN: the gross, with the to-par beside it on the same line. §2 — the
+       gross is a SCORE, so it takes the to-par grammar. A gross with no par to
+       measure it against is not a score and stays white. */
     return (
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, minWidth: 0 }}>
-        <span style={numStyle}>{gross ?? '\u2014'}</span>
+        <span
+          style={{
+            ...numStyle,
+            color:
+              grossToPar != null
+                ? getScoreColor(grossToPar, 'dark', 'standard')
+                : numStyle.color,
+          }}
+        >
+          {gross ?? '\u2014'}
+        </span>
         {toParText && <span style={{ ...wordStyle, letterSpacing: '0.06em' }}>{toParText}</span>}
       </div>
     );
