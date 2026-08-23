@@ -1303,6 +1303,14 @@ interface Props {
   onRegionChange?: (sel: RegionSelection | null) => void;
   onCardPress: (r: CircleRoundRow) => void;
   onSeeAll: () => void;
+  /**
+   * BRIEF_DISCOVER_WORLD_CLASS §1.5 — the readout and the pills STAY WHERE THEY
+   * ARE, beneath the hero. But the safe-area + chrome-island clearance lives in
+   * this section's first row (MICRO_BRIEF_ROUNDS_SECTION_CHROME S1.4), and when
+   * a full-bleed hero renders above it that hero owns the notch instead. False
+   * drops the clearance to the ordinary section gap; nothing else moves.
+   */
+  chromeClearance?: boolean;
   style?: React.CSSProperties;
 }
 
@@ -1314,6 +1322,7 @@ export function GolfThisWeek({
   onRegionChange,
   onCardPress,
   onSeeAll,
+  chromeClearance = true,
   style,
 }: Props) {
   const { t } = useTranslation('courses');
@@ -1649,7 +1658,9 @@ export function GolfThisWeek({
           gap: 12,
           /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
              gives 16px of clearance everywhere. */
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
+          paddingTop: chromeClearance
+            ? 'calc(env(safe-area-inset-top, 0px) + 70px)'
+            : 0,
           marginBottom: 12,
           minWidth: 0,
         }}
