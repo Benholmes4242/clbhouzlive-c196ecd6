@@ -1592,7 +1592,7 @@
           "hole": "HOLE {n}",
           "holes": "{n} HOLES",
           "inThree": "{n} IN THREE",
-          "inARow": "{n} IN A ROW",
+          "inARow": "{n} PARS IN A ROW",
           "birdies": "{n} BIRDIES"
         },
         "sentence": {

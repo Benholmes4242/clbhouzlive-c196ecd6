@@ -1103,7 +1103,7 @@
           "hole": "{n} 番ホール",
           "holes": "{n} ホール",
           "inThree": "3ホールで {n}",
-          "inARow": "{n} 連続",
+          "inARow": "{n} パー連続",
           "birdies": "{n} バーディー"
         },
         "sentence": {

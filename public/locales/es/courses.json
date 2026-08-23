@@ -1165,7 +1165,7 @@
           "hole": "HOYO {n}",
           "holes": "{n} HOYOS",
           "inThree": "{n} DE TRES",
-          "inARow": "{n} SEGUIDOS",
+          "inARow": "{n} PARS SEGUIDOS",
           "birdies": "{n} BIRDIES"
         },
         "sentence": {

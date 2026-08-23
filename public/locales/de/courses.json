@@ -1165,7 +1165,7 @@
           "hole": "LOCH {n}",
           "holes": "{n} LÖCHER",
           "inThree": "{n} VON DREI",
-          "inARow": "{n} IN FOLGE",
+          "inARow": "{n} PARS IN FOLGE",
           "birdies": "{n} BIRDIES"
         },
         "sentence": {
