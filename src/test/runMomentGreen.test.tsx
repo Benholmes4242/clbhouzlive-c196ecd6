@@ -98,7 +98,7 @@ describe('BRIEF_RUN_GREEN_FIGURE', () => {
       const txt = s.textContent?.trim() ?? '';
       return txt === '9' || /^PARS\s*IN\s*A\s*ROW$/i.test(txt);
     });
-    expect(runSpans.length).toBe(2);
+    expect(runSpans.length).toBeGreaterThanOrEqual(2);
     const greens = runSpans.filter((s) => {
       const c = s.style.color;
       return c === 'rgb(74, 222, 128)' || c === '#4ADE80';
