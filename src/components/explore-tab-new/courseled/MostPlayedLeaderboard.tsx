@@ -645,7 +645,8 @@ export function MostPlayedLeaderboard({
                   }
                 }}
                 style={{
-                  display: 'flex',
+                  display: 'grid',
+                  gridTemplateColumns: '52px minmax(0, 1fr) 15px',
                   alignItems: 'center',
                   gap: 11,
                   width: '100%',
@@ -757,44 +758,6 @@ export function MostPlayedLeaderboard({
                          return null and reserve no width. */}
                      <MoveMark row={r} t={t} />
 
-                    {/* §1 — THE GOLFER COUNT, a SECOND FACT ON THE SAME LINE in
-                        the same 11 / 700 / A.INK and the same dot separator.
-                        IT IS `players.length`, NOT `members`: members counts ids
-                        the board cannot render (deleted account, RLS — §S4.4),
-                        so it would reintroduce the very mismatch this fixes.
-                        "11 rounds · 9 golfers" reads as two golfers who played
-                        twice, not a board missing two entries. */}
-                    {r.players.length > 0 && (
-                      <>
-                        <span
-                          aria-hidden
-                          style={{
-                            flex: 'none',
-                            width: 2.5,
-                            height: 2.5,
-                            borderRadius: '50%',
-                            background: GHOST,
-                            marginRight: 7,
-                          }}
-                        />
-                        <span
-                          style={{
-                            ...NUMF,
-                            flex: 'none',
-                            fontSize: 11,
-                            fontWeight: 700,
-                            lineHeight: 1,
-                             color: DISCOVER_FACT,
-                            marginRight: 7,
-                          }}
-                        >
-                          {t('discover.mostPlayedGolferCount', '{{count}} golfer', {
-                            count: r.players.length,
-                          })}
-                        </span>
-                      </>
-                    )}
-
                   </span>
                  </span>
                 {/* WITHOUT IT NOTHING SAYS THE ROW OPENS (§S2.2). */}
@@ -817,8 +780,7 @@ export function MostPlayedLeaderboard({
                   <div
                   style={{
                      width: '100%',
-                     marginLeft: -(52 + 11),
-                     paddingLeft: 0,
+                     gridColumn: '1 / -1',
                      paddingTop: 8,
                      paddingBottom: 10,
                      marginTop: 10,
@@ -853,7 +815,7 @@ export function MostPlayedLeaderboard({
                           {formatToPar(r.avgToPar)}
                         </span>
                         <span style={{ ...LABEL, display: 'block', marginTop: 4, fontSize: 7.5, letterSpacing: '0.14em', color: FAINT }}>
-                          {t('fieldAvg', 'Field')}
+                          {t('discover.mostPlayedField', 'FIELD')}
                         </span>
                       </span>
                     )}

@@ -1486,6 +1486,7 @@
     "mostPlayedLowest": "Lowest",
     "mostPlayedLowLabel": "THE ONLY ROUND",
     "mostPlayedLowLabel_other": "LOWEST THIS WEEK",
+    "mostPlayedField": "FIELD",
     "mostPlayedSeeAllAtCourse": "Visit this course",
     "mostPlayedNew": "New",
     "mostPlayedAvgToParBy_one": "Played to {{value}} by {{count}} member",
