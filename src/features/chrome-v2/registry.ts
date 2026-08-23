@@ -321,9 +321,20 @@ export const CHROME_REGISTRY: ChromeRule[] = [
 const DEFAULT_SPEC: ChromeSpec = {
   chrome: 'island',
   left: { kind: 'logo' },
-  tone: 'light',
+  tone: 'dark',
   bleed: false,
 };
+
+/** Tour Hub remains the sole light-island exception during the dark-only flip. */
+function keepsLightChrome(pathname: string): boolean {
+  return pathname === '/tour' || pathname.startsWith('/tour/') ||
+    pathname === '/tourhub' || pathname.startsWith('/tourhub/');
+}
+
+function withResolvedTone(spec: ChromeSpec, pathname: string): ChromeSpec {
+  if (spec.chrome === 'none' || keepsLightChrome(pathname) || spec.tone === 'dark') return spec;
+  return { ...spec, tone: 'dark' };
+}
 
 /**
  * Resolve chrome for a route. Walks CHROME_REGISTRY in order; first match wins.
@@ -336,9 +347,9 @@ export function resolveChrome(
 ): ChromeSpec {
   for (const rule of CHROME_REGISTRY) {
     const { exact, prefix, test } = rule.match;
-    if (exact !== undefined && pathname === exact) return rule.spec;
-    if (prefix !== undefined && pathname.startsWith(prefix)) return rule.spec;
-    if (test !== undefined && test(pathname, search)) return rule.spec;
+    if (exact !== undefined && pathname === exact) return withResolvedTone(rule.spec, pathname);
+    if (prefix !== undefined && pathname.startsWith(prefix)) return withResolvedTone(rule.spec, pathname);
+    if (test !== undefined && test(pathname, search)) return withResolvedTone(rule.spec, pathname);
   }
   return DEFAULT_SPEC;
 }

@@ -8,6 +8,7 @@ import {
   THUMBNAIL_RADIUS,
   WELL_RADIUS,
 } from './tokens';
+import { GOLD_TINT_10, WHITE_ALPHA_04 } from '@/features/tourhub/_shared/tokens';
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
@@ -193,7 +194,7 @@ export function FriendsRail() {
  * GOLF THIS WEEK. MEASURED off GolfThisWeek.tsx after BRIEF_ROUND_TILE_THE_MOMENT:
  * 256 wide, no border and a 1px shadow, then a 191px DARK REGION — the 156px
  * hero plus the member row, which now sits ON the photograph and its scrims
- * (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW, BRIEF_ROUND_TILE_HERO_TOUR_COLOUR), then the WHITE WELL (#FFFFFF, hairline on all four sides — BRIEF_ROUND_TILE_WHITE_WELL) at a FIXED 135px running to the
+ * (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW, BRIEF_ROUND_TILE_HERO_TOUR_COLOUR), then the dark feed well (hairline on all four sides) at a FIXED 135px running to the
  * card's bottom edge: its header rule and the 96px two-rows-of-nine scorecard. Above the rail: the
  * count/region readout row, the pills row and the best-of-week band, all of
  * which the live section renders before its first card and none of which may
@@ -314,7 +315,7 @@ export function GolfThisWeekRail() {
                   height: 36,
                   padding: '6px 12px',
                   margin: '0 -12px',
-                  background: 'rgba(11,15,20,0.035)',
+                  background: WHITE_ALPHA_04,
                   borderRadius: CHIP_RADIUS,
                   boxSizing: 'border-box',
                   display: 'flex',
@@ -413,13 +414,10 @@ export function GolfThisWeekRail() {
               </div>
             </div>
             <div style={{ padding: '0 10px 0' }}>
-              {/* THE WHITE WELL (BRIEF_ROUND_TILE_WHITE_WELL §4): header, its one
+              {/* THE DARK FEED WELL (BRIEF_DARK_ONLY_PART_B §2.2): header, its one
                   rule, and the FIXED 96px scorecard region — the same height on
-                  every card, running to the card's bottom edge. It is #FFFFFF
-                  with a WELL_RULE hairline inset on all four sides, exactly as
-                  the live tile draws it; the shell's bars stay A.TRACK (#E9EDF1),
-                  which is a point of contrast BETTER on white than it was on the
-                  old #F2F5F8 tint. */}
+                   every card, running to the card's bottom edge, with the same
+                   dark hairline inset on all four sides as the live tile. */}
               <div
                 style={{
                   /* THE WELL'S 8px OFFSET MOVED UP INTO THE DARK REGION'S BOTTOM
@@ -430,8 +428,8 @@ export function GolfThisWeekRail() {
                   marginLeft: -10,
                   marginRight: -10,
                   height: 139,
-                  background: '#FFFFFF',
-                  boxShadow: 'inset 0 0 0 1px rgba(11,15,20,0.07)',
+                  background: 'rgba(11,13,16,0.66)',
+                  boxShadow: `inset 0 0 0 1px ${A.HAIRLINE}`,
                    borderRadius: `0 0 ${WELL_RADIUS}px ${WELL_RADIUS}px`,
                   padding: '6px 6px 9px',
                   boxSizing: 'border-box',
@@ -444,7 +442,7 @@ export function GolfThisWeekRail() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     paddingBottom: 6,
-                    borderBottom: '1px solid rgba(11,15,20,0.07)',
+                    borderBottom: `1px solid ${A.HAIRLINE}`,
                   }}
                 >
                   <Bar style={{ height: 8, width: 54 }} />
@@ -803,7 +801,7 @@ export function HonoursPanel() {
               height: SK_CARD_H,
               flex: 'none',
               borderRadius: CARD_RADIUS,
-              background: '#FFFFFF',
+              background: A.PANEL,
               boxShadow: '0 1px 3px rgba(11,15,20,0.06)',
               overflow: 'hidden',
               boxSizing: 'border-box',
@@ -812,7 +810,7 @@ export function HonoursPanel() {
             <div
               style={{
                 height: SK_HEAD_H,
-                background: '#F4F6F9',
+                background: i === 0 ? GOLD_TINT_10 : A.PANEL,
                 padding: '11px 12px 12px',
                 boxSizing: 'border-box',
                 display: 'flex',

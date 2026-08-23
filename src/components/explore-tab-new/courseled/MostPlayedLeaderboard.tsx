@@ -102,7 +102,7 @@ function MoveMark({
     return <span style={{ ...base, color: A.AMBER }}>{t('discover.mostPlayedNew', 'New')}</span>;
   if (row.move !== 'up') return null;
   return (
-    <span style={{ ...base, color: INDEX_DELTA.light.improved }}>
+    <span style={{ ...base, color: INDEX_DELTA.dark.improved }}>
       <ArrowUp size={9} strokeWidth={2.75} />
       {formatNumber(Math.abs(row.change))}
     </span>
@@ -134,10 +134,10 @@ const BOARD_MAX_ROWS = 8.5;
 const BOARD_MAX_H = Math.round(BOARD_ROW_H * BOARD_MAX_ROWS);
 
 /** Ink ramp of the round tiles, shared so the board reads as one family. */
-const INK = '#0B0F14';
-const MID = '#5A6673';
-const FAINT = '#8A929C';
-const GHOST = '#C8D0D8';
+const INK = A.INK;
+const MID = A.MUTE;
+const FAINT = A.DIM;
+const GHOST = A.DIM;
 
 /** §S2.8 — the viewing member's row takes a 4.5% amber tint. NO RING, NO "You". */
 const VIEWER_TINT = 'rgba(247,147,30,0.045)';
@@ -420,7 +420,7 @@ function MemberBoard({
             bottom: 10,
             height: 28,
             pointerEvents: 'none',
-            background: `linear-gradient(to bottom, rgba(255,255,255,0), ${A.PANEL})`,
+            background: `linear-gradient(to bottom, transparent, ${A.PANEL})`,
           }}
         />
       )}

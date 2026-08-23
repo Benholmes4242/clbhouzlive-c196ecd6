@@ -1,23 +1,16 @@
 import { useLocation } from 'react-router-dom';
+import { isDarkChromeRoute } from '@/components/header/globalHeaderRules';
 
 /**
  * Route → theme for the floating bottom nav pill.
- * DARK glass on dark-surface routes; LIGHT glass everywhere else.
- *
- * Kept in sync with isDarkChromeRoute() in header rules:
- *   '/'          — Clubhouse feed (dark)
- *   '/clubhouse' — Clubhouse feed (dark)
- *   '/handicap'  — Handicap area (dark)
+ * DARK glass follows the app-wide chrome resolver. Tour Hub keeps its explicit
+ * light treatment until that surface is converted.
  */
-const DARK_PREFIXES = ['/handicap'];
-const DARK_EXACT = new Set(['/', '/clubhouse']);
-
 export type NavTheme = 'dark' | 'light';
 
 export function useNavTheme(): NavTheme {
   const { pathname } = useLocation();
-  if (DARK_EXACT.has(pathname)) return 'dark';
-  if (pathname.startsWith('/clubhouse')) return 'dark';
-  if (DARK_PREFIXES.some(p => pathname.startsWith(p))) return 'dark';
-  return 'light';
+  if (pathname === '/tour' || pathname.startsWith('/tour/') ||
+      pathname === '/tourhub' || pathname.startsWith('/tourhub/')) return 'light';
+  return isDarkChromeRoute(pathname) ? 'dark' : 'light';
 }

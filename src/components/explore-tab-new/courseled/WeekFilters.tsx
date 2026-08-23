@@ -192,8 +192,11 @@ export function RegionDropdown({
 
 
 
-        <SelectContent className="bg-card border-border z-50 max-h-[60vh] rounded-sq-sm shadow-lg">
-          <SelectItem value={ALL}>
+        <SelectContent
+          className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg"
+          style={{ background: A.PANEL, borderColor: A.BORDER, color: A.INK }}
+        >
+          <SelectItem value={ALL} style={{ color: A.INK }}>
             <span className="flex w-full items-center justify-between gap-3">
               <span className="truncate">{t('discover.week.allRegions', 'Everywhere')}</span>
               <span style={{ ...LABEL, color: A.MUTE }}>{regions.total}</span>
@@ -208,7 +211,7 @@ export function RegionDropdown({
                 </span>
               </SelectLabel>
               {/* THE MACRO AREA IS SELECTABLE — "Britain & Ireland 16". */}
-              <SelectItem value={`country:${g.country}`} disabled={g.count === 0}>
+              <SelectItem value={`country:${g.country}`} disabled={g.count === 0} style={{ color: A.INK }}>
                 <span className="flex w-full items-center justify-between gap-3">
                   <span className="truncate">{g.country}</span>
                   <span style={{ ...LABEL, color: A.MUTE }}>{g.count}</span>
@@ -221,6 +224,7 @@ export function RegionDropdown({
                   /* ZERO IS GREYED AND UNSELECTABLE (§S3.3) — it stays on the
                      list because its absence is the answer. */
                   disabled={s.count === 0}
+                  style={{ color: A.BODY }}
                 >
                   <span className="flex w-full items-center justify-between gap-3">
                     <span className="truncate pl-2" style={{ color: A.BODY }}>
