@@ -78,16 +78,6 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 88 }}>
-            <LazySection minHeight={400}>
-              <WorldRankingsSlot />
-            </LazySection>
-            <LazySection minHeight={400}>
-              <StatWatchSlot />
-            </LazySection>
-            <CourseOfTheWeekSection />
-            <LazySection minHeight={350}>
-              <CollegeFranchise />
-            </LazySection>
             <LazySection minHeight={90}>
               <ConnectHandicapCue variant="tour-venue" courseName="" />
             </LazySection>
