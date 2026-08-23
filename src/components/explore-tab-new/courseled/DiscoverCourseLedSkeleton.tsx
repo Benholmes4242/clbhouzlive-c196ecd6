@@ -703,8 +703,10 @@ export function MostPlayedPanel() {
                 <TextBar w={130} h={13} />
                 <TextBar w={92} h={13} />
               </div>
-              <div style={{ height: 15, display: 'flex', alignItems: 'center' }}>
-                <TextBar w={92} h={11} />
+              <div style={{ height: 15, display: 'flex', alignItems: 'center', gap: 7 }}>
+                <TextBar w={48} h={11} />
+                <Bar style={{ width: 2.5, height: 2.5, borderRadius: '50%' }} />
+                <TextBar w={52} h={11} />
               </div>
               </div>
               <Bar style={{ height: 15, width: 15, marginLeft: 'auto', flexShrink: 0 }} />

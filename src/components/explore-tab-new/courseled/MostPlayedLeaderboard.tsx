@@ -691,28 +691,8 @@ export function MostPlayedLeaderboard({
                        LINE. It deliberately declares every type property rather
                        than spreading LABEL, whose uppercase transform previously
                        changed sentence-case database values such as "Kent". */}
-                   {m?.region && (
-                     <span
-                       style={{
-                         display: 'block',
-                         marginTop: 2,
-                         minWidth: 0,
-                         fontSize: 11,
-                         fontWeight: 700,
-                         lineHeight: 1.2,
-                         letterSpacing: 0,
-                          color: DISCOVER_FACT,
-                         overflow: 'hidden',
-                         textOverflow: 'ellipsis',
-                         whiteSpace: 'nowrap',
-                       }}
-                     >
-                       {m.region}
-                     </span>
-                   )}
-
-                   {/* THE THIRD LINE IS COUNTS + MOVEMENT ONLY. The count dot,
-                       pluralisation and players.length source are unchanged.
+                   {/* REGION + ROUNDS share the meta line. The resolved-player
+                       count is represented only by the pile below.
 
                       SUPERSEDED (BRIEF_MOST_PLAYED_META_LINE): §S2.2 recorded
                       "the round count is A.MID and the region is A.FAINT on the
@@ -734,13 +714,33 @@ export function MostPlayedLeaderboard({
                       fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
                   >
+                     {m?.region && (
+                       <>
+                         <span
+                           style={{
+                             minWidth: 0,
+                             overflow: 'hidden',
+                             textOverflow: 'ellipsis',
+                             whiteSpace: 'nowrap',
+                             fontSize: 11,
+                             fontWeight: 700,
+                             lineHeight: 1,
+                             letterSpacing: 0,
+                             color: DISCOVER_FACT,
+                           }}
+                         >
+                           {m.region}
+                         </span>
+                         <span aria-hidden style={{ flex: 'none', width: 2.5, height: 2.5, borderRadius: '50%', background: GHOST, margin: '0 7px' }} />
+                       </>
+                     )}
                     {/* §S4.2 — A PLURAL RULE, NEVER A CONCATENATION: i18next
                         count pluralisation, so "1 round" / "11 rounds" and
                         every language's own rule both work. */}
                     <span
                       style={{
                         ...NUMF,
-                        flex: 'none',
+                         flex: 'none',
                         fontSize: 11,
                         fontWeight: 700,
                         lineHeight: 1,
