@@ -6,7 +6,7 @@ import { ArrowUp, ChevronDown } from 'lucide-react';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import type { MostPlayedPlayer, MostPlayedRow } from './hooks/useMostPlayedThisWeek';
-import { A, CARD_RADIUS, Eyebrow, InkAction, LABEL, NUMF, SANS, THUMBNAIL_RADIUS } from './tokens';
+import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, Eyebrow, InkAction, LABEL, NUMF, SANS, THUMBNAIL_RADIUS } from './tokens';
 import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
@@ -134,10 +134,10 @@ const BOARD_MAX_ROWS = 8.5;
 const BOARD_MAX_H = Math.round(BOARD_ROW_H * BOARD_MAX_ROWS);
 
 /** Ink ramp of the round tiles, shared so the board reads as one family. */
-const INK = A.INK;
-const MID = A.MUTE;
-const FAINT = A.DIM;
-const GHOST = A.DIM;
+const INK = DISCOVER_FACT;
+const MID = DISCOVER_QUIET;
+const FAINT = DISCOVER_QUIET;
+const GHOST = DISCOVER_QUIET;
 
 /** §S2.8 — the viewing member's row takes a 4.5% amber tint. NO RING, NO "You". */
 const VIEWER_TINT = 'rgba(247,147,30,0.045)';
@@ -381,7 +381,7 @@ function MemberBoard({
                 flex: 'none',
                 fontSize: 12,
                 lineHeight: 1,
-                color: under ? TOPAR_RED : MID,
+                color: under ? TOPAR_RED : INK,
               }}
             >
               {p.toPar != null ? formatRelInt(p.toPar) : ''}
@@ -591,7 +591,7 @@ export function MostPlayedLeaderboard({
                       WebkitLineClamp: 2,
                       fontSize: 14,
                       fontWeight: 700,
-                      color: A.INK,
+                       color: DISCOVER_FACT,
                       letterSpacing: '-0.02em',
                       lineHeight: 1.2,
                       overflow: 'hidden',
@@ -613,7 +613,7 @@ export function MostPlayedLeaderboard({
                          fontWeight: 700,
                          lineHeight: 1.2,
                          letterSpacing: 0,
-                         color: A.INK,
+                          color: DISCOVER_FACT,
                          overflow: 'hidden',
                          textOverflow: 'ellipsis',
                          whiteSpace: 'nowrap',
@@ -656,7 +656,7 @@ export function MostPlayedLeaderboard({
                         fontSize: 11,
                         fontWeight: 700,
                         lineHeight: 1,
-                        color: A.INK,
+                         color: DISCOVER_FACT,
                         marginRight: 7,
                       }}
                     >
@@ -697,7 +697,7 @@ export function MostPlayedLeaderboard({
                             fontSize: 11,
                             fontWeight: 700,
                             lineHeight: 1,
-                            color: A.INK,
+                             color: DISCOVER_FACT,
                             marginRight: 7,
                           }}
                         >
@@ -776,13 +776,13 @@ export function MostPlayedLeaderboard({
                   <span style={{ flex: 'none', fontSize: 9, fontWeight: 700, lineHeight: 1, letterSpacing: '0.14em', textTransform: 'uppercase', color: FAINT }}>
                     {t('discover.mostPlayedLowest', 'Lowest')}
                   </span>
-                  <span style={{ flex: 'none', fontSize: 12, fontWeight: 700, lineHeight: 1.2, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                   <span style={{ flex: 'none', fontSize: 12, fontWeight: 700, lineHeight: 1.2, color: DISCOVER_FACT, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {bestPlayer.gross != null ? formatNumber(bestPlayer.gross) : ''}
                   </span>
-                  <span style={{ flex: 'none', fontSize: 10, fontWeight: 700, lineHeight: 1.2, color: bestPlayer.toPar != null && bestPlayer.toPar < 0 ? TOPAR_RED : MID, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  <span style={{ flex: 'none', fontSize: 10, fontWeight: 700, lineHeight: 1.2, color: bestPlayer.toPar != null && bestPlayer.toPar < 0 ? TOPAR_RED : INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {bestPlayer.toPar != null ? formatRelInt(bestPlayer.toPar) : ''}
                   </span>
-                  <span style={{ flex: 'none', minWidth: 0, fontSize: 12, fontWeight: 700, lineHeight: 1.2, color: A.INK }}>
+                   <span style={{ flex: 'none', minWidth: 0, fontSize: 12, fontWeight: 700, lineHeight: 1.2, color: DISCOVER_FACT }}>
                     {bestPlayer.name}
                   </span>
                 </div>

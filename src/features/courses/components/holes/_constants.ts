@@ -43,7 +43,8 @@ export const SC_ACCENT    = '#94A3B8'; // holes tab section eyebrow - slate (can
 export const SC_ACE_DARK       = '#FFE066';
 export const SC_ALBATROSS_DARK = '#FFD84D';
 export const SC_EAGLE_DARK     = '#F5C842';
-export const SC_BIRDIE_DARK    = '#FF6B5E';
+// Dark birdies share the canonical dark to-par red; no independent pink-red.
+export { TOPAR_UNDER_DARK as SC_BIRDIE_DARK } from '@/features/tourhub/_shared/tokens';
 export const SC_PAR_DARK       = 'rgba(242,244,247,0.42)';
 export const SC_BOGEY_DARK     = '#A6C2F0'; // paler blue - lighter damage
 export const SC_DOUBLE_DARK    = '#7AA6EC'; // more saturated blue - worse damage

@@ -37,7 +37,7 @@ import { formatPurse } from '../../../_shared/formatPurse';
 const DARK_EYEBROW = 'rgba(255,255,255,0.62)';
 
 const TICKER_BAR_H = 34;
-const LEADER_RED = TOPAR_UNDER_DARK;              // '#FF6B5E'
+const LEADER_RED = TOPAR_UNDER_DARK;              // '#FF6B60'
 const LEADER_RED_RING = 'rgba(255,107,94,0.55)';
 const LEADER_RED_WASH = 'linear-gradient(90deg, rgba(255,107,94,0.18) 0%, rgba(255,107,94,0.06) 100%)';
 const CHAMPION_BAND_H = 62;

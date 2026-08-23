@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { A, LABEL, FIGS, NUM, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_EVEN_LIGHT, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { beadForScore } from '@/features/courses/_shared/beadForScore';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
@@ -86,7 +86,7 @@ const SURFACE_TOKENS = {
   dark: {
     baseline: 'rgba(255,255,255,0.18)',
     over: '#E8EDF2',
-    under: '#FF6B60',
+    under: TOPAR_UNDER_DARK,
     halo: '#0B0D10',
     beadStroke: '#0B0D10',
     tickInk: 'rgba(255,255,255,0.82)',
@@ -94,7 +94,7 @@ const SURFACE_TOKENS = {
     rule: 'rgba(255,255,255,0.34)',
     readInk: '#F4F7F9',
     readDim: 'rgba(255,255,255,0.40)',
-    gradeUnder: '#FF6B60',
+    gradeUnder: TOPAR_UNDER_DARK,
     gradeEven: 'rgba(255,255,255,0.40)',
     gradeBogey: 'rgba(255,255,255,0.68)',
     gradeOver: '#E8EDF2',

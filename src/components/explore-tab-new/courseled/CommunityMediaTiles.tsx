@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Heart } from 'lucide-react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { DISCOVER_FACT, DISCOVER_QUIET } from './tokens';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { formatRelativeRounded } from '@/i18n/format';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -294,7 +295,7 @@ export function CommunityVideoTile({
           fontSize: 13.5,
           fontWeight: 700,
           letterSpacing: '-0.012em',
-          color: A.INK,
+          color: DISCOVER_FACT,
           lineHeight: 1.28,
           margin: '8px 0 0',
           display: '-webkit-box',
@@ -344,7 +345,7 @@ export function CommunityVideoTile({
           style={{
             flex: 1,
             fontSize: 11.5,
-            color: A.MUTE,
+            color: DISCOVER_QUIET,
             minWidth: 0,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -363,7 +364,7 @@ export function CommunityVideoTile({
               alignItems: 'center',
               gap: 3,
               fontSize: 11.5,
-              color: A.DIM,
+              color: DISCOVER_QUIET,
               fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >

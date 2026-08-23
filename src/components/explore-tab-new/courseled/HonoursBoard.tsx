@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, CARD_RADIUS, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
+import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 
@@ -58,7 +58,7 @@ const AVATAR = 20;
  */
 const ACE_GROUND = `linear-gradient(135deg, color-mix(in srgb, ${SC_FILL_GOLD} 30%, ${A.PANEL}), color-mix(in srgb, ${SC_FILL_GOLD} 18%, ${A.PANEL}))`;
 const NEUTRAL_GROUND = A.PANEL;
-const GHOST = A.BODY;
+const GHOST = DISCOVER_QUIET;
 
 export type HonoursMode = 'recent' | 'leaders';
 
@@ -266,7 +266,7 @@ export function FeatCard({
             fontSize: 8,
             fontWeight: 800,
             letterSpacing: '0.18em',
-            color: A.INK,
+             color: DISCOVER_FACT,
           }}
         >
           {kindLabel(e)}
@@ -299,7 +299,7 @@ export function FeatCard({
                 fontWeight: 800,
                 letterSpacing: '-0.05em',
                 lineHeight: 1,
-                color: A.INK,
+                 color: DISCOVER_FACT,
               }}
             >
               {e.holeYards}
@@ -310,7 +310,7 @@ export function FeatCard({
                 fontSize: 8,
                 fontWeight: 800,
                 letterSpacing: '0.18em',
-                color: A.BODY,
+                color: DISCOVER_QUIET,
               }}
             >
               {t('discover.honours.yards', 'YARDS')}
@@ -324,7 +324,7 @@ export function FeatCard({
               fontWeight: 800,
               letterSpacing: '-0.04em',
               lineHeight: 1,
-              color: A.INK,
+               color: DISCOVER_FACT,
             }}
           >
             {line || t('discover.honours.badgeAce', 'Ace')}
@@ -339,7 +339,7 @@ export function FeatCard({
               fontSize: 11,
               fontWeight: 700,
               letterSpacing: '-0.01em',
-              color: A.BODY,
+              color: DISCOVER_FACT,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -368,7 +368,7 @@ export function FeatCard({
             fontSize: 13,
             fontWeight: 700,
             letterSpacing: '-0.02em',
-            color: A.INK,
+            color: DISCOVER_FACT,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -389,7 +389,7 @@ export function FeatCard({
               fontSize: 12,
               fontWeight: 700,
               letterSpacing: '-0.015em',
-              color: e.isOwn ? A.AMBER_DEEP : A.BODY,
+              color: e.isOwn ? A.AMBER_DEEP : DISCOVER_FACT,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -484,7 +484,7 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
           fontSize: 13.5,
           fontWeight: 700,
           letterSpacing: '-0.02em',
-          color: l.isOwn ? A.AMBER_DEEP : A.INK,
+          color: l.isOwn ? A.AMBER_DEEP : DISCOVER_FACT,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -499,7 +499,7 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
           ...LABEL,
           fontSize: 8,
           letterSpacing: '0.18em',
-          color: A.BODY,
+          color: DISCOVER_QUIET,
           flex: '0 0 auto',
           fontVariantNumeric: 'tabular-nums lining-nums',
         }}
@@ -591,7 +591,7 @@ export function HonoursHeading({
             fontSize: 11.5,
             fontWeight: 500,
             lineHeight: 1.4,
-            color: A.MUTE,
+             color: DISCOVER_QUIET,
           }}
         >
           {subline}

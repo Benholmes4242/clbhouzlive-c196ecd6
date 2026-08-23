@@ -12,16 +12,16 @@ import {
   type WeekScope,
 } from './useGolfThisWeek';
 import { useWeekRegionCounts, type RegionSelection } from './useWeekRegionCounts';
-import { selectMoment, type Moment, type MomentKind } from '../roundMoment';
+import { selectMoment, type Moment } from '../roundMoment';
 
 /**
  * THE PAGE HERO'S SUBJECT (BRIEF_DISCOVER_WORLD_CLASS §1.1).
  *
  * IT SHOWS THE BEST STORY, NOT THE BEST SCORE. The lowest gross is row 1 of the
  * BEST THIS WEEK chip immediately beneath the hero, and a hero that repeats the
- * chip under it is a bigger version of nothing. So the hero surfaces the round
- * whose MOMENT ranks highest and the chips keep the numbers — two different
- * questions, no duplication (§1.1, ACCEPTANCE b).
+ * chip under it is a bigger version of nothing. So the hero surfaces the most
+ * recent notable round and the chips keep the numbers — two different questions,
+ * no duplication. Ace/albatross rarity alone can hold against a newer moment.
  *
  * ZERO NEW NETWORK REQUESTS (§1.4, ACCEPTANCE k). Every hook below is the SAME
  * hook GolfThisWeek calls with the SAME arguments, so every read resolves out of
@@ -29,21 +29,28 @@ import { selectMoment, type Moment, type MomentKind } from '../roundMoment';
  * seven-day rounds, the course meta and the ONE batched hole-shape read. There is
  * no query, no RPC and no field here that the section did not already fetch.
  *
- * THE RANK IS READ, NOT REDEFINED (§1.1, WHAT DOES NOT CHANGE). selectMoment
- * already orders the seven kinds by first-match; this only names that order so a
- * WINNER can be picked ACROSS rounds. Change roundMoment.ts and this follows.
+ * MOMENT detection remains in roundMoment.ts. This hook only chooses between
+ * already-classified rounds by recency and the explicit rarity exception.
  */
 
-/** selectMoment's first-match order, expressed as a comparable rank. */
-const MOMENT_RANK: Record<MomentKind, number> = {
-  eagle: 7,
-  finishedInRed: 6,
-  birdieHaul: 5,
-  strongFinish: 4,
-  run: 3,
-  grind: 2,
-  plain: 1,
-};
+type HeroCandidate = { row: CircleRoundRow; moment: Moment };
+
+const isRarity = (moment: Moment) =>
+  moment.kind === 'eagle' && (moment.feat === 'ace' || moment.feat === 'albatross');
+
+/**
+ * Amendment 1: recency chooses the story. An ace or albatross is the sole
+ * exception and holds the slot against every ordinary notable moment; when
+ * more than one rarity exists, the newest rarity wins. Input order is never
+ * trusted because the rail deliberately reorders self/new-course rounds.
+ */
+export function selectDiscoverHeroCandidate(candidates: readonly HeroCandidate[]): HeroCandidate | null {
+  const notable = candidates.filter(({ moment }) => moment.kind !== 'plain');
+  if (notable.length === 0) return null;
+  const rarity = notable.filter(({ moment }) => isRarity(moment));
+  const pool = rarity.length > 0 ? rarity : notable;
+  return [...pool].sort((a, b) => String(b.row.play_date).localeCompare(String(a.row.play_date)))[0] ?? null;
+}
 
 export interface DiscoverHeroSubject {
   row: CircleRoundRow;
@@ -95,36 +102,17 @@ export function useDiscoverHero(
   return useMemo(() => {
     const withImage = ordered.filter((r) => !!meta?.get(r.course_id ?? '')?.imageUrl).length;
 
-    let best: { row: CircleRoundRow; moment: Moment } | null = null;
     let allPlain = true;
-    for (const r of ordered) {
+    const candidates = ordered.map((r) => {
       const shape = holeShapes?.get(r.score_id ?? '') ?? null;
       const moment = selectMoment(shape?.holes ?? []);
       if (moment.kind !== 'plain') allPlain = false;
-      if (!best) {
-        best = { row: r, moment };
-        continue;
-      }
-      const a = MOMENT_RANK[moment.kind];
-      const b = MOMENT_RANK[best.moment.kind];
-      if (a > b) {
-        best = { row: r, moment };
-        continue;
-      }
-      /* TIE-BREAK (§1.2): SAME KIND, MOST RECENT ROUND WINS — the `newer()` rule
-         the band reducers already use. A THIRD TIE (same kind, same play_date)
-         KEEPS THE INCUMBENT, which is the earlier row in `ordered` — the rail's
-         own lens order. play_date is a DATE, so this is not exotic: two members
-         finishing under par on the same Saturday hit it routinely. It is
-         deliberately not broken by round_id — an arbitrary uuid comparison would
-         look random to a member watching the hero change. */
-      if (a === b && String(r.play_date) > String(best.row.play_date)) {
-        best = { row: r, moment };
-      }
-    }
+      return { row: r, moment };
+    });
+    const best = selectDiscoverHeroCandidate(candidates);
 
     const subject: DiscoverHeroSubject | null =
-      best && best.moment.kind !== 'plain'
+      best
         ? {
             row: best.row,
             moment: best.moment,
