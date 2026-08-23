@@ -1076,6 +1076,14 @@
       "stablefordLabel": "ベストステーブルフォード",
       "birdiesLabel": "バーディー最多",
       "stablefordUnit": "ポイント",
+      "gap": {
+        "shots_one": "{{count}}打差",
+        "shots_other": "{{count}}打差",
+        "points_one": "{{count}}ポイント差",
+        "points_other": "{{count}}ポイント差",
+        "clear": "{{count}}差",
+        "tied": "同率"
+      },
       "moment": {
         "theCard": "スコアカード",
         "fullScorecard": "スコアカード全体",

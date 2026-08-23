@@ -1565,6 +1565,14 @@
       "stablefordLabel": "[Bèst stàblefôrd]",
       "birdiesLabel": "[Mòst bìrdiés]",
       "stablefordUnit": "[pôints]",
+      "gap": {
+        "shots_one": "[{{count}} ŠĤŐŢ ĈĻÉÁŘ]",
+        "shots_other": "[{{count}} ŠĤŐŢŠ ĈĻÉÁŘ]",
+        "points_one": "[{{count}} ƤŐÍÑŢ ĈĻÉÁŘ]",
+        "points_other": "[{{count}} ƤŐÍÑŢŠ ĈĻÉÁŘ]",
+        "clear": "[{{count}} ĈĻÉÁŘ]",
+        "tied": "[ŢÍÉĐ]"
+      },
       "moment": {
         "theCard": "The card",
         "fullScorecard": "Full scorecard",

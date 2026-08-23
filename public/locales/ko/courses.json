@@ -1076,6 +1076,14 @@
       "stablefordLabel": "최고 스테이블포드",
       "birdiesLabel": "버디 최다",
       "stablefordUnit": "포인트",
+      "gap": {
+        "shots_one": "{{count}}타 차",
+        "shots_other": "{{count}}타 차",
+        "points_one": "{{count}}포인트 차",
+        "points_other": "{{count}}포인트 차",
+        "clear": "{{count}} 차",
+        "tied": "동률"
+      },
       "moment": {
         "theCard": "스코어카드",
         "fullScorecard": "전체 스코어카드",

@@ -1,12 +1,13 @@
 import React from 'react';
 import { A, SANS, KICKER as KICKER_LEGACY, LABEL as LABEL_LEGACY, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { SURFACE } from '@/lib/tokens/surface';
+import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
 /**
  * Course-led Discover — shared tokens and the three chrome primitives
  * (BRIEF_DISCOVER_REBUILT_COURSE_LED). Eyebrows and quiet actions are INK per
- * the app-wide flip; amber means isOwn and nothing else; GOLD is reserved for
- * legendary feats (hole in one, albatross).
+ * the app-wide flip; amber means isOwn and nothing else.
  *
  * TYPE (BRIEF_SURFACE_TOKENS_DECISION_AND_DISCOVER_PAGE): weights come from
  * the canonical scale — nothing on Discover renders at 800. The legacy
@@ -27,6 +28,35 @@ export const KICKER: React.CSSProperties = { ...KICKER_LEGACY, fontWeight: 700, 
 export const LABEL: React.CSSProperties = { ...LABEL_LEGACY, fontWeight: 700, color: DISCOVER_QUIET };
 
 export const GOLD = '#D8A93C';
+
+/**
+ * METAL SEMANTICS (BRIEF_BAND_TILES_PODIUM §0).
+ *
+ * GOLD MEANS BEST: the best round of the week on Discover's BEST THIS WEEK
+ * podium, and the best possible score on a hole. PLATINUM MEANS RAREST: it sits
+ * above gold, which is why the Honours Board's albatross card outranks its ace
+ * card. BEST THIS WEEK sharing gold with the Honours Board's ace is therefore
+ * not a collision: gold means "top", not "rare".
+ *
+ * The podium's figure line is gold even when the winning round is over par.
+ * That gold reports that the round WON; it is deliberately not the ordinary
+ * to-par colour grammar and must not be "fixed" back to white.
+ */
+export const PODIUM_ACCENT = {
+  gold: GOLD,
+  white: DISCOVER_FACT,
+  red: TOPAR_UNDER_DARK,
+  green: INDEX_DELTA.dark.improved,
+} as const;
+
+/** Low-alpha grounds used only by podium margin chips. */
+export const PODIUM_GROUND = {
+  gold: 'rgba(216,169,60,0.14)',
+  white: 'rgba(255,255,255,0.08)',
+  red: 'rgba(255,107,96,0.12)',
+  green: 'rgba(74,222,128,0.12)',
+  tie: 'rgba(255,255,255,0.08)',
+} as const;
 export { A, SANS, FIGS };
 
 /** Discover content geometry: one master, all subordinate radii derived. */

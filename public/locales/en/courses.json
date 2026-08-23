@@ -1582,6 +1582,14 @@
       "stablefordLabel": "Best stableford",
       "birdiesLabel": "Most birdies",
       "stablefordUnit": "points",
+      "gap": {
+        "shots_one": "{{count}} SHOT CLEAR",
+        "shots_other": "{{count}} SHOTS CLEAR",
+        "points_one": "{{count}} POINT CLEAR",
+        "points_other": "{{count}} POINTS CLEAR",
+        "clear": "{{count}} CLEAR",
+        "tied": "TIED"
+      },
       "moment": {
         "theCard": "The card",
         "fullScorecard": "Full scorecard",

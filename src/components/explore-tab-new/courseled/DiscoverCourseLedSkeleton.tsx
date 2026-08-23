@@ -8,7 +8,6 @@ import {
   THUMBNAIL_RADIUS,
   WELL_RADIUS,
 } from './tokens';
-import { WHITE_ALPHA_04 } from '@/features/tourhub/_shared/tokens';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import {
   COURSE_GRADIENT,
@@ -51,7 +50,7 @@ const SK_ROUND_HERO_BG = [
  * Every block below is MEASURED off the rendered component it stands in for,
  * not read off the JSX and added up:
  *   rounds rail    merged Golf this week: readout + region, scope pills, the
- *                  LEADER BAND (three 230px chips, 163 tall, 9px gap) and the
+ *                  PODIUM BAND (three 230px chips, 215 tall, 9px gap) and the
  *                  round tiles
  *   most played    four collapsed cards at 10px gaps, 52px thumbnail, with
  *                  separate region/count lines and the resolved-player BEST row
@@ -240,32 +239,9 @@ export function GolfThisWeekRail() {
           <Bar key={i} style={{ height: 34, width: w, borderRadius: SCOPE_PILL_RADIUS }} />
         ))}
       </div>
-      {/* THE LEADER BAND IS THREE CHIPS, NOT A BORDERED STRIP
-          (BRIEF_DISCOVER_SKELETON_RESYNC §1). The strip this replaced was the
-          band as it stood BEFORE BRIEF_BAND_TILES_REFINEMENT made it cards, and
-          it was ~21px against a live chip MEASURED at 123 — so every cold load
-          dropped the round tiles by ~100px when the band resolved.
-          RE-MEASURED at each pass since: 100 after BRIEF_DISCOVER_FINISHING_PASS
-          deleted the course line, then 163 after BRIEF_BAND_TILES_TOP_THREE
-          added a hero plus two runner rows.
-          RE-MEASURED AGAIN for BRIEF_BAND_TILES_LADDER (§5): the hero block is
-          GONE and the chip is ONE LADDER of three rows, the first taller than
-          the other two.
-            width  1 0 230px, mirroring the live flex rule rather than a
-                   hard-coded px.
-            height 11 pad
-                   + 12 eyebrow line box
-                   + 8  ladder marginTop
-                   + 36 leader row   (6 pad + 24 name line box + 6 pad)
-                   + 41 second row   (1px rule + 8 + 24 name line box + 8)
-                   + 41 third row
-                   + 12 pad         = 161.
-                   RE-MEASURED IN THE BROWSER for LADDER_TIGHTEN: the row height
-                   is set by the NAME's inherited 24px line box, NOT by the
-                   avatar (20/16) and no longer by the figure — which is why the
-                   leader's row only lost 4px when its figure dropped from 30 to
-                   12, and why the previous shell's 13/40/33/33 under-measured
-                   the live chip by 11px.
+      {/* BRIEF_BAND_TILES_PODIUM §7 — measured against the live tallest podium:
+          eyebrow, 40px face + 34px leader figure, margin chip, hairline, and two
+          compact chasers. The rail stretches sparse cards to this same height.
 
           WHY THREE ROWS AND NOT ONE, given the shell models the SMALLEST
           plausible state: the rail levels every chip to the TALLEST, so the
@@ -280,6 +256,7 @@ export function GolfThisWeekRail() {
         {[0, 1, 2].map((i) => (
           <div
             key={i}
+            data-band-podium-skeleton
             style={{
               background: A.PANEL,
               border: 'none',
@@ -305,48 +282,43 @@ export function GolfThisWeekRail() {
               <Bar style={{ height: 8, width: 26 }} />
             </div>
 
-            {/* THE LADDER. Same columns on every row — rank, figure, avatar,
-                name, chevron. BRIEF_BAND_TILES_LADDER_TIGHTEN §5: the leader's
-                figure is now ROW SIZE, so the leader's row is 36 not 40 — it is
-                shorter than the runners by their 1px rule, and it carries
-                the same ~3.5% ink ground the live chip gives first place. */}
+            {/* Leader: 40px face, 34px figure and name. */}
             <div style={{ marginTop: 8 }}>
               <div
                 style={{
-                  height: 36,
-                  padding: '6px 12px',
-                  margin: '0 -12px',
-                  background: WHITE_ALPHA_04,
-                  borderRadius: CHIP_RADIUS,
-                  boxSizing: 'border-box',
-                  display: 'flex',
+                  minHeight: 64,
+                  display: 'grid',
+                  gridTemplateColumns: '40px minmax(0, 1fr)',
                   alignItems: 'center',
-                  gap: 6,
+                  gap: 10,
                 }}
               >
-                <Bar style={{ height: 8, width: 7 }} />
-                <Bar style={{ height: 12, width: 33 }} />
-                <Bar style={{ height: 20, width: 20, borderRadius: '34%' }} />
-                <Bar style={{ height: 12, width: 72 }} />
+                <Bar style={{ height: 42, width: 40, borderRadius: '34%' }} />
+                <div>
+                  <Bar style={{ height: 31, width: 58 }} />
+                  <Bar style={{ height: 10, width: 84, marginTop: 5 }} />
+                </div>
               </div>
-
+              <Bar style={{ height: 20, width: 76, marginTop: 8 }} />
+              <div style={{ height: 1, background: A.HAIRLINE, marginTop: 12 }} />
               {[0, 1].map((j) => (
                 <div
                   key={j}
                   style={{
-                    height: 41,
-                    padding: '8px 0',
-                    borderTop: '1px solid rgba(11,15,20,0.07)',
+                    height: 34,
+                    borderTop: j === 0 ? 'none' : `1px solid ${A.HAIRLINE}`,
                     boxSizing: 'border-box',
-                    display: 'flex',
+                    display: 'grid',
+                    gridTemplateColumns: '12px 16px minmax(0, 1fr) 22px 18px',
                     alignItems: 'center',
                     gap: 6,
                   }}
                 >
                   <Bar style={{ height: 8, width: 7 }} />
-                  <Bar style={{ height: 12, width: 22 }} />
                   <Bar style={{ height: 16, width: 16, borderRadius: '34%' }} />
-                  <Bar style={{ height: 12, width: j === 0 ? 84 : 66 }} />
+                  <Bar style={{ height: 10, width: j === 0 ? 84 : 66 }} />
+                  <Bar style={{ height: 10, width: 22 }} />
+                  <Bar style={{ height: 9, width: 18 }} />
                 </div>
               ))}
             </div>

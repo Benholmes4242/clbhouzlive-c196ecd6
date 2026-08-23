@@ -1138,6 +1138,14 @@
       "stablefordLabel": "Mejor stableford",
       "birdiesLabel": "Más birdies",
       "stablefordUnit": "puntos",
+      "gap": {
+        "shots_one": "{{count}} GOLPE DE VENTAJA",
+        "shots_other": "{{count}} GOLPES DE VENTAJA",
+        "points_one": "{{count}} PUNTO DE VENTAJA",
+        "points_other": "{{count}} PUNTOS DE VENTAJA",
+        "clear": "{{count}} DE VENTAJA",
+        "tied": "EMPATE"
+      },
       "moment": {
         "theCard": "La tarjeta",
         "fullScorecard": "Tarjeta completa",
