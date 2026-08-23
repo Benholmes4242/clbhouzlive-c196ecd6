@@ -1539,15 +1539,10 @@ export function GolfThisWeek({
       gapKind: 'shots',
       /* GOLD REPORTS THE WIN (§0), not under/over par. The whole line remains
          gold even when the winning round's qualifier is +3. */
-      figureOf: (r) => {
-        const tp = toParOf(r);
-        return {
-          text: String(r.gross ?? '\u2014'),
-          tone: PODIUM_ACCENT.gold,
-          qual: tp?.text,
-          qualTone: PODIUM_ACCENT.gold,
-        };
-      },
+      figureOf: (r) => ({
+        text: String(r.gross ?? '\u2014'),
+        tone: PODIUM_ACCENT.gold,
+      }),
     });
   }
   if (bestStableford) {
@@ -1901,9 +1896,9 @@ export function GolfThisWeek({
                             aria-hidden
                             style={{
                               position: 'absolute',
-                              inset: 0,
+                              inset: 2,
                               borderRadius: '34%',
-                              boxShadow: `inset 0 0 0 3.5px ${tile.accent}`,
+                              boxShadow: `inset 0 0 0 1px ${tile.accent}`,
                               pointerEvents: 'none',
                             }}
                           />
