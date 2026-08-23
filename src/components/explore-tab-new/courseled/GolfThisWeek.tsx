@@ -1987,6 +1987,7 @@ export function GolfThisWeek({
                           <div style={{ height: 1, background: WELL_RULE, margin: '12px 0 0' }} />
                           {tile.runners.map((r, i) => {
                             const figure = tile.figureOf(r);
+                            const showDeficit = tile.key === 'best' || tile.key === 'improved';
                             return (
                               <div
                                 key={r.round_id}
@@ -2006,7 +2007,9 @@ export function GolfThisWeek({
                                 }}
                                 style={{
                                   display: 'grid',
-                                  gridTemplateColumns: '12px 16px minmax(0, 1fr) auto auto',
+                                  gridTemplateColumns: showDeficit
+                                    ? '12px 16px minmax(0, 1fr) auto auto'
+                                    : '12px 16px minmax(0, 1fr) auto',
                                   alignItems: 'center',
                                   gap: 6,
                                   minHeight: 34,
@@ -2043,12 +2046,14 @@ export function GolfThisWeek({
                                 >
                                   {figure.text}
                                 </span>
-                                <span
-                                  className="tabular-nums"
-                                  style={{ fontSize: 10, fontWeight: 700, color: DISCOVER_QUIET }}
-                                >
-                                  {podiumDeficit(tile, r)}
-                                </span>
+                                {showDeficit ? (
+                                  <span
+                                    className="tabular-nums"
+                                    style={{ fontSize: 10, fontWeight: 700, color: DISCOVER_QUIET }}
+                                  >
+                                    {podiumDeficit(tile, r)}
+                                  </span>
+                                ) : null}
                               </div>
                             );
                           })}
@@ -2070,9 +2075,7 @@ export function GolfThisWeek({
 
                   ABSENT IS ABSENT (BRIEF_BAND_TILES_TOP_THREE §3): fewer than
                   three qualifiers renders fewer rows — no dash, no placeholder,
-                  no reserved height. The rail's `alignItems: 'stretch'` levels
-                  every chip to the tallest, so a short tile simply carries an
-                  empty area and nothing fills it. */}
+                  no reserved height. Sparse cards collapse to their content. */}
 
             </div>
           ))}
