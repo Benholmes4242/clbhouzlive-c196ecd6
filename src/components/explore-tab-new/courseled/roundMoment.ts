@@ -123,13 +123,14 @@ export interface Moment {
  * THIS VALUE IS PROVISIONAL and is the only thing in v3 awaiting a decision.
  * It is clear of every other tone in the table and of the canonical birdie red.
  */
-import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
-
 export const BIRDIE_HAUL_TONE_PROVISIONAL = '#B58CFF';
+
+/** Exact red sampled from the filled birdie circles in the dark scorecard. */
+export const FINISHED_IN_RED_TONE = '#C13636';
 
 export const MOMENT_TONE: Record<MomentKind, string> = {
   eagle: '#FFC93C',
-  finishedInRed: TOPAR_UNDER_DARK,
+  finishedInRed: FINISHED_IN_RED_TONE,
   birdieHaul: BIRDIE_HAUL_TONE_PROVISIONAL,
   strongFinish: '#3B9DFF',
   run: '#22D07A',
