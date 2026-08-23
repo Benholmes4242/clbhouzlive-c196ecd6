@@ -1,0 +1,145 @@
+import { useMemo } from 'react';
+
+import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
+
+import { useCourseCardMeta } from './useCourseCardMeta';
+import { useRoundHoleShapes } from './useRoundHoleShapes';
+import {
+  orderForWeek,
+  usePlayedCourseIds,
+  useGolfThisWeek,
+  useWeekScopeCourses,
+  type WeekScope,
+} from './useGolfThisWeek';
+import { useWeekRegionCounts, type RegionSelection } from './useWeekRegionCounts';
+import { selectMoment, type Moment, type MomentKind } from '../roundMoment';
+
+/**
+ * THE PAGE HERO'S SUBJECT (BRIEF_DISCOVER_WORLD_CLASS §1.1).
+ *
+ * IT SHOWS THE BEST STORY, NOT THE BEST SCORE. The lowest gross is row 1 of the
+ * BEST THIS WEEK chip immediately beneath the hero, and a hero that repeats the
+ * chip under it is a bigger version of nothing. So the hero surfaces the round
+ * whose MOMENT ranks highest and the chips keep the numbers — two different
+ * questions, no duplication (§1.1, ACCEPTANCE b).
+ *
+ * ZERO NEW NETWORK REQUESTS (§1.4, ACCEPTANCE k). Every hook below is the SAME
+ * hook GolfThisWeek calls with the SAME arguments, so every read resolves out of
+ * the react-query cache the section already populated: the scope allow-list, the
+ * seven-day rounds, the course meta and the ONE batched hole-shape read. There is
+ * no query, no RPC and no field here that the section did not already fetch.
+ *
+ * THE RANK IS READ, NOT REDEFINED (§1.1, WHAT DOES NOT CHANGE). selectMoment
+ * already orders the seven kinds by first-match; this only names that order so a
+ * WINNER can be picked ACROSS rounds. Change roundMoment.ts and this follows.
+ */
+
+/** selectMoment's first-match order, expressed as a comparable rank. */
+const MOMENT_RANK: Record<MomentKind, number> = {
+  eagle: 7,
+  finishedInRed: 6,
+  birdieHaul: 5,
+  strongFinish: 4,
+  run: 3,
+  grind: 2,
+  plain: 1,
+};
+
+export interface DiscoverHeroSubject {
+  row: CircleRoundRow;
+  moment: Moment;
+  courseName: string | null;
+  region: string | null;
+  imageUrl: string | null;
+}
+
+export interface DiscoverHeroResult {
+  /** `null` means NO HERO RENDERS — no placeholder, no reserved height (§1.1). */
+  subject: DiscoverHeroSubject | null;
+  /** True while the section's own reads are in flight. The hero renders nothing. */
+  isPending: boolean;
+  /** Reported figures (§REPORT 1 and 5). Cheap, derived, no extra read. */
+  stats: { rounds: number; allPlain: boolean; withImage: number };
+}
+
+export function useDiscoverHero(
+  userId: string | undefined,
+  scope: WeekScope,
+  region: RegionSelection | null,
+): DiscoverHeroResult {
+  const scopeCourses = useWeekScopeCourses(userId, scope);
+  const roundsQuery = useGolfThisWeek(userId, scope, scopeCourses.courseIds);
+  const all = roundsQuery.data ?? [];
+
+  const courseIds = useMemo(
+    () => all.map((r) => r.course_id).filter((v): v is string => !!v),
+    [all],
+  );
+  const played = usePlayedCourseIds(userId);
+  const playedSet = useMemo(() => new Set(played.ids), [played.ids]);
+  const metaQuery = useCourseCardMeta(courseIds);
+  const meta = metaQuery.data;
+
+  const regions = useWeekRegionCounts(all, meta);
+  const inRegion = useMemo(
+    () => all.filter((r) => regions.matches(r, region)),
+    [all, regions, region],
+  );
+  const ordered = useMemo(() => orderForWeek(inRegion, playedSet), [inRegion, playedSet]);
+
+  const scoreIds = useMemo(() => ordered.map((r) => r.score_id), [ordered]);
+  const holeShapes = useRoundHoleShapes(scoreIds);
+
+  const isPending = !!userId && (roundsQuery.isPending || !scopeCourses.ready);
+
+  return useMemo(() => {
+    const withImage = ordered.filter((r) => !!meta?.get(r.course_id ?? '')?.imageUrl).length;
+
+    let best: { row: CircleRoundRow; moment: Moment } | null = null;
+    let allPlain = true;
+    for (const r of ordered) {
+      const shape = holeShapes?.get(r.score_id ?? '') ?? null;
+      const moment = selectMoment(shape?.holes ?? []);
+      if (moment.kind !== 'plain') allPlain = false;
+      if (!best) {
+        best = { row: r, moment };
+        continue;
+      }
+      const a = MOMENT_RANK[moment.kind];
+      const b = MOMENT_RANK[best.moment.kind];
+      if (a > b) {
+        best = { row: r, moment };
+        continue;
+      }
+      /* TIE-BREAK (§1.2): SAME KIND, MOST RECENT ROUND WINS — the `newer()` rule
+         the band reducers already use. A THIRD TIE (same kind, same play_date)
+         KEEPS THE INCUMBENT, which is the earlier row in `ordered` — the rail's
+         own lens order. play_date is a DATE, so this is not exotic: two members
+         finishing under par on the same Saturday hit it routinely. It is
+         deliberately not broken by round_id — an arbitrary uuid comparison would
+         look random to a member watching the hero change. */
+      if (a === b && String(r.play_date) > String(best.row.play_date)) {
+        best = { row: r, moment };
+      }
+    }
+
+    const subject: DiscoverHeroSubject | null =
+      best && best.moment.kind !== 'plain'
+        ? {
+            row: best.row,
+            moment: best.moment,
+            courseName: meta?.get(best.row.course_id ?? '')?.name ?? best.row.course_name ?? null,
+            region: meta?.get(best.row.course_id ?? '')?.region ?? null,
+            imageUrl: meta?.get(best.row.course_id ?? '')?.imageUrl ?? null,
+          }
+        : null;
+
+    return {
+      subject: isPending ? null : subject,
+      isPending,
+      stats: { rounds: ordered.length, allPlain: ordered.length > 0 && allPlain, withImage },
+    };
+  }, [ordered, holeShapes, meta, isPending]);
+}
+
+export default useDiscoverHero;
