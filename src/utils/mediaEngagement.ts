@@ -23,6 +23,8 @@
  * autoplay, which is the confound the audit already found.
  */
 
+import { useEffect, useRef, useState } from 'react';
+
 import { analyticsEvents } from './analyticsEvents';
 import { getSessionId } from './analyticsSession';
 
@@ -172,14 +174,22 @@ export function registerMediaImpression(
  * (the tiles are shared, and a surface that has not been wired must not throw).
  */
 export function useMediaImpression(target?: MediaTrackTarget) {
-  return (el: Element | null) => {
-    if (!el || !target) return;
-    // The returned cleanup is intentionally dropped for the callback-ref form:
-    // registration is keyed by element, and a re-render with the same element
-    // re-registers idempotently (Map.set) while an unmounted element is
-    // collected by the observer's weak target handling on unobserve at the next
-    // registration for that key. Components that unmount long lists use
-    // registerMediaImpression directly via useMediaImpressionRef below.
-    registerMediaImpression(el, target);
-  };
+  const [node, setNode] = useState<Element | null>(null);
+  // The target is an object literal at every call site, so it is compared by its
+  // fields — otherwise every render would unregister and re-register the tile
+  // and the one-second clock would never finish.
+  const keyed = target
+    ? `${target.surface}|${target.section}|${target.position}|${target.postId}|${target.mediaId ?? ''}|${target.mediaType}`
+    : null;
+  const latest = useRef(target);
+  latest.current = target;
+
+  useEffect(() => {
+    const t = latest.current;
+    if (!node || !t) return;
+    return registerMediaImpression(node, t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node, keyed]);
+
+  return setNode;
 }
