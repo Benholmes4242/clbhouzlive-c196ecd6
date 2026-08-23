@@ -1479,6 +1479,8 @@
     "momentsCount_one": "[~~{{count}} ɱőɱéñţ~~]",
     "mostPlayedAvgToPar": "Played to {{value}}",
     "mostPlayedLowest": "[~~Ļőŵēšţ~~]",
+    "mostPlayedLowLabel": "[~~ŢĤĒ ŐŃĻŶ ŘŐŮŃĐ~~]",
+    "mostPlayedLowLabel_other": "[~~ĻŐŴĒŚŢ ŢĤĨŚ ŴĒĒĶ~~]",
     "mostPlayedNew": "New",
     "mostPlayedAvgToParBy_one": "[~~Ƥļáýéđ ţő {{value}} ƀý {{count}} ménƀéř~~]",
     "mostPlayedAvgToParBy_other": "[~~Ƥļáýéđ ţő {{value}} ƀý {{count}} ménƀéřš~~]",

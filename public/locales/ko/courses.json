@@ -1066,6 +1066,8 @@
     "mostPlayedPlayedToLabel": "기록",
     "mostPlayedAvgToPar": "{{value}}",
     "mostPlayedLowest": "최저",
+    "mostPlayedLowLabel": "유일한 라운드",
+    "mostPlayedLowLabel_other": "이번 주 최저",
     "mostPlayedNew": "신규",
     "trackedRounds": "기록된 라운드",
     "videosHeading": "최신 영상",

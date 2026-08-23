@@ -1128,6 +1128,8 @@
     "mostPlayedPlayedToLabel": "Jugado a",
     "mostPlayedAvgToPar": "Jugado a {{value}}",
     "mostPlayedLowest": "Más bajo",
+    "mostPlayedLowLabel": "LA ÚNICA RONDA",
+    "mostPlayedLowLabel_other": "MÁS BAJA ESTA SEMANA",
     "mostPlayedNew": "Nuevo",
     "trackedRounds": "Rondas registradas",
     "videosHeading": "Videos recientes",

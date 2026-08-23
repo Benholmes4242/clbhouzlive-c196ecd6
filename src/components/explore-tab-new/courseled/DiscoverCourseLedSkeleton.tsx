@@ -669,21 +669,16 @@ export function MostPlayedPanel() {
   return (
     <section>
       <EyebrowBar w={189} aside />
-      {/* CORRECTION_MOST_PLAYED_COURSE_HEADERS §S4.4 — FOUR SEPARATE CARDS with
+      {/* COURSE CARD FACEPILE §6 — FIVE SEPARATE CARDS with
           the same 10px gap, or the section settles from one panel into four on
           every cold load. */}
       <div>
-        {[0, 1, 2, 3].map((i) => (
+        {[0, 1, 2, 3, 4].map((i) => (
           <div
             key={i}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 11,
-              padding: '12px 14px',
-              /* Browser-measured against the live collapsed card at 320px:
-                 124px when the two-line course-name allowance is exercised. */
-              height: 124,
+              padding: '11px 13px 10px',
+              height: 113,
               boxSizing: 'border-box',
               background: A.PANEL,
               borderRadius: CARD_RADIUS,
@@ -693,11 +688,9 @@ export function MostPlayedPanel() {
           >
             {/* NO RANK BAR (BRIEF_MOST_PLAYED_LEADERBOARD §S1.2) and a 52px
                 thumbnail to match the shipped header row. */}
-            <Bar style={{ height: 52, width: 52, borderRadius: THUMBNAIL_RADIUS, flexShrink: 0 }} />
-            {/* BRIEF_COURSE_CARD_REGION_AND_BEST §4: the shell remains the
-                COLLAPSED state. Region and counts are separate 11px lines; the
-                BEST line sits below the same hairline as the live card. */}
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+              <Bar style={{ height: 52, width: 52, borderRadius: THUMBNAIL_RADIUS, flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
               <div
                 style={{
                   height: 34,
@@ -713,31 +706,28 @@ export function MostPlayedPanel() {
               <div style={{ height: 15, display: 'flex', alignItems: 'center' }}>
                 <TextBar w={92} h={11} />
               </div>
-              <div style={{ height: 13, display: 'flex', alignItems: 'center' }}>
-                <TextBar w={116} h={11} />
               </div>
-              <div
-                style={{
-                  marginTop: 6,
-                  paddingTop: 6,
-                  borderTop: `1px solid ${A.HAIRLINE}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                }}
-              >
-                <TextBar w={27} h={9} />
-                <TextBar w={16} h={12} />
-                <TextBar w={14} h={10} />
-                <TextBar w={48} h={12} />
+              <Bar style={{ height: 15, width: 15, marginLeft: 'auto', flexShrink: 0 }} />
+            </div>
+            <div style={{ marginTop: 10, paddingTop: 8, borderTop: `1px solid ${A.HAIRLINE}`, display: 'grid', gridTemplateColumns: '69px minmax(0,1fr) 34px', alignItems: 'center', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                {[0, 1, 2, 3].map((face) => (
+                  <Bar key={face} style={{ width: 26, height: 26, marginLeft: face === 0 ? 0 : -7, borderRadius: '34%', boxShadow: `0 0 0 ${face === 0 ? 2 : 1.5}px ${A.PANEL}` }} />
+                ))}
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <TextBar w={21} h={18} />
+                  <TextBar w={15} h={10} />
+                  <TextBar w={46} h={10} />
+                </div>
+                <Bar style={{ height: 7, width: 66, marginTop: 4 }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                <TextBar w={26} h={11} />
+                <TextBar w={24} h={7} />
               </div>
             </div>
-            {/* §S1.5 — the promoted PLAYED TO figure over its 8px label. */}
-            <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-              <TextBar w={30} h={17} />
-              <TextBar w={34} h={8} />
-            </div>
-
           </div>
         ))}
       </div>

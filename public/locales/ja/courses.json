@@ -1066,6 +1066,8 @@
     "mostPlayedPlayedToLabel": "スコア",
     "mostPlayedAvgToPar": "{{value}}",
     "mostPlayedLowest": "最低",
+    "mostPlayedLowLabel": "唯一のラウンド",
+    "mostPlayedLowLabel_other": "今週の最少スコア",
     "mostPlayedNew": "新規",
     "trackedRounds": "記録ラウンド",
     "videosHeading": "最新の動画",
