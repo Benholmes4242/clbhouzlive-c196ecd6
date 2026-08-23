@@ -1142,7 +1142,8 @@
         "worldwide": "今週はラウンドがありません。"
       }
     },
-    "mostPlayedSeeAllAtCourse": "このコースを見る"
+    "mostPlayedSeeAllAtCourse": "このコースを見る",
+    "seam": "全期間 · みんなから"
   },
   "statBrowse": {
     "colArea": "エリア",
