@@ -148,7 +148,11 @@ export function Eyebrow({
           {children}
           {dot ? <NewDot /> : null}
         </span>
-        {aside ? <span style={{ marginLeft: 'auto' }}>{aside}</span> : null}
+        {aside ? (
+          <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+            {aside}
+          </span>
+        ) : null}
       </div>
       {subline ? (
         <div
