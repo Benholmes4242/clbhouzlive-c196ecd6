@@ -140,6 +140,12 @@ export default function CommunityPage() {
   const handlePress = useCallback(
     (item: { postId: string; thumbnail: string | null }) => {
       const found = visible.find((i) => i.postId === item.postId);
+      // BOTH EVENTS FIRE ON /community FOR A PERIOD, deliberately
+      // (BRIEF_MEDIA_TRACKING_MINIMUM §2). media_item_opened comes from the tile
+      // itself, carrying type/section/position; this one stays UNCHANGED because
+      // its historical rows are the only baseline that exists for the current
+      // layout, and deleting it breaks the before-and-after the moment this
+      // ships. RETIREABLE AFTER 2026-12-01.
       analyticsEvents.track('community_moment_tapped', {
         course_id: found?.courseId ?? null,
         post_id: item.postId,
