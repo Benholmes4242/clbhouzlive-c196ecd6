@@ -11,6 +11,7 @@ import { Eyebrow, InkAction } from '@/components/explore-tab-new/courseled/token
 import { PageRoot } from '@/components/layout/PageRoot';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { mediaTarget } from '@/utils/mediaEngagement';
 
 import { CommunityClipMosaic } from './CommunityClipMosaic';
 import { CommunityCourseIndex } from './CommunityCourseIndex';
@@ -158,6 +159,24 @@ export default function CommunityPage() {
     [posts, visible],
   );
 
+  /**
+   * THE FILTER PILLS ARE THE ONE SIGNAL FREE OF EVERY CONFOUND
+   * (BRIEF_MEDIA_TRACKING_MINIMUM §4): a member explicitly naming the content
+   * type they want, unaffected by position and by autoplay. Every path that
+   * changes the chip — the pills AND the "See all" actions, which are the same
+   * statement made from inside a section — goes through here, so the event can
+   * never be missed by a new call site.
+   */
+  const selectChip = useCallback(
+    (next: ChipId) => {
+      setChip((prev) => {
+        if (prev !== next) analyticsEvents.media.filterSelected(next, prev);
+        return next;
+      });
+    },
+    [],
+  );
+
   const chips: { id: ChipId; label: string }[] = [
     { id: 'all', label: t('community.chips.everything', 'Everything') },
     { id: 'clips', label: t('community.chips.clips', 'Clips') },
@@ -214,7 +233,7 @@ export default function CommunityPage() {
             <button
               key={c.id}
               type="button"
-              onClick={() => setChip(c.id)}
+              onClick={() => selectChip(c.id)}
               style={{
                 flex: 'none',
                 padding: '8px 14px',
@@ -257,6 +276,7 @@ export default function CommunityPage() {
                   railVisible
                   onPress={handlePress}
                   width="100%"
+                  track={mediaTarget(featured, 'community', 'featured', 0)}
                 />
               </div>
             )}
@@ -271,7 +291,7 @@ export default function CommunityPage() {
                     subline={t('community.sections.clips.subline', 'Under three minutes')}
                     aside={
                       chip === 'all' && clipsPool.length > clipsCap ? (
-                        <InkAction onClick={() => setChip('clips')}>
+                        <InkAction onClick={() => selectChip('clips')}>
                           {t('community.seeAll', 'See all')}
                         </InkAction>
                       ) : undefined
@@ -306,6 +326,7 @@ export default function CommunityPage() {
                       item={item}
                       first={i === 0}
                       onPress={handlePress}
+                      track={mediaTarget(item, 'community', 'videos', i)}
                     />
                   ))}
                 </div>
@@ -320,7 +341,7 @@ export default function CommunityPage() {
                     subline={t('community.sections.photos.subline', 'From the courses')}
                     aside={
                       chip === 'all' && photosPool.length > photos.length ? (
-                        <InkAction onClick={() => setChip('photos')}>
+                        <InkAction onClick={() => selectChip('photos')}>
                           {t('community.seeAll', 'See all')}
                         </InkAction>
                       ) : undefined
