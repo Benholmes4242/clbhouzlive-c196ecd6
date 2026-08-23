@@ -1064,6 +1064,9 @@ function GolfThisWeekCard({
         <FigureLine
           moment={moment}
           gross={row.gross ?? null}
+          grossToPar={
+            row.gross != null && row.course_par != null ? row.gross - row.course_par : null
+          }
           toParText={toPar?.text ?? null}
           t={t as TFn}
         />
