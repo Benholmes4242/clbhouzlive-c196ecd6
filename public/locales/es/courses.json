@@ -1178,7 +1178,6 @@
           "birdieHaul": "{{0}} birdies en {{1}} hoyos.",
           "strongFinish": "Birdie o mejor en la vuelta a casa, para acabar en {{0}}."
         },
-        "theShape": "La forma"
       },
       "count": "{{rounds}} rondas · {{courses}} campos · {{days}} días"
     },
