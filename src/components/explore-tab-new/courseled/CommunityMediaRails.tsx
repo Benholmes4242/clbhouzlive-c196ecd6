@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Eyebrow, InkAction, THUMBNAIL_RADIUS } from './tokens';
+import { CHIP_RADIUS, Eyebrow, InkAction, THUMBNAIL_RADIUS } from './tokens';
 import {
   CommunityClipTile,
   CommunityVideoTile,
@@ -85,6 +85,7 @@ export function LatestVideosRail({ items, onTilePress, onSeeAll, style }: Props)
             key={item.key}
             item={item}
             radius={THUMBNAIL_RADIUS}
+            badgeRadius={CHIP_RADIUS}
             railVisible={visible}
             onPress={onTilePress}
           />

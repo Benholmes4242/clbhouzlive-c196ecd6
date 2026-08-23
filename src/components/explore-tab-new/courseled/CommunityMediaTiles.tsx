@@ -216,9 +216,18 @@ interface TileProps {
   square?: boolean;
   /** Discover can opt into its page geometry without changing Community. */
   radius?: number;
+  /** Discover-only badge geometry; Community retains its existing default. */
+  badgeRadius?: number;
 }
 
-export function CommunityVideoTile({ item, railVisible, onPress, width, radius = RADIUS }: TileProps) {
+export function CommunityVideoTile({
+  item,
+  railVisible,
+  onPress,
+  width,
+  radius = RADIUS,
+  badgeRadius = 6,
+}: TileProps) {
   // WHEN content IS EMPTY the poster's name takes the title slot and the meta
   // row drops the duplicate name, keeping the time and the likes.
   const hasTitle = item.title.length > 0;
@@ -264,7 +273,7 @@ export function CommunityVideoTile({ item, railVisible, onPress, width, radius =
                   gap: 5,
                   color: '#FFFFFF',
                   background: 'rgba(10,14,10,0.62)',
-                  borderRadius: 6,
+                  borderRadius: badgeRadius,
                   padding: '2px 6px',
                   fontSize: 10,
                   fontWeight: 700,
