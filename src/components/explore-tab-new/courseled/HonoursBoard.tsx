@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
+import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 
 /**
@@ -178,11 +178,13 @@ function MemberAvatar({
   src,
   alt,
   size = AVATAR,
+  metal = false,
 }: {
   userId: string | null;
   src: string | null;
   alt: string;
   size?: number;
+  metal?: boolean;
 }) {
   return (
     <span
@@ -192,13 +194,8 @@ function MemberAvatar({
         borderRadius: '34%',
       }}
     >
-      <SquircleAvatar
-        size={size}
-        src={src}
-        alt={alt}
-        userId={userId}
-        ringColor={METAL_AVATAR_RING}
-      />
+      <SquircleAvatar size={size} src={src} alt={alt} userId={userId}
+        {...(metal ? { ringColor: METAL_AVATAR_RING } : { hairlineRing: true })} />
     </span>
   );
 }
@@ -294,7 +291,7 @@ export function FeatCard({
         </span>
 
         <span style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <MemberAvatar userId={e.userId} src={e.actorAvatar} alt={e.actorName} />
+          <MemberAvatar userId={e.userId} src={e.actorAvatar} alt={e.actorName} metal />
           <span
             style={{
               display: 'flex',
@@ -310,7 +307,7 @@ export function FeatCard({
                 fontWeight: 800,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.15,
-                color: METAL_INK,
+                color: e.isOwn ? A.AMBER_DEEP : METAL_INK,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
