@@ -1204,7 +1204,8 @@
         "worldwide": "Diese Woche keine Runden."
       }
     },
-    "mostPlayedSeeAllAtCourse": "Diesen Platz besuchen"
+    "mostPlayedSeeAllAtCourse": "Diesen Platz besuchen",
+    "seam": "Alle Zeiten · von allen"
   },
   "statBrowse": {
     "colArea": "Gebiet",

@@ -32,6 +32,15 @@ import { GolfThisWeekSheet } from './GolfThisWeekSheet';
 
 import { ClipsRail, LatestVideosRail } from './courseled/CommunityMediaRails';
 import { useCommunityVideos } from './courseled/hooks/useCommunityVideos';
+import { ActSeam } from './courseled/ActSeam';
+import { Eyebrow, InkAction } from './courseled/tokens';
+import {
+  useCommunityLibrary,
+  type CommunityLibraryItem,
+} from './courseled/hooks/useCommunityLibrary';
+import { CommunityPhotoMosaic } from '@/features/community/CommunityPhotoMosaic';
+import { CommunityCourseIndex } from '@/features/community/CommunityCourseIndex';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
 import { MostPlayedSheet } from './courseled/MostPlayedSheet';
 
@@ -65,12 +74,54 @@ import { useMostPlayedThisWeek, type MostPlayedPlayer, type MostPlayedRow } from
  *   6 Clips                       rail
  *   7 the bottom-nav spacer
  *
+ * =====================================================================
+ * THE SCOPE PILLS ONLY GOVERN THE DATA (BRIEF_DISCOVER_ABSORBS_COMMUNITY §0).
+ *
+ * Your Circle / Suggested / Top 100 / Played / Worldwide filter ROUNDS. A clip
+ * is not "in your circle". So this page is TWO ACTS WITH A VISIBLE SEAM, and the
+ * seam is where the pills' authority ends. Anything below it is unscoped and
+ * must LOOK unscoped.
+ *
+ * EVERY FUTURE SECTION ADDED HERE ANSWERS THAT QUESTION FIRST: which side of the
+ * seam does it belong on? A media rail placed in act one quietly breaks the
+ * promise the pills make, and nothing in the code would complain.
+ *
+ *   ACT ONE   governed by the scope pills, and bounded to the week
+ *     1 the page hero
+ *     2 the readout and the scope pills
+ *     3 the four leader tiles      } inside GolfThisWeek
+ *     4 the round tiles rail       }
+ *     5 courses played this week
+ *   THE SEAM  ALL TIME - FROM EVERYONE
+ *   ACT TWO   governed by nothing above it
+ *     6 the honours board          the hinge: data, so it speaks act one's
+ *                                  language; all-time and unscoped, so it obeys
+ *                                  act two's rules
+ *     7 photos
+ *     8 clips
+ *     9 latest videos
+ *    10 browse by club             navigational, not content, so it is last
+ *
+ * /community IS NO LONGER NAVIGATED TO; it survives as the destination behind
+ * every act two "see all" (§3). Its route, page and media filter pills are
+ * untouched. THOSE FILTER PILLS DO NOT COME HERE: two pill rows on one page,
+ * one scoping rounds and one scoping media, is §0's ambiguity made literal.
+ *
  * ON TOUR THIS WEEK, LATEST REVIEWS, the rate prompt and FROM THE COMMUNITY
- * were each removed from this page deliberately.
+ * were each removed from this page deliberately. Photos are back — as the lead
+ * of act two, not as an act one section.
  *
  * The "This week on clbhouz" pulse band from the signed-off mock is REMOVED per
  * the brief and must not be reinstated.
  */
+
+/**
+ * EVERY ACT TWO SECTION SHOWS A SAMPLE, NOT ITS POOL (§5). Twelve photos is two
+ * full mosaic rows plus a third that is visibly cut off — enough to read as a
+ * wall, short enough that browse by club is still reachable. The rails cap
+ * themselves. The full pool is one see-all away.
+ */
+const PHOTOS_CAP = 12;
 
 interface ExploreTabContentProps {
   embedded?: boolean;
@@ -128,6 +179,10 @@ export default function ExploreTabContent({
   // THE MEDIA RAILS ARE NOT COURSE-LED (BRIEF_DISCOVER_MEDIA_RAILS §0.2): this
   // reads the whole media library, unfiltered by course tag and by `lens`.
   const communityVideos = useCommunityVideos();
+  /* ACT TWO'S PHOTOS AND CLUBS read the WHOLE library (all-time, untagged,
+     newest first) — the same hook the /community destination reads, so the
+     sample and the full pool can never disagree. */
+  const library = useCommunityLibrary();
   const mostPlayedQuery = useMostPlayedThisWeek();
 
   const mostPlayed = mostPlayedQuery.data;
@@ -226,6 +281,45 @@ export default function ExploreTabContent({
     [opener],
   );
 
+  /**
+   * PHOTOS LEAD THE MEDIA (§1.2), and the reasoning is recorded so it is not
+   * reversed on a hunch: photos are the only media section that contains the
+   * member's OWN CIRCLE — their friends' faces, their own courses. Clips and
+   * videos are mostly other people's golf. On a page whose first act is entirely
+   * about your circle, the section that continues that thought should open the
+   * second. Photos are also the cheapest to consume (no tap, no audio, no
+   * commitment) and the densest per pixel, which earns the scroll to the clips.
+   *
+   * THIS IS A REASONED PRIOR, NOT A MEASUREMENT. AUDIT_MEDIA_ENGAGEMENT found
+   * the data cannot currently support a ranking of photos against clips against
+   * videos; BRIEF_MEDIA_TRACKING_MINIMUM shipped the two events that will settle
+   * it. Reorder this on those numbers, not on taste.
+   */
+  const photoPool = useMemo(() => library.data?.photos ?? [], [library.data]);
+  const photos = useMemo(() => photoPool.slice(0, PHOTOS_CAP), [photoPool]);
+  const libraryAll = useMemo(() => library.data?.all ?? [], [library.data]);
+
+  /* A SAMPLE IS STILL A QUEUE: the fullscreen viewer swipes the photos the
+     member can actually see here, not the whole library behind the see-all. */
+  const handlePhoto = useCallback(
+    (item: CommunityLibraryItem) => {
+      const posts = photos.map((i) => i.post);
+      const index = Math.max(0, posts.findIndex((post) => post.id === item.postId));
+      openWithOrigin({
+        posts,
+        index,
+        originEl: null,
+        posterUrl: item.thumbnail,
+        mediaIndex: item.mediaIndex ?? 0,
+        mediaId: item.mediaId ?? null,
+        openedFrom: 'discover-photos',
+      });
+    },
+    [photos],
+  );
+
+  const goCommunity = useCallback(() => navigate('/community'), [navigate]);
+
   const honours = useMemo(() => sortHonours(legendary), [legendary]);
 
   const handleHonoursRow = useCallback(
@@ -317,6 +411,13 @@ export default function ExploreTabContent({
           onSeeAll={mostPlayedList.length > 5 ? () => setMostPlayedSheet(true) : undefined}
         />
 
+        {/* THE SEAM. Everything above it obeys the scope pills; nothing below
+            it does. It is a chapter break, not a section header — see ActSeam. */}
+        <ActSeam label={t('discover.seam', 'All time \u00b7 from everyone')} />
+
+        {/* 6 — THE HINGE (§1.1). Data, so it speaks act one's language; all-time
+            and unscoped, so it sits on the join without lying about which side
+            it is on. Its own design is unchanged. */}
         <HonoursBoard
           events={honours}
           isPending={wireLoading}
@@ -325,27 +426,66 @@ export default function ExploreTabContent({
           onSeeAll={openHonoursSheet}
         />
 
-        {/* LATEST VIDEOS. ON TOUR THIS WEEK left this page
-            (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL S1): it was the only
-            section here that is not about the member's world, and its content
-            already owns a bottom-nav tab, so it duplicated a top-level
-            destination. The component and its hook are intact — unmounted, not
-            deleted. LATEST REVIEWS left too (S2), moved to the Courses browse
-            where a review is decision content rather than entertainment.
-            NOTHING MOVED UP to fill either gap. */}
-        <LatestVideosRail
-          items={communityVideos.data?.videos ?? []}
-          onTilePress={() => navigate('/community')}
-          onSeeAll={() => navigate('/community')}
-        />
+        {/* 7 — PHOTOS, on Discover for the first time. The /community mosaic is
+            IMPORTED, not copied: one component, a tone switch for this canvas.
+            Capped and never infinite here — the wall would make everything under
+            it unreachable, which is what the destination is for. */}
+        {photos.length > 0 && (
+          <section>
+            <Eyebrow
+              subline={t('community.sections.photos.subline', 'From the courses')}
+              aside={
+                photoPool.length > photos.length ? (
+                  <InkAction onClick={goCommunity}>
+                    {t('discover.seeAll', 'See all')}
+                  </InkAction>
+                ) : undefined
+              }
+            >
+              {t('community.sections.photos.title', 'Photos')}
+            </Eyebrow>
+            {/* 2px to reach the 16px mosaic margin from the page's 14px. */}
+            <div style={{ margin: '10px 2px 0' }}>
+              <CommunityPhotoMosaic
+                items={photos}
+                onPress={handlePhoto}
+                infinite={false}
+                tone="dark"
+                surface="discover"
+              />
+            </div>
+          </section>
+        )}
 
-        {/* CLIPS — last content section. It reads the whole library, so the
-            scope pills (which live inside the rounds section's own subtree) do
-            not and must not filter it. */}
+        {/* 8 — CLIPS. "Under three minutes" is the only thing telling a member
+            why there are two video sections; it stays on both of them. */}
         <ClipsRail
           items={communityVideos.data?.clips ?? []}
-          onTilePress={() => navigate('/community')}
-          onSeeAll={() => navigate('/community')}
+          onTilePress={goCommunity}
+          onSeeAll={goCommunity}
+        />
+
+        {/* 9 — LATEST VIDEOS, "Three minutes and over". /community's FEATURED
+            FILM does not come across: Discover already has a hero and a second
+            full-width one in act two competes with it. The newest long video is
+            simply the first tile of this rail, which is where it already was.
+            ON TOUR THIS WEEK and LATEST REVIEWS left this page for good. */}
+        <LatestVideosRail
+          items={communityVideos.data?.videos ?? []}
+          onTilePress={goCommunity}
+          onSeeAll={goCommunity}
+        />
+
+        {/* 10 — BROWSE BY CLUB IS LAST (§1.3): it is a way IN, not something to
+            read, and it covers only tagged content. Imported from /community and
+            embedded, so this page keeps owning the gutter and the rhythm. */}
+        <CommunityCourseIndex
+          items={libraryAll}
+          title={t('community.sections.clubs.title', 'Browse by club')}
+          subline={t('community.sections.clubs.subline', 'Only where a course was tagged')}
+          countLabel={(n) => t('community.count', { count: n, defaultValue: '{{count}} posts' })}
+          tone="dark"
+          embedded
         />
 
         {/* From the community was removed from Discover deliberately. Discover

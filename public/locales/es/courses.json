@@ -1204,7 +1204,8 @@
         "worldwide": "Esta semana no hay rondas."
       }
     },
-    "mostPlayedSeeAllAtCourse": "Visitar este campo"
+    "mostPlayedSeeAllAtCourse": "Visitar este campo",
+    "seam": "Todos los tiempos · de todos"
   },
   "statBrowse": {
     "colArea": "Zona",
