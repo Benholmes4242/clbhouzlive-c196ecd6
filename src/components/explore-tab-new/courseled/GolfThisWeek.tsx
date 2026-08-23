@@ -1527,7 +1527,7 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'best',
       emoji: '\uD83D\uDD25', // FIRE
-      label: t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK'),
+      label: t('discover.golfThisWeek.bestLabel', 'Best this week'),
       row: best.row,
       /* The hero is `bestOfWeek`'s winner, unchanged; the sort's first place is
          the same row, so the runners are places 2 and 3 of that same list. */
@@ -1554,8 +1554,7 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'stableford',
       emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
-      label: t('discover.golfThisWeek.stablefordLabel', 'Best stableford'),
-      unit: t('discover.golfThisWeek.stablefordUnit', 'points'),
+      label: t('discover.golfThisWeek.stablefordLabel', 'Best Stableford points'),
       row: bestStableford,
       runners: stablefordRanked.slice(1),
       lowerWins: false,
@@ -1570,8 +1569,7 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'birdies',
       emoji: '\uD83D\uDC26', // BIRD
-      label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
-      unit: t('discover.friendsRail.birdies', 'birdies'),
+      label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies in a round'),
       row: mostBirdies,
       runners: birdiesRanked.slice(1),
       lowerWins: false,
@@ -1587,8 +1585,7 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'improved',
       emoji: '\uD83D\uDCAA', // FLEXED ARM
-      label: t('discover.golfThisWeek.improvedLabel', 'MOST IMPROVED'),
-      unit: t('discover.friendsRail.index', 'HCP'),
+      label: t('discover.golfThisWeek.improvedLabel', 'Most improved handicap'),
       row: mostImproved,
       runners: improvedRanked.slice(1),
       lowerWins: false,
@@ -1837,9 +1834,6 @@ export function GolfThisWeek({
                   </span>
                 </span>
                 {tile.label}
-                {tile.unit ? (
-                  <span style={{ marginLeft: 'auto' }}>{tile.unit}</span>
-                ) : null}
               </div>
 
               {/* BRIEF_BAND_TILES_PODIUM — one leader with a face, the margin,

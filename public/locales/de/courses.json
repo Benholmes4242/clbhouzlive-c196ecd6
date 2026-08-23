@@ -1135,8 +1135,10 @@
     "clipsHeading": "Clips",
     "clipsAction": "Alle Clips",
     "golfThisWeek": {
-      "stablefordLabel": "Bestes Stableford",
-      "birdiesLabel": "Meiste Birdies",
+      "bestLabel": "Beste Runde der Woche",
+      "stablefordLabel": "Beste Stableford-Punkte",
+      "birdiesLabel": "Meiste Birdies in einer Runde",
+      "improvedLabel": "Größte Handicap-Verbesserung",
       "stablefordUnit": "Punkte",
       "gap": {
         "shots_one": "{{count}} SCHLAG VORN",

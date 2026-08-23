@@ -1562,8 +1562,10 @@
     "clipsHeading": "Clips",
     "clipsAction": "All clips",
     "golfThisWeek": {
-      "stablefordLabel": "[Bèst stàblefôrd]",
-      "birdiesLabel": "[Mòst bìrdiés]",
+      "bestLabel": "[Bèst thís wèék]",
+      "stablefordLabel": "[Bèst Stàblefôrd pôints]",
+      "birdiesLabel": "[Mòst bìrdiés ín à rôund]",
+      "improvedLabel": "[Mòst ímprôvèd hàndícàp]",
       "stablefordUnit": "[pôints]",
       "gap": {
         "shots_one": "[{{count}} ŠĤŐŢ ĈĻÉÁŘ]",

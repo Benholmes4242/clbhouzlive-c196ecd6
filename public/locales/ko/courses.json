@@ -1073,8 +1073,10 @@
     "clipsHeading": "클립",
     "clipsAction": "모든 클립",
     "golfThisWeek": {
-      "stablefordLabel": "최고 스테이블포드",
-      "birdiesLabel": "버디 최다",
+      "bestLabel": "이번 주 베스트 라운드",
+      "stablefordLabel": "최고 스테이블포드 포인트",
+      "birdiesLabel": "한 라운드 최다 버디",
+      "improvedLabel": "핸디캡 최다 향상",
       "stablefordUnit": "포인트",
       "gap": {
         "shots_one": "{{count}}타 차",

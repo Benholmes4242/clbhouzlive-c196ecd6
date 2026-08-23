@@ -1135,8 +1135,10 @@
     "clipsHeading": "Clips",
     "clipsAction": "Todos los clips",
     "golfThisWeek": {
-      "stablefordLabel": "Mejor stableford",
-      "birdiesLabel": "Más birdies",
+      "bestLabel": "Mejor ronda de la semana",
+      "stablefordLabel": "Mejores puntos Stableford",
+      "birdiesLabel": "Más birdies en una ronda",
+      "improvedLabel": "Mayor mejora de hándicap",
       "stablefordUnit": "puntos",
       "gap": {
         "shots_one": "{{count}} GOLPE DE VENTAJA",
