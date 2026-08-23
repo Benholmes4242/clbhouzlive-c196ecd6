@@ -40,6 +40,7 @@ import {
 } from './hooks/useGolfThisWeek';
 import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegionCounts';
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
+import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import { MiniScorecard } from './RoundShape';
 import {
   FINISHED_IN_RED_TONE,
@@ -125,10 +126,26 @@ import {
    THE TILE IS A HERO, A MEMBER ROW AND A SCORECARD WELL: gradient hero 156 /
    member row with the score / a tinted well holding TWO ROWS OF NINE.
 
-   ONE CHART ONLY — THE SCORECARD (§S0.3). The trajectory variant was designed
-   and CUT: two chart types meant two heights, two sets of axis rules and a
-   selector deciding presentation as well as content. The hero already says what
-   to look for, so the card simply shows it.
+   §S0.3 IS OVERTURNED (AMENDMENT 1 TO BRIEF_ROUND_TILE_CURVE §A3). BOTH HALVES
+   ARE RECORDED so neither is rediscovered:
+
+   WHAT §S0.3 ACTUALLY REFUSED, and it still stands: a tile that CHOOSES BETWEEN
+   a scorecard and a trajectory. Its words were "two chart types meant two
+   heights, two sets of axis rules and a selector deciding presentation as well
+   as content". NOTHING HERE REINTRODUCES A SELECTOR — do not add one.
+
+   WHAT THIS DOES INSTEAD: adds ONE fixed element to EVERY tile. One shape, one
+   height, no branch. The scorecard is neither replaced nor chosen against; the
+   curve sits above it, inside the well, on every card, always.
+
+   THE COST, ACCEPTED KNOWINGLY (§0): the curve and the eighteen marks are the
+   same eighteen numbers. The marks say WHAT happened on each hole; the curve
+   says WHERE the round went. Both stay. Do not remove the OUT/IN rows and do
+   not shrink the marks to compensate.
+
+   THE CURVE IS INSIDE THE WELL (§A4): the well is the round's DATA and the
+   curve is data about the round. Above the well it would sit between the member
+   row and the card and read as belonging to the member.
 
    THE PHOTOGRAPH IS GONE (§S0.4). PHOTO_H, the scrim and the glass chip tokens
    went with it; the hero gradient carries the top of the card. */
@@ -184,13 +201,46 @@ const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 
 /**
  * TILE HEIGHT. hero 156 + 8 pad + 20 member row + 8 + well (6 header + 6 +
- * 1 rule + 7 + 96 grid + 9 pad = 135) = 327. THE WELL RUNS TO THE CARD'S
- * BOTTOM EDGE — there is no card padding beneath it, so the tint finishes the
- * tile instead of stopping 10px short. EVERY KIND LANDS ON IT because the grid
- * region is fixed, INCLUDING a round with NO HOLE DATA (§S1.7, ACCEPTANCE Q).
+ * 1 rule + THE SHAPE 53 + 7 + 100 grid + 9 pad) = 384. THE WELL RUNS TO THE
+ * CARD'S BOTTOM EDGE — there is no card padding beneath it, so the tint
+ * finishes the tile instead of stopping 10px short. EVERY KIND LANDS ON IT
+ * because both regions are fixed, INCLUDING a round with NO HOLE DATA
+ * (§S1.7, ACCEPTANCE Q).
  */
-const WELL_H = 139;
-const CARD_MIN_H = 331;
+/** THE SHAPE's region: eyebrow row 11 + gap 4 + curve 34 + 4 = 53. */
+const SHAPE_H = 34;
+const SHAPE_BLOCK_H = 53;
+const WELL_H = 139 + SHAPE_BLOCK_H;
+const CARD_MIN_H = 331 + SHAPE_BLOCK_H;
+
+/**
+ * THE RAIL SCALE — NOT A CHART DEFAULT (AMENDMENT 1 §A2).
+ *
+ * −6 … +20, passed as TrajectoryLine's `yDomain` by THIS RAIL ONLY. A sixth
+ * caller must not inherit it by accident: the constant is local, the prop is
+ * optional and absent means self-scaling exactly as before.
+ *
+ * WHY ASYMMETRIC: measured over 3,270 rounds (2026-08-23), the worst round runs
+ * to +36 and the best to −8, so a symmetric domain spends nearly half the plot
+ * on ground no round has ever occupied — which flattens every good round, the
+ * same failure self-scaling produces from the other direction. The brief's
+ * suggested ±12 clamped 25.4% of rounds. −6 … +20 clamps 4.3% high and 0.15%
+ * low, and a clamped round draws to the ceiling rather than rescaling the rail.
+ *
+ * RE-MEASURE ANNUALLY, or whenever the member base changes shape.
+ */
+const RAIL_Y_DOMAIN: [number, number] = [-6, 20];
+
+/**
+ * THE FILLS ARE MIXED ON THE WELL, NOT ON THE PANEL (§A5). TrajectoryLine's dark
+ * fillOver/fillUnder are solids pre-mixed on #0B0D10 and are CORRECT on the four
+ * surfaces that use them; the well is rgba(11,13,16,0.66) over the card, a
+ * lighter ground, so the panel-mixed pair reads as a smudge here. These are the
+ * same lightness step taken off the well's resolved colour. NEVER brighten the
+ * shared tokens to fix this one surface.
+ */
+const SHAPE_FILL_OVER = '#3D424A';
+const SHAPE_FILL_UNDER = '#4A2A2E';
 
 /** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
@@ -780,10 +830,14 @@ interface CardProps {
  *
  * Top to bottom (§S4.1): HERO 178 / member row with the score / THE WELL.
  *
- * IT GIVES UP COMPLETENESS DELIBERATELY (§S0.3). No treatment except the grind
- * shows all eighteen holes, because THE SCORECARD IS ONE TAP AWAY AND DOES IT
- * PROPERLY, and a rail tile that tries to be the scorecard ends up as a small
- * unreadable scorecard — which is exactly what shipped before this.
+ * THIS CLAIM IS NO LONGER TRUE AND IS CORRECTED, NOT DELETED (AMENDMENT 1 §A3):
+ * it read "IT GIVES UP COMPLETENESS DELIBERATELY (§S0.3) — no treatment except
+ * the grind shows all eighteen holes". The mini scorecard already draws eighteen
+ * marks, and THE SHAPE now draws the same eighteen numbers cumulatively, so the
+ * tile is complete twice over.
+ * WHAT SURVIVES OF THE ORIGINAL WARNING: a rail tile must not try to BE the
+ * scorecard — no figures per hole, no columns, no yardages. THE SCORECARD IS
+ * STILL ONE TAP AWAY and still does it properly.
  *
  * THE PHOTOGRAPH IS GONE (§S4.6): the hero gradient replaces it, so the course
  * is named in words at the top of the hero.
@@ -1232,6 +1286,47 @@ function GolfThisWeekCard({
               {t('discover.golfThisWeek.moment.fullScorecard', 'Full scorecard')}
               <ChevronRight size={9} strokeWidth={3} />
             </span>
+          </div>
+
+          {/* ===================== THE SHAPE (BRIEF_ROUND_TILE_CURVE §2) =========
+              THE EXISTING TrajectoryLine, IMPORTED — not a second curve. Its own
+              colour rules govern and are not overridden: the graded stroke, the
+              level-par fill split, earned red, and gold-only beads. THE WINNER'S
+              GOLD DOES NOT RECOLOUR IT. The only things this caller supplies are
+              geometry (height, viewWidth, no ticks), the RAIL's fixed y domain,
+              and the fills mixed on the well (§A5).
+              NOT "ENERGY", NOT "POWER", NOT "FORM" — THE SHAPE. */}
+          <div style={{ height: SHAPE_BLOCK_H, boxSizing: 'border-box', paddingTop: 4 }}>
+            <span style={{ ...LABEL, fontSize: 8.5, letterSpacing: '0.14em', color: DISCOVER_QUIET }}>
+              {t('discover.golfThisWeek.moment.theShape', 'The shape')}
+            </span>
+            <div style={{ height: SHAPE_H, marginTop: 4, position: 'relative' }}>
+              {/* THE LEVEL-PAR BASELINE, dashed, at the domain's zero. */}
+              <div
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: `${(RAIL_Y_DOMAIN[1] / (RAIL_Y_DOMAIN[1] - RAIL_Y_DOMAIN[0])) * 100}%`,
+                  borderTop: `1px dashed ${A.HAIRLINE}`,
+                }}
+              />
+              {shape && (
+                <TrajectoryLine
+                  holes={shape.holes}
+                  surface="dark"
+                  height={SHAPE_H}
+                  viewWidth={WELL_INNER}
+                  showTicks={false}
+                  padY={0}
+                  strokeWidth={1.6}
+                  yDomain={RAIL_Y_DOMAIN}
+                  fillOverColor={SHAPE_FILL_OVER}
+                  fillUnderColor={SHAPE_FILL_UNDER}
+                />
+              )}
+            </div>
           </div>
 
           <div

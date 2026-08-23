@@ -399,7 +399,10 @@ export function GolfThisWeekRail() {
                   marginTop: 0,
                   marginLeft: -10,
                   marginRight: -10,
-                  height: 139,
+                  /* 139 + THE SHAPE's 53 (BRIEF_ROUND_TILE_CURVE §5). The live
+                     tile grew by the curve and its eyebrow; the shell grows in
+                     the same pass or the first frame is the wrong height. */
+                  height: 192,
                   background: 'rgba(11,13,16,0.66)',
                   boxShadow: `inset 0 0 0 1px ${A.HAIRLINE}`,
                    borderRadius: `0 0 ${WELL_RADIUS}px ${WELL_RADIUS}px`,
@@ -419,6 +422,15 @@ export function GolfThisWeekRail() {
                 >
                   <Bar style={{ height: 8, width: 54 }} />
                   <Bar style={{ height: 8, width: 66 }} />
+                </div>
+                {/* THE SHAPE's region, 53 = eyebrow 11 + gap 4 + curve 34 + 4.
+                    A FLAT ROW, not a fake curve: the shell states the height the
+                    curve will take, nothing about its content. */}
+                <div style={{ height: 53, paddingTop: 4, boxSizing: 'border-box' }}>
+                  <Bar style={{ height: 8, width: 44 }} />
+                  <div style={{ height: 34, marginTop: 4, display: 'flex', alignItems: 'center' }}>
+                    <Bar style={{ height: 2, width: '100%' }} />
+                  </div>
                 </div>
                 <div
                   style={{

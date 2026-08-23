@@ -161,6 +161,28 @@ interface Props {
    * detail, so it draws shorter and thinner.
    */
   strokeWidth?: number;
+  /**
+   * FIXED Y DOMAIN (AMENDMENT 1 TO BRIEF_ROUND_TILE_CURVE §A1).
+   *
+   * ABSENT = byte-identical to before: the scale is the round's own range and
+   * zero, which is right for a single chart read on its own.
+   *
+   * PRESENT = min/max come from it and every cumulative value is CLAMPED into it
+   * before the y transform, so a rail of tiles draws COMPARABLE shapes and one
+   * outlier round cannot rescale its neighbours. The domain itself is the
+   * CALLER'S, never a default here — see DISCOVER_RAIL_Y_DOMAIN.
+   */
+  yDomain?: [number, number];
+  /**
+   * THE GROUND THE OPAQUE FILLS ARE MIXED ON (§A5). The surface fills are
+   * pre-mixed solids, correct on the panel they were derived from. A caller that
+   * draws on a DIFFERENT ground (the Discover well is a translucent black over
+   * the panel) passes the resolved colour of that ground so the fill can be
+   * mixed against what it actually sits on. Absent = the surface defaults, which
+   * are unchanged for every existing caller.
+   */
+  fillOverColor?: string;
+  fillUnderColor?: string;
 }
 
 
@@ -184,6 +206,9 @@ export const TrajectoryLine: React.FC<Props> = ({
   padY = 10,
   viewWidth = 340,
   strokeWidth = 1.8,
+  yDomain,
+  fillOverColor,
+  fillUnderColor,
 }) => {
 
   const T = SURFACE_TOKENS[surface];
@@ -264,15 +289,24 @@ export const TrajectoryLine: React.FC<Props> = ({
    * earned-red rule both reference it.
    */
   const all = [...allPts.map((p) => p.cum), 0];
-  const min = Math.min(...all);
-  const max = Math.max(...all);
+  const dataMin = Math.min(...all);
+  const dataMax = Math.max(...all);
+  /* A FIXED DOMAIN REPLACES THE SELF-SCALE WHEN GIVEN (§A1) and values CLAMP
+     into it — a +19 round draws to the ceiling and stays there. */
+  const min = yDomain ? yDomain[0] : dataMin;
+  const max = yDomain ? yDomain[1] : dataMax;
   const span = Math.max(max - min, 1);
 
-  // RED IS EARNED, NOT RESERVED — same rule as the friends tile.
-  const wentUnder = min < 0;
+  // RED IS EARNED, NOT RESERVED — same rule as the friends tile. It reads the
+  // DATA, never the domain: a fixed domain includes negative ground for every
+  // round, and a round that never went under par must still draw no red.
+  const wentUnder = dataMin < 0;
 
   const x = (pos: number) => padX + (pos / m) * (w - padX * 2);
-  const y = (v: number) => padY + ((max - v) / span) * (height - padY * 2);
+  const y = (v: number) => {
+    const c = v < min ? min : v > max ? max : v;
+    return padY + ((max - c) / span) * (height - padY * 2);
+  };
   const zeroY = y(0);
 
   const toPts = (seg: Pt[]) => seg.map((p) => ({ x: x(p.pos), y: y(p.cum) }));
@@ -382,9 +416,9 @@ export const TrajectoryLine: React.FC<Props> = ({
           EARNED — the under-par tone only appears when the round went under. */}
       {fillDs.map((d, i) => (
         <g key={`fill-${i}`}>
-          <path d={d} fill={T.fillOver} stroke="none" clipPath={`url(#${clipAbove})`} />
+          <path d={d} fill={fillOverColor ?? T.fillOver} stroke="none" clipPath={`url(#${clipAbove})`} />
           {wentUnder && (
-            <path d={d} fill={T.fillUnder} stroke="none" clipPath={`url(#${clipBelow})`} />
+            <path d={d} fill={fillUnderColor ?? T.fillUnder} stroke="none" clipPath={`url(#${clipBelow})`} />
           )}
         </g>
       ))}

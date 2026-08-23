@@ -1572,14 +1572,13 @@
       "subline": "Everywhere clbhouz golfers played, and how it went.",
       "count": "{{rounds}} rounds · {{courses}} courses · {{days}} days",
       "seeAll": "See all {{count}} rounds",
-      "bestLabel": "BEST THIS WEEK",
+      "bestLabel": "Best this week",
       "overline": "THIS WEEK",
       "follow": "FOLLOW",
       "following": "FOLLOWING",
       "ace": "ACE",
       "albatross": "ALBATROSS",
       "unknownCourse": "A course",
-      "bestLabel": "Best this week",
       "stablefordLabel": "Best Stableford points",
       "birdiesLabel": "Most birdies in a round",
       "improvedLabel": "Most improved handicap",
@@ -1621,7 +1620,8 @@
           "finishedInRed": "Eighteen holes finished under par.",
           "birdieHaul": "{{0}} birdies across {{1}} holes.",
           "strongFinish": "Birdie or better coming home, to finish on {{0}}."
-        }
+        },
+        "theShape": "The shape"
       }
     },
     "week": {
