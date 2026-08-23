@@ -1746,11 +1746,10 @@ export function GolfThisWeek({
                     than an unpredictable filter or shadow. */}
                 <span
                   style={{
-                    width: 16,
-                    height: 16,
-                    flex: '0 0 16px',
-                    borderRadius: '50%',
-                    background: WHITE_ALPHA_08,
+                    position: 'relative',
+                    width: 11,
+                    height: 11,
+                    flex: '0 0 11px',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1758,7 +1757,16 @@ export function GolfThisWeek({
                     lineHeight: 1,
                   }}
                 >
-                  {tile.emoji}
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      inset: -2,
+                      borderRadius: '50%',
+                      background: WHITE_ALPHA_08,
+                    }}
+                  />
+                  <span style={{ position: 'relative' }}>{tile.emoji}</span>
                 </span>
                 {tile.label}
                 {tile.unit ? (
