@@ -253,13 +253,14 @@ export function CommunityVideoTile({
 
   return (
     <div
+      ref={impressionRef}
       role="button"
       tabIndex={0}
-      onClick={() => onPress(item)}
+      onClick={open}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          onPress(item);
+          open();
         }
       }}
       style={{
@@ -392,13 +393,18 @@ export function CommunityVideoTile({
   );
 }
 
-export function CommunityClipTile({ item, railVisible, onPress, width, aspect, square, radius: radiusOverride = RADIUS }: TileProps) {
+export function CommunityClipTile({ item, railVisible, onPress, width, aspect, square, radius: radiusOverride = RADIUS, track }: TileProps) {
   const radius = square ? 0 : radiusOverride;
   const overlayInset = square ? 10 : 8;
+  const impressionRef = useMediaImpression(track);
   return (
     <button
+      ref={impressionRef as unknown as React.Ref<HTMLButtonElement>}
       type="button"
-      onClick={() => onPress(item)}
+      onClick={() => {
+        if (track) analyticsEvents.media.opened(track);
+        onPress(item);
+      }}
       style={{
         flex: width === undefined ? `0 0 ${CLIP_TILE_W}px` : '1 1 auto',
         width: width ?? CLIP_TILE_W,
