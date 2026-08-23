@@ -54,7 +54,7 @@ const SK_ROUND_HERO_BG = [
  *                  round tiles
  *   most played    four collapsed cards at 10px gaps, 52px thumbnail, with
  *                  separate region/count lines and the resolved-player BEST row
- *   honours        rail of 206 x 164 cards over a 96px head
+ *   honours        rail of 206 x 148 cards over a 104px person-led head
  *                  (SK_CARD_W / SK_CARD_H / SK_HEAD_H)
  * so the loaded page lands on its own outline with no section boundary
  * shifting.
@@ -739,16 +739,16 @@ export function MostPlayedPanel() {
 }
 
 /**
- * Section 7 — honours board (BRIEF_HONOURS_BOARD_THE_HOLE): heading, the rarity
+ * Section 7 — honours board (BRIEF_HONOURS_PERSON_LED): heading, the rarity
  * subline, then a RAIL OF EQUAL CARDS bled off the right edge. NO MODE TOGGLE —
  * the toggle moved into the see-all sheet — and NO PHOTO BAND: the card leads
- * with the yardage over a tinted head. Values are literals here on purpose:
+ * with the member over a metal head. Values are literals here on purpose:
  * HonoursBoard imports this shell, so this leaf must not import back from it
- * (card 206 x 164, head 96).
+ * (card 206 x 148, head 104).
  */
 const SK_CARD_W = 206;
-const SK_CARD_H = 164;
-const SK_HEAD_H = 96;
+const SK_CARD_H = 148;
+const SK_HEAD_H = 104;
 
 export function HonoursPanel() {
   return (
@@ -797,25 +797,27 @@ export function HonoursPanel() {
                 gap: 6,
               }}
             >
-              <Bar style={{ height: 26, width: 96, borderRadius: CHIP_RADIUS }} />
-              <TextBar w={78} h={11} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Bar style={{ height: 46, width: 44, borderRadius: '34%', flexShrink: 0 }} />
+                <div>
+                  <TextBar w={102} h={15} />
+                  <div style={{ marginTop: 5 }}>
+                    <TextBar w={112} h={11} />
+                  </div>
+                </div>
+              </div>
             </div>
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
-                gap: 8,
                 height: SK_CARD_H - SK_HEAD_H,
                 padding: '0 12px',
                 boxSizing: 'border-box',
               }}
             >
               <TextBar w={112} h={13} />
-              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                <Bar style={{ height: 20, width: 20, borderRadius: '34%', flexShrink: 0 }} />
-                <TextBar w={84} h={12} />
-              </div>
             </div>
           </div>
         ))}
