@@ -222,7 +222,6 @@ const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
 const VideosPageV2 = lazy(() => import("./features/videos-v2/VideosPageV2"));
 const ClipsPageV2 = lazy(() => import("./features/clips-v2/ClipsPageV2"));
 const ExplorePage = lazy(() => import("./pages/ExplorePage"));
-const HeroSpecimen = lazy(() => import("./pages/__HeroSpecimen"));
 
 
 
@@ -550,7 +549,6 @@ function AppRoutes() {
         <Route path="/clips" element={<WatchGate><Navigate to="/watch/clips" replace /></WatchGate>} />
         <Route path="/watch/clips" element={<WatchGate><Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense></WatchGate>} />
         <Route path="/watch/videos" element={<WatchGate><Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense></WatchGate>} />
-        <Route path="/__hero" element={<Suspense fallback={null}><HeroSpecimen /></Suspense>} />
         <Route path="/explore" element={<Suspense fallback={<DiscoverCourseLedSkeleton />}><ExplorePage /></Suspense>} />
 
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />

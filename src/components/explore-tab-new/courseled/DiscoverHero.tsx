@@ -236,7 +236,6 @@ export function DiscoverHero({
           top: 0,
           left: 0,
           right: 0,
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
           padding: 'calc(env(safe-area-inset-top, 0px) + 70px) 14px 0',
           display: 'flex',
           justifyContent: 'flex-end',
