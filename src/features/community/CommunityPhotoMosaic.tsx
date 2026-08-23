@@ -125,6 +125,8 @@ function PhotoTile({
   height,
   index,
   onPress,
+  tone,
+  surface,
 }: {
   item: CommunityLibraryItem;
   height: number;
