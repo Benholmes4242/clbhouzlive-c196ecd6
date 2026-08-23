@@ -59,6 +59,8 @@ import {
   KICKER,
   LABEL,
   NUMF,
+  PODIUM_ACCENT,
+  PODIUM_GROUND,
   SANS,
   WELL_RADIUS,
 } from './tokens';
@@ -1508,6 +1510,13 @@ export function GolfThisWeek({
      figure's baseline. Colour appears only where it MEANS something: red on an
      under-par to-par, red on a birdie count, green on a falling index. The emoji
      marks the category; nothing else needs to. No accent bar, no tint. */
+  type PodiumFigure = {
+    text: string;
+    tone: string;
+    qual?: string;
+    qualTone?: string;
+  };
+
   const bandTiles: {
     key: string;
     emoji?: string;
@@ -1516,21 +1525,18 @@ export function GolfThisWeek({
         Absent on BEST THIS WEEK, whose qualifier is data and stays per-row. */
     unit?: string;
     row: CircleRoundRow;
-    course: string;
     /** §2 — places 2 and 3, member-capped. Empty is a normal week. */
     runners: CircleRoundRow[];
     /** The tile's comparison for ONE row: the figure, and — only where the
         qualifier varies by round — that row's qualifier. */
-    figureOf: (r: CircleRoundRow) => {
-      text: string;
-      tone: string;
-      qual?: string;
-      qualTone?: string;
-    };
-    /** §3 — the tile's WORST-CASE figure, so the measured column has a stable
-        floor and does not jitter one digit when the scope pill changes the
-        data under it. The column is max(measured rows, this). */
-    figureFloor?: { text: string; qual?: string };
+    figureOf: (r: CircleRoundRow) => PodiumFigure;
+    /** ONE DIRECTION FLAG (§4): lower figures win only BEST THIS WEEK. */
+    lowerWins: boolean;
+    /** Numeric comparison value. Improved uses positive improvement magnitude. */
+    valueOf: (r: CircleRoundRow) => number;
+    accent: string;
+    chipGround: string;
+    gapKind: 'shots' | 'points' | 'clear';
   }[] = [];
 
 
@@ -1555,22 +1561,25 @@ export function GolfThisWeek({
       emoji: '\uD83D\uDD25', // FIRE
       label: t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK'),
       row: best.row,
-      course: courseNameFor(best.row),
       /* The hero is `bestOfWeek`'s winner, unchanged; the sort's first place is
          the same row, so the runners are places 2 and 3 of that same list. */
       runners: bestRanked.slice(1),
-      /* §S1.4 — the figure itself stays INK; only the to-par is coloured. What
-         gets coloured is the TO-PAR, never the count. */
+      lowerWins: true,
+      valueOf: (r) => r.gross as number,
+      accent: PODIUM_ACCENT.gold,
+      chipGround: PODIUM_GROUND.gold,
+      gapKind: 'shots',
+      /* GOLD REPORTS THE WIN (§0), not under/over par. The whole line remains
+         gold even when the winning round's qualifier is +3. */
       figureOf: (r) => {
         const tp = toParOf(r);
         return {
           text: String(r.gross ?? '\u2014'),
-          tone: INK,
+          tone: PODIUM_ACCENT.gold,
           qual: tp?.text,
-          qualTone: tp?.tone,
+          qualTone: PODIUM_ACCENT.gold,
         };
       },
-      figureFloor: { text: '77', qual: '+16' },
     });
   }
   if (bestStableford) {
@@ -1580,10 +1589,13 @@ export function GolfThisWeek({
       label: t('discover.golfThisWeek.stablefordLabel', 'Best stableford'),
       unit: t('discover.golfThisWeek.stablefordUnit', 'points'),
       row: bestStableford,
-      course: courseNameFor(bestStableford),
       runners: stablefordRanked.slice(1),
-      figureOf: (r) => ({ text: String(r.stableford_points), tone: INK }),
-      figureFloor: { text: '41' },
+      lowerWins: false,
+      valueOf: (r) => r.stableford_points as number,
+      accent: PODIUM_ACCENT.white,
+      chipGround: PODIUM_GROUND.white,
+      gapKind: 'points',
+      figureOf: (r) => ({ text: String(r.stableford_points), tone: PODIUM_ACCENT.white }),
     });
   }
   if (mostBirdies) {
@@ -1593,11 +1605,14 @@ export function GolfThisWeek({
       label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
       unit: t('discover.friendsRail.birdies', 'birdies'),
       row: mostBirdies,
-      course: courseNameFor(mostBirdies),
       runners: birdiesRanked.slice(1),
+      lowerWins: false,
+      valueOf: (r) => r.birdies as number,
+      accent: PODIUM_ACCENT.red,
+      chipGround: PODIUM_GROUND.red,
+      gapKind: 'clear',
       /* A birdie count IS a count of under-par holes, so the red is literal. */
       figureOf: (r) => ({ text: String(r.birdies), tone: ROW_DARK_TOPAR_UNDER }),
-      figureFloor: { text: '5' },
     });
   }
   if (mostImproved) {
@@ -1607,14 +1622,19 @@ export function GolfThisWeek({
       label: t('discover.golfThisWeek.improvedLabel', 'MOST IMPROVED'),
       unit: t('discover.friendsRail.index', 'HCP'),
       row: mostImproved,
-      course: courseNameFor(mostImproved),
       runners: improvedRanked.slice(1),
-      /* A falling index IS better — the index-delta scale, with a down arrow. */
+      lowerWins: false,
+      /* Convert negative deltas to positive improvement magnitudes. This keeps
+         one higher-wins deficit formula: −0.4 leads −0.2, and the chaser is
+         0.2 behind, never 0.2 ahead. */
+      valueOf: (r) => Math.abs(r.delta_index as number),
+      accent: PODIUM_ACCENT.green,
+      chipGround: PODIUM_GROUND.green,
+      gapKind: 'clear',
       figureOf: (r) => ({
-        text: `\u2193${Math.abs(r.delta_index as number).toFixed(1)}`,
-        tone: A.IMPROVED,
+        text: `\u2212${Math.abs(r.delta_index as number).toFixed(1)}`,
+        tone: PODIUM_ACCENT.green,
       }),
-      figureFloor: { text: '\u21930.4' },
     });
   }
 
