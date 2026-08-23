@@ -145,7 +145,7 @@ export function RoundShape({
       <TrajectoryLine
         holes={shape.holes}
         height={height}
-        surface="light"
+        surface="dark"
         showTicks={false}
         padY={1}
         /* THE VIEWBOX MATCHES THE COLUMN (CORRECTION_SHEET_TRACE_HEIGHT §4):
