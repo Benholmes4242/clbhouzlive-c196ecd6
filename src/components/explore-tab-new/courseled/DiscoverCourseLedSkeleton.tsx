@@ -102,6 +102,13 @@ function Bar({
  * block on the page nine pixels short, which is why the whole page used to
  * settle upward by 9 on load.
  */
+/**
+ * BRIEF_DISCOVER_EYEBROWS §5 — the heading is now a 10px uppercase eyebrow at
+ * lineHeight 1 (KICKER, matching the readout) with NO icon, so the header row is
+ * 10px tall, not 15, and reserves no leading glyph width. Callers' `w` values
+ * were measured for the old 15.5px sentence-case title; each is scaled to the
+ * uppercase run it now models.
+ */
 function EyebrowBar({ w = 150, aside = false }: { w?: number; aside?: boolean }) {
   return (
     <>
@@ -110,11 +117,11 @@ function EyebrowBar({ w = 150, aside = false }: { w?: number; aside?: boolean })
           display: 'flex',
           alignItems: 'center',
           padding: '0 2px',
-          height: 15,
+          height: 10,
         }}
       >
-        <Bar style={{ height: 10, width: w }} />
-        {aside ? <Bar style={{ height: 10, width: 44, marginLeft: 'auto' }} /> : null}
+        <Bar style={{ height: 9, width: w }} />
+        {aside ? <Bar style={{ height: 9, width: 44, marginLeft: 'auto' }} /> : null}
       </div>
       <div style={{ height: 19, display: 'flex', alignItems: 'center', padding: '0 2px' }}>
         <Bar style={{ height: 10, width: 196 }} />
