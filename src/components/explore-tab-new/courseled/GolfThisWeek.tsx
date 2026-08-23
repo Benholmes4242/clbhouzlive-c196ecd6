@@ -53,6 +53,8 @@ import {
   CARD_RADIUS,
   CARD_SHELL,
   CHIP_RADIUS,
+  DISCOVER_FACT,
+  DISCOVER_QUIET,
   InkAction,
   KICKER,
   LABEL,
@@ -163,15 +165,15 @@ void WELL_INNER;
 
 /* THE INK DOES THE HIERARCHY. One genuinely dark ink and greys that are clearly
    different from each other, not four middling greys. */
-const INK = A.INK;   // scores and totals
-const MID = A.MUTE;   // secondary text
+const INK = DISCOVER_FACT;   // scores, names and totals are content
+const MID = DISCOVER_QUIET;  // all quiet chrome shares one tier
 const HAIRLINE_INK = A.HAIRLINE;
 
 /* THREE CLEARLY DIFFERENT GREYS FOR THE BAND (§S4.2 of the band brief). A.FAINT
    and A.GHOST do not exist on the shared ramp, so the band names them here
    against the same ink. THE BAND TILES ARE NOT TOUCHED BY THIS BRIEF. */
 const BAND_MUTE = MID;
-const BAND_FAINT = A.DIM;
+const BAND_FAINT = DISCOVER_QUIET;
 
 
 
@@ -233,11 +235,11 @@ const AMBER = '#F7931E';
    canonical to-par grammar on dark. The light values above stay put because the
    band tiles and the well still use them. */
 /** Names and grosses: the hero's own white, so one white runs down the block. */
-const ROW_DARK_INK = 'rgba(255,255,255,0.94)';
+const ROW_DARK_INK = DISCOVER_FACT;
 /** Over/level par, and every quiet value on dark. FLOORED AT 0.78
     (BRIEF_HERO_TEXT_FLOOR_AND_DELTA §1): PhotoBand's 0.62 is unreadable at
     10.5px over a photograph. The INDEX MOVEMENT no longer uses this — see below. */
-const ROW_DARK_QUIET = 'rgba(255,255,255,0.78)';
+const ROW_DARK_QUIET = DISCOVER_QUIET;
 /** THE INDEX MOVEMENT KEEPS ITS COLOUR (§2). Colour where it means something:
     a falling index is better (green), a rising one is worse (red). The tour hero
     has no index movement, so PhotoBand's "colour only on a score" never governed
@@ -740,7 +742,7 @@ function FigureLine({
     letterSpacing: '0.14em',
     lineHeight: 1,
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.78)',
+    color: DISCOVER_QUIET,
   };
 
   if (moment.figureRole === 'score' && moment.figure != null) {
@@ -986,7 +988,7 @@ function GolfThisWeekCard({
                 fontWeight: 700,
                 lineHeight: 1.15,
                 letterSpacing: '-0.01em',
-                color: 'rgba(255,255,255,0.94)',
+                 color: DISCOVER_FACT,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -1001,7 +1003,7 @@ function GolfThisWeekCard({
                   fontSize: 9.5,
                   fontWeight: 600,
                   lineHeight: 1,
-                  color: 'rgba(255,255,255,0.78)',
+                   color: DISCOVER_QUIET,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -1019,7 +1021,7 @@ function GolfThisWeekCard({
               lineHeight: 1,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.78)',
+               color: DISCOVER_QUIET,
             }}
           >
             {relativeDay(row.play_date, t)}
@@ -1053,7 +1055,7 @@ function GolfThisWeekCard({
                   ? ROW_DARK_INDEX_FELL
                   : moment.kind === 'finishedInRed'
                     ? ROW_DARK_TOPAR_UNDER
-                    : 'rgba(255,255,255,0.78)',
+                    : DISCOVER_QUIET,
             }}
           >
             {label}
@@ -1079,7 +1081,7 @@ function GolfThisWeekCard({
             fontSize: 10.5,
             fontWeight: 500,
             lineHeight: 1.3,
-            color: 'rgba(255,255,255,0.82)',
+            color: DISCOVER_FACT,
             display: '-webkit-box',
             WebkitBoxOrient: 'vertical',
             WebkitLineClamp: 2,

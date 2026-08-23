@@ -11,7 +11,7 @@ import {
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 import { relativeDay } from './discoverWhen';
-import { A, NUMF, SANS } from './tokens';
+import { A, DISCOVER_FACT, DISCOVER_QUIET, NUMF, SANS } from './tokens';
 import {
   ROW_DARK_INDEX_FELL,
   ROW_DARK_TOPAR_UNDER,
@@ -248,7 +248,7 @@ export function DiscoverHero({
             lineHeight: 1,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.78)',
+            color: DISCOVER_QUIET,
           }}
         >
           {relativeDay(row.play_date, t)}
@@ -274,7 +274,7 @@ export function DiscoverHero({
                   ? ROW_DARK_INDEX_FELL
                   : moment.kind === 'finishedInRed'
                     ? ROW_DARK_TOPAR_UNDER
-                    : 'rgba(255,255,255,0.78)',
+                    : DISCOVER_QUIET,
             }}
           >
             {label}
@@ -307,7 +307,7 @@ export function DiscoverHero({
             fontSize: 12.5,
             fontWeight: 500,
             lineHeight: 1.35,
-            color: 'rgba(255,255,255,0.82)',
+            color: DISCOVER_FACT,
             display: '-webkit-box',
             WebkitBoxOrient: 'vertical',
             WebkitLineClamp: 2,
@@ -341,7 +341,7 @@ export function DiscoverHero({
               fontSize: 13,
               fontWeight: 700,
               lineHeight: 1.2,
-              color: row.is_self ? '#F7931E' : 'rgba(255,255,255,0.94)',
+              color: row.is_self ? '#F7931E' : DISCOVER_FACT,
               flexShrink: 0,
               maxWidth: '45%',
               overflow: 'hidden',
@@ -356,7 +356,7 @@ export function DiscoverHero({
               fontSize: 12,
               fontWeight: 600,
               lineHeight: 1.2,
-              color: 'rgba(255,255,255,0.78)',
+              color: DISCOVER_QUIET,
               minWidth: 0,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -378,7 +378,7 @@ const heroWordStyle: React.CSSProperties = {
   letterSpacing: '0.14em',
   lineHeight: 1,
   textTransform: 'uppercase',
-  color: 'rgba(255,255,255,0.78)',
+  color: DISCOVER_FACT,
 };
 
 export default DiscoverHero;

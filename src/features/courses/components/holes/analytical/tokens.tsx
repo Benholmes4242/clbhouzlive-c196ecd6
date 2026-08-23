@@ -24,7 +24,7 @@
  */
 
 import React from 'react';
-import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_UNDER_DARK, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 
 /**
@@ -44,7 +44,7 @@ export const A = {
   DIM: 'rgba(248,250,252,0.42)',
   AMBER: '#F7931E',
   AMBER_DEEP: '#F7931E',
-  RED: '#FF6B60',
+  RED: TOPAR_UNDER_DARK,
   GREEN: '#34D77F',
   /**
    * HANDICAP INDEX MOVEMENT only (not par): IMPROVED = index came down,

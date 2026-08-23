@@ -19,11 +19,15 @@ import { SURFACE } from '@/lib/tokens/surface';
 /** Dark ink ramp of record for this area. Identical to A.INK / BODY / MUTE / DIM. */
 export const INK = SURFACE.dark;
 
-export const KICKER: React.CSSProperties = { ...KICKER_LEGACY, fontWeight: 700 };
-export const LABEL: React.CSSProperties = { ...LABEL_LEGACY, fontWeight: 700 };
+export const KICKER: React.CSSProperties = { ...KICKER_LEGACY, fontWeight: 700, color: DISCOVER_QUIET };
+export const LABEL: React.CSSProperties = { ...LABEL_LEGACY, fontWeight: 700, color: DISCOVER_QUIET };
 
 export const GOLD = '#D8A93C';
 export { A, SANS, FIGS };
+
+/** Amendment 1: Discover content is white; interface labels are one quiet tier. */
+export const DISCOVER_FACT = '#FFFFFF';
+export const DISCOVER_QUIET = 'rgba(255,255,255,0.70)';
 
 /** Discover content geometry: one master, all subordinate radii derived. */
 export const CARD_RADIUS = 8;
@@ -97,7 +101,7 @@ export const SECTION_TITLE: React.CSSProperties = {
   fontSize: 15.5,
   fontWeight: 700,
   letterSpacing: '-0.02em',
-  color: A.INK,
+  color: DISCOVER_QUIET,
   lineHeight: 1.2,
 };
 
@@ -117,7 +121,7 @@ export const SECTION_TITLE: React.CSSProperties = {
 export const EYEBROW_TEXT: React.CSSProperties = {
   fontFamily: SANS,
   ...KICKER,
-  color: A.INK,
+  color: DISCOVER_QUIET,
   lineHeight: 1,
 };
 
@@ -169,7 +173,7 @@ export function Eyebrow({
             fontSize: 11.5,
             fontWeight: 500,
             lineHeight: 1.4,
-            color: A.MUTE,
+            color: DISCOVER_QUIET,
           }}
         >
           {subline}
@@ -202,7 +206,7 @@ export function InkAction({
         ...LABEL,
         fontSize: 10,
         lineHeight: 1,
-        color: A.INK,
+        color: DISCOVER_QUIET,
         background: 'transparent',
         border: 'none',
         // 44px tap target without disturbing the eyebrow baseline: the padding
@@ -219,7 +223,7 @@ export function InkAction({
         height="12"
         viewBox="0 0 24 24"
         fill="none"
-        stroke={A.INK}
+        stroke={DISCOVER_QUIET}
         strokeWidth="2.5"
         strokeLinecap="round"
         aria-hidden
