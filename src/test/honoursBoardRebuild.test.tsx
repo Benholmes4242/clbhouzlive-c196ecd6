@@ -10,6 +10,7 @@ import {
   PLATINUM_GROUND,
   METAL_INK,
   METAL_YEAR,
+  sortHonoursRail,
 } from '@/components/explore-tab-new/courseled/HonoursBoard';
 import type { WireEvent } from '@/components/explore-tab-new/hooks/useDiscoverWire';
 
@@ -33,12 +34,15 @@ function ev(over: Partial<WireEvent> & { id: string }): WireEvent {
 }
 
 describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
-  it('leads each card with the yardage and puts the hole and par beneath', () => {
-    const { container } = render(<HonoursBoard events={[ev({ id: 'a' })]} />);
+  it('leads each card with the member and puts hole, par and yardage beneath', () => {
+    const { container } = render(
+      <HonoursBoard events={[ev({ id: 'a', actorAvatar: 'https://example.com/avatar.jpg' })]} />,
+    );
     expect(container.textContent).toMatch(/152/);
-    expect(container.textContent).toMatch(/YARDS/i);
+    expect(container.textContent).toMatch(/152 yds/i);
     expect(container.textContent).toMatch(/Par 3/);
     expect(screen.getByText('Ace')).toBeTruthy();
+    expect(screen.getAllByText('Sam Fairway')).toHaveLength(1);
     expect(PLAQUE_W).toBe(206);
   });
 
@@ -102,21 +106,33 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     expect(head).toBeTruthy();
     const ink = 'rgb(15, 23, 42)';
     expect(screen.getByText('Ace').style.color).toBe(ink);
-    expect(screen.getByText('152').style.color).toBe(ink);
-    expect(screen.getByText('YARDS').style.color).toBe(ink);
-    expect(screen.getByText(/Par 3/).style.color).toBe(ink);
+    expect(screen.getByText('Sam Fairway').style.color).toBe(ink);
+    expect(screen.getByText(/Par 3/).style.color).toBe('rgba(15, 23, 42, 0.8)');
     expect(screen.getByText('2024').style.color).toBe('rgba(15, 23, 42, 0.8)');
   });
 
-  it('shows no photograph on any card', () => {
-    const { container } = render(<HonoursBoard events={[ev({ id: 'a' })]} />);
-    expect(container.querySelectorAll('img')).toHaveLength(0);
+  it('uses a lazy-loaded 44px squircle avatar on every card', () => {
+    const { container } = render(
+      <HonoursBoard events={[ev({ id: 'a', actorAvatar: 'https://example.com/avatar.jpg' })]} />,
+    );
+    const avatar = container.querySelector('img');
+    expect(avatar?.getAttribute('loading')).toBe('lazy');
+    expect(avatar?.parentElement?.style.width).toBe('44px');
   });
 
   it('renders the member name with no "You" substitution', () => {
     render(<HonoursBoard events={[ev({ id: 'a', isOwn: true })]} />);
     expect(screen.getByText('Sam Fairway')).toBeTruthy();
     expect(screen.queryByText('You')).toBeNull();
+  });
+
+  it('orders rarity first, then most recent within each rarity', () => {
+    const ordered = sortHonoursRail([
+      ev({ id: 'new-ace', at: '2025-01-01T00:00:00Z' }),
+      ev({ id: 'old-albatross', kind: 'albatross', at: '2020-01-01T00:00:00Z' }),
+      ev({ id: 'new-albatross', kind: 'albatross', at: '2024-01-01T00:00:00Z' }),
+    ]);
+    expect(ordered.map((event) => event.id)).toEqual(['new-albatross', 'old-albatross', 'new-ace']);
   });
 
   it('still ranks leaders for the sheet: total, then albatrosses, then recency', () => {
