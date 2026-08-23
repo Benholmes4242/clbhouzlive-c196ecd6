@@ -146,8 +146,14 @@ export function DiscoverHero({
 
   const isScore = moment.figureRole === 'score' && moment.figure != null;
   const figure = moment.figure ?? 0;
-  /* The hero figure and its adjacent noun share the course-name white. */
-  const figureColor = DISCOVER_FACT;
+  /* The hero figure and its adjacent noun share the course-name white — EXCEPT
+     THE RUN, which carries the falling-index green through figure and noun, the
+     same rule the round tile's MomentFigure applies. */
+  const isRun = moment.kind === 'run';
+  const figureColor = isRun ? ROW_DARK_INDEX_FELL : DISCOVER_FACT;
+  const wordStyle: React.CSSProperties = isRun
+    ? { ...heroWordStyle, color: ROW_DARK_INDEX_FELL }
+    : heroWordStyle;
 
   return (
     <div
@@ -289,7 +295,7 @@ export function DiscoverHero({
             from the ONE translatable template — before an IDENTITY, after a
             QUANTITY — so a translator can still reorder. */}
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, minWidth: 0 }}>
-          {parts.before && <span style={heroWordStyle}>{parts.before}</span>}
+          {parts.before && <span style={wordStyle}>{parts.before}</span>}
           <CountUpFigure
             value={figure}
             format={isScore ? fmtRel : (n) => String(n)}
@@ -302,7 +308,7 @@ export function DiscoverHero({
               color: figureColor,
             }}
           />
-          {parts.after && <span style={heroWordStyle}>{parts.after}</span>}
+          {parts.after && <span style={wordStyle}>{parts.after}</span>}
         </div>
 
         <div
