@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Eyebrow } from '@/components/explore-tab-new/courseled/tokens';
+import { A, Eyebrow } from '@/components/explore-tab-new/courseled/tokens';
+import { SURFACE } from '@/lib/tokens/surface';
 import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
 
 /**
@@ -15,9 +16,17 @@ import type { CommunityLibraryItem } from '@/components/explore-tab-new/coursele
  * arrives newest-first.
  */
 
-const INK = '#0E1216';
-const MUTE = '#A2A9B2';
-const PANEL = '#EDF0F3';
+const LIGHT = { ink: '#0E1216', mute: '#A2A9B2', panel: '#EDF0F3' } as const;
+/**
+ * DARK IS FOR DISCOVER, WHICH IMPORTS THIS SECTION RATHER THAN COPYING IT
+ * (BRIEF_DISCOVER_ABSORBS_COMMUNITY §2). The brief states these components are
+ * already dark; they are NOT — every one of them was written against
+ * /community's #F8FAFC canvas and carries its own light hexes. A tone switch is
+ * the smallest change that lets ONE component serve both surfaces, which is the
+ * outcome the brief actually asked for. Light stays the default so /community
+ * renders byte-for-byte what it renders today.
+ */
+const DARK = { ink: SURFACE.dark.ink, mute: SURFACE.dark.mute, panel: A.PANEL } as const;
 
 /** Twelve clubs. A thirteenth would start to read as a list again. */
 const MAX_CLUBS = 12;
@@ -28,6 +37,13 @@ interface Props {
   title: string;
   subline: string;
   countLabel: (n: number) => string;
+  /** Discover is dark. Default light = /community, unchanged. */
+  tone?: 'light' | 'dark';
+  /**
+   * TRUE ON DISCOVER: the caller already owns the page gutter and the 28px
+   * section seam, so this section supplies neither and cannot double either.
+   */
+  embedded?: boolean;
 }
 
 interface ClubCard {
@@ -37,8 +53,16 @@ interface ClubCard {
   thumbnail: string | null;
 }
 
-export function CommunityCourseIndex({ items, title, subline, countLabel }: Props) {
+export function CommunityCourseIndex({
+  items,
+  title,
+  subline,
+  countLabel,
+  tone = 'light',
+  embedded = false,
+}: Props) {
   const navigate = useNavigate();
+  const C = tone === 'dark' ? DARK : LIGHT;
 
   const clubs = useMemo<ClubCard[]>(() => {
     const byCourse = new Map<string, ClubCard>();
@@ -65,11 +89,11 @@ export function CommunityCourseIndex({ items, title, subline, countLabel }: Prop
   if (clubs.length === 0) return null;
 
   return (
-    <section style={{ marginBottom: 26 }}>
+    <section style={{ marginBottom: embedded ? 0 : 26 }}>
       {/* Eyebrow's own padding is 0 2px because Discover callers own their
           gutter. Rendered bare it looks pushed left, so this page supplies the
           16px itself and the icon lands on the first tile's left edge. */}
-      <div style={{ padding: '0 14px' }}>
+      <div style={{ padding: embedded ? 0 : '0 14px' }}>
         <Eyebrow subline={subline}>
           {title}
         </Eyebrow>
@@ -80,7 +104,7 @@ export function CommunityCourseIndex({ items, title, subline, countLabel }: Prop
           display: 'flex',
           gap: 8,
           overflowX: 'auto',
-          padding: '0 16px 2px',
+          padding: embedded ? '0 0 2px' : '0 16px 2px',
           willChange: 'transform',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
@@ -107,7 +131,7 @@ export function CommunityCourseIndex({ items, title, subline, countLabel }: Prop
                 height: CARD_W,
                 borderRadius: 12,
                 overflow: 'hidden',
-                background: PANEL,
+                background: C.panel,
               }}
             >
               {c.thumbnail && (
@@ -126,7 +150,7 @@ export function CommunityCourseIndex({ items, title, subline, countLabel }: Prop
                 fontSize: 12,
                 fontWeight: 700,
                 letterSpacing: '-0.01em',
-                color: INK,
+                color: C.ink,
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
@@ -142,7 +166,7 @@ export function CommunityCourseIndex({ items, title, subline, countLabel }: Prop
                 marginTop: 2,
                 fontSize: 11,
                 fontWeight: 700,
-                color: MUTE,
+                color: C.mute,
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
