@@ -4,6 +4,13 @@ import { render } from '@testing-library/react';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (_key: string, fallback?: string) => fallback ?? _key,
+    i18n: { language: 'en', resolvedLanguage: 'en' },
+  }),
+}));
+
 const rows: CircleRoundRow[] = [];
 
 vi.mock('@/components/explore-tab-new/courseled/hooks/useGolfThisWeek', async () => {
@@ -80,12 +87,13 @@ describe('BRIEF_RUN_GREEN_FIGURE', () => {
     } as unknown as CircleRoundRow);
 
     const { container } = render(<GolfThisWeek userId="me" onCardPress={() => {}} onSeeAll={() => {}} />);
-    const card = container.querySelector('[role="button"]');
-    expect(card).toBeTruthy();
-    const text = card?.textContent ?? '';
+    const buttons = [...container.querySelectorAll('[role="button"]')] as HTMLElement[];
+    const runCard = buttons.find((b) => /Test Links|9\s*PARS\s*IN\s*A\s*ROW/i.test(b.textContent ?? ''));
+    expect(runCard).toBeTruthy();
+    const text = runCard?.textContent ?? '';
     expect(text).toMatch(/9\s*PARS\s*IN\s*A\s*ROW/i);
 
-    const spans = [...(card?.querySelectorAll('span') ?? [])] as HTMLElement[];
+    const spans = [...(runCard?.querySelectorAll('span') ?? [])] as HTMLElement[];
     const runSpans = spans.filter((s) => /9|PARS\s*IN\s*A\s*ROW/i.test(s.textContent ?? ''));
     expect(runSpans.length).toBeGreaterThan(0);
     const greens = runSpans.filter((s) => {
