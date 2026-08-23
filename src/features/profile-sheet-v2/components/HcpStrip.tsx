@@ -343,7 +343,7 @@ const TrendCard: React.FC<{
                     fontWeight: 700,
                     letterSpacing: '0.08em',
                     color: on ? A.INK : A.DIM,
-                    boxShadow: on ? '0 1px 2px rgba(14,18,22,0.10)' : 'none',
+                    boxShadow: on ? `0 1px 2px ${A.BORDER}` : 'none',
                     cursor: 'pointer',
                   }}
                 >

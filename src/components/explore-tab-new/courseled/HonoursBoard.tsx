@@ -58,7 +58,7 @@ const AVATAR = 20;
  */
 const ACE_GROUND = `linear-gradient(135deg, color-mix(in srgb, ${SC_FILL_GOLD} 30%, ${A.PANEL}), color-mix(in srgb, ${SC_FILL_GOLD} 18%, ${A.PANEL}))`;
 const NEUTRAL_GROUND = A.PANEL;
-const GHOST = A.DIM;
+const GHOST = A.BODY;
 
 export type HonoursMode = 'recent' | 'leaders';
 
@@ -239,8 +239,8 @@ export function FeatCard({
         fontFamily: SANS,
         boxSizing: 'border-box',
         cursor: tappable ? 'pointer' : 'default',
-        /* A feat with no score genuinely cannot open — say so visually. */
-        opacity: tappable ? 1 : 0.62,
+        /* Disabled changes interaction only; rarity copy must keep full contrast. */
+        opacity: 1,
       }}
     >
       {/* THE TINTED HEAD — gold for an ace, the neutral well for an albatross. */}
@@ -310,7 +310,7 @@ export function FeatCard({
                 fontSize: 8,
                 fontWeight: 800,
                 letterSpacing: '0.18em',
-                color: A.MUTE,
+                color: A.BODY,
               }}
             >
               {t('discover.honours.yards', 'YARDS')}
