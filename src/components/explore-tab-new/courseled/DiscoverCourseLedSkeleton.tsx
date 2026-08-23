@@ -146,7 +146,7 @@ function TextBar({ w, h = 11 }: { w: number | string; h?: number }) {
 export function FriendsRail() {
   return (
     <section>
-      <EyebrowBar w={168} aside />
+      <EyebrowBar w={87} aside />
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
           <div key={i} style={{ ...CARD_SHELL, width: 224, flexShrink: 0, padding: 0 }}>
@@ -503,7 +503,7 @@ export function GolfThisWeekRail() {
 export function TourRail() {
   return (
     <section>
-      <EyebrowBar w={140} aside />
+      <EyebrowBar w={132} aside />
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1].map((i) => (
           <div
@@ -561,7 +561,7 @@ export function TourRail() {
 export function ReviewsMosaic() {
   return (
     <section>
-      <EyebrowBar w={126} aside />
+      <EyebrowBar w={109} aside />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         {[0, 1].map((i) => (
           <Bar key={i} style={{ height: 265, borderRadius: 14 }} />
@@ -650,7 +650,7 @@ export function AroundTheWorldCard({ pills }: { pills?: React.ReactNode } = {}) 
 export function MomentsMosaic() {
   return (
     <section>
-      <EyebrowBar w={142} aside />
+      <EyebrowBar w={154} aside />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {[0, 1].map((b) => (
           <div key={b} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
@@ -680,7 +680,7 @@ export function MomentsMosaic() {
 export function MostPlayedPanel() {
   return (
     <section>
-      <EyebrowBar w={152} aside />
+      <EyebrowBar w={189} aside />
       {/* CORRECTION_MOST_PLAYED_COURSE_HEADERS §S4.4 — FOUR SEPARATE CARDS with
           the same 10px gap, or the section settles from one panel into four on
           every cold load. */}
