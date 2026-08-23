@@ -1026,8 +1026,8 @@
       "holeAndPar": "{{hole}} · パー{{par}}",
       "sublineAces_other": "ホールインワン {{count}}回",
       "sublineAlbatrosses_other": "アルバトロス {{count}}回",
-      "sublineBoth": "通算で{{aces}}、{{albatrosses}}。ホールインワンの確率は一般に12,500分の1と言われています。",
-      "sublineOne": "通算で{{feats}}。ホールインワンの確率は一般に12,500分の1と言われています。"
+      "sublineBoth": "通算で{{aces}}、{{albatrosses}}。希少な順、次に新しい順。ホールインワンの確率は一般に12,500分の1と言われています。",
+      "sublineOne": "通算で{{feats}}。希少な順、次に新しい順。ホールインワンの確率は一般に12,500分の1と言われています。"
     },
     "feat": {
       "group": {

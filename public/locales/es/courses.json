@@ -1085,8 +1085,8 @@
       "sublineAces_other": "{{count}} aces",
       "sublineAlbatrosses_one": "{{count}} albatros",
       "sublineAlbatrosses_other": "{{count}} albatros",
-      "sublineBoth": "{{aces}} y {{albatrosses}}, en toda la historia. Un ace se cita habitualmente en 12.500 a 1.",
-      "sublineOne": "{{feats}}, en toda la historia. Un ace se cita habitualmente en 12.500 a 1."
+      "sublineBoth": "{{aces}} y {{albatrosses}}, en toda la historia. Primero las más raras y después las más recientes. Un ace se cita habitualmente en 12.500 a 1.",
+      "sublineOne": "{{feats}}, en toda la historia. Primero las más raras y después las más recientes. Un ace se cita habitualmente en 12.500 a 1."
     },
     "feat": {
       "group": {

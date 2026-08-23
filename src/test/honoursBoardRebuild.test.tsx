@@ -36,7 +36,9 @@ function ev(over: Partial<WireEvent> & { id: string }): WireEvent {
 
 describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
   it('leads each card with the member and puts hole, par and yardage beneath', () => {
-    const { container } = render(<HonoursBoard events={[ev({ id: 'a' })]} />);
+    const { container } = render(
+      <HonoursBoard events={[ev({ id: 'a', actorAvatar: 'https://example.com/avatar.jpg' })]} />,
+    );
     expect(container.textContent).toMatch(/152/);
     expect(container.textContent).toMatch(/152 yds/i);
     expect(container.textContent).toMatch(/Par 3/);
