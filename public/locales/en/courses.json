@@ -1579,8 +1579,10 @@
       "ace": "ACE",
       "albatross": "ALBATROSS",
       "unknownCourse": "A course",
-      "stablefordLabel": "Best stableford",
-      "birdiesLabel": "Most birdies",
+      "bestLabel": "Best this week",
+      "stablefordLabel": "Best Stableford points",
+      "birdiesLabel": "Most birdies in a round",
+      "improvedLabel": "Most improved handicap",
       "stablefordUnit": "points",
       "gap": {
         "shots_one": "{{count}} SHOT CLEAR",

@@ -1073,8 +1073,10 @@
     "clipsHeading": "クリップ",
     "clipsAction": "すべてのクリップ",
     "golfThisWeek": {
-      "stablefordLabel": "ベストステーブルフォード",
-      "birdiesLabel": "バーディー最多",
+      "bestLabel": "今週のベストラウンド",
+      "stablefordLabel": "ベストステーブルフォードポイント",
+      "birdiesLabel": "1ラウンド最多バーディー",
+      "improvedLabel": "ハンディキャップ最多改善",
       "stablefordUnit": "ポイント",
       "gap": {
         "shots_one": "{{count}}打差",
