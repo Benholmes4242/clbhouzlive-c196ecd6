@@ -48,7 +48,18 @@ import {
 } from './roundMoment';
 
 import { GolfThisWeekRail as GolfThisWeekShell } from './DiscoverCourseLedSkeleton';
-import { A, CARD_SHELL, InkAction, KICKER, LABEL, NUMF, SANS } from './tokens';
+import {
+  A,
+  CARD_RADIUS,
+  CARD_SHELL,
+  CHIP_RADIUS,
+  InkAction,
+  KICKER,
+  LABEL,
+  NUMF,
+  SANS,
+  WELL_RADIUS,
+} from './tokens';
 
 
 /**
@@ -146,7 +157,6 @@ const GRID_H = 100;
    spacer outside a moment band is invisible, which is what a spacer wants. */
 const WELL = '#FFFFFF';
 
-const WELL_RADIUS = 12;
 /* 6, not 10 — see WELL_INNER. */
 const WELL_PAD_X = 6;
 /* THE ONE RULE IN THE WELL: under its header. */
@@ -1191,7 +1201,7 @@ function GolfThisWeekCard({
                NOT an outer shadow (the CARD already carries CARD_SHADOW). */
             boxShadow: `inset 0 0 0 1px ${WELL_RULE}`,
 
-            borderRadius: `0 0 16px 16px`,
+            borderRadius: `0 0 ${WELL_RADIUS}px ${WELL_RADIUS}px`,
             padding: `6px ${WELL_PAD_X}px 9px`,
             boxSizing: 'border-box',
           }}
@@ -1704,7 +1714,7 @@ export function GolfThisWeek({
                    being drawn onto it. */
                 background: A.PANEL,
                 border: 'none',
-                borderRadius: 14,
+                borderRadius: CARD_RADIUS,
                 boxShadow: CARD_SHADOW,
                 overflow: 'hidden',
                 /* FOUR TILES DO NOT SHRINK (§3.1): the figure is the content, so
@@ -1812,7 +1822,7 @@ export function GolfThisWeek({
                         /* LIGHT INK GROUND for first place: a subtle gray tint
                            that bleeds to the chip's padding edges. */
                         background: lead ? 'rgba(11,15,20,0.035)' : undefined,
-                        borderRadius: lead ? 6 : undefined,
+                        borderRadius: lead ? CHIP_RADIUS : undefined,
                         margin: lead ? '0 -12px' : undefined,
                         padding: lead ? '6px 12px' : '8px 0',
                       }}

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { SCOPE_PILL_RADIUS } from '../courseled/tokens';
 import type { ExploreLens } from '../hooks/useExploreLens';
 
 /**
@@ -76,7 +77,7 @@ export function ScopePills({ lens, onChange, style }: Props) {
               border: `1px solid ${active ? A.INK : A.BORDER}`,
               background: active ? A.INK : A.PANEL,
               color: active ? A.PANEL : A.INK,
-              borderRadius: 999,
+              borderRadius: SCOPE_PILL_RADIUS,
               padding: '9px 16px',
               fontSize: 13,
               fontWeight: 700,

@@ -25,6 +25,13 @@ export const LABEL: React.CSSProperties = { ...LABEL_LEGACY, fontWeight: 700 };
 export const GOLD = '#D8A93C';
 export { A, SANS, FIGS };
 
+/** Discover content geometry: one master, all subordinate radii derived. */
+export const CARD_RADIUS = 8;
+export const WELL_RADIUS = Math.round(CARD_RADIUS * 0.85);
+export const THUMBNAIL_RADIUS = Math.round(CARD_RADIUS * 0.78);
+export const CHIP_RADIUS = Math.round(CARD_RADIUS * 0.5);
+export const SCOPE_PILL_RADIUS = CARD_RADIUS;
+
 
 export const NUMF: React.CSSProperties = {
   fontWeight: 700,
@@ -36,7 +43,7 @@ export const NUMF: React.CSSProperties = {
 export const CARD_SHELL: React.CSSProperties = {
   background: A.PANEL,
   border: `1px solid ${A.BORDER}`,
-  borderRadius: 16,
+  borderRadius: CARD_RADIUS,
   overflow: 'hidden',
 };
 
@@ -55,7 +62,7 @@ export function NewDot() {
         display: 'inline-block',
         width: 6,
         height: 6,
-        borderRadius: 999,
+        borderRadius: CHIP_RADIUS,
         background: A.INK,
         marginLeft: 6,
         verticalAlign: 'middle',

@@ -214,9 +214,11 @@ interface TileProps {
    * compensate for the text sitting nearer a square edge.
    */
   square?: boolean;
+  /** Discover can opt into its page geometry without changing Community. */
+  radius?: number;
 }
 
-export function CommunityVideoTile({ item, railVisible, onPress, width }: TileProps) {
+export function CommunityVideoTile({ item, railVisible, onPress, width, radius = RADIUS }: TileProps) {
   // WHEN content IS EMPTY the poster's name takes the title slot and the meta
   // row drops the duplicate name, keeping the time and the likes.
   const hasTitle = item.title.length > 0;
@@ -247,7 +249,7 @@ export function CommunityVideoTile({ item, railVisible, onPress, width }: TilePr
       }}
     >
       <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9' }}>
-        <TileMedia item={item} railVisible={railVisible} radius={RADIUS}>
+        <TileMedia item={item} railVisible={railVisible} radius={radius}>
           {(playing) => (
             <>
               {item.courseName && <CourseTag name={item.courseName} />}
@@ -365,8 +367,8 @@ export function CommunityVideoTile({ item, railVisible, onPress, width }: TilePr
   );
 }
 
-export function CommunityClipTile({ item, railVisible, onPress, width, aspect, square }: TileProps) {
-  const radius = square ? 0 : RADIUS;
+export function CommunityClipTile({ item, railVisible, onPress, width, aspect, square, radius: radiusOverride = RADIUS }: TileProps) {
+  const radius = square ? 0 : radiusOverride;
   const overlayInset = square ? 10 : 8;
   return (
     <button
