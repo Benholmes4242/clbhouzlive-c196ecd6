@@ -423,12 +423,11 @@ export function GolfThisWeekRail() {
                   <Bar style={{ height: 8, width: 54 }} />
                   <Bar style={{ height: 8, width: 66 }} />
                 </div>
-                {/* THE SHAPE's region, 53 = eyebrow 11 + gap 4 + curve 34 + 4.
-                    A FLAT ROW, not a fake curve: the shell states the height the
-                    curve will take, nothing about its content. */}
+                {/* THE SHAPE's region, 53 = 4 + curve 49. NO EYEBROW — the live
+                    tile dropped it and the curve took the space. A FLAT ROW, not a
+                    fake curve: the shell states the height, nothing about content. */}
                 <div style={{ height: 53, paddingTop: 4, boxSizing: 'border-box' }}>
-                  <Bar style={{ height: 8, width: 44 }} />
-                  <div style={{ height: 34, marginTop: 4, display: 'flex', alignItems: 'center' }}>
+                  <div style={{ height: 49, display: 'flex', alignItems: 'center' }}>
                     <Bar style={{ height: 2, width: '100%' }} />
                   </div>
                 </div>
