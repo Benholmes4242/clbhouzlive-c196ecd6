@@ -96,16 +96,14 @@ describe('BRIEF_RUN_GREEN_FIGURE', () => {
     const spans = [...(runCard?.querySelectorAll('span') ?? [])] as HTMLElement[];
     const runSpans = spans.filter((s) => {
       const txt = s.textContent?.trim() ?? '';
-      return txt === '9' || /^PARS\s*IN\s*A\s*ROW$/i.test(txt);
+      const fs = s.style.fontSize;
+      return (txt === '9' && fs === '46px') || /^PARS\s*IN\s*A\s*ROW$/i.test(txt);
     });
-    expect(runSpans.length).toBeGreaterThanOrEqual(2);
-    const nonGreen = runSpans.filter((s) => {
+    expect(runSpans.length).toBe(2);
+    const greens = runSpans.filter((s) => {
       const c = s.style.color;
-      return c !== 'rgb(74, 222, 128)' && c !== '#4ADE80';
+      return c === 'rgb(74, 222, 128)' || c === '#4ADE80';
     });
-    if (nonGreen.length > 0) {
-      console.log('non-green run spans:', nonGreen.map((s) => ({ text: s.textContent, style: s.style.cssText })));
-    }
-    expect(nonGreen.length).toBe(0);
+    expect(greens.length).toBe(runSpans.length);
   });
 });
