@@ -207,7 +207,6 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
     <section>
       <style>{GLASS_CSS}</style>
       <Eyebrow
-        icon={Users}
         dot={newCount > 0}
         aside={<InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>}
       >

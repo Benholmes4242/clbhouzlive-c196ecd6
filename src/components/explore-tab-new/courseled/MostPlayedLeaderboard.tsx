@@ -493,7 +493,6 @@ export function MostPlayedLeaderboard({
     <section>
       {showEyebrow && (
         <Eyebrow
-          icon={Trophy}
           aside={
             rows.length > shown.length && onSeeAll ? (
               <InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>

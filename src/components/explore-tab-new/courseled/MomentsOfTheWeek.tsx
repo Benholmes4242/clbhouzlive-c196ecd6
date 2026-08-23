@@ -64,7 +64,6 @@ export function MomentsOfTheWeek({
   return (
     <section>
       <Eyebrow
-        icon={MapPin}
         dot={newCount > 0}
         aside={
           (totalCount ?? moments.length) > PAGE_CAP ? (

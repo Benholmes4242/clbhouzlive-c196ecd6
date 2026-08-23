@@ -75,7 +75,6 @@ export function LatestVideosRail({ items, onTilePress, onSeeAll, style }: Props)
     <section ref={ref} style={style}>
       {/* NO COUNT IN THE HEADING — thin supply must not advertise itself. */}
       <Eyebrow
-        icon={Clapperboard}
         aside={<InkAction onClick={onSeeAll}>{t('discover.videosAction', 'All videos')}</InkAction>}
       >
         {t('discover.videosHeading', 'Latest videos')}
@@ -103,7 +102,6 @@ export function ClipsRail({ items, onTilePress, onSeeAll }: Props) {
   return (
     <section ref={ref}>
       <Eyebrow
-        icon={Film}
         aside={<InkAction onClick={onSeeAll}>{t('discover.clipsAction', 'All clips')}</InkAction>}
       >
         {t('discover.clipsHeading', 'Clips')}
