@@ -1882,7 +1882,7 @@ export function GolfThisWeek({
                         <span
                           style={{
                             position: 'relative',
-                            width: 40,
+                            width: 43,
                             aspectRatio: '1 / 1.05',
                             borderRadius: '34%',
                             display: 'inline-flex',
@@ -1903,7 +1903,12 @@ export function GolfThisWeek({
                               position: 'absolute',
                               inset: 0,
                               borderRadius: '34%',
-                              boxShadow: `inset 0 0 0 3.5px ${tile.accent}`,
+                              /* AVATAR → SQUIRCLE → 0.5px GAP → 1px RING.
+                                 Wrapper is 43px so a 40px avatar centred inside
+                                 leaves 1.5px of space; a 1px inset ring at the
+                                 outer edge leaves exactly 0.5px between the
+                                 ring's inner edge and the avatar. */
+                              boxShadow: `inset 0 0 0 1px ${tile.accent}`,
                               pointerEvents: 'none',
                             }}
                           />
@@ -1932,8 +1937,7 @@ export function GolfThisWeek({
                               <span
                                 style={{
                                   ...NUMF,
-                                  paddingBottom: 2,
-                                  fontSize: 11,
+                                  fontSize: 13,
                                   lineHeight: 1,
                                   color: tile.accent,
                                 }}
