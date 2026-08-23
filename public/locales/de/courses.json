@@ -1138,6 +1138,14 @@
       "stablefordLabel": "Bestes Stableford",
       "birdiesLabel": "Meiste Birdies",
       "stablefordUnit": "Punkte",
+      "gap": {
+        "shots_one": "{{count}} SCHLAG VORN",
+        "shots_other": "{{count}} SCHLÄGE VORN",
+        "points_one": "{{count}} PUNKT VORN",
+        "points_other": "{{count}} PUNKTE VORN",
+        "clear": "{{count}} VORN",
+        "tied": "GLEICHSTAND"
+      },
       "moment": {
         "theCard": "Die Karte",
         "fullScorecard": "Ganze Scorekarte",

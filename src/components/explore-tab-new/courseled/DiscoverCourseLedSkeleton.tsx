@@ -8,7 +8,6 @@ import {
   THUMBNAIL_RADIUS,
   WELL_RADIUS,
 } from './tokens';
-import { WHITE_ALPHA_04 } from '@/features/tourhub/_shared/tokens';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import {
   COURSE_GRADIENT,
@@ -257,6 +256,7 @@ export function GolfThisWeekRail() {
         {[0, 1, 2].map((i) => (
           <div
             key={i}
+            data-band-podium-skeleton
             style={{
               background: A.PANEL,
               border: 'none',
