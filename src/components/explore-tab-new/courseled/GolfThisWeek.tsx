@@ -1726,7 +1726,9 @@ export function GolfThisWeek({
           className="scrollbar-hide"
           style={{
             display: 'flex',
-            alignItems: 'stretch',
+            /* Sparse podiums deliberately collapse to their own content height.
+               Ben chose compact sparse cards over equal-height empty space. */
+            alignItems: 'flex-start',
             gap: 9,
             overflowX: 'auto',
             marginBottom: 12,

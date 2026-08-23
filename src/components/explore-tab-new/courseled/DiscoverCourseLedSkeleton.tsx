@@ -239,20 +239,19 @@ export function GolfThisWeekRail() {
           <Bar key={i} style={{ height: 34, width: w, borderRadius: SCOPE_PILL_RADIUS }} />
         ))}
       </div>
-      {/* BRIEF_BAND_TILES_PODIUM §7 — measured against the live tallest podium:
+      {/* BRIEF_BAND_TILES_PODIUM §7 — measured against a full live podium:
           eyebrow, 40px face + 34px leader figure, margin chip, hairline, and two
-          compact chasers. The rail stretches sparse cards to this same height.
+          compact chasers. Sparse live cards collapse, by explicit decision;
+          this shell models the full state so resolving content never pushes the
+          round rail downward.
 
-          WHY THREE ROWS AND NOT ONE, given the shell models the SMALLEST
-          plausible state: the rail levels every chip to the TALLEST, so the
-          settled height of EVERY chip is the tallest tile's. In the current data
+          WHY THREE ROWS AND NOT ONE: in the current data
           three of the four categories clear their floor with three or more
-          distinct members, so the smallest plausible SETTLED height is a full
-          ladder. A one-row shell would under-measure by 66px and strand the band
-          exactly as the old strip did.
+          distinct members. A one-row shell would under-measure the common full
+          state by 89px and strand the band exactly as the old strip did.
           THREE CHIPS, NOT FOUR: MOST IMPROVED renders only when a falling index
           exists, and a skeleton is never larger than the smallest settled state. */}
-      <div style={{ display: 'flex', alignItems: 'stretch', gap: 9, marginBottom: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 12 }}>
         {[0, 1, 2].map((i) => (
           <div
             key={i}
