@@ -71,8 +71,11 @@ function row(over: Partial<CircleRoundRow> & { round_id: string }): CircleRoundR
 }
 
 function chipFor(container: HTMLElement, label: RegExp) {
+  /* The chip's radius is no longer a literal 14 — it derives from CARD_RADIUS
+     (MICRO_BRIEF_DISCOVER_RADIUS_8), so the helper identifies a chip by the fact
+     that it CARRIES a radius and an eyebrow, not by a hard-coded value. */
   const chips = [...container.querySelectorAll('div[role="button"]')].filter(
-    (el) => (el as HTMLElement).style.borderRadius === '14px',
+    (el) => !!(el as HTMLElement).style.borderRadius,
   ) as HTMLElement[];
   const hit = chips.find((c) => label.test(c.textContent ?? ''));
   if (!hit) throw new Error(`no chip matching ${label}`);
