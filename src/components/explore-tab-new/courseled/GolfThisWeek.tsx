@@ -141,21 +141,11 @@ const HERO_H = 156;
    when a round has no hole data and the well is empty (§S1.7, ACCEPTANCE K). */
 const GRID_H = 100;
 
-/* §S4.1 OVERTURNED BY BRIEF_ROUND_TILE_WHITE_WELL §0 — A WHITE WELL WITH A RULE.
-   §S4.1 read: "A TINTED WELL, NO BORDER. The tone separates it from the card and
-   an outline would be a second signal for one edge. The marker outer rings trace
-   against THIS colour (§S4.7), never white — a white ring on a tinted well
-   haloes."
-   WHY IT NO LONGER HOLDS: the tint was chosen INSTEAD OF a border, to separate
-   the well from the card. The well is now the card's own colour, so there is
-   nothing to separate and the job passes to the rule §S4.1 rejected only because
-   the tint was already doing it. And the tint was failing anyway — #F2F5F8
-   against a page canvas of #F4F6F9 is three points of grey, so the well never
-   read as a card edge; white against #F4F6F9 does. The well matches the leader
-   chips exactly.
-   THE SECOND HALF SURVIVES AND GETS EASIER: the marker spacer still takes the
-   WELL's colour (§S4.7) — that colour simply happens to be white now, so a
-   spacer outside a moment band is invisible, which is what a spacer wants. */
+/* BRIEF_DARK_ONLY_PART_B §2.2 — THE CLUBHOUSE FEED'S DARK SCORECARD WELL.
+   The previous white well was correct only on the retired light canvas. This
+   uses the feed round card's existing translucent scorecard-panel treatment;
+   marker spacers receive this exact value and moment-band spacers receive its
+   computed blend, so neither can halo. */
 const WELL = 'rgba(11,13,16,0.66)';
 
 /* 6, not 10 — see WELL_INNER. */
@@ -1162,13 +1152,12 @@ function GolfThisWeekCard({
         </div>
       </div>
 
-      {/* THE LIGHT HALF. The well keeps its own container so it still bleeds to
+      {/* THE SCORECARD HALF. The well keeps its own container so it still bleeds to
           the card edges. */}
       <div style={{ padding: '0 10px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* ===================== THE SCORECARD WELL (§S4) =====================
-            A WHITE WELL WITH A HAIRLINE (BRIEF_ROUND_TILE_WHITE_WELL §1/§2) — the
-            well is now the card's own #FFFFFF and matches the leader chips, so
-            the boundary is DRAWN rather than implied by a tone. The tint and the
+            A DARK FEED WELL WITH A HAIRLINE (BRIEF_DARK_ONLY_PART_B §2.2). The
+            boundary is DRAWN rather than implied by a tone. The tint and the
             border are ALTERNATIVES, not additions.
             IT RUNS TO THE CARD'S BOTTOM EDGE: the well finishing 10px short of
             the tile read as an unfinished panel, so the bottom corners take the

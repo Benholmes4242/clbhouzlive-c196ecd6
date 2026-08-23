@@ -515,8 +515,8 @@ const UNDER_INK = SC_FILL_BIRDIE;
 const BOGEY_GROUND = WHITE_ALPHA_08;
 const DOUBLE_GROUND = WHITE_ALPHA_18;
 
-/** The surface the grid sits on. NO TINT: it is the white card, and the marker
- *  outer rings trace against exactly that, so a ring reads as clear air. */
+/** Dark-only fallback for the surface the grid sits on. Callers pass their
+ * exact host well so ring spacers always trace the rendered surface. */
 export const MINI_WELL = A.PANEL;
 
 /** §S1.3 — the Clubhouse card's own key, not a second vocabulary. */
@@ -544,9 +544,8 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
  *
  *  THE SPACER TAKES THE SURFACE COLOUR the cell sits on — that is the rule, and
  *  it holds whatever that colour is: pass the card, sheet or well background in,
- *  never a fixed grey. Since BRIEF_ROUND_TILE_WHITE_WELL the round tile's well is
- *  #FFFFFF, so outside a band the spacer is invisible, which is exactly what a
- *  spacer wants to be. THE RULE IS STILL LOAD-BEARING INSIDE A MOMENT BAND: a
+ *  never a fixed grey. Outside a band the spacer is invisible because it equals
+ *  the host well. THE RULE IS STILL LOAD-BEARING INSIDE A MOMENT BAND: a
  *  cell there must be passed the BLENDED well (the tone composited over the well
  *  at the band's opacity), or its spacer draws the plain well against a tinted
  *  background — a pale halo inside the ring. See bandWell in NineRow.
