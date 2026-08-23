@@ -6,15 +6,9 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
-import { CollegeFranchise } from '../../overview/sections/CollegeFranchise';
 import { VenueRecordBand } from '../../overview/sections/VenueRecordBand';
-import { CourseOfTheWeekSection } from '../../overview/sections/CourseOfTheWeekSection';
 import { ConnectHandicapCue } from '@/components/courses/course-detail/ConnectHandicapCue';
 import { LazySection } from '../overview-v3/LazySection';
-
-import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
-import { StatWatchSlot } from '../overview-v3/StatWatchSlot';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
@@ -64,10 +58,8 @@ export function OverviewPageV3() {
             See OverviewHero.tsx. */}
         <OverviewHero />
 
-        {/* Cohesion unit: VenueRecordBand + Schedule sit in a tight 14px
-            group directly under the hero, keyed to viewingTournamentId so they
-            crossfade together in step with the hero. The larger sectionSection
-            gap that follows is what makes this unit read as one. */}
+        {/* Cohesion unit: VenueRecordBand sits directly under the hero, keyed
+            to viewingTournamentId so it crossfades in step with the hero. */}
         <AnimatePresence mode="wait">
           <motion.div
             key={viewingTournamentId ?? 'none'}
@@ -75,15 +67,10 @@ export function OverviewPageV3() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            /* On a live slide the dark hero block ends with a straight edge
-               directly above this — the canvas must BREATHE before the Schedule,
-               so the gap is real (24), not the old 2px seam. */
             style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: viewingIsLive ? 24 : 12 }}
           >
             <VenueRecordBand tournamentId={viewingTournamentId ?? undefined} />
-            <ComingUpSlot />
           </motion.div>
-
         </AnimatePresence>
 
         <div
@@ -91,16 +78,6 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 88 }}>
-            <LazySection minHeight={400}>
-              <WorldRankingsSlot />
-            </LazySection>
-            <LazySection minHeight={400}>
-              <StatWatchSlot />
-            </LazySection>
-            <CourseOfTheWeekSection />
-            <LazySection minHeight={350}>
-              <CollegeFranchise />
-            </LazySection>
             <LazySection minHeight={90}>
               <ConnectHandicapCue variant="tour-venue" courseName="" />
             </LazySection>
