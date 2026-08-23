@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { CommunityClipTile } from '@/components/explore-tab-new/courseled/CommunityMediaTiles';
 import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
+import { mediaTarget } from '@/utils/mediaEngagement';
 
 /**
  * CLIPS — a TWO-COLUMN MASONRY AT TRUE ASPECT (BRIEF_COMMUNITY_PAGE_CORRECTIONS
@@ -46,18 +47,24 @@ interface Props {
   onPress: (item: CommunityLibraryItem) => void;
 }
 
+/**
+ * POSITION IS THE INDEX IN THE POOL, NOT IN THE COLUMN. The masonry fills the
+ * shortest column, so a column index would make "position 0" mean two different
+ * tiles and the position bands meaningless.
+ */
+
 export function CommunityClipMosaic({ items, onPress }: Props) {
   /**
    * SHORTEST-COLUMN FILL on relative height (1 / aspect), so a column of
    * landscape clips does not run half the length of a column of portraits.
    */
   const columns = useMemo(() => {
-    const cols: { item: CommunityLibraryItem; aspect: number }[][] = [[], []];
+    const cols: { item: CommunityLibraryItem; aspect: number; index: number }[][] = [[], []];
     const heights = [0, 0];
-    for (const item of items) {
+    for (const [index, item] of items.entries()) {
       const aspect = clipAspect(item.aspect);
       const target = heights[0] <= heights[1] ? 0 : 1;
-      cols[target].push({ item, aspect });
+      cols[target].push({ item, aspect, index });
       heights[target] += 1 / aspect;
     }
     return cols;
@@ -69,7 +76,7 @@ export function CommunityClipMosaic({ items, onPress }: Props) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
       {columns.map((col, ci) => (
         <div key={ci} style={{ display: 'grid', gap: 2, alignContent: 'start' }}>
-          {col.map(({ item, aspect }) => (
+          {col.map(({ item, aspect, index }) => (
             <CommunityClipTile
               key={item.key}
               item={item}
@@ -77,6 +84,7 @@ export function CommunityClipMosaic({ items, onPress }: Props) {
               onPress={onPress}
               width="100%"
               aspect={aspect}
+              track={mediaTarget(item, 'community', 'clips', index)}
             />
           ))}
         </div>
