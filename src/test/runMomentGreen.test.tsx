@@ -94,8 +94,11 @@ describe('BRIEF_RUN_GREEN_FIGURE', () => {
     expect(text).toMatch(/9\s*PARS\s*IN\s*A\s*ROW/i);
 
     const spans = [...(runCard?.querySelectorAll('span') ?? [])] as HTMLElement[];
-    const runSpans = spans.filter((s) => /9|PARS\s*IN\s*A\s*ROW/i.test(s.textContent ?? ''));
-    expect(runSpans.length).toBeGreaterThan(0);
+    const runSpans = spans.filter((s) => {
+      const txt = s.textContent?.trim() ?? '';
+      return txt === '9' || /^PARS\s*IN\s*A\s*ROW$/i.test(txt);
+    });
+    expect(runSpans.length).toBe(2);
     const greens = runSpans.filter((s) => {
       const c = s.style.color;
       return c === 'rgb(74, 222, 128)' || c === '#4ADE80';
