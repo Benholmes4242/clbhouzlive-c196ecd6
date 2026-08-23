@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clapperboard, Film, Image as ImageIcon } from 'lucide-react';
+
 
 import { CommunityVideoTile } from '@/components/explore-tab-new/courseled/CommunityMediaTiles';
 import {
@@ -268,7 +268,6 @@ export default function CommunityPage() {
                     (S2.2). Same reasoning at every heading on this page. */}
                 <div style={{ padding: '0 14px' }}>
                   <Eyebrow
-                    icon={Film}
                     subline={t('community.sections.clips.subline', 'Under three minutes')}
                     aside={
                       chip === 'all' && clipsPool.length > clipsCap ? (
@@ -291,7 +290,6 @@ export default function CommunityPage() {
               <section style={{ marginBottom: 26 }}>
                 <div style={{ padding: '0 14px' }}>
                   <Eyebrow
-                    icon={Clapperboard}
                     subline={t('community.sections.videos.subline', 'Three minutes and over')}
                   >
                     {t('community.sections.videos.title', 'Latest videos')}
@@ -319,7 +317,6 @@ export default function CommunityPage() {
               <section style={{ marginBottom: 26 }}>
                 <div style={{ padding: '0 14px' }}>
                   <Eyebrow
-                    icon={ImageIcon}
                     subline={t('community.sections.photos.subline', 'From the courses')}
                     aside={
                       chip === 'all' && photosPool.length > photos.length ? (

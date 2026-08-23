@@ -1,11 +1,10 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Medal } from 'lucide-react';
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, LABEL, NUMF, SANS, SECTION_TITLE, InkAction } from './tokens';
+import { A, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 
 /**
@@ -583,14 +582,12 @@ export function HonoursHeading({
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
-        <Medal size={15} strokeWidth={2.2} color={A.INK} />
-        <span style={SECTION_TITLE}>{t('discover.honoursTitle', 'The honours board')}</span>
+        <span style={EYEBROW_TEXT}>{t('discover.honoursTitle', 'The honours board')}</span>
         {aside ? <span style={{ marginLeft: 'auto' }}>{aside}</span> : null}
       </div>
       {subline ? (
         <div
           style={{
-            marginLeft: 22,
             marginTop: 3,
             fontFamily: SANS,
             fontSize: 11.5,

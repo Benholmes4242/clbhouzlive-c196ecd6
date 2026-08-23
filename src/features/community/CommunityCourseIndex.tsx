@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Eyebrow } from '@/components/explore-tab-new/courseled/tokens';
@@ -71,7 +70,7 @@ export function CommunityCourseIndex({ items, title, subline, countLabel }: Prop
           gutter. Rendered bare it looks pushed left, so this page supplies the
           16px itself and the icon lands on the first tile's left edge. */}
       <div style={{ padding: '0 14px' }}>
-        <Eyebrow icon={MapPin} subline={subline}>
+        <Eyebrow subline={subline}>
           {title}
         </Eyebrow>
       </div>

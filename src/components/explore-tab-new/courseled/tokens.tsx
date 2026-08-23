@@ -100,23 +100,31 @@ export const SECTION_TITLE: React.CSSProperties = {
  * the content beneath it (see the /community call sites).
  */
 
-/** §1.5 — indent that puts the subline under the WORDS, not under the glyph. */
-const SUBLINE_INDENT = 22;
+/**
+ * BRIEF_DISCOVER_EYEBROWS §1 — the eyebrow is now the SAME treatment as the
+ * readout above the scope pills ("6 ROUNDS · 3 COURSES · 7 DAYS"), which is
+ * KICKER: 10 / 700 / 0.16em / uppercase. The readout takes MUTE; a section name
+ * takes INK so the aside (FAINT/DIM) stays distinguishable beside it (§4).
+ * SECTION_TITLE is left untouched at source.
+ */
+export const EYEBROW_TEXT: React.CSSProperties = {
+  fontFamily: SANS,
+  ...KICKER,
+  color: A.INK,
+  lineHeight: 1,
+};
 
 export function Eyebrow({
   children,
   aside,
   dot = false,
-  icon: Icon,
   subline,
 }: {
   children: React.ReactNode;
   aside?: React.ReactNode;
   /** True when this section contains anything new since the last visit. */
   dot?: boolean;
-  /** Optional lucide component. Absent renders NOTHING — no reserved width. */
-  icon?: React.ComponentType<{ size?: number | string; strokeWidth?: number | string; color?: string }>;
-  /** Optional one-line description, indented under the heading text. */
+  /** Optional one-line description, aligned to the eyebrow's left edge. */
   subline?: React.ReactNode;
 }) {
   return (
@@ -126,24 +134,29 @@ export function Eyebrow({
           display: 'flex',
           alignItems: 'center',
           gap: 7,
+          /* The row is 20px whatever the aside is: an InkAction's line box
+             measured 24 and the LABEL aside ~11, so without this the header
+             height depended on WHICH aside a section passed and the shell could
+             only match one of them (BRIEF_DISCOVER_EYEBROWS §5). */
+          minHeight: 20,
           /* §4.3 — at 320px the action wraps below rather than the heading
              shrinking. */
           flexWrap: 'wrap',
         }}
       >
-        {Icon ? (
-          <Icon size={15} strokeWidth={2.2} color={A.INK} />
-        ) : null}
-        <span style={SECTION_TITLE}>
+        <span style={EYEBROW_TEXT}>
           {children}
           {dot ? <NewDot /> : null}
         </span>
-        {aside ? <span style={{ marginLeft: 'auto' }}>{aside}</span> : null}
+        {aside ? (
+          <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+            {aside}
+          </span>
+        ) : null}
       </div>
       {subline ? (
         <div
           style={{
-            marginLeft: Icon ? SUBLINE_INDENT : 0,
             marginTop: 3,
             fontFamily: SANS,
             fontSize: 11.5,
@@ -161,7 +174,7 @@ export function Eyebrow({
 }
 
 export function Aside({ children }: { children: React.ReactNode }) {
-  return <span style={LABEL}>{children}</span>;
+  return <span style={{ ...LABEL, lineHeight: 1 }}>{children}</span>;
 }
 
 export function InkAction({
@@ -181,6 +194,7 @@ export function InkAction({
         gap: 4,
         ...LABEL,
         fontSize: 10,
+        lineHeight: 1,
         color: A.INK,
         background: 'transparent',
         border: 'none',

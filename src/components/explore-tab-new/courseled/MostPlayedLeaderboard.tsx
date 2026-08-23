@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUp, ChevronDown, Trophy } from 'lucide-react';
+import { ArrowUp, ChevronDown } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
@@ -493,7 +493,6 @@ export function MostPlayedLeaderboard({
     <section>
       {showEyebrow && (
         <Eyebrow
-          icon={Trophy}
           aside={
             rows.length > shown.length && onSeeAll ? (
               <InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>

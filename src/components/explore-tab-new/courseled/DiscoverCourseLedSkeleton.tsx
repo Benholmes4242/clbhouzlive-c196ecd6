@@ -102,6 +102,13 @@ function Bar({
  * block on the page nine pixels short, which is why the whole page used to
  * settle upward by 9 on load.
  */
+/**
+ * BRIEF_DISCOVER_EYEBROWS §5 — the heading is now a 10px uppercase eyebrow at
+ * lineHeight 1 (KICKER, matching the readout) with NO icon, so the header row is a FIXED 20 (Eyebrow sets minHeight: 20 so the aside kind cannot change it), not 15+aside, and it
+ * 10px tall, not 15, and reserves no leading glyph width. Callers' `w` values
+ * were measured for the old 15.5px sentence-case title; each is scaled to the
+ * uppercase run it now models.
+ */
 function EyebrowBar({ w = 150, aside = false }: { w?: number; aside?: boolean }) {
   return (
     <>
@@ -110,11 +117,11 @@ function EyebrowBar({ w = 150, aside = false }: { w?: number; aside?: boolean })
           display: 'flex',
           alignItems: 'center',
           padding: '0 2px',
-          height: 15,
+          height: 20,
         }}
       >
-        <Bar style={{ height: 10, width: w }} />
-        {aside ? <Bar style={{ height: 10, width: 44, marginLeft: 'auto' }} /> : null}
+        <Bar style={{ height: 9, width: w }} />
+        {aside ? <Bar style={{ height: 9, width: 44, marginLeft: 'auto' }} /> : null}
       </div>
       <div style={{ height: 19, display: 'flex', alignItems: 'center', padding: '0 2px' }}>
         <Bar style={{ height: 10, width: 196 }} />
@@ -139,7 +146,7 @@ function TextBar({ w, h = 11 }: { w: number | string; h?: number }) {
 export function FriendsRail() {
   return (
     <section>
-      <EyebrowBar w={168} aside />
+      <EyebrowBar w={87} aside />
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
           <div key={i} style={{ ...CARD_SHELL, width: 224, flexShrink: 0, padding: 0 }}>
@@ -496,7 +503,7 @@ export function GolfThisWeekRail() {
 export function TourRail() {
   return (
     <section>
-      <EyebrowBar w={140} aside />
+      <EyebrowBar w={132} aside />
       <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
         {[0, 1].map((i) => (
           <div
@@ -554,7 +561,7 @@ export function TourRail() {
 export function ReviewsMosaic() {
   return (
     <section>
-      <EyebrowBar w={126} aside />
+      <EyebrowBar w={109} aside />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         {[0, 1].map((i) => (
           <Bar key={i} style={{ height: 265, borderRadius: 14 }} />
@@ -643,7 +650,7 @@ export function AroundTheWorldCard({ pills }: { pills?: React.ReactNode } = {}) 
 export function MomentsMosaic() {
   return (
     <section>
-      <EyebrowBar w={142} aside />
+      <EyebrowBar w={154} aside />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {[0, 1].map((b) => (
           <div key={b} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
@@ -673,7 +680,7 @@ export function MomentsMosaic() {
 export function MostPlayedPanel() {
   return (
     <section>
-      <EyebrowBar w={152} aside />
+      <EyebrowBar w={189} aside />
       {/* CORRECTION_MOST_PLAYED_COURSE_HEADERS §S4.4 — FOUR SEPARATE CARDS with
           the same 10px gap, or the section settles from one panel into four on
           every cold load. */}
