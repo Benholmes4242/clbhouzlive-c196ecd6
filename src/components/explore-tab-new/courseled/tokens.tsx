@@ -149,7 +149,6 @@ export function Eyebrow({
         <div
           style={{
             marginTop: 3,
-            marginTop: 3,
             fontFamily: SANS,
             fontSize: 11.5,
             fontWeight: 500,
