@@ -722,8 +722,14 @@ function FigureLine({
     fontWeight: 800,
     lineHeight: 1,
     letterSpacing: '-0.06em',
-    /* Tile-hero figures are white to match the course name above. */
-    color: DISCOVER_FACT,
+    /* Tile-hero figures are white to match the course name above, EXCEPT a
+       score figure that carries to-par meaning. FINISHED IN THE RED's figure
+       IS the round's to-par, so it shares the same under-par red as the label
+       and the birdie circles in the well. */
+    color:
+      moment.figureRole === 'score' && moment.figure != null && moment.figure < 0
+        ? FINISHED_IN_RED_TONE
+        : DISCOVER_FACT,
   };
 
   const wordStyle: React.CSSProperties = {
