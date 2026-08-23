@@ -134,6 +134,11 @@ export function Eyebrow({
           display: 'flex',
           alignItems: 'center',
           gap: 7,
+          /* The row is 20px whatever the aside is: an InkAction's line box
+             measured 24 and the LABEL aside ~11, so without this the header
+             height depended on WHICH aside a section passed and the shell could
+             only match one of them (BRIEF_DISCOVER_EYEBROWS §5). */
+          minHeight: 20,
           /* §4.3 — at 320px the action wraps below rather than the heading
              shrinking. */
           flexWrap: 'wrap',
