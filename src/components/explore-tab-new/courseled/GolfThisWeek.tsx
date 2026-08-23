@@ -1766,7 +1766,21 @@ export function GolfThisWeek({
                       background: WHITE_ALPHA_08,
                     }}
                   />
-                  <span style={{ position: 'relative' }}>{tile.emoji}</span>
+                  <span
+                    style={{
+                      position: 'relative',
+                      opacity: 1,
+                      color: A.INK,
+                      WebkitTextFillColor: 'initial',
+                      fontFamily:
+                        '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
+                      fontWeight: 400,
+                      fontStyle: 'normal',
+                      fontVariantEmoji: 'emoji',
+                    }}
+                  >
+                    {tile.emoji}
+                  </span>
                 </span>
                 {tile.label}
                 {tile.unit ? (
