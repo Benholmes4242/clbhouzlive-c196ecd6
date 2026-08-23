@@ -12,11 +12,10 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
-import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { WHITE_ALPHA_04, WHITE_ALPHA_08 } from '@/features/tourhub/_shared/tokens';
+import { WHITE_ALPHA_08, WHITE_ALPHA_12 } from '@/features/tourhub/_shared/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
@@ -243,11 +242,11 @@ const ROW_DARK_QUIET = 'rgba(255,255,255,0.78)';
     a falling index is better (green), a rising one is worse (red). The tour hero
     has no index movement, so PhotoBand's "colour only on a score" never governed
     this figure. Applies to the TRIANGLE and its FIGURE alike. */
-const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
+export const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
 const ROW_DARK_INDEX_ROSE = INDEX_DELTA.dark.drifted;
 /** UNDER PAR RESOLVES THROUGH getScoreColor — no hand-picked hex. TOPAR_RED
     (#C8102E) is the LIGHT-surface red and goes muddy on a scrimmed photograph. */
-const ROW_DARK_TOPAR_UNDER = getScoreColor(-1, 'dark', 'standard');
+export const ROW_DARK_TOPAR_UNDER = getScoreColor(-1, 'dark', 'standard');
 
 
 
@@ -591,7 +590,7 @@ const TILE_BOTTOM_SCRIM =
    reintroduce it on that reasoning. */
 
 
-const fmtRel = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
+export const fmtRel = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
 
 /**
  * THE COPY (§S6) — THE SENTENCE IS THE HIGHEST-RISK ELEMENT ON THE CARD. Every
@@ -638,14 +637,31 @@ const SENTENCE_FALLBACK: Record<string, string> = {
   noHoles: 'A round played. The hole by hole detail was not recorded.',
 };
 
-type TFn = (k: string, d?: string, o?: object) => string;
+export type TFn = (k: string, d?: string, o?: object) => string;
 
-function momentLabel(m: Moment, t: TFn): string | null {
+export function momentLabel(m: Moment, t: TFn): string | null {
   if (!m.labelKey) return null;
   return t(`${MK}.label.${m.labelKey}`, LABEL_FALLBACK[m.labelKey]);
 }
 
-function momentSentence(m: Moment, t: TFn): string {
+/**
+ * THE FIGURE'S WORDS, split off the ONE translatable template so a second
+ * surface (the page hero, BRIEF_DISCOVER_WORLD_CLASS §1) can print the same
+ * noun placement without owning a second copy of the templates. The rule is
+ * unchanged: an IDENTITY figure takes its noun BEFORE, a QUANTITY after.
+ */
+export function momentFigureParts(m: Moment, t: TFn): { before: string; after: string } {
+  if (m.figureKey == null) return { before: '', after: '' };
+  const template = t(`${MK}.figure.${m.figureKey}`, FIGURE_FALLBACK[m.figureKey]);
+  const idx = template.indexOf(FIGURE_PLACEHOLDER);
+  if (idx < 0) return { before: '', after: template };
+  return {
+    before: template.slice(0, idx).trim(),
+    after: template.slice(idx + FIGURE_PLACEHOLDER.length).trim(),
+  };
+}
+
+export function momentSentence(m: Moment, t: TFn): string {
   const f = m.facts;
   const key = `${MK}.sentence.${m.sentenceKey}`;
   const fb = SENTENCE_FALLBACK[m.sentenceKey];
@@ -678,11 +694,14 @@ function momentSentence(m: Moment, t: TFn): string {
 function FigureLine({
   moment,
   gross,
+  grossToPar,
   toParText,
   t,
 }: {
   moment: Moment;
   gross: number | null;
+  /** The gross's own to-par. Drives §2's colour on the PLAIN card. */
+  grossToPar: number | null;
   toParText: string | null;
   t: TFn;
 }) {
@@ -691,8 +710,14 @@ function FigureLine({
      "8 IN A ROW" in green would be decoration, and §S1.4 exists to stop exactly
      that. A SCORE carries a to-par meaning — on FINISHED IN THE RED the figure
      IS the round's to-par — so colouring it is the same rule that puts the red
-     on BEST THIS WEEK's -3. PLAIN's tone is white, so it is unchanged. The
-     NOUN and the sentence stay as they are. */
+     on BEST THIS WEEK's -3. The NOUN and the sentence stay as they are.
+
+     BRIEF_DISCOVER_WORLD_CLASS §2 EXTENDS THIS TO THE PLAIN CARD'S GROSS. A
+     gross IS a score — 83 and 78 were the largest numerals on the page and both
+     rendered the same white, so a +12 looked exactly as good as a −3. It now
+     resolves through the SAME getScoreColor call, so under par is the dark
+     under-par red and level/over is ink-on-dark. No new value, no new rule; the
+     member row's figures directly beneath already did this and are untouched. */
   const numStyle: React.CSSProperties = {
     ...NUMF,
     fontSize: 46,
@@ -729,10 +754,22 @@ function FigureLine({
   }
 
   if (moment.figureKey == null || moment.figure == null) {
-    /* PLAIN: the gross, with the to-par beside it on the same line. */
+    /* PLAIN: the gross, with the to-par beside it on the same line. §2 — the
+       gross is a SCORE, so it takes the to-par grammar. A gross with no par to
+       measure it against is not a score and stays white. */
     return (
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, minWidth: 0 }}>
-        <span style={numStyle}>{gross ?? '\u2014'}</span>
+        <span
+          style={{
+            ...numStyle,
+            color:
+              grossToPar != null
+                ? getScoreColor(grossToPar, 'dark', 'standard')
+                : numStyle.color,
+          }}
+        >
+          {gross ?? '\u2014'}
+        </span>
         {toParText && <span style={{ ...wordStyle, letterSpacing: '0.06em' }}>{toParText}</span>}
       </div>
     );
@@ -1026,6 +1063,9 @@ function GolfThisWeekCard({
         <FigureLine
           moment={moment}
           gross={row.gross ?? null}
+          grossToPar={
+            row.gross != null && row.course_par != null ? row.gross - row.course_par : null
+          }
           toParText={toPar?.text ?? null}
           t={t as TFn}
         />
@@ -1263,6 +1303,14 @@ interface Props {
   onRegionChange?: (sel: RegionSelection | null) => void;
   onCardPress: (r: CircleRoundRow) => void;
   onSeeAll: () => void;
+  /**
+   * BRIEF_DISCOVER_WORLD_CLASS §1.5 — the readout and the pills STAY WHERE THEY
+   * ARE, beneath the hero. But the safe-area + chrome-island clearance lives in
+   * this section's first row (MICRO_BRIEF_ROUNDS_SECTION_CHROME S1.4), and when
+   * a full-bleed hero renders above it that hero owns the notch instead. False
+   * drops the clearance to the ordinary section gap; nothing else moves.
+   */
+  chromeClearance?: boolean;
   style?: React.CSSProperties;
 }
 
@@ -1274,6 +1322,7 @@ export function GolfThisWeek({
   onRegionChange,
   onCardPress,
   onSeeAll,
+  chromeClearance = true,
   style,
 }: Props) {
   const { t } = useTranslation('courses');
@@ -1507,7 +1556,11 @@ export function GolfThisWeek({
     const d = (r.gross as number) - (r.course_par as number);
     return {
       text: d === 0 ? 'E' : d < 0 ? `\u2212${Math.abs(d)}` : `+${d}`,
-      tone: d < 0 ? TOPAR_RED : A.MUTE,
+      /* §3.2 (BRIEF_DISCOVER_WORLD_CLASS) — THE DARK RED, NOT TOPAR_RED. The
+         chips sit on A.PANEL, and TOPAR_RED (#C8102E) is the LIGHT-surface red:
+         at 12px on a dark panel it goes muddy and stops reading as red at all.
+         Same canonical call the hero and the member row make. */
+      tone: d < 0 ? ROW_DARK_TOPAR_UNDER : A.MUTE,
     };
   };
 
@@ -1558,7 +1611,7 @@ export function GolfThisWeek({
       course: courseNameFor(mostBirdies),
       runners: birdiesRanked.slice(1),
       /* A birdie count IS a count of under-par holes, so the red is literal. */
-      figureOf: (r) => ({ text: String(r.birdies), tone: TOPAR_RED }),
+      figureOf: (r) => ({ text: String(r.birdies), tone: ROW_DARK_TOPAR_UNDER }),
       figureFloor: { text: '5' },
     });
   }
@@ -1605,7 +1658,9 @@ export function GolfThisWeek({
           gap: 12,
           /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
              gives 16px of clearance everywhere. */
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
+          paddingTop: chromeClearance
+            ? 'calc(env(safe-area-inset-top, 0px) + 70px)'
+            : 0,
           marginBottom: 12,
           minWidth: 0,
         }}
@@ -1847,9 +1902,18 @@ export function GolfThisWeek({
                         /* UNIFORM DIVIDERS (§1): the same hairline between every
                            pair of rows, none above the leader. */
                         borderTop: lead ? 'none' : `1px solid ${WELL_RULE}`,
-                        /* LIGHT INK GROUND for first place: a subtle gray tint
-                           that bleeds to the chip's padding edges. */
-                        background: lead ? WHITE_ALPHA_04 : undefined,
+                        /* §3.1 (BRIEF_DISCOVER_WORLD_CLASS) — THE LEADER'S
+                           GROUND WAS RAISED FROM WHITE_ALPHA_04 TO
+                           WHITE_ALPHA_12. The 4% value was tuned on the retired
+                           white canvas: composited over A.PANEL (#1B1E27) it
+                           lands on #24272F, a relative-luminance step of
+                           0.0136 -> 0.0187 — about 0.5:1 of contrast, which is
+                           to say none. 12% lands on #36393F, L 0.0136 -> 0.0416,
+                           roughly a 3x step and plainly the top row at arm's
+                           length. Same converted-value / unconverted-relationship
+                           fault Part C §1 found on the bogey ground. It is an
+                           EXISTING token — no new value. */
+                        background: lead ? WHITE_ALPHA_12 : undefined,
                         borderRadius: lead ? CHIP_RADIUS : undefined,
                         margin: lead ? '0 -12px' : undefined,
                         padding: lead ? '6px 12px' : '8px 0',
