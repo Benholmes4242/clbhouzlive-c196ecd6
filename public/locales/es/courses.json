@@ -1177,7 +1177,7 @@
           "finishedInRed": "Dieciocho hoyos terminados bajo par.",
           "birdieHaul": "{{0}} birdies en {{1}} hoyos.",
           "strongFinish": "Birdie o mejor en la vuelta a casa, para acabar en {{0}}."
-        },
+        }
       },
       "count": "{{rounds}} rondas · {{courses}} campos · {{days}} días"
     },
