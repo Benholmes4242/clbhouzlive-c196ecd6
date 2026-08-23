@@ -1065,7 +1065,7 @@
     "mostPlayedGolferCount_other": "{{count}}人",
     "mostPlayedPlayedToLabel": "スコア",
     "mostPlayedAvgToPar": "{{value}}",
-    "mostPlayedLow": "ロー",
+    "mostPlayedLowest": "最低",
     "mostPlayedNew": "新規",
     "trackedRounds": "記録ラウンド",
     "videosHeading": "最新の動画",

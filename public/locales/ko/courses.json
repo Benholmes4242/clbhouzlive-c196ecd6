@@ -1065,7 +1065,7 @@
     "mostPlayedGolferCount_other": "{{count}}명",
     "mostPlayedPlayedToLabel": "기록",
     "mostPlayedAvgToPar": "{{value}}",
-    "mostPlayedLow": "로우",
+    "mostPlayedLowest": "최저",
     "mostPlayedNew": "신규",
     "trackedRounds": "기록된 라운드",
     "videosHeading": "최신 영상",
