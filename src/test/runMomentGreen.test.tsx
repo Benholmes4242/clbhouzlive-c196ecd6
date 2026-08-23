@@ -98,7 +98,7 @@ describe('BRIEF_RUN_GREEN_FIGURE', () => {
     expect(runSpans.length).toBeGreaterThan(0);
     const greens = runSpans.filter((s) => {
       const c = s.style.color;
-      return c === 'rgb(34, 208, 122)' || c === '#22D07A';
+      return c === 'rgb(74, 222, 128)' || c === '#4ADE80';
     });
     expect(greens.length).toBe(runSpans.length);
   });
