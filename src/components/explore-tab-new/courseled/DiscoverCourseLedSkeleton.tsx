@@ -104,7 +104,7 @@ function Bar({
  */
 /**
  * BRIEF_DISCOVER_EYEBROWS §5 — the heading is now a 10px uppercase eyebrow at
- * lineHeight 1 (KICKER, matching the readout) with NO icon, so the header row is
+ * lineHeight 1 (KICKER, matching the readout) with NO icon, so the header row is a FIXED 20 (Eyebrow sets minHeight: 20 so the aside kind cannot change it), not 15+aside, and it
  * 10px tall, not 15, and reserves no leading glyph width. Callers' `w` values
  * were measured for the old 15.5px sentence-case title; each is scaled to the
  * uppercase run it now models.
