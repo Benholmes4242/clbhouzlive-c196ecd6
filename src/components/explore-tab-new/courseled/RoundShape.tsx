@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { CSSProperties, ReactNode } from 'react';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
-import { SC_FILL_BIRDIE, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { SC_BIRDIE_DARK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
@@ -511,7 +511,7 @@ const MINI_FAINT = A.MUTE;
 void MINI_FAINT;
 const MINI_GHOST = A.DIM;
 const ACE_GOLD = SC_FILL_GOLD;
-const UNDER_INK = SC_FILL_BIRDIE;
+const UNDER_INK = SC_BIRDIE_DARK;
 /* Match ScoreMark exactly on dark: both over-par marks use WHITE_ALPHA_18.
    At this 17px size the double's 1px ring is the entire magnitude distinction;
    do not soften it without reopening the shared contrast decision. */

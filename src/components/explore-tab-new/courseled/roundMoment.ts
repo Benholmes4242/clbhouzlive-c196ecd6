@@ -125,8 +125,10 @@ export interface Moment {
  */
 export const BIRDIE_HAUL_TONE_PROVISIONAL = '#B58CFF';
 
-/** Exact red sampled from the filled birdie circles in the dark scorecard. */
-export const FINISHED_IN_RED_TONE = '#C13636';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+
+/** Exact shared red used by filled birdie circles on Clubhouse dark scorecards. */
+export const FINISHED_IN_RED_TONE = TOPAR_UNDER_DARK;
 
 export const MOMENT_TONE: Record<MomentKind, string> = {
   eagle: '#FFC93C',
