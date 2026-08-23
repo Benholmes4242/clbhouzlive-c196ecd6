@@ -1127,7 +1127,7 @@
     "mostPlayedGolferCount_other": "{{count}} golfistas",
     "mostPlayedPlayedToLabel": "Jugado a",
     "mostPlayedAvgToPar": "Jugado a {{value}}",
-    "mostPlayedLow": "Bajo",
+    "mostPlayedLowest": "Más bajo",
     "mostPlayedNew": "Nuevo",
     "trackedRounds": "Rondas registradas",
     "videosHeading": "Videos recientes",

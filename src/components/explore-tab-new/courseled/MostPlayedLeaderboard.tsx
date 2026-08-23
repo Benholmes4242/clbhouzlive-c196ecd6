@@ -775,7 +775,7 @@ export function MostPlayedLeaderboard({
                   }}
                 >
                   <span style={{ flex: 'none', fontSize: 9, fontWeight: 700, lineHeight: 1, letterSpacing: '0.14em', textTransform: 'uppercase', color: FAINT }}>
-                    {t('discover.mostPlayedLow', 'Low')}
+                    {t('discover.mostPlayedLowest', 'Lowest')}
                   </span>
                   <span style={{ flex: 'none', fontSize: 12, fontWeight: 700, lineHeight: 1.2, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {bestPlayer.gross != null ? formatNumber(bestPlayer.gross) : ''}
