@@ -43,6 +43,7 @@ import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegion
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
 import { MiniScorecard } from './RoundShape';
 import {
+  FINISHED_IN_RED_TONE,
   selectMoment,
   type Moment,
 } from './roundMoment';
@@ -246,9 +247,8 @@ const ROW_DARK_QUIET = DISCOVER_QUIET;
     this figure. Applies to the TRIANGLE and its FIGURE alike. */
 export const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
 const ROW_DARK_INDEX_ROSE = INDEX_DELTA.dark.drifted;
-/** UNDER PAR RESOLVES THROUGH getScoreColor — no hand-picked hex. TOPAR_RED
-    (#C8102E) is the LIGHT-surface red and goes muddy on a scrimmed photograph. */
-export const ROW_DARK_TOPAR_UNDER = getScoreColor(-1, 'dark', 'standard');
+/** Under-par figures use the exact filled-birdie-circle red. */
+export const ROW_DARK_TOPAR_UNDER = FINISHED_IN_RED_TONE;
 
 
 
@@ -726,14 +726,8 @@ function FigureLine({
     fontWeight: 800,
     lineHeight: 1,
     letterSpacing: '-0.06em',
-    /* §5.2 — THE RULE IS UNCHANGED, THE SOURCE OF THE COLOUR IS NOT: a
-       score-role figure resolves through getScoreColor, the same call PhotoBand
-       makes, and never through moment.tone. They may render the same red today;
-       only one of them is the to-par grammar. A QUANTITY stays white. */
-    color:
-      moment.figureRole === 'score' && moment.figure != null
-        ? getScoreColor(moment.figure, 'dark', 'standard')
-        : '#FFFFFF',
+    /* Tile-hero figures are white to match the course name above. */
+    color: DISCOVER_FACT,
   };
 
   const wordStyle: React.CSSProperties = {
@@ -742,7 +736,7 @@ function FigureLine({
     letterSpacing: '0.14em',
     lineHeight: 1,
     textTransform: 'uppercase',
-    color: DISCOVER_QUIET,
+    color: DISCOVER_FACT,
   };
 
   if (moment.figureRole === 'score' && moment.figure != null) {
@@ -756,20 +750,10 @@ function FigureLine({
   }
 
   if (moment.figureKey == null || moment.figure == null) {
-    /* PLAIN: the gross, with the to-par beside it on the same line. §2 — the
-       gross is a SCORE, so it takes the to-par grammar. A gross with no par to
-       measure it against is not a score and stays white. */
+    /* PLAIN: the gross and adjacent to-par are both hero white. */
     return (
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, minWidth: 0 }}>
-        <span
-          style={{
-            ...numStyle,
-            color:
-              grossToPar != null
-                ? getScoreColor(grossToPar, 'dark', 'standard')
-                : numStyle.color,
-          }}
-        >
+        <span style={numStyle}>
           {gross ?? '\u2014'}
         </span>
         {toParText && <span style={{ ...wordStyle, letterSpacing: '0.06em' }}>{toParText}</span>}
