@@ -207,8 +207,13 @@ const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
  * because both regions are fixed, INCLUDING a round with NO HOLE DATA
  * (§S1.7, ACCEPTANCE Q).
  */
-/** THE SHAPE's region: eyebrow row 11 + gap 4 + curve 34 + 4 = 53. */
-const SHAPE_H = 34;
+/**
+ * THE SHAPE's region. THE EYEBROW IS GONE and the curve takes the whole block:
+ * the shape needs no label — it sits directly above the scorecard it summarises,
+ * and 15px of the region spent on the word "THE SHAPE" was 15px not spent on the
+ * curve. Block height is unchanged so the tile and its skeleton do not move.
+ */
+const SHAPE_H = 49;
 const SHAPE_BLOCK_H = 53;
 const WELL_H = 139 + SHAPE_BLOCK_H;
 const CARD_MIN_H = 331 + SHAPE_BLOCK_H;
@@ -1297,10 +1302,7 @@ function GolfThisWeekCard({
               and the fills mixed on the well (§A5).
               NOT "ENERGY", NOT "POWER", NOT "FORM" — THE SHAPE. */}
           <div style={{ height: SHAPE_BLOCK_H, boxSizing: 'border-box', paddingTop: 4 }}>
-            <span style={{ ...LABEL, fontSize: 8.5, letterSpacing: '0.14em', color: DISCOVER_QUIET }}>
-              {t('discover.golfThisWeek.moment.theShape', 'The shape')}
-            </span>
-            <div style={{ height: SHAPE_H, marginTop: 4, position: 'relative' }}>
+            <div style={{ height: SHAPE_H, position: 'relative' }}>
               {/* THE LEVEL-PAR BASELINE, dashed, at the domain's zero. */}
               <div
                 aria-hidden="true"

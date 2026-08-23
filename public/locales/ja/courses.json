@@ -1115,8 +1115,7 @@
           "finishedInRed": "18ホールをアンダーパーで終了。",
           "birdieHaul": "{{1}} ホールで {{0}} バーディー。",
           "strongFinish": "上がり3ホールでバーディー以上、{{0}} でフィニッシュ。"
-        },
-        "theShape": "ラウンドの流れ"
+        }
       },
       "count": "{{rounds}} ラウンド · {{courses}} コース · {{days}}日間"
     },

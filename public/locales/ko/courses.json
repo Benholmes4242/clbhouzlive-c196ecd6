@@ -1115,8 +1115,7 @@
           "finishedInRed": "18홀을 언더파로 마쳤습니다.",
           "birdieHaul": "{{1}} 홀에서 버디 {{0}}개.",
           "strongFinish": "마지막 세 홀에서 버디 이상, {{0}}로 마무리."
-        },
-        "theShape": "라운드 흐름"
+        }
       },
       "count": "{{rounds}} 라운드 · {{courses}} 코스 · {{days}}일"
     },
