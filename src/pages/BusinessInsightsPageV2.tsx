@@ -93,8 +93,8 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       <button
         type="button"
         onClick={() => refetch()}
-        className="inline-flex items-center gap-1.5 px-3.5 rounded-full text-[13px] font-bold text-white active:opacity-90"
-        style={{ background: A.INK, border: 'none', minHeight: 44 }}
+        className="inline-flex items-center gap-1.5 px-3.5 rounded-full text-[13px] font-bold active:opacity-90"
+        style={{ background: A.INK, color: A.CANVAS, border: 'none', minHeight: 44 }}
       >
         Retry
       </button>
@@ -111,7 +111,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
           <button
             onClick={() => navigate(`/business/${businessId}/reviews`)}
             className="inline-flex items-center gap-1.5 px-3.5 rounded-full text-[13px] font-bold active:opacity-90"
-            style={{ background: A.INK, color: '#fff', border: 'none', minHeight: 44 }}
+            style={{ background: A.INK, color: A.CANVAS, border: 'none', minHeight: 44 }}
           >
             Manage reviews
           </button>
@@ -146,7 +146,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       <button
         onClick={() => navigate(`/business/${businessId}/reviews`)}
         className="inline-flex items-center gap-1.5 px-3.5 rounded-full text-[13px] font-bold active:opacity-90"
-        style={{ background: A.INK, color: '#fff', border: 'none', minHeight: 44 }}
+        style={{ background: A.INK, color: A.CANVAS, border: 'none', minHeight: 44 }}
       >
         Manage reviews
       </button>
@@ -467,7 +467,7 @@ const BusinessInsightsPageV2 = () => {
       <ManagePageShell title="Insights">
         <div className="max-w-xl mx-auto mt-10 text-center px-4">
           <p style={BIZ_BODY}>Business not found</p>
-          <Button onClick={() => navigate('/')} className="mt-4 text-white border-0" style={{ background: A.INK }}>Go home</Button>
+          <Button onClick={() => navigate('/')} className="mt-4 border-0" style={{ background: A.INK, color: A.CANVAS }}>Go home</Button>
         </div>
       </ManagePageShell>
     );
@@ -503,7 +503,7 @@ const BusinessInsightsPageV2 = () => {
                 fontSize: 13,
                 fontWeight: active ? 700 : 500,
                 letterSpacing: '-0.01em',
-                ...(active ? { background: A.INK, color: '#ffffff' } : { color: A.MUTE, background: 'transparent' }),
+                ...(active ? { background: A.INK, color: A.CANVAS } : { color: A.MUTE, background: 'transparent' }),
               }}
             >
               {rangeLabels[range]}

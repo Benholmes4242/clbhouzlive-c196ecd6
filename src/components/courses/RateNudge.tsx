@@ -43,8 +43,8 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
           justifyContent: 'space-between',
           padding: '10px 14px',
           marginBottom: 12,
-          background: 'rgba(247,147,30,0.05)',
-          border: '1px solid rgba(247,147,30,0.18)',
+           background: 'rgba(247,147,30,0.10)',
+           border: '1px solid rgba(247,147,30,0.42)',
           borderRadius: 12,
           cursor: 'pointer',
         }}
@@ -95,7 +95,7 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
           borderRadius: 10,
           overflow: 'hidden',
           flexShrink: 0,
-          background: '#0f172a',
+           background: 'rgba(255,255,255,0.06)',
         }}
       >
         {course.thumbnail ? (
@@ -117,7 +117,7 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: 0.6,
-            color: AMBER,
+             color: 'rgba(248,250,252,0.62)',
             marginBottom: 2,
           }}
         >
@@ -157,7 +157,7 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
           gap: 4,
           padding: '6px 12px',
           background: A.INK,
-          color: '#fff',
+          color: A.CANVAS,
           borderRadius: 999,
           fontSize: 12,
           fontWeight: 700,
