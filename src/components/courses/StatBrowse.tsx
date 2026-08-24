@@ -154,7 +154,7 @@ const CARD_BAND = 'rgba(255,255,255,0.06)';
  * trailing edge so different content widths still read as one matched pair.
  */
 const WELL_TRIGGER_CLS =
-  'flex h-auto w-full border-0 p-0 shadow-none focus:ring-0 ' +
+  'flex h-auto w-full border-0 p-0 shadow-none focus:ring-0 disabled:opacity-100 ' +
   '[&>span]:!flex [&>svg]:hidden';
 
 /** Row 2 (lens): sized to its content, leaving search at the opposite edge. */
