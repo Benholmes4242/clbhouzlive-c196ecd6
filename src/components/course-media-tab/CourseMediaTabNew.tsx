@@ -7,7 +7,8 @@ import { useCourseMedia, type CourseMediaFilter } from './hooks/useCourseMedia';
 import { CourseMediaHeader } from './CourseMediaHeader';
 import { CourseMediaCanonGrid } from './CourseMediaCanonGrid';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-import { SLATE_50 } from '@/features/courses/_shared/tokens';
+import { AMBER, SLATE_50 } from '@/features/courses/_shared/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface CourseMediaTabNewProps {
   courseId: string;
@@ -59,7 +60,8 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         <button
           type="button"
           onClick={() => navigate('/auth')}
-          className="h-11 px-6 rounded-xl bg-[#f59e0b] text-white text-sm font-semibold hover:bg-[#e8920f] active:scale-[0.97] transition-all"
+          className="h-11 px-6 rounded-xl text-sm font-semibold active:scale-[0.97] transition-all"
+          style={{ background: AMBER, color: A.CANVAS }}
         >
           {t('courses:media.signInCta')}
         </button>

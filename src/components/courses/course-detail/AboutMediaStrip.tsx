@@ -11,7 +11,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { AMBER } from '@/features/courses/_shared/tokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { Action, KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
+import { A, Action, KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 
@@ -225,8 +225,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               key={i}
               style={
                 isMobile && i === 0
-                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 10, background: 'rgba(15,23,42,0.06)' }
-                  : { height: '100%', borderRadius: 8, background: 'rgba(15,23,42,0.06)' }
+                  ? { gridRow: '1 / span 2', height: '100%', borderRadius: 10, background: 'rgba(255,255,255,0.08)' }
+                  : { height: '100%', borderRadius: 8, background: 'rgba(255,255,255,0.08)' }
               }
             />
           ))}
@@ -256,19 +256,19 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               style={{
                 aspectRatio: '1',
                 borderRadius: 8,
-                background: 'rgba(15,23,42,0.03)',
-                border: '1px dashed rgba(15,23,42,0.10)',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px dashed rgba(255,255,255,0.14)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              {i === 0 && <Plus size={16} strokeWidth={2} color="#A2A9B2" />}
+              {i === 0 && <Plus size={16} strokeWidth={2} color={A.DIM} />}
             </div>
           ))}
         </div>
 
-        <p style={{ fontSize: 12, color: '#68707B', margin: '0 16px', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 12, color: A.MUTE, margin: '0 16px', lineHeight: 1.5 }}>
           {t('courseDetail.mediaStrip.helpDiscover')}
         </p>
 
@@ -338,7 +338,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 overflow: 'hidden',
                 padding: 0,
                 border: 'none',
-                background: '#0F172A',
+                background: A.CANVAS,
                 cursor: 'pointer',
               }}
               aria-label={t('courseDetail.a11y.openMediaTab')}
@@ -351,7 +351,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                   style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               ) : (
-                <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.08)' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.14)' }} />
               )}
 
               {media.media_type === 'video' && !showOverflow && (
