@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import type { CSSProperties, ReactNode } from 'react';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
-import { SC_BIRDIE_DARK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { SC_FILL_BIRDIE, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { HAIRLINE_INK_12, INK_TINT_06, TOPAR_EVEN_LIGHT, WHITE_ALPHA_18 } from '@/features/tourhub/_shared/tokens';
+import { HAIRLINE_INK_12, INK_TINT_06, TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
 import { A, CHIP_RADIUS } from './tokens';
@@ -145,7 +145,7 @@ export function RoundShape({
       <TrajectoryLine
         holes={shape.holes}
         height={height}
-        surface="dark"
+        surface="light"
         showTicks={false}
         padY={1}
         /* THE VIEWBOX MATCHES THE COLUMN (CORRECTION_SHEET_TRACE_HEIGHT §4):
@@ -503,24 +503,21 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
 
    LOCAL to this grid, which only the Discover round tile renders — the
    Clubhouse scorecard sheet keeps its own tokens untouched. */
-const MINI_INK = A.INK;
-const MINI_FAINT = A.MUTE;
+const MINI_INK = '#0B0F14';
+const MINI_FAINT = '#9AA5B1';
 /* Kept on the ramp but no longer used by the nine header: §3 of
    BRIEF_DISCOVER_FINISHING_PASS darkened the labels and level/over to-par to
    MINI_INK. Retained so the ramp stays legible to a reader. */
 void MINI_FAINT;
-const MINI_GHOST = A.DIM;
+const MINI_GHOST = '#C8D0D8';
 const ACE_GOLD = SC_FILL_GOLD;
-const UNDER_INK = SC_BIRDIE_DARK;
-/* Match ScoreMark exactly on dark: both over-par marks use WHITE_ALPHA_18.
-   At this 17px size the double's 1px ring is the entire magnitude distinction;
-   do not soften it without reopening the shared contrast decision. */
-const BOGEY_GROUND = WHITE_ALPHA_18;
-const DOUBLE_GROUND = WHITE_ALPHA_18;
+const UNDER_INK = SC_FILL_BIRDIE;
+const BOGEY_GROUND = INK_TINT_06;
+const DOUBLE_GROUND = HAIRLINE_INK_12;
 
-/** Dark-only fallback for the surface the grid sits on. Callers pass their
- * exact host well so ring spacers always trace the rendered surface. */
-export const MINI_WELL = A.PANEL;
+/** The surface the grid sits on. NO TINT: it is the white card, and the marker
+ *  outer rings trace against exactly that, so a ring reads as clear air. */
+export const MINI_WELL = '#FFFFFF';
 
 /** §S1.3 — the Clubhouse card's own key, not a second vocabulary. */
 type Marker = 'ace' | 'albatross' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double';
@@ -547,8 +544,9 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
  *
  *  THE SPACER TAKES THE SURFACE COLOUR the cell sits on — that is the rule, and
  *  it holds whatever that colour is: pass the card, sheet or well background in,
- *  never a fixed grey. Outside a band the spacer is invisible because it equals
- *  the host well. THE RULE IS STILL LOAD-BEARING INSIDE A MOMENT BAND: a
+ *  never a fixed grey. Since BRIEF_ROUND_TILE_WHITE_WELL the round tile's well is
+ *  #FFFFFF, so outside a band the spacer is invisible, which is exactly what a
+ *  spacer wants to be. THE RULE IS STILL LOAD-BEARING INSIDE A MOMENT BAND: a
  *  cell there must be passed the BLENDED well (the tone composited over the well
  *  at the band's opacity), or its spacer draws the plain well against a tinted
  *  background — a pale halo inside the ring. See bandWell in NineRow.
@@ -587,11 +585,11 @@ function markerStyle(m: Marker | null, well: string): CSSProperties {
   switch (m) {
     case 'ace':
     case 'albatross':
-      return magnitude(ACE_GOLD, UNDER_INK, A.INK);
+      return magnitude(ACE_GOLD, UNDER_INK, MINI_WELL);
     case 'eagle':
-      return magnitude(UNDER_INK, UNDER_INK, A.INK);
+      return magnitude(UNDER_INK, UNDER_INK, MINI_WELL);
     case 'birdie':
-      return { ...base, ...filled, background: UNDER_INK, color: A.INK };
+      return { ...base, ...filled, background: UNDER_INK, color: MINI_WELL };
     case 'bogey':
       return { ...base, ...filled, background: BOGEY_GROUND };
     case 'double':
@@ -663,7 +661,15 @@ const NUM_BLOCK = 7 + 2.5;
  *  A cell inside a band is handed this instead of the plain well so its 1px
  *  spacer matches the tint behind it. */
 function blend(tone: string, surface: string, alpha: number): string {
-  return `color-mix(in srgb, ${tone} ${alpha * 100}%, ${surface})`;
+  const hex = (h: string) => {
+    const v = h.replace('#', '');
+    const full = v.length === 3 ? v.split('').map((c) => c + c).join('') : v;
+    return [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16));
+  };
+  const a = hex(tone);
+  const b = hex(surface);
+  const mix = a.map((c, i) => Math.round(c * alpha + b[i] * (1 - alpha)));
+  return `#${mix.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
 }
 
 /** Consecutive runs of marked holes WITHIN one nine, as [startIndex, length]. */

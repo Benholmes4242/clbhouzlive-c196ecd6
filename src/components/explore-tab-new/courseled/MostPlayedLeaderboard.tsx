@@ -6,7 +6,7 @@ import { ArrowUp, ChevronDown } from 'lucide-react';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import type { MostPlayedPlayer, MostPlayedRow } from './hooks/useMostPlayedThisWeek';
-import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, Eyebrow, GOLD, InkAction, LABEL, NUMF, SANS, THUMBNAIL_RADIUS } from './tokens';
+import { A, CARD_RADIUS, Eyebrow, InkAction, LABEL, NUMF, SANS, THUMBNAIL_RADIUS } from './tokens';
 import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
@@ -102,7 +102,7 @@ function MoveMark({
     return <span style={{ ...base, color: A.AMBER }}>{t('discover.mostPlayedNew', 'New')}</span>;
   if (row.move !== 'up') return null;
   return (
-    <span style={{ ...base, color: INDEX_DELTA.dark.improved }}>
+    <span style={{ ...base, color: INDEX_DELTA.light.improved }}>
       <ArrowUp size={9} strokeWidth={2.75} />
       {formatNumber(Math.abs(row.change))}
     </span>
@@ -134,10 +134,10 @@ const BOARD_MAX_ROWS = 8.5;
 const BOARD_MAX_H = Math.round(BOARD_ROW_H * BOARD_MAX_ROWS);
 
 /** Ink ramp of the round tiles, shared so the board reads as one family. */
-const INK = DISCOVER_FACT;
-const MID = DISCOVER_QUIET;
-const FAINT = DISCOVER_QUIET;
-const GHOST = DISCOVER_QUIET;
+const INK = '#0B0F14';
+const MID = '#5A6673';
+const FAINT = '#8A929C';
+const GHOST = '#C8D0D8';
 
 /** §S2.8 — the viewing member's row takes a 4.5% amber tint. NO RING, NO "You". */
 const VIEWER_TINT = 'rgba(247,147,30,0.045)';
@@ -146,77 +146,6 @@ const VIEWER_TINT = 'rgba(247,147,30,0.045)';
 const GROSS_COL = 30;
 /** §S2.2 — position first, in a fixed column so names start on one line. */
 const POS_COL = 17;
-
-const FACE_SIZE = 26;
-const FACE_OVERLAP = -7;
-const FACE_LIMIT = 4;
-
-/**
- * The collapsed pile is descriptive, never interactive: the containing course
- * header remains the single disclosure target. `SquircleAvatar` owns the
- * canonical deterministic-initial fallback and lazy image loading.
- */
-function PlayerFacepile({ players, accent }: { players: MostPlayedPlayer[]; accent: string }) {
-  const visible = players.slice(0, FACE_LIMIT);
-  const overflow = players.length - visible.length;
-
-  return (
-    <span
-      aria-hidden
-      style={{ display: 'inline-flex', alignItems: 'center', flex: 'none', minWidth: 0 }}
-    >
-      {visible.map((player, index) => (
-        <span
-          key={player.userId}
-          style={{
-            position: 'relative',
-            zIndex: visible.length - index + (overflow > 0 ? 1 : 0),
-            width: FACE_SIZE,
-            height: FACE_SIZE,
-            marginLeft: index === 0 ? 0 : FACE_OVERLAP,
-            borderRadius: '34%',
-            boxShadow: `0 0 0 ${index === 0 ? 2 : 1.5}px ${index === 0 ? accent : A.PANEL}`,
-            flex: 'none',
-          }}
-        >
-          <SquircleAvatar
-            size={FACE_SIZE}
-            src={player.avatarUrl}
-            alt={player.name}
-            userId={player.userId}
-            hideRing
-            className="[&>div]:!aspect-square"
-          />
-        </span>
-      ))}
-      {overflow > 0 && (
-        <span
-          style={{
-            position: 'relative',
-            zIndex: 0,
-            width: FACE_SIZE,
-            height: FACE_SIZE,
-            marginLeft: FACE_OVERLAP,
-            borderRadius: '34%',
-            background: A.TRACK,
-            boxShadow: `0 0 0 1.5px ${A.PANEL}`,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: DISCOVER_QUIET,
-            fontSize: 9,
-            fontWeight: 800,
-            lineHeight: 1,
-            fontVariantNumeric: 'tabular-nums lining-nums',
-            flex: 'none',
-          }}
-        >
-          +{formatNumber(overflow)}
-        </span>
-      )}
-    </span>
-  );
-}
 
 /* NO VIEWER MARKING ON THE COURSE HEADER. Ben's call
  * (BRIEF_SCORECARD_WIDTH_AND_VIEWER_RING §S2) — the amber ring and the "You"
@@ -452,7 +381,7 @@ function MemberBoard({
                 flex: 'none',
                 fontSize: 12,
                 lineHeight: 1,
-                color: under ? TOPAR_RED : INK,
+                color: under ? TOPAR_RED : MID,
               }}
             >
               {p.toPar != null ? formatRelInt(p.toPar) : ''}
@@ -491,7 +420,7 @@ function MemberBoard({
             bottom: 10,
             height: 28,
             pointerEvents: 'none',
-            background: `linear-gradient(to bottom, transparent, ${A.PANEL})`,
+            background: `linear-gradient(to bottom, rgba(255,255,255,0), ${A.PANEL})`,
           }}
         />
       )}
@@ -547,19 +476,6 @@ export function MostPlayedLeaderboard({
   // while the rest of the row reads straight away.
   const thumbPending = shown.length > 0 && metaQuery.isPending;
 
-  /* GOLD MEANS BEST in all three Discover appearances: the BEST THIS WEEK
-     podium, its winning round tile, and this course card. Resolve the winning
-     course against ALL supplied rows before slicing; if it is outside the
-     visible list, no visible card is promoted. `find` intentionally awards at
-     most one course if equal gross values occur. */
-  const weekBestGross = rows.reduce<number | null>(
-    (best, row) => row.bestGross == null ? best : best == null ? row.bestGross : Math.min(best, row.bestGross),
-    null,
-  );
-  const weekBestCourseId = weekBestGross == null
-    ? null
-    : rows.find((row) => row.bestGross === weekBestGross)?.courseId ?? null;
-
   const openMember = (userId: string) => navigate(`/profile/${userId}`);
 
   /* NO SCORE ID (an untracked round, or one the read could not resolve) FALLS
@@ -605,8 +521,6 @@ export function MostPlayedLeaderboard({
           const m = meta?.get(r.courseId);
           const name = m?.name ?? r.courseName ?? t('discover.unknownCourse', 'Course');
           const bestPlayer = r.players[0];
-           const isWeekBestCourse = r.courseId === weekBestCourseId;
-           const cardAccent = isWeekBestCourse ? GOLD : DISCOVER_FACT;
           const open = openId === r.courseId;
           const toggle = () => setOpenId(open ? null : r.courseId);
           return (
@@ -621,12 +535,11 @@ export function MostPlayedLeaderboard({
               key={r.courseId}
               style={{
                 background: A.PANEL,
-                 border: `1px solid ${isWeekBestCourse ? GOLD : 'transparent'}`,
                 borderRadius: CARD_RADIUS,
                 overflow: 'hidden',
                 boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
                 marginBottom: 10,
-                 padding: '0 13px',
+                padding: '0 14px',
               }}
             >
               {/* NO BUTTON INSIDE A BUTTON (§S2.8). The row is a div carrying
@@ -645,13 +558,11 @@ export function MostPlayedLeaderboard({
                   }
                 }}
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: '52px minmax(0, 1fr) 15px',
+                  display: 'flex',
                   alignItems: 'center',
-                  columnGap: 11,
-                  rowGap: 0,
+                  gap: 11,
                   width: '100%',
-                  padding: '6px 0 0',
+                  padding: '12px 0',
                   background: 'transparent',
                   textAlign: 'left',
                   fontFamily: SANS,
@@ -680,7 +591,7 @@ export function MostPlayedLeaderboard({
                       WebkitLineClamp: 2,
                       fontSize: 14,
                       fontWeight: 700,
-                       color: DISCOVER_FACT,
+                      color: A.INK,
                       letterSpacing: '-0.02em',
                       lineHeight: 1.2,
                       overflow: 'hidden',
@@ -692,8 +603,28 @@ export function MostPlayedLeaderboard({
                        LINE. It deliberately declares every type property rather
                        than spreading LABEL, whose uppercase transform previously
                        changed sentence-case database values such as "Kent". */}
-                   {/* REGION + ROUNDS share the meta line. The resolved-player
-                       count is represented only by the pile below.
+                   {m?.region && (
+                     <span
+                       style={{
+                         display: 'block',
+                         marginTop: 2,
+                         minWidth: 0,
+                         fontSize: 11,
+                         fontWeight: 700,
+                         lineHeight: 1.2,
+                         letterSpacing: 0,
+                         color: A.INK,
+                         overflow: 'hidden',
+                         textOverflow: 'ellipsis',
+                         whiteSpace: 'nowrap',
+                       }}
+                     >
+                       {m.region}
+                     </span>
+                   )}
+
+                   {/* THE THIRD LINE IS COUNTS + MOVEMENT ONLY. The count dot,
+                       pluralisation and players.length source are unchanged.
 
                       SUPERSEDED (BRIEF_MOST_PLAYED_META_LINE): §S2.2 recorded
                       "the round count is A.MID and the region is A.FAINT on the
@@ -715,37 +646,17 @@ export function MostPlayedLeaderboard({
                       fontVariantNumeric: 'tabular-nums lining-nums',
                     }}
                   >
-                     {m?.region && (
-                       <>
-                         <span
-                           style={{
-                             minWidth: 0,
-                             overflow: 'hidden',
-                             textOverflow: 'ellipsis',
-                             whiteSpace: 'nowrap',
-                             fontSize: 11,
-                             fontWeight: 700,
-                             lineHeight: 1,
-                             letterSpacing: 0,
-                             color: DISCOVER_FACT,
-                           }}
-                         >
-                           {m.region}
-                         </span>
-                         <span aria-hidden style={{ flex: 'none', width: 2.5, height: 2.5, borderRadius: '50%', background: GHOST, margin: '0 7px' }} />
-                       </>
-                     )}
                     {/* §S4.2 — A PLURAL RULE, NEVER A CONCATENATION: i18next
                         count pluralisation, so "1 round" / "11 rounds" and
                         every language's own rule both work. */}
                     <span
                       style={{
                         ...NUMF,
-                         flex: 'none',
+                        flex: 'none',
                         fontSize: 11,
                         fontWeight: 700,
                         lineHeight: 1,
-                         color: DISCOVER_FACT,
+                        color: A.INK,
                         marginRight: 7,
                       }}
                     >
@@ -759,8 +670,81 @@ export function MostPlayedLeaderboard({
                          return null and reserve no width. */}
                      <MoveMark row={r} t={t} />
 
+                    {/* §1 — THE GOLFER COUNT, a SECOND FACT ON THE SAME LINE in
+                        the same 11 / 700 / A.INK and the same dot separator.
+                        IT IS `players.length`, NOT `members`: members counts ids
+                        the board cannot render (deleted account, RLS — §S4.4),
+                        so it would reintroduce the very mismatch this fixes.
+                        "11 rounds · 9 golfers" reads as two golfers who played
+                        twice, not a board missing two entries. */}
+                    {r.players.length > 0 && (
+                      <>
+                        <span
+                          aria-hidden
+                          style={{
+                            flex: 'none',
+                            width: 2.5,
+                            height: 2.5,
+                            borderRadius: '50%',
+                            background: GHOST,
+                            marginRight: 7,
+                          }}
+                        />
+                        <span
+                          style={{
+                            ...NUMF,
+                            flex: 'none',
+                            fontSize: 11,
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            color: A.INK,
+                            marginRight: 7,
+                          }}
+                        >
+                          {t('discover.mostPlayedGolferCount', '{{count}} golfer', {
+                            count: r.players.length,
+                          })}
+                        </span>
+                      </>
+                    )}
+
                   </span>
                  </span>
+                {/* §S1.5 — "PLAYED TO" IS PROMOTED: 19px / 800 on the right of
+                    the header with an 8px label beneath. It is the row's
+                    HEADLINE FIGURE, because it is the only figure on the row
+                    that describes the GOLF (§S0.3). A course with no comparable
+                    scored round this week renders neither figure nor label. */}
+                {r.avgToPar != null && (
+                  <span style={{ flexShrink: 0, textAlign: 'right', minWidth: 40 }}>
+                    <span
+                      style={{
+                        ...NUMF,
+                        display: 'block',
+                        fontSize: 19,
+                        fontWeight: 800,
+                        // CORRECTION §S3.2 — -0.04em (found at -0.03em).
+                        letterSpacing: '-0.04em',
+                        lineHeight: 1,
+                        color: INK,
+                      }}
+                    >
+                      {formatToPar(r.avgToPar)}
+                    </span>
+                    <span
+                      style={{
+                        ...LABEL,
+                        display: 'block',
+                        fontSize: 8,
+                        letterSpacing: '0.14em',
+                        color: FAINT,
+                        marginTop: 4,
+                      }}
+                    >
+                      {t('discover.mostPlayedPlayedToLabel', 'Played to')}
+                    </span>
+                  </span>
+                )}
                 {/* WITHOUT IT NOTHING SAYS THE ROW OPENS (§S2.2). */}
                 <ChevronDown
                   size={15}
@@ -774,55 +758,35 @@ export function MostPlayedLeaderboard({
                     transition: 'transform 160ms ease',
                   }}
                 />
-                {/* The count is now embodied by the faces. The pile and the low
-                    round share one compact row; neither introduces a nested tap
-                    target, so every point in the collapsed card still toggles. */}
-                {bestPlayer && (
-                  <div
-                  style={{
-                     width: '100%',
-                     gridColumn: '1 / -1',
-                     paddingTop: 4,
-                     paddingBottom: 5,
-                     marginTop: 4,
-                     borderTop: `1px solid ${A.HAIRLINE}`,
-                     display: 'grid',
-                     gridTemplateColumns: 'auto minmax(0, 1fr) auto',
-                     alignItems: 'center',
-                     columnGap: 10,
-                     minWidth: 0,
-                   }}
-                  >
-                    <PlayerFacepile players={r.players} accent={cardAccent} />
-                    <span style={{ minWidth: 0 }}>
-                      <span style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 0 }}>
-                        <span style={{ flex: 'none', fontSize: 19, fontWeight: 800, lineHeight: 1, color: cardAccent, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                          {bestPlayer.gross != null ? formatNumber(bestPlayer.gross) : '\u2014'}
-                        </span>
-                        <span style={{ flex: 'none', fontSize: 11.5, fontWeight: 800, lineHeight: 1, color: isWeekBestCourse ? GOLD : bestPlayer.toPar != null && bestPlayer.toPar < 0 ? TOPAR_RED : DISCOVER_QUIET, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                          {bestPlayer.toPar != null ? formatRelInt(bestPlayer.toPar) : ''}
-                        </span>
-                        <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 11.5, fontWeight: 700, lineHeight: 1.2, color: viewerId === bestPlayer.userId ? A.AMBER_DEEP : DISCOVER_FACT }}>
-                          {bestPlayer.name}
-                        </span>
-                      </span>
-                      <span style={{ ...LABEL, display: 'block', marginTop: 4, fontSize: 8, letterSpacing: '0.14em', color: FAINT }}>
-                        {t('discover.mostPlayedLowLabel', 'LOWEST THIS WEEK', { count: r.players.length })}
-                      </span>
-                    </span>
-                    {r.avgToPar != null && (
-                      <span style={{ flex: 'none', textAlign: 'right' }}>
-                        <span style={{ ...NUMF, display: 'block', fontSize: 12.5, lineHeight: 1, color: DISCOVER_QUIET }}>
-                          {formatToPar(r.avgToPar)}
-                        </span>
-                        <span style={{ ...LABEL, display: 'block', marginTop: 4, fontSize: 7.5, letterSpacing: '0.14em', color: FAINT }}>
-                          {t('discover.mostPlayedField', 'FIELD')}
-                        </span>
-                      </span>
-                    )}
-                  </div>
-                )}
               </div>
+              {/* LOW summarises the whole card, so it spans beneath the entire
+                  header rather than being constrained by thumbnail and score. */}
+              {bestPlayer && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 6,
+                    minWidth: 0,
+                    padding: '7px 0 10px',
+                    borderTop: `1px solid ${A.HAIRLINE}`,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span style={{ flex: 'none', fontSize: 9, fontWeight: 700, lineHeight: 1, letterSpacing: '0.14em', textTransform: 'uppercase', color: FAINT }}>
+                    {t('discover.mostPlayedLowest', 'Lowest')}
+                  </span>
+                  <span style={{ flex: 'none', fontSize: 12, fontWeight: 700, lineHeight: 1.2, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                    {bestPlayer.gross != null ? formatNumber(bestPlayer.gross) : ''}
+                  </span>
+                  <span style={{ flex: 'none', fontSize: 10, fontWeight: 700, lineHeight: 1.2, color: bestPlayer.toPar != null && bestPlayer.toPar < 0 ? TOPAR_RED : MID, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                    {bestPlayer.toPar != null ? formatRelInt(bestPlayer.toPar) : ''}
+                  </span>
+                  <span style={{ flex: 'none', minWidth: 0, fontSize: 12, fontWeight: 700, lineHeight: 1.2, color: A.INK }}>
+                    {bestPlayer.name}
+                  </span>
+                </div>
+              )}
               {open && <div style={{ height: 1, margin: '0 -14px', background: A.BORDER }} />}
 
               {/* The LOW line is part of this disclosure header and has no

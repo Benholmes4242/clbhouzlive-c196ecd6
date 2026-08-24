@@ -143,10 +143,10 @@ export const LEADER_GOLD_TINT_10 = 'rgba(251,188,46,0.10)';  // medium leader ti
 // red across every golf surface (leaderboard, hero, schedule, player history,
 // college, TI). All prior SCORE_* tokens have been removed in favour of these.
 export const TOPAR_UNDER_LIGHT = '#D2222D';
-// One bright red for under par on every dark surface. This consolidates the
-// former #DC2626 canonical token, #FF6B5E scorecard birdie, #FF5D5D glass
-// override and duplicate #FF6B60 trajectory/analytical declarations.
-export const TOPAR_UNDER_DARK  = '#FF6B60';
+// One red for under par on dark. Was '#FF6B5E' — a faded pink-red; this is the
+// hero ticker's red, now the single source for every dark under-par score AND
+// for LEADER_RED in CinematicHeroFullBleed / CinematicFrame, which derive it.
+export const TOPAR_UNDER_DARK  = '#DC2626';
 export const TOPAR_OVER_LIGHT  = '#0F172A';                  // INK
 export const TOPAR_OVER_DARK   = 'rgba(242,244,247,0.62)';
 export const TOPAR_EVEN_LIGHT  = '#8A9099';

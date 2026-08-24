@@ -288,11 +288,8 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     videoPrefetchCount: 8,
   },
   {
-    // THE COMMUNITY DESTINATION. '/discover/community' was a dead path — that
-    // route has never existed, so this entry never fired
-    // (BRIEF_DISCOVER_ABSORBS_COMMUNITY, acceptance f). The live route is
-    // '/community', now reached only from Discover's act two see-alls.
-    path: '/community',
+    // Community tab within Discover - prefetch community feed
+    path: '/discover/community',
     queryKey: ['community-feed-base'],
     priority: 3,
     queryFn: fetchCommunityFeedBase,

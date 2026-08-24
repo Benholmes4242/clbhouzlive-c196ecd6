@@ -11,6 +11,7 @@ import {
   INK_TINT_06,
   SURFACE,
   TOPAR_UNDER_DARK,
+  WHITE_ALPHA_08,
   WHITE_ALPHA_18,
 } from '@/features/tourhub/_shared/tokens';
 
@@ -70,10 +71,7 @@ const OVER_INK_DARK = '#F2F4F7';
 /** Existing semantic surface tokens only — no locally invented colours. */
 const LIGHT_BOGEY_GROUND = INK_TINT_06;
 const LIGHT_DOUBLE_GROUND = HAIRLINE_INK_12;
-/* DARK-ONLY PART C: bogey and double deliberately share the same legible
-   ground. At 17px their ONE distinction is the double's 1.5px magnitude ring;
-   that ring can never be softened without reopening this contrast decision. */
-const DARK_BOGEY_GROUND = WHITE_ALPHA_18;
+const DARK_BOGEY_GROUND = WHITE_ALPHA_08;
 const DARK_DOUBLE_GROUND = WHITE_ALPHA_18;
 
 export interface ScoreMarkProps {

@@ -1085,8 +1085,8 @@
       "sublineAces_other": "{{count}} Aces",
       "sublineAlbatrosses_one": "{{count}} Albatross",
       "sublineAlbatrosses_other": "{{count}} Albatrosses",
-      "sublineBoth": "{{aces}} und {{albatrosses}}, insgesamt. Seltenste zuerst, dann neueste. Ein Ace wird üblicherweise mit 12.500 zu 1 angegeben.",
-      "sublineOne": "{{feats}}, insgesamt. Seltenste zuerst, dann neueste. Ein Ace wird üblicherweise mit 12.500 zu 1 angegeben."
+      "sublineBoth": "{{aces}} und {{albatrosses}}, insgesamt. Ein Ace wird üblicherweise mit 12.500 zu 1 angegeben.",
+      "sublineOne": "{{feats}}, insgesamt. Ein Ace wird üblicherweise mit 12.500 zu 1 angegeben."
     },
     "feat": {
       "group": {
@@ -1128,9 +1128,6 @@
     "mostPlayedPlayedToLabel": "Gespielt zu",
     "mostPlayedAvgToPar": "Gespielt zu {{value}}",
     "mostPlayedLowest": "Niedrigster",
-    "mostPlayedLowLabel": "DIE EINZIGE RUNDE",
-    "mostPlayedLowLabel_other": "NIEDRIGSTE DIESE WOCHE",
-    "mostPlayedField": "FELD",
     "mostPlayedNew": "Neu",
     "trackedRounds": "Erfasste Runden",
     "videosHeading": "Neueste Videos",
@@ -1138,19 +1135,9 @@
     "clipsHeading": "Clips",
     "clipsAction": "Alle Clips",
     "golfThisWeek": {
-      "bestLabel": "Beste Runde der Woche",
-      "stablefordLabel": "Beste Stableford-Punkte",
-      "birdiesLabel": "Meiste Birdies in einer Runde",
-      "improvedLabel": "Größte Handicap-Verbesserung",
+      "stablefordLabel": "Bestes Stableford",
+      "birdiesLabel": "Meiste Birdies",
       "stablefordUnit": "Punkte",
-      "gap": {
-        "shots_one": "{{count}} SCHLAG VORN",
-        "shots_other": "{{count}} SCHLÄGE VORN",
-        "points_one": "{{count}} PUNKT VORN",
-        "points_other": "{{count}} PUNKTE VORN",
-        "clear": "{{count}} VORN",
-        "tied": "GLEICHSTAND"
-      },
       "moment": {
         "theCard": "Die Karte",
         "fullScorecard": "Ganze Scorekarte",
@@ -1168,7 +1155,7 @@
           "hole": "LOCH {n}",
           "holes": "{n} LÖCHER",
           "inThree": "{n} VON DREI",
-          "inARow": "{n} PARS IN FOLGE",
+          "inARow": "{n} IN FOLGE",
           "birdies": "{n} BIRDIES"
         },
         "sentence": {
@@ -1204,8 +1191,7 @@
         "worldwide": "Diese Woche keine Runden."
       }
     },
-    "mostPlayedSeeAllAtCourse": "Diesen Platz besuchen",
-    "seam": "Alle Zeiten · von allen"
+    "mostPlayedSeeAllAtCourse": "Diesen Platz besuchen"
   },
   "statBrowse": {
     "colArea": "Gebiet",

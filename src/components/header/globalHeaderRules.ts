@@ -106,8 +106,7 @@ export function isImmersiveRoute(pathname: string): boolean {
 
 
 /**
- * Dark chrome is the app default. The retained route list documents the
- * original launch surfaces for consumers that need that classification.
+ * Dark-chrome routes = the charcoal launch/landing surfaces (Clubhouse).
  * Single source of truth for: html/body bg, status bar, bottom nav,
  * PageRoot status-bar styling, and pre-React shell seeding.
  *
@@ -116,8 +115,10 @@ export function isImmersiveRoute(pathname: string): boolean {
  */
 export const DARK_CHROME_ROUTES = ['/', '/clubhouse', '/auth', '/signup'] as const;
 
-export function isDarkChromeRoute(_pathname: string): boolean {
-  return true;
+export function isDarkChromeRoute(pathname: string): boolean {
+  return (DARK_CHROME_ROUTES as readonly string[]).includes(pathname)
+    || pathname.startsWith('/auth/')
+    || pathname.startsWith('/handicap');
 }
 
 /**

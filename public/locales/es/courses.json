@@ -1085,8 +1085,8 @@
       "sublineAces_other": "{{count}} aces",
       "sublineAlbatrosses_one": "{{count}} albatros",
       "sublineAlbatrosses_other": "{{count}} albatros",
-      "sublineBoth": "{{aces}} y {{albatrosses}}, en toda la historia. Primero las más raras y después las más recientes. Un ace se cita habitualmente en 12.500 a 1.",
-      "sublineOne": "{{feats}}, en toda la historia. Primero las más raras y después las más recientes. Un ace se cita habitualmente en 12.500 a 1."
+      "sublineBoth": "{{aces}} y {{albatrosses}}, en toda la historia. Un ace se cita habitualmente en 12.500 a 1.",
+      "sublineOne": "{{feats}}, en toda la historia. Un ace se cita habitualmente en 12.500 a 1."
     },
     "feat": {
       "group": {
@@ -1128,9 +1128,6 @@
     "mostPlayedPlayedToLabel": "Jugado a",
     "mostPlayedAvgToPar": "Jugado a {{value}}",
     "mostPlayedLowest": "Más bajo",
-    "mostPlayedLowLabel": "LA ÚNICA RONDA",
-    "mostPlayedLowLabel_other": "MÁS BAJA ESTA SEMANA",
-    "mostPlayedField": "CAMPO",
     "mostPlayedNew": "Nuevo",
     "trackedRounds": "Rondas registradas",
     "videosHeading": "Videos recientes",
@@ -1138,19 +1135,9 @@
     "clipsHeading": "Clips",
     "clipsAction": "Todos los clips",
     "golfThisWeek": {
-      "bestLabel": "Mejor ronda de la semana",
-      "stablefordLabel": "Mejores puntos Stableford",
-      "birdiesLabel": "Más birdies en una ronda",
-      "improvedLabel": "Mayor mejora de hándicap",
+      "stablefordLabel": "Mejor stableford",
+      "birdiesLabel": "Más birdies",
       "stablefordUnit": "puntos",
-      "gap": {
-        "shots_one": "{{count}} GOLPE DE VENTAJA",
-        "shots_other": "{{count}} GOLPES DE VENTAJA",
-        "points_one": "{{count}} PUNTO DE VENTAJA",
-        "points_other": "{{count}} PUNTOS DE VENTAJA",
-        "clear": "{{count}} DE VENTAJA",
-        "tied": "EMPATE"
-      },
       "moment": {
         "theCard": "La tarjeta",
         "fullScorecard": "Tarjeta completa",
@@ -1168,7 +1155,7 @@
           "hole": "HOYO {n}",
           "holes": "{n} HOYOS",
           "inThree": "{n} DE TRES",
-          "inARow": "{n} PARS SEGUIDOS",
+          "inARow": "{n} SEGUIDOS",
           "birdies": "{n} BIRDIES"
         },
         "sentence": {
@@ -1204,8 +1191,7 @@
         "worldwide": "Esta semana no hay rondas."
       }
     },
-    "mostPlayedSeeAllAtCourse": "Visitar este campo",
-    "seam": "Todos los tiempos · de todos"
+    "mostPlayedSeeAllAtCourse": "Visitar este campo"
   },
   "statBrowse": {
     "colArea": "Zona",

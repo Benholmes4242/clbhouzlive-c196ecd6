@@ -37,7 +37,7 @@ import { formatNumber } from '@/i18n/format';
 
 // ---- tokens ---------------------------------------------------------------
 
-const LEADER_RED = TOPAR_UNDER_DARK;              // '#FF6B60'
+const LEADER_RED = TOPAR_UNDER_DARK;              // '#FF6B5E'
 const LEADER_RED_RING = 'rgba(255,107,94,0.55)';
 const GOLD = '#E8C26A';
 const GOLD_TINT = 'rgba(232,194,106,0.16)';

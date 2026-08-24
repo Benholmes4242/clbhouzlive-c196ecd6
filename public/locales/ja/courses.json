@@ -1026,8 +1026,8 @@
       "holeAndPar": "{{hole}} · パー{{par}}",
       "sublineAces_other": "ホールインワン {{count}}回",
       "sublineAlbatrosses_other": "アルバトロス {{count}}回",
-      "sublineBoth": "通算で{{aces}}、{{albatrosses}}。希少な順、次に新しい順。ホールインワンの確率は一般に12,500分の1と言われています。",
-      "sublineOne": "通算で{{feats}}。希少な順、次に新しい順。ホールインワンの確率は一般に12,500分の1と言われています。"
+      "sublineBoth": "通算で{{aces}}、{{albatrosses}}。ホールインワンの確率は一般に12,500分の1と言われています。",
+      "sublineOne": "通算で{{feats}}。ホールインワンの確率は一般に12,500分の1と言われています。"
     },
     "feat": {
       "group": {
@@ -1066,9 +1066,6 @@
     "mostPlayedPlayedToLabel": "スコア",
     "mostPlayedAvgToPar": "{{value}}",
     "mostPlayedLowest": "最低",
-    "mostPlayedLowLabel": "唯一のラウンド",
-    "mostPlayedLowLabel_other": "今週の最少スコア",
-    "mostPlayedField": "全体",
     "mostPlayedNew": "新規",
     "trackedRounds": "記録ラウンド",
     "videosHeading": "最新の動画",
@@ -1076,19 +1073,9 @@
     "clipsHeading": "クリップ",
     "clipsAction": "すべてのクリップ",
     "golfThisWeek": {
-      "bestLabel": "今週のベストラウンド",
-      "stablefordLabel": "ベストステーブルフォードポイント",
-      "birdiesLabel": "1ラウンド最多バーディー",
-      "improvedLabel": "ハンディキャップ最多改善",
+      "stablefordLabel": "ベストステーブルフォード",
+      "birdiesLabel": "バーディー最多",
       "stablefordUnit": "ポイント",
-      "gap": {
-        "shots_one": "{{count}}打差",
-        "shots_other": "{{count}}打差",
-        "points_one": "{{count}}ポイント差",
-        "points_other": "{{count}}ポイント差",
-        "clear": "{{count}}差",
-        "tied": "同率"
-      },
       "moment": {
         "theCard": "スコアカード",
         "fullScorecard": "スコアカード全体",
@@ -1106,7 +1093,7 @@
           "hole": "{n} 番ホール",
           "holes": "{n} ホール",
           "inThree": "3ホールで {n}",
-          "inARow": "{n} パー連続",
+          "inARow": "{n} 連続",
           "birdies": "{n} バーディー"
         },
         "sentence": {
@@ -1142,8 +1129,7 @@
         "worldwide": "今週はラウンドがありません。"
       }
     },
-    "mostPlayedSeeAllAtCourse": "このコースを見る",
-    "seam": "全期間 · みんなから"
+    "mostPlayedSeeAllAtCourse": "このコースを見る"
   },
   "statBrowse": {
     "colArea": "エリア",

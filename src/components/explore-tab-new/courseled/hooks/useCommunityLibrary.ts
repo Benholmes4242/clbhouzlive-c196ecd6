@@ -59,9 +59,9 @@ export interface CommunityLibraryResult {
   all: CommunityLibraryItem[];
   /** Video, duration >= 180s. */
   videos: CommunityLibraryItem[];
-  /** Video, duration > 0 and < 180s, PLUS video of unknown duration. */
+  /** Video, duration > 0 and < 180s. */
   clips: CommunityLibraryItem[];
-  /** Photo leads ONLY. Never a video. */
+  /** Photo leads, plus any video whose duration is unknown. */
   photos: CommunityLibraryItem[];
 }
 
@@ -247,24 +247,19 @@ export function useCommunityLibrary() {
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
 
-      // A VIDEO IS A VIDEO REGARDLESS OF WHETHER ITS DURATION IS KNOWN
-      // (MICRO_BRIEF_UNKNOWN_DURATION_VIDEOS). The photos pool is kind ===
-      // 'photo' ONLY — a video never renders in a photo mosaic, and is never
-      // counted as a photo by anything measuring this page.
-      //
-      // UNKNOWN DURATION GOES TO CLIPS (§1 option a): almost all member-shot
-      // golf video is short, so clips is right far more often than videos, and
-      // the cost of being wrong is cosmetic (a long upload sitting in a rail
-      // sized for short verticals) rather than a member's video going unseen.
+      // A TIER IS A CLAIM ABOUT LENGTH (S2.4): an unknown duration never enters
+      // one, it falls to photos-and-everything.
       const videos = all.filter(
         (i) => i.kind === 'video' && i.duration != null && i.duration >= LIBRARY_VIDEO_MIN_SECONDS,
       );
       const clips = all.filter(
         (i) =>
           i.kind === 'video' &&
-          (i.duration == null || (i.duration > 0 && i.duration < LIBRARY_VIDEO_MIN_SECONDS)),
+          i.duration != null &&
+          i.duration > 0 &&
+          i.duration < LIBRARY_VIDEO_MIN_SECONDS,
       );
-      const photos = all.filter((i) => i.kind === 'photo');
+      const photos = all.filter((i) => i.kind === 'photo' || i.duration == null);
 
       return { all, videos, clips, photos };
     },

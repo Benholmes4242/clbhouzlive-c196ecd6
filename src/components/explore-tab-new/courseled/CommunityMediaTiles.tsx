@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Heart } from 'lucide-react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { DISCOVER_FACT, DISCOVER_QUIET } from './tokens';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { formatRelativeRounded } from '@/i18n/format';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -11,8 +10,6 @@ import { autoplayBlocked } from './reviewVideoAutoplay';
 import { registerRailVideo } from './mediaRailAutoplay';
 import { attachTileHls } from './tileHlsPlayer';
 import type { CommunityVideo } from './hooks/useCommunityVideos';
-import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useMediaImpression, type MediaTrackTarget } from '@/utils/mediaEngagement';
 
 import '@/styles/media-rail-bars.css';
 
@@ -221,13 +218,6 @@ interface TileProps {
   radius?: number;
   /** Discover-only badge geometry; Community retains its existing default. */
   badgeRadius?: number;
-  /**
-   * MEDIA ENGAGEMENT TARGET (BRIEF_MEDIA_TRACKING_MINIMUM). Present = this tile
-   * reports an impression at 50%/1s and an open on deliberate activation.
-   * ABSENT = the tile is silent, so an unwired surface cannot half-report and
-   * skew a ratio. Autoplay fires NEITHER event — election is the app's decision.
-   */
-  track?: MediaTrackTarget;
 }
 
 export function CommunityVideoTile({
@@ -237,13 +227,7 @@ export function CommunityVideoTile({
   width,
   radius = RADIUS,
   badgeRadius = 6,
-  track,
 }: TileProps) {
-  const impressionRef = useMediaImpression(track);
-  const open = () => {
-    if (track) analyticsEvents.media.opened(track);
-    onPress(item);
-  };
   // WHEN content IS EMPTY the poster's name takes the title slot and the meta
   // row drops the duplicate name, keeping the time and the likes.
   const hasTitle = item.title.length > 0;
@@ -253,14 +237,13 @@ export function CommunityVideoTile({
 
   return (
     <div
-      ref={impressionRef}
       role="button"
       tabIndex={0}
-      onClick={open}
+      onClick={() => onPress(item)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          open();
+          onPress(item);
         }
       }}
       style={{
@@ -311,7 +294,7 @@ export function CommunityVideoTile({
           fontSize: 13.5,
           fontWeight: 700,
           letterSpacing: '-0.012em',
-          color: DISCOVER_FACT,
+          color: A.INK,
           lineHeight: 1.28,
           margin: '8px 0 0',
           display: '-webkit-box',
@@ -361,7 +344,7 @@ export function CommunityVideoTile({
           style={{
             flex: 1,
             fontSize: 11.5,
-            color: DISCOVER_QUIET,
+            color: A.MUTE,
             minWidth: 0,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -380,7 +363,7 @@ export function CommunityVideoTile({
               alignItems: 'center',
               gap: 3,
               fontSize: 11.5,
-              color: DISCOVER_QUIET,
+              color: A.DIM,
               fontVariantNumeric: 'tabular-nums lining-nums',
             }}
           >
@@ -393,18 +376,13 @@ export function CommunityVideoTile({
   );
 }
 
-export function CommunityClipTile({ item, railVisible, onPress, width, aspect, square, radius: radiusOverride = RADIUS, track }: TileProps) {
+export function CommunityClipTile({ item, railVisible, onPress, width, aspect, square, radius: radiusOverride = RADIUS }: TileProps) {
   const radius = square ? 0 : radiusOverride;
   const overlayInset = square ? 10 : 8;
-  const impressionRef = useMediaImpression(track);
   return (
     <button
-      ref={impressionRef as unknown as React.Ref<HTMLButtonElement>}
       type="button"
-      onClick={() => {
-        if (track) analyticsEvents.media.opened(track);
-        onPress(item);
-      }}
+      onClick={() => onPress(item)}
       style={{
         flex: width === undefined ? `0 0 ${CLIP_TILE_W}px` : '1 1 auto',
         width: width ?? CLIP_TILE_W,

@@ -11,8 +11,6 @@ import {
   MIN_RAIL_TILES,
   type CommunityVideo,
 } from './hooks/useCommunityVideos';
-import { analyticsEvents } from '@/utils/analyticsEvents';
-import { mediaTarget } from '@/utils/mediaEngagement';
 
 /**
  * THE TWO MEDIA RAILS (BRIEF_DISCOVER_MEDIA_RAILS §1.8, §3.3, §4).
@@ -67,24 +65,6 @@ interface Props {
   style?: CSSProperties;
 }
 
-/**
- * A SEE ALL IS A WHOLE-SECTION OPEN, POSITION -1 (BRIEF_MEDIA_TRACKING_MINIMUM
- * §3). It rides on media_item_opened rather than a fourth event so the ratio
- * stays one division: -1 excludes cleanly from any position band, and asking for
- * MORE of a type is counted against the same impressions that produced it. The
- * post/media ids are empty because the member named a SECTION, not an item.
- */
-function trackSeeAll(section: 'videos' | 'clips') {
-  analyticsEvents.media.opened({
-    mediaType: section === 'videos' ? 'video' : 'clip',
-    surface: 'discover',
-    section,
-    position: -1,
-    postId: '',
-    mediaId: null,
-  });
-}
-
 export function LatestVideosRail({ items, onTilePress, onSeeAll, style }: Props) {
   const { t } = useTranslation('courses');
   const { ref, visible } = useRailVisible<HTMLElement>();
@@ -94,22 +74,13 @@ export function LatestVideosRail({ items, onTilePress, onSeeAll, style }: Props)
     <section ref={ref} style={style}>
       {/* NO COUNT IN THE HEADING — thin supply must not advertise itself. */}
       <Eyebrow
-        aside={
-          <InkAction
-            onClick={() => {
-              trackSeeAll('videos');
-              onSeeAll();
-            }}
-          >
-            {t('discover.videosAction', 'All videos')}
-          </InkAction>
-        }
+        aside={<InkAction onClick={onSeeAll}>{t('discover.videosAction', 'All videos')}</InkAction>}
       >
         {t('discover.videosHeading', 'Latest videos')}
       </Eyebrow>
 
       <div style={{ ...SCROLLER, gap: 12, margin: '0 -14px', padding: '0 14px 2px' }}>
-        {items.map((item, i) => (
+        {items.map((item) => (
           <CommunityVideoTile
             key={item.key}
             item={item}
@@ -117,7 +88,6 @@ export function LatestVideosRail({ items, onTilePress, onSeeAll, style }: Props)
             badgeRadius={CHIP_RADIUS}
             railVisible={visible}
             onPress={onTilePress}
-            track={mediaTarget(item, 'discover', 'videos', i)}
           />
         ))}
       </div>
@@ -133,29 +103,19 @@ export function ClipsRail({ items, onTilePress, onSeeAll }: Props) {
   return (
     <section ref={ref}>
       <Eyebrow
-        aside={
-          <InkAction
-            onClick={() => {
-              trackSeeAll('clips');
-              onSeeAll();
-            }}
-          >
-            {t('discover.clipsAction', 'All clips')}
-          </InkAction>
-        }
+        aside={<InkAction onClick={onSeeAll}>{t('discover.clipsAction', 'All clips')}</InkAction>}
       >
         {t('discover.clipsHeading', 'Clips')}
       </Eyebrow>
 
       <div style={{ ...SCROLLER, gap: 8, margin: '0 -14px', padding: '0 14px 2px' }}>
-        {items.map((item, i) => (
+        {items.map((item) => (
           <CommunityClipTile
             key={item.key}
             item={item}
             radius={THUMBNAIL_RADIUS}
             railVisible={visible}
             onPress={onTilePress}
-            track={mediaTarget(item, 'discover', 'clips', i)}
           />
         ))}
       </div>

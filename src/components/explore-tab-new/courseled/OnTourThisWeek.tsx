@@ -123,13 +123,20 @@ const PANEL_LABEL = '#CFD6DD';
 const PANEL_MUTE = '#AAB3BB';
 
 /**
+ * THE UNDER-PAR RED ON GLASS. #D2222D (and the dark-surface #DC2626) are
+ * unreadable over a photograph, so the documented exception is a LIGHTER RED
+ * held as a NAMED CONSTANT with the reason attached.
+ */
+const GLASS_UNDER_RED = '#FF5D5D';
+
+/**
  * Canonical tour convention: under par is RED, over par ink, level neutral.
  * ROUTED THROUGH the existing helper rather than around it — getScoreColor
- * decides the SEMANTICS on the dark surface. Under par now remains canonical;
- * only neutral alpha tokens are made opaque for photograph legibility.
+ * still decides the SEMANTICS on the dark surface, and this map only swaps the
+ * three dark-surface tokens for their solid, photograph-legible equivalents.
  */
 const GLASS_SCORE: Record<string, string> = {
-  [TOPAR_UNDER_DARK]: TOPAR_UNDER_DARK,
+  [TOPAR_UNDER_DARK]: GLASS_UNDER_RED,
   [TOPAR_OVER_DARK]: PANEL_BODY,
   [TOPAR_EVEN_DARK]: PANEL_LABEL,
 };
