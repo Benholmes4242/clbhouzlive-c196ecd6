@@ -169,18 +169,42 @@ export default function CourseTagSheet({
           </button>
         </div>
 
+        {/*
+          CANONICAL DARK FIELD TREATMENT (MICRO_BRIEF_CANONICAL_FIELD_TREATMENT):
+          radius 14, height 44, REST bg 6% / border 10%, FOCUS bg 10% /
+          border 28%, text 96%, placeholder 38%. Both channels step on focus.
+        */}
         <div style={{ flex: 'none', padding: '8px 16px 12px' }}>
           <div style={{ position: 'relative' }}>
-            <Search size={16} color={CT.secondary} style={{ position: 'absolute', top: 12, left: 12 }} />
+            <Search
+              size={16}
+              color={CT.secondary}
+              style={{ position: 'absolute', top: 14, left: 12 }}
+            />
             <input
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
+              onFocus={() => setFieldFocused(true)}
+              onBlur={() => setFieldFocused(false)}
               placeholder="Search any of 40,000+ courses"
-              style={{ width: '100%', padding: '10px 12px 10px 34px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, fontSize: 14, background: 'rgba(248,250,252,0.06)', color: CT.ink }}
+              className="placeholder:text-[rgba(255,255,255,0.38)]"
+              style={{
+                width: '100%',
+                height: 44,
+                padding: '0 12px 0 34px',
+                border: `1px solid ${fieldFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
+                borderRadius: 14,
+                fontSize: 14,
+                outline: 'none',
+                background: fieldFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
+                color: 'rgba(255,255,255,0.96)',
+                transition: 'background 140ms ease, border-color 140ms ease',
+              }}
             />
           </div>
         </div>
+
 
         {/* Scrolling list region — the only part that grows */}
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
