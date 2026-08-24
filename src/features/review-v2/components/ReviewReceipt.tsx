@@ -9,7 +9,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { RV2 } from '../tokens';
 import { FIGURE } from '@/lib/tokens/type';
-import { bandColor } from '../bandColor';
+import { bandColorOnDark as bandColor } from '../bandColor';
 import { useReviewReceipt } from '../hooks/useReviewReceipt';
 import type { CategoryKey, ReviewV2Course } from '../types';
 

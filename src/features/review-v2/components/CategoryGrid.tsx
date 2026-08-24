@@ -6,7 +6,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RV2 } from '../tokens';
 import { FIGURE } from '@/lib/tokens/type';
-import { bandColor } from '../bandColor';
+import { bandColorOnDark as bandColor } from '../bandColor';
 import type { CategoryKey } from '../types';
 
 export interface CategoryCopy {
