@@ -9,6 +9,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  ChevronDown,
   Crown,
   Globe,
   Ruler,
@@ -117,8 +118,8 @@ const LENS_ICON: Record<StatLens, LucideIcon> = {
   chase: Crown,
 };
 
-/** Dropdown icon geometry — one treatment for lenses and the areas trigger. */
-const DD_ICON = { size: 15, strokeWidth: 2, 'aria-hidden': true } as const;
+/** Dropdown icon geometry — mirrors Discover's quiet Everywhere control. */
+const DD_ICON = { size: 12, strokeWidth: 2.4, 'aria-hidden': true } as const;
 
 function LensIcon({ lens }: { lens: StatLens }) {
   const Icon = LENS_ICON[lens];
@@ -147,15 +148,26 @@ const LIST_LABEL: Record<string, string> = {
  */
 const CARD_BAND = 'rgba(255,255,255,0.06)';
 
-const TRIGGER_ROW =
-  '[&>span]:!flex [&>span]:items-center [&>span]:gap-2 [&>span]:min-w-0';
+const INLINE_TRIGGER_CLS =
+  'inline-flex h-auto w-auto max-w-full justify-start gap-0 whitespace-nowrap border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden';
 
-const TRIGGER_CLS =
-  `h-10 rounded-xl border px-3 text-[13px] font-semibold justify-between focus:outline-none ${TRIGGER_ROW}`;
+const triggerStyle: React.CSSProperties = {
+  color: INK_MUTE,
+  padding: '4px 0',
+};
 
-/** Condensed sticky bar control. */
-const COMPACT_TRIGGER_CLS =
-  `h-8 w-full rounded-xl border px-3 text-[12px] font-semibold justify-between focus:outline-none ${TRIGGER_ROW}`;
+const triggerLabelStyle: React.CSSProperties = {
+  fontSize: 12.5,
+  fontWeight: 700,
+  letterSpacing: '-0.01em',
+  color: INK_MUTE,
+};
+
+const menuStyle: React.CSSProperties = {
+  background: SURFACE,
+  borderColor: HAIRLINE_INK_10,
+  color: INK,
+};
 
 
 /**
@@ -646,17 +658,18 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const countrySelect = (compact: boolean) => (
     <Select value={country ?? 'all'} onValueChange={onCountryChange}>
       <SelectTrigger
-        className={compact ? COMPACT_TRIGGER_CLS : TRIGGER_CLS}
-        style={{ background: 'rgba(255,255,255,0.06)', borderColor: HAIRLINE_INK_10, color: country ? INK : INK_MUTE }}
+        className={INLINE_TRIGGER_CLS}
+        style={triggerStyle}
         aria-label={t('statBrowse.selectCountryA11y')}
       >
-        <span className="flex min-w-0 items-center gap-2">
+        <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
           <Globe {...DD_ICON} />
-          <span className="truncate">{countryTriggerLabel}</span>
+          <span className="truncate" style={triggerLabelStyle}>{countryTriggerLabel}</span>
+          <ChevronDown {...DD_ICON} />
         </span>
       </SelectTrigger>
-      <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
-        <SelectItem value="all" className="[&>span:last-child]:w-full">
+      <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
+        <SelectItem value="all" className="[&>span:last-child]:w-full" style={{ color: INK }}>
           <span className="flex w-full items-center gap-2">
             <Globe {...DD_ICON} />
             <span className="flex-1 min-w-0 truncate">{t('statBrowse.allAreas')}</span>
@@ -674,6 +687,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                 key={c.sub_country}
                 value={c.sub_country}
                 className="[&>span:last-child]:w-full"
+                style={{ color: INK }}
               >
                 <span className="flex w-full items-center gap-2">
                   <CountryFlag country={c.sub_country} size="sm" />
@@ -691,19 +705,20 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const regionSelect = (compact: boolean) => (
     <Select value={region ?? 'all'} onValueChange={onRegionChange} disabled={regionDisabled}>
       <SelectTrigger
-        className={`${compact ? COMPACT_TRIGGER_CLS : TRIGGER_CLS} disabled:opacity-60`}
-        style={{ background: 'rgba(255,255,255,0.06)', borderColor: HAIRLINE_INK_10, color: region ? INK : INK_MUTE }}
+        className={`${INLINE_TRIGGER_CLS} disabled:opacity-60`}
+        style={triggerStyle}
         aria-label={t('statBrowse.selectRegionA11y')}
       >
-        <span className="flex min-w-0 items-center gap-2">
-          <span className="truncate">
+        <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
+          <span className="truncate" style={triggerLabelStyle}>
             {regionDisabled
               ? t('statBrowse.allRegions')
               : region ?? (country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions'))}
           </span>
+          <ChevronDown {...DD_ICON} />
         </span>
       </SelectTrigger>
-      <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
+      <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
         <SelectGroup>
           <SelectLabel
             className="sticky top-0 z-10 flex w-full items-center py-2 pl-8 pr-2"
@@ -714,7 +729,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           >
             <span style={LABEL}>{t('statBrowse.colRegion')}</span>
           </SelectLabel>
-          <SelectItem value="all" className="[&>span:last-child]:w-full">
+          <SelectItem value="all" className="[&>span:last-child]:w-full" style={{ color: INK }}>
             <span className="flex w-full items-center gap-2">
               <span className="flex-1 min-w-0 truncate">
                 {country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions')}
@@ -722,7 +737,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             </span>
           </SelectItem>
           {regionsForCountry.map((r) => (
-            <SelectItem key={r.region} value={r.region} className="[&>span:last-child]:w-full">
+            <SelectItem key={r.region} value={r.region} className="[&>span:last-child]:w-full" style={{ color: INK }}>
               <span className="flex w-full items-center gap-2">
                 <span className="flex-1 min-w-0 truncate">{r.region}</span>
               </span>
@@ -736,28 +751,23 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const lensSelect = (compact: boolean) => (
     <Select value={lens} onValueChange={(v) => onLensChange(v as StatLens)}>
       <SelectTrigger
-        className={
-          compact
-            ? COMPACT_TRIGGER_CLS
-            // Sized to its content: a short label ("Toughest") must not leave
-            // a wide gap between text and chevron.
-            : `${TRIGGER_CLS} w-auto gap-2`
-        }
-        style={{ background: 'rgba(255,255,255,0.06)', borderColor: HAIRLINE_INK_10, color: INK }}
+        className={INLINE_TRIGGER_CLS}
+        style={triggerStyle}
         aria-label={t('statBrowse.selectLensA11y')}
       >
-        <span className="flex min-w-0 items-center gap-2">
+        <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
           <LensIcon lens={lens} />
-          <span className="truncate">{t(`statBrowse.lens.${lens}.label`)}</span>
+          <span className="truncate" style={triggerLabelStyle}>{t(`statBrowse.lens.${lens}.label`)}</span>
+          <ChevronDown {...DD_ICON} />
         </span>
       </SelectTrigger>
-      <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
+      <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
         {/* Fixed order, nothing hidden or reordered: a lens with no qualifying
             course in this area is disabled with the reason beside it. */}
         {STAT_LENSES.map((l) => {
           const reason = lensUnavailableReason(l);
           return (
-            <SelectItem key={l} value={l} disabled={!!reason}>
+            <SelectItem key={l} value={l} disabled={!!reason} style={{ color: INK }}>
               <span className="flex items-center gap-2 w-full">
                 <LensIcon lens={l} />
                 <span style={{ opacity: reason ? 0.9 : 1 }}>
