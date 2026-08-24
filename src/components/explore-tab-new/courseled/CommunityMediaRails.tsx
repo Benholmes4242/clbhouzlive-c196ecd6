@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { CHIP_RADIUS, Eyebrow, InkAction, THUMBNAIL_RADIUS } from './tokens';
+import { CHIP_RADIUS, Eyebrow, InkAction, RAIL_GAP, THUMBNAIL_RADIUS } from './tokens';
 import {
   CommunityClipTile,
   CommunityVideoTile,
@@ -108,7 +108,10 @@ export function LatestVideosRail({ items, onTilePress, onSeeAll, style }: Props)
         {t('discover.videosHeading', 'Latest videos')}
       </Eyebrow>
 
-      <div style={{ ...SCROLLER, gap: 12, margin: '0 -14px', padding: '0 14px 2px' }}>
+      {/* ONE RAIL GAP (BRIEF_DISCOVER_ONE_PAGE §6): this rail ran on 12 and the
+          clips rail on 8, tuned separately against tiles that have both since
+          changed size. Both now read RAIL_GAP. */}
+      <div style={{ ...SCROLLER, gap: RAIL_GAP, margin: '0 -14px', padding: '0 14px 2px' }}>
         {items.map((item, i) => (
           <CommunityVideoTile
             key={item.key}
@@ -147,7 +150,7 @@ export function ClipsRail({ items, onTilePress, onSeeAll }: Props) {
         {t('discover.clipsHeading', 'Clips')}
       </Eyebrow>
 
-      <div style={{ ...SCROLLER, gap: 8, margin: '0 -14px', padding: '0 14px 2px' }}>
+      <div style={{ ...SCROLLER, gap: RAIL_GAP, margin: '0 -14px', padding: '0 14px 2px' }}>
         {items.map((item, i) => (
           <CommunityClipTile
             key={item.key}
