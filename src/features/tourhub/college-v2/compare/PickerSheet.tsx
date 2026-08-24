@@ -41,6 +41,8 @@ interface Props {
 export function PickerSheet({ open, onClose, target, standings, otherSlug }: Props) {
   const [, setSearchParams] = useSearchParams();
   const [q, setQ] = useState('');
+  /** paint-only focus state for the search field (see the field comment) */
+  const [fieldFocused, setFieldFocused] = useState(false);
   const debounced = useDebouncedValue(q, 150);
   const inputRef = useRef<HTMLInputElement>(null);
 
