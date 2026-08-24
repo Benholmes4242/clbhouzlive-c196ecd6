@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -28,10 +28,10 @@ import {
   A, BIZ_KICKER, BIZ_LABEL, BIZ_BODY, bizFigure,
 } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK = '#0F172A';
-const INK_45 = '#64748B';
-const HAIR = 'rgba(15,23,42,0.08)';
-const CARD_BG = '#FFFFFF';
+/* NO PRIVATE PALETTE - see BusinessReviewsPage. Shared manage vocabulary,
+   derived from the analytical `A` ramp. Declare a colour here and the next
+   import-tracing audit cannot see this file. */
+import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, DANGER } from '@/components/manage/ui';
 
 const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
 
@@ -160,7 +160,7 @@ function JobTitleField({
       ref={wrapRef}
       className="flex items-center gap-2"
       style={{
-        background: '#F8FAFC',
+        background: PAGE_BG,
         border: `1.5px solid ${A.INK}`,
         borderRadius: 10,
         padding: '9px 11px',
@@ -247,7 +247,7 @@ export default function BusinessTeamPage() {
           alt={name}
           size={44}
           hairlineRing
-          ringColor={LIGHT_HAIRLINE}
+          ringColor={DARK_HAIRLINE}
         />
 
         {/* LEFT COLUMN - identity only */}
@@ -460,13 +460,13 @@ export default function BusinessTeamPage() {
                         alt={label}
                         size={40}
                         hairlineRing
-                        ringColor={LIGHT_HAIRLINE}
+                        ringColor={DARK_HAIRLINE}
                       />
                     ) : (
                       <div
                         className="h-10 w-10 flex items-center justify-center"
                         style={{
-                          background: 'rgba(15,23,42,0.05)',
+                          background: 'rgba(255,255,255,0.06)',
                           border: `1px solid ${HAIR}`,
                           borderRadius: 12,
                         }}
@@ -488,9 +488,9 @@ export default function BusinessTeamPage() {
                       disabled={revokeInvite.isPending}
                       className="text-[12px] font-semibold px-3 py-1.5 rounded-full active:opacity-70"
                       style={{
-                        color: '#DC2626',
-                        background: 'rgba(220,38,38,0.06)',
-                        border: '1px solid rgba(220,38,38,0.18)',
+                        color: DANGER,
+                        background: 'rgba(255,90,90,0.14)',
+                        border: '1px solid rgba(255,90,90,0.28)',
                       }}
                     >
                       Revoke
@@ -514,7 +514,7 @@ export default function BusinessTeamPage() {
             style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
               paddingTop: 12,
-              background: 'linear-gradient(to top, #F8FAFC 60%, rgba(248,250,252,0))',
+              background: `linear-gradient(to top, ${PAGE_BG} 60%, rgba(21,23,31,0))`,
             }}
           >
             <button
@@ -525,7 +525,7 @@ export default function BusinessTeamPage() {
                 minHeight: 50,
                 borderRadius: 999,
                 background: INK,
-                color: '#FFFFFF',
+                color: A.CANVAS,
                 fontSize: 14.5,
                 fontWeight: 700,
                 letterSpacing: '-0.01em',
