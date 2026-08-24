@@ -42,6 +42,7 @@ import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegion
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import { MiniScorecard } from './RoundShape';
+import { PodiumAvatarRing } from './PodiumAvatarRing';
 import {
   FINISHED_IN_RED_TONE,
   selectMoment,
@@ -1954,40 +1955,13 @@ export function GolfThisWeek({
                           cursor: 'pointer',
                         }}
                       >
-                        <span
-                          style={{
-                            position: 'relative',
-                            width: 43,
-                            aspectRatio: '1 / 1.05',
-                            borderRadius: '34%',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <SquircleAvatar
-                            src={tile.row.profile_photo_url}
-                            userId={tile.row.user_id}
-                            alt={tile.row.display_name}
-                            size={40}
-                            hideRing
-                          />
-                          <span
-                            aria-hidden
-                            style={{
-                              position: 'absolute',
-                              inset: 0,
-                              borderRadius: '34%',
-                              /* AVATAR → SQUIRCLE → 0.5px GAP → 1px RING.
-                                 Wrapper is 43px so a 40px avatar centred inside
-                                 leaves 1.5px of space; a 1px inset ring at the
-                                 outer edge leaves exactly 0.5px between the
-                                 ring's inner edge and the avatar. */
-                              boxShadow: `inset 0 0 0 1px ${tile.accent}`,
-                              pointerEvents: 'none',
-                            }}
-                          />
-                        </span>
+                        <PodiumAvatarRing
+                          avatarSize={40}
+                          src={tile.row.profile_photo_url}
+                          userId={tile.row.user_id}
+                          alt={tile.row.display_name}
+                          ringColor={tile.accent}
+                        />
                         <span style={{ minWidth: 0 }}>
                           <span
                             style={{

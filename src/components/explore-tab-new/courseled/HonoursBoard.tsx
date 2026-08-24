@@ -6,6 +6,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
+import { PodiumAvatarRing } from './PodiumAvatarRing';
 
 /**
  * Section 7 — THE HONOURS BOARD (BRIEF_HONOURS_PERSON_LED).
@@ -192,16 +193,13 @@ function MemberAvatar({
   metal?: boolean;
 }) {
   return (
-    <span
-      style={{
-        flex: '0 0 auto',
-        display: 'block',
-        borderRadius: '34%',
-      }}
-    >
-      <SquircleAvatar size={size} src={src} alt={alt} userId={userId}
-        {...(metal ? { ringColor: METAL_AVATAR_RING } : { hairlineRing: true })} />
-    </span>
+    <PodiumAvatarRing
+      avatarSize={size}
+      src={src}
+      alt={alt}
+      userId={userId}
+      ringColor={metal ? METAL_AVATAR_RING : DISCOVER_FACT}
+    />
   );
 }
 
