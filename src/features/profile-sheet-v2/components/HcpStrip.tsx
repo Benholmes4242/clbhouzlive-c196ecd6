@@ -441,20 +441,42 @@ const TrendCard: React.FC<{
         const worstIdx = flat ? -1 : points.findIndex((p) => p.v === stats.worst);
         const bestIdx = flat ? -1 : points.findIndex((p) => p.v === stats.best);
 
-        const callout = (idx: number, kind: 'high' | 'low') => {
+        // COLLISION GUARD for two labels that are now both above their dots.
+        // When the extremes are close in x AND close in y (the flat-index
+        // case: a settled handicap whose high and low are a few days and a
+        // few tenths apart) the two callouts would sit on top of each other.
+        // We nudge the LOW one horizontally AWAY from the high one rather
+        // than suppressing it — both figures stay readable, and neither
+        // moves below its dot into the legend row again.
+        let lowShift = 0;
+        if (worstIdx >= 0 && bestIdx >= 0) {
+          const dx = xy[bestIdx][0] - xy[worstIdx][0];
+          const dy = Math.abs(xy[bestIdx][1] - xy[worstIdx][1]);
+          if (Math.abs(dx) < 46 && dy < 16) lowShift = dx >= 0 ? 24 : -24;
+        }
+
+        const callout = (idx: number, kind: 'high' | 'low', xShift = 0) => {
           if (idx < 0) return null;
           const [cx, cy] = xy[idx];
           const tone = zoneColor(points[idx].v, stats.best, stats.worst);
           const onMarker = idx === active;
           // Horizontal edge guard: the last revision is often the best, so the
           // right-hand rim is hit immediately. Anchor into the plot by 2px.
-          const nearLeft = cx <= padX + 18;
-          const nearRight = cx >= w - padX - 18;
+          const lx = Math.min(Math.max(cx + xShift, padX), w - padX);
+          const nearLeft = lx <= padX + 18;
+          const nearRight = lx >= w - padX - 18;
           const anchor = nearLeft ? 'start' : nearRight ? 'end' : 'middle';
-          const tx = nearLeft ? 2 : nearRight ? w - 2 : cx;
-          // Vertical placement is fixed: high is always above its dot, low
-          // always below. PAD_Y = 16 reserves headroom at both edges so this
-          // never clips.
+          const tx = nearLeft ? 2 : nearRight ? w - 2 : lx;
+          // Vertical placement: BOTH labels sit ABOVE their dot. This
+          // overturns the earlier rule — "high is always above its dot, low
+          // always below" — which existed for two reasons: symmetry, and
+          // clip-safety at both edges (PAD_Y = 16 reserved headroom top AND
+          // bottom, so neither direction could clip). Ben has chosen both
+          // above, so the low label no longer risks the OFF BEST / MID / NEAR
+          // BEST legend row beneath the plot; instead it enters the plot area,
+          // and the two guards above (horizontal nudge) and below (y clamp at
+          // 9px) keep it clear of the other label and of the top edge.
+          const ty = Math.max(cy - 8, 9);
           return (
             <g key={idx} opacity={onMarker ? 0.42 : 1}>
               {/* When today IS the extreme, the scrub marker owns the point:
