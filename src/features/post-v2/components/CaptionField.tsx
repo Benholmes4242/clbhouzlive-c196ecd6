@@ -45,7 +45,14 @@ export default function CaptionField({
         fontSize: light ? 17 : 16,
         lineHeight: light ? '25px' : '24px',
         color: light ? LIGHT_INK : CT_DARK.ink,
-        caretColor: light ? LIGHT_INK : CT_DARK.amber,
+        /*
+          ONE CARET COLOUR (MICRO_BRIEF_REVIEW_WIZARD_FIELDS §2). Was amber
+          here and ink in ReviewComposerV2 — the same component with two
+          carets. Amber means "the viewing member"; a text cursor is not a
+          member, so the caret is ink on both composers.
+        */
+        caretColor: light ? LIGHT_INK : CT_DARK.ink,
+
         // The highlighter has no placeholder layer, so the field must name its
         // own placeholder fill (see MentionsTextStyle.placeholderColor).
         placeholderColor: light ? 'rgba(14,18,22,0.38)' : 'rgba(255,255,255,0.38)',
