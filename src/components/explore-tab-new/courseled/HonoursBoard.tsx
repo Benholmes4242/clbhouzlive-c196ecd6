@@ -321,7 +321,9 @@ export function FeatCard({
             <span
               style={{
                 fontSize: 15,
-                fontWeight: 800,
+                // Match the self-name treatment used by Courses Played This
+                // Week: the same canonical amber at the same 700 weight.
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.15,
                 color: e.isOwn ? A.AMBER_DEEP : METAL_INK,
