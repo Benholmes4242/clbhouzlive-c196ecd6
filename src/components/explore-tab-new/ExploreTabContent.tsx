@@ -32,14 +32,17 @@ import { GolfThisWeekSheet } from './GolfThisWeekSheet';
 
 import { ClipsRail, LatestVideosRail } from './courseled/CommunityMediaRails';
 import { useCommunityVideos } from './courseled/hooks/useCommunityVideos';
-import { ActSeam } from './courseled/ActSeam';
-import { Eyebrow, InkAction } from './courseled/tokens';
+import { MediaActBar, type MediaChipId } from './courseled/MediaActBar';
+import { ProgressiveReveal } from './courseled/ProgressiveReveal';
+import { ACT_GAP, CHIP_GAP, Eyebrow, HEAD_GAP, InkAction, PAGE_GUTTER, RHYTHM } from './courseled/tokens';
 import {
   useCommunityLibrary,
   type CommunityLibraryItem,
 } from './courseled/hooks/useCommunityLibrary';
-import { CommunityPhotoMosaic } from '@/features/community/CommunityPhotoMosaic';
-import { CommunityCourseIndex } from '@/features/community/CommunityCourseIndex';
+import { CommunityPhotoMosaic } from './courseled/community/CommunityPhotoMosaic';
+import { CommunityCourseIndex } from './courseled/community/CommunityCourseIndex';
+import { CommunityClipMosaic } from './courseled/community/CommunityClipMosaic';
+import { CommunityVideoRow } from './courseled/community/CommunityVideoRow';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
 import { MostPlayedSheet } from './courseled/MostPlayedSheet';
@@ -116,12 +119,21 @@ import { useMostPlayedThisWeek, type MostPlayedPlayer, type MostPlayedRow } from
  */
 
 /**
- * EVERY ACT TWO SECTION SHOWS A SAMPLE, NOT ITS POOL (§5). Twelve photos is two
- * full mosaic rows plus a third that is visibly cut off — enough to read as a
- * wall, short enough that browse by club is still reachable. The rails cap
- * themselves. The full pool is one see-all away.
+ * ON 'EVERYTHING', EVERY MEDIA SECTION SHOWS A SAMPLE (BRIEF_DISCOVER_ONE_PAGE
+ * §3.4). Twelve photos is two full mosaic rows plus a third that is visibly cut
+ * off — enough to read as a wall, short enough that browse by club is still
+ * reachable. The rails cap themselves at MAX_RAIL_TILES.
+ *
+ * NOTHING IS UNREACHABLE ANY MORE, WHICH IS THE POINT: with /community deleted a
+ * cap with no way past it would hide 157 of 169 photos permanently. The chips
+ * ARE the way past it — a type chip drops the cap and the section grows in place
+ * on scroll (ProgressiveReveal). Every former "see all" now switches a chip
+ * instead of navigating.
  */
-const PHOTOS_CAP = 12;
+const PHOTOS_SAMPLE = 12;
+/** Full-pool reveal steps. The pool is already in memory; this is mount count. */
+const PHOTO_STEP = 30;
+const CLIP_STEP = 24;
 
 interface ExploreTabContentProps {
   embedded?: boolean;
