@@ -32,7 +32,7 @@ const buttonVariants = cva(
         'glass-outline':   'bg-white/70 backdrop-blur-md border border-black/15 shadow text-gray-900 font-medium',
         gradient:          'font-bold text-white border-none',
         'gradient-primary': 'font-bold text-white border-none',
-        tertiary:          'border border-border/60 bg-card text-foreground shadow-sm',
+        tertiary:          'border border-border/[0.06] bg-card text-foreground shadow-sm',
       },
       size: {
         default: 'h-11 px-5 py-2.5 rounded-[10px]',

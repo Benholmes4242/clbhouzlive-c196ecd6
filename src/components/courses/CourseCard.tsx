@@ -134,7 +134,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   if (isCompactMode) {
     return (
       <div
-        className="rounded-sq-md border border-border/70 bg-card/80 hover:bg-card transition-all duration-motion-medium ease-standard shadow-sm hover:shadow-[var(--shadow-medium)] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--primary-accent)] p-4 space-y-3 cursor-pointer"
+        className="rounded-sq-md border border-border/[0.07] bg-card/80 hover:bg-card transition-all duration-motion-medium ease-standard shadow-sm hover:shadow-[var(--shadow-medium)] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--primary-accent)] p-4 space-y-3 cursor-pointer"
         onClick={handleCardClick}
       >
         {/* Top row */}
@@ -197,7 +197,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   return (
     <>
       <div 
-        className={`group transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative aspect-[1.77/1] rounded-none shadow-none sm:rounded-sq-md sm:shadow-md md:shadow-lg border border-border/60 sm:border-border/40 animate-fadeIn`}
+        className={`group transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative aspect-[1.77/1] rounded-none shadow-none sm:rounded-sq-md sm:shadow-md md:shadow-lg border border-border/[0.06] sm:border-border/[0.04] animate-fadeIn`}
         onClick={handleCardClick}
       >
         <div

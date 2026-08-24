@@ -162,7 +162,7 @@ export const MiniPlayer: React.FC = () => {
       <div
         className={cn(
           "pointer-events-auto relative",
-          "bg-card/95 backdrop-blur-xl border border-border/30",
+          "bg-card/95 backdrop-blur-xl border border-border/[0.03]",
           "rounded-none md:rounded-2xl",
           "shadow-2xl",
           "overflow-hidden",

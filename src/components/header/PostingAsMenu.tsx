@@ -264,7 +264,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
       <div 
         className={cn(
           "px-4 py-4 border-b flex-shrink-0",
-          useLightTheme ? "border-border/80" : "border-white/8"
+          useLightTheme ? "border-border/[0.08]" : "border-white/8"
         )}
         style={{ background: useLightTheme ? 'hsl(var(--muted) / 0.3)' : 'rgba(255, 255, 255, 0.04)' }}
       >
@@ -434,7 +434,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
         {/* Divider */}
         <div className={cn(
           "border-t mx-3",
-          useLightTheme ? "border-border/60" : "border-white/6"
+          useLightTheme ? "border-border/[0.06]" : "border-white/6"
         )} />
         
         {/* Core action items */}
@@ -529,7 +529,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
         <div className="px-3 pt-1 pb-3">
           <div className={cn(
             "border-t pt-2",
-            useLightTheme ? "border-border/60" : "border-white/6"
+            useLightTheme ? "border-border/[0.06]" : "border-white/6"
           )}>
             <button
               onClick={() => {

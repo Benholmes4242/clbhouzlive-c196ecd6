@@ -39,7 +39,7 @@ export function BusinessLocationCard({
     return (
       <div className="mt-4 p-4 rounded-sq-md bg-muted border border-border/10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-muted to-muted/80 border border-border/60 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-muted to-muted/80 border border-border/[0.06] flex items-center justify-center">
             <MapPin className="h-5 w-5 text-muted-foreground" />
           </div>
           <div>

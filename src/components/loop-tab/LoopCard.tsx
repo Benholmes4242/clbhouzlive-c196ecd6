@@ -210,7 +210,7 @@ export const LoopCard = React.memo(function LoopCard({
 
   return (
     <>
-      <article ref={tileRef} className="bg-card border-b border-border/50">
+      <article ref={tileRef} className="bg-card border-b border-border/[0.05]">
 
         {/* 1. MEDIA — leads the card, full width, variable aspect ratio */}
         {post.mediaItems.length > 1 ? (

@@ -134,7 +134,7 @@ const CourseReviewsPage: React.FC = () => {
       <div className="mx-auto w-full max-w-3xl px-4 pb-10 pt-4">
 
         {/* Summary & rate button */}
-        <div className="mb-4 flex items-center justify-between rounded-2xl border border-border/60 bg-card/80 px-4 py-3 shadow-sm">
+        <div className="mb-4 flex items-center justify-between rounded-2xl border border-border/[0.06] bg-card/80 px-4 py-3 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-slate/80">
               <Star className="h-4 w-4 fill-white text-white" />
@@ -216,7 +216,7 @@ const CourseReviewsPage: React.FC = () => {
             ))}
           </div>
         ) : reviews && reviews.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-border/60 bg-card/80 px-4 py-6 text-center text-sm text-muted-foreground">
+          <div className="mt-6 rounded-2xl border border-border/[0.06] bg-card/80 px-4 py-6 text-center text-sm text-muted-foreground">
             No reviews yet for this filter.
           </div>
         ) : (
@@ -229,7 +229,7 @@ const CourseReviewsPage: React.FC = () => {
               return (
                 <div
                   key={r.id}
-                  className="rounded-2xl border border-border/60 bg-card/80 px-4 py-3 shadow-sm"
+                  className="rounded-2xl border border-border/[0.06] bg-card/80 px-4 py-3 shadow-sm"
                 >
                   <div className="mb-2 flex items-start justify-between gap-3">
                     {/* Reviewer */}
@@ -298,7 +298,7 @@ const CourseReviewsPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleMarkHelpful(r.id, r.helpful_count)}
-                      className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-card/70 px-2.5 py-1 text-[11px] font-medium text-muted-foreground hover:bg-card hover:text-foreground transition-colors"
+                      className="inline-flex items-center gap-1 rounded-full border border-border/[0.07] bg-card/70 px-2.5 py-1 text-[11px] font-medium text-muted-foreground hover:bg-card hover:text-foreground transition-colors"
                     >
                       <ThumbsUp className="h-3 w-3" />
                       Helpful

@@ -264,7 +264,7 @@ export function UploadProgressBanner() {
         className="fixed left-0 right-0 z-[60] px-3"
         style={{ bottom: "109px" }}
       >
-        <div className="bg-background/95 backdrop-blur-lg border border-border/30 shadow-lg rounded-2xl overflow-hidden">
+        <div className="bg-background/95 backdrop-blur-lg border border-border/[0.03] shadow-lg rounded-2xl overflow-hidden">
           {visibleUploads.map((upload) => (
             <UploadProgressItem
               key={upload.jobId}

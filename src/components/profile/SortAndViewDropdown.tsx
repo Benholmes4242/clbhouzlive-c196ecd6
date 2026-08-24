@@ -49,7 +49,7 @@ const SortAndViewDropdown: React.FC<SortAndViewDropdownProps> = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="start" 
-        className="w-80 bg-background/95 backdrop-blur-sm border border-border/50 z-50"
+        className="w-80 bg-background/95 backdrop-blur-sm border border-border/[0.05] z-50"
         style={{ backdropFilter: 'blur(20px) saturate(150%)' }}
       >
         {/* Top Section - Two Columns */}
