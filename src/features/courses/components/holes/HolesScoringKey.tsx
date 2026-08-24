@@ -48,7 +48,7 @@ export const HolesScoringKey: React.FC = () => {
       >
         {KEY.map((it) => (
           <div key={it.id} style={{ display: 'flex', alignItems: 'center', gap: 7, lineHeight: 1 }}>
-            <ScoreMark strokes={it.strokes} par={it.par} size={22} surface="light" />
+            <ScoreMark strokes={it.strokes} par={it.par} size={22} surface="dark" />
             <span style={{ fontSize: 12, fontWeight: 600, color: INK }}>{t(it.labelKey)}</span>
           </div>
         ))}

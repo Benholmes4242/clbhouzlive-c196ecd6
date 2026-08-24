@@ -214,7 +214,7 @@ const Nine: React.FC<{
       <CardRow
         label={scoreLabel}
         cells={rows.map((h) => (
-          <ScoreMark key={h.holeNo} strokes={h.strokes} par={h.par ?? 4} size={22} surface="light" />
+          <ScoreMark key={h.holeNo} strokes={h.strokes} par={h.par ?? 4} size={22} surface="dark" />
         ))}
         total={strokes || '\u2014'}
       />
@@ -274,7 +274,7 @@ const Legend: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'center', gap: 16, rowGap: 10, flexWrap: 'wrap' }}>
         {keys.map((k) => (
           <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
-            <ScoreMark strokes={k.strokes} par={4} size={22} surface="light" />
+            <ScoreMark strokes={k.strokes} par={4} size={22} surface="dark" />
             <span style={{ ...LABEL, fontSize: 8 }}>{k.label}</span>
           </span>
         ))}
