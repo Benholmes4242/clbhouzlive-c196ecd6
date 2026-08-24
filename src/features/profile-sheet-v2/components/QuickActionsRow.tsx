@@ -67,10 +67,12 @@ function Tile({ label, icon, badge, onClick }: TileProps) {
             height: 18,
             padding: '0 5px',
             borderRadius: 999,
-            // A waiting count is a count of things for THIS member — the one
-            // surviving amber fill on this sheet, and it is correct.
-            background: A.AMBER,
-            color: A.PANEL,
+            // ON THIS SHEET A NOTIFICATION COUNT IS WHITE: ground A.INK,
+            // figure A.CANVAS. Amber still means the viewing member app-wide
+            // and still marks a business actor on the actor cards; a count is
+            // not either of those things, so it does not take amber.
+            background: A.INK,
+            color: A.CANVAS,
             fontWeight: 700,
             fontSize: 10,
             fontVariantNumeric: 'tabular-nums',

@@ -122,11 +122,10 @@ export default function SheetNavGroup({
           subLabel={analyticsSubLabel}
           onClick={handleAnalyticsTap}
           disabled={analyticsDisabled}
-          trailing={
-            analyticsState === 'ready' ? (
-              <span style={{ ...LABEL, fontSize: 8.5, color: A.AMBER_DEEP }}>New</span>
-            ) : undefined
-          }
+          // No trailing tag: this row takes the same chevron as View profile,
+          // Invite friends and Manage businesses. The old amber "New" badge
+          // replaced the chevron, making this the one row without one.
+          // `trailing` itself stays — Command Center's "Admin" tag uses it.
         />
       )}
       {currentActor.type === 'personal' && onInviteFriends && (
