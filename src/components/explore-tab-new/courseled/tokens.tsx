@@ -60,6 +60,32 @@ export const PODIUM_GROUND = {
 export { A, SANS, FIGS };
 
 /** Discover content geometry: one master, all subordinate radii derived. */
+/**
+ * ONE SPACING RHYTHM (BRIEF_DISCOVER_ONE_PAGE §6). Every vertical measure on
+ * Discover is derived from RHYTHM, so the next change is one edit. Hand-typed
+ * numbers in this area are a defect: several of the values these replace were
+ * tuned individually against sections that have since moved.
+ *
+ *   RHYTHM      section -> section, both acts
+ *   ACT_GAP     above and below the media bar. A chapter break gets more air
+ *               than a section break, hence 1.5x.
+ *   HEAD_GAP    eyebrow (or its subline) -> the section's content
+ *   CARD_GAP    card -> card in a vertical list
+ *   RAIL_GAP    tile -> tile in a horizontal rail
+ *   CHIP_GAP    a chip/pill row -> the content beneath it. The scope pills and
+ *               the media chips share it, so the two rows read as one family.
+ *   MOSAIC_GAP  the mosaic gutter. Deliberately NOT derived: a wall of stills
+ *               is a wall, and 2px is a seam rather than a rhythm.
+ */
+export const RHYTHM = 28;
+export const ACT_GAP = Math.round(RHYTHM * 1.5);
+export const HEAD_GAP = Math.round(RHYTHM * 0.36);
+export const CARD_GAP = Math.round(RHYTHM * 0.36);
+export const RAIL_GAP = Math.round(RHYTHM * 0.36);
+export const CHIP_GAP = Math.round(RHYTHM * 0.43);
+export const MOSAIC_GAP = 2;
+export const PAGE_GUTTER = 14;
+
 export const CARD_RADIUS = 8;
 export const WELL_RADIUS = Math.round(CARD_RADIUS * 0.85);
 export const THUMBNAIL_RADIUS = Math.round(CARD_RADIUS * 0.78);
@@ -169,7 +195,7 @@ export function Eyebrow({
   subline?: React.ReactNode;
 }) {
   return (
-    <div style={{ padding: '0 2px', marginBottom: 10 }}>
+    <div style={{ padding: '0 2px', marginBottom: HEAD_GAP }}>
       <div
         style={{
           display: 'flex',
