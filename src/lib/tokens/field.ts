@@ -63,3 +63,39 @@ export const FIELD_PAINT_CLASS =
   'bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] rounded-[14px] ' +
   'transition-[background-color,border-color] duration-[140ms] ease-out ' +
   'focus-within:bg-[rgba(255,255,255,0.10)] focus-within:border-[rgba(255,255,255,0.28)]';
+
+/* ── THE RAISED SET — for fields on a ground LIGHTER than the canvas ──────
+ *
+ * THE TEST, in one line: IS THE GROUND LIGHTER THAN #15171F? Lighter -> RAISED.
+ * Equal -> the canvas set above.
+ *
+ * Measured: 6% white over SURFACE #1B1E27 lands ~3 luminance steps from its
+ * ground versus ~9 on the canvas — the well stops being a well. The value was
+ * carried across and the RELATIONSHIP was not.
+ *
+ * THE ONE CONSTRAINT: a field's paint now depends on its parent, which nothing
+ * else in this token system does. So the choice is ALWAYS an explicit import
+ * the consuming file makes — never computed from context, never inherited,
+ * never a prop with a default. If it can be got wrong silently, the next copy
+ * will get it wrong silently.
+ */
+export const FIELD_RAISED_REST_BG = 'rgba(255,255,255,0.09)';
+export const FIELD_RAISED_REST_BORDER = 'rgba(255,255,255,0.14)';
+export const FIELD_RAISED_FOCUS_BG = 'rgba(255,255,255,0.14)';
+export const FIELD_RAISED_FOCUS_BORDER = 'rgba(255,255,255,0.32)';
+
+/** fieldPaint() for a raised ground. Same construction, raised alphas. */
+export function fieldPaintRaised(focused: boolean) {
+  return {
+    background: focused ? FIELD_RAISED_FOCUS_BG : FIELD_RAISED_REST_BG,
+    border: `1px solid ${focused ? FIELD_RAISED_FOCUS_BORDER : FIELD_RAISED_REST_BORDER}`,
+    borderRadius: FIELD_RADIUS,
+    transition: FIELD_TRANSITION,
+  } as const;
+}
+
+/** FIELD_PAINT_CLASS for a raised ground. Import this one deliberately. */
+export const FIELD_PAINT_RAISED_CLASS =
+  'bg-[rgba(255,255,255,0.09)] border border-[rgba(255,255,255,0.14)] rounded-[14px] ' +
+  'transition-[background-color,border-color] duration-[140ms] ease-out ' +
+  'focus-within:bg-[rgba(255,255,255,0.14)] focus-within:border-[rgba(255,255,255,0.32)]';
