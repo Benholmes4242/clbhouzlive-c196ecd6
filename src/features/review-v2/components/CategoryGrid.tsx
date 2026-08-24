@@ -167,6 +167,7 @@ function CategoryRow({
           </>
         )}
       </div>
+      </div>
     </div>
   );
 }
