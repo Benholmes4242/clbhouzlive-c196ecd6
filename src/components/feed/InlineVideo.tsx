@@ -27,7 +27,7 @@ import { feedLaneRoles, type FeedRole } from '@/video/feedLaneRoles';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteButton } from '@/audio/MuteButton';
-import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import { formatDuration, formatRemaining } from '@/features/watch-v2/utils/formatDuration';
 import '@/styles/media-rail-bars.css';
 import { VideoProcessingCard } from './VideoProcessingCard';
 import {
@@ -377,7 +377,17 @@ export const InlineVideo: React.FC<Props> = ({
           }}
         >
           {showVideo && <PlayingBars />}
-          {formatDuration(item.duration)}
+          {/* THE BADGE COUNTS DOWN WHILE THIS MEDIA IS PLAYING, and shows total
+              length otherwise. Broadcast-golf convention, chosen deliberately —
+              do not "correct" it to elapsed. The lane snapshot is already the
+              re-render source (VideoEngine emits on every timeupdate); the
+              value itself is FLOORED, so the displayed integer only changes once
+              per second and the number cannot stutter. snap.duration is
+              preferred over item.duration — the element knows the true length,
+              the post record holds what the encoder reported. */}
+          {(showVideo && laneOwnsThisMedia
+            ? formatRemaining(snap!.duration || item.duration, snap!.currentTime)
+            : null) ?? formatDuration(item.duration)}
         </span>
       )}
     </div>

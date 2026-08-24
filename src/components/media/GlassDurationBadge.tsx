@@ -6,6 +6,10 @@ import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
  * Matches the course glass pill treatment (semi-transparent dark fill +
  * backdrop-blur, white text, pill radius). Positioned absolute bottom-right
  * within a `position: relative` media container.
+ *
+ * IT DOES NOT COUNT DOWN because it is used on POSTER tiles with no playing
+ * element — there is no playhead to read, and a frozen countdown would read as
+ * broken. Give it a currentTime and it inherits the countdown automatically.
  */
 export function GlassDurationBadge({
   seconds,

@@ -3,7 +3,7 @@ import { Heart } from 'lucide-react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { DISCOVER_FACT, DISCOVER_QUIET } from './tokens';
-import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import { formatDuration, formatRemaining } from '@/features/watch-v2/utils/formatDuration';
 import { formatRelativeRounded } from '@/i18n/format';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
@@ -95,7 +95,10 @@ function TileMedia({
   item: CommunityVideo;
   railVisible: boolean;
   radius: number;
-  children?: (playing: boolean) => React.ReactNode;
+  children?: (
+    playing: boolean,
+    clock: { duration: number; currentTime: number } | null,
+  ) => React.ReactNode;
 }) {
   const reducedMotion = usePrefersReducedMotion();
   const [failed, setFailed] = useState(false);
@@ -114,14 +117,37 @@ function TileMedia({
     return registerRailVideo(el, setActive);
   }, [mountVideo]);
 
+  // COUNTDOWN SOURCE. The listener lives INSIDE the play effect, so it exists
+  // only for the ONE elected tile that is actually playing — never an always-on
+  // per-tile listener in a rail. 'timeupdate' fires ~4x a second at irregular
+  // intervals, so the state update is GATED on the floored remaining integer
+  // changing: one re-render per displayed second, no stutter, no timer (the
+  // playhead is the source of truth through stalls and seeks).
+  // Stored as the PAIR the shared helper takes, updated only when the floored
+  // remaining integer changes, so "0:00" is reachable (a bare remaining of 0
+  // would be an unusable duration to the helper and fall back to total length).
+  const [clock, setClock] = useState<{ duration: number; currentTime: number } | null>(null);
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !item.hlsUrl || !active) return;
     const attachment = attachTileHls(v, item.hlsUrl, () => setFailed(true));
     v.muted = true;
+    const onTime = () => {
+      const d = Number.isFinite(v.duration) ? v.duration : NaN;
+      if (!Number.isFinite(d) || d <= 0) return;
+      const remaining = Math.max(0, Math.floor(d - v.currentTime));
+      setClock((prev) =>
+        prev && Math.max(0, Math.floor(prev.duration - prev.currentTime)) === remaining
+          ? prev
+          : { duration: d, currentTime: v.currentTime },
+      );
+    };
+    v.addEventListener('timeupdate', onTime);
     const p = v.play();
     if (p && typeof p.catch === 'function') p.catch(() => setPlaying(false));
     return () => {
+      v.removeEventListener('timeupdate', onTime);
+      setClock(null);
       setPlaying(false);
       attachment.detach();
     };
@@ -187,7 +213,7 @@ function TileMedia({
           />
         </span>
       )}
-      {children?.(playing)}
+      {children?.(playing, clock)}
     </div>
   );
 }
@@ -276,7 +302,7 @@ export function CommunityVideoTile({
     >
       <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9' }}>
         <TileMedia item={item} railVisible={railVisible} radius={radius}>
-          {(playing) => (
+          {(playing, clock) => (
             <>
               {item.courseName && <CourseTag name={item.courseName} />}
               <span
@@ -298,7 +324,13 @@ export function CommunityVideoTile({
                   pointerEvents: 'none',
                 }}
               >
-                {formatDuration(item.durationSeconds)}
+                {/* COUNTS DOWN WHILE PLAYING, total length otherwise. The
+                    remaining seconds come from this tile's own playhead; if it
+                    is not playing (or the length is unknown) the badge falls
+                    back to total length rather than freezing a countdown. */}
+                {(playing && clock
+                  ? formatRemaining(clock.duration, clock.currentTime)
+                  : null) ?? formatDuration(item.durationSeconds)}
                 {playing && <PlayingBars />}
               </span>
             </>
