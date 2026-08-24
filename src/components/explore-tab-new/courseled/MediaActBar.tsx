@@ -1,7 +1,7 @@
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { A, CHIP_GAP, DISCOVER_QUIET, WELL_RADIUS } from './tokens';
+import { CHIP_GAP, DISCOVER_QUIET, WELL_RADIUS } from './tokens';
 import { PillFilterRow } from './PillFilterRow';
 
 /**
@@ -32,32 +32,42 @@ import { PillFilterRow } from './PillFilterRow';
  * CONTROL ON THIS PAGE MAY EVER REACH BACKWARDS PAST ITSELF.
  *
  * =====================================================================
- * THE SEARCH DEFERS TO THE GLOBAL SEARCH, IT DOES NOT COMPETE WITH IT (§4.3).
+ * THE SEARCH IS AN INLINE FILTER OVER MEDIA ALREADY ON THE PAGE
+ * (MICRO_BRIEF_DISCOVER_MEDIA_SEARCH_INLINE §0 — §4.3 OVERTURNED IN PART).
  *
- * The chrome island's glyph already opens SearchOverlayV2, which searches
- * members and courses plus clubs, tour players, videos and posts with recents and
- * scope chips. So this bar is a TAP TARGET FOR THAT OVERLAY — it dispatches the
- * same `clbhouz:open-search` event the island listens for. NO SECOND SEARCH
- * INPUT, no second query hook, no second result vocabulary. PlayerSearchSheet
- * was NOT reused: it is members-only, on the light handicap tokens, and reusing
- * it would have meant extending it to courses — which is rebuilding the overlay
- * that already exists.
+ * There is now a second search INPUT, and the part of §4.3 that mattered still
+ * holds: there is NO second query hook, NO second result vocabulary and NO
+ * second network path. This field filters only the photo, clip and video pools
+ * already in memory — the same items the sections beneath it are rendering. It
+ * cannot return a person, a course, a club or a post, so it cannot compete with
+ * the global overlay's vocabulary.
+ *
+ * THE GLOBAL SEARCH IS UNTOUCHED AND STILL ONE TAP AWAY on the chrome island,
+ * which owns SearchOverlayV2 and keeps people, courses, clubs and posts. This
+ * bar no longer dispatches `clbhouz:open-search`: a control that pointed
+ * elsewhere while sitting under the media chips was the one thing on the page
+ * that did NOT govern what was below it. It does now, which is why this obeys
+ * the rule above rather than breaking it.
+ *
+ * THE BAR IS A CONTROL, NOT A DATA OWNER. The matching lives in
+ * ExploreTabContent where the pools live; this component holds no query state
+ * of its own beyond the field.
  */
 
 export type MediaChipId = 'all' | 'photos' | 'clips' | 'videos';
 
 export const MEDIA_CHIPS: MediaChipId[] = ['all', 'photos', 'clips', 'videos'];
 
-export function openGlobalSearch() {
-  window.dispatchEvent(new Event('clbhouz:open-search'));
-}
-
 export function MediaActBar({
   chip,
   onChipChange,
+  query,
+  onQueryChange,
 }: {
   chip: MediaChipId;
   onChipChange: (next: MediaChipId) => void;
+  query: string;
+  onQueryChange: (next: string) => void;
 }) {
   const { t } = useTranslation('courses');
 
@@ -76,6 +86,7 @@ export function MediaActBar({
   };
 
   const options = MEDIA_CHIPS.map((id) => ({ value: id, label: label(id) }));
+  const hasQuery = query.length > 0;
 
   return (
     <div>
@@ -86,9 +97,12 @@ export function MediaActBar({
         ariaLabel={t('discover.media.chipsAria', 'Media type')}
       />
 
-      <button
-        type="button"
-        onClick={openGlobalSearch}
+      {/* THE CANONICAL DARK FIELD, IN DISCOVER'S RADIUS SCALE. Both channels
+          step on focus (fill 6% → 10%, border 10% → 28%) and the border stays
+          dimmer than the text. The radius is WELL_RADIUS, derived from
+          CARD_RADIUS — the canon's sq-sm applies to full-height fields on the
+          canvas, not to a compact control inside a derived scale. */}
+      <div
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -96,23 +110,86 @@ export function MediaActBar({
           width: '100%',
           padding: '11px 12px',
           borderRadius: WELL_RADIUS,
-          background: A.PANEL,
-          border: `1px solid ${A.BORDER}`,
-          color: DISCOVER_QUIET,
-          fontSize: 13,
-          fontWeight: 600,
-          textAlign: 'left',
-          cursor: 'pointer',
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.10)',
           marginTop: CHIP_GAP,
+          transition: 'background 140ms ease, border-color 140ms ease',
+        }}
+        onFocusCapture={(e) => {
+          const el = e.currentTarget;
+          el.style.background = 'rgba(255,255,255,0.10)';
+          el.style.borderColor = 'rgba(255,255,255,0.28)';
+        }}
+        onBlurCapture={(e) => {
+          const el = e.currentTarget;
+          el.style.background = 'rgba(255,255,255,0.06)';
+          el.style.borderColor = 'rgba(255,255,255,0.10)';
         }}
       >
-        <Search size={15} color={DISCOVER_QUIET} strokeWidth={2.4} aria-hidden />
-        <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {t('discover.media.searchPlaceholder', 'Search people, courses, clubs and posts')}
-        </span>
-      </button>
+        <Search
+          size={15}
+          color={hasQuery ? 'rgba(255,255,255,0.62)' : DISCOVER_QUIET}
+          strokeWidth={2.4}
+          aria-hidden
+          style={{ flex: 'none' }}
+        />
+        {/* type="text", NOT type="search": a search input draws the UA's own
+            clear button, which would sit beside ours. */}
+        <input
+          type="text"
+          inputMode="search"
+          enterKeyHint="search"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          onKeyDown={(e) => {
+            // Nothing to submit — filtering is live, so Enter just dismisses
+            // the keyboard.
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              e.currentTarget.blur();
+            }
+          }}
+          placeholder={t('discover.media.searchPlaceholder', 'Search photos, clips and videos')}
+          aria-label={t('discover.media.searchPlaceholder', 'Search photos, clips and videos')}
+          style={{
+            flex: '1 1 auto',
+            minWidth: 0,
+            border: 'none',
+            outline: 'none',
+            background: 'transparent',
+            color: 'rgba(255,255,255,0.96)',
+            fontSize: 13,
+            fontWeight: 600,
+          }}
+        />
+        {/* WITHOUT A CLEAR CONTROL a member who filters and scrolls has no
+            visible way back and the sections below look broken. */}
+        {hasQuery && (
+          <button
+            type="button"
+            onClick={() => onQueryChange('')}
+            aria-label={t('discover.media.searchClear', 'Clear search')}
+            style={{
+              flex: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0,
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+            }}
+          >
+            <X size={15} color="rgba(255,255,255,0.62)" strokeWidth={2.4} aria-hidden />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
 
 export default MediaActBar;
+
