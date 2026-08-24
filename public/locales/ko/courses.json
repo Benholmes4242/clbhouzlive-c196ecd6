@@ -1143,11 +1143,7 @@
       }
     },
     "mostPlayedSeeAllAtCourse": "이 코스 방문하기",
-    "seam": "전기간 · 모든 사람",
-    "media": {
-      "searchPlaceholder": "Search members and courses",
-      "chipsAria": "Media type"
-    }
+    "seam": "전기간 · 모든 사람"
   },
   "statBrowse": {
     "colArea": "지역",
