@@ -7,13 +7,10 @@ import { relativeDay } from './courseled/discoverWhen';
 import { useRoundHoleShapes } from './courseled/hooks/useRoundHoleShapes';
 import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { SF_STACK } from '@/components/manage/ui';
 
-const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const SLATE_50 = '#F8FAFC';
-const INK = '#0F172A';
-const EYEBROW_INK = '#0E1216';
-const SLATE_400 = '#94A3B8';
-const HAIRLINE = '#E2E8F0';
+const FONT = SF_STACK;
 
 interface Props {
   open: boolean;
@@ -61,24 +58,24 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
       onClose={onClose}
       ariaLabelledBy="friends-rounds-title"
       variant="light"
-      surfaceColor={SLATE_50}
+      surfaceColor={A.CANVAS}
       style={{
         height: 'auto',
         maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: FONT,
-        background: SLATE_50,
+        background: A.CANVAS,
       }}
     >
-      <div style={{ padding: '10px 16px 12px', background: SLATE_50, borderBottom: `1px solid ${HAIRLINE}` }}>
+      <div style={{ padding: '10px 16px 12px', background: A.CANVAS, borderBottom: `1px solid ${A.BORDER}` }}>
         <div
           style={{
             fontSize: 10.5,
             fontWeight: 600,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: EYEBROW_INK,
+            color: A.INK,
             marginBottom: 4,
           }}
         >
@@ -91,7 +88,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
           id="friends-rounds-title"
           style={{
             ...TITLE_METRICS,
-            color: INK,
+            color: A.INK,
           }}
         >
           {t('discover.whosBeenPlaying', "Who's been playing")}
@@ -103,7 +100,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
           flex: 1,
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
-          background: SLATE_50,
+          background: A.CANVAS,
         }}
       >
         {days.length > 0 ? (
@@ -122,18 +119,18 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
                   justifyContent: 'space-between',
                   gap: 8,
                   padding: '8px 16px 7px',
-                  background: SLATE_50,
-                  borderBottom: `1px solid ${HAIRLINE}`,
+                  background: A.CANVAS,
+                  borderBottom: `1px solid ${A.BORDER}`,
                   fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: '0.09em',
                   textTransform: 'uppercase',
                 }}
               >
-                <span style={{ color: EYEBROW_INK }}>
+                <span style={{ color: A.INK }}>
                   {key ? relativeDay(key, t as never, 'long') : ''}
                 </span>
-                <span className="tabular-nums" style={{ color: SLATE_400 }}>
+                <span className="tabular-nums" style={{ color: A.MUTE }}>
                   {list.length}{' '}
                   {list.length === 1
                     ? t('discover.friendsRounds.entrySingular', 'ROUND')
@@ -159,7 +156,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
             </div>
           ))
         ) : (
-          <div style={{ padding: '32px 16px', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
+          <div style={{ padding: '32px 16px', textAlign: 'center', color: A.MUTE, fontSize: 13 }}>
             {t('discover.friendsRounds.empty', 'No recent friend rounds yet.')}
           </div>
         )}

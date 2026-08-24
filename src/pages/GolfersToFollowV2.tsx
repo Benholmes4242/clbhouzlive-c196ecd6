@@ -25,16 +25,12 @@ import {
   RowSubline,
   FollowButton,
   ROW_FONT,
-  ROW_INK,
-  ROW_INK_MUTE,
-  ROW_SURFACE,
-  ROW_HAIR,
   type RowActorLike,
 } from '@/features/social-lists-v2/rowParts';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { ListSkeleton } from '@/features/social-lists-v2/SocialListPage';
 
-const BG = '#F8FAFC';
-const AMBER = '#F7931E';
+
 
 /* ── reason eyebrow copy mapping ─────────────────────────────────────── */
 function reasonEyebrow(s: EmptyStateSuggestion): string {
@@ -102,7 +98,7 @@ export default function GolfersToFollowV2() {
     <div
       style={{
         minHeight: '100dvh',
-        background: BG,
+        background: A.CANVAS,
         fontFamily: ROW_FONT,
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
         paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 108px)',
@@ -121,9 +117,9 @@ export default function GolfersToFollowV2() {
             height: 34,
             padding: '0 12px 0 10px',
             borderRadius: 17,
-            background: ROW_SURFACE,
-            border: `0.5px solid ${ROW_HAIR}`,
-            color: ROW_INK,
+            background: A.PANEL,
+            border: `0.5px solid ${A.BORDER}`,
+            color: A.INK,
             fontSize: 12.5,
             fontWeight: 600,
             fontFamily: ROW_FONT,
@@ -141,7 +137,7 @@ export default function GolfersToFollowV2() {
               fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '0.16em',
-              color: AMBER,
+              color: A.AMBER,
               textTransform: 'uppercase',
             }}
           >
@@ -154,12 +150,12 @@ export default function GolfersToFollowV2() {
               lineHeight: 1.1,
               letterSpacing: '-0.02em',
               fontWeight: 700,
-              color: ROW_INK,
+              color: A.INK,
             }}
           >
             Golfers to follow
           </h1>
-          <div style={{ fontSize: 13, fontWeight: 500, color: ROW_INK_MUTE }}>
+          <div style={{ fontSize: 13, fontWeight: 500, color: A.BODY }}>
             Fill your feed with players, friends, and courses you care about.
           </div>
         </div>
@@ -199,7 +195,7 @@ export default function GolfersToFollowV2() {
                 style={{
                   padding: '18px 16px',
                   fontSize: 12.5,
-                  color: ROW_INK_MUTE,
+                  color: A.BODY,
                   fontWeight: 500,
                 }}
               >
@@ -219,7 +215,7 @@ export default function GolfersToFollowV2() {
           bottom: 0,
           padding:
             'calc(env(safe-area-inset-bottom, 0px) + 12px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
-          background: 'linear-gradient(180deg, rgba(248,250,252,0) 0%, #F8FAFC 40%)',
+          background: `linear-gradient(180deg, rgba(21,23,31,0) 0%, ${A.CANVAS} 40%)`,
           display: 'flex',
           justifyContent: 'center',
           zIndex: 20,
@@ -242,8 +238,8 @@ export default function GolfersToFollowV2() {
               padding: '0 18px',
               borderRadius: 23,
               background: 'transparent',
-              border: `1px solid ${ROW_HAIR}`,
-              color: ROW_INK_MUTE,
+              border: `1px solid ${A.BORDER}`,
+              color: A.BODY,
               fontSize: 14,
               fontWeight: 600,
               fontFamily: ROW_FONT,
@@ -260,8 +256,8 @@ export default function GolfersToFollowV2() {
               flex: 1,
               height: 46,
               borderRadius: 23,
-              background: selected.size >= 1 ? ROW_INK : 'rgba(15,23,42,0.12)',
-              color: '#FFFFFF',
+              background: selected.size >= 1 ? A.INK : 'rgba(255,255,255,0.08)',
+              color: selected.size >= 1 ? A.CANVAS : 'rgba(248,250,252,0.38)',
               border: 'none',
               fontSize: 14,
               fontWeight: 700,
@@ -282,9 +278,9 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   return (
     <section
       style={{
-        background: ROW_SURFACE,
+        background: A.PANEL,
         borderRadius: 16,
-        border: `0.5px solid ${ROW_HAIR}`,
+        border: `0.5px solid ${A.BORDER}`,
         overflow: 'hidden',
       }}
     >
@@ -294,7 +290,7 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
           fontSize: 10.5,
           fontWeight: 700,
           letterSpacing: '0.16em',
-          color: ROW_INK_MUTE,
+          color: A.BODY,
         }}
       >
         {title}
@@ -334,7 +330,7 @@ function SuggestionRow({
         padding: '11px 16px',
         cursor: 'pointer',
         borderTop: showDivider ? undefined : undefined,
-        borderBottom: showDivider ? `0.5px solid ${ROW_HAIR}` : undefined,
+        borderBottom: showDivider ? `0.5px solid ${A.BORDER}` : undefined,
       }}
     >
       <RowAvatar row={row} />
@@ -344,7 +340,7 @@ function SuggestionRow({
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.12em',
-            color: AMBER,
+            color: A.AMBER,
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -359,7 +355,7 @@ function SuggestionRow({
             style={{
               fontSize: 14,
               fontWeight: 700,
-              color: ROW_INK,
+              color: A.INK,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -385,7 +381,7 @@ function ErrorBlock({ onRetry }: { onRetry: () => void }) {
         flexDirection: 'column',
         alignItems: 'center',
         gap: 10,
-        color: ROW_INK_MUTE,
+        color: A.BODY,
         fontSize: 13,
       }}
     >
@@ -394,8 +390,8 @@ function ErrorBlock({ onRetry }: { onRetry: () => void }) {
         type="button"
         onClick={onRetry}
         style={{
-          background: ROW_INK,
-          color: '#fff',
+          background: A.INK,
+          color: A.CANVAS,
           border: 'none',
           borderRadius: 999,
           padding: '8px 16px',
@@ -420,7 +416,7 @@ function EmptyBlock({ onFind }: { onFind: () => void }) {
         flexDirection: 'column',
         alignItems: 'center',
         gap: 10,
-        color: ROW_INK_MUTE,
+        color: A.BODY,
         fontSize: 13,
         textAlign: 'center',
       }}
@@ -433,8 +429,8 @@ function EmptyBlock({ onFind }: { onFind: () => void }) {
           display: 'inline-flex',
           alignItems: 'center',
           gap: 6,
-          background: ROW_INK,
-          color: '#fff',
+          background: A.INK,
+          color: A.CANVAS,
           border: 'none',
           borderRadius: 999,
           padding: '8px 14px',
