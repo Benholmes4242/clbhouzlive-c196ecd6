@@ -315,11 +315,58 @@ export default function ExploreTabContent({
    * videos; BRIEF_MEDIA_TRACKING_MINIMUM shipped the two events that will settle
    * it. Reorder this on those numbers, not on taste.
    */
-  const photoPool = useMemo(() => library.data?.photos ?? [], [library.data]);
-  const photoSample = useMemo(() => photoPool.slice(0, PHOTOS_SAMPLE), [photoPool]);
+  const allPhotoPool = useMemo(() => library.data?.photos ?? [], [library.data]);
   const libraryAll = useMemo(() => library.data?.all ?? [], [library.data]);
-  const clipPool = useMemo(() => library.data?.clips ?? [], [library.data]);
-  const videoPool = useMemo(() => library.data?.videos ?? [], [library.data]);
+  const allClipPool = useMemo(() => library.data?.clips ?? [], [library.data]);
+  const allVideoPool = useMemo(() => library.data?.videos ?? [], [library.data]);
+
+  /**
+   * THE MEDIA SEARCH IS AN INLINE FILTER OVER THESE POOLS
+   * (MICRO_BRIEF_DISCOVER_MEDIA_SEARCH_INLINE §2). No hook, no query key, no
+   * network path: the pools are already client-side, so the match happens here,
+   * where the data lives. MediaActBar is a control, not a data owner.
+   *
+   * IT GOVERNS ONLY WHAT IS BELOW THE BAR. photoPool, clipPool and videoPool —
+   * nothing else. The honours board is a preceding sibling and is outside
+   * data-media-filter-scope, so this state cannot reach it.
+   *
+   * MINIMUM 2 CHARACTERS, DEBOUNCED 200ms: one letter matches nearly every
+   * caption (the page would appear to do nothing), and three mosaics should not
+   * re-render on every keystroke.
+   *
+   * courseName IS DELIBERATELY NOT MATCHED. It resolves on 6 posts out of 242
+   * (useCommunityVideos.ts:54), and a field that silently matches almost nothing
+   * makes search feel broken rather than empty.
+   */
+  const [mediaQuery, setMediaQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebouncedQuery(mediaQuery), 200);
+    return () => window.clearTimeout(id);
+  }, [mediaQuery]);
+
+  const needle = useMemo(() => normaliseForSearch(debouncedQuery), [debouncedQuery]);
+  const filtering = needle.length >= 2;
+
+  const matchMedia = useCallback(
+    (items: CommunityLibraryItem[]) =>
+      filtering
+        ? items.filter(
+            (i) =>
+              normaliseForSearch(i.title).includes(needle) ||
+              normaliseForSearch(i.displayName).includes(needle),
+          )
+        : items,
+    [filtering, needle],
+  );
+
+  const photoPool = useMemo(() => matchMedia(allPhotoPool), [matchMedia, allPhotoPool]);
+  const clipPool = useMemo(() => matchMedia(allClipPool), [matchMedia, allClipPool]);
+  const videoPool = useMemo(() => matchMedia(allVideoPool), [matchMedia, allVideoPool]);
+  const photoSample = useMemo(() => photoPool.slice(0, PHOTOS_SAMPLE), [photoPool]);
+  const noMediaMatches =
+    filtering && photoPool.length === 0 && clipPool.length === 0 && videoPool.length === 0;
+
 
   /**
    * THE MEDIA CHIP (BRIEF_DISCOVER_ONE_PAGE §4.2). Component state, never the
