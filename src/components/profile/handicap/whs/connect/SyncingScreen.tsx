@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
-import { INK, MUTE, DIM, BORDER, TRACK, GOOD, LABEL_LG } from './designTokens';
+import { CANVAS, INK, MUTE, DIM, BORDER, TRACK, GOOD, LABEL_LG } from './designTokens';
 import { Stage, StageHead } from './Primitives';
 
 /**
@@ -67,7 +67,7 @@ export const SyncingScreen: React.FC = () => {
                   transition: 'background 200ms ease, border-color 200ms ease',
                 }}
               >
-                {passed ? <Check size={10} strokeWidth={3.2} color="#FFF" /> : null}
+                {passed ? <Check size={10} strokeWidth={3.2} color={CANVAS} /> : null}
               </span>
               <span
                 style={{

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   INK, MUTE, DIM, PANEL, BORDER, GOOD, BAD,
-  LABEL_LG, CAPTION, HERO_FIG, NUM,
+  LABEL_LG, CAPTION, HERO_FIG, NUM, TRACK,
 } from './designTokens';
 import { PrimaryButton, FooterBar, Stage, StageHead } from './Primitives';
 import { useImportedCounts } from './useImportedCounts';
@@ -286,14 +286,14 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
                   marginBottom: 10,
                 }}
               >
-                {/* The white square: the hole number, nothing else. */}
+                {/* The raised square: the hole number, nothing else. */}
                 <div
                   style={{
                     width: 52,
                     height: 52,
                     flexShrink: 0,
                     borderRadius: 12,
-                    background: '#F8FAFC',
+                    background: TRACK,
                     border: `1px solid ${BORDER}`,
                     display: 'flex',
                     flexDirection: 'column',

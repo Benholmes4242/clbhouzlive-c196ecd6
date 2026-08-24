@@ -96,7 +96,7 @@ export const HandicapCard: React.FC<Props> = ({
         border: `1px solid ${BORDER}`,
         borderRadius: 20,
         padding: '16px 18px 15px',
-        boxShadow: '0 10px 30px rgba(14,18,22,0.08)',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
       }}
     >
       <div style={{ ...KICKER, color: kickerColor ?? DIM, marginBottom: 13 }}>{kicker}</div>

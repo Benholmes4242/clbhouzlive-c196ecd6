@@ -28,9 +28,9 @@ const FRAME: React.CSSProperties = {
   borderRadius: 3,
   overflow: 'hidden',
   flexShrink: 0,
-  border: '0.5px solid rgba(15,23,42,0.10)',
+  border: '0.5px solid rgba(255,255,255,0.16)',
   position: 'relative',
-  background: '#fff',
+  background: 'rgba(255,255,255,0.08)',
 };
 
 export const MiniFlag: React.FC<Props> = ({ iso, dimmed }) => {
@@ -53,7 +53,7 @@ export const MiniFlag: React.FC<Props> = ({ iso, dimmed }) => {
           }}
         />
       ) : (
-        <span style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.06)' }} />
+        <span style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.06)' }} />
       )}
     </span>
   );
