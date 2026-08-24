@@ -164,6 +164,8 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
           />
         )}
       </div>
+      </div>
+
 
       <div
         aria-hidden
