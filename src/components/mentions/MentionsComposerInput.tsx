@@ -45,6 +45,7 @@ import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { Z } from '@/config/zIndex';
 import { extractMentions } from '@/lib/mentions/format';
+import { FIELD_PLACEHOLDER as DEFAULT_PLACEHOLDER } from '@/lib/tokens/field';
 
 const INK = '#F8FAFC';
 const INK_SUBTLE = 'rgba(248,250,252,0.42)';
@@ -52,8 +53,7 @@ const AMBER = '#F7931E';
 const BORDER = 'rgba(248,250,252,0.10)';
 /** Mention sheet ground (dark elevated surface). */
 const PANEL_BG = '#1B222B';
-/** Canonical dark placeholder tier. */
-const DEFAULT_PLACEHOLDER = 'rgba(255,255,255,0.38)';
+
 
 const PANEL_MAX_HEIGHT = 6 * 44 + 44 + 8; // 6 rows + eyebrow header + gutter
 
