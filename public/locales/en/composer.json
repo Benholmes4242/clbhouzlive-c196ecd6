@@ -21,7 +21,10 @@
     "statToPar": "To par",
     "statBirdies": "Birdies",
     "statPhotos": "Photos",
-    "statVideos": "Videos"
+    "statVideos": "Videos",
+    "uploadingSimple": "Uploading",
+    "keepUsing": "You can keep using the app",
+    "keepUsingSub": "We'll finish this in the background."
   },
   "emptyState": {
     "headline": "Put it on the wall",

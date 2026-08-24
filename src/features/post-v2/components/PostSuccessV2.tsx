@@ -74,6 +74,19 @@ export default function PostSuccessV2({ result, onDone }: Props) {
 /** POSTED — the same card, resolved. Green accent, no scrims, LIVE eyebrow. */
 function PostedScreen({ result, onDone }: Props) {
   const { t } = useTranslation(['composer', 'common']);
+  // The edit-save path arrives with no card facts at all — there is nothing to
+  // render as a card, so it keeps the plain confirmation.
+  const hasCard = !!(result.mediaPreviews?.length || (result.caption ?? '').trim() || result.actorName);
+  if (!hasCard) {
+    return (
+      <ImmersiveSuccessShell accent={GREEN_ON_DARK} onTapClose={onDone} showTapHint>
+        <Column>
+          <Label>{t('composer:success.posted')}</Label>
+          <Copy>{t('composer:success.postedBody')}</Copy>
+        </Column>
+      </ImmersiveSuccessShell>
+    );
+  }
   return (
     <ImmersiveSuccessShell accent={GREEN_ON_DARK} onTapClose={onDone} showTapHint>
       <Column>
