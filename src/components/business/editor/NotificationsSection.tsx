@@ -13,6 +13,7 @@ import { Bell, Loader2 } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 type ToggleDef = { key: string; label: string; help: string };
 
@@ -113,8 +114,18 @@ export function NotificationsSection({ businessId }: Props) {
                   }}
                 >
                   <span
-                    className="inline-block h-[20px] w-[20px] rounded-full bg-white shadow transition-transform"
-                    style={{ transform: enabled ? 'translateX(21px)' : 'translateX(3px)' }}
+                    /* KNOB IS THE CANVAS, NOT WHITE. The #F8FAFC ON track above
+                       was copied from SettingsToggleRow, whose thumb is
+                       ui/switch's bg-background — the dark canvas. A white knob
+                       on that track is invisible, which is every row's default
+                       state. OpeningHoursSection's white knob is correct because
+                       its ON track is amber; that is a different track, not a
+                       different knob. */
+                    className="inline-block h-[20px] w-[20px] rounded-full shadow transition-transform"
+                    style={{
+                      transform: enabled ? 'translateX(21px)' : 'translateX(3px)',
+                      background: A.CANVAS,
+                    }}
                   />
                 </button>
               </div>
