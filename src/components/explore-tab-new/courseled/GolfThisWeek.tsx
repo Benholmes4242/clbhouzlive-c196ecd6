@@ -14,7 +14,6 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { WHITE_ALPHA_08 } from '@/features/tourhub/_shared/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
@@ -1868,12 +1867,10 @@ export function GolfThisWeek({
                   gap: 4,
                 }}
               >
-                {/* Emoji remain deliberate on celebratory band tiles. Their
-                    platform-owned colours get a neutral local surface rather
-                    than an unpredictable filter or shadow. */}
+                {/* Emoji remain deliberate on celebratory band tiles and sit
+                    directly on the tile background with no local surface. */}
                 <span
                   style={{
-                    position: 'relative',
                     width: 11,
                     height: 11,
                     flex: '0 0 11px',
@@ -1882,32 +1879,16 @@ export function GolfThisWeek({
                     justifyContent: 'center',
                     fontSize: 11,
                     lineHeight: 1,
+                    color: DISCOVER_FACT,
+                    WebkitTextFillColor: 'initial',
+                    fontFamily:
+                      '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
+                    fontWeight: 400,
+                    fontStyle: 'normal',
+                    fontVariantEmoji: 'emoji',
                   }}
                 >
-                  <span
-                    aria-hidden
-                    style={{
-                      position: 'absolute',
-                      inset: -2,
-                      borderRadius: '50%',
-                      background: WHITE_ALPHA_08,
-                    }}
-                  />
-                  <span
-                    style={{
-                      position: 'relative',
-                      opacity: 1,
-                      color: DISCOVER_FACT,
-                      WebkitTextFillColor: 'initial',
-                      fontFamily:
-                        '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
-                      fontWeight: 400,
-                      fontStyle: 'normal',
-                      fontVariantEmoji: 'emoji',
-                    }}
-                  >
-                    {tile.emoji}
-                  </span>
+                  {tile.emoji}
                 </span>
                 {tile.label}
               </div>
