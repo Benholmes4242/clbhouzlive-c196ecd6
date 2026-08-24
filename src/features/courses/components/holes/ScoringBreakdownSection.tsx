@@ -949,11 +949,28 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                     +{v.toFixed(1)}
                   </div>
                   {/* Neutral ink by rank. NEVER semantic colour, never a tint. */}
-                  <div style={{ height: 3, borderRadius: 2, background: shade, marginTop: 6 }} />
+                  <div
+                    style={{
+                      height: 6,
+                      borderRadius: 3,
+                      background: A.TRACK,
+                      marginTop: 6,
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: 6,
+                        borderRadius: 3,
+                        width: `${thirdShares[i]}%`,
+                        background: shade,
+                      }}
+                    />
+                  </div>
                   <div style={{ ...LABEL, fontSize: 8.5, marginTop: 7 }}>{thirdLabels[i]}</div>
                 </div>
               );
             })}
+
           </div>
           <Caption>{s3Advice}</Caption>
         </Panel>
