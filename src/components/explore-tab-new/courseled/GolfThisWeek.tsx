@@ -1751,7 +1751,10 @@ export function GolfThisWeek({
       <div
         style={{
           display: 'flex',
-          flexWrap: 'wrap',
+          /* NO flexWrap. The region well now shrinks and ellipses its label
+             (WeekFilters §0.3), so the row resolves by truncating INSIDE the
+             control instead of dropping it to a second line. Leaving wrap here
+             would let the row wrap before the ellipsis ever engaged. */
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: 12,
