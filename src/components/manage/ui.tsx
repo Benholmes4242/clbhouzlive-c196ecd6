@@ -5,14 +5,14 @@
  */
 import React from 'react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { FIELD_REST_BG, FIELD_FOCUS_BG } from '@/lib/tokens/field';
+import { FIELD_REST_BG } from '@/lib/tokens/field';
 
 export const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 /**
  * DARK-ONLY (BRIEF_SETTINGS_AND_MANAGE_DARK). Values are the analytical ramp,
  * sourced from the already-converted Settings rows (settings/ui/rowParts.tsx).
  *
- * PAGE_BG (canvas) and FIELD_FILL (raised) MUST stay distinguishable: on light
+ * PAGE_BG (canvas) and a raised surface MUST stay distinguishable: on light
  * a field matching the page read as inset; on dark that would erase the field.
  */
 export const INK = A.INK;
@@ -23,16 +23,13 @@ export const HAIR = A.BORDER;
 export const PAGE_BG = A.CANVAS;
 export const CARD_BG = A.PANEL;
 /**
- * Raised above CARD_BG so an input never disappears into its card.
+ * A button or row surface raised above CARD_BG so it never disappears into its
+ * card. NOT a field: it must never follow the field canon's alphas.
  *
- * @deprecated Import FIELD_REST_BG / FIELD_FOCUS_BG from '@/lib/tokens/field'
- * instead. These were a SECOND BROADCAST of the field canon at the same
- * literal values; they are now re-exports so one alpha change moves every
- * field at once. New code must not add call sites here.
+ * Declared locally on purpose. Same value as the canon's rest fill today,
+ * different meaning, and it must be free to move independently.
  */
-export const FIELD_FILL = FIELD_REST_BG;
-/** @deprecated Use FIELD_FOCUS_BG from '@/lib/tokens/field'. */
-export const FIELD_FILL_FOCUS = FIELD_FOCUS_BG;
+export const SURFACE_RAISED = 'rgba(255,255,255,0.06)';
 export const GREEN = A.GREEN;
 /** Bespoke destructive red. NOT the under-par red — different meaning. */
 export const DANGER = '#FF5A5A';
@@ -133,7 +130,7 @@ export function GroupLabel({
 /** Shared input/textarea/select inline style. */
 export const FIELD_STYLE: React.CSSProperties = {
   width: '100%',
-  background: FIELD_FILL,
+  background: FIELD_REST_BG,
   border: `1px solid ${HAIR}`,
   borderRadius: 10,
   padding: '11px 13px',
