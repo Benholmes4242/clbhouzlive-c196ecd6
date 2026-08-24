@@ -554,7 +554,6 @@ export function HonoursBoard({
       {showHeader ? (
         <div style={{ padding: '0 2px', marginBottom: 10 }}>
           <HonoursHeading
-            events={events}
             aside={
               onSeeAll ? (
                 <InkAction onClick={onSeeAll}>
