@@ -38,9 +38,10 @@ export interface PlayerInitialAvatarProps {
    *  (INK_TINT_06) for player headshots; logo callers pass white/near-white so
    *  the badge fills the avatar like before. */
   imageBg?: string;
-  /** Traced 1px hairline colour. Default DARK_HAIRLINE (white @ 22%) matches
-   *  the hero/dark surfaces where these are rendered. Pass LIGHT_HAIRLINE on
-   *  light card surfaces. Set to null to disable. */
+  /** Traced 1px hairline colour. Defaults to DARK_HAIRLINE (white @ 22%), the
+   *  one canonical hairline. Override only for an achievement or accent ring —
+   *  the app is dark-only, so this is never a surface choice.
+   *  Set to null to disable. */
   ringColor?: string | null;
 }
 

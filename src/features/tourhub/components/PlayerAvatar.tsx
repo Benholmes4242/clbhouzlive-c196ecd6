@@ -26,8 +26,9 @@ interface PlayerAvatarProps {
   photoUrl?: string | null;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
-  /** Traced hairline colour. Default DARK_HAIRLINE (white @ 22%) for hero
-   *  backdrops. Pass LIGHT_HAIRLINE for light card surfaces. */
+  /** Traced hairline colour. Defaults to DARK_HAIRLINE (white @ 22%), the one
+   *  canonical hairline. Override only for an achievement or accent ring — the
+   *  app is dark-only, so this is never a surface choice. */
   ringColor?: string;
 }
 
