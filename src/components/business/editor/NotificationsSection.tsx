@@ -107,24 +107,19 @@ export function NotificationsSection({ businessId }: Props) {
                   onClick={() => toggle(t.key)}
                   className="relative inline-flex h-[26px] w-[44px] flex-shrink-0 items-center rounded-full transition-colors"
                   style={{
-                    // Shipped dark switch track (settings/ui/SettingsToggleRow).
-                    // Both former branches were slate on a near-black canvas.
-                    background: enabled ? '#F8FAFC' : 'rgba(255,255,255,0.14)',
+                    // Matches OpeningHoursSection's toggle: amber ON track,
+                    // 14% white OFF track, white knob. One toggle grammar
+                    // across the business editor.
+                    background: enabled ? BIZ.amber : 'rgba(255,255,255,0.14)',
                     opacity: isSaving ? 0.6 : 1,
                   }}
                 >
                   <span
-                    /* KNOB IS THE CANVAS, NOT WHITE. The #F8FAFC ON track above
-                       was copied from SettingsToggleRow, whose thumb is
-                       ui/switch's bg-background — the dark canvas. A white knob
-                       on that track is invisible, which is every row's default
-                       state. OpeningHoursSection's white knob is correct because
-                       its ON track is amber; that is a different track, not a
-                       different knob. */
                     className="inline-block h-[20px] w-[20px] rounded-full shadow transition-transform"
                     style={{
                       transform: enabled ? 'translateX(21px)' : 'translateX(3px)',
-                      background: A.CANVAS,
+                      background: '#fff',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                     }}
                   />
                 </button>
