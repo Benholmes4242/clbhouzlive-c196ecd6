@@ -1,7 +1,7 @@
 import React from 'react';
 import { ImageIcon, Camera, Trash2 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SF_STACK, INK, INK_45, FIELD_FILL, DANGER, HAIR } from '@/components/manage/ui';
+import { SF_STACK, INK, INK_45, SURFACE_RAISED, DANGER, HAIR } from '@/components/manage/ui';
 
 interface PhotoActionSheetProps {
   open: boolean;
@@ -86,7 +86,7 @@ export function PhotoActionSheet({
             width: 'calc(100% - 32px)',
             margin: '0 16px',
             padding: '12px 0',
-            background: FIELD_FILL,
+            background: SURFACE_RAISED,
             border: `1px solid ${HAIR}`,
             borderRadius: 12,
             fontFamily: SF_STACK,

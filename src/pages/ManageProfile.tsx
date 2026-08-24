@@ -30,7 +30,7 @@ import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp } from '@/lib/formatHcp';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { ManageCard, Label, Nudge, PAGE_BG, CARD_BG, FIELD_FILL, HAIR, DANGER, GREEN as GREEN_TOKEN, INK as INK_TOKEN, INK_45 as INK_45_TOKEN } from '@/components/manage/ui';
+import { ManageCard, Label, Nudge, PAGE_BG, CARD_BG, SURFACE_RAISED, HAIR, DANGER, GREEN as GREEN_TOKEN, INK as INK_TOKEN, INK_45 as INK_45_TOKEN } from '@/components/manage/ui';
 
 /**
  * Inert-but-present fill for the DISABLED SAVE BUTTON. Same value as the field
@@ -854,7 +854,7 @@ function HandicapRow({
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '12px 14px', borderRadius: 10,
-              background: FIELD_FILL, border: `1px solid ${HAIR}`,
+              background: SURFACE_RAISED, border: `1px solid ${HAIR}`,
               fontSize: 14, fontWeight: 600, color: INK, fontFamily: SF_STACK, cursor: 'pointer',
             }}
           >

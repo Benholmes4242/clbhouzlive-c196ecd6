@@ -11,6 +11,7 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { A, BIZ_LABEL } from '@/features/courses/components/holes/analytical/tokens';
+import { FIELD_REST_BG } from '@/lib/tokens/field';
 
 /** Field label: LABEL caps 8px DIM above the input. */
 export const FIELD_LABEL: React.CSSProperties = { ...BIZ_LABEL };
@@ -31,28 +32,42 @@ export const FIELD_HINT: React.CSSProperties = {
 };
 
 /**
- * Input treatment. DARK-ONLY. The literal hexes/alphas mirror A.BORDER and the
- * manage FIELD_FILL - Tailwind arbitrary values cannot be interpolated at
- * build time. Focus ring is white-alpha, never amber.
+ * Input treatment. DARK-ONLY. This module COMPOSES THE FIELD CANON
+ * (@/lib/tokens/field) for the manage and business editors - it is a consumer,
+ * not a second source. Any alpha change happens in field.ts and arrives here.
+ *
+ * The literals below are the canon's values written out because Tailwind
+ * arbitrary values cannot be interpolated at build time; the inline styles
+ * import the tokens directly.
+ *
+ * ONE MECHANISM AT FOCUS: a border step to 28%, no ring. The old
+ * ring-1 + border construction put two concentric lines at different alphas
+ * (0.22 border inside a 0.34 ring); it was copied out of FIELD_ERROR_CLASS
+ * where both lines are the same red and the doubling is invisible.
+ * Focus is INK, never amber.
  */
 export const FIELD_INPUT_CLASS =
-  'w-full rounded-[11px] focus:outline-none focus:ring-1 focus:ring-[rgba(255,255,255,0.34)] focus:border-[rgba(255,255,255,0.22)] border border-[rgba(255,255,255,0.10)] transition-colors';
+  'w-full rounded-[14px] focus:outline-none focus:border-[rgba(255,255,255,0.28)] border border-[rgba(255,255,255,0.10)] transition-colors';
 
 export const FIELD_INPUT_STYLE: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)',
+  // NO border here on purpose: FIELD_INPUT_CLASS carries the border, and three
+  // consumers spread this style onto a BARE input inside an already-painted
+  // wrapper (CountrySelector:135, PhoneInputWithDialCode:156/193) where a
+  // second border would double the line.
+  background: FIELD_REST_BG,
   padding: '12px 13px',
   fontSize: 14,
   fontWeight: 400,
   color: A.INK,
-  borderRadius: 11,
+  borderRadius: 14,
 };
 
 /** Placeholder is CHROME at the 0.62 quiet floor; filled text is INK. */
 export const FIELD_PLACEHOLDER_CLASS = 'placeholder:text-[rgba(248,250,252,0.62)]';
 
-/** Error state: red hairline + red hint, no fill change. */
+/** Error state: ONE red border + red hint, no fill change, no ring. */
 export const FIELD_ERROR_CLASS =
-  'w-full rounded-[11px] focus:outline-none focus:ring-1 focus:ring-[#FF5A5A] border border-[#FF5A5A] transition-colors';
+  'w-full rounded-[14px] focus:outline-none border border-[#FF5A5A] transition-colors';
 
 /** Disabled: reads as present but inert. */
 export const FIELD_DISABLED_STYLE: React.CSSProperties = {

@@ -31,7 +31,10 @@ export const AMBER = '#F7931E';                             // brand amber accen
 /* ── Hairlines / fills on light bg ──────────────────────────────────── */
 export const HAIRLINE_INK_7 = 'rgba(255,255,255,0.08)';      // faint divider
 export const HAIRLINE_INK_8 = 'rgba(255,255,255,0.10)';      // hairline — pill borders, table dividers
-export const HAIRLINE_INK_10 = 'rgba(255,255,255,0.14)';     // input/dropdown border
+// Hairline only: button borders, card borders, dropdown MENU containers, row
+// dividers. NOT a field border — fields take the canon (@/lib/tokens/field).
+// The old "input/dropdown border" note was a fossil from before the field sweep.
+export const HAIRLINE_INK_10 = 'rgba(255,255,255,0.14)';
 export const HAIRLINE_INK_12 = 'rgba(255,255,255,0.18)';     // drag-handle / strong hairline
 export const INK_TINT_02 = 'rgba(255,255,255,0.03)';         // ultra-faint tint — search input bg, guide-card bg
 export const INK_TINT_04 = 'rgba(255,255,255,0.05)';         // very-faint tint — tile placeholder bg, fallback surfaces
