@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Switch } from '@/components/ui/switch';
+import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
@@ -49,6 +50,13 @@ const CATEGORIES: { key: string; label: string; sub: string; types: string[] }[]
 
 ];
 
+// Matches the personal SettingsToggleRow grammar used in the Privacy section:
+// checked fill is near-white ink, unchecked is a raised track with a hairline.
+const SETTINGS_SWITCH_CLASS = cn(
+  'relative before:absolute before:content-[""] before:-inset-y-2.5 before:-inset-x-1',
+  'data-[state=checked]:bg-[#F8FAFC] data-[state=unchecked]:bg-[rgba(255,255,255,0.14)]',
+  'data-[state=unchecked]:border data-[state=unchecked]:border-[rgba(255,255,255,0.18)]',
+);
 
 export default function NotificationsPage() {
   const { user } = useSupabaseSession();
@@ -146,6 +154,7 @@ export default function NotificationsPage() {
             checked={pushSwitchChecked}
             disabled={pushSwitchDisabled}
             onCheckedChange={handleTogglePush}
+            className={SETTINGS_SWITCH_CLASS}
           />
         </div>
 
@@ -175,6 +184,7 @@ export default function NotificationsPage() {
                   checked={categoryStates[c.key]}
                   disabled={isSaving}
                   onCheckedChange={(val) => updatePref(c.key, val)}
+                  className={SETTINGS_SWITCH_CLASS}
                 />
               </div>
             ))}
