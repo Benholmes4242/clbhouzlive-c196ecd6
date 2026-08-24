@@ -65,7 +65,7 @@ export const HAIRLINE_INK_7 = 'rgba(255,255,255,0.10)';
 export const HAIRLINE_INK_8 = 'rgba(255,255,255,0.12)';         // hairline/faint bg fill — 15 cross-app files
 export const HAIRLINE_INK_10 = 'rgba(255,255,255,0.14)';
 export const HAIRLINE_INK_12 = 'rgba(255,255,255,0.18)';        // cut-line / section divider hairline — 7 cross-app files
-export const HAIRLINE_INK_15 = 'rgba(255,255,255,0.22)';        // section divider on light bg with stronger emphasis
+export const HAIRLINE_INK_15 = 'rgba(255,255,255,0.22)';        // section divider on DARK bg, stronger emphasis (value is white-alpha post-flip)
 export const HAIRLINE_INK_18 = 'rgba(255,255,255,0.28)';        // hairline at strongest emphasis — TIED-state bar bg, faint row-number digits — 4 cross-app files
 
 // ============================================================================
@@ -100,20 +100,24 @@ export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text o
 // ============================================================================
 // Cross-app frequency (pre-Phase 6):
 //   _07: 47 files (borders) | _06: 30 files (placeholder bgs)
-// Use for: faint placeholder backgrounds, hairline borders on light surfaces.
+// Use for: faint placeholder backgrounds, hairline borders on DARK surfaces.
 // Phase 10 will sweep all cross-app sites.
 export const INK_TINT_02 = 'rgba(255,255,255,0.03)';            // ultra-faint ink tint — column-header strip bg — 11 cross-app files
 export const INK_TINT_04 = 'rgba(255,255,255,0.05)';            // very-faint ink tint — logo-tile bg, mini-header bg — 9 cross-app files
 export const INK_TINT_05 = 'rgba(255,255,255,0.06)';            // ultra-faint inline pill/skeleton bg — 11 cross-app files
-export const INK_TINT_06 = 'rgba(255,255,255,0.08)';            // light slate bg — placeholder containers, faint surfaces
-export const INK_TINT_07 = 'rgba(255,255,255,0.10)';            // light slate border — hairline dividers on light bg
+export const INK_TINT_06 = 'rgba(255,255,255,0.08)';            // faint white-alpha bg (name historical) — placeholder containers, faint surfaces
+export const INK_TINT_07 = 'rgba(255,255,255,0.10)';            // faint white-alpha border — hairline dividers on DARK bg (name historical)
 
 // ============================================================================
 // AMBER (brand)
 // ============================================================================
 export const AMBER = '#F7931E';
 export const AMBER_INK = '#D97706';
-export const AMBER_DEEP = '#C2620A';                         // identity/status amber (WIN tone, isWin) — NOT for eyebrows: those are INK
+// identity/status amber (WIN tone, isWin) — NOT for eyebrows. On dark, eyebrows
+// take the dark MUTE rgba(255,255,255,0.62), NOT INK: INK is now near-white and
+// would collide with the figures. AMBER_DEEP is never repointed — it does
+// identity work at FormSection:89 and TournamentsSection:200.
+export const AMBER_DEEP = '#C2620A';
 export const AMBER_TINT_08 = 'rgba(247,147,30,0.08)';        // faint amber selection/tint (canonical zero-padded name)
 export const AMBER_TINT_10 = 'rgba(247,147,30,0.10)';
 export const AMBER_TINT_04 = 'rgba(247,147,30,0.04)';        // very faint amber — selection state bg, 8 cross-app files
@@ -175,7 +179,7 @@ export const STATUS_LIVE_ON_DARK = '#5EE9A6';                 // live green that
 export const LIVE_INK = '#34D77F';                           // readable LIVE green text on DARK bg — counterpart to STATUS_LIVE — 7 cross-app files
 export const STATUS_LIVE_TINT_10 = 'rgba(16,185,129,0.10)';  // LIVE pill faint green fill — 3 cross-app sites
 export const STATUS_LIVE_BORDER = 'rgba(16,185,129,0.32)';   // LIVE pill border — 2 cross-app sites
-export const LIVE_DOT = '#22C55E';                            // bright pulse-dot green (green-500) — animated LIVE indicators on light bg — 7 cross-app files
+export const LIVE_DOT = '#22C55E';                            // bright pulse-dot green (green-500) — animated LIVE indicators — 7 cross-app files
 export const STATUS_NEGATIVE = '#C24A4A';                     // cancelled/warning — distinct from TOPAR_UNDER red (good) and from live green
 
 
