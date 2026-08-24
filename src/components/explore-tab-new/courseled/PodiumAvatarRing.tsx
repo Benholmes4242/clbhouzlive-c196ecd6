@@ -29,6 +29,7 @@ export function PodiumAvatarRing({
 }: PodiumAvatarRingProps) {
   return (
     <span
+      data-podium-avatar-ring
       className={className}
       style={{
         position: 'relative',
@@ -42,13 +43,23 @@ export function PodiumAvatarRing({
         ...style,
       }}
     >
-      <SquircleAvatar
-        src={src}
-        userId={userId}
-        alt={alt}
-        size={avatarSize}
-        hideRing
-      />
+      <span
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          display: 'flex',
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
+        <SquircleAvatar
+          src={src}
+          userId={userId}
+          alt={alt}
+          size={avatarSize}
+          hideRing
+        />
+      </span>
       <span
         aria-hidden
         style={{
