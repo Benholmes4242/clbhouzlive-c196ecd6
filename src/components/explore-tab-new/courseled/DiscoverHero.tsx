@@ -327,8 +327,11 @@ export function DiscoverHero({
           {sentence}
         </div>
 
-        {/* THE MEMBER, THEIR AVATAR AND THE COURSE (§1.2). Amber marks the
-            viewing member and nothing else — the same rule as the round tile. */}
+        {/* THE MEMBER AND THEIR AVATAR ON ROW ONE, THE COURSE ON ROW TWO
+            (BRIEF_DISCOVER_ONE_PAGE §1). Sharing one row cost the course most of
+            its width, and the first thing to go was the parenthetical — which is
+            the ONLY thing separating East from West at the same club. A line
+            break, not a restyle: every size, weight and colour is unchanged. */}
         <div
           style={{
             marginTop: 13,
@@ -352,8 +355,8 @@ export function DiscoverHero({
               fontWeight: 700,
               lineHeight: 1.2,
               color: row.is_self ? '#F7931E' : DISCOVER_FACT,
-              flexShrink: 0,
-              maxWidth: '45%',
+              flexShrink: 1,
+              minWidth: 0,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -361,21 +364,26 @@ export function DiscoverHero({
           >
             {row.display_name}
           </span>
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              lineHeight: 1.2,
-              color: DISCOVER_QUIET,
-              minWidth: 0,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
-            {region ? ` \u00B7 ${region}` : ''}
-          </span>
+        </div>
+
+        {/* ROW TWO — the course, then the region, across the full width. It
+            wraps to a second line rather than truncating: a clipped course name
+            is a course the member cannot identify. */}
+        <div
+          style={{
+            marginTop: 4,
+            fontSize: 12,
+            fontWeight: 600,
+            lineHeight: 1.25,
+            color: DISCOVER_QUIET,
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: 2,
+            overflow: 'hidden',
+          }}
+        >
+          {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
+          {region ? ` \u00B7 ${region}` : ''}
         </div>
       </div>
     </div>
