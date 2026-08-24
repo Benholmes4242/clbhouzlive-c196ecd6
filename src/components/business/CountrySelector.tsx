@@ -2,6 +2,7 @@ import { FIELD_INPUT_CLASS, FIELD_INPUT_STYLE, FIELD_PLACEHOLDER_CLASS } from '@
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, Search, Check } from 'lucide-react';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS as FIELD_PLACEHOLDER_CLASS_CANON } from '@/lib/tokens/field';
 import { cn } from '@/lib/utils';
 import { COUNTRIES, findCountryByName } from '@/constants/countries';
 import { MiniFlag } from '@/components/profile/handicap/whs/connect/MiniFlag';
@@ -125,8 +126,13 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search country..."
-                className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full h-9 pl-8 pr-3 text-sm rounded-[8px]`}
-                style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 32, paddingRight: 12, fontSize: 14, borderRadius: 8 }}
+                /* FIELD CANON (lib/tokens/field.ts). FIELD_INPUT_CLASS rests at
+                   a 10% border with a focus RING rather than a border/fill
+                   step, so it had nowhere to go; this now steps both channels.
+                   HEIGHT EXCEPTION (36px, h-9): sits inside the floating
+                   country panel above a scrolling list of countries. */
+                className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS_CANON} w-full h-9 pl-8 pr-3 text-sm`}
+                style={{ ...FIELD_INPUT_STYLE, background: undefined, borderRadius: undefined, padding: 0, paddingLeft: 32, paddingRight: 12, fontSize: 14 }}
               />
             </div>
           </div>

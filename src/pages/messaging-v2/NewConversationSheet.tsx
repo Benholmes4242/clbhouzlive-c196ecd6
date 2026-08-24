@@ -30,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { X, Check } from 'lucide-react';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -401,12 +402,13 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t('search.people')}
+            /* FIELD CANON (lib/tokens/field.ts). Was RAISED (#181F28, an opaque
+               panel) with a 0.5px EDGE hairline. Height is padding-derived
+               (~46px); stands alone. */
+            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
             style={{
               width: '100%',
               padding: '12px 14px',
-              borderRadius: 12,
-              background: RAISED,
-              border: `0.5px solid ${MSG.EDGE}`,
               color: MSG.INK,
               fontSize: 15,
               outline: 'none',
@@ -422,12 +424,12 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t('group.namePlaceholder')}
+              /* FIELD CANON (lib/tokens/field.ts) — group-title field, same
+                 construction as the people search above it. */
+              className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
               style={{
                 width: '100%',
                 padding: '12px 14px',
-                borderRadius: 12,
-                background: RAISED,
-                border: `0.5px solid ${MSG.EDGE}`,
                 color: MSG.INK,
                 fontSize: 15,
                 outline: 'none',
