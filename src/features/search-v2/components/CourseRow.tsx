@@ -7,6 +7,7 @@ import { BarChartGlyph } from '@/components/courses/YourStatsChip';
 import { useUserStatsRoundsForCourse } from '@/contexts/UserStatsCoursesContext';
 import { A, KICKER, NUM } from '@/features/courses/components/holes/analytical/tokens';
 import { ResultTile } from './ResultTile';
+import { ROW_BASE, S } from '../lib/tokens';
 
 interface Props { course: CourseHit; query: string; onSelect: () => void }
 
@@ -18,7 +19,7 @@ export function CourseRow({ course, query, onSelect }: Props) {
     <button
       type="button"
       onClick={onSelect}
-      className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02] text-left"
+      className={ROW_BASE}
     >
       <ResultTile>
         <MapPin size={18} color={A.MUTE} strokeWidth={2.25} />
@@ -26,7 +27,7 @@ export function CourseRow({ course, query, onSelect }: Props) {
       <div className="flex-1 min-w-0 flex flex-col gap-1">
         {/* Row 1: name + rating (single source of truth: CourseCommunityRating). */}
         <div className="flex items-center gap-2 min-w-0">
-          <p className="text-[14px] font-medium truncate min-w-0" style={{ color: '#0F172A' }}>
+          <p className="text-[14px] font-medium truncate min-w-0" style={{ color: S.INK }}>
             <Highlight text={course.name} query={query} />
           </p>
           {course.avg_rating != null && (
@@ -45,7 +46,7 @@ export function CourseRow({ course, query, onSelect }: Props) {
         )}
 
         {sub && (
-          <p className="text-[12px] truncate" style={{ color: '#475569' }}>
+          <p className="text-[12px] truncate" style={{ color: S.QUIET }}>
             {sub}
           </p>
         )}

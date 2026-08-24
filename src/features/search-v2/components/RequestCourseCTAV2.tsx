@@ -13,6 +13,7 @@ export function RequestCourseCTAV2({ prefillName, onBeforeOpen }: Props) {
     <div style={{ padding: '18px 16px 24px' }}>
       <RequestCourseCTA
         variant="hero"
+        tone="dark"
         prefillName={prefillName}
         onBeforeOpen={onBeforeOpen}
       />

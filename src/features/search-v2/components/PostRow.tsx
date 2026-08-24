@@ -1,6 +1,7 @@
 import { Quote } from 'lucide-react';
 import type { PostHit } from '../lib/searchNavigation';
 import { Highlight } from './Highlight';
+import { S } from '../lib/tokens';
 
 interface Props { post: PostHit; query: string; onSelect: () => void }
 
@@ -27,19 +28,19 @@ export function PostRow({ post, query, onSelect }: Props) {
     <button
       type="button"
       onClick={onSelect}
-      className="w-full flex items-start gap-3 px-4 py-3 active:bg-black/[0.02] text-left"
+      className="w-full flex items-start gap-3 px-4 py-3 active:bg-white/[0.04] text-left"
     >
       <div
         className="w-[42px] h-[42px] rounded-[12px] flex items-center justify-center shrink-0"
-        style={{ background: 'rgba(15,23,42,0.06)' }}
+        style={{ background: S.TILE }}
       >
-        <Quote size={18} color="#475569" strokeWidth={2.25} />
+        <Quote size={18} color={S.QUIET} strokeWidth={2.25} />
       </div>
       <div className="flex-1 min-w-0">
         <p
           className="text-[13.5px]"
           style={{
-            color: '#0F172A',
+            color: S.INK,
             lineHeight: 1.4,
             display: '-webkit-box',
             WebkitLineClamp: 2,
@@ -49,7 +50,7 @@ export function PostRow({ post, query, onSelect }: Props) {
         >
           <Highlight text={excerpt} query={query} />
         </p>
-        <p className="text-[11.5px] mt-1" style={{ color: '#94A3B8' }}>
+        <p className="text-[11.5px] mt-1" style={{ color: S.QUIET }}>
           {relTime(post.created_at)}
         </p>
       </div>

@@ -1,10 +1,17 @@
 import { useTranslation } from 'react-i18next';
 import { Plus, MapPin, MapPinPlus, Zap, Bell } from 'lucide-react';
 import { openRequestCourseSheet } from './requestCourseSheetStore';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface RequestCourseCTAProps {
   prefillName?: string;
   variant?: 'button' | 'row' | 'hero';
+  /**
+   * Surface the CTA sits on. 'dark' is used by the global search overlay
+   * (BRIEF_SEARCH_OVERLAY_DARK §4); CourseSearchSheet is still a light
+   * surface, so the light hero is retained rather than deleted.
+   */
+  tone?: 'light' | 'dark';
   className?: string;
   /** Called immediately before the sheet opens — use to close the parent overlay/sheet. */
   onBeforeOpen?: () => void;
@@ -31,7 +38,9 @@ export function RequestCourseCTA({
   variant = 'button',
   className = '',
   onBeforeOpen,
+  tone = 'light',
 }: RequestCourseCTAProps) {
+  const dark = tone === 'dark';
   const { t } = useTranslation('courses');
   const handleOpen = () => {
     onBeforeOpen?.();
@@ -44,13 +53,17 @@ export function RequestCourseCTA({
     const headline = q ? t('request.hero.headlineWithQuery', { query: truncate(q) }) : t('request.hero.headline');
     return (
       <div
-        className={`mx-auto w-full overflow-hidden rounded-2xl border border-border/60 bg-white ${className}`}
-        style={{ maxWidth: 340 }}
+        className={`mx-auto w-full overflow-hidden rounded-2xl ${className}`}
+        style={{
+          maxWidth: 340,
+          background: dark ? A.PANEL : '#FFFFFF',
+          border: `1px solid ${dark ? A.BORDER : 'hsl(var(--border) / 0.6)'}`,
+        }}
       >
         {/* Top amber band */}
         <div
           style={{
-            background: HERO_BAND_BG,
+            background: dark ? 'rgba(247,147,30,0.12)' : HERO_BAND_BG,
             padding: '24px 20px 20px',
             textAlign: 'center',
           }}
@@ -61,17 +74,17 @@ export function RequestCourseCTA({
               width: 52,
               height: 52,
               borderRadius: 15,
-              background: '#fff',
+              background: dark ? 'rgba(255,255,255,0.10)' : '#fff',
               marginBottom: 12,
             }}
           >
-            <MapPinPlus size={26} color={HERO_ACCENT} strokeWidth={2.25} />
+            <MapPinPlus size={26} color={dark ? A.AMBER : HERO_ACCENT} strokeWidth={2.25} />
           </div>
           <p
             style={{
               fontSize: 17,
               fontWeight: 500,
-              color: HERO_HEADLINE,
+              color: dark ? A.INK : HERO_HEADLINE,
               lineHeight: 1.3,
               margin: 0,
             }}
@@ -82,7 +95,7 @@ export function RequestCourseCTA({
             className="mx-auto"
             style={{
               fontSize: 13,
-              color: HERO_SUBTEXT,
+              color: dark ? A.MUTE : HERO_SUBTEXT,
               lineHeight: 1.5,
               maxWidth: 260,
               marginTop: 6,
@@ -96,14 +109,14 @@ export function RequestCourseCTA({
         <div style={{ padding: '16px 20px' }}>
           <div className="flex flex-col gap-2.5 mb-4">
             <div className="flex items-center gap-2.5">
-              <Zap size={17} color={HERO_ACCENT} strokeWidth={2.25} />
-              <span className="text-[13px] text-muted-foreground">
+              <Zap size={17} color={dark ? A.AMBER : HERO_ACCENT} strokeWidth={2.25} />
+              <span className={`text-[13px] ${dark ? '' : 'text-muted-foreground'}`} style={dark ? { color: A.MUTE } : undefined}>
                 {t('request.hero.perkQuick')}
               </span>
             </div>
             <div className="flex items-center gap-2.5">
-              <Bell size={17} color={HERO_ACCENT} strokeWidth={2.25} />
-              <span className="text-[13px] text-muted-foreground">
+              <Bell size={17} color={dark ? A.AMBER : HERO_ACCENT} strokeWidth={2.25} />
+              <span className={`text-[13px] ${dark ? '' : 'text-muted-foreground'}`} style={dark ? { color: A.MUTE } : undefined}>
                 {t('request.hero.perkNotify')}
               </span>
             </div>
