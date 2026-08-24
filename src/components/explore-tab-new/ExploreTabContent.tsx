@@ -555,7 +555,13 @@ export default function ExploreTabContent({
           data-media-act-controls
           style={{ marginTop: ACT_GAP - RHYTHM, marginBottom: ACT_GAP - RHYTHM }}
         >
-          <MediaActBar chip={mediaChip} onChipChange={changeChip} />
+          <MediaActBar
+            chip={mediaChip}
+            onChipChange={changeChip}
+            query={mediaQuery}
+            onQueryChange={setMediaQuery}
+          />
+
         </div>
 
         {/* MEDIA-CONTROLLED SUBTREE. This starts after the chips and search; the
