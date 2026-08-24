@@ -200,7 +200,7 @@ function CoursesPageHeroInner() {
         width: '100%',
         minHeight: HERO_MIN_HEIGHT,
         background,
-        backgroundColor: '#0F172A',
+        backgroundColor: '#15171F',
         display: 'flex',
         flexDirection: 'column',
         paddingTop: 'env(safe-area-inset-top, 0px)',

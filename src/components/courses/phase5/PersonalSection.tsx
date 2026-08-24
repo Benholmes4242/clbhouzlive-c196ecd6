@@ -42,8 +42,8 @@ export const PersonalSection: React.FC<PersonalSectionProps> = ({
   if (isLoading) {
     return (
       <section style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div style={{ height: 18, width: 120, background: 'rgba(15,23,42,0.06)', borderRadius: 4 }} />
-        <div style={{ height: 96, width: '100%', background: 'rgba(15,23,42,0.06)', borderRadius: 12 }} />
+        <div style={{ height: 18, width: 120, background: 'rgba(255,255,255,0.06)', borderRadius: 4 }} />
+        <div style={{ height: 96, width: '100%', background: 'rgba(255,255,255,0.06)', borderRadius: 12 }} />
       </section>
     );
   }

@@ -52,8 +52,8 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
         className={cn(
           "w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98]",
           isWantToPlay
-            ? "bg-white border-2 border-amber-300 shadow-sm"
-            : "bg-white border border-amber-200 hover:border-amber-300"
+            ? "bg-white/[0.06] border-2 border-amber-300/60 shadow-sm"
+            : "bg-white/[0.04] border border-amber-200/30 hover:border-amber-300/50"
         )}
       >
         <div className="flex items-center gap-3">
