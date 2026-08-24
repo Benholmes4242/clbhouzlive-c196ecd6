@@ -1,3 +1,5 @@
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+
 /**
  * THE ROUND'S MOMENT — the pure selector (BRIEF_ROUND_MOMENTS_V3 §2).
  *
@@ -11,7 +13,7 @@
  *
  * SEVEN KINDS, FIRST MATCH WINS (§2 — was six):
  *   1 EAGLE           any hole 2+ under par, or a 1.               #FFC93C
- *   2 FINISHED IN RED the round's TOTAL to-par is BELOW ZERO.      #C8102E
+ *   2 FINISHED IN RED the round's TOTAL to-par is BELOW ZERO.      canonical birdie red
  *   3 BIRDIE HAUL     4 or more birdies (d === -1 exactly).        PROVISIONAL
  *   4 STRONG FINISH   birdie or better on 2 of holes 16 / 17 / 18. #3B9DFF
  *   5 RUN             7+ CONSECUTIVE holes at par or better.       #22D07A
@@ -121,14 +123,16 @@ export interface Moment {
  * BIRDIE HAUL'S TONE IS NOT YET CHOSEN (§2.4). Ben picks it; the candidates and
  * their contrast against the hero's dark ground were reported with this brief.
  * THIS VALUE IS PROVISIONAL and is the only thing in v3 awaiting a decision.
- * It is clear of every other tone in the table and of #C8102E, which birdie
- * cells already ink.
+ * It is clear of every other tone in the table and of the canonical birdie red.
  */
 export const BIRDIE_HAUL_TONE_PROVISIONAL = '#B58CFF';
 
+/** Exact shared red used by filled birdie circles on Clubhouse dark scorecards. */
+export const FINISHED_IN_RED_TONE = TOPAR_UNDER_DARK;
+
 export const MOMENT_TONE: Record<MomentKind, string> = {
   eagle: '#FFC93C',
-  finishedInRed: '#C8102E',
+  finishedInRed: FINISHED_IN_RED_TONE,
   birdieHaul: BIRDIE_HAUL_TONE_PROVISIONAL,
   strongFinish: '#3B9DFF',
   run: '#22D07A',

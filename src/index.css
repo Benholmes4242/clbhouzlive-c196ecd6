@@ -57,8 +57,8 @@ img[src*="Silhouette"] {
  * Now using standard body scroll with overscroll prevention.
  */
 html {
-  background-color: #F8FAFC;
-  color-scheme: light; /* app is light theme; Clubhouse feed paints its own dark bg at the component level */
+  background-color: #15171F;
+  color-scheme: dark; /* clbhouz is dark-only; native controls and WebView paint follow */
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -68,8 +68,8 @@ html {
 
 body {
   @apply font-sans;
-  background-color: #F8FAFC;
-  color-scheme: light;
+  background-color: #15171F;
+  color-scheme: dark;
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -224,7 +224,7 @@ html.lightbox-open {
   /* ========================================
      PAGE BACKGROUND VARIABLES
      ======================================== */
-  --bg-page: #F8FAFC; /* slate-50 - primary page background for light theme */
+  --bg-page: #15171F; /* canonical dark-only page canvas */
   --bg-page-dark: #0F0F0F; /* Clubhouse dark mode background */
   
   /* ========================================
@@ -833,20 +833,18 @@ html.lightbox-open {
 }
 
 /* ── BOOT FLASH PREVENTION ─────────────────────────────────────────────────
-   The app shell defaults to --bg-page (#F8FAFC) which causes a white flash
-   between the splash screen and Clubhouse skeleton. Force the shell to black
-   on first render; individual light pages apply their own background via
-   body class or component-level styles once they mount.
+   The shell and route-specific boot surfaces share the canonical dark canvas,
+   preventing a light flash before React mounts.
    ──────────────────────────────────────────────────────────────────────── */
 body.route-clubhouse .app-shell {
-  background-color: #F8FAFC !important;
+  background-color: #15171F !important;
 }
 body.route-handicap .app-shell {
-  background-color: #F8FAFC !important;
+  background-color: #15171F !important;
 }
 
 body.route-auth .app-shell {
-  background-color: #F8FAFC !important;
+  background-color: #15171F !important;
 }
 
 /* Light routes restore the page background after mount */
@@ -894,21 +892,21 @@ html[data-immersive-route='true'] .app-shell {
   body.route-light .app-shell {
     background-color: var(--bg-page) !important;
   }
-  /* Clubhouse light edge-to-edge */
+  /* Clubhouse dark edge-to-edge */
   body.route-clubhouse,
   body.route-clubhouse #root {
-    background-color: #F8FAFC !important;
+    background-color: #15171F !important;
   }
   body.route-clubhouse .app-shell {
-    background-color: #F8FAFC !important;
+    background-color: #15171F !important;
   }
-  /* Handicap light edge-to-edge */
+  /* Handicap dark edge-to-edge */
   body.route-handicap,
   body.route-handicap #root {
-    background-color: #F8FAFC !important;
+    background-color: #15171F !important;
   }
   body.route-handicap .app-shell {
-    background-color: #F8FAFC !important;
+    background-color: #15171F !important;
   }
 }
 
@@ -987,7 +985,7 @@ html, body, #root {
      ======================================== */
   
   /* Core surfaces - Global Background: Cool blue-grey slate */
-  --bg-page: #F8FAFC;
+  --bg-page: #15171F;
   --bg-surface: #0F0F0F;
   --bg-card: rgba(255,255,255,0.06);
   --bg-card-hover: rgba(255,255,255,0.08);
@@ -1864,7 +1862,7 @@ body.route-clubhouse .global-header {
   inset: 0;
   height: 100svh;
   width: 100%;
-  background: #F8FAFC; /* match feed CANVAS so iPad gutters read as one continuous light surface */
+  background: #15171F; /* match the feed canvas so iPad gutters remain continuous */
   overflow: hidden;
 }
 
@@ -2446,26 +2444,26 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
   :root {
   /* ========================================
-     PHASE 6: UNIFIED COLOR SYSTEM
-     Light Grey + Slate + Orange Accent
+     DARK-ONLY UNIFIED COLOR SYSTEM
+     Charcoal + Light Ink + Orange Accent
      ======================================== */
     
-    /* Base canvas - Cool blue-grey slate */
-    --background: 210 40% 98%;           /* #F8FAFC */
-    --foreground: 210 13% 18%;           /* #1F2428 (text-primary) */
+    /* Base canvas */
+    --background: 225 11% 10%;           /* #15171F */
+    --foreground: 210 40% 98%;           /* #F8FAFC */
     
     /* Surfaces */
     --surface-slate: #3A3F46;            /* headers, footers, active pills */
-    --surface-card: #FAFAFB;             /* cards, tiles */
-    --surface-alt: #EDEFF2;              /* inputs, inactive pills, subtle bands */
+    --surface-card: #1B1E27;             /* cards, tiles */
+    --surface-alt: #272C37;              /* inputs, inactive pills, subtle bands */
     
     /* Cards */
-    --card: 240 17% 98%;                 /* #FAFAFB */
-    --card-foreground: 210 13% 18%;      /* #1F2428 */
+    --card: 227 18% 13%;                 /* #1B1E27 */
+    --card-foreground: 210 40% 98%;      /* #F8FAFC */
     
     /* Borders */
-    --border: 213 7% 84%;                /* #D4D7DB */
-    --border-subtle: #E5E7EA;
+    --border: 0 0% 100% / 0.10;
+    --border-subtle: rgba(255, 255, 255, 0.10);
     
     /* Shadows for light mode */
     --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -2473,41 +2471,41 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --shadow-medium: 0 4px 10px rgba(0, 0, 0, 0.12);
     
     /* Input / search / dropdown surfaces */
-    --surface-input: #EDEFF2;              /* --surface-alt */
-    --surface-input-hover: #E8EAEC;        /* hover state */
-    --surface-input-focus: #E0E2E4;        /* focus state */
+    --surface-input: #272C37;               /* --surface-alt */
+    --surface-input-hover: #303643;         /* hover state */
+    --surface-input-focus: #383F4D;         /* focus state */
     
     /* Placeholder / helper text */
-    --placeholder-foreground: rgba(31, 36, 40, 0.48);  /* softer text-primary */
+    --placeholder-foreground: rgba(248, 250, 252, 0.42);
     
     /* Text hierarchy */
-    --text-primary: #1F2428;             /* primary text */
-    --text-secondary: #5E666D;           /* secondary text */
-    --text-tertiary: #97A1AA;            /* meta text, timestamps */
+    --text-primary: #F8FAFC;             /* primary text */
+    --text-secondary: rgba(248, 250, 252, 0.62);
+    --text-tertiary: rgba(248, 250, 252, 0.42);
     
     /* Icons */
-    --icon-primary: #3A3F46;             /* main icons */
-    --icon-secondary: #747C84;           /* secondary icons */
-    --icon-disabled: #B4BAC0;            /* disabled state */
+    --icon-primary: #F8FAFC;             /* main icons */
+    --icon-secondary: rgba(248, 250, 252, 0.62);
+    --icon-disabled: rgba(248, 250, 252, 0.42);
     
     /* Primary Accent - Orange Brand Color (UNIFIED) */
     --primary-accent: #F7931E;           /* THE ONLY ACCENT */
     --accent-primary: #F7931E;           /* alias */
     
     /* Shadcn semantic tokens - updated to use orange accent */
-    --popover: 240 17% 98%;              /* #FAFAFB (same as card) */
-    --popover-foreground: 210 13% 18%;   /* #1F2428 */
+    --popover: 227 18% 13%;              /* #1B1E27 (same as card) */
+    --popover-foreground: 210 40% 98%;   /* #F8FAFC */
     --primary: 31 93% 54%;               /* #F7931E - orange accent (UNIFIED) */
     --primary-foreground: 0 0% 100%;     /* white text on accent */
-    --secondary: 210 11% 24%;            /* #3A3F46 (surface-slate) */
+    --secondary: 220 17% 18%;            /* #272C37 */
     --secondary-foreground: 0 0% 100%;   /* white text on slate */
-    --muted: 240 5% 92%;                 /* #EDEFF2 (surface-alt) */
-    --muted-foreground: 210 10% 38%;     /* #5E666D (text-secondary) */
+    --muted: 220 17% 18%;                /* #272C37 (surface-alt) */
+    --muted-foreground: 210 40% 98% / 0.62;
     --accent: 31 93% 54%;                /* #F7931E - orange accent */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --input: 210 8% 86%;                 /* #D4D7DB - border for inputs */
+    --input: 0 0% 100% / 0.10;
     --input-focus: 31 93% 54%;           /* #F7931E - orange accent for focus */
     --ring: 31 93% 54%;                  /* #F7931E - orange accent */
     --radius: 0.75rem;
@@ -2598,29 +2596,29 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   /* Clubhouse now inherits the global light tokens — no dark overrides. */
 
-  /* Light theme reset - forces light mode for components that need it regardless of page theme */
-  /* Used by Post Wizard, Review Wizard, and other modals that should always be light */
+  /* Legacy forced-theme scope. Dark-only keeps the selector for compatibility,
+     but its semantic roles now resolve to the global dark palette. */
   .light,
   .light * {
-    --background: 210 40% 98%;
-    --foreground: 210 13% 18%;
-    --card: 0 0% 100%;
-    --card-foreground: 210 13% 18%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 13% 18%;
-    --primary: 210 13% 18%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 210 13% 18%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 210 13% 18%;
+    --background: 225 11% 10%;
+    --foreground: 210 40% 98%;
+    --card: 227 18% 13%;
+    --card-foreground: 210 40% 98%;
+    --popover: 227 18% 13%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 31 93% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 17% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 17% 18%;
+    --muted-foreground: 210 40% 98% / 0.62;
+    --accent: 31 93% 54%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 210 13% 18%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 100% / 0.10;
+    --input: 0 0% 100% / 0.10;
+    --ring: 31 93% 54%;
   }
 
   body.route-hub,
@@ -2837,26 +2835,26 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 
   .dark {
-    /* Dark mode tokens (currently disabled - app is dark-only) */
-    --background: 210 20% 96%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 7.8%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 10.2%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
+    /* Legacy dark scope now matches the dark-only semantic baseline. */
+    --background: 225 11% 10%;
+    --foreground: 210 40% 98%;
+    --card: 227 18% 13%;
+    --card-foreground: 210 40% 98%;
+    --popover: 227 18% 13%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 31 93% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 17% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 17% 18%;
+    --muted-foreground: 210 40% 98% / 0.62;
     --accent: 31 93% 54%;
-    --accent-foreground: 210 20% 98%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 14.9%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 100% / 0.10;
+    --input: 0 0% 100% / 0.10;
+    --ring: 31 93% 54%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;

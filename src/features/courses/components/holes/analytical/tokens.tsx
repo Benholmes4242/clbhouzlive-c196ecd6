@@ -24,7 +24,7 @@
  */
 
 import React from 'react';
-import { TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_UNDER_DARK, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 
 /**
@@ -34,32 +34,32 @@ import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 export const TOPAR_RED = TOPAR_UNDER_LIGHT;
 
 export const A = {
-  CANVAS: '#F4F6F9',
-  PANEL: '#FFFFFF',
-  BORDER: '#EDF0F3',
-  INK: '#0E1216',
-  MUTE: '#68707B',
+  CANVAS: '#15171F',
+  PANEL: '#1B1E27',
+  BORDER: 'rgba(255,255,255,0.10)',
+  INK: '#F8FAFC',
+  MUTE: 'rgba(248,250,252,0.62)',
   /** Detail lines: near-ink body text, heavier than MUTE. */
-  BODY: '#3A424C',
-  DIM: '#A2A9B2',
+  BODY: 'rgba(248,250,252,0.72)',
+  DIM: 'rgba(248,250,252,0.42)',
   AMBER: '#F7931E',
-  AMBER_DEEP: '#C2620A',
-  RED: '#C8372B',
-  GREEN: '#0F8F4A',
+  AMBER_DEEP: '#F7931E',
+  RED: TOPAR_UNDER_DARK,
+  GREEN: '#34D77F',
   /**
    * HANDICAP INDEX MOVEMENT only (not par): IMPROVED = index came down,
    * DRIFTED = index went up. Sourced from the shared INDEX_DELTA token so one
    * pair serves every light surface. Nothing to do with the to-par convention,
    * where UNDER par is TOPAR_RED and OVER par is INK.
    */
-  IMPROVED: INDEX_DELTA.light.improved,
-  DRIFTED: INDEX_DELTA.light.drifted,
-  TRACK: '#E9EDF1',
+  IMPROVED: INDEX_DELTA.dark.improved,
+  DRIFTED: INDEX_DELTA.dark.drifted,
+  TRACK: '#272C37',
   /**
    * The ONLY internal rule permitted inside a panel, and only to separate a
    * headline from its supporting figures, or a table body from its summary row.
    */
-  HAIRLINE: 'rgba(14,18,22,0.08)',
+  HAIRLINE: 'rgba(255,255,255,0.10)',
 } as const;
 
 /**

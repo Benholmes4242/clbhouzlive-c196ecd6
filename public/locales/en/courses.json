@@ -1484,6 +1484,9 @@
     "momentsCount_one": "{{count}} moment",
     "mostPlayedAvgToPar": "Played to {{value}}",
     "mostPlayedLowest": "Lowest",
+    "mostPlayedLowLabel": "THE ONLY ROUND",
+    "mostPlayedLowLabel_other": "LOWEST THIS WEEK",
+    "mostPlayedField": "FIELD",
     "mostPlayedSeeAllAtCourse": "Visit this course",
     "mostPlayedNew": "New",
     "mostPlayedAvgToParBy_one": "Played to {{value}} by {{count}} member",
@@ -1533,8 +1536,8 @@
       "sublineAces_other": "{{count}} aces",
       "sublineAlbatrosses_one": "{{count}} albatross",
       "sublineAlbatrosses_other": "{{count}} albatrosses",
-      "sublineBoth": "{{aces}} and {{albatrosses}}, all time. An ace is commonly quoted at 12,500 to 1.",
-      "sublineOne": "{{feats}}, all time. An ace is commonly quoted at 12,500 to 1."
+      "sublineBoth": "{{aces}} and {{albatrosses}}, all time. Rarest first, then most recent. An ace is commonly quoted at 12,500 to 1.",
+      "sublineOne": "{{feats}}, all time. Rarest first, then most recent. An ace is commonly quoted at 12,500 to 1."
     },
     "feat": {
       "group": {
@@ -1572,16 +1575,25 @@
       "subline": "Everywhere clbhouz golfers played, and how it went.",
       "count": "{{rounds}} rounds · {{courses}} courses · {{days}} days",
       "seeAll": "See all {{count}} rounds",
-      "bestLabel": "BEST THIS WEEK",
+      "bestLabel": "Best this week",
       "overline": "THIS WEEK",
       "follow": "FOLLOW",
       "following": "FOLLOWING",
       "ace": "ACE",
       "albatross": "ALBATROSS",
       "unknownCourse": "A course",
-      "stablefordLabel": "Best stableford",
-      "birdiesLabel": "Most birdies",
+      "stablefordLabel": "Best Stableford points",
+      "birdiesLabel": "Most birdies in a round",
+      "improvedLabel": "Most improved handicap",
       "stablefordUnit": "points",
+      "gap": {
+        "shots_one": "{{count}} SHOT CLEAR",
+        "shots_other": "{{count}} SHOTS CLEAR",
+        "points_one": "{{count}} POINT CLEAR",
+        "points_other": "{{count}} POINTS CLEAR",
+        "clear": "{{count}} CLEAR",
+        "tied": "TIED"
+      },
       "moment": {
         "theCard": "The card",
         "fullScorecard": "Full scorecard",
@@ -1599,7 +1611,7 @@
           "hole": "HOLE {n}",
           "holes": "{n} HOLES",
           "inThree": "{n} IN THREE",
-          "inARow": "{n} IN A ROW",
+          "inARow": "{n} PARS IN A ROW",
           "birdies": "{n} BIRDIES"
         },
         "sentence": {
@@ -1633,7 +1645,8 @@
         "played": "No rounds at your courses this week.",
         "worldwide": "No rounds this week."
       }
-    }
+    },
+    "seam": "All time · from everyone"
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",

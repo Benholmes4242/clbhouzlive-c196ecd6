@@ -1026,8 +1026,8 @@
       "holeAndPar": "{{hole}} · 파 {{par}}",
       "sublineAces_other": "홀인원 {{count}}회",
       "sublineAlbatrosses_other": "알바트로스 {{count}}회",
-      "sublineBoth": "역대 {{aces}}, {{albatrosses}}. 홀인원 확률은 보통 12,500 대 1로 알려져 있습니다.",
-      "sublineOne": "역대 {{feats}}. 홀인원 확률은 보통 12,500 대 1로 알려져 있습니다."
+      "sublineBoth": "역대 {{aces}}, {{albatrosses}}. 희귀한 순, 그다음 최신순입니다. 홀인원 확률은 보통 12,500 대 1로 알려져 있습니다.",
+      "sublineOne": "역대 {{feats}}. 희귀한 순, 그다음 최신순입니다. 홀인원 확률은 보통 12,500 대 1로 알려져 있습니다."
     },
     "feat": {
       "group": {
@@ -1066,6 +1066,9 @@
     "mostPlayedPlayedToLabel": "기록",
     "mostPlayedAvgToPar": "{{value}}",
     "mostPlayedLowest": "최저",
+    "mostPlayedLowLabel": "유일한 라운드",
+    "mostPlayedLowLabel_other": "이번 주 최저",
+    "mostPlayedField": "필드",
     "mostPlayedNew": "신규",
     "trackedRounds": "기록된 라운드",
     "videosHeading": "최신 영상",
@@ -1073,9 +1076,19 @@
     "clipsHeading": "클립",
     "clipsAction": "모든 클립",
     "golfThisWeek": {
-      "stablefordLabel": "최고 스테이블포드",
-      "birdiesLabel": "버디 최다",
+      "bestLabel": "이번 주 베스트 라운드",
+      "stablefordLabel": "최고 스테이블포드 포인트",
+      "birdiesLabel": "한 라운드 최다 버디",
+      "improvedLabel": "핸디캡 최다 향상",
       "stablefordUnit": "포인트",
+      "gap": {
+        "shots_one": "{{count}}타 차",
+        "shots_other": "{{count}}타 차",
+        "points_one": "{{count}}포인트 차",
+        "points_other": "{{count}}포인트 차",
+        "clear": "{{count}} 차",
+        "tied": "동률"
+      },
       "moment": {
         "theCard": "스코어카드",
         "fullScorecard": "전체 스코어카드",
@@ -1093,7 +1106,7 @@
           "hole": "{n}번 홀",
           "holes": "{n} 홀",
           "inThree": "3홀 중 {n}",
-          "inARow": "{n} 연속",
+          "inARow": "{n} 파 연속",
           "birdies": "버디 {n}개"
         },
         "sentence": {
@@ -1129,7 +1142,8 @@
         "worldwide": "이번 주 라운드가 없습니다."
       }
     },
-    "mostPlayedSeeAllAtCourse": "이 코스 방문하기"
+    "mostPlayedSeeAllAtCourse": "이 코스 방문하기",
+    "seam": "전기간 · 모든 사람"
   },
   "statBrowse": {
     "colArea": "지역",

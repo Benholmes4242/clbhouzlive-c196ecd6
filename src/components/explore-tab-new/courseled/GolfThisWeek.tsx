@@ -12,10 +12,9 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
-import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { WHITE_ALPHA_08 } from '@/features/tourhub/_shared/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
@@ -41,8 +40,10 @@ import {
 } from './hooks/useGolfThisWeek';
 import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegionCounts';
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
+import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import { MiniScorecard } from './RoundShape';
 import {
+  FINISHED_IN_RED_TONE,
   selectMoment,
   type Moment,
 } from './roundMoment';
@@ -53,10 +54,14 @@ import {
   CARD_RADIUS,
   CARD_SHELL,
   CHIP_RADIUS,
+  DISCOVER_FACT,
+  DISCOVER_QUIET,
   InkAction,
   KICKER,
   LABEL,
   NUMF,
+  PODIUM_ACCENT,
+  PODIUM_GROUND,
   SANS,
   WELL_RADIUS,
 } from './tokens';
@@ -121,10 +126,26 @@ import {
    THE TILE IS A HERO, A MEMBER ROW AND A SCORECARD WELL: gradient hero 156 /
    member row with the score / a tinted well holding TWO ROWS OF NINE.
 
-   ONE CHART ONLY — THE SCORECARD (§S0.3). The trajectory variant was designed
-   and CUT: two chart types meant two heights, two sets of axis rules and a
-   selector deciding presentation as well as content. The hero already says what
-   to look for, so the card simply shows it.
+   §S0.3 IS OVERTURNED (AMENDMENT 1 TO BRIEF_ROUND_TILE_CURVE §A3). BOTH HALVES
+   ARE RECORDED so neither is rediscovered:
+
+   WHAT §S0.3 ACTUALLY REFUSED, and it still stands: a tile that CHOOSES BETWEEN
+   a scorecard and a trajectory. Its words were "two chart types meant two
+   heights, two sets of axis rules and a selector deciding presentation as well
+   as content". NOTHING HERE REINTRODUCES A SELECTOR — do not add one.
+
+   WHAT THIS DOES INSTEAD: adds ONE fixed element to EVERY tile. One shape, one
+   height, no branch. The scorecard is neither replaced nor chosen against; the
+   curve sits above it, inside the well, on every card, always.
+
+   THE COST, ACCEPTED KNOWINGLY (§0): the curve and the eighteen marks are the
+   same eighteen numbers. The marks say WHAT happened on each hole; the curve
+   says WHERE the round went. Both stay. Do not remove the OUT/IN rows and do
+   not shrink the marks to compensate.
+
+   THE CURVE IS INSIDE THE WELL (§A4): the well is the round's DATA and the
+   curve is data about the round. Above the well it would sit between the member
+   row and the card and read as belonging to the member.
 
    THE PHOTOGRAPH IS GONE (§S0.4). PHOTO_H, the scrim and the glass chip tokens
    went with it; the hero gradient carries the top of the card. */
@@ -140,27 +161,17 @@ const HERO_H = 156;
    when a round has no hole data and the well is empty (§S1.7, ACCEPTANCE K). */
 const GRID_H = 100;
 
-/* §S4.1 OVERTURNED BY BRIEF_ROUND_TILE_WHITE_WELL §0 — A WHITE WELL WITH A RULE.
-   §S4.1 read: "A TINTED WELL, NO BORDER. The tone separates it from the card and
-   an outline would be a second signal for one edge. The marker outer rings trace
-   against THIS colour (§S4.7), never white — a white ring on a tinted well
-   haloes."
-   WHY IT NO LONGER HOLDS: the tint was chosen INSTEAD OF a border, to separate
-   the well from the card. The well is now the card's own colour, so there is
-   nothing to separate and the job passes to the rule §S4.1 rejected only because
-   the tint was already doing it. And the tint was failing anyway — #F2F5F8
-   against a page canvas of #F4F6F9 is three points of grey, so the well never
-   read as a card edge; white against #F4F6F9 does. The well matches the leader
-   chips exactly.
-   THE SECOND HALF SURVIVES AND GETS EASIER: the marker spacer still takes the
-   WELL's colour (§S4.7) — that colour simply happens to be white now, so a
-   spacer outside a moment band is invisible, which is what a spacer wants. */
-const WELL = '#FFFFFF';
+/* BRIEF_DARK_ONLY_PART_B §2.2 — THE CLUBHOUSE FEED'S DARK SCORECARD WELL.
+   The previous white well was correct only on the retired light canvas. This
+   uses the feed round card's existing translucent scorecard-panel treatment;
+   marker spacers receive this exact value and moment-band spacers receive its
+   computed blend, so neither can halo. */
+const WELL = 'rgba(11,13,16,0.66)';
 
 /* 6, not 10 — see WELL_INNER. */
 const WELL_PAD_X = 6;
 /* THE ONE RULE IN THE WELL: under its header. */
-const WELL_RULE = 'rgba(11,15,20,0.07)';
+const WELL_RULE = A.HAIRLINE;
 
 /* THE WELL BLEEDS TO THE CARD EDGES, so its inner width is 244px — the width the
    marker/gap measurement table in RoundShape is measured at. That table is the
@@ -173,15 +184,15 @@ void WELL_INNER;
 
 /* THE INK DOES THE HIERARCHY. One genuinely dark ink and greys that are clearly
    different from each other, not four middling greys. */
-const INK = '#0B0F14';   // scores and totals
-const MID = '#5A6673';   // secondary text
-const HAIRLINE_INK = 'rgba(11,15,20,0.12)';
+const INK = DISCOVER_FACT;   // scores, names and totals are content
+const MID = DISCOVER_QUIET;  // all quiet chrome shares one tier
+const HAIRLINE_INK = A.HAIRLINE;
 
 /* THREE CLEARLY DIFFERENT GREYS FOR THE BAND (§S4.2 of the band brief). A.FAINT
    and A.GHOST do not exist on the shared ramp, so the band names them here
    against the same ink. THE BAND TILES ARE NOT TOUCHED BY THIS BRIEF. */
 const BAND_MUTE = MID;
-const BAND_FAINT = '#8A929C';
+const BAND_FAINT = DISCOVER_QUIET;
 
 
 
@@ -189,43 +200,34 @@ const BAND_FAINT = '#8A929C';
 const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 
 /**
- * §3 (BRIEF_BAND_TILES_LADDER_TIGHTEN) — THE FIGURE COLUMN IS MEASURED.
- * Tabular lining figures have a fixed advance, so the column can be derived
- * arithmetically from the strings a tile actually prints: 0.6em per figure,
- * sign or arrow glyph, 0.3em for a decimal point. A tile must not reserve
- * space for a qualifier it never shows (BEST STABLEFORD's old 40px gap).
+ * TILE HEIGHT. hero 156 + 8 pad + 20 member row + 8 + well (6 header + 6 +
+ * 1 rule + THE SHAPE 53 + 7 + 100 grid + 9 pad) = 384. THE WELL RUNS TO THE
+ * CARD'S BOTTOM EDGE — there is no card padding beneath it, so the tint
+ * finishes the tile instead of stopping 10px short. EVERY KIND LANDS ON IT
+ * because both regions are fixed, INCLUDING a round with NO HOLE DATA
+ * (§S1.7, ACCEPTANCE Q).
  */
-const BAND_FIG_SIZE = 12;
-const BAND_QUAL_SIZE = 8;
-const BAND_QUAL_GAP = 2;
-const bandGlyphEm = (ch: string) =>
-  /[0-9+\u2212\u2193\u2014-]/.test(ch) ? 0.6 : ch === '.' ? 0.3 : 0.28;
-const bandTextWidth = (s: string, size: number) =>
-  [...s].reduce((w, ch) => w + bandGlyphEm(ch) * size, 0);
-export const bandFigureColumnWidth = (
-  figures: { text: string; qual?: string }[],
-) =>
-  Math.ceil(
-    Math.max(
-      9,
-      ...figures.map(
-        (f) =>
-          bandTextWidth(f.text, BAND_FIG_SIZE) +
-          (f.qual ? BAND_QUAL_GAP + bandTextWidth(f.qual, BAND_QUAL_SIZE) : 0),
-      ),
-    ),
-  );
-
+/**
+ * THE SHAPE's region. THE EYEBROW IS GONE and the curve takes the whole block:
+ * the shape needs no label — it sits directly above the scorecard it summarises,
+ * and 15px of the region spent on the word "THE SHAPE" was 15px not spent on the
+ * curve. Block height is unchanged so the tile and its skeleton do not move.
+ */
+const SHAPE_H = 49;
+const SHAPE_BLOCK_H = 53;
+const WELL_H = 139 + SHAPE_BLOCK_H;
+const CARD_MIN_H = 331 + SHAPE_BLOCK_H;
 
 /**
- * TILE HEIGHT. hero 156 + 8 pad + 20 member row + 8 + well (6 header + 6 +
- * 1 rule + 7 + 96 grid + 9 pad = 135) = 327. THE WELL RUNS TO THE CARD'S
- * BOTTOM EDGE — there is no card padding beneath it, so the tint finishes the
- * tile instead of stopping 10px short. EVERY KIND LANDS ON IT because the grid
- * region is fixed, INCLUDING a round with NO HOLE DATA (§S1.7, ACCEPTANCE Q).
+ * THE FILLS ARE MIXED ON THE WELL, NOT ON THE PANEL (§A5). TrajectoryLine's dark
+ * fillOver/fillUnder are solids pre-mixed on #0B0D10 and are CORRECT on the four
+ * surfaces that use them; the well is rgba(11,13,16,0.66) over the card, a
+ * lighter ground, so the panel-mixed pair reads as a smudge here. These are the
+ * same lightness step taken off the well's resolved colour. NEVER brighten the
+ * shared tokens to fix this one surface.
  */
-const WELL_H = 139;
-const CARD_MIN_H = 331;
+const SHAPE_FILL_OVER = '#3D424A';
+const SHAPE_FILL_UNDER = '#4A2A2E';
 
 /** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
@@ -243,20 +245,19 @@ const AMBER = '#F7931E';
    canonical to-par grammar on dark. The light values above stay put because the
    band tiles and the well still use them. */
 /** Names and grosses: the hero's own white, so one white runs down the block. */
-const ROW_DARK_INK = 'rgba(255,255,255,0.94)';
+const ROW_DARK_INK = DISCOVER_FACT;
 /** Over/level par, and every quiet value on dark. FLOORED AT 0.78
     (BRIEF_HERO_TEXT_FLOOR_AND_DELTA §1): PhotoBand's 0.62 is unreadable at
     10.5px over a photograph. The INDEX MOVEMENT no longer uses this — see below. */
-const ROW_DARK_QUIET = 'rgba(255,255,255,0.78)';
+const ROW_DARK_QUIET = DISCOVER_QUIET;
 /** THE INDEX MOVEMENT KEEPS ITS COLOUR (§2). Colour where it means something:
     a falling index is better (green), a rising one is worse (red). The tour hero
     has no index movement, so PhotoBand's "colour only on a score" never governed
     this figure. Applies to the TRIANGLE and its FIGURE alike. */
-const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
+export const ROW_DARK_INDEX_FELL = INDEX_DELTA.dark.improved;
 const ROW_DARK_INDEX_ROSE = INDEX_DELTA.dark.drifted;
-/** UNDER PAR RESOLVES THROUGH getScoreColor — no hand-picked hex. TOPAR_RED
-    (#C8102E) is the LIGHT-surface red and goes muddy on a scrimmed photograph. */
-const ROW_DARK_TOPAR_UNDER = getScoreColor(-1, 'dark', 'standard');
+/** Under-par figures use the exact filled-birdie-circle red. */
+export const ROW_DARK_TOPAR_UNDER = FINISHED_IN_RED_TONE;
 
 
 
@@ -600,7 +601,7 @@ const TILE_BOTTOM_SCRIM =
    reintroduce it on that reasoning. */
 
 
-const fmtRel = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
+export const fmtRel = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`);
 
 /**
  * THE COPY (§S6) — THE SENTENCE IS THE HIGHEST-RISK ELEMENT ON THE CARD. Every
@@ -629,7 +630,7 @@ const FIGURE_FALLBACK: Record<string, string> = {
   hole: `HOLE ${FIGURE_PLACEHOLDER}`,
   holes: `${FIGURE_PLACEHOLDER} HOLES`,
   inThree: `${FIGURE_PLACEHOLDER} IN THREE`,
-  inARow: `${FIGURE_PLACEHOLDER} IN A ROW`,
+  inARow: `${FIGURE_PLACEHOLDER} PARS IN A ROW`,
   /* A QUANTITY TAKES ITS NOUN AFTER THE FIGURE (§S2.6). */
   birdies: `${FIGURE_PLACEHOLDER} BIRDIES`,
 };
@@ -647,14 +648,31 @@ const SENTENCE_FALLBACK: Record<string, string> = {
   noHoles: 'A round played. The hole by hole detail was not recorded.',
 };
 
-type TFn = (k: string, d?: string, o?: object) => string;
+export type TFn = (k: string, d?: string, o?: object) => string;
 
-function momentLabel(m: Moment, t: TFn): string | null {
+export function momentLabel(m: Moment, t: TFn): string | null {
   if (!m.labelKey) return null;
   return t(`${MK}.label.${m.labelKey}`, LABEL_FALLBACK[m.labelKey]);
 }
 
-function momentSentence(m: Moment, t: TFn): string {
+/**
+ * THE FIGURE'S WORDS, split off the ONE translatable template so a second
+ * surface (the page hero, BRIEF_DISCOVER_WORLD_CLASS §1) can print the same
+ * noun placement without owning a second copy of the templates. The rule is
+ * unchanged: an IDENTITY figure takes its noun BEFORE, a QUANTITY after.
+ */
+export function momentFigureParts(m: Moment, t: TFn): { before: string; after: string } {
+  if (m.figureKey == null) return { before: '', after: '' };
+  const template = t(`${MK}.figure.${m.figureKey}`, FIGURE_FALLBACK[m.figureKey]);
+  const idx = template.indexOf(FIGURE_PLACEHOLDER);
+  if (idx < 0) return { before: '', after: template };
+  return {
+    before: template.slice(0, idx).trim(),
+    after: template.slice(idx + FIGURE_PLACEHOLDER.length).trim(),
+  };
+}
+
+export function momentSentence(m: Moment, t: TFn): string {
   const f = m.facts;
   const key = `${MK}.sentence.${m.sentenceKey}`;
   const fb = SENTENCE_FALLBACK[m.sentenceKey];
@@ -700,22 +718,35 @@ function FigureLine({
      "8 IN A ROW" in green would be decoration, and §S1.4 exists to stop exactly
      that. A SCORE carries a to-par meaning — on FINISHED IN THE RED the figure
      IS the round's to-par — so colouring it is the same rule that puts the red
-     on BEST THIS WEEK's -3. PLAIN's tone is white, so it is unchanged. The
-     NOUN and the sentence stay as they are. */
+     on BEST THIS WEEK's -3. The NOUN and the sentence stay as they are.
+
+     BRIEF_DISCOVER_WORLD_CLASS §2 EXTENDS THIS TO THE PLAIN CARD'S GROSS. A
+     gross IS a score — 83 and 78 were the largest numerals on the page and both
+     rendered the same white, so a +12 looked exactly as good as a −3. It now
+     resolves through the SAME getScoreColor call, so under par is the dark
+     under-par red and level/over is ink-on-dark. No new value, no new rule; the
+     member row's figures directly beneath already did this and are untouched. */
+  /* THE RUN'S FIGURE AND NOUN ARE GREEN (BRIEF_RUN_GREEN_FIGURE). The run is a
+     positive streak, so its quantity figure and the surrounding words take the
+     same falling-index green as the eyebrow — the one moment where a quantity
+     carries the moment's own colour. */
+  const runGreen = moment.kind === 'run' ? ROW_DARK_INDEX_FELL : null;
+
   const numStyle: React.CSSProperties = {
     ...NUMF,
     fontSize: 46,
     fontWeight: 800,
     lineHeight: 1,
     letterSpacing: '-0.06em',
-    /* §5.2 — THE RULE IS UNCHANGED, THE SOURCE OF THE COLOUR IS NOT: a
-       score-role figure resolves through getScoreColor, the same call PhotoBand
-       makes, and never through moment.tone. They may render the same red today;
-       only one of them is the to-par grammar. A QUANTITY stays white. */
+    /* Tile-hero figures are white to match the course name above, EXCEPT a
+       score figure that carries to-par meaning (under-par red) and a RUN
+       figure (green). FINISHED IN THE RED's figure IS the round's to-par, so
+       it shares the same under-par red as the label and the birdie circles. */
     color:
-      moment.figureRole === 'score' && moment.figure != null
-        ? getScoreColor(moment.figure, 'dark', 'standard')
-        : '#FFFFFF',
+      runGreen ??
+      (moment.figureRole === 'score' && moment.figure != null && moment.figure < 0
+        ? FINISHED_IN_RED_TONE
+        : DISCOVER_FACT),
   };
 
   const wordStyle: React.CSSProperties = {
@@ -724,7 +755,7 @@ function FigureLine({
     letterSpacing: '0.14em',
     lineHeight: 1,
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.78)',
+    color: runGreen ?? DISCOVER_FACT,
   };
 
   if (moment.figureRole === 'score' && moment.figure != null) {
@@ -738,10 +769,12 @@ function FigureLine({
   }
 
   if (moment.figureKey == null || moment.figure == null) {
-    /* PLAIN: the gross, with the to-par beside it on the same line. */
+    /* PLAIN: the gross and adjacent to-par are both hero white. */
     return (
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, minWidth: 0 }}>
-        <span style={numStyle}>{gross ?? '\u2014'}</span>
+        <span style={numStyle}>
+          {gross ?? '\u2014'}
+        </span>
         {toParText && <span style={{ ...wordStyle, letterSpacing: '0.06em' }}>{toParText}</span>}
       </div>
     );
@@ -784,10 +817,14 @@ interface CardProps {
  *
  * Top to bottom (§S4.1): HERO 178 / member row with the score / THE WELL.
  *
- * IT GIVES UP COMPLETENESS DELIBERATELY (§S0.3). No treatment except the grind
- * shows all eighteen holes, because THE SCORECARD IS ONE TAP AWAY AND DOES IT
- * PROPERLY, and a rail tile that tries to be the scorecard ends up as a small
- * unreadable scorecard — which is exactly what shipped before this.
+ * THIS CLAIM IS NO LONGER TRUE AND IS CORRECTED, NOT DELETED (AMENDMENT 1 §A3):
+ * it read "IT GIVES UP COMPLETENESS DELIBERATELY (§S0.3) — no treatment except
+ * the grind shows all eighteen holes". The mini scorecard already draws eighteen
+ * marks, and THE SHAPE now draws the same eighteen numbers cumulatively, so the
+ * tile is complete twice over.
+ * WHAT SURVIVES OF THE ORIGINAL WARNING: a rail tile must not try to BE the
+ * scorecard — no figures per hole, no columns, no yardages. THE SCORECARD IS
+ * STILL ONE TAP AWAY and still does it properly.
  *
  * THE PHOTOGRAPH IS GONE (§S4.6): the hero gradient replaces it, so the course
  * is named in words at the top of the hero.
@@ -958,7 +995,7 @@ function GolfThisWeekCard({
                 fontWeight: 700,
                 lineHeight: 1.15,
                 letterSpacing: '-0.01em',
-                color: 'rgba(255,255,255,0.94)',
+                 color: DISCOVER_FACT,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -973,7 +1010,7 @@ function GolfThisWeekCard({
                   fontSize: 9.5,
                   fontWeight: 600,
                   lineHeight: 1,
-                  color: 'rgba(255,255,255,0.78)',
+                   color: DISCOVER_QUIET,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -991,7 +1028,7 @@ function GolfThisWeekCard({
               lineHeight: 1,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.78)',
+               color: DISCOVER_QUIET,
             }}
           >
             {relativeDay(row.play_date, t)}
@@ -1025,7 +1062,7 @@ function GolfThisWeekCard({
                   ? ROW_DARK_INDEX_FELL
                   : moment.kind === 'finishedInRed'
                     ? ROW_DARK_TOPAR_UNDER
-                    : 'rgba(255,255,255,0.78)',
+                    : DISCOVER_QUIET,
             }}
           >
             {label}
@@ -1048,7 +1085,7 @@ function GolfThisWeekCard({
             fontSize: 10.5,
             fontWeight: 500,
             lineHeight: 1.3,
-            color: 'rgba(255,255,255,0.82)',
+            color: DISCOVER_FACT,
             display: '-webkit-box',
             WebkitBoxOrient: 'vertical',
             WebkitLineClamp: 2,
@@ -1161,13 +1198,12 @@ function GolfThisWeekCard({
         </div>
       </div>
 
-      {/* THE LIGHT HALF. The well keeps its own container so it still bleeds to
+      {/* THE SCORECARD HALF. The well keeps its own container so it still bleeds to
           the card edges. */}
       <div style={{ padding: '0 10px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* ===================== THE SCORECARD WELL (§S4) =====================
-            A WHITE WELL WITH A HAIRLINE (BRIEF_ROUND_TILE_WHITE_WELL §1/§2) — the
-            well is now the card's own #FFFFFF and matches the leader chips, so
-            the boundary is DRAWN rather than implied by a tone. The tint and the
+            A DARK FEED WELL WITH A HAIRLINE (BRIEF_DARK_ONLY_PART_B §2.2). The
+            boundary is DRAWN rather than implied by a tone. The tint and the
             border are ALTERNATIVES, not additions.
             IT RUNS TO THE CARD'S BOTTOM EDGE: the well finishing 10px short of
             the tile read as an unfinished panel, so the bottom corners take the
@@ -1218,7 +1254,7 @@ function GolfThisWeekCard({
           >
             {/* §3 — the row label darkens to the card's ink with the rest of the
                 chrome. */}
-            <span style={{ ...LABEL, fontSize: 8, color: INK }}>
+            <span style={{ ...LABEL, fontSize: 8, color: DISCOVER_QUIET }}>
               {t('discover.golfThisWeek.moment.theCard', 'The card')}
             </span>
             {/* THE TAP AFFORDANCE, ON EVERY CARD (§S4.2). A hero with a hidden
@@ -1228,7 +1264,7 @@ function GolfThisWeekCard({
                 ...LABEL,
                 fontSize: 8,
                 /* §3 — the action and its chevron darken to the card's ink. */
-                color: INK,
+                color: DISCOVER_QUIET,
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 2,
@@ -1237,6 +1273,33 @@ function GolfThisWeekCard({
               {t('discover.golfThisWeek.moment.fullScorecard', 'Full scorecard')}
               <ChevronRight size={9} strokeWidth={3} />
             </span>
+          </div>
+
+          {/* ===================== THE SHAPE (BRIEF_ROUND_TILE_CURVE §2) =========
+              THE EXISTING TrajectoryLine, IMPORTED — not a second curve. Its own
+              colour rules govern and are not overridden: the graded stroke, the
+              level-par fill split, earned red, and gold-only beads. THE WINNER'S
+              GOLD DOES NOT RECOLOUR IT. It uses TrajectoryLine's native
+              per-round self-scaling, matching Clubhouse. The only things this
+              caller supplies are geometry (height, viewWidth, no ticks) and the
+              fills mixed on the well (§A5).
+              NOT "ENERGY", NOT "POWER", NOT "FORM" — THE SHAPE. */}
+          <div style={{ height: SHAPE_BLOCK_H, boxSizing: 'border-box', paddingTop: 4 }}>
+            <div style={{ height: SHAPE_H, position: 'relative' }}>
+              {shape && (
+                <TrajectoryLine
+                  holes={shape.holes}
+                  surface="dark"
+                  height={SHAPE_H}
+                  viewWidth={WELL_INNER}
+                  showTicks={false}
+                  padY={0}
+                  strokeWidth={1.6}
+                  fillOverColor={SHAPE_FILL_OVER}
+                  fillUnderColor={SHAPE_FILL_UNDER}
+                />
+              )}
+            </div>
           </div>
 
           <div
@@ -1273,6 +1336,14 @@ interface Props {
   onRegionChange?: (sel: RegionSelection | null) => void;
   onCardPress: (r: CircleRoundRow) => void;
   onSeeAll: () => void;
+  /**
+   * BRIEF_DISCOVER_WORLD_CLASS §1.5 — the readout and the pills STAY WHERE THEY
+   * ARE, beneath the hero. But the safe-area + chrome-island clearance lives in
+   * this section's first row (MICRO_BRIEF_ROUNDS_SECTION_CHROME S1.4), and when
+   * a full-bleed hero renders above it that hero owns the notch instead. False
+   * drops the clearance to the ordinary section gap; nothing else moves.
+   */
+  chromeClearance?: boolean;
   style?: React.CSSProperties;
 }
 
@@ -1284,6 +1355,7 @@ export function GolfThisWeek({
   onRegionChange,
   onCardPress,
   onSeeAll,
+  chromeClearance = true,
   style,
 }: Props) {
   const { t } = useTranslation('courses');
@@ -1327,9 +1399,6 @@ export function GolfThisWeek({
 
   const pending = !!userId && (roundsQuery.isPending || !scopeCourses.ready);
   if (pending) return <GolfThisWeekShell />;
-
-  const courseNameFor = (r: CircleRoundRow) =>
-    meta?.get(r.course_id ?? '')?.name ?? r.course_name ?? '';
 
   /* THE BAND IS FOUR COMPARISONS OF EQUAL WEIGHT (§2) — tiles, not a sentence
       with footnotes. Each is self-contained: label, figure, who, where.
@@ -1484,6 +1553,13 @@ export function GolfThisWeek({
      figure's baseline. Colour appears only where it MEANS something: red on an
      under-par to-par, red on a birdie count, green on a falling index. The emoji
      marks the category; nothing else needs to. No accent bar, no tint. */
+  type PodiumFigure = {
+    text: string;
+    tone: string;
+    qual?: string;
+    qualTone?: string;
+  };
+
   const bandTiles: {
     key: string;
     emoji?: string;
@@ -1492,21 +1568,18 @@ export function GolfThisWeek({
         Absent on BEST THIS WEEK, whose qualifier is data and stays per-row. */
     unit?: string;
     row: CircleRoundRow;
-    course: string;
     /** §2 — places 2 and 3, member-capped. Empty is a normal week. */
     runners: CircleRoundRow[];
     /** The tile's comparison for ONE row: the figure, and — only where the
         qualifier varies by round — that row's qualifier. */
-    figureOf: (r: CircleRoundRow) => {
-      text: string;
-      tone: string;
-      qual?: string;
-      qualTone?: string;
-    };
-    /** §3 — the tile's WORST-CASE figure, so the measured column has a stable
-        floor and does not jitter one digit when the scope pill changes the
-        data under it. The column is max(measured rows, this). */
-    figureFloor?: { text: string; qual?: string };
+    figureOf: (r: CircleRoundRow) => PodiumFigure;
+    /** ONE DIRECTION FLAG (§4): lower figures win only BEST THIS WEEK. */
+    lowerWins: boolean;
+    /** Numeric comparison value. Improved uses positive improvement magnitude. */
+    valueOf: (r: CircleRoundRow) => number;
+    accent: string;
+    chipGround: string;
+    gapKind: 'shots' | 'points' | 'clear';
   }[] = [];
 
 
@@ -1517,7 +1590,11 @@ export function GolfThisWeek({
     const d = (r.gross as number) - (r.course_par as number);
     return {
       text: d === 0 ? 'E' : d < 0 ? `\u2212${Math.abs(d)}` : `+${d}`,
-      tone: d < 0 ? TOPAR_RED : A.MUTE,
+      /* §3.2 (BRIEF_DISCOVER_WORLD_CLASS) — THE DARK RED, NOT TOPAR_RED. The
+         chips sit on A.PANEL, and TOPAR_RED (#C8102E) is the LIGHT-surface red:
+         at 12px on a dark panel it goes muddy and stops reading as red at all.
+         Same canonical call the hero and the member row make. */
+      tone: d < 0 ? ROW_DARK_TOPAR_UNDER : A.MUTE,
     };
   };
 
@@ -1525,70 +1602,104 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'best',
       emoji: '\uD83D\uDD25', // FIRE
-      label: t('discover.golfThisWeek.bestLabel', 'BEST THIS WEEK'),
+      label: t('discover.golfThisWeek.bestLabel', 'Best this week'),
       row: best.row,
-      course: courseNameFor(best.row),
       /* The hero is `bestOfWeek`'s winner, unchanged; the sort's first place is
          the same row, so the runners are places 2 and 3 of that same list. */
       runners: bestRanked.slice(1),
-      /* §S1.4 — the figure itself stays INK; only the to-par is coloured. What
-         gets coloured is the TO-PAR, never the count. */
+      lowerWins: true,
+      valueOf: (r) => r.gross as number,
+      accent: PODIUM_ACCENT.gold,
+      chipGround: PODIUM_GROUND.gold,
+      gapKind: 'shots',
+      /* GOLD REPORTS THE WIN (§0), not under/over par. The whole line remains
+         gold even when the winning round's qualifier is +3. */
       figureOf: (r) => {
         const tp = toParOf(r);
         return {
           text: String(r.gross ?? '\u2014'),
-          tone: INK,
+          tone: PODIUM_ACCENT.gold,
           qual: tp?.text,
-          qualTone: tp?.tone,
+          qualTone: PODIUM_ACCENT.gold,
         };
       },
-      figureFloor: { text: '77', qual: '+16' },
     });
   }
   if (bestStableford) {
     bandTiles.push({
       key: 'stableford',
       emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
-      label: t('discover.golfThisWeek.stablefordLabel', 'Best stableford'),
-      unit: t('discover.golfThisWeek.stablefordUnit', 'points'),
+      label: t('discover.golfThisWeek.stablefordLabel', 'Best Stableford points'),
       row: bestStableford,
-      course: courseNameFor(bestStableford),
       runners: stablefordRanked.slice(1),
-      figureOf: (r) => ({ text: String(r.stableford_points), tone: INK }),
-      figureFloor: { text: '41' },
+      lowerWins: false,
+      valueOf: (r) => r.stableford_points as number,
+      accent: PODIUM_ACCENT.white,
+      chipGround: PODIUM_GROUND.white,
+      gapKind: 'points',
+      figureOf: (r) => ({ text: String(r.stableford_points), tone: PODIUM_ACCENT.white }),
     });
   }
   if (mostBirdies) {
     bandTiles.push({
       key: 'birdies',
       emoji: '\uD83D\uDC26', // BIRD
-      label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
-      unit: t('discover.friendsRail.birdies', 'birdies'),
+      label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies in a round'),
       row: mostBirdies,
-      course: courseNameFor(mostBirdies),
       runners: birdiesRanked.slice(1),
+      lowerWins: false,
+      valueOf: (r) => r.birdies as number,
+      accent: PODIUM_ACCENT.red,
+      chipGround: PODIUM_GROUND.red,
+      gapKind: 'clear',
       /* A birdie count IS a count of under-par holes, so the red is literal. */
-      figureOf: (r) => ({ text: String(r.birdies), tone: TOPAR_RED }),
-      figureFloor: { text: '5' },
+      figureOf: (r) => ({ text: String(r.birdies), tone: ROW_DARK_TOPAR_UNDER }),
     });
   }
   if (mostImproved) {
     bandTiles.push({
       key: 'improved',
       emoji: '\uD83D\uDCAA', // FLEXED ARM
-      label: t('discover.golfThisWeek.improvedLabel', 'MOST IMPROVED'),
-      unit: t('discover.friendsRail.index', 'HCP'),
+      label: t('discover.golfThisWeek.improvedLabel', 'Most improved handicap'),
       row: mostImproved,
-      course: courseNameFor(mostImproved),
       runners: improvedRanked.slice(1),
-      /* A falling index IS better — the index-delta scale, with a down arrow. */
+      lowerWins: false,
+      /* Convert negative deltas to positive improvement magnitudes. This keeps
+         one higher-wins deficit formula: −0.4 leads −0.2, and the chaser is
+         0.2 behind, never 0.2 ahead. */
+      valueOf: (r) => Math.abs(r.delta_index as number),
+      accent: PODIUM_ACCENT.green,
+      chipGround: PODIUM_GROUND.green,
+      gapKind: 'clear',
       figureOf: (r) => ({
-        text: `\u2193${Math.abs(r.delta_index as number).toFixed(1)}`,
-        tone: A.IMPROVED,
+        text: `\u2212${Math.abs(r.delta_index as number).toFixed(1)}`,
+        tone: PODIUM_ACCENT.green,
       }),
-      figureFloor: { text: '\u21930.4' },
     });
   }
+
+  const podiumGap = (tile: (typeof bandTiles)[number], gap: number) => {
+    if (gap === 0) return t('discover.golfThisWeek.gap.tied', 'TIED');
+    if (tile.gapKind === 'shots') {
+      return t('discover.golfThisWeek.gap.shots', '{{count}} SHOTS CLEAR', { count: gap });
+    }
+    if (tile.gapKind === 'points') {
+      return t('discover.golfThisWeek.gap.points', '{{count}} POINTS CLEAR', { count: gap });
+    }
+    return t('discover.golfThisWeek.gap.clear', '{{count}} CLEAR', { count: gap });
+  };
+
+  const podiumDeficit = (
+    tile: (typeof bandTiles)[number],
+    row: CircleRoundRow,
+  ) => {
+    const leaderValue = tile.valueOf(tile.row);
+    const rowValue = tile.valueOf(row);
+    const gap = tile.lowerWins ? rowValue - leaderValue : leaderValue - rowValue;
+    const precision = tile.key === 'improved' ? 1 : 0;
+    const magnitude = Math.abs(gap).toFixed(precision);
+    return `${tile.lowerWins ? '+' : '\u2212'}${magnitude}`;
+  };
 
 
 
@@ -1615,7 +1726,9 @@ export function GolfThisWeek({
           gap: 12,
           /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
              gives 16px of clearance everywhere. */
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
+          paddingTop: chromeClearance
+            ? 'calc(env(safe-area-inset-top, 0px) + 70px)'
+            : 0,
           marginBottom: 12,
           minWidth: 0,
         }}
@@ -1625,7 +1738,7 @@ export function GolfThisWeek({
             describe what is CURRENTLY rendered. */}
         <span
           className="tabular-nums"
-          style={{ ...KICKER, color: A.MUTE, flex: '0 0 auto' }}
+          style={{ ...KICKER, color: DISCOVER_QUIET, flex: '0 0 auto' }}
         >
           {/* The window is a THIRD SEGMENT OF THE SAME TEMPLATE so a translator
               can reorder all three. It is FIXED at seven days — never derived
@@ -1671,7 +1784,7 @@ export function GolfThisWeek({
           style={{
             fontSize: 13,
             fontWeight: 600,
-            color: A.MUTE,
+            color: DISCOVER_QUIET,
             fontFamily: SANS,
             padding: '10px 0 0',
           }}
@@ -1685,7 +1798,9 @@ export function GolfThisWeek({
           className="scrollbar-hide"
           style={{
             display: 'flex',
-            alignItems: 'stretch',
+            /* Sparse podiums deliberately collapse to their own content height.
+               Ben chose compact sparse cards over equal-height empty space. */
+            alignItems: 'flex-start',
             gap: 9,
             overflowX: 'auto',
             marginBottom: 12,
@@ -1694,6 +1809,7 @@ export function GolfThisWeek({
           {bandTiles.map((tile) => (
             <div
               key={tile.key}
+              data-band-podium={tile.key}
               /* EVERY BAND TILE IS ITS OWN ROUND, so tapping one opens THAT
                  round's scorecard — the same sheet the round tiles open. Not a
                  <button>: these tiles sit in the same family as the round tiles,
@@ -1751,183 +1867,280 @@ export function GolfThisWeek({
                   gap: 4,
                 }}
               >
-                {/* §S3.3 — 11px with lineHeight 1 keeps the emoji on the label's
-                    baseline across all four tiles. */}
-                <span style={{ fontSize: 11, lineHeight: 1 }}>{tile.emoji}</span>
+                {/* Emoji remain deliberate on celebratory band tiles. Their
+                    platform-owned colours get a neutral local surface rather
+                    than an unpredictable filter or shadow. */}
+                <span
+                  style={{
+                    position: 'relative',
+                    width: 11,
+                    height: 11,
+                    flex: '0 0 11px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 11,
+                    lineHeight: 1,
+                  }}
+                >
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      inset: -2,
+                      borderRadius: '50%',
+                      background: WHITE_ALPHA_08,
+                    }}
+                  />
+                  <span
+                    style={{
+                      position: 'relative',
+                      opacity: 1,
+                      color: DISCOVER_FACT,
+                      WebkitTextFillColor: 'initial',
+                      fontFamily:
+                        '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
+                      fontWeight: 400,
+                      fontStyle: 'normal',
+                      fontVariantEmoji: 'emoji',
+                    }}
+                  >
+                    {tile.emoji}
+                  </span>
+                </span>
                 {tile.label}
-                {tile.unit ? (
-                  <span style={{ marginLeft: 'auto' }}>{tile.unit}</span>
-                ) : null}
               </div>
 
-              {/* ONE LADDER (§1). The hero block is DISSOLVED: every row —
-                  including the leader's — has the same columns in the same
-                  order, RANK, FIGURE, AVATAR, NAME, CHEVRON, and the figure
-                  column is FIXED WIDTH and LEFT-ALIGNED so 68 / 73 / 77 stack
-                  down one edge (its width MEASURED per tile, §3). The leader's
-                  row is not BIGGER: BRIEF_BAND_TILES_LADDER_TIGHTEN drops its
-                  figure to row size and marks first place three ways instead —
-                  weight 800, an inked rank digit and a light ground on the row.
-                  Its avatar stays 20 against 16; it costs no column width. */}
+              {/* BRIEF_BAND_TILES_PODIUM — one leader with a face, the margin,
+                  then up to two chasers. No field-relative progress bar: the
+                  exact deficit is the comparison. */}
               <div
                 style={{
                   marginTop: 8,
                   display: 'flex',
                   flexDirection: 'column',
+                  alignItems: 'stretch',
                 }}
               >
-                {[tile.row, ...tile.runners].map((r, i) => {
-                  const f = tile.figureOf(r);
-                  const lead = i === 0;
-                  /* §3 — MEASURED, NOT GUESSED. The column takes this tile's own
-                     widest printed figure (plus its to-par where it has one) at
-                     the new sizes, floored by the tile's worst case so the
-                     ladder cannot shift a digit's width when the scope pill
-                     changes the data. Rows 2 and 3 no longer pay for a leader's
-                     size, and a tile without a qualifier reserves no room for
-                     one — which is what closed the gap on BEST STABLEFORD. */
-                  const figCol = bandFigureColumnWidth([
-                    ...[tile.row, ...tile.runners].map(tile.figureOf),
-                    ...(tile.figureFloor ? [tile.figureFloor] : []),
-                  ]);
+                {(() => {
+                  const leaderFigure = tile.figureOf(tile.row);
+                  const second = tile.runners[0];
+                  const gap = second
+                    ? Math.abs(tile.valueOf(tile.row) - tile.valueOf(second))
+                    : null;
                   return (
-                    <div
-                      key={r.round_id}
-                      /* §3 — EVERY ROW IS TAPPABLE, INCLUDING THE LEADER'S, and
-                         the chip around them is itself role="button" with an
-                         onClick and an Enter/Space handler. Without
-                         stopPropagation a row tap would open TWO scorecards. */
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onCardPress(r);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          onCardPress(r);
-                        }
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        minWidth: 0,
-                        cursor: 'pointer',
-                        /* UNIFORM DIVIDERS (§1): the same hairline between every
-                           pair of rows, none above the leader. */
-                        borderTop: lead ? 'none' : `1px solid ${WELL_RULE}`,
-                        /* LIGHT INK GROUND for first place: a subtle gray tint
-                           that bleeds to the chip's padding edges. */
-                        background: lead ? 'rgba(11,15,20,0.035)' : undefined,
-                        borderRadius: lead ? CHIP_RADIUS : undefined,
-                        margin: lead ? '0 -12px' : undefined,
-                        padding: lead ? '6px 12px' : '8px 0',
-                      }}
-                    >
-                      {/* EVERY ROW CARRIES ITS RANK (§1) — the leader's 1 is
-                          PRESENT, not implied. It sits in its own 7px column at
-                          the ladder's left edge so all three digits align.
-                          §4.2 — the leader's digit takes INK; 2 and 3 stay
-                          faint. */}
-                      <span
-                        style={{
-                          fontSize: 8,
-                          fontWeight: 700,
-                          lineHeight: 1,
-                          color: lead ? INK : BAND_FAINT,
-                          fontVariantNumeric: 'tabular-nums lining-nums',
-                          width: 7,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {i + 1}
-                      </span>
-
-                      {/* THE FIGURE COLUMN — measured width, left-aligned, one
-                          width for the whole tile so the three figures stack on
-                          a single left edge. */}
+                    <>
                       <div
+                        data-podium-row="leader"
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCardPress(tile.row);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onCardPress(tile.row);
+                          }
+                        }}
                         style={{
-                          width: figCol,
-                          flexShrink: 0,
-                          /* §2 — the to-par is BOTTOM-ALIGNED with the gross, so
-                              its foot sits level and it reads as tucked under the
-                              gross's right shoulder rather than as a second
-                              column on the same baseline. */
-                          display: 'flex',
-                          alignItems: 'flex-end',
-                          gap: BAND_QUAL_GAP,
-                          minWidth: 0,
+                          display: 'grid',
+                          gridTemplateColumns: '40px minmax(0, 1fr)',
+                          alignItems: 'center',
+                          columnGap: 10,
+                          minHeight: 64,
+                          cursor: 'pointer',
                         }}
                       >
-                        {/* §1 — EVERY FIGURE IS ROW SIZE. The leader is BOLD, not
-                            BIG: 800 against 700 at the same 12px. Charging the
-                            leader's size to every name in the tile is what made
-                            real account names truncate. */}
                         <span
                           style={{
-                            fontSize: BAND_FIG_SIZE,
-                            fontWeight: lead ? 800 : 700,
-                            lineHeight: 1,
-                            fontVariantNumeric: 'tabular-nums lining-nums',
-                            color: f.tone,
+                            position: 'relative',
+                            width: 43,
+                            aspectRatio: '1 / 1.05',
+                            borderRadius: '34%',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                           }}
                         >
-                          {f.text}
+                          <SquircleAvatar
+                            src={tile.row.profile_photo_url}
+                            userId={tile.row.user_id}
+                            alt={tile.row.display_name}
+                            size={40}
+                            hideRing
+                          />
+                          <span
+                            aria-hidden
+                            style={{
+                              position: 'absolute',
+                              inset: 0,
+                              borderRadius: '34%',
+                              /* AVATAR → SQUIRCLE → 0.5px GAP → 1px RING.
+                                 Wrapper is 43px so a 40px avatar centred inside
+                                 leaves 1.5px of space; a 1px inset ring at the
+                                 outer edge leaves exactly 0.5px between the
+                                 ring's inner edge and the avatar. */
+                              boxShadow: `inset 0 0 0 1px ${tile.accent}`,
+                              pointerEvents: 'none',
+                            }}
+                          />
                         </span>
-                        {f.qual ? (
+                        <span style={{ minWidth: 0 }}>
                           <span
                             style={{
-                              fontSize: BAND_QUAL_SIZE,
-                              fontWeight: 700,
-                              lineHeight: 1,
-                              fontVariantNumeric: 'tabular-nums lining-nums',
-                              color: f.qualTone ?? A.MUTE,
-                              whiteSpace: 'nowrap',
+                              display: 'flex',
+                              alignItems: 'flex-end',
+                              gap: 4,
+                              color: tile.accent,
                             }}
                           >
-                            {f.qual}
+                            <span
+                              style={{
+                                ...NUMF,
+                                fontSize: 34,
+                                fontWeight: 700,
+                                lineHeight: 0.92,
+                                color: tile.accent,
+                              }}
+                            >
+                              {leaderFigure.text}
+                            </span>
+                            {leaderFigure.qual ? (
+                              <span
+                                style={{
+                                  ...NUMF,
+                                  fontSize: 13,
+                                  lineHeight: 1,
+                                  color: tile.accent,
+                                }}
+                              >
+                                {leaderFigure.qual}
+                              </span>
+                            ) : null}
                           </span>
-                        ) : null}
+                          <span
+                            style={{
+                              display: 'block',
+                              marginTop: 5,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              fontSize: 12,
+                              fontWeight: 700,
+                              lineHeight: 1,
+                              color: tile.row.is_self ? AMBER : INK,
+                            }}
+                          >
+                            {tile.row.display_name}
+                          </span>
+                        </span>
                       </div>
 
-
-                      <SquircleAvatar
-                        src={r.profile_photo_url}
-                        userId={r.user_id}
-                        alt={r.display_name}
-                        size={16}
-                        hideRing
-                      />
-                      <span
-                        style={{
-                          flex: 1,
-                          minWidth: 0,
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: INK,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {r.display_name}
-                      </span>
-                      {/* THE CHEVRON IS ON EVERY ROW (§0.3). On the leader alone
-                          it read as that member's mark rather than the card's
-                          affordance, while all three rows were tappable. */}
-                      <ChevronRight
-                        size={9}
-                        strokeWidth={3}
-                        color={INK}
-                        style={{ flexShrink: 0 }}
-                      />
-                    </div>
+                      {gap != null ? (
+                        <>
+                          <div style={{ marginTop: 8 }}>
+                            <span
+                              className="tabular-nums"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                minHeight: 20,
+                                padding: '4px 7px',
+                                boxSizing: 'border-box',
+                                borderRadius: CHIP_RADIUS,
+                                background: gap === 0 ? PODIUM_GROUND.tie : tile.chipGround,
+                                color: gap === 0 ? DISCOVER_QUIET : tile.accent,
+                                fontSize: 8,
+                                fontWeight: 700,
+                                lineHeight: 1,
+                                letterSpacing: '0.08em',
+                                textTransform: 'uppercase',
+                              }}
+                            >
+                              {podiumGap(tile, gap)}
+                            </span>
+                          </div>
+                          <div style={{ height: 1, background: WELL_RULE, margin: '12px 0 0' }} />
+                          {tile.runners.map((r, i) => {
+                            const figure = tile.figureOf(r);
+                            const showDeficit = tile.key === 'best' || tile.key === 'improved';
+                            return (
+                              <div
+                                key={r.round_id}
+                                data-podium-row="chaser"
+                                role="button"
+                                tabIndex={0}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onCardPress(r);
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onCardPress(r);
+                                  }
+                                }}
+                                style={{
+                                  display: 'grid',
+                                  gridTemplateColumns: showDeficit
+                                    ? '12px 16px minmax(0, 1fr) auto auto'
+                                    : '12px 16px minmax(0, 1fr) auto',
+                                  alignItems: 'center',
+                                  gap: 6,
+                                  minHeight: 34,
+                                  borderTop: i === 0 ? 'none' : `1px solid ${WELL_RULE}`,
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                <span style={{ fontSize: 8, fontWeight: 700, color: BAND_FAINT }}>
+                                  {i + 2}
+                                </span>
+                                <SquircleAvatar
+                                  src={r.profile_photo_url}
+                                  userId={r.user_id}
+                                  alt={r.display_name}
+                                  size={16}
+                                  hideRing
+                                />
+                                <span
+                                  style={{
+                                    minWidth: 0,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    color: r.is_self ? AMBER : INK,
+                                  }}
+                                >
+                                  {r.display_name}
+                                </span>
+                                <span
+                                  className="tabular-nums"
+                                  style={{ fontSize: 11, fontWeight: 700, color: tile.accent }}
+                                >
+                                  {figure.text}
+                                </span>
+                                {showDeficit ? (
+                                  <span
+                                    className="tabular-nums"
+                                    style={{ fontSize: 10, fontWeight: 700, color: DISCOVER_QUIET }}
+                                  >
+                                    {podiumDeficit(tile, r)}
+                                  </span>
+                                ) : null}
+                              </div>
+                            );
+                          })}
+                        </>
+                      ) : null}
+                    </>
                   );
-                })}
+                })()}
               </div>
               {/* §1.1/§1.2 (BRIEF_DISCOVER_FINISHING_PASS) — THE COURSE LINE IS
                   GONE. This OVERTURNS BRIEF_BAND_TILES_REFINEMENT ("the bottom
@@ -1941,9 +2154,7 @@ export function GolfThisWeek({
 
                   ABSENT IS ABSENT (BRIEF_BAND_TILES_TOP_THREE §3): fewer than
                   three qualifiers renders fewer rows — no dash, no placeholder,
-                  no reserved height. The rail's `alignItems: 'stretch'` levels
-                  every chip to the tallest, so a short tile simply carries an
-                  empty area and nothing fills it. */}
+                  no reserved height. Sparse cards collapse to their content. */}
 
             </div>
           ))}

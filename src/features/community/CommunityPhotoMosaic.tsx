@@ -1,6 +1,10 @@
+import type { Ref } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { mediaTarget, useMediaImpression } from '@/utils/mediaEngagement';
+import { A, CARD_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
 
 /**
  * PHOTOS — the two-column mosaic (BRIEF_COMMUNITY_PAGE_REBUILD, reference
@@ -30,7 +34,9 @@ import type { CommunityLibraryItem } from '@/components/explore-tab-new/coursele
 /** Tiles mounted initially and per reveal. Even = whole rows across two cols. */
 export const PHOTO_MOSAIC_STEP = 30;
 const STEP = PHOTO_MOSAIC_STEP;
+/** /community's placeholder. Dark is Discover's — see CommunityCourseIndex. */
 const PANEL = '#EDF0F3';
+const PANEL_DARK = A.PANEL;
 /** Height steps, px. Cycled by index so a tile's height is stable. */
 const HEIGHTS = [240, 132, 148, 160, 128, 176];
 
@@ -39,9 +45,22 @@ interface Props {
   onPress: (item: CommunityLibraryItem) => void;
   /** False on Everything: the wall stops at one page. Default true (Photos chip). */
   infinite?: boolean;
+  /** Discover is dark and owns the 8px radius system. Default light. */
+  tone?: 'light' | 'dark';
+  /**
+   * WHICH SURFACE IS REPORTING (BRIEF_MEDIA_TRACKING_MINIMUM). The section value
+   * stays 'photos' on both pages, so the before-and-after survives the move.
+   */
+  surface?: 'community' | 'discover';
 }
 
-export function CommunityPhotoMosaic({ items, onPress, infinite = true }: Props) {
+export function CommunityPhotoMosaic({
+  items,
+  onPress,
+  infinite = true,
+  tone = 'light',
+  surface = 'community',
+}: Props) {
   const [shown, setShown] = useState(STEP);
   const sentinel = useRef<HTMLDivElement | null>(null);
 
@@ -63,9 +82,9 @@ export function CommunityPhotoMosaic({ items, onPress, infinite = true }: Props)
 
   /** Alternating fill keeps both columns growing together without measuring. */
   const columns = useMemo(() => {
-    const cols: { item: CommunityLibraryItem; height: number }[][] = [[], []];
+    const cols: { item: CommunityLibraryItem; height: number; index: number }[][] = [[], []];
     items.slice(0, shown).forEach((item, i) => {
-      cols[i % 2].push({ item, height: HEIGHTS[i % HEIGHTS.length] });
+      cols[i % 2].push({ item, height: HEIGHTS[i % HEIGHTS.length], index: i });
     });
     return cols;
   }, [items, shown]);
@@ -77,20 +96,64 @@ export function CommunityPhotoMosaic({ items, onPress, infinite = true }: Props)
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
         {columns.map((col, ci) => (
           <div key={ci} style={{ display: 'grid', gap: 2, alignContent: 'start' }}>
-            {col.map(({ item, height }) => (
-              <button
+            {col.map(({ item, height, index }) => (
+              <PhotoTile
                 key={item.key}
+                item={item}
+                height={height}
+                index={index}
+                onPress={onPress}
+                tone={tone}
+                surface={surface}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <div ref={sentinel} aria-hidden style={{ height: 1 }} />
+    </>
+  );
+}
+
+/**
+ * ONE TILE, so the impression observer has a per-tile element to register and
+ * the open fires from the same place the member taps. Purely structural — the
+ * markup, the geometry and the scrim are byte-for-byte what shipped.
+ */
+function PhotoTile({
+  item,
+  height,
+  index,
+  onPress,
+  tone,
+  surface,
+}: {
+  item: CommunityLibraryItem;
+  height: number;
+  index: number;
+  onPress: (item: CommunityLibraryItem) => void;
+  tone: 'light' | 'dark';
+  surface: 'community' | 'discover';
+}) {
+  const track = mediaTarget(item, surface, 'photos', index);
+  const impressionRef = useMediaImpression(track);
+  return (
+              <button
+                ref={impressionRef as unknown as Ref<HTMLButtonElement>}
                 type="button"
-                onClick={() => onPress(item)}
+                onClick={() => {
+                  analyticsEvents.media.opened(track);
+                  onPress(item);
+                }}
                 style={{
                   position: 'relative',
                   height,
                   width: '100%',
                   padding: 0,
                   border: 'none',
-                  borderRadius: 14,
+                  borderRadius: tone === 'dark' ? CARD_RADIUS : 14,
                   overflow: 'hidden',
-                  background: PANEL,
+                  background: tone === 'dark' ? PANEL_DARK : PANEL,
                   cursor: 'pointer',
                 }}
               >
@@ -142,12 +205,6 @@ export function CommunityPhotoMosaic({ items, onPress, infinite = true }: Props)
                   </>
                 )}
               </button>
-            ))}
-          </div>
-        ))}
-      </div>
-      <div ref={sentinel} aria-hidden style={{ height: 1 }} />
-    </>
   );
 }
 

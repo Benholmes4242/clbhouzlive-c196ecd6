@@ -4,17 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, CARD_RADIUS, LABEL, NUMF, SANS, EYEBROW_TEXT, InkAction } from './tokens';
+import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 
 /**
- * Section 7 — THE HONOURS BOARD (BRIEF_HONOURS_BOARD_THE_HOLE).
+ * Section 7 — THE HONOURS BOARD (BRIEF_HONOURS_PERSON_LED).
  *
- * THE HOLE LEADS BECAUSE THE HOLE IS WHAT VARIES (§S1.2). The feat name is the
- * same word on every card of its kind; the odds are the same number. The
- * yardage, the hole and the course are the only things that differ between one
- * ace and the next. So the card opens with the YARDAGE at size, the hole and
- * par beneath it, and the feat name reduced to a small label.
+ * THE MEMBER LEADS. Honours commemorates the person who made the feat; hole,
+ * par and yardage are supporting context on one line beneath their name.
  *
  * TWO EARLIER ANSWERS WERE DESIGNED AND CUT (§S0.5) — do not revisit them:
  *   A DARK CLUBHOUSE BOARD (gold on lacquer) read as a foreign object parked in
@@ -23,11 +20,8 @@ import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
  *   type in the largest type on the card: six cards that looked like one card
  *   six times. The odds are now said ONCE, in the section subline (§S3).
  *
- * NO PHOTOGRAPHY (§S0.4 / acceptance K). The stock course image was of
- * somewhere else on the property; the hole it never showed is the subject.
- *
  * THE RAIL IS A SAMPLE, THE SHEET IS THE RECORD (§S4): one card per feat,
- * newest first, EVERY CARD THE SAME WIDTH AND HEIGHT. Grouping by person was
+ * RAREST FIRST THEN MOST RECENT, EVERY CARD THE SAME WIDTH AND HEIGHT. Grouping by person was
  * cut because a member's nested feats made some cards taller than others; a
  * member with two feats simply APPEARS TWICE, which is its own signal. The
  * RECENT / LEADERS toggle lives only in the see-all sheet.
@@ -36,36 +30,44 @@ import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 /** §S1.5 — one card geometry, and it is fixed so the rail cannot go ragged. */
 export const PLAQUE_W = 206;
 export const CARD_SHADOW = '0 1px 3px rgba(11,15,20,0.06)';
-/** The tinted head, then the course + member foot. Both fixed. */
-export const HEAD_H = 96;
-export const CARD_H = 164;
+/** The person-led metal head, then the course-only foot. Both fixed. */
+export const HEAD_H = 104;
+export const CARD_H = 148;
 const PLAQUE_GAP = 10;
-const AVATAR = 20;
+const AVATAR = 44;
 
 /**
- * GOLD IS THE ACE (§S2), AND IT IS NOT A RARITY JUDGEMENT — AN ALBATROSS IS THE
- * RARER SHOT. Gold already means an ace in this app: the scorecard's scoring key
- * shows a gold circle for one and `beadForScore` returns SC_FILL_GOLD for it.
- * The honours board was contradicting the scorecard, so the ace takes the gold
- * ground and the albatross takes the neutral well. Do NOT swap these on rarity
- * grounds: whoever does that is right about the rarity and wrong about the
- * convention.
+ * TWO SURFACES, TWO JOBS. A scorecard IDENTIFIES a score, so an ace and an
+ * albatross deliberately share its red disc with a gold ring: both mean “rarer
+ * than an eagle”. The honours board RANKS rarity, so it deliberately separates
+ * the roughly 500× rarer albatross (platinum) from the ace (gold). Do not make
+ * either surface match the other; the difference is semantic, not accidental.
  *
- * ONE GOLD, NOT TWO (§S2.3). SC_FILL_GOLD is #FFD200 — the scorecard's bead
- * FILL, which is a fill value and illegible as 8px lettering on cream. ACE_GOLD
- * below is that same gold taken to text weight; the ground is its wash. No
- * second gold hue is introduced on this surface.
+ * Metal is confined to the feat block. The light top-left stop and deeper final
+ * stop make each ground resolve as material rather than a flat colour wash.
  */
-const ACE_GROUND = '#F5EBD2';
-const ACE_GOLD = '#B8860B';
-const NEUTRAL_GROUND = '#F4F6F9';
-const GHOST = '#C8D0D8';
+export const PLATINUM_GROUND = 'linear-gradient(145deg, #FAFCFF 0%, #D7DEE8 52%, #929EAD 100%)';
+export const ACE_GROUND = 'linear-gradient(145deg, #FFF1A8 0%, #FFD200 52%, #C98700 100%)';
+export const METAL_INK = '#0F172A';
+/** 80% is the lowest quiet tier that remains AA at the darkest gold stop. */
+export const METAL_YEAR = 'rgba(15,23,42,0.80)';
+/** Shared with the year: the darkest gold stop needs this alpha to reach AA. */
+export const METAL_SUPPORT = 'rgba(15,23,42,0.80)';
+export const METAL_AVATAR_RING = 'rgba(15,23,42,0.28)';
 
 export type HonoursMode = 'recent' | 'leaders';
 
-/** Newest first everywhere on this surface (§S4.2). */
+/** The sheet's Recent mode remains chronological. */
 export function sortHonours(events: WireEvent[]): WireEvent[] {
   return [...events].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+}
+
+/** The page rail's stated order: rarity first, then most recent within rarity. */
+export function sortHonoursRail(events: WireEvent[]): WireEvent[] {
+  return [...events].sort((a, b) => {
+    const rarity = Number(b.kind === 'albatross') - Number(a.kind === 'albatross');
+    return rarity || new Date(b.at).getTime() - new Date(a.at).getTime();
+  });
 }
 
 const at = (e: WireEvent) => new Date(e.at).getTime();
@@ -164,13 +166,13 @@ export function useHonoursSubline(events: WireEvent[]) {
   if (aces > 0 && albatrosses > 0)
     return t(
       'discover.honours.sublineBoth',
-      '{{aces}} and {{albatrosses}}, all time. An ace is commonly quoted at 12,500 to 1.',
+       '{{aces}} and {{albatrosses}}, all time. Rarest first, then most recent. An ace is commonly quoted at 12,500 to 1.',
       { aces: acePart, albatrosses: albatrossPart },
     );
   if (aces > 0 || albatrosses > 0)
     return t(
       'discover.honours.sublineOne',
-      '{{feats}}, all time. An ace is commonly quoted at 12,500 to 1.',
+       '{{feats}}, all time. Rarest first, then most recent. An ace is commonly quoted at 12,500 to 1.',
       { feats: aces > 0 ? acePart : albatrossPart },
     );
   return '';
@@ -181,11 +183,13 @@ function MemberAvatar({
   src,
   alt,
   size = AVATAR,
+  metal = false,
 }: {
   userId: string | null;
   src: string | null;
   alt: string;
   size?: number;
+  metal?: boolean;
 }) {
   return (
     <span
@@ -195,14 +199,15 @@ function MemberAvatar({
         borderRadius: '34%',
       }}
     >
-      <SquircleAvatar size={size} src={src} alt={alt} userId={userId} hairlineRing />
+      <SquircleAvatar size={size} src={src} alt={alt} userId={userId}
+        {...(metal ? { ringColor: METAL_AVATAR_RING } : { hairlineRing: true })} />
     </span>
   );
 }
 
 /* ───────────────────────────── the feat card ─────────────────────────── */
 
-/** §S1 — one card per FEAT, led by the yardage. */
+/** §S1 — one card per feat, led by the member. */
 export function FeatCard({
   event: e,
   onPress,
@@ -213,11 +218,11 @@ export function FeatCard({
   width?: number | string;
 }) {
   const { t } = useTranslation('courses');
-  const holeAndPar = useHoleAndPar();
+  const holeDetail = useHoleDetail();
   const kindLabel = useKindLabel();
   const tappable = !!onPress && !!e.scoreId;
   const ace = e.kind === 'ace';
-  const line = holeAndPar(e);
+  const line = holeDetail(e);
 
   return (
     <button
@@ -240,12 +245,14 @@ export function FeatCard({
         fontFamily: SANS,
         boxSizing: 'border-box',
         cursor: tappable ? 'pointer' : 'default',
-        /* A feat with no score genuinely cannot open — say so visually. */
-        opacity: tappable ? 1 : 0.62,
+        /* Disabled changes interaction only; rarity copy must keep full contrast. */
+        opacity: 1,
       }}
     >
-      {/* THE TINTED HEAD — gold for an ace, the neutral well for an albatross. */}
+      {/* THE METAL FEAT BLOCK — platinum ranks above gold; the panel foot stays dark. */}
       <span
+        data-honours-feat-block={ace ? 'ace' : 'albatross'}
+        data-honours-metal={ace ? ACE_GROUND : PLATINUM_GROUND}
         style={{
           position: 'relative',
           display: 'flex',
@@ -253,7 +260,7 @@ export function FeatCard({
           justifyContent: 'flex-end',
           height: HEAD_H,
           flex: '0 0 auto',
-          background: ace ? ACE_GROUND : NEUTRAL_GROUND,
+          background: ace ? ACE_GROUND : PLATINUM_GROUND,
           padding: '11px 12px 12px',
           boxSizing: 'border-box',
         }}
@@ -267,7 +274,7 @@ export function FeatCard({
             fontSize: 8,
             fontWeight: 800,
             letterSpacing: '0.18em',
-            color: ace ? ACE_GOLD : A.INK,
+             color: METAL_INK,
           }}
         >
           {kindLabel(e)}
@@ -281,84 +288,63 @@ export function FeatCard({
             fontSize: 8,
             fontWeight: 800,
             letterSpacing: '0.18em',
-            color: GHOST,
+            color: METAL_YEAR,
             fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
           {formatYearNumeric(e.at)}
         </span>
 
-        {/* THE YARDAGE IS THE HERO (§S1.1). A card with no yardage on record
-            falls back to the hole line at the same rank rather than printing an
-            empty figure. */}
-        {e.holeYards != null ? (
-          <span style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+          <MemberAvatar userId={e.userId} src={e.actorAvatar} alt={e.actorName} metal />
+          <span
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              minWidth: 0,
+              flex: 1,
+            }}
+          >
             <span
               style={{
-                ...NUMF,
-                fontSize: 32,
+                fontSize: 15,
                 fontWeight: 800,
-                letterSpacing: '-0.05em',
-                lineHeight: 1,
-                color: A.INK,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
+                color: e.isOwn ? A.AMBER_DEEP : METAL_INK,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
-              {e.holeYards}
+              {e.actorName}
             </span>
             <span
               style={{
-                ...LABEL,
-                fontSize: 8,
-                fontWeight: 800,
-                letterSpacing: '0.18em',
-                color: A.MUTE,
+                marginTop: 5,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: 0,
+                lineHeight: 1.15,
+                color: METAL_SUPPORT,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
-              {t('discover.honours.yards', 'YARDS')}
+              {line || kindLabel(e)}
             </span>
           </span>
-        ) : (
-          <span
-            style={{
-              ...NUMF,
-              fontSize: 24,
-              fontWeight: 800,
-              letterSpacing: '-0.04em',
-              lineHeight: 1,
-              color: A.INK,
-            }}
-          >
-            {line || t('discover.honours.badgeAce', 'Ace')}
-          </span>
-        )}
-
-        {e.holeYards != null && line ? (
-          <span
-            style={{
-              display: 'block',
-              marginTop: 6,
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '-0.01em',
-              color: A.BODY,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {line}
-          </span>
-        ) : null}
+        </span>
       </span>
 
-      {/* THE COURSE, THEN THE MEMBER (§S1.4). One line each — a rail card that
-          wraps is a rail card that changes height. */}
+      {/* The member appears once, on the metal. The dark foot carries course only. */}
       <span
         style={{
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          gap: 8,
           flex: 1,
           padding: '0 12px',
         }}
@@ -369,35 +355,13 @@ export function FeatCard({
             fontSize: 13,
             fontWeight: 700,
             letterSpacing: '-0.02em',
-            color: A.INK,
+            color: DISCOVER_FACT,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}
         >
           {e.courseName ?? t('discover.unknownCourse', 'Course')}
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-          <MemberAvatar
-            userId={e.userId}
-            src={e.actorAvatar}
-            alt={e.actorName}
-          />
-          {/* NO "YOU" SUBSTITUTION (§S5.2) — this is a record, and a record
-              carries names. Amber says whose it is. */}
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              letterSpacing: '-0.015em',
-              color: e.isOwn ? A.AMBER_DEEP : A.BODY,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {e.actorName}
-          </span>
         </span>
       </span>
     </button>
@@ -471,7 +435,7 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
         alignItems: 'center',
         gap: 9,
         padding: '11px 12px',
-        background: l.events.some((e) => e.kind === 'ace') ? ACE_GROUND : NEUTRAL_GROUND,
+        background: A.PANEL,
       }}
     >
       <MemberAvatar
@@ -485,7 +449,7 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
           fontSize: 13.5,
           fontWeight: 700,
           letterSpacing: '-0.02em',
-          color: l.isOwn ? A.AMBER_DEEP : A.INK,
+          color: l.isOwn ? A.AMBER_DEEP : DISCOVER_FACT,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -500,7 +464,7 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
           ...LABEL,
           fontSize: 8,
           letterSpacing: '0.18em',
-          color: A.BODY,
+          color: DISCOVER_QUIET,
           flex: '0 0 auto',
           fontVariantNumeric: 'tabular-nums lining-nums',
         }}
@@ -592,7 +556,7 @@ export function HonoursHeading({
             fontSize: 11.5,
             fontWeight: 500,
             lineHeight: 1.4,
-            color: A.MUTE,
+             color: DISCOVER_QUIET,
           }}
         >
           {subline}
@@ -624,7 +588,7 @@ export function HonoursBoard({
   onSeeAll,
 }: Props) {
   const { t } = useTranslation('courses');
-  const feats = useMemo(() => sortHonours(events), [events]);
+  const feats = useMemo(() => sortHonoursRail(events), [events]);
 
   if (isPending) return <HonoursPanelShell />;
   if (events.length === 0) return null;
