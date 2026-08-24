@@ -1096,6 +1096,7 @@
           "eagle": "EAGLE",
           "ace": "ACE",
           "albatross": "ALBATROSS",
+          "courseRecord": "코스 레코드",
           "run": "연속",
           "grind": "버텨낸 라운드",
           "finishedInRed": "언더파로 마감",
@@ -1111,6 +1112,10 @@
         },
         "sentence": {
           "eagle": "파 {{1}} 홀에서 {{0}}.",
+          "courseRecord_one": "{{1}}의 {{2}}보다 {{0}}타 낮았습니다.",
+          "courseRecord_other": "{{1}}의 {{2}}보다 {{0}}타 낮았습니다.",
+          "courseRecordUnknown_one": "이전 기록 {{2}}보다 {{0}}타 낮았습니다.",
+          "courseRecordUnknown_other": "이전 기록 {{2}}보다 {{0}}타 낮았습니다.",
           "run": "{{0}}번부터 {{1}}번까지 파 이상.",
           "grind": "라운드 내내 보기보다 나쁜 홀이 없었습니다.",
           "plain": "{{1}} 홀 중 {{0}} 홀을 파 이상.",

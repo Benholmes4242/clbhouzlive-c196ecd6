@@ -1601,6 +1601,7 @@
           "eagle": "EAGLE",
           "ace": "ACE",
           "albatross": "ALBATROSS",
+          "courseRecord": "COURSE RECORD",
           "run": "THE RUN",
           "grind": "THE GRIND",
           "finishedInRed": "FINISHED IN THE RED",
@@ -1616,6 +1617,10 @@
         },
         "sentence": {
           "eagle": "A {{0}} on a par {{1}}.",
+          "courseRecord_one": "{{0}} shot better than {{1}}'s {{2}}.",
+          "courseRecord_other": "{{0}} shots better than {{1}}'s {{2}}.",
+          "courseRecordUnknown_one": "{{0}} shot better than the previous record of {{2}}.",
+          "courseRecordUnknown_other": "{{0}} shots better than the previous record of {{2}}.",
           "run": "Par or better from {{0}} through {{1}}.",
           "grind": "Nothing worse than a bogey all the way round.",
           "plain": "{{0}} of {{1}} holes at par or better.",

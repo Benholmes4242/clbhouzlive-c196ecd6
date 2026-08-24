@@ -1158,6 +1158,7 @@
           "eagle": "EAGLE",
           "ace": "ACE",
           "albatross": "ALBATROSS",
+          "courseRecord": "PLATZREKORD",
           "run": "DIE SERIE",
           "grind": "DIE ARBEIT",
           "finishedInRed": "UNTER PAR BEENDET",
@@ -1173,6 +1174,10 @@
         },
         "sentence": {
           "eagle": "Eine {{0}} auf einem Par {{1}}.",
+          "courseRecord_one": "{{0}} Schlag besser als die {{2}} von {{1}}.",
+          "courseRecord_other": "{{0}} Schläge besser als die {{2}} von {{1}}.",
+          "courseRecordUnknown_one": "{{0}} Schlag besser als der bisherige Rekord von {{2}}.",
+          "courseRecordUnknown_other": "{{0}} Schläge besser als der bisherige Rekord von {{2}}.",
           "run": "Par oder besser von {{0}} bis {{1}}.",
           "grind": "Nichts schlechter als ein Bogey auf der ganzen Runde.",
           "plain": "{{0}} von {{1}} Löchern auf Par oder besser.",
