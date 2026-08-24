@@ -9,11 +9,11 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
 
-const INK = '#1F2428';
-const SECONDARY = '#8A9099';
-const MUTED = '#AEB4BC';
+const INK = '#F8FAFC';
+const SECONDARY = 'rgba(248,250,252,0.60)';
+const MUTED = 'rgba(248,250,252,0.40)';
 const AMBER = '#F7931E';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+const HAIRLINE = 'rgba(255,255,255,0.10)';
 
 const REASONS: { id: string; label: string }[] = [
   { id: 'spam', label: 'Spam or misleading' },
@@ -64,13 +64,13 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
             transition={{ type: 'spring', damping: 28, stiffness: 320 }}
             className="fixed left-0 right-0 bottom-0 z-[12007] mx-auto"
             style={{
-              maxWidth: 560, background: '#FFFFFF',
+              maxWidth: 560, background: '#1B1E27',
               borderRadius: '20px 20px 0 0',
               paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
             }}
           >
             <div className="flex justify-center pt-2.5 pb-2">
-              <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(0,0,0,0.14)' }} />
+              <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(255,255,255,0.18)' }} />
             </div>
 
             <div className="flex items-center justify-between px-5 pb-2">
@@ -100,7 +100,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                         style={{
                           borderRadius: 12,
                           border: `1px solid ${active ? AMBER : HAIRLINE}`,
-                          background: active ? 'rgba(247,147,30,0.06)' : '#FFFFFF',
+                          background: active ? 'rgba(247,147,30,0.10)' : '#1B1E27',
                         }}
                       >
                         <span style={{ fontSize: 14, color: INK }}>{r.label}</span>
@@ -123,7 +123,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                   className="w-full mt-4 py-3 cursor-pointer"
                   style={{
                     borderRadius: 12, border: 0,
-                    background: reason ? AMBER : 'rgba(15,23,42,0.08)',
+                    background: reason ? AMBER : 'rgba(255,255,255,0.10)',
                     color: reason ? '#FFFFFF' : MUTED,
                     fontSize: 15, fontWeight: 700,
                   }}
@@ -145,7 +145,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                   className="w-full outline-none"
                   style={{
                     height: 96, padding: 12, borderRadius: 12,
-                    border: `1px solid ${HAIRLINE}`, background: '#FFFFFF',
+                    border: `1px solid ${HAIRLINE}`, background: '#1B1E27',
                     fontSize: 14, color: INK, resize: 'none',
                   }}
                 />
@@ -156,7 +156,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                     className="flex-1 py-3 cursor-pointer"
                     style={{
                       borderRadius: 12, border: `1px solid ${HAIRLINE}`,
-                      background: '#FFFFFF', color: INK, fontSize: 15, fontWeight: 600,
+                      background: '#1B1E27', color: INK, fontSize: 15, fontWeight: 600,
                     }}
                   >
                     Back

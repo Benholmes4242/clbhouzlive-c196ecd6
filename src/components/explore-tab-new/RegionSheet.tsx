@@ -37,7 +37,7 @@ export default function RegionSheet({
           style={{
             fontSize: 10.5,
             fontWeight: 600,
-            color: '#0E1216',
+            color: '#F8FAFC',
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
             marginBottom: 4,
@@ -49,14 +49,14 @@ export default function RegionSheet({
           id="explore-region-sheet-title"
           style={{
             ...TITLE_METRICS,
-            color: '#0F172A',
+            color: '#F8FAFC',
           }}
         >
           Browse by region
         </div>
       </div>
 
-      <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+      <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.10)' }}>
         {/* All regions — clears the param */}
         <SheetRow
           label="All regions"
@@ -72,7 +72,7 @@ export default function RegionSheet({
             style={{
               padding: '32px 20px',
               fontSize: 13,
-              color: '#94A3B8',
+              color: 'rgba(248,250,252,0.60)',
               textAlign: 'center',
             }}
           >
@@ -120,10 +120,10 @@ function SheetRow({
         alignItems: 'center',
         gap: 12,
         padding: '14px 20px',
-        background: isActive ? 'rgba(247,147,30,0.04)' : 'transparent',
+        background: isActive ? 'rgba(247,147,30,0.10)' : 'transparent',
         border: 'none',
         borderLeft: isActive ? '3px solid #F7931E' : '3px solid transparent',
-        borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+        borderBottom: '0.5px solid rgba(255,255,255,0.10)',
         cursor: 'pointer',
         textAlign: 'left',
       }}
@@ -133,7 +133,7 @@ function SheetRow({
           style={{
             fontSize: 15,
             fontWeight: isActive ? 700 : 600,
-            color: '#0F172A',
+            color: '#F8FAFC',
             letterSpacing: '-0.01em',
           }}
         >
