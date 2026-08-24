@@ -39,7 +39,7 @@ export const SearchField = forwardRef<HTMLInputElement, Props>(function SearchFi
       }}
     >
       <div
-        className="flex-1 flex items-center gap-2 px-3 rounded-full"
+        className="flex-1 flex items-center gap-2 px-3 rounded-sq-sm"
         style={{
           height: 44,
           background: focused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
@@ -59,8 +59,8 @@ export const SearchField = forwardRef<HTMLInputElement, Props>(function SearchFi
             if (e.key === 'Enter' && onSubmit) onSubmit();
           }}
           placeholder={placeholder}
-          className="flex-1 bg-transparent text-sm outline-none placeholder:text-[rgba(248,250,252,0.38)]"
-          style={{ color: 'rgba(248,250,252,0.96)' }}
+          className="flex-1 bg-transparent text-sm outline-none placeholder:text-[rgba(255,255,255,0.38)]"
+          style={{ color: 'rgba(255,255,255,0.96)' }}
           autoComplete="off"
           spellCheck="false"
         />
