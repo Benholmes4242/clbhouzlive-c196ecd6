@@ -14,6 +14,7 @@ import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 type ToggleDef = { key: string; label: string; help: string };
 
