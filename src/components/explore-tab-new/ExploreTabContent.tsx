@@ -503,23 +503,30 @@ export default function ExploreTabContent({
         {/* 7 — PHOTOS lead the media (§1.2 reasoning above). On 'Everything' this
             is a 12-tile sample whose see-all SWITCHES THE CHIP instead of
             navigating; on 'Photos' the mosaic runs the whole pool with its own
-            infinite reveal. NO SUBLINE (§5): "From the courses" told a member
-            nothing the tiles did not. */}
+            infinite reveal.
+
+            THE CHIP CARRIES THE LABEL. When a type chip is active it already
+            names what is below it, so the section eyebrow is deleted in the
+            filtered views — a heading that repeats the control above it is
+            noise. Eyebrows survive only on 'Everything', where several types
+            share the page and must be told apart. */}
         {(mediaChip === 'all' || mediaChip === 'photos') && photosShown.length > 0 && (
           <section>
-            <Eyebrow
-              aside={
-                mediaChip === 'all' && photoPool.length > photosShown.length ? (
-                  <InkAction onClick={() => changeChip('photos')}>
-                    {t('discover.seeAll', 'See all')}
-                  </InkAction>
-                ) : undefined
-              }
-            >
-              {t('community.sections.photos.title', 'Photos')}
-            </Eyebrow>
+            {mediaChip === 'all' && (
+              <Eyebrow
+                aside={
+                  photoPool.length > photosShown.length ? (
+                    <InkAction onClick={() => changeChip('photos')}>
+                      {t('discover.seeAll', 'See all')}
+                    </InkAction>
+                  ) : undefined
+                }
+              >
+                {t('community.sections.photos.title', 'Photos')}
+              </Eyebrow>
+            )}
             {/* 2px to reach the 16px mosaic margin from the page's 14px. */}
-            <div style={{ margin: `${HEAD_GAP}px 2px 0` }}>
+            <div style={{ margin: `${mediaChip === 'all' ? HEAD_GAP : 0}px 2px 0` }}>
               <CommunityPhotoMosaic
                 items={photosShown}
                 onPress={handlePhoto}
@@ -544,8 +551,7 @@ export default function ExploreTabContent({
         )}
         {mediaChip === 'clips' && clipPool.length > 0 && (
           <section>
-            <Eyebrow>{t('community.sections.clips.title', 'Clips')}</Eyebrow>
-            <div style={{ margin: `${HEAD_GAP}px 2px 0` }}>
+            <div style={{ margin: '0 2px' }}>
               <ProgressiveReveal items={clipPool} step={CLIP_STEP}>
                 {(visible) => (
                   <CommunityClipMosaic items={visible} onPress={handleClip} surface="discover" />
@@ -568,8 +574,7 @@ export default function ExploreTabContent({
         )}
         {mediaChip === 'videos' && videoPool.length > 0 && (
           <section>
-            <Eyebrow>{t('community.sections.videos.title', 'Latest videos')}</Eyebrow>
-            <div style={{ marginTop: HEAD_GAP }}>
+            <div>
               {videoPool.map((item, i) => (
                 <CommunityVideoRow
                   key={item.key}
@@ -583,6 +588,7 @@ export default function ExploreTabContent({
             </div>
           </section>
         )}
+
 
         {/* 10 — BROWSE BY CLUB IS LAST (§1.3): a way IN, not something to read,
             and it covers only tagged content. It survives on 'Everything' and on
