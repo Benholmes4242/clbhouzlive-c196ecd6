@@ -38,7 +38,7 @@ export function PostRow({ post, query, onSelect }: Props) {
       </div>
       <div className="flex-1 min-w-0">
         <p
-          className="text-[13.5px]"
+          className="text-[15px]"
           style={{
             color: S.INK,
             lineHeight: 1.4,
@@ -50,7 +50,7 @@ export function PostRow({ post, query, onSelect }: Props) {
         >
           <Highlight text={excerpt} query={query} />
         </p>
-        <p className="text-[11.5px] mt-1" style={{ color: S.QUIET }}>
+        <p className="text-[13px] mt-1" style={{ color: S.QUIET }}>
           {relTime(post.created_at)}
         </p>
       </div>

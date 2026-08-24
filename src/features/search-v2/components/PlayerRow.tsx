@@ -27,10 +27,10 @@ export function PlayerRow({ player, query, onSelect }: Props) {
         </span>
       </ResultTile>
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] font-medium truncate" style={{ color: S.INK }}>
+        <p className="text-[15px] font-medium truncate" style={{ color: S.INK }}>
           <Highlight text={player.full_name} query={query} />
         </p>
-        <p className="text-[12px] truncate" style={{ color: S.QUIET }}>
+        <p className="text-[13px] truncate" style={{ color: S.QUIET }}>
           {player.country ?? 'Tour player'}
         </p>
       </div>

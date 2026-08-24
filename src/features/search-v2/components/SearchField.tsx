@@ -83,7 +83,7 @@ export const SearchField = forwardRef<HTMLInputElement, Props>(function SearchFi
       <button
         type="button"
         onClick={onCancel}
-        className="shrink-0 text-[14px] font-bold min-h-[44px] px-1"
+        className="shrink-0 text-[15px] font-bold min-h-[44px] px-1"
         style={{ color: S.INK }}
       >
         Cancel

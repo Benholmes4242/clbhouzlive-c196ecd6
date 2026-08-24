@@ -63,7 +63,7 @@ export function SearchEmptyState({ onSelect }: Props) {
           textAlign: 'center',
         }}
       >
-        <p style={{ fontSize: 13, fontWeight: 600, color: S.INK }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: S.INK }}>
           Couldn't load suggestions
         </p>
         <button
@@ -76,7 +76,7 @@ export function SearchEmptyState({ onSelect }: Props) {
             borderRadius: 999,
             background: S.INK,
             color: A.CANVAS,
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: 700,
             border: 'none',
             transition: 'transform 100ms ease',
@@ -198,7 +198,8 @@ function SectionEyebrow({
         gap: 8,
       }}
     >
-      <span style={KICKER} className="truncate">
+      {/* MICRO_BRIEF_SEARCH_OVERLAY_TYPE_SCALE: local floor lift (9 -> 11). */}
+      <span style={{ ...KICKER, fontSize: 11 }} className="truncate">
         {label}
       </span>
       {rightChip}
@@ -219,7 +220,7 @@ function LiveChip() {
         // ACCENT, not a fault: white label over the live green chip.
         background: '#22C55E',
         color: '#fff',
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 600,
         letterSpacing: '0.02em',
       }}
@@ -350,10 +351,10 @@ function SuggestionRow({
         ringColor={DARK_HAIRLINE}
       />
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] font-medium truncate" style={{ color: S.INK }}>
+        <p className="text-[15px] font-medium truncate" style={{ color: S.INK }}>
           {name}
         </p>
-        <p className="text-[12px] truncate" style={{ color: S.QUIET }}>
+        <p className="text-[13px] truncate" style={{ color: S.QUIET }}>
           {reasonLine(suggestion)}
         </p>
       </div>

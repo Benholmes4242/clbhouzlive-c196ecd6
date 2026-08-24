@@ -21,11 +21,11 @@ export function ClubRow({ club, query, onSelect }: Props) {
         )}
       </ResultTile>
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] font-medium truncate" style={{ color: S.INK }}>
+        <p className="text-[15px] font-medium truncate" style={{ color: S.INK }}>
           <Highlight text={club.name} query={query} />
         </p>
         {club.city && (
-          <p className="text-[12px] truncate" style={{ color: S.QUIET }}>
+          <p className="text-[13px] truncate" style={{ color: S.QUIET }}>
             {club.city}
           </p>
         )}

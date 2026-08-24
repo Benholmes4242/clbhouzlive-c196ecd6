@@ -270,13 +270,13 @@ export function SearchOverlayV2({
 
             {hasQuery && !isLoading && error && (
               <div style={{ padding: '32px 16px', textAlign: 'center' }}>
-                <p className="text-[13px]" style={{ color: S.QUIET }}>
+                <p className="text-[14px]" style={{ color: S.QUIET }}>
                   Something went wrong. Tap to retry.
                 </p>
                 <button
                   type="button"
                   onClick={() => refetch()}
-                  className="mt-3 text-[13px] font-bold"
+                  className="mt-3 text-[14px] font-bold"
                   style={{ color: S.INK }}
                 >
                   Retry
@@ -429,7 +429,7 @@ export function SearchOverlayV2({
                           >
                             Nothing for &ldquo;{q}&rdquo;
                           </p>
-                          <p className="text-[12.5px] mt-1" style={{ color: S.QUIET }}>
+                          <p className="text-[13px] mt-1" style={{ color: S.QUIET }}>
                             Try a different spelling or check the course request below.
                           </p>
                         </div>
@@ -584,7 +584,7 @@ function SingleScope({
 function EmptyScope({ label }: { label: string }) {
   return (
     <div style={{ padding: '40px 16px 16px', textAlign: 'center' }}>
-      <p className="text-[13.5px]" style={{ color: S.QUIET }}>
+      <p className="text-[14px]" style={{ color: S.QUIET }}>
         {label}
       </p>
     </div>
@@ -625,10 +625,10 @@ function CommitResults({
           <Search size={15} strokeWidth={2.5} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[14px] font-bold truncate" style={{ color: S.INK }}>
+          <div className="text-[15px] font-bold truncate" style={{ color: S.INK }}>
             Search “{query}”
           </div>
-          <div className="text-[11.5px]" style={{ color: S.QUIET }}>
+          <div className="text-[13px]" style={{ color: S.QUIET }}>
             Filter the grid to matching clips
           </div>
         </div>
@@ -659,7 +659,7 @@ function CommitResults({
         </>
       ) : (
         <div style={{ padding: '32px 16px', textAlign: 'center' }}>
-          <p className="text-[13px]" style={{ color: S.QUIET }}>
+          <p className="text-[14px]" style={{ color: S.QUIET }}>
             No preview clips yet — tap “Search” to filter the grid.
           </p>
         </div>
