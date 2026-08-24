@@ -263,7 +263,7 @@ function Distribution({ dist }: { dist: Array<{ bucket: number; count: number }>
                 className="h-full rounded-full"
                 style={{
                   width: `${pct}%`,
-                  background: b >= 4 ? GREEN : b === 3 ? AMBER : RED,
+                  background: bandColorOnDark(BUCKET_REP_SCORE[b]),
                   transition: 'width 300ms ease',
                 }}
               />
