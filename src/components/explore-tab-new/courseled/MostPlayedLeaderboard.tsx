@@ -13,6 +13,7 @@ import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { PodiumAvatarRing } from './PodiumAvatarRing';
 
 
 /**
@@ -166,37 +167,42 @@ function PlayerFacepile({ players, accent }: { players: MostPlayedPlayer[]; acce
       style={{ display: 'inline-flex', alignItems: 'center', flex: 'none', minWidth: 0 }}
     >
       {visible.map((player, index) => (
-        <span
-          key={player.userId}
-          style={{
-            position: 'relative',
-            zIndex: visible.length - index + (overflow > 0 ? 1 : 0),
-            width: FACE_SIZE,
-            height: FACE_SIZE,
-            marginLeft: index === 0 ? 0 : FACE_OVERLAP,
-            borderRadius: '34%',
-            /* THE LEADER'S RING IS TWO STACKED SHADOWS (BRIEF_DISCOVER_ONE_PAGE
-               §2): a PANEL-coloured gap first, then the accent OUTSIDE it —
-               the BEST THIS WEEK construction (avatar, gap, ring), which is
-               what makes a ring read as a ring rather than a thick border.
-               The other faces keep the single flat 1.5px panel shadow: that one
-               is a separator between overlapping faces, not a ring. */
-            boxShadow:
-              index === 0
-                ? `0 0 0 1.5px ${A.PANEL}, 0 0 0 2.5px ${accent}`
-                : `0 0 0 1.5px ${A.PANEL}`,
-            flex: 'none',
-          }}
-        >
-          <SquircleAvatar
-            size={FACE_SIZE}
+        index === 0 ? (
+          <PodiumAvatarRing
+            key={player.userId}
+            avatarSize={FACE_SIZE}
             src={player.avatarUrl}
             alt={player.name}
             userId={player.userId}
-            hideRing
-            className="[&>div]:!aspect-square"
+            ringColor={accent}
+            style={{
+              zIndex: visible.length - index + (overflow > 0 ? 1 : 0),
+            }}
           />
-        </span>
+        ) : (
+          <span
+            key={player.userId}
+            style={{
+              position: 'relative',
+              zIndex: visible.length - index + (overflow > 0 ? 1 : 0),
+              width: FACE_SIZE,
+              height: FACE_SIZE,
+              marginLeft: FACE_OVERLAP,
+              borderRadius: '34%',
+              boxShadow: `0 0 0 1.5px ${A.PANEL}`,
+              flex: 'none',
+            }}
+          >
+            <SquircleAvatar
+              size={FACE_SIZE}
+              src={player.avatarUrl}
+              alt={player.name}
+              userId={player.userId}
+              hideRing
+              className="[&>div]:!aspect-square"
+            />
+          </span>
+        )
       ))}
       {overflow > 0 && (
         <span
