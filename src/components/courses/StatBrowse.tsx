@@ -800,8 +800,17 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   );
 
   /* Top-of-page door into the full directory — a member whose course is
-     missing should not have to exhaust the list to go looking. */
+     missing should not have to exhaust the list to go looking.
+   *
+   * THIS BUTTON DOES NOT MATCH THE FIELD IT OPENS, AND THAT IS INTENDED.
+   * The directory sheet's search field is on the canonical field treatment
+   * (radius 14, 6%/10% stepping to 10%/28%). This button keeps A.PANEL at
+   * radius 8 because it sits in a toolbar with three filter wells that share
+   * exactly that treatment. A control's first duty is to its neighbours:
+   * matching a field on another surface at the cost of breaking a row of four
+   * is the wrong trade. Do not "fix" this to match the sheet. */
   const directorySearchButton = (compact: boolean) => (
+
     <button
       type="button"
       onClick={() => openDirectory(country, 'filter_bar')}
