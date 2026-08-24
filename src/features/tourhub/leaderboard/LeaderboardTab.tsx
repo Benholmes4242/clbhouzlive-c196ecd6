@@ -1,3 +1,4 @@
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 /**
  * LeaderboardTab — Tour Book design (v1).
  *
@@ -29,7 +30,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
-import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 
 
@@ -430,10 +430,10 @@ export function LeaderboardTab() {
         )}
 
         {/* SEARCH - its own full-width row; the masthead stays legible. */}
+        {/* FIELD CANON paint + focus step. RADIUS EXCEPTION (8): compact
+            masthead control row, sized off the chips beside it, not 14.
+            HEIGHT EXCEPTION (~28px, padding-derived) for the same reason. */}
         {searchOpen && (
-          {/* FIELD CANON paint + focus step. RADIUS EXCEPTION (8): compact
-              masthead control row, sized off the chips beside it, not 14.
-              HEIGHT EXCEPTION (~28px, padding-derived) for the same reason. */}
           <div
             className={FIELD_PAINT_CLASS}
             style={{

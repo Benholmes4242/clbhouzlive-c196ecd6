@@ -1,3 +1,4 @@
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 /**
  * FindGolfersSheet (BRIEF_FIND_GOLFERS_SHEET) — the sheet the Discover
  * 'friends' prompt opens.
@@ -32,7 +33,6 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A, FIGS, KICKER, LABEL, SANS } from './courseled/tokens';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 import {
-import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
   useFindGolfers,
   type FindGolferRow,
 } from './courseled/hooks/useFindGolfers';
