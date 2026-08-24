@@ -1205,7 +1205,11 @@
       }
     },
     "mostPlayedSeeAllAtCourse": "Diesen Platz besuchen",
-    "seam": "Alle Zeiten · von allen"
+    "seam": "Alle Zeiten · von allen",
+    "media": {
+      "searchPlaceholder": "Search members and courses",
+      "chipsAria": "Media type"
+    }
   },
   "statBrowse": {
     "colArea": "Gebiet",

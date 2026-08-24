@@ -1205,7 +1205,11 @@
       }
     },
     "mostPlayedSeeAllAtCourse": "Visitar este campo",
-    "seam": "Todos los tiempos · de todos"
+    "seam": "Todos los tiempos · de todos",
+    "media": {
+      "searchPlaceholder": "Search members and courses",
+      "chipsAria": "Media type"
+    }
   },
   "statBrowse": {
     "colArea": "Zona",

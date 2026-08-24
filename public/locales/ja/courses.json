@@ -1143,7 +1143,11 @@
       }
     },
     "mostPlayedSeeAllAtCourse": "このコースを見る",
-    "seam": "全期間 · みんなから"
+    "seam": "全期間 · みんなから",
+    "media": {
+      "searchPlaceholder": "Search members and courses",
+      "chipsAria": "Media type"
+    }
   },
   "statBrowse": {
     "colArea": "エリア",

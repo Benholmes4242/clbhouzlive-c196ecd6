@@ -1632,7 +1632,11 @@
       }
     },
     "mostPlayedSeeAllAtCourse": "[Ṿíśíţ ţĥíś çóûŕśé one]",
-    "seam": "[Āļļ ţīmē · ƒrŏm ēṽērýŏnē]"
+    "seam": "[Āļļ ţīmē · ƒrŏm ēṽērýŏnē]",
+    "media": {
+      "searchPlaceholder": "Search members and courses",
+      "chipsAria": "Media type"
+    }
   },
   "statBrowse": {
     "eyebrow": "[~~Ŵĥéřé ţĥíš ĉőɱɱúñíţý ƥļáýš~~]",
