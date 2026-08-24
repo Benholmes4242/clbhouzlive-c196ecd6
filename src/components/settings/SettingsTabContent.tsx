@@ -40,7 +40,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import DeleteAccountConfirmSheet from '@/components/manage/overlays/DeleteAccountConfirmSheet';
 import { useLogout } from '@/hooks/useLogout';
 
@@ -199,7 +199,6 @@ export function SettingsTabContent() {
             size={52}
             fallback={p?.display_name?.charAt(0) || '?'}
             hairlineRing
-            ringColor={LIGHT_HAIRLINE}
           />
           <div className="flex-1 min-w-0">
             <p className="text-[16px] font-semibold text-foreground truncate">

@@ -17,7 +17,6 @@ import type { CommentV2 } from '../hooks/useCommentsV2';
 
 vi.mock('@/components/ui/SquircleAvatar', () => ({
   SquircleAvatar: ({ alt }: { alt?: string }) => <div data-testid="avatar" data-alt={alt} />,
-  LIGHT_HAIRLINE: '#EDF0F3',
   DARK_HAIRLINE: 'rgba(255,255,255,0.22)',
 }));
 vi.mock('@/i18n/format', () => ({

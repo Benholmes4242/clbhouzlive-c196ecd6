@@ -1,7 +1,7 @@
 import React from 'react';
 import { Radio, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import AdminErrorState from './AdminErrorState';
 import {
@@ -154,7 +154,7 @@ export function RightNowPanel({
               {/* ALWAYS render the avatar: SquircleAvatar draws deterministic
                   initials on a null src, and it occupies the 20px slot either
                   way, so rows still align. */}
-              <SquircleAvatar src={u.avatarUrl} alt={u.displayName} size={20} hairlineRing ringColor={LIGHT_HAIRLINE} />
+              <SquircleAvatar src={u.avatarUrl} alt={u.displayName} size={20} hairlineRing />
 
               <span style={{ color: t.ink, fontSize: 13, fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {u.displayName}

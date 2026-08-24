@@ -3,7 +3,7 @@ import { BIZ } from '@/components/business/businessTokens';
 import { TITLE } from '@/lib/tokens/type';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
@@ -256,7 +256,6 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
                       alt={requesterName}
                       size={40}
                       hairlineRing
-                      ringColor={LIGHT_HAIRLINE}
                     />
                     <div className="flex-1 min-w-0">
                       <p className="truncate" style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK }}>

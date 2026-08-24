@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import DetailDrawer from './DetailDrawer';
 import StatusPill from './StatusPill';
@@ -95,7 +95,6 @@ export default function ApprovalDetailDrawer({ open, onClose, row }: Props) {
                   alt={row.target?.display_name ?? undefined}
                   size={40}
                   hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, minWidth: 0 }}>
                   <span style={{ color: t.ink, fontWeight: 700, fontSize: 14 }}>{targetName}</span>
@@ -117,7 +116,6 @@ export default function ApprovalDetailDrawer({ open, onClose, row }: Props) {
                   alt={row.requester?.display_name ?? undefined}
                   size={32}
                   hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
                 />
                 <span style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>{requesterName}</span>
               </div>

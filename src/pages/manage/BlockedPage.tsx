@@ -4,7 +4,7 @@ import { toast } from '@/lib/toast';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -99,7 +99,6 @@ export default function BlockedPage() {
                     userId={item.blocked_id}
                     size={40}
                     hairlineRing
-                    ringColor={LIGHT_HAIRLINE}
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-[15px] font-medium text-foreground" style={{ lineHeight: 1.3 }}>{p?.full_name ?? 'Unknown'}</p>

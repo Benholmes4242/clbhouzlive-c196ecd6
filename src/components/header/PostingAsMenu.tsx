@@ -5,7 +5,7 @@ import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus, C
 import { UploadCenterPanel } from '@/components/uploads/UploadCenterPanel';
 import { useUploadJobs } from '@/uploads/useUploadJobs';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -275,7 +275,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             alt={displayName}
             userId={activeActor?.id}
             hairlineRing
-            ringColor={LIGHT_HAIRLINE}
           />
           <div className="flex flex-col min-w-0 flex-1">
             <span className={cn(
@@ -366,7 +365,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
                         alt={actor.name}
                         userId={actor.id}
                         hairlineRing
-                        ringColor={LIGHT_HAIRLINE}
                       />
                       {!isActive && actorUnread > 0 && (
                         <span

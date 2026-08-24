@@ -23,11 +23,11 @@ import {
  * - Uses getRingColorForTotalPlayed() from clbhouzAchievementPalette.ts
 
 /**
- * Canonical hairline ring colours.
- * - LIGHT_HAIRLINE: use on light surfaces (ink @ 12%).
- * - DARK_HAIRLINE:  default when hairlineRing is set on dark surfaces (white @ 22%).
+ * Canonical hairline ring colour.
+ * clbhouz is dark-only: DARK_HAIRLINE is THE hairline and is applied by default
+ * whenever hairlineRing is set. `ringColor` is an override for an achievement or
+ * accent ring — never a surface choice. Do not add a light variant.
  */
-export const LIGHT_HAIRLINE = 'rgba(15,23,42,0.12)';
 export const DARK_HAIRLINE = 'rgba(255,255,255,0.22)';
 
 
@@ -310,7 +310,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
       className="absolute inset-0 pointer-events-none"
       style={{
         borderRadius: '34%',
-        border: `1px solid ${effectiveRingColor || 'rgba(255,255,255,0.22)'}`,
+        border: `1px solid ${effectiveRingColor || DARK_HAIRLINE}`,
       }}
     />
   ) : null;

@@ -7,7 +7,7 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus } from 'lucide-react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const INK = '#0F172A';
 const INK_SOFT = '#475569';
@@ -114,7 +114,7 @@ export function ProfileSwitcherPopover({
                       src={profile.avatarUrl}
                       alt={profile.name}
                       fallback={profile.name?.charAt(0)?.toUpperCase() ?? '?'}
-                      hairlineRing ringColor={LIGHT_HAIRLINE}
+                      hairlineRing
                     />
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div

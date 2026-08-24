@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { A, Panel, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { useBusinessTeam, type BusinessRole } from '@/hooks/useBusinessTeam';
@@ -92,7 +92,6 @@ export const BusinessTeamTab: React.FC<BusinessTeamTabProps> = ({ businessId }) 
               alt={name}
               fallback={name.charAt(0).toUpperCase()}
               hairlineRing
-              ringColor={LIGHT_HAIRLINE}
             />
             <div className="min-w-0 flex-1">
               <p

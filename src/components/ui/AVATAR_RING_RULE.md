@@ -19,7 +19,10 @@ All avatars MUST use the `<SquircleAvatar
                           >` component from `@/components/ui/SquircleAvatar.tsx`.
 
 ```tsx
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+// The hairline ring defaults to DARK_HAIRLINE (white @ 22%). Never pass a
+// surface-based ring colour: clbhouz is dark-only. `ringColor` is an override
+// for achievement or accent rings only.
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 // User with achievement ring (shows colored ring, no grey)
 <SquircleAvatar 

@@ -11,7 +11,6 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SectionEyebrow } from './SectionEyebrow';
 import { useEventMoments, MOMENT_TYPE_CONFIG, type MomentType } from '../../hooks/useEventMoments';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
-import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, SURFACE, SLATE_50, HAIRLINE_INK_8,
 } from '../../_shared/tokens';
@@ -184,7 +183,6 @@ function MomentCard({ moment, tourCode }: { moment: ReturnType<typeof useEventMo
           playerName={player.full_name}
           tourCode={tourCode}
           size="sm"
-          ringColor={LIGHT_HAIRLINE}
         />
       )}
       <div style={{ fontSize: 10.5, fontWeight: 700, color: INK, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>

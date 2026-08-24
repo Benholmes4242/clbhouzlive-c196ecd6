@@ -9,7 +9,7 @@ import {
   AtSign,
 } from 'lucide-react';
 import { LABEL } from '@/lib/tokens/type';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useUserActions } from '@/hooks/admin/useUserDetails';
 import { supabase } from '@/integrations/supabase/client';
 import { adminTheme as t } from '../theme';
@@ -717,7 +717,7 @@ function Member360Sheet({
             paddingBottom: 12, borderBottom: `1px solid ${t.line}`,
           }}>
             <SquircleAvatar size={46} src={detail.avatar_url} alt={detail.display_name ?? ''} userId={detail.id}
-              hairlineRing ringColor={LIGHT_HAIRLINE}
+              hairlineRing
             />
             <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>

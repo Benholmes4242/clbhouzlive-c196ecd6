@@ -26,7 +26,7 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { MovementFigure } from '../../_shared/movement';
@@ -167,7 +167,6 @@ function PlayerCell({
           alt={row.name}
           userId={row.playerId}
           hairlineRing
-          ringColor={LIGHT_HAIRLINE}
         />
         {live && (
           <span
@@ -356,7 +355,6 @@ function WinnersCircleInner({ category, onOpen, onPlayerTap }: BoardBaseProps) {
                 alt={r.name}
                 userId={r.playerId}
                 hairlineRing
-                ringColor={LIGHT_HAIRLINE}
               />
               <span
                 style={{

@@ -15,7 +15,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { FIGURE } from '@/lib/tokens/type';
 import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSharePromptFor, type SharePromptCandidate } from '../hooks/useSharePrompt';
@@ -71,7 +71,6 @@ const StackedLikers: React.FC<{
             src={back}
             alt=""
             hairlineRing
-            ringColor={LIGHT_HAIRLINE}
           />
         </div>
       )}
@@ -82,7 +81,6 @@ const StackedLikers: React.FC<{
           alt={frontIsLiker ? '' : (actorName ?? '')}
           userId={frontIsLiker ? null : actorUserId}
           hairlineRing
-          ringColor={LIGHT_HAIRLINE}
         />
       </div>
     </div>
@@ -312,7 +310,6 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         alt={row.actor_display_name ?? ''}
         userId={row.actor_user_id}
         hairlineRing
-        ringColor={LIGHT_HAIRLINE}
       />
     );
   }

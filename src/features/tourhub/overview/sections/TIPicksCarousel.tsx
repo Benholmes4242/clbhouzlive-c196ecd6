@@ -24,7 +24,7 @@ import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { TourStatusBlock, TOUR_UNDER } from '../../_shared/TourStatusBlock';
 import { TOPAR_UNDER_LIGHT, TOPAR_UNDER_DARK } from '../../_shared/tokens';
 
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { useSinglePlayerStatistics, useTourTournament, type TourTournament } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
@@ -1560,7 +1560,6 @@ function AllPicksSheet({
                   alt={p.playerName}
                   userId={p.playerId}
                   hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
                 />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>

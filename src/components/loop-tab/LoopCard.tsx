@@ -23,7 +23,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { toast } from '@/lib/toast';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
-import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { LoopCardMenu } from './LoopCardMenu';
 
 import { ExpandableCaption } from '@/components/posts/ExpandableCaption';
@@ -333,7 +333,6 @@ export const LoopCard = React.memo(function LoopCard({
               userId={post.userId}
               size="sm"
               hairlineRing
-              ringColor={LIGHT_HAIRLINE}
             />
           </button>
           <button
