@@ -1,5 +1,5 @@
 /**
- * ParRings - the three par-type rings, LIGHT SURFACE.
+ * ParRings - the three par-type rings, DARK SURFACE.
  *
  * Used by screen 1 (hardcoded example figures, labelled as such) and screen 5
  * (the member's own avg_over from get_my_scoring_breakdown_all_courses).
@@ -7,7 +7,7 @@
  * what was offered.
  *
  * ALL THREE RINGS SHARE ONE CEILING (RING_MAX) so they are comparable with
- * each other. Colours are the LIGHT-surface tokens - never the dark chart set.
+ * each other. Colours are designTokens AMBER / BAD / GOOD - the dark values.
  */
 import React from 'react';
 import { INK, DIM, TRACK, AMBER, GOOD, BAD, LABEL, NUM } from './designTokens';

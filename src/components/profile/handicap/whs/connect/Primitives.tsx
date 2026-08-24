@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import {
-  PANEL, BORDER, INK, MUTE, DIM, AMBER, TRACK, FONT,
+  CANVAS, PANEL, BORDER, INK, MUTE, DIM, AMBER, TRACK, FONT,
   KICKER, LABEL, NUM,
   DISPLAY, DISPLAY_SM, LEAD, KICKER_LG,
 } from './designTokens';
@@ -116,7 +116,7 @@ export const PrimaryButton: React.FC<{
       borderRadius: 12,
       border: 'none',
       background: disabled ? TRACK : INK,
-      color: disabled ? DIM : '#FFF',
+      color: disabled ? DIM : CANVAS,
       fontFamily: FONT,
       fontSize: 14.5,
       fontWeight: 700,
@@ -204,7 +204,7 @@ export const BackRow: React.FC<{
           padding: '0 10px 0 6px',
           border: 'none',
           borderRadius: 12,
-          background: pressed && !disabled ? 'rgba(14,18,22,0.06)' : 'transparent',
+          background: pressed && !disabled ? 'rgba(255,255,255,0.08)' : 'transparent',
           transition: 'background 120ms ease',
           opacity: disabled ? 0.3 : 1,
           cursor: disabled ? 'default' : 'pointer',
@@ -287,7 +287,7 @@ export const StageRule: React.FC = () => (
 );
 
 
-/** Shared collapsible list - light surface variant. */
+/** Shared collapsible list - dark surface. */
 export const Collapsible: React.FC<{
   children: React.ReactNode;
   threshold?: number;
