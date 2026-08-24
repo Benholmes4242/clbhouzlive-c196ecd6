@@ -619,6 +619,7 @@ const LABEL_FALLBACK: Record<string, string> = {
   eagle: 'EAGLE',
   ace: 'ACE',
   albatross: 'ALBATROSS',
+  courseRecord: 'COURSE RECORD',
   finishedInRed: 'FINISHED IN THE RED',
   birdieHaul: 'BIRDIE HAUL',
   strongFinish: 'STRONG FINISH',
@@ -637,6 +638,8 @@ const FIGURE_FALLBACK: Record<string, string> = {
 
 const SENTENCE_FALLBACK: Record<string, string> = {
   eagle: 'A {{0}} on a par {{1}}.',
+  courseRecord: "{{0}} shots better than {{1}}'s {{2}}.",
+  courseRecordUnknown: '{{0}} shots better than the previous record of {{2}}.',
   /* THE NEW RULE IS THE FINISHING SCORE (§2.1), so the sentence states that and
      nothing about going under par along the way. */
   finishedInRed: 'Eighteen holes finished under par.',
@@ -679,6 +682,14 @@ export function momentSentence(m: Moment, t: TFn): string {
   switch (m.sentenceKey) {
     case 'eagle':
       return t(key, fb, { 0: f.strokes, 1: f.par });
+    case 'courseRecord':
+    case 'courseRecordUnknown':
+      return t(`${key}_${f.margin === 1 ? 'one' : 'other'}`, fb, {
+        0: f.margin,
+        1: f.heldBy,
+        2: f.beatenGross,
+        count: f.margin,
+      });
     case 'finishedInRed':
       /* THE SENTENCE NEVER REPEATS THE FIGURE (§S2.8) and the figure IS the
          to-par here, so the sentence carries no number at all. */
@@ -759,11 +770,22 @@ function FigureLine({
   };
 
   if (moment.figureRole === 'score' && moment.figure != null) {
-    /* FINISHED IN THE RED: the round's to-par IS the figure, with a true minus
-       (§5). No template, no noun — the eyebrow already said it. */
+    /* FINISHED IN THE RED's figure is to-par and takes a true minus. COURSE
+       RECORD's figure is gross, so it stays an unsigned score; its score colour
+       still follows the round's to-par fact rather than the magenta identity. */
     return (
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, minWidth: 0 }}>
-        <span style={numStyle}>{fmtRel(moment.figure)}</span>
+        <span
+          style={{
+            ...numStyle,
+            color:
+              moment.kind === 'courseRecord' && (moment.facts.toPar ?? 0) < 0
+                ? FINISHED_IN_RED_TONE
+                : numStyle.color,
+          }}
+        >
+          {moment.kind === 'courseRecord' ? moment.figure : fmtRel(moment.figure)}
+        </span>
       </div>
     );
   }
@@ -847,7 +869,10 @@ function GolfThisWeekCard({
 
   /* THE SELECTOR IS PURE AND LIVES IN ITS OWN MODULE (§S1.8). A round with no
      hole data returns PLAIN with no counts, and the well renders empty (§S1.7). */
-  const moment = useMemo(() => selectMoment(shape?.holes ?? []), [shape]);
+  const moment = useMemo(
+    () => selectMoment(shape?.holes ?? [], row.course_record_fact),
+    [shape, row.course_record_fact],
+  );
   const label = momentLabel(moment, t as TFn);
   const sentence = momentSentence(moment, t as TFn);
   const marked = useMemo(() => new Set(moment.markedHoles), [moment.markedHoles]);

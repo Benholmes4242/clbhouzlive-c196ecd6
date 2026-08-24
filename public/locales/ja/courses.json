@@ -1096,6 +1096,7 @@
           "eagle": "EAGLE",
           "ace": "ACE",
           "albatross": "ALBATROSS",
+          "courseRecord": "コースレコード",
           "run": "連続",
           "grind": "我慢のゴルフ",
           "finishedInRed": "アンダーパーで終了",
@@ -1111,6 +1112,10 @@
         },
         "sentence": {
           "eagle": "パー{{1}}で{{0}}。",
+          "courseRecord_one": "{{1}}の{{2}}を{{0}}打更新。",
+          "courseRecord_other": "{{1}}の{{2}}を{{0}}打更新。",
+          "courseRecordUnknown_one": "これまでの記録{{2}}を{{0}}打更新。",
+          "courseRecordUnknown_other": "これまでの記録{{2}}を{{0}}打更新。",
           "run": "{{0}} 番から {{1}} 番までパー以上。",
           "grind": "ボギー以上に崩れたホールはひとつもなし。",
           "plain": "{{1}} ホール中 {{0}} ホールをパー以上。",

@@ -1158,6 +1158,7 @@
           "eagle": "EAGLE",
           "ace": "ACE",
           "albatross": "ALBATROSS",
+          "courseRecord": "RÉCORD DEL CAMPO",
           "run": "LA RACHA",
           "grind": "EL OFICIO",
           "finishedInRed": "TERMINÓ BAJO PAR",
@@ -1173,6 +1174,10 @@
         },
         "sentence": {
           "eagle": "Un {{0}} en un par {{1}}.",
+          "courseRecord_one": "{{0}} golpe mejor que el {{2}} de {{1}}.",
+          "courseRecord_other": "{{0}} golpes mejor que el {{2}} de {{1}}.",
+          "courseRecordUnknown_one": "{{0}} golpe mejor que el récord anterior de {{2}}.",
+          "courseRecordUnknown_other": "{{0}} golpes mejor que el récord anterior de {{2}}.",
           "run": "Par o mejor del {{0}} al {{1}}.",
           "grind": "Nada peor que un bogey en toda la vuelta.",
           "plain": "{{0}} de {{1}} hoyos en par o mejor.",
