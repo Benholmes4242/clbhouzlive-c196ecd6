@@ -398,6 +398,27 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     if (v > thirdSums[worstIdx]) worstIdx = i;
     if (v < thirdSums[bestIdx] || !thirdHas[bestIdx]) bestIdx = i;
   });
+  /**
+   * THE DENOMINATOR IS THE ROUND'S OWN DAMAGE, not the worst third.
+   *
+   * A track needs a scale, and scaling each third against the largest of the
+   * three would make the worst third 100% full in EVERY round: the bar would
+   * carry no information the ink ladder does not already carry, and no two
+   * rounds or courses would compare. So the fill is each third's SHARE of the
+   * shots this round dropped here - the same denominator the share figures
+   * already use (the viewer's own total over par, never the field's). The three
+   * fills sum to 100%, which is what makes "the back six costs you half your
+   * round" readable straight off the bars.
+   *
+   * A third played UNDER par contributes no damage: it is floored at zero and
+   * renders an empty track rather than a negative width. If no third dropped a
+   * shot there is nothing to apportion and all three tracks read empty.
+   */
+  const thirdDamage = thirdSums.map((v) => Math.max(0, v));
+  const thirdDamageTotal = thirdDamage.reduce((a, b) => a + b, 0);
+  const thirdShares = thirdDamage.map((v) =>
+    thirdDamageTotal > 0 ? Math.round((v / thirdDamageTotal) * 100) : 0,
+  );
   const spread = +(thirdSums[worstIdx] - thirdSums[bestIdx]).toFixed(1);
   /** Below the floor: ink nothing, claim nothing. The curve still draws. */
   const thirdsEven = spread < THIRDS_NOISE_FLOOR || worstIdx === bestIdx;
