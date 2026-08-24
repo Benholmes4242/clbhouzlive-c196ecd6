@@ -193,7 +193,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
         <button
           onClick={() => refetch()}
           className="px-5 py-2.5 rounded-full text-sm font-semibold active:scale-[0.97] transition-all min-h-[44px]"
-          style={{ background: AMBER, color: A.CANVAS }}
+          style={{ background: A.INK, color: A.CANVAS }}
         >
           {t('common:action.retry')}
         </button>
@@ -290,7 +290,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
 
       {isFetchingNextPage && (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
-          <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
+          <Loader2 className="w-5 h-5 animate-spin" style={{ color: AMBER }} />
         </div>
       )}
     </div>
