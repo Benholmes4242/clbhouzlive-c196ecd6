@@ -474,19 +474,24 @@ export default function ExploreTabContent({
             is on. It stays ABOVE the media bar because a chip row that heads it
             would imply the honours board is a media type.
             It is structurally outside the media-controlled subtree below. */}
-        <HonoursBoard
-          events={honours}
-          isPending={wireLoading}
-          onRowPress={handleHonoursRow}
-          limit={20}
-          onSeeAll={openHonoursSheet}
-        />
+        <div data-act-one-honours style={{ display: 'contents' }}>
+          <HonoursBoard
+            events={honours}
+            isPending={wireLoading}
+            onRowPress={handleHonoursRow}
+            limit={20}
+            onSeeAll={openHonoursSheet}
+          />
+        </div>
 
         {/* THE CHAPTER BREAK IS NOW A CONTROL (§4). ActSeam is deleted: a
             decorative rule with a caption that had to explain itself is a rule
             that failed. ACT_GAP above and below, so the break reads as a break
             rather than as another section. */}
-        <div style={{ marginTop: ACT_GAP - RHYTHM, marginBottom: ACT_GAP - RHYTHM }}>
+        <div
+          data-media-act-controls
+          style={{ marginTop: ACT_GAP - RHYTHM, marginBottom: ACT_GAP - RHYTHM }}
+        >
           <MediaActBar chip={mediaChip} onChipChange={changeChip} />
         </div>
 
