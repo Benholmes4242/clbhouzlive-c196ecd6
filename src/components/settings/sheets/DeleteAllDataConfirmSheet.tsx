@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TITLE } from '@/lib/tokens/type';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import {
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
   PANEL, BORDER, INK, MUTE, DIM, BAD, TRACK, FONT, KICKER, LABEL,
 } from '@/components/profile/handicap/whs/connect/designTokens';
 
@@ -67,14 +68,12 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
             autoCorrect="off"
             spellCheck={false}
             aria-label="Type DELETE to confirm"
+            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
             style={{
               width: '100%',
               boxSizing: 'border-box',
               padding: '12px 14px',
-              border: `1px solid ${BORDER}`,
-              borderRadius: 10,
               fontSize: 15,
-              background: PANEL,
               color: INK,
               fontFamily: FONT,
               outline: 'none',

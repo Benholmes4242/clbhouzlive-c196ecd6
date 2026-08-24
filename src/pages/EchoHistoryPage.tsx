@@ -13,6 +13,7 @@ import { formatRelativeRounded } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { TITLE } from '@/lib/tokens/type';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 /**
  * BRIEF_ECHO_CADDIE §6.2 — NO LIGHT CANVAS SURVIVES ANYWHERE IN ECHO, history
@@ -554,16 +555,8 @@ const EchoHistoryPage: React.FC = () => {
                   value={renameValue}
                   onChange={(e) => setRenameValue(e.target.value)}
                   placeholder="Chat title"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: 10,
-                    background: '#1D222A',
-                    border: 'none',
-                    outline: 'none',
-                    fontSize: 14,
-                    color: INK,
-                  }}
+                  className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} outline-none`}
+                  style={{ width: '100%', padding: '12px', fontSize: 14, color: INK }}
                 />
                 <button
                   type="button"

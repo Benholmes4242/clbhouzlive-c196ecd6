@@ -72,6 +72,7 @@ import { EC } from '@/features/echo-chat/tokens';
 import { MSG, MT, FIGS } from '@/features/messaging-dark/tokens';
 import type { Json } from '@/integrations/supabase/types';
 import type { ConversationMember, MemberRole } from '@/types/messaging';
+import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 /** §5 — the sheet is a step lighter than the canvas. No new tokens declared. */
 const SHEET = EC.PANEL;
@@ -451,11 +452,9 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
                       if (e.key === 'Enter') void handleSaveTitle();
                       if (e.key === 'Escape') setTitleEdit(null);
                     }}
+                    className={`${FIELD_PAINT_RAISED_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
                     style={{
                       flex: 1,
-                      background: RAISED,
-                      border: `1px solid ${HAIRLINE}`,
-                      borderRadius: 10,
                       padding: '9px 12px',
                       fontSize: 15,
                       color: INK,
@@ -1020,12 +1019,9 @@ const AddPeopleSheet: React.FC<AddPeopleSheetProps> = ({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t('messaging:search.peopleAnd')}
-            className="msg-input"
+            className={`msg-input ${FIELD_PAINT_RAISED_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
             style={{
               width: '100%',
-              background: RAISED,
-              border: `1px solid ${HAIRLINE}`,
-              borderRadius: 12,
               padding: '11px 14px',
               fontSize: 15,
               color: INK,

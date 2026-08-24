@@ -32,6 +32,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A, FIGS, KICKER, LABEL, SANS } from './courseled/tokens';
 import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 import {
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
   useFindGolfers,
   type FindGolferRow,
 } from './courseled/hooks/useFindGolfers';
@@ -513,13 +514,12 @@ export function FindGolfersSheet({ open, onClose }: Props) {
         </div>
 
         {/* INPUTS STAY WHITE; the shell does not. */}
+        {/* FIELD CANON. HEIGHT EXCEPTION (42): paired with the scope row below it. */}
         <div
+          className={FIELD_PAINT_CLASS}
           style={{
             marginTop: 12,
             height: 42,
-            borderRadius: 12,
-            border: `1px solid ${A.BORDER}`,
-            background: A.PANEL,
             display: 'flex',
             alignItems: 'center',
             gap: 8,

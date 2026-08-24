@@ -32,6 +32,7 @@ import {
 import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, GREEN, DANGER as RED } from '@/components/manage/ui';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { BIZ } from '@/components/business/businessTokens';
+import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 const AMBER = A.AMBER;
 const AMBER_SOFT = BIZ.amberTint;
@@ -159,16 +160,10 @@ function ReplySheet({
             onChange={(e) => setText(e.target.value.slice(0, 1000))}
             placeholder="Thank the golfer, address specifics, invite them back..."
             rows={6}
-            className="w-full resize-none outline-none"
-            style={{
-              background: CARD_BG,
-              border: `1px solid ${HAIR}`,
-              borderRadius: 12,
-              padding: '12px 14px',
-              fontSize: 15,
-              color: INK,
-              fontFamily: 'inherit',
-            }}
+            /* FIELD CANON, RAISED set — the ground here is the reply CARD_BG
+               card, lighter than the canvas. */
+            className={`w-full resize-none outline-none ${FIELD_PAINT_RAISED_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+            style={{ padding: '12px 14px', fontSize: 15, color: INK, fontFamily: 'inherit' }}
           />
           <div className="flex items-center justify-between">
             <span className="text-[12px]" style={{ color: INK_45 }}>

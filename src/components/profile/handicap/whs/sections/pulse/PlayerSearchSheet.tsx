@@ -175,16 +175,10 @@ export const PlayerSearchSheet: React.FC<Props> = ({ open, onClose }) => {
       {/* Scrollable body */}
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingBottom: 24 }}>
         <div style={{ padding: '16px 16px 0' }}>
+          {/* FIELD CANON (lib/tokens/field.ts) — was --hcp-bg-1/--hcp-line, no step. */}
           <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              background: 'var(--hcp-bg-1)',
-              border: '1px solid var(--hcp-line)',
-              borderRadius: 12,
-              padding: '12px 14px',
-            }}
+            className={FIELD_PAINT_CLASS}
+            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px' }}
           >
             <Search size={16} color="var(--hcp-t-60)" />
             <input

@@ -45,6 +45,7 @@ import { whoLeads, type H2HStatFormat } from './h2hStats';
 import { useCompareStats } from './useCompareStats';
 
 import type { CompareSource } from './events';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 const RECENT_LIMIT = 6;
 
@@ -641,16 +642,10 @@ export const CompareSheet: React.FC<Props> = ({
           <>
             {/* Search */}
             <div style={{ padding: '14px 16px 12px' }}>
+              {/* FIELD CANON — ground is CHART.CANVAS, so the canvas set. */}
               <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  background: CHART.PANEL,
-                  border: `1px solid ${CHART.BORDER}`,
-                  borderRadius: 12,
-                  padding: '9px 12px',
-                }}
+                className={FIELD_PAINT_CLASS}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px' }}
               >
                 <Search size={15} strokeWidth={2.2} color={CHART.DIM} />
                 <input
