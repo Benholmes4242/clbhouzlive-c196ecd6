@@ -12,7 +12,7 @@ const HERO_MIN_HEIGHT =
 
 export const CoursesHubSkeleton = () => {
   return (
-    <div style={{ minHeight: '100vh', background: '#F8FAFC' }}>
+    <div style={{ minHeight: '100vh', background: '#15171F' }}>
       {/* Hero hold — same gradient AmateurCircuitHero uses for its own
           isLoading state, so fallback -> hero-loading -> hero is one frame */}
       <div
@@ -31,7 +31,7 @@ export const CoursesHubSkeleton = () => {
           gap: 16,
           padding: '12px 16px',
           borderBottom: '0.5px solid rgba(15,23,42,0.06)',
-          background: '#FFFFFF',
+          background: '#1B1E27',
         }}
       >
         <Skeleton className="h-6 w-20 rounded-md" />

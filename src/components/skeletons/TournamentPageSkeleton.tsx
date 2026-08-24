@@ -7,7 +7,7 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { HERO_MIN_H } from '@/features/tourhub/_shared/tokens';
 
-const SLATE_50 = '#F8FAFC';
+const SLATE_50 = '#15171F';
 const HAIRLINE_INK_8 = 'rgba(15,23,42,0.08)';
 
 export const TournamentPageSkeleton = () => {
