@@ -21,6 +21,7 @@ import {
   GREEN,
   ManageCard,
 } from '@/components/manage/ui';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { getAvatarFallbackColor, getInitialsFromName } from '@/lib/avatarFallback';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
@@ -289,7 +290,8 @@ export function FilledButton({
         minHeight: 50,
         borderRadius: 12,
         background: INK,
-        color: '#FFFFFF',
+        /* INK is A.INK (near-white): the label takes CANVAS, not white. */
+        color: A.CANVAS,
         fontFamily: SF_STACK,
         fontSize: 16,
         fontWeight: 600,

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -160,10 +161,12 @@ export function BusinessCommandCard({
         className="overflow-hidden"
         style={{
           background: BIZ.card,
-          border: `1px solid ${expanded ? 'rgba(15,23,42,0.12)' : BIZ.hair}`,
+          border: `1px solid ${expanded ? 'rgba(255,255,255,0.16)' : BIZ.hair}`,
           borderRadius: BIZ.rCard,
-          boxShadow: expanded ? '0 6px 24px rgba(15,23,42,0.06)' : 'none',
-          transition: 'box-shadow 200ms ease, border-color 200ms ease',
+          /* No elevation. A black-alpha shadow is invisible on dark and a
+             white-alpha glow is an unsettled decision: the border alone carries
+             the expanded state. */
+          transition: 'border-color 200ms ease',
         }}
       >
         {/* ─── SUMMARY ROW ─── */}
@@ -191,11 +194,11 @@ export function BusinessCommandCard({
                 {business.name.charAt(0).toUpperCase()}
               </span>
             )}
-            {/* Canonical 1px traced hairline ring — ink @ 12% */}
+            {/* Canonical 1px traced hairline ring — A.BORDER white-alpha */}
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0"
-              style={{ border: '1px solid rgba(15,23,42,0.12)', borderRadius: 14 }}
+              style={{ border: `1px solid ${A.BORDER}`, borderRadius: 14 }}
             />
           </div>
 
@@ -216,9 +219,9 @@ export function BusinessCommandCard({
             {locationDisplay && (
               <p
                 className="flex items-center gap-1"
-                style={{ color: 'rgba(15,23,42,0.45)', fontSize: 12, fontWeight: 500, lineHeight: 1.35 }}
+                style={{ color: A.MUTE, fontSize: 12, fontWeight: 500, lineHeight: 1.35 }}
               >
-                <MapPin className="h-3 w-3 shrink-0" style={{ color: 'rgba(15,23,42,0.45)' }} />
+                <MapPin className="h-3 w-3 shrink-0" style={{ color: A.MUTE }} />
                 {locationDisplay}
               </p>
             )}
