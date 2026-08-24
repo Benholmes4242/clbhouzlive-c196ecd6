@@ -17,7 +17,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { TourPlayerStatistics } from '../hooks/useTourHubData';
-import type { TourId } from '../hooks/useOverviewData';
+import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 import { formatEarnings } from '../_shared/formatEarnings';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
