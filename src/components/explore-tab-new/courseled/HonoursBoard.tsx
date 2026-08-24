@@ -18,7 +18,7 @@ import { PodiumAvatarRing } from './PodiumAvatarRing';
  *   a light scroll.
  *   AN ODDS-LED CARD ("1 IN 12,500" as the hero) put the one constant per feat
  *   type in the largest type on the card: six cards that looked like one card
- *   six times. The odds are now said ONCE, in the section subline (§S3).
+ *   six times.
  *
  * THE RAIL IS A SAMPLE, THE SHEET IS THE RECORD (§S4): one card per feat,
  * RAREST FIRST THEN MOST RECENT, EVERY CARD THE SAME WIDTH AND HEIGHT. Grouping by person was
