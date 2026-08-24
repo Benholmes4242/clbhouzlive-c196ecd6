@@ -223,7 +223,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
     <section
       style={{
         position: 'relative',
-        background: HERO_INK,
+        background: HERO_GROUND,
         marginTop: 0,
         padding: '0 16px 16px',
         /* MINIMUM top inset - it clears the status bar and ChromeIsland and
