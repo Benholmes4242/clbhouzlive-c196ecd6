@@ -292,7 +292,7 @@ const Legend: React.FC = () => {
  * you against the field. Different jobs, different rules. Do not "harmonise".
  *
  * A zero band renders NO segment (never a zero-width sliver) and its cell shows
- * 0 in DIM rather than the band colour — a colour there would claim a score
+ * 0 in quiet chrome rather than the band colour — a colour there would claim a score
  * that was not made.
  */
 const RoundSplit: React.FC<{ split: { label: string; n: number; tone: string }[] }> = ({ split }) => (
@@ -306,7 +306,7 @@ const RoundSplit: React.FC<{ split: { label: string; n: number; tone: string }[]
       {split.map((s) => (
         <div key={s.label} style={{ textAlign: 'center' }}>
           <div style={LABEL}>{s.label}</div>
-          <div style={{ ...NUM, fontSize: 18, color: s.n > 0 ? s.tone : A.DIM, marginTop: 3 }}>{s.n}</div>
+          <div style={{ ...NUM, fontSize: 18, color: s.n > 0 ? s.tone : A.MUTE, marginTop: 3 }}>{s.n}</div>
         </div>
       ))}
     </div>
