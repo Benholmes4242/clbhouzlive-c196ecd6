@@ -51,6 +51,7 @@ export default function CourseTagSheet({
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
   const [searching, setSearching] = useState(false);
+  const [fieldFocused, setFieldFocused] = useState(false);
   const [draft, setDraft] = useState<StageCourse[]>(selected);
   const { rows: popular, loaded: popularLoaded } = usePopularCourses(open, {
     excludeReviewedForUserId,
