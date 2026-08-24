@@ -15,6 +15,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -165,11 +166,11 @@ export function FullListSheet({
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              background: SURFACE,
-              border: `0.5px solid ${HAIRLINE_INK_10}`,
-              borderRadius: 18,
               padding: '6px 12px',
             }}
+            /* FIELD CANON (lib/tokens/field.ts). HEIGHT EXCEPTION (~33px,
+               padding-derived): sheet header above the leaders list. */
+            className={FIELD_PAINT_CLASS}
           >
             <Search size={13} color={INK_MUTE} strokeWidth={2.25} />
             <input

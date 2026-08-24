@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 
 const CATEGORIES = [
@@ -186,12 +187,10 @@ export default function ContactPage() {
             onChange={(e) => setSubject(e.target.value)}
             maxLength={140}
             placeholder="Short summary"
-            className="w-full h-12 px-4 rounded-2xl text-[15px] outline-none"
-            style={{
-              background: A.PANEL,
-              border: `1px solid ${A.BORDER}`,
-              color: A.INK,
-            }}
+            /* FIELD CANON (lib/tokens/field.ts): 6% well, radius 14, height 44
+               (was 48 on an A.PANEL slab). Stands alone, no exception. */
+            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full h-11 px-4 text-[15px] outline-none`}
+            style={{ color: A.INK }}
           />
         </div>
 
@@ -208,13 +207,9 @@ export default function ContactPage() {
             onChange={(e) => setMessage(e.target.value)}
             placeholder="What happened? Include steps, device, and anything else that helps us reproduce it."
             rows={7}
-            className="w-full p-4 rounded-2xl text-[15px] outline-none resize-none leading-relaxed"
-            style={{
-              background: A.PANEL,
-              border: `1px solid ${A.BORDER}`,
-              color: A.INK,
-              minHeight: 160,
-            }}
+            /* FIELD CANON (lib/tokens/field.ts). Textarea: minHeight governs. */
+            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full p-4 text-[15px] outline-none resize-none leading-relaxed`}
+            style={{ color: A.INK, minHeight: 160 }}
           />
         </div>
 

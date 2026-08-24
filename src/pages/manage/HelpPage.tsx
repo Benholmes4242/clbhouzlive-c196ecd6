@@ -5,6 +5,7 @@ import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useHelpArticles, type HelpArticle } from '@/hooks/useHelpArticles';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 
 function AccordionRow({
@@ -78,17 +79,16 @@ export default function HelpPage() {
 
   const searchBar = (
     <div className="px-4 pb-3">
-      <div
-        className="flex items-center gap-2 h-11 px-3 rounded-xl"
-        style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
-      >
+      {/* FIELD CANON (lib/tokens/field.ts): was an A.PANEL slab; now a 6%
+          well on the canvas. Height 44 (h-11) — stands alone, no exception. */}
+      <div className={`${FIELD_PAINT_CLASS} flex items-center gap-2 h-11 px-3`}>
         <Search size={16} style={{ color: A.MUTE }} className="shrink-0" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search help articles"
-          className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-[rgba(248,250,252,0.62)]"
+          className={`${FIELD_PLACEHOLDER_CLASS} flex-1 bg-transparent text-[15px] outline-none`}
           style={{ color: A.INK }}
         />
       </div>

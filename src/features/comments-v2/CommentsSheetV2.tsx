@@ -9,6 +9,7 @@
  * Keyboard-aware via useKeyboardHeight.
  */
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -370,10 +371,11 @@ function CommentsSheetV2Inner({
               <textarea
                 value={editText}
                 onChange={(e) => setEditText(e.target.value)}
-                className="w-full outline-none"
+                /* FIELD CANON (lib/tokens/field.ts). Textarea: minHeight
+                   governs, no height exception. */
+                className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full outline-none`}
                 style={{
-                  minHeight: 96, padding: 12, borderRadius: 12,
-                  border: `1px solid ${HAIRLINE}`, background: 'rgba(255,255,255,0.06)',
+                  minHeight: 96, padding: 12,
                   fontSize: 14, color: INK, resize: 'vertical',
                 }}
               />

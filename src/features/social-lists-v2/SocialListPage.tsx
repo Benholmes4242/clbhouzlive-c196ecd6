@@ -16,6 +16,7 @@
 import { useMemo, useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, UserPlus } from 'lucide-react';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { toast } from '@/lib/toast';
 
@@ -240,11 +241,14 @@ export default function SocialListPage({
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            background: SURFACE,
-            border: `0.5px solid ${HAIR}`,
-            borderRadius: 12,
             padding: '9px 12px',
           }}
+          /* FIELD CANON (lib/tokens/field.ts). The REST of this page is still
+             light (ink-alpha literals on a dark canvas) — it needs its own
+             migration brief; only the field was in scope here.
+             HEIGHT EXCEPTION (~39px, padding-derived): sits directly above the
+             list with the tab switcher above it. */
+          className={FIELD_PAINT_CLASS}
         >
           <Search size={16} color={INK_FAINT} strokeWidth={2.2} />
           <input

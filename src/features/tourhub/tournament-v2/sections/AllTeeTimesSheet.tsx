@@ -8,6 +8,7 @@
  * reached them (live/completed) or, for upcoming events, only Round 1.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
@@ -203,11 +204,13 @@ export function AllTeeTimesSheet({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 7,
-                background: SLATE_50,
-                border: `0.5px solid ${INK_FAINT}33`,
-                borderRadius: 18,
                 padding: '7px 12px',
               }}
+              /* FIELD CANON (lib/tokens/field.ts): was a SLATE_50 slab with a
+                 0.5px border. HEIGHT EXCEPTION (~35px, padding-derived): sits
+                 in the sheet header above the tee-time list; 44 would cost a
+                 row. Constrained by neighbours, not preference. */
+              className={FIELD_PAINT_CLASS}
             >
               <Search size={13} color={INK_FAINT} />
               <input

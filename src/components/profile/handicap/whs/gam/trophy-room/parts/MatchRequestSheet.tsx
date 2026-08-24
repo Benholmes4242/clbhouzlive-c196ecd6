@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -231,13 +232,13 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
               value={whsName}
               onChange={(e) => setWhsName(e.target.value)}
               placeholder="What does your WHS record call it? (optional)"
+              /* FIELD CANON (lib/tokens/field.ts). Rest lifted 4% -> 6%.
+                 Height is padding-derived (~43px); stands alone. */
+              className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
               style={{
                 width: '100%',
                 boxSizing: 'border-box',
                 padding: '11px 12px',
-                borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.12)',
-                background: 'rgba(255,255,255,0.04)',
                 color: '#fff',
                 fontSize: 13,
                 fontFamily: FONT,
