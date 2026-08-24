@@ -20,7 +20,6 @@ import {
 } from '@/hooks/courses/useCourseDirectorySearch';
 import {
   HAIRLINE_INK_8,
-  HAIRLINE_INK_10,
   INK,
   INK_MUTE,
   SURFACE,
@@ -51,6 +50,8 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
   const navigate = useNavigate();
   const [term, setTerm] = useState('');
   const [country, setCountry] = useState<string | null>(initialCountry);
+  /** Focus lives on the WRAPPER: the wrapper owns the paint, the input is bare. */
+  const [searchFocused, setSearchFocused] = useState(false);
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const trackedFor = useRef<string | null>(null);
@@ -164,9 +165,18 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
           {t('statBrowse.directory.title')}
         </h2>
 
+        {/* CANONICAL FIELD TREATMENT. h-11 is 44 (already canonical) and the
+            rest paint was already 6%; what was missing was the focus step —
+            there was no onFocus/onBlur anywhere, so neither channel ever moved.
+            The rest border states rgba(255,255,255,0.10) literally rather than
+            via HAIRLINE_INK_10, which resolves to 0.14 after the token flip. */}
         <div
-          className="flex items-center gap-2 h-11 rounded-xl px-3"
-          style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${HAIRLINE_INK_10}` }}
+          className="flex items-center gap-2 h-11 rounded-sq-sm px-3"
+          style={{
+            background: searchFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
+            border: `1px solid ${searchFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
+            transition: 'background 140ms ease, border-color 140ms ease',
+          }}
         >
           <Search className="h-4 w-4 shrink-0" style={{ color: INK_MUTE }} aria-hidden="true" />
           <input
@@ -174,8 +184,10 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
             onChange={(e) => setTerm(e.target.value)}
             placeholder={t('directorySheet.placeholder')}
             aria-label={t('directorySheet.placeholder')}
-            className="flex-1 bg-transparent outline-none text-[14px]"
-            style={{ color: INK }}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+            className="flex-1 bg-transparent outline-none text-[14px] placeholder:text-[rgba(255,255,255,0.38)]"
+            style={{ color: 'rgba(255,255,255,0.96)' }}
           />
           {term.length > 0 && (
             <button
