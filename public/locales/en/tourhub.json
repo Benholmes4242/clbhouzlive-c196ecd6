@@ -1006,6 +1006,10 @@
         "th": "{{n}}th"
       },
       "ordinalTied": "T{{ordinal}}"
+    },
+    "seasonSheet": {
+      "kicker": "Season",
+      "sub": "{{count}} tournaments"
     }
   },
   "tour": {

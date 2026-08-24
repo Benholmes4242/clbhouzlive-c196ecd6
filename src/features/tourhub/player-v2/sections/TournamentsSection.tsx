@@ -162,7 +162,7 @@ export function PlayerResultRow({
             </span>
           ) : isMajor ? (
             <span style={{ flexShrink: 0, ...LABEL, color: INK_FAINT }}>
-              {t('player.tournaments.major')}
+              {t('schedule.badge.major')}
             </span>
           ) : null}
           {isLive && (
@@ -355,10 +355,9 @@ export function TournamentsSection({
             }}
             className="active:opacity-60 transition-opacity"
           >
-            {t('player.tournaments.fullSeason')}
-            <span aria-hidden style={{ fontSize: 12, lineHeight: 1 }}>
-              {'\u203a'}
-            </span>
+            {/* ONE KEY PER STRING: player.tournaments.expand already carries the
+                chevron ("Full season ›"), so the separate glyph span is gone. */}
+            {t('player.tournaments.expand')}
           </button>
         )}
       </div>
