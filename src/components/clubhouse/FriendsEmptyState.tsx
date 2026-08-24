@@ -212,7 +212,7 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
         </h1>
         <p
           style={{
-            fontSize: 14,
+            fontSize: 15,
             lineHeight: 1.5,
             color: INK_MUTED,
             marginTop: 8,
@@ -315,7 +315,7 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
               borderRadius: 14,
               background: AMBER,
               color: CHARCOAL,
-              fontSize: 15,
+              fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.10em',
               fontWeight: 700,
               border: 'none',
               transition: 'transform 100ms ease',
@@ -379,7 +379,7 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   color: '#FFFFFF',
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
@@ -477,7 +477,7 @@ const SuggestionRow: React.FC<SuggestionRowProps> = ({
       >
         <div
           style={{
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: 600,
             color: '#FFFFFF',
             lineHeight: 1.2,
@@ -494,7 +494,7 @@ const SuggestionRow: React.FC<SuggestionRowProps> = ({
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            fontSize: 12,
+            fontSize: 13,
             color: INK_MUTED,
           }}
         >
@@ -508,7 +508,7 @@ const SuggestionRow: React.FC<SuggestionRowProps> = ({
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 padding: '2px 6px',
                 borderRadius: 999,
@@ -532,7 +532,7 @@ const SuggestionRow: React.FC<SuggestionRowProps> = ({
           minWidth: 96,
           height: 34,
           borderRadius: 10,
-          fontSize: 12,
+          fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.10em',
           fontWeight: 600,
           border: 'none',
           transition: 'transform 100ms ease',
@@ -595,7 +595,7 @@ const SecondaryAction: React.FC<{ icon: React.ReactNode; label: string; onClick:
       background: CARD,
       border: `1px solid ${HAIRLINE}`,
       color: '#FFFFFF',
-      fontSize: 13,
+      fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.10em',
       fontWeight: 600,
       display: 'inline-flex',
       alignItems: 'center',
