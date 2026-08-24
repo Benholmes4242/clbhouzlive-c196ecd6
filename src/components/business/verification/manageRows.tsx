@@ -25,8 +25,8 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { getAvatarFallbackColor, getInitialsFromName } from '@/lib/avatarFallback';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
-/** The one amber on this surface: waiting. Brand amber, as used app-wide. */
-export const WAITING = '#F7931E';
+/** The one amber on this surface: waiting. Brand amber, resolved through the analytical ramp. */
+export const WAITING = A.AMBER;
 
 export type RowTone = 'confirmed' | 'waiting' | 'absent' | 'neutral';
 
