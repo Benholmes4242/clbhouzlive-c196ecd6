@@ -62,6 +62,18 @@ export interface SubmitResult {
    * only when a caller supplies it, and shows media counts otherwise.
    */
   round?: { gross?: number | null; toPar?: number | null; birdies?: number | null };
+
+  // ---- card facts (§2): the material needed to render the post AS IT WILL
+  // APPEAR while it uploads. Client-side only — previewUrl blobs stay valid for
+  // the life of the composer mount, which is exactly the life of this screen.
+  /** The caption the member typed, verbatim (may be empty). */
+  caption?: string;
+  /** Posting actor's display name. */
+  actorName?: string;
+  /** Posting actor's avatar. */
+  actorAvatarUrl?: string | null;
+  /** Ordered local previews for the card's media block. */
+  mediaPreviews?: { url: string; type: 'image' | 'video' }[];
 }
 
 export function usePostSubmit() {
@@ -179,6 +191,9 @@ export function usePostSubmit() {
           scheduledAt: bornObj.scheduled_at,
           isScheduled: !!input.scheduledAt,
           courseName: input.course?.name,
+          caption: input.caption,
+          actorName: input.authorName,
+          actorAvatarUrl: input.authorAvatarUrl,
         };
       }
 
@@ -207,6 +222,10 @@ export function usePostSubmit() {
         courseName: input.course?.name,
         photoCount: input.media.filter((m) => m.type !== 'video').length,
         videoCount: input.media.filter((m) => m.type === 'video').length,
+        caption: input.caption,
+        actorName: input.authorName,
+        actorAvatarUrl: input.authorAvatarUrl,
+        mediaPreviews: input.media.map((m) => ({ url: m.previewUrl, type: m.type })),
       };
     } catch (e) {
       // Roll back the optimistic pending card - the post was never born.
