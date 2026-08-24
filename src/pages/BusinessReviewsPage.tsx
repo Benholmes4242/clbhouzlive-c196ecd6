@@ -29,10 +29,17 @@ import {
    it. Colours come from the shared manage vocabulary (itself derived from the
    analytical `A` ramp) and from BIZ for the amber wash. Add a colour here and
    the next audit is blind again. */
-import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, GREEN, DANGER as RED } from '@/components/manage/ui';
+/* GREEN is gone: its only two uses were band colours, now the canon's.
+   RED stays — it is DANGER, used by the 1000-char warning and the delete/error
+   blocks, a different quantity on a different scale. */
+import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, DANGER as RED } from '@/components/manage/ui';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { BIZ } from '@/components/business/businessTokens';
 import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+/* THE score-band canon (0-10 member scores only). This page previously carried
+   three private scales — bars at 7/5, chip at 8/6, and its own green/red hexes.
+   Every band colour here now comes from bandColorOnDark and nowhere else. */
+import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 
 const AMBER = A.AMBER;
 const AMBER_SOFT = BIZ.amberTint;
@@ -46,10 +53,15 @@ const CHIPS: Array<{ key: ChipKey; label: string; filter: BusinessReviewFilter; 
   { key: 'lowest', label: 'Lowest rated', filter: 'all', sort: 'lowest' },
 ];
 
+/* Foreground from the canon; the two washes are the canon's dark green and dark
+   red at the SAME 0.16 the amber tint already uses, so all three chips carry
+   equal presence. The thresholds below only pick a wash — the colour they wash
+   is decided by bandColorOnDark, so a canon change reaches this chip. */
 function ratingTone(rating: number): { bg: string; fg: string } {
-  if (rating >= 8) return { bg: 'rgba(52,215,127,0.16)', fg: GREEN };
-  if (rating >= 6) return { bg: AMBER_SOFT, fg: AMBER };
-  return { bg: 'rgba(255,90,90,0.16)', fg: RED };
+  const fg = bandColorOnDark(rating);
+  if (rating >= 9) return { bg: 'rgba(52,211,153,0.16)', fg };
+  if (rating >= 5) return { bg: AMBER_SOFT, fg };
+  return { bg: 'rgba(255,107,107,0.16)', fg };
 }
 
 function fmtRating(v: number | null): string {
@@ -228,6 +240,17 @@ function CourseTag({ name }: { name: string }) {
 function Distribution({ dist }: { dist: Array<{ bucket: number; count: number }> }) {
   const max = Math.max(...dist.map((d) => d.count), 1);
   const labels: Record<number, string> = { 5: '9-10', 4: '7-8', 3: '5-6', 2: '3-4', 1: '0-2' };
+  /* Each bucket spans a range, so it gets a REPRESENTATIVE score and the canon
+     colours it — same pattern as CourseReviewsTab's tier bars. Result is
+     green / amber / amber / red / red, which is what the wizard produces for
+     these scores. Never hand-write that as a ternary. */
+  const BUCKET_REP_SCORE: Record<number, number> = {
+    5: 9.5,   // 9-10
+    4: 7.5,   // 7-8
+    3: 5.5,   // 5-6
+    2: 3.5,   // 3-4
+    1: 1,     // 0-2
+  };
   return (
     <div className="space-y-1.5">
       {[5, 4, 3, 2, 1].map((b) => {
@@ -243,7 +266,7 @@ function Distribution({ dist }: { dist: Array<{ bucket: number; count: number }>
                 className="h-full rounded-full"
                 style={{
                   width: `${pct}%`,
-                  background: b >= 4 ? GREEN : b === 3 ? AMBER : RED,
+                  background: bandColorOnDark(BUCKET_REP_SCORE[b]),
                   transition: 'width 300ms ease',
                 }}
               />
