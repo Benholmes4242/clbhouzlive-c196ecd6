@@ -9,7 +9,7 @@ import {
   SelectLabel,
   SelectTrigger,
 } from '@/components/ui/select';
-import { A, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS } from './tokens';
+import { A, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, SCOPE_PILL_RADIUS } from './tokens';
 import { PillFilterRow } from './PillFilterRow';
 import { WEEK_SCOPES, type WeekScope } from './hooks/useGolfThisWeek';
 import type { RegionSelection, WeekRegions } from './hooks/useWeekRegionCounts';
