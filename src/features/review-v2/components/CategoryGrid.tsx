@@ -98,13 +98,13 @@ function CategoryRow({
             fontSize: 18,
             ...FIGURE,
             letterSpacing: '-0.03em',
-            color: value == null ? RV2.muted : color,
+            color: value == null ? RV2.secondary : color,
           }}
         >
           {value == null ? '--' : value.toFixed(1)}
         </span>
       </div>
-      <div style={{ fontSize: 11, color: RV2.muted, marginBottom: 10 }}>{hint}</div>
+      <div style={{ fontSize: 11, color: RV2.secondary, marginBottom: 10 }}>{hint}</div>
       <div
         ref={trackRef}
         role="slider"

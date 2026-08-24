@@ -721,7 +721,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 fontWeight: 700,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                color: i <= step ? RV2.ink : RV2.muted,
+                color: i <= step ? RV2.ink : RV2.secondary,
               }}
             >
               {label}
@@ -898,7 +898,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 }}
               />
             </div>
-            <div style={{ fontSize: 11, color: RV2.muted, marginTop: 8 }}>
+            <div style={{ fontSize: 11, color: RV2.secondary, marginTop: 8 }}>
               {t('review.wizard.step2.optionalNote')}
             </div>
           </section>
