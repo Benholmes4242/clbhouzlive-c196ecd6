@@ -30,7 +30,10 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { X, Check } from 'lucide-react';
-import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+/* RAISED field set: the sheet paints RAISED #181F28, a ground LIGHTER than the
+   canvas, where 6% stops reading as a well. Explicit import by design — the
+   canon never computes this from context. See lib/tokens/field.ts. */
+import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -405,7 +408,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
             /* FIELD CANON (lib/tokens/field.ts). Was RAISED (#181F28, an opaque
                panel) with a 0.5px EDGE hairline. Height is padding-derived
                (~46px); stands alone. */
-            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+            className={`${FIELD_PAINT_RAISED_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
             style={{
               width: '100%',
               padding: '12px 14px',
@@ -426,7 +429,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
               placeholder={t('group.namePlaceholder')}
               /* FIELD CANON (lib/tokens/field.ts) — group-title field, same
                  construction as the people search above it. */
-              className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+              className={`${FIELD_PAINT_RAISED_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
               style={{
                 width: '100%',
                 padding: '12px 14px',

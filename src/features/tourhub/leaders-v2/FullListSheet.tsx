@@ -15,7 +15,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
-import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+/* RAISED field set: the list sheet paints SURFACE #1B1E27, a ground LIGHTER than the
+   canvas, where 6% stops reading as a well. Explicit import by design — the
+   canon never computes this from context. See lib/tokens/field.ts. */
+import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -170,7 +173,7 @@ export function FullListSheet({
             }}
             /* FIELD CANON (lib/tokens/field.ts). HEIGHT EXCEPTION (~33px,
                padding-derived): sheet header above the leaders list. */
-            className={FIELD_PAINT_CLASS}
+            className={FIELD_PAINT_RAISED_CLASS}
           >
             <Search size={13} color={INK_MUTE} strokeWidth={2.25} />
             <input

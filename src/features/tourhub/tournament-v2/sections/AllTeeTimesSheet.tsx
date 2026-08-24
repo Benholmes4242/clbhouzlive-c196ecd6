@@ -8,7 +8,10 @@
  * reached them (live/completed) or, for upcoming events, only Round 1.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+/* RAISED field set: the sheet paints A.PANEL, a ground LIGHTER than the
+   canvas, where 6% stops reading as a well. Explicit import by design — the
+   canon never computes this from context. See lib/tokens/field.ts. */
+import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
@@ -210,7 +213,7 @@ export function AllTeeTimesSheet({
                  0.5px border. HEIGHT EXCEPTION (~35px, padding-derived): sits
                  in the sheet header above the tee-time list; 44 would cost a
                  row. Constrained by neighbours, not preference. */
-              className={FIELD_PAINT_CLASS}
+              className={FIELD_PAINT_RAISED_CLASS}
             >
               <Search size={13} color={INK_FAINT} />
               <input
