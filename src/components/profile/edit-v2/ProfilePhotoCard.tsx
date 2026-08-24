@@ -1,3 +1,4 @@
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import React, { useRef, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Camera, User, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -119,8 +120,10 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
               height: 78,
               borderRadius: '34%',
               overflow: 'hidden',
-              background: '#E2E8F0',
-              border: '3px solid #ffffff',
+              background: A.PANEL,
+              /* The ring cuts the avatar out of the cover behind it, so it takes
+                 the CANVAS value, not white. */
+              border: `3px solid ${A.CANVAS}`,
               boxShadow: '0 2px 10px rgba(0,0,0,0.10)',
               padding: 0,
               cursor: 'pointer',
@@ -137,9 +140,9 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
               <div style={{
                 width: '100%', height: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'linear-gradient(135deg,#F1F5F9,#E2E8F0)',
+                background: 'linear-gradient(135deg,#1B1E27,#272C37)',
               }}>
-                <User size={28} strokeWidth={1.75} style={{ color: '#94A3B8' }} />
+                <User size={28} strokeWidth={1.75} style={{ color: A.MUTE }} />
               </div>
             )}
             {/* Canonical 1px traced hairline ring — ink @ 12% */}
@@ -164,8 +167,8 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
               width: 27,
               height: 27,
               borderRadius: '50%',
-              background: '#0F172A',
-              border: '2.5px solid #ffffff',
+              background: A.INK,
+              border: `2.5px solid ${A.CANVAS}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -175,9 +178,9 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
             }}
           >
             {displayUrl ? (
-              <Camera size={12} strokeWidth={2.25} style={{ color: '#fff' }} />
+              <Camera size={12} strokeWidth={2.25} style={{ color: A.CANVAS }} />
             ) : (
-              <Plus size={13} strokeWidth={2.5} style={{ color: '#fff' }} />
+              <Plus size={13} strokeWidth={2.5} style={{ color: A.CANVAS }} />
             )}
           </button>
         </div>

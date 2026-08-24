@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 

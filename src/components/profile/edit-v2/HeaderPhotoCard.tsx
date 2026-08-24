@@ -109,7 +109,7 @@ return (
           display: 'block',
           width: '100%',
           aspectRatio: HEADER_ASPECT_CSS,
-          background: displayUrl ? 'transparent' : 'linear-gradient(135deg,#E2E8F0,#F1F5F9)',
+          background: displayUrl ? 'transparent' : 'linear-gradient(135deg,#272C37,#1B1E27)',
           overflow: 'hidden',
           border: 'none',
           padding: 0,

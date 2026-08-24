@@ -742,8 +742,8 @@ export default function BusinessProfileEditor() {
               style={{
                 borderRadius: 16,
                 overflow: 'hidden',
-                background: '#fff',
-                border: '1px solid rgba(15,23,42,0.07)',
+                background: BIZ.card,
+                border: `1px solid ${BIZ.hair}`,
               }}
             >
               <HeaderPhotoCard
@@ -799,9 +799,9 @@ export default function BusinessProfileEditor() {
                 margin: '8px 16px 16px',
                 padding: '12px 14px',
                 borderRadius: 10,
-                background: '#FFF7ED',
-                border: '1px solid #FED7AA',
-                color: '#9A3412',
+                background: BIZ.amberTint,
+                border: `1px solid ${BIZ.amberHair}`,
+                color: A.INK,
                 fontSize: 13,
                 lineHeight: 1.45,
               }}
@@ -824,7 +824,7 @@ export default function BusinessProfileEditor() {
                 }}
               >
                 Tell us your connection to this club{' '}
-                <span style={{ color: '#64748B', fontWeight: 400 }}>(optional)</span>
+                <span style={{ color: A.MUTE, fontWeight: 400 }}>(optional)</span>
               </label>
               <textarea
                 id="claim-proof-note"
@@ -833,20 +833,19 @@ export default function BusinessProfileEditor() {
                 placeholder="e.g. I'm the General Manager, work email on the club domain, happy to send a verification email."
                 rows={3}
                 maxLength={500}
+                className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} rounded-[8px]`}
                 style={{
                   width: '100%',
                   padding: '10px 12px',
+                  ...FIELD_INPUT_STYLE,
+                  padding: '10px 12px',
                   borderRadius: 8,
-                  border: '1px solid rgba(15,23,42,0.12)',
-                  fontSize: 14,
                   fontFamily: 'inherit',
-                  color: '#0F172A',
-                  background: '#FFFFFF',
                   resize: 'vertical',
                   outline: 'none',
                 }}
               />
-              <p style={{ marginTop: 6, fontSize: 11, color: '#64748B', lineHeight: 1.4 }}>
+              <p style={{ marginTop: 6, fontSize: 11, color: A.MUTE, lineHeight: 1.4 }}>
                 Helps admins verify your claim faster. Your club link is pending until approval.
               </p>
             </div>
