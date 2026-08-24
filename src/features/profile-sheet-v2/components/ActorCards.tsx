@@ -1,8 +1,8 @@
 /**
  * ProfileSheetV2 · ActorCards
  *
- * Horizontal rail of "posting as" actor cards. Selection is marked with a 2px
- * INK border (amber means the viewing member, and BOTH cards are the viewing
+ * Horizontal rail of "posting as" actor cards. Selection is marked with the
+ * canonical 1px active border (amber means the viewing member, and BOTH cards are the viewing
  * member, so amber cannot tell them apart); inactive cards tap to switch. Per-actor unread
  * badges (notifications + DMs) via useActorUnreadCounts. A trailing
  * dashed "+ Business" door is rendered ONLY when the user has no
