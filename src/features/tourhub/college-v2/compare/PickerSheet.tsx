@@ -108,10 +108,22 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
         >
           Pick a college
         </div>
+        {/* SEARCH FIELD — canonical twin of CollegeHubPage.tsx's hub search
+            field. The two are the same construction; change one, change both.
+            Glyph is white, NOT amber: amber means the viewing member, and a
+            magnifier is not the member. Contrast TugStat (compare/), where
+            amber IS correct because it marks the winning school.
+            RADIUS/HEIGHT EXCEPTION (recorded — do not "correct" to 44): the
+            canon is radius 14 / height 44. Radius is 14 here; height stays 34
+            because this sits in the sheet header (padding '8px 16px 12px')
+            above a scrolling list, and 44 would deepen the header and cost a
+            row of results. Fifth recorded exception — after the OTP boxes, the
+            Reviews control row, the Players control row and the hub field —
+            all constrained by neighbours rather than preference. */}
         <div style={{ position: 'relative' }}>
           <Search
             size={13}
-            color={AMBER}
+            color={q ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.62)'}
             strokeWidth={2.5}
             style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
           />
@@ -121,14 +133,18 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
             placeholder="Search colleges…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
+            onFocus={() => setFieldFocused(true)}
+            onBlur={() => setFieldFocused(false)}
+            className="placeholder:text-[rgba(255,255,255,0.38)]"
             style={{
               width: '100%',
               height: 34,
               paddingLeft: 30,
               paddingRight: 10,
-              borderRadius: 8,
-              background: SURFACE,
-              border: `1px solid ${HAIRLINE_INK_10}`,
+              borderRadius: 14,
+              background: fieldFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
+              border: `1px solid ${fieldFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
+              transition: 'background 140ms ease, border-color 140ms ease',
               fontFamily: FONT,
               fontSize: 13,
               fontWeight: 600,
@@ -137,6 +153,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
             }}
           />
         </div>
+
       </div>
 
       {/* List */}
