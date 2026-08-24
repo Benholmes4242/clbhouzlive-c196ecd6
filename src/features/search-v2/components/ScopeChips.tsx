@@ -1,17 +1,21 @@
+import { PillFilterRow } from '@/components/explore-tab-new/courseled/PillFilterRow';
 import type { Scope } from '../hooks/useGlobalSearchV2';
 
-const INK = '#0F172A';
-const INK_SOFT = '#475569';
-const BORDER = 'rgba(15,23,42,0.08)';
-
-const CHIPS: { key: Scope; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'people', label: 'People' },
-  { key: 'courses', label: 'Courses' },
-  { key: 'players', label: 'Players' },
-  { key: 'clubs', label: 'Clubs' },
-  { key: 'videos', label: 'Videos' },
-  { key: 'posts', label: 'Posts' },
+/**
+ * Search scopes render the SHARED Discover pill row (PillFilterRow), not a
+ * local copy. The previous implementation hand-styled its own active/inactive
+ * pair with the ACTIVE state hardcoded to ink-on-white, which is exactly how
+ * four surfaces end up with four different pills. Geometry, radius, padding,
+ * type and both states now come from one place.
+ */
+const CHIPS: { value: Scope; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'people', label: 'People' },
+  { value: 'courses', label: 'Courses' },
+  { value: 'players', label: 'Players' },
+  { value: 'clubs', label: 'Clubs' },
+  { value: 'videos', label: 'Videos' },
+  { value: 'posts', label: 'Posts' },
 ];
 
 interface Props {
@@ -21,38 +25,13 @@ interface Props {
 
 export function ScopeChips({ scope, onChange }: Props) {
   return (
-    <div
-      className="w-full md:max-w-[560px] flex scrollbar-hide"
-      style={{
-        gap: 8,
-        padding: '10px 16px 6px',
-        overflowX: 'auto',
-      }}
-    >
-      {CHIPS.map((c) => {
-        const active = scope === c.key;
-        return (
-          <button
-            key={c.key}
-            type="button"
-            onClick={() => onChange(c.key)}
-            style={{
-              flexShrink: 0,
-              padding: '9px 16px',
-              borderRadius: 999,
-              fontSize: 12,
-              fontWeight: active ? 700 : 600,
-              border: `1px solid ${active ? INK : BORDER}`,
-              background: active ? INK : '#fff',
-              color: active ? '#fff' : INK_SOFT,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {c.label}
-          </button>
-        );
-      })}
+    <div className="w-full md:max-w-[560px]" style={{ padding: '10px 16px 6px' }}>
+      <PillFilterRow<Scope>
+        value={scope}
+        options={CHIPS}
+        onChange={onChange}
+        ariaLabel="Search scope"
+      />
     </div>
   );
 }
