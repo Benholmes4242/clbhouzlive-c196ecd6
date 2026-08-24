@@ -39,7 +39,10 @@ import { FeedCard } from '@/components/feed/FeedCard';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 const PAGE_BG = A.CANVAS;
-const DIVIDER = '#E5E7EA';
+/* Inter-card band. Same value and same 5px height as CARD_BAND in StatBrowse
+   and VirtualizedCourseList — three local declarations, deliberately not
+   extracted. */
+const DIVIDER = 'rgba(255,255,255,0.06)';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1;
