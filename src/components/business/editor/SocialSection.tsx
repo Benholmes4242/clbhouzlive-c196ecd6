@@ -60,7 +60,7 @@ export function SocialSection({ social, setSocial }: SocialSectionProps) {
               <div className="flex items-center gap-2">
                 <div
                   className="w-10 h-11 rounded-[10px] flex items-center justify-center flex-shrink-0"
-                  style={{ background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)', color: '#0F172A' }}
+                  style={{ ...FIELD_INPUT_STYLE, padding: 0, borderRadius: 10 }}
                 >
                   <Icon size={16} strokeWidth={2} />
                 </div>
@@ -70,8 +70,8 @@ export function SocialSection({ social, setSocial }: SocialSectionProps) {
                   onChange={(e) => setField(field, e.target.value, kind)}
                   placeholder={placeholder}
                   aria-label={label}
-                  className="flex-1 h-11 rounded-[10px] px-3.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)]"
-                  style={{ background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)', color: '#0F172A' }}
+                  className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} flex-1 h-11 rounded-[10px] px-3.5 text-[15px]`}
+                  style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 14, paddingRight: 14, fontSize: 15, borderRadius: 10 }}
                 />
               </div>
             </div>

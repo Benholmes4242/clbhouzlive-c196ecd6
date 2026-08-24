@@ -52,16 +52,16 @@ export function OpeningHoursSection({ enabled, setEnabled, openingHours, setOpen
                             type="time"
                             value={entry.open}
                             onChange={(e) => updateDay(day, { open: e.target.value })}
-                            className="flex-1 h-9 rounded-[8px] px-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-[rgba(15,23,42,0.20)]"
-                            style={{ background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)' }}
+                            className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} flex-1 h-9 rounded-[8px] px-2 text-[13px]`}
+                            style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 8, paddingRight: 8, fontSize: 13, borderRadius: 8 }}
                           />
                           <span className="text-muted-foreground text-xs">-</span>
                           <input
                             type="time"
                             value={entry.close}
                             onChange={(e) => updateDay(day, { close: e.target.value })}
-                            className="flex-1 h-9 rounded-[8px] px-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-[rgba(15,23,42,0.20)]"
-                            style={{ background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)' }}
+                            className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} flex-1 h-9 rounded-[8px] px-2 text-[13px]`}
+                            style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 8, paddingRight: 8, fontSize: 13, borderRadius: 8 }}
                           />
                         </div>
                       )}
@@ -69,7 +69,7 @@ export function OpeningHoursSection({ enabled, setEnabled, openingHours, setOpen
                         type="button"
                         onClick={() => updateDay(day, { closed: !entry.closed })}
                         className="text-[12px] font-semibold flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-end"
-                        style={{ color: entry.closed ? BIZ.amber : '#94A3B8' }}
+                        style={{ color: entry.closed ? BIZ.amber : A.MUTE }}
                       >
                         {entry.closed ? 'Open' : 'Close'}
                       </button>
