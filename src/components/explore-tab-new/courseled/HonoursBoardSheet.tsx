@@ -7,6 +7,9 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import {
+  ACE_GROUND,
+  ALBATROSS_GROUND,
+  METAL_INK,
   HonoursHeading,
   HonoursModeToggle,
   LeaderHead,
@@ -17,7 +20,7 @@ import {
   type HonoursLeader,
   type HonoursMode,
 } from './HonoursBoard';
-import { A, LABEL, NUMF, SANS } from './tokens';
+import { A, CHIP_RADIUS, LABEL, NUMF, SANS } from './tokens';
 
 /**
  * THE HONOURS BOARD, ALL TIME (BRIEF_HONOURS_BOARD_REBUILD part 2).
@@ -90,12 +93,31 @@ function HonoursRow({
         border: 'none',
         borderTop: divider ? `1px solid ${A.BORDER}` : 'none',
         background: 'transparent',
-        padding: '10px 12px',
+        position: 'relative',
+        padding: '10px 12px 10px 15px',
         cursor: tappable ? 'pointer' : 'default',
         opacity: tappable ? 1 : 0.62,
         fontFamily: SANS,
       }}
     >
+      {/* THE METAL EDGE (BRIEF_HONOURS_SHEET_DARK §2b). A 3px bar of the feat's
+          own gradient down the leading edge. Chosen WITH the chip rather than a
+          full-bleed metal ground: twelve metal rows would be a wall and would
+          strip the rail cards of their distinction, whereas the edge is a
+          scanning aid — in a run of aces the champagne albatross bar is the one
+          warm mark in the column, findable without reading a word. */}
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: divider ? 1 : 0,
+          bottom: 0,
+          width: 3,
+          background: e.kind === 'albatross' ? ALBATROSS_GROUND : ACE_GROUND,
+        }}
+      />
+
       {mode === 'recent' ? (
         <span style={{ flex: '0 0 auto', display: 'block' }}>
           <SquircleAvatar
@@ -120,7 +142,7 @@ function HonoursRow({
               fontSize: 13,
               fontWeight: 700,
               letterSpacing: '-0.015em',
-              color: e.isOwn ? A.AMBER_DEEP : A.INK,
+              color: e.isOwn ? A.AMBER : A.INK,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -163,7 +185,20 @@ function HonoursRow({
       </span>
 
       <span style={{ flex: '0 0 auto', textAlign: 'right' }}>
-        <span style={{ ...LABEL, fontSize: 8.5, color: A.BODY, display: 'block' }}>
+        {/* THE TYPE CHIP (§2a) — the metal appears once per row at chip scale
+            and NAMES the feat. Lettering is METAL_INK, never white: a bone or
+            champagne ground cannot carry white type at 8.5px (HonoursBoard §55). */}
+        <span
+          style={{
+            ...LABEL,
+            fontSize: 8.5,
+            color: METAL_INK,
+            display: 'inline-block',
+            background: e.kind === 'albatross' ? ALBATROSS_GROUND : ACE_GROUND,
+            borderRadius: CHIP_RADIUS,
+            padding: '2px 6px',
+          }}
+        >
           {kindLabel(e)}
         </span>
         {mode === 'recent' ? (

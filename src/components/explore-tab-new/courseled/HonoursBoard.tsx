@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, EYEBROW_TEXT, InkAction } from './tokens';
+import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, SCOPE_PILL_RADIUS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 import { PodiumAvatarRing } from './PodiumAvatarRing';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -326,7 +326,7 @@ export function FeatCard({
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.15,
-                color: e.isOwn ? A.AMBER_DEEP : METAL_INK,
+                color: e.isOwn ? A.AMBER : METAL_INK,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -463,7 +463,7 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
           fontSize: 13.5,
           fontWeight: 700,
           letterSpacing: '-0.02em',
-          color: l.isOwn ? A.AMBER_DEEP : DISCOVER_FACT,
+          color: l.isOwn ? A.AMBER : DISCOVER_FACT,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -504,22 +504,39 @@ export function HonoursModeToggle({
   onChange: (m: HonoursMode) => void;
 }) {
   const { t } = useTranslation('courses');
+  /* THE SCOPE PILLS' TREATMENT (BRIEF_HONOURS_SHEET_DARK §3). This control had
+     no sibling in the app, so it kept a white selected pill on a light track —
+     the last light element in the sheet. It now takes Discover's settled
+     selected/unselected values verbatim from PillFilterRow.tsx:50-57: A.INK
+     fill with A.PANEL lettering when selected, A.PANEL with A.BORDER and A.INK
+     when not, SCOPE_PILL_RADIUS, 12.5/700.
+
+     WHAT DOES NOT TRANSFER: the enclosing TRACK. A two-segment control with a
+     tinted track behind two already-bordered pills reads as a third surface,
+     and the track was the light residue. The pills sit directly on the canvas
+     with the row's own 6px gap. Type is 12.5/700, not LABEL's 8.5 caps, because
+     the pills' legibility comes from their size and these two words are values,
+     not chrome. */
   const seg = (m: HonoursMode, label: string) => {
     const on = mode === m;
     return (
       <button
         key={m}
         type="button"
+        role="tab"
+        aria-selected={on}
         aria-pressed={on}
         onClick={() => onChange(m)}
         style={{
-          ...LABEL,
-          fontSize: 8.5,
-          padding: '5px 10px',
-          borderRadius: 999,
-          border: 'none',
-          background: on ? A.INK : 'transparent',
-          color: on ? '#FFFFFF' : A.MUTE,
+          flex: 'none',
+          border: `1px solid ${on ? A.INK : A.BORDER}`,
+          background: on ? A.INK : A.PANEL,
+          color: on ? A.PANEL : A.INK,
+          borderRadius: SCOPE_PILL_RADIUS,
+          padding: '8px 14px',
+          fontSize: 12.5,
+          fontWeight: 700,
+          whiteSpace: 'nowrap',
           cursor: 'pointer',
           fontFamily: SANS,
         }}
@@ -530,14 +547,9 @@ export function HonoursModeToggle({
   };
   return (
     <span
-      style={{
-        display: 'inline-flex',
-        gap: 2,
-        padding: 2,
-        borderRadius: 999,
-        background: 'rgba(15,23,42,0.05)',
-        flexShrink: 0,
-      }}
+      role="tablist"
+      aria-label={t('discover.honours.modeLabel', 'Order')}
+      style={{ display: 'inline-flex', gap: 6, flexShrink: 0 }}
     >
       {seg('recent', t('discover.honours.modeRecent', 'Recent'))}
       {seg('leaders', t('discover.honours.modeLeaders', 'Leaders'))}
