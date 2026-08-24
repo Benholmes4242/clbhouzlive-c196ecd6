@@ -600,9 +600,12 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               height: 36,
               padding: '0 14px',
               borderRadius: 999,
-              background: '#0F172A',
-              color: '#FFFFFF',
-              border: 'none',
+              /* FOLLOWS THE THEME. This pill was slate-on-white regardless of
+                 T, so on the dark sheet it read as a hole punched in the
+                 surface. T.card / T.ink keeps the label legible in both. */
+              background: T.card,
+              color: T.ink,
+              border: `1px solid ${T.hairline}`,
               fontFamily: GAM.FONT_SF,
               fontSize: 11.5,
               fontWeight: 700,
@@ -610,7 +613,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               fontVariantNumeric: 'tabular-nums lining-nums',
               textTransform: 'uppercase',
               cursor: 'pointer',
-              boxShadow: '0 4px 16px rgba(15,23,42,0.28)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.45)',
             }}
           >
             {selfOffscreen === 'above' ? (
