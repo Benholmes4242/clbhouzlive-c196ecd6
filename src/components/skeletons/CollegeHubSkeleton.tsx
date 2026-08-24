@@ -11,7 +11,7 @@ const CHARCOAL = '#14161c';
 
 export const CollegeHubSkeleton = () => {
   return (
-    <div style={{ background: '#F8FAFC', minHeight: '100dvh' }}>
+    <div style={{ background: '#15171F', minHeight: '100dvh' }}>
       {/* Hero - matches CollegeHeroMasthead charcoal fallback exactly */}
       <div
         style={{

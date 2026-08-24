@@ -9,9 +9,9 @@
 
 import { Skeleton } from '@/components/ui/skeleton';
 
-const SLATE_50 = '#F8FAFC';
-const SURFACE = '#FFFFFF';
-const HAIRLINE_INK_8 = 'rgba(15,23,42,0.08)';
+const SLATE_50 = '#15171F';
+const SURFACE = '#1B1E27';
+const HAIRLINE_INK_8 = 'rgba(255,255,255,0.10)';
 
 function Bone({ w, h, radius = 6, dark = false }: { w: number | string; h: number; radius?: number; dark?: boolean }) {
   return (

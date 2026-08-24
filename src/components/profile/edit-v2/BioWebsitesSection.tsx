@@ -36,7 +36,7 @@ export function BioWebsitesSection({
           maxLength={BIO_MAX}
           rows={4}
           placeholder="Tell the clbhouz community about yourself and your golf game…"
-          className="scrollbar-hide w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors resize-none"
+          className="scrollbar-hide w-full bg-[rgba(255,255,255,0.06)] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors resize-none"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
         />
         {bioError && <p className="text-[12px] text-destructive mt-1">{bioError}</p>}
@@ -53,7 +53,7 @@ export function BioWebsitesSection({
                 value={site.url}
                 onChange={(e) => onUpdateWebsite(site.id, e.target.value)}
                 placeholder="https://yoursite.com"
-                className="flex-1 bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+                className="flex-1 bg-[rgba(255,255,255,0.06)] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors"
               />
               <button
                 onClick={() => onRemoveWebsite(site.id)}
@@ -74,7 +74,7 @@ export function BioWebsitesSection({
             >
               <div
                 className="w-6 h-6 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
               >
                 <Plus size={14} style={{ color: '#475569' }} />
               </div>

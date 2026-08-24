@@ -148,7 +148,7 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
               style={{
                 position: 'absolute', inset: 0,
                 borderRadius: '34%',
-                border: '1px solid rgba(15,23,42,0.12)',
+                border: '1px solid rgba(255,255,255,0.14)',
                 pointerEvents: 'none',
               }}
             />
@@ -248,7 +248,7 @@ export const ProfilePhotoCard = forwardRef<ProfilePhotoCardHandle, ProfilePhotoC
               <span
                 aria-hidden
                 className="pointer-events-none absolute inset-0"
-                style={{ borderRadius: '34%', border: '1px solid rgba(15,23,42,0.12)' }}
+                style={{ borderRadius: '34%', border: '1px solid rgba(255,255,255,0.14)' }}
               />
             </div>
 

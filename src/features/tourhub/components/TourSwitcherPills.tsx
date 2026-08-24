@@ -28,7 +28,7 @@ export function TourSwitcherPills({ selectedTour, onSelect, className }: TourSwi
             style={{
               borderRadius: 8,
               background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-              color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+              color: isActive ? 'hsl(var(--background))' : 'hsl(var(--muted-foreground))',
               border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
             }}
           >

@@ -70,7 +70,7 @@ export const BoardAvatar: React.FC<{ photoUrl: string | null; name: string; size
           position: 'absolute',
           inset: 0,
           borderRadius: '34%',
-          border: `1px solid rgba(15,23,42,0.12)`,
+          border: `1px solid rgba(255,255,255,0.14)`,
           pointerEvents: 'none',
         }}
       />

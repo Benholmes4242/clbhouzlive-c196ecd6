@@ -136,7 +136,7 @@
 
   /* Champions refinement tokens */
   --hcp-champ-card-bg:      linear-gradient(135deg, #FFFAEF, #FFF6E3);
-  --hcp-pill-border:        rgba(15,23,42,0.12);
+  --hcp-pill-border:        rgba(255,255,255,0.14);
   --hcp-pill-rank-bg:       rgba(15,23,42,0.05);
   --hcp-pill-rank-held-bg:  #0F172A;
 
@@ -151,7 +151,7 @@
   --hcp-accent-util:        #0F172A;
   --hcp-accent-util-tint:   rgba(15, 23, 42, 0.05);
   --hcp-accent-util-tint-2: rgba(15, 23, 42, 0.02);
-  --hcp-accent-util-border: rgba(15, 23, 42, 0.18);
+  --hcp-accent-util-border: rgba(255,255,255,0.18);
   --hcp-accent-celebrate:       #C97211;
   --hcp-accent-celebrate-tint:  rgba(251, 188, 46, 0.12);
 

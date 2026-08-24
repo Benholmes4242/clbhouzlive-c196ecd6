@@ -116,7 +116,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       )}
 
       {displayedSecondary.length > 0 && (
-        <div className="mt-3 pt-2.5" style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div className="mt-3 pt-2.5" style={{ borderTop: '0.5px solid rgba(255,255,255,0.10)' }}>
           <p className="text-xs font-medium text-muted-foreground mb-2">Also plays at</p>
           <div className="space-y-1">
             {displayedSecondary.map(club => (

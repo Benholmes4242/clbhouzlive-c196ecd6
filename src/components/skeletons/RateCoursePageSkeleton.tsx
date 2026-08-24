@@ -69,7 +69,7 @@ export const RateCoursePageSkeleton = () => {
                 height: 3,
                 borderRadius: 999,
                 marginBottom: 6,
-                background: i === 0 ? RV2.dark : 'rgba(15,23,42,0.10)',
+                background: i === 0 ? RV2.dark : 'rgba(255,255,255,0.12)',
               }}
             />
             <Block style={{ width: i === 0 ? 44 : 56, height: 8, borderRadius: 3 }} />
