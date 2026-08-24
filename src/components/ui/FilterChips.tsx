@@ -1,5 +1,8 @@
 import React from 'react';
 
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
+
 /**
  * TIER 2 canonical content-filter primitive.
  *
@@ -7,18 +10,25 @@ import React from 'react';
  * media surfaces (Watch, Clips, Videos) share the same pill markup. Sticky
  * containment is the caller's job — this component owns the scroll row +
  * pill styling only.
+ *
+ * MICRO_BRIEF_TABS_SHEETS_MAP §1.2 — GEOMETRY AND BOTH STATES NOW COME FROM
+ * THE SHIPPED DISCOVER PILLS (PillFilterRow), not from a local pair. Radius is
+ * SCOPE_PILL_RADIUS, padding 8/14, type 12.5/700, selected = INK fill with
+ * PANEL ink, unselected = PANEL fill with a BORDER hairline and FULL INK text
+ * (the old 0.62 unselected ink was the quiet tier and read as disabled).
+ * Do not re-hardcode these; edit the Discover pill and both follow.
  */
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
-// Keep the active/inactive pair co-located: these values are the inverse of
-// the dark glass band they sit on and must migrate with that band.
-const ACTIVE_FILL = '#F8FAFC';
-const ACTIVE_INK = '#15171F';
-const INACTIVE_FILL = 'rgba(255,255,255,0.06)';
-const INACTIVE_INK = 'rgba(248,250,252,0.62)';
-const INACTIVE_BORDER = '1px solid rgba(255,255,255,0.10)';
+// Both states resolve through the dark ramp of record. A near-white selected
+// fill on a dark canvas is an ACCENT, not an unconverted leftover.
+const ACTIVE_FILL = A.INK;
+const ACTIVE_INK = A.PANEL;
+const INACTIVE_FILL = A.PANEL;
+const INACTIVE_INK = A.INK;
+const INACTIVE_BORDER = `1px solid ${A.BORDER}`;
 
 export interface FilterChipsOption<T extends string> {
   id: T;
@@ -66,13 +76,14 @@ export function FilterChips<T extends string>({
             style={{
               flexShrink: 0,
               cursor: 'pointer',
-              fontWeight: 600,
+              fontWeight: 700,
               fontSize: 12.5,
-              padding: '7px 14px',
-              borderRadius: 999,
+              padding: '8px 14px',
+              whiteSpace: 'nowrap',
+              borderRadius: SCOPE_PILL_RADIUS,
               background: active ? ACTIVE_FILL : INACTIVE_FILL,
               color: active ? ACTIVE_INK : INACTIVE_INK,
-              border: active ? 'none' : INACTIVE_BORDER,
+              border: active ? `1px solid ${ACTIVE_FILL}` : INACTIVE_BORDER,
               fontFamily: FONT_FAMILY,
             }}
           >

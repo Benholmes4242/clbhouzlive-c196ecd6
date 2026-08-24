@@ -239,7 +239,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
           style={{ padding: '6px 16px 12px' }}
         >
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#0E1216' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)' }}>
               {t('map.kicker')}
             </div>
             <div style={{ fontSize: 17, fontWeight: 700, color: '#F8FAFC', marginTop: 3, letterSpacing: '-0.01em' }}>

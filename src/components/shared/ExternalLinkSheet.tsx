@@ -6,6 +6,19 @@ import { toast } from '@/lib/toast';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { KICKER, A } from '@/features/courses/components/holes/analytical/tokens';
 
+/**
+ * MICRO_BRIEF_TABS_SHEETS_MAP §3 — dark conversion.
+ *
+ * COPY CONFIRMATION IS ITS OWN MEANING. The tap on "Copy link" produces no
+ * other feedback than this colour, so it does not resolve to the index-delta
+ * improvement green or a live green; it takes the dark green of record for a
+ * near-black surface (#4ADE80) plus a tinted well, so the change is
+ * unmistakable rather than a hue nudge on a white button.
+ */
+const COPIED_INK = '#4ADE80';
+const COPIED_FILL = 'rgba(74,222,128,0.12)';
+const COPIED_BORDER = 'rgba(74,222,128,0.38)';
+
 interface ExternalLinkSheetProps {
   isOpen: boolean;
   onClose: () => void;
@@ -56,11 +69,12 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl bg-background border-t border-border/10 px-0 pb-8"
+        className="rounded-t-3xl border-t px-0 pb-8"
+        style={{ background: A.PANEL, borderTopColor: A.BORDER }}
       >
         {/* Grabber Handle */}
         <div className="flex justify-center pt-2 pb-4">
-          <div className="w-9 h-1 bg-muted-foreground/30 rounded-full" />
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.18)' }} aria-hidden="true" />
         </div>
 
         <div className="px-6">
@@ -77,7 +91,7 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
               fontSize: 16,
               fontWeight: 700,
               letterSpacing: '-0.01em',
-              color: '#0F172A',
+              color: A.INK,
             }}
             title={domain}
           >
@@ -91,7 +105,7 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
               marginTop: 3,
               fontSize: 11.5,
               fontWeight: 500,
-              color: 'rgba(15,23,42,0.45)',
+              color: A.MUTE,
             }}
           >
             {contextLine}
@@ -104,9 +118,9 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
               onClick={handleCopyLink}
               style={{
                 flex: 1,
-                background: '#ffffff',
-                border: '1px solid #EDF0F3',
-                color: copied ? '#16a34a' : '#0F172A',
+                background: copied ? COPIED_FILL : 'rgba(255,255,255,0.06)',
+                border: `1px solid ${copied ? COPIED_BORDER : A.BORDER}`,
+                color: copied ? COPIED_INK : A.INK,
                 fontSize: 13.5,
                 fontWeight: 700,
                 borderRadius: 14,
@@ -133,7 +147,7 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
                 flex: 2,
                 background: A.INK,
                 border: 'none',
-                color: A.CANVAS,
+                color: A.PANEL,
                 fontSize: 13.5,
                 fontWeight: 700,
                 borderRadius: 14,
