@@ -3,7 +3,7 @@ import { Heart } from 'lucide-react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { DISCOVER_FACT, DISCOVER_QUIET } from './tokens';
-import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import { formatDuration, formatRemaining } from '@/features/watch-v2/utils/formatDuration';
 import { formatRelativeRounded } from '@/i18n/format';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
@@ -95,7 +95,7 @@ function TileMedia({
   item: CommunityVideo;
   railVisible: boolean;
   radius: number;
-  children?: (playing: boolean) => React.ReactNode;
+  children?: (playing: boolean, remainingSecs: number | null) => React.ReactNode;
 }) {
   const reducedMotion = usePrefersReducedMotion();
   const [failed, setFailed] = useState(false);
@@ -120,7 +120,7 @@ function TileMedia({
   // intervals, so the state update is GATED on the floored remaining integer
   // changing: one re-render per displayed second, no stutter, no timer (the
   // playhead is the source of truth through stalls and seeks).
-  const [elapsed, setElapsed] = useState<number | null>(null);
+  const [remainingSecs, setRemainingSecs] = useState<number | null>(null);
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !item.hlsUrl || !active) return;
@@ -130,14 +130,14 @@ function TileMedia({
       const d = Number.isFinite(v.duration) ? v.duration : NaN;
       if (!Number.isFinite(d) || d <= 0) return;
       const remaining = Math.max(0, Math.floor(d - v.currentTime));
-      setElapsed((prev) => (prev === remaining ? prev : remaining));
+      setRemainingSecs((prev) => (prev === remaining ? prev : remaining));
     };
     v.addEventListener('timeupdate', onTime);
     const p = v.play();
     if (p && typeof p.catch === 'function') p.catch(() => setPlaying(false));
     return () => {
       v.removeEventListener('timeupdate', onTime);
-      setElapsed(null);
+      setRemainingSecs(null);
       setPlaying(false);
       attachment.detach();
     };
@@ -203,7 +203,7 @@ function TileMedia({
           />
         </span>
       )}
-      {children?.(playing)}
+      {children?.(playing, remainingSecs)}
     </div>
   );
 }
@@ -292,7 +292,7 @@ export function CommunityVideoTile({
     >
       <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9' }}>
         <TileMedia item={item} railVisible={railVisible} radius={radius}>
-          {(playing) => (
+          {(playing, remainingSecs) => (
             <>
               {item.courseName && <CourseTag name={item.courseName} />}
               <span
@@ -314,7 +314,13 @@ export function CommunityVideoTile({
                   pointerEvents: 'none',
                 }}
               >
-                {formatDuration(item.durationSeconds)}
+                {/* COUNTS DOWN WHILE PLAYING, total length otherwise. The
+                    remaining seconds come from this tile's own playhead; if it
+                    is not playing (or the length is unknown) the badge falls
+                    back to total length rather than freezing a countdown. */}
+                {(playing
+                  ? formatRemaining(remainingSecs != null ? remainingSecs : null, 0)
+                  : null) ?? formatDuration(item.durationSeconds)}
                 {playing && <PlayingBars />}
               </span>
             </>
