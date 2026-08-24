@@ -377,7 +377,17 @@ export const InlineVideo: React.FC<Props> = ({
           }}
         >
           {showVideo && <PlayingBars />}
-          {formatDuration(item.duration)}
+          {/* THE BADGE COUNTS DOWN WHILE THIS MEDIA IS PLAYING, and shows total
+              length otherwise. Broadcast-golf convention, chosen deliberately —
+              do not "correct" it to elapsed. The lane snapshot is already the
+              re-render source (VideoEngine emits on every timeupdate); the
+              value itself is FLOORED, so the displayed integer only changes once
+              per second and the number cannot stutter. snap.duration is
+              preferred over item.duration — the element knows the true length,
+              the post record holds what the encoder reported. */}
+          {(showVideo && laneOwnsThisMedia
+            ? formatRemaining(snap!.duration || item.duration, snap!.currentTime)
+            : null) ?? formatDuration(item.duration)}
         </span>
       )}
     </div>
