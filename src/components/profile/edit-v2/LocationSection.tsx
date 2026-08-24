@@ -219,14 +219,14 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
           </button>
         )}
         {loading && (
-          <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, border: '2px solid #0F172A', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
+          <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, border: `2px solid ${A.INK}`, borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
         )}
       </div>
 
       {open && results.length > 0 && (
         <div
           className="absolute left-0 right-0 z-50 border border-border/10 rounded-[12px] shadow-xl overflow-hidden"
-          style={{ top: 'calc(100% + 6px)', background: '#FFFFFF' }}
+          style={{ top: 'calc(100% + 6px)', background: A.PANEL }}
         >
           {results.map(city => (
             <button
@@ -234,12 +234,12 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
               type="button"
               onClick={() => { setQuery(city); onChange(city); setResults([]); setOpen(false); }}
               className="w-full text-left px-4 py-2.5 text-[14px] transition-colors flex items-center gap-2"
-              style={{ color: '#0F172A', background: 'transparent' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#F8FAFC'; }}
+              style={{ color: A.INK, background: 'transparent' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
             >
-              <MapPin size={13} style={{ color: '#94A3B8', flexShrink: 0 }} />
-              <span style={{ color: '#0F172A' }}>{city}</span>
+              <MapPin size={13} style={{ color: A.DIM, flexShrink: 0 }} />
+              <span style={{ color: A.INK }}>{city}</span>
             </button>
           ))}
         </div>

@@ -16,7 +16,7 @@ export function PrivacySection({ isPublic, onChange }: Props) {
         <div
           className="w-9 h-9 rounded-[11px] flex items-center justify-center shrink-0"
           style={{
-            backgroundColor: isPublic ? 'rgba(247,147,30,0.10)' : 'rgba(15,23,42,0.06)',
+            backgroundColor: isPublic ? 'rgba(247,147,30,0.10)' : 'rgba(255,255,255,0.06)',
           }}
         >
           {isPublic
