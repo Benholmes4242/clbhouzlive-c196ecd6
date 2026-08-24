@@ -243,7 +243,7 @@ export function CollegeHubPage() {
             background: 'rgba(248,250,252,0.72)',
             backdropFilter: 'blur(14px)',
             WebkitBackdropFilter: 'blur(14px)',
-            borderBottom: '1px solid rgba(0,0,0,0.07)',
+            borderBottom: '1px solid rgba(255,255,255,0.10)',
             padding: '8px 16px 10px',
             display: 'flex',
             alignItems: 'center',

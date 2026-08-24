@@ -323,7 +323,7 @@ const rowStyle: React.CSSProperties = {
   padding: '14px 20px',
   background: 'transparent',
   border: 'none',
-  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+  borderBottom: '0.5px solid rgba(255,255,255,0.10)',
   cursor: 'pointer',
   textAlign: 'left',
 };
