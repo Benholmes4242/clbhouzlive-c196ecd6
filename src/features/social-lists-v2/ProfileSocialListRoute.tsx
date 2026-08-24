@@ -13,6 +13,7 @@ import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import SocialListPage, { ListSkeleton } from './SocialListPage';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   direction: 'followers' | 'following';
@@ -40,7 +41,7 @@ export default function ProfileSocialListRoute({ direction }: Props) {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100dvh', background: '#F8FAFC', paddingTop: 'calc(var(--chrome-total-h, 0px) + 24px)' }}>
+      <div style={{ minHeight: '100dvh', background: A.CANVAS, paddingTop: 'calc(var(--chrome-total-h, 0px) + 24px)' }}>
         <ListSkeleton />
       </div>
     );
@@ -48,12 +49,12 @@ export default function ProfileSocialListRoute({ direction }: Props) {
 
   if (isError) {
     return (
-      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '80px 16px', color: '#64748B', fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+      <div style={{ minHeight: '100dvh', background: A.CANVAS, padding: '80px 16px', color: A.BODY, fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
         Couldn't load this profile.
         <button
           type="button"
           onClick={() => refetch()}
-          style={{ background: '#0F172A', color: '#fff', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+          style={{ background: A.INK, color: A.CANVAS, border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
         >
           Retry
         </button>
@@ -63,7 +64,7 @@ export default function ProfileSocialListRoute({ direction }: Props) {
 
   if (!profile) {
     return (
-      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: '80px 16px', color: '#64748B', fontSize: 13 }}>
+      <div style={{ minHeight: '100dvh', background: A.CANVAS, padding: '80px 16px', color: A.BODY, fontSize: 13 }}>
         User not found.
       </div>
     );
