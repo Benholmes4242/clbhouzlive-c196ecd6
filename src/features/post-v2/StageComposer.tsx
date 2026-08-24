@@ -13,7 +13,7 @@
 // drafts -> useDrafts, uploads -> postUploadController (module-level, survives unmount).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, Loader2, Pencil } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Pencil, X } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
@@ -763,7 +763,14 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
       <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT_DARK.bg, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
         {/* Top bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT_DARK.bg, flex: 'none' }}>
-          <button onClick={handleClose} aria-label="Close" style={closeButtonStyle}>×</button>
+          <button onClick={handleClose} aria-label="Close" style={closeButtonStyle}>
+            {/* SVG GLYPH, NOT A TEXT GLYPH. A "\u00d7" character sits on the text
+                baseline inside its line box, so flex centring centres the LINE
+                BOX and the mark itself reads high and left of centre. The lucide
+                icon is centred in its own square viewBox, so the button centres
+                the mark. */}
+            <X size={18} strokeWidth={2.2} />
+          </button>
           {/* Fixed 22px = the 16/800 title's line box, so the bar height and
               position are identical with or without the title. */}
           <div style={{ minWidth: 0, flex: 1, height: 22, display: 'flex', alignItems: 'center' }}>
@@ -964,7 +971,12 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
           aria-label={state.media.length > 0 ? 'Back' : 'Close'}
           style={page2IconButtonStyle}
         >
-          {state.media.length > 0 ? '\u2039' : '\u00d7'}
+          {/* SVG GLYPHS, NOT TEXT GLYPHS - same reason as page 1's close. The
+              "\u2039" was the worse of the two: it carries asymmetric side
+              bearing, so it read both high and right inside the circle. */}
+          {state.media.length > 0
+            ? <ChevronLeft size={18} strokeWidth={2.2} />
+            : <X size={18} strokeWidth={2.2} />}
         </button>
         <div style={{ minWidth: 0, flex: 1 }} />
         <div style={{ fontSize: 12, fontWeight: 700, color: PAGE2.mute, fontVariantNumeric: 'tabular-nums' }}>2 / 2</div>
