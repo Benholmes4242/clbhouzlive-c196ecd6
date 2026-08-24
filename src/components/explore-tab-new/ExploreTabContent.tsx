@@ -420,7 +420,9 @@ export default function ExploreTabContent({
     [],
   );
 
-  const photosShown = mediaChip === 'photos' ? photoPool : photoSample;
+  /* WHILE FILTERING, PHOTOS DO NOT SAMPLE (§3): showing 12 of a filtered set
+     would make the result count a lie. Every match renders. */
+  const photosShown = filtering || mediaChip === 'photos' ? photoPool : photoSample;
   const handlePhoto = useCallback(
     (item: CommunityLibraryItem) => openMedia(photosShown, item, 'discover-photos'),
     [openMedia, photosShown],
