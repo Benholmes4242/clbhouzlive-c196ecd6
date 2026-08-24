@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { FONT, INK, SC_ACCENT } from './_constants';
+import { A } from './analytical/tokens';
 
 // Scoring key: swatches are rendered BY ScoreMark itself, never hand-drawn,
 // so the key can never drift from the card.
@@ -22,7 +23,7 @@ export const HolesScoringKey: React.FC = () => {
     <div
       style={{
         padding: '22px 18px 28px',
-        borderTop: '1px solid rgba(15,23,42,0.06)',
+        borderTop: `1px solid ${A.BORDER}`,
         fontFamily: FONT,
       }}
     >

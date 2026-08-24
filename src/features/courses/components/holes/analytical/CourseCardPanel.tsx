@@ -234,7 +234,7 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
             marginTop: -DOT / 2,
             borderRadius: '50%',
             background: DIFFICULTY_RAMP[5],
-            border: '2.5px solid #FFFFFF',
+            border: `2.5px solid ${A.INK}`,
             boxShadow: '0 1px 3px rgba(14,18,22,0.22)',
             boxSizing: 'border-box',
           }}

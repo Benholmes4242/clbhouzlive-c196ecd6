@@ -26,7 +26,6 @@
  */
 import React from 'react';
 import { INK, SC_FILL_GOLD, SC_FILL_BIRDIE } from './_constants';
-import { A } from './analytical/tokens';
 
 export type HoleGlyphKind =
   /** Kept for the callers that cannot yet tell an eagle from an ace: RED ring. */

@@ -12,6 +12,7 @@ import { INK_MUTE } from '@/features/courses/_shared/tokens';
 import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
 import { HoleDataSheet, type HoleDataSection } from './HoleDataSheet';
 import { CourseTeeCard } from './CourseTeeCard';
+import { A } from './analytical/tokens';
 
 interface Props {
   courseId: string | undefined;
@@ -103,8 +104,8 @@ export const CourseHolesTab: React.FC<Props> = ({
           style={{
             border: 0,
             borderRadius: 999,
-            background: '#f59e0b',
-            color: '#fff',
+            background: A.AMBER,
+            color: A.CANVAS,
             padding: '10px 20px',
             fontSize: 14,
             fontWeight: 700,

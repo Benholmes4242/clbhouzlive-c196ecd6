@@ -366,7 +366,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                     width: 32, height: 32, borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <Play size={14} color="#fff" fill="#fff" />
+                    <Play size={14} color={A.INK} fill={A.INK} />
                   </div>
                 </div>
               )}
@@ -383,7 +383,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                   }}
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                    <span style={{ ...FIGURE, color: '#fff', fontSize: 19 }}>+{overflowCount}</span>
+                    <span style={{ ...FIGURE, color: A.INK, fontSize: 19 }}>+{overflowCount}</span>
                     <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 10, fontWeight: 600 }}>{t('courseDetail.mediaStrip.seeAll')}</span>
                   </div>
                 </div>
