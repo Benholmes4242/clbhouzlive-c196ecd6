@@ -149,7 +149,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'rgba(15,23,42,0.4)',
+          background: 'rgba(0,0,0,0.55)',
           backdropFilter: 'blur(2px)',
           WebkitBackdropFilter: 'blur(2px)',
           opacity: visible ? 1 : 0,
@@ -166,10 +166,13 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           left: 0,
           width: '80%',
           maxWidth: 340,
-          background: 'rgba(248,250,252,0.94)',
+          // Ground taken from the app's translucent dark chrome
+          // (GlobalBottomNavigation's rgba(27,30,39,0.86) = A.PANEL alpha'd),
+          // held at the menu's original 0.94 so the page still shows faintly.
+          background: 'rgba(27,30,39,0.94)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          boxShadow: '0 24px 60px rgba(15,23,42,0.25)',
+          boxShadow: '0 24px 60px rgba(0,0,0,0.55)',
           transform: slideTransform,
           transition: `transform ${DURATION}ms ${ease}`,
           paddingTop: 'env(safe-area-inset-top, 0px)',
