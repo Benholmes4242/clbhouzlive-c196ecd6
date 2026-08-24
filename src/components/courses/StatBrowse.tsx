@@ -70,6 +70,7 @@ import {
   HAIRLINE_INK_8,
   HAIRLINE_INK_10,
   INK,
+  INK_FAINT,
   INK_MUTE,
   SURFACE,
   SLATE_50,
@@ -148,19 +149,31 @@ const LIST_LABEL: Record<string, string> = {
  */
 const CARD_BAND = 'rgba(255,255,255,0.06)';
 
-const INLINE_TRIGGER_CLS =
-  'inline-flex h-auto w-auto max-w-full justify-start gap-0 whitespace-nowrap border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden';
+/**
+ * Row 1 (area, region): full width of its 50/50 cell, with the chevron at the
+ * trailing edge so different content widths still read as one matched pair.
+ */
+const WELL_TRIGGER_CLS =
+  'flex h-auto w-full border-0 p-0 shadow-none focus:ring-0 disabled:opacity-100 ' +
+  '[&>span]:!flex [&>svg]:hidden';
 
-const triggerStyle: React.CSSProperties = {
-  color: INK_MUTE,
-  padding: '4px 0',
-};
+/** Row 2 (lens): sized to its content, leaving search at the opposite edge. */
+const WELL_TRIGGER_AUTO_CLS =
+  'inline-flex h-auto w-auto max-w-full border-0 p-0 shadow-none focus:ring-0 ' +
+  '[&>span]:!flex [&>svg]:hidden';
+
+const wellStyle = (applied: boolean): React.CSSProperties => ({
+  background: applied ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.10)',
+  border: 'none',
+  borderRadius: 10,
+  padding: '9px 12px',
+  color: applied ? INK : INK_MUTE,
+});
 
 const triggerLabelStyle: React.CSSProperties = {
   fontSize: 12.5,
   fontWeight: 700,
   letterSpacing: '-0.01em',
-  color: INK_MUTE,
 };
 
 const menuStyle: React.CSSProperties = {
@@ -658,14 +671,14 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const countrySelect = (_compact: boolean) => (
     <Select value={country ?? 'all'} onValueChange={onCountryChange}>
       <SelectTrigger
-        className={INLINE_TRIGGER_CLS}
-        style={triggerStyle}
+        className={WELL_TRIGGER_CLS}
+        style={wellStyle(!!country)}
         aria-label={t('statBrowse.selectCountryA11y')}
       >
-        <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
+        <span className="flex w-full items-center" style={{ gap: 6 }}>
           <Globe {...DD_ICON} />
-          <span className="truncate" style={triggerLabelStyle}>{countryTriggerLabel}</span>
-          <ChevronDown {...DD_ICON} />
+          <span className="truncate flex-1 min-w-0" style={triggerLabelStyle}>{countryTriggerLabel}</span>
+          <ChevronDown {...DD_ICON} style={{ color: INK_FAINT }} />
         </span>
       </SelectTrigger>
       <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
@@ -705,17 +718,19 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const regionSelect = (_compact: boolean) => (
     <Select value={region ?? 'all'} onValueChange={onRegionChange} disabled={regionDisabled}>
       <SelectTrigger
-        className={`${INLINE_TRIGGER_CLS} disabled:opacity-60`}
-        style={triggerStyle}
+        className={WELL_TRIGGER_CLS}
+        style={regionDisabled
+          ? { ...wellStyle(false), background: 'rgba(255,255,255,0.05)', color: INK_FAINT }
+          : wellStyle(!!region)}
         aria-label={t('statBrowse.selectRegionA11y')}
       >
-        <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
-          <span className="truncate" style={triggerLabelStyle}>
+        <span className="flex w-full items-center" style={{ gap: 6 }}>
+          <span className="truncate flex-1 min-w-0" style={triggerLabelStyle}>
             {regionDisabled
               ? t('statBrowse.allRegions')
               : region ?? (country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions'))}
           </span>
-          <ChevronDown {...DD_ICON} />
+          <ChevronDown {...DD_ICON} style={{ color: INK_FAINT }} />
         </span>
       </SelectTrigger>
       <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
@@ -751,14 +766,14 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const lensSelect = (_compact: boolean) => (
     <Select value={lens} onValueChange={(v) => onLensChange(v as StatLens)}>
       <SelectTrigger
-        className={INLINE_TRIGGER_CLS}
-        style={triggerStyle}
+        className={WELL_TRIGGER_AUTO_CLS}
+        style={wellStyle(true)}
         aria-label={t('statBrowse.selectLensA11y')}
       >
-        <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
+        <span className="flex min-w-0 items-center" style={{ gap: 6 }}>
           <LensIcon lens={lens} />
           <span className="truncate" style={triggerLabelStyle}>{t(`statBrowse.lens.${lens}.label`)}</span>
-          <ChevronDown {...DD_ICON} />
+          <ChevronDown {...DD_ICON} style={{ color: INK_FAINT }} />
         </span>
       </SelectTrigger>
       <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
@@ -793,8 +808,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       type="button"
       onClick={() => openDirectory(country, 'filter_bar')}
       aria-label={t('directorySheet.openA11y')}
-      className={`${compact ? 'h-8 w-8' : 'h-10 w-10'} shrink-0 rounded-xl flex items-center justify-center`}
-      style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${HAIRLINE_INK_10}` }}
+      className={`${compact ? 'h-8 w-8' : 'h-10 w-10'} shrink-0 flex items-center justify-center`}
+      style={{ background: 'rgba(255,255,255,0.10)', borderRadius: 10 }}
     >
       <Search className={compact ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
     </button>
