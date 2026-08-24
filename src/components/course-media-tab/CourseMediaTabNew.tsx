@@ -7,7 +7,7 @@ import { useCourseMedia, type CourseMediaFilter } from './hooks/useCourseMedia';
 import { CourseMediaHeader } from './CourseMediaHeader';
 import { CourseMediaCanonGrid } from './CourseMediaCanonGrid';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
-import { AMBER, SLATE_50 } from '@/features/courses/_shared/tokens';
+import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface CourseMediaTabNewProps {
