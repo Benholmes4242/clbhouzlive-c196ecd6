@@ -50,6 +50,13 @@ const CATEGORIES: { key: string; label: string; sub: string; types: string[] }[]
 
 ];
 
+// Matches the personal SettingsToggleRow grammar used in the Privacy section:
+// checked fill is near-white ink, unchecked is a raised track with a hairline.
+const SETTINGS_SWITCH_CLASS = cn(
+  'relative before:absolute before:content-[""] before:-inset-y-2.5 before:-inset-x-1',
+  'data-[state=checked]:bg-[#F8FAFC] data-[state=unchecked]:bg-[rgba(255,255,255,0.14)]',
+  'data-[state=unchecked]:border data-[state=unchecked]:border-[rgba(255,255,255,0.18)]',
+);
 
 export default function NotificationsPage() {
   const { user } = useSupabaseSession();
