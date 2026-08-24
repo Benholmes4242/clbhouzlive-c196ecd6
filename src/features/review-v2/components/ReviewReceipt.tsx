@@ -194,7 +194,7 @@ export function ReviewReceipt({
                       flex: 1,
                       minWidth: 0,
                       height: 3,
-                      background: 'rgba(15,23,42,0.08)',
+                      background: RV2.track,
                       position: 'relative',
                     }}
                   >
@@ -267,7 +267,7 @@ export function ReviewReceipt({
                   fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.14em',
-                  color: 'rgba(15,23,42,0.42)',
+                  color: RV2.secondary,
                   marginBottom: 10,
                 }}
               >
@@ -394,7 +394,7 @@ export function ReviewReceipt({
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.14em',
-                    color: 'rgba(15,23,42,0.42)',
+                    color: RV2.secondary,
                     marginBottom: 10,
                   }}
                 >
@@ -451,7 +451,7 @@ export function ReviewReceipt({
                       padding: '7px 13px',
                       borderRadius: 999,
                       background: RV2.amberSoft,
-                      color: '#C2620A',
+                      color: RV2.amber,
                       fontSize: 12,
                       fontWeight: 700,
                       flexShrink: 0,
@@ -491,7 +491,7 @@ export function ReviewReceipt({
                 borderRadius: 14,
                 border: 'none',
                 background: RV2.ink,
-                color: '#FFFFFF',
+                color: RV2.canvas,
                 fontSize: 14,
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -540,7 +540,7 @@ export function ReviewReceipt({
               borderRadius: 14,
               border: 'none',
               background: RV2.ink,
-              color: '#FFFFFF',
+              color: RV2.canvas,
               fontSize: 14,
               fontWeight: 700,
               cursor: 'pointer',

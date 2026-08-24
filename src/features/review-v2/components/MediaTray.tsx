@@ -92,7 +92,7 @@ export function MediaTray({
                     'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.35) 100%)',
                 }}
               >
-                <Play size={16} color="#fff" fill="#fff" />
+                <Play size={16} color={RV2.onDark} fill={RV2.onDark} />
               </div>
             )}
 
@@ -127,7 +127,7 @@ export function MediaTray({
                   position: 'absolute',
                   inset: 0,
                   background: 'rgba(0,0,0,0.55)',
-                  color: '#fff',
+                  color: RV2.onDark,
                   border: 'none',
                   display: 'flex',
                   flexDirection: 'column',
@@ -155,7 +155,7 @@ export function MediaTray({
                 borderRadius: '50%',
                 border: 'none',
                 background: 'rgba(0,0,0,0.6)',
-                color: '#fff',
+                color: RV2.onDark,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -179,7 +179,7 @@ export function MediaTray({
               flexShrink: 0,
               borderRadius: 12,
               border: `1.5px dashed ${RV2.hairlineStrong}`,
-              background: '#FFFFFF',
+              background: RV2.ghost,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',

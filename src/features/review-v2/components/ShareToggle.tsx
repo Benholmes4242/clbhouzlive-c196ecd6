@@ -1,6 +1,7 @@
 /**
  * ShareToggle — "Share to your feed" true toggle.
- * Solid slate #0F172A when on, neutral surface when off.
+ * Ink (near-white) track when on, quiet track when off, on the dark composer
+ * canvas. The knob inverts against the track so both states stay legible.
  */
 
 import React from 'react';
@@ -11,7 +12,7 @@ interface Props {
   onChange: (v: boolean) => void;
 }
 
-const SLATE_ON = '#0F172A';
+const TRACK_ON = RV2.ink;
 
 export function ShareToggle({ value, onChange }: Props) {
   return (
@@ -26,7 +27,7 @@ export function ShareToggle({ value, onChange }: Props) {
         gap: 12,
         width: '100%',
         padding: '12px 16px',
-        background: '#FFFFFF',
+        background: RV2.cardBg,
         border: `1px solid ${RV2.hairline}`,
         borderRadius: RV2.panelRadius,
         cursor: 'pointer',
@@ -48,7 +49,7 @@ export function ShareToggle({ value, onChange }: Props) {
           width: 42,
           height: 24,
           borderRadius: 999,
-          background: value ? SLATE_ON : 'rgba(15,23,42,0.14)',
+          background: value ? TRACK_ON : RV2.trackStrong,
           transition: 'background 160ms ease',
           flexShrink: 0,
         }}
@@ -61,7 +62,7 @@ export function ShareToggle({ value, onChange }: Props) {
             width: 20,
             height: 20,
             borderRadius: '50%',
-            background: '#FFFFFF',
+            background: value ? RV2.canvas : RV2.ink,
             boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
             transition: 'left 160ms ease',
           }}

@@ -107,7 +107,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
           position: 'relative',
           height: 12,
           borderRadius: 999,
-          background: 'rgba(15,23,42,0.08)',
+          background: RV2.track,
           cursor: 'pointer',
           touchAction: 'none',
           padding: 0,
@@ -136,7 +136,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
               top: 0,
               bottom: 0,
               width: 1,
-              background: 'rgba(15,23,42,0.16)',
+              background: RV2.trackStrong,
               pointerEvents: 'none',
             }}
           />
@@ -152,7 +152,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
               width: 26,
               height: 26,
               borderRadius: '50%',
-              background: '#FFFFFF',
+              background: RV2.ink,
               border: `2.5px solid ${color}`,
               boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
               pointerEvents: 'none',

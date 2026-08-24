@@ -245,9 +245,9 @@ export function VoiceDictateButton({ onAppend }: Props) {
           height: 28,
           padding: '0 10px',
           borderRadius: 999,
-          border: '1px solid rgba(15,23,42,0.10)',
-          background: '#FFFFFF',
-          color: '#0F172A',
+          border: `1px solid ${RV2.hairlineStrong}`,
+          background: RV2.ghost,
+          color: RV2.ink,
           fontSize: 11.5,
           fontWeight: 600,
           letterSpacing: '-0.005em',
@@ -284,7 +284,7 @@ export function VoiceDictateButton({ onAppend }: Props) {
           width: 8,
           height: 8,
           borderRadius: 999,
-          background: listening ? '#EF4444' : AMBER,
+          background: listening ? RV2.danger : AMBER,
           animation:
             listening && !reduced ? 'rv2-pulse-dot 1s ease-in-out infinite' : 'none',
           flexShrink: 0,
@@ -303,7 +303,7 @@ export function VoiceDictateButton({ onAppend }: Props) {
             style={{
               fontSize: 11.5,
               fontWeight: 700,
-              color: '#0F172A',
+              color: RV2.ink,
               fontVariantNumeric: 'tabular-nums',
               minWidth: 32,
               textAlign: 'right',
@@ -325,7 +325,7 @@ export function VoiceDictateButton({ onAppend }: Props) {
               borderRadius: 999,
               border: 'none',
               background: AMBER,
-              color: '#FFFFFF',
+              color: RV2.dark,
               cursor: 'pointer',
               flexShrink: 0,
             }}
@@ -338,7 +338,7 @@ export function VoiceDictateButton({ onAppend }: Props) {
           style={{
             fontSize: 11.5,
             fontWeight: 600,
-            color: 'rgba(15,23,42,0.55)',
+            color: RV2.secondary,
             whiteSpace: 'nowrap',
           }}
         >
