@@ -67,8 +67,8 @@ function parse(body: string): Block[] {
 
 export const LegalBodyRenderer: React.FC<Props> = ({
   body,
-  color = 'rgba(15,23,42,0.78)',
-  headingColor = '#0F172A',
+  color = 'rgba(248,250,252,0.72)',
+  headingColor = '#F8FAFC',
 }) => {
   const blocks = React.useMemo(() => parse(body || ''), [body]);
   return (
