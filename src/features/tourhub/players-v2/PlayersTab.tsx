@@ -91,6 +91,7 @@ export function PlayersTab() {
   // -- Search
   const [search, setSearch] = useState('');
   const [searchExpanded, setSearchExpanded] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
   const debouncedSearch = useDebouncedValue(search, 200);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
