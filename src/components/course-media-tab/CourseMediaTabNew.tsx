@@ -61,7 +61,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
           type="button"
           onClick={() => navigate('/auth')}
           className="h-11 px-6 rounded-xl text-sm font-semibold active:scale-[0.97] transition-all"
-          style={{ background: AMBER, color: A.CANVAS }}
+          style={{ background: A.INK, color: A.CANVAS }}
         >
           {t('courses:media.signInCta')}
         </button>
