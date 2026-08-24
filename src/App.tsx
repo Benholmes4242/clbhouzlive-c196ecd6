@@ -255,7 +255,6 @@ const PostV2Page = lazy(() => import("./features/post-v2/PostV2Page"));
 
 // ShareReviewPage removed in PR-5 Part 2 (zero navigators — orphan preview surface, ReviewWizard shares inline).
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
-const CommunityPage = lazy(() => import("./features/community/CommunityPage"));
 
 
 
@@ -562,8 +561,10 @@ function AppRoutes() {
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
         <Route path="/user/:username/courses" element={<Suspense fallback={<CoursesListSkeleton />}><UserCoursesPage /></Suspense>} />
         
-        {/* Community — the destination that replaced the moments see-all sheet. */}
-        <Route path="/community" element={<Suspense fallback={<GenericPageSkeleton />}><CommunityPage /></Suspense>} />
+        {/* /community IS DELETED (BRIEF_DISCOVER_ONE_PAGE §3). Its four sections
+            live on Discover, which is now the only page. The path redirects
+            rather than 404s: it shipped, so it exists in history and in links. */}
+        <Route path="/community" element={<Navigate to="/explore" replace />} />
 
         <Route path="/journey" element={<Navigate to="/courses" replace />} />
         
