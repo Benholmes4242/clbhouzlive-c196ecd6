@@ -164,7 +164,7 @@ export function LocationContactSection({
                     />
                     <div
                       className="px-3 py-2.5 flex items-center justify-between"
-                      style={{ background: '#ffffff', borderTop: `0.5px solid ${BIZ.hair}` }}
+                      style={{ background: BIZ.fill, borderTop: `0.5px solid ${BIZ.hair}` }}
                     >
                       <div className="flex items-center gap-2 text-[13px] min-w-0">
                         <MapPin className="h-4 w-4 flex-shrink-0" style={{ color: BIZ.amber }} />

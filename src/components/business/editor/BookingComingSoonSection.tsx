@@ -12,8 +12,8 @@ export function BookingComingSoonSection() {
             className="flex items-center justify-center flex-shrink-0"
             style={{
               width: 40, height: 40, borderRadius: 10,
-              background: 'rgba(15,23,42,0.05)',
-              border: '1px solid rgba(15,23,42,0.08)',
+              background: BIZ.fill,
+              border: `1px solid ${BIZ.hair}`,
             }}
           >
             <CalendarClock size={18} className="text-muted-foreground" />

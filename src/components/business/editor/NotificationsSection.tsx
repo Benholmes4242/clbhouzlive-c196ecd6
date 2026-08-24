@@ -88,7 +88,7 @@ export function NotificationsSection({ businessId }: Props) {
           <Loader2 size={14} className="animate-spin" /> Loading preferences…
         </div>
       ) : (
-        <div className="divide-y divide-[rgba(15,23,42,0.06)]">
+        <div className="divide-y divide-[rgba(255,255,255,0.10)]">
           {TOGGLES.map((t) => {
             const enabled = !muted.has(t.key);
             const isSaving = saving === t.key;
