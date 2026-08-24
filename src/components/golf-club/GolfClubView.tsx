@@ -294,19 +294,22 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             value="legends"
             className={`mt-0 transition-opacity duration-200 ${activeTab === 'legends' ? 'opacity-100' : 'hidden'}`}
           >
-            <div className="hcp-light">
-              <CourseLegendsDrilldown
-                selection={{
-                  courseId: course.id,
-                  courseName: course.name,
-                  courseRegion: course.region ?? null,
-                  courseCountry: course.country ?? null,
-                  courseType: (course as { course_type?: string | null }).course_type ?? null,
-                }}
-                hideHeader
-                theme="light"
-              />
-            </div>
+            {/* DARK, like every other tab. The page was light when this tab
+                opted out with a .hcp-light wrapper and theme="light"; both are
+                gone and theme now defaults to 'dark', which is the path the
+                handicap page exercises daily. .hcp-light itself stays — it
+                still serves FriendSheet and PageRoot. */}
+            <CourseLegendsDrilldown
+              selection={{
+                courseId: course.id,
+                courseName: course.name,
+                courseRegion: course.region ?? null,
+                courseCountry: course.country ?? null,
+                courseType: (course as { course_type?: string | null }).course_type ?? null,
+              }}
+              hideHeader
+            />
+
           </TabsContent>
         )}
 
