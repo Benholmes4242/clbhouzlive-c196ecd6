@@ -8,12 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { useTranslation } from 'react-i18next';
 import { Z } from '@/config/zIndex';
-import {
-  FONT,
-  HAIRLINE_INK_10,
-  INK,
-  INK_MUTE,
-} from '@/features/tourhub/_shared/tokens';
+import { FONT } from '@/features/tourhub/_shared/tokens';
 import { A, LABEL, KICKER, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -149,7 +144,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'rgba(15,23,42,0.4)',
+          background: 'rgba(0,0,0,0.55)',
           backdropFilter: 'blur(2px)',
           WebkitBackdropFilter: 'blur(2px)',
           opacity: visible ? 1 : 0,
@@ -166,10 +161,13 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           left: 0,
           width: '80%',
           maxWidth: 340,
-          background: 'rgba(248,250,252,0.94)',
+          // Ground taken from the app's translucent dark chrome
+          // (GlobalBottomNavigation's rgba(27,30,39,0.86) = A.PANEL alpha'd),
+          // held at the menu's original 0.94 so the page still shows faintly.
+          background: 'rgba(27,30,39,0.94)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          boxShadow: '0 24px 60px rgba(15,23,42,0.25)',
+          boxShadow: '0 24px 60px rgba(0,0,0,0.55)',
           transform: slideTransform,
           transition: `transform ${DURATION}ms ${ease}`,
           paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -234,7 +232,8 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
                     border: 'none',
                     borderRadius: 14,
                     background: isActive ? A.INK : 'transparent',
-                    color: isActive ? '#FFFFFF' : A.INK,
+                    // Active ink derives from the fill: A.INK fill -> A.CANVAS label.
+                    color: isActive ? A.CANVAS : A.INK,
                     fontFamily: 'inherit',
                     fontSize: 16,
                     fontWeight: isActive ? 700 : 600,
@@ -245,7 +244,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
                   }}
                 >
                   <span style={{ width: 22, display: 'inline-flex', justifyContent: 'center' }}>
-                    <Icon size={20} color={isActive ? '#FFFFFF' : A.INK} strokeWidth={isActive ? 2.4 : 2} />
+                    <Icon size={20} color={isActive ? A.CANVAS : A.INK} strokeWidth={isActive ? 2.4 : 2} />
                   </span>
                   <span style={{ flex: 1, minWidth: 0 }}>{t(labelKey)}</span>
                   {id === 'live' && liveCount > 0 && (
@@ -301,7 +300,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           </div>
 
           {/* Secondary group header */}
-          <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
+          <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${A.BORDER}` }}>
             <div style={{ marginTop: 12 }}>
               <GroupHeader>{t('nav.group.account')}</GroupHeader>
             </div>
@@ -345,7 +344,7 @@ function LiveCountBadge({ count, onInk }: { count: number; onInk: boolean }) {
         style={{
           ...LABEL,
           fontSize: 8.5,
-          color: onInk ? 'rgba(255,255,255,0.72)' : A.DIM,
+          color: onInk ? 'rgba(21,23,31,0.72)' : A.DIM,
           ...FIGS,
         }}
       >
@@ -432,7 +431,7 @@ function LiveRow({
               fontSize: 15,
               fontWeight: 700,
               letterSpacing: '-0.02em',
-              color: getScoreColor(leaderToPar, 'light'),
+              color: getScoreColor(leaderToPar, 'dark'),
               ...FIGS,
             }}
           >
@@ -490,12 +489,12 @@ function SecondaryLink({
         fontFamily: 'inherit',
         fontSize: 14,
         fontWeight: 600,
-        color: INK_MUTE,
+        color: A.MUTE,
         cursor: 'pointer',
         textAlign: 'left',
       }}
     >
-      <Icon size={18} color={INK_MUTE} strokeWidth={2} />
+      <Icon size={18} color={A.MUTE} strokeWidth={2} />
       {label}
     </button>
   );
