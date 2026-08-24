@@ -305,9 +305,9 @@ export default function ManageProfile() {
         <div
           className="sticky top-0 z-30"
           style={{
-            background: 'rgba(248,250,252,0.85)',
-            backdropFilter: 'saturate(180%) blur(14px)',
-            WebkitBackdropFilter: 'saturate(180%) blur(14px)',
+            background: 'var(--glass-bg)',
+            backdropFilter: 'saturate(180%) blur(var(--glass-blur))',
+            WebkitBackdropFilter: 'saturate(180%) blur(var(--glass-blur))',
           }}
         >
           <div
