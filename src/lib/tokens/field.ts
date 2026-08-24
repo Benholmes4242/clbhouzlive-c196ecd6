@@ -46,3 +46,20 @@ export function fieldPaint(focused: boolean) {
     transition: FIELD_TRANSITION,
   } as const;
 }
+
+/**
+ * The whole field paint as one class, focus step included.
+ *
+ * Uses :focus-within, which matches the element itself as well as its
+ * descendants — so it works on a wrapper <div> that holds a glyph plus a
+ * transparent input AND on a self-painting <input>. No local focus state, and
+ * therefore no way to break an existing onFocus side effect (CollegeHubPage's
+ * blur nearly closed its results list before a tap landed).
+ *
+ * Do NOT also set background/border/borderRadius inline — inline style beats
+ * the class and the focus step dies silently.
+ */
+export const FIELD_PAINT_CLASS =
+  'bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] rounded-[14px] ' +
+  'transition-[background-color,border-color] duration-[140ms] ease-out ' +
+  'focus-within:bg-[rgba(255,255,255,0.10)] focus-within:border-[rgba(255,255,255,0.28)]';
