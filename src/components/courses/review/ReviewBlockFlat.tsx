@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { ThumbsUp, ThumbsDown, MoreHorizontal } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatRatingValue } from '@/utils/formatters';
-import { bandColor } from '@/features/courses/_shared/scoreBands';
+import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
@@ -61,6 +61,18 @@ const formatDate = (dateString: string) => {
   if (diffInDays < 365) return `${months} ${months === 1 ? 'month' : 'months'} ago`;
   const years = Math.floor(diffInDays / 365);
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+};
+
+/** Local formatting helper only — colours themselves always come from
+ * bandColorOnDark() in the canonical scoreBands module, never redeclared here. */
+const hexToRgba = (color: string, alpha: number): string => {
+  if (color.startsWith('rgba') || color.startsWith('rgb(')) return color;
+  const hex = color.replace('#', '');
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r},${g},${b},${alpha})`;
 };
 
 const SUBSCORE_LABELS: { key: keyof Review; labelKey: string }[] = [
@@ -121,7 +133,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
             style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flexShrink: 0 }}
           >
             {user.avatarUrl ? (
-              <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} hairlineRing ringColor={LIGHT_HAIRLINE} />
+              <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} hairlineRing ringColor={DARK_HAIRLINE} />
 
             ) : (
               <div
@@ -145,7 +157,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </button>
         ) : (
           user.avatarUrl ? (
-            <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} hairlineRing ringColor={LIGHT_HAIRLINE} />
+            <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} hairlineRing ringColor={DARK_HAIRLINE} />
           ) : (
             <div
               style={{
@@ -168,9 +180,9 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
         )}
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', lineHeight: 1.3 }}>{user.name}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.96)', lineHeight: 1.3 }}>{user.name}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 1, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 11, color: '#94A3B8' }}>{formatDate(createdAt)}</span>
+            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.62)' }}>{formatDate(createdAt)}</span>
             {review.teeLabel && (
               <span
                 style={{
@@ -178,10 +190,10 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                   alignItems: 'center',
                   padding: '1px 7px',
                   borderRadius: 999,
-                  border: '1px solid rgba(15,23,42,0.14)',
+                  border: '1px solid rgba(255,255,255,0.10)',
                   fontSize: 10,
                   fontWeight: 700,
-                  color: '#475569',
+                  color: 'rgba(255,255,255,0.62)',
                   textTransform: 'none',
                   letterSpacing: '0.01em',
                   whiteSpace: 'nowrap',
@@ -201,7 +213,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               letterSpacing: '-0.03em',
               lineHeight: 1,
               fontVariantNumeric: 'tabular-nums lining-nums',
-              color: bandColor(score),
+              color: bandColorOnDark(score),
             }}
           >
             {formatRatingValue(score)}
@@ -217,7 +229,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                 border: 'none',
                 padding: '4px',
                 cursor: 'pointer',
-                color: '#94A3B8',
+                color: 'rgba(255,255,255,0.62)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -233,27 +245,30 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
       {/* Sub-scores chips */}
       {subscores.length > 0 && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
-          {subscores.map((s) => (
-            <div
-              key={s.label}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5,
-                padding: '4px 9px',
-                borderRadius: 999,
-                background: 'rgba(247,147,30,0.08)',
-                border: '1px solid rgba(247,147,30,0.2)',
-              }}
-            >
-              <span style={{ fontSize: 9, fontWeight: 700, color: '#F7931E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                {s.label}
-              </span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#F7931E', fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                {formatRatingValue(Number(s.value))}
-              </span>
-            </div>
-          ))}
+          {subscores.map((s) => {
+            const chipColor = bandColorOnDark(Number(s.value));
+            return (
+              <div
+                key={s.label}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  padding: '4px 9px',
+                  borderRadius: 999,
+                  background: 'rgba(255,255,255,0.06)',
+                  border: `1px solid ${hexToRgba(chipColor, 0.35)}`,
+                }}
+              >
+                <span style={{ fontSize: 9, fontWeight: 700, color: chipColor, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  {s.label}
+                </span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: chipColor, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  {formatRatingValue(Number(s.value))}
+                </span>
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -262,14 +277,14 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
       {text && text.trim().length > 0 && (
         <>
           {collapsedText !== null ? (
-            <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.65, margin: '0 0 6px' }}>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.62)', lineHeight: 1.65, margin: '0 0 6px' }}>
               {collapsedText}
             </p>
           ) : (
             <MentionText
               as="p"
               text={text}
-              style={{ fontSize: 13, color: '#475569', lineHeight: 1.65, margin: '0 0 6px' }}
+              style={{ fontSize: 13, color: 'rgba(255,255,255,0.62)', lineHeight: 1.65, margin: '0 0 6px' }}
             />
           )}
           {isLong && (
@@ -279,7 +294,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#94A3B8',
+                color: 'rgba(255,255,255,0.62)',
                 fontSize: 12,
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -303,7 +318,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
       {/* Helpful row — only for other reviews */}
       {!isMine && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-          <span style={{ fontSize: 11, color: '#94A3B8', marginRight: 2 }}>{t('review.helpful')}</span>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.62)', marginRight: 2 }}>{t('review.helpful')}</span>
           <button
             type="button"
             onClick={() => !votingDisabled && onToggleHelpful?.(review.id, isHelpful ? 'clear' : 'helpful')}
@@ -314,13 +329,13 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               gap: 4,
               padding: isHelpful ? '5px 10px' : '4px 8px',
               borderRadius: 8,
-              background: isHelpful ? 'rgba(15,23,42,0.06)' : 'transparent',
+              background: isHelpful ? 'rgba(255,255,255,0.06)' : 'transparent',
               border: isHelpful
-                ? '1px solid rgba(15,23,42,0.12)'
-                : '0.5px solid rgba(15,23,42,0.05)',
+                ? '1px solid rgba(255,255,255,0.10)'
+                : '0.5px solid rgba(255,255,255,0.10)',
               fontSize: 11,
               fontWeight: isHelpful ? 700 : 500,
-              color: isHelpful ? '#0F172A' : '#94A3B8',
+              color: isHelpful ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.62)',
               cursor: votingDisabled ? 'default' : 'pointer',
               opacity: votingDisabled ? 0.5 : 1,
             }}
@@ -337,13 +352,13 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
               gap: 4,
               padding: isUnhelpful ? '5px 10px' : '4px 8px',
               borderRadius: 8,
-              background: isUnhelpful ? 'rgba(15,23,42,0.06)' : 'transparent',
+              background: isUnhelpful ? 'rgba(255,255,255,0.06)' : 'transparent',
               border: isUnhelpful
-                ? '1px solid rgba(15,23,42,0.12)'
-                : '0.5px solid rgba(15,23,42,0.05)',
+                ? '1px solid rgba(255,255,255,0.10)'
+                : '0.5px solid rgba(255,255,255,0.10)',
               fontSize: 11,
               fontWeight: isUnhelpful ? 700 : 500,
-              color: isUnhelpful ? '#0F172A' : '#94A3B8',
+              color: isUnhelpful ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.62)',
               cursor: votingDisabled ? 'default' : 'pointer',
               opacity: votingDisabled ? 0.5 : 1,
             }}
