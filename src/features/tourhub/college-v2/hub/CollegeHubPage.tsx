@@ -252,7 +252,9 @@ export function CollegeHubPage() {
             gap: 8,
           }}
         >
-          {/* RADIUS/HEIGHT EXCEPTION (recorded — do not "correct" to 44).
+          {/* Canonical twin of compare/PickerSheet.tsx's search field — same
+              construction, same paint. Change one, change both.
+              RADIUS/HEIGHT EXCEPTION (recorded — do not "correct" to 44).
               The canon is radius 14 / height 44. Radius moves to 14 here; the
               height stays 34 because this field sits inside the sticky glass
               bar (padding '8px 16px 10px'), and 44 would deepen that bar and
