@@ -430,10 +430,10 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             <div
               className="flex items-center flex-shrink-0 gap-1.5"
               style={{
-                 background: 'rgba(0,0,0,0.62)',
-                border: '0.5px solid rgba(255,255,255,0.20)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
+                background: 'rgba(12,18,14,0.58)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
                 borderRadius: 9999,
                 padding: '5px 11px',
               }}
