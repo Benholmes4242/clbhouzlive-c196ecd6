@@ -1011,89 +1011,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </>
           )}
 
-          {/* PANEL 3 — identity */}
-          {showIdentity && (
-            <Panel>
-              {/*
-                ONE TWO-ROW GRID, NOT TWO STACKED COLUMNS. Two independently
-                stacked columns let the 14.5px name and the 20px value set
-                different heights, so the label and the delta chip could never
-                land on the same line and no margin nudge would hold across
-                string lengths. The grid owns the rows: alignSelf end settles
-                row 1 on a common baseline, rowGap owns the label spacing, and
-                the empty span placeholders keep cell order when there is no
-                stat. Do not flatten this back to two columns.
-              */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <SquircleAvatar
-                  src={playerAvatarUrl ?? null}
-                  alt={playerName}
-                  userId={playerUserId ?? undefined}
-                  size={40}
-                  hairlineRing
-                />
-                <div
-                  style={{
-                    flex: 1, minWidth: 0,
-                    display: 'grid',
-                    gridTemplateColumns: '1fr auto',
-                    rowGap: 3,
-                    columnGap: 12,
-                  }}
-                >
-                  {/* row 1 */}
-                  <div
-                    style={{
-                      fontSize: 13.5, fontWeight: 700, color: A.INK,
-                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                      alignSelf: 'end',
-                    }}
-                  >
+          {/*
+            NOTHING FOLLOWS THE BREAKDOWN (BRIEF_SCORECARD_SHEET_HEADER §4).
+            The identity panel and the anonymous-round footer that used to sit
+            here are BOTH gone: the member row and both actions live in the
+            header, and the anonymous path is served there too (member row
+            omitted, actions row still rendered). Do not add a footer back.
+          */}
 
-                    {playerName}
-                  </div>
-                  {(identityStat || playerHcp != null) ? (
-                    <div style={{ ...NUM, fontSize: 22, color: A.INK, textAlign: 'center', alignSelf: 'end' }}>
-                      {identityStat ? identityStat.value : formatHcp(playerHcp as number)}
-                    </div>
-                  ) : <span />}
-
-                  {/* row 2 — the label is quiet chrome; LABEL carries A.MUTE. */}
-                  {(identityStat || playerHcp != null) ? (
-                    <div style={LABEL}>
-                      {identityStat ? identityStat.label : t('courses:scorecard.handicapIndex')}
-                    </div>
-                  ) : <span />}
-                  <div style={{ textAlign: 'center' }}>
-                    {!identityStat && showChip && <HandicapChip delta={playerHcpDelta as number} />}
-                  </div>
-                </div>
-              </div>
-
-              {/* The footer actions belong to this panel, under a hairline. */}
-              {(onShareRound || onViewProfile || onViewCourse) && (
-                <>
-                  <Hairline style={{ margin: '16px 0 4px' }} />
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap' }}>
-                    {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
-                    {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
-                    {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
-                  </div>
-                </>
-              )}
-            </Panel>
-          )}
-
-          {/* FOOTER — when there is no identity panel to host the actions. */}
-          {!showIdentity && (onShareRound || onViewProfile || onViewCourse) && (
-            <Panel>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap' }}>
-                {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
-                {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
-                {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
-              </div>
-            </Panel>
-          )}
 
         </div>
       </div>
