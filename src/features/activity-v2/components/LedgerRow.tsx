@@ -21,7 +21,7 @@ import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSharePromptFor, type SharePromptCandidate } from '../hooks/useSharePrompt';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 import { getActivityLink } from '../utils/activityLinks';
-import { resolveKind, composeCommentBody, T, type KindSpec } from './ledgerKinds';
+import { resolveKind, composeCommentBody, ACT, type KindSpec } from './ledgerKinds';
 
 
 const SF_STACK =
@@ -150,8 +150,9 @@ const FollowBackPill: React.FC<{ targetUserId: string; name: string }> = ({
       style={{
         padding: '7px 12px',
         borderRadius: 20,
-        background: T.INK,
-        color: '#fff',
+        background: ACT.INK,
+        // §2.2: the label follows the inverted fill, or it is white on white.
+        color: ACT.CANVAS,
         fontSize: 12,
         fontWeight: 700,
         border: 'none',
@@ -171,8 +172,8 @@ const ResolvePill: React.FC = () => (
     style={{
       padding: '6px 10px',
       borderRadius: 20,
-      border: `1px solid ${T.AMBER}`,
-      color: T.AMBER_DEEP,
+      border: `1px solid ${ACT.AMBER}`,
+      color: ACT.AMBER_DEEP,
       fontSize: 11.5,
       fontWeight: 700,
       display: 'inline-flex',
@@ -232,9 +233,9 @@ const SharePromptAction: React.FC<{ candidate: SharePromptCandidate }> = ({ cand
         marginTop: 7,
         padding: '6px 11px',
         borderRadius: 20,
-        border: `1px solid ${T.AMBER}`,
+        border: `1px solid ${ACT.AMBER}`,
         background: 'transparent',
-        color: T.AMBER_DEEP,
+        color: ACT.AMBER_DEEP,
         fontSize: 11.5,
         fontWeight: 700,
         fontFamily: SF_STACK,
@@ -328,8 +329,10 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
             width: 44,
             height: 44,
             borderRadius: 10,
-            background: `url(${src}) center/cover, #E2E8F0`,
-            border: `1px solid ${T.HAIR}`,
+            // §4.3 The fallback shows while loading and forever on a 404, so it
+            // is a dark placeholder, not a light one.
+            background: `url(${src}) center/cover, ${ACT.NEUTRAL}`,
+            border: `1px solid ${ACT.HAIR}`,
             flexShrink: 0,
           }}
         />
@@ -361,14 +364,14 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
     bodyNode = (
       <>
         {bodyNode}{' '}
-        <span style={{ fontWeight: 700, color: T.GOLD }}>{data.badge_title}</span>.
+        <span style={{ fontWeight: 700, color: ACT.GOLD }}>{data.badge_title}</span>.
       </>
     );
   } else if (spec.bold === 'achievement_name' && data.achievement_name) {
     bodyNode = (
       <>
         {bodyNode}{' '}
-        <span style={{ fontWeight: 700, color: T.GOLD }}>{data.achievement_name}</span>
+        <span style={{ fontWeight: 700, color: ACT.GOLD }}>{data.achievement_name}</span>
       </>
     );
   } else if (spec.bold === 'course_name' && data.course_name && !body.includes(data.course_name)) {
@@ -397,7 +400,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         opacity: 1,
         cursor: 'pointer',
         fontFamily: SF_STACK,
-        borderBottom: `0.5px solid ${T.HAIR}`,
+        borderBottom: `0.5px solid ${ACT.HAIR}`,
         userSelect: 'none',
       }}
     >
@@ -407,14 +410,14 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
           style={{
             fontSize: 13.5,
             fontWeight: 500,
-            color: T.INK,
+            color: ACT.INK,
             lineHeight: 1.35,
             wordBreak: 'break-word',
           }}
         >
           {bodyNode}
         </div>
-        <div style={{ fontSize: 11, fontWeight: 500, color: T.INK_45, marginTop: 2 }}>
+        <div style={{ fontSize: 11, fontWeight: 500, color: ACT.INK_45, marginTop: 2 }}>
           {relativeTime(row.created_at)}
         </div>
         {sharePrompt && <SharePromptAction candidate={sharePrompt} />}
@@ -427,7 +430,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
             width: 7,
             height: 7,
             borderRadius: '50%',
-            background: T.AMBER,
+            background: ACT.AMBER,
             marginTop: 8,
             flexShrink: 0,
           }}
