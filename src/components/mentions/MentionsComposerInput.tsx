@@ -41,15 +41,19 @@ import ReactDOM from 'react-dom';
 import { MentionsInput, Mention, type SuggestionDataItem } from 'react-mentions';
 
 import { CheckCircle2, Building2, AtSign } from 'lucide-react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { Z } from '@/config/zIndex';
 import { extractMentions } from '@/lib/mentions/format';
 
-const INK = '#0F172A';
-const INK_SUBTLE = '#94A3B8';
+const INK = '#F8FAFC';
+const INK_SUBTLE = 'rgba(248,250,252,0.42)';
 const AMBER = '#F7931E';
-const BORDER = 'rgba(15,23,42,0.10)';
+const BORDER = 'rgba(248,250,252,0.10)';
+/** Mention sheet ground (dark elevated surface). */
+const PANEL_BG = '#1B222B';
+/** Canonical dark placeholder tier. */
+const DEFAULT_PLACEHOLDER = 'rgba(255,255,255,0.38)';
 
 const PANEL_MAX_HEIGHT = 6 * 44 + 44 + 8; // 6 rows + eyebrow header + gutter
 
@@ -138,6 +142,13 @@ export interface MentionsTextStyle {
   caretColor?: string;
   minHeight?: number;
   maxHeight?: number;
+  /**
+   * ::placeholder fill. Needed because the textarea sets
+   * WebkitTextFillColor: 'transparent' (the highlighter paints the real text),
+   * and that inherited fill also blanks the placeholder — the highlighter has
+   * no placeholder layer to compensate. Defaults to the canonical dark tier.
+   */
+  placeholderColor?: string;
 }
 
 interface Props {
@@ -250,7 +261,7 @@ function buildMentionsStyle(text: MentionsTextStyle | undefined) {
       item: {
         padding: 0,
         '&focused': {
-          background: 'rgba(247,147,30,0.08)',
+          background: 'rgba(247,147,30,0.12)',
         },
       },
     },
@@ -278,7 +289,7 @@ function renderSuggestion(
         position: 'relative',
         padding: '9px 14px',
         minHeight: 44,
-        background: focused ? 'rgba(247,147,30,0.10)' : 'transparent',
+        background: focused ? 'rgba(247,147,30,0.12)' : 'transparent',
       }}
     >
       {focused && (
@@ -302,7 +313,7 @@ function renderSuggestion(
         alt={s.display}
         fallback={s.display.charAt(0).toUpperCase()}
         hairlineRing
-        ringColor={LIGHT_HAIRLINE}
+        ringColor={DARK_HAIRLINE}
       />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1">
@@ -423,10 +434,10 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
         maxHeight: geom?.maxHeight ?? PANEL_MAX_HEIGHT,
         display: 'flex',
         flexDirection: 'column',
-        background: '#FFFFFF',
+        background: PANEL_BG,
         borderRadius: '18px 18px 0 0',
-        borderTop: '1px solid rgba(15,23,42,0.12)',
-        boxShadow: '0 -10px 30px -6px rgba(15,23,42,0.16)',
+        borderTop: `1px solid ${BORDER}`,
+        boxShadow: '0 -10px 30px -6px rgba(0,0,0,0.45)',
         pointerEvents: 'auto',
         opacity: geom ? 1 : 0,
         zIndex: Z.mentionsPanel,
@@ -436,7 +447,7 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
         <div
           style={{
             flexShrink: 0,
-            background: '#FFFFFF',
+            background: PANEL_BG,
           }}
         >
           <div
@@ -452,7 +463,7 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
                 width: 36,
                 height: 4,
                 borderRadius: 999,
-                background: 'rgba(15,23,42,0.16)',
+                background: 'rgba(255,255,255,0.18)',
               }}
             />
           </div>
@@ -493,7 +504,7 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
             flexShrink: 0,
             height: 6,
             borderTop: `1px solid ${BORDER}`,
-            background: '#FFFFFF',
+            background: PANEL_BG,
           }}
         />
       )}
@@ -558,8 +569,28 @@ export function MentionsComposerInput({
   return (
     <div
       ref={anchorRef}
-      style={{ position: 'relative', flex: 1, minWidth: 0, width: '100%', ...style }}
+      style={{
+        position: 'relative',
+        flex: 1,
+        minWidth: 0,
+        width: '100%',
+        ['--mention-placeholder' as any]: textStyle?.placeholderColor ?? DEFAULT_PLACEHOLDER,
+        ...style,
+      }}
     >
+      {/*
+        Restores the placeholder fill killed by the transparent text-fill on the
+        input. -webkit-text-fill-color MUST be set explicitly: resetting `color`
+        alone does not override an inherited fill on WebKit.
+      */}
+      <style>{`
+        .mentions-composer textarea::placeholder,
+        .mentions-composer input::placeholder {
+          color: var(--mention-placeholder, ${DEFAULT_PLACEHOLDER});
+          -webkit-text-fill-color: var(--mention-placeholder, ${DEFAULT_PLACEHOLDER});
+          opacity: 1;
+        }
+      `}</style>
       <MentionsInput
         value={value}
         onChange={(_evt, newValue) => onChange(newValue)}
