@@ -29,7 +29,7 @@ import {
   INK_FAINT,
   INK_MUTE,
   STATUS_LIVE,
-  SURFACE,, SLATE_50 } from '@/features/tourhub/_shared/tokens';
+  SURFACE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
 import { useCollegeRoster } from '../data/useCollegeRoster';
 import { Skeleton } from '@/components/ui/skeleton';
 

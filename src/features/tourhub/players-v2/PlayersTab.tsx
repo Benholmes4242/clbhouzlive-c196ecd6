@@ -26,7 +26,7 @@ import {
   HAIRLINE_INK_10,
   INK,
   INK_MUTE,
-  SLATE_50,, SURFACE } from '../_shared/tokens';
+  SLATE_50, SURFACE } from '../_shared/tokens';
 import { getScoreColor } from '../_shared/scoreColor';
 import { MovementFigure } from '../_shared/movement';
 import { fmtScore } from '../utils/fmtScore';

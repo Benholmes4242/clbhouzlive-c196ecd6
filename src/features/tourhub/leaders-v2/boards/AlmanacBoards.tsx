@@ -35,7 +35,7 @@ import {
   INK,
   INK_FAINT,
   INK_MUTE,
-  SLATE_50,, SURFACE } from '../../_shared/tokens';
+  SLATE_50, SURFACE } from '../../_shared/tokens';
 import type { LeaderCategoryDef, LeaderRow } from '../data/useLeaderCategories';
 import type { LivePlayerMap } from '../../players-v2/data/useLivePlayerIds';
 
