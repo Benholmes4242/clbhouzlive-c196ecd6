@@ -1653,7 +1653,9 @@
     },
     "seam": "All time · from everyone",
     "media": {
-      "searchPlaceholder": "Search people, courses, clubs and posts",
+      "searchPlaceholder": "Search photos, clips and videos",
+      "searchClear": "Clear search",
+      "searchEmpty": "No photos, clips or videos match \"{{query}}\".",
       "chipsAria": "Media type"
     }
   },
