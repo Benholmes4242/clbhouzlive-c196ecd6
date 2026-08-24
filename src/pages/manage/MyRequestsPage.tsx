@@ -67,7 +67,7 @@ export default function MyRequestsPage() {
         {isLoading && (
           <div className="space-y-2">
             {[0, 1, 2].map((i) => (
-              <Skeleton key={i} className="h-[72px] w-full rounded-xl" />
+              <Skeleton key={i} variant="dark" className="h-[72px] w-full rounded-xl" />
             ))}
           </div>
         )}

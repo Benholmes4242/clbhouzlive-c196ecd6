@@ -101,7 +101,7 @@ export default function HelpPage() {
         {isLoading && (
           <div className="space-y-2">
             {[0, 1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-14 w-full rounded-xl" />
+              <Skeleton key={i} variant="dark" className="h-14 w-full rounded-xl" />
             ))}
           </div>
         )}
