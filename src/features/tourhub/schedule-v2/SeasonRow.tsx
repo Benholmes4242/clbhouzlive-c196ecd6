@@ -408,7 +408,7 @@ const ChampionStrip: React.FC<{
           style={{
             fontSize: 11.5,
             fontWeight: 700,
-            color: getScoreColor(score, 'light'),
+            color: getScoreColor(score, 'dark'),
             fontVariantNumeric: 'tabular-nums lining-nums',
             lineHeight: 1.2,
           }}
@@ -461,7 +461,7 @@ const LeaderStrip: React.FC<{
           style={{
             fontSize: 11.5,
             fontWeight: 700,
-            color: getScoreColor(score, 'light'),
+            color: getScoreColor(score, 'dark'),
             fontVariantNumeric: 'tabular-nums lining-nums',
             lineHeight: 1.2,
           }}

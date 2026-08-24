@@ -138,7 +138,7 @@ export function TeeTimesFirstGroups({ groups, limit, entries, onPlayerTap }: Pro
                         style={{
                           fontSize: 12,
                           fontWeight: 700,
-                          color: getScoreColor(score, 'light'),
+                          color: getScoreColor(score, 'dark'),
                           fontVariantNumeric: 'tabular-nums lining-nums',
                         }}
                       >

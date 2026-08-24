@@ -207,7 +207,7 @@ export function ThisWeek({ slug, collegeName }: Props) {
                       style={{
                         fontSize: 17,
                         fontWeight: 700,
-                        color: getScoreColor(scoreVal, 'light'),
+                        color: getScoreColor(scoreVal, 'dark'),
                         fontVariantNumeric: 'tabular-nums lining-nums',
                         letterSpacing: '-0.01em',
                       }}

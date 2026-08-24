@@ -429,7 +429,7 @@ export function PlayersTab() {
               if (posStr) segments.push(<span key="pos">{posStr}</span>);
               if (live.score != null) {
                 segments.push(
-                  <span key="score" style={{ color: getScoreColor(live.score, 'light') }}>
+                  <span key="score" style={{ color: getScoreColor(live.score, 'dark') }}>
                     {fmtScore(live.score)}
                   </span>,
                 );

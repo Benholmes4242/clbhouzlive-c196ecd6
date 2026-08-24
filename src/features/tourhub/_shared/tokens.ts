@@ -38,7 +38,7 @@ export const SURFACE = '#FFFFFF';
 // ============================================================================
 // SLATE (neutrals on light surface)
 // ============================================================================
-export const SLATE_50 = '#F8FAFC';
+export const SLATE_50 = '#F8FAFC';           // NOTE: shares a value with the dark ramp's primary INK for a DIFFERENT reason (a light surface vs near-white text). Do not merge these on the strength of the value alone.
 export const SLATE_100 = '#F1F5F9';                          // slate-100 — segmented-control trough, photo bg — 7 cross-app files
 export const SLATE_150 = '#EDF1F5';
 export const SLATE_200 = '#E2E8F0';
@@ -198,7 +198,7 @@ export const SHELL_BG = '#0A0E14';                           // Tour Hub shell/c
 // ============================================================================
 // CHARCOAL (shared Clubhouse / player hero / live-card surface)
 // ============================================================================
-export const CHARCOAL = '#15171F';                           // canonical charcoal — Clubhouse feed, player hero gradient end, live-now card
+export const CHARCOAL = '#15171F';           // NOTE: shares a value with the app canvas for a DIFFERENT reason (a named product surface vs the global ground). Do not merge these on the strength of the value alone.                           // canonical charcoal — Clubhouse feed, player hero gradient end, live-now card
 
 // ============================================================================
 // HERO BOARD SURFACE (Tour Overview hero leaderboard block ONLY)
