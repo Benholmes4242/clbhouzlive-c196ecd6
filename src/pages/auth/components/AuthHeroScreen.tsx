@@ -243,15 +243,22 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                   setHasEditedSinceError(true);
                 }}
                 onKeyDown={handleEmailKeyDown}
-                onFocus={(e) => { e.currentTarget.style.borderColor = '#FFFFFF'; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'; }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.28)';
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.10)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)';
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                }}
                 placeholder={t('auth:hero.emailPlaceholder')}
                 disabled={submitting}
-                className="auth-email-input w-full h-[54px] px-5 rounded-[16px] font-medium text-[15px] text-left focus:outline-none transition-all disabled:opacity-50"
+                className="auth-email-input w-full h-[54px] px-5 rounded-sq-sm font-medium text-[15px] text-left focus:outline-none transition-all disabled:opacity-50"
                 style={{
-                  background: '#20242E',
+                  background: 'rgba(255,255,255,0.06)',
                   border: '1px solid rgba(255,255,255,0.10)',
                   color: 'rgba(255,255,255,0.96)',
+                  transition: 'background-color 140ms ease, border-color 140ms ease',
                 }}
                 autoComplete="email"
                 inputMode="email"
@@ -276,7 +283,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               onClick={handleContinue}
               disabled={!canContinue}
               aria-label={t('auth:hero.continue')}
-              className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[16px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
+              className="w-full h-[54px] flex items-center justify-center gap-2 rounded-sq-sm font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
               style={{
                 background: continueActiveLook ? '#FFFFFF' : 'rgba(255,255,255,0.06)',
                 color: continueActiveLook ? '#0A0D12' : 'rgba(255,255,255,0.38)',
