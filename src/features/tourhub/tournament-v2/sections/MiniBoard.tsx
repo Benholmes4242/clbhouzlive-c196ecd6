@@ -100,14 +100,17 @@ function thruLabel(row: Row, today: number | null): string {
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
-export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'dark', pickPlayerIds, onRowTap }: Props) {
+export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
   const T = THEME_TOKENS[theme];
-  // Dark hero board: an absent TODAY reads as an em dash (never a zero, never
-  // the previous round). Light board keeps its blank-cell doctrine.
-  const todayBlank = theme === 'dark' ? '\u2014' : BLANK;
+  /** getScoreColor knows two ramps only; both dark grounds take the dark ramp. */
+  const scoreTheme = theme === 'light' ? 'light' : 'dark';
+  // Dark grounds: an absent TODAY reads as an em dash (never a zero, never
+  // the previous round). The light board keeps its blank-cell doctrine.
+  const todayBlank = theme === 'light' ? BLANK : '\u2014';
+
 
 
   return (
