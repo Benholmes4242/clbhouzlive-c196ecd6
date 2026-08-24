@@ -329,7 +329,7 @@ const DEFAULT_SPEC: ChromeSpec = {
 // callers or effect and was removed with it. Every island tone now resolves
 // dark; the surviving `tone: 'light'` literals in this file are historical and
 // are coerced here (see 3.4 finding — they need their own cleanup brief).
-function withResolvedTone(spec: ChromeSpec, pathname: string): ChromeSpec {
+function withResolvedTone(spec: ChromeSpec): ChromeSpec {
   if (spec.chrome === 'none' || spec.tone === 'dark') return spec;
   return { ...spec, tone: 'dark' };
 }
@@ -345,9 +345,9 @@ export function resolveChrome(
 ): ChromeSpec {
   for (const rule of CHROME_REGISTRY) {
     const { exact, prefix, test } = rule.match;
-    if (exact !== undefined && pathname === exact) return withResolvedTone(rule.spec, pathname);
-    if (prefix !== undefined && pathname.startsWith(prefix)) return withResolvedTone(rule.spec, pathname);
-    if (test !== undefined && test(pathname, search)) return withResolvedTone(rule.spec, pathname);
+    if (exact !== undefined && pathname === exact) return withResolvedTone(rule.spec);
+    if (prefix !== undefined && pathname.startsWith(prefix)) return withResolvedTone(rule.spec);
+    if (test !== undefined && test(pathname, search)) return withResolvedTone(rule.spec);
   }
   return DEFAULT_SPEC;
 }
