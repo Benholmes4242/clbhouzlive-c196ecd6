@@ -7,6 +7,7 @@ const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 // §4.1 Four light literals declared beside a component whose page went dark.
 import { ACT } from './ledgerKinds';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 const INK = ACT.INK;
 const INK_60 = ACT.INK_60;
@@ -41,7 +42,7 @@ const RequestCard: React.FC<CardProps> = ({ row, pending, onOpen, onAccept, onDe
       style={{
         width: 210,
         flexShrink: 0,
-        background: ACT.CANVAS === '#15171F' ? '#1B1E27' : ACT.CANVAS,
+        background: A.PANEL,
         border: `1px solid ${HAIR}`,
         borderRadius: 16,
         padding: 14,

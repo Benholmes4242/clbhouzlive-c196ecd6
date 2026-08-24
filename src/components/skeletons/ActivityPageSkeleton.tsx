@@ -6,8 +6,17 @@
  */
 import { Skeleton } from "@/components/ui/skeleton";
 
-const PAGE = '#F8FAFC';
-const HAIR = 'rgba(15,23,42,0.10)';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
+/**
+ * BRIEF_ACTIVITY_PAGE_DARK §6. Two changes: the page and its rules go dark,
+ * and the shell stops being LARGER than the state it resolves into. The settled
+ * page draws FLAT rows on the canvas with a 0.5px hairline under each and 9px
+ * 18px padding — it has no white bucket card, no 16px side margin and no 16px
+ * radius. The skeleton was drawing all three, so it collapsed on load.
+ */
+const PAGE = A.CANVAS;
+const HAIR = A.BORDER;
 
 export function ActivityRowsSkeleton({ buckets = 2 }: { buckets?: number }) {
   const rowCounts = [2, 3];
@@ -15,18 +24,10 @@ export function ActivityRowsSkeleton({ buckets = 2 }: { buckets?: number }) {
     <div style={{ paddingBottom: 40 }}>
       {Array.from({ length: buckets }).map((_, b) => (
         <section key={b} style={{ padding: '18px 0 6px' }}>
-          <div style={{ padding: '0 16px 10px' }}>
+          <div style={{ padding: '18px 18px 8px' }}>
             <Skeleton className="h-3 w-16" />
           </div>
-          <div
-            style={{
-              margin: '0 16px',
-              background: '#FFFFFF',
-              border: `1px solid ${HAIR}`,
-              borderRadius: 16,
-              overflow: 'hidden',
-            }}
-          >
+          <div>
             {Array.from({ length: rowCounts[b] ?? 2 }).map((_, i) => (
               <div
                 key={i}
@@ -34,8 +35,8 @@ export function ActivityRowsSkeleton({ buckets = 2 }: { buckets?: number }) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
-                  padding: '12px 14px',
-                  borderTop: i === 0 ? 'none' : `1px solid ${HAIR}`,
+                  padding: '9px 18px',
+                  borderBottom: `0.5px solid ${HAIR}`,
                 }}
               >
                 <Skeleton className="h-10 w-10 flex-shrink-0" style={{ borderRadius: '36%' }} />
@@ -59,7 +60,7 @@ export function ActivityPageSkeleton() {
       {/* Shell header mirror: back chevron + left title + right action */}
       <div
         style={{
-          background: '#FFFFFF',
+          background: PAGE,
           borderBottom: `1px solid ${HAIR}`,
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
         }}

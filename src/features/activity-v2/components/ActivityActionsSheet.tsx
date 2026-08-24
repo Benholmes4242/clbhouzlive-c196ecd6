@@ -15,6 +15,8 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
+import { ACT } from './ledgerKinds';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   open: boolean;
@@ -30,7 +32,7 @@ const rowStyle: React.CSSProperties = {
   padding: '14px 20px',
   background: 'transparent',
   border: 'none',
-  borderBottom: '0.5px solid rgba(15,23,42,0.07)',
+  borderBottom: `0.5px solid ${ACT.HAIR}`,
   cursor: 'pointer',
   textAlign: 'left',
 };
@@ -128,19 +130,25 @@ export const ActivityActionsSheet: React.FC<Props> = ({ open, row, onClose }) =>
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
       <SheetContent
         side="bottom"
-        className="rounded-t-[20px] bg-[#F8FAFC]"
-        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}
+        // §4.2 was an ARBITRARY TAILWIND VALUE, bg-[#F8FAFC] — invisible to a hex
+        // grep of style objects. The surface is now the app panel.
+        className="rounded-t-[20px]"
+        style={{
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
+          background: A.PANEL,
+          borderColor: ACT.HAIR,
+        }}
       >
         <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 4px' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.18)' }} />
         </div>
 
-        <div style={{ padding: '6px 20px 14px', borderBottom: '0.5px solid rgba(15,23,42,0.07)' }}>
+        <div style={{ padding: '6px 20px 14px', borderBottom: `0.5px solid ${ACT.HAIR}` }}>
           <span
             style={{
               fontSize: 9,
               fontWeight: 700,
-              color: '#64748B',
+              color: ACT.INK_45,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
             }}
@@ -151,24 +159,24 @@ export const ActivityActionsSheet: React.FC<Props> = ({ open, row, onClose }) =>
 
         <div>
           <button onClick={handleMuteType} style={rowStyle}>
-            <BellMinus className="h-5 w-5" style={{ color: '#94A3B8' }} />
-            <span style={{ fontSize: 14, fontWeight: 500, color: '#0F172A' }}>
+            <BellMinus className="h-5 w-5" style={{ color: ACT.INK_45 }} />
+            <span style={{ fontSize: 14, fontWeight: 500, color: ACT.INK }}>
               Mute {type.replace(/_/g, ' ')} notifications
             </span>
           </button>
 
           {actorId && (
             <button onClick={handleMuteUser} style={rowStyle}>
-              <UserX className="h-5 w-5" style={{ color: '#94A3B8' }} />
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#0F172A' }}>
+              <UserX className="h-5 w-5" style={{ color: ACT.INK_45 }} />
+              <span style={{ fontSize: 14, fontWeight: 500, color: ACT.INK }}>
                 Mute {actorName}
               </span>
             </button>
           )}
 
           <button onClick={handleDelete} style={{ ...rowStyle, borderBottom: 'none' }}>
-            <Trash2 className="h-5 w-5" style={{ color: '#DC2626' }} />
-            <span style={{ fontSize: 14, fontWeight: 700, color: '#DC2626' }}>
+            <Trash2 className="h-5 w-5" style={{ color: ACT.RED }} />
+            <span style={{ fontSize: 14, fontWeight: 700, color: ACT.RED }}>
               Delete notification
             </span>
           </button>
