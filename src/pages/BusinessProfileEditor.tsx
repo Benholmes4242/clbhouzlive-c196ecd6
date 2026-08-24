@@ -819,7 +819,7 @@ export default function BusinessProfileEditor() {
                   display: 'block',
                   fontSize: 13,
                   fontWeight: 600,
-                  color: BIZ.ink ?? '#0F172A',
+                  color: BIZ.ink,
                   marginBottom: 6,
                 }}
               >
@@ -943,8 +943,11 @@ export default function BusinessProfileEditor() {
                   borderRadius: 999,
                   fontSize: 14.5,
                   fontWeight: 700,
-                  background: (saveEnabled || saving) ? A.INK : 'rgba(15,23,42,0.06)',
-                  color: (saveEnabled || saving) ? '#fff' : 'rgba(15,23,42,0.45)',
+                  // Enabled = near-white fill with CANVAS-dark ink, the
+                  // inverse of the disabled state. The label was left a literal
+                  // when the fill was migrated, so enabled read white-on-white.
+                  background: (saveEnabled || saving) ? A.INK : 'rgba(255,255,255,0.08)',
+                  color: (saveEnabled || saving) ? A.CANVAS : 'rgba(248,250,252,0.38)',
                 }}
               >
                 {saving ? (

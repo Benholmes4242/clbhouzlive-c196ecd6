@@ -104,7 +104,9 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
       onClick={() => onChange(!checked)}
       style={{
         width: 44, height: 26, borderRadius: 999,
-        background: checked ? BIZ.amber : 'rgba(15,23,42,0.15)',
+        // Amber stays for OPEN: open-vs-closed is semantic here, not a
+        // generic on/off. The closed track takes the shipped dark value.
+        background: checked ? BIZ.amber : 'rgba(255,255,255,0.14)',
         position: 'relative', transition: 'background .15s',
         flexShrink: 0,
       }}
