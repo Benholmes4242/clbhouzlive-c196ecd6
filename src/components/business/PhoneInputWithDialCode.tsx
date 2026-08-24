@@ -1,4 +1,4 @@
-import { FIELD_INPUT_CLASS, FIELD_INPUT_STYLE, FIELD_PLACEHOLDER_CLASS } from '@/components/manage/fieldTreatment';
+import { FIELD_INPUT_CLASS, FIELD_INPUT_STYLE } from '@/components/manage/fieldTreatment';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, Search } from 'lucide-react';
