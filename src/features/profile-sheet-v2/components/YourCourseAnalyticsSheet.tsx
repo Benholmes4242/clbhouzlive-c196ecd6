@@ -118,10 +118,17 @@ function fmtBucketPct(pct: number, pctExact: number, count: number): string {
  * These rows EXPAND, so each one owns a card rather than sharing one panel:
  * an open row's block has to visibly belong to it. Open state raises the
  * border to heavier ink - no colour, no shadow, no scale.
+ *
+ * The MECHANISM was right and stays: border weight only. The VALUE was not.
+ * A.INK is #F8FAFC, so the open outline was brighter than the course name it
+ * surrounded. 28% is the canonical focus/active border — the same step a
+ * focused field takes two elements above this list. If it ever reads too weak,
+ * the answer is lifting the CARD FILL a step, never brightening the ring.
  */
 const CARD = (open = false): React.CSSProperties => ({
   background: A.PANEL,
-  border: `1px solid ${open ? A.INK : A.BORDER}`,
+  border: `1px solid ${open ? 'rgba(255,255,255,0.28)' : A.BORDER}`,
+
   borderRadius: 14,
   overflow: 'hidden',
 });
