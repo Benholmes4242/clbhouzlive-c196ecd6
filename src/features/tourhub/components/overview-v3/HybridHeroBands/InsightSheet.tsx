@@ -21,6 +21,7 @@ import { formatPurse } from '../../../_shared/formatPurse';
 import { useVenueCourseDna } from '../../../hooks/useVenueCourseDna';
 import { AMBER } from '../HybridHero.constants';
 import { TITLE } from '@/lib/tokens/type';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   open: boolean;
@@ -36,10 +37,10 @@ interface Props {
   purse?: number | null;
 }
 
-const INK = '#0F172A';
-const DIM = '#64748B';
-const HAIR = 'rgba(15,23,42,0.10)';
-const TILE_BG = '#FFFFFF';
+const INK = A.INK;
+const DIM = A.MUTE;
+const HAIR = A.BORDER;
+const TILE_BG = A.PANEL;
 
 const STAT_KEYS: Array<{
   key: keyof import('../../../hooks/useVenueCourseDna').VenueCourseDna;
@@ -148,7 +149,7 @@ export function InsightSheet({
   const courseTypeLabel = formatCourseType(dna?.course_type ?? null);
 
   return (
-    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="insight-sheet-title">
+    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="insight-sheet-title" variant="dark" surfaceColor={A.CANVAS}>
       <div
         style={{
           padding: '4px 20px 20px',
@@ -236,7 +237,7 @@ export function InsightSheet({
                       padding: '5px 10px',
                       borderRadius: 999,
                       background: 'rgba(247,147,30,0.12)',
-                      color: '#A15E00',
+                      color: AMBER,
                       fontSize: 12,
                       fontWeight: 700,
                       letterSpacing: '0.02em',
@@ -276,7 +277,7 @@ export function InsightSheet({
                         width: '100%',
                         height: 6,
                         borderRadius: 3,
-                        background: 'rgba(15,23,42,0.06)',
+                        background: 'rgba(255,255,255,0.08)',
                         overflow: 'hidden',
                       }}
                     >
@@ -313,7 +314,7 @@ export function InsightSheet({
             minHeight: 50,
             borderRadius: 14,
             background: INK,
-            color: '#fff',
+            color: A.CANVAS,
             fontSize: 15.5,
             fontWeight: 700,
             border: 'none',

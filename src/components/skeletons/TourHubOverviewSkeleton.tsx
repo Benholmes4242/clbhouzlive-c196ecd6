@@ -9,39 +9,30 @@
  * order OverviewPageV3 ACTUALLY RENDERS them, every block MEASURED on the
  * rendered section at 390px rather than added up off the JSX.
  *
- * RENDER ORDER, read off the JSX:
- *   OverviewHero, VenueRecordBand, TISlot, ComingUpSlot, WorldRankingsSlot,
- *   StatWatchSlot, CourseOfTheWeekSection, CollegeFranchise,
- *   ConnectHandicapCue.
+ * VERIFIED LIVE RENDER ORDER (corrected after the overview composition changed):
+ *   OverviewHero, VenueRecordBand, ConnectHandicapCue.
  *
  * ONLY THE CERTAIN SECTIONS ARE DRAWN (B4). A silhouette that draws a section
  * which then does not appear is worse than no silhouette, because the page
  * collapses upward and everything below jumps.
  *
- *   CERTAIN     hero (always mounts, holds its own height), ComingUp (459: 17 + 28 head, 399 table, 16 pager) with
- *               its tour-lens pill row (52), WorldRankings (353) — both boards
- *               are populated year-round for the default PGA lens and neither
- *               is gated on a live tournament.
- *   CONDITIONAL VenueRecordBand (no rating/rank -> null), TISlot (no tournament
- *               or no picks -> null), StatWatch (SG coverage is PGA-only and it
- *               self-hides on no data), CourseOfTheWeek (hides on error/empty),
- *               CollegeFranchise (hides with no leader/chaser pair).
- *               These draw NOTHING and appear when they resolve.
+ *   CERTAIN     hero (always mounts and holds its own height).
+ *   CONDITIONAL VenueRecordBand (no rating/rank -> null), so it draws NOTHING
+ *               and appears only when it resolves.
  *   NOT A LOAD  ConnectHandicapCue is a gate, not a loading state (B6).
  */
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { INK_TINT_06 } from '@/features/tourhub/_shared/tokens';
 import { OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
-import { SPACE } from '@/lib/spacing';
 
 /**
- * Shimmer block. The base fill is INLINE because `.clb-shimmer-light` sets the
+ * Shimmer block. The base fill is INLINE because `.clb-shimmer-dark` sets the
  * `background` shorthand, which would otherwise wipe out a `bg-*` utility class
  * and leave the bars invisible on the canvas. Do not "tidy" it away.
  */
 function Bar({ style }: { style?: React.CSSProperties }) {
   return (
-    <div className="clb-shimmer-light" style={{ backgroundColor: A.TRACK, borderRadius: 6, ...style }} />
+    <div className="clb-shimmer-dark" style={{ backgroundColor: A.TRACK, borderRadius: 6, ...style }} />
   );
 }
 
@@ -158,27 +149,9 @@ export const TourHubOverviewSkeleton = () => {
         style={{
           height: OVERVIEW_HERO_TOTAL_HEIGHT,
           borderRadius: 20,
-          background: `linear-gradient(135deg, ${INK_TINT_06}, rgba(15,23,42,0.02))`,
+          background: `linear-gradient(135deg, ${INK_TINT_06}, ${A.CANVAS})`,
         }}
       />
-
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: SPACE.sectionSection,
-          paddingTop: SPACE.sectionSection,
-          paddingBottom: 88,
-        }}
-      >
-        <ComingUpBlock />
-        {/* The lens row and the board are SEPARATE children on the live page,
-            so they take the 32px section gap between them here too. */}
-        <LensRow />
-        <WorldRankingsBlock />
-        {/* NOTHING BELOW THIS POINT. StatWatch, CourseOfTheWeek and
-            CollegeFranchise are conditional and keep their own inline holds. */}
-      </div>
     </div>
   );
 };

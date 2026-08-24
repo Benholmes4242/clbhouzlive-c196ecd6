@@ -27,6 +27,7 @@ import {
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { GOLD_DEEP, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { roundStarted } from '../../../_shared/roundState';
 import type { HeroState, TopTie, TickerRow } from '../HybridHero.utils';
 import { fmtScore, formatRank, buildLeaderboardSlots } from '../HybridHero.utils';
@@ -124,7 +125,7 @@ function StackedAvatarsDark({
             height: size,
             borderRadius: '34%',
             marginLeft: i === 0 ? 0 : -8,
-            border: '0.5px solid #141C28',
+            border: `0.5px solid ${A.BORDER}`,
             overflow: 'hidden',
             flexShrink: 0,
             zIndex: visible.length - i,
