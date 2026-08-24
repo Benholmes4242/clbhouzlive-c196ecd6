@@ -6,6 +6,18 @@ import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const AMBER = '#F7931E';
+/**
+ * BRIEF_ACTIVITY_PAGE_DARK §3 — OPTION (b). This card's whole job was to stand
+ * out by INVERTING: a near-black card on a white page. On the dark page that
+ * inversion stops working — it is not illegible, it is invisible AS A CARD. It
+ * keeps a distinct ground, but one that now reads AGAINST dark: a RAISED panel,
+ * one clear step lighter than the canvas, plus an amber-tinted edge to hold the
+ * "while you were away" prominence. Option (c), the one light card, would fight
+ * everything else the app now does.
+ */
+const CARD_TOP = '#262B37';
+const CARD_MID = '#1F232E';
+const CARD_END = '#1B1E27';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -87,12 +99,12 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
         role="button"
         tabIndex={0}
         style={{
-          background: 'linear-gradient(160deg,#111827 0%,#0F172A 60%,#0B1220 100%)',
+          background: `linear-gradient(160deg,${CARD_TOP} 0%,${CARD_MID} 60%,${CARD_END} 100%)`,
           borderRadius: 18,
           padding: '16px 16px 14px',
           color: '#F8FAFC',
           cursor: 'pointer',
-          border: '1px solid rgba(255,255,255,0.06)',
+          border: '1px solid rgba(247,147,30,0.22)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
@@ -147,11 +159,15 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
                       width: 28,
                       height: 28,
                       borderRadius: '34%',
-                      background: isUrl ? '#1F2937' : 'rgba(247,147,30,0.25)',
+                      background: isUrl ? 'rgba(255,255,255,0.10)' : 'rgba(247,147,30,0.25)',
                       backgroundImage: isUrl ? `url(${val})` : undefined,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
-                      border: '1.5px solid #0F172A',
+                      // §3 :154 was a near-black ring on a near-black card: it is the
+            // facepile's CUT-OUT, separating overlapping avatars by painting the
+            // card's own ground between them. It therefore tracks the card
+            // ground, and follows it to the raised panel.
+            border: `1.5px solid ${CARD_MID}`,
                       marginLeft: i === 0 ? 0 : -8,
                       display: 'flex',
                       alignItems: 'center',
