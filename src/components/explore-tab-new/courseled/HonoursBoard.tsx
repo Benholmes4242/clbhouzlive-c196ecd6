@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, EYEBROW_TEXT, InkAction } from './tokens';
+import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, SCOPE_PILL_RADIUS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 import { PodiumAvatarRing } from './PodiumAvatarRing';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -326,7 +326,7 @@ export function FeatCard({
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.15,
-                color: e.isOwn ? A.AMBER_DEEP : METAL_INK,
+                color: e.isOwn ? A.AMBER : METAL_INK,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -463,7 +463,7 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
           fontSize: 13.5,
           fontWeight: 700,
           letterSpacing: '-0.02em',
-          color: l.isOwn ? A.AMBER_DEEP : DISCOVER_FACT,
+          color: l.isOwn ? A.AMBER : DISCOVER_FACT,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
