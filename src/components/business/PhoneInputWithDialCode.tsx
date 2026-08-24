@@ -1,3 +1,5 @@
+import { FIELD_INPUT_CLASS, FIELD_INPUT_STYLE, FIELD_PLACEHOLDER_CLASS } from '@/components/manage/fieldTreatment';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -104,12 +106,8 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
           type="button"
           disabled={disabled}
           onClick={() => setOpen(!open)}
-          className="h-11 pl-2.5 pr-2 rounded-[10px] flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)]"
-          style={{
-            background: '#F8FAFC',
-            border: '1px solid rgba(15,23,42,0.08)',
-            minWidth: 96,
-          }}
+          className={`${FIELD_INPUT_CLASS} h-11 pl-2.5 pr-2 rounded-[10px] flex items-center gap-1.5`}
+          style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 10, paddingRight: 8, borderRadius: 10, minWidth: 96 }}
         >
           {selected ? (
             <MiniFlag iso={selected.code} />
@@ -117,13 +115,13 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
             <span
               style={{
                 width: 32, height: 22, borderRadius: 3,
-                background: 'rgba(15,23,42,0.06)', flexShrink: 0,
+                background: 'rgba(255,255,255,0.10)', flexShrink: 0,
               }}
             />
           )}
           <span
             className="text-[13px] tabular-nums whitespace-nowrap"
-            style={{ color: dialCode ? '#0F172A' : '#94A3B8' }}
+            style={{ color: dialCode ? A.INK : A.MUTE }}
           >
             {dialCode || '+--'}
           </span>
@@ -133,14 +131,16 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
         {open && (
           <div
             className="absolute z-50 mt-1 rounded-[12px] shadow-lg overflow-hidden"
+            /* A floating panel is not a field: A.PANEL with an A.BORDER
+               hairline, never the field fill. */
             style={{
-              background: '#fff',
-              border: '1px solid rgba(15,23,42,0.08)',
+              background: A.PANEL,
+              border: `1px solid ${A.BORDER}`,
               width: 300,
               maxWidth: '80vw',
             }}
           >
-            <div className="p-2 border-b" style={{ borderColor: 'rgba(15,23,42,0.06)' }}>
+            <div className="p-2 border-b" style={{ borderColor: A.BORDER }}>
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
@@ -149,8 +149,8 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search country or code..."
-                  className="w-full h-9 pl-8 pr-3 text-sm rounded-[8px] focus:outline-none focus:ring-1 focus:ring-[rgba(15,23,42,0.20)]"
-                  style={{ background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)' }}
+                  className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full h-9 pl-8 pr-3 text-sm rounded-[8px]`}
+                  style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 32, paddingRight: 12, fontSize: 14, borderRadius: 8 }}
                 />
               </div>
             </div>
@@ -185,12 +185,8 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
         onChange={setLocal}
         placeholder="Phone number"
         disabled={disabled}
-        className="flex-1 min-w-0 h-11 rounded-[10px] px-3.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)]"
-        style={{
-          background: '#F8FAFC',
-          border: '1px solid rgba(15,23,42,0.08)',
-          color: '#0F172A',
-        }}
+        className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} flex-1 min-w-0 h-11 rounded-[10px] px-3.5 text-[15px]`}
+        style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 14, paddingRight: 14, fontSize: 15, borderRadius: 10 }}
       />
     </div>
   );

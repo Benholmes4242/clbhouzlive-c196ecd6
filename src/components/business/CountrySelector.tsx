@@ -1,3 +1,5 @@
+import { FIELD_INPUT_CLASS, FIELD_INPUT_STYLE, FIELD_PLACEHOLDER_CLASS } from '@/components/manage/fieldTreatment';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, Search, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -80,13 +82,10 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
         disabled={disabled}
         className={cn(
           'w-full h-11 px-3 rounded-[10px] text-left flex items-center justify-between transition-colors',
-          'focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)]',
+          FIELD_INPUT_CLASS,
           disabled && 'opacity-50 cursor-not-allowed',
         )}
-        style={{
-          background: '#F8FAFC',
-          border: '1px solid rgba(15,23,42,0.08)',
-        }}
+        style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 12, paddingRight: 12, borderRadius: 10 }}
       >
         <span className="flex items-center gap-2 min-w-0">
           {selected ? (
@@ -95,13 +94,13 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
             <span
               style={{
                 width: 32, height: 22, borderRadius: 3,
-                background: 'rgba(15,23,42,0.06)', flexShrink: 0,
+                background: 'rgba(255,255,255,0.10)', flexShrink: 0,
               }}
             />
           )}
           <span
             className="text-[15px] truncate"
-            style={{ color: displayValue ? '#0F172A' : '#94A3B8' }}
+            style={{ color: displayValue ? A.INK : A.MUTE }}
           >
             {displayValue || 'Select country'}
           </span>
@@ -114,9 +113,10 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
       {isOpen && (
         <div
           className="absolute z-50 mt-1 w-full rounded-[12px] shadow-lg overflow-hidden"
-          style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.08)' }}
+          /* Floating panel, not a field: A.PANEL + A.BORDER. */
+          style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
         >
-          <div className="p-2 border-b" style={{ borderColor: 'rgba(15,23,42,0.06)' }}>
+          <div className="p-2 border-b" style={{ borderColor: A.BORDER }}>
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
@@ -125,11 +125,8 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search country..."
-                className="w-full h-9 pl-8 pr-3 text-sm rounded-[8px] focus:outline-none focus:ring-1 focus:ring-[rgba(15,23,42,0.20)]"
-                style={{
-                  background: '#F8FAFC',
-                  border: '1px solid rgba(15,23,42,0.08)',
-                }}
+                className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full h-9 pl-8 pr-3 text-sm rounded-[8px]`}
+                style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 32, paddingRight: 12, fontSize: 14, borderRadius: 8 }}
               />
             </div>
           </div>

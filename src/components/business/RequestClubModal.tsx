@@ -24,7 +24,7 @@ interface RequestClubModalProps {
 
 const INPUT_CLASS =
   'w-full rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40 transition-colors';
-const INPUT_STYLE = { background: '#ffffff', border: `1px solid ${BIZ.hair}` };
+const INPUT_STYLE = { background: BIZ.fill, border: `1px solid ${BIZ.hair}`, color: A.INK };
 
 /**
  * Modal that lets a user request a missing golf course/club be added to the
