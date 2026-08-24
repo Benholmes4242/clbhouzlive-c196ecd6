@@ -603,16 +603,19 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
       <GlassHeaderPlate visible={tabsStuck} />
       {cinematicHero}
       <div ref={sentinelRef} style={{ height: 1 }} aria-hidden />
+      {/* The sticky tab band follows the page canvas. It was a light glass
+          (rgba(248,250,252,0.72)) — that band, not FilterChips, is why the
+          course tabs read light. Solid canvas per the mobile-performance rule
+          (no static backdrop-filters). */}
       <div
         className="sticky"
         style={{
           top: 'var(--sat, 0px)',
           zIndex: 30,
-          background: 'rgba(248,250,252,0.72)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
+          background: '#15171F',
         }}
       >
+
         <CourseDetailShellTabs
           activeTab={activeTab}
           onTabChange={handleTabChange}
