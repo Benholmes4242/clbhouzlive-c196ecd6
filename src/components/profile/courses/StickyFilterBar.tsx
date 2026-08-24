@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { CourseRegionPills, type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 export type CoursePrimaryTab = 'all' | 'top100';
 export type CourseSortOption = 'recently-played' | 'rating-high-low' | 'rating-low-high';
@@ -78,9 +79,9 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
                 fontSize: 12.5,
                 padding: '7px 14px',
                 borderRadius: 999,
-                background: isActive ? '#15171F' : '#fff',
-                color: isActive ? '#fff' : '#0F172A',
-                border: isActive ? 'none' : '1px solid rgba(0,0,0,0.07)',
+                background: isActive ? A.INK : A.PANEL,
+                color: isActive ? A.PANEL : A.INK,
+                border: `1px solid ${isActive ? A.INK : A.BORDER}`,
                 fontFamily: 'inherit',
                 whiteSpace: 'nowrap',
                 display: 'inline-flex',
@@ -94,7 +95,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
                   style={{
                     fontSize: 11.5,
                     fontWeight: 600,
-                    color: isActive ? 'rgba(255,255,255,0.65)' : '#94A3B8',
+                    color: isActive ? 'rgba(21,23,31,0.65)' : A.MUTE,
                     fontVariantNumeric: 'tabular-nums lining-nums',
                   }}
                 >
@@ -116,7 +117,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
           <DropdownMenuTrigger asChild>
             <button
               className="inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[12.5px] font-semibold min-h-[34px] whitespace-nowrap shrink-0"
-              style={{ background: 'rgba(15,23,42,0.04)', border: '0.5px solid rgba(15,23,42,0.08)', color: '#0F172A' }}
+              style={{ background: A.PANEL, border: `0.5px solid ${A.BORDER}`, color: A.INK }}
             >
               {currentSortLabel.replace('Rating: ', '')}
               <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />

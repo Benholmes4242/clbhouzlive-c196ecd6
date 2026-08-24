@@ -345,11 +345,11 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   if (isLoading) {
     return (
       <div ref={sectionRef} className="py-4">
-        <Skeleton className="h-5 w-32 rounded mb-1" />
-        <Skeleton className="h-3 w-48 rounded mb-4" />
+        <Skeleton variant="dark" className="h-5 w-32 rounded mb-1" />
+        <Skeleton variant="dark" className="h-3 w-48 rounded mb-4" />
         <div className="space-y-2">
           {[1, 2, 3].map(i => (
-            <Skeleton key={i} className="h-20 rounded-xl" />
+            <Skeleton key={i} variant="dark" className="h-20 rounded-xl" />
           ))}
         </div>
       </div>

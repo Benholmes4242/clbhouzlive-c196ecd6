@@ -37,16 +37,17 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-// ---- Canonical tokens (post-flip: no amber on this sheet) ----
-const INK = '#0F172A';
-const INK_SOFT = '#475569';
-const INK_SUBTLE = '#94A3B8';
-const BORDER = '#EDF0F3';
-const PANEL = '#FFFFFF';
-const TILE = '#F4F6F9';
-const DANGER = '#DC2626';
-const BG_SURFACE = '#F8FAFC';
+// ---- Canonical tokens — dark-only, sourced from the analytical ramp ----
+const INK = A.INK;
+const INK_SOFT = 'rgba(255,255,255,0.72)';
+const INK_SUBTLE = A.MUTE;
+const BORDER = A.BORDER;
+const PANEL = A.PANEL;
+const TILE = 'rgba(255,255,255,0.06)';
+const DANGER = '#F87171';
+const BG_SURFACE = A.CANVAS;
 
 interface AddCourseModalProps {
   userId: string;

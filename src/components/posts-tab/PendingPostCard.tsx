@@ -10,33 +10,26 @@ import { uploadManager } from '@/uploads/UploadManager';
 import { retryJob, retryFailedItems, enqueuePostUpload, cancelJob } from '@/uploads/uploadPipeline';
 import { reviewRetryRegistry } from '@/uploads/reviewRetryRegistry';
 import { MentionText } from '@/components/mentions/MentionText';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface PendingPostCardProps {
   entry: PendingPost;
-  theme?: 'light' | 'dark';
 }
 
-const LIGHT = {
-  surface: '#FFFFFF',
-  hairline: 'rgba(15,23,42,0.07)',
-  text: '#0F172A',
-  muted: '#64748B',
-  trackBg: 'rgba(15,23,42,0.08)',
-  trackFill: '#F7931E',
-  failed: '#DC2626',
-};
+// Dark-only. The light palette was retired with the light profile surface —
+// every host of this card (profile Posts tab, Videos feed) is now dark.
 const DARK = {
-  surface: '#1A1D26',
-  hairline: 'rgba(255,255,255,0.07)',
-  text: '#E5E7EB',
-  muted: '#94A3B8',
+  surface: A.PANEL,
+  hairline: A.BORDER,
+  text: A.INK,
+  muted: A.MUTE,
   trackBg: 'rgba(255,255,255,0.08)',
   trackFill: '#F7931E',
   failed: '#F87171',
 };
 
-export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry, theme = 'light' }) => {
-  const T = theme === 'dark' ? DARK : LIGHT;
+export const PendingPostCard: React.FC<PendingPostCardProps> = ({ entry }) => {
+  const T = DARK;
   const removeJob = usePendingPostsStore((s) => s.removeJob);
   const [retrying, setRetrying] = useState(false);
   const isReview = entry.kind === 'review';

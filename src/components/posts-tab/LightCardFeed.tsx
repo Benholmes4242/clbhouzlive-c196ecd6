@@ -29,9 +29,10 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
-import { LightFeedCard } from './LightFeedCard';
+import { FeedCard } from '@/components/feed/FeedCard';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-const PAGE_BG = '#F8FAFC';
+const PAGE_BG = A.CANVAS;
 const DIVIDER = '#E5E7EA';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
@@ -516,7 +517,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
             earlyIdx={earlyIdx}
           >
             {({ isActive, mountVideo, earlyMotion }) => (
-              <LightFeedCard
+              <FeedCard
                 post={post}
                 liked={!!likeState?.liked}
                 likeCount={likeState?.count ?? post.likeCount ?? 0}

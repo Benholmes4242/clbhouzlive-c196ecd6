@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/sheet';
 import type { RatedCourseData } from './my-ratings/myRatingsTiers';
 import { TITLE } from '@/lib/tokens/type';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface BreakdownsPickerSheetProps {
   isOpen: boolean;
@@ -45,7 +46,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
       <SheetContent
         side="bottom"
         hideCloseButton
-        className="!bg-[#F8FAFC] border-0 p-0 flex flex-col rounded-t-2xl"
+        className="!bg-[#15171F] border-0 p-0 flex flex-col rounded-t-2xl"
         // 75dvh as BOTH height and maxHeight — the canonical scrolling-list
         // sheet (CourseDirectorySheet). The inner height stops a short list
         // from shrinking the sheet to its content; dvh so dynamic browser
@@ -68,7 +69,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
               width: 36,
               height: 4,
               borderRadius: 999,
-              background: 'rgba(15,23,42,0.18)',
+              background: 'rgba(255,255,255,0.18)',
             }}
           />
         </div>
@@ -81,7 +82,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                 style={{
                   fontFamily: FONT_SANS,
                   ...TITLE,
-                  color: '#0F172A',
+                  color: A.INK,
                   textAlign: 'left',
                 }}
               >
@@ -91,7 +92,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                 style={{
                   fontFamily: FONT_SANS,
                   fontSize: 12,
-                  color: '#64748B',
+                  color: A.MUTE,
                   marginTop: 6,
                   textAlign: 'left',
                 }}
@@ -118,7 +119,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                 width: 32,
                 height: 32,
                 borderRadius: 999,
-                background: 'rgba(15,23,42,0.06)',
+                background: 'rgba(255,255,255,0.08)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -127,7 +128,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                 cursor: 'pointer',
               }}
             >
-              <X size={16} color="#475569" strokeWidth={2} />
+              <X size={16} color={A.MUTE} strokeWidth={2} />
             </button>
           </div>
         </SheetHeader>
@@ -139,7 +140,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
         />
 
         {/* List */}
-        {/* Body inherits the shell's canvas — no white paint over #F8FAFC. */}
+        {/* Body inherits the shell's canvas — no paint over the dark canvas. */}
         <div className="flex-1 overflow-y-auto">
 
           {missingCourses.map((course) => {
@@ -210,7 +211,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                       fontFamily: FONT_SANS,
                       fontWeight: 700,
                       fontSize: 15,
-                      color: '#0F172A',
+                      color: A.INK,
                       lineHeight: 1.15,
                       letterSpacing: '-0.01em',
                       overflow: 'hidden',
@@ -226,7 +227,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                       marginTop: 4,
                       fontSize: 10,
                       fontWeight: 700,
-                      color: '#94A3B8',
+                      color: A.MUTE,
                       letterSpacing: '0.14em',
                       textTransform: 'uppercase',
                       overflow: 'hidden',
@@ -237,7 +238,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                     {mode !== 'review' && (
                       <span
                         style={{
-                          color: '#0F172A',
+                          color: A.INK,
                           fontVariantNumeric: 'tabular-nums lining-nums',
                         }}
                       >
@@ -246,7 +247,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                     )}
                     {dateText && (
                       <>
-                        {mode !== 'review' && <span style={{ color: '#CBD5E1' }}> · </span>}
+                        {mode !== 'review' && <span style={{ color: A.BORDER }}> · </span>}
                         <span>{mode === 'review' ? 'PLAYED ' : 'ADDED '}{dateText}</span>
                       </>
                     )}
@@ -255,7 +256,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
 
                 <ChevronRight
                   size={16}
-                  color="#94A3B8"
+                  color={A.MUTE}
                   strokeWidth={2}
                   style={{ flexShrink: 0 }}
                 />
