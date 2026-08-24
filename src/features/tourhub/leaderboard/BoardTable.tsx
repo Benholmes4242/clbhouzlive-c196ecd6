@@ -34,7 +34,7 @@ import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import CountryFlag from '@/components/ui/country-flag';
 import { getScoreColor } from '../_shared/scoreColor';
-import { TREND_UP, TREND_DOWN, AMBER } from '../_shared/tokens';
+import { TREND_UP, TREND_DOWN, AMBER, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
 // Dark ramp, imported so the board follows the tour token file (was four pinned light literals).

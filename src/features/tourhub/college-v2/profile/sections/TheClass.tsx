@@ -203,7 +203,7 @@ export function TheClass({ slug, collegeName }: Props) {
                   srcCandidates={getPlayerHeadshotCandidates(a.fullName, a.tourCodes?.[0] ?? 'pga')}
                   alt={a.fullName}
                   hairlineRing
-                  ringColor="rgba(15,23,42,0.12)"
+                  ringColor="rgba(255,255,255,0.18)"
                 />
                 {live && (
                   <span

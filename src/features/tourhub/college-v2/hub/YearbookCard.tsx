@@ -105,7 +105,7 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected, onTap }: P
             inset: 0,
             borderRadius: '34%',
             overflow: 'hidden',
-            background: 'rgba(15,23,42,0.04)',
+            background: 'rgba(255,255,255,0.05)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -137,7 +137,7 @@ function YearbookCardInner({ standing, liveCount, onSelect, selected, onTap }: P
             position: 'absolute',
             inset: 0,
             borderRadius: '34%',
-            border: '1px solid rgba(15,23,42,0.12)',
+            border: '1px solid rgba(255,255,255,0.18)',
             pointerEvents: 'none',
           }}
         />

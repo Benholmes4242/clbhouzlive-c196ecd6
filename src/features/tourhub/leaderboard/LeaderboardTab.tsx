@@ -28,6 +28,7 @@ import { resolveCutDisplay } from '../_shared/cutDisplay';
 import { Skeleton } from '@/components/ui/skeleton';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 
 
 
