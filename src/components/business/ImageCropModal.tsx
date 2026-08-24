@@ -2,6 +2,7 @@
  * ImageCropModal - Unified image cropper for logo and cover photos
  * Uses react-easy-crop for intuitive crop/zoom experience
  */
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useState, useCallback } from 'react';
 import { TITLE } from '@/lib/tokens/type';
 import Cropper, { Area } from 'react-easy-crop';
@@ -225,7 +226,7 @@ export function ImageCropModal({
               size="sm"
               onClick={handleConfirm}
               disabled={isProcessing || !croppedAreaPixels}
-              className="bg-[#f59e0b] hover:bg-[#e8920f] text-white border-0"
+              className="text-white border-0 hover:opacity-90" style={{ background: A.AMBER }}
             >
               {isProcessing ? (
                 <>

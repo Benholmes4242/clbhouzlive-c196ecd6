@@ -2,7 +2,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Check, ArrowRight, Megaphone, BarChart3, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+/* NO PRIVATE PALETTE - this page had no constants at all, only inline light
+   literals, which is the same blind spot from the other direction. */
+import { CARD_BG, HAIR } from '@/components/manage/ui';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { BIZ } from '@/components/business/businessTokens';
 
 interface LocationState {
   businessId: string;
@@ -85,7 +90,7 @@ const BusinessProfileLiveSuccessPage = () => {
           transition={{ delay: 0.3 }}
           className="w-full max-w-sm mb-10"
         >
-          <div className="rounded-2xl p-4" style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}>
+          <div className="rounded-2xl p-4" style={{ background: CARD_BG, border: `1px solid ${HAIR}` }}>
             <div className="flex items-center gap-3">
               <SquircleAvatar
                 size={56}
@@ -93,7 +98,7 @@ const BusinessProfileLiveSuccessPage = () => {
                 alt={businessName}
                 fallback={initials}
                 hairlineRing
-                ringColor={LIGHT_HAIRLINE}
+                ringColor={DARK_HAIRLINE}
               />
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-foreground truncate">{businessName}</p>
@@ -118,46 +123,46 @@ const BusinessProfileLiveSuccessPage = () => {
             <button
               onClick={() => navigate('/create-post', { state: { businessId, asBusinessId: businessId } })}
               className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+              style={{ background: CARD_BG, border: `1px solid ${HAIR}` }}
             >
-              <div className="h-10 w-10 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.20)' }}>
-                <Megaphone className="h-5 w-5" style={{ color: '#F7931E' }} />
+              <div className="h-10 w-10 rounded-full flex items-center justify-center shrink-0" style={{ background: BIZ.amberTint, border: `1px solid ${BIZ.amberHair}` }}>
+                <Megaphone className="h-5 w-5" style={{ color: A.AMBER }} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Post as your business</p>
                 <p className="text-xs text-muted-foreground">Share updates, photos, and moments with golfers.</p>
               </div>
-              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: '#94A3B8' }} />
+              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: A.MUTE }} />
             </button>
             
             <button
               onClick={() => navigate(`/business/${slug || businessId}/verification`)}
               className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+              style={{ background: CARD_BG, border: `1px solid ${HAIR}` }}
             >
-              <div className="h-10 w-10 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.20)' }}>
-                <CheckCircle2 className="h-5 w-5" style={{ color: '#F7931E' }} />
+              <div className="h-10 w-10 rounded-full flex items-center justify-center shrink-0" style={{ background: BIZ.amberTint, border: `1px solid ${BIZ.amberHair}` }}>
+                <CheckCircle2 className="h-5 w-5" style={{ color: A.AMBER }} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Request verification</p>
                 <p className="text-xs text-muted-foreground">Get a verified badge to build trust with golfers.</p>
               </div>
-              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: '#94A3B8' }} />
+              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: A.MUTE }} />
             </button>
             
             <button
               onClick={() => navigate(`/business/${slug || businessId}/insights`)}
               className="w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left"
-              style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+              style={{ background: CARD_BG, border: `1px solid ${HAIR}` }}
             >
-              <div className="h-10 w-10 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.20)' }}>
-                <BarChart3 className="h-5 w-5" style={{ color: '#F7931E' }} />
+              <div className="h-10 w-10 rounded-full flex items-center justify-center shrink-0" style={{ background: BIZ.amberTint, border: `1px solid ${BIZ.amberHair}` }}>
+                <BarChart3 className="h-5 w-5" style={{ color: A.AMBER }} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Track your reach</p>
                 <p className="text-xs text-muted-foreground">See profile views and engagement in Business Insights.</p>
               </div>
-              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: '#94A3B8' }} />
+              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: A.MUTE }} />
             </button>
           </div>
         </motion.div>
@@ -171,8 +176,8 @@ const BusinessProfileLiveSuccessPage = () => {
         >
           <button
             onClick={handleViewProfile}
-            className="w-full h-12 text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
-            style={{ background: '#0F172A' }}
+            className="w-full h-12 text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+            style={{ background: A.INK, color: A.CANVAS }}
           >
             View business profile
             <ArrowRight className="h-4 w-4" />

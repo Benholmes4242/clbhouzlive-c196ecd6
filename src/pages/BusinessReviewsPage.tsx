@@ -3,7 +3,7 @@ import { TITLE, FIGURE } from '@/lib/tokens/type';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MessageSquare, Star, X, Edit3, Trash2, MapPin, Sparkles } from 'lucide-react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -24,14 +24,17 @@ import {
   type BusinessReviewSort,
 } from '@/hooks/useBusinessReviews';
 
-const INK = '#0F172A';
-const INK_45 = '#64748B';
-const HAIR = 'rgba(15,23,42,0.08)';
-const CARD_BG = '#FFFFFF';
-const AMBER = '#F7931E';
-const AMBER_SOFT = 'rgba(247,147,30,0.10)';
-const GREEN = '#059669';
-const RED = '#DC2626';
+/* NO PRIVATE PALETTE. This page declared its own INK/HAIR/CARD_BG/GREEN/RED
+   and imported nothing, which is why two import-tracing sweeps could not see
+   it. Colours come from the shared manage vocabulary (itself derived from the
+   analytical `A` ramp) and from BIZ for the amber wash. Add a colour here and
+   the next audit is blind again. */
+import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, GREEN, DANGER as RED } from '@/components/manage/ui';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { BIZ } from '@/components/business/businessTokens';
+
+const AMBER = A.AMBER;
+const AMBER_SOFT = BIZ.amberTint;
 
 type ChipKey = 'all' | 'unreplied' | 'recent' | 'lowest';
 
@@ -43,9 +46,9 @@ const CHIPS: Array<{ key: ChipKey; label: string; filter: BusinessReviewFilter; 
 ];
 
 function ratingTone(rating: number): { bg: string; fg: string } {
-  if (rating >= 8) return { bg: 'rgba(5,150,105,0.10)', fg: GREEN };
-  if (rating >= 6) return { bg: AMBER_SOFT, fg: '#B4650C' };
-  return { bg: 'rgba(220,38,38,0.08)', fg: RED };
+  if (rating >= 8) return { bg: 'rgba(52,215,127,0.16)', fg: GREEN };
+  if (rating >= 6) return { bg: AMBER_SOFT, fg: AMBER };
+  return { bg: 'rgba(255,90,90,0.16)', fg: RED };
 }
 
 function fmtRating(v: number | null): string {
@@ -107,7 +110,7 @@ function ReplySheet({
       <SheetContent
         side="bottom"
         className="p-0 border-0 rounded-t-2xl max-h-[85dvh] overflow-hidden"
-        style={{ background: '#F8FAFC' }}
+        style={{ background: PAGE_BG }}
       >
         <div className="flex items-center justify-between px-4 pt-4 pb-3" style={{ borderBottom: `1px solid ${HAIR}` }}>
           <div>
@@ -121,7 +124,7 @@ function ReplySheet({
           <button
             onClick={onClose}
             className="w-9 h-9 rounded-full flex items-center justify-center"
-            style={{ background: '#fff', border: `1px solid ${HAIR}` }}
+            style={{ background: CARD_BG, border: `1px solid ${HAIR}` }}
             aria-label="Close"
           >
             <X size={16} style={{ color: INK }} />
@@ -137,7 +140,7 @@ function ReplySheet({
                 alt={review.reviewer.display_name || 'Reviewer'}
                 size={28}
                 hairlineRing
-                ringColor={LIGHT_HAIRLINE}
+                ringColor={DARK_HAIRLINE}
               />
               <div className="text-[13px] font-semibold" style={{ color: INK }}>
                 {review.reviewer.display_name || review.reviewer.username || 'Golfer'}
@@ -145,7 +148,7 @@ function ReplySheet({
               <RatingChip rating={review.rating} />
             </div>
             {review.review && (
-              <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(15,23,42,0.75)' }}>
+              <p className="text-[13px] leading-relaxed" style={{ color: A.BODY }}>
                 {review.review}
               </p>
             )}
@@ -158,7 +161,7 @@ function ReplySheet({
             rows={6}
             className="w-full resize-none outline-none"
             style={{
-              background: '#fff',
+              background: CARD_BG,
               border: `1px solid ${HAIR}`,
               borderRadius: 12,
               padding: '12px 14px',
@@ -185,8 +188,8 @@ function ReplySheet({
             style={{
               minHeight: 50,
               borderRadius: 14,
-              background: disabled ? 'rgba(15,23,42,0.30)' : INK,
-              color: '#fff',
+              background: disabled ? 'rgba(255,255,255,0.08)' : INK,
+              color: disabled ? 'rgba(248,250,252,0.38)' : A.CANVAS,
               fontSize: 15,
               fontWeight: 700,
               border: 'none',
@@ -219,7 +222,7 @@ function CourseTag({ name }: { name: string }) {
   return (
     <span
       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold truncate max-w-[180px]"
-      style={{ background: 'rgba(15,23,42,0.05)', color: INK_45, border: `1px solid ${HAIR}` }}
+      style={{ background: 'rgba(255,255,255,0.06)', color: INK_45, border: `1px solid ${HAIR}` }}
     >
       <MapPin size={10} strokeWidth={2.5} />
       <span className="truncate">{name}</span>
@@ -240,7 +243,7 @@ function Distribution({ dist }: { dist: Array<{ bucket: number; count: number }>
             <div className="w-8 text-[11px] tabular-nums font-semibold" style={{ color: INK_45 }}>
               {labels[b]}
             </div>
-            <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(15,23,42,0.05)' }}>
+            <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
               <div
                 className="h-full rounded-full"
                 style={{
@@ -308,7 +311,7 @@ function ReviewCard({
           alt={name}
           size={40}
           hairlineRing
-          ringColor={LIGHT_HAIRLINE}
+          ringColor={DARK_HAIRLINE}
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -318,7 +321,7 @@ function ReviewCard({
             {r.reviewer.handicap != null && (
               <span
                 className="inline-flex items-center px-1.5 py-0.5 rounded text-[10.5px] font-bold tabular-nums"
-                style={{ background: 'rgba(15,23,42,0.05)', color: INK_45 }}
+                style={{ background: 'rgba(255,255,255,0.06)', color: INK_45 }}
               >
                 Hcp {r.reviewer.handicap.toFixed(1)}
               </span>
@@ -340,7 +343,7 @@ function ReviewCard({
         </div>
       )}
       {r.review && (
-        <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'rgba(15,23,42,0.78)' }}>
+        <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: A.BODY }}>
           {r.review}
         </p>
       )}
@@ -359,13 +362,13 @@ function ReviewCard({
         <div
           className="mt-3 p-3"
           style={{
-            background: 'rgba(247,147,30,0.05)',
-            border: `1px solid ${AMBER_SOFT}`,
+            background: BIZ.amberTint,
+            border: `1px solid ${BIZ.amberHair}`,
             borderRadius: 12,
           }}
         >
           <div className="flex items-center justify-between mb-1">
-            <div className="text-[11.5px] font-bold uppercase tracking-[0.06em]" style={{ color: '#94A3B8' }}>
+            <div className="text-[11.5px] font-bold uppercase tracking-[0.06em]" style={{ color: A.MUTE }}>
               Your reply
             </div>
             <div className="text-[11px]" style={{ color: INK_45 }}>
@@ -380,14 +383,14 @@ function ReviewCard({
               <button
                 onClick={() => onEdit(r)}
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-semibold active:opacity-70"
-                style={{ background: '#fff', border: `1px solid ${HAIR}`, color: INK }}
+                style={{ background: CARD_BG, border: `1px solid ${HAIR}`, color: INK }}
               >
                 <Edit3 size={11} strokeWidth={2.5} /> Edit
               </button>
               <button
                 onClick={() => onDelete(r)}
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-semibold active:opacity-70"
-                style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.18)', color: RED }}
+                style={{ background: 'rgba(255,90,90,0.14)', border: '1px solid rgba(255,90,90,0.28)', color: RED }}
               >
                 <Trash2 size={11} strokeWidth={2.5} /> Delete
               </button>
@@ -399,7 +402,7 @@ function ReviewCard({
           <button
             onClick={() => onReply(r)}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12.5px] font-bold active:opacity-90"
-            style={{ background: INK, color: '#fff', border: 'none' }}
+            style={{ background: INK, color: A.CANVAS, border: 'none' }}
           >
             <MessageSquare size={12} strokeWidth={2.5} /> Reply
           </button>
@@ -501,7 +504,7 @@ export default function BusinessReviewsPage() {
                 {/* stat strip */}
                 <div
                   className="mt-4 flex items-center"
-                  style={{ background: 'rgba(15,23,42,0.03)', borderRadius: 12 }}
+                  style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 12 }}
                 >
                   <StatCell
                     label="Awaiting"
@@ -527,8 +530,8 @@ export default function BusinessReviewsPage() {
                   onClick={() => setChip(c.key)}
                   className="shrink-0 px-3 py-1.5 rounded-full text-[12.5px] font-semibold active:opacity-80"
                   style={{
-                    background: isActive ? INK : '#fff',
-                    color: isActive ? '#fff' : INK,
+                    background: isActive ? INK : CARD_BG,
+                    color: isActive ? A.CANVAS : INK,
                     border: `1px solid ${isActive ? INK : HAIR}`,
                   }}
                 >

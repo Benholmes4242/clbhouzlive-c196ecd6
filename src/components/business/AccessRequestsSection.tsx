@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BIZ } from '@/components/business/businessTokens';
 import { TITLE } from '@/lib/tokens/type';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -225,8 +226,8 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       <section
         className="mb-6"
         style={{
-          background: '#FFFFFF',
-          border: `1px solid rgba(15,23,42,0.08)`,
+          background: BIZ.card,
+          border: `1px solid ${BIZ.hair}`,
           borderRadius: 14,
           padding: '4px 16px',
         }}
