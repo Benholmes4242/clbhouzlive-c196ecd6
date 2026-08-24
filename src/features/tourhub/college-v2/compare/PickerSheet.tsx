@@ -15,7 +15,6 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { TITLE } from '@/lib/tokens/type';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
-  
   FONT,
   GOLD,
   GOLD_DEEP,
