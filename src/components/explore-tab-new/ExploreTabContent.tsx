@@ -136,6 +136,20 @@ import { useMostPlayedThisWeek, type MostPlayedPlayer, type MostPlayedRow } from
  * instead of navigating.
  */
 const PHOTOS_SAMPLE = 12;
+
+/**
+ * BOTH SIDES OF THE MEDIA SEARCH ARE NORMALISED the same way: trimmed,
+ * lowercased and stripped of diacritics, because course and member names carry
+ * accents and a member typing "jose" should reach "José".
+ */
+function normaliseForSearch(value: string | null | undefined): string {
+  return (value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '');
+}
+
 /**
  * The clip reveal step. Photos do not have one here: CommunityPhotoMosaic owns
  * its own STEP internally, because it fills two columns by index and a wrapper
