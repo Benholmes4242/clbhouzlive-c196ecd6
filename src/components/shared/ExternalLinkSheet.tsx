@@ -70,11 +70,11 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
       <SheetContent
         side="bottom"
         className="rounded-t-3xl border-t px-0 pb-8"
-        style={{ background: A.PANEL, borderTopColor: A.BORDER }
+        style={{ background: A.PANEL, borderTopColor: A.BORDER }}
       >
         {/* Grabber Handle */}
         <div className="flex justify-center pt-2 pb-4">
-          <div className="w-9 h-1 bg-muted-foreground/30 rounded-full" />
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.18)' }} aria-hidden="true" />
         </div>
 
         <div className="px-6">
