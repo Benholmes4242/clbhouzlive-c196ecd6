@@ -1,3 +1,4 @@
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import React, { useEffect, useRef, useState } from 'react';
 import { Search, ChevronRight, X, Swords, Pin } from 'lucide-react';
 import GamSheet from '@/components/profile/handicap/gam/_shared/GamSheet';

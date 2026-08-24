@@ -1,3 +1,4 @@
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, ChevronRight } from 'lucide-react';

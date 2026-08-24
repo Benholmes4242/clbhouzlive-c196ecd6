@@ -1,3 +1,4 @@
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { useState, useEffect, useRef } from 'react';
 import { Search, GraduationCap, Loader2, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
