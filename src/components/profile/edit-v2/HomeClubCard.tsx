@@ -3,6 +3,7 @@ import { Search, X, MapPin, Check } from 'lucide-react';
 import { useClubSearch } from '@/hooks/useClubSearch';
 import { VisibilityRow, type VisibilityValue } from './VisibilityDropdown';
 import { FieldLabel } from '@/components/manage/fieldTreatment';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 interface Props {
   clubName: string;
@@ -115,7 +116,7 @@ export function HomeClubCard({
               setTimeout(() => setIsOpen(false), 150);
             }}
             placeholder="Search for your home club"
-            className="w-full bg-[rgba(255,255,255,0.06)] border border-border/[0.06] rounded-[11px] pl-9 pr-10 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors"
+            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full pl-9 pr-10 py-3 text-[15px] text-[rgba(255,255,255,0.96)] focus:outline-none`}
           />
           {query && (
             <button

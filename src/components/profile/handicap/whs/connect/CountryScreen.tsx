@@ -40,14 +40,13 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
     <Stage>
       <StageHead small headline="Where do you play?" lead={t('whsConnect.country.sub')} />
 
+      {/* FIELD CANON (lib/tokens/field.ts). Was PANEL/BORDER with no focus step. */}
       <div
+        className={FIELD_PAINT_CLASS}
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          background: PANEL,
-          border: `1px solid ${BORDER}`,
-          borderRadius: 14,
           padding: '12px 14px',
           marginTop: 28,
         }}
@@ -68,6 +67,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
             fontSize: 15,
             color: INK,
           }}
+          className={FIELD_PLACEHOLDER_CLASS}
         />
       </div>
 

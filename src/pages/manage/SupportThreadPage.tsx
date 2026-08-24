@@ -12,6 +12,7 @@ import {
   type MyRequestStatus,
 } from '@/hooks/useMyRequests';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 
 
@@ -203,7 +204,7 @@ export default function SupportThreadPage() {
         <div
           className="fixed bottom-0 left-0 right-0 z-30"
           style={{
-            background: 'rgba(244,246,248,0.96)',
+            background: 'rgba(21,23,31,0.96)', // was a light-mode glass literal
             backdropFilter: 'saturate(180%) blur(14px)',
             WebkitBackdropFilter: 'saturate(180%) blur(14px)',
             borderTop: `1px solid ${A.BORDER}`,
@@ -222,10 +223,8 @@ export default function SupportThreadPage() {
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="Write a reply..."
                 rows={2}
-                className="flex-1 p-3 rounded-2xl text-[14.5px] outline-none resize-none leading-relaxed"
+                className={`flex-1 p-3 text-[14.5px] outline-none resize-none leading-relaxed ${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
                 style={{
-                  background: A.PANEL,
-                  border: `1px solid ${A.BORDER}`,
                   color: A.INK,
                   minHeight: 48,
                   maxHeight: 160,

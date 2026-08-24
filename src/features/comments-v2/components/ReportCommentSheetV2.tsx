@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 const INK = '#F8FAFC';
 const SECONDARY = 'rgba(248,250,252,0.60)';
@@ -142,12 +143,8 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                   value={details}
                   onChange={(e) => setDetails(e.target.value)}
                   placeholder="Tell us more…"
-                  className="w-full outline-none"
-                  style={{
-                    height: 96, padding: 12, borderRadius: 12,
-                    border: `1px solid ${HAIRLINE}`, background: '#1B1E27',
-                    fontSize: 14, color: INK, resize: 'none',
-                  }}
+                  className={`w-full outline-none ${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+                  style={{ height: 96, padding: 12, fontSize: 14, color: INK, resize: 'none' }}
                 />
                 <div className="flex gap-2 mt-3">
                   <button

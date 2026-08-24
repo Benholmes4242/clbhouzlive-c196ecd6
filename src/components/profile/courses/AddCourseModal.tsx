@@ -429,6 +429,7 @@ const CourseRow: React.FC<CourseRowProps> = ({
 );
 
 import SectionHeader from '@/components/ui/SectionHeader';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 // =====================================================================
 export const AddCourseModal: React.FC<AddCourseModalProps> = ({
@@ -726,21 +727,12 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   paddingLeft: 40,
                   paddingRight: 16,
                   fontSize: 14,
-                  borderRadius: 12,
-                  background: PANEL,
-                  border: `1px solid ${BORDER}`,
+                  // radius comes from FIELD_PAINT_CLASS (14)
+
                   color: INK,
                   caretColor: INK,
-                  outline: 'none',
                 }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = INK;
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = BORDER;
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
+                className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} outline-none`}
               />
             </div>
           </div>

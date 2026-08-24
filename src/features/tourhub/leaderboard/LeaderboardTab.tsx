@@ -1,3 +1,4 @@
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 /**
  * LeaderboardTab — Tour Book design (v1).
  *
@@ -429,15 +430,17 @@ export function LeaderboardTab() {
         )}
 
         {/* SEARCH - its own full-width row; the masthead stays legible. */}
+        {/* FIELD CANON paint + focus step. RADIUS EXCEPTION (8): compact
+            masthead control row, sized off the chips beside it, not 14.
+            HEIGHT EXCEPTION (~28px, padding-derived) for the same reason. */}
         {searchOpen && (
           <div
+            className={FIELD_PAINT_CLASS}
             style={{
               marginTop: 10,
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              background: 'rgba(255,255,255,0.06)',
-              border: `1px solid ${HAIRLINE}`,
               borderRadius: 8,
               padding: '5px 8px',
             }}
@@ -458,6 +461,7 @@ export function LeaderboardTab() {
                 color: INK,
                 minWidth: 0,
               }}
+              className={FIELD_PLACEHOLDER_CLASS}
             />
           </div>
         )}

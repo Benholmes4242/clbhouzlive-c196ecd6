@@ -1,3 +1,4 @@
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 /**
  * FindGolfersSheet (BRIEF_FIND_GOLFERS_SHEET) — the sheet the Discover
  * 'friends' prompt opens.
@@ -513,13 +514,12 @@ export function FindGolfersSheet({ open, onClose }: Props) {
         </div>
 
         {/* INPUTS STAY WHITE; the shell does not. */}
+        {/* FIELD CANON. HEIGHT EXCEPTION (42): paired with the scope row below it. */}
         <div
+          className={FIELD_PAINT_CLASS}
           style={{
             marginTop: 12,
             height: 42,
-            borderRadius: 12,
-            border: `1px solid ${A.BORDER}`,
-            background: A.PANEL,
             display: 'flex',
             alignItems: 'center',
             gap: 8,

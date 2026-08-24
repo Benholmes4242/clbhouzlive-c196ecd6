@@ -22,7 +22,10 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import CoursesErrorBoundary from './CoursesErrorBoundary';
 import { Search, X, Star, ChevronRight } from 'lucide-react';
-import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+/* RAISED field set: the browse panel paints SURFACE #1B1E27, a ground LIGHTER than the
+   canvas, where 6% stops reading as a well. Explicit import by design — the
+   canon never computes this from context. See lib/tokens/field.ts. */
+import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { FIGS } from '@/lib/tokens/type';
 import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
 import { supabase } from '@/integrations/supabase/client';
@@ -120,7 +123,7 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
             placeholder={t('rateSheet.searchPlaceholder', { defaultValue: 'Search courses…' })}
             /* FIELD CANON (lib/tokens/field.ts). HEIGHT EXCEPTION (~37px,
                padding-derived): rate-sheet header above the results list. */
-            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
+            className={`${FIELD_PAINT_RAISED_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
             style={{
               width: '100%', padding: '9px 12px 9px 36px',
               fontSize: 14, outline: 'none',

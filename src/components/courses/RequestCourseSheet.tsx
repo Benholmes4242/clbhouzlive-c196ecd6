@@ -68,7 +68,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
 
   const close = () => onOpenChange(false);
 
-  const labelCls = 'block text-[13px] font-medium text-slate-700 mb-1.5';
+  const labelCls = 'block text-[13px] font-medium text-[rgba(255,255,255,0.62)] mb-1.5';
   /* FIELD CANON (lib/tokens/field.ts). This field painted WHITE with
      slate-200 borders and an amber focus ring — a light-mode survivor, not a
      6% well. Height 44 (h-11) already canon; radius moves 10 -> 14 and the
@@ -88,10 +88,10 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
             >
               <Check size={28} color="#F7931E" strokeWidth={2.5} />
             </div>
-            <h2 id="request-course-title" className="text-slate-900 mb-1.5" style={TITLE}>
+            <h2 id="request-course-title" className="text-[rgba(255,255,255,0.96)] mb-1.5" style={TITLE}>
               {t('request.sheet.successTitle')}
             </h2>
-            <p className="text-[14px] text-slate-500 mb-6 max-w-[280px]">{successMessage}</p>
+            <p className="text-[14px] text-[rgba(255,255,255,0.62)] mb-6 max-w-[280px]">{successMessage}</p>
             <button
               type="button"
               onClick={close}
@@ -104,10 +104,10 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
         ) : (
           <>
             <div className="pt-1 pb-4">
-              <h2 id="request-course-title" className="text-slate-900" style={TITLE}>
+              <h2 id="request-course-title" className="text-[rgba(255,255,255,0.96)]" style={TITLE}>
                 {t('request.sheet.title')}
               </h2>
-              <p className="text-[13px] text-slate-500 mt-1 leading-snug">
+              <p className="text-[13px] text-[rgba(255,255,255,0.62)] mt-1 leading-snug">
                 {t('request.sheet.subtitle')}
               </p>
             </div>
@@ -143,7 +143,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
               <div>
                 <label className={labelCls} htmlFor="rc-note">
                   {t('request.sheet.noteLabel')}{' '}
-                  <span className="text-slate-400 font-normal">{t('request.sheet.optional')}</span>
+                  <span className="text-[rgba(255,255,255,0.38)] font-normal">{t('request.sheet.optional')}</span>
                 </label>
                 <textarea
                   id="rc-note"
