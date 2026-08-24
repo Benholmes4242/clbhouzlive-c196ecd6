@@ -157,7 +157,7 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
           gap: 4,
           padding: '6px 12px',
           background: A.INK,
-           color: A.CANVAS,
+          color: A.CANVAS,
           borderRadius: 999,
           fontSize: 12,
           fontWeight: 700,

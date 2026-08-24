@@ -983,7 +983,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     </div>
                   ) : <span />}
 
-                  {/* row 2 — the label is DIM; LABEL already carries A.DIM. */}
+                  {/* row 2 — the label is quiet chrome; LABEL carries A.MUTE. */}
                   {(identityStat || playerHcp != null) ? (
                     <div style={LABEL}>
                       {identityStat ? identityStat.label : t('courses:scorecard.handicapIndex')}
