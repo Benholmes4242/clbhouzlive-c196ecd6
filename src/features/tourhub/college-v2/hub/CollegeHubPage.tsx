@@ -250,10 +250,20 @@ export function CollegeHubPage() {
             gap: 8,
           }}
         >
+          {/* RADIUS/HEIGHT EXCEPTION (recorded — do not "correct" to 44).
+              The canon is radius 14 / height 44. Radius moves to 14 here; the
+              height stays 34 because this field sits inside the sticky glass
+              bar (padding '8px 16px 10px'), and 44 would deepen that bar and
+              push the yearbook list down at every scroll position. Fourth
+              recorded exception, after the OTP boxes, the Reviews control row
+              and the Players control row — all constrained by neighbours.
+              Paint state (searchPaintFocus) is deliberately SEPARATE from
+              searchExpanded: blur must restore the paint without collapsing
+              the results list, or a result tap dies before it lands. */}
           <div style={{ position: 'relative', flex: 1 }}>
             <Search
               size={13}
-              color={AMBER}
+              color={searchValue ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.62)'}
               strokeWidth={2.5}
               style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
             />
@@ -263,15 +273,21 @@ export function CollegeHubPage() {
               placeholder={t('college.hub.searchPlaceholder')}
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              onFocus={() => setSearchExpanded(true)}
+              onFocus={() => {
+                setSearchExpanded(true);
+                setSearchPaintFocus(true);
+              }}
+              onBlur={() => setSearchPaintFocus(false)}
+              className="placeholder:text-[rgba(255,255,255,0.38)]"
               style={{
                 width: '100%',
                 height: 34,
                 paddingLeft: 30,
                 paddingRight: 30,
-                borderRadius: 8,
-                background: SURFACE,
-                border: `1px solid ${HAIRLINE_INK_10}`,
+                borderRadius: 14,
+                background: searchPaintFocus ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
+                border: `1px solid ${searchPaintFocus ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
+                transition: 'background 140ms ease, border-color 140ms ease',
                 fontFamily: FONT,
                 fontSize: 13,
                 fontWeight: 600,
@@ -279,6 +295,7 @@ export function CollegeHubPage() {
                 outline: 'none',
               }}
             />
+
             {searchValue && (
               <button
                 type="button"
