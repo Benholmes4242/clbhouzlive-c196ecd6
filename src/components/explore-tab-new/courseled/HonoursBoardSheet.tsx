@@ -290,7 +290,6 @@ export function HonoursBoardSheet({
         <div id="courseled-honours-title">
           {/* §S4.1 — THE ONLY RECENT / LEADERS TOGGLE IN THE APP LIVES HERE. */}
           <HonoursHeading
-            events={events}
             aside={<HonoursModeToggle mode={mode} onChange={setMode} />}
           />
         </div>
