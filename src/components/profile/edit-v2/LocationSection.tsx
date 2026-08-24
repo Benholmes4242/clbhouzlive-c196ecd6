@@ -119,12 +119,13 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
                   onClick={() => { onChange(c); setOpen(false); setSearch(''); }}
                   className="w-full text-left px-4 py-2.5 text-[14px] transition-colors"
                   style={{
-                    background: c === value ? 'rgba(15,23,42,0.06)' : 'transparent',
-                    color: '#0F172A',
+                    background: c === value ? 'rgba(255,255,255,0.08)' : 'transparent',
+                    color: A.INK,
                     fontFamily: SF_STACK,
                     fontWeight: c === value ? 600 : 400,
                   }}
-                  onMouseEnter={e => { if (c !== value) (e.currentTarget as HTMLElement).style.background = '#F8FAFC'; }}
+                  onMouseEnter={e => { if (c !== value) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+
                   onMouseLeave={e => { if (c !== value) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                 >
                   {c}
