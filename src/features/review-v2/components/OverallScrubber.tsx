@@ -91,7 +91,6 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
       </div>
 
       <div
-        ref={trackRef}
         role="slider"
         tabIndex={0}
         aria-valuemin={1}
@@ -104,14 +103,19 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
         }}
         onKeyDown={onKeyDown}
         style={{
+          padding: '16px 0',
+          background: 'transparent',
+          cursor: 'pointer',
+          touchAction: 'none',
+        }}
+      >
+      <div
+        ref={trackRef}
+        style={{
           position: 'relative',
           height: 12,
           borderRadius: 999,
           background: RV2.track,
-          cursor: 'pointer',
-          touchAction: 'none',
-          padding: 0,
-          margin: '16px 0',
         }}
       >
         <div
