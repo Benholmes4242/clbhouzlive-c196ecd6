@@ -70,8 +70,8 @@ export function HomeClubCard({
         </div>
 
         <div
-          className="w-full flex items-center justify-between bg-[#F8FAFC] border border-border/60 rounded-[11px] px-3.5 py-3 min-h-[48px]"
-          style={{ borderColor: 'rgba(15,23,42,0.10)' }}
+          className="w-full flex items-center justify-between bg-[rgba(255,255,255,0.06)] border border-border/60 rounded-[11px] px-3.5 py-3 min-h-[48px]"
+          style={{ borderColor: 'rgba(255,255,255,0.12)' }}
         >
           <div className="flex items-center gap-2.5 min-w-0">
             <MapPin size={16} className="shrink-0" style={{ color: INK }} />
@@ -115,7 +115,7 @@ export function HomeClubCard({
               setTimeout(() => setIsOpen(false), 150);
             }}
             placeholder="Search for your home club"
-            className="w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] pl-9 pr-10 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+            className="w-full bg-[rgba(255,255,255,0.06)] border border-border/60 rounded-[11px] pl-9 pr-10 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors"
           />
           {query && (
             <button

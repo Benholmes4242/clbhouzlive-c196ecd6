@@ -74,7 +74,7 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
       <button
         type="button"
         onClick={() => { setOpen(v => !v); setSearch(''); }}
-        className="w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] px-4 py-3 text-[15px] text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors"
+        className="w-full bg-[rgba(255,255,255,0.06)] border border-border/60 rounded-[11px] px-4 py-3 text-[15px] text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors"
         style={{ color: value ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))' }}
       >
         <span>{value || 'Select country'}</span>
@@ -100,7 +100,7 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search countries..."
                 style={{ color: '#0F172A' }}
-                className="w-full bg-[#F8FAFC] rounded-[8px] pl-8 pr-3 py-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-[rgba(15,23,42,0.20)]"
+                className="w-full bg-[rgba(255,255,255,0.06)] rounded-[8px] pl-8 pr-3 py-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-[rgba(255,255,255,0.22)]"
               />
             </div>
           </div>
@@ -202,7 +202,7 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
           onFocus={() => { if (results.length > 0) setOpen(true); }}
           placeholder={country ? `City in ${country}` : 'Select a country first'}
           disabled={!country}
-          className="w-full bg-[#F8FAFC] border border-border/60 rounded-[11px] pl-9 pr-9 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(15,23,42,0.20)] focus:bg-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-[rgba(255,255,255,0.06)] border border-border/60 rounded-[11px] pl-9 pr-9 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         />
         {query && (
           <button
