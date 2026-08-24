@@ -14,7 +14,6 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { toast } from '@/lib/toast';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { WHITE_ALPHA_08 } from '@/features/tourhub/_shared/tokens';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
