@@ -330,22 +330,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
         {shellTabs}
         <div className="px-4 pt-2">
           {rateNudge}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ ...KICKER, marginBottom: 5 }}>TOP 100</div>
-            <h2
-              style={{
-                margin: 0,
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                fontSize: 20,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                color: INK,
-                lineHeight: 1.2,
-              }}
-            >
-              {t('top100.sectionTitle', { defaultValue: "The world's best" })}
-            </h2>
-          </div>
+          {/* Eyebrow sits directly above the provenance line — the h2 title
+              was removed, so the kicker owns the heading role here. */}
+          <div style={{ ...KICKER, marginBottom: 5 }}>TOP 100</div>
           {/* Provenance subhead — masthead-line mock */}
           <p
             style={{
@@ -354,7 +341,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
               color: INK_MUTE,
               lineHeight: 1.45,
               maxWidth: 330,
-              marginTop: 6,
+              marginTop: 0,
               marginBottom: 12,
               fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
               letterSpacing: '-0.005em',
@@ -362,6 +349,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           >
             {t('top100.provenance', { defaultValue: "The top 100 courses in the world and in every region, as ranked by golf's leading publications." })}
           </p>
+
 
         </div>
       </div>
