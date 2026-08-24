@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FONT, INK } from './_constants';
-import { INK_MUTE } from '@/features/courses/_shared/tokens';
+import { INK_MUTE, SURFACE, HAIRLINE_INK_8 } from '@/features/courses/_shared/tokens';
 
 const AMBER = '#F7931E';
 const GOLD = '#F5B301';
@@ -20,8 +20,8 @@ export const BirdieMapSummary: React.FC<Props> = ({ birdiedCount, totalHoles }) 
         margin: '4px 16px 8px',
         padding: '10px 12px',
         borderRadius: 12,
-        background: '#ffffff',
-        border: '1px solid rgba(15,23,42,0.07)',
+        background: SURFACE,
+        border: `1px solid ${HAIRLINE_INK_8}`,
         fontFamily: FONT,
       }}
     >
@@ -51,7 +51,7 @@ export const BirdieMapSummary: React.FC<Props> = ({ birdiedCount, totalHoles }) 
               height: 8,
               borderRadius: 999,
               background: GOLD,
-              boxShadow: '0 0 0 2px #ffffff',
+              boxShadow: `0 0 0 2px ${SURFACE}`,
               display: 'inline-block',
             }}
           />
@@ -76,7 +76,7 @@ export const BirdieMapSummary: React.FC<Props> = ({ birdiedCount, totalHoles }) 
           width: '100%',
           height: 4,
           borderRadius: 4,
-          background: 'rgba(15,23,42,0.06)',
+          background: 'rgba(255,255,255,0.06)',
           overflow: 'hidden',
         }}
       >

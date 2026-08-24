@@ -21,11 +21,9 @@ import {
   useSubmitHolePhoto,
   type SubmitFailureReason,
 } from '@/hooks/media/useHoleMedia';
+import { A } from './analytical/tokens';
 
 
-const INK = '#0F172A';
-const INK_06 = 'rgba(15,23,42,0.06)';
-const INK_55 = 'rgba(15,23,42,0.55)';
 const AMBER_INK = '#C97211';
 
 export type HolePhotoSurface = 'hole_sheet' | 'discover_card';
@@ -82,9 +80,9 @@ export const AddHolePhotoRow: React.FC<Props> = ({ courseId, holeNo, surface, da
 
   if (!courseId) return null;
 
-  const muted = dark ? 'rgba(255,255,255,0.62)' : INK_55;
-  const strong = dark ? '#FFFFFF' : INK;
-  const hairline = dark ? 'rgba(255,255,255,0.14)' : INK_06;
+  const muted = A.MUTE;
+  const strong = A.INK;
+  const hairline = A.BORDER;
 
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
@@ -220,7 +218,7 @@ export const AddHolePhotoRow: React.FC<Props> = ({ courseId, holeNo, surface, da
         onClick={() => inputRef.current?.click()}
         style={{
           width: '100%',
-          border: `1px dashed ${dark ? 'rgba(255,255,255,0.28)' : 'rgba(15,23,42,0.18)'}`,
+          border: `1px dashed ${dark ? 'rgba(255,255,255,0.28)' : A.BORDER}`,
           background: 'transparent',
           borderRadius: 12,
           padding: '10px 12px',

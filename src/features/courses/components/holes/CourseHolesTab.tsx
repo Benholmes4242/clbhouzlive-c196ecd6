@@ -78,7 +78,7 @@ export const CourseHolesTab: React.FC<Props> = ({
             style={{
               height: 88,
               borderRadius: 12,
-              background: 'linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%)',
+              background: 'linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.05) 100%)',
               backgroundSize: '200% 100%',
               animation: 'holesShimmer 1.4s linear infinite',
             }}

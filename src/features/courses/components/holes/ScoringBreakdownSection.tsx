@@ -61,7 +61,7 @@ const THIRDS_NOISE_FLOOR = 1.5;
 
 
 /** Neutral ink ladder for the thirds, worst first. Never semantic colour. */
-const THIRD_LADDER = ['rgba(14,18,22,0.70)', 'rgba(14,18,22,0.40)', 'rgba(14,18,22,0.18)'];
+const THIRD_LADDER = ['rgba(248,250,252,0.70)', 'rgba(248,250,252,0.40)', 'rgba(248,250,252,0.18)'];
 
 /** Below this, viewer and field are level - no direction claimed either way. */
 const REFERENCE_NOISE_FLOOR = 0.5;
@@ -101,18 +101,18 @@ function marginTone(gap: number): string {
 }
 
 /** The field's bar / mark. Neutral - the comparison, not a verdict. */
-const FIELD_BAR = '#C6CFD8';
-const FIELD_TICK = 'rgba(15,23,42,0.55)';
+const FIELD_BAR = A.BODY;
+const FIELD_TICK = A.MUTE;
 
 /** A row inside the noise floor: neutral ink, NO direction claimed. */
-const LEVEL_BAR = 'rgba(14,18,22,0.34)';
+const LEVEL_BAR = 'rgba(248,250,252,0.34)';
 
 /**
  * The 18-hole chart's quiet stop. A SOLID NEUTRAL, not a lightened red - the
  * cost column has always been ink on this page and red is reserved for the
  * doubles figures (BRIEF_YOU_TAB_CHART_LED s1.3).
  */
-const COLUMN_QUIET = '#C6CFD8';
+const COLUMN_QUIET = A.BODY;
 
 /**
  * One bar on a scale shared with its sibling.
@@ -921,7 +921,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             aria-hidden
             style={{ display: 'block' }}
           >
-            <path d={cumulative.area} fill="rgba(14,18,22,0.06)" />
+            <path d={cumulative.area} fill="rgba(255,255,255,0.06)" />
             <path
               d={cumulative.d}
               fill="none"
@@ -1047,7 +1047,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                   <path
                     d={line}
                     fill="none"
-                    stroke="#FFFFFF"
+                    stroke={A.INK}
                     strokeOpacity={0.6}
                     strokeWidth={4}
                     strokeLinecap="round"
@@ -1063,7 +1063,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                     strokeLinejoin="round"
                     vectorEffect="non-scaling-stroke"
                   />
-                  <circle cx={pts[bi].x} cy={pts[bi].y} r={3.4} fill={A.GREEN} stroke="#FFFFFF" strokeWidth={1.6} />
+                  <circle cx={pts[bi].x} cy={pts[bi].y} r={3.4} fill={A.GREEN} stroke={A.INK} strokeWidth={1.6} />
 
                 </svg>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>

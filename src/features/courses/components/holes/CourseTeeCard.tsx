@@ -17,6 +17,7 @@ import { useCourseTeeSets, type TeeSet } from '../../hooks/useCourseTeeSets';
 import { AMBER, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8 } from '../../_shared/tokens';
 import { FONT } from './_constants';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { A } from './analytical/tokens';
 
 interface Props {
   courseId: string | undefined;
@@ -216,7 +217,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId, hideHeader = false })
       style={{
         padding: '14px 16px 8px',
         fontFamily: FONT,
-        background: '#FFFFFF',
+        background: A.CANVAS,
         // minWidth:0 is the load-bearing rule here: without it a flex/grid
         // child defaults to min-width:auto and will happily push its parent
         // past the viewport regardless of maxWidth. maxWidth:100% then caps
@@ -433,8 +434,8 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId, hideHeader = false })
                           padding: '0 14px',
                           borderRadius: 999,
                           border: `1px solid ${isActive ? INK : HAIRLINE_INK_8}`,
-                          background: isActive ? INK : '#FFFFFF',
-                          color: isActive ? '#FFFFFF' : INK,
+                          background: isActive ? INK : A.PANEL,
+                          color: isActive ? A.CANVAS : INK,
                           fontSize: 13,
                           fontWeight: 700,
                           whiteSpace: 'nowrap',
@@ -543,7 +544,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId, hideHeader = false })
                 display: 'grid',
                 gridTemplateColumns: HOLE_GRID_COLUMNS,
                 padding: '8px 12px',
-                background: '#F8FAFC',
+                background: A.PANEL,
                 borderBottom: `1px solid ${HAIRLINE_INK_8}`,
                 fontSize: 10,
                 fontWeight: 700,
@@ -764,8 +765,8 @@ const TeePillsRow: React.FC<{
                 padding: '0 14px',
                 borderRadius: 999,
                 border: `1px solid ${isActive ? INK : HAIRLINE_INK_8}`,
-                background: isActive ? INK : '#FFFFFF',
-                color: isActive ? '#FFFFFF' : INK,
+                background: isActive ? INK : A.PANEL,
+                color: isActive ? A.CANVAS : INK,
                 fontSize: 13,
                 fontWeight: 700,
                 whiteSpace: 'nowrap',
@@ -791,7 +792,7 @@ const Row: React.FC<{ h: { hole_no: number; par: number; si: number; yards: numb
       display: 'grid',
       gridTemplateColumns: HOLE_GRID_COLUMNS,
       padding: '8px 12px',
-      background: '#FFFFFF',
+      background: A.CANVAS,
       fontSize: 13,
       color: INK,
       ...NUM,
@@ -813,7 +814,7 @@ const SubtotalRow: React.FC<{ label: string; par: number; yards: number }> = ({ 
       display: 'grid',
       gridTemplateColumns: HOLE_GRID_COLUMNS,
       padding: '8px 12px',
-      background: '#F8FAFC',
+      background: A.PANEL,
       borderTop: `1px solid ${HAIRLINE_INK_8}`,
       fontSize: 13,
       fontWeight: 700,
