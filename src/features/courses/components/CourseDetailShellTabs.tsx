@@ -28,7 +28,7 @@ export const CourseDetailShellTabs: React.FC<CourseDetailShellTabsProps> = ({
   const { t } = useTranslation('courses');
 
   return (
-    <div className="px-4 py-1 flex justify-center">
+    <div className="px-4 py-2 flex justify-center">
       <FilterChips
         options={TABS.map((tab) => ({ id: tab.id, label: t(tab.labelKey) }))}
         value={activeTab}
