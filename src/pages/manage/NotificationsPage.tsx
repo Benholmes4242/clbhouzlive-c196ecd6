@@ -154,6 +154,7 @@ export default function NotificationsPage() {
             checked={pushSwitchChecked}
             disabled={pushSwitchDisabled}
             onCheckedChange={handleTogglePush}
+            className={SETTINGS_SWITCH_CLASS}
           />
         </div>
 
