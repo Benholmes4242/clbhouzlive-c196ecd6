@@ -19873,6 +19873,14 @@ export type Database = {
           viewer_value: number
         }[]
       }
+      get_live_course_record_facts: {
+        Args: { p_score_ids: string[] }
+        Returns: {
+          beaten_gross: number
+          held_by: string
+          score_id: string
+        }[]
+      }
       get_long_form_videos: {
         Args: {
           p_category?: string
