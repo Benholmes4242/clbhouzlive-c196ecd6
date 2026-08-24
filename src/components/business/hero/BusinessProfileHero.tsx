@@ -11,25 +11,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
-import { SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HeroShell, W_55 } from '@/components/profile/hero/HeroShell';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 export type BusinessHeroStat = 'followers' | 'posts' | 'rounds' | 'rated';
-
-/** The shared 0-10 band scale, in its DARK-SURFACE variants: the light hexes
- *  (#047857 / #DC2626) sit too close to INK to read at 40px on this block. */
-const DARK_BAND_GREEN = '#4ADE80';
-const DARK_BAND_AMBER = '#F7931E';
-const DARK_BAND_RED = '#F87171';
-
-function darkBandColor(score: number | null | undefined): string {
-  if (score == null) return W_55;
-  if (score >= 9) return DARK_BAND_GREEN;
-  if (score >= 5) return DARK_BAND_AMBER;
-  return DARK_BAND_RED;
-}
 
 /** "golf_club" / "OTHER" -> "Golf club". Sentence case, never caps. */
 function sentenceCase(value: string): string {
@@ -107,7 +95,7 @@ export const BusinessProfileHero: React.FC<Props> = ({
     <>
       {metaLine && <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{metaLine}</div>}
       {showEvidence && (
-        <div style={{ marginTop: 1, color: DARK_BAND_AMBER, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ marginTop: 1, color: A.AMBER, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {evidenceLine}
         </div>
       )}
@@ -167,7 +155,7 @@ export const BusinessProfileHero: React.FC<Props> = ({
               label: t('business.hero.communityRating', 'Community rating'),
               ariaLabel: t('business.hero.communityRating', 'Community rating'),
               value: (avgRating as number).toFixed(1),
-              color: darkBandColor(avgRating),
+              color: bandColorOnDark(avgRating),
               aside: (
                 <span
                   style={{

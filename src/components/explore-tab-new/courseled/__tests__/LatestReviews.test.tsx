@@ -11,7 +11,7 @@ vi.mock('react-i18next', () => ({
 
 import { LatestReviews } from '@/components/explore-tab-new/courseled/LatestReviews';
 import { REVIEW_TILE_HEIGHT, REVIEW_TILE_FEATURED_HEIGHT } from '@/components/explore-tab-new/courseled/ReviewTile';
-import { BAND_GREEN, BAND_AMBER, BAND_RED } from '@/features/courses/_shared/scoreBands';
+import { BAND_GREEN_DARK, BAND_AMBER_DARK, BAND_RED_DARK } from '@/features/courses/_shared/scoreBands';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
 /** The mosaic reads reactions through React Query; the tree needs a client. */
@@ -185,7 +185,7 @@ describe('LatestReviews mosaic', () => {
     expect(screen.queryByTestId('review-tile-breakdown')).toBeNull();
   });
 
-  it('tints bars with the app-wide score bands, not a local scale', () => {
+  it('tints dark-surface bars with the app-wide dark score bands, not the light scale', () => {
     render(
       <LatestReviews
         reviews={[
@@ -200,8 +200,8 @@ describe('LatestReviews mosaic', () => {
     // jsdom serialises inline colours as rgb(); assert the band values.
     const rgb = (hex: string) =>
       `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ')})`;
-    expect(html).toContain(rgb(BAND_GREEN));
-    expect(html).toContain(rgb(BAND_AMBER));
-    expect(html).toContain(rgb(BAND_RED));
+    expect(html).toContain(rgb(BAND_GREEN_DARK));
+    expect(html).toContain(rgb(BAND_AMBER_DARK));
+    expect(html).toContain(rgb(BAND_RED_DARK));
   });
 });

@@ -46,6 +46,15 @@ vi.mock('@/components/explore-tab-new/courseled/hooks/useWeekRegionCounts', () =
 vi.mock('@/hooks/useToggleFollow', () => ({ useToggleFollow: () => ({ mutate: () => {} }) }));
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ actor: null }) }));
 vi.mock('@tanstack/react-query', () => ({ useQueryClient: () => ({ setQueriesData: () => {} }) }));
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (_key: string, fallback?: string | Record<string, unknown>, options?: Record<string, unknown>) => {
+      const template = typeof fallback === 'string' ? fallback : String(fallback?.defaultValue ?? _key);
+      const values = typeof fallback === 'string' ? options : fallback;
+      return template.replace(/{{(\w+)}}/g, (_match, key: string) => String(values?.[key] ?? `{{${key}}}`));
+    },
+  }),
+}));
 
 // eslint-disable-next-line import/first
 import { GolfThisWeek } from '@/components/explore-tab-new/courseled/GolfThisWeek';
@@ -82,17 +91,17 @@ function chipFor(container: HTMLElement, label: RegExp) {
   return hit;
 }
 
-/** Every ladder row is its own role="button"; the chip is the outer one. */
-function ladderRows(chip: HTMLElement) {
-  return [...chip.querySelectorAll('div[role="button"]')] as HTMLElement[];
+/** The podium has one leader hero and up to two compact chaser rows. */
+function podiumRows(chip: HTMLElement) {
+  return [...chip.querySelectorAll('[data-podium-row]')] as HTMLElement[];
 }
 
-describe('BRIEF_BAND_TILES_LADDER', () => {
+describe('BRIEF_BAND_TILES_PODIUM', () => {
   beforeEach(() => {
     rows.length = 0;
   });
 
-  it('is ONE ladder of three ranked rows, each with its own figure (a, b, §1)', () => {
+  it('renders one unnumbered leader and two ranked chasers', () => {
     rows.push(
       row({ round_id: 'a', user_id: 'a', display_name: 'Alpha', gross: 74 }),
       row({ round_id: 'b', user_id: 'b', display_name: 'Bravo', gross: 76 }),
@@ -101,73 +110,63 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
     );
     const { container } = render(<GolfThisWeek userId="me" onCardPress={() => {}} onSeeAll={() => {}} />);
     const chip = chipFor(container, /BEST THIS WEEK/i);
-    const ladder = ladderRows(chip);
-    expect(ladder).toHaveLength(3);
-    /* THE LEADER'S RANK IS PRESENT, NOT IMPLIED (§1). */
-    expect(ladder[0].textContent).toMatch(/^174\+2A?Alpha$/);
-    expect(ladder[1].textContent).toMatch(/^276\+4B?Bravo$/);
-    expect(ladder[2].textContent).toMatch(/^378\+6C?Charlie$/);
+    const podium = podiumRows(chip);
+    expect(podium).toHaveLength(3);
+    expect(podium[0].dataset.podiumRow).toBe('leader');
+    expect(podium[0].textContent).toMatch(/74\+2Alpha$/);
+    expect(podium[1].dataset.podiumRow).toBe('chaser');
+    expect(podium[1].textContent).toMatch(/^2B?Bravo76\+2$/);
+    expect(podium[2].textContent).toMatch(/^3C?Charlie78\+4$/);
     expect(chip.textContent).not.toMatch(/Delta/);
   });
 
-  it('shares ONE MEASURED figure column across every row (a, §1, §3)', () => {
+  it('uses the podium leader and chaser grid geometries', () => {
     rows.push(
       row({ round_id: 'a', user_id: 'a', display_name: 'Alpha', gross: 74 }),
       row({ round_id: 'b', user_id: 'b', display_name: 'Bravo', gross: 76 }),
     );
     const { container } = render(<GolfThisWeek userId="me" onCardPress={() => {}} onSeeAll={() => {}} />);
-    const cols = ladderRows(chipFor(container, /BEST THIS WEEK/i)).map(
-      (r) => (r.children[1] as HTMLElement).style.width,
-    );
-    /* MEASURED, NOT 56 (LADDER_TIGHTEN §3): "77 +6" at 12/8 is 31px, and rows
-       2 and 3 no longer pay for a leader's size. */
-    expect(cols).toEqual(['31px', '31px']);
+    const podium = podiumRows(chipFor(container, /BEST THIS WEEK/i));
+    expect(podium[0].style.gridTemplateColumns).toBe('40px minmax(0, 1fr)');
+    expect(podium[1].style.gridTemplateColumns).toBe('12px 16px minmax(0, 1fr) auto auto');
   });
 
-  it('prints the unit ONCE on the eyebrow row, and never per row (e, §2)', () => {
+  it('states Stableford in the eyebrow and expresses the leader margin in points', () => {
     rows.push(
       row({ round_id: 'a', user_id: 'a', display_name: 'Alpha', stableford_points: 41 }),
       row({ round_id: 'b', user_id: 'b', display_name: 'Bravo', stableford_points: 38 }),
     );
     const { container } = render(<GolfThisWeek userId="me" onCardPress={() => {}} onSeeAll={() => {}} />);
     const chip = chipFor(container, /stableford/i);
-    expect((chip.textContent!.match(/points/gi) ?? [])).toHaveLength(1);
-    for (const r of ladderRows(chip)) expect(r.textContent).not.toMatch(/points/i);
-    /* BEST THIS WEEK is the exception: no unit on the eyebrow, a to-par per row. */
-    rows.push(row({ round_id: 'c', user_id: 'c', display_name: 'Charlie', gross: 70 }));
+    expect(chip.textContent).toMatch(/Best Stableford points/i);
+    expect(chip.textContent).toMatch(/3 points clear/i);
+    for (const r of podiumRows(chip)) expect(r.textContent).not.toMatch(/points/i);
   });
 
-  it('colours the to-par red under par and mutes it at level or over (f, §2)', () => {
+  it('keeps each gross paired with its to-par comparison in the podium', () => {
     rows.push(
       row({ round_id: 'a', user_id: 'a', display_name: 'Alpha', gross: 70 }),
       row({ round_id: 'b', user_id: 'b', display_name: 'Bravo', gross: 72 }),
       row({ round_id: 'c', user_id: 'c', display_name: 'Charlie', gross: 76 }),
     );
     const { container } = render(<GolfThisWeek userId="me" onCardPress={() => {}} onSeeAll={() => {}} />);
-    const quals = ladderRows(chipFor(container, /BEST THIS WEEK/i)).map((r) => {
-      const col = r.children[1] as HTMLElement;
-      const q = col.children[1] as HTMLElement;
-      return { text: q.textContent, color: q.style.color };
-    });
-    expect(quals[0].text).toMatch(/2/);
-    expect(quals[1].text).toBe('E');
-    expect(quals[2].text).toBe('+4');
-    expect(quals[0].color).not.toBe(quals[1].color);
-    expect(quals[1].color).toBe(quals[2].color);
+    const podium = podiumRows(chipFor(container, /BEST THIS WEEK/i));
+    expect(podium[0].textContent).toMatch(/70[−-]2Alpha$/);
+    expect(podium[1].textContent).toMatch(/^2B?Bravo72\+2$/);
+    expect(podium[2].textContent).toMatch(/^3C?Charlie76\+6$/);
   });
 
-  it('keeps every figure at 12px and the leader BOLD not BIG (a, §1)', () => {
+  it('gives the leader a 34px figure and keeps chaser figures compact', () => {
     rows.push(
       row({ round_id: 'a', user_id: 'a', display_name: 'Alpha', gross: 74 }),
       row({ round_id: 'b', user_id: 'b', display_name: 'Bravo', gross: 76 }),
     );
     const { container } = render(<GolfThisWeek userId="me" onCardPress={() => {}} onSeeAll={() => {}} />);
-    const figs = ladderRows(chipFor(container, /BEST THIS WEEK/i)).map((r) => {
-      const f = (r.children[1] as HTMLElement).children[0] as HTMLElement;
-      return [f.style.fontSize, f.style.fontWeight];
-    });
-    expect(figs[0]).toEqual(['12px', '800']);
-    expect(figs[1]).toEqual(['12px', '700']);
+    const podium = podiumRows(chipFor(container, /BEST THIS WEEK/i));
+    const leaderFigure = [...podium[0].querySelectorAll('span')].find((el) => el.textContent === '74') as HTMLElement;
+    const chaserFigure = [...podium[1].querySelectorAll('span')].find((el) => el.textContent === '76') as HTMLElement;
+    expect([leaderFigure.style.fontSize, leaderFigure.style.fontWeight]).toEqual(['34px', '700']);
+    expect([chaserFigure.style.fontSize, chaserFigure.style.fontWeight]).toEqual(['11px', '700']);
   });
 
   it('applies the floor to every place and shows NOTHING for a missing one (§4)', () => {
@@ -179,9 +178,9 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
     );
     const { container } = render(<GolfThisWeek userId="me" onCardPress={() => {}} onSeeAll={() => {}} />);
     const stab = chipFor(container, /stableford/i);
-    expect(ladderRows(stab)).toHaveLength(1);
+    expect(podiumRows(stab)).toHaveLength(1);
     expect(stab.textContent).not.toMatch(/Bravo|\u2014/);
-    expect(ladderRows(chipFor(container, /Most birdies/i))).toHaveLength(1);
+    expect(podiumRows(chipFor(container, /Most birdies/i))).toHaveLength(1);
   });
 
   it('never shows a member twice in one tile, and keeps their best (§4)', () => {
@@ -194,7 +193,7 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
     const { container } = render(<GolfThisWeek userId="me" onCardPress={() => {}} onSeeAll={() => {}} />);
     const chip = chipFor(container, /BEST THIS WEEK/i);
     expect((chip.textContent!.match(/Bravo/g) ?? [])).toHaveLength(1);
-    expect(ladderRows(chip)[1].textContent).toMatch(/Bravo/);
+    expect(podiumRows(chip)[1].textContent).toMatch(/Bravo/);
   });
 
   it('lets one member hold first place in several tiles (§4)', () => {
@@ -225,9 +224,9 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
     const { container } = render(
       <GolfThisWeek userId="me" onCardPress={onCardPress} onSeeAll={() => {}} />,
     );
-    const ladder = ladderRows(chipFor(container, /BEST THIS WEEK/i));
+    const podium = podiumRows(chipFor(container, /BEST THIS WEEK/i));
     const expected = ['a', 'b', 'c'];
-    ladder.forEach((rowEl, i) => {
+    podium.forEach((rowEl, i) => {
       onCardPress.mockClear();
       fireEvent.click(rowEl);
       expect(onCardPress).toHaveBeenCalledTimes(1);
@@ -238,11 +237,11 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
       expect(onCardPress).toHaveBeenCalledTimes(1);
       expect(onCardPress.mock.calls[0][0].round_id).toBe(expected[i]);
     });
-    /* Every row shows a chevron (§3). */
-    for (const rowEl of ladder) expect(rowEl.querySelector('svg')).toBeTruthy();
+    expect(podium[0].dataset.podiumRow).toBe('leader');
+    expect(podium.slice(1).every((rowEl) => rowEl.dataset.podiumRow === 'chaser')).toBe(true);
   });
 
-  it('keeps the widened chip and the type scale (§4, §5)', () => {
+  it('keeps the widened chip and distinct leader/chaser type roles', () => {
     rows.push(
       row({ round_id: 'a', user_id: 'a', display_name: 'Alpha', gross: 74 }),
       row({ round_id: 'b', user_id: 'b', display_name: 'Notascratchgolfer', gross: 76 }),
@@ -251,17 +250,11 @@ describe('BRIEF_BAND_TILES_LADDER', () => {
     const chip = chipFor(container, /BEST THIS WEEK/i);
     expect(chip.style.minWidth).toBe('230px');
     expect(chip.style.flex).toBe('1 0 230px');
-    /* TWO SIZES EXACTLY — 8 (the to-par, §2) and 12. Nothing is big any more.
-       The avatar's own initial glyph is the avatar component's business, not the
-       band's scale. */
-    const sizes = new Set<string>();
-    for (const rowEl of ladderRows(chip)) {
-      sizes.add((rowEl.children[0] as HTMLElement).style.fontSize);
-      for (const c of (rowEl.children[1] as HTMLElement).children) {
-        sizes.add((c as HTMLElement).style.fontSize);
-      }
-      sizes.add((rowEl.querySelector('span[style*="ellipsis"]') as HTMLElement).style.fontSize);
-    }
-    expect([...sizes].sort()).toEqual(['12px', '8px']);
+    const podium = podiumRows(chip);
+    const leaderName = [...podium[0].querySelectorAll('span')].find((el) => el.textContent === 'Alpha') as HTMLElement;
+    const chaserName = [...podium[1].querySelectorAll('span')].find((el) => el.textContent === 'Notascratchgolfer') as HTMLElement;
+    expect(leaderName.style.fontSize).toBe('12px');
+    expect(chaserName.style.fontSize).toBe('11px');
+    expect(chaserName.style.textOverflow).toBe('ellipsis');
   });
 });
