@@ -23,6 +23,7 @@ import {
   INK_FAINT,
   INK_MUTE,
   SLATE_50,
+  TOPAR_UNDER_DARK,
 } from '@/features/tourhub/_shared/tokens';
 import { collegeHubRoute } from '@/features/tourhub/routes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -153,7 +154,7 @@ export function CollegeProfilePage() {
                 justifyContent: 'center',
               }}
             >
-              <AlertCircle size={20} color="#DC2626" />
+              <AlertCircle size={20} color={TOPAR_UNDER_DARK} />
             </div>
             <div style={{ fontSize: 14, fontWeight: 700, color: INK, marginBottom: 4 }}>
               Couldn't load school data
