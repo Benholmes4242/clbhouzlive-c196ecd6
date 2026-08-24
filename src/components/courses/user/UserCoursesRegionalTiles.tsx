@@ -153,7 +153,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                         className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors rounded-sq-xs ${
                           activeFilter === tile.key 
                             ? 'bg-primary text-white shadow-md' 
-                            : 'bg-muted border border-border text-foreground hover:bg-muted/80'
+                            : 'bg-muted border border-border/10 text-foreground hover:bg-muted/80'
                         }`}
                       >
                         {tile.flag === 'earth' ? (
@@ -185,7 +185,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                         className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-4 py-2 transition-colors rounded-sq-xs ${
                           activeFilter === tile.key 
                             ? 'bg-primary text-white shadow-md' 
-                            : 'bg-muted border border-border text-foreground hover:bg-muted/80'
+                            : 'bg-muted border border-border/10 text-foreground hover:bg-muted/80'
                         }`}
                       >
                         {tile.flag === 'earth' ? (
@@ -212,7 +212,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         <div className="flex justify-center gap-3">
           <button
             onClick={() => setIsSortViewModalOpen(true)}
-            className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors rounded-sq-xs bg-muted border border-border text-foreground hover:bg-muted/80"
+            className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors rounded-sq-xs bg-muted border border-border/10 text-foreground hover:bg-muted/80"
           >
             <div className="flex items-center gap-2">
               {t('userCourses.regionalSortView')}
@@ -224,7 +224,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
           {isOwnProfile && onAddCoursesClick && (
             <button
               onClick={onAddCoursesClick}
-              className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors rounded-sq-xs bg-muted border border-border text-foreground hover:bg-muted/80"
+              className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors rounded-sq-xs bg-muted border border-border/10 text-foreground hover:bg-muted/80"
             >
               <div className="flex items-center gap-2">
                 <span aria-hidden="true">{t('userCourses.regionalAddCoursesEmoji', { defaultValue: '📍' })}</span>

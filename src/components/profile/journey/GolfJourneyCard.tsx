@@ -32,7 +32,7 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.26, delay: 0.05 }}
       className={cn(
-        'rounded-2xl border border-border/40 bg-card/60 backdrop-blur-sm p-5',
+        'rounded-2xl border border-border/[0.04] bg-card/60 backdrop-blur-sm p-5',
         'shadow-sm',
         className
       )}
@@ -64,7 +64,7 @@ const GolfJourneyCard: React.FC<GolfJourneyCardProps> = ({
                 className={cn(
                   'px-3 py-1.5 text-sm rounded-full',
                   'bg-muted/50 text-foreground/90',
-                  'border border-border/30'
+                  'border border-border/[0.03]'
                 )}
               >
                 {country}

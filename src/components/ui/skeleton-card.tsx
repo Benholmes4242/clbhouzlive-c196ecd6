@@ -39,7 +39,7 @@ export function SkeletonCard({
 
       {/* Footer */}
       {showFooter && (
-        <div className="flex gap-2 pt-2 border-t border-border">
+        <div className="flex gap-2 pt-2 border-t border-border/10">
           <SkeletonText lines={1} variant="meta" className="flex-1" />
         </div>
       )}

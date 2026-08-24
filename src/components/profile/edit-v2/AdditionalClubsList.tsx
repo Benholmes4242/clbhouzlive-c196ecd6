@@ -45,7 +45,7 @@ export function AdditionalClubsList({
           {clubs.map((club) => (
             <div
               key={club.id}
-              className="flex items-center justify-between bg-[rgba(255,255,255,0.06)] border border-border/60 rounded-[11px] px-3.5 py-3"
+              className="flex items-center justify-between bg-[rgba(255,255,255,0.06)] border border-border/[0.06] rounded-[11px] px-3.5 py-3"
             >
               <p className="text-[15px] text-foreground">{club.name}</p>
               <button
@@ -82,10 +82,10 @@ export function AdditionalClubsList({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for a club"
-            className="w-full bg-[rgba(255,255,255,0.06)] border border-border/60 rounded-[11px] pl-9 pr-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors"
+            className="w-full bg-[rgba(255,255,255,0.06)] border border-border/[0.06] rounded-[11px] pl-9 pr-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors"
           />
           {query.length >= 2 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-20 max-h-48 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border/10 rounded-xl shadow-lg z-20 max-h-48 overflow-y-auto">
               {isSearching ? (
                 <div className="px-4 py-3 text-[14px] text-muted-foreground">Searching…</div>
               ) : results.length === 0 ? (

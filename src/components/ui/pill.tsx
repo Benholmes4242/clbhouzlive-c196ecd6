@@ -14,9 +14,9 @@ const pillVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-surface-alt border-border text-secondary hover:bg-surface-alt/80 hover:border-border",
+        default: "bg-surface-alt border-border/10 text-secondary hover:bg-surface-alt/80 hover:border-border/10",
         active: "bg-surface-slate border-transparent text-white hover:opacity-90",
-        outline: "bg-transparent border-border text-primary hover:bg-surface-alt",
+        outline: "bg-transparent border-border/10 text-primary hover:bg-surface-alt",
       },
       size: {
         default: "px-3 py-1.5 text-body-sm",

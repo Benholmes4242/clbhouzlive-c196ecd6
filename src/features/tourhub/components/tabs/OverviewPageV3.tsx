@@ -41,7 +41,7 @@ export function OverviewPageV3() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-2 py-2 px-4 bg-muted/95 backdrop-blur-sm border-b border-border"
+            className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-2 py-2 px-4 bg-muted/95 backdrop-blur-sm border-b border-border/10"
             style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
           >
             <WifiOff className="w-3.5 h-3.5 text-muted-foreground" />

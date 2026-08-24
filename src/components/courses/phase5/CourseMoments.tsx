@@ -85,10 +85,10 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
   if (isLoading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div style={{ height: 14, width: 140, background: 'rgba(15,23,42,0.06)', borderRadius: 4 }} />
+        <div style={{ height: 14, width: 140, background: 'rgba(255,255,255,0.06)', borderRadius: 4 }} />
         <div style={{ display: 'flex', gap: 8 }}>
-          <div style={{ height: 80, width: 80, borderRadius: 10, background: 'rgba(15,23,42,0.06)' }} />
-          <div style={{ height: 80, width: 80, borderRadius: 10, background: 'rgba(15,23,42,0.06)' }} />
+          <div style={{ height: 80, width: 80, borderRadius: 10, background: 'rgba(255,255,255,0.06)' }} />
+          <div style={{ height: 80, width: 80, borderRadius: 10, background: 'rgba(255,255,255,0.06)' }} />
         </div>
       </div>
     );

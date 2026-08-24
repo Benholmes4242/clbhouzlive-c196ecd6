@@ -52,20 +52,20 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
         className={cn(
           "w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98]",
           isWantToPlay
-            ? "bg-white border-2 border-amber-300 shadow-sm"
-            : "bg-white border border-amber-200 hover:border-amber-300"
+            ? "bg-white/[0.06] border-2 border-[rgba(247,147,30,0.45)] shadow-sm"
+            : "bg-white/[0.04] border border-[rgba(255,255,255,0.10)] hover:border-[rgba(247,147,30,0.35)]"
         )}
       >
         <div className="flex items-center gap-3">
           <Bookmark 
             className={cn(
               "h-5 w-5",
-              isWantToPlay ? "fill-amber-500 text-amber-500" : "text-gray-400"
+              isWantToPlay ? "fill-amber-500 text-amber-500" : "text-[rgba(255,255,255,0.62)]"
             )} 
           />
           <span className={cn(
             "font-medium",
-            isWantToPlay ? "text-amber-700" : "text-gray-700"
+            isWantToPlay ? "text-[#F7931E]" : "text-[rgba(255,255,255,0.96)]"
           )}>
             {t('phase5.planning.addBucketList')}
           </span>
@@ -78,7 +78,7 @@ export const PlanningSignals: React.FC<PlanningSignalsProps> = ({
       </button>
 
       {/* Subtle helper text */}
-      <p className="text-xs text-gray-500 mt-3 text-center">
+      <p className="text-xs text-[rgba(255,255,255,0.62)] mt-3 text-center">
         {t('phase5.planning.privateNote')}
       </p>
     </div>

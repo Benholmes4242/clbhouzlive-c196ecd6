@@ -70,7 +70,7 @@ export function HomeClubCard({
         </div>
 
         <div
-          className="w-full flex items-center justify-between bg-[rgba(255,255,255,0.06)] border border-border/60 rounded-[11px] px-3.5 py-3 min-h-[48px]"
+          className="w-full flex items-center justify-between bg-[rgba(255,255,255,0.06)] border border-border/[0.06] rounded-[11px] px-3.5 py-3 min-h-[48px]"
           style={{ borderColor: 'rgba(255,255,255,0.12)' }}
         >
           <div className="flex items-center gap-2.5 min-w-0">
@@ -115,7 +115,7 @@ export function HomeClubCard({
               setTimeout(() => setIsOpen(false), 150);
             }}
             placeholder="Search for your home club"
-            className="w-full bg-[rgba(255,255,255,0.06)] border border-border/60 rounded-[11px] pl-9 pr-10 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors"
+            className="w-full bg-[rgba(255,255,255,0.06)] border border-border/[0.06] rounded-[11px] pl-9 pr-10 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors"
           />
           {query && (
             <button
@@ -128,7 +128,7 @@ export function HomeClubCard({
         </div>
 
         {isOpen && query.length >= 2 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-20 max-h-52 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border/10 rounded-xl shadow-lg z-20 max-h-52 overflow-y-auto">
             {isSearching ? (
               <div className="px-4 py-3 text-[14px] text-muted-foreground">Searching…</div>
             ) : clubs.length === 0 ? (

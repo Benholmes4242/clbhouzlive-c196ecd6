@@ -17,7 +17,7 @@ export function SectionErrorState({ sectionName, onRetry, isOffline }: SectionEr
   const { t } = useTranslation(['common', 'tourhub']);
 
   return (
-    <div className="mx-4 rounded-2xl bg-card border border-border/50 p-6 text-center">
+    <div className="mx-4 rounded-2xl bg-card border border-border/[0.05] p-6 text-center">
       <Icon className="w-5 h-5 mx-auto mb-2 text-muted-foreground/50" />
       <p className="text-sm text-muted-foreground">
         {t('common:errors.sectionLoadFailed', { section: sectionName })}

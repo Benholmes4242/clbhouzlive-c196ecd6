@@ -45,7 +45,7 @@ export function HubSkeleton() {
         <SkeletonBlock className="h-[165px] w-full" />
 
         {/* Messages card skeleton */}
-        <div className="rounded-[22px] p-4 bg-muted/30 border border-border/50">
+        <div className="rounded-[22px] p-4 bg-muted/30 border border-border/[0.05]">
           <div className="flex items-center gap-3">
             <SkeletonCircle size="h-10 w-10" />
             <div className="flex-1 space-y-2">
@@ -62,7 +62,7 @@ export function HubSkeleton() {
         </div>
 
         {/* Your Games card skeleton */}
-        <div className="rounded-[22px] p-4 bg-muted/30 border border-border/50">
+        <div className="rounded-[22px] p-4 bg-muted/30 border border-border/[0.05]">
           <div className="flex items-center gap-4">
             <SkeletonCircle size="h-10 w-10" />
             <div className="flex-1 space-y-2">

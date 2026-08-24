@@ -25,7 +25,7 @@
  * point and can be removed once that mount is retired.
  */
 import React from 'react';
-import { INK, SC_FILL_GOLD, SC_FILL_BIRDIE } from './_constants';
+import { INK, SC_FILL_GOLD, SC_BIRDIE_DARK } from './_constants';
 
 export type HoleGlyphKind =
   /** Kept for the callers that cannot yet tell an eagle from an ace: RED ring. */
@@ -53,13 +53,13 @@ export const HoleGlyph: React.FC<{ kind: HoleGlyphKind; size?: number }> = ({
   const goldRing = kind === 'ace-or-albatross';
 
   const fill = under
-    ? SC_FILL_BIRDIE
+    ? SC_BIRDIE_DARK
     : kind === 'double-plus'
       ? DOUBLE_GROUND
       : kind === 'bogey'
         ? BOGEY_GROUND
         : 'none';
-  const ringTone = goldRing ? SC_FILL_GOLD : under ? SC_FILL_BIRDIE : INK;
+  const ringTone = goldRing ? SC_FILL_GOLD : under ? SC_BIRDIE_DARK : INK;
 
   const RING_GAP = 1.4;
   const discInset = ring ? STRIP_STROKE + RING_GAP : 0;

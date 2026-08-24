@@ -463,7 +463,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           >
             <div className="h-full overflow-hidden flex flex-col relative">
               {/* Header with title and close button */}
-              <div className="sticky top-0 z-10 bg-background border-b border-border md:rounded-none">
+              <div className="sticky top-0 z-10 bg-background border-b border-border/10 md:rounded-none">
                 <div className="flex items-center justify-between px-4 sm:px-6 py-4">
                   <h2 style={TITLE}>
                     {regionName}
@@ -524,7 +524,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
             </DropdownMenuTrigger>
             <DropdownMenuContent 
               align="end" 
-              className="w-48 bg-background border border-border shadow-lg z-[1100]"
+              className="w-48 bg-background border border-border/10 shadow-lg z-[1100]"
               sideOffset={4}
             >
               <DropdownMenuItem 
@@ -593,7 +593,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
             </DropdownMenuTrigger>
             <DropdownMenuContent 
               align="end" 
-              className="w-48 bg-background border border-border shadow-lg z-[1100]"
+              className="w-48 bg-background border border-border/10 shadow-lg z-[1100]"
               sideOffset={4}
             >
               <DropdownMenuItem 
@@ -672,7 +672,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                     }}
                     showAddButton={false}
                   >
-                    <div className="flex items-center gap-4 p-3 border border-border rounded-none hover:bg-muted/50 transition-colors cursor-pointer relative">
+                    <div className="flex items-center gap-4 p-3 border border-border/10 rounded-none hover:bg-muted/50 transition-colors cursor-pointer relative">
                     {/* Lock overlay for unplayed courses */}
                     {!course.userPlayed && (
                       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/40 to-muted/60 rounded-none z-10 backdrop-blur-[1px]">

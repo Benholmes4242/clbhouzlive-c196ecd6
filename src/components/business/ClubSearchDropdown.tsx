@@ -84,7 +84,7 @@ export const ClubSearchDropdown: React.FC<ClubSearchDropdownProps> = ({
   if (disabled) {
     return (
       <div className={cn(
-        "flex items-center gap-2 px-3 py-2.5 border border-border rounded-sq-sm bg-muted/50 opacity-60",
+        "flex items-center gap-2 px-3 py-2.5 border border-border/10 rounded-sq-sm bg-muted/50 opacity-60",
         className
       )}>
         <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -98,7 +98,7 @@ export const ClubSearchDropdown: React.FC<ClubSearchDropdownProps> = ({
       {value ? (
         <div className={cn(
           "flex items-center gap-2 px-3 py-2.5 border rounded-sq-sm bg-muted/30",
-          error ? "border-destructive" : "border-border"
+          error ? "border-destructive" : "border-border/10"
         )}>
           {(() => {
             const flagCode = value.country ? getFlagCode(value.country) : null;
@@ -150,7 +150,7 @@ export const ClubSearchDropdown: React.FC<ClubSearchDropdownProps> = ({
 
           {/* Dropdown */}
           {isOpen && searchQuery.length >= 2 && (
-            <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded-sq-sm shadow-lg max-h-64 overflow-y-auto">
+            <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border/10 rounded-sq-sm shadow-lg max-h-64 overflow-y-auto">
               {loading ? (
                 <div className="p-4 text-center text-sm text-muted-foreground">
                   Searching...

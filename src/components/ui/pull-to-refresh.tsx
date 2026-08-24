@@ -27,7 +27,7 @@ export function PullToRefreshIndicator({
     >
       <div 
         className={cn(
-          'flex items-center justify-center w-10 h-10 rounded-full bg-background shadow-md border border-border',
+          'flex items-center justify-center w-10 h-10 rounded-full bg-background shadow-md border border-border/10',
           isRefreshing && 'animate-spin'
         )}
         style={{

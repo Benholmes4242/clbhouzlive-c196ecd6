@@ -17,15 +17,15 @@ interface RequestCourseCTAProps {
   onBeforeOpen?: () => void;
 }
 
-const INK = '#0F172A';
-const INK_SOFT = '#475569';
+const INK = '#F8FAFC';
+const INK_SOFT = 'rgba(255,255,255,0.66)';
 const AMBER = '#F7931E';
 
 // Hero palette (amber ramp)
-const HERO_BAND_BG = '#FAEEDA';
-const HERO_HEADLINE = '#633806';
-const HERO_SUBTEXT = '#854F0B';
-const HERO_ACCENT = '#BA7517';
+const HERO_BAND_BG = 'rgba(247,147,30,0.12)';
+const HERO_HEADLINE = '#F8FAFC';
+const HERO_SUBTEXT = 'rgba(255,255,255,0.66)';
+const HERO_ACCENT = '#F7931E';
 
 function truncate(s: string, max = 24) {
   const t = s.trim();

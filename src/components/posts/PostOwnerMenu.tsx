@@ -182,7 +182,7 @@ export const PostOwnerMenu: React.FC<PostOwnerMenuProps> = ({
           <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="w-44 bg-background/95 backdrop-blur-sm border border-border shadow-xl z-[100]"
+            className="w-44 bg-background/95 backdrop-blur-sm border border-border/10 shadow-xl z-[100]"
             sideOffset={5}
           >
             {isReviewDerived ? (

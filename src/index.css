@@ -1325,7 +1325,7 @@ html, body, #root {
 
 .app-shell a:focus-visible,
 .app-shell button:focus-visible {
-  outline: 2px solid hsl(var(--border));
+  outline: 2px solid hsl(var(--border) / 0.10);
   outline-offset: 2px;
   border-radius: 8px;
 }
@@ -2461,8 +2461,15 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --card: 227 18% 13%;                 /* #1B1E27 */
     --card-foreground: 210 40% 98%;      /* #F8FAFC */
     
-    /* Borders */
-    --border: 0 0% 100% / 0.10;
+    /* Borders
+     * BARE HSL TRIPLE, NO ALPHA. tailwind.config.ts injects `<alpha-value>`
+     * into hsl(var(--border) / <alpha-value>), so a token carrying its own
+     * slash-alpha composed to hsl(0 0% 100% / 0.10 / 1) — invalid, dropped by
+     * the browser, and border-color then fell back to currentColor (near-white
+     * ink on this canvas). The transparency now lives at the consumption site:
+     * border-border/10. --border-subtle below is the other valid convention:
+     * a complete colour consumed through var(), never through hsl(). */
+    --border: 0 0% 100%;
     --border-subtle: rgba(255, 255, 255, 0.10);
     
     /* Shadows for light mode */
@@ -2505,7 +2512,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --input: 0 0% 100% / 0.10;
+    --input: 0 0% 100%;            /* bare triple — see --border above */
     --input-focus: 31 93% 54%;           /* #F7931E - orange accent for focus */
     --ring: 31 93% 54%;                  /* #F7931E - orange accent */
     --radius: 0.75rem;
@@ -2616,8 +2623,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 100% / 0.10;
-    --input: 0 0% 100% / 0.10;
+    --border: 0 0% 100%;           /* bare triple — see :root */
+    --input: 0 0% 100%;            /* bare triple — see --border above */
     --ring: 31 93% 54%;
   }
 
@@ -2852,8 +2859,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 100% / 0.10;
-    --input: 0 0% 100% / 0.10;
+    --border: 0 0% 100%;           /* bare triple — see :root */
+    --input: 0 0% 100%;            /* bare triple — see --border above */
     --ring: 31 93% 54%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -2875,7 +2882,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border/10;
     /* Disable text selection */
     -webkit-user-select: none;
     -moz-user-select: none;

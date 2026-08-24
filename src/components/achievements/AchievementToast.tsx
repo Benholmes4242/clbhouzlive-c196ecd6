@@ -57,7 +57,7 @@ export const AchievementToast: React.FC<AchievementToastProps> = ({
         className={`
           pointer-events-auto
           bg-card/95 backdrop-blur-lg 
-          border border-border/50 
+          border border-border/[0.05] 
           rounded-2xl 
           shadow-2xl shadow-primary/10
           p-4

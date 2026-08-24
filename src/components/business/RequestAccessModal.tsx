@@ -177,7 +177,7 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
                 onValueChange={(v) => setRequestedRole(v as 'team_member' | 'manager')}
                 className="space-y-2"
               >
-                <div className="flex items-start gap-3 p-3 border border-border rounded-sq-sm hover:bg-muted/30 transition-colors">
+                <div className="flex items-start gap-3 p-3 border border-border/10 rounded-sq-sm hover:bg-muted/30 transition-colors">
                   <RadioGroupItem value="team_member" id="role-team" className="mt-0.5" />
                   <div className="flex-1">
                     <label htmlFor="role-team" className="text-sm font-medium cursor-pointer">
@@ -188,7 +188,7 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-3 border border-border rounded-sq-sm hover:bg-muted/30 transition-colors">
+                <div className="flex items-start gap-3 p-3 border border-border/10 rounded-sq-sm hover:bg-muted/30 transition-colors">
                   <RadioGroupItem value="manager" id="role-manager" className="mt-0.5" />
                   <div className="flex-1">
                     <label htmlFor="role-manager" className="text-sm font-medium cursor-pointer">

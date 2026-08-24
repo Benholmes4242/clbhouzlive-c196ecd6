@@ -246,7 +246,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
               return (
                 <div 
                   key={request.id} 
-                  className="p-3 rounded-sq-sm bg-card border border-border/50 space-y-2"
+                  className="p-3 rounded-sq-sm bg-card border border-border/[0.05] space-y-2"
                 >
                   {/* Top row: Avatar + Name + Role */}
                   <div className="flex items-start gap-3">

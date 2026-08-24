@@ -31,7 +31,7 @@ import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
  * Canonical to-par RED, reused (not redeclared) from the tour tokens so one
  * red serves every golf surface. See BRIEF_UNDER_PAR_RED.
  */
-export const TOPAR_RED = TOPAR_UNDER_LIGHT;
+export const TOPAR_RED = TOPAR_UNDER_DARK;
 
 export const A = {
   CANVAS: '#15171F',

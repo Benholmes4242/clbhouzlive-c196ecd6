@@ -117,8 +117,8 @@ export function ReportSheet({
                 className={cn(
                   "w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all text-left active:scale-[0.97]",
                   selectedReason === reason.id
-                    ? "border-border/20 hover:border-border/40"
-                    : "border-border/20 hover:border-border/40"
+                    ? "border-border/[0.02] hover:border-border/[0.04]"
+                    : "border-border/[0.02] hover:border-border/[0.04]"
                 )}
                 style={selectedReason === reason.id ? { borderColor: '#F7931E', background: 'rgba(247,147,30,0.05)' } : undefined}
               >

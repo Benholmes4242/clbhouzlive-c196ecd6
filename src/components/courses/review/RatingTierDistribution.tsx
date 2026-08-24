@@ -46,7 +46,7 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
       {distributionItems.map((item) => {
         const percentage = (item.count / maxCount) * 100;
         const hasCount = item.count > 0;
-        const bandFill = reviewTierColor(item.key as RatingTier, 'light');
+        const bandFill = reviewTierColor(item.key as RatingTier, 'dark');
 
         return (
           <div key={item.key} className="flex items-center gap-2">
@@ -54,19 +54,19 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
               {item.label}
             </span>
 
-            <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: 'rgba(15,23,42,0.05)' }}>
+            <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
               <div
                 className="h-full rounded-full transition-all duration-300"
                 style={{
                   width: `${percentage}%`,
-                  background: hasCount ? bandFill : '#f3f4f6',
+                  background: hasCount ? bandFill : 'rgba(255,255,255,0.10)',
 
                 }}
               />
             </div>
 
 
-            <span className="w-6 text-right text-xs text-muted-foreground/60 tabular-nums shrink-0">
+            <span className="w-6 text-right text-xs text-muted-foreground tabular-nums shrink-0">
               {item.count}
             </span>
           </div>

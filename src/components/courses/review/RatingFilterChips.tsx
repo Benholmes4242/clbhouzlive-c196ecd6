@@ -85,7 +85,7 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
             style={{
               fontSize: 16,
               fontWeight: 700,
-              color: '#0F172A',
+              color: 'rgba(255,255,255,0.96)',
               textAlign: 'left',
               margin: 0,
             }}
@@ -113,11 +113,11 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
                   justifyContent: 'space-between',
                   background: isActive ? 'rgba(247,147,30,0.06)' : 'transparent',
                   border: 'none',
-                  borderTop: '0.5px solid rgba(15,23,42,0.07)',
+                  borderTop: '0.5px solid rgba(255,255,255,0.10)',
                   cursor: 'pointer',
                   fontSize: 15,
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? '#F7931E' : '#0F172A',
+                  color: isActive ? '#F7931E' : 'rgba(255,255,255,0.96)',
                   textAlign: 'left',
                 }}
               >

@@ -58,7 +58,7 @@ const CountryFlag: React.FC<CountryFlagProps> = ({
         role="img"
         aria-label={String(country)}
         title={String(country)}
-        className={`inline-flex items-center justify-center shrink-0 rounded-sm border border-border bg-muted text-muted-foreground ${sizeClasses[size]} ${className}`}
+        className={`inline-flex items-center justify-center shrink-0 rounded-sm border border-border/10 bg-muted text-muted-foreground ${sizeClasses[size]} ${className}`}
         style={{
           fontSize: chipTextPx[size],
           fontWeight: 700,

@@ -10,6 +10,7 @@ import { getFlagCode } from '@/utils/countryFlags';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { FIGS, TITLE } from '@/lib/tokens/type';
+import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 
 interface Course {
   id: string;
@@ -185,35 +186,35 @@ export function CourseSearchSheet({
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
             className={cn(
-              "fixed z-[10011] overflow-hidden flex flex-col light",
+              "fixed z-[10011] overflow-hidden flex flex-col",
               isMobile 
                 ? 'inset-x-0 bottom-0 rounded-t-[20px]' 
                 : 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl rounded-2xl',
-              "shadow-[0_-4px_32px_rgba(0,0,0,0.1)]"
+              "shadow-[0_-4px_32px_rgba(0,0,0,0.55)]"
             )}
             style={{
               maxHeight: 'min(85dvh, calc(100dvh - max(env(safe-area-inset-top, 47px), 47px) - 20px))',
               paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : 0,
-              backgroundColor: '#FFFFFF',
+              backgroundColor: '#1B1E27',
             }}
           >
             {/* Handle bar */}
             {isMobile && (
               <div className="flex justify-center pt-2.5 pb-1">
-                <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
+                <div className="w-9 h-1 rounded-full bg-white/[0.18]" />
               </div>
             )}
 
             {/* Header */}
             <div className="px-5 pb-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 style={{ ...TITLE, color: '#1A1A1A' }}>
+                <h3 style={{ ...TITLE, color: 'rgba(255,255,255,0.96)' }}>
                   {t('searchSheet.title')}
                 </h3>
                 <button
                   onClick={onClose}
                   className="w-11 h-11 rounded-full flex items-center justify-center transition-colors active:opacity-60"
-                  style={{ backgroundColor: '#F5F5F7', color: '#7A7A7A' }}
+                  style={{ backgroundColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.62)' }}
                   aria-label={t('searchSheet.closeA11y')}
                 >
                   <X className="w-4.5 h-4.5" />
@@ -224,7 +225,7 @@ export function CourseSearchSheet({
               <div className="relative">
                 <Search
                   className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200"
-                  style={{ color: isFocused ? '#f59e0b' : '#AEAEB2' }}
+                  style={{ color: isFocused ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.38)' }}
                 />
                 <input
                   ref={inputRef}
@@ -235,13 +236,13 @@ export function CourseSearchSheet({
                   onKeyDown={handleKeyDown}
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
-                  className="w-full h-11 pl-10 pr-10 rounded-xl text-sm transition-all duration-200 focus:outline-none"
+                  className="w-full h-11 pl-10 pr-10 rounded-sq-sm text-sm transition-all duration-200 focus:outline-none"
                   style={{
-                    backgroundColor: '#F5F5F7',
-                    color: '#1A1A1A',
-                    caretColor: '#f59e0b',
-                    border: isFocused ? '1.5px solid #f59e0b' : '1.5px solid rgba(0,0,0,0.07)',
-                    boxShadow: isFocused ? '0 0 0 3px rgba(245,158,11,0.10)' : 'none',
+                    backgroundColor: isFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
+                    color: 'rgba(255,255,255,0.96)',
+                    caretColor: '#F7931E',
+                    border: isFocused ? '1px solid rgba(255,255,255,0.28)' : '1px solid rgba(255,255,255,0.10)',
+                    transition: 'background 140ms ease, border-color 140ms ease',
                   }}
                   autoComplete="off"
                   autoCapitalize="off"
@@ -251,7 +252,7 @@ export function CourseSearchSheet({
                   <button
                     onClick={() => setQuery('')}
                     className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center transition-colors"
-                    style={{ color: '#AEAEB2' }}
+                    style={{ color: 'rgba(255,255,255,0.38)' }}
                     aria-label={t('searchSheet.clearSearchA11y')}
                   >
                     <X className="w-3.5 h-3.5" />
@@ -270,11 +271,11 @@ export function CourseSearchSheet({
                   <SkeletonList rows={6} />
                 ) : error ? (
                   <div className="p-8 text-center">
-                    <p className="text-sm mb-3" style={{ color: '#7A7A7A' }}>{t('searchSheet.trouble')}</p>
+                    <p className="text-sm mb-3" style={{ color: 'rgba(255,255,255,0.62)' }}>{t('searchSheet.trouble')}</p>
                     <button
                       onClick={() => refetch()}
                       className="text-sm font-medium hover:underline"
-                      style={{ color: '#f59e0b' }}
+                      style={{ color: '#F7931E' }}
                     >
                       {t('searchSheet.retry', { defaultValue: 'Retry' })}
                     </button>
@@ -285,7 +286,7 @@ export function CourseSearchSheet({
                     {!isSearchMode && (
                       <p
                         className="uppercase tracking-[1.5px] mb-2 mt-1 px-1"
-                        style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2' }}
+                        style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.38)' }}
                       >
                         {t('searchSheet.yourCourses')}
                       </p>
@@ -310,14 +311,14 @@ export function CourseSearchSheet({
                   <div className="py-12 text-center">
                     <div
                       className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center"
-                      style={{ backgroundColor: 'rgba(245,158,11,0.10)' }}
+                      style={{ backgroundColor: 'rgba(247,147,30,0.14)' }}
                     >
-                      <MapPin className="w-5 h-5" style={{ color: '#f59e0b' }} />
+                      <MapPin className="w-5 h-5" style={{ color: '#F7931E' }} />
                     </div>
-                    <p style={{ fontSize: '16px', fontWeight: 600, color: '#1A1A1A' }}>
+                    <p style={{ fontSize: '16px', fontWeight: 600, color: 'rgba(255,255,255,0.96)' }}>
                       {query ? "No courses found" : "Search for a course"}
                     </p>
-                    <p style={{ fontSize: '13px', fontWeight: 400, color: '#AEAEB2', marginTop: '4px' }}>
+                    <p style={{ fontSize: '13px', fontWeight: 400, color: 'rgba(255,255,255,0.38)', marginTop: '4px' }}>
                       {query ? "Try a different search term" : "Start typing to find courses"}
                     </p>
                     {query ? (
@@ -333,7 +334,7 @@ export function CourseSearchSheet({
               {items && items.length > 4 && (
                 <div
                   className="absolute bottom-0 left-0 right-0 h-6 pointer-events-none"
-                  style={{ background: 'linear-gradient(to top, #FFFFFF, transparent)' }}
+                  style={{ background: 'linear-gradient(to top, #1B1E27, transparent)' }}
                 />
               )}
             </div>
@@ -382,9 +383,9 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
       )}
       style={{
         backgroundColor: isSelecting
-          ? 'rgba(245,158,11,0.10)'
+          ? 'rgba(247,147,30,0.14)'
           : isFocused
-            ? 'rgba(245,158,11,0.06)'
+            ? 'rgba(247,147,30,0.08)'
             : 'transparent',
       }}
       onClick={isAlreadyAdded ? undefined : onClick}
@@ -399,7 +400,7 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
             className="w-12 h-12 object-cover flex-shrink-0"
             style={{
               borderRadius: '10px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              
             }}
             onError={() => setImgError(true)}
           />
@@ -408,18 +409,18 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
             className="w-12 h-12 flex items-center justify-center flex-shrink-0"
             style={{
               borderRadius: '10px',
-              backgroundColor: 'rgba(245,158,11,0.08)',
+              backgroundColor: 'rgba(247,147,30,0.12)',
             }}
           >
-            <MapPin className="w-5 h-5" style={{ color: '#f59e0b' }} />
+            <MapPin className="w-5 h-5" style={{ color: '#F7931E' }} />
           </div>
         )}
         
         <div className="flex-1 min-w-0">
-          <div className="truncate" style={{ fontSize: '15px', fontWeight: 600, color: '#1A1A1A' }}>
+          <div className="truncate" style={{ fontSize: '15px', fontWeight: 600, color: 'rgba(255,255,255,0.96)' }}>
             {course.name}
           </div>
-          <div className="flex items-center gap-1.5 mt-0.5" style={{ fontSize: '13px', color: '#7A7A7A' }}>
+          <div className="flex items-center gap-1.5 mt-0.5" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.62)' }}>
             {(() => {
               const flagCode = getFlagCode(course.country);
               return flagCode ? (
@@ -434,8 +435,8 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
             {course.rating != null && (
               <span>
                 {t('searchSheet.ratingBullet', { defaultValue: '• ' })}
-                <span style={{ color: course.rating >= 9.0 ? '#d97706' : '#78716C', fontWeight: 600, ...FIGS }}>{course.rating.toFixed(1)}</span>
-                <span style={{ color: '#AEAEB2', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>{t('searchSheet.outOfTen')}</span>
+                <span style={{ color: bandColorOnDark(course.rating), fontWeight: 600, ...FIGS }}>{course.rating.toFixed(1)}</span>
+                <span style={{ color: 'rgba(255,255,255,0.38)', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>{t('searchSheet.outOfTen')}</span>
               </span>
             )}
           </div>
@@ -445,14 +446,14 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
           <div
             className="flex items-center gap-1 px-2 py-0.5"
             style={{
-              backgroundColor: 'rgba(245,158,11,0.10)',
-              color: '#d97706',
+              backgroundColor: 'rgba(247,147,30,0.14)',
+              color: '#F7931E',
               fontSize: '11px',
               fontWeight: 600,
               borderRadius: '980px',
             }}
           >
-            <Check className="w-3 h-3" style={{ color: '#f59e0b' }} />
+            <Check className="w-3 h-3" style={{ color: '#F7931E' }} />
             {t('searchSheet.added')}
           </div>
         )}
@@ -460,7 +461,7 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
 
       {/* Inset divider */}
       {!isLast && (
-        <div className="ml-[60px] mt-3" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.07)' }} />
+        <div className="ml-[60px] mt-3" style={{ borderBottom: '0.5px solid rgba(255,255,255,0.10)' }} />
       )}
     </motion.div>
   );

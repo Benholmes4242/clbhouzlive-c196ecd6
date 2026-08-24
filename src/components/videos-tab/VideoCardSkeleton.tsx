@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function VideoCardSkeleton() {
   return (
-    <div className="bg-card overflow-hidden border-b border-border/50">
+    <div className="bg-card overflow-hidden border-b border-border/[0.05]">
       {/* Thumbnail */}
       <Skeleton className="aspect-video w-full" />
       {/* Creator row — squircle avatar */}

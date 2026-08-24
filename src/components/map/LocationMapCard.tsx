@@ -33,7 +33,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
   if (!hasValidCoords) {
     if (showOwnerPrompt) {
       return (
-        <div className="p-4 rounded-sq-md bg-muted border border-border">
+        <div className="p-4 rounded-sq-md bg-muted border border-border/10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sq-sm bg-secondary flex items-center justify-center">
               <MapPin className="h-5 w-5 text-muted-foreground" />
@@ -54,8 +54,8 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
       <div
         key={`map-${lat}-${lng}`}
         style={{
-          background: '#FFFFFF',
-          border: '1px solid rgba(15,23,42,0.07)',
+          background: '#1B1E27',
+          border: '1px solid rgba(255,255,255,0.10)',
           borderRadius: 16,
           overflow: 'hidden',
         }}
@@ -86,9 +86,9 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
         </div>
         {/* Footer rail — analytical treatment: no tinted tiles or pills */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px' }}>
-          <MapPin size={14} strokeWidth={2} color="#68707B" style={{ flexShrink: 0 }} />
+          <MapPin size={14} strokeWidth={2} color="rgba(255,255,255,0.66)" style={{ flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1216', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#F8FAFC', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {locationText}
             </div>
           </div>
@@ -97,7 +97,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
             onClick={() => setExpanded(true)}
             style={{
               flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 5,
-              background: 'transparent', color: '#0E1216',
+              background: 'transparent', color: 'rgba(255,255,255,0.66)',
               border: 'none', padding: '8px 0', minHeight: 44,
               fontSize: 9, fontWeight: 700, letterSpacing: '0.13em',
               textTransform: 'uppercase', cursor: 'pointer',

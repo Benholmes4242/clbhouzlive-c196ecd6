@@ -30,8 +30,8 @@ export function ProfileTouchDebugPanel({ className }: { className?: string }) {
       )}
       data-debug-id="profile-debug-panel"
     >
-      <div className="rounded-sq-lg border border-border bg-background/95 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border">
+      <div className="rounded-sq-lg border border-border/10 bg-background/95 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border/10">
           <div className="min-w-0">
             <div className="text-xs font-semibold text-foreground">Profile Touch Debug</div>
             <div className="text-[11px] text-muted-foreground truncate max-w-[280px]">{locationStr}</div>
@@ -39,14 +39,14 @@ export function ProfileTouchDebugPanel({ className }: { className?: string }) {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="text-[11px] px-2 py-1 rounded-sq-md border border-border bg-background hover:bg-muted"
+              className="text-[11px] px-2 py-1 rounded-sq-md border border-border/10 bg-background hover:bg-muted"
               onClick={() => dbg.clear()}
             >
               Clear
             </button>
             <button
               type="button"
-              className="text-[11px] px-2 py-1 rounded-sq-md border border-border bg-background hover:bg-muted"
+              className="text-[11px] px-2 py-1 rounded-sq-md border border-border/10 bg-background hover:bg-muted"
               onClick={() => setOpen((v) => !v)}
             >
               {open ? 'Hide' : 'Show'}
@@ -57,25 +57,25 @@ export function ProfileTouchDebugPanel({ className }: { className?: string }) {
         {open && (
           <div className="p-3 w-[320px] max-w-[calc(100vw-24px)]">
             <div className="grid grid-cols-2 gap-2 mb-3">
-              <div className="rounded-sq-md border border-border p-2">
+              <div className="rounded-sq-md border border-border/10 p-2">
                 <div className="text-[11px] text-muted-foreground">Tabs row</div>
                 <div className="text-sm font-semibold text-foreground">
                   {(dbg.state.points['tabs_row.pointerdown'] ?? 0) + (dbg.state.points['tabs_row.click'] ?? 0)}
                 </div>
               </div>
-              <div className="rounded-sq-md border border-border p-2">
+              <div className="rounded-sq-md border border-border/10 p-2">
                 <div className="text-[11px] text-muted-foreground">Profile photo</div>
                 <div className="text-sm font-semibold text-foreground">
                   {(dbg.state.points['profile_photo.pointerdown'] ?? 0) + (dbg.state.points['profile_photo.click'] ?? 0)}
                 </div>
               </div>
-              <div className="rounded-sq-md border border-border p-2">
+              <div className="rounded-sq-md border border-border/10 p-2">
                 <div className="text-[11px] text-muted-foreground">Achievements CTA</div>
                 <div className="text-sm font-semibold text-foreground">
                   {(dbg.state.points['achievements.view_all.pointerdown'] ?? 0) + (dbg.state.points['achievements.view_all.click'] ?? 0)}
                 </div>
               </div>
-              <div className="rounded-sq-md border border-border p-2">
+              <div className="rounded-sq-md border border-border/10 p-2">
                 <div className="text-[11px] text-muted-foreground">Global events</div>
                 <div className="text-sm font-semibold text-foreground">
                   {dbg.state.recentGlobalEvents.length}
@@ -85,7 +85,7 @@ export function ProfileTouchDebugPanel({ className }: { className?: string }) {
 
             <div className="mb-2">
               <div className="text-xs font-semibold text-foreground mb-1">Latest global events (capture phase)</div>
-              <div className="max-h-[160px] overflow-auto rounded-sq-md border border-border">
+              <div className="max-h-[160px] overflow-auto rounded-sq-md border border-border/10">
                 {dbg.state.recentGlobalEvents.length === 0 ? (
                   <div className="p-2 text-[11px] text-muted-foreground">No events yet — try tapping anywhere.</div>
                 ) : (
@@ -112,7 +112,7 @@ export function ProfileTouchDebugPanel({ className }: { className?: string }) {
 
             <div>
               <div className="text-xs font-semibold text-foreground mb-1">Latest point logs</div>
-              <div className="max-h-[120px] overflow-auto rounded-sq-md border border-border">
+              <div className="max-h-[120px] overflow-auto rounded-sq-md border border-border/10">
                 {dbg.state.recentPoints.length === 0 ? (
                   <div className="p-2 text-[11px] text-muted-foreground">No point logs yet.</div>
                 ) : (

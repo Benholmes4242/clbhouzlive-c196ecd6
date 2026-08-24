@@ -43,7 +43,7 @@ const ReviewMediaThumb: React.FC<{
         height: dim,
         borderRadius: radius,
         overflow: 'hidden',
-        background: 'rgba(15,23,42,0.04)',
+        background: 'rgba(255,255,255,0.04)',
         border: 'none',
         padding: 0,
         cursor: 'pointer',
@@ -51,13 +51,13 @@ const ReviewMediaThumb: React.FC<{
     >
       {/* Shimmer placeholder */}
       {!isLoaded && !isBroken && (
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,0.06)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.06)' }} />
       )}
 
       {/* Broken image fallback */}
       {isBroken && (
         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Camera style={{ width: 18, height: 18, color: 'rgba(15,23,42,0.3)' }} />
+          <Camera style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.62)' }} />
         </div>
       )}
 

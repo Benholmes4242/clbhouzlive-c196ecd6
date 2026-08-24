@@ -49,8 +49,8 @@ export function AppSelect<T extends string = string>({
         <SelectTrigger
           aria-label={ariaLabel}
           className={cn(
-            'h-9 rounded-sq-sm border border-border bg-card px-3 text-sm text-[hsl(210,13%,18%)]',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border',
+            'h-9 rounded-sq-sm border border-border/10 bg-card px-3 text-sm text-[hsl(210,13%,18%)]',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border/10',
             '',
             icon && 'pl-2',
             triggerClassName
@@ -59,7 +59,7 @@ export function AppSelect<T extends string = string>({
           {icon && <span className="mr-1.5 text-muted-foreground">{icon}</span>}
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg">
+        <SelectContent className="bg-card border-border/10 z-50 rounded-sq-sm shadow-lg">
           {options.map((opt) => (
             <SelectItem
               key={opt.value}

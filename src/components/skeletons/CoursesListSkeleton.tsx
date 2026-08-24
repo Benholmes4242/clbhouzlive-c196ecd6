@@ -42,7 +42,7 @@ export const CoursesListSkeleton = () => {
             {/* Course cards skeleton */}
             <div className="space-y-3 max-w-2xl mx-auto">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="bg-surface-card rounded-2xl border border-border p-4">
+                <div key={i} className="bg-surface-card rounded-2xl border border-border/10 p-4">
                   <div className="flex items-center gap-3">
                     {/* Rank */}
                     <Skeleton className="w-10 h-10 rounded-lg" />
