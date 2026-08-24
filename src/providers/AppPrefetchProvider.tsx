@@ -288,28 +288,6 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
     videoPrefetchCount: 8,
   },
   {
-    // THE COMMUNITY DESTINATION. '/discover/community' was a dead path — that
-    // route has never existed, so this entry never fired
-    // (BRIEF_DISCOVER_ABSORBS_COMMUNITY, acceptance f). The live route is
-    // '/community', now reached only from Discover's act two see-alls.
-    path: '/community',
-    queryKey: ['community-feed-base'],
-    priority: 3,
-    queryFn: fetchCommunityFeedBase,
-    extractVideoUrls: (data) => {
-      if (!Array.isArray(data)) return [];
-      return data
-        .filter((post: any) => post.media?.[0]?.media_type === 'video' && post.media?.[0]?.media_url)
-        .map((post: any) => {
-          const streamId = uidFromNode({ src: post.media[0].media_url });
-          return streamId ? generateStreamHlsUrl(streamId) : null;
-        })
-        .filter(Boolean)
-        .slice(0, 8) as string[];
-    },
-    videoPrefetchCount: 8,
-  },
-  {
     // Videos tab within Discover - prefetch long-form videos
     path: '/discover/videos',
     queryKey: ['longform-videos-base'],
