@@ -24,6 +24,26 @@ import type { RegionSelection, WeekRegions } from './hooks/useWeekRegionCounts';
  *
  * Both are the existing chrome: the pills are the retired ScopePills' pill, the
  * dropdown is the Courses browse's shadcn Select. Nothing new is designed.
+ *
+ * CANON RECORDED (MICRO_BRIEF_REGION_WELL_TRUNCATES §0). Written down here
+ * because a canon that lives only in chat is how input.tsx stayed light through
+ * five migrations.
+ *
+ * §0.1 THE SCOPE PILLS ARE CANONICAL. PillFilterRow.tsx is the app's
+ * filter-pill treatment: A.PANEL fill, A.BORDER hairline, SCOPE_PILL_RADIUS
+ * (8), 8px 14px padding, 12.5/700 type; the selected pill INVERTS to an A.INK
+ * fill with an A.PANEL label. It has two consumers already (week scope, media
+ * type) and IS NOT TO BE FORKED — add an option, not a second pill.
+ *
+ * §0.2 THE REGION WELL IS THE CANONICAL FILTER-BAR CONTROL, as shipped by
+ * MICRO_BRIEF_DISCOVER_REGION_WELL: a filled well with a hairline, its radius
+ * matched to the pill directly beneath it, an applied state that brightens BOTH
+ * the fill and the label, and a chevron that stays quiet in either state.
+ *
+ * §0.3 SIZING. The well sizes to its CONTENT up to the space available; past
+ * that it TRUNCATES its place name with an ellipsis. It does not wrap, and the
+ * row it sits on does not wrap either. Wrapping was the previous escape hatch
+ * and it did not look deliberate.
  */
 
 const ALL = '__all__';
@@ -116,7 +136,11 @@ export function RegionDropdown({
     : t('discover.week.allRegions', 'Everywhere');
 
   return (
-    <div style={{ flex: 'none', ...style }}>
+    // flex: '0 1 auto' + minWidth: 0, NOT flex: 'none'. flex: none is
+    // 0 0 auto, which forbids shrinking outright: with it the well could never
+    // give up width and the row had to wrap instead. Sized to content, allowed
+    // to shrink, never allowed to grow.
+    <div style={{ flex: '0 1 auto', minWidth: 0, ...style }}>
       <Select
         value={value}
         onValueChange={(v) => {
@@ -149,7 +173,10 @@ export function RegionDropdown({
             three children of ONE inline flex line, 4px apart, sharing a
             baseline — no absolute positioning, no marginLeft auto. */}
         <SelectTrigger
-          className="inline-flex h-auto w-auto justify-start whitespace-nowrap border-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
+          // max-w-full min-w-0 replace w-auto so the trigger can shrink below
+          // its content width; whitespace-nowrap STAYS — it is what turns the
+          // overflow into an ellipsis instead of a second line inside the well.
+          className="inline-flex h-auto max-w-full min-w-0 justify-start whitespace-nowrap border-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
           style={{
             background: selection ? 'rgba(255,255,255,0.14)' : A.PANEL,
             border: `1px solid ${A.BORDER}`,
@@ -166,12 +193,21 @@ export function RegionDropdown({
               strokeWidth={2.4}
               style={{ color: selection ? DISCOVER_FACT : DISCOVER_QUIET, flex: 'none' }}
             />
+            {/* THE ONLY ELASTIC CHILD. The pin and the chevron are flex: none
+                and never truncate — a control that loses its chevron stops
+                looking like a dropdown. title carries the full name for a
+                screen reader and as a native tooltip once the label clips. */}
             <span
+              title={triggerLabel}
               style={{
                 fontSize: 12.5,
                 fontWeight: 700,
                 letterSpacing: '-0.01em',
                 color: selection ? DISCOVER_FACT : DISCOVER_QUIET,
+                minWidth: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
               {triggerLabel}
