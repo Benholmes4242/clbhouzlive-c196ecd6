@@ -65,13 +65,19 @@ interface Props {
   onRowTap?: (playerId: string) => void;
 }
 
-/** Surface tokens per theme. INK has no named dark counterpart - plain white. */
+/**
+ * Surface tokens per ground. INK has no named dark counterpart — plain white.
+ *
+ * 'panel' and 'heroBoard' share the ink ramp and differ ONLY in surface: the
+ * panel rises above the #15171F canvas, the hero board sinks into the photo
+ * block. Same component on two grounds — the ground is passed in, never guessed.
+ */
 const THEME_TOKENS = {
   light: { surface: SURFACE, ink: INK, mute: INK_MUTE, faint: INK_FAINT, hairline: HAIRLINE_INK_8, press: 'active:bg-black/[0.03]' },
-  // dark is used ONLY by the Tour Overview hero board, so it draws on that
-  // block's surface (colder/deeper than CHARCOAL) rather than charcoal.
-  dark: { surface: HERO_BOARD_SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
+  panel: { surface: SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
+  heroBoard: { surface: HERO_BOARD_SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
 } as const;
+
 
 /**
  * Canonical scoring: fmtScore + getScoreColor(..., theme) - the same helpers
