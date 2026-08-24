@@ -415,8 +415,14 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={t('top100.searchPlaceholder', { listLabel: activeListShortLabel })}
                 aria-label={t('top100.searchA11y')}
-                className="pl-10 pr-10 h-12 rounded-2xl text-base focus-visible:ring-2 focus-visible:ring-[#F7931E]/30 focus-visible:outline-none"
-                style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}` }}
+                /* No inline style and no paint classes: the Input primitive owns
+                   rest fill, focus fill, border and transition. Inline styles
+                   beat the primitive's focus-visible classes, which is why this
+                   field previously had no focus behaviour at all. h-11 (44) is
+                   the canonical search-bar height and deliberately overrides the
+                   primitive's h-10 form-field height. */
+                className="pl-10 pr-10 h-11 focus-visible:outline-none"
+
               />
               {searchTerm && (
                 <button
