@@ -291,6 +291,7 @@
     "rankHere": "Your {{ordinal}} best of {{count}} rounds here.",
     "legendBirdie": "Birdie",
     "legendEagle": "Eagle",
+    "legendAlbatross": "Albatross",
     "legendAce": "Ace",
     "legendBogey": "Bogey",
     "legendDouble": "Double+",
