@@ -107,10 +107,12 @@ export function NotificationsSection({ businessId }: Props) {
                   onClick={() => toggle(t.key)}
                   className="relative inline-flex h-[26px] w-[44px] flex-shrink-0 items-center rounded-full transition-colors"
                   style={{
-                    // Matches OpeningHoursSection's toggle: amber ON track,
-                    // 14% white OFF track, white knob. One toggle grammar
-                    // across the business editor.
-                    background: enabled ? BIZ.amber : 'rgba(255,255,255,0.14)',
+                    // PERSONAL SETTINGS GRAMMAR (settings/ui/SettingsToggleRow):
+                    // ON is the near-white ink fill, OFF a 14% raised track with
+                    // an 18% hairline, knob on the canvas. Amber is reserved for
+                    // semantic states (open/closed), not generic on/off.
+                    background: enabled ? A.INK : 'rgba(255,255,255,0.14)',
+                    border: enabled ? '1px solid transparent' : '1px solid rgba(255,255,255,0.18)',
                     opacity: isSaving ? 0.6 : 1,
                   }}
                 >
@@ -118,7 +120,7 @@ export function NotificationsSection({ businessId }: Props) {
                     className="inline-block h-[20px] w-[20px] rounded-full shadow transition-transform"
                     style={{
                       transform: enabled ? 'translateX(21px)' : 'translateX(3px)',
-                      background: '#fff',
+                      background: A.CANVAS,
                       boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                     }}
                   />
