@@ -12,6 +12,14 @@ import React from 'react';
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
+// Keep the active/inactive pair co-located: these values are the inverse of
+// the dark glass band they sit on and must migrate with that band.
+const ACTIVE_FILL = '#F8FAFC';
+const ACTIVE_INK = '#15171F';
+const INACTIVE_FILL = 'rgba(255,255,255,0.06)';
+const INACTIVE_INK = 'rgba(248,250,252,0.62)';
+const INACTIVE_BORDER = '1px solid rgba(255,255,255,0.10)';
+
 export interface FilterChipsOption<T extends string> {
   id: T;
   label: string;
@@ -62,9 +70,9 @@ export function FilterChips<T extends string>({
               fontSize: 12.5,
               padding: '7px 14px',
               borderRadius: 999,
-               background: active ? '#F8FAFC' : 'rgba(255,255,255,0.06)',
-               color: active ? '#15171F' : 'rgba(248,250,252,0.62)',
-               border: active ? 'none' : '1px solid rgba(255,255,255,0.10)',
+              background: active ? ACTIVE_FILL : INACTIVE_FILL,
+              color: active ? ACTIVE_INK : INACTIVE_INK,
+              border: active ? 'none' : INACTIVE_BORDER,
               fontFamily: FONT_FAMILY,
             }}
           >
