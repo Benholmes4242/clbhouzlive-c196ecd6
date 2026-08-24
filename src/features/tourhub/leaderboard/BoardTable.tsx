@@ -97,7 +97,7 @@ interface Props {
 
 function houseColor(score: number | null | undefined): string {
   if (score == null) return INK;
-  return getScoreColor(score, 'light');
+  return getScoreColor(score, 'dark');
 }
 
 

@@ -5,7 +5,7 @@ import { SC_BIRDIE_DARK, SC_FILL_GOLD } from '@/features/courses/components/hole
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { HAIRLINE_INK_12, INK_TINT_06, TOPAR_EVEN_LIGHT, WHITE_ALPHA_18 } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_EVEN_LIGHT, WHITE_ALPHA_18 } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
 import { A, CHIP_RADIUS } from './tokens';

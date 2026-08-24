@@ -67,8 +67,10 @@ const THEME_TOKENS = {
 } as const;
 
 /**
- * Canonical scoring: fmtScore + getScoreColor(..., 'light') - the same helpers
- * the schedule, board and college surfaces use. No local forks.
+ * Canonical scoring: fmtScore + getScoreColor(..., theme) - the same helpers
+ * the schedule, board and college surfaces use. No local forks. The canonical
+ * theme is 'dark' (the app's only surface); 'light' survives for the few light
+ * chrome islands that have not been flipped, and is NOT the default.
  *
  * Placeholders: a missing figure renders as NOTHING. An em dash is a value in
  * a tabular column and reads as data the field does not have.
@@ -85,7 +87,7 @@ function thruLabel(row: Row, today: number | null): string {
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
-export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'light', pickPlayerIds, onRowTap }: Props) {
+export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'dark', pickPlayerIds, onRowTap }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);

@@ -97,7 +97,7 @@ export function PlayerResultRow({
   const month = dt ? formatMonthShort(dt).toUpperCase() : '';
   const scoreStr = typeof r.score === 'number' ? fmtScore(r.score) : '';
   // Missed cut keeps its INK_FAINT override: no meaningful score-to-par.
-  const scoreColor = isMissed ? INK_FAINT : getScoreColor(r.score, 'light');
+  const scoreColor = isMissed ? INK_FAINT : getScoreColor(r.score, 'dark');
 
   return (
     <Link

@@ -7,9 +7,6 @@ import {
   SC_PAR_DARK,
 } from '@/features/courses/components/holes/_constants';
 import {
-  HAIRLINE_INK_12,
-  INK_TINT_06,
-  SURFACE,
   TOPAR_UNDER_DARK,
   WHITE_ALPHA_18,
 } from '@/features/tourhub/_shared/tokens';
@@ -67,9 +64,16 @@ const variantFor = (strokes: number | null | undefined, par: number): Variant =>
 const OVER_INK_LIGHT = INK;
 const OVER_INK_DARK = '#F2F4F7';
 
-/** Existing semantic surface tokens only — no locally invented colours. */
-const LIGHT_BOGEY_GROUND = INK_TINT_06;
-const LIGHT_DOUBLE_GROUND = HAIRLINE_INK_12;
+/** These three are PINNED LOCALLY, not sourced from the tour ramp: that ramp is
+    going dark and these serve the light path. Their values are unchanged from the
+    tokens they replace (INK_TINT_06, HAIRLINE_INK_12) — this is a sourcing change
+    only, with zero visual effect. */
+const LIGHT_BOGEY_GROUND = 'rgba(15,23,42,0.06)';
+const LIGHT_DOUBLE_GROUND = 'rgba(15,23,42,0.12)';
+/** The under-par numeral: white text on a saturated red disc, on BOTH surfaces
+    regardless of theme. It is not a surface token and must never be repointed by
+    a surface change — that mis-naming (as SURFACE) was the original fault. */
+const MARK_NUMERAL_ON_FILL = '#FFFFFF';
 /* DARK-ONLY PART C: bogey and double deliberately share the same legible
    ground. At 17px their ONE distinction is the double's 1.5px magnitude ring;
    that ring can never be softened without reopening this contrast decision. */
@@ -125,7 +129,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   if (colourOverride) numColour = colourOverride;
   else if (variant === 'empty') numColour = emptyInk;
   else if (variant === 'par') numColour = parInk;
-  else if (under) numColour = SURFACE;
+  else if (under) numColour = MARK_NUMERAL_ON_FILL;
   else numColour = overInk;
 
   const numWeight = 700;
