@@ -2,10 +2,14 @@ import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { TITLE } from '@/lib/tokens/type';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const RED = '#DC2626';
+// DARK-ONLY. RED is the BESPOKE DESTRUCTIVE red (dark variant of #DC2626).
+// It is deliberately NOT the app's under-par red — red means UNDER PAR on
+// every scorecard and a destructive action is a different meaning entirely.
+const INK = A.INK;
+const INK_55 = A.MUTE;
+const RED = '#FF5A5A';
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
@@ -45,12 +49,12 @@ export default function DeleteAccountConfirmSheet({
         style={{
           fontFamily: FONT,
           color: INK,
-          background: '#fff',
+          background: A.PANEL,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 8 }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.18)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.18)' }} />
         </div>
 
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 20px 12px' }}>
@@ -92,8 +96,8 @@ export default function DeleteAccountConfirmSheet({
             aria-label="Type DELETE to confirm"
             style={{
               width: '100%', padding: '12px 14px',
-              border: '1px solid rgba(15,23,42,0.14)', borderRadius: 12,
-              fontSize: 15, background: '#fff', color: INK, fontFamily: FONT,
+              border: `1px solid ${A.BORDER}`, borderRadius: 12,
+              fontSize: 15, background: 'rgba(255,255,255,0.06)', color: INK, fontFamily: FONT,
               outline: 'none', marginBottom: 18,
               letterSpacing: '0.10em', fontWeight: 600,
               opacity: isWorking ? 0.5 : 1,
@@ -106,7 +110,7 @@ export default function DeleteAccountConfirmSheet({
             disabled={!canConfirm}
             style={{
               width: '100%', padding: '14px 16px', borderRadius: 12,
-              background: canConfirm ? RED : 'rgba(220,38,38,0.30)',
+              background: canConfirm ? RED : 'rgba(255,90,90,0.22)',
               color: '#fff', border: 'none',
               fontSize: 15, fontWeight: 600, fontFamily: FONT,
               cursor: canConfirm ? 'pointer' : 'not-allowed',
@@ -121,8 +125,9 @@ export default function DeleteAccountConfirmSheet({
             disabled={isWorking}
             style={{
               width: '100%', padding: '14px 16px', borderRadius: 12,
-              background: 'transparent', color: INK, border: 'none',
-              fontSize: 15, fontWeight: 500, fontFamily: FONT,
+              background: 'rgba(255,255,255,0.06)', color: INK,
+              border: `1px solid ${A.BORDER}`,
+              fontSize: 15, fontWeight: 600, fontFamily: FONT,
               cursor: isWorking ? 'default' : 'pointer',
             }}
           >
