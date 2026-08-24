@@ -111,8 +111,8 @@ export default function SupportThreadPage() {
             <button
               type="button"
               onClick={() => navigate('/manage/requests')}
-              className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold text-white"
-              style={{ background: A.INK }}
+              className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold"
+              style={{ background: A.INK, color: A.CANVAS }}
             >
               Back to my requests
             </button>
@@ -186,7 +186,7 @@ export default function SupportThreadPage() {
                     padding: '10px 14px',
                     borderRadius: 16,
                     background: mine ? A.INK : '#fff',
-                    color: mine ? '#fff' : A.INK,
+                    color: mine ? A.CANVAS : A.INK,
                     border: mine ? 'none' : `1px solid ${A.BORDER}`,
                   }}
                 >
@@ -235,9 +235,10 @@ export default function SupportThreadPage() {
                 type="button"
                 onClick={handleSend}
                 disabled={!body.trim() || sending}
-                className="inline-flex items-center gap-1.5 rounded-2xl text-white font-semibold text-[13.5px]"
+                className="inline-flex items-center gap-1.5 rounded-2xl font-semibold text-[13.5px]"
                 style={{
                   background: A.INK,
+                  color: A.CANVAS,
                   padding: '0 14px',
                   minHeight: 44,
                   opacity: !body.trim() || sending ? 0.5 : 1,

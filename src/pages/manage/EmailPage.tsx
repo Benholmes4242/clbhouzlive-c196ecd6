@@ -147,7 +147,7 @@ export default function EmailPage() {
                 className="w-full min-h-[44px] font-semibold"
                 disabled={!emailValid || submitting}
                 onClick={handleSendInitial}
-                style={{ background: A.INK, color: '#fff' }}
+                style={{ background: A.INK, color: A.CANVAS }}
               >
                 {submitting ? 'Sending\u2026' : 'Send verification code'}
               </Button>
@@ -240,7 +240,7 @@ export default function EmailPage() {
             <Button
               className="w-full min-h-[44px] font-semibold"
               onClick={() => navigate(-1)}
-              style={{ background: A.INK, color: '#fff' }}
+              style={{ background: A.INK, color: A.CANVAS }}
             >
               Done
             </Button>

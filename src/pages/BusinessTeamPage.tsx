@@ -414,8 +414,8 @@ export default function BusinessTeamPage() {
                   <button
                     type="button"
                     onClick={() => refetchTeam()}
-                    className="mt-3 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12.5px] text-white active:opacity-90"
-                    style={{ background: A.INK, border: 'none', fontSize: 12.5, fontWeight: 700 }}
+                    className="mt-3 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12.5px] active:opacity-90"
+                    style={{ background: A.INK, color: A.CANVAS, border: 'none', fontSize: 12.5, fontWeight: 700 }}
                   >
                     Retry
                   </button>

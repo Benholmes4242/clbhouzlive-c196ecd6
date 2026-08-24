@@ -242,7 +242,7 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
             padding: '8px 14px',
             borderRadius: 999,
             background: A.INK,
-            color: '#FFFFFF',
+            color: A.CANVAS,
             border: 'none',
             fontFamily: SANS,
             fontSize: 11,

@@ -133,7 +133,7 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
                 flex: 2,
                 background: A.INK,
                 border: 'none',
-                color: '#ffffff',
+                color: A.CANVAS,
                 fontSize: 13.5,
                 fontWeight: 700,
                 borderRadius: 14,

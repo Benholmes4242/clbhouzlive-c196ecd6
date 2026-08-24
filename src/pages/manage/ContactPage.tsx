@@ -104,8 +104,8 @@ export default function ContactPage() {
             <button
               type="button"
               onClick={() => navigate('/manage/requests')}
-              className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold text-white"
-              style={{ background: A.INK }}
+              className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold"
+              style={{ background: A.INK, color: A.CANVAS }}
             >
               Go to my requests
             </button>
@@ -162,7 +162,7 @@ export default function ContactPage() {
                   className="min-h-[40px] rounded-lg text-[13.5px] font-medium transition-colors"
                   style={{
                     background: active ? A.INK : 'transparent',
-                    color: active ? '#fff' : A.INK,
+                    color: active ? A.CANVAS : A.INK,
                   }}
                 >
                   {c.label}
@@ -222,8 +222,8 @@ export default function ContactPage() {
           type="button"
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="w-full min-h-[48px] rounded-2xl text-[15px] font-semibold text-white transition-opacity"
-          style={{ background: A.INK, opacity: canSubmit ? 1 : 0.5 }}
+          className="w-full min-h-[48px] rounded-2xl text-[15px] font-semibold transition-opacity"
+          style={{ background: A.INK, color: A.CANVAS, opacity: canSubmit ? 1 : 0.5 }}
         >
           {submitting ? 'Sending...' : 'Send request'}
         </button>

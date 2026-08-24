@@ -14,8 +14,8 @@ import { FIGS } from '@/lib/tokens/type';
 
 /** Numerals stay in the SF Pro stack: monospace faces slash their zeros. */
 const MONO = 'inherit';
-const GREEN = '#047857';
-const RED = '#B91C1C';
+const GREEN = '#34D77F';
+const RED = '#FF6B60';
 
 export function formatDelta(delta: number): string {
   return `${delta > 0 ? '+' : ''}${delta.toFixed(1)}`;
@@ -144,7 +144,7 @@ export const Top100MoversSection: React.FC<Props> = ({ movers, onViewAll }) => {
               fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: AMBER,
+               color: 'rgba(248,250,252,0.62)',
             }}
           >
             {t('top100.movers.kicker')}
@@ -164,7 +164,7 @@ export const Top100MoversSection: React.FC<Props> = ({ movers, onViewAll }) => {
         <button
           type="button"
           onClick={onViewAll}
-          style={{ fontSize: 11.5, fontWeight: 700, color: AMBER, whiteSpace: 'nowrap' }}
+          style={{ fontSize: 11.5, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}
         >
           {t('top100.movers.viewAll')}
         </button>

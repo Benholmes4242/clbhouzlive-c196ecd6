@@ -108,8 +108,8 @@ export default function MyRequestsPage() {
             <button
               type="button"
               onClick={() => navigate('/manage/contact')}
-              className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold text-white"
-              style={{ background: A.INK }}
+              className="w-full min-h-[44px] rounded-xl text-[15px] font-semibold"
+              style={{ background: A.INK, color: A.CANVAS }}
             >
               Contact support
             </button>

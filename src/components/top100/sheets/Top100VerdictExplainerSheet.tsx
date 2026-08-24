@@ -358,7 +358,7 @@ export const Top100VerdictExplainerSheet: React.FC<Props> = ({
                 padding: '12px 16px',
                 borderRadius: 12,
                 background: INK,
-                color: '#FFFFFF',
+                color: '#15171F',
                 fontSize: 13.5,
                 fontWeight: 700,
                 letterSpacing: '-0.01em',
