@@ -182,8 +182,10 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                       background: '#FFFFFF',
                       border: 'none',
                       color: '#0B0D12',
-                      fontSize: 15,
-                      fontWeight: 600,
+                      fontSize: 13,
+                      letterSpacing: '0.10em',
+                      textTransform: 'uppercase',
+                      fontWeight: 700,
                     }}
                   >
                     {appleSubmitting ? (
@@ -209,8 +211,10 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                       background: '#FFFFFF',
                       border: '1px solid rgba(255,255,255,0.10)',
                       color: '#1F1F1F',
-                      fontSize: 15,
-                      fontWeight: 600,
+                      fontSize: 13,
+                      letterSpacing: '0.10em',
+                      textTransform: 'uppercase',
+                      fontWeight: 700,
                     }}
                   >
                     {googleSubmitting ? (
@@ -226,7 +230,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
                 <div className="flex items-center gap-3" aria-hidden="true">
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
-                  <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>{t('auth:hero.or')}</span>
+                  <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>{t('auth:hero.or')}</span>
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.10)' }} />
                 </div>
 
@@ -266,7 +270,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             </div>
 
             {emailError && (
-              <p className="text-center" style={{ ...BODY, color: '#F87171' }}>{emailError}</p>
+              <p className="text-center" style={{ ...BODY, fontSize: 14, color: '#F87171' }}>{emailError}</p>
             )}
 
             {errorMessage && !hasEditedSinceError && (
@@ -283,8 +287,11 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               onClick={handleContinue}
               disabled={!canContinue}
               aria-label={t('auth:hero.continue')}
-              className="w-full h-[54px] flex items-center justify-center gap-2 rounded-sq-sm font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
+              className="w-full h-[54px] flex items-center justify-center gap-2 rounded-sq-sm font-bold transition-all duration-150 active:scale-[0.98]"
               style={{
+                fontSize: 13,
+                letterSpacing: '0.10em',
+                textTransform: 'uppercase',
                 background: continueActiveLook ? '#FFFFFF' : 'rgba(255,255,255,0.06)',
                 color: continueActiveLook ? '#0A0D12' : 'rgba(255,255,255,0.38)',
                 border: continueActiveLook ? 'none' : '1px solid rgba(255,255,255,0.10)',
@@ -304,7 +311,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
             <p
               className="text-center"
-              style={{ ...BODY, color: 'rgba(255,255,255,0.55)' }}
+              style={{ ...BODY, fontSize: 14, color: 'rgba(255,255,255,0.55)' }}
             >
               {t('auth:hero.codeHint')}
             </p>
@@ -312,7 +319,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             <p
               style={{
                 margin: '14px 4px 0',
-                ...BODY,
+                ...BODY, fontSize: 14,
                 color: 'rgba(255,255,255,0.45)',
                 textAlign: 'center',
               }}
