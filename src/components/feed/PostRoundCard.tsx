@@ -95,7 +95,7 @@ const LabelRow: React.FC<{
   <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 4 }}>
     <span
       style={{
-        fontSize: 9.5,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.1em',
         textTransform: 'uppercase',
@@ -220,11 +220,11 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
             key={h.holeNo}
             style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
           >
-            <span style={{ ...NUM, fontSize: 8.5, fontWeight: 700, color: DIM, lineHeight: 1.15 }}>
+            <span style={{ ...NUM, fontSize: 11, fontWeight: 700, color: DIM, lineHeight: 1.15 }}>
               {h.holeNo}
             </span>
             <span
-              style={{ ...NUM, fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.26)', lineHeight: 1.2 }}
+              style={{ ...NUM, fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.26)', lineHeight: 1.2 }}
             >
               {h.par ?? '·'}
             </span>
@@ -304,7 +304,7 @@ const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, 
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
         <span
           style={{
-            fontSize: 9.5,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
@@ -401,7 +401,7 @@ const BreakdownBar: React.FC<{ holes: PostRound['holeShape'] }> = ({ holes }) =>
           <span key={b.key} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
             <span
               style={{
-                fontSize: 8.5,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
@@ -535,7 +535,7 @@ export const PostRoundCard: React.FC<Props> = ({
               background: 'rgba(11,13,16,0.66)',
               border: `1px solid ${HAIRLINE}`,
               color: AMBER,
-              fontSize: 9.5,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
@@ -552,7 +552,7 @@ export const PostRoundCard: React.FC<Props> = ({
           {kicker && (
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
@@ -594,7 +594,7 @@ export const PostRoundCard: React.FC<Props> = ({
               alignItems: 'center',
               gap: 14,
               marginTop: 10,
-              fontSize: 10.5,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
