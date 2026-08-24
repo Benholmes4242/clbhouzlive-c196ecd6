@@ -735,7 +735,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   options={sortOptions.map((o) => ({ value: o.value as string, label: o.label }))}
                   ariaLabel={t('review.sortA11y')}
                   icon={<ArrowUpDown className="h-3 w-3 mr-1" />}
-                  triggerClassName="!h-[34px] !py-0 !px-3 !text-xs !font-semibold !rounded-full !bg-[rgba(255,255,255,0.06)] !border !border-white/10 !text-foreground hover:!bg-white/10 gap-0 [&>span]:text-foreground"
+                  triggerClassName="!h-[34px] !py-0 !px-3 !text-xs !font-semibold !rounded-full !bg-[rgba(255,255,255,0.06)] !border !border-white/10 !text-foreground hover:!bg-[rgba(255,255,255,0.10)] gap-0 [&>span]:text-foreground"
                 />
 
                 {teeFilterAvailable && (
