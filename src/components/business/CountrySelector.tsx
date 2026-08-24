@@ -133,8 +133,9 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
                    HEIGHT EXCEPTION (36px, h-9): sits inside the floating
                    country panel above a scrolling list of countries. */
                 className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS_CANON} w-full h-9 pl-8 pr-3 text-sm`}
-                // Bare input inside an already-painted wrapper: paint and
-                // radius are deliberately nulled and inherited from it.
+                // Paint and radius NULLED so FIELD_PAINT_CLASS above wins:
+                // inline style beats the class, so the canon's fill/border/
+                // radius-14 would die silently if these were left set.
                 style={{ ...FIELD_INPUT_STYLE, background: undefined, borderRadius: undefined, padding: 0, paddingLeft: 32, paddingRight: 12, fontSize: 14 }}
               />
             </div>
