@@ -1,5 +1,11 @@
 /**
- * LightCardFeed — light-mode, window-scrolled, virtualized profile feed.
+ * LightCardFeed — the WINDOW-SCROLLED, virtualized profile feed. Dark, like
+ * everything else: "Light" in the name is a fossil of the light era and says
+ * nothing about this component's reason to exist.
+ *
+ * It exists because it window-scrolls, so the profile hero scrolls away
+ * naturally, while Clubhouse's `CardFeed` owns its own scroller. That
+ * scrolling architecture is the decision; the theme was incidental to it.
  *
  * Built ground-up for the profile Activity / Posts tab (personal + business).
  * Uses `react-virtuoso` with `useWindowScroll` so the page hero scrolls away
