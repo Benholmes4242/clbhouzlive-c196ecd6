@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { ActiveActor } from '@/types/actor';
 import { KICKER } from '@/lib/tokens/type';
