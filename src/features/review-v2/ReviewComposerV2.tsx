@@ -121,8 +121,8 @@ function TeeChipRow({
                 padding: '6px 12px',
                 borderRadius: 999,
                 border: selected ? `1px solid ${RV2.ink}` : `1px solid ${RV2.hairlineStrong}`,
-                background: selected ? RV2.ink : '#FFFFFF',
-                color: selected ? '#FFFFFF' : RV2.ink,
+                background: selected ? RV2.ink : RV2.ghost,
+                color: selected ? RV2.canvas : RV2.ink,
                 fontSize: 12,
                 fontWeight: 700,
                 letterSpacing: '0.01em',
@@ -245,7 +245,7 @@ function InnerComposer() {
             type="button"
             onClick={() => navigate(-1)}
             style={{
-              background: '#FFFFFF',
+              background: RV2.ghost,
               border: `1px solid ${RV2.hairlineStrong}`,
               borderRadius: 999,
               padding: '10px 18px',
@@ -261,8 +261,8 @@ function InnerComposer() {
             type="button"
             onClick={() => courseQ.refetch()}
             style={{
-              background: RV2.dark,
-              color: '#F5F6F7',
+              background: RV2.ink,
+              color: RV2.canvas,
               border: 0,
               borderRadius: 999,
               padding: '10px 18px',
@@ -690,7 +690,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                color: '#EF4444',
+                color: RV2.danger,
               }}
             >
               <Trash2 size={16} />
@@ -712,7 +712,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 height: 3,
                 borderRadius: 999,
                 marginBottom: 6,
-                background: i <= step ? RV2.dark : 'rgba(15,23,42,0.10)',
+                background: i <= step ? RV2.ink : RV2.track,
               }}
             />
             <div
@@ -721,7 +721,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 fontWeight: 700,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                color: i <= step ? RV2.ink : RV2.muted,
+                color: i <= step ? RV2.ink : RV2.secondary,
               }}
             >
               {label}
@@ -861,7 +861,10 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
             <div
               key={dictationFlashKey}
               style={{
-                background: '#FFFFFF',
+                background: RV2.cardBg,
+                // The flash keyframe cannot read a JS token, so the resting
+                // colour is published to CSS as a custom property (§2.3).
+                ['--rv2-flash-rest' as string]: RV2.cardBg,
                 border: `1px solid ${RV2.hairline}`,
                 borderRadius: 14,
                 padding: 14,
@@ -873,7 +876,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
               <style>{`
                 @keyframes rv2-dictation-flash {
                   0%   { background-color: rgba(247,147,30,0.16); box-shadow: 0 0 0 2px rgba(247,147,30,0.28); }
-                  100% { background-color: #FFFFFF; box-shadow: 0 0 0 0 rgba(247,147,30,0); }
+                  100% { background-color: var(--rv2-flash-rest); box-shadow: 0 0 0 0 rgba(247,147,30,0); }
                 }
                 @media (prefers-reduced-motion: reduce) {
                   [data-rv2-flash="1"] { animation: none !important; }
@@ -895,7 +898,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 }}
               />
             </div>
-            <div style={{ fontSize: 11, color: RV2.muted, marginTop: 8 }}>
+            <div style={{ fontSize: 11, color: RV2.secondary, marginTop: 8 }}>
               {t('review.wizard.step2.optionalNote')}
             </div>
           </section>

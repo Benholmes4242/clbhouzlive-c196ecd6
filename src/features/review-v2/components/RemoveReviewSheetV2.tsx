@@ -33,7 +33,7 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
         position: 'fixed',
         inset: 0,
         zIndex: 10000,
-        background: 'rgba(15,23,42,0.4)',
+        background: RV2.scrim,
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'center',
@@ -45,7 +45,7 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
         style={{
           width: '100%',
           maxWidth: 480,
-          background: '#FFFFFF',
+          background: RV2.canvas,
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           padding: '16px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
@@ -55,7 +55,7 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(15,23,42,0.16)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 999, background: RV2.trackStrong }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div
@@ -69,7 +69,7 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
               justifyContent: 'center',
             }}
           >
-            <Trash2 size={18} color="#EF4444" />
+            <Trash2 size={18} color={RV2.danger} />
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ ...TITLE, color: RV2.ink }}>Remove review?</div>
@@ -85,7 +85,7 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
               width: 30,
               height: 30,
               borderRadius: '50%',
-              background: 'rgba(15,23,42,0.06)',
+              background: RV2.ghost,
               border: 'none',
               display: 'flex',
               alignItems: 'center',
@@ -106,7 +106,7 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
               flex: 1,
               padding: 12,
               borderRadius: 12,
-              background: '#FFFFFF',
+              background: RV2.ghost,
               border: `1px solid ${RV2.hairline}`,
               fontSize: 14,
               fontWeight: 600,
@@ -124,11 +124,11 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
               flex: 1,
               padding: 12,
               borderRadius: 12,
-              background: '#EF4444',
+              background: RV2.danger,
               border: 'none',
               fontSize: 14,
               fontWeight: 700,
-              color: '#FFFFFF',
+              color: RV2.dark,
               cursor: submitting ? 'not-allowed' : 'pointer',
             }}
           >

@@ -6,7 +6,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { RV2 } from '../tokens';
 import { FIGURE } from '@/lib/tokens/type';
-import { bandColor } from '../bandColor';
+import { bandColorOnDark as bandColor } from '../bandColor';
 import type { CategoryKey } from '../types';
 
 export interface CategoryCopy {
@@ -98,13 +98,13 @@ function CategoryRow({
             fontSize: 18,
             ...FIGURE,
             letterSpacing: '-0.03em',
-            color: value == null ? RV2.muted : color,
+            color: value == null ? RV2.secondary : color,
           }}
         >
           {value == null ? '--' : value.toFixed(1)}
         </span>
       </div>
-      <div style={{ fontSize: 11, color: RV2.muted, marginBottom: 10 }}>{hint}</div>
+      <div style={{ fontSize: 11, color: RV2.secondary, marginBottom: 10 }}>{hint}</div>
       <div
         ref={trackRef}
         role="slider"
@@ -122,7 +122,7 @@ function CategoryRow({
           position: 'relative',
           height: 7,
           borderRadius: 999,
-          background: 'rgba(15,23,42,0.08)',
+          background: RV2.track,
           cursor: 'pointer',
           touchAction: 'none',
           margin: '18px 0',
@@ -152,7 +152,7 @@ function CategoryRow({
                 width: 18,
                 height: 18,
                 borderRadius: '50%',
-                background: '#FFFFFF',
+                background: RV2.ink,
                 border: `2px solid ${color}`,
                 boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
                 pointerEvents: 'none',

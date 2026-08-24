@@ -32,8 +32,11 @@ export function SubmitBar({ label, enabled, onPress }: Props) {
           padding: 16,
           borderRadius: 14,
           border: 'none',
-          background: enabled ? RV2.dark : 'rgba(15,23,42,0.10)',
-          color: enabled ? RV2.onDark : RV2.secondary,
+          // Enabled = ink fill, canvas label (RV2.onDark is itself near-white
+          // now, so it cannot label an ink fill). Disabled keeps a visible fill
+          // and a 0.60 label so the gate reads as disabled but PRESENT (§5.2).
+          background: enabled ? RV2.ink : RV2.disabledFill,
+          color: enabled ? RV2.canvas : RV2.secondary,
           fontSize: 14.5,
           fontWeight: 700,
           cursor: enabled ? 'pointer' : 'not-allowed',
