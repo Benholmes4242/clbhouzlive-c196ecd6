@@ -145,12 +145,17 @@ export function DiscoverHero({
   const parts = momentFigureParts(moment, t as TFn);
 
   const isScore = moment.figureRole === 'score' && moment.figure != null;
+  const isGrossScore = moment.kind === 'courseRecord';
   const figure = moment.figure ?? 0;
   /* The hero figure and its adjacent noun share the course-name white — EXCEPT
      THE RUN, which carries the falling-index green through figure and noun, the
      same rule the round tile's MomentFigure applies. */
   const isRun = moment.kind === 'run';
-  const figureColor = isRun ? ROW_DARK_INDEX_FELL : DISCOVER_FACT;
+  const figureColor = isRun
+    ? ROW_DARK_INDEX_FELL
+    : isGrossScore && (moment.facts.toPar ?? 0) < 0
+      ? ROW_DARK_TOPAR_UNDER
+      : DISCOVER_FACT;
   const wordStyle: React.CSSProperties = isRun
     ? { ...heroWordStyle, color: ROW_DARK_INDEX_FELL }
     : heroWordStyle;
@@ -298,7 +303,7 @@ export function DiscoverHero({
           {parts.before && <span style={wordStyle}>{parts.before}</span>}
           <CountUpFigure
             value={figure}
-            format={isScore ? fmtRel : (n) => String(n)}
+            format={isScore && !isGrossScore ? fmtRel : (n) => String(n)}
             style={{
               ...NUMF,
               fontSize: 56,

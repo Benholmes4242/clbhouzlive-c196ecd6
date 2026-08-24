@@ -6,20 +6,24 @@ import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
  * SUPERSEDES the v2 six-kind list IN FULL. There is still ONE chart (the
  * scorecard) and the hero layout is untouched.
  *
- * IT RUNS ON `holes: { holeNo, par, strokes }[]` AND NOTHING ELSE (§S1.1) — the
- * exact array useRoundHoleShapes already returns. No query, no new hook, no new
- * field, no field average. Do not add one: this module is tuned against live
- * data and must stay testable without rendering a tile (§S1.8).
+ * IT RUNS ON `holes: { holeNo, par, strokes }[]` PLUS FACTS IT CANNOT DERIVE
+ * (§S1.1) — the exact hole array useRoundHoleShapes already returns, and an
+ * optional upstream course-record fact. The original holes-only rule stopped a
+ * query, hook, new field or field average appearing here; that spirit remains:
+ * this selector fetches nothing, derives no external fact, and stays testable
+ * without rendering a tile (§S1.8).
  *
- * SEVEN KINDS, FIRST MATCH WINS (§2 — was six):
- *   1 EAGLE           any hole 2+ under par, or a 1.               #FFC93C
- *   2 FINISHED IN RED the round's TOTAL to-par is BELOW ZERO.      canonical birdie red
- *   3 BIRDIE HAUL     4 or more birdies (d === -1 exactly).        PROVISIONAL
- *   4 STRONG FINISH   birdie or better on 2 of holes 16 / 17 / 18. #3B9DFF
- *   5 RUN             7+ CONSECUTIVE holes at par or better.       #22D07A
- *   6 GRIND           12+ at par or better, nothing worse than a
+ * EIGHT KINDS, FIRST MATCH WINS (§2):
+ *   1 ACE/ALBATROSS   a 1, or 3+ under par on one hole.             #FFC93C
+ *   2 COURSE RECORD   strictly beat an earlier clbhouz course mark. #F05AA6
+ *   3 EAGLE           exactly 2 under par, excluding an ace.        #FFC93C
+ *   4 FINISHED IN RED the round's TOTAL to-par is BELOW ZERO.       canonical birdie red
+ *   5 BIRDIE HAUL     4 or more birdies (d === -1 exactly).         PROVISIONAL
+ *   6 STRONG FINISH   birdie or better on 2 of holes 16 / 17 / 18.  #3B9DFF
+ *   7 RUN             7+ CONSECUTIVE holes at par or better.        #22D07A
+ *   8 GRIND           12+ at par or better, nothing worse than a
  *                     bogey.                                      #F7931E
- *   7 PLAIN           THE DEFAULT. Everything else.                #FFFFFF
+ *   9 PLAIN           THE DEFAULT. Everything else.                #FFFFFF
  *
  * `inRed` WAS RENAMED `finishedInRed` AND ITS RULE CHANGED (§2.1). It used to
  * fire when the CUMULATIVE to-par went below zero at ANY point. Ben's reasoning
@@ -55,6 +59,7 @@ import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
  * WHICH KINDS MARK HOLES (§3): ONLY birdieHaul, strongFinish and run.
  *   eagle          nothing — the feat hole already carries the loudest marker on
  *                  the card, and a second mark on it is redundant.
+ *   courseRecord   nothing — it is a WHOLE-ROUND claim.
  *   finishedInRed  nothing — a WHOLE-ROUND claim, exactly like the grind. This
  *                  alone removes the reported "par drawn as an eagle" bug.
  *   run            THE ONLY KIND WHERE MARKING ADDS ANYTHING: a stretch of pars
@@ -66,6 +71,7 @@ import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
 export type MomentKind =
   | 'eagle'
+  | 'courseRecord'
   | 'finishedInRed'
   | 'birdieHaul'
   | 'strongFinish'
@@ -77,6 +83,15 @@ export interface MomentHole {
   holeNo: number;
   par: number | null;
   strokes: number | null;
+}
+
+export interface CourseRecordFact {
+  /** The new live record. Included because a record can exist without hole rows. */
+  gross: number;
+  /** The mark this round took. */
+  beatenGross: number;
+  /** Null when the prior profile is deleted or hidden. */
+  heldBy: string | null;
 }
 
 /**
@@ -116,6 +131,9 @@ export interface Moment {
     parOrBetter?: number;
     played?: number;
     toPar?: number;
+    margin?: number;
+    beatenGross?: number;
+    heldBy?: string;
   };
 }
 
@@ -132,6 +150,9 @@ export const FINISHED_IN_RED_TONE = TOPAR_UNDER_DARK;
 
 export const MOMENT_TONE: Record<MomentKind, string> = {
   eagle: '#FFC93C',
+  /* Magenta is free in this grammar: not honours/BEST gold, under-par red,
+     viewing-member amber, index green, run green, or strong-finish cyan. */
+  courseRecord: '#F05AA6',
   finishedInRed: FINISHED_IN_RED_TONE,
   birdieHaul: BIRDIE_HAUL_TONE_PROVISIONAL,
   strongFinish: '#3B9DFF',
@@ -180,20 +201,20 @@ function scored(holes: readonly MomentHole[]): Scored[] {
  * no marked holes and no counts, and the card renders the plain hero with an
  * EMPTY well. Never a blank hero, never a placeholder grid.
  */
-export function selectMoment(holes: readonly MomentHole[] | null | undefined): Moment {
+export function selectMoment(
+  holes: readonly MomentHole[] | null | undefined,
+  courseRecord: CourseRecordFact | null = null,
+): Moment {
   const hs = scored(holes ?? []);
-  if (hs.length === 0) return plain([], 0);
-
   const played = hs.length;
   const toPar = hs.reduce((s, h) => s + h.d, 0);
 
-  /* 1 — EAGLE. An ACE outranks an eagle; an ALBATROSS outranks both. Same
-     treatment, different word (§S1.2). NOTHING IS MARKED (§3): the feat hole
-     already carries the loudest marker on the card. */
-  const feats = hs.filter((h) => h.strokes === 1 || h.d <= -2);
-  if (feats.length > 0) {
+  /* 1 — ACE / ALBATROSS. They alone outrank a course record. Existing feat
+     labels, figures, sentences and marked-hole rules are unchanged. */
+  const rarities = hs.filter((h) => h.strokes === 1 || h.d <= -3);
+  if (rarities.length > 0) {
     const rank = (h: Scored) => (h.strokes === 1 ? 3 : h.d <= -3 ? 2 : 1);
-    const best = feats.reduce((a, b) => (rank(b) > rank(a) ? b : a));
+    const best = rarities.reduce((a, b) => (rank(b) > rank(a) ? b : a));
     const feat: Moment['feat'] =
       best.strokes === 1 ? 'ace' : best.d <= -3 ? 'albatross' : 'eagle';
     return {
@@ -210,7 +231,54 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
     };
   }
 
-  /* 2 — FINISHED IN THE RED. The round's TOTAL to-par is below zero (§2.1).
+  /* 2 — COURSE RECORD. A RECORD IS SOMETHING YOU TAKE FROM SOMEONE. A first
+     round has no mark to beat, so upstream sends null; an equal gross also sends
+     null. This deliberately keeps the common weak "first here" meaning out of
+     COURSE RECORD as the catalogue grows. The fact is live, keyed by course_id,
+     and no individual hole is marked because this is a whole-round claim. */
+  if (courseRecord) {
+    const margin = courseRecord.beatenGross - courseRecord.gross;
+    return {
+      kind: 'courseRecord',
+      tone: MOMENT_TONE.courseRecord,
+      labelKey: 'courseRecord',
+      figureKey: null,
+      figureRole: 'score',
+      figure: courseRecord.gross,
+      sentenceKey: courseRecord.heldBy ? 'courseRecord' : 'courseRecordUnknown',
+      markedHoles: [],
+      facts: {
+        margin,
+        beatenGross: courseRecord.beatenGross,
+        ...(courseRecord.heldBy ? { heldBy: courseRecord.heldBy } : {}),
+        toPar,
+        played,
+      },
+    };
+  }
+
+  if (hs.length === 0) return plain([], 0);
+
+  /* 3 — EAGLE. Exactly two under, excluding a hole in one. The rendered result
+     is byte-for-byte the former plain-eagle branch; only its precedence moved. */
+  const eagles = hs.filter((h) => h.strokes !== 1 && h.d === -2);
+  if (eagles.length > 0) {
+    const best = eagles[0];
+    return {
+      kind: 'eagle',
+      tone: MOMENT_TONE.eagle,
+      labelKey: 'eagle',
+      figureKey: 'hole',
+      figureRole: 'identity',
+      figure: best.holeNo,
+      sentenceKey: 'eagle',
+      markedHoles: [],
+      feat: 'eagle',
+      facts: { holeNo: best.holeNo, par: best.par, strokes: best.strokes, toPar, played },
+    };
+  }
+
+  /* 4 — FINISHED IN THE RED. The round's TOTAL to-par is below zero (§2.1).
      NOTHING IS MARKED: the claim is about the whole round. */
   if (toPar < 0) {
     return {
@@ -226,7 +294,7 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
     };
   }
 
-  /* 3 — BIRDIE HAUL. A birdie is d === -1 EXACTLY (§2.3). Anything better has
+  /* 5 — BIRDIE HAUL. A birdie is d === -1 EXACTLY (§2.3). Anything better has
      already been taken by the eagle above. The birdie holes ARE marked: they
      are scattered by nature and worth grouping. */
   const birdies = hs.filter((h) => h.d === -1);
@@ -244,7 +312,7 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
     };
   }
 
-  /* 4 — THE STRONG FINISH. Birdie or better on at least two of 16, 17, 18. */
+  /* 6 — THE STRONG FINISH. Birdie or better on at least two of 16, 17, 18. */
   const closing = hs.filter((h) => h.holeNo >= 16 && h.holeNo <= 18 && h.d <= -1);
   if (closing.length >= FINISH_MIN) {
     return {
@@ -260,7 +328,7 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
     };
   }
 
-  /* 5 — THE RUN. Consecutive by HOLE NUMBER, so a missing hole breaks it. */
+  /* 7 — THE RUN. Consecutive by HOLE NUMBER, so a missing hole breaks it. */
   let bestRun: Scored[] = [];
   let cur: Scored[] = [];
   for (const h of hs) {
@@ -289,7 +357,7 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
     };
   }
 
-  /* 6 — THE GRIND. Twelve or more at par or better AND no hole worse than a
+  /* 8 — THE GRIND. Twelve or more at par or better AND no hole worse than a
      bogey. NOTHING IS MARKED: the claim is about the WHOLE round, and marking
      twelve of eighteen holes would mark the card rather than a moment. */
   const parOrBetter = hs.filter((h) => h.d <= 0).length;
@@ -308,7 +376,7 @@ export function selectMoment(holes: readonly MomentHole[] | null | undefined): M
     };
   }
 
-  /* 7 — PLAIN. The default, and the card members see most (§S1.6). */
+  /* 9 — PLAIN. The default, and the card members see most (§S1.6). */
   return plain(hs, toPar);
 }
 

@@ -35,20 +35,23 @@ import { selectMoment, type Moment } from '../roundMoment';
 
 type HeroCandidate = { row: CircleRoundRow; moment: Moment };
 
-const isRarity = (moment: Moment) =>
-  moment.kind === 'eagle' && (moment.feat === 'ace' || moment.feat === 'albatross');
+const rarityTier = (moment: Moment) => {
+  if (moment.kind === 'eagle' && (moment.feat === 'ace' || moment.feat === 'albatross')) return 2;
+  if (moment.kind === 'courseRecord') return 1;
+  return 0;
+};
 
 /**
- * Amendment 1: recency chooses the story. An ace or albatross is the sole
- * exception and holds the slot against every ordinary notable moment; when
- * more than one rarity exists, the newest rarity wins. Input order is never
- * trusted because the rail deliberately reorders self/new-course rounds.
+ * Recency chooses the story inside a tier. Ace/albatross holds the full window;
+ * COURSE RECORD holds unless that top tier exists; ordinary moments then use
+ * recency. Input order is never trusted because the rail deliberately reorders
+ * self/new-course rounds.
  */
 export function selectDiscoverHeroCandidate(candidates: readonly HeroCandidate[]): HeroCandidate | null {
   const notable = candidates.filter(({ moment }) => moment.kind !== 'plain');
   if (notable.length === 0) return null;
-  const rarity = notable.filter(({ moment }) => isRarity(moment));
-  const pool = rarity.length > 0 ? rarity : notable;
+  const highestTier = Math.max(...notable.map(({ moment }) => rarityTier(moment)));
+  const pool = notable.filter(({ moment }) => rarityTier(moment) === highestTier);
   return [...pool].sort((a, b) => String(b.row.play_date).localeCompare(String(a.row.play_date)))[0] ?? null;
 }
 
@@ -105,7 +108,7 @@ export function useDiscoverHero(
     let allPlain = true;
     const candidates = ordered.map((r) => {
       const shape = holeShapes?.get(r.score_id ?? '') ?? null;
-      const moment = selectMoment(shape?.holes ?? []);
+      const moment = selectMoment(shape?.holes ?? [], r.course_record_fact);
       if (moment.kind !== 'plain') allPlain = false;
       return { row: r, moment };
     });

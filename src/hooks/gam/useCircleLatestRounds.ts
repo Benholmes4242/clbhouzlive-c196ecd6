@@ -80,8 +80,14 @@ export interface CircleRoundRow {
   /** To-par on each nine, from the hole rows. Null = no hole data. */
   front_nine_to_par: number | null;
   back_nine_to_par: number | null;
-  /** A current, guarded course record attained with THIS round. */
+  /** A current live record attained by strictly beating an earlier course mark. */
   is_course_record: boolean;
+  /** Upstream fact for the pure round-moment selector; null for first rounds/ties/non-records. */
+  course_record_fact: {
+    gross: number;
+    beatenGross: number;
+    heldBy: string | null;
+  } | null;
   /** Their first ever sub-80 round. */
   is_first_sub_80: boolean;
   /**
@@ -555,44 +561,26 @@ export function useCircleLatestRounds(
         });
       }
 
-      //  ii. COURSE RECORDS. A record only counts where the legends board has
-      //      three distinct players at the course — the same guard
-      //      create_round_posts applies (see useCourseFieldSizes.ts, which
-      //      counts distinct members on the same view).
-      const RECORD_MIN_PLAYERS = 3;
-      const recordScoreIds = new Set<string>();
-      if (surfacedCourseIds.length > 0) {
-        const { data: legends } = await supabase
-          .from('gam_course_legends_view')
-          .select('course_id, user_id, rank, category, trigger_whs_score_id')
-          .in('course_id', surfacedCourseIds)
-          .eq('is_current', true);
-        const playersByCourse = new Map<string, Set<string>>();
-        const candidates: Array<{ course_id: string; score_id: string }> = [];
-        for (const l of ((legends ?? []) as unknown) as Array<{
-          course_id: string | null;
-          user_id: string | null;
-          rank: number | null;
-          category: string | null;
-          trigger_whs_score_id: string | null;
-        }>) {
-          if (!l.course_id || !l.user_id) continue;
-          const set = playersByCourse.get(l.course_id) ?? new Set<string>();
-          set.add(l.user_id);
-          playersByCourse.set(l.course_id, set);
-          if (
-            l.category === 'lowest_gross_all_time' &&
-            Number(l.rank) === 1 &&
-            l.trigger_whs_score_id &&
-            scoreIds.includes(l.trigger_whs_score_id)
-          ) {
-            candidates.push({ course_id: l.course_id, score_id: l.trigger_whs_score_id });
-          }
-        }
-        for (const c of candidates) {
-          if ((playersByCourse.get(c.course_id)?.size ?? 0) >= RECORD_MIN_PLAYERS) {
-            recordScoreIds.add(c.score_id);
-          }
+      //  ii. COURSE RECORDS. ONE RPC FOR THE WHOLE SURFACED SET — its windowed
+      //      query compares each requested round with the lowest earlier gross
+      //      on the exact course_id. It returns only the live holder, only after
+      //      a strict beat; first rounds and equals return nothing. No N+1.
+      type CourseRecordFact = { gross: number; beatenGross: number; heldBy: string | null };
+      const recordFactByScore = new Map<string, CourseRecordFact>();
+      if (scoreIds.length > 0) {
+        const { data: recordFacts, error: recordFactsError } = await supabase.rpc(
+          'get_live_course_record_facts',
+          { p_score_ids: scoreIds },
+        );
+        if (recordFactsError) throw recordFactsError;
+        for (const fact of recordFacts ?? []) {
+          const round = rowsWindow.find((r) => r.whs_score_id === fact.score_id);
+          if (!round || round.gross_score == null) continue;
+          recordFactByScore.set(fact.score_id, {
+            gross: round.gross_score,
+            beatenGross: fact.beaten_gross,
+            heldBy: fact.held_by,
+          });
         }
       }
 
@@ -658,7 +646,8 @@ export function useCircleLatestRounds(
           albatross_hole: r.whs_score_id ? albatrossHoleByScore.get(r.whs_score_id) ?? null : null,
           front_nine_to_par: r.whs_score_id ? nineByScore.get(r.whs_score_id)?.front ?? null : null,
           back_nine_to_par: r.whs_score_id ? nineByScore.get(r.whs_score_id)?.back ?? null : null,
-          is_course_record: !!r.whs_score_id && recordScoreIds.has(r.whs_score_id),
+          is_course_record: !!r.whs_score_id && recordFactByScore.has(r.whs_score_id),
+          course_record_fact: r.whs_score_id ? recordFactByScore.get(r.whs_score_id) ?? null : null,
           is_first_sub_80:
             r.sub_80 === true && firstSub80ByUser.get(r.user_id) === r.play_date,
           suggested:
