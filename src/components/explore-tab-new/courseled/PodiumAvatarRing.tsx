@@ -7,6 +7,7 @@ interface PodiumAvatarRingProps {
   userId?: string | null;
   ringColor: string;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -24,6 +25,7 @@ export function PodiumAvatarRing({
   userId,
   ringColor,
   className,
+  style,
 }: PodiumAvatarRingProps) {
   return (
     <span
@@ -37,6 +39,7 @@ export function PodiumAvatarRing({
         alignItems: 'center',
         justifyContent: 'center',
         flex: 'none',
+        ...style,
       }}
     >
       <SquircleAvatar

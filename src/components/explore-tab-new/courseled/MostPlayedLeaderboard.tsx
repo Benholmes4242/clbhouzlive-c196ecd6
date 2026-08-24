@@ -175,6 +175,9 @@ function PlayerFacepile({ players, accent }: { players: MostPlayedPlayer[]; acce
             alt={player.name}
             userId={player.userId}
             ringColor={accent}
+            style={{
+              zIndex: visible.length - index + (overflow > 0 ? 1 : 0),
+            }}
           />
         ) : (
           <span
