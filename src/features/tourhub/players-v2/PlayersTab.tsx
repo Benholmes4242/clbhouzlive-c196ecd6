@@ -91,6 +91,7 @@ export function PlayersTab() {
   // -- Search
   const [search, setSearch] = useState('');
   const [searchExpanded, setSearchExpanded] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
   const debouncedSearch = useDebouncedValue(search, 200);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
@@ -240,6 +241,15 @@ export function PlayersTab() {
                   excludeTours={['champ']}
                 />
               </div>
+              {/* RADIUS/HEIGHT EXCEPTION (recorded — do not "correct" to 44).
+                  The canon puts search bars at radius 14 / height 44. This
+                  control sits in a 36px control row beside the SectionTourLens
+                  chip row and a 36px circular button: forcing 44 makes the row
+                  jump on expand and orphans the button. Radius unifies at 14;
+                  the height stays 36 because it is constrained by neighbours.
+                  Third such exception, after the OTP digit boxes and the
+                  Reviews tab control row. If the row ever goes to 44, it moves
+                  as one change across chip row + button + field. */}
               <button
                 type="button"
                 aria-label={t('players.search.openAria')}
@@ -247,9 +257,9 @@ export function PlayersTab() {
                 style={{
                   width: 36,
                   height: 36,
-                  borderRadius: 18,
-                  background: SURFACE,
-                  border: `0.5px solid ${HAIRLINE_INK_10}`,
+                  borderRadius: 14,
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.10)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -267,10 +277,12 @@ export function PlayersTab() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                background: SURFACE,
-                border: `0.5px solid ${HAIRLINE_INK_10}`,
-                borderRadius: 18,
-                padding: '6px 12px',
+                height: 36,
+                background: searchFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
+                border: `1px solid ${searchFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
+                borderRadius: 14,
+                padding: '0 12px',
+                transition: 'background 140ms ease, border-color 140ms ease',
                 minWidth: 0,
                 margin: '8.5px 0 8.5px 16px',
               }}
@@ -280,7 +292,10 @@ export function PlayersTab() {
                 ref={searchInputRef}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
                 placeholder={t('players.search.placeholder')}
+                className="placeholder:text-[rgba(255,255,255,0.38)]"
                 style={{
                   flex: 1,
                   border: 'none',
