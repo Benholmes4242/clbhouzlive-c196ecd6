@@ -39,11 +39,18 @@ interface Props {
   /** Active round from sr_tournaments.current_round - scopes TODAY and THRU. */
   currentRound?: number | null;
   /**
-   * Surface the board is drawn on. 'light' (default) keeps the tournament-page
-   * consumers pixel-identical; 'dark' maps every surface token to its dark
-   * counterpart for the photo-backed hero board. Same component, not a fork.
+   * THE GROUND THE BOARD SITS ON. One component, two real grounds:
+   *  - 'panel' (default): the tournament page (TournamentPage:233 live board and
+   *    :255 final board). Its ground is the #15171F app canvas, so the board is
+   *    a PANEL that must read as a step UP — SURFACE (#1B1E27).
+   *  - 'heroBoard': the Tour Overview hybrid hero (HeroBoardBand:331). Its ground
+   *    is the photo-backed hero block, so the board takes HERO_BOARD_SURFACE
+   *    (#0B0F14) and is continuous with the block around it.
+   *  - 'light': legacy light chrome islands. No live callsite; retained because
+   *    the light ramp has not been deleted.
    */
-  theme?: 'light' | 'dark';
+  theme?: 'panel' | 'heroBoard' | 'light';
+
   /**
    * Player ids that are Tournament Intelligence picks. DEFAULTS TO UNDEFINED so
    * the tournament-page consumers are pixel-identical — no fork.
@@ -58,13 +65,19 @@ interface Props {
   onRowTap?: (playerId: string) => void;
 }
 
-/** Surface tokens per theme. INK has no named dark counterpart - plain white. */
+/**
+ * Surface tokens per ground. INK has no named dark counterpart — plain white.
+ *
+ * 'panel' and 'heroBoard' share the ink ramp and differ ONLY in surface: the
+ * panel rises above the #15171F canvas, the hero board sinks into the photo
+ * block. Same component on two grounds — the ground is passed in, never guessed.
+ */
 const THEME_TOKENS = {
   light: { surface: SURFACE, ink: INK, mute: INK_MUTE, faint: INK_FAINT, hairline: HAIRLINE_INK_8, press: 'active:bg-black/[0.03]' },
-  // dark is used ONLY by the Tour Overview hero board, so it draws on that
-  // block's surface (colder/deeper than CHARCOAL) rather than charcoal.
-  dark: { surface: HERO_BOARD_SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
+  panel: { surface: SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
+  heroBoard: { surface: HERO_BOARD_SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
 } as const;
+
 
 /**
  * Canonical scoring: fmtScore + getScoreColor(..., theme) - the same helpers
@@ -87,14 +100,17 @@ function thruLabel(row: Row, today: number | null): string {
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
-export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'dark', pickPlayerIds, onRowTap }: Props) {
+export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
   const T = THEME_TOKENS[theme];
-  // Dark hero board: an absent TODAY reads as an em dash (never a zero, never
-  // the previous round). Light board keeps its blank-cell doctrine.
-  const todayBlank = theme === 'dark' ? '\u2014' : BLANK;
+  /** getScoreColor knows two ramps only; both dark grounds take the dark ramp. */
+  const scoreTheme = theme === 'light' ? 'light' : 'dark';
+  // Dark grounds: an absent TODAY reads as an em dash (never a zero, never
+  // the previous round). The light board keeps its blank-cell doctrine.
+  const todayBlank = theme === 'light' ? BLANK : '\u2014';
+
 
 
   return (
@@ -164,10 +180,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               <div style={{ width: 40, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 600, color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {thruLabel(r, today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, theme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 12, fontWeight: 700, color: getScoreColor(today, scoreTheme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {today == null ? todayBlank : fmtScore(today)}
               </div>
-              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, theme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              <div style={{ width: 46, textAlign: 'right', flexShrink: 0, fontSize: 13, fontWeight: 700, color: getScoreColor(r.score, scoreTheme), fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {r.score == null ? BLANK : fmtScore(r.score)}
               </div>
             </button>
