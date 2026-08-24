@@ -197,9 +197,9 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
               maxWidth: 52,
               height: 56,
               borderRadius: 14,
-              background: '#272C37',
+              background: 'rgba(255,255,255,0.06)',
               border: `1px solid ${d ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.10)'}`,
-              transition: 'border-color 150ms ease',
+              transition: 'background 140ms ease, border-color 140ms ease',
               color: 'rgba(255,255,255,0.96)',
               ...FIGURE,
               fontSize: 21,
@@ -207,10 +207,12 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
               caretColor: '#FFFFFF',
             }}
             onFocus={(e) => {
-              e.currentTarget.style.borderColor = '#FFFFFF';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.28)';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.10)';
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = d ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.10)';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
             }}
           />
         ))}
@@ -234,7 +236,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
         onClick={handleManualSubmit}
         disabled={!canSubmit}
         aria-label={t('otp.verifyAria')}
-        className="w-full h-[54px] flex items-center justify-center gap-2 rounded-[16px] font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
+        className="w-full h-[54px] flex items-center justify-center gap-2 rounded-sq-sm font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
         style={{
           background: verifyActiveLook ? '#FFFFFF' : 'rgba(255,255,255,0.06)',
           boxShadow: verifyActiveLook ? '0 6px 20px rgba(255,255,255,0.18)' : 'none',
