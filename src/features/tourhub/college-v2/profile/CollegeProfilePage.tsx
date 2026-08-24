@@ -154,7 +154,7 @@ export function CollegeProfilePage() {
                 justifyContent: 'center',
               }}
             >
-              <AlertCircle size={20} color="#DC2626" />
+              <AlertCircle size={20} color={TOPAR_UNDER_DARK} />
             </div>
             <div style={{ fontSize: 14, fontWeight: 700, color: INK, marginBottom: 4 }}>
               Couldn't load school data
