@@ -33,6 +33,10 @@ import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, GREEN, DANGER as RED } from '@/com
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { BIZ } from '@/components/business/businessTokens';
 import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+/* THE score-band canon (0-10 member scores only). This page previously carried
+   three private scales — bars at 7/5, chip at 8/6, and its own green/red hexes.
+   Every band colour here now comes from bandColorOnDark and nowhere else. */
+import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 
 const AMBER = A.AMBER;
 const AMBER_SOFT = BIZ.amberTint;
