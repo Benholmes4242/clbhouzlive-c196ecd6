@@ -131,8 +131,9 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
         },
         {
           onSuccess: () => {
-            // Remove followed suggestion from the shelf query so it doesn't
-            // linger on the list (mirrors SuggestedCreatorCard behaviour).
+            // Drop the followed creator from the cached suggestion list: once
+            // followed it is no longer a suggestion, so it should not linger.
+
             queryClient.setQueryData(
               ['suggested-creators', userId],
               (old: SuggestedCreator[] | undefined) =>
