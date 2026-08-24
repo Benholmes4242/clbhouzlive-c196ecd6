@@ -1,5 +1,5 @@
 /**
- * ReviewBottomSheet — LIGHT bottom sheet (solid canvas).
+ * ReviewBottomSheet — DARK bottom sheet (solid canvas).
  *
  * Single overlay used from both entry points:
  *   1. Clubhouse "Read review" card CTA
@@ -20,8 +20,12 @@
  * Both overlays portal to document.body, so this panel's translateZ(0) and the
  * scroller's -webkit-overflow-scrolling cannot clamp either of them.
  *
- * No blur anywhere: the panel is opaque #F8FAFC so the dark page beneath
- * cannot muddy it. The scrim stays a plain rgba dim.
+ * No blur anywhere: the panel is OPAQUE (#15171F canvas, #1B1E27 insets) for
+ * the same reason it was opaque when it was light — the original conversion
+ * (Aug 5) replaced rgba(24,28,24,0.62) + blur(14px) with a solid panel because
+ * a translucent sheet over a busy page muddies. That reasoning is surface-
+ * agnostic and still holds. Only the hue changed: the panel was light between
+ * Aug 5 and the dark migration. The scrim stays a plain rgba dim.
  */
 
 
@@ -32,7 +36,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Play } from 'lucide-react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
@@ -48,14 +52,20 @@ import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { TITLE } from '@/lib/tokens/type';
 
-/* Light-mode surface tokens (Dispatch canvas set). */
-const CANVAS = '#F8FAFC';
-const PANEL = '#FFFFFF';
-const BORDER = '#EDF0F3';
-const INK = '#0E1216';
-const BODY = '#3A424C';
-const MUTE = '#68707B';
-const GRABBER = '#D6DBE1';
+/* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
+   a caption would take: this sheet's payload is three paragraphs of member
+   prose, and body copy needs more separation than a label does. */
+const CANVAS = '#15171F';
+const PANEL = '#1B1E27';
+const BORDER = 'rgba(255,255,255,0.10)';
+const INK = '#F8FAFC';
+const BODY = 'rgba(248,250,252,0.72)';
+const MUTE = 'rgba(248,250,252,0.62)';
+const GRABBER = 'rgba(255,255,255,0.18)';
+/* BORDER doubles as a fill in two places (sub-score tracks, photo placeholder).
+   A hairline alpha reads as nothing when it becomes a surface on dark, so those
+   sites take one step up — the fills are NOT brightened to compensate. */
+const TRACK = 'rgba(255,255,255,0.14)';
 const FONT_SF =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -408,7 +418,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             >
               {/* Ghost numeral — huge watermark, top-right, clipped by header edge */}
               {rating != null && (
-                <ReviewGhostNumeral rating={rating} fontSize={110} right={-10} top={40} surface="light" />
+                <ReviewGhostNumeral rating={rating} fontSize={110} right={-10} top={40} surface="dark" />
               )}
 
               {/* Drag handle */}
@@ -496,7 +506,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
                 {/* Verdict label — tier word over the ghost numeral, top-right */}
                 {rating != null && (
-                  <ReviewVerdictLabel rating={rating} surface="light" />
+                  <ReviewVerdictLabel rating={rating} surface="dark" />
                 )}
 
               </div>
@@ -517,7 +527,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   <RefCell
                     figure={rating.toFixed(1)}
                     figureSize={40}
-                    color={reviewLabelColor(rating, 'light')}
+                    color={reviewLabelColor(rating, 'dark')}
                     label="THEIR SCORE"
                   />
                   <RefCell
@@ -547,7 +557,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   }}
                 >
                   {breakdownEntries.map(({ key, label, value }) => {
-                    const c = reviewLabelColor(value, 'light');
+                    const c = reviewLabelColor(value, 'dark');
                     return (
                       <div key={key} style={{ minWidth: 0 }}>
                         <div
@@ -566,7 +576,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                             marginTop: 5,
                             height: 3,
                             borderRadius: 2,
-                            background: BORDER,
+                            background: TRACK,
                             overflow: 'hidden',
                           }}
                         >
@@ -676,7 +686,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                           border: 'none',
                           borderRadius: 12,
                           overflow: 'hidden',
-                          background: BORDER,
+                          background: TRACK,
                           position: 'relative',
                           cursor: 'pointer',
                           appearance: 'none',
@@ -748,7 +758,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   alt={user.name}
                   fallback={initials}
                   hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
+                  ringColor={DARK_HAIRLINE}
                 />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
@@ -793,7 +803,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     borderRadius: 10,
                     background: INK,
                     border: 'none',
-                    color: PANEL,
+                    /* INK fill takes a CANVAS label. It was PANEL (#FFFFFF)
+                       before the flip, which would have been white-on-white. */
+                    color: CANVAS,
                     fontSize: 15,
                     fontWeight: 700,
                     cursor: courseId ? 'pointer' : 'default',
@@ -812,7 +824,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     minHeight: 48,
                     padding: '14px 12px',
                     borderRadius: 10,
-                    background: PANEL,
+                    background: 'rgba(255,255,255,0.06)',
                     border: `1px solid ${BORDER}`,
                     color: INK,
                     fontSize: 15,
