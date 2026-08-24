@@ -18,7 +18,7 @@ import { PodiumAvatarRing } from './PodiumAvatarRing';
  *   a light scroll.
  *   AN ODDS-LED CARD ("1 IN 12,500" as the hero) put the one constant per feat
  *   type in the largest type on the card: six cards that looked like one card
- *   six times. The odds are now said ONCE, in the section subline (§S3).
+ *   six times.
  *
  * THE RAIL IS A SAMPLE, THE SHEET IS THE RECORD (§S4): one card per feat,
  * RAREST FIRST THEN MOST RECENT, EVERY CARD THE SAME WIDTH AND HEIGHT. Grouping by person was
@@ -136,47 +136,6 @@ export function useCountLabel() {
   };
 }
 
-/**
- * §S3 — THE RARITY, SAID ONCE. The totals are COMPUTED from the feats on the
- * board, so "Four aces and an albatross" changes the moment someone makes one.
- *
- * "COMMONLY QUOTED AT" IS DELIBERATE AND MUST NOT BE TIGHTENED (§S3.3): the
- * 12,500 figure is folklore rather than a measured statistic and the app should
- * not assert it as fact.
- *
- * The sentence takes the two totals as SEPARATE PLACEHOLDERS (§S6.3) because
- * "four aces and an albatross" does not concatenate in every language.
- */
-export function useHonoursSubline(events: WireEvent[]) {
-  const { t } = useTranslation('courses');
-  const aces = events.filter((e) => e.kind === 'ace').length;
-  const albatrosses = events.length - aces;
-
-  const acePart = t('discover.honours.sublineAces', {
-    count: aces,
-    defaultValue: '{{count}} aces',
-    defaultValue_one: '{{count}} ace',
-  });
-  const albatrossPart = t('discover.honours.sublineAlbatrosses', {
-    count: albatrosses,
-    defaultValue: '{{count}} albatrosses',
-    defaultValue_one: '{{count}} albatross',
-  });
-
-  if (aces > 0 && albatrosses > 0)
-    return t(
-      'discover.honours.sublineBoth',
-       '{{aces}} and {{albatrosses}}, all time. Rarest first, then most recent. An ace is commonly quoted at 12,500 to 1.',
-      { aces: acePart, albatrosses: albatrossPart },
-    );
-  if (aces > 0 || albatrosses > 0)
-    return t(
-      'discover.honours.sublineOne',
-       '{{feats}}, all time. Rarest first, then most recent. An ace is commonly quoted at 12,500 to 1.',
-      { feats: aces > 0 ? acePart : albatrossPart },
-    );
-  return '';
-}
 
 function MemberAvatar({
   userId,
@@ -528,38 +487,19 @@ export function HonoursModeToggle({
   );
 }
 
-/** The heading block: glyph, title, quiet see-all, then the rarity subline. */
+/** The heading block: eyebrow title and an optional aside action. */
 export function HonoursHeading({
-  events,
   aside,
 }: {
-  events: WireEvent[];
   aside?: React.ReactNode;
 }) {
   const { t } = useTranslation('courses');
-  const subline = useHonoursSubline(events);
 
   return (
-    <>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
-        <span style={EYEBROW_TEXT}>{t('discover.honoursTitle', 'The honours board')}</span>
-        {aside ? <span style={{ marginLeft: 'auto' }}>{aside}</span> : null}
-      </div>
-      {subline ? (
-        <div
-          style={{
-            marginTop: 3,
-            fontFamily: SANS,
-            fontSize: 11.5,
-            fontWeight: 500,
-            lineHeight: 1.4,
-             color: DISCOVER_QUIET,
-          }}
-        >
-          {subline}
-        </div>
-      ) : null}
-    </>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
+      <span style={EYEBROW_TEXT}>{t('discover.honoursTitle', 'The honours board')}</span>
+      {aside ? <span style={{ marginLeft: 'auto' }}>{aside}</span> : null}
+    </div>
   );
 }
 
@@ -614,7 +554,6 @@ export function HonoursBoard({
       {showHeader ? (
         <div style={{ padding: '0 2px', marginBottom: 10 }}>
           <HonoursHeading
-            events={events}
             aside={
               onSeeAll ? (
                 <InkAction onClick={onSeeAll}>
