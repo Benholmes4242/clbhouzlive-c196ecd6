@@ -382,7 +382,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   }, [pros, ctx.courseId, meta, window, groupedWithTotals, visibleCategories]);
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} style={theme === 'light' ? { background: '#F4F6F9' } : undefined}>
 
       {!hideHeader && (
         <DrilldownHeader
