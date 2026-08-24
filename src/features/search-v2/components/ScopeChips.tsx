@@ -26,7 +26,7 @@ interface Props {
 export function ScopeChips({ scope, onChange }: Props) {
   return (
     <div className="w-full md:max-w-[560px]" style={{ padding: '10px 16px 6px' }}>
-      <PillFilterRow<Scope>
+      <PillFilterRow
         value={scope}
         options={CHIPS}
         onChange={onChange}
