@@ -11,15 +11,14 @@ import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { SF_STACK } from '@/components/manage/ui';
+import { getAvatarFallbackColor } from '@/lib/avatarFallback';
 
-/* ── tokens (shared with SocialListPage) ────────────────────────────── */
-export const ROW_FONT =
-  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-export const ROW_INK = '#0F172A';
-export const ROW_INK_MUTE = '#64748B';
-export const ROW_SURFACE = '#FFFFFF';
-export const ROW_HAIR = 'rgba(15,23,42,0.08)';
-export const ROW_HAIR_STRONG = 'rgba(15,23,42,0.12)';
+/* ── type stack ──────────────────────────────────────────────────────
+   Colour lives in A (analytical dark ramp) — this surface declares NO
+   colour constants. ROW_FONT is the SF stack, sourced from manage/ui. */
+export const ROW_FONT = SF_STACK;
 
 /** Minimal shape the shared row primitives operate on. */
 export interface RowActorLike {
@@ -55,7 +54,10 @@ export function RowAvatar({
             height: size,
             borderRadius: '34%',
             overflow: 'hidden',
-            background: ROW_SURFACE,
+            /* LOGO PLATE: #E9ECF2, not white — a club mark must stay legible
+               (white knock-outs need a plate) but must not out-rank member ink
+               at A.INK. Mirrored in components/business/verification/manageRows. */
+            background: '#E9ECF2',
             border: `0.5px solid ${DARK_HAIRLINE}`,
             flexShrink: 0,
           }}
@@ -74,14 +76,16 @@ export function RowAvatar({
           width: size,
           height: size,
           borderRadius: '34%',
-          background: 'rgba(15,23,42,0.06)',
+          /* Shared fallback hash — see lib/avatarFallback.ts. Keyed on actor_id
+             so a business gets the same colour everywhere it appears. */
+          background: getAvatarFallbackColor(row.actor_id),
           border: `0.5px solid ${DARK_HAIRLINE}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: 15,
           fontWeight: 700,
-          color: ROW_INK_MUTE,
+          color: A.INK,
           flexShrink: 0,
         }}
       >
@@ -105,7 +109,7 @@ export function RowSubline({ row }: { row: RowActorLike }) {
   if (row.actor_type === 'business') {
     const loc = row.business_location ?? row.business_category ?? '';
     return (
-      <div style={{ fontSize: 11.5, fontWeight: 500, color: ROW_INK_MUTE, marginTop: 1 }}>
+      <div style={{ fontSize: 11.5, fontWeight: 500, color: A.BODY, marginTop: 1 }}>
         Business{loc ? ` · ${loc}` : ''}
       </div>
     );
@@ -114,7 +118,7 @@ export function RowSubline({ row }: { row: RowActorLike }) {
   if ((row.mutual_count ?? 0) > 0 && mutuals.length > 0) {
     const extra = (row.mutual_count ?? 0) - 1;
     return (
-      <div style={{ fontSize: 11.5, fontWeight: 500, color: ROW_INK_MUTE, marginTop: 1 }}>
+      <div style={{ fontSize: 11.5, fontWeight: 500, color: A.BODY, marginTop: 1 }}>
         Followed by @{mutuals[0]}
         {extra > 0 ? ` + ${extra} ${extra === 1 ? 'other' : 'others'}` : ''}
       </div>
@@ -123,11 +127,11 @@ export function RowSubline({ row }: { row: RowActorLike }) {
   const home = row.home_club;
   if (!home) return null;
   return (
-    <div style={{ fontSize: 11.5, fontWeight: 500, color: ROW_INK_MUTE, marginTop: 1 }}>{home}</div>
+    <div style={{ fontSize: 11.5, fontWeight: 500, color: A.BODY, marginTop: 1 }}>{home}</div>
   );
 }
 
-/* ── follow button (ink pill; Following = surface + ink + strong hair) ── */
+/* ── follow button (near-white action pill; Following = 6% raised fill) ── */
 export function FollowButton({
   row,
   onFollowChange,
@@ -189,9 +193,11 @@ export function FollowButton({
         height: 30,
         padding: '0 14px',
         borderRadius: 15,
-        background: following ? ROW_SURFACE : ROW_INK,
-        color: following ? ROW_INK : '#FFFFFF',
-        border: following ? `1px solid ${ROW_HAIR_STRONG}` : 'none',
+        /* The ACTION is the near-white pill with canvas-dark ink; the
+           completed state recedes to a quiet raised fill. */
+        background: following ? 'rgba(255,255,255,0.06)' : A.INK,
+        color: following ? A.BODY : A.CANVAS,
+        border: following ? `1px solid ${A.BORDER}` : 'none',
         fontSize: 12,
         fontWeight: 700,
         fontFamily: ROW_FONT,

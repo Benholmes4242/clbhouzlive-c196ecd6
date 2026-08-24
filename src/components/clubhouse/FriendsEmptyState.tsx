@@ -133,9 +133,6 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
           onSuccess: () => {
             // Drop the followed creator from the cached suggestion list: once
             // followed it is no longer a suggestion, so it should not linger.
-
-
-
             queryClient.setQueryData(
               ['suggested-creators', userId],
               (old: SuggestedCreator[] | undefined) =>
