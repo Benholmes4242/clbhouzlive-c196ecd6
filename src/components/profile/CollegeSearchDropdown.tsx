@@ -86,10 +86,12 @@ export const CollegeSearchDropdown: React.FC<CollegeSearchDropdownProps> = ({
     setHighlightedIndex(-1);
   };
 
+  /* FIELD CANON (lib/tokens/field.ts). Was a private 2/5/8% ramp with a 7%
+     border — near-canon by eye, off-canon by value. Disabled keeps its own
+     lower fill; rest/focus come from the canon. */
   const getInputBackground = () => {
-    if (disabled) return 'rgba(255, 255, 255, 0.02)';
-    if (isFocused) return 'rgba(255, 255, 255, 0.08)';
-    return 'rgba(255, 255, 255, 0.05)';
+    if (disabled) return 'rgba(255,255,255,0.02)';
+    return isFocused ? FIELD_FOCUS_BG : FIELD_REST_BG;
   };
 
   const getDisplayName = (college: CollegeMediaResult) => 
@@ -152,10 +154,12 @@ export const CollegeSearchDropdown: React.FC<CollegeSearchDropdownProps> = ({
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full h-[54px] px-4 pr-10 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
+          /* HEIGHT EXCEPTION (54px): matches the selected-college row it swaps
+             with — 44 would jump the card's height on selection. */
+          className={`${FIELD_PLACEHOLDER_CLASS} w-full h-[54px] px-4 pr-10 rounded-2xl text-[rgba(255,255,255,0.96)] text-[15px] focus:outline-none transition-all duration-200`}
           style={{
             background: getInputBackground(),
-            border: '1px solid rgba(255, 255, 255, 0.07)',
+            border: `1px solid ${isFocused ? FIELD_FOCUS_BORDER : FIELD_REST_BORDER}`,
             opacity: disabled ? 0.5 : 1,
           }}
         />
