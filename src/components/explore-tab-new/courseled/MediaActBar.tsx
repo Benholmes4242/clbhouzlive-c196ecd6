@@ -1,7 +1,7 @@
 import { Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { CHIP_GAP, DISCOVER_QUIET, WELL_RADIUS } from './tokens';
+import { CHIP_GAP, DISCOVER_QUIET } from './tokens';
 import { PillFilterRow } from './PillFilterRow';
 
 /**
@@ -97,19 +97,29 @@ export function MediaActBar({
         ariaLabel={t('discover.media.chipsAria', 'Media type')}
       />
 
-      {/* THE CANONICAL DARK FIELD, IN DISCOVER'S RADIUS SCALE. Both channels
-          step on focus (fill 6% → 10%, border 10% → 28%) and the border stays
-          dimmer than the text. The radius is WELL_RADIUS, derived from
-          CARD_RADIUS — the canon's sq-sm applies to full-height fields on the
-          canvas, not to a compact control inside a derived scale. */}
+      {/* THE CANONICAL DARK FIELD, ON THE APP-WIDE FIELD SHAPE AND SIZE.
+          Both channels step on focus (fill 6% → 10%, border 10% → 28%) and the
+          border stays dimmer than the text.
+
+          RADIUS 14 (sq-sm) and HEIGHT 44, not WELL_RADIUS
+          (BRIEF_FIELD_SHAPE_AND_SIZE_CANON §0.1). The previous rule here was
+          that Discover derives card 8 / well 7 / thumb 6 / chips 4 from one
+          constant, so a compact control taking a full-field radius breaks that
+          derivation. OVERTURNED: a text input is a text input wherever it sits,
+          and a member moving between Discover, auth and the search overlay
+          should meet ONE control, not three variants of one. Consistency across
+          the app beats internal consistency within one page's scale. The pills,
+          chips and filter wells above are NOT text inputs and keep their
+          derived radii. */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: 9,
           width: '100%',
-          padding: '11px 12px',
-          borderRadius: WELL_RADIUS,
+          height: 44,
+          padding: '0 12px',
+          borderRadius: 14,
           background: 'rgba(255,255,255,0.06)',
           border: '1px solid rgba(255,255,255,0.10)',
           marginTop: CHIP_GAP,
