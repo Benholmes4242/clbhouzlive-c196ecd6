@@ -11,20 +11,33 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Image as ImageIcon, Send } from 'lucide-react';
+import { X, Image as ImageIcon, Send, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
 import type { ActiveActor } from '@/types/actor';
 
-const INK = '#1F2428';
-const MUTED = '#AEB4BC';
-const SECONDARY = '#8A9099';
+/*
+  DARK BASELINE (MICRO_BRIEF_COMMENTS_DARK §1). The comments sheet is no
+  longer a light-forced surface: the bar sits on the page canvas, the field
+  is a 6% well on it, and AMBER keeps its single meaning (the viewing
+  member) — it is not used for chrome here.
+*/
+const INK = '#F8FAFC';
+const MUTED = 'rgba(248,250,252,0.42)';
+const SECONDARY = 'rgba(248,250,252,0.62)';
 const AMBER = '#F7931E';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+const HAIRLINE = 'rgba(255,255,255,0.10)';
+
+/* Canonical field treatment: both channels step on focus, 140ms. */
+const FIELD_REST_BG = 'rgba(255,255,255,0.06)';
+const FIELD_REST_BORDER = 'rgba(255,255,255,0.10)';
+const FIELD_FOCUS_BG = 'rgba(255,255,255,0.10)';
+const FIELD_FOCUS_BORDER = 'rgba(255,255,255,0.28)';
 
 export interface CommentComposerHandles {
   focus: () => void;
@@ -50,6 +63,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
   const [uploading, setUploading] = useState(false);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [focused, setFocused] = useState(false);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -103,8 +117,8 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
     <div
       className="shrink-0"
       style={{
-        background: '#FFFFFF',
-        borderTop: `1px solid ${HAIRLINE}`,
+        background: A.CANVAS,
+        borderTop: `1px solid ${A.BORDER}`,
         padding: '12px',
         paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
       }}
@@ -128,7 +142,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
 
       {pendingImage && (
         <div className="mb-2 flex items-center gap-2">
-          <div className="w-14 h-14 rounded-[10px] bg-[rgba(15,23,42,0.06)] flex items-center justify-center overflow-hidden">
+          <div className="w-14 h-14 rounded-[10px] bg-white/[0.06] flex items-center justify-center overflow-hidden">
             <ImageIcon size={18} style={{ color: SECONDARY }} />
           </div>
           <span style={{ fontSize: 12, color: SECONDARY }}>Photo attached</span>
@@ -158,7 +172,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
             src={selfActor?.avatarUrl}
             alt={selfActor?.name || 'You'}
             fallback={selfActor?.name?.charAt(0) || '?'}
-            hairlineRing ringColor={LIGHT_HAIRLINE}
+            hairlineRing ringColor={DARK_HAIRLINE}
           />
         </button>
 
@@ -166,9 +180,9 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
           <div
             style={{
               position: 'absolute', bottom: 44, left: 0, zIndex: 20,
-              background: '#FFFFFF', border: `1px solid ${HAIRLINE}`,
+              background: A.PANEL, border: `1px solid ${A.BORDER}`,
               borderRadius: 12, minWidth: 200, padding: 4,
-              boxShadow: '0 10px 30px rgba(15,23,42,0.12)',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.45)',
             }}
           >
             {availableActors.map((a) => (
@@ -176,18 +190,27 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
                 key={`${a.type}:${a.id}`}
                 type="button"
                 onClick={() => { setActiveActor(a); setPickerOpen(false); }}
-                className="w-full flex items-center gap-2 px-2 py-2 bg-transparent border-0 rounded-[8px] cursor-pointer hover:bg-[rgba(15,23,42,0.04)] text-left"
+                className="w-full flex items-center gap-2 px-2 py-2 bg-transparent border-0 rounded-[8px] cursor-pointer hover:bg-white/[0.06] text-left"
               >
                 <SquircleAvatar
                   size={22}
                   src={a.avatarUrl}
                   alt={a.name}
                   fallback={a.name?.charAt(0) || '?'}
-                  hairlineRing ringColor={LIGHT_HAIRLINE}
+                  hairlineRing ringColor={DARK_HAIRLINE}
                 />
                 <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>{a.name}</span>
                 {a.type === 'business' && (
                   <span style={{ fontSize: 9, fontWeight: 700, color: AMBER, letterSpacing: '0.14em' }}>BUSINESS</span>
+                )}
+                {/*
+                  Selected identity. Briefed as amber; note that ActorCards.tsx
+                  answers the same question with the canonical 28% white border
+                  instead, on the grounds that BOTH identities are the viewing
+                  member so amber cannot separate them. Flagged, not resolved.
+                */}
+                {selfActor?.type === a.type && selfActor?.id === a.id && (
+                  <Check size={14} style={{ color: AMBER, marginLeft: 'auto' }} />
                 )}
               </button>
             ))}
@@ -197,9 +220,12 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
         {/* Pill input */}
         <div
           className="flex-1 min-w-0"
+          onFocusCapture={() => setFocused(true)}
+          onBlurCapture={() => setFocused(false)}
           style={{
-            background: '#FFFFFF',
-            border: `1px solid ${HAIRLINE}`,
+            background: focused ? FIELD_FOCUS_BG : FIELD_REST_BG,
+            border: `1px solid ${focused ? FIELD_FOCUS_BORDER : FIELD_REST_BORDER}`,
+            transition: 'background-color 140ms ease-out, border-color 140ms ease-out',
             borderRadius: 22,
             padding: '4px 6px 4px 14px',
             minHeight: 42,
@@ -217,14 +243,10 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
               : t('comments.placeholder')}
             inputRef={(el) => { inputRef.current = el; }}
             currentUserId={user?.id ?? null}
-            /*
-              The comments sheet is a LIGHT-forced surface, so it must name its
-              own ink now that MentionsComposerInput's defaults are dark.
-            */
             textStyle={{
               color: INK,
               caretColor: INK,
-              placeholderColor: 'rgba(14,18,22,0.38)',
+              placeholderColor: 'rgba(255,255,255,0.38)',
             }}
           />
 
@@ -259,7 +281,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
           aria-label="Send"
           style={{
             width: 38, height: 38, borderRadius: '50%',
-            background: canSend ? AMBER : 'rgba(15,23,42,0.08)',
+            background: canSend ? AMBER : 'rgba(255,255,255,0.08)',
             color: canSend ? '#FFFFFF' : MUTED,
             border: 0, cursor: canSend ? 'pointer' : 'not-allowed',
             display: 'flex', alignItems: 'center', justifyContent: 'center',

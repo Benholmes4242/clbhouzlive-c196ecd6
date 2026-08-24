@@ -7,22 +7,24 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Heart, MoreHorizontal } from 'lucide-react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { getActorRouteByType } from '@/types/actor';
 import { CommentImageV2 } from './CommentImageV2';
 import { ReplyRow } from './ReplyRow';
-import { FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { FIGS, A } from '@/features/courses/components/holes/analytical/tokens';
 import { isEmojiOnly } from '../lib/emojiOnly';
 import type { CommentV2 } from '../hooks/useCommentsV2';
 
-const INK = '#0E1216';
-const MUTE = '#68707B';
-const DIM = '#A2A9B2';
+/* Dark baseline (MICRO_BRIEF_COMMENTS_DARK §2). Row separation is hairline
+   only, so the border sits one step stronger than its light counterpart. */
+const INK = A.INK;
+const MUTE = A.MUTE;
+const DIM = 'rgba(248,250,252,0.42)';
 const AMBER = '#F7931E';
-const BORDER = '#EDF0F3';
-const CONNECTOR = '#EDF0F3';
+const BORDER = A.BORDER;
+const CONNECTOR = 'rgba(255,255,255,0.14)';
 
 const INITIAL_REPLIES = 3;
 
@@ -67,7 +69,7 @@ export function CommentCard({
         padding: isFirst ? '0 0 16px' : '16px 0',
         borderTop: isFirst ? undefined : `1px solid ${BORDER}`,
         transition: 'background-color 300ms',
-        background: highlightedId === comment.id ? 'rgba(247,147,30,0.06)' : 'transparent',
+        background: highlightedId === comment.id ? 'rgba(247,147,30,0.12)' : 'transparent',
       }}
     >
       {/* Parent row */}
@@ -88,7 +90,7 @@ export function CommentCard({
             src={comment.avatar_url}
             alt={comment.display_name}
             fallback={comment.display_name?.charAt(0) || '?'}
-            hairlineRing ringColor={LIGHT_HAIRLINE}
+            hairlineRing ringColor={DARK_HAIRLINE}
           />
         </button>
 
@@ -101,7 +103,7 @@ export function CommentCard({
               <span style={{
                 padding: '1px 5px', borderRadius: 3, fontSize: 9, fontWeight: 700,
                 textTransform: 'uppercase', letterSpacing: '0.14em',
-                background: 'rgba(247,147,30,0.10)', color: AMBER,
+                background: 'rgba(247,147,30,0.16)', color: AMBER,
               }}>{t('comments.business')}</span>
             )}
             <span style={{ ...FIGS, fontSize: 11, color: DIM }}>

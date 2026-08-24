@@ -41,8 +41,8 @@ export function CommentImageV2({ mediaUrl, height = 140 }: Props) {
   if (!signed) {
     return (
       <div
-        className="w-full rounded-[12px] mt-2 clb-shimmer-light"
-        style={{ height, background: 'rgba(15,23,42,0.06)' }}
+        className="w-full rounded-[12px] mt-2"
+        style={{ height, background: 'rgba(255,255,255,0.08)' }}
       />
     );
   }
@@ -79,7 +79,7 @@ export function CommentImageV2({ mediaUrl, height = 140 }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="w-full mt-2 overflow-hidden rounded-[12px] block bg-[rgba(15,23,42,0.04)]"
+        className="w-full mt-2 overflow-hidden rounded-[12px] block bg-white/[0.06]"
         style={{ height, border: 0, padding: 0, cursor: 'zoom-in' }}
         aria-label="Open image"
       >

@@ -3,7 +3,7 @@
  * and editorial cards. Fetches via useCommentsV2 (RPC-only writes); realtime
  * merges via useCommentsRealtimeV2.
  *
- * Design: light surface on the canonical page background (--bg-page, #F8FAFC),
+ * Design: DARK canvas (A.CANVAS #15171F) — see MICRO_BRIEF_COMMENTS_DARK,
  * comments as hairline
  * separated ROWS (no cards). Height is content-driven, capped at 75dvh.
  * Keyboard-aware via useKeyboardHeight.
@@ -25,7 +25,7 @@ import { CommentCard } from './components/CommentCard';
 import { CommentComposer } from './components/CommentComposer';
 import { CommentActionSheetV2 } from './components/CommentActionSheetV2';
 import { ReportCommentSheetV2 } from './components/ReportCommentSheetV2';
-import { FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { FIGS, A } from '@/features/courses/components/holes/analytical/tokens';
 import { TITLE as TITLE_SCALE, BODY } from '@/lib/tokens/type';
 
 import {
@@ -39,13 +39,17 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-/** Canonical page background. Token, not a literal, so it cannot drift. */
-const CANVAS = 'var(--bg-page)';
-const INK = '#0E1216';
-const MUTE = '#68707B';
+/*
+  Dark baseline. Rows carry no fill; separation is the hairline alone, which
+  is why BORDER steps up one notch from the light value it replaces.
+*/
+const CANVAS = A.CANVAS;
+const INK = A.INK;
+const MUTE = A.MUTE;
 const AMBER = '#F7931E';
-const BORDER = '#EDF0F3';
+const BORDER = A.BORDER;
 const HAIRLINE = BORDER;
+const SHIMMER = 'rgba(255,255,255,0.08)';
 
 /**
  * Floor for the content-driven sheet. Measured on the smallest supported
@@ -235,15 +239,15 @@ function CommentsSheetV2Inner({
           >
             {/* Grabber */}
             <div className="flex justify-center pt-2 pb-1 shrink-0">
-              <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(0,0,0,0.14)' }} />
+              <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(255,255,255,0.18)' }} />
             </div>
 
             {/* Header - the count is stated ONCE; no kicker, no close button. */}
             <div className="px-5 pb-3 shrink-0">
               {totalCountLoading ? (
                 <div
-                  className="clb-shimmer-light rounded-sm"
-                  style={{ width: 96, height: 21, background: 'rgba(14,18,22,0.06)' }}
+                  className="rounded-sm"
+                  style={{ width: 96, height: 21, background: SHIMMER }}
                 />
               ) : (
                 <div style={{ ...TITLE_SCALE, ...FIGS, color: INK }}>
@@ -369,7 +373,7 @@ function CommentsSheetV2Inner({
                 className="w-full outline-none"
                 style={{
                   minHeight: 96, padding: 12, borderRadius: 12,
-                  border: `1px solid ${HAIRLINE}`, background: '#FFFFFF',
+                  border: `1px solid ${HAIRLINE}`, background: 'rgba(255,255,255,0.06)',
                   fontSize: 14, color: INK, resize: 'vertical',
                 }}
               />
@@ -430,11 +434,11 @@ function SkeletonRows() {
             borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
           }}
         >
-          <div className="w-[34px] h-[34px] rounded-[34%] shrink-0 clb-shimmer-light" style={{ background: 'rgba(14,18,22,0.06)' }} />
+          <div className="w-[34px] h-[34px] rounded-[34%] shrink-0" style={{ background: SHIMMER }} />
           <div className="flex-1 space-y-2 py-0.5">
-            <div className="h-4 w-24 rounded clb-shimmer-light" style={{ background: 'rgba(14,18,22,0.06)' }} />
-            <div className="h-4 w-[85%] rounded clb-shimmer-light" style={{ background: 'rgba(14,18,22,0.06)' }} />
-            <div className="h-4 w-[55%] rounded clb-shimmer-light" style={{ background: 'rgba(14,18,22,0.06)' }} />
+            <div className="h-4 w-24 rounded" style={{ background: SHIMMER }} />
+            <div className="h-4 w-[85%] rounded" style={{ background: SHIMMER }} />
+            <div className="h-4 w-[55%] rounded" style={{ background: SHIMMER }} />
           </div>
         </div>
       ))}

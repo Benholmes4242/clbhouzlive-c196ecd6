@@ -7,8 +7,12 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, Flag, EyeOff, Pencil, Trash2 } from 'lucide-react';
 
-const INK = '#1F2428';
-const HAIRLINE = 'rgba(0,0,0,0.07)';
+/* Dark baseline (MICRO_BRIEF_COMMENTS_DARK §2). Destructive red is the
+   shipped dark danger value, not the light #B42318. */
+const INK = '#F8FAFC';
+const HAIRLINE = 'rgba(255,255,255,0.10)';
+const DANGER = '#FF5A5A';
+const ICON = 'rgba(248,250,252,0.62)';
 
 interface Props {
   open: boolean;
@@ -39,13 +43,13 @@ export function CommentActionSheetV2({
             transition={{ type: 'spring', damping: 28, stiffness: 320 }}
             className="fixed left-0 right-0 bottom-0 z-[12005] mx-auto"
             style={{
-              maxWidth: 560, background: '#FFFFFF',
+              maxWidth: 560, background: '#1B1E27',
               borderRadius: '20px 20px 0 0',
               paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
             }}
           >
             <div className="flex justify-center pt-2.5 pb-2">
-              <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(0,0,0,0.14)' }} />
+              <div style={{ width: 36, height: 4, borderRadius: 999, background: 'rgba(255,255,255,0.18)' }} />
             </div>
 
             {isOwn ? (
@@ -91,9 +95,9 @@ function Row({
       type="button"
       onClick={onClick}
       className="w-full flex items-center gap-3 px-5 py-4 bg-transparent border-0 cursor-pointer text-left"
-      style={{ color: destructive ? '#B42318' : INK, fontSize: 15, fontWeight: 500 }}
+      style={{ color: destructive ? DANGER : INK, fontSize: 15, fontWeight: 500 }}
     >
-      <span style={{ color: destructive ? '#B42318' : '#8A9099' }}>{icon}</span>
+      <span style={{ color: destructive ? DANGER : ICON }}>{icon}</span>
       <span>{label}</span>
     </button>
   );
