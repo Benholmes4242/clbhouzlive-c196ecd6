@@ -78,7 +78,7 @@ export function RequestCourseCTA({
               marginBottom: 12,
             }}
           >
-            <MapPinPlus size={26} color={HERO_ACCENT} strokeWidth={2.25} />
+            <MapPinPlus size={26} color={dark ? A.AMBER : HERO_ACCENT} strokeWidth={2.25} />
           </div>
           <p
             style={{
@@ -109,14 +109,14 @@ export function RequestCourseCTA({
         <div style={{ padding: '16px 20px' }}>
           <div className="flex flex-col gap-2.5 mb-4">
             <div className="flex items-center gap-2.5">
-              <Zap size={17} color={HERO_ACCENT} strokeWidth={2.25} />
-              <span className="text-[13px]" style={{ color: dark ? A.MUTE : undefined }}>
+              <Zap size={17} color={dark ? A.AMBER : HERO_ACCENT} strokeWidth={2.25} />
+              <span className={`text-[13px] ${dark ? '' : 'text-muted-foreground'}`} style={dark ? { color: A.MUTE } : undefined}>
                 {t('request.hero.perkQuick')}
               </span>
             </div>
             <div className="flex items-center gap-2.5">
-              <Bell size={17} color={HERO_ACCENT} strokeWidth={2.25} />
-              <span className="text-[13px]" style={{ color: dark ? A.MUTE : undefined }}>
+              <Bell size={17} color={dark ? A.AMBER : HERO_ACCENT} strokeWidth={2.25} />
+              <span className={`text-[13px] ${dark ? '' : 'text-muted-foreground'}`} style={dark ? { color: A.MUTE } : undefined}>
                 {t('request.hero.perkNotify')}
               </span>
             </div>
