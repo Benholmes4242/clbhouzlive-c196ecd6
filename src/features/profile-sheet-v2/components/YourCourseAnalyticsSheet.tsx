@@ -54,14 +54,22 @@ const DOT = '\u00B7';
 const DIST = {
   eagles: SC_FILL_GOLD,
   birdies: TOPAR_UNDER_LIGHT,
-  pars: '#B4BEC9',
+  pars: A.DIM,
   bogeys: TOPAR_OVER_LIGHT,
 } as const;
 
-/** The index card's zone tones. Borrowed, not owned. */
-const ZONE_BEST = '#0F8F4A';
-const ZONE_MID = '#F7931E';
-const ZONE_OFF = '#C8372B';
+/**
+ * The index card's zone tones. Borrowed, not owned.
+ *
+ * ZONE, NOT SCORE. These describe a round's position within THIS member's own
+ * range at THIS course, so they keep the improvement convention (green good,
+ * red bad). The figures beside them keep the to-par convention. Do not unify
+ * the two — that is the getScoreColor mistake.
+ */
+const ZONE_BEST = A.GREEN;
+const ZONE_MID = A.AMBER;
+const ZONE_OFF = A.RED;
+
 
 /** Zone of one round between the member's worst (0) and best (1) at a course. */
 function zoneColor(v: number, best: number, worst: number): string {
