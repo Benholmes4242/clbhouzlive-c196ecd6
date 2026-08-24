@@ -1,6 +1,7 @@
 import React from 'react';
 import { Globe } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 export type QuickRegion = 'global' | 'gb-i' | 'usa' | 'europe' | 'row';
 
@@ -44,7 +45,9 @@ export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onC
               cursor: 'pointer',
               fontSize: 13,
               fontWeight: isActive ? 700 : 500,
-              color: isActive ? '#0F172A' : '#94A3B8',
+              // Active was #0F172A - near-canvas slate, invisible on the dark
+              // ground. Ink/mute from the analytical ramp instead.
+              color: isActive ? A.INK : A.MUTE,
               letterSpacing: isActive ? '-0.01em' : 0,
               transition: 'color 0.15s ease',
               minHeight: 34,
