@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { AppLog } from '@/lib/logger';
 import { BIZ } from './businessTokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface RequestClubModalProps {
   open: boolean;
