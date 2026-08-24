@@ -108,7 +108,7 @@ export default function DomainStep({ businessId, onDone }: Props) {
     return (
       <form onSubmit={handleSendCode} className="space-y-6 py-4">
         <div className="text-center">
-          <div className="h-14 w-14 rounded-full bg-[#F7931E]/10 flex items-center justify-center mx-auto mb-4">
+          <div className="h-14 w-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: BIZ.amberTint }}>
             <Mail className="h-7 w-7" style={{ color: '#F7931E' }} />
           </div>
           <h3 className="text-lg font-semibold mb-2">Verify your domain</h3>
@@ -132,8 +132,8 @@ export default function DomainStep({ businessId, onDone }: Props) {
         </div>
         <Button
           type="submit"
-          className="w-full h-11 text-white border-0"
-          style={{ background: '#0F172A' }}
+          className="w-full h-11 border-0"
+          style={{ background: A.INK, color: A.CANVAS }}
           disabled={sendCode.isPending}
         >
           {sendCode.isPending ? (
@@ -152,7 +152,7 @@ export default function DomainStep({ businessId, onDone }: Props) {
   return (
     <div className="space-y-6 py-4">
       <div className="text-center">
-        <div className="h-14 w-14 rounded-full bg-[#F7931E]/10 flex items-center justify-center mx-auto mb-4">
+        <div className="h-14 w-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: BIZ.amberTint }}>
           <Mail className="h-7 w-7" style={{ color: '#F7931E' }} />
         </div>
         <h3 className="text-lg font-semibold mb-2">Enter verification code</h3>
@@ -173,8 +173,8 @@ export default function DomainStep({ businessId, onDone }: Props) {
         <p className="text-sm text-destructive text-center">{(verifyCode.error as Error).message}</p>
       )}
       <Button
-        className="w-full h-11 text-white border-0"
-        style={{ background: '#0F172A' }}
+        className="w-full h-11 border-0"
+        style={{ background: A.INK, color: A.CANVAS }}
         onClick={handleVerify}
         disabled={code.length !== 6 || verifyCode.isPending}
       >

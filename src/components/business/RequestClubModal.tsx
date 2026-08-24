@@ -109,8 +109,8 @@ export function RequestClubModal({ open, onOpenChange, initialName = '' }: Reque
               onClick={handleSubmit}
               disabled={!canSubmit}
               style={{
-                background: canSubmit ? BIZ.amber : 'rgba(15,23,42,0.06)',
-                color: canSubmit ? '#fff' : 'rgba(15,23,42,0.45)',
+                background: canSubmit ? BIZ.amber : 'rgba(255,255,255,0.08)',
+                color: canSubmit ? '#fff' : 'rgba(248,250,252,0.38)',
               }}
             >
               {submitting ? (
