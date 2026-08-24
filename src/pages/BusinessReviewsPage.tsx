@@ -237,6 +237,17 @@ function CourseTag({ name }: { name: string }) {
 function Distribution({ dist }: { dist: Array<{ bucket: number; count: number }> }) {
   const max = Math.max(...dist.map((d) => d.count), 1);
   const labels: Record<number, string> = { 5: '9-10', 4: '7-8', 3: '5-6', 2: '3-4', 1: '0-2' };
+  /* Each bucket spans a range, so it gets a REPRESENTATIVE score and the canon
+     colours it — same pattern as CourseReviewsTab's tier bars. Result is
+     green / amber / amber / red / red, which is what the wizard produces for
+     these scores. Never hand-write that as a ternary. */
+  const BUCKET_REP_SCORE: Record<number, number> = {
+    5: 9.5,   // 9-10
+    4: 7.5,   // 7-8
+    3: 5.5,   // 5-6
+    2: 3.5,   // 3-4
+    1: 1,     // 0-2
+  };
   return (
     <div className="space-y-1.5">
       {[5, 4, 3, 2, 1].map((b) => {
