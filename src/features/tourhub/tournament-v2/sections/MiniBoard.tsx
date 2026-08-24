@@ -39,11 +39,18 @@ interface Props {
   /** Active round from sr_tournaments.current_round - scopes TODAY and THRU. */
   currentRound?: number | null;
   /**
-   * Surface the board is drawn on. 'light' (default) keeps the tournament-page
-   * consumers pixel-identical; 'dark' maps every surface token to its dark
-   * counterpart for the photo-backed hero board. Same component, not a fork.
+   * THE GROUND THE BOARD SITS ON. One component, two real grounds:
+   *  - 'panel' (default): the tournament page (TournamentPage:233 live board and
+   *    :255 final board). Its ground is the #15171F app canvas, so the board is
+   *    a PANEL that must read as a step UP — SURFACE (#1B1E27).
+   *  - 'heroBoard': the Tour Overview hybrid hero (HeroBoardBand:331). Its ground
+   *    is the photo-backed hero block, so the board takes HERO_BOARD_SURFACE
+   *    (#0B0F14) and is continuous with the block around it.
+   *  - 'light': legacy light chrome islands. No live callsite; retained because
+   *    the light ramp has not been deleted.
    */
-  theme?: 'light' | 'dark';
+  theme?: 'panel' | 'heroBoard' | 'light';
+
   /**
    * Player ids that are Tournament Intelligence picks. DEFAULTS TO UNDEFINED so
    * the tournament-page consumers are pixel-identical — no fork.
