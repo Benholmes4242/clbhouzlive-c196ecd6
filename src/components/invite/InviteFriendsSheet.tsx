@@ -213,10 +213,13 @@ function ConnectedState({ ownerUserId, source }: { ownerUserId: string; source: 
               display: 'flex',
               alignItems: 'center',
               gap: 7,
-              background: '#FFFFFF',
-              border: `0.5px solid ${A.BORDER}`,
-              borderRadius: 18,
-              padding: '8px 13px',
+              height: 44,
+              // Canonical dark field treatment: 6%/10% at rest, 10%/28% on focus.
+              background: searchFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
+              border: `1px solid ${searchFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
+              borderRadius: 14,
+              padding: '0 13px',
+              transition: 'background 140ms ease, border-color 140ms ease',
             }}
           >
             <Search size={13} color={A.DIM} />
@@ -224,13 +227,16 @@ function ConnectedState({ ownerUserId, source }: { ownerUserId: string; source: 
               type="text"
               value={q}
               onChange={(e) => setQ(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
               placeholder={t('invite.searchPlaceholder')}
+              className="placeholder:text-[rgba(255,255,255,0.38)]"
               style={{
                 flex: 1,
                 minWidth: 0,
                 fontSize: 14,
                 fontFamily: SANS,
-                color: A.INK,
+                color: 'rgba(255,255,255,0.96)',
                 background: 'transparent',
                 border: 'none',
                 outline: 'none',
@@ -238,6 +244,7 @@ function ConnectedState({ ownerUserId, source }: { ownerUserId: string; source: 
             />
           </div>
         )}
+
       </div>
 
       {/* Scroller. overscrollBehavior: contain stops scroll chaining into the
