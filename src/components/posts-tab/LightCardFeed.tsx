@@ -570,7 +570,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
               />
             )}
           </LightItemGate>
-          {/* Inter-card divider — a touch darker than the page bg */}
+          {/* Inter-card divider — a hairline lift off the dark canvas */}
           <div aria-hidden style={{ height: 5, background: DIVIDER }} />
         </div>
       );
