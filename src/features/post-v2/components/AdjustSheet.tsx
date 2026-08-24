@@ -167,7 +167,7 @@ export default function AdjustSheet({ open, onClose, item, onApply }: Props) {
     <BottomSheet open={open} title="Adjust" onClose={onClose}>
       <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Frame stage */}
-        <div style={{ background: CT.ink, borderRadius: 14, height: STAGE_H, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <div style={{ background: '#000', borderRadius: 14, height: STAGE_H, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
           <div
             ref={stageRef}
             onPointerDown={onPointerDown}
@@ -230,7 +230,7 @@ export default function AdjustSheet({ open, onClose, item, onApply }: Props) {
             onChange={(e) => setScale(clampScale(parseFloat(e.target.value)))}
             onPointerDown={() => setInteracting(true)}
             onPointerUp={() => setInteracting(false)}
-            style={{ flex: 1, accentColor: CT.dark, cursor: 'pointer' }}
+            style={{ flex: 1, accentColor: CT.ink, cursor: 'pointer' }}
           />
           <span style={{ fontSize: 12, fontVariantNumeric: 'tabular-nums', color: CT.ink, width: 40, textAlign: 'right' }}>{scale.toFixed(2)}x</span>
         </div>
@@ -245,7 +245,7 @@ export default function AdjustSheet({ open, onClose, item, onApply }: Props) {
           </button>
           <button
             onClick={done}
-            style={{ flex: 2, background: CT.dark, color: CT.onDark, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+            style={{ flex: 2, background: CT.ink, color: CT.canvas, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
           >
             Done
           </button>
