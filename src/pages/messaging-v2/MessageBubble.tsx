@@ -322,18 +322,26 @@ export const MessageBubble: React.FC<Props> = ({
               key={r.emoji}
               className="inline-flex items-center"
               style={{ position: "relative", 
+                // MICRO_BRIEF_MESSAGES_LEFTOVERS §1, option (a): the chip is an
+                // ACCENT. The white fill stays — emoji are full-colour glyphs and
+                // white is the one ground they read on. What was wrong is the
+                // RELATIONSHIP: a black-alpha hairline is invisible on the
+                // incoming bubble's dark ground, and INK (near-white) was set as
+                // the chip's text colour ON a white fill. The chip now takes the
+                // bubble's context: an edge only where there is something to
+                // separate it from, and dark ink because its ground is white.
                 background: '#FFFFFF',
-                border: '0.5px solid rgba(0,0,0,0.08)',
+                border: isOutgoing ? '0.5px solid rgba(5,7,10,0.12)' : 'none',
                 borderRadius: 11,
                 padding: '1px 7px',
                 fontSize: 12,
                 lineHeight: '18px',
-                color: INK,
+                color: OUT_FG,
                 gap: 3,
               }}
             >
               <span>{r.emoji}</span>
-              {r.count > 1 ? <span style={{ position: "relative",  ...FIGS, color: SUB }}>{r.count}</span> : null}
+              {r.count > 1 ? <span style={{ position: "relative",  ...FIGS, color: 'rgba(5,7,10,0.55)' }}>{r.count}</span> : null}
             </span>
           ))}
         </div>
