@@ -396,7 +396,10 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         alignItems: 'flex-start',
         gap: 11,
         padding: '9px 18px',
-        background: isUnread ? 'rgba(247,147,30,0.045)' : 'transparent',
+        // §5.2 THE UNREAD STATE. A 4.5% amber wash was legible on white and is
+        // nothing on #15171F, so the tint is lifted to carry the same job on
+        // dark. The amber dot below is the second, redundant signal.
+        background: isUnread ? 'rgba(247,147,30,0.10)' : 'transparent',
         opacity: 1,
         cursor: 'pointer',
         fontFamily: SF_STACK,
