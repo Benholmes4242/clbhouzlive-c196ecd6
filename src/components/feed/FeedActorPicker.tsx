@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { ActiveActor } from '@/types/actor';
 import { KICKER } from '@/lib/tokens/type';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-// Only the trigger chevron is theme-dependent; the sheet is always light.
+// Only the trigger chevron is theme-dependent; the sheet follows the dark canvas.
 const PALETTE = {
   dark: {
     // FeedCard footer is NOT inside .hcp-dark scope, so we can't rely on
@@ -91,8 +92,9 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
       <BottomSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
-        variant="light"
-        style={{ background: '#F8FAFC' }}
+        variant="dark"
+        surfaceColor={A.CANVAS}
+        style={{ background: A.CANVAS }}
       >
         <div
           onClick={(e) => e.stopPropagation()}
@@ -125,12 +127,12 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
                   alignItems: 'center',
                   gap: 12,
                   width: '100%',
-                  background: isActive ? 'rgba(15, 23, 42, 0.05)' : 'transparent',
+                  background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
                   border: 'none',
                   padding: 12,
                   borderRadius: 12,
                   cursor: 'pointer',
-                  color: '#0F172A',
+                  color: A.INK,
                   textAlign: 'left',
                 }}
               >
@@ -140,7 +142,7 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
                   alt={a.name}
                   userId={a.type === 'personal' ? a.id : null}
                   hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
+                  ringColor={A.BORDER}
                 />
 
                 <span style={{ fontSize: 15, fontWeight: 600, flex: 1 }}>{a.name}</span>

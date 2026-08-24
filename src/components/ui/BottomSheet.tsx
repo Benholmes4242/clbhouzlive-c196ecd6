@@ -10,8 +10,15 @@ interface BottomSheetProps {
   className?: string;
   style?: React.CSSProperties;
   ariaLabelledBy?: string;
-  /** 'light' (default, uses `bg-background`) or 'dark' (ink #0F172A surface + light handle). */
+  /**
+   * NOTE ON THE VARIANT NAMES (dark-only baseline): 'light' and 'dark' no
+   * longer mean light vs dark. Both paint a DARK surface — 'light' takes
+   * `bg-background`, which resolves to #15171F, and 'dark' takes an explicit
+   * #0F172A (or `surfaceColor`). The names are kept because 45 files import
+   * them; do NOT rename. Consequence: the grabber is white in both cases.
+   */
   variant?: 'light' | 'dark';
+
   /** Optional surface colour override for the dark variant. */
   surfaceColor?: string;
   /** Optional max-height override (default '85dvh'). Use e.g. '75dvh' for dvh-aware caps. */
@@ -149,7 +156,10 @@ export function BottomSheet({
               width: 36,
               height: 4,
               borderRadius: 2,
-               background: variant === 'dark' ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.12)',
+              /* Unconditional white grabber. Both variants paint a dark surface
+                 now (see the variant note above), so there is no light case. */
+              background: 'rgba(255,255,255,0.18)',
+
               margin: '0 auto',
             }}
           />
