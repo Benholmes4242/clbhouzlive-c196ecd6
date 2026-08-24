@@ -364,7 +364,7 @@ export function BusinessRow({
           overflow: 'hidden',
           flexShrink: 0,
           border: `1px solid ${HAIR}`,
-          background: logoUrl ? '#FFFFFF' : getAvatarFallbackColor(fallbackKey || name),
+          background: logoUrl ? '#E9ECF2' : getAvatarFallbackColor(fallbackKey || name),
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

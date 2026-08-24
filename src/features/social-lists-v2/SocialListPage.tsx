@@ -34,19 +34,13 @@ import {
 } from './hooks/useSocialListV2';
 import { FIGURE } from '@/lib/tokens/type';
 import { RowAvatar, RowSubline, FollowButton } from './rowParts';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { SF_STACK } from '@/components/manage/ui';
 
-/* ── design tokens (Circle) ─────────────────────────────────────────── */
-const FONT =
-  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const INK = '#0F172A';
-const INK_MUTE = '#64748B';
-const INK_FAINT = '#94A3B8';
-const BG = '#F8FAFC';
-const SURFACE = '#FFFFFF';
-const HAIR = 'rgba(15,23,42,0.08)';
-const HAIR_STRONG = 'rgba(15,23,42,0.12)';
-
-const BRAND_AMBER = '#F7931E';
+/* ── type stack ──────────────────────────────────────────────────────
+   No colour constants on this surface: colour comes from A, the analytical
+   dark ramp, and the type stack from manage/ui. */
+const FONT = SF_STACK;
 
 /* ── props ──────────────────────────────────────────────────────────── */
 interface Props {
@@ -153,7 +147,7 @@ export default function SocialListPage({
     <div
       style={{
         minHeight: '100dvh',
-        background: BG,
+        background: A.CANVAS,
         fontFamily: FONT,
         paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)',
         paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)',
@@ -165,7 +159,7 @@ export default function SocialListPage({
           style={{
             fontSize: 21,
             fontWeight: 700,
-            color: INK,
+            color: A.INK,
             letterSpacing: '-0.02em',
             lineHeight: 1.15,
           }}
@@ -173,7 +167,7 @@ export default function SocialListPage({
           {profileDisplayName ?? profileUsername ?? 'Profile'}
         </div>
         {profileUsername && (
-          <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
+          <div style={{ fontSize: 11.5, fontWeight: 500, color: A.BODY, marginTop: 2 }}>
             @{profileUsername}
           </div>
         )}
@@ -187,7 +181,7 @@ export default function SocialListPage({
             gridTemplateColumns: '1fr 1fr',
             gap: 6,
             padding: 4,
-            background: 'rgba(15,23,42,0.05)',
+            background: 'rgba(255,255,255,0.06)',
             borderRadius: 12,
           }}
         >
@@ -203,8 +197,11 @@ export default function SocialListPage({
                   padding: '9px 10px',
                   borderRadius: 9,
                   border: 'none',
-                  background: active ? INK : 'transparent',
-                  color: active ? '#FFFFFF' : INK,
+                  /* SEGMENTED CONTROL, not a pill row: equal-width grid inside a
+                     6% track. PillFilterRow cannot host it without changing
+                     geometry, so it stays hand-styled on the A ramp. */
+                  background: active ? A.INK : 'transparent',
+                  color: active ? A.CANVAS : A.INK,
                   fontSize: 13,
                   fontWeight: 700,
                   fontFamily: FONT,
@@ -250,7 +247,7 @@ export default function SocialListPage({
              list with the tab switcher above it. */
           className={FIELD_PAINT_CLASS}
         >
-          <Search size={16} color={INK_FAINT} strokeWidth={2.2} />
+          <Search size={16} color={A.MUTE} strokeWidth={2.2} />
           <input
             type="search"
             value={search}
@@ -263,7 +260,7 @@ export default function SocialListPage({
               background: 'transparent',
               fontSize: 14,
               fontWeight: 500,
-              color: INK,
+              color: A.INK,
               fontFamily: FONT,
             }}
           />
@@ -280,8 +277,8 @@ export default function SocialListPage({
               display: 'flex',
               alignItems: 'center',
               gap: 12,
-              background: SURFACE,
-              border: `1px solid ${HAIR}`,
+              background: A.PANEL,
+              border: `1px solid ${A.BORDER}`,
               borderRadius: 12,
               padding: '12px 14px',
               cursor: 'pointer',
@@ -294,20 +291,20 @@ export default function SocialListPage({
                 width: 32,
                 height: 32,
                 borderRadius: 10,
-                background: 'rgba(247,147,30,0.10)',
+                background: 'rgba(247,147,30,0.16)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <UserPlus size={16} color={BRAND_AMBER} strokeWidth={2.2} />
+              <UserPlus size={16} color={A.AMBER} strokeWidth={2.2} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: INK }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: A.INK }}>
                 Invite friends to Clbhouz
               </div>
-              <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
+              <div style={{ fontSize: 11.5, fontWeight: 500, color: A.BODY, marginTop: 2 }}>
                 Bring your regular fourball along
               </div>
             </div>
@@ -315,7 +312,7 @@ export default function SocialListPage({
               style={{
                 fontSize: 11,
                 fontWeight: 500,
-                color: BRAND_AMBER,
+                color: A.AMBER,
                 textTransform: 'uppercase',
                 letterSpacing: '0.04em',
                 flexShrink: 0,
@@ -334,7 +331,7 @@ export default function SocialListPage({
         ) : (
           <>
             {showPending && pending.length > 0 && (
-              <Section eyebrow={`PENDING · ${pending.length}`} eyebrowColor={BRAND_AMBER}>
+              <Section eyebrow={`PENDING · ${pending.length}`} eyebrowColor={A.AMBER}>
                 {pending.map((r) => (
                   <PendingRow key={rowKey(r)} row={r} viewerUserId={viewer?.id} />
                 ))}
@@ -356,7 +353,7 @@ export default function SocialListPage({
                       background: 'transparent',
                       border: 'none',
                       padding: '10px 16px 4px',
-                      color: '#94A3B8',
+                      color: A.MUTE,
                       fontSize: 11.5,
                       fontWeight: 600,
                       fontFamily: FONT,
@@ -385,7 +382,7 @@ export default function SocialListPage({
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: 12,
-                  color: INK_MUTE,
+                  color: A.BODY,
                   fontSize: 13,
                 }}
               >
@@ -394,8 +391,8 @@ export default function SocialListPage({
                   type="button"
                   onClick={() => list.refetch()}
                   style={{
-                    background: INK,
-                    color: '#fff',
+                    background: A.INK,
+                    color: A.CANVAS,
                     border: 'none',
                     borderRadius: 999,
                     padding: '8px 16px',
@@ -415,7 +412,7 @@ export default function SocialListPage({
                 style={{
                   padding: '48px 24px',
                   textAlign: 'center',
-                  color: INK_MUTE,
+                  color: A.BODY,
                   fontSize: 13,
                 }}
               >
@@ -461,7 +458,7 @@ function Section({
           fontSize: 10.5,
           fontWeight: 700,
           letterSpacing: '0.16em',
-          color: eyebrowColor ?? (muted ? INK_MUTE : INK),
+          color: eyebrowColor ?? (muted ? A.BODY : A.INK),
         }}
       >
         {eyebrow}
@@ -522,7 +519,7 @@ function PendingRow({
           style={{
             fontSize: 13.5,
             fontWeight: 700,
-            color: INK,
+            color: A.INK,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -530,7 +527,7 @@ function PendingRow({
         >
           {row.display_name ?? row.username}
         </div>
-        <div style={{ fontSize: 11, fontWeight: 500, color: INK_MUTE, marginTop: 1 }}>
+        <div style={{ fontSize: 11, fontWeight: 500, color: A.BODY, marginTop: 1 }}>
           {cancelled ? 'Request cancelled' : 'Friend request sent'}
         </div>
       </div>
@@ -543,9 +540,9 @@ function PendingRow({
             height: 30,
             padding: '0 12px',
             borderRadius: 15,
-            background: SURFACE,
-            border: `1px solid ${HAIR_STRONG}`,
-            color: INK,
+            background: A.PANEL,
+            border: `1px solid rgba(255,255,255,0.16)`,
+            color: A.INK,
             fontSize: 12,
             fontWeight: 700,
             fontFamily: FONT,
@@ -596,7 +593,7 @@ function RichRow({
             style={{
               fontSize: 14,
               fontWeight: 700,
-              color: INK,
+              color: A.INK,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -609,8 +606,8 @@ function RichRow({
               style={{
                 ...FIGURE,
                 fontSize: 10.5,
-                color: INK,
-                background: 'rgba(0,0,0,0.05)',
+                color: A.INK,
+                background: 'rgba(255,255,255,0.08)',
                 padding: '2px 6px',
                 borderRadius: 6,
               }}
