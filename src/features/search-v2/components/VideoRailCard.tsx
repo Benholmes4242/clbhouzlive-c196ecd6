@@ -83,7 +83,7 @@ export function VideoRailCard({ video, onSelect }: Props) {
               // photographic thumbnail behind a black scrim.
               background: 'rgba(0,0,0,0.7)',
               color: '#fff',
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 700,
               fontVariantNumeric: 'tabular-nums',
             }}
@@ -95,7 +95,7 @@ export function VideoRailCard({ video, onSelect }: Props) {
       <div style={{ padding: '6px 2px 0' }}>
         <div
           style={{
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: 600,
             color: S.INK,
             lineHeight: 1.3,

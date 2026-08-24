@@ -34,7 +34,7 @@ export function RecentsList({ items, onPick, onClear }: Props) {
           >
             <Clock size={14} color={S.QUIET} strokeWidth={2} />
           </div>
-          <span className="text-[14px]" style={{ color: S.INK }}>{item.query}</span>
+          <span className="text-[15px]" style={{ color: S.INK }}>{item.query}</span>
         </button>
       ))}
     </div>
