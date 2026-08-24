@@ -1,3 +1,4 @@
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS, FIELD_REST_BG, FIELD_FOCUS_BG, FIELD_REST_BORDER, FIELD_FOCUS_BORDER } from '@/lib/tokens/field';
 import React, { useState, useRef, useEffect } from 'react';
 import { useCollegeMediaSearch, CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
 import { GraduationCap, Loader2 } from 'lucide-react';
