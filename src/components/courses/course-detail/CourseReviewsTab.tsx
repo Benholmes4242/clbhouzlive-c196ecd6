@@ -46,7 +46,7 @@ import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { AlertCircle } from 'lucide-react';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { ReportSheet } from "@/components/moderation/ReportSheet";
-import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_06, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
+import { AMBER, HAIRLINE_INK_7, INK, INK_FAINT, INK_LIGHT, INK_MUTE, INK_TINT_02, INK_TINT_06, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
 
 export type SortOption = ReviewsSortBy;
 
@@ -121,6 +121,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const [reportingReview, setReportingReview] = useState<CourseReview | null>(null);
 
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
 
   const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(externalHighlightReviewId || null);
 
@@ -568,7 +569,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             type="button"
             onClick={() => refetch()}
             className="rounded-full text-sm font-semibold px-5 py-2 active:scale-[0.98] transition-all min-h-[44px]"
-            style={{ background: AMBER, color: A.CANVAS }}
+            style={{ background: A.INK, color: A.CANVAS }}
           >
             {t('review.error.retry')}
           </button>
@@ -612,6 +613,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
     <div style={{ paddingBottom: 8, background: SLATE_50, minHeight: '100%' }}>
+      {/* ::placeholder cannot be reached from an inline style; the field
+          inherited a light-mode placeholder until this rule. */}
+      <style>{`.course-reviews-search-input::placeholder{color:rgba(255,255,255,0.38);}`}</style>
       {(() => {
         const maxTierCount = Math.max(...TIER_ROWS.map(t => reviewCountsByTier[t.key] ?? 0), 1);
         return (
@@ -620,7 +624,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             <div
               style={{
                 background: 'rgba(255,255,255,0.06)',
-                border: `1px solid ${HAIRLINE_INK_10}`,
+                border: '1px solid rgba(255,255,255,0.10)',
                 borderRadius: 16,
                 padding: '16px 16px',
                 display: 'flex',
@@ -694,7 +698,28 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
             {/* Control row / expanding search */}
             {searchOpen ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 12px', borderRadius: 17, background: 'rgba(255,255,255,0.06)', border: `1px solid ${HAIRLINE_INK_10}` }}>
+              /* HEIGHT EXCEPTION, DELIBERATE - DO NOT "CORRECT" TO 44.
+                 The canon puts search fields at 44 / sq-sm. This one is an
+                 INLINE CONTROL-ROW search: it replaces a row of 34px controls
+                 (search button, sort select, tee filter), so 44 would either
+                 jump the row's height on open or drag all three neighbours to
+                 44 with it. It keeps 34 and the pill radius (17) because its
+                 neighbours do. Paint and focus follow the canon; geometry
+                 follows the row. Second recorded exception, after the OTP
+                 digit boxes - both constrained by neighbours, not preference. */
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  height: 34,
+                  padding: '0 12px',
+                  borderRadius: 17,
+                  background: searchFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
+                  border: `1px solid ${searchFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
+                  transition: 'background 140ms ease, border-color 140ms ease',
+                }}
+              >
                 <Search className="h-4 w-4 text-muted-foreground" style={{ flexShrink: 0 }} />
                 <input
                   type="text"
@@ -702,6 +727,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
+                  className="course-reviews-search-input"
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setSearchFocused(false)}
                   style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', fontSize: 13, color: INK, background: 'transparent' }}
                 />
                 {searchQuery && (
@@ -712,7 +740,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                 <button
                   type="button"
                   onClick={() => { handleClearSearch(); setSearchOpen(false); }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: AMBER, padding: 0, flexShrink: 0 }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: INK, padding: 0, flexShrink: 0 }}
                 >
                   {t('review.search.cancel')}
                 </button>
@@ -724,7 +752,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   type="button"
                   onClick={() => setSearchOpen(true)}
                   aria-label={t('review.search.openA11y')}
-                  style={{ width: 34, height: 34, borderRadius: 17, background: 'rgba(255,255,255,0.06)', border: `1px solid ${HAIRLINE_INK_10}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                  style={{ width: 34, height: 34, borderRadius: 17, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
                 >
                   <Search className="h-4 w-4 text-muted-foreground" />
                 </button>
@@ -758,7 +786,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                       borderRadius: 17,
                       background: teeFilterOn ? A.INK : 'rgba(255,255,255,0.06)',
                       color: teeFilterOn ? A.CANVAS : A.INK,
-                      border: `1px solid ${teeFilterOn ? A.INK : HAIRLINE_INK_10}`,
+                      border: `1px solid ${teeFilterOn ? A.INK : 'rgba(255,255,255,0.10)'}`,
                       fontSize: 12,
                       fontWeight: 700,
                       cursor: 'pointer',
