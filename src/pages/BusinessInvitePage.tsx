@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Search, Mail, AtSign, Shield, Edit3, BarChart3, Check, X, UserPlus } from 'lucide-react';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -159,13 +160,10 @@ export default function BusinessInvitePage() {
                     autoCapitalize="none"
                     autoComplete="off"
                     autoCorrect="off"
-                    className="w-full pl-10 pr-3 py-2.5 text-[14px] outline-none"
-                    style={{
-                      background: 'rgba(255,255,255,0.06)',
-                      border: `1px solid ${HAIR}`,
-                      borderRadius: 10,
-                      color: INK,
-                    }}
+                    /* FIELD CANON (lib/tokens/field.ts). Height is
+                       padding-derived (~42px) inside the recipient card. */
+                    className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full pl-10 pr-3 py-2.5 text-[14px] outline-none`}
+                    style={{ color: INK }}
                   />
                 </div>
 

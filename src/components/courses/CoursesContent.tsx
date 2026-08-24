@@ -22,13 +22,14 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 
 import CoursesErrorBoundary from './CoursesErrorBoundary';
 import { Search, X, Star, ChevronRight } from 'lucide-react';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { FIGS } from '@/lib/tokens/type';
 import CoursesShellTabs from '@/features/courses/components/CoursesShellTabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, HAIRLINE_INK_12, INK, INK_MUTE, INK_TINT_05, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
+import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, HAIRLINE_INK_12, INK, INK_MUTE, INK_TINT_05, SLATE_50 } from '@/features/courses/_shared/tokens';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 /* ─── Rate a Course bottom sheet ─── */
@@ -117,10 +118,11 @@ function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t('rateSheet.searchPlaceholder', { defaultValue: 'Search courses…' })}
+            /* FIELD CANON (lib/tokens/field.ts). HEIGHT EXCEPTION (~37px,
+               padding-derived): rate-sheet header above the results list. */
+            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
             style={{
               width: '100%', padding: '9px 12px 9px 36px',
-              borderRadius: 10, border: `1px solid ${HAIRLINE_INK_10}`,
-              background: SURFACE,
               fontSize: 14, outline: 'none',
               color: INK,
               boxSizing: 'border-box' as const,

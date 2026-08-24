@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Loader2 } from 'lucide-react';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { TITLE } from '@/lib/tokens/type';
 import { supabase } from '@/integrations/supabase/client';
@@ -68,8 +69,13 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
   const close = () => onOpenChange(false);
 
   const labelCls = 'block text-[13px] font-medium text-slate-700 mb-1.5';
+  /* FIELD CANON (lib/tokens/field.ts). This field painted WHITE with
+     slate-200 borders and an amber focus ring — a light-mode survivor, not a
+     6% well. Height 44 (h-11) already canon; radius moves 10 -> 14 and the
+     amber focus ring becomes the white focus step (amber means the viewing
+     member, never a field). */
   const inputCls =
-    'w-full h-11 px-3 rounded-[10px] border border-slate-200 bg-white text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F7931E]/40 focus:border-[#F7931E]';
+    `${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full h-11 px-3 text-[15px] text-[rgba(255,255,255,0.96)] focus:outline-none`;
 
   return (
     <BottomSheet open={open} onClose={close} ariaLabelledBy="request-course-title" zIndexBase={zIndexBase}>

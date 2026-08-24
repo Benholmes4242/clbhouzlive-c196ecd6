@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { TITLE } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 // DARK-ONLY. RED is the BESPOKE DESTRUCTIVE red (dark variant of #DC2626).
 // It is deliberately NOT the app's under-par red — red means UNDER PAR on
@@ -94,10 +95,13 @@ export default function DeleteAccountConfirmSheet({
             disabled={isWorking}
             autoCapitalize="characters"
             aria-label="Type DELETE to confirm"
+            /* FIELD CANON (lib/tokens/field.ts): 6% rest, 10% border, radius 14,
+               focus steps both channels via :focus-within. Height is
+               padding-derived (~46px) and stands alone — no exception. */
+            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
             style={{
               width: '100%', padding: '12px 14px',
-              border: `1px solid ${A.BORDER}`, borderRadius: 12,
-              fontSize: 15, background: 'rgba(255,255,255,0.06)', color: INK, fontFamily: FONT,
+              fontSize: 15, color: INK, fontFamily: FONT,
               outline: 'none', marginBottom: 18,
               letterSpacing: '0.10em', fontWeight: 600,
               opacity: isWorking ? 0.5 : 1,
