@@ -13,7 +13,12 @@ import React from 'react';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
 
-export const HERO_INK = A.INK;
+/* The hero's FALLBACK GROUND, shown only when there is no cover photo.
+   Named HERO_INK while the app was light, which hid the fact that it was a
+   background: after the dark flip it painted a near-white band under five
+   #FFFFFF labels. It is never used as an ink — the labels stay white because
+   they also sit over the cover photograph. */
+export const HERO_GROUND = A.CANVAS;
 export const W_55 = 'rgba(255,255,255,0.55)';
 export const W_45 = 'rgba(255,255,255,0.45)';
 export const W_40 = 'rgba(255,255,255,0.40)';
@@ -218,7 +223,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
     <section
       style={{
         position: 'relative',
-        background: HERO_INK,
+        background: HERO_GROUND,
         marginTop: 0,
         padding: '0 16px 16px',
         /* MINIMUM top inset - it clears the status bar and ChromeIsland and

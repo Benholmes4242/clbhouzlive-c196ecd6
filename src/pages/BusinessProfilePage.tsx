@@ -493,7 +493,7 @@ const BusinessProfilePage: React.FC = () => {
           <p
             ref={bioRef}
             className={cn('whitespace-pre-wrap', !bioExpanded && 'line-clamp-3')}
-            style={{ fontSize: 13.5, lineHeight: 1.55, color: '#3A424C', overflowWrap: 'anywhere' }}
+            style={{ fontSize: 13.5, lineHeight: 1.55, color: A.BODY, overflowWrap: 'anywhere' }}
           >
             {bioText}
           </p>
