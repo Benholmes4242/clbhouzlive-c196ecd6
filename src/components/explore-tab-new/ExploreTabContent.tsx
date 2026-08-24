@@ -308,14 +308,35 @@ export default function ExploreTabContent({
    * it. Reorder this on those numbers, not on taste.
    */
   const photoPool = useMemo(() => library.data?.photos ?? [], [library.data]);
-  const photos = useMemo(() => photoPool.slice(0, PHOTOS_CAP), [photoPool]);
+  const photoSample = useMemo(() => photoPool.slice(0, PHOTOS_SAMPLE), [photoPool]);
   const libraryAll = useMemo(() => library.data?.all ?? [], [library.data]);
+  const clipPool = useMemo(() => library.data?.clips ?? [], [library.data]);
+  const videoPool = useMemo(() => library.data?.videos ?? [], [library.data]);
 
-  /* A SAMPLE IS STILL A QUEUE: the fullscreen viewer swipes the photos the
-     member can actually see here, not the whole library behind the see-all. */
-  const handlePhoto = useCallback(
-    (item: CommunityLibraryItem) => {
-      const posts = photos.map((i) => i.post);
+  /**
+   * THE MEDIA CHIP (BRIEF_DISCOVER_ONE_PAGE §4.2). Component state, never the
+   * URL — the same rule /community held and the same rule the scope pills hold:
+   * a filtered view is not a place a member should land on cold, and a chip tap
+   * must not enter the back stack.
+   */
+  const [mediaChip, setMediaChip] = useState<MediaChipId>('all');
+  const changeChip = useCallback(
+    (next: MediaChipId) => {
+      if (next === mediaChip) return;
+      analyticsEvents.media.filterSelected(next, mediaChip);
+      setMediaChip(next);
+    },
+    [mediaChip],
+  );
+
+  /**
+   * THE VIEWER'S QUEUE IS WHAT THE MEMBER CAN SEE (unchanged rule): swiping
+   * inside the fullscreen viewer walks the pool this section actually rendered,
+   * so the queue can never contain something the page does not show.
+   */
+  const openMedia = useCallback(
+    (pool: CommunityLibraryItem[], item: CommunityLibraryItem, openedFrom: string) => {
+      const posts = pool.map((i) => i.post);
       const index = Math.max(0, posts.findIndex((post) => post.id === item.postId));
       openWithOrigin({
         posts,
@@ -324,13 +345,26 @@ export default function ExploreTabContent({
         posterUrl: item.thumbnail,
         mediaIndex: item.mediaIndex ?? 0,
         mediaId: item.mediaId ?? null,
-        openedFrom: 'discover-photos',
+        openedFrom,
       });
     },
-    [photos],
+    [],
   );
 
-  const goCommunity = useCallback(() => navigate('/community'), [navigate]);
+  const photosShown = mediaChip === 'photos' ? photoPool : photoSample;
+  const handlePhoto = useCallback(
+    (item: CommunityLibraryItem) => openMedia(photosShown, item, 'discover-photos'),
+    [openMedia, photosShown],
+  );
+  const handleClip = useCallback(
+    (item: CommunityLibraryItem) => openMedia(clipPool, item, 'discover-clips'),
+    [openMedia, clipPool],
+  );
+  const handleVideo = useCallback(
+    (item: CommunityLibraryItem) => openMedia(videoPool, item, 'discover-videos'),
+    [openMedia, videoPool],
+  );
+
 
   const honours = useMemo(() => sortHonours(legendary), [legendary]);
 
