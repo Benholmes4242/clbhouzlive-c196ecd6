@@ -84,7 +84,7 @@ export function SettingsLevelRow({
                 minHeight: 38,
                 borderRadius: 999,
                 background: selected ? A.INK : 'transparent',
-                color: selected ? '#FFFFFF' : A.MUTE,
+                color: selected ? A.CANVAS : A.MUTE,
               }}
             >
               {labels[opt.value]}

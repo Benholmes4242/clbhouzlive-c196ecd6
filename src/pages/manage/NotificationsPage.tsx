@@ -136,7 +136,7 @@ export default function NotificationsPage() {
         {/* Push (global) */}
         <div
           className="rounded-2xl px-4 py-3 flex items-center justify-between"
-          style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+          style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
         >
           <div className="min-w-0 pr-3">
             <p className="text-[15px] font-medium text-foreground">Push notifications</p>
@@ -159,13 +159,13 @@ export default function NotificationsPage() {
           </p>
           <div
             className="rounded-2xl overflow-hidden"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             {CATEGORIES.map((c, idx) => (
               <div
                 key={c.key}
                 className="flex items-center justify-between px-4 py-3 min-h-[52px]"
-                style={{ borderTop: idx === 0 ? 'none' : '0.5px solid rgba(15,23,42,0.08)' }}
+                style={{ borderTop: idx === 0 ? 'none' : `0.5px solid ${A.BORDER}` }}
               >
                 <div className="min-w-0 pr-3">
                   <p className="text-[15px] text-foreground">{c.label}</p>
@@ -195,7 +195,7 @@ export default function NotificationsPage() {
             </p>
             <div
               className="rounded-2xl overflow-hidden"
-              style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+              style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
             >
               <div
                 className="flex items-center justify-between px-4 py-3 min-h-[52px] cursor-default"
@@ -203,7 +203,7 @@ export default function NotificationsPage() {
                 <p className="text-[15px] text-foreground">Muted accounts</p>
                 <span
                   className="text-[13px] font-semibold rounded-full px-2 py-0.5"
-                  style={{ background: 'rgba(15,23,42,0.06)', color: A.MUTE }}
+                  style={{ background: 'rgba(255,255,255,0.06)', color: A.MUTE }}
                 >
                   {mutedUserIds.length}
                 </span>

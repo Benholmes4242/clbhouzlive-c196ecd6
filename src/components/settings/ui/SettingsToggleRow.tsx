@@ -61,7 +61,10 @@ export function SettingsToggleRow({
             disabled={disabled || isLoading}
             className={cn(
               'relative before:absolute before:content-[""] before:-inset-y-2.5 before:-inset-x-1',
-              'data-[state=checked]:bg-[#0F172A] data-[state=unchecked]:bg-[rgba(15,23,42,0.15)]',
+              // ON is the near-white ink fill, OFF is a raised track with a hairline:
+              // unmistakable at a glance on the dark canvas.
+              'data-[state=checked]:bg-[#F8FAFC] data-[state=unchecked]:bg-[rgba(255,255,255,0.14)]',
+              'data-[state=unchecked]:border data-[state=unchecked]:border-[rgba(255,255,255,0.18)]',
             )}
           />
         </div>

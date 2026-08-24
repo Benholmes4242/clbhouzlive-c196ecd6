@@ -185,7 +185,7 @@ export default function SupportThreadPage() {
                     maxWidth: '85%',
                     padding: '10px 14px',
                     borderRadius: 16,
-                    background: mine ? A.INK : '#fff',
+                    background: mine ? A.INK : A.PANEL,
                     color: mine ? A.CANVAS : A.INK,
                     border: mine ? 'none' : `1px solid ${A.BORDER}`,
                   }}
@@ -206,7 +206,7 @@ export default function SupportThreadPage() {
             background: 'rgba(244,246,248,0.96)',
             backdropFilter: 'saturate(180%) blur(14px)',
             WebkitBackdropFilter: 'saturate(180%) blur(14px)',
-            borderTop: '1px solid rgba(15,23,42,0.08)',
+            borderTop: `1px solid ${A.BORDER}`,
             paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
           }}
         >
