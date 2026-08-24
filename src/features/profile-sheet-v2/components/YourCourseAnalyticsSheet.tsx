@@ -355,8 +355,8 @@ const RoundsTrend: React.FC<{ points: CourseRoundPoint[]; gradientId: string }> 
           d={line}
           fill="none"
           stroke="#FFFFFF"
-          strokeOpacity={0.9}
-          strokeWidth={6}
+          strokeOpacity={0.6}
+          strokeWidth={4.0}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -364,7 +364,7 @@ const RoundsTrend: React.FC<{ points: CourseRoundPoint[]; gradientId: string }> 
           d={line}
           fill="none"
           stroke={`url(#${gradientId}-stroke)`}
-          strokeWidth={3}
+          strokeWidth={2.2}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -867,34 +867,46 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
         {/* Fixed search field (only when we already have a list) */}
         {showSearchField && (
           <div style={{ padding: '0 20px 12px', flexShrink: 0 }}>
+            {/* CANONICAL FIELD TREATMENT. REST 6% fill / 10% border, FOCUS 10%
+                fill / 28% border, both channels stepping on 140ms ease, radius
+                14 (sq-sm), height 44. The wrapper carries the paint and the
+                focus state; the <input> stays transparent and borderless so
+                there is exactly one visible box. A.TRACK — the progress-bar
+                track — used to be the fill here; it is not a field token. */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 7,
-                background: A.TRACK,
-                border: `0.5px solid ${A.BORDER}`,
-                borderRadius: 18,
-                padding: '8px 13px',
+                height: 44,
+                background: searchFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
+                border: `1px solid ${searchFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
+                borderRadius: 14,
+                padding: '0 13px',
+                transition: 'background 140ms ease, border-color 140ms ease',
               }}
             >
-              <Search size={13} color={A.DIM} />
+              <Search size={13} color={q ? 'rgba(255,255,255,0.62)' : A.DIM} />
               <input
                 type="text"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
                 placeholder={t('yourCourses.searchPlaceholder')}
                 style={{
                   flex: 1,
                   minWidth: 0,
                   fontSize: 14,
                   fontFamily: SANS,
-                  color: A.INK,
+                  color: 'rgba(255,255,255,0.96)',
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
                 }}
+                className="cas-search-input"
               />
+              <style>{`.cas-search-input::placeholder{color:rgba(255,255,255,0.38);}`}</style>
             </div>
           </div>
         )}
