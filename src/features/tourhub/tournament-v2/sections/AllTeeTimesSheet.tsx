@@ -21,7 +21,7 @@ import { useTeeTimesAll } from '../data/useTeeTimesAll';
 import { TeeTimesFirstGroups } from './TeeTimesFirstGroups';
 import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { ScopeSegment, type ScopeSegmentOption } from '@/components/shared/ScopeSegment';
-import { FONT, INK, INK_MUTE, INK_FAINT } from '../../_shared/tokens';
+import { FONT, INK, INK_MUTE, INK_FAINT, SLATE_50 } from '../../_shared/tokens';
 import { A, KICKER, LABEL, CAPTION } from '@/features/courses/components/holes/analytical/tokens';
 
 type RoundKey = '1' | '2' | '3' | '4';
@@ -203,7 +203,7 @@ export function AllTeeTimesSheet({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 7,
-                background: '#F8FAFC',
+                background: SLATE_50,
                 border: `0.5px solid ${INK_FAINT}33`,
                 borderRadius: 18,
                 padding: '7px 12px',

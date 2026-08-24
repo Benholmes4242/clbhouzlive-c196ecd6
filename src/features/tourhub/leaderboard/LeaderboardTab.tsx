@@ -32,11 +32,12 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 
 const F = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const INK = '#0F172A';
-const SECONDARY = '#4B5563';
-const MUTED = '#94A3B8';
-const HAIRLINE = 'rgba(0,0,0,0.08)';
-const SURFACE = '#F8FAFC';
+// Dark ramp, imported so the board follows the tour token file (was four pinned light literals).
+const INK = TOUR_INK;
+const SECONDARY = TOUR_INK_SOFT;
+const MUTED = TOUR_INK_FAINT;
+const HAIRLINE = 'rgba(255,255,255,0.12)';
+const SURFACE = TOUR_SLATE_50;
 const STATUS_LIVE_GREEN = '#22C55E';
 
 function fmtDateRange(start: string | null, end: string | null): string | null {
@@ -253,7 +254,7 @@ export function LeaderboardTab() {
           <button
             type="button"
             onClick={() => refetchLive()}
-            style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: F, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+            style={{ background: INK, color: TOUR_SLATE_50, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: F, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
           >
             {t('board.retry')}
           </button>
@@ -434,7 +435,7 @@ export function LeaderboardTab() {
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              background: '#F1F5F9',
+              background: 'rgba(255,255,255,0.06)',
               border: `1px solid ${HAIRLINE}`,
               borderRadius: 8,
               padding: '5px 8px',
@@ -552,7 +553,7 @@ export function LeaderboardTab() {
                   fontFamily: F,
                   fontSize: 12.5,
                   fontWeight: 700,
-                  color: active ? '#FFFFFF' : A.MUTE,
+                  color: active ? A.CANVAS : A.MUTE,
                   whiteSpace: 'nowrap',
                 }}
                 aria-pressed={active}
@@ -610,7 +611,7 @@ export function LeaderboardTab() {
           <button
             type="button"
             onClick={() => refetchBoard()}
-            style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: F, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+            style={{ background: INK, color: TOUR_SLATE_50, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: F, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
           >
             {t('board.retry')}
           </button>

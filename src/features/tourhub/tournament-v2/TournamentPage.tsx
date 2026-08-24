@@ -160,7 +160,7 @@ export function TournamentPage() {
                 type="button"
                 onClick={() => refetchMeta()}
                 style={{
-                  background: INK, color: '#fff', border: 'none', borderRadius: 999,
+                  background: INK, color: SLATE_50, border: 'none', borderRadius: 999,
                   padding: '10px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
                   fontFamily: FONT, letterSpacing: '0.02em',
                 }}

@@ -26,8 +26,7 @@ import {
   HAIRLINE_INK_10,
   INK,
   INK_MUTE,
-  SLATE_50,
-} from '../_shared/tokens';
+  SLATE_50,, SURFACE } from '../_shared/tokens';
 import { getScoreColor } from '../_shared/scoreColor';
 import { MovementFigure } from '../_shared/movement';
 import { fmtScore } from '../utils/fmtScore';
@@ -249,7 +248,7 @@ export function PlayersTab() {
                   width: 36,
                   height: 36,
                   borderRadius: 18,
-                  background: '#FFFFFF',
+                  background: SURFACE,
                   border: `0.5px solid ${HAIRLINE_INK_10}`,
                   display: 'flex',
                   alignItems: 'center',
@@ -268,7 +267,7 @@ export function PlayersTab() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                background: '#FFFFFF',
+                background: SURFACE,
                 border: `0.5px solid ${HAIRLINE_INK_10}`,
                 borderRadius: 18,
                 padding: '6px 12px',
@@ -352,8 +351,8 @@ export function PlayersTab() {
                   padding: '5px 10px',
                   borderRadius: 10,
                   border: active ? 'none' : `0.5px solid ${HAIRLINE_INK_10}`,
-                  background: active ? INK : '#FFFFFF',
-                  color: active ? '#FFFFFF' : INK_MUTE,
+                  background: active ? INK : SURFACE,
+                  color: active ? SLATE_50 : INK_MUTE,
                   fontFamily: 'inherit',
                   fontSize: 10,
                   fontWeight: 700,
@@ -389,7 +388,7 @@ export function PlayersTab() {
           <button
             type="button"
             onClick={() => refetchRanking()}
-            style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+            style={{ background: INK, color: SLATE_50, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
           >
             {t('players.error.retry', { defaultValue: 'Retry' })}
           </button>
@@ -411,7 +410,7 @@ export function PlayersTab() {
       ) : orderedRows.length === 0 ? (
         <TourHubEmptyState variant="players" />
       ) : (
-        <div style={{ background: '#FFFFFF' }}>
+        <div style={{ background: SLATE_50 }}>
           <RankedPlayerHeader
             rankLabel={t('players.header.rank')}
             playerLabel={t('players.header.player')}

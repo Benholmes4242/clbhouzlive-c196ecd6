@@ -68,7 +68,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
               type="button"
               onClick={() => navigate('/post-v2')}
               style={{
-                background: INK, color: '#FFFFFF',
+                background: INK, color: SLATE_50,
                 fontSize: 12, fontWeight: 700, fontFamily: FONT,
                 border: 'none', borderRadius: 14,
                 padding: '10px 16px', cursor: 'pointer',
@@ -131,7 +131,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
                     borderBottom: i === list.length - 1 ? 'none' : `0.5px solid ${HAIRLINE_INK_8}`,
                   }}
                 >
-                  <div style={{ width: 30, height: 30, borderRadius: 10, background: 'rgba(15,23,42,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 10, background: 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>
                     {cfg.icon ?? '⛳'}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
