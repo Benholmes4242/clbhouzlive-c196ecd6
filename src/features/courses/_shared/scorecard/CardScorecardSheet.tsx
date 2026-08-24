@@ -1010,7 +1010,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                       <Nine rows={back} label={t('courses:scorecard.in')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
                     )}
 
-                    <Legend />
+                    <Legend holes={played} />
 
                     {/*
                       TOTALS BLOCK - a member of the HOLE / PAR / YOU family, not
