@@ -29,12 +29,60 @@ export default function BlockedPage() {
     queryKey: ['blocked-users', userId],
     queryFn: async () => {
       if (!userId) return [];
-      const { data, error } = await supabase
+
+      // Two queries, deliberately. user_blocks.blocked_id references auth.users,
+      // not user_profiles, so no PostgREST embed exists here. See MICRO_BRIEF §0.
+      const { data: blocks, error: blocksError } = await supabase
         .from('user_blocks')
-        .select('blocked_id, user_profiles!user_blocks_blocked_id_fkey(id, username, avatar_url, full_name)')
+        .select('blocked_id')
         .eq('blocker_id', userId);
-      if (error) throw error;
-      return (data ?? []) as unknown as BlockedUserRow[];
+      if (blocksError) {
+        console.error('[BlockedPage] user_blocks read failed', {
+          code: (blocksError as any).code,
+          message: blocksError.message,
+          details: (blocksError as any).details,
+          hint: (blocksError as any).hint,
+        });
+        throw blocksError;
+      }
+
+      const ids = (blocks ?? []).map(b => b.blocked_id).filter(Boolean) as string[];
+      if (ids.length === 0) return [];
+
+      // user_profiles.id IS the auth.users id (user_profiles_id_fkey -> auth.users),
+      // so blocked_id joins directly against it.
+      const { data: profiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, username, display_name, profile_photo_url')
+        .in('id', ids);
+      if (profilesError) {
+        console.error('[BlockedPage] user_profiles read failed', {
+          code: (profilesError as any).code,
+          message: profilesError.message,
+          details: (profilesError as any).details,
+          hint: (profilesError as any).hint,
+        });
+        throw profilesError;
+      }
+
+      const byId = new Map((profiles ?? []).map(p => [p.id, p]));
+
+      // A missing profile must NOT drop the row — the block still exists and
+      // must stay unblockable. Falls through to the 'Unknown' render branch.
+      return ids.map<BlockedUserRow>(id => {
+        const p = byId.get(id);
+        return {
+          blocked_id: id,
+          user_profiles: p
+            ? {
+                id: p.id,
+                username: p.username ?? null,
+                avatar_url: p.profile_photo_url ?? null,
+                full_name: p.display_name ?? null,
+              }
+            : null,
+        };
+      });
     },
     enabled: !!userId,
   });
@@ -49,10 +97,17 @@ export default function BlockedPage() {
       if (error) throw error;
       queryClient.invalidateQueries({ queryKey: ['blocked-users', userId] });
       toast.success('User has been unblocked.');
-    } catch {
+    } catch (e) {
+      console.error('[BlockedPage] unblock failed', {
+        code: (e as any)?.code,
+        message: (e as any)?.message,
+        details: (e as any)?.details,
+        hint: (e as any)?.hint,
+      });
       toast.error('Could not unblock user.');
     }
   };
+
 
   return (
     <ManagePageShell title="Blocked users">
