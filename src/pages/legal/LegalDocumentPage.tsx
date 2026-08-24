@@ -5,8 +5,9 @@ import { useLegalDocument } from '@/hooks/useLegalDocuments';
 import LegalBodyRenderer from '@/components/legal/LegalBodyRenderer';
 import { formatDayMonthLongYearGB } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK_55 = '#64748B';
+const INK_55 = A.MUTE;
 
 function formatEffective(iso: string | null): string | null {
   if (!iso) return null;
@@ -37,7 +38,7 @@ const LegalDocumentPage: React.FC<Props> = ({ slug: slugProp }) => {
       <div className="px-4 pt-4 pb-16">
         <div
           className="rounded-2xl p-5"
-          style={{ background: '#fff', border: '1px solid rgba(15,23,42,0.07)' }}
+          style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
         >
           {isLoading && (
             <div className="space-y-2">
@@ -50,7 +51,7 @@ const LegalDocumentPage: React.FC<Props> = ({ slug: slugProp }) => {
           {/* eslint-disable-next-line settled/no-not-loading-empty-check -- isLoading is derived as !isFetched || fetching above. */}
           {!isLoading && (isError || !data) && (
             <div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#0F172A', marginBottom: 6 }}>
+              <div style={{ fontSize: 15, fontWeight: 600, color: A.INK, marginBottom: 6 }}>
                 Document not available
               </div>
               <div style={{ color: INK_55, fontSize: 14, marginBottom: 14 }}>
@@ -59,7 +60,7 @@ const LegalDocumentPage: React.FC<Props> = ({ slug: slugProp }) => {
               <Link
                 to="/manage/legal"
                 style={{
-                  fontSize: 13, fontWeight: 600, color: '#0F172A',
+                  fontSize: 13, fontWeight: 600, color: A.INK,
                   textDecoration: 'underline',
                 }}
               >
@@ -76,7 +77,7 @@ const LegalDocumentPage: React.FC<Props> = ({ slug: slugProp }) => {
                 </div>
               )}
               <LegalBodyRenderer body={data.body} />
-              <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid rgba(15,23,42,0.06)', color: INK_55, fontSize: 12 }}>
+              <div style={{ marginTop: 24, paddingTop: 16, borderTop: `1px solid ${A.BORDER}`, color: INK_55, fontSize: 12 }}>
                 Operated by CLBHOUZ LTD. Contact: support@clbhouz.co.uk
               </div>
             </>
