@@ -5,6 +5,8 @@ import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
 const AMBER = '#F7931E';
 /**
  * BRIEF_ACTIVITY_PAGE_DARK §3 — OPTION (b). This card's whole job was to stand
@@ -88,7 +90,7 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
           fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: '#94A3B8',
+          color: 'rgba(248,250,252,0.62)',
           marginBottom: 10,
         }}
       >
@@ -102,7 +104,7 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
           background: `linear-gradient(160deg,${CARD_TOP} 0%,${CARD_MID} 60%,${CARD_END} 100%)`,
           borderRadius: 18,
           padding: '16px 16px 14px',
-          color: '#F8FAFC',
+          color: A.INK,
           cursor: 'pointer',
           border: '1px solid rgba(247,147,30,0.22)',
         }}
@@ -172,7 +174,7 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#F8FAFC',
+                      color: A.INK,
                       fontSize: 10,
                       fontWeight: 700,
                     }}
@@ -207,7 +209,8 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
             padding: '8px 14px',
             borderRadius: 30,
             background: AMBER,
-            color: '#0F172A',
+            // Label ON the amber fill: near-black canvas, not white (§2.2).
+            color: A.CANVAS,
             fontSize: 13,
             fontWeight: 700,
             border: 'none',
