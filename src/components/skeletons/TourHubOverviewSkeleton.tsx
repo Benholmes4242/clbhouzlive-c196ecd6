@@ -9,8 +9,15 @@
  * order OverviewPageV3 ACTUALLY RENDERS them, every block MEASURED on the
  * rendered section at 390px rather than added up off the JSX.
  *
- * VERIFIED LIVE RENDER ORDER (corrected after the overview composition changed):
- *   OverviewHero, VenueRecordBand, ConnectHandicapCue.
+ * VERIFIED LIVE RENDER ORDER (re-verified against OverviewPageV3 at HEAD):
+ *   OverviewHero, VenueRecordBand, ComingUpSlot, WorldRankingsSlot,
+ *   StatWatchSlot, CourseOfTheWeekSection, CollegeFranchise,
+ *   ConnectHandicapCue.
+ *
+ * ComingUp and WorldRankings were REMOUNTED after the audit that removed their
+ * holds, so both are drawn again. MEASURED LIVE at 390px: ComingUp 476 (hold
+ * 459 — deliberately 17 short; a hold may be smaller than the settled state,
+ * never larger) and WorldRankings 353 (hold 353, exact).
  *
  * ONLY THE CERTAIN SECTIONS ARE DRAWN (B4). A silhouette that draws a section
  * which then does not appear is worse than no silhouette, because the page
@@ -152,6 +159,12 @@ export const TourHubOverviewSkeleton = () => {
           background: `linear-gradient(135deg, ${INK_TINT_06}, ${A.CANVAS})`,
         }}
       />
+      {/* VenueRecordBand stays undrawn (conditional). Schedule + rankings
+          are mounted again and reserve their measured heights. */}
+      <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <ComingUpBlock />
+        <WorldRankingsBlock />
+      </div>
     </div>
   );
 };

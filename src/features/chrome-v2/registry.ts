@@ -209,7 +209,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: {
       chrome: 'island',
       left: { kind: 'back', title: null, backTarget: 'history' },
-      tone: 'light',
+      tone: 'dark',
       bleed: true, // tourHeroOverlay drives transparent chrome over cinematic hero
       note: EDITORIAL_NOTE,
     },
@@ -219,7 +219,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: {
       chrome: 'island',
       left: { kind: 'back', title: null, backTarget: 'history' },
-      tone: 'light',
+      tone: 'dark',
       bleed: false,
       note: EDITORIAL_NOTE,
     },
@@ -229,7 +229,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: {
       chrome: 'island',
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' },
-      tone: 'light',
+      tone: 'dark',
       bleed: false,
       scrollAway: true,
       note: EDITORIAL_NOTE,
@@ -240,7 +240,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: {
       chrome: 'island',
       left: { kind: 'back', title: null, backTarget: 'history' },
-      tone: 'light',
+      tone: 'dark',
       bleed: false,
       note: EDITORIAL_NOTE,
     },
@@ -255,7 +255,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: {
       chrome: 'island',
       left: { kind: 'back', title: null, backTarget: 'history' },
-      tone: 'light',
+      tone: 'dark',
       bleed: false,
       note: EDITORIAL_NOTE,
     },
@@ -265,9 +265,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // Overview tab keeps fixed islands over the cinematic hero; every other tab
   // gets scrollAway islands (chips lock at the notch on scroll).
   { match: { test: (p, s) => (p === '/tourhub' || p === '/tour') && (s.get('tab') ?? 'overview') === 'overview' },
-    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true, note: EDITORIAL_NOTE } },
-  { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
-  { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, note: EDITORIAL_NOTE } },
+  { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+  { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
   // Remaining /tourhub/* sub-tabs and /tour/* aliases (not deep) — page owns
   // chrome today (isConditionallyExcluded); only the exact hubs above stay island.
   { match: { prefix: '/tourhub/' },               spec: { chrome: 'none', tone: 'light', bleed: true, note: 'other tour subpages immersive/page-owned today (isConditionallyExcluded)' } },
@@ -324,14 +324,13 @@ const DEFAULT_SPEC: ChromeSpec = {
   bleed: false,
 };
 
-/** Tour Hub remains the sole light-island exception during the dark-only flip. */
-function keepsLightChrome(pathname: string): boolean {
-  return pathname === '/tour' || pathname.startsWith('/tour/') ||
-    pathname === '/tourhub' || pathname.startsWith('/tourhub/');
-}
-
-function withResolvedTone(spec: ChromeSpec, pathname: string): ChromeSpec {
-  if (spec.chrome === 'none' || keepsLightChrome(pathname) || spec.tone === 'dark') return spec;
+// The tour-only light-island exception is GONE: the seven tour island entries
+// now declare tone: 'dark' themselves, so keepsLightChrome() had no remaining
+// callers or effect and was removed with it. Every island tone now resolves
+// dark; the surviving `tone: 'light'` literals in this file are historical and
+// are coerced here (see 3.4 finding — they need their own cleanup brief).
+function withResolvedTone(spec: ChromeSpec): ChromeSpec {
+  if (spec.chrome === 'none' || spec.tone === 'dark') return spec;
   return { ...spec, tone: 'dark' };
 }
 
@@ -346,9 +345,9 @@ export function resolveChrome(
 ): ChromeSpec {
   for (const rule of CHROME_REGISTRY) {
     const { exact, prefix, test } = rule.match;
-    if (exact !== undefined && pathname === exact) return withResolvedTone(rule.spec, pathname);
-    if (prefix !== undefined && pathname.startsWith(prefix)) return withResolvedTone(rule.spec, pathname);
-    if (test !== undefined && test(pathname, search)) return withResolvedTone(rule.spec, pathname);
+    if (exact !== undefined && pathname === exact) return withResolvedTone(rule.spec);
+    if (prefix !== undefined && pathname.startsWith(prefix)) return withResolvedTone(rule.spec);
+    if (test !== undefined && test(pathname, search)) return withResolvedTone(rule.spec);
   }
   return DEFAULT_SPEC;
 }

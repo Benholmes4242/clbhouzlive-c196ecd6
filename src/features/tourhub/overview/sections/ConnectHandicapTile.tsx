@@ -22,11 +22,15 @@ import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 
+import { V4 } from '../tokens';
+
 const AMBER_RGBA_STRONG = 'rgba(247,147,30,0.12)';
 const AMBER_RGBA_WEAK = 'rgba(247,147,30,0.04)';
 const AMBER_BORDER = 'rgba(247,147,30,0.3)';
-const INK = '#0F172A';
-const INK_SECONDARY = '#64748B';
+// No private palette: these route through the overview ramp so the tile
+// follows the token rather than drifting from it.
+const INK = V4.ink;
+const INK_SECONDARY = V4.inkMute;
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export function ConnectHandicapTile() {
@@ -85,7 +89,9 @@ export function ConnectHandicapTile() {
           onClick={goConnect}
           style={{
             background: INK,
-            color: '#FFFFFF',
+            // FILLED-ACTION: INK is near-white on dark, so the label takes
+            // the canvas.
+            color: V4.bg,
             fontFamily: FONT,
             fontSize: 12.5,
             fontWeight: 700,
