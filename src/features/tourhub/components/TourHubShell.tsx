@@ -1,6 +1,7 @@
 import { ReactNode, useEffect } from 'react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface TourHubShellProps {
   children: ReactNode;
@@ -28,8 +29,7 @@ export function TourHubShell({ children, immersive = false, immersiveStatusBar =
     return (
       <PageRoot
         className="min-h-screen w-full"
-        style={{ background: '#F8FAFC' }}
-        dark={false}
+        style={{ background: A.CANVAS }}
         immersive
         immersiveStatusBar
       >
@@ -40,11 +40,11 @@ export function TourHubShell({ children, immersive = false, immersiveStatusBar =
     );
   }
 
-  // Light chrome: Tour Hub now uses the global light page treatment.
+  // Dark-only baseline: Tour Hub follows the app canvas; its surfaces own their palette.
   return (
     <PageRoot
       className="min-h-screen w-full"
-      style={{ background: '#F8FAFC' }}
+      style={{ background: A.CANVAS }}
       immersiveStatusBar={immersiveStatusBar}
     >
       {children}
