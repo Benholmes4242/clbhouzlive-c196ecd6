@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { claimOverlayChrome, releaseOverlayChrome } from '@/lib/routeChrome';
-import { A, S } from './lib/tokens';
+import { S } from './lib/tokens';
 
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { SearchField } from './components/SearchField';
