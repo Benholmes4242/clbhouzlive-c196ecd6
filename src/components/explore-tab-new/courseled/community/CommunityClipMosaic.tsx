@@ -45,6 +45,12 @@ export function clipAspect(aspect: number | null | undefined): number {
 interface Props {
   items: CommunityLibraryItem[];
   onPress: (item: CommunityLibraryItem) => void;
+  /**
+   * WHICH PAGE IS ASKING (BRIEF_MEDIA_TRACKING_MINIMUM §2). The same treatment
+   * the photo mosaic already carries: `section` stays 'clips' so the ratio is
+   * comparable, only the surface changes.
+   */
+  surface?: 'community' | 'discover';
 }
 
 /**
@@ -53,7 +59,7 @@ interface Props {
  * tiles and the position bands meaningless.
  */
 
-export function CommunityClipMosaic({ items, onPress }: Props) {
+export function CommunityClipMosaic({ items, onPress, surface = 'community' }: Props) {
   /**
    * SHORTEST-COLUMN FILL on relative height (1 / aspect), so a column of
    * landscape clips does not run half the length of a column of portraits.
@@ -84,7 +90,7 @@ export function CommunityClipMosaic({ items, onPress }: Props) {
               onPress={onPress}
               width="100%"
               aspect={aspect}
-              track={mediaTarget(item, 'community', 'clips', index)}
+              track={mediaTarget(item, surface, 'clips', index)}
             />
           ))}
         </div>

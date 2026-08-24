@@ -175,7 +175,16 @@ function PlayerFacepile({ players, accent }: { players: MostPlayedPlayer[]; acce
             height: FACE_SIZE,
             marginLeft: index === 0 ? 0 : FACE_OVERLAP,
             borderRadius: '34%',
-            boxShadow: `0 0 0 ${index === 0 ? 2 : 1.5}px ${index === 0 ? accent : A.PANEL}`,
+            /* THE LEADER'S RING IS TWO STACKED SHADOWS (BRIEF_DISCOVER_ONE_PAGE
+               §2): a PANEL-coloured gap first, then the accent OUTSIDE it —
+               the BEST THIS WEEK construction (avatar, gap, ring), which is
+               what makes a ring read as a ring rather than a thick border.
+               The other faces keep the single flat 1.5px panel shadow: that one
+               is a separator between overlapping faces, not a ring. */
+            boxShadow:
+              index === 0
+                ? `0 0 0 1.5px ${A.PANEL}, 0 0 0 2.5px ${accent}`
+                : `0 0 0 1.5px ${A.PANEL}`,
             flex: 'none',
           }}
         >

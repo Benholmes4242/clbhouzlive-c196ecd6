@@ -1646,7 +1646,11 @@
         "worldwide": "No rounds this week."
       }
     },
-    "seam": "All time · from everyone"
+    "seam": "All time · from everyone",
+    "media": {
+      "searchPlaceholder": "Search members and courses",
+      "chipsAria": "Media type"
+    }
   },
   "statBrowse": {
     "eyebrow": "Where this community plays",

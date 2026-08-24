@@ -4,10 +4,12 @@ import {
   CARD_RADIUS,
   CARD_SHELL,
   CHIP_RADIUS,
+  RHYTHM,
   SCOPE_PILL_RADIUS,
   THUMBNAIL_RADIUS,
   WELL_RADIUS,
 } from './tokens';
+
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
@@ -714,7 +716,7 @@ export function MostPlayedPanel() {
             <div style={{ marginTop: 4, paddingTop: 4, borderTop: `1px solid ${A.HAIRLINE}`, display: 'grid', gridTemplateColumns: '102px minmax(0,1fr) 34px', alignItems: 'center', gap: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {[0, 1, 2, 3, 4].map((face) => (
-                  <Bar key={face} style={{ width: 26, height: 26, marginLeft: face === 0 ? 0 : -7, borderRadius: '34%', boxShadow: `0 0 0 ${face === 0 ? 2 : 1.5}px ${A.PANEL}` }} />
+                  <Bar key={face} style={{ width: 26, height: 26, marginLeft: face === 0 ? 0 : -7, borderRadius: '34%', boxShadow: face === 0 ? `0 0 0 1.5px ${A.PANEL}, 0 0 0 2.5px ${A.TRACK}` : `0 0 0 1.5px ${A.PANEL}` }} />
                 ))}
               </div>
               <div style={{ minWidth: 0 }}>
@@ -867,10 +869,10 @@ export default function DiscoverCourseLedSkeleton() {
       <div
         style={{
           padding: '0 14px',
-          marginTop: 28,
+          marginTop: RHYTHM,
           display: 'flex',
           flexDirection: 'column',
-          gap: 28,
+          gap: RHYTHM,
         }}
       >
 

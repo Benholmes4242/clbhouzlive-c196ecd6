@@ -286,9 +286,8 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/courses' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
 
 
-  // Community (BRIEF_COMMUNITY_PAGE_V2) — back arrow, history. The page owns
-  // its own sticky masthead (title + count), so the island carries BACK only.
-  { match: { exact: '/community' },               spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/explore' }, tone: 'light', bleed: false } },
+  // /community is deleted (BRIEF_DISCOVER_ONE_PAGE §3); the path now redirects
+  // to Discover, so it needs no chrome entry of its own.
 
   // Friends activity — back arrow, history.
   { match: { exact: '/friends-activity' },        spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history' }, tone: 'light', bleed: false } },
