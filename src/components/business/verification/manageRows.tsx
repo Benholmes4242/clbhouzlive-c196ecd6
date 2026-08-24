@@ -21,6 +21,7 @@ import {
   GREEN,
   ManageCard,
 } from '@/components/manage/ui';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { getAvatarFallbackColor, getInitialsFromName } from '@/lib/avatarFallback';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
