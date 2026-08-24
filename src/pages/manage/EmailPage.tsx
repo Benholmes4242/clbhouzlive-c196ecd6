@@ -140,7 +140,14 @@ export default function EmailPage() {
                   autoCapitalize="none"
                   autoComplete="email"
                   spellCheck={false}
-                  style={{ background: A.BORDER, border: 'none' }}
+                  /* No inline style: the Input primitive owns the canonical
+                     rest paint (6% fill / 10% border), the focus step
+                     (10% / 28%) and the transition. An inline background or
+                     border here beats the focus-visible classes and the field
+                     would rest at its own focus state — see lib/tokens/field.ts.
+                     h-11 = the canon's 44px standalone height. */
+                  className="h-11"
+
                 />
               </div>
               <Button
