@@ -4,17 +4,30 @@
  * Used by /edit-profile (Profile tab + Settings tab).
  */
 import React from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 export const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-export const INK = '#0F172A';
-export const INK_60 = '#475569';
-export const INK_45 = '#64748B';
-export const INK_30 = '#94A3B8';
-export const HAIR = 'rgba(15,23,42,0.08)';
-export const PAGE_BG = '#F8FAFC';
-export const FIELD_FILL = '#F8FAFC';
-export const GREEN = '#059669';
-export const DANGER = '#DC2626';
+/**
+ * DARK-ONLY (BRIEF_SETTINGS_AND_MANAGE_DARK). Values are the analytical ramp,
+ * sourced from the already-converted Settings rows (settings/ui/rowParts.tsx).
+ *
+ * PAGE_BG (canvas) and FIELD_FILL (raised) MUST stay distinguishable: on light
+ * a field matching the page read as inset; on dark that would erase the field.
+ */
+export const INK = A.INK;
+export const INK_60 = A.BODY;
+export const INK_45 = A.MUTE;
+export const INK_30 = A.DIM;
+export const HAIR = A.BORDER;
+export const PAGE_BG = A.CANVAS;
+export const CARD_BG = A.PANEL;
+/** Raised above CARD_BG so an input never disappears into its card. */
+export const FIELD_FILL = 'rgba(255,255,255,0.06)';
+export const FIELD_FILL_FOCUS = 'rgba(255,255,255,0.10)';
+export const GREEN = A.GREEN;
+/** Bespoke destructive red. NOT the under-par red — different meaning. */
+export const DANGER = '#FF5A5A';
+export const DANGER_SOFT = 'rgba(255,90,90,0.14)';
 
 /** Quiet slate field label. No kicker, no cut-line. */
 export function Label({
@@ -50,7 +63,7 @@ export function Label({
   );
 }
 
-/** White card with hairline border, 14 radius. */
+/** Raised panel card with hairline border, 14 radius. */
 export function ManageCard({
   children,
   padding = 16,
@@ -66,7 +79,7 @@ export function ManageCard({
     <div
       className={className}
       style={{
-        background: '#ffffff',
+        background: CARD_BG,
         border: `1px solid ${HAIR}`,
         borderRadius: 14,
         padding,

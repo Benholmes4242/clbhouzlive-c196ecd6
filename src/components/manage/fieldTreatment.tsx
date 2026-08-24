@@ -31,14 +31,15 @@ export const FIELD_HINT: React.CSSProperties = {
 };
 
 /**
- * Input treatment. The literal hexes mirror A.BORDER / A.INK - Tailwind
- * arbitrary values cannot be interpolated at build time.
+ * Input treatment. DARK-ONLY. The literal hexes/alphas mirror A.BORDER and the
+ * manage FIELD_FILL - Tailwind arbitrary values cannot be interpolated at
+ * build time. Focus ring is white-alpha, never amber.
  */
 export const FIELD_INPUT_CLASS =
-  'w-full rounded-[11px] focus:outline-none focus:ring-1 focus:ring-[#0E1216] border border-[#EDF0F3] transition-colors';
+  'w-full rounded-[11px] focus:outline-none focus:ring-1 focus:ring-[rgba(255,255,255,0.34)] focus:border-[rgba(255,255,255,0.22)] border border-[rgba(255,255,255,0.10)] transition-colors';
 
 export const FIELD_INPUT_STYLE: React.CSSProperties = {
-  background: A.PANEL,
+  background: 'rgba(255,255,255,0.06)',
   padding: '12px 13px',
   fontSize: 14,
   fontWeight: 400,
@@ -46,13 +47,23 @@ export const FIELD_INPUT_STYLE: React.CSSProperties = {
   borderRadius: 11,
 };
 
-/** Placeholder colour is DIM; filled text is INK. */
-export const FIELD_PLACEHOLDER_CLASS = 'placeholder:text-[#A2A9B2]';
+/** Placeholder is CHROME at the 0.62 quiet floor; filled text is INK. */
+export const FIELD_PLACEHOLDER_CLASS = 'placeholder:text-[rgba(248,250,252,0.62)]';
+
+/** Error state: red hairline + red hint, no fill change. */
+export const FIELD_ERROR_CLASS =
+  'w-full rounded-[11px] focus:outline-none focus:ring-1 focus:ring-[#FF5A5A] border border-[#FF5A5A] transition-colors';
+
+/** Disabled: reads as present but inert. */
+export const FIELD_DISABLED_STYLE: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.04)',
+  color: 'rgba(248,250,252,0.62)',
+};
 
 /** LOCKED: the quiet inset, NO border. Its explanation lives in the hint slot. */
 export const LOCKED_CLASS = 'flex items-center gap-2 rounded-[11px]';
 export const LOCKED_STYLE: React.CSSProperties = {
-  background: 'rgba(14,18,22,0.028)',
+  background: 'rgba(255,255,255,0.04)',
   border: 'none',
   borderRadius: 11,
   padding: '12px 13px',
@@ -62,8 +73,8 @@ export const LOCKED_STYLE: React.CSSProperties = {
 };
 
 /** Class-name equivalents, for sections that style with Tailwind. */
-export const LABEL_CLASS = 'text-[8px] font-bold uppercase tracking-[0.16em] text-[#A2A9B2]';
-export const HINT_CLASS = 'text-[7.5px] font-bold uppercase tracking-[0.16em] text-[#A2A9B2] mt-1.5';
+export const LABEL_CLASS = 'text-[8px] font-bold uppercase tracking-[0.16em] text-[rgba(248,250,252,0.62)]';
+export const HINT_CLASS = 'text-[7.5px] font-bold uppercase tracking-[0.16em] text-[rgba(248,250,252,0.62)] mt-1.5';
 
 /** Label row with an optional right slot (counter, quiet action). */
 export function FieldLabel({

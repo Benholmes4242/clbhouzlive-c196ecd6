@@ -6,8 +6,6 @@ import { PAGE_BG } from '@/components/manage/ui';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const INK = '#0F172A';
-const SLATE_BG = PAGE_BG;
 
 interface Props {
   title: string;
@@ -22,10 +20,8 @@ interface Props {
    *  `flex-1` stretches to fill the viewport. Default false. */
   fill?: boolean;
   /**
-   * BRIEF_ACTIVITY_PAGE_DARK: the shell paints the page ground, the sticky
-   * header and the back chevron, so converting only a page's body leaves a
-   * light bar above a dark page. This is OPT-IN and defaults to 'light' — the
-   * other 24 /manage/* consumers are untouched.
+   * DEPRECATED (BRIEF_SETTINGS_AND_MANAGE_DARK): the shell is dark-only now.
+   * Kept so the existing `theme="dark"` callers still typecheck; ignored.
    */
   theme?: 'light' | 'dark';
 }
@@ -33,7 +29,7 @@ interface Props {
 /**
  * Direction A pushed sub-page shell used by /manage/* routes.
  * Sticky translucent header, 32px circle back chevron, 18/600 title,
- * 1px hairline bottom border, slate background (#F8FAFC — matches the
+ * 1px hairline bottom border, dark canvas background (A.CANVAS — matches the
  * notch shield exactly so there is no visible seam).
  *
  * Safe-area ownership: `.app-shell` globally pads `padding-top: var(--sat)`
@@ -41,12 +37,11 @@ interface Props {
  * on top of that. Do NOT snapshot safe-area here — it would double the
  * inset and open a visible gap under the notch on device.
  */
-export function ManagePageShell({ title, children, right, onBack, belowTitle, fill = false, theme = 'light' }: Props) {
-  const dark = theme === 'dark';
-  const bg = dark ? A.CANVAS : SLATE_BG;
-  const ink = dark ? A.INK : INK;
-  const rule = dark ? A.BORDER : 'rgba(15,23,42,0.08)';
-  const backBg = dark ? A.PANEL : '#fff';
+export function ManagePageShell({ title, children, right, onBack, belowTitle, fill = false }: Props) {
+  const bg = PAGE_BG;
+  const ink = A.INK;
+  const rule = A.BORDER;
+  const backBg = A.PANEL;
   const navigate = useNavigate();
   const handleBack = () => (onBack ? onBack() : navigate(-1));
 
