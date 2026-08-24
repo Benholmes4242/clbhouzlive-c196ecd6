@@ -1,6 +1,6 @@
 export const AMBER = '#F7931E';
 export const DEEP_AMBER = '#B26818';                  // darker amber - empty-state pill borders (mirrors GAM.DEEP_AMBER from WHS Legends)
-export const INK = '#0F172A';
+export const INK = '#F8FAFC';
 export const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // SF Pro sans stack (same value as FONT). Kept as a named export for the Holes tab figure cells.
