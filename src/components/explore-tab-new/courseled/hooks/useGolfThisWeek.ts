@@ -35,16 +35,16 @@ export const GOLF_WEEK_DAYS = 7;
 export const GOLF_WEEK_FETCH = 60;
 
 
-/** The five scopes (§S2.1). Your Circle leads and is the default. */
-export type WeekScope = 'circle' | 'suggested' | 'top_100' | 'played' | 'worldwide';
+/** The five scopes (§S2.1). Worldwide leads and is the default. */
+export type WeekScope = 'worldwide' | 'circle' | 'suggested' | 'top_100' | 'played';
 export const WEEK_SCOPES: WeekScope[] = [
+  'worldwide',
   'circle',
   'suggested',
   'top_100',
   'played',
-  'worldwide',
 ];
-export const DEFAULT_WEEK_SCOPE: WeekScope = 'circle';
+export const DEFAULT_WEEK_SCOPE: WeekScope = 'worldwide';
 
 /** Every course id on an ACTIVE published Top 100 list. Cached for the session. */
 export function useTop100CourseIds() {
