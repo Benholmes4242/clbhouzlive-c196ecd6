@@ -1,9 +1,8 @@
 /**
  * SLOT B — one featured review, full width, NO PHOTOGRAPH.
  *
- * The absence of a photograph is THE POINT: it is not a card of the same kind
- * as a course card, so it does not compete with the list it sits inside, and
- * the photography stays on the courses. Score leads at 30px in its band colour,
+ * The panel uses a PANEL surface rather than a card surface and carries no
+ * photograph, so the photography stays on the courses. Score leads at 30px in its band colour,
  * the prose carries at 15px, and the four sub-scores close it as an even
  * four-up on 3px tracks (scoreBands' shipped SubScoreStack — never a local copy
  * of the scale).
@@ -16,7 +15,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { bandColor, SubScoreStack } from '@/features/courses/_shared/scoreBands';
+import { bandColorOnDark, SubScoreStack } from '@/features/courses/_shared/scoreBands';
 import {
   HAIRLINE_INK_8,
   INK,
@@ -69,7 +68,7 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
               fontWeight: 700,
               lineHeight: 1,
               letterSpacing: '-0.03em',
-              color: bandColor(r.rating),
+              color: bandColorOnDark(r.rating),
             }}
           >
             {r.rating.toFixed(1)}

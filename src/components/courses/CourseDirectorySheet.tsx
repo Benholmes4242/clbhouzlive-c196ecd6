@@ -145,7 +145,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
     <BottomSheet
       open={open}
       onClose={onClose}
-      variant="light"
+      variant="dark"
       maxHeight="85dvh"
       ariaLabelledBy="course-directory-title"
       style={{
@@ -166,7 +166,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
 
         <div
           className="flex items-center gap-2 h-11 rounded-xl px-3"
-          style={{ background: '#FFFFFF', border: `1px solid ${HAIRLINE_INK_10}` }}
+          style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${HAIRLINE_INK_10}` }}
         >
           <Search className="h-4 w-4 shrink-0" style={{ color: INK_MUTE }} aria-hidden="true" />
           <input
@@ -195,7 +195,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
               onClick={() => setCountry(null)}
               aria-label={t('directorySheet.scopeClear')}
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
-              style={{ background: 'rgba(15,23,42,0.06)', color: INK, fontSize: 12, fontWeight: 700 }}
+              style={{ background: 'rgba(255,255,255,0.06)', color: INK, fontSize: 12, fontWeight: 700 }}
             >
               {country}
               <X className="h-3 w-3" style={{ color: INK_MUTE }} aria-hidden="true" />
@@ -295,7 +295,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                     ) : (
                       <div
                         className="h-11 w-11 shrink-0"
-                        style={{ borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }}
+                        style={{ borderRadius: '34%', background: 'rgba(255,255,255,0.06)' }}
                       />
                     )}
                     <span className="flex-1 min-w-0">
@@ -327,7 +327,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
               <div
                 key={i}
                 className="h-14 rounded-xl animate-pulse"
-                style={{ background: 'rgba(15,23,42,0.06)' }}
+                style={{ background: 'rgba(255,255,255,0.06)' }}
               />
             ))}
           </div>
@@ -372,7 +372,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                 ) : (
                   <div
                     className="h-11 w-11 shrink-0"
-                    style={{ borderRadius: '34%', background: 'rgba(15,23,42,0.06)' }}
+                    style={{ borderRadius: '34%', background: 'rgba(255,255,255,0.06)' }}
                   />
                 )}
                 <span className="flex-1 min-w-0">

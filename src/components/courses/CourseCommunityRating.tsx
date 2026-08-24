@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { formatRatingValue } from '@/utils/formatters';
-import { bandColor } from '@/features/courses/_shared/scoreBands';
+import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 
 
 interface CourseCommunityRatingProps {
@@ -26,8 +26,8 @@ interface CourseCommunityRatingProps {
  * -  < 5.0  BAND_RED    #DC2626
  *
  * `forceNeutral` overrides the band entirely: foreground on light, near-white
- * when `onDark` is also set. All three band colours read on a dark scrim, so
- * `onDark` has no effect on the banded case.
+ * when `onDark` is also set. Banded ratings always use the lifted dark-surface
+ * scale; this replaces the older assumption that the light bands read on dark.
  */
 export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
   rating,
@@ -70,7 +70,7 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
             ? onDark
               ? { color: 'rgba(255,255,255,0.95)' }
               : undefined
-            : { color: bandColor(rating) }
+            : { color: bandColorOnDark(rating) }
         }
       >
         {formatRatingValue(rating)}
