@@ -11,7 +11,7 @@
  */
 import { useNavigate } from 'react-router-dom';
 import { Check, Zap } from 'lucide-react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { PlayerInitialAvatar } from '@/features/tourhub/_shared/PlayerInitialAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -28,6 +28,7 @@ import {
 } from '../hooks/useSearchEmptyStateV2';
 import { navCourse } from '../lib/searchNavigation';
 import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { S } from '../lib/tokens';
 
 
 interface Props {
@@ -255,7 +256,7 @@ function PlayerCard({
         srcCandidates={candidates}
         size={64}
         radius="34%"
-        ringColor={LIGHT_HAIRLINE}
+        ringColor={DARK_HAIRLINE}
       />
       <p
         className="truncate w-full text-center"
@@ -337,7 +338,7 @@ function SuggestionRow({
   return (
     <div
       onClick={onSelect}
-      className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02] text-left cursor-pointer"
+      className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-white/[0.04] text-left cursor-pointer"
     >
       <SquircleAvatar
         size={42}
@@ -345,13 +346,13 @@ function SuggestionRow({
         alt={name}
         fallback={initials}
         hairlineRing
-        ringColor={LIGHT_HAIRLINE}
+        ringColor={DARK_HAIRLINE}
       />
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] font-medium truncate" style={{ color: '#0F172A' }}>
+        <p className="text-[14px] font-medium truncate" style={{ color: S.INK }}>
           {name}
         </p>
-        <p className="text-[12px] truncate" style={{ color: '#64748B' }}>
+        <p className="text-[12px] truncate" style={{ color: S.QUIET }}>
           {reasonLine(suggestion)}
         </p>
       </div>
@@ -408,15 +409,15 @@ function PlayerRailSkeleton() {
           style={{ width: 84 }}
         >
           <div
-            className="clb-shimmer-light"
+            className="clb-shimmer-dark"
             style={{ width: 64, height: 64, borderRadius: '34%' }}
           />
           <div
-            className="clb-shimmer-light"
+            className="clb-shimmer-dark"
             style={{ width: 60, height: 10, marginTop: 8, borderRadius: 4 }}
           />
           <div
-            className="clb-shimmer-light"
+            className="clb-shimmer-dark"
             style={{ width: 40, height: 8, marginTop: 4, borderRadius: 4 }}
           />
         </div>
@@ -431,15 +432,15 @@ function PeopleSkeleton() {
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 px-4 min-h-[60px]">
           <div
-            className="clb-shimmer-light shrink-0"
+            className="clb-shimmer-dark shrink-0"
             style={{ width: 42, height: 42, borderRadius: '34%' }}
           />
           <div className="flex-1 space-y-2">
-            <div className="h-3.5 w-32 rounded clb-shimmer-light" />
-            <div className="h-3 w-24 rounded clb-shimmer-light" />
+            <div className="h-3.5 w-32 rounded clb-shimmer-dark" />
+            <div className="h-3 w-24 rounded clb-shimmer-dark" />
           </div>
           <div
-            className="clb-shimmer-light shrink-0"
+            className="clb-shimmer-dark shrink-0"
             style={{ width: 82, height: 30, borderRadius: 999 }}
           />
         </div>
@@ -454,12 +455,12 @@ function CoursesSkeleton() {
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 px-4 min-h-[60px]">
           <div
-            className="clb-shimmer-light shrink-0"
+            className="clb-shimmer-dark shrink-0"
             style={{ width: 42, height: 42, borderRadius: 12 }}
           />
           <div className="flex-1 space-y-2">
-            <div className="h-3.5 w-40 rounded clb-shimmer-light" />
-            <div className="h-3 w-20 rounded clb-shimmer-light" />
+            <div className="h-3.5 w-40 rounded clb-shimmer-dark" />
+            <div className="h-3 w-20 rounded clb-shimmer-dark" />
           </div>
         </div>
       ))}

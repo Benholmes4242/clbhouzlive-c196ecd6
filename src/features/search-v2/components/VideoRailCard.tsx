@@ -1,5 +1,6 @@
 import { Play } from 'lucide-react';
 import type { VideoHit } from '../lib/searchNavigation';
+import { S } from '../lib/tokens';
 
 interface Props { video: VideoHit; onSelect: () => void }
 
@@ -34,8 +35,7 @@ export function VideoRailCard({ video, onSelect }: Props) {
           height: 86,
           borderRadius: 12,
           overflow: 'hidden',
-          background: '#0F172A',
-          boxShadow: '0 1px 3px rgba(15,23,42,0.08)',
+          background: S.TILE,
         }}
       >
         {video.poster_url && (
@@ -95,7 +95,7 @@ export function VideoRailCard({ video, onSelect }: Props) {
           style={{
             fontSize: 12,
             fontWeight: 600,
-            color: '#0F172A',
+            color: S.INK,
             lineHeight: 1.3,
             display: '-webkit-box',
             WebkitLineClamp: 2,
