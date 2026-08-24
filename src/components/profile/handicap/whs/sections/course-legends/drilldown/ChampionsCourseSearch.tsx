@@ -10,6 +10,23 @@ import { GAM } from '../../../gam/tokens';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
+/**
+ * CANONICAL FIELD TREATMENT. Rest 6% fill / 10% border, focus 10% / 28%,
+ * radius 14, height 44 - the same control as every other search field on the
+ * dark baseline. The height lives on the box and the padding is horizontal
+ * ONLY: the collapsed button and the expanded field previously carried
+ * different vertical padding ('11px 13px' vs '10px 14px'), so the control
+ * changed height on tap. One fixed height removes that jump.
+ */
+const FIELD_H = 44;
+const FIELD_RADIUS = 14;
+const FIELD_REST_BG = 'rgba(255,255,255,0.06)';
+const FIELD_REST_BORDER = 'rgba(255,255,255,0.10)';
+const FIELD_FOCUS_BG = 'rgba(255,255,255,0.10)';
+const FIELD_FOCUS_BORDER = 'rgba(255,255,255,0.28)';
+const FIELD_INK = 'rgba(255,255,255,0.96)';
+const FIELD_PLACEHOLDER = 'rgba(255,255,255,0.38)';
+
 interface Props {
   /** Optional id to exclude from results (the current course). */
   currentCourseId?: string;
@@ -22,6 +39,7 @@ interface Props {
 export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [focused, setFocused] = useState(false);
   const [query, setQuery] = useState('');
   const debounced = useDebounce(query, 250);
   const { data: results, isLoading } = useCourseSearch(debounced);
@@ -38,6 +56,9 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
 
   return (
     <div style={{ padding: '14px 16px 4px' }}>
+      {/* ::placeholder is unreachable from an inline style, so the one rule the
+          field needs is scoped to this input by class. */}
+      <style>{`.champions-course-search-input::placeholder{color:${FIELD_PLACEHOLDER};}`}</style>
       {!open ? (
         <button
           type="button"
@@ -47,10 +68,11 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
             display: 'flex',
             alignItems: 'center',
             gap: 10,
-            background: 'var(--hcp-tint-1)',
-            border: '1px solid var(--hcp-line)',
-            borderRadius: 12,
-            padding: '11px 13px',
+            background: FIELD_REST_BG,
+            border: `1px solid ${FIELD_REST_BORDER}`,
+            borderRadius: FIELD_RADIUS,
+            height: FIELD_H,
+            padding: '0 13px',
             cursor: 'pointer',
             fontFamily: FONT,
             textAlign: 'left',
@@ -68,10 +90,12 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
             display: 'flex',
             alignItems: 'center',
             gap: 10,
-            background: 'var(--hcp-tint-1)',
-            border: '1px solid var(--hcp-line)',
-            borderRadius: 12,
-            padding: '10px 14px',
+            background: focused ? FIELD_FOCUS_BG : FIELD_REST_BG,
+            border: `1px solid ${focused ? FIELD_FOCUS_BORDER : FIELD_REST_BORDER}`,
+            borderRadius: FIELD_RADIUS,
+            height: FIELD_H,
+            padding: '0 13px',
+            transition: 'background 140ms ease, border-color 140ms ease',
           }}
         >
           <Search size={16} color="var(--hcp-t-40)" strokeWidth={2.2} />
@@ -81,6 +105,9 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search another course's champions…"
             autoFocus
+            className="champions-course-search-input"
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
             style={{
               flex: 1,
               background: 'transparent',
@@ -88,7 +115,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
               outline: 'none',
               fontFamily: FONT,
               fontSize: 14,
-              color: 'var(--hcp-t-100)',
+              color: FIELD_INK,
               minWidth: 0,
             }}
           />
