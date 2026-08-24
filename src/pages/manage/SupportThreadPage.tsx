@@ -157,9 +157,9 @@ export default function SupportThreadPage() {
         <div ref={scrollRef} className="space-y-3">
           {isLoading && (
             <div className="flex flex-col gap-3">
-              <Skeleton className="h-16 w-2/3 self-start rounded-2xl" />
-              <Skeleton className="h-12 w-1/2 self-end rounded-2xl" />
-              <Skeleton className="h-20 w-3/4 self-start rounded-2xl" />
+              <Skeleton variant="dark" className="h-16 w-2/3 self-start rounded-2xl" />
+              <Skeleton variant="dark" className="h-12 w-1/2 self-end rounded-2xl" />
+              <Skeleton variant="dark" className="h-20 w-3/4 self-start rounded-2xl" />
             </div>
           )}
 

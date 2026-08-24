@@ -16,12 +16,12 @@ export default function LegalPage() {
 
         <div
           className="rounded-2xl overflow-hidden"
-          style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+          style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
         >
           {isLoading && (
             <div className="p-4 space-y-3">
-              <Skeleton className="h-12 w-full rounded-lg" />
-              <Skeleton className="h-12 w-full rounded-lg" />
+              <Skeleton variant="dark" className="h-12 w-full rounded-lg" />
+              <Skeleton variant="dark" className="h-12 w-full rounded-lg" />
             </div>
           )}
 

@@ -89,7 +89,7 @@ export default function ContactPage() {
         <div className="px-4 pt-6">
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             <div className="flex justify-center mb-3">
               <CheckCircle2 size={40} style={{ color: '#2F6B4F' }} />
@@ -132,7 +132,7 @@ export default function ContactPage() {
       <div className="px-4 pt-4 space-y-4 pb-0">
         <div
           className="rounded-2xl p-4"
-          style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+          style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
         >
           <p className="text-[13.5px] leading-relaxed" style={{ color: A.MUTE }}>
             Tell us what's going on and we'll get back to you. Include as much detail as
@@ -150,7 +150,7 @@ export default function ContactPage() {
           </label>
           <div
             className="rounded-2xl p-2 grid grid-cols-2 gap-2"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             {CATEGORIES.map((c) => {
               const active = c.value === category;
@@ -188,7 +188,7 @@ export default function ContactPage() {
             placeholder="Short summary"
             className="w-full h-12 px-4 rounded-2xl text-[15px] outline-none"
             style={{
-              background: '#fff',
+              background: A.PANEL,
               border: `1px solid ${A.BORDER}`,
               color: A.INK,
             }}
@@ -210,7 +210,7 @@ export default function ContactPage() {
             rows={7}
             className="w-full p-4 rounded-2xl text-[15px] outline-none resize-none leading-relaxed"
             style={{
-              background: '#fff',
+              background: A.PANEL,
               border: `1px solid ${A.BORDER}`,
               color: A.INK,
               minHeight: 160,

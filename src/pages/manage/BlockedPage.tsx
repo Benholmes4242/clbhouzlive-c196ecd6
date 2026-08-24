@@ -58,13 +58,13 @@ export default function BlockedPage() {
     <ManagePageShell title="Blocked users">
       <div className="px-4 pt-4">
         {isLoading ? (
-          <div className="rounded-2xl p-2" style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}>
+          <div className="rounded-2xl p-2" style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}>
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-center gap-3 p-3">
-                <Skeleton className="w-10 h-10 rounded-full" />
+                <Skeleton variant="dark" className="w-10 h-10 rounded-full" />
                 <div className="flex-1 space-y-1.5">
-                  <Skeleton className="h-3.5 w-32" />
-                  <Skeleton className="h-3 w-20" />
+                  <Skeleton variant="dark" className="h-3.5 w-32" />
+                  <Skeleton variant="dark" className="h-3 w-20" />
                 </div>
               </div>
             ))}
@@ -82,7 +82,7 @@ export default function BlockedPage() {
             <p className="text-[13px] mt-1" style={{ color: A.MUTE }}>Users you block will appear here.</p>
           </div>
         ) : (
-          <div className="rounded-2xl overflow-hidden" style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}>
+          <div className="rounded-2xl overflow-hidden" style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}>
             {blocked.map((item, idx) => {
               const p = item.user_profiles;
               return (
