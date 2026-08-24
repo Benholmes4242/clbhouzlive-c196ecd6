@@ -655,7 +655,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       });
   }, [facets]);
 
-  const countrySelect = (compact: boolean) => (
+  const countrySelect = (_compact: boolean) => (
     <Select value={country ?? 'all'} onValueChange={onCountryChange}>
       <SelectTrigger
         className={INLINE_TRIGGER_CLS}
@@ -702,7 +702,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     </Select>
   );
 
-  const regionSelect = (compact: boolean) => (
+  const regionSelect = (_compact: boolean) => (
     <Select value={region ?? 'all'} onValueChange={onRegionChange} disabled={regionDisabled}>
       <SelectTrigger
         className={`${INLINE_TRIGGER_CLS} disabled:opacity-60`}
@@ -748,7 +748,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     </Select>
   );
 
-  const lensSelect = (compact: boolean) => (
+  const lensSelect = (_compact: boolean) => (
     <Select value={lens} onValueChange={(v) => onLensChange(v as StatLens)}>
       <SelectTrigger
         className={INLINE_TRIGGER_CLS}
