@@ -7,6 +7,11 @@
  * badges (notifications + DMs) via useActorUnreadCounts. A trailing
  * dashed "+ Business" door is rendered ONLY when the user has no
  * business actors yet.
+ *
+ * ON THIS SHEET A NOTIFICATION COUNT IS WHITE (ground A.INK, figure
+ * A.CANVAS). Amber still means the viewing member app-wide, and still marks
+ * a BUSINESS actor here (:156). The two must not be confused, which is
+ * exactly why the counts moved off amber.
  */
 
 import React from 'react';
@@ -215,8 +220,9 @@ export default function ActorCards({
                     height: 18,
                     padding: '0 5px',
                     borderRadius: 999,
-                    background: A.AMBER,
-                    color: A.PANEL,
+                    // ON THIS SHEET A NOTIFICATION COUNT IS WHITE.
+                    background: A.INK,
+                    color: A.CANVAS,
                     fontWeight: 700,
                     fontSize: 10,
                     display: 'flex',
