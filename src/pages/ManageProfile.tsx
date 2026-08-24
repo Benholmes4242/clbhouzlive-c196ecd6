@@ -31,6 +31,13 @@ import { formatHcp } from '@/lib/formatHcp';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { ManageCard, Label, Nudge, PAGE_BG, CARD_BG, FIELD_FILL, HAIR, DANGER, GREEN as GREEN_TOKEN, INK as INK_TOKEN, INK_45 as INK_45_TOKEN } from '@/components/manage/ui';
+
+/**
+ * Inert-but-present fill for the DISABLED SAVE BUTTON. Same value as the field
+ * canon's rest fill today, DIFFERENT MEANING: a button's disabled state must
+ * not follow a field alpha change. Do not repoint this at FIELD_REST_BG.
+ */
+const DISABLED_BUTTON_FILL = 'rgba(255,255,255,0.06)';
 import { SegToggle } from '@/components/profile/edit-v2/SegToggle';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
 import { CoverGuidance } from '@/components/profile/edit-v2/CoverGuidance';
@@ -765,7 +772,7 @@ function ProfileTabBody({
               fontWeight: 700,
               // Disabled must read as DISABLED BUT PRESENT: a raised inert
               // fill with a hairline, label at the 0.62 quiet floor.
-              background: (isDisabled && !isSaving) ? FIELD_FILL : INK,
+              background: (isDisabled && !isSaving) ? DISABLED_BUTTON_FILL : INK,
               color: (isDisabled && !isSaving) ? INK_55 : PAGE_BG,
               border: (isDisabled && !isSaving) ? `1px solid ${HAIR}` : 'none',
               fontFamily: SF_STACK,

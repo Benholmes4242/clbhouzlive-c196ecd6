@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { FIELD_REST_BG, FIELD_FOCUS_BG } from '@/lib/tokens/field';
 
 export const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 /**
@@ -21,9 +22,17 @@ export const INK_30 = A.DIM;
 export const HAIR = A.BORDER;
 export const PAGE_BG = A.CANVAS;
 export const CARD_BG = A.PANEL;
-/** Raised above CARD_BG so an input never disappears into its card. */
-export const FIELD_FILL = 'rgba(255,255,255,0.06)';
-export const FIELD_FILL_FOCUS = 'rgba(255,255,255,0.10)';
+/**
+ * Raised above CARD_BG so an input never disappears into its card.
+ *
+ * @deprecated Import FIELD_REST_BG / FIELD_FOCUS_BG from '@/lib/tokens/field'
+ * instead. These were a SECOND BROADCAST of the field canon at the same
+ * literal values; they are now re-exports so one alpha change moves every
+ * field at once. New code must not add call sites here.
+ */
+export const FIELD_FILL = FIELD_REST_BG;
+/** @deprecated Use FIELD_FOCUS_BG from '@/lib/tokens/field'. */
+export const FIELD_FILL_FOCUS = FIELD_FOCUS_BG;
 export const GREEN = A.GREEN;
 /** Bespoke destructive red. NOT the under-par red — different meaning. */
 export const DANGER = '#FF5A5A';

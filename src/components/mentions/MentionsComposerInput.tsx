@@ -45,6 +45,7 @@ import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { Z } from '@/config/zIndex';
 import { extractMentions } from '@/lib/mentions/format';
+import { FIELD_PLACEHOLDER } from '@/lib/tokens/field';
 
 const INK = '#F8FAFC';
 const INK_SUBTLE = 'rgba(248,250,252,0.42)';
@@ -52,8 +53,7 @@ const AMBER = '#F7931E';
 const BORDER = 'rgba(248,250,252,0.10)';
 /** Mention sheet ground (dark elevated surface). */
 const PANEL_BG = '#1B222B';
-/** Canonical dark placeholder tier. */
-const DEFAULT_PLACEHOLDER = 'rgba(255,255,255,0.38)';
+
 
 const PANEL_MAX_HEIGHT = 6 * 44 + 44 + 8; // 6 rows + eyebrow header + gutter
 
@@ -574,7 +574,7 @@ export function MentionsComposerInput({
         flex: 1,
         minWidth: 0,
         width: '100%',
-        ['--mention-placeholder' as any]: textStyle?.placeholderColor ?? DEFAULT_PLACEHOLDER,
+        ['--mention-placeholder' as any]: textStyle?.placeholderColor ?? FIELD_PLACEHOLDER,
         ...style,
       }}
     >
@@ -586,8 +586,8 @@ export function MentionsComposerInput({
       <style>{`
         .mentions-composer textarea::placeholder,
         .mentions-composer input::placeholder {
-          color: var(--mention-placeholder, ${DEFAULT_PLACEHOLDER});
-          -webkit-text-fill-color: var(--mention-placeholder, ${DEFAULT_PLACEHOLDER});
+          color: var(--mention-placeholder, ${FIELD_PLACEHOLDER});
+          -webkit-text-fill-color: var(--mention-placeholder, ${FIELD_PLACEHOLDER});
           opacity: 1;
         }
       `}</style>
