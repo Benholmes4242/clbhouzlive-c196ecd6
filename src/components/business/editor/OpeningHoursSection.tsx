@@ -1,7 +1,8 @@
 import React from 'react';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
-import { HINT_CLASS } from '@/components/manage/fieldTreatment';
+import { HINT_CLASS, FIELD_INPUT_CLASS, FIELD_INPUT_STYLE, FIELD_PLACEHOLDER_CLASS } from '@/components/manage/fieldTreatment';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { DAYS_ORDER, Day, OpeningHours, OpeningHoursEntry } from './editorTypes';
 
 interface Props {

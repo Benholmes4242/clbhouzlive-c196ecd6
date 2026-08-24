@@ -3,7 +3,7 @@ import React from 'react';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 
-import { HINT_CLASS, LABEL_CLASS } from '@/components/manage/fieldTreatment';
+import { HINT_CLASS, LABEL_CLASS, FIELD_INPUT_CLASS, FIELD_INPUT_STYLE, FIELD_PLACEHOLDER_CLASS } from '@/components/manage/fieldTreatment';
 import { SocialFields } from './editorTypes';
 import { Instagram, Music2, Youtube, Facebook, type LucideProps } from 'lucide-react';
 
