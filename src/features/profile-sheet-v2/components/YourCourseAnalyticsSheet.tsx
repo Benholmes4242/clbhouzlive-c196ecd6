@@ -689,6 +689,9 @@ function AnalyticsCourseRow({
 export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, synced }: Props) {
   const { t } = useTranslation('courses');
   const [q, setQ] = useState('');
+  /** Focus lives on the wrapper, not the input: the wrapper owns the paint. */
+  const [searchFocused, setSearchFocused] = useState(false);
+
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   // SETTLED IS NOT "NOT LOADING": this query is disabled until the sheet opens.
