@@ -184,6 +184,7 @@ export default function NotificationsPage() {
                   checked={categoryStates[c.key]}
                   disabled={isSaving}
                   onCheckedChange={(val) => updatePref(c.key, val)}
+                  className={SETTINGS_SWITCH_CLASS}
                 />
               </div>
             ))}
