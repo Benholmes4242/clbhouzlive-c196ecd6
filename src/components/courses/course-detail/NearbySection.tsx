@@ -6,6 +6,7 @@ import { getActorRouteByType } from '@/types/actor';
 import { getBusinessCategoryIcon } from '@/constants/businessCategories';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { formatDistanceKm } from '@/utils/formatDistance';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface NearbySectionProps {
   lat?: number | null;
@@ -61,7 +62,7 @@ const NearbySection: React.FC<NearbySectionProps> = ({ lat, lng }) => {
                   width: 150,
                   height: 150,
                   borderRadius: 12,
-                  background: '#F1F5F9',
+                  background: 'rgba(255,255,255,0.06)',
                   overflow: 'hidden',
                   display: 'flex',
                   alignItems: 'center',
@@ -76,7 +77,7 @@ const NearbySection: React.FC<NearbySectionProps> = ({ lat, lng }) => {
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 ) : (
-                  <Icon size={40} color="#94A3B8" strokeWidth={1.5} />
+                  <Icon size={40} color={A.DIM} strokeWidth={1.5} />
                 )}
               </div>
               <div
@@ -84,7 +85,7 @@ const NearbySection: React.FC<NearbySectionProps> = ({ lat, lng }) => {
                   marginTop: 8,
                   fontSize: 13,
                   fontWeight: 700,
-                  color: '#0F172A',
+                  color: A.INK,
                   lineHeight: 1.3,
                   display: '-webkit-box',
                   WebkitLineClamp: 2,
@@ -98,7 +99,7 @@ const NearbySection: React.FC<NearbySectionProps> = ({ lat, lng }) => {
                 style={{
                   marginTop: 2,
                   fontSize: 11,
-                  color: '#64748B',
+                  color: A.MUTE,
                   lineHeight: 1.3,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',

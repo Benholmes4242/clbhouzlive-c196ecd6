@@ -40,7 +40,7 @@ interface HookCell {
 }
 
 /** The field's bar on a hook row. Neutral - the comparison, not a verdict. */
-const FIELD_BAR_A = '#C6CFD8';
+const FIELD_BAR_A = A.BODY;
 
 /**
  * One small bar of a two-bar comparison on a hook row, sharing its sibling's
@@ -88,18 +88,18 @@ const HookBar: React.FC<{
 
 // ── Tokens ────────────────────────────────────────────────────────────
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const INK = '#0F172A';
-const INK_06 = 'rgba(15,23,42,0.06)';
-const INK_20 = 'rgba(15,23,42,0.20)';
-const INK_35 = 'rgba(15,23,42,0.35)';
-const INK_55 = 'rgba(15,23,42,0.55)';
-const INK_85 = 'rgba(15,23,42,0.85)';
+const INK = A.INK;
+const INK_06 = 'rgba(255,255,255,0.06)';
+const INK_20 = 'rgba(255,255,255,0.20)';
+const INK_35 = 'rgba(255,255,255,0.35)';
+const INK_55 = A.MUTE;
+const INK_85 = 'rgba(248,250,252,0.85)';
 const GOLD = '#F7931E';
 const GOLD_2 = '#FBBC2E';
 const GOLD_INK = '#C97211';
 const GOLD_TINT = 'rgba(247,147,30,0.10)';
 const GOLD_GRAD_V = `linear-gradient(180deg, ${GOLD} 0%, ${GOLD_2} 100%)`;
-const CARD_SHADOW = '0 1px 2px rgba(15,23,42,0.04)';
+const CARD_SHADOW = 'none';
 const NUM: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
 /**
@@ -116,7 +116,8 @@ export const DIST_SEG_COLORS = {
 
 
 const CARD: React.CSSProperties = {
-  background: '#FFFFFF',
+  background: A.PANEL,
+  border: `1px solid ${A.BORDER}`,
   borderRadius: 20,
   boxShadow: CARD_SHADOW,
 };
@@ -393,7 +394,7 @@ export const HoleDataSheet: React.FC<Props> = ({
             role="tablist"
             style={{
               display: 'inline-flex',
-              background: '#FFFFFF',
+              background: A.PANEL,
               borderRadius: 999,
               padding: 3,
               boxShadow: CARD_SHADOW,
@@ -413,7 +414,7 @@ export const HoleDataSheet: React.FC<Props> = ({
                 style={{
                   border: 0,
                   background: sort === v ? INK : 'transparent',
-                  color: sort === v ? '#FFFFFF' : INK_55,
+                  color: sort === v ? A.CANVAS : INK_55,
                   fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.04em',
@@ -474,7 +475,7 @@ export const HoleDataSheet: React.FC<Props> = ({
                 bottom: 0,
                 height: 80,
                 pointerEvents: 'none',
-                background: 'linear-gradient(180deg, rgba(248,250,252,0) 0%, rgba(248,250,252,0.92) 70%, #F8FAFC 100%)',
+                background: 'linear-gradient(180deg, rgba(21,23,31,0) 0%, rgba(21,23,31,0.92) 70%, #15171F 100%)',
               }}
             />
           )}
@@ -495,8 +496,8 @@ export const HoleDataSheet: React.FC<Props> = ({
               minHeight: 44,
               border: 0,
               borderRadius: 14,
-              background: collapsed ? INK : '#F8FAFC',
-              color: collapsed ? '#FFFFFF' : INK,
+              background: collapsed ? INK : A.PANEL,
+              color: collapsed ? A.CANVAS : INK,
               fontSize: 13.5,
               fontWeight: 700,
               letterSpacing: '-0.005em',
@@ -1097,7 +1098,7 @@ const HoleCard: React.FC<{
               height: 42,
               borderRadius: 14,
               background: isHardest ? INK : INK_06,
-              color: isHardest ? '#FFFFFF' : INK,
+              color: isHardest ? A.CANVAS : INK,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1118,7 +1119,7 @@ const HoleCard: React.FC<{
                 width: 15,
                 height: 15,
                 borderRadius: 999,
-                background: '#FFFFFF',
+                background: A.PANEL,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

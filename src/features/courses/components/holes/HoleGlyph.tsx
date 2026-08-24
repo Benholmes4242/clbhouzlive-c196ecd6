@@ -26,7 +26,6 @@
  */
 import React from 'react';
 import { INK, SC_FILL_GOLD, SC_FILL_BIRDIE } from './_constants';
-import { HAIRLINE_INK_12, INK_TINT_06 } from '@/features/tourhub/_shared/tokens';
 
 export type HoleGlyphKind =
   /** Kept for the callers that cannot yet tell an eagle from an ace: RED ring. */
@@ -39,8 +38,8 @@ export type HoleGlyphKind =
   | 'bogey'
   | 'double-plus';
 
-const BOGEY_GROUND = INK_TINT_06;
-const DOUBLE_GROUND = HAIRLINE_INK_12;
+const BOGEY_GROUND = 'rgba(248,250,252,0.28)';
+const DOUBLE_GROUND = 'rgba(248,250,252,0.62)';
 const STRIP_STROKE = 1.4;
 
 export const HoleGlyph: React.FC<{ kind: HoleGlyphKind; size?: number }> = ({

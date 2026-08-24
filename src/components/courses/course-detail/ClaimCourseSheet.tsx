@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses, type BusinessMembership } from '@/hooks/useMyBusinesses';
 import { INK, INK_FAINT } from '@/features/courses/_shared/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { AppLog } from '@/lib/logger';
 import { KICKER, TITLE } from '@/lib/tokens/type';
 
@@ -19,7 +20,7 @@ interface ClaimCourseSheetProps {
   sourceCourseId?: string;
 }
 
-const HAIRLINE = 'rgba(15,23,42,0.08)';
+const HAIRLINE = A.BORDER;
 
 const createUrl = (clubId: string, clubName: string, sourceCourseId?: string) => {
   const p = new URLSearchParams({ category: 'golf_club', clubId, clubName });
@@ -42,8 +43,8 @@ const PrimaryButton: React.FC<{
     disabled={disabled || loading}
     className="w-full h-[52px] rounded-[14px] font-bold text-[15px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
     style={{
-      background: disabled ? 'rgba(15,23,42,0.06)' : INK,
-      color: disabled ? 'rgba(15,23,42,0.38)' : '#FFFFFF',
+      background: disabled ? 'rgba(255,255,255,0.06)' : INK,
+      color: disabled ? A.DIM : A.CANVAS,
       border: 'none',
       cursor: disabled || loading ? 'not-allowed' : 'pointer',
     }}
@@ -140,7 +141,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
   // --- Render ---
   const renderHeader = () => (
     <div style={{ padding: '4px 0 12px' }}>
-      <div style={{ ...KICKER, color: '#0E1216' }}>
+      <div style={{ ...KICKER, color: A.INK }}>
         {t('courseDetail.claim.sheet.kicker')}
       </div>
       <h2 style={{ ...TITLE, color: INK, marginTop: 4 }}>
@@ -166,9 +167,9 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
     if (isLoading) {
       return (
         <div style={{ padding: '24px 0' }}>
-          <div style={{ height: 14, width: '70%', background: 'rgba(15,23,42,0.06)', borderRadius: 6, marginBottom: 12 }} />
-          <div style={{ height: 60, background: 'rgba(15,23,42,0.04)', borderRadius: 14, marginBottom: 12 }} />
-          <div style={{ height: 60, background: 'rgba(15,23,42,0.04)', borderRadius: 14 }} />
+          <div style={{ height: 14, width: '70%', background: 'rgba(255,255,255,0.08)', borderRadius: 6, marginBottom: 12 }} />
+          <div style={{ height: 60, background: 'rgba(255,255,255,0.06)', borderRadius: 14, marginBottom: 12 }} />
+          <div style={{ height: 60, background: 'rgba(255,255,255,0.06)', borderRadius: 14 }} />
         </div>
       );
     }
@@ -193,7 +194,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
                   style={{
                     padding: '12px 16px',
                     borderRadius: 14,
-                    background: '#FFFFFF',
+                    background: A.PANEL,
                     border: `1.5px solid ${selected ? INK : HAIRLINE}`,
                   }}
                 >
@@ -202,7 +203,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
                       width: 38,
                       height: 38,
                       borderRadius: 10,
-                      background: '#F4F4F5',
+                      background: 'rgba(255,255,255,0.06)',
                       overflow: 'hidden',
                       flexShrink: 0,
                       display: 'flex',
@@ -216,7 +217,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
                     ) : (
                       <BadgeCheck size={18} color={INK_FAINT} />
                     )}
-                    <span aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 10, border: '1px solid rgba(15,23,42,0.12)', pointerEvents: 'none' }} />
+                    <span aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 10, border: `1px solid ${A.BORDER}`, pointerEvents: 'none' }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 14, fontWeight: 700, color: INK, lineHeight: 1.2 }}>
@@ -241,7 +242,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
                         flexShrink: 0,
                       }}
                     >
-                      <Check size={14} color="#FFF" strokeWidth={3} />
+                      <Check size={14} color={A.CANVAS} strokeWidth={3} />
                     </div>
                   )}
                 </button>
@@ -250,7 +251,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
           </div>
 
           {errorMessage && (
-            <p style={{ fontSize: 13, color: '#DC2626', marginBottom: 12, textAlign: 'center' }}>
+            <p style={{ fontSize: 13, color: A.RED, marginBottom: 12, textAlign: 'center' }}>
               {errorMessage}
             </p>
           )}
@@ -341,7 +342,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
 
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="light">
+    <BottomSheet open={open} onClose={onClose} variant="dark" surfaceColor={A.PANEL}>
       <div style={{ padding: '20px 20px 28px' }}>
         {renderHeader()}
         {renderBody()}
@@ -351,7 +352,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
             fontWeight: 700,
             letterSpacing: '0.13em',
             textTransform: 'uppercase',
-            color: '#A2A9B2',
+            color: A.DIM,
             textAlign: 'center',
             marginTop: 14,
           }}

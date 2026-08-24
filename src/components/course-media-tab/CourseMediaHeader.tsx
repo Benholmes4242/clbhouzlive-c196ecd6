@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { MediaCounts } from './hooks/useCourseMedia';
 import type { CourseMediaFilter } from './hooks/useCourseMedia';
-import { INK, HAIRLINE_INK_10 } from '@/features/courses/_shared/tokens';
+import { INK, INK_MUTE, HAIRLINE_INK_10 } from '@/features/courses/_shared/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 
@@ -70,7 +70,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
           aria-label={t('courses:media.addMediaA11y')}
           style={{
             marginLeft: 'auto', width: 34, height: 34, borderRadius: 17,
-            background: A.INK, color: '#FFFFFF', border: 'none',
+            background: A.INK, color: '#15171F', border: 'none',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', flexShrink: 0,
           }}
@@ -100,10 +100,10 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
               height: 34, padding: '0 13px', borderRadius: 17,
-              background: isActive ? INK : '#FFFFFF',
+              background: isActive ? INK : 'rgba(255,255,255,0.06)',
               border: isActive ? `1px solid ${INK}` : `1px solid ${HAIRLINE_INK_10}`,
               fontSize: 12.5, fontWeight: isActive ? 700 : 600,
-              color: isActive ? '#FFFFFF' : INK,
+              color: isActive ? '#15171F' : INK_MUTE,
               cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
             }}
           >
@@ -111,7 +111,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
             {(
               <span style={{
                 fontSize: 11, fontWeight: 700, fontVariantNumeric: 'tabular-nums lining-nums',
-                color: isActive ? 'rgba(255,255,255,0.6)' : A.DIM,
+                 color: isActive ? 'rgba(21,23,31,0.55)' : A.DIM,
               }}>
                 {count}
               </span>
@@ -126,7 +126,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
           aria-label={t('courses:media.addMediaA11y')}
           style={{
             marginLeft: 'auto', width: 34, height: 34, borderRadius: 17,
-            background: A.INK, color: '#FFFFFF', border: 'none',
+            background: A.INK, color: '#15171F', border: 'none',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', flexShrink: 0,
           }}

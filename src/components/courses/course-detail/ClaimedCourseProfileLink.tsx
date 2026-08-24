@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import { AMBER, INK, INK_FAINT } from '@/features/courses/_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_TINT_06 } from '@/features/courses/_shared/tokens';
 import type { ClaimingBusiness } from '@/hooks/useCourseClaim';
 
 
@@ -22,7 +22,7 @@ const ClaimedCourseProfileLink: React.FC<Props> = ({ business }) => {
           width: 40,
           height: 40,
           borderRadius: 8,
-          background: '#F1F5F9',
+          background: INK_TINT_06,
           overflow: 'hidden',
           flexShrink: 0,
           display: 'flex',

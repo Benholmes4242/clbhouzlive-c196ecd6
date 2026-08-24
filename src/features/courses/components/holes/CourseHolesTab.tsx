@@ -12,6 +12,7 @@ import { INK_MUTE } from '@/features/courses/_shared/tokens';
 import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
 import { HoleDataSheet, type HoleDataSection } from './HoleDataSheet';
 import { CourseTeeCard } from './CourseTeeCard';
+import { A } from './analytical/tokens';
 
 interface Props {
   courseId: string | undefined;
@@ -78,7 +79,7 @@ export const CourseHolesTab: React.FC<Props> = ({
             style={{
               height: 88,
               borderRadius: 12,
-              background: 'linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%)',
+              background: 'linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.05) 100%)',
               backgroundSize: '200% 100%',
               animation: 'holesShimmer 1.4s linear infinite',
             }}
@@ -103,8 +104,8 @@ export const CourseHolesTab: React.FC<Props> = ({
           style={{
             border: 0,
             borderRadius: 999,
-            background: '#f59e0b',
-            color: '#fff',
+            background: A.AMBER,
+            color: A.CANVAS,
             padding: '10px 20px',
             fontSize: 14,
             fontWeight: 700,

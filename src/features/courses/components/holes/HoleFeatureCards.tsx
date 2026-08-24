@@ -24,7 +24,7 @@ const MiniDifficultyBar: React.FC<{ avg: number; maxAbs: number }> = ({ avg, max
         position: 'relative',
         width: '100%',
         height: 4,
-        background: 'rgba(15,23,42,0.06)',
+        background: 'rgba(255,255,255,0.06)',
         borderRadius: 4,
         overflow: 'hidden',
       }}
@@ -36,7 +36,7 @@ const MiniDifficultyBar: React.FC<{ avg: number; maxAbs: number }> = ({ avg, max
           bottom: 0,
           left: '50%',
           width: 1,
-          background: 'rgba(15,23,42,0.14)',
+          background: 'rgba(255,255,255,0.14)',
           transform: 'translateX(-0.5px)',
         }}
       />

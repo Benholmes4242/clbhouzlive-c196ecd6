@@ -6,8 +6,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHolePhotos } from '@/hooks/media/useHoleMedia';
-
-const INK_55 = 'rgba(15,23,42,0.55)';
+import { A } from './analytical/tokens';
 
 function ordinal(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
@@ -59,7 +58,7 @@ export const HolePhotoGallery: React.FC<Props> = ({ courseId, holeNo }) => {
             }}
           />
           {p.contributorName ? (
-            <figcaption style={{ marginTop: 6, fontSize: 11, fontWeight: 600, color: INK_55 }}>
+            <figcaption style={{ marginTop: 6, fontSize: 11, fontWeight: 600, color: A.MUTE }}>
               {t('courses:holePhoto.credit', { name: p.contributorName })}
             </figcaption>
           ) : null}

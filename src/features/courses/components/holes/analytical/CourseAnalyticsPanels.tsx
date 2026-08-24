@@ -401,7 +401,7 @@ const ShapeChart: React.FC<{
               height: 7,
               borderRadius: '50%',
               background: A.AMBER,
-              boxShadow: '0 0 0 2.5px #FFFFFF',
+              boxShadow: `0 0 0 2.5px ${A.INK}`,
             }}
           />
         )}
@@ -761,7 +761,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
                     borderRadius: 999,
                     border: on ? '1px solid transparent' : `1px solid ${A.BORDER}`,
                     background: on ? A.INK : A.PANEL,
-                    color: on ? A.PANEL : '#64748B',
+                    color: on ? A.PANEL : A.MUTE,
                     fontSize: 12.5,
                     fontWeight: on ? 700 : 600,
                     lineHeight: 1,

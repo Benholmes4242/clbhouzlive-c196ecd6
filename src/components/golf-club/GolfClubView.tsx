@@ -26,6 +26,7 @@ import CourseStatsSheet from '@/components/feed/CourseStatsSheet';
 import CourseCommunityRating from '@/components/courses/CourseCommunityRating';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 
 interface GolfClubViewProps {
@@ -159,20 +160,20 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   if (courseError) {
     return (
       <div className="min-h-screen w-full bg-background flex flex-col items-center justify-center gap-4 px-6 text-center">
-        <h2 style={{ fontSize: 17, fontWeight: 700, color: '#0F172A', margin: 0 }}>Couldn't load this course</h2>
-        <p style={{ fontSize: 13.5, color: '#64748B', margin: 0, maxWidth: 280 }}>
+        <h2 style={{ fontSize: 17, fontWeight: 700, color: A.INK, margin: 0 }}>Couldn't load this course</h2>
+        <p style={{ fontSize: 13.5, color: A.MUTE, margin: 0, maxWidth: 280 }}>
           It may have been removed, or your connection dropped.
         </p>
         <div style={{ display: 'flex', gap: 10 }}>
           <button
             onClick={() => refetchCourse()}
-            style={{ background: '#0F172A', color: '#fff', border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+            style={{ background: A.INK, color: A.CANVAS, border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
           >
             Retry
           </button>
           <button
             onClick={() => (isInModal && onClose ? onClose() : safeGoBack(navigate, '/courses'))}
-            style={{ background: '#fff', color: '#0F172A', border: '1px solid rgba(15,23,42,0.12)', borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+            style={{ background: 'rgba(255,255,255,0.06)', color: A.INK, border: `1px solid ${A.BORDER}`, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
           >
             Back
           </button>
@@ -251,7 +252,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         width: '100%',
         minHeight: 'calc(clamp(280px, 35dvh, 390px) + env(safe-area-inset-top, 0px))',
         background: heroBackground,
-        backgroundColor: '#0F172A',
+        backgroundColor: A.CANVAS,
         display: 'flex',
         flexDirection: 'column',
         paddingTop: 'env(safe-area-inset-top, 0px)',

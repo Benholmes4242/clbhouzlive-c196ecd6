@@ -567,7 +567,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <button
             type="button"
             onClick={() => refetch()}
-            className="rounded-full bg-[#f59e0b] text-white text-sm font-semibold px-5 py-2 active:scale-[0.98] transition-all min-h-[44px] hover:bg-[#e8920f]"
+            className="rounded-full text-sm font-semibold px-5 py-2 active:scale-[0.98] transition-all min-h-[44px]"
+            style={{ background: AMBER, color: A.CANVAS }}
           >
             {t('review.error.retry')}
           </button>
@@ -618,7 +619,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             {/* Distribution card */}
             <div
               style={{
-                background: '#FFFFFF',
+                background: 'rgba(255,255,255,0.06)',
                 border: `1px solid ${HAIRLINE_INK_10}`,
                 borderRadius: 16,
                 padding: '16px 16px',
@@ -635,7 +636,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   >
                     {communityScore.toFixed(1)}
                   </span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(15,23,42,0.25)', letterSpacing: '-0.02em' }}>/10</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: A.DIM, letterSpacing: '-0.02em' }}>/10</span>
                 </div>
                 <div
                   style={{ fontSize: 11, ...TIER_LABEL_STYLE, color: bandColor(communityScore), textAlign: 'center' }}
@@ -693,7 +694,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
             {/* Control row / expanding search */}
             {searchOpen ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 12px', borderRadius: 17, background: '#FFFFFF', border: `1px solid ${HAIRLINE_INK_10}` }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 34, padding: '0 12px', borderRadius: 17, background: 'rgba(255,255,255,0.06)', border: `1px solid ${HAIRLINE_INK_10}` }}>
                 <Search className="h-4 w-4 text-muted-foreground" style={{ flexShrink: 0 }} />
                 <input
                   type="text"
@@ -723,7 +724,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   type="button"
                   onClick={() => setSearchOpen(true)}
                   aria-label={t('review.search.openA11y')}
-                  style={{ width: 34, height: 34, borderRadius: 17, background: '#FFFFFF', border: `1px solid ${HAIRLINE_INK_10}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                  style={{ width: 34, height: 34, borderRadius: 17, background: 'rgba(255,255,255,0.06)', border: `1px solid ${HAIRLINE_INK_10}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
                 >
                   <Search className="h-4 w-4 text-muted-foreground" />
                 </button>
@@ -734,7 +735,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   options={sortOptions.map((o) => ({ value: o.value as string, label: o.label }))}
                   ariaLabel={t('review.sortA11y')}
                   icon={<ArrowUpDown className="h-3 w-3 mr-1" />}
-                  triggerClassName="!h-[34px] !py-0 !px-3 !text-xs !font-semibold !rounded-full !bg-white !border !border-input !text-foreground hover:!bg-accent gap-0 [&>span]:text-foreground"
+                  triggerClassName="!h-[34px] !py-0 !px-3 !text-xs !font-semibold !rounded-full !bg-[rgba(255,255,255,0.06)] !border !border-white/10 !text-foreground hover:!bg-[rgba(255,255,255,0.10)] gap-0 [&>span]:text-foreground"
                 />
 
                 {teeFilterAvailable && (
@@ -755,9 +756,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                       height: 34,
                       padding: '0 12px',
                       borderRadius: 17,
-                      background: teeFilterOn ? '#0F172A' : '#FFFFFF',
-                      color: teeFilterOn ? '#FFFFFF' : '#0F172A',
-                      border: `1px solid ${teeFilterOn ? '#0F172A' : HAIRLINE_INK_10}`,
+                      background: teeFilterOn ? A.INK : 'rgba(255,255,255,0.06)',
+                      color: teeFilterOn ? A.CANVAS : A.INK,
+                      border: `1px solid ${teeFilterOn ? A.INK : HAIRLINE_INK_10}`,
                       fontSize: 12,
                       fontWeight: 700,
                       cursor: 'pointer',
@@ -773,7 +774,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   <button
                     type="button"
                     onClick={handleRateClick}
-                    style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px', borderRadius: 17, background: '#0F172A', color: '#FFFFFF', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}
+                    style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px', borderRadius: 17, background: A.INK, color: A.CANVAS, fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}
                   >
                     <Pencil className="w-3.5 h-3.5" /> {t('review.editYours')}
                   </button>
@@ -821,7 +822,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <button
             type="button"
             onClick={handleRateClick}
-            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: '#FFFFFF', border: `1px solid ${A.BORDER}`, fontSize: 13, fontWeight: 700, color: A.INK, cursor: 'pointer' }}
+            style={{ width: '100%', padding: '12px 0', borderRadius: 12, background: A.PANEL, border: `1px solid ${A.BORDER}`, fontSize: 13, fontWeight: 700, color: A.INK, cursor: 'pointer' }}
           >
             {t('review.writePromptInline')}
           </button>

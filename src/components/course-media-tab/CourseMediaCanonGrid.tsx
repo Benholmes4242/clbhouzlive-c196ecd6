@@ -30,6 +30,8 @@ import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
 import { packColumns } from '@/components/feed-cards/packColumns';
 import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
+import { AMBER } from '@/features/courses/_shared/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -190,7 +192,8 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
         <p className="text-sm text-muted-foreground">{t('courses:media.errorBody')}</p>
         <button
           onClick={() => refetch()}
-          className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#f59e0b] text-white hover:bg-[#e8920f] active:scale-[0.97] transition-all min-h-[44px]"
+          className="px-5 py-2.5 rounded-full text-sm font-semibold active:scale-[0.97] transition-all min-h-[44px]"
+          style={{ background: AMBER, color: A.CANVAS }}
         >
           {t('common:action.retry')}
         </button>
