@@ -10,6 +10,7 @@
 import { useParams } from 'react-router-dom';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import SocialListPage, { ListSkeleton } from './SocialListPage';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   direction: 'followers' | 'following';
@@ -21,7 +22,7 @@ export default function BusinessSocialListRoute({ direction }: Props) {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100dvh', background: '#F8FAFC', paddingTop: 'calc(var(--chrome-total-h, 0px) + 24px)' }}>
+      <div style={{ minHeight: '100dvh', background: A.CANVAS, paddingTop: 'calc(var(--chrome-total-h, 0px) + 24px)' }}>
         <ListSkeleton />
       </div>
     );
@@ -31,9 +32,9 @@ export default function BusinessSocialListRoute({ direction }: Props) {
 
   if (error && !isNotFound) {
     return (
-      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: 'calc(var(--chrome-total-h, 0px) + 24px) 16px 80px', color: '#64748B', fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+      <div style={{ minHeight: '100dvh', background: A.CANVAS, padding: 'calc(var(--chrome-total-h, 0px) + 24px) 16px 80px', color: A.BODY, fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
         Couldn't load this business.
-        <button type="button" onClick={() => refetch()} style={{ background: '#0F172A', color: '#fff', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+        <button type="button" onClick={() => refetch()} style={{ background: A.INK, color: A.CANVAS, border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
           Retry
         </button>
       </div>
@@ -42,7 +43,7 @@ export default function BusinessSocialListRoute({ direction }: Props) {
 
   if (!business) {
     return (
-      <div style={{ minHeight: '100dvh', background: '#F8FAFC', padding: 'calc(var(--chrome-total-h, 0px) + 24px) 16px 80px', color: '#64748B', fontSize: 13 }}>
+      <div style={{ minHeight: '100dvh', background: A.CANVAS, padding: 'calc(var(--chrome-total-h, 0px) + 24px) 16px 80px', color: A.BODY, fontSize: 13 }}>
         Business not found.
       </div>
     );
