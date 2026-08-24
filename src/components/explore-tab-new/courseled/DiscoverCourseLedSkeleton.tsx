@@ -4,10 +4,12 @@ import {
   CARD_RADIUS,
   CARD_SHELL,
   CHIP_RADIUS,
+  RHYTHM,
   SCOPE_PILL_RADIUS,
   THUMBNAIL_RADIUS,
   WELL_RADIUS,
 } from './tokens';
+
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
