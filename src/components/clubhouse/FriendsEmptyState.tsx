@@ -5,7 +5,8 @@
  * state is owned by Clubhouse.tsx and stays separate.
  *
  * Data:
- *   - Suggestions reuse useSuggestedCreators (same source as SuggestedCreatorsShelf).
+ *   - Suggestions come from useSuggestedCreators (watch/hooks) — this is now its
+ *     only consumer.
  *   - Follows go through useToggleFollow (optimistic; onError rollback via toast).
  *   - Fourball spine seeds from useSocialCounts (following count) + useSocialListV2
  *     (avatars) and increments as follows happen on this screen.
@@ -130,8 +131,10 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
         },
         {
           onSuccess: () => {
-            // Remove followed suggestion from the shelf query so it doesn't
-            // linger on the list (mirrors SuggestedCreatorCard behaviour).
+            // Drop the followed creator from the cached suggestion list: once
+            // followed it is no longer a suggestion, so it should not linger.
+
+
             queryClient.setQueryData(
               ['suggested-creators', userId],
               (old: SuggestedCreator[] | undefined) =>
