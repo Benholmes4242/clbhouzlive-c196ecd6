@@ -46,6 +46,8 @@ export function CollegeHubPage() {
   const { data: liveAlumni } = useLiveAlumni();
 
   const [searchExpanded, setSearchExpanded] = useState(false);
+  // Paint-only focus state; see the exception note on the field below.
+  const [searchPaintFocus, setSearchPaintFocus] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const debouncedSearch = useDebouncedValue(searchValue, 200);
   const searchInputRef = useRef<HTMLInputElement>(null);
