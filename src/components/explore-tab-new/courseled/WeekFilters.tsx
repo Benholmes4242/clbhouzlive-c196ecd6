@@ -173,9 +173,9 @@ export function RegionDropdown({
             three children of ONE inline flex line, 4px apart, sharing a
             baseline — no absolute positioning, no marginLeft auto. */}
         <SelectTrigger
-          // max-w-full min-w-0 replace w-auto so the trigger can shrink below
-          // its content width; whitespace-nowrap STAYS — it is what turns the
-          // overflow into an ellipsis instead of a second line inside the well.
+          /* max-w-full min-w-0 replace w-auto so the trigger can shrink below
+             its content width; whitespace-nowrap STAYS — it turns the overflow
+             into an ellipsis, not a second line inside the well. */
           className="inline-flex h-auto max-w-full min-w-0 justify-start whitespace-nowrap border-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
           style={{
             background: selection ? 'rgba(255,255,255,0.14)' : A.PANEL,
