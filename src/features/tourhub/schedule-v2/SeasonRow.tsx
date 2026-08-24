@@ -10,7 +10,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatMonthShort } from '@/i18n/format';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import { getScoreColor } from '../_shared/scoreColor';
@@ -29,8 +29,14 @@ import {
 } from '../_shared/tokens';
 import { FIGS } from '@/lib/tokens/type';
 
-const VIOLET = '#7C3AED';
-const VIOLET_TINT = 'rgba(124,58,237,0.10)';
+/* PLAYOFFS VIOLET. These were Tailwind violet-600 (#7C3AED), which is not the
+   playoffs token. Pinned to the documented V4 playoffs identity and its DARK
+   tint rather than imported, because V4 is still the LIGHT overview ramp until
+   BRIEF_TOUR_OVERVIEW_FULL_DARK Part B ships (V4.violetSoft is #EDEAF7 today, a
+   pastel that fails on dark). CONVERGE ON V4.violet / V4.violetSoft the moment
+   that brief lands. */
+const VIOLET = '#5E4DA8';
+const VIOLET_TINT = 'rgba(94,77,168,0.22)';
 
 function shortDay(iso: string): string {
   return String(parseInt(iso.slice(8, 10), 10));
@@ -400,7 +406,7 @@ const ChampionStrip: React.FC<{
         srcCandidates={photoCandidates}
         alt={name}
         hairlineRing
-        ringColor={LIGHT_HAIRLINE}
+        ringColor={DARK_HAIRLINE}
       />
       <span style={nameStyle}>{name}</span>
       {scoreText && (
@@ -450,7 +456,7 @@ const LeaderStrip: React.FC<{
           srcCandidates={photoCandidates}
           alt={name}
           hairlineRing
-          ringColor={LIGHT_HAIRLINE}
+          ringColor={DARK_HAIRLINE}
         />
       )}
       <span style={nameStyle}>
@@ -495,7 +501,7 @@ const DefendsStrip: React.FC<{ name: string; photoCandidates: string[] }> = ({
         srcCandidates={photoCandidates}
         alt={name}
         hairlineRing
-        ringColor={LIGHT_HAIRLINE}
+        ringColor={DARK_HAIRLINE}
       />
       <span style={nameStyle}>{name}</span>
       <span
