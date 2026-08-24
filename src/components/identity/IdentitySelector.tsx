@@ -1,7 +1,7 @@
 import { ChevronDown, Check, Building2, User, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useActiveActor, ActiveActor } from '@/context/ActiveActorContext';
-import { SquircleAvatar, LIGHT_HAIRLINE} from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { postingAsCopy } from '@/lib/postingAsCopy';
 import {
@@ -53,7 +53,6 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
         alt={actor.name}
         userId={actor.id}
         hairlineRing
-        ringColor={LIGHT_HAIRLINE}
       />
     );
   };

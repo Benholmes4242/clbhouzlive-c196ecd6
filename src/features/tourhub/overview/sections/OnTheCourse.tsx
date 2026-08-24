@@ -31,7 +31,6 @@ import { getScoreColor } from '../../_shared/scoreColor';
 import { todayFromEntry } from '../../leaderboard/BoardTable';
 
 import { PlayerAvatar } from '../../components/PlayerAvatar';
-import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { SPACE } from '@/lib/spacing';
 import { formatTimeHm } from '@/i18n/format';
 import { A, LABEL, KICKER, FIGS } from '@/features/courses/components/holes/analytical/tokens';
@@ -422,7 +421,6 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                         tourCode={tourCode}
                         photoUrl={p.photo_url ?? null}
                         size="sm"
-                        ringColor={LIGHT_HAIRLINE}
                       />
                       <span
                         style={{
@@ -651,7 +649,6 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                             tourCode={tourCode}
                             photoUrl={p.photoUrl ?? null}
                             size="xs"
-                            ringColor={LIGHT_HAIRLINE}
                           />
                           <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {p.name}

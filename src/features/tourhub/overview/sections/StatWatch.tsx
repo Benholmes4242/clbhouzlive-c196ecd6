@@ -9,7 +9,6 @@ import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { useStatWatch, type StatCategory } from '../data/useStatWatch';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
-import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
 import type { TourId } from '../../hooks/useOverviewData';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -134,7 +133,6 @@ function StatCard({
           tourCode={tourCode}
           photoUrl={leader.photoUrl}
           size="sm"
-          ringColor={LIGHT_HAIRLINE}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: V4.ink, letterSpacing: '-0.005em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

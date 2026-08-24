@@ -34,7 +34,7 @@ import { useDailyEditorial } from '@/hooks/championship/useDailyEditorial';
 import { formatCurrencyUsdCompact } from '@/i18n/format';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { COLLEGE_RIVALRY_FALLBACK } from '../../utils/editorialFallbacks';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
@@ -418,7 +418,6 @@ function DuelSide({
             alt={captain.name}
             userId={captain.id}
             hairlineRing
-            ringColor={LIGHT_HAIRLINE}
           />
           <span style={{ fontSize: 10, fontWeight: 600, color: V4.inkMute, letterSpacing: '-0.005em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {captain.name}

@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Settings, Share2, ArrowLeft } from 'lucide-react';
 
 interface StickyMiniHeaderProps {
@@ -63,7 +63,6 @@ export const StickyMiniHeader: React.FC<StickyMiniHeaderProps> = ({
               fallback={displayName.substring(0, 2)}
               size="sm"
               hairlineRing
-              ringColor={LIGHT_HAIRLINE}
             />
             <span
               className="font-semibold text-sm"

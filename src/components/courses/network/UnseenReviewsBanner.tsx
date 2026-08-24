@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { X } from 'lucide-react';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const AMBER = '#F7931E';
 
@@ -48,7 +48,6 @@ export function UnseenReviewsBanner() {
           alt={latest.reviewer_name}
           fallback={latest.reviewer_name.slice(0, 2).toUpperCase()}
           hairlineRing
-          ringColor={LIGHT_HAIRLINE}
         />
       </div>
 

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import DetailDrawer from './DetailDrawer';
 import StatusPill from './StatusPill';
@@ -293,7 +293,6 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
                 <div style={cardStyle()}>
                   <SquircleAvatar src={row.targetUser.profile_photo_url ?? undefined} alt={row.targetUser.display_name ?? undefined} size={44}
                     hairlineRing
-                    ringColor={LIGHT_HAIRLINE}
                   />
                   <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                     <span style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>{row.targetUser.display_name ?? 'Unknown'}</span>
@@ -308,7 +307,6 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <SquircleAvatar src={row.targetPost.author?.profile_photo_url ?? undefined} alt={row.targetPost.author?.display_name ?? undefined} size={32}
                       hairlineRing
-                      ringColor={LIGHT_HAIRLINE}
                     />
                     <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                       <span style={{ color: t.ink, fontWeight: 700, fontSize: 13 }}>
@@ -336,7 +334,6 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <SquircleAvatar src={r.reporter?.profile_photo_url ?? undefined} alt={r.reporter?.display_name ?? undefined} size={24}
                             hairlineRing
-                            ringColor={LIGHT_HAIRLINE}
                           />
                           <span style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>
                             {r.reporter?.display_name ?? 'Unknown reporter'}

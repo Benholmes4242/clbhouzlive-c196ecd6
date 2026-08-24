@@ -11,7 +11,6 @@ import { differenceInCalendarDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { Trophy, Star } from 'lucide-react';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
-import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatPurse } from '../../_shared/formatPurse';
 import { formatNumber } from '@/i18n/format';
 import { FONT, WHITE_ALPHA_65 } from '../../_shared/tokens';
@@ -136,7 +135,6 @@ function PersonLockup({
           tourCode={tourCode}
           photoUrl={photoUrl ?? null}
           size="md"
-          ringColor={LIGHT_HAIRLINE}
         />
       )}
       <div style={{ flex: 1, minWidth: 0 }}>

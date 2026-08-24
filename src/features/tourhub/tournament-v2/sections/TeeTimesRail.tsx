@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 import { SectionEyebrow } from './SectionEyebrow';
 import type { TeeGroup } from '../data/useTeeTimesAll';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
-import { LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, SURFACE, HAIRLINE_INK_8,
 } from '../../_shared/tokens';
@@ -161,7 +160,6 @@ export function TeeTimesRail({ groups, round, onOpenAll }: Props) {
                       playerName={p.name}
                       photoUrl={p.photoUrl ?? null}
                       size="xs"
-                      ringColor={LIGHT_HAIRLINE}
                     />
                     <div
                       style={{

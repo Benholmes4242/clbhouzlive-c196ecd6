@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import DetailDrawer from './DetailDrawer';
 import StatusPill from './StatusPill';
@@ -150,7 +150,6 @@ export default function SupportTicketDrawer({ ticket, onClose }: Props) {
           alt={userName}
           size={36}
           hairlineRing
-          ringColor={LIGHT_HAIRLINE}
         />
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, minWidth: 0 }}>
           <span style={{ color: t.ink, fontSize: 14, fontWeight: 600 }}>{userName}</span>

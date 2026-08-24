@@ -7,7 +7,7 @@
  */
 
 import { memo, type ReactNode } from 'react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import { formatNumberMaxFrac } from '@/i18n/format';
@@ -96,7 +96,6 @@ function RankedPlayerRowInner({
           alt={player.name}
           userId={player.playerId}
           hairlineRing
-          ringColor={LIGHT_HAIRLINE}
         />
         {live && (
           <span

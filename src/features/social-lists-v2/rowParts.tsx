@@ -7,7 +7,7 @@
  */
 import { useState } from 'react';
 import { toast } from '@/lib/toast';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
@@ -56,7 +56,7 @@ export function RowAvatar({
             borderRadius: '34%',
             overflow: 'hidden',
             background: ROW_SURFACE,
-            border: `0.5px solid ${LIGHT_HAIRLINE}`,
+            border: `0.5px solid ${DARK_HAIRLINE}`,
             flexShrink: 0,
           }}
         >
@@ -75,7 +75,7 @@ export function RowAvatar({
           height: size,
           borderRadius: '34%',
           background: 'rgba(15,23,42,0.06)',
-          border: `0.5px solid ${LIGHT_HAIRLINE}`,
+          border: `0.5px solid ${DARK_HAIRLINE}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -96,7 +96,6 @@ export function RowAvatar({
       size={size}
       fallback={initial}
       hairlineRing
-      ringColor={LIGHT_HAIRLINE}
     />
   );
 }

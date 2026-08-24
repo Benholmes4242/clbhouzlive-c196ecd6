@@ -18,7 +18,7 @@ import { MovementFigure } from '../../_shared/movement';
 
 import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
 import type { TourId } from '../../hooks/useOverviewData';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatNumber } from '@/i18n/format';
@@ -132,7 +132,6 @@ export function WorldRankings({ tour }: { tour: TourId }) {
                   tourCode={mapping.tourCode}
                   photoUrl={r.photoUrl}
                   size="sm"
-                  ringColor={LIGHT_HAIRLINE}
                 />
                 <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {r.playerName}
@@ -183,7 +182,6 @@ function SpotlightRow({
           alt={row.playerName}
           userId={row.playerId ?? row.playerName}
           hairlineRing
-          ringColor={LIGHT_HAIRLINE}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 9.5, fontWeight: 700, color: V4.ink, letterSpacing: '0.12em', textTransform: 'uppercase' }}>

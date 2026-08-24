@@ -20,7 +20,7 @@ import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { toast } from '@/lib/toast';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
@@ -512,7 +512,6 @@ function PendingRow({
         size={38}
         fallback={(row.display_name ?? row.username ?? '?').charAt(0)}
         hairlineRing
-        ringColor={LIGHT_HAIRLINE}
       />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div

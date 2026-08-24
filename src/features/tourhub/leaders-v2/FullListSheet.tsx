@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -267,7 +267,6 @@ export function FullListSheet({
                       alt={r.name}
                       userId={r.playerId}
                       hairlineRing
-                      ringColor={LIGHT_HAIRLINE}
                     />
                     {live && (
                       <span
