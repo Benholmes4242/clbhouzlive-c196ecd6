@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape } from './courseled/hooks/useRoundHoleShapes';
-import { RoundShape } from './courseled/RoundShape';
+import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import {
   movementFor,
   insightFor,
@@ -19,11 +20,13 @@ import {
  * FriendRoundRow — the "Who's been playing" see-all sheet row
  * (BRIEF_WHOS_BEEN_PLAYING_SHEET §3).
  *
- * FOUR COLUMNS: avatar 34 / text / trace 96 / figures.
+ * TWO ROWS: avatar / identity / figures, then insight / trace. At the narrowest
+ * supported viewport the old four-column row left only 52px for all three text
+ * lines, so the meaning of every insight was clipped away.
  *
- * THE TRACE IS THE RAIL'S OWN RENDERER at row scale — the extracted RoundShape,
- * not a second implementation — so a round drawn on the tile is drawn the same
- * way after the tap. NO HOLE DATA MEANS NO TRACE: the column collapses rather
+ * THE TRACE IS THE CANONICAL SCORECARD TrajectoryLine at row scale, imported
+ * directly so the graded stroke, earned-red fill and gold-only beads cannot
+ * drift. NO HOLE DATA MEANS NO TRACE: the column collapses rather
  * than reserving space or drawing a flat line, which would be a claim about a
  * round nobody measured.
  *
@@ -31,12 +34,6 @@ import {
  * rounds"), so "2d" beside every name would be the same fact twice.
  */
 
-
-const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const INK = '#0F172A';
-const SLATE_400 = '#94A3B8';
-const SLATE_500 = '#64748B';
-const HAIRLINE = '#E2E8F0';
 
 // Compact density (canonical Discover/Champions).
 const ROW_MIN_HEIGHT = 56;
@@ -103,176 +100,190 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight, shape = 
     <button
       type="button"
       onClick={onPress}
-      className="w-full text-left active:bg-slate-50 transition-colors"
+      className="w-full text-left transition-colors"
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 10,
+        display: 'block',
         width: '100%',
         minHeight: ROW_MIN_HEIGHT,
         padding: ROW_PADDING,
         background: 'transparent',
         border: 'none',
-        borderBottom: isLast ? 'none' : `1px solid ${HAIRLINE}`,
+        borderBottom: isLast ? 'none' : `1px solid ${A.BORDER}`,
         cursor: onPress ? 'pointer' : 'default',
-        fontFamily: FONT,
       }}
     >
-      <div style={{ flexShrink: 0, marginTop: 1 }}>
-        <SquircleAvatar
-          size={AVATAR_SIZE}
-          srcCandidates={profile_photo_url ? [profile_photo_url] : []}
-          alt={display_name}
-          fallback={getInitialsFromName(display_name)}
-          userId={user_id ?? undefined}
-          hairlineRing
-        />
-      </div>
-
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-        {/* LINE 1 — THE MEMBER. The whole line is theirs now that the age stamp
-            has gone up into the day header. */}
-        <div
-          style={{
-            fontSize: NAME_SIZE,
-            fontWeight: 700,
-            color: INK,
-            letterSpacing: '-0.01em',
-            lineHeight: 1.2,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            minWidth: 0,
-          }}
-        >
-          {display_name}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ flexShrink: 0, marginTop: 1 }}>
+          <SquircleAvatar
+            size={AVATAR_SIZE}
+            srcCandidates={profile_photo_url ? [profile_photo_url] : []}
+            alt={display_name}
+            fallback={getInitialsFromName(display_name)}
+            userId={user_id ?? undefined}
+            hairlineRing
+          />
         </div>
 
-        <div
-          style={{
-            marginTop: 3,
-            fontSize: SUBLINE_SIZE,
-            fontWeight: 600,
-            color: SLATE_500,
-            lineHeight: 1.2,
-            minWidth: 0,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {course_name ?? ''}
-        </div>
-
-        {/* LINE 3 — the analytical line: the insight, marked by its glyph. */}
-        {reference && (
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           <div
-            className="tabular-nums"
             style={{
-              marginTop: 6,
+              fontSize: NAME_SIZE,
+              fontWeight: 700,
+              color: A.INK,
+              letterSpacing: '-0.01em',
+              lineHeight: 1.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
               minWidth: 0,
-              display: 'flex',
-              alignItems: 'baseline',
-              fontSize: INSIGHT_FONT_SIZE,
-              lineHeight: INSIGHT_LINE_HEIGHT,
+            }}
+          >
+            {display_name}
+          </div>
+
+          <div
+            style={{
+              marginTop: 3,
+              fontSize: SUBLINE_SIZE,
               fontWeight: 600,
-              color: SLATE_500,
+              color: A.INK,
+              lineHeight: 1.2,
+              minWidth: 0,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
             }}
           >
-            <InsightGlyph />
-            <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {reference}
-            </span>
+            {course_name ?? ''}
           </div>
-        )}
-      </div>
-
-      {hasTrace && (
-        <div style={{ flexShrink: 0, width: TRACE_W, height: TRACE_H }}>
-          <RoundShape row={row} shape={shape} width={TRACE_W} height={TRACE_H} showMeta={false} />
         </div>
-      )}
 
-      {gross != null ? (
-        <div
-          style={{
-            flexShrink: 0,
-            width: SCORE_COL_W,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-            <div
-              className="tabular-nums"
-              style={{
-                fontSize: STAT_VALUE_SIZE,
-                fontWeight: 700,
-                lineHeight: 1,
-                color: INK,
-                letterSpacing: '-0.03em',
-              }}
-            >
-              {gross}
-            </div>
-            {toPar && (
+        {gross != null ? (
+          <div
+            style={{
+              flexShrink: 0,
+              width: SCORE_COL_W,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
               <div
                 className="tabular-nums"
                 style={{
-                  fontSize: 13,
+                  fontSize: STAT_VALUE_SIZE,
                   fontWeight: 700,
                   lineHeight: 1,
-                  letterSpacing: '-0.02em',
-                  color: toPar.tone,
+                  color: A.INK,
+                  letterSpacing: '-0.03em',
                 }}
               >
-                {toPar.text}
+                {gross}
+              </div>
+              {toPar && (
+                <div
+                  className="tabular-nums"
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    letterSpacing: '-0.02em',
+                    color: toPar.tone,
+                  }}
+                >
+                  {toPar.text}
+                </div>
+              )}
+            </div>
+            <div
+              style={{
+                marginTop: 4,
+                fontSize: STAT_LABEL_SIZE,
+                fontWeight: 700,
+                letterSpacing: '0.13em',
+                textTransform: 'uppercase',
+                color: A.MUTE,
+                lineHeight: 1,
+              }}
+            >
+              {row.course_par != null ? `PAR ${row.course_par}` : 'GROSS'}
+            </div>
+            {movement && (
+              <div
+                className="tabular-nums"
+                style={{
+                  marginTop: 5,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  color: movement.tone,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                <IndexMovementTriangle
+                  direction={movement.arrow === '\u2193' ? 'down' : 'up'}
+                  color={movement.tone}
+                  size={7}
+                />
+                <span>{movement.figure}</span>
               </div>
             )}
           </div>
-          <div
-            style={{
-              marginTop: 4,
-              fontSize: STAT_LABEL_SIZE,
-              fontWeight: 700,
-              letterSpacing: '0.13em',
-              textTransform: 'uppercase',
-              color: SLATE_400,
-              lineHeight: 1,
-            }}
-          >
-            {row.course_par != null ? `PAR ${row.course_par}` : 'GROSS'}
-          </div>
-          {movement && (
+        ) : (
+          <div style={{ flexShrink: 0, width: SCORE_COL_W }} />
+        )}
+      </div>
+
+      {(reference || hasTrace) && (
+        <div
+          style={{
+            marginTop: 7,
+            marginLeft: AVATAR_SIZE + 10,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            minWidth: 0,
+          }}
+        >
+          {reference && (
             <div
               className="tabular-nums"
               style={{
-                marginTop: 5,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 3,
-                fontSize: 11,
-                fontWeight: 700,
-                lineHeight: 1,
-                color: movement.tone,
-                letterSpacing: '-0.01em',
+                minWidth: 0,
+                flex: 1,
+                display: 'flex',
+                alignItems: 'baseline',
+                fontSize: INSIGHT_FONT_SIZE,
+                lineHeight: INSIGHT_LINE_HEIGHT,
+                fontWeight: 600,
+                color: A.INK,
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
               }}
             >
-              <IndexMovementTriangle
-                direction={movement.arrow === '\u2193' ? 'down' : 'up'}
-                color={movement.tone}
-                size={7}
+              <InsightGlyph />
+              <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {reference}
+              </span>
+            </div>
+          )}
+          {hasTrace && shape && (
+            <div style={{ flexShrink: 0, width: TRACE_W, height: TRACE_H }}>
+              <TrajectoryLine
+                holes={shape.holes}
+                surface="dark"
+                height={TRACE_H}
+                viewWidth={TRACE_W}
+                showTicks={false}
+                padY={0}
               />
-              <span>{movement.figure}</span>
             </div>
           )}
         </div>
-      ) : (
-        <div style={{ flexShrink: 0, width: SCORE_COL_W }} />
       )}
 
     </button>

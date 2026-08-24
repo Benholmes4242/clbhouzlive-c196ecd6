@@ -34,13 +34,6 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
  * which carry through so the lens can be changed inside the sheet.
  */
 
-const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const SLATE_50 = '#F8FAFC';
-const INK = '#0F172A';
-const EYEBROW_INK = '#0E1216';
-const SLATE_400 = '#94A3B8';
-const HAIRLINE = '#E2E8F0';
-
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -99,22 +92,21 @@ export function GolfThisWeekSheet({
       open={open}
       onClose={onClose}
       ariaLabelledBy="golf-this-week-title"
-      variant="light"
-      surfaceColor={SLATE_50}
+      variant="dark"
+      surfaceColor={A.CANVAS}
       style={{
         height: 'auto',
         maxHeight: '85dvh',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: FONT,
-        background: SLATE_50,
+        background: A.CANVAS,
       }}
     >
       <div
         style={{
           padding: '10px 16px 12px',
-          background: SLATE_50,
-          borderBottom: `1px solid ${HAIRLINE}`,
+          background: A.CANVAS,
+          borderBottom: `1px solid ${A.BORDER}`,
         }}
       >
         <div
@@ -123,7 +115,7 @@ export function GolfThisWeekSheet({
             fontWeight: 600,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: EYEBROW_INK,
+            color: A.MUTE,
             marginBottom: 4,
           }}
         >
@@ -132,7 +124,7 @@ export function GolfThisWeekSheet({
             ? t('discover.friendsRounds.entrySingular', 'ROUND')
             : t('discover.friendsRounds.entryPlural', 'ROUNDS')}
         </div>
-        <div id="golf-this-week-title" style={{ ...TITLE_METRICS, color: INK }}>
+        <div id="golf-this-week-title" style={{ ...TITLE_METRICS, color: A.INK }}>
           {t('discover.golfThisWeek.heading', 'Golf this week')}
         </div>
       </div>
@@ -159,7 +151,7 @@ export function GolfThisWeekSheet({
           flex: 1,
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
-          background: SLATE_50,
+          background: A.CANVAS,
         }}
       >
         {days.map(([key, list], dayIdx) => (
@@ -174,18 +166,18 @@ export function GolfThisWeekSheet({
                 justifyContent: 'space-between',
                 gap: 8,
                 padding: '8px 16px 7px',
-                background: SLATE_50,
-                borderBottom: `1px solid ${HAIRLINE}`,
+                background: A.CANVAS,
+                borderBottom: `1px solid ${A.BORDER}`,
                 fontSize: 10,
                 fontWeight: 700,
                 letterSpacing: '0.09em',
                 textTransform: 'uppercase',
               }}
             >
-              <span style={{ color: EYEBROW_INK }}>
+              <span style={{ color: A.MUTE }}>
                 {key ? relativeDay(key, t as never, 'long') : ''}
               </span>
-              <span className="tabular-nums" style={{ color: SLATE_400 }}>
+              <span className="tabular-nums" style={{ color: A.MUTE }}>
                 {list.length}{' '}
                 {list.length === 1
                   ? t('discover.friendsRounds.entrySingular', 'ROUND')
