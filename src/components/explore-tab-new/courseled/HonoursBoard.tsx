@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, EYEBROW_TEXT, InkAction, PODIUM_ACCENT } from './tokens';
+import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 import { PodiumAvatarRing } from './PodiumAvatarRing';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 /**
  * Section 7 — THE HONOURS BOARD (BRIEF_HONOURS_PERSON_LED).
@@ -40,20 +41,71 @@ const AVATAR = 44;
  * TWO SURFACES, TWO JOBS. A scorecard IDENTIFIES a score, so an ace and an
  * albatross deliberately share its red disc with a gold ring: both mean “rarer
  * than an eagle”. The honours board RANKS rarity, so it deliberately separates
- * the roughly 500× rarer albatross (platinum) from the ace (gold). Do not make
+ * the roughly 500× rarer albatross (champagne) from the ace (bone). Do not make
  * either surface match the other; the difference is semantic, not accidental.
  *
- * Metal is confined to the feat block. The light top-left stop and deeper final
- * stop make each ground resolve as material rather than a flat colour wash.
+ * THESE TWO SEPARATE BY SATURATION, NOT VALUE. Champagne is the richer card,
+ * not a lighter or darker card. Do not introduce a value difference to make the
+ * hierarchy louder. Both three-stop grounds remain confined to the feat block.
  */
-export const PLATINUM_GROUND = 'linear-gradient(145deg, #FAFCFF 0%, #D7DEE8 52%, #929EAD 100%)';
-export const ACE_GROUND = 'linear-gradient(145deg, #FFF1A8 0%, #FFD200 52%, #C98700 100%)';
-export const METAL_INK = '#0F172A';
-/** 80% is the lowest quiet tier that remains AA at the darkest gold stop. */
-export const METAL_YEAR = 'rgba(15,23,42,0.80)';
-/** Shared with the year: the darkest gold stop needs this alpha to reach AA. */
-export const METAL_SUPPORT = 'rgba(15,23,42,0.80)';
-export const METAL_AVATAR_RING = 'rgba(15,23,42,0.28)';
+export const ALBATROSS_GROUND = 'linear-gradient(150deg, #FAF3E4 0%, #EADCBD 48%, #C2AE86 100%)';
+export const ACE_GROUND = 'linear-gradient(150deg, #FBFAF6 0%, #E7E3D8 48%, #C3BDAC 100%)';
+export const METAL_INK = '#0B0F14';
+export const METAL_YEAR = 'rgba(11,15,20,0.60)';
+export const METAL_SUPPORT = 'rgba(11,15,20,0.60)';
+export const METAL_AVATAR_RING = 'rgba(11,15,20,0.28)';
+
+/**
+ * Honours uses Best This Week's measured 1px ring and 0.5px visible gap, but
+ * cannot use its panel-filled gap over a gradient. An offset outline leaves the
+ * gap genuinely empty. The 40px avatar and existing 44px footprint are fixed.
+ */
+const HONOURS_RING_WIDTH = 1;
+const HONOURS_RING_GAP = 0.5;
+
+function HonoursAvatarRing({
+  src,
+  alt,
+  userId,
+}: {
+  src: string | null;
+  alt: string;
+  userId: string | null;
+}) {
+  return (
+    <span
+      data-honours-avatar-ring
+      style={{
+        position: 'relative',
+        width: AVATAR,
+        aspectRatio: '1 / 1.05',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 'none',
+      }}
+    >
+      <span
+        style={{
+          width: 40,
+          aspectRatio: '1 / 1.05',
+          borderRadius: '34%',
+          outline: `${HONOURS_RING_WIDTH}px solid ${METAL_AVATAR_RING}`,
+          outlineOffset: HONOURS_RING_GAP,
+          display: 'inline-flex',
+        }}
+      >
+        <SquircleAvatar
+          size={40}
+          src={src}
+          alt={alt}
+          userId={userId}
+          hideRing
+        />
+      </span>
+    </span>
+  );
+}
 
 export type HonoursMode = 'recent' | 'leaders';
 
@@ -205,10 +257,10 @@ export function FeatCard({
         opacity: 1,
       }}
     >
-      {/* THE METAL FEAT BLOCK — platinum ranks above gold; the panel foot stays dark. */}
+      {/* THE FEAT BLOCK — champagne ranks above bone; the panel foot stays dark. */}
       <span
         data-honours-feat-block={ace ? 'ace' : 'albatross'}
-        data-honours-metal={ace ? ACE_GROUND : PLATINUM_GROUND}
+        data-honours-metal={ace ? ACE_GROUND : ALBATROSS_GROUND}
         style={{
           position: 'relative',
           display: 'flex',
@@ -216,7 +268,7 @@ export function FeatCard({
           justifyContent: 'flex-end',
           height: HEAD_H,
           flex: '0 0 auto',
-          background: ace ? ACE_GROUND : PLATINUM_GROUND,
+          background: ace ? ACE_GROUND : ALBATROSS_GROUND,
           padding: '11px 12px 12px',
           boxSizing: 'border-box',
         }}
@@ -252,12 +304,10 @@ export function FeatCard({
         </span>
 
         <span style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <PodiumAvatarRing
-            avatarSize={40}
+          <HonoursAvatarRing
             src={e.actorAvatar}
             userId={e.userId}
             alt={e.actorName}
-            ringColor={ace ? PODIUM_ACCENT.gold : PODIUM_ACCENT.white}
           />
           <span
             style={{
