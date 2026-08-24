@@ -215,8 +215,8 @@ const GhostCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
             </defs>
             <path d={area} fill="url(#hcp-ghost-fill)" />
             {/* The white halo is what stops the line reading flat on its own fill. */}
-            <path d={d} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={5.5} strokeLinecap="round" strokeLinejoin="round" />
-            <path d={d} fill="none" stroke="url(#hcp-ghost-stroke)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+            <path d={d} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={4.0} strokeLinecap="round" strokeLinejoin="round" />
+            <path d={d} fill="none" stroke="url(#hcp-ghost-stroke)" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           {/* The action sits INSIDE the plot on its baseline — the row the date
               ticks would use — so it costs no height. */}
