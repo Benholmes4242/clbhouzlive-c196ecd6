@@ -5,17 +5,19 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Heart, MoreHorizontal } from 'lucide-react';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import { getActorRouteByType } from '@/types/actor';
 import { CommentImageV2 } from './CommentImageV2';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { isEmojiOnly } from '../lib/emojiOnly';
 import type { CommentV2 } from '../hooks/useCommentsV2';
 
-const INK = '#0E1216';
-const MUTE = '#68707B';
-const DIM = '#A2A9B2';
+/* Dark baseline (MICRO_BRIEF_COMMENTS_DARK §2). */
+const INK = A.INK;
+const MUTE = A.MUTE;
+const DIM = 'rgba(248,250,252,0.42)';
 const AMBER = '#F7931E';
 
 interface Props {
@@ -42,7 +44,7 @@ export function ReplyRow({ comment, registerRef, highlighted, onLike, onMore, on
         gap: 11,
         padding: '10px 0 0',
         transition: 'background-color 300ms',
-        background: highlighted ? 'rgba(247,147,30,0.06)' : 'transparent',
+        background: highlighted ? 'rgba(247,147,30,0.12)' : 'transparent',
       }}
     >
       <button
@@ -61,7 +63,7 @@ export function ReplyRow({ comment, registerRef, highlighted, onLike, onMore, on
           src={comment.avatar_url}
           alt={comment.display_name}
           fallback={comment.display_name?.charAt(0) || '?'}
-          hairlineRing ringColor={LIGHT_HAIRLINE}
+          hairlineRing ringColor={DARK_HAIRLINE}
         />
       </button>
 
@@ -74,7 +76,7 @@ export function ReplyRow({ comment, registerRef, highlighted, onLike, onMore, on
             <span style={{
               padding: '1px 5px', borderRadius: 3, fontSize: 8.5, fontWeight: 700,
               textTransform: 'uppercase', letterSpacing: '0.14em',
-              background: 'rgba(247,147,30,0.10)', color: AMBER,
+              background: 'rgba(247,147,30,0.16)', color: AMBER,
             }}>{t('comments.business')}</span>
           )}
           <span style={{ fontSize: 10.5, color: DIM }}>

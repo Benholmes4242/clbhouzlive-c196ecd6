@@ -197,8 +197,13 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                   onClick={close}
                   className="w-full mt-4 py-3 cursor-pointer"
                   style={{
+                    /*
+                      INK fill takes a CANVAS label. White-on-white is the
+                      trap this migration keeps finding: flip the label, never
+                      the fill.
+                    */
                     borderRadius: 12, border: 0, background: INK,
-                    color: '#FFFFFF', fontSize: 15, fontWeight: 700,
+                    color: '#15171F', fontSize: 15, fontWeight: 700,
                   }}
                 >
                   Done
