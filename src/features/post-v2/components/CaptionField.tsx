@@ -46,6 +46,9 @@ export default function CaptionField({
         lineHeight: light ? '25px' : '24px',
         color: light ? LIGHT_INK : CT_DARK.ink,
         caretColor: light ? LIGHT_INK : CT_DARK.amber,
+        // The highlighter has no placeholder layer, so the field must name its
+        // own placeholder fill (see MentionsTextStyle.placeholderColor).
+        placeholderColor: light ? 'rgba(14,18,22,0.38)' : 'rgba(255,255,255,0.38)',
         minHeight,
         padding: light ? '2px 0' : '12px 0',
       }}

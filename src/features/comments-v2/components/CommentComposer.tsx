@@ -217,6 +217,15 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
               : t('comments.placeholder')}
             inputRef={(el) => { inputRef.current = el; }}
             currentUserId={user?.id ?? null}
+            /*
+              The comments sheet is a LIGHT-forced surface, so it must name its
+              own ink now that MentionsComposerInput's defaults are dark.
+            */
+            textStyle={{
+              color: INK,
+              caretColor: INK,
+              placeholderColor: 'rgba(14,18,22,0.38)',
+            }}
           />
 
           <button
