@@ -4,7 +4,13 @@ const CLUBHOUSE_CHARCOAL = '#15171F';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
-import { SquircleAvatar, LIGHT_HAIRLINE, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
+
+/** PENDING DECISION (BRIEF_DELETE_LIGHT_HAIRLINE §2): the shared LIGHT_HAIRLINE
+ *  export is gone. This component is the last light-branch holdout and appears
+ *  to be dead code — kept byte-identical in behaviour pending Ben's call on
+ *  deleting it outright. Do not copy this constant anywhere else. */
+const LIGHT_HAIRLINE = 'rgba(15,23,42,0.12)';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { useActiveActor } from '@/context/ActiveActorContext';
