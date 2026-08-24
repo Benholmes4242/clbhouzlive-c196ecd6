@@ -567,7 +567,31 @@ export default function ExploreTabContent({
         {/* MEDIA-CONTROLLED SUBTREE. This starts after the chips and search; the
             honours board is a preceding sibling and cannot be reached by this
             state boundary. display:contents preserves the established rhythm. */}
-        <div data-media-filter-scope={mediaChip} style={{ display: 'contents' }}>
+        <div
+          data-media-filter-scope={mediaChip}
+          data-media-filter-query={filtering ? 'active' : 'idle'}
+          style={{ display: 'contents' }}
+        >
+
+        {/* THE EMPTY ANSWER (§4). A 2+ character query that matches nothing across
+            all three pools replaces the three sections with ONE SENTENCE — no
+            icon, no tile, no CTA. The chips and the field stay interactive, which
+            is the page's existing empty-answer pattern (GolfThisWeek §S2.5).
+            The query is member input echoed back, so i18next escapes it. */}
+        {noMediaMatches && (
+          <p
+            style={{
+              margin: `${HEAD_GAP}px 0 0`,
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.62)',
+            }}
+          >
+            {t('discover.media.searchEmpty', 'No photos, clips or videos match "{{query}}".', {
+              query: debouncedQuery.trim(),
+            })}
+          </p>
+        )}
 
         {/* 7 — PHOTOS lead the media (§1.2 reasoning above). On 'Everything' this
             is a 12-tile sample whose see-all SWITCHES THE CHIP instead of
@@ -578,7 +602,8 @@ export default function ExploreTabContent({
           <section>
             <Eyebrow
               aside={
-                mediaChip === 'all' && photoPool.length > photosShown.length ? (
+                /* NO SEE-ALL WHILE FILTERING (§3): every match is already shown. */
+                !filtering && mediaChip === 'all' && photoPool.length > photosShown.length ? (
                   <InkAction onClick={() => changeChip('photos')}>
                     {t('discover.seeAll', 'See all')}
                   </InkAction>
@@ -603,15 +628,17 @@ export default function ExploreTabContent({
         {/* 8 — CLIPS. On 'Everything' the RAIL (capped, horizontal, sublined
             "under three minutes"); on 'Clips' the MOSAIC, which is the treatment
             /community used for the same pool and the only one that can carry 71
-            clips. The rail's see-all switches the chip. */}
-        {mediaChip === 'all' && (
+            clips. The rail's see-all switches the chip.
+            WHILE FILTERING THE RAIL BECOMES THE MOSAIC (§3): a capped horizontal
+            rail cannot honestly represent a result set. */}
+        {mediaChip === 'all' && !filtering && (
           <ClipsRail
             items={communityVideos.data?.clips ?? []}
             onTilePress={handleClip}
             onSeeAll={() => changeChip('clips')}
           />
         )}
-        {mediaChip === 'clips' && clipPool.length > 0 && (
+        {(mediaChip === 'clips' || (mediaChip === 'all' && filtering)) && clipPool.length > 0 && (
           <section>
             <Eyebrow>{t('community.sections.clips.title', 'Clips')}</Eyebrow>
             <div style={{ margin: `${HEAD_GAP}px 2px 0` }}>
@@ -628,14 +655,14 @@ export default function ExploreTabContent({
             ROW LIST on 'Videos', where titles matter more than thumbnails.
             The FEATURED FILM does not come across: Discover already has a hero,
             and a second full-width one in act two competes with it. */}
-        {mediaChip === 'all' && (
+        {mediaChip === 'all' && !filtering && (
           <LatestVideosRail
             items={communityVideos.data?.videos ?? []}
             onTilePress={handleVideo}
             onSeeAll={() => changeChip('videos')}
           />
         )}
-        {mediaChip === 'videos' && videoPool.length > 0 && (
+        {(mediaChip === 'videos' || (mediaChip === 'all' && filtering)) && videoPool.length > 0 && (
           <section>
             <Eyebrow>{t('community.sections.videos.title', 'Latest videos')}</Eyebrow>
             <div style={{ marginTop: HEAD_GAP }}>
@@ -656,8 +683,11 @@ export default function ExploreTabContent({
         {/* 10 — BROWSE BY CLUB IS LAST (§1.3): a way IN, not something to read,
             and it covers only tagged content. It survives on 'Everything' and on
             'Photos' — the two views where a member is browsing rather than
-            watching. NO SUBLINE (§5); the tagging caveat is a builder's note. */}
-        {(mediaChip === 'all' || mediaChip === 'photos') && (
+            watching. NO SUBLINE (§5); the tagging caveat is a builder's note.
+            It is not a filter target, but it does not survive an empty answer:
+            an index of the whole library beneath "nothing matches" contradicts
+            the sentence. */}
+        {(mediaChip === 'all' || mediaChip === 'photos') && !noMediaMatches && (
           <CommunityCourseIndex
             items={libraryAll}
             title={t('community.sections.clubs.title', 'Browse by club')}
@@ -667,6 +697,7 @@ export default function ExploreTabContent({
           />
         )}
         </div>
+
 
 
         {/* From the community was removed from Discover deliberately. Discover
