@@ -41,8 +41,8 @@ export function bandColorOnDark(score: number | null | undefined): string {
 }
 
 
-const LABEL_INK = 'rgba(15,23,42,0.42)';
-const TRACK = 'rgba(15,23,42,0.08)';
+const LABEL_INK = 'rgba(248,250,252,0.42)';
+const TRACK = 'rgba(255,255,255,0.10)';
 /** Numerals stay in the SF Pro stack: monospace faces slash their zeros. */
 const MONO = 'inherit';
 
@@ -79,11 +79,11 @@ export const SubScoreBar: React.FC<{ label: string; score: number }> = ({ label,
           width: `${Math.max(0, Math.min(100, (score / 10) * 100))}%`,
           height: '100%',
           borderRadius: 2,
-          background: bandColor(score),
+          background: bandColorOnDark(score),
         }}
       />
     </div>
-    <span style={{ ...barFigureStyle, color: bandColor(score) }}>{score.toFixed(1)}</span>
+    <span style={{ ...barFigureStyle, color: bandColorOnDark(score) }}>{score.toFixed(1)}</span>
   </div>
 );
 
@@ -100,7 +100,7 @@ export const SubScoreStack: React.FC<{ label: string; score: number }> = ({ labe
           width: `${Math.max(0, Math.min(100, (score / 10) * 100))}%`,
           height: '100%',
           borderRadius: 2,
-          background: bandColor(score),
+          background: bandColorOnDark(score),
         }}
       />
     </div>
@@ -114,7 +114,7 @@ export const SubScoreStack: React.FC<{ label: string; score: number }> = ({ labe
         minWidth: 0,
       }}
     >
-      <span style={{ ...barFigureStyle, color: bandColor(score) }}>{score.toFixed(1)}</span>
+      <span style={{ ...barFigureStyle, color: bandColorOnDark(score) }}>{score.toFixed(1)}</span>
       <span
         style={{
           ...barLabelStyle,

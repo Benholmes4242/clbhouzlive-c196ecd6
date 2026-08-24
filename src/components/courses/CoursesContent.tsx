@@ -375,9 +375,9 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           const shellTabsNode = (
             <div
               style={{
-                background: 'rgba(248,250,252,0.72)',
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
+                 background: 'var(--glass-bg)',
+                 backdropFilter: 'blur(var(--glass-blur))',
+                 WebkitBackdropFilter: 'blur(var(--glass-blur))',
               }}
             >
               <CoursesShellTabs

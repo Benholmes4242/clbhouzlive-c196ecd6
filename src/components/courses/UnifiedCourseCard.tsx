@@ -123,7 +123,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
         type="button"
         onClick={handleClick}
         className={`group w-full rounded-sq-sm overflow-hidden text-left active:scale-[0.99] transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
-        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+        style={{ background: '#1B1E27', border: '1px solid rgba(255,255,255,0.10)' }}
       >
         <div className="flex">
           {/* Thumbnail */}
@@ -138,7 +138,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                 }}
               />
             ) : (
-              <div className="w-20 h-20" style={{ background: 'rgba(15,23,42,0.06)' }} />
+              <div className="w-20 h-20" style={{ background: 'rgba(255,255,255,0.06)' }} />
             )}
           </div>
 
@@ -202,7 +202,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
           />
         ) : (
-          <div className="w-full h-full" style={{ background: 'rgba(15,23,42,0.06)' }} />
+          <div className="w-full h-full" style={{ background: 'rgba(255,255,255,0.06)' }} />
         )}
 
         {/* Gradient scrim — strong at bottom for text legibility */}
