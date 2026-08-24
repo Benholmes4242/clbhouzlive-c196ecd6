@@ -18,23 +18,27 @@ import {
   type ActivityFeedRowV2,
 } from './hooks/useActivityFeedV2';
 import { useRecordsUnreadCount } from './hooks/useRecordsUnreadCount';
-import { GAME_NOTIF_TYPES } from './components/ledgerKinds';
+import { GAME_NOTIF_TYPES, ACT } from './components/ledgerKinds';
 import { FeaturedMomentCard, pickFeaturedRow } from './components/FeaturedMomentCard';
 import { FriendRequestsRail } from './components/FriendRequestsRail';
 import { FIGURE } from '@/lib/tokens/type';
 import { LedgerRow } from './components/LedgerRow';
 import { ActivityActionsSheet } from './components/ActivityActionsSheet';
 import { ActivityRowsSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
+import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
 
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const INK = '#0F172A';
-const INK_60 = '#475569';
-const AMBER = '#F7931E';
-const AMBER_SOFT = 'rgba(247,147,30,0.10)';
-const AMBER_DEEP = '#C97A10';
-const HAIR2 = 'rgba(15,23,42,0.10)';
-const PAGE = '#F8FAFC';
+// BRIEF_ACTIVITY_PAGE_DARK §2.1: these were five light literals declared
+// beside the page. They now read from the converted Activity palette so the
+// page and its rows cannot diverge.
+const INK = ACT.INK;
+const INK_60 = ACT.INK_60;
+const AMBER = ACT.AMBER;
+const AMBER_SOFT = ACT.AMBER_SOFT;
+const AMBER_DEEP = ACT.AMBER_DEEP;
+const HAIR2 = ACT.HAIR;
+const PAGE = ACT.CANVAS;
 
 type ChipKey = 'all' | 'new' | 'mentions' | 'friends' | 'crowns';
 const CHIPS: { key: ChipKey; label: string }[] = [
@@ -76,15 +80,20 @@ const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick }) => (
     onClick={onClick}
     className="shrink-0 inline-flex items-center transition-all active:scale-[0.96]"
     style={{
+      // §2.3 These are the app's scope pills: same geometry, same type, same
+      // two states as PillFilterRow. The count badge is Activity-only and has
+      // no equivalent there — see the report.
       padding: '8px 14px',
-      borderRadius: 30,
-      background: active ? INK : '#FFFFFF',
-      color: active ? '#FFFFFF' : INK_60,
-      border: active ? '1px solid transparent' : `1px solid ${HAIR2}`,
+      borderRadius: SCOPE_PILL_RADIUS,
+      background: active ? INK : ACT.CANVAS,
+      // §2.2 was `active ? INK : '#FFFFFF'` over `active ? '#FFFFFF' : INK_60`
+      // — a token/literal ternary, so flipping INK broke BOTH states at once.
+      color: active ? PAGE : INK,
+      border: `1px solid ${active ? INK : HAIR2}`,
       gap: 6,
       fontFamily: SF_STACK,
-      fontSize: 13,
-      fontWeight: 600,
+      fontSize: 12.5,
+      fontWeight: 700,
     }}
   >
     {label}
@@ -95,8 +104,8 @@ const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick }) => (
           fontSize: 10.5,
           padding: '2px 7px',
           borderRadius: 20,
-          background: active ? 'rgba(255,255,255,0.18)' : AMBER_SOFT,
-          color: active ? '#FFFFFF' : AMBER_DEEP,
+          background: active ? 'rgba(21,23,31,0.18)' : AMBER_SOFT,
+          color: active ? PAGE : AMBER_DEEP,
           lineHeight: 1,
         }}
       >
@@ -115,7 +124,7 @@ const SectionHeader: React.FC<{ label: string; tone?: 'new' | 'date' }> = ({ lab
       fontWeight: 700,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: '#94A3B8',
+      color: ACT.INK_45,
       fontFamily: SF_STACK,
     }}
   >
@@ -477,6 +486,7 @@ export const ActivityPageV2: React.FC = () => {
       onBack={() => navigate(-1)}
       right={markAllRead}
       belowTitle={chips}
+      theme="dark"
     >
       <div style={{ background: PAGE, fontFamily: SF_STACK, minHeight: '100%' }}>
         {featured && <FeaturedMomentCard row={featured} />}
@@ -504,7 +514,7 @@ export const ActivityPageV2: React.FC = () => {
               onClick={() => feed.refetch()}
               style={{
                 background: INK,
-                color: '#fff',
+                color: PAGE,
                 border: 'none',
                 borderRadius: 999,
                 padding: '8px 16px',

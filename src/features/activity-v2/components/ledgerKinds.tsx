@@ -12,6 +12,7 @@ import {
   Video,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 export type LeftVisualKind =
   | 'actor'              // actor_avatar_url or initials
@@ -37,24 +38,64 @@ export interface KindSpec {
   isSystem?: boolean;
 }
 
-// Token palette (dispatch light) --------------------------------------
-export const T = {
-  INK: '#0F172A',
-  INK_60: '#475569',
-  INK_45: '#64748B',
-  HAIR: 'rgba(15,23,42,0.10)',
+/**
+ * ACTIVITY DARK PALETTE (BRIEF_ACTIVITY_PAGE_DARK §1).
+ *
+ * This object was `T`, commented "dispatch light", and every one of its
+ * sixteen values was tuned for ink on white. The page now runs on the app's
+ * dark canvas, so the name and the comment were the first thing to fix: an
+ * object whose name contradicts its contents is exactly what produced
+ * DARK_BAND_GREEN sitting beside BAND_GREEN_DARK elsewhere in this tree.
+ *
+ * The ink ramp is SOURCED from the analytical A ramp rather than re-derived,
+ * so Activity cannot drift from the rest of the dark app:
+ *   INK    -> A.INK    (#F8FAFC)      the facts: names, what they did
+ *   INK_60 -> A.BODY   (white 0.72)   supporting body copy
+ *   INK_45 -> A.MUTE   (white 0.62)   chrome: timestamps, eyebrows (§5.1 floor)
+ *   HAIR   -> A.BORDER (white 0.10)   was a BLACK-alpha rule, invisible on dark
+ *
+ * The _SOFT tints are RECOMPUTED against the dark panel, not carried across:
+ * a 10% tint that reads on white disappears on #15171F, so each is lifted.
+ */
+export const ACT = {
+  INK: A.INK,
+  INK_60: A.BODY,
+  INK_45: A.MUTE,
+  /** The tile/row rule. White-alpha, because a black-alpha rule does nothing here. */
+  HAIR: A.BORDER,
+  /** Label colour for anything using INK as a FILL (§2.2). */
+  CANVAS: A.CANVAS,
   AMBER: '#F7931E',
-  AMBER_DEEP: '#C97A10',
-  AMBER_SOFT: 'rgba(247,147,30,0.10)',
-  GREEN: '#189A55',
-  GREEN_SOFT: 'rgba(24,154,85,0.10)',
-  RED: '#C24A4A',
-  RED_SOFT: 'rgba(194,74,74,0.10)',
-  BLUE: '#2563EB',
-  BLUE_SOFT: 'rgba(37,99,235,0.09)',
-  NEUTRAL: '#F1F5F9',
-  GOLD: '#B36B00',
-  GOLD_SOFT: 'rgba(179,107,0,0.12)',
+  /**
+   * §1.4 COLLAPSED. #C97A10 was a fourth deep amber, and it existed only to
+   * survive small type ON WHITE. On dark it is the FAILING value, so it now
+   * resolves to AMBER — the same call Part A made for the analytical ramp.
+   * The key is kept so no consumer needs editing.
+   */
+  AMBER_DEEP: '#F7931E',
+  AMBER_SOFT: 'rgba(247,147,30,0.16)',
+  GREEN: A.GREEN,
+  GREEN_SOFT: 'rgba(52,215,127,0.14)',
+  /**
+   * §1.6 NOT the under-par red and deliberately not becoming it. Red here means
+   * DECLINE / LOSS / REMOVAL — crown lost, streak broken, request rejected,
+   * blocked. That is a different meaning from "under par is good", so it stays
+   * a different value: the app's failure red, which is dark-tuned already.
+   */
+  RED: '#F0616D',
+  RED_SOFT: 'rgba(240,97,109,0.14)',
+  /** §1.7 Currently unreferenced — see the report. Kept, dark-legible. */
+  BLUE: '#6AA6FF',
+  BLUE_SOFT: 'rgba(106,166,255,0.14)',
+  /** §1.3 A tile GROUND, not an ink: the raised panel step over the canvas. */
+  NEUTRAL: 'rgba(255,255,255,0.08)',
+  /**
+   * §1.5 #B36B00 was neither of the app's golds — a brown-gold that existed to
+   * hold contrast on white. It colours crowns, badges and achievements, i.e.
+   * RARE / EARNED, so it resolves to the app's achievement gold.
+   */
+  GOLD: '#FFB800',
+  GOLD_SOFT: 'rgba(255,184,0,0.14)',
 } as const;
 
 /**
@@ -161,7 +202,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Crown, fg: T.GOLD, bg: T.GOLD_SOFT },
+      tile: { icon: Crown, fg: ACT.GOLD, bg: ACT.GOLD_SOFT },
       isSystem: true,
       bold: 'course_name',
     };
@@ -170,7 +211,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Crown, fg: T.RED, bg: T.RED_SOFT },
+      tile: { icon: Crown, fg: ACT.RED, bg: ACT.RED_SOFT },
       isSystem: true,
       bold: 'course_name',
     };
@@ -179,7 +220,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: TrendingUp, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      tile: { icon: TrendingUp, fg: ACT.AMBER_DEEP, bg: ACT.AMBER_SOFT },
       isSystem: true,
     };
   }
@@ -189,8 +230,8 @@ export function resolveKind(row: {
       right: 'none',
       tile: {
         icon: Flame,
-        fg: t === 'streak_broken' ? T.RED : T.AMBER_DEEP,
-        bg: t === 'streak_broken' ? T.RED_SOFT : T.AMBER_SOFT,
+        fg: t === 'streak_broken' ? ACT.RED : ACT.AMBER_DEEP,
+        bg: t === 'streak_broken' ? ACT.RED_SOFT : ACT.AMBER_SOFT,
       },
       isSystem: true,
     };
@@ -201,8 +242,8 @@ export function resolveKind(row: {
       right: 'none',
       tile: {
         icon: ShieldAlert,
-        fg: t === 'status_reclaimed' ? T.GREEN : T.AMBER_DEEP,
-        bg: t === 'status_reclaimed' ? T.GREEN_SOFT : T.AMBER_SOFT,
+        fg: t === 'status_reclaimed' ? ACT.GREEN : ACT.AMBER_DEEP,
+        bg: t === 'status_reclaimed' ? ACT.GREEN_SOFT : ACT.AMBER_SOFT,
       },
       isSystem: true,
     };
@@ -211,7 +252,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Award, fg: T.GOLD, bg: T.GOLD_SOFT },
+      tile: { icon: Award, fg: ACT.GOLD, bg: ACT.GOLD_SOFT },
       isSystem: true,
       bold: 'badge_title',
     };
@@ -220,7 +261,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Swords, fg: T.INK_60, bg: T.NEUTRAL },
+      tile: { icon: Swords, fg: ACT.INK_60, bg: ACT.NEUTRAL },
       isSystem: true,
       bold: 'course_name',
     };
@@ -231,7 +272,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Trophy, fg: T.GOLD, bg: T.GOLD_SOFT },
+      tile: { icon: Trophy, fg: ACT.GOLD, bg: ACT.GOLD_SOFT },
       bold: 'achievement_name',
       isSystem: true,
     };
@@ -242,7 +283,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: BadgeCheck, fg: T.GREEN, bg: T.GREEN_SOFT },
+      tile: { icon: BadgeCheck, fg: ACT.GREEN, bg: ACT.GREEN_SOFT },
       isSystem: true,
       bold: 'business_name',
     };
@@ -251,7 +292,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Ban, fg: T.RED, bg: T.RED_SOFT },
+      tile: { icon: Ban, fg: ACT.RED, bg: ACT.RED_SOFT },
       isSystem: true,
       bold: 'business_name',
     };
@@ -260,7 +301,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'resolve',
-      tile: { icon: MailQuestion, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      tile: { icon: MailQuestion, fg: ACT.AMBER_DEEP, bg: ACT.AMBER_SOFT },
       isSystem: true,
       bold: 'business_name',
     };
@@ -269,7 +310,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Clock, fg: T.INK_60, bg: T.NEUTRAL },
+      tile: { icon: Clock, fg: ACT.INK_60, bg: ACT.NEUTRAL },
       isSystem: true,
       bold: 'business_name',
     };
@@ -280,7 +321,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'resolve',
-      tile: { icon: MailQuestion, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      tile: { icon: MailQuestion, fg: ACT.AMBER_DEEP, bg: ACT.AMBER_SOFT },
       isSystem: true,
       bold: 'course_name',
     };
@@ -289,7 +330,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Ban, fg: T.RED, bg: T.RED_SOFT },
+      tile: { icon: Ban, fg: ACT.RED, bg: ACT.RED_SOFT },
       isSystem: true,
       bold: 'course_name',
     };
@@ -298,7 +339,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: BadgeCheck, fg: T.GREEN, bg: T.GREEN_SOFT },
+      tile: { icon: BadgeCheck, fg: ACT.GREEN, bg: ACT.GREEN_SOFT },
       isSystem: true,
       bold: 'course_name',
     };
@@ -307,7 +348,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Clock, fg: T.INK_60, bg: T.NEUTRAL },
+      tile: { icon: Clock, fg: ACT.INK_60, bg: ACT.NEUTRAL },
       isSystem: true,
       bold: 'course_name',
     };
@@ -318,7 +359,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Building2, fg: T.INK_60, bg: T.NEUTRAL },
+      tile: { icon: Building2, fg: ACT.INK_60, bg: ACT.NEUTRAL },
       isSystem: true,
       bold: 'business_name',
     };
@@ -327,7 +368,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Users, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      tile: { icon: Users, fg: ACT.AMBER_DEEP, bg: ACT.AMBER_SOFT },
       isSystem: true,
       bold: 'business_name',
     };
@@ -336,7 +377,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Building2, fg: T.INK_60, bg: T.NEUTRAL },
+      tile: { icon: Building2, fg: ACT.INK_60, bg: ACT.NEUTRAL },
       isSystem: true,
       bold: 'business_name',
     };
@@ -352,7 +393,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Reply, fg: T.INK_60, bg: T.NEUTRAL },
+      tile: { icon: Reply, fg: ACT.INK_60, bg: ACT.NEUTRAL },
       isSystem: true,
     };
   }
@@ -361,7 +402,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Bell, fg: T.INK_60, bg: T.NEUTRAL },
+      tile: { icon: Bell, fg: ACT.INK_60, bg: ACT.NEUTRAL },
       isSystem: true,
     };
   }
@@ -369,7 +410,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Flag, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      tile: { icon: Flag, fg: ACT.AMBER_DEEP, bg: ACT.AMBER_SOFT },
       isSystem: true,
     };
   }
@@ -379,7 +420,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Star, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      tile: { icon: Star, fg: ACT.AMBER_DEEP, bg: ACT.AMBER_SOFT },
       isSystem: true,
       bold: 'course_name',
     };
@@ -390,7 +431,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: BadgeCheck, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      tile: { icon: BadgeCheck, fg: ACT.AMBER_DEEP, bg: ACT.AMBER_SOFT },
       isSystem: true,
     };
   }
@@ -401,7 +442,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: row.target_poster_url || row.target_course_image ? 'thumb' : 'none',
-      tile: { icon: Video, fg: T.AMBER_DEEP, bg: T.AMBER_SOFT },
+      tile: { icon: Video, fg: ACT.AMBER_DEEP, bg: ACT.AMBER_SOFT },
       isSystem: true,
     };
   }
@@ -414,7 +455,7 @@ export function resolveKind(row: {
     return {
       left: 'tile',
       right: 'none',
-      tile: { icon: Bell, fg: T.INK_60, bg: T.NEUTRAL },
+      tile: { icon: Bell, fg: ACT.INK_60, bg: ACT.NEUTRAL },
       isSystem: true,
     };
   }
@@ -447,7 +488,7 @@ export function composeCommentBody(row: {
     <>
       <span style={{ fontWeight: 700 }}>{actor || 'Someone'}</span>
       {verb}
-      <span style={{ color: T.INK_45, fontStyle: 'italic' }}>{`\u201C${msg}\u201D`}</span>
+      <span style={{ color: ACT.INK_45, fontStyle: 'italic' }}>{`\u201C${msg}\u201D`}</span>
     </>
   );
 }

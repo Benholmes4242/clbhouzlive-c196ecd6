@@ -5,10 +5,14 @@ import { useFriendRequestsV2, type FriendRequestRowV2 } from '../hooks/useFriend
 
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const INK = '#0F172A';
-const INK_60 = '#475569';
-const AMBER_DEEP = '#C97A10';
-const HAIR = 'rgba(15,23,42,0.10)';
+// §4.1 Four light literals declared beside a component whose page went dark.
+import { ACT } from './ledgerKinds';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
+const INK = ACT.INK;
+const INK_60 = ACT.INK_60;
+const AMBER_DEEP = ACT.AMBER_DEEP;
+const HAIR = ACT.HAIR;
 
 function initialsOf(name?: string | null): string {
   if (!name) return '?';
@@ -38,7 +42,7 @@ const RequestCard: React.FC<CardProps> = ({ row, pending, onOpen, onAccept, onDe
       style={{
         width: 210,
         flexShrink: 0,
-        background: '#FFFFFF',
+        background: A.PANEL,
         border: `1px solid ${HAIR}`,
         borderRadius: 16,
         padding: 14,
@@ -56,7 +60,9 @@ const RequestCard: React.FC<CardProps> = ({ row, pending, onOpen, onAccept, onDe
           borderRadius: '36%',
           background: row.requester_avatar_url
             ? `url(${row.requester_avatar_url}) center/cover`
-            : '#E2E8F0',
+            // §4.1 :59 is the AVATAR FALLBACK ground, shown when a requester has
+            // no photo — a light fill becomes a dark placeholder.
+            : ACT.NEUTRAL,
           border: `1px solid ${HAIR}`,
           display: 'flex',
           alignItems: 'center',
@@ -99,7 +105,8 @@ const RequestCard: React.FC<CardProps> = ({ row, pending, onOpen, onAccept, onDe
             padding: '8px 0',
             borderRadius: 20,
             background: INK,
-            color: '#FFFFFF',
+            // §2.2 case: the label follows the inverted ink fill.
+            color: ACT.CANVAS,
             fontSize: 12.5,
             fontWeight: 700,
             border: 'none',
@@ -117,7 +124,7 @@ const RequestCard: React.FC<CardProps> = ({ row, pending, onOpen, onAccept, onDe
             flex: 1,
             padding: '8px 0',
             borderRadius: 20,
-            background: '#FFFFFF',
+            background: 'transparent',
             color: INK_60,
             fontSize: 12.5,
             fontWeight: 600,
@@ -164,7 +171,7 @@ export const FriendRequestsRail: React.FC = () => {
                 fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                color: '#94A3B8',
+                color: ACT.INK_45,
               }}
             >
               Friend requests · {rows!.length}
