@@ -50,9 +50,9 @@ import PostSuccessV2 from './components/PostSuccessV2';
 import BottomSheet from './components/BottomSheet';
 import { CT_DARK } from '@/features/_shared/composerTokens';
 import { LABEL, DISPLAY_TRACKING } from '@/lib/tokens/type';
-import { SURFACE } from '@/lib/tokens/surface';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import StageLoadingShell from './StageLoadingShell';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 
 interface Props {
@@ -728,14 +728,14 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
         <BottomSheet open={sheet === 'close-guard'} onClose={() => setSheet(null)} title="Unsaved changes">
           {/* One short job = content height. Grabber + title come from the sheet. */}
           <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 600, color: LIGHT.mute }}>
+            <div style={{ fontSize: 12.5, fontWeight: 600, color: PAGE2.mute }}>
               Keep this post as a draft to finish later?
             </div>
             {!isEditMode && (
               <button
                 onClick={saveAsDraft}
                 disabled={savingDraft}
-                style={{ height: 48, background: LIGHT.ink, color: '#FFFFFF', border: 0, borderRadius: 999, fontSize: 14.5, fontWeight: 700, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}
+                style={{ height: 48, background: PAGE2.ink, color: PAGE2.canvas, border: 0, borderRadius: 999, fontSize: 14.5, fontWeight: 700, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}
               >
                 {savingDraft ? 'Saving' : 'Save draft'}
               </button>
@@ -954,20 +954,20 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     );
   }
 
-  // ---- PAGE 2 — WORDS, LIGHT ----------------------------------------------
+  // ---- PAGE 2 — WORDS, DARK ----------------------------------------------
   return (
-    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: LIGHT.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
       {/* Top bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: LIGHT.canvas, flex: 'none' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: PAGE2.canvas, flex: 'none' }}>
         <button
           onClick={() => (state.media.length > 0 ? setPage(1) : handleClose())}
           aria-label={state.media.length > 0 ? 'Back' : 'Close'}
-          style={lightIconButtonStyle}
+          style={page2IconButtonStyle}
         >
           {state.media.length > 0 ? '\u2039' : '\u00d7'}
         </button>
         <div style={{ minWidth: 0, flex: 1 }} />
-        <div style={{ fontSize: 12, fontWeight: 700, color: LIGHT.mute, fontVariantNumeric: 'tabular-nums' }}>2 / 2</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: PAGE2.mute, fontVariantNumeric: 'tabular-nums' }}>2 / 2</div>
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
@@ -982,7 +982,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                   key={m.id}
                   onClick={() => { setActiveIndex(i); setPage(1); }}
                   aria-label={`Edit item ${i + 1}`}
-                  style={{ position: 'relative', width: 56, height: 70, borderRadius: 10, overflow: 'hidden', flex: 'none', border: `1px solid ${LIGHT.line}`, padding: 0, background: '#EEF1F4', cursor: 'pointer' }}
+                  style={{ position: 'relative', width: 56, height: 70, borderRadius: 10, overflow: 'hidden', flex: 'none', border: `1px solid ${PAGE2.line}`, padding: 0, background: PAGE2.panel, cursor: 'pointer' }}
                 >
                   <SlideThumb item={m} glyph={20} />
                 </button>
@@ -990,10 +990,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               <button
                 onClick={handleStageAdd}
                 aria-label="Add photos or video"
-                style={{ width: 56, height: 70, borderRadius: 10, flex: 'none', border: `1px dashed ${LIGHT.dim}`, background: 'transparent', color: LIGHT.mute, fontSize: 18, cursor: 'pointer' }}
+                style={{ width: 56, height: 70, borderRadius: 10, flex: 'none', border: `1px dashed ${PAGE2.dim}`, background: 'transparent', color: PAGE2.mute, fontSize: 18, cursor: 'pointer' }}
               >+</button>
             </div>
-            <div style={{ padding: '6px 18px 0', fontSize: 10.5, color: LIGHT.dim }}>Tap a photo to go back and edit</div>
+            <div style={{ padding: '6px 18px 0', fontSize: 10.5, color: PAGE2.dim }}>Tap a photo to go back and edit</div>
           </>
         )}
 
@@ -1003,23 +1003,23 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
             value={state.caption}
             onChange={handleSetCaption}
             currentUserId={profile?.id ?? null}
-            variant="light"
+            variant="dark"
             minHeight={96}
             placeholder="What's on your mind"
             autoFocus={!isEditMode}
             inputRef={(el) => { captionElRef.current = el; }}
           />
-          <div style={{ fontSize: 11, color: LIGHT.dim, marginTop: 2 }}>@mention friends and businesses</div>
+          <div style={{ fontSize: 11, color: PAGE2.dim, marginTop: 2 }}>@mention friends and businesses</div>
         </div>
 
         {/* Tag a course — suggestion-first, Search is the fallback */}
-        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
+        <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
           <div style={{ padding: '14px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontSize: 14.5, fontWeight: 700, color: LIGHT.ink }}>Tag a course</span>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>Tag a course</span>
               <button
                 onClick={() => { openDetail('course'); setSheet('course'); }}
-                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: LIGHT.ink, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: PAGE2.ink, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
               >
                 Search
                 <ChevronRight size={12} strokeWidth={2.5} />
@@ -1035,7 +1035,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                     key={`tagged-${c.id}`}
                     onClick={() => setCourses(state.courses.filter((x) => x.id !== c.id))}
                     aria-label={`Untag ${c.name}`}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${LIGHT.ink}`, background: LIGHT.ink, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: '#FFFFFF' }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${PAGE2.ink}`, background: PAGE2.ink, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: PAGE2.canvas }}
                   >
                     {c.name}
                     <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.85 }}>×</span>
@@ -1045,45 +1045,45 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                   <button
                     key={`suggested-${c.id}`}
                     onClick={() => { openDetail('course'); setCourses([...state.courses, { id: c.id, name: c.name, country: c.country }]); }}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 5, border: `1px solid ${LIGHT.line}`, background: LIGHT.canvas, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: LIGHT.ink }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 5, border: `1px solid ${PAGE2.line}`, background: PAGE2.canvas, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: PAGE2.ink }}
                   >
-                    <span style={{ fontWeight: 700, color: LIGHT.mute }}>+</span>
+                    <span style={{ fontWeight: 700, color: PAGE2.mute }}>+</span>
                     {c.name}
-                    <span style={{ color: LIGHT.dim, fontWeight: 600 }}>· {formatRoundWhen(c.playDate)}</span>
+                    <span style={{ color: PAGE2.dim, fontWeight: 600 }}>· {formatRoundWhen(c.playDate)}</span>
                   </button>
                 ))}
               </div>
             )}
             {suggestedCourses.length > 0 && (
-              <div style={{ fontSize: 10.5, color: LIGHT.dim, marginTop: 8 }}>From your recent rounds</div>
+              <div style={{ fontSize: 10.5, color: PAGE2.dim, marginTop: 8 }}>From your recent rounds</div>
             )}
           </div>
         </div>
 
         {/* Detail rows — Drafts appears only when drafts exist */}
-        <div style={{ background: LIGHT.panel, border: `1px solid ${LIGHT.line}`, borderRadius: 16, margin: '12px 16px 0', overflow: 'hidden' }}>
-          <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={lightRowStyle(false)}>
-            <span style={{ fontSize: 14.5, fontWeight: 700, color: LIGHT.ink }}>Posting as</span>
+        <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '12px 16px 0', overflow: 'hidden' }}>
+          <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={page2RowStyle(false)}>
+            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>Posting as</span>
             <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 13, color: LIGHT.mute, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
-              <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={LIGHT_HAIRLINE} />
+              <span style={{ fontSize: 13, color: PAGE2.mute, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
+              <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={DARK_HAIRLINE} />
             </span>
-            <ChevronRight size={14} color={LIGHT.dim} style={{ marginLeft: 6, flex: 'none' }} />
+            <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
           </button>
           {showScheduleRow && (
-            <button onClick={() => { openDetail('schedule'); setSheet('schedule'); }} style={lightRowStyle(true)}>
-              <span style={{ fontSize: 14.5, fontWeight: 700, color: LIGHT.ink }}>Schedule for later</span>
-              <span style={{ marginLeft: 'auto', fontSize: 13, color: state.scheduledAt ? LIGHT.ink : LIGHT.mute }}>
+            <button onClick={() => { openDetail('schedule'); setSheet('schedule'); }} style={page2RowStyle(true)}>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>Schedule for later</span>
+              <span style={{ marginLeft: 'auto', fontSize: 13, color: state.scheduledAt ? PAGE2.ink : PAGE2.mute }}>
                 {state.scheduledAt ? state.scheduledAt.toLocaleString() : 'Off'}
               </span>
-              <ChevronRight size={14} color={LIGHT.dim} style={{ marginLeft: 6, flex: 'none' }} />
+              <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
             </button>
           )}
           {!isEditMode && drafts.drafts.length > 0 && (
-            <button onClick={() => setSheet('drafts')} style={lightRowStyle(true)}>
-              <span style={{ fontSize: 14.5, fontWeight: 700, color: LIGHT.ink }}>Drafts</span>
-              <span style={{ marginLeft: 'auto', fontSize: 13, color: LIGHT.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length}</span>
-              <ChevronRight size={14} color={LIGHT.dim} style={{ marginLeft: 6, flex: 'none' }} />
+            <button onClick={() => setSheet('drafts')} style={page2RowStyle(true)}>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>Drafts</span>
+              <span style={{ marginLeft: 'auto', fontSize: 13, color: PAGE2.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length}</span>
+              <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
             </button>
           )}
         </div>
@@ -1091,7 +1091,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
 
       {/* Share */}
-      <div style={{ flex: 'none', background: LIGHT.canvas, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
+      <div style={{ flex: 'none', background: PAGE2.canvas, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
         <button
           onClick={onPrimary}
           disabled={!canSubmit}
@@ -1102,8 +1102,8 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
             border: 'none',
             fontSize: 15,
             fontWeight: 700,
-            background: canSubmit ? LIGHT.ink : '#C7CDD4',
-            color: '#FFFFFF',
+            background: canSubmit ? PAGE2.ink : 'rgba(248,250,252,0.10)',
+            color: canSubmit ? PAGE2.canvas : PAGE2.dim,
             cursor: canSubmit ? 'pointer' : 'not-allowed',
           }}
         >
@@ -1215,25 +1215,30 @@ const moreRowStyle: React.CSSProperties = {
   textAlign: 'left',
 };
 
-// Page 2 (words) light tokens — the canvas is the app's editorial light surface.
-// Page 2 ink comes from SURFACE.light (identical values, previously restated
-// here). canvas / panel / line have no ramp equivalent and stay local.
-const LIGHT = {
-  canvas: '#F8FAFC',
-  panel: '#FFFFFF',
-  line: '#E9EDF2',
-  ink: SURFACE.light.ink,
-  mute: SURFACE.light.mute,
-  dim: SURFACE.light.dim,
+// Page 2 (words) DARK tokens. Values are lifted from the already-converted
+// profile bottom sheet (src/features/profile-sheet-v2), which takes them from
+// the analytical ramp — so the composer matches an existing dark surface
+// rather than inventing a second dark.
+//   canvas A.CANVAS #15171F   panel A.PANEL #1B1E27
+//   line   A.BORDER           ink/mute/dim A.INK / A.MUTE / A.DIM
+// Named PAGE2 (not LIGHT): an object called LIGHT holding dark values is the
+// naming fault that produced DARK_BAND_GREEN beside BAND_GREEN_DARK.
+const PAGE2 = {
+  canvas: A.CANVAS,
+  panel: A.PANEL,
+  line: A.BORDER,
+  ink: A.INK,
+  mute: A.MUTE,
+  dim: A.DIM,
 } as const;
 
-const lightIconButtonStyle: React.CSSProperties = {
+const page2IconButtonStyle: React.CSSProperties = {
   width: 32,
   height: 32,
   borderRadius: 999,
-  border: `1px solid ${LIGHT.line}`,
-  background: LIGHT.panel,
-  color: LIGHT.ink,
+  border: `1px solid ${PAGE2.line}`,
+  background: PAGE2.panel,
+  color: PAGE2.ink,
   fontSize: 20,
   lineHeight: 1,
   display: 'flex',
@@ -1243,7 +1248,7 @@ const lightIconButtonStyle: React.CSSProperties = {
   flex: 'none',
 };
 
-const lightRowStyle = (divider: boolean): React.CSSProperties => ({
+const page2RowStyle = (divider: boolean): React.CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -1252,7 +1257,7 @@ const lightRowStyle = (divider: boolean): React.CSSProperties => ({
   padding: '14px 14px',
   background: 'transparent',
   border: 0,
-  borderTop: divider ? `1px solid ${LIGHT.line}` : 0,
+  borderTop: divider ? `1px solid ${PAGE2.line}` : 0,
   cursor: 'pointer',
   textAlign: 'left',
 });
