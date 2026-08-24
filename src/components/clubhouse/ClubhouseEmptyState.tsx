@@ -32,12 +32,12 @@ export const ClubhouseEmptyState: React.FC<ClubhouseEmptyStateProps> = ({
             <Users className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.5)' }} />
           </div>
           <p className="text-[17px] font-semibold mb-1" style={{ color: '#FFFFFF' }}>Sign in to see your friends</p>
-          <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          <p className="text-[14px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
             Create an account or sign in to start following golfers.
           </p>
           <button
             onClick={onSignIn}
-            style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+            style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.10em', padding: '12px 24px', borderRadius: 12, border: 'none' }}
           >
             Sign in
           </button>
@@ -54,10 +54,10 @@ export const ClubhouseEmptyState: React.FC<ClubhouseEmptyStateProps> = ({
             <Users className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.5)' }} />
           </div>
           <p className="text-[17px] font-semibold mb-1" style={{ color: '#FFFFFF' }}>Couldn’t load your feed</p>
-          <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>Tap retry to try again.</p>
+          <p className="text-[14px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>Tap retry to try again.</p>
           <button
             onClick={onRetry}
-            style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+            style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.10em', padding: '12px 24px', borderRadius: 12, border: 'none' }}
           >
             Retry
           </button>
@@ -78,20 +78,20 @@ export const ClubhouseEmptyState: React.FC<ClubhouseEmptyStateProps> = ({
       <p className="text-lg font-semibold mb-1" style={{ color: '#FFFFFF' }}>
         {!user ? 'Sign in to see your feed' : (isError ? 'Couldn’t load your feed' : 'No posts to show')}
       </p>
-      <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
+      <p className="text-[14px] mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
         {!user ? 'Create an account or sign in to get started.' : (isError ? 'Tap retry to try again.' : 'Check back soon for new content')}
       </p>
       {!user ? (
         <button
           onClick={onSignIn}
-          style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+          style={{ background: '#F7931E', color: '#0F172A', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.10em', padding: '12px 24px', borderRadius: 12, border: 'none' }}
         >
           Sign in
         </button>
       ) : (
         <button
           onClick={onRetry}
-          style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 15, padding: '12px 24px', borderRadius: 12, border: 'none' }}
+          style={{ background: '#0F172A', color: '#FFFFFF', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.10em', padding: '12px 24px', borderRadius: 12, border: 'none' }}
         >
           Retry
         </button>
