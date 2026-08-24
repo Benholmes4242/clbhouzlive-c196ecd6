@@ -7,6 +7,16 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { CourseEyebrow } from '../_shared/CourseEyebrow';
 import { GAM } from '../../../gam/tokens';
+import {
+  FIELD_HEIGHT,
+  FIELD_RADIUS,
+  FIELD_REST_BG,
+  FIELD_REST_BORDER,
+  FIELD_FOCUS_BG,
+  FIELD_FOCUS_BORDER,
+  FIELD_INK,
+  FIELD_PLACEHOLDER,
+} from '@/lib/tokens/field';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -18,14 +28,6 @@ const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Robo
  * different vertical padding ('11px 13px' vs '10px 14px'), so the control
  * changed height on tap. One fixed height removes that jump.
  */
-const FIELD_H = 44;
-const FIELD_RADIUS = 14;
-const FIELD_REST_BG = 'rgba(255,255,255,0.06)';
-const FIELD_REST_BORDER = 'rgba(255,255,255,0.10)';
-const FIELD_FOCUS_BG = 'rgba(255,255,255,0.10)';
-const FIELD_FOCUS_BORDER = 'rgba(255,255,255,0.28)';
-const FIELD_INK = 'rgba(255,255,255,0.96)';
-const FIELD_PLACEHOLDER = 'rgba(255,255,255,0.38)';
 
 interface Props {
   /** Optional id to exclude from results (the current course). */
@@ -71,7 +73,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
             background: FIELD_REST_BG,
             border: `1px solid ${FIELD_REST_BORDER}`,
             borderRadius: FIELD_RADIUS,
-            height: FIELD_H,
+            height: FIELD_HEIGHT,
             padding: '0 13px',
             cursor: 'pointer',
             fontFamily: FONT,
@@ -93,7 +95,7 @@ export const ChampionsCourseSearch: React.FC<Props> = ({ currentCourseId }) => {
             background: focused ? FIELD_FOCUS_BG : FIELD_REST_BG,
             border: `1px solid ${focused ? FIELD_FOCUS_BORDER : FIELD_REST_BORDER}`,
             borderRadius: FIELD_RADIUS,
-            height: FIELD_H,
+            height: FIELD_HEIGHT,
             padding: '0 13px',
             transition: 'background 140ms ease, border-color 140ms ease',
           }}

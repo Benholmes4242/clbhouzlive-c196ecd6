@@ -20,6 +20,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
 import type { ActiveActor } from '@/types/actor';
+import { FIELD_REST_BG, FIELD_REST_BORDER, FIELD_FOCUS_BG, FIELD_FOCUS_BORDER } from '@/lib/tokens/field';
 
 /*
   DARK BASELINE (MICRO_BRIEF_COMMENTS_DARK §1). The comments sheet is no
@@ -33,11 +34,6 @@ const SECONDARY = 'rgba(248,250,252,0.62)';
 const AMBER = '#F7931E';
 const HAIRLINE = 'rgba(255,255,255,0.10)';
 
-/* Canonical field treatment: both channels step on focus, 140ms. */
-const FIELD_REST_BG = 'rgba(255,255,255,0.06)';
-const FIELD_REST_BORDER = 'rgba(255,255,255,0.10)';
-const FIELD_FOCUS_BG = 'rgba(255,255,255,0.10)';
-const FIELD_FOCUS_BORDER = 'rgba(255,255,255,0.28)';
 
 export interface CommentComposerHandles {
   focus: () => void;
