@@ -106,7 +106,6 @@ function CategoryRow({
       </div>
       <div style={{ fontSize: 11, color: RV2.secondary, marginBottom: 10 }}>{hint}</div>
       <div
-        ref={trackRef}
         role="slider"
         tabIndex={0}
         aria-valuemin={1}
@@ -119,13 +118,20 @@ function CategoryRow({
         }}
         onKeyDown={onKeyDown}
         style={{
+          padding: '18.5px 0',
+          margin: '-0.5px 0',
+          background: 'transparent',
+          cursor: 'pointer',
+          touchAction: 'none',
+        }}
+      >
+      <div
+        ref={trackRef}
+        style={{
           position: 'relative',
           height: 7,
           borderRadius: 999,
           background: RV2.track,
-          cursor: 'pointer',
-          touchAction: 'none',
-          margin: '18px 0',
         }}
       >
         {value != null && (
@@ -160,6 +166,7 @@ function CategoryRow({
             />
           </>
         )}
+      </div>
       </div>
     </div>
   );
