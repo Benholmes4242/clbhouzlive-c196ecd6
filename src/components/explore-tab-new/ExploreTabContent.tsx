@@ -440,15 +440,19 @@ export default function ExploreTabContent({
         />
       </div>
 
-      {/* ONE SECTION RHYTHM: 28px between a section's content and the next
-          section's eyebrow. Eyebrows own their own 10px to their content. */}
-      <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 28 }}>
-        {/* BRIEF_DISCOVER_ORDER_AND_LABELS §1 — the two RANKED sections now
-            precede the two MEDIA rails. The old 10px "first group" wrapper and
-            the videos rail's +16px correction were both tuned for the rail
-            sitting directly under the round tiles' hard card edge. It no longer
-            does, so both are GONE and every adjacent pair sits on the one 28px
-            rhythm. The rhythm itself is unchanged. */}
+      {/* ONE SECTION RHYTHM, ONE CONSTANT (BRIEF_DISCOVER_ONE_PAGE §6): RHYTHM
+          between a section's content and the next section's eyebrow. Eyebrows own
+          their own HEAD_GAP to their content. */}
+      <div
+        style={{
+          padding: `0 ${PAGE_GUTTER}px`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: RHYTHM,
+        }}
+      >
+        {/* BRIEF_DISCOVER_ORDER_AND_LABELS §1 — the RANKED sections precede the
+            MEDIA sections. */}
         <MostPlayedLeaderboard
           rows={mostPlayedList}
           isPending={mostPlayedQuery.isPending}
@@ -457,32 +461,42 @@ export default function ExploreTabContent({
           onSeeAll={mostPlayedList.length > 5 ? () => setMostPlayedSheet(true) : undefined}
         />
 
-        {/* THE SEAM. Everything above it obeys the scope pills; nothing below
-            it does. It is a chapter break, not a section header — see ActSeam. */}
-        <ActSeam label={t('discover.seam', 'All time \u00b7 from everyone')} />
-
         {/* 6 — THE HINGE (§1.1). Data, so it speaks act one's language; all-time
-            and unscoped, so it sits on the join without lying about which side
-            it is on. Its own design is unchanged. */}
-        <HonoursBoard
-          events={honours}
-          isPending={wireLoading}
-          onRowPress={handleHonoursRow}
-          limit={20}
-          onSeeAll={openHonoursSheet}
-        />
+            and unscoped, so it sits on the join without lying about which side it
+            is on. It stays ABOVE the media bar because a chip row that heads it
+            would imply the honours board is a media type.
+            IT IS ALSO ACT ONE'S LAST SECTION now that the seam is functional, so
+            it is hidden while a media type is selected: a filtered library is not
+            a place for an all-time board. */}
+        {mediaChip === 'all' && (
+          <HonoursBoard
+            events={honours}
+            isPending={wireLoading}
+            onRowPress={handleHonoursRow}
+            limit={20}
+            onSeeAll={openHonoursSheet}
+          />
+        )}
 
-        {/* 7 — PHOTOS, on Discover for the first time. The /community mosaic is
-            IMPORTED, not copied: one component, a tone switch for this canvas.
-            Capped and never infinite here — the wall would make everything under
-            it unreachable, which is what the destination is for. */}
-        {photos.length > 0 && (
+        {/* THE CHAPTER BREAK IS NOW A CONTROL (§4). ActSeam is deleted: a
+            decorative rule with a caption that had to explain itself is a rule
+            that failed. ACT_GAP above and below, so the break reads as a break
+            rather than as another section. */}
+        <div style={{ marginTop: ACT_GAP - RHYTHM, marginBottom: ACT_GAP - RHYTHM - CHIP_GAP }}>
+          <MediaActBar chip={mediaChip} onChipChange={changeChip} />
+        </div>
+
+        {/* 7 — PHOTOS lead the media (§1.2 reasoning above). On 'Everything' this
+            is a 12-tile sample whose see-all SWITCHES THE CHIP instead of
+            navigating; on 'Photos' the mosaic runs the whole pool with its own
+            infinite reveal. NO SUBLINE (§5): "From the courses" told a member
+            nothing the tiles did not. */}
+        {(mediaChip === 'all' || mediaChip === 'photos') && photosShown.length > 0 && (
           <section>
             <Eyebrow
-              subline={t('community.sections.photos.subline', 'From the courses')}
               aside={
-                photoPool.length > photos.length ? (
-                  <InkAction onClick={goCommunity}>
+                mediaChip === 'all' && photoPool.length > photosShown.length ? (
+                  <InkAction onClick={() => changeChip('photos')}>
                     {t('discover.seeAll', 'See all')}
                   </InkAction>
                 ) : undefined
@@ -491,11 +505,12 @@ export default function ExploreTabContent({
               {t('community.sections.photos.title', 'Photos')}
             </Eyebrow>
             {/* 2px to reach the 16px mosaic margin from the page's 14px. */}
-            <div style={{ margin: '10px 2px 0' }}>
+            <div style={{ margin: `${HEAD_GAP}px 2px 0` }}>
               <CommunityPhotoMosaic
-                items={photos}
+                items={photosShown}
                 onPress={handlePhoto}
-                infinite={false}
+                infinite={mediaChip === 'photos'}
+                step={PHOTO_STEP}
                 tone="dark"
                 surface="discover"
               />
@@ -503,36 +518,73 @@ export default function ExploreTabContent({
           </section>
         )}
 
-        {/* 8 — CLIPS. "Under three minutes" is the only thing telling a member
-            why there are two video sections; it stays on both of them. */}
-        <ClipsRail
-          items={communityVideos.data?.clips ?? []}
-          onTilePress={goCommunity}
-          onSeeAll={goCommunity}
-        />
+        {/* 8 — CLIPS. On 'Everything' the RAIL (capped, horizontal, sublined
+            "under three minutes"); on 'Clips' the MOSAIC, which is the treatment
+            /community used for the same pool and the only one that can carry 71
+            clips. The rail's see-all switches the chip. */}
+        {mediaChip === 'all' && (
+          <ClipsRail
+            items={communityVideos.data?.clips ?? []}
+            onTilePress={handleClip}
+            onSeeAll={() => changeChip('clips')}
+          />
+        )}
+        {mediaChip === 'clips' && clipPool.length > 0 && (
+          <section>
+            <Eyebrow>{t('community.sections.clips.title', 'Clips')}</Eyebrow>
+            <div style={{ margin: `${HEAD_GAP}px 2px 0` }}>
+              <ProgressiveReveal items={clipPool} step={CLIP_STEP}>
+                {(visible) => (
+                  <CommunityClipMosaic items={visible} onPress={handleClip} surface="discover" />
+                )}
+              </ProgressiveReveal>
+            </div>
+          </section>
+        )}
 
-        {/* 9 — LATEST VIDEOS, "Three minutes and over". /community's FEATURED
-            FILM does not come across: Discover already has a hero and a second
-            full-width one in act two competes with it. The newest long video is
-            simply the first tile of this rail, which is where it already was.
-            ON TOUR THIS WEEK and LATEST REVIEWS left this page for good. */}
-        <LatestVideosRail
-          items={communityVideos.data?.videos ?? []}
-          onTilePress={goCommunity}
-          onSeeAll={goCommunity}
-        />
+        {/* 9 — LATEST VIDEOS. Same shape: rail on 'Everything', the /community
+            ROW LIST on 'Videos', where titles matter more than thumbnails.
+            The FEATURED FILM does not come across: Discover already has a hero,
+            and a second full-width one in act two competes with it. */}
+        {mediaChip === 'all' && (
+          <LatestVideosRail
+            items={communityVideos.data?.videos ?? []}
+            onTilePress={handleVideo}
+            onSeeAll={() => changeChip('videos')}
+          />
+        )}
+        {mediaChip === 'videos' && videoPool.length > 0 && (
+          <section>
+            <Eyebrow>{t('community.sections.videos.title', 'Latest videos')}</Eyebrow>
+            <div style={{ marginTop: HEAD_GAP }}>
+              {videoPool.map((item, i) => (
+                <CommunityVideoRow
+                  key={item.key}
+                  item={item}
+                  first={i === 0}
+                  tone="dark"
+                  onPress={handleVideo}
+                  track={mediaTarget(item, 'discover', 'videos', i)}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
-        {/* 10 — BROWSE BY CLUB IS LAST (§1.3): it is a way IN, not something to
-            read, and it covers only tagged content. Imported from /community and
-            embedded, so this page keeps owning the gutter and the rhythm. */}
-        <CommunityCourseIndex
-          items={libraryAll}
-          title={t('community.sections.clubs.title', 'Browse by club')}
-          subline={t('community.sections.clubs.subline', 'Only where a course was tagged')}
-          countLabel={(n) => t('community.count', { count: n, defaultValue: '{{count}} posts' })}
-          tone="dark"
-          embedded
-        />
+        {/* 10 — BROWSE BY CLUB IS LAST (§1.3): a way IN, not something to read,
+            and it covers only tagged content. It survives on 'Everything' and on
+            'Photos' — the two views where a member is browsing rather than
+            watching. NO SUBLINE (§5); the tagging caveat is a builder's note. */}
+        {(mediaChip === 'all' || mediaChip === 'photos') && (
+          <CommunityCourseIndex
+            items={libraryAll}
+            title={t('community.sections.clubs.title', 'Browse by club')}
+            countLabel={(n) => t('community.count', { count: n, defaultValue: '{{count}} posts' })}
+            tone="dark"
+            embedded
+          />
+        )}
+
 
         {/* From the community was removed from Discover deliberately. Discover
             now shows no member photographs; the Community page still holds
