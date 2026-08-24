@@ -16,6 +16,7 @@ import { bodyNameForProvider } from '@/lib/whs/whsCountries';
 import DisconnectConfirmSheet from '@/components/settings/sheets/DisconnectConfirmSheet';
 import DeleteAllDataConfirmSheet from '@/components/settings/sheets/DeleteAllDataConfirmSheet';
 import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 
 export default function HandicapManagePage() {
@@ -110,8 +111,8 @@ export default function HandicapManagePage() {
     return (
       <div style={{ background: SURFACE, minHeight: '100dvh' }}>
         <div className="px-4 pt-4 pb-0 space-y-3" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)' }}>
-          <Skeleton className="h-24 w-full rounded-2xl" />
-          <Skeleton className="h-40 w-full rounded-2xl" />
+          <Skeleton variant="dark" className="h-24 w-full rounded-2xl" />
+          <Skeleton variant="dark" className="h-40 w-full rounded-2xl" />
         </div>
       </div>
     );

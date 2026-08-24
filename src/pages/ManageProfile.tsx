@@ -30,7 +30,7 @@ import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { formatHcp } from '@/lib/formatHcp';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { ManageCard, Label, Nudge, PAGE_BG, INK as INK_TOKEN, INK_45 as INK_45_TOKEN } from '@/components/manage/ui';
+import { ManageCard, Label, Nudge, PAGE_BG, CARD_BG, FIELD_FILL, HAIR, DANGER, GREEN as GREEN_TOKEN, INK as INK_TOKEN, INK_45 as INK_45_TOKEN } from '@/components/manage/ui';
 import { SegToggle } from '@/components/profile/edit-v2/SegToggle';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
 import { CoverGuidance } from '@/components/profile/edit-v2/CoverGuidance';
@@ -52,7 +52,7 @@ const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", 
 const INK = INK_TOKEN;
 const INK_55 = INK_45_TOKEN;
 const SLATE_BG = PAGE_BG;
-const GREEN = '#059669';
+const GREEN = GREEN_TOKEN;
 
 
 const GENDER_OPTIONS = [
@@ -313,7 +313,7 @@ export default function ManageProfile() {
                   onClick={() => navigate(-1)}
                   style={{
                     width: 32, height: 32, borderRadius: '50%',
-                    background: '#fff', border: '1px solid rgba(15,23,42,0.10)',
+                    background: CARD_BG, border: `1px solid ${HAIR}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0, cursor: 'pointer',
                   }}
@@ -383,11 +383,11 @@ export default function ManageProfile() {
                   );
                 })}
               </div>
-              <div style={{ height: 1, width: '100%', background: 'rgba(15,23,42,0.08)' }} />
+              <div style={{ height: 1, width: '100%', background: HAIR }} />
             </>
           )}
           {!showTabBar && (
-            <div style={{ height: 1, width: '100%', background: 'rgba(15,23,42,0.08)' }} />
+            <div style={{ height: 1, width: '100%', background: HAIR }} />
           )}
         </div>
 
@@ -534,7 +534,7 @@ function ProfileTabBody({
       <div className="px-4 pb-4">
         <ManageCard padding={0}>
           {/* Name */}
-          <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
+          <div className="px-4 pt-4 pb-3" style={{ borderBottom: `1px solid ${HAIR}` }}>
             <FieldLabel>Name</FieldLabel>
             <div className="flex gap-2">
               <input
@@ -557,7 +557,7 @@ function ProfileTabBody({
           </div>
 
           {/* Display Name */}
-          <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
+          <div className="px-4 pt-4 pb-3" style={{ borderBottom: `1px solid ${HAIR}` }}>
             <FieldLabel
               right={
                 <span style={FIELD_COUNTER}>
@@ -583,7 +583,7 @@ function ProfileTabBody({
 
           {/* Username. Locked reads as locked: the quiet inset, and its
               explanation sits in the hint slot beneath where it has room. */}
-          <div className="px-4 pt-3 pb-4" style={{ borderBottom: '1px solid rgba(15,23,42,0.06)' }}>
+          <div className="px-4 pt-3 pb-4" style={{ borderBottom: `1px solid ${HAIR}` }}>
             <FieldLabel>Username</FieldLabel>
             {usernameIsLocked ? (
               <>
@@ -620,8 +620,8 @@ function ProfileTabBody({
                           <CheckCircle2 size={14} strokeWidth={2.25} /> available
                         </span>
                       )}
-                      {usernameStatus === 'taken' && (<span style={{ color: '#DC2626' }}>taken</span>)}
-                      {usernameStatus === 'invalid' && (<span style={{ color: '#DC2626' }}>invalid</span>)}
+                      {usernameStatus === 'taken' && (<span style={{ color: DANGER }}>taken</span>)}
+                      {usernameStatus === 'invalid' && (<span style={{ color: DANGER }}>invalid</span>)}
                     </span>
                   )}
                 </div>
@@ -763,8 +763,11 @@ function ProfileTabBody({
               borderRadius: 999,
               fontSize: 14.5,
               fontWeight: 700,
-              background: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.06)' : INK,
-              color: (isDisabled && !isSaving) ? 'rgba(15,23,42,0.45)' : '#fff',
+              // Disabled must read as DISABLED BUT PRESENT: a raised inert
+              // fill with a hairline, label at the 0.62 quiet floor.
+              background: (isDisabled && !isSaving) ? FIELD_FILL : INK,
+              color: (isDisabled && !isSaving) ? INK_55 : PAGE_BG,
+              border: (isDisabled && !isSaving) ? `1px solid ${HAIR}` : 'none',
               fontFamily: SF_STACK,
             }}
           >
@@ -844,7 +847,7 @@ function HandicapRow({
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '12px 14px', borderRadius: 10,
-              background: '#F8FAFC', border: '1px solid rgba(15,23,42,0.08)',
+              background: FIELD_FILL, border: `1px solid ${HAIR}`,
               fontSize: 14, fontWeight: 600, color: INK, fontFamily: SF_STACK, cursor: 'pointer',
             }}
           >
@@ -857,7 +860,7 @@ function HandicapRow({
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '12px 14px', borderRadius: 10,
-              background: '#fff', border: '1px solid rgba(15,23,42,0.08)',
+              background: CARD_BG, border: `1px solid ${HAIR}`,
               fontSize: 13, fontWeight: 500, color: INK_55, fontFamily: SF_STACK, cursor: 'pointer',
             }}
           >
@@ -881,7 +884,7 @@ function HandicapRow({
           style={{
             width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
             minHeight: 46, padding: '12px 16px', borderRadius: 999,
-            background: INK, color: '#fff', border: 'none',
+            background: INK, color: PAGE_BG, border: 'none',
             fontSize: 14, fontWeight: 700, fontFamily: SF_STACK, cursor: 'pointer',
           }}
         >
@@ -903,7 +906,7 @@ function HandicapRow({
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
           minHeight: 46, padding: '12px 16px', borderRadius: 999,
-          background: INK, color: '#fff', border: 'none',
+          background: INK, color: PAGE_BG, border: 'none',
           fontSize: 14, fontWeight: 700, fontFamily: SF_STACK, cursor: 'pointer',
         }}
       >

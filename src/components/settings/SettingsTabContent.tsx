@@ -190,7 +190,7 @@ export function SettingsTabContent() {
         <button
           onClick={() => navigate(`/profile/${p?.username}`)}
           className="w-full flex items-center gap-3 p-4 rounded-2xl text-left active:opacity-70"
-          style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+          style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
         >
           <SquircleAvatar
             src={p?.profile_photo_url}
@@ -364,7 +364,7 @@ export function SettingsTabContent() {
         {/* Version footer */}
         <div
           className="pt-4 text-center"
-          style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', fontSize: 12, color: '#94A3B8', letterSpacing: '0.01em' }}
+          style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', fontSize: 12, color: A.MUTE, letterSpacing: '0.01em' }}
         >
           {`clbhouz \u00B7 v${APP_VERSION}`}
         </div>

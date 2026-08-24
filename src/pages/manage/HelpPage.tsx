@@ -80,7 +80,7 @@ export default function HelpPage() {
     <div className="px-4 pb-3">
       <div
         className="flex items-center gap-2 h-11 px-3 rounded-xl"
-        style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+        style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
       >
         <Search size={16} style={{ color: A.MUTE }} className="shrink-0" />
         <input
@@ -88,7 +88,7 @@ export default function HelpPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search help articles"
-          className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-[#94A3B8]"
+          className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-[rgba(248,250,252,0.62)]"
           style={{ color: A.INK }}
         />
       </div>
@@ -101,7 +101,7 @@ export default function HelpPage() {
         {isLoading && (
           <div className="space-y-2">
             {[0, 1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-14 w-full rounded-xl" />
+              <Skeleton key={i} variant="dark" className="h-14 w-full rounded-xl" />
             ))}
           </div>
         )}
@@ -110,7 +110,7 @@ export default function HelpPage() {
         {!isLoading && isError && (
           <div
             className="rounded-2xl p-6 text-center"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             <p className="text-[15px] font-medium" style={{ color: A.INK }}>Couldn't load help articles</p>
             <p className="text-[13px] mt-1 mb-3" style={{ color: A.MUTE }}>Check your connection and try again.</p>
@@ -129,7 +129,7 @@ export default function HelpPage() {
         {!isLoading && searching && matches.length === 0 && (
           <div
             className="rounded-2xl p-4 text-center"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             <p className="text-[14px]" style={{ color: A.MUTE }}>
               No articles match that. Try different words, or contact support below.
@@ -140,7 +140,7 @@ export default function HelpPage() {
         {!isLoading && searching && matches.length > 0 && (
           <div
             className="rounded-2xl overflow-hidden"
-            style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+            style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             {matches.map((a, i) => (
               <AccordionRow
@@ -167,7 +167,7 @@ export default function HelpPage() {
                 </h3>
                 <div
                   className="rounded-2xl overflow-hidden"
-                  style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+                  style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
                 >
                   {data.grouped[cat].map((a, i) => (
                     <AccordionRow
@@ -186,7 +186,7 @@ export default function HelpPage() {
         {/* Still need help footer */}
         <div
           className="rounded-2xl p-4 mt-2"
-          style={{ background: '#fff', border: `1px solid ${A.BORDER}` }}
+          style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
         >
           <div className="flex items-center gap-2 mb-1">
             <LifeBuoy size={16} style={{ color: A.INK }} />

@@ -157,9 +157,9 @@ export default function SupportThreadPage() {
         <div ref={scrollRef} className="space-y-3">
           {isLoading && (
             <div className="flex flex-col gap-3">
-              <Skeleton className="h-16 w-2/3 self-start rounded-2xl" />
-              <Skeleton className="h-12 w-1/2 self-end rounded-2xl" />
-              <Skeleton className="h-20 w-3/4 self-start rounded-2xl" />
+              <Skeleton variant="dark" className="h-16 w-2/3 self-start rounded-2xl" />
+              <Skeleton variant="dark" className="h-12 w-1/2 self-end rounded-2xl" />
+              <Skeleton variant="dark" className="h-20 w-3/4 self-start rounded-2xl" />
             </div>
           )}
 
@@ -185,7 +185,7 @@ export default function SupportThreadPage() {
                     maxWidth: '85%',
                     padding: '10px 14px',
                     borderRadius: 16,
-                    background: mine ? A.INK : '#fff',
+                    background: mine ? A.INK : A.PANEL,
                     color: mine ? A.CANVAS : A.INK,
                     border: mine ? 'none' : `1px solid ${A.BORDER}`,
                   }}
@@ -206,7 +206,7 @@ export default function SupportThreadPage() {
             background: 'rgba(244,246,248,0.96)',
             backdropFilter: 'saturate(180%) blur(14px)',
             WebkitBackdropFilter: 'saturate(180%) blur(14px)',
-            borderTop: '1px solid rgba(15,23,42,0.08)',
+            borderTop: `1px solid ${A.BORDER}`,
             paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
           }}
         >

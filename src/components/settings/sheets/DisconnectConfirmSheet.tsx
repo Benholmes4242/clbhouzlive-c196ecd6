@@ -2,11 +2,15 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { TITLE } from '@/lib/tokens/type';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 
-const INK = '#0F172A';
-const INK_55 = '#64748B';
-const RED = '#DC2626';
+// DARK-ONLY. RED is the BESPOKE DESTRUCTIVE red (dark variant of #DC2626).
+// It is deliberately NOT the app's under-par red — red means UNDER PAR on
+// every scorecard and a destructive action is a different meaning entirely.
+const INK = A.INK;
+const INK_55 = A.MUTE;
+const RED = '#FF5A5A';
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
@@ -26,13 +30,13 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
         style={{
           fontFamily: FONT,
           color: INK,
-          background: '#fff',
+          background: A.PANEL,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
         }}
       >
         {/* Drag handle */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8, paddingBottom: 4 }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.18)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.18)' }} />
         </div>
 
         {/* Header */}
@@ -84,8 +88,9 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
             disabled={isWorking}
             style={{
               width: '100%', padding: '14px 16px', borderRadius: 12,
-              background: 'transparent', color: INK, border: 'none',
-              fontSize: 15, fontWeight: 500, fontFamily: FONT,
+              background: 'rgba(255,255,255,0.06)', color: INK,
+              border: `1px solid ${A.BORDER}`,
+              fontSize: 15, fontWeight: 600, fontFamily: FONT,
               cursor: isWorking ? 'default' : 'pointer',
             }}
           >

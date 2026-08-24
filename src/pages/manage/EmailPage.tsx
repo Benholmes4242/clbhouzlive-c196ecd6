@@ -12,7 +12,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 const HAIRLINE = `1px solid ${A.BORDER}`;
-const DANGER = '#B91C1C';
+const DANGER = '#FF5A5A';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -204,7 +204,7 @@ export default function EmailPage() {
                 disabled={resendCooldown > 0 || submitting}
                 className="text-[13px] font-medium"
                 style={{
-                  color: resendCooldown > 0 ? 'rgba(15,23,42,0.35)' : A.INK,
+                  color: resendCooldown > 0 ? A.DIM : A.INK,
                   
                   cursor: resendCooldown > 0 ? 'default' : 'pointer',
                 }}
