@@ -1,7 +1,7 @@
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { PersonHit } from '../lib/searchNavigation';
 import { Highlight } from './Highlight';
-import { S } from '../lib/tokens';
+import { ROW_BASE, S } from '../lib/tokens';
 
 interface Props { person: PersonHit; query: string; onSelect: () => void }
 
@@ -11,7 +11,7 @@ export function PersonRow({ person, query, onSelect }: Props) {
     <button
       type="button"
       onClick={onSelect}
-      className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-white/[0.04] text-left"
+      className={ROW_BASE}
     >
       <SquircleAvatar
         src={person.profile_photo_url ?? undefined}

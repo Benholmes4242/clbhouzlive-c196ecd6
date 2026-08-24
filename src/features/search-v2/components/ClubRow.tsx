@@ -1,7 +1,7 @@
 import type { ClubHit } from '../lib/searchNavigation';
 import { Highlight } from './Highlight';
 import { ResultTile, TILE_INITIALS } from './ResultTile';
-import { S } from '../lib/tokens';
+import { ROW_BASE, S } from '../lib/tokens';
 
 interface Props { club: ClubHit; query: string; onSelect: () => void }
 
@@ -11,7 +11,7 @@ export function ClubRow({ club, query, onSelect }: Props) {
     <button
       type="button"
       onClick={onSelect}
-      className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-white/[0.04] text-left"
+      className={ROW_BASE}
     >
       <ResultTile white={!!club.logo_url}>
         {club.logo_url ? (

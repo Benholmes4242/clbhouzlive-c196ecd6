@@ -28,7 +28,7 @@ import {
 } from '../hooks/useSearchEmptyStateV2';
 import { navCourse } from '../lib/searchNavigation';
 import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
-import { A, S } from '../lib/tokens';
+import { A, ROW_BASE, S } from '../lib/tokens';
 
 
 interface Props {
@@ -216,6 +216,7 @@ function LiveChip() {
         gap: 6,
         padding: '4px 10px',
         borderRadius: 999,
+        // ACCENT, not a fault: white label over the live green chip.
         background: '#22C55E',
         color: '#fff',
         fontSize: 11,
@@ -338,7 +339,7 @@ function SuggestionRow({
   return (
     <div
       onClick={onSelect}
-      className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-white/[0.04] text-left cursor-pointer"
+      className={`${ROW_BASE} cursor-pointer`}
     >
       <SquircleAvatar
         size={42}

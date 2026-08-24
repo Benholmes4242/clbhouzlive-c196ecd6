@@ -4,7 +4,10 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 /**
  * The ONE tile treatment for search result rows (BRIEF_SEARCH_OVERLAY_ALIGNMENT §3).
  * 44px, radius 13, TRACK fill, 1px BORDER, contents in MUTE.
- * `white` is the single legitimate exception: a club logo needs a white plate.
+ * `white` is the single legitimate exception and SURVIVES the dark migration:
+ * a club crest is artwork drawn for a white plate and loses its outline
+ * without one. White as a plate under logo art stays; white as a panel behind
+ * dark content is gone.
  */
 export function ResultTile({
   children,

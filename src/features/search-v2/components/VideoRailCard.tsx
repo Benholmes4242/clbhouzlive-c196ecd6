@@ -79,6 +79,8 @@ export function VideoRailCard({ video, onSelect }: Props) {
               bottom: 6,
               padding: '1px 5px',
               borderRadius: 4,
+              // ACCENT, not a fault: ink OVER media. The badge sits on a
+              // photographic thumbnail behind a black scrim.
               background: 'rgba(0,0,0,0.7)',
               color: '#fff',
               fontSize: 10,

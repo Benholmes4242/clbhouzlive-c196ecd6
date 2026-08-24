@@ -7,7 +7,7 @@ import { BarChartGlyph } from '@/components/courses/YourStatsChip';
 import { useUserStatsRoundsForCourse } from '@/contexts/UserStatsCoursesContext';
 import { A, KICKER, NUM } from '@/features/courses/components/holes/analytical/tokens';
 import { ResultTile } from './ResultTile';
-import { S } from '../lib/tokens';
+import { ROW_BASE, S } from '../lib/tokens';
 
 interface Props { course: CourseHit; query: string; onSelect: () => void }
 
@@ -19,7 +19,7 @@ export function CourseRow({ course, query, onSelect }: Props) {
     <button
       type="button"
       onClick={onSelect}
-      className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-white/[0.04] text-left"
+      className={ROW_BASE}
     >
       <ResultTile>
         <MapPin size={18} color={A.MUTE} strokeWidth={2.25} />
