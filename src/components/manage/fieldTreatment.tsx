@@ -11,7 +11,7 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { A, BIZ_LABEL } from '@/features/courses/components/holes/analytical/tokens';
-import { FIELD_REST_BG, FIELD_REST_BORDER } from '@/lib/tokens/field';
+import { FIELD_REST_BG } from '@/lib/tokens/field';
 
 /** Field label: LABEL caps 8px DIM above the input. */
 export const FIELD_LABEL: React.CSSProperties = { ...BIZ_LABEL };
@@ -50,8 +50,11 @@ export const FIELD_INPUT_CLASS =
   'w-full rounded-[14px] focus:outline-none focus:border-[rgba(255,255,255,0.28)] border border-[rgba(255,255,255,0.10)] transition-colors';
 
 export const FIELD_INPUT_STYLE: React.CSSProperties = {
+  // NO border here on purpose: FIELD_INPUT_CLASS carries the border, and three
+  // consumers spread this style onto a BARE input inside an already-painted
+  // wrapper (CountrySelector:135, PhoneInputWithDialCode:156/193) where a
+  // second border would double the line.
   background: FIELD_REST_BG,
-  border: `1px solid ${FIELD_REST_BORDER}`,
   padding: '12px 13px',
   fontSize: 14,
   fontWeight: 400,

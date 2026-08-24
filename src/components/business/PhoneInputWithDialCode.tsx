@@ -108,6 +108,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
           disabled={disabled}
           onClick={() => setOpen(!open)}
           className={`${FIELD_INPUT_CLASS} h-11 pl-2.5 pr-2 rounded-[10px] flex items-center gap-1.5`}
+          // GEOMETRY: radius 10 for the dial-code control paired with the number.
           style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 10, paddingRight: 8, borderRadius: 10, minWidth: 96 }}
         >
           {selected ? (
@@ -153,6 +154,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
                   /* FIELD CANON (lib/tokens/field.ts). HEIGHT EXCEPTION (36px,
                      h-9): floating dial-code panel above a scrolling list. */
                   className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS_CANON} w-full h-9 pl-8 pr-3 text-sm`}
+                  // Bare input inside a painted wrapper: paint and radius nulled.
                   style={{ ...FIELD_INPUT_STYLE, background: undefined, borderRadius: undefined, padding: 0, paddingLeft: 32, paddingRight: 12, fontSize: 14 }}
                 />
               </div>
@@ -190,6 +192,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
         disabled={disabled}
         /* FIELD CANON (lib/tokens/field.ts). Height 44 (h-11), radius 14. */
         className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS_CANON} flex-1 min-w-0 h-11 px-3.5 text-[15px]`}
+        // Bare input inside a painted wrapper: paint and radius nulled.
         style={{ ...FIELD_INPUT_STYLE, background: undefined, borderRadius: undefined, padding: 0, paddingLeft: 14, paddingRight: 14, fontSize: 15 }}
       />
     </div>

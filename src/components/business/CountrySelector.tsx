@@ -86,6 +86,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
           FIELD_INPUT_CLASS,
           disabled && 'opacity-50 cursor-not-allowed',
         )}
+        // GEOMETRY: radius 10 for the compact country control row.
         style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 12, paddingRight: 12, borderRadius: 10 }}
       >
         <span className="flex items-center gap-2 min-w-0">
@@ -132,6 +133,8 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
                    HEIGHT EXCEPTION (36px, h-9): sits inside the floating
                    country panel above a scrolling list of countries. */
                 className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS_CANON} w-full h-9 pl-8 pr-3 text-sm`}
+                // Bare input inside an already-painted wrapper: paint and
+                // radius are deliberately nulled and inherited from it.
                 style={{ ...FIELD_INPUT_STYLE, background: undefined, borderRadius: undefined, padding: 0, paddingLeft: 32, paddingRight: 12, fontSize: 14 }}
               />
             </div>

@@ -54,6 +54,9 @@ export function OpeningHoursSection({ enabled, setEnabled, openingHours, setOpen
                             value={entry.open}
                             onChange={(e) => updateDay(day, { open: e.target.value })}
                             className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} flex-1 h-9 rounded-[8px] px-2 text-[13px]`}
+                            // GEOMETRY: a 36px time input inside a day row
+                            // cannot carry radius 14. Do not repoint.
+                            // GEOMETRY: paired 36px time input, radius 8.
                             style={{ ...FIELD_INPUT_STYLE, padding: 0, paddingLeft: 8, paddingRight: 8, fontSize: 13, borderRadius: 8 }}
                           />
                           <span className="text-muted-foreground text-xs">-</span>
