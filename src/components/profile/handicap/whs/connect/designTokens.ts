@@ -1,28 +1,30 @@
 /**
- * WHS connect flow - light surface tokens.
+ * WHS connect flow - DARK surface tokens (BRIEF_SETTINGS_AND_MANAGE_DARK).
+ * Values mirror the analytical ramp; chrome never drops below the 0.62 floor.
  * Presentation only. No business logic here.
  * ASCII only.
  */
 
-export const CANVAS = '#F4F6F9';
-export const PANEL = '#FFFFFF';
-export const BORDER = '#EDF0F3';
-export const INK = '#0E1216';
-export const MUTE = '#68707B';
-export const DIM = '#A2A9B2';
+export const CANVAS = '#15171F';
+export const PANEL = '#1B1E27';
+export const BORDER = 'rgba(255,255,255,0.10)';
+export const INK = '#F8FAFC';
+export const MUTE = 'rgba(248,250,252,0.72)';
+export const DIM = 'rgba(248,250,252,0.62)';
 export const AMBER = '#F7931E';
-export const GOOD = '#0F8F4A';
-export const BAD = '#C8372B';
-export const TRACK = 'rgba(14,18,22,0.08)';
+export const GOOD = '#34D77F';
+/** Bespoke destructive red - NOT the under-par red. */
+export const BAD = '#FF5A5A';
+export const TRACK = 'rgba(255,255,255,0.08)';
 
 export const FONT =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 /**
- * Connect-surface base. #F8FAFC matches the host page (ManagePageShell) and the
- * notch shield exactly, so there is no seam or white strip under the header.
+ * Connect-surface base. Matches the host page (ManagePageShell) and the notch
+ * shield exactly, so there is no seam or bright strip under the header.
  */
-export const SURFACE = '#F8FAFC';
+export const SURFACE = '#15171F';
 
 /** Amber wash. Runs edge to edge, sits behind the content, never a top bar. */
 export const WASH =
@@ -38,7 +40,7 @@ export const KICKER: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  color: '#0E1216',
+  color: INK,
 };
 
 export const LABEL: React.CSSProperties = {
