@@ -240,7 +240,7 @@ export function CollegeHubPage() {
             position: 'sticky',
             top: 'var(--sat, 0px)',
             zIndex: 10,
-            background: 'rgba(248,250,252,0.72)',
+            background: 'rgba(21,23,31,0.72)',
             backdropFilter: 'blur(14px)',
             WebkitBackdropFilter: 'blur(14px)',
             borderBottom: '1px solid rgba(255,255,255,0.10)',
