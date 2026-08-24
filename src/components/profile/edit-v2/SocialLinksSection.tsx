@@ -1,6 +1,7 @@
 import { Label } from '@/components/manage/ui';
 import { Instagram, Youtube } from 'lucide-react';
 
+
 function XIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -38,7 +39,7 @@ function SocialRow({
 }) {
   return (
     <div className="flex overflow-hidden rounded-[11px] border border-border/[0.06]">
-      <div className="w-11 flex-shrink-0 flex items-center justify-center bg-[#F0F4F3] text-muted-foreground border-r border-border/[0.06]">
+      <div className="w-11 flex-shrink-0 flex items-center justify-center bg-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.62)] border-r border-border/[0.06]">
         {icon}
       </div>
       <input
@@ -49,7 +50,7 @@ function SocialRow({
         autoCapitalize="none"
         autoCorrect="off"
         spellCheck={false}
-        className="flex-1 bg-[rgba(255,255,255,0.06)] px-3 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] transition-colors"
+        className="flex-1 bg-[rgba(255,255,255,0.06)] px-3 py-2.5 text-[15px] text-[rgba(255,255,255,0.96)] placeholder:text-[rgba(255,255,255,0.38)] focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] transition-colors"
       />
     </div>
   );

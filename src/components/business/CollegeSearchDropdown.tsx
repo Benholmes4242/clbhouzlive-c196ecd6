@@ -131,7 +131,10 @@ export function CollegeSearchDropdown({
           }}
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
-          className="w-full h-12 pl-11 pr-10 bg-background border border-border/10 rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-border/10"
+          /* FIELD CANON (lib/tokens/field.ts). Was bg-background + border-border/10 with
+             a focus RING and no fill/border step. HEIGHT EXCEPTION (48px, h-12):
+             matches the business editor's taller identity rows it sits among. */
+          className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full h-12 pl-11 pr-10 text-sm text-[rgba(255,255,255,0.96)] focus:outline-none`}
         />
         {isLoading && (
           <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />

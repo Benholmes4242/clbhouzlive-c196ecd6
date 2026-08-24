@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Label } from '@/components/manage/ui';
 import { FIGURE } from '@/lib/tokens/type';
 import { SegToggle } from './SegToggle';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 interface Props {
   value: string;
@@ -75,7 +76,9 @@ export function HandicapInput({ value, onChange }: Props) {
           onChange={handleChange}
           placeholder={isPlusHandicap ? '1.2' : 'e.g. 8.4'}
           className={cn(
-            'w-full bg-[rgba(255,255,255,0.06)] border border-border/[0.06] rounded-[11px] py-3 text-[15px] font-semibold text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors',
+            FIELD_PAINT_CLASS,
+            FIELD_PLACEHOLDER_CLASS,
+            'w-full py-3 text-[15px] font-semibold text-[rgba(255,255,255,0.96)] focus:outline-none',
             isPlusHandicap ? 'pl-9 pr-4' : 'px-4'
           )}
         />

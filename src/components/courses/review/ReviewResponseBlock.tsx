@@ -20,6 +20,7 @@ import {
   useDeleteReviewResponse,
 } from '@/hooks/useReviewResponses';
 import type { BusinessClaimContext } from '@/hooks/useBusinessClaimForCourse';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 const formatRelativeDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -235,7 +236,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value.slice(0, 1000))}
-            className="w-full min-h-[80px] p-3 text-sm bg-card border border-border/10 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border placeholder:text-muted-foreground"
+            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full min-h-[80px] p-3 text-sm text-[rgba(255,255,255,0.96)] resize-none focus:outline-none`}
             maxLength={1000}
           />
           <div className="flex items-center justify-between mt-2">
@@ -399,7 +400,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
         value={text}
         onChange={(e) => setText(e.target.value.slice(0, 1000))}
         placeholder={t('review.response.replyPlaceholder', { business: businessClaim.businessName })}
-        className="w-full min-h-[80px] p-3 text-sm bg-card border border-border/10 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border placeholder:text-muted-foreground"
+        className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full min-h-[80px] p-3 text-sm text-[rgba(255,255,255,0.96)] resize-none focus:outline-none`}
         maxLength={1000}
       />
       <div className="flex items-center justify-between mt-2">

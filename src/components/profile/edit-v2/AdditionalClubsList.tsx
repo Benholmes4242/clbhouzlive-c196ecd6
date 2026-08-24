@@ -4,6 +4,7 @@ import { useClubSearch } from '@/hooks/useClubSearch';
 import { ClubEntry } from '@/components/profile/profile-wizard/types';
 import { VisibilityRow, type VisibilityValue } from './VisibilityDropdown';
 import { FieldLabel } from '@/components/manage/fieldTreatment';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 interface Props {
   clubs: ClubEntry[];
@@ -82,7 +83,7 @@ export function AdditionalClubsList({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for a club"
-            className="w-full bg-[rgba(255,255,255,0.06)] border border-border/[0.06] rounded-[11px] pl-9 pr-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors"
+            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full pl-9 pr-4 py-3 text-[15px] text-[rgba(255,255,255,0.96)] focus:outline-none`}
           />
           {query.length >= 2 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border/10 rounded-xl shadow-lg z-20 max-h-48 overflow-y-auto">

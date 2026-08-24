@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 interface SuggestEditModalProps {
   open: boolean;
@@ -96,9 +97,9 @@ const SuggestEditModal: React.FC<SuggestEditModalProps> = ({
             <div key={field.fieldName}>
               <label className="text-sm font-medium text-foreground mb-1 block">{t(field.labelKey)}</label>
               {field.fieldName === 'description' ? (
-                <textarea value={field.newValue} onChange={(e) => updateField(i, e.target.value)} className="w-full min-h-[100px] p-3 text-sm bg-card border border-border/10 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border" maxLength={2500} />
+                <textarea value={field.newValue} onChange={(e) => updateField(i, e.target.value)} className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full min-h-[100px] p-3 text-sm text-[rgba(255,255,255,0.96)] resize-none focus:outline-none`} maxLength={2500} />
               ) : (
-                <input type="text" value={field.newValue} onChange={(e) => updateField(i, e.target.value)} className="w-full h-11 px-3 text-sm bg-card border border-border/10 rounded-lg focus:outline-none focus:ring-1 focus:ring-border" />
+                <input type="text" value={field.newValue} onChange={(e) => updateField(i, e.target.value)} className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full h-11 px-3 text-sm text-[rgba(255,255,255,0.96)] focus:outline-none`} />
               )}
             </div>
           ))}

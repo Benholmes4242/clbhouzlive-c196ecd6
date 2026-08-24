@@ -1,4 +1,5 @@
 import { DISPLAY_NAME_MAX, USERNAME_MAX } from '@/components/profile/profile-wizard/types';
+import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
 interface Props {
   displayName: string;
@@ -27,7 +28,7 @@ export function IdentitySection({
           maxLength={DISPLAY_NAME_MAX}
           onChange={(e) => onDisplayNameChange(e.target.value)}
           placeholder="Your full name"
-          className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+          className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full px-4 py-3 text-[15px] text-[rgba(255,255,255,0.96)] focus:outline-none`}
         />
         {displayNameError && (
           <p className="text-[12px] text-destructive mt-1">{displayNameError}</p>
@@ -49,7 +50,7 @@ export function IdentitySection({
             maxLength={USERNAME_MAX}
             readOnly={usernameIsLocked}
             placeholder="username"
-            className={`w-full bg-muted border-0 rounded-xl pl-8 pr-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full pl-8 pr-4 py-3 text-[15px] text-[rgba(255,255,255,0.96)] focus:outline-none ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
           />
         </div>
       </div>
