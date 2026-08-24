@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Search, Mail, AtSign, Shield, Edit3, BarChart3, Check, X, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
@@ -12,12 +12,14 @@ import {
   AssignableBusinessRole, BUSINESS_ROLE_LABELS,
 } from '@/hooks/useBusinessTeam';
 
-const INK = '#0F172A';
-const INK_45 = '#64748B';
-const HAIR = 'rgba(15,23,42,0.08)';
-const AMBER = '#F7931E';
-const AMBER_SOFT = 'rgba(247,147,30,0.10)';
-const CARD_BG = '#FFFFFF';
+/* NO PRIVATE PALETTE - see BusinessReviewsPage. Shared manage vocabulary,
+   derived from the analytical `A` ramp. */
+import { INK, INK_45, HAIR, CARD_BG, PAGE_BG } from '@/components/manage/ui';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { BIZ } from '@/components/business/businessTokens';
+
+const AMBER = A.AMBER;
+const AMBER_SOFT = BIZ.amberTint;
 
 interface UserResult {
   id: string;
@@ -128,7 +130,7 @@ export default function BusinessInvitePage() {
                   alt={pickedUser.display_name || pickedUser.username}
                   size={40}
                   hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
+                  ringColor={DARK_HAIRLINE}
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-[14px] truncate" style={{ color: INK }}>
@@ -159,7 +161,7 @@ export default function BusinessInvitePage() {
                     autoCorrect="off"
                     className="w-full pl-10 pr-3 py-2.5 text-[14px] outline-none"
                     style={{
-                      background: '#F8FAFC',
+                      background: 'rgba(255,255,255,0.06)',
                       border: `1px solid ${HAIR}`,
                       borderRadius: 10,
                       color: INK,
@@ -190,7 +192,7 @@ export default function BusinessInvitePage() {
                             alt={u.display_name || u.username}
                             size={36}
                             hairlineRing
-                            ringColor={LIGHT_HAIRLINE}
+                            ringColor={DARK_HAIRLINE}
                           />
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-[13.5px] truncate" style={{ color: INK }}>
@@ -239,11 +241,11 @@ export default function BusinessInvitePage() {
                     <div
                       className="h-9 w-9 flex items-center justify-center shrink-0"
                       style={{
-                        background: selected ? AMBER : 'rgba(15,23,42,0.05)',
+                        background: selected ? AMBER : 'rgba(255,255,255,0.06)',
                         borderRadius: 10,
                       }}
                     >
-                      <Icon size={16} color={selected ? '#fff' : INK_45} strokeWidth={2.25} />
+                      <Icon size={16} color={selected ? A.CANVAS : INK_45} strokeWidth={2.25} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -253,7 +255,7 @@ export default function BusinessInvitePage() {
                             className="inline-flex items-center justify-center h-4 w-4 rounded-full"
                             style={{ background: AMBER }}
                           >
-                            <Check size={10} color="#fff" strokeWidth={3} />
+                            <Check size={10} color={A.CANVAS} strokeWidth={3} />
                           </span>
                         )}
                       </div>
@@ -279,7 +281,7 @@ export default function BusinessInvitePage() {
           style={{
             paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
             paddingTop: 12,
-            background: 'linear-gradient(to top, #F8FAFC 60%, rgba(248,250,252,0))',
+            background: `linear-gradient(to top, ${PAGE_BG} 60%, rgba(21,23,31,0))`,
           }}
         >
           <button
@@ -291,7 +293,7 @@ export default function BusinessInvitePage() {
               minHeight: 52,
               borderRadius: 14,
               background: INK,
-              color: '#FFFFFF',
+              color: A.CANVAS,
               fontSize: 15,
               fontWeight: 700,
               letterSpacing: '-0.01em',

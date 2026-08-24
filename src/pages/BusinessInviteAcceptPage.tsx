@@ -6,11 +6,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useAcceptInvite, BUSINESS_ROLE_LABELS, BusinessRole } from '@/hooks/useBusinessTeam';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
-const INK = '#0F172A';
-const INK_45 = '#64748B';
-const HAIR = 'rgba(15,23,42,0.08)';
+/* NO PRIVATE PALETTE - see BusinessReviewsPage. Shared manage vocabulary,
+   derived from the analytical `A` ramp. */
+import { INK, INK_45, HAIR, CARD_BG, PAGE_BG } from '@/components/manage/ui';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { GREEN, DANGER } from '@/components/manage/ui';
 
 interface InviteView {
   id: string;
@@ -89,9 +91,9 @@ export default function BusinessInviteAcceptPage() {
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-center py-8">
             <div
               className="h-16 w-16 mx-auto rounded-full flex items-center justify-center mb-4"
-              style={{ background: 'rgba(22,163,74,0.10)' }}
+              style={{ background: 'rgba(52,215,127,0.16)' }}
             >
-              <CheckCircle2 size={32} color="#16A34A" strokeWidth={2.25} />
+              <CheckCircle2 size={32} color={GREEN} strokeWidth={2.25} />
             </div>
             <h2 className="text-[19px] font-bold mb-2" style={{ color: INK }}>You're on the team</h2>
             <p className="text-[13.5px] mb-6" style={{ color: INK_45 }}>
@@ -100,8 +102,8 @@ export default function BusinessInviteAcceptPage() {
             <button
               type="button"
               onClick={() => navigate(`/business/${accepted.businessId}`)}
-              className="px-6 py-3 rounded-full font-semibold text-[14px] text-white"
-              style={{ background: INK }}
+              className="px-6 py-3 rounded-full font-semibold text-[14px]"
+              style={{ background: INK, color: A.CANVAS }}
             >
               Go to business
             </button>
@@ -110,9 +112,9 @@ export default function BusinessInviteAcceptPage() {
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-center py-8">
             <div
               className="h-16 w-16 mx-auto rounded-full flex items-center justify-center mb-4"
-              style={{ background: 'rgba(220,38,38,0.08)' }}
+              style={{ background: 'rgba(255,90,90,0.16)' }}
             >
-              <XCircle size={32} color="#DC2626" strokeWidth={2.25} />
+              <XCircle size={32} color={DANGER} strokeWidth={2.25} />
             </div>
             <h2 className="text-[19px] font-bold mb-2" style={{ color: INK }}>Invite unavailable</h2>
             <p className="text-[13.5px] mb-6" style={{ color: INK_45 }}>{error || 'This invite may have expired.'}</p>
@@ -129,7 +131,7 @@ export default function BusinessInviteAcceptPage() {
             <div
               className="mb-6 text-center"
               style={{
-                background: '#FFFFFF',
+                background: CARD_BG,
                 border: `1px solid ${HAIR}`,
                 borderRadius: 16,
                 padding: '24px 16px',
@@ -141,12 +143,12 @@ export default function BusinessInviteAcceptPage() {
                   alt={invite.business_name}
                   size={72}
                   hairlineRing
-                  ringColor={LIGHT_HAIRLINE}
+                  ringColor={DARK_HAIRLINE}
                 />
               ) : (
                 <div
                   className="h-[72px] w-[72px] mx-auto flex items-center justify-center"
-                  style={{ background: 'rgba(15,23,42,0.05)', borderRadius: 24 }}
+                  style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 24 }}
                 >
                   <Building2 size={32} color={INK_45} />
                 </div>
@@ -164,7 +166,7 @@ export default function BusinessInviteAcceptPage() {
                 type="button"
                 onClick={() => navigate(-1)}
                 className="flex-1 py-3 rounded-full font-semibold text-[14px]"
-                style={{ color: INK, background: '#FFFFFF', border: `1px solid ${HAIR}` }}
+                style={{ color: INK, background: CARD_BG, border: `1px solid ${HAIR}` }}
               >
                 Not now
               </button>
@@ -172,8 +174,8 @@ export default function BusinessInviteAcceptPage() {
                 type="button"
                 onClick={handleAccept}
                 disabled={acceptInvite.isPending}
-                className="flex-1 py-3 rounded-full font-semibold text-[14px] text-white disabled:opacity-60"
-                style={{ background: INK }}
+                className="flex-1 py-3 rounded-full font-semibold text-[14px] disabled:opacity-60"
+                style={{ background: INK, color: A.CANVAS }}
               >
                 {acceptInvite.isPending ? 'Joining…' : 'Accept invite'}
               </button>
