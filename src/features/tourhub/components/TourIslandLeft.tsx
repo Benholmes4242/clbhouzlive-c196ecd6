@@ -11,10 +11,20 @@
 import React from 'react';
 import { ChevronDown, ChevronLeft, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 
-const INK = '#0F172A';
-const DIVIDER = 'rgba(15,23,42,0.14)';
-const CHEVRON = 'rgba(15,23,42,0.55)';
+import { resolveChrome } from '@/features/chrome-v2/registry';
+
+/**
+ * The island is ONE object: this content must never disagree with the capsule
+ * it sits inside. So rather than pinning literals, we resolve the same spec
+ * ChromeIsland resolves and mirror its inkFor(tone) exactly (#FFFFFF on dark,
+ * #0F172A on light) — the registry stays the single source of tone.
+ */
+const TONED = {
+  light: { INK: '#0F172A', DIVIDER: 'rgba(15,23,42,0.14)', CHEVRON: 'rgba(15,23,42,0.55)' },
+  dark: { INK: '#FFFFFF', DIVIDER: 'rgba(255,255,255,0.18)', CHEVRON: 'rgba(255,255,255,0.62)' },
+} as const;
 
 export interface TourIslandLeftProps {
   label: string;
@@ -36,6 +46,9 @@ export const TourIslandLeft: React.FC<TourIslandLeftProps> = ({
   onBackTap,
 }) => {
   const { t } = useTranslation('tourhub');
+  const location = useLocation();
+  const { INK, DIVIDER, CHEVRON } =
+    TONED[resolveChrome(location.pathname, new URLSearchParams(location.search)).tone];
   return (
     <div
       style={{
