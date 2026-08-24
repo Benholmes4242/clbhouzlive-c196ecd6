@@ -269,7 +269,11 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
   );
 
   // Sub-line: season . tour . events. Events segment drops when null.
-  const tourLabel = t('player.hero.tourSuffix', { tour: t(`followPrompt.tours.${tour}`) });
+  /* `tour` is a SLUG (TourId), so it needs a lookup. TOUR_CONFIG is the
+     existing source and its names already carry the tour word ("PGA Tour",
+     "LIV Golf") — so no tourSuffix wrapper, which would render "LIV GOLF TOUR".
+     The old `followPrompt.tours.*` namespace existed in no locale file. */
+  const tourLabel = TOUR_CONFIG[tour]?.name ?? tour;
   const year = currentSeasonYear();
   const sub =
     playerStats.events_played !== null && playerStats.events_played !== undefined
