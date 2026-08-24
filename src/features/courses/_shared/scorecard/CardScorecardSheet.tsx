@@ -251,27 +251,84 @@ const Nine: React.FC<{
  * examples still use real score/par pairs but cannot imply that (for example)
  * every 3 is a birdie. Labels carry the outcome names.
  */
-const Legend: React.FC = () => {
+/**
+ * MICRO_BRIEF_SCORING_KEY §1.2 — EACH ITEM'S MARK SITS IN A FIXED-WIDTH BOX.
+ * ScoreMark is a fixed size x size box and centres its own contents, but in a
+ * gapped flex row beside unringed siblings any optical difference between a
+ * ringed and a bare mark reads as an alignment fault. A fixed MARK_BOX equal to
+ * the largest mark's outer diameter, with the mark centred inside it, makes
+ * every item occupy the same width and share one horizontal AND vertical
+ * centreline. The fix is in the key: ScoreMark has four callers and is untouched.
+ *
+ * §2.2 — THE KEY SHOWS ONLY WHAT THE ROUND CONTAINS. Birdie, bogey and double+
+ * are always shown because they teach the grammar a member reads while scanning.
+ * Eagle, ace and albatross are conditional — never explain a mark this card does
+ * not carry. Derived from the SAME hole data the card renders, so the key and
+ * the card can never disagree.
+ *
+ * THE SCORING KEY IS A KEY, NOT A TALLY (BRIEF_SCORECARD_TRAJECTORY_WHOOP §9.1).
+ * The key teaches the MARK, not an incidental stroke count. ScoreMark can hide
+ * its numeral while preserving the fill, tone and magnitude/rarity ring, so the
+ * examples still use real score/par pairs but cannot imply that (for example)
+ * every 3 is a birdie. Labels carry the outcome names.
+ */
+const KEY_MARK_SIZE = 22;
+/* The ring is drawn inset:0 inside the mark box, so outer diameter == size.
+   The box is the mark size exactly; it exists to equalise item widths. */
+const KEY_MARK_BOX = KEY_MARK_SIZE;
+
+const Legend: React.FC<{ holes: CardScorecardHole[] }> = ({ holes }) => {
   const { t } = useTranslation(['courses']);
+
+  const rarities = React.useMemo(() => {
+    let eagle = false, ace = false, alba = false;
+    for (const h of holes) {
+      const s = h.strokes;
+      const p = h.par;
+      if (s == null || s <= 0 || p == null) continue;
+      if (s === 1) { ace = true; continue; }
+      const d = s - p;
+      if (d <= -3) alba = true;
+      else if (d === -2) eagle = true;
+    }
+    return { eagle, ace, alba };
+  }, [holes]);
+
   const keys: { strokes: number; label: string }[] = [
     { strokes: 3, label: t('courses:scorecard.legendBirdie') },
-    { strokes: 2, label: t('courses:scorecard.legendEagle') },
-    { strokes: 1, label: t('courses:scorecard.legendAce') },
-    { strokes: 5, label: t('courses:scorecard.legendBogey') },
-    { strokes: 6, label: t('courses:scorecard.legendDouble') },
   ];
+  if (rarities.eagle) keys.push({ strokes: 2, label: t('courses:scorecard.legendEagle') });
+  // AN ALBATROSS AND AN ACE TAKE THE SAME MARK (solid red, gold ring): the
+  // grammar does not distinguish them. If a round contains both we show the
+  // RARER one once (albatross) rather than two identical entries.
+  if (rarities.alba) keys.push({ strokes: 1, label: t('courses:scorecard.legendAlbatross') });
+  else if (rarities.ace) keys.push({ strokes: 1, label: t('courses:scorecard.legendAce') });
+  keys.push({ strokes: 5, label: t('courses:scorecard.legendBogey') });
+  keys.push({ strokes: 6, label: t('courses:scorecard.legendDouble') });
+
   return (
     <div>
       {/* THE KEY IS CENTRED UNDER THE CARD (BRIEF_SCORECARD_CHART_ALIGNMENT §4).
-          Centre justification also centres the fifth item ("Double+") under the
-          four that wrapped above it, instead of leaving it hanging left. */}
+          Centre justification also centres a trailing item under the ones that
+          wrapped above it, instead of leaving it hanging left. */}
       <div style={{ ...LABEL, fontSize: 8, color: A.INK, marginBottom: 8, textAlign: 'center' }}>
         {t('courses:holes.scoringKey.title')}
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', gap: 16, rowGap: 10, flexWrap: 'wrap' }}>
         {keys.map((k) => (
           <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
-            <ScoreMark strokes={k.strokes} par={4} size={22} surface="dark" showStroke={false} />
+            <span
+              style={{
+                width: KEY_MARK_BOX,
+                height: KEY_MARK_BOX,
+                flex: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ScoreMark strokes={k.strokes} par={4} size={KEY_MARK_SIZE} surface="dark" showStroke={false} />
+            </span>
             <span style={{ ...LABEL, fontSize: 8 }}>{k.label}</span>
           </span>
         ))}
@@ -279,6 +336,7 @@ const Legend: React.FC = () => {
     </div>
   );
 };
+
 
 
 /* ------------------------------------------------------ round breakdown */
