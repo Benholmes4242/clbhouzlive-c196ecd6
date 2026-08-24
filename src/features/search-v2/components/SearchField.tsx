@@ -13,9 +13,18 @@ interface Props {
 /**
  * CANONICAL DARK FIELD TREATMENT (MICRO_BRIEF_CANONICAL_FIELD_TREATMENT),
  * applied to the overlay's own input: REST bg 6% / border 10%, FOCUS bg 10% /
- * border 28%, text 96%, placeholder 38%. The pill shape is kept — this is a
- * search field, not a form field.
+ * border 28%, text 96%, placeholder 38%.
+ *
+ * SHAPE: rounded-sq-sm (14). The earlier pill shape — "this is a full-screen
+ * overlay whose entire job is one input" — is OVERTURNED by
+ * BRIEF_FIELD_SHAPE_AND_SIZE_CANON. A text input is a text input wherever it
+ * sits: a member moving between Discover, auth and this overlay must meet ONE
+ * control, not three variants of one. HEIGHT 44 is the canonical search-bar
+ * height (a field that filters as you type, with no submit button).
+ * The Cancel control and the clear button stay rounded-full — they are
+ * circular controls, not fields.
  */
+
 export const SearchField = forwardRef<HTMLInputElement, Props>(function SearchField(
   { value, onChange, onCancel, onSubmit, placeholder = 'Search clbhouz' },
   ref,
@@ -30,7 +39,7 @@ export const SearchField = forwardRef<HTMLInputElement, Props>(function SearchFi
       }}
     >
       <div
-        className="flex-1 flex items-center gap-2 px-3 rounded-full"
+        className="flex-1 flex items-center gap-2 px-3 rounded-sq-sm"
         style={{
           height: 44,
           background: focused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
@@ -50,8 +59,8 @@ export const SearchField = forwardRef<HTMLInputElement, Props>(function SearchFi
             if (e.key === 'Enter' && onSubmit) onSubmit();
           }}
           placeholder={placeholder}
-          className="flex-1 bg-transparent text-sm outline-none placeholder:text-[rgba(248,250,252,0.38)]"
-          style={{ color: 'rgba(248,250,252,0.96)' }}
+          className="flex-1 bg-transparent text-sm outline-none placeholder:text-[rgba(255,255,255,0.38)]"
+          style={{ color: 'rgba(255,255,255,0.96)' }}
           autoComplete="off"
           spellCheck="false"
         />

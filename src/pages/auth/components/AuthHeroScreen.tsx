@@ -176,9 +176,9 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     onClick={onAppleSignIn}
                     disabled={submitting}
                     aria-label={t('auth:hero.continueWithApple')}
-                    className="w-full flex items-center justify-center gap-2 rounded-[16px] transition-opacity active:opacity-85 disabled:opacity-60"
+                    className="w-full flex items-center justify-center gap-2 rounded-sq-sm transition-opacity active:opacity-85 disabled:opacity-60"
                     style={{
-                      minHeight: 52,
+                      minHeight: 54,
                       background: '#FFFFFF',
                       border: 'none',
                       color: '#0B0D12',
@@ -203,9 +203,9 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     onClick={onGoogleSignIn}
                     disabled={submitting}
                     aria-label={t('auth:hero.continueWithGoogle')}
-                    className="w-full flex items-center justify-center gap-2 rounded-[16px] transition-opacity active:opacity-85 disabled:opacity-60"
+                    className="w-full flex items-center justify-center gap-2 rounded-sq-sm transition-opacity active:opacity-85 disabled:opacity-60"
                     style={{
-                      minHeight: 52,
+                      minHeight: 54,
                       background: '#FFFFFF',
                       border: '1px solid rgba(255,255,255,0.10)',
                       color: '#1F1F1F',
