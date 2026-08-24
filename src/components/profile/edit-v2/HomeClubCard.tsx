@@ -13,8 +13,10 @@ interface Props {
   onVisibilityChange: (v: VisibilityValue) => void;
 }
 
-const INK = '#0F172A';
-const GREEN = '#059669';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
+const INK = A.INK;
+const GREEN = A.GREEN;
 
 
 export function HomeClubCard({
@@ -85,7 +87,7 @@ export function HomeClubCard({
             type="button"
             onClick={handleClear}
             className="text-[12px] font-semibold uppercase tracking-[0.08em] px-2 min-h-[44px] flex items-center"
-            style={{ color: '#64748B' }}
+            style={{ color: A.MUTE }}
             aria-label="Change home club"
           >
             Change

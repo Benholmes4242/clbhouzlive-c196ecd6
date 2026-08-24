@@ -165,9 +165,9 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
         {/* Overlay at z-[199] to sit above wizard's z-[100] */}
         <DialogPrimitive.Overlay className="fixed inset-0 z-[199] bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
         {/* Content at z-[200] */}
-        <DialogPrimitive.Content className="fixed left-[50%] top-[50%] z-[200] grid w-full max-w-lg sm:max-w-xl translate-x-[-50%] translate-y-[-50%] p-0 gap-0 overflow-hidden bg-white border border-border/10 shadow-lg rounded-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95">
-          <div className="px-4 py-3 border-b border-[#e2e8f0]">
-            <DialogPrimitive.Title style={TITLE} className="leading-none text-[#1e293b]">{title}</DialogPrimitive.Title>
+        <DialogPrimitive.Content className="fixed left-[50%] top-[50%] z-[200] grid w-full max-w-lg sm:max-w-xl translate-x-[-50%] translate-y-[-50%] p-0 gap-0 overflow-hidden bg-[#1B1E27] border border-white/10 shadow-lg rounded-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95">
+          <div className="px-4 py-3 border-b border-white/10">
+            <DialogPrimitive.Title style={TITLE} className="leading-none text-[#F8FAFC]">{title}</DialogPrimitive.Title>
           </div>
 
         {/* Cropper area - dark background for contrast */}
@@ -188,10 +188,10 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
         </div>
 
         {/* Controls */}
-        <div className="px-4 py-4 space-y-4 bg-white">
+        <div className="px-4 py-4 space-y-4 bg-[#1B1E27]">
           {/* Zoom slider - orange accent */}
           <div className="flex items-center gap-3">
-            <ZoomOut className="w-4 h-4 text-[#64748b] flex-shrink-0" />
+            <ZoomOut className="w-4 h-4 text-[rgba(248,250,252,0.62)] flex-shrink-0" />
             <Slider
               value={[zoom]}
               onValueChange={([value]) => setZoom(value)}
@@ -200,7 +200,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
               step={0.1}
               className="flex-1 [&_[role=slider]]:bg-[hsl(38,92%,50%)] [&_.bg-primary]:bg-[hsl(38,92%,50%)]"
             />
-            <ZoomIn className="w-4 h-4 text-[#64748b] flex-shrink-0" />
+            <ZoomIn className="w-4 h-4 text-[rgba(248,250,252,0.62)] flex-shrink-0" />
           </div>
 
           {/* Action buttons */}
@@ -210,7 +210,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
               variant="ghost"
               size="sm"
               onClick={handleReset}
-              className="gap-1.5 text-[#64748b] hover:text-[#1e293b]"
+              className="gap-1.5 text-[rgba(248,250,252,0.62)] hover:text-[#F8FAFC]"
             >
               <RotateCcw className="w-4 h-4" />
               Reset
@@ -223,7 +223,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                 size="sm"
                 onClick={handleCancel}
                 disabled={isSaving}
-                className="border-[#e2e8f0] text-[#64748b] hover:text-[#1e293b]"
+                className="border-white/10 text-[rgba(248,250,252,0.62)] hover:text-[#F8FAFC]"
               >
                 <X className="w-4 h-4 mr-1" />
                 Cancel

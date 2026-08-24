@@ -40,20 +40,24 @@ export function SegToggle({ options, value, onChange, fill }: SegToggleProps) {
               fontFamily: SF_STACK,
               fontSize: 14,
               fontWeight: active ? 700 : 500,
-              color: active ? '#FFFFFF' : '#64748B',
-              background: active ? '#0F172A' : '#F8FAFC',
+              /* DARK INVERSION: selected = light chip, unselected = quiet well.
+                 Same inversion FilterChips took. Check glyph inherits colour.
+                 borderRadius 11 is chip-row geometry — NOT the 14px field canon. */
+              color: active ? '#15171F' : 'rgba(248,250,252,0.62)',
+              background: active ? '#F8FAFC' : 'rgba(255,255,255,0.06)',
               border: active
-                ? '1px solid #0F172A'
-                : '1px solid rgba(15,23,42,0.08)',
+                ? 'none'
+                : '1px solid rgba(255,255,255,0.10)',
             }}
           >
             {active && <Check size={13} strokeWidth={3} />}
             <span>{o.label}</span>
             {o.hint && (
-              <span style={{ fontFamily: SF_STACK, fontWeight: 500, color: active ? 'rgba(255,255,255,0.65)' : '#94A3B8', fontSize: 12 }}>
+              <span style={{ fontFamily: SF_STACK, fontWeight: 500, color: active ? 'rgba(21,23,31,0.55)' : 'rgba(248,250,252,0.42)', fontSize: 12 }}>
                 {o.hint}
               </span>
             )}
+
           </button>
         );
       })}

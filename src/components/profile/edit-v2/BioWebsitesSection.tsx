@@ -3,6 +3,7 @@ import { Plus, X } from 'lucide-react';
 import { WebsiteEntry, BIO_MAX } from '@/components/profile/profile-wizard/types';
 import { Label } from '@/components/manage/ui';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   bio: string;
@@ -71,13 +72,13 @@ export function BioWebsitesSection({
             <button
               onClick={onAddWebsite}
               className="flex items-center gap-2.5 text-[14px] font-semibold min-h-[44px]"
-              style={{ color: '#0F172A' }}
+              style={{ color: A.INK }}
             >
               <div
                 className="w-6 h-6 rounded-full flex items-center justify-center"
                 style={{ backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
               >
-                <Plus size={14} style={{ color: '#475569' }} />
+                <Plus size={14} style={{ color: A.MUTE }} />
               </div>
               Add website
             </button>
