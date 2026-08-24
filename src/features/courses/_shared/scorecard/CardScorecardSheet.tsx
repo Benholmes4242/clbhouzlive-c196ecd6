@@ -735,8 +735,27 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       style={{ background: A.CANVAS, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>
-        {/* HEADER — course-first */}
-        <div style={{ padding: '10px 16px 14px', background: A.CANVAS, borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+        {/*
+          HEADER — DATE / COURSE / REGION / MEMBER / ACTIONS
+          (BRIEF_SCORECARD_SHEET_HEADER, option B with ACTIONS UP).
+
+          The identity and the two actions used to sit at the BOTTOM of the
+          sheet, below the trajectory, the grid, the key and the breakdown — so a
+          member scrolled a whole scorecard to learn whose round it was. They are
+          header rows now. This also serves :722: the card's score-column label
+          is blank in the third person because the reader is told the name
+          ABOVE the card, which only works if the name is above it.
+
+          THE COURSE KEEPS THE FULL WIDTH ON ITS OWN LINE. That is why B was
+          chosen over the split layout: nothing sits beside the course name and
+          nothing competes with it for horizontal space, so the parenthetical
+          that separates East from West survives.
+
+          NO TILE. The identity was a Panel because it was a standalone block at
+          the end of a scroll; in the header it is part of the header — no panel,
+          no border, no separate ground, one hairline above it.
+        */}
+        <div style={{ padding: '10px 16px 12px', background: A.CANVAS, borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
           <div style={{ minWidth: 0 }}>
             {!!eyebrowText && (
                <div style={{ ...KICKER, color: A.MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -756,7 +775,63 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               <div style={{ fontSize: 12.5, color: A.MUTE, marginTop: 2 }}>{courseLocation}</div>
             )}
           </div>
+
+          {(showIdentity || onShareRound || onViewProfile || onViewCourse) && (
+            <Hairline style={{ margin: '10px 0 0' }} />
+          )}
+
+          {/* MEMBER ROW. With NO NAME this does not render at all — no avatar,
+              no placeholder, no avatar-shaped hole — and the actions row falls
+              directly under the region, still beneath its hairline. */}
+          {showIdentity && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
+              <SquircleAvatar
+                src={playerAvatarUrl ?? null}
+                alt={playerName}
+                userId={playerUserId ?? undefined}
+                size={34}
+                hairlineRing
+              />
+              {/* The name is the ONLY elastic cell: minWidth 0 + ellipsis, so a
+                  long display name yields to the figure rather than pushing it
+                  off. The figure column is auto and never shrinks. */}
+              <div
+                style={{
+                  flex: '1 1 auto', minWidth: 0,
+                  fontSize: 13.5, fontWeight: 700,
+                  color: isOwner ? A.AMBER : A.INK,
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}
+                title={isOwner ? undefined : playerName}
+              >
+                {/* OWN ROUND (§3, option b): the app's viewing-member marker,
+                    amber "You", with the avatar kept. The row's shape is
+                    identical in both cases. */}
+                {isOwner ? t('courses:scorecard.voiceYou') : playerName}
+              </div>
+              {(identityStat || playerHcp != null) && (
+                <div style={{ flex: 'none', textAlign: 'right' }}>
+                  <div style={{ ...NUM, fontSize: 20, color: A.INK, lineHeight: 1.05 }}>
+                    {identityStat ? identityStat.value : formatHcp(playerHcp as number)}
+                  </div>
+                  <div style={{ ...LABEL, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
+                    <span>{identityStat ? identityStat.label : t('courses:scorecard.handicapIndex')}</span>
+                    {!identityStat && showChip && <HandicapChip delta={playerHcpDelta as number} />}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {(onShareRound || onViewProfile || onViewCourse) && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', marginTop: showIdentity ? 4 : 8 }}>
+              {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} align="left" />}
+              {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} align="left" />}
+              {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} align="left" />}
+            </div>
+          )}
         </div>
+
 
         <div
           style={{
@@ -936,89 +1011,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </>
           )}
 
-          {/* PANEL 3 — identity */}
-          {showIdentity && (
-            <Panel>
-              {/*
-                ONE TWO-ROW GRID, NOT TWO STACKED COLUMNS. Two independently
-                stacked columns let the 14.5px name and the 20px value set
-                different heights, so the label and the delta chip could never
-                land on the same line and no margin nudge would hold across
-                string lengths. The grid owns the rows: alignSelf end settles
-                row 1 on a common baseline, rowGap owns the label spacing, and
-                the empty span placeholders keep cell order when there is no
-                stat. Do not flatten this back to two columns.
-              */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <SquircleAvatar
-                  src={playerAvatarUrl ?? null}
-                  alt={playerName}
-                  userId={playerUserId ?? undefined}
-                  size={40}
-                  hairlineRing
-                />
-                <div
-                  style={{
-                    flex: 1, minWidth: 0,
-                    display: 'grid',
-                    gridTemplateColumns: '1fr auto',
-                    rowGap: 3,
-                    columnGap: 12,
-                  }}
-                >
-                  {/* row 1 */}
-                  <div
-                    style={{
-                      fontSize: 13.5, fontWeight: 700, color: A.INK,
-                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                      alignSelf: 'end',
-                    }}
-                  >
+          {/*
+            NOTHING FOLLOWS THE BREAKDOWN (BRIEF_SCORECARD_SHEET_HEADER §4).
+            The identity panel and the anonymous-round footer that used to sit
+            here are BOTH gone: the member row and both actions live in the
+            header, and the anonymous path is served there too (member row
+            omitted, actions row still rendered). Do not add a footer back.
+          */}
 
-                    {playerName}
-                  </div>
-                  {(identityStat || playerHcp != null) ? (
-                    <div style={{ ...NUM, fontSize: 22, color: A.INK, textAlign: 'center', alignSelf: 'end' }}>
-                      {identityStat ? identityStat.value : formatHcp(playerHcp as number)}
-                    </div>
-                  ) : <span />}
-
-                  {/* row 2 — the label is quiet chrome; LABEL carries A.MUTE. */}
-                  {(identityStat || playerHcp != null) ? (
-                    <div style={LABEL}>
-                      {identityStat ? identityStat.label : t('courses:scorecard.handicapIndex')}
-                    </div>
-                  ) : <span />}
-                  <div style={{ textAlign: 'center' }}>
-                    {!identityStat && showChip && <HandicapChip delta={playerHcpDelta as number} />}
-                  </div>
-                </div>
-              </div>
-
-              {/* The footer actions belong to this panel, under a hairline. */}
-              {(onShareRound || onViewProfile || onViewCourse) && (
-                <>
-                  <Hairline style={{ margin: '16px 0 4px' }} />
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap' }}>
-                    {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
-                    {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
-                    {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
-                  </div>
-                </>
-              )}
-            </Panel>
-          )}
-
-          {/* FOOTER — when there is no identity panel to host the actions. */}
-          {!showIdentity && (onShareRound || onViewProfile || onViewCourse) && (
-            <Panel>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap' }}>
-                {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} />}
-                {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} />}
-                {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} />}
-              </div>
-            </Panel>
-          )}
 
         </div>
       </div>
