@@ -32,7 +32,10 @@ export function SectionShell({
     <section style={{ padding: '0 0 4px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: `0 ${SPACE.pagePadX}px`, marginBottom: SPACE.sectionHeaderContent }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <span style={{ ...KICKER, color: eyebrowColor ?? A.INK }}>
+          {/* DARK EYEBROW: the fallback is the dark MUTE, not A.INK (now
+              #F8FAFC) and never amber — amber means the viewing member.
+              eyebrowColor remains for SEMANTIC overrides only (live green). */}
+          <span style={{ ...KICKER, color: eyebrowColor ?? 'rgba(255,255,255,0.62)' }}>
             {eyebrow}
           </span>
 
