@@ -237,7 +237,8 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
                     border: 'none',
                     borderRadius: 14,
                     background: isActive ? A.INK : 'transparent',
-                    color: isActive ? '#FFFFFF' : A.INK,
+                    // Active ink derives from the fill: A.INK fill -> A.CANVAS label.
+                    color: isActive ? A.CANVAS : A.INK,
                     fontFamily: 'inherit',
                     fontSize: 16,
                     fontWeight: isActive ? 700 : 600,
