@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
 import type { WireEvent } from '../hooks/useDiscoverWire';
-import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, EYEBROW_TEXT, InkAction } from './tokens';
+import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, EYEBROW_TEXT, InkAction, PODIUM_ACCENT } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
 import { PodiumAvatarRing } from './PodiumAvatarRing';
 
@@ -252,7 +252,13 @@ export function FeatCard({
         </span>
 
         <span style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <MemberAvatar userId={e.userId} src={e.actorAvatar} alt={e.actorName} metal />
+          <PodiumAvatarRing
+            avatarSize={40}
+            src={e.actorAvatar}
+            userId={e.userId}
+            alt={e.actorName}
+            ringColor={ace ? PODIUM_ACCENT.gold : PODIUM_ACCENT.white}
+          />
           <span
             style={{
               display: 'flex',
