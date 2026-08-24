@@ -252,7 +252,13 @@ export function FeatCard({
         </span>
 
         <span style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <MemberAvatar userId={e.userId} src={e.actorAvatar} alt={e.actorName} metal />
+          <PodiumAvatarRing
+            avatarSize={40}
+            src={e.actorAvatar}
+            userId={e.userId}
+            alt={e.actorName}
+            ringColor={ace ? PODIUM_ACCENT.gold : PODIUM_ACCENT.white}
+          />
           <span
             style={{
               display: 'flex',
