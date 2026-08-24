@@ -27,7 +27,7 @@ import { feedLaneRoles, type FeedRole } from '@/video/feedLaneRoles';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { MuteButton } from '@/audio/MuteButton';
-import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
+import { formatDuration, formatRemaining } from '@/features/watch-v2/utils/formatDuration';
 import '@/styles/media-rail-bars.css';
 import { VideoProcessingCard } from './VideoProcessingCard';
 import {
