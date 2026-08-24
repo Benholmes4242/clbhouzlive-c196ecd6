@@ -171,12 +171,10 @@ function PlayerFacepile({ players, accent }: { players: MostPlayedPlayer[]; acce
           <PodiumAvatarRing
             key={player.userId}
             avatarSize={FACE_SIZE}
-            size={FACE_SIZE}
             src={player.avatarUrl}
             alt={player.name}
             userId={player.userId}
             ringColor={accent}
-            className={index === 0 ? undefined : ''}
           />
         ) : (
           <span

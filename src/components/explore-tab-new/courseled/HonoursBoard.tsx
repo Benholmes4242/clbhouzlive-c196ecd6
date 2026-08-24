@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { formatOrdinal, formatYearNumeric } from '@/i18n/format';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { WireEvent } from '../hooks/useDiscoverWire';
 import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, EYEBROW_TEXT, InkAction } from './tokens';
 import { HonoursPanel as HonoursPanelShell } from './DiscoverCourseLedSkeleton';
