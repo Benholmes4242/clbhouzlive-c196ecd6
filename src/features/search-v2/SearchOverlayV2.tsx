@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { claimOverlayChrome, releaseOverlayChrome } from '@/lib/routeChrome';
+import { A, S } from './lib/tokens';
 
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { SearchField } from './components/SearchField';
@@ -51,10 +52,10 @@ interface Props {
 function RowSkeleton() {
   return (
     <div className="flex items-center gap-3 px-4 min-h-[60px]">
-      <div className="w-[42px] h-[42px] rounded-[12px] clb-shimmer-light shrink-0" />
+      <div className="w-[42px] h-[42px] rounded-[12px] clb-shimmer-dark shrink-0" />
       <div className="flex-1 space-y-2">
-        <div className="h-3.5 w-32 rounded clb-shimmer-light" />
-        <div className="h-3 w-20 rounded clb-shimmer-light" />
+        <div className="h-3.5 w-32 rounded clb-shimmer-dark" />
+        <div className="h-3 w-20 rounded clb-shimmer-dark" />
       </div>
     </div>
   );
@@ -64,7 +65,7 @@ function LoadingBlock() {
   return (
     <div>
       <div style={{ padding: '16px 16px 12px' }}>
-        <div className="h-3 w-16 rounded clb-shimmer-light" />
+        <div className="h-3 w-16 rounded clb-shimmer-dark" />
       </div>
       <RowSkeleton />
       <RowSkeleton />
@@ -103,19 +104,21 @@ export function SearchOverlayV2({
     return () => unlockBodyScroll();
   }, [isOpen]);
 
-  // Search overlay is always a light surface: claim light chrome while open.
+  // Search overlay is always a DARK surface: claim dark chrome while open.
   // The claim stack ensures returning from immersive overlays (fullscreen
-  // viewer, etc.) restores the light chrome instead of the underlying route.
-  // Claim light chrome SYNCHRONOUSLY at commit (useLayoutEffect) so the
+  // viewer, etc.) restores the overlay's chrome instead of the underlying route.
+  // Claim dark chrome SYNCHRONOUSLY at commit (useLayoutEffect) so the
   // native status bar repaint is dispatched one frame ahead of the slide
   // animation, preventing a visible recolour mid-slide on device.
   useLayoutEffect(() => {
     if (!isOpen) return;
     claimOverlayChrome({
       id: 'search-overlay-v2',
-      statusBarStyle: 'dark',      // dark icons on light bg
-      statusBarColor: 'FFF8FAFC',
-      shieldColor: '#F8FAFC',
+      // 'light' = LIGHT icons (clock/signal/battery) over a DARK bar. The
+      // naming describes the ICONS, not the background.
+      statusBarStyle: S.STATUS_BAR_STYLE,
+      statusBarColor: S.STATUS_BAR_COLOR,
+      shieldColor: S.GROUND,
     });
     return () => releaseOverlayChrome('search-overlay-v2');
   }, [isOpen]);
@@ -184,15 +187,19 @@ export function SearchOverlayV2({
           {/* Static safe-area cap: present immediately so the sliding
               panel never reveals an uncovered notch band mid-animation. */}
           <motion.div
-            className="fixed inset-x-0 top-0 z-[10099] bg-[#F8FAFC]"
-            style={{ height: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 0px)' }}
+            className="fixed inset-x-0 top-0 z-[10099]"
+            style={{
+              background: S.GROUND,
+              height: 'max(var(--safe-top, env(safe-area-inset-top, 0px)), 0px)',
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.12, ease: 'easeOut' }}
           />
           <motion.div
-            className="fixed inset-0 z-[10100] bg-[#F8FAFC] flex flex-col md:items-center"
+            className="fixed inset-0 z-[10100] flex flex-col md:items-center"
+            style={{ background: S.GROUND }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -263,14 +270,14 @@ export function SearchOverlayV2({
 
             {hasQuery && !isLoading && error && (
               <div style={{ padding: '32px 16px', textAlign: 'center' }}>
-                <p className="text-[13px]" style={{ color: '#94A3B8' }}>
+                <p className="text-[13px]" style={{ color: S.QUIET }}>
                   Something went wrong. Tap to retry.
                 </p>
                 <button
                   type="button"
                   onClick={() => refetch()}
                   className="mt-3 text-[13px] font-bold"
-                  style={{ color: '#0F172A' }}
+                  style={{ color: S.INK }}
                 >
                   Retry
                 </button>
@@ -418,11 +425,11 @@ export function SearchOverlayV2({
                         <div style={{ padding: '32px 16px 8px', textAlign: 'center' }}>
                           <p
                             className="text-[15px] font-bold"
-                            style={{ color: '#0F172A' }}
+                            style={{ color: S.INK }}
                           >
                             Nothing for &ldquo;{q}&rdquo;
                           </p>
-                          <p className="text-[12.5px] mt-1" style={{ color: '#64748B' }}>
+                          <p className="text-[12.5px] mt-1" style={{ color: S.QUIET }}>
                             Try a different spelling or check the course request below.
                           </p>
                         </div>
@@ -577,7 +584,7 @@ function SingleScope({
 function EmptyScope({ label }: { label: string }) {
   return (
     <div style={{ padding: '40px 16px 16px', textAlign: 'center' }}>
-      <p className="text-[13.5px]" style={{ color: '#64748B' }}>
+      <p className="text-[13.5px]" style={{ color: S.QUIET }}>
         {label}
       </p>
     </div>
@@ -601,15 +608,15 @@ function CommitResults({
         type="button"
         onClick={() => onCommit(query)}
         className="w-full flex items-center gap-3 px-4 min-h-[56px] text-left active:opacity-70"
-        style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}
+        style={{ borderBottom: `1px solid ${S.HAIRLINE}` }}
       >
         <div
           className="flex items-center justify-center rounded-full shrink-0"
           style={{
             width: 32,
             height: 32,
-            background: '#0F172A',
-            color: '#F8FAFC',
+            background: S.TILE,
+            color: S.INK,
             fontSize: 14,
             fontWeight: 700,
           }}
@@ -618,10 +625,10 @@ function CommitResults({
           <Search size={15} strokeWidth={2.5} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[14px] font-bold truncate" style={{ color: '#0F172A' }}>
+          <div className="text-[14px] font-bold truncate" style={{ color: S.INK }}>
             Search “{query}”
           </div>
-          <div className="text-[11.5px]" style={{ color: '#64748B' }}>
+          <div className="text-[11.5px]" style={{ color: S.QUIET }}>
             Filter the grid to matching clips
           </div>
         </div>
@@ -632,7 +639,7 @@ function CommitResults({
           <div style={{ padding: '16px 16px 12px' }}>
             <span
               className="text-[11px] font-bold tracking-[0.08em] uppercase"
-              style={{ color: '#64748B' }}
+              style={{ color: S.QUIET }}
             >
               Previews
             </span>
@@ -652,7 +659,7 @@ function CommitResults({
         </>
       ) : (
         <div style={{ padding: '32px 16px', textAlign: 'center' }}>
-          <p className="text-[13px]" style={{ color: '#64748B' }}>
+          <p className="text-[13px]" style={{ color: S.QUIET }}>
             No preview clips yet — tap “Search” to filter the grid.
           </p>
         </div>
