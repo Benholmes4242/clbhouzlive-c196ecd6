@@ -8,12 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { useTranslation } from 'react-i18next';
 import { Z } from '@/config/zIndex';
-import {
-  FONT,
-  HAIRLINE_INK_10,
-  INK,
-  INK_MUTE,
-} from '@/features/tourhub/_shared/tokens';
+import { FONT } from '@/features/tourhub/_shared/tokens';
 import { A, LABEL, KICKER, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -249,7 +244,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
                   }}
                 >
                   <span style={{ width: 22, display: 'inline-flex', justifyContent: 'center' }}>
-                    <Icon size={20} color={isActive ? '#FFFFFF' : A.INK} strokeWidth={isActive ? 2.4 : 2} />
+                    <Icon size={20} color={isActive ? A.CANVAS : A.INK} strokeWidth={isActive ? 2.4 : 2} />
                   </span>
                   <span style={{ flex: 1, minWidth: 0 }}>{t(labelKey)}</span>
                   {id === 'live' && liveCount > 0 && (
@@ -305,7 +300,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
           </div>
 
           {/* Secondary group header */}
-          <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
+          <div style={{ marginTop: 8, paddingTop: 12, borderTop: `1px solid ${A.BORDER}` }}>
             <div style={{ marginTop: 12 }}>
               <GroupHeader>{t('nav.group.account')}</GroupHeader>
             </div>
@@ -349,7 +344,7 @@ function LiveCountBadge({ count, onInk }: { count: number; onInk: boolean }) {
         style={{
           ...LABEL,
           fontSize: 8.5,
-          color: onInk ? 'rgba(255,255,255,0.72)' : A.DIM,
+          color: onInk ? 'rgba(21,23,31,0.72)' : A.DIM,
           ...FIGS,
         }}
       >
@@ -436,7 +431,7 @@ function LiveRow({
               fontSize: 15,
               fontWeight: 700,
               letterSpacing: '-0.02em',
-              color: getScoreColor(leaderToPar, 'light'),
+              color: getScoreColor(leaderToPar, 'dark'),
               ...FIGS,
             }}
           >
@@ -494,12 +489,12 @@ function SecondaryLink({
         fontFamily: 'inherit',
         fontSize: 14,
         fontWeight: 600,
-        color: INK_MUTE,
+        color: A.MUTE,
         cursor: 'pointer',
         textAlign: 'left',
       }}
     >
-      <Icon size={18} color={INK_MUTE} strokeWidth={2} />
+      <Icon size={18} color={A.MUTE} strokeWidth={2} />
       {label}
     </button>
   );
