@@ -29,7 +29,6 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { usePostSubmit, type SubmitResult } from './hooks/usePostSubmit';
 import { useDrafts } from './hooks/useDrafts';
-import { useRecentRoundCourses, formatRoundWhen } from './hooks/useRecentRoundCourses';
 import { useEditablePost } from '@/hooks/useEditablePost';
 import { startPostUpload } from './lib/postUploadController';
 
@@ -77,8 +76,6 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setCourses, setScheduledAt, restoreDraft, hydrate, reset } = composer;
   const { submit, submitting } = usePostSubmit();
   const drafts = useDrafts(profile?.id);
-  // Suggestion-first course tagging: the courses this member played most recently.
-  const recentCourses = useRecentRoundCourses(profile?.id ?? null).data ?? [];
   const queryClient = useQueryClient();
 
   const isEditMode = !!editPostId;
@@ -751,8 +748,6 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     </>
   );
 
-  // Suggestions still on offer: recent rounds minus anything already tagged.
-  const suggestedCourses = recentCourses.filter((c) => !state.courses.some((s) => s.id === c.id));
   const frameRatio: Record<string, string> = { original: '4 / 5', '4:5': '4 / 5', '1:1': '1 / 1', '9:16': '9 / 16' };
   const stageAspect = active ? (frameRatio[active.frame] ?? '4 / 5') : '4 / 5';
   const firstItem = state.media[0] ?? null;
@@ -1038,9 +1033,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               </button>
             </div>
 
-            {/* TAGGED = filled ink chip with a trailing ×. SUGGESTED = outlined
-                chip on the canvas with a leading +. Tapping converts in place. */}
-            {(state.courses.length > 0 || suggestedCourses.length > 0) && (
+            {/* Tagging is SEARCH-ONLY (MICRO_BRIEF_POST_WIZARD_FIELDS §4): the
+                recent-rounds suggestion chips are gone. Only a course the
+                member actually chose renders here, and it stays removable. */}
+            {state.courses.length > 0 && (
               <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
                 {state.courses.map((c) => (
                   <button
@@ -1053,21 +1049,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                     <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.85 }}>×</span>
                   </button>
                 ))}
-                {suggestedCourses.map((c) => (
-                  <button
-                    key={`suggested-${c.id}`}
-                    onClick={() => { openDetail('course'); setCourses([...state.courses, { id: c.id, name: c.name, country: c.country }]); }}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 5, border: `1px solid ${PAGE2.line}`, background: 'rgba(248,250,252,0.06)', borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: PAGE2.ink }}
-                  >
-                    <span style={{ fontWeight: 700, color: PAGE2.mute }}>+</span>
-                    {c.name}
-                    <span style={{ color: PAGE2.dim, fontWeight: 600 }}>· {formatRoundWhen(c.playDate)}</span>
-                  </button>
-                ))}
               </div>
-            )}
-            {suggestedCourses.length > 0 && (
-              <div style={{ fontSize: 10.5, color: PAGE2.dim, marginTop: 8 }}>From your recent rounds</div>
             )}
           </div>
         </div>
