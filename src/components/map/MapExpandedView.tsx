@@ -224,12 +224,12 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
       <SheetContent
         side="bottom"
         className="h-[75dvh] p-0 !rounded-t-2xl overflow-hidden flex flex-col immersive-map-sheet expanded-map-glass-controls"
-        style={{ background: '#FFFFFF' }}
+        style={{ background: '#1B1E27' }}
         hideCloseButton
       >
         {/* Grabber */}
         <div className="flex-none flex justify-center pt-2.5 pb-1">
-          <div style={{ width: 38, height: 4, borderRadius: 2, background: '#DDE2E8' }} aria-hidden="true" />
+          <div style={{ width: 38, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.20)' }} aria-hidden="true" />
         </div>
 
         {/* Header — kicker / title / place, no icon tile. Swipe down closes. */}
@@ -242,11 +242,11 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#0E1216' }}>
               {t('map.kicker')}
             </div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: '#0E1216', marginTop: 3, letterSpacing: '-0.01em' }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: '#F8FAFC', marginTop: 3, letterSpacing: '-0.01em' }}>
               {name}
             </div>
             {locationText && (
-              <div style={{ fontSize: 13, color: '#68707B', marginTop: 2 }}>{locationText}</div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.66)', marginTop: 2 }}>{locationText}</div>
             )}
           </div>
           <button
@@ -254,7 +254,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
             onClick={() => onOpenChange(false)}
             aria-label={t('map.close')}
             className="flex-none"
-            style={{ border: 'none', background: 'transparent', color: '#68707B', cursor: 'pointer', padding: 0, lineHeight: 1 }}
+            style={{ border: 'none', background: 'transparent', color: 'rgba(255,255,255,0.66)', cursor: 'pointer', padding: 0, lineHeight: 1 }}
           >
             <X className="h-5 w-5" />
           </button>
@@ -269,7 +269,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
         <div
           className="flex-none"
           style={{
-            borderTop: '1px solid #EDF0F3',
+            borderTop: '1px solid rgba(255,255,255,0.10)',
             paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           }}
         >
@@ -284,13 +284,13 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
                 background: 'transparent',
                 cursor: 'pointer',
                 padding: '15px 16px',
-                borderBottom: i === destinations.length - 1 ? 'none' : '1px solid #EDF0F3',
+                borderBottom: i === destinations.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.10)',
               }}
             >
-              <span style={{ fontSize: 14, fontWeight: 700, color: '#0E1216' }}>{d.label}</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: '#F8FAFC' }}>{d.label}</span>
               <span
                 aria-hidden="true"
-                style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.13em', color: '#0E1216' }}
+                style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.13em', color: 'rgba(255,255,255,0.66)' }}
               >
                 {'\u2197'}
               </span>
