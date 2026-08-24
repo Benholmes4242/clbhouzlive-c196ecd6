@@ -114,14 +114,30 @@ function TileMedia({
     return registerRailVideo(el, setActive);
   }, [mountVideo]);
 
+  // COUNTDOWN SOURCE. The listener lives INSIDE the play effect, so it exists
+  // only for the ONE elected tile that is actually playing — never an always-on
+  // per-tile listener in a rail. 'timeupdate' fires ~4x a second at irregular
+  // intervals, so the state update is GATED on the floored remaining integer
+  // changing: one re-render per displayed second, no stutter, no timer (the
+  // playhead is the source of truth through stalls and seeks).
+  const [elapsed, setElapsed] = useState<number | null>(null);
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !item.hlsUrl || !active) return;
     const attachment = attachTileHls(v, item.hlsUrl, () => setFailed(true));
     v.muted = true;
+    const onTime = () => {
+      const d = Number.isFinite(v.duration) ? v.duration : NaN;
+      if (!Number.isFinite(d) || d <= 0) return;
+      const remaining = Math.max(0, Math.floor(d - v.currentTime));
+      setElapsed((prev) => (prev === remaining ? prev : remaining));
+    };
+    v.addEventListener('timeupdate', onTime);
     const p = v.play();
     if (p && typeof p.catch === 'function') p.catch(() => setPlaying(false));
     return () => {
+      v.removeEventListener('timeupdate', onTime);
+      setElapsed(null);
       setPlaying(false);
       attachment.detach();
     };
