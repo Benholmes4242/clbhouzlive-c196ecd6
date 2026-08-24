@@ -29,7 +29,10 @@ import {
    it. Colours come from the shared manage vocabulary (itself derived from the
    analytical `A` ramp) and from BIZ for the amber wash. Add a colour here and
    the next audit is blind again. */
-import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, GREEN, DANGER as RED } from '@/components/manage/ui';
+/* GREEN is gone: its only two uses were band colours, now the canon's.
+   RED stays — it is DANGER, used by the 1000-char warning and the delete/error
+   blocks, a different quantity on a different scale. */
+import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, DANGER as RED } from '@/components/manage/ui';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { BIZ } from '@/components/business/businessTokens';
 import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
