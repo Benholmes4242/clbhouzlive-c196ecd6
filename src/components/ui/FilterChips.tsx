@@ -59,7 +59,7 @@ export function FilterChips<T extends string>({
         display: 'flex',
         gap: 8,
         overflowX: 'auto',
-        padding: '0 4px',
+        padding: '3px 4px',
         scrollbarWidth: 'none',
         WebkitOverflowScrolling: 'touch',
         fontFamily: FONT_FAMILY,
