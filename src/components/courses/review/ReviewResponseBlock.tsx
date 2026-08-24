@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { SquircleAvatar, LIGHT_HAIRLINE } from '@/components/ui/SquircleAvatar';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import {
   AlertDialog,
@@ -89,16 +89,16 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
     deleteMutation.mutate({ responseId: response.id });
   };
 
-  const INK = '#0F172A';
-  const INK_75 = 'rgba(15,23,42,0.75)';
-  const INK_40 = 'rgba(15,23,42,0.40)';
-  const HAIRLINE = 'rgba(15,23,42,0.07)';
+  const INK = 'rgba(255,255,255,0.96)';
+  const INK_75 = 'rgba(255,255,255,0.75)';
+  const INK_40 = 'rgba(255,255,255,0.62)';
+  const HAIRLINE = 'rgba(255,255,255,0.10)';
 
   return (
     <div
       style={{
         marginTop: 12,
-        background: 'rgba(15,23,42,0.035)',
+        background: 'rgba(255,255,255,0.04)',
         borderRadius: 14,
         padding: '12px 13px',
       }}
@@ -112,14 +112,14 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
             size={26}
             fallback={response.business_name.slice(0, 2).toUpperCase()}
             hairlineRing
-            ringColor={LIGHT_HAIRLINE}
+            ringColor={DARK_HAIRLINE}
           />
         ) : (
           <SquircleAvatar
             size={26}
             fallback={response.business_name.slice(0, 2).toUpperCase()}
             hairlineRing
-            ringColor={LIGHT_HAIRLINE}
+            ringColor={DARK_HAIRLINE}
           />
         )}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
@@ -146,7 +146,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
               fontSize: 8.5,
               fontWeight: 700,
               letterSpacing: '0.07em',
-              color: '#8A6400',
+              color: '#FBBF24',
               background: 'rgba(232,181,48,0.16)',
               border: '1px solid rgba(232,181,48,0.35)',
               borderRadius: 999,
@@ -219,7 +219,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
                     cursor: 'pointer',
                     fontSize: 11.5,
                     fontWeight: 600,
-                    color: 'rgba(210,34,45,0.85)',
+                    color: 'rgba(255,107,107,0.85)',
                     opacity: deleteMutation.isPending ? 0.5 : 1,
                   }}
                   aria-label={t('review.response.deleteA11y')}
@@ -327,11 +327,11 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
           flexDirection: 'column',
           width: '100%',
           minHeight: 44,
-          background: '#ffffff',
-          border: '0.5px solid rgba(15,23,42,0.08)',
+          background: 'rgba(255,255,255,0.04)',
+          border: '0.5px solid rgba(255,255,255,0.10)',
           borderRadius: 14,
           padding: '9px 10px',
-          boxShadow: '0 1px 3px rgba(15,23,42,0.03)',
+          boxShadow: 'none',
           cursor: 'pointer',
         }}
       >
@@ -343,14 +343,14 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
             alt={shortName}
             fallback={shortName.slice(0, 2).toUpperCase()}
             hairlineRing
-            ringColor={LIGHT_HAIRLINE}
+            ringColor={DARK_HAIRLINE}
           />
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
             <span
               style={{
                 fontSize: 12.5,
                 fontWeight: 500,
-                color: 'rgba(15,23,42,0.40)',
+                color: 'rgba(255,255,255,0.62)',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -368,7 +368,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
                 fontWeight: 700,
                 letterSpacing: '0.07em',
                 textTransform: 'uppercase',
-                color: '#8A6400',
+                color: '#FBBF24',
                 background: 'rgba(232,181,48,0.16)',
                 border: '1px solid rgba(232,181,48,0.35)',
                 borderRadius: 999,
@@ -449,7 +449,7 @@ export const VerifyToRespondPrompt: React.FC<VerifyToRespondPromptProps> = ({
           ns="courses"
           values={{ business: businessClaim.businessName }}
           components={{
-            1: <Link to={href} className="font-medium text-[#d97706] active:opacity-70" />,
+            1: <Link to={href} className="font-medium text-[#F7931E] active:opacity-70" />,
           }}
         />
       </p>
