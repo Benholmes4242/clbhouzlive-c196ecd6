@@ -5,6 +5,7 @@ import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 import { HINT_CLASS } from '@/components/manage/fieldTreatment';
 import { getFacilitiesForCategory } from './editorTypes';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   category: string;
@@ -42,11 +43,15 @@ export function FacilitiesSection({ category, amenities, setAmenities }: Props) 
                   className="inline-flex items-center gap-1.5 rounded-full text-[13px] font-medium transition-colors"
                   style={{
                     padding: '7px 12px',
-                    background: active ? 'rgba(247,147,30,0.10)' : '#fff',
+                    /*
+                      Inactive branch only (§5): a white slab became the 6%
+                      raised fill. The amber selected border is untouched.
+                    */
+                    background: active ? BIZ.amberTint : 'rgba(255,255,255,0.06)',
                     border: active
                       ? `1px solid ${BIZ.amber}`
-                      : '1px solid rgba(15,23,42,0.10)',
-                    color: active ? BIZ.amber : '#0F172A',
+                      : `1px solid ${A.BORDER}`,
+                    color: active ? BIZ.amber : A.BODY,
                   }}
                 >
                   {active && <Check size={13} strokeWidth={2.5} />}

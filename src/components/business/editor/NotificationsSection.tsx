@@ -106,7 +106,9 @@ export function NotificationsSection({ businessId }: Props) {
                   onClick={() => toggle(t.key)}
                   className="relative inline-flex h-[26px] w-[44px] flex-shrink-0 items-center rounded-full transition-colors"
                   style={{
-                    background: enabled ? '#0F172A' : 'rgba(15,23,42,0.18)',
+                    // Shipped dark switch track (settings/ui/SettingsToggleRow).
+                    // Both former branches were slate on a near-black canvas.
+                    background: enabled ? '#F8FAFC' : 'rgba(255,255,255,0.14)',
                     opacity: isSaving ? 0.6 : 1,
                   }}
                 >
