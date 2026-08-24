@@ -96,9 +96,9 @@ const SuggestEditModal: React.FC<SuggestEditModalProps> = ({
             <div key={field.fieldName}>
               <label className="text-sm font-medium text-foreground mb-1 block">{t(field.labelKey)}</label>
               {field.fieldName === 'description' ? (
-                <textarea value={field.newValue} onChange={(e) => updateField(i, e.target.value)} className="w-full min-h-[100px] p-3 text-sm bg-card border border-border rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border" maxLength={2500} />
+                <textarea value={field.newValue} onChange={(e) => updateField(i, e.target.value)} className="w-full min-h-[100px] p-3 text-sm bg-card border border-border/10 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border" maxLength={2500} />
               ) : (
-                <input type="text" value={field.newValue} onChange={(e) => updateField(i, e.target.value)} className="w-full h-11 px-3 text-sm bg-card border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-border" />
+                <input type="text" value={field.newValue} onChange={(e) => updateField(i, e.target.value)} className="w-full h-11 px-3 text-sm bg-card border border-border/10 rounded-lg focus:outline-none focus:ring-1 focus:ring-border" />
               )}
             </div>
           ))}

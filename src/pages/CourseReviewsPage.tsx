@@ -198,7 +198,7 @@ const CourseReviewsPage: React.FC = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as ReviewsSortBy)}
-              className="rounded-full border border-border bg-card/80 px-2 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-border/70"
+              className="rounded-full border border-border/10 bg-card/80 px-2 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-border/70"
             >
               <option value="recent">Most recent</option>
               <option value="highest">Highest rating</option>

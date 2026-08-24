@@ -37,7 +37,7 @@ export const ProfileHeaderSkeleton = () => {
 export const ProfileTabsSkeleton = () => {
   return (
     <div className="space-y-4">
-      <div className="border-b border-border">
+      <div className="border-b border-border/10">
         <div className="flex gap-6 px-6">
           {['Activity', 'Courses', 'Stats'].map((tab) => (
             <Skeleton key={tab} className="h-10 w-20" />

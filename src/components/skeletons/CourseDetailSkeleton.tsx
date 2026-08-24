@@ -35,7 +35,7 @@ export const CourseDetailSkeleton = () => {
       </div>
       
       {/* Tabs skeleton */}
-      <div className="sticky top-14 z-10 bg-background/95 backdrop-blur-md border-b border-border">
+      <div className="sticky top-14 z-10 bg-background/95 backdrop-blur-md border-b border-border/10">
         <div className="flex gap-4 px-6 py-3">
           {['About', 'Reviews', 'Media'].map((label) => (
             <Skeleton key={label} className="h-6 w-16" />

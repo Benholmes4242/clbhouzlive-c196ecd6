@@ -178,7 +178,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 />
               ))}
               {friendsMeta.count > 3 && (
-                <div className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-muted/80 text-meta text-muted-foreground pointer-events-none">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full border border-border/10 bg-muted/80 text-meta text-muted-foreground pointer-events-none">
                   +{friendsMeta.count - 3}
                 </div>
               )}
@@ -299,7 +299,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   <div className="flex flex-wrap gap-2">
                     {/* Average rating badge */}
                     {course.average_rating && (
-                      <div className="bg-muted border-border text-foreground text-meta font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                      <div className="bg-muted border-border/10 text-foreground text-meta font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                         {t('card.avgRating', { rating: course.average_rating })}
                       </div>
                     )}

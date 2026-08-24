@@ -20,7 +20,7 @@ export const EliteGameCardSkeleton: React.FC<EliteGameCardSkeletonProps> = ({
     return (
       <div 
         className={cn(
-          "flex flex-col items-center justify-center p-3 rounded-xl border border-border bg-card",
+          "flex flex-col items-center justify-center p-3 rounded-xl border border-border/10 bg-card",
           className
         )}
         style={{ minHeight: '90px' }}
@@ -35,7 +35,7 @@ export const EliteGameCardSkeleton: React.FC<EliteGameCardSkeletonProps> = ({
   return (
     <div 
       className={cn(
-        "flex items-center gap-4 p-4 rounded-2xl border border-border bg-card",
+        "flex items-center gap-4 p-4 rounded-2xl border border-border/10 bg-card",
         className
       )}
     >

@@ -238,7 +238,7 @@ export function BusinessCommandCard({
                   <MoreHorizontal className="h-5 w-5" style={{ color: BIZ.inkMute }} />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border-border">
+              <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border-border/10">
                 <DropdownMenuItem
                   onClick={(e) => { e.stopPropagation(); navigate(`/business/${business.id}`); }}
                   className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"

@@ -87,7 +87,7 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
 
       {open && (
         <div
-          className="absolute left-0 right-0 z-50 border border-border rounded-[12px] shadow-xl overflow-hidden"
+          className="absolute left-0 right-0 z-50 border border-border/10 rounded-[12px] shadow-xl overflow-hidden"
           style={{ top: 'calc(100% + 6px)', maxHeight: 280, background: '#FFFFFF' }}
         >
           <div className="p-2 border-b border-border/60">
@@ -220,7 +220,7 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
 
       {open && results.length > 0 && (
         <div
-          className="absolute left-0 right-0 z-50 border border-border rounded-[12px] shadow-xl overflow-hidden"
+          className="absolute left-0 right-0 z-50 border border-border/10 rounded-[12px] shadow-xl overflow-hidden"
           style={{ top: 'calc(100% + 6px)', background: '#FFFFFF' }}
         >
           {results.map(city => (

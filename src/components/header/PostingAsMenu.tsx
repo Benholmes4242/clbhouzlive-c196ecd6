@@ -352,7 +352,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
                       "transition-all duration-150 active:scale-[0.98]",
                       useLightTheme 
                         ? isActive 
-                          ? "bg-muted border border-border" 
+                          ? "bg-muted border border-border/10" 
                           : "hover:bg-muted/50 border border-transparent"
                         : isActive 
                           ? "bg-white/10 border border-white/12" 

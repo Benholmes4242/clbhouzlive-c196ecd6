@@ -33,7 +33,7 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
   if (!hasValidCoords) {
     if (showOwnerPrompt) {
       return (
-        <div className="p-4 rounded-sq-md bg-muted border border-border">
+        <div className="p-4 rounded-sq-md bg-muted border border-border/10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-sq-sm bg-secondary flex items-center justify-center">
               <MapPin className="h-5 w-5 text-muted-foreground" />

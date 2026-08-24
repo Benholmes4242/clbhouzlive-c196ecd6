@@ -436,9 +436,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
       {/* Course list */}
       {tieAnnotated.length === 0 ? (
-        <div className="bg-card rounded-2xl border border-border p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)] mt-3">
+        <div className="bg-card rounded-2xl border border-border/10 p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)] mt-3">
           <div className="flex flex-col items-center justify-center text-center">
-            <div className="w-14 h-14 rounded-full bg-muted border border-border flex items-center justify-center mb-4">
+            <div className="w-14 h-14 rounded-full bg-muted border border-border/10 flex items-center justify-center mb-4">
               <ClipboardList className="w-6 h-6 text-muted-foreground" />
             </div>
             <h3 className="text-base font-semibold text-foreground mb-1">

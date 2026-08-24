@@ -235,7 +235,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value.slice(0, 1000))}
-            className="w-full min-h-[80px] p-3 text-sm bg-card border border-border rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border placeholder:text-muted-foreground"
+            className="w-full min-h-[80px] p-3 text-sm bg-card border border-border/10 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border placeholder:text-muted-foreground"
             maxLength={1000}
           />
           <div className="flex items-center justify-between mt-2">
@@ -394,12 +394,12 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
   };
 
   return (
-    <div className="ml-4 mt-3 pl-4 border-l-2 border-border">
+    <div className="ml-4 mt-3 pl-4 border-l-2 border-border/10">
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value.slice(0, 1000))}
         placeholder={t('review.response.replyPlaceholder', { business: businessClaim.businessName })}
-        className="w-full min-h-[80px] p-3 text-sm bg-card border border-border rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border placeholder:text-muted-foreground"
+        className="w-full min-h-[80px] p-3 text-sm bg-card border border-border/10 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-border placeholder:text-muted-foreground"
         maxLength={1000}
       />
       <div className="flex items-center justify-between mt-2">
@@ -442,7 +442,7 @@ export const VerifyToRespondPrompt: React.FC<VerifyToRespondPromptProps> = ({
     : `/business/${businessClaim.businessId}/verification`;
 
   return (
-    <div className="ml-4 mt-2 pl-4 border-l-2 border-border">
+    <div className="ml-4 mt-2 pl-4 border-l-2 border-border/10">
       <p className="text-xs text-muted-foreground">
         <Trans
           i18nKey="review.response.verifyPrompt"

@@ -32,7 +32,7 @@ export const LearningCollectionCard: React.FC<LearningCollectionCardProps> = ({
       onClick={() => onClick?.(collection.id)}
       className={cn(
         "w-full text-left p-4 rounded-xl border border-border/60 bg-card/80",
-        "hover:bg-card hover:border-border transition-all duration-200",
+        "hover:bg-card hover:border-border/10 transition-all duration-200",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         "group",
         className

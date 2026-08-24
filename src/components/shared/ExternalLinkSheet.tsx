@@ -56,7 +56,7 @@ export const ExternalLinkSheet: React.FC<ExternalLinkSheetProps> = ({
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl bg-background border-t border-border px-0 pb-8"
+        className="rounded-t-3xl bg-background border-t border-border/10 px-0 pb-8"
       >
         {/* Grabber Handle */}
         <div className="flex justify-center pt-2 pb-4">

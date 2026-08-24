@@ -85,7 +85,7 @@ const BusinessDirectoryPage = () => {
 
       <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
         {/* CTA Banner */}
-        <div className="flex items-center justify-between p-4 rounded-sq-md bg-muted/50 border border-border">
+        <div className="flex items-center justify-between p-4 rounded-sq-md bg-muted/50 border border-border/10">
           <div>
             <h2 className="font-medium text-foreground">
               {hasBusinesses ? 'Manage your business profiles' : 'List your golf business on clbhouz'}
