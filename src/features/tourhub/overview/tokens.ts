@@ -1,58 +1,76 @@
 /**
- * Overview V4 shared tokens — LIGHT canvas, editorial dispatch aesthetic.
+ * Overview V4 shared tokens — DARK canvas, editorial dispatch aesthetic.
  * Spec ref: Brief O2.1 shared anatomy.
+ *
+ * READ THE VALUE, NOT THE NAME. These keys were named for a light surface
+ * ("surface" was white, "ink" was near-black, "hairline" was black-alpha) and
+ * they are deliberately NOT renamed: ten importers across the overview tree
+ * read them, and a rename would be a churn pass with no visual outcome. The
+ * names are historical; the values are the dark ramp.
+ *
+ * Alphas LIFT rather than mirror — light-on-dark needs more separation than
+ * dark-on-light, which is why `hairline` is 0.14 and not 0.10.
+ *
+ * Tints are tints OF THEIR OWN HUE (hit/miss, gold, violet), never pale
+ * pastels: a washed-out saturated hue reads as failed on a dark canvas.
  */
 
 export const V4 = {
   // Canvas
-  bg: '#F8FAFC',
-  surface: '#FFFFFF',
-  cardBorder: 'rgba(0,0,0,0.07)',
-  cardShadow: '0 2px 10px rgba(31,36,40,0.05)',
+  // NON-MERGE: #15171F is also CHARCOAL and SLATE_50 in
+  // features/tourhub/_shared/tokens.ts. Three names, one value, three
+  // reasons — see the two existing notes there. Deliberately not converged.
+  bg: '#15171F',
+  surface: '#1B1E27',
+  cardBorder: 'rgba(255,255,255,0.10)',
+  // A card on dark is separated by its surface step and its hairline. A drop
+  // shadow only adds a smudge — if a card reads flat, raise `surface`.
+  cardShadow: 'none',
   cardRadius: 18,
 
   // Ink
-  ink: '#0F172A',
-  inkSoft: '#3C4351',
-  inkMute: '#5B6572',
-  inkFaint: '#8A9099',
-  slate: '#94A3B8',
-  hairline: 'rgba(15,23,42,0.10)',
+  ink: '#F8FAFC',
+  inkSoft: 'rgba(248,250,252,0.72)',
+  inkMute: 'rgba(248,250,252,0.62)',
+  inkFaint: 'rgba(248,250,252,0.42)',
+  slate: 'rgba(248,250,252,0.42)',
+  hairline: 'rgba(255,255,255,0.14)',
 
-  // Accents
+  // Accents — amber means the viewing member; amberDeep doubles as the
+  // MAJORS GOLD (see holes/_constants.ts). Never repointed.
   amber: '#F7931E',
   amberSoft: 'rgba(247,147,30,0.12)',
   amberDeep: '#B36B00',
 
-  // Gold family (majors)
+  // Gold family (majors) — celebration identity, held.
   gold: '#F5D061',
   goldMid: '#C9A227',
   goldDeep: '#8A6A00',
-  goldSoftA: '#FFF4DB',
-  goldSoftB: '#FDE9B8',
+  goldSoftA: 'rgba(245,208,97,0.14)',
+  goldSoftB: 'rgba(245,208,97,0.22)',
 
-  // Playoffs (violet)
+  // Playoffs (violet) — identity held, tint repointed.
   violet: '#5E4DA8',
-  violetSoft: '#EDEAF7',
+  violetSoft: 'rgba(94,77,168,0.22)',
 
   // Score colours resolve through the canonical getScoreColor helper
   // (features/tourhub/_shared/scoreColor). Even/null stays here for
   // muted-neutral fallbacks used by non-score numeric surfaces.
-  scoreEven: '#8A9099',
+  scoreEven: 'rgba(248,250,252,0.42)',
 
 
   // Live
-  live: '#22C55E',
+  live: '#5EE9A6',
 
   // Movement
-  up: '#189A55',
-  down: '#C24A4A',
+  up: '#34D77F',
+  down: '#FF6B60',
 
   // Hit / Miss
-  hitBg: '#E2F4E9',
-  hitFg: '#155E38',
-  missBg: '#F9E7E7',
-  missFg: '#8A3B3B',
+  hitBg: 'rgba(52,215,127,0.14)',
+  hitFg: '#34D77F',
+  missBg: 'rgba(255,107,96,0.14)',
+  missFg: '#FF6B60',
 } as const;
 
 // Match course-details hero height (full-viewport-under-safe-area).
