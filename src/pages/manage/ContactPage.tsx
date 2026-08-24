@@ -93,7 +93,7 @@ export default function ContactPage() {
             style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
           >
             <div className="flex justify-center mb-3">
-              <CheckCircle2 size={40} style={{ color: '#2F6B4F' }} />
+              <CheckCircle2 size={40} style={{ color: A.GREEN }} />
             </div>
             <h3 className="text-[17px] font-semibold mb-1" style={{ color: A.INK }}>
               Request received
@@ -217,8 +217,11 @@ export default function ContactPage() {
           type="button"
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="w-full min-h-[48px] rounded-2xl text-[15px] font-semibold transition-opacity"
-          style={{ background: A.INK, color: A.CANVAS, opacity: canSubmit ? 1 : 0.5 }}
+          className="w-full min-h-[48px] rounded-2xl text-[15px] font-semibold"
+          style={{
+            background: canSubmit ? A.INK : 'rgba(255,255,255,0.14)',
+            color: canSubmit ? A.CANVAS : A.DIM,
+          }}
         >
           {submitting ? 'Sending...' : 'Send request'}
         </button>
