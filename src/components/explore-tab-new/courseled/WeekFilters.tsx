@@ -9,7 +9,8 @@ import {
   SelectLabel,
   SelectTrigger,
 } from '@/components/ui/select';
-import { A, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, SCOPE_PILL_RADIUS } from './tokens';
+import { A, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS } from './tokens';
+import { PillFilterRow } from './PillFilterRow';
 import { WEEK_SCOPES, type WeekScope } from './hooks/useGolfThisWeek';
 import type { RegionSelection, WeekRegions } from './hooks/useWeekRegionCounts';
 
@@ -38,46 +39,16 @@ export function WeekScopePills({
 }) {
   const { t } = useTranslation('courses');
   return (
-    <div
-      role="tablist"
-      aria-label={t('discover.week.scopeAria', 'Rounds scope')}
-      className="scrollbar-hide"
-      style={{
-        display: 'flex',
-        gap: 8,
-        overflowX: 'auto',
-        minWidth: 0,
-        ...style,
-      }}
-    >
-      {WEEK_SCOPES.map((id) => {
-        const active = id === scope;
-        return (
-          <button
-            key={id}
-            type="button"
-            role="tab"
-            aria-selected={active}
-            onClick={() => onChange(id)}
-            style={{
-              flex: 'none',
-              border: `1px solid ${active ? A.INK : A.BORDER}`,
-              background: active ? A.INK : A.PANEL,
-              color: active ? A.PANEL : A.INK,
-              borderRadius: SCOPE_PILL_RADIUS,
-              padding: '8px 14px',
-              fontSize: 12.5,
-              fontWeight: 700,
-              fontFamily: SANS,
-              whiteSpace: 'nowrap',
-              cursor: 'pointer',
-            }}
-          >
-            {t(scopeLabelKey(id).key, scopeLabelKey(id).fallback)}
-          </button>
-        );
-      })}
-    </div>
+    <PillFilterRow
+      value={scope}
+      onChange={onChange}
+      ariaLabel={t('discover.week.scopeAria', 'Rounds scope')}
+      style={style}
+      options={WEEK_SCOPES.map((id) => ({
+        value: id,
+        label: t(scopeLabelKey(id).key, scopeLabelKey(id).fallback),
+      }))}
+    />
   );
 }
 

@@ -117,6 +117,10 @@ import { useMostPlayedThisWeek, type MostPlayedPlayer, type MostPlayedRow } from
  *
  * The "This week on clbhouz" pulse band from the signed-off mock is REMOVED per
  * the brief and must not be reinstated.
+ *
+ * A FILTER GOVERNS WHAT IS BELOW IT AND NOTHING ELSE. The scope pills govern
+ * act one's data. The media chips govern the media sections beneath them. NO
+ * CONTROL ON THIS PAGE MAY EVER REACH BACKWARDS PAST ITSELF.
  */
 
 /**
@@ -469,26 +473,27 @@ export default function ExploreTabContent({
             and unscoped, so it sits on the join without lying about which side it
             is on. It stays ABOVE the media bar because a chip row that heads it
             would imply the honours board is a media type.
-            IT IS ALSO ACT ONE'S LAST SECTION now that the seam is functional, so
-            it is hidden while a media type is selected: a filtered library is not
-            a place for an all-time board. */}
-        {mediaChip === 'all' && (
-          <HonoursBoard
-            events={honours}
-            isPending={wireLoading}
-            onRowPress={handleHonoursRow}
-            limit={20}
-            onSeeAll={openHonoursSheet}
-          />
-        )}
+            It is structurally outside the media-controlled subtree below. */}
+        <HonoursBoard
+          events={honours}
+          isPending={wireLoading}
+          onRowPress={handleHonoursRow}
+          limit={20}
+          onSeeAll={openHonoursSheet}
+        />
 
         {/* THE CHAPTER BREAK IS NOW A CONTROL (§4). ActSeam is deleted: a
             decorative rule with a caption that had to explain itself is a rule
             that failed. ACT_GAP above and below, so the break reads as a break
             rather than as another section. */}
-        <div style={{ marginTop: ACT_GAP - RHYTHM, marginBottom: ACT_GAP - RHYTHM - CHIP_GAP }}>
+        <div style={{ marginTop: ACT_GAP - RHYTHM, marginBottom: ACT_GAP - RHYTHM }}>
           <MediaActBar chip={mediaChip} onChipChange={changeChip} />
         </div>
+
+        {/* MEDIA-CONTROLLED SUBTREE. This starts after the chips and search; the
+            honours board is a preceding sibling and cannot be reached by this
+            state boundary. display:contents preserves the established rhythm. */}
+        <div data-media-filter-scope={mediaChip} style={{ display: 'contents' }}>
 
         {/* 7 — PHOTOS lead the media (§1.2 reasoning above). On 'Everything' this
             is a 12-tile sample whose see-all SWITCHES THE CHIP instead of
@@ -587,6 +592,7 @@ export default function ExploreTabContent({
             embedded
           />
         )}
+        </div>
 
 
         {/* From the community was removed from Discover deliberately. Discover

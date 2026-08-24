@@ -1,7 +1,8 @@
 import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { A, CHIP_GAP, DISCOVER_FACT, DISCOVER_QUIET, SANS, WELL_RADIUS } from './tokens';
+import { A, CHIP_GAP, DISCOVER_QUIET, WELL_RADIUS } from './tokens';
+import { PillFilterRow } from './PillFilterRow';
 
 /**
  * THE MEDIA ACT'S HEAD, AND THE PAGE'S ONE CHAPTER BREAK
@@ -20,24 +21,21 @@ import { A, CHIP_GAP, DISCOVER_FACT, DISCOVER_QUIET, SANS, WELL_RADIUS } from '.
  * row's authority ended.
  *
  * =====================================================================
- * THE CHIPS ARE NOT THE SCOPE PILLS, AND MUST NOT BECOME THEM (§4.5).
+ * THE MEDIA CHIPS MATCH THE SCOPE PILLS (MICRO_BRIEF_MEDIA_CHIPS_SCOPE §3).
  *
- *   scope pills   FILLED BOXES — 1px border, panel or ink ground, 8px radius,
- *                 12.5/700. A pill is a solid object you switch between.
- *   media chips   TEXT ONLY — no ground, no border, no radius; the active one is
- *                 white and carries a 2px rule beneath it, the rest are quiet.
+ * BRIEF_DISCOVER_ONE_PAGE §4.5 is withdrawn. Both rows use PillFilterRow so they
+ * are pixel-identical and cannot drift. Their different positions — and this
+ * row's search control beneath it — communicate their separate scopes.
  *
- * That is the app-wide tab/filter-row treatment, and the difference is
- * structural rather than a recolour: one control family is filled, the other is
- * a run of words with a rule under the live one. If anyone later gives these a
- * ground, the two rows become indistinguishable and this whole arrangement
- * stops working.
+ * A FILTER GOVERNS WHAT IS BELOW IT AND NOTHING ELSE. The scope pills govern
+ * act one's data. The media chips govern the media sections beneath them. NO
+ * CONTROL ON THIS PAGE MAY EVER REACH BACKWARDS PAST ITSELF.
  *
  * =====================================================================
  * THE SEARCH DEFERS TO THE GLOBAL SEARCH, IT DOES NOT COMPETE WITH IT (§4.3).
  *
  * The chrome island's glyph already opens SearchOverlayV2, which searches
- * members AND courses (plus clubs, tour players, videos, posts) with recents and
+ * members and courses plus clubs, tour players, videos and posts with recents and
  * scope chips. So this bar is a TAP TARGET FOR THAT OVERLAY — it dispatches the
  * same `clbhouz:open-search` event the island listens for. NO SECOND SEARCH
  * INPUT, no second query hook, no second result vocabulary. PlayerSearchSheet
@@ -77,8 +75,17 @@ export function MediaActBar({
     }
   };
 
+  const options = MEDIA_CHIPS.map((id) => ({ value: id, label: label(id) }));
+
   return (
-    <div style={{ fontFamily: SANS }}>
+    <div>
+      <PillFilterRow
+        value={chip}
+        options={options}
+        onChange={onChipChange}
+        ariaLabel={t('discover.media.chipsAria', 'Media type')}
+      />
+
       <button
         type="button"
         onClick={openGlobalSearch}
@@ -92,61 +99,18 @@ export function MediaActBar({
           background: A.PANEL,
           border: `1px solid ${A.BORDER}`,
           color: DISCOVER_QUIET,
-          fontFamily: SANS,
           fontSize: 13,
           fontWeight: 600,
           textAlign: 'left',
           cursor: 'pointer',
+          marginTop: CHIP_GAP,
         }}
       >
         <Search size={15} color={DISCOVER_QUIET} strokeWidth={2.4} aria-hidden />
         <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {t('discover.media.searchPlaceholder', 'Search members and courses')}
+          {t('discover.media.searchPlaceholder', 'Search people, courses, clubs and posts')}
         </span>
       </button>
-
-      <div
-        role="tablist"
-        aria-label={t('discover.media.chipsAria', 'Media type')}
-        className="scrollbar-hide"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 18,
-          overflowX: 'auto',
-          marginTop: 12,
-          marginBottom: CHIP_GAP,
-          minWidth: 0,
-        }}
-      >
-        {MEDIA_CHIPS.map((id) => {
-          const active = id === chip;
-          return (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              onClick={() => onChipChange(id)}
-              style={{
-                flex: 'none',
-                background: 'transparent',
-                border: 'none',
-                padding: '2px 0 5px',
-                borderBottom: `2px solid ${active ? DISCOVER_FACT : 'transparent'}`,
-                color: active ? DISCOVER_FACT : DISCOVER_QUIET,
-                fontFamily: SANS,
-                fontSize: 12.5,
-                fontWeight: active ? 700 : 600,
-                whiteSpace: 'nowrap',
-                cursor: 'pointer',
-              }}
-            >
-              {label(id)}
-            </button>
-          );
-        })}
-      </div>
     </div>
   );
 }
