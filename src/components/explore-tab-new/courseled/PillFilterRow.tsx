@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { A, SANS, SCOPE_PILL_RADIUS } from './tokens';
+import { A, SCOPE_PILL_RADIUS } from './tokens';
 
 export interface PillFilterOption<T extends string> {
   value: T;
@@ -57,7 +57,6 @@ export function PillFilterRow<T extends string>({
               padding: '8px 14px',
               fontSize: 12.5,
               fontWeight: 700,
-              fontFamily: SANS,
               whiteSpace: 'nowrap',
               cursor: 'pointer',
             }}
