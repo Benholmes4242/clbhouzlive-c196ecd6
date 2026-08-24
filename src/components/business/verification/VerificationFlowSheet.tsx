@@ -602,7 +602,7 @@ export default function VerificationFlowSheet({
           className="sticky top-0 z-10 shrink-0"
           style={{
             background: BIZ.pageBg,
-            borderBottom: '1px solid rgba(15,23,42,0.08)',
+            borderBottom: `1px solid ${HAIR}`,
             paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)',
           }}
         >
@@ -614,13 +614,13 @@ export default function VerificationFlowSheet({
               }}
               style={{
                 width: 32, height: 32, borderRadius: '50%',
-                background: '#fff', border: '1px solid rgba(15,23,42,0.10)',
+                background: BIZ.fill, border: `1px solid ${BIZ.hair}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0, cursor: 'pointer',
               }}
               aria-label={safeIndex > 0 ? 'Back' : 'Close'}
             >
-              <ChevronLeft size={18} strokeWidth={2.5} style={{ color: '#0F172A' }} />
+              <ChevronLeft size={18} strokeWidth={2.5} style={{ color: A.INK }} />
             </button>
             <h2 style={{ fontFamily: SF_STACK, fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', color: INK, lineHeight: 1, margin: 0 }}>
               {showDomainMode ? 'Verify domain' : 'Get verified'}
@@ -720,7 +720,7 @@ export default function VerificationFlowSheet({
                                   border: on ? 'none' : `1.5px solid ${INK_30}`,
                                 }}
                               >
-                                {on && <Check size={11} strokeWidth={3} style={{ color: '#FFFFFF' }} />}
+                                {on && <Check size={11} strokeWidth={3} style={{ color: A.CANVAS }} />}
                               </span>
                               <span className="flex-1 min-w-0">
                                 <span
@@ -889,7 +889,9 @@ export default function VerificationFlowSheet({
                             size="sm"
                             onClick={handleVerifyOtp}
                             disabled={otpCode.length !== 6 || verifyCode.isPending}
-                            style={{ background: BIZ.ink, color: '#fff' }}
+                            /* INK fill takes a CANVAS label; white-on-white
+                               after BIZ.ink was re-pointed to A.INK. */
+                            style={{ background: BIZ.ink, color: A.CANVAS }}
                           >
                             {verifyCode.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Verify'}
                           </Button>
@@ -1247,7 +1249,9 @@ export default function VerificationFlowSheet({
                 className="flex-1 h-12 border-0 text-[15px]"
                 style={{
                   background: isLast && !evidencedBar.met ? 'transparent' : INK,
-                  color: isLast && !evidencedBar.met ? INK : '#FFFFFF',
+                  /* Filled branch only: an INK fill takes a CANVAS label. The
+                     transparent branch keeps INK ink and is correct. */
+                  color: isLast && !evidencedBar.met ? INK : A.CANVAS,
                   border: isLast && !evidencedBar.met ? `1px solid ${HAIR}` : 'none',
                   borderRadius: BIZ.rInner,
                   fontWeight: isLast && !evidencedBar.met ? 400 : 600,
@@ -1282,7 +1286,7 @@ const SectionCard = React.forwardRef<
     <div
       ref={ref}
       className="rounded-[14px] p-4"
-      style={{ background: '#ffffff', border: `1px solid ${HAIR}` }}
+      style={{ background: BIZ.card, border: `1px solid ${HAIR}` }}
     >
       <div className="flex items-baseline gap-2.5 mb-3">
         <span
@@ -1433,8 +1437,8 @@ function ConfirmationView({
       <div className="mt-8">
         <Button
           onClick={onDone}
-          className="w-full h-11 text-white border-0"
-          style={{ background: BIZ.ink, borderRadius: BIZ.rInner }}
+          className="w-full h-11 border-0"
+          style={{ background: BIZ.ink, borderRadius: BIZ.rInner, color: A.CANVAS }}
         >
           Done
         </Button>
