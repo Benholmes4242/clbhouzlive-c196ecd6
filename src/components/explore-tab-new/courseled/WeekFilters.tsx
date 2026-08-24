@@ -128,9 +128,12 @@ export function RegionDropdown({
           onChange({ kind: kind as RegionSelection['kind'], value: rest.join(':') });
         }}
       >
-        {/* A QUIET INLINE CONTROL, NOT A FIELD (§S1.3): no border, no
-            background, no padding box. And NO COUNT (§S1.2) — the readout to
-            its left already states how many rounds are rendered.
+        {/* A FILLED WELL CONTROL, NOT A QUIET INLINE LABEL (§S1.3 OVERTURNED):
+            the control sits directly above WeekScopePills, which renders a
+            filled bordered pill at PillFilterRow.tsx:50-53. Both are filters on
+            the same section, 12px apart, and only one of them looked tappable.
+            Quiet was the right instinct for a control paired with prose; it
+            stopped being right once a boxed control landed underneath it.
 
             WHY THE FIRST ATTEMPT DID NOT LAND (CORRECTION §S1.4): shadcn's
             SelectTrigger base class carries TWO rules that beat a child's own
@@ -146,14 +149,30 @@ export function RegionDropdown({
             three children of ONE inline flex line, 4px apart, sharing a
             baseline — no absolute positioning, no marginLeft auto. */}
         <SelectTrigger
-          className="inline-flex h-auto w-auto justify-start gap-0 whitespace-nowrap border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
-          style={{ color: DISCOVER_QUIET, fontFamily: SANS, padding: '4px 0' }}
+          className="inline-flex h-auto w-auto justify-start whitespace-nowrap border-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
+          style={{
+            background: selection ? 'rgba(255,255,255,0.14)' : A.PANEL,
+            border: `1px solid ${A.BORDER}`,
+            borderRadius: SCOPE_PILL_RADIUS,
+            padding: '8px 12px',
+            fontFamily: SANS,
+            color: selection ? DISCOVER_FACT : DISCOVER_QUIET,
+          }}
           aria-label={t('discover.week.selectRegionA11y', 'Filter rounds by area')}
         >
           <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
-            <MapPin size={12} strokeWidth={2.4} style={{ color: DISCOVER_QUIET, flex: 'none' }} />
+            <MapPin
+              size={12}
+              strokeWidth={2.4}
+              style={{ color: selection ? DISCOVER_FACT : DISCOVER_QUIET, flex: 'none' }}
+            />
             <span
-              style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.01em', color: DISCOVER_QUIET }}
+              style={{
+                fontSize: 12.5,
+                fontWeight: 700,
+                letterSpacing: '-0.01em',
+                color: selection ? DISCOVER_FACT : DISCOVER_QUIET,
+              }}
             >
               {triggerLabel}
             </span>
