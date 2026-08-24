@@ -339,7 +339,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                 fontSize: 20,
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
-                color: '#0F172A',
+                color: INK,
                 lineHeight: 1.2,
               }}
             >
@@ -351,7 +351,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             style={{
               fontSize: 11.5,
               fontWeight: 500,
-              color: 'rgba(15,23,42,0.55)',
+              color: INK_MUTE,
               lineHeight: 1.45,
               maxWidth: 330,
               marginTop: 6,
@@ -374,9 +374,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           style={{
             top: 'var(--sat, 0px)',
             zIndex: 10,
-            background: 'rgba(248,250,252,0.72)',
-            backdropFilter: 'blur(14px)',
-            WebkitBackdropFilter: 'blur(14px)',
+            background: 'var(--glass-bg)',
+            backdropFilter: 'blur(var(--glass-blur))',
+            WebkitBackdropFilter: 'blur(var(--glass-blur))',
             padding: '4px 0 6px',
             marginTop: -1,
           }}
