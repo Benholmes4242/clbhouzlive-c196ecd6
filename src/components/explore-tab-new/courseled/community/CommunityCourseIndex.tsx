@@ -35,7 +35,8 @@ const CARD_W = 118;
 interface Props {
   items: CommunityLibraryItem[];
   title: string;
-  subline: string;
+  /** Optional: Discover dropped section sublines (BRIEF_DISCOVER_ONE_PAGE §5). */
+  subline?: string;
   countLabel: (n: number) => string;
   /** Discover is dark. Default light = /community, unchanged. */
   tone?: 'light' | 'dark';
@@ -94,7 +95,7 @@ export function CommunityCourseIndex({
           gutter. Rendered bare it looks pushed left, so this page supplies the
           16px itself and the icon lands on the first tile's left edge. */}
       <div style={{ padding: embedded ? 0 : '0 14px' }}>
-        <Eyebrow subline={subline}>
+        <Eyebrow subline={subline || undefined}>
           {title}
         </Eyebrow>
       </div>

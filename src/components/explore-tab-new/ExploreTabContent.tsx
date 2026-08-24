@@ -44,6 +44,7 @@ import { CommunityCourseIndex } from './courseled/community/CommunityCourseIndex
 import { CommunityClipMosaic } from './courseled/community/CommunityClipMosaic';
 import { CommunityVideoRow } from './courseled/community/CommunityVideoRow';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { mediaTarget } from '@/utils/mediaEngagement';
 import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
 import { MostPlayedSheet } from './courseled/MostPlayedSheet';
 
@@ -131,8 +132,11 @@ import { useMostPlayedThisWeek, type MostPlayedPlayer, type MostPlayedRow } from
  * instead of navigating.
  */
 const PHOTOS_SAMPLE = 12;
-/** Full-pool reveal steps. The pool is already in memory; this is mount count. */
-const PHOTO_STEP = 30;
+/**
+ * The clip reveal step. Photos do not have one here: CommunityPhotoMosaic owns
+ * its own STEP internally, because it fills two columns by index and a wrapper
+ * slicing the pool would fight it.
+ */
 const CLIP_STEP = 24;
 
 interface ExploreTabContentProps {
@@ -510,7 +514,6 @@ export default function ExploreTabContent({
                 items={photosShown}
                 onPress={handlePhoto}
                 infinite={mediaChip === 'photos'}
-                step={PHOTO_STEP}
                 tone="dark"
                 surface="discover"
               />
