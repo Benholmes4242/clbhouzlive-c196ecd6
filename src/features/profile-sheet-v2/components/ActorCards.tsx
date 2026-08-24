@@ -125,16 +125,19 @@ export default function ActorCards({
                 width: 220,
                 background: A.PANEL,
                 borderRadius: 16,
-                padding: active ? 13 : 14,
+                padding: 14,
                 display: 'flex',
                 flexDirection: 'row',
                 gap: 12,
                 alignItems: 'center',
                 cursor: active ? 'default' : 'pointer',
-                // 2px INK when selected; the padding above compensates so the
-                // cards never shift as selection moves.
+                // One border weight in both states — the selected card carries
+                // the canonical active field border (1px at 28% white) and the
+                // inactive card A.BORDER. Because both are 1px there is nothing
+                // to compensate for, so padding is a constant 14 and the cards
+                // never shift as selection moves.
                 border: active
-                  ? `2px solid ${A.INK}`
+                  ? '1px solid rgba(255,255,255,0.28)'
                   : `1px solid ${A.BORDER}`,
                 opacity: switchingId === p.id ? 0.55 : 1,
                 transition: 'opacity 120ms ease',

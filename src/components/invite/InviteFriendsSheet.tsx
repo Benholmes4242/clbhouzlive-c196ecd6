@@ -147,6 +147,7 @@ function InviteHeader({ sub }: { sub?: string | null }) {
 function ConnectedState({ ownerUserId, source }: { ownerUserId: string; source: string }) {
   const { t } = useTranslation('common');
   const [q, setQ] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
   const debouncedQ = useDebouncedValue(q, 200);
   // BRIEF_CIRCLE_INVITE_ENTRY: the list derivation lives in one shared hook so
   // this sheet and the Circle entry cannot disagree. Behaviour here is
@@ -460,7 +461,7 @@ function EGFriendRow({
               height: 34,
               borderRadius: '34%',
               overflow: 'hidden',
-              background: '#F1F5F9',
+              background: 'rgba(255,255,255,0.06)',
             }}
           >
             <img
@@ -475,7 +476,7 @@ function EGFriendRow({
               position: 'absolute',
               inset: 0,
               borderRadius: '34%',
-              border: '1px solid rgba(15,23,42,0.10)',
+              border: '1px solid rgba(255,255,255,0.10)',
               pointerEvents: 'none',
             }}
           />
