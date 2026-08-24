@@ -487,38 +487,19 @@ export function HonoursModeToggle({
   );
 }
 
-/** The heading block: glyph, title, quiet see-all, then the rarity subline. */
+/** The heading block: eyebrow title and an optional aside action. */
 export function HonoursHeading({
-  events,
   aside,
 }: {
-  events: WireEvent[];
   aside?: React.ReactNode;
 }) {
   const { t } = useTranslation('courses');
-  const subline = useHonoursSubline(events);
 
   return (
-    <>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
-        <span style={EYEBROW_TEXT}>{t('discover.honoursTitle', 'The honours board')}</span>
-        {aside ? <span style={{ marginLeft: 'auto' }}>{aside}</span> : null}
-      </div>
-      {subline ? (
-        <div
-          style={{
-            marginTop: 3,
-            fontFamily: SANS,
-            fontSize: 11.5,
-            fontWeight: 500,
-            lineHeight: 1.4,
-             color: DISCOVER_QUIET,
-          }}
-        >
-          {subline}
-        </div>
-      ) : null}
-    </>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
+      <span style={EYEBROW_TEXT}>{t('discover.honoursTitle', 'The honours board')}</span>
+      {aside ? <span style={{ marginLeft: 'auto' }}>{aside}</span> : null}
+    </div>
   );
 }
 
