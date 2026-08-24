@@ -509,9 +509,6 @@ export function BusinessCommandCard({
 /* ─────────────────────── sub-components ───────────────────────
    Both are LOCAL to this file — no other importers. */
 
-/** 6px marks on white fail contrast at BIZ.amber, so the dot deepens. */
-const AMBER_DEEP = '#C2620A';
-
 /**
  * One metric cell inside the shared inset. Three states, three renderings:
  * loading -> nothing, null/undefined -> nothing, 0 -> "0", else formatted.
@@ -618,7 +615,7 @@ function ActionRow({
       {badge && (
         <span
           className="rounded-full shrink-0"
-          style={{ width: 6, height: 6, background: AMBER_DEEP }}
+          style={{ width: 6, height: 6, background: BIZ.amber }}
         />
       )}
       <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkFaint }} />

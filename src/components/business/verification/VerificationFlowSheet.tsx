@@ -821,7 +821,7 @@ export default function VerificationFlowSheet({
                         {otpEmailVerified ? (
                           <span
                             className="inline-flex items-center gap-1.5 px-3 rounded-md text-[12px] font-semibold"
-                            style={{ background: 'rgba(5,150,105,0.10)', color: '#059669' }}
+                            style={{ background: 'rgba(52,215,127,0.16)', color: A.GREEN }}
                           >
                             <CheckCircle2 className="h-3.5 w-3.5" />
                             Verified
