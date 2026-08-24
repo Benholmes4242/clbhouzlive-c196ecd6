@@ -50,10 +50,15 @@ const CHIPS: Array<{ key: ChipKey; label: string; filter: BusinessReviewFilter; 
   { key: 'lowest', label: 'Lowest rated', filter: 'all', sort: 'lowest' },
 ];
 
+/* Foreground from the canon; the two washes are the canon's dark green and dark
+   red at the SAME 0.16 the amber tint already uses, so all three chips carry
+   equal presence. The thresholds below only pick a wash — the colour they wash
+   is decided by bandColorOnDark, so a canon change reaches this chip. */
 function ratingTone(rating: number): { bg: string; fg: string } {
-  if (rating >= 8) return { bg: 'rgba(52,215,127,0.16)', fg: GREEN };
-  if (rating >= 6) return { bg: AMBER_SOFT, fg: AMBER };
-  return { bg: 'rgba(255,90,90,0.16)', fg: RED };
+  const fg = bandColorOnDark(rating);
+  if (rating >= 9) return { bg: 'rgba(52,211,153,0.16)', fg };
+  if (rating >= 5) return { bg: AMBER_SOFT, fg };
+  return { bg: 'rgba(255,107,107,0.16)', fg };
 }
 
 function fmtRating(v: number | null): string {
