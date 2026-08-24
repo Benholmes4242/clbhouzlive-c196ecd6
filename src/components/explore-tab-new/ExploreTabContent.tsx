@@ -136,6 +136,20 @@ import { useMostPlayedThisWeek, type MostPlayedPlayer, type MostPlayedRow } from
  * instead of navigating.
  */
 const PHOTOS_SAMPLE = 12;
+
+/**
+ * BOTH SIDES OF THE MEDIA SEARCH ARE NORMALISED the same way: trimmed,
+ * lowercased and stripped of diacritics, because course and member names carry
+ * accents and a member typing "jose" should reach "José".
+ */
+function normaliseForSearch(value: string | null | undefined): string {
+  return (value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '');
+}
+
 /**
  * The clip reveal step. Photos do not have one here: CommunityPhotoMosaic owns
  * its own STEP internally, because it fills two columns by index and a wrapper
@@ -315,11 +329,58 @@ export default function ExploreTabContent({
    * videos; BRIEF_MEDIA_TRACKING_MINIMUM shipped the two events that will settle
    * it. Reorder this on those numbers, not on taste.
    */
-  const photoPool = useMemo(() => library.data?.photos ?? [], [library.data]);
-  const photoSample = useMemo(() => photoPool.slice(0, PHOTOS_SAMPLE), [photoPool]);
+  const allPhotoPool = useMemo(() => library.data?.photos ?? [], [library.data]);
   const libraryAll = useMemo(() => library.data?.all ?? [], [library.data]);
-  const clipPool = useMemo(() => library.data?.clips ?? [], [library.data]);
-  const videoPool = useMemo(() => library.data?.videos ?? [], [library.data]);
+  const allClipPool = useMemo(() => library.data?.clips ?? [], [library.data]);
+  const allVideoPool = useMemo(() => library.data?.videos ?? [], [library.data]);
+
+  /**
+   * THE MEDIA SEARCH IS AN INLINE FILTER OVER THESE POOLS
+   * (MICRO_BRIEF_DISCOVER_MEDIA_SEARCH_INLINE §2). No hook, no query key, no
+   * network path: the pools are already client-side, so the match happens here,
+   * where the data lives. MediaActBar is a control, not a data owner.
+   *
+   * IT GOVERNS ONLY WHAT IS BELOW THE BAR. photoPool, clipPool and videoPool —
+   * nothing else. The honours board is a preceding sibling and is outside
+   * data-media-filter-scope, so this state cannot reach it.
+   *
+   * MINIMUM 2 CHARACTERS, DEBOUNCED 200ms: one letter matches nearly every
+   * caption (the page would appear to do nothing), and three mosaics should not
+   * re-render on every keystroke.
+   *
+   * courseName IS DELIBERATELY NOT MATCHED. It resolves on 6 posts out of 242
+   * (useCommunityVideos.ts:54), and a field that silently matches almost nothing
+   * makes search feel broken rather than empty.
+   */
+  const [mediaQuery, setMediaQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebouncedQuery(mediaQuery), 200);
+    return () => window.clearTimeout(id);
+  }, [mediaQuery]);
+
+  const needle = useMemo(() => normaliseForSearch(debouncedQuery), [debouncedQuery]);
+  const filtering = needle.length >= 2;
+
+  const matchMedia = useCallback(
+    (items: CommunityLibraryItem[]) =>
+      filtering
+        ? items.filter(
+            (i) =>
+              normaliseForSearch(i.title).includes(needle) ||
+              normaliseForSearch(i.displayName).includes(needle),
+          )
+        : items,
+    [filtering, needle],
+  );
+
+  const photoPool = useMemo(() => matchMedia(allPhotoPool), [matchMedia, allPhotoPool]);
+  const clipPool = useMemo(() => matchMedia(allClipPool), [matchMedia, allClipPool]);
+  const videoPool = useMemo(() => matchMedia(allVideoPool), [matchMedia, allVideoPool]);
+  const photoSample = useMemo(() => photoPool.slice(0, PHOTOS_SAMPLE), [photoPool]);
+  const noMediaMatches =
+    filtering && photoPool.length === 0 && clipPool.length === 0 && videoPool.length === 0;
+
 
   /**
    * THE MEDIA CHIP (BRIEF_DISCOVER_ONE_PAGE §4.2). Component state, never the
@@ -359,7 +420,9 @@ export default function ExploreTabContent({
     [],
   );
 
-  const photosShown = mediaChip === 'photos' ? photoPool : photoSample;
+  /* WHILE FILTERING, PHOTOS DO NOT SAMPLE (§3): showing 12 of a filtered set
+     would make the result count a lie. Every match renders. */
+  const photosShown = filtering || mediaChip === 'photos' ? photoPool : photoSample;
   const handlePhoto = useCallback(
     (item: CommunityLibraryItem) => openMedia(photosShown, item, 'discover-photos'),
     [openMedia, photosShown],
@@ -492,13 +555,43 @@ export default function ExploreTabContent({
           data-media-act-controls
           style={{ marginTop: ACT_GAP - RHYTHM, marginBottom: ACT_GAP - RHYTHM }}
         >
-          <MediaActBar chip={mediaChip} onChipChange={changeChip} />
+          <MediaActBar
+            chip={mediaChip}
+            onChipChange={changeChip}
+            query={mediaQuery}
+            onQueryChange={setMediaQuery}
+          />
+
         </div>
 
         {/* MEDIA-CONTROLLED SUBTREE. This starts after the chips and search; the
             honours board is a preceding sibling and cannot be reached by this
             state boundary. display:contents preserves the established rhythm. */}
-        <div data-media-filter-scope={mediaChip} style={{ display: 'contents' }}>
+        <div
+          data-media-filter-scope={mediaChip}
+          data-media-filter-query={filtering ? 'active' : 'idle'}
+          style={{ display: 'contents' }}
+        >
+
+        {/* THE EMPTY ANSWER (§4). A 2+ character query that matches nothing across
+            all three pools replaces the three sections with ONE SENTENCE — no
+            icon, no tile, no CTA. The chips and the field stay interactive, which
+            is the page's existing empty-answer pattern (GolfThisWeek §S2.5).
+            The query is member input echoed back, so i18next escapes it. */}
+        {noMediaMatches && (
+          <p
+            style={{
+              margin: `${HEAD_GAP}px 0 0`,
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.62)',
+            }}
+          >
+            {t('discover.media.searchEmpty', 'No photos, clips or videos match "{{query}}".', {
+              query: debouncedQuery.trim(),
+            })}
+          </p>
+        )}
 
         {/* 7 — PHOTOS lead the media (§1.2 reasoning above). On 'Everything' this
             is a 12-tile sample whose see-all SWITCHES THE CHIP instead of
@@ -509,7 +602,8 @@ export default function ExploreTabContent({
           <section>
             <Eyebrow
               aside={
-                mediaChip === 'all' && photoPool.length > photosShown.length ? (
+                /* NO SEE-ALL WHILE FILTERING (§3): every match is already shown. */
+                !filtering && mediaChip === 'all' && photoPool.length > photosShown.length ? (
                   <InkAction onClick={() => changeChip('photos')}>
                     {t('discover.seeAll', 'See all')}
                   </InkAction>
@@ -534,15 +628,17 @@ export default function ExploreTabContent({
         {/* 8 — CLIPS. On 'Everything' the RAIL (capped, horizontal, sublined
             "under three minutes"); on 'Clips' the MOSAIC, which is the treatment
             /community used for the same pool and the only one that can carry 71
-            clips. The rail's see-all switches the chip. */}
-        {mediaChip === 'all' && (
+            clips. The rail's see-all switches the chip.
+            WHILE FILTERING THE RAIL BECOMES THE MOSAIC (§3): a capped horizontal
+            rail cannot honestly represent a result set. */}
+        {mediaChip === 'all' && !filtering && (
           <ClipsRail
             items={communityVideos.data?.clips ?? []}
             onTilePress={handleClip}
             onSeeAll={() => changeChip('clips')}
           />
         )}
-        {mediaChip === 'clips' && clipPool.length > 0 && (
+        {(mediaChip === 'clips' || (mediaChip === 'all' && filtering)) && clipPool.length > 0 && (
           <section>
             <Eyebrow>{t('community.sections.clips.title', 'Clips')}</Eyebrow>
             <div style={{ margin: `${HEAD_GAP}px 2px 0` }}>
@@ -559,14 +655,14 @@ export default function ExploreTabContent({
             ROW LIST on 'Videos', where titles matter more than thumbnails.
             The FEATURED FILM does not come across: Discover already has a hero,
             and a second full-width one in act two competes with it. */}
-        {mediaChip === 'all' && (
+        {mediaChip === 'all' && !filtering && (
           <LatestVideosRail
             items={communityVideos.data?.videos ?? []}
             onTilePress={handleVideo}
             onSeeAll={() => changeChip('videos')}
           />
         )}
-        {mediaChip === 'videos' && videoPool.length > 0 && (
+        {(mediaChip === 'videos' || (mediaChip === 'all' && filtering)) && videoPool.length > 0 && (
           <section>
             <Eyebrow>{t('community.sections.videos.title', 'Latest videos')}</Eyebrow>
             <div style={{ marginTop: HEAD_GAP }}>
@@ -587,8 +683,11 @@ export default function ExploreTabContent({
         {/* 10 — BROWSE BY CLUB IS LAST (§1.3): a way IN, not something to read,
             and it covers only tagged content. It survives on 'Everything' and on
             'Photos' — the two views where a member is browsing rather than
-            watching. NO SUBLINE (§5); the tagging caveat is a builder's note. */}
-        {(mediaChip === 'all' || mediaChip === 'photos') && (
+            watching. NO SUBLINE (§5); the tagging caveat is a builder's note.
+            It is not a filter target, but it does not survive an empty answer:
+            an index of the whole library beneath "nothing matches" contradicts
+            the sentence. */}
+        {(mediaChip === 'all' || mediaChip === 'photos') && !noMediaMatches && (
           <CommunityCourseIndex
             items={libraryAll}
             title={t('community.sections.clubs.title', 'Browse by club')}
@@ -598,6 +697,7 @@ export default function ExploreTabContent({
           />
         )}
         </div>
+
 
 
         {/* From the community was removed from Discover deliberately. Discover
