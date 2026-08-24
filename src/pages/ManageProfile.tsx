@@ -766,7 +766,7 @@ function ProfileTabBody({
               // Disabled must read as DISABLED BUT PRESENT: a raised inert
               // fill with a hairline, label at the 0.62 quiet floor.
               background: (isDisabled && !isSaving) ? FIELD_FILL : INK,
-              color: (isDisabled && !isSaving) ? INK_45 : PAGE_BG,
+              color: (isDisabled && !isSaving) ? INK_55 : PAGE_BG,
               border: (isDisabled && !isSaving) ? `1px solid ${HAIR}` : 'none',
               fontFamily: SF_STACK,
             }}
