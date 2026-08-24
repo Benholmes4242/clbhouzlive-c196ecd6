@@ -149,7 +149,10 @@ export function BottomSheet({
               width: 36,
               height: 4,
               borderRadius: 2,
-               background: variant === 'dark' ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.12)',
+              /* Unconditional white grabber. Both variants paint a dark surface
+                 now (see the variant note above), so there is no light case. */
+              background: 'rgba(255,255,255,0.18)',
+
               margin: '0 auto',
             }}
           />
