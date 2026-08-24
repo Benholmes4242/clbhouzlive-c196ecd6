@@ -57,7 +57,7 @@ import {
   type LensCounts,
 
 } from './useStatBrowse';
-import { KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
+import { A, KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { ReviewRailSlot } from './ReviewRailSlot';
 import { ReviewFeaturedSlot } from './ReviewFeaturedSlot';
 import { allocateReviewSlots } from './reviewSlots';
@@ -149,24 +149,22 @@ const LIST_LABEL: Record<string, string> = {
  */
 const CARD_BAND = 'rgba(255,255,255,0.06)';
 
-/**
- * Row 1 (area, region): full width of its 50/50 cell, with the chevron at the
- * trailing edge so different content widths still read as one matched pair.
- */
+/** Discover's Everywhere trigger geometry, kept full-width inside the Courses
+ * row so area and region remain an equal 50/50 pair. */
 const WELL_TRIGGER_CLS =
   'flex h-auto w-full border-0 p-0 shadow-none focus:ring-0 disabled:opacity-100 ' +
   '[&>span]:!flex [&>svg]:hidden';
 
-/** Row 2 (lens): sized to its content, leaving search at the opposite edge. */
+/** The lens uses the same trigger at its natural content width. */
 const WELL_TRIGGER_AUTO_CLS =
   'inline-flex h-auto w-auto max-w-full border-0 p-0 shadow-none focus:ring-0 ' +
   '[&>span]:!flex [&>svg]:hidden';
 
 const wellStyle = (applied: boolean): React.CSSProperties => ({
-  background: applied ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.10)',
-  border: 'none',
-  borderRadius: 10,
-  padding: '9px 12px',
+  background: applied ? 'rgba(255,255,255,0.14)' : A.PANEL,
+  border: `1px solid ${A.BORDER}`,
+  borderRadius: 8,
+  padding: '8px 12px',
   color: applied ? INK : INK_MUTE,
 });
 
@@ -720,7 +718,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       <SelectTrigger
         className={WELL_TRIGGER_CLS}
         style={regionDisabled
-          ? { ...wellStyle(false), background: 'rgba(255,255,255,0.05)', color: INK_FAINT }
+          ? { ...wellStyle(false), opacity: 0.55, color: INK_FAINT }
           : wellStyle(!!region)}
         aria-label={t('statBrowse.selectRegionA11y')}
       >
@@ -809,7 +807,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       onClick={() => openDirectory(country, 'filter_bar')}
       aria-label={t('directorySheet.openA11y')}
       className={`${compact ? 'h-8 w-8' : 'h-10 w-10'} shrink-0 flex items-center justify-center`}
-      style={{ background: 'rgba(255,255,255,0.10)', borderRadius: 10 }}
+      style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8 }}
     >
       <Search className={compact ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
     </button>

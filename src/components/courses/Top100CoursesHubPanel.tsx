@@ -6,13 +6,13 @@ import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
 import type { CourseListMembership } from '@/hooks/useGolfCoursesSearch';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
-import { Search, Award, X } from 'lucide-react';
+import { Search, Award, ChevronDown, Globe2, X } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import VirtualizedCourseList from './VirtualizedCourseList';
-import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
-import { FilterChips } from '@/components/ui/FilterChips';
+import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { useNavigate } from 'react-router-dom';
@@ -368,7 +368,8 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
 
       {/* SCOPE 2 — sticky pills row + rest */}
       <div>
-        {/* Sticky list filter pills — full-bleed glass row */}
+        {/* Sticky list filter — the same compact bordered well as Discover's
+            Everywhere control, rather than a second pill-navigation grammar. */}
         <div
           className="sticky"
           style={{
@@ -381,16 +382,38 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             marginTop: -1,
           }}
         >
-          <div className="px-4 flex justify-center">
-            <FilterChips
-              options={listOptions.map((o) => ({
-                id: o.value,
-                label: o.label.replace(/\s*Top 100\s*$/, '').trim() || o.label,
-              }))}
-              value={selectedList}
-              onChange={(id) => setSelectedList(id)}
-              ariaLabel={t('top100.listsA11y')}
-            />
+          <div className="px-4">
+            <Select value={selectedList} onValueChange={setSelectedList}>
+              <SelectTrigger
+                aria-label={t('top100.listsA11y')}
+                className="inline-flex h-auto w-auto justify-start whitespace-nowrap border-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
+                style={{
+                  background: selectedList === 'global' ? A.PANEL : 'rgba(255,255,255,0.14)',
+                  border: `1px solid ${A.BORDER}`,
+                  borderRadius: 8,
+                  padding: '8px 12px',
+                  color: selectedList === 'global' ? A.MUTE : A.INK,
+                }}
+              >
+                <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
+                  <Globe2 size={12} strokeWidth={2.4} aria-hidden />
+                  <span style={{ fontSize: 12.5, fontWeight: 700 }}>
+                    {activeListShortLabel}
+                  </span>
+                  <ChevronDown size={13} strokeWidth={2.4} style={{ color: A.MUTE, flex: 'none' }} aria-hidden />
+                </span>
+              </SelectTrigger>
+              <SelectContent
+                className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg"
+                style={{ background: A.PANEL, borderColor: A.BORDER, color: A.INK }}
+              >
+                {listOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value} style={{ color: A.INK }}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
