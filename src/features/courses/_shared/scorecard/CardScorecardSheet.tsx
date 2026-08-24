@@ -9,7 +9,7 @@ import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
   TREND_UP, TREND_DOWN,
-  TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT, TOPAR_EVEN_LIGHT,
+  TOPAR_UNDER_DARK, TOPAR_OVER_DARK, TOPAR_EVEN_DARK,
 } from '@/features/tourhub/_shared/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp } from '@/lib/formatHcp';
@@ -25,7 +25,7 @@ import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS } from '@/lib/tokens/typ
  * Canonical scale (src/lib/tokens/type.ts) is colourless by design; this sheet
  * keeps its own palette, so ink is re-attached here and nowhere else.
  */
-const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
+const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.MUTE };
 const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
 /** Panel headings sit below the sheet title: same role, 13px as before. */
 const SECTION_TITLE: React.CSSProperties = { ...TITLE, fontSize: 13 };
@@ -53,7 +53,7 @@ const SENTENCE: React.CSSProperties = {
  * same score identically. Course DIFFICULTY (red harder / green easier) is a
  * different semantic surface and does not appear on a scorecard.
  */
-const EVEN_GRAY = TOPAR_EVEN_LIGHT;
+const EVEN_GRAY = TOPAR_EVEN_DARK;
 
 export interface CardScorecardHole {
   holeNo: number;
@@ -131,7 +131,7 @@ function fmtRel(n: number | null): string {
 
 function toParColor(n: number | null): string {
   if (n == null || Math.round(n) === 0) return EVEN_GRAY;
-  return getScoreColor(Math.round(n), 'light');
+  return getScoreColor(Math.round(n), 'dark');
 }
 
 /* --------------------------------------------------------------- the card */
@@ -246,13 +246,10 @@ const Nine: React.FC<{
 
 /**
  * THE SCORING KEY IS A KEY, NOT A TALLY (BRIEF_SCORECARD_TRAJECTORY_WHOOP §9.1).
- * Its numerals (3 birdie, 2 eagle, 1 ace, 5 bogey, 6 double+ against par 4) are
- * EXAMPLES. Unheaded and sitting between the total row and the breakdown panel,
- * a member read "2 EAGLE, 1 ACE, 6 DOUBLE+" as counts directly above a panel
- * stating DOUBLE+ 0. It now carries the same heading HolesScoringKey uses
- * (courses:holes.scoringKey.title), is LEFT-ALIGNED with it, and sits ABOVE the
- * total row with the grid it decodes — so nothing numeric stands between the
- * total and the breakdown.
+ * The key teaches the MARK, not an incidental stroke count. ScoreMark can hide
+ * its numeral while preserving the fill, tone and magnitude/rarity ring, so the
+ * examples still use real score/par pairs but cannot imply that (for example)
+ * every 3 is a birdie. Labels carry the outcome names.
  */
 const Legend: React.FC = () => {
   const { t } = useTranslation(['courses']);
@@ -274,7 +271,7 @@ const Legend: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'center', gap: 16, rowGap: 10, flexWrap: 'wrap' }}>
         {keys.map((k) => (
           <span key={k.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, lineHeight: 1 }}>
-            <ScoreMark strokes={k.strokes} par={4} size={22} surface="dark" />
+            <ScoreMark strokes={k.strokes} par={4} size={22} surface="dark" showStroke={false} />
             <span style={{ ...LABEL, fontSize: 8 }}>{k.label}</span>
           </span>
         ))}
@@ -295,7 +292,7 @@ const Legend: React.FC = () => {
  * you against the field. Different jobs, different rules. Do not "harmonise".
  *
  * A zero band renders NO segment (never a zero-width sliver) and its cell shows
- * 0 in DIM rather than the band colour — a colour there would claim a score
+ * 0 in quiet chrome rather than the band colour — a colour there would claim a score
  * that was not made.
  */
 const RoundSplit: React.FC<{ split: { label: string; n: number; tone: string }[] }> = ({ split }) => (
@@ -309,7 +306,7 @@ const RoundSplit: React.FC<{ split: { label: string; n: number; tone: string }[]
       {split.map((s) => (
         <div key={s.label} style={{ textAlign: 'center' }}>
           <div style={LABEL}>{s.label}</div>
-          <div style={{ ...NUM, fontSize: 18, color: s.n > 0 ? s.tone : A.DIM, marginTop: 3 }}>{s.n}</div>
+          <div style={{ ...NUM, fontSize: 18, color: s.n > 0 ? s.tone : A.MUTE, marginTop: 3 }}>{s.n}</div>
         </div>
       ))}
     </div>
@@ -672,10 +669,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const split = useMemo(() => {
     const d = (h: CardScorecardHole) => (h.strokes as number) - (h.par as number);
     return [
-      { label: t('courses:scorecard.splitBirdie'), n: played.filter((h) => d(h) <= -1).length, tone: TOPAR_UNDER_LIGHT },
-      { label: t('courses:scorecard.splitPar'), n: played.filter((h) => d(h) === 0).length, tone: TOPAR_EVEN_LIGHT },
+      { label: t('courses:scorecard.splitBirdie'), n: played.filter((h) => d(h) <= -1).length, tone: TOPAR_UNDER_DARK },
+      { label: t('courses:scorecard.splitPar'), n: played.filter((h) => d(h) === 0).length, tone: TOPAR_EVEN_DARK },
       { label: t('courses:scorecard.splitBogey'), n: played.filter((h) => d(h) === 1).length, tone: A.MUTE },
-      { label: t('courses:scorecard.splitDouble'), n: played.filter((h) => d(h) >= 2).length, tone: TOPAR_OVER_LIGHT },
+      { label: t('courses:scorecard.splitDouble'), n: played.filter((h) => d(h) >= 2).length, tone: TOPAR_OVER_DARK },
     ];
   }, [played, t]);
 
@@ -733,7 +730,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     <BottomSheet
       open={open}
       onClose={onClose}
-      variant="light"
+      variant="dark"
+      surfaceColor={A.CANVAS}
       style={{ background: A.CANVAS, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>
@@ -741,7 +739,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
         <div style={{ padding: '10px 16px 14px', background: A.CANVAS, borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
           <div style={{ minWidth: 0 }}>
             {!!eyebrowText && (
-              <div style={{ ...KICKER, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+               <div style={{ ...KICKER, color: A.MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {eyebrowText}
               </div>
             )}
@@ -856,7 +854,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   removed, and a single-colour swatch cannot represent a stroke
                   graded per hole.
                 */}
-                <TrajectoryLine holes={holes} interactive />
+                <TrajectoryLine holes={holes} height={120} surface="dark" interactive />
 
 
                 {(captions.length > 0 || fieldCaption) && (

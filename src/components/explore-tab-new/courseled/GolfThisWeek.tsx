@@ -470,12 +470,16 @@ function FollowButton({
             alignItems: 'center',
             gap: 4,
             fontFamily: SANS,
-            /* §S4.5 — the pill tightens to 4px 11px at 9.5px, in the new ink. */
+            /* Match PhotoBand's quiet action over photography exactly: no fill,
+               no border, and white-62 ink. This is confirmation, not identity. */
             fontSize: 9.5,
             color: MID,
-            border: `1px solid ${HAIRLINE_INK}`,
-            borderRadius: 999,
-            padding: '4px 11px',
+            background: 'transparent',
+            border: 'none',
+            borderRadius: 0,
+            padding: '6px 4px',
+            margin: '-6px -4px',
+            textShadow: '0 1px 3px rgba(0,0,0,0.55)',
             pointerEvents: 'none',
           }}
         >
@@ -497,11 +501,13 @@ function FollowButton({
           flexShrink: 0,
           fontFamily: SANS,
           fontSize: 9.5,
-          color: '#FFFFFF',
-          background: INK,
-          border: `1px solid ${INK}`,
-          borderRadius: 999,
-          padding: '4px 11px',
+          color: MID,
+          background: 'transparent',
+          border: 'none',
+          borderRadius: 0,
+          padding: '6px 4px',
+          margin: '-6px -4px',
+          textShadow: '0 1px 3px rgba(0,0,0,0.55)',
           cursor: 'pointer',
         }}
       >
