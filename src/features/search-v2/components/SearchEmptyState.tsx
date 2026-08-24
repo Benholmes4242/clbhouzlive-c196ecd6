@@ -28,7 +28,7 @@ import {
 } from '../hooks/useSearchEmptyStateV2';
 import { navCourse } from '../lib/searchNavigation';
 import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
-import { S } from '../lib/tokens';
+import { A, S } from '../lib/tokens';
 
 
 interface Props {
@@ -63,7 +63,7 @@ export function SearchEmptyState({ onSelect }: Props) {
           textAlign: 'center',
         }}
       >
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: S.INK }}>
           Couldn't load suggestions
         </p>
         <button
@@ -74,8 +74,8 @@ export function SearchEmptyState({ onSelect }: Props) {
             height: 32,
             padding: '0 16px',
             borderRadius: 999,
-            background: '#0F172A',
-            color: '#fff',
+            background: S.INK,
+            color: A.CANVAS,
             fontSize: 12,
             fontWeight: 700,
             border: 'none',
@@ -265,7 +265,7 @@ function PlayerCard({
           fontSize: 12,
           fontWeight: 600,
           lineHeight: '14px',
-          color: '#0F172A',
+          color: S.INK,
         }}
       >
         {player.abbr_name || player.full_name}
@@ -369,15 +369,18 @@ function SuggestionRow({
           fontSize: 12,
           fontWeight: 700,
           transition: 'transform 100ms ease',
+          // Both states come from tokens: FOLLOW is ink-filled with the
+          // canvas as its label; FOLLOWING is a quiet outline. Neither is a
+          // literal.
           ...(following
             ? {
                 background: 'transparent',
-                color: 'rgba(15,23,42,0.55)',
-                border: '1px solid rgba(15,23,42,0.14)',
+                color: S.QUIET,
+                border: `1px solid ${S.HAIRLINE}`,
               }
             : {
-                background: '#0F172A',
-                color: '#fff',
+                background: S.INK,
+                color: A.CANVAS,
                 border: 'none',
               }),
         }}

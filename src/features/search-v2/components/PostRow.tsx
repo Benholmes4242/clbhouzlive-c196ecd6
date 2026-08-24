@@ -40,7 +40,7 @@ export function PostRow({ post, query, onSelect }: Props) {
         <p
           className="text-[13.5px]"
           style={{
-            color: '#0F172A',
+            color: S.INK,
             lineHeight: 1.4,
             display: '-webkit-box',
             WebkitLineClamp: 2,
