@@ -507,7 +507,7 @@ const ClubhouseContent = () => {
           padding: '10px 16px',
           textAlign: 'center',
           color: 'white',
-          fontSize: 13,
+          fontSize: 14,
           fontWeight: 600,
         }}>
           No internet connection

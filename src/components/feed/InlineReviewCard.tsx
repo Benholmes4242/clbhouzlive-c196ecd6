@@ -132,10 +132,10 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           style={{ width: 14, height: 14, objectFit: 'contain' }}
           aria-hidden="true"
         />
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: '#fff' }}>REVIEW</span>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#fff' }}>REVIEW</span>
         <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
           {formattedRating}
-          <span style={{ fontSize: 10, opacity: 0.6 }}>/10</span>
+          <span style={{ fontSize: 11, opacity: 0.6 }}>/10</span>
         </span>
       </div>
 
@@ -160,7 +160,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         </div>
         <span
           style={{
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: 700,
             color: '#fff',
             lineHeight: 1.2,
@@ -174,7 +174,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         {coursesRated != null && (
           <span
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: 'rgba(255,255,255,0.70)',
               fontVariantNumeric: 'tabular-nums',
               whiteSpace: 'nowrap',
@@ -204,7 +204,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
       {locationStr && (
         <div
           style={{
-            fontSize: 13,
+            fontSize: 14,
             color: 'rgba(255,255,255,0.78)',
             marginTop: 3,
             display: 'flex',

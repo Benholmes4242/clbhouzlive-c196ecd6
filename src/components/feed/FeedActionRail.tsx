@@ -127,7 +127,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
       {count && (
         <span
           style={{
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: 700,
             color: accentCount ? '#F7931E' : '#fff',
             fontVariantNumeric: 'tabular-nums',
@@ -316,7 +316,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               </span>
               <span
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: 700,
                   color: showJustFollowed ? '#F7931E' : '#fff',
                   fontVariantNumeric: 'tabular-nums',

@@ -195,7 +195,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
         <div
           ref={textRef}
           style={{
-            fontSize: 14,
+            fontSize: 15,
             lineHeight: 1.4,
             color: T100,
             ...((isReviewMode || !expanded)
@@ -215,7 +215,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
               style={{
                 background: 'transparent', border: 'none', padding: 0, marginLeft: 6,
-                color: T60, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                color: T60, fontSize: 15, fontWeight: 600, cursor: 'pointer',
               }}
             >
               less
@@ -234,7 +234,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               background: 'linear-gradient(90deg, rgba(16,21,28,0) 0%, #10151C 40%)',
               border: 'none',
               color: T60,
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               cursor: 'pointer',
               lineHeight: 1.4,
@@ -255,7 +255,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               background: 'linear-gradient(90deg, rgba(16,21,28,0) 0%, #10151C 38%)',
               border: 'none',
               color: T60,
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 600,
               cursor: 'pointer',
               lineHeight: 1.4,
@@ -521,7 +521,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               border: 'none',
               padding: 0,
               textAlign: 'left',
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 700,
               color: T100,
               whiteSpace: 'nowrap',
@@ -545,7 +545,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 variant="inline"
               />
             )}
-            <span style={{ fontSize: 11, color: T60 }}>{subLine}</span>
+            <span style={{ fontSize: 12, color: T60 }}>{subLine}</span>
             {mountFollowPill && (
               <FeedFollowPill
                 isFollowed={!!post.isFollowedByMe}
@@ -597,7 +597,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           {isDeal && (
             <span
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: 0.5,
                 color: GREEN,
@@ -913,7 +913,7 @@ const FooterButton: React.FC<{
       border: 'none',
       padding: 0,
       color: active ? activeColor ?? T100 : T60,
-      fontSize: 12,
+      fontSize: 13,
       fontVariantNumeric: 'tabular-nums',
     }}
     innerStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}

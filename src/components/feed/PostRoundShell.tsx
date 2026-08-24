@@ -47,7 +47,7 @@ const NineShell: React.FC = () => (
         marginBottom: 4,
       }}
     >
-      <Line size={9.5} width={26} />
+      <Line size={11} width={26} />
       <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6 }}>
         <Line size={13.5} width={20} />
         <Line size={12} width={16} />
@@ -68,10 +68,10 @@ const NineShell: React.FC = () => (
           {/* Each placeholder owns its own line box, which is what makes the
               hole-number and par rows the same height as the real card's.
               Do NOT give these an explicit height — measured, it costs 33px. */}
-          <span style={{ fontSize: 9, fontWeight: 700, lineHeight: 1.2 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, lineHeight: 1.2 }}>
             <span style={bar(7, BAR_SOFT)}>&nbsp;</span>
           </span>
-          <span style={{ fontSize: 9, fontWeight: 700, lineHeight: 1.3 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, lineHeight: 1.3 }}>
             <span style={bar(7, BAR_SOFT)}>&nbsp;</span>
           </span>
           <div style={{ width: 27, height: 27, borderRadius: 999, background: BAR_SOFT }} />
@@ -92,7 +92,7 @@ export const PostRoundShell: React.FC = () => (
       >
         {/* Date kicker */}
         <div>
-          <Line size={10} width={82} />
+          <Line size={11} width={82} />
         </div>
 
         {/* Course + score */}
@@ -121,10 +121,10 @@ export const PostRoundShell: React.FC = () => (
 
         {/* Par / slope / index strip */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 10 }}>
-          <Line size={10.5} width={46} tone={BAR_SOFT} />
-          <Line size={10.5} width={54} tone={BAR_SOFT} />
+          <Line size={11} width={46} tone={BAR_SOFT} />
+          <Line size={11} width={54} tone={BAR_SOFT} />
           <span style={{ marginLeft: 'auto' }}>
-            <Line size={10.5} width={58} tone={BAR_SOFT} />
+            <Line size={11} width={58} tone={BAR_SOFT} />
           </span>
         </div>
 
@@ -139,7 +139,7 @@ export const PostRoundShell: React.FC = () => (
           }}
         >
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <Line size={9.5} width={62} />
+            <Line size={11} width={62} />
             <Line size={12} width={18} tone={BAR_SOFT} />
           </div>
           <svg width="100%" viewBox="0 0 320 74" style={{ display: 'block' }} aria-hidden>
