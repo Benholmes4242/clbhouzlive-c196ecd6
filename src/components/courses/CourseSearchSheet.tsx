@@ -10,6 +10,7 @@ import { getFlagCode } from '@/utils/countryFlags';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { FIGS, TITLE } from '@/lib/tokens/type';
+import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 
 interface Course {
   id: string;
@@ -434,7 +435,7 @@ function ResultRow({ course, index, onClick, isFocused, onMouseEnter, isAlreadyA
             {course.rating != null && (
               <span>
                 {t('searchSheet.ratingBullet', { defaultValue: '• ' })}
-                <span style={{ color: course.rating >= 9.0 ? '#F7931E' : 'rgba(255,255,255,0.62)', fontWeight: 600, ...FIGS }}>{course.rating.toFixed(1)}</span>
+                <span style={{ color: bandColorOnDark(course.rating), fontWeight: 600, ...FIGS }}>{course.rating.toFixed(1)}</span>
                 <span style={{ color: 'rgba(255,255,255,0.38)', fontWeight: 400, fontSize: '11px', marginLeft: '2px' }}>{t('searchSheet.outOfTen')}</span>
               </span>
             )}
