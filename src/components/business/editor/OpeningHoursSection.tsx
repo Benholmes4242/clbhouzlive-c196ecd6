@@ -108,9 +108,10 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
       onClick={() => onChange(!checked)}
       style={{
         width: 44, height: 26, borderRadius: 999,
-        // Amber stays for OPEN: open-vs-closed is semantic here, not a
-        // generic on/off. The closed track takes the shipped dark value.
-        background: checked ? BIZ.amber : 'rgba(255,255,255,0.14)',
+        // PERSONAL SETTINGS GRAMMAR (settings/ui/SettingsToggleRow): near-white
+        // ink ON, 14% raised track with an 18% hairline OFF, knob on the canvas.
+        background: checked ? A.INK : 'rgba(255,255,255,0.14)',
+        border: checked ? '1px solid transparent' : '1px solid rgba(255,255,255,0.18)',
         position: 'relative', transition: 'background .15s',
         flexShrink: 0,
       }}
@@ -120,7 +121,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
           position: 'absolute',
           top: 3, left: checked ? 21 : 3,
           width: 20, height: 20, borderRadius: '50%',
-          background: '#fff', transition: 'left .15s',
+          background: A.CANVAS, transition: 'left .15s',
           boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
         }}
       />
