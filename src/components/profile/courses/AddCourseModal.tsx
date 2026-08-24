@@ -727,7 +727,8 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                   paddingLeft: 40,
                   paddingRight: 16,
                   fontSize: 14,
-                  borderRadius: 12,
+                  // radius comes from FIELD_PAINT_CLASS (14)
+
                   color: INK,
                   caretColor: INK,
                 }}
