@@ -46,6 +46,15 @@ vi.mock('@/components/explore-tab-new/courseled/hooks/useWeekRegionCounts', () =
 vi.mock('@/hooks/useToggleFollow', () => ({ useToggleFollow: () => ({ mutate: () => {} }) }));
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ actor: null }) }));
 vi.mock('@tanstack/react-query', () => ({ useQueryClient: () => ({ setQueriesData: () => {} }) }));
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (_key: string, fallback?: string | Record<string, unknown>, options?: Record<string, unknown>) => {
+      const template = typeof fallback === 'string' ? fallback : String(fallback?.defaultValue ?? _key);
+      const values = typeof fallback === 'string' ? options : fallback;
+      return template.replace(/{{(\w+)}}/g, (_match, key: string) => String(values?.[key] ?? `{{${key}}}`));
+    },
+  }),
+}));
 
 // eslint-disable-next-line import/first
 import { GolfThisWeek } from '@/components/explore-tab-new/courseled/GolfThisWeek';
@@ -104,7 +113,7 @@ describe('BRIEF_BAND_TILES_PODIUM', () => {
     const podium = podiumRows(chip);
     expect(podium).toHaveLength(3);
     expect(podium[0].dataset.podiumRow).toBe('leader');
-    expect(podium[0].textContent).toMatch(/^74\+2Alpha$/);
+    expect(podium[0].textContent).toMatch(/74\+2Alpha$/);
     expect(podium[1].dataset.podiumRow).toBe('chaser');
     expect(podium[1].textContent).toMatch(/^2B?Bravo76\+2$/);
     expect(podium[2].textContent).toMatch(/^3C?Charlie78\+4$/);
@@ -142,7 +151,7 @@ describe('BRIEF_BAND_TILES_PODIUM', () => {
     );
     const { container } = render(<GolfThisWeek userId="me" onCardPress={() => {}} onSeeAll={() => {}} />);
     const podium = podiumRows(chipFor(container, /BEST THIS WEEK/i));
-    expect(podium[0].textContent).toMatch(/^70[−-]2Alpha$/);
+    expect(podium[0].textContent).toMatch(/70[−-]2Alpha$/);
     expect(podium[1].textContent).toMatch(/^2B?Bravo72\+2$/);
     expect(podium[2].textContent).toMatch(/^3C?Charlie76\+6$/);
   });
