@@ -13,10 +13,12 @@ import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK = '#0F172A';
-const INK_60 = '#64748B';
-const HAIRLINE = 'rgba(15,23,42,0.07)';
+const INK = A.INK;
+/* Body tier at 62%, not the 42% caption tier: :100 is a four-line paragraph. */
+const INK_60 = A.MUTE;
+const HAIRLINE = 'rgba(255,255,255,0.10)';
 const AMBER = '#F7931E';
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
@@ -55,7 +57,7 @@ export const VerifiedAccountsNote: React.FC<Props> = ({ variant }) => {
     <div
       style={{
         position: 'relative',
-        background: '#fff',
+        background: A.PANEL,
         border: `1px solid ${HAIRLINE}`,
         borderRadius: 18,
         padding: '14px 16px',
