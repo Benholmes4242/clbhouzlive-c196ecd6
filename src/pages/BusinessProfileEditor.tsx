@@ -835,9 +835,8 @@ export default function BusinessProfileEditor() {
                 maxLength={500}
                 className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} rounded-[8px]`}
                 style={{
-                  width: '100%',
-                  padding: '10px 12px',
                   ...FIELD_INPUT_STYLE,
+                  width: '100%',
                   padding: '10px 12px',
                   borderRadius: 8,
                   fontFamily: 'inherit',
