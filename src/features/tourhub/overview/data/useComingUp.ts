@@ -54,13 +54,18 @@ export function useComingUp(tour: TourId | null, limit = 12) {
         const slug = mapTourSlug(r.season?.tour_name);
         return { r, slug };
       });
-      const filtered = tour === null
+      const scoped = tour === null
         ? rows
         : rows.filter(({ r, slug }) => {
             if (slug === tour) return true;
             if (tour === 'pga' && isMajor(r.name)) return true;
             return false;
           });
+      // Some tours (e.g. LIV) carry no scheduled future events in the feed. The
+      // Schedule section must never vanish for that reason — fall back to the
+      // merged all-tour list rather than rendering nothing.
+      const filtered = scoped.length > 0 ? scoped : rows;
+
       return filtered.slice(0, effectiveLimit).map(({ r, slug }) => ({
         id: r.id,
         name: r.name,
