@@ -30,7 +30,7 @@ export const CoursesHubSkeleton = () => {
           display: 'flex',
           gap: 16,
           padding: '12px 16px',
-          borderBottom: '0.5px solid rgba(15,23,42,0.06)',
+          borderBottom: '0.5px solid rgba(255,255,255,0.08)',
           background: '#1B1E27',
         }}
       >
@@ -40,7 +40,7 @@ export const CoursesHubSkeleton = () => {
       </div>
 
       {/* Ticker bar */}
-      <div style={{ padding: '10px 16px', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}>
+      <div style={{ padding: '10px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.08)' }}>
         <Skeleton className="h-4 w-full rounded" />
       </div>
 
