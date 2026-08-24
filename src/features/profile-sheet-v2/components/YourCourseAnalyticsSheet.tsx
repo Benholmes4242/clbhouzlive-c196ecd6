@@ -54,14 +54,22 @@ const DOT = '\u00B7';
 const DIST = {
   eagles: SC_FILL_GOLD,
   birdies: TOPAR_UNDER_LIGHT,
-  pars: '#B4BEC9',
+  pars: A.DIM,
   bogeys: TOPAR_OVER_LIGHT,
 } as const;
 
-/** The index card's zone tones. Borrowed, not owned. */
-const ZONE_BEST = '#0F8F4A';
-const ZONE_MID = '#F7931E';
-const ZONE_OFF = '#C8372B';
+/**
+ * The index card's zone tones. Borrowed, not owned.
+ *
+ * ZONE, NOT SCORE. These describe a round's position within THIS member's own
+ * range at THIS course, so they keep the improvement convention (green good,
+ * red bad). The figures beside them keep the to-par convention. Do not unify
+ * the two — that is the getScoreColor mistake.
+ */
+const ZONE_BEST = A.GREEN;
+const ZONE_MID = A.AMBER;
+const ZONE_OFF = A.RED;
+
 
 /** Zone of one round between the member's worst (0) and best (1) at a course. */
 function zoneColor(v: number, best: number, worst: number): string {
@@ -110,10 +118,17 @@ function fmtBucketPct(pct: number, pctExact: number, count: number): string {
  * These rows EXPAND, so each one owns a card rather than sharing one panel:
  * an open row's block has to visibly belong to it. Open state raises the
  * border to heavier ink - no colour, no shadow, no scale.
+ *
+ * The MECHANISM was right and stays: border weight only. The VALUE was not.
+ * A.INK is #F8FAFC, so the open outline was brighter than the course name it
+ * surrounded. 28% is the canonical focus/active border — the same step a
+ * focused field takes two elements above this list. If it ever reads too weak,
+ * the answer is lifting the CARD FILL a step, never brightening the ring.
  */
 const CARD = (open = false): React.CSSProperties => ({
   background: A.PANEL,
-  border: `1px solid ${open ? A.INK : A.BORDER}`,
+  border: `1px solid ${open ? 'rgba(255,255,255,0.28)' : A.BORDER}`,
+
   borderRadius: 14,
   overflow: 'hidden',
 });
@@ -340,8 +355,8 @@ const RoundsTrend: React.FC<{ points: CourseRoundPoint[]; gradientId: string }> 
           d={line}
           fill="none"
           stroke="#FFFFFF"
-          strokeOpacity={0.9}
-          strokeWidth={6}
+          strokeOpacity={0.6}
+          strokeWidth={4.0}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -349,7 +364,7 @@ const RoundsTrend: React.FC<{ points: CourseRoundPoint[]; gradientId: string }> 
           d={line}
           fill="none"
           stroke={`url(#${gradientId}-stroke)`}
-          strokeWidth={3}
+          strokeWidth={2.2}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -674,6 +689,9 @@ function AnalyticsCourseRow({
 export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, synced }: Props) {
   const { t } = useTranslation('courses');
   const [q, setQ] = useState('');
+  /** Focus lives on the wrapper, not the input: the wrapper owns the paint. */
+  const [searchFocused, setSearchFocused] = useState(false);
+
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   // SETTLED IS NOT "NOT LOADING": this query is disabled until the sheet opens.
@@ -852,34 +870,46 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
         {/* Fixed search field (only when we already have a list) */}
         {showSearchField && (
           <div style={{ padding: '0 20px 12px', flexShrink: 0 }}>
+            {/* CANONICAL FIELD TREATMENT. REST 6% fill / 10% border, FOCUS 10%
+                fill / 28% border, both channels stepping on 140ms ease, radius
+                14 (sq-sm), height 44. The wrapper carries the paint and the
+                focus state; the <input> stays transparent and borderless so
+                there is exactly one visible box. A.TRACK — the progress-bar
+                track — used to be the fill here; it is not a field token. */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 7,
-                background: A.TRACK,
-                border: `0.5px solid ${A.BORDER}`,
-                borderRadius: 18,
-                padding: '8px 13px',
+                height: 44,
+                background: searchFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
+                border: `1px solid ${searchFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
+                borderRadius: 14,
+                padding: '0 13px',
+                transition: 'background 140ms ease, border-color 140ms ease',
               }}
             >
-              <Search size={13} color={A.DIM} />
+              <Search size={13} color={q ? 'rgba(255,255,255,0.62)' : A.DIM} />
               <input
                 type="text"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
                 placeholder={t('yourCourses.searchPlaceholder')}
                 style={{
                   flex: 1,
                   minWidth: 0,
                   fontSize: 14,
                   fontFamily: SANS,
-                  color: A.INK,
+                  color: 'rgba(255,255,255,0.96)',
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
                 }}
+                className="cas-search-input"
               />
+              <style>{`.cas-search-input::placeholder{color:rgba(255,255,255,0.38);}`}</style>
             </div>
           </div>
         )}
