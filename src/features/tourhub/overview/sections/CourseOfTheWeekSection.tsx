@@ -304,7 +304,9 @@ export function CourseOfTheWeekSection() {
                     borderRadius: 12,
                     border: `0.5px solid ${V4.ink}`,
                     background: V4.ink,
-                    color: '#FFFFFF',
+                    // FILLED-ACTION: V4.ink is now near-white, so the label
+                    // takes the canvas. Flip the label, never the fill.
+                    color: V4.bg,
                     fontSize: 13,
                     fontWeight: 700,
                     letterSpacing: '0.04em',

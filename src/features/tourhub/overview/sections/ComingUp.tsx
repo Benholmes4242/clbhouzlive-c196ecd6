@@ -170,7 +170,7 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
                   width: 6,
                   height: 6,
                   borderRadius: 999,
-                  background: i === activePage ? '#0F172A' : 'rgba(15,23,42,0.2)',
+                  background: i === activePage ? V4.ink : 'rgba(255,255,255,0.24)',
                   transition: 'background 160ms ease',
                 }}
               />
