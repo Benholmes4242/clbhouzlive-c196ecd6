@@ -8,9 +8,18 @@
  * different things in different files). This file resolves those collisions
  * and gives Phase 2B+ a single place to evolve the system.
  *
+ * SURFACE ORIENTATION: DARK. As of BRIEF_TOUR_SURFACES_DARK_MIGRATION Part B,
+ * INK_*, SLATE_* and SURFACE are the DARK-surface ramp: INK_* is near-white text
+ * on a dark ground, SLATE_* are dark neutrals, SURFACE is a raised dark card.
+ * THE NAMES ARE HISTORICAL AND DELIBERATELY NOT RENAMED HERE — 78 importers.
+ * Read the value, not the name. The alphas in this file are one step STRONGER
+ * than their former light counterparts: 8% ink on white and 8% white on #15171F
+ * are not the same separation, and mirroring them is what made bogey grounds
+ * invisible on four surfaces.
+ *
  * Naming convention:
- * - INK_*       → text colour on light surfaces (primary / secondary / mute / faint / light)
- * - SLATE_*     → background-adjacent neutrals on light surfaces (50/150/200/etc., Tailwind-scale)
+ * - INK_*       → text colour on DARK surfaces (primary / secondary / mute / faint / light)
+ * - SLATE_*     → background-adjacent neutrals on DARK surfaces (50/150/200/etc., names Tailwind-scale, values not)
  * - HAIRLINE_*  → divider colours / borders (solid or ink-alpha variants)
  * - AMBER_*     → brand amber (text, tints, borders, soft bgs)
  * - GOLD_*      → celebratory / winner / trophy moments (more saturated than amber)
@@ -21,48 +30,51 @@
  */
 
 // ============================================================================
-// INK (text on light surface)
+// INK (text on DARK surface — names historical)
 // ============================================================================
-export const INK = '#0F172A';
+export const INK = '#F8FAFC';
 export const INK_DEEP = '#0A0E14';   // app dark-chrome / active-tab underline ink
-export const INK_SOFT = '#475569';
-export const INK_MUTE = '#64748B';
-export const INK_FAINT = '#94A3B8';
-export const INK_LIGHT = '#CBD5E1';
+export const INK_SOFT = 'rgba(248,250,252,0.72)';
+export const INK_MUTE = 'rgba(248,250,252,0.62)';
+export const INK_FAINT = 'rgba(248,250,252,0.42)';
+export const INK_LIGHT = 'rgba(248,250,252,0.28)';
 
 // ============================================================================
-// SURFACE (background fills for cards on light theme)
+// SURFACE (background fills for cards on DARK theme — raised panel)
 // ============================================================================
-export const SURFACE = '#FFFFFF';
+export const SURFACE = '#1B1E27';
 
 // ============================================================================
-// SLATE (neutrals on light surface)
+// SLATE (neutrals on DARK surface)
 // ============================================================================
-export const SLATE_50 = '#F8FAFC';           // NOTE: shares a value with the dark ramp's primary INK for a DIFFERENT reason (a light surface vs near-white text). Do not merge these on the strength of the value alone.
-export const SLATE_100 = '#F1F5F9';                          // slate-100 — segmented-control trough, photo bg — 7 cross-app files
-export const SLATE_150 = '#EDF1F5';
-export const SLATE_200 = '#E2E8F0';
+// NOTE: shares a value with CHARCOAL and with the app canvas. Different reasons:
+// this is the quietest neutral in the tour ramp and will move again when the ramp
+// is renamed. Do not merge on the strength of the value.
+export const SLATE_50 = '#15171F';
+export const SLATE_100 = 'rgba(255,255,255,0.06)';           // segmented-control trough, photo bg — 7 cross-app files
+export const SLATE_150 = 'rgba(255,255,255,0.08)';
+export const SLATE_200 = 'rgba(255,255,255,0.10)';
 export const SLATE_600 = '#475569';                          // Tailwind slate-600 — used as fallback bg/stripe when no brand color is available (22 files)
 export const SLATE_700 = '#334155';                          // Tailwind slate-700 — avatar fallback gradient endpoint, 6 cross-app files
 export const SLATE_800 = '#1e293b';                          // Tailwind slate-800 — avatar fallback gradient endpoint, 8 cross-app files
 
 // ============================================================================
-// HAIRLINE (divider variants)
+// HAIRLINE (divider variants — white-alpha, ONE STEP STRONGER than the light values)
 // ============================================================================
-export const HAIRLINE_INK_7 = 'rgba(15,23,42,0.07)';
-export const HAIRLINE_INK_8 = 'rgba(15,23,42,0.08)';         // hairline/faint bg fill — 15 cross-app files
-export const HAIRLINE_INK_10 = 'rgba(15,23,42,0.10)';
-export const HAIRLINE_INK_12 = 'rgba(15,23,42,0.12)';        // cut-line / section divider hairline — 7 cross-app files
-export const HAIRLINE_INK_15 = 'rgba(15,23,42,0.15)';        // section divider on light bg with stronger emphasis
-export const HAIRLINE_INK_18 = 'rgba(15,23,42,0.18)';        // hairline at strongest emphasis — TIED-state bar bg, faint row-number digits — 4 cross-app files
+export const HAIRLINE_INK_7 = 'rgba(255,255,255,0.10)';
+export const HAIRLINE_INK_8 = 'rgba(255,255,255,0.12)';         // hairline/faint bg fill — 15 cross-app files
+export const HAIRLINE_INK_10 = 'rgba(255,255,255,0.14)';
+export const HAIRLINE_INK_12 = 'rgba(255,255,255,0.18)';        // cut-line / section divider hairline — 7 cross-app files
+export const HAIRLINE_INK_15 = 'rgba(255,255,255,0.22)';        // section divider on light bg with stronger emphasis
+export const HAIRLINE_INK_18 = 'rgba(255,255,255,0.28)';        // hairline at strongest emphasis — TIED-state bar bg, faint row-number digits — 4 cross-app files
 
 // ============================================================================
-// INK_ALPHA (text/scrim overlays on light bg where alpha-based muting is needed)
+// INK_ALPHA (alpha-muted text on DARK bg — names historical)
 // ============================================================================
 // Used primarily by hero PhotoBand for legibility scrims and ink-alpha caption text.
 // Distinct from INK_* which are solid Tailwind slate values.
-export const INK_ALPHA_45 = 'rgba(15,23,42,0.45)';           // medium ink-alpha (caption / secondary on light)
-export const INK_ALPHA_60 = 'rgba(15,23,42,0.60)';           // heavier ink-alpha (subhead-equivalent on light)
+export const INK_ALPHA_45 = 'rgba(248,250,252,0.42)';        // medium alpha (caption / tertiary on dark)
+export const INK_ALPHA_60 = 'rgba(248,250,252,0.62)';        // quiet floor (subhead-equivalent on dark)
 
 // ============================================================================
 // WHITE ALPHAS (text + borders on dark bg — parallel to INK_ALPHA family)
@@ -84,17 +96,17 @@ export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text o
 
 
 // ============================================================================
-// INK TINTS (faint backgrounds + borders on light bg — parallel to WHITE_ALPHA)
+// INK TINTS (faint backgrounds + borders on DARK bg — one step stronger than the light values)
 // ============================================================================
 // Cross-app frequency (pre-Phase 6):
 //   _07: 47 files (borders) | _06: 30 files (placeholder bgs)
 // Use for: faint placeholder backgrounds, hairline borders on light surfaces.
 // Phase 10 will sweep all cross-app sites.
-export const INK_TINT_02 = 'rgba(15,23,42,0.02)';            // ultra-faint ink tint — column-header strip bg — 11 cross-app files
-export const INK_TINT_04 = 'rgba(15,23,42,0.04)';            // very-faint ink tint — logo-tile bg, mini-header bg — 9 cross-app files
-export const INK_TINT_05 = 'rgba(15,23,42,0.05)';            // ultra-faint inline pill/skeleton bg — 11 cross-app files
-export const INK_TINT_06 = 'rgba(15,23,42,0.06)';            // light slate bg — placeholder containers, faint surfaces
-export const INK_TINT_07 = 'rgba(15,23,42,0.07)';            // light slate border — hairline dividers on light bg
+export const INK_TINT_02 = 'rgba(255,255,255,0.03)';            // ultra-faint ink tint — column-header strip bg — 11 cross-app files
+export const INK_TINT_04 = 'rgba(255,255,255,0.05)';            // very-faint ink tint — logo-tile bg, mini-header bg — 9 cross-app files
+export const INK_TINT_05 = 'rgba(255,255,255,0.06)';            // ultra-faint inline pill/skeleton bg — 11 cross-app files
+export const INK_TINT_06 = 'rgba(255,255,255,0.08)';            // light slate bg — placeholder containers, faint surfaces
+export const INK_TINT_07 = 'rgba(255,255,255,0.10)';            // light slate border — hairline dividers on light bg
 
 // ============================================================================
 // AMBER (brand)
@@ -107,7 +119,7 @@ export const AMBER_TINT_10 = 'rgba(247,147,30,0.10)';
 export const AMBER_TINT_04 = 'rgba(247,147,30,0.04)';        // very faint amber — selection state bg, 8 cross-app files
 export const AMBER_TINT_12 = 'rgba(247,147,30,0.12)';        // VS divider bg, pill treatment — 6 cross-app files
 export const AMBER_BORDER = 'rgba(247,147,30,0.30)';
-export const AMBER_SOFT_BG = '#FEF3E7';
+export const AMBER_SOFT_BG = 'rgba(247,147,30,0.12)';
 
 // ============================================================================
 // GOLD (celebratory / winner / trophy theatre)
@@ -160,7 +172,7 @@ export const TOPAR_EVEN_DARK   = 'rgba(242,244,247,0.42)';
 // ============================================================================
 export const STATUS_LIVE = '#10B981';
 export const STATUS_LIVE_ON_DARK = '#5EE9A6';                 // live green that reads on dark hero gradients (STATUS_LIVE is too dark there)
-export const LIVE_INK = '#047857';                           // readable LIVE green text on light bg (emerald-700) — high-contrast counterpart to STATUS_LIVE — 7 cross-app files
+export const LIVE_INK = '#34D77F';                           // readable LIVE green text on DARK bg — counterpart to STATUS_LIVE — 7 cross-app files
 export const STATUS_LIVE_TINT_10 = 'rgba(16,185,129,0.10)';  // LIVE pill faint green fill — 3 cross-app sites
 export const STATUS_LIVE_BORDER = 'rgba(16,185,129,0.32)';   // LIVE pill border — 2 cross-app sites
 export const LIVE_DOT = '#22C55E';                            // bright pulse-dot green (green-500) — animated LIVE indicators on light bg — 7 cross-app files
@@ -198,7 +210,10 @@ export const SHELL_BG = '#0A0E14';                           // Tour Hub shell/c
 // ============================================================================
 // CHARCOAL (shared Clubhouse / player hero / live-card surface)
 // ============================================================================
-export const CHARCOAL = '#15171F';           // NOTE: shares a value with the app canvas for a DIFFERENT reason (a named product surface vs the global ground). Do not merge these on the strength of the value alone.                           // canonical charcoal — Clubhouse feed, player hero gradient end, live-now card
+// NOTE: shares a value with SLATE_50 and the app canvas. Different reasons: this
+// is a named product surface — Clubhouse feed, player hero gradient end, live-now
+// card — not a ramp step. Do not merge on the strength of the value.
+export const CHARCOAL = '#15171F';
 
 // ============================================================================
 // HERO BOARD SURFACE (Tour Overview hero leaderboard block ONLY)
@@ -220,9 +235,9 @@ export const FONT =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 // ============================================================================
-// BAR (proportional tug/track fills on light surfaces)
+// BAR (proportional tug/track fills on DARK surfaces)
 // ============================================================================
-export const BAR_NEUTRAL = '#AEB4BC';                        // losing / non-winning half of a head-to-head tug bar
+export const BAR_NEUTRAL = 'rgba(255,255,255,0.18)';                        // losing / non-winning half of a head-to-head tug bar
 
 // ============================================================================
 // HERO HEIGHT (canonical, every tour surface EXCEPT the tour overview hero)
