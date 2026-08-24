@@ -5,7 +5,8 @@
  * state is owned by Clubhouse.tsx and stays separate.
  *
  * Data:
- *   - Suggestions reuse useSuggestedCreators (same source as SuggestedCreatorsShelf).
+ *   - Suggestions come from useSuggestedCreators (watch/hooks) — this is now its
+ *     only consumer.
  *   - Follows go through useToggleFollow (optimistic; onError rollback via toast).
  *   - Fourball spine seeds from useSocialCounts (following count) + useSocialListV2
  *     (avatars) and increments as follows happen on this screen.
