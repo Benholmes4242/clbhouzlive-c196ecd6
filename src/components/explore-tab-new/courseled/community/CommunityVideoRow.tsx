@@ -5,6 +5,7 @@ import { formatRelativeRounded } from '@/i18n/format';
 import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useMediaImpression, type MediaTrackTarget } from '@/utils/mediaEngagement';
+import { A, DISCOVER_FACT, DISCOVER_QUIET } from '@/components/explore-tab-new/courseled/tokens';
 
 /**
  * LATEST VIDEOS ROW (BRIEF_COMMUNITY_PAGE_REBUILD, reference frame).
@@ -17,22 +18,40 @@ import { useMediaImpression, type MediaTrackTarget } from '@/utils/mediaEngageme
  * Rows are separated by a hairline, never by a card. Zero likes render nothing.
  */
 
-const INK = '#0E1216';
-const MUTE = '#5B6572';
-const DIM = '#A2A9B2';
-const HAIR = '#EDF0F3';
-const PANEL = '#EDF0F3';
+/**
+ * DARK IS A TONE SWITCH, NOT A FORK (BRIEF_DISCOVER_ONE_PAGE §3.3). This row was
+ * written against /community's #F8FAFC canvas; with that page deleted the row
+ * lives on Discover's dark canvas, where its ink would be invisible. Same
+ * treatment already applied to the photo mosaic and the club index: light stays
+ * the default so nothing that still asks for light changes.
+ */
+const LIGHT = { ink: '#0E1216', mute: '#5B6572', dim: '#A2A9B2', hair: '#EDF0F3', panel: '#EDF0F3' } as const;
+const DARK = {
+  ink: DISCOVER_FACT,
+  mute: DISCOVER_QUIET,
+  dim: DISCOVER_QUIET,
+  hair: A.HAIRLINE,
+  panel: A.PANEL,
+} as const;
 const NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const };
 
 interface Props {
   item: CommunityLibraryItem;
+  /** Discover is dark. Default light = the treatment this row shipped with. */
+  tone?: 'light' | 'dark';
   first: boolean;
   onPress: (item: CommunityLibraryItem) => void;
   /** Media engagement target. Absent = the row reports nothing. */
   track?: MediaTrackTarget;
 }
 
-export function CommunityVideoRow({ item, first, onPress, track }: Props) {
+export function CommunityVideoRow({ item, first, onPress, track, tone = 'light' }: Props) {
+  const C = tone === 'dark' ? DARK : LIGHT;
+  const INK = C.ink;
+  const MUTE = C.mute;
+  const DIM = C.dim;
+  const HAIR = C.hair;
+  const PANEL = C.panel;
   const impressionRef = useMediaImpression(track);
   const open = () => {
     if (track) analyticsEvents.media.opened(track);
