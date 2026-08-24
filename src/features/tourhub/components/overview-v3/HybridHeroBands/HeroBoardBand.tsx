@@ -333,7 +333,7 @@ export function HeroBoardSection({
           entries={entries}
           limit={HERO_BOARD_ROWS}
           currentRound={currentRound as number}
-          theme="dark"
+          theme="heroBoard"
           pickPlayerIds={pickPlayerIds}
           onRowTap={onRowTap}
         />

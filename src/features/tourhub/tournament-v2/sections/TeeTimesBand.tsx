@@ -7,10 +7,10 @@
 import { Clock, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { FONT, INK, INK_MUTE, HAIRLINE_INK_8, SURFACE } from '../../_shared/tokens';
+import { FONT, INK, INK_MUTE, HAIRLINE_INK_8, SURFACE, AMBER } from '../../_shared/tokens';
 
 const AMBER_TINT = 'rgba(247,147,30,0.10)';
-const AMBER = '#F7931E';
+
 
 interface Props {
   round: number;
