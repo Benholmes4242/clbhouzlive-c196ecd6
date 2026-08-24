@@ -3,6 +3,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Loader2, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { BIZ } from '@/components/business/businessTokens';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
