@@ -1,22 +1,31 @@
-// PostSuccessV2 - immersive amber-tinted overlay confirming a post outcome.
-// Three variants:
-//   - 'uploading' (media in flight): ProgressRing tracks the controller.
-//     Phase-driven: running / complete (amber -> green + check) / failed.
+// PostSuccessV2 - immersive overlay confirming a post outcome.
+//
+// BRIEF_POST_COMPOSER_DARK §2. The posting and posted states are ONE
+// composition: the post rendered AS A CARD (option A), centred in the shell,
+// with the status beneath it. The posted state is that same card RESOLVING —
+// the scrims clear and the accent moves from amber to green. Nothing about
+// the shell changed: it still owns z-order, the accent radial, the status bar
+// and tap-to-close.
+//
+// Variants:
+//   - 'uploading' (media in flight): the card, scrimmed, with an honest
+//     eyebrow (see honestEyebrow). Phase-driven: running / complete / failed.
 //   - 'scheduled' (text-only or media): calendar glyph confirmation.
-//   - 'published' (text-only): green check confirmation.
-// Transient moment: tap anywhere to close; complete auto-dismisses at 1200ms.
+//   - 'published' (text-only, and the edit-save path): the card, resolved.
 
 import { useEffect, useState } from 'react';
-import { Clock, AlertTriangle } from 'lucide-react';
+import { Clock, AlertTriangle, MapPin } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import type { SubmitResult } from '../hooks/usePostSubmit';
 import { formatSchedule } from '../lib/formatSchedule';
 import { subscribeToJob, getJobSnapshot } from '../lib/postUploadController';
 import { ImmersiveSuccessShell } from './ImmersiveSuccessShell';
-import { CT } from '@/features/_shared/composerTokens';
+import { CT, CT_DARK } from '@/features/_shared/composerTokens';
+import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 const AMBER = CT.amber;
-/** On-dark green: the shell's accent, the top bar at 100%, the LIVE kicker. */
+/** On-dark green: the shell's accent, the LIVE eyebrow. */
 const GREEN_ON_DARK = CT.successOnDark;
 const NEUTRAL = 'rgba(255,255,255,0.5)';
 
@@ -29,12 +38,11 @@ export default function PostSuccessV2({ result, onDone }: Props) {
   const { t } = useTranslation(['composer', 'common']);
 
   // Auto-dismiss the terminal (non-uploading) variants so edit-save success
-  // closes itself if the user does not tap. Mirrors UploadingState's 1200ms
-  // auto-dismiss. Tap remains the immediate path.
+  // closes itself if the user does not tap. Tap remains the immediate path.
   const isTerminal = result.kind === 'scheduled' || result.kind === 'published';
   useEffect(() => {
     if (!isTerminal) return;
-    const id = window.setTimeout(() => onDone(), 1200);
+    const id = window.setTimeout(() => onDone(), 2200);
     return () => window.clearTimeout(id);
   }, [isTerminal, onDone]);
 
@@ -63,57 +71,21 @@ export default function PostSuccessV2({ result, onDone }: Props) {
   return <PostedScreen result={result} onDone={onDone} />;
 }
 
-/**
- * POSTED - minimal treatment. Green shell, green 2px bar at 100%, bottom
- * anchored copy. The strip states only what is TRUE for this post; with fewer
- * than two true cells the strip and its hairline are omitted entirely.
- */
+/** POSTED — the same card, resolved. Green accent, no scrims, LIVE eyebrow. */
 function PostedScreen({ result, onDone }: Props) {
   const { t } = useTranslation(['composer', 'common']);
-  const cells = postedCells(result, t);
   return (
-    <ImmersiveSuccessShell accent={GREEN_ON_DARK} onTapClose={onDone} showTapHint padded={false}>
-      <TopBar progress={100} color={GREEN_ON_DARK} />
-      <BottomBlock>
-        <Kicker color={GREEN_ON_DARK}>{t('composer:success.liveKicker')}</Kicker>
-        <Headline>{result.courseName || t('composer:success.posted')}</Headline>
-        {cells.length >= 2 && <Strip cells={cells} />}
-      </BottomBlock>
+    <ImmersiveSuccessShell accent={GREEN_ON_DARK} onTapClose={onDone} showTapHint>
+      <Column>
+        <PostCard result={result} completedFiles={result.mediaPreviews?.length ?? 0} resolved />
+        <Status
+          eyebrow={t('composer:success.liveKicker')}
+          eyebrowColor={GREEN_ON_DARK}
+          headline={t('composer:success.posted')}
+        />
+      </Column>
     </ImmersiveSuccessShell>
   );
-}
-
-/** Figure cells for the posted strip. Never a zero, never a placeholder. */
-function postedCells(result: SubmitResult, t: (k: string) => string): StripCell[] {
-  const cells: StripCell[] = [];
-  const r = result.round;
-  if (r) {
-    if (r.gross != null) cells.push({ label: t('composer:success.statGross'), value: String(r.gross) });
-    if (r.toPar != null) {
-      cells.push({
-        label: t('composer:success.statToPar'),
-        value: fmtToPar(r.toPar),
-        color: r.toPar < 0 ? GREEN_ON_DARK : undefined,
-      });
-    }
-    if (r.birdies != null && r.birdies > 0) {
-      cells.push({ label: t('composer:success.statBirdies'), value: String(r.birdies) });
-    }
-    return cells.slice(0, 3);
-  }
-  if (result.photoCount) {
-    cells.push({ label: t('composer:success.statPhotos'), value: String(result.photoCount) });
-  }
-  if (result.videoCount) {
-    cells.push({ label: t('composer:success.statVideos'), value: String(result.videoCount) });
-  }
-  return cells.slice(0, 3);
-}
-
-/** True minus U+2212, and "E" for level. */
-function fmtToPar(n: number): string {
-  if (n === 0) return 'E';
-  return n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`;
 }
 
 type Phase = 'running' | 'complete' | 'failed';
@@ -123,25 +95,28 @@ function UploadingState({ result, onDone }: Props) {
   const isUploadingKind = result.kind === 'uploading';
   const jobId = isUploadingKind ? (result.jobId ?? null) : null;
   const initial = jobId ? getJobSnapshot(jobId) : null;
-  const [progress, setProgress] = useState<number>(initial?.overallProgress ?? 0);
+  const [completed, setCompleted] = useState<number>(initial?.completedFiles ?? 0);
+  const [total, setTotal] = useState<number>(initial?.totalFiles ?? (result.mediaPreviews?.length ?? 0));
   const [phase, setPhase] = useState<Phase>((initial?.phase as Phase) ?? 'running');
   const [errorText, setErrorText] = useState<string | null>(initial?.error ?? null);
 
   useEffect(() => {
     if (!jobId) return;
     return subscribeToJob(jobId, (s) => {
-      setProgress(s.overallProgress);
+      setCompleted(s.completedFiles);
+      setTotal(s.totalFiles);
       setPhase(s.phase as Phase);
       if (s.error) setErrorText(s.error);
     });
   }, [jobId]);
 
   // Auto-dismiss shortly after completion so the user does not need to tap.
+  // Longer than the old 1200ms: the resolved card is now worth looking at.
   useEffect(() => {
     if (!isUploadingKind) return;
     if (phase !== 'complete') return;
-    const t = window.setTimeout(() => onDone(), 1200);
-    return () => window.clearTimeout(t);
+    const id = window.setTimeout(() => onDone(), 2400);
+    return () => window.clearTimeout(id);
   }, [isUploadingKind, phase, onDone]);
 
   if (!isUploadingKind) return null;
@@ -149,16 +124,18 @@ function UploadingState({ result, onDone }: Props) {
   const isScheduled = !!result.isScheduled;
 
   if (phase === 'complete') {
-    // Scheduled keeps its own amber copy; posted becomes the green screen.
+    // Scheduled keeps its own amber copy; posted becomes the green card.
     if (isScheduled) {
       return (
-        <ImmersiveSuccessShell onTapClose={onDone} showTapHint padded={false}>
-          <TopBar progress={100} color={AMBER} />
-          <BottomBlock>
-            <Kicker>{t('composer:success.scheduled')}</Kicker>
-            <Headline>{result.courseName || t('composer:success.scheduled')}</Headline>
-            <Body>{t('composer:success.scheduledBody')}</Body>
-          </BottomBlock>
+        <ImmersiveSuccessShell onTapClose={onDone} showTapHint>
+          <Column>
+            <PostCard result={result} completedFiles={total} resolved />
+            <Status
+              eyebrow={t('composer:success.scheduled')}
+              headline={result.scheduledAt ? formatSchedule(new Date(result.scheduledAt)) : t('composer:success.scheduled')}
+              body={t('composer:success.scheduledBody')}
+            />
+          </Column>
         </ImmersiveSuccessShell>
       );
     }
@@ -182,109 +159,271 @@ function UploadingState({ result, onDone }: Props) {
   }
 
   return (
-    <ImmersiveSuccessShell onTapClose={onDone} padded={false}>
-      <TopBar progress={progress} color={AMBER} />
-      <BottomBlock>
-        <Kicker>
-          {isScheduled
-            ? t('composer:success.scheduledKicker', { n: Math.round(progress) })
-            : t('composer:success.uploadingKicker', { n: Math.round(progress) })}
-        </Kicker>
-        <Headline>{result.courseName || t('composer:success.posting')}</Headline>
-        <Body>
-          {isScheduled && result.scheduledAt
+    <ImmersiveSuccessShell onTapClose={onDone}>
+      <Column>
+        <PostCard result={result} completedFiles={completed} />
+        <Status
+          eyebrow={honestEyebrow(total, completed, isScheduled, t)}
+          eyebrowColor={AMBER}
+          headline={isScheduled ? t('composer:success.scheduled') : t('composer:success.posting')}
+          reassure
+          body={isScheduled && result.scheduledAt
             ? t('composer:success.uploadingScheduledBody', { when: formatSchedule(new Date(result.scheduledAt)) })
-            : t('composer:success.uploadingBody')}
-        </Body>
-        <div style={{ marginTop: 4 }}>
-          <DonePill onClick={onDone} />
-        </div>
-      </BottomBlock>
+            : undefined}
+        />
+      </Column>
     </ImmersiveSuccessShell>
   );
 }
 
-// ---------- minimal treatment pieces ----------
-
-/** 2px determinate bar pinned to the very top edge, full width, no radius. */
-function TopBar({ progress, color }: { progress: number; color: string }) {
-  const clamped = Math.max(0, Math.min(100, progress));
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: 2,
-        background: 'rgba(255,255,255,0.10)',
-      }}
-    >
-      <div
-        style={{
-          width: `${clamped}%`,
-          height: '100%',
-          background: color,
-          transition: 'width 300ms ease, background 400ms ease',
-        }}
-      />
-    </div>
-  );
+/**
+ * §2.3 — THE PROGRESS IS HONEST TO WHAT THE UPLOAD REPORTS.
+ * The controller reports PER-ITEM COMPLETION reliably (completedFiles is
+ * incremented after each item, sequentially, and emitted). Bytes are NOT
+ * uniformly smooth: an image only reports 50 then 100, so a percentage sits
+ * still for most of an image-only post. So:
+ *   > 1 item  -> "UPLOADING · N OF M"  (items-completed, the honest figure)
+ *   1 item    -> "UPLOADING"           (no "1 OF 1", no stuck percentage)
+ */
+function honestEyebrow(
+  total: number,
+  completed: number,
+  isScheduled: boolean,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): string {
+  const stem = isScheduled ? t('composer:success.scheduled') : t('composer:success.uploadingSimple');
+  if (total > 1) return `${stem} · ${Math.min(completed, total)} of ${total}`;
+  return stem;
 }
 
-/** Bottom-anchored, left-aligned content block. */
-function BottomBlock({ children }: { children: React.ReactNode }) {
+// ---------- the card ----------
+
+const CARD_MAX = 344;
+const CELL_GAP = 2;
+
+/**
+ * The post as it will appear in the clubhouse: media block, actor, caption,
+ * course. `completedFiles` scrims the cells still in flight; `resolved` clears
+ * every scrim regardless.
+ */
+function PostCard({ result, completedFiles, resolved }: { result: SubmitResult; completedFiles: number; resolved?: boolean }) {
+  const previews = result.mediaPreviews ?? [];
+  const caption = (result.caption ?? '').trim();
   return (
     <div
       style={{
-        marginTop: 'auto',
         width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        textAlign: 'left',
-        gap: 10,
-        padding: 28,
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 64px)',
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function Kicker({ color, children }: { color?: string; children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        fontSize: 8.5,
-        fontWeight: 700,
-        letterSpacing: '0.16em',
-        textTransform: 'uppercase',
-        color: color ?? 'rgba(255,255,255,0.38)',
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function Headline({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        fontSize: 26,
-        fontWeight: 700,
-        letterSpacing: '-0.02em',
-        lineHeight: 1.15,
-        color: 'rgba(255,255,255,0.96)',
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
+        maxWidth: CARD_MAX,
+        background: CT_DARK.elev,
+        border: `1px solid ${CT_DARK.line}`,
+        borderRadius: 18,
         overflow: 'hidden',
+        textAlign: 'left',
       }}
     >
-      {children}
+      {previews.length > 0 && (
+        <MediaMosaic previews={previews} completedFiles={completedFiles} resolved={resolved} />
+      )}
+
+      <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {result.actorName && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+            <SquircleAvatar
+              src={result.actorAvatarUrl ?? null}
+              alt={result.actorName}
+              size={26}
+              fallback={result.actorName[0]}
+              hairlineRing
+              ringColor={DARK_HAIRLINE}
+            />
+            <div style={{ fontSize: 13, fontWeight: 700, color: CT_DARK.ink, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {result.actorName}
+            </div>
+          </div>
+        )}
+
+        {caption.length > 0 && (
+          <div
+            style={{
+              fontSize: 13.5,
+              lineHeight: 1.45,
+              color: CT_DARK.ink,
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {caption}
+          </div>
+        )}
+
+        {result.courseName && (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, alignSelf: 'flex-start', border: `1px solid ${CT_DARK.line}`, background: 'rgba(248,250,252,0.06)', borderRadius: 999, padding: '5px 10px' }}>
+            <MapPin size={11} color={CT_DARK.mute} strokeWidth={2.5} />
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: CT_DARK.ink }}>{result.courseName}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * §2.2 — THE MOSAIC (option 3). MAX_MEDIA is 10, at most three cells render.
+ *   1        one full-width image, no grid, no badge, no +N
+ *   2        two cells
+ *   3        one large leading cell, two stacked beside it
+ *   4+       the same three cells, +N over the last
+ * The +N is NOT a progress indicator: it never animates and never counts down.
+ */
+function MediaMosaic({
+  previews,
+  completedFiles,
+  resolved,
+}: {
+  previews: { url: string; type: 'image' | 'video' }[];
+  completedFiles: number;
+  resolved?: boolean;
+}) {
+  const n = previews.length;
+  const visible = previews.slice(0, 3);
+  const overflow = n > 3 ? n - 3 : 0;
+  const pending = (i: number) => !resolved && i >= completedFiles;
+
+  if (n === 1) {
+    return (
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 5', background: '#000' }}>
+        <Cell item={visible[0]} pending={pending(0)} />
+      </div>
+    );
+  }
+
+  if (n === 2) {
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: CELL_GAP, width: '100%', aspectRatio: '4 / 5', background: '#000' }}>
+        {visible.map((m, i) => (
+          <div key={i} style={{ position: 'relative', overflow: 'hidden' }}>
+            <Cell item={m} pending={pending(i)} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gridTemplateRows: '1fr 1fr', gap: CELL_GAP, width: '100%', aspectRatio: '4 / 5', background: '#000' }}>
+      <div style={{ gridRow: '1 / span 2', position: 'relative', overflow: 'hidden' }}>
+        <Cell item={visible[0]} pending={pending(0)} />
+      </div>
+      <div style={{ position: 'relative', overflow: 'hidden' }}>
+        <Cell item={visible[1]} pending={pending(1)} />
+      </div>
+      <div style={{ position: 'relative', overflow: 'hidden' }}>
+        <Cell item={visible[2]} pending={pending(2)} />
+        {overflow > 0 && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(11,15,20,0.58)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 20,
+              fontWeight: 700,
+              color: '#FFFFFF',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            +{overflow}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** One mosaic cell: the local preview, plus the pending scrim that clears. */
+function Cell({ item, pending }: { item: { url: string; type: 'image' | 'video' }; pending: boolean }) {
+  const reduce = useReducedMotion();
+  return (
+    <>
+      {item.type === 'video' ? (
+        <video
+          src={item.url}
+          muted
+          playsInline
+          preload="metadata"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      ) : (
+        <img
+          src={item.url}
+          alt=""
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      )}
+      <motion.div
+        aria-hidden
+        initial={false}
+        animate={{ opacity: pending ? 1 : 0 }}
+        transition={reduce ? { duration: 0 } : { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(11,15,20,0.55)', pointerEvents: 'none' }}
+      />
+    </>
+  );
+}
+
+// ---------- status beneath the card ----------
+
+function Status({
+  eyebrow,
+  eyebrowColor,
+  headline,
+  body,
+  reassure,
+}: {
+  eyebrow: string;
+  eyebrowColor?: string;
+  headline: string;
+  body?: string;
+  reassure?: boolean;
+}) {
+  const reduce = useReducedMotion();
+  return (
+    <div style={{ width: '100%', maxWidth: CARD_MAX, display: 'flex', flexDirection: 'column', gap: 6, textAlign: 'left' }}>
+      <motion.div
+        initial={false}
+        animate={{ color: eyebrowColor ?? 'rgba(255,255,255,0.38)' }}
+        transition={reduce ? { duration: 0 } : { duration: 0.4 }}
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: '0.19em',
+          textTransform: 'uppercase',
+        }}
+      >
+        {eyebrow}
+      </motion.div>
+      <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, color: 'rgba(255,255,255,0.96)' }}>
+        {headline}
+      </div>
+      {reassure && <Reassurance />}
+      {body && <Body>{body}</Body>}
+    </div>
+  );
+}
+
+/** §2.4 — the best thing on either screen, given real weight. */
+function Reassurance() {
+  const { t } = useTranslation('composer');
+  return (
+    <div style={{ marginTop: 4 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: '#FFFFFF' }}>{t('success.keepUsing')}</div>
+      <div style={{ fontSize: 11.5, fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
+        {t('success.keepUsingSub')}
+      </div>
     </div>
   );
 }
@@ -297,57 +436,13 @@ function Body({ children }: { children: React.ReactNode }) {
   );
 }
 
-interface StripCell { label: string; value: string; color?: string }
-
-function Strip({ cells }: { cells: StripCell[] }) {
-  return (
-    <div
-      style={{
-        marginTop: 8,
-        width: '100%',
-        borderTop: '1px solid rgba(255,255,255,0.12)',
-        paddingTop: 14,
-        display: 'flex',
-        gap: 30,
-      }}
-    >
-      {cells.map((c) => (
-        <div key={c.label} style={{ minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 17,
-              fontWeight: 700,
-              color: c.color ?? 'rgba(255,255,255,0.96)',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {c.value}
-          </div>
-          <div
-            style={{
-              marginTop: 4,
-              fontSize: 7.5,
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.38)',
-            }}
-          >
-            {c.label}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ---------- pieces ----------
 
 function Column({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      gap: 22, maxWidth: 340, width: '100%', textAlign: 'center',
+      gap: 20, maxWidth: CARD_MAX, width: '100%', textAlign: 'center',
     }}>
       {children}
     </div>
