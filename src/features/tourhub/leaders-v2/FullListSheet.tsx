@@ -28,8 +28,7 @@ import {
   INK,
   INK_FAINT,
   INK_MUTE,
-  SLATE_50,
-} from '../_shared/tokens';
+  SLATE_50,, SURFACE } from '../_shared/tokens';
 import { TITLE } from '@/lib/tokens/type';
 
 import type { LeaderCategoryDef } from './data/useLeaderCategories';
@@ -166,7 +165,7 @@ export function FullListSheet({
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              background: '#FFFFFF',
+              background: SURFACE,
               border: `0.5px solid ${HAIRLINE_INK_10}`,
               borderRadius: 18,
               padding: '6px 12px',

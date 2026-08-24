@@ -145,7 +145,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
                   color: INK_MUTE,
                   padding: '2px 6px',
                   borderRadius: 4,
-                  background: 'rgba(15,23,42,0.05)',
+                  background: 'rgba(255,255,255,0.06)',
                   textTransform: 'uppercase',
                   lineHeight: 1,
                   whiteSpace: 'nowrap',

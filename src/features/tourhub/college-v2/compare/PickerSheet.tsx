@@ -180,7 +180,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
                       inset: 0,
                       borderRadius: '34%',
                       overflow: 'hidden',
-                      background: isTop ? 'rgba(255,184,0,0.10)' : 'rgba(15,23,42,0.04)',
+                      background: isTop ? 'rgba(255,184,0,0.10)' : 'rgba(255,255,255,0.05)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -201,7 +201,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
                       position: 'absolute',
                       inset: 0,
                       borderRadius: '34%',
-                      border: isTop ? `1px solid ${GOLD_DEEP}` : '1px solid rgba(15,23,42,0.12)',
+                      border: isTop ? `1px solid ${GOLD_DEEP}` : '1px solid rgba(255,255,255,0.18)',
                       pointerEvents: 'none',
                     }}
                   />

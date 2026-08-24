@@ -200,7 +200,7 @@ export function RankedPlayerHeader({
     fontWeight: 700,
     letterSpacing: '0.13em',
     textTransform: 'uppercase',
-    color: 'rgba(15,23,42,0.45)',
+    color: 'rgba(248,250,252,0.42)',
   };
   return (
     <div

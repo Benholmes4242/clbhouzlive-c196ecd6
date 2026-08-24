@@ -55,7 +55,7 @@ import { useCollegeAggregateStats } from './data/useCollegeAggregateStats';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CLASS_CAP = 5;
-const OFF_INK = 'rgba(15,23,42,0.38)';
+const OFF_INK = 'rgba(248,250,252,0.38)';
 const fmtInt = (n: number) => formatNumber(n);
 const fmtScoringAvg = (n: number) => n.toFixed(2);
 const fmtDrive = (n: number) => `${n.toFixed(1)} yds`;
@@ -221,7 +221,7 @@ export function ComparePage() {
             <button
               type="button"
               onClick={() => refetch()}
-              style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+              style={{ background: INK, color: SLATE_50, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
             >
               Retry
             </button>
@@ -517,7 +517,7 @@ function ClassColumn({ headerCode, roster, liveMap, weekByPlayer, alignRight }: 
                   srcCandidates={a.photoUrl ? [a.photoUrl] : []}
                   alt={a.fullName}
                   hairlineRing
-                  ringColor="rgba(15,23,42,0.12)"
+                  ringColor="rgba(255,255,255,0.18)"
                 />
                 {live && (
                   <span

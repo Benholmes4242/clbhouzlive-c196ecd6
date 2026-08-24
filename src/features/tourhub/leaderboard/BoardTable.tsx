@@ -34,17 +34,18 @@ import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
 import CountryFlag from '@/components/ui/country-flag';
 import { getScoreColor } from '../_shared/scoreColor';
-import { TREND_UP, TREND_DOWN, AMBER } from '../_shared/tokens';
+import { TREND_UP, TREND_DOWN, AMBER, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
-const INK = '#0F172A';
-const SECONDARY = '#4B5563';
-const MUTED = '#94A3B8';
-const HAIRLINE = 'rgba(0,0,0,0.08)';
+// Dark ramp, imported so the board follows the tour token file (was four pinned light literals).
+const INK = TOUR_INK;
+const SECONDARY = TOUR_INK_SOFT;
+const MUTED = TOUR_INK_FAINT;
+const HAIRLINE = 'rgba(255,255,255,0.12)';
 
-const CANVAS = '#F8FAFC';
+const CANVAS = TOUR_SLATE_50;
 /** Leader wash — the only per-row emphasis left on the board. */
-const LEADER_WASH = 'rgba(14,18,22,0.025)';
+const LEADER_WASH = 'rgba(255,255,255,0.05)';
 
 const POS_NUM_W = 32;
 const POS_MOVE_W = 20;
@@ -317,7 +318,7 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
       <div
         key="__cut__"
         style={{
-          background: 'rgba(15,23,42,0.03)',
+          background: 'rgba(255,255,255,0.04)',
           padding: '10px 16px',
           // The ONE horizontal rule left on the board: it separates two
           // GROUPS, not two peers.

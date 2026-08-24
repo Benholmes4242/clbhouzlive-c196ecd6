@@ -29,8 +29,7 @@ import {
   INK_FAINT,
   INK_MUTE,
   STATUS_LIVE,
-  SURFACE,
-} from '@/features/tourhub/_shared/tokens';
+  SURFACE,, SLATE_50 } from '@/features/tourhub/_shared/tokens';
 import { useCollegeRoster } from '../data/useCollegeRoster';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -127,7 +126,7 @@ export function TheClass({ slug, collegeName }: Props) {
           <button
             type="button"
             onClick={() => refetch()}
-            style={{ background: INK, color: '#fff', border: 'none', borderRadius: 999, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+            style={{ background: INK, color: SLATE_50, border: 'none', borderRadius: 999, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
           >
             {t('college.profile.rosterRetry')}
           </button>
@@ -204,7 +203,7 @@ export function TheClass({ slug, collegeName }: Props) {
                   srcCandidates={getPlayerHeadshotCandidates(a.fullName, a.tourCodes?.[0] ?? 'pga')}
                   alt={a.fullName}
                   hairlineRing
-                  ringColor="rgba(15,23,42,0.12)"
+                  ringColor="rgba(255,255,255,0.18)"
                 />
                 {live && (
                   <span

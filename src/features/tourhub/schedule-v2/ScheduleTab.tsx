@@ -405,8 +405,8 @@ export function ScheduleTab() {
               onClick={() => refetch()}
               style={{
                 marginTop: 4,
-                background: '#0F172A',
-                color: '#fff',
+                background: INK,
+                color: SLATE_50,
                 border: 'none',
                 borderRadius: 999,
                 padding: '10px 20px',
@@ -493,7 +493,7 @@ export function ScheduleTab() {
             padding: '0 12px',
             borderRadius: 999,
             background: INK,
-            color: '#FFFFFF',
+            color: SLATE_50,
             border: 'none',
             fontFamily: FONT,
             fontSize: 11,

@@ -35,13 +35,12 @@ import {
   INK,
   INK_FAINT,
   INK_MUTE,
-  SLATE_50,
-} from '../../_shared/tokens';
+  SLATE_50,, SURFACE } from '../../_shared/tokens';
 import type { LeaderCategoryDef, LeaderRow } from '../data/useLeaderCategories';
 import type { LivePlayerMap } from '../../players-v2/data/useLivePlayerIds';
 
 // -- Page-local tokens -------------------------------------------------
-const HAIRLINE = 'rgba(15,23,42,0.08)';
+const HAIRLINE = 'rgba(255,255,255,0.12)';   // white-alpha, one step stronger than the former ink 0.08
 const PAD_X = 14;
 const LIVE_GREEN = '#10B981';
 
@@ -344,7 +343,7 @@ function WinnersCircleInner({ category, onOpen, onPlayerTap }: BoardBaseProps) {
                 alignItems: 'center',
                 gap: 8,
                 padding: '5px 10px 5px 5px',
-                background: '#FFFFFF',
+                background: SURFACE,
                 borderRadius: 999,
                 border: `0.5px solid ${HAIRLINE}`,
                 fontFamily: FONT,
@@ -376,8 +375,8 @@ function WinnersCircleInner({ category, onOpen, onPlayerTap }: BoardBaseProps) {
                   height: 20,
                   padding: '0 6px',
                   borderRadius: 999,
-                  background: isLeader ? INK : 'rgba(15,23,42,0.06)',
-                  color: isLeader ? '#FFFFFF' : INK,
+                  background: isLeader ? INK : 'rgba(255,255,255,0.08)',
+                  color: isLeader ? SLATE_50 : INK,
                   fontSize: 11,
                   fontWeight: 700,
                   fontVariantNumeric: 'tabular-nums lining-nums',
