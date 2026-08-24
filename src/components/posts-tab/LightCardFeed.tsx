@@ -1,5 +1,11 @@
 /**
- * LightCardFeed — light-mode, window-scrolled, virtualized profile feed.
+ * LightCardFeed — the WINDOW-SCROLLED, virtualized profile feed. Dark, like
+ * everything else: "Light" in the name is a fossil of the light era and says
+ * nothing about this component's reason to exist.
+ *
+ * It exists because it window-scrolls, so the profile hero scrolls away
+ * naturally, while Clubhouse's `CardFeed` owns its own scroller. That
+ * scrolling architecture is the decision; the theme was incidental to it.
  *
  * Built ground-up for the profile Activity / Posts tab (personal + business).
  * Uses `react-virtuoso` with `useWindowScroll` so the page hero scrolls away
@@ -33,7 +39,10 @@ import { FeedCard } from '@/components/feed/FeedCard';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 const PAGE_BG = A.CANVAS;
-const DIVIDER = '#E5E7EA';
+/* Inter-card band. Same value and same 5px height as CARD_BAND in StatBrowse
+   and VirtualizedCourseList — three local declarations, deliberately not
+   extracted. */
+const DIVIDER = 'rgba(255,255,255,0.06)';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1;
@@ -561,7 +570,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
               />
             )}
           </LightItemGate>
-          {/* Inter-card divider — a touch darker than the page bg */}
+          {/* Inter-card divider — a hairline lift off the dark canvas */}
           <div aria-hidden style={{ height: 5, background: DIVIDER }} />
         </div>
       );
