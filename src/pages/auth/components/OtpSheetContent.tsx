@@ -161,15 +161,15 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
     <div className="space-y-4">
       {/* Sent-to */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <p style={{ ...LABEL, color: 'rgba(255,255,255,0.60)', margin: 0 }}>
+        <p style={{ ...LABEL, fontSize: 10, color: 'rgba(255,255,255,0.60)', margin: 0 }}>
           {t('otp.sentTo')}
         </p>
-        <p style={{ ...BODY, margin: 0, display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+        <p style={{ ...BODY, fontSize: 14, margin: 0, display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
           <span style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 600 }}>{email}</span>
           <button
             type="button"
             onClick={onUseDifferentEmail}
-            style={{ ...BODY, fontWeight: 600, color: '#FFFFFF', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+            style={{ ...BODY, fontSize: 14, fontWeight: 600, color: '#FFFFFF', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
           >
             {t('otp.changeEmail')}
           </button>
@@ -220,12 +220,12 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
 
       {/* Error / Info */}
       {errorMessage && (
-        <p className="text-center" style={{ ...BODY, color: '#F87171' }}>
+        <p className="text-center" style={{ ...BODY, fontSize: 14, color: '#F87171' }}>
           {errorMessage}
         </p>
       )}
       {infoMessage && !errorMessage && (
-        <p className="text-center" style={{ ...BODY, color: 'rgba(255,255,255,0.96)' }}>
+        <p className="text-center" style={{ ...BODY, fontSize: 14, color: 'rgba(255,255,255,0.96)' }}>
           {infoMessage}
         </p>
       )}
@@ -236,7 +236,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
         onClick={handleManualSubmit}
         disabled={!canSubmit}
         aria-label={t('otp.verifyAria')}
-        className="w-full h-[54px] flex items-center justify-center gap-2 rounded-sq-sm font-bold text-[15px] transition-all duration-150 active:scale-[0.98]"
+        className="w-full h-[54px] flex items-center justify-center gap-2 rounded-sq-sm font-bold uppercase tracking-[0.10em] text-[13px] transition-all duration-150 active:scale-[0.98]"
         style={{
           background: verifyActiveLook ? '#FFFFFF' : 'rgba(255,255,255,0.06)',
           boxShadow: verifyActiveLook ? '0 6px 20px rgba(255,255,255,0.18)' : 'none',
@@ -256,6 +256,7 @@ const OtpSheetContent: React.FC<OtpSheetContentProps> = ({
           disabled={resendCooldown > 0 || submitting}
           style={{
             ...BODY,
+            fontSize: 14,
             color: resendCooldown > 0 ? 'rgba(255,255,255,0.38)' : 'rgba(255,255,255,0.55)',
             cursor: resendCooldown > 0 ? 'default' : 'pointer',
           }}
