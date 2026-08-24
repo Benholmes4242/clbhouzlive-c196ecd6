@@ -1045,7 +1045,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                   <button
                     key={`suggested-${c.id}`}
                     onClick={() => { openDetail('course'); setCourses([...state.courses, { id: c.id, name: c.name, country: c.country }]); }}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 5, border: `1px solid ${PAGE2.line}`, background: PAGE2.canvas, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: PAGE2.ink }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 5, border: `1px solid ${PAGE2.line}`, background: 'rgba(248,250,252,0.06)', borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: PAGE2.ink }}
                   >
                     <span style={{ fontWeight: 700, color: PAGE2.mute }}>+</span>
                     {c.name}

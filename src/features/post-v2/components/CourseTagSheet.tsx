@@ -142,7 +142,7 @@ export default function CourseTagSheet({
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '4px 16px 8px',
-            borderBottom: '1px solid rgba(15,23,42,0.08)',
+            borderBottom: '1px solid rgba(255,255,255,0.10)',
           }}
         >
           <div
@@ -154,7 +154,7 @@ export default function CourseTagSheet({
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: 'rgba(15,23,42,0.55)',
+              color: CT.secondary,
             }}
           >
             <MapPin size={11} strokeWidth={2.25} color={CT.amber} />
@@ -177,7 +177,7 @@ export default function CourseTagSheet({
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search any of 40,000+ courses"
-              style={{ width: '100%', padding: '10px 12px 10px 34px', border: '1px solid rgba(15,23,42,0.1)', borderRadius: 12, fontSize: 14, background: '#fff', color: CT.ink }}
+              style={{ width: '100%', padding: '10px 12px 10px 34px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, fontSize: 14, background: 'rgba(248,250,252,0.06)', color: CT.ink }}
             />
           </div>
         </div>
@@ -274,7 +274,7 @@ export default function CourseTagSheet({
             style={{
               flexShrink: 0,
               padding: '10px 16px max(env(safe-area-inset-bottom), 10px)',
-              borderTop: '1px solid rgba(15,23,42,0.08)',
+              borderTop: '1px solid rgba(255,255,255,0.10)',
               background: CT.cardBg,
               display: 'flex',
               alignItems: 'center',
@@ -318,11 +318,11 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function CourseRowSkeleton() {
   return (
-    <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', gap: 12 }}>
-      <div className="clb-shimmer-light" style={{ width: 34, height: 34, borderRadius: 12, background: 'rgba(0,0,0,0.06)', flex: 'none' }} />
+    <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div className="clb-shimmer-dark" style={{ width: 34, height: 34, borderRadius: 12, background: 'rgba(255,255,255,0.06)', flex: 'none' }} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div className="clb-shimmer-light" style={{ height: 12, width: '55%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
-        <div className="clb-shimmer-light" style={{ height: 10, width: '30%', borderRadius: 6, background: 'rgba(0,0,0,0.06)' }} />
+        <div className="clb-shimmer-dark" style={{ height: 12, width: '55%', borderRadius: 6, background: 'rgba(255,255,255,0.06)' }} />
+        <div className="clb-shimmer-dark" style={{ height: 10, width: '30%', borderRadius: 6, background: 'rgba(255,255,255,0.06)' }} />
       </div>
     </div>
   );
@@ -351,7 +351,7 @@ function CourseRow({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 34, height: 34, borderRadius: 12, background: CT.ghost, border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 34, height: 34, borderRadius: 12, background: CT.ghost, border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <MapPin size={16} color={CT.amber} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
@@ -381,7 +381,7 @@ function CourseRow({
             width: 22,
             height: 22,
             borderRadius: 999,
-            border: selected ? 0 : '1.5px solid rgba(15,23,42,0.18)',
+            border: selected ? 0 : '1.5px solid rgba(255,255,255,0.22)',
             background: selected ? CT.amber : 'transparent',
             display: 'flex',
             alignItems: 'center',
@@ -402,7 +402,7 @@ const rowBtn: React.CSSProperties = {
   textAlign: 'left',
   padding: '12px 16px',
   border: 0,
-  borderTop: '1px solid rgba(15,23,42,0.06)',
+  borderTop: '1px solid rgba(255,255,255,0.08)',
   background: 'transparent',
   cursor: 'pointer',
 };

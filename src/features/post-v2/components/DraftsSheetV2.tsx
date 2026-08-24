@@ -38,7 +38,7 @@ export default function DraftsSheetV2({ open, onClose, drafts, onRestore, onDele
           {drafts.map(d => {
             const isBusiness = d.actor_type === 'business';
             return (
-              <div key={d.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(15,23,42,0.06)' }}>
+              <div key={d.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                 <div
                   style={{
                     width: 34,
@@ -90,7 +90,7 @@ export default function DraftsSheetV2({ open, onClose, drafts, onRestore, onDele
             <div style={{ fontSize: 15, fontWeight: 700, color: CT.ink }}>Delete this draft?</div>
             <div style={{ fontSize: 13, color: CT.secondary }}>This can't be undone.</div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setConfirmId(null)} style={{ flex: 1, background: '#fff', border: '1px solid rgba(15,23,42,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.ink }}>Cancel</button>
+              <button onClick={() => setConfirmId(null)} style={{ flex: 1, background: 'rgba(248,250,252,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.ink }}>Cancel</button>
               <button
                 onClick={() => { const id = confirmId; setConfirmId(null); onDelete(id!); }}
                 style={{ flex: 1, background: CT.danger, color: CT.canvas, border: 0, borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}

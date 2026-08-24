@@ -119,7 +119,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
                   padding: '10px 0 10px',
                   borderRadius: 14,
                   background: selected ? CT.ink : CT.cardBg,
-                  border: selected ? 0 : '1px solid rgba(15,23,42,0.08)',
+                  border: selected ? 0 : '1px solid rgba(255,255,255,0.10)',
                   color: selected ? CT.canvas : CT.ink,
                   cursor: 'pointer',
                   display: 'flex',
@@ -145,7 +145,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
         </div>
 
         {/* Summary */}
-        <div style={{ padding: '12px 14px', borderRadius: 12, background: CT.cardBg, border: '1px solid rgba(15,23,42,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ padding: '12px 14px', borderRadius: 12, background: CT.cardBg, border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ fontSize: 13, color: isPast ? CT.danger : CT.ink }}>
             {isPast ? 'Pick a future time.' : (
               <>Goes live <span style={{ fontWeight: 700 }}>{formatScheduleDay(finalDate, now)}</span> - <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{formatScheduleTime(finalDate)}</span></>
@@ -155,7 +155,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
 
         <div style={{ display: 'flex', gap: 8 }}>
           {value && (
-            <button onClick={clear} style={{ flex: 1, background: '#fff', border: '1px solid rgba(15,23,42,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.ink }}>Clear</button>
+            <button onClick={clear} style={{ flex: 1, background: 'rgba(248,250,252,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.ink }}>Clear</button>
           )}
           <button
             onClick={apply}
@@ -180,7 +180,7 @@ export default function ScheduleSheetV2({ open, onClose, value, onChange, onOpen
       {onOpenScheduled && (
         <button
           onClick={onOpenScheduled}
-          style={{ display: 'block', width: '100%', border: 0, borderTop: '1px solid rgba(15,23,42,0.07)', background: 'transparent', padding: '12px 16px', textAlign: 'left', fontSize: 13, color: CT.ink, cursor: 'pointer' }}
+          style={{ display: 'block', width: '100%', border: 0, borderTop: '1px solid rgba(255,255,255,0.08)', background: 'transparent', padding: '12px 16px', textAlign: 'left', fontSize: 13, color: CT.ink, cursor: 'pointer' }}
         >
           View scheduled - <span style={{ fontWeight: 700 }}>{scheduledCount ?? 0}</span>
         </button>
@@ -195,7 +195,7 @@ function Preset({ children, onClick }: { children: React.ReactNode; onClick: () 
       onClick={onClick}
       style={{
         background: CT.cardBg,
-        border: '1px solid rgba(15,23,42,0.1)',
+        border: '1px solid rgba(255,255,255,0.10)',
         borderRadius: 999,
         padding: '8px 14px',
         fontSize: 13,

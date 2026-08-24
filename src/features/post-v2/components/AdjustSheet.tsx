@@ -239,7 +239,7 @@ export default function AdjustSheet({ open, onClose, item, onApply }: Props) {
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={reset}
-            style={{ flex: 1, background: '#fff', border: '1px solid rgba(15,23,42,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.ink, fontWeight: 600 }}
+            style={{ flex: 1, background: 'rgba(248,250,252,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '12px', fontSize: 14, cursor: 'pointer', color: CT.ink, fontWeight: 600 }}
           >
             Reset
           </button>
