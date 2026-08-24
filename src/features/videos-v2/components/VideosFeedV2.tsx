@@ -155,7 +155,7 @@ export function VideosFeedV2({ sort, category }: Props) {
         <div style={{ padding: '12px 4px 0' }}>
           {visiblePending.map((p) => (
             <div key={p.jobId} style={{ marginBottom: 12 }}>
-              <PendingPostCard entry={p} theme="light" />
+              <PendingPostCard entry={p} />
             </div>
           ))}
         </div>

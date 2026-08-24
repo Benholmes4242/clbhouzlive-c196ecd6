@@ -757,7 +757,7 @@ const ProfilePageV2Content: React.FC = () => {
         {
           /* ── Other user: Follow + Add Friend + Overflow menu ── */
           friendshipStatus === 'blocked' ? (
-            <div className="h-11 flex-1 rounded-full text-sm font-medium flex items-center justify-center text-[#94A3B8]" style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}>
+            <div className="h-11 flex-1 rounded-full text-sm font-medium flex items-center justify-center" style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, color: A.MUTE }}>
               Unavailable
             </div>
           ) : (
@@ -800,7 +800,7 @@ const ProfilePageV2Content: React.FC = () => {
                   ? { background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.30)', color: '#F7931E' }
                   : friendshipStatus === 'request_received'
                     ? undefined
-                    : { background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }
+                    : { background: A.PANEL, border: `1px solid ${A.BORDER}`, color: A.INK }
               }
               onClick={handleFriendAction}
               disabled={friendshipUpdating}
@@ -844,9 +844,9 @@ const ProfilePageV2Content: React.FC = () => {
               <DropdownMenuTrigger asChild>
                 <button 
                   className="w-11 h-11 flex-shrink-0 rounded-full flex items-center justify-center focus:outline-none active:scale-[0.97] transition-transform"
-                  style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+                  style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
                 >
-                  <MoreHorizontal className="w-5 h-5" style={{ color: '#0F172A' }} />
+                  <MoreHorizontal className="w-5 h-5" style={{ color: A.INK }} />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
@@ -1041,8 +1041,8 @@ const ProfilePageV2Content: React.FC = () => {
                     type="button"
                     aria-label={l.label}
                     onClick={(e) => { e.preventDefault(); openExternalUrl(l.url); }}
-                    className="inline-flex items-center justify-center rounded-full min-h-[44px] min-w-[44px] text-[#64748B] hover:text-foreground transition-colors active:scale-[0.96]"
-                    style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)' }}
+                    className="inline-flex items-center justify-center rounded-full min-h-[44px] min-w-[44px] transition-colors active:scale-[0.96]"
+                    style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, color: A.MUTE }}
                   >
                     {l.icon}
                   </button>
@@ -1081,7 +1081,7 @@ const ProfilePageV2Content: React.FC = () => {
 
         {/* Divider above Clubs section */}
         <div className="px-4 mb-3">
-          <div style={{ borderTop: '0.5px solid rgba(15,23,42,0.07)' }} />
+          <div style={{ borderTop: `0.5px solid ${A.BORDER}` }} />
         </div>
 
         {/* Clubs section */}

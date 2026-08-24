@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Top10CourseCard } from './Top10CourseCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 
 interface FavouritesCarouselProps {
@@ -190,10 +191,10 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         <div className="px-4">
           <div 
             className="relative w-full max-w-[320px] h-[280px] rounded-[24px] flex items-center justify-center mx-auto border-2 border-dashed"
-            style={{ background: 'rgba(15,23,42,0.04)', borderColor: 'rgba(15,23,42,0.12)' }}
+            style={{ background: A.PANEL, borderColor: A.BORDER }}
           >
             <div className="text-center p-6">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(15,23,42,0.05)' }}>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.06)' }}>
                 <Trophy className="w-7 h-7 text-muted-foreground/40" />
               </div>
               
@@ -282,7 +283,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                 key={`empty-${index}`}
                 onClick={onManage}
                 className="relative w-[210px] h-[269px] rounded-[4px] flex-shrink-0 snap-center flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-[0.99] active:scale-[0.97] border-2 border-dashed"
-                style={{ background: 'rgba(15,23,42,0.04)', borderColor: 'rgba(15,23,42,0.12)' }}
+                style={{ background: A.PANEL, borderColor: A.BORDER }}
               >
                 <div className="text-center p-6">
                   <Plus className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />

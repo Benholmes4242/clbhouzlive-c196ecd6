@@ -16,6 +16,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useProfilePosts } from './hooks/useProfilePosts';
 import { PostsFeedSkeleton } from './PostsFeedSkeleton';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 import type { FeedPost } from '@/components/media-system/types/media';
 import { LightCardFeed } from './LightCardFeed';
@@ -295,7 +296,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
             <DropdownMenuTrigger asChild>
               <button
                 className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium min-h-[36px] whitespace-nowrap shrink-0"
-                style={{ background: 'rgba(15,23,42,0.05)', border: '1px solid rgba(15,23,42,0.07)', color: '#0F172A' }}
+                style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, color: A.INK }}
               >
                 {currentFilterLabel}
                 <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
@@ -323,7 +324,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
       {isOwnProfile && pendingEntries.length > 0 && (
         <div>
           {pendingEntries.map((p) => (
-            <PendingPostCard key={p.jobId} entry={p} theme="light" />
+            <PendingPostCard key={p.jobId} entry={p} />
           ))}
         </div>
       )}
@@ -367,10 +368,10 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
       {isFetchingNextPage && (
         <div
-          className="overflow-hidden bg-white"
-          style={{ borderTop: '0.5px solid rgba(15,23,42,0.06)', borderBottom: '0.5px solid rgba(15,23,42,0.06)' }}
+          className="overflow-hidden"
+          style={{ background: A.PANEL, borderTop: `0.5px solid ${A.BORDER}`, borderBottom: `0.5px solid ${A.BORDER}` }}
         >
-          <Skeleton className="w-full rounded-none" style={{ aspectRatio: '16 / 10' }} />
+          <Skeleton variant="dark" className="w-full rounded-none" style={{ aspectRatio: '4 / 5' }} />
         </div>
       )}
 

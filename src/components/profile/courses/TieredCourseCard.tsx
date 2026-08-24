@@ -7,6 +7,7 @@ import { Calendar, Trophy } from 'lucide-react';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { motion } from 'framer-motion';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 export interface CourseCardData {
   id: string;
@@ -66,7 +67,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
         className="relative rounded-xl overflow-hidden cursor-pointer transition-all group"
-        style={{ background: '#ffffff', border: '1px solid rgba(247,147,30,0.30)' }}
+        style={{ background: A.PANEL, border: '1px solid rgba(247,147,30,0.30)' }}
       >
         <div 
           className="absolute top-0 left-0 right-0 h-[2px]" 
@@ -141,7 +142,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
         className="rounded-xl overflow-hidden cursor-pointer transition-colors"
-        style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+        style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
       >
         <div className="flex">
           <div className="relative flex-shrink-0 self-stretch">
@@ -154,7 +155,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
                 className="w-16 h-full object-cover opacity-80 rounded-l-xl"
               />
             ) : (
-              <div className="w-16 h-full rounded-l-xl" style={{ background: 'rgba(15,23,42,0.04)' }} />
+              <div className="w-16 h-full rounded-l-xl" style={{ background: 'rgba(255,255,255,0.06)' }} />
             )}
           </div>
 
@@ -180,7 +181,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
               <button 
                 onClick={handleRateClick}
                 className="text-[10px] font-medium px-2 py-1 rounded-md transition-colors whitespace-nowrap"
-                style={{ background: 'rgba(15,23,42,0.04)', border: '1px solid rgba(15,23,42,0.07)', color: '#94A3B8' }}
+                style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${A.BORDER}`, color: A.MUTE }}
               >
                 Review
               </button>
@@ -197,7 +198,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
       onClick={handleClick}
       whileTap={{ scale: 0.98 }}
       className="rounded-xl overflow-hidden cursor-pointer transition-colors"
-      style={{ background: '#ffffff', border: '1px solid rgba(15,23,42,0.07)' }}
+      style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
     >
       <div className="flex">
         <div className="relative flex-shrink-0 self-stretch">
@@ -210,7 +211,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
               className="w-[72px] h-full object-cover rounded-l-xl"
             />
           ) : (
-            <div className="w-[72px] h-full rounded-l-xl" style={{ background: 'rgba(15,23,42,0.04)' }} />
+            <div className="w-[72px] h-full rounded-l-xl" style={{ background: 'rgba(255,255,255,0.06)' }} />
           )}
         </div>
 

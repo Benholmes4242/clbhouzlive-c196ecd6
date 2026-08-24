@@ -12,6 +12,7 @@ import { formatRelativeAgoLong } from '@/i18n/format';
 import { toast } from '@/lib/toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface WantToPlaySectionProps {
   userId: string;
@@ -94,8 +95,8 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                 scrollSnapAlign: 'start',
                 borderRadius: 16,
                 overflow: 'hidden',
-                background: '#FFFFFF',
-                border: '0.5px solid rgba(15,23,42,0.08)',
+                background: A.PANEL,
+                border: `0.5px solid ${A.BORDER}`,
                 cursor: 'pointer',
               }}
             >

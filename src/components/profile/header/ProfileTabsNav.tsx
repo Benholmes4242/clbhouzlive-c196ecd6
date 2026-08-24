@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { getProfileTabs } from '@/hooks/useProfileType';
-import { cn } from '@/lib/utils';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
 
 interface ProfileTabsNavProps {
   userType: string | null | undefined;
@@ -11,7 +12,10 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav — Pinpoint main tab (typographic underline)
+ * ProfileTabsNav — the profile's selected control. Geometry and both states are
+ * taken from the shipped Discover scope pills (PillFilterRow): 8px radius,
+ * 1px edge, A.INK fill when selected, A.PANEL when not. Only the 36px tap
+ * floor and the disabled state are local — the pills have neither.
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   userType,
@@ -47,11 +51,11 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
               style={{
                 cursor: disabled ? 'default' : 'pointer',
                 padding: '8px 14px',
-                borderRadius: 999,
-                border: 'none',
-                background: isActive ? '#15171F' : 'transparent',
-                color: isActive ? '#FFFFFF' : 'rgba(15,23,42,0.65)',
-                fontSize: 13,
+                borderRadius: SCOPE_PILL_RADIUS,
+                border: `1px solid ${isActive ? A.INK : A.BORDER}`,
+                background: isActive ? A.INK : A.PANEL,
+                color: isActive ? A.PANEL : A.INK,
+                fontSize: 12.5,
                 fontWeight: 700,
                 letterSpacing: '0.01em',
                 minHeight: 36,
