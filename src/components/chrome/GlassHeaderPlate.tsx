@@ -13,7 +13,7 @@
  *
  * Perf note: blur is limited to this thin fixed band. Do NOT add will-change
  * or transforms. If older Android WebViews jank, downgrade to opaque:
- *   background: '#F8FAFC'; remove both backdrop-filter declarations.
+ *   background: '#15171F'; remove both backdrop-filter declarations.
  */
 export function GlassHeaderPlate({
   visible = true,
@@ -35,7 +35,7 @@ export function GlassHeaderPlate({
         left: 0,
         right: 0,
         height: `calc(var(--sat, env(safe-area-inset-top, 0px)) + ${heightPx}px)`,
-        background: 'rgba(248,250,252,0.72)',
+         background: 'var(--glass-bg)',
         backdropFilter: 'blur(14px)',
         WebkitBackdropFilter: 'blur(14px)',
         zIndex: 11,

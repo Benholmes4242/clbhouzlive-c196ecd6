@@ -28,12 +28,12 @@ import { type Verdict } from './verdict';
 import { FIGS } from '@/lib/tokens/type';
 
 /** A WHISPER of tint. The old solid fill + highlight + two shadows are gone. */
-const GREEN_TINT = 'rgba(30,122,70,0.07)';
-const GREEN_INK = '#0C7B40';
-const RED_TINT = 'rgba(179,38,30,0.06)';
-const RED_INK = '#B22F24';
+const GREEN_TINT = 'rgba(52,215,127,0.12)';
+const GREEN_INK = '#34D77F';
+const RED_TINT = 'rgba(255,107,96,0.12)';
+const RED_INK = '#FF6B60';
 /** The rank reference is a reference point, not a claim: it stays neutral. */
-const MUTE_INK = '#68707B';
+const MUTE_INK = 'rgba(248,250,252,0.62)';
 
 /** Fires once per course per session, not per mount. */
 const seen = new Set<string>();

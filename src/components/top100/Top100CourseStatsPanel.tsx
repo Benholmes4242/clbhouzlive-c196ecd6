@@ -25,12 +25,12 @@ import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
-import { SubScoreStack, bandColor } from '@/features/courses/_shared/scoreBands';
+import { SubScoreStack, bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 import { A, StatItem, StatRow, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 
 
 /** Deliberately colourless: this is an invitation, not a data value. */
-const NO_ROUNDS_INK = '#68707B';
+const NO_ROUNDS_INK = 'rgba(248,250,252,0.62)';
 /** Fires once per course per session, not per mount. */
 const seenSubscores = new Set<string>();
 const seenNoRounds = new Set<string>();
@@ -182,7 +182,7 @@ export const Top100CourseStatsPanel: React.FC<Props> = ({ courseId, rank, list, 
       // band-coloured figure says nothing the number does not.
       label: t('top100.stats.fromRatings', { count: ratingCount }),
       value: rating.toFixed(1),
-      tone: bandColor(rating),
+      tone: bandColorOnDark(rating),
     },
   ];
   if (toPar) {

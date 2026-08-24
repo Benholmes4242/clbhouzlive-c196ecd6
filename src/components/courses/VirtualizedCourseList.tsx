@@ -23,11 +23,11 @@ import { fromGolfCourse } from '@/lib/mappers/toCourseCardModel';
 import { useNavigate } from 'react-router-dom';
 
 /**
- * The 5px band between cards. Same convention as the light feed, declared
- * locally on purpose: that is a different feature and must not become a
- * dependency of this one.
+ * The 5px band between cards. Same convention as the feed, declared locally
+ * on purpose: that is a different feature and must not become a dependency of
+ * this one. The locality decision survives the dark migration.
  */
-const CARD_BAND = '#E5E7EA';
+const CARD_BAND = 'rgba(255,255,255,0.06)';
 
 interface Course {
   id: string;

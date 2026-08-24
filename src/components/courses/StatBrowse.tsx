@@ -141,21 +141,21 @@ const LIST_LABEL: Record<string, string> = {
  * icon then stacks ABOVE the label. Every trigger here re-asserts the row.
  */
 /**
- * The 5px band between cards. Same convention as the light feed, declared
- * locally on purpose: that is a different feature and must not become a
- * dependency of this one.
+ * The 5px band between cards. Same convention as the feed, declared locally
+ * on purpose: that is a different feature and must not become a dependency of
+ * this one. The locality decision survives the dark migration.
  */
-const CARD_BAND = '#E5E7EA';
+const CARD_BAND = 'rgba(255,255,255,0.06)';
 
 const TRIGGER_ROW =
   '[&>span]:!flex [&>span]:items-center [&>span]:gap-2 [&>span]:min-w-0';
 
 const TRIGGER_CLS =
-  `h-10 rounded-xl border bg-white px-3 text-[13px] font-semibold justify-between focus:outline-none ${TRIGGER_ROW}`;
+  `h-10 rounded-xl border px-3 text-[13px] font-semibold justify-between focus:outline-none ${TRIGGER_ROW}`;
 
 /** Condensed sticky bar control. */
 const COMPACT_TRIGGER_CLS =
-  `h-8 w-full rounded-xl border bg-white px-3 text-[12px] font-semibold justify-between focus:outline-none ${TRIGGER_ROW}`;
+  `h-8 w-full rounded-xl border px-3 text-[12px] font-semibold justify-between focus:outline-none ${TRIGGER_ROW}`;
 
 
 /**
@@ -647,7 +647,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     <Select value={country ?? 'all'} onValueChange={onCountryChange}>
       <SelectTrigger
         className={compact ? COMPACT_TRIGGER_CLS : TRIGGER_CLS}
-        style={{ borderColor: HAIRLINE_INK_10, color: country ? INK : INK_MUTE }}
+        style={{ background: 'rgba(255,255,255,0.06)', borderColor: HAIRLINE_INK_10, color: country ? INK : INK_MUTE }}
         aria-label={t('statBrowse.selectCountryA11y')}
       >
         <span className="flex min-w-0 items-center gap-2">
@@ -692,7 +692,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     <Select value={region ?? 'all'} onValueChange={onRegionChange} disabled={regionDisabled}>
       <SelectTrigger
         className={`${compact ? COMPACT_TRIGGER_CLS : TRIGGER_CLS} disabled:opacity-60`}
-        style={{ borderColor: HAIRLINE_INK_10, color: region ? INK : INK_MUTE }}
+        style={{ background: 'rgba(255,255,255,0.06)', borderColor: HAIRLINE_INK_10, color: region ? INK : INK_MUTE }}
         aria-label={t('statBrowse.selectRegionA11y')}
       >
         <span className="flex min-w-0 items-center gap-2">
@@ -743,7 +743,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             // a wide gap between text and chevron.
             : `${TRIGGER_CLS} w-auto gap-2`
         }
-        style={{ borderColor: HAIRLINE_INK_10, color: INK }}
+        style={{ background: 'rgba(255,255,255,0.06)', borderColor: HAIRLINE_INK_10, color: INK }}
         aria-label={t('statBrowse.selectLensA11y')}
       >
         <span className="flex min-w-0 items-center gap-2">
@@ -783,8 +783,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       type="button"
       onClick={() => openDirectory(country, 'filter_bar')}
       aria-label={t('directorySheet.openA11y')}
-      className={`${compact ? 'h-8 w-8' : 'h-10 w-10'} shrink-0 rounded-xl bg-white flex items-center justify-center`}
-      style={{ border: `1px solid ${HAIRLINE_INK_10}` }}
+      className={`${compact ? 'h-8 w-8' : 'h-10 w-10'} shrink-0 rounded-xl flex items-center justify-center`}
+      style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${HAIRLINE_INK_10}` }}
     >
       <Search className={compact ? 'h-3.5 w-3.5' : 'h-4 w-4'} style={{ color: INK }} aria-hidden="true" />
     </button>
@@ -802,9 +802,9 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         style={{
           top: 'calc(var(--sat, 0px))',
           zIndex: 20,
-          // Light-page glass: canonical --glass-bg is a dark token, so the
-          // bar uses the light translucent equivalent to keep ink controls legible.
-          background: 'rgba(255,255,255,0.72)',
+          // The bar now uses the canonical dark glass token. The light
+          // translucent equivalent existed only while Courses was a light page.
+          background: 'var(--glass-bg)',
           backdropFilter: 'blur(var(--glass-blur))',
           WebkitBackdropFilter: 'blur(var(--glass-blur))',
         }}
@@ -863,7 +863,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             <div
               key={i}
               className="w-full aspect-[16/9.5] animate-pulse"
-              style={{ background: 'rgba(15,23,42,0.06)' }}
+              style={{ background: 'rgba(255,255,255,0.06)' }}
             />
           ))}
         </div>
@@ -904,8 +904,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           <button
             type="button"
             onClick={() => onLensChange('played')}
-            className="w-full mt-4 h-11 rounded-xl text-[14px] font-bold text-white"
-            style={{ background: INK }}
+            className="w-full mt-4 h-11 rounded-xl text-[14px] font-bold"
+            style={{ background: INK, color: '#15171F' }}
           >
             {country
               ? t('statBrowse.empty.lensSwitch', { country })
@@ -929,8 +929,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           <div
             className="mt-4 p-5"
             style={{
-              background: 'rgba(247,147,30,0.06)',
-              border: `1px solid rgba(247,147,30,0.35)`,
+              background: 'rgba(247,147,30,0.10)',
+              border: `1px solid rgba(247,147,30,0.42)`,
               borderRadius: 16,
             }}
           >

@@ -5,8 +5,8 @@
  * WHY IT LOOKS NOTHING LIKE THE DISCOVER MOSAIC: that mosaic is 265px
  * photo-led tiles, and alternating those with the course cards — which are
  * ALSO full-bleed photographs with glass chips — would put two card systems on
- * one page. These panels are white, bordered and carry NO photograph, so the
- * photography stays on the courses and the reviews read as voice.
+ * one page. These panels use a PANEL surface rather than a card surface and
+ * carry NO photograph, so the photography stays on the courses.
  *
  * Presentation only. Placement and selection belong to reviewSlots.ts.
  */
@@ -14,7 +14,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { bandColor } from '@/features/courses/_shared/scoreBands';
+import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 import {
   HAIRLINE_INK_8,
   INK,
@@ -131,7 +131,7 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
                   fontWeight: 700,
                   lineHeight: 1,
                   letterSpacing: '-0.02em',
-                  color: bandColor(r.rating),
+                  color: bandColorOnDark(r.rating),
                 }}
               >
                 {r.rating.toFixed(1)}
@@ -166,11 +166,9 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
               {r.quote}
             </p>
 
-            <div
-              aria-hidden
-              style={{ height: 1, background: HAIRLINE_INK_8, margin: '10px 0 9px' }}
-            />
-            <Reviewer r={r} />
+            <div style={{ marginTop: 12 }}>
+              <Reviewer r={r} />
+            </div>
           </button>
         ))}
       </div>

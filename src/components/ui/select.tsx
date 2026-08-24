@@ -79,7 +79,6 @@ const SelectContent = React.forwardRef<
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
         className
       )}
-      style={{ color: '#0C0C0E', ...props.style }}
       position={position}
       {...props}
     >
@@ -124,7 +123,6 @@ const SelectItem = React.forwardRef<
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
-    style={{ color: '#0C0C0E', ...props.style }}
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
