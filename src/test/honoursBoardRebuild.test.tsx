@@ -7,7 +7,7 @@ import {
   PLAQUE_W,
   CARD_H,
   ACE_GROUND,
-  PLATINUM_GROUND,
+  ALBATROSS_GROUND,
   METAL_INK,
   METAL_YEAR,
   sortHonoursRail,
@@ -46,20 +46,6 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     expect(PLAQUE_W).toBe(206);
   });
 
-  it('states the computed totals and the hedged rarity once, in the subline', () => {
-    const { container } = render(
-      <HonoursBoard
-        events={[ev({ id: 'a' }), ev({ id: 'b' }), ev({ id: 'c', kind: 'albatross' })]}
-      />,
-    );
-    expect(container.textContent).toMatch(/2 aces/);
-    expect(container.textContent).toMatch(/1 albatross/);
-    expect(container.textContent).toMatch(/all time/);
-    expect(container.textContent).toMatch(/commonly quoted at 12,500 to 1/);
-    /* E — no card carries the odds: it is said once, above the rail. */
-    expect(container.textContent!.match(/12,500/g)).toHaveLength(1);
-  });
-
   it('carries NO recent / leaders toggle on the section', () => {
     render(<HonoursBoard events={[ev({ id: 'a' })]} />);
     expect(screen.queryByRole('button', { name: /Leaders/i })).toBeNull();
@@ -81,7 +67,7 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     }
   });
 
-  it('ranks albatross above ace with platinum and gold feat blocks only', () => {
+  it('ranks albatross above ace with champagne and bone feat blocks only', () => {
     const { container } = render(
       <HonoursBoard
         events={[
@@ -91,33 +77,38 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
         ]}
       />,
     );
-    const platinum = container.querySelector<HTMLElement>('[data-honours-feat-block="albatross"]');
-    const gold = [...container.querySelectorAll<HTMLElement>('[data-honours-feat-block="ace"]')];
-    expect(platinum?.dataset.honoursMetal).toBe(PLATINUM_GROUND);
-    expect(gold).toHaveLength(2);
-    expect(gold.every((head) => head.dataset.honoursMetal === ACE_GROUND)).toBe(true);
-    expect(platinum?.parentElement?.style.background).not.toBe(PLATINUM_GROUND);
-    expect(gold[0].parentElement?.style.background).not.toBe(ACE_GROUND);
+    const champagne = container.querySelector<HTMLElement>('[data-honours-feat-block="albatross"]');
+    const bone = [...container.querySelectorAll<HTMLElement>('[data-honours-feat-block="ace"]')];
+    expect(champagne?.dataset.honoursMetal).toBe(ALBATROSS_GROUND);
+    expect(bone).toHaveLength(2);
+    expect(bone.every((head) => head.dataset.honoursMetal === ACE_GROUND)).toBe(true);
+    expect(champagne?.parentElement?.style.background).not.toBe(ALBATROSS_GROUND);
+    expect(bone[0].parentElement?.style.background).not.toBe(ACE_GROUND);
   });
 
   it('uses full ink for feat copy and a measured quiet ink for the year', () => {
     const { container } = render(<HonoursBoard events={[ev({ id: 'a' })]} />);
     const head = container.querySelector<HTMLElement>('[data-honours-feat-block="ace"]');
     expect(head).toBeTruthy();
-    const ink = 'rgb(15, 23, 42)';
+    const ink = 'rgb(11, 15, 20)';
     expect(screen.getByText('Ace').style.color).toBe(ink);
     expect(screen.getByText('Sam Fairway').style.color).toBe(ink);
-    expect(screen.getByText(/Par 3/).style.color).toBe('rgba(15, 23, 42, 0.8)');
-    expect(screen.getByText('2024').style.color).toBe('rgba(15, 23, 42, 0.8)');
+    expect(screen.getByText(/Par 3/).style.color).toBe('rgba(11, 15, 20, 0.6)');
+    expect(screen.getByText('2024').style.color).toBe('rgba(11, 15, 20, 0.6)');
   });
 
-  it('uses a lazy-loaded 44px squircle avatar on every card', () => {
+  it('uses a lazy-loaded 40px squircle avatar in the unchanged 44px footprint', () => {
     const { container } = render(
       <HonoursBoard events={[ev({ id: 'a', actorAvatar: 'https://example.com/avatar.jpg' })]} />,
     );
     const avatar = container.querySelector('img');
     expect(avatar?.getAttribute('loading')).toBe('lazy');
-    expect(avatar?.parentElement?.style.width).toBe('44px');
+    const ring = container.querySelector<HTMLElement>('[data-honours-avatar-ring]');
+    expect(ring?.style.width).toBe('44px');
+    const outline = ring?.firstElementChild as HTMLElement | undefined;
+    expect(outline?.style.width).toBe('40px');
+    expect(outline?.style.outline.replace(/\s/g, '')).toBe('1pxsolidrgba(11,15,20,0.28)');
+    expect(outline?.style.outlineOffset).toBe('0.5px');
   });
 
   it('renders the member name with no "You" substitution', () => {

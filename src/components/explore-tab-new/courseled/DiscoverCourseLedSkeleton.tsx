@@ -740,8 +740,8 @@ export function MostPlayedPanel() {
 }
 
 /**
- * Section 7 — honours board (BRIEF_HONOURS_PERSON_LED): heading, the rarity
- * subline, then a RAIL OF EQUAL CARDS bled off the right edge. NO MODE TOGGLE —
+ * Section 7 — honours board (BRIEF_HONOURS_PERSON_LED): heading, then a RAIL
+ * OF EQUAL CARDS bled off the right edge. NO MODE TOGGLE —
  * the toggle moved into the see-all sheet — and NO PHOTO BAND: the card leads
  * with the member over a metal head. Values are literals here on purpose:
  * HonoursBoard imports this shell, so this leaf must not import back from it
@@ -750,8 +750,8 @@ export function MostPlayedPanel() {
 const SK_CARD_W = 206;
 const SK_CARD_H = 148;
 const SK_HEAD_H = 104;
-const SK_PLATINUM_GROUND = 'linear-gradient(145deg, #FAFCFF 0%, #D7DEE8 52%, #929EAD 100%)';
-const SK_GOLD_GROUND = 'linear-gradient(145deg, #FFF1A8 0%, #FFD200 52%, #C98700 100%)';
+const SK_CHAMPAGNE_GROUND = 'linear-gradient(150deg, #FAF3E4 0%, #EADCBD 48%, #C2AE86 100%)';
+const SK_BONE_GROUND = 'linear-gradient(150deg, #FBFAF6 0%, #E7E3D8 48%, #C3BDAC 100%)';
 
 export function HonoursPanel() {
   return (
@@ -762,12 +762,6 @@ export function HonoursPanel() {
           <div style={{ marginLeft: 'auto' }}>
             <TextBar w={44} h={10} />
           </div>
-        </div>
-        <div style={{ marginTop: 5, marginLeft: 22 }}>
-          <TextBar w={228} h={11} />
-        </div>
-        <div style={{ marginTop: 4, marginLeft: 22 }}>
-          <TextBar w={172} h={11} />
         </div>
       </div>
 
@@ -790,7 +784,7 @@ export function HonoursPanel() {
               style={{
                 height: SK_HEAD_H,
                 position: 'relative',
-                background: i === 0 ? SK_PLATINUM_GROUND : SK_GOLD_GROUND,
+                background: i === 0 ? SK_CHAMPAGNE_GROUND : SK_BONE_GROUND,
                 padding: '11px 12px 12px',
                 boxSizing: 'border-box',
                 display: 'flex',
