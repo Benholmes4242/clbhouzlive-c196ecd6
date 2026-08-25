@@ -1656,6 +1656,7 @@ export function GolfThisWeek({
       accent: PODIUM_ACCENT.gold,
       chipGround: PODIUM_GROUND.gold,
       gapKind: 'shots',
+      precision: 0,
       /* GOLD REPORTS THE WIN (§0), not under/over par. The whole line remains
          gold even when the winning round's qualifier is +3. */
       figureOf: (r) => {
@@ -1673,7 +1674,7 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'stableford',
       emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
-      label: t('discover.golfThisWeek.stablefordLabel', 'Best Stableford points'),
+      label: t('discover.golfThisWeek.stablefordLabel', 'Best Stableford'),
       row: bestStableford,
       runners: stablefordRanked.slice(1),
       lowerWins: false,
@@ -1681,6 +1682,7 @@ export function GolfThisWeek({
       accent: PODIUM_ACCENT.white,
       chipGround: PODIUM_GROUND.white,
       gapKind: 'points',
+      precision: 0,
       figureOf: (r) => ({ text: String(r.stableford_points), tone: PODIUM_ACCENT.white }),
     });
   }
@@ -1688,7 +1690,7 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'birdies',
       emoji: '\uD83D\uDC26', // BIRD
-      label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies in a round'),
+      label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
       row: mostBirdies,
       runners: birdiesRanked.slice(1),
       lowerWins: false,
@@ -1696,6 +1698,7 @@ export function GolfThisWeek({
       accent: PODIUM_ACCENT.red,
       chipGround: PODIUM_GROUND.red,
       gapKind: 'clear',
+      precision: 0,
       /* A birdie count IS a count of under-par holes, so the red is literal. */
       figureOf: (r) => ({ text: String(r.birdies), tone: ROW_DARK_TOPAR_UNDER }),
     });
@@ -1704,7 +1707,7 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'improved',
       emoji: '\uD83D\uDCAA', // FLEXED ARM
-      label: t('discover.golfThisWeek.improvedLabel', 'Most improved handicap'),
+      label: t('discover.golfThisWeek.improvedLabel', 'Most improved'),
       row: mostImproved,
       runners: improvedRanked.slice(1),
       lowerWins: false,
@@ -1715,6 +1718,7 @@ export function GolfThisWeek({
       accent: PODIUM_ACCENT.green,
       chipGround: PODIUM_GROUND.green,
       gapKind: 'clear',
+      precision: 1,
       figureOf: (r) => ({
         text: `\u2212${Math.abs(r.delta_index as number).toFixed(1)}`,
         tone: PODIUM_ACCENT.green,
@@ -1740,8 +1744,7 @@ export function GolfThisWeek({
     const leaderValue = tile.valueOf(tile.row);
     const rowValue = tile.valueOf(row);
     const gap = tile.lowerWins ? rowValue - leaderValue : leaderValue - rowValue;
-    const precision = tile.key === 'improved' ? 1 : 0;
-    const magnitude = Math.abs(gap).toFixed(precision);
+    const magnitude = Math.abs(gap).toFixed(tile.precision);
     return `${tile.lowerWins ? '+' : '\u2212'}${magnitude}`;
   };
 
@@ -1997,8 +2000,14 @@ export function GolfThisWeek({
                 {(() => {
                   const leaderFigure = tile.figureOf(tile.row);
                   const second = tile.runners[0];
+                  /* §1 — ROUND BEFORE COMPARING. Number(...) so the gap === 0
+                     tie test below still matches: toFixed returns a string. */
                   const gap = second
-                    ? Math.abs(tile.valueOf(tile.row) - tile.valueOf(second))
+                    ? Number(
+                        Math.abs(tile.valueOf(tile.row) - tile.valueOf(second)).toFixed(
+                          tile.precision,
+                        ),
+                      )
                     : null;
                   return (
                     <>
