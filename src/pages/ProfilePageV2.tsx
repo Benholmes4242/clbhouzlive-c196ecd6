@@ -966,9 +966,9 @@ const ProfilePageV2Content: React.FC = () => {
                     className="mt-1 min-h-[44px] flex items-center gap-1 active:scale-[0.97] transition-transform"
                     style={{
                       fontFamily: SANS,
-                      fontSize: 8.5,
+                      fontSize: 11,
                       fontWeight: 700,
-                      letterSpacing: '0.14em',
+                      letterSpacing: '0.10em',
                       textTransform: 'uppercase',
                       color: A.INK,
                     }}
@@ -990,9 +990,9 @@ const ProfilePageV2Content: React.FC = () => {
                   className="min-h-[44px] flex items-center active:opacity-70 transition-opacity"
                   style={{
                     fontFamily: SANS,
-                    fontSize: 8.5,
+                    fontSize: 11,
                     fontWeight: 700,
-                    letterSpacing: '0.14em',
+                    letterSpacing: '0.10em',
                     textTransform: 'uppercase',
                     color: A.INK,
                   }}
