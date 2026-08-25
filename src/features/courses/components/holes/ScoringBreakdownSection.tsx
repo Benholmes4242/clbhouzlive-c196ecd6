@@ -934,7 +934,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                         height: 7,
                         borderRadius: 3.5,
                         width: `${barW}%`,
-                        background: A.INK,
+                        background: difficultyRampColor(parTint(p)),
                       }}
                     />
                     {tickW != null && (
