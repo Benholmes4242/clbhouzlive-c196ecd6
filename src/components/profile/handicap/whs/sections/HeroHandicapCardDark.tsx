@@ -6,9 +6,9 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import type { WhsConnection } from '@/lib/whs/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { IndexChart, type IndexPoint } from '../charts';
-import { formatDayMonthShortGB } from '@/i18n/format';
+import { HcpTrendChart, type IndexPoint } from '../charts';
 import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 
 interface Props {
   connection: WhsConnection;
@@ -33,10 +33,10 @@ function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
   const improved = delta != null && delta < -0.05;
   const drifted = delta != null && delta > 0.05;
   const color = improved
-    ? 'var(--hcp-good-2)'
+    ? A.IMPROVED
     : drifted
-      ? 'var(--hcp-bad)'
-      : 'var(--hcp-t-40)';
+      ? A.DRIFTED
+      : A.DIM;
   const triangleDir = improved ? 'down' : drifted ? 'up' : null;
   return (
     <div
@@ -45,18 +45,18 @@ function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
         borderTop: borderTop ? '1px solid var(--hcp-line-2)' : 'none',
       }}
     >
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: 'var(--hcp-t-40)',
-          marginBottom: 4,
-        }}
-      >
-        {label}
-      </div>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: A.DIM,
+            marginBottom: 4,
+          }}
+        >
+          {label}
+        </div>
       <div
         style={{
           fontSize: 22,
@@ -79,16 +79,16 @@ function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
         )}
         {formatDelta(delta)}
       </div>
-      <div
-        style={{
-          fontSize: 11,
-          color: 'var(--hcp-t-40)',
-          fontWeight: 600,
-          marginTop: 4,
-        }}
-      >
-        {caption}
-      </div>
+        <div
+          style={{
+            fontSize: 11,
+            color: A.DIM,
+            fontWeight: 600,
+            marginTop: 4,
+          }}
+        >
+          {caption}
+        </div>
     </div>
   );
 }
@@ -98,8 +98,6 @@ type WindowKey = '30d' | '90d' | '12m';
 const MS_PER_DAY = 86_400_000;
 /** useHandicapTrend12mo's guard: 335 days of record before we claim 12 months. */
 const MIN_12M_DAYS = 335;
-/** Card colour — the halo under the graded stroke, never white. */
-const CARD_BG = '#1B1E27';
 
 const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
   const { t } = useTranslation(['common']);
@@ -188,7 +186,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               fontWeight: 700,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              color: 'var(--hcp-t-40)',
+              color: A.DIM,
               marginBottom: 8,
             }}
           >
@@ -202,12 +200,12 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
           ) : (
             <div
               style={{
-                fontSize: 56,
-                fontWeight: 200,
-                color: 'var(--hcp-t-100)',
-                lineHeight: 0.9,
-                letterSpacing: '-0.03em',
-                fontVariantNumeric: 'tabular-nums lining-nums',
+                fontSize: 36,
+                fontWeight: 700,
+                letterSpacing: '-0.05em',
+                color: A.INK,
+                lineHeight: 1,
+                ...FIGS,
               }}
             >
               {handicap != null
@@ -262,13 +260,13 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                         fontWeight: 700,
                         letterSpacing: '0.12em',
                         textTransform: 'uppercase',
-                        background: on ? 'rgba(255,255,255,0.12)' : 'transparent',
+                        background: on ? A.TRACK : 'transparent',
                         color: disabled
-                          ? 'rgba(255,255,255,0.20)'
+                          ? A.DIM
                           : on
-                            ? 'var(--hcp-t-100)'
-                            : 'var(--hcp-t-40)',
-                        opacity: disabled ? 0.6 : 1,
+                            ? A.INK
+                            : A.DIM,
+                        opacity: disabled ? 0.5 : 1,
                       }}
                     >
                       {w.label}
@@ -282,18 +280,15 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
-                  color: 'var(--hcp-t-40)',
+                  color: A.DIM,
                 }}
               >
                 {t('common:handicap.hero.chartSample', { count: chartPoints.length })}
               </div>
             </div>
-            <IndexChart
+            <HcpTrendChart
               points={chartPoints}
-              height={124}
-              hideFooter
-              halo={CARD_BG}
-              formatLabel={(iso) => formatDayMonthShortGB(iso)}
+              height={96}
             />
           </div>
         )}

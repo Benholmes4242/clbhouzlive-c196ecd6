@@ -7,6 +7,8 @@ export type { ChartTone } from './tokens';
 export { IndexChart } from './IndexChart';
 export type { IndexPoint } from './IndexChart';
 
+export { HcpTrendChart } from './HcpTrendChart';
+
 export { CountingScatter } from './CountingScatter';
 export type { CountingRound, CountingState } from './CountingScatter';
 
