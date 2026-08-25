@@ -283,9 +283,20 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   if (isLoading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SANS }}>
-        <Panel><Skeleton className="h-[190px] w-full" /></Panel>
-        <Panel><Skeleton className="h-[240px] w-full" /></Panel>
-        <Panel><Skeleton className="h-[150px] w-full" /></Panel>
+        {/*
+          RESERVATION MOVES WITH THE REPOINT, NOT AFTER IT.
+          BRIEF_ANALYTICAL_SCALE_REPOINT (Part B) lifted LABEL 9 -> 11, which
+          grows every StatRow label box. Raised by the WORST case, not the
+          typical one: a skeleton may never be LARGER than the state it
+          resolves into, but over-reservation settles downward invisibly while
+          under-reservation collapses the page upward.
+            190 -> 205  (kicker + two READ lines)
+            240 -> 255  (stat row: +8.75 worst case with sub-lines, rounded up)
+            150 -> 160  (kicker + one READ line)
+        */}
+        <Panel><Skeleton className="h-[205px] w-full" /></Panel>
+        <Panel><Skeleton className="h-[255px] w-full" /></Panel>
+        <Panel><Skeleton className="h-[160px] w-full" /></Panel>
       </div>
     );
   }

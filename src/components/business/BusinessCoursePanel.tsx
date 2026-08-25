@@ -162,7 +162,6 @@ export const BusinessCoursePanel: React.FC<BusinessCoursePanelProps> = ({
                 <div
                   style={{
                     ...LABEL,
-                    fontSize: 9,
                     marginTop: 3,
                     color: c.subTone ?? A.DIM,
                     overflow: 'hidden',

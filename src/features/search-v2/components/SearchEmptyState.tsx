@@ -199,7 +199,7 @@ function SectionEyebrow({
       }}
     >
       {/* MICRO_BRIEF_SEARCH_OVERLAY_TYPE_SCALE: local floor lift (9 -> 11). */}
-      <span style={{ ...KICKER, fontSize: 11 }} className="truncate">
+      <span style={KICKER} className="truncate">
         {label}
       </span>
       {rightChip}
