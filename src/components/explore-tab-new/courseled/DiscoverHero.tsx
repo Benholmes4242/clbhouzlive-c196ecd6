@@ -258,7 +258,7 @@ export function DiscoverHero({
       >
         <span
           style={{
-            fontSize: 8.5,
+            fontSize: 11,
             fontWeight: 700,
             lineHeight: 1,
             letterSpacing: '0.14em',
@@ -275,7 +275,7 @@ export function DiscoverHero({
         {label && (
           <div
             style={{
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 800,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',

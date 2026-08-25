@@ -445,7 +445,7 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
         justifyContent: 'space-between',
         gap: 8,
         padding: '4px 11px 0',
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.02em',
       }}
@@ -455,7 +455,8 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
           <span key={k} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
             <span
               style={{
-                fontSize: 7.5,
+                /* READ: a bucket name is language. */
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.06em',
                 color: A.DIM,
@@ -465,7 +466,7 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
             </span>
             <span
               style={{
-                fontSize: 10.5,
+                fontSize: 11,
                 fontWeight: 700,
                 ...FIGS,
                 color: buckets[k] > 0 ? RAMP_TOPAR[k] : A.DIM,
@@ -740,7 +741,8 @@ function NineRow({
       >
         <span
           style={{
-            fontSize: 8,
+            /* READ: OUT / IN are read as language, so the 11px floor. */
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
@@ -752,12 +754,12 @@ function NineRow({
           {label}
         </span>
         <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
-          <span style={{ fontSize: 10.5, fontWeight: 700, color: MINI_INK, ...FIGS }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: MINI_INK, ...FIGS }}>
             {totals?.strokes ?? ''}
           </span>
           <span
             style={{
-              fontSize: 8.5,
+              fontSize: 11,
               fontWeight: 700,
               /* §3 — the nine's to-par keeps the tour colour rule: red under
                  par, INK at level or over. Colour only where it means something. */
@@ -828,7 +830,10 @@ function NineRow({
                   value. */}
               <span
                 style={{
-                  fontSize: 7,
+                  /* AXIS — STATED EXCEPTION to the 11px floor. A hole number is
+                     a COORDINATE, not language: it is indexed, not read, and the
+                     comment above records why it must stay quiet. Floor 10. */
+                  fontSize: 10,
                   fontWeight: 700,
                   lineHeight: 1,
                   marginBottom: 2.5,

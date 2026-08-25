@@ -472,7 +472,9 @@ function FollowButton({
             fontFamily: SANS,
             /* Match PhotoBand's quiet action over photography exactly: no fill,
                no border, and white-62 ink. This is confirmation, not identity. */
-            fontSize: 9.5,
+            /* CAPS ACTION at the 11px floor, tracking 0.10em. */
+            fontSize: 11,
+            letterSpacing: '0.10em',
             color: MID,
             background: 'transparent',
             border: 'none',
@@ -500,7 +502,9 @@ function FollowButton({
           ...LABEL,
           flexShrink: 0,
           fontFamily: SANS,
-          fontSize: 9.5,
+          /* CAPS ACTION at the 11px floor, tracking 0.10em. */
+          fontSize: 11,
+          letterSpacing: '0.10em',
           color: MID,
           background: 'transparent',
           border: 'none',
@@ -1038,7 +1042,7 @@ function GolfThisWeekCard({
               <div
                 style={{
                   marginTop: 2,
-                  fontSize: 9.5,
+                  fontSize: 11,
                   fontWeight: 600,
                   lineHeight: 1,
                    color: DISCOVER_QUIET,
@@ -1054,7 +1058,7 @@ function GolfThisWeekCard({
           <span
             style={{
               flexShrink: 0,
-              fontSize: 8.5,
+              fontSize: 11,
               fontWeight: 700,
               lineHeight: 1,
               letterSpacing: '0.14em',
@@ -1077,7 +1081,7 @@ function GolfThisWeekCard({
         {label && (
           <div
             style={{
-              fontSize: 9.5,
+              fontSize: 11,
               fontWeight: 800,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
@@ -1113,7 +1117,7 @@ function GolfThisWeekCard({
         <div
           style={{
             marginTop: 7,
-            fontSize: 10.5,
+            fontSize: 11,
             fontWeight: 500,
             lineHeight: 1.3,
             color: DISCOVER_FACT,
@@ -1285,7 +1289,7 @@ function GolfThisWeekCard({
           >
             {/* §3 — the row label darkens to the card's ink with the rest of the
                 chrome. */}
-            <span style={{ ...LABEL, fontSize: 8, color: DISCOVER_QUIET }}>
+            <span style={{ ...LABEL, fontSize: 11, color: DISCOVER_QUIET }}>
               {t('discover.golfThisWeek.moment.theCard', 'The card')}
             </span>
             {/* THE TAP AFFORDANCE, ON EVERY CARD (§S4.2). A hero with a hidden
@@ -1293,7 +1297,7 @@ function GolfThisWeekCard({
             <span
               style={{
                 ...LABEL,
-                fontSize: 8,
+                fontSize: 11,
                 /* §3 — the action and its chevron darken to the card's ink. */
                 color: DISCOVER_QUIET,
                 display: 'inline-flex',
@@ -1772,7 +1776,16 @@ export function GolfThisWeek({
             describe what is CURRENTLY rendered. */}
         <span
           className="tabular-nums"
-          style={{ ...KICKER, color: DISCOVER_QUIET, flex: '0 0 auto' }}
+          /* READ, floor 11: the readout is language. Local override only —
+             the shared KICKER metric (9) is not repointed. */
+          /* At 11px the full template measures ~248px, so on a 320 viewport it
+             must be the row's shrinking member and ELLIPSIZE — never wrap, and
+             never squeeze the region well to nothing. */
+          style={{
+            ...KICKER, fontSize: 11, color: DISCOVER_QUIET,
+            flex: '0 1 auto', minWidth: 0,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}
         >
           {/* The window is a THIRD SEGMENT OF THE SAME TEMPLATE so a translator
               can reorder all three. It is FIXED at seven days — never derived
@@ -1891,7 +1904,7 @@ export function GolfThisWeek({
                   stays beside every figure. */}
               <div
                 style={{
-                  fontSize: 8,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
@@ -2042,7 +2055,7 @@ export function GolfThisWeek({
                                 borderRadius: CHIP_RADIUS,
                                 background: gap === 0 ? PODIUM_GROUND.tie : tile.chipGround,
                                 color: gap === 0 ? DISCOVER_QUIET : tile.accent,
-                                fontSize: 8,
+                                fontSize: 11,
                                 fontWeight: 700,
                                 lineHeight: 1,
                                 letterSpacing: '0.08em',
@@ -2085,7 +2098,10 @@ export function GolfThisWeek({
                                   cursor: 'pointer',
                                 }}
                               >
-                                <span style={{ fontSize: 8, fontWeight: 700, color: BAND_FAINT }}>
+                                <span style={{
+                                  /* AXIS — STATED EXCEPTION: a rank marker is a
+                                     coordinate, not language. Floor 10. */
+                                  fontSize: 10, fontWeight: 700, color: BAND_FAINT }}>
                                   {i + 2}
                                 </span>
                                 <SquircleAvatar

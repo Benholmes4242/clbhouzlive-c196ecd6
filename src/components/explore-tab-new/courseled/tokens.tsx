@@ -146,15 +146,17 @@ export const NEW_ROW_BAR: React.CSSProperties = {
 };
 
 /**
- * SECTION HEADING (BRIEF_DISCOVER_SECTION_HIERARCHY §1.3) — 15.5 / 700 /
- * -0.02em / SENTENCE CASE / INK. Sub-sections keep the 9.5px uppercase label
+ * SECTION HEADING (BRIEF_DISCOVER_SECTION_HIERARCHY §1.3) — 17 / 700 /
+ * -0.02em / SENTENCE CASE / INK. Sub-sections keep the 11px uppercase label
  * treatment, so the two ranks read as different KINDS, not two sizes of label.
+ * The argument is unchanged and only sharper: 17 against 11 is a clearer
+ * difference of kind than 15.5 against 9.5 was.
  * No colour accent, no tile, no background: colour still means over par, under
  * par or the viewing member.
  */
 export const SECTION_TITLE: React.CSSProperties = {
   fontFamily: SANS,
-  fontSize: 15.5,
+  fontSize: 17,
   fontWeight: 700,
   letterSpacing: '-0.02em',
   color: DISCOVER_QUIET,
@@ -226,7 +228,7 @@ export function Eyebrow({
           style={{
             marginTop: 3,
             fontFamily: SANS,
-            fontSize: 11.5,
+            fontSize: 12,
             fontWeight: 500,
             lineHeight: 1.4,
             color: DISCOVER_QUIET,
@@ -260,7 +262,7 @@ export function InkAction({
         alignItems: 'center',
         gap: 4,
         ...LABEL,
-        fontSize: 10,
+        fontSize: 11,
         lineHeight: 1,
         color: DISCOVER_QUIET,
         background: 'transparent',
@@ -306,7 +308,9 @@ export function ImageChip({
         position: 'absolute',
         top: 8,
         [side]: 8,
-        fontSize: 8,
+        /* READ, not AXIS: this chip carries WORDS (when / tour / days), so it
+           takes the 11px floor rather than the axis exception. */
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.1em',
         textTransform: 'uppercase',

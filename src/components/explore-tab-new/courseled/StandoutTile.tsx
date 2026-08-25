@@ -203,7 +203,7 @@ export function StandoutTile({
             {unit && (
               <span
                 style={{
-                  fontSize: large ? 7.5 : 6.5,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
@@ -267,7 +267,7 @@ export function StandoutTile({
                       {waitLabel ? (
                         <span
                           style={{
-                            fontSize: 6.5,
+                            fontSize: 11,
                             fontWeight: 700,
                             letterSpacing: '0.14em',
                             textTransform: 'uppercase',
@@ -305,7 +305,7 @@ export function StandoutTile({
             position: 'absolute',
             top: 8,
             right: 10,
-            fontSize: 6.5,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
@@ -342,7 +342,7 @@ export function StandoutTile({
             <div
               style={{
                 ...LABEL,
-                fontSize: 6.5,
+                fontSize: 11,
                 color: 'rgba(255,255,255,0.60)',
                 marginTop: 3,
                 whiteSpace: 'nowrap',
@@ -363,7 +363,7 @@ export function StandoutTile({
         {kicker ? (
           <div
             style={{
-              fontSize: 9,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',

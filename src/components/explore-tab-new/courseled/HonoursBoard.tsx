@@ -279,7 +279,7 @@ export function FeatCard({
             top: 11,
             left: 12,
             ...LABEL,
-            fontSize: 8,
+            fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.18em',
              color: METAL_INK,
@@ -293,7 +293,7 @@ export function FeatCard({
             top: 11,
             right: 12,
             ...LABEL,
-            fontSize: 8,
+            fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.18em',
             color: METAL_YEAR,
@@ -476,7 +476,7 @@ export function LeaderHead({ leader: l }: { leader: HonoursLeader }) {
       <span
         style={{
           ...LABEL,
-          fontSize: 8,
+          fontSize: 11,
           letterSpacing: '0.18em',
           color: DISCOVER_QUIET,
           flex: '0 0 auto',
