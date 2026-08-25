@@ -107,7 +107,10 @@ function toneFor(v: number, digits = 1): string {
  */
 function marginTone(gap: number): string {
   if (Math.abs(gap) < REFERENCE_NOISE_FLOOR) return A.MUTE;
-  return gap > 0 ? A.IMPROVED : A.DRIFTED;
+  // BRIEF_PAR_TYPE_ROWS_AND_MARGIN_TONE s2: a to-par margin is a SCORE, so it
+  // takes the score-band canon. INDEX_DELTA (A.IMPROVED / A.DRIFTED) is index
+  // MOVEMENT only and its own source forbids this use.
+  return gap > 0 ? BAND_GREEN_DARK : BAND_RED_DARK;
 }
 
 /** The field's bar / mark. Neutral - the comparison, not a verdict. */
@@ -407,6 +410,20 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
       ...parTypes.map((p) => Math.max(p.you, p.covered ? p.field : 0)),
       0.1,
     ) * 1.1;
+  /**
+   * BRIEF_PAR_TYPE_ROWS_AND_MARGIN_TONE s1: the RAMP GOES ON THE RATE. p.you is
+   * a TOTAL across the par type, so ramping it would encode hole count. Width
+   * stays the quantity (total); colour is shots over par PER HOLE. The 0.06
+   * floor / 0.94 multiplier are verbatim from CourseAnalyticsPanels so the two
+   * charts tint identically.
+   */
+  const rateOf = (p: { you: number; holes: number }) =>
+    p.holes > 0 ? p.you / p.holes : 0;
+  const rMin = Math.min(...parTypes.map(rateOf));
+  const rMax = Math.max(...parTypes.map(rateOf));
+  const rSpan = rMax - rMin;
+  const parTint = (p: { you: number; holes: number }) =>
+    rSpan > 0 ? 0.06 + 0.94 * ((rateOf(p) - rMin) / rSpan) : 0.5;
 
   // ------------------------------------------------- panel 4, the unfolding
   const thirdOf = (h: ScoringBreakdownHole): 0 | 1 | 2 =>
@@ -917,7 +934,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                         height: 7,
                         borderRadius: 3.5,
                         width: `${barW}%`,
-                        background: A.INK,
+                        background: difficultyRampColor(parTint(p)),
                       }}
                     />
                     {tickW != null && (
@@ -1063,8 +1080,14 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
             const delta = form.priorAvg == null ? null : form.priorAvg - form.recentAvg;
             /** The fill carries the direction of travel, as on the index tile. */
+            // Acceptance D: this is a SCORING-average trend, not index movement,
+            // so it takes the score-band canon like marginTone.
             const fillTone =
-              delta == null || Math.abs(delta) < 0.5 ? A.AMBER : delta > 0 ? A.IMPROVED : A.DRIFTED;
+              delta == null || Math.abs(delta) < 0.5
+                ? A.AMBER
+                : delta > 0
+                  ? BAND_GREEN_DARK
+                  : BAND_RED_DARK;
 
             return (
               <>
@@ -1080,7 +1103,12 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                     <span
                       style={{
                         ...LABEL,
-                        color: Math.abs(delta) < 0.5 ? A.MUTE : delta > 0 ? A.IMPROVED : A.DRIFTED,
+                        color:
+                          Math.abs(delta) < 0.5
+                            ? A.MUTE
+                            : delta > 0
+                              ? BAND_GREEN_DARK
+                              : BAND_RED_DARK,
                       }}
                     >
                       {Math.abs(delta) < 0.5
