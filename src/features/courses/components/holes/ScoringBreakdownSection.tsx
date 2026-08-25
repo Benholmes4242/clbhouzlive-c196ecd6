@@ -71,8 +71,9 @@ const DAMAGE_GRID = '30px 1fr 52px';
 const THIRDS_NOISE_FLOOR = 1.5;
 
 
-/** Neutral ink ladder for the thirds, worst first. Never semantic colour. */
-const THIRD_LADDER = ['rgba(248,250,252,0.70)', 'rgba(248,250,252,0.40)', 'rgba(248,250,252,0.18)'];
+/* THIRD_LADDER (neutral ink ladder for the thirds) is gone with the thirds
+   bars: ThirdsChart owns their colour now. */
+
 
 /** Below this, viewer and field are level - no direction claimed either way. */
 const REFERENCE_NOISE_FLOOR = 0.5;
