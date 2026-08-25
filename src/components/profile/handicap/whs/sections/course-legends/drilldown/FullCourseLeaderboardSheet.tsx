@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { type LucideIcon, ChevronDown, ChevronUp, Crown } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   ChampionsListRow,
   CHAMPS_GRID_FULL,
@@ -24,6 +25,8 @@ interface SectionRow {
   valueDisplay: string;
   attained_at: string;
   isSelf: boolean;
+  /** Member UUID — threaded to SquircleAvatar for the deterministic initial. */
+  userId?: string | null;
   rank30d?: number | null;
   delta?: number | null;
 }
@@ -531,6 +534,8 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                     rank={row.rank}
                     name={row.isSelf ? 'You' : row.name}
                     photoUrl={row.photoUrl}
+                    userId={row.userId}
+                    fallbackName={row.name}
                     valueDisplay={row.valueDisplay}
                     unitLabel={activeDescriptor?.unit ?? ''}
                     isSelf={row.isSelf}
