@@ -116,7 +116,9 @@ export const SharedGroundStrip: React.FC<Props> = ({ ground, rivalFirstName }) =
                   </span>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ ...MT.SCORE, color: MSG.INK }}>{r.rival_gross}</span>
-                    <span className="truncate" style={{ ...MT.MICRO, maxWidth: 62 }}>
+                    {/* MICRO went 9 -> 11, so the same first name needs ~22% more
+                        room: 62 -> 72, inside a 168px card (144px inner). */}
+                    <span className="truncate" style={{ ...MT.MICRO, maxWidth: 72 }}>
                       {rivalFirstName}
                     </span>
                   </div>
