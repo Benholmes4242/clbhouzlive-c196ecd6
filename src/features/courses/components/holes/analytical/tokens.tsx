@@ -26,6 +26,7 @@
 import React from 'react';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
+import { BAND_GREEN_DARK } from '@/features/courses/_shared/scoreBands';
 
 /**
  * Canonical to-par RED, reused (not redeclared) from the tour tokens so one
@@ -45,7 +46,12 @@ export const A = {
   AMBER: '#F7931E',
   AMBER_DEEP: '#F7931E',
   RED: TOPAR_UNDER_DARK,
-  GREEN: '#34D77F',
+  /**
+   * The analytical green IS the score-band dark green (BRIEF_ONE_GREEN). One
+   * green app-wide: do NOT re-fork this into a local hex. #34D77F was a
+   * near-miss of #34D399 and was visible wherever the two met.
+   */
+  GREEN: BAND_GREEN_DARK,
   /**
    * HANDICAP INDEX MOVEMENT only (not par): IMPROVED = index came down,
    * DRIFTED = index went up. Sourced from the shared INDEX_DELTA token so one
