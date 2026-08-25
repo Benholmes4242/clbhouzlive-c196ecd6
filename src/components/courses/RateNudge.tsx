@@ -114,7 +114,8 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div
           style={{
-            fontSize: 10,
+            /* READ floor — the nudge eyebrow. 10 -> 11. */
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: 0.6,
              color: 'rgba(248,250,252,0.62)',
@@ -159,8 +160,11 @@ const RateNudge: React.FC<Props> = ({ userId, onEmptyFallback }) => {
           background: A.INK,
           color: A.CANVAS,
           borderRadius: 999,
-          fontSize: 12,
+          /* CAPS ACTION (§5) — the Rate pill, two points down, height unchanged. */
+          fontSize: 11,
           fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.10em',
           flexShrink: 0,
         }}
       >

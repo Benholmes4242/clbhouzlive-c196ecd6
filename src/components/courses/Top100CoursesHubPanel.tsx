@@ -503,7 +503,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
               </div>
               <button
                 onClick={() => refetch()}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-[0.10em] active:scale-[0.97] transition-transform"
                 style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
               >
                 {t('top100.retry', { defaultValue: 'Retry' })}
@@ -531,7 +531,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
               {searchTerm ? (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-[0.10em] active:scale-[0.97] transition-transform"
                   style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
                 >
                   <X className="h-3.5 w-3.5" />
@@ -540,7 +540,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
               ) : (
                 <button
                   onClick={handleResetFilters}
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-transform"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[12px] font-bold uppercase tracking-[0.10em] active:scale-[0.97] transition-transform"
                   style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
                 >
                   {t('top100.resetFilters')}

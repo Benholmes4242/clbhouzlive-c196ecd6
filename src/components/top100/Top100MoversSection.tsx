@@ -140,7 +140,8 @@ export const Top100MoversSection: React.FC<Props> = ({ movers, onViewAll }) => {
         <div>
           <div
             style={{
-              fontSize: 8.5,
+              /* READ floor — the movers kicker is language. 8.5 -> 11. */
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -164,7 +165,15 @@ export const Top100MoversSection: React.FC<Props> = ({ movers, onViewAll }) => {
         <button
           type="button"
           onClick={onViewAll}
-          style={{ fontSize: 11.5, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}
+          /* CAPS ACTION (§5) — two points down at the floor, height unchanged. */
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.10em',
+            color: INK,
+            whiteSpace: 'nowrap',
+          }}
         >
           {t('top100.movers.viewAll')}
         </button>
