@@ -162,7 +162,7 @@ const Shell: React.FC<{
 const LegendSwatch: React.FC<{ color: string; label: string }> = ({ color, label }) => (
   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
     <span style={{ width: 9, height: 9, borderRadius: 2.5, background: color }} />
-    <span style={{ ...LABEL, fontSize: 8, letterSpacing: '0.1em', color: A.MUTE }}>{label}</span>
+    <span style={{ ...LABEL, fontSize: 11, letterSpacing: '0.1em', color: A.MUTE }}>{label}</span>
   </span>
 );
 
@@ -339,7 +339,7 @@ const TrendCard: React.FC<{
                     borderRadius: 5,
                     padding: '3px 9px',
                     fontFamily: SANS,
-                    fontSize: 9.5,
+                    fontSize: 11,
                     fontWeight: 700,
                     letterSpacing: '0.08em',
                     color: on ? A.INK : A.DIM,
@@ -375,7 +375,7 @@ const TrendCard: React.FC<{
                 marginLeft: 'auto',
                 borderRadius: 999,
                 padding: '4px 10px',
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 700,
                 letterSpacing: '-0.01em',
                 ...FIGS,
@@ -489,7 +489,10 @@ const TrendCard: React.FC<{
                 y={ty}
                 textAnchor={anchor}
                 fill={tone}
-                style={{ fontSize: 9.5, fontWeight: 700, ...FIGS }}
+                /* Extreme-value labels are READ figures (the high/low index), not axis
+                   ticks, so they take the 11px floor rather than the 10px axis
+                   exception. */
+                style={{ fontSize: 11, fontWeight: 700, ...FIGS }}
               >
                 {formatIndex(points[idx].v)}
               </text>
