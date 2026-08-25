@@ -22,6 +22,7 @@ import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/use
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, DIFFICULTY_HARD_HEX, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
+import { BAND_GREEN_DARK } from '@/features/courses/_shared/scoreBands';
 import {
   DistributionStrip,
   HoleRowV2,
