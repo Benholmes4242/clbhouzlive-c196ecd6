@@ -45,8 +45,8 @@ import {
 
 /** Canonical metrics; the sheet keeps its own ink. */
 /* Local floor overrides: LABEL to 11, KICKER to 11. Shared metrics untouched. */
-const LABEL: React.CSSProperties = { ...LABEL_METRICS, fontSize: 11, color: A.DIM };
-const KICKER: React.CSSProperties = { ...KICKER_METRICS, fontSize: 11, color: A.INK };
+const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
+const KICKER: React.CSSProperties = { ...KICKER_METRICS, color: A.INK };
 const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
 
 const DOT = '\u00B7';
