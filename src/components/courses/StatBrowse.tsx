@@ -44,7 +44,6 @@ import { Top100VerdictExplainerSheet } from '@/components/top100/sheets/Top100Ve
 import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
-import { isEarlyData } from '@/lib/earlyData';
 import {
   chipForLens,
   isStatLens,
@@ -543,7 +542,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const unitLabel = useCallback((key: string) => t(`statBrowse.unit.${key}`), [t]);
 
   const sampleLine = useCallback(
-    (row: StatBrowseRow): { text: string; earlyData?: boolean } | null => {
+    (row: StatBrowseRow): { text: string } | null => {
       let text: string | null = null;
       if (lens === 'toughest' || lens === 'scoreable') {
         text = t('statBrowse.sample.rounds', { count: row.rounds });
@@ -559,7 +558,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           : null;
       }
       if (!text) return null;
-      return { text, earlyData: isEarlyData(row.rounds) };
+      return { text };
     },
     [lens, t],
   );

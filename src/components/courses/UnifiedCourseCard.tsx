@@ -43,8 +43,8 @@ interface UnifiedCourseCardProps {
   activeListSlug?: string | null;
   /** Glass stat capsule rendered top-right of the image (stat browse). */
   statChip?: { value: string; unit: string } | null;
-  /** Small sample line under the location line, with optional early-data flag. */
-  statLine?: { text: string; earlyData?: boolean } | null;
+  /** Small sample line under the location line. */
+  statLine?: { text: string } | null;
   /**
    * Viewer's relationship to this course, rendered as a small pill inside the
    * rank capsule. 'rated' outranks 'played' — a rating implies a visit.
@@ -295,7 +295,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                       fontWeight: 700,
                       letterSpacing: '0.10em',
                       textTransform: 'uppercase',
-                      color: viewerStatus === 'rated' ? '#F7931E' : 'rgba(255,255,255,0.82)',
+                      color: 'rgba(255,255,255,0.82)',
                     }}
                   >
                     {viewerStatus === 'rated' ? t('card.rated') : t('card.played')}
@@ -396,21 +396,6 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                 >
                   {statLine.text}
                 </span>
-                {statLine.earlyData && (
-                  <span
-                    className="flex-shrink-0"
-                    style={{
-                      /* READ floor — the "Early data" chip. 9 -> 11. */
-                      fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-                      letterSpacing: '0.10em', borderRadius: 9999,
-                      padding: '2px 6px',
-                      background: 'rgba(255,255,255,0.2)',
-                      color: 'rgba(255,255,255,0.9)',
-                    }}
-                  >
-                    {t('statBrowse.earlyData')}
-                  </span>
-                )}
               </div>
             )}
 

@@ -1,10 +1,10 @@
 /**
  * EARLY DATA threshold - single source of truth.
  *
- * Neither the Courses stat browse nor the Discover rails apply a
- * minimum-rounds filter to their rankings; instead, any course whose
- * ranking rests on fewer than EARLY_DATA_MIN_ROUNDS recorded rounds is
- * labelled "Early data" so the reader can judge the sample for themselves.
+ * The threshold now serves club analytics only. Courses stat browse and
+ * Discover rails no longer surface an "Early data" label on the course card,
+ * so this constant is the shared guard used by the business club-analytics
+ * surface to flag rankings with a small sample.
  *
  * Change the number here and every surface follows.
  *
