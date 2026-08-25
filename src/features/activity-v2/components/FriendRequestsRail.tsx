@@ -107,7 +107,11 @@ const RequestCard: React.FC<CardProps> = ({ row, pending, onOpen, onAccept, onDe
             background: INK,
             // §2.2 case: the label follows the inverted ink fill.
             color: ACT.CANVAS,
-            fontSize: 12.5,
+            // CAPS button: tracked out at 0.10em, stepped down to the READ floor
+            // (11, not 10.5 — the floor holds), padding unchanged so height holds.
+            fontSize: 11,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
             fontWeight: 700,
             border: 'none',
             cursor: pending ? 'default' : 'pointer',
@@ -126,8 +130,11 @@ const RequestCard: React.FC<CardProps> = ({ row, pending, onOpen, onAccept, onDe
             borderRadius: 20,
             background: 'transparent',
             color: INK_60,
-            fontSize: 12.5,
-            fontWeight: 600,
+            // CAPS button, as Accept.
+            fontSize: 11,
+            letterSpacing: '0.10em',
+            textTransform: 'uppercase',
+            fontWeight: 700,
             border: `1px solid ${HAIR}`,
             cursor: pending ? 'default' : 'pointer',
             opacity: pending ? 0.6 : 1,
@@ -167,9 +174,10 @@ export const FriendRequestsRail: React.FC = () => {
             <div
               style={{
                 padding: '0 16px 10px',
-                fontSize: 10.5,
+                // READ 11 floor (rail eyebrow).
+                fontSize: 11,
                 fontWeight: 700,
-                letterSpacing: '0.14em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: ACT.INK_45,
               }}

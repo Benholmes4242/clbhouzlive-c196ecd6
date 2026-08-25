@@ -86,9 +86,10 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
     <div style={{ padding: '18px 16px 4px', fontFamily: SF_STACK }}>
       <div
         style={{
-          fontSize: 10.5,
+          // READ 11 floor (card kicker).
+          fontSize: 11,
           fontWeight: 700,
-          letterSpacing: '0.14em',
+          letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: 'rgba(248,250,252,0.62)',
           marginBottom: 10,
@@ -126,9 +127,10 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
           </div>
           <div
             style={{
-              fontSize: 10.5,
+              // READ 11 floor (moment kicker).
+              fontSize: 11,
               fontWeight: 700,
-              letterSpacing: '0.12em',
+              letterSpacing: '0.10em',
               textTransform: 'uppercase',
               color: 'rgba(255,255,255,0.72)',
             }}
@@ -175,6 +177,8 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: A.INK,
+                      // AXIS 10: facepile initials are a marker inside a 28px avatar,
+                      // not language. Floors at 10.
                       fontSize: 10,
                       fontWeight: 700,
                     }}

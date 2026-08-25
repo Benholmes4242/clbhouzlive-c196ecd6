@@ -146,10 +146,11 @@ export const ActivityActionsSheet: React.FC<Props> = ({ open, row, onClose }) =>
         <div style={{ padding: '6px 20px 14px', borderBottom: `0.5px solid ${ACT.HAIR}` }}>
           <span
             style={{
-              fontSize: 9,
+              // READ 11 floor (sheet eyebrow).
+              fontSize: 11,
               fontWeight: 700,
               color: ACT.INK_45,
-              letterSpacing: '0.16em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
             }}
           >
