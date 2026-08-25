@@ -442,6 +442,7 @@ function ClassColumn({ headerCode, roster, liveMap, weekByPlayer, alignRight }: 
   return (
     <div
       style={{
+        minWidth: 0, // 1fr columns must be allowed to shrink: min-content is 168 at 320
         padding: '12px 12px 16px',
         borderLeft: alignRight ? `0.5px solid ${HAIRLINE_INK_10}` : 'none',
       }}
