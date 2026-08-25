@@ -419,14 +419,19 @@ const TeeList: React.FC<{
   if (tees.length < 2) return null;
   if (!showAll && !rows.some((r) => r.slope != null)) return null;
 
-  // ~5.4px per character at LABEL 8.5 uppercase with 0.13em tracking.
+  /* RE-MEASURED at LABEL 11 uppercase with 0.13em tracking (§4): the old 5.4 was
+     taken at LABEL 8.5 and under-measured every label. Measured widths are 8.0
+     (long composited) to 9.52 ("FORWARD") px per character, so 9.6 is the
+     worst-case rate and no plain label clips. */
   const labelW = Math.min(
     TEE_LABEL_W_MAX,
-    Math.max(TEE_LABEL_W_MIN, ...rows.map((r) => Math.ceil(r.tee.tee_label.length * 5.4) + 2)),
+    Math.max(TEE_LABEL_W_MIN, ...rows.map((r) => Math.ceil(r.tee.tee_label.length * 9.6) + 2)),
   );
 
   return (
-    <div style={{ marginTop: 14 }}>
+    /* 2px between the wells - without it the resting fills abut and read as one
+       block rather than three controls. */
+    <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 2 }}>
       {rows.map(({ tee, slope }) => (
         <TeeRow
           key={tee.tee_label}
