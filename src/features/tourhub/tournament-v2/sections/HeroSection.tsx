@@ -25,6 +25,7 @@ import { FONT, WHITE_ALPHA_65 } from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { HERO_MIN_H } from '../../_shared/tokens';
+import { heroCanonBackground } from '../../_shared/heroGradient';
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
@@ -33,12 +34,10 @@ import type { EventState } from '../../components/overview-v3/useTournamentPulse
 // Canonical hero height: HERO_MIN_H from _shared/tokens, sourced from the
 // course detail hero (GolfClubView). Do not re-declare it locally.
 
-// Same scrim as CinematicHeroFullBleed (overview hero) — grep both files.
-const CINEMATIC_SCRIM =
-  'linear-gradient(180deg, rgba(15,23,42,0.10) 0%, rgba(15,23,42,0) 30%, rgba(15,23,42,0.32) 58%, rgba(13,30,22,0.82) 100%)';
-const FALLBACK_BG = 'linear-gradient(180deg, #0A0E14 0%, #1A2130 100%)';
+// ONE canon scrim, ending on the canvas — HERO_CANON_SCRIM in
+// _shared/heroGradient (BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON). No text shadow.
+const FALLBACK_BG = 'linear-gradient(180deg, #1A2130 0%, #15171F 100%)';
 const IMAGE_FOCAL = '50% 72%';
-const TEXT_SHADOW = '0 2px 16px rgba(0,0,0,0.55)';
 const HAIRLINE = 'rgba(255,255,255,0.18)';
 
 const LEADER_RED = '#FF6B6B';
@@ -83,7 +82,6 @@ function Figure({ value, label, tone }: { value: string; label: string; tone?: s
           color: tone ?? '#fff',
           fontVariantNumeric: 'tabular-nums lining-nums',
           letterSpacing: '-0.02em',
-          textShadow: TEXT_SHADOW,
         }}
       >
         {value}
@@ -98,7 +96,6 @@ function Figure({ value, label, tone }: { value: string; label: string; tone?: s
           letterSpacing: '0.14em',
           color: 'rgba(255,255,255,0.62)',
           textTransform: 'uppercase',
-          textShadow: TEXT_SHADOW,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -159,7 +156,6 @@ function PersonLockup({
             letterSpacing: '0.12em',
             color: labelTone ?? 'rgba(255,255,255,0.62)',
             textTransform: 'uppercase',
-            textShadow: TEXT_SHADOW,
           }}
         >
           {icon}
@@ -174,7 +170,6 @@ function PersonLockup({
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            textShadow: TEXT_SHADOW,
           }}
         >
           {name}
@@ -187,7 +182,6 @@ function PersonLockup({
               color: WHITE_ALPHA_65,
               marginTop: 2,
               fontVariantNumeric: 'tabular-nums lining-nums',
-              textShadow: TEXT_SHADOW,
             }}
           >
             {sub}
@@ -211,9 +205,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
     state === 'upcoming' ? meta.id : null,
   );
 
-  const background = imageUrl
-    ? `${CINEMATIC_SCRIM}, url("${imageUrl}") ${IMAGE_FOCAL} / cover no-repeat`
-    : `${CINEMATIC_SCRIM}, ${FALLBACK_BG}`;
+  const background = heroCanonBackground(imageUrl, FALLBACK_BG, IMAGE_FOCAL);
 
   const leader =
     state === 'live'
@@ -419,7 +411,6 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
             marginBottom: 8,
-            textShadow: TEXT_SHADOW,
           }}
         >
           {chip.label}
@@ -433,7 +424,6 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
             lineHeight: 1.04,
             letterSpacing: '-0.02em',
             margin: 0,
-            textShadow: TEXT_SHADOW,
             display: '-webkit-box',
             WebkitBoxOrient: 'vertical',
             WebkitLineClamp: 2,
@@ -451,7 +441,6 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
               color: 'rgba(255,255,255,0.65)',
               marginTop: 4,
               fontVariantNumeric: 'tabular-nums lining-nums',
-              textShadow: TEXT_SHADOW,
             }}
           >
             {venueLine}

@@ -13,7 +13,8 @@ import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseTabs, type CourseTabId } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
-import { buildOverviewHeroBackground } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
+import { heroCanonBackground } from '@/features/tourhub/_shared/heroGradient';
+import { HERO_MIN_H } from '@/features/tourhub/_shared/tokens';
 import { safeGoBack } from '@/utils/navigation';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
@@ -192,7 +193,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     <div
       className="relative overflow-hidden bg-background"
       style={{
-        height: 'calc(306px + var(--sat, env(safe-area-inset-top, 0px)))',
+        height: HERO_MIN_H,
         marginTop: 0,
       }}
     >
@@ -208,7 +209,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.05) 70%, transparent 100%)',
+          background: `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.20) 42%, rgba(0,0,0,0.62) 74%, ${A.CANVAS} 100%)`,
         }}
       />
       {onClose && (
@@ -240,17 +241,16 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
   // Standalone (non-modal) full-bleed cinematic hero — bleeds into the notch.
   // Pattern mirrors Tour hero: image as container `background` + paddingTop env(sat).
-  // Same layered scrim as PhotoBand (Tour Overview hero) — see
-  // `buildOverviewHeroBackground` in HybridHero.constants. Kept as a
-  // dynamic import target so grep from either surface finds the pair.
-  const heroBackground = buildOverviewHeroBackground(course.thumbnail_image ?? null);
+  // ONE canon scrim ending on the canvas — heroCanonBackground in
+  // _shared/heroGradient (BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON).
+  const heroBackground = heroCanonBackground(course.thumbnail_image ?? null, A.CANVAS);
 
   const cinematicHero = (
     <div
       className="relative overflow-hidden"
       style={{
         width: '100%',
-        minHeight: 'calc(clamp(280px, 35dvh, 390px) + env(safe-area-inset-top, 0px))',
+        minHeight: HERO_MIN_H,
         background: heroBackground,
         backgroundColor: A.CANVAS,
         display: 'flex',

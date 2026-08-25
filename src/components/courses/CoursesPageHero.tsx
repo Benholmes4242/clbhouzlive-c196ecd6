@@ -10,10 +10,9 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatRatingValue } from '@/utils/formatters';
 import { formatNumber } from '@/i18n/format';
 import { useHeroCourseFact, type HeroCourseFactRow } from '@/hooks/courses/useHeroCourseFact';
-import {
-  buildOverviewHeroBackground,
-  COURSE_GRADIENT,
-} from '@/features/tourhub/components/overview-v3/HybridHero.constants';
+import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
+import { heroCanonBackground } from '@/features/tourhub/_shared/heroGradient';
+import { HERO_MIN_H } from '@/features/tourhub/_shared/tokens';
 
 /**
  * CoursesPageHero
@@ -23,10 +22,8 @@ import {
  * hero (notch bleed, scrim, cover position) and the SAME data source as
  * the old Discover "Standout courses" card (useExploreHero).
  *
- * Scrim treatment: shares the layered stack from the Tour Overview
- * `PhotoBand` (top scrim + heavy bottom scrim + radial ambient) via
- * `buildOverviewHeroBackground` so the Courses hero matches the Tour
- * Overview hero pixel-for-pixel.
+ * Scrim treatment: the ONE canon hero scrim (heroCanonBackground) —
+ * a single layer ending on the canvas. No top scrim, no radial ambient.
  *
  * The global CompactHeader floats over this hero in transparent overlay
  * mode; this component reserves that space via env(safe-area-inset-top).
@@ -41,9 +38,6 @@ import {
  *  - hero_fact_shown    { course_id, fact_kind, rounds_tracked, player_count }
  *  - hero_view_course   { course_id, mood, had_blurb }     (CTA onClick)
  */
-
-const HERO_MIN_HEIGHT =
-  'calc(clamp(280px, 35dvh, 390px) + env(safe-area-inset-top, 0px))';
 
 /** 1st, 2nd, 3rd, 11th - never "The 11 plays hardest". */
 function ordinal(n: number): string {
@@ -140,9 +134,9 @@ function CoursesPageHeroInner() {
 
   const background = useMemo(() => {
     if (hero?.hero_image_url) {
-      return buildOverviewHeroBackground(hero.hero_image_url);
+      return heroCanonBackground(hero.hero_image_url);
     }
-    return COURSE_GRADIENT;
+    return heroCanonBackground(null, COURSE_GRADIENT);
   }, [hero?.hero_image_url]);
 
   const locationText = hero
@@ -198,7 +192,7 @@ function CoursesPageHeroInner() {
       className="relative overflow-hidden"
       style={{
         width: '100%',
-        minHeight: HERO_MIN_HEIGHT,
+        minHeight: HERO_MIN_H,
         background,
         backgroundColor: '#15171F',
         display: 'flex',

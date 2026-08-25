@@ -29,3 +29,25 @@ export function heroTintGradient(brandHex: string | null, amount = 0.3): string 
   const top = brandHex ? darkenTowardCharcoal(brandHex, amount) : '#262B33';
   return `linear-gradient(180deg, ${top} 0%, ${CHARCOAL} 100%)`;
 }
+
+/**
+ * BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON — the ONE photo-hero scrim.
+ *
+ * One layer, ending on the canvas (#15171F === CHARCOAL === A.CANVAS: one
+ * colour, three names). No top scrim, no radial ambient, no second bottom
+ * scrim, no text shadow. Every photo-led hero (course detail, courses page,
+ * tournament) uses this and nothing else.
+ */
+export const HERO_CANON_SCRIM =
+  `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.20) 42%, rgba(0,0,0,0.62) 74%, ${CHARCOAL} 100%)`;
+
+/** Canon hero background: the one scrim over an image, or over a fallback. */
+export function heroCanonBackground(
+  imageUrl: string | null | undefined,
+  fallback: string = CHARCOAL,
+  focal = 'center 40%',
+): string {
+  return imageUrl
+    ? `${HERO_CANON_SCRIM}, url("${imageUrl}") ${focal} / cover no-repeat`
+    : `${HERO_CANON_SCRIM}, ${fallback}`;
+}
