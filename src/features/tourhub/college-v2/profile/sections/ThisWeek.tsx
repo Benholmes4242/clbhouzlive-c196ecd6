@@ -41,7 +41,7 @@ interface Props {
 }
 
 const KICKER_STYLE: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -49,7 +49,7 @@ const KICKER_STYLE: React.CSSProperties = {
 };
 
 const LABEL_STYLE: React.CSSProperties = {
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
@@ -193,7 +193,8 @@ export function ThisWeek({ slug, collegeName }: Props) {
                       >
                         {pos ?? ''}
                       </div>
-                      {microThru && <div style={{ ...LABEL_STYLE, marginTop: 5 }}>{microThru}</div>}
+                      {/* AXIS 10: FINAL / THRU is a status marker, not a sentence. */}
+                      {microThru && <div style={{ ...LABEL_STYLE, fontSize: 10, marginTop: 5 }}>{microThru}</div>}
                     </>
                   ) : (
                     <div style={LABEL_STYLE}>{t('college.profile.teeTime')}</div>

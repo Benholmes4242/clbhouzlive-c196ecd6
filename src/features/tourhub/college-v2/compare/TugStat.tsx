@@ -77,10 +77,10 @@ function valueStyle(color: string, align: 'left' | 'right') {
 }
 
 const LABEL_STYLE = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   color: INK_FAINT,
-  letterSpacing: '0.16em',
+  letterSpacing: '0.06em', // tightened from 0.16em: READ 11 labels must stay on one line at 320 (DRIVING DISTANCE = 114.9px)
   textTransform: 'uppercase' as const,
   textAlign: 'center' as const,
   whiteSpace: 'nowrap' as const,
@@ -234,10 +234,11 @@ function Coverage({
     <div
       style={{
         marginTop: 3,
-        fontSize: 9,
+        // AXIS 10: coverage is a count pair (FROM 6 OF 14), a coordinate under the figure.
+        fontSize: 10,
         fontWeight: 700,
         color: INK_FAINT,
-        letterSpacing: '0.1em',
+        letterSpacing: '0.06em',
         textTransform: 'uppercase',
         fontVariantNumeric: 'tabular-nums lining-nums',
         textAlign: align,

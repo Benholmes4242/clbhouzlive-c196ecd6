@@ -159,7 +159,7 @@ function Column({
           color: '#FFFFFF',
           fontSize: 9,
           fontWeight: 700,
-          letterSpacing: '0.13em',
+          letterSpacing: '0.10em',
           textTransform: 'uppercase',
           cursor: 'pointer',
         }}
@@ -189,7 +189,7 @@ function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onC
     >
       <div
         style={{
-          fontSize: 9.5,
+          fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',

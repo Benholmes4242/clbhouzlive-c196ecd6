@@ -197,7 +197,7 @@ export function CollegeHubPage() {
           >
             <div
               style={{
-                fontSize: 9.5,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
@@ -338,7 +338,7 @@ export function CollegeHubPage() {
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
               <div
                 style={{
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
@@ -415,7 +415,7 @@ export function CollegeHubPage() {
           >
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
@@ -436,9 +436,9 @@ export function CollegeHubPage() {
                 border: 'none',
                 padding: 0,
                 color: INK,
-                fontSize: 10,
+                fontSize: 9,
                 fontWeight: 700,
-                letterSpacing: '0.13em',
+                letterSpacing: '0.10em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
               }}
@@ -521,7 +521,7 @@ export function CollegeHubPage() {
         <div
           style={{
             padding: '14px 16px 0',
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.10em',
             textTransform: 'uppercase',
