@@ -907,7 +907,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                   padding: '0',
                   color: RV2.ink,
                   caretColor: RV2.ink,
+                  /* The only consumer that was not passing one — the shared
+                     component's default is the canonical dark tier anyway, but
+                     three composers should not disagree about whether they
+                     state it (MICRO_BRIEF_MENTIONS_COMPOSER_BROKEN §4). */
+                  placeholderColor: 'rgba(255,255,255,0.38)',
                 }}
+
               />
             </div>
             <div style={{ fontSize: 11, color: RV2.secondary, marginTop: 8 }}>
