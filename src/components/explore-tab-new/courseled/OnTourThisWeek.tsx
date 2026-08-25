@@ -169,7 +169,7 @@ function GlassChip({
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        fontSize: 8.5,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.1em',
         textTransform: 'uppercase',
@@ -222,7 +222,7 @@ function ThreeUp({ cells }: { cells: Array<[string, string]> }) {
           >
             {value}
           </div>
-          <div style={{ ...LABEL, fontSize: 8.5, color: PANEL_LABEL, marginTop: 2 }}>{label}</div>
+          <div style={{ ...LABEL, fontSize: 11, color: PANEL_LABEL, marginTop: 2 }}>{label}</div>
         </div>
       ))}
     </div>
@@ -323,7 +323,7 @@ function PositionRows({ positions, paused }: { positions: PeekPosition[]; paused
             <span
               style={{
                 ...LABEL,
-                fontSize: 8.5,
+                fontSize: 11,
                 color: PANEL_LABEL,
                 flexShrink: 0,
                 minWidth: 18,
@@ -490,7 +490,7 @@ function TourTile({
               {fmtScore(peek.leaderScore)}
             </span>
             {isTied && (
-              <span style={{ ...LABEL, fontSize: 8.5, letterSpacing: '0.11em', color: PANEL_LABEL }}>
+              <span style={{ ...LABEL, fontSize: 11, letterSpacing: '0.11em', color: PANEL_LABEL }}>
                 {t('discover.tour.nTied', { defaultValue: '{{count}} tied', count: tiedCount })}
               </span>
             )}
@@ -498,7 +498,7 @@ function TourTile({
               <span
                 style={{
                   ...LABEL,
-                  fontSize: 8.5,
+                  fontSize: 11,
                   letterSpacing: '0.11em',
                   color: PANEL_LABEL,
                   marginLeft: 'auto',
@@ -560,7 +560,7 @@ function TourTile({
               <span
                 style={{
                   ...LABEL,
-                  fontSize: 8.5,
+                  fontSize: 11,
                   letterSpacing: '0.11em',
                   color: PANEL_LABEL,
                   flexShrink: 0,
@@ -584,7 +584,7 @@ function TourTile({
         : t('discover.tour.nDays', { defaultValue: '{{count}} days', count: days });
     return (
       <>
-        <div style={{ ...LABEL, fontSize: 8.5, letterSpacing: '0.11em', color: PANEL_LABEL }}>
+        <div style={{ ...LABEL, fontSize: 11, letterSpacing: '0.11em', color: PANEL_LABEL }}>
           {e.defendingChampion
             ? t('discover.defendingChampion', 'Defending champion')
             : t('discover.tour.startsIn', 'Starts in')}
@@ -609,7 +609,7 @@ function TourTile({
             <span
               style={{
                 ...LABEL,
-                fontSize: 8.5,
+                fontSize: 11,
                 letterSpacing: '0.11em',
                 color: PANEL_LABEL,
                 flexShrink: 0,
@@ -774,7 +774,7 @@ function TourTile({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            fontSize: 8.5,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',

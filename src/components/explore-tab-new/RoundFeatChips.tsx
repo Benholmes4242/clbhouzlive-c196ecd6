@@ -24,7 +24,7 @@ export const featChipBase: CSSProperties = {
   gap: 4,
   padding: '3px 6px',
   borderRadius: 4,
-  fontSize: 9.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.07em',
   textTransform: 'uppercase',
@@ -36,7 +36,7 @@ export const featChipBase: CSSProperties = {
 const badgeBase: CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
-  fontSize: 8.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.08em',
   textTransform: 'uppercase',

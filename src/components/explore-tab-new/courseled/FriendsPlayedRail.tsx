@@ -264,7 +264,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                     position: 'absolute',
                     top: 8,
                     right: 8,
-                    fontSize: 8,
+                    fontSize: 11,
                     fontWeight: 700,
                     letterSpacing: '0.1em',
                     textTransform: 'uppercase',

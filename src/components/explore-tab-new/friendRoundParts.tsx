@@ -138,7 +138,7 @@ export function IndexMovement({ row }: { row: CircleRoundRow }) {
       </span>
       <span
         style={{
-          fontSize: 6.5,
+          fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.13em',
           textTransform: 'uppercase',

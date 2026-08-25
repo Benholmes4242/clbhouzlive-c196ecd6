@@ -282,7 +282,7 @@ export function MomentTile({
                   flexShrink: 0,
                   marginLeft: 'auto',
                   color: '#FFFFFF',
-                  fontSize: 9.5,
+                  fontSize: 11,
                   fontWeight: 700,
                   borderRadius: 5,
                   padding: '2px 5px',

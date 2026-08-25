@@ -148,7 +148,7 @@ export function CompactStandoutTile({
             position: 'absolute',
             top: 7,
             right: 9,
-            fontSize: 6.5,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
@@ -197,7 +197,7 @@ export function CompactStandoutTile({
         {unit ? (
           <span
             style={{
-              fontSize: 7,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
