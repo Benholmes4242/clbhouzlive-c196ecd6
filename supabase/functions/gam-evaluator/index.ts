@@ -1603,7 +1603,7 @@ async function maybeEmitRateCoursePrompt(
 
 
 async function recomputeLegend(courseId: string, cfg: LegendCfg) {
-  // Current top 10
+  // Current stored board — the FULL field for this course/category, no cap.
   const { data: prev } = await supabase
     .from("gam_course_legends")
     .select("user_id, value")
@@ -1611,7 +1611,8 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
     .order("rank", { ascending: true });
   const prevTopUser = prev?.[0]?.user_id ?? null;
 
-  // Build new top 10 client-side
+  // Build the new FULL board client-side — every qualifying player, ranked from
+  // 1, with no cap (BRIEF_CHAMPIONS_FULL_LEADERBOARD).
   const sinceDate = cfg.windowDays
     ? new Date(Date.now() - cfg.windowDays * 86400_000).toISOString().slice(0, 10)
     : null;
@@ -1674,8 +1675,7 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
       if (d !== 0) return d;
       if (a.attained_at !== b.attained_at) return a.attained_at < b.attained_at ? -1 : 1;
       return a.user_id < b.user_id ? -1 : 1;
-    })
-    .slice(0, 10);
+    });
 
   // Mark old as not current
   await supabase
