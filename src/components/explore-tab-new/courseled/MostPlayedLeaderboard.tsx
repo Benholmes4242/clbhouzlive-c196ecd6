@@ -615,7 +615,7 @@ export function MostPlayedLeaderboard({
               was. Do not silently reverse this again.
               'discover.whereTheyPlayed' is now unused and STAYS in all six
               locale files, the treatment §S4.1 gave the key it replaced. */}
-          {t('discover.mostPlayed', 'Courses played in the last 14 days')}
+          {t('discover.mostPlayed', 'Courses played · 14 days')}
         </Eyebrow>
       )}
 

@@ -1339,7 +1339,7 @@
     "defending": "Defending",
     "nPhotos": "{{count}} photos",
     "nPhotos_one": "{{count}} photo",
-    "mostPlayed": "Courses played in the last 14 days",
+    "mostPlayed": "Courses played · 14 days",
     "whereTheyPlayed": "Where they played in the last 14 days",
     "mostPlayedRoundCount": "{{count}} round",
     "mostPlayedRoundCount_other": "{{count}} rounds",
