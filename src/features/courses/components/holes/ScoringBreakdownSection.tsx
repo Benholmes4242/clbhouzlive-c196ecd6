@@ -47,6 +47,8 @@ import { BAND_AMBER, BAND_GREEN_DARK, BAND_RED_DARK } from '@/features/courses/_
  */
 const OVER = BAND_RED_DARK;
 const UNDER = BAND_GREEN_DARK;
+/* BRIEF_PAR_BARS_TO_PAR_SCALE: A.TRACK's neighbour - the level-with-par tone. */
+const LEVEL_GREY = 'rgba(248,250,252,0.34)';
 
 /** The coaching line. Caption weight - it advises, it does not narrate. */
 const CAPTION: React.CSSProperties = {
@@ -411,19 +413,27 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
       0.1,
     ) * 1.1;
   /**
-   * BRIEF_PAR_TYPE_ROWS_AND_MARGIN_TONE s1: the RAMP GOES ON THE RATE. p.you is
-   * a TOTAL across the par type, so ramping it would encode hole count. Width
-   * stays the quantity (total); colour is shots over par PER HOLE. The 0.06
-   * floor / 0.94 multiplier are verbatim from CourseAnalyticsPanels so the two
-   * charts tint identically.
+   * BRIEF_PAR_BARS_TO_PAR_SCALE: the bar's colour states how the par type is
+   * played AGAINST PAR - green under, neutral grey level, ramped red over. The
+   * value is PER HOLE (p.you is a total, so colouring it would encode hole
+   * count). Width stays the quantity (total); colour is the rate. Tone is
+   * decided AFTER rounding to one decimal so -0.04, which prints "0.0", reads
+   * level rather than green. The 0.06 floor / 0.94 multiplier are verbatim from
+   * CourseAnalyticsPanels so every ramp in the app tints identically.
    */
   const rateOf = (p: { you: number; holes: number }) =>
     p.holes > 0 ? p.you / p.holes : 0;
-  const rMin = Math.min(...parTypes.map(rateOf));
-  const rMax = Math.max(...parTypes.map(rateOf));
-  const rSpan = rMax - rMin;
-  const parTint = (p: { you: number; holes: number }) =>
-    rSpan > 0 ? 0.06 + 0.94 * ((rateOf(p) - rMin) / rSpan) : 0.5;
+  const parOvers = parTypes.map((p) => Math.round(rateOf(p) * 10) / 10).filter((v) => v > 0);
+  const oMin = parOvers.length ? Math.min(...parOvers) : 0;
+  const oMax = parOvers.length ? Math.max(...parOvers) : 0;
+  const oSpan = oMax - oMin;
+  const overTint = (v: number) => (oSpan > 0 ? 0.06 + 0.94 * ((v - oMin) / oSpan) : 0.75);
+  const toneForPar = (v: number): string => {
+    const r = Math.round(v * 10) / 10;
+    if (r < 0) return BAND_GREEN_DARK;
+    if (r === 0) return LEVEL_GREY;
+    return difficultyRampColor(overTint(r));
+  };
 
   // ------------------------------------------------- panel 4, the unfolding
   const thirdOf = (h: ScoringBreakdownHole): 0 | 1 | 2 =>
@@ -923,8 +933,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               const margin = p.covered ? p.field - p.you : null;
               return (
                 <div key={p.par} style={{ display: 'grid', gridTemplateColumns: '66px 1fr 44px 52px', gap: 9, alignItems: 'center' }}>
-                  <span style={LABEL}>
-                    {t('courses:holes.scoringBreakdown.parLabel', { n: p.par })}
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK }}>
+                    {t('courses:courseDetail.parTypes.parNPlural', { n: p.par })}
                   </span>
                   <span style={{ display: 'block', position: 'relative', height: 7, borderRadius: 3.5, background: A.TRACK }}>
                     <span
@@ -933,7 +943,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                         height: 7,
                         borderRadius: 3.5,
                         width: `${barW}%`,
-                        background: difficultyRampColor(parTint(p)),
+                        background: toneForPar(rateOf(p)),
                       }}
                     />
                     {tickW != null && (
