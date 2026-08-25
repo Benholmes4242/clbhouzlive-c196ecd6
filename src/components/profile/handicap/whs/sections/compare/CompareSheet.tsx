@@ -377,7 +377,7 @@ export const CompareSheet: React.FC<Props> = ({
       if (mine.length === 0) return null;
       return (
         <div key={g.id} style={{ padding: '4px 0' }}>
-          <div style={{ ...LABEL_STYLE, fontSize: 7.5, fontWeight: 700, color: CHART.DIM, padding: '8px 0 2px' }}>
+          <div style={{ ...LABEL_STYLE, fontSize: 11, fontWeight: 700, color: CHART.DIM, padding: '8px 0 2px' }}>
             {g.label}
           </div>
           {renderCareerRows(mine)}
@@ -785,7 +785,7 @@ export const CompareSheet: React.FC<Props> = ({
                   marginBottom: 6,
                 }}
               >
-                <div style={{ ...LABEL_STYLE, fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', color: CHART.MUTE }}>
+                <div style={{ ...LABEL_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.19em', color: CHART.MUTE }}>
                   {isSharedMode
                     ? t('handicap.compare.headToHead')
                     : t('handicap.compare.thisSeason')}
@@ -794,7 +794,7 @@ export const CompareSheet: React.FC<Props> = ({
                   <div
                     style={{
                       ...LABEL_STYLE,
-                      fontSize: 7.5,
+                      fontSize: 11,
                       fontWeight: 700,
                       letterSpacing: '0.16em',
                       color: CHART.AMBER,
@@ -811,7 +811,7 @@ export const CompareSheet: React.FC<Props> = ({
               {/* THE SAMPLE LINE SITS ABOVE THE FIGURES so the scope is read
                   before the numbers - that is what stops BEST GROSS reading as
                   one figure stated twice against the career block below. */}
-              <div style={{ ...LABEL_STYLE, fontSize: 7.5, fontWeight: 700, letterSpacing: '0.16em', color: CHART.DIM, marginBottom: 10, lineHeight: 1.5 }}>
+              <div style={{ ...LABEL_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', color: CHART.DIM, marginBottom: 10, lineHeight: 1.5 }}>
                 {isSharedMode
                   ? t('handicap.compare.sharedFooter', { count: sharedCount })
                   : t('handicap.compare.neverFooter')}
@@ -826,7 +826,7 @@ export const CompareSheet: React.FC<Props> = ({
                   gap: 8,
                   marginBottom: 4,
                   ...LABEL_STYLE,
-                  fontSize: 7.5,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.16em',
                 }}
@@ -956,10 +956,10 @@ export const CompareSheet: React.FC<Props> = ({
                   Grouped, so BEST EVER is plainly a different scope. */}
               {isSharedMode && careerAvailable && careerRows.length > 0 && (
                 <>
-                  <div style={{ ...LABEL_STYLE, fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', marginTop: 18, color: CHART.MUTE }}>
+                  <div style={{ ...LABEL_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.19em', marginTop: 18, color: CHART.MUTE }}>
                     {t('handicap.compare.career')}
                   </div>
-                  <div style={{ ...LABEL_STYLE, fontSize: 7.5, fontWeight: 700, letterSpacing: '0.16em', marginTop: 6, color: CHART.DIM, lineHeight: 1.5 }}>
+                  <div style={{ ...LABEL_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', marginTop: 6, color: CHART.DIM, lineHeight: 1.5 }}>
                     {t('handicap.compare.careerFooter')}
                   </div>
                   <div
