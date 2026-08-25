@@ -533,7 +533,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     const avg = (xs: number[]) => xs.reduce((s, x) => s + x, 0) / xs.length;
     const recentAvg = avg(last10);
     const priorAvg = prior.length >= 5 ? avg(prior.slice(-10)) : null;
-    return { series, best, worst, span, recentAvg, priorAvg, bestIndex: series.indexOf(best) };
+    return { series, rounds, best, worst, span, recentAvg, priorAvg, bestIndex: series.indexOf(best) };
   })();
 
   // ------------------------------------------------ panel 6, within reach
