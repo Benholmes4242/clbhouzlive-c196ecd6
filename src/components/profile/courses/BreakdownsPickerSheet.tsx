@@ -225,10 +225,10 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                     style={{
                       fontFamily: FONT_SANS,
                       marginTop: 4,
-                      fontSize: 10,
+                      fontSize: 11,
                       fontWeight: 700,
                       color: A.MUTE,
-                      letterSpacing: '0.14em',
+                      letterSpacing: '0.10em',
                       textTransform: 'uppercase',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',

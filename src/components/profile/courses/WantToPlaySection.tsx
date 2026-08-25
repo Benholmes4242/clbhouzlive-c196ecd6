@@ -126,7 +126,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                 {isTop100 && (
                   <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', alignItems: 'center', gap: 4, padding: '3px 7px', borderRadius: 999, background: 'rgba(247,147,30,0.92)' }}>
                     <Trophy size={9} strokeWidth={2.6} color="#fff" />
-                    <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '0.1em', color: '#fff' }}>TOP 100</span>
+                    <span style={{ /* AXIS floor 10: TOP 100 marker over photography */ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: '#fff' }}>TOP 100</span>
                   </div>
                 )}
                 <div style={{ position: 'absolute', left: 12, right: 12, bottom: 10 }}>
@@ -136,7 +136,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                   {loc && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 2 }}>
                       <MapPin size={9} strokeWidth={2.4} color="rgba(255,255,255,0.85)" />
-                      <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.85)', textTransform: 'uppercase', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.85)', textTransform: 'uppercase', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
                         {loc}
                       </span>
                     </div>
@@ -146,7 +146,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
 
               {/* Footer */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 10px 10px 12px', gap: 8 }}>
-                <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.04em', color: '#94A3B8', textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.02em', color: '#94A3B8', textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {addedAgo}
                 </span>
                 {isOwnProfile && (

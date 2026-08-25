@@ -241,9 +241,9 @@ const SortableManageItem: React.FC<SortableItemProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3 }}>
             <div style={{ flex: 1, minWidth: 0, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
               <span style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
-                letterSpacing: '0.14em',
+                letterSpacing: '0.10em',
                 textTransform: 'uppercase',
                 color: INK_SUBTLE,
               }}>
@@ -383,9 +383,9 @@ const CourseRow: React.FC<CourseRowProps> = ({
         flexWrap: 'wrap',
       }}>
         <span style={{
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 700,
-          letterSpacing: '0.14em',
+          letterSpacing: '0.10em',
           color: INK_SUBTLE,
           textTransform: 'uppercase',
         }}>
@@ -777,9 +777,9 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                       }}>
                         <div style={{ width: 3, height: 9, background: INK }} />
                         <span style={{
-                          fontSize: 10,
+                          fontSize: 11,
                           fontWeight: 700,
-                          letterSpacing: '0.14em',
+                          letterSpacing: '0.10em',
                           color: INK_SUBTLE,
                           textTransform: 'uppercase',
                         }}>
@@ -853,9 +853,9 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
                           minHeight: 44,
                           cursor: 'pointer',
                           color: INK,
-                          fontSize: 10,
+                          fontSize: 11,
                           fontWeight: 700,
-                          letterSpacing: '0.14em',
+                          letterSpacing: '0.10em',
                           textTransform: 'uppercase',
                         }}
                       >

@@ -169,9 +169,10 @@ export const HeroCell: React.FC<{
       <div
         style={{
           marginTop: 4,
-          fontSize: 7.5,
+          // AXIS floor 10 exception: labels a counter figure over the cover photo.
+          fontSize: 10,
           fontWeight: 700,
-          letterSpacing: '0.14em',
+          letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: W_45,
         }}
@@ -388,9 +389,9 @@ export const HeroShell: React.FC<HeroShellProps> = ({
           >
             <div
               style={{
-                fontSize: 8.5,
+                fontSize: 11,
                 fontWeight: 700,
-                letterSpacing: '0.14em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: W_45,
               }}
@@ -452,9 +453,9 @@ export const HeroPill: React.FC<{
       borderRadius: 999,
       color: '#FFFFFF',
       fontFamily: SANS,
-      fontSize: 8,
+      fontSize: 11,
       fontWeight: 700,
-      letterSpacing: '0.14em',
+      letterSpacing: '0.10em',
       textTransform: 'uppercase',
       padding: '9px 14px',
       minHeight: 34,

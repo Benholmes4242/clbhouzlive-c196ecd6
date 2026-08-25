@@ -54,13 +54,13 @@ const MyRatingsTierDivider: React.FC<MyRatingsTierDividerProps> = ({
           >
             <span
               style={{
-                fontSize: 10.5,
+                fontSize: 11,
                 fontWeight: 700,
                 color: TIER_NAMES.includes(tierName)
                   ? reviewTierColor(tierName as RatingTier, 'light')
                   : INK_TERTIARY,
 
-                letterSpacing: '0.14em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
               }}
             >
@@ -69,7 +69,7 @@ const MyRatingsTierDivider: React.FC<MyRatingsTierDividerProps> = ({
           </div>
           <span
             style={{
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 600,
               color: INK_TERTIARY,
               letterSpacing: '0.12em',
