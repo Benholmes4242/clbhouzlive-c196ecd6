@@ -1809,7 +1809,8 @@
     "overName": "over {{name}}",
     "levelWithName": "Level with {{name}}",
     "nearest": "Nearest {{value}}",
-    "youHoldIt": "You hold it"
+    "youHoldIt": "You hold it",
+    "jointChampion": "Joint champion"
   },
   "search": {
     "yourRounds": "Your rounds"
