@@ -519,12 +519,8 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
             analyticsEvents.track('course_hero_stats_tapped', { course_id: courseId, rounds_tracked: rounds });
             onOpenStats();
           }}
-          className="inline-flex items-center self-start active:scale-[0.98] transition-transform"
+          className="inline-flex items-center self-start drop-shadow-lg active:scale-[0.98] transition-transform"
           style={{
-            background: 'rgba(15,23,42,0.5)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            borderRadius: 8,
             padding: '4px 8px',
             marginLeft: -8,
             border: 0,
