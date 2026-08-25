@@ -147,7 +147,14 @@ export function usePlayersRanking(tour: PlayersTourId) {
           .limit(300);
         if (statsErr) throw statsErr;
         if (!stats?.length) return { synced: false, statLabel: null, rows: [] };
-        const statsRows = stats as unknown as PgaStatRow[];
+        // A player with no season points has no season ranking. Zero is not a
+        // NULL, so the query's nullsFirst:false does not catch it and a
+        // zero-point row lands wherever an unstable descending sort puts it -
+        // which is how Stefano Mazzoli (0 pts, 5 events) reached the top.
+        const statsRows = (stats as unknown as PgaStatRow[]).filter(
+          (s) => s.fedex_points != null && Number(s.fedex_points) > 0,
+        );
+        if (!statsRows.length) return { synced: false, statLabel: null, rows: [] };
         const playerIds = [...new Set(statsRows.map((s) => s.player_id))];
         const { data: players, error: playersErr } = await supabase
           .from('sr_players')
@@ -155,11 +162,16 @@ export function usePlayersRanking(tour: PlayersTourId) {
           .in('id', playerIds);
         if (playersErr) throw playersErr;
         const pmap = new Map(((players ?? []) as unknown as PlayerRow[]).map((p) => [p.id, p]));
-        let rows: RankedRow[] = statsRows.map((s, i) => {
+        // Points descending is authoritative, so the position IS the rank: the
+        // column and the order agree by construction, not by luck.
+        const ordered = [...statsRows].sort(
+          (a, b) => Number(b.fedex_points) - Number(a.fedex_points),
+        );
+        const rows: RankedRow[] = ordered.map((s, i) => {
           const p = pmap.get(s.player_id);
           return {
             playerId: s.player_id,
-            rank: s.fedex_rank ?? i + 1,
+            rank: i + 1,
             name: p?.full_name ?? 'Unknown',
             country: p?.country ?? null,
             countryCode: p?.country_code ?? null,
@@ -171,9 +183,12 @@ export function usePlayersRanking(tour: PlayersTourId) {
           };
         });
 
-        rows = [...rows].sort((a, b) => a.rank - b.rank);
+        if (rows.length < MIN_RANKING_ROWS) {
+          return { synced: false, statLabel: null, rows: [] };
+        }
         return { synced: true, statLabel: statLabelFor('pga'), rows };
       }
+
 
       const year = currentSeasonYear();
       const primary = await supabase
