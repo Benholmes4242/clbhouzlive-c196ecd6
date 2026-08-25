@@ -1,6 +1,8 @@
 import { GAM } from '../../../gam/tokens';
 import React from 'react';
 import { Crown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MovementCell } from './_shared/MovementCell';
 
 /**
@@ -32,6 +34,10 @@ interface ChampionsListRowProps {
   gapToChampion: string | null;
   holdDuration: string | null;
   isNew?: boolean;
+  /** Member UUID — feeds SquircleAvatar's deterministic-initial fallback colour. */
+  userId?: string | null;
+  /** Real display name, used for fallback initials when `name` is "You". */
+  fallbackName?: string;
   /** Compact variant for inline duel-card top-5 lists. */
   compact?: boolean;
   /** Backdrop theme. Default 'dark' preserves handicap drilldown look. */
@@ -41,16 +47,6 @@ interface ChampionsListRowProps {
   delta?: number | null;
 }
 
-const SQUIRCLE_MASK_URL =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
-const squircleMaskStyle: React.CSSProperties = {
-  WebkitMaskImage: SQUIRCLE_MASK_URL,
-  maskImage: SQUIRCLE_MASK_URL,
-  WebkitMaskSize: '100% 100%',
-  maskSize: '100% 100%',
-  WebkitMaskRepeat: 'no-repeat',
-  maskRepeat: 'no-repeat',
-};
 
 export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   rank,
@@ -63,11 +59,14 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   gapToChampion,
   holdDuration,
   isNew = false,
+  userId,
+  fallbackName,
   compact = false,
   theme = 'dark',
   rank30d,
   delta,
 }) => {
+  const { t } = useTranslation('courses');
   const isLight = theme === 'light';
   // "Absent from the 30d board" is treated as NEW; extend the badge trigger
   // so newcomers 8-30 days old are also flagged. Keeps the delta cell blank
@@ -93,51 +92,34 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   const valueColor = isLight ? '#0F172A' : 'rgba(255,255,255,0.96)';
   const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
 
-  const photoBg = photoUrl
-    ? `url(${photoUrl}) center/cover`
-    : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
-
   const avatarSize = 34;
 
-  const hairlineOverlay = (
-    <div
-      aria-hidden
-      style={{
-        position: 'absolute',
-        inset: 0,
-        borderRadius: '34%',
-        border: `1px solid ${avatarRing}`,
-        pointerEvents: 'none',
-      }}
+  /* SquircleAvatar owns the deterministic-initial fallback and lazy image
+     loading. hairlineRing + ringColor reproduces the 1px traced ring this row
+     drew by hand, so champion and non-champion rows look as they did. */
+  const avatar = (
+    <SquircleAvatar
+      size={avatarSize}
+      src={photoUrl}
+      alt={fallbackName || (name === 'You' ? '' : name)}
+      userId={userId}
+      hairlineRing
+      ringColor={avatarRing}
     />
   );
 
-  const avatar = isChampion ? (
-    <div style={{ width: avatarSize, height: avatarSize, position: 'relative', flexShrink: 0 }} aria-hidden>
-      <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
-      {hairlineOverlay}
-    </div>
-  ) : (
-    <div
-      aria-hidden
-      style={{
-        position: 'relative',
-        width: avatarSize,
-        height: avatarSize,
-        borderRadius: '34%',
-        background: photoBg,
-        flexShrink: 0,
-      }}
-    >
-      {hairlineOverlay}
-    </div>
-  );
+  /* A gap of zero is not news — it is a shared crown. formatGapFromChampion
+     returns a STRING ("+0" for higher-better, "0" for lower-better), so the
+     test is numeric, not a compare against either literal. */
+  const gapIsZero = gapToChampion != null && Number.parseFloat(gapToChampion) === 0;
 
   const subText = isChampion
     ? holdDuration
-    : gapToChampion
-      ? `${gapToChampion.replace('-', '−')} from champion`
-      : '';
+    : gapIsZero
+      ? t('champions.jointChampion')
+      : gapToChampion
+        ? `${gapToChampion.replace('-', '−')} from champion`
+        : '';
 
   const padY = compact ? '7px' : '10px';
   const nameSize = 14.5;
