@@ -134,15 +134,19 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
           )}
         </div>
 
-        {cohorts.totalInactive > 0 && !showInactive && (
+        {cohorts.totalInactive > 0 && (
           <button
             type="button"
-            onClick={() => setShowInactive(true)}
+            onClick={() => setShowInactive((v) => !v)}
+            aria-expanded={showInactive}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 5,
-              margin: '12px 16px 16px',
+              // 44px tap target without moving the label: the original 12/16
+              // margins shrink by the 14px added above and below.
+              margin: '-2px 16px 2px',
+              minHeight: 44,
               padding: 0,
               background: 'transparent',
               border: 'none',
@@ -156,19 +160,28 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
               WebkitTapHighlightColor: 'transparent',
             }}
           >
-            <span
+            {!showInactive && (
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  letterSpacing: '-0.03em',
+                  color: 'rgba(242,244,247,0.96)',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                }}
+              >
+                {cohorts.totalInactive}
+              </span>
+            )}
+            {showInactive ? 'Hide inactive' : 'Inactive'}
+            <ChevronDown
+              size={12}
+              strokeWidth={2}
               style={{
-                fontSize: 13,
-                fontWeight: 700,
-                letterSpacing: '-0.03em',
-                color: 'rgba(242,244,247,0.96)',
-                fontVariantNumeric: 'tabular-nums lining-nums',
+                transform: showInactive ? 'rotate(180deg)' : 'none',
+                transition: 'transform 160ms ease',
               }}
-            >
-              {cohorts.totalInactive}
-            </span>
-            Inactive
-            <ChevronDown size={12} strokeWidth={2} />
+            />
           </button>
         )}
 
