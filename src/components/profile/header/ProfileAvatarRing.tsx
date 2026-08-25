@@ -1,3 +1,4 @@
+import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { getTop100Club } from '@/lib/top100Club';
@@ -158,7 +159,7 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
             width: `${width}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: '2px solid #D1D5DB',
+            border: `2px solid ${DARK_HAIRLINE}`,
             boxShadow: '0 8px 20px rgba(0,0,0,0.35)',
           }}
         >

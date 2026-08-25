@@ -1,3 +1,4 @@
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import React from 'react';
 import { Globe, Pencil, Building2, MapPin, CheckCircle2 } from 'lucide-react';
 import { BUSINESS_CATEGORIES, BusinessCategory } from '@/types/profile';
@@ -165,7 +166,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       {/* Website - Business profiles */}
       {!isPersonal && websiteUrl && (
         <div className="flex items-center gap-1.5 text-sm">
-          <Globe className="w-3.5 h-3.5 text-slate-500" />
+          <Globe className="w-3.5 h-3.5" style={{ color: A.MUTE }} />
           <a 
             href={getWebsiteHref(websiteUrl)}
             target="_blank"

@@ -285,6 +285,20 @@ const ProfilePageV2Content: React.FC = () => {
      cannot predict rendered lines (viewport width, font metrics, word breaks). */
   const bioRef = useRef<HTMLDivElement>(null);
   const [bioOverflows, setBioOverflows] = useState(false);
+  /* Measure while CLAMPED only: once expanded the clamp is off and
+     scrollHeight === clientHeight, which would report "no overflow" and hide
+     READ LESS, trapping the reader. ResizeObserver re-evaluates on rotation
+     and width changes. +1 absorbs sub-pixel rounding. */
+  useLayoutEffect(() => {
+    const el = bioRef.current;
+    if (!el || bioExpanded) return;
+    const measure = () => setBioOverflows(el.scrollHeight > el.clientHeight + 1);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [profile?.bio, bioExpanded]);
+
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
