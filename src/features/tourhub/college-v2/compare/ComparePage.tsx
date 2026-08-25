@@ -452,7 +452,8 @@ function ClassColumn({ headerCode, roster, liveMap, weekByPlayer, alignRight }: 
           // AXIS 10: class-column header, a coordinate not a sentence.
           fontSize: 10,
           fontWeight: 700,
-          letterSpacing: '0.16em',
+          // 0.10em, not 0.16em: WAKE FOREST LEADS must hold one line in a 136px column at 320.
+          letterSpacing: '0.10em',
           textTransform: 'uppercase',
           color: INK_FAINT,
           textAlign: alignRight ? 'right' : 'left',
