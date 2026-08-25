@@ -577,9 +577,26 @@ Deno.serve(async (req) => {
 
     // ---- V5 SECTION A: revoke access first if the auth delete fails. ----
     const { error: authErr } = await admin.auth.admin.deleteUser(targetId);
+    // V6: do not trust the return value. GoTrue can answer success while the row
+    // survives - that leaves an account soft-deleted in user_profiles, unbanned,
+    // still able to sign in, and audited as gdpr_compliant. Verify by reading it
+    // back. A throw (or any read failure) is treated as "row is gone" so the
+    // verification can never fail an otherwise successful deletion.
+    let authRowSurvives = false;
+    try {
+      const { data: stillThere } = await admin.auth.admin.getUserById(targetId);
+      authRowSurvives = !!stillThere?.user;
+    } catch (e) {
+      console.error('[delete-account v6] auth verify read threw (treating row as gone):', e);
+      authRowSurvives = false;
+    }
+    if (authRowSurvives) {
+      console.error('[delete-account v6] auth row survived a successful deleteUser:', targetId);
+    }
     let accessRevoked = false;
-    if (authErr) {
-      console.error('[delete-account v5] auth delete failed:', authErr.message);
+    if (authErr || authRowSurvives) {
+      console.error('[delete-account v5] auth delete failed:',
+        authErr ? authErr.message : 'row_survived');
       // 1) Ban the user so no NEW session can be minted (refresh + password
       //    grant both rejected by GoTrue while banned_until is in the future).
       try {
