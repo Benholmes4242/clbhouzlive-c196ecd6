@@ -14,6 +14,7 @@ import { legendCategoryLabel, formatLegendGap } from '@/lib/gam/visuals';
 import { monotonePath } from '@/lib/charts/monotonePath';
 import { A, Panel, Hairline, LABEL, NUM, SANS, StatRow, FIGS, TOPAR_RED, difficultyRampColor } from './analytical/tokens';
 import { BAND_AMBER, BAND_GREEN_DARK, BAND_RED_DARK } from '@/features/courses/_shared/scoreBands';
+import { ThirdsChart } from '@/components/profile/handicap/whs/charts/ThirdsChart';
 
 /**
  * "Where your shots go" - the CHART-LED You tab
@@ -28,8 +29,9 @@ import { BAND_AMBER, BAND_GREEN_DARK, BAND_RED_DARK } from '@/features/courses/_
  *     identical derivation (sum of per-hole averages to par) over the SAME
  *     set of hole numbers
  *   - REFERENCE_NOISE_FLOOR governs the WORDS on a row, never the field mark
- *   - the thirds take a neutral ink ladder assigned by rank, and the
- *     cumulative curve inherits that rule. OVERTURNED for the shots-go
+ *   - the thirds are drawn by the handicap page's ThirdsChart (worst third in
+ *     CHART.UP - red means WORST on a damage metric, not under par).
+ *     OVERTURNED for the shots-go
  *     columns only: they are ramp-coloured by their own value
  *     (difficultyRampColor), so the deepest red is the costliest hole. The
  *     risk, stated so it is not rediscovered: this chart ranks by SHOTS LOST,
@@ -70,8 +72,9 @@ const DAMAGE_GRID = '30px 1fr 52px';
 const THIRDS_NOISE_FLOOR = 1.5;
 
 
-/** Neutral ink ladder for the thirds, worst first. Never semantic colour. */
-const THIRD_LADDER = ['rgba(248,250,252,0.70)', 'rgba(248,250,252,0.40)', 'rgba(248,250,252,0.18)'];
+/* THIRD_LADDER (neutral ink ladder for the thirds) is gone with the thirds
+   bars: ThirdsChart owns their colour now. */
+
 
 /** Below this, viewer and field are level - no direction claimed either way. */
 const REFERENCE_NOISE_FLOOR = 0.5;
@@ -456,54 +459,22 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     if (v < thirdSums[bestIdx] || !thirdHas[bestIdx]) bestIdx = i;
   });
   /**
-   * THE DENOMINATOR IS THE ROUND'S OWN DAMAGE, not the worst third.
+   * The bars, their scale and the worst-third mark now live in ThirdsChart
+   * (imported from the handicap page, unedited). It scales each bar against the
+   * largest of the three, which is a DIFFERENT denominator from the share-of-own
+   * damage the removed bars used - recorded here because the old comment argued
+   * for the share basis. Ben chose the handicap treatment; the trade is that the
+   * worst third is always full-height, and the figures above the bars carry the
+   * absolute values.
    *
-   * A track needs a scale, and scaling each third against the largest of the
-   * three would make the worst third 100% full in EVERY round: the bar would
-   * carry no information the ink ladder does not already carry, and no two
-   * rounds or courses would compare. So the fill is each third's SHARE of the
-   * shots this round dropped here - the same denominator the share figures
-   * already use (the viewer's own total over par, never the field's). The three
-   * fills sum to 100%, which is what makes "the back six costs you half your
-   * round" readable straight off the bars.
-   *
-   * A third played UNDER par contributes no damage: it is floored at zero and
-   * renders an empty track rather than a negative width. If no third dropped a
-   * shot there is nothing to apportion and all three tracks read empty.
+   * The cumulative shots-dropped curve is gone with them: it could only ever
+   * rise, so it never showed WHERE the damage was.
    */
-  const thirdDamage = thirdSums.map((v) => Math.max(0, v));
-  const thirdDamageTotal = thirdDamage.reduce((a, b) => a + b, 0);
-  const thirdShares = thirdDamage.map((v) =>
-    thirdDamageTotal > 0 ? Math.round((v / thirdDamageTotal) * 100) : 0,
-  );
+  const thirdsMax = Math.max(...thirdSums.map((v) => Math.max(0, v)));
   const spread = +(thirdSums[worstIdx] - thirdSums[bestIdx]).toFixed(1);
-  /** Below the floor: ink nothing, claim nothing. The curve still draws. */
+  /** Below the floor: claim nothing in the caption. */
   const thirdsEven = spread < THIRDS_NOISE_FLOOR || worstIdx === bestIdx;
-  /** Rank 0 = worst third. Drives the ink ladder; even rounds get one shade. */
-  const thirdRank = [0, 1, 2]
-    .slice()
-    .sort((a, b) => thirdSums[b] - thirdSums[a])
-    .reduce<Record<number, number>>((acc, idx, rank) => {
-      acc[idx] = rank;
-      return acc;
-    }, {});
 
-  /** Cumulative shots dropped, hole 1 to 18. Monotone cubic, never a spline. */
-  const cumulative = (() => {
-    const W = 300;
-    const H = 78;
-    const pts: { x: number; y: number }[] = [];
-    let run = 0;
-    const seq = ordered;
-    if (seq.length < 2) return null;
-    seq.forEach((h, i) => {
-      run += h.shots_over_par || 0;
-      pts.push({ x: (i / (seq.length - 1)) * W, y: run });
-    });
-    const max = Math.max(...pts.map((p) => p.y), 0.1);
-    const scaled = pts.map((p) => ({ x: p.x, y: H - (p.y / max) * (H - 4) }));
-    return { W, H, d: monotonePath(scaled), area: `${monotonePath(scaled)} L${W},${H} L0,${H} Z`, total: run };
-  })();
 
   const s3Advice = thirdsEven
     ? t('courses:holes.scoringBreakdown.s3AdviceEven')
@@ -1001,75 +972,28 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
         </Panel>
       )}
 
-      {/* 4 - HOW YOUR ROUND UNFOLDS */}
-      {hasInterpretation && cumulative && (
+      {/* 4 - HOW YOUR ROUND UNFOLDS
+          The handicap page's ThirdsChart, imported unchanged (Ben's call: it
+          reads better than the cumulative curve + three bars it replaces).
+
+          RED HERE IS NOT THE UNDER-PAR RED. ThirdsChart marks the WORST third
+          in CHART.UP. On a SCORE (Clubhouse cards, the holes tree, every to-par
+          mark) red means UNDER par - good. On a DAMAGE metric (shots dropped,
+          here and on the handicap page's "How your rounds unfold" card) higher
+          is worse, so red marks the worst value. Both surfaces are deliberate;
+          do not "reconcile" one against the other. */}
+      {hasInterpretation && thirdsMax > 0 && (
         <Panel
           title={t('courses:courseDetail.you.roundUnfolds')}
           aside={t('courses:courseDetail.you.byThird')}
         >
-          <svg
-            viewBox={`0 0 ${cumulative.W} ${cumulative.H}`}
-            width="100%"
-            height={cumulative.H}
-            preserveAspectRatio="none"
-            aria-hidden
-            style={{ display: 'block' }}
-          >
-            <path d={cumulative.area} fill="rgba(255,255,255,0.06)" />
-            <path
-              d={cumulative.d}
-              fill="none"
-              stroke={A.INK}
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-              gap: 12,
-              marginTop: 12,
-            }}
-          >
-            {thirdSums.map((v, i) => {
-              const isWorst = !thirdsEven && i === worstIdx;
-              const shade = thirdsEven ? THIRD_LADDER[2] : THIRD_LADDER[thirdRank[i]];
-              return (
-                <div key={i} style={{ textAlign: 'center', minWidth: 0 }}>
-                  <div style={{ ...NUM, fontSize: 18, color: isWorst ? A.INK : A.MUTE }}>
-                    +{v.toFixed(1)}
-                  </div>
-                  {/* Neutral ink by rank. NEVER semantic colour, never a tint. */}
-                  <div
-                    style={{
-                      height: 6,
-                      borderRadius: 3,
-                      background: A.TRACK,
-                      marginTop: 6,
-                    }}
-                  >
-                    <div
-                      style={{
-                        height: 6,
-                        borderRadius: 3,
-                        width: `${thirdShares[i]}%`,
-                        background: shade,
-                      }}
-                    />
-                  </div>
-                  {/* AXIS, STATED EXCEPTION (floor 10): a hole RANGE is a coordinate. */}
-                  <div style={{ ...LABEL, fontSize: 10, marginTop: 7 }}>{thirdLabels[i]}</div>
-                </div>
-              );
-            })}
-
-          </div>
+          <ThirdsChart
+            thirds={thirdSums.map((v, i) => ({ l: thirdLabels[i], v: Math.max(0, v) }))}
+          />
           <Caption>{s3Advice}</Caption>
         </Panel>
       )}
+
 
       {/* 5 - YOUR FORM HERE */}
       {form && (
