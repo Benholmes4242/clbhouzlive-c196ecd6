@@ -1103,7 +1103,12 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                     <span
                       style={{
                         ...LABEL,
-                        color: Math.abs(delta) < 0.5 ? A.MUTE : delta > 0 ? A.IMPROVED : A.DRIFTED,
+                        color:
+                          Math.abs(delta) < 0.5
+                            ? A.MUTE
+                            : delta > 0
+                              ? BAND_GREEN_DARK
+                              : BAND_RED_DARK,
                       }}
                     >
                       {Math.abs(delta) < 0.5
