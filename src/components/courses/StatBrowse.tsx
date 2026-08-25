@@ -44,7 +44,6 @@ import { Top100VerdictExplainerSheet } from '@/components/top100/sheets/Top100Ve
 import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
-import { isEarlyData } from '@/lib/earlyData';
 import {
   chipForLens,
   isStatLens,
