@@ -112,7 +112,7 @@ const Counter: React.FC<{ label: string; value: React.ReactNode }> = ({ label, v
   <div style={{ textAlign: 'center', minWidth: 0 }}>
     <div
       style={{
-        fontSize: 7.5,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
@@ -332,7 +332,6 @@ const TeeRow: React.FC<{
     <span
       style={{
         ...LABEL,
-        fontSize: 8.5,
         /* Only EMPHASIS differs between rows, never legibility (§3.3). */
         color: on ? A.INK : A.BODY,
         whiteSpace: 'nowrap',
@@ -375,7 +374,7 @@ const TeeRow: React.FC<{
       {slope != null ? slope : ''}
     </span>
     {/* §3.3: unselected yardages take the MUTED tone, never the dim one. */}
-    <span style={{ ...LABEL, fontSize: 8.5, color: on ? A.BODY : A.MUTE, textAlign: 'right' }}>
+    <span style={{ ...LABEL, color: on ? A.BODY : A.MUTE, textAlign: 'right' }}>
       {tee.total_yards == null ? '' : fmtInt(tee.total_yards)}
     </span>
   </button>
@@ -459,7 +458,7 @@ const SH_KICKER: React.CSSProperties = {
 
 /** NO LABEL RENDERS IN DIM (§6): labels take the readable muted tone. */
 const SH_LABEL: React.CSSProperties = {
-  fontSize: 8.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -695,7 +694,7 @@ const ShapeCell: React.FC<{
     >
       <span style={{ ...shFig(size, color), whiteSpace: 'nowrap' }}>{value}</span>
       {tail ? (
-        <span style={{ ...SH_LABEL, fontSize: 8.5, whiteSpace: 'nowrap' }}>{tail}</span>
+        <span style={{ ...SH_LABEL, whiteSpace: 'nowrap' }}>{tail}</span>
       ) : null}
     </div>
   </div>
@@ -1280,7 +1279,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
             The label carries the TEE - it qualifies every figure beneath it. */}
         <div
           style={{
-            fontSize: 8.5,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',

@@ -59,14 +59,14 @@ const HookBar: React.FC<{
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '58px 1fr 38px',
+        gridTemplateColumns: '74px 1fr 40px',
         alignItems: 'center',
         gap: 8,
       }}
     >
       <span
         style={{
-          fontSize: 7.5,
+          fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
@@ -838,7 +838,7 @@ const StoryTiles: React.FC<{
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: 8,
+                    fontSize: 11,
                     fontWeight: 700,
                     letterSpacing: '0.14em',
                     textTransform: 'uppercase',
