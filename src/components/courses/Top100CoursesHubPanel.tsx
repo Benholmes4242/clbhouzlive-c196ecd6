@@ -356,8 +356,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
 
       {/* SCOPE 2 — sticky pills row + rest */}
       <div>
-        {/* Sticky list filter — the same compact bordered well as Discover's
-            Everywhere control, rather than a second pill-navigation grammar. */}
+        {/* Sticky list filter + search row — the same compact bordered well as
+            Discover's Everywhere control, rather than a second pill-navigation
+            grammar. */}
         <div
           className="sticky"
           style={{
@@ -366,21 +367,23 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
             background: 'var(--glass-bg)',
             backdropFilter: 'blur(var(--glass-blur))',
             WebkitBackdropFilter: 'blur(var(--glass-blur))',
-            padding: '4px 0 6px',
+            padding: '6px 0 8px',
             marginTop: -1,
           }}
         >
-          <div className="px-4">
+          <div className="px-4" style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
             <Select value={selectedList} onValueChange={setSelectedList}>
               <SelectTrigger
                 aria-label={t('top100.listsA11y')}
                 className="inline-flex h-auto w-auto justify-start whitespace-nowrap border-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
                 style={{
-                  background: selectedList === 'global' ? A.PANEL : 'rgba(255,255,255,0.14)',
+                  flex: 'none',
+                  background: 'rgba(255,255,255,0.14)',
                   border: `1px solid ${A.BORDER}`,
                   borderRadius: 8,
-                  padding: '8px 12px',
-                  color: selectedList === 'global' ? A.MUTE : A.INK,
+                  height: 44,
+                  padding: '0 12px',
+                  color: A.INK,
                 }}
               >
                 <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
@@ -402,13 +405,8 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                 ))}
               </SelectContent>
             </Select>
-          </div>
-        </div>
 
-        <div className="px-4 space-y-4 pt-2">
-          {/* Search bar — non-sticky */}
-          <div className="-mx-4 px-4">
-            <div className="relative">
+            <div className="relative" style={{ flex: '1 1 auto', minWidth: 0 }}>
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 value={searchTerm}
@@ -422,7 +420,6 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
                    the canonical search-bar height and deliberately overrides the
                    primitive's h-10 form-field height. */
                 className="pl-10 pr-10 h-11 focus-visible:outline-none"
-
               />
               {searchTerm && (
                 <button
@@ -436,7 +433,9 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
               )}
             </div>
           </div>
+        </div>
 
+        <div className="px-4 space-y-4 pt-2">
           {/* Meta row */}
           {!isError && (isLoading || allCourses.length > 0) && (
             <div className="flex items-center justify-between gap-3">
