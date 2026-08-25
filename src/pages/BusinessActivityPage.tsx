@@ -1,11 +1,11 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Users, FileText, Settings, Clock } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { CheckCircle2, Users, FileText, Settings, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBusinessActivityLog, getActivityDescription, BusinessActivityLogEntry } from '@/hooks/useBusinessActivityLog';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { isToday, isYesterday, startOfDay } from 'date-fns';
 import { formatMonthLongDayYear, formatTimeHm } from '@/i18n/format';
+import { ManagePageShell } from '@/components/manage/ManagePageShell';
 
 const iconMap = {
   verification: CheckCircle2,
@@ -35,7 +35,6 @@ function formatDateHeader(dateStr: string) {
 
 export default function BusinessActivityPage() {
   const { businessId } = useParams<{ businessId: string }>();
-  const navigate = useNavigate();
   const { data: activities, isLoading, isError, refetch } = useBusinessActivityLog(businessId);
 
   if (!businessId) return null;
@@ -43,17 +42,7 @@ export default function BusinessActivityPage() {
   const groupedActivities = activities ? groupByDate(activities) : [];
 
   return (
-    <div
-      className="min-h-screen bg-background md:max-w-[620px] md:mx-auto"
-      style={{ paddingTop: 'var(--chrome-total-h, 0px)' }}
-    >
-      {/* Title block — CompactHeader provides the back arrow */}
-      <div className="px-4 pt-3 pb-3">
-        <h1 className="text-lg font-semibold">Activity</h1>
-        <p className="text-sm text-muted-foreground">Audit log</p>
-      </div>
-
-
+    <ManagePageShell title="Activity">
       <div className="max-w-2xl mx-auto px-4 py-6">
         {isLoading ? (
           <div className="space-y-3">
@@ -116,6 +105,6 @@ export default function BusinessActivityPage() {
           </div>
         )}
       </div>
-    </div>
+    </ManagePageShell>
   );
 }
