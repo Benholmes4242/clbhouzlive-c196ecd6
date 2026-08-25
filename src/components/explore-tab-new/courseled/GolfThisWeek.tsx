@@ -1778,7 +1778,14 @@ export function GolfThisWeek({
           className="tabular-nums"
           /* READ, floor 11: the readout is language. Local override only —
              the shared KICKER metric (9) is not repointed. */
-          style={{ ...KICKER, fontSize: 11, color: DISCOVER_QUIET, flex: '0 0 auto' }}
+          /* At 11px the full template measures ~248px, so on a 320 viewport it
+             must be the row's shrinking member and ELLIPSIZE — never wrap, and
+             never squeeze the region well to nothing. */
+          style={{
+            ...KICKER, fontSize: 11, color: DISCOVER_QUIET,
+            flex: '0 1 auto', minWidth: 0,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}
         >
           {/* The window is a THIRD SEGMENT OF THE SAME TEMPLATE so a translator
               can reorder all three. It is FIXED at seven days — never derived
