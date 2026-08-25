@@ -43,7 +43,7 @@ const SOURCE = 'handicap_circle';
 /** Dark type scale, this file only. Nothing here at weight 800. */
 const KICKER: React.CSSProperties = {
   fontFamily: FONT,
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.19em',
   textTransform: 'uppercase',
@@ -51,7 +51,7 @@ const KICKER: React.CSSProperties = {
 };
 const LABEL: React.CSSProperties = {
   fontFamily: FONT,
-  fontSize: 7.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -251,18 +251,18 @@ const InviteRow: React.FC<{
 
       <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <span style={{ ...DARK_ROW_TITLE, overflowWrap: 'anywhere' }}>{shown}</span>
-        {sub ? <span style={{ ...LABEL, fontSize: 7 }}>{sub}</span> : null}
+        {sub ? <span style={{ ...LABEL, fontSize: 11 }}>{sub}</span> : null}
       </span>
 
       {alreadySent ? (
-        <span style={{ ...LABEL, fontSize: 8, color: 'var(--hcp-t-60)', flexShrink: 0 }}>
+        <span style={{ ...LABEL, fontSize: 11, color: 'var(--hcp-t-60)', flexShrink: 0 }}>
           {t('handicap.circle.invite.invited')}
         </span>
       ) : (
         <span
           style={{
             ...LABEL,
-            fontSize: 8,
+            fontSize: 11,
             color: 'var(--hcp-t-100)',
             flexShrink: 0,
             display: 'inline-flex',
