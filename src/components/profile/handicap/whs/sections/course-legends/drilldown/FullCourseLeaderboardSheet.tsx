@@ -364,7 +364,14 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
               <Crown size={17} strokeWidth={2.5} fill={GOLD} style={{ color: DEEP_AMBER }} />
             </div>
-            <BannerAvatar photoUrl={champion.photoUrl} size={40} ringColor={T.avatarRing} />
+            <SquircleAvatar
+              size={40}
+              src={champion.photoUrl}
+              alt={champion.name}
+              userId={champion.userId}
+              hairlineRing
+              ringColor={T.avatarRing}
+            />
             <div style={{ minWidth: 0 }}>
               <div
                 style={{
