@@ -3,7 +3,7 @@
  * Exact match to design mock
  */
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { AnimatedNumber } from '@/components/ui/motion';
@@ -281,6 +281,10 @@ const ProfilePageV2Content: React.FC = () => {
   
   const [activeSection, setActiveSection] = useState(initialTab);
   const [bioExpanded, setBioExpanded] = useState(false);
+  /* READ MORE is gated on a MEASUREMENT, not a character count: a char count
+     cannot predict rendered lines (viewport width, font metrics, word breaks). */
+  const bioRef = useRef<HTMLDivElement>(null);
+  const [bioOverflows, setBioOverflows] = useState(false);
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
@@ -949,6 +953,7 @@ const ProfilePageV2Content: React.FC = () => {
             return (
               <section className="px-4 mb-4">
                 <div
+                  ref={bioRef}
                   className={cn('whitespace-pre-wrap', !bioExpanded && 'line-clamp-6')}
                   style={{
                     fontFamily: SANS,
@@ -960,7 +965,7 @@ const ProfilePageV2Content: React.FC = () => {
                 >
                   {profile.bio}
                 </div>
-                {(profile.bio.length > 200 || profile.bio.split('\n').length > 4) && (
+                {(bioOverflows || bioExpanded) && (
                   <button
                     onClick={() => setBioExpanded(v => !v)}
                     className="mt-1 min-h-[44px] flex items-center gap-1 active:scale-[0.97] transition-transform"
