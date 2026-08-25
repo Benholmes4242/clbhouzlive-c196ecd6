@@ -389,9 +389,9 @@ export const HeroShell: React.FC<HeroShellProps> = ({
           >
             <div
               style={{
-                fontSize: 8.5,
+                fontSize: 11,
                 fontWeight: 700,
-                letterSpacing: '0.14em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: W_45,
               }}
