@@ -30,7 +30,7 @@ import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/u
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
 import { useMyRoundsByCourse, type CourseRoundPoint } from '@/hooks/gam/useMyRoundsByCourse';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
-import { TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT } from '@/features/tourhub/_shared/tokens';
+
 import monotonePath from '@/lib/charts/monotonePath';
 
 /** Canonical metrics from the shared module; this sheet keeps its palette. */
