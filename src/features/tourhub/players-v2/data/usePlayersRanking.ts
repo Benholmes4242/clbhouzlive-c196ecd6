@@ -57,6 +57,13 @@ const STAT_LABEL_KEY: Record<PlayersTourId, string> = {
   liv: 'players.statLabel.liv',
 };
 
+/**
+ * A ranking of one is a data failure, not a valid state. Below this floor the
+ * hook reports unsynced and the page shows its unavailable state rather than
+ * rendering "Top 1 by season ranking" as though it were a leaderboard.
+ */
+const MIN_RANKING_ROWS = 5;
+
 function currentSeasonYear(): number {
   const now = new Date();
   return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
@@ -90,7 +97,6 @@ async function resolvePgaSeasonId(): Promise<string | null> {
 interface PgaStatRow {
   player_id: string;
   fedex_points: number | string | null;
-  fedex_rank: number | null;
   wins: number | null;
   top_10s: number | null;
   events_played: number | null;
