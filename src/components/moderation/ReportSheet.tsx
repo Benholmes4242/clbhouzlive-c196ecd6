@@ -16,7 +16,10 @@ import { haptic } from '@/utils/haptics';
 import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-const HAIRLINE_INK_7 = 'rgba(15,23,42,0.07)';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
+/** White-alpha hairline. Named for what it is, not for the ink it replaced. */
+const HAIRLINE = A.BORDER;
 
 interface ReportSheetProps {
   open: boolean;
