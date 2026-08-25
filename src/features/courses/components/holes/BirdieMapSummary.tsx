@@ -59,7 +59,7 @@ export const BirdieMapSummary: React.FC<Props> = ({ birdiedCount, totalHoles }) 
         </span>
         <span
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.14em',
             color: INK_MUTE,

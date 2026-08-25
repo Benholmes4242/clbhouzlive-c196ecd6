@@ -145,7 +145,7 @@ export const AddHolePhotoRow: React.FC<Props> = ({ courseId, holeNo, surface, da
         <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
           <span
             style={{
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',

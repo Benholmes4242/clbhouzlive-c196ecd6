@@ -39,7 +39,7 @@ const Figure: React.FC<{ label: string; value: React.ReactNode; tone?: string; s
   sub,
 }) => (
   <div style={{ textAlign: 'center', minWidth: 0 }}>
-    <div style={{ ...LABEL, fontSize: 8 }}>{label}</div>
+    <div style={LABEL}>{label}</div>
     <div
       style={{
         fontSize: 20,
@@ -54,7 +54,7 @@ const Figure: React.FC<{ label: string; value: React.ReactNode; tone?: string; s
       {value}
     </div>
     {sub ? (
-      <div style={{ fontSize: 10.5, fontWeight: 600, color: A.BODY, marginTop: 2 }}>{sub}</div>
+      <div style={{ fontSize: 11.5, fontWeight: 600, color: A.BODY, marginTop: 2 }}>{sub}</div>
     ) : null}
   </div>
 );
@@ -358,6 +358,8 @@ const ShapeChart: React.FC<{
               left: `${(cx(hardestIdx) / W) * 100}%`,
               top: Math.max(0, hardestTopY - 14),
               transform: 'translateX(-50%)',
+              /* AXIS, STATED EXCEPTION (floor 10): a figure pinned to a point
+                 on the curve, not a line of language. */
               fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '-0.025em',
@@ -376,6 +378,8 @@ const ShapeChart: React.FC<{
               left: `${(cx(easiestIdx) / W) * 100}%`,
               top: Math.max(0, easiestTopY - 14),
               transform: 'translateX(-50%)',
+              /* AXIS, STATED EXCEPTION (floor 10): a figure pinned to a point
+                 on the curve, not a line of language. */
               fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '-0.025em',
@@ -418,7 +422,9 @@ const ShapeChart: React.FC<{
                 position: 'absolute',
                 left: `${(cx(i) / W) * 100}%`,
                 transform: 'translateX(-50%)',
-                fontSize: 8.5,
+                /* AXIS, STATED EXCEPTION (floor 10): hole numbers on the
+                   chart's x-axis are coordinates and stay quiet. */
+                fontSize: 10,
                 fontWeight: end ? 700 : 600,
                 color: end ? A.BODY : A.DIM,
               }}
@@ -522,7 +528,7 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
                 <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK, display: 'block' }}>
                   {t('courses:courseDetail.card.shape.parN', { n: r.par })}
                 </span>
-                <span style={{ ...LABEL, fontSize: 7.5, display: 'block', marginTop: 1 }}>
+                <span style={{ ...LABEL, display: 'block', marginTop: 1 }}>
                   {t('courses:courseDetail.parTypes.holesN', { count: r.holes })}
                 </span>
               </span>
@@ -603,7 +609,7 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
       </div>
 
       {/* SAID ONCE, beneath the rows - never on every row. */}
-      <div style={{ ...LABEL, fontSize: 7.5, marginTop: 11 }}>
+      <div style={{ ...LABEL, marginTop: 11 }}>
         {anyYou
           ? t('courses:courseDetail.parTypes.keyBoth')
           : t('courses:courseDetail.parTypes.keyField')}
@@ -775,7 +781,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           </div>
           <div
             style={{
-              fontSize: 10.5,
+              fontSize: 11.5,
               fontWeight: 600,
               lineHeight: 1.3,
               color: A.BODY,
@@ -813,7 +819,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
         {/* THE COMPRESSION IS THE FINDING (Pros only): the chart is not rescaled,
             so a line states what the flatness means, derived from the average. */}
         {activeView === 'pros' && (
-          <div style={{ ...LABEL, fontSize: 8, marginTop: 8, textTransform: 'none', letterSpacing: 0 }}>
+          <div style={{ ...LABEL, marginTop: 8, textTransform: 'none', letterSpacing: 0 }}>
             {Math.abs(stats.fieldAvg) <= 0.05
               ? t('courses:courseDetail.proView.fieldLevel')
               : t(

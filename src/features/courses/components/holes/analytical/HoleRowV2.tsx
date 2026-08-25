@@ -631,7 +631,7 @@ const DetailFigure: React.FC<{ label: string; value: string; tone?: string }> = 
   tone = A.INK,
 }) => (
   <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
-    <span style={{ ...LABEL, fontSize: 8 }}>{label}</span>
+    <span style={LABEL}>{label}</span>
     <span style={{ fontSize: 12.5, fontWeight: 700, color: tone }}>{value}</span>
   </span>
 );

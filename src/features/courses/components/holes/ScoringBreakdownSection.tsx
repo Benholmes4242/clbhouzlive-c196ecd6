@@ -135,12 +135,12 @@ const CompareBar: React.FC<{
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: size === 'md' ? '84px 1fr 44px' : '66px 1fr 42px',
+        gridTemplateColumns: size === 'md' ? '98px 1fr 46px' : '84px 1fr 44px',
         alignItems: 'center',
         gap: 9,
       }}
     >
-      <span style={{ ...LABEL, fontSize: size === 'md' ? 8.5 : 8.5 }}>{label}</span>
+      <span style={LABEL}>{label}</span>
       <span style={{ display: 'block', height: h, borderRadius: h / 2, background: A.TRACK }}>
         <span
           style={{
@@ -220,7 +220,7 @@ const DistributionRing: React.FC<{
         }}
       >
         <span style={{ ...NUM, fontSize: 26, lineHeight: 1, color: A.INK }}>{centre}</span>
-        <span style={{ ...LABEL, fontSize: 8.5 }}>{centreLabel}</span>
+        <span style={LABEL}>{centreLabel}</span>
       </div>
     </div>
   );
@@ -581,14 +581,14 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                   aria-hidden
                   style={{ width: 8, height: 8, borderRadius: 2, background: s.tone, flexShrink: 0 }}
                 />
-                <span style={{ ...LABEL, fontSize: 8.5, flex: 1, minWidth: 0, whiteSpace: 'pre-line' }}>
+                <span style={{ ...LABEL, flex: 1, minWidth: 0, whiteSpace: 'pre-line' }}>
                   {s.label}
                 </span>
                 <span style={{ ...NUM, fontSize: 16, color: A.INK }}>
                   {s.pct}
                   <span style={{ fontSize: 11 }}>%</span>
                 </span>
-                <span style={{ ...LABEL, fontSize: 8.5, width: 52, textAlign: 'right' }}>
+                <span style={{ ...LABEL, width: 62, textAlign: 'right' }}>
                   {t('courses:holes.scoringBreakdown.nHoles', { count: s.holes })}
                 </span>
               </div>
@@ -668,7 +668,9 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                   }}
                 >
                   {isWorst && (
-                    <span style={{ ...NUM, fontSize: 8.5, color: A.INK }}>{v.toFixed(1)}</span>
+                    /* AXIS, STATED EXCEPTION (floor 10): a value tick printed on a
+                       column, not a line of language. */
+                    <span style={{ ...NUM, fontSize: 10, color: A.INK }}>{v.toFixed(1)}</span>
                   )}
                   <span
                     aria-hidden
@@ -683,7 +685,9 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                   <span
                     style={{
                       ...LABEL,
-                      fontSize: 8.5,
+                      /* AXIS, STATED EXCEPTION (floor 10): the hole number is a
+                         coordinate under its column and stays quiet. */
+                      fontSize: 10,
                       letterSpacing: 0,
                       color: isWorst ? A.INK : A.MUTE,
                     }}
@@ -716,10 +720,10 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 7 }}>
-            <span style={{ ...LABEL, fontSize: 8.5, color: A.INK }}>
+            <span style={{ ...LABEL, color: A.INK }}>
               {t('courses:holes.scoringBreakdown.shareTop', { share: s1Share })}
             </span>
-            <span style={{ ...LABEL, fontSize: 8.5 }}>
+            <span style={LABEL}>
               {t('courses:holes.scoringBreakdown.shareRest', {
                 count: Math.max(0, ordered.length - damaging.length),
                 share: restShare,
@@ -777,7 +781,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               >
                 <span style={{ ...NUM, fontSize: 14, color: A.INK, textAlign: 'center' }}>{h.hole_no}</span>
                 <span style={{ minWidth: 0 }}>
-                  <span style={{ ...LABEL, fontSize: 8.5, display: 'block' }}>
+                  <span style={{ ...LABEL, display: 'block' }}>
                     {t('courses:holes.scoringBreakdown.parYouAvg', {
                       par: h.par,
                       avg: h.avg_score.toFixed(2),
@@ -827,12 +831,12 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                     }}
                   >
                     {verdict && (
-                      <span style={{ ...LABEL, fontSize: 8.5, color: level ? A.MUTE : barTone }}>
+                      <span style={{ ...LABEL, color: level ? A.MUTE : barTone }}>
                         {verdict}
                       </span>
                     )}
                     {dbl > 0 && (
-                      <span style={{ ...LABEL, fontSize: 8.5, color: OVER }}>
+                      <span style={{ ...LABEL, color: OVER }}>
                         {t('courses:holes.scoringBreakdown.doublesShare', {
                           count: dbl,
                           share: dblShare,
@@ -853,7 +857,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                 aria-hidden
                 style={{ display: 'block', width: 2, height: 9, borderRadius: 1, background: FIELD_TICK }}
               />
-              <span style={{ ...LABEL, fontSize: 8.5 }}>
+              <span style={LABEL}>
                 {t('courses:holes.scoringBreakdown.vsFieldLegend')}
               </span>
             </div>
@@ -881,8 +885,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               // field minus you: POSITIVE means the member is better here.
               const margin = p.covered ? p.field - p.you : null;
               return (
-                <div key={p.par} style={{ display: 'grid', gridTemplateColumns: '56px 1fr 44px 52px', gap: 9, alignItems: 'center' }}>
-                  <span style={{ ...LABEL, fontSize: 8.5 }}>
+                <div key={p.par} style={{ display: 'grid', gridTemplateColumns: '66px 1fr 44px 52px', gap: 9, alignItems: 'center' }}>
+                  <span style={LABEL}>
                     {t('courses:holes.scoringBreakdown.parLabel', { n: p.par })}
                   </span>
                   <span style={{ display: 'block', position: 'relative', height: 7, borderRadius: 3.5, background: A.TRACK }}>
@@ -929,7 +933,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
             })}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
-            <span style={{ ...LABEL, fontSize: 8.5 }}>
+            <span style={LABEL}>
               {t('courses:holes.scoringBreakdown.parTypeTotal')}
             </span>
             {/* Reconciles with the headline by construction - see the comment
@@ -998,7 +1002,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                       }}
                     />
                   </div>
-                  <div style={{ ...LABEL, fontSize: 8.5, marginTop: 7 }}>{thirdLabels[i]}</div>
+                  {/* AXIS, STATED EXCEPTION (floor 10): a hole RANGE is a coordinate. */}
+                  <div style={{ ...LABEL, fontSize: 10, marginTop: 7 }}>{thirdLabels[i]}</div>
                 </div>
               );
             })}
@@ -1047,14 +1052,13 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                     {form.recentAvg.toFixed(1)}
                   </span>
                   {delta == null ? (
-                    <span style={{ ...LABEL, fontSize: 8.5 }}>
+                    <span style={LABEL}>
                       {t('courses:holes.scoringBreakdown.formLast10')}
                     </span>
                   ) : (
                     <span
                       style={{
                         ...LABEL,
-                        fontSize: 8.5,
                         color: Math.abs(delta) < 0.5 ? A.MUTE : delta > 0 ? A.IMPROVED : A.DRIFTED,
                       }}
                     >
@@ -1116,10 +1120,10 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
                 </svg>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-                  <span style={{ ...LABEL, fontSize: 8.5 }}>
+                  <span style={LABEL}>
                     {t('courses:holes.scoringBreakdown.formBest', { n: form.best })}
                   </span>
-                  <span style={{ ...LABEL, fontSize: 8.5 }}>
+                  <span style={LABEL}>
                     {t('courses:holes.scoringBreakdown.formWorstHere', { n: form.worst })}
                   </span>
                 </div>
@@ -1143,7 +1147,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                     {t('courses:holes.scoringBreakdown.reachBirdies')}
                   </div>
                   {birdied.lastOne != null && (
-                    <div style={{ ...LABEL, fontSize: 8.5, marginTop: 4 }}>
+                    <div style={{ ...LABEL, marginTop: 4 }}>
                       {t('courses:courseDetail.you.oneToGoHole', { n: birdied.lastOne })}
                     </div>
                   )}
@@ -1174,7 +1178,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{chase.label}</div>
-                  <div style={{ ...LABEL, fontSize: 8.5, marginTop: 4 }}>
+                  <div style={{ ...LABEL, marginTop: 4 }}>
                     {/* A TIE IS NOT A DISTANCE. */}
                     {chase.level
                       ? t('courses:holes.scoringBreakdown.reachChaseLevel')
