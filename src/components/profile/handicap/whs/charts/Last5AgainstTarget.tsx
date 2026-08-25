@@ -39,7 +39,7 @@ interface Props {
 
 const VALUE_STYLE = {
   fontFamily: CHART_FONT,
-  fontSize: 7,
+  fontSize: 10,  // AXIS floor: chart tick/caption label, 10 not 11
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
@@ -96,7 +96,7 @@ export const Last5AgainstTarget: React.FC<Props> = ({
               right: 0,
               top: Math.max(0, cutTop - 11),
               ...VALUE_STYLE,
-              fontSize: 8,
+              fontSize: 10,  // AXIS floor: chart tick/caption label, 10 not 11
               color: CHART.DIM,
             }}
           >
@@ -169,7 +169,7 @@ export const Last5AgainstTarget: React.FC<Props> = ({
         style={{
           marginTop: 10,
           fontFamily: CHART_FONT,
-          fontSize: 8,
+          fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',

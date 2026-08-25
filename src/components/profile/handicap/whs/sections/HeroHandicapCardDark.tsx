@@ -47,7 +47,7 @@ function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
     >
       <div
         style={{
-          fontSize: 9,
+          fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
@@ -81,7 +81,7 @@ function TrendRow({ label, delta, borderTop, caption }: TrendRowProps) {
       </div>
       <div
         style={{
-          fontSize: 10,
+          fontSize: 11,
           color: 'var(--hcp-t-40)',
           fontWeight: 600,
           marginTop: 4,
@@ -184,7 +184,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
         >
           <div
             style={{
-              fontSize: 9,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
@@ -258,7 +258,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
                         border: 'none',
                         borderRadius: 999,
                         padding: '4px 9px',
-                        fontSize: 9,
+                        fontSize: 11,
                         fontWeight: 700,
                         letterSpacing: '0.12em',
                         textTransform: 'uppercase',
@@ -278,7 +278,7 @@ const HeroHandicapCardDark: React.FC<Props> = ({ connection }) => {
               </div>
               <div
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',

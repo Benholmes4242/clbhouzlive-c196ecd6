@@ -122,7 +122,7 @@ const DistributionChart: React.FC<{
           alignItems: 'center',
           gap: 4,
           padding: '2px 6px',
-          fontSize: 9,
+          fontSize: 11,
           fontWeight: 700,
           color: '#34D399',
           letterSpacing: '0.14em',
@@ -182,7 +182,7 @@ const DistributionChart: React.FC<{
                 {!isEmpty && (
                   <div
                     style={{
-                      fontSize: 10,
+                      fontSize: 10,  // AXIS floor: chart axis/data label, 10 not 11
                       fontWeight: 700,
                       color: isUser ? AMBER : INK_55,
                       marginBottom: 4,
@@ -371,7 +371,7 @@ const AvailableCard: React.FC<{
             />
             <span
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
@@ -400,7 +400,7 @@ const AvailableCard: React.FC<{
               display: 'flex',
               alignItems: 'center',
               gap: 12,
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 600,
               color: INK_55,
             }}

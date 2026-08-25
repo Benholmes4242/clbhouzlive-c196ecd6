@@ -138,7 +138,7 @@ const EyebrowRow: React.FC<{
     <span
       style={{
         textTransform: 'uppercase',
-        fontSize: 10,
+        fontSize: 11,
         letterSpacing: '0.18em',
         fontWeight: 700,
         color: color ?? T.textMid,
@@ -150,7 +150,7 @@ const EyebrowRow: React.FC<{
       <span
         style={{
           textTransform: 'uppercase',
-          fontSize: 10,
+          fontSize: 11,
           letterSpacing: '0.14em',
           fontWeight: 700,
           color: T.textLow,
@@ -272,7 +272,7 @@ const CounterStrip: React.FC<{
                   top: -10,
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  fontSize: 9,
+                  fontSize: 10,  // AXIS floor: chart axis/data label, 10 not 11
                   fontWeight: 700,
                   color: cell.isExpiring ? T.bad : T.good,
                   lineHeight: 1,
@@ -310,7 +310,7 @@ const CounterDetailPanel: React.FC<{ cell: CounterCell }> = ({ cell }) => {
       <span
         style={{
           textTransform: 'uppercase',
-          fontSize: 9,
+          fontSize: 11,
           letterSpacing: '0.16em',
           fontWeight: 700,
           color: T.textLow,
@@ -382,7 +382,7 @@ const StripBand: React.FC<{ f: Forecast }> = ({ f }) => {
         style={{
           padding: '0 16px 8px',
           textTransform: 'uppercase',
-          fontSize: 9.5,
+          fontSize: 11,
           letterSpacing: '0.18em',
           fontWeight: 700,
           color: T.textLow,
@@ -400,7 +400,7 @@ const StripBand: React.FC<{ f: Forecast }> = ({ f }) => {
           display: 'flex',
           justifyContent: 'space-between',
           padding: '8px 16px 0',
-          fontSize: 10,
+          fontSize: 10,  // AXIS floor: chart axis/data label, 10 not 11
           fontWeight: 700,
           letterSpacing: '0.08em',
           color: T.textLow,
@@ -673,7 +673,7 @@ const BuildingCard: React.FC<{ f: Forecast; ctx: CopyCtx }> = ({ f, ctx }) => {
         <div
           style={{
             textTransform: 'uppercase',
-            fontSize: 10,
+            fontSize: 11,
             letterSpacing: '0.18em',
             fontWeight: 700,
             color: T.textMid,
@@ -720,7 +720,7 @@ const BrandNewCard: React.FC<{ ctx: CopyCtx }> = ({ ctx }) => (
       <div
         style={{
           textTransform: 'uppercase',
-          fontSize: 10,
+          fontSize: 11,
           letterSpacing: '0.18em',
           fontWeight: 700,
           color: T.textMid,

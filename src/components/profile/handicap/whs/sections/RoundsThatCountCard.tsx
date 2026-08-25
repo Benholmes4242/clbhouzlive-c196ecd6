@@ -349,7 +349,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
             >
               <span
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.14em',
                   color: DIM,
@@ -370,7 +370,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 </span>
                 <span
                   style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: 700,
                     color: FAINT,
                     marginLeft: 4,
@@ -440,7 +440,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
               >
                 <span
                   style={{
-                    fontSize: 9,
+                    fontSize: 11,
                     fontWeight: 700,
                     letterSpacing: '0.1em',
                     color: statusColor,
@@ -503,7 +503,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                     textAnchor="end"
                     fill={FAINT}
                     style={{
-                      fontSize: 9,
+                      fontSize: 10,  // AXIS floor: chart tick/axis label, 10 not 11
                       fontWeight: 700,
                       ...NUM,
                     }}
@@ -540,7 +540,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                     y={y(cutLine) - 5}
                     fill={GOOD}
                     opacity={0.8}
-                    style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.12em' }}
+                    /* AXIS floor: chart annotation, 10 not 11 */
+                    style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em' }}
                   >
                     COUNTS BELOW
                   </text>
@@ -614,7 +615,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 y={H - 3}
                 fill={FAINT}
                 style={{
-                  fontSize: 9,
+                  fontSize: 10,  // AXIS floor: chart tick/axis label, 10 not 11
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                 }}
@@ -627,7 +628,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 textAnchor="end"
                 fill={FAINT}
                 style={{
-                  fontSize: 9,
+                  fontSize: 10,  // AXIS floor: chart tick/axis label, 10 not 11
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                 }}
@@ -659,7 +660,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 />
                 <span
                   style={{
-                    fontSize: 9,
+                    fontSize: 11,
                     fontWeight: 700,
                     letterSpacing: '0.1em',
                     color: FAINT,
@@ -682,7 +683,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                   />
                   <span
                     style={{
-                      fontSize: 9,
+                      fontSize: 11,
                       fontWeight: 700,
                       letterSpacing: '0.1em',
                       color: FAINT,
@@ -751,7 +752,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                       </span>
                       <span
                         style={{
-                          fontSize: 9,
+                          fontSize: 11,
                           fontWeight: 700,
                           letterSpacing: '0.1em',
                           color: FAINT,
@@ -766,7 +767,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 })}
                 <div
                   style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: 600,
                     color: DIM,
                     marginTop: 6,
@@ -794,7 +795,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
             >
               <span
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                   color: DIM,
@@ -812,7 +813,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                 {n < 20 ? (
                   <span
                     style={{
-                      fontSize: 9,
+                      fontSize: 11,
                       fontWeight: 700,
                       letterSpacing: '0.1em',
                       color: FAINT,
@@ -842,7 +843,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                         </span>
                         <span
                           style={{
-                            fontSize: 9,
+                            fontSize: 11,
                             fontWeight: 700,
                             letterSpacing: '0.1em',
                             color: GOOD,
@@ -872,7 +873,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                         </span>
                         <span
                           style={{
-                            fontSize: 9,
+                            fontSize: 11,
                             fontWeight: 700,
                             letterSpacing: '0.1em',
                             color: WARN,
@@ -884,7 +885,7 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                     ) : (
                       <span
                         style={{
-                          fontSize: 9,
+                          fontSize: 11,
                           fontWeight: 700,
                           letterSpacing: '0.1em',
                           color: FAINT,

@@ -305,7 +305,7 @@ const CounterBadge: React.FC<{ count: number }> = ({ count }) => (
   <div style={{ textAlign: 'right' }}>
     <div
       style={{
-        fontSize: 9,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.14em',
         color: T.inkFaded,
@@ -450,7 +450,7 @@ const MonthDivider: React.FC<{ month: string; count: number }> = ({
   <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
     <span
       style={{
-        fontSize: 7.5,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.16em',
         color: T.inkMute,
@@ -461,7 +461,7 @@ const MonthDivider: React.FC<{ month: string; count: number }> = ({
     </span>
     <span
       style={{
-        fontSize: 7.5,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
@@ -488,7 +488,7 @@ interface FeedCardProps {
 }
 
 const FIGURE_LABEL: React.CSSProperties = {
-  fontSize: 7.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -577,7 +577,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
               <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
               <span
                 style={{
-                  fontSize: 7.5,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',

@@ -214,7 +214,7 @@ export const KPICell: React.FC<KPICellProps> = ({
       <span
         style={{
           textTransform: 'uppercase',
-          fontSize: 9.5,
+          fontSize: 11,
           letterSpacing: '0.16em',
           fontWeight: 700,
           color: 'var(--hcp-t-60)',
@@ -237,7 +237,7 @@ export const KPICell: React.FC<KPICellProps> = ({
       {meta && (
         <span
           style={{
-            fontSize: 10.5,
+            fontSize: 11,
             color: 'var(--hcp-t-40)',
             fontVariantNumeric: 'tabular-nums lining-nums',
           }}
@@ -376,7 +376,7 @@ export const VerdictPill: React.FC<VerdictPillProps> = ({ children, verdict = 'n
         background: bg,
         color,
         textTransform: 'uppercase',
-        fontSize: 9.5,
+        fontSize: 11,
         letterSpacing: '0.14em',
         fontWeight: 700,
         fontVariantNumeric: 'tabular-nums lining-nums',
@@ -431,7 +431,7 @@ export const LiveStatus: React.FC<LiveStatusProps> = ({ status, syncedAgo }) => 
       <span
         style={{
           textTransform: 'uppercase',
-          fontSize: 10,
+          fontSize: 11,
           letterSpacing: '0.18em',
           fontWeight: 700,
           color: 'var(--hcp-t-60)',
