@@ -1288,9 +1288,53 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                     strokeLinejoin="round"
                     vectorEffect="non-scaling-stroke"
                   />
-                  <circle cx={pts[bi].x} cy={pts[bi].y} r={3.4} fill={A.GREEN} stroke={A.INK} strokeWidth={1.6} />
-
+                  {idx != null && (
+                    <line
+                      x1={pts[idx].x}
+                      x2={pts[idx].x}
+                      y1={0}
+                      y2={H}
+                      stroke={A.INK}
+                      strokeOpacity={0.28}
+                      strokeWidth={1}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  )}
                 </svg>
+                {/* Best round. HTML span, not <circle>: see the host comment. */}
+                <span
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    left: `${(pts[bi].x / W) * 100}%`,
+                    top: `${(pts[bi].y / H) * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                    width: 9,
+                    height: 9,
+                    borderRadius: '50%',
+                    background: A.GREEN,
+                    boxShadow: `0 0 0 2px ${A.PANEL}`,
+                    pointerEvents: 'none',
+                  }}
+                />
+                {idx != null && (
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      left: `${(pts[idx].x / W) * 100}%`,
+                      top: `${(pts[idx].y / H) * 100}%`,
+                      transform: 'translate(-50%, -50%)',
+                      width: 11,
+                      height: 11,
+                      borderRadius: '50%',
+                      background: A.INK,
+                      boxShadow: `0 0 0 2px ${A.PANEL}`,
+                      pointerEvents: 'none',
+                    }}
+                  />
+                )}
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
                   <span style={LABEL}>
                     {t('courses:holes.scoringBreakdown.formBest', { n: form.best })}
