@@ -518,7 +518,9 @@ export function PlayersTab() {
         </div>
       )}
 
-      {/* Sample-size caption - always visible, always true. */}
+      {/* Sample-size caption - shown only when there IS a ranking, so the
+          page can never print "Top 0 by season ranking" over an empty state. */}
+      {loadedCount > 0 && (
       <div
         style={{
           padding: '16px 16px 0',
@@ -532,6 +534,7 @@ export function PlayersTab() {
       >
         {t('players.footer.sample', { count: loadedCount })}
       </div>
+      )}
 
       <div style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }} />
     </div>

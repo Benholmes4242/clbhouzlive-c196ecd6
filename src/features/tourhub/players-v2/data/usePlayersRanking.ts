@@ -217,6 +217,17 @@ export function usePlayersRanking(tour: PlayersTourId) {
         if (alt.error) throw alt.error;
         rankings = (alt.data ?? []) as unknown as TourSeasonRankingRow[];
       }
+      // Client-side guard mirroring the ingest floor: reject rows that cannot
+      // be a player. A null player id with no manual override is not a person,
+      // and an 80+ character "name" is prose - the DP World row currently in
+      // production is the Race to Dubai eligibility footnote, with the alt text
+      // of a flag <img> ("Flag for USA") sitting in country.
+      rankings = rankings.filter(
+        (r) =>
+          !!(r.player_id ?? r.manual_player_id) &&
+          !!r.player_name !== false &&
+          (r.player_name ?? '').length <= 80,
+      );
       if (!rankings.length) return { synced: false, statLabel: null, rows: [] };
       const playerIds = [
         ...new Set(
@@ -252,6 +263,9 @@ export function usePlayersRanking(tour: PlayersTourId) {
         };
 
       });
+      if (rows.length < MIN_RANKING_ROWS) {
+        return { synced: false, statLabel: null, rows: [] };
+      }
       return { synced: true, statLabel: statLabelFor(tour), rows };
     },
   });
