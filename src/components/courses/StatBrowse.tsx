@@ -160,13 +160,25 @@ const WELL_TRIGGER_AUTO_CLS =
   'inline-flex h-auto w-auto max-w-full border-0 p-0 shadow-none focus:ring-0 ' +
   '[&>span]:!flex [&>svg]:hidden';
 
-const wellStyle = (applied: boolean): React.CSSProperties => ({
-  background: applied ? 'rgba(255,255,255,0.14)' : A.PANEL,
+/** Two states only. A default selection is still a selection and reads as active;
+ *  only a control the member cannot operate is dimmed. */
+const WELL_ENABLED: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.14)',
   border: `1px solid ${A.BORDER}`,
   borderRadius: 8,
   padding: '8px 12px',
-  color: applied ? INK : INK_MUTE,
-});
+  color: INK,
+};
+
+const WELL_DISABLED: React.CSSProperties = {
+  background: A.PANEL,
+  border: `1px solid ${A.BORDER}`,
+  borderRadius: 8,
+  padding: '8px 12px',
+  color: INK_FAINT,
+  cursor: 'not-allowed',
+};
+
 
 const triggerLabelStyle: React.CSSProperties = {
   fontSize: 12.5,
@@ -670,13 +682,13 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     <Select value={country ?? 'all'} onValueChange={onCountryChange}>
       <SelectTrigger
         className={WELL_TRIGGER_CLS}
-        style={wellStyle(!!country)}
+        style={WELL_ENABLED}
         aria-label={t('statBrowse.selectCountryA11y')}
       >
         <span className="flex w-full items-center" style={{ gap: 6 }}>
           <Globe {...DD_ICON} />
           <span className="truncate flex-1 min-w-0" style={triggerLabelStyle}>{countryTriggerLabel}</span>
-          <ChevronDown {...DD_ICON} style={{ color: INK_FAINT }} />
+          <ChevronDown {...DD_ICON} style={{ color: INK_MUTE }} />
         </span>
       </SelectTrigger>
       <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
@@ -717,9 +729,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     <Select value={region ?? 'all'} onValueChange={onRegionChange} disabled={regionDisabled}>
       <SelectTrigger
         className={WELL_TRIGGER_CLS}
-        style={regionDisabled
-          ? { ...wellStyle(false), opacity: 0.55, color: INK_FAINT }
-          : wellStyle(!!region)}
+        style={regionDisabled ? WELL_DISABLED : WELL_ENABLED}
         aria-label={t('statBrowse.selectRegionA11y')}
       >
         <span className="flex w-full items-center" style={{ gap: 6 }}>
@@ -728,7 +738,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
               ? t('statBrowse.allRegions')
               : region ?? (country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions'))}
           </span>
-          <ChevronDown {...DD_ICON} style={{ color: INK_FAINT }} />
+          <ChevronDown {...DD_ICON} style={{ color: regionDisabled ? INK_FAINT : INK_MUTE }} />
         </span>
       </SelectTrigger>
       <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
@@ -765,13 +775,13 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     <Select value={lens} onValueChange={(v) => onLensChange(v as StatLens)}>
       <SelectTrigger
         className={WELL_TRIGGER_AUTO_CLS}
-        style={wellStyle(true)}
+        style={WELL_ENABLED}
         aria-label={t('statBrowse.selectLensA11y')}
       >
         <span className="flex min-w-0 items-center" style={{ gap: 6 }}>
           <LensIcon lens={lens} />
           <span className="truncate" style={triggerLabelStyle}>{t(`statBrowse.lens.${lens}.label`)}</span>
-          <ChevronDown {...DD_ICON} style={{ color: INK_FAINT }} />
+          <ChevronDown {...DD_ICON} style={{ color: INK_MUTE }} />
         </span>
       </SelectTrigger>
       <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
