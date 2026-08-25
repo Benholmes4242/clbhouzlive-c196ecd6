@@ -6,14 +6,17 @@
 import { memo, type ReactNode } from 'react';
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { formatNumber } from '@/i18n/format';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { BAND_RED_DARK } from '@/features/courses/_shared/scoreBands';
 
 
 const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const AMBER = '#F7931E';
-const AMBER_AA = '#0E1216'; // eyebrow ink (flipped from amber — EYEBROW INK FLIP)
-const INK = '#0F172A';
-const INK_MUTE = '#64748B';
-const SLATE = '#94A3B8';
+/**
+ * EYEBROW INK FLIP (retired): the prime eyebrow used to flip from amber to a
+ * near-black ink because small amber text failed contrast on WHITE. The canvas
+ * is dark-only now, so the reasoning inverts — near-black is the failing value
+ * and amber is the legible one. The eyebrow is plain A.AMBER.
+ */
 
 type Tier = 'editorial' | 'standard' | 'rail';
 type Role = 'prime' | 'section' | 'rail';
@@ -28,10 +31,11 @@ const TIER_TO_ROLE: Record<Tier, Role> = {
 };
 
 const EYEBROW_TONE: Record<EyebrowTone, string> = {
-  slate: '#64748B',
-  amber: '#0E1216',
-  danger: '#DC2626',
+  slate: A.MUTE,
+  amber: A.AMBER,
+  danger: BAND_RED_DARK,
 };
+
 
 interface SectionHeaderProps {
   tier?: Tier;
