@@ -384,7 +384,16 @@ export interface StatItem {
   subVariant?: 'label' | 'caption';
 }
 
-/** Label line-height used to reserve a consistent label box. */
+/**
+ * Label line-height used to reserve a consistent label box.
+ *
+ * TYPE DRIVES LAYOUT HERE — ONE OF TWO PLACES IN THIS FILE. statRowLabelBox
+ * below derives its minHeight from a font size, and so does the sub-line inside
+ * StatRow (search subFontSize). Repoint LABEL or the sub size and every StatRow
+ * in the app changes HEIGHT, not just type. The pair is deliberate: reserving
+ * from the size is what keeps values on one baseline when one cell's label
+ * wraps. Change one and check the other.
+ */
 const STATROW_LABEL_LH = 1.25;
 const statRowLabelBox = (fontSize: number, lines: 1 | 2 = 2): React.CSSProperties => ({
   lineHeight: STATROW_LABEL_LH,
@@ -453,9 +462,12 @@ export const StatRow: React.FC<{
       }}
     >
       {items.map((it) => {
+        // Sub-line: READ, floor 11 (was pinned at 8). It reserves its own
+        // height from this size — the second of the two type-drives-layout
+        // sites noted at STATROW_LABEL_LH.
         const subStyle: React.CSSProperties =
-          it.subVariant === 'caption' ? { ...CAPTION } : { ...LABEL, fontSize: 8 };
-        const subFontSize = (subStyle.fontSize as number) ?? 8;
+          it.subVariant === 'caption' ? { ...CAPTION } : { ...LABEL };
+        const subFontSize = (subStyle.fontSize as number) ?? 11;
         return (
           <div key={it.label} style={{ textAlign: 'center', minWidth: 0 }}>
             {/* Reservation keeps every value on one baseline; labels stay top-aligned. */}
