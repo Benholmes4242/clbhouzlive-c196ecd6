@@ -55,9 +55,9 @@ const GOLD_RING = 'rgba(232,194,106,0.65)';
 const INK_BASE = '#0D1E16';
 
 const RANK_W = 20;
-const COL_TOTAL = 38;
-const COL_THRU = 30;
-const COL_TODAY = 32;
+const COL_TOTAL = 42; // widened 38→42 for 'TOTAL' at the AXIS floor of 10 (38.4px measured)
+const COL_THRU = 34; // widened 30→34 for 'THRU' at the AXIS floor of 10 (32.6px measured)
+const COL_TODAY = 42; // widened 32→42 for 'TODAY' at the AXIS floor of 10 (39.9px measured)
 
 const FALLBACK_GRADIENT = 'linear-gradient(180deg,#1E4D38,#0F172A)';
 const IMAGE_FOCAL = '50% 72%';

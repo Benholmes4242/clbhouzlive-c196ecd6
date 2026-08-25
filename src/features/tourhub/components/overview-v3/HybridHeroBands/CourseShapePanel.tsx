@@ -39,7 +39,7 @@ const HARD = TOPAR_UNDER_DARK;
 const EASY = '#55BD8B';
 
 const COL_HOLE = 20;
-const COL_PAR = 30;
+const COL_PAR = 38; // widened 30→38: 'PAR n' at the AXIS floor of 10 measures 35.7px and must not clip (BRIEF_TOUR_OVERVIEW_TYPE_SCALE)
 const COL_FIG = 46;
 const ROW_GAP = 8;
 const BAR_H = 7;

@@ -1113,9 +1113,9 @@ export function CinematicFrame({
 
       {/* Live — broadcast board (TODAY / TOTAL / THRU) pinned to bottom */}
       {isLive && (() => {
-        const COL_TODAY = 30;
-        const COL_TOTAL = 34;
-        const COL_THRU = 22;
+        const COL_TODAY = 42; // widened 30→42 for 'TODAY' at the AXIS floor of 10 (39.9px measured)
+        const COL_TOTAL = 42; // widened 34→42 for 'TOTAL' at the AXIS floor of 10 (38.4px measured)
+        const COL_THRU = 34; // widened 22→34 for 'THRU' at the AXIS floor of 10 (32.6px measured)
         const RANK_W = 18;
 
         // Live pre-play fallback: no leaderboard yet → field-strength preview
