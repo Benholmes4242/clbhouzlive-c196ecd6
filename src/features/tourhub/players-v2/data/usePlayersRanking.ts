@@ -133,8 +133,15 @@ export function usePlayersRanking(tour: PlayersTourId) {
         const { data: stats, error: statsErr } = await supabase
           .from('sr_player_statistics')
           .select(
-            'player_id, fedex_points, fedex_rank, wins, top_10s, events_played',
+            // fedex_rank is NOT selected. Measured across both stored seasons it
+            // is a per-event finishing position (2025: Fleetwood 1, Henley 2,
+            // Scheffler 4 = the Tour Championship result, not the season
+            // standing), it ties (T5, T7, T11) and it repeats within a season.
+            // Rendering it as the # of a points-ordered list guaranteed
+            // disagreement. The # is now the sort position.
+            'player_id, fedex_points, wins, top_10s, events_played',
           )
+
           .eq('season_id', seasonId)
           .order('fedex_points', { ascending: false, nullsFirst: false })
           .limit(300);
