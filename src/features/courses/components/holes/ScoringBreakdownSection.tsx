@@ -410,6 +410,20 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
       ...parTypes.map((p) => Math.max(p.you, p.covered ? p.field : 0)),
       0.1,
     ) * 1.1;
+  /**
+   * BRIEF_PAR_TYPE_ROWS_AND_MARGIN_TONE s1: the RAMP GOES ON THE RATE. p.you is
+   * a TOTAL across the par type, so ramping it would encode hole count. Width
+   * stays the quantity (total); colour is shots over par PER HOLE. The 0.06
+   * floor / 0.94 multiplier are verbatim from CourseAnalyticsPanels so the two
+   * charts tint identically.
+   */
+  const rateOf = (p: { you: number; holes: number }) =>
+    p.holes > 0 ? p.you / p.holes : 0;
+  const rMin = Math.min(...parTypes.map(rateOf));
+  const rMax = Math.max(...parTypes.map(rateOf));
+  const rSpan = rMax - rMin;
+  const parTint = (p: { you: number; holes: number }) =>
+    rSpan > 0 ? 0.06 + 0.94 * ((rateOf(p) - rMin) / rSpan) : 0.5;
 
   // ------------------------------------------------- panel 4, the unfolding
   const thirdOf = (h: ScoringBreakdownHole): 0 | 1 | 2 =>
