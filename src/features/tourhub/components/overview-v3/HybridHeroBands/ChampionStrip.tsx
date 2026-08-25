@@ -1,4 +1,14 @@
 /**
+ * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
+ * The hero is a broadcast surface. Tracked-out caps over photography read
+ * larger than their point size, so a ticker segment, a band label or a rank
+ * marker takes the AXIS floor of 10 rather than the READ floor of 11 — the
+ * same exception granted to the scorecard axis and the chart ticks. It covers
+ * COORDINATES AND MARKERS ONLY. It does NOT cover leader names, tournament
+ * names, course names, scores, or any sentence: those are language and take
+ * 11. Nothing goes below 10.
+ */
+/**
  * ChampionStrip — gold-tinted single-player strip.
  * Reused by Results (champion / playoff winner) and Upcoming (defending champion / fallbacks).
  * §5.2.1 + §5.3 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
@@ -92,7 +102,7 @@ export function ChampionStrip({
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
             <span
               style={{
-                fontSize: 9,
+                fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
                 fontWeight: 700,
                 letterSpacing: '0.18em',
                 color: GOLD,
@@ -108,7 +118,7 @@ export function ChampionStrip({
             {country && (
               <span
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 600,
                   color: 'rgba(255,255,255,0.50)',
                   letterSpacing: '0.04em',
@@ -197,7 +207,7 @@ export function CancelledStrip({ reason }: { reason: string }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            fontSize: 9,
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
             fontWeight: 700,
             letterSpacing: '0.18em',
             color: STATUS_NEGATIVE,
@@ -272,7 +282,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
       </div>
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
         <div style={{
-          fontSize: 9,
+          fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
           fontWeight: 700,
           letterSpacing: '0.18em',
           color: GOLD,
@@ -301,7 +311,7 @@ export function PlayoffStrip({ count, score }: PlayoffStripProps) {
         >
           {score}
         </div>
-        <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: '0.16em', marginTop: 2 }}>
+        <div style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, color: 'rgba(255,255,255,0.50)', letterSpacing: '0.16em', marginTop: 2 }}>
           {t('overview.champion.scoreLabelToPar')}
         </div>
       </div>

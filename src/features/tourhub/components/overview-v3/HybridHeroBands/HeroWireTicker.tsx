@@ -1,4 +1,14 @@
 /**
+ * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
+ * The hero is a broadcast surface. Tracked-out caps over photography read
+ * larger than their point size, so a ticker segment, a band label or a rank
+ * marker takes the AXIS floor of 10 rather than the READ floor of 11 — the
+ * same exception granted to the scorecard axis and the chart ticks. It covers
+ * COORDINATES AND MARKERS ONLY. It does NOT cover leader names, tournament
+ * names, course names, scores, or any sentence: those are language and take
+ * 11. Nothing goes below 10.
+ */
+/**
  * HeroWireTicker — Tour Hub hero leaderboard band.
  *
  * A dark wire ticker (36px tall, #15171F) that lives at the bottom of the
@@ -88,7 +98,7 @@ function factNode(fact: TickerFact, key: string): ReactNode {
       <span
         className={fact.pulseLabel ? 'hero-wire-fact-pulse' : undefined}
         style={{
-          fontSize: 9,
+          fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
           fontWeight: 700,
           letterSpacing: '0.08em',
           color: fact.labelGold ? GOLD : 'rgba(255,255,255,0.45)',
@@ -144,7 +154,7 @@ function EmptyStateBar({
     <div
       style={{
         padding: '0 12px',
-        fontSize: 9,
+        fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
         fontWeight: 700,
         letterSpacing: '0.16em',
         color: AMBER,
@@ -236,7 +246,7 @@ export function HeroWireTicker({
         fontSize: 12,
       }}
     >
-      <span style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', fontWeight: 700 }}>
+      <span style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, color: 'rgba(255,255,255,0.42)', fontWeight: 700 }}>
         {r.rank}
       </span>
       <span
@@ -263,7 +273,7 @@ export function HeroWireTicker({
     <div
       style={{
         padding: '0 12px',
-        fontSize: 9,
+        fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
         fontWeight: 700,
         letterSpacing: '0.16em',
         color: 'rgba(255,255,255,0.55)',

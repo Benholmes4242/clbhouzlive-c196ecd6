@@ -1,4 +1,14 @@
 /**
+ * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
+ * The hero is a broadcast surface. Tracked-out caps over photography read
+ * larger than their point size, so a ticker segment, a band label or a rank
+ * marker takes the AXIS floor of 10 rather than the READ floor of 11 — the
+ * same exception granted to the scorecard axis and the chart ticks. It covers
+ * COORDINATES AND MARKERS ONLY. It does NOT cover leader names, tournament
+ * names, course names, scores, or any sentence: those are language and take
+ * 11. Nothing goes below 10.
+ */
+/**
  * TeeTimeRow — Upcoming · imminent marquee group row.
  * §6.3.7 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
  */
@@ -47,7 +57,7 @@ export function TeeTimeRow({ time, holeStart, players, isMarquee, isLast }: TeeT
         </div>
         <div
           style={{
-            fontSize: 9,
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
             fontWeight: 700,
             color: INK_45,
             letterSpacing: '0.12em',

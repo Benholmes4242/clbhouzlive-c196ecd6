@@ -1,4 +1,14 @@
 /**
+ * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
+ * The hero is a broadcast surface. Tracked-out caps over photography read
+ * larger than their point size, so a ticker segment, a band label or a rank
+ * marker takes the AXIS floor of 10 rather than the READ floor of 11 — the
+ * same exception granted to the scorecard axis and the chart ticks. It covers
+ * COORDINATES AND MARKERS ONLY. It does NOT cover leader names, tournament
+ * names, course names, scores, or any sentence: those are language and take
+ * 11. Nothing goes below 10.
+ */
+/**
  * CinematicFrame — Direction A "The Frame" Tour Overview hero (live/results).
  * One full-bleed photo with title block + a frosted-glass leaderboard capsule.
  * Replaces PhotoBand + MiddleBand + LeaderboardBand for live/results states.
@@ -401,7 +411,7 @@ function ChampionRowDark({
         <span
           style={{
             ...NUMERIC_STYLE,
-            fontSize: 9.5,
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
             fontWeight: 700,
             letterSpacing: '0.14em',
             color: GOLD,
@@ -465,7 +475,7 @@ function DefendingChampionRowDark({
         <span
           style={{
             ...NUMERIC_STYLE,
-            fontSize: 9.5,
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
             fontWeight: 700,
             letterSpacing: '0.14em',
             color: GOLD,
@@ -517,7 +527,7 @@ function FieldStrengthRowDark({ data }: { data: FieldStrength }) {
         <span
           style={{
             ...NUMERIC_STYLE,
-            fontSize: 9.5,
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
             fontWeight: 700,
             letterSpacing: '0.14em',
             color: DARK_EYEBROW,
@@ -801,7 +811,7 @@ export function CinematicFrame({
             border: '0.5px solid rgba(255,255,255,0.18)',
             borderRadius: 8, padding: '5px 9px',
           }}>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.10em', color: 'rgba(255,255,255,0.60)' }}>{p.label}</span>
+            <span style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, letterSpacing: '0.10em', color: 'rgba(255,255,255,0.60)' }}>{p.label}</span>
             <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: '-0.01em' }}>{p.value}</span>
           </div>
         ))}
@@ -891,7 +901,7 @@ export function CinematicFrame({
                 border: '0.5px solid rgba(255,255,255,0.18)',
                 borderRadius: 999, padding: '5px 11px', alignSelf: 'flex-start',
               }}>
-                <span style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.16em', color: '#fff', textTransform: 'uppercase' }}>{t('overview.cinematic.teesOffIn')}</span>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, letterSpacing: '0.16em', color: '#fff', textTransform: 'uppercase' }}>{t('overview.cinematic.teesOffIn')}</span>
                 <span style={{ ...NUMERIC_STYLE, fontSize: 12, fontWeight: 700, color: '#fff', letterSpacing: '-0.01em' }}>{countdownText}</span>
               </div>
             ) : (
@@ -1015,7 +1025,7 @@ export function CinematicFrame({
                     ringColor={GOLD}
                   />
                 </span>
-                <div style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', color: GOLD, textTransform: 'uppercase' }}>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, letterSpacing: '0.22em', color: GOLD, textTransform: 'uppercase' }}>
                   {t('overview.cinematic.championLabel')}
                 </div>
                 <div
@@ -1075,7 +1085,7 @@ export function CinematicFrame({
                 );
               })()}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ ...NUMERIC_STYLE, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
+                <div style={{ ...NUMERIC_STYLE, fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, letterSpacing: '0.16em', color: GOLD, textTransform: 'uppercase' }}>
                   {defendingChamp.year
                     ? t('overview.cinematic.defendingChampionYearLabel', { year: defendingChamp.year })
                     : t('overview.cinematic.defendingChampionLabel')}
@@ -1139,7 +1149,7 @@ export function CinematicFrame({
                   borderTop: '0.5px solid rgba(255,255,255,0.12)',
                 }}
               >
-                <span style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
+                <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
                   {fieldStrength?.totalPlayers != null ? t('overview.cinematic.inTheField', { count: fieldStrength.totalPlayers }) : ''}
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -1231,9 +1241,9 @@ export function CinematicFrame({
               <span style={{ width: RANK_W, flexShrink: 0 }} />
               <span style={{ width: 26, flexShrink: 0 }} />
               <span style={{ flex: 1 }} />
-              {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'center', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colToday')}</span>}
-              <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colTotal')}</span>
-              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'center', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colThru')}</span>
+              {anyToday && <span style={{ ...NUMERIC_STYLE, width: COL_TODAY, textAlign: 'center', fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colToday')}</span>}
+              <span style={{ ...NUMERIC_STYLE, width: COL_TOTAL, textAlign: 'center', fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colTotal')}</span>
+              <span style={{ ...NUMERIC_STYLE, width: COL_THRU, textAlign: 'center', fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)' }}>{t('overview.cinematic.colThru')}</span>
             </div>
 
             {/* Score rows */}
@@ -1302,7 +1312,7 @@ export function CinematicFrame({
                 borderTop: '0.5px solid rgba(255,255,255,0.12)',
               }}
             >
-              <span style={{ ...NUMERIC_STYLE, fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
+              <span style={{ ...NUMERIC_STYLE, fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
                 {t('overview.cinematic.inTheField', { count: fieldSize })}
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
