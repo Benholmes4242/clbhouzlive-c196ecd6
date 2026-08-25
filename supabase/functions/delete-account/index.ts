@@ -532,8 +532,32 @@ Deno.serve(async (req) => {
     } catch (e) { results.whs_data = { deleted: 0, error: String(e) }; }
 
     // =========================================================================
-    // STEP 4 — Soft-delete profile + hard-delete auth user.
+    // STEP 4 — Clear follow edges, soft-delete profile, hard-delete auth user.
     // =========================================================================
+    // A soft-deleted account must not hold follow edges: it would otherwise show
+    // up in follower/following lists and in follower counts (get_social_list and
+    // the direct count queries are SECURITY DEFINER / unjoined and cannot filter
+    // deleted_at). Clearing at the source fixes every reader at once. Non-fatal:
+    // log and continue, like the whs/vault steps.
+    try {
+      const { error: followsErr, count: followsDeleted } = await admin
+        .from('follows')
+        .delete({ count: 'exact' })
+        .or(
+          `and(follower_actor_type.eq.personal,follower_actor_id.eq.${targetId}),` +
+          `and(following_actor_type.eq.personal,following_actor_id.eq.${targetId})`
+        );
+      if (followsErr) {
+        console.error('[delete-account v5] follow edge delete failed:', followsErr.message);
+        results.follow_edges = { deleted: followsDeleted ?? 0, error: followsErr.message };
+      } else {
+        results.follow_edges = { deleted: followsDeleted ?? 0 };
+      }
+    } catch (e) {
+      console.error('[delete-account v5] follow edge delete threw:', e);
+      results.follow_edges = { deleted: 0, error: String(e) };
+    }
+
     const anonymizedUsername = `deleted_${targetId.slice(0, 8)}_${Date.now()}`;
     const { error: updateError } = await admin.from('user_profiles').update({
       deleted_at: deletedAt,
