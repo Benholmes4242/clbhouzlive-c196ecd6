@@ -255,7 +255,7 @@ export function CourseNewsSheet({
                           {e.figureUnit && (
                             <span
                               style={{
-                                fontSize: 6.5,
+                                fontSize: 11,
                                 fontWeight: 700,
                                 letterSpacing: '0.12em',
                                 textTransform: 'uppercase',
@@ -290,7 +290,7 @@ export function CourseNewsSheet({
                                 {e.waitLabel && (
                                   <span
                                     style={{
-                                      fontSize: 6.5,
+                                      fontSize: 11,
                                       fontWeight: 700,
                                       letterSpacing: '0.12em',
                                       textTransform: 'uppercase',
@@ -386,7 +386,7 @@ export function CourseNewsSheet({
                           {e.who}
                         </span>
                       )}
-                      <span style={{ fontSize: 10.5, color: A.MUTE, whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: 11, color: A.MUTE, whiteSpace: 'nowrap' }}>
                         {whenLabel(e.at)}
                       </span>
                     </div>

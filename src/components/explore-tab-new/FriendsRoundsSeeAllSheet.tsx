@@ -71,7 +71,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
       <div style={{ padding: '10px 16px 12px', background: A.CANVAS, borderBottom: `1px solid ${A.BORDER}` }}>
         <div
           style={{
-            fontSize: 10.5,
+            fontSize: 11,
             fontWeight: 600,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
@@ -121,7 +121,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
                   padding: '8px 16px 7px',
                   background: A.CANVAS,
                   borderBottom: `1px solid ${A.BORDER}`,
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.09em',
                   textTransform: 'uppercase',

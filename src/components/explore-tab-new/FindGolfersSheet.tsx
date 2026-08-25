@@ -114,9 +114,10 @@ function Pill({
         gap: 4,
         whiteSpace: 'nowrap',
         fontFamily: SANS,
-        fontSize: 9.5,
+        /* CAPS ACTION at the 11px floor, tracking 0.10em. */
+        fontSize: 11,
         fontWeight: 700,
-        letterSpacing: '0.09em',
+        letterSpacing: '0.10em',
         textTransform: 'uppercase',
         cursor: onClick ? 'pointer' : 'default',
         userSelect: 'none',
@@ -154,9 +155,10 @@ function TextAction({
         whiteSpace: 'nowrap',
         color,
         fontFamily: SANS,
-        fontSize: 9.5,
+        /* CAPS ACTION at the 11px floor, tracking 0.10em. */
+        fontSize: 11,
         fontWeight: 700,
-        letterSpacing: '0.09em',
+        letterSpacing: '0.10em',
         textTransform: 'uppercase',
         cursor: 'pointer',
         userSelect: 'none',
@@ -172,7 +174,7 @@ function TextAction({
 function Fig({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
     <>
-      <span style={{ ...LABEL, fontSize: 9, color: A.DIM }}>{label}</span>
+      <span style={{ ...LABEL, fontSize: 11, color: A.DIM }}>{label}</span>
       <span
         style={{
           fontSize: 12.5,
@@ -606,9 +608,9 @@ export function FindGolfersSheet({ open, onClose }: Props) {
                 background: 'none',
                 color: A.INK,
                 fontFamily: SANS,
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
-                letterSpacing: '0.13em',
+                letterSpacing: '0.10em',
                 textTransform: 'uppercase',
               }}
             >

@@ -35,7 +35,7 @@ export default function RegionSheet({
       <div style={{ padding: '8px 20px 12px' }}>
         <div
           style={{
-            fontSize: 10.5,
+            fontSize: 11,
             fontWeight: 600,
             color: '#F8FAFC',
             letterSpacing: '0.06em',
