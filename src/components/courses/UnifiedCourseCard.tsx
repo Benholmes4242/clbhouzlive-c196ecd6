@@ -422,7 +422,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             )}
             {/* Friends context */}
             {showFriendsContext && course.context?.friendsPlayedCount != null && (
-              <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 {course.context.friendsPlayedCount > 0
                   ? t('card.friendsPlayedCount', { count: course.context.friendsPlayedCount })
                   : t('card.noFriendsPlayed')}
