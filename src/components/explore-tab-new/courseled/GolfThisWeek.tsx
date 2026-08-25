@@ -1806,41 +1806,48 @@ export function GolfThisWeek({
       </div>
 
       {/* SCOPE PILLS AND THE REGION WELL — one row beneath the readout. Per
-          BRIEF_DISCOVER_PILL_PEEK the well FLOATS OVER the scroller rather than
-          sitting beside it: the scroller keeps the full row width, so the fourth
-          pill peeks structurally at every viewport instead of being tuned out at
-          390. paddingRight 62 (46 well + 8 gap + 8 breathing) is INSIDE the
-          scrollable area, so the last pill can still scroll clear of the well. */}
+          BRIEF_DISCOVER_PILL_PEEK the well FLOATS OVER THE SCROLLER'S LEFT EDGE
+          rather than sitting beside it: the scroller keeps the full row width and
+          the scrollable CONTENT is padded clear of the well, so the right-hand
+          cut lands deep inside a pill instead of in a gap. The peek is therefore
+          structural — the padding moves the cut point by a fixed 62px whatever
+          the pill widths turn out to be — not tuned to one viewport or language.
+          Pills pass UNDER the well as a member scrolls; that is intended and
+          needs no left-hand fade, because the well is opaque. */}
       <div style={{ position: 'relative', marginBottom: 12, minWidth: 0 }}>
-        {/* The scroller's right-edge fade lives on this relative wrapper, not
-            inside PillFilterRow — its job is now to soften pills as they pass
-            BENEATH the well, so the full-opacity stop sits at 100%, off the
-            visible area. The transparent stop is A.CANVAS at zero alpha, never
-            `transparent`, which some engines resolve as a grey haze. */}
-        <div style={{ position: 'relative', minWidth: 0 }}>
-          <WeekScopePills
-            scope={scope}
-            onChange={(s) => onScopeChange?.(s)}
-            style={{ minWidth: 0, paddingRight: 62 }}
-          />
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: 0,
-              bottom: 0,
-              right: 0,
-              width: 40,
-              pointerEvents: 'none',
-              background: 'linear-gradient(90deg, rgba(21,23,31,0) 0%, #15171F 100%)',
-            }}
-          />
-        </div>
+        <WeekScopePills
+          scope={scope}
+          onChange={(s) => onScopeChange?.(s)}
+          /* paddingLeft 62 = 46 well + 8 gap + 8 breathing, INSIDE the scrollable
+             area so at rest the first pill starts clear of the well: the SELECTED
+             pill must never be the hidden one. paddingRight 16 lets the last pill
+             scroll clear of the right edge rather than ending flush against it.
+             No flex here — the scroller is this wrapper's only flow child. */
+          style={{ minWidth: 0, paddingLeft: 62, paddingRight: 16 }}
+        />
+        {/* THE FADE IS A SCROLL CUE, NOT A MASK: nothing sits behind the right
+            edge now, so the final stop is 100% and the peeking pill SOFTENS into
+            the edge instead of being flatly painted out at 90%. The transparent
+            stop is A.CANVAS at zero alpha, never `transparent`, which some
+            engines resolve as a grey haze. It renders BEFORE the well in DOM
+            order so it can never paint over it. */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            right: 0,
+            width: 24,
+            pointerEvents: 'none',
+            background: 'linear-gradient(90deg, rgba(21,23,31,0) 0%, #15171F 100%)',
+          }}
+        />
         <div
           style={{
             position: 'absolute',
             top: 0,
-            right: 0,
+            left: 0,
             bottom: 0,
             display: 'flex',
             alignItems: 'center',
@@ -1853,6 +1860,7 @@ export function GolfThisWeek({
           />
         </div>
       </div>
+
 
 
       {/* AN HONEST EMPTY ANSWER (§S2.5): the filters stay, the sentence explains. */}
