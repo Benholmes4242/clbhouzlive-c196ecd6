@@ -325,8 +325,13 @@ const TeeRow: React.FC<{
       /* SELECTION IS STRUCTURAL, NOT CHROMATIC (§3.2): a leading ink rule and a
          faint neutral wash. NEVER opacity on the inactive rows - a control you
          cannot read is not a control (§3.3). */
+      /* §2/§3: the old 4% INK wash was a light-surface value and contributed
+         nothing on the dark card, so the rule carried selection alone and the
+         unselected rows announced nothing. EVERY ROW NOW SITS IN A RESTING WELL
+         - three faint wells read as a control group, three rows on bare card
+         read as a list. A fill is what makes something look tappable. */
       borderLeft: `2px solid ${on ? A.INK : 'transparent'}`,
-      background: on ? 'rgba(14,18,22,0.04)' : 'transparent',
+      background: on ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
       paddingLeft: 6,
       transition: 'background 160ms ease',
       ...FIGS,
