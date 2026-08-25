@@ -219,8 +219,8 @@ function PlayerFacepile({ players, accent }: { players: MostPlayedPlayer[]; acce
                it — the same separation the pile uses throughout, cutting the
                other way. */
             zIndex: visible.length + 2,
-
             width: FACE_SIZE,
+
             height: FACE_SIZE,
             marginLeft: FACE_OVERLAP,
             borderRadius: '34%',
