@@ -38,8 +38,17 @@ export function heroTintGradient(brandHex: string | null, amount = 0.3): string 
  * scrim, no text shadow. Every photo-led hero (course detail, courses page,
  * tournament) uses this and nothing else.
  */
-export const HERO_CANON_SCRIM =
-  `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.20) 42%, rgba(0,0,0,0.62) 74%, ${CHARCOAL} 100%)`;
+export function heroCanonScrimOn(endColour: string): string {
+  return `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.20) 42%, rgba(0,0,0,0.62) 74%, ${endColour} 100%)`;
+}
+
+/**
+ * The canon scrim ending on the canvas — the usual answer, and the default.
+ * MICRO_BRIEF_TOUR_OVERVIEW_HERO_CANON_LAYERING: the rule is "no seam against
+ * what sits beneath", so a hero sitting on a different surface passes that
+ * surface to `heroCanonScrimOn` instead. The RAMP lives here, once.
+ */
+export const HERO_CANON_SCRIM = heroCanonScrimOn(CHARCOAL);
 
 /** Canon hero background: the one scrim over an image, or over a fallback. */
 export function heroCanonBackground(

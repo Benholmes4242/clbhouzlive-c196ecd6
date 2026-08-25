@@ -35,10 +35,10 @@ import {
   PHOTO_BAND_HEIGHT,
   COURSE_GRADIENT,
   COURSE_GRADIENT_DUSK,
-  COURSE_SCRIMS,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
 import { FONT, HERO_BOARD_SURFACE } from '../../../_shared/tokens';
+import { heroCanonScrimOn } from '../../../_shared/heroGradient';
 import { getScoreColor } from '../../../_shared/scoreColor';
 
 import { type HeroState } from '../HybridHero.utils';
@@ -123,6 +123,11 @@ export function PhotoBand({
         // column (photo + 36px ticker) exactly fills OVERVIEW_HERO_TOTAL_HEIGHT
         // — otherwise the inset showed as a white gap above the live board.
         height: `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+        // MICRO_BRIEF_TOUR_OVERVIEW_HERO_CANON_LAYERING took this hero's RAMP
+        // and LAYERING onto the canon but DELIBERATELY NOT its height: HERO_MIN_H
+        // ADDS the inset and is a floor, while PHOTO_BAND_HEIGHT is a term in
+        // TOTAL_HERO_HEIGHT_TARGET and must ABSORB the inset. Do not "finish the
+        // job" by swapping in HERO_MIN_H — it re-opens the white-gap bug.
 
         flexGrow: 0,
         overflow: 'hidden',
@@ -155,30 +160,22 @@ export function PhotoBand({
           }}
         />
       )}
-      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: COURSE_SCRIMS, zIndex: 2 }} />
+      {/* ONE gradient over the photograph — MICRO_BRIEF_TOUR_OVERVIEW_HERO_CANON_LAYERING.
+          The radial ambient (COURSE_SCRIMS, green included) and the 80px top
+          scrim are deleted; this is the canon ramp shared with the other six
+          heroes.
 
-      {/* Top scrim — protects the top eyebrow row */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: 0, left: 0, right: 0, height: 80,
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 100%)',
-          zIndex: 2,
-        }}
-      />
-
-      {/* Bottom scrim — heavier so the lower-third holds legibility, and it ENDS
-          on HERO_BOARD_SURFACE so the seam into the board below is invisible.
-          Ending on rgba(0,0,0,0.92) let the green base gradient bleed through as
-          a cast at the top of the board. */}
+          THE RECORDED EXCEPTION: it ends on HERO_BOARD_SURFACE, not the canvas.
+          The canon's rule is "no seam against what sits beneath", and what sits
+          beneath this hero is the board. Ending on rgba(0,0,0,0.92) was tried
+          and rejected: the green base gradient bled through as a cast at the top
+          of the board. */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute',
           left: 0, right: 0, bottom: 0, height: 260,
-          background:
-            `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, ${HERO_BOARD_SURFACE} 100%)`,
+          background: heroCanonScrimOn(HERO_BOARD_SURFACE),
           zIndex: 2,
         }}
       />
