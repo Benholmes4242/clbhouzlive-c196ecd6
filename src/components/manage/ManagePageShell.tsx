@@ -48,13 +48,18 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle, fi
   return (
     <PageRoot hasBottomNav={false} className="md:!max-w-[440px]" style={{ background: bg } as any}>
       <div className="min-h-screen flex flex-col w-full" style={{ background: bg }}>
+        {/* Sticky sticks to the SCROLLPORT, not to .app-shell's safe-area
+            padding — `top: 0` let the title row slide under the notch on
+            scroll, where the safe-area shield painted over it. Pin at --sat. */}
         <div
-          className="sticky top-0 z-30"
+          className="sticky z-30"
           style={{
+            top: 'var(--sat, env(safe-area-inset-top, 0px))',
             background: bg,
             borderBottom: `1px solid ${rule}`,
           }}
         >
+
           <div
             className="flex items-center justify-between px-4"
             style={{ paddingTop: 8, paddingBottom: belowTitle ? 8 : 12, minHeight: 56 }}
