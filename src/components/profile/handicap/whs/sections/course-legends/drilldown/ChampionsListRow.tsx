@@ -34,6 +34,10 @@ interface ChampionsListRowProps {
   gapToChampion: string | null;
   holdDuration: string | null;
   isNew?: boolean;
+  /** Member UUID — feeds SquircleAvatar's deterministic-initial fallback colour. */
+  userId?: string | null;
+  /** Real display name, used for fallback initials when `name` is "You". */
+  fallbackName?: string;
   /** Compact variant for inline duel-card top-5 lists. */
   compact?: boolean;
   /** Backdrop theme. Default 'dark' preserves handicap drilldown look. */
