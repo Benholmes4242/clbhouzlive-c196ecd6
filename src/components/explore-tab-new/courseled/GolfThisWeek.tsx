@@ -1753,19 +1753,15 @@ export function GolfThisWeek({
           Every section below it keeps the glyph-and-heading treatment — that rule
           is intact, this is the one exception and it is because it is first. */}
 
-      {/* THE FILTER'S READOUT ROW. The count and the region control are the
-          section's top edge; without them the pills would sit bare under the
-          chrome island. */}
+      {/* THE FILTER'S READOUT ROW. The count alone is the section's top edge.
+          BRIEF_DISCOVER_REGION_WELL_ON_PILL_ROW moved the region well down to
+          the pill row: the readout was this row's shrinking member and clipped
+          to "14 ..." at every viewport. It now owns the full width — do not put
+          anything else back on this row. */}
       <div
         style={{
           display: 'flex',
-          /* NO flexWrap. The region well now shrinks and ellipses its label
-             (WeekFilters §0.3), so the row resolves by truncating INSIDE the
-             control instead of dropping it to a second line. Leaving wrap here
-             would let the row wrap before the ellipsis ever engaged. */
-          justifyContent: 'space-between',
           alignItems: 'center',
-          gap: 12,
           /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
              gives 16px of clearance everywhere. */
           paddingTop: chromeClearance
@@ -1787,7 +1783,7 @@ export function GolfThisWeek({
              never squeeze the region well to nothing. */
           style={{
             ...KICKER, fontSize: 11, color: DISCOVER_QUIET,
-            flex: '0 1 auto', minWidth: 0,
+            flex: 'none', minWidth: 0,
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}
         >
@@ -1807,14 +1803,12 @@ export function GolfThisWeek({
             },
           )}
         </span>
-        <RegionDropdown
-          regions={regions}
-          selection={region}
-          onChange={(sel) => onRegionChange?.(sel)}
-        />
       </div>
 
-      {/* SCOPE PILLS — one row beneath the readout. */}
+      {/* SCOPE PILLS AND THE REGION WELL — one row beneath the readout. The well
+          sits AFTER the pills and OUTSIDE their scroller: PillFilterRow is
+          overflowX auto with flex:'none' children, so anything inside it
+          scrolls out of reach once a member scrolls to Top 100. */}
       <div
         style={{
           display: 'flex',
@@ -1824,10 +1818,34 @@ export function GolfThisWeek({
           minWidth: 0,
         }}
       >
-        <WeekScopePills
-          scope={scope}
-          onChange={(s) => onScopeChange?.(s)}
-          style={{ flex: '1 1 auto', minWidth: 0 }}
+        {/* The scroller's right-edge fade lives on this relative wrapper, not
+            inside PillFilterRow — the clip now happens against the well beside
+            it, which without a cue reads as a layout bug rather than as more
+            content. The transparent stop is A.CANVAS at zero alpha, never
+            `transparent`, which some engines resolve as a grey haze. */}
+        <div style={{ position: 'relative', flex: '1 1 auto', minWidth: 0 }}>
+          <WeekScopePills
+            scope={scope}
+            onChange={(s) => onScopeChange?.(s)}
+            style={{ flex: '1 1 auto', minWidth: 0 }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              right: 0,
+              width: 24,
+              pointerEvents: 'none',
+              background: 'linear-gradient(90deg, rgba(21,23,31,0) 0%, #15171F 90%)',
+            }}
+          />
+        </div>
+        <RegionDropdown
+          regions={regions}
+          selection={region}
+          onChange={(sel) => onRegionChange?.(sel)}
         />
       </div>
 

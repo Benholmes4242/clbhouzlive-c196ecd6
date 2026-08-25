@@ -181,7 +181,11 @@ export function RegionDropdown({
             background: selection ? 'rgba(255,255,255,0.14)' : A.PANEL,
             border: `1px solid ${A.BORDER}`,
             borderRadius: SCOPE_PILL_RADIUS,
-            padding: '8px 12px',
+            /* COLLAPSED AT "Everywhere" (BRIEF_DISCOVER_REGION_WELL_ON_PILL_ROW):
+               pin + chevron only, tighter side padding. The wrapper KEEPS
+               flex '0 1 auto' — collapsed the control has no elastic child left,
+               so the pills beside it absorb the row's pressure. */
+            padding: selection ? '8px 12px' : '8px 10px',
             fontFamily: SANS,
             color: selection ? DISCOVER_FACT : DISCOVER_QUIET,
           }}
@@ -197,6 +201,7 @@ export function RegionDropdown({
                 and never truncate — a control that loses its chevron stops
                 looking like a dropdown. title carries the full name for a
                 screen reader and as a native tooltip once the label clips. */}
+            {selection && (
             <span
               title={triggerLabel}
               style={{
@@ -212,6 +217,7 @@ export function RegionDropdown({
             >
               {triggerLabel}
             </span>
+            )}
             <ChevronDown size={13} strokeWidth={2.4} style={{ color: DISCOVER_QUIET, flex: 'none' }} />
           </span>
         </SelectTrigger>
