@@ -110,14 +110,17 @@ export const RAMP_TOPAR = {
  * lower-opacity or desaturated version of any other, so nothing on this tab
  * reads as a colour that failed to arrive.
  *
- * Monotone in lightness, stop 0 -> stop 5 (relative luminance
- * 0.606 / 0.414 / 0.319 / 0.143 / 0.087 / 0.050).
+ * Monotone in lightness on the ORIGINAL white-surface values. The stops below
+ * have since been repointed for the dark ground (see the note under this block).
  *
- * Stop 2 was tuned from the brief's sampled #B8705F, which read muddy and sat
- * within 0.03 luminance of the hole-by-hole bogey slate (#7C8B9C). #D8836A is a
- * brighter terracotta, clearly warm, and 0.07 clear of the slate in lightness.
- * Stop 3 kept the sampled #C0392B - it is the only value here that has to read
- * as unambiguous red, and it does.
+ * The old note here recorded a luminance relationship between stop 2 and the
+ * hole-by-hole bogey slate (#7C8B9C). BOTH VALUES HAVE MOVED - stop 2 by
+ * MICRO_BRIEF_COURSE_CARD_TEE_ROWS and RAMP_TOPAR.bogey by
+ * MICRO_BRIEF_RAMP_TOPAR_DARK - so that relationship no longer holds and the
+ * note is removed rather than left to claim a match that does not exist. The
+ * two ramps are now separated by KIND, not by lightness: this one is warm/red,
+ * RAMP_TOPAR's over-par half is pure neutral.
+
  *
  * RED MEANS DEMANDING. Nothing on this tab is a score or a member, so this is
  * neither the to-par red nor the member amber.
