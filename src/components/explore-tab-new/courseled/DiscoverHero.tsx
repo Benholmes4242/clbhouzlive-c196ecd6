@@ -44,24 +44,28 @@ import type { DiscoverHeroSubject } from './hooks/useDiscoverHero';
  * COUNT, not a score, and stays white. That is BRIEF_ROUND_TILE_MARK_AND_FIGURE
  * §1 unchanged, at a larger size. NO NEW HUE EXISTS IN THIS FILE.
  *
- * THE SCRIM STACK IS THE TILE'S, SCALED (§1.2). Same layers in the same order —
- * COURSE_GRADIENT base, image, COURSE_SCRIMS, bottom scrim, HERO_TOP_SCRIM — at
- * the tour's proportions (28% top, 90.9% bottom) re-derived against THIS height.
+ * THE SCRIM IS THE CANON, ONE LAYER (MICRO_BRIEF_DISCOVER_HERO_CANON_LAYERING).
+ * HERO_CANON_SCRIM over the image, with COURSE_GRADIENT painted beneath as the
+ * NO-IMAGE FALLBACK only. No radial ambient, no top scrim, no second bottom
+ * scrim, no text shadow — the same single gradient every other photo-led hero
+ * runs, ending on A.CANVAS so there is no seam into the readout row.
+ *
+ * THE RAMP LIVES ONCE, in _shared/heroGradient.ts: 0 -> 0.20 @42% -> 0.62 @74%
+ * -> the surface below. That last stop is the rule, not a detail: END ON WHAT
+ * COMES NEXT so the seam is invisible and the gradient's sand base cannot cast
+ * through. Here the neighbour is the page canvas; the round tile ends on full
+ * black because ITS next band is the dark well. Same principle, different
+ * neighbour.
+ *
+ * THE HEIGHT WAS DELIBERATELY HELD AT 372 when the layering was canonicalised
+ * (same brief, §0). Nothing composes against Discover's total — no ticker, no
+ * height target — so the canon's clamp does not apply here. Do not "finish the
+ * job" by swapping it for HERO_MIN_H.
  */
 
 /** Full-bleed and tall enough to be the page's opening, not a banner. */
 const HERO_H = 372;
-const TOP_SCRIM_H = Math.round(HERO_H * 0.28); // 104
-const BOTTOM_SCRIM_H = Math.round(HERO_H * 0.909); // 338
 
-/**
- * THE TOUR'S FIRST THREE STOPS EXACTLY, and a final stop on THE COLOUR OF THE
- * BAND BELOW — which is the page canvas. That is PhotoBand's own rule (end on
- * what comes next so the seam is invisible and the gradient's sand base cannot
- * cast through); the round tile ends on full black because ITS next band is the
- * dark well. Same principle, different neighbour. A.CANVAS is an existing token.
- */
-const HERO_BOTTOM_SCRIM = `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, ${A.CANVAS} 100%)`;
 
 /** §4.1 — ~400ms, ease-out, once. */
 const COUNT_MS = 400;
