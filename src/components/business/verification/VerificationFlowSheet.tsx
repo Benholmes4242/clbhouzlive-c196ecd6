@@ -978,7 +978,8 @@ export default function VerificationFlowSheet({
                           </>
                         )}
                       </button>
-                      <div className="text-center" style={{ ...BIZ_LABEL, fontSize: 7.5, marginTop: 6 }}>
+                      <div className="text-center" style={{ ...BIZ_LABEL, marginTop: 6 }}>
+                        {/* MICRO_BRIEF_BUSINESS_PROFILE_TYPE_SCALE: pin deleted so this inherits BIZ_LABEL (8). It stays below the app floor until the deferred business-scale brief repoints BIZ_LABEL — do NOT re-pin. */}
                         Image or PDF · Max 10MB
                       </div>
                     </div>
@@ -1133,7 +1134,7 @@ export default function VerificationFlowSheet({
                           </SelectContent>
                         </Select>
                         {role === 'owner' && (
-                          <p style={{ ...BIZ_LABEL, fontSize: 7.5, color: A.MUTE, margin: '6px 0 0' }}>
+                          <p style={{ ...BIZ_LABEL, color: A.MUTE, margin: '6px 0 0' }}>
                             Owners can usually answer our questions fastest.
                           </p>
                         )}

@@ -504,7 +504,7 @@ const BusinessProfilePage: React.FC = () => {
               style={{
                 marginTop: 6, background: 'transparent', border: 'none', padding: 0,
                 minHeight: 36, display: 'flex', alignItems: 'center',
-                fontSize: 10, fontWeight: 700, letterSpacing: '0.13em',
+                fontSize: 11, fontWeight: 700, letterSpacing: '0.10em',
                 textTransform: 'uppercase', color: A.INK,
               }}
             >
@@ -573,7 +573,7 @@ const BusinessProfilePage: React.FC = () => {
             disabled={disabled}
             onClick={onClick}
             className={cn('h-11 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]', className)}
-            style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }}
+            style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL }}
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Icon className="w-3.5 h-3.5" />}
             {label}
@@ -588,7 +588,7 @@ const BusinessProfilePage: React.FC = () => {
               <div className="mt-4 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
                 <button
                   className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                  style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, fontSize: 10 }}
+                  style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL }}
                   onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
                   disabled={isStartingDM}
                   aria-label={`Message ${business.name}`}
