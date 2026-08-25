@@ -623,7 +623,13 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           itemContent={itemContent}
           computeItemKey={(_, post) => post.id}
           endReached={handleEndReached}
-          defaultItemHeight={950}
+          // HAND-SET ESTIMATE, not a measurement. Raised 950 -> 1000 when the
+          // type scale grew card heights. The safe direction is HIGH: an
+          // under-estimate makes the list jump as rows measure, an
+          // over-estimate settles downward silently. Do not guess it downward
+          // and do not drop it — without it Virtuoso falls back to its own
+          // heuristic, which is no better and harder to reason about.
+          defaultItemHeight={1000}
           // Symmetric viewport-anchored keep window — see CardFeed for the
           // full rationale. Top was previously 600 (half of bottom), which
           // unmounted playingIdx-1 under sustained down-scroll and starved
