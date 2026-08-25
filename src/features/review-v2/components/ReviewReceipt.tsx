@@ -315,10 +315,10 @@ export function ReviewReceipt({
                   if (row === 'b') {
                     return (
                       <div key="b" style={rowStyle(i)}>
-                        <div style={{ fontSize: 13, color: RV2.ink, lineHeight: 1.45 }}>
+                        <div style={{ fontSize: 14, color: RV2.ink, lineHeight: 1.45 }}>
                           {t('review.wizard.receipt.rowB')}
                         </div>
-                        <div style={{ fontSize: 11.5, color: RV2.secondary, marginTop: 4 }}>
+                        <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 4 }}>
                           {t('review.wizard.receipt.rowBSub')}
                         </div>
                       </div>
