@@ -349,15 +349,39 @@ export function DiscoverHero({
           >
             {row.display_name}
           </span>
+        </div>
 
-          {/* THE GROSS AT THE RIGHT OF THE NAME (BRIEF_HERO_GROSS_AND_REVERT §2).
-              The hero's 46px figure is the MOMENT; this is WHAT THE ROUND SCORED,
-              the same device the round cards below the fold run at the right of
-              their name row — 21/700 gross, 13/700 qualifier, baseline aligned.
-              TONE: figureColor, the ACHIEVEMENT's own colour, so green on THE RUN.
+        {/* ROW TWO — the course, then the region, with the gross right-aligned
+            against it (BRIEF_HERO_ROW_AND_DEFICIT §1). The course text wraps to a
+            second line rather than truncating: a clipped course name is a course
+            the member cannot identify. flex-end, not centre — bottom-aligning
+            keeps the gross on the last line's baseline either way. */}
+        <div style={{ marginTop: 4, display: 'flex', alignItems: 'flex-end', gap: 10, minWidth: 0 }}>
+          <div
+            style={{
+              flex: '1 1 auto',
+              minWidth: 0,
+              fontSize: 12,
+              fontWeight: 600,
+              lineHeight: 1.25,
+              color: DISCOVER_QUIET,
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              overflow: 'hidden',
+            }}
+          >
+            {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
+            {region ? ` \u00B7 ${region}` : ''}
+          </div>
+
+          {/* THE GROSS (BRIEF_HERO_GROSS_AND_REVERT §2, re-seated by
+              BRIEF_HERO_ROW_AND_DEFICIT §1). The hero's 46px figure is the MOMENT;
+              this is WHAT THE ROUND SCORED — 21/700 gross, 13/700 qualifier,
+              baseline aligned. TONE: figureColor, the ACHIEVEMENT's own colour.
               ABSENT IS ABSENT: a null gross renders nothing, not a dash.
-              §3 — ON COURSE RECORD the 46px figure ALREADY IS the gross, so only
-              the qualifier renders here; printing it twice on one card is noise. */}
+              ON COURSE RECORD the 46px figure ALREADY IS the gross, so only the
+              qualifier renders here; printing it twice on one card is noise. */}
           {(() => {
             const toPar = moment.facts.toPar;
             const showGross = row.gross != null && !isGrossScore;
@@ -403,26 +427,6 @@ export function DiscoverHero({
               </div>
             );
           })()}
-        </div>
-
-        {/* ROW TWO — the course, then the region, across the full width. It
-            wraps to a second line rather than truncating: a clipped course name
-            is a course the member cannot identify. */}
-        <div
-          style={{
-            marginTop: 4,
-            fontSize: 12,
-            fontWeight: 600,
-            lineHeight: 1.25,
-            color: DISCOVER_QUIET,
-            display: '-webkit-box',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
-            overflow: 'hidden',
-          }}
-        >
-          {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
-          {region ? ` \u00B7 ${region}` : ''}
         </div>
       </div>
     </div>
