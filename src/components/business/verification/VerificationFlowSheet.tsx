@@ -1133,8 +1133,8 @@ export default function VerificationFlowSheet({
                             ))}
                           </SelectContent>
                         </Select>
+                        {/* MICRO_BRIEF_BUSINESS_PROFILE_TYPE_SCALE: pin deleted so this inherits BIZ_LABEL (8) — interim, below the app floor until the deferred business-scale brief repoints BIZ_LABEL. Do NOT re-pin. */}
                         {role === 'owner' && (
-                          {/* MICRO_BRIEF_BUSINESS_PROFILE_TYPE_SCALE: pin deleted so this inherits BIZ_LABEL (8) — interim, below the app floor until the deferred business-scale brief repoints BIZ_LABEL. Do NOT re-pin. */}
                           <p style={{ ...BIZ_LABEL, color: A.MUTE, margin: '6px 0 0' }}>
                             Owners can usually answer our questions fastest.
                           </p>
