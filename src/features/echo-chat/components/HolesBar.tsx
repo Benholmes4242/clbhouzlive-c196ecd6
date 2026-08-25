@@ -53,6 +53,8 @@ export const HolesBar: React.FC<{
               style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
             >
               {mine && (
+                {/* AXIS 10: a per-hole coordinate above the bar, not language.
+                    The strip stays quiet, as every other hole strip in the app. */}
                 <span style={{ ...T.FIG, fontSize: 10 }}>
                   {h.avgToPar > 0 ? '+' : h.avgToPar < 0 ? '\u2212' : ''}
                   {Math.abs(h.avgToPar).toFixed(1)}
