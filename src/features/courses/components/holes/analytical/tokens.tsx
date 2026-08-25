@@ -24,7 +24,7 @@
  */
 
 import React from 'react';
-import { TOPAR_UNDER_DARK, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 
 /**
@@ -83,14 +83,23 @@ export const RAMP = {
  *
  * UNDER par is RED at the GOOD end. That is the convention on the scorecard,
  * the friends tile, the round post and the scorecard sheet - it is NOT an error
- * and must not be "corrected" to green. OVER par darkens to ink.
+ * and must not be "corrected" to green.
+ *
+ * REPOINTED FOR THE DARK GROUND by MICRO_BRIEF_RAMP_TOPAR_DARK. The convention
+ * did not change; the VALUE OF INK did. On white, ink was #0F172A and worse
+ * meant DARKER - which on #15171F made double+ invisible. On dark, ink is
+ * near-white, so worse means progressively BRIGHTER NEUTRAL. This is the same
+ * neutral ramp Ben chose for the course analytics sheet's four-bucket bar, and
+ * for the same reason: a second red for double+ would put one red meaning
+ * under par and one meaning over par in a single bar.
  */
 export const RAMP_TOPAR = {
-  birdie: TOPAR_UNDER_LIGHT,
-  par: '#B4BEC9',
-  bogey: '#7C8B9C',
-  double: '#0F172A',
+  birdie: TOPAR_UNDER_DARK,
+  par: 'rgba(248,250,252,0.42)',
+  bogey: 'rgba(248,250,252,0.56)',
+  double: 'rgba(248,250,252,0.72)',
 } as const;
+
 
 /**
  * THE DEMANDING RAMP - BRIEF_COURSE_TAB_NO_FADED_COLOUR §2.
@@ -101,14 +110,17 @@ export const RAMP_TOPAR = {
  * lower-opacity or desaturated version of any other, so nothing on this tab
  * reads as a colour that failed to arrive.
  *
- * Monotone in lightness, stop 0 -> stop 5 (relative luminance
- * 0.606 / 0.414 / 0.319 / 0.143 / 0.087 / 0.050).
+ * Monotone in lightness on the ORIGINAL white-surface values. The stops below
+ * have since been repointed for the dark ground (see the note under this block).
  *
- * Stop 2 was tuned from the brief's sampled #B8705F, which read muddy and sat
- * within 0.03 luminance of the hole-by-hole bogey slate (#7C8B9C). #D8836A is a
- * brighter terracotta, clearly warm, and 0.07 clear of the slate in lightness.
- * Stop 3 kept the sampled #C0392B - it is the only value here that has to read
- * as unambiguous red, and it does.
+ * The old note here recorded a luminance relationship between stop 2 and the
+ * hole-by-hole bogey slate (#7C8B9C). BOTH VALUES HAVE MOVED - stop 2 by
+ * MICRO_BRIEF_COURSE_CARD_TEE_ROWS and RAMP_TOPAR.bogey by
+ * MICRO_BRIEF_RAMP_TOPAR_DARK - so that relationship no longer holds and the
+ * note is removed rather than left to claim a match that does not exist. The
+ * two ramps are now separated by KIND, not by lightness: this one is warm/red,
+ * RAMP_TOPAR's over-par half is pure neutral.
+
  *
  * RED MEANS DEMANDING. Nothing on this tab is a score or a member, so this is
  * neither the to-par red nor the member amber.
