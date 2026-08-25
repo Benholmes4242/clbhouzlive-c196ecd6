@@ -261,15 +261,21 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
               <span style={{ fontSize: 11, color: 'var(--hcp-t-60)' }}>›</span>
             </button>
 
-            {cohorts.totalInactive > 0 && !showInactive && (
+            {cohorts.totalInactive > 0 && (
               <button
                 type="button"
-                onClick={() => setShowInactive(true)}
+                onClick={() => setShowInactive((v) => !v)}
+                aria-expanded={showInactive}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 5,
                   padding: 0,
+                  // 44px tap target without moving the label: the extra height is
+                  // absorbed by equal negative margins.
+                  minHeight: 44,
+                  marginTop: -14,
+                  marginBottom: -14,
                   background: 'transparent',
                   border: 'none',
                   color: 'var(--hcp-t-60)',
@@ -282,19 +288,28 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
                   WebkitTapHighlightColor: 'transparent',
                 }}
               >
-                <span
+                {!showInactive && (
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      letterSpacing: '-0.03em',
+                      color: 'var(--hcp-t-100)',
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                    }}
+                  >
+                    {cohorts.totalInactive}
+                  </span>
+                )}
+                {showInactive ? 'Hide inactive' : 'Inactive'}
+                <ChevronDown
+                  size={12}
+                  strokeWidth={2}
                   style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    letterSpacing: '-0.03em',
-                    color: 'var(--hcp-t-100)',
-                    fontVariantNumeric: 'tabular-nums lining-nums',
+                    transform: showInactive ? 'rotate(180deg)' : 'none',
+                    transition: 'transform 160ms ease',
                   }}
-                >
-                  {cohorts.totalInactive}
-                </span>
-                Inactive
-                <ChevronDown size={12} strokeWidth={2} />
+                />
               </button>
             )}
           </div>
