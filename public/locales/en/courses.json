@@ -845,8 +845,8 @@
       "noOneRated": "No one's scored {{courseName}} yet. Give it a 0–10 and help fellow golfers discover it.",
       "thisCourse": "this course",
       "rateThis": "Rate this course",
-      "basedOn_one": "Based on 1 rating",
-      "basedOn_other": "Based on {{count}} ratings",
+      "basedOn_one": "1 rating",
+      "basedOn_other": "{{count}} ratings",
       "onlyYouSuffix": " · Only you",
       "categoryScores": "Category Scores",
       "seeAllReviews": "See all reviews"
