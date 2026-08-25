@@ -169,9 +169,10 @@ export const HeroCell: React.FC<{
       <div
         style={{
           marginTop: 4,
-          fontSize: 7.5,
+          // AXIS floor 10 exception: labels a counter figure over the cover photo.
+          fontSize: 10,
           fontWeight: 700,
-          letterSpacing: '0.14em',
+          letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: W_45,
         }}
