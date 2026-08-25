@@ -4687,21 +4687,30 @@ em-emoji-picker input:focus {
  * react-mentions composer — overlay/input registration guards
  * ============================================================
  * The library's default class names are `.mentions-composer__…`
- * (from our `className="mentions-composer"` prop). We enforce
- * transparent input text + placeholder colour + full-width
- * suggestions here so no third-party default can override the
- * inline style props and re-introduce the doubled-text bug.
- */
+ * (from our `className="mentions-composer"` prop). These guards keep
+ * the TWO-LAYER construction intact — transparent textarea, painted
+ * highlighter — so no third-party default re-introduces the doubled
+ * text bug.
+ *
+ * MICRO_BRIEF_MENTIONS_COMPOSER_BROKEN — THE CAUSE OF THE INVISIBLE
+ * TEXT AND THE DEAD CARET. This block used to hard-code LIGHT-mode
+ * ink (#0F172A) with `!important` on the highlighter substring and on
+ * caret-color. After BRIEF_DARK_ONLY every consumer passes dark ink
+ * (#F8FAFC) inline via buildMentionsStyle, and an `!important`
+ * declaration beats an inline style — so every composer painted its
+ * glyphs slate-on-slate and its caret slate-on-slate. Two callsites
+ * broke identically because the override was global.
+ *
+ * NO COLOUR IS DECLARED HERE ANY MORE. Ink, caret and placeholder are
+ * the CONSUMER'S business, passed through MentionsTextStyle. Do not
+ * reintroduce a colour in this file, with or without `!important`. */
 .mentions-composer__input,
 .mentions-composer textarea {
+  /* Structural only: the textarea must never paint its own glyphs, the
+     highlighter beneath it does. caret-color comes from the inline
+     style (textStyle.caretColor). */
   color: transparent !important;
   -webkit-text-fill-color: transparent !important;
-  caret-color: #0F172A !important;
-}
-.mentions-composer__input::placeholder,
-.mentions-composer textarea::placeholder {
-  color: rgba(15,23,42,0.35) !important;
-  -webkit-text-fill-color: rgba(15,23,42,0.35) !important;
 }
 .mentions-composer__suggestions {
   width: 100% !important;
@@ -4715,22 +4724,13 @@ em-emoji-picker input:focus {
 .mentions-composer__suggestions__list {
   width: 100% !important;
 }
-.mentions-composer__highlighter,
-.mentions-composer__highlighter * {
-  color: #0F172A;
-  -webkit-text-fill-color: #0F172A;
-}
+/* The substring layer only needs to be VISIBLE — the library sets it
+   hidden in some paths. Its colour is inherited from the highlighter,
+   which carries the consumer's ink inline. */
 .mentions-composer__highlighter__substring {
   visibility: visible !important;
-  color: #0F172A !important;
-  -webkit-text-fill-color: #0F172A !important;
 }
-.mentions-composer__highlighter strong,
-.mentions-composer__highlighter [data-mention="true"] {
-  color: #F7931E !important;
-  -webkit-text-fill-color: #F7931E !important;
-  font-weight: 400 !important;
-}
+
 
 
 /* Discover ON TOUR live chip dot (BRIEF_DISCOVER_LIVE_TOUR, section 2).
