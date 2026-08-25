@@ -43,7 +43,8 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        fontSize: 10.5,
+        /* READ floor. 10.5 -> 11. */
+        fontSize: 11,
         fontWeight: 700,
         color: RV2.eyebrow,
         textTransform: 'uppercase',
@@ -123,7 +124,7 @@ function TeeChipRow({
                 border: selected ? `1px solid ${RV2.ink}` : `1px solid ${RV2.hairlineStrong}`,
                 background: selected ? RV2.ink : RV2.ghost,
                 color: selected ? RV2.canvas : RV2.ink,
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 700,
                 letterSpacing: '0.01em',
                 cursor: 'pointer',
@@ -237,7 +238,7 @@ function InnerComposer() {
         <div style={{ fontSize: 17, fontWeight: 700, color: RV2.ink, marginBottom: 6 }}>
           Couldn&apos;t load this course
         </div>
-        <div style={{ fontSize: 13, color: RV2.secondary, marginBottom: 20, maxWidth: 280 }}>
+        <div style={{ fontSize: 14, color: RV2.secondary, marginBottom: 20, maxWidth: 280 }}>
           Check your connection and try again.
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
@@ -249,8 +250,11 @@ function InnerComposer() {
               border: `1px solid ${RV2.hairlineStrong}`,
               borderRadius: 999,
               padding: '10px 18px',
-              fontSize: 14,
+              /* CAPS ACTION (§5) at the size the brief's table gives. */
+              fontSize: 15,
               fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.10em',
               color: RV2.ink,
               cursor: 'pointer',
             }}
@@ -266,8 +270,11 @@ function InnerComposer() {
               border: 0,
               borderRadius: 999,
               padding: '10px 18px',
-              fontSize: 14,
+              /* CAPS ACTION (§5). */
+              fontSize: 15,
               fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.10em',
               cursor: 'pointer',
             }}
           >
@@ -662,7 +669,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
               style={{
-                fontSize: 14.5,
+                fontSize: 15,
                 fontWeight: 700,
                 letterSpacing: '-0.015em',
                 color: RV2.ink,
@@ -673,7 +680,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
             >
               {course.name}
             </div>
-            <div style={{ fontSize: 11.5, color: RV2.secondary }}>{region}</div>
+            <div style={{ fontSize: 12, color: RV2.secondary }}>{region}</div>
           </div>
           {isEditMode && (
             <button
@@ -717,9 +724,10 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
             />
             <div
               style={{
-                fontSize: 9,
+                /* READ floor — step labels are language. 9 -> 11. */
+                fontSize: 11,
                 fontWeight: 700,
-                letterSpacing: '0.1em',
+                letterSpacing: '0.10em',
                 textTransform: 'uppercase',
                 color: i <= step ? RV2.ink : RV2.secondary,
               }}
@@ -810,7 +818,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           </h1>
           <p
             style={{
-              fontSize: 12.5,
+              fontSize: 13,
               color: RV2.secondary,
               lineHeight: 1.55,
               marginBottom: 16,
@@ -840,7 +848,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
             >
               <div
                 style={{
-                  fontSize: 10.5,
+                  /* READ floor. 10.5 -> 11. */
+                  fontSize: 11,
                   fontWeight: 700,
                   color: RV2.eyebrow,
                   textTransform: 'uppercase',
@@ -888,7 +897,10 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 placeholder={t('review.wizard.step2.placeholder')}
                 currentUserId={userId}
                 textStyle={{
-                  fontSize: 14,
+                  /* YOUR WORDS is PINNED here, not inherited. 14 -> 15 so the
+                     review composer sits at the floor alongside the comment
+                     composer (15, inherited) and the post caption (16/17). */
+                  fontSize: 15,
                   lineHeight: '1.55',
                   minHeight: 72,
                   maxHeight: 260,
@@ -938,10 +950,10 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 600, color: RV2.ink }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: RV2.ink }}>
                     {t('review.wizard.step2.shareTitle')}
                   </div>
-                  <div style={{ fontSize: 11.5, color: RV2.secondary }}>
+                  <div style={{ fontSize: 12, color: RV2.secondary }}>
                     {t('review.wizard.step2.shareSub')}
                   </div>
                 </div>

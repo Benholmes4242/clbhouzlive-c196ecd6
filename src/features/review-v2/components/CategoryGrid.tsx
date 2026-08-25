@@ -92,7 +92,7 @@ function CategoryRow({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 13.5, fontWeight: 600, color: RV2.ink }}>{label}</span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: RV2.ink }}>{label}</span>
         <span
           style={{
             fontSize: 18,

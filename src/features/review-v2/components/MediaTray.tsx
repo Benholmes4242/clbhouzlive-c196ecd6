@@ -138,7 +138,7 @@ export function MediaTray({
                 }}
               >
                 <RotateCcw size={16} />
-                <span style={{ fontSize: 9, fontWeight: 700 }}>Retry</span>
+                <span style={{ /* CAPS ACTION (§5), floor 11. */ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.10em' }}>Retry</span>
               </button>
             )}
 
@@ -190,7 +190,7 @@ export function MediaTray({
             }}
           >
             <Plus size={20} strokeWidth={2} />
-            <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+            <span style={{ /* CAPS ACTION (§5), floor 11. */ fontSize: 11, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase' }}>
               Add
             </span>
           </button>
@@ -208,7 +208,7 @@ export function MediaTray({
             border: `1px solid ${RV2.hairline}`,
             borderRadius: 10,
             color: RV2.ink,
-            fontSize: 12.5,
+            fontSize: 13,
           }}
         >
           <AlertCircle size={14} color={RV2.amber} />

@@ -248,9 +248,11 @@ export function VoiceDictateButton({ onAppend }: Props) {
           border: `1px solid ${RV2.hairlineStrong}`,
           background: RV2.ghost,
           color: RV2.ink,
-          fontSize: 11.5,
+          /* CAPS ACTION (§5) — 'Dictate' two points down at the floor. */
+          fontSize: 11,
           fontWeight: 600,
-          letterSpacing: '-0.005em',
+          textTransform: 'uppercase',
+          letterSpacing: '0.10em',
           cursor: 'pointer',
         }}
       >
@@ -301,7 +303,7 @@ export function VoiceDictateButton({ onAppend }: Props) {
         <>
           <span
             style={{
-              fontSize: 11.5,
+              fontSize: 12,
               fontWeight: 700,
               color: RV2.ink,
               fontVariantNumeric: 'tabular-nums',
@@ -336,7 +338,7 @@ export function VoiceDictateButton({ onAppend }: Props) {
       ) : (
         <span
           style={{
-            fontSize: 11.5,
+            fontSize: 12,
             fontWeight: 600,
             color: RV2.secondary,
             whiteSpace: 'nowrap',
