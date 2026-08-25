@@ -8,7 +8,7 @@ import { HERO_CANON_SCRIM } from '@/features/tourhub/_shared/heroGradient';
 
 
 import { relativeDay } from './discoverWhen';
-import { A, DISCOVER_FACT, DISCOVER_QUIET, NUMF, SANS } from './tokens';
+import { DISCOVER_FACT, DISCOVER_QUIET, NUMF, SANS } from './tokens';
 import {
   ROW_DARK_INDEX_FELL,
   ROW_DARK_TOPAR_UNDER,
