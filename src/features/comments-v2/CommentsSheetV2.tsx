@@ -303,7 +303,7 @@ function CommentsSheetV2Inner({
                       onClick={() => fetchNextPage()}
                       disabled={isFetchingNextPage}
                       className="mt-1 mx-auto py-2 px-3 bg-transparent border-0 cursor-pointer"
-                      style={{ fontSize: 12, fontWeight: 700, color: AMBER, letterSpacing: '0.06em' }}
+                      style={{ fontSize: 13, fontWeight: 700, color: AMBER, letterSpacing: '0.06em' }}
                     >
                       {isFetchingNextPage ? t('comments.loading') : t('comments.viewEarlier')}
                     </button>

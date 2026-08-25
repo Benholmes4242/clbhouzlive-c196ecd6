@@ -156,7 +156,7 @@ const RefCell: React.FC<{
     <div
       style={{
         marginTop: 5,
-        fontSize: 9.5,
+        fontSize: 11,
         fontWeight: 600,
         letterSpacing: '0.1em',
         color: MUTE,
@@ -482,7 +482,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     <div
                       style={{
                         marginTop: 5,
-                        fontSize: 12.5,
+                        fontSize: 13,
                         color: MUTE,
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -591,7 +591,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         <div
                           style={{
                             marginTop: 5,
-                            fontSize: 9.5,
+                            fontSize: 12,
                             fontWeight: 600,
                             letterSpacing: '0.1em',
                             color: MUTE,
@@ -661,7 +661,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 <div style={{ marginTop: 16 }}>
                   <div
                     style={{
-                      fontSize: 10,
+                      fontSize: 11,
                       fontWeight: 600,
                       letterSpacing: '0.12em',
                       color: MUTE,
@@ -763,7 +763,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: 600,
                       color: INK,
                       whiteSpace: 'nowrap',
@@ -777,7 +777,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     <div
                       style={{
                         marginTop: 2,
-                        fontSize: 11.5,
+                        fontSize: 12,
                         color: BODY,
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
@@ -806,12 +806,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     /* INK fill takes a CANVAS label. It was PANEL (#FFFFFF)
                        before the flip, which would have been white-on-white. */
                     color: CANVAS,
-                    fontSize: 15,
+                    /* CAPS BUTTON: two points down, caps at 0.10em, height unchanged. */
+                    fontSize: 13,
                     fontWeight: 700,
+                    textTransform: 'uppercase',
                     cursor: courseId ? 'pointer' : 'default',
                     opacity: courseId ? 1 : 0.5,
                     fontFamily: 'inherit',
-                    letterSpacing: '0.01em',
+                    letterSpacing: '0.10em',
                   }}
                 >
                   Go to review
@@ -827,11 +829,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     background: 'rgba(255,255,255,0.06)',
                     border: `1px solid ${BORDER}`,
                     color: INK,
-                    fontSize: 15,
+                    /* CAPS BUTTON: two points down, caps at 0.10em, height unchanged. */
+                    fontSize: 13,
                     fontWeight: 700,
+                    textTransform: 'uppercase',
                     cursor: 'pointer',
                     fontFamily: 'inherit',
-                    letterSpacing: '0.01em',
+                    letterSpacing: '0.10em',
                   }}
                 >
                   Go to profile

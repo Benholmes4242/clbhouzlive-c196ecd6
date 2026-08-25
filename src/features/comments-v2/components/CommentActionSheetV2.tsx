@@ -74,7 +74,7 @@ export function CommentActionSheetV2({
               type="button"
               onClick={onClose}
               className="w-full mt-1 py-4 bg-transparent border-0 cursor-pointer"
-              style={{ fontSize: 15, fontWeight: 600, color: INK }}
+              style={{ fontSize: 13, fontWeight: 600, color: INK, textTransform: 'uppercase', letterSpacing: '0.10em' }}
             >
               Cancel
             </button>
@@ -95,7 +95,7 @@ function Row({
       type="button"
       onClick={onClick}
       className="w-full flex items-center gap-3 px-5 py-4 bg-transparent border-0 cursor-pointer text-left"
-      style={{ color: destructive ? DANGER : INK, fontSize: 15, fontWeight: 500 }}
+      style={{ color: destructive ? DANGER : INK, fontSize: 13, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.10em' }}
     >
       <span style={{ color: destructive ? DANGER : ICON }}>{icon}</span>
       <span>{label}</span>

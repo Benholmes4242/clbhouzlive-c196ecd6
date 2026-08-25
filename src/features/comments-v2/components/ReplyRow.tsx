@@ -69,20 +69,20 @@ export function ReplyRow({ comment, registerRef, highlighted, onLike, onMore, on
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="truncate" style={{ fontSize: 12.5, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
+          <span className="truncate" style={{ fontSize: 15, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
             {comment.display_name}
           </span>
           {comment.actor_type === 'business' && (
             <span style={{
-              padding: '1px 5px', borderRadius: 3, fontSize: 8.5, fontWeight: 700,
+              padding: '1px 5px', borderRadius: 3, fontSize: 11, fontWeight: 700,
               textTransform: 'uppercase', letterSpacing: '0.14em',
               background: 'rgba(247,147,30,0.16)', color: AMBER,
             }}>{t('comments.business')}</span>
           )}
-          <span style={{ fontSize: 10.5, color: DIM }}>
+          <span style={{ fontSize: 13, color: DIM }}>
             {relativeTime(comment.created_at)}
           </span>
-          {comment.is_edited && <span style={{ fontSize: 10.5, color: DIM }}>{'\u00B7'} {t('comments.edited')}</span>}
+          {comment.is_edited && <span style={{ fontSize: 13, color: DIM }}>{'\u00B7'} {t('comments.edited')}</span>}
         </div>
 
         {comment.content && (
@@ -91,8 +91,8 @@ export function ReplyRow({ comment, registerRef, highlighted, onLike, onMore, on
             text={comment.content}
             className="mt-0.5 whitespace-pre-wrap"
             style={big
-              ? { fontSize: 26, lineHeight: 1.15, color: INK }
-              : { fontSize: 12.5, lineHeight: 1.5, color: INK }}
+              ? { fontSize: 30, lineHeight: 1.15, color: INK }
+              : { fontSize: 14, lineHeight: 1.5, color: INK }}
             onMentionTap={(m) => {
               onClose?.();
               navigate(m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`);
@@ -120,7 +120,7 @@ export function ReplyRow({ comment, registerRef, highlighted, onLike, onMore, on
               }}
             />
             {comment.likes_count > 0 && (
-              <span className="tabular-nums" style={{ fontSize: 11, fontWeight: 600, color: comment.has_liked ? AMBER : MUTE }}>
+              <span className="tabular-nums" style={{ fontSize: 13, fontWeight: 600, color: comment.has_liked ? AMBER : MUTE }}>
                 {comment.likes_count}
               </span>
             )}
