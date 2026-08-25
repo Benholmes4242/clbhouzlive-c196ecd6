@@ -644,7 +644,7 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({
         error: 'account_deletion_incomplete',
         stage: 'auth_delete',
-        detail: authErr.message,
+        detail: authErr?.message ?? 'auth row survived deleteUser',
         access_revoked: accessRevoked,
         deletionAuditId,
         version: FUNCTION_VERSION,
