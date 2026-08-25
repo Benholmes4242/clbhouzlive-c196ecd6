@@ -175,7 +175,7 @@ function Row({
         <div
           style={{
             fontWeight: 700,
-            fontSize: 13.5,
+            fontSize: 14,
             color: A.INK,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -185,7 +185,7 @@ function Row({
           {title}
         </div>
         {subtitle && (
-          <div style={{ fontWeight: 500, fontSize: 11.5, color: A.DIM, marginTop: 2 }}>
+          <div style={{ fontWeight: 500, fontSize: 12, color: A.DIM, marginTop: 2 }}>
             {subtitle}
           </div>
         )}
@@ -382,7 +382,7 @@ const RoundsTrend: React.FC<{ points: CourseRoundPoint[]; gradientId: string }> 
 const TrendLegendSwatch: React.FC<{ color: string; label: string }> = ({ color, label }) => (
   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
     <span style={{ width: 9, height: 9, borderRadius: 2.5, background: color }} />
-    <span style={{ ...LABEL, fontSize: 8, letterSpacing: '0.1em' }}>{label}</span>
+    <span style={{ ...LABEL, fontSize: 11, letterSpacing: '0.1em' }}>{label}</span>
   </span>
 );
 
@@ -483,7 +483,7 @@ function AnalyticsCourseRow({
         <div
           style={{
             fontWeight: 700,
-            fontSize: 13.5,
+            fontSize: 14,
             color: A.INK,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -526,7 +526,7 @@ function AnalyticsCourseRow({
 
       {avgVal != null && (
         <div style={{ width: 52, textAlign: 'right', minWidth: 0, gridColumn: 3 }}>
-          <div style={{ fontWeight: 700, fontSize: 13.5, color: A.INK }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: A.INK }}>
             {fmtSigned(avgVal, 1)}
           </div>
           <div

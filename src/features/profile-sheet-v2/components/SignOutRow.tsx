@@ -13,7 +13,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { LABEL as LABEL_METRICS } from '@/lib/tokens/type';
 
-const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
+/* Both rows are read prose, so the shared LABEL's 8px is overridden locally
+   to the 11px floor. The shared token itself does not move. */
+const LABEL: React.CSSProperties = { ...LABEL_METRICS, fontSize: 11, color: A.DIM };
 
 interface Props {
   onNavigate: (route: string) => void;

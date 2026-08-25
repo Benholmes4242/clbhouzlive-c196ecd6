@@ -55,7 +55,7 @@ function Tile({ label, icon, badge, onClick }: TileProps) {
       }}
     >
       {icon}
-      <span style={{ fontWeight: 600, fontSize: 11.5, color: A.INK }}>{label}</span>
+      <span style={{ fontWeight: 600, fontSize: 13, color: A.INK }}>{label}</span>
       {badge != null && badge > 0 && (
         <span
           aria-label={`${badge} unread`}
@@ -74,7 +74,7 @@ function Tile({ label, icon, badge, onClick }: TileProps) {
             background: A.INK,
             color: A.CANVAS,
             fontWeight: 700,
-            fontSize: 10,
+            fontSize: 11,
             fontVariantNumeric: 'tabular-nums',
             border: `2px solid ${A.PANEL}`,
             boxSizing: 'content-box',

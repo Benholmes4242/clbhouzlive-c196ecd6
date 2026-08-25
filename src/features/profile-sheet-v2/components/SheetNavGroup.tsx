@@ -63,9 +63,9 @@ function Row({ label, onClick, trailing, isLast, subLabel, disabled }: RowProps)
       }}
     >
       <div style={{ minWidth: 0, flex: 1, paddingRight: 12 }}>
-        <div style={{ fontWeight: 700, fontSize: 14.5, color: A.INK }}>{label}</div>
+        <div style={{ fontWeight: 700, fontSize: 15, color: A.INK }}>{label}</div>
         {subLabel && (
-          <div style={{ fontWeight: 500, fontSize: 12.5, color: A.MUTE, marginTop: 2 }}>
+          <div style={{ fontWeight: 500, fontSize: 13, color: A.MUTE, marginTop: 2 }}>
             {subLabel}
           </div>
         )}
@@ -150,7 +150,7 @@ export default function SheetNavGroup({
           onClick={() => onNavigate('/admin/command-center')}
           isLast
           trailing={
-            <span style={{ ...LABEL, fontSize: 8.5, color: A.MUTE }}>Admin</span>
+            <span style={{ ...LABEL, fontSize: 11, color: A.MUTE }}>Admin</span>
           }
         />
       )}
