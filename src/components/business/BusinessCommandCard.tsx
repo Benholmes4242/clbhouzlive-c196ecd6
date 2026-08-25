@@ -401,10 +401,10 @@ export function BusinessCommandCard({
                       className="shrink-0 inline-flex items-center gap-0.5"
                       style={{
                         color: BIZ.ink,
-                        fontSize: 9,
+                        fontSize: 11,
                         fontWeight: 700,
                         textTransform: 'uppercase',
-                        letterSpacing: '0.08em',
+                        letterSpacing: '0.10em',
                       }}
                     >
                       {t('business.card.verify.action')}
@@ -451,10 +451,10 @@ export function BusinessCommandCard({
                   <div
                     style={{
                       color: BIZ.inkFaint,
-                      fontSize: 9,
+                      fontSize: 11,
                       fontWeight: 700,
                       textTransform: 'uppercase',
-                      letterSpacing: '0.08em',
+                      letterSpacing: '0.10em',
                       marginBottom: 2,
                     }}
                   >
@@ -540,10 +540,10 @@ function MetricCell({
       <span
         style={{
           color: BIZ.inkFaint,
-          fontSize: 8,
+          fontSize: 11,
           fontWeight: 700,
           textTransform: 'uppercase',
-          letterSpacing: '0.16em',
+          letterSpacing: '0.10em',
           lineHeight: 1,
         }}
       >
@@ -566,7 +566,8 @@ function MetricCell({
       <span
         style={{
           color: BIZ.inkFaint,
-          fontSize: 7.5,
+          // AXIS floor 10 exception: the window marker under a counter figure.
+          fontSize: 10,
           fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
