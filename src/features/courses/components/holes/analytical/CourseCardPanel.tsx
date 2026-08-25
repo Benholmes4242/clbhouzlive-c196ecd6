@@ -288,8 +288,11 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
    arrive composited ("Black - Himalayas") and 40px truncates them all to
    "BLAC...", which destroys the comparison the rows exist to make. The column
    takes the widest label in THIS list, capped, and every row shares it. */
+/* Cap raised 104 -> 132 by MICRO_BRIEF_COURSE_CARD_TEE_ROWS §4: at LABEL 11 the
+   old cap clipped plain labels too. The bar is the 1fr, so a wider label column
+   shortens the bar - which is the trade taken. */
 const TEE_LABEL_W_MIN = 40;
-const TEE_LABEL_W_MAX = 104;
+const TEE_LABEL_W_MAX = 132;
 const TEE_YARDS_W = 46;
 
 const TeeRow: React.FC<{
