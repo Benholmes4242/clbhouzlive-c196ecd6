@@ -349,6 +349,60 @@ export function DiscoverHero({
           >
             {row.display_name}
           </span>
+
+          {/* THE GROSS AT THE RIGHT OF THE NAME (BRIEF_HERO_GROSS_AND_REVERT §2).
+              The hero's 46px figure is the MOMENT; this is WHAT THE ROUND SCORED,
+              the same device the round cards below the fold run at the right of
+              their name row — 21/700 gross, 13/700 qualifier, baseline aligned.
+              TONE: figureColor, the ACHIEVEMENT's own colour, so green on THE RUN.
+              ABSENT IS ABSENT: a null gross renders nothing, not a dash.
+              §3 — ON COURSE RECORD the 46px figure ALREADY IS the gross, so only
+              the qualifier renders here; printing it twice on one card is noise. */}
+          {(() => {
+            const toPar = moment.facts.toPar;
+            const showGross = row.gross != null && !isGrossScore;
+            const showQual = toPar != null;
+            if (!showGross && !showQual) return null;
+            return (
+              <div
+                style={{
+                  flex: 'none',
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 6,
+                }}
+              >
+                {showGross && (
+                  <span
+                    className="tabular-nums"
+                    style={{
+                      fontSize: 21,
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      letterSpacing: '-0.03em',
+                      color: figureColor,
+                    }}
+                  >
+                    {row.gross}
+                  </span>
+                )}
+                {showQual && (
+                  <span
+                    className="tabular-nums"
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      letterSpacing: '-0.02em',
+                      color: figureColor,
+                    }}
+                  >
+                    {fmtRel(toPar as number)}
+                  </span>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         {/* ROW TWO — the course, then the region, across the full width. It
