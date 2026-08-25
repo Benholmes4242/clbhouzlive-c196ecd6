@@ -95,7 +95,7 @@ function MoveMark({
     alignItems: 'center',
     justifyContent: 'flex-end',
     gap: 2,
-    fontSize: 9,
+    fontSize: 11,
     fontVariantNumeric: 'tabular-nums lining-nums',
     marginRight: 7,
   };
@@ -219,7 +219,9 @@ function PlayerFacepile({ players, accent }: { players: MostPlayedPlayer[]; acce
             alignItems: 'center',
             justifyContent: 'center',
             color: DISCOVER_QUIET,
-            fontSize: 9,
+            /* AXIS-CLASS EXCEPTION: this figure is an avatar GLYPH bound by
+               FACE_SIZE (26) geometry, not text on the card. Floor 10. */
+            fontSize: 10,
             fontWeight: 800,
             lineHeight: 1,
             fontVariantNumeric: 'tabular-nums lining-nums',
@@ -445,7 +447,7 @@ function MemberBoard({
                 <span
                   style={{
                     display: 'block',
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: 500,
                     letterSpacing: '-0.005em',
                     lineHeight: 1.25,
@@ -521,7 +523,9 @@ function MemberBoard({
           }}
           style={{
             ...LABEL,
-            fontSize: 9,
+            /* CAPS ACTION at the 11px floor, tracking 0.10em. */
+            fontSize: 11,
+            letterSpacing: '0.10em',
             color: INK,
             border: 'none',
             background: 'transparent',
@@ -821,7 +825,7 @@ export function MostPlayedLeaderboard({
                           {bestPlayer.name}
                         </span>
                       </span>
-                      <span style={{ ...LABEL, display: 'block', marginTop: 4, fontSize: 8, letterSpacing: '0.14em', color: FAINT }}>
+                      <span style={{ ...LABEL, display: 'block', marginTop: 4, fontSize: 11, letterSpacing: '0.14em', color: FAINT }}>
                         {t('discover.mostPlayedLowLabel', 'LOWEST THIS WEEK', { count: r.players.length })}
                       </span>
                     </span>
@@ -830,7 +834,7 @@ export function MostPlayedLeaderboard({
                         <span style={{ ...NUMF, display: 'block', fontSize: 12.5, lineHeight: 1, color: DISCOVER_QUIET }}>
                           {formatToPar(r.avgToPar)}
                         </span>
-                        <span style={{ ...LABEL, display: 'block', marginTop: 4, fontSize: 7.5, letterSpacing: '0.14em', color: FAINT }}>
+                        <span style={{ ...LABEL, display: 'block', marginTop: 4, fontSize: 11, letterSpacing: '0.14em', color: FAINT }}>
                           {t('discover.mostPlayedField', 'FIELD')}
                         </span>
                       </span>
