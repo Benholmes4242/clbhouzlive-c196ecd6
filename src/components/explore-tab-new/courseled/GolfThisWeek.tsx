@@ -2120,7 +2120,10 @@ export function GolfThisWeek({
                           <div style={{ height: 1, background: WELL_RULE, margin: '12px 0 0' }} />
                           {tile.runners.map((r, i) => {
                             const figure = tile.figureOf(r);
-                            const showDeficit = tile.key === 'best' || tile.key === 'improved';
+                            /* BRIEF_HERO_ROW_AND_DEFICIT §2 — the improved tile
+                               drops the grey deficit: two negative numbers on one
+                               row, in two colours, measuring different things. */
+                            const showDeficit = tile.key === 'best';
                             return (
                               <div
                                 key={r.round_id}
