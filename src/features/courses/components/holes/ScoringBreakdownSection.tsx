@@ -47,6 +47,8 @@ import { BAND_AMBER, BAND_GREEN_DARK, BAND_RED_DARK } from '@/features/courses/_
  */
 const OVER = BAND_RED_DARK;
 const UNDER = BAND_GREEN_DARK;
+/* BRIEF_PAR_BARS_TO_PAR_SCALE: A.TRACK's neighbour - the level-with-par tone. */
+const LEVEL_GREY = 'rgba(248,250,252,0.34)';
 
 /** The coaching line. Caption weight - it advises, it does not narrate. */
 const CAPTION: React.CSSProperties = {
@@ -931,8 +933,8 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               const margin = p.covered ? p.field - p.you : null;
               return (
                 <div key={p.par} style={{ display: 'grid', gridTemplateColumns: '66px 1fr 44px 52px', gap: 9, alignItems: 'center' }}>
-                  <span style={LABEL}>
-                    {t('courses:holes.scoringBreakdown.parLabel', { n: p.par })}
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK }}>
+                    {t('courses:courseDetail.parTypes.parNPlural', { n: p.par })}
                   </span>
                   <span style={{ display: 'block', position: 'relative', height: 7, borderRadius: 3.5, background: A.TRACK }}>
                     <span
@@ -941,7 +943,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                         height: 7,
                         borderRadius: 3.5,
                         width: `${barW}%`,
-                        background: difficultyRampColor(parTint(p)),
+                        background: toneForPar(rateOf(p)),
                       }}
                     />
                     {tickW != null && (

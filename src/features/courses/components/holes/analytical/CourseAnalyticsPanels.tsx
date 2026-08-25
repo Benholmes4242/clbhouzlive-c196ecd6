@@ -402,9 +402,22 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
     ...rows.map((r) => (r.you == null ? 0 : r.you)),
   );
 
-  const fMin = Math.min(...rows.map((r) => r.field));
-  const fMax = Math.max(...rows.map((r) => r.field));
-  const fSpan = Math.max(0.01, fMax - fMin);
+  /* BRIEF_PAR_BARS_TO_PAR_SCALE: colour states how the FIELD plays this par
+     type against par - green under, neutral grey level, ramped red over the
+     over-par values only. Rounded FIRST so -0.04, which prints "0.0", reads
+     level. 0.06 / 0.94 are the app's canonical tint span; 0.75 is the deliberate
+     single-value fallback - clearly red without claiming the worst stop. */
+  const overs = rows.map((r) => Math.round(r.field * 10) / 10).filter((v) => v > 0);
+  const oMin = overs.length ? Math.min(...overs) : 0;
+  const oMax = overs.length ? Math.max(...overs) : 0;
+  const oSpan = oMax - oMin;
+  const overTint = (v: number) => (oSpan > 0 ? 0.06 + 0.94 * ((v - oMin) / oSpan) : 0.75);
+  const toneForPar = (v: number): string => {
+    const r = Math.round(v * 10) / 10;
+    if (r < 0) return BAND_GREEN_DARK;
+    if (r === 0) return 'rgba(248,250,252,0.34)';
+    return difficultyRampColor(overTint(r));
+  };
   const anyYou = rows.some((r) => r.you != null);
 
   return (
@@ -448,7 +461,7 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
                     inset: 0,
                     width: `${Math.max(2, Math.min(100, (Math.max(0, r.field) / domain) * 100))}%`,
                     borderRadius: 4,
-                    background: difficultyRampColor((r.field - fMin) / fSpan),
+                    background: toneForPar(r.field),
                     display: 'block',
                   }}
                 />
