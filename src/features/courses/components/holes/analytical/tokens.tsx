@@ -24,7 +24,7 @@
  */
 
 import React from 'react';
-import { TOPAR_UNDER_DARK, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 
 /**
