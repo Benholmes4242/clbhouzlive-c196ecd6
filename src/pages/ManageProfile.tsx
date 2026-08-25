@@ -299,28 +299,32 @@ export default function ManageProfile() {
 
   return (
     <PageRoot hasBottomNav={!isNewUser.current} className="md:!max-w-[440px]" style={{ background: SLATE_BG } as React.CSSProperties}>
-      <div className="min-h-screen flex flex-col w-full" style={{ background: SLATE_BG }}>
+      <div
+        className="min-h-screen flex flex-col w-full"
+        style={{
+          background: SLATE_BG,
+          marginTop: 'calc(-1 * var(--sat, env(safe-area-inset-top, 0px)))',
+        }}
+      >
 
-        {/* Sticky Header (Direction A) + Tab bar
-            STICKY STICKS TO THE SCROLLPORT, NOT TO .app-shell's padding.
-            With `top: 0` the title row rode up under the notch on scroll and
-            the safe-area shield painted over it (the row simply vanished).
-            The page already starts at y = var(--sat) thanks to .app-shell's
-            padding-top, so pinning at var(--sat) holds the row exactly where
-            it renders unscrolled — no gap, no double inset. */}
+        {/* Sticky Header (Direction A) + Tab bar. The header owns the safe-area
+            band and stays opaque, so the first card cannot scroll beneath it. */}
         <div
-          className="sticky z-30"
+          className="sticky"
           style={{
-            top: 'var(--sat, env(safe-area-inset-top, 0px))',
-            background: 'var(--glass-bg)',
-            backdropFilter: 'saturate(180%) blur(var(--glass-blur))',
-            WebkitBackdropFilter: 'saturate(180%) blur(var(--glass-blur))',
+            top: 0,
+            background: SLATE_BG,
+            zIndex: 60,
           }}
         >
 
           <div
             className="flex items-center justify-between px-4 pb-3"
-            style={{ paddingTop: 8, minHeight: 56 }}
+            style={{
+              paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 8px)',
+              minHeight: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 56px)',
+              boxSizing: 'border-box',
+            }}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               {!isNewUser.current && (

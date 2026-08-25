@@ -47,22 +47,34 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle, fi
 
   return (
     <PageRoot hasBottomNav={false} className="md:!max-w-[440px]" style={{ background: bg } as any}>
-      <div className="min-h-screen flex flex-col w-full" style={{ background: bg }}>
-        {/* Sticky sticks to the SCROLLPORT, not to .app-shell's safe-area
-            padding — `top: 0` let the title row slide under the notch on
-            scroll, where the safe-area shield painted over it. Pin at --sat. */}
+      <div
+        className="min-h-screen flex flex-col w-full"
+        style={{
+          background: bg,
+          marginTop: 'calc(-1 * var(--sat, env(safe-area-inset-top, 0px)))',
+        }}
+      >
+        {/* Header owns the safe-area band itself. It is opaque and remains in
+            normal flow, so page content starts after the full header instead
+            of sliding beneath the title/filter section. */}
         <div
-          className="sticky z-30"
+          className="sticky"
           style={{
-            top: 'var(--sat, env(safe-area-inset-top, 0px))',
+            top: 0,
             background: bg,
             borderBottom: `1px solid ${rule}`,
+            zIndex: 60,
           }}
         >
 
           <div
             className="flex items-center justify-between px-4"
-            style={{ paddingTop: 8, paddingBottom: belowTitle ? 8 : 12, minHeight: 56 }}
+            style={{
+              paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 8px)',
+              paddingBottom: belowTitle ? 8 : 12,
+              minHeight: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 56px)',
+              boxSizing: 'border-box',
+            }}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <button

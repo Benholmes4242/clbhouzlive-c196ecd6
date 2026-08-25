@@ -148,6 +148,17 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/i/' },                     spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/rate-course-v2/' },        spec: { chrome: 'none', tone: 'light', bleed: false } },
 
+  // Managed business subpages are page-owned. This must sit BEFORE the live
+  // business profile predicate below, otherwise /business/:id/course is treated
+  // as an immersive live profile and the floating island overlaps the shell.
+  {
+    match: {
+      test: (p) =>
+        /^\/business\/[^/]+\/(verification|edit|insights|team|activity|course|reviews)(\/.*)?$/.test(p),
+    },
+    spec: { chrome: 'none', tone: 'light', bleed: false, note: 'managed business subpages - shell owns chrome' },
+  },
+
   // Business profile: /business/:idOrSlug (exactly 3 segments, third segment
   // not a reserved static route) — ISLAND (H3), no back button (bottom nav is
   // the way out). Managed sub-pages (edit/verification/etc.) remain
@@ -162,16 +173,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     },
   },
 
-  // Business social lists (F3): ISLAND, padded. Declared BEFORE the managed-subpage rule.
+  // Business social lists (F3): ISLAND, padded.
   { match: { test: (p) => /^\/business\/[^/]+\/(followers|following)$/.test(p) },
     spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/clubhouse' }, tone: 'light', bleed: false, note: 'business social lists (F3)' } },
-  {
-    match: {
-      test: (p) =>
-        /^\/business\/[^/]+\/(verification|edit|insights|team|activity|reviews)(\/.*)?$/.test(p),
-    },
-    spec: { chrome: 'none', tone: 'light', bleed: false, note: 'managed business subpages - shell owns chrome' },
-  },
 
 
   // Course detail: /courses/:id (exactly 3 segments) — ISLAND (H3),
