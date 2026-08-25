@@ -78,7 +78,7 @@ export function AboutSection({ player }: AboutSectionProps) {
       <p
         style={{
           margin: '0 0 12px',
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 700,
           color: INK,
           letterSpacing: '0.16em',
@@ -92,10 +92,11 @@ export function AboutSection({ player }: AboutSectionProps) {
           <div key={f.label} style={{ minWidth: 0 }}>
             <div
               style={{
-                fontSize: 9,
+                // Field labels (AGE, TURNED PRO, HEIGHT, COLLEGE, RESIDENCE) — READ 11.
+                fontSize: 11,
                 fontWeight: 700,
                 color: INK_FAINT,
-                letterSpacing: '0.13em',
+                letterSpacing: '0.11em',
                 textTransform: 'uppercase',
                 marginBottom: 4,
               }}
