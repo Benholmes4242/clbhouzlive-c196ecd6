@@ -32,9 +32,11 @@ import { FIGS } from '@/lib/tokens/type';
 /* PLAYOFFS VIOLET. These were Tailwind violet-600 (#7C3AED), which is not the
    playoffs token. Pinned to the documented V4 playoffs identity and its DARK
    tint rather than imported, because V4 is still the LIGHT overview ramp until
-   BRIEF_TOUR_OVERVIEW_FULL_DARK Part B ships (V4.violetSoft is #EDEAF7 today, a
-   pastel that fails on dark). CONVERGE ON V4.violet / V4.violetSoft the moment
-   that brief lands. */
+   BRIEF_TOUR_OVERVIEW_FULL_DARK Part B shipped. THAT BRIEF HAS SINCE LANDED and
+   V4 now carries exactly these two values (V4.violet '#5E4DA8',
+   V4.violetSoft 'rgba(94,77,168,0.22)'), so these pins are no longer an interim —
+   they are duplicates. Converging them on V4 is a no-op in value and is left for
+   whoever next touches the playoffs identity. */
 const VIOLET = '#5E4DA8';
 const VIOLET_TINT = 'rgba(94,77,168,0.22)';
 
@@ -104,11 +106,17 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
               fontSize: 20,
               fontWeight: 200,
               lineHeight: 1,
-              // AMBER ON THIS PAGE MEANS THE ANCHOR ROW - the live event, else this
-              // week, else the next event up. There is no viewing member on a tour
-              // surface, so the app-wide "amber means you" rule does not apply here.
-              // This is the only amber figure on the schedule. Do not extend it.
-              color: isAnchor ? AMBER : INK,
+              // THE AMBER ANCHOR NUMERAL WAS REMOVED. It used to be
+              // `isAnchor ? AMBER : INK`: amber marked the anchor row — the live
+              // event, else this week, else the next event up. The argument for it
+              // was that the app-wide "amber means the viewing member" rule has no
+              // force on a tour surface, where there is no viewing member. That
+              // held, but it is not why it failed: amber read as a HIGHLIGHT whose
+              // meaning no member could infer from the row itself. A colour that
+              // says "look here" and nothing more is noise. Do not reintroduce it.
+              // The anchor is still derived and still scrolled to (ScheduleTab) —
+              // it is simply no longer coloured.
+              color: INK,
               fontVariantNumeric: 'tabular-nums lining-nums',
               letterSpacing: '-0.01em',
             }}
