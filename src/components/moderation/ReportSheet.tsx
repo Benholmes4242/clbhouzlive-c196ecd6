@@ -98,13 +98,13 @@ export function ReportSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85dvh] overflow-y-auto">
-        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '8px auto 0' }} />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.22)', margin: '8px auto 0' }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE}` }}>
           <SectionHeader tier="standard" kicker={`Report ${typeLabel}`} tone="danger" />
         </div>
 
         <div className="space-y-4">
-          <p className="text-sm text-[#8E8E93] text-center">
+          <p className="text-sm text-center" style={{ color: A.MUTE }}>
             Why are you reporting this {reportType}?
           </p>
 
