@@ -70,7 +70,9 @@ export function EventInfoSection({ meta, broadcast }: Props) {
                 width: 104, flexShrink: 0,
                 // READ 11: a field label naming the sentence beside it.
                 fontSize: 11, fontWeight: 700, color: INK_FAINT,
-                letterSpacing: '0.14em', textTransform: 'uppercase',
+                // 0.10em, not 0.14em: PAR / YARDAGE measures 105.6px at 0.14em and
+                // wraps in the 104px label column; 0.10em brings it to 99.9px.
+                letterSpacing: '0.10em', textTransform: 'uppercase',
               }}
             >
               {label}
