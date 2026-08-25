@@ -939,7 +939,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           <button
             type="button"
             onClick={() => onLensChange('played')}
-            className="w-full mt-4 h-11 rounded-xl text-[14px] font-bold"
+            className="w-full mt-4 h-11 rounded-xl text-[12px] font-bold uppercase tracking-[0.10em]"
             style={{ background: INK, color: '#15171F' }}
           >
             {country
@@ -951,7 +951,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             <button
               type="button"
               onClick={() => openDirectory(country, 'empty_state')}
-              className="w-full mt-2 h-11 rounded-xl text-[14px] font-semibold"
+              className="w-full mt-2 h-11 rounded-xl text-[12px] font-bold uppercase tracking-[0.10em]"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
               {t('statBrowse.empty.browse', { country })}
@@ -990,7 +990,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                 });
                 navigate('/handicap');
               }}
-              className="w-full mt-4 h-11 rounded-xl text-white text-[14px] font-bold"
+              className="w-full mt-4 h-11 rounded-xl text-white text-[12px] font-bold uppercase tracking-[0.10em]"
               style={{ background: AMBER }}
             >
               {t('statBrowse.empty.connect')}
@@ -998,7 +998,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             <button
               type="button"
               onClick={() => openDirectory(country, 'empty_state')}
-              className="w-full mt-2 h-11 rounded-xl text-[14px] font-semibold"
+              className="w-full mt-2 h-11 rounded-xl text-[12px] font-bold uppercase tracking-[0.10em]"
               style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
             >
               {t('statBrowse.empty.browse', { country })}
@@ -1151,7 +1151,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           <button
             type="button"
             onClick={() => openDirectory(null, 'footer')}
-            className="w-full mt-3 h-11 rounded-xl text-[13.5px] font-semibold"
+            className="w-full mt-3 h-11 rounded-xl text-[11.5px] font-bold uppercase tracking-[0.10em]"
             style={{ background: SLATE_50, border: `1px solid ${HAIRLINE_INK_10}`, color: INK }}
           >
             {t('statBrowse.directory.cta')}
