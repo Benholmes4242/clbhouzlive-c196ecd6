@@ -68,7 +68,8 @@ export function EventInfoSection({ meta, broadcast }: Props) {
             <div
               style={{
                 width: 104, flexShrink: 0,
-                fontSize: 9, fontWeight: 700, color: INK_FAINT,
+                // READ 11: a field label naming the sentence beside it.
+                fontSize: 11, fontWeight: 700, color: INK_FAINT,
                 letterSpacing: '0.14em', textTransform: 'uppercase',
               }}
             >

@@ -83,7 +83,9 @@ function Figure({ value, label, tone }: { value: string; label: string; tone?: s
       <div
         style={{
           marginTop: 5,
-          fontSize: 8.5,
+          // AXIS 10 (hero exception): stat-band column label over photography,
+          // where tracked caps read larger than their point size.
+          fontSize: 10,
           fontWeight: 700,
           letterSpacing: '0.14em',
           color: 'rgba(255,255,255,0.62)',
@@ -143,7 +145,8 @@ function PersonLockup({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 5,
-            fontSize: 9.5,
+            // AXIS 10 (hero exception): band label / marker, not a sentence.
+            fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.12em',
             color: labelTone ?? 'rgba(255,255,255,0.62)',
@@ -401,7 +404,8 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
             borderRadius: 4,
             background: chip.bg,
             border: `1px solid ${chip.border}`,
-            fontSize: 9.5,
+            // AXIS 10 (hero exception): status marker chip.
+            fontSize: 10,
             fontWeight: 700,
             color: chip.color,
             letterSpacing: '0.10em',

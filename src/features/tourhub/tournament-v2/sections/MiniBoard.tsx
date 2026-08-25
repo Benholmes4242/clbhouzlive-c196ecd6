@@ -121,6 +121,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             display: 'flex', alignItems: 'center',
             padding: '8px 16px',
             borderBottom: `0.5px solid ${T.hairline}`,
+            // AXIS 10: column headers (POS / PLAYER / THRU / TODAY / TOT).
             fontSize: 10, fontWeight: 700, letterSpacing: '0.10em',
             color: T.faint, textTransform: 'uppercase',
           }}

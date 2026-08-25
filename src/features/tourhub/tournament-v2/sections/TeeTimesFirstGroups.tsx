@@ -71,7 +71,8 @@ export function TeeTimesFirstGroups({ groups, limit, entries, onPlayerTap }: Pro
             <div
               style={{
                 marginTop: 5,
-                fontSize: 9,
+                // AXIS 10: TEE marker under the CONTENT tee time.
+                fontSize: 10,
                 fontWeight: 700,
                 letterSpacing: '0.13em',
                 textTransform: 'uppercase',

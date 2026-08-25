@@ -112,6 +112,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
                 gridTemplateColumns: boardGridTemplate(cols),
                 alignItems: 'center',
                 padding: '8px 16px',
+                // AXIS 10: column headers, shared grid with BoardTable.
                 fontSize: 10, fontWeight: 700, color: INK_FAINT,
                 letterSpacing: '0.10em', textTransform: 'uppercase',
                 background: A.PANEL, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,

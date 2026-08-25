@@ -149,7 +149,8 @@ export function TournamentPage() {
           padding: '32px 20px', textAlign: 'center',
         }}>
           <div style={{ maxWidth: 320 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: INK_FAINT, marginBottom: 10 }}>
+            {/* READ 11: error eyebrow is a sentence in caps, not a coordinate. */}
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: INK_FAINT, marginBottom: 10 }}>
               {t('tournament.error.title')}
             </div>
             <div style={{ fontSize: 13, fontWeight: 500, color: INK_MUTE, lineHeight: 1.55, marginBottom: 18 }}>
