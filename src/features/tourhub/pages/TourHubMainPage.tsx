@@ -17,6 +17,7 @@ import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerShee
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { scrollPageToTop } from '@/lib/getScrollParent';
+import { safeGoBack } from '@/utils/navigation';
 
 import { useLogout } from '@/hooks/useLogout';
 
@@ -96,8 +97,16 @@ export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const backMode =
-    (location.state as { from?: string } | null)?.from === 'tournament' && location.key !== 'default';
+  /* BACK vs BURGER. The left capsule is a page-owned slot (useSetChromeLeftSlot),
+     so the registry's `left: { kind: 'logo' }` for /tour and /tourhub never
+     reaches the screen — this predicate is the real control.
+     A member who navigated TO the hub (bottom nav, which tags state.from='nav')
+     or who deep-linked straight in (location.key === 'default', no history to
+     return to) gets the burger. A member who arrived AT it from a tournament
+     card, a share or any other in-app link gets a back chevron, because
+     otherwise the hub strands them. */
+  const navState = (location.state as { from?: string } | null)?.from;
+  const backMode = location.key !== 'default' && navState !== 'nav';
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
 
@@ -184,7 +193,7 @@ export function TourHubMainPage() {
           onProfile={() => navigate('/profile')}
           onSignOut={() => { void logout(); }}
           backMode={backMode}
-          onBack={() => navigate(-1)}
+          onBack={() => safeGoBack(navigate, '/tourhub')}
         />
         {/* Glass plate: mounted for every non-overview tab. Overview keeps
             its own cinematic hero overlay chrome. Height 70 matches tour
