@@ -16,7 +16,10 @@ import { haptic } from '@/utils/haptics';
 import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-const HAIRLINE_INK_7 = 'rgba(15,23,42,0.07)';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
+/** White-alpha hairline. Named for what it is, not for the ink it replaced. */
+const HAIRLINE = A.BORDER;
 
 interface ReportSheetProps {
   open: boolean;
@@ -95,13 +98,13 @@ export function ReportSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85dvh] overflow-y-auto">
-        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(15,23,42,0.12)', margin: '8px auto 0' }} />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_7}` }}>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.22)', margin: '8px auto 0' }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE}` }}>
           <SectionHeader tier="standard" kicker={`Report ${typeLabel}`} tone="danger" />
         </div>
 
         <div className="space-y-4">
-          <p className="text-sm text-[#8E8E93] text-center">
+          <p className="text-sm text-center" style={{ color: A.MUTE }}>
             Why are you reporting this {reportType}?
           </p>
 
@@ -120,10 +123,12 @@ export function ReportSheet({
                     ? "border-border/[0.02] hover:border-border/[0.04]"
                     : "border-border/[0.02] hover:border-border/[0.04]"
                 )}
-                style={selectedReason === reason.id ? { borderColor: '#F7931E', background: 'rgba(247,147,30,0.05)' } : undefined}
+                /* 16% wash, not 5%: the light-tuned 5% has no presence on the
+                   dark sheet. Matches BIZ.amberTint. */
+                style={selectedReason === reason.id ? { borderColor: '#F7931E', background: 'rgba(247,147,30,0.16)' } : undefined}
               >
                 <span className="text-xl">{reason.icon}</span>
-                <span className="font-medium" style={{ color: '#1D1D1F' }}>{reason.label}</span>
+                <span className="font-medium" style={{ color: A.INK }}>{reason.label}</span>
                 {selectedReason === reason.id && (
                    <div className="ml-auto w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#F7931E' }}>
                     <span className="text-white text-xs">✓</span>
@@ -136,7 +141,7 @@ export function ReportSheet({
           {/* Details textarea (show for "other" or always) */}
           {selectedReason && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#8E8E93]">
+              <label className="text-sm font-medium" style={{ color: A.MUTE }}>
                 Additional details {selectedReason !== 'other' && '(optional)'}
               </label>
               <Textarea
