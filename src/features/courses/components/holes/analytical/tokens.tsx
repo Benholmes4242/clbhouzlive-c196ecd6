@@ -187,16 +187,20 @@ export const NUM: React.CSSProperties = {
   ...FIGS,
 };
 
+/**
+ * READ. Floor 11. Repointed 9 -> 11 by BRIEF_ANALYTICAL_SCALE_REPOINT (Part B).
+ */
 export const LABEL: React.CSSProperties = {
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
   color: A.DIM,
 };
 
+/** READ. Floor 11. Repointed 10 -> 11 by BRIEF_ANALYTICAL_SCALE_REPOINT (Part B). */
 export const KICKER: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -204,8 +208,9 @@ export const KICKER: React.CSSProperties = {
 };
 
 /** Quiet sentence-case caption. Not a figure and not a column label. */
+/** READ. Repointed 10.5 -> 12 by BRIEF_ANALYTICAL_SCALE_REPOINT (Part B). */
 export const CAPTION: React.CSSProperties = {
-  fontSize: 10.5,
+  fontSize: 12,
   fontWeight: 600,
   letterSpacing: '0.01em',
   color: A.MUTE,
@@ -216,6 +221,25 @@ export const Hairline: React.FC<{ style?: React.CSSProperties }> = ({ style }) =
   <div style={{ height: 1, background: A.HAIRLINE, ...style }} />
 );
 
+/**
+ * TITLE — HELD AT 13 BY BRIEF_ANALYTICAL_SCALE_REPOINT (Part B). DO NOT REPOINT.
+ *
+ * ITS NAME AND ITS ROLE HAVE DIVERGED. This is a ROLE collision, not merely a
+ * name-and-size one:
+ *   - It has NO external consumers. It is read only inside this file, by Panel
+ *     (see the `title && !kicker` branch), so a grep for the name finds nothing.
+ *   - EVERY live callsite passes an UPPERCASE string — "COUNTING STATS",
+ *     "MILESTONES", "COURSE CROWNS", "STREAKS", "THRESHOLDS" — most of them in
+ *     the trophy room, which has never had a type brief.
+ *   - It therefore functions as a PANEL KICKER, not as a heading.
+ *
+ * Repointing 13 -> 16 with the rest of the READ bucket would have enlarged
+ * fifteen-plus uppercase panel kickers on un-audited surfaces. It was
+ * deliberately held for that reason.
+ *
+ * The rename stays deferred. Whoever takes it picks one of two: give Panel a
+ * real sentence-cased heading path, or rename this token PANEL_LABEL.
+ */
 export const TITLE: React.CSSProperties = { fontSize: 13, fontWeight: 700, color: A.INK };
 
 export interface ToParParts { text: string; tone: string }
