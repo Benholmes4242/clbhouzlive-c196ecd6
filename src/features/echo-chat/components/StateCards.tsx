@@ -111,7 +111,7 @@ export const EntryPanel: React.FC<{
           className="ec-glass active:opacity-70"
           style={{ padding: '13px 16px', borderRadius: 14, textAlign: 'left' }}
         >
-          <div style={{ ...T.LABEL, fontSize: 8.5 }}>{ex.kind}</div>
+          <div style={T.LABEL}>{ex.kind}</div>
           <div style={{ fontSize: 14.5, color: EC.INK, marginTop: 5, lineHeight: 1.35 }}>
             {ex.question}
           </div>

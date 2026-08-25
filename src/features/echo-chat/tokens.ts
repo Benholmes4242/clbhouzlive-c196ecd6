@@ -43,22 +43,35 @@ export const EC = {
 
 const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums' };
 
-/** Nothing at weight 800. Nothing below 8.5px. */
+/**
+ * MICRO_BRIEF_ECHO_TYPE_SCALE — THE FLOOR MOVED.
+ *
+ * Nothing at weight 800. NOTHING BELOW 10px, and 10 only where the type labels
+ * a coordinate. The old "nothing below 8.5px" is retired: it sat under the app
+ * floor and this scale is contained to Echo (eight importers, all in-tree), so
+ * it repoints without touching anything outside the feature.
+ *
+ * MICRO is the AXIS tier at 10 — chart ticks, hole numerals, the basis note.
+ * LABEL is the READ tier at 11 — section and basis LANGUAGE. A floor is a
+ * minimum, never a target: BODY/ASKED (15), DISPLAY (27) and FIG (13.5) hold.
+ */
 export const T = {
   /** Section / basis label. */
   LABEL: {
-    fontSize: 9,
+    // READ 11 — this tier carries language.
+    fontSize: 11,
     fontWeight: 700,
-    letterSpacing: '0.16em',
+    letterSpacing: '0.12em',
     textTransform: 'uppercase',
     color: EC.INK_3,
   } as React.CSSProperties,
 
-  /** Smallest label used — the floor. */
+  /** AXIS tier — coordinates only (ticks, hole numerals, basis notes). */
   MICRO: {
-    fontSize: 8.5,
+    // AXIS 10 exception: never language. Language takes LABEL (11).
+    fontSize: 10,
     fontWeight: 700,
-    letterSpacing: '0.16em',
+    letterSpacing: '0.12em',
     textTransform: 'uppercase',
     color: EC.INK_3,
     ...FIGS,

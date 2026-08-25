@@ -408,7 +408,8 @@ const EchoHistoryPage: React.FC = () => {
                 </span>
                 <span
                   style={{
-                    fontSize: 12.5,
+                    // Prose: body tier.
+                    fontSize: 14,
                     color: SUB,
                     lineHeight: 1.5,
                     maxWidth: 260,
@@ -425,9 +426,10 @@ const EchoHistoryPage: React.FC = () => {
                   <li
                     style={{
                       padding: '16px 14px 7px',
-                      fontSize: 9,
+                      // READ 11 floor (TODAY / EARLIER date group header).
+                      fontSize: 11,
                       fontWeight: 700,
-                      letterSpacing: '0.16em',
+                      letterSpacing: '0.12em',
                       textTransform: 'uppercase',
                       color: SUB,
                     }}
@@ -587,7 +589,7 @@ const EchoHistoryPage: React.FC = () => {
                       })
                     : t('history.delete.one.title', { defaultValue: 'Delete this chat?' })}
                 </span>
-                <span style={{ fontSize: 13, color: SUB, lineHeight: 1.45 }}>
+                <span style={{ fontSize: 14, color: SUB, lineHeight: 1.45 }}>
                   {t('history.delete.one.body', { defaultValue: "This can't be undone." })}
                 </span>
                 <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
@@ -679,7 +681,9 @@ const ChatRow: React.FC<{
           {chat.pinned ? <Pin size={12} color={PIN} style={{ flexShrink: 0 }} /> : null}
           <span
             style={{
-              fontSize: 14,
+              // The row's headline: the title tier (15), matching this page's
+              // other headlines. One line, ellipsised — it cannot wrap.
+              fontSize: 15,
               fontWeight: 600,
               color: INK,
               whiteSpace: 'nowrap',

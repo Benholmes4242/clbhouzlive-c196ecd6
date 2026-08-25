@@ -53,7 +53,7 @@ export const HolesBar: React.FC<{
               style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
             >
               {mine && (
-                <span style={{ ...T.FIG, fontSize: 9.5 }}>
+                <span style={{ ...T.FIG, fontSize: 10 }}>
                   {h.avgToPar > 0 ? '+' : h.avgToPar < 0 ? '\u2212' : ''}
                   {Math.abs(h.avgToPar).toFixed(1)}
                 </span>
