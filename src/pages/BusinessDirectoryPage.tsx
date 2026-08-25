@@ -64,12 +64,16 @@ const BusinessDirectoryPage = () => {
   return (
     <PageRoot className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
+      <div
+        className="sticky z-10 bg-background/95 backdrop-blur-sm border-b"
+        style={{ top: 'var(--sat, env(safe-area-inset-top, 0px))' }}
+      >
         <div className="mx-auto max-w-5xl px-4 py-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
               className="p-2 -ml-2 hover:bg-muted rounded-sq-sm transition-colors"
+              aria-label="Back"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>

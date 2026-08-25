@@ -463,8 +463,14 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           >
             <div className="h-full overflow-hidden flex flex-col relative">
               {/* Header with title and close button */}
-              <div className="sticky top-0 z-10 bg-background border-b border-border/10 md:rounded-none">
-                <div className="flex items-center justify-between px-4 sm:px-6 py-4">
+              <div
+                className="sticky z-10 bg-background border-b border-border/10 md:rounded-none"
+                style={{ top: 'var(--sat, env(safe-area-inset-top, 0px))' }}
+              >
+                <div
+                  className="flex items-center justify-between px-4 sm:px-6 pb-4"
+                  style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)' }}
+                >
                   <h2 style={TITLE}>
                     {regionName}
                   </h2>
