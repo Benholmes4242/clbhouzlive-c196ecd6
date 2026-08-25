@@ -56,7 +56,7 @@ export function MostPlayedSheet({ open, onClose, rows, onRowPress, onPlayerPress
             color: A.INK,
           }}
         >
-          {t('discover.mostPlayed', 'Courses played in the last 14 days')}
+          {t('discover.mostPlayed', 'Courses played · 14 days')}
         </div>
       </div>
 

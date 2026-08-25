@@ -208,8 +208,19 @@ function PlayerFacepile({ players, accent }: { players: MostPlayedPlayer[]; acce
         <span
           style={{
             position: 'relative',
-            zIndex: 0,
+            /* THE CHIP SITS ABOVE EVERY AVATAR (MICRO_BRIEF_MOST_PLAYED_HEADER_AND_FACEPILE §2).
+               Avatars descend from visible.length down to 1, so anything lower
+               than that — zIndex 0, as this was — is painted UNDER the avatar
+               before it, and FACE_OVERLAP (-7) then eats 7px of the chip's 26px.
+               The chip is a COUNT and must be readable whole; an avatar is
+               decorative and already overlaps its neighbour, so the overlap must
+               cut into the avatar, not into the figure. Hence the top of the
+               stack, and its A.PANEL cut-out ring now scores the avatar beneath
+               it — the same separation the pile uses throughout, cutting the
+               other way. */
+            zIndex: visible.length + 2,
             width: FACE_SIZE,
+
             height: FACE_SIZE,
             marginLeft: FACE_OVERLAP,
             borderRadius: '34%',
@@ -615,7 +626,7 @@ export function MostPlayedLeaderboard({
               was. Do not silently reverse this again.
               'discover.whereTheyPlayed' is now unused and STAYS in all six
               locale files, the treatment §S4.1 gave the key it replaced. */}
-          {t('discover.mostPlayed', 'Courses played in the last 14 days')}
+          {t('discover.mostPlayed', 'Courses played · 14 days')}
         </Eyebrow>
       )}
 
