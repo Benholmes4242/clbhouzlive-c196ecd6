@@ -33,7 +33,7 @@ import { CHART, CHART_FONT, indexTone } from '../charts';
 const MIN_ROUNDS = 20;
 const KICKER = {
   fontFamily: CHART_FONT,
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.19em',
   textTransform: 'uppercase' as const,
@@ -41,7 +41,7 @@ const KICKER = {
 };
 const LABEL = {
   fontFamily: CHART_FONT,
-  fontSize: 8,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,

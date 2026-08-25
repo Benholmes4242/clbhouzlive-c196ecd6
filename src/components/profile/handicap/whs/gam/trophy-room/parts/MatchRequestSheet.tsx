@@ -201,7 +201,7 @@ export function MatchRequestSheet({ courseId, courseName, onClose }: Props) {
               <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
               <div
                 style={{
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.18em',
                   color: 'rgba(255,255,255,0.45)',

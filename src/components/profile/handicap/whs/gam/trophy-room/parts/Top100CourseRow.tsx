@@ -155,7 +155,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
           }}
           style={{
             flexShrink: 0,
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 700,
             color: GAM.AMBER,
             padding: '4px 9px',
@@ -177,7 +177,7 @@ export const Top100CourseRow: React.FC<Props> = ({ row, isFriendView, onNavigate
           aria-label="You have also played here"
           style={{
             flexShrink: 0,
-            fontSize: 9,
+            fontSize: 11,
             fontWeight: 700,
             color: 'rgba(255,255,255,0.55)',
             letterSpacing: '0.10em',

@@ -11,9 +11,9 @@ import {
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
-/** Dark LABEL: 7.5/700/0.16em at T40. */
+/** Dark LABEL: READ 11 / 700 / 0.16em at T40. */
 const LABEL_STYLE: React.CSSProperties = {
-  fontSize: 7.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',

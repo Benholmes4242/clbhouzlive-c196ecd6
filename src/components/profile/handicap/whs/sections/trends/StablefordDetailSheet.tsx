@@ -25,7 +25,7 @@ const FONT = CHART_FONT;
 const LABEL: React.CSSProperties = {
   margin: 0,
   fontFamily: FONT,
-  fontSize: 9.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',

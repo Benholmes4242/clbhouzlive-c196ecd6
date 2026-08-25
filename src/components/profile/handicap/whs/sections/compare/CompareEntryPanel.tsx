@@ -33,7 +33,7 @@ import { useSharedRoundCounts } from '@/lib/whs/hooks';
 const PANEL_LIMIT = 3;
 
 const KICKER: React.CSSProperties = {
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.19em',
   textTransform: 'uppercase',
@@ -41,7 +41,7 @@ const KICKER: React.CSSProperties = {
 };
 
 const LABEL: React.CSSProperties = {
-  fontSize: 7.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',

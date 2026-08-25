@@ -572,7 +572,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                 padding: '12px 16px',
                 paddingBottom: 'calc(20px + env(safe-area-inset-bottom, 0px))',
                 textAlign: 'center',
-                fontSize: 10.5,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.08em',
                 color: INK_40,

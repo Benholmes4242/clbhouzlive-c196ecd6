@@ -57,7 +57,7 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
             }}
             holesLabel={(n) => t('whsConnect.rings.holes', { n })}
           />
-          <div style={{ ...LABEL_LG, fontSize: 8, color: DIM, marginTop: 22 }}>
+          <div style={{ ...LABEL_LG, fontSize: 11, color: DIM, marginTop: 22 }}>
             {t('whsConnect.rings.example', { rounds: EXAMPLE.rounds })}
           </div>
         </div>

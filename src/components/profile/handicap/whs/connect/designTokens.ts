@@ -36,7 +36,7 @@ export const NUM: React.CSSProperties = {
 };
 
 export const KICKER: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -44,7 +44,7 @@ export const KICKER: React.CSSProperties = {
 };
 
 export const LABEL: React.CSSProperties = {
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
@@ -131,7 +131,7 @@ export const LEAD: React.CSSProperties = {
 
 /** Stage eyebrow, one per screen, above the headline. */
 export const KICKER_LG: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.18em',
   textTransform: 'uppercase',
@@ -140,7 +140,7 @@ export const KICKER_LG: React.CSSProperties = {
 
 /** Names a value on the display surface. */
 export const LABEL_LG: React.CSSProperties = {
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.15em',
   textTransform: 'uppercase',

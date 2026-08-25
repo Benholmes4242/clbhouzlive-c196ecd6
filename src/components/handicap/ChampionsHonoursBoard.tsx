@@ -61,7 +61,7 @@ interface Props {
 const PHOTO_BAND_HEIGHT = 132;
 
 const FIG_LABEL: React.CSSProperties = {
-  fontSize: 8.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.10em',
   textTransform: 'uppercase',
@@ -175,7 +175,7 @@ const FigureLine: React.FC<{ figures?: HonoursFigures; onPhoto: boolean; labels:
     <div
       style={{
         ...FIGS,
-        fontSize: 10.5,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.04em',
         color: onPhoto ? 'rgba(255,255,255,0.82)' : A.MUTE,

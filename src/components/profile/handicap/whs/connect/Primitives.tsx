@@ -212,7 +212,7 @@ export const BackRow: React.FC<{
         }}
       >
         <ChevronLeft size={17} strokeWidth={2.4} color={INK} />
-        <span style={{ ...KICKER, fontSize: 9, color: INK }}>{title}</span>
+        <span style={{ ...KICKER, fontSize: 11, color: INK }}>{title}</span>
       </button>
     </div>
   );

@@ -37,7 +37,7 @@ interface BlockProps {
 const ExplainerBlock: React.FC<BlockProps> = ({ eyebrow, eyebrowColor, title, body }) => (
   <div>
     <div style={{
-      fontSize: 9, fontWeight: 700, color: eyebrowColor,
+      fontSize: 11, fontWeight: 700, color: eyebrowColor,
       letterSpacing: '0.16em', marginBottom: 4,
     }}>
       {eyebrow}

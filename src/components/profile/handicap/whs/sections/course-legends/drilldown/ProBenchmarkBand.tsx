@@ -104,7 +104,7 @@ export const ProBenchmarkBand: React.FC<Props> = ({ pro, value, sub, base }) => 
           </div>
           <span
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: 'var(--hcp-t-60)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',

@@ -50,9 +50,9 @@ const GAP_NAME_TO_DATE = 3;
 const GAP_DATE_TO_CLUB = 3;
 const GAP_FIGURE_TO_LABEL = 3;
 
-/** Dark LABEL, this surface's scale: 7/700/0.16em. */
+/** Dark LABEL, this surface: READ 11 / 700 / 0.16em. */
 const LABEL: React.CSSProperties = {
-  fontSize: 7,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',

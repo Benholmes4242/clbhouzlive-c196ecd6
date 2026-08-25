@@ -313,7 +313,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
                   >
                     {h.hole_no}
                   </span>
-                  <span style={{ ...LABEL_LG, fontSize: 7 }}>{`PAR ${h.par}`}</span>
+                  <span style={{ ...LABEL_LG, fontSize: 11 }}>{`PAR ${h.par}`}</span>
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
