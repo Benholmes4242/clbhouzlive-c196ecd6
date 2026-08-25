@@ -49,9 +49,6 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
   if (isLoading && rows.length === 0) {
     return (
       <SectionShell eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={() => navigate(tour ? `/tourhub?tab=schedule&tour=${tour}` : '/tourhub?tab=schedule')}>
-      <div style={{ padding: '0 16px 10px', fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-        {t('overview.comingUp.subline')}
-      </div>
 
         <div style={{ margin: '0 16px' }}>
           <V4Card style={{ overflow: 'hidden' }}>
@@ -83,9 +80,6 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
 
   return (
     <SectionShell eyebrow={t('overview.comingUp.eyebrow')} linkLabel={t('overview.comingUp.linkLabel')} onLinkClick={() => navigate(tour ? `/tourhub?tab=schedule&tour=${tour}` : '/tourhub?tab=schedule')}>
-      <div style={{ padding: '0 16px 10px', fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-        {t('overview.comingUp.subline')}
-      </div>
       <div style={{ margin: '0 16px' }}>
         <V4Card style={{ overflow: 'hidden' }}>
           <div
