@@ -288,8 +288,11 @@ const SlopeScale: React.FC<{ slope: number; rangeLabelStyle?: React.CSSPropertie
    arrive composited ("Black - Himalayas") and 40px truncates them all to
    "BLAC...", which destroys the comparison the rows exist to make. The column
    takes the widest label in THIS list, capped, and every row shares it. */
+/* Cap raised 104 -> 132 by MICRO_BRIEF_COURSE_CARD_TEE_ROWS §4: at LABEL 11 the
+   old cap clipped plain labels too. The bar is the 1fr, so a wider label column
+   shortens the bar - which is the trade taken. */
 const TEE_LABEL_W_MIN = 40;
-const TEE_LABEL_W_MAX = 104;
+const TEE_LABEL_W_MAX = 132;
 const TEE_YARDS_W = 46;
 
 const TeeRow: React.FC<{
@@ -322,8 +325,13 @@ const TeeRow: React.FC<{
       /* SELECTION IS STRUCTURAL, NOT CHROMATIC (§3.2): a leading ink rule and a
          faint neutral wash. NEVER opacity on the inactive rows - a control you
          cannot read is not a control (§3.3). */
+      /* §2/§3: the old 4% INK wash was a light-surface value and contributed
+         nothing on the dark card, so the rule carried selection alone and the
+         unselected rows announced nothing. EVERY ROW NOW SITS IN A RESTING WELL
+         - three faint wells read as a control group, three rows on bare card
+         read as a list. A fill is what makes something look tappable. */
       borderLeft: `2px solid ${on ? A.INK : 'transparent'}`,
-      background: on ? 'rgba(14,18,22,0.04)' : 'transparent',
+      background: on ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
       paddingLeft: 6,
       transition: 'background 160ms ease',
       ...FIGS,
@@ -411,14 +419,19 @@ const TeeList: React.FC<{
   if (tees.length < 2) return null;
   if (!showAll && !rows.some((r) => r.slope != null)) return null;
 
-  // ~5.4px per character at LABEL 8.5 uppercase with 0.13em tracking.
+  /* RE-MEASURED at LABEL 11 uppercase with 0.13em tracking (§4): the old 5.4 was
+     taken at LABEL 8.5 and under-measured every label. Measured widths are 8.0
+     (long composited) to 9.52 ("FORWARD") px per character, so 9.6 is the
+     worst-case rate and no plain label clips. */
   const labelW = Math.min(
     TEE_LABEL_W_MAX,
-    Math.max(TEE_LABEL_W_MIN, ...rows.map((r) => Math.ceil(r.tee.tee_label.length * 5.4) + 2)),
+    Math.max(TEE_LABEL_W_MIN, ...rows.map((r) => Math.ceil(r.tee.tee_label.length * 9.6) + 2)),
   );
 
   return (
-    <div style={{ marginTop: 14 }}>
+    /* 2px between the wells - without it the resting fills abut and read as one
+       block rather than three controls. */
+    <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 2 }}>
       {rows.map(({ tee, slope }) => (
         <TeeRow
           key={tee.tee_label}
