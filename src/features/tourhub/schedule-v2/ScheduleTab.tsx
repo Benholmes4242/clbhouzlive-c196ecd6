@@ -37,7 +37,7 @@ import {
 } from '../_shared/tokens';
 
 const KICKER: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -45,7 +45,7 @@ const KICKER: React.CSSProperties = {
 };
 
 const LABEL: React.CSSProperties = {
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
@@ -411,8 +411,11 @@ export function ScheduleTab() {
                 borderRadius: 999,
                 padding: '10px 20px',
                 fontFamily: FONT,
-                fontSize: 13.5,
+                // CAPS BUTTON: two points down from the 13 button base, 0.10em.
+                fontSize: 11.5,
                 fontWeight: 700,
+                letterSpacing: '0.10em',
+                textTransform: 'uppercase',
                 cursor: 'pointer',
               }}
             >
@@ -438,7 +441,8 @@ export function ScheduleTab() {
                       backdropFilter: 'blur(14px)',
                       WebkitBackdropFilter: 'blur(14px)',
                       padding: '14px 16px 6px',
-                      fontSize: 10.5,
+                      // READ 11: the month group heading is language.
+                      fontSize: 11,
                       fontWeight: 700,
                       letterSpacing: '0.14em',
                       color: INK_MUTE,
@@ -498,7 +502,7 @@ export function ScheduleTab() {
             fontFamily: FONT,
             fontSize: 11,
             fontWeight: 700,
-            letterSpacing: '0.08em',
+            letterSpacing: '0.10em',
             textTransform: 'uppercase',
             boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
             cursor: 'pointer',

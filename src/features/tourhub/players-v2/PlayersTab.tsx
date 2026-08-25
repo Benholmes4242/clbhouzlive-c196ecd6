@@ -344,6 +344,8 @@ export function PlayersTab() {
       >
         <span
           style={{
+            // AXIS 10: THE FIELD / RANKING header row - a column header, same
+            // call as the hero's TODAY/TOTAL/THRU.
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.16em',
@@ -369,7 +371,8 @@ export function PlayersTab() {
                   background: active ? INK : SURFACE,
                   color: active ? SLATE_50 : INK_MUTE,
                   fontFamily: 'inherit',
-                  fontSize: 10,
+                  // CAPS BUTTON: two points down from the 13 button base, 0.10em.
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.10em',
                   textTransform: 'uppercase',
@@ -403,7 +406,7 @@ export function PlayersTab() {
           <button
             type="button"
             onClick={() => refetchRanking()}
-            style={{ background: INK, color: SLATE_50, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer' }}
+            style={{ background: INK, color: SLATE_50, border: 'none', borderRadius: 999, padding: '10px 20px', fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', cursor: 'pointer' }}
           >
             {t('players.error.retry', { defaultValue: 'Retry' })}
           </button>
@@ -519,7 +522,7 @@ export function PlayersTab() {
       <div
         style={{
           padding: '16px 16px 0',
-          fontSize: 10.5,
+          fontSize: 11,
           fontWeight: 500,
           color: INK_MUTE,
           letterSpacing: '0.04em',

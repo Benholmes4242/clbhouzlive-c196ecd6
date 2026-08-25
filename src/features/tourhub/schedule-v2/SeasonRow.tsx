@@ -118,7 +118,8 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
           <span
             style={{
               marginTop: 4,
-              fontSize: 9,
+              // AXIS 10: the month abbreviation is a date coordinate, not language.
+              fontSize: 10,
               fontWeight: 700,
               letterSpacing: '0.14em',
               color: INK_MUTE,
@@ -145,7 +146,8 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
               <span
                 style={{
                   flex: 'none',
-                  fontSize: 9,
+                  // AXIS 10: tour code marker (PGA / DPWT), not a word.
+                  fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: '0.16em',
                   color: INK_MUTE,
@@ -266,7 +268,8 @@ const MajorChip: React.FC = () => {
     <span
       style={{
         flex: 'none',
-        fontSize: 9,
+        // AXIS 10: MAJOR is a marker on the row, not a sentence.
+        fontSize: 10,
         fontWeight: 700,
         letterSpacing: '0.16em',
         color: GOLD_DEEP,
@@ -289,7 +292,8 @@ const PlayoffChip: React.FC = () => {
     <span
       style={{
         flex: 'none',
-        fontSize: 9,
+        // AXIS 10: PLAYOFFS is a marker on the row, not a sentence.
+        fontSize: 10,
         fontWeight: 700,
         letterSpacing: '0.16em',
         color: VIOLET,
@@ -322,7 +326,8 @@ const LiveMark: React.FC = () => {
       <span
         style={{
           marginTop: 4,
-          fontSize: 9,
+          // READ 11: LIVE is a word a member reads.
+          fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.14em',
           color: LIVE_DOT,
@@ -358,7 +363,8 @@ const UpcomingRail: React.FC<{ daysAway: number; highlight: boolean }> = ({
       <span
         style={{
           marginTop: 3,
-          fontSize: 9,
+          // AXIS 10: the unit under the countdown figure.
+          fontSize: 10,
           fontWeight: 700,
           letterSpacing: '0.14em',
           color: INK_FAINT,
@@ -425,7 +431,8 @@ const ChampionStrip: React.FC<{
       <span
         style={{
           marginLeft: 'auto',
-          fontSize: 9,
+          // AXIS 10: CHAMPION is a marker on the strip.
+          fontSize: 10,
           fontWeight: 700,
           letterSpacing: '0.14em',
           color: GOLD_DEEP,
@@ -507,7 +514,8 @@ const DefendsStrip: React.FC<{ name: string; photoCandidates: string[] }> = ({
       <span
         style={{
           marginLeft: 'auto',
-          fontSize: 9,
+          // AXIS 10: DEFENDS is a marker on the strip.
+          fontSize: 10,
           fontWeight: 700,
           letterSpacing: '0.14em',
           color: INK_FAINT,
