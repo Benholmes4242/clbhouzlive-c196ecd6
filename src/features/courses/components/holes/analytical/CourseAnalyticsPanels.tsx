@@ -358,6 +358,8 @@ const ShapeChart: React.FC<{
               left: `${(cx(hardestIdx) / W) * 100}%`,
               top: Math.max(0, hardestTopY - 14),
               transform: 'translateX(-50%)',
+              /* AXIS, STATED EXCEPTION (floor 10): a figure pinned to a point
+                 on the curve, not a line of language. */
               fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '-0.025em',
@@ -376,6 +378,8 @@ const ShapeChart: React.FC<{
               left: `${(cx(easiestIdx) / W) * 100}%`,
               top: Math.max(0, easiestTopY - 14),
               transform: 'translateX(-50%)',
+              /* AXIS, STATED EXCEPTION (floor 10): a figure pinned to a point
+                 on the curve, not a line of language. */
               fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '-0.025em',
