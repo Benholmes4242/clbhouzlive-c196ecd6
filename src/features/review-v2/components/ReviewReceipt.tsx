@@ -140,7 +140,8 @@ export function ReviewReceipt({
         <div style={{ padding: '34px 20px 22px', textAlign: 'center' }}>
           <div
             style={{
-              fontSize: 10,
+              /* READ floor — a kicker is language. 10 -> 11. */
+              fontSize: 11,
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.14em',
@@ -164,7 +165,7 @@ export function ReviewReceipt({
           <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.015em', marginTop: 12 }}>
             {course.name}
           </div>
-          <div style={{ fontSize: 11.5, color: RV2.secondary, marginTop: 2 }}>
+          <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 2 }}>
             {regionLine(course)}
           </div>
         </div>
@@ -186,7 +187,7 @@ export function ReviewReceipt({
               const c = bandColor(v);
               return (
                 <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                  <span style={{ fontSize: 11.5, color: RV2.secondary, width: 62, flexShrink: 0 }}>
+                  <span style={{ fontSize: 12, color: RV2.secondary, width: 66, flexShrink: 0 }}>
                     {catLabels[key]}
                   </span>
                   <span
@@ -228,7 +229,7 @@ export function ReviewReceipt({
           {catAvg != null && (
             <div
               style={{
-                fontSize: 11.5,
+                fontSize: 12,
                 lineHeight: '17px',
                 color: RV2.secondary,
                 marginTop: 10,
@@ -263,7 +264,8 @@ export function ReviewReceipt({
             <div style={{ padding: '0 20px 22px' }}>
               <div
                 style={{
-                  fontSize: 10,
+                  /* READ floor. 10 -> 11. */
+                  fontSize: 11,
                   fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.14em',
@@ -285,7 +287,7 @@ export function ReviewReceipt({
                   if (row === 'a') {
                     return (
                       <div key="a" style={rowStyle(i)}>
-                        <div style={{ fontSize: 13, color: RV2.ink, lineHeight: 1.45 }}>
+                        <div style={{ fontSize: 14, color: RV2.ink, lineHeight: 1.45 }}>
                           <Trans
                             i18nKey="review.wizard.receipt.rowA"
                             ns="courses"
@@ -301,7 +303,7 @@ export function ReviewReceipt({
                           />
                         </div>
                         {showDelta && (
-                          <div style={{ fontSize: 11.5, color: RV2.secondary, marginTop: 4 }}>
+                          <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 4 }}>
                             {deltaAbove
                               ? t('review.wizard.receipt.rowADeltaAbove', { delta: delta!.toFixed(1) })
                               : t('review.wizard.receipt.rowADeltaBelow', { delta: delta!.toFixed(1) })}
@@ -328,7 +330,7 @@ export function ReviewReceipt({
                         key="c"
                         style={{ ...rowStyle(i), display: 'flex', alignItems: 'center', gap: 10 }}
                       >
-                        <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: RV2.ink }}>
+                        <div style={{ flex: 1, minWidth: 0, fontSize: 14, color: RV2.ink }}>
                           <Trans
                             i18nKey="review.wizard.receipt.rowC"
                             ns="courses"
@@ -341,7 +343,7 @@ export function ReviewReceipt({
                         </div>
                         <div
                           style={{
-                            fontSize: 11.5,
+                            fontSize: 12,
                             fontWeight: 700,
                             color: RV2.secondary,
                             flexShrink: 0,
@@ -359,7 +361,7 @@ export function ReviewReceipt({
                       key="d"
                       style={{ ...rowStyle(i), display: 'flex', alignItems: 'center', gap: 10 }}
                     >
-                      <div style={{ flex: 1, minWidth: 0, fontSize: 13, color: RV2.ink }}>
+                      <div style={{ flex: 1, minWidth: 0, fontSize: 14, color: RV2.ink }}>
                         <Trans
                           i18nKey="review.wizard.receipt.rowD"
                           ns="courses"
@@ -369,7 +371,7 @@ export function ReviewReceipt({
                       </div>
                       <div
                         style={{
-                          fontSize: 11.5,
+                          fontSize: 12,
                           fontWeight: 700,
                           color: RV2.secondary,
                           flexShrink: 0,
@@ -390,7 +392,8 @@ export function ReviewReceipt({
               <div style={{ padding: '0 20px 22px' }}>
                 <div
                   style={{
-                    fontSize: 10,
+                    /* READ floor — the unrated-courses kicker. 10 -> 11. */
+                    fontSize: 11,
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.14em',
@@ -428,7 +431,7 @@ export function ReviewReceipt({
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
-                        fontSize: 13.5,
+                        fontSize: 14,
                         fontWeight: 700,
                         color: RV2.ink,
                         whiteSpace: 'nowrap',
@@ -439,7 +442,7 @@ export function ReviewReceipt({
                       {receipt.next_course_name}
                     </div>
                     {receipt.next_played_at && (
-                      <div style={{ fontSize: 11.5, color: RV2.secondary }}>
+                      <div style={{ fontSize: 12, color: RV2.secondary }}>
                         {t('review.wizard.receipt.nextPlayed', {
                           date: formatPlayedDate(receipt.next_played_at),
                         })}
@@ -452,8 +455,11 @@ export function ReviewReceipt({
                       borderRadius: 999,
                       background: RV2.amberSoft,
                       color: RV2.amber,
-                      fontSize: 12,
+                      /* CAPS ACTION (§5) — two points down, floor 11. */
+                      fontSize: 11,
                       fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.10em',
                       flexShrink: 0,
                     }}
                   >
@@ -492,8 +498,11 @@ export function ReviewReceipt({
                 border: 'none',
                 background: RV2.ink,
                 color: RV2.canvas,
-                fontSize: 14,
+                /* CAPS ACTION (§5) — two points down, height unchanged. */
+                fontSize: 12,
                 fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.10em',
                 cursor: 'pointer',
               }}
             >
@@ -516,8 +525,11 @@ export function ReviewReceipt({
                 border: 'none',
                 background: 'transparent',
                 color: RV2.secondary,
-                fontSize: 13,
+                /* CAPS ACTION (§5) — two points down, floor 11. */
+                fontSize: 11,
                 fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.10em',
                 cursor: 'pointer',
               }}
             >
@@ -541,8 +553,11 @@ export function ReviewReceipt({
               border: 'none',
               background: RV2.ink,
               color: RV2.canvas,
-              fontSize: 14,
+              /* CAPS ACTION (§5) — two points down, height unchanged. */
+              fontSize: 12,
               fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.10em',
               cursor: 'pointer',
             }}
           >

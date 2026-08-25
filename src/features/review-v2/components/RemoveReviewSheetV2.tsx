@@ -73,7 +73,7 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ ...TITLE, color: RV2.ink }}>Remove review?</div>
-            <div style={{ fontSize: 12.5, color: RV2.secondary, marginTop: 2 }}>
+            <div style={{ fontSize: 13, color: RV2.secondary, marginTop: 2 }}>
               Your score, verdict, and any media go with it.
             </div>
           </div>
@@ -108,8 +108,11 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
               borderRadius: 12,
               background: RV2.ghost,
               border: `1px solid ${RV2.hairline}`,
-              fontSize: 14,
+              /* CAPS ACTION (§5) — two points down, height unchanged. */
+              fontSize: 12,
               fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.10em',
               color: RV2.ink,
               cursor: submitting ? 'not-allowed' : 'pointer',
             }}
@@ -126,8 +129,11 @@ export function RemoveReviewSheetV2({ open, submitting, onCancel, onConfirm }: P
               borderRadius: 12,
               background: RV2.danger,
               border: 'none',
-              fontSize: 14,
+              /* CAPS ACTION (§5) — destructive, DANGER ground kept. */
+              fontSize: 12,
               fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.10em',
               color: RV2.dark,
               cursor: submitting ? 'not-allowed' : 'pointer',
             }}

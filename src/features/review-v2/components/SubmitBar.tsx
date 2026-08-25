@@ -37,8 +37,11 @@ export function SubmitBar({ label, enabled, onPress }: Props) {
           // and a 0.60 label so the gate reads as disabled but PRESENT (§5.2).
           background: enabled ? RV2.ink : RV2.disabledFill,
           color: enabled ? RV2.canvas : RV2.secondary,
-          fontSize: 14.5,
+          /* CAPS ACTION (§5) — two points down, height unchanged. */
+          fontSize: 12.5,
           fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.10em',
           cursor: enabled ? 'pointer' : 'not-allowed',
           boxShadow: enabled ? '0 6px 16px rgba(21,23,31,0.22)' : 'none',
           transition: 'background 160ms, color 160ms',

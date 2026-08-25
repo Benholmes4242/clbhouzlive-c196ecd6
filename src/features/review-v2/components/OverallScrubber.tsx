@@ -86,7 +86,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
       >
         {value == null ? '--' : value.toFixed(1)}
       </div>
-      <div style={{ fontSize: 12, color: RV2.secondary, margin: '6px 0 18px', minHeight: 17 }}>
+      <div style={{ fontSize: 13, color: RV2.secondary, margin: '6px 0 18px', minHeight: 17 }}>
         {caption}
       </div>
 
@@ -172,9 +172,13 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
         style={{
           display: 'flex',
           marginTop: 9,
-          fontSize: 9.5,
+          /* AXIS — STATED EXCEPTION. These are the three band tick labels
+             under the track (POOR / GOOD / GREAT): coordinates on the scale,
+             not language, and they sit in fixed percentage-width slots that a
+             READ lift would collide. Floor 10. */
+          fontSize: 10,
           ...FIGURE,
-          letterSpacing: '0.1em',
+          letterSpacing: '0.10em',
           textTransform: 'uppercase',
         }}
       >
@@ -184,7 +188,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
       </div>
 
       {calibration && (
-        <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 12 }}>{calibration}</div>
+        <div style={{ fontSize: 13, color: RV2.secondary, marginTop: 12 }}>{calibration}</div>
       )}
     </div>
 
