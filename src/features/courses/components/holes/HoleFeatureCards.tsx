@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
-import { TOPAR_OVER_LIGHT, TOPAR_UNDER_LIGHT } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_OVER_DARK, TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { FONT, INK, SANS, SC_BIRDIE, SC_DOUBLE } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
 
@@ -11,6 +11,15 @@ interface Props {
 }
 
 const AVG_EPSILON = 0.05;
+
+/**
+ * MICRO_BRIEF_TOPAR_LIGHT_ON_DARK_SURFACES.
+ * The two fills below are a SEMANTIC PAIR (under par left of centre, over par
+ * right of it), not a ramp, so they take the dark-surface branch of the theme
+ * pair rather than the neutral ramp used by the distribution bar. The _LIGHT
+ * values were the light branch used unconditionally on a dark card — the
+ * over-par side (#0F172A, the former INK) was invisible.
+ */
 
 const MiniDifficultyBar: React.FC<{ avg: number; maxAbs: number }> = ({ avg, maxAbs }) => {
   const scale = Math.max(0.01, maxAbs);
@@ -48,7 +57,7 @@ const MiniDifficultyBar: React.FC<{ avg: number; maxAbs: number }> = ({ avg, max
             bottom: 0,
             right: '50%',
             width: `${magnitude}%`,
-            background: TOPAR_UNDER_LIGHT,
+            background: TOPAR_UNDER_DARK,
           }}
         />
       )}
@@ -60,7 +69,7 @@ const MiniDifficultyBar: React.FC<{ avg: number; maxAbs: number }> = ({ avg, max
             bottom: 0,
             left: '50%',
             width: `${magnitude}%`,
-            background: TOPAR_OVER_LIGHT,
+            background: TOPAR_OVER_DARK,
           }}
         />
       )}
