@@ -121,7 +121,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
     >
       {replyingTo && (
         <div className="flex items-center justify-between mb-2">
-          <span style={{ fontSize: 12, color: SECONDARY }}>
+          <span style={{ fontSize: 13, color: SECONDARY }}>
             {t('comments.replyingTo')} <span style={{ color: INK, fontWeight: 600 }}>{replyingTo.displayName}</span>
           </span>
           <button
@@ -141,7 +141,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
           <div className="w-14 h-14 rounded-[10px] bg-white/[0.06] flex items-center justify-center overflow-hidden">
             <ImageIcon size={18} style={{ color: SECONDARY }} />
           </div>
-          <span style={{ fontSize: 12, color: SECONDARY }}>Photo attached</span>
+          <span style={{ fontSize: 13, color: SECONDARY }}>Photo attached</span>
           <button
             type="button"
             onClick={() => setPendingImage(null)}
@@ -195,9 +195,9 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
                   fallback={a.name?.charAt(0) || '?'}
                   hairlineRing ringColor={DARK_HAIRLINE}
                 />
-                <span style={{ fontSize: 13, fontWeight: 600, color: INK }}>{a.name}</span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: INK }}>{a.name}</span>
                 {a.type === 'business' && (
-                  <span style={{ fontSize: 9, fontWeight: 700, color: AMBER, letterSpacing: '0.14em' }}>BUSINESS</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: AMBER, letterSpacing: '0.14em' }}>BUSINESS</span>
                 )}
                 {/*
                   Selected identity. Briefed as amber; note that ActorCards.tsx

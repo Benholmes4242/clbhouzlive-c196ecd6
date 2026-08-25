@@ -76,7 +76,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
 
             <div className="flex items-center justify-between px-5 pb-2">
               <span style={{
-                fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em',
+                fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
                 textTransform: 'uppercase', color: AMBER,
               }}>REPORT COMMENT</span>
               <button type="button" onClick={close} className="bg-transparent border-0 p-1 cursor-pointer" aria-label="Close">
@@ -104,7 +104,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                           background: active ? 'rgba(247,147,30,0.10)' : '#1B1E27',
                         }}
                       >
-                        <span style={{ fontSize: 14, color: INK }}>{r.label}</span>
+                        <span style={{ fontSize: 15, color: INK }}>{r.label}</span>
                         {active && (
                           <span
                             className="flex items-center justify-center"
@@ -126,7 +126,9 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                     borderRadius: 12, border: 0,
                     background: reason ? AMBER : 'rgba(255,255,255,0.10)',
                     color: reason ? '#FFFFFF' : MUTED,
-                    fontSize: 15, fontWeight: 700,
+                    /* CAPS BUTTON: two points down, caps at 0.10em, height unchanged. */
+                    fontSize: 13, fontWeight: 700,
+                    textTransform: 'uppercase', letterSpacing: '0.10em',
                   }}
                 >
                   Next
@@ -153,7 +155,10 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                     className="flex-1 py-3 cursor-pointer"
                     style={{
                       borderRadius: 12, border: `1px solid ${HAIRLINE}`,
-                      background: '#1B1E27', color: INK, fontSize: 15, fontWeight: 600,
+                      background: '#1B1E27', color: INK,
+                      /* CAPS BUTTON */
+                      fontSize: 13, fontWeight: 600,
+                      textTransform: 'uppercase', letterSpacing: '0.10em',
                     }}
                   >
                     Back
@@ -165,7 +170,10 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                     className="flex-1 py-3 cursor-pointer"
                     style={{
                       borderRadius: 12, border: 0,
-                      background: AMBER, color: '#FFFFFF', fontSize: 15, fontWeight: 700,
+                      background: AMBER, color: '#FFFFFF',
+                      /* CAPS BUTTON */
+                      fontSize: 13, fontWeight: 700,
+                      textTransform: 'uppercase', letterSpacing: '0.10em',
                     }}
                   >
                     {submitting ? 'Submitting…' : 'Submit'}
@@ -186,7 +194,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                   <Check size={22} color={AMBER} />
                 </div>
                 <h3 style={{ ...TITLE_SCALE, color: INK }}>Thanks for letting us know</h3>
-                <p style={{ fontSize: 13, color: SECONDARY, marginTop: 6 }}>
+                <p style={{ fontSize: 14, color: SECONDARY, marginTop: 6 }}>
                   We'll review this comment and take action if needed.
                 </p>
                 <button
@@ -200,7 +208,10 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
                       the fill.
                     */
                     borderRadius: 12, border: 0, background: INK,
-                    color: '#15171F', fontSize: 15, fontWeight: 700,
+                    color: '#15171F',
+                    /* CAPS BUTTON */
+                    fontSize: 13, fontWeight: 700,
+                    textTransform: 'uppercase', letterSpacing: '0.10em',
                   }}
                 >
                   Done

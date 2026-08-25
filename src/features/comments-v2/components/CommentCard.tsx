@@ -96,20 +96,20 @@ export function CommentCard({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="truncate" style={{ fontSize: 13.5, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
+            <span className="truncate" style={{ fontSize: 15, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
               {comment.display_name}
             </span>
             {comment.actor_type === 'business' && (
               <span style={{
-                padding: '1px 5px', borderRadius: 3, fontSize: 9, fontWeight: 700,
+                padding: '1px 5px', borderRadius: 3, fontSize: 11, fontWeight: 700,
                 textTransform: 'uppercase', letterSpacing: '0.14em',
                 background: 'rgba(247,147,30,0.16)', color: AMBER,
               }}>{t('comments.business')}</span>
             )}
-            <span style={{ ...FIGS, fontSize: 11, color: DIM }}>
+            <span style={{ ...FIGS, fontSize: 13, color: DIM }}>
               {relativeTime(comment.created_at)}
             </span>
-            {comment.is_edited && <span style={{ ...FIGS, fontSize: 11, color: DIM }}>{'\u00B7'} {t('comments.edited')}</span>}
+            {comment.is_edited && <span style={{ ...FIGS, fontSize: 13, color: DIM }}>{'\u00B7'} {t('comments.edited')}</span>}
           </div>
 
           {comment.content && (
@@ -118,7 +118,7 @@ export function CommentCard({
               text={comment.content}
               className="mt-1 whitespace-pre-wrap"
               style={big
-                ? { fontSize: 30, lineHeight: 1.15, color: INK }
+                ? { fontSize: 32, lineHeight: 1.15, color: INK }
                 : { fontSize: 14, lineHeight: 1.5, color: INK }}
               onMentionTap={(m) => {
                 onClose?.();
@@ -149,7 +149,7 @@ export function CommentCard({
                 }}
               />
               {comment.likes_count > 0 && (
-                <span style={{ ...FIGS, fontSize: 12, fontWeight: 600, color: comment.has_liked ? AMBER : MUTE }}>
+                <span style={{ ...FIGS, fontSize: 13, fontWeight: 600, color: comment.has_liked ? AMBER : MUTE }}>
                   {comment.likes_count}
                 </span>
               )}
@@ -158,7 +158,7 @@ export function CommentCard({
               type="button"
               onClick={() => onReply(comment)}
               className="bg-transparent border-0 p-0 cursor-pointer"
-              style={{ ...FIGS, fontSize: 12, fontWeight: 600, color: MUTE }}
+              style={{ ...FIGS, fontSize: 13, fontWeight: 600, color: MUTE }}
             >
               {t('comments.reply')}
             </button>
@@ -184,7 +184,7 @@ export function CommentCard({
               type="button"
               onClick={() => setExpanded(true)}
               className="bg-transparent border-0 p-0 cursor-pointer"
-              style={{ ...FIGS, fontSize: 12, fontWeight: 600, color: MUTE, marginBottom: 4 }}
+              style={{ ...FIGS, fontSize: 13, fontWeight: 600, color: MUTE, marginBottom: 4 }}
             >
               {t('comments.viewMoreReplies', { count: hiddenCount })}
             </button>
