@@ -83,14 +83,23 @@ export const RAMP = {
  *
  * UNDER par is RED at the GOOD end. That is the convention on the scorecard,
  * the friends tile, the round post and the scorecard sheet - it is NOT an error
- * and must not be "corrected" to green. OVER par darkens to ink.
+ * and must not be "corrected" to green.
+ *
+ * REPOINTED FOR THE DARK GROUND by MICRO_BRIEF_RAMP_TOPAR_DARK. The convention
+ * did not change; the VALUE OF INK did. On white, ink was #0F172A and worse
+ * meant DARKER - which on #15171F made double+ invisible. On dark, ink is
+ * near-white, so worse means progressively BRIGHTER NEUTRAL. This is the same
+ * neutral ramp Ben chose for the course analytics sheet's four-bucket bar, and
+ * for the same reason: a second red for double+ would put one red meaning
+ * under par and one meaning over par in a single bar.
  */
 export const RAMP_TOPAR = {
-  birdie: TOPAR_UNDER_LIGHT,
-  par: '#B4BEC9',
-  bogey: '#7C8B9C',
-  double: '#0F172A',
+  birdie: TOPAR_UNDER_DARK,
+  par: 'rgba(248,250,252,0.42)',
+  bogey: 'rgba(248,250,252,0.56)',
+  double: 'rgba(248,250,252,0.72)',
 } as const;
+
 
 /**
  * THE DEMANDING RAMP - BRIEF_COURSE_TAB_NO_FADED_COLOUR §2.
