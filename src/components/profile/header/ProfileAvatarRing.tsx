@@ -1,4 +1,3 @@
-import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { getTop100Club } from '@/lib/top100Club';
