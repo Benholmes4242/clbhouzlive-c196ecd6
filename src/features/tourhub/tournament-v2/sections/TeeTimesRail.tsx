@@ -132,7 +132,8 @@ export function TeeTimesRail({ groups, round, onOpenAll }: Props) {
               >
                 <div
                   style={{
-                    fontSize: 9.5,
+                    // AXIS 10: the group meta line is time + TEE marker, a coordinate pair.
+                    fontSize: 10,
                     fontWeight: 700,
                     color: INK_FAINT,
                     letterSpacing: '0.1em',

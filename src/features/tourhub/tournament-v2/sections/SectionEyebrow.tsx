@@ -40,7 +40,8 @@ export function SectionEyebrow({ kicker, actionLabel, onAction }: Props) {
           }}
           className="active:opacity-70 transition-opacity"
         >
-          <span style={{ ...LABEL, color: A.INK }}>{actionLabel}</span>
+          {/* CAPS BUTTON: two points below the READ floor, 0.10em, height unchanged. */}
+          <span style={{ ...LABEL, fontSize: 9, letterSpacing: '0.10em', color: A.INK }}>{actionLabel}</span>
           <span style={{ fontSize: 12, color: A.INK, fontWeight: 700 }} aria-hidden="true">
             {'\u203A'}
           </span>

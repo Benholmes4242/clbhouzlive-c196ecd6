@@ -185,11 +185,11 @@ function MomentCard({ moment, tourCode }: { moment: ReturnType<typeof useEventMo
           size="sm"
         />
       )}
-      <div style={{ fontSize: 10.5, fontWeight: 700, color: INK, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: INK, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
         {moment!.headline}
       </div>
       {player && (
-        <div style={{ fontSize: 9, fontWeight: 700, color: INK_FAINT, marginTop: 'auto', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: INK_FAINT, marginTop: 'auto', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {player.full_name}
         </div>
       )}

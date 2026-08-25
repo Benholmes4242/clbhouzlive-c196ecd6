@@ -371,9 +371,12 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
     <div style={{ minWidth: 0, textAlign: 'center' }}>
       <div
         style={{
-          fontSize: 7,
+          // AXIS 10: in-row column header (TODAY / THRU / R1..Rn) — a coordinate
+          // naming the figure beneath it. Tracking tightened 0.09em -> 0.06em so
+          // the widest label still holds one line in a three-up cell at 320.
+          fontSize: 10,
           fontWeight: 700,
-          letterSpacing: '0.09em',
+          letterSpacing: '0.06em',
           textTransform: 'uppercase',
           color: labelColor ?? A.DIM,
           whiteSpace: 'nowrap',
@@ -451,7 +454,9 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
         >
           <div
             style={{
-              fontSize: demotedRow ? 9 : 13,
+              // AXIS 10: the position column. The demoted (cut-line) rows read at
+              // the floor; the live rows are already above it at 13 and hold.
+              fontSize: demotedRow ? 10 : 13,
               fontWeight: demotedRow ? 700 : isLeader ? 700 : 700,
               color: demotedRow ? SECONDARY : isLeader ? A.INK : A.BODY,
               fontVariantNumeric: 'tabular-nums lining-nums',
@@ -583,7 +588,8 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
                     fontVariantNumeric: 'tabular-nums lining-nums',
                   }}
                 >
-                  <span aria-hidden style={{ fontSize: 8 }}>
+                  {/* AXIS 10: movement marker glyph, a coordinate beside the count. */}
+                  <span aria-hidden style={{ fontSize: 10 }}>
                     {climbed ? '\u25B2' : '\u25BC'}
                   </span>
                   {n}
