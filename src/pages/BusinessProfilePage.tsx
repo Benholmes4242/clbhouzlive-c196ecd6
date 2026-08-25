@@ -573,10 +573,10 @@ const BusinessProfilePage: React.FC = () => {
             disabled={disabled}
             onClick={onClick}
             className={cn('h-11 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]', className)}
-            style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL }}
+            style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, letterSpacing: '0.10em', minWidth: 0 }}
           >
-            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Icon className="w-3.5 h-3.5" />}
-            {label}
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" /> : <Icon className="w-3.5 h-3.5 shrink-0" />}
+            <span className="truncate">{label}</span>
           </button>
         );
 
@@ -588,7 +588,7 @@ const BusinessProfilePage: React.FC = () => {
               <div className="mt-4 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
                 <button
                   className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                  style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL }}
+                  style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, letterSpacing: '0.10em' }}
                   onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
                   disabled={isStartingDM}
                   aria-label={`Message ${business.name}`}
