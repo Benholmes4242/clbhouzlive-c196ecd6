@@ -88,32 +88,32 @@ export function scopeLabelKey(scope: WeekScope): { key: string; fallback: string
   }
 }
 
-/** "No rounds from your circle this week." — one honest sentence per scope (§S2.5). */
+/** "No rounds from your circle in the last 14 days." — one sentence per scope (§S2.5). */
 export function scopeEmptyKey(scope: WeekScope): { key: string; fallback: string } {
   switch (scope) {
     case 'circle':
       return {
         key: 'discover.week.empty.circle',
-        fallback: 'No rounds from your circle this week.',
+        fallback: 'No rounds from your circle in the last 14 days.',
       };
     case 'suggested':
       return {
         key: 'discover.week.empty.suggested',
-        fallback: 'No suggested rounds this week.',
+        fallback: 'No suggested rounds in the last 14 days.',
       };
     case 'top_100':
       return {
         key: 'discover.week.empty.top100',
-        fallback: 'No Top 100 rounds this week.',
+        fallback: 'No Top 100 rounds in the last 14 days.',
       };
     case 'played':
       return {
         key: 'discover.week.empty.played',
-        fallback: 'No rounds at your courses this week.',
+        fallback: 'No rounds at your courses in the last 14 days.',
       };
     case 'worldwide':
     default:
-      return { key: 'discover.week.empty.worldwide', fallback: 'No rounds this week.' };
+      return { key: 'discover.week.empty.worldwide', fallback: 'No rounds in the last 14 days.' };
   }
 }
 

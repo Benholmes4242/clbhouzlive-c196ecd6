@@ -1339,8 +1339,8 @@
     "defending": "Defending",
     "nPhotos": "{{count}} photos",
     "nPhotos_one": "{{count}} photo",
-    "mostPlayed": "Courses played this week",
-    "whereTheyPlayed": "Where they played this week",
+    "mostPlayed": "Courses played in the last 14 days",
+    "whereTheyPlayed": "Where they played in the last 14 days",
     "mostPlayedRoundCount": "{{count}} round",
     "mostPlayedRoundCount_other": "{{count}} rounds",
     "mostPlayedGolferCount": "{{count}} golfer",
@@ -1486,7 +1486,7 @@
     "mostPlayedAvgToPar": "Played to {{value}}",
     "mostPlayedLowest": "Lowest",
     "mostPlayedLowLabel": "THE ONLY ROUND",
-    "mostPlayedLowLabel_other": "LOWEST THIS WEEK",
+    "mostPlayedLowLabel_other": "LOWEST IN 14 DAYS",
     "mostPlayedField": "FIELD",
     "mostPlayedSeeAllAtCourse": "Visit this course",
     "mostPlayedNew": "New",
@@ -1572,12 +1572,12 @@
     "clipsHeading": "Clips",
     "clipsAction": "All clips",
     "golfThisWeek": {
-      "heading": "Golf this week",
+      "heading": "Golf in the last 14 days",
       "subline": "Everywhere clbhouz golfers played, and how it went.",
       "count": "{{rounds}} rounds · {{courses}} courses · {{days}} days",
       "seeAll": "See all {{count}} rounds",
-      "bestLabel": "Best this week",
-      "overline": "THIS WEEK",
+      "bestLabel": "Best in 14 days",
+      "overline": "LAST 14 DAYS",
       "follow": "FOLLOW",
       "following": "FOLLOWING",
       "ace": "ACE",
@@ -1645,11 +1645,11 @@
         "worldwide": "Worldwide"
       },
       "empty": {
-        "circle": "No rounds from your circle this week.",
-        "suggested": "No suggested rounds this week.",
-        "top100": "No Top 100 rounds this week.",
-        "played": "No rounds at your courses this week.",
-        "worldwide": "No rounds this week."
+        "circle": "No rounds from your circle in the last 14 days.",
+        "suggested": "No suggested rounds in the last 14 days.",
+        "top100": "No Top 100 rounds in the last 14 days.",
+        "played": "No rounds at your courses in the last 14 days.",
+        "worldwide": "No rounds in the last 14 days."
       }
     },
     "seam": "All time · from everyone",

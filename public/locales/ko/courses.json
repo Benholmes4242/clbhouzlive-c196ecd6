@@ -1057,8 +1057,8 @@
     "mostPlayedAvgToParBy_other": "{{value}} · {{count}}명",
     "mostPlayedMembers_other": "{{count}}명",
     "mostPlayedSheetCaption_other": "{{count}}개 코스",
-    "mostPlayed": "이번 주 플레이한 코스",
-    "whereTheyPlayed": "이번 주 플레이한 곳",
+    "mostPlayed": "최근 14일간 플레이한 코스",
+    "whereTheyPlayed": "최근 14일간 플레이한 곳",
     "mostPlayedRoundCount": "{{count}} 라운드",
     "mostPlayedRoundCount_other": "{{count}} 라운드",
     "mostPlayedGolferCount": "{{count}}명",
@@ -1067,7 +1067,7 @@
     "mostPlayedAvgToPar": "{{value}}",
     "mostPlayedLowest": "최저",
     "mostPlayedLowLabel": "유일한 라운드",
-    "mostPlayedLowLabel_other": "이번 주 최저",
+    "mostPlayedLowLabel_other": "최근 14일간 최저",
     "mostPlayedField": "필드",
     "mostPlayedNew": "신규",
     "trackedRounds": "기록된 라운드",
@@ -1076,7 +1076,7 @@
     "clipsHeading": "클립",
     "clipsAction": "모든 클립",
     "golfThisWeek": {
-      "bestLabel": "이번 주 베스트 라운드",
+      "bestLabel": "최근 14일간 베스트 라운드",
       "stablefordLabel": "최고 스테이블포드 포인트",
       "birdiesLabel": "한 라운드 최다 버디",
       "improvedLabel": "핸디캡 최다 향상",
@@ -1140,11 +1140,11 @@
         "worldwide": "전 세계"
       },
       "empty": {
-        "circle": "이번 주 서클 라운드가 없습니다.",
-        "suggested": "이번 주 추천 라운드가 없습니다.",
-        "top100": "이번 주 톱 100 라운드가 없습니다.",
-        "played": "이번 주 내 코스 라운드가 없습니다.",
-        "worldwide": "이번 주 라운드가 없습니다."
+        "circle": "최근 14일간 서클 라운드가 없습니다.",
+        "suggested": "최근 14일간 추천 라운드가 없습니다.",
+        "top100": "최근 14일간 톱 100 라운드가 없습니다.",
+        "played": "최근 14일간 내 코스 라운드가 없습니다.",
+        "worldwide": "최근 14일간 라운드가 없습니다."
       }
     },
     "mostPlayedSeeAllAtCourse": "이 코스 방문하기",

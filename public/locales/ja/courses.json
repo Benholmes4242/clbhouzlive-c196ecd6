@@ -1057,8 +1057,8 @@
     "mostPlayedAvgToParBy_other": "{{value}}（{{count}}人）",
     "mostPlayedMembers_other": "{{count}}人",
     "mostPlayedSheetCaption_other": "{{count}}コース",
-    "mostPlayed": "今週プレーされたコース",
-    "whereTheyPlayed": "今週プレーした場所",
+    "mostPlayed": "過去14日間にプレーされたコース",
+    "whereTheyPlayed": "過去14日間にプレーした場所",
     "mostPlayedRoundCount": "{{count}} ラウンド",
     "mostPlayedRoundCount_other": "{{count}} ラウンド",
     "mostPlayedGolferCount": "{{count}}人",
@@ -1067,7 +1067,7 @@
     "mostPlayedAvgToPar": "{{value}}",
     "mostPlayedLowest": "最低",
     "mostPlayedLowLabel": "唯一のラウンド",
-    "mostPlayedLowLabel_other": "今週の最少スコア",
+    "mostPlayedLowLabel_other": "過去14日間の最少スコア",
     "mostPlayedField": "全体",
     "mostPlayedNew": "新規",
     "trackedRounds": "記録ラウンド",
@@ -1076,7 +1076,7 @@
     "clipsHeading": "クリップ",
     "clipsAction": "すべてのクリップ",
     "golfThisWeek": {
-      "bestLabel": "今週のベストラウンド",
+      "bestLabel": "過去14日間のベストラウンド",
       "stablefordLabel": "ベストステーブルフォードポイント",
       "birdiesLabel": "1ラウンド最多バーディー",
       "improvedLabel": "ハンディキャップ最多改善",
@@ -1140,11 +1140,11 @@
         "worldwide": "世界"
       },
       "empty": {
-        "circle": "今週はサークルのラウンドがありません。",
-        "suggested": "今週はおすすめのラウンドがありません。",
-        "top100": "今週はトップ100のラウンドがありません。",
-        "played": "今週はあなたのコースでのラウンドがありません。",
-        "worldwide": "今週はラウンドがありません。"
+        "circle": "過去14日間にサークルのラウンドがありません。",
+        "suggested": "過去14日間におすすめのラウンドがありません。",
+        "top100": "過去14日間にトップ100のラウンドがありません。",
+        "played": "過去14日間にあなたのコースでのラウンドがありません。",
+        "worldwide": "過去14日間にラウンドがありません。"
       }
     },
     "mostPlayedSeeAllAtCourse": "このコースを見る",

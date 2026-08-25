@@ -1334,8 +1334,8 @@
     "defending": "[~~Đéƒéñđíñĝ~~]",
     "nPhotos": "[~~{{count}} ƥĥőţőš~~]",
     "nPhotos_one": "[~~{{count}} ƥĥőţő~~]",
-    "mostPlayed": "[~~Çőúřšéš ƥļáýéđ ţĥíš ŵééǩ~~]",
-    "whereTheyPlayed": "[Ẃĥéŕé ţĥéý ṗļàýéð ţĥíś ŵééķ one]",
+    "mostPlayed": "[~~Çőúřšéš ƥļáýéđ íñ ţĥé ļášţ 14 đáýš~~]",
+    "whereTheyPlayed": "[Ẃĥéŕé ţĥéý ṗļàýéð íñ ţĥé ļàśţ 14 ðàýś one]",
     "mostPlayedRoundCount": "[{{count}} ŕóûñð one]",
     "mostPlayedRoundCount_other": "[{{count}} ŕóûñðś one]",
     "mostPlayedGolferCount": "[{{count}} gôlfér one]",
@@ -1481,7 +1481,7 @@
     "mostPlayedAvgToPar": "Played to {{value}}",
     "mostPlayedLowest": "[~~Ļőŵēšţ~~]",
     "mostPlayedLowLabel": "[~~ŢĤĒ ŐŃĻŶ ŘŐŮŃĐ~~]",
-    "mostPlayedLowLabel_other": "[~~ĻŐŴĒŚŢ ŢĤĨŚ ŴĒĒĶ~~]",
+    "mostPlayedLowLabel_other": "[~~ĻŐŴĒŚŢ ĨŃ 14 ÐÁÝŚ~~]",
     "mostPlayedField": "[~~ƑĨĒĻĐ~~]",
     "mostPlayedNew": "New",
     "mostPlayedAvgToParBy_one": "[~~Ƥļáýéđ ţő {{value}} ƀý {{count}} ménƀéř~~]",
@@ -1566,7 +1566,7 @@
     "clipsHeading": "Clips",
     "clipsAction": "All clips",
     "golfThisWeek": {
-      "bestLabel": "[Bèst thís wèék]",
+      "bestLabel": "[Bèst ín 14 dàys]",
       "stablefordLabel": "[Bèst Stàblefôrd pôints]",
       "birdiesLabel": "[Mòst bìrdiés ín à rôund]",
       "improvedLabel": "[Mòst ímprôvèd hàndícàp]",
@@ -1630,11 +1630,11 @@
         "worldwide": "Worldwide"
       },
       "empty": {
-        "circle": "No rounds from your circle this week.",
-        "suggested": "No suggested rounds this week.",
-        "top100": "No Top 100 rounds this week.",
-        "played": "No rounds at your courses this week.",
-        "worldwide": "No rounds this week."
+        "circle": "No rounds from your circle in the last 14 days.",
+        "suggested": "No suggested rounds in the last 14 days.",
+        "top100": "No Top 100 rounds in the last 14 days.",
+        "played": "No rounds at your courses in the last 14 days.",
+        "worldwide": "No rounds in the last 14 days."
       }
     },
     "mostPlayedSeeAllAtCourse": "[Ṿíśíţ ţĥíś çóûŕśé one]",
