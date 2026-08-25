@@ -241,9 +241,9 @@ const GhostCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
     }}
     legend={
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <LegendSwatch color={A.DRIFTED} label="Off best" />
+        <LegendSwatch color={A.DRIFTED} label="Worst" />
         <LegendSwatch color={AMBER} label="Mid" />
-        <LegendSwatch color={A.IMPROVED} label="Near best" />
+        <LegendSwatch color={A.IMPROVED} label="Best" />
       </div>
     }
   />
@@ -542,9 +542,9 @@ const TrendCard: React.FC<{
       legend={
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <LegendSwatch color={A.DRIFTED} label="Off best" />
+            <LegendSwatch color={A.DRIFTED} label="Worst" />
             <LegendSwatch color={AMBER} label="Mid" />
-            <LegendSwatch color={A.IMPROVED} label="Near best" />
+            <LegendSwatch color={A.IMPROVED} label="Best" />
           </div>
           <button
             type="button"
