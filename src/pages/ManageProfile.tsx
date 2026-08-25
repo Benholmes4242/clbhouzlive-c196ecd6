@@ -301,15 +301,23 @@ export default function ManageProfile() {
     <PageRoot hasBottomNav={!isNewUser.current} className="md:!max-w-[440px]" style={{ background: SLATE_BG } as React.CSSProperties}>
       <div className="min-h-screen flex flex-col w-full" style={{ background: SLATE_BG }}>
 
-        {/* Sticky Header (Direction A) + Tab bar */}
+        {/* Sticky Header (Direction A) + Tab bar
+            STICKY STICKS TO THE SCROLLPORT, NOT TO .app-shell's padding.
+            With `top: 0` the title row rode up under the notch on scroll and
+            the safe-area shield painted over it (the row simply vanished).
+            The page already starts at y = var(--sat) thanks to .app-shell's
+            padding-top, so pinning at var(--sat) holds the row exactly where
+            it renders unscrolled — no gap, no double inset. */}
         <div
-          className="sticky top-0 z-30"
+          className="sticky z-30"
           style={{
+            top: 'var(--sat, env(safe-area-inset-top, 0px))',
             background: 'var(--glass-bg)',
             backdropFilter: 'saturate(180%) blur(var(--glass-blur))',
             WebkitBackdropFilter: 'saturate(180%) blur(var(--glass-blur))',
           }}
         >
+
           <div
             className="flex items-center justify-between px-4 pb-3"
             style={{ paddingTop: 8, minHeight: 56 }}
