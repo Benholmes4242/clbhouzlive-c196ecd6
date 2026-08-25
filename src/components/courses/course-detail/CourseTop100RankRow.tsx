@@ -65,7 +65,7 @@ export const CourseTop100RankRow: React.FC<Props> = ({ courseId }) => {
             }}
           >
             <div style={{ ...NUM, fontSize: 15, color: A.INK, lineHeight: 1 }}>#{m.rank}</div>
-            <div style={{ ...LABEL, fontSize: 8.5, marginTop: 3 }}>
+            <div style={{ ...LABEL, marginTop: 3 }}>
               {m.short_label || m.list_name}
             </div>
           </button>
