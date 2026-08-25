@@ -319,7 +319,8 @@ export const HeroShell: React.FC<HeroShellProps> = ({
                 height: 56,
                 borderRadius: 16,
                 overflow: 'hidden',
-                border: `0.5px solid ${W_12}`,
+                // No ring on the hero avatar: it sits on the cover photograph,
+                // where a hairline reads as an outline rather than a surface.
               }}
             >
               {avatar}
