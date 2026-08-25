@@ -92,51 +92,34 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   const valueColor = isLight ? '#0F172A' : 'rgba(255,255,255,0.96)';
   const avatarRing = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.22)';
 
-  const photoBg = photoUrl
-    ? `url(${photoUrl}) center/cover`
-    : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
-
   const avatarSize = 34;
 
-  const hairlineOverlay = (
-    <div
-      aria-hidden
-      style={{
-        position: 'absolute',
-        inset: 0,
-        borderRadius: '34%',
-        border: `1px solid ${avatarRing}`,
-        pointerEvents: 'none',
-      }}
+  /* SquircleAvatar owns the deterministic-initial fallback and lazy image
+     loading. hairlineRing + ringColor reproduces the 1px traced ring this row
+     drew by hand, so champion and non-champion rows look as they did. */
+  const avatar = (
+    <SquircleAvatar
+      size={avatarSize}
+      src={photoUrl}
+      alt={fallbackName || (name === 'You' ? '' : name)}
+      userId={userId}
+      hairlineRing
+      ringColor={avatarRing}
     />
   );
 
-  const avatar = isChampion ? (
-    <div style={{ width: avatarSize, height: avatarSize, position: 'relative', flexShrink: 0 }} aria-hidden>
-      <div style={{ position: 'absolute', inset: 0, background: photoBg, ...squircleMaskStyle }} />
-      {hairlineOverlay}
-    </div>
-  ) : (
-    <div
-      aria-hidden
-      style={{
-        position: 'relative',
-        width: avatarSize,
-        height: avatarSize,
-        borderRadius: '34%',
-        background: photoBg,
-        flexShrink: 0,
-      }}
-    >
-      {hairlineOverlay}
-    </div>
-  );
+  /* A gap of zero is not news — it is a shared crown. formatGapFromChampion
+     returns a STRING ("+0" for higher-better, "0" for lower-better), so the
+     test is numeric, not a compare against either literal. */
+  const gapIsZero = gapToChampion != null && Number.parseFloat(gapToChampion) === 0;
 
   const subText = isChampion
     ? holdDuration
-    : gapToChampion
-      ? `${gapToChampion.replace('-', '−')} from champion`
-      : '';
+    : gapIsZero
+      ? t('champions.jointChampion')
+      : gapToChampion
+        ? `${gapToChampion.replace('-', '−')} from champion`
+        : '';
 
   const padY = compact ? '7px' : '10px';
   const nameSize = 14.5;
