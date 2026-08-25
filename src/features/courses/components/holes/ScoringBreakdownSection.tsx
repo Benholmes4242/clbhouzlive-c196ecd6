@@ -14,6 +14,7 @@ import { legendCategoryLabel, formatLegendGap } from '@/lib/gam/visuals';
 import { monotonePath } from '@/lib/charts/monotonePath';
 import { A, Panel, Hairline, LABEL, NUM, SANS, StatRow, FIGS, TOPAR_RED, difficultyRampColor } from './analytical/tokens';
 import { BAND_AMBER, BAND_GREEN_DARK, BAND_RED_DARK } from '@/features/courses/_shared/scoreBands';
+import { ThirdsChart } from '@/components/profile/handicap/whs/charts/ThirdsChart';
 
 /**
  * "Where your shots go" - the CHART-LED You tab
