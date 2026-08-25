@@ -256,6 +256,14 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   const { data: myRounds } = useMyRoundsAtCourse(golfCourseId);
   const { data: pulse } = useLegendPulse(user?.id, 60);
 
+  /**
+   * Form-panel scrubber selection. Lives here, NOT in the panel's IIFE: that
+   * block re-runs on every render and cannot hold state. null = resting state
+   * (the ten-round average). On release the selection HOLDS.
+   */
+  const [scrubIdx, setScrubIdx] = useState<number | null>(null);
+  const scrubBoxRef = useRef<HTMLDivElement | null>(null);
+
   const parsed = useMemo(() => {
     if (!data || !Array.isArray(data.holes)) return null;
     if ((data.rounds ?? 0) < 1) return null;
