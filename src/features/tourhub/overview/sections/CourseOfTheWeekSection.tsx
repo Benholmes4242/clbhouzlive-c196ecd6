@@ -33,7 +33,7 @@ function CotwStat({
         {value}
       </span>
       <span style={{ ...LABEL, color: A.DIM }}>{label}</span>
-      {sub ? <span style={{ ...LABEL, fontSize: 8, color: A.MUTE }}>{sub}</span> : null}
+      {sub ? <span style={{ ...LABEL, color: A.MUTE }}>{sub}</span> : null}
     </div>
   );
 }
