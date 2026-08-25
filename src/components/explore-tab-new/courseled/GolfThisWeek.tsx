@@ -1619,6 +1619,11 @@ export function GolfThisWeek({
     accent: string;
     chipGround: string;
     gapKind: 'shots' | 'points' | 'clear';
+    /* §1 (BRIEF_PODIUM_BANDS_FIXES) — ONE precision per tile, read by BOTH the
+       leader CLEAR chip and the chaser deficit. Without it the chip printed raw
+       IEEE 754 float residue ("0.09999999999999998 CLEAR") on the improved
+       tile, where the deficit column was already rounding. */
+    precision: number;
   }[] = [];
 
 
