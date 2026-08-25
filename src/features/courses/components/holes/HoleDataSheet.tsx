@@ -891,7 +891,7 @@ const StoryTiles: React.FC<{
                           0,
                           Math.min(100, (h.progress.done / Math.max(1, h.progress.total)) * 100),
                         )}%`,
-                        background: A.AMBER,
+                        background: A.INK,
                       }}
                     />
                   </span>
