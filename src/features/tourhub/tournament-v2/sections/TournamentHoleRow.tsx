@@ -106,12 +106,12 @@ export const TourHoleRampLegend: React.FC = () => {
       {items.map((it) => (
         <span key={it.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
           <i style={{ width: 10, height: 6, borderRadius: 2, background: it.bg, display: 'block' }} />
-          <span style={{ ...LABEL, fontSize: 8 }}>{it.label}</span>
+          <span style={LABEL}>{it.label}</span>
         </span>
       ))}
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginLeft: 'auto' }}>
         <i style={{ width: 2, height: 10, background: A.BODY, display: 'block' }} />
-        <span style={{ ...LABEL, fontSize: 8 }}>{t('courses:courseDetail.plays.legendField')}</span>
+        <span style={LABEL}>{t('courses:courseDetail.plays.legendField')}</span>
       </span>
     </div>
   );
@@ -157,9 +157,15 @@ export const TournamentHoleRow: React.FC<{
           ...FIGS,
         }}
       >
+        {/* AXIS: the hole number is a coordinate, not a headline. The AXIS floor
+            is 10 and this sits ABOVE it at 15 — a floor is a minimum, so it holds
+            where the grid put it, and its quiet BODY-adjacent tone is unchanged. */}
         <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>
           {row.hole_no}
         </span>
+        {/* AXIS: par is a COLUMN VALUE in a 26px fixed column, centred under no
+            header — a coordinate. Already above the AXIS floor of 10, so it holds
+            at 12. Yardage, by contrast, is a read figure (see DetailFigure). */}
         <span style={{ fontSize: 12, fontWeight: 700, color: A.BODY, textAlign: 'center', ...FIGS }}>
           {row.par}
         </span>
@@ -209,7 +215,7 @@ export const TournamentHoleRow: React.FC<{
           >
             {field && (
               <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
-                <span style={{ ...LABEL, fontSize: 7.5 }}>
+                <span style={LABEL}>
                   {t('courses:courseDetail.plays.legendField')}
                 </span>
                 <span style={{ fontSize: 12, fontWeight: 700, color: A.INK, ...FIGS }}>{field.text}</span>
@@ -234,7 +240,7 @@ export const TournamentHoleRow: React.FC<{
                       gap: 8,
                     }}
                   >
-                    <span style={{ ...LABEL, fontSize: 8 }}>{s.label}</span>
+                    <span style={LABEL}>{s.label}</span>
                     <span style={{ fontSize: 12, fontWeight: 700, color: A.INK, ...FIGS }}>
                       {Math.round(share)}%
                     </span>
@@ -275,7 +281,7 @@ export const TournamentHoleRow: React.FC<{
 
 const DetailFigure: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
-    <span style={{ ...LABEL, fontSize: 8 }}>{label}</span>
+    <span style={LABEL}>{label}</span>
     <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK, ...FIGS }}>{value}</span>
   </span>
 );

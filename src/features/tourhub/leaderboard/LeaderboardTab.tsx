@@ -586,9 +586,12 @@ export function LeaderboardTab() {
           background: SURFACE,
           borderBottom: `1px solid ${HAIRLINE}`,
           fontFamily: F,
-          fontSize: 8,
+          // AXIS 10: sticky column headers (POS / PLAYER / TOT), matching the
+          // hero's markers. Tracking 0.08em -> 0.06em keeps TOT on one line in
+          // the 52px answer column at 320.
+          fontSize: 10,
           fontWeight: 700,
-          letterSpacing: '0.08em',
+          letterSpacing: '0.06em',
           color: SECONDARY,
           textTransform: 'uppercase',
         }}
@@ -673,7 +676,8 @@ export function LeaderboardTab() {
         style={{
           padding: '10px 16px 16px',
           fontFamily: F,
-          fontSize: 8.5,
+          // READ 11: the footnote is a sentence, not a coordinate.
+          fontSize: 11,
           color: MUTED,
           textAlign: 'center',
           ...FIGS,
