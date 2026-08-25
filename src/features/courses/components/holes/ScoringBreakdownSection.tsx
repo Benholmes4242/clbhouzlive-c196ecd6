@@ -516,6 +516,15 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     const rows = (myRounds ?? []).filter((r) => r.grossScore != null);
     if (rows.length < FORM_MIN_ROUNDS) return null;
     const series = [...rows].reverse().map((r) => Number(r.grossScore));
+    /**
+     * Index-aligned with `series`: same reversed rows, no filtering. The
+     * scrubber readout needs date and par, which `series` flattens away.
+     */
+    const rounds = [...rows].reverse().map((r) => ({
+      gross: Number(r.grossScore),
+      playDate: r.playDate,
+      coursePar: r.coursePar,
+    }));
     const best = Math.min(...series);
     const worst = Math.max(...series);
     const span = worst - best || 1;
