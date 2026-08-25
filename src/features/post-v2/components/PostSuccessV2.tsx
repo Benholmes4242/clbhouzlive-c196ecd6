@@ -411,7 +411,7 @@ function Status({
         animate={{ color: eyebrowColor ?? 'rgba(255,255,255,0.38)' }}
         transition={reduce ? { duration: 0 } : { duration: 0.4 }}
         style={{
-          fontSize: 9,
+          fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.19em',
           textTransform: 'uppercase',
