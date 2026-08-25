@@ -165,7 +165,7 @@ export const StablefordCard: React.FC<Props> = ({ scores, userId, connectionId }
         {metaCount && (
           <span
             style={{
-              fontSize: 9.5,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.12em',
               color: T.ink40,
@@ -302,7 +302,7 @@ const ScopeToggle: React.FC<{
           border: 'none',
           cursor: 'pointer',
           fontFamily: FONT,
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.06em',
           transition: 'background 160ms ease, color 160ms ease',
@@ -371,7 +371,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
       >
         <span
           style={{
-            fontSize: 9,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.14em',
             color: T.inkMute,
@@ -382,7 +382,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
         </span>
         <span
           style={{
-            fontSize: 9,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.14em',
             color: T.ink40,
@@ -460,7 +460,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
               </div>
               <div
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   color: T.ink40,
                   letterSpacing: '0.12em',
@@ -471,7 +471,7 @@ const PointsBody: React.FC<PointsBodyProps> = ({ dist, scope, scoringRange }) =>
               </div>
               <div
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   color: 'rgba(242,244,247,0.28)',
                   letterSpacing: '0.10em',
@@ -506,7 +506,7 @@ const KeyCell: React.FC<KeyCellProps> = ({ color, label, meta }) => (
   <div style={{ textAlign: 'center', padding: '0 4px', fontFamily: FONT }}>
     <div
       style={{
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: 700,
         color: T.ink,
         letterSpacing: '0.12em',
@@ -527,7 +527,7 @@ const KeyCell: React.FC<KeyCellProps> = ({ color, label, meta }) => (
     </div>
     <div
       style={{
-        fontSize: 10.5,
+        fontSize: 11,
         color: T.inkMute,
         fontWeight: 600,
         fontVariantNumeric: 'tabular-nums lining-nums',
@@ -567,7 +567,7 @@ const ScoringRangeBlock: React.FC<{
       >
         <span
           style={{
-            fontSize: 9.5,
+            fontSize: 11,
             fontWeight: 700,
             color: T.inkMute,
             letterSpacing: '0.14em',
@@ -577,7 +577,7 @@ const ScoringRangeBlock: React.FC<{
         </span>
         <span
           style={{
-            fontSize: 9.5,
+            fontSize: 11,
             fontWeight: 700,
             color: T.ink40,
             fontVariantNumeric: 'tabular-nums lining-nums',
@@ -620,7 +620,7 @@ const ScoringRangeBlock: React.FC<{
           display: 'flex',
           justifyContent: 'space-between',
           marginTop: 8,
-          fontSize: 9,
+          fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.10em',
           color: T.ink40,
@@ -752,7 +752,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
       >
         <span
           style={{
-            fontSize: 9,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.14em',
             color: T.inkMute,
@@ -763,7 +763,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
         </span>
         <span
           style={{
-            fontSize: 9,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.14em',
             color: T.ink40,
@@ -845,7 +845,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
               </div>
               <div
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   color: labelColor,
                   letterSpacing: '0.12em',
@@ -856,7 +856,7 @@ const ShotsBody: React.FC<ShotsBodyProps> = ({ trophyAgg, shotsLoading, scope })
               </div>
               <div
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   color: 'rgba(242,244,247,0.28)',
                   letterSpacing: '0.10em',
@@ -979,7 +979,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
       >
         <span
           style={{
-            fontSize: 9.5,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.14em',
             color: T.inkMute,
@@ -991,7 +991,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
         <span
           style={{
             fontFamily: FONT,
-            fontSize: 9.5,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.10em',
             color: T.ink40,
@@ -1000,7 +1000,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
         >
           <span
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: unlockedCount > 0 ? SC_BIRDIE_DARK : T.inkMute,
             }}
           >
@@ -1070,7 +1070,7 @@ const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
                 <div
                   style={{
                     marginTop: 3,
-                    fontSize: 9.5,
+                    fontSize: 11,
                     fontWeight: 700,
                     letterSpacing: '0.10em',
                   }}
