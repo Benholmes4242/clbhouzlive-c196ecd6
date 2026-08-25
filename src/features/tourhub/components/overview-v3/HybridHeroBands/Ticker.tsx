@@ -1,4 +1,14 @@
 /**
+ * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
+ * The hero is a broadcast surface. Tracked-out caps over photography read
+ * larger than their point size, so a ticker segment, a band label or a rank
+ * marker takes the AXIS floor of 10 rather than the READ floor of 11 — the
+ * same exception granted to the scorecard axis and the chart ticks. It covers
+ * COORDINATES AND MARKERS ONLY. It does NOT cover leader names, tournament
+ * names, course names, scores, or any sentence: those are language and take
+ * 11. Nothing goes below 10.
+ */
+/**
  * Ticker — Live state auto-scrolling top-10 marquee.
  * §5.1 of HYBRID_HERO_IMPLEMENTATION_BRIEF.
  */
@@ -68,7 +78,7 @@ export function Ticker({ rows }: TickerProps) {
       <div
         style={{
           padding: '0 12px',
-          fontSize: 9,
+          fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
           fontWeight: 700,
           letterSpacing: '0.16em',
           color: 'rgba(255,255,255,0.50)',

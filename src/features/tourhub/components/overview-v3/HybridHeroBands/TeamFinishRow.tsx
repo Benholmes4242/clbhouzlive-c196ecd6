@@ -179,7 +179,7 @@ export function TeamFinishRow({
           {isChampion && memberSubtext && (
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 600,
                 color: INK_45,
                 letterSpacing: '0.02em',

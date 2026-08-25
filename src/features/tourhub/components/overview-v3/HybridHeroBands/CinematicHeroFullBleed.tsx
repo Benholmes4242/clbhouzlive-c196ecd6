@@ -1,4 +1,14 @@
 /**
+ * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
+ * The hero is a broadcast surface. Tracked-out caps over photography read
+ * larger than their point size, so a ticker segment, a band label or a rank
+ * marker takes the AXIS floor of 10 rather than the READ floor of 11 — the
+ * same exception granted to the scorecard axis and the chart ticks. It covers
+ * COORDINATES AND MARKERS ONLY. It does NOT cover leader names, tournament
+ * names, course names, scores, or any sentence: those are language and take
+ * 11. Nothing goes below 10.
+ */
+/**
  * CinematicHeroFullBleed — full-bleed cinematic tournament hero.
  *
  * Supports three states as one system:
@@ -45,9 +55,9 @@ const GOLD_RING = 'rgba(232,194,106,0.65)';
 const INK_BASE = '#0D1E16';
 
 const RANK_W = 20;
-const COL_TOTAL = 38;
-const COL_THRU = 30;
-const COL_TODAY = 32;
+const COL_TOTAL = 42; // widened 38→42 for 'TOTAL' at the AXIS floor of 10 (38.4px measured)
+const COL_THRU = 34; // widened 30→34 for 'THRU' at the AXIS floor of 10 (32.6px measured)
+const COL_TODAY = 42; // widened 32→42 for 'TODAY' at the AXIS floor of 10 (39.9px measured)
 
 const FALLBACK_GRADIENT = 'linear-gradient(180deg,#1E4D38,#0F172A)';
 const IMAGE_FOCAL = '50% 72%';
@@ -145,7 +155,7 @@ function StackedAvatars({
             borderRadius: 8,
             background: 'rgba(255,255,255,0.16)',
             color: 'rgba(255,255,255,0.92)',
-            fontSize: 10,
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
             fontWeight: 700,
             letterSpacing: '-0.01em',
             display: 'inline-flex',
@@ -243,7 +253,7 @@ function CountdownPills({ hoursUntilStart }: { hoursUntilStart: number }) {
           </span>
           <span
             style={{
-              fontSize: 8.5,
+              fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
               fontWeight: 700,
               letterSpacing: '0.14em',
               color: 'rgba(255,255,255,0.55)',
@@ -503,7 +513,7 @@ export function CinematicHeroFullBleed({
             background: GOLD_TINT,
             border: `0.5px solid ${GOLD_RING}`,
             color: GOLD,
-            fontSize: 9,
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
@@ -624,7 +634,7 @@ export function CinematicHeroFullBleed({
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span
               style={{
-                fontSize: 9.5,
+                fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
                 fontWeight: 700,
                 letterSpacing: '0.14em',
                 color: GOLD,
@@ -662,7 +672,7 @@ export function CinematicHeroFullBleed({
               {champion.playoffWin ? (
                 <span
                   style={{
-                    fontSize: 8.5,
+                    fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
                     fontWeight: 700,
                     letterSpacing: '0.08em',
                     color: GOLD,
@@ -864,7 +874,7 @@ export function CinematicHeroFullBleed({
                     ...NUMERIC_STYLE,
                     width: COL_THRU,
                     textAlign: 'center',
-                    fontSize: 8,
+                    fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
                     fontWeight: 700,
                     letterSpacing: '0.12em',
                     color: 'rgba(255,255,255,0.45)',
@@ -879,7 +889,7 @@ export function CinematicHeroFullBleed({
                     ...NUMERIC_STYLE,
                     width: COL_TODAY,
                     textAlign: 'center',
-                    fontSize: 8,
+                    fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
                     fontWeight: 700,
                     letterSpacing: '0.12em',
                     color: 'rgba(255,255,255,0.45)',
@@ -893,7 +903,7 @@ export function CinematicHeroFullBleed({
                   ...NUMERIC_STYLE,
                   width: COL_TOTAL,
                   textAlign: 'center',
-                  fontSize: 8,
+                  fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                   color: 'rgba(255,255,255,0.45)',
@@ -1109,7 +1119,7 @@ export function CinematicHeroFullBleed({
               <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <span
                   style={{
-                    fontSize: 9.5,
+                    fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
                     fontWeight: 700,
                     letterSpacing: '0.14em',
                     color: GOLD,
@@ -1188,7 +1198,7 @@ function Footer({ leftText, isLive, noBorder }: { leftText: string; isLive: bool
       <span
         style={{
           ...NUMERIC_STYLE,
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 600,
           color: 'rgba(255,255,255,0.5)',
           letterSpacing: '0.02em',
@@ -1222,7 +1232,7 @@ function CourseStat({ label, value }: { label: string; value: string }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <span
         style={{
-          fontSize: 8.5,
+          fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
           fontWeight: 700,
           letterSpacing: '0.14em',
           color: 'rgba(255,255,255,0.5)',

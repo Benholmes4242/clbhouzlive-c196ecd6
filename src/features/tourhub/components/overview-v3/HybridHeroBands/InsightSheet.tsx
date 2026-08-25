@@ -1,4 +1,14 @@
 /**
+ * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
+ * The hero is a broadcast surface. Tracked-out caps over photography read
+ * larger than their point size, so a ticker segment, a band label or a rank
+ * marker takes the AXIS floor of 10 rather than the READ floor of 11 — the
+ * same exception granted to the scorecard axis and the chart ticks. It covers
+ * COORDINATES AND MARKERS ONLY. It does NOT cover leader names, tournament
+ * names, course names, scores, or any sentence: those are language and take
+ * 11. Nothing goes below 10.
+ */
+/**
  * InsightSheet — Venue detail sheet for the PhotoBand insight line.
  *
  * Always renders (for any venue):
@@ -92,7 +102,7 @@ function StatTile({ value, label }: { value: React.ReactNode; label: string }) {
       </div>
       <div
         style={{
-          fontSize: 10.5,
+          fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
           fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
@@ -190,7 +200,7 @@ export function InsightSheet({
         {/* Eyebrow */}
         <div
           style={{
-            fontSize: 10.5,
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
             fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
@@ -219,7 +229,7 @@ export function InsightSheet({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div
                 style={{
-                  fontSize: 10.5,
+                  fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
                   fontWeight: 700,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',

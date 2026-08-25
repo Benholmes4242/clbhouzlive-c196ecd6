@@ -343,7 +343,6 @@ function LiveCountBadge({ count, onInk }: { count: number; onInk: boolean }) {
       <span
         style={{
           ...LABEL,
-          fontSize: 8.5,
           color: onInk ? 'rgba(21,23,31,0.72)' : A.DIM,
           ...FIGS,
         }}

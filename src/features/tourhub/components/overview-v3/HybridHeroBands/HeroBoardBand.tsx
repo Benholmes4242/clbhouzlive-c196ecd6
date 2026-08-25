@@ -1,4 +1,14 @@
 /**
+ * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
+ * The hero is a broadcast surface. Tracked-out caps over photography read
+ * larger than their point size, so a ticker segment, a band label or a rank
+ * marker takes the AXIS floor of 10 rather than the READ floor of 11 — the
+ * same exception granted to the scorecard axis and the chart ticks. It covers
+ * COORDINATES AND MARKERS ONLY. It does NOT cover leader names, tournament
+ * names, course names, scores, or any sentence: those are language and take
+ * 11. Nothing goes below 10.
+ */
+/**
  * HeroBoardSection — the always-on live leaderboard that EXTENDS DOWNWARD from
  * the hero.
  *
@@ -95,7 +105,7 @@ function StatCell({
     <div style={{ flex: '1 1 0', minWidth: 0, textAlign: align }}>
       <div
         style={{
-          fontSize: 7.5,
+          fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
           fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
@@ -120,7 +130,7 @@ function StatCell({
       {sub && (
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 600,
             color: WHITE_ALPHA_65,
             marginTop: 2,
@@ -359,7 +369,7 @@ export function HeroBoardSection({
         >
           <span
             style={{
-              fontSize: 9,
+              fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
               fontWeight: 700,
               letterSpacing: '0.16em',
               color: WHITE_ALPHA_65,
@@ -437,7 +447,7 @@ export function HeroBoardSection({
       >
         <span
           style={{
-            fontSize: 9,
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
             fontWeight: 700,
             letterSpacing: '0.16em',
             color: WHITE_ALPHA_65,
@@ -487,7 +497,7 @@ export function HeroBoardSection({
         >
           <span
             style={{
-              fontSize: 9,
+              fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
               fontWeight: 700,
               letterSpacing: '0.16em',
               color: WHITE_ALPHA_65,
@@ -508,7 +518,7 @@ export function HeroBoardSection({
           >
             <span
               style={{
-                fontSize: 10.5,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
@@ -521,7 +531,7 @@ export function HeroBoardSection({
               {closedFigure.name}
             </span>
             {closedFigure.right && (
-              <span style={{ fontSize: 10.5, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>
                 {closedFigure.right}
               </span>
             )}
@@ -640,7 +650,7 @@ function PicksPanel({
                 style={{
                   width: 12,
                   flexShrink: 0,
-                  fontSize: 10,
+                  fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
                   fontWeight: 700,
                   color: WHITE_ALPHA_65,
                   ...FIGS,
@@ -680,7 +690,7 @@ function PicksPanel({
                   </span>
                   <ClbhouzPickMark size={10} label={t('overview.onTheCourse.ourPicksLabel')} />
                   {live && (
-                    <span style={{ fontSize: 10, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>
+                    <span style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>
                       {`${line!.tied ? 'T' : ''}${line!.position}`}
                     </span>
                   )}
@@ -689,7 +699,7 @@ function PicksPanel({
                   <span
                     style={{
                       display: 'block',
-                      fontSize: 10.5,
+                      fontSize: 11,
                       fontWeight: 500,
                       color: WHITE_ALPHA_65,
                       marginTop: 1,
@@ -719,7 +729,7 @@ function PicksPanel({
         <div
           style={{
             padding: '10px 16px',
-            fontSize: 9,
+            fontSize: 11,
             fontWeight: 600,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',

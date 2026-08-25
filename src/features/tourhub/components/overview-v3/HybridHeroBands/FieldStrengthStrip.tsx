@@ -1,4 +1,14 @@
 /**
+ * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
+ * The hero is a broadcast surface. Tracked-out caps over photography read
+ * larger than their point size, so a ticker segment, a band label or a rank
+ * marker takes the AXIS floor of 10 rather than the READ floor of 11 — the
+ * same exception granted to the scorecard axis and the chart ticks. It covers
+ * COORDINATES AND MARKERS ONLY. It does NOT cover leader names, tournament
+ * names, course names, scores, or any sentence: those are language and take
+ * 11. Nothing goes below 10.
+ */
+/**
  * FieldStrengthStrip — Upcoming · far middle band fallback (level 2).
  * Shown when no defending champion data exists but field info does.
  * Per TOUR_HUB_POLISH_PATCH_BRIEF §4.3.
@@ -92,7 +102,7 @@ export function FieldStrengthStrip({
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
         <div
           style={{
-            fontSize: 9,
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
             fontWeight: 700,
             letterSpacing: '0.18em',
             color: GOLD,
@@ -120,7 +130,7 @@ export function FieldStrengthStrip({
         {topRanked != null && topRanked > 0 && (
           <div
             style={{
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 600,
               color: WHITE_ALPHA_55,
               marginTop: 1,
@@ -145,7 +155,7 @@ export function FieldStrengthStrip({
         </div>
         <div
           style={{
-            fontSize: 8,
+            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
             fontWeight: 700,
             color: 'rgba(255,255,255,0.50)',
             letterSpacing: '0.16em',

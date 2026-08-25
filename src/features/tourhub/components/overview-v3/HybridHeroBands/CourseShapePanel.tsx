@@ -1,4 +1,14 @@
 /**
+ * TYPE — THE HERO EXCEPTION (BRIEF_TOUR_OVERVIEW_TYPE_SCALE, Part 2).
+ * The hero is a broadcast surface. Tracked-out caps over photography read
+ * larger than their point size, so a ticker segment, a band label or a rank
+ * marker takes the AXIS floor of 10 rather than the READ floor of 11 — the
+ * same exception granted to the scorecard axis and the chart ticks. It covers
+ * COORDINATES AND MARKERS ONLY. It does NOT cover leader names, tournament
+ * names, course names, scores, or any sentence: those are language and take
+ * 11. Nothing goes below 10.
+ */
+/**
  * CourseShapePanel — the hole-shape chart, extracted verbatim in geometry from
  * the deleted LiveFieldPanel (bar geometry, centre line, "awaiting players"
  * caption, the same get_tournament_hole_averages call — NO NEW SQL) and
@@ -29,7 +39,7 @@ const HARD = TOPAR_UNDER_DARK;
 const EASY = '#55BD8B';
 
 const COL_HOLE = 20;
-const COL_PAR = 30;
+const COL_PAR = 38; // widened 30→38: 'PAR n' at the AXIS floor of 10 measures 35.7px and must not clip (BRIEF_TOUR_OVERVIEW_TYPE_SCALE)
 const COL_FIG = 46;
 const ROW_GAP = 8;
 const BAR_H = 7;
@@ -77,7 +87,7 @@ function HoleNumeral({ hole, par }: { hole: number; par: number }) {
       <div
         style={{
           width: COL_PAR,
-          fontSize: 6.5,
+          fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
           fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
@@ -176,7 +186,7 @@ function PlainRow({ r, maxAbs, first }: { r: LadderRow; maxAbs: number; first: b
 function AxisMarkers() {
   const { t } = useTranslation('tourhub');
   const label = {
-    fontSize: 7,
+    fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
     fontWeight: 700,
     letterSpacing: '0.14em',
     textTransform: 'uppercase' as const,
@@ -247,7 +257,7 @@ export function CourseShapePanel({
         <>
           <div
             style={{
-              fontSize: 7.5,
+              fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
               fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -264,7 +274,7 @@ export function CourseShapePanel({
         </>
       )}
       {gaps && (
-        <div style={{ marginTop: 8, fontSize: 9, fontWeight: 600, color: WHITE_ALPHA_55, ...FIGS }}>
+        <div style={{ marginTop: 8, fontSize: 11, fontWeight: 600, color: WHITE_ALPHA_55, ...FIGS }}>
           {t('overview.onTheCourse.awaitingPlayers', { range: gaps })}
         </div>
       )}
