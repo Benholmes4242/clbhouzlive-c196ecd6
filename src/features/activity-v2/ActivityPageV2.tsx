@@ -101,7 +101,8 @@ const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick }) => (
       <span
         style={{
           ...FIGURE,
-          fontSize: 10.5,
+          // READ 11: a chip count is a number a member reads, not a coordinate.
+          fontSize: 11,
           padding: '2px 7px',
           borderRadius: 20,
           background: active ? 'rgba(21,23,31,0.18)' : AMBER_SOFT,
@@ -120,7 +121,8 @@ const SectionHeader: React.FC<{ label: string; tone?: 'new' | 'date' }> = ({ lab
   <div
     style={{
       padding: '18px 18px 8px',
-      fontSize: 10.5,
+      // READ 11 floor (section headers: TODAY / THIS WEEK / EARLIER).
+      fontSize: 11,
       fontWeight: 700,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
@@ -534,7 +536,8 @@ export const ActivityPageV2: React.FC = () => {
             <div style={{ fontSize: 14, fontWeight: 700, color: INK, marginBottom: 6 }}>
               {EMPTY_COPY[chip].title}
             </div>
-            <div style={{ fontSize: 12, fontWeight: 500, color: INK_60 }}>
+            {/* Empty-state copy is prose: body 14. */}
+            <div style={{ fontSize: 14, fontWeight: 500, color: INK_60, lineHeight: 1.4 }}>
               {EMPTY_COPY[chip].sub}
             </div>
           </div>

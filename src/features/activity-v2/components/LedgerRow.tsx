@@ -408,7 +408,9 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            fontSize: 13.5,
+            // BODY. The action sentence is prose, so it reads at the body tier (14),
+            // not the READ floor (11). A floor is a minimum, never a target.
+            fontSize: 14,
             fontWeight: 500,
             color: ACT.INK,
             lineHeight: 1.35,
