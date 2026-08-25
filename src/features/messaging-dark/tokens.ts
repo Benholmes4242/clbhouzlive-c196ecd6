@@ -9,8 +9,14 @@
  * on this surface.
  *
  * NO FADED COLOUR (§3.3): every tone below is its own solid value. Nothing here
- * is another token at an alpha. Weight never reaches 800, size never drops
- * below 8.5px (§6).
+ * is another token at an alpha. Weight never reaches 800.
+ *
+ * MICRO_BRIEF_MESSAGES_TYPE_SCALE — THE FLOOR MOVED. Size never drops below 11:
+ * every role in MT carries language (eyebrows, names, previews, context lines,
+ * timestamps, unread counts, the small score captions), so NONE of them takes
+ * the AXIS exception of 10 — messaging declares no coordinate type. The old
+ * "never below 8.5px" is retired. A floor is a minimum, never a target: TITLE
+ * (22), NAME (15), PREVIEW (13), BUBBLE (14.5) and SCORE (19) hold.
  */
 
 import type React from 'react';
@@ -48,9 +54,10 @@ export const MT = {
 
   /** Section eyebrow (shared-ground strip, compose groups). */
   EYEBROW: {
-    fontSize: 9.5,
+    // READ 11 floor.
+    fontSize: 11,
     fontWeight: 700,
-    letterSpacing: '0.18em',
+    letterSpacing: '0.12em',
     textTransform: 'uppercase',
     color: MSG.INK_3,
   } as React.CSSProperties,
@@ -73,7 +80,8 @@ export const MT = {
 
   /** The context line: where and when you last played together (§2.3). */
   CONTEXT: {
-    fontSize: 10.5,
+    // READ 11 floor — a sentence about where and when you played.
+    fontSize: 11,
     fontWeight: 600,
     letterSpacing: '0.01em',
     lineHeight: '13px',
@@ -83,7 +91,8 @@ export const MT = {
 
   /** Timestamp. */
   TIME: {
-    fontSize: 10.5,
+    // READ 11 floor — a word a member reads, not a coordinate.
+    fontSize: 11,
     fontWeight: 600,
     lineHeight: '13px',
     color: MSG.INK_3,
@@ -92,7 +101,8 @@ export const MT = {
 
   /** Unread count. WHITE, never amber (§2.2). */
   BADGE: {
-    fontSize: 10.5,
+    // READ 11 floor — an unread count is read, not plotted.
+    fontSize: 11,
     fontWeight: 700,
     ...FIGS,
   } as React.CSSProperties,
@@ -113,9 +123,9 @@ export const MT = {
     ...FIGS,
   } as React.CSSProperties,
 
-  /** Smallest type on the surface. Never below 8.5px. */
+  /** Smallest type on the surface. READ 11 — it captions scores in words. */
   MICRO: {
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: 700,
     letterSpacing: '0.06em',
     textTransform: 'uppercase',

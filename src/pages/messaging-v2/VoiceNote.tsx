@@ -153,7 +153,8 @@ export const VoiceNote: React.FC<Props> = ({ attachment, isOutgoing }) => {
         <div
           style={{
             ...FIGURE,
-            fontSize: 10,
+            // READ 11: a duration readout, not a waveform tick.
+            fontSize: 11,
             color: timeColor,
           }}
         >
