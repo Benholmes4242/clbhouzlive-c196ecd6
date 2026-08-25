@@ -34,6 +34,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { A, KICKER, LABEL, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatDayMonthShortGB } from '@/i18n/format';
 import { smoothPathXY } from '@/lib/charts/smoothPath';
+import { HcpTrendChart } from '@/components/profile/handicap/whs/charts';
 
 interface Props {
   actorType: 'personal' | 'business';
@@ -413,132 +414,15 @@ const TrendCard: React.FC<{
           )}
         </>
       }
-      plot={(w) => {
-        if (n < 2 || !stats) return null;
-        const h = PLOT_H;
-        const padY = 16;
-        const padX = 11;
-        const span = stats.worst - stats.best || 1;
-        // NATURAL AXIS: high index at the TOP. A dip is a good spell.
-        // 16px vertical headroom at each end guarantees the high/low callouts
-        // never clip out of the plot.
-        const xy = points.map((p, i) => {
-          const x = padX + (i / (n - 1)) * (w - 2 * padX);
-          const y = padY + ((stats.worst - p.v) / span) * (h - padY * 2);
-          return [x, y] as const;
-        });
-        const line = smoothPath(xy);
-        const area = `${line} L${w - padX},${h} L${padX},${h} Z`;
-
-        const mx = xy[active][0];
-        const my = xy[active][1];
-        const markerTone = zoneColor(points[active].v, stats.best, stats.worst);
-
-        // CALLOUTS: the high and the low, on the curve, no axis furniture.
-        // A flat window has no extremes — draw neither. Tied extremes label
-        // their FIRST occurrence only.
-        const flat = stats.worst - stats.best <= 0;
-        const worstIdx = flat ? -1 : points.findIndex((p) => p.v === stats.worst);
-        const bestIdx = flat ? -1 : points.findIndex((p) => p.v === stats.best);
-
-        // COLLISION GUARD for two labels that are now both above their dots.
-        // When the extremes are close in x AND close in y (the flat-index
-        // case: a settled handicap whose high and low are a few days and a
-        // few tenths apart) the two callouts would sit on top of each other.
-        // We nudge the LOW one horizontally AWAY from the high one rather
-        // than suppressing it — both figures stay readable, and neither
-        // moves below its dot into the legend row again.
-        let lowShift = 0;
-        if (worstIdx >= 0 && bestIdx >= 0) {
-          const dx = xy[bestIdx][0] - xy[worstIdx][0];
-          const dy = Math.abs(xy[bestIdx][1] - xy[worstIdx][1]);
-          if (Math.abs(dx) < 46 && dy < 16) lowShift = dx >= 0 ? 24 : -24;
-        }
-
-        const callout = (idx: number, kind: 'high' | 'low', xShift = 0) => {
-          if (idx < 0) return null;
-          const [cx, cy] = xy[idx];
-          const tone = zoneColor(points[idx].v, stats.best, stats.worst);
-          const onMarker = idx === active;
-          // Horizontal edge guard: the last revision is often the best, so the
-          // right-hand rim is hit immediately. Anchor into the plot by 2px.
-          const lx = Math.min(Math.max(cx + xShift, padX), w - padX);
-          const nearLeft = lx <= padX + 18;
-          const nearRight = lx >= w - padX - 18;
-          const anchor = nearLeft ? 'start' : nearRight ? 'end' : 'middle';
-          const tx = nearLeft ? 2 : nearRight ? w - 2 : lx;
-          // Vertical placement: BOTH labels sit ABOVE their dot. This
-          // overturns the earlier rule — "high is always above its dot, low
-          // always below" — which existed for two reasons: symmetry, and
-          // clip-safety at both edges (PAD_Y = 16 reserved headroom top AND
-          // bottom, so neither direction could clip). Ben has chosen both
-          // above, so the low label no longer risks the OFF BEST / MID / NEAR
-          // BEST legend row beneath the plot; instead it enters the plot area,
-          // and the two guards above (horizontal nudge) and below (y clamp at
-          // 9px) keep it clear of the other label and of the top edge.
-          const ty = Math.max(cy - 8, 9);
-          return (
-            <g key={idx} opacity={onMarker ? 0.42 : 1}>
-              {/* When today IS the extreme, the scrub marker owns the point:
-                  one dot, not two stacked. */}
-              {!onMarker && (
-                <circle cx={cx} cy={cy} r={3.4} fill={tone} stroke="#FFFFFF" strokeWidth={1.6} />
-              )}
-              <text
-                x={tx}
-                y={ty}
-                textAnchor={anchor}
-                fill={tone}
-                /* Extreme-value labels are READ figures (the high/low index), not axis
-                   ticks, so they take the 11px floor rather than the 10px axis
-                   exception. */
-                style={{ fontSize: 11, fontWeight: 700, ...FIGS }}
-              >
-                {formatIndex(points[idx].v)}
-              </text>
-            </g>
-          );
-        };
-
-        return (
-          <svg width={w} height={h} style={{ display: 'block' }}>
-            <defs>
-              <linearGradient id="hcp-trend-fill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={deltaTone} stopOpacity={0.42} />
-                <stop offset="100%" stopColor={deltaTone} stopOpacity={0.03} />
-              </linearGradient>
-              {/* One stop per revision, coloured by its zone, so a good spell
-                  renders green and a bad one red along one continuous line. */}
-              <linearGradient id="hcp-trend-stroke" x1="0" y1="0" x2="1" y2="0">
-                {points.map((p, i) => (
-                  <stop
-                    key={i}
-                    offset={`${(i / (n - 1)) * 100}%`}
-                    stopColor={zoneColor(p.v, stats.best, stats.worst)}
-                  />
-                ))}
-              </linearGradient>
-            </defs>
-            <path d={area} fill="url(#hcp-trend-fill)" />
-            <path d={line} fill="none" stroke="#FFFFFF" strokeOpacity={0.6} strokeWidth={4.0} strokeLinecap="round" strokeLinejoin="round" />
-            <path d={line} fill="none" stroke="url(#hcp-trend-stroke)" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
-            {/* Under the marker triple, so the marker is never obscured. */}
-            {callout(worstIdx, 'high')}
-            {callout(bestIdx, 'low', lowShift)}
-            {/* The vertical crosshair is a SCRUB AFFORDANCE, not chrome: it
-                only draws while the member is parked on a revision. At rest
-                the marker sits on the last point and the line read as a
-                stray white rule at the plot's right edge. */}
-            {scrub != null && (
-              <line x1={mx} y1={0} x2={mx} y2={h} stroke="#FFFFFF" strokeOpacity={0.85} strokeWidth={2} />
-            )}
-            <circle cx={mx} cy={my} r={8.5} fill="#FFFFFF" fillOpacity={0.45} />
-            <circle cx={mx} cy={my} r={4.5} fill="#FFFFFF" />
-            <circle cx={mx} cy={my} r={2.5} fill={markerTone} />
-          </svg>
-        );
-
-      }}
+      plot={(w) => (
+        <HcpTrendChart
+          points={points}
+          active={active}
+          showCrosshair={scrub != null}
+          width={w}
+          height={PLOT_H}
+        />
+      )}
       legend={
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
