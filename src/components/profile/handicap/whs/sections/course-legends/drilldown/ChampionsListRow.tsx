@@ -1,6 +1,8 @@
 import { GAM } from '../../../gam/tokens';
 import React from 'react';
 import { Crown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MovementCell } from './_shared/MovementCell';
 
 /**
