@@ -525,7 +525,13 @@ const TrendCard: React.FC<{
             {/* Under the marker triple, so the marker is never obscured. */}
             {callout(worstIdx, 'high')}
             {callout(bestIdx, 'low', lowShift)}
-            <line x1={mx} y1={0} x2={mx} y2={h} stroke="#FFFFFF" strokeOpacity={0.85} strokeWidth={2} />
+            {/* The vertical crosshair is a SCRUB AFFORDANCE, not chrome: it
+                only draws while the member is parked on a revision. At rest
+                the marker sits on the last point and the line read as a
+                stray white rule at the plot's right edge. */}
+            {scrub != null && (
+              <line x1={mx} y1={0} x2={mx} y2={h} stroke="#FFFFFF" strokeOpacity={0.85} strokeWidth={2} />
+            )}
             <circle cx={mx} cy={my} r={8.5} fill="#FFFFFF" fillOpacity={0.45} />
             <circle cx={mx} cy={my} r={4.5} fill="#FFFFFF" />
             <circle cx={mx} cy={my} r={2.5} fill={markerTone} />
