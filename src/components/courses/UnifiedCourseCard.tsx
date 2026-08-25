@@ -295,7 +295,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                       fontWeight: 700,
                       letterSpacing: '0.10em',
                       textTransform: 'uppercase',
-                      color: viewerStatus === 'rated' ? '#F7931E' : 'rgba(255,255,255,0.82)',
+                      color: 'rgba(255,255,255,0.82)',
                     }}
                   >
                     {viewerStatus === 'rated' ? t('card.rated') : t('card.played')}
