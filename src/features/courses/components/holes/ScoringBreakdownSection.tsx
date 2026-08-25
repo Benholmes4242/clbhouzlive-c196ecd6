@@ -1001,75 +1001,28 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
         </Panel>
       )}
 
-      {/* 4 - HOW YOUR ROUND UNFOLDS */}
-      {hasInterpretation && cumulative && (
+      {/* 4 - HOW YOUR ROUND UNFOLDS
+          The handicap page's ThirdsChart, imported unchanged (Ben's call: it
+          reads better than the cumulative curve + three bars it replaces).
+
+          RED HERE IS NOT THE UNDER-PAR RED. ThirdsChart marks the WORST third
+          in CHART.UP. On a SCORE (Clubhouse cards, the holes tree, every to-par
+          mark) red means UNDER par - good. On a DAMAGE metric (shots dropped,
+          here and on the handicap page's "How your rounds unfold" card) higher
+          is worse, so red marks the worst value. Both surfaces are deliberate;
+          do not "reconcile" one against the other. */}
+      {hasInterpretation && thirdsMax > 0 && (
         <Panel
           title={t('courses:courseDetail.you.roundUnfolds')}
           aside={t('courses:courseDetail.you.byThird')}
         >
-          <svg
-            viewBox={`0 0 ${cumulative.W} ${cumulative.H}`}
-            width="100%"
-            height={cumulative.H}
-            preserveAspectRatio="none"
-            aria-hidden
-            style={{ display: 'block' }}
-          >
-            <path d={cumulative.area} fill="rgba(255,255,255,0.06)" />
-            <path
-              d={cumulative.d}
-              fill="none"
-              stroke={A.INK}
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-              gap: 12,
-              marginTop: 12,
-            }}
-          >
-            {thirdSums.map((v, i) => {
-              const isWorst = !thirdsEven && i === worstIdx;
-              const shade = thirdsEven ? THIRD_LADDER[2] : THIRD_LADDER[thirdRank[i]];
-              return (
-                <div key={i} style={{ textAlign: 'center', minWidth: 0 }}>
-                  <div style={{ ...NUM, fontSize: 18, color: isWorst ? A.INK : A.MUTE }}>
-                    +{v.toFixed(1)}
-                  </div>
-                  {/* Neutral ink by rank. NEVER semantic colour, never a tint. */}
-                  <div
-                    style={{
-                      height: 6,
-                      borderRadius: 3,
-                      background: A.TRACK,
-                      marginTop: 6,
-                    }}
-                  >
-                    <div
-                      style={{
-                        height: 6,
-                        borderRadius: 3,
-                        width: `${thirdShares[i]}%`,
-                        background: shade,
-                      }}
-                    />
-                  </div>
-                  {/* AXIS, STATED EXCEPTION (floor 10): a hole RANGE is a coordinate. */}
-                  <div style={{ ...LABEL, fontSize: 10, marginTop: 7 }}>{thirdLabels[i]}</div>
-                </div>
-              );
-            })}
-
-          </div>
+          <ThirdsChart
+            thirds={thirdSums.map((v, i) => ({ l: thirdLabels[i], v: Math.max(0, v) }))}
+          />
           <Caption>{s3Advice}</Caption>
         </Panel>
       )}
+
 
       {/* 5 - YOUR FORM HERE */}
       {form && (
