@@ -107,7 +107,10 @@ function toneFor(v: number, digits = 1): string {
  */
 function marginTone(gap: number): string {
   if (Math.abs(gap) < REFERENCE_NOISE_FLOOR) return A.MUTE;
-  return gap > 0 ? A.IMPROVED : A.DRIFTED;
+  // BRIEF_PAR_TYPE_ROWS_AND_MARGIN_TONE s2: a to-par margin is a SCORE, so it
+  // takes the score-band canon. INDEX_DELTA (A.IMPROVED / A.DRIFTED) is index
+  // MOVEMENT only and its own source forbids this use.
+  return gap > 0 ? BAND_GREEN_DARK : BAND_RED_DARK;
 }
 
 /** The field's bar / mark. Neutral - the comparison, not a verdict. */
