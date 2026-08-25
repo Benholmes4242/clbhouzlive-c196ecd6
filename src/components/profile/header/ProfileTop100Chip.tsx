@@ -1,3 +1,4 @@
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
@@ -71,7 +72,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
           enableAnimations={false}
           quality="low"
         />
-        <ChevronRight className="absolute -right-7 h-5 w-5 text-slate-400" />
+        <ChevronRight className="absolute -right-7 h-5 w-5" style={{ color: A.MUTE }} />
       </button>
       
       {/* Completion stamps row */}

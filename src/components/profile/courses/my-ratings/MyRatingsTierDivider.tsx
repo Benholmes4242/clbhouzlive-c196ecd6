@@ -1,4 +1,5 @@
 import React from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { reviewTierColor } from '@/components/shared/ReviewGhostScore';
 import type { RatingTier } from '@/lib/ratingTier';
 
@@ -13,8 +14,8 @@ import type { RatingTier } from '@/lib/ratingTier';
 const FONT_SANS =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
-const INK_TERTIARY = '#94A3B8';
-const HAIRLINE = '#E2E8F0';
+const INK_TERTIARY = A.MUTE;
+const HAIRLINE = A.BORDER;
 
 const TIER_NAMES: readonly string[] = ['EXCEPTIONAL', 'EXCELLENT', 'GOOD', 'FAIR', 'POOR'];
 
