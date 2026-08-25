@@ -115,13 +115,19 @@ export const RAMP_TOPAR = {
  *
  * THIS IS THE ONLY DEFINITION IN THE CODEBASE. Every consumer imports it.
  */
+/* REPOINTED FOR THE DARK GROUND by MICRO_BRIEF_COURSE_CARD_TEE_ROWS §1. The
+   reasoning above survives intact - six stops, a neutral-to-red arc, and never
+   a faint red at the easy end. Only the VALUES moved. On white, harder meant
+   DARKER; on #15171F the deep maroons went muddy and the hardest stop - the one
+   that must read - was the muddiest of all. On dark, harder means BRIGHTER, so
+   the arc now runs TOWARD the red rather than away from it. */
 export const DIFFICULTY_RAMP = [
-  '#C7CDD4', // 0 easiest - a solid neutral, never a faint red
-  '#A6ADB6', // 1
-  '#D8836A', // 2 warm middle
-  '#C0392B', // 3
-  '#A02219', // 4
-  '#7E140F', // 5 hardest
+  'rgba(248,250,252,0.34)', // 0 easiest - a solid neutral, never a faint red
+  'rgba(248,250,252,0.50)', // 1
+  '#E08B70', // 2 warm middle
+  '#E5604E', // 3
+  '#F0554A', // 4
+  '#FF6B60', // 5 hardest - A.RED, the dark-surface red
 ] as const;
 
 export const DIFFICULTY_HARD_HEX = DIFFICULTY_RAMP[5];
