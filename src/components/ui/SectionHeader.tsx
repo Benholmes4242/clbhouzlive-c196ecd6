@@ -6,14 +6,17 @@
 import { memo, type ReactNode } from 'react';
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { formatNumber } from '@/i18n/format';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { BAND_RED_DARK } from '@/features/courses/_shared/scoreBands';
 
 
 const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const AMBER = '#F7931E';
-const AMBER_AA = '#0E1216'; // eyebrow ink (flipped from amber — EYEBROW INK FLIP)
-const INK = '#0F172A';
-const INK_MUTE = '#64748B';
-const SLATE = '#94A3B8';
+/**
+ * EYEBROW INK FLIP (retired): the prime eyebrow used to flip from amber to a
+ * near-black ink because small amber text failed contrast on WHITE. The canvas
+ * is dark-only now, so the reasoning inverts — near-black is the failing value
+ * and amber is the legible one. The eyebrow is plain A.AMBER.
+ */
 
 type Tier = 'editorial' | 'standard' | 'rail';
 type Role = 'prime' | 'section' | 'rail';
@@ -28,10 +31,11 @@ const TIER_TO_ROLE: Record<Tier, Role> = {
 };
 
 const EYEBROW_TONE: Record<EyebrowTone, string> = {
-  slate: '#64748B',
-  amber: '#0E1216',
-  danger: '#DC2626',
+  slate: A.MUTE,
+  amber: A.AMBER,
+  danger: BAND_RED_DARK,
 };
+
 
 interface SectionHeaderProps {
   tier?: Tier;
@@ -53,7 +57,7 @@ interface SectionHeaderProps {
   action?: { label: string; onClick: () => void };
   /** Non-interactive right-aligned caps text (e.g. "FRI 19 JUN", "SCORE DIFF VS HCP"). */
   meta?: ReactNode;
-  /** Tier-2 eyebrow colour. 'slate' default (#64748B) | 'amber' (#F7931E) | 'danger' (#DC2626). */
+  /** Tier-2 eyebrow colour. 'slate' default (A.MUTE) | 'amber' (A.AMBER) | 'danger' (BAND_RED_DARK). */
   tone?: EyebrowTone;
   /** Optional inline count rendered after the eyebrow (slate-400, tabular). */
   count?: number;
@@ -82,7 +86,7 @@ interface SectionHeaderProps {
 
 function ActionAffordance({
   action,
-  color = SLATE,
+  color = A.MUTE,
 }: {
   action: { label: string; onClick: () => void };
   color?: string;
@@ -121,7 +125,7 @@ function MetaSlot({ children }: { children: ReactNode }) {
         fontWeight: 700,
         letterSpacing: '0.12em',
         textTransform: 'uppercase',
-        color: 'var(--hcp-t-40, #94A3B8)',
+        color: 'var(--hcp-t-40, rgba(248,250,252,0.62))',
         fontVariantNumeric: 'tabular-nums',
         fontFeatureSettings: '"kern" 1, "liga" 1',
         whiteSpace: 'nowrap',
@@ -158,8 +162,8 @@ function SectionHeaderInner(props: SectionHeaderProps) {
 
   const role: Role = roleProp ?? TIER_TO_ROLE[tierProp ?? 'standard'];
   const isDark = surface === 'dark';
-  const titleColor = isDark ? 'var(--hcp-t-100)' : INK;
-  const subColor = isDark ? 'var(--hcp-t-60)' : INK_MUTE;
+  const titleColor = isDark ? 'var(--hcp-t-100)' : A.INK;
+  const subColor = isDark ? 'var(--hcp-t-60)' : A.BODY;
 
   const pad = { paddingTop, paddingLeft: paddingX, paddingRight: paddingX };
 
@@ -201,12 +205,12 @@ function SectionHeaderInner(props: SectionHeaderProps) {
   const cutWidth = isPrime ? 34 : 22;
   const cutHeight = isPrime ? 3 : 2;
   const defaultEyebrowColor = isPrime
-    ? AMBER_AA
+    ? A.AMBER
     : isDark
       ? 'var(--hcp-t-60)'
-      : '#94A3B8';
+      : A.MUTE;
   const eyebrowColor = accent ?? (tone ? EYEBROW_TONE[tone] : defaultEyebrowColor);
-  const cutColor = accent ?? AMBER;
+  const cutColor = accent ?? A.AMBER;
 
   const hasTitle = Boolean(title);
 
@@ -241,7 +245,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
             )}
             {kicker}
             {required && (
-              <span aria-hidden="true" style={{ color: AMBER, marginLeft: 3, letterSpacing: 0 }}>
+              <span aria-hidden="true" style={{ color: A.AMBER, marginLeft: 3, letterSpacing: 0 }}>
                 *
               </span>
             )}
@@ -252,7 +256,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
                   fontFamily: SF_STACK,
                   fontSize: 11,
                   fontWeight: 700,
-                  color: '#94A3B8',
+                  color: A.MUTE,
                   fontVariantNumeric: 'tabular-nums',
                   letterSpacing: 0,
                 }}
