@@ -682,7 +682,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     <Select value={country ?? 'all'} onValueChange={onCountryChange}>
       <SelectTrigger
         className={WELL_TRIGGER_CLS}
-        style={wellStyle(!!country)}
+        style={WELL_ENABLED}
         aria-label={t('statBrowse.selectCountryA11y')}
       >
         <span className="flex w-full items-center" style={{ gap: 6 }}>
@@ -729,9 +729,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     <Select value={region ?? 'all'} onValueChange={onRegionChange} disabled={regionDisabled}>
       <SelectTrigger
         className={WELL_TRIGGER_CLS}
-        style={regionDisabled
-          ? { ...wellStyle(false), opacity: 0.55, color: INK_FAINT }
-          : wellStyle(!!region)}
+        style={regionDisabled ? WELL_DISABLED : WELL_ENABLED}
         aria-label={t('statBrowse.selectRegionA11y')}
       >
         <span className="flex w-full items-center" style={{ gap: 6 }}>
@@ -777,7 +775,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     <Select value={lens} onValueChange={(v) => onLensChange(v as StatLens)}>
       <SelectTrigger
         className={WELL_TRIGGER_AUTO_CLS}
-        style={wellStyle(true)}
+        style={WELL_ENABLED}
         aria-label={t('statBrowse.selectLensA11y')}
       >
         <span className="flex min-w-0 items-center" style={{ gap: 6 }}>
