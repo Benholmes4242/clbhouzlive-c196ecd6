@@ -927,7 +927,7 @@
       "yards_other": "{{yards}} yds",
       "slopeLabel": "Slope rating",
       "lengthLabel": "Length",
-      "courseRating": "Course rating",
+      "courseRating": "Rating",
       "vsStandard": "vs standard slope of {{standard}}",
       "playsHarder": "Higher handicaps give up more strokes here than at an average course.",
       "playsEasier": "Higher handicaps give up fewer strokes here than at an average course.",
