@@ -69,7 +69,7 @@ export default function ActorCards({
       <div
         style={{
           fontWeight: 700,
-          fontSize: 10,
+          fontSize: 11,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
           color: A.INK,
@@ -189,7 +189,7 @@ export default function ActorCards({
                 <div
                   style={{
                     fontWeight: 700,
-                    fontSize: 14,
+                    fontSize: 15,
                     color: A.INK,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -201,7 +201,7 @@ export default function ActorCards({
                 <div
                   style={{
                     fontWeight: 500,
-                    fontSize: 11,
+                    fontSize: 13,
                     color: A.MUTE,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -227,7 +227,7 @@ export default function ActorCards({
                     background: A.INK,
                     color: A.CANVAS,
                     fontWeight: 700,
-                    fontSize: 10,
+                    fontSize: 11,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -269,7 +269,7 @@ export default function ActorCards({
             <div style={{ fontWeight: 700, fontSize: 16, color: A.AMBER_DEEP, lineHeight: 1 }}>
               +
             </div>
-            <div style={{ fontWeight: 600, fontSize: 10, color: A.MUTE, marginTop: 4 }}>
+            <div style={{ fontWeight: 600, fontSize: 11, color: A.MUTE, marginTop: 4 }}>
               Business
             </div>
           </div>
