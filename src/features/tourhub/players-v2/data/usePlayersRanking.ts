@@ -225,7 +225,6 @@ export function usePlayersRanking(tour: PlayersTourId) {
       rankings = rankings.filter(
         (r) =>
           !!(r.player_id ?? r.manual_player_id) &&
-          !!r.player_name !== false &&
           (r.player_name ?? '').length <= 80,
       );
       if (!rankings.length) return { synced: false, statLabel: null, rows: [] };
