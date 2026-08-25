@@ -184,7 +184,7 @@ function SpotlightRow({
           hairlineRing
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 9.5, fontWeight: 700, color: V4.ink, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: V4.ink, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
             {t('overview.rankings.worldNo1Label')}
           </div>
           <div style={{ marginTop: 2, fontSize: 16.5, fontWeight: 700, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -197,7 +197,7 @@ function SpotlightRow({
           <div style={{ fontSize: 28, fontWeight: 200, color: V4.ink, lineHeight: 1, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
             {formatNumber(Math.round(row.points))}
           </div>
-          <div style={{ marginTop: 4, fontSize: 8.5, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em' }}>
+          <div style={{ marginTop: 4, fontSize: 11, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em' }}>
             {t('overview.rankings.pointsLabel')}
           </div>
         </div>

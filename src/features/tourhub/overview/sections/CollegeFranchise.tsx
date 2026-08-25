@@ -146,7 +146,7 @@ export function CollegeFranchise() {
             <Skeleton className="h-11 w-11" style={{ borderRadius: 15 }} />
             <Skeleton className="h-3.5 w-20 rounded" />
           </div>
-          <span style={{ fontSize: 10, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.16em' }}>{t('overview.collegeFranchise.vs')}</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.16em' }}>{t('overview.collegeFranchise.vs')}</span>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
             <Skeleton className="h-11 w-11" style={{ borderRadius: 15 }} />
             <Skeleton className="h-3.5 w-20 rounded" />
@@ -252,7 +252,7 @@ export function CollegeFranchise() {
           onClick={() => goCollege(leader.normalized_name)}
           onCaptainClick={leaderCap ? () => navigate(`/tourhub/player/${leaderCap.playerId}`) : undefined}
         />
-        <div style={{ fontSize: 10, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.16em' }}>{t('overview.collegeFranchise.vs')}</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.16em' }}>{t('overview.collegeFranchise.vs')}</div>
         <DuelSide
           name={chaserShort}
           logo={chaserLogo}
@@ -283,7 +283,7 @@ export function CollegeFranchise() {
           <span style={{ fontSize: 11.5, fontWeight: 700, color: leaderColor, fontVariantNumeric: 'tabular-nums' }}>
             {formatCurrencyUsdCompact(leader.earnings_total)}
           </span>
-          <span style={{ fontSize: 9, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em', textAlign: 'center' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em', textAlign: 'center' }}>
             {t('overview.collegeFranchise.tugLabel')}
           </span>
           <span style={{ fontSize: 11.5, fontWeight: 700, color: chaserColor, fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
@@ -419,10 +419,10 @@ function DuelSide({
             userId={captain.id}
             hairlineRing
           />
-          <span style={{ fontSize: 10, fontWeight: 600, color: V4.inkMute, letterSpacing: '-0.005em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: V4.inkMute, letterSpacing: '-0.005em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {captain.name}
           </span>
-          <span style={{ fontSize: 7.5, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
             {t('overview.collegeFranchise.captainSuffix')}
           </span>
         </button>
