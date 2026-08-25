@@ -615,7 +615,7 @@ export function MostPlayedLeaderboard({
               was. Do not silently reverse this again.
               'discover.whereTheyPlayed' is now unused and STAYS in all six
               locale files, the treatment §S4.1 gave the key it replaced. */}
-          {t('discover.mostPlayed', 'Courses played this week')}
+          {t('discover.mostPlayed', 'Courses played in the last 14 days')}
         </Eyebrow>
       )}
 
@@ -826,7 +826,7 @@ export function MostPlayedLeaderboard({
                         </span>
                       </span>
                       <span style={{ ...LABEL, display: 'block', marginTop: 4, fontSize: 11, letterSpacing: '0.14em', color: FAINT }}>
-                        {t('discover.mostPlayedLowLabel', 'LOWEST THIS WEEK', { count: r.players.length })}
+                        {t('discover.mostPlayedLowLabel', 'LOWEST IN 14 DAYS', { count: r.players.length })}
                       </span>
                     </span>
                     {r.avgToPar != null && (

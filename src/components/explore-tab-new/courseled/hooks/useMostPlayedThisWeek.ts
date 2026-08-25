@@ -2,14 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
- * useMostPlayedThisWeek — tracked WHS rounds per course over a rolling 7 days,
- * with the delta against the prior 7 (BRIEF, section 5).
+ * useMostPlayedThisWeek — tracked WHS rounds per course over a rolling 14 days,
+ * with the delta against the prior 14 (BRIEF_DISCOVER_FOURTEEN_DAY_WINDOW §3).
+ * The hook name still says WEEK; that is a known, accepted cost (§5).
  *
- * QUERY SHAPE: one client select over gam_round_stats for the 14-day window
+ * QUERY SHAPE: one client select over gam_round_stats for the 28-day window
  * (course_id + play_date only), counted client-side for both windows. Platform
  * volume is single figures per week, so an RPC would buy nothing; if row volume
  * ever makes this heavy the aggregate belongs in a `discover_most_played` RPC
- * returning (course_id, rounds_7d, rounds_prev_7d).
+ * returning (course_id, rounds_14d, rounds_prev_14d).
  *
  * A cooling-off course shows NO delta — never a red one.
  *
@@ -23,35 +24,35 @@ import { supabase } from '@/integrations/supabase/client';
  */
 
 /**
- * A course needs at least this many rounds in the 7-day window to appear.
+ * A course needs at least this many rounds in the 14-day window to appear.
  *
  * ONE, NOT TWO (BRIEF_MOST_PLAYED_MIN_ONE §1.1): at this member base a single
  * tracked round is still a course somebody played, and a floor of two was
- * hiding three of the five courses played in the week. Five honest entries beat
+ * hiding three of the five courses played in the window. Five honest entries beat
  * two "qualifying" ones.
  */
 const MIN_ROUNDS = 1;
 
-/** Every outcome of the week-on-week comparison, none discarded. */
+/** Every outcome of the period-on-period comparison, none discarded. */
 export type MostPlayedMove = 'new' | 'up' | 'down' | 'level';
 
 export interface MostPlayedRow {
   courseId: string;
   courseName: string | null;
   count: number;
-  /** Rounds in the prior 7 days. */
+  /** Rounds in the prior 14 days (days 15–28). */
   prior: number;
-  /** Raw signed change vs the prior 7 days (count - prior). */
+  /** Raw signed change vs the prior 14 days (count - prior). */
   change: number;
   /** Which of the four states the row renders. */
   move: MostPlayedMove;
   /**
-   * DISTINCT members with a tracked round here in the CURRENT seven days.
+   * DISTINCT members with a tracked round here in the CURRENT fourteen days.
    * The count on the right is ROUNDS, so this is the figure that says
    * "4 rounds, by 3 members".
    *
    * AMENDED (BRIEF_MOST_PLAYED_WHO_PLAYED §S0.2): the Set behind this count is
-   * still built the same way from the same 14-day read — but it is no longer
+   * still built the same way from the same 28-day read — but it is no longer
    * thrown away. `players` below resolves those very ids through ONE profile
    * select, so the row can say WHO played rather than only how many. The last
    * clause of this comment ("No avatars, no profile join — a count") is the
@@ -59,8 +60,8 @@ export interface MostPlayedRow {
    */
   members: number;
   /**
-   * Average to par over the CURRENT seven days, eighteen-hole scored rounds
-   * only. Null when the course has no comparable scored round this week.
+   * Average to par over the CURRENT fourteen days, eighteen-hole scored rounds
+   * only. Null when the course has no comparable scored round in the window.
    */
   avgToPar: number | null;
   /**
@@ -72,9 +73,9 @@ export interface MostPlayedRow {
    */
   players: MostPlayedPlayer[];
   /**
-   * LOWEST GROSS at this course in the current seven days, over every tracked
+   * LOWEST GROSS at this course in the current fourteen days, over every tracked
    * round — independent of whether that member's profile resolved. Null when no
-   * round this week carried a gross.
+   * round in the window carried a gross.
    */
   bestGross: number | null;
 }
@@ -84,7 +85,7 @@ export interface MostPlayedPlayer {
   userId: string;
   name: string;
   avatarUrl: string | null;
-  /** That member's BEST (lowest) gross at this course this week. */
+  /** That member's BEST (lowest) gross at this course in the window. */
   gross: number | null;
   /**
    * TO PAR for that same best round (gross - course_par), null when the round
@@ -133,8 +134,11 @@ export function useMostPlayedThisWeek(limit = 25) {
     queryKey: ['courseled', 'most-played', limit],
     queryFn: async (): Promise<MostPlayedRow[]> => {
       const now = Date.now();
-      const startPrev = new Date(now - 14 * DAY).toISOString().slice(0, 10);
-      const startCur = new Date(now - 7 * DAY).toISOString().slice(0, 10);
+      // TWO EQUAL-LENGTH FOURTEEN-DAY PERIODS (§3): current = day −14..now,
+      // prior = day −28..−14. Both bounds move together or the comparison
+      // silently lies (a zero-length prior makes every course read NEW).
+      const startPrev = new Date(now - 28 * DAY).toISOString().slice(0, 10);
+      const startCur = new Date(now - 14 * DAY).toISOString().slice(0, 10);
 
       // SAME READ, TWO MORE COLUMNS. gam_round_stats carries NO to-par field,
       // so the average is derived from gross_score - course_par; holes_played

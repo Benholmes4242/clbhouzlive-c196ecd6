@@ -33,6 +33,7 @@ import {
   orderForWeek,
   usePlayedCourseIds,
   useGolfThisWeek,
+  GOLF_WEEK_DAYS,
   useWeekCounts,
   useWeekScopeCourses,
   type WeekScope,
@@ -1640,7 +1641,7 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'best',
       emoji: '\uD83D\uDD25', // FIRE
-      label: t('discover.golfThisWeek.bestLabel', 'Best this week'),
+      label: t('discover.golfThisWeek.bestLabel', 'Best in 14 days'),
       row: best.row,
       /* The hero is `bestOfWeek`'s winner, unchanged; the sort's first place is
          the same row, so the runners are places 2 and 3 of that same list. */
@@ -1791,16 +1792,18 @@ export function GolfThisWeek({
           }}
         >
           {/* The window is a THIRD SEGMENT OF THE SAME TEMPLATE so a translator
-              can reorder all three. It is FIXED at seven days — never derived
-              from the oldest round, which would make the window look like it
-              moves on a quiet week. */}
+              can reorder all three. It is FIXED at GOLF_WEEK_DAYS (fourteen,
+              per BRIEF_DISCOVER_FOURTEEN_DAY_WINDOW) — never derived from the
+              oldest round, which would make the window look like it moves on a
+              quiet fortnight, and never a literal, which would let the readout
+              disagree with the query. */}
           {t(
             'discover.golfThisWeek.count',
             '{{rounds}} rounds \u00B7 {{courses}} courses \u00B7 {{days}} days',
             {
               rounds: counts.rounds,
               courses: counts.courses,
-              days: 7,
+              days: GOLF_WEEK_DAYS,
             },
           )}
         </span>

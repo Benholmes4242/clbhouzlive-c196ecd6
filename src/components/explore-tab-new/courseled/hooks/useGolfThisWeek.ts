@@ -21,18 +21,28 @@ import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircl
  * rather than duplicated. RLS decides visibility.
  */
 
-/** Seven days. "This week" is the section's entire claim — do not widen it (§F). */
-export const GOLF_WEEK_DAYS = 7;
+/**
+ * FOURTEEN DAYS (BRIEF_DISCOVER_FOURTEEN_DAY_WINDOW §1). The window was seven;
+ * Ben widened it to a fortnight and every "this week" claim in the copy now
+ * reads "in the last 14 days". A FIXED constant — never derived from the data.
+ *
+ * KNOWN, ACCEPTED COST (§5): the identifiers still say WEEK — useGolfThisWeek,
+ * GOLF_WEEK_*, WeekScope, the discover.golfThisWeek.* / discover.week.* keys.
+ * Renaming them would touch dozens of files and every locale key for no
+ * user-visible gain, so the names name a week while the window is a fortnight.
+ */
+export const GOLF_WEEK_DAYS = 14;
 
 /**
  * THE ONLY BOUND (BRIEF_GOLF_THIS_WEEK_UNCAP §1/§3). The rail renders EVERY
  * round the fetch returns for the selected scope — there is no client-side rail
- * cap. So "unlimited" means UP TO 60: the fetch is the single bound, and the
- * readout is true only while a scope's real seven-day total stays under it.
- * Measured at ship time: worldwide = 15 rounds in the window, so every scope is
- * well inside 60. Raising this is a different brief (60 heavy tiles is a lot).
+ * cap. So "unlimited" means UP TO 120: the fetch is the single bound, and the
+ * readout is true only while a scope's real fourteen-day total stays under it.
+ * DOUBLED WITH THE WINDOW (§1): a fortnight is expected to carry twice the rows,
+ * and if the cap clipped them the readout and the rail would disagree on a busy
+ * fortnight. Current volume is single figures per week, so this is headroom.
  */
-export const GOLF_WEEK_FETCH = 60;
+export const GOLF_WEEK_FETCH = 120;
 
 
 /** The five scopes (§S2.1). Worldwide leads and is the default. */
@@ -95,7 +105,8 @@ export function useWeekScopeCourses(userId: string | undefined, scope: WeekScope
 }
 
 /**
- * THE ROUNDS FOR A SCOPE. Seven days in every case; the per-member cap is off,
+ * THE ROUNDS FOR A SCOPE. GOLF_WEEK_DAYS (fourteen) in every case; the
+ * per-member cap is off,
  * because a section that says "16 rounds" must show sixteen rounds (§S1.4).
  */
 export function useGolfThisWeek(
