@@ -151,7 +151,15 @@ function toParColor(n: number | null): string {
 
 /* --------------------------------------------------------------- the card */
 
-const NINE_GRID = '26px repeat(9, minmax(0, 1fr)) 32px';
+/*
+ * THE STUB COLUMN (item 4). It was 26px, set when the axis labels were 8px, and
+ * it was already too narrow for TOTAL then. With the floor at 11 the widest stub
+ * string, "PAR 72", measures 48.3px, so the column is widened to 54px — the
+ * measured width plus slack — and the width is taken out of the nine hole
+ * columns, NOT out of the type. The centred OUT/IN segments sit on those nine
+ * columns and so lose ~3px each at 320; both strings are nowrap and still fit.
+ */
+const NINE_GRID = '54px repeat(9, minmax(0, 1fr)) 32px';
 
 /**
  * Result marks come from the shared ScoreMark renderer — one grammar across the
