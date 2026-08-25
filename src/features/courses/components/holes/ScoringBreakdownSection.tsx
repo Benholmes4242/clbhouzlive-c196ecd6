@@ -1080,8 +1080,14 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
 
             const delta = form.priorAvg == null ? null : form.priorAvg - form.recentAvg;
             /** The fill carries the direction of travel, as on the index tile. */
+            // Acceptance D: this is a SCORING-average trend, not index movement,
+            // so it takes the score-band canon like marginTone.
             const fillTone =
-              delta == null || Math.abs(delta) < 0.5 ? A.AMBER : delta > 0 ? A.IMPROVED : A.DRIFTED;
+              delta == null || Math.abs(delta) < 0.5
+                ? A.AMBER
+                : delta > 0
+                  ? BAND_GREEN_DARK
+                  : BAND_RED_DARK;
 
             return (
               <>
