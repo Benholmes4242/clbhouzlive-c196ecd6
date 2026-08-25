@@ -1683,7 +1683,8 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
     .update({ is_current: false, updated_at: new Date().toISOString() })
     .eq("course_id", courseId).eq("category", cfg.category).eq("is_current", true);
 
-  // Insert new top 10
+  // Insert the FULL field, ranked from 1 with no cap. One insert; at this scale
+  // (largest course ~17 players) chunking is unnecessary.
   if (arr.length > 0) {
     const rows = arr.map((r, i) => ({
       user_id: r.user_id,
