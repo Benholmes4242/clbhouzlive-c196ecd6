@@ -930,57 +930,61 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
           title={t('courses:holes.scoringBreakdown.parTypeTitle')}
           aside={t('courses:holes.scoringBreakdown.parTypeAside')}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
+          {/*
+            Same row construction as the Course tab's ParTypePanel: plural
+            label, 8px ramp-tinted track, one figure at the right. The field
+            tick and the field-margin column are deliberately absent here -
+            this section shows the member's own scoring only.
+          */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {parTypes.map((p) => {
-              const barW = Math.max(3, Math.min(100, (Math.max(0, p.you) / parTypeScale) * 100));
-              const tickW = p.covered
-                ? Math.max(0, Math.min(100, (Math.max(0, p.field) / parTypeScale) * 100))
-                : null;
-              // field minus you: POSITIVE means the member is better here.
-              const margin = p.covered ? p.field - p.you : null;
+              const barW = Math.max(2, Math.min(100, (Math.max(0, p.you) / parTypeScale) * 100));
               return (
-                <div key={p.par} style={{ display: 'grid', gridTemplateColumns: '66px 1fr 44px 52px', gap: 9, alignItems: 'center' }}>
-                  <span style={LABEL}>
-                    {t('courses:holes.scoringBreakdown.parLabel', { n: p.par })}
-                  </span>
-                  <span style={{ display: 'block', position: 'relative', height: 7, borderRadius: 3.5, background: A.TRACK }}>
-                    <span
-                      style={{
-                        display: 'block',
-                        height: 7,
-                        borderRadius: 3.5,
-                        width: `${barW}%`,
-                        background: difficultyRampColor(parTint(p)),
-                      }}
-                    />
-                    {tickW != null && (
-                      <span
-                        aria-hidden
-                        style={{
-                          position: 'absolute',
-                          top: -1.5,
-                          left: `${tickW}%`,
-                          width: 2,
-                          height: 10,
-                          borderRadius: 1,
-                          background: FIELD_TICK,
-                          transform: 'translateX(-1px)',
-                        }}
-                      />
-                    )}
-                  </span>
-                  <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'right' }}>
-                    {signed(p.you)}
+                <div
+                  key={p.par}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '46px 1fr auto',
+                    gap: 10,
+                    alignItems: 'center',
+                    ...FIGS,
+                  }}
+                >
+                  <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK }}>
+                    {t('courses:courseDetail.parTypes.parNPlural', { n: p.par })}
                   </span>
                   <span
                     style={{
-                      ...NUM,
-                      fontSize: 13,
-                      color: margin == null ? A.MUTE : marginTone(margin),
-                      textAlign: 'right',
+                      position: 'relative',
+                      display: 'block',
+                      height: 8,
+                      borderRadius: 4,
+                      background: A.TRACK,
                     }}
                   >
-                    {margin == null ? '' : signed(Math.abs(margin) < REFERENCE_NOISE_FLOOR ? 0 : margin)}
+                    <i
+                      aria-hidden="true"
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        display: 'block',
+                        width: `${barW}%`,
+                        borderRadius: 4,
+                        background: difficultyRampColor(parTint(p)),
+                      }}
+                    />
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 13.5,
+                      fontWeight: 700,
+                      color: A.INK,
+                      minWidth: 34,
+                      textAlign: 'right',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {signed(p.you)}
                   </span>
                 </div>
               );
