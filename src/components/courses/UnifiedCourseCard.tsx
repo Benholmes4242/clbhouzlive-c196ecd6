@@ -155,7 +155,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             {showLastPlayed && course.context?.lastPlayedAt && (
               <div className="flex items-center gap-1 mt-1.5">
                 <Calendar className="w-3 h-3 text-muted-foreground" />
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-[11px] text-muted-foreground">
                   {formatDayMonthYearShortGB(course.context.lastPlayedAt)}
                 </span>
               </div>
@@ -288,7 +288,10 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
 
                   <span
                     style={{
-                      fontSize: 8.5,
+                      /* READ floor — RATED / PLAYED are words, not ticks.
+                         8.5 -> 11 inside the absolutely-positioned overlay
+                         capsule, so no card height moves with it. */
+                      fontSize: 11,
                       fontWeight: 700,
                       letterSpacing: '0.10em',
                       textTransform: 'uppercase',
@@ -328,8 +331,9 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
             </div>
             <div
               style={{
-                fontSize: 9, fontWeight: 700, textTransform: 'uppercase',
-                letterSpacing: '0.08em', color: 'rgba(255,255,255,0.75)',
+                /* READ floor — the chip's unit names the figure. 9 -> 11. */
+                fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+                letterSpacing: '0.10em', color: 'rgba(255,255,255,0.75)',
               }}
             >
               {statChip.unit}
@@ -340,7 +344,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
         {/* Context tag — top-right */}
         {contextTag && (
           <div className="absolute top-3 right-3">
-            <span className="text-[10px] font-medium bg-black/60 text-white px-2 py-1 rounded-sq-xs backdrop-blur-sm">
+            <span className="text-[11px] font-medium bg-black/60 text-white px-2 py-1 rounded-sq-xs backdrop-blur-sm">
               {contextTag}
             </span>
           </div>
@@ -396,8 +400,9 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                   <span
                     className="flex-shrink-0"
                     style={{
-                      fontSize: 9, fontWeight: 700, textTransform: 'uppercase',
-                      letterSpacing: '0.05em', borderRadius: 9999,
+                      /* READ floor — the "Early data" chip. 9 -> 11. */
+                      fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+                      letterSpacing: '0.10em', borderRadius: 9999,
                       padding: '2px 6px',
                       background: 'rgba(255,255,255,0.2)',
                       color: 'rgba(255,255,255,0.9)',
@@ -411,7 +416,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
 
             {/* Logged date if present */}
             {loggedDate && (
-              <div className="inline-block text-[9px] font-medium text-white/60 mt-0.5">
+              <div className="inline-block text-[11px] font-medium text-white/60 mt-0.5">
                 {t('card.logged', { date: formatDayMonthYearShortGB(loggedDate) })}
               </div>
             )}

@@ -234,7 +234,8 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                 <div className="flex items-baseline justify-between" style={{ marginBottom: 4 }}>
                   <span
                     style={{
-                      fontSize: 10.5,
+                      /* READ floor — section kicker. 10.5 -> 11. */
+                      fontSize: 11,
                       fontWeight: 700,
                       color: INK_MUTE,
                       letterSpacing: '0.14em',
@@ -278,7 +279,8 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                 <span
                   className="block"
                   style={{
-                    fontSize: 10.5,
+                    /* READ floor — section kicker. 10.5 -> 11. */
+                    fontSize: 11,
                     fontWeight: 700,
                     color: INK_MUTE,
                     letterSpacing: '0.14em',
@@ -353,8 +355,11 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
               onClick={onRequestCourse}
               style={{
                 marginTop: 12,
-                fontSize: 13.5,
+                /* CAPS ACTION (§5) — request-a-course, two points down. */
+                fontSize: 11.5,
                 fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.10em',
                 color: INK,
                 textDecoration: 'underline',
                 textUnderlineOffset: 3,
@@ -408,7 +413,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
             ))}
 
             {isPaging && (
-              <div style={{ fontSize: 12.5, color: INK_MUTE, padding: '12px 0' }}>
+              <div style={{ fontSize: 13, color: INK_MUTE, padding: '12px 0' }}>
                 {t('directorySheet.loadingMore')}
               </div>
             )}

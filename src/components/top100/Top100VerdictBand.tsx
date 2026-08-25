@@ -172,7 +172,7 @@ export const Top100VerdictBand: React.FC<Props> = ({
 
       <span
         style={{
-          fontSize: 11.5,
+          fontSize: 12,
           fontWeight: 700,
           letterSpacing: '-0.005em',
           lineHeight: 1.25,
@@ -187,7 +187,8 @@ export const Top100VerdictBand: React.FC<Props> = ({
           style={{
             ...FIGS,
             marginLeft: 'auto',
-            fontSize: 10.5,
+            /* READ floor — the band's second line. 10.5 -> 11. */
+            fontSize: 11,
             fontWeight: 600,
             lineHeight: 1.25,
             textAlign: 'right',

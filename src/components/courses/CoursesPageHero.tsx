@@ -235,7 +235,8 @@ function CoursesPageHeroInner() {
             {eyebrowParts.length > 0 && (
               <div
                 style={{
-                  fontSize: 10,
+                  /* READ floor — the hero eyebrow. 10 -> 11. */
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
@@ -302,7 +303,7 @@ function CoursesPageHeroInner() {
             {blurb && (
               <div
                 style={{
-                  fontSize: 13.5,
+                  fontSize: 14,
                   color: 'rgba(255,255,255,0.9)',
                   lineHeight: 1.45,
                   maxWidth: 340,
@@ -334,7 +335,7 @@ function CoursesPageHeroInner() {
 
                 <span
                   style={{
-                    fontSize: 12.5,
+                    fontSize: 13,
                     color: 'rgba(255,255,255,0.72)',
                     minWidth: 0,
                     overflow: 'hidden',
@@ -363,9 +364,11 @@ function CoursesPageHeroInner() {
                 style={{
                   background: '#fff',
                   color: '#15171F',
-                  fontSize: 12,
+                  /* CAPS ACTION (§5) — two points down, height unchanged. */
+                  fontSize: 11,
                   fontWeight: 700,
-                  letterSpacing: '-0.005em',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.10em',
                   padding: '9px 15px',
                   borderRadius: 999,
                   border: 'none',

@@ -52,9 +52,13 @@ const NUMERALS: React.CSSProperties = {
 };
 
 const barLabelStyle: React.CSSProperties = {
-  width: 54,
+  /* The label column widens with the type so DESIGN / CONDITION / CLUBHOUSE /
+     FACILITIES still fit without touching the track, which stays flex: 1. */
+  width: 58,
   flexShrink: 0,
-  fontSize: 10,
+  /* READ floor — these are WORDS (Design, Condition, Clubhouse, Facilities),
+     not axis ticks, so they take 11 rather than the AXIS exception. */
+  fontSize: 11,
   fontWeight: 600,
   color: LABEL_INK,
   whiteSpace: 'nowrap',
