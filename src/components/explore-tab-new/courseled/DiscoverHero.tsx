@@ -210,34 +210,12 @@ export function DiscoverHero({
           }}
         />
       )}
+      {/* THE ONE GRADIENT (MICRO_BRIEF_DISCOVER_HERO_CANON_LAYERING §1-2). */}
       <div
         aria-hidden="true"
-        style={{ position: 'absolute', inset: 0, background: COURSE_SCRIMS, zIndex: -1 }}
+        style={{ position: 'absolute', inset: 0, background: HERO_CANON_SCRIM, zIndex: -1 }}
       />
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: BOTTOM_SCRIM_H,
-          background: HERO_BOTTOM_SCRIM,
-          zIndex: -1,
-        }}
-      />
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: 0,
-          height: TOP_SCRIM_H,
-          background: HERO_TOP_SCRIM,
-          zIndex: -1,
-        }}
-      />
+
 
       {/* THE HERO OWNS THE NOTCH AND THE FLOATING CHROME ISLAND: the clearance
           that used to live in the rounds section's first row is paid here, and
