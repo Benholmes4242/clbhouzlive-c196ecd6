@@ -159,7 +159,7 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
             width: `${width}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: `2px solid ${DARK_HAIRLINE}`,
+            // No neutral ring in the hero: the drop shadow does the lifting.
             boxShadow: '0 8px 20px rgba(0,0,0,0.35)',
           }}
         >
