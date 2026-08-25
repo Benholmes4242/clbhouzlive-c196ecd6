@@ -24,11 +24,10 @@ import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatNumber } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// Board sub-label routed via i18n key (see overview.rankings.boards.*).
-const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; labelKey: string; tourCode: string }>> = {
-  pga: { board: 'owgr', labelKey: 'overview.rankings.boards.owgr', tourCode: 'pga' },
-  euro: { board: 'r2d', labelKey: 'overview.rankings.boards.r2d', tourCode: 'euro' },
-  lpga: { board: 'rolex', labelKey: 'overview.rankings.boards.rolex', tourCode: 'lpga' },
+const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; tourCode: string }>> = {
+  pga: { board: 'owgr', tourCode: 'pga' },
+  euro: { board: 'r2d', tourCode: 'euro' },
+  lpga: { board: 'rolex', tourCode: 'lpga' },
 };
 
 export function WorldRankings({ tour }: { tour: TourId }) {
@@ -42,9 +41,6 @@ export function WorldRankings({ tour }: { tour: TourId }) {
   if (isLoading && rows.length === 0) {
     return (
       <SectionShell eyebrow={t('overview.rankings.sectionEyebrow')} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
-        <div style={{ padding: '0 16px 10px' }}>
-          <Skeleton className="h-3 w-32 rounded" />
-        </div>
         <div style={{ padding: '4px 16px 12px', display: 'flex', alignItems: 'center', gap: 14 }}>
           <Skeleton className="h-[54px] w-[54px]" style={{ borderRadius: 18 }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -88,10 +84,6 @@ export function WorldRankings({ tour }: { tour: TourId }) {
 
   return (
     <SectionShell eyebrow={t('overview.rankings.sectionEyebrow')} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
-      <div style={{ padding: '0 16px 10px', fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-        {t(mapping.labelKey)}
-      </div>
-
       {/* No.1 spotlight — cardless, scale does the work. */}
       <div style={{ padding: '4px 16px 12px' }}>
         <SpotlightRow
