@@ -1805,29 +1805,23 @@ export function GolfThisWeek({
         </span>
       </div>
 
-      {/* SCOPE PILLS AND THE REGION WELL — one row beneath the readout. The well
-          sits AFTER the pills and OUTSIDE their scroller: PillFilterRow is
-          overflowX auto with flex:'none' children, so anything inside it
-          scrolls out of reach once a member scrolls to Top 100. */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          marginBottom: 12,
-          minWidth: 0,
-        }}
-      >
+      {/* SCOPE PILLS AND THE REGION WELL — one row beneath the readout. Per
+          BRIEF_DISCOVER_PILL_PEEK the well FLOATS OVER the scroller rather than
+          sitting beside it: the scroller keeps the full row width, so the fourth
+          pill peeks structurally at every viewport instead of being tuned out at
+          390. paddingRight 62 (46 well + 8 gap + 8 breathing) is INSIDE the
+          scrollable area, so the last pill can still scroll clear of the well. */}
+      <div style={{ position: 'relative', marginBottom: 12, minWidth: 0 }}>
         {/* The scroller's right-edge fade lives on this relative wrapper, not
-            inside PillFilterRow — the clip now happens against the well beside
-            it, which without a cue reads as a layout bug rather than as more
-            content. The transparent stop is A.CANVAS at zero alpha, never
+            inside PillFilterRow — its job is now to soften pills as they pass
+            BENEATH the well, so the full-opacity stop sits at 100%, off the
+            visible area. The transparent stop is A.CANVAS at zero alpha, never
             `transparent`, which some engines resolve as a grey haze. */}
-        <div style={{ position: 'relative', flex: '1 1 auto', minWidth: 0 }}>
+        <div style={{ position: 'relative', minWidth: 0 }}>
           <WeekScopePills
             scope={scope}
             onChange={(s) => onScopeChange?.(s)}
-            style={{ flex: '1 1 auto', minWidth: 0 }}
+            style={{ minWidth: 0, paddingRight: 62 }}
           />
           <div
             aria-hidden
@@ -1836,18 +1830,30 @@ export function GolfThisWeek({
               top: 0,
               bottom: 0,
               right: 0,
-              width: 24,
+              width: 40,
               pointerEvents: 'none',
-              background: 'linear-gradient(90deg, rgba(21,23,31,0) 0%, #15171F 90%)',
+              background: 'linear-gradient(90deg, rgba(21,23,31,0) 0%, #15171F 100%)',
             }}
           />
         </div>
-        <RegionDropdown
-          regions={regions}
-          selection={region}
-          onChange={(sel) => onRegionChange?.(sel)}
-        />
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <RegionDropdown
+            regions={regions}
+            selection={region}
+            onChange={(sel) => onRegionChange?.(sel)}
+          />
+        </div>
       </div>
+
 
       {/* AN HONEST EMPTY ANSWER (§S2.5): the filters stay, the sentence explains. */}
       {ordered.length === 0 && (
