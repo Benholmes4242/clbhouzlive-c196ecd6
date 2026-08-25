@@ -80,7 +80,7 @@ const LABEL_STYLE = {
   fontSize: 11,
   fontWeight: 700,
   color: INK_FAINT,
-  letterSpacing: '0.16em',
+  letterSpacing: '0.10em', // tightened from 0.16em so READ 11 labels stay on one line at 320
   textTransform: 'uppercase' as const,
   textAlign: 'center' as const,
   whiteSpace: 'nowrap' as const,
