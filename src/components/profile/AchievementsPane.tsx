@@ -1149,11 +1149,14 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
 
 
           {/* Sticky Progress Header (Collapsed state) */}
-          <div className={`sticky top-0 z-10 bg-card/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
+          <div
+            className={`sticky z-10 bg-card/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
             isCollapsed 
               ? isMobile ? 'px-4 py-2' : 'px-6 py-3' 
               : 'hidden'
-          }`}>
+          }`}
+            style={{ top: 'var(--sat, env(safe-area-inset-top, 0px))' }}
+          >
             <div className={`flex items-center justify-between ${
                 isMobile ? 'p-2 max-h-[52px]' : 'p-3'
               }`}>
