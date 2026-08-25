@@ -428,13 +428,8 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
                 ...FIGS,
               }}
             >
-              <span style={{ display: 'block' }}>
-                <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK, display: 'block' }}>
-                  {t('courses:courseDetail.card.shape.parN', { n: r.par })}
-                </span>
-                <span style={{ ...LABEL, display: 'block', marginTop: 1 }}>
-                  {t('courses:courseDetail.parTypes.holesN', { count: r.holes })}
-                </span>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK }}>
+                {t('courses:courseDetail.parTypes.parNPlural', { n: r.par })}
               </span>
 
               <span
