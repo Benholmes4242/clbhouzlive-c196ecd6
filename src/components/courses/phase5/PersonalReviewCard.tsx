@@ -12,15 +12,22 @@ import { useTranslation } from 'react-i18next';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { formatMonthDayYearShort } from '@/i18n/format';
-import { SubScoreBar, bandColor } from '@/features/courses/_shared/scoreBands';
+import {
+  SubScoreBar, bandColorOnDark, BAND_GREEN_DARK, BAND_RED_DARK,
+} from '@/features/courses/_shared/scoreBands';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import {
   A, Panel, StatRow, Action, SANS, type StatItem,
 } from '@/features/courses/components/holes/analytical/tokens';
 
-const UNDER = '#0F8F4A';
-const OVER = '#C8372B';
+/**
+ * Dark-canvas score inks (BRIEF_ONE_GREEN). The local '#0F8F4A' / '#C8372B'
+ * pair was a second byte-identical copy of an ink tuned for white; scoreBands
+ * documents that failure and supplies the dark variants.
+ */
+const UNDER = BAND_GREEN_DARK;
+const OVER = BAND_RED_DARK;
 
 interface PersonalReviewCardProps {
   courseId: string;
@@ -56,14 +63,14 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
 
   // Three-state comparison, unchanged: |diff| < 0.2 reads level, not "+0.1".
   const items: StatItem[] = [
-    { label: t('courseDetail.you.yours'), value: rating.rating.toFixed(1), tone: bandColor(rating.rating) },
+    { label: t('courseDetail.you.yours'), value: rating.rating.toFixed(1), tone: bandColorOnDark(rating.rating) },
   ];
   if (hasCommunity) {
     const avg = communityAverage as number;
     items.push({
       label: t('courseDetail.you.community'),
       value: avg.toFixed(1),
-      tone: bandColor(avg),
+      tone: bandColorOnDark(avg),
     });
     const diff = Number((rating.rating - avg).toFixed(1));
     const absDiff = Math.abs(diff);
