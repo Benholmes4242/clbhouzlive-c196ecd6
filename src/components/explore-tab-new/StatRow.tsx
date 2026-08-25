@@ -132,7 +132,7 @@ function Chip({ chip }: { chip: StatRowChip }) {
         borderRadius: 999,
         background: bg,
         color: fg,
-        fontSize: 9,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.08em',
         textTransform: 'uppercase',

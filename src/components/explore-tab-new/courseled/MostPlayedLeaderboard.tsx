@@ -221,7 +221,7 @@ function PlayerFacepile({ players, accent }: { players: MostPlayedPlayer[]; acce
             color: DISCOVER_QUIET,
             /* AXIS-CLASS EXCEPTION: this figure is an avatar GLYPH bound by
                FACE_SIZE (26) geometry, not text on the card. Floor 10. */
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 800,
             lineHeight: 1,
             fontVariantNumeric: 'tabular-nums lining-nums',

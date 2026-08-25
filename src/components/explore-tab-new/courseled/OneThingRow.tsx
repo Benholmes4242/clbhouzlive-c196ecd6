@@ -178,7 +178,7 @@ export function OneThingRow({ userId, onFindGolfers }: Props) {
         <div
           style={{
             ...LABEL,
-            fontSize: 6.5,
+            fontSize: 11,
             color: A.DIM,
             marginTop: 4,
             whiteSpace: 'nowrap',
@@ -207,7 +207,7 @@ export function OneThingRow({ userId, onFindGolfers }: Props) {
           border: 'none',
           color: A.INK,
           fontFamily: SANS,
-          fontSize: 9,
+          fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.13em',
           flexShrink: 0,

@@ -1189,7 +1189,9 @@ function GolfThisWeekCard({
               <span
                 style={{
                   ...NUMF,
-                  fontSize: 10.5,
+                  /* FLOOR (item 2) — CONTENT-unchanged applies only to figures
+                     already at or above 11. This one was below it. 10.5 -> 11. */
+                  fontSize: 11,
                   lineHeight: 1,
                   /* §5.3 — the canonical dark under-par red via getScoreColor,
                      white-at-alpha for over/level. Never TOPAR_RED, never grey. */
@@ -1210,7 +1212,8 @@ function GolfThisWeekCard({
                 <span
                   style={{
                     ...NUMF,
-                    fontSize: 10.5,
+                    /* FLOOR (item 2) — index delta lifted 10.5 -> 11. */
+                    fontSize: 11,
                     lineHeight: 1,
                     color: (delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE,
                   }}
@@ -2133,7 +2136,9 @@ export function GolfThisWeek({
                                 {showDeficit ? (
                                   <span
                                     className="tabular-nums"
-                                    style={{ fontSize: 10, fontWeight: 700, color: DISCOVER_QUIET }}
+                                    /* FLOOR (item 2) — the podium deficit is a
+                                       read figure, not a coordinate: 10 -> 11. */
+                                    style={{ fontSize: 11, fontWeight: 700, color: DISCOVER_QUIET }}
                                   >
                                     {podiumDeficit(tile, r)}
                                   </span>

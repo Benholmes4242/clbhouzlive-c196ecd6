@@ -111,7 +111,7 @@ export function GolfThisWeekSheet({
       >
         <div
           style={{
-            fontSize: 10.5,
+            fontSize: 11,
             fontWeight: 600,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
@@ -168,7 +168,7 @@ export function GolfThisWeekSheet({
                 padding: '8px 16px 7px',
                 background: A.CANVAS,
                 borderBottom: `1px solid ${A.BORDER}`,
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.09em',
                 textTransform: 'uppercase',

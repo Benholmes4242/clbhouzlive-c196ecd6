@@ -71,7 +71,7 @@ export function WireTicker() {
           style={{
             display: 'inline-flex', alignItems: 'center', padding: '2px 6px',
             borderRadius: 4, background: '#FBBC2E', color: '#0F172A',
-            fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', lineHeight: 1,
+            fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', lineHeight: 1,
             flexShrink: 0,
           }}
         >

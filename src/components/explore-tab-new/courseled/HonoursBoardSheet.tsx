@@ -170,7 +170,7 @@ function HonoursRow({
           <span
             style={{
               ...LABEL,
-              fontSize: 8.5,
+              fontSize: 11,
               color: A.MUTE,
               display: 'block',
               marginTop: 2,
@@ -191,7 +191,7 @@ function HonoursRow({
         <span
           style={{
             ...LABEL,
-            fontSize: 8.5,
+            fontSize: 11,
             color: METAL_INK,
             display: 'inline-block',
             background: e.kind === 'albatross' ? ALBATROSS_GROUND : ACE_GROUND,
@@ -358,7 +358,7 @@ export function HonoursBoardSheet({
                 <span
                   style={{
                     ...LABEL,
-                    fontSize: 9,
+                    fontSize: 11,
                     color: A.MUTE,
                     marginLeft: 'auto',
                     fontVariantNumeric: 'tabular-nums lining-nums',

@@ -286,7 +286,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           {/* Type scale mirrors CoursesPageHero: 10/700 eyebrow, 18.5 title. */}
           <div
             style={{
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
@@ -324,7 +324,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
                     alignItems: 'center',
                     padding: '3px 6px',
                     borderRadius: 4,
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: 700,
                     letterSpacing: '0.07em',
                     lineHeight: 1,
@@ -391,7 +391,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             {story.happened_at ? (
               <span
                 style={{
-                  fontSize: 10.5,
+                  fontSize: 11,
                   fontWeight: 500,
                   color: 'rgba(255,255,255,0.60)',
                   whiteSpace: 'nowrap',
@@ -454,7 +454,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
           <div
             style={{
               marginTop: 6,
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 600,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
@@ -468,7 +468,7 @@ function HeroSlide({ story, onOpenScore, onOpenProfile }: HeroSlideProps) {
             <div
               style={{
                 marginTop: 3,
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 600,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',

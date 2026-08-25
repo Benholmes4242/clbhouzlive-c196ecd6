@@ -117,7 +117,7 @@ export function CommunityVideoRow({ item, first, onPress, track, tone = 'light' 
             borderRadius: 5,
             background: 'rgba(10,14,10,0.72)',
             color: '#FFFFFF',
-            fontSize: 9.5,
+            fontSize: 11,
             fontWeight: 700,
             ...NUM,
           }}
@@ -189,7 +189,7 @@ export function CommunityVideoRow({ item, first, onPress, track, tone = 'light' 
                 alignItems: 'center',
                 gap: 3,
                 color: DIM,
-                fontSize: 10.5,
+                fontSize: 11,
                 fontWeight: 700,
                 ...NUM,
               }}

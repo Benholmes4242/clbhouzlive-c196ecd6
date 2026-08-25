@@ -144,7 +144,7 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
                 style={{
                   display: 'block',
                   marginTop: 1,
-                  fontSize: 9.5,
+                  fontSize: 11,
                   fontWeight: 700,
                   color: '#FFFFFF',
                   letterSpacing: 0,

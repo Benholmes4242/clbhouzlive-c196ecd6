@@ -364,7 +364,7 @@ export function ReviewTile({
           >
             {r.rating.toFixed(1)}
           </span>
-          <span style={{ ...LABEL, fontSize: 6.5, color: 'rgba(255,255,255,0.62)' }}>/10</span>
+          <span style={{ ...LABEL, fontSize: 11, color: 'rgba(255,255,255,0.62)' }}>/10</span>
         </span>
         </span>
 
@@ -390,7 +390,7 @@ export function ReviewTile({
               className="review-tile-chip"
               style={{
                 ...LABEL,
-                fontSize: 7,
+                fontSize: 11,
                 color: '#FFFFFF',
                 borderRadius: 999,
                 padding: '4px 8px',
@@ -431,7 +431,7 @@ export function ReviewTile({
           <div
             style={{
               ...LABEL,
-              fontSize: 7,
+              fontSize: 11,
               marginTop: 5,
               color: 'rgba(255,255,255,0.62)',
               whiteSpace: 'nowrap',
@@ -510,7 +510,7 @@ export function ReviewTile({
               <div
                 style={{
                   ...LABEL,
-                  fontSize: 7,
+                  fontSize: 11,
                   marginTop: 4,
                   color: A.MUTE,
                   whiteSpace: 'nowrap',
