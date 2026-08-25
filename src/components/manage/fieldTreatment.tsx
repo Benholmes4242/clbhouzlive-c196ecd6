@@ -16,17 +16,24 @@ import { FIELD_REST_BG } from '@/lib/tokens/field';
 /** Field label: LABEL caps 8px DIM above the input. */
 export const FIELD_LABEL: React.CSSProperties = { ...BIZ_LABEL };
 
-/** Counter: LABEL caps 7.5px tabular, right-aligned on the label row. */
+/**
+ * Counter: LABEL caps tabular, right-aligned on the label row.
+ * MICRO_BRIEF_MANAGE_PROFILE_TYPE_SCALE: the 7.5 pin is DELETED so this
+ * inherits BIZ_LABEL at the READ floor of 11. Do not re-pin below it.
+ */
 export const FIELD_COUNTER: React.CSSProperties = {
   ...BIZ_LABEL,
-  fontSize: 7.5,
   fontVariantNumeric: 'tabular-nums',
 };
 
-/** Hint: LABEL caps 7.5px beneath the input. */
+/**
+ * Hint: LABEL caps beneath the input.
+ * MICRO_BRIEF_MANAGE_PROFILE_TYPE_SCALE: the 7.5 pin is DELETED so this
+ * inherits BIZ_LABEL at the READ floor of 11. These are words a member
+ * reads, never coordinates - NO AXIS EXCEPTION APPLIES.
+ */
 export const FIELD_HINT: React.CSSProperties = {
   ...BIZ_LABEL,
-  fontSize: 7.5,
   lineHeight: 1.5,
   marginTop: 6,
 };
@@ -87,9 +94,15 @@ export const LOCKED_STYLE: React.CSSProperties = {
   color: A.MUTE,
 };
 
-/** Class-name equivalents, for sections that style with Tailwind. */
-export const LABEL_CLASS = 'text-[8px] font-bold uppercase tracking-[0.16em] text-[rgba(248,250,252,0.62)]';
-export const HINT_CLASS = 'text-[7.5px] font-bold uppercase tracking-[0.16em] text-[rgba(248,250,252,0.62)] mt-1.5';
+/**
+ * Class-name equivalents, for sections that style with Tailwind. These are the
+ * SAME TWO ROLES as FIELD_LABEL and FIELD_HINT above, expressed twice because
+ * Tailwind arbitrary values cannot be interpolated - keep the two forms at the
+ * same value. MICRO_BRIEF_MANAGE_PROFILE_TYPE_SCALE lifted both to the READ
+ * floor of 11 (were 8 and 7.5).
+ */
+export const LABEL_CLASS = 'text-[11px] font-bold uppercase tracking-[0.16em] text-[rgba(248,250,252,0.62)]';
+export const HINT_CLASS = 'text-[11px] font-bold uppercase tracking-[0.16em] text-[rgba(248,250,252,0.62)] mt-1.5';
 
 /** Label row with an optional right slot (counter, quiet action). */
 export function FieldLabel({
