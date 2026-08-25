@@ -78,35 +78,10 @@ const LIGHT = {
   pillYouBg: 'rgba(15,23,42,0.05)',
 } as const;
 
-const SQUIRCLE_MASK_URL =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
-const squircleMaskStyle: React.CSSProperties = {
-  WebkitMaskImage: SQUIRCLE_MASK_URL,
-  maskImage: SQUIRCLE_MASK_URL,
-  WebkitMaskSize: '100% 100%',
-  maskSize: '100% 100%',
-  WebkitMaskRepeat: 'no-repeat',
-  maskRepeat: 'no-repeat',
-};
+/* The bespoke BannerAvatar that used to live here drew a slate gradient with no
+   initial. SquircleAvatar is canonical and owns the deterministic-initial
+   fallback; the champion's ring is composed with hairlineRing + ringColor. */
 
-const BannerAvatar: React.FC<{ photoUrl: string | null; size?: number; ringColor: string }> = ({ photoUrl, size = 44, ringColor }) => {
-  const bg = photoUrl
-    ? `url(${photoUrl}) center/cover`
-    : 'linear-gradient(135deg, #cbd5e1 0%, #64748b 100%)';
-  return (
-    <div style={{ width: size, height: size, position: 'relative', flexShrink: 0 }} aria-hidden>
-      <div style={{ position: 'absolute', inset: 0, background: bg, ...squircleMaskStyle }} />
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          ...squircleMaskStyle,
-          boxShadow: `inset 0 0 0 1px ${ringColor}`,
-        }}
-      />
-    </div>
-  );
-};
 
 export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   open,
