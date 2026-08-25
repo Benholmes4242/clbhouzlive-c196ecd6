@@ -29,7 +29,7 @@ function AccordionRow({
         <div className="flex-1 pr-4 min-w-0">
           {caption && (
             <div
-              className="text-[10px] font-semibold uppercase tracking-[1.4px] mb-1"
+              className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-1"
               style={{ color: A.MUTE }}
             >
               {caption}

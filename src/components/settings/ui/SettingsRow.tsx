@@ -73,7 +73,7 @@ export function SettingsBadge({ children, variant = 'default' }: {
   return (
     <span
       className={cn(
-        'text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full',
+        'text-[11px] font-semibold uppercase tracking-[0.10em] px-2 py-0.5 rounded-full',
         variant === 'default' && 'bg-amber-500/15 text-amber-600',
         variant === 'destructive' && 'bg-destructive/15 text-destructive',
       )}
