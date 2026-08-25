@@ -26,9 +26,14 @@ interface HeroSectionProps {
   playerStats: TourPlayerStatistics | null;
 }
 
-// LABEL token on dark: 9 / 800 / 0.13em / uppercase.
+/* HERO EXCEPTION.
+   This is the same immersive/broadcast register as the tour overview hero:
+   tracked caps over photography read materially larger than their point size.
+   So the hero's band labels and markers take AXIS 10, while its names,
+   tournament titles and sentences take READ 11. LABEL_ON_DARK carries only
+   band labels (the RankFigure captions) and the eyebrow markers, so it is AXIS. */
 const LABEL_ON_DARK = {
-  fontSize: 9,
+  fontSize: 10, // AXIS floor — hero band labels and eyebrow markers.
   fontWeight: 700 as const,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,

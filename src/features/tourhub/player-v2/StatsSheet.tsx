@@ -83,10 +83,11 @@ function Cell({ row, ordinal }: { row: Row; ordinal: (r: RankRef) => string }) {
     <div>
       <div
         style={{
-          fontSize: 9,
+          // Stat label (EVENTS, WINS, DRIVING, ACCURACY, GIR) — READ 11.
+          fontSize: 11,
           fontWeight: 700,
           color: INK_FAINT,
-          letterSpacing: '0.13em',
+          letterSpacing: '0.11em',
           textTransform: 'uppercase',
         }}
       >
@@ -109,7 +110,9 @@ function Cell({ row, ordinal }: { row: Row; ordinal: (r: RankRef) => string }) {
         <div
           style={{
             marginTop: 3,
-            fontSize: 9,
+            // Rank footnote (1ST, T3RD, 52ND) — AXIS 10 floor: a rank marker
+            // under a figure, not language.
+            fontSize: 10,
             fontWeight: 700,
             color: INK_FAINT,
             letterSpacing: '0.13em',
@@ -129,7 +132,7 @@ function Kicker({ children }: { children: React.ReactNode }) {
     <p
       style={{
         margin: '0 0 6px',
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: 700,
         color: INK,
         letterSpacing: '0.16em',
@@ -339,10 +342,11 @@ export function StatsSheet({ open, onClose, playerStats, playerName, tour }: Sta
           <p
             style={{
               margin: 0,
-              fontSize: 9,
+              // Sub-line (season · tour · events) — language, READ 11.
+              fontSize: 11,
               fontWeight: 700,
               color: INK_FAINT,
-              letterSpacing: '0.13em',
+              letterSpacing: '0.11em',
               textTransform: 'uppercase',
               fontVariantNumeric: 'tabular-nums lining-nums',
             }}

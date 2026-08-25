@@ -25,8 +25,10 @@ interface LiveNowStripProps {
   playerName: string;
 }
 
+// AXIS 10 (floor): this token carries the LIVE badge marker and the
+// position/thru meta markers on the immersive hero — markers, not language.
 const LABEL_ON_DARK = {
-  fontSize: 9,
+  fontSize: 10,
   fontWeight: 700 as const,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,

@@ -226,6 +226,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
             {activeMajor.status === 'live' ? (
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, display: 'inline-block' }} />
+                {/* AXIS 10 (floor): status marker, not language. */}
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: STATUS_LIVE }}>{t('status.live')}</span>
               </span>
             ) : (

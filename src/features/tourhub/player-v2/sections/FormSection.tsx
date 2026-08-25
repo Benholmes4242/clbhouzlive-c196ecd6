@@ -45,7 +45,7 @@ export function FormSection({ results }: FormSectionProps) {
       <p
         style={{
           margin: '0 16px 12px',
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 700,
           color: INK,
           letterSpacing: '0.16em',

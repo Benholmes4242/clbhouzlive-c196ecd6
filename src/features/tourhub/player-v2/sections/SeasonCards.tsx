@@ -103,7 +103,7 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
         <p
           style={{
             margin: 0,
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 700,
             color: INK,
             letterSpacing: '0.16em',
@@ -120,9 +120,10 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
               display: 'inline-flex',
               alignItems: 'center',
               gap: 4,
+              // CAPS button: two points below the floor, 0.10em.
               fontSize: 9,
               fontWeight: 700,
-              letterSpacing: '0.13em',
+              letterSpacing: '0.10em',
               textTransform: 'uppercase',
               color: INK,
               background: 'transparent',
@@ -153,10 +154,11 @@ export function SeasonCards({ playerStats, results, player }: SeasonCardsProps) 
           <div key={c.key} style={{ minWidth: 0, textAlign: 'center' as const }}>
             <div
               style={{
-                fontSize: 9,
+                // Stat labels (TOP 10S, WINS, SCORING, EARNINGS) — READ 11.
+                fontSize: 11,
                 fontWeight: 700,
                 color: INK_FAINT,
-                letterSpacing: '0.13em',
+                letterSpacing: '0.11em',
                 textTransform: 'uppercase',
               }}
             >

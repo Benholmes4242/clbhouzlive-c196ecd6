@@ -45,16 +45,20 @@ interface TournamentsSectionProps {
 
 const INITIAL_LIMIT = 8;
 
+// KICKER: section eyebrow — language, so READ floor 11.
 const KICKER = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700 as const,
   letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
   color: INK,
 };
 
+// LABEL: AXIS 10 (floor). This token only ever carries markers on this row —
+// the month abbreviation (same call as SeasonRow), the WIN / MAJOR / LIVE
+// chips, and the sheet's row-count sub-line. Never language, never a figure.
 const LABEL = {
-  fontSize: 9,
+  fontSize: 10,
   fontWeight: 700 as const,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,
@@ -347,6 +351,9 @@ export function TournamentsSection({
               alignItems: 'center',
               gap: 4,
               ...LABEL,
+              // CAPS button: two points below the floor, 0.10em.
+              fontSize: 9,
+              letterSpacing: '0.10em',
               color: INK,
               background: 'transparent',
               border: 'none',
