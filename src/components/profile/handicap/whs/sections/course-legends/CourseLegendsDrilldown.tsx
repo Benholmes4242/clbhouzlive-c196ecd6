@@ -382,7 +382,19 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   }, [pros, ctx.courseId, meta, window, groupedWithTotals, visibleCategories]);
 
   return (
-    <div ref={containerRef} style={theme === 'light' ? { background: '#F4F6F9' } : undefined}>
+    /*
+      The whole subtree reads var(--hcp-*), and those variables exist ONLY
+      inside a .hcp-dark / .hcp-light class scope (src/styles/handicap-dark.css).
+      Without the class every such declaration resolves to nothing and is
+      dropped - which is why unheld crown slots had no wash, no dashed border
+      and no icon colour on the Course Detail Champions tab. The class is the
+      fix; do NOT add var() fallbacks in the consumers.
+    */
+    <div
+      ref={containerRef}
+      className={theme === 'light' ? 'hcp-light' : 'hcp-dark'}
+      style={theme === 'light' ? { background: '#F4F6F9' } : undefined}
+    >
 
       {!hideHeader && (
         <DrilldownHeader
