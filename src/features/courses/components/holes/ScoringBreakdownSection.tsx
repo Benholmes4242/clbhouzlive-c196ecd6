@@ -29,10 +29,9 @@ import { ThirdsChart } from '@/components/profile/handicap/whs/charts/ThirdsChar
  *     identical derivation (sum of per-hole averages to par) over the SAME
  *     set of hole numbers
  *   - REFERENCE_NOISE_FLOOR governs the WORDS on a row, never the field mark
-  *   - the thirds are drawn by the handicap page's ThirdsChart (worst third in
+ *   - the thirds are drawn by the handicap page's ThirdsChart (worst third in
  *     CHART.UP - red means WORST on a damage metric, not under par).
  *     OVERTURNED for the shots-go
-
  *     columns only: they are ramp-coloured by their own value
  *     (difficultyRampColor), so the deepest red is the costliest hole. The
  *     risk, stated so it is not rediscovered: this chart ranks by SHOTS LOST,
