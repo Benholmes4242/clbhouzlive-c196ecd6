@@ -50,7 +50,7 @@ const ROLE_ICON: Record<BusinessRole, typeof Crown> = {
 function RoleLabel({ role }: { role: BusinessRole }) {
   const Icon = ROLE_ICON[role];
   return (
-    <span className="inline-flex items-center gap-1" style={{ ...BIZ_LABEL, fontSize: 7.5 }}>
+    <span className="inline-flex items-center gap-1" style={BIZ_LABEL}>
       <Icon size={9} strokeWidth={2.5} />
       {BUSINESS_ROLE_LABELS[role]}
     </span>
@@ -149,7 +149,7 @@ function JobTitleField({
         style={{ minHeight: 20, background: 'transparent', border: 0, padding: 0 }}
         aria-label={addAria}
       >
-        <span style={{ ...BIZ_LABEL, fontSize: 7.5 }}>{addLabel}</span>
+        <span style={BIZ_LABEL}>{addLabel}</span>
         <ChevronRight size={9} color={A.DIM} strokeWidth={2.5} />
       </button>
     );
@@ -303,7 +303,7 @@ export default function BusinessTeamPage() {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wide" style={{ color: INK_45 }}>
+                  <div className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wide" style={{ color: INK_45 }}>
                     Change role
                   </div>
                   {ASSIGNABLE_ROLES.map((r) => (
@@ -344,7 +344,6 @@ export default function BusinessTeamPage() {
                 className="inline-flex items-center gap-1 active:opacity-70"
                 style={{
                   ...BIZ_LABEL,
-                  fontSize: 7.5,
                   color: isPublic ? A.MUTE : A.DIM,
                   minHeight: 20,
                   paddingRight: canRowManage ? 8 : 0,

@@ -218,7 +218,7 @@ const Delta = ({ value, prev }: { value: number; prev: number }) => {
   return (
     <span
       className="inline-flex items-center gap-1 tabular-nums"
-      style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '-0.01em', color, ...numFeat }}
+      style={{ fontSize: 11, fontWeight: 700, letterSpacing: '-0.01em', color, ...numFeat }}
     >
       <Triangle up={up} color={color} />
       {text}
@@ -298,8 +298,8 @@ const VisitsChart = ({ data, emptyLabel }: { data: { day: string; total: number;
               </linearGradient>
             </defs>
             <CartesianGrid stroke={A.TRACK} strokeDasharray="2 4" vertical={false} />
-            <XAxis dataKey="day" tick={{ fill: A.MUTE, fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
-            <YAxis tick={{ fill: A.MUTE, fontSize: 10 }} axisLine={false} tickLine={false} width={28} allowDecimals={false} />
+            <XAxis dataKey="day" /* AXIS floor 10: chart tick, a coordinate. */ tick={{ fill: A.MUTE, fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
+            <YAxis /* AXIS floor 10: chart tick, a coordinate. */ tick={{ fill: A.MUTE, fontSize: 10 }} axisLine={false} tickLine={false} width={28} allowDecimals={false} />
             <Tooltip contentStyle={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8, fontSize: 12, color: A.INK }} labelStyle={{ color: A.MUTE }} />
             <Legend wrapperStyle={{ fontSize: 11, color: A.MUTE }} iconType="circle" iconSize={8} />
             <Area type="monotone" dataKey="Total" stroke={A.INK} strokeWidth={2} fill="url(#visitsInk)" />
@@ -363,8 +363,8 @@ const FollowersChart = ({ data, emptyTitle, emptyBody }: {
         <ResponsiveContainer>
           <LineChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid stroke={A.TRACK} strokeDasharray="2 4" vertical={false} />
-            <XAxis dataKey="day" tick={{ fill: A.MUTE, fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
-            <YAxis tick={{ fill: A.MUTE, fontSize: 10 }} axisLine={false} tickLine={false} width={28} allowDecimals={false} />
+            <XAxis dataKey="day" /* AXIS floor 10: chart tick, a coordinate. */ tick={{ fill: A.MUTE, fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={20} />
+            <YAxis /* AXIS floor 10: chart tick, a coordinate. */ tick={{ fill: A.MUTE, fontSize: 10 }} axisLine={false} tickLine={false} width={28} allowDecimals={false} />
             <Tooltip contentStyle={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8, fontSize: 12, color: A.INK }} labelStyle={{ color: A.MUTE }} />
             <Line type="monotone" dataKey="Followers" stroke={A.INK} strokeWidth={2} dot={false} />
           </LineChart>

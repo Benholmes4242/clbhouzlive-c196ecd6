@@ -978,7 +978,6 @@ export default function VerificationFlowSheet({
                           </>
                         )}
                       </button>
-                      {/* MICRO_BRIEF_BUSINESS_PROFILE_TYPE_SCALE: pin deleted so this inherits BIZ_LABEL (8) — interim, below the app floor until the deferred business-scale brief repoints BIZ_LABEL. Do NOT re-pin. */}
                       <div className="text-center" style={{ ...BIZ_LABEL, marginTop: 6 }}>
                         Image or PDF · Max 10MB
                       </div>
@@ -1133,7 +1132,6 @@ export default function VerificationFlowSheet({
                             ))}
                           </SelectContent>
                         </Select>
-                        {/* MICRO_BRIEF_BUSINESS_PROFILE_TYPE_SCALE: pin deleted so this inherits BIZ_LABEL (8) — interim, below the app floor until the deferred business-scale brief repoints BIZ_LABEL. Do NOT re-pin. */}
                         {role === 'owner' && (
                           <p style={{ ...BIZ_LABEL, color: A.MUTE, margin: '6px 0 0' }}>
                             Owners can usually answer our questions fastest.

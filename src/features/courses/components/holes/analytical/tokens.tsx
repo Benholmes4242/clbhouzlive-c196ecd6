@@ -658,10 +658,17 @@ export const EmptyState: React.FC<{
    These are NEW exports, deliberately not a repoint of KICKER / LABEL /
    TITLE - those three have ~120 consumers across the course tab and the
    tour hub, and moving them would drag every one of those surfaces.
-   Nothing on a business surface renders at weight 800. */
+   Nothing on a business surface renders at weight 800.
+
+   MICRO_BRIEF_BUSINESS_FLOW_TYPE_SCALE: this pair was the last sub-floor
+   type in this file. Both now sit at the app-wide READ floor of 11 -
+   BIZ_KICKER 9 -> 11, BIZ_LABEL 8 -> 11. Tracking, weight and colour are
+   untouched; the scale is still FEWER BOLD ELEMENTS WITH MORE SPACE, it is
+   simply no longer smaller than the floor. A FLOOR IS A MINIMUM, NEVER A
+   TARGET: do not re-pin either of these below 11. */
 
 export const BIZ_KICKER: React.CSSProperties = {
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.19em',
   textTransform: 'uppercase',
@@ -669,7 +676,7 @@ export const BIZ_KICKER: React.CSSProperties = {
 };
 
 export const BIZ_LABEL: React.CSSProperties = {
-  fontSize: 8,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',

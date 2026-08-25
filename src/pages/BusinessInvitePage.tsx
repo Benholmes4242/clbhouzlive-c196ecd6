@@ -120,7 +120,7 @@ export default function BusinessInvitePage() {
               padding: 14,
             }}
           >
-            <label className="text-[10.5px] font-bold uppercase tracking-[0.08em]" style={{ color: INK_45 }}>
+            <label className="text-[11px] font-bold uppercase tracking-[0.10em]" style={{ color: INK_45 }}>
               Recipient
             </label>
 
@@ -215,7 +215,7 @@ export default function BusinessInvitePage() {
           {/* Roles */}
           <div className="mb-5">
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-[10.5px] font-bold uppercase tracking-[0.08em]" style={{ color: INK_45 }}>
+              <span className="text-[11px] font-bold uppercase tracking-[0.10em]" style={{ color: INK_45 }}>
                 Role
               </span>
             </div>

@@ -22,7 +22,7 @@ export function BookingComingSoonSection() {
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-[14px] font-semibold text-foreground">Tee-time & lesson booking</p>
               <span
-                className="text-[10.5px] font-bold uppercase tracking-[0.05em]"
+                className="text-[11px] font-bold uppercase tracking-[0.10em]"
                 style={{
                   padding: '2px 8px',
                   borderRadius: 999,
