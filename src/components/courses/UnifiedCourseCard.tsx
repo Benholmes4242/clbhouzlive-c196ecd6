@@ -396,21 +396,6 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
                 >
                   {statLine.text}
                 </span>
-                {statLine.earlyData && (
-                  <span
-                    className="flex-shrink-0"
-                    style={{
-                      /* READ floor — the "Early data" chip. 9 -> 11. */
-                      fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-                      letterSpacing: '0.10em', borderRadius: 9999,
-                      padding: '2px 6px',
-                      background: 'rgba(255,255,255,0.2)',
-                      color: 'rgba(255,255,255,0.9)',
-                    }}
-                  >
-                    {t('statBrowse.earlyData')}
-                  </span>
-                )}
               </div>
             )}
 
