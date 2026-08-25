@@ -1619,6 +1619,11 @@ export function GolfThisWeek({
     accent: string;
     chipGround: string;
     gapKind: 'shots' | 'points' | 'clear';
+    /* §1 (BRIEF_PODIUM_BANDS_FIXES) — ONE precision per tile, read by BOTH the
+       leader CLEAR chip and the chaser deficit. Without it the chip printed raw
+       IEEE 754 float residue ("0.09999999999999998 CLEAR") on the improved
+       tile, where the deficit column was already rounding. */
+    precision: number;
   }[] = [];
 
 
@@ -1651,6 +1656,7 @@ export function GolfThisWeek({
       accent: PODIUM_ACCENT.gold,
       chipGround: PODIUM_GROUND.gold,
       gapKind: 'shots',
+      precision: 0,
       /* GOLD REPORTS THE WIN (§0), not under/over par. The whole line remains
          gold even when the winning round's qualifier is +3. */
       figureOf: (r) => {
@@ -1668,7 +1674,7 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'stableford',
       emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
-      label: t('discover.golfThisWeek.stablefordLabel', 'Best Stableford points'),
+      label: t('discover.golfThisWeek.stablefordLabel', 'Best Stableford'),
       row: bestStableford,
       runners: stablefordRanked.slice(1),
       lowerWins: false,
@@ -1676,6 +1682,7 @@ export function GolfThisWeek({
       accent: PODIUM_ACCENT.white,
       chipGround: PODIUM_GROUND.white,
       gapKind: 'points',
+      precision: 0,
       figureOf: (r) => ({ text: String(r.stableford_points), tone: PODIUM_ACCENT.white }),
     });
   }
@@ -1683,7 +1690,7 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'birdies',
       emoji: '\uD83D\uDC26', // BIRD
-      label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies in a round'),
+      label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
       row: mostBirdies,
       runners: birdiesRanked.slice(1),
       lowerWins: false,
@@ -1691,6 +1698,7 @@ export function GolfThisWeek({
       accent: PODIUM_ACCENT.red,
       chipGround: PODIUM_GROUND.red,
       gapKind: 'clear',
+      precision: 0,
       /* A birdie count IS a count of under-par holes, so the red is literal. */
       figureOf: (r) => ({ text: String(r.birdies), tone: ROW_DARK_TOPAR_UNDER }),
     });
@@ -1699,7 +1707,7 @@ export function GolfThisWeek({
     bandTiles.push({
       key: 'improved',
       emoji: '\uD83D\uDCAA', // FLEXED ARM
-      label: t('discover.golfThisWeek.improvedLabel', 'Most improved handicap'),
+      label: t('discover.golfThisWeek.improvedLabel', 'Most improved'),
       row: mostImproved,
       runners: improvedRanked.slice(1),
       lowerWins: false,
@@ -1710,6 +1718,7 @@ export function GolfThisWeek({
       accent: PODIUM_ACCENT.green,
       chipGround: PODIUM_GROUND.green,
       gapKind: 'clear',
+      precision: 1,
       figureOf: (r) => ({
         text: `\u2212${Math.abs(r.delta_index as number).toFixed(1)}`,
         tone: PODIUM_ACCENT.green,
@@ -1735,8 +1744,7 @@ export function GolfThisWeek({
     const leaderValue = tile.valueOf(tile.row);
     const rowValue = tile.valueOf(row);
     const gap = tile.lowerWins ? rowValue - leaderValue : leaderValue - rowValue;
-    const precision = tile.key === 'improved' ? 1 : 0;
-    const magnitude = Math.abs(gap).toFixed(precision);
+    const magnitude = Math.abs(gap).toFixed(tile.precision);
     return `${tile.lowerWins ? '+' : '\u2212'}${magnitude}`;
   };
 
@@ -1992,8 +2000,14 @@ export function GolfThisWeek({
                 {(() => {
                   const leaderFigure = tile.figureOf(tile.row);
                   const second = tile.runners[0];
+                  /* §1 — ROUND BEFORE COMPARING. Number(...) so the gap === 0
+                     tie test below still matches: toFixed returns a string. */
                   const gap = second
-                    ? Math.abs(tile.valueOf(tile.row) - tile.valueOf(second))
+                    ? Number(
+                        Math.abs(tile.valueOf(tile.row) - tile.valueOf(second)).toFixed(
+                          tile.precision,
+                        ),
+                      )
                     : null;
                   return (
                     <>
@@ -2107,6 +2121,20 @@ export function GolfThisWeek({
                           {tile.runners.map((r, i) => {
                             const figure = tile.figureOf(r);
                             const showDeficit = tile.key === 'best' || tile.key === 'improved';
+                            /* §3 (BRIEF_PODIUM_BANDS_FIXES) — THE GROSS IS CONTEXT.
+                               Every tile's chaser row carries the round's gross and
+                               its to-par so the metric can be read against the
+                               round it came from. On BEST the gross IS the metric,
+                               so only its qualifier is added. ABSENT IS ABSENT: a
+                               null gross renders nothing, not a dash or a zero.
+                               TONE: the tile's OWN accent — the accent reports the
+                               WIN, not under-or-over par (see the gold rule above). */
+                            const grossContext =
+                              tile.key === 'best'
+                                ? figure.qual ?? null
+                                : r.gross == null
+                                  ? null
+                                  : `${r.gross}${toParOf(r)?.text ? ` ${toParOf(r)!.text}` : ''}`;
                             return (
                               <div
                                 key={r.round_id}
@@ -2126,9 +2154,13 @@ export function GolfThisWeek({
                                 }}
                                 style={{
                                   display: 'grid',
-                                  gridTemplateColumns: showDeficit
-                                    ? '12px 16px minmax(0, 1fr) auto auto'
-                                    : '12px 16px minmax(0, 1fr) auto',
+                                  gridTemplateColumns: [
+                                    '12px 16px minmax(0, 1fr) auto',
+                                    grossContext ? 'auto' : null,
+                                    showDeficit ? 'auto' : null,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' '),
                                   alignItems: 'center',
                                   gap: 6,
                                   minHeight: 34,
@@ -2168,6 +2200,14 @@ export function GolfThisWeek({
                                 >
                                   {figure.text}
                                 </span>
+                                {grossContext ? (
+                                  <span
+                                    className="tabular-nums"
+                                    style={{ fontSize: 11, fontWeight: 700, color: tile.accent }}
+                                  >
+                                    {grossContext}
+                                  </span>
+                                ) : null}
                                 {showDeficit ? (
                                   <span
                                     className="tabular-nums"
