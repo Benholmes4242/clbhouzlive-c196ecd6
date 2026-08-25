@@ -338,7 +338,7 @@ function ReviewCard({
             </span>
             {r.reviewer.handicap != null && (
               <span
-                className="inline-flex items-center px-1.5 py-0.5 rounded text-[10.5px] font-bold tabular-nums"
+                className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold tabular-nums"
                 style={{ background: 'rgba(255,255,255,0.06)', color: INK_45 }}
               >
                 Hcp {r.reviewer.handicap.toFixed(1)}

@@ -114,7 +114,8 @@ export const VerdictSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }
                       background: drift == null ? A.TRACK : difficultyRampStop(stop),
                     }}
                   />
-                  <div style={{ ...LABEL, fontSize: 8, letterSpacing: '0.04em', color: A.DIM, marginTop: 5 }}>
+                  {/* AXIS floor 10: hole number under a bar, a coordinate. */}
+                  <div style={{ ...LABEL, fontSize: 10, letterSpacing: '0.04em', color: A.DIM, marginTop: 5 }}>
                     {h.hole_no}
                   </div>
                 </div>
@@ -404,7 +405,8 @@ export const BusynessSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
                     background: isPeak ? A.INK : 'rgba(14,18,22,0.18)',
                   }}
                 />
-                <div style={{ ...LABEL, fontSize: 8, letterSpacing: '0.04em', marginTop: 5 }}>{label[0]}</div>
+                {/* AXIS floor 10: day initial under a bar, a coordinate. */}
+                <div style={{ ...LABEL, fontSize: 10, letterSpacing: '0.04em', marginTop: 5 }}>{label[0]}</div>
               </div>
             );
           })}
