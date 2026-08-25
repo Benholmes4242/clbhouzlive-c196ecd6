@@ -173,7 +173,7 @@ interface Props {
 }
 
 const DEFAULT_TEXT_STYLE: Required<Pick<MentionsTextStyle, 'fontSize' | 'lineHeight' | 'padding' | 'color' | 'caretColor'>> = {
-  fontSize: 14,
+  fontSize: 15,
   lineHeight: '20px',
   padding: '8px 0',
   color: INK,
@@ -319,7 +319,7 @@ function renderSuggestion(
         <div className="flex items-center gap-1">
           <span
             className="truncate"
-            style={{ fontSize: 14, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}
+            style={{ fontSize: 15, fontWeight: 600, color: INK, letterSpacing: '-0.01em' }}
           >
             {s.display}
           </span>
@@ -333,7 +333,7 @@ function renderSuggestion(
         {s.secondary && (
           <div
             className="truncate"
-            style={{ fontSize: 12, color: INK_SUBTLE, lineHeight: 1.2, marginTop: 1 }}
+            style={{ fontSize: 13, color: INK_SUBTLE, lineHeight: 1.2, marginTop: 1 }}
           >
             {s.secondary}
           </div>
@@ -475,7 +475,7 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
               gap: 6,
               padding: '2px 14px 8px',
               borderBottom: `1px solid ${BORDER}`,
-              fontSize: 10.5,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',

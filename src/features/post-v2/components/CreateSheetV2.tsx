@@ -108,8 +108,8 @@ function OptionRow({ glyph, title, subtitle, onClick }: { glyph: React.ReactNode
         {glyph}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: CT.ink, letterSpacing: -0.1 }}>{title}</div>
-        <div style={{ fontSize: 12, color: CT.secondary, marginTop: 2 }}>{subtitle}</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: CT.ink, letterSpacing: -0.1 }}>{title}</div>
+        <div style={{ fontSize: 13, color: CT.secondary, marginTop: 2 }}>{subtitle}</div>
       </div>
     </button>
   );

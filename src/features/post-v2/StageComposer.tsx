@@ -364,8 +364,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     padding: '14px 20px',
     borderRadius: 999,
     border: 'none',
-    fontSize: 15,
+    /* CAPS ACTION: two points down, caps at 0.10em, padding unchanged. */
+    fontSize: 13,
     fontWeight: 700,
+    textTransform: 'uppercase', letterSpacing: '0.10em',
     background: canSubmit ? CT_DARK.amber : CT_DARK.dim,
     color: CT_DARK.ink,
     cursor: canSubmit ? 'pointer' : 'not-allowed',
@@ -732,14 +734,14 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               <button
                 onClick={saveAsDraft}
                 disabled={savingDraft}
-                style={{ height: 48, background: PAGE2.ink, color: PAGE2.canvas, border: 0, borderRadius: 999, fontSize: 14.5, fontWeight: 700, cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}
+                style={{ height: 48, background: PAGE2.ink, color: PAGE2.canvas, border: 0, borderRadius: 999, fontSize: 12.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.10em', cursor: savingDraft ? 'not-allowed' : 'pointer', opacity: savingDraft ? 0.7 : 1 }}
               >
                 {savingDraft ? 'Saving' : 'Save draft'}
               </button>
             )}
             <button
               onClick={() => { setSheet(null); reset(); onClose(); }}
-              style={{ background: 'transparent', border: 0, padding: 0, fontSize: 14, fontWeight: 700, cursor: 'pointer', color: '#C0392B' }}
+              style={{ background: 'transparent', border: 0, padding: 0, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.10em', cursor: 'pointer', color: '#C0392B' }}
             >
               Discard
             </button>
@@ -900,7 +902,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                       color: CT_DARK.mute,
                       borderRadius: 999,
                       padding: '8px 13px',
-                      fontSize: 10.5,
+                      fontSize: 11,
                       fontWeight: 700,
                       cursor: 'pointer',
                       flex: 'none',
@@ -938,9 +940,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               padding: '15px 20px',
               borderRadius: 999,
               border: 'none',
-              fontSize: 15,
+              /* CAPS ACTION. */
+              fontSize: 13,
               fontWeight: 700,
-              letterSpacing: '-0.01em',
+              textTransform: 'uppercase', letterSpacing: '0.10em',
               background: emptyStage ? 'rgba(248,250,252,0.10)' : CT_DARK.ink,
               color: emptyStage ? CT_DARK.dim : '#11131A',
               cursor: emptyStage ? 'default' : 'pointer',
@@ -1000,7 +1003,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                 style={{ width: 56, height: 70, borderRadius: 10, flex: 'none', border: `1px dashed ${PAGE2.dim}`, background: 'transparent', color: PAGE2.mute, fontSize: 18, cursor: 'pointer' }}
               >+</button>
             </div>
-            <div style={{ padding: '6px 18px 0', fontSize: 10.5, color: PAGE2.dim }}>Tap a photo to go back and edit</div>
+            <div style={{ padding: '6px 18px 0', fontSize: 11, color: PAGE2.dim }}>Tap a photo to go back and edit</div>
           </>
         )}
 
@@ -1026,7 +1029,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
               <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>Tag a course</span>
               <button
                 onClick={() => { openDetail('course'); setSheet('course'); }}
-                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: PAGE2.ink, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: PAGE2.ink, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
               >
                 Search
                 <ChevronRight size={12} strokeWidth={2.5} />
@@ -1094,8 +1097,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
             padding: '14px 20px',
             borderRadius: 999,
             border: 'none',
-            fontSize: 15,
+            /* CAPS ACTION. */
+            fontSize: 13,
             fontWeight: 700,
+            textTransform: 'uppercase', letterSpacing: '0.10em',
             background: canSubmit ? PAGE2.ink : 'rgba(248,250,252,0.10)',
             color: canSubmit ? PAGE2.canvas : PAGE2.dim,
             cursor: canSubmit ? 'pointer' : 'not-allowed',
@@ -1118,9 +1123,10 @@ const emptyButtonBase: React.CSSProperties = {
   width: '100%',
   height: 44,
   borderRadius: 999,
-  fontSize: 14,
+  /* CAPS ACTION. */
+  fontSize: 12,
   fontWeight: 700,
-  letterSpacing: '-0.01em',
+  textTransform: 'uppercase', letterSpacing: '0.10em',
   cursor: 'pointer',
 };
 

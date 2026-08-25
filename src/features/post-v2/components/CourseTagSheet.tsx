@@ -151,7 +151,7 @@ export default function CourseTagSheet({
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              fontSize: 10.5,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
@@ -335,7 +335,7 @@ export default function CourseTagSheet({
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ padding: '10px 16px 6px', fontSize: 10, fontWeight: 700, letterSpacing: 1, color: CT.secondary }}>
+    <div style={{ padding: '10px 16px 6px', fontSize: 11, fontWeight: 700, letterSpacing: 1, color: CT.secondary }}>
       {children}
     </div>
   );
@@ -391,7 +391,7 @@ function CourseRow({
               borderRadius: 999,
               background: 'rgba(247,147,30,0.12)',
               color: CT.amberDeep,
-              fontSize: 9.5,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.08em',
             }}

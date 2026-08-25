@@ -69,7 +69,7 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
                   <span style={{ fontSize: 12, fontWeight: 700, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
                 </span>
               ) : (
-                <span className={CHIP_GLASS_CLASS} style={{ position: 'absolute', left: 6, bottom: 6, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.85)', borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
+                <span className={CHIP_GLASS_CLASS} style={{ position: 'absolute', left: 6, bottom: 6, fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.85)', borderRadius: 999, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
               )}
               <button
                 onClick={(e) => { e.stopPropagation(); onRemove(i); }}
@@ -118,7 +118,7 @@ export default function MediaTray({ media, activeIndex, onSelect, onRemove, onRe
 
       {/* Album-order note + reorder arrows */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ fontSize: 10.5, color: CT_DARK.dim, letterSpacing: '0.01em' }}>
+        <div style={{ fontSize: 11, color: CT_DARK.dim, letterSpacing: '0.01em' }}>
           Tap a photo, then move it — this is the album order.
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
