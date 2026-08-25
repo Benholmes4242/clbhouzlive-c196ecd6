@@ -54,7 +54,7 @@ const Figure: React.FC<{ label: string; value: React.ReactNode; tone?: string; s
       {value}
     </div>
     {sub ? (
-      <div style={{ fontSize: 10.5, fontWeight: 600, color: A.BODY, marginTop: 2 }}>{sub}</div>
+      <div style={{ fontSize: 11.5, fontWeight: 600, color: A.BODY, marginTop: 2 }}>{sub}</div>
     ) : null}
   </div>
 );
@@ -777,7 +777,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           </div>
           <div
             style={{
-              fontSize: 10.5,
+              fontSize: 11.5,
               fontWeight: 600,
               lineHeight: 1.3,
               color: A.BODY,

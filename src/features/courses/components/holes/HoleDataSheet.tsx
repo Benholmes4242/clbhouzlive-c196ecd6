@@ -440,7 +440,7 @@ export const HoleDataSheet: React.FC<Props> = ({
           ] as const).map(([bg, label]) => (
             <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
               <span style={{ width: 10, height: 8, borderRadius: 3, background: bg, display: 'inline-block' }} />
-              <span style={{ fontSize: 10, fontWeight: 600, color: INK_55 }}>{label}</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: INK_55 }}>{label}</span>
             </span>
           ))}
         </div>
@@ -688,7 +688,7 @@ const LegendSwatch: React.FC<{ swatch: React.ReactNode; label: string }> = ({ sw
       display: 'inline-flex',
       alignItems: 'center',
       gap: 5,
-      fontSize: 9,
+      fontSize: 11,
       fontWeight: 700,
       letterSpacing: '0.10em',
       color: INK_55,
@@ -1000,7 +1000,7 @@ const StoryTile: React.FC<{
     <div style={{ fontSize: 16, lineHeight: 1 }} aria-hidden>{emoji}</div>
     <div
       style={{
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: 700,
         letterSpacing: '0.12em',
         color: INK_55,
@@ -1020,7 +1020,7 @@ const StoryTile: React.FC<{
     >
       {headline}
     </div>
-    <div style={{ fontSize: 10.5, color: INK_55, lineHeight: 1.45, marginTop: 2 }}>
+    <div style={{ fontSize: 11.5, color: INK_55, lineHeight: 1.45, marginTop: 2 }}>
       {sentence}
     </div>
   </div>
@@ -1166,7 +1166,7 @@ const HoleCard: React.FC<{
           {showYou && (
             <div
               style={{
-                fontSize: 9.5,
+                fontSize: 11.5,
                 color: youBeats ? GOLD_INK : INK_85,
                 marginTop: 3,
                 ...NUM,
@@ -1294,7 +1294,7 @@ const ExpandedCard: React.FC<{
               <div style={{ height: 1, background: INK_06, width: '100%', marginTop: 2 }} />
               <div
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.10em',
                   color: INK_55,

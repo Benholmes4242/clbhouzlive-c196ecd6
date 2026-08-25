@@ -29,7 +29,7 @@ export const HolesScoringKey: React.FC = () => {
     >
       <div
         style={{
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',

@@ -92,7 +92,7 @@ const DASH = '\u2014';
 /** ONE eyebrow treatment: the panel and its sheet render identically. */
 const SHEET_EYEBROW: React.CSSProperties = {
   ...KICKER,
-  fontSize: 9.5,
+  fontSize: 11.5,
   letterSpacing: '0.15em',
   fontWeight: 700,
 };
@@ -449,7 +449,7 @@ const TeeList: React.FC<{
    Declared locally ON PURPOSE. Repointing the canonical KICKER / LABEL / TITLE
    in ./tokens is an app-wide run of its own - ~76 files import them. */
 const SH_KICKER: React.CSSProperties = {
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.19em',
   textTransform: 'uppercase',
@@ -1260,7 +1260,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
           >
             <span
               style={{
-                fontSize: 9,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',

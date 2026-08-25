@@ -321,7 +321,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId, hideHeader = false })
             <div key={cell.k as string} style={{ textAlign: 'center', minWidth: 0 }}>
               <div
                 style={{
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
@@ -477,7 +477,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId, hideHeader = false })
               <div key={cell.k as string} style={{ textAlign: 'center', minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: 700,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
@@ -546,7 +546,7 @@ export const CourseTeeCard: React.FC<Props> = ({ courseId, hideHeader = false })
                 padding: '8px 12px',
                 background: A.PANEL,
                 borderBottom: `1px solid ${HAIRLINE_INK_8}`,
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
