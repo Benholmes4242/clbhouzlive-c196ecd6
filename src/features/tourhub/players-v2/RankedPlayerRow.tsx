@@ -78,6 +78,8 @@ function RankedPlayerRowInner({
         style={{
           width: 28,
           flex: '0 0 28px',
+          // AXIS: position column. Already above the AXIS floor of 10 and the
+          // floor is a minimum, not a target - it stays at 15.
           fontSize: 15,
           fontWeight: 200,
           color: INK,
@@ -136,7 +138,8 @@ function RankedPlayerRowInner({
             style={{
               display: 'flex',
               alignItems: 'center',
-              fontSize: 9,
+              // READ 11: this is language (world rank, movement, counts).
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.13em',
               textTransform: 'uppercase',
@@ -154,8 +157,8 @@ function RankedPlayerRowInner({
       {/* Stat column */}
       <div
         style={{
-          width: 72,
-          flex: '0 0 72px',
+          width: 64,
+          flex: '0 0 64px',
           textAlign: 'right',
           fontSize: 14,
           fontWeight: 200,
@@ -195,7 +198,8 @@ export function RankedPlayerHeader({
   statLabel: string | null;
 }) {
   const cell: React.CSSProperties = {
-    fontSize: 9,
+    // AXIS 10: column headers (#, PLAYER, FEDEX PTS) - coordinates, not language.
+    fontSize: 10,
     fontWeight: 700,
     letterSpacing: '0.13em',
     textTransform: 'uppercase',
@@ -214,7 +218,7 @@ export function RankedPlayerHeader({
       <div style={{ ...cell, width: 28, flex: '0 0 28px', textAlign: 'right' }}>{rankLabel}</div>
       <div style={{ ...cell, flex: 1, minWidth: 0 }}>{playerLabel}</div>
       {statLabel && (
-        <div style={{ ...cell, width: 72, flex: '0 0 72px', textAlign: 'right' }}>{statLabel}</div>
+        <div style={{ ...cell, width: 64, flex: '0 0 64px', textAlign: 'right' }}>{statLabel}</div>
       )}
     </div>
   );
