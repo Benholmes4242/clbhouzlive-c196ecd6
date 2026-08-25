@@ -141,7 +141,7 @@ export function ReportSheet({
           {/* Details textarea (show for "other" or always) */}
           {selectedReason && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#8E8E93]">
+              <label className="text-sm font-medium" style={{ color: A.MUTE }}>
                 Additional details {selectedReason !== 'other' && '(optional)'}
               </label>
               <Textarea
