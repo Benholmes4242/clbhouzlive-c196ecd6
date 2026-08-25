@@ -782,7 +782,6 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
           >
             <span style={{ ...LABEL, textAlign: 'center' }}>{t('courses:courseDetail.you.colHole')}</span>
             <span style={LABEL}>{t('courses:holes.scoringBreakdown.s1Sub')}</span>
-            <span style={{ ...LABEL, textAlign: 'right' }}>{t('courses:courseDetail.you.colCostARound')}</span>
           </div>
           {damaging.map((h) => {
             /**
@@ -800,7 +799,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
               gap == null
                 ? null
                 : level
-                  ? t('courses:holes.scoringBreakdown.vsLevel')
+                  ? null
                   : gap > 0
                     ? t('courses:holes.scoringBreakdown.vsBetter')
                     : t('courses:holes.scoringBreakdown.vsWorse');
