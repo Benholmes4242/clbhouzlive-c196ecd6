@@ -125,12 +125,7 @@
       "sectionEyebrow": "World rankings",
       "linkLabel": "Full rankings",
       "worldNo1Label": "World No. 1",
-      "pointsLabel": "POINTS",
-      "boards": {
-        "owgr": "Official World Golf Ranking",
-        "r2d": "Race to Dubai",
-        "rolex": "Rolex Rankings"
-      }
+      "pointsLabel": "POINTS"
     },
     "teamWinnerStrip": {
       "eyebrow": "TEAM WINNER",
@@ -225,8 +220,7 @@
       "linkLabel": "Full schedule",
       "chipPlayoffs": "Playoffs",
       "daysLabel": "DAYS",
-      "venueDefendsSep": " · {{name}} defends",
-      "subline": "The tour schedule"
+      "venueDefendsSep": " · {{name}} defends"
     },
     "onTheCourse": {
       "eyebrow": "On the course",
