@@ -876,9 +876,8 @@ const StoryTiles: React.FC<{
                   <span
                     style={{
                       display: 'block',
-                      width: 54,
-                      height: 4,
-                      borderRadius: 2,
+                      height: 6,
+                      borderRadius: 3,
                       background: A.TRACK,
                       marginTop: 8,
                     }}
@@ -886,8 +885,8 @@ const StoryTiles: React.FC<{
                     <span
                       style={{
                         display: 'block',
-                        height: 4,
-                        borderRadius: 2,
+                        height: 6,
+                        borderRadius: 3,
                         width: `${Math.max(
                           0,
                           Math.min(100, (h.progress.done / Math.max(1, h.progress.total)) * 100),
