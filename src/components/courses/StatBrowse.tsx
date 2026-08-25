@@ -688,7 +688,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         <span className="flex w-full items-center" style={{ gap: 6 }}>
           <Globe {...DD_ICON} />
           <span className="truncate flex-1 min-w-0" style={triggerLabelStyle}>{countryTriggerLabel}</span>
-          <ChevronDown {...DD_ICON} style={{ color: INK_FAINT }} />
+          <ChevronDown {...DD_ICON} style={{ color: INK_MUTE }} />
         </span>
       </SelectTrigger>
       <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
@@ -738,7 +738,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
               ? t('statBrowse.allRegions')
               : region ?? (country ? t('statBrowse.allOf', { country }) : t('statBrowse.allRegions'))}
           </span>
-          <ChevronDown {...DD_ICON} style={{ color: INK_FAINT }} />
+          <ChevronDown {...DD_ICON} style={{ color: regionDisabled ? INK_FAINT : INK_MUTE }} />
         </span>
       </SelectTrigger>
       <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
@@ -781,7 +781,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         <span className="flex min-w-0 items-center" style={{ gap: 6 }}>
           <LensIcon lens={lens} />
           <span className="truncate" style={triggerLabelStyle}>{t(`statBrowse.lens.${lens}.label`)}</span>
-          <ChevronDown {...DD_ICON} style={{ color: INK_FAINT }} />
+          <ChevronDown {...DD_ICON} style={{ color: INK_MUTE }} />
         </span>
       </SelectTrigger>
       <SelectContent className="z-50 max-h-[60vh] rounded-sq-sm shadow-lg" style={menuStyle}>
