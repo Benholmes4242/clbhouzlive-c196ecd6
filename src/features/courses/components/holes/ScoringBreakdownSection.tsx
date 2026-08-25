@@ -12,8 +12,8 @@ import { useLegendPulse } from '@/hooks/gam/useLegendPulse';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { legendCategoryLabel, formatLegendGap } from '@/lib/gam/visuals';
 import { monotonePath } from '@/lib/charts/monotonePath';
-import { A, Panel, Hairline, LABEL, NUM, SANS, StatRow, FIGS, TOPAR_RED } from './analytical/tokens';
-import { BAND_AMBER } from '@/features/courses/_shared/scoreBands';
+import { A, Panel, Hairline, LABEL, NUM, SANS, StatRow, FIGS, TOPAR_RED, difficultyRampColor } from './analytical/tokens';
+import { BAND_AMBER, BAND_GREEN_DARK, BAND_RED_DARK } from '@/features/courses/_shared/scoreBands';
 
 /**
  * "Where your shots go" - the CHART-LED You tab
@@ -28,15 +28,25 @@ import { BAND_AMBER } from '@/features/courses/_shared/scoreBands';
  *     identical derivation (sum of per-hole averages to par) over the SAME
  *     set of hole numbers
  *   - REFERENCE_NOISE_FLOOR governs the WORDS on a row, never the field mark
- *   - the thirds take a neutral ink ladder assigned by rank, NEVER colour and
- *     never a tint - the cumulative curve inherits that rule
+ *   - the thirds take a neutral ink ladder assigned by rank, and the
+ *     cumulative curve inherits that rule. OVERTURNED for the shots-go
+ *     columns only: they are ramp-coloured by their own value
+ *     (difficultyRampColor), so the deepest red is the costliest hole. The
+ *     risk, stated so it is not rediscovered: this chart ranks by SHOTS LOST,
+ *     not by difficulty, so the same ramp means a different thing here than on
+ *     the Course tab.
  *   - the share denominator is the viewer's own total_over_par, never the
  *     field's
  *   - a caption advises; it never narrates what the chart above it shows
  */
 
-const OVER = '#C8372B';
-const UNDER = '#0F8F4A';
+/**
+ * Dark-canvas score inks. The local '#C8372B' / '#0F8F4A' pair was tuned for
+ * ink on white and went muddy here - scoreBands documents that exact failure
+ * and supplies the dark variants, so this file now takes them.
+ */
+const OVER = BAND_RED_DARK;
+const UNDER = BAND_GREEN_DARK;
 
 /** The coaching line. Caption weight - it advises, it does not narrate. */
 const CAPTION: React.CSSProperties = {
@@ -334,6 +344,17 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   const damaging = damagingAll.slice(0, 3);
   const worstSet = new Set(damaging.map((h) => h.hole_no));
   const columnMax = Math.max(...ordered.map((h) => h.shots_over_par || 0), 0.1);
+
+  /**
+   * Column tint, normalised across the holes shown. The 0.06 floor and 0.94
+   * multiplier are taken verbatim from CourseAnalyticsPanels so the two charts
+   * tint identically. The vSpan guard matters: where every hole costs the same,
+   * dividing by zero would paint every column the deepest red.
+   */
+  const vMin = Math.min(...ordered.map((h) => h.shots_over_par || 0));
+  const vMax = Math.max(...ordered.map((h) => h.shots_over_par || 0));
+  const vSpan = vMax - vMin;
+  const columnTint = (v: number) => (vSpan > 0 ? 0.06 + 0.94 * ((v - vMin) / vSpan) : 0.5);
 
   const damagingFieldCosts = damaging
     .map((h) => fieldCostByHole.get(h.hole_no))
@@ -679,7 +700,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                       width: '100%',
                       height: barH,
                       borderRadius: 2,
-                      background: isWorst ? A.INK : COLUMN_QUIET,
+                      background: difficultyRampColor(columnTint(v)),
                     }}
                   />
                   <span
