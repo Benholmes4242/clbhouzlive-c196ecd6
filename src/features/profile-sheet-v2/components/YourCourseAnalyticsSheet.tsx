@@ -30,7 +30,7 @@ import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/u
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
 import { useMyRoundsByCourse, type CourseRoundPoint } from '@/hooks/gam/useMyRoundsByCourse';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
-import { TOPAR_UNDER_LIGHT, TOPAR_OVER_LIGHT } from '@/features/tourhub/_shared/tokens';
+
 import monotonePath from '@/lib/charts/monotonePath';
 
 /** Canonical metrics from the shared module; this sheet keeps its palette. */
@@ -51,11 +51,25 @@ const DOT = '\u00B7';
  * straddles the eagle/albatross line and gold is the rarity mark for the
  * bucket as a whole.
  */
+/**
+ * MICRO_BRIEF_TOPAR_LIGHT_ON_DARK_SURFACES — option C, the neutral ramp.
+ *
+ * The two _LIGHT values here were the light branch of a theme pair used
+ * unconditionally on a #1B1E27 card: #0F172A (the former INK) was invisible.
+ *
+ * Bogeys+ does NOT take the over-par red, which is the obvious answer: two
+ * reds side by side in one bar — one meaning under par, one over — is not
+ * readable. On the round card position and the ring carry that distinction; in
+ * a four-segment bar nothing does. So the tail runs as a neutral ramp: pars
+ * 0.42, bogeys+ 0.66 — "further from par" left to right, with no fifth
+ * meaning added to a palette where colour means under par, over par, or the
+ * viewing member.
+ */
 const DIST = {
   eagles: SC_FILL_GOLD,
-  birdies: TOPAR_UNDER_LIGHT,
+  birdies: A.RED,
   pars: A.DIM,
-  bogeys: TOPAR_OVER_LIGHT,
+  bogeys: 'rgba(248,250,252,0.66)',
 } as const;
 
 /**
