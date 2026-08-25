@@ -160,13 +160,25 @@ const WELL_TRIGGER_AUTO_CLS =
   'inline-flex h-auto w-auto max-w-full border-0 p-0 shadow-none focus:ring-0 ' +
   '[&>span]:!flex [&>svg]:hidden';
 
-const wellStyle = (applied: boolean): React.CSSProperties => ({
-  background: applied ? 'rgba(255,255,255,0.14)' : A.PANEL,
+/** Two states only. A default selection is still a selection and reads as active;
+ *  only a control the member cannot operate is dimmed. */
+const WELL_ENABLED: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.14)',
   border: `1px solid ${A.BORDER}`,
   borderRadius: 8,
   padding: '8px 12px',
-  color: applied ? INK : INK_MUTE,
-});
+  color: INK,
+};
+
+const WELL_DISABLED: React.CSSProperties = {
+  background: A.PANEL,
+  border: `1px solid ${A.BORDER}`,
+  borderRadius: 8,
+  padding: '8px 12px',
+  color: INK_FAINT,
+  cursor: 'not-allowed',
+};
+
 
 const triggerLabelStyle: React.CSSProperties = {
   fontSize: 12.5,
