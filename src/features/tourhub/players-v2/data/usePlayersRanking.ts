@@ -57,6 +57,13 @@ const STAT_LABEL_KEY: Record<PlayersTourId, string> = {
   liv: 'players.statLabel.liv',
 };
 
+/**
+ * A ranking of one is a data failure, not a valid state. Below this floor the
+ * hook reports unsynced and the page shows its unavailable state rather than
+ * rendering "Top 1 by season ranking" as though it were a leaderboard.
+ */
+const MIN_RANKING_ROWS = 5;
+
 function currentSeasonYear(): number {
   const now = new Date();
   return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
@@ -90,7 +97,6 @@ async function resolvePgaSeasonId(): Promise<string | null> {
 interface PgaStatRow {
   player_id: string;
   fedex_points: number | string | null;
-  fedex_rank: number | null;
   wins: number | null;
   top_10s: number | null;
   events_played: number | null;
@@ -133,14 +139,28 @@ export function usePlayersRanking(tour: PlayersTourId) {
         const { data: stats, error: statsErr } = await supabase
           .from('sr_player_statistics')
           .select(
-            'player_id, fedex_points, fedex_rank, wins, top_10s, events_played',
+            // fedex_rank is NOT selected. Measured across both stored seasons it
+            // is a per-event finishing position (2025: Fleetwood 1, Henley 2,
+            // Scheffler 4 = the Tour Championship result, not the season
+            // standing), it ties (T5, T7, T11) and it repeats within a season.
+            // Rendering it as the # of a points-ordered list guaranteed
+            // disagreement. The # is now the sort position.
+            'player_id, fedex_points, wins, top_10s, events_played',
           )
+
           .eq('season_id', seasonId)
           .order('fedex_points', { ascending: false, nullsFirst: false })
           .limit(300);
         if (statsErr) throw statsErr;
         if (!stats?.length) return { synced: false, statLabel: null, rows: [] };
-        const statsRows = stats as unknown as PgaStatRow[];
+        // A player with no season points has no season ranking. Zero is not a
+        // NULL, so the query's nullsFirst:false does not catch it and a
+        // zero-point row lands wherever an unstable descending sort puts it -
+        // which is how Stefano Mazzoli (0 pts, 5 events) reached the top.
+        const statsRows = (stats as unknown as PgaStatRow[]).filter(
+          (s) => s.fedex_points != null && Number(s.fedex_points) > 0,
+        );
+        if (!statsRows.length) return { synced: false, statLabel: null, rows: [] };
         const playerIds = [...new Set(statsRows.map((s) => s.player_id))];
         const { data: players, error: playersErr } = await supabase
           .from('sr_players')
@@ -148,11 +168,16 @@ export function usePlayersRanking(tour: PlayersTourId) {
           .in('id', playerIds);
         if (playersErr) throw playersErr;
         const pmap = new Map(((players ?? []) as unknown as PlayerRow[]).map((p) => [p.id, p]));
-        let rows: RankedRow[] = statsRows.map((s, i) => {
+        // Points descending is authoritative, so the position IS the rank: the
+        // column and the order agree by construction, not by luck.
+        const ordered = [...statsRows].sort(
+          (a, b) => Number(b.fedex_points) - Number(a.fedex_points),
+        );
+        const rows: RankedRow[] = ordered.map((s, i) => {
           const p = pmap.get(s.player_id);
           return {
             playerId: s.player_id,
-            rank: s.fedex_rank ?? i + 1,
+            rank: i + 1,
             name: p?.full_name ?? 'Unknown',
             country: p?.country ?? null,
             countryCode: p?.country_code ?? null,
@@ -164,9 +189,12 @@ export function usePlayersRanking(tour: PlayersTourId) {
           };
         });
 
-        rows = [...rows].sort((a, b) => a.rank - b.rank);
+        if (rows.length < MIN_RANKING_ROWS) {
+          return { synced: false, statLabel: null, rows: [] };
+        }
         return { synced: true, statLabel: statLabelFor('pga'), rows };
       }
+
 
       const year = currentSeasonYear();
       const primary = await supabase
@@ -189,6 +217,16 @@ export function usePlayersRanking(tour: PlayersTourId) {
         if (alt.error) throw alt.error;
         rankings = (alt.data ?? []) as unknown as TourSeasonRankingRow[];
       }
+      // Client-side guard mirroring the ingest floor: reject rows that cannot
+      // be a player. A null player id with no manual override is not a person,
+      // and an 80+ character "name" is prose - the DP World row currently in
+      // production is the Race to Dubai eligibility footnote, with the alt text
+      // of a flag <img> ("Flag for USA") sitting in country.
+      rankings = rankings.filter(
+        (r) =>
+          !!(r.player_id ?? r.manual_player_id) &&
+          (r.player_name ?? '').length <= 80,
+      );
       if (!rankings.length) return { synced: false, statLabel: null, rows: [] };
       const playerIds = [
         ...new Set(
@@ -224,6 +262,9 @@ export function usePlayersRanking(tour: PlayersTourId) {
         };
 
       });
+      if (rows.length < MIN_RANKING_ROWS) {
+        return { synced: false, statLabel: null, rows: [] };
+      }
       return { synced: true, statLabel: statLabelFor(tour), rows };
     },
   });
