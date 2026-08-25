@@ -30,6 +30,21 @@ const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
 /** Panel headings sit below the sheet title: same role, 13px as before. */
 const SECTION_TITLE: React.CSSProperties = { ...TITLE, fontSize: 13 };
 
+/**
+ * MICRO_BRIEF_SHEETS_TYPE_SCALE — TWO LOCAL LABEL ROLES.
+ *
+ * AXIS (10px) is the ONE STATED EXCEPTION to the app's 11px floor: a scorecard
+ * axis label (HOLE / PAR / YOU row stubs) is a COORDINATE, not something read.
+ * Lifting it to 11 would double the grid's weight beside 18 numerals.
+ *
+ * READ (11px) is for anything a member actually reads: the scoring-key title
+ * and its entries, the TOTAL / OUT n / IN n / PAR n figures, the hcp chip.
+ *
+ * Size only — no tone moves. The quiet hole numbers stay quiet.
+ */
+const LABEL_AXIS: React.CSSProperties = { ...LABEL, fontSize: 10 };
+const LABEL_READ: React.CSSProperties = { ...LABEL, fontSize: 11 };
+
 const CAPTION: React.CSSProperties = { fontSize: 12.5, lineHeight: 1.5, color: A.MUTE, margin: 0 };
 /**
  * THE TWO SENTENCES are the best copy in the sheet and must read LIGHTER than
@@ -153,7 +168,7 @@ const CardRow: React.FC<{
   tone?: string;
 }> = ({ label, cells, total, muted, tone }) => (
   <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-    <span style={{ ...LABEL, fontSize: 8 }}>{label}</span>
+    <span style={{ ...LABEL_AXIS }}>{label}</span>
     {cells.map((c, i) => (
       <span key={i} style={{ textAlign: 'center', minWidth: 0 }}>
         {typeof c === 'object' ? c : (
@@ -311,7 +326,7 @@ const Legend: React.FC<{ holes: CardScorecardHole[] }> = ({ holes }) => {
       {/* THE KEY IS CENTRED UNDER THE CARD (BRIEF_SCORECARD_CHART_ALIGNMENT §4).
           Centre justification also centres a trailing item under the ones that
           wrapped above it, instead of leaving it hanging left. */}
-      <div style={{ ...LABEL, fontSize: 8, color: A.INK, marginBottom: 8, textAlign: 'center' }}>
+      <div style={{ ...LABEL_READ, color: A.INK, marginBottom: 8, textAlign: 'center' }}>
         {t('courses:holes.scoringKey.title')}
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', gap: 16, rowGap: 10, flexWrap: 'wrap' }}>
@@ -329,7 +344,7 @@ const Legend: React.FC<{ holes: CardScorecardHole[] }> = ({ holes }) => {
             >
               <ScoreMark strokes={k.strokes} par={4} size={KEY_MARK_SIZE} surface="dark" showStroke={false} />
             </span>
-            <span style={{ ...LABEL, fontSize: 8 }}>{k.label}</span>
+            <span style={{ ...LABEL_READ }}>{k.label}</span>
           </span>
         ))}
       </div>
@@ -363,7 +378,7 @@ const RoundSplit: React.FC<{ split: { label: string; n: number; tone: string }[]
     <div style={{ display: 'grid', gridTemplateColumns: `repeat(${split.length}, minmax(0, 1fr))` }}>
       {split.map((s) => (
         <div key={s.label} style={{ textAlign: 'center' }}>
-          <div style={LABEL}>{s.label}</div>
+          <div style={LABEL_READ}>{s.label}</div>
           <div style={{ ...NUM, fontSize: 18, color: s.n > 0 ? s.tone : A.MUTE, marginTop: 3 }}>{s.n}</div>
         </div>
       ))}
@@ -379,7 +394,7 @@ const HandicapChip: React.FC<{ delta: number }> = ({ delta }) => {
   const color = cut ? TREND_UP : TREND_DOWN;
   const arrow = cut ? '\u2193' : '\u2191';
   return (
-    <span style={{ ...LABEL, fontSize: 8, color, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+    <span style={{ ...LABEL_READ, color, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
       <span aria-hidden="true">{arrow}</span>
       {Math.abs(delta).toFixed(1)}
     </span>
@@ -1024,11 +1039,11 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     */}
                     <div>
                       <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-                        <span style={{ ...LABEL, fontSize: 8, color: A.INK }}>{t('courses:scorecard.total')}</span>
+                        <span style={{ ...LABEL_READ, color: A.INK }}>{t('courses:scorecard.total')}</span>
                         <span
                           style={{
                             gridColumn: backSummary ? 'span 4' : 'span 9',
-                            ...LABEL, fontSize: 8, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
+                            ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
                           }}
                         >
                           {t('courses:scorecard.outN', { n: outSummary.strokes })}
@@ -1037,7 +1052,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                           <span
                             style={{
                               gridColumn: 'span 5',
-                              ...LABEL, fontSize: 8, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
+                              ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
                             }}
                           >
                             {t('courses:scorecard.inN', { n: backSummary.strokes })}
@@ -1047,7 +1062,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                       </div>
 
                       <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-                        <span style={{ ...LABEL, fontSize: 8, color: A.MUTE, whiteSpace: 'nowrap' }}>
+                        <span style={{ ...LABEL_READ, color: A.MUTE, whiteSpace: 'nowrap' }}>
                           {t('courses:scorecard.parN', { n: cardTotalPar })}
                         </span>
                         <span style={{ gridColumn: 'span 9' }} />
