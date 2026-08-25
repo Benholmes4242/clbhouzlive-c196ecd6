@@ -17,6 +17,7 @@ import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerShee
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { scrollPageToTop } from '@/lib/getScrollParent';
+import { safeGoBack } from '@/utils/navigation';
 
 import { useLogout } from '@/hooks/useLogout';
 
