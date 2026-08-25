@@ -193,7 +193,8 @@ export function ThisWeek({ slug, collegeName }: Props) {
                       >
                         {pos ?? ''}
                       </div>
-                      {microThru && <div style={{ ...LABEL_STYLE, marginTop: 5 }}>{microThru}</div>}
+                      {/* AXIS 10: FINAL / THRU is a status marker, not a sentence. */}
+                      {microThru && <div style={{ ...LABEL_STYLE, fontSize: 10, marginTop: 5 }}>{microThru}</div>}
                     </>
                   ) : (
                     <div style={LABEL_STYLE}>{t('college.profile.teeTime')}</div>

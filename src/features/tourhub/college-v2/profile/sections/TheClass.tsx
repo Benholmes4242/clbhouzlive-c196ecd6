@@ -83,14 +83,15 @@ export function TheClass({ slug, collegeName }: Props) {
       </header>
 
       {/* Column header */}
+      {/* AXIS 10 on all three column headers: they are coordinates over the rows. */}
       <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px' }}>
-        <span style={{ ...LABEL_STYLE, width: 22, flex: '0 0 22px' }}>
+        <span style={{ ...LABEL_STYLE, fontSize: 10, width: 22, flex: '0 0 22px' }}>
           {t('college.profile.colRank')}
         </span>
-        <span style={{ ...LABEL_STYLE, flex: 1, marginLeft: 8 }}>
+        <span style={{ ...LABEL_STYLE, fontSize: 10, flex: 1, marginLeft: 8 }}>
           {t('college.profile.colPlayer')}
         </span>
-        <span style={{ ...LABEL_STYLE, width: 78, flex: '0 0 78px', textAlign: 'right' }}>
+        <span style={{ ...LABEL_STYLE, fontSize: 10, width: 78, flex: '0 0 78px', textAlign: 'right' }}>
           {t('college.profile.colEarnings')}
         </span>
       </div>
