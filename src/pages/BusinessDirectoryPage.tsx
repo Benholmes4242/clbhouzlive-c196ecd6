@@ -65,7 +65,7 @@ const BusinessDirectoryPage = () => {
     <PageRoot className="min-h-screen bg-background">
       {/* Header */}
       <div
-        className="sticky z-10 bg-background/95 backdrop-blur-sm border-b"
+        className="sticky z-10 bg-background border-b"
         style={{ top: 'var(--sat, env(safe-area-inset-top, 0px))' }}
       >
         <div className="mx-auto max-w-5xl px-4 py-4">
