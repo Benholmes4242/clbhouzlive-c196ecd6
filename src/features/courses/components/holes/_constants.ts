@@ -46,5 +46,13 @@ export const SC_EAGLE_DARK     = '#F5C842';
 // Dark birdies share the canonical dark to-par red; no independent pink-red.
 export { TOPAR_UNDER_DARK as SC_BIRDIE_DARK } from '@/features/tourhub/_shared/tokens';
 export const SC_PAR_DARK       = 'rgba(242,244,247,0.42)';
-export const SC_BOGEY_DARK     = '#A6C2F0'; // paler blue - lighter damage
-export const SC_DOUBLE_DARK    = '#7AA6EC'; // more saturated blue - worse damage
+// Bogey / double+ were '#A6C2F0' and '#7AA6EC' - a deliberate pair, paler blue
+// for lighter damage and more saturated blue for worse. Retired by
+// MICRO_BRIEF_SC_DARK_NEUTRAL_RAMP: blue carried no other meaning in this app
+// (red = under par, neutral = over par, amber = the viewing member, green =
+// movement, gold = celebration), and the same four buckets were drawn in three
+// palettes across the analytics sheet, the holes tree and here. The lighter-vs-
+// worse distinction survives, carried by BRIGHTNESS instead of hue. Values are
+// RAMP_TOPAR.bogey / .double verbatim so the two ramps agree by construction.
+export const SC_BOGEY_DARK     = 'rgba(248,250,252,0.56)';
+export const SC_DOUBLE_DARK    = 'rgba(248,250,252,0.72)';
