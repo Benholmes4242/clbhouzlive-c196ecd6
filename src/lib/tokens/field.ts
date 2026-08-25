@@ -56,13 +56,26 @@ export function fieldPaint(focused: boolean) {
  * therefore no way to break an existing onFocus side effect (CollegeHubPage's
  * blur nearly closed its results list before a tap landed).
  *
+ * SAFE ON EITHER A BARE CONTROL OR A WRAPPER. The name does not say which, and
+ * both are in use, so both focus: and focus-within: are carried: focus: alone
+ * misses the wrapper case, focus-within: alone is the less obvious of the two.
+ *
+ * THE OUTLINE SUPPRESSION IS NOT A MISSING FOCUS INDICATOR, IT IS A DUPLICATE
+ * ONE. This class supplies its own focus indicator — background 6% -> 10% AND
+ * border 10% -> 28%, a non-colour-only change — so the user-agent outline draws
+ * a SECOND, brighter ring on top of the field's own border. That is what Ben
+ * saw on the autofocused country search. Remove these two utilities and the
+ * ring comes back. Do not remove them from a consumer that overrides the paint.
+ *
  * Do NOT also set background/border/borderRadius inline — inline style beats
  * the class and the focus step dies silently.
  */
 export const FIELD_PAINT_CLASS =
   'bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] rounded-[14px] ' +
   'transition-[background-color,border-color] duration-[140ms] ease-out ' +
+  'focus:outline-none focus-within:outline-none ' +
   'focus-within:bg-[rgba(255,255,255,0.10)] focus-within:border-[rgba(255,255,255,0.28)]';
+
 
 /* ── THE RAISED SET — for fields on a ground LIGHTER than the canvas ──────
  *
