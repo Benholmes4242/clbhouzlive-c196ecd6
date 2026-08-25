@@ -2121,20 +2121,6 @@ export function GolfThisWeek({
                           {tile.runners.map((r, i) => {
                             const figure = tile.figureOf(r);
                             const showDeficit = tile.key === 'best' || tile.key === 'improved';
-                            /* §3 (BRIEF_PODIUM_BANDS_FIXES) — THE GROSS IS CONTEXT.
-                               Every tile's chaser row carries the round's gross and
-                               its to-par so the metric can be read against the
-                               round it came from. On BEST the gross IS the metric,
-                               so only its qualifier is added. ABSENT IS ABSENT: a
-                               null gross renders nothing, not a dash or a zero.
-                               TONE: the tile's OWN accent — the accent reports the
-                               WIN, not under-or-over par (see the gold rule above). */
-                            const grossContext =
-                              tile.key === 'best'
-                                ? figure.qual ?? null
-                                : r.gross == null
-                                  ? null
-                                  : `${r.gross}${toParOf(r)?.text ? ` ${toParOf(r)!.text}` : ''}`;
                             return (
                               <div
                                 key={r.round_id}
