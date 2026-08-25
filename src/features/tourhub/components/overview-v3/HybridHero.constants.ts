@@ -54,32 +54,21 @@ export const LEGIBILITY_SCRIM =
   'linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.04) 30%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%)';
 
 /**
- * Canonical Tour-Overview hero scrim layers — extracted so the Courses
- * Discover hero (`CoursesPageHero`), the Amateur Circuit hero, and the
- * standalone Course Details cinematic hero (`GolfClubView.cinematicHero`)
- * share pixel-identical treatment with `PhotoBand`.
+ * THE 80px TOP SCRIM — the ONE survivor of the old five-layer hero recipe.
  *
- * Top scrim: protects eyebrow / notch chrome.
- * Bottom scrim: heavy fade so the lower-third title stack holds legibility.
- * Radial ambient: same subtle green ambient used by PhotoBand.
- * Base gradient: the fallback venue gradient rendered when no image loads.
+ * Every photo-led hero now runs the single canon ramp from
+ * `_shared/heroGradient.ts` (`HERO_CANON_SCRIM` / `heroCanonScrimOn`), so the
+ * old stack's bottom scrim and its multi-layer composer are GONE — they had
+ * zero consumers after MICRO_BRIEF_DISCOVER_HERO_CANON_LAYERING, and a recipe
+ * nothing calls reads as a live alternative to the canon.
+ *
+ * This top scrim stays because it is NOT a hero layer any more: the Golf this
+ * week ROUND TILE still paints it (and COURSE_SCRIMS) at tile proportions, and
+ * DiscoverCourseLedSkeleton models that tile exactly.
  */
 export const HERO_TOP_SCRIM =
   'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 100%)';
-export const HERO_BOTTOM_SCRIM =
-  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,0.92) 100%)';
 
-/**
- * Build a single multi-layer CSS `background` value that matches the
- * PhotoBand scrim stack (top scrim + bottom scrim + radial ambient +
- * image + base gradient). Pass `null` to render just the gradient.
- */
-export function buildOverviewHeroBackground(imageUrl: string | null | undefined): string {
-  const top = `${HERO_TOP_SCRIM} top / 100% 80px no-repeat`;
-  const bottom = `${HERO_BOTTOM_SCRIM} bottom / 100% 260px no-repeat`;
-  const image = imageUrl ? `url(${imageUrl}) center 40% / cover no-repeat` : null;
-  return [top, bottom, COURSE_SCRIMS, image, COURSE_GRADIENT].filter(Boolean).join(', ');
-}
 
 /**
  * CinematicFrame scrim (Direction A) — heavy at base for capsule+title legibility,

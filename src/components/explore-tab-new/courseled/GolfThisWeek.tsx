@@ -591,9 +591,9 @@ const DARK_REGION_H = 191;
 const PHOTO_TOP_SCRIM_H = Math.round(DARK_REGION_H * 0.28);      // 53
 const PHOTO_BOTTOM_SCRIM_H = Math.round(DARK_REGION_H * 0.909);  // 174
 
-/* §4.2 — THE BOTTOM SCRIM IS INLINE, NOT THE EXPORTED HERO_BOTTOM_SCRIM.
-   PhotoBand does NOT render the exported constant either: it takes the first
-   three stops and ends the last one on the colour of the band BELOW, so the
+/* §4.2 — THE BOTTOM SCRIM IS INLINE. There is no exported hero bottom scrim
+   any more: PhotoBand runs the canon ramp (heroCanonScrimOn), taking the
+   canon stops and ending the last one on the colour of the band BELOW, so the
    seam is invisible and the green base cannot bleed through as a cast.
    THE PRINCIPLE, NOT THE VALUE: the tile's next band is the LIGHT well
    (#F2F5F8), and ending on that would blow a pale band across the bottom of

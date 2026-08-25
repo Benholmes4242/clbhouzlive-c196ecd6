@@ -27,7 +27,7 @@ import {
  * BRIEF_ROUND_TILE_HERO_TOUR_MATCH §7: the heights are now the TOUR'S
  * PROPORTIONS against the 191px dark region (28.0% -> 53, 90.9% -> 174), and
  * the bottom layer is the tile's own inline gradient ending at FULL opacity —
- * NOT the exported HERO_BOTTOM_SCRIM, which stops at 0.92 and lets
+ * NOT a scrim that stops at 0.92, which would let
  * COURSE_GRADIENT's sand bottom stop cast through.
  */
 const SK_TILE_BOTTOM_SCRIM =
