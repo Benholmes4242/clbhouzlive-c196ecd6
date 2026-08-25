@@ -540,7 +540,8 @@ export const RoundsThatCountCard: React.FC<Props> = ({
                     y={y(cutLine) - 5}
                     fill={GOOD}
                     opacity={0.8}
-                    style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em' }}  // AXIS floor: chart tick/axis label, 10 not 11
+                    /* AXIS floor: chart annotation, 10 not 11 */
+                    style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em' }}
                   >
                     COUNTS BELOW
                   </text>
