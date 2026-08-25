@@ -123,10 +123,12 @@ export function ReportSheet({
                     ? "border-border/[0.02] hover:border-border/[0.04]"
                     : "border-border/[0.02] hover:border-border/[0.04]"
                 )}
-                style={selectedReason === reason.id ? { borderColor: '#F7931E', background: 'rgba(247,147,30,0.05)' } : undefined}
+                /* 16% wash, not 5%: the light-tuned 5% has no presence on the
+                   dark sheet. Matches BIZ.amberTint. */
+                style={selectedReason === reason.id ? { borderColor: '#F7931E', background: 'rgba(247,147,30,0.16)' } : undefined}
               >
                 <span className="text-xl">{reason.icon}</span>
-                <span className="font-medium" style={{ color: '#1D1D1F' }}>{reason.label}</span>
+                <span className="font-medium" style={{ color: A.INK }}>{reason.label}</span>
                 {selectedReason === reason.id && (
                    <div className="ml-auto w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#F7931E' }}>
                     <span className="text-white text-xs">✓</span>
