@@ -25,9 +25,10 @@ const OPTIONS: { value: VisibilityLevel; key: 'pub' | 'fr' | 'pri' }[] = [
 ];
 
 const SEG_LABEL: React.CSSProperties = {
-  fontSize: 7.5,
+  // READ floor: a segment label is language ("Public"/"Friends"/"Only me"), not a coordinate.
+  fontSize: 11,
   fontWeight: 700,
-  letterSpacing: '0.15em',
+  letterSpacing: '0.10em',
   textTransform: 'uppercase',
 };
 

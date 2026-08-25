@@ -137,13 +137,13 @@ export default function SupportThreadPage() {
           >
             <div className="flex items-center gap-2 flex-wrap">
               <span
-                className="text-[8px] uppercase tracking-[0.16em]"
+                className="text-[11px] uppercase tracking-[0.12em]"
                 style={{ fontWeight: 700, color: A.DIM }}
               >
                 {cat}
               </span>
               <span
-                className="text-[8px] uppercase tracking-[0.16em]"
+                className="text-[11px] uppercase tracking-[0.12em]"
                 style={{ fontWeight: 700, color: status.fg }}
               >
                 {status.label}

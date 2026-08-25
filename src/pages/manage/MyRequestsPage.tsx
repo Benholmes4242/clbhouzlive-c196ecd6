@@ -154,13 +154,13 @@ export default function MyRequestsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span
-                        className="text-[8px] uppercase tracking-[0.16em]"
+                        className="text-[11px] uppercase tracking-[0.12em]"
                         style={{ fontWeight: 700, color: A.DIM }}
                       >
                         {cat}
                       </span>
                       <span
-                        className="text-[8px] uppercase tracking-[0.16em]"
+                        className="text-[11px] uppercase tracking-[0.12em]"
                         style={{ fontWeight: 700, color: status.fg }}
                       >
                         {status.label}
