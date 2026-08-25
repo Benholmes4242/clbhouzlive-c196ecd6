@@ -2140,13 +2140,9 @@ export function GolfThisWeek({
                                 }}
                                 style={{
                                   display: 'grid',
-                                  gridTemplateColumns: [
-                                    '12px 16px minmax(0, 1fr) auto',
-                                    grossContext ? 'auto' : null,
-                                    showDeficit ? 'auto' : null,
-                                  ]
-                                    .filter(Boolean)
-                                    .join(' '),
+                                  gridTemplateColumns: showDeficit
+                                    ? '12px 16px minmax(0, 1fr) auto auto'
+                                    : '12px 16px minmax(0, 1fr) auto',
                                   alignItems: 'center',
                                   gap: 6,
                                   minHeight: 34,
