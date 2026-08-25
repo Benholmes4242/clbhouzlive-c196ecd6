@@ -543,7 +543,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const unitLabel = useCallback((key: string) => t(`statBrowse.unit.${key}`), [t]);
 
   const sampleLine = useCallback(
-    (row: StatBrowseRow): { text: string; earlyData?: boolean } | null => {
+    (row: StatBrowseRow): { text: string } | null => {
       let text: string | null = null;
       if (lens === 'toughest' || lens === 'scoreable') {
         text = t('statBrowse.sample.rounds', { count: row.rounds });
@@ -559,7 +559,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           : null;
       }
       if (!text) return null;
-      return { text, earlyData: isEarlyData(row.rounds) };
+      return { text };
     },
     [lens, t],
   );
