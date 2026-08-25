@@ -630,7 +630,12 @@ Deno.serve(async (req) => {
             deletionAuditId,
             deletion_results: results,
             assetCounts,
-            auth_delete: { ok: false, error: authErr.message, access_revoked: accessRevoked },
+            auth_delete: {
+              ok: false,
+              reason: authErr ? 'error' : 'row_survived',
+              error: authErr?.message ?? null,
+              access_revoked: accessRevoked,
+            },
             gdpr_compliant: false,
           },
         });
