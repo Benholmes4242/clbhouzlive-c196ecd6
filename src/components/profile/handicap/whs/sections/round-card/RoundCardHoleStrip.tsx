@@ -61,7 +61,7 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
       <div
         style={{
           width: 24,
-          fontSize: 9,
+          fontSize: 10,  // AXIS floor: chart tick/axis label, 10 not 11
           fontWeight: 700,
           color: 'var(--hcp-t-60)',
           letterSpacing: '0.12em',
@@ -100,7 +100,7 @@ const NineRow: React.FC<{ label: string; holes: HoleRow[] }> = ({ label, holes }
         {anyPlayed && (
           <span
             style={{
-              fontSize: 9,
+              fontSize: 11,
               fontWeight: 700,
               color: 'var(--hcp-t-60)',
               letterSpacing: '0.04em',

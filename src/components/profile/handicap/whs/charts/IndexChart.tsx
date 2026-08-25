@@ -215,7 +215,7 @@ export const IndexChart: React.FC<Props> = ({
             position: 'absolute',
             top: pts[c.idx].y + (c.above ? -8 : 15),
             transform: c.above ? 'translateY(-100%)' : undefined,
-            fontSize: 10,
+            fontSize: 10,  // AXIS floor: chart tick/axis label, 10 not 11
             fontWeight: 700,
             letterSpacing: '-0.01em',
             color: c.color,

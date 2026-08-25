@@ -41,7 +41,7 @@ const FIGURE: React.CSSProperties = {
 // Local LABEL: the shared chart token is 9/800; this surface is 7.5/700.
 const LBL: React.CSSProperties = {
   ...LABEL_STYLE,
-  fontSize: 7.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
 };

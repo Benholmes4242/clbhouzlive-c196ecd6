@@ -51,7 +51,7 @@ const StalePill: React.FC = () => (
       color: T.amberInk,
       padding: '1px 5px',
       borderRadius: 4,
-      fontSize: 9,
+      fontSize: 11,
       fontWeight: 700,
       letterSpacing: '0.14em',
       flexShrink: 0,
@@ -76,7 +76,7 @@ const RankDeltaChip: React.FC<RankDeltaChipProps> = ({ delta, isNew, isStale, ha
     return (
       <span
         style={{
-          fontSize: 9,
+          fontSize: 11,
           fontWeight: 700,
           color: T.amber,
           background: T.amberSoft,
@@ -248,7 +248,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
           <p
             style={{
               margin: '3px 0 0',
-              fontSize: 7,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',

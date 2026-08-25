@@ -164,7 +164,7 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
             background: '#FFFFFF',
           }}
         >
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: INK_60, marginBottom: 6 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: INK_60, marginBottom: 6 }}>
             {eyebrow}
           </div>
           <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.03em', color: INK, lineHeight: 1.2 }}>

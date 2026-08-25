@@ -39,7 +39,7 @@ interface Props {
 
 /** Local type, 700 everywhere. The shared LABEL token is 800. */
 const LABEL_7: React.CSSProperties = {
-  fontSize: 7,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -153,7 +153,7 @@ export const CountingStatsPanel: React.FC<Props> = ({ data, items, sparse }) => 
 
   const score = (
     <span style={{ display: 'flex', alignItems: 'baseline', gap: 5, ...REC.TABULAR }}>
-      <span style={{ ...LABEL_7, color: REC.GOOD, fontSize: 8 }}>
+      <span style={{ ...LABEL_7, color: REC.GOOD, fontSize: 11 }}>
         {t('career.maxedOf', { n: maxed, total: rows.length })}
       </span>
     </span>

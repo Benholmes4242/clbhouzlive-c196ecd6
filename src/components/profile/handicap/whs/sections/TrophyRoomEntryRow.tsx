@@ -40,7 +40,7 @@ const THEME = {
 } as const;
 
 const LABEL = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,

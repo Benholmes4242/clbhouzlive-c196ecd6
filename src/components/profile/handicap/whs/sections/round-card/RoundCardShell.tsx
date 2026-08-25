@@ -98,7 +98,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 9,
+              fontSize: 11,
               fontWeight: 700,
               color: 'var(--hcp-t-60)',
               letterSpacing: '0.16em',
@@ -152,7 +152,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
             <div style={{ textAlign: 'right' }}>
               <div
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   color: 'var(--hcp-t-60)',
                   letterSpacing: '0.16em',
@@ -215,7 +215,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
           >
             <span
               style={{
-                fontSize: 9,
+                fontSize: 11,
                 fontWeight: 700,
                 color: 'var(--hcp-t-60)',
                 letterSpacing: '0.16em',
@@ -235,7 +235,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
                   borderRadius: 999,
                   background: 'var(--hcp-bg-3)',
                   border: '1px solid var(--hcp-line-2)',
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: 700,
                   color: 'var(--hcp-t-100)',
                   letterSpacing: '0.06em',

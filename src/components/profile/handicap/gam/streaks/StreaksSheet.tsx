@@ -20,7 +20,7 @@ const FONT = CHART_FONT;
 
 const LABEL: React.CSSProperties = {
   fontFamily: FONT,
-  fontSize: 7.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -209,7 +209,7 @@ const StreakRowView: React.FC<{
           >
             {t(`streaks.type.${type}.label`)}
           </div>
-          <div style={{ ...LABEL, marginTop: 4, fontSize: 7, letterSpacing: '0.14em', lineHeight: 1.5 }}>
+          <div style={{ ...LABEL, marginTop: 4, fontSize: 11, letterSpacing: '0.14em', lineHeight: 1.5 }}>
             {t(`streaks.type.${type}.explainer`)}
           </div>
         </div>
@@ -362,7 +362,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
       >
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',

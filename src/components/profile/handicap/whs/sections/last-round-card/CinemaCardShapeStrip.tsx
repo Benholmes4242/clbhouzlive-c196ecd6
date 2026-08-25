@@ -43,7 +43,7 @@ export const CinemaCardShapeStrip: React.FC<Props> = ({ holes }) => {
   // Take first 18 holes ordered by hole_no
   const ordered = [...holes].sort((a, b) => a.hole_no - b.hole_no).slice(0, 18);
   const labelStyle: React.CSSProperties = {
-    fontSize: 10,
+    fontSize: 10,  // AXIS floor: chart tick/axis label, 10 not 11
     fontWeight: 700,
     color: 'rgba(255,255,255,0.55)',
     letterSpacing: '0.16em',

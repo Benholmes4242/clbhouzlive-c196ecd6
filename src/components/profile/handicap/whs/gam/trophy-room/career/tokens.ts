@@ -37,7 +37,7 @@ export const REC = {
 } as const;
 
 export const KICKER = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
@@ -45,7 +45,7 @@ export const KICKER = {
 };
 
 export const LABEL = {
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase' as const,

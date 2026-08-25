@@ -24,7 +24,7 @@ const TIE = 'rgba(255,255,255,0.30)';
 
 const LABEL: React.CSSProperties = {
   fontFamily: CHART_FONT,
-  fontSize: 7.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',

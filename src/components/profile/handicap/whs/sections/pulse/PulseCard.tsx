@@ -31,7 +31,7 @@ function colorFromUserId(id: string): string {
 
 /** Dark-surface LABEL. Nothing on this card renders at weight 800. */
 const ZONE_LABEL: React.CSSProperties = {
-  fontSize: 7.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   color: 'var(--hcp-t-40)',
@@ -152,7 +152,7 @@ export const PulseCard: React.FC<Props> = ({ friend }) => {
           >
             {friend.first_name ?? friend.display_name}
           </div>
-          <div style={{ fontSize: 10, color: 'var(--hcp-t-60)', lineHeight: 1, marginTop: 3 }}>
+          <div style={{ fontSize: 11, color: 'var(--hcp-t-60)', lineHeight: 1, marginTop: 3 }}>
             {lastPlayedLabel}
           </div>
         </div>

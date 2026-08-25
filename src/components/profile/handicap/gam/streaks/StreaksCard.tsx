@@ -303,7 +303,7 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
         </span>
         <span
           style={{
-            fontSize: 8,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
@@ -316,7 +316,7 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
           <span
             style={{
               marginLeft: 'auto',
-              fontSize: 8,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
@@ -389,7 +389,7 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
             display: 'flex',
             justifyContent: 'space-between',
             gap: 8,
-            fontSize: 7.5,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
@@ -531,7 +531,7 @@ export const StreaksCard: React.FC<Props> = ({ userId, readOnly = false }) => {
                 border: 'none',
                 cursor: 'pointer',
                 color: 'var(--hcp-t-60)',
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.14em',
                 padding: '4px 6px',

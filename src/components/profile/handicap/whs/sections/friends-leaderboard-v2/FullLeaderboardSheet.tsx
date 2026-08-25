@@ -21,7 +21,7 @@ const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Robo
 // Hardcoded dark tokens — BottomSheet portals outside .hcp-dark scope.
 const DIM = 'rgba(242,244,247,0.55)';
 const LABEL_STYLE: React.CSSProperties = {
-  fontSize: 7.5,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   color: DIM,
@@ -147,7 +147,7 @@ export const FullLeaderboardSheet: React.FC<FullLeaderboardSheetProps> = ({
               background: 'transparent',
               border: 'none',
               color: DIM,
-              fontSize: 7.5,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',

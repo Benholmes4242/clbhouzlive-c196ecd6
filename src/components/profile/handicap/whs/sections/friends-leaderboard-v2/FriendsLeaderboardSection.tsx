@@ -28,7 +28,7 @@ const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Robo
 
 const LABEL_STYLE: React.CSSProperties = {
   margin: 0,
-  fontSize: 7.5,
+  fontSize: 11,
   fontWeight: 700,
   color: 'var(--hcp-t-40)',
   letterSpacing: '0.16em',
@@ -249,7 +249,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
                 border: 'none',
                 color: 'var(--hcp-t-80)',
                 fontFamily: FONT,
-                fontSize: 7.5,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
@@ -274,7 +274,7 @@ export const FriendsLeaderboardSection: React.FC<Props> = ({ userId, viewMode = 
                   border: 'none',
                   color: 'var(--hcp-t-60)',
                   fontFamily: FONT,
-                  fontSize: 7.5,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
