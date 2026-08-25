@@ -3,11 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { animate, useReducedMotion } from 'framer-motion';
 
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import {
-  COURSE_GRADIENT,
-  COURSE_SCRIMS,
-  HERO_TOP_SCRIM,
-} from '@/features/tourhub/components/overview-v3/HybridHero.constants';
+import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
+import { HERO_CANON_SCRIM } from '@/features/tourhub/_shared/heroGradient';
+
 
 import { relativeDay } from './discoverWhen';
 import { A, DISCOVER_FACT, DISCOVER_QUIET, NUMF, SANS } from './tokens';
