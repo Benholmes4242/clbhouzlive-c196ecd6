@@ -2182,14 +2182,6 @@ export function GolfThisWeek({
                                 >
                                   {figure.text}
                                 </span>
-                                {grossContext ? (
-                                  <span
-                                    className="tabular-nums"
-                                    style={{ fontSize: 11, fontWeight: 700, color: tile.accent }}
-                                  >
-                                    {grossContext}
-                                  </span>
-                                ) : null}
                                 {showDeficit ? (
                                   <span
                                     className="tabular-nums"
