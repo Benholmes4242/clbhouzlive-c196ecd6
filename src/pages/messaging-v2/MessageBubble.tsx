@@ -365,7 +365,8 @@ export const MessageBubble: React.FC<Props> = ({
               className="inline-flex items-center gap-1 active:opacity-60"
               style={{ position: "relative", 
                 color: '#DC2626',
-                fontSize: 10.5,
+                // READ 11: the failed-send prompt is language.
+                fontSize: 11,
                 fontWeight: 500,
                 background: 'transparent',
                 border: 'none',
@@ -380,7 +381,8 @@ export const MessageBubble: React.FC<Props> = ({
           ) : isSending ? (
             <Clock size={11} style={{ position: "relative",  color: HINT }} />
           ) : null}
-          <span style={{ position: "relative",  ...FIGS, color: HINT, fontSize: 10.5, lineHeight: 1 }}>
+          {/* READ 11: the bubble timestamp. Outside the bubble body, so no reflow. */}
+          <span style={{ position: "relative",  ...FIGS, color: HINT, fontSize: 11, lineHeight: 1 }}>
             {formatTime(message.created_at)}
           </span>
           {showTicks && !isFailed && !isSending ? (
