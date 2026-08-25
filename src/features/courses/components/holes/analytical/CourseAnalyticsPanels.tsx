@@ -120,60 +120,6 @@ function monotonePath(pts: { x: number; y: number }[]): string {
   return d;
 }
 
-/**
- * Monotone Hermite EVALUATOR - same tangents as monotonePath, but samplable at
- * arbitrary x. Needed for the gap shading: the field edge of the fill must
- * follow the field's own curve, not the tops of the bars, so both curves are
- * sampled at the same x positions and the polygon is built between them.
- */
-function monotoneSampler(pts: { x: number; y: number }[]): (x: number) => number {
-  const n = pts.length;
-  if (n === 0) return () => 0;
-  if (n === 1) return () => pts[0].y;
-  const dx: number[] = [];
-  const slope: number[] = [];
-  for (let i = 0; i < n - 1; i++) {
-    dx.push(pts[i + 1].x - pts[i].x);
-    slope.push(dx[i] === 0 ? 0 : (pts[i + 1].y - pts[i].y) / dx[i]);
-  }
-  const m: number[] = new Array(n);
-  m[0] = slope[0];
-  m[n - 1] = slope[n - 2];
-  for (let i = 1; i < n - 1; i++) {
-    m[i] = slope[i - 1] * slope[i] <= 0 ? 0 : (slope[i - 1] + slope[i]) / 2;
-  }
-  for (let i = 0; i < n - 1; i++) {
-    if (slope[i] === 0) {
-      m[i] = 0;
-      m[i + 1] = 0;
-      continue;
-    }
-    const a = m[i] / slope[i];
-    const b = m[i + 1] / slope[i];
-    const s = a * a + b * b;
-    if (s > 9) {
-      const tau = 3 / Math.sqrt(s);
-      m[i] = tau * a * slope[i];
-      m[i + 1] = tau * b * slope[i];
-    }
-  }
-  return (x: number) => {
-    if (x <= pts[0].x) return pts[0].y;
-    if (x >= pts[n - 1].x) return pts[n - 1].y;
-    let i = 0;
-    while (i < n - 2 && x > pts[i + 1].x) i++;
-    const h = dx[i] || 1;
-    const tt = (x - pts[i].x) / h;
-    const t2 = tt * tt;
-    const t3 = t2 * tt;
-    return (
-      (2 * t3 - 3 * t2 + 1) * pts[i].y +
-      (t3 - 2 * t2 + tt) * h * m[i] +
-      (-2 * t3 + 3 * t2) * pts[i + 1].y +
-      (t3 - t2) * h * m[i + 1]
-    );
-  };
-}
 
 /**
  * DIFFICULTY RAMP - one hue, varying intensity, across the course's OWN spread.
@@ -238,7 +184,6 @@ const ShapeChart: React.FC<{
   const fSpan = Math.max(0.01, fMax - fMin);
   const tint = (v: number) => 0.06 + 0.94 * ((v - fMin) / fSpan);
 
-  const fieldPts = holes.map((h, i) => ({ x: cx(i), y: y(h.avg_to_par) }));
   const linePts = hasYou
     ? holes
         .map((h, i) => {
@@ -249,38 +194,6 @@ const ShapeChart: React.FC<{
     : [];
   const linePath = linePts.length > 1 ? monotonePath(linePts) : '';
   const endPt = linePts.length > 1 ? linePts[linePts.length - 1] : null;
-
-  /**
-   * THE GAP. Shaded only where the member's line sits BELOW the field's curve
-   * (lower on screen = fewer shots = gained). No member line, no shading.
-   */
-  const gapPaths: string[] = [];
-  if (linePts.length > 1) {
-    const fieldAt = monotoneSampler(fieldPts);
-    const mineAt = monotoneSampler(linePts);
-    const x0 = linePts[0].x;
-    const x1 = linePts[linePts.length - 1].x;
-    const STEPS = 160;
-    let run: { x: number; f: number; m: number }[] = [];
-    const flush = () => {
-      if (run.length > 1) {
-        const top = run.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.f.toFixed(2)}`);
-        const bottom = [...run]
-          .reverse()
-          .map((p) => `L ${p.x.toFixed(2)} ${p.m.toFixed(2)}`);
-        gapPaths.push([...top, ...bottom, 'Z'].join(' '));
-      }
-      run = [];
-    };
-    for (let s = 0; s <= STEPS; s++) {
-      const x = x0 + ((x1 - x0) * s) / STEPS;
-      const f = fieldAt(x);
-      const m = mineAt(x);
-      if (m > f + 0.15) run.push({ x, f, m });
-      else flush();
-    }
-    flush();
-  }
 
   const hardestIdx = holes.findIndex((h) => h.hole_no === hardestHole);
   const hardestTopY = hardestIdx >= 0 ? Math.min(y(holes[hardestIdx].avg_to_par), yBase) : null;
@@ -307,12 +220,6 @@ const ShapeChart: React.FC<{
           style={{ display: 'block' }}
           aria-hidden="true"
         >
-          <defs>
-            <linearGradient id="hip-gap" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(247,147,30,0.26)" />
-              <stop offset="100%" stopColor="rgba(247,147,30,0.04)" />
-            </linearGradient>
-          </defs>
           {holes.map((h, i) => {
             const yv = y(h.avg_to_par);
             const top = Math.min(yv, yBase);
@@ -333,9 +240,6 @@ const ShapeChart: React.FC<{
             ].join(' ');
             return <path key={h.hole_no} d={d} fill={rampColor(tint(h.avg_to_par))} />;
           })}
-          {gapPaths.map((d, i) => (
-            <path key={`gap-${i}`} d={d} fill="url(#hip-gap)" />
-          ))}
           {linePath && (
             <path
               d={linePath}
