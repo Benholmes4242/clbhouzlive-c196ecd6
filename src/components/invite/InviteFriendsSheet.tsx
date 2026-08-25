@@ -44,8 +44,9 @@ import {
 } from '@/lib/tokens/type';
 
 /** Canonical metrics; the sheet keeps its own ink. */
-const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.DIM };
-const KICKER: React.CSSProperties = { ...KICKER_METRICS, color: A.INK };
+/* Local floor overrides: LABEL to 11, KICKER to 11. Shared metrics untouched. */
+const LABEL: React.CSSProperties = { ...LABEL_METRICS, fontSize: 11, color: A.DIM };
+const KICKER: React.CSSProperties = { ...KICKER_METRICS, fontSize: 11, color: A.INK };
 const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
 
 const DOT = '\u00B7';
@@ -369,8 +370,11 @@ function ShareLinkButton({ source }: { source: string }) {
         color: A.CANVAS,
         border: 'none',
         borderRadius: 12,
-        fontSize: 13.5,
+        /* CAPS BUTTON: two points down, caps at 0.10em, height unchanged. */
+        fontSize: 12,
         fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '0.10em',
         fontFamily: SANS,
         cursor: busy ? 'default' : 'pointer',
       }}
@@ -506,7 +510,7 @@ function EGFriendRow({
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            fontSize: 13.5,
+            fontSize: 15,
             fontWeight: 700,
             color: A.INK,
             whiteSpace: 'nowrap',
@@ -520,6 +524,10 @@ function EGFriendRow({
           <div
             style={{
               ...LABEL,
+              /* The club · handicap meta line is a sentence, not a caps label. */
+              fontSize: 13,
+              textTransform: 'none',
+              letterSpacing: 'normal',
               color: A.MUTE,
               marginTop: 4,
               whiteSpace: 'nowrap',
@@ -673,7 +681,7 @@ function UnconnectedState({ source }: { source: string }) {
               style={{
                 fontFamily: SANS,
                 fontVariantNumeric: 'tabular-nums lining-nums',
-                fontSize: 12.5,
+                fontSize: 13,
                 color: A.MUTE,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -702,8 +710,11 @@ function UnconnectedState({ source }: { source: string }) {
             color: A.CANVAS,
             border: 'none',
             borderRadius: 12,
-            fontSize: 13.5,
+            /* CAPS BUTTON: two points down, caps at 0.10em, height unchanged. */
+            fontSize: 12,
             fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.10em',
             fontFamily: SANS,
             cursor: loading ? 'default' : 'pointer',
             opacity: loading || !link ? 0.5 : 1,
