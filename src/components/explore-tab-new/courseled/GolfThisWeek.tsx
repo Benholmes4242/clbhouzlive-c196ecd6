@@ -1776,7 +1776,9 @@ export function GolfThisWeek({
             describe what is CURRENTLY rendered. */}
         <span
           className="tabular-nums"
-          style={{ ...KICKER, color: DISCOVER_QUIET, flex: '0 0 auto' }}
+          /* READ, floor 11: the readout is language. Local override only —
+             the shared KICKER metric (9) is not repointed. */
+          style={{ ...KICKER, fontSize: 11, color: DISCOVER_QUIET, flex: '0 0 auto' }}
         >
           {/* The window is a THIRD SEGMENT OF THE SAME TEMPLATE so a translator
               can reorder all three. It is FIXED at seven days — never derived
