@@ -45,7 +45,7 @@ const PAD_X = 14;
 const LIVE_GREEN = '#10B981';
 
 const KICKER: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -54,7 +54,7 @@ const KICKER: React.CSSProperties = {
 };
 
 const LABEL: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
@@ -102,6 +102,9 @@ function FullListAction({ onOpen }: { onOpen: () => void }) {
         onClick={onOpen}
         style={{
           ...LABEL,
+          // CAPS button: two points under READ, 0.10em.
+          fontSize: 9,
+          letterSpacing: '0.10em',
           background: 'none',
           border: 'none',
           padding: 0,
@@ -253,7 +256,7 @@ function StatBoardRowsInner({
             {r.rankLabel}
           </div>
           {showMovement && (
-            <div style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, lineHeight: 1 }}>
+            <div style={{ flexShrink: 0, /* AXIS 10: movement marker, not language. */ fontSize: 10, fontWeight: 700, lineHeight: 1 }}>
               <MovementFigure movement={r.movement} nullPlaceholder="none" variant="inline" />
             </div>
           )}

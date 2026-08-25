@@ -203,7 +203,7 @@ export function CollegeProfilePage() {
               style={{
                 padding: '16px 24px 0',
                 textAlign: 'center',
-                fontSize: 10.5,
+                fontSize: 11,
                 fontWeight: 600,
                 color: INK_FAINT,
                 letterSpacing: '0.01em',

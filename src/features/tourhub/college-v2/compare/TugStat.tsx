@@ -77,7 +77,7 @@ function valueStyle(color: string, align: 'left' | 'right') {
 }
 
 const LABEL_STYLE = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   color: INK_FAINT,
   letterSpacing: '0.16em',
@@ -234,7 +234,7 @@ function Coverage({
     <div
       style={{
         marginTop: 3,
-        fontSize: 9,
+        fontSize: 11,
         fontWeight: 700,
         color: INK_FAINT,
         letterSpacing: '0.1em',

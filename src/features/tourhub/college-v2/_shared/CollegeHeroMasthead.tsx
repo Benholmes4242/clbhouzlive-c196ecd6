@@ -27,7 +27,7 @@ import { formatEarnings } from '@/features/tourhub/_shared/formatEarnings';
 /* Figure-row typography. Labels use WHITE_ALPHA_55 - the light-surface A.DIM
    token does not read on this dark gradient. */
 const LABEL_STYLE: CSSProperties = {
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
@@ -189,7 +189,7 @@ export function CollegeHeroMasthead({
       <div style={{ width: '100%', minWidth: 0 }}>
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',

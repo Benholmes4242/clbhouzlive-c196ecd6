@@ -39,7 +39,7 @@ interface Props {
 }
 
 const KICKER_STYLE: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -47,7 +47,7 @@ const KICKER_STYLE: React.CSSProperties = {
 };
 
 const LABEL_STYLE: React.CSSProperties = {
-  fontSize: 9,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.13em',
   textTransform: 'uppercase',
@@ -255,7 +255,7 @@ export function TheClass({ slug, collegeName }: Props) {
                   <div
                     style={{
                       marginTop: 1,
-                      fontSize: 10.5,
+                      fontSize: 11,
                       fontWeight: 600,
                       color: INK_MUTE,
                       letterSpacing: '0.02em',

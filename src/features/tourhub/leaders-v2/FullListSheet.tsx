@@ -140,7 +140,7 @@ export function FullListSheet({
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
@@ -327,7 +327,7 @@ export function FullListSheet({
                       <div
                         style={{
                           marginTop: 4,
-                          fontSize: 9.5,
+                          fontSize: 11,
                           fontWeight: 700,
                           letterSpacing: '0.10em',
                           textTransform: 'uppercase',

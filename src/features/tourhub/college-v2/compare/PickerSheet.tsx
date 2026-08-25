@@ -89,7 +89,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
       <div style={{ padding: '8px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_10}`, background: SLATE_50 }}>
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
@@ -200,7 +200,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
                     {s.logoUrl ? (
                       <img src={s.logoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     ) : (
-                      <span style={{ fontSize: 10, fontWeight: 700, color: isTop ? GOLD_DEEP : INK }}>
+                      <span style={{ /* AXIS 10: crest initials marker. */ fontSize: 10, fontWeight: 700, color: isTop ? GOLD_DEEP : INK }}>
                         {(s.shortName ?? s.collegeName).slice(0, 3).toUpperCase()}
                       </span>
                     )}
@@ -234,6 +234,7 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
                 <div
                   style={{
                     flexShrink: 0,
+                    // AXIS 10: rank marker.
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: '0.04em',

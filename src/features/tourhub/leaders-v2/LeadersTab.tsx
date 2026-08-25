@@ -252,7 +252,7 @@ export function LeadersTab() {
           <div
             style={{
               padding: '4px 16px 0',
-              fontSize: 10.5,
+              fontSize: 11,
               fontWeight: 500,
               color: INK_MUTE,
               letterSpacing: '0.04em',

@@ -63,7 +63,7 @@ const fmtSg = (n: number) => (n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2));
 
 const KICKER_STYLE = {
   padding: '18px 16px 8px',
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
@@ -364,7 +364,7 @@ export function ComparePage() {
             <div
               style={{
                 padding: '10px 16px 16px',
-                fontSize: 10.5,
+                fontSize: 11,
                 fontWeight: 500,
                 color: INK_FAINT,
                 textAlign: 'center',
@@ -448,7 +448,8 @@ function ClassColumn({ headerCode, roster, liveMap, weekByPlayer, alignRight }: 
     >
       <div
         style={{
-          fontSize: 8.5,
+          // AXIS 10: class-column header, a coordinate not a sentence.
+          fontSize: 10,
           fontWeight: 700,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
@@ -553,7 +554,7 @@ function ClassColumn({ headerCode, roster, liveMap, weekByPlayer, alignRight }: 
                 <div
                   style={{
                     marginTop: 1,
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: live ? 700 : 500,
                     color: sublineColor,
                     letterSpacing: '0.02em',
