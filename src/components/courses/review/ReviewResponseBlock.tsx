@@ -144,7 +144,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({
             style={{
               marginTop: 3,
               alignSelf: 'flex-start',
-              fontSize: 8.5,
+              fontSize: 11.5,
               fontWeight: 700,
               letterSpacing: '0.07em',
               color: '#FBBF24',
@@ -365,7 +365,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
                 marginTop: 3,
                 alignSelf: 'flex-start',
                 display: 'inline-block',
-                fontSize: 8.5,
+                fontSize: 11.5,
                 fontWeight: 700,
                 letterSpacing: '0.07em',
                 textTransform: 'uppercase',

@@ -10,7 +10,9 @@ import { MovementCell } from './_shared/MovementCell';
  * the 1fr name column, so trailing columns remain anchored to the right.
  */
 export const CHAMPS_COL_30D_FULL = 40;
-export const CHAMPS_COL_SCORE_FULL = 56;
+/* Widened 56 -> 62 when the header unit label went to READ 11: a long
+   unit ('STROKES') measured ~56px at that size and had no slack. */
+export const CHAMPS_COL_SCORE_FULL = 62;
 export const CHAMPS_COL_30D_COMPACT = 40;
 export const CHAMPS_COL_SCORE_COMPACT = 48;
 export const CHAMPS_GRID_FULL = `24px 40px 1fr ${CHAMPS_COL_30D_FULL}px ${CHAMPS_COL_SCORE_FULL}px`;

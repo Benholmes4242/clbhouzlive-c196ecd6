@@ -144,7 +144,9 @@ const FieldChart: React.FC<{ shape: FieldShape }> = ({ shape }) => {
                 flex: 1,
                 textAlign: 'center',
                 ...FIGS,
-                fontSize: 9,
+                /* AXIS, STATED EXCEPTION (floor 10): a figure pinned to the
+                   hardest / easiest column, not a line of language. */
+                fontSize: 10,
                 fontWeight: 700,
                 letterSpacing: '-0.03em',
                 color: isHardest ? DIFFICULTY_HARD_HEX : A.MUTE,
@@ -186,7 +188,9 @@ const FieldChart: React.FC<{ shape: FieldShape }> = ({ shape }) => {
                 flex: 1,
                 textAlign: 'center',
                 ...FIGS,
-                fontSize: 8.5,
+                /* AXIS, STATED EXCEPTION (floor 10): hole numbers along the
+                   strip are coordinates and stay quiet. */
+                fontSize: 10,
                 fontWeight: 700,
                 letterSpacing: '0.02em',
                 lineHeight: 1,
@@ -221,7 +225,7 @@ const Channel: React.FC = () => (
         justifyContent: 'center',
       }}
     >
-      <span style={{ ...LABEL_MUTE, fontSize: 8.5, letterSpacing: '0.16em' }}>Your line here</span>
+      <span style={{ ...LABEL_MUTE, letterSpacing: '0.16em' }}>Your line here</span>
     </div>
   </div>
 );

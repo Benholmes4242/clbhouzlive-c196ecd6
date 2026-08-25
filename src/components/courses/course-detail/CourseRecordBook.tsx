@@ -101,7 +101,7 @@ export const CourseRecordBook: React.FC<Props> = ({
     if (isYou) {
       return (
         <div style={{ marginTop: 4 }}>
-          <div style={{ ...LABEL, fontSize: 7.5, color: A.AMBER_DEEP }}>
+          <div style={{ ...LABEL, color: A.AMBER_DEEP }}>
             {t('courseDetail.records.youHold')}
           </div>
         </div>
@@ -167,7 +167,9 @@ export const CourseRecordBook: React.FC<Props> = ({
                 onClick={openBoards}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '26px 1fr 58px',
+                  /* 58 -> 70: the unit label under the figure inherits LABEL 11, and
+                     'BIRDIES' measures ~61px there. */
+                  gridTemplateColumns: '26px 1fr 70px',
                   alignItems: 'center',
                   gap: 12,
                   width: '100%',
@@ -230,7 +232,7 @@ export const CourseRecordBook: React.FC<Props> = ({
                     {formatLegendValueCompact(category, row.value)}
                   </div>
                   {UNIT_KEY[category] ? (
-                    <div style={{ ...LABEL, fontSize: 7.5, marginTop: 1 }}>
+                    <div style={{ ...LABEL, marginTop: 1 }}>
                       {t(`courseDetail.records.units.${UNIT_KEY[category]}`)}
                     </div>
                   ) : null}

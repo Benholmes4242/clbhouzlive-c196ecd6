@@ -16,7 +16,7 @@ export const CourseEyebrow: React.FC<{
     <div
       style={{
         fontFamily: FONT,
-        fontSize: 9.5,
+        fontSize: 11.5,
         fontWeight: 700,
         letterSpacing: '0.16em',
         color: onPhoto ? '#FFFFFF' : 'var(--hcp-t-100)',

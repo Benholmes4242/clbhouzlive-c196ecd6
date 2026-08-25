@@ -66,7 +66,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 9,
+                fontSize: 11,
                 fontWeight: 700,
                 fontVariantNumeric: 'tabular-nums lining-nums',
                 padding: '0 4px',

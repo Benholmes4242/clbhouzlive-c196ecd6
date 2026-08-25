@@ -122,7 +122,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
               <span
                 className="tabular-nums"
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   color: 'var(--hcp-t-55)',
                   letterSpacing: '-0.005em',
@@ -244,7 +244,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
                 <span
                   className="tabular-nums"
                   style={{
-                    fontSize: 9,
+                    fontSize: 11,
                     fontWeight: 700,
                     color: 'var(--hcp-t-55)',
                     letterSpacing: '-0.005em',

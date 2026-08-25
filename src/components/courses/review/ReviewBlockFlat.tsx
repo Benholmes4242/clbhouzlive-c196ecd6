@@ -260,7 +260,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
                   border: `1px solid ${hexToRgba(chipColor, 0.35)}`,
                 }}
               >
-                <span style={{ fontSize: 9, fontWeight: 700, color: chipColor, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: chipColor, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   {s.label}
                 </span>
                 <span style={{ fontSize: 11, fontWeight: 700, color: chipColor, fontVariantNumeric: 'tabular-nums lining-nums' }}>

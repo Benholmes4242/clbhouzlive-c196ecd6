@@ -277,7 +277,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             {defending ? (
               <span
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.10em',
                   textTransform: 'uppercase',
@@ -292,7 +292,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             ) : selfRow ? (
               <span
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.10em',
                   textTransform: 'uppercase',
@@ -468,7 +468,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             <span
               style={{
                 textAlign: 'center',
-                fontSize: 9,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
@@ -480,7 +480,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             <span
               style={{
                 textAlign: 'center',
-                fontSize: 9,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
