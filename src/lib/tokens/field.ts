@@ -107,8 +107,20 @@ export function fieldPaintRaised(focused: boolean) {
   } as const;
 }
 
-/** FIELD_PAINT_CLASS for a raised ground. Import this one deliberately. */
+/**
+ * FIELD_PAINT_CLASS for a raised ground. Import this one deliberately.
+ *
+ * SAFE ON EITHER A BARE CONTROL OR A WRAPPER, and carries both focus: and
+ * focus-within: for that reason — LocationSection's country search puts this
+ * class straight on an <input>, other consumers put it on a wrapper <div>.
+ *
+ * THE OUTLINE SUPPRESSION IS NOT A MISSING FOCUS INDICATOR, IT IS A DUPLICATE
+ * ONE: background 9% -> 14% AND border 14% -> 32% is already a visible,
+ * non-colour-only focus state, so the user-agent outline is a second, brighter
+ * ring drawn over the field's own border. Remove it and the ring comes back.
+ */
 export const FIELD_PAINT_RAISED_CLASS =
   'bg-[rgba(255,255,255,0.09)] border border-[rgba(255,255,255,0.14)] rounded-[14px] ' +
   'transition-[background-color,border-color] duration-[140ms] ease-out ' +
+  'focus:outline-none focus-within:outline-none ' +
   'focus-within:bg-[rgba(255,255,255,0.14)] focus-within:border-[rgba(255,255,255,0.32)]';
