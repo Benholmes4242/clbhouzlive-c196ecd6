@@ -456,54 +456,22 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     if (v < thirdSums[bestIdx] || !thirdHas[bestIdx]) bestIdx = i;
   });
   /**
-   * THE DENOMINATOR IS THE ROUND'S OWN DAMAGE, not the worst third.
+   * The bars, their scale and the worst-third mark now live in ThirdsChart
+   * (imported from the handicap page, unedited). It scales each bar against the
+   * largest of the three, which is a DIFFERENT denominator from the share-of-own
+   * damage the removed bars used - recorded here because the old comment argued
+   * for the share basis. Ben chose the handicap treatment; the trade is that the
+   * worst third is always full-height, and the figures above the bars carry the
+   * absolute values.
    *
-   * A track needs a scale, and scaling each third against the largest of the
-   * three would make the worst third 100% full in EVERY round: the bar would
-   * carry no information the ink ladder does not already carry, and no two
-   * rounds or courses would compare. So the fill is each third's SHARE of the
-   * shots this round dropped here - the same denominator the share figures
-   * already use (the viewer's own total over par, never the field's). The three
-   * fills sum to 100%, which is what makes "the back six costs you half your
-   * round" readable straight off the bars.
-   *
-   * A third played UNDER par contributes no damage: it is floored at zero and
-   * renders an empty track rather than a negative width. If no third dropped a
-   * shot there is nothing to apportion and all three tracks read empty.
+   * The cumulative shots-dropped curve is gone with them: it could only ever
+   * rise, so it never showed WHERE the damage was.
    */
-  const thirdDamage = thirdSums.map((v) => Math.max(0, v));
-  const thirdDamageTotal = thirdDamage.reduce((a, b) => a + b, 0);
-  const thirdShares = thirdDamage.map((v) =>
-    thirdDamageTotal > 0 ? Math.round((v / thirdDamageTotal) * 100) : 0,
-  );
+  const thirdsMax = Math.max(...thirdSums.map((v) => Math.max(0, v)));
   const spread = +(thirdSums[worstIdx] - thirdSums[bestIdx]).toFixed(1);
-  /** Below the floor: ink nothing, claim nothing. The curve still draws. */
+  /** Below the floor: claim nothing in the caption. */
   const thirdsEven = spread < THIRDS_NOISE_FLOOR || worstIdx === bestIdx;
-  /** Rank 0 = worst third. Drives the ink ladder; even rounds get one shade. */
-  const thirdRank = [0, 1, 2]
-    .slice()
-    .sort((a, b) => thirdSums[b] - thirdSums[a])
-    .reduce<Record<number, number>>((acc, idx, rank) => {
-      acc[idx] = rank;
-      return acc;
-    }, {});
 
-  /** Cumulative shots dropped, hole 1 to 18. Monotone cubic, never a spline. */
-  const cumulative = (() => {
-    const W = 300;
-    const H = 78;
-    const pts: { x: number; y: number }[] = [];
-    let run = 0;
-    const seq = ordered;
-    if (seq.length < 2) return null;
-    seq.forEach((h, i) => {
-      run += h.shots_over_par || 0;
-      pts.push({ x: (i / (seq.length - 1)) * W, y: run });
-    });
-    const max = Math.max(...pts.map((p) => p.y), 0.1);
-    const scaled = pts.map((p) => ({ x: p.x, y: H - (p.y / max) * (H - 4) }));
-    return { W, H, d: monotonePath(scaled), area: `${monotonePath(scaled)} L${W},${H} L0,${H} Z`, total: run };
-  })();
 
   const s3Advice = thirdsEven
     ? t('courses:holes.scoringBreakdown.s3AdviceEven')
