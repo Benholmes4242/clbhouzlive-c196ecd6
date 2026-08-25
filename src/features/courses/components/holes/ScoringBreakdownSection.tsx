@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -255,6 +255,14 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
   /** Gross per round in date order at this course - the form panel's series. */
   const { data: myRounds } = useMyRoundsAtCourse(golfCourseId);
   const { data: pulse } = useLegendPulse(user?.id, 60);
+
+  /**
+   * Form-panel scrubber selection. Lives here, NOT in the panel's IIFE: that
+   * block re-runs on every render and cannot hold state. null = resting state
+   * (the ten-round average). On release the selection HOLDS.
+   */
+  const [scrubIdx, setScrubIdx] = useState<number | null>(null);
+  const scrubBoxRef = useRef<HTMLDivElement | null>(null);
 
   const parsed = useMemo(() => {
     if (!data || !Array.isArray(data.holes)) return null;
@@ -516,6 +524,15 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     const rows = (myRounds ?? []).filter((r) => r.grossScore != null);
     if (rows.length < FORM_MIN_ROUNDS) return null;
     const series = [...rows].reverse().map((r) => Number(r.grossScore));
+    /**
+     * Index-aligned with `series`: same reversed rows, no filtering. The
+     * scrubber readout needs date and par, which `series` flattens away.
+     */
+    const rounds = [...rows].reverse().map((r) => ({
+      gross: Number(r.grossScore),
+      playDate: r.playDate,
+      coursePar: r.coursePar,
+    }));
     const best = Math.min(...series);
     const worst = Math.max(...series);
     const span = worst - best || 1;
@@ -524,7 +541,7 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
     const avg = (xs: number[]) => xs.reduce((s, x) => s + x, 0) / xs.length;
     const recentAvg = avg(last10);
     const priorAvg = prior.length >= 5 ? avg(prior.slice(-10)) : null;
-    return { series, best, worst, span, recentAvg, priorAvg, bestIndex: series.indexOf(best) };
+    return { series, rounds, best, worst, span, recentAvg, priorAvg, bestIndex: series.indexOf(best) };
   })();
 
   // ------------------------------------------------ panel 6, within reach
@@ -1088,36 +1105,143 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                   ? BAND_GREEN_DARK
                   : BAND_RED_DARK;
 
+            const count = form.series.length;
+            const idx = scrubIdx == null ? null : Math.max(0, Math.min(count - 1, scrubIdx));
+            const sel = idx == null ? null : form.rounds[idx];
+            /**
+             * STOP CONDITION honoured: a round with a null course_par gets no
+             * to-par at all. No course-level fallback - a different tee can
+             * carry a different par and the number would be wrong.
+             */
+            const selToPar =
+              sel == null || sel.coursePar == null
+                ? null
+                : sel.gross - sel.coursePar === 0
+                  ? 'E'
+                  : signed(sel.gross - sel.coursePar, 0);
+            const selDate = (() => {
+              if (!sel) return '';
+              const [y, m, d] = sel.playDate.slice(0, 10).split('-').map(Number);
+              if (!y || !m || !d) return sel.playDate;
+              return new Date(y, m - 1, d).toLocaleDateString(undefined, {
+                day: 'numeric',
+                month: 'short',
+              });
+            })();
+            const valueText =
+              sel == null
+                ? ''
+                : selToPar == null
+                  ? t('courses:holes.scoringBreakdown.formScrubValueTextNoPar', {
+                      gross: sel.gross,
+                      date: selDate,
+                    })
+                  : t('courses:holes.scoringBreakdown.formScrubValueText', {
+                      gross: sel.gross,
+                      toPar: selToPar,
+                      date: selDate,
+                    });
+
+            const pick = (clientX: number) => {
+              const el = scrubBoxRef.current;
+              if (!el) return;
+              const rect = el.getBoundingClientRect();
+              const k = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+              // ROUND, not floor: the nearest round snaps under the finger.
+              setScrubIdx(Math.round(k * (count - 1)));
+            };
+            const step = (to: number) =>
+              setScrubIdx(Math.max(0, Math.min(count - 1, to)));
+
             return (
               <>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10 }}>
-                  <span style={{ ...NUM, fontSize: 30, lineHeight: 1, color: A.INK }}>
-                    {form.recentAvg.toFixed(1)}
-                  </span>
-                  {delta == null ? (
-                    <span style={LABEL}>
-                      {t('courses:holes.scoringBreakdown.formLast10')}
-                    </span>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 10,
+                    marginBottom: 10,
+                    // Pinned so the panel does not jump as the headline swaps.
+                    minHeight: 30,
+                  }}
+                >
+                  {sel ? (
+                    <>
+                      <span style={{ ...NUM, fontSize: 30, lineHeight: 1, color: A.INK }}>
+                        {sel.gross}
+                      </span>
+                      <span style={{ ...LABEL, color: zone(sel.gross) }}>
+                        {selToPar == null
+                          ? t('courses:holes.scoringBreakdown.formScrubRoundNoPar', { date: selDate })
+                          : t('courses:holes.scoringBreakdown.formScrubRound', {
+                              toPar: selToPar,
+                              date: selDate,
+                            })}
+                      </span>
+                    </>
                   ) : (
-                    <span
-                      style={{
-                        ...LABEL,
-                        color:
-                          Math.abs(delta) < 0.5
-                            ? A.MUTE
+                    <>
+                      <span style={{ ...NUM, fontSize: 30, lineHeight: 1, color: A.INK }}>
+                        {form.recentAvg.toFixed(1)}
+                      </span>
+                      {delta == null ? (
+                        <span style={LABEL}>
+                          {t('courses:holes.scoringBreakdown.formLast10')}
+                        </span>
+                      ) : (
+                        <span
+                          style={{
+                            ...LABEL,
+                            color:
+                              Math.abs(delta) < 0.5
+                                ? A.MUTE
+                                : delta > 0
+                                  ? BAND_GREEN_DARK
+                                  : BAND_RED_DARK,
+                          }}
+                        >
+                          {Math.abs(delta) < 0.5
+                            ? t('courses:holes.scoringBreakdown.formLevel')
                             : delta > 0
-                              ? BAND_GREEN_DARK
-                              : BAND_RED_DARK,
-                      }}
-                    >
-                      {Math.abs(delta) < 0.5
-                        ? t('courses:holes.scoringBreakdown.formLevel')
-                        : delta > 0
-                          ? t('courses:holes.scoringBreakdown.formBetter', { n: Math.abs(delta).toFixed(1) })
-                          : t('courses:holes.scoringBreakdown.formWorse', { n: Math.abs(delta).toFixed(1) })}
-                    </span>
+                              ? t('courses:holes.scoringBreakdown.formBetter', { n: Math.abs(delta).toFixed(1) })
+                              : t('courses:holes.scoringBreakdown.formWorse', { n: Math.abs(delta).toFixed(1) })}
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
+                {/*
+                  Overlay host. The svg uses preserveAspectRatio="none", so any
+                  SVG <circle> renders as an ellipse; the markers are HTML spans
+                  positioned in percentages of this box instead.
+                  touchAction 'pan-y', NOT 'none' - the page scrolls vertically
+                  through this panel.
+                */}
+                <div
+                  ref={scrubBoxRef}
+                  role="slider"
+                  tabIndex={0}
+                  aria-label={t('courses:holes.scoringBreakdown.formScrubAria')}
+                  aria-valuemin={1}
+                  aria-valuemax={count}
+                  aria-valuenow={(idx ?? count - 1) + 1}
+                  aria-valuetext={valueText || undefined}
+                  onPointerDown={(e) => {
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                    pick(e.clientX);
+                  }}
+                  onPointerMove={(e) => {
+                    if (e.buttons) pick(e.clientX);
+                  }}
+                  onKeyDown={(e) => {
+                    const base = idx ?? count - 1;
+                    if (e.key === 'ArrowLeft') { e.preventDefault(); step(base - 1); }
+                    else if (e.key === 'ArrowRight') { e.preventDefault(); step(base + 1); }
+                    else if (e.key === 'Home') { e.preventDefault(); step(0); }
+                    else if (e.key === 'End') { e.preventDefault(); step(count - 1); }
+                  }}
+                  style={{ position: 'relative', touchAction: 'pan-y', outline: 'none' }}
+                >
                 <svg
                   viewBox={`0 0 ${W} ${H}`}
                   width="100%"
@@ -1164,9 +1288,53 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                     strokeLinejoin="round"
                     vectorEffect="non-scaling-stroke"
                   />
-                  <circle cx={pts[bi].x} cy={pts[bi].y} r={3.4} fill={A.GREEN} stroke={A.INK} strokeWidth={1.6} />
-
+                  {idx != null && (
+                    <line
+                      x1={pts[idx].x}
+                      x2={pts[idx].x}
+                      y1={0}
+                      y2={H}
+                      stroke={A.INK}
+                      strokeOpacity={0.28}
+                      strokeWidth={1}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  )}
                 </svg>
+                {/* Best round. HTML span, not <circle>: see the host comment. */}
+                <span
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    left: `${(pts[bi].x / W) * 100}%`,
+                    top: `${(pts[bi].y / H) * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                    width: 9,
+                    height: 9,
+                    borderRadius: '50%',
+                    background: A.GREEN,
+                    boxShadow: `0 0 0 2px ${A.PANEL}`,
+                    pointerEvents: 'none',
+                  }}
+                />
+                {idx != null && (
+                  <span
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      left: `${(pts[idx].x / W) * 100}%`,
+                      top: `${(pts[idx].y / H) * 100}%`,
+                      transform: 'translate(-50%, -50%)',
+                      width: 11,
+                      height: 11,
+                      borderRadius: '50%',
+                      background: A.INK,
+                      boxShadow: `0 0 0 2px ${A.PANEL}`,
+                      pointerEvents: 'none',
+                    }}
+                  />
+                )}
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
                   <span style={LABEL}>
                     {t('courses:holes.scoringBreakdown.formBest', { n: form.best })}
