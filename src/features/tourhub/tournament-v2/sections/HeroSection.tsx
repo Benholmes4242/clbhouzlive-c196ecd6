@@ -6,6 +6,14 @@
  * the scrim above a 0.5px hairline; a state band pivots on `state`
  * (live -> LEADER row, upcoming -> DEFENDING + countdown, completed ->
  * CHAMPION + winning score).
+ *
+ * TYPE SCALE — HERO EXCEPTION (MICRO_BRIEF_TOURNAMENT_PAGE_TYPE_SCALE). This is
+ * the same cinematic register as the overview hero: a broadcast surface over
+ * photography, where tracked caps read larger than their point size. Its band
+ * labels, column headers and status markers therefore take AXIS 10 rather than
+ * the READ floor of 11, each commented at the site; its names, tournament
+ * titles and sentences take 11 or above. Nothing already above a floor comes
+ * down — a floor is a minimum, never a target.
  */
 import { differenceInCalendarDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
