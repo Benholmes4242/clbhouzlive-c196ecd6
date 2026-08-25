@@ -1105,36 +1105,143 @@ export const ScoringBreakdownSection: React.FC<Props> = ({ golfCourseId }) => {
                   ? BAND_GREEN_DARK
                   : BAND_RED_DARK;
 
+            const count = form.series.length;
+            const idx = scrubIdx == null ? null : Math.max(0, Math.min(count - 1, scrubIdx));
+            const sel = idx == null ? null : form.rounds[idx];
+            /**
+             * STOP CONDITION honoured: a round with a null course_par gets no
+             * to-par at all. No course-level fallback - a different tee can
+             * carry a different par and the number would be wrong.
+             */
+            const selToPar =
+              sel == null || sel.coursePar == null
+                ? null
+                : sel.gross - sel.coursePar === 0
+                  ? 'E'
+                  : signed(sel.gross - sel.coursePar, 0);
+            const selDate = (() => {
+              if (!sel) return '';
+              const [y, m, d] = sel.playDate.slice(0, 10).split('-').map(Number);
+              if (!y || !m || !d) return sel.playDate;
+              return new Date(y, m - 1, d).toLocaleDateString(undefined, {
+                day: 'numeric',
+                month: 'short',
+              });
+            })();
+            const valueText =
+              sel == null
+                ? ''
+                : selToPar == null
+                  ? t('courses:holes.scoringBreakdown.formScrubValueTextNoPar', {
+                      gross: sel.gross,
+                      date: selDate,
+                    })
+                  : t('courses:holes.scoringBreakdown.formScrubValueText', {
+                      gross: sel.gross,
+                      toPar: selToPar,
+                      date: selDate,
+                    });
+
+            const pick = (clientX: number) => {
+              const el = scrubBoxRef.current;
+              if (!el) return;
+              const rect = el.getBoundingClientRect();
+              const k = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+              // ROUND, not floor: the nearest round snaps under the finger.
+              setScrubIdx(Math.round(k * (count - 1)));
+            };
+            const step = (to: number) =>
+              setScrubIdx(Math.max(0, Math.min(count - 1, to)));
+
             return (
               <>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10 }}>
-                  <span style={{ ...NUM, fontSize: 30, lineHeight: 1, color: A.INK }}>
-                    {form.recentAvg.toFixed(1)}
-                  </span>
-                  {delta == null ? (
-                    <span style={LABEL}>
-                      {t('courses:holes.scoringBreakdown.formLast10')}
-                    </span>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 10,
+                    marginBottom: 10,
+                    // Pinned so the panel does not jump as the headline swaps.
+                    minHeight: 30,
+                  }}
+                >
+                  {sel ? (
+                    <>
+                      <span style={{ ...NUM, fontSize: 30, lineHeight: 1, color: A.INK }}>
+                        {sel.gross}
+                      </span>
+                      <span style={{ ...LABEL, color: zone(sel.gross) }}>
+                        {selToPar == null
+                          ? t('courses:holes.scoringBreakdown.formScrubRoundNoPar', { date: selDate })
+                          : t('courses:holes.scoringBreakdown.formScrubRound', {
+                              toPar: selToPar,
+                              date: selDate,
+                            })}
+                      </span>
+                    </>
                   ) : (
-                    <span
-                      style={{
-                        ...LABEL,
-                        color:
-                          Math.abs(delta) < 0.5
-                            ? A.MUTE
+                    <>
+                      <span style={{ ...NUM, fontSize: 30, lineHeight: 1, color: A.INK }}>
+                        {form.recentAvg.toFixed(1)}
+                      </span>
+                      {delta == null ? (
+                        <span style={LABEL}>
+                          {t('courses:holes.scoringBreakdown.formLast10')}
+                        </span>
+                      ) : (
+                        <span
+                          style={{
+                            ...LABEL,
+                            color:
+                              Math.abs(delta) < 0.5
+                                ? A.MUTE
+                                : delta > 0
+                                  ? BAND_GREEN_DARK
+                                  : BAND_RED_DARK,
+                          }}
+                        >
+                          {Math.abs(delta) < 0.5
+                            ? t('courses:holes.scoringBreakdown.formLevel')
                             : delta > 0
-                              ? BAND_GREEN_DARK
-                              : BAND_RED_DARK,
-                      }}
-                    >
-                      {Math.abs(delta) < 0.5
-                        ? t('courses:holes.scoringBreakdown.formLevel')
-                        : delta > 0
-                          ? t('courses:holes.scoringBreakdown.formBetter', { n: Math.abs(delta).toFixed(1) })
-                          : t('courses:holes.scoringBreakdown.formWorse', { n: Math.abs(delta).toFixed(1) })}
-                    </span>
+                              ? t('courses:holes.scoringBreakdown.formBetter', { n: Math.abs(delta).toFixed(1) })
+                              : t('courses:holes.scoringBreakdown.formWorse', { n: Math.abs(delta).toFixed(1) })}
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
+                {/*
+                  Overlay host. The svg uses preserveAspectRatio="none", so any
+                  SVG <circle> renders as an ellipse; the markers are HTML spans
+                  positioned in percentages of this box instead.
+                  touchAction 'pan-y', NOT 'none' - the page scrolls vertically
+                  through this panel.
+                */}
+                <div
+                  ref={scrubBoxRef}
+                  role="slider"
+                  tabIndex={0}
+                  aria-label={t('courses:holes.scoringBreakdown.formScrubAria')}
+                  aria-valuemin={1}
+                  aria-valuemax={count}
+                  aria-valuenow={(idx ?? count - 1) + 1}
+                  aria-valuetext={valueText || undefined}
+                  onPointerDown={(e) => {
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                    pick(e.clientX);
+                  }}
+                  onPointerMove={(e) => {
+                    if (e.buttons) pick(e.clientX);
+                  }}
+                  onKeyDown={(e) => {
+                    const base = idx ?? count - 1;
+                    if (e.key === 'ArrowLeft') { e.preventDefault(); step(base - 1); }
+                    else if (e.key === 'ArrowRight') { e.preventDefault(); step(base + 1); }
+                    else if (e.key === 'Home') { e.preventDefault(); step(0); }
+                    else if (e.key === 'End') { e.preventDefault(); step(count - 1); }
+                  }}
+                  style={{ position: 'relative', touchAction: 'pan-y', outline: 'none' }}
+                >
                 <svg
                   viewBox={`0 0 ${W} ${H}`}
                   width="100%"
