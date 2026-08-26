@@ -77,22 +77,29 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
     border: 'none',
   };
 
-  const venueLine = [
-    event.venueName,
-    event.venueCity,
-    event.purse ? formatPurse(event.purse) : null,
-  ]
-    .filter(Boolean)
-    .join(' · ');
+  /* VENUE LINE CARRIES NO MONEY. The purse used to be the LAST member of this
+     join on a nowrap+ellipsis line, so a long venue put the ellipsis inside the
+     figure ("$3...."). A truncated venue is still recognisable; a truncated
+     number is a WRONG number. The purse now renders as its own flex:'none'
+     element beside this line. */
+  const venueLine = [event.venueName, event.venueCity].filter(Boolean).join(' · ');
+  const purseText = event.purse ? formatPurse(event.purse) : null;
+  const countdown =
+    event.state === 'upcoming' && event.daysAway !== null
+      ? event.daysAway === 0
+        ? t('schedule.floating.today')
+        : t('schedule.row.countdownIn', { n: event.daysAway })
+      : null;
 
   return (
     <div ref={anchorRef}>
       <button type="button" onClick={() => onSelect(event)} style={rowStyle}>
-        {/* Date block ─ 34px column */}
+        {/* Date block ─ 38px column. WIDENED FROM 34 to hold "IN 214D" once the
+            schedule reaches next season; 34 could not. */}
         <div
           style={{
-            width: 34,
-            flex: '0 0 34px',
+            width: 38,
+            flex: '0 0 38px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -136,6 +143,32 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
           >
             {shortMonth(event.startDate)}
           </span>
+          {/* THE COUNTDOWN LIVES HERE NOW, under the date it counts to. It was a
+              right-hand rail, which stated the same fact at the opposite end of
+              the row, squeezed the name from both sides, and sat permanently
+              under the back-to-top FAB. Upcoming rows only — nothing renders and
+              no space is reserved on live or completed rows. */}
+          {countdown && (
+            <span
+              style={{
+                marginTop: 7,
+                paddingTop: 6,
+                borderTop: `0.5px solid ${HAIRLINE_INK_10}`,
+                alignSelf: 'stretch',
+                textAlign: 'center',
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                color: INK_FAINT,
+                textTransform: 'uppercase',
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {countdown}
+            </span>
+          )}
         </div>
 
         {/* Identity column ─ flex */}
@@ -143,69 +176,102 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
           <div
             style={{
               display: 'flex',
-              alignItems: 'center',
-              gap: 6,
+              // flex-start, not center: the chip group must sit on the FIRST
+              // line of a two-line name, not centre against the block.
+              alignItems: 'flex-start',
+              gap: 8,
               flexWrap: 'nowrap',
               minWidth: 0,
             }}
           >
-            {event.tourSlug && (
-              <span
-                style={{
-                  flex: 'none',
-                  // AXIS 10: tour code marker (PGA / DPWT), not a word.
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.16em',
-                  color: INK_MUTE,
-                  padding: '2px 6px',
-                  borderRadius: 4,
-                  background: 'rgba(255,255,255,0.06)',
-                  textTransform: 'uppercase',
-                  lineHeight: 1,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {TOUR_LABEL[event.tourSlug] ?? event.tourSlug}
-              </span>
-            )}
+            {/* THE NAME TAKES THE WIDTH AND WRAPS TO TWO LINES. It used to be
+                nowrap+ellipsis with the tour badge to its LEFT, so the one thing
+                being cut was the event's identity. */}
             <span
               style={{
-                flex: 1,
+                flex: '1 1 auto',
                 minWidth: 0,
-                fontSize: 13,
+                fontSize: 13.5,
                 fontWeight: 700,
                 color: INK,
                 letterSpacing: '-0.005em',
-                lineHeight: 1.2,
-                whiteSpace: 'nowrap',
+                lineHeight: 1.22,
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 2,
                 overflow: 'hidden',
-                textOverflow: 'ellipsis',
               }}
             >
               {event.name}
             </span>
-            {event.isMajor && <MajorChip />}
-            {event.isPlayoff && !event.isMajor && <PlayoffChip />}
+            {/* ONE flex:'none' group so the tour badge is always the same
+                distance from the row's right edge. Order matches ComingUp:
+                badge immediately outside the name, major/playoff outermost. */}
+            <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6, paddingTop: 1 }}>
+              {event.tourSlug && (
+                <span
+                  style={{
+                    flex: 'none',
+                    // AXIS 10: tour code marker (PGA / DPWT), not a word.
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.16em',
+                    color: INK_MUTE,
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                    background: 'rgba(255,255,255,0.06)',
+                    textTransform: 'uppercase',
+                    lineHeight: 1,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {TOUR_LABEL[event.tourSlug] ?? event.tourSlug}
+                </span>
+              )}
+              {event.isMajor && <MajorChip />}
+              {event.isPlayoff && !event.isMajor && <PlayoffChip />}
+            </div>
           </div>
 
-          {venueLine && (
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 500,
-                color: INK_MUTE,
-                letterSpacing: '0.01em',
-                lineHeight: 1.3,
-                ...FIGS,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {venueLine}
+          {(venueLine || purseText) && (
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
+              {venueLine && (
+                <span
+                  style={{
+                    flex: '1 1 auto',
+                    minWidth: 0,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: INK_MUTE,
+                    letterSpacing: '0.01em',
+                    lineHeight: 1.3,
+                    ...FIGS,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {venueLine}
+                </span>
+              )}
+              {purseText && (
+                <span
+                  style={{
+                    flex: 'none',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: INK_MUTE,
+                    lineHeight: 1.3,
+                    ...FIGS,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {purseText}
+                </span>
+              )}
             </div>
           )}
+
 
           {isDone && event.champion && (
             <ChampionStrip
