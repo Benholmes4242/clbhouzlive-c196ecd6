@@ -390,9 +390,8 @@ export function DiscoverHero({
           {(() => {
             const toPar = moment.facts.toPar;
             const showGross = row.gross != null && !isGrossScore;
-            /* ON PLAIN the 56px figure IS the gross and the to-par is already
-               beside it, so this cluster would print both a second time. */
-            const showQual = toPar != null && !isPlainGross;
+            const showQual = toPar != null;
+
             if (!showGross && !showQual) return null;
             return (
               <div
