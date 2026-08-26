@@ -18,6 +18,14 @@ export interface ComingUpRow {
   start_date: string;
   end_date: string;
   venue: string | null;
+  purse: number | null;
+  /**
+   * FIELD SIZE HAS NO SOURCE IN THE FEED. sr_tournaments carries no field/entry
+   * count and raw_data has no such key on scheduled events, so this is always
+   * null today and the row's FIELD column collapses. Declared rather than
+   * omitted so the figure lights up the day the feed carries it.
+   */
+  field_size: number | null;
   days_away: number;
   defending_champion: string | null;
   isMajor: boolean;
@@ -41,7 +49,7 @@ export function useComingUp(tour: TourId | null, limit = 12) {
         .select(`
           id, name, start_date, end_date,
           venue_course_name, venue_name, venue_city, venue_country,
-          defending_champion,
+          purse, defending_champion,
           season:sr_seasons(tour_name)
         `)
         .in('status', ['scheduled', 'created'])
@@ -71,6 +79,8 @@ export function useComingUp(tour: TourId | null, limit = 12) {
         name: r.name,
         start_date: r.start_date,
         end_date: r.end_date,
+        purse: r.purse ?? null,
+        field_size: null,
         venue: r.venue_course_name || r.venue_name || [r.venue_city, r.venue_country].filter(Boolean).join(', ') || null,
         days_away: Math.max(0, Math.ceil((new Date(r.start_date).getTime() - now) / DAY)),
         defending_champion: r.defending_champion ?? null,
