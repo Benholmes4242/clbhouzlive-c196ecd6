@@ -111,11 +111,22 @@ export interface ClubAnalyticsSiBandRows {
   threshold: number;
 }
 
-/** Every course the club owns. Supersedes any client-side course picking. */
+/**
+ * Every course the club owns. Supersedes any client-side course picking.
+ * ORDERED BY rounds DESC, then name — entry [0] is the club's main course.
+ *
+ * `rounds` here is every measured round on that course, and it is NOT the same
+ * quantity as `ClubCourseAnalytics.complete_rounds` (rounds carrying all 18
+ * holes, the hole ranking's sample). Do not conflate them.
+ */
 export interface ClubCourseRef {
   course_id: string;
   course_name: string;
+  /** Every measured round on that course. Lets a COLLAPSED block state its
+   *  size without fetching that course. */
+  rounds: number;
 }
+
 
 export interface ClubCourseAnalytics {
   course_id: string;
