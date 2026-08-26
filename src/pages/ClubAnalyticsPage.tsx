@@ -30,9 +30,11 @@ import {
 import { useClubCourseLink } from '@/features/business/clubAnalytics/useClubCourseLink';
 import { useClubCourseAnalytics } from '@/features/business/clubAnalytics/useClubCourseAnalytics';
 import {
-  SampleSection, HoleBySection, StrokeIndexSection, ScoringSection, TeesSection,
-  SeasonalitySection, WhoPlaysSection, CompetitionSection,
+  VerdictStrip, IndexDisagreesSection, SampleSection, HoleBySection, StrokeIndexSection,
+  ScoringSection, RecordBookSection, TeesSection, SeasonalitySection, WhoPlaysSection,
+  CompetitionSection,
 } from '@/features/business/clubAnalytics/sections';
+
 import type { ClubCourseRef } from '@/features/business/clubAnalytics/types';
 
 const TITLE = 'Your course';
