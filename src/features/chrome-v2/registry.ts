@@ -212,9 +212,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     match: { prefix: '/tourhub/tournament/' },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history' },
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=schedule' },
       tone: 'dark',
-      bleed: true, // tourHeroOverlay drives transparent chrome over cinematic hero
+      bleed: true, // hero page: island rides over the cinematic hero
       note: EDITORIAL_NOTE,
     },
   },
@@ -222,9 +222,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     match: { prefix: '/tourhub/player/' },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history' },
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=players' },
       tone: 'dark',
-      bleed: false,
+      bleed: true, // hero page: matches the tournament page
       note: EDITORIAL_NOTE,
     },
   },
@@ -235,7 +235,6 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' },
       tone: 'dark',
       bleed: false,
-      scrollAway: true,
       note: EDITORIAL_NOTE,
     },
   },
@@ -243,7 +242,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     match: { exact: '/tourhub/college-golf/compare' },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history' },
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub/college-golf' },
       tone: 'dark',
       bleed: false,
       note: EDITORIAL_NOTE,
@@ -258,11 +257,12 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history' },
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub/college-golf' },
       tone: 'dark',
-      bleed: false,
+      bleed: true, // hero page (CollegeHeroMasthead)
       note: EDITORIAL_NOTE,
     },
+
   },
 
   // Tour Hub top-level (logo + editorial geometry; cinematic overlay on overview).
