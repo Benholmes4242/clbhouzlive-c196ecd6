@@ -85,8 +85,16 @@ export function selectDiscoverHeroCandidate(
   const leads = candidates.filter(({ row, moment }) => {
     if (rarityTier(moment) === 0) return false;
     const start = playSlot(row.play_date);
+    /* THE BOUND IS 2, NOT 1 (AMENDMENT 1 §5). play_date anchors midnight, so a
+       bound of 1 expires the lead AT MIDNIGHT TONIGHT: an evening ace could hold
+       the hero for three hours and be gone before anyone opened the app. With 2
+       the guaranteed minimum is twelve hours (a 23:59 round) and the maximum
+       thirty-six (a 00:01 round). That variability is a KNOWN CONSEQUENCE of
+       anchoring on a DATE rather than an arrival timestamp — the arrival-stamp
+       brief is parked and out of scope here. */
     return slot >= start && slot - start <= LEAD_SLOTS;
   });
+
   if (leads.length > 0) {
     return [...leads].sort(
       (a, b) =>
