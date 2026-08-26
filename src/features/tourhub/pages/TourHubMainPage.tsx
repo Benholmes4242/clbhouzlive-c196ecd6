@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { TourHubShell } from '../components/TourHubShell';
 import { TourPageShell } from '../components/TourPageShell';
@@ -108,7 +108,6 @@ function TourHubChromeBridge({
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const location = useLocation();
   /* The left capsule on the hub is ALWAYS the burger. The hub is a bottom-nav
      destination, so a back chevron there is wrong regardless of how the member
      arrived. */
