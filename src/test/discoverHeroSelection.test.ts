@@ -30,14 +30,19 @@ const moment = (kind: Moment['kind'], feat?: Moment['feat']): Moment => ({
 /** The slot a round's play_date starts in, so lead windows can be pinned. */
 const slotOf = (playDate: string) => slotForTime(Date.parse(`${playDate}T00:00:00Z`));
 
+/** The hero's pool rule (AMENDMENT 1 §1): moments only, plain never qualifies. */
+const heroPool = (all: readonly { row: CircleRoundRow; moment: Moment }[]) =>
+  all.filter(({ moment }) => moment.kind !== 'plain');
+
 describe('Discover hero rotation (BRIEF_DISCOVER_HERO_ROTATION)', () => {
-  it('promotes a plain round instead of returning null', () => {
-    const picked = selectDiscoverHeroCandidate(
-      [{ row: row('plain', '2026-08-22'), moment: moment('plain') }],
-      slotOf('2026-08-24'),
-    );
-    expect(picked?.row.round_id).toBe('plain');
+  it('renders nothing for an all-plain fortnight — no fallback to the best plain round', () => {
+    const all = [
+      { row: row('plain-a', '2026-08-22'), moment: moment('plain') },
+      { row: row('plain-b', '2026-08-23'), moment: moment('plain') },
+    ];
+    expect(selectDiscoverHeroCandidate(heroPool(all), slotOf('2026-08-24'))).toBeNull();
   });
+
 
   it('rotates over the pool in the section order for a fixed slot', () => {
     const pool = ['a', 'b', 'c'].map((id) => ({
@@ -71,19 +76,42 @@ describe('Discover hero rotation (BRIEF_DISCOVER_HERO_ROTATION)', () => {
     expect(selectDiscoverHeroCandidate(pool, -1)?.row.round_id).toBe('c');
   });
 
-  it('gives an ace the lead immediately and one slot later, but not two', () => {
+  it('gives an ace the lead through two slots, but not three', () => {
     const ace = { row: row('ace', '2026-08-22'), moment: moment('eagle', 'ace') };
-    const pool = [{ row: row('plain', '2026-08-23'), moment: moment('plain') }, ace];
+    /* Three fillers so the post-lead rotation index cannot land on the ace by
+       chance and mask the expiry. */
+    const pool = [
+      { row: row('e1', '2026-08-23'), moment: moment('eagle') },
+      { row: row('e2', '2026-08-23'), moment: moment('eagle') },
+      ace,
+    ];
     const start = slotOf('2026-08-22');
     expect(selectDiscoverHeroCandidate(pool, start)?.row.round_id).toBe('ace');
-    expect(selectDiscoverHeroCandidate(pool, start + 1)?.row.round_id).toBe('ace');
-    const after = selectDiscoverHeroCandidate(pool, start + 2);
-    expect(after?.row.round_id).not.toBe('ace');
+    expect(selectDiscoverHeroCandidate(pool, start + 2)?.row.round_id).toBe('ace');
+    /* Expired: the pick is now plain rotation over the pool, not the lead. */
+    expect(selectDiscoverHeroCandidate(pool, start + 3)?.row.round_id).toBe(
+      pool[(start + 3) % pool.length].row.round_id,
+    );
   });
+
+
+
+
+
+  it('keeps a late tee time leading the next morning (AMENDMENT 1 §5-6)', () => {
+    /* Played 21:00 on the 22nd: play_date anchors slot(22nd 00:00Z), so 09:00 on
+       the 23rd is start + 2. With the old bound of 1 this ace had expired. */
+    const ace = { row: row('ace', '2026-08-22'), moment: moment('eagle', 'ace') };
+    const pool = [{ row: row('eagle', '2026-08-23'), moment: moment('eagle') }, ace];
+    const nextMorning = slotForTime(Date.parse('2026-08-23T09:00:00Z'));
+    expect(nextMorning - slotOf('2026-08-22')).toBe(2);
+    expect(selectDiscoverHeroCandidate(pool, nextMorning)?.row.round_id).toBe('ace');
+  });
+
 
   it('lets a course record lead but lose to an ace in the same window', () => {
     const record = { row: row('record', '2026-08-22'), moment: moment('courseRecord') };
-    const plain = { row: row('plain', '2026-08-22'), moment: moment('plain') };
+    const plain = { row: row('eagle', '2026-08-22'), moment: moment('eagle') };
     const start = slotOf('2026-08-22');
     expect(selectDiscoverHeroCandidate([plain, record], start)?.row.round_id).toBe('record');
     const ace = { row: row('ace', '2026-08-22'), moment: moment('eagle', 'ace') };

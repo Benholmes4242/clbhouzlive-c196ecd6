@@ -15,21 +15,23 @@ import { useWeekRegionCounts, type RegionSelection } from './useWeekRegionCounts
 import { selectMoment, type Moment } from '../roundMoment';
 
 /**
- * THE PAGE HERO'S SUBJECT (BRIEF_DISCOVER_HERO_ROTATION).
+ * THE PAGE HERO'S SUBJECT (BRIEF_DISCOVER_HERO_ROTATION + AMENDMENT 1).
  *
- * THE HERO PROMOTES ONE OF THE SECTION'S OWN ROUNDS, and that overlap is
+ * THE HERO PROMOTES ONE OF THE SECTION'S OWN NOTABLE ROUNDS, and that overlap is
  * INTENDED. It reads the same `ordered` array GolfThisWeek renders, in the same
- * fourteen-day window, under the same scope and region selection, and shows one
- * of those rounds at hero scale on a TWELVE-HOUR ROTATION. Change the scope or
- * region pill and the pool changes with it, so the hero can never show a round
- * the section is filtering out.
+ * fourteen-day window, under the same scope and region selection, FILTERED TO
+ * ROUNDS WITH A MOMENT, and shows one at hero scale on a TWELVE-HOUR ROTATION.
+ * Change the scope or region pill and the pool changes with it, so the hero can
+ * never show a round the section is filtering out. AN ALL-PLAIN FORTNIGHT RENDERS
+ * NOTHING — no placeholder, no reserved height, no fallback.
  *
  * THE SLOT COMES FROM THE CLOCK, NOT FROM STATE: no useState, no interval, no
  * localStorage. Two consequences are the whole point — the hero cannot repeat
  * itself by chance, and every member sees the same hero at the same moment.
  *
  * THE LEAD SLOT: a genuinely rare feat (ace, albatross, course record) takes the
- * hero immediately and holds it for one slot, then rejoins the rotation.
+ * hero immediately and holds it across the lead window, then rejoins the rotation.
+
  *
  * ZERO NEW NETWORK REQUESTS (ACCEPTANCE I). Every hook below is the SAME hook
  * GolfThisWeek calls with the SAME arguments, so every read resolves out of the
@@ -55,12 +57,13 @@ export const SLOT_MS = 12 * 60 * 60 * 1000;
 export const slotForTime = (ms: number) => Math.floor(ms / SLOT_MS);
 
 /**
- * A rare feat leads from the slot its round appeared in and through the next
- * one, so a feat landing mid-slot still holds twelve hours later and is back in
- * the rotation twenty-four hours later. play_date is the only arrival signal
- * available (the arrival-stamp work is parked), so it anchors the window.
+ * A rare feat leads from the slot its round appeared in and through the next TWO
+ * slots' worth of boundaries (see the `<= LEAD_SLOTS` comparison below).
+ * play_date is the only arrival signal available (the arrival-stamp work is
+ * parked), so it anchors the window.
  */
-const LEAD_SLOTS = 1;
+const LEAD_SLOTS = 2;
+
 
 const playSlot = (playDate: unknown): number => {
   const ms = Date.parse(`${String(playDate ?? '').slice(0, 10)}T00:00:00Z`);
@@ -84,8 +87,16 @@ export function selectDiscoverHeroCandidate(
   const leads = candidates.filter(({ row, moment }) => {
     if (rarityTier(moment) === 0) return false;
     const start = playSlot(row.play_date);
+    /* THE BOUND IS 2, NOT 1 (AMENDMENT 1 §5). play_date anchors midnight, so a
+       bound of 1 expires the lead AT MIDNIGHT TONIGHT: an evening ace could hold
+       the hero for three hours and be gone before anyone opened the app. With 2
+       the guaranteed minimum is twelve hours (a 23:59 round) and the maximum
+       thirty-six (a 00:01 round). That variability is a KNOWN CONSEQUENCE of
+       anchoring on a DATE rather than an arrival timestamp — the arrival-stamp
+       brief is parked and out of scope here. */
     return slot >= start && slot - start <= LEAD_SLOTS;
   });
+
   if (leads.length > 0) {
     return [...leads].sort(
       (a, b) =>
@@ -151,13 +162,19 @@ export function useDiscoverHero(
     const slot = slotForTime(Date.now());
 
     let allPlain = true;
-    const candidates = ordered.map((r) => {
-      const shape = holeShapes?.get(r.score_id ?? '') ?? null;
-      const moment = selectMoment(shape?.holes ?? [], r.course_record_fact);
-      if (moment.kind !== 'plain') allPlain = false;
-      return { row: r, moment };
-    });
+    /* MOMENTS ONLY (AMENDMENT 1 §1). An ordinary round never becomes the hero,
+       and an all-plain fortnight renders NOTHING — no placeholder, no fallback to
+       the best plain round. */
+    const candidates = ordered
+      .map((r) => {
+        const shape = holeShapes?.get(r.score_id ?? '') ?? null;
+        const moment = selectMoment(shape?.holes ?? [], r.course_record_fact);
+        if (moment.kind !== 'plain') allPlain = false;
+        return { row: r, moment };
+      })
+      .filter(({ moment }) => moment.kind !== 'plain');
     const best = selectDiscoverHeroCandidate(candidates, slot);
+
 
     const subject: DiscoverHeroSubject | null =
       best
