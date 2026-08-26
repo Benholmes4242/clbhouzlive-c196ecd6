@@ -260,13 +260,15 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     isFreshCreate && (initialMedia.length > 0 || awaitingMedia) ? 1 : 2,
   );
 
-  // Page 1 is a dark canvas (light icons), page 2 is light (dark icons).
+  // Both pages are dark canvases now (page 1 #0B0F14 stage, page 2 A.CANVAS
+  // #15171F write surface), so the status bar keeps light icons and the notch
+  // bleeds the page colour instead of the legacy light-mode white (FFF8FAFC).
   // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
   // Watch light, profile immersive, etc.) because overlay close is not a route change.
   useEffect(() => {
     try {
       if (page === 1) setStatusBarStyleColor('light', 'FF0B0F14');
-      else setStatusBarStyleColor('dark', 'FFF8FAFC');
+      else setStatusBarStyleColor('light', 'FF15171F');
     } catch { /* status bar best-effort */ }
   }, [page]);
 
