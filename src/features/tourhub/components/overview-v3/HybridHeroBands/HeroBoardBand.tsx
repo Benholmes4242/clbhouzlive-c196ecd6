@@ -554,7 +554,16 @@ export function HeroBoardSection({
               {closedFigure.name}
             </span>
             {closedFigure.right && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: closedFigure.right === 'WON' ? 800 : 600,
+                  letterSpacing: closedFigure.right === 'WON' ? '0.08em' : undefined,
+                  color: closedFigure.rightColor,
+                  ...FIGS,
+                }}
+              >
+
                 {closedFigure.right}
               </span>
             )}
