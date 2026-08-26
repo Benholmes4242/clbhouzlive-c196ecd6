@@ -180,8 +180,7 @@ export default function ClubAnalyticsPage() {
   const { data: seed, isLoading: seedLoading } = useClubCourseAnalytics(seedId);
 
   const [openId, setOpenId] = React.useState<string | null>(null);
-  const defaultOpen = seedId ?? null;
-  const effectiveOpen = openId ?? defaultOpen;
+
 
   if (businessLoading || linkLoading) {
     return (
