@@ -20,6 +20,11 @@ import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamen
 import { getContextLabel } from '../utils/tournamentClassification';
 import { isAnyMajor, getMajorType } from '../utils/majorScope';
 import { isTournamentDecided } from '@/utils/tournamentDecided';
+import {
+  RESULTS_CAP_DAYS,
+  RESULTS_HANDOVER_DAYS,
+  daysSinceEndDate,
+} from '../components/overview-v3/HybridHero.utils';
 
 // Tour priority order for sorting live tournaments
 const TOUR_PRIORITY: TourId[] = ['pga', 'liv', 'euro', 'lpga', 'pgad', 'champ'];
