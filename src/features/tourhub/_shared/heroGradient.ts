@@ -60,3 +60,38 @@ export function heroCanonBackground(
     ? `${HERO_CANON_SCRIM}, url("${imageUrl}") ${focal} / cover no-repeat`
     : `${HERO_CANON_SCRIM}, ${fallback}`;
 }
+
+/**
+ * MICRO_BRIEF_COLLEGE_FRANCHISE_REBUILD §4 — the lighten counterpart to
+ * `darkenTowardCharcoal`, and the sibling this file was missing.
+ *
+ * Brand colours vary enormously in luminance. Northwestern (#4E2A84) is DARKER
+ * than the panel it is drawn on, so a raw brand glow there is less visible than
+ * no glow at all — a value correct against one ground, used against a darker
+ * one. Every brand is therefore lifted toward a relative-luminance floor before
+ * it is used as LIGHT (a glow, a halo, a tint) rather than as a GROUND.
+ *
+ * Relative luminance (0.2126R + 0.7152G + 0.0722B on the 0-1 channels), floor
+ * 0.42; below it, mix toward white by (floor - l) / (1 - l). No per-school
+ * override belongs here: if a school still reads badly, the floor is wrong.
+ */
+export const BRAND_LUMINANCE_FLOOR = 0.42;
+
+export function liftBrandToLuminanceFloor(hex: string, floor = BRAND_LUMINANCE_FLOOR): string {
+  const parsed = parseHex(hex);
+  if (!parsed) return hex;
+  const [r, g, b] = parsed;
+  const l = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  if (l >= floor) return `rgb(${r}, ${g}, ${b})`;
+  const t = (floor - l) / (1 - l);
+  const mix = (c: number) => Math.round(c * (1 - t) + 255 * t);
+  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+}
+
+/** The lifted brand as an rgba() at `alpha` — what a glow actually wants. */
+export function liftedBrandAlpha(hex: string, alpha: number, floor = BRAND_LUMINANCE_FLOOR): string {
+  const lifted = liftBrandToLuminanceFloor(hex, floor);
+  const m = lifted.match(/rgb\((\d+), (\d+), (\d+)\)/);
+  if (!m) return lifted;
+  return `rgba(${m[1]}, ${m[2]}, ${m[3]}, ${alpha})`;
+}

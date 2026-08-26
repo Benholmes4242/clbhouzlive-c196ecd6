@@ -432,7 +432,10 @@
       "headlineRunaway": "<0>{{leader}} runs away with it.</0>",
       "headlineClosing": "<0>{{leader}} leads. {{chaser}} is closing.</0>",
       "rowMetaWithCaptain": "{{count}} on tour · {{captain}} captains",
-      "rowMeta": "{{count}} on tour"
+      "rowMeta": "{{count}} on tour",
+      "behindThem": "AND BEHIND THEM",
+      "supportingWide": "<0>{{gap}}</0> clear of {{chaser}}, with <1>{{count}}</1> alumni on tour.",
+      "supportingClose": "Just <0>{{gap}}</0> between them, with <1>{{count}}</1> alumni on tour."
     },
     "cinematic": {
       "championEyebrow": "★ Champion",
