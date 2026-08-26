@@ -97,12 +97,13 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
   return (
     <div ref={anchorRef}>
       <button type="button" onClick={() => onSelect(event)} style={rowStyle}>
-        {/* Date block ─ 38px column. WIDENED FROM 34 to hold "IN 214D" once the
-            schedule reaches next season; 34 could not. */}
+        {/* Date block ─ 42px column. WIDENED FROM 34: the three-digit countdown
+            ("IN 107D" today, "IN 214D" next season) measures 40.9px at 10/700 with
+            0.06em tracking, so neither 34 nor the brief's 38 held it. 42 does. */}
         <div
           style={{
-            width: 38,
-            flex: '0 0 38px',
+            width: 42,
+            flex: '0 0 42px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
