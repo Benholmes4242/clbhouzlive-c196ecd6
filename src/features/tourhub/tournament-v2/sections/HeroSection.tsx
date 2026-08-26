@@ -214,7 +214,13 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
     state === 'upcoming' ? meta.id : null,
   );
 
-  const background = heroCanonBackground(imageUrl, FALLBACK_BG, IMAGE_FOCAL);
+  // heroCanonBackground() hard-codes the CANVAS termination, so the canon's own
+  // heroCanonScrimOn() is used with the surface beneath this hero instead.
+  const scrim = heroCanonScrimOn(HERO_BOARD_SURFACE_SOFT);
+  const background = imageUrl
+    ? `${scrim}, url("${imageUrl}") ${IMAGE_FOCAL} / cover no-repeat`
+    : `${scrim}, ${FALLBACK_BG}`;
+
 
   const leader =
     state === 'live'
