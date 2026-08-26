@@ -15,22 +15,29 @@ import { useWeekRegionCounts, type RegionSelection } from './useWeekRegionCounts
 import { selectMoment, type Moment } from '../roundMoment';
 
 /**
- * THE PAGE HERO'S SUBJECT (BRIEF_DISCOVER_WORLD_CLASS §1.1).
+ * THE PAGE HERO'S SUBJECT (BRIEF_DISCOVER_HERO_ROTATION).
  *
- * IT SHOWS THE BEST STORY, NOT THE BEST SCORE. The lowest gross is row 1 of the
- * BEST THIS WEEK chip immediately beneath the hero, and a hero that repeats the
- * chip under it is a bigger version of nothing. So the hero surfaces the most
- * recent notable round and the chips keep the numbers — two different questions,
- * no duplication. Ace/albatross rarity alone can hold against a newer moment.
+ * THE HERO PROMOTES ONE OF THE SECTION'S OWN ROUNDS, and that overlap is
+ * INTENDED. It reads the same `ordered` array GolfThisWeek renders, in the same
+ * fourteen-day window, under the same scope and region selection, and shows one
+ * of those rounds at hero scale on a TWELVE-HOUR ROTATION. Change the scope or
+ * region pill and the pool changes with it, so the hero can never show a round
+ * the section is filtering out.
  *
- * ZERO NEW NETWORK REQUESTS (§1.4, ACCEPTANCE k). Every hook below is the SAME
- * hook GolfThisWeek calls with the SAME arguments, so every read resolves out of
- * the react-query cache the section already populated: the scope allow-list, the
- * seven-day rounds, the course meta and the ONE batched hole-shape read. There is
- * no query, no RPC and no field here that the section did not already fetch.
+ * THE SLOT COMES FROM THE CLOCK, NOT FROM STATE: no useState, no interval, no
+ * localStorage. Two consequences are the whole point — the hero cannot repeat
+ * itself by chance, and every member sees the same hero at the same moment.
  *
- * MOMENT detection remains in roundMoment.ts. This hook only chooses between
- * already-classified rounds by recency and the explicit rarity exception.
+ * THE LEAD SLOT: a genuinely rare feat (ace, albatross, course record) takes the
+ * hero immediately and holds it for one slot, then rejoins the rotation.
+ *
+ * ZERO NEW NETWORK REQUESTS (ACCEPTANCE I). Every hook below is the SAME hook
+ * GolfThisWeek calls with the SAME arguments, so every read resolves out of the
+ * react-query cache the section already populated: the scope allow-list, the
+ * fourteen-day rounds, the course meta and the ONE batched hole-shape read.
+ *
+ * MOMENT detection remains in roundMoment.ts. This hook only chooses WHICH
+ * already-classified round appears, and WHEN.
  */
 
 type HeroCandidate = { row: CircleRoundRow; moment: Moment };
@@ -41,18 +48,54 @@ const rarityTier = (moment: Moment) => {
   return 0;
 };
 
+/** Twelve hours. The rotation's only clock. */
+export const SLOT_MS = 12 * 60 * 60 * 1000;
+
+/** The slot index for a moment in time. Exported so tests can pin it. */
+export const slotForTime = (ms: number) => Math.floor(ms / SLOT_MS);
+
 /**
- * Recency chooses the story inside a tier. Ace/albatross holds the full window;
- * COURSE RECORD holds unless that top tier exists; ordinary moments then use
- * recency. Input order is never trusted because the rail deliberately reorders
- * self/new-course rounds.
+ * A rare feat leads from the slot its round appeared in and through the next
+ * one, so a feat landing mid-slot still holds twelve hours later and is back in
+ * the rotation twenty-four hours later. play_date is the only arrival signal
+ * available (the arrival-stamp work is parked), so it anchors the window.
  */
-export function selectDiscoverHeroCandidate(candidates: readonly HeroCandidate[]): HeroCandidate | null {
-  const notable = candidates.filter(({ moment }) => moment.kind !== 'plain');
-  if (notable.length === 0) return null;
-  const highestTier = Math.max(...notable.map(({ moment }) => rarityTier(moment)));
-  const pool = notable.filter(({ moment }) => rarityTier(moment) === highestTier);
-  return [...pool].sort((a, b) => String(b.row.play_date).localeCompare(String(a.row.play_date)))[0] ?? null;
+const LEAD_SLOTS = 1;
+
+const playSlot = (playDate: unknown): number => {
+  const ms = Date.parse(`${String(playDate ?? '').slice(0, 10)}T00:00:00Z`);
+  return Number.isNaN(ms) ? Number.NEGATIVE_INFINITY : slotForTime(ms);
+};
+
+/**
+ * PURE: the slot is an argument, never Date.now() in here.
+ *
+ * A rare feat inside its lead window wins (rarer first, then more recent);
+ * otherwise the slot indexes the pool in the SECTION'S OWN ORDER so the hero and
+ * the section never disagree about ranking. The double modulo guards a negative
+ * slot rather than assuming the clock is positive.
+ */
+export function selectDiscoverHeroCandidate(
+  candidates: readonly HeroCandidate[],
+  slot: number,
+): HeroCandidate | null {
+  if (candidates.length === 0) return null;
+
+  const leads = candidates.filter(({ row, moment }) => {
+    if (rarityTier(moment) === 0) return false;
+    const start = playSlot(row.play_date);
+    return slot >= start && slot - start <= LEAD_SLOTS;
+  });
+  if (leads.length > 0) {
+    return [...leads].sort(
+      (a, b) =>
+        rarityTier(b.moment) - rarityTier(a.moment) ||
+        String(b.row.play_date).localeCompare(String(a.row.play_date)),
+    )[0];
+  }
+
+  const index = ((slot % candidates.length) + candidates.length) % candidates.length;
+  return candidates[index];
 }
 
 export interface DiscoverHeroSubject {
@@ -64,7 +107,7 @@ export interface DiscoverHeroSubject {
 }
 
 export interface DiscoverHeroResult {
-  /** `null` means NO HERO RENDERS — no placeholder, no reserved height (§1.1). */
+  /** `null` means NO HERO RENDERS — no placeholder, no reserved height. */
   subject: DiscoverHeroSubject | null;
   /** True while the section's own reads are in flight. The hero renders nothing. */
   isPending: boolean;
@@ -105,6 +148,8 @@ export function useDiscoverHero(
   return useMemo(() => {
     const withImage = ordered.filter((r) => !!meta?.get(r.course_id ?? '')?.imageUrl).length;
 
+    const slot = slotForTime(Date.now());
+
     let allPlain = true;
     const candidates = ordered.map((r) => {
       const shape = holeShapes?.get(r.score_id ?? '') ?? null;
@@ -112,7 +157,7 @@ export function useDiscoverHero(
       if (moment.kind !== 'plain') allPlain = false;
       return { row: r, moment };
     });
-    const best = selectDiscoverHeroCandidate(candidates);
+    const best = selectDiscoverHeroCandidate(candidates, slot);
 
     const subject: DiscoverHeroSubject | null =
       best

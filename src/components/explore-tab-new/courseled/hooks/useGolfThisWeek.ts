@@ -10,7 +10,7 @@ import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircl
  * GOLF THIS WEEK — the data layer (BRIEF_GOLF_THIS_WEEK §1, extended by
  * BRIEF_MERGE_CIRCLE_AND_GOLF_THIS_WEEK §S2).
  *
- * ONE READ, NO FEAT THRESHOLD, SEVEN DAYS FOR EVERY SCOPE. Your Circle and Golf
+ * ONE READ, NO FEAT THRESHOLD, FOURTEEN DAYS FOR EVERY SCOPE (see GOLF_WEEK_DAYS below). Your Circle and Golf
  * this week were one section shown twice; they are now one rail whose SCOPE is a
  * pill. The scope is answered by the DATABASE — Top 100 and Played are course
  * allow-lists passed into the query, never a client-side discard of rows the app
