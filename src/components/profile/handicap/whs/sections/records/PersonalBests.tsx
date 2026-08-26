@@ -107,24 +107,31 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
       };
     }
 
-    // #4 Best vs handicap
+    // #4 Best vs handicap — rounds with no course par cannot be scored against
+    // par, so they are excluded rather than defaulted to a guessed par.
     let bestVsHcp: Tile = empty('Best vs HCP');
     if (currentHandicap != null && grossList.length) {
-      const scored = grossList.map((s) => {
-        const course = s.course as { course_par?: number | null } | null | undefined;
-        const par = course?.course_par ?? 72;
-        const overPar = (s.adjusted_gross as number) - par;
-        const vsHcp = overPar - currentHandicap;
-        return { s, vsHcp };
-      });
-      const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));
-      const sign = best.vsHcp <= 0 ? '' : '+';
-      bestVsHcp = {
-        eyebrow: 'Best vs HCP',
-        value: `${sign}${best.vsHcp.toFixed(1)}`,
-        caption: fmtCourseDate(best.s),
-      };
+      const scored = grossList
+        .map((s) => {
+          const course = s.course as { course_par?: number | null } | null | undefined;
+          const par = course?.course_par;
+          if (typeof par !== 'number') return null;
+          const overPar = (s.adjusted_gross as number) - par;
+          return { s, vsHcp: overPar - currentHandicap };
+        })
+        .filter((x): x is NonNullable<typeof x> => x !== null);
+
+      if (scored.length) {
+        const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));
+        const sign = best.vsHcp <= 0 ? '' : '+';
+        bestVsHcp = {
+          eyebrow: 'Best vs HCP',
+          value: `${sign}${best.vsHcp.toFixed(1)}`,
+          caption: fmtCourseDate(best.s),
+        };
+      }
     }
+
 
     // #5 Most rounds in a month
     let mostMonth: Tile = empty('Most Rounds in a Month');
