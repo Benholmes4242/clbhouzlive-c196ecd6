@@ -38,11 +38,16 @@ import type { EventState } from '../../components/overview-v3/useTournamentPulse
 // Canonical hero height: HERO_MIN_H from _shared/tokens, sourced from the
 // course detail hero (GolfClubView). Do not re-declare it locally.
 
-// ONE canon scrim, ending on the canvas — HERO_CANON_SCRIM in
-// _shared/heroGradient (BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON). No text shadow.
-const FALLBACK_BG = 'linear-gradient(180deg, #1A2130 0%, #15171F 100%)';
+/**
+ * ONE canon scrim — heroCanonScrimOn (BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON).
+ * The canon is that the ramp ends on whatever surface sits BENEATH the photo.
+ * That surface is no longer the canvas: it is the stat strip, so the gradient
+ * and the flat fallback both terminate on HERO_BOARD_SURFACE_SOFT (#121820).
+ * No text shadow, no second layer.
+ */
+const FALLBACK_BG = `linear-gradient(180deg, #1A2130 0%, ${HERO_BOARD_SURFACE_SOFT} 100%)`;
 const IMAGE_FOCAL = '50% 72%';
-const HAIRLINE = 'rgba(255,255,255,0.18)';
+
 
 const LEADER_RED = '#FF6B6B';
 const GOLD = '#FBBC2E';
