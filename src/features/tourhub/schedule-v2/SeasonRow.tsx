@@ -62,8 +62,10 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
   isAnchor = false,
   onSelect,
 }) => {
+  const { t } = useTranslation('tourhub');
   const isLive = event.state === 'live';
   const isDone = event.state === 'completed';
+
 
   const rowStyle: React.CSSProperties = {
     display: 'flex',
