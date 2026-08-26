@@ -1869,8 +1869,9 @@ export function GolfThisWeek({
                fixed pixel height anywhere — a number would silently rot the day
                pill type or padding moves. */
             alignItems: 'stretch',
-
+          }}
         >
+
           <RegionDropdown
             regions={regions}
             selection={region}
