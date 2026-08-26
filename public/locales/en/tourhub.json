@@ -176,7 +176,11 @@
     "statWatch": {
       "eyebrow": "Stat watch",
       "allStatsLink": "All stats",
-      "seasonLeaders": "Season leaders · {{tourLabel}}"
+      "seasonLeaders": "Season leaders · {{tourLabel}}",
+      "pickerAriaLabel": "Choose a statistic",
+      "higherIsBetter": "Higher is better",
+      "lowerIsBetter": "Lower is better",
+      "vsFieldAvg": "vs field avg {{value}}"
     },
     "sectionTourLens": {
       "allTours": "All Tours",

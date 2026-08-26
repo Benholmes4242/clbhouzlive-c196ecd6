@@ -23,6 +23,14 @@ export interface StatLeader {
   photoUrl: string | null;
   headshotOverride: string | null;
   value: number;
+  /**
+   * Signed distance from the category's ANCHOR (see StatCategory.anchor).
+   * For the SG categories the anchor is a true zero and the deviation IS the
+   * value. For the absolute stats it is the season field average computed from
+   * the same sr_player_statistics rows this query already fetched — a measured
+   * origin, never an invented one.
+   */
+  deviation: number;
 }
 
 export interface StatCategory {
@@ -31,7 +39,18 @@ export interface StatCategory {
   unit: string; // micro-label
   order: 'asc' | 'desc';
   format: (v: number) => string;
-  leaders: StatLeader[]; // 1..3 (self-hidden when 0)
+  /**
+   * 'zero'        — strokes gained IS a deviation; zero is the field, so the
+   *                 bar can be anchored there and means something.
+   * 'fieldAverage'— scoring average / driving distance have NO natural zero
+   *                 (a bar from 0 to 68.61 says nothing). They anchor on the
+   *                 measured season field average instead, and the section
+   *                 SAYS SO in the micro-label.
+   */
+  anchor: 'zero' | 'fieldAverage';
+  /** The measured anchor for absolute stats; null for the SG categories. */
+  fieldAverage: number | null;
+  leaders: StatLeader[]; // 1..5 (self-hidden when 0)
 }
 
 const CATEGORIES: Array<{
@@ -41,6 +60,7 @@ const CATEGORIES: Array<{
   unit: string;
   order: 'asc' | 'desc';
   format: (v: number) => string;
+  anchor: 'zero' | 'fieldAverage';
 }> = [
   {
     key: 'sg_putting',
@@ -49,6 +69,7 @@ const CATEGORIES: Array<{
     unit: 'per round',
     order: 'desc',
     format: (v) => (v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2)),
+    anchor: 'zero',
   },
   {
     key: 'sg_tee_to_green',
@@ -57,6 +78,7 @@ const CATEGORIES: Array<{
     unit: 'per round',
     order: 'desc',
     format: (v) => (v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2)),
+    anchor: 'zero',
   },
   {
     key: 'driving_distance',
@@ -65,6 +87,7 @@ const CATEGORIES: Array<{
     unit: 'yards avg',
     order: 'desc',
     format: (v) => v.toFixed(1),
+    anchor: 'fieldAverage',
   },
   {
     key: 'scoring_average',
@@ -73,8 +96,12 @@ const CATEGORIES: Array<{
     unit: 'per round',
     order: 'asc',
     format: (v) => v.toFixed(2),
+    anchor: 'fieldAverage',
   },
 ];
+
+/** The list holds five rows. Fewer than five in a category renders what exists. */
+const LEADER_CAP = 5;
 
 interface StatRow {
   player_id: string;
@@ -176,19 +203,30 @@ export function useStatWatch(tour: TourId) {
       if (rows.length === 0) return { categories: [] };
 
 
-      // Rank per category, keep top 3.
-      const perCategory: Array<{ cfg: (typeof CATEGORIES)[number]; ranked: Array<{ playerId: string; value: number }> }> =
-        CATEGORIES.map((cfg) => {
-          const ranked = rows
-            .filter((r) => {
-              const v = r[cfg.column];
-              return typeof v === 'number' && Number.isFinite(v);
-            })
-            .map((r) => ({ playerId: r.player_id, value: r[cfg.column] as number }))
-            .sort((a, b) => (cfg.order === 'asc' ? a.value - b.value : b.value - a.value))
-            .slice(0, 3);
-          return { cfg, ranked };
-        });
+      // Rank per category, keep the top LEADER_CAP. The query already fetches
+      // every row of the winning season, so the cap is a client-side slice:
+      // raising 3 -> 5 costs nothing at the database.
+      const perCategory: Array<{
+        cfg: (typeof CATEGORIES)[number];
+        ranked: Array<{ playerId: string; value: number }>;
+        fieldAverage: number | null;
+      }> = CATEGORIES.map((cfg) => {
+        const values = rows
+          .filter((r) => {
+            const v = r[cfg.column];
+            return typeof v === 'number' && Number.isFinite(v);
+          })
+          .map((r) => ({ playerId: r.player_id, value: r[cfg.column] as number }));
+        // Measured season field average — the anchor for absolute stats.
+        const fieldAverage =
+          cfg.anchor === 'fieldAverage' && values.length > 0
+            ? values.reduce((sum, v) => sum + v.value, 0) / values.length
+            : null;
+        const ranked = [...values]
+          .sort((a, b) => (cfg.order === 'asc' ? a.value - b.value : b.value - a.value))
+          .slice(0, LEADER_CAP);
+        return { cfg, ranked, fieldAverage };
+      });
 
       const playerIds = Array.from(
         new Set(perCategory.flatMap(({ ranked }) => ranked.map((r) => r.playerId))),
@@ -214,7 +252,7 @@ export function useStatWatch(tour: TourId) {
       }
 
       const categories: StatCategory[] = perCategory
-        .map(({ cfg, ranked }) => {
+        .map(({ cfg, ranked, fieldAverage }) => {
           const leaders: StatLeader[] = ranked
             .map((r) => {
               const p = playerMap.get(r.playerId);
@@ -225,6 +263,7 @@ export function useStatWatch(tour: TourId) {
                 photoUrl: p.photoUrl,
                 headshotOverride: p.headshotOverride,
                 value: r.value,
+                deviation: cfg.anchor === 'zero' ? r.value : r.value - (fieldAverage ?? r.value),
               };
             })
             .filter((r): r is StatLeader => !!r);
@@ -234,6 +273,8 @@ export function useStatWatch(tour: TourId) {
             unit: cfg.unit,
             order: cfg.order,
             format: cfg.format,
+            anchor: cfg.anchor,
+            fieldAverage,
             leaders,
           };
         })
