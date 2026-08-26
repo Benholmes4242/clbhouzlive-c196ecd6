@@ -128,6 +128,9 @@ export function CourseOfTheWeekSection() {
 
   const location = [region, country].filter(Boolean).join(' · ');
   const trimmedQuote = clampToSentence(quote ?? '');
+  // Ellipsis only when text was genuinely dropped, and spaced off a full stop
+  // so a completed sentence does not read "heard.…".
+  const quoteSuffix = trimmedQuote.truncated ? (/[.!?]$/.test(trimmedQuote.text) ? ' …' : '…') : '';
 
   return (
     <AnimatePresence initial={false}>
@@ -319,7 +322,7 @@ export function CourseOfTheWeekSection() {
                           overflow: 'hidden',
                         }}
                       >
-                        “{trimmedQuote.text}{trimmedQuote.truncated ? '…' : ''}”
+                        “{trimmedQuote.text}{quoteSuffix}”
                       </div>
                       <div style={{ marginTop: 6, fontSize: 11, fontWeight: 700, color: A.DIM, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
                         — {reviewer_name ?? 'A member'}
