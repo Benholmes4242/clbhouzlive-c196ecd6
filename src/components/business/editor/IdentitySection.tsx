@@ -6,6 +6,7 @@ import { AlertCircle, Lock, MapPin } from 'lucide-react';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
+import { AppSelect } from '@/components/ui/AppSelect';
 import { ClubSearchDropdown, SelectedClub } from '@/components/business/ClubSearchDropdown';
 import { CollegeSearchDropdown, SelectedCollege } from '@/components/business/CollegeSearchDropdown';
 
@@ -82,30 +83,30 @@ export function IdentitySection({
               </>
             ) : (
               <>
-                <select
+                {/*
+                 * AppSelect, not a native <select>: the native popup is painted
+                 * by the browser outside the document and composites the alpha
+                 * FIELD_REST_BG over its own WHITE backdrop, rendering white.
+                 * Radix renders the menu inside the page on the dark --card.
+                 * triggerClassName re-applies the field treatment because
+                 * AppSelect's built-in trigger text colour is pre-dark-mode.
+                 */}
+                <AppSelect
                   value={category}
-                  onChange={(e) => {
-                    setCategory(e.target.value);
+                  onChange={(v) => {
+                    setCategory(v);
                     setBusinessName('');
                     setSelectedClub(null);
                     setSelectedCollege(null);
                   }}
-                  className={`${FIELD_INPUT_CLASS} ${FIELD_PLACEHOLDER_CLASS} appearance-none cursor-pointer`}
-                  style={{
-                    ...FIELD_INPUT_STYLE,
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 16px center',
-                  }}
-                >
-                  <option value="">Select a category</option>
-                  {BUSINESS_CATEGORIES_WITH_ICONS.map(({ value, label, subtitle }) => (
-                    <option key={value} value={value}>
-                      {label}
-                      {subtitle ? ` — ${subtitle}` : ''}
-                    </option>
-                  ))}
-                </select>
+                  options={BUSINESS_CATEGORIES_WITH_ICONS.map(({ value, label, subtitle }) => ({
+                    value,
+                    label: `${label}${subtitle ? ` — ${subtitle}` : ''}`,
+                  }))}
+                  placeholder="Select a category"
+                  ariaLabel="Business category"
+                  triggerClassName={`${FIELD_INPUT_CLASS} h-auto w-full px-[13px] py-3 text-[14px] font-normal text-foreground`}
+                />
                 <p className={HINT_CLASS}>Category cannot be changed after creation.</p>
               </>
             )}
