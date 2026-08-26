@@ -36,6 +36,39 @@ import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { A, Action, Panel } from '@/features/courses/components/holes/analytical/tokens';
 import { useFriendsWhoPlayedCourse } from '@/hooks/useFriendsWhoPlayedCourse';
+import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
+import { SiLadder } from '@/features/courses/_shared/SiLadder';
+import { buildSiLadder } from '@/features/courses/_shared/siLadder';
+
+/**
+ * BRIEF_SI_LADDER_SHARED §3/§4 — THE LADDER ON THE COURSE TAB.
+ *
+ * SAME COMPONENT, SAME RULE AS THE CLUB PAGE. The only difference is the voice,
+ * and the voice is a prop: a member reading this may not belong to this club, so
+ * the copy is "the card indexes it", never "you index it". A member reading
+ * their OWN club's course should not be told the card is theirs to fix either.
+ *
+ * It sits AFTER the hole-by-hole content and BEFORE the reviews prompt: it is a
+ * companion to the hole list, not a replacement for it.
+ *
+ * `get_course_hole_analysis` is already fetched by CourseAnalyticsPanels above,
+ * so this shares that cached query rather than adding a request. Under 100
+ * rounds `buildSiLadder` returns null and this renders nothing at all — the
+ * grid gap on the parent means an absent section leaves no hole behind it.
+ */
+const CourseSiLadder: React.FC<{ courseId: string }> = ({ courseId }) => {
+  const { data } = useCourseHoleAnalysis(courseId);
+  const ladder = React.useMemo(
+    () => buildSiLadder(data?.holes ?? [], data?.total_rounds),
+    [data?.holes, data?.total_rounds],
+  );
+  if (!ladder) return null;
+  return (
+    <div style={{ padding: '0 16px' }}>
+      <SiLadder ladder={ladder} voice="course" />
+    </div>
+  );
+};
 
 interface Course {
   id: string;
