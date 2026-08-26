@@ -220,7 +220,7 @@ export function TournamentPage() {
         immersive
         background={SLATE_50}
         title={meta?.name ?? 'Tournament'}
-        subtitle={meta?.venue ?? undefined}
+        subtitle={meta?.venue_name ?? undefined}
         backFallback="/tourhub?tab=schedule"
       >
       <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
