@@ -156,11 +156,11 @@ const CourseBlock: React.FC<{
             <>
               {/* §1b — THE VERDICT STRIP LEADS: mean gross, hardest hole, comp share. */}
               <VerdictStrip data={result.data} />
-              {/* §2 — the ladder is the one thing no other product shows a club. */}
-              <IndexDisagreesSection data={result.data} />
               {/* §7 — the sample is stated before the rest of the figures. */}
               <SampleSection data={result.data} />
               <HoleBySection data={result.data} />
+              {/* §2 — the ladder is the one thing no other product shows a club. */}
+              <IndexDisagreesSection data={result.data} />
               <StrokeIndexSection data={result.data} />
               <ScoringSection data={result.data} />
               {/* §5 — values only. Names live on the course's Champions tab. */}
