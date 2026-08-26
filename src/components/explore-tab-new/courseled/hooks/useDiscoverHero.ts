@@ -160,13 +160,19 @@ export function useDiscoverHero(
     const slot = slotForTime(Date.now());
 
     let allPlain = true;
-    const candidates = ordered.map((r) => {
-      const shape = holeShapes?.get(r.score_id ?? '') ?? null;
-      const moment = selectMoment(shape?.holes ?? [], r.course_record_fact);
-      if (moment.kind !== 'plain') allPlain = false;
-      return { row: r, moment };
-    });
+    /* MOMENTS ONLY (AMENDMENT 1 §1). An ordinary round never becomes the hero,
+       and an all-plain fortnight renders NOTHING — no placeholder, no fallback to
+       the best plain round. */
+    const candidates = ordered
+      .map((r) => {
+        const shape = holeShapes?.get(r.score_id ?? '') ?? null;
+        const moment = selectMoment(shape?.holes ?? [], r.course_record_fact);
+        if (moment.kind !== 'plain') allPlain = false;
+        return { row: r, moment };
+      })
+      .filter(({ moment }) => moment.kind !== 'plain');
     const best = selectDiscoverHeroCandidate(candidates, slot);
+
 
     const subject: DiscoverHeroSubject | null =
       best
