@@ -6,7 +6,7 @@
  * 
  * Coverage:
  * - Live/starting-soon tournaments
- * - Recently completed (last 3 days — covers Sun→Tue/Wed viewing window)
+ * - Recently completed (last 21 days — wide enough for the hero's 14-day cap)
  * - Upcoming (next 14 days, limit 20)
  */
 
@@ -96,12 +96,12 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
       .order('start_date', { ascending: true })
       .order('purse', { ascending: false }),
 
-    // Completed in last 3 days
+    // Completed within COMPLETED_BUCKET_DAYS (days against end_date)
     supabase
       .from('sr_tournaments')
       .select(CACHE_SELECT)
       .in('status', ['closed', 'complete'])
-      .gte('end_date', resultsWindowAgo)
+      .gte('end_date', completedFromDate)
       .order('end_date', { ascending: false })
       .order('purse', { ascending: false }),
 
