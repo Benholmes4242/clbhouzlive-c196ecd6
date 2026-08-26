@@ -187,6 +187,8 @@ export function TourHubMainPage() {
     scrollPageToTop('auto');
   };
 
+  const tabTitle = TAB_TITLES[activeTab] ?? 'Tour';
+
   return (
     <TourSelectionProvider>
       <TourHubShell showBack={false} immersiveStatusBar={fullBleedHero}>
@@ -198,13 +200,49 @@ export function TourHubMainPage() {
           onSignOut={() => { void logout(); }}
           backMode={backMode}
           onBack={() => safeGoBack(navigate, '/tourhub')}
+          menuOpen={menuOpen}
+          setMenuOpen={setMenuOpen}
         />
-        {/* Glass plate: mounted for every non-overview tab. Overview keeps
-            its own cinematic hero overlay chrome. Height 70 matches tour
-            island HEADER_H (see ChromeIsland.tsx). */}
-        <GlassHeaderPlate visible={activeTab !== 'overview'} />
-        <div>{renderTab()}</div>
+        {activeTab === 'overview' ? (
+          <>
+            {/* Overview keeps its cinematic hero overlay chrome (the island). */}
+            <div>{renderTab()}</div>
+          </>
+        ) : (
+          /* Every other tab is an Activity-style opaque header page: one
+             sticky chrome that owns the safe area, back chevron to the
+             overview, and a burger for the tour menu. */
+          <TourPageShell
+            title={tabTitle}
+            onBack={() => handleSelectTab('overview')}
+            backFallback="/tourhub"
+            right={
+              <button
+                type="button"
+                aria-label="Tour menu"
+                onClick={() => setMenuOpen(true)}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  cursor: 'pointer',
+                }}
+              >
+                <Menu size={17} strokeWidth={2.2} color="#F8FAFC" />
+              </button>
+            }
+          >
+            {renderTab()}
+          </TourPageShell>
+        )}
       </TourHubShell>
     </TourSelectionProvider>
+
   );
 }
