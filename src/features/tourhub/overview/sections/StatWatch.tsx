@@ -24,7 +24,7 @@ import { useStatWatch, type StatCategory, type StatKey } from '../data/useStatWa
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { TOUR_LABEL } from '../../_shared/tourOrder';
 import type { TourId } from '../../hooks/useOverviewData';
-import { PillFilterRow } from '@/components/explore-tab-new/courseled/PillFilterRow';
+import { PillFilterRow, type PillFilterOption } from '@/components/explore-tab-new/courseled/PillFilterRow';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /** Bar geometry — the fill never touches the track end (1.12 headroom). */
@@ -41,6 +41,11 @@ export function StatWatch({ tour }: { tour: TourId }) {
   const active: StatCategory | undefined = useMemo(
     () => categories.find((c) => c.key === selected) ?? categories[0],
     [categories, selected],
+  );
+
+  const pickerOptions: ReadonlyArray<PillFilterOption<StatKey>> = useMemo(
+    () => categories.map((c) => ({ value: c.key, label: c.label })),
+    [categories],
   );
 
   if (isLoading && categories.length === 0) {
@@ -89,10 +94,10 @@ export function StatWatch({ tour }: { tour: TourId }) {
       </div>
 
       {/* Canonical pill row — same primitive as Discover / Courses / Champions. */}
-      <PillFilterRow<StatKey>
+      <PillFilterRow
         value={active.key}
-        options={categories.map((c) => ({ value: c.key, label: c.label }))}
-        onChange={setSelected}
+        options={pickerOptions}
+        onChange={(next: StatKey) => setSelected(next)}
         ariaLabel={t('overview.statWatch.pickerAriaLabel', 'Choose a statistic')}
         style={{ padding: '2px 16px 0' }}
       />
