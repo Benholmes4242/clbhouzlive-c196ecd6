@@ -175,23 +175,40 @@ export function RegionDropdown({
         <SelectTrigger
           /* max-w-full min-w-0 replace w-auto so the trigger can shrink below
              its content width; whitespace-nowrap STAYS — it turns the overflow
-             into an ellipsis, not a second line inside the well. */
-          className="inline-flex h-auto max-w-full min-w-0 justify-start whitespace-nowrap border-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
+             into an ellipsis, not a second line inside the well.
+             NO h-auto and NO fixed height (MICRO_BRIEF_REGION_WELL_HEIGHT_AND_
+             OPACITY §1): the trigger STRETCHES to its absolutely-positioned
+             parent, whose height IS the pill row's, so the well can never end up
+             shorter than a pill scrolling behind it. Collapsed at "Everywhere"
+             the label does not render and h-auto resolved to the 13px chevron. */
+          className="inline-flex h-full max-w-full min-w-0 justify-start whitespace-nowrap border-0 shadow-none focus:ring-0 [&>span]:!flex [&>svg]:hidden"
           style={{
-            background: selection ? 'rgba(255,255,255,0.14)' : A.PANEL,
+            /* THIS CONTROL FLOATS OVER A HORIZONTAL SCROLLER, so its background
+               must be OPAQUE IN EVERY STATE. The selected tint was
+               rgba(255,255,255,0.14), which reads correctly against the canvas
+               but masks nothing — a pill, including the WHITE selected one, shows
+               straight through it. #36373E is that tint composited over A.CANVAS
+               (#15171F). Never reintroduce this as an alpha. */
+            background: selection ? '#36373E' : A.PANEL,
             border: `1px solid ${A.BORDER}`,
             borderRadius: SCOPE_PILL_RADIUS,
             /* COLLAPSED AT "Everywhere" (BRIEF_DISCOVER_REGION_WELL_ON_PILL_ROW):
                pin + chevron only, tighter side padding. The wrapper KEEPS
                flex '0 1 auto' — collapsed the control has no elastic child left,
-               so the pills beside it absorb the row's pressure. */
-            padding: selection ? '8px 12px' : '8px 10px',
+               so the pills beside it absorb the row's pressure. Vertical padding
+               is gone: the well takes its height from the row now, and the inner
+               span centres the contents inside it. */
+            padding: selection ? '0 12px' : '0 10px',
             fontFamily: SANS,
             color: selection ? DISCOVER_FACT : DISCOVER_QUIET,
           }}
           aria-label={t('discover.week.selectRegionA11y', 'Filter rounds by area')}
         >
-          <span className="flex min-w-0 items-center" style={{ gap: 4 }}>
+          {/* h-full + items-center keeps pin, label and chevron on the well's
+              vertical centre now that the trigger stretches — centring belongs
+              here, not on a re-added height. */}
+          <span className="flex h-full min-w-0 items-center" style={{ gap: 4 }}>
+
             <MapPin
               size={12}
               strokeWidth={2.4}
