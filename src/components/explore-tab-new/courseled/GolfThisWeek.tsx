@@ -200,8 +200,9 @@ const BAND_FAINT = DISCOVER_QUIET;
    places — the feather's solid stop and the scroller's left padding — and they
    MOVE TOGETHER, which is why paddingLeft is derived here rather than written as
    a literal 62. WELL_COLLAPSED_W is the collapsed well's width (pin + chevron +
-   side padding); the mask itself is never sized from it, only this padding is. */
-export const WELL_COLLAPSED_W = 46;
+   side padding) — MEASURED at 390 CSS px, not the 46 an earlier brief assumed;
+   the mask itself is never sized from it, only this padding is. */
+export const WELL_COLLAPSED_W = 51;
 export const MASK_PROUD = 8;
 export const MASK_FEATHER = 16;
 export const PILL_BREATHING = 8;
@@ -1883,6 +1884,11 @@ export function GolfThisWeek({
             left: 0,
             bottom: 0,
             display: 'flex',
+            /* THE WRAPPER IS NOW WIDER THAN THE CONTROL (it also holds the mask),
+               so it must not swallow taps meant for the pills scrolling beneath:
+               it is pointer-transparent and the dropdown re-enables events for
+               itself. */
+            pointerEvents: 'none',
             /* STRETCH, NOT CENTRE: this wrapper spans top 0 to bottom 0, so its
                height is the pill row's height and BOTH the trigger and the mask
                inherit it. No fixed pixel height anywhere — a number would
@@ -1895,6 +1901,7 @@ export function GolfThisWeek({
             regions={regions}
             selection={region}
             onChange={(sel) => onRegionChange?.(sel)}
+            style={{ pointerEvents: 'auto' }}
           />
 
           {/* THE MASK IS A FLEX SIBLING OF THE WELL, NOT A FIXED-WIDTH OVERLAY
