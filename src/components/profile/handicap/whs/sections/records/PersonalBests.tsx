@@ -119,7 +119,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
           const overPar = (s.adjusted_gross as number) - par;
           return { s, vsHcp: overPar - currentHandicap };
         })
-        .filter((x): x is { s: WhsScore; vsHcp: number } => x !== null);
+        .filter((x): x is NonNullable<typeof x> => x !== null);
 
       if (scored.length) {
         const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));
