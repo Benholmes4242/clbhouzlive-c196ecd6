@@ -40,10 +40,8 @@ import { sortTees, yd } from './tees';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-/** §2 — the ladder's colours. The verdict, not a hue for its own sake. */
-const HARDER = '#FF6B60';
-const EASIER = '#34D399';
-const LINE_QUIET = 'rgba(255,255,255,0.13)';
+
+
 
 /** A share below PCT_MIN_N is an absolute, not a percentage. */
 function share(count: number, total: number): string {
