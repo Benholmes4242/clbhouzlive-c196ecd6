@@ -27,6 +27,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { TourHubShell } from '@/features/tourhub/components/TourHubShell';
+import { TourPageShell } from '@/features/tourhub/components/TourPageShell';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { collegeProfileRoute, playerRoute } from '@/features/tourhub/routes';
 import { formatEarnings } from '@/features/tourhub/_shared/formatEarnings';
@@ -210,6 +211,7 @@ export function ComparePage() {
   if (isError) {
     return (
       <TourHubShell immersiveStatusBar>
+        <TourPageShell immersive background={SLATE_50} title="Head to head" backFallback={collegeHubRoute()}>
         <div style={{ background: SLATE_50, minHeight: '100vh', fontFamily: FONT, paddingBottom: 88 }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
             <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
@@ -227,6 +229,7 @@ export function ComparePage() {
             </button>
           </div>
         </div>
+        </TourPageShell>
       </TourHubShell>
     );
   }
@@ -234,6 +237,13 @@ export function ComparePage() {
 
   return (
     <TourHubShell immersiveStatusBar>
+      <TourPageShell
+        immersive
+        background={SLATE_50}
+        title="Head to head"
+        subtitle={left && right ? `${left.shortName ?? left.collegeName} vs ${right.shortName ?? right.collegeName}` : undefined}
+        backFallback={collegeHubRoute()}
+      >
       <div
         style={{
           background: SLATE_50,
@@ -412,6 +422,7 @@ export function ComparePage() {
         standings={standings}
         otherSlug={pickerTarget === 'c1' ? c2 : c1}
       />
+      </TourPageShell>
     </TourHubShell>
   );
 }
