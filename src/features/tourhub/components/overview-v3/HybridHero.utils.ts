@@ -59,6 +59,18 @@ export const COMPLETED_BUCKET_DAYS = 21;
 export const RESULTS_CAP_DAYS = 14;
 
 /**
+ * Handover window for a tour that DOES have an upcoming event: the result
+ * stands for this many days, then the upcoming card takes the slot. A SECOND
+ * constant on purpose — widening the bucket to COMPLETED_BUCKET_DAYS must not
+ * make ordinary weeks show three-week-old results. Preserves the pre-brief
+ * behaviour of RESULTS_WINDOW_HOURS = 72 (now expressed in days against
+ * end_date).
+ */
+export const RESULTS_HANDOVER_DAYS = 3;
+
+
+
+/**
  * Whole days between a tournament's `end_date` (a Postgres `date`) and today.
  * MEASURED IN DAYS AGAINST end_date — the same unit the completed bucket uses
  * — so the bucket and the cap can never drift the way hours-vs-date did.
