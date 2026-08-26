@@ -214,9 +214,7 @@ export function PlayersTab() {
           position: 'sticky',
           top: 'var(--tour-header-h, 0px)',
           zIndex: 10,
-          background: 'rgba(21,23,31,0.72)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
+          background: '#15171F',
           borderBottom: '1px solid rgba(255,255,255,0.10)',
         }}
       >
