@@ -140,7 +140,17 @@ export function RegionDropdown({
     // 0 0 auto, which forbids shrinking outright: with it the well could never
     // give up width and the row had to wrap instead. Sized to content, allowed
     // to shrink, never allowed to grow.
-    <div style={{ flex: '0 1 auto', minWidth: 0, ...style }}>
+    <div
+      style={{
+        flex: '0 1 auto',
+        minWidth: 0,
+        /* The trigger is rounded, so its corner pixels are transparent. Without
+           this rectangular canvas backplate, a scope pill travelling underneath
+           reappears through those corners after it has already crossed the mask. */
+        background: '#15171F',
+        ...style,
+      }}
+    >
       <Select
         value={value}
         onValueChange={(v) => {
