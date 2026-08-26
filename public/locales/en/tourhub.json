@@ -219,8 +219,12 @@
       "eyebrow": "What's coming up",
       "linkLabel": "Full schedule",
       "chipPlayoffs": "Playoffs",
-      "daysLabel": "DAYS",
-      "venueDefendsSep": " · {{name}} defends"
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "inDays": "In {{count}} days",
+      "figPurse": "Purse",
+      "figField": "Field",
+      "figDefends": "Defends"
     },
     "onTheCourse": {
       "eyebrow": "On the course",
