@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
-import { useHeroCarouselData, type HeroSlide } from '../hooks/useHeroCarouselData';
+import { useHeroCarouselData, mapTourSlug as mapTourSlugForPicker, type HeroSlide } from '../hooks/useHeroCarouselData';
 import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 import {

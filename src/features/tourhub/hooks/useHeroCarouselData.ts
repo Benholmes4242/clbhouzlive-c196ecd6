@@ -74,7 +74,7 @@ export interface HeroSlide {
   type: 'live' | 'completed' | 'upcoming';
 }
 
-function mapTourSlug(tourName: string): TourId {
+export function mapTourSlug(tourName: string): TourId {
   const normalized = tourName?.toLowerCase().trim();
   if (normalized === 'pga' || normalized === 'pga tour') return 'pga';
   if (normalized === 'euro' || normalized === 'eur' || normalized === 'dp world' || normalized === 'dp world tour' || normalized === 'european tour') return 'euro';

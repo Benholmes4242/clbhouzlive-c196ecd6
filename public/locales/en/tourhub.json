@@ -4,7 +4,8 @@
     "upcoming": "UPCOMING",
     "final": "FINAL",
     "results": "RESULTS",
-    "noEvent": "NO EVENT"
+    "noEvent": "NO EVENT",
+    "seasonComplete": "SEASON COMPLETE"
   },
   "pill": {
     "updated": "Updated {{time}}",
