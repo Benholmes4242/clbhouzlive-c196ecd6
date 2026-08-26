@@ -19,13 +19,14 @@ import type { SeasonEvent } from './useSeasonTimeline';
 import { TOUR_LABEL } from '../_shared/tourOrder';
 import {
   FONT,
-  GOLD,
   GOLD_DEEP,
+  HAIRLINE_INK_10,
   INK,
   INK_FAINT,
   INK_MUTE,
   LIVE_DOT,
 } from '../_shared/tokens';
+
 import { FIGS } from '@/lib/tokens/type';
 
 /* PLAYOFFS VIOLET. These were Tailwind violet-600 (#7C3AED), which is not the
