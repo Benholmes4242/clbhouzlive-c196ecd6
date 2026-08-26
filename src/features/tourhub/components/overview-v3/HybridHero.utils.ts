@@ -219,14 +219,19 @@ export function deriveHeroState(
     };
   }
 
-  // Upcoming — `scheduled` and `created` (§4: `created` is what Sportradar
-  // carries on the TOUR Championship, the Presidents Cup, the FM Championship
-  // and The Ally Challenge; it is now handled by name rather than by accident
-  // of falling through). Any other unrecognised status also lands here, which
-  // is safe ONLY because closed/complete/completed return above.
+  // Upcoming — `scheduled` and `created`, HANDLED BY NAME (§4). `created` is
+  // what Sportradar carries on the TOUR Championship, the Presidents Cup, the
+  // FM Championship and The Ally Challenge; it previously reached this block by
+  // falling through, which was correct only by accident. Anything unrecognised
+  // still lands here — safe ONLY because closed/complete/completed return above
+  // — and is flagged in dev so a new status is noticed rather than absorbed.
+  if (status && !UPCOMING_STATUSES.includes(status) && import.meta.env.DEV) {
+    console.warn('[deriveHeroState] unhandled tournament status, rendering as upcoming:', status);
+  }
 
   const variant: UpcomingVariant =
     hoursUntilStart <= 48 && opts.teeTimesAvailable ? 'imminent' : 'far';
+
 
   return {
     kind: 'upcoming',
