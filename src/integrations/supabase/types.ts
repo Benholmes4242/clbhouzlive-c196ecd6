@@ -18845,6 +18845,7 @@ export type Database = {
           avg_gross: number
           club_courses: Json
           competition: Json
+          complete_rounds: number
           course_id: string
           course_name: string
           first_round: string
@@ -18858,9 +18859,12 @@ export type Database = {
           outcomes: Json
           outcomes_total: number
           rounds: number
+          si_advice: Json
+          si_advice_state: string
+          si_band_rows: Json
           tees: Json
-          verdict_scope: Json
           weekdays: Json
+          years: Json
         }[]
       }
       get_continue_watching: {
