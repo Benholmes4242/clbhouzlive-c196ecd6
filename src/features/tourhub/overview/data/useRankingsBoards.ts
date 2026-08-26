@@ -108,7 +108,7 @@ async function fetchSeasonBoard(tourCode: 'euro' | 'lpga'): Promise<RankingsRow[
   const year = new Date().getFullYear();
   const { data, error } = await supabase
     .from('tour_season_rankings' as any)
-    .select('position, position_change, points, player_name, country, player_id, manual_player_id')
+    .select('position, position_change, points, player_name, country, player_id, manual_player_id, wins')
     .eq('tour_code', tourCode)
     .eq('season_year', year)
     .order('position', { ascending: true })
@@ -155,6 +155,10 @@ async function fetchSeasonBoard(tourCode: 'euro' | 'lpga'): Promise<RankingsRow[
       points: r.points ?? null,
       // position_change stores the feed's own convention: positive = climbed.
       movement: change != null && !Number.isNaN(change) ? change : null,
+      wins: r.wins ?? null,
+      // tour_season_rankings has no top-10 column — genuinely absent, so the
+      // figure collapses on these boards rather than rendering "TOP 10 0".
+      top10s: null,
 
     };
   });
