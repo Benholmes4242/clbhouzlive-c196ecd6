@@ -152,18 +152,53 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [activePage, setActivePage] = useState(0);
 
+  /* PAGE HEIGHT FOLLOWS THE SWIPE. Pages differ in height (see header claim c),
+     and a flex row sizes to its tallest child — so the track height is measured
+     per page and driven from the same scrollLeft read as the active dot. No CSS
+     transition: the height already tracks the finger continuously. */
+  const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const heightsRef = useRef<number[]>([]);
+  const [trackH, setTrackH] = useState<number | null>(null);
+
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
     const onScroll = () => {
       const w = el.clientWidth;
       if (w <= 0) return;
-      const idx = Math.round(el.scrollLeft / w);
+      const raw = el.scrollLeft / w;
+      const lo = Math.max(0, Math.floor(raw));
+      const hi = Math.min(pages.length - 1, lo + 1);
+      const h = Math.max(heightsRef.current[lo] ?? 0, heightsRef.current[hi] ?? 0);
+      if (h > 0) setTrackH(h);
+      const idx = Math.round(raw);
       setActivePage((prev) => (prev === idx ? prev : idx));
     };
     el.addEventListener('scroll', onScroll, { passive: true });
     return () => el.removeEventListener('scroll', onScroll);
   }, [pages.length]);
+
+  // Re-measure on data / lens / font / locale change. A zero measurement leaves
+  // trackH null so the card sizes itself rather than collapsing.
+  useEffect(() => {
+    const els = pageRefs.current.slice(0, pages.length).filter(Boolean) as HTMLDivElement[];
+    if (els.length === 0) return;
+    const apply = () => {
+      heightsRef.current = pageRefs.current.map((el) => el?.offsetHeight ?? 0);
+      const el = trackRef.current;
+      const w = el?.clientWidth ?? 0;
+      const raw = el && w > 0 ? el.scrollLeft / w : 0;
+      const lo = Math.max(0, Math.floor(raw));
+      const hi = Math.min(pages.length - 1, lo + 1);
+      const h = Math.max(heightsRef.current[lo] ?? 0, heightsRef.current[hi] ?? 0);
+      if (h > 0) setTrackH(h);
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    els.forEach((el) => ro.observe(el));
+    return () => ro.disconnect();
+  }, [pages.length, pages]);
+
 
   const goSchedule = () =>
     navigate(tour ? `/tourhub?tab=schedule&tour=${tour}` : '/tourhub?tab=schedule');
