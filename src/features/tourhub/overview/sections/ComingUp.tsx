@@ -182,8 +182,11 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
                   borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
                 }}
               >
-                <Skeleton className="h-3.5 w-16 rounded" />
-                <Skeleton className="mt-1.5 h-4 w-3/5 rounded" />
+                {/* line 1 — name with the tour badge beside it (three-line row) */}
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-3/5 rounded" />
+                  <Skeleton className="h-3.5 w-10 rounded" />
+                </div>
                 <Skeleton className="mt-1.5 h-3 w-2/5 rounded" />
                 <Skeleton className="mt-2 h-7 w-4/5 rounded" />
               </div>
