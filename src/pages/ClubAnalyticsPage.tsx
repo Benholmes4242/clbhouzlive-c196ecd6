@@ -312,7 +312,7 @@ export default function ClubAnalyticsPage() {
 
   return (
     <ManagePageShell title={TITLE}>
-      <div style={{ padding: '4px 16px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ padding: '4px 16px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
         {courses.length > 1 && (
           <p style={{ ...BIZ_BODY, margin: 0, fontSize: 12.5 }}>
             Your club has {courses.length} courses. Each is measured on its own — a stroke index belongs to a course, so
