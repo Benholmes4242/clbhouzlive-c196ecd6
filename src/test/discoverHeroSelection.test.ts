@@ -76,15 +76,26 @@ describe('Discover hero rotation (BRIEF_DISCOVER_HERO_ROTATION)', () => {
     expect(selectDiscoverHeroCandidate(pool, -1)?.row.round_id).toBe('c');
   });
 
-  it('gives an ace the lead immediately and one slot later, but not two', () => {
+  it('gives an ace the lead through two slots, but not three', () => {
     const ace = { row: row('ace', '2026-08-22'), moment: moment('eagle', 'ace') };
-    const pool = [{ row: row('plain', '2026-08-23'), moment: moment('plain') }, ace];
+    const other = { row: row('eagle', '2026-08-23'), moment: moment('eagle') };
+    const pool = [other, ace];
     const start = slotOf('2026-08-22');
     expect(selectDiscoverHeroCandidate(pool, start)?.row.round_id).toBe('ace');
-    expect(selectDiscoverHeroCandidate(pool, start + 1)?.row.round_id).toBe('ace');
-    const after = selectDiscoverHeroCandidate(pool, start + 2);
-    expect(after?.row.round_id).not.toBe('ace');
+    expect(selectDiscoverHeroCandidate(pool, start + 2)?.row.round_id).toBe('ace');
+    expect(selectDiscoverHeroCandidate(pool, start + 3)?.row.round_id).not.toBe('ace');
   });
+
+  it('keeps a late tee time leading the next morning (AMENDMENT 1 §5-6)', () => {
+    /* Played 21:00 on the 22nd: play_date anchors slot(22nd 00:00Z), so 09:00 on
+       the 23rd is start + 2. With the old bound of 1 this ace had expired. */
+    const ace = { row: row('ace', '2026-08-22'), moment: moment('eagle', 'ace') };
+    const pool = [{ row: row('eagle', '2026-08-23'), moment: moment('eagle') }, ace];
+    const nextMorning = slotForTime(Date.parse('2026-08-23T09:00:00Z'));
+    expect(nextMorning - slotOf('2026-08-22')).toBe(2);
+    expect(selectDiscoverHeroCandidate(pool, nextMorning)?.row.round_id).toBe('ace');
+  });
+
 
   it('lets a course record lead but lose to an ace in the same window', () => {
     const record = { row: row('record', '2026-08-22'), moment: moment('courseRecord') };
