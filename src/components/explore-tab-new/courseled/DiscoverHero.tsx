@@ -299,21 +299,6 @@ export function DiscoverHero({
             }}
           />
           {parts.after && <span style={wordStyle}>{parts.after}</span>}
-          {plainToPar != null && (
-            <span
-              className="tabular-nums"
-              style={{
-                ...NUMF,
-                fontSize: 18,
-                fontWeight: 700,
-                lineHeight: 1,
-                letterSpacing: '-0.02em',
-                color: plainToPar < 0 ? ROW_DARK_TOPAR_UNDER : DISCOVER_QUIET,
-              }}
-            >
-              {fmtRel(plainToPar)}
-            </span>
-          )}
         </div>
 
         <div
