@@ -21,8 +21,51 @@ export interface RankingsRow {
   photoUrl: string | null;
   points: number | null;
   movement: number | null; // positive = climbed, negative = fell
+  /** Season wins. NULL = the feed has no figure (collapse it); 0 = a fact (render "WINS 0"). */
+  wins: number | null;
+  /** Season top-10s. Only the PGA season stats carry this; season boards leave it null. */
+  top10s: number | null;
 }
 
+/** Season-year convention shared with players-v2: the season flips in October. */
+function currentSeasonYear(): number {
+  const now = new Date();
+  return now.getMonth() >= 9 ? now.getFullYear() + 1 : now.getFullYear();
+}
+
+/**
+ * Wins / top-10s are NOT on sr_world_rankings — that table carries points and
+ * movement only. The players page reads them from sr_player_statistics, so the
+ * OWGR board joins the same table here (newest stored season wins) rather than
+ * inventing a figure.
+ */
+async function fetchOwgrStats(
+  playerIds: string[],
+): Promise<Map<string, { wins: number | null; top10s: number | null }>> {
+  const out = new Map<string, { wins: number | null; top10s: number | null }>();
+  if (playerIds.length === 0) return out;
+  const year = currentSeasonYear();
+  const { data: seasons } = await supabase
+    .from('sr_seasons')
+    .select('id, year')
+    .eq('tour_name', 'pga')
+    .in('year', [year, year - 1]);
+  const seasonYear = new Map<string, number>(((seasons ?? []) as any[]).map((s) => [s.id, s.year]));
+  if (seasonYear.size === 0) return out;
+  const { data: stats } = await supabase
+    .from('sr_player_statistics')
+    .select('player_id, wins, top_10s, season_id')
+    .in('player_id', playerIds)
+    .in('season_id', [...seasonYear.keys()]);
+  const bestYear = new Map<string, number>();
+  ((stats ?? []) as any[]).forEach((s) => {
+    const y = seasonYear.get(s.season_id) ?? 0;
+    if ((bestYear.get(s.player_id) ?? -1) >= y) return;
+    bestYear.set(s.player_id, y);
+    out.set(s.player_id, { wins: s.wins ?? null, top10s: s.top_10s ?? null });
+  });
+  return out;
+}
 
 async function fetchOwgr(): Promise<RankingsRow[]> {
   const { data, error } = await supabase
@@ -38,11 +81,14 @@ async function fetchOwgr(): Promise<RankingsRow[]> {
     .limit(40);
   if (error) throw error;
   const latest = data?.[0]?.ranking_date ?? null;
-  const rows = (data ?? []).filter((r: any) => r.ranking_date === latest);
-  return rows
+  const rows = (data ?? [])
+    .filter((r: any) => r.ranking_date === latest)
     .filter((r: any) => r.player && r.rank > 0)
-    .slice(0, 5)
-    .map((r: any) => ({
+    .slice(0, 5);
+  const statsMap = await fetchOwgrStats(rows.map((r: any) => r.player.id));
+  return rows.map((r: any) => {
+    const s = statsMap.get(r.player.id);
+    return {
       rank: r.rank,
       priorRank: r.prior_rank ?? null,
       playerId: r.player.id,
@@ -51,8 +97,12 @@ async function fetchOwgr(): Promise<RankingsRow[]> {
       photoUrl: r.player.photo_url ?? null,
       points: r.points ?? null,
       movement: movementFrom(r.rank, r.prior_rank ?? null),
-    }));
+      wins: s?.wins ?? null,
+      top10s: s?.top10s ?? null,
+    };
+  });
 }
+
 
 async function fetchSeasonBoard(tourCode: 'euro' | 'lpga'): Promise<RankingsRow[]> {
   const year = new Date().getFullYear();
