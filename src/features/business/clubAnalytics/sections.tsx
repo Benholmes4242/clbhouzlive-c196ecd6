@@ -143,222 +143,38 @@ export const VerdictStrip: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) 
 /* ─────────────────── WHERE YOUR INDEX DISAGREES ─────────────────── */
 
 /**
- * §2 — THE LADDER. Three columns that NEVER reorder: HOLE, SI, PLAYS.
+ * BRIEF_SI_LADDER_SHARED §0 — THIS SECTION IS NOW A THIN WRAPPER.
  *
- * THE FLAG IS COMPUTED FROM places_gap AND shots_gap, NEVER FROM THE LINE'S
- * SLOPE. In the Holes view the left axis is hole number, which is not a
- * ranking — a slope-based colour there would flag holes for sitting late on the
- * scorecard. Flip the toggle and the same three lines stay coloured.
+ * The ladder, and the rule behind it, moved to `_shared/siLadder.ts` and
+ * `_shared/SiLadder.tsx` so the course detail Course tab renders THE SAME chart
+ * from THE SAME verdict. The same course must never show different flags on the
+ * two pages, which is exactly what two copies of a threshold produce.
  *
- * BOTH thresholds are required. Places alone flags rank noise: Sundridge's
- * holes 3, 6 and 13 sit at +0.377, +0.370 and +0.366 and occupy three separate
- * ranks. The shots gate drops those and keeps the three real ones.
+ * WHAT CHANGED IN THE RULE, and it is worth knowing here: the shots gate is no
+ * longer a fixed 0.10. It is MAX(0.05, sd/3) of this course's own spread of
+ * avg_to_par, so a flat course is judged no more harshly than a dramatic one.
+ * At Sundridge Park East that yields 0.067 and the flagged set is unchanged.
+ *
+ * places_gap AND shots_gap FROM THE RPC ARE NO LONGER READ. The helper computes
+ * both from stroke_index and avg_to_par, which every hole row already carries.
+ * The columns remain on `get_club_course_analytics` — dropping them is another
+ * SQL pass — but nothing in the client touches them. Do not wire them back in.
+ *
+ * ELIGIBILITY: 100 measured rounds on the course. Under that the helper returns
+ * null and this renders NOTHING — no empty state, no greyed chart. The section
+ * appears by itself once the course crosses the line. That is why the old "your
+ * card declares no stroke index" panel is gone too: a club with no declared
+ * index has no ladder to show, and an explanation of an absent chart is noise.
  */
-const PLACES_GATE = 4;
-const SHOTS_GATE = 0.10;
+export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => (
+  <SiLadder
+    ladder={buildSiLadder(data.holes ?? [], data.complete_rounds)}
+    voice="club"
+    basis={`${(data.complete_rounds ?? 0).toLocaleString()} full rounds`}
+    style={CARD}
+  />
+);
 
-type Flag = 'harder' | 'easier' | null;
-
-function flagFor(h: ClubAnalyticsHole): Flag {
-  const p = h.places_gap;
-  const s = h.shots_gap;
-  if (p == null || s == null) return null;
-  if (Math.abs(p) < PLACES_GATE || Math.abs(s) < SHOTS_GATE) return null;
-  return p < 0 ? 'harder' : 'easier';
-}
-
-const flagColour = (f: Flag) => (f === 'harder' ? HARDER : f === 'easier' ? EASIER : LINE_QUIET);
-
-const LADDER_GRID = '22px 14px 20px 1fr 26px';
-const ROW_H = 16;
-
-export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  const [sort, setSort] = React.useState<'si' | 'hole'>('si');
-  const holes = (data.holes ?? []).filter((h) => h.stroke_index != null);
-
-  if (holes.length === 0) {
-    return (
-      <Panel kicker="Where your index disagrees" style={CARD}>
-        <Body>
-          Your card declares no stroke index on the rounds we hold, so there is nothing to measure your index against.
-        </Body>
-      </Panel>
-    );
-  }
-
-  const rows = [...holes].sort((a, b) =>
-    sort === 'si' ? (a.stroke_index ?? 99) - (b.stroke_index ?? 99) : a.hole_no - b.hole_no,
-  );
-  const n = rows.length;
-  const height = n * ROW_H;
-  const yFor = (i: number) => i * ROW_H + ROW_H / 2;
-
-  const flagged = [...holes]
-    .filter((h) => flagFor(h) !== null)
-    .sort((a, b) => a.measured_rank - b.measured_rank);
-
-  const holeInk = (h: ClubAnalyticsHole) => {
-    const f = flagFor(h);
-    if (f) return flagColour(f);
-    return sort === 'hole' ? A.INK : A.DIM;
-  };
-  const siInk = (h: ClubAnalyticsHole) => {
-    const f = flagFor(h);
-    if (f) return flagColour(f);
-    return sort === 'si' ? A.INK : A.DIM;
-  };
-
-  return (
-    <Panel
-      kicker="Where your index disagrees"
-      aside={`${data.complete_rounds.toLocaleString()} full rounds`}
-      subline="Your declared stroke index on the left, the position each hole actually plays in on the right."
-      style={CARD}
-    >
-      {/* THE TOGGLE RE-SORTS THE ROWS ONLY. The columns do not swap, do not
-          reorder and do not change label. */}
-      <div style={{ display: 'flex', gap: 16, marginBottom: 12 }}>
-        {[
-          { label: 'Official SI', key: 'si' as const },
-          { label: 'Holes', key: 'hole' as const },
-        ].map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setSort(t.key)}
-            aria-pressed={sort === t.key}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              padding: 0,
-              cursor: 'pointer',
-              fontFamily: SANS,
-              fontSize: 12,
-              fontWeight: sort === t.key ? 700 : 600,
-              color: sort === t.key ? A.INK : A.DIM,
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* HEADERS AND ROWS SHARE ONE GRID, so Hole and SI cannot collide. */}
-      <div style={{ display: 'grid', gridTemplateColumns: LADDER_GRID, gap: 0, marginBottom: 6 }}>
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'center', color: sort === 'hole' ? A.MUTE : A.DIM }}>Hole</span>
-        <span />
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'center', color: sort === 'si' ? A.MUTE : A.DIM }}>SI</span>
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'center' }}>Plays</span>
-        <span />
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: LADDER_GRID, gap: 0, alignItems: 'start' }}>
-        {/* HOLE */}
-        <div>
-          {rows.map((h) => (
-            <div
-              key={h.hole_no}
-              style={{ height: ROW_H, lineHeight: `${ROW_H}px`, textAlign: 'center', fontSize: 11, fontWeight: 700, color: holeInk(h), ...FIGS }}
-            >
-              {h.hole_no}
-            </div>
-          ))}
-        </div>
-        <div />
-        {/* SI */}
-        <div>
-          {rows.map((h) => (
-            <div
-              key={h.hole_no}
-              style={{ height: ROW_H, lineHeight: `${ROW_H}px`, textAlign: 'center', fontSize: 11, fontWeight: 700, color: siInk(h), ...FIGS }}
-            >
-              {h.stroke_index}
-            </div>
-          ))}
-        </div>
-
-        {/* ONE LINE PER HOLE, left position to right position. */}
-        <svg width="100%" height={height} viewBox={`0 0 100 ${height}`} preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
-          {rows.map((h, i) => {
-            const f = flagFor(h);
-            return (
-              <line
-                key={h.hole_no}
-                x1={2}
-                y1={yFor(i)}
-                x2={98}
-                y2={yFor(h.measured_rank - 1)}
-                stroke={flagColour(f)}
-                strokeWidth={f ? 2.2 : 1.1}
-                vectorEffect="non-scaling-stroke"
-                strokeLinecap="round"
-              />
-            );
-          })}
-        </svg>
-
-        {/* A BARE SCALE, 1 to 18, 1 hardest at top. No hole numbers — the line
-            tells you which hole lands where. */}
-        <div>
-          {Array.from({ length: n }, (_, i) => (
-            <div
-              key={i}
-              style={{ height: ROW_H, lineHeight: `${ROW_H}px`, textAlign: 'right', fontSize: 10, fontWeight: 600, color: A.DIM, ...FIGS }}
-            >
-              {i + 1}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* THE LEGEND SAYS WHAT THE COLOURS MEAN, not which is which. Same weight
-          on both: neither error is the acceptable one. */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 14 }}>
-        {[
-          { colour: HARDER, text: 'Plays harder than you index it' },
-          { colour: EASIER, text: 'Plays easier than you index it' },
-        ].map((l) => (
-          <span key={l.text} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <i style={{ width: 12, height: 2.2, borderRadius: 2, background: l.colour }} />
-            <span style={{ fontSize: 11, fontWeight: 600, color: A.BODY }}>{l.text}</span>
-          </span>
-        ))}
-      </div>
-
-      {/* THE VERDICT SURVIVES EVEN IF NOBODY READS THE CHART. */}
-      {flagged.length > 0 ? (
-        <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {flagged.map((h) => {
-            const f = flagFor(h);
-            const gap = h.shots_gap ?? 0;
-            return (
-              <div
-                key={h.hole_no}
-                style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, fontFamily: SANS, ...FIGS }}
-              >
-                <span style={{ fontSize: 12.5, fontWeight: 600, color: A.BODY }}>
-                  Hole {h.hole_no} — you say {h.stroke_index}, plays {h.measured_rank}
-                </span>
-                <span style={{ ...bizFigure(12.5, flagColour(f)), flexShrink: 0 }}>
-                  {gap > 0 ? '+' : '\u2212'}
-                  {Math.abs(gap).toFixed(2)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <Body style={{ marginTop: 14 }}>
-          No hole sits far enough out of position, in places and in shots, for us to call your index wrong on it.
-        </Body>
-      )}
-
-      <Body style={{ marginTop: 12, fontSize: 11.5, color: A.DIM }}>
-        A hole is marked only when it sits at least four places out AND at least a tenth of a shot away from what its
-        declared index should return. Places alone flags rank noise.
-      </Body>
-    </Panel>
-  );
 };
 
 /* ─────────────────── THE SAMPLE, STATED PLAINLY ─────────────────── */
