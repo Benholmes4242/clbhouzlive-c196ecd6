@@ -1919,17 +1919,20 @@ export function GolfThisWeek({
               zero alpha, never `transparent`. No backdrop-filter: this paints the
               canvas colour; a blur would still show the pill's shape and would
               cost a compositing layer on a scrolling row. */}
+          {/* FULLY OPAQUE, NO FEATHER: a gradient tail let the leading edge of a
+              scrolling pill show through as a ghost. The mask paints the exact
+              canvas colour, so its own right edge is invisible against the
+              canvas while a pill passing under it is hidden outright. */}
           <div
             aria-hidden
             style={{
               flex: 'none',
               width: MASK_PROUD + MASK_FEATHER,
               pointerEvents: 'none',
-              background: `linear-gradient(90deg, #15171F 0%, #15171F ${(
-                (MASK_PROUD / (MASK_PROUD + MASK_FEATHER)) * 100
-              ).toFixed(2)}%, rgba(21,23,31,0) 100%)`,
+              background: '#15171F',
             }}
           />
+
         </div>
       </div>
 
