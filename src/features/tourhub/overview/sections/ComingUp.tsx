@@ -248,6 +248,8 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
             className="coming-up-track"
             style={{
               display: 'flex',
+              alignItems: 'flex-start',
+              height: trackH != null ? trackH : undefined,
               overflowX: 'auto',
               scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch',
@@ -255,7 +257,14 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
             }}
           >
             {pages.map((page, pi) => (
-              <div key={pi} style={{ flex: '0 0 100%', width: '100%', scrollSnapAlign: 'start' }}>
+              <div
+                key={pi}
+                ref={(el) => {
+                  pageRefs.current[pi] = el;
+                }}
+                style={{ flex: '0 0 100%', width: '100%', scrollSnapAlign: 'start' }}
+              >
+
                 {page.map((group, gi) => (
                   <div key={group.key}>
                     {/* GROUP HEADER — the date once, the countdown once. */}
