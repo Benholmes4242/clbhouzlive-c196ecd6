@@ -90,16 +90,18 @@ export function CourseOfTheWeekSection() {
               overflow: 'hidden',
             }}
           >
-            <Skeleton className="w-full" style={{ height: 200, borderRadius: 0 }} />
-            <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <Skeleton className="h-3 w-24 rounded" />
-              <Skeleton className="h-5 w-2/3 rounded" />
-              <Skeleton className="h-3 w-1/3 rounded" />
-              <div style={{ height: '0.5px', background: V4.hairline, margin: '4px 0' }} />
+            <Skeleton className="w-full" style={{ height: 170, borderRadius: 0 }} />
+            {/* Hold mirrors the rebuilt card: one figure line, three quote
+                lines, one quiet action. No footer, no button block. */}
+            <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <Skeleton className="h-4 w-2/3 rounded" />
+              <div style={{ height: '0.5px', background: V4.hairline }} />
               <Skeleton className="h-3 w-full rounded" />
-              <Skeleton className="h-3 w-4/5 rounded" />
-              <Skeleton className="h-9 w-full rounded" style={{ marginTop: 6 }} />
+              <Skeleton className="h-3 w-full rounded" />
+              <Skeleton className="h-3 w-3/5 rounded" />
+              <Skeleton className="h-3 w-24 rounded" />
             </div>
+
           </div>
         </div>
       </SectionShell>
