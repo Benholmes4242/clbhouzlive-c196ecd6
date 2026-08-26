@@ -13,7 +13,10 @@ export function WorldRankingsSlot() {
   const [tour, setTour] = useState<TourId>('pga');
   return (
     <>
-      <SectionTourLens value={tour} onChange={setTour} showAllTours={false} />
+      {/* Champions is the ONE tour with no row in tour_season_rankings. liv and
+          pgad DO have boards — keep this array in step with TOUR_TO_BOARD in
+          WorldRankings.tsx. */}
+      <SectionTourLens value={tour} onChange={setTour} showAllTours={false} excludeTours={['champ']} />
       <WorldRankings tour={tour} />
     </>
   );

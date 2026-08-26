@@ -119,7 +119,8 @@
         "owgr": "Official World Golf Ranking",
         "r2d": "Race to Dubai",
         "rolex": "Rolex Rankings"
-      }
+      },
+      "seasonNo1Label": "Season No. 1"
     },
     "teamWinnerStrip": {
       "eyebrow": "TEAM WINNER",
@@ -711,7 +712,8 @@
     "pointsBrand": {
       "euro": "Race to Dubai",
       "lpga": "CME Points",
-      "liv": "LIV Points"
+      "liv": "LIV Points",
+      "pgad": "Korn Ferry Points"
     },
     "almanac": {
       "world": {

@@ -1,8 +1,10 @@
 /**
  * useRankingsBoards — Overview V4 world rankings section.
- * board: 'owgr' -> sr_world_rankings (latest ranking_date, top 5, rank vs prior_rank)
- *        'r2d'  -> tour_season_rankings (tour_code = 'euro', current season_year, top 5)
- *        'rolex'-> tour_season_rankings (tour_code = 'lpga', current season_year, top 5)
+ * board: 'owgr'   -> sr_world_rankings (latest ranking_date, top 5, rank vs prior_rank)
+ *        'r2d'    -> tour_season_rankings (tour_code = 'euro', current season_year, top 5)
+ *        'cme'    -> tour_season_rankings (tour_code = 'lpga')
+ *        'livpts' -> tour_season_rankings (tour_code = 'liv')
+ *        'kft'    -> tour_season_rankings (tour_code = 'pgad')
  * These chips are independent from the hero tour picker.
  */
 
@@ -10,7 +12,12 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { movementFrom } from '../../_shared/movement';
 
-export type RankingsBoard = 'owgr' | 'r2d' | 'rolex';
+/**
+ * Each id names the SOURCE, not a marketing name. 'cme' was called 'rolex' until
+ * it was found to read the CME points list — the Rolex Women's World Rankings
+ * are a separate system this code does not read.
+ */
+export type RankingsBoard = 'owgr' | 'r2d' | 'cme' | 'livpts' | 'kft';
 
 export interface RankingsRow {
   rank: number;
@@ -104,7 +111,7 @@ async function fetchOwgr(): Promise<RankingsRow[]> {
 }
 
 
-async function fetchSeasonBoard(tourCode: 'euro' | 'lpga'): Promise<RankingsRow[]> {
+async function fetchSeasonBoard(tourCode: 'euro' | 'lpga' | 'liv' | 'pgad'): Promise<RankingsRow[]> {
   const year = new Date().getFullYear();
   const { data, error } = await supabase
     .from('tour_season_rankings' as any)
@@ -170,7 +177,9 @@ export function useRankingsBoards(board: RankingsBoard) {
     queryFn: async (): Promise<RankingsRow[]> => {
       if (board === 'owgr') return fetchOwgr();
       if (board === 'r2d') return fetchSeasonBoard('euro');
-      return fetchSeasonBoard('lpga');
+      if (board === 'cme') return fetchSeasonBoard('lpga');
+      if (board === 'livpts') return fetchSeasonBoard('liv');
+      return fetchSeasonBoard('pgad');
     },
     staleTime: 60 * 60 * 1000,
   });

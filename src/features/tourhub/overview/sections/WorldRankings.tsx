@@ -1,7 +1,8 @@
 /**
- * WorldRankings — cardless Open Spotlight (Option B). Tour-picker driven:
- * pga -> OWGR, euro -> Race to Dubai, lpga -> Rolex Rankings. Other tours
- * (liv, pgad, champ) have no ranking board and render null.
+ * WorldRankings — cardless Open Spotlight (Option B). Tour-picker driven: pga
+ * reads the OWGR (sr_world_rankings); euro, lpga, liv and pgad each read
+ * tour_season_rankings for their own tour_code. champ alone has no board in the
+ * data and renders null.
  *
  * Anatomy: eyebrow header, No.1 spotlight row, hairline, then rows 2-5. Every
  * avatar+name cluster deep-links to the player page (H8 convention). OWGR rows
@@ -34,7 +35,23 @@ import { Skeleton } from '@/components/ui/skeleton';
 const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; tourCode: string }>> = {
   pga: { board: 'owgr', tourCode: 'pga' },
   euro: { board: 'r2d', tourCode: 'euro' },
-  lpga: { board: 'rolex', tourCode: 'lpga' },
+  lpga: { board: 'cme', tourCode: 'lpga' },
+  liv: { board: 'livpts', tourCode: 'liv' },
+  pgad: { board: 'kft', tourCode: 'pgad' },
+};
+
+/**
+ * The eyebrow NAMES THE BOARD. "World rankings" is true of the OWGR alone, so
+ * the season boards reuse the EXISTING leaders brand keys rather than
+ * duplicating brand names. Used at BOTH SectionShell call sites so the skeleton
+ * and the loaded state cannot drift.
+ */
+const BOARD_EYEBROW_KEY: Record<RankingsBoard, string> = {
+  owgr: 'overview.rankings.sectionEyebrow',
+  r2d: 'leaders.pointsBrand.euro',
+  cme: 'leaders.pointsBrand.lpga',
+  livpts: 'leaders.pointsBrand.liv',
+  kft: 'leaders.pointsBrand.pgad',
 };
 
 /**
@@ -105,13 +122,15 @@ export function WorldRankings({ tour }: { tour: TourId }) {
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
   const mapping = TOUR_TO_BOARD[tour];
-  const { data, isLoading } = useRankingsBoards(mapping?.board ?? 'owgr');
+  const board = mapping?.board ?? 'owgr';
+  const { data, isLoading } = useRankingsBoards(board);
+  const eyebrow = t(BOARD_EYEBROW_KEY[board]);
 
   if (!mapping) return null;
   const rows = data ?? [];
   if (isLoading && rows.length === 0) {
     return (
-      <SectionShell eyebrow={t('overview.rankings.sectionEyebrow')} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
+      <SectionShell eyebrow={eyebrow} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
         <div style={{ padding: '4px 16px 12px', display: 'flex', alignItems: 'center', gap: 14 }}>
           <Skeleton className="h-[62px] w-[62px]" style={{ borderRadius: 18 }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -158,11 +177,12 @@ export function WorldRankings({ tour }: { tour: TourId }) {
   };
 
   return (
-    <SectionShell eyebrow={t('overview.rankings.sectionEyebrow')} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
+    <SectionShell eyebrow={eyebrow} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
       {/* No.1 spotlight — cardless, scale does the work. */}
       <div style={{ padding: '4px 16px 12px' }}>
         <SpotlightRow
           row={top}
+          board={board}
           tourCode={mapping.tourCode}
           onNavigate={goToPlayer}
         />
@@ -260,10 +280,12 @@ export function WorldRankings({ tour }: { tour: TourId }) {
 
 function SpotlightRow({
   row,
+  board,
   tourCode,
   onNavigate,
 }: {
   row: RankingsRow;
+  board: RankingsBoard;
   tourCode: string;
   onNavigate: (playerId: string | null) => void;
 }) {
@@ -289,7 +311,11 @@ function SpotlightRow({
         />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: V4.ink, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-            {t('overview.rankings.worldNo1Label')}
+            {/* Only the OWGR leader is the WORLD No. 1. A season board's leader
+                is the SEASON No. 1 — the eyebrow above already names the board. */}
+            {board === 'owgr'
+              ? t('overview.rankings.worldNo1Label')
+              : t('overview.rankings.seasonNo1Label')}
           </div>
           <div style={{ marginTop: 2, display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
             <CountryFlag country={row.country} size="sm" className="!w-4 !h-3" />
