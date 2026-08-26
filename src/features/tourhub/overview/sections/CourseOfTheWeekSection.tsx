@@ -15,27 +15,59 @@ import { useMyCourseBest } from '../../hooks/useMyCourseBest';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { CHIP_GLASS_CLASS, SCRIM_STANDOUT } from '@/styles/photoScrim';
 
-/** Stat cell for the Course of the Week panel. Amber is reserved for the member. */
-function CotwStat({
-  label,
-  value,
-  sub,
-  tone,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  tone?: string;
-}) {
+/**
+ * FigurePair — one label/value pair on the single figure line.
+ * Label AXIS-adjacent at the READ floor (11), value 15/700 tabular, 5px gap.
+ * Amber is reserved for the VIEWING MEMBER's figure (Your best).
+ */
+function FigurePair({ label, value, tone }: { label: string; value: string; tone?: string }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 0 }}>
-      <span style={{ fontSize: 20, fontWeight: 700, color: tone ?? A.INK, letterSpacing: '-0.01em', ...FIGS }}>
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, whiteSpace: 'nowrap' }}>
+      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>
+        {label}
+      </span>
+      <span style={{ fontSize: 15, fontWeight: 700, color: tone ?? A.INK, letterSpacing: '-0.01em', ...FIGS }}>
         {value}
       </span>
-      <span style={{ ...LABEL, color: A.DIM }}>{label}</span>
-      {sub ? <span style={{ ...LABEL, color: A.MUTE }}>{sub}</span> : null}
-    </div>
+    </span>
   );
+}
+
+/**
+ * clampToSentence — the quote is the best content in the section, so it must
+ * FINISH A THOUGHT rather than stop mid-phrase.
+ *
+ * The RPC returns the FULL review text (get_course_of_the_week selects
+ * cr.review with no substring), so all trimming is ours to do client-side.
+ * A bare -webkit-line-clamp cuts wherever line three happens to end, which is
+ * how "…I wouldn't quite put it …" shipped. Instead we keep whole sentences up
+ * to a three-line budget, and only then fall back to a word boundary. The CSS
+ * clamp stays underneath as a geometric safety net (a wide glyph run can still
+ * overflow), but in the normal case it has nothing left to cut.
+ *
+ * The ellipsis is appended ONLY when text was actually dropped.
+ */
+const QUOTE_BUDGET = 150; // ~3 lines at 14.5px italic in the card's text column
+
+export function clampToSentence(text: string, budget = QUOTE_BUDGET): { text: string; truncated: boolean } {
+  const clean = text.trim().replace(/\s+/g, ' ');
+  if (clean.length <= budget) return { text: clean, truncated: false };
+
+  // Whole sentences first.
+  const sentences = clean.match(/[^.!?]+[.!?]+(\s|$)/g) ?? [];
+  let out = '';
+  for (const sentence of sentences) {
+    const next = (out + sentence).trimEnd();
+    if (next.length > budget) break;
+    out = next + ' ';
+  }
+  out = out.trim();
+  if (out.length > 0) return { text: out, truncated: out.length < clean.length };
+
+  // No sentence fits — fall back to the last word boundary inside the budget.
+  const slice = clean.slice(0, budget);
+  const cut = slice.lastIndexOf(' ');
+  return { text: (cut > 40 ? slice.slice(0, cut) : slice).trimEnd(), truncated: true };
 }
 
 export function CourseOfTheWeekSection() {
