@@ -413,25 +413,39 @@ export const ScoringSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }
   );
 };
 
-/* ─────────────────── 4  WHAT YOUR TEES SCORED ─────────────────── */
+/* ─────────────────── 4  YOUR TEES, AND WHO PLAYS THEM ─────────────────── */
 
 /**
- * §7 — TEES CARRY A CAUTION AND NO RANKING. At Sundridge East the 6,600 set
- * scores BETTER than the 6,500 set, 7.81 against 10.27. That is SELECTION, not
- * difficulty: better players choose the back tees. So this section describes
- * what each yardage scored and never orders the sets by difficulty, and never
- * implies the longer tee is the easier test.
+ * BRIEF_CLUB_TEES_WHO_PLAYS_WHERE — THE MIX SITS BESIDE THE SCORE.
+ *
+ * The score alone is the misleading half. At Sundridge East the 6,600 set
+ * returns +8.81 and the 6,500 set +11.27; read alone that says the longer tee
+ * is easier. It is not: 124 of the 6,600 set's 134 rounds come from
+ * single-figure players and ONE came from a 15-plus. So every row carries its
+ * handicap mix, and nothing here ranks the sets by difficulty.
+ *
+ * The mix denominator is `with_index`, NEVER `rounds` — rounds carrying no
+ * index at all would make the split fail to add up. Below ten indexed rounds a
+ * three-way split is noise, so no mix is drawn for that set.
  *
  * The sets are LABELLED BY YARDAGE. We know the distance; we do not know whether
  * the club calls it white, yellow or blue, and a colour would be a fabrication.
  */
+const MIX_FLOOR = 10;
+
+const MIX_BANDS = [
+  { key: 'low' as const, label: 'Under 9', colour: difficultyRampStop(1) },
+  { key: 'mid' as const, label: '9–14.9', colour: difficultyRampStop(3) },
+  { key: 'high' as const, label: '15+', colour: difficultyRampStop(5) },
+];
+
 export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
   const tees = sortTees(data.tees ?? []);
   const totalRounds = tees.reduce((s, t) => s + t.rounds, 0);
 
   if (tees.length === 0) {
     return (
-      <Panel kicker="What your tees scored">
+      <Panel kicker="Your tees, and who plays them">
         <Body>
           We hold no yardages on these rounds, so we cannot tell which tees were played. Nothing here is estimated.
         </Body>
@@ -441,7 +455,7 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
 
   return (
     <Panel
-      kicker="What your tees scored"
+      kicker="Your tees, and who plays them"
       aside={`${totalRounds.toLocaleString()} rounds`}
       subline={
         tees.length === 1
@@ -450,46 +464,79 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
       }
     >
       <Inset>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 56px 56px', gap: 10, paddingBottom: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 52px 52px 52px', gap: 10, paddingBottom: 8 }}>
           <span style={BIZ_LABEL}>Yardage</span>
           <span style={{ ...BIZ_LABEL, textAlign: 'right' }}>Rounds</span>
           <span style={{ ...BIZ_LABEL, textAlign: 'right' }}>To par</span>
+          <span style={{ ...BIZ_LABEL, textAlign: 'right' }}>Mean idx</span>
         </div>
         {tees.map((t) => {
           const parts = toParParts(t.avg_to_par);
-          // The bar is the SHARE OF ROUNDS on the set — a usage figure, not a
-          // difficulty one, because ranking these sets would be wrong.
-          const width = totalRounds > 0 ? Math.max(3, (t.rounds / totalRounds) * 100) : 0;
+          const withIndex = t.with_index ?? 0;
+          const hasMix = withIndex >= MIX_FLOOR;
           return (
-            <div key={t.yards} style={{ padding: '7px 0', fontFamily: SANS, ...FIGS }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 56px 56px', gap: 10, alignItems: 'baseline' }}>
+            <div key={t.yards} style={{ padding: '8px 0', fontFamily: SANS, ...FIGS }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 52px 52px 52px', gap: 10, alignItems: 'baseline' }}>
                 <span style={{ fontSize: 12.5, fontWeight: 600, color: A.BODY }}>{teeLabel(t, tees)}</span>
                 <span style={{ ...bizFigure(14, A.INK), textAlign: 'right' }}>{t.rounds.toLocaleString()}</span>
                 <span style={{ ...bizFigure(13, parts?.tone ?? A.INK), textAlign: 'right' }}>
                   {parts?.text ?? '0'}
                 </span>
+                <span style={{ ...bizFigure(13, A.BODY), textAlign: 'right' }}>
+                  {t.mean_index == null ? '—' : t.mean_index.toFixed(1)}
+                </span>
               </div>
-              <div style={{ height: 5, borderRadius: 3, background: A.TRACK, marginTop: 6, overflow: 'hidden' }}>
-                {t.rounds > 0 && (
-                  <i style={{ display: 'block', height: '100%', width: `${width}%`, background: difficultyRampStop(3) }} />
-                )}
-              </div>
+
+              {hasMix ? (
+                <>
+                  <div style={{ display: 'flex', height: 5, borderRadius: 3, background: A.TRACK, marginTop: 7, overflow: 'hidden' }}>
+                    {MIX_BANDS.map((b) => {
+                      const n = t[b.key] ?? 0;
+                      if (n <= 0) return null;
+                      return (
+                        <i
+                          key={b.key}
+                          style={{ display: 'block', height: '100%', width: `${(n / withIndex) * 100}%`, background: b.colour }}
+                        />
+                      );
+                    })}
+                  </div>
+                  <div style={{ display: 'flex', gap: 12, marginTop: 5, flexWrap: 'wrap' }}>
+                    {MIX_BANDS.map((b) => {
+                      const n = t[b.key] ?? 0;
+                      return (
+                        <span key={b.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                          <i style={{ width: 6, height: 6, borderRadius: 2, background: b.colour }} />
+                          <span style={{ ...LABEL, fontSize: 10, letterSpacing: '0.04em' }}>{b.label}</span>
+                          <span style={bizFigure(11, A.BODY)}>{n.toLocaleString()}</span>
+                          <span style={bizFigure(11, A.DIM)}>{share(n, withIndex)}</span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : (
+                <div style={{ ...LABEL, fontSize: 10, letterSpacing: '0.04em', marginTop: 7, color: A.DIM }}>
+                  Mix not available for this set — {withIndex.toLocaleString()} indexed{' '}
+                  {withIndex === 1 ? 'round' : 'rounds'}
+                </div>
+              )}
             </div>
           );
         })}
       </Inset>
       <Body style={{ marginTop: 12 }}>
-        These are what each yardage returned, not how hard each yardage is. Players choose their tee, and the stronger
-        players tend to go back — which is why a longer set here can return a lower score than a shorter one. Read the
-        rows as a description of who plays where, and do not take them as an order of difficulty.
+        Scoring differences between yardages largely reflect who chooses them.
       </Body>
       <Body style={{ marginTop: 8, fontSize: 11.5, color: A.DIM }}>
-        To par is the mean 18-hole score against par on that yardage. Yardages come from the rounds themselves, bucketed
-        to the nearest hundred; we do not know which colour your club calls each tee, so we do not guess.
+        To par is the mean 18-hole score against each round's own par. The mix is the handicap index carried at the time
+        of play, out of the rounds carrying one. Yardages come from the rounds themselves, bucketed to the nearest
+        hundred; we do not know which colour your club calls each tee, so we do not guess.
       </Body>
     </Panel>
   );
 };
+
 
 /* ─────────────────── 5  WHEN YOUR COURSE PLAYS ─────────────────── */
 
