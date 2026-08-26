@@ -16,32 +16,16 @@
  *   TOLERANCE BAND is applied: two totals that differ by a yard are two sets,
  *   because inventing a merge threshold is a second judgement we do not need.
  *
- * §4.4 THE TEES ARE NOT NAMED. We know the yardage; we do not know whether the
- * club calls it white, yellow or blue. The label IS the yardage plus a neutral
- * position word, and a colour would be a fabrication in a new place.
+ * §4.4 THE TEES ARE NOT NAMED — and BRIEF_CLUB_ANALYTICS_PAGE_REBUILD §6.1
+ * removed the last trace of naming. `teePosition` and `teeLabel` used to append
+ * "back", "middle" or "forward" to the yardage, which rendered "middle" three
+ * times in a row directly above a footnote saying we do not guess what a club
+ * calls a tee. THE YARDAGE IS THE LABEL. Do not reintroduce a position word: a
+ * length order is not a tee name, and a club reads it as one.
  */
 import type { ClubAnalyticsTee } from './types';
 
 export const yd = (n: number) => `${n.toLocaleString()} yd`;
-
-/**
- * The neutral position word (§4.4). Derived purely from length order within
- * this course: the longest set is the back, the shortest the forward, and
- * anything between is the middle. No colour, ever.
- */
-export function teePosition(yards: number, all: ClubAnalyticsTee[]): string {
-  if (all.length <= 1) return 'the only set we measure';
-  const lengths = all.map((t) => t.yards);
-  const max = Math.max(...lengths);
-  const min = Math.min(...lengths);
-  if (yards === max) return 'back';
-  if (yards === min) return 'forward';
-  return 'middle';
-}
-
-export function teeLabel(t: ClubAnalyticsTee, all: ClubAnalyticsTee[]): string {
-  return `${yd(t.yards)} · ${teePosition(t.yards, all)}`;
-}
 
 /** Tee sets, longest first — the order a card is read in. */
 export function sortTees(tees: ClubAnalyticsTee[]): ClubAnalyticsTee[] {

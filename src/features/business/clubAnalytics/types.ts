@@ -39,7 +39,21 @@ export interface ClubAnalyticsHole {
   spread: number | null;
   /** Stroke index the spread implies, 1 = needs the shot most. Gated. */
   si_should_be: number | null;
+
+  /* ── THE LADDER'S TWO THRESHOLDS, computed server-side. The client NEVER
+     recomputes them, and never infers the verdict from a line's slope. ── */
+  /** measured_rank - stroke_index. NEGATIVE = plays HARDER than indexed. */
+  places_gap: number | null;
+  /** avg_to_par minus what the declared index position actually returns. */
+  shots_gap: number | null;
+
+  /* ── PER-HOLE OUTCOME SPLIT, for the tap-to-expand row. ── */
+  birdie_plus: number;
+  par_count: number;
+  bogey: number;
+  double_plus: number;
 }
+
 
 /** Seven outcomes, scorecard order, worst to best. */
 export interface ClubAnalyticsOutcomes {
@@ -67,7 +81,35 @@ export interface ClubAnalyticsWeekday {
 export interface ClubAnalyticsYear {
   year: number;
   rounds: number;
+  /** TRUE for the year still in progress. Its bar is drawn HOLLOW and never
+   *  read as a fall against a completed year. */
+  partial?: boolean;
 }
+
+/**
+ * THE RECORD BOOK — VALUES AND DATES ONLY, NEVER A NAME.
+ *
+ * Champions is filtered per member by champions_visibility, so a named list
+ * here would be a PARTIAL list presented as a complete one. This section
+ * counts; the course's Champions tab names, under each member's own control.
+ */
+export interface ClubAnalyticsRecord {
+  value: number | null;
+  attained_at: string | null;
+  /** Distinct members who have ever held this record (lowest_gross only). */
+  changed_hands?: number | null;
+}
+
+export interface ClubAnalyticsRecordBook {
+  lowest_gross: ClubAnalyticsRecord | null;
+  /** A CAREER TOTAL on this course, never a single round's birdies. */
+  most_birdies: ClubAnalyticsRecord | null;
+  best_stableford: ClubAnalyticsRecord | null;
+  /** Present on some payload shapes; `lowest_gross.changed_hands` otherwise. */
+  holders_ever?: number | null;
+  rounds_since_record: number | null;
+}
+
 
 /**
  * ONE MEASURED TEE, recovered from a round's summed 18 hole distances and
@@ -169,6 +211,9 @@ export interface ClubCourseAnalytics {
   /** Rounds carrying an index at the time of play. */
   handicap_rounds: number;
   competition: ClubAnalyticsCompetition | null;
+  /** Values and dates only — no member is named here, ever. */
+  record_book: ClubAnalyticsRecordBook | null;
+
   /** NULL unless si_advice_state is 'ready'. Read the state, never this. */
   si_advice: ClubAnalyticsSiAdvice[] | null;
   si_advice_state: 'ready' | 'needs_more_players' | string;

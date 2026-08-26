@@ -18858,6 +18858,7 @@ export type Database = {
           months: Json
           outcomes: Json
           outcomes_total: number
+          record_book: Json
           rounds: number
           si_advice: Json
           si_advice_state: string
