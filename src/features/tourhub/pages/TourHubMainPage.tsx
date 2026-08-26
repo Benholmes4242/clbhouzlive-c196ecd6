@@ -109,16 +109,10 @@ export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-  /* BACK vs BURGER. The left capsule is a page-owned slot (useSetChromeLeftSlot),
-     so the registry's `left: { kind: 'logo' }` for /tour and /tourhub never
-     reaches the screen — this predicate is the real control.
-     A member who navigated TO the hub (bottom nav, which tags state.from='nav')
-     or who deep-linked straight in (location.key === 'default', no history to
-     return to) gets the burger. A member who arrived AT it from a tournament
-     card, a share or any other in-app link gets a back chevron, because
-     otherwise the hub strands them. */
-  const navState = (location.state as { from?: string } | null)?.from;
-  const backMode = location.key !== 'default' && navState !== 'nav';
+  /* The left capsule on the hub is ALWAYS the burger. The hub is a bottom-nav
+     destination, so a back chevron there is wrong regardless of how the member
+     arrived. */
+  const backMode = false;
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
   const [menuOpen, setMenuOpen] = useState(false);
