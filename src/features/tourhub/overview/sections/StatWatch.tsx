@@ -22,7 +22,7 @@ import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { useStatWatch, type StatCategory, type StatKey } from '../data/useStatWatch';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
-import { TOUR_LABEL } from '../../_shared/tourOrder';
+
 import type { TourId } from '../../hooks/useOverviewData';
 import { PillFilterRow, type PillFilterOption } from '@/components/explore-tab-new/courseled/PillFilterRow';
 import { Skeleton } from '@/components/ui/skeleton';
