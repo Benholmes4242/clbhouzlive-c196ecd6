@@ -1228,7 +1228,9 @@ export default function VerificationFlowSheet({
             className="shrink-0 backdrop-blur-xl"
             style={{
               borderTop: `0.5px solid ${BIZ.hair}`,
-              background: 'rgba(248,250,252,0.97)',
+              /* A.PANEL at 92% - a surface, not ink. The backdrop-blur-xl below
+                 needs the remaining 8% to read as glass over scrolling content. */
+              background: 'rgba(27,30,39,0.92)',
               paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
             }}
           >
@@ -1238,7 +1240,14 @@ export default function VerificationFlowSheet({
                   variant="outline"
                   onClick={() => setPageIndex(safeIndex - 1)}
                   className="h-12 px-5 text-[15px]"
-                  style={{ borderRadius: BIZ.rInner }}
+                  style={{
+                    borderRadius: BIZ.rInner,
+                    /* Explicit treatment: shadcn's outline variant is near
+                       invisible against the dark footer. */
+                    background: 'rgba(255,255,255,0.08)',
+                    color: A.INK,
+                    border: `1px solid ${A.BORDER}`,
+                  }}
                 >
                   Back
                 </Button>
