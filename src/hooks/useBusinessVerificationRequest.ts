@@ -59,7 +59,16 @@ export function useBusinessVerificationRequest(businessId: string | undefined) {
 
 /**
  * Derive verification state from business and request data
+ *
+ * BRIEF_CLAIM_AWARE_VERIFY_CARD §2 — DECISION ON RECORD: an approved COURSE
+ * CLAIM must not confer verification. The two records verify different things —
+ * a claim says "this business runs this course", verification says "this
+ * business is who it claims to be". Collapsing them would hand a verified badge
+ * to anyone who successfully claims a course without ever proving identity.
+ * So do NOT read course_claim_requests here, and do not add an
+ * "approved claim => verified" branch below.
  */
+
 export function deriveVerificationState(
   isVerified: boolean | null | undefined,
   request: BusinessVerificationRequest | null | undefined

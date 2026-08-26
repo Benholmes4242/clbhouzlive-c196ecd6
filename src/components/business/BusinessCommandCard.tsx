@@ -21,6 +21,8 @@ import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingReque
 import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
+import { useBusinessCourseClaim } from '@/hooks/useBusinessCourseClaim';
+
 import { useBusinessReviews } from '@/hooks/useBusinessReviews';
 import { getCityCountry } from '@/lib/locationDisplay';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
@@ -78,6 +80,15 @@ export function BusinessCommandCard({
   const { data: totalFollowers, isLoading: followersLoading } = useBusinessFollowersCount(business?.id);
 
   const { data: verificationRequest } = useBusinessVerificationRequest(business?.id);
+
+  /**
+   * BRIEF_CLAIM_AWARE_VERIFY_CARD §1 — a parallel, independent read.
+   * A COURSE CLAIM is not a verification request: it never feeds
+   * deriveVerificationState, it only lets the card acknowledge work the owner
+   * has already done.
+   */
+  const { data: courseClaim } = useBusinessCourseClaim(business?.id);
+
 
   // Fetch pending access requests count for indicator
   const { data: pendingRequestsCount } = useBusinessPendingRequestsCount(business?.id);
@@ -377,8 +388,31 @@ export function BusinessCommandCard({
               <div style={{ height: '0.5px', background: BIZ.hair }} />
 
               <div className="p-4 pt-3 space-y-3">
+                {/* BRIEF_CLAIM_AWARE_VERIFY_CARD §1 — claim acknowledgement.
+                    Shown ONLY when nothing has been submitted for verification
+                    ('none'), so we never stack two review notices. The copy
+                    states plainly that the two are independent: a claim decision
+                    does not produce verification, and verification does not
+                    resolve a claim. */}
+                {verificationState === 'none' &&
+                  (courseClaim?.status === 'pending' || courseClaim?.status === 'needs_more_info') && (
+                    <div className="flex items-start gap-2" style={{ paddingTop: 2 }}>
+                      <Clock className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkMute, marginTop: 2 }} />
+                      <p className="min-w-0" style={{ color: BIZ.inkMute, fontSize: 12.5, fontWeight: 500, lineHeight: 1.4 }}>
+                        <span style={{ color: BIZ.ink, fontWeight: 700 }}>
+                          {courseClaim.courseName
+                            ? `Your claim on ${courseClaim.courseName} is with our team.`
+                            : 'Your course claim is with our team.'}
+                        </span>{' '}
+                        That is a separate request from verification — whichever way it goes, you still
+                        need to verify this business to earn the badge.
+                      </p>
+                    </div>
+                  )}
+
                 {/* Verify status line — treatment only; copy per state is unchanged.
                     No gradient, no tint, no bordered tile, no amber chevron. */}
+
                 {!isVerified && (
                   <button
                     type="button"
