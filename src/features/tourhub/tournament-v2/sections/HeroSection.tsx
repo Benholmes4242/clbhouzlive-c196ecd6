@@ -380,134 +380,188 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
 
 
 
+  /**
+   * THE ACTION ROW — one disclosure at the foot of the hero.
+   * Targets are the page's OWN existing in-page anchor (#the-act, the target
+   * TournamentPage's inbound ?tab=leaderboard / ?tab=tee-times deep link
+   * scrolls to at TournamentPage.tsx:127-141). No new route is invented and
+   * TournamentPage is not edited, so no sheet is opened from here.
+   */
+  const actionLabel =
+    state === 'live'
+      ? t('tournament.shell.board.action')
+      : state === 'completed'
+        ? t('tournament.shell.leaderboard.finalEyebrow')
+        : t('tournament.teeTimesBand.title');
+
+  const onAction = () => {
+    const el = document.getElementById('the-act');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
-    <div
-      style={{
-        position: 'relative',
-        minHeight: HERO_MIN_H,
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 48px)',
-        background,
-        fontFamily: FONT,
-        color: '#fff',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-end',
-      }}
-    >
-      <div style={{ padding: '10px 16px 12px' }}>
-        {/* Shared lockup */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            padding: '4px 8px',
-            borderRadius: 4,
-            background: chip.bg,
-            border: `1px solid ${chip.border}`,
-            // AXIS 10 (hero exception): status marker chip.
-            fontSize: 10,
-            fontWeight: 700,
-            color: chip.color,
-            letterSpacing: '0.10em',
-            textTransform: 'uppercase',
-            marginBottom: 8,
-          }}
-        >
-          {chip.label}
-        </div>
-
-        <h1
-          style={{
-            fontSize: 21,
-            fontWeight: 700,
-            color: '#fff',
-            lineHeight: 1.04,
-            letterSpacing: '-0.02em',
-            margin: 0,
-            display: '-webkit-box',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
-            overflow: 'hidden',
-          }}
-        >
-          {meta.name}
-        </h1>
-
-        {venueLine && (
+    <div style={{ fontFamily: FONT, color: '#fff' }}>
+      {/* PHOTO BAND — chip, title, venue line. Nothing else. */}
+      <div
+        style={{
+          position: 'relative',
+          minHeight: HERO_MIN_H,
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 48px)',
+          background,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+        }}
+      >
+        <div style={{ padding: '10px 16px 12px' }}>
           <div
             style={{
-              fontSize: 12.5,
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.65)',
-              marginTop: 4,
-              fontVariantNumeric: 'tabular-nums lining-nums',
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '4px 8px',
+              borderRadius: 4,
+              background: chip.bg,
+              border: `1px solid ${chip.border}`,
+              // AXIS 10 (hero exception): status marker chip.
+              fontSize: 10,
+              fontWeight: 700,
+              color: chip.color,
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              marginBottom: 8,
             }}
           >
-            {venueLine}
+            {chip.label}
           </div>
-        )}
 
-        {/* Hairline separator (0.5px, no boxed panel). */}
+          <h1
+            style={{
+              fontSize: 'clamp(22px, 7.2vw, 28px)',
+              fontWeight: 700,
+              color: '#fff',
+              lineHeight: 1.04,
+              letterSpacing: '-0.02em',
+              margin: 0,
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              overflow: 'hidden',
+            }}
+          >
+            {meta.name}
+          </h1>
+
+          {venueLine && (
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.65)',
+                marginTop: 4,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {venueLine}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* STAT STRIP — three figures on HERO_BOARD_SURFACE_SOFT, the surface the
+          photo gradient terminates on. Renders whatever the state produced;
+          never padded to three. */}
+      {figures.length > 0 && (
         <div
           style={{
-            height: 0,
-            borderTop: `0.5px solid ${HAIRLINE}`,
-            marginTop: 8,
-            marginBottom: 8,
+            background: HERO_BOARD_SURFACE_SOFT,
+            padding: '12px 16px 14px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 10,
           }}
+        >
+          {figures.map((f) => (
+            <Figure key={f.label} value={f.value} label={f.label} tone={f.tone} />
+          ))}
+        </div>
+      )}
+
+      {/* PERSON BAND — one row on HERO_BOARD_SURFACE. */}
+      {state === 'live' && leader && (
+        <PersonLockup
+          label={t('tournament.hero.leaderLabel')}
+          name={leader.player?.full_name ?? t('tournament.hero.tbdPlayer')}
+          sub={
+            leader.today != null
+              ? t('board.columns.today') + ' ' + fmtScore(leader.today)
+              : null
+          }
+          playerId={leader.player?.id ?? null}
+          photoUrl={leader.player?.photo_url ?? null}
+          tourCode={tourCode}
+          showAvatar
         />
+      )}
 
-        {/* THREE FIGURES - one row, every state. */}
-        {figures.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 8 }}>
-            {figures.map((f) => (
-              <Figure key={f.label} value={f.value} label={f.label} tone={f.tone} />
-            ))}
-          </div>
-        )}
+      {state === 'upcoming' && (
+        <PersonLockup
+          label={t('tournament.hero.defendingLabel', { defaultValue: 'DEFENDING CHAMPION' })}
+          labelTone={GOLD}
+          icon={<Star size={11} fill={GOLD} color={GOLD} strokeWidth={0} />}
+          name={defendingChamp?.name ?? meta.defending_champion ?? t('tournament.hero.tbdPlayer')}
+          sub={[defendingChamp?.year, defendingChamp?.score].filter(Boolean).join(' \u00B7 ') || null}
+          tourCode={tourCode}
+        />
+      )}
 
-        {/* PERSON - leader / defending champion / champion, one lockup. */}
-        {state === 'live' && leader && (
-          <PersonLockup
-            label={t('tournament.hero.leaderLabel')}
-            name={leader.player?.full_name ?? t('tournament.hero.tbdPlayer')}
-            sub={
-              leader.today != null
-                ? t('board.columns.today') + ' ' + fmtScore(leader.today)
-                : null
-            }
-            playerId={leader.player?.id ?? null}
-            photoUrl={leader.player?.photo_url ?? null}
-            tourCode={tourCode}
-            showAvatar
-          />
-        )}
+      {state === 'completed' && champion && (
+        <PersonLockup
+          label={t('tournament.hero.championLabel', { defaultValue: 'CHAMPION' })}
+          labelTone={GOLD}
+          icon={<Trophy size={11} color={GOLD} strokeWidth={2.4} />}
+          name={champion.player?.full_name ?? t('tournament.hero.championFallback')}
+          playerId={champion.player?.id ?? null}
+          photoUrl={champion.player?.photo_url ?? null}
+          tourCode={tourCode}
+          showAvatar
+        />
+      )}
 
-        {state === 'upcoming' && (
-          <PersonLockup
-            label={t('tournament.hero.defendingLabel', { defaultValue: 'DEFENDING CHAMPION' })}
-            labelTone={GOLD}
-            icon={<Star size={11} fill={GOLD} color={GOLD} strokeWidth={0} />}
-            name={defendingChamp?.name ?? meta.defending_champion ?? t('tournament.hero.tbdPlayer')}
-            sub={[defendingChamp?.year, defendingChamp?.score].filter(Boolean).join(' \u00B7 ') || null}
-            tourCode={tourCode}
-          />
-        )}
-
-        {state === 'completed' && champion && (
-          <PersonLockup
-            label={t('tournament.hero.championLabel', { defaultValue: 'CHAMPION' })}
-            labelTone={GOLD}
-            icon={<Trophy size={11} color={GOLD} strokeWidth={2.4} />}
-            name={champion.player?.full_name ?? t('tournament.hero.championFallback')}
-            playerId={champion.player?.id ?? null}
-            photoUrl={champion.player?.photo_url ?? null}
-            tourCode={tourCode}
-            showAvatar
-          />
-        )}
-
-      </div>
+      {/* ACTION ROW */}
+      <button
+        type="button"
+        onClick={onAction}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          background: HERO_BOARD_SURFACE,
+          borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
+          borderLeft: 'none',
+          borderRight: 'none',
+          borderBottom: 'none',
+          padding: '11px 16px',
+          textAlign: 'left',
+          cursor: 'pointer',
+          fontFamily: FONT,
+        }}
+      >
+        <span
+          style={{
+            // AXIS 10 (hero exception): disclosure label, tracked caps.
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: WHITE_ALPHA_65,
+          }}
+        >
+          {actionLabel}
+        </span>
+        <ChevronRight size={14} strokeWidth={2.5} color={WHITE_ALPHA_65} style={{ marginLeft: 'auto' }} aria-hidden />
+      </button>
     </div>
   );
 }
+
