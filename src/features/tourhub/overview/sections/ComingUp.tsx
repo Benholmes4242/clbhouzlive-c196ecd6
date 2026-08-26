@@ -80,6 +80,17 @@ export function surnameOf(full: string | null | undefined): string | null {
   return parts[parts.length - 1];
 }
 
+/**
+ * DISPLAY NAME. "Husqvarna British Masters hosted by Sir Nick Faldo" is 50
+ * characters and does not fit one nowrap line at 15/700 in a 390 viewport —
+ * MEASURED, it overflowed by ~30px. The host credit is the only removable part
+ * and carries no scheduling information, so it is dropped for display only. The
+ * stored name is untouched and the tournament page still shows it in full.
+ */
+export function displayEventName(name: string): string {
+  return name.replace(/\s+(hosted|presented)\s+by\s+.+$/i, '').trim() || name;
+}
+
 interface DayGroup {
   key: string;
   dateLabel: string;
@@ -301,7 +312,7 @@ function EventRow({ row, first, onOpen }: { row: ComingUpRow; first: boolean; on
           textOverflow: 'ellipsis',
         }}
       >
-        {row.name}
+        {displayEventName(row.name)}
       </div>
       {/* line 3 — venue only. The defender lives in the three-up. */}
       {row.venue ? (
