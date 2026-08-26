@@ -93,14 +93,25 @@ export function TourPageShell({
     };
   }, [belowTitle, subtitle]);
 
-  // Immersive pages only: transparent -> opaque on first scroll.
+  // Immersive pages only: transparent -> opaque on first scroll. Listening in
+  // the capture phase catches inner scroll containers too (college hub scrolls
+  // a div, not the window), otherwise the header would stay transparent and
+  // let rows show through the notch.
   useEffect(() => {
     if (!immersive) return;
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = (e?: Event) => {
+      const t = e?.target as (HTMLElement & { scrollTop?: number }) | Document | null;
+      const inner =
+        t && t !== document && t !== document.documentElement && typeof (t as HTMLElement).scrollTop === 'number'
+          ? (t as HTMLElement).scrollTop
+          : 0;
+      setScrolled(Math.max(window.scrollY, inner) > 8);
+    };
     onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    return () => window.removeEventListener('scroll', onScroll, { capture: true } as any);
   }, [immersive]);
+
 
   const solid = !immersive || scrolled;
 
