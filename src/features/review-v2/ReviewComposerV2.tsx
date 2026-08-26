@@ -710,7 +710,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           The page sits inside .app-shell, which already pays padding-top: var(--sat),
           so the spacer only owes the 69px chrome below the notch. Was a flat 54 —
           that is why step content started under the header. */}
-      <div aria-hidden style={{ height: 69, flexShrink: 0 }} />
+      <div aria-hidden style={{ height: 69 + 14, flexShrink: 0 }} />
 
       {/* Step rail */}
       <div
