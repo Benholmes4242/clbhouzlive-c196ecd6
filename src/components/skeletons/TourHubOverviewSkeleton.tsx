@@ -58,31 +58,66 @@ function Head({ w = 150, sub = 210 }: { w?: number; sub?: number }) {
   );
 }
 
-/** WHAT'S COMING UP — head (17 + 28) over a 399 table body, 459 total. */
+/**
+ * WHAT'S COMING UP — head (17 + 28) over a 754 table body, plus the pager dots.
+ *
+ * REMEASURED for MICRO_BRIEF_COMING_UP_REBUILD. The section is now ONE HEADER
+ * PER DAY over four-line rows, and the settled track MEASURED LIVE at 390 is
+ * 799 (five 138 rows + three 32 group headers). The hold draws two group headers
+ * and five rows = 754, deliberately 45 SHORT: a hold may be smaller than the
+ * settled state, never larger, and the group count varies with the fixture list.
+ */
 function ComingUpBlock() {
   return (
     <section>
       <Head w={158} sub={228} />
       <div style={{ padding: '0 16px' }}>
-        <div style={{ height: 399, display: 'flex', flexDirection: 'column' }}>
-          {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                height: 57,
-                borderBottom: i === 6 ? 'none' : `1px solid ${A.BORDER}`,
-                boxSizing: 'border-box',
-              }}
-            >
-              <Bar style={{ height: 30, width: 44 }} />
-              <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <Bar style={{ height: 12, width: '58%' }} />
-                <Bar style={{ height: 10, width: '38%' }} />
+        <div style={{ height: 754, display: 'flex', flexDirection: 'column' }}>
+          {[0, 1].map((g) => (
+            <div key={g} style={{ display: 'flex', flexDirection: 'column' }}>
+              {/* group header — 32 */}
+              <div
+                style={{
+                  height: 32,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  boxSizing: 'border-box',
+                  background: 'rgba(255,255,255,0.03)',
+                  padding: '0 14px',
+                }}
+              >
+                <Bar style={{ height: 10, width: 54 }} />
+                <Bar style={{ height: 10, width: 72 }} />
               </div>
-              <Bar style={{ height: 13, width: 30 }} />
+              {/* rows — 138 each; 3 under the first header, 2 under the second */}
+              {(g === 0 ? [0, 1, 2] : [0, 1]).map((i) => (
+                <div
+                  key={i}
+                  style={{
+                    height: 138,
+                    boxSizing: 'border-box',
+                    padding: '11px 14px 12px',
+                    borderTop: i === 0 ? 'none' : `1px solid ${A.BORDER}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <Bar style={{ height: 15, width: 62 }} />
+                  <Bar style={{ height: 16, width: '62%', marginTop: 6 }} />
+                  <Bar style={{ height: 12, width: '44%', marginTop: 5 }} />
+                  <div style={{ display: 'flex', gap: 18, marginTop: 10 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <Bar style={{ height: 10, width: 40 }} />
+                      <Bar style={{ height: 12, width: 34 }} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <Bar style={{ height: 10, width: 52 }} />
+                      <Bar style={{ height: 12, width: 46 }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ))}
         </div>
@@ -96,6 +131,7 @@ function ComingUpBlock() {
     </section>
   );
 }
+
 
 /** The per-section tour lens above WORLD RANKINGS renders at 52. */
 function LensRow() {
