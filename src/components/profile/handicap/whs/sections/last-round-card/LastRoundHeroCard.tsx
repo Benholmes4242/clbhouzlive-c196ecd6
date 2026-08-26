@@ -165,11 +165,11 @@ const LastRoundHeroCard: React.FC<Props> = ({ round, onClick }) => {
   const { data: detail } = useFriendRoundDetail(round.id);
 
   const par = React.useMemo(() => {
-    if (!detail?.holes?.length) return null;
-    const played = detail.holes.filter((h) => h.played && h.par != null);
-    if (!played.length) return null;
-    return played.reduce((sum, h) => sum + (h.par ?? 0), 0);
-  }, [detail]);
+    const played = detail?.holes?.filter((h) => h.played && h.par != null) ?? [];
+    if (played.length) return played.reduce((sum, h) => sum + (h.par ?? 0), 0);
+    return round.course_par ?? null;
+  }, [detail, round.course_par]);
+
 
   const slope = round.slope_rating ?? null;
   const gross = round.adjusted_gross;
