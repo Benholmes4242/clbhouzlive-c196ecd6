@@ -1821,7 +1821,13 @@ export function GolfThisWeek({
           structural — the padding moves the cut point by a fixed 62px whatever
           the pill widths turn out to be — not tuned to one viewport or language.
           Pills pass UNDER the well as a member scrolls; that is intended and
-          needs no left-hand fade, because the well is opaque. */}
+          needs no left-hand fade, because the well is OPAQUE IN BOTH STATES —
+          A.PANEL collapsed, an opaque #36373E when a region is selected. That
+          opacity is the whole reason there is no left fade or mask here, so the
+          selected tint must NEVER be reintroduced as an alpha. The well also
+          STRETCHES to this row's height (alignItems stretch below) so a pill
+          cannot show above or below it. */}
+
       <div style={{ position: 'relative', marginBottom: 12, minWidth: 0 }}>
         <WeekScopePills
           scope={scope}
