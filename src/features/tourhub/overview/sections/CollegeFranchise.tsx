@@ -39,6 +39,7 @@ import { COLLEGE_RIVALRY_FALLBACK } from '../../utils/editorialFallbacks';
 import { SectionShell } from './SectionShell';
 import { V4 } from '../tokens';
 import { getCollegeColor } from '../data/collegeColors';
+import { liftedBrandAlpha } from '../../_shared/heroGradient';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function displayName(stats: CollegeSeasonStats, media: CollegeMedia | undefined): string {
@@ -56,13 +57,13 @@ function abbreviate(name: string): string {
   return parts.length >= 2 ? `${parts[0][0]}. ${parts.slice(1).join(' ')}` : name;
 }
 
-function SchoolSquircle({ size, logo, name }: { size: number; logo: string | null; name: string }) {
+function SchoolSquircle({ size, logo, name, radius }: { size: number; logo: string | null; name: string; radius?: number }) {
   return (
     <div
       style={{
         width: size,
         height: size,
-        borderRadius: `${Math.round(size * 0.34)}px`,
+        borderRadius: `${radius ?? Math.round(size * 0.34)}px`,
         background: '#FFFFFF',
         border: `0.5px solid ${V4.hairline}`,
         display: 'flex',
@@ -118,15 +119,21 @@ export function CollegeFranchise() {
 
   const leader = sorted[0];
   const chaser = sorted[1];
-  const top5 = sorted.slice(0, 5);
+  // The list starts at 3: ranks 1 and 2 are the duel. __rank is the display
+  // rank so the rows read 3/4/5 rather than 1/2/3.
+  const chasers = useMemo(
+    () => sorted.slice(2, 5).map((s, i) => ({ ...s, __rank: i + 3 })),
+    [sorted],
+  );
 
   // Captain-for-each: query all top-5 colleges in a single IN() call
   // (useFranchiseCaptains groups client-side by college and takes the
   // first row per college, which is the highest earner because the RPC
   // orders earnings DESC).
   const captainNames = useMemo(
-    () => top5.map((s) => s.normalized_name).filter((n): n is string => !!n),
-    [top5],
+    // Only the duel names captains now, so only the duel is queried.
+    () => sorted.slice(0, 2).map((s) => s.normalized_name).filter((n): n is string => !!n),
+    [sorted],
   );
   const { data: captainMap } = useFranchiseCaptains(captainNames);
 
@@ -138,8 +145,8 @@ export function CollegeFranchise() {
         onLinkClick={() => navigate('/tourhub?tab=college')}
       >
         <div style={{ padding: '0 16px', marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <Skeleton className="h-4 w-4/5 rounded" />
-          <Skeleton className="h-4 w-2/3 rounded" />
+          <Skeleton className="h-5 w-4/5 rounded" />
+          <Skeleton className="h-4 w-11/12 rounded" />
         </div>
         <div style={{ padding: '0 16px 12px', display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 12 }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
@@ -157,7 +164,7 @@ export function CollegeFranchise() {
         </div>
         <div style={{ height: 1, background: V4.hairline, margin: '16px 16px 6px' }} />
         <div style={{ padding: '0 4px' }}>
-          {[0, 1, 2, 3, 4].map((i) => (
+          {[0, 1, 2].map((i) => (
             <div
               key={i}
               style={{
@@ -166,11 +173,11 @@ export function CollegeFranchise() {
                 alignItems: 'center',
                 gap: 12,
                 padding: '11px 12px',
-                borderBottom: i < 4 ? `0.5px solid ${V4.hairline}` : 'none',
+                borderBottom: i < 2 ? `0.5px solid ${V4.hairline}` : 'none',
               }}
             >
               <Skeleton className="h-3.5 w-3 rounded" />
-              <Skeleton className="h-[26px] w-[26px]" style={{ borderRadius: 9 }} />
+              <Skeleton className="h-[34px] w-[34px]" style={{ borderRadius: 10 }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 <Skeleton className="h-3.5 w-2/5 rounded" />
                 <Skeleton className="h-3 w-1/3 rounded" />
@@ -216,21 +223,44 @@ export function CollegeFranchise() {
       linkLabel={t('overview.collegeFranchise.linkLabel')}
       onLinkClick={() => navigate('/tourhub?tab=college')}
     >
-      {/* Editorial headline */}
+      {/* Editorial headline (19/700) + supporting line. The supporting line is
+          arithmetic on figures already on screen — nothing new is queried — and
+          it is only drawn beneath the TEMPLATED headline. When a
+          championship_editorial_daily row supplies the headline (which may be
+          human-edited), its own headlineTwo is used instead, so a generated
+          line never sits under a hand-written one. */}
       <div style={{ padding: '0 16px', marginBottom: 16 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
+        <div style={{ fontSize: 19, fontWeight: 700, color: V4.ink, letterSpacing: '-0.02em', lineHeight: 1.25 }}>
           {useEditorial ? (
-            <>
-              {editorialLine1}
-              {editorialLine2 ? <> <span style={{ color: V4.inkMute }}>{editorialLine2}</span></> : null}
-            </>
+            editorialLine1
           ) : !isClosingRace ? (
             <Trans t={t} i18nKey="overview.collegeFranchise.headlineRunaway" values={{ leader: leaderShort }} components={[<span key="a" />]} />
           ) : (
             <Trans t={t} i18nKey="overview.collegeFranchise.headlineClosing" values={{ leader: leaderShort, chaser: chaserShort }} components={[<span key="a" />]} />
           )}
         </div>
+        <div style={{ fontSize: 13.5, fontWeight: 500, color: V4.inkMute, lineHeight: 1.45, marginTop: 4 }}>
+          {useEditorial ? (
+            editorialLine2
+          ) : (
+            <Trans
+              t={t}
+              i18nKey={isClosingRace ? 'overview.collegeFranchise.supportingClose' : 'overview.collegeFranchise.supportingWide'}
+              values={{
+                gap: formatCurrencyUsdCompact(gap),
+                chaser: chaserShort,
+                leader: leaderShort,
+                count: leader.player_count,
+              }}
+              components={[
+                <span key="g" style={{ color: V4.ink, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }} />,
+                <span key="n" style={{ color: V4.ink, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }} />,
+              ]}
+            />
+          )}
+        </div>
       </div>
+
 
       {/* THE DUEL */}
       <div
@@ -295,57 +325,90 @@ export function CollegeFranchise() {
       {/* HAIRLINE */}
       <div style={{ height: 1, background: V4.hairline, margin: '16px 16px 6px' }} />
 
-      {/* TOP-5 STANDINGS */}
+      {/* AND BEHIND THEM — ranks 3-5 only. Ranks 1 and 2 ARE the duel above;
+          repeating them made the section say two things twice. The rows also do
+          NOT repeat the captain — that is what the duel is for. */}
+      <div style={{ padding: '0 16px 6px' }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em' }}>
+          {t('overview.collegeFranchise.behindThem')}
+        </span>
+      </div>
       <div style={{ padding: '0 4px' }}>
-        {top5.map((s, i) => {
+        {chasers.map((s, i) => {
           const media = mediaMap?.get(s.normalized_name);
           const name = displayName(s, media);
           const fname = fullName(s, media);
           const logo = getCollegeLogoUrl(fname);
-          const cap = captainMap?.get(s.normalized_name);
-          const capName = cap ? abbreviate(cap.fullName) : null;
+          // Glow width tracks earnings as a share of the LEADER's, so the three
+          // haloes step down together.
+          const w = leader.earnings_total > 0 ? (s.earnings_total / leader.earnings_total) * 100 : 0;
+          const glow = liftedBrandAlpha(getCollegeColor(s.normalized_name), 0.34);
           return (
             <button
               key={s.id}
               onClick={() => goCollege(s.normalized_name)}
               style={{
+                position: 'relative',
                 width: '100%',
-                display: 'grid',
-                gridTemplateColumns: '28px 26px 1fr auto',
-                alignItems: 'center',
-                gap: 12,
+                // overflow:hidden or the 22px blur bleeds past the panel edge.
+                overflow: 'hidden',
+                display: 'block',
                 padding: '11px 12px',
                 background: 'transparent',
                 border: 'none',
-                borderBottom: i < top5.length - 1 ? `0.5px solid ${V4.hairline}` : 'none',
+                borderBottom: i < chasers.length - 1 ? `0.5px solid ${V4.hairline}` : 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: 700, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums', textAlign: 'center' }}>
-                {i + 1}
-              </span>
-              <SchoolSquircle size={26} logo={logo} name={name} />
-              <div style={{ minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: V4.ink, letterSpacing: '-0.005em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {/* THIS IS ATMOSPHERE, NOT MEASUREMENT. The blurred brand halo has
+                  no readable terminus by design — the gap is carried by the exact
+                  $-figure on the right. Do NOT "fix" this into a bar. */}
+              <div
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  left: `${w * 0.42}%`,
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: `${w * 0.9}%`,
+                  height: 46,
+                  borderRadius: 999,
+                  background: glow,
+                  filter: 'blur(22px)',
+                  pointerEvents: 'none',
+                }}
+              />
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'grid',
+                  gridTemplateColumns: '14px 34px 1fr auto',
+                  alignItems: 'center',
+                  gap: 12,
+                }}
+              >
+                <span style={{ fontSize: 13, fontWeight: 700, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>
+                  {s.__rank}
+                </span>
+                <SchoolSquircle size={34} logo={logo} name={name} radius={10} />
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: V4.ink, letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {name}
-                  </span>
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 500, color: V4.inkFaint, marginTop: 1, whiteSpace: 'nowrap' }}>
+                    {t('overview.collegeFranchise.rowMeta', { count: s.player_count })}
+                  </div>
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 500, color: V4.inkFaint, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {capName
-                    ? t('overview.collegeFranchise.rowMetaWithCaptain', { count: s.player_count, captain: capName })
-                    : t('overview.collegeFranchise.rowMeta', { count: s.player_count })}
-                </div>
-
+                <span style={{ fontSize: 15, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
+                  {formatCurrencyUsdCompact(s.earnings_total)}
+                </span>
               </div>
-              <span style={{ fontSize: 12, fontWeight: 700, color: V4.ink, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
-                {formatCurrencyUsdCompact(s.earnings_total)}
-              </span>
             </button>
           );
         })}
       </div>
+
     </SectionShell>
   );
 }
