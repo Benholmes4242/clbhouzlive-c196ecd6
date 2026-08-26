@@ -454,7 +454,12 @@ export function DiscoverHero({
   );
 }
 
+/* The hero's FAINT tier — the same quiet interface tone the eyebrow and the
+   course line already take. Labels never carry the achievement colour. */
+const HERO_FAINT = DISCOVER_QUIET;
+
 const heroWordStyle: React.CSSProperties = {
+
   fontSize: 14,
   fontWeight: 700,
   letterSpacing: '0.14em',
