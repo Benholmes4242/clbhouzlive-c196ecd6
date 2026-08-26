@@ -88,11 +88,6 @@ export function StatWatch({ tour }: { tour: TourId }) {
       linkLabel={t('overview.statWatch.allStatsLink')}
       onLinkClick={() => navigate('/tourhub?tab=leaderboards')}
     >
-      <div style={{ padding: '0 16px 6px', fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-        {/* NEVER-KEY interpolation: TOUR_LABEL/tour is a data token (proper noun). */}
-        {t('overview.statWatch.seasonLeaders', { tourLabel: TOUR_LABEL[tour] ?? tour.toUpperCase() })}
-      </div>
-
       {/* Canonical pill row — same primitive as Discover / Courses / Champions. */}
       <PillFilterRow
         value={active.key}
