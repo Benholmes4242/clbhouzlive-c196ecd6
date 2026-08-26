@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { Menu } from 'lucide-react';
 import { TourHubShell } from '../components/TourHubShell';
+import { TourPageShell } from '../components/TourPageShell';
 import type { TourHubTab } from '../components/types';
 import { OverviewTab } from '../components/tabs';
 import { LeadersTab as LeadersTabV2 } from '@/features/tourhub/leaders-v2/LeadersTab';
@@ -15,11 +17,17 @@ import { TourSideMenu } from '../components/TourSideMenu';
 import { TourIslandLeft } from '../components/TourIslandLeft';
 import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
-import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { safeGoBack } from '@/utils/navigation';
 
 import { useLogout } from '@/hooks/useLogout';
+
+const TAB_TITLES: Record<string, string> = {
+  live: 'Live',
+  schedule: 'Schedule',
+  players: 'Players',
+  leaderboards: 'Leaders',
+};
 
 /**
  * TourHubChromeBridge — registers the ChromeIsland left-capsule slot with
@@ -113,6 +121,7 @@ export function TourHubMainPage() {
   const backMode = location.key !== 'default' && navState !== 'nav';
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useTournamentStatusRealtime();
 
