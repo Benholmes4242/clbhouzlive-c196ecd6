@@ -212,9 +212,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     match: { prefix: '/tourhub/tournament/' },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history' },
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=schedule' },
       tone: 'dark',
-      bleed: true, // tourHeroOverlay drives transparent chrome over cinematic hero
+      bleed: true, // hero page: island rides over the cinematic hero
       note: EDITORIAL_NOTE,
     },
   },
@@ -222,9 +222,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     match: { prefix: '/tourhub/player/' },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history' },
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=players' },
       tone: 'dark',
-      bleed: false,
+      bleed: true, // hero page: matches the tournament page
       note: EDITORIAL_NOTE,
     },
   },
@@ -235,7 +235,6 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' },
       tone: 'dark',
       bleed: false,
-      scrollAway: true,
       note: EDITORIAL_NOTE,
     },
   },
@@ -243,7 +242,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     match: { exact: '/tourhub/college-golf/compare' },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history' },
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub/college-golf' },
       tone: 'dark',
       bleed: false,
       note: EDITORIAL_NOTE,
@@ -258,11 +257,12 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history' },
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub/college-golf' },
       tone: 'dark',
-      bleed: false,
+      bleed: true, // hero page (CollegeHeroMasthead)
       note: EDITORIAL_NOTE,
     },
+
   },
 
   // Tour Hub top-level (logo + editorial geometry; cinematic overlay on overview).
@@ -272,10 +272,12 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, note: EDITORIAL_NOTE } },
   { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
   { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
-  // Remaining /tourhub/* sub-tabs and /tour/* aliases (not deep) — page owns
-  // chrome today (isConditionallyExcluded); only the exact hubs above stay island.
-  { match: { prefix: '/tourhub/' },               spec: { chrome: 'none', tone: 'light', bleed: true, note: 'other tour subpages immersive/page-owned today (isConditionallyExcluded)' } },
-  { match: { prefix: '/tour/' },                  spec: { chrome: 'none', tone: 'light', bleed: true, note: 'other tour subpages immersive/page-owned today (isConditionallyExcluded)' } },
+  // Backstop for any /tourhub/* or /tour/* path not matched above. Tour sub-tabs
+  // are query params on the exact hubs, so nothing real lands here today — but
+  // anything that does gets Pattern A chrome (opaque island, back, safe area)
+  // rather than no chrome at all. tone flipped light -> dark (dark-only app).
+  { match: { prefix: '/tourhub/' },               spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' }, tone: 'dark', bleed: false, note: 'tour backstop — Pattern A' } },
+  { match: { prefix: '/tour/' },                  spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' }, tone: 'dark', bleed: false, note: 'tour backstop — Pattern A' } },
 
   // Watch sub-pages: back to /watch's caller.
   { match: { exact: '/watch/videos' },            spec: { chrome: 'island', left: { kind: 'back', title: 'Videos', backTarget: 'history' }, tone: 'light', bleed: true, scrollAway: true } },
