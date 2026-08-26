@@ -45,6 +45,10 @@ function monthLabel(yyyyMm: string): string {
   return formatMonthYearLongGB(d);
 }
 
+function isEighteenHoleRound(s: WhsScore): boolean {
+  return !s.is_nine_hole && s.total_holes === 18;
+}
+
 export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, viewMode = 'owner', ownerFirstName = null }) => {
   const { t } = useTranslation('common');
   const { data: scores, isLoading: fetching, isFetched, isError, refetch } = useAllScores(connectionId);
@@ -65,8 +69,10 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
       ];
     }
 
+    const eighteenHoleList = list.filter(isEighteenHoleRound);
+
     // #1 Lowest gross (sanity-filtered to exclude impossible rounds)
-    const grossList = list.filter(isReasonableGross);
+    const grossList = eighteenHoleList.filter(isReasonableGross);
     let bestGross: Tile = empty('Best Gross');
     if (grossList.length) {
       const best = grossList.reduce((a, b) =>
@@ -80,7 +86,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
     }
 
     // #2 Lowest differential (sanity-filtered to exclude impossible rounds)
-    const diffList = list.filter(isReasonableDiff);
+    const diffList = eighteenHoleList.filter(isReasonableDiff);
     let bestDiff: Tile = empty('Best Diff');
     if (diffList.length) {
       const best = diffList.reduce((a, b) =>
@@ -94,7 +100,7 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
     }
 
     // #3 Best Stableford
-    const stableList = list.filter((s) => s.stableford_points != null);
+    const stableList = eighteenHoleList.filter((s) => s.stableford_points != null);
     let bestSF: Tile = empty('Best Stableford Score');
     if (stableList.length) {
       const best = stableList.reduce((a, b) =>
@@ -112,14 +118,14 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
     let bestVsHcp: Tile = empty('Best vs HCP');
     if (currentHandicap != null && grossList.length) {
       const scored = grossList
+        .filter((s): s is WhsScore & { adjusted_gross: number; course_par: number } =>
+          typeof s.adjusted_gross === 'number' && typeof s.course_par === 'number',
+        )
         .map((s) => {
-          const course = s.course as { course_par?: number | null } | null | undefined;
-          const par = course?.course_par;
-          if (typeof par !== 'number') return null;
-          const overPar = (s.adjusted_gross as number) - par;
+          const overPar = s.adjusted_gross - s.course_par;
           return { s, vsHcp: overPar - currentHandicap };
         })
-        .filter((x): x is NonNullable<typeof x> => x !== null);
+        ;
 
       if (scored.length) {
         const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));

@@ -149,9 +149,27 @@ export async function fetchHandicapTrend(connectionId: string): Promise<WhsHandi
 const SCORE_SELECT = `
   id, play_date, course_id, adjusted_gross, stableford_points,
   handicap_differential, course_rating, slope_rating, marker_name,
-  is_counter, handicap_index_at_time,
+  is_counter, is_nine_hole, total_holes, handicap_index_at_time,
+  round_stats:gam_round_stats!gam_round_stats_whs_score_id_fkey(course_par),
   course:whs_courses(name, country_name, country_code)
 `;
+
+type WhsRoundStatsRef = { course_par: number | null };
+
+type RawScoreRow = Omit<WhsScore, 'course_par'> & {
+  handicap_index_at_time: number | null;
+  course_par?: number | null;
+  round_stats?: WhsRoundStatsRef | WhsRoundStatsRef[] | null;
+};
+
+function normalizeScoreRow(row: RawScoreRow): WhsScore & { handicap_index_at_time: number | null } {
+  const { round_stats, ...score } = row;
+  const stats = Array.isArray(round_stats) ? round_stats[0] : round_stats;
+  return {
+    ...score,
+    course_par: stats?.course_par ?? score.course_par ?? null,
+  };
+}
 
 export async function fetchLastRound(connectionId: string): Promise<WhsLastRound | null> {
   const { data, error } = await supabase
@@ -163,7 +181,7 @@ export async function fetchLastRound(connectionId: string): Promise<WhsLastRound
   if (error) throw error;
   if (!data || data.length === 0) return null;
 
-  const rows = data as unknown as Array<WhsScore & { handicap_index_at_time: number | null }>;
+  const rows = ((data as unknown as RawScoreRow[]) ?? []).map(normalizeScoreRow);
   const latest = rows[0];
   const previous = rows[1] ?? null;
 
@@ -237,8 +255,7 @@ export async function fetchAllScores(connectionId: string): Promise<WhsScoreWith
     .limit(1000);
   if (error) throw error;
 
-  type RawScore = Omit<WhsScoreWithIndex, 'course_thumbnail_image'>;
-  const rawRows = (data as unknown as RawScore[]) ?? [];
+  const rawRows = ((data as unknown as RawScoreRow[]) ?? []).map(normalizeScoreRow);
   if (rawRows.length === 0) return [];
 
   // Build a map of name → country_code so each thumbnail lookup uses the right
