@@ -21,7 +21,6 @@
  * position word, and a colour would be a fabrication in a new place.
  */
 import type { ClubAnalyticsTee } from './types';
-import { TEE_DOMINANT_SHARE } from './constants';
 
 export const yd = (n: number) => `${n.toLocaleString()} yd`;
 
