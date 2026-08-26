@@ -42,11 +42,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const PAGE_SIZE = 5;
 
-/* PLAYOFFS VIOLET — pinned pending V4, matching SeasonRow. V4.violet /
-   V4.violetSoft now carry these exact values; converging them is a no-op left
-   for whoever next touches the playoffs identity. */
-const VIOLET_TINT = 'rgba(94,77,168,0.22)';
-const VIOLET_INK = '#B9AEEA';
+/* The PLAYOFFS violet pair lived here for the removed playoffs chip. Both locals
+   are gone with it; the SHARED tokens are untouched and SeasonRow on the
+   schedule page still pins its own copies. */
+
 
 const DIM = V4.inkFaint;
 const MUTE = V4.inkMute;
@@ -183,8 +182,11 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
                   borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
                 }}
               >
-                <Skeleton className="h-3.5 w-16 rounded" />
-                <Skeleton className="mt-1.5 h-4 w-3/5 rounded" />
+                {/* line 1 — name with the tour badge beside it (three-line row) */}
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-3/5 rounded" />
+                  <Skeleton className="h-3.5 w-10 rounded" />
+                </div>
                 <Skeleton className="mt-1.5 h-3 w-2/5 rounded" />
                 <Skeleton className="mt-2 h-7 w-4/5 rounded" />
               </div>
@@ -293,26 +295,30 @@ function EventRow({ row, first, onOpen }: { row: ComingUpRow; first: boolean; on
         cursor: 'pointer',
       }}
     >
-      {/* line 1 — tour identity, always; playoffs / majors when applicable */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      {/* AMENDMENT — line 1 IS NOW NAME + TOUR BADGE, on one row. The badge sits
+          AFTER the name because a truncated tour code is useless where a
+          truncated tournament name is still recognisable: the name takes
+          minWidth 0 and the ellipsis, the badge is flex 'none' and never
+          shrinks or wraps. THE PLAYOFFS CHIP IS GONE from this section (Ben's
+          call); it survives on the schedule page's SeasonRow. */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+        <div
+          style={{
+            minWidth: 0,
+            flex: '1 1 auto',
+            fontSize: 15,
+            fontWeight: 700,
+            color: V4.ink,
+            letterSpacing: '-0.01em',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {displayEventName(row.name)}
+        </div>
         <Chip label={TOUR_LABEL[row.tour_slug] ?? row.tour_slug} fg={MUTE} bg="rgba(255,255,255,0.06)" border="rgba(255,255,255,0.10)" />
         {row.isMajor ? <Chip label={t('pill.majorEyebrow')} fg={V4.gold} bg={V4.goldSoftA} /> : null}
-        {row.isPlayoff ? <Chip label={t('overview.comingUp.chipPlayoffs')} fg={VIOLET_INK} bg={VIOLET_TINT} /> : null}
-      </div>
-      {/* line 2 — event name, full row width, nowrap */}
-      <div
-        style={{
-          marginTop: 5,
-          fontSize: 15,
-          fontWeight: 700,
-          color: V4.ink,
-          letterSpacing: '-0.01em',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {displayEventName(row.name)}
       </div>
       {/* line 3 — venue only. The defender lives in the three-up. */}
       {row.venue ? (
