@@ -3,11 +3,18 @@
  * pga -> OWGR, euro -> Race to Dubai, lpga -> Rolex Rankings. Other tours
  * (liv, pgad, champ) have no ranking board and render null.
  *
- * Anatomy: eyebrow header, board sub-label, No.1 spotlight row, hairline,
- * then rows 2-5. Every avatar+name cluster deep-links to the player page
- * (H8 convention). OWGR rows carry sr_players.id via the join; season
- * boards may lack a player_id when the row is a manual entry — those
- * rows fall through as non-tappable.
+ * Anatomy: eyebrow header, No.1 spotlight row, hairline, then rows 2-5. Every
+ * avatar+name cluster deep-links to the player page (H8 convention). OWGR rows
+ * carry sr_players.id via the join; season boards may lack a player_id when the
+ * row is a manual entry — those rows fall through as non-tappable.
+ *
+ * ENRICHMENT (MICRO_BRIEF_WORLD_RANKINGS_ENRICHMENT):
+ *  - Rows 2-5 carry a points bar scaled to the LEADER, not to the visible set,
+ *    so the shape still tells the truth if the section ever shows rows 6-10.
+ *    The hero gets no bar: a bar at 100% says nothing.
+ *  - Wins / top-10s render on every row INCLUDING the hero.
+ *  - Flags use the app's one flag system (@/components/ui/country-flag), the
+ *    same component the players page uses. Never emoji.
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +26,7 @@ import { MovementFigure } from '../../_shared/movement';
 import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
 import type { TourId } from '../../hooks/useOverviewData';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { PlayerAvatar } from '../../components/PlayerAvatar';
+import CountryFlag from '@/components/ui/country-flag';
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
 import { formatNumber } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -29,6 +36,70 @@ const TOUR_TO_BOARD: Partial<Record<TourId, { board: RankingsBoard; tourCode: st
   euro: { board: 'r2d', tourCode: 'euro' },
   lpga: { board: 'rolex', tourCode: 'lpga' },
 };
+
+/**
+ * Wins / top-10s: A ZERO IS A FACT AND RENDERS ("WINS 0"). Only a genuinely
+ * NULL figure collapses.
+ *
+ * This DIFFERS DELIBERATELY from "What's coming up" on the same page, where a
+ * missing figure collapses its column — there the DATA is absent (the fixture
+ * feed carries no field size at all), here the data is present and the value is
+ * zero. Do not reconcile the two rules; they answer different questions.
+ */
+function Figures({
+  wins,
+  top10s,
+  gap,
+  marginTop,
+}: {
+  wins: number | null;
+  top10s: number | null;
+  gap: number;
+  marginTop: number;
+}) {
+  const { t } = useTranslation('tourhub');
+  if (wins == null && top10s == null) return null;
+  return (
+    <div style={{ marginTop, display: 'flex', alignItems: 'center', gap }}>
+      {wins != null && (
+        <Figure label={t('overview.rankings.winsLabel', 'Wins')} value={wins} />
+      )}
+      {top10s != null && (
+        <Figure label={t('overview.rankings.top10Label', 'Top 10')} value={top10s} />
+      )}
+    </div>
+  );
+}
+
+function Figure({ label, value }: { label: string; value: number }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, minWidth: 0 }}>
+      {/* READ floor is 11 — this label sits at the floor, not below it. */}
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: '0.11em',
+          textTransform: 'uppercase',
+          color: V4.inkFaint,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          color: V4.inkMute,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
 
 export function WorldRankings({ tour }: { tour: TourId }) {
   const navigate = useNavigate();
@@ -42,12 +113,13 @@ export function WorldRankings({ tour }: { tour: TourId }) {
     return (
       <SectionShell eyebrow={t('overview.rankings.sectionEyebrow')} linkLabel={t('overview.rankings.linkLabel')} onLinkClick={() => navigate('/tourhub?tab=leaderboards')}>
         <div style={{ padding: '4px 16px 12px', display: 'flex', alignItems: 'center', gap: 14 }}>
-          <Skeleton className="h-[54px] w-[54px]" style={{ borderRadius: 18 }} />
+          <Skeleton className="h-[62px] w-[62px]" style={{ borderRadius: 18 }} />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <Skeleton className="h-3 w-24 rounded" />
             <Skeleton className="h-4 w-1/2 rounded" />
+            <Skeleton className="h-3 w-28 rounded" />
           </div>
-          <Skeleton className="h-7 w-16 rounded" />
+          <Skeleton className="h-8 w-16 rounded" />
         </div>
         <div style={{ margin: '0 16px', height: '0.5px', background: V4.hairline }} />
         <div style={{ padding: '2px 16px 0' }}>
@@ -58,16 +130,17 @@ export function WorldRankings({ tour }: { tour: TourId }) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                padding: '10px 0',
+                padding: '9px 0',
                 borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
               }}
             >
               <Skeleton className="h-3.5 w-4 rounded" />
-              <Skeleton className="h-8 w-8" style={{ borderRadius: 12 }} />
-              <div style={{ flex: 1 }}>
+              <Skeleton className="h-[34px] w-[34px]" style={{ borderRadius: 12 }} />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
                 <Skeleton className="h-3.5 w-2/5 rounded" />
+                <Skeleton className="h-2.5 w-1/3 rounded" />
               </div>
-              <Skeleton className="h-3 w-12 rounded" />
+              <Skeleton className="h-3 w-10 rounded" />
             </div>
           ))}
         </div>
@@ -77,6 +150,8 @@ export function WorldRankings({ tour }: { tour: TourId }) {
   if (rows.length === 0) return null;
 
   const [top, ...pack] = rows;
+  // Bars scale to the LEADER (row 1), never to the visible slice.
+  const leaderPoints = top?.points ?? null;
   const goToPlayer = (playerId: string | null) => {
     if (!playerId) return;
     navigate(`/tourhub/player/${playerId}`);
@@ -99,45 +174,82 @@ export function WorldRankings({ tour }: { tour: TourId }) {
       <div style={{ padding: '2px 16px 0' }}>
         {pack.map((r, i) => {
           const tappable = !!r.playerId;
+          const share =
+            leaderPoints && leaderPoints > 0 && r.points != null
+              ? Math.max(0, Math.min(1, r.points / leaderPoints))
+              : null;
           return (
             <div
               key={`${r.rank}-${i}`}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '10px 0',
+                position: 'relative',
                 borderTop: i === 0 ? 'none' : `0.5px solid ${V4.hairline}`,
               }}
             >
-              <div style={{ width: 22, textAlign: 'right', fontSize: 13, fontWeight: 700, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>
-                {r.rank}
-              </div>
-              <div
-                role={tappable ? 'link' : undefined}
-                onClick={tappable ? () => goToPlayer(r.playerId) : undefined}
-                style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0, cursor: tappable ? 'pointer' : 'default' }}
-              >
-                <PlayerAvatar
-                  playerId={r.playerId ?? r.playerName}
-                  playerName={r.playerName}
-                  tourCode={mapping.tourCode}
-                  photoUrl={r.photoUrl}
-                  size="sm"
+              {/* Points bar — BEHIND the content. No height, no column: it fills
+                  the row that already exists (same idea as the tee-difficulty
+                  bars on the course card). The content wrapper is
+                  position:relative and comes after, so no z-index is needed. */}
+              {share != null && (
+                <div
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: `${share * 100}%`,
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '0 3px 3px 0',
+                  }}
                 />
-                <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {r.playerName}
+              )}
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '9px 0',
+                }}
+              >
+                {/* Position numbers stay at 13 — the floor is a minimum, not a target. */}
+                <div style={{ width: 16, flex: 'none', textAlign: 'right', fontSize: 13, fontWeight: 700, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>
+                  {r.rank}
+                </div>
+                <div
+                  role={tappable ? 'link' : undefined}
+                  onClick={tappable ? () => goToPlayer(r.playerId) : undefined}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0, cursor: tappable ? 'pointer' : 'default' }}
+                >
+                  <SquircleAvatar
+                    size={34}
+                    srcCandidates={
+                      r.photoUrl
+                        ? [r.photoUrl, ...getPlayerHeadshotCandidates(r.playerName, mapping.tourCode)]
+                        : getPlayerHeadshotCandidates(r.playerName, mapping.tourCode)
+                    }
+                    alt={r.playerName}
+                    userId={r.playerId ?? r.playerName}
+                    hairlineRing
+                  />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                      <CountryFlag country={r.country} size="sm" className="!w-[13px] !h-[10px]" />
+                      <div style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 600, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {r.playerName}
+                      </div>
+                    </div>
+                    <Figures wins={r.wins} top10s={r.top10s} gap={12} marginTop={3} />
+                  </div>
+                </div>
+                <div style={{ minWidth: 38, flex: 'none', textAlign: 'right', fontSize: 15, fontWeight: 700, color: V4.inkMute, fontVariantNumeric: 'tabular-nums' }}>
+                  {r.points != null ? formatNumber(Math.round(r.points)) : ''}
+                </div>
+                <div style={{ minWidth: 22, flex: 'none', display: 'flex', justifyContent: 'flex-end' }}>
+                  <MovementFigure movement={r.movement} />
                 </div>
               </div>
-              {r.points != null ? (
-                <div style={{ minWidth: 56, textAlign: 'right', fontSize: 12, fontWeight: 700, color: V4.inkFaint, fontVariantNumeric: 'tabular-nums' }}>
-                  {formatNumber(Math.round(r.points))}
-                </div>
-              ) : (
-                <div style={{ minWidth: 56 }} />
-              )}
-              <MovementFigure movement={r.movement} />
-
             </div>
           );
         })}
@@ -169,7 +281,7 @@ function SpotlightRow({
         style={{ display: 'flex', alignItems: 'center', gap: 14, flex: 1, minWidth: 0, cursor: tappable ? 'pointer' : 'default' }}
       >
         <SquircleAvatar
-          size={54}
+          size={62}
           srcCandidates={candidates}
           alt={row.playerName}
           userId={row.playerId ?? row.playerName}
@@ -179,14 +291,19 @@ function SpotlightRow({
           <div style={{ fontSize: 11, fontWeight: 700, color: V4.ink, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
             {t('overview.rankings.worldNo1Label')}
           </div>
-          <div style={{ marginTop: 2, fontSize: 16.5, fontWeight: 700, color: V4.ink, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {row.playerName}
+          <div style={{ marginTop: 2, display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+            <CountryFlag country={row.country} size="sm" className="!w-4 !h-3" />
+            <div style={{ flex: 1, minWidth: 0, fontSize: 19, fontWeight: 700, color: V4.ink, letterSpacing: '-0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {row.playerName}
+            </div>
           </div>
+          {/* The hero carries wins/top-10s too — it is the one player whose wins matter most. */}
+          <Figures wins={row.wins} top10s={row.top10s} gap={14} marginTop={5} />
         </div>
       </div>
       {row.points != null ? (
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div style={{ fontSize: 28, fontWeight: 200, color: V4.ink, lineHeight: 1, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
+          <div style={{ fontSize: 30, fontWeight: 700, color: V4.ink, lineHeight: 1, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em' }}>
             {formatNumber(Math.round(row.points))}
           </div>
           <div style={{ marginTop: 4, fontSize: 11, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.14em' }}>

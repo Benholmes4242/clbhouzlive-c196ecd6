@@ -125,7 +125,9 @@
       "sectionEyebrow": "World rankings",
       "linkLabel": "Full rankings",
       "worldNo1Label": "World No. 1",
-      "pointsLabel": "POINTS"
+      "pointsLabel": "POINTS",
+      "winsLabel": "Wins",
+      "top10Label": "Top 10"
     },
     "teamWinnerStrip": {
       "eyebrow": "TEAM WINNER",
