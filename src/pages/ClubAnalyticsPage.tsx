@@ -281,7 +281,15 @@ export default function ClubAnalyticsPage() {
   // course the RPC answered about, so a club always sees at least its own block.
   const courses: ClubCourseRef[] = seed.data.club_courses.length
     ? seed.data.club_courses
-    : [{ course_id: seed.data.course_id, course_name: seed.data.course_name }];
+    : [{ course_id: seed.data.course_id, course_name: seed.data.course_name, rounds: seed.data.rounds }];
+
+  // §1 — the default-open block is club_courses[0] (ordered rounds DESC, then
+  // name), NOT the seed. The seed only existed to make the first call; if it is
+  // not [0] its response stays in the react-query cache under its own course id,
+  // so expanding that block later costs no request.
+  const defaultOpen = courses[0]?.course_id ?? null;
+  const effectiveOpen = openId ?? defaultOpen;
+
 
   return (
     <ManagePageShell title={TITLE}>
