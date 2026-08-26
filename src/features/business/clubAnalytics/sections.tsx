@@ -28,7 +28,7 @@ import {
 } from '@/features/courses/components/holes/analytical/tokens';
 import { PCT_MIN_N, MIN_BAR_PCT } from './constants';
 import type { ClubCourseAnalytics } from './types';
-import { sortTees, teeLabel, yd } from './tees';
+import { sortTees, teeLabel } from './tees';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
