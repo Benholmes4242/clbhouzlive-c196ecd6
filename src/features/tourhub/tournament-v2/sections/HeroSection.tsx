@@ -17,15 +17,19 @@
  */
 import { differenceInCalendarDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Star } from 'lucide-react';
+import { Trophy, Star, ChevronRight } from 'lucide-react';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { formatPurse } from '../../_shared/formatPurse';
 import { formatNumber } from '@/i18n/format';
-import { FONT, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import {
+  FONT, WHITE_ALPHA_65, WHITE_ALPHA_12,
+  HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT,
+} from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { HERO_MIN_H } from '../../_shared/tokens';
-import { heroCanonBackground } from '../../_shared/heroGradient';
+import { heroCanonScrimOn } from '../../_shared/heroGradient';
+
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
