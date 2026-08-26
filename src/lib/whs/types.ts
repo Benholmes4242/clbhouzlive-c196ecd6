@@ -25,6 +25,7 @@ export interface WhsHandicapTrend {
 export interface WhsCourseRef {
   name: string;
   country_name: string | null;
+  country_code?: string | null;
 }
 
 export interface WhsScore {
@@ -37,6 +38,10 @@ export interface WhsScore {
   slope_rating: number | null;
   marker_name: string | null;
   is_counter: boolean;
+  is_nine_hole: boolean;
+  total_holes: number;
+  /** Round/tee par from gam_round_stats, not the course catalogue. */
+  course_par: number | null;
   /** WHS-side course id. NOT a golf_courses id - bridge via whs_to_golf_course_map. */
   course_id: string | null;
   course: WhsCourseRef | null;
