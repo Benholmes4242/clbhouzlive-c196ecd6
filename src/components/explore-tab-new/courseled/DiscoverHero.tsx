@@ -425,11 +425,12 @@ export function DiscoverHero({
           </span>
         </div>
 
-        {/* ROW TWO — the course and its region, alone. The gross cluster moved up
-            onto the headline row (MICRO_BRIEF_HERO_SCORE_ON_HEADLINE_ROW §3), so
-            there is nothing to right-align against here and no flex row. The text
-            wraps to a second line rather than truncating: a clipped course name is
-            a course the member cannot identify. */}
+        {/* ROW TWO — the course and its region, ALONE (§1.1). No flex wrapper for
+            a single child and nothing to right-align against: the score is a
+            labelled two-up above the member row now. The text wraps to a second
+            line rather than truncating: a clipped course name is a course the
+            member cannot identify. */}
+
         <div
           style={{
             marginTop: 4,
