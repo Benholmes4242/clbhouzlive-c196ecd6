@@ -59,20 +59,21 @@ function Head({ w = 150, sub = 210 }: { w?: number; sub?: number }) {
 }
 
 /**
- * WHAT'S COMING UP — head (17 + 28) over a 754 table body, plus the pager dots.
+ * WHAT'S COMING UP — head (17 + 28) over a 624 table body, plus the pager dots.
  *
- * REMEASURED for MICRO_BRIEF_COMING_UP_REBUILD. The section is now ONE HEADER
- * PER DAY over four-line rows, and the settled track MEASURED LIVE at 390 is
- * 799 (five 138 rows + three 32 group headers). The hold draws two group headers
- * and five rows = 754, deliberately 45 SHORT: a hold may be smaller than the
- * settled state, never larger, and the group count varies with the fixture list.
+ * REMEASURED for the AMENDMENT to MICRO_BRIEF_COMING_UP_REBUILD: the tour badge
+ * moved INLINE with the name and the playoffs chip was removed, so each event is
+ * THREE lines and MEASURES 112 LIVE at 390 (was 138). The settled track is 658
+ * (five 112 rows + three 32 group headers). The hold draws two group headers and
+ * five rows = 624, deliberately 34 SHORT: a hold may be smaller than the settled
+ * state, never larger, and the group count varies with the fixture list.
  */
 function ComingUpBlock() {
   return (
     <section>
       <Head w={158} sub={228} />
       <div style={{ padding: '0 16px' }}>
-        <div style={{ height: 754, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ height: 624, display: 'flex', flexDirection: 'column' }}>
           {[0, 1].map((g) => (
             <div key={g} style={{ display: 'flex', flexDirection: 'column' }}>
               {/* group header — 32 */}
@@ -90,12 +91,12 @@ function ComingUpBlock() {
                 <Bar style={{ height: 10, width: 54 }} />
                 <Bar style={{ height: 10, width: 72 }} />
               </div>
-              {/* rows — 138 each; 3 under the first header, 2 under the second */}
+              {/* rows — 112 each; 3 under the first header, 2 under the second */}
               {(g === 0 ? [0, 1, 2] : [0, 1]).map((i) => (
                 <div
                   key={i}
                   style={{
-                    height: 138,
+                    height: 112,
                     boxSizing: 'border-box',
                     padding: '11px 14px 12px',
                     borderTop: i === 0 ? 'none' : `1px solid ${A.BORDER}`,
@@ -103,9 +104,13 @@ function ComingUpBlock() {
                     flexDirection: 'column',
                   }}
                 >
-                  <Bar style={{ height: 15, width: 62 }} />
-                  <Bar style={{ height: 16, width: '62%', marginTop: 6 }} />
+                  {/* line 1 — name with the tour badge beside it */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Bar style={{ height: 16, width: '58%' }} />
+                    <Bar style={{ height: 15, width: 40 }} />
+                  </div>
                   <Bar style={{ height: 12, width: '44%', marginTop: 5 }} />
+
                   <div style={{ display: 'flex', gap: 18, marginTop: 10 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                       <Bar style={{ height: 10, width: 40 }} />
