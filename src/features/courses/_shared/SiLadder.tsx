@@ -123,8 +123,8 @@ export const SiLadder: React.FC<{
         <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'center', color: sort === 'si' ? A.MUTE : A.DIM }}>
           SI
         </span>
-        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'center' }}>Plays</span>
         <span />
+        <span style={{ ...LABEL, fontSize: 8.5, textAlign: 'right' }}>Plays</span>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: GRID, alignItems: 'start' }}>
