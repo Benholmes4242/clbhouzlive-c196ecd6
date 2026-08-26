@@ -112,15 +112,15 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
     let bestVsHcp: Tile = empty('Best vs HCP');
     if (currentHandicap != null && grossList.length) {
       const scored = grossList
-        .filter((s) => {
-          const course = s.course as { course_par?: number | null } | null | undefined;
-          return typeof course?.course_par === 'number';
-        })
         .map((s) => {
-          const par = (s.course as { course_par: number }).course_par;
+          const course = s.course as { course_par?: number | null } | null | undefined;
+          const par = course?.course_par;
+          if (typeof par !== 'number') return null;
           const overPar = (s.adjusted_gross as number) - par;
           return { s, vsHcp: overPar - currentHandicap };
-        });
+        })
+        .filter((x): x is { s: WhsScore; vsHcp: number } => x !== null);
+
       if (scored.length) {
         const best = scored.reduce((a, b) => (a.vsHcp <= b.vsHcp ? a : b));
         const sign = best.vsHcp <= 0 ? '' : '+';
