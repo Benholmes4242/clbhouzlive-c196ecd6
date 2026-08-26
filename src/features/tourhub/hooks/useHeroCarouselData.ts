@@ -444,13 +444,36 @@ export function useHeroCarouselData() {
             liveSlides.push({ tournament, type: 'live' });
           }
         } else if (completed.length > 0) {
-          // Concurrent completed events (e.g. two DPWT events the same week)
-          // each get a slide - mirrors the live branch. The completed cache
-          // is bounded to the recent window, so this cannot flood.
-          for (const tournament of completed) {
-            completedSlides.push({ tournament, type: 'completed' });
+          // Age gate (MICRO_BRIEF_TOUR_SEASON_COMPLETE_WINDOW §2). The bucket is
+          // fetched wide (COMPLETED_BUCKET_DAYS) so the cap lives HERE, in the
+          // selection — never in deriveHeroState.
+          //   tour HAS an upcoming event  -> result stands RESULTS_HANDOVER_DAYS,
+          //                                  then the upcoming card takes the slot
+          //   tour has NO upcoming event  -> result stands RESULTS_CAP_DAYS, then
+          //                                  the TOUR is omitted from the carousel
+          // Both measured in DAYS against end_date, same unit as the bucket.
+          const hasUpcoming = upcoming.length > 0;
+          const maxAge = hasUpcoming ? RESULTS_HANDOVER_DAYS : RESULTS_CAP_DAYS;
+          const inWindow = completed.filter(t => {
+            const age = daysSinceEndDate(t.endDate);
+            return age == null || age <= maxAge;
+          });
+
+          if (inWindow.length > 0) {
+            // Concurrent completed events (e.g. two DPWT events the same week)
+            // each get a slide - mirrors the live branch. The bucket is bounded,
+            // so this cannot flood.
+            for (const tournament of inWindow) {
+              completedSlides.push({ tournament, type: 'completed' });
+            }
+          } else if (hasUpcoming) {
+            // Handover: the stale result steps aside for the next event.
+            pushUpcomingForTour(tour, upcoming);
           }
+          // else: season complete past the cap — the TOUR is omitted entirely.
+          // No slide, no empty slot, no placeholder.
         } else if (upcoming.length > 0) {
+
           // Skip co-sanctioned majors on non-PGA tours (already excluded from PGA
           // slot when active via the eviction above).
           const nextTrueEvent = tour === 'pga'
