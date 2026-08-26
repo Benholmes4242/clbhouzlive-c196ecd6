@@ -1,11 +1,13 @@
 /**
- * HeroSection — cinematic tournament hero (mock: tournament-hero-states).
+ * HeroSection — tournament hero, ported to the overview hero's structure
+ * (BRIEF_TOURNAMENT_HERO_BAND_PORT).
  *
- * Full-bleed course image (useSingleCourseImage) under the same scrim as the
- * overview cinematic hero. NO boxed glass panel — content sits directly on
- * the scrim above a 0.5px hairline; a state band pivots on `state`
- * (live -> LEADER row, upcoming -> DEFENDING + countdown, completed ->
- * CHAMPION + winning score).
+ * The PHOTOGRAPH carries three things only: the state chip, the h1 and the
+ * venue line. Every fact sits in stacked bands BENEATH it — a stat strip on
+ * HERO_BOARD_SURFACE_SOFT, a one-row person band and a disclosure row on
+ * HERO_BOARD_SURFACE. No hairline over the image, no figures over foliage.
+ * No board or ticker band lives here: TournamentPage mounts MiniBoard directly
+ * below this hero, and a second board would print the same rows twice.
  *
  * TYPE SCALE — HERO EXCEPTION (MICRO_BRIEF_TOURNAMENT_PAGE_TYPE_SCALE). This is
  * the same cinematic register as the overview hero: a broadcast surface over
