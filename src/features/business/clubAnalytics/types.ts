@@ -75,13 +75,24 @@ export interface ClubAnalyticsYear {
  * yardage, not whether the club calls it white, yellow or blue.
  */
 export interface ClubAnalyticsTee {
-  /** 18-hole total for the set, in yards. */
+  /** 18-hole total for the set, in yards, bucketed to 100. */
   yards: number;
-  /** Rounds played off this set. */
+  /** Rounds played off this set. Sets under 10 rounds are not returned. */
   rounds: number;
-  /** Mean gross over par for a round on this set. */
+  /** Mean gross over THAT ROUND'S OWN PAR for a round on this set. */
   avg_to_par: number;
+  /** Mean handicap index at the time of play on this set. */
+  mean_index: number | null;
+  /** Rounds from an index under 9. */
+  low: number;
+  /** Rounds from an index of 9 to 14.9. */
+  mid: number;
+  /** Rounds from an index of 15 and above. */
+  high: number;
+  /** Rounds carrying an index at all — the denominator for the mix, never `rounds`. */
+  with_index: number;
 }
+
 
 export interface ClubAnalyticsBand {
   /** e.g. "Scratch to 4.9" — the band label is the RPC's, not the client's. */
