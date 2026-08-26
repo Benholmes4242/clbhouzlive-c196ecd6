@@ -163,7 +163,7 @@ export function TourPageShell({
                   style={{
                     fontSize: 12,
                     fontWeight: 600,
-                    color: A.INK_MUTE,
+                    color: A.MUTE,
                     marginTop: 1,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
