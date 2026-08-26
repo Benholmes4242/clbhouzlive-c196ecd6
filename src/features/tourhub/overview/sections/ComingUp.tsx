@@ -12,7 +12,13 @@
  *     said ONCE PER DAY, not once per event.
  *  c. The venue line wrapped because the defender was appended to it. THE
  *     DEFENDER IS NOT ON THE VENUE LINE — it is a figure in the three-up. Venue
- *     is nowrap + ellipsis, so every row is the same height.
+ *     is nowrap + ellipsis so THE VENUE LINE never wraps. ROWS ARE NOT EQUAL
+ *     HEIGHT: the three-up and the venue line each collapse independently, and
+ *     day-header count varies per page because pages are cut on event count. The
+ *     pager therefore MEASURES each page and sizes the track to the swipe rather
+ *     than assuming a fixed page height (a flex row otherwise sizes to its
+ *     tallest page and leaves dead space under short ones).
+
  *  d. Event names truncated inside a narrow flex column. The name now owns the
  *     full row width (the date column is gone), so "Husqvarna British Masters
  *     hosted by Sir Nick Faldo" fits at 390.
