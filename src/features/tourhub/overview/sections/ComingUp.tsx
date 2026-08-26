@@ -42,11 +42,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const PAGE_SIZE = 5;
 
-/* PLAYOFFS VIOLET — pinned pending V4, matching SeasonRow. V4.violet /
-   V4.violetSoft now carry these exact values; converging them is a no-op left
-   for whoever next touches the playoffs identity. */
-const VIOLET_TINT = 'rgba(94,77,168,0.22)';
-const VIOLET_INK = '#B9AEEA';
+/* The PLAYOFFS violet pair lived here for the removed playoffs chip. Both locals
+   are gone with it; the SHARED tokens are untouched and SeasonRow on the
+   schedule page still pins its own copies. */
+
 
 const DIM = V4.inkFaint;
 const MUTE = V4.inkMute;
