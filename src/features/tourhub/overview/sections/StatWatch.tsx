@@ -114,10 +114,6 @@ function StatList({
   const { t } = useTranslation('tourhub');
   const leaders = category.leaders;
   const maxAbs = Math.max(...leaders.map((l) => Math.abs(l.deviation)), 0.0001);
-  const direction =
-    category.order === 'desc'
-      ? t('overview.statWatch.higherIsBetter', 'Higher is better')
-      : t('overview.statWatch.lowerIsBetter', 'Lower is better');
   // Absolute stats say what the bar is measured against; SG stats do not need
   // to, because their zero IS the field.
   const anchorNote =
@@ -130,17 +126,19 @@ function StatList({
   return (
     <div style={{ padding: '10px 16px 0' }}>
       {/* READ floor 11. */}
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: V4.inkFaint,
-        }}
-      >
-        {[category.unit, direction, anchorNote].filter(Boolean).join(' · ')}
-      </div>
+      {category.unit || anchorNote ? (
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: V4.inkFaint,
+          }}
+        >
+          {[category.unit, anchorNote].filter(Boolean).join(' · ')}
+        </div>
+      ) : null}
 
       <div style={{ marginTop: 8 }}>
         {leaders.map((l, i) => {
