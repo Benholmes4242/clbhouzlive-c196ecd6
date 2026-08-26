@@ -32,6 +32,8 @@ import {
   SC_PAR_DARK, SC_BOGEY_DARK, SC_DOUBLE_DARK,
 } from '@/features/courses/components/holes/_constants';
 import { PCT_MIN_N, MIN_BAR_PCT } from './constants';
+import { SiLadder } from '@/features/courses/_shared/SiLadder';
+import { buildSiLadder } from '@/features/courses/_shared/siLadder';
 import type { ClubCourseAnalytics, ClubAnalyticsHole, ClubAnalyticsTee } from './types';
 import { sortTees, yd } from './tees';
 
