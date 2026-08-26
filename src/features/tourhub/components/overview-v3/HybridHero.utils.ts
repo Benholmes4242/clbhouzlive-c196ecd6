@@ -40,10 +40,16 @@ export interface TopTie {
 /**
  * How long a finished tournament continues to show as the RESULTS card
  * before handing over to the next event's UPCOMING card. 72h covers the
- * Sun-finish → Wed-viewing rhythm. Used by both useTournamentsCache (bucket
- * query window) and deriveHeroState (visual-state guard).
+ * Sun-finish → Wed-viewing rhythm.
+ *
+ * ONE CONSUMER ONLY: useTournamentsCache's completed-bucket window. It is NO
+ * LONGER a visual-state guard — deriveHeroState renders a closed event as
+ * results at any age (BRIEF_TOUR_HERO_STALE_STATE §1). Note Postgres compares
+ * `end_date >= now - 72h` date-truncated, so the bucket is slightly more
+ * generous than the literal 72 hours.
  */
 export const RESULTS_WINDOW_HOURS = 72;
+
 
 /**
  * How far in advance the next event begins showing as UPCOMING. Used by
