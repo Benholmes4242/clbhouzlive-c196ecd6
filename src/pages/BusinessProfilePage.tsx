@@ -650,8 +650,12 @@ const BusinessProfilePage: React.FC = () => {
 
 
 
-      {/* ----- Tabs ----- */}
-      <section className="px-4 bg-background">
+      {/* ----- Tabs -----
+          Deliberately paints NO background: the PageRoot canvas (--bg-page)
+          shows through so the strip is continuous with the page. Do NOT
+          reintroduce bg-background — --background (#15171F) and --bg-page
+          (#111113 under .dark) resolve differently, which produced a band. */}
+      <section className="px-4">
         <div className="flex justify-center" style={{ padding: '10px 0' }}>
           <FilterChips
             options={tabs.map((tab) => ({ id: tab.id, label: tab.label }))}
