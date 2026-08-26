@@ -51,7 +51,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
-import { FONT, HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { FONT, GOLD, HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
 import { PlayerAvatar } from '../../PlayerAvatar';
@@ -302,23 +302,46 @@ export function HeroBoardSection({
         }
       }
       if (best) {
+        /* MICRO_BRIEF_PICKS_ROW_WINNER §2 — A WIN IS NOT AN ORDINAL. A pick that
+           finished 1st OUTRIGHT on a settled result reads WON in GOLD (the
+           celebratory token, same value as the majors numerals and the crown).
+           NOT amber — amber is the viewing member. A TIED FIRST IS NOT A WIN:
+           `T1` stays a numeral, and useHeroCarouselData re-buckets a tied top
+           with no confirmed winner into LIVE, so an unsettled playoff can never
+           reach this branch. */
+        const won = phase === 'completed' && best.position === 1 && !best.tied;
         return {
           name: surnameOf(best.pick.playerName),
-          right: phase === 'completed' ? `${best.tied ? 'T' : ''}${best.position}` : null,
+          right: phase === 'completed' ? (won ? 'WON' : `${best.tied ? 'T' : ''}${best.position}`) : null,
+          rightColor: won ? GOLD : WHITE_ALPHA_65,
           figure: best.score == null ? null : formatToPar(best.score),
           figureColor: tourFigColor(best.score),
         };
       }
+
+      /* MICRO_BRIEF_PICKS_ROW_WINNER §1 — NO WIN PROBABILITY ON A LIVE OR
+         COMPLETED SLIDE, IN ANY PATH. When no pick has a board line (withdrawn,
+         missed cut, not in the field) the row shows the top-ranked pick's NAME
+         ONLY. It never falls through to the PRE percentage. */
+      const ranked = [...picks].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))[0];
+      if (!ranked) return null;
+      return {
+        name: surnameOf(ranked.playerName),
+        right: null,
+        rightColor: WHITE_ALPHA_65,
+        figure: null,
+        figureColor: '#FFFFFF',
+      };
     }
 
-    /* PRE — and the fallback for every phase §2 cannot serve: the TOP-RANKED
-       pick and its win probability. COMPLETE lands here too: see the report —
-       a finishing position is not reachable from anything already in scope. */
+    /* PRE ONLY — the TOP-RANKED pick and its win probability. Before a
+       tournament a probability is the only thing a pick can say. UNCHANGED. */
     const top = [...picks].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))[0];
     if (!top) return null;
     return {
       name: surnameOf(top.playerName),
       right: null,
+      rightColor: WHITE_ALPHA_65,
       figure: top.winProbability != null ? `${Math.round(top.winProbability)}%` : null,
       figureColor: '#FFFFFF',
     };
@@ -531,7 +554,16 @@ export function HeroBoardSection({
               {closedFigure.name}
             </span>
             {closedFigure.right && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: closedFigure.right === 'WON' ? 800 : 600,
+                  letterSpacing: closedFigure.right === 'WON' ? '0.08em' : undefined,
+                  color: closedFigure.rightColor,
+                  ...FIGS,
+                }}
+              >
+
                 {closedFigure.right}
               </span>
             )}
