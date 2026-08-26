@@ -1864,8 +1864,12 @@ export function GolfThisWeek({
             left: 0,
             bottom: 0,
             display: 'flex',
-            alignItems: 'center',
-          }}
+            /* STRETCH, NOT CENTRE: this wrapper spans top 0 to bottom 0, so its
+               height is the pill row's height and the trigger inherits it. No
+               fixed pixel height anywhere — a number would silently rot the day
+               pill type or padding moves. */
+            alignItems: 'stretch',
+
         >
           <RegionDropdown
             regions={regions}
