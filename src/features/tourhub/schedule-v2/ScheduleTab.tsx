@@ -297,7 +297,7 @@ export function ScheduleTab() {
         position: 'relative',
       }}
     >
-      {/* Tour lens — sticky glass wrapper preserves --tour-chips-h. */}
+      {/* Tour lens — sticky opaque wrapper preserves --tour-chips-h. */}
       <div
         ref={chipsRef}
         style={{
@@ -435,9 +435,7 @@ export function ScheduleTab() {
                       position: 'sticky',
                       top: 'calc(var(--tour-header-h, 0px) + var(--tour-chips-h, 47px) - 1px)',
                       zIndex: 2,
-                      background: 'rgba(21,23,31,0.72)',
-                      backdropFilter: 'blur(14px)',
-                      WebkitBackdropFilter: 'blur(14px)',
+                      background: SLATE_50,
                       padding: '14px 16px 6px',
                       // READ 11: the month group heading is language.
                       fontSize: 11,

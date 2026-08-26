@@ -81,10 +81,7 @@ function SectionTourLensInner({ value, onChange, showAllTours = true, excludeTou
         className="pointer-events-none absolute top-0 right-0 h-full hrail-fade hrail-fade-right"
         style={{
           width: 5,
-          // Canvas (#15171F) at full alpha on the masked edge. Both stops were
-          // flattened to alpha 0, which painted nothing while useEdgeFades kept
-          // toggling it; the zero-alpha stops were the bug, not the element.
-          background: 'linear-gradient(to left, rgba(21,23,31,0) 0%, rgba(21,23,31,1) 100%)',
+          background: '#15171F',
           opacity: 0,
           transition: 'opacity 150ms ease',
         }}
