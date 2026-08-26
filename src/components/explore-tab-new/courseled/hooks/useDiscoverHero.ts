@@ -55,12 +55,13 @@ export const SLOT_MS = 12 * 60 * 60 * 1000;
 export const slotForTime = (ms: number) => Math.floor(ms / SLOT_MS);
 
 /**
- * A rare feat leads from the slot its round appeared in and through the next
- * one, so a feat landing mid-slot still holds twelve hours later and is back in
- * the rotation twenty-four hours later. play_date is the only arrival signal
- * available (the arrival-stamp work is parked), so it anchors the window.
+ * A rare feat leads from the slot its round appeared in and through the next TWO
+ * slots' worth of boundaries (see the `<= LEAD_SLOTS` comparison below).
+ * play_date is the only arrival signal available (the arrival-stamp work is
+ * parked), so it anchors the window.
  */
-const LEAD_SLOTS = 1;
+const LEAD_SLOTS = 2;
+
 
 const playSlot = (playDate: unknown): number => {
   const ms = Date.parse(`${String(playDate ?? '').slice(0, 10)}T00:00:00Z`);
