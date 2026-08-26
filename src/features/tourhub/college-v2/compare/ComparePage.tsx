@@ -29,7 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { TourHubShell } from '@/features/tourhub/components/TourHubShell';
 import { TourPageShell } from '@/features/tourhub/components/TourPageShell';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { collegeProfileRoute, playerRoute } from '@/features/tourhub/routes';
+import { collegeHubRoute, collegeProfileRoute, playerRoute } from '@/features/tourhub/routes';
 import { formatEarnings } from '@/features/tourhub/_shared/formatEarnings';
 import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
