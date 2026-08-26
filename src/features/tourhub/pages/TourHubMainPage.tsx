@@ -35,6 +35,8 @@ function TourHubChromeBridge({
   onSignOut,
   backMode,
   onBack,
+  menuOpen,
+  setMenuOpen,
 }: {
   activeTab: TourHubTab;
   onSelectTab: (tabId: string) => void;
@@ -43,8 +45,9 @@ function TourHubChromeBridge({
   onSignOut: () => void;
   backMode: boolean;
   onBack: () => void;
+  menuOpen: boolean;
+  setMenuOpen: (v: boolean) => void;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const label = useTourShortLabel();
   const isOverview = activeTab === 'overview';
@@ -68,7 +71,7 @@ function TourHubChromeBridge({
         showPicker={isOverview}
       />
     ),
-    [label, isOverview, backMode, onBack],
+    [label, isOverview, backMode, onBack, setMenuOpen],
   );
   useSetChromeLeftSlot(slot);
 
@@ -92,6 +95,7 @@ function TourHubChromeBridge({
     </>
   );
 }
+
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
