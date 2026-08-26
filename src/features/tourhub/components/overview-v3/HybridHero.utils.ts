@@ -132,6 +132,12 @@ interface DeriveOpts {
   teeTimesAvailable?: boolean;
 }
 
+/**
+ * Statuses present in sr_tournaments that mean "has not been played yet".
+ * `created` sits here explicitly (BRIEF_TOUR_HERO_STALE_STATE §4).
+ */
+export const UPCOMING_STATUSES = ['scheduled', 'created'];
+
 export function deriveHeroState(
   tournament: HeroTournament,
   now: Date = new Date(),
@@ -140,8 +146,8 @@ export function deriveHeroState(
   const status = (tournament.status || '').toLowerCase();
   const start = tournament.startDate ? new Date(tournament.startDate) : null;
   const end = tournament.endDate ? new Date(tournament.endDate) : null;
-  const hoursSinceEnd = end ? (now.getTime() - end.getTime()) / 3_600_000 : null;
   const hoursUntilStart = start ? (start.getTime() - now.getTime()) / 3_600_000 : Infinity;
+
 
   // Cancelled — short circuit
   if (status === 'cancelled') {
