@@ -50,7 +50,8 @@ export function useClubCourseAnalytics(courseId: string | undefined, enabled = t
         return { state: 'unavailable', reason: error.message };
       }
 
-      const row = (Array.isArray(data) ? data[0] : data) as Record<string, unknown> | null | undefined;
+      const payload = data as unknown;
+      const row = (Array.isArray(payload) ? payload[0] : payload) as Record<string, unknown> | null | undefined;
       if (!row) return { state: 'empty' };
 
       const shaped: ClubCourseAnalytics = {
