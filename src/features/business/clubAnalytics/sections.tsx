@@ -1,52 +1,51 @@
 /**
- * BRIEF_CLUB_ANALYTICS_TAB §4 — THE SECTIONS, IN ORDER.
+ * BRIEF_CLUB_ANALYTICS_MULTI_COURSE §4-§7 — THE SECTIONS OF ONE COURSE BLOCK.
  *
- *   1  THE VERDICT              stroke index, declared against measured
- *   2  HOW YOUR COURSE PLAYS    every hole, hardest to easiest, both ranks
- *   3  WHAT GETS MADE HERE      the scoring distribution
- *   4  WHAT YOUR TEES COST      every measured yardage (v2 §4)
- *   5  WHEN YOUR COURSE IS BUSY by month
- *   6  WHO PLAYS HERE           handicap bands, DISTRIBUTION ONLY
+ *   0  THE SAMPLE            members · rounds · since — before any figure (§4)
+ *   1  HOLE BY HOLE          declared SI beside measured rank, with a toggle (§5)
+ *   2  STROKE INDEX          GATED on si_advice_state, never on si_advice (§6)
+ *   3  WHAT GETS MADE HERE   the seven outcomes, worst to best
+ *   4  WHAT YOUR TEES SCORED yardages, described — NEVER ranked by difficulty
+ *   5  WHEN YOUR COURSE PLAYS months, weekdays, years
+ *   6  WHO PLAYS HERE        handicap bands with rounds AND members
+ *   7  HOW IT IS PLAYED      competition against social
  *
- * WITHDRAWN (v2 §8): the low-versus-high handicap band differential — the
- * statistic a stroke index is actually FOR. It is NOT BUILDABLE and must not be
- * attempted: of 3,161 rounds only 72 sit at index 18 or above, 891 are PLUS
- * handicaps, and at Hanbury there are ZERO rounds at 18+, so the comparison
- * returns an empty panel. WHO PLAYS HERE therefore shows the distribution and
- * makes NO difficulty claim from it.
- *
- * THE TWO FAULTS FROM INSIGHTS, NOT REPEATED (§6):
+ * TWO RULES CARRIED FORWARD:
  *   - ZERO IS A FACT. A club with no albatrosses renders 0. The dash is
  *     reserved for "not measured" and nothing else.
  *   - NO INVENTED ROWS. A section with no data says so; it never renders
  *     plausible-looking placeholders with empty bars.
- *   - ONE CHART INSET, populated or not, so the page does not change shape as
- *     data arrives. No dashed edges.
+ *
+ * TWO ROUND COUNTS, AND THEY ARE NOT INTERCHANGEABLE. `rounds` is every
+ * measured round; `complete_rounds` is rounds carrying all 18 holes. The HOLE
+ * RANKING rests on the second, because picked-up holes are excluded rather than
+ * counted, so a hole statement cites complete_rounds.
  */
 import React from 'react';
 import {
-  A, SANS, FIGS, LABEL, Panel, BIZ_LABEL, BIZ_BODY, BIZ_TITLE, bizFigure,
-  BIZ_INSET, difficultyRampStop, DIFFICULTY_RAMP, RAMP_TOPAR, TOPAR_RED, toParParts,
+  A, SANS, FIGS, NUM, LABEL, Panel, BIZ_LABEL, BIZ_BODY, BIZ_TITLE, bizFigure,
+  BIZ_INSET, difficultyRampColor, difficultyRampStop, DIFFICULTY_RAMP, RAMP_TOPAR, TOPAR_RED, toParParts,
 } from '@/features/courses/components/holes/analytical/tokens';
-import { EARLY_DATA_FLOOR, DRIFT_FIGURE_MIN, PCT_MIN_N, MIN_BAR_PCT } from './constants';
+import { PCT_MIN_N, MIN_BAR_PCT } from './constants';
 import type { ClubCourseAnalytics } from './types';
-import { sortTees, teeLabel, teeSpreadLine, verdictScopeLine, yd } from './tees';
-import { buildVerdict, withDrift, ordinal, type Verdict } from './verdict';
+import { sortTees, teeLabel, yd } from './tees';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-/** §5a — every section carries its n, or says EARLY DATA below the floor. */
-export function nLabel(rounds: number): string {
-  if (rounds < EARLY_DATA_FLOOR) return 'Early data';
-  return `${rounds.toLocaleString()} rounds`;
-}
-
-/** §6.4 — a share below PCT_MIN_N is an absolute, not a percentage. */
+/** A share below PCT_MIN_N is an absolute, not a percentage. */
 function share(count: number, total: number): string {
   if (total < PCT_MIN_N) return count.toLocaleString();
   const pct = (count / total) * 100;
   if (count === 0) return '0%';
   return pct >= 1 ? `${Math.round(pct)}%` : `${pct.toFixed(1)}%`;
+}
+
+function monthYear(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  const d = new Date(`${iso.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return null;
+  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
 
 const Inset: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
@@ -57,119 +56,148 @@ const Body: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }>
   <p style={{ ...BIZ_BODY, margin: 0, ...style }}>{children}</p>
 );
 
-/* ───────────────────────── 1  THE VERDICT ───────────────────────── */
+const roundsLabel = (n: number) => `${n.toLocaleString()} ${n === 1 ? 'round' : 'rounds'}`;
 
-export const VerdictSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  const verdict: Verdict = buildVerdict(data.holes, data.rounds);
-  const rated = withDrift(data.holes).filter((h) => h.drift != null) as { hole_no: number; drift: number }[];
-  const maxDrift = rated.reduce((m, h) => Math.max(m, h.drift), 0) || 1;
+/* ─────────────────── 0  THE SAMPLE, STATED PLAINLY ─────────────────── */
+
+/**
+ * §4 — THE HEADER IS THE HONEST BIT, AND IT IS ALSO THE PITCH.
+ *
+ * "17 members · 817 rounds · since March 2018". NOT presented as the club's
+ * membership: seventeen of Sundridge's members have connected and the club has
+ * hundreds. A club shown 817 rounds without the member count reads it as the
+ * whole picture. The line underneath makes that limitation the reason to promote
+ * clbhouz — the commercial mechanic, not a disclaimer.
+ */
+export const SampleSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
+  const since = monthYear(data.first_round);
+  const parts = [
+    `${data.members.toLocaleString()} ${data.members === 1 ? 'member' : 'members'}`,
+    roundsLabel(data.rounds),
+    since ? `since ${since}` : null,
+  ].filter(Boolean) as string[];
 
   return (
-    <Panel kicker="The verdict" aside={nLabel(data.rounds)}>
-      <div
-        style={{
-          ...BIZ_TITLE,
-          fontSize: verdict.kind === 'sound' ? 22 : 19,
-          letterSpacing: '-0.035em',
-          marginBottom: 8,
-        }}
-      >
-        {verdict.headline}
+    <Panel kicker="The sample">
+      <div style={{ ...BIZ_TITLE, fontSize: 19, letterSpacing: '-0.03em', marginBottom: 8 }}>
+        {parts.join(' · ')}
       </div>
-      <Body style={{ marginBottom: 10 }}>{verdict.support}</Body>
-
-      {/*
-        §4.2 — WHICH TEES THIS VERDICT IS ABOUT, on screen, always. A stroke
-        index verdict that silently mixes tees is worse than no verdict, so the
-        scope is stated whether the ranking was scoped to one set or adjusted
-        across several.
-      */}
-      <Body style={{ marginBottom: 14, fontSize: 12, color: A.DIM }}>
-        {verdictScopeLine(data.verdict_scope)}
+      <Body>
+        That is every member of your club who has connected their handicap record to clbhouz, and every round of theirs
+        played here. The more of your members are connected, the sharper this picture gets — each one adds rounds to
+        every figure below, and to the stroke index check.
       </Body>
-
-      {/* ONE CHART INSET, populated or not (§6.3). */}
-      <Inset>
-        <div style={{ ...BIZ_LABEL, marginBottom: 10 }}>Places out of position, hole by hole</div>
-        {rated.length === 0 ? (
-          <Body>No hole on the rounds we hold carries a stroke index, so there is nothing to plot here yet.</Body>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 92 }}>
-            {withDrift(data.holes).map((h) => {
-              const drift = h.drift;
-              // §3.4 — SIX DISCRETE STOPS, stepped, never interpolated.
-              const stop = drift == null
-                ? 0
-                : Math.round((drift / maxDrift) * (DIFFICULTY_RAMP.length - 1));
-              const height = drift == null ? 3 : Math.max(4, (drift / maxDrift) * 68);
-              return (
-                <div key={h.hole_no} style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
-                  {drift != null && drift >= DRIFT_FIGURE_MIN && (
-                    <div style={{ ...bizFigure(11, A.INK), marginBottom: 4 }}>{drift}</div>
-                  )}
-                  <div
-                    style={{
-                      height,
-                      borderRadius: 2,
-                      background: drift == null ? A.TRACK : difficultyRampStop(stop),
-                    }}
-                  />
-                  {/* AXIS floor 10: hole number under a bar, a coordinate. */}
-                  <div style={{ ...LABEL, fontSize: 10, letterSpacing: '0.04em', color: A.DIM, marginTop: 5 }}>
-                    {h.hole_no}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </Inset>
+      <Body style={{ marginTop: 10, fontSize: 12, color: A.DIM }}>
+        {data.complete_rounds.toLocaleString()} of those rounds carry all 18 holes, and hole figures are taken from
+        those. {data.avg_gross != null ? `The mean 18-hole gross returned here is ${data.avg_gross}.` : ''}
+      </Body>
     </Panel>
   );
 };
 
-/* ───────────────── 2  HOW YOUR COURSE PLAYS ───────────────── */
+/* ─────────────────── 1  HOLE BY HOLE ─────────────────── */
 
-export const HowItPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  const holes = [...data.holes].sort((a, b) => a.measured_rank - b.measured_rank);
-  const worst = holes.reduce((m, h) => Math.max(m, Math.abs(h.avg_to_par)), 0.01);
+/**
+ * §5 — the same treatment as the course detail page's hole list: the load-bearing
+ * grid, the LABEL header row, NUM figures, the to-par convention and the shared
+ * difficulty ramp. HOLE / PAR / SI / ramp / measured rank / to par.
+ *
+ * DECLARED STROKE INDEX SITS BESIDE MEASURED RANK ON EVERY ROW. That pairing is
+ * the reason a club opens this page, so it is never behind a tap.
+ */
+const CLUB_HOLE_GRID = '26px 28px 28px 1fr 40px 48px';
+
+export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
+  const [hardestFirst, setHardestFirst] = React.useState(false);
+  const holes = data.holes ?? [];
+
+  if (holes.length === 0) {
+    return (
+      <Panel kicker="Hole by hole">
+        <Body>We hold no hole rows for this course, so there is nothing to rank.</Body>
+      </Panel>
+    );
+  }
+
+  const rows = [...holes].sort((a, b) =>
+    hardestFirst ? a.measured_rank - b.measured_rank : a.hole_no - b.hole_no,
+  );
+  const n = holes.length;
 
   return (
-    <Panel kicker="How your course plays" aside={nLabel(data.rounds)}
-      subline="Every hole from hardest to easiest as measured, with the stroke index you declare beside it.">
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '28px 30px 1fr 44px 40px',
-          gap: 10,
-          paddingBottom: 8,
-        }}
-      >
-        <span style={{ ...BIZ_LABEL, textAlign: 'center' }}>Hole</span>
-        <span style={{ ...BIZ_LABEL, textAlign: 'center' }}>Par</span>
-        <span style={BIZ_LABEL}>Measured</span>
-        <span style={{ ...BIZ_LABEL, textAlign: 'right' }}>Rank</span>
-        <span style={{ ...BIZ_LABEL, textAlign: 'right' }}>SI</span>
+    <Panel
+      kicker="Hole by hole"
+      aside={`${data.complete_rounds.toLocaleString()} full rounds`}
+      subline="Your declared stroke index beside the position each hole actually plays in, 1 being the hardest."
+    >
+      {/* CARD ORDER IS THE DEFAULT (§5). Text-only toggle, no fills. */}
+      <div style={{ display: 'flex', gap: 16, marginBottom: 10 }}>
+        {[
+          { label: 'Card order', on: !hardestFirst, next: false },
+          { label: 'Hardest first', on: hardestFirst, next: true },
+        ].map((t) => (
+          <button
+            key={t.label}
+            type="button"
+            onClick={() => setHardestFirst(t.next)}
+            aria-pressed={t.on}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              padding: 0,
+              cursor: 'pointer',
+              fontFamily: SANS,
+              fontSize: 12,
+              fontWeight: t.on ? 700 : 600,
+              color: t.on ? A.INK : A.DIM,
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
-      {holes.map((h) => {
+
+      <div style={{ display: 'grid', gridTemplateColumns: CLUB_HOLE_GRID, gap: 10, paddingBottom: 8 }}>
+        <span style={{ ...LABEL, textAlign: 'center' }}>Hole</span>
+        <span style={{ ...LABEL, textAlign: 'center' }}>Par</span>
+        <span style={{ ...LABEL, textAlign: 'center' }}>SI</span>
+        <span style={LABEL}>Measured</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>Rank</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>To par</span>
+      </div>
+
+      {rows.map((h) => {
         const parts = toParParts(h.avg_to_par);
-        const width = Math.max(3, (Math.abs(h.avg_to_par) / worst) * 100);
+        const t = n > 1 ? (n - h.measured_rank) / (n - 1) : 1;
+        const width = Math.max(4, t * 100);
+        const out =
+          h.stroke_index != null ? Math.abs(h.stroke_index - h.measured_rank) : null;
         return (
           <div
             key={h.hole_no}
             style={{
               display: 'grid',
-              gridTemplateColumns: '28px 30px 1fr 44px 40px',
+              gridTemplateColumns: CLUB_HOLE_GRID,
               gap: 10,
               alignItems: 'center',
-              padding: '7px 0',
+              padding: '8px 0',
               fontFamily: SANS,
               ...FIGS,
             }}
           >
-            <span style={{ ...bizFigure(14, A.INK), textAlign: 'center' }}>{h.hole_no}</span>
+            <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'center' }}>{h.hole_no}</span>
             <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE, textAlign: 'center' }}>
               {h.par ?? '\u2014'}
+            </span>
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: out != null && out >= 6 ? 700 : 600,
+                color: out != null && out >= 6 ? A.INK : A.MUTE,
+                textAlign: 'center',
+              }}
+            >
+              {h.stroke_index ?? '\u2014'}
             </span>
             <span style={{ height: 5, borderRadius: 3, background: A.TRACK, display: 'block', overflow: 'hidden' }}>
               <i
@@ -177,38 +205,156 @@ export const HowItPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ dat
                   display: 'block',
                   height: '100%',
                   width: `${width}%`,
-                  background: difficultyRampStop(
-                    Math.round(((holes.length - h.measured_rank) / Math.max(1, holes.length - 1)) * (DIFFICULTY_RAMP.length - 1)),
-                  ),
+                  background: difficultyRampColor(t),
                 }}
               />
             </span>
-            <span style={{ ...bizFigure(13, parts?.tone ?? A.INK), textAlign: 'right' }}>
+            <span style={{ ...NUM, fontSize: 13, color: A.INK, textAlign: 'right' }}>{h.measured_rank}</span>
+            <span style={{ ...NUM, fontSize: 13, color: parts?.tone ?? A.INK, textAlign: 'right' }}>
               {parts?.text ?? '\u2014'}
-            </span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE, textAlign: 'right' }}>
-              {h.stroke_index ?? '\u2014'}
             </span>
           </div>
         );
       })}
-      <div style={{ ...BIZ_BODY, marginTop: 8, fontSize: 12 }}>
-        Rank is the mean strokes over par on each hole. SI is your declared stroke index. A dash means we hold no
-        figure for that hole.
-      </div>
+
+      <Body style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
+        SI is the stroke index your card declares. Rank is where the hole sits on mean strokes over par across
+        {` ${data.complete_rounds.toLocaleString()} `}
+        full rounds. A dash means we hold no figure for that hole.
+      </Body>
     </Panel>
   );
 };
 
-/* ───────────────── 3  WHAT GETS MADE HERE ───────────────── */
+/* ─────────────────── 2  THE STROKE INDEX RECOMMENDATION ─────────────────── */
+
+/**
+ * §6 — GATED, AND THE GATE IS THE POINT. Read si_advice_state, never
+ * si_advice's presence.
+ *
+ * A stroke index ranks WHERE A HIGHER HANDICAPPER NEEDS A SHOT MOST relative to
+ * a lower one — not raw difficulty. That needs both bands well sampled. At
+ * Sundridge East there are 541 low-handicap hole rows and 18 high; eighteen rows
+ * is roughly one round, and a recommendation built on it falls apart the moment
+ * a handicap secretary asks how many players it came from.
+ *
+ * So below the gate NO RANKING RENDERS ANYWHERE HERE, the shortfall is named,
+ * and that is the strongest "get your members on clbhouz" argument on the page.
+ */
+export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
+  const gate = data.si_band_rows;
+  const ready = data.si_advice_state === 'ready' && (data.si_advice?.length ?? 0) > 0;
+
+  if (!ready) {
+    const threshold = gate?.threshold ?? 200;
+    return (
+      <Panel kicker="Stroke index" aside="Locked">
+        <div style={{ ...BIZ_TITLE, marginBottom: 8 }}>We will not rank your stroke index on this sample</div>
+        <Body>
+          A stroke index is not a difficulty order. It ranks where a higher handicapper needs a shot most relative to a
+          lower one, so it can only be measured when both ends of the handicap range have played every hole enough
+          times.
+        </Body>
+        {gate && (
+          <Inset style={{ marginTop: 12 }}>
+            <div style={{ ...BIZ_LABEL, marginBottom: 10 }}>What we hold on your thinnest hole</div>
+            <div style={{ display: 'flex', gap: 22 }}>
+              {[
+                { label: 'Lower handicaps', value: gate.min_low_rows },
+                { label: 'Higher handicaps', value: gate.min_high_rows },
+                { label: 'Needed, each', value: threshold },
+              ].map((s) => (
+                <div key={s.label}>
+                  <div style={bizFigure(19, s.value < threshold ? TOPAR_RED : A.INK)}>
+                    {s.value.toLocaleString()}
+                  </div>
+                  <div style={{ ...LABEL, marginTop: 4 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </Inset>
+        )}
+        <Body style={{ marginTop: 12 }}>
+          {gate
+            ? `Your higher-handicap side stands at ${gate.min_high_rows.toLocaleString()} hole ${
+                gate.min_high_rows === 1 ? 'row' : 'rows'
+              } on the thinnest hole — roughly ${Math.max(1, Math.round(gate.min_high_rows / 18))} ${
+                Math.round(gate.min_high_rows / 18) === 1 ? 'round' : 'rounds'
+              }. We need ${threshold.toLocaleString()} on every hole in both bands before we will put a recommendation in front of your handicap secretary.`
+            : `We need ${threshold.toLocaleString()} hole rows in each handicap band, on every hole, before we will put a recommendation in front of your handicap secretary.`}{' '}
+          Every higher-handicap member who connects to clbhouz moves that number, and they are the members this
+          measurement is waiting on.
+        </Body>
+      </Panel>
+    );
+  }
+
+  const rows = data.si_advice ?? [];
+  return (
+    <Panel
+      kicker="Stroke index"
+      aside={`${data.complete_rounds.toLocaleString()} full rounds`}
+      subline="Where a higher handicapper needs the shot most, measured against the index your card declares."
+    >
+      <div style={{ display: 'grid', gridTemplateColumns: '26px 1fr 48px 48px', gap: 10, paddingBottom: 8 }}>
+        <span style={{ ...LABEL, textAlign: 'center' }}>Hole</span>
+        <span style={LABEL}>Shot needed</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>Declared</span>
+        <span style={{ ...LABEL, textAlign: 'right' }}>Measured</span>
+      </div>
+      {rows.map((r) => {
+        const spread = r.spread ?? 0;
+        const max = rows.reduce((m, x) => Math.max(m, Math.abs(x.spread ?? 0)), 0.01);
+        const t = Math.min(1, Math.abs(spread) / max);
+        return (
+          <div
+            key={r.hole_no}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '26px 1fr 48px 48px',
+              gap: 10,
+              alignItems: 'center',
+              padding: '8px 0',
+              fontFamily: SANS,
+              ...FIGS,
+            }}
+          >
+            <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'center' }}>{r.hole_no}</span>
+            <span style={{ height: 5, borderRadius: 3, background: A.TRACK, display: 'block', overflow: 'hidden' }}>
+              <i style={{ display: 'block', height: '100%', width: `${Math.max(4, t * 100)}%`, background: difficultyRampColor(t) }} />
+            </span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE, textAlign: 'right' }}>
+              {r.declared ?? '\u2014'}
+            </span>
+            <span style={{ ...NUM, fontSize: 13, color: A.INK, textAlign: 'right' }}>
+              {r.should_be ?? '\u2014'}
+            </span>
+          </div>
+        );
+      })}
+      <Body style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
+        Measured is the order of the gap between what higher and lower handicaps return on each hole. It is a
+        measurement of your course, not a statement that your card is incorrect.
+      </Body>
+    </Panel>
+  );
+};
+
+/* ─────────────────── 3  WHAT GETS MADE HERE ─────────────────── */
 
 interface Outcome { key: string; label: string; count: number; colour: string }
 
 export const ScoringSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
   const o = data.outcomes;
-  // SEVEN OUTCOMES IN SCORECARD ORDER, worst to best (§4.1).
-  // Colour: bogey and worse take the demanding ramp's deep end, par is
-  // neutral, under par takes the to-par RED — which in this app is EARNED.
+  if (!o) {
+    return (
+      <Panel kicker="What gets made here">
+        <Body>We hold no scored holes for this course, so there is no distribution to show.</Body>
+      </Panel>
+    );
+  }
+
+  // SEVEN OUTCOMES IN SCORECARD ORDER, worst to best.
   const rows: Outcome[] = [
     { key: 'double_plus', label: 'Double +', count: o.double_plus, colour: DIFFICULTY_RAMP[5] },
     { key: 'bogey', label: 'Bogey', count: o.bogey, colour: DIFFICULTY_RAMP[4] },
@@ -222,22 +368,19 @@ export const ScoringSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }
 
   if (total === 0) {
     return (
-      <Panel kicker="What gets made here" aside={nLabel(data.rounds)}>
-        <Body>No scored holes have landed on this course yet, so there is no distribution to show.</Body>
+      <Panel kicker="What gets made here">
+        <Body>We hold no scored holes for this course, so there is no distribution to show.</Body>
       </Panel>
     );
   }
 
   return (
-    <Panel kicker="What gets made here" aside={nLabel(data.rounds)}
+    <Panel kicker="What gets made here" aside={`${total.toLocaleString()} holes`}
       subline="Every scored hole on your course, worst to best.">
       <Inset>
-        {/* The shape first: one stacked bar. */}
         <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: A.TRACK }}>
           {rows.map((r) => {
             if (r.count === 0) return null;
-            // A RARE FEAT KEEPS A VISIBLE MARK: any non-zero count holds a
-            // minimum width. The FIGURE carries the magnitude.
             const pct = Math.max(MIN_BAR_PCT, (r.count / total) * 100);
             return <i key={r.key} style={{ width: `${pct}%`, background: r.colour }} />;
           })}
@@ -251,7 +394,7 @@ export const ScoringSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }
                 <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
                   <span style={{ fontSize: 12.5, fontWeight: 600, color: A.BODY }}>{r.label}</span>
                   <span style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                    {/* ZERO IS A FACT, NOT AN ABSENCE (§6.1). */}
+                    {/* ZERO IS A FACT, NOT AN ABSENCE. */}
                     <span style={bizFigure(15, A.INK)}>{r.count.toLocaleString()}</span>
                     <span style={{ fontSize: 11.5, fontWeight: 600, color: A.DIM, minWidth: 34, textAlign: 'right' }}>
                       {share(r.count, total)}
@@ -270,24 +413,25 @@ export const ScoringSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }
   );
 };
 
-/* ───────────────── 4  WHAT YOUR TEES COST ───────────────── */
+/* ─────────────────── 4  WHAT YOUR TEES SCORED ─────────────────── */
 
 /**
- * §4.3 — ITS OWN SECTION, not a footnote to the verdict: each measured yardage
- * with its round count and mean over par, and one line naming the spread.
- * Directly useful for competition setup and visitor pricing.
+ * §7 — TEES CARRY A CAUTION AND NO RANKING. At Sundridge East the 6,600 set
+ * scores BETTER than the 6,500 set, 7.81 against 10.27. That is SELECTION, not
+ * difficulty: better players choose the back tees. So this section describes
+ * what each yardage scored and never orders the sets by difficulty, and never
+ * implies the longer tee is the easier test.
  *
- * §4.4 — LABELLED BY YARDAGE plus a neutral position word. No colour is named
- * anywhere, because we know the distance and not the club's own naming.
+ * The sets are LABELLED BY YARDAGE. We know the distance; we do not know whether
+ * the club calls it white, yellow or blue, and a colour would be a fabrication.
  */
 export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
   const tees = sortTees(data.tees ?? []);
   const totalRounds = tees.reduce((s, t) => s + t.rounds, 0);
 
-  // NO INVENTED ROWS (§6.2). If the tee split is not measured, we say so.
   if (tees.length === 0) {
     return (
-      <Panel kicker="What your tees cost" aside={nLabel(data.rounds)}>
+      <Panel kicker="What your tees scored">
         <Body>
           We hold no yardages on these rounds, so we cannot tell which tees were played. Nothing here is estimated.
         </Body>
@@ -295,45 +439,31 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
     );
   }
 
-  const spread = teeSpreadLine(tees);
-  const hardest = tees.reduce((a, b) => (b.avg_to_par > a.avg_to_par ? b : a));
-
   return (
     <Panel
-      kicker="What your tees cost"
-      aside={nLabel(data.rounds)}
+      kicker="What your tees scored"
+      aside={`${totalRounds.toLocaleString()} rounds`}
       subline={
         tees.length === 1
-          ? 'Every round we hold was played off one set of tees.'
-          : `Your rounds were played off ${tees.length} different yardages. Each is measured on its own.`
+          ? 'Every measured round was played off one yardage.'
+          : `Your rounds were played off ${tees.length} measured yardages, each described on its own.`
       }
     >
       <Inset>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 56px 52px',
-            gap: 10,
-            paddingBottom: 8,
-          }}
-        >
-          <span style={BIZ_LABEL}>Set</span>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 56px 56px', gap: 10, paddingBottom: 8 }}>
+          <span style={BIZ_LABEL}>Yardage</span>
           <span style={{ ...BIZ_LABEL, textAlign: 'right' }}>Rounds</span>
           <span style={{ ...BIZ_LABEL, textAlign: 'right' }}>To par</span>
         </div>
         {tees.map((t) => {
-          const parts = toParParts(t.avg_to_par * 18);
-          // The bar is the SHARE OF ROUNDS on the set — the useful figure for
-          // pricing and competition setup — and it is never zero-width for a
-          // set that carries rounds.
+          const parts = toParParts(t.avg_to_par);
+          // The bar is the SHARE OF ROUNDS on the set — a usage figure, not a
+          // difficulty one, because ranking these sets would be wrong.
           const width = totalRounds > 0 ? Math.max(3, (t.rounds / totalRounds) * 100) : 0;
-          const isHardest = tees.length > 1 && t.yards === hardest.yards;
           return (
             <div key={t.yards} style={{ padding: '7px 0', fontFamily: SANS, ...FIGS }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 56px 52px', gap: 10, alignItems: 'baseline' }}>
-                <span style={{ fontSize: 12.5, fontWeight: 600, color: isHardest ? A.INK : A.BODY }}>
-                  {teeLabel(t, tees)}
-                </span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 56px 56px', gap: 10, alignItems: 'baseline' }}>
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: A.BODY }}>{teeLabel(t, tees)}</span>
                 <span style={{ ...bizFigure(14, A.INK), textAlign: 'right' }}>{t.rounds.toLocaleString()}</span>
                 <span style={{ ...bizFigure(13, parts?.tone ?? A.INK), textAlign: 'right' }}>
                   {parts?.text ?? '0'}
@@ -341,14 +471,7 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
               </div>
               <div style={{ height: 5, borderRadius: 3, background: A.TRACK, marginTop: 6, overflow: 'hidden' }}>
                 {t.rounds > 0 && (
-                  <i
-                    style={{
-                      display: 'block',
-                      height: '100%',
-                      width: `${width}%`,
-                      background: difficultyRampStop(isHardest ? 5 : 3),
-                    }}
-                  />
+                  <i style={{ display: 'block', height: '100%', width: `${width}%`, background: difficultyRampStop(3) }} />
                 )}
               </div>
             </div>
@@ -356,88 +479,119 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
         })}
       </Inset>
       <Body style={{ marginTop: 12 }}>
-        {spread ?? `Every round we hold here was played off ${yd(tees[0].yards)}, so there is no spread to compare yet.`}
+        These are what each yardage returned, not how hard each yardage is. Players choose their tee, and the stronger
+        players tend to go back — which is why a longer set here can return a lower score than a shorter one. Read the
+        rows as a description of who plays where, and do not take them as an order of difficulty.
       </Body>
       <Body style={{ marginTop: 8, fontSize: 11.5, color: A.DIM }}>
-        To par is the mean over 18 holes on that set. We label these by yardage because that is what the rounds tell
-        us — we do not know which colour your club calls each tee, so we do not guess.
+        To par is the mean 18-hole score against par on that yardage. Yardages come from the rounds themselves, bucketed
+        to the nearest hundred; we do not know which colour your club calls each tee, so we do not guess.
       </Body>
     </Panel>
   );
 };
 
-/* ───────────────── 5  WHEN YOUR COURSE IS BUSY ───────────────── */
+/* ─────────────────── 5  WHEN YOUR COURSE PLAYS ─────────────────── */
 
-export const BusynessSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
+const BarRow: React.FC<{ labels: string[]; values: number[]; peakInk?: boolean }> = ({ labels, values, peakInk = true }) => {
+  const max = Math.max(1, ...values);
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 96 }}>
+      {labels.map((label, i) => {
+        const count = values[i] ?? 0;
+        const isPeak = peakInk && count > 0 && count === max;
+        return (
+          <div key={label} style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
+            <div style={{ ...bizFigure(10, isPeak ? A.INK : A.DIM), marginBottom: 4 }}>{count}</div>
+            <div
+              style={{
+                height: Math.max(count > 0 ? 4 : 2, (count / max) * 58),
+                borderRadius: 2,
+                background: isPeak ? A.INK : 'rgba(248,250,252,0.22)',
+              }}
+            />
+            <div style={{ ...LABEL, fontSize: 10, letterSpacing: '0.04em', marginTop: 5 }}>{label}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export const SeasonalitySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
   const months = data.months ?? [];
   const total = months.reduce((s, m) => s + m.rounds, 0);
-  if (months.length === 0 || total === 0) {
+  if (total === 0) {
     return (
-      <Panel kicker="When your course is busy" aside={nLabel(data.rounds)}>
-        <Body>We hold no dated rounds on this course yet, so there is no seasonal pattern to show.</Body>
+      <Panel kicker="When your course plays">
+        <Body>We hold no dated rounds on this course, so there is no seasonal pattern to show.</Body>
       </Panel>
     );
   }
 
-  const peak = months.reduce((a, b) => (b.rounds > a.rounds ? b : a));
-  const max = peak.rounds || 1;
-  const summer = months.filter((m) => m.month >= 4 && m.month <= 9).reduce((s, m) => s + m.rounds, 0);
-  const line =
-    summer / total >= 0.7
-      ? `${MONTHS[peak.month - 1]} is your busiest month, and the great majority of play lands between April and September.`
-      : `${MONTHS[peak.month - 1]} is your busiest month, and play is spread fairly evenly across the year.`;
+  const values = MONTHS.map((_, i) => months.find((m) => m.month === i + 1)?.rounds ?? 0);
+  const peakIdx = values.indexOf(Math.max(...values));
+  const summer = values.slice(3, 9).reduce((s, v) => s + v, 0);
+
+  const weekdays = data.weekdays ?? [];
+  const dowValues = DOW.map((_, i) => weekdays.find((w) => w.dow === i + 1)?.rounds ?? 0);
+  const midweek = dowValues.slice(0, 5).reduce((s, v) => s + v, 0);
+  const weekend = dowValues[5] + dowValues[6];
+  const dowTotal = midweek + weekend;
+
+  const years = [...(data.years ?? [])].sort((a, b) => a.year - b.year);
 
   return (
-    <Panel kicker="When your course is busy" aside={nLabel(data.rounds)}>
+    <Panel kicker="When your course plays" aside={`${total.toLocaleString()} rounds`}>
+      <div style={{ ...BIZ_LABEL, marginBottom: 8 }}>Across the year</div>
       <Inset>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 96 }}>
-          {MONTHS.map((label, i) => {
-            const row = months.find((m) => m.month === i + 1);
-            const count = row?.rounds ?? 0;
-            const isPeak = count > 0 && count === peak.rounds;
-            return (
-              <div key={label} style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
-                <div style={{ ...bizFigure(10, isPeak ? A.INK : A.DIM), marginBottom: 4 }}>{count}</div>
-                <div
-                  style={{
-                    height: Math.max(count > 0 ? 4 : 2, (count / max) * 58),
-                    borderRadius: 2,
-                    background: isPeak ? A.INK : 'rgba(14,18,22,0.18)',
-                  }}
-                />
-                {/* AXIS floor 10: day initial under a bar, a coordinate. */}
-                <div style={{ ...LABEL, fontSize: 10, letterSpacing: '0.04em', marginTop: 5 }}>{label[0]}</div>
-              </div>
-            );
-          })}
-        </div>
+        <BarRow labels={MONTHS.map((m) => m[0])} values={values} />
       </Inset>
-      <Body style={{ marginTop: 12 }}>{line}</Body>
+      <Body style={{ marginTop: 10 }}>
+        {MONTHS[peakIdx]} is your busiest month
+        {summer / total >= 0.7
+          ? ', and the great majority of play lands between April and September.'
+          : ', and play is spread fairly evenly across the year.'}
+      </Body>
+
+      {dowTotal > 0 && (
+        <>
+          <div style={{ ...BIZ_LABEL, margin: '18px 0 8px' }}>Across the week</div>
+          <Inset>
+            <BarRow labels={DOW.map((d) => d[0])} values={dowValues} />
+          </Inset>
+          <Body style={{ marginTop: 10 }}>
+            {weekend / dowTotal >= 0.5
+              ? 'Most of the play we hold lands at the weekend, so midweek is where your tee sheet has room.'
+              : 'Most of the play we hold lands midweek, which is unusual and worth reading against your visitor pricing.'}
+          </Body>
+        </>
+      )}
+
+      {years.length > 1 && (
+        <>
+          <div style={{ ...BIZ_LABEL, margin: '18px 0 8px' }}>Year on year</div>
+          <Inset>
+            <BarRow labels={years.map((y) => String(y.year).slice(2))} values={years.map((y) => y.rounds)} />
+          </Inset>
+          <Body style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
+            This is rounds we hold, not rounds played. It rises as more of your members connect, so read it as coverage
+            first and demand second.
+          </Body>
+        </>
+      )}
     </Panel>
   );
 };
 
-/* ───────────────── 6  WHO PLAYS HERE ───────────────── */
+/* ─────────────────── 6  WHO PLAYS HERE ─────────────────── */
 
 export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  // §5c — the handicap breakdown WITHDRAWS ENTIRELY below the floor and says
-  // so in one line. It does not render bands with short bars.
-  if (data.rounds < EARLY_DATA_FLOOR) {
-    return (
-      <Panel kicker="Who plays here" aside="Early data">
-        <Body>
-          Handicap bands are held back until this course has {EARLY_DATA_FLOOR} measured rounds — below that, the split
-          says more about who happened to play than about who plays here.
-        </Body>
-      </Panel>
-    );
-  }
-
   const bands = data.handicap_bands ?? [];
   const total = data.handicap_rounds || bands.reduce((s, b) => s + b.rounds, 0);
   if (bands.length === 0 || total === 0) {
     return (
-      <Panel kicker="Who plays here" aside={nLabel(data.rounds)}>
+      <Panel kicker="Who plays here">
         <Body>None of the rounds we hold carried a handicap index at the time of play, so there is no split to show.</Body>
       </Panel>
     );
@@ -445,14 +599,13 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
 
   const max = bands.reduce((m, b) => Math.max(m, b.rounds), 1);
   return (
-    <Panel kicker="Who plays here" aside={`${total.toLocaleString()} rounds`}
-      subline="The handicap index each player held at the time of the round, not the index they hold today.">
-      {/*
-        §8 — DISTRIBUTION ONLY. No low-versus-high difficulty claim is made here
-        or anywhere else on this page: the base has no spread to support one.
-      */}
+    <Panel
+      kicker="Who plays here"
+      aside={`${total.toLocaleString()} rounds`}
+      subline="The handicap index each player held at the time of the round, not the index they hold today."
+    >
       <Inset>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {bands.map((b) => (
             <div key={b.label}>
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
@@ -466,8 +619,59 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
               </div>
               <div style={{ height: 5, borderRadius: 3, background: A.TRACK, marginTop: 5, overflow: 'hidden' }}>
                 {b.rounds > 0 && (
-                  <i style={{ display: 'block', height: '100%', width: `${(b.rounds / max) * 100}%`, background: 'rgba(14,18,22,0.42)' }} />
+                  <i style={{ display: 'block', height: '100%', width: `${(b.rounds / max) * 100}%`, background: 'rgba(248,250,252,0.42)' }} />
                 )}
+              </div>
+              {/* A BAND WITH 400 ROUNDS FROM 2 MEMBERS IS NOT 400 GOLFERS. */}
+              <div style={{ ...LABEL, fontSize: 10, marginTop: 5 }}>
+                {b.members.toLocaleString()} {b.members === 1 ? 'member' : 'members'}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Inset>
+      <Body style={{ marginTop: 12, fontSize: 11.5, color: A.DIM }}>
+        Rounds and members are separate figures on purpose: a band can carry hundreds of rounds from a handful of
+        regulars, and it should not be read as a headcount.
+      </Body>
+    </Panel>
+  );
+};
+
+/* ─────────────────── 7  HOW IT IS PLAYED ─────────────────── */
+
+export const CompetitionSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
+  const c = data.competition;
+  const total = (c?.competition ?? 0) + (c?.social ?? 0);
+  if (!c || total === 0) {
+    return (
+      <Panel kicker="How it is played">
+        <Body>We hold no rounds marked competition or social for this course.</Body>
+      </Panel>
+    );
+  }
+
+  const rows = [
+    { label: 'Competition', count: c.competition, colour: A.INK },
+    { label: 'Social', count: c.social, colour: 'rgba(248,250,252,0.42)' },
+  ];
+
+  return (
+    <Panel kicker="How it is played" aside={`${total.toLocaleString()} rounds`}>
+      <Inset>
+        <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: A.TRACK }}>
+          {rows.map((r) =>
+            r.count === 0 ? null : (
+              <i key={r.label} style={{ width: `${Math.max(MIN_BAR_PCT, (r.count / total) * 100)}%`, background: r.colour }} />
+            ),
+          )}
+        </div>
+        <div style={{ marginTop: 14, display: 'flex', gap: 24 }}>
+          {rows.map((r) => (
+            <div key={r.label}>
+              <div style={bizFigure(19, A.INK)}>{r.count.toLocaleString()}</div>
+              <div style={{ ...LABEL, marginTop: 4 }}>
+                {r.label} · {share(r.count, total)}
               </div>
             </div>
           ))}
@@ -476,9 +680,3 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
     </Panel>
   );
 };
-
-/** Used by the early-data state's supporting line so the copy stays in one place. */
-export const earlyDataNote = (rounds: number) =>
-  `We hold ${rounds.toLocaleString()} ${rounds === 1 ? 'round' : 'rounds'} on this course. Everything below is real, and it is a signal rather than a finding until ${EARLY_DATA_FLOOR} rounds have landed.`;
-
-export { ordinal };
