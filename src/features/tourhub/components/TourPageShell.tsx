@@ -74,15 +74,23 @@ export function TourPageShell({
   // directly beneath it instead of guessing at safe-area + island math.
   useLayoutEffect(() => {
     const el = headerRef.current;
-    const root = rootRef.current;
-    if (!el || !root) return;
+    if (!el) return;
+    // Published on <html> (not the shell root) so page code that reads it via
+    // getComputedStyle(document.documentElement) — e.g. the schedule anchor
+    // scroll offset — sees the same number the CSS does.
     const publish = () => {
-      root.style.setProperty('--tour-header-h', `${Math.round(el.getBoundingClientRect().height)}px`);
+      document.documentElement.style.setProperty(
+        '--tour-header-h',
+        `${Math.round(el.getBoundingClientRect().height)}px`,
+      );
     };
     publish();
     const ro = new ResizeObserver(publish);
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      document.documentElement.style.removeProperty('--tour-header-h');
+    };
   }, [belowTitle, subtitle]);
 
   // Immersive pages only: transparent -> opaque on first scroll.
