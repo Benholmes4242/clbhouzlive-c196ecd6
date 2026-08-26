@@ -6,6 +6,7 @@ import { AlertCircle, Lock, MapPin } from 'lucide-react';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';
+import { AppSelect } from '@/components/ui/AppSelect';
 import { ClubSearchDropdown, SelectedClub } from '@/components/business/ClubSearchDropdown';
 import { CollegeSearchDropdown, SelectedCollege } from '@/components/business/CollegeSearchDropdown';
 
