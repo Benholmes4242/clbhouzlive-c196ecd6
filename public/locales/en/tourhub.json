@@ -128,7 +128,8 @@
       "worldNo1Label": "World No. 1",
       "pointsLabel": "POINTS",
       "winsLabel": "Wins",
-      "top10Label": "Top 10"
+      "top10Label": "Top 10",
+      "seasonNo1Label": "Season No. 1"
     },
     "teamWinnerStrip": {
       "eyebrow": "TEAM WINNER",
@@ -821,7 +822,8 @@
     "pointsBrand": {
       "euro": "Race to Dubai",
       "lpga": "CME Points",
-      "liv": "LIV Points"
+      "liv": "LIV Points",
+      "pgad": "Korn Ferry Points"
     },
     "almanac": {
       "world": {
