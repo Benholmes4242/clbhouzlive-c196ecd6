@@ -1240,7 +1240,14 @@ export default function VerificationFlowSheet({
                   variant="outline"
                   onClick={() => setPageIndex(safeIndex - 1)}
                   className="h-12 px-5 text-[15px]"
-                  style={{ borderRadius: BIZ.rInner }}
+                  style={{
+                    borderRadius: BIZ.rInner,
+                    /* Explicit treatment: shadcn's outline variant is near
+                       invisible against the dark footer. */
+                    background: 'rgba(255,255,255,0.08)',
+                    color: A.INK,
+                    border: `1px solid ${A.BORDER}`,
+                  }}
                 >
                   Back
                 </Button>
