@@ -74,6 +74,14 @@ import {
 export const HERO_BOARD_ROWS = 6;
 
 const FIGS = { fontVariantNumeric: 'tabular-nums' as const, fontFeatureSettings: '"kern" 1, "liga" 1' };
+const WON_LABEL = 'WON';
+
+type SettledFigure = {
+  right: string;
+  rightColor: string;
+  figure: string | null;
+  figureColor: string;
+};
 
 /**
  * TOUR COLOUR RULE (unchanged from the removed panel): under par is RED,
@@ -82,6 +90,23 @@ const FIGS = { fontVariantNumeric: 'tabular-nums' as const, fontFeatureSettings:
 function tourFigColor(v: number | null | undefined): string {
   if (v == null || v === 0) return '#FFFFFF';
   return v < 0 ? TOPAR_UNDER_DARK : '#FFFFFF';
+}
+
+function settledFigureFor(
+  line: { position: number | null; tied: boolean; score: number | null } | undefined,
+): SettledFigure | null {
+  if (!line || line.position == null) return null;
+
+  // A TIED FIRST IS NOT A WIN - T1 stays a numeral. Unchanged rule from
+  // MICRO_BRIEF_PICKS_ROW_WINNER section 2.
+  const won = line.position === 1 && !line.tied;
+
+  return {
+    right: won ? WON_LABEL : `${line.tied ? 'T' : ''}${line.position}`,
+    rightColor: won ? GOLD : WHITE_ALPHA_65,
+    figure: line.score == null ? null : formatToPar(line.score),
+    figureColor: tourFigColor(line.score),
+  };
 }
 
 /**
@@ -309,13 +334,13 @@ export function HeroBoardSection({
            `T1` stays a numeral, and useHeroCarouselData re-buckets a tied top
            with no confirmed winner into LIVE, so an unsettled playoff can never
            reach this branch. */
-        const won = phase === 'completed' && best.position === 1 && !best.tied;
+        const settled = phase === 'completed' ? settledFigureFor(best) : null;
         return {
           name: surnameOf(best.pick.playerName),
-          right: phase === 'completed' ? (won ? 'WON' : `${best.tied ? 'T' : ''}${best.position}`) : null,
-          rightColor: won ? GOLD : WHITE_ALPHA_65,
-          figure: best.score == null ? null : formatToPar(best.score),
-          figureColor: tourFigColor(best.score),
+          right: settled?.right ?? null,
+          rightColor: settled?.rightColor ?? WHITE_ALPHA_65,
+          figure: settled?.figure ?? (best.score == null ? null : formatToPar(best.score)),
+          figureColor: settled?.figureColor ?? tourFigColor(best.score),
         };
       }
 
@@ -557,8 +582,8 @@ export function HeroBoardSection({
               <span
                 style={{
                   fontSize: 11,
-                  fontWeight: closedFigure.right === 'WON' ? 800 : 600,
-                  letterSpacing: closedFigure.right === 'WON' ? '0.08em' : undefined,
+                  fontWeight: closedFigure.right === WON_LABEL ? 800 : 600,
+                  letterSpacing: closedFigure.right === WON_LABEL ? '0.08em' : undefined,
                   color: closedFigure.rightColor,
                   ...FIGS,
                 }}
@@ -667,13 +692,20 @@ function PicksPanel({
       >
         {rows.map((p, i) => {
           const line = boardByPlayer.get(String(p.playerId));
-          const live = phase === 'live' && line && line.position != null;
-          const figure = live
-            ? (line!.score == null ? null : formatToPar(line!.score))
-            : p.winProbability != null
-              ? `${Math.round(p.winProbability)}%`
-              : null;
-          const figureColor = live ? tourFigColor(line!.score) : '#FFFFFF';
+          const settled = phase === 'completed' ? settledFigureFor(line) : null;
+          const liveLine = phase === 'live' && line && line.position != null ? line : null;
+          const figure = settled
+            ? settled.figure
+            : liveLine
+              ? (liveLine.score == null ? null : formatToPar(liveLine.score))
+              : phase === 'upcoming' && p.winProbability != null
+                ? `${Math.round(p.winProbability)}%`
+                : null;
+          const figureColor = settled
+            ? settled.figureColor
+            : liveLine
+              ? tourFigColor(liveLine.score)
+              : '#FFFFFF';
           const pull = p.pulledQuote || p.reasons?.[0] || null;
 
           return (
@@ -721,9 +753,9 @@ function PicksPanel({
                     {p.playerName}
                   </span>
                   <ClbhouzPickMark size={10} label={t('overview.onTheCourse.ourPicksLabel')} />
-                  {live && (
+                  {liveLine && (
                     <span style={{ fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>
-                      {`${line!.tied ? 'T' : ''}${line!.position}`}
+                      {`${liveLine.tied ? 'T' : ''}${liveLine.position}`}
                     </span>
                   )}
                 </span>
@@ -744,9 +776,26 @@ function PicksPanel({
                   </span>
                 )}
               </span>
-              {figure && (
-                <span style={{ flexShrink: 0, fontSize: 12.5, fontWeight: 700, color: figureColor, ...FIGS }}>
-                  {figure}
+              {(settled || figure) && (
+                <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  {settled && (
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: settled.right === WON_LABEL ? 800 : 600,
+                        letterSpacing: settled.right === WON_LABEL ? '0.08em' : undefined,
+                        color: settled.rightColor,
+                        ...FIGS,
+                      }}
+                    >
+                      {settled.right}
+                    </span>
+                  )}
+                  {figure && (
+                    <span style={{ fontSize: 12.5, fontWeight: 700, color: figureColor, ...FIGS }}>
+                      {figure}
+                    </span>
+                  )}
                 </span>
               )}
             </div>

@@ -145,7 +145,11 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
    * belong to different tournaments. The leaderboard query key is shared with
    * HybridHero, so this costs no extra network.
    */
-  const boardTournamentId = viewingLive ? viewingTid : null;
+  // Fetch entries for LIVE and COMPLETED because the picks row resolves finishing
+  // positions from them. The board itself stays hidden on completed: hasBoard
+  // also requires currentRound, and boardRound remains live-only below. Same query
+  // key as HybridHero.tsx, so a completed slide is a cache hit.
+  const boardTournamentId = activeSlide?.type === 'upcoming' ? null : viewingTid;
   const { data: boardLeaderboard } = useTourLeaderboard(boardTournamentId ?? '');
   const boardEntries = boardTournamentId ? (boardLeaderboard ?? []) : [];
   const boardRound = viewingLive ? (activeSlide?.tournament.currentRound ?? null) : null;
