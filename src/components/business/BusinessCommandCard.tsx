@@ -21,6 +21,8 @@ import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingReque
 import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
+import { useBusinessCourseClaim } from '@/hooks/useBusinessCourseClaim';
+
 import { useBusinessReviews } from '@/hooks/useBusinessReviews';
 import { getCityCountry } from '@/lib/locationDisplay';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
@@ -78,6 +80,15 @@ export function BusinessCommandCard({
   const { data: totalFollowers, isLoading: followersLoading } = useBusinessFollowersCount(business?.id);
 
   const { data: verificationRequest } = useBusinessVerificationRequest(business?.id);
+
+  /**
+   * BRIEF_CLAIM_AWARE_VERIFY_CARD §1 — a parallel, independent read.
+   * A COURSE CLAIM is not a verification request: it never feeds
+   * deriveVerificationState, it only lets the card acknowledge work the owner
+   * has already done.
+   */
+  const { data: courseClaim } = useBusinessCourseClaim(business?.id);
+
 
   // Fetch pending access requests count for indicator
   const { data: pendingRequestsCount } = useBusinessPendingRequestsCount(business?.id);
