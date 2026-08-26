@@ -144,44 +144,52 @@ function LensRow() {
   );
 }
 
-/** WORLD RANKINGS — head (17 + 28), a 73 lead row, then hairline rows. 353. */
+/**
+ * WORLD RANKINGS — head (45), an 81 hero row (62 avatar + figures), then four
+ * two-line pack rows at 59. 362, measured against the resolved section at 390
+ * (363) after the flag / wins / top-10 / points-bar enrichment. A hold may never
+ * exceed the state it resolves into, so this sits 1 under, not over.
+ */
 function WorldRankingsBlock() {
   return (
     <section>
       <Head w={144} sub={196} />
       <div style={{ padding: '0 16px' }}>
-        <div style={{ height: 73, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Bar style={{ height: 54, width: 54, borderRadius: 18, flexShrink: 0 }} />
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
+        <div style={{ height: 81, display: 'flex', alignItems: 'center', gap: 14 }}>
+          <Bar style={{ height: 62, width: 62, borderRadius: 20, flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <Bar style={{ height: 10, width: 96 }} />
-            <Bar style={{ height: 15, width: '52%' }} />
+            <Bar style={{ height: 17, width: '52%' }} />
+            <Bar style={{ height: 10, width: 104 }} />
           </div>
-          <Bar style={{ height: 22, width: 56 }} />
+          <Bar style={{ height: 28, width: 56 }} />
         </div>
-        {[0, 1, 2, 3, 4].map((i) => (
+        {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 11,
-              height: 47,
+              gap: 12,
+              height: 59,
               borderTop: `1px solid ${A.BORDER}`,
               boxSizing: 'border-box',
             }}
           >
             <Bar style={{ height: 12, width: 14 }} />
-            <Bar style={{ height: 32, width: 32, borderRadius: 12, flexShrink: 0 }} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <Bar style={{ height: 12, width: '42%' }} />
+            <Bar style={{ height: 34, width: 34, borderRadius: 12, flexShrink: 0 }} />
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <Bar style={{ height: 13, width: '46%' }} />
+              <Bar style={{ height: 9, width: '30%' }} />
             </div>
-            <Bar style={{ height: 11, width: 42 }} />
+            <Bar style={{ height: 13, width: 38 }} />
           </div>
         ))}
       </div>
     </section>
   );
 }
+
 
 export const TourHubOverviewSkeleton = () => {
   return (
