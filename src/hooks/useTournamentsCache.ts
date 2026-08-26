@@ -13,7 +13,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
-  RESULTS_WINDOW_HOURS,
+  COMPLETED_BUCKET_DAYS,
   UPCOMING_WINDOW_DAYS,
 } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 
