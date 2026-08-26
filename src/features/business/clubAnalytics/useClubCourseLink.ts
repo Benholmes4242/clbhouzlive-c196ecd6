@@ -1,26 +1,21 @@
 /**
- * BRIEF_CLUB_ANALYTICS_TAB §2 — ELIGIBILITY, and the course the tab is about.
+ * BRIEF_CLUB_ANALYTICS_MULTI_COURSE §3 — THE GATE, AND NOTHING ELSE.
  *
  * THE TAB RENDERS ONLY WHEN ALL THREE HOLD:
  *   a. category is 'Golf Club'
  *   b. the business is VERIFIED
- *   c. the claim resolves to a COURSE
+ *   c. the club owns at least one course
  *
- * THE COURSE LINK ALREADY EXISTS — no new association is built here and the
- * club is never asked to pick its own course from a list. Resolution order:
- *   1. business_claimed_courses.course_id  (the approved link; authoritative)
- *   2. course_claim_requests.source_course_id on an approved claim — this is
- *      the field BusinessProfileEditor writes when the claim originated from a
- *      course page, and in practice it is the ONLY one of club_id / club_key /
- *      source_course_id that resolves to a golf_courses ROW: club_id resolves
- *      to a CLUB and club_key is a slug of one.
- *   3. the claim's club_id, and ONLY when that club owns exactly one course.
+ * THE COURSE-PICKING HALF OF THIS HOOK IS GONE. There is no 'resolved' state,
+ * no 'ambiguous' state, and none of the three lookups that existed only to
+ * choose ONE course (business_claimed_courses, course_claim_requests
+ * .source_course_id, the sole-club-course query). The RPC returns `club_courses`
+ * — every course the club owns — and the page renders one block per course, so
+ * choosing was the bug: Sundridge Park owns two courses and the old page could
+ * only ever reach East.
  *
- * §2.1 MULTI-COURSE CLUBS ARE NOT EDGE. A stroke index belongs to a COURSE,
- * not a club, so when the claim resolves to a club with more than one course
- * and no specific course, this hook returns `ambiguous` and the tab REPORTS AND
- * STOPS. It never merges two courses' holes into one ranking — that would
- * produce a verdict for a course that does not exist.
+ * All this hook still needs is SOME course id to make the FIRST call with. It
+ * takes the club's first course by name; the RPC then hands back the full list.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,13 +24,8 @@ export type ClubCourseLink =
   | { state: 'not_a_club' }
   | { state: 'unverified' }
   | { state: 'unclaimed' }
-  | { state: 'ambiguous'; clubName: string | null; courses: { id: string; name: string }[] }
-  | {
-      state: 'resolved';
-      courseId: string;
-      courseName: string;
-      source: 'claimed_course' | 'source_course_id' | 'sole_club_course';
-    };
+  /** A course id to open the first RPC with. `club_courses` supersedes it. */
+  | { state: 'seed'; courseId: string; courseName: string };
 
 interface Input {
   businessId: string | undefined;
@@ -47,7 +37,8 @@ interface Input {
 export const CLUB_ANALYTICS_CATEGORY = 'Golf Club';
 
 /** Cheap, synchronous pre-check — used to decide whether to show the entry
- *  point at all. It cannot know about (c), so the page carries the full test. */
+ *  point at all. It cannot know about (c), so the page carries the full test.
+ *  UNTOUCHED: BusinessCommandCard imports this. */
 export function mayHaveClubAnalytics(
   category: string | null | undefined,
   isVerified: boolean | undefined,
@@ -64,77 +55,18 @@ export function useClubCourseLink({ businessId, category, isVerified, clubId }: 
     queryFn: async () => {
       if (category !== CLUB_ANALYTICS_CATEGORY) return { state: 'not_a_club' };
       if (!isVerified) return { state: 'unverified' };
+      if (!clubId) return { state: 'unclaimed' };
 
-      // 1. the approved link
-      const { data: claimed } = await supabase
-        .from('business_claimed_courses')
-        .select('course_id')
-        .eq('business_id', businessId!)
-        .limit(2);
-
-      const claimedIds = (claimed ?? []).map((r) => r.course_id).filter(Boolean) as string[];
-      if (claimedIds.length === 1) {
-        const name = await courseName(claimedIds[0]);
-        if (name) return { state: 'resolved', courseId: claimedIds[0], courseName: name, source: 'claimed_course' };
-      }
-      if (claimedIds.length > 1) {
-        const courses = await courseRows(claimedIds);
-        return { state: 'ambiguous', clubName: null, courses };
-      }
-
-      // 2. the claim's source course
-      const { data: claims } = await supabase
-        .from('course_claim_requests')
-        .select('club_id, source_course_id, status, created_at')
-        .eq('business_id', businessId!)
-        .order('created_at', { ascending: false });
-
-      const approved = (claims ?? []).find((c) => c.status === 'approved') ?? (claims ?? [])[0] ?? null;
-      if (approved?.source_course_id) {
-        const name = await courseName(approved.source_course_id);
-        if (name) {
-          return {
-            state: 'resolved',
-            courseId: approved.source_course_id,
-            courseName: name,
-            source: 'source_course_id',
-          };
-        }
-      }
-
-      // 3. the club — only when it owns exactly one course
-      const club = approved?.club_id ?? clubId ?? null;
-      if (!club) return { state: 'unclaimed' };
-
-      const { data: courses } = await supabase
+      const { data } = await supabase
         .from('golf_courses')
         .select('id, name')
-        .eq('club_id', club)
-        .order('name');
+        .eq('club_id', clubId)
+        .order('name')
+        .limit(1);
 
-      const rows = (courses ?? []) as { id: string; name: string }[];
-      if (rows.length === 1) {
-        return { state: 'resolved', courseId: rows[0].id, courseName: rows[0].name, source: 'sole_club_course' };
-      }
-      if (rows.length > 1) {
-        const { data: clubRow } = await supabase
-          .from('golf_clubs')
-          .select('name')
-          .eq('id', club)
-          .maybeSingle();
-        return { state: 'ambiguous', clubName: clubRow?.name ?? null, courses: rows };
-      }
-      return { state: 'unclaimed' };
+      const first = (data ?? [])[0] as { id: string; name: string } | undefined;
+      if (!first) return { state: 'unclaimed' };
+      return { state: 'seed', courseId: first.id, courseName: first.name };
     },
   });
-}
-
-async function courseName(id: string): Promise<string | null> {
-  const { data } = await supabase.from('golf_courses').select('name').eq('id', id).maybeSingle();
-  return data?.name ?? null;
-}
-
-async function courseRows(ids: string[]): Promise<{ id: string; name: string }[]> {
-  const { data } = await supabase.from('golf_courses').select('id, name').in('id', ids).order('name');
-  return (data ?? []) as { id: string; name: string }[];
 }
