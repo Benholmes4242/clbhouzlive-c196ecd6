@@ -283,23 +283,89 @@ export function DiscoverHero({
 
         {/* THE LARGEST NUMERAL IN THE APP (§1.2). The noun keeps its placement
             from the ONE translatable template — before an IDENTITY, after a
-            QUANTITY — so a translator can still reorder. */}
+            QUANTITY — so a translator can still reorder. The gross-and-qualifier
+            cluster rides the SAME row, right-aligned (MICRO_BRIEF_HERO_SCORE_ON_
+            HEADLINE_ROW §1). */}
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, minWidth: 0 }}>
-          {parts.before && <span style={wordStyle}>{parts.before}</span>}
-          <CountUpFigure
-            value={figure}
-            format={isScore && !isGrossScore ? fmtRel : (n) => String(n)}
-            style={{
-              ...NUMF,
-              fontSize: 56,
-              fontWeight: 800,
-              lineHeight: 1,
-              letterSpacing: '-0.06em',
-              color: figureColor,
-            }}
-          />
-          {parts.after && <span style={wordStyle}>{parts.after}</span>}
+          <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', alignItems: 'baseline', gap: 9 }}>
+            {parts.before && <span style={wordStyle}>{parts.before}</span>}
+            <CountUpFigure
+              value={figure}
+              format={isScore && !isGrossScore ? fmtRel : (n) => String(n)}
+              style={{
+                ...NUMF,
+                fontSize: 56,
+                fontWeight: 800,
+                lineHeight: 1,
+                letterSpacing: '-0.06em',
+                color: figureColor,
+              }}
+            />
+            {parts.after && <span style={wordStyle}>{parts.after}</span>}
+          </div>
+
+          {/* WHAT THE ROUND SCORED — 21/700 gross, 13/700 qualifier, baseline
+              aligned with the 56px figure. TONE: the gross carries figureColor,
+              the ACHIEVEMENT's colour. THE QUALIFIER'S COLOUR IS A FUNCTION OF
+              WHAT THE MOMENT CLAIMS, NOT OF THE NUMBER'S SIGN (§4): only when the
+              moment is itself about the score (course record, finished in the red)
+              does the to-par carry the achievement colour. Everywhere else — the
+              run, birdie haul, strong finish, grind, eagle — it is CONTEXT beside
+              the claim and renders in the neutral fact tone. Never inverted to
+              red: a red +4 beside a green 9 would read as criticism.
+              ABSENT IS ABSENT: no gross and no to-par renders nothing, not a dash.
+              ON COURSE RECORD the 56px figure ALREADY IS the gross, so only the
+              qualifier renders here; printing it twice on one row is noise. */}
+          {(() => {
+            const toPar = moment.facts.toPar;
+            const showGross = row.gross != null && !isGrossScore;
+            const showQual = toPar != null;
+
+            if (!showGross && !showQual) return null;
+            const momentIsAboutScore = isGrossScore || moment.kind === 'finishedInRed';
+            return (
+              <div
+                style={{
+                  flex: 'none',
+                  marginLeft: 'auto',
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 6,
+                }}
+              >
+                {showGross && (
+                  <span
+                    className="tabular-nums"
+                    style={{
+                      fontSize: 21,
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      letterSpacing: '-0.03em',
+                      color: figureColor,
+                    }}
+                  >
+                    {row.gross}
+                  </span>
+                )}
+                {showQual && (
+                  <span
+                    className="tabular-nums"
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      letterSpacing: '-0.02em',
+                      color: momentIsAboutScore ? figureColor : DISCOVER_FACT,
+                    }}
+                  >
+                    {fmtRel(toPar as number)}
+                  </span>
+                )}
+              </div>
+            );
+          })()}
         </div>
+
 
         <div
           style={{
