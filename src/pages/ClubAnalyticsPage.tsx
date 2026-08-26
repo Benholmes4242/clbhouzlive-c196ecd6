@@ -73,10 +73,9 @@ const CourseBlock: React.FC<{
     if (open) setOpenedOnce(true);
   }, [open]);
 
-  const { data: result, isLoading } = useClubCourseAnalytics(course.course_id, openedOnce);
-
   const navigate = useNavigate();
   const { data: result, isLoading } = useClubCourseAnalytics(course.course_id, openedOnce);
+
 
   return (
     /* BRIEF_CLUB_ANALYTICS_PAGE_REBUILD §1 — THE BLOCK IS NO LONGER A CARD.
