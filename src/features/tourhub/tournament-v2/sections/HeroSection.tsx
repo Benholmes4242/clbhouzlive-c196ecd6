@@ -1,11 +1,13 @@
 /**
- * HeroSection — cinematic tournament hero (mock: tournament-hero-states).
+ * HeroSection — tournament hero, ported to the overview hero's structure
+ * (BRIEF_TOURNAMENT_HERO_BAND_PORT).
  *
- * Full-bleed course image (useSingleCourseImage) under the same scrim as the
- * overview cinematic hero. NO boxed glass panel — content sits directly on
- * the scrim above a 0.5px hairline; a state band pivots on `state`
- * (live -> LEADER row, upcoming -> DEFENDING + countdown, completed ->
- * CHAMPION + winning score).
+ * The PHOTOGRAPH carries three things only: the state chip, the h1 and the
+ * venue line. Every fact sits in stacked bands BENEATH it — a stat strip on
+ * HERO_BOARD_SURFACE_SOFT, a one-row person band and a disclosure row on
+ * HERO_BOARD_SURFACE. No hairline over the image, no figures over foliage.
+ * No board or ticker band lives here: TournamentPage mounts MiniBoard directly
+ * below this hero, and a second board would print the same rows twice.
  *
  * TYPE SCALE — HERO EXCEPTION (MICRO_BRIEF_TOURNAMENT_PAGE_TYPE_SCALE). This is
  * the same cinematic register as the overview hero: a broadcast surface over
@@ -17,15 +19,19 @@
  */
 import { differenceInCalendarDays } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Star } from 'lucide-react';
+import { Trophy, Star, ChevronRight } from 'lucide-react';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { formatPurse } from '../../_shared/formatPurse';
 import { formatNumber } from '@/i18n/format';
-import { FONT, WHITE_ALPHA_65 } from '../../_shared/tokens';
+import {
+  FONT, WHITE_ALPHA_65, WHITE_ALPHA_12,
+  HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT,
+} from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { HERO_MIN_H } from '../../_shared/tokens';
-import { heroCanonBackground } from '../../_shared/heroGradient';
+import { heroCanonScrimOn } from '../../_shared/heroGradient';
+
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
@@ -34,11 +40,16 @@ import type { EventState } from '../../components/overview-v3/useTournamentPulse
 // Canonical hero height: HERO_MIN_H from _shared/tokens, sourced from the
 // course detail hero (GolfClubView). Do not re-declare it locally.
 
-// ONE canon scrim, ending on the canvas — HERO_CANON_SCRIM in
-// _shared/heroGradient (BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON). No text shadow.
-const FALLBACK_BG = 'linear-gradient(180deg, #1A2130 0%, #15171F 100%)';
+/**
+ * ONE canon scrim — heroCanonScrimOn (BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON).
+ * The canon is that the ramp ends on whatever surface sits BENEATH the photo.
+ * That surface is no longer the canvas: it is the stat strip, so the gradient
+ * and the flat fallback both terminate on HERO_BOARD_SURFACE_SOFT (#121820).
+ * No text shadow, no second layer.
+ */
+const FALLBACK_BG = `linear-gradient(180deg, #1A2130 0%, ${HERO_BOARD_SURFACE_SOFT} 100%)`;
 const IMAGE_FOCAL = '50% 72%';
-const HAIRLINE = 'rgba(255,255,255,0.18)';
+
 
 const LEADER_RED = '#FF6B6B';
 const GOLD = '#FBBC2E';
@@ -134,7 +145,17 @@ function PersonLockup({
   showAvatar?: boolean;
 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        minWidth: 0,
+        background: HERO_BOARD_SURFACE,
+        borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
+        padding: '11px 16px',
+      }}
+    >
       {showAvatar && (
         <PlayerAvatar
           playerId={playerId ?? ''}
@@ -144,51 +165,52 @@ function PersonLockup({
           size="md"
         />
       )}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            // AXIS 10 (hero exception): band label / marker, not a sentence.
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            color: labelTone ?? 'rgba(255,255,255,0.62)',
-            textTransform: 'uppercase',
-          }}
-        >
-          {icon}
-          {label}
-        </div>
-        <div
-          style={{
-            fontSize: 15.5,
-            fontWeight: 700,
-            color: '#fff',
-            marginTop: 3,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {name}
-        </div>
-        {sub && (
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: WHITE_ALPHA_65,
-              marginTop: 2,
-              fontVariantNumeric: 'tabular-nums lining-nums',
-            }}
-          >
-            {sub}
-          </div>
-        )}
+      <div
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 5,
+          flexShrink: 0,
+          // AXIS 10 (hero exception): band label / marker, not a sentence.
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: '0.16em',
+          color: labelTone ?? 'rgba(255,255,255,0.62)',
+          textTransform: 'uppercase',
+        }}
+      >
+        {icon}
+        {label}
       </div>
+      <div
+        style={{
+          minWidth: 0,
+          fontSize: 13,
+          fontWeight: 700,
+          color: '#fff',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {name}
+      </div>
+      {sub && (
+        <div
+          style={{
+            marginLeft: 'auto',
+            flexShrink: 0,
+            fontSize: 11,
+            fontWeight: 600,
+            color: WHITE_ALPHA_65,
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+        >
+          {sub}
+        </div>
+      )}
     </div>
+
   );
 }
 
@@ -205,7 +227,13 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
     state === 'upcoming' ? meta.id : null,
   );
 
-  const background = heroCanonBackground(imageUrl, FALLBACK_BG, IMAGE_FOCAL);
+  // heroCanonBackground() hard-codes the CANVAS termination, so the canon's own
+  // heroCanonScrimOn() is used with the surface beneath this hero instead.
+  const scrim = heroCanonScrimOn(HERO_BOARD_SURFACE_SOFT);
+  const background = imageUrl
+    ? `${scrim}, url("${imageUrl}") ${IMAGE_FOCAL} / cover no-repeat`
+    : `${scrim}, ${FALLBACK_BG}`;
+
 
   const leader =
     state === 'live'
@@ -380,134 +408,188 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
 
 
 
+  /**
+   * THE ACTION ROW — one disclosure at the foot of the hero.
+   * Targets are the page's OWN existing in-page anchor (#the-act, the target
+   * TournamentPage's inbound ?tab=leaderboard / ?tab=tee-times deep link
+   * scrolls to at TournamentPage.tsx:127-141). No new route is invented and
+   * TournamentPage is not edited, so no sheet is opened from here.
+   */
+  const actionLabel =
+    state === 'live'
+      ? t('tournament.shell.board.action')
+      : state === 'completed'
+        ? t('tournament.shell.leaderboard.finalEyebrow')
+        : t('tournament.teeTimesBand.title');
+
+  const onAction = () => {
+    const el = document.getElementById('the-act');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
-    <div
-      style={{
-        position: 'relative',
-        minHeight: HERO_MIN_H,
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 48px)',
-        background,
-        fontFamily: FONT,
-        color: '#fff',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-end',
-      }}
-    >
-      <div style={{ padding: '10px 16px 12px' }}>
-        {/* Shared lockup */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            padding: '4px 8px',
-            borderRadius: 4,
-            background: chip.bg,
-            border: `1px solid ${chip.border}`,
-            // AXIS 10 (hero exception): status marker chip.
-            fontSize: 10,
-            fontWeight: 700,
-            color: chip.color,
-            letterSpacing: '0.10em',
-            textTransform: 'uppercase',
-            marginBottom: 8,
-          }}
-        >
-          {chip.label}
-        </div>
-
-        <h1
-          style={{
-            fontSize: 21,
-            fontWeight: 700,
-            color: '#fff',
-            lineHeight: 1.04,
-            letterSpacing: '-0.02em',
-            margin: 0,
-            display: '-webkit-box',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
-            overflow: 'hidden',
-          }}
-        >
-          {meta.name}
-        </h1>
-
-        {venueLine && (
+    <div style={{ fontFamily: FONT, color: '#fff' }}>
+      {/* PHOTO BAND — chip, title, venue line. Nothing else. */}
+      <div
+        style={{
+          position: 'relative',
+          minHeight: HERO_MIN_H,
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 48px)',
+          background,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+        }}
+      >
+        <div style={{ padding: '10px 16px 12px' }}>
           <div
             style={{
-              fontSize: 12.5,
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.65)',
-              marginTop: 4,
-              fontVariantNumeric: 'tabular-nums lining-nums',
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '4px 8px',
+              borderRadius: 4,
+              background: chip.bg,
+              border: `1px solid ${chip.border}`,
+              // AXIS 10 (hero exception): status marker chip.
+              fontSize: 10,
+              fontWeight: 700,
+              color: chip.color,
+              letterSpacing: '0.10em',
+              textTransform: 'uppercase',
+              marginBottom: 8,
             }}
           >
-            {venueLine}
+            {chip.label}
           </div>
-        )}
 
-        {/* Hairline separator (0.5px, no boxed panel). */}
+          <h1
+            style={{
+              fontSize: 'clamp(22px, 7.2vw, 28px)',
+              fontWeight: 700,
+              color: '#fff',
+              lineHeight: 1.04,
+              letterSpacing: '-0.02em',
+              margin: 0,
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              overflow: 'hidden',
+            }}
+          >
+            {meta.name}
+          </h1>
+
+          {venueLine && (
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.65)',
+                marginTop: 4,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+              }}
+            >
+              {venueLine}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* STAT STRIP — three figures on HERO_BOARD_SURFACE_SOFT, the surface the
+          photo gradient terminates on. Renders whatever the state produced;
+          never padded to three. */}
+      {figures.length > 0 && (
         <div
           style={{
-            height: 0,
-            borderTop: `0.5px solid ${HAIRLINE}`,
-            marginTop: 8,
-            marginBottom: 8,
+            background: HERO_BOARD_SURFACE_SOFT,
+            padding: '12px 16px 14px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 10,
           }}
+        >
+          {figures.map((f) => (
+            <Figure key={f.label} value={f.value} label={f.label} tone={f.tone} />
+          ))}
+        </div>
+      )}
+
+      {/* PERSON BAND — one row on HERO_BOARD_SURFACE. */}
+      {state === 'live' && leader && (
+        <PersonLockup
+          label={t('tournament.hero.leaderLabel')}
+          name={leader.player?.full_name ?? t('tournament.hero.tbdPlayer')}
+          sub={
+            leader.today != null
+              ? t('board.columns.today') + ' ' + fmtScore(leader.today)
+              : null
+          }
+          playerId={leader.player?.id ?? null}
+          photoUrl={leader.player?.photo_url ?? null}
+          tourCode={tourCode}
+          showAvatar
         />
+      )}
 
-        {/* THREE FIGURES - one row, every state. */}
-        {figures.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 8 }}>
-            {figures.map((f) => (
-              <Figure key={f.label} value={f.value} label={f.label} tone={f.tone} />
-            ))}
-          </div>
-        )}
+      {state === 'upcoming' && (
+        <PersonLockup
+          label={t('tournament.hero.defendingLabel', { defaultValue: 'DEFENDING CHAMPION' })}
+          labelTone={GOLD}
+          icon={<Star size={11} fill={GOLD} color={GOLD} strokeWidth={0} />}
+          name={defendingChamp?.name ?? meta.defending_champion ?? t('tournament.hero.tbdPlayer')}
+          sub={[defendingChamp?.year, defendingChamp?.score].filter(Boolean).join(' \u00B7 ') || null}
+          tourCode={tourCode}
+        />
+      )}
 
-        {/* PERSON - leader / defending champion / champion, one lockup. */}
-        {state === 'live' && leader && (
-          <PersonLockup
-            label={t('tournament.hero.leaderLabel')}
-            name={leader.player?.full_name ?? t('tournament.hero.tbdPlayer')}
-            sub={
-              leader.today != null
-                ? t('board.columns.today') + ' ' + fmtScore(leader.today)
-                : null
-            }
-            playerId={leader.player?.id ?? null}
-            photoUrl={leader.player?.photo_url ?? null}
-            tourCode={tourCode}
-            showAvatar
-          />
-        )}
+      {state === 'completed' && champion && (
+        <PersonLockup
+          label={t('tournament.hero.championLabel', { defaultValue: 'CHAMPION' })}
+          labelTone={GOLD}
+          icon={<Trophy size={11} color={GOLD} strokeWidth={2.4} />}
+          name={champion.player?.full_name ?? t('tournament.hero.championFallback')}
+          playerId={champion.player?.id ?? null}
+          photoUrl={champion.player?.photo_url ?? null}
+          tourCode={tourCode}
+          showAvatar
+        />
+      )}
 
-        {state === 'upcoming' && (
-          <PersonLockup
-            label={t('tournament.hero.defendingLabel', { defaultValue: 'DEFENDING CHAMPION' })}
-            labelTone={GOLD}
-            icon={<Star size={11} fill={GOLD} color={GOLD} strokeWidth={0} />}
-            name={defendingChamp?.name ?? meta.defending_champion ?? t('tournament.hero.tbdPlayer')}
-            sub={[defendingChamp?.year, defendingChamp?.score].filter(Boolean).join(' \u00B7 ') || null}
-            tourCode={tourCode}
-          />
-        )}
-
-        {state === 'completed' && champion && (
-          <PersonLockup
-            label={t('tournament.hero.championLabel', { defaultValue: 'CHAMPION' })}
-            labelTone={GOLD}
-            icon={<Trophy size={11} color={GOLD} strokeWidth={2.4} />}
-            name={champion.player?.full_name ?? t('tournament.hero.championFallback')}
-            playerId={champion.player?.id ?? null}
-            photoUrl={champion.player?.photo_url ?? null}
-            tourCode={tourCode}
-            showAvatar
-          />
-        )}
-
-      </div>
+      {/* ACTION ROW */}
+      <button
+        type="button"
+        onClick={onAction}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          background: HERO_BOARD_SURFACE,
+          borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
+          borderLeft: 'none',
+          borderRight: 'none',
+          borderBottom: 'none',
+          padding: '11px 16px',
+          textAlign: 'left',
+          cursor: 'pointer',
+          fontFamily: FONT,
+        }}
+      >
+        <span
+          style={{
+            // AXIS 10 (hero exception): disclosure label, tracked caps.
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: WHITE_ALPHA_65,
+          }}
+        >
+          {actionLabel}
+        </span>
+        <ChevronRight size={14} strokeWidth={2.5} color={WHITE_ALPHA_65} style={{ marginLeft: 'auto' }} aria-hidden />
+      </button>
     </div>
   );
 }
+
