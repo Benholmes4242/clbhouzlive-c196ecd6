@@ -576,7 +576,7 @@ export function LeaderboardTab() {
       <div
         style={{
           position: 'sticky',
-          top: 'var(--sat, 0px)',
+          top: 'var(--tour-header-h, 0px)',
           zIndex: 2,
           display: 'grid',
           gridTemplateColumns: boardGridTemplate(headerCols),

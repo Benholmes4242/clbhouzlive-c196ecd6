@@ -156,7 +156,7 @@ export function LeadersTab() {
       }}
     >
 
-      {/* Tour lens - sticky glass wrapper; chips from SectionTourLens
+      {/* Tour lens - sticky opaque wrapper; chips from SectionTourLens
           (no All Tours; PGA default). CHAMP taps are ignored - no board
           coverage for that tour. */}
       <div

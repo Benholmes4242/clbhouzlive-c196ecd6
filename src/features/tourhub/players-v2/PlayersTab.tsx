@@ -26,7 +26,9 @@ import {
   HAIRLINE_INK_10,
   INK,
   INK_MUTE,
-  SLATE_50, SURFACE } from '../_shared/tokens';
+  SLATE_50,
+  SURFACE,
+} from '../_shared/tokens';
 import { getScoreColor } from '../_shared/scoreColor';
 import { MovementFigure } from '../_shared/movement';
 import { fmtScore } from '../utils/fmtScore';
@@ -253,8 +255,8 @@ export function PlayersTab() {
                   width: 36,
                   height: 36,
                   borderRadius: 14,
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.10)',
+                background: SURFACE,
+                border: `1px solid ${HAIRLINE_INK_10}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -273,8 +275,8 @@ export function PlayersTab() {
                 alignItems: 'center',
                 gap: 6,
                 height: 36,
-                background: searchFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
-                border: `1px solid ${searchFocused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
+                background: SURFACE,
+                border: `1px solid ${searchFocused ? INK_MUTE : HAIRLINE_INK_10}`,
                 borderRadius: 14,
                 padding: '0 12px',
                 transition: 'background 140ms ease, border-color 140ms ease',

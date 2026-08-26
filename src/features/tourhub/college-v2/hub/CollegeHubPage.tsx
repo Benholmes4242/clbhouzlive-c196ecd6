@@ -242,7 +242,7 @@ export function CollegeHubPage() {
         )}
 
 
-        {/* Sticky glass search row - locks under island band; filters the feed. */}
+        {/* Sticky opaque search row - locks under the tour header; filters the feed. */}
         <div
           style={{
             position: 'sticky',
@@ -263,7 +263,7 @@ export function CollegeHubPage() {
               construction, same paint. Change one, change both.
               RADIUS/HEIGHT EXCEPTION (recorded — do not "correct" to 44).
               The canon is radius 14 / height 44. Radius moves to 14 here; the
-              height stays 34 because this field sits inside the sticky glass
+              height stays 34 because this field sits inside the sticky control
               bar (padding '8px 16px 10px'), and 44 would deepen that bar and
               push the yearbook list down at every scroll position. Fourth
               recorded exception, after the OTP boxes, the Reviews control row
@@ -296,8 +296,8 @@ export function CollegeHubPage() {
                 paddingLeft: 30,
                 paddingRight: 30,
                 borderRadius: 14,
-                background: searchPaintFocus ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
-                border: `1px solid ${searchPaintFocus ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.10)'}`,
+                background: SURFACE,
+                border: `1px solid ${searchPaintFocus ? INK_MUTE : HAIRLINE_INK_10}`,
                 transition: 'background 140ms ease, border-color 140ms ease',
                 fontFamily: FONT,
                 fontSize: 13,
