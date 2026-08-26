@@ -125,6 +125,7 @@ export function CourseOfTheWeekSection() {
   } = data;
 
   const location = [region, country].filter(Boolean).join(' · ');
+  const trimmedQuote = clampToSentence(quote ?? '');
 
   return (
     <AnimatePresence initial={false}>
@@ -278,28 +279,17 @@ export function CourseOfTheWeekSection() {
 
               {/* Body */}
               <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {/* Stat row — three cells when the member has played here,
-                    two when signed out / never played (grid rebalances). */}
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: `repeat(${myBest?.best_gross != null ? 3 : 2}, 1fr)`,
-                    alignItems: 'start',
-                  }}
-                >
-                  <CotwStat label="Rating" value={Number(avg_rating ?? 0).toFixed(1)} />
-                  <CotwStat label="Reviews" value={review_count.toLocaleString()} />
+                {/* ONE figure line, not a three-up. The pairs are inline with a
+                    5px internal gap and 16px between them; nothing wraps.
+                    "1 round" is gone — it wrapped under YOUR BEST and cost the
+                    card a line for one word. */}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, flexWrap: 'nowrap', overflow: 'hidden' }}>
+                  <FigurePair label="Rating" value={Number(avg_rating ?? 0).toFixed(1)} />
+                  <FigurePair label="Reviews" value={review_count.toLocaleString()} tone={A.MUTE} />
+                  {/* Never played / signed out => the pair COLLAPSES. No dash,
+                      no zero, no em-dash placeholder. */}
                   {myBest?.best_gross != null ? (
-                    <CotwStat
-                      label="Your best"
-                      value={String(myBest.best_gross)}
-                      tone={A.AMBER}
-                      sub={
-                        myBest.rounds_here && myBest.rounds_here > 0
-                          ? `${myBest.rounds_here} ${myBest.rounds_here === 1 ? 'round' : 'rounds'}`
-                          : undefined
-                      }
-                    />
+                    <FigurePair label="Your best" value={String(myBest.best_gross)} tone={A.AMBER} />
                   ) : null}
                 </div>
 
@@ -311,15 +301,15 @@ export function CourseOfTheWeekSection() {
                       style={{
                         margin: 0,
                         padding: 0,
-                        borderLeft: `2px solid ${V4.amber}`,
-                        paddingLeft: 10,
+                        borderLeft: `3px solid ${V4.amber}`,
+                        paddingLeft: 11,
                       }}
                     >
                       <div
                         style={{
-                          fontSize: 14,
+                          fontSize: 14.5,
                           lineHeight: 1.5,
-                          color: V4.inkSoft,
+                          color: A.MUTE,
                           fontStyle: 'italic',
                           display: '-webkit-box',
                           WebkitLineClamp: 3,
@@ -327,52 +317,21 @@ export function CourseOfTheWeekSection() {
                           overflow: 'hidden',
                         }}
                       >
-                        “{quote}”
+                        “{trimmedQuote.text}{trimmedQuote.truncated ? '…' : ''}”
                       </div>
-                      <div style={{ marginTop: 6, fontSize: 11, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                      <div style={{ marginTop: 6, fontSize: 11, fontWeight: 700, color: A.DIM, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
                         — {reviewer_name ?? 'A member'}
                       </div>
                     </blockquote>
                   </>
                 ) : null}
 
-                {/* CTA */}
-                <button
-                  type="button"
-                  onClick={() => navigate(`/courses/${course_id}`)}
-                  style={{
-                    marginTop: 2,
-                    width: '100%',
-                    height: 44,
-                    borderRadius: 12,
-                    border: `0.5px solid ${V4.ink}`,
-                    background: V4.ink,
-                    // FILLED-ACTION: V4.ink is now near-white, so the label
-                    // takes the canvas. Flip the label, never the fill.
-                    color: V4.bg,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    letterSpacing: '0.04em',
-                    textTransform: 'uppercase',
-                    cursor: 'pointer',
-                  }}
-                >
-                  See the course
-                </button>
+                {/* Quiet action. The card owns the navigation; this is the
+                    affordance, so it must not become a second tap target. */}
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK }}>
+                  See the course ›
+                </div>
               </div>
-            </div>
-
-            <div
-              style={{
-                marginTop: 8,
-                textAlign: 'center',
-                fontSize: 11,
-                fontWeight: 600,
-                color: V4.inkFaint,
-                letterSpacing: '0.04em',
-              }}
-            >
-              Today's pick from the Top 100 — rated by members
             </div>
           </div>
         </SectionShell>
