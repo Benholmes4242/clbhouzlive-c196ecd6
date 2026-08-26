@@ -99,7 +99,7 @@ describe('Discover hero rotation (BRIEF_DISCOVER_HERO_ROTATION)', () => {
 
   it('lets a course record lead but lose to an ace in the same window', () => {
     const record = { row: row('record', '2026-08-22'), moment: moment('courseRecord') };
-    const plain = { row: row('plain', '2026-08-22'), moment: moment('plain') };
+    const plain = { row: row('eagle', '2026-08-22'), moment: moment('eagle') };
     const start = slotOf('2026-08-22');
     expect(selectDiscoverHeroCandidate([plain, record], start)?.row.round_id).toBe('record');
     const ace = { row: row('ace', '2026-08-22'), moment: moment('eagle', 'ace') };
