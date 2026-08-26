@@ -18,7 +18,7 @@ import {
   momentSentence,
   type TFn,
 } from './GolfThisWeek';
-import { MOMENT_TONE } from './roundMoment';
+
 import type { DiscoverHeroSubject } from './hooks/useDiscoverHero';
 
 /**
