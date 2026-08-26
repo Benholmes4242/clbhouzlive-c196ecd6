@@ -78,6 +78,9 @@
       "remaining": "REMAINING",
       "nextMajor": "NEXT MAJOR",
       "daysSuffix": "D"
+    },
+    "row": {
+      "countdownIn": "IN {{n}}D"
     }
   },
   "overview": {

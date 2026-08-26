@@ -66,6 +66,9 @@
     },
     "champion": {
       "defendsSuffix": "{{name}} defends"
+    },
+    "row": {
+      "countdownIn": "EN {{n}}D"
     }
   },
   "overview": {
