@@ -312,22 +312,23 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
           )}
         </div>
 
-        {/* Right rail */}
-        <div
-          style={{
-            width: 52,
-            flex: '0 0 52px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-          }}
-        >
-          {isLive && <LiveMark />}
-          {event.state === 'upcoming' && event.daysAway !== null && (
-            <UpcomingRail daysAway={event.daysAway} highlight={false} />
-          )}
-        </div>
+        {/* Right rail — LIVE mark only. The upcoming countdown rail is gone; no
+            column is reserved for it, which is where the name's width came from. */}
+        {isLive && (
+          <div
+            style={{
+              width: 52,
+              flex: '0 0 52px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+            }}
+          >
+            <LiveMark />
+          </div>
+        )}
+
       </button>
     </div>
   );
