@@ -88,8 +88,11 @@ describe('Discover hero rotation (BRIEF_DISCOVER_HERO_ROTATION)', () => {
     const start = slotOf('2026-08-22');
     expect(selectDiscoverHeroCandidate(pool, start)?.row.round_id).toBe('ace');
     expect(selectDiscoverHeroCandidate(pool, start + 2)?.row.round_id).toBe('ace');
-    expect(selectDiscoverHeroCandidate(pool, start + 3)?.row.round_id).not.toBe('ace');
-  });
+    /* Expired: the pick is now plain rotation over the pool, not the lead. */
+    expect(selectDiscoverHeroCandidate(pool, start + 3)?.row.round_id).toBe(
+      pool[(start + 3) % pool.length].row.round_id,
+    );
+
 
 
   it('keeps a late tee time leading the next morning (AMENDMENT 1 §5-6)', () => {
