@@ -705,7 +705,12 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           )}
         </div>
       </header>
-      <div aria-hidden style={{ height: 54, flexShrink: 0 }} />
+      {/* Spacer must clear the FIXED header, whose box is
+          env(safe-area-inset-top) + 8 (pad) + 6 + 44 (row) + 10 (pad) + 1 (rule).
+          The page sits inside .app-shell, which already pays padding-top: var(--sat),
+          so the spacer only owes the 69px chrome below the notch. Was a flat 54 —
+          that is why step content started under the header. */}
+      <div aria-hidden style={{ height: 69, flexShrink: 0 }} />
 
       {/* Step rail */}
       <div
