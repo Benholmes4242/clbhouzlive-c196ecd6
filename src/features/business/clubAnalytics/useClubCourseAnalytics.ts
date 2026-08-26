@@ -1,13 +1,18 @@
 /**
- * BRIEF_CLUB_ANALYTICS_TAB §7 — WIRING.
+ * BRIEF_CLUB_ANALYTICS_MULTI_COURSE §1 — THE EMPTY STATE MUST STOP ASSERTING
+ * WHAT IT CANNOT KNOW.
  *
- * ONE RPC, course-scoped, everything the tab needs in one round trip. The
- * function is SECURITY DEFINER and verifies the caller manages a verified Golf
- * Club whose claim resolves to that course; it returns AGGREGATES ONLY.
+ * The old hook collapsed three different outcomes into `null` — function
+ * missing, caller not entitled, and genuinely no rounds — and the page then
+ * stated the third as fact. It told every club nothing had been scored on their
+ * course while 817 rounds of hole-by-hole data sat in whs_score_holes.
  *
- * BEN RUNS ALL SQL. The function is not created here and there is no migration.
- * Until it exists, an error resolves to `null` and the tab says the measurement
- * is not available yet — it does NOT render placeholder rows (§6.2).
+ * So this resolves a DISCRIMINATED RESULT. The RPC returns NO ROWS when the
+ * caller is not entitled — that is deliberate, so the function cannot leak
+ * whether a club exists — which means 'empty' is "not available", never "no
+ * rounds here".
+ *
+ * BEN OWNS ALL SQL. Nothing here creates or patches the function.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,10 +20,22 @@ import type { ClubCourseAnalytics } from './types';
 
 export const CLUB_ANALYTICS_RPC = 'get_club_course_analytics';
 
-export function useClubCourseAnalytics(courseId: string | undefined) {
-  return useQuery<ClubCourseAnalytics | null>({
+export type ClubAnalyticsResult =
+  | { state: 'ok'; data: ClubCourseAnalytics }
+  /** Any error from the RPC. The reason is logged, never put on screen. */
+  | { state: 'unavailable'; reason: string }
+  /** Zero rows: no entitlement OR no data. We cannot tell, so we do not claim. */
+  | { state: 'empty' };
+
+/** Defensive coercion — jsonb columns arrive as unknown until we look. */
+function arr<T>(v: unknown): T[] {
+  return Array.isArray(v) ? (v as T[]) : [];
+}
+
+export function useClubCourseAnalytics(courseId: string | undefined, enabled = true) {
+  return useQuery<ClubAnalyticsResult>({
     queryKey: ['club-course-analytics', courseId],
-    enabled: !!courseId,
+    enabled: !!courseId && enabled,
     staleTime: 10 * 60 * 1000,
     retry: false,
     queryFn: async () => {
@@ -27,12 +44,28 @@ export function useClubCourseAnalytics(courseId: string | undefined) {
         CLUB_ANALYTICS_RPC as never,
         { p_golf_course_id: courseId } as never,
       );
-      // Function missing / caller not permitted → the tab renders its
-      // "not measured" state. Never a fabricated payload.
-      if (error) return null;
-      if (!data) return null;
-      const row = Array.isArray(data) ? data[0] : data;
-      return (row as ClubCourseAnalytics | null) ?? null;
+
+      if (error) {
+        console.error('[clubAnalytics] rpc failed', { courseId, reason: error.message });
+        return { state: 'unavailable', reason: error.message };
+      }
+
+      const payload = data as unknown;
+      const row = (Array.isArray(payload) ? payload[0] : payload) as Record<string, unknown> | null | undefined;
+      if (!row) return { state: 'empty' };
+
+      const shaped: ClubCourseAnalytics = {
+        ...(row as unknown as ClubCourseAnalytics),
+        club_courses: arr(row.club_courses),
+        holes: arr(row.holes),
+        months: arr(row.months),
+        weekdays: arr(row.weekdays),
+        years: arr(row.years),
+        tees: arr(row.tees),
+        handicap_bands: arr(row.handicap_bands),
+        si_advice: Array.isArray(row.si_advice) ? (row.si_advice as ClubCourseAnalytics['si_advice']) : null,
+      };
+      return { state: 'ok', data: shaped };
     },
   });
 }

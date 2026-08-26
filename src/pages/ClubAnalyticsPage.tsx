@@ -1,44 +1,44 @@
 /**
- * BRIEF_CLUB_ANALYTICS_TAB — the Club Analytics surface.
+ * BRIEF_CLUB_ANALYTICS_MULTI_COURSE — the Club Analytics surface.
  *
- * WHAT THIS IS: a tab inside Manage business profiles, for VERIFIED GOLF CLUBS
- * ONLY, showing what actually happens on their golf course — led by whether
- * their stroke index is right. That verdict is the product; the rest supports
- * it. Nothing here is a member's round: it is the club's course, measured.
+ * WHAT THIS IS: a page inside Manage business profiles, for VERIFIED GOLF CLUBS
+ * ONLY, showing what actually happens on their golf course. Nothing here is a
+ * member's round: it is the club's course, measured, in aggregate.
  *
- * ALL THREE STATES ARE BUILT and all three come out of the same code path,
- * because they are the same page with different data:
- *   A  A CARD THAT IS OUT     verdict names the largest disagreement (Hanbury)
- *   B  A CARD THAT IS SOUND   verdict pays the compliment (Sundridge)
- *   C  EARLY DATA             every section renders, the n reads "Early data",
- *                             the verdict's verb softens, handicap withdraws
+ * ONE BLOCK PER COURSE (§2). The old page picked ONE course and everything else
+ * was unreachable — Sundridge Park owns two and only East could ever be seen.
+ * `club_courses` from the RPC now drives a collapsible block per course. The
+ * default-open block fetches on mount; the rest fetch when first expanded, so a
+ * club with four courses does not fire four RPCs to show one.
  *
- * ELIGIBILITY IS A GATE, NOT A DISCLAIMER (§2). Category, verification and a
- * resolved course must all hold. A multi-course club with no specific course
- * REPORTS AND STOPS — a stroke index belongs to a course, and merging two
- * courses' holes would produce a verdict for a course that does not exist.
+ * THE EMPTY STATE DOES NOT ASSERT WHAT IT CANNOT KNOW (§1). The RPC returns no
+ * rows both when the caller is not entitled and when there is no data, so the
+ * page never claims a course has no rounds.
  *
- * BEN RUNS ALL SQL. The one RPC this reads is not created here.
+ * BEN RUNS ALL SQL. The RPC is live and is not created or patched here.
  */
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ChevronDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import {
-  A, BIZ_KICKER, BIZ_BODY, BIZ_TITLE, Panel,
+  A, SANS, FIGS, LABEL, BIZ_BODY, BIZ_TITLE, Panel,
 } from '@/features/courses/components/holes/analytical/tokens';
 import { useClubCourseLink } from '@/features/business/clubAnalytics/useClubCourseLink';
 import { useClubCourseAnalytics } from '@/features/business/clubAnalytics/useClubCourseAnalytics';
 import {
-  VerdictSection, HowItPlaysSection, ScoringSection, TeesSection, BusynessSection, WhoPlaysSection,
+  SampleSection, HoleBySection, StrokeIndexSection, ScoringSection, TeesSection,
+  SeasonalitySection, WhoPlaysSection, CompetitionSection,
 } from '@/features/business/clubAnalytics/sections';
-import { EARLY_DATA_FLOOR } from '@/features/business/clubAnalytics/constants';
+import type { ClubCourseRef } from '@/features/business/clubAnalytics/types';
 
 const TITLE = 'Your course';
 
 /** One shape for every "we cannot show this, and here is exactly why" state.
- *  It never renders empty charts — that was the Insights fault (§6.2). */
+ *  It never renders empty charts. */
 function Notice({ kicker, headline, body }: { kicker: string; headline: string; body: string }) {
   return (
     <div style={{ padding: '4px 16px 0' }}>
@@ -49,6 +49,113 @@ function Notice({ kicker, headline, body }: { kicker: string; headline: string; 
     </div>
   );
 }
+
+/* ───────────────────────── ONE COURSE BLOCK ───────────────────────── */
+
+/**
+ * §2 — a collapsible block, headed by the course name. It fetches ONLY once it
+ * has been opened: `openedOnce` gates the query, so a collapsed block costs
+ * nothing. Once it has data, the collapsed head carries its round count.
+ */
+const CourseBlock: React.FC<{
+  course: ClubCourseRef;
+  open: boolean;
+  onToggle: () => void;
+}> = ({ course, open, onToggle }) => {
+  const [openedOnce, setOpenedOnce] = React.useState(open);
+  React.useEffect(() => {
+    if (open) setOpenedOnce(true);
+  }, [open]);
+
+  const { data: result, isLoading } = useClubCourseAnalytics(course.course_id, openedOnce);
+  const rounds = result?.state === 'ok' ? result.data.rounds : null;
+
+  return (
+    <section style={{ border: `1px solid ${A.BORDER}`, borderRadius: 16, background: A.PANEL, overflow: 'hidden' }}>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          width: '100%',
+          padding: 16,
+          border: 'none',
+          background: 'transparent',
+          cursor: 'pointer',
+          textAlign: 'left',
+          fontFamily: SANS,
+          ...FIGS,
+        }}
+      >
+        <span style={{ minWidth: 0 }}>
+          <span style={{ ...BIZ_TITLE, display: 'block' }}>{course.course_name}</span>
+          {rounds != null && (
+            <span style={{ ...LABEL, display: 'block', marginTop: 5 }}>
+              {rounds.toLocaleString()} {rounds === 1 ? 'round' : 'rounds'}
+            </span>
+          )}
+        </span>
+        <ChevronDown
+          size={18}
+          color={A.MUTE}
+          style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 160ms ease' }}
+        />
+      </button>
+
+      {open && (
+        <div style={{ padding: '0 12px 14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {isLoading && (
+            <>
+              <Skeleton className="h-32 rounded-2xl" />
+              <Skeleton className="h-64 rounded-2xl" />
+            </>
+          )}
+
+          {/* §1 — an error is NOT "no rounds". The reason is logged, not shown. */}
+          {!isLoading && result?.state === 'unavailable' && (
+            <Panel kicker="Not loaded">
+              <div style={{ ...BIZ_TITLE, marginBottom: 8 }}>We could not load this measurement</div>
+              <p style={{ ...BIZ_BODY, margin: 0 }}>
+                Something went wrong reading the figures for this course. Nothing is missing from your side — try again
+                shortly, and if it persists we will pick it up from our logs.
+              </p>
+            </Panel>
+          )}
+
+          {!isLoading && result?.state === 'empty' && (
+            <Panel kicker="Not available">
+              <div style={{ ...BIZ_TITLE, marginBottom: 8 }}>Measurement is not available for this course yet</div>
+              <p style={{ ...BIZ_BODY, margin: 0 }}>
+                We are not able to show figures for this course at the moment. There is nothing for you to configure —
+                when it becomes available it appears here.
+              </p>
+            </Panel>
+          )}
+
+          {!isLoading && result?.state === 'ok' && (
+            <>
+              {/* §4 — the sample comes BEFORE any figure. */}
+              <SampleSection data={result.data} />
+              <HoleBySection data={result.data} />
+              <StrokeIndexSection data={result.data} />
+              <ScoringSection data={result.data} />
+              <TeesSection data={result.data} />
+              <SeasonalitySection data={result.data} />
+              <WhoPlaysSection data={result.data} />
+              <CompetitionSection data={result.data} />
+            </>
+          )}
+        </div>
+      )}
+    </section>
+  );
+};
+
+/* ───────────────────────── THE PAGE ───────────────────────── */
 
 export default function ClubAnalyticsPage() {
   const { id } = useParams<{ id: string }>();
@@ -63,8 +170,12 @@ export default function ClubAnalyticsPage() {
     clubId: business?.club_id,
   });
 
-  const courseId = link?.state === 'resolved' ? link.courseId : undefined;
-  const { data, isLoading: dataLoading } = useClubCourseAnalytics(courseId);
+  const seedId = link?.state === 'seed' ? link.courseId : undefined;
+  const { data: seed, isLoading: seedLoading } = useClubCourseAnalytics(seedId);
+
+  const [openId, setOpenId] = React.useState<string | null>(null);
+  const defaultOpen = seedId ?? null;
+  const effectiveOpen = openId ?? defaultOpen;
 
   if (businessLoading || linkLoading) {
     return (
@@ -89,7 +200,7 @@ export default function ClubAnalyticsPage() {
     );
   }
 
-  /* ── §2 ELIGIBILITY ── */
+  /* ── THE GATE. Unchanged states, unchanged copy. ── */
 
   if (link?.state === 'not_a_club') {
     return (
@@ -127,43 +238,7 @@ export default function ClubAnalyticsPage() {
     );
   }
 
-  // §2.1 — MULTI-COURSE CLUBS. Report and stop; never merge.
-  if (link?.state === 'ambiguous') {
-    return (
-      <ManagePageShell title={TITLE}>
-        <div style={{ padding: '4px 16px 0' }}>
-          <Panel kicker="More than one course">
-            <div style={{ ...BIZ_TITLE, marginBottom: 8 }}>
-              {link.clubName ?? 'Your club'} has {link.courses.length} courses
-            </div>
-            <p style={{ ...BIZ_BODY, margin: 0, marginBottom: 12 }}>
-              A stroke index belongs to a course, not to a club, so we will not average your courses together — the
-              verdict would describe a course that does not exist. Your claim needs to point at one of these before
-              this page can measure it.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {link.courses.map((c) => (
-                <div
-                  key={c.id}
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: A.INK,
-                    borderTop: `1px solid ${A.HAIRLINE}`,
-                    paddingTop: 8,
-                  }}
-                >
-                  {c.name}
-                </div>
-              ))}
-            </div>
-          </Panel>
-        </div>
-      </ManagePageShell>
-    );
-  }
-
-  if (dataLoading) {
+  if (seedLoading) {
     return (
       <ManagePageShell title={TITLE}>
         <div className="space-y-3 px-4 pt-4">
@@ -175,46 +250,54 @@ export default function ClubAnalyticsPage() {
     );
   }
 
-  // The RPC is absent, or the caller is not permitted, or no round has landed.
-  // We say so plainly rather than drawing an empty page (§6.2).
-  if (!data || data.rounds === 0 || data.holes.length === 0) {
+  // §1 — no rows means "not available", NEVER "this course has no rounds".
+  if (!seed || seed.state !== 'ok') {
     return (
       <ManagePageShell title={TITLE}>
         <Notice
-          kicker={link?.state === 'resolved' ? link.courseName : 'Your course'}
-          headline="No measured rounds yet"
-          body="Nothing has been scored hole by hole on this course through Clbhouz yet. As soon as rounds land, your stroke index gets checked against them here — there is nothing to configure."
+          kicker={link?.state === 'seed' ? link.courseName : 'Your course'}
+          headline={
+            seed?.state === 'unavailable'
+              ? 'We could not load this measurement'
+              : 'Measurement is not available for your course yet'
+          }
+          body={
+            seed?.state === 'unavailable'
+              ? 'Something went wrong reading the figures for your course. Nothing is missing from your side — try again shortly, and if it persists we will pick it up from our logs.'
+              : 'We are not able to show figures for this club at the moment. There is nothing for you to configure — when it becomes available it appears here.'
+          }
         />
       </ManagePageShell>
     );
   }
 
-  const early = data.rounds < EARLY_DATA_FLOOR;
+  // club_courses supersedes any client-side course picking. Fall back to the
+  // course the RPC answered about, so a club always sees at least its own block.
+  const courses: ClubCourseRef[] = seed.data.club_courses.length
+    ? seed.data.club_courses
+    : [{ course_id: seed.data.course_id, course_name: seed.data.course_name }];
 
   return (
     <ManagePageShell title={TITLE}>
       <div style={{ padding: '4px 16px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {/* The course this page is about, named once, at the top. */}
-        <div>
-          <div style={BIZ_KICKER}>{data.course_name}</div>
-          <p style={{ ...BIZ_BODY, margin: '6px 0 0', fontSize: 12.5 }}>
-            {early
-              ? `We hold ${data.rounds.toLocaleString()} ${data.rounds === 1 ? 'round' : 'rounds'} on this course. Everything below is real, and it reads as a signal rather than a finding until ${EARLY_DATA_FLOOR} rounds have landed.`
-              : `Drawn from ${data.rounds.toLocaleString()} rounds played here, hole by hole.`}
+        {courses.length > 1 && (
+          <p style={{ ...BIZ_BODY, margin: 0, fontSize: 12.5 }}>
+            Your club has {courses.length} courses. Each is measured on its own — a stroke index belongs to a course, so
+            we never average them together.
           </p>
-        </div>
+        )}
 
-        {/* §5 — the six sections, in order. TeesSection is v2's addition, and
-            it also CORRECTS the verdict above it (§4.1). */}
-        <VerdictSection data={data} />
-        <HowItPlaysSection data={data} />
-        <ScoringSection data={data} />
-        <TeesSection data={data} />
-        <BusynessSection data={data} />
-        <WhoPlaysSection data={data} />
+        {courses.map((c) => (
+          <CourseBlock
+            key={c.course_id}
+            course={c}
+            open={effectiveOpen === c.course_id}
+            onToggle={() => setOpenId(effectiveOpen === c.course_id ? '' : c.course_id)}
+          />
+        ))}
 
         <p style={{ ...BIZ_BODY, fontSize: 11.5, margin: 0, color: A.DIM }}>
-          Everything on this page is an aggregate across rounds played on your course. No individual member, round or
+          Everything on this page is an aggregate across rounds played on your courses. No individual member, round or
           score is shown here, and none is available to your club.
         </p>
 
