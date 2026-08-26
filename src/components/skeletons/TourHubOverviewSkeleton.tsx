@@ -15,9 +15,9 @@
  *   ConnectHandicapCue.
  *
  * ComingUp and WorldRankings were REMOUNTED after the audit that removed their
- * holds, so both are drawn again. MEASURED LIVE at 390px: ComingUp 476 (hold
- * 459 — deliberately 17 short; a hold may be smaller than the settled state,
- * never larger) and WorldRankings 353 (hold 353, exact).
+ * holds, so both are drawn again. MEASURED LIVE at 390px: ComingUp 799 after the
+ * one-header-per-day rebuild (hold 754 — deliberately 45 short; a hold may be
+ * smaller than the settled state, never larger) and WorldRankings 353 (exact).
  *
  * ONLY THE CERTAIN SECTIONS ARE DRAWN (B4). A silhouette that draws a section
  * which then does not appear is worse than no silhouette, because the page
