@@ -92,6 +92,9 @@ describe('Discover hero rotation (BRIEF_DISCOVER_HERO_ROTATION)', () => {
     expect(selectDiscoverHeroCandidate(pool, start + 3)?.row.round_id).toBe(
       pool[(start + 3) % pool.length].row.round_id,
     );
+  });
+
+
 
 
 
