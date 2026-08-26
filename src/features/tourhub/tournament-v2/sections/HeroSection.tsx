@@ -143,7 +143,17 @@ function PersonLockup({
   showAvatar?: boolean;
 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        minWidth: 0,
+        background: HERO_BOARD_SURFACE,
+        borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
+        padding: '11px 16px',
+      }}
+    >
       {showAvatar && (
         <PlayerAvatar
           playerId={playerId ?? ''}
@@ -153,51 +163,52 @@ function PersonLockup({
           size="md"
         />
       )}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            // AXIS 10 (hero exception): band label / marker, not a sentence.
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            color: labelTone ?? 'rgba(255,255,255,0.62)',
-            textTransform: 'uppercase',
-          }}
-        >
-          {icon}
-          {label}
-        </div>
-        <div
-          style={{
-            fontSize: 15.5,
-            fontWeight: 700,
-            color: '#fff',
-            marginTop: 3,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {name}
-        </div>
-        {sub && (
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: WHITE_ALPHA_65,
-              marginTop: 2,
-              fontVariantNumeric: 'tabular-nums lining-nums',
-            }}
-          >
-            {sub}
-          </div>
-        )}
+      <div
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 5,
+          flexShrink: 0,
+          // AXIS 10 (hero exception): band label / marker, not a sentence.
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: '0.16em',
+          color: labelTone ?? 'rgba(255,255,255,0.62)',
+          textTransform: 'uppercase',
+        }}
+      >
+        {icon}
+        {label}
       </div>
+      <div
+        style={{
+          minWidth: 0,
+          fontSize: 13,
+          fontWeight: 700,
+          color: '#fff',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {name}
+      </div>
+      {sub && (
+        <div
+          style={{
+            marginLeft: 'auto',
+            flexShrink: 0,
+            fontSize: 11,
+            fontWeight: 600,
+            color: WHITE_ALPHA_65,
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+        >
+          {sub}
+        </div>
+      )}
     </div>
+
   );
 }
 
