@@ -208,10 +208,10 @@ const BAND_FAINT = DISCOVER_QUIET;
    WELL_COLLAPSED_W is the collapsed well's width (pin + chevron + side padding)
    as specified by the source brief; the feather itself is never sized from it,
    only this padding is. */
-export const WELL_COLLAPSED_W = 46;
+export const WELL_COLLAPSED_W = 51; // measured collapsed well width (pin + chevron + side padding)
 export const MASK_PROUD = 8; // solid canvas past the well's right edge
 export const MASK_FEATHER = 8; // gradient out to fully transparent
-export const PILL_ROW_PADDING_LEFT = WELL_COLLAPSED_W + MASK_PROUD + MASK_FEATHER;
+export const PILL_ROW_PADDING_LEFT = WELL_COLLAPSED_W + MASK_PROUD + MASK_FEATHER; // 67
 
 
 
