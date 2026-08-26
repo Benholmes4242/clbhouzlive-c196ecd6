@@ -18839,6 +18839,30 @@ export type Database = {
         }[]
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
+      get_club_course_analytics: {
+        Args: { p_golf_course_id: string }
+        Returns: {
+          avg_gross: number
+          club_courses: Json
+          competition: Json
+          course_id: string
+          course_name: string
+          first_round: string
+          handicap_bands: Json
+          handicap_rounds: number
+          hole_rows: number
+          holes: Json
+          last_round: string
+          members: number
+          months: Json
+          outcomes: Json
+          outcomes_total: number
+          rounds: number
+          tees: Json
+          verdict_scope: Json
+          weekdays: Json
+        }[]
+      }
       get_continue_watching: {
         Args: { p_format?: string; p_limit?: number; p_user_id: string }
         Returns: {
