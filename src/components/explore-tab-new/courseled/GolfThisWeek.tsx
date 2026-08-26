@@ -1818,26 +1818,33 @@ export function GolfThisWeek({
           rather than sitting beside it: the scroller keeps the full row width and
           the scrollable CONTENT is padded clear of the well, so the right-hand
           cut lands deep inside a pill instead of in a gap. The peek is therefore
-          structural — the padding moves the cut point by a fixed 62px whatever
+          structural — the padding moves the cut point by a fixed amount whatever
           the pill widths turn out to be — not tuned to one viewport or language.
-          Pills pass UNDER the well as a member scrolls; that is intended and
-          needs no left-hand fade, because the well is OPAQUE IN BOTH STATES —
-          A.PANEL collapsed, an opaque #36373E when a region is selected. That
-          opacity is the whole reason there is no left fade or mask here, so the
-          selected tint must NEVER be reintroduced as an alpha. The well also
-          STRETCHES to this row's height (alignItems stretch below) so a pill
-          cannot show above or below it. */}
+          THE WELL IS OPAQUE IN BOTH STATES — A.PANEL collapsed, an opaque #36373E
+          when a region is selected — and the selected tint must NEVER be
+          reintroduced as an alpha. Opacity alone was not enough, though: a hard
+          opaque edge reads as a pill SLIDING BEHIND A PANEL rather than
+          disappearing, so A SOLID MASK RUNS 8px PROUD of the well
+          (BRIEF_DISCOVER_HERO_SCORE_AND_FILTER_ROW §3) and a pill is fully
+          invisible BEFORE it reaches the control. The mask feathers only so it
+          has no visible edge of its own — it is not a fade and not a scroll cue.
+          The well and the mask both STRETCH to this row's height (alignItems
+          stretch below) so no sliver can show above or below either. */}
 
       <div style={{ position: 'relative', marginBottom: 12, minWidth: 0 }}>
         <WeekScopePills
           scope={scope}
           onChange={(s) => onScopeChange?.(s)}
-          /* paddingLeft 62 = 46 well + 8 gap + 8 breathing, INSIDE the scrollable
-             area so at rest the first pill starts clear of the well: the SELECTED
-             pill must never be the hidden one. paddingRight 16 lets the last pill
-             scroll clear of the right edge rather than ending flush against it.
-             No flex here — the scroller is this wrapper's only flow child. */
-          style={{ minWidth: 0, paddingLeft: 62, paddingRight: 16 }}
+          /* THE COUPLING IS IN CODE, NOT ONLY IN A COMMENT (§3.5): paddingLeft is
+             DERIVED from the same constants the mask uses, so the 8px proud edge
+             always lands on the gap between the well and the first pill. Widen the
+             gap and the mask no longer reaches the first pill's resting position;
+             narrow it and the SELECTED pill starts under the mask, breaking the
+             rule that the selected pill is never the hidden one. paddingRight 16
+             lets the last pill scroll clear of the right edge rather than ending
+             flush against it. No flex here — the scroller is this wrapper's only
+             flow child. */
+          style={{ minWidth: 0, paddingLeft: PILL_ROW_PADDING_LEFT, paddingRight: 16 }}
         />
         {/* THE FADE IS A SCROLL CUE, NOT A MASK: nothing sits behind the right
             edge now, so the final stop is 100% and the peeking pill SOFTENS into
@@ -1865,9 +1872,9 @@ export function GolfThisWeek({
             bottom: 0,
             display: 'flex',
             /* STRETCH, NOT CENTRE: this wrapper spans top 0 to bottom 0, so its
-               height is the pill row's height and the trigger inherits it. No
-               fixed pixel height anywhere — a number would silently rot the day
-               pill type or padding moves. */
+               height is the pill row's height and BOTH the trigger and the mask
+               inherit it. No fixed pixel height anywhere — a number would
+               silently rot the day pill type or padding moves. */
             alignItems: 'stretch',
           }}
         >
@@ -1877,8 +1884,31 @@ export function GolfThisWeek({
             selection={region}
             onChange={(sel) => onRegionChange?.(sel)}
           />
+
+          {/* THE MASK IS A FLEX SIBLING OF THE WELL, NOT A FIXED-WIDTH OVERLAY
+              (§3.1). THE WELL IS NOT A FIXED 46px: collapsed it is pin plus
+              chevron, and with a region selected it grows to fit the label. A mask
+              sized from a constant would be NARROWER than the well in exactly the
+              state where a pill showing through is most visible. As a sibling the
+              solid stop always begins at the well's ACTUAL right edge — no
+              measurement, no ResizeObserver. The transparent stop is the canvas at
+              zero alpha, never `transparent`. No backdrop-filter: this paints the
+              canvas colour; a blur would still show the pill's shape and would
+              cost a compositing layer on a scrolling row. */}
+          <div
+            aria-hidden
+            style={{
+              flex: 'none',
+              width: MASK_PROUD + MASK_FEATHER,
+              pointerEvents: 'none',
+              background: `linear-gradient(90deg, #15171F 0%, #15171F ${(
+                (MASK_PROUD / (MASK_PROUD + MASK_FEATHER)) * 100
+              ).toFixed(2)}%, rgba(21,23,31,0) 100%)`,
+            }}
+          />
         </div>
       </div>
+
 
 
 
