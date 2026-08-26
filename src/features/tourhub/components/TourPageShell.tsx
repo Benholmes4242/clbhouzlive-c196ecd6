@@ -150,38 +150,10 @@ export function TourPageShell({
             >
               <ChevronLeft size={18} strokeWidth={2.5} style={{ color: A.INK }} />
             </button>
-            <div style={{ minWidth: 0 }}>
-              <h1
-                style={{
-                  fontFamily: SF_STACK,
-                  fontSize: 18,
-                  fontWeight: 600,
-                  color: A.INK,
-                  letterSpacing: '-0.01em',
-                  margin: 0,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {title}
-              </h1>
-              {subtitle && (
-                <div
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: A.MUTE,
-                    marginTop: 1,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {subtitle}
-                </div>
-              )}
-            </div>
+            {/* Titles were removed platform-wide: the back chevron is the only
+                identity the tour headers carry. `title` / `subtitle` remain in
+                the props for a11y labelling only. */}
+
           </div>
           {right}
         </div>
