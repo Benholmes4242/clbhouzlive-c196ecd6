@@ -55,7 +55,13 @@ function Notice({ kicker, headline, body }: { kicker: string; headline: string; 
 /**
  * §2 — a collapsible block, headed by the course name. It fetches ONLY once it
  * has been opened: `openedOnce` gates the query, so a collapsed block costs
- * nothing. Once it has data, the collapsed head carries its round count.
+ * nothing.
+ *
+ * BRIEF_CLUB_COURSES_ROUND_COUNTS §2 — the COLLAPSED head states its round
+ * count from `club_courses`, never from a fetch. That count is the whole point
+ * of the RPC change; fetching a collapsed course to fill its header would undo
+ * it. The EXPANDED header — members, rounds, date range — comes from that
+ * course's own response, via SampleSection.
  */
 const CourseBlock: React.FC<{
   course: ClubCourseRef;
@@ -68,7 +74,6 @@ const CourseBlock: React.FC<{
   }, [open]);
 
   const { data: result, isLoading } = useClubCourseAnalytics(course.course_id, openedOnce);
-  const rounds = result?.state === 'ok' ? result.data.rounds : null;
 
   return (
     <section style={{ border: `1px solid ${A.BORDER}`, borderRadius: 16, background: A.PANEL, overflow: 'hidden' }}>
@@ -93,12 +98,13 @@ const CourseBlock: React.FC<{
       >
         <span style={{ minWidth: 0 }}>
           <span style={{ ...BIZ_TITLE, display: 'block' }}>{course.course_name}</span>
-          {rounds != null && (
+          {!open && (
             <span style={{ ...LABEL, display: 'block', marginTop: 5 }}>
-              {rounds.toLocaleString()} {rounds === 1 ? 'round' : 'rounds'}
+              {course.rounds.toLocaleString()} {course.rounds === 1 ? 'round' : 'rounds'}
             </span>
           )}
         </span>
+
         <ChevronDown
           size={18}
           color={A.MUTE}
