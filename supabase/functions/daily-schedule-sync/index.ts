@@ -9,14 +9,23 @@ import { corsFor } from '../_shared/cors.ts';
  */
 
 // Tours to sync - includes all supported professional golf tours
+//
+// RECORDED 2026-08-26 — LIV COVERAGE GAP, NOT A BUG. LIV's 2026 calendar has a
+// Team Championship after Indianapolis (ends 2026-08-23); the Sportradar 'liv'
+// v3 schedule feed does NOT carry it, so LIV's season appears to end in August.
+// Ben has accepted this; it is a provider coverage gap and is NOT being chased.
+// Consequence (intended, per MICRO_BRIEF_TOUR_SEASON_COMPLETE_WINDOW): the hero
+// shows the LIV result for 14 days after 23 August, then LIV drops out of the
+// carousel until the 2027 schedule appears. Do not re-investigate.
 const TOURS_TO_SYNC = [
   'pga',    // PGA Tour
   'euro',   // DP World Tour (Sportradar v3 uses 'euro')
   'lpga',   // LPGA Tour
-  'liv',    // LIV Golf
+  'liv',    // LIV Golf — see coverage-gap note above
   'pgad',   // Korn Ferry Tour (Sportradar v3 uses 'pgad')
   'champ',  // Champions Tour (Sportradar v3 uses 'champ')
 ];
+
 
 // Map database tour names to SportRadar API codes
 const TOUR_NAME_TO_API: Record<string, string> = {

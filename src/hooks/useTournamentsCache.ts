@@ -6,14 +6,14 @@
  * 
  * Coverage:
  * - Live/starting-soon tournaments
- * - Recently completed (last 3 days — covers Sun→Tue/Wed viewing window)
+ * - Recently completed (last 21 days — wide enough for the hero's 14-day cap)
  * - Upcoming (next 14 days, limit 20)
  */
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
-  RESULTS_WINDOW_HOURS,
+  COMPLETED_BUCKET_DAYS,
   UPCOMING_WINDOW_DAYS,
 } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 
@@ -68,11 +68,14 @@ export interface TournamentsCache {
 
 async function fetchTournamentsCache(): Promise<TournamentsCache> {
   const today = new Date().toISOString().split('T')[0];
-  // Rail + Hero results window — shared with deriveHeroState so the bucket
-  // and the visual state agree (prevents badge/card drift).
-  const resultsWindowAgo = new Date(
-    Date.now() - RESULTS_WINDOW_HOURS * 3_600_000
-  ).toISOString();
+  // Completed bucket window — measured in DAYS against end_date (a `date`
+  // column), deliberately WIDER than the hero's RESULTS_CAP_DAYS display cap so
+  // the cap is enforceable in the selection rather than silently pre-applied by
+  // the query (MICRO_BRIEF_TOUR_SEASON_COMPLETE_WINDOW §1).
+  const completedFromDate = new Date(
+    Date.now() - COMPLETED_BUCKET_DAYS * 86_400_000
+  ).toISOString().split('T')[0];
+
   // Upcoming horizon — used as a soft cap on the rail; the hero picks the
   // first per-tour event from this set, so an over-wide window is safe but a
   // declared constant keeps the intent (UPCOMING_WINDOW_DAYS) visible.
@@ -93,12 +96,12 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
       .order('start_date', { ascending: true })
       .order('purse', { ascending: false }),
 
-    // Completed in last 3 days
+    // Completed within COMPLETED_BUCKET_DAYS (days against end_date)
     supabase
       .from('sr_tournaments')
       .select(CACHE_SELECT)
       .in('status', ['closed', 'complete'])
-      .gte('end_date', resultsWindowAgo)
+      .gte('end_date', completedFromDate)
       .order('end_date', { ascending: false })
       .order('purse', { ascending: false }),
 

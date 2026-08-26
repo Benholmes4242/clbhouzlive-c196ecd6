@@ -38,24 +38,57 @@ export interface TopTie {
 // ---------- Changeover windows (single source of truth) -------------------
 
 /**
- * How long a finished tournament continues to show as the RESULTS card
- * before handing over to the next event's UPCOMING card. 72h covers the
- * Sun-finish → Wed-viewing rhythm.
+ * How wide the COMPLETED bucket is fetched, in DAYS against `end_date`.
+ * Deliberately LOOSER than the display cap below so the cap is enforceable in
+ * the selection — a 14-day rule cannot be applied to a 3-day bucket
+ * (MICRO_BRIEF_TOUR_SEASON_COMPLETE_WINDOW §1). Replaces the old
+ * RESULTS_WINDOW_HOURS = 72, whose only consumer was that bucket.
  *
- * ONE CONSUMER ONLY: useTournamentsCache's completed-bucket window. It is NO
- * LONGER a visual-state guard — deriveHeroState renders a closed event as
- * results at any age (BRIEF_TOUR_HERO_STALE_STATE §1). Note Postgres compares
- * `end_date >= now - 72h` date-truncated, so the bucket is slightly more
- * generous than the literal 72 hours.
+ * ONE CONSUMER: useTournamentsCache's completed-bucket query.
  */
-export const RESULTS_WINDOW_HOURS = 72;
+export const COMPLETED_BUCKET_DAYS = 21;
 
+/**
+ * How long a tour with NO upcoming event keeps showing its last result in the
+ * hero carousel. Past this the whole TOUR is omitted from the carousel
+ * (useHeroCarouselData) and its picker row reads "Season complete".
+ *
+ * NOT a derivation guard: deriveHeroState still renders a closed event as
+ * `results` at any age (BRIEF_TOUR_HERO_STALE_STATE §1).
+ */
+export const RESULTS_CAP_DAYS = 14;
+
+/**
+ * Handover window for a tour that DOES have an upcoming event: the result
+ * stands for this many days, then the upcoming card takes the slot. A SECOND
+ * constant on purpose — widening the bucket to COMPLETED_BUCKET_DAYS must not
+ * make ordinary weeks show three-week-old results. Preserves the pre-brief
+ * behaviour of RESULTS_WINDOW_HOURS = 72 (now expressed in days against
+ * end_date).
+ */
+export const RESULTS_HANDOVER_DAYS = 3;
+
+
+
+/**
+ * Whole days between a tournament's `end_date` (a Postgres `date`) and today.
+ * MEASURED IN DAYS AGAINST end_date — the same unit the completed bucket uses
+ * — so the bucket and the cap can never drift the way hours-vs-date did.
+ */
+export function daysSinceEndDate(endDate: string | null | undefined): number | null {
+  if (!endDate) return null;
+  const end = Date.parse(`${endDate.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(end)) return null;
+  const today = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`);
+  return Math.round((today - end) / 86_400_000);
+}
 
 /**
  * How far in advance the next event begins showing as UPCOMING. Used by
  * useTournamentsCache (bucket query window).
  */
 export const UPCOMING_WINDOW_DAYS = 14;
+
 
 // ---------- Score formatting -----------------------------------------------
 

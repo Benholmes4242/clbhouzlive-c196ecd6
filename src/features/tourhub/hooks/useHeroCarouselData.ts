@@ -20,6 +20,11 @@ import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamen
 import { getContextLabel } from '../utils/tournamentClassification';
 import { isAnyMajor, getMajorType } from '../utils/majorScope';
 import { isTournamentDecided } from '@/utils/tournamentDecided';
+import {
+  RESULTS_CAP_DAYS,
+  RESULTS_HANDOVER_DAYS,
+  daysSinceEndDate,
+} from '../components/overview-v3/HybridHero.utils';
 
 // Tour priority order for sorting live tournaments
 const TOUR_PRIORITY: TourId[] = ['pga', 'liv', 'euro', 'lpga', 'pgad', 'champ'];
@@ -69,7 +74,7 @@ export interface HeroSlide {
   type: 'live' | 'completed' | 'upcoming';
 }
 
-function mapTourSlug(tourName: string): TourId {
+export function mapTourSlug(tourName: string): TourId {
   const normalized = tourName?.toLowerCase().trim();
   if (normalized === 'pga' || normalized === 'pga tour') return 'pga';
   if (normalized === 'euro' || normalized === 'eur' || normalized === 'dp world' || normalized === 'dp world tour' || normalized === 'european tour') return 'euro';
@@ -421,6 +426,34 @@ export function useHeroCarouselData() {
       const completedSlides: HeroSlide[] = [];
       const upcomingSlides: HeroSlide[] = [];
 
+      /** Push a tour's next upcoming event (+ any co-hosted siblings). */
+      const pushUpcomingForTour = (tour: TourId, upcoming: HeroTournament[]) => {
+        // Skip co-sanctioned majors on non-PGA tours (already excluded from PGA
+        // slot when active via the eviction above).
+        const nextTrueEvent = tour === 'pga'
+          ? upcoming[0]
+          : upcoming.find(t => getMajorType(t.name || '') !== 'mens') ?? upcoming[0];
+        if (!nextTrueEvent) return;
+        upcomingSlides.push({ tournament: nextTrueEvent, type: 'upcoming' });
+
+        // Concurrent siblings: other upcoming events on this tour whose
+        // date ranges OVERLAP the primary (co-hosted weeks) also slide.
+        // Overlap - not "push all" - because the upcoming cache spans
+        // multiple weeks and later weeks must not leak in.
+        const pStart = new Date(nextTrueEvent.startDate).getTime();
+        const pEnd = new Date(nextTrueEvent.endDate || nextTrueEvent.startDate).getTime();
+        upcoming
+          .filter(t => t.id !== nextTrueEvent.id)
+          .filter(t => {
+            const s = new Date(t.startDate).getTime();
+            const e = new Date(t.endDate || t.startDate).getTime();
+            return s <= pEnd && e >= pStart;
+          })
+          .forEach(t => upcomingSlides.push({ tournament: t, type: 'upcoming' }));
+      };
+
+
+
       TOUR_PRIORITY.forEach(tour => {
         const live = liveByTour[tour];
         const completed = completedByTour[tour];
@@ -444,35 +477,38 @@ export function useHeroCarouselData() {
             liveSlides.push({ tournament, type: 'live' });
           }
         } else if (completed.length > 0) {
-          // Concurrent completed events (e.g. two DPWT events the same week)
-          // each get a slide - mirrors the live branch. The completed cache
-          // is bounded to the recent window, so this cannot flood.
-          for (const tournament of completed) {
-            completedSlides.push({ tournament, type: 'completed' });
-          }
-        } else if (upcoming.length > 0) {
-          // Skip co-sanctioned majors on non-PGA tours (already excluded from PGA
-          // slot when active via the eviction above).
-          const nextTrueEvent = tour === 'pga'
-            ? upcoming[0]
-            : upcoming.find(t => getMajorType(t.name || '') !== 'mens') ?? upcoming[0];
-          upcomingSlides.push({ tournament: nextTrueEvent, type: 'upcoming' });
+          // Age gate (MICRO_BRIEF_TOUR_SEASON_COMPLETE_WINDOW §2). The bucket is
+          // fetched wide (COMPLETED_BUCKET_DAYS) so the cap lives HERE, in the
+          // selection — never in deriveHeroState.
+          //   tour HAS an upcoming event  -> result stands RESULTS_HANDOVER_DAYS,
+          //                                  then the upcoming card takes the slot
+          //   tour has NO upcoming event  -> result stands RESULTS_CAP_DAYS, then
+          //                                  the TOUR is omitted from the carousel
+          // Both measured in DAYS against end_date, same unit as the bucket.
+          const hasUpcoming = upcoming.length > 0;
+          const maxAge = hasUpcoming ? RESULTS_HANDOVER_DAYS : RESULTS_CAP_DAYS;
+          const inWindow = completed.filter(t => {
+            const age = daysSinceEndDate(t.endDate);
+            return age == null || age <= maxAge;
+          });
 
-          // Concurrent siblings: other upcoming events on this tour whose
-          // date ranges OVERLAP the primary (co-hosted weeks) also slide.
-          // Overlap - not "push all" - because the upcoming cache spans
-          // multiple weeks and later weeks must not leak in.
-          const pStart = new Date(nextTrueEvent.startDate).getTime();
-          const pEnd = new Date(nextTrueEvent.endDate || nextTrueEvent.startDate).getTime();
-          upcoming
-            .filter(t => t.id !== nextTrueEvent.id)
-            .filter(t => {
-              const s = new Date(t.startDate).getTime();
-              const e = new Date(t.endDate || t.startDate).getTime();
-              return s <= pEnd && e >= pStart;
-            })
-            .forEach(t => upcomingSlides.push({ tournament: t, type: 'upcoming' }));
+          if (inWindow.length > 0) {
+            // Concurrent completed events (e.g. two DPWT events the same week)
+            // each get a slide - mirrors the live branch. The bucket is bounded,
+            // so this cannot flood.
+            for (const tournament of inWindow) {
+              completedSlides.push({ tournament, type: 'completed' });
+            }
+          } else if (hasUpcoming) {
+            // Handover: the stale result steps aside for the next event.
+            pushUpcomingForTour(tour, upcoming);
+          }
+          // else: season complete past the cap — the TOUR is omitted entirely.
+          // No slide, no empty slot, no placeholder.
+        } else if (upcoming.length > 0) {
+          pushUpcomingForTour(tour, upcoming);
         }
+
       });
 
       // Inject synthetic MAJOR slide(s) — one per active major (mens/womens).
