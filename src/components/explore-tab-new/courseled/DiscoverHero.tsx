@@ -18,6 +18,7 @@ import {
   momentSentence,
   type TFn,
 } from './GolfThisWeek';
+import { MOMENT_TONE } from './roundMoment';
 import type { DiscoverHeroSubject } from './hooks/useDiscoverHero';
 
 /**
@@ -147,13 +148,22 @@ export function DiscoverHero({
   const parts = momentFigureParts(moment, t as TFn);
 
   const isScore = moment.figureRole === 'score' && moment.figure != null;
-  const isGrossScore = moment.kind === 'courseRecord';
-  const figure = moment.figure ?? 0;
+  /* A PLAIN ROUND IS NOT A BLANK HERO (BRIEF_DISCOVER_HERO_ROTATION §6). plain
+     carries figureRole 'score' with no label and no figureKey on purpose, so THE
+     GROSS IS THE FIGURE, the to-par sits beside it, and the existing 'plain'
+     sentence does the talking. No invented eyebrow, and the PLAIN TONE — white,
+     never the under-par red — because a gross is not an achievement colour. */
+  const isPlainGross = moment.kind === 'plain' && row.gross != null;
+  const plainToPar = isPlainGross ? moment.facts.toPar ?? null : null;
+  const isGrossScore = moment.kind === 'courseRecord' || isPlainGross;
+  const figure = isPlainGross ? (row.gross as number) : moment.figure ?? 0;
   /* The hero figure and its adjacent noun share the course-name white — EXCEPT
      THE RUN, which carries the falling-index green through figure and noun, the
      same rule the round tile's MomentFigure applies. */
   const isRun = moment.kind === 'run';
-  const figureColor = isRun
+  const figureColor = isPlainGross
+    ? MOMENT_TONE.plain
+    : isRun
     ? ROW_DARK_INDEX_FELL
     : isGrossScore && (moment.facts.toPar ?? 0) < 0
       ? ROW_DARK_TOPAR_UNDER
@@ -294,6 +304,21 @@ export function DiscoverHero({
             }}
           />
           {parts.after && <span style={wordStyle}>{parts.after}</span>}
+          {plainToPar != null && (
+            <span
+              className="tabular-nums"
+              style={{
+                ...NUMF,
+                fontSize: 18,
+                fontWeight: 700,
+                lineHeight: 1,
+                letterSpacing: '-0.02em',
+                color: plainToPar < 0 ? ROW_DARK_TOPAR_UNDER : DISCOVER_QUIET,
+              }}
+            >
+              {fmtRel(plainToPar)}
+            </span>
+          )}
         </div>
 
         <div
@@ -385,7 +410,9 @@ export function DiscoverHero({
           {(() => {
             const toPar = moment.facts.toPar;
             const showGross = row.gross != null && !isGrossScore;
-            const showQual = toPar != null;
+            /* ON PLAIN the 56px figure IS the gross and the to-par is already
+               beside it, so this cluster would print both a second time. */
+            const showQual = toPar != null && !isPlainGross;
             if (!showGross && !showQual) return null;
             return (
               <div
