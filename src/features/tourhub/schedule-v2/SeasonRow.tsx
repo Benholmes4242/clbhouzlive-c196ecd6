@@ -414,42 +414,9 @@ const LiveMark: React.FC = () => {
   );
 };
 
-const UpcomingRail: React.FC<{ daysAway: number; highlight: boolean }> = ({
-  daysAway,
-  highlight,
-}) => {
-  const { t } = useTranslation('tourhub');
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-      <span
-        style={{
-          fontSize: 16,
-          fontWeight: 200,
-          color: highlight ? GOLD : INK_MUTE,
-          fontVariantNumeric: 'tabular-nums lining-nums',
-          lineHeight: 1,
-          letterSpacing: '-0.02em',
-        }}
-      >
-        {daysAway}
-      </span>
-      <span
-        style={{
-          marginTop: 3,
-          // AXIS 10: the unit under the countdown figure.
-          fontSize: 10,
-          fontWeight: 700,
-          letterSpacing: '0.14em',
-          color: INK_FAINT,
-          textTransform: 'uppercase',
-          lineHeight: 1,
-        }}
-      >
-        {t('schedule.rail.daysUnit', { count: daysAway })}
-      </span>
-    </div>
-  );
-};
+/* UpcomingRail DELETED (BRIEF_SCHEDULE_ROW_ONE_TIME_COLUMN). The countdown now
+   renders as a third line inside the date block. It had no other caller. */
+
 
 const stripStyle: React.CSSProperties = {
   marginTop: 2,
