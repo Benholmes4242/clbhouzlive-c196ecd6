@@ -2,8 +2,10 @@
  * AppSelect – The canonical select component for Clbhouz.
  * 
  * NOTE: Do not use native <select> for in-app filters – always use <AppSelect>.
- * This ensures consistent styling across the app (slate-on-white dropdowns,
- * same animation, and "opens above when needed" behaviour via Radix).
+ * Renders a Radix select: a dark --card trigger and menu (in-app, so no
+ * browser-painted white popup), same animation, and "opens above when needed"
+ * behaviour via Radix. The built-in trigger text colour predates the dark-only
+ * canvas - dark-surface consumers should override it via triggerClassName.
  */
 
 import * as React from 'react';
