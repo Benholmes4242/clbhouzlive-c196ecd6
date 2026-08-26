@@ -75,8 +75,15 @@ const CourseBlock: React.FC<{
 
   const { data: result, isLoading } = useClubCourseAnalytics(course.course_id, openedOnce);
 
+  const navigate = useNavigate();
+  const { data: result, isLoading } = useClubCourseAnalytics(course.course_id, openedOnce);
+
   return (
-    <section style={{ border: `1px solid ${A.BORDER}`, borderRadius: 16, background: A.PANEL, overflow: 'hidden' }}>
+    /* BRIEF_CLUB_ANALYTICS_PAGE_REBUILD §1 — THE BLOCK IS NO LONGER A CARD.
+       It was one tall panel with every section ruled off inside it, which is
+       why the page read as an endless tile. The head is now a bare heading row
+       on the canvas and each section is its own card beneath it. */
+    <section>
       <button
         type="button"
         onClick={onToggle}
@@ -87,7 +94,7 @@ const CourseBlock: React.FC<{
           justifyContent: 'space-between',
           gap: 12,
           width: '100%',
-          padding: 16,
+          padding: '4px 2px 12px',
           border: 'none',
           background: 'transparent',
           cursor: 'pointer',
@@ -113,17 +120,19 @@ const CourseBlock: React.FC<{
       </button>
 
       {open && (
-        <div style={{ padding: '0 12px 14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        /* §1 — 14px between cards, and the cards carry their own 16px padding. */
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {isLoading && (
             <>
-              <Skeleton className="h-32 rounded-2xl" />
-              <Skeleton className="h-64 rounded-2xl" />
+              <Skeleton className="h-20 rounded-xl" />
+              <Skeleton className="h-72 rounded-xl" />
+              <Skeleton className="h-64 rounded-xl" />
             </>
           )}
 
           {/* §1 — an error is NOT "no rounds". The reason is logged, not shown. */}
           {!isLoading && result?.state === 'unavailable' && (
-            <Panel kicker="Not loaded">
+            <Panel kicker="Not loaded" style={{ borderRadius: 12 }}>
               <div style={{ ...BIZ_TITLE, marginBottom: 8 }}>We could not load this measurement</div>
               <p style={{ ...BIZ_BODY, margin: 0 }}>
                 Something went wrong reading the figures for this course. Nothing is missing from your side — try again
@@ -133,7 +142,7 @@ const CourseBlock: React.FC<{
           )}
 
           {!isLoading && result?.state === 'empty' && (
-            <Panel kicker="Not available">
+            <Panel kicker="Not available" style={{ borderRadius: 12 }}>
               <div style={{ ...BIZ_TITLE, marginBottom: 8 }}>Measurement is not available for this course yet</div>
               <p style={{ ...BIZ_BODY, margin: 0 }}>
                 We are not able to show figures for this course at the moment. There is nothing for you to configure —
@@ -144,11 +153,20 @@ const CourseBlock: React.FC<{
 
           {!isLoading && result?.state === 'ok' && (
             <>
-              {/* §4 — the sample comes BEFORE any figure. */}
+              {/* §1b — THE VERDICT STRIP LEADS: mean gross, hardest hole, comp share. */}
+              <VerdictStrip data={result.data} />
+              {/* §2 — the ladder is the one thing no other product shows a club. */}
+              <IndexDisagreesSection data={result.data} />
+              {/* §7 — the sample is stated before the rest of the figures. */}
               <SampleSection data={result.data} />
               <HoleBySection data={result.data} />
               <StrokeIndexSection data={result.data} />
               <ScoringSection data={result.data} />
+              {/* §5 — values only. Names live on the course's Champions tab. */}
+              <RecordBookSection
+                data={result.data}
+                onSeeChampions={() => navigate(`/courses/${course.course_id}?tab=legends`)}
+              />
               <TeesSection data={result.data} />
               <SeasonalitySection data={result.data} />
               <WhoPlaysSection data={result.data} />
@@ -160,6 +178,7 @@ const CourseBlock: React.FC<{
     </section>
   );
 };
+
 
 /* ───────────────────────── THE PAGE ───────────────────────── */
 
