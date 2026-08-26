@@ -175,8 +175,6 @@ export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({
   />
 );
 
-};
-
 /* ─────────────────── THE SAMPLE, STATED PLAINLY ─────────────────── */
 
 /**
