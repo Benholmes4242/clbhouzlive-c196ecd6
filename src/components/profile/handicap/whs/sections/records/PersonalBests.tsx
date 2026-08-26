@@ -118,12 +118,10 @@ export const PersonalBests: React.FC<Props> = ({ connectionId, currentHandicap, 
     let bestVsHcp: Tile = empty('Best vs HCP');
     if (currentHandicap != null && grossList.length) {
       const scored = grossList
-        .filter((s): s is WhsScore & { adjusted_gross: number; course_par: number } =>
-          typeof s.adjusted_gross === 'number' && typeof s.course_par === 'number',
-        )
-        .map((s) => {
+        .flatMap((s) => {
+          if (typeof s.adjusted_gross !== 'number' || typeof s.course_par !== 'number') return [];
           const overPar = s.adjusted_gross - s.course_par;
-          return { s, vsHcp: overPar - currentHandicap };
+          return [{ s, vsHcp: overPar - currentHandicap }];
         })
         ;
 
