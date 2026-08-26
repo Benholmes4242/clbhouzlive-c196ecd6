@@ -141,13 +141,24 @@ export function CourseOfTheWeekSection() {
           linkLabel="Top 100"
           onLinkClick={() => navigate('/top100')}
         >
-          <div style={{ padding: `0 ${SPACE.pagePadX}px 6px`, fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-            The clubhouse verdict
-          </div>
-
-          <div style={{ padding: `10px ${SPACE.pagePadX}px 0` }}>
+          <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
+            {/* THE WHOLE CARD IS THE TAP TARGET. It was not before — only the
+                filled button was — so a card that looked tappable was not, and
+                the button was the loudest thing on the page for a destination
+                the card already implied. The quiet "See the course ›" below is
+                the affordance, not a second target. */}
             <div
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate(`/courses/${course_id}`)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate(`/courses/${course_id}`);
+                }
+              }}
               style={{
+                cursor: 'pointer',
                 background: V4.surface,
                 border: `0.5px solid ${V4.cardBorder}`,
                 boxShadow: V4.cardShadow,
@@ -160,7 +171,7 @@ export function CourseOfTheWeekSection() {
                 style={{
                   position: 'relative',
                   width: '100%',
-                  height: 200,
+                  height: 170,
                   background: 'linear-gradient(145deg, #0a1f0a, #0d0d0d)',
                   overflow: 'hidden',
                 }}
