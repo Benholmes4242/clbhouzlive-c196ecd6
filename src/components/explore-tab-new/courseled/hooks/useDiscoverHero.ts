@@ -15,21 +15,23 @@ import { useWeekRegionCounts, type RegionSelection } from './useWeekRegionCounts
 import { selectMoment, type Moment } from '../roundMoment';
 
 /**
- * THE PAGE HERO'S SUBJECT (BRIEF_DISCOVER_HERO_ROTATION).
+ * THE PAGE HERO'S SUBJECT (BRIEF_DISCOVER_HERO_ROTATION + AMENDMENT 1).
  *
- * THE HERO PROMOTES ONE OF THE SECTION'S OWN ROUNDS, and that overlap is
+ * THE HERO PROMOTES ONE OF THE SECTION'S OWN NOTABLE ROUNDS, and that overlap is
  * INTENDED. It reads the same `ordered` array GolfThisWeek renders, in the same
- * fourteen-day window, under the same scope and region selection, and shows one
- * of those rounds at hero scale on a TWELVE-HOUR ROTATION. Change the scope or
- * region pill and the pool changes with it, so the hero can never show a round
- * the section is filtering out.
+ * fourteen-day window, under the same scope and region selection, FILTERED TO
+ * ROUNDS WITH A MOMENT, and shows one at hero scale on a TWELVE-HOUR ROTATION.
+ * Change the scope or region pill and the pool changes with it, so the hero can
+ * never show a round the section is filtering out. AN ALL-PLAIN FORTNIGHT RENDERS
+ * NOTHING — no placeholder, no reserved height, no fallback.
  *
  * THE SLOT COMES FROM THE CLOCK, NOT FROM STATE: no useState, no interval, no
  * localStorage. Two consequences are the whole point — the hero cannot repeat
  * itself by chance, and every member sees the same hero at the same moment.
  *
  * THE LEAD SLOT: a genuinely rare feat (ace, albatross, course record) takes the
- * hero immediately and holds it for one slot, then rejoins the rotation.
+ * hero immediately and holds it across the lead window, then rejoins the rotation.
+
  *
  * ZERO NEW NETWORK REQUESTS (ACCEPTANCE I). Every hook below is the SAME hook
  * GolfThisWeek calls with the SAME arguments, so every read resolves out of the
