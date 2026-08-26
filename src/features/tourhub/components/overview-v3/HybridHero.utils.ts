@@ -40,10 +40,16 @@ export interface TopTie {
 /**
  * How long a finished tournament continues to show as the RESULTS card
  * before handing over to the next event's UPCOMING card. 72h covers the
- * Sun-finish → Wed-viewing rhythm. Used by both useTournamentsCache (bucket
- * query window) and deriveHeroState (visual-state guard).
+ * Sun-finish → Wed-viewing rhythm.
+ *
+ * ONE CONSUMER ONLY: useTournamentsCache's completed-bucket window. It is NO
+ * LONGER a visual-state guard — deriveHeroState renders a closed event as
+ * results at any age (BRIEF_TOUR_HERO_STALE_STATE §1). Note Postgres compares
+ * `end_date >= now - 72h` date-truncated, so the bucket is slightly more
+ * generous than the literal 72 hours.
  */
 export const RESULTS_WINDOW_HOURS = 72;
+
 
 /**
  * How far in advance the next event begins showing as UPCOMING. Used by
@@ -132,6 +138,12 @@ interface DeriveOpts {
   teeTimesAvailable?: boolean;
 }
 
+/**
+ * Statuses present in sr_tournaments that mean "has not been played yet".
+ * `created` sits here explicitly (BRIEF_TOUR_HERO_STALE_STATE §4).
+ */
+export const UPCOMING_STATUSES = ['scheduled', 'created'];
+
 export function deriveHeroState(
   tournament: HeroTournament,
   now: Date = new Date(),
@@ -140,8 +152,8 @@ export function deriveHeroState(
   const status = (tournament.status || '').toLowerCase();
   const start = tournament.startDate ? new Date(tournament.startDate) : null;
   const end = tournament.endDate ? new Date(tournament.endDate) : null;
-  const hoursSinceEnd = end ? (now.getTime() - end.getTime()) / 3_600_000 : null;
   const hoursUntilStart = start ? (start.getTime() - now.getTime()) / 3_600_000 : Infinity;
+
 
   // Cancelled — short circuit
   if (status === 'cancelled') {
@@ -185,29 +197,53 @@ export function deriveHeroState(
     };
   }
 
-  // Results — closed/complete AND within RESULTS_WINDOW_HOURS of finish.
-  // Stale completed events (>72h) degrade gracefully to upcoming so the
-  // badge/card body never claim "FINAL" for a long-finished event that
-  // somehow ended up as the chosen slide.
+  // Results — closed/complete, AT ANY AGE.
+  //
+  // BRIEF_TOUR_HERO_STALE_STATE §1 — THE DEGRADE-TO-UPCOMING FALLBACK IS GONE.
+  // This branch used to require the finish to be within RESULTS_WINDOW_HOURS
+  // and otherwise fell through to the upcoming block, "so the badge/card body
+  // never claim FINAL for a long-finished event that somehow ended up as the
+  // chosen slide". The intent was sound and the fallback was worse than what it
+  // prevented: it presented a finished event as one that had not happened and
+  // ran a countdown on it. On 2026-08-26 the hero showed LIV Golf Indianapolis
+  // — closed, finished 8/23 — as "TEES OFF AUG 20-23". A stale FINAL is merely
+  // old; a stale TEES OFF is false.
+  //
+  // The trigger was a units mismatch, not bad data: useTournamentsCache bounds
+  // the completed bucket with `end_date >= now - 72h`, which Postgres compares
+  // date-truncated, so a Sunday finish stays in the bucket all of Wednesday,
+  // while this derivation measured exact hours and flipped at hour 72.
+  //
+  // A CLOSED EVENT MAY RENDER AS RESULTS OR BE EXCLUDED. IT MAY NEVER RENDER AS
+  // UPCOMING. Keeping an ancient result off the hero is the SELECTION's job
+  // (useTournamentsCache bucket window + useHeroCarouselData priority); this
+  // function's job is to describe the event it is given, truthfully. Do not
+  // reinstate an age guard here — a third `stale` kind the hero declines to
+  // render would be the only acceptable shape, never `upcoming`.
   if (status === 'closed' || status === 'complete' || status === 'completed') {
-    const isStale = hoursSinceEnd != null && hoursSinceEnd > RESULTS_WINDOW_HOURS;
-    if (!isStale) {
-      return {
-        kind: 'results',
-        variant: 'standard',
-        finishDate: tournament.endDate || '',
-        meta: start && end
-          ? `${formatMonthDay(start).toUpperCase()} \u2013 ${formatMonthDay(end).toUpperCase()}`
-          : end ? formatMonthDay(end).toUpperCase() : '',
-      };
-    }
-    // fall through to upcoming
+    return {
+      kind: 'results',
+      variant: 'standard',
+      finishDate: tournament.endDate || '',
+      meta: start && end
+        ? `${formatMonthDay(start).toUpperCase()} \u2013 ${formatMonthDay(end).toUpperCase()}`
+        : end ? formatMonthDay(end).toUpperCase() : '',
+    };
   }
 
+  // Upcoming — `scheduled` and `created`, HANDLED BY NAME (§4). `created` is
+  // what Sportradar carries on the TOUR Championship, the Presidents Cup, the
+  // FM Championship and The Ally Challenge; it previously reached this block by
+  // falling through, which was correct only by accident. Anything unrecognised
+  // still lands here — safe ONLY because closed/complete/completed return above
+  // — and is flagged in dev so a new status is noticed rather than absorbed.
+  if (status && !UPCOMING_STATUSES.includes(status) && import.meta.env.DEV) {
+    console.warn('[deriveHeroState] unhandled tournament status, rendering as upcoming:', status);
+  }
 
-  // Upcoming
   const variant: UpcomingVariant =
     hoursUntilStart <= 48 && opts.teeTimesAvailable ? 'imminent' : 'far';
+
 
   return {
     kind: 'upcoming',
