@@ -26,6 +26,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { differenceInCalendarDays } from 'date-fns';
 import { formatWeekdayShort, formatTimeHm } from '@/i18n/format';
 import { TourHubShell } from '../components/TourHubShell';
+import { TourPageShell } from '../components/TourPageShell';
 
 
 import { useTournamentMeta } from '../leaderboard/useTournamentMeta';
@@ -215,6 +216,13 @@ export function TournamentPage() {
 
   return (
     <TourHubShell immersive immersiveStatusBar>
+      <TourPageShell
+        immersive
+        background={SLATE_50}
+        title={meta?.name ?? 'Tournament'}
+        subtitle={meta?.venue ?? undefined}
+        backFallback="/tourhub?tab=schedule"
+      >
       <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
         <HeroSection
           meta={meta}
@@ -302,6 +310,7 @@ export function TournamentPage() {
         meta={meta}
         entries={leaderboardRows}
       />
+      </TourPageShell>
     </TourHubShell>
   );
 }
