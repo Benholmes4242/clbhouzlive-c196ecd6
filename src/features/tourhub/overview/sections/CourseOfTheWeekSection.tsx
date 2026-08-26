@@ -15,27 +15,59 @@ import { useMyCourseBest } from '../../hooks/useMyCourseBest';
 import { A, LABEL, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { CHIP_GLASS_CLASS, SCRIM_STANDOUT } from '@/styles/photoScrim';
 
-/** Stat cell for the Course of the Week panel. Amber is reserved for the member. */
-function CotwStat({
-  label,
-  value,
-  sub,
-  tone,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  tone?: string;
-}) {
+/**
+ * FigurePair — one label/value pair on the single figure line.
+ * Label AXIS-adjacent at the READ floor (11), value 15/700 tabular, 5px gap.
+ * Amber is reserved for the VIEWING MEMBER's figure (Your best).
+ */
+function FigurePair({ label, value, tone }: { label: string; value: string; tone?: string }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 0 }}>
-      <span style={{ fontSize: 20, fontWeight: 700, color: tone ?? A.INK, letterSpacing: '-0.01em', ...FIGS }}>
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, whiteSpace: 'nowrap' }}>
+      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>
+        {label}
+      </span>
+      <span style={{ fontSize: 15, fontWeight: 700, color: tone ?? A.INK, letterSpacing: '-0.01em', ...FIGS }}>
         {value}
       </span>
-      <span style={{ ...LABEL, color: A.DIM }}>{label}</span>
-      {sub ? <span style={{ ...LABEL, color: A.MUTE }}>{sub}</span> : null}
-    </div>
+    </span>
   );
+}
+
+/**
+ * clampToSentence — the quote is the best content in the section, so it must
+ * FINISH A THOUGHT rather than stop mid-phrase.
+ *
+ * The RPC returns the FULL review text (get_course_of_the_week selects
+ * cr.review with no substring), so all trimming is ours to do client-side.
+ * A bare -webkit-line-clamp cuts wherever line three happens to end, which is
+ * how "…I wouldn't quite put it …" shipped. Instead we keep whole sentences up
+ * to a three-line budget, and only then fall back to a word boundary. The CSS
+ * clamp stays underneath as a geometric safety net (a wide glyph run can still
+ * overflow), but in the normal case it has nothing left to cut.
+ *
+ * The ellipsis is appended ONLY when text was actually dropped.
+ */
+const QUOTE_BUDGET = 150; // ~3 lines at 14.5px italic in the card's text column
+
+export function clampToSentence(text: string, budget = QUOTE_BUDGET): { text: string; truncated: boolean } {
+  const clean = text.trim().replace(/\s+/g, ' ');
+  if (clean.length <= budget) return { text: clean, truncated: false };
+
+  // Whole sentences first.
+  const sentences = clean.match(/[^.!?]+[.!?]+(\s|$)/g) ?? [];
+  let out = '';
+  for (const sentence of sentences) {
+    const next = (out + sentence).trimEnd();
+    if (next.length > budget) break;
+    out = next + ' ';
+  }
+  out = out.trim();
+  if (out.length > 0) return { text: out, truncated: out.length < clean.length };
+
+  // No sentence fits — fall back to the last word boundary inside the budget.
+  const slice = clean.slice(0, budget);
+  const cut = slice.lastIndexOf(' ');
+  return { text: (cut > 40 ? slice.slice(0, cut) : slice).trimEnd(), truncated: true };
 }
 
 export function CourseOfTheWeekSection() {
@@ -58,16 +90,18 @@ export function CourseOfTheWeekSection() {
               overflow: 'hidden',
             }}
           >
-            <Skeleton className="w-full" style={{ height: 200, borderRadius: 0 }} />
-            <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <Skeleton className="h-3 w-24 rounded" />
-              <Skeleton className="h-5 w-2/3 rounded" />
-              <Skeleton className="h-3 w-1/3 rounded" />
-              <div style={{ height: '0.5px', background: V4.hairline, margin: '4px 0' }} />
+            <Skeleton className="w-full" style={{ height: 170, borderRadius: 0 }} />
+            {/* Hold mirrors the rebuilt card: one figure line, three quote
+                lines, one quiet action. No footer, no button block. */}
+            <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <Skeleton className="h-4 w-2/3 rounded" />
+              <div style={{ height: '0.5px', background: V4.hairline }} />
               <Skeleton className="h-3 w-full rounded" />
-              <Skeleton className="h-3 w-4/5 rounded" />
-              <Skeleton className="h-9 w-full rounded" style={{ marginTop: 6 }} />
+              <Skeleton className="h-3 w-full rounded" />
+              <Skeleton className="h-3 w-3/5 rounded" />
+              <Skeleton className="h-3 w-24 rounded" />
             </div>
+
           </div>
         </div>
       </SectionShell>
@@ -93,6 +127,10 @@ export function CourseOfTheWeekSection() {
   } = data;
 
   const location = [region, country].filter(Boolean).join(' · ');
+  const trimmedQuote = clampToSentence(quote ?? '');
+  // Ellipsis only when text was genuinely dropped, and spaced off a full stop
+  // so a completed sentence does not read "heard.…".
+  const quoteSuffix = trimmedQuote.truncated ? (/[.!?]$/.test(trimmedQuote.text) ? ' …' : '…') : '';
 
   return (
     <AnimatePresence initial={false}>
@@ -109,13 +147,24 @@ export function CourseOfTheWeekSection() {
           linkLabel="Top 100"
           onLinkClick={() => navigate('/top100')}
         >
-          <div style={{ padding: `0 ${SPACE.pagePadX}px 6px`, fontSize: 13, fontWeight: 700, color: V4.ink, letterSpacing: '-0.005em', lineHeight: 1.35 }}>
-            The clubhouse verdict
-          </div>
-
-          <div style={{ padding: `10px ${SPACE.pagePadX}px 0` }}>
+          <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
+            {/* THE WHOLE CARD IS THE TAP TARGET. It was not before — only the
+                filled button was — so a card that looked tappable was not, and
+                the button was the loudest thing on the page for a destination
+                the card already implied. The quiet "See the course ›" below is
+                the affordance, not a second target. */}
             <div
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate(`/courses/${course_id}`)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate(`/courses/${course_id}`);
+                }
+              }}
               style={{
+                cursor: 'pointer',
                 background: V4.surface,
                 border: `0.5px solid ${V4.cardBorder}`,
                 boxShadow: V4.cardShadow,
@@ -128,7 +177,7 @@ export function CourseOfTheWeekSection() {
                 style={{
                   position: 'relative',
                   width: '100%',
-                  height: 200,
+                  height: 170,
                   background: 'linear-gradient(145deg, #0a1f0a, #0d0d0d)',
                   overflow: 'hidden',
                 }}
@@ -235,28 +284,17 @@ export function CourseOfTheWeekSection() {
 
               {/* Body */}
               <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {/* Stat row — three cells when the member has played here,
-                    two when signed out / never played (grid rebalances). */}
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: `repeat(${myBest?.best_gross != null ? 3 : 2}, 1fr)`,
-                    alignItems: 'start',
-                  }}
-                >
-                  <CotwStat label="Rating" value={Number(avg_rating ?? 0).toFixed(1)} />
-                  <CotwStat label="Reviews" value={review_count.toLocaleString()} />
+                {/* ONE figure line, not a three-up. The pairs are inline with a
+                    5px internal gap and 16px between them; nothing wraps.
+                    "1 round" is gone — it wrapped under YOUR BEST and cost the
+                    card a line for one word. */}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, flexWrap: 'nowrap', overflow: 'hidden' }}>
+                  <FigurePair label="Rating" value={Number(avg_rating ?? 0).toFixed(1)} />
+                  <FigurePair label="Reviews" value={review_count.toLocaleString()} tone={A.MUTE} />
+                  {/* Never played / signed out => the pair COLLAPSES. No dash,
+                      no zero, no em-dash placeholder. */}
                   {myBest?.best_gross != null ? (
-                    <CotwStat
-                      label="Your best"
-                      value={String(myBest.best_gross)}
-                      tone={A.AMBER}
-                      sub={
-                        myBest.rounds_here && myBest.rounds_here > 0
-                          ? `${myBest.rounds_here} ${myBest.rounds_here === 1 ? 'round' : 'rounds'}`
-                          : undefined
-                      }
-                    />
+                    <FigurePair label="Your best" value={String(myBest.best_gross)} tone={A.AMBER} />
                   ) : null}
                 </div>
 
@@ -268,15 +306,15 @@ export function CourseOfTheWeekSection() {
                       style={{
                         margin: 0,
                         padding: 0,
-                        borderLeft: `2px solid ${V4.amber}`,
-                        paddingLeft: 10,
+                        borderLeft: `3px solid ${V4.amber}`,
+                        paddingLeft: 11,
                       }}
                     >
                       <div
                         style={{
-                          fontSize: 14,
+                          fontSize: 14.5,
                           lineHeight: 1.5,
-                          color: V4.inkSoft,
+                          color: A.MUTE,
                           fontStyle: 'italic',
                           display: '-webkit-box',
                           WebkitLineClamp: 3,
@@ -284,52 +322,21 @@ export function CourseOfTheWeekSection() {
                           overflow: 'hidden',
                         }}
                       >
-                        “{quote}”
+                        “{trimmedQuote.text}{quoteSuffix}”
                       </div>
-                      <div style={{ marginTop: 6, fontSize: 11, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                      <div style={{ marginTop: 6, fontSize: 11, fontWeight: 700, color: A.DIM, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
                         — {reviewer_name ?? 'A member'}
                       </div>
                     </blockquote>
                   </>
                 ) : null}
 
-                {/* CTA */}
-                <button
-                  type="button"
-                  onClick={() => navigate(`/courses/${course_id}`)}
-                  style={{
-                    marginTop: 2,
-                    width: '100%',
-                    height: 44,
-                    borderRadius: 12,
-                    border: `0.5px solid ${V4.ink}`,
-                    background: V4.ink,
-                    // FILLED-ACTION: V4.ink is now near-white, so the label
-                    // takes the canvas. Flip the label, never the fill.
-                    color: V4.bg,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    letterSpacing: '0.04em',
-                    textTransform: 'uppercase',
-                    cursor: 'pointer',
-                  }}
-                >
-                  See the course
-                </button>
+                {/* Quiet action. The card owns the navigation; this is the
+                    affordance, so it must not become a second tap target. */}
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK }}>
+                  See the course ›
+                </div>
               </div>
-            </div>
-
-            <div
-              style={{
-                marginTop: 8,
-                textAlign: 'center',
-                fontSize: 11,
-                fontWeight: 600,
-                color: V4.inkFaint,
-                letterSpacing: '0.04em',
-              }}
-            >
-              Today's pick from the Top 100 — rated by members
             </div>
           </div>
         </SectionShell>
