@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { TourHubShell } from '@/features/tourhub/components';
+import { TourPageShell } from '@/features/tourhub/components/TourPageShell';
 
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import {
@@ -158,7 +159,12 @@ export function CollegeHubPage() {
 
   return (
     <TourHubShell showBack={false} immersiveStatusBar>
-      {/* Hero bleeds into the notch - no GlassHeaderPlate veil (matches profile page). */}
+      <TourPageShell
+        immersive
+        background={SLATE_50}
+        title="College golf"
+        backFallback="/tourhub"
+      >
 
       <div
         className="pb-22"
@@ -240,7 +246,7 @@ export function CollegeHubPage() {
         <div
           style={{
             position: 'sticky',
-            top: 'var(--sat, 0px)',
+            top: 'var(--tour-header-h, 0px)',
             zIndex: 10,
             background: 'rgba(21,23,31,0.72)',
             backdropFilter: 'blur(14px)',
@@ -532,6 +538,7 @@ export function CollegeHubPage() {
           {t('college.hub.footer', { year })}
         </div>
       </div>
+      </TourPageShell>
     </TourHubShell>
   );
 }

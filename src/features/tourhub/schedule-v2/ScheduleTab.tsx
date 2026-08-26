@@ -144,8 +144,9 @@ export function ScheduleTab() {
       parseInt(rootStyles.getPropertyValue('--tour-chips-h'), 10) || 47;
     const monthH =
       parseInt(rootStyles.getPropertyValue('--tour-month-h'), 10) || 32;
-    const sat = parseInt(rootStyles.getPropertyValue('--sat'), 10) || 0;
-    return sat + chipsH + monthH + 20;
+    const headerH =
+      parseInt(rootStyles.getPropertyValue('--tour-header-h'), 10) || 0;
+    return headerH + chipsH + monthH + 20;
   };
   useEffect(() => {
     if (!anchorId) return;
@@ -294,7 +295,6 @@ export function ScheduleTab() {
         minHeight: '100vh',
         fontFamily: FONT,
         position: 'relative',
-        paddingTop: 'calc(var(--sat, 0px) + 69px)',
       }}
     >
       {/* Tour lens — sticky glass wrapper preserves --tour-chips-h. */}
@@ -302,11 +302,9 @@ export function ScheduleTab() {
         ref={chipsRef}
         style={{
           position: 'sticky',
-          top: 'var(--sat, 0px)',
+          top: 'var(--tour-header-h, 0px)',
           zIndex: 10,
-          background: 'rgba(21,23,31,0.72)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
+          background: '#15171F',
           borderBottom: '1px solid rgba(255,255,255,0.10)',
         }}
       >
@@ -435,7 +433,7 @@ export function ScheduleTab() {
                     ref={attachRef ? monthHeaderRef : undefined}
                     style={{
                       position: 'sticky',
-                      top: 'calc(var(--sat, 0px) + var(--tour-chips-h, 47px) - 1px)',
+                      top: 'calc(var(--tour-header-h, 0px) + var(--tour-chips-h, 47px) - 1px)',
                       zIndex: 2,
                       background: 'rgba(21,23,31,0.72)',
                       backdropFilter: 'blur(14px)',

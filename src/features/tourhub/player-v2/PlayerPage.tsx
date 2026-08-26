@@ -15,6 +15,7 @@ import { AlertCircle } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TourHubShell } from '../components/TourHubShell';
+import { TourPageShell } from '@/features/tourhub/components/TourPageShell';
 import { useTourPlayer, useSinglePlayerStatistics } from '../hooks/useTourHubData';
 import { usePlayerResults } from '../hooks/usePlayerResults';
 import { usePlayerState } from '../hooks/usePlayerState';
@@ -81,6 +82,12 @@ export function PlayerPage() {
 
   return (
     <TourHubShell>
+      <TourPageShell
+        immersive
+        background={SLATE_50}
+        title={player.full_name}
+        backFallback="/tourhub?tab=players"
+      >
       <div style={{ background: SLATE_50, minHeight: '100vh' }}>
         <HeroSection player={player} playerStats={playerStats ?? null} />
 
@@ -151,6 +158,7 @@ export function PlayerPage() {
           }}
         />
       </div>
+      </TourPageShell>
     </TourHubShell>
   );
 }

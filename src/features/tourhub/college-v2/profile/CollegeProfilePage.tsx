@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { TourHubShell } from '@/features/tourhub/components/TourHubShell';
+import { TourPageShell } from '@/features/tourhub/components/TourPageShell';
 import {
   CHARCOAL,
   FONT,
@@ -76,6 +77,12 @@ export function CollegeProfilePage() {
 
   return (
     <TourHubShell immersiveStatusBar>
+      <TourPageShell
+        immersive
+        background={SLATE_50}
+        title={displayName}
+        backFallback={collegeHubRoute()}
+      >
       <div
         style={{
           background: SLATE_50,
@@ -218,6 +225,7 @@ export function CollegeProfilePage() {
         <div style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }} />
       </div>
 
+      </TourPageShell>
     </TourHubShell>
   );
 }

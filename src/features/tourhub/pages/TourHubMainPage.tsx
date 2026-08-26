@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { Menu } from 'lucide-react';
 import { TourHubShell } from '../components/TourHubShell';
+import { TourPageShell } from '../components/TourPageShell';
 import type { TourHubTab } from '../components/types';
 import { OverviewTab } from '../components/tabs';
 import { LeadersTab as LeadersTabV2 } from '@/features/tourhub/leaders-v2/LeadersTab';
@@ -15,11 +17,17 @@ import { TourSideMenu } from '../components/TourSideMenu';
 import { TourIslandLeft } from '../components/TourIslandLeft';
 import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
-import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { safeGoBack } from '@/utils/navigation';
 
 import { useLogout } from '@/hooks/useLogout';
+
+const TAB_TITLES: Record<string, string> = {
+  live: 'Live',
+  schedule: 'Schedule',
+  players: 'Players',
+  leaderboards: 'Leaders',
+};
 
 /**
  * TourHubChromeBridge — registers the ChromeIsland left-capsule slot with
@@ -35,6 +43,8 @@ function TourHubChromeBridge({
   onSignOut,
   backMode,
   onBack,
+  menuOpen,
+  setMenuOpen,
 }: {
   activeTab: TourHubTab;
   onSelectTab: (tabId: string) => void;
@@ -43,8 +53,9 @@ function TourHubChromeBridge({
   onSignOut: () => void;
   backMode: boolean;
   onBack: () => void;
+  menuOpen: boolean;
+  setMenuOpen: (v: boolean) => void;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const label = useTourShortLabel();
   const isOverview = activeTab === 'overview';
@@ -68,7 +79,7 @@ function TourHubChromeBridge({
         showPicker={isOverview}
       />
     ),
-    [label, isOverview, backMode, onBack],
+    [label, isOverview, backMode, onBack, setMenuOpen],
   );
   useSetChromeLeftSlot(slot);
 
@@ -93,6 +104,7 @@ function TourHubChromeBridge({
   );
 }
 
+
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -109,6 +121,7 @@ export function TourHubMainPage() {
   const backMode = location.key !== 'default' && navState !== 'nav';
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useTournamentStatusRealtime();
 
@@ -183,6 +196,8 @@ export function TourHubMainPage() {
     scrollPageToTop('auto');
   };
 
+  const tabTitle = TAB_TITLES[activeTab] ?? 'Tour';
+
   return (
     <TourSelectionProvider>
       <TourHubShell showBack={false} immersiveStatusBar={fullBleedHero}>
@@ -194,13 +209,49 @@ export function TourHubMainPage() {
           onSignOut={() => { void logout(); }}
           backMode={backMode}
           onBack={() => safeGoBack(navigate, '/tourhub')}
+          menuOpen={menuOpen}
+          setMenuOpen={setMenuOpen}
         />
-        {/* Glass plate: mounted for every non-overview tab. Overview keeps
-            its own cinematic hero overlay chrome. Height 70 matches tour
-            island HEADER_H (see ChromeIsland.tsx). */}
-        <GlassHeaderPlate visible={activeTab !== 'overview'} />
-        <div>{renderTab()}</div>
+        {activeTab === 'overview' ? (
+          <>
+            {/* Overview keeps its cinematic hero overlay chrome (the island). */}
+            <div>{renderTab()}</div>
+          </>
+        ) : (
+          /* Every other tab is an Activity-style opaque header page: one
+             sticky chrome that owns the safe area, back chevron to the
+             overview, and a burger for the tour menu. */
+          <TourPageShell
+            title={tabTitle}
+            onBack={() => handleSelectTab('overview')}
+            backFallback="/tourhub"
+            right={
+              <button
+                type="button"
+                aria-label="Tour menu"
+                onClick={() => setMenuOpen(true)}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  cursor: 'pointer',
+                }}
+              >
+                <Menu size={17} strokeWidth={2.2} color="#F8FAFC" />
+              </button>
+            }
+          >
+            {renderTab()}
+          </TourPageShell>
+        )}
       </TourHubShell>
     </TourSelectionProvider>
+
   );
 }

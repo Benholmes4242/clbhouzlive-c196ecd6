@@ -153,9 +153,6 @@ export function LeadersTab() {
         background: SLATE_50,
         minHeight: '100vh',
         fontFamily: FONT,
-        // Islands overlay the top band at rest; on scroll they ride away and
-        // the chips row locks at the notch. Matches ScheduleTab.
-        paddingTop: 'calc(var(--sat, 0px) + 69px)',
       }}
     >
 
@@ -165,11 +162,9 @@ export function LeadersTab() {
       <div
         style={{
           position: 'sticky',
-          top: 'var(--sat, 0px)',
+          top: 'var(--tour-header-h, 0px)',
           zIndex: 10,
-          background: 'rgba(21,23,31,0.72)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
+          background: '#15171F',
           borderBottom: '1px solid rgba(255,255,255,0.10)',
         }}
       >
