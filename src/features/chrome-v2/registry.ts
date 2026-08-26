@@ -272,10 +272,12 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, note: EDITORIAL_NOTE } },
   { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
   { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
-  // Remaining /tourhub/* sub-tabs and /tour/* aliases (not deep) — page owns
-  // chrome today (isConditionallyExcluded); only the exact hubs above stay island.
-  { match: { prefix: '/tourhub/' },               spec: { chrome: 'none', tone: 'light', bleed: true, note: 'other tour subpages immersive/page-owned today (isConditionallyExcluded)' } },
-  { match: { prefix: '/tour/' },                  spec: { chrome: 'none', tone: 'light', bleed: true, note: 'other tour subpages immersive/page-owned today (isConditionallyExcluded)' } },
+  // Backstop for any /tourhub/* or /tour/* path not matched above. Tour sub-tabs
+  // are query params on the exact hubs, so nothing real lands here today — but
+  // anything that does gets Pattern A chrome (opaque island, back, safe area)
+  // rather than no chrome at all. tone flipped light -> dark (dark-only app).
+  { match: { prefix: '/tourhub/' },               spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' }, tone: 'dark', bleed: false, note: 'tour backstop — Pattern A' } },
+  { match: { prefix: '/tour/' },                  spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' }, tone: 'dark', bleed: false, note: 'tour backstop — Pattern A' } },
 
   // Watch sub-pages: back to /watch's caller.
   { match: { exact: '/watch/videos' },            spec: { chrome: 'island', left: { kind: 'back', title: 'Videos', backTarget: 'history' }, tone: 'light', bleed: true, scrollAway: true } },
