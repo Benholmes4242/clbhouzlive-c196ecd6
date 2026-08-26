@@ -293,26 +293,30 @@ function EventRow({ row, first, onOpen }: { row: ComingUpRow; first: boolean; on
         cursor: 'pointer',
       }}
     >
-      {/* line 1 — tour identity, always; playoffs / majors when applicable */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      {/* AMENDMENT — line 1 IS NOW NAME + TOUR BADGE, on one row. The badge sits
+          AFTER the name because a truncated tour code is useless where a
+          truncated tournament name is still recognisable: the name takes
+          minWidth 0 and the ellipsis, the badge is flex 'none' and never
+          shrinks or wraps. THE PLAYOFFS CHIP IS GONE from this section (Ben's
+          call); it survives on the schedule page's SeasonRow. */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+        <div
+          style={{
+            minWidth: 0,
+            flex: '1 1 auto',
+            fontSize: 15,
+            fontWeight: 700,
+            color: V4.ink,
+            letterSpacing: '-0.01em',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {displayEventName(row.name)}
+        </div>
         <Chip label={TOUR_LABEL[row.tour_slug] ?? row.tour_slug} fg={MUTE} bg="rgba(255,255,255,0.06)" border="rgba(255,255,255,0.10)" />
         {row.isMajor ? <Chip label={t('pill.majorEyebrow')} fg={V4.gold} bg={V4.goldSoftA} /> : null}
-        {row.isPlayoff ? <Chip label={t('overview.comingUp.chipPlayoffs')} fg={VIOLET_INK} bg={VIOLET_TINT} /> : null}
-      </div>
-      {/* line 2 — event name, full row width, nowrap */}
-      <div
-        style={{
-          marginTop: 5,
-          fontSize: 15,
-          fontWeight: 700,
-          color: V4.ink,
-          letterSpacing: '-0.01em',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {displayEventName(row.name)}
       </div>
       {/* line 3 — venue only. The defender lives in the three-up. */}
       {row.venue ? (
