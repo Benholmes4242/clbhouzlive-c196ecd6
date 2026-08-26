@@ -15,6 +15,11 @@ import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
 import { useHeroCarouselData, type HeroSlide } from '../hooks/useHeroCarouselData';
 import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
+import { useTournamentsCache } from '@/hooks/useTournamentsCache';
+import {
+  RESULTS_CAP_DAYS,
+  daysSinceEndDate,
+} from './overview-v3/HybridHero.utils';
 import { useTourSelection } from '../context/TourSelectionContext';
 import {
   AMBER_TINT_04,
@@ -76,6 +81,7 @@ export interface TourPickerSheetProps {
 
 export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose }) => {
   const { data: heroSlides } = useHeroCarouselData();
+  const { data: cache } = useTournamentsCache();
   const activeMajor = useActiveMensMajor();
   const { selectedTourSlug, selectTour, viewingTourSlug, viewingTournamentId } = useTourSelection();
   const { t } = useTranslation('tourhub');
@@ -93,6 +99,32 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
     });
     return map;
   }, [heroSlides]);
+
+  // SEASON COMPLETE (MICRO_BRIEF_TOUR_SEASON_COMPLETE_WINDOW §3). A tour past
+  // the hero's RESULTS_CAP_DAYS with no upcoming event is omitted from the
+  // carousel, so its picker row has no slide to describe. Read the last result
+  // straight from the (wider) completed bucket instead. No date claim about the
+  // next season — the feed may not carry it yet.
+  const seasonCompleteByTour = useMemo(() => {
+    const map: Record<string, { name: string; winner: string | null }> = {};
+    if (!cache) return map;
+    const hasUpcoming = new Set(
+      cache.upcoming.map((t) => mapTourSlugForPicker(t.season?.tour_name || '')),
+    );
+    const hasLive = new Set(
+      cache.live.map((t) => mapTourSlugForPicker(t.season?.tour_name || '')),
+    );
+    [...cache.completed]
+      .sort((a, b) => (b.end_date || '').localeCompare(a.end_date || ''))
+      .forEach((t) => {
+        const slug = mapTourSlugForPicker(t.season?.tour_name || '');
+        if (map[slug] || hasUpcoming.has(slug) || hasLive.has(slug)) return;
+        const age = daysSinceEndDate(t.end_date);
+        if (age == null || age <= RESULTS_CAP_DAYS) return;
+        map[slug] = { name: t.name, winner: t.defending_champion ?? null };
+      });
+    return map;
+  }, [cache]);
 
   return (
     <BottomSheet
@@ -238,6 +270,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
         )}
         {Object.entries(TOUR_LABEL).flatMap(([slug, label]) => {
           const tourSlides = slidesByTour[slug] ?? [];
+          const seasonDone = seasonCompleteByTour[slug];
 
           if (tourSlides.length === 0) {
             return [(
@@ -269,11 +302,11 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                     {label}
                   </div>
                   <div style={{ marginTop: 2, fontSize: 12, fontWeight: 500, color: SUBTITLE_COLOR, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {t('picker.noEventsThisWeek')}
+                    {seasonDone ? seasonDone.name : t('picker.noEventsThisWeek')}
                   </div>
                 </div>
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: 'rgba(15,23,42,0.30)' }}>
-                  {t('status.noEvent')}
+                  {seasonDone ? t('status.seasonComplete') : t('status.noEvent')}
                 </span>
               </button>
             )];
