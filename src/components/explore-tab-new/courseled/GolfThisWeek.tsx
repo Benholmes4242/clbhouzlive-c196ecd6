@@ -195,6 +195,18 @@ const HAIRLINE_INK = A.HAIRLINE;
 const BAND_MUTE = MID;
 const BAND_FAINT = DISCOVER_QUIET;
 
+/* THE PILL ROW'S LEFT-EDGE GEOMETRY, NAMED ONCE
+   (BRIEF_DISCOVER_HERO_SCORE_AND_FILTER_ROW §3.5). MASK_PROUD appears in TWO
+   places — the feather's solid stop and the scroller's left padding — and they
+   MOVE TOGETHER, which is why paddingLeft is derived here rather than written as
+   a literal 62. WELL_COLLAPSED_W is the collapsed well's width (pin + chevron +
+   side padding); the mask itself is never sized from it, only this padding is. */
+export const WELL_COLLAPSED_W = 46;
+export const MASK_PROUD = 8;
+export const MASK_FEATHER = 16;
+export const PILL_BREATHING = 8;
+export const PILL_ROW_PADDING_LEFT = WELL_COLLAPSED_W + MASK_PROUD + PILL_BREATHING;
+
 
 
 /* The card sits on the page rather than being drawn onto it. */
