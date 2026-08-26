@@ -78,13 +78,19 @@ describe('Discover hero rotation (BRIEF_DISCOVER_HERO_ROTATION)', () => {
 
   it('gives an ace the lead through two slots, but not three', () => {
     const ace = { row: row('ace', '2026-08-22'), moment: moment('eagle', 'ace') };
-    const other = { row: row('eagle', '2026-08-23'), moment: moment('eagle') };
-    const pool = [other, ace];
+    /* Three fillers so the post-lead rotation index cannot land on the ace by
+       chance and mask the expiry. */
+    const pool = [
+      { row: row('e1', '2026-08-23'), moment: moment('eagle') },
+      { row: row('e2', '2026-08-23'), moment: moment('eagle') },
+      ace,
+    ];
     const start = slotOf('2026-08-22');
     expect(selectDiscoverHeroCandidate(pool, start)?.row.round_id).toBe('ace');
     expect(selectDiscoverHeroCandidate(pool, start + 2)?.row.round_id).toBe('ace');
     expect(selectDiscoverHeroCandidate(pool, start + 3)?.row.round_id).not.toBe('ace');
   });
+
 
   it('keeps a late tee time leading the next morning (AMENDMENT 1 §5-6)', () => {
     /* Played 21:00 on the 22nd: play_date anchors slot(22nd 00:00Z), so 09:00 on
