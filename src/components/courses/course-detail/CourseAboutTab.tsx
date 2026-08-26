@@ -199,6 +199,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {/* ══ BLOCK 2 — HOW IT PLAYS / HOLE BY HOLE (analytical panels) ══ */}
         <CourseAnalyticsPanels courseId={course.id} />
 
+        {/* §4 — after the hole-by-hole content, before the reviews prompt. */}
+        <CourseSiLadder courseId={course.id} />
+
       {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
       <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
         <CourseRecordBook
