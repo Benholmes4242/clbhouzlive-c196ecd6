@@ -30,14 +30,19 @@ const moment = (kind: Moment['kind'], feat?: Moment['feat']): Moment => ({
 /** The slot a round's play_date starts in, so lead windows can be pinned. */
 const slotOf = (playDate: string) => slotForTime(Date.parse(`${playDate}T00:00:00Z`));
 
+/** The hero's pool rule (AMENDMENT 1 §1): moments only, plain never qualifies. */
+const heroPool = (all: readonly { row: CircleRoundRow; moment: Moment }[]) =>
+  all.filter(({ moment }) => moment.kind !== 'plain');
+
 describe('Discover hero rotation (BRIEF_DISCOVER_HERO_ROTATION)', () => {
-  it('promotes a plain round instead of returning null', () => {
-    const picked = selectDiscoverHeroCandidate(
-      [{ row: row('plain', '2026-08-22'), moment: moment('plain') }],
-      slotOf('2026-08-24'),
-    );
-    expect(picked?.row.round_id).toBe('plain');
+  it('renders nothing for an all-plain fortnight — no fallback to the best plain round', () => {
+    const all = [
+      { row: row('plain-a', '2026-08-22'), moment: moment('plain') },
+      { row: row('plain-b', '2026-08-23'), moment: moment('plain') },
+    ];
+    expect(selectDiscoverHeroCandidate(heroPool(all), slotOf('2026-08-24'))).toBeNull();
   });
+
 
   it('rotates over the pool in the section order for a fixed slot', () => {
     const pool = ['a', 'b', 'c'].map((id) => ({
