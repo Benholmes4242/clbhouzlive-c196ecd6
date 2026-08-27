@@ -290,7 +290,7 @@
       "hardest": "HARDEST",
       "parN": "par {{n}}",
       "rankOn": "{{list}} RANK",
-      "footLine": "Toughest hole plays {{toPar}} . {{count}} members have played here",
+      "footLine": "Toughest hole plays {{toPar}}",
       "footHardest": "Toughest hole plays {{toPar}}",
       "footMembers": "{{count}} members have played here",
       "open": "Open course"
