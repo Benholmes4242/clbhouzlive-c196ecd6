@@ -1045,7 +1045,10 @@
       "roundN": "Round {{n}}",
       "nTied": "{{count}} tied",
       "nTied_one": "{{count}} tied"
-    }
+    },
+    "parValue": "Par {{par}}",
+    "yardsValue": "{{yards}} yds",
+    "fieldInline": "Field {{v}} from {{n}}"
   },
   "college": {
     "hero": {

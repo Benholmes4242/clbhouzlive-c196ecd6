@@ -463,6 +463,14 @@ export function LeaderboardTab() {
             {metaSegments.join(' \u00B7 ')}
           </div>
         )}
+        {field != null && (
+          <FieldAverageTracker
+            count={field.count}
+            tournamentId={selected.id}
+            round={fieldRound}
+          />
+        )}
+
 
 
         {/* SEARCH - its own full-width row; the masthead stays legible. */}
