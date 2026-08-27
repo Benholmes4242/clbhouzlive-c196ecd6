@@ -249,6 +249,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' },
       tone: 'dark',
       bleed: false,
+      // The hub's yearbook search lives in the LEFT capsule (ChromeLeftSlot),
+      // so the island's own magnifier would be a second one beside it.
+      hideSearch: true,
       note: EDITORIAL_NOTE,
     },
   },

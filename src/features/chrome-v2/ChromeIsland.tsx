@@ -131,11 +131,19 @@ const LeftCapsule: React.FC<{
 
   // Slot wins over back-override AND the registry rule.
   if (slot) {
+    // A slot element may ask the capsule to fill the row by carrying
+    // data-island-grow. Content-sized slots (Tour Hub's burger + picker) must
+    // NOT grow, or the glass would run empty to the right; a slot holding a
+    // text field (college hub) must, so the field can span to the right
+    // capsule. The marker keeps that a per-slot decision, not a global flip.
+    const grow =
+      React.isValidElement(slot) && (slot.props as Record<string, unknown>)['data-island-grow'] === true;
     return (
       <div
         style={{
           ...glassStyle(tone),
-          padding: '0 14px 0 13px',
+          padding: grow ? '0 8px 0 10px' : '0 14px 0 13px',
+          ...(grow ? { flex: '1 1 auto', minWidth: 0 } : null),
         }}
       >
         {slot}
