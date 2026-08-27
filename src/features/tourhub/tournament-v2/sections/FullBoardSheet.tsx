@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { TITLE, FIGS as TFIGS } from '@/lib/tokens/type';
-import { BoardTable, BoardHeaderCells, boardGridTemplate, computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
+import { BoardTable, todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { resolveCutDisplay } from '../../_shared/cutDisplay';
@@ -102,39 +102,16 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
           </div>
         </div>
 
-        {/* Column header (shares BoardTable's grid template) */}
-        {(() => {
-          const cols = computeBoardColumns(entries, meta?.current_round ?? null);
-          return (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: boardGridTemplate(cols),
-                alignItems: 'center',
-                padding: '8px 16px',
-                // AXIS 10: column headers, shared grid with BoardTable.
-                fontSize: 10, fontWeight: 700, color: INK_FAINT,
-                letterSpacing: '0.10em', textTransform: 'uppercase',
-                background: A.PANEL, borderBottom: `0.5px solid ${HAIRLINE_INK_8}`,
-              }}
-            >
-              <div>{t('board.columns.pos')}</div>
-              <div style={{ minWidth: 0, paddingLeft: 4 }}>{t('board.columns.player')}</div>
-              <BoardHeaderCells
-                columns={cols}
-                totLabel={t('board.columns.tot')}
-              />
-            </div>
-          );
-        })()}
-
-
+        {/* Column header moved INTO BoardTable in lockstep with the
+            single-line row: one grid definition, no duplicate strip here. */}
         <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
           <BoardTable
             entries={entries}
             cutState={cutState}
             currentRound={meta?.current_round ?? null}
             onRowClick={handleRow}
+            headerTop={0}
+            surface={A.PANEL}
           />
         </div>
       </div>

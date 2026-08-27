@@ -1,39 +1,55 @@
 /**
  * BoardTable — Tour Book leaderboard rows.
  *
- * TWO-LINE ROW. A single line carrying POS + name + R1..R4 + THRU + TOT does
- * not fit a full name on a 390pt device, so the row splits:
- *   LINE 1  POS (46) | PLAYER (1fr, wraps — never truncates) | TOT (52, right)
- *   LINE 2  six LABELLED cells, repeat(6, 1fr): R1 R2 R3 R4 THRU MOV
- * The labels are the point of the split: those figures were unlabelled
- * numerals before. Line 2 is indented 54 so it hangs under the name.
+ * ONE LINE PER PLAYER. Labels appear ONCE, in the header strip this component
+ * renders itself (parents no longer print their own column header, so header
+ * and rows can never drift):
+ *
+ *   POS(+MOV) | PLAYER | R1..Rn | THRU (conditional) | TOT
+ *
+ * The width for a four-round single line came from four deliberate losses:
+ *  1. The country flag is OUT of the row. Do not reintroduce it.
+ *  2. MOVEMENT folds into the POS cell — movement describes a change in
+ *     POSITION, so it lives with position. There is no MOV column.
+ *  3. THRU renders ONLY while a round is in progress: no header cell and no
+ *     grid track otherwise. Decided ONCE per table, never per row.
+ *  4. Tighter geometry: name 13px, gap 4, round cells 26 (floor 22), POS 38,
+ *     TOT 40.
+ *
+ * THE NAME NEVER CLIPS. Table-level degradation ladder, one tier for the whole
+ * table so the grid stays square: full name -> initial+surname (shortenName
+ * from overview-v3/HybridHero.utils) -> surname alone. If even the surname
+ * does not fit, width is taken from the ROUND CELLS (26 -> 22 floor), never
+ * from the name. If the 22px floor is reached and the name still overflows the
+ * component warns once — it does not ellipsise and it does not shrink type.
+ *
+ * PRE-TOURNAMENT. With no rounds played there is no POS, no score and no TOT,
+ * so the board renders PLAYER | R1 TEE (name back at 15px) instead of a grid of
+ * dashes. Tee times are supplied by the parent via `teeTimes`; the leaderboard
+ * row itself carries no tee time.
  *
  * Score colours resolved via getScoreColor (canonical to-par grammar:
  * red under par, ink over par, muted-gray even).
  *
  * TWO ABSENCES, TWO TREATMENTS.
- *  - MOV renders an EN DASH when the delta is zero or unavailable: holding
- *    your position IS a value, not an absence.
+ *  - MOVEMENT renders an EN DASH when the delta is zero or unavailable:
+ *    holding your position IS a value, not an absence. This is deliberately
+ *    NOT the Champions board's collapse rule.
  *  - Every OTHER numeric cell (an unplayed round, a missing thru, a missing
- *    total) renders NOTHING. The grid holds the column, so the board stays
- *    aligned without placeholder dashes.
+ *    total) renders NOTHING. The grid holds the column.
  * Deltas come from movementFromRounds using standard-competition ranking on
  * prior-round strokes. CUT/WD/DQ rows never show a delta at all.
- *
- * No horizontal rule is drawn between rows — alignment and whitespace
- * separate peers. The leader carries a faint wash; the CUT sentence keeps its
- * rule because it separates two GROUPS, not two peers.
  *
  * CUT sentence and CUT/WD/DQ demoted rows are inserted inline by
  * this component; the parent supplies cut state via props.
  */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
-import CountryFlag from '@/components/ui/country-flag';
 import { getScoreColor } from '../_shared/scoreColor';
+import { shortenName } from '../components/overview-v3/HybridHero.utils';
 import { TREND_UP, TREND_DOWN, AMBER, INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, SLATE_50 as TOUR_SLATE_50 } from '../_shared/tokens';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -47,18 +63,21 @@ const CANVAS = TOUR_SLATE_50;
 /** Leader wash — the only per-row emphasis left on the board. */
 const LEADER_WASH = 'rgba(255,255,255,0.05)';
 
-const POS_NUM_W = 32;
-const POS_MOVE_W = 20;
-const NUM_W = 44;
-/** Line-1 geometry, shared with the parent-rendered header. */
-const POS_W = 46;
-const TOT_W = 52;
-/** MOV only: zero or unavailable movement is a STATEMENT, so it gets a mark. */
+/** TIGHTENED GEOMETRY (2.4). */
+const POS_W = 38;
+const TOT_W = 40;
+const THRU_W = 26;
+const CELL_W = 26;
+const CELL_W_FLOOR = 22;
+const GRID_GAP = 4;
+const ROW_PAD_X = 16;
+const NAME_SIZE = 13;
+const PRE_NAME_SIZE = 15;
+const PRE_TEE_W = 76;
+/** MOVEMENT only: zero or unavailable movement is a STATEMENT, so it gets a mark. */
 const MOV_DASH = '\u2013';
 
-
 const F = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-
 
 export interface BoardEntry {
   id: string;
@@ -94,13 +113,20 @@ interface Props {
   cutState: CutState;
   currentRound?: number | null;
   onRowClick?: (entry: BoardEntry) => void;
+  /** Header strip is owned by this component. Off only for embedded previews. */
+  showHeader?: boolean;
+  /** CSS `top` for the sticky header strip (parent supplies its chrome offset). */
+  headerTop?: number | string;
+  /** Header/row surface. Defaults to the board canvas. */
+  surface?: string;
+  /** playerId -> R1 tee time label, used by the pre-tournament board only. */
+  teeTimes?: Record<string, string>;
 }
 
 function houseColor(score: number | null | undefined): string {
   if (score == null) return INK;
   return getScoreColor(score, 'dark');
 }
-
 
 /** Absent figures render NOTHING — the grid holds the column. */
 function fmtScore(score: number | null | undefined): string {
@@ -156,16 +182,15 @@ export interface BoardColumns {
   cellW: number;
   gap: number;
   liveRound: number | null;
-  /** Movement column width: 20 when ANY row has movement, else 0. */
-  moveW: number;
-  /** POS + MOVE block width, for parent-rendered headers. */
-  posBlockW: number;
+  /** THRU only occupies a track while a round is in progress. */
+  showThru: boolean;
+  /** Nothing has been played: PLAYER | R1 TEE board. */
+  preTournament: boolean;
 }
 
 /**
- * Adaptive per-round column spec. ONE source of truth shared by the row
- * renderer and by every parent-rendered column header, so the two can
- * never drift.
+ * Adaptive per-round column spec. ONE source of truth for the header strip and
+ * every body row.
  */
 export function computeBoardColumns(
   entries: BoardEntry[],
@@ -178,30 +203,24 @@ export function computeBoardColumns(
   }
   const n = Math.max(1, Math.min(4, Math.max(highest, currentRound ?? 0)));
   const rounds = Array.from({ length: n }, (_, i) => i + 1);
-  const cellW = n >= 4 ? 24 : n === 3 ? 27 : 30;
-  const gap = n >= 4 ? 4 : 6;
   // "Live" only once play has actually started in the current round.
   const started =
     currentRound != null &&
     entries.some((e) => todayFromEntry(e, currentRound) != null);
-  // Movement column is reserved at the TABLE level only: either every row
-  // gets the slot or none do, so player names never go ragged.
-  const moves = boardMovementMap(entries, currentRound ?? null);
-  let hasMovement = false;
-  for (const e of entries) {
-    if (isDemoted(e.status)) continue;
-    const d = e.player?.id ? moves.get(e.player.id) : undefined;
-    if (d != null && d !== 0) { hasMovement = true; break; }
-  }
-  const moveW = hasMovement ? POS_MOVE_W : 0;
-  return {
-    rounds,
-    cellW,
-    gap,
-    liveRound: started ? currentRound! : null,
-    moveW,
-    posBlockW: POS_NUM_W + moveW,
-  };
+  // 2.3 — decided ONCE per table: a round is in progress when at least one
+  // player is out there and has not finished it.
+  const showThru =
+    started &&
+    entries.some((e) => {
+      if (isDemoted(e.status)) return false;
+      if (todayFromEntry(e, currentRound) == null) return false;
+      return e.thru != null && e.thru < 18;
+    });
+  const preTournament =
+    entries.length > 0 &&
+    highest === 0 &&
+    entries.every((e) => e.score == null && e.position == null);
+  return { rounds, cellW: CELL_W, gap: GRID_GAP, liveRound: started ? currentRound! : null, showThru, preTournament };
 }
 
 /** Shared movement source for both the column spec and the row renderer. */
@@ -221,43 +240,105 @@ export function boardMovementMap(entries: BoardEntry[], currentRound: number | n
   );
 }
 
-export const BOARD_NUM_W = NUM_W;
-
-/**
- * Header cells for the numeric block (R1..Rn | THRU | TOT). Rendered by the
- * parents inside their own header bar so typography stays theirs, while the
- * widths/centring come from computeBoardColumns.
- */
 /** Fixed width of the R1..Rn block — never sized to its content. */
 export function boardRoundsWidth(c: BoardColumns): number {
   return c.rounds.length * c.cellW + Math.max(0, c.rounds.length - 1) * c.gap;
 }
 
 /**
- * ONE grid template shared by the header row and LINE 1 of every body row, so
- * the two can never drift. The detail figures live on line 2 with their own
- * labels, so the header carries POS / PLAYER / TOT and nothing else.
+ * ONE grid template shared by the header strip and every body row.
  */
-export function boardGridTemplate(_c: BoardColumns): string {
-  return `${POS_W}px minmax(0,1fr) ${TOT_W}px`;
+export function boardGridTemplate(c: BoardColumns): string {
+  if (c.preTournament) return `minmax(0,1fr) ${PRE_TEE_W}px`;
+  const rounds = c.rounds.map(() => `${c.cellW}px`).join(' ');
+  return [
+    `${POS_W}px`,
+    'minmax(0,1fr)',
+    rounds,
+    c.showThru ? `${THRU_W}px` : '',
+    `${TOT_W}px`,
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
+
+// ---------------------------------------------------------------------------
+// NAME LADDER (2.5)
+// ---------------------------------------------------------------------------
+
+type NameTier = 'full' | 'short' | 'surname';
+
+function surnameOf(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  return parts.length === 1 ? parts[0] : parts[parts.length - 1];
+}
+
+function nameAtTier(fullName: string, tier: NameTier): string {
+  if (tier === 'full') return fullName;
+  // shortenName (HybridHero.utils) is the ONE initial-plus-surname helper.
+  if (tier === 'short') return shortenName(fullName);
+  return surnameOf(fullName);
+}
+
+let measureCtx: CanvasRenderingContext2D | null = null;
+function measureText(text: string, font: string): number {
+  if (typeof document === 'undefined') return text.length * 7;
+  if (!measureCtx) measureCtx = document.createElement('canvas').getContext('2d');
+  if (!measureCtx) return text.length * 7;
+  measureCtx.font = font;
+  return measureCtx.measureText(text).width;
+}
+
+let warnedOverflow = false;
 
 /**
- * Header cell for the answer column. R1..Rn and THRU are no longer header
- * columns — they are labelled in-row on line 2.
+ * Table-level layout resolution: pick the widest name tier that fits, and only
+ * if no tier fits take width from the round cells (26 -> 22 floor).
  */
-export function BoardHeaderCells({
-  totLabel,
-}: {
-  columns?: BoardColumns;
-  totLabel: string;
-}) {
-  return (
-    <div style={{ width: TOT_W, textAlign: 'right', whiteSpace: 'nowrap' }}>{totLabel}</div>
-  );
+function resolveLayout(
+  names: string[],
+  base: BoardColumns,
+  containerW: number,
+): { columns: BoardColumns; tier: NameTier } {
+  if (base.preTournament || !containerW) return { columns: base, tier: 'full' };
+  const font = `700 ${NAME_SIZE}px ${F}`;
+  const trackCount = 2 + base.rounds.length + (base.showThru ? 1 : 0) + 1;
+  const fixed =
+    ROW_PAD_X * 2 +
+    POS_W +
+    TOT_W +
+    (base.showThru ? THRU_W : 0) +
+    (trackCount - 1) * base.gap;
+
+  const widest = (tier: NameTier) =>
+    names.reduce((m, n) => Math.max(m, measureText(nameAtTier(n, tier), font)), 0);
+
+  const tiers: NameTier[] = ['full', 'short', 'surname'];
+  for (const tier of tiers) {
+    const need = Math.ceil(widest(tier)) + 2; // 2px optical breathing room
+    const avail = containerW - fixed - boardRoundsWidth(base);
+    if (need <= avail) return { columns: base, tier };
+  }
+
+  // Surname alone still overflows: take the shortfall from the ROUND CELLS.
+  const need = Math.ceil(widest('surname')) + 2;
+  const n = base.rounds.length;
+  let cellW = base.cellW;
+  while (cellW > CELL_W_FLOOR) {
+    cellW -= 1;
+    const avail = containerW - fixed - (n * cellW + Math.max(0, n - 1) * base.gap);
+    if (need <= avail) return { columns: { ...base, cellW }, tier: 'surname' };
+  }
+  if (!warnedOverflow) {
+    warnedOverflow = true;
+    // STOP CONDITION (2.5): the layout has run out. No clip, no ellipsis, no
+    // type shrink — reported instead.
+    console.warn(
+      `[BoardTable] name column exhausted: surname needs ${need}px, round cells at the ${CELL_W_FLOOR}px floor at container ${containerW}px.`,
+    );
+  }
+  return { columns: { ...base, cellW: CELL_W_FLOOR }, tier: 'surname' };
 }
-
-
 
 function isDemoted(s?: string | null): boolean {
   if (!s) return false;
@@ -272,15 +353,47 @@ function statusWord(s?: string | null): string {
   return u || '-';
 }
 
-export function BoardTable({ entries, cutState, currentRound, onRowClick }: Props) {
+export function BoardTable({
+  entries,
+  cutState,
+  currentRound,
+  onRowClick,
+  showHeader = true,
+  headerTop,
+  surface = CANVAS,
+  teeTimes,
+}: Props) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
 
-  const columns = useMemo(
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [containerW, setContainerW] = useState(0);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const measure = () => setContainerW(Math.round(el.getBoundingClientRect().width));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const base = useMemo(
     () => computeBoardColumns(entries, currentRound),
     [entries, currentRound],
   );
 
+  const names = useMemo(
+    () => entries.filter((e) => !isDemoted(e.status)).map((e) => e.player?.full_name || ''),
+    [entries],
+  );
+
+  const { columns, tier } = useMemo(
+    () => resolveLayout(names, base, containerW),
+    [names, base, containerW],
+  );
+
+  const template = boardGridTemplate(columns);
 
   // Computed round-start deltas (empty in R1 / when unavailable).
   const movementMap = useMemo(
@@ -351,52 +464,70 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
         )}
       </div>
     );
-
   };
 
-  /**
-   * One labelled figure cell on line 2. The label sits over a fixed 16px-tall
-   * figure box, so every figure on the board shares a baseline whether or not
-   * it has a value.
-   */
-  const DetailCell = ({
-    label,
-    labelColor,
-    children,
-  }: {
-    label: string;
-    labelColor?: string;
-    children?: React.ReactNode;
-  }) => (
-    <div style={{ minWidth: 0, textAlign: 'center' }}>
+  /** Column labels — ONCE, above the list. */
+  const renderHeader = () => {
+    if (!showHeader) return null;
+    const labelStyle: React.CSSProperties = {
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: '0.06em',
+      textTransform: 'uppercase',
+      color: SECONDARY,
+      whiteSpace: 'nowrap',
+    };
+    return (
       <div
         style={{
-          // AXIS 10: in-row column header (TODAY / THRU / R1..Rn) — a coordinate
-          // naming the figure beneath it. Tracking tightened 0.09em -> 0.06em so
-          // the widest label still holds one line in a three-up cell at 320.
-          fontSize: 10,
-          fontWeight: 700,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          color: labelColor ?? A.DIM,
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          height: 16,
-          display: 'flex',
+          position: headerTop != null ? 'sticky' : undefined,
+          top: headerTop as string | number | undefined,
+          zIndex: 2,
+          display: 'grid',
+          gridTemplateColumns: template,
+          gap: columns.gap,
           alignItems: 'center',
-          justifyContent: 'center',
-          fontVariantNumeric: 'tabular-nums lining-nums',
+          padding: `8px ${ROW_PAD_X}px`,
+          background: surface,
+          borderBottom: `1px solid ${HAIRLINE}`,
+          fontFamily: F,
+          ...labelStyle,
         }}
       >
-        {children}
+        {columns.preTournament ? (
+          <>
+            <div style={{ ...labelStyle, minWidth: 0 }}>{t('board.columns.player')}</div>
+            <div style={{ ...labelStyle, textAlign: 'right' }}>
+              {`R1 ${t('board.columns.thru') === 'THRU' ? 'TEE' : 'TEE'}`}
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={labelStyle}>{t('board.columns.pos')}</div>
+            <div style={{ ...labelStyle, minWidth: 0 }}>{t('board.columns.player')}</div>
+            {columns.rounds.map((r) => (
+              <div
+                key={r}
+                style={{
+                  ...labelStyle,
+                  textAlign: 'center',
+                  // AMBER on this page means THE LIVE ROUND, not the viewing
+                  // member. Bounded, local, deliberate.
+                  color: columns.liveRound === r ? AMBER : SECONDARY,
+                }}
+              >
+                {`R${r}`}
+              </div>
+            ))}
+            {columns.showThru && (
+              <div style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.thru')}</div>
+            )}
+            <div style={{ ...labelStyle, textAlign: 'right' }}>{t('board.columns.tot')}</div>
+          </>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderRow = (e: BoardEntry, opts?: { demoted?: boolean }) => {
     const demotedRow = !!opts?.demoted;
@@ -414,192 +545,189 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
     const thruEmpty = demotedRow || todayVal == null;
     const thruDisplay = thruEmpty ? '' : fmtThru(e.thru);
     const roundVals = [e.round_1, e.round_2, e.round_3, e.round_4];
-    const cc = e.player?.country_code || e.player?.country || '';
     const pid = e.player?.id;
     const mov = !demotedRow && pid ? movementMap.get(pid) : undefined;
+    const fullName = e.player?.full_name || t('board.unknownPlayer');
+    const nameText = columns.preTournament ? fullName : nameAtTier(fullName, tier);
 
-
+    const open = () => {
+      if (onRowClick) return onRowClick(e);
+      if (e.player?.id) navigate(`/tourhub/player/${e.player.id}`);
+    };
 
     return (
       <div
         key={e.id}
         role="button"
         tabIndex={0}
-        onClick={() => {
-          if (onRowClick) return onRowClick(e);
-          if (e.player?.id) navigate(`/tourhub/player/${e.player.id}`);
-        }}
+        aria-label={fullName}
+        onClick={open}
         onKeyDown={(k) => {
-          if (k.key === 'Enter' || k.key === ' ') {
-            if (onRowClick) return onRowClick(e);
-            if (e.player?.id) navigate(`/tourhub/player/${e.player.id}`);
-          }
+          if (k.key === 'Enter' || k.key === ' ') open();
         }}
         style={{
-          padding: '11px 16px 12px',
-          background: isLeader ? LEADER_WASH : CANVAS,
+          display: 'grid',
+          gridTemplateColumns: template,
+          gap: columns.gap,
+          alignItems: 'center',
+          padding: `10px ${ROW_PAD_X}px`,
+          background: isLeader ? LEADER_WASH : surface,
           opacity: demotedRow ? 0.55 : 1,
           cursor: 'pointer',
           fontFamily: F,
         }}
       >
-        {/* LINE 1 — POS | PLAYER (wraps) | TOT */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: boardGridTemplate(columns),
-            gap: 8,
-            alignItems: 'baseline',
-          }}
-        >
-          <div
-            style={{
-              // AXIS 10: the position column. The demoted (cut-line) rows read at
-              // the floor; the live rows are already above it at 13 and hold.
-              fontSize: demotedRow ? 10 : 13,
-              fontWeight: demotedRow ? 700 : isLeader ? 700 : 700,
-              color: demotedRow ? SECONDARY : isLeader ? A.INK : A.BODY,
-              fontVariantNumeric: 'tabular-nums lining-nums',
-              letterSpacing: demotedRow ? '0.06em' : undefined,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {posText}
-          </div>
-
-          {/* PLAYER — NEVER truncates. A long name takes a second line and the
-              row grows; naming the player is the board's one job. */}
-          <div style={{ minWidth: 0 }}>
-            <span
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                letterSpacing: '-0.015em',
-                color: A.INK,
-                overflowWrap: 'anywhere',
-              }}
-            >
-              {e.player?.full_name || t('board.unknownPlayer')}
-            </span>
-            {cc && (
-              <span style={{ marginLeft: 5, display: 'inline-flex', alignItems: 'center', lineHeight: 1 }}>
-                <CountryFlag country={cc} size="sm" />
-              </span>
-            )}
-          </div>
-
-          {/* TOT — the answer column, right edge, largest figure in the row. */}
-          <div
-            style={{
-              textAlign: 'right',
-              fontSize: 16,
-              fontWeight: 700,
-              letterSpacing: '-0.025em',
-              color: totColor,
-              fontVariantNumeric: 'tabular-nums lining-nums',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {totalDisplay}
-          </div>
-        </div>
-
-        {/* LINE 2 — six labelled cells, evenly distributed, hung under the name */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(6, minmax(0,1fr))',
-            gap: 4,
-            marginLeft: 54,
-            marginTop: 7,
-          }}
-        >
-          {[1, 2, 3, 4].map((r) => {
-            const isLive = columns.liveRound === r;
-            const val = r === currentRound ? todayVal : roundVals[r - 1] ?? null;
-            const settled = r < 4;
-            return (
-              <DetailCell
-                key={r}
-                label={`R${r}`}
-                // AMBER on this page means THE LIVE ROUND, not the viewing
-                // member. There is no viewing member on a tour board. Bounded,
-                // local, deliberate — do not "correct" this to the app-wide rule.
-                labelColor={r === 4 || isLive ? AMBER : undefined}
-              >
-                {val == null || demotedRow ? null : (
-                  <span
-                    style={{
-                      fontSize: 12.5,
-                      // History is settled; the live round is what is happening.
-                      fontWeight: settled ? 600 : 700,
-                      opacity: settled ? 0.55 : 1,
-                      color: houseColor(val),
-                    }}
-                  >
-                    {fmtScore(val)}
-                  </span>
-                )}
-              </DetailCell>
-            );
-          })}
-
-          <DetailCell label={t('board.columns.thru')}>
-            {thruDisplay === '' ? null : (
+        {columns.preTournament ? (
+          <>
+            <div style={{ minWidth: 0 }}>
               <span
                 style={{
-                  fontSize: 12.5,
+                  fontSize: PRE_NAME_SIZE,
+                  fontWeight: 700,
+                  letterSpacing: '-0.015em',
+                  color: A.INK,
+                  overflowWrap: 'anywhere',
+                }}
+              >
+                {nameText}
+              </span>
+            </div>
+            <div
+              style={{
+                textAlign: 'right',
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: A.BODY,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {(pid && teeTimes?.[pid]) || ''}
+            </div>
+          </>
+        ) : (
+          <>
+            {/* POS — movement folds in here; there is no MOV column. */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                whiteSpace: 'nowrap',
+                minWidth: 0,
+              }}
+            >
+              {!demotedRow &&
+                (mov == null || mov === 0 ? (
+                  // Zero or unavailable movement IS a statement: they held.
+                  <span style={{ fontSize: 10, fontWeight: 700, color: A.DIM }}>{MOV_DASH}</span>
+                ) : (
+                  <span
+                    aria-label={
+                      mov > 0
+                        ? t('board.movement.up', { count: Math.abs(mov) })
+                        : t('board.movement.down', { count: Math.abs(mov) })
+                    }
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      color: mov > 0 ? TREND_UP : TREND_DOWN,
+                      fontVariantNumeric: 'tabular-nums lining-nums',
+                    }}
+                  >
+                    <span aria-hidden>{mov > 0 ? '\u25B2' : '\u25BC'}</span>
+                    {Math.abs(mov)}
+                  </span>
+                ))}
+              <span
+                style={{
+                  // AXIS 10: the position column. Demoted (cut-line) rows read
+                  // at the floor; live rows hold at 13.
+                  fontSize: demotedRow ? 10 : 13,
+                  fontWeight: 700,
+                  color: demotedRow ? SECONDARY : isLeader ? A.INK : A.BODY,
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                  letterSpacing: demotedRow ? '0.06em' : undefined,
+                }}
+              >
+                {posText}
+              </span>
+            </div>
+
+            {/* PLAYER — never ellipsised, never a truncated surname. The tier
+                was resolved at table level so every row matches. */}
+            <div style={{ minWidth: 0 }}>
+              <span
+                style={{
+                  fontSize: NAME_SIZE,
+                  fontWeight: 700,
+                  letterSpacing: '-0.015em',
+                  color: A.INK,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {nameText}
+              </span>
+            </div>
+
+            {columns.rounds.map((r) => {
+              const isLive = columns.liveRound === r;
+              const val = r === currentRound ? todayVal : roundVals[r - 1] ?? null;
+              const settled = !isLive;
+              return (
+                <div
+                  key={r}
+                  style={{
+                    textAlign: 'center',
+                    fontSize: 12,
+                    fontWeight: settled ? 600 : 700,
+                    opacity: val == null ? 1 : settled ? 0.6 : 1,
+                    color: val == null ? A.DIM : houseColor(val),
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {val == null || demotedRow ? '' : fmtScore(val)}
+                </div>
+              );
+            })}
+
+            {columns.showThru && (
+              <div
+                style={{
+                  textAlign: 'center',
+                  fontSize: 12,
                   // Still out there = a number, stated. Settled = a quiet 'F'.
                   fontWeight: thruDisplay === 'F' ? 600 : 700,
                   color: thruDisplay === 'F' ? A.DIM : A.BODY,
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {thruDisplay}
-              </span>
+              </div>
             )}
-          </DetailCell>
 
-          <DetailCell label={t('board.columns.mov')}>
-            {(() => {
-              // CUT/WD/DQ rows never show a delta at all — not even the dash.
-              if (demotedRow) return null;
-              // Zero or unavailable movement IS a statement: they held.
-              if (mov == null || mov === 0) {
-                return (
-                  <span style={{ fontSize: 12, fontWeight: 700, color: A.DIM }}>{MOV_DASH}</span>
-                );
-              }
-              const climbed = mov > 0;
-              const n = Math.abs(mov);
-              return (
-                <span
-                  aria-label={
-                    climbed
-                      ? t('board.movement.up', { count: n })
-                      : t('board.movement.down', { count: n })
-                  }
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: climbed ? TREND_UP : TREND_DOWN,
-                    fontVariantNumeric: 'tabular-nums lining-nums',
-                  }}
-                >
-                  {/* AXIS 10: movement marker glyph, a coordinate beside the count. */}
-                  <span aria-hidden style={{ fontSize: 10 }}>
-                    {climbed ? '\u25B2' : '\u25BC'}
-                  </span>
-                  {n}
-                </span>
-              );
-            })()}
-          </DetailCell>
-        </div>
+            {/* TOT — the answer column, right edge, largest figure in the row. */}
+            <div
+              style={{
+                textAlign: 'right',
+                fontSize: 15,
+                fontWeight: 700,
+                letterSpacing: '-0.025em',
+                color: totColor,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {totalDisplay}
+            </div>
+          </>
+        )}
       </div>
-
     );
   };
 
@@ -613,7 +741,12 @@ export function BoardTable({ entries, cutState, currentRound, onRowClick }: Prop
   }
   demoted.forEach((e) => parts.push(renderRow(e, { demoted: true })));
 
-  return <div>{parts}</div>;
+  return (
+    <div ref={rootRef}>
+      {renderHeader()}
+      {parts}
+    </div>
+  );
 }
 
 export default BoardTable;
