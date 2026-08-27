@@ -295,7 +295,10 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/explore' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
 
   // Courses landing (editorial geometry; cinematic hero → glass overlay).
-  { match: { exact: '/courses' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+  // bleed + scrollAway stay TRUE deliberately: hero page, same as the tour hero
+  // entries (/tourhub overview, /tourhub/tournament/, /tourhub/player/).
+  { match: { exact: '/courses' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+
 
 
   // /community is deleted (BRIEF_DISCOVER_ONE_PAGE §3); the path now redirects
