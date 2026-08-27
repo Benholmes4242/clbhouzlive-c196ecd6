@@ -63,6 +63,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
   const benefit = t(`courseDetail.handicapCue.${benefitKey}`, { name });
   const sub = t(`courseDetail.handicapCue.${subKey}`, { name });
   const isBanner = variant === 'about' || variant === 'discover';
+  const showBenefit = variant !== 'tour-venue';
 
 
   // Banner: lighter inline locked-comparison row (about / discover)
