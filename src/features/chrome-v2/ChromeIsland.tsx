@@ -131,11 +131,19 @@ const LeftCapsule: React.FC<{
 
   // Slot wins over back-override AND the registry rule.
   if (slot) {
+    // A slot element may ask the capsule to fill the row by carrying
+    // data-island-grow. Content-sized slots (Tour Hub's burger + picker) must
+    // NOT grow, or the glass would run empty to the right; a slot holding a
+    // text field (college hub) must, so the field can span to the right
+    // capsule. The marker keeps that a per-slot decision, not a global flip.
+    const grow =
+      React.isValidElement(slot) && (slot.props as Record<string, unknown>)['data-island-grow'] === true;
     return (
       <div
         style={{
           ...glassStyle(tone),
-          padding: '0 14px 0 13px',
+          padding: grow ? '0 8px 0 10px' : '0 14px 0 13px',
+          ...(grow ? { flex: '1 1 auto', minWidth: 0 } : null),
         }}
       >
         {slot}
@@ -547,21 +555,26 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
             position: 'relative',
           }}
         >
-          <button
-            type="button"
-            onClick={() => setSearchOpen(true)}
-            aria-label="Search"
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-            }}
-          >
-            <Search size={14} color={inkFor(tone)} strokeWidth={2.4} />
-          </button>
+          {/* Search cell — hidden on routes whose page owns a search field in
+              the left capsule (spec.hideSearch). No divider belongs to it, so
+              nothing is stranded when it goes. */}
+          {!spec.hideSearch && (
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              <Search size={14} color={inkFor(tone)} strokeWidth={2.4} />
+            </button>
+          )}
 
           {/* HcpCell renders its own leading divider so the rule can never be
               stranded when the chip is hidden. */}

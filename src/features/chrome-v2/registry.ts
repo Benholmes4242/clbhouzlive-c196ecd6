@@ -45,6 +45,14 @@ export interface ChromeSpec {
   /** Hide the HCP cell in the right capsule (e.g. handicap/rivalry). */
   hideHcp?: boolean;
   /**
+   * Hide the SEARCH cell in the right capsule. For routes whose page owns a
+   * search field inside the island's LEFT capsule (college hub): two
+   * magnifiers a few pixels apart read as a rendering fault. Deliberately a
+   * SIBLING of hideHcp, not a merge of it — different cells, different
+   * reasons, and one flag would force the next route to lose both.
+   */
+  hideSearch?: boolean;
+  /**
    * When true, the island capsules render with `position: absolute` instead
    * of `fixed` — they ride away with the page on scroll (TikTok/Instagram
    * top-chrome model). The page's single sticky row (chips/tabs) locks at
@@ -241,6 +249,9 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' },
       tone: 'dark',
       bleed: false,
+      // The hub's yearbook search lives in the LEFT capsule (ChromeLeftSlot),
+      // so the island's own magnifier would be a second one beside it.
+      hideSearch: true,
       note: EDITORIAL_NOTE,
     },
   },

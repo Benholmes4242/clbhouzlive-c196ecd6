@@ -157,6 +157,79 @@ export function CollegeHubPage() {
     });
   }, [debouncedSearch, filtered.length]);
 
+  /**
+   * The yearbook search field. It rides in the header's own left group, beside
+   * the back chevron (TourPageShell `leftAccessory`) — the hub no longer spends
+   * a second sticky row on it.
+   *
+   * Shares construction and paint with compare/PickerSheet.tsx's field, but NO
+   * LONGER its height: this one sits in the header row, which already pays 44,
+   * so it returns to canon (radius 14 / height 44). The sheet's field keeps 34
+   * because it is constrained by the sheet's own control row. Change the
+   * construction in both; do not copy the height.
+   *
+   * Paint state (searchPaintFocus) is deliberately SEPARATE from
+   * searchExpanded: blur must restore the paint without collapsing the filtered
+   * list, or a result tap dies before it lands.
+   */
+  const searchField = (
+    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+      <Search
+        size={13}
+        color={searchValue ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.62)'}
+        strokeWidth={2.5}
+        style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
+      />
+      <input
+        ref={searchInputRef}
+        type="text"
+        placeholder={t('college.hub.searchPlaceholder')}
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
+        onFocus={() => {
+          setSearchExpanded(true);
+          setSearchPaintFocus(true);
+        }}
+        onBlur={() => setSearchPaintFocus(false)}
+        className="placeholder:text-[rgba(255,255,255,0.38)]"
+        style={{
+          width: '100%',
+          height: 44,
+          paddingLeft: 30,
+          paddingRight: 30,
+          borderRadius: 14,
+          background: SURFACE,
+          border: `1px solid ${searchPaintFocus ? INK_MUTE : HAIRLINE_INK_10}`,
+          transition: 'background 140ms ease, border-color 140ms ease',
+          fontFamily: FONT,
+          fontSize: 13,
+          fontWeight: 600,
+          color: INK,
+          outline: 'none',
+        }}
+      />
+      {searchValue && (
+        <button
+          type="button"
+          aria-label={t('college.hub.clearSearchAria')}
+          onClick={() => setSearchValue('')}
+          style={{
+            position: 'absolute',
+            right: 8,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'transparent',
+            border: 'none',
+            padding: 4,
+            cursor: 'pointer',
+          }}
+        >
+          <X size={12} color={INK_MUTE} />
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <TourHubShell showBack={false} immersiveStatusBar>
       <TourPageShell
@@ -164,6 +237,7 @@ export function CollegeHubPage() {
         background={SLATE_50}
         title="College golf"
         backFallback="/tourhub"
+        leftAccessory={searchField}
       >
 
       <div
@@ -242,92 +316,6 @@ export function CollegeHubPage() {
         )}
 
 
-        {/* Sticky opaque search row - locks under the tour header; filters the feed. */}
-        <div
-          style={{
-            position: 'sticky',
-            top: 'var(--tour-header-h, 0px)',
-            zIndex: 10,
-            // Solid, not glass: the row sits inside a scrolling container where
-            // a backdrop-filter let list rows bleed through it.
-            background: '#15171F',
-
-            borderBottom: '1px solid rgba(255,255,255,0.10)',
-            padding: '8px 16px 10px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-          }}
-        >
-          {/* Canonical twin of compare/PickerSheet.tsx's search field — same
-              construction, same paint. Change one, change both.
-              RADIUS/HEIGHT EXCEPTION (recorded — do not "correct" to 44).
-              The canon is radius 14 / height 44. Radius moves to 14 here; the
-              height stays 34 because this field sits inside the sticky control
-              bar (padding '8px 16px 10px'), and 44 would deepen that bar and
-              push the yearbook list down at every scroll position. Fourth
-              recorded exception, after the OTP boxes, the Reviews control row
-              and the Players control row — all constrained by neighbours.
-              Paint state (searchPaintFocus) is deliberately SEPARATE from
-              searchExpanded: blur must restore the paint without collapsing
-              the results list, or a result tap dies before it lands. */}
-          <div style={{ position: 'relative', flex: 1 }}>
-            <Search
-              size={13}
-              color={searchValue ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.62)'}
-              strokeWidth={2.5}
-              style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
-            />
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder={t('college.hub.searchPlaceholder')}
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onFocus={() => {
-                setSearchExpanded(true);
-                setSearchPaintFocus(true);
-              }}
-              onBlur={() => setSearchPaintFocus(false)}
-              className="placeholder:text-[rgba(255,255,255,0.38)]"
-              style={{
-                width: '100%',
-                height: 34,
-                paddingLeft: 30,
-                paddingRight: 30,
-                borderRadius: 14,
-                background: SURFACE,
-                border: `1px solid ${searchPaintFocus ? INK_MUTE : HAIRLINE_INK_10}`,
-                transition: 'background 140ms ease, border-color 140ms ease',
-                fontFamily: FONT,
-                fontSize: 13,
-                fontWeight: 600,
-                color: INK,
-                outline: 'none',
-              }}
-            />
-
-            {searchValue && (
-              <button
-                type="button"
-                aria-label={t('college.hub.clearSearchAria')}
-                onClick={() => setSearchValue('')}
-                style={{
-                  position: 'absolute',
-                  right: 8,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 4,
-                  cursor: 'pointer',
-                }}
-              >
-                <X size={12} color={INK_MUTE} />
-              </button>
-            )}
-          </div>
-        </div>
 
         {/* Compare entry / pick-mode banner */}
         {pickMode ? (
