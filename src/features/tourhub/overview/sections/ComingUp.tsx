@@ -255,9 +255,19 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
               alignItems: 'flex-start',
               height: trackH != null ? trackH : undefined,
               overflowX: 'auto',
+              // MICRO_BRIEF_COMING_UP_HORIZONTAL_ONLY: declared explicitly. A
+              // computed `visible` resolves to `auto` when the other axis is
+              // not visible, which made the fixed-height track scroll on both.
+              overflowY: 'hidden',
+              // Load-bearing: tells the compositor this element consumes
+              // horizontal pans only, so a vertical/diagonal drag is handed
+              // straight to the page scroller instead of being absorbed here.
+              // Do not remove while tidying styles.
+              touchAction: 'pan-x',
               scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch',
               scrollbarWidth: 'none',
+
             }}
           >
             {pages.map((page, pi) => (
