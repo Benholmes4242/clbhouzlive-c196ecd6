@@ -17,9 +17,31 @@ import React from 'react';
 import { A, LABEL, NUM, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { MovementCell } from './MovementCell';
 
-/** Fixed grid: rank, avatar, name, 30d, value. */
-export const BOARD_GRID = '22px 26px 1fr 44px 52px';
+/**
+ * Grid: [rank+movement] | avatar | name | [gap+value].
+ *
+ * BRIEF_CHAMPIONS_TOGGLE_AND_BOARD §2.3 — each figure sits with what it
+ * modifies. Rank MOVEMENT describes a change in position, so it shares the
+ * rank cell; the STROKE GAP describes a difference in the value, so it shares
+ * the value cell. No fifth or sixth column: there is no room at 390 without
+ * shrinking the name.
+ *
+ * §2.2 — the movement track is computed ONCE per board (`anyMovement`) and
+ * collapses to zero width when nothing moved, so names stay aligned across
+ * every row in both states. Never branch per row.
+ */
+export const boardGrid = (withMovement: boolean) =>
+  `${withMovement ? 46 : 22}px 26px 1fr 82px`;
+/** Back-compat: the movement-expanded grid. */
+export const BOARD_GRID = boardGrid(true);
 export const BOARD_GAP = 10;
+
+/** True when at least one row actually moved. A new entrant is not movement. */
+export function hasAnyMovement(
+  rows: ReadonlyArray<{ delta?: number | null }>,
+): boolean {
+  return rows.some((r) => r.delta != null && r.delta !== 0);
+}
 
 const SQUIRCLE_MASK_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
