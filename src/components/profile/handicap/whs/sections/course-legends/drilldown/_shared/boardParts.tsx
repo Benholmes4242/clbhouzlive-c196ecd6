@@ -216,20 +216,29 @@ export const BoardHeaderRow: React.FC<{
   >
     <span
       style={{
-        display: 'flex',
+        display: 'grid',
+        gridTemplateColumns: showMovement ? '22px 4px 20px' : '22px',
         alignItems: 'center',
-        justifyContent: showMovement ? 'space-between' : 'center',
-        gap: 6,
+        justifyItems: 'center',
       }}
     >
-      {showMovement && <span style={LABEL}>{movementLabel}</span>}
-      <span style={LABEL}>{rankLabel}</span>
+      {showMovement && <span style={{ ...LABEL, textAlign: 'center' }}>{movementLabel}</span>}
+      {showMovement && <span aria-hidden />}
+      <span style={{ ...LABEL, textAlign: 'center' }}>{rankLabel}</span>
     </span>
     <span />
-    <span style={LABEL}>{memberLabel}</span>
-    <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 6 }}>
-      {gapLabel ? <span style={LABEL}>{gapLabel}</span> : null}
-      <span style={{ ...LABEL, textAlign: 'right' }}>{unitLabel}</span>
+    <span style={{ ...LABEL, textAlign: 'center' }}>{memberLabel}</span>
+    <span
+      style={{
+        display: 'grid',
+        gridTemplateColumns: gapLabel ? '32px 4px 46px' : '0px 4px 46px',
+        alignItems: 'center',
+        justifyItems: 'center',
+      }}
+    >
+      {gapLabel ? <span style={{ ...LABEL, textAlign: 'center' }}>{gapLabel}</span> : <span aria-hidden />}
+      <span aria-hidden />
+      <span style={{ ...LABEL, textAlign: 'center' }}>{unitLabel}</span>
     </span>
   </div>
 );
