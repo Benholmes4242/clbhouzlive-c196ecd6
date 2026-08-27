@@ -113,11 +113,9 @@ export const BusinessCoursePanel: React.FC<BusinessCoursePanelProps> = ({
   }
 
   const hardestToPar = rounds > 0 ? toParParts(stats?.hardest_hole_plays, 1) : null;
-  const circle = rounds > 0 ? stats?.circle_played ?? null : null;
-  const footParts: string[] = [];
-  if (hardestToPar) footParts.push(t('business.course.footHardest', { toPar: hardestToPar.text }));
-  if (circle != null && circle > 0) footParts.push(t('business.course.footMembers', { count: circle }));
-  const footLine = footParts.length ? footParts.join(' . ') : null;
+  const footLine = hardestToPar
+    ? t('business.course.footHardest', { toPar: hardestToPar.text })
+    : null;
 
   const reportedRef = useRef<boolean>(false);
   const hasFigures = cells.length > 0;
