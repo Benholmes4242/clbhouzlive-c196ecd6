@@ -1117,7 +1117,9 @@ const ProfilePageV2Content: React.FC = () => {
         <section
           className="px-4 pt-1 pb-0"
           style={{
-            background: 'hsl(var(--background))',
+            /* One canvas: --background and --bg-page resolve differently, which
+               printed a black band behind the tabs. Paint nothing but the page. */
+            background: 'var(--bg-page)',
             touchAction: 'auto',
             pointerEvents: 'auto',
           }}

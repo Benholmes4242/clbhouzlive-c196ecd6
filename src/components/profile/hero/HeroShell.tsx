@@ -306,7 +306,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
 
       <div style={{ position: 'relative', zIndex: 1 }}>
         {/* Identity row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, maxWidth: '100%' }}>
           <button
             type="button"
             onClick={onAvatarTap}
