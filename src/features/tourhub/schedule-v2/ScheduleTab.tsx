@@ -132,8 +132,10 @@ export function ScheduleTab() {
   const anchorId = timeline?.anchorEventId ?? null;
   const computeOffset = () => {
     const rootStyles = getComputedStyle(document.documentElement);
-    const chipsH =
-      parseInt(rootStyles.getPropertyValue('--tour-chips-h'), 10) || 47;
+    /* `|| 47` would swallow a legitimate 0: the chips row is gone, so the var
+       IS "0px" and the fallback must only cover an unset/NaN read. */
+    const chipsRaw = parseInt(rootStyles.getPropertyValue('--tour-chips-h'), 10);
+    const chipsH = Number.isNaN(chipsRaw) ? 47 : chipsRaw;
     const monthH =
       parseInt(rootStyles.getPropertyValue('--tour-month-h'), 10) || 32;
     const headerH =
