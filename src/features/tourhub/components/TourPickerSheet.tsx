@@ -36,6 +36,7 @@ import {
 // "KORN FERRY" / "CHAMPIONS" / "LIV GOLF". Do NOT key. Same rationale as
 // player names, tournament names, team names.
 const TOUR_LABEL: Record<string, string> = {
+  all: 'ALL TOURS',
   pga: 'PGA TOUR',
   lpga: 'LPGA',
   euro: 'DP WORLD TOUR',
@@ -45,6 +46,7 @@ const TOUR_LABEL: Record<string, string> = {
 };
 
 const TOUR_LABEL_SHORT: Record<string, string> = {
+  all: 'ALL TOURS',
   pga: 'PGA',
   lpga: 'LPGA',
   euro: 'DP WORLD',
@@ -58,20 +60,35 @@ const GOLD_TINT_18 = 'rgba(255,184,0,0.18)';
 const GOLD_BORDER = 'rgba(255,184,0,0.45)';
 const SUBTITLE_COLOR = '#8A9099';
 
-/** Long-form pill label reflecting the tour currently in view on the hero. */
-export function useTourPillLabel(): string {
-  const { selectedTourSlug, viewingTourSlug } = useTourSelection();
-  const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
-  if (activeTourSlug === 'major') return 'THE MAJORS';
-  return TOUR_LABEL[activeTourSlug] ?? 'PGA TOUR';
+/**
+ * Title-case an unmapped slug so an absence reads as visibly odd rather than as
+ * a confident, wrong tour name. Never returns a real tour label.
+ */
+function plainSlug(slug: string): string {
+  return slug.charAt(0).toUpperCase() + slug.slice(1);
 }
 
-/** Short-form label for tight chrome (e.g. Chrome island left capsule). */
+/**
+ * Long-form pill label. This is a READOUT of whatever tour is on screen — never
+ * an independent opinion about it. appliedTourSlug (published by the active tab)
+ * wins, then the hero's viewing slug, then the picker's command channel.
+ */
+export function useTourPillLabel(): string {
+  const { selectedTourSlug, viewingTourSlug, appliedTourSlug } = useTourSelection();
+  const activeTourSlug = appliedTourSlug ?? viewingTourSlug ?? selectedTourSlug ?? 'pga';
+  if (activeTourSlug === 'major') return 'THE MAJORS';
+  return TOUR_LABEL[activeTourSlug] ?? plainSlug(activeTourSlug);
+}
+
+/**
+ * Short-form label for tight chrome (Chrome island left capsule). Same rule:
+ * a readout of the list on screen, in the same precedence order.
+ */
 export function useTourShortLabel(): string {
-  const { selectedTourSlug, viewingTourSlug } = useTourSelection();
-  const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
+  const { selectedTourSlug, viewingTourSlug, appliedTourSlug } = useTourSelection();
+  const activeTourSlug = appliedTourSlug ?? viewingTourSlug ?? selectedTourSlug ?? 'pga';
   if (activeTourSlug === 'major') return 'MAJORS';
-  return TOUR_LABEL_SHORT[activeTourSlug] ?? 'PGA';
+  return TOUR_LABEL_SHORT[activeTourSlug] ?? activeTourSlug.toUpperCase();
 }
 
 export interface TourPickerSheetProps {
