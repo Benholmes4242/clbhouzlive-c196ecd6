@@ -215,6 +215,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
   nameSuffix,
   subline,
   action,
+  headlineAction,
   headline,
   counters,
   centreCounters = false,
