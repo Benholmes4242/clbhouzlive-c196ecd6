@@ -63,6 +63,7 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
   const benefit = t(`courseDetail.handicapCue.${benefitKey}`, { name });
   const sub = t(`courseDetail.handicapCue.${subKey}`, { name });
   const isBanner = variant === 'about' || variant === 'discover';
+  const showBenefit = variant !== 'tour-venue';
 
 
   // Banner: lighter inline locked-comparison row (about / discover)
@@ -87,10 +88,12 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
-            {benefit}
-          </div>
-          <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_MUTE, marginTop: 2 }}>
+          {showBenefit && (
+            <div style={{ fontSize: 13, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
+              {benefit}
+            </div>
+          )}
+          <div style={{ fontSize: 11.5, fontWeight: 500, color: INK_MUTE, marginTop: showBenefit ? 2 : 0 }}>
             {sub}
           </div>
         </div>
@@ -125,10 +128,12 @@ export const ConnectHandicapCue: React.FC<Props> = ({ variant, courseName }) => 
       >
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
-              {benefit}
-            </div>
-            <div style={{ fontSize: 12.5, fontWeight: 500, color: INK_MUTE, marginTop: 3, lineHeight: 1.4 }}>
+            {showBenefit && (
+              <div style={{ fontSize: 14, fontWeight: 700, color: INK, letterSpacing: '-0.01em' }}>
+                {benefit}
+              </div>
+            )}
+            <div style={{ fontSize: 12.5, fontWeight: 500, color: INK_MUTE, marginTop: showBenefit ? 3 : 0, lineHeight: 1.4 }}>
               {sub}
             </div>
           </div>
