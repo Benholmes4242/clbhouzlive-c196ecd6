@@ -124,9 +124,8 @@ function LiveMarker({
       </span>
     </span>
   );
+}
 
-    </span>
-  );
 }
 
 /** Minimum completed rounds before a field average means anything. */
