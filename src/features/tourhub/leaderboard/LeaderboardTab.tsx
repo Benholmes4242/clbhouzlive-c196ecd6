@@ -94,7 +94,7 @@ function LiveMarker({
     : t('tour.roundUpcoming', { n: currentRound ?? 1 });
 
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
       {live && (
         <span
           aria-hidden
@@ -108,7 +108,23 @@ function LiveMarker({
           }}
         />
       )}
-      <span style={{ ...LABEL, color: live ? A.INK : A.DIM }}>{text}</span>
+      {/* 12/800 tabular - sits on line one beside the h1. */}
+      <span
+        style={{
+          fontFamily: F,
+          fontSize: 12,
+          fontWeight: 800,
+          letterSpacing: '0.01em',
+          whiteSpace: 'nowrap',
+          color: live ? A.INK : A.DIM,
+          ...FIGS,
+        }}
+      >
+        {text}
+      </span>
+    </span>
+  );
+
     </span>
   );
 }
