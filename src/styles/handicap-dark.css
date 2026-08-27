@@ -225,8 +225,11 @@
   display: inline-block;
 }
 
-/* Tab underline switches to amber-on-dark in the dashboard */
-.hcp-dark [role="tab"][aria-selected="true"] {
+/* Tab underline switches to amber-on-dark in the dashboard.
+ * ScopeSegment buttons are excluded via [data-scope-tab]: the segment owns
+ * its ink inline (white thumb + dark ink in dark tone), and this !important
+ * rule would otherwise paint the active label white-on-white. */
+.hcp-dark [role="tab"][aria-selected="true"]:not([data-scope-tab]) {
   color: var(--hcp-t-100) !important;
 }
 
