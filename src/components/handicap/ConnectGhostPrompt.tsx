@@ -23,14 +23,23 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { FIELD_REST_BG } from '@/lib/tokens/field';
 
-const INK = '#0F172A';
-const INK_60 = '#64748B';
-const INK_45 = '#94A3B8';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
-const NEUTRAL_BG = 'rgba(15,23,42,0.04)';
-const NEUTRAL_BORDER = 'rgba(15,23,42,0.10)';
-const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+/**
+ * DARK-ONLY (BRIEF_CONNECT_GHOST_PROMPT_DARK). The local light palette that
+ * used to live here painted a white card around the already-dark
+ * ChampionsHonoursBoard, making holder names near-white on white. The shared
+ * analytical tokens are consumed here, never forked.
+ */
+const INK = A.INK;
+const INK_60 = A.MUTE;
+const INK_45 = A.DIM;
+const HAIRLINE = A.BORDER;
+/** Faint WHITE fill: an ink alpha over a dark panel darkens, it cannot lighten. */
+const NEUTRAL_BG = FIELD_REST_BG;
+const NEUTRAL_BORDER = A.BORDER;
+const FONT = SANS;
 
 export type ConnectGhostSurface = 'holes' | 'about' | 'profile' | 'champions';
 
@@ -120,10 +129,9 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
       <div
         style={{
           position: 'relative',
-          background: '#FFFFFF',
+          background: A.PANEL,
           borderRadius: 18,
           border: `1px solid ${HAIRLINE}`,
-          boxShadow: '0 1px 2px rgba(15,23,42,0.03)',
           overflow: 'hidden',
         }}
       >
@@ -140,7 +148,7 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
             height: 26,
             borderRadius: 8,
             border: 'none',
-            background: 'rgba(15,23,42,0.05)',
+            background: NEUTRAL_BG,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -161,7 +169,7 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
         <div
           style={{
             padding: '14px 16px 16px',
-            background: '#FFFFFF',
+            background: A.PANEL,
           }}
         >
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: INK_60, marginBottom: 6 }}>
@@ -180,8 +188,8 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
               marginTop: 14,
               width: '100%',
               padding: '13px 0',
-              background: INK,
-              color: '#FFFFFF',
+              background: A.INK,
+              color: A.CANVAS,
               border: 'none',
               borderRadius: 13,
               fontSize: 14,
