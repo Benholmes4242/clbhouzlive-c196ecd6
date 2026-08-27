@@ -74,6 +74,7 @@ export const BusinessProfileHero: React.FC<Props> = ({
   followersCount,
   postsCount,
   action,
+  headlineAction,
   onAvatarTap,
   onStatTap,
   courseNavEnabled,
