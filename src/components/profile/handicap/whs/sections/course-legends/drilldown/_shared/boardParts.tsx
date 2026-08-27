@@ -108,6 +108,12 @@ export interface BoardRowData {
   isSelf: boolean;
   rank30d?: number | null;
   delta?: number | null;
+  /**
+   * Signed gap from the leader in the member's terms, e.g. "+4" on lowest
+   * gross, "-3" on a counting category. The LEADER passes null: zero is not a
+   * fact here, it is the definition of being first.
+   */
+  gapDisplay?: string | null;
 }
 
 export const BoardRow: React.FC<{
@@ -115,14 +121,16 @@ export const BoardRow: React.FC<{
   rowRef?: React.Ref<HTMLDivElement>;
   /** Hairline above the row. Callers pass false for the first row of a board. */
   rule?: boolean;
-}> = ({ row, rowRef, rule = true }) => {
+  /** Board-level movement state. Computed once by the caller, never per row. */
+  showMovement?: boolean;
+}> = ({ row, rowRef, rule = true, showMovement = true }) => {
   const tone = row.isSelf ? A.AMBER : A.INK;
   return (
     <div
       ref={rowRef}
       style={{
         display: 'grid',
-        gridTemplateColumns: BOARD_GRID,
+        gridTemplateColumns: boardGrid(showMovement),
         gap: BOARD_GAP,
         alignItems: 'center',
         padding: '9px 0',
@@ -130,7 +138,19 @@ export const BoardRow: React.FC<{
         borderTop: rule ? `1px solid ${A.HAIRLINE}` : undefined,
       }}
     >
-      <span style={{ ...NUM, fontSize: 12.5, color: A.DIM, textAlign: 'center' }}>{row.rank}</span>
+      <span
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: showMovement ? 'space-between' : 'center',
+          gap: 6,
+        }}
+      >
+        {showMovement && (
+          <MovementCell delta={row.delta} rank30d={row.rank30d} theme="dark" size="figure" />
+        )}
+        <span style={{ ...NUM, fontSize: 12.5, color: A.DIM }}>{row.rank}</span>
+      </span>
       <BoardAvatar photoUrl={row.photoUrl} name={row.name} />
       <span
         style={{
@@ -146,11 +166,23 @@ export const BoardRow: React.FC<{
       >
         {row.name}
       </span>
-      <span style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <MovementCell delta={row.delta} rank30d={row.rank30d} theme="light" size="figure" />
-      </span>
-      <span style={{ ...NUM, fontSize: 16, color: tone, textAlign: 'right' }}>
-        {row.valueDisplay}
+      <span
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'flex-end',
+          gap: 6,
+          minWidth: 0,
+        }}
+      >
+        {row.gapDisplay ? (
+          <span style={{ ...NUM, fontSize: 11, fontWeight: 600, color: A.DIM }}>
+            {row.gapDisplay}
+          </span>
+        ) : null}
+        <span style={{ ...NUM, fontSize: 16, color: tone, textAlign: 'right' }}>
+          {row.valueDisplay}
+        </span>
       </span>
     </div>
   );
@@ -162,21 +194,36 @@ export const BoardHeaderRow: React.FC<{
   movementLabel: string;
   unitLabel: string;
   rankLabel: string;
-}> = ({ memberLabel, movementLabel, unitLabel, rankLabel }) => (
+  gapLabel?: string;
+  /** Board-level movement state. Must match the rows'. */
+  showMovement?: boolean;
+}> = ({ memberLabel, movementLabel, unitLabel, rankLabel, gapLabel, showMovement = true }) => (
   <div
     style={{
       display: 'grid',
-      gridTemplateColumns: BOARD_GRID,
+      gridTemplateColumns: boardGrid(showMovement),
       gap: BOARD_GAP,
       paddingBottom: 4,
       fontFamily: SANS,
     }}
   >
-    <span style={{ ...LABEL, textAlign: 'center' }}>{rankLabel}</span>
+    <span
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: showMovement ? 'space-between' : 'center',
+        gap: 6,
+      }}
+    >
+      {showMovement && <span style={LABEL}>{movementLabel}</span>}
+      <span style={LABEL}>{rankLabel}</span>
+    </span>
     <span />
     <span style={LABEL}>{memberLabel}</span>
-    <span style={{ ...LABEL, textAlign: 'right' }}>{movementLabel}</span>
-    <span style={{ ...LABEL, textAlign: 'right' }}>{unitLabel}</span>
+    <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 6 }}>
+      {gapLabel ? <span style={LABEL}>{gapLabel}</span> : null}
+      <span style={{ ...LABEL, textAlign: 'right' }}>{unitLabel}</span>
+    </span>
   </div>
 );
 
