@@ -34,6 +34,13 @@ interface Props {
   children: ReactNode;
   /** Right-aligned slot (menu button, actions). */
   right?: ReactNode;
+  /**
+   * Rendered immediately after the back chevron. The tour tabs put their tour
+   * picker trigger here (BRIEF_TOUR_HEADER_ONE_ROW): this shell suppresses the
+   * global ChromeIsland, so the island's left capsule is NOT on screen here and
+   * the picker has to live in the shell's own left group.
+   */
+  leftAccessory?: ReactNode;
   /** Rendered inside the header, below the title row (chips / search). */
   belowTitle?: ReactNode;
   /** Overrides history back. */
@@ -51,6 +58,7 @@ export function TourPageShell({
   subtitle,
   children,
   right,
+  leftAccessory,
   belowTitle,
   onBack,
   backFallback = '/tourhub',
@@ -164,6 +172,7 @@ export function TourPageShell({
             {/* Titles were removed platform-wide: the back chevron is the only
                 identity the tour headers carry. `title` / `subtitle` remain in
                 the props for a11y labelling only. */}
+            {leftAccessory}
 
           </div>
           {right}
