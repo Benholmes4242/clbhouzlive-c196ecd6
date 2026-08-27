@@ -13,7 +13,8 @@ import type { LucideIcon } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { A, KICKER, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { BoardHeaderRow, BoardRow } from './_shared/boardParts';
+import { BoardHeaderRow, BoardRow, hasAnyMovement } from './_shared/boardParts';
+import { formatGapFromChampion } from './_shared/helpers';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 
 interface SectionRow {
@@ -204,12 +205,15 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
               rankLabel={t('champions.colRank')}
               memberLabel={t('champions.colMember')}
               movementLabel={t('champions.col30d')}
+              gapLabel={t('champions.colGap')}
+              showMovement={anyMovement}
               unitLabel={category.unit || category.short}
             />
             {rows.map((r, i) => (
               <BoardRow
                 key={`${r.rank}-${r.attained_at}-${r.name}`}
                 rule={i > 0}
+                showMovement={anyMovement}
                 rowRef={r.isSelf && r.rank !== 1 ? selfRowRef : undefined}
                 row={{
                   rank: r.rank,
@@ -219,6 +223,10 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
                   isSelf: r.isSelf,
                   rank30d: r.rank30d,
                   delta: r.delta,
+                  gapDisplay:
+                    leaderValue != null && i > 0
+                      ? formatGapFromChampion(category.key, r.value, leaderValue)
+                      : null,
                 }}
               />
             ))}
