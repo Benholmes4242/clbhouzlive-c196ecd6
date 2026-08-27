@@ -30,6 +30,7 @@ import {
   BoardHeaderRow,
   BoardRow,
   HeldGauge,
+  hasAnyMovement,
   ordinalSuffix,
 } from './_shared/boardParts';
 
@@ -112,6 +113,11 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
   const selfRow = rows.find((r) => r.isSelf) ?? null;
   const standsAlone = rows.length === 1;
   const topRows = rows.slice(0, 5);
+  // §2.2 — ONE computation per render, at board level. A dash next to a
+  // neighbour's arrow is meaningful; a column of dashes is not. All-time BEST
+  // categories can never move, so the whole track collapses there.
+  const anyMovement = hasAnyMovement(topRows);
+  const leaderValue = champion?.value ?? null;
 
   const gapRaw = selfRow && champion ? selfRow.value - champion.value : null;
   const level = selfRow != null && champion != null && Math.abs(gapRaw ?? 0) < 0.005;
@@ -230,12 +236,15 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
             rankLabel={t('champions.colRank')}
             memberLabel={t('champions.colMember')}
             movementLabel={t('champions.col30d')}
+            gapLabel={t('champions.colGap')}
+            showMovement={anyMovement}
             unitLabel={unitLabel || categoryLabel}
           />
           {topRows.map((r, i) => (
             <BoardRow
               key={`${r.rank}-${r.name}`}
               rule={i > 0}
+              showMovement={anyMovement}
               row={{
                 rank: r.rank,
                 name: r.name,
@@ -244,6 +253,13 @@ export const ChampionsDuelCard: React.FC<ChampionsDuelCardProps> = ({
                 isSelf: r.isSelf,
                 rank30d: r.rank30d,
                 delta: r.delta,
+                // The leader defines the gap, so the leader has none. The sign
+                // and direction come from the category's own ordering via the
+                // shared helper - never assumed lower-is-better.
+                gapDisplay:
+                  leaderValue != null && i > 0
+                    ? formatGapFromChampion(category, r.value, leaderValue)
+                    : null,
               }}
             />
           ))}

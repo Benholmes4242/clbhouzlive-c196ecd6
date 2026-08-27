@@ -17,9 +17,31 @@ import React from 'react';
 import { A, LABEL, NUM, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { MovementCell } from './MovementCell';
 
-/** Fixed grid: rank, avatar, name, 30d, value. */
-export const BOARD_GRID = '22px 26px 1fr 44px 52px';
+/**
+ * Grid: [rank+movement] | avatar | name | [gap+value].
+ *
+ * BRIEF_CHAMPIONS_TOGGLE_AND_BOARD §2.3 — each figure sits with what it
+ * modifies. Rank MOVEMENT describes a change in position, so it shares the
+ * rank cell; the STROKE GAP describes a difference in the value, so it shares
+ * the value cell. No fifth or sixth column: there is no room at 390 without
+ * shrinking the name.
+ *
+ * §2.2 — the movement track is computed ONCE per board (`anyMovement`) and
+ * collapses to zero width when nothing moved, so names stay aligned across
+ * every row in both states. Never branch per row.
+ */
+export const boardGrid = (withMovement: boolean) =>
+  `${withMovement ? 46 : 22}px 26px 1fr 82px`;
+/** Back-compat: the movement-expanded grid. */
+export const BOARD_GRID = boardGrid(true);
 export const BOARD_GAP = 10;
+
+/** True when at least one row actually moved. A new entrant is not movement. */
+export function hasAnyMovement(
+  rows: ReadonlyArray<{ delta?: number | null }>,
+): boolean {
+  return rows.some((r) => r.delta != null && r.delta !== 0);
+}
 
 const SQUIRCLE_MASK_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
@@ -86,6 +108,12 @@ export interface BoardRowData {
   isSelf: boolean;
   rank30d?: number | null;
   delta?: number | null;
+  /**
+   * Signed gap from the leader in the member's terms, e.g. "+4" on lowest
+   * gross, "-3" on a counting category. The LEADER passes null: zero is not a
+   * fact here, it is the definition of being first.
+   */
+  gapDisplay?: string | null;
 }
 
 export const BoardRow: React.FC<{
@@ -93,14 +121,16 @@ export const BoardRow: React.FC<{
   rowRef?: React.Ref<HTMLDivElement>;
   /** Hairline above the row. Callers pass false for the first row of a board. */
   rule?: boolean;
-}> = ({ row, rowRef, rule = true }) => {
+  /** Board-level movement state. Computed once by the caller, never per row. */
+  showMovement?: boolean;
+}> = ({ row, rowRef, rule = true, showMovement = true }) => {
   const tone = row.isSelf ? A.AMBER : A.INK;
   return (
     <div
       ref={rowRef}
       style={{
         display: 'grid',
-        gridTemplateColumns: BOARD_GRID,
+        gridTemplateColumns: boardGrid(showMovement),
         gap: BOARD_GAP,
         alignItems: 'center',
         padding: '9px 0',
@@ -108,7 +138,19 @@ export const BoardRow: React.FC<{
         borderTop: rule ? `1px solid ${A.HAIRLINE}` : undefined,
       }}
     >
-      <span style={{ ...NUM, fontSize: 12.5, color: A.DIM, textAlign: 'center' }}>{row.rank}</span>
+      <span
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: showMovement ? 'space-between' : 'center',
+          gap: 6,
+        }}
+      >
+        {showMovement && (
+          <MovementCell delta={row.delta} rank30d={row.rank30d} theme="dark" size="figure" />
+        )}
+        <span style={{ ...NUM, fontSize: 12.5, color: A.DIM }}>{row.rank}</span>
+      </span>
       <BoardAvatar photoUrl={row.photoUrl} name={row.name} />
       <span
         style={{
@@ -124,11 +166,23 @@ export const BoardRow: React.FC<{
       >
         {row.name}
       </span>
-      <span style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <MovementCell delta={row.delta} rank30d={row.rank30d} theme="light" size="figure" />
-      </span>
-      <span style={{ ...NUM, fontSize: 16, color: tone, textAlign: 'right' }}>
-        {row.valueDisplay}
+      <span
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'flex-end',
+          gap: 6,
+          minWidth: 0,
+        }}
+      >
+        {row.gapDisplay ? (
+          <span style={{ ...NUM, fontSize: 11, fontWeight: 600, color: A.DIM }}>
+            {row.gapDisplay}
+          </span>
+        ) : null}
+        <span style={{ ...NUM, fontSize: 16, color: tone, textAlign: 'right' }}>
+          {row.valueDisplay}
+        </span>
       </span>
     </div>
   );
@@ -140,21 +194,36 @@ export const BoardHeaderRow: React.FC<{
   movementLabel: string;
   unitLabel: string;
   rankLabel: string;
-}> = ({ memberLabel, movementLabel, unitLabel, rankLabel }) => (
+  gapLabel?: string;
+  /** Board-level movement state. Must match the rows'. */
+  showMovement?: boolean;
+}> = ({ memberLabel, movementLabel, unitLabel, rankLabel, gapLabel, showMovement = true }) => (
   <div
     style={{
       display: 'grid',
-      gridTemplateColumns: BOARD_GRID,
+      gridTemplateColumns: boardGrid(showMovement),
       gap: BOARD_GAP,
       paddingBottom: 4,
       fontFamily: SANS,
     }}
   >
-    <span style={{ ...LABEL, textAlign: 'center' }}>{rankLabel}</span>
+    <span
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: showMovement ? 'space-between' : 'center',
+        gap: 6,
+      }}
+    >
+      {showMovement && <span style={LABEL}>{movementLabel}</span>}
+      <span style={LABEL}>{rankLabel}</span>
+    </span>
     <span />
     <span style={LABEL}>{memberLabel}</span>
-    <span style={{ ...LABEL, textAlign: 'right' }}>{movementLabel}</span>
-    <span style={{ ...LABEL, textAlign: 'right' }}>{unitLabel}</span>
+    <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 6 }}>
+      {gapLabel ? <span style={LABEL}>{gapLabel}</span> : null}
+      <span style={{ ...LABEL, textAlign: 'right' }}>{unitLabel}</span>
+    </span>
   </div>
 );
 

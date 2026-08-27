@@ -54,6 +54,7 @@ export const Top100MoversSheet: React.FC<Props> = ({
           </div>
           <div style={{ marginTop: 12, display: 'flex', justifyContent: 'center' }}>
             <ScopeSegment
+              tone="dark"
               value={range}
               ariaLabel={t('top100.movers.rangeA11y')}
               onChange={(next) => {

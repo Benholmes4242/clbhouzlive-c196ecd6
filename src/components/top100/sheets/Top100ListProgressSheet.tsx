@@ -130,6 +130,7 @@ export const Top100ListProgressSheet: React.FC<Props> = ({
           </div>
           <div style={{ marginTop: 12, display: 'flex', justifyContent: 'center' }}>
             <ScopeSegment
+              tone="dark"
               value={segment}
               ariaLabel={t('top100.listSheet.segmentA11y')}
               onChange={(next) => {

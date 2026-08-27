@@ -27,6 +27,12 @@ interface Props<T extends string> {
   ariaLabel?: string;
   /** Optional style overrides on the outer capsule (e.g. flexShrink). */
   style?: React.CSSProperties;
+  /**
+   * Palette. Default 'light' is deliberate: this control ships on at least one
+   * light surface by decision (the Discover Almanac's glass header), so the
+   * default must not be flipped. Dark call sites pass tone="dark" explicitly.
+   */
+  tone?: 'light' | 'dark';
 }
 
 export function ScopeSegment<T extends string>({
@@ -35,7 +41,14 @@ export function ScopeSegment<T extends string>({
   options,
   ariaLabel,
   style,
+  tone = 'light',
 }: Props<T>) {
+  const dark = tone === 'dark';
+  const capsuleBg = dark ? 'rgba(255,255,255,0.05)' : '#FFFFFF';
+  const capsuleBorder = dark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.08)';
+  const activeBg = dark ? '#FFFFFF' : '#15171F';
+  const activeInk = dark ? '#12141A' : '#FFFFFF';
+  const inactiveInk = dark ? 'rgba(255,255,255,0.56)' : 'rgba(15,23,42,0.55)';
   return (
     <div
       role="tablist"
@@ -45,8 +58,8 @@ export function ScopeSegment<T extends string>({
         display: 'inline-flex',
         gap: 2,
         padding: 2,
-        background: '#FFFFFF',
-        border: '1px solid rgba(15,23,42,0.08)',
+        background: capsuleBg,
+        border: capsuleBorder,
         borderRadius: 999,
         ...style,
       }}
@@ -66,12 +79,12 @@ export function ScopeSegment<T extends string>({
             style={{
               padding: '5px 11px',
               borderRadius: 999,
-              background: active ? '#15171F' : 'transparent',
-              color: active ? '#FFFFFF' : 'rgba(15,23,42,0.55)',
+              background: active ? activeBg : 'transparent',
+              color: active ? activeInk : inactiveInk,
               border: 'none',
               fontFamily: FONT,
               fontSize: 10.5,
-              fontWeight: 600,
+              fontWeight: active && dark ? 700 : 600,
               whiteSpace: 'nowrap',
               cursor: disabled ? 'not-allowed' : 'pointer',
               opacity: disabled ? 0.35 : 1,
