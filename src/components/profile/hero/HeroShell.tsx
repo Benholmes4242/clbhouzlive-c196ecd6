@@ -195,8 +195,11 @@ interface HeroShellProps {
   nameSuffix?: React.ReactNode;
   /** PHASE 5B §2 — a node, so the business hero can add its evidence line. */
   subline?: React.ReactNode;
-  /** Right-hand controls (EDIT / FOLLOW pill + glass circles). */
+  /** Right-hand controls in the identity row (EDIT / FOLLOW pill + glass circles). */
   action?: React.ReactNode;
+  /** Right-hand controls inside the headline block (e.g. business profile actions
+   *  aligned with the community rating). */
+  headlineAction?: React.ReactNode;
   headline?: HeroHeadline | null;
   counters: HeroCounter[];
   /** Two-cell counter sets read better centred than stretched. */
