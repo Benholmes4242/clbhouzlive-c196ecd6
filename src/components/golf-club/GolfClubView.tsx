@@ -3,7 +3,7 @@ import GlassHeaderPlate from '@/components/chrome/GlassHeaderPlate';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { ChevronLeft } from 'lucide-react';
+
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
@@ -212,24 +212,11 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           background: `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.20) 42%, rgba(0,0,0,0.62) 74%, ${A.CANVAS} 100%)`,
         }}
       />
-      {onClose && (
-        <button
-          onClick={onClose}
-          className="absolute left-4 flex h-[34px] w-[34px] items-center justify-center active:scale-95 transition-all z-10"
-          style={{
-            top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)',
-            borderRadius: '12px',
-            background: 'rgba(0, 0, 0, 0.28)',
-            backdropFilter: 'blur(22px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
-          }}
-          aria-label="Go back"
-        >
-          <ChevronLeft className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
-        </button>
-      )}
+      {/* Modal-path back chevron deleted (BRIEF_COURSES_CHROME_DARK): no caller
+          passes onClose — the sole caller is CourseDetailPage.tsx:53 with
+          isInModal={false} — so it was dead alongside the H3 FloatingPageHeader
+          removal. The routed page's only back affordance is the ChromeIsland. */}
+
       <CourseTitleOverlay
         course={course}
         courseStats={courseStats ?? null}

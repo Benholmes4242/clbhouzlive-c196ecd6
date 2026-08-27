@@ -192,19 +192,25 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: {
       chrome: 'island',
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/courses' },
-      tone: 'light',
+      tone: 'dark',
+      // bleed + scrollAway stay TRUE deliberately: this is a hero page, so the
+      // island floats over the course photograph and scrolls away rather than
+      // sitting on it. Precedent: the tour hero entries — /tourhub/tournament/
+      // and /tourhub/player/ (both bleed:true) and the tour overview.
       bleed: true,
       scrollAway: true,
     },
   },
 
-  // All courses sub-routes are page-owned today (isConditionallyExcluded).
-  // The detail page renders its own FloatingPageHeader; other sub-pages are
-  // similarly excluded from the global chrome.
+  // Deeper /courses/* subroutes (e.g. /courses/:id/reviews, /courses/:id/rate)
+  // are chrome:'none' and page-owned — each renders its own back affordance.
+  // The 3-segment detail route above is chrome:'island'. FloatingPageHeader was
+  // removed at H3 and is no longer part of this architecture.
   {
     match: { prefix: '/courses/' },
-    spec: { chrome: 'none', tone: 'light', bleed: true, note: 'all courses subroutes excluded today (isConditionallyExcluded); detail page owns FloatingPageHeader' },
+    spec: { chrome: 'none', tone: 'light', bleed: true, note: 'deeper courses subroutes are page-owned (own back affordance); detail page is island via the 3-segment rule above' },
   },
+
 
   // ── ISLAND routes ────────────────────────────────────────────────────────
   // Tour Hub deep pages (island + back arrow, editorial geometry).
@@ -289,7 +295,10 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/explore' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
 
   // Courses landing (editorial geometry; cinematic hero → glass overlay).
-  { match: { exact: '/courses' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+  // bleed + scrollAway stay TRUE deliberately: hero page, same as the tour hero
+  // entries (/tourhub overview, /tourhub/tournament/, /tourhub/player/).
+  { match: { exact: '/courses' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+
 
 
   // /community is deleted (BRIEF_DISCOVER_ONE_PAGE §3); the path now redirects
