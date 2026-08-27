@@ -151,6 +151,7 @@ export const BusinessProfileHero: React.FC<Props> = ({
       }
       subline={subline}
       action={action}
+      headlineAction={headlineAction}
       headline={
         showRating
           ? {
