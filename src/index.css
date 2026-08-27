@@ -791,8 +791,15 @@ html.lightbox-open {
   padding-top: var(--sat);
   /* NUKED: bottom safe area handled by GlobalBottomNavigation's hardcoded 55px paddingBottom */
   padding-bottom: 0;
-  padding-left: var(--sal);
-  padding-right: var(--sar);
+  /* Horizontal safe area: SYMMETRIC on purpose. Real devices (Android
+     hole-punch/curved panels, iOS in landscape, some webview wrappers) can
+     report a LEFT inset with a zero RIGHT inset. Paying each side its own
+     inset then shifted the whole page column to the right of the viewport
+     centre while position:fixed chrome (ChromeIsland, bottom nav) stayed
+     centred — the bug never reproduced in the desktop preview, where both
+     insets are 0. One value for both sides keeps the column centred. */
+  padding-left: max(var(--sal), var(--sar));
+  padding-right: max(var(--sal), var(--sar));
   
   /* Ensure background extends behind safe areas */
   background-color: #0d0d0d;
