@@ -129,10 +129,9 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
       <div
         style={{
           position: 'relative',
-          background: '#FFFFFF',
+          background: A.PANEL,
           borderRadius: 18,
           border: `1px solid ${HAIRLINE}`,
-          boxShadow: '0 1px 2px rgba(15,23,42,0.03)',
           overflow: 'hidden',
         }}
       >
