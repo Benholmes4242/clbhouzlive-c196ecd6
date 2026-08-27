@@ -93,7 +93,31 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
   const userInteractedRef = useRef(false);
   const landingAppliedRef = useRef(false);
 
+  // The active tab's expressable-slug predicate (S2.1). Null means nothing has
+  // registered — the overview expresses every slug, so everything is allowed.
+  const acceptRef = useRef<SlugPredicate | null>(null);
+  const [, setAcceptNonce] = useState(0);
+
+  const registerAcceptedSlugs = useCallback((predicate: SlugPredicate) => {
+    acceptRef.current = predicate;
+    setAcceptNonce((n) => n + 1);
+    return () => {
+      if (acceptRef.current === predicate) {
+        acceptRef.current = null;
+        setAcceptNonce((n) => n + 1);
+      }
+    };
+  }, []);
+
+  const isSlugAcceptable = useCallback((slug: string) => {
+    const fn = acceptRef.current;
+    return fn ? fn(slug) : true;
+  }, []);
+
   const selectTour = useCallback((slug: string, opts?: SelectTourOptions) => {
+    // S2.3 — never commit a slug the active page cannot express; the label is
+    // derived from selectedTourSlug, so committing one would make it lie.
+    if (acceptRef.current && !acceptRef.current(slug)) return;
     userInteractedRef.current = true;
     landingAppliedRef.current = true;
     writeStoredTour(slug);
@@ -142,6 +166,8 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
         setViewingTournamentId,
         viewingIsLive,
         setViewingIsLive,
+        registerAcceptedSlugs,
+        isSlugAcceptable,
       }}
 
     >
@@ -165,7 +191,8 @@ export function useTourSelection(): TourSelectionValue {
       setViewingTournamentId: () => {},
       viewingIsLive: false,
       setViewingIsLive: () => {},
-
+      registerAcceptedSlugs: () => () => {},
+      isSlugAcceptable: () => true,
     };
   }
   return ctx;
