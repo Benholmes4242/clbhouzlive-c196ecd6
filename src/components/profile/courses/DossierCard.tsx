@@ -10,7 +10,7 @@ import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 /**
  * DossierCard - scannable rated-course row.
  * Collapsed: rank + thumb + name + meta line + rating (+ Top 100 rank).
- * Expanded: 2x2 banded sub-score grid, scoring stat row (own profile only),
+ * Expanded: single-row sub-score stacks, scoring stat row (own profile only),
  * then the quiet actions. Tap the row to toggle; navigation via the actions.
  *
  * Scoring comes from a PAGE-LEVEL useUserAnalyticsCourses lookup passed in as
