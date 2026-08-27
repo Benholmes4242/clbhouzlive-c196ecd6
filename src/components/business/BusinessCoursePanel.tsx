@@ -175,14 +175,24 @@ export const BusinessCoursePanel: React.FC<BusinessCoursePanelProps> = ({
         </div>
       )}
 
-      {footLine && <p style={{ ...CAPTION, marginTop: 12 }}>{footLine}</p>}
+      <div
+        style={{
+          marginTop: 12,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: footLine ? 'space-between' : 'flex-end',
+          gap: 12,
+        }}
+      >
+        {footLine && <p style={{ ...CAPTION, margin: 0 }}>{footLine}</p>}
+        <Action
+          label={t('business.course.open')}
+          align="left"
+          onClick={() => onOpen(course.id, position)}
+          style={{ flexShrink: 0 }}
+        />
+      </div>
 
-      <Action
-        label={t('business.course.open')}
-        align="left"
-        onClick={() => onOpen(course.id, position)}
-        style={{ marginTop: 12 }}
-      />
     </Panel>
   );
 };
