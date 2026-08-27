@@ -45,6 +45,8 @@ function TourHubChromeBridge({
   onBack,
   menuOpen,
   setMenuOpen,
+  pickerOpen,
+  setPickerOpen,
 }: {
   activeTab: TourHubTab;
   onSelectTab: (tabId: string) => void;
@@ -55,15 +57,10 @@ function TourHubChromeBridge({
   onBack: () => void;
   menuOpen: boolean;
   setMenuOpen: (v: boolean) => void;
+  pickerOpen: boolean;
+  setPickerOpen: (v: boolean) => void;
 }) {
-  const [pickerOpen, setPickerOpen] = useState(false);
   const label = useTourShortLabel();
-  const isOverview = activeTab === 'overview';
-
-  // Auto-close the picker if the user leaves the overview tab while it is open.
-  useEffect(() => {
-    if (!isOverview && pickerOpen) setPickerOpen(false);
-  }, [isOverview, pickerOpen]);
 
   const slot = useMemo(
     () => (
@@ -73,13 +70,15 @@ function TourHubChromeBridge({
         onBackTap={onBack}
         onMenuTap={() => setMenuOpen(true)}
         onPickerTap={() => {
-          // Picker is scoped to the overview tab only.
-          if (isOverview) setPickerOpen(true);
+          /* The picker is NO LONGER scoped to the overview. The sub-pages used
+             to carry their own sticky tour-pills row; that row is gone, so the
+             island IS the tour control on every tour tab. */
+          setPickerOpen(true);
         }}
-        showPicker={isOverview}
+        showPicker
       />
     ),
-    [label, isOverview, backMode, onBack, setMenuOpen],
+    [label, backMode, onBack, setMenuOpen, setPickerOpen],
   );
   useSetChromeLeftSlot(slot);
 
@@ -97,9 +96,8 @@ function TourHubChromeBridge({
         onProfile={onProfile}
         onSignOut={onSignOut}
       />
-      {isOverview && (
-        <TourPickerSheet open={pickerOpen} onClose={() => setPickerOpen(false)} />
-      )}
+      <TourPickerSheet open={pickerOpen} onClose={() => setPickerOpen(false)} />
+
     </>
   );
 }
@@ -115,6 +113,9 @@ export function TourHubMainPage() {
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
   const [menuOpen, setMenuOpen] = useState(false);
+  /* Owned here, not in the bridge: the sub-page shell suppresses the island, so
+     its own header carries the picker trigger and needs the same state. */
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   useTournamentStatusRealtime();
 
@@ -204,6 +205,8 @@ export function TourHubMainPage() {
           onBack={() => safeGoBack(navigate, '/tourhub')}
           menuOpen={menuOpen}
           setMenuOpen={setMenuOpen}
+          pickerOpen={pickerOpen}
+          setPickerOpen={setPickerOpen}
         />
         {activeTab === 'overview' ? (
           <>

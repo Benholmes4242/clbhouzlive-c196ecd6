@@ -16,7 +16,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
-import { SectionTourLens } from '../overview/sections/SectionTourLens';
+import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 
 import { useLivePlayerIds } from '../players-v2/data/useLivePlayerIds';
@@ -131,6 +131,14 @@ export function LeadersTab() {
     });
   }, [categories, isLoading, isError, activeTour]);
 
+  /* The island's TourPickerSheet replaces the deleted pills row. This page's
+     lens had showAllTours={false} and ignored CHAMP, so the sheet's All-tours
+     row ('all'), 'major' and 'champ' are ignored here rather than substituted. */
+  useTourLensFromPicker<TourId>(
+    (slug) => (slug !== 'champ' && slug in TOUR_CONFIG ? (slug as TourId) : undefined),
+    setActiveTour,
+  );
+
   const closeCategory = useCallback(() => {
     setOpenKey(null);
     const p = new URLSearchParams(searchParams);
@@ -156,28 +164,8 @@ export function LeadersTab() {
       }}
     >
 
-      {/* Tour lens - sticky opaque wrapper; chips from SectionTourLens
-          (no All Tours; PGA default). CHAMP taps are ignored - no board
-          coverage for that tour. */}
-      <div
-        style={{
-          position: 'sticky',
-          top: 'var(--tour-header-h, 0px)',
-          zIndex: 10,
-          background: '#15171F',
-          borderBottom: '1px solid rgba(255,255,255,0.10)',
-        }}
-      >
-        <SectionTourLens
-          value={activeTour}
-          onChange={(t) => {
-            if (!t || t === 'champ') return;
-            setActiveTour(t);
-          }}
-          showAllTours={false}
-        />
-      </div>
-
+      {/* No tour-pills row: the island's left capsule owns the tour control
+          (BRIEF_TOUR_HEADER_ONE_ROW). CHAMP still has no board coverage. */}
 
       {/* Boards feed */}
       {isLoading ? (

@@ -17,7 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { SectionTourLens } from '../overview/sections/SectionTourLens';
+import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 
 import { tournamentRoute } from '../routes';
@@ -65,26 +65,18 @@ export function ScheduleTab() {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const chipsRef = useRef<HTMLDivElement | null>(null);
   const monthHeaderRef = useRef<HTMLDivElement | null>(null);
   const [anchorFar, setAnchorFar] = useState(false);
   const viewTrackedRef = useRef(false);
 
-  // Publish real chips-row outer height so month headers can stack flush.
+  // The sticky chips row is GONE (BRIEF_TOUR_HEADER_ONE_ROW): the tour control
+  // now lives in the island's left capsule. --tour-chips-h is still read by the
+  // month-header offset and the anchor scroll maths, and both readers carry a
+  // 47px fallback — so it must be written as 0, never left unset.
   useEffect(() => {
-    const el = chipsRef.current;
-    if (!el) return;
-    const publish = () => {
-      document.documentElement.style.setProperty(
-        '--tour-chips-h',
-        `${Math.round(el.offsetHeight)}px`,
-      );
-    };
-    publish();
-    const ro = new ResizeObserver(publish);
-    ro.observe(el);
-    return () => ro.disconnect();
+    document.documentElement.style.setProperty('--tour-chips-h', '0px');
   }, []);
+
 
   // Per-section tour lens (local state, All Tours allowed). Seeded ONCE from
   // ?tour= when it names a known tour; All Tours (null) stays the default.
@@ -250,6 +242,20 @@ export function ScheduleTab() {
     [tourLens],
   );
 
+  /* The island's TourPickerSheet replaces the deleted pills row. Mapping:
+     the sheet's All-tours row emits 'all', which is this page's `null` lens
+     (the merged schedule) — the same value the lens's All Tours chip passed.
+     'major' is not a schedule tour, so it is ignored rather than substituted. */
+  useTourLensFromPicker<TourId | null>(
+    (slug) => {
+      if (slug === 'all') return null;
+      if (Object.prototype.hasOwnProperty.call(TOUR_CONFIG, slug)) return slug as TourId;
+      return undefined;
+    },
+    onTourChange,
+  );
+
+
   // ── Header figures ─────────────────────────────────────────────────────
   const yearLabel = timeline?.seasonYear ?? new Date().getFullYear();
   const played = useMemo(
@@ -297,21 +303,11 @@ export function ScheduleTab() {
         position: 'relative',
       }}
     >
-      {/* Tour lens — sticky opaque wrapper preserves --tour-chips-h. */}
-      <div
-        ref={chipsRef}
-        style={{
-          position: 'sticky',
-          top: 'var(--tour-header-h, 0px)',
-          zIndex: 10,
-          background: '#15171F',
-          borderBottom: '1px solid rgba(255,255,255,0.10)',
-        }}
-      >
-        <SectionTourLens value={tourLens} onChange={onTourChange} showAllTours />
-      </div>
+      {/* No tour-pills row: the island's left capsule owns the tour control
+          (BRIEF_TOUR_HEADER_ONE_ROW). --tour-chips-h is written as 0 above. */}
 
-      {/* HEADER — scrolls under the chips row like any content. */}
+      {/* HEADER */}
+
       <div style={{ padding: '16px 16px 12px' }}>
         <div
           style={{

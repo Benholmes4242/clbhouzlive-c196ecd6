@@ -16,7 +16,7 @@ import { Search, X } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
-import { SectionTourLens } from '../overview/sections/SectionTourLens';
+import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
@@ -88,6 +88,16 @@ export function PlayersTab() {
   const changeTour = useCallback((next: PlayersTourId) => {
     setActiveTour(next);
   }, []);
+
+  /* The island's TourPickerSheet replaces the deleted pills row
+     (BRIEF_TOUR_HEADER_ONE_ROW). This page's lens had showAllTours={false} and
+     excluded 'champ', so the sheet's All-tours row ('all'), 'major' and
+     'champ' have no expression here and are ignored rather than substituted. */
+  useTourLensFromPicker<PlayersTourId>(
+    (slug) =>
+      slug !== 'champ' && slug in TOUR_CONFIG ? (slug as PlayersTourId) : undefined,
+    changeTour,
+  );
 
 
   // -- Search
@@ -230,14 +240,11 @@ export function PlayersTab() {
         >
           {!searchExpanded ? (
             <>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <SectionTourLens
-                  value={activeTour}
-                  onChange={(t) => t && t !== 'champ' && changeTour(t as PlayersTourId)}
-                  showAllTours={false}
-                  excludeTours={['champ']}
-                />
-              </div>
+              {/* Tour pills deleted (BRIEF_TOUR_HEADER_ONE_ROW): the island's
+                  left capsule owns the tour control. The search affordance
+                  STAYS - it is a within-page filter over the ranking rows,
+                  not the island's global search. */}
+              <div style={{ flex: 1, minWidth: 0 }} />
               {/* RADIUS/HEIGHT EXCEPTION (recorded — do not "correct" to 44).
                   The canon puts search bars at radius 14 / height 44. This
                   control sits in a 36px control row beside the SectionTourLens
