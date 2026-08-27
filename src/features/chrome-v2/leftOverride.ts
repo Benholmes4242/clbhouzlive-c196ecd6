@@ -90,13 +90,29 @@ export function useSetChromeLeftSlot(node: ReactNode | null): void {
 // publishes --header-h: 0, matching chrome:'none' semantics without a
 // registry flip. Pages toggle this for transient chrome takeover states
 // (e.g. Clubhouse's PGA "This Week" card).
+let suppressCount = 0;
 let currentSuppressed = false;
 const suppressSubs = new Set<(v: boolean) => void>();
 
+function publishSuppressed(): void {
+  const next = suppressCount > 0;
+  if (currentSuppressed === next) return;
+  currentSuppressed = next;
+  suppressSubs.forEach((s) => s(next));
+}
+
+/**
+ * Imperative escape hatch. Prefer useSetChromeSuppressed: this setter does not
+ * participate in the refcount, so a `false` here is only honoured while no
+ * component holds a claim.
+ */
 export function setChromeSuppressed(v: boolean): void {
-  if (currentSuppressed === v) return;
-  currentSuppressed = v;
-  suppressSubs.forEach((s) => s(v));
+  if (v) {
+    suppressCount += 1;
+  } else if (suppressCount > 0) {
+    suppressCount -= 1;
+  }
+  publishSuppressed();
 }
 
 export function useChromeSuppressed(): boolean {
@@ -111,10 +127,23 @@ export function useChromeSuppressed(): boolean {
   return v;
 }
 
-/** Set suppression for the lifetime + value of the calling component. */
+/**
+ * Set suppression for the lifetime + value of the calling component.
+ *
+ * REFCOUNTED ON PURPOSE: a plain boolean let two overlapping owners fight —
+ * the second one's unmount cleanup wrote `false` and the island reappeared on
+ * top of a shell that was still asking for it to be hidden (the tour sub-pages
+ * showed both the island and TourPageShell's header at once). Suppression now
+ * lifts only when the LAST claimant releases it.
+ */
 export function useSetChromeSuppressed(v: boolean): void {
   useEffect(() => {
-    setChromeSuppressed(v);
-    return () => setChromeSuppressed(false);
+    if (!v) return;
+    suppressCount += 1;
+    publishSuppressed();
+    return () => {
+      suppressCount = Math.max(0, suppressCount - 1);
+      publishSuppressed();
+    };
   }, [v]);
 }
