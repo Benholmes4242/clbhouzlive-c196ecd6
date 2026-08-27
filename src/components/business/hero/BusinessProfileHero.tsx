@@ -49,6 +49,7 @@ interface Props {
   followersCount?: number | null;
   postsCount?: number | null;
   action?: React.ReactNode;
+  headlineAction?: React.ReactNode;
   onAvatarTap?: () => void;
   onStatTap: (stat: BusinessHeroStat) => void;
   /** Multi-course clubs cannot resolve a single destination yet - inert. */
@@ -73,6 +74,7 @@ export const BusinessProfileHero: React.FC<Props> = ({
   followersCount,
   postsCount,
   action,
+  headlineAction,
   onAvatarTap,
   onStatTap,
   courseNavEnabled,
@@ -149,6 +151,7 @@ export const BusinessProfileHero: React.FC<Props> = ({
       }
       subline={subline}
       action={action}
+      headlineAction={headlineAction}
       headline={
         showRating
           ? {

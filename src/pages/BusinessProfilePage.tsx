@@ -418,7 +418,7 @@ const BusinessProfilePage: React.FC = () => {
             );
           }
         }}
-        action={
+        headlineAction={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {isOwner ? (
               <HeroPill label={t('business.hero.edit', 'Edit')} onClick={() => navigate(`/business/${business.id}/edit`)} />
