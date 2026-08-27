@@ -398,13 +398,12 @@ export function LeaderboardTab() {
     <div style={{ background: SURFACE, minHeight: '60vh', fontFamily: F }}>
       {/* MASTHEAD */}
       <div style={{ padding: '16px 16px 12px', background: SURFACE }}>
-        {/* TITLE ROW - heading in line with the search control. flex-start so
-            the icon tracks the FIRST line of a two-line title. */}
+        {/* LINE ONE - title, live round, search. Broadcast strip: the round
+            marker sits immediately right of the title. */}
         <div
           style={{
             display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
+            alignItems: 'center',
             gap: 10,
           }}
         >
@@ -414,15 +413,22 @@ export function LeaderboardTab() {
               flex: 1,
               minWidth: 0,
               fontFamily: F,
-              fontSize: 26,
+              fontSize: 22,
               fontWeight: 700,
               color: A.INK,
               letterSpacing: '-0.02em',
-              lineHeight: 1.1,
+              lineHeight: 1.12,
             }}
           >
             {meta?.name ?? selected.name}
           </h1>
+
+          {(metaStatus || currentRound != null) && (
+            <span style={{ flex: 'none' }}>
+              <LiveMarker status={metaStatus} currentRound={currentRound} />
+            </span>
+          )}
+
 
           <button
             type="button"
@@ -453,19 +459,31 @@ export function LeaderboardTab() {
           </button>
         </div>
 
-        {venueLine && (
+        {/* META LINE - one broadcast line, dot separated, MUTE ink, tabular.
+            ORDERING IS LOAD-BEARING: par and yards ALWAYS precede the field
+            average. The deleted stat tile used a FIXED grid rather than
+            space-around so PAR could not move horizontally between a
+            two-stat and a three-stat event one pill-tap apart; the same
+            hazard exists here because the field average appears and
+            disappears through the day. Keeping the volatile segment LAST
+            means nothing after it can shift.
+            These figures are NOT scores: they take MUTE ink, never a score
+            colour. */}
+        {metaSegments.length > 0 && (
           <div
             style={{
               marginTop: 5,
               fontFamily: F,
-              fontSize: 13.5,
+              fontSize: 12.5,
               fontWeight: 500,
               color: A.MUTE,
+              ...FIGS,
             }}
           >
-            {venueLine}
+            {metaSegments.join(' \u00B7 ')}
           </div>
         )}
+
 
         {/* SEARCH - its own full-width row; the masthead stays legible. */}
         {/* FIELD CANON paint + focus step. RADIUS EXCEPTION (8): compact
