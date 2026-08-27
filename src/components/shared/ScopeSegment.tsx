@@ -72,6 +72,7 @@ export function ScopeSegment<T extends string>({
             key={o.value}
             type="button"
             role="tab"
+            data-scope-tab="true"
             aria-selected={active}
             aria-disabled={disabled}
             disabled={disabled}
