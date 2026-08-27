@@ -68,6 +68,9 @@ export const FullCourseLeaderboardSheetDispatch: React.FC<Props> = ({
 
   const champion = rows[0] ?? null;
   const selfIsChampion = !!champion?.isSelf;
+  // §2.2 — board-level, once per render. Same rule as the inline panel.
+  const anyMovement = hasAnyMovement(rows);
+  const leaderValue = champion?.value ?? null;
 
   // Self-row visibility tracking for the jump pill.
   const scrollRef = useRef<HTMLDivElement | null>(null);

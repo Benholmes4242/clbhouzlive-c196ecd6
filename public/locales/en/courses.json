@@ -1801,6 +1801,7 @@
     "colRank": "#",
     "colMember": "Member",
     "col30d": "30d",
+    "colGap": "Gap",
     "noneYet": "None yet.",
     "jumpToYou": "Jump to you · #{{rank}}",
     "close": "Close",
