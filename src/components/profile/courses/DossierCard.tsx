@@ -69,10 +69,10 @@ const DossierCard: React.FC<DossierCardProps> = ({
   };
 
   const bars: { label: string; score: number | null }[] = [
-    { label: 'DESIGN', score: course.design_score },
-    { label: 'CONDITION', score: course.condition_score },
-    { label: 'CLUBHOUSE', score: course.clubhouse_score },
-    { label: 'FACILITIES', score: course.facilities_score },
+    { label: t('top100.stats.design'), score: course.design_score },
+    { label: t('top100.stats.condition'), score: course.condition_score },
+    { label: t('top100.stats.clubhouse'), score: course.clubhouse_score },
+    { label: t('top100.stats.facilities'), score: course.facilities_score },
   ];
 
   const where = [course.sub_country, course.country].filter(Boolean)[0] ?? null;
