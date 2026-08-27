@@ -126,8 +126,6 @@ function LiveMarker({
   );
 }
 
-}
-
 /** Minimum completed rounds before a field average means anything. */
 const FIELD_GATE = 20;
 
