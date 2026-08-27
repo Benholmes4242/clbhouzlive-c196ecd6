@@ -19,9 +19,9 @@ import { useSearchParams } from 'react-router-dom';
 import { formatTournamentDateRange } from '@/i18n/format';
 import { Search, X } from 'lucide-react';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
-import { useTourLeaderboard } from '../hooks/useTourHubData';
+import { useTourLeaderboard, useTourTeeTimesEnriched } from '../hooks/useTourHubData';
 import { useTournamentMeta } from './useTournamentMeta';
-import { BoardTable, BoardHeaderCells, boardGridTemplate, computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from './BoardTable';
+import { BoardTable, todayFromEntry, type BoardEntry, type CutState } from './BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from './ScorecardSheet';
 import { EditorialEmpty } from '../components/EditorialEmpty';
 import { tourPriorityIndex } from '../_shared/tourOrder';
@@ -235,6 +235,35 @@ export function LeaderboardTab() {
   const { data: meta } = useTournamentMeta(selected?.id ?? null);
   const { data: boardRaw, isLoading: boardLoading, isError: boardError, refetch: refetchBoard } = useTourLeaderboard(selected?.id ?? '');
 
+  // PRE-TOURNAMENT ONLY: the board carries no tee time, so R1 tee times come
+  // from the EXISTING enriched tee-times hook. Passing '' keeps the query
+  // disabled the moment anyone has posted a score, so live boards are unchanged.
+  const preTournament =
+    (boardRaw ?? []).length > 0 &&
+    (boardRaw ?? []).every(
+      (e: BoardEntry) =>
+        e.score == null &&
+        e.position == null &&
+        e.round_1 == null &&
+        e.round_2 == null &&
+        e.round_3 == null &&
+        e.round_4 == null,
+    );
+  const { data: teeTimeRows } = useTourTeeTimesEnriched(preTournament ? selected?.id ?? '' : '', 1);
+  const teeTimes = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const g of (teeTimeRows ?? []) as any[]) {
+      const label = g.tee_time
+        ? new Date(g.tee_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+        : '';
+      for (const p of g.players ?? []) {
+        const id = p.player?.id;
+        if (id && label) map[id] = label;
+      }
+    }
+    return map;
+  }, [teeTimeRows]);
+
   useEffect(() => {
     if (searchOpen) searchInputRef.current?.focus();
   }, [searchOpen]);
@@ -246,7 +275,7 @@ export function LeaderboardTab() {
   if (!selected) {
     if (liveError) {
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, paddingTop: 'calc(var(--sat, 0px) + 90px)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, paddingTop: 32 }}>
           <EditorialEmpty
             tint="slate"
             eyebrow={t('empty.leaderboard.error.eyebrow')}
@@ -339,7 +368,7 @@ export function LeaderboardTab() {
   const fieldRound = isLive ? currentRound : cutHasHappened ? currentRound : null;
   const field = fieldAverageToday(boardEntries, fieldRound);
 
-  const headerCols = computeBoardColumns(filteredEntries, currentRound);
+  // Column header is owned by BoardTable now (ONE grid definition).
 
 
   // Footnote: our thru column stores 0-18 integers only; no back-nine marker
@@ -357,7 +386,7 @@ export function LeaderboardTab() {
   };
 
   return (
-    <div style={{ background: SURFACE, minHeight: '60vh', fontFamily: F, paddingTop: 'calc(var(--sat, 0px) + 69px)' }}>
+    <div style={{ background: SURFACE, minHeight: '60vh', fontFamily: F }}>
       {/* MASTHEAD */}
       <div style={{ padding: '16px 16px 12px', background: SURFACE }}>
         {/* TITLE ROW - heading in line with the search control. flex-start so
@@ -559,7 +588,12 @@ export function LeaderboardTab() {
                   fontSize: 12.5,
                   fontWeight: 700,
                   color: active ? A.CANVAS : A.MUTE,
+                  // 2.9 — a pill never runs off screen. The full event name is
+                  // the page title directly above, so one line + ellipsis here.
                   whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: 190,
                 }}
                 aria-pressed={active}
                 aria-label={tt.name}
@@ -572,37 +606,9 @@ export function LeaderboardTab() {
       )}
 
 
-      {/* COLUMN HEADER (sticky) — SAME grid template as every body row. */}
-      <div
-        style={{
-          position: 'sticky',
-          top: 'var(--tour-header-h, 0px)',
-          zIndex: 2,
-          display: 'grid',
-          gridTemplateColumns: boardGridTemplate(headerCols),
-          gap: 8,
-          alignItems: 'center',
-          padding: '8px 16px',
-          background: SURFACE,
-          borderBottom: `1px solid ${HAIRLINE}`,
-          fontFamily: F,
-          // AXIS 10: sticky column headers (POS / PLAYER / TOT), matching the
-          // hero's markers. Tracking 0.08em -> 0.06em keeps TOT on one line in
-          // the 52px answer column at 320.
-          fontSize: 10,
-          fontWeight: 700,
-          letterSpacing: '0.06em',
-          color: SECONDARY,
-          textTransform: 'uppercase',
-        }}
-      >
-        <div style={{ whiteSpace: 'nowrap' }}>{t('board.columns.pos')}</div>
-        <div style={{ minWidth: 0, whiteSpace: 'nowrap' }}>{t('board.columns.player')}</div>
-        <BoardHeaderCells
-          columns={headerCols}
-          totLabel={t('board.columns.tot')}
-        />
-      </div>
+      {/* COLUMN HEADER — rendered by BoardTable itself, sticky under the
+          TourPageShell header, so header and rows share ONE grid definition. */}
+
 
 
       {/* BOARD */}
@@ -641,6 +647,9 @@ export function LeaderboardTab() {
           entries={filteredEntries}
           cutState={cutState}
           currentRound={currentRound}
+          headerTop={'var(--tour-header-h, 0px)'}
+          surface={SURFACE}
+          teeTimes={teeTimes}
           onRowClick={(row) => {
             if (!row.player?.id) return;
             setSheetTarget({
@@ -716,10 +725,13 @@ function LeaderboardSkeleton({ variant = 'board' }: { variant?: 'page' | 'board'
 
   if (variant === 'board') return rows;
 
-  // 'page': initial load before any event is selected — mirror the real
-  // chassis (sat+69 clearance, header block, column strip) above the rows.
+  // 'page': initial load before any event is selected — header block + column
+  // strip above the rows. NO safe-area clearance: TourPageShell owns the inset
+  // (TourPageShell.tsx:147 paddingTop, :149 minHeight) and its header is in
+  // normal flow, so paying it here would double the band. The skeleton must not
+  // reproduce it.
   return (
-    <div style={{ paddingTop: 'calc(var(--sat, 0px) + 69px)', background: SURFACE, minHeight: '100dvh' }}>
+    <div style={{ background: SURFACE, minHeight: '100dvh' }}>
       <div style={{ padding: '12px 16px 8px' }}>
         <Skeleton style={{ height: 10, width: 80, marginBottom: 10 }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
