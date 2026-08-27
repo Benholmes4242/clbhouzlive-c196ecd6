@@ -42,6 +42,13 @@ interface SelectTourOptions {
   tournamentId?: string;
 }
 
+/**
+ * The active tab registers what it can express (S2.1). The picker disables
+ * rows outside the set, and selectTour refuses to commit one, so the island
+ * label can never state a tour the page is not showing.
+ */
+export type SlugPredicate = (slug: string) => boolean;
+
 interface TourSelectionValue {
   selectedTourSlug: string | null;
   selectedTournamentId: string | null;
@@ -60,6 +67,10 @@ interface TourSelectionValue {
   /** Whether the hero's currently-viewed slide is a LIVE tournament. Display-only. */
   viewingIsLive: boolean;
   setViewingIsLive: (isLive: boolean) => void;
+  /** Register the active page's expressable-slug predicate; returns a cleanup. */
+  registerAcceptedSlugs: (predicate: SlugPredicate) => () => void;
+  /** True when no page has registered (overview) or the page accepts the slug. */
+  isSlugAcceptable: (slug: string) => boolean;
 }
 
 
