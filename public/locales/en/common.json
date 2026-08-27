@@ -270,7 +270,7 @@
   },
   "business": {
     "reach": {
-      "rated": "RATED",
+      "rated": "RATINGS",
       "ratedFrom": "from {{count}}",
       "rounds": "ROUNDS",
       "followers": "FOLLOWERS",
