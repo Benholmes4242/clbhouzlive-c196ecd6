@@ -357,15 +357,6 @@ export function LeaderboardTab() {
         ? { kind: 'projected', cutline: cutDisplay.cutline as number, extraCount: 0 }
         : { kind: 'none', cutline: null, extraCount: 0 };
 
-  const venueLine = [
-    meta?.venue_name ?? selected.venue_name,
-    [meta?.venue_city ?? selected.venue_city, meta?.venue_country ?? selected.venue_country]
-      .filter(Boolean)
-      .join(', ') || null,
-  ]
-    .filter(Boolean)
-    .join(' \u00B7 ');
-
   const par = meta?.venue_par ?? selected.venue_par;
   const yardage = meta?.venue_yardage ?? selected.venue_yardage;
   const dates = fmtDateRange(
@@ -376,6 +367,25 @@ export function LeaderboardTab() {
   // FIELD_GATE completed rounds. Absent below the gate (no provisional figure).
   const fieldRound = isLive ? currentRound : cutHasHappened ? currentRound : null;
   const field = fieldAverageToday(boardEntries, fieldRound);
+
+  // META LINE SEGMENTS. Absent value renders nothing, separator included.
+  // Order is fixed: par and yards before the field average (see the comment
+  // on the meta line for why the volatile segment must come last).
+  const venue = meta?.venue_name ?? selected.venue_name;
+  const city =
+    [meta?.venue_city ?? selected.venue_city, meta?.venue_country ?? selected.venue_country]
+      .filter(Boolean)
+      .join(', ') || null;
+  const metaSegments = [
+    venue || null,
+    city,
+    par != null ? t('tour.parValue', { par }) : null,
+    yardage != null ? t('tour.yardsValue', { yards: yardage.toLocaleString() }) : null,
+    field != null
+      ? t('tour.fieldInline', { v: fmtAvgToPar(field.avg), n: String(field.count) })
+      : null,
+  ].filter(Boolean) as string[];
+
 
   // Column header is owned by BoardTable now (ONE grid definition).
 
