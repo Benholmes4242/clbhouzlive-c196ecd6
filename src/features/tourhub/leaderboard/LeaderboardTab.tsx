@@ -443,13 +443,13 @@ export function LeaderboardTab() {
             aria-label={searchOpen ? t('board.search.closeAria') : t('board.search.openAria')}
             style={{
               flex: 'none',
-              marginTop: 4,
               background: 'none',
               border: 'none',
               padding: 4,
               cursor: 'pointer',
               display: 'flex',
             }}
+
           >
             {searchOpen ? (
               <X size={16} color={INK} strokeWidth={2.5} />
@@ -522,65 +522,13 @@ export function LeaderboardTab() {
           </div>
         )}
 
-        {/* META ROW - round state left, date range right. */}
-        {(metaStatus || currentRound != null || dates) && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-              marginTop: 10,
-            }}
-          >
-            {(metaStatus || currentRound != null) && (
-              <LiveMarker status={metaStatus} currentRound={currentRound} />
-            )}
-            {dates && <div style={{ ...LABEL, color: A.DIM, textAlign: 'right' }}>{dates}</div>}
-          </div>
-        )}
+        {/* The bordered par/yards stat tile and the separate round/date meta
+            row are deleted: the round moved onto line one and the figures
+            onto the meta line above. Dates dropped from the masthead - a
+            live board tells you it is live; they remain on the tournament
+            page and the schedule. To restore, append `dates` to
+            metaSegments. */}
 
-        {/* STAT ROW - par / yards / field average.
-            A FIXED GRID, never space-around: a two-stat event and a
-            three-stat event are one pill-tap apart, and PAR must not move
-            horizontally between them. Cells with no value are omitted and
-            the grid rebalances evenly. */}
-        {(par != null || yardage != null || field != null) && (
-          <div
-            style={{
-              marginTop: 12,
-              background: A.PANEL,
-              border: `1px solid ${A.BORDER}`,
-              borderRadius: 16,
-              padding: '18px 16px',
-              fontFamily: F,
-              ...FIGS,
-            }}
-          >
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: `repeat(${[par != null, yardage != null, field != null].filter(Boolean).length}, minmax(0,1fr))`,
-                alignItems: 'flex-start',
-                gap: 12,
-              }}
-            >
-              {par != null && <StatCell label={t('tour.par')} value={String(par)} />}
-              {yardage != null && (
-                <StatCell label={t('tour.yards')} value={yardage.toLocaleString()} />
-              )}
-              {field != null && (
-                <FieldTodayStat
-                  label={t('tour.fieldToday')}
-                  field={field}
-                  tournamentId={selected.id}
-                  round={fieldRound}
-                  subLabel={t('tour.fromNIn', { count: field.count, n: String(field.count) })}
-                />
-              )}
-            </div>
-          </div>
-        )}
 
 
       </div>
