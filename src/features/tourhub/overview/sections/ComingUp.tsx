@@ -168,7 +168,11 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
       if (w <= 0) return;
       const raw = el.scrollLeft / w;
       const lo = Math.max(0, Math.floor(raw));
-      const hi = Math.min(pages.length - 1, lo + 1);
+      // CORRECTION_BRIEF_COMING_UP_TRACK_HEIGHT: use ceil, not lo + 1.
+      // At rest raw is a whole number, so floor(raw) === ceil(raw) and the
+      // track height is the exact page height. During a swipe they straddle
+      // the boundary and Math.max prevents clipping the taller incoming page.
+      const hi = Math.min(pages.length - 1, Math.ceil(raw));
       const h = Math.max(heightsRef.current[lo] ?? 0, heightsRef.current[hi] ?? 0);
       if (h > 0) setTrackH(h);
       const idx = Math.round(raw);
@@ -189,7 +193,7 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
       const w = el?.clientWidth ?? 0;
       const raw = el && w > 0 ? el.scrollLeft / w : 0;
       const lo = Math.max(0, Math.floor(raw));
-      const hi = Math.min(pages.length - 1, lo + 1);
+      const hi = Math.min(pages.length - 1, Math.ceil(raw));
       const h = Math.max(heightsRef.current[lo] ?? 0, heightsRef.current[hi] ?? 0);
       if (h > 0) setTrackH(h);
     };
