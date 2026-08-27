@@ -3,14 +3,14 @@ import { Flag, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
-import { SubScoreBar } from '@/features/courses/_shared/scoreBands';
+import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
 import { A, SANS, LABEL, NUM, Action, StatRow, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
 /**
  * DossierCard - scannable rated-course row.
  * Collapsed: rank + thumb + name + meta line + rating (+ Top 100 rank).
- * Expanded: 2x2 banded sub-score grid, scoring stat row (own profile only),
+ * Expanded: single-row sub-score stacks, scoring stat row (own profile only),
  * then the quiet actions. Tap the row to toggle; navigation via the actions.
  *
  * Scoring comes from a PAGE-LEVEL useUserAnalyticsCourses lookup passed in as
@@ -69,10 +69,10 @@ const DossierCard: React.FC<DossierCardProps> = ({
   };
 
   const bars: { label: string; score: number | null }[] = [
-    { label: 'DESIGN', score: course.design_score },
-    { label: 'CONDITION', score: course.condition_score },
-    { label: 'CLUBHOUSE', score: course.clubhouse_score },
-    { label: 'FACILITIES', score: course.facilities_score },
+    { label: t('top100.stats.design'), score: course.design_score },
+    { label: t('top100.stats.condition'), score: course.condition_score },
+    { label: t('top100.stats.clubhouse'), score: course.clubhouse_score },
+    { label: t('top100.stats.facilities'), score: course.facilities_score },
   ];
 
   const where = [course.sub_country, course.country].filter(Boolean)[0] ?? null;
@@ -206,17 +206,10 @@ const DossierCard: React.FC<DossierCardProps> = ({
       {/* EXPANDED */}
       {expanded && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {/* Sub-scores - shared band scale */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              columnGap: 16,
-              rowGap: 10,
-            }}
-          >
+          {/* Sub-scores - shared band scale, single row like Courses page */}
+          <div style={{ display: 'flex', gap: 10 }}>
             {bars.map(({ label, score }) =>
-              score != null ? <SubScoreBar key={label} label={label} score={score} /> : null,
+              score != null ? <SubScoreStack key={label} label={label} score={score} /> : null,
             )}
           </div>
 
