@@ -169,7 +169,7 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
         <div
           style={{
             padding: '14px 16px 16px',
-            background: '#FFFFFF',
+            background: A.PANEL,
           }}
         >
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: INK_60, marginBottom: 6 }}>
