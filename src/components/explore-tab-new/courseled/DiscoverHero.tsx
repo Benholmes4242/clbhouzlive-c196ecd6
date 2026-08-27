@@ -255,7 +255,13 @@ export function DiscoverHero({
         </span>
       </div>
 
-      {/* THE CONTENT STACK, bottom-aligned: eyebrow, figure, sentence, member. */}
+      {/* THE CONTENT STACK, bottom-aligned: THREE BLOCKS ONLY
+          (BRIEF_DISCOVER_HERO_HIERARCHY) — eyebrow, headline row, and one
+          member-course-score row. THE SENTENCE IS GONE: the eyebrow named the
+          moment, the headline named it again and the sentence named it a third
+          time, so the only unseen facts (who, where) were last and smallest.
+          The run's hole span — the one detail the sentence carried that the
+          headline could not — is folded onto the headline as a qualifier. */}
       <div style={{ padding: '0 14px 18px', minWidth: 0 }}>
         {label && (
           <div
@@ -283,11 +289,26 @@ export function DiscoverHero({
 
         {/* THE LARGEST NUMERAL IN THE APP (§1.2). The noun keeps its placement
             from the ONE translatable template — before an IDENTITY, after a
-            QUANTITY — so a translator can still reorder. THE ROW HOLDS THE FIGURE
-            AND ITS NOUN AND NOTHING ELSE (BRIEF_DISCOVER_HERO_SCORE_AND_FILTER_ROW
-            §1.1): a gross total beside a count of holes put two numerals of
-            different KINDS on one line in one colour, and a hero states one claim. */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, minWidth: 0 }}>
+            QUANTITY — so a translator can still reorder.
+
+            THE SPAN IS RUN-ONLY (§2). roundMoment.ts carries facts.from and
+            facts.to on the RUN alone; birdie haul and strong finish carry count,
+            toPar and played and NO span. So the qualifier renders only when BOTH
+            bounds exist, and otherwise renders NOTHING — no separator, no
+            reserved width, and never an adjacent fact (`played`, `count`)
+            substituted in: a qualifier meaning a different thing per kind is
+            worse than no qualifier. It needs no locale key — an en dash between
+            two existing numbers. The row keeps flexWrap so a long noun plus a
+            span takes a second line rather than truncating. */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            flexWrap: 'wrap',
+            gap: 9,
+            minWidth: 0,
+          }}
+        >
           {parts.before && <span style={wordStyle}>{parts.before}</span>}
           <CountUpFigure
             value={figure}
@@ -302,154 +323,134 @@ export function DiscoverHero({
             }}
           />
           {parts.after && <span style={wordStyle}>{parts.after}</span>}
+          {moment.facts.from != null && moment.facts.to != null && (
+            <span
+              className="tabular-nums"
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                lineHeight: 1,
+                color: HERO_FAINT,
+              }}
+            >
+              {`${moment.facts.from}\u2013${moment.facts.to}`}
+            </span>
+          )}
         </div>
 
+        {/* ONE ROW CARRIES MEMBER, COURSE AND SCORE (§5). The member and their
+            course are a two-line stack on the left; the gross sits over the
+            to-par on the right, right-aligned and flex: none.
 
-        <div
-          style={{
-            marginTop: 9,
-            fontSize: 12.5,
-            fontWeight: 500,
-            lineHeight: 1.35,
-            color: DISCOVER_FACT,
-            display: '-webkit-box',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
-            overflow: 'hidden',
-          }}
-        >
-          {sentence}
-        </div>
-
-        {/* WHAT THE ROUND SCORED — a LABELLED TWO-UP (§1.2), the same
-            figure-over-label shape the tour surfaces use. TONE: the gross carries
-            figureColor, the ACHIEVEMENT's colour. THE QUALIFIER'S COLOUR IS A
-            FUNCTION OF WHAT THE MOMENT CLAIMS, NOT OF THE NUMBER'S SIGN (§1.4):
-            only when the moment is itself about the score (course record,
-            finished in the red) does the to-par carry the achievement colour.
-            Everywhere else — the run, birdie haul, strong finish, grind, eagle —
-            it is CONTEXT beside the claim and renders in the neutral fact tone.
-            Never inverted to red: a red +4 beside a green 9 would read as
-            criticism of a good round. BOTH LABELS ARE ALWAYS FAINT.
-            ABSENT IS ABSENT: neither value renders NOTHING — no block, no
-            marginTop, no reserved height, never a dash. ON A COURSE RECORD the
-            56px figure ALREADY IS the gross, so only TO PAR renders. */}
+            TONE: the gross carries figureColor, the ACHIEVEMENT's colour. THE
+            QUALIFIER'S COLOUR IS A FUNCTION OF WHAT THE MOMENT CLAIMS, NOT OF
+            THE NUMBER'S SIGN: only when the moment is itself about the score
+            (course record, finished in the red) does the to-par carry the
+            achievement colour. Everywhere else — the run, birdie haul, strong
+            finish, grind, eagle — it is CONTEXT beside the claim and renders in
+            the neutral fact tone. Never inverted to red: a red +4 beside a green
+            9 would read as criticism of a good round.
+            ABSENT IS ABSENT: neither value renders NO right-hand block and no
+            gap, never a dash. ON A COURSE RECORD the 56px figure ALREADY IS the
+            gross, so only the to-par renders. */}
         {(() => {
           const toPar = moment.facts.toPar;
           const showGross = row.gross != null && !isGrossScore;
           const showQual = toPar != null;
-          if (!showGross && !showQual) return null;
-
           const momentIsAboutScore = isGrossScore || moment.kind === 'finishedInRed';
-          const cell = (value: string, label: string, color: string) => (
-            <div key={label} style={{ minWidth: 0 }}>
-              <div
-                className="tabular-nums"
-                style={{
-                  fontSize: 19,
-                  fontWeight: 700,
-                  lineHeight: 1,
-                  letterSpacing: '-0.02em',
-                  color,
-                }}
-              >
-                {value}
-              </div>
-              <div
-                style={{
-                  marginTop: 5,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  lineHeight: 1,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  color: HERO_FAINT,
-                }}
-              >
-                {label}
-              </div>
-            </div>
-          );
 
           return (
-            <div style={{ display: 'flex', gap: 22, marginTop: 12 }}>
-              {showGross &&
-                cell(String(row.gross), t('scorecard.gross', 'GROSS'), figureColor)}
-              {showQual &&
-                cell(
-                  fmtRel(toPar as number),
-                  t('scorecard.toPar', 'TO PAR'),
-                  momentIsAboutScore ? figureColor : DISCOVER_FACT,
-                )}
+            <div
+              style={{
+                marginTop: 13,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                minWidth: 0,
+              }}
+            >
+              <SquircleAvatar
+                src={row.profile_photo_url}
+                userId={row.user_id}
+                alt={row.display_name}
+                size={26}
+                hairlineRing
+                ringColor={DARK_HAIRLINE}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13.5,
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    color: row.is_self ? '#F7931E' : DISCOVER_FACT,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {row.display_name}
+                </div>
+                {/* The course WRAPS to a second line rather than truncating: a
+                    clipped course name is a course the member cannot identify. */}
+                <div
+                  style={{
+                    marginTop: 3,
+                    minWidth: 0,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    lineHeight: 1.25,
+                    color: DISCOVER_QUIET,
+                    display: '-webkit-box',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 2,
+                    overflow: 'hidden',
+                  }}
+                >
+                  {courseName ??
+                    row.course_name ??
+                    t('discover.golfThisWeek.unknownCourse', 'A course')}
+                  {region ? ` \u00B7 ${region}` : ''}
+                </div>
+              </div>
+
+              {(showGross || showQual) && (
+                <div style={{ flex: 'none', textAlign: 'right' }}>
+                  {showGross && (
+                    <div
+                      className="tabular-nums"
+                      style={{
+                        fontSize: 17,
+                        fontWeight: 700,
+                        lineHeight: 1,
+                        letterSpacing: '-0.02em',
+                        color: figureColor,
+                      }}
+                    >
+                      {String(row.gross)}
+                    </div>
+                  )}
+                  {showQual && (
+                    <div
+                      className="tabular-nums"
+                      style={{
+                        marginTop: showGross ? 4 : 0,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        lineHeight: 1,
+                        color: momentIsAboutScore ? figureColor : DISCOVER_FACT,
+                      }}
+                    >
+                      {fmtRel(toPar as number)}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })()}
-
-
-        {/* THE MEMBER AND THEIR AVATAR ON ROW ONE, THE COURSE ON ROW TWO
-            (BRIEF_DISCOVER_ONE_PAGE §1). Sharing one row cost the course most of
-            its width, and the first thing to go was the parenthetical — which is
-            the ONLY thing separating East from West at the same club. A line
-            break, not a restyle: every size, weight and colour is unchanged. */}
-        <div
-          style={{
-            marginTop: 13,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            minWidth: 0,
-          }}
-        >
-          <SquircleAvatar
-            src={row.profile_photo_url}
-            userId={row.user_id}
-            alt={row.display_name}
-            size={24}
-            hairlineRing
-            ringColor={DARK_HAIRLINE}
-          />
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 700,
-              lineHeight: 1.2,
-              color: row.is_self ? '#F7931E' : DISCOVER_FACT,
-              flexShrink: 1,
-              minWidth: 0,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {row.display_name}
-          </span>
-        </div>
-
-        {/* ROW TWO — the course and its region, ALONE (§1.1). No flex wrapper for
-            a single child and nothing to right-align against: the score is a
-            labelled two-up above the member row now. The text wraps to a second
-            line rather than truncating: a clipped course name is a course the
-            member cannot identify. */}
-
-        <div
-          style={{
-            marginTop: 4,
-            minWidth: 0,
-            fontSize: 12,
-            fontWeight: 600,
-            lineHeight: 1.25,
-            color: DISCOVER_QUIET,
-            display: '-webkit-box',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
-            overflow: 'hidden',
-          }}
-        >
-          {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
-          {region ? ` \u00B7 ${region}` : ''}
-        </div>
-
       </div>
+
     </div>
   );
 }
