@@ -237,6 +237,7 @@ function HolesSheet({
 
           <div style={{ marginTop: 10 }}>
             <ScopeSegment
+              tone="dark"
               value={round}
               onChange={(v) => setRound(v as RoundKey)}
               options={roundOptions}
