@@ -529,7 +529,7 @@ export function LeaderboardTab() {
             alignItems: 'center',
             gap: 8,
             overflowX: 'auto',
-            padding: '4px 16px 12px',
+            padding: '10px 16px 12px',
             background: SURFACE,
           }}
         >
@@ -545,10 +545,10 @@ export function LeaderboardTab() {
                   background: active ? A.INK : A.PANEL,
                   border: active ? '1px solid transparent' : `1px solid ${A.BORDER}`,
                   borderRadius: 999,
-                  padding: '9px 15px',
+                  padding: '6px 12px',
                   cursor: 'pointer',
                   fontFamily: F,
-                  fontSize: 12.5,
+                  fontSize: 12,
                   fontWeight: 700,
                   color: active ? A.CANVAS : A.MUTE,
                   // 2.9 — a pill never runs off screen. The full event name is
