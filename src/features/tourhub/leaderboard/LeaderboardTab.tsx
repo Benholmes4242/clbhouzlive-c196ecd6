@@ -147,47 +147,17 @@ function fmtAvgToPar(v: number): string {
   return 'E';
 }
 
-function StatCell({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-}) {
-  return (
-    <div style={{ textAlign: 'center', minWidth: 0 }}>
-      <div style={{ ...LABEL }}>{label}</div>
-      <div
-        style={{
-          marginTop: 7,
-          fontFamily: F,
-          fontSize: 22,
-          fontWeight: 700,
-          letterSpacing: '-0.025em',
-          color: A.INK,
-          ...FIGS,
-        }}
-      >
-        {value}
-      </div>
-      {sub && <div style={{ ...LABEL, marginTop: 4 }}>{sub}</div>}
-    </div>
-  );
-}
-
-/** Only mounted when a field average exists, so the effect is the evidence. */
-function FieldTodayStat({
-  label,
-  field,
-  subLabel,
+/**
+ * Renders nothing. Only mounted when a field average exists, so the mount is
+ * the evidence for the analytics ping. Replaces the deleted FieldTodayStat /
+ * StatCell pair, which died with the bordered stat tile.
+ */
+function FieldAverageTracker({
+  count,
   tournamentId,
   round,
 }: {
-  label: string;
-  field: FieldAverage;
-  subLabel: string;
+  count: number;
   tournamentId: string;
   round: number | null;
 }) {
@@ -195,12 +165,12 @@ function FieldTodayStat({
     analyticsEvents.track('tour_field_average_shown', {
       tournament_id: tournamentId,
       round,
-      completed_count: field.count,
+      completed_count: count,
     });
-  }, [tournamentId, round, field.count]);
-
-  return <StatCell label={label} value={fmtAvgToPar(field.avg)} sub={subLabel} />;
+  }, [tournamentId, round, count]);
+  return null;
 }
+
 
 
 
