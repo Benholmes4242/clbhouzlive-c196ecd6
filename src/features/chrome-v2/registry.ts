@@ -208,7 +208,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // removed at H3 and is no longer part of this architecture.
   {
     match: { prefix: '/courses/' },
-    spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'deeper courses subroutes are page-owned (own back affordance); detail page is island via the 3-segment rule above' },
+    spec: { chrome: 'none', tone: 'light', bleed: true, note: 'deeper courses subroutes are page-owned (own back affordance); detail page is island via the 3-segment rule above' },
   },
 
 
