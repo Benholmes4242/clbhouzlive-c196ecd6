@@ -83,7 +83,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
   const { data: heroSlides } = useHeroCarouselData();
   const { data: cache } = useTournamentsCache();
   const activeMajor = useActiveMensMajor();
-  const { selectedTourSlug, selectTour, viewingTourSlug, viewingTournamentId } = useTourSelection();
+  const { selectedTourSlug, selectTour, viewingTourSlug, viewingTournamentId, isSlugAcceptable } = useTourSelection();
   const { t } = useTranslation('tourhub');
 
   const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
@@ -145,12 +145,16 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
         <button
           key="all"
           type="button"
+          disabled={!isSlugAcceptable('all')}
           onClick={() => {
             selectTour('all');
             onClose();
           }}
           aria-pressed={activeTourSlug === 'all'}
           style={{
+            /* S2.2 — a row the active page cannot express is DIMMED, never
+               hidden: a picker whose contents change per tab reads as broken. */
+            opacity: isSlugAcceptable('all') ? 1 : 0.35,
             width: '100%',
             display: 'flex',
             alignItems: 'center',
@@ -192,6 +196,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
           <button
             key="major"
             type="button"
+            disabled={!isSlugAcceptable('major')}
             onClick={() => {
               selectTour('major');
               onClose();
@@ -204,6 +209,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
               gap: 12,
               padding: '12px 16px',
               background: isMajorActive ? GOLD_TINT_18 : GOLD_TINT_10,
+              opacity: isSlugAcceptable('major') ? 1 : 0.35,
               border: 'none',
               borderBottom: `0.5px solid ${INK_TINT_07}`,
               cursor: 'pointer',
@@ -323,6 +329,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
               <button
                 key={`${slug}:${tournament.id}`}
                 type="button"
+                disabled={!isSlugAcceptable(slug)}
                 onClick={() => {
                   selectTour(slug, { tournamentId: tournament.id });
                   onClose();
@@ -335,9 +342,10 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                   gap: 12,
                   padding: '12px 16px',
                   background: isActive ? AMBER_TINT_04 : 'transparent',
+                  opacity: isSlugAcceptable(slug) ? 1 : 0.35,
                   border: 'none',
                   borderBottom: `0.5px solid ${INK_TINT_07}`,
-                  cursor: 'pointer',
+                  cursor: isSlugAcceptable(slug) ? 'pointer' : 'default',
                   textAlign: 'left',
                   fontFamily: FONT,
                 }}
