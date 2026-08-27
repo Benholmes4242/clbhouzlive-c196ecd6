@@ -431,7 +431,7 @@ export function ScheduleTab() {
                     ref={attachRef ? monthHeaderRef : undefined}
                     style={{
                       position: 'sticky',
-                      top: 'calc(var(--tour-header-h, 0px) + var(--tour-chips-h, 47px) - 1px)',
+                      top: 'calc(var(--tour-header-h, 0px) + var(--tour-chips-h, 0px) - 1px)',
                       zIndex: 2,
                       background: SLATE_50,
                       padding: '14px 16px 6px',
