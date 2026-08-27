@@ -187,6 +187,10 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   const eyebrow = `LEADERBOARD · ${windowLabel}`;
 
   // Chase line + status pill
+  /* One condition for the jump pill: it gates both the pill itself and the
+     scroller's bottom padding that keeps rows out from under it. */
+  const pillMounted = selfOffscreen != null && selfRank != null && !defending;
+
   const opponentValue = defending
     ? (runnerUp?.value ?? champion?.value ?? 0)
     : (selfRow?.value ?? champion?.value ?? 0);
