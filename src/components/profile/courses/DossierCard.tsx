@@ -3,7 +3,7 @@ import { Flag, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
-import { SubScoreBar } from '@/features/courses/_shared/scoreBands';
+import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
 import { A, SANS, LABEL, NUM, Action, StatRow, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
