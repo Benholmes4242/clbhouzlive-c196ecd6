@@ -49,6 +49,7 @@ interface Props {
   followersCount?: number | null;
   postsCount?: number | null;
   action?: React.ReactNode;
+  headlineAction?: React.ReactNode;
   onAvatarTap?: () => void;
   onStatTap: (stat: BusinessHeroStat) => void;
   /** Multi-course clubs cannot resolve a single destination yet - inert. */
