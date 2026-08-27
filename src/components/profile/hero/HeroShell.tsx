@@ -379,56 +379,7 @@ export const HeroShell: React.FC<HeroShellProps> = ({
         {/* Headline figure. Omitted entirely when the surface has none - the
             counter strip simply moves up. */}
         {headline && (
-          <button
-            type="button"
-            onClick={headline.onTap}
-            disabled={!headline.onTap}
-            aria-label={headline.ariaLabel ?? headline.label}
-            style={{
-              display: 'block',
-              width: '100%',
-              marginTop: 18,
-              padding: 0,
-              background: 'transparent',
-              border: 'none',
-              textAlign: 'left',
-              color: 'inherit',
-              fontFamily: SANS,
-              cursor: headline.onTap ? 'pointer' : 'default',
-              transition: 'opacity 120ms ease',
-            }}
-            onPointerDown={(e) => { e.currentTarget.style.opacity = '0.72'; }}
-            onPointerUp={(e) => { e.currentTarget.style.opacity = '1'; }}
-            onPointerLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
-          >
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: W_45,
-              }}
-            >
-              {headline.label}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, marginTop: 4 }}>
-              <span
-                style={{
-                  fontSize: 40,
-                  fontWeight: 700,
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1,
-                  color: headline.color ?? '#FFFFFF',
-                  ...FIGS,
-                }}
-              >
-                {headline.value}
-              </span>
-              {headline.aside}
-            </div>
-            {headline.below}
-          </button>
+          <HeadlineBlock headline={headline} headlineAction={headlineAction} />
         )}
 
         {/* Counter strip */}
