@@ -183,6 +183,83 @@ export const HeroCell: React.FC<{
   );
 };
 
+const HeadlineBlock: React.FC<{
+  headline: HeroHeadline;
+  headlineAction?: React.ReactNode;
+}> = ({ headline, headlineAction }) => {
+  const content = (
+    <>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 10,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: W_45,
+          }}
+        >
+          {headline.label}
+        </div>
+        {headlineAction}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, marginTop: 4 }}>
+        <span
+          style={{
+            fontSize: 40,
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+            lineHeight: 1,
+            color: headline.color ?? '#FFFFFF',
+            ...FIGS,
+          }}
+        >
+          {headline.value}
+        </span>
+        {headline.aside}
+      </div>
+      {headline.below}
+    </>
+  );
+
+  const style = {
+    display: 'block',
+    width: '100%',
+    marginTop: 18,
+    padding: 0,
+    background: 'transparent',
+    border: 'none',
+    textAlign: 'left',
+    color: 'inherit',
+    fontFamily: SANS,
+    cursor: headline.onTap ? 'pointer' : 'default',
+    transition: 'opacity 120ms ease',
+  } as const;
+
+  return headline.onTap ? (
+    <button
+      type="button"
+      onClick={headline.onTap}
+      aria-label={headline.ariaLabel ?? headline.label}
+      style={style}
+      onPointerDown={(e) => { e.currentTarget.style.opacity = '0.72'; }}
+      onPointerUp={(e) => { e.currentTarget.style.opacity = '1'; }}
+      onPointerLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+    >
+      {content}
+    </button>
+  ) : (
+    <div style={style}>{content}</div>
+  );
+};
+
 interface HeroShellProps {
   /** Resolved cover image; the shell handles the broken-image fallback. */
   coverUrl?: string | null;
