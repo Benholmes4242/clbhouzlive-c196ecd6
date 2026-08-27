@@ -6,7 +6,7 @@ import { SheetHeader } from '@/components/ui/SheetHeader';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   ChampionsListRow,
-  CHAMPS_GRID_FULL,
+  champsGrid,
   CHAMPS_GRID_GAP_FULL,
   CHAMPS_ROW_PADDING_X,
   CHAMPS_COL_30D_FULL,
@@ -133,6 +133,17 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
 
   // Rows in the scrollable list = everything except the pinned champion.
   const listRows = activeRows.slice(1);
+
+  /* MOVEMENT COLLAPSE. Computed over the WHOLE rendered set - champion row
+     included - so the pinned banner, the header and the scrolling list share
+     one grid. New entrants (rank30d == null) carry the NEW badge and do not
+     count as movement. All-time gross / score-diff / stableford boards never
+     move, so the column disappears rather than printing a dash on every row. */
+  const anyMovement = useMemo(
+    () => activeRows.some((r) => r.rank30d != null && r.delta != null && r.delta !== 0),
+    [activeRows],
+  );
+  const GRID = champsGrid(false, anyMovement);
 
   const listRef = useRef<HTMLDivElement>(null);
   const selfRowRef = useRef<HTMLDivElement>(null);
@@ -354,7 +365,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: CHAMPS_GRID_FULL,
+              gridTemplateColumns: GRID,
               gap: CHAMPS_GRID_GAP_FULL,
               alignItems: 'center',
               padding: `12px ${CHAMPS_ROW_PADDING_X}px`,
@@ -404,15 +415,17 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                 {championHoldDuration ? `${championHoldDuration} · Champion` : 'Champion'}
               </div>
             </div>
-            {/* 30D column */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <MovementCell
-                delta={champion.delta}
-                rank30d={champion.rank30d}
-                theme={theme}
-                size="row"
-              />
-            </div>
+            {/* 30D column — omitted with the rest of the set when nothing moved */}
+            {anyMovement && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <MovementCell
+                  delta={champion.delta}
+                  rank30d={champion.rank30d}
+                  theme={theme}
+                  size="row"
+                />
+              </div>
+            )}
             {/* SCORE column — centered under the header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div
@@ -437,7 +450,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: CHAMPS_GRID_FULL,
+              gridTemplateColumns: GRID,
               gap: CHAMPS_GRID_GAP_FULL,
               alignItems: 'center',
               padding: `10px ${CHAMPS_ROW_PADDING_X}px 6px`,
@@ -450,18 +463,20 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             <span />
             <span />
             <span />
-            <span
-              style={{
-                textAlign: 'center',
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: INK_55,
-              }}
-            >
-              30D
-            </span>
+            {anyMovement && (
+              <span
+                style={{
+                  textAlign: 'center',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: INK_55,
+                }}
+              >
+                30D
+              </span>
+            )}
             <span
               style={{
                 textAlign: 'center',
@@ -490,6 +505,13 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             minHeight: 0,
             overflowY: 'auto',
             padding: '8px 0 0',
+            /* PAY FOR THE JUMP PILL. It floats absolutely at bottom
+               calc(14px + safe-area) over this scroller and would otherwise
+               cover the last rows' subline. 36px pill + 14px offset + 10px
+               breathing room, applied only while the pill is mounted. */
+            paddingBottom: pillMounted
+              ? 'calc(60px + env(safe-area-inset-bottom, 0px))'
+              : undefined,
             WebkitOverflowScrolling: 'touch',
             background: SURFACE,
             scrollbarWidth: 'none',
@@ -540,12 +562,17 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                     unitLabel={activeDescriptor?.unit ?? ''}
                     isSelf={row.isSelf}
                     isChampion={false}
+                    /* SUBLINE by design: "-2 from champion". The inline duel
+                       board (_shared/boardParts.tsx) shows this same gap as a
+                       column paired with the score, because that five-row panel
+                       has no room for the word "champion". */
                     gapToChampion={formatGapFromChampion(activeCategory, row.value, championRow.value)}
                     holdDuration={null}
                     isNew={daysSince(row.attained_at) < NEW_BADGE_DAYS}
                     theme={theme}
                     rank30d={row.rank30d}
                     delta={row.delta}
+                    showMovement={anyMovement}
                   />
                 </div>
               );
@@ -570,7 +597,7 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
             </div>
           )}
         </div>
-        {selfOffscreen && selfRank != null && !defending && (
+        {pillMounted && (
           <button
             type="button"
             onClick={jumpToSelf}
