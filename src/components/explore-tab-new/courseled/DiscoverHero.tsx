@@ -15,7 +15,7 @@ import {
   fmtRel,
   momentFigureParts,
   momentLabel,
-  momentSentence,
+  
   type TFn,
 } from './GolfThisWeek';
 
@@ -144,7 +144,10 @@ export function DiscoverHero({
   const { row, moment, courseName, region, imageUrl } = subject;
 
   const label = momentLabel(moment, t as TFn);
-  const sentence = momentSentence(moment, t as TFn);
+  /* THE SENTENCE IS NOT RENDERED HERE ANY MORE (§3). momentSentence and the
+     sentenceKey machinery stay in roundMoment.ts — the round tiles below still
+     consume them. Only the hero stops rendering it. */
+
   const parts = momentFigureParts(moment, t as TFn);
 
   const isScore = moment.figureRole === 'score' && moment.figure != null;
