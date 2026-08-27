@@ -108,8 +108,11 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
         >
           Pick a college
         </div>
-        {/* SEARCH FIELD — canonical twin of CollegeHubPage.tsx's hub search
-            field. The two are the same construction; change one, change both.
+        {/* SEARCH FIELD — twin of CollegeHubPage.tsx's hub search field in
+            CONSTRUCTION AND PAINT ONLY. The twinning no longer covers HEIGHT:
+            the hub field moved into the header row (which already pays 44) and
+            returned to canon, while this one stays 34. Change the construction
+            in both; do NOT copy the hub's height back here.
             Glyph is white, NOT amber: amber means the viewing member, and a
             magnifier is not the member. Contrast TugStat (compare/), where
             amber IS correct because it marks the winning school.
@@ -117,9 +120,9 @@ export function PickerSheet({ open, onClose, target, standings, otherSlug }: Pro
             canon is radius 14 / height 44. Radius is 14 here; height stays 34
             because this sits in the sheet header (padding '8px 16px 12px')
             above a scrolling list, and 44 would deepen the header and cost a
-            row of results. Fifth recorded exception — after the OTP boxes, the
-            Reviews control row, the Players control row and the hub field —
-            all constrained by neighbours rather than preference. */}
+            row of results. Fourth recorded exception — after the OTP boxes,
+            the Reviews control row and the Players control row (the hub field
+            is no longer one) — all constrained by neighbours. */}
         <div style={{ position: 'relative' }}>
           <Search
             size={13}
