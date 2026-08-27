@@ -555,21 +555,26 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
             position: 'relative',
           }}
         >
-          <button
-            type="button"
-            onClick={() => setSearchOpen(true)}
-            aria-label="Search"
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-            }}
-          >
-            <Search size={14} color={inkFor(tone)} strokeWidth={2.4} />
-          </button>
+          {/* Search cell — hidden on routes whose page owns a search field in
+              the left capsule (spec.hideSearch). No divider belongs to it, so
+              nothing is stranded when it goes. */}
+          {!spec.hideSearch && (
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              <Search size={14} color={inkFor(tone)} strokeWidth={2.4} />
+            </button>
+          )}
 
           {/* HcpCell renders its own leading divider so the rule can never be
               stranded when the chip is hidden. */}
