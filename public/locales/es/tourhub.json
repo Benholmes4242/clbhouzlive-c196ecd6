@@ -865,5 +865,10 @@
         "strokesGained": "Strokes Gained"
       }
     }
+  },
+  "tour": {
+    "parValue": "Par {{par}}",
+    "yardsValue": "{{yards}} yds",
+    "fieldInline": "Campo {{v}} de {{n}}"
   }
 }

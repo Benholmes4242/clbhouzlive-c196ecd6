@@ -94,7 +94,7 @@ function LiveMarker({
     : t('tour.roundUpcoming', { n: currentRound ?? 1 });
 
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
       {live && (
         <span
           aria-hidden
@@ -108,7 +108,20 @@ function LiveMarker({
           }}
         />
       )}
-      <span style={{ ...LABEL, color: live ? A.INK : A.DIM }}>{text}</span>
+      {/* 12/800 tabular - sits on line one beside the h1. */}
+      <span
+        style={{
+          fontFamily: F,
+          fontSize: 12,
+          fontWeight: 800,
+          letterSpacing: '0.01em',
+          whiteSpace: 'nowrap',
+          color: live ? A.INK : A.DIM,
+          ...FIGS,
+        }}
+      >
+        {text}
+      </span>
     </span>
   );
 }
@@ -147,47 +160,17 @@ function fmtAvgToPar(v: number): string {
   return 'E';
 }
 
-function StatCell({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-}) {
-  return (
-    <div style={{ textAlign: 'center', minWidth: 0 }}>
-      <div style={{ ...LABEL }}>{label}</div>
-      <div
-        style={{
-          marginTop: 7,
-          fontFamily: F,
-          fontSize: 22,
-          fontWeight: 700,
-          letterSpacing: '-0.025em',
-          color: A.INK,
-          ...FIGS,
-        }}
-      >
-        {value}
-      </div>
-      {sub && <div style={{ ...LABEL, marginTop: 4 }}>{sub}</div>}
-    </div>
-  );
-}
-
-/** Only mounted when a field average exists, so the effect is the evidence. */
-function FieldTodayStat({
-  label,
-  field,
-  subLabel,
+/**
+ * Renders nothing. Only mounted when a field average exists, so the mount is
+ * the evidence for the analytics ping. Replaces the deleted FieldTodayStat /
+ * StatCell pair, which died with the bordered stat tile.
+ */
+function FieldAverageTracker({
+  count,
   tournamentId,
   round,
 }: {
-  label: string;
-  field: FieldAverage;
-  subLabel: string;
+  count: number;
   tournamentId: string;
   round: number | null;
 }) {
@@ -195,12 +178,12 @@ function FieldTodayStat({
     analyticsEvents.track('tour_field_average_shown', {
       tournament_id: tournamentId,
       round,
-      completed_count: field.count,
+      completed_count: count,
     });
-  }, [tournamentId, round, field.count]);
-
-  return <StatCell label={label} value={fmtAvgToPar(field.avg)} sub={subLabel} />;
+  }, [tournamentId, round, count]);
+  return null;
 }
+
 
 
 
@@ -357,15 +340,6 @@ export function LeaderboardTab() {
         ? { kind: 'projected', cutline: cutDisplay.cutline as number, extraCount: 0 }
         : { kind: 'none', cutline: null, extraCount: 0 };
 
-  const venueLine = [
-    meta?.venue_name ?? selected.venue_name,
-    [meta?.venue_city ?? selected.venue_city, meta?.venue_country ?? selected.venue_country]
-      .filter(Boolean)
-      .join(', ') || null,
-  ]
-    .filter(Boolean)
-    .join(' \u00B7 ');
-
   const par = meta?.venue_par ?? selected.venue_par;
   const yardage = meta?.venue_yardage ?? selected.venue_yardage;
   const dates = fmtDateRange(
@@ -376,6 +350,25 @@ export function LeaderboardTab() {
   // FIELD_GATE completed rounds. Absent below the gate (no provisional figure).
   const fieldRound = isLive ? currentRound : cutHasHappened ? currentRound : null;
   const field = fieldAverageToday(boardEntries, fieldRound);
+
+  // META LINE SEGMENTS. Absent value renders nothing, separator included.
+  // Order is fixed: par and yards before the field average (see the comment
+  // on the meta line for why the volatile segment must come last).
+  const venue = meta?.venue_name ?? selected.venue_name;
+  const city =
+    [meta?.venue_city ?? selected.venue_city, meta?.venue_country ?? selected.venue_country]
+      .filter(Boolean)
+      .join(', ') || null;
+  const metaSegments = [
+    venue || null,
+    city,
+    par != null ? t('tour.parValue', { par }) : null,
+    yardage != null ? t('tour.yardsValue', { yards: yardage.toLocaleString() }) : null,
+    field != null
+      ? t('tour.fieldInline', { v: fmtAvgToPar(field.avg), n: String(field.count) })
+      : null,
+  ].filter(Boolean) as string[];
+
 
   // Column header is owned by BoardTable now (ONE grid definition).
 
@@ -398,13 +391,12 @@ export function LeaderboardTab() {
     <div style={{ background: SURFACE, minHeight: '60vh', fontFamily: F }}>
       {/* MASTHEAD */}
       <div style={{ padding: '16px 16px 12px', background: SURFACE }}>
-        {/* TITLE ROW - heading in line with the search control. flex-start so
-            the icon tracks the FIRST line of a two-line title. */}
+        {/* LINE ONE - title, live round, search. Broadcast strip: the round
+            marker sits immediately right of the title. */}
         <div
           style={{
             display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
+            alignItems: 'center',
             gap: 10,
           }}
         >
@@ -414,15 +406,22 @@ export function LeaderboardTab() {
               flex: 1,
               minWidth: 0,
               fontFamily: F,
-              fontSize: 26,
+              fontSize: 22,
               fontWeight: 700,
               color: A.INK,
               letterSpacing: '-0.02em',
-              lineHeight: 1.1,
+              lineHeight: 1.12,
             }}
           >
             {meta?.name ?? selected.name}
           </h1>
+
+          {(metaStatus || currentRound != null) && (
+            <span style={{ flex: 'none' }}>
+              <LiveMarker status={metaStatus} currentRound={currentRound} />
+            </span>
+          )}
+
 
           <button
             type="button"
@@ -437,13 +436,13 @@ export function LeaderboardTab() {
             aria-label={searchOpen ? t('board.search.closeAria') : t('board.search.openAria')}
             style={{
               flex: 'none',
-              marginTop: 4,
               background: 'none',
               border: 'none',
               padding: 4,
               cursor: 'pointer',
               display: 'flex',
             }}
+
           >
             {searchOpen ? (
               <X size={16} color={INK} strokeWidth={2.5} />
@@ -453,19 +452,39 @@ export function LeaderboardTab() {
           </button>
         </div>
 
-        {venueLine && (
+        {/* META LINE - one broadcast line, dot separated, MUTE ink, tabular.
+            ORDERING IS LOAD-BEARING: par and yards ALWAYS precede the field
+            average. The deleted stat tile used a FIXED grid rather than
+            space-around so PAR could not move horizontally between a
+            two-stat and a three-stat event one pill-tap apart; the same
+            hazard exists here because the field average appears and
+            disappears through the day. Keeping the volatile segment LAST
+            means nothing after it can shift.
+            These figures are NOT scores: they take MUTE ink, never a score
+            colour. */}
+        {metaSegments.length > 0 && (
           <div
             style={{
               marginTop: 5,
               fontFamily: F,
-              fontSize: 13.5,
+              fontSize: 12.5,
               fontWeight: 500,
               color: A.MUTE,
+              ...FIGS,
             }}
           >
-            {venueLine}
+            {metaSegments.join(' \u00B7 ')}
           </div>
         )}
+        {field != null && (
+          <FieldAverageTracker
+            count={field.count}
+            tournamentId={selected.id}
+            round={fieldRound}
+          />
+        )}
+
+
 
         {/* SEARCH - its own full-width row; the masthead stays legible. */}
         {/* FIELD CANON paint + focus step. RADIUS EXCEPTION (8): compact
@@ -504,65 +523,13 @@ export function LeaderboardTab() {
           </div>
         )}
 
-        {/* META ROW - round state left, date range right. */}
-        {(metaStatus || currentRound != null || dates) && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-              marginTop: 10,
-            }}
-          >
-            {(metaStatus || currentRound != null) && (
-              <LiveMarker status={metaStatus} currentRound={currentRound} />
-            )}
-            {dates && <div style={{ ...LABEL, color: A.DIM, textAlign: 'right' }}>{dates}</div>}
-          </div>
-        )}
+        {/* The bordered par/yards stat tile and the separate round/date meta
+            row are deleted: the round moved onto line one and the figures
+            onto the meta line above. Dates dropped from the masthead - a
+            live board tells you it is live; they remain on the tournament
+            page and the schedule. To restore, append `dates` to
+            metaSegments. */}
 
-        {/* STAT ROW - par / yards / field average.
-            A FIXED GRID, never space-around: a two-stat event and a
-            three-stat event are one pill-tap apart, and PAR must not move
-            horizontally between them. Cells with no value are omitted and
-            the grid rebalances evenly. */}
-        {(par != null || yardage != null || field != null) && (
-          <div
-            style={{
-              marginTop: 12,
-              background: A.PANEL,
-              border: `1px solid ${A.BORDER}`,
-              borderRadius: 16,
-              padding: '18px 16px',
-              fontFamily: F,
-              ...FIGS,
-            }}
-          >
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: `repeat(${[par != null, yardage != null, field != null].filter(Boolean).length}, minmax(0,1fr))`,
-                alignItems: 'flex-start',
-                gap: 12,
-              }}
-            >
-              {par != null && <StatCell label={t('tour.par')} value={String(par)} />}
-              {yardage != null && (
-                <StatCell label={t('tour.yards')} value={yardage.toLocaleString()} />
-              )}
-              {field != null && (
-                <FieldTodayStat
-                  label={t('tour.fieldToday')}
-                  field={field}
-                  tournamentId={selected.id}
-                  round={fieldRound}
-                  subLabel={t('tour.fromNIn', { count: field.count, n: String(field.count) })}
-                />
-              )}
-            </div>
-          </div>
-        )}
 
 
       </div>
@@ -575,7 +542,7 @@ export function LeaderboardTab() {
             alignItems: 'center',
             gap: 8,
             overflowX: 'auto',
-            padding: '4px 16px 12px',
+            padding: '10px 16px 12px',
             background: SURFACE,
           }}
         >
@@ -591,10 +558,10 @@ export function LeaderboardTab() {
                   background: active ? A.INK : A.PANEL,
                   border: active ? '1px solid transparent' : `1px solid ${A.BORDER}`,
                   borderRadius: 999,
-                  padding: '9px 15px',
+                  padding: '6px 12px',
                   cursor: 'pointer',
                   fontFamily: F,
-                  fontSize: 12.5,
+                  fontSize: 12,
                   fontWeight: 700,
                   color: active ? A.CANVAS : A.MUTE,
                   // 2.9 — a pill never runs off screen. The full event name is

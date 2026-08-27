@@ -850,5 +850,10 @@
         "strokesGained": "[~~Šţřőǩéš Ĝáíñéđ~~]"
       }
     }
+  },
+  "tour": {
+    "parValue": "[Par {{par}}]",
+    "yardsValue": "[{{yards}} yds]",
+    "fieldInline": "[Field {{v}} from {{n}}]"
   }
 }
