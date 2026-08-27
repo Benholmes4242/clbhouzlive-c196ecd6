@@ -227,6 +227,15 @@ export const HeroShell: React.FC<HeroShellProps> = ({
         background: HERO_GROUND,
         marginTop: 0,
         padding: '0 16px 16px',
+        /* The hero pays ONE horizontal inset on both sides and nothing inside
+           it may escape that box: an over-wide identity row (long club name +
+           badge + FOLLOW + overflow control) used to push its controls past
+           the right padding, which read as an asymmetric page. Clipping here
+           keeps the left and right gaps identical at every width. */
+        boxSizing: 'border-box',
+        width: '100%',
+        maxWidth: '100%',
+        overflow: 'hidden',
         /* MINIMUM top inset - it clears the status bar and ChromeIsland and
            still does under bottom-anchoring: `justify-content: flex-end`
            packs content against the padding box's BOTTOM edge and can only
