@@ -23,14 +23,23 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { FIELD_REST_BG } from '@/lib/tokens/field';
 
-const INK = '#0F172A';
-const INK_60 = '#64748B';
-const INK_45 = '#94A3B8';
-const HAIRLINE = 'rgba(15,23,42,0.08)';
-const NEUTRAL_BG = 'rgba(15,23,42,0.04)';
-const NEUTRAL_BORDER = 'rgba(15,23,42,0.10)';
-const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+/**
+ * DARK-ONLY (BRIEF_CONNECT_GHOST_PROMPT_DARK). The local light palette that
+ * used to live here painted a white card around the already-dark
+ * ChampionsHonoursBoard, making holder names near-white on white. The shared
+ * analytical tokens are consumed here, never forked.
+ */
+const INK = A.INK;
+const INK_60 = A.MUTE;
+const INK_45 = A.DIM;
+const HAIRLINE = A.BORDER;
+/** Faint WHITE fill: an ink alpha over a dark panel darkens, it cannot lighten. */
+const NEUTRAL_BG = FIELD_REST_BG;
+const NEUTRAL_BORDER = A.BORDER;
+const FONT = SANS;
 
 export type ConnectGhostSurface = 'holes' | 'about' | 'profile' | 'champions';
 
