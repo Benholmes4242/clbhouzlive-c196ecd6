@@ -97,6 +97,7 @@ export function PlayersTab() {
     (slug) =>
       slug !== 'champ' && slug in TOUR_CONFIG ? (slug as PlayersTourId) : undefined,
     changeTour,
+    activeTour,
   );
 
 

@@ -67,6 +67,14 @@ interface TourSelectionValue {
   /** Whether the hero's currently-viewed slide is a LIVE tournament. Display-only. */
   viewingIsLive: boolean;
   setViewingIsLive: (isLive: boolean) => void;
+  /**
+   * The tour the surface currently on screen is ACTUALLY showing (published by
+   * the active tab via useTourLensFromPicker). Null when no page publishes —
+   * the overview, which is driven BY selectedTourSlug and has nothing separate
+   * to report. Label hooks read this FIRST so the capsule reports the list.
+   */
+  appliedTourSlug: string | null;
+  setAppliedTourSlug: (slug: string | null) => void;
   /** Register the active page's expressable-slug predicate; returns a cleanup. */
   registerAcceptedSlugs: (predicate: SlugPredicate) => () => void;
   /** True when no page has registered (overview) or the page accepts the slug. */
@@ -86,6 +94,7 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
   const [viewingTourSlug, setViewingTourSlugState] = useState<string | null>(null);
   const [viewingTournamentId, setViewingTournamentIdState] = useState<string | null>(null);
   const [viewingIsLive, setViewingIsLiveState] = useState<boolean>(false);
+  const [appliedTourSlug, setAppliedTourSlugState] = useState<string | null>(null);
 
 
   // Guards for the land-time override — runs at most once per session, and
@@ -117,6 +126,9 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
   const selectTour = useCallback((slug: string, opts?: SelectTourOptions) => {
     // S2.3 — never commit a slug the active page cannot express; the label is
     // derived from selectedTourSlug, so committing one would make it lie.
+    // This guard and appliedTourSlug are the two halves of ONE rule: this stops
+    // the label LEADING the list, appliedTourSlug stops it LAGGING. Neither
+    // replaces the other.
     if (acceptRef.current && !acceptRef.current(slug)) return;
     userInteractedRef.current = true;
     landingAppliedRef.current = true;
@@ -147,6 +159,10 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
     setViewingTournamentIdState((prev) => (prev === id ? prev : id));
   }, []);
 
+  const setAppliedTourSlug = useCallback((slug: string | null) => {
+    setAppliedTourSlugState((prev) => (prev === slug ? prev : slug));
+  }, []);
+
   const setViewingIsLive = useCallback((isLive: boolean) => {
     setViewingIsLiveState((prev) => (prev === isLive ? prev : isLive));
   }, []);
@@ -166,6 +182,8 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
         setViewingTournamentId,
         viewingIsLive,
         setViewingIsLive,
+        appliedTourSlug,
+        setAppliedTourSlug,
         registerAcceptedSlugs,
         isSlugAcceptable,
       }}
@@ -191,6 +209,8 @@ export function useTourSelection(): TourSelectionValue {
       setViewingTournamentId: () => {},
       viewingIsLive: false,
       setViewingIsLive: () => {},
+      appliedTourSlug: null,
+      setAppliedTourSlug: () => {},
       registerAcceptedSlugs: () => () => {},
       isSlugAcceptable: () => true,
     };

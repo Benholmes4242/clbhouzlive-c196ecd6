@@ -255,6 +255,7 @@ export function ScheduleTab() {
       return undefined;
     },
     onTourChange,
+    tourLens ?? 'all',
   );
 
 

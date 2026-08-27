@@ -137,6 +137,7 @@ export function LeadersTab() {
   useTourLensFromPicker<TourId>(
     (slug) => (slug !== 'champ' && slug in TOUR_CONFIG ? (slug as TourId) : undefined),
     setActiveTour,
+    activeTour,
   );
 
   const closeCategory = useCallback(() => {
