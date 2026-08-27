@@ -137,7 +137,15 @@ export function ReviewReceipt({
     >
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {/* Hero */}
-        <div style={{ padding: '34px 20px 22px', textAlign: 'center' }}>
+        <div
+          style={{
+            /* Notch Safety: clear the island band (safe-area + 62px island
+             * row) so the hero never slides under the chrome. */
+            padding:
+              'calc(max(env(safe-area-inset-top, 0px), var(--sat, 0px)) + 62px + 16px) 20px 22px',
+            textAlign: 'center',
+          }}
+        >
           <div
             style={{
               /* READ floor — a kicker is language. 10 -> 11. */
