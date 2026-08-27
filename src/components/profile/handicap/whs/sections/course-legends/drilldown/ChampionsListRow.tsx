@@ -20,6 +20,19 @@ export const CHAMPS_COL_SCORE_COMPACT = 48;
 export const CHAMPS_GRID_FULL = `24px 40px 1fr ${CHAMPS_COL_30D_FULL}px ${CHAMPS_COL_SCORE_FULL}px`;
 export const CHAMPS_GRID_COMPACT = `18px 32px 1fr ${CHAMPS_COL_30D_COMPACT}px ${CHAMPS_COL_SCORE_COMPACT}px`;
 export const CHAMPS_GRID_GAP_FULL = 14;
+/**
+ * Grid template with an OPTIONAL movement track. When a board's whole rendered
+ * set has no 30d movement (every row a dash), the column collapses entirely -
+ * no header label, no reserved width. Header, champion banner and list rows
+ * must all be built from this one function or they fall out of alignment.
+ */
+export function champsGrid(compact: boolean, withMovement: boolean): string {
+  const rank = compact ? '18px' : '24px';
+  const avatar = compact ? '32px' : '40px';
+  const mv = compact ? CHAMPS_COL_30D_COMPACT : CHAMPS_COL_30D_FULL;
+  const score = compact ? CHAMPS_COL_SCORE_COMPACT : CHAMPS_COL_SCORE_FULL;
+  return `${rank} ${avatar} 1fr ${withMovement ? `${mv}px ` : ''}${score}px`;
+}
 export const CHAMPS_GRID_GAP_COMPACT = 12;
 export const CHAMPS_ROW_PADDING_X = 16;
 
@@ -45,6 +58,8 @@ interface ChampionsListRowProps {
   /** 30-day movement inputs. delta is null when rank_30d is null (NEW). */
   rank30d?: number | null;
   delta?: number | null;
+  /** False collapses the 30d movement column (track + cell) for the whole set. */
+  showMovement?: boolean;
 }
 
 
@@ -65,6 +80,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
   theme = 'dark',
   rank30d,
   delta,
+  showMovement = true,
 }) => {
   const { t } = useTranslation('courses');
   const isLight = theme === 'light';
@@ -113,6 +129,10 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
      test is numeric, not a compare against either literal. */
   const gapIsZero = gapToChampion != null && Number.parseFloat(gapToChampion) === 0;
 
+  /* SUBLINE, NOT A COLUMN. The inline duel board (_shared/boardParts.tsx)
+     prints the same gap as a paired figure beside the score because it has no
+     room for the word "champion". This full-width list does, so it keeps the
+     sentence. Deliberate divergence, not drift. */
   const subText = isChampion
     ? holdDuration
     : gapIsZero
@@ -130,7 +150,7 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
       style={{
         position: 'relative',
         display: 'grid',
-        gridTemplateColumns: compact ? CHAMPS_GRID_COMPACT : CHAMPS_GRID_FULL,
+        gridTemplateColumns: champsGrid(compact, showMovement),
         gap: compact ? CHAMPS_GRID_GAP_COMPACT : CHAMPS_GRID_GAP_FULL,
         alignItems: 'center',
         padding: `${padY} ${CHAMPS_ROW_PADDING_X}px`,
@@ -189,10 +209,12 @@ export const ChampionsListRow: React.FC<ChampionsListRowProps> = ({
         </div>
       </div>
 
-      {/* 30D column — fixed width, centered */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <MovementCell delta={delta} rank30d={rank30d} theme={theme} size={compact ? 'chip' : 'row'} />
-      </div>
+      {/* 30D column — fixed width, centered. Omitted when the set has no movement. */}
+      {showMovement && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <MovementCell delta={delta} rank30d={rank30d} theme={theme} size={compact ? 'chip' : 'row'} />
+        </div>
+      )}
 
       {/* SCORE column — fixed width, centered */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
