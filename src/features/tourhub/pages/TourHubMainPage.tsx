@@ -72,13 +72,16 @@ function TourHubChromeBridge({
         onPickerTap={() => {
           /* The picker is NO LONGER scoped to the overview. The sub-pages used
              to carry their own sticky tour-pills row; that row is gone, so the
-             island IS the tour control on every tour tab. */
+             island IS the tour control on every tour tab EXCEPT the live
+             leaderboard, which is deliberately cross-tour (concurrent events on
+             several tours at once) and uses its tournament pills as its own
+             selector. A tour label there would state something false. */
           setPickerOpen(true);
         }}
-        showPicker
+        showPicker={activeTab !== 'live'}
       />
     ),
-    [label, backMode, onBack, setMenuOpen, setPickerOpen],
+    [label, backMode, onBack, setMenuOpen, setPickerOpen, activeTab],
   );
   useSetChromeLeftSlot(slot);
 
@@ -269,7 +272,11 @@ export function TourHubMainPage() {
             title={tabTitle}
             onBack={() => handleSelectTab('overview')}
             backFallback="/tourhub"
-            leftAccessory={<TourPickerTrigger onTap={() => setPickerOpen(true)} />}
+            leftAccessory={
+              activeTab === 'live'
+                ? undefined
+                : <TourPickerTrigger onTap={() => setPickerOpen(true)} />
+            }
             right={
               <button
                 type="button"

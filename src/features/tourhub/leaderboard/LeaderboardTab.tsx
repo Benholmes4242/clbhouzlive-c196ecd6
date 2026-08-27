@@ -54,10 +54,19 @@ function fmtDateRange(start: string | null, end: string | null): string | null {
  * field on sr_tournaments and this deliberately invents no abbreviations.
  */
 function shortEventName(name: string): string {
-  let s = (name || '').trim();
-  s = s.replace(/\s+(presented|driven|sponsored)\s+by\s+.*$/i, '');
-  s = s.replace(/\s+Championship$/i, '');
-  return s.trim() || name;
+  const original = (name || '').trim();
+  // The "presented/driven/sponsored by" clause never produces a stub, so it is
+  // stripped unconditionally.
+  const base = original.replace(/\s+(presented|driven|sponsored)\s+by\s+.*$/i, '').trim();
+  const stripped = base.replace(/\s+Championship$/i, '').trim();
+  if (!stripped) return base || original;
+  // S3.1 — THE FLOOR. Dropping " Championship" from "FM Championship" leaves
+  // "FM", which reads as a rendering fault rather than an event. Reject the
+  // strip and keep the fuller name when the result is a single token or under
+  // six characters.
+  const tokens = stripped.split(/\s+/);
+  if (tokens.length < 2 || stripped.length < 6) return base || original;
+  return stripped;
 }
 
 

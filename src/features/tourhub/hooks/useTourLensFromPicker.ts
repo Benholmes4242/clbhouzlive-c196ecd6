@@ -20,11 +20,19 @@ export function useTourLensFromPicker<T>(
   accept: (slug: string) => T | undefined,
   apply: (value: T) => void,
 ): void {
-  const { selectedTourSlug, selectionNonce } = useTourSelection();
+  const { selectedTourSlug, selectionNonce, registerAcceptedSlugs } = useTourSelection();
   const acceptRef = useRef(accept);
   const applyRef = useRef(apply);
   acceptRef.current = accept;
   applyRef.current = apply;
+
+  // S2.1 — register what this page can express so the picker can disable the
+  // rest and selectTour can refuse to commit one. The `accept`-returns-
+  // undefined path below is now a BACKSTOP for a page that forgets to register.
+  useEffect(
+    () => registerAcceptedSlugs((slug) => acceptRef.current(slug) !== undefined),
+    [registerAcceptedSlugs],
+  );
 
   useEffect(() => {
     if (!selectedTourSlug) return;

@@ -42,6 +42,13 @@ interface SelectTourOptions {
   tournamentId?: string;
 }
 
+/**
+ * The active tab registers what it can express (S2.1). The picker disables
+ * rows outside the set, and selectTour refuses to commit one, so the island
+ * label can never state a tour the page is not showing.
+ */
+export type SlugPredicate = (slug: string) => boolean;
+
 interface TourSelectionValue {
   selectedTourSlug: string | null;
   selectedTournamentId: string | null;
@@ -60,6 +67,10 @@ interface TourSelectionValue {
   /** Whether the hero's currently-viewed slide is a LIVE tournament. Display-only. */
   viewingIsLive: boolean;
   setViewingIsLive: (isLive: boolean) => void;
+  /** Register the active page's expressable-slug predicate; returns a cleanup. */
+  registerAcceptedSlugs: (predicate: SlugPredicate) => () => void;
+  /** True when no page has registered (overview) or the page accepts the slug. */
+  isSlugAcceptable: (slug: string) => boolean;
 }
 
 
@@ -82,7 +93,31 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
   const userInteractedRef = useRef(false);
   const landingAppliedRef = useRef(false);
 
+  // The active tab's expressable-slug predicate (S2.1). Null means nothing has
+  // registered — the overview expresses every slug, so everything is allowed.
+  const acceptRef = useRef<SlugPredicate | null>(null);
+  const [, setAcceptNonce] = useState(0);
+
+  const registerAcceptedSlugs = useCallback((predicate: SlugPredicate) => {
+    acceptRef.current = predicate;
+    setAcceptNonce((n) => n + 1);
+    return () => {
+      if (acceptRef.current === predicate) {
+        acceptRef.current = null;
+        setAcceptNonce((n) => n + 1);
+      }
+    };
+  }, []);
+
+  const isSlugAcceptable = useCallback((slug: string) => {
+    const fn = acceptRef.current;
+    return fn ? fn(slug) : true;
+  }, []);
+
   const selectTour = useCallback((slug: string, opts?: SelectTourOptions) => {
+    // S2.3 — never commit a slug the active page cannot express; the label is
+    // derived from selectedTourSlug, so committing one would make it lie.
+    if (acceptRef.current && !acceptRef.current(slug)) return;
     userInteractedRef.current = true;
     landingAppliedRef.current = true;
     writeStoredTour(slug);
@@ -131,6 +166,8 @@ export function TourSelectionProvider({ children }: { children: ReactNode }) {
         setViewingTournamentId,
         viewingIsLive,
         setViewingIsLive,
+        registerAcceptedSlugs,
+        isSlugAcceptable,
       }}
 
     >
@@ -154,7 +191,8 @@ export function useTourSelection(): TourSelectionValue {
       setViewingTournamentId: () => {},
       viewingIsLive: false,
       setViewingIsLive: () => {},
-
+      registerAcceptedSlugs: () => () => {},
+      isSlugAcceptable: () => true,
     };
   }
   return ctx;

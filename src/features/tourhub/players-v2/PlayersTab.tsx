@@ -219,76 +219,48 @@ export function PlayersTab() {
         fontFamily: FONT,
       }}
     >
-      {/* Tour lens + search - single sticky row. Pills scroll under a pinned
-          search button; expanding search hides the pills and fills the row. */}
+      {/* S4 — the search magnifier no longer owns a header row of its own; it
+          sits inline with the field/sort row below, matching LeaderboardTab's
+          treatment (icon in line with the page title, expand to input). */}
+      {/* THE FIELD. The kicker is the only amber on this page: there is no
+          viewing member on a tour surface, so nothing else earns brand colour.
+          With the stat lens present the pills need a full scrollable row of
+          their own; with two pills they stay inline beside the kicker. */}
       <div
         style={{
-          position: 'sticky',
-          top: 'var(--tour-header-h, 0px)',
-          zIndex: 10,
-          background: '#15171F',
-          borderBottom: '1px solid rgba(255,255,255,0.10)',
+          padding: '12px 16px 4px',
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
         }}
       >
-        <div
+        <span
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            paddingRight: 16,
+            // AXIS 10: THE FIELD / RANKING header row - a column header, same
+            // call as the hero's TODAY/TOTAL/THRU.
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            color: INK,
+            textTransform: 'uppercase',
           }}
         >
-          {!searchExpanded ? (
-            <>
-              {/* Tour pills deleted (BRIEF_TOUR_HEADER_ONE_ROW): the island's
-                  left capsule owns the tour control. The search affordance
-                  STAYS - it is a within-page filter over the ranking rows,
-                  not the island's global search. */}
-              <div style={{ flex: 1, minWidth: 0 }} />
-              {/* RADIUS/HEIGHT EXCEPTION (recorded — do not "correct" to 44).
-                  The canon puts search bars at radius 14 / height 44. This
-                  control sits in a 36px control row beside the SectionTourLens
-                  chip row and a 36px circular button: forcing 44 makes the row
-                  jump on expand and orphans the button. Radius unifies at 14;
-                  the height stays 36 because it is constrained by neighbours.
-                  Third such exception, after the OTP digit boxes and the
-                  Reviews tab control row. If the row ever goes to 44, it moves
-                  as one change across chip row + button + field. */}
-              <button
-                type="button"
-                aria-label={t('players.search.openAria')}
-                onClick={() => setSearchExpanded(true)}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 14,
-                background: SURFACE,
-                border: `1px solid ${HAIRLINE_INK_10}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                }}
-              >
-                <Search size={14} color={INK} />
-              </button>
-            </>
-          ) : (
+          {t('players.field.eyebrow')}
+        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          {searchExpanded ? (
             <div
               style={{
-                flex: 1,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                height: 36,
+                height: 30,
                 background: SURFACE,
                 border: `1px solid ${searchFocused ? INK_MUTE : HAIRLINE_INK_10}`,
                 borderRadius: 14,
-                padding: '0 12px',
+                padding: '0 10px',
                 transition: 'background 140ms ease, border-color 140ms ease',
                 minWidth: 0,
-                margin: '8.5px 0 8.5px 16px',
               }}
             >
               <Search size={13} color={INK_MUTE} />
@@ -301,7 +273,7 @@ export function PlayersTab() {
                 placeholder={t('players.search.placeholder')}
                 className="placeholder:text-[rgba(255,255,255,0.38)]"
                 style={{
-                  flex: 1,
+                  width: 132,
                   border: 'none',
                   outline: 'none',
                   fontSize: 13,
@@ -329,38 +301,9 @@ export function PlayersTab() {
                 <X size={14} color={INK_MUTE} />
               </button>
             </div>
-          )}
-        </div>
-      </div>
-
-
-      {/* THE FIELD. The kicker is the only amber on this page: there is no
-          viewing member on a tour surface, so nothing else earns brand colour.
-          With the stat lens present the pills need a full scrollable row of
-          their own; with two pills they stay inline beside the kicker. */}
-      <div
-        style={{
-          padding: '12px 16px 4px',
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-        }}
-      >
-        <span
-          style={{
-            // AXIS 10: THE FIELD / RANKING header row - a column header, same
-            // call as the hero's TODAY/TOTAL/THRU.
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            color: INK,
-            textTransform: 'uppercase',
-          }}
-        >
-          {t('players.field.eyebrow')}
-        </span>
-        <div style={{ display: 'flex', gap: 4 }}>
-          {sortOptions.map((k) => {
+          ) : (
+            <>
+              {sortOptions.map((k) => {
             const active = k === sort;
             return (
               <button
@@ -389,7 +332,24 @@ export function PlayersTab() {
                 {k === 'ranking' ? t('players.sort.ranking') : t('players.sort.playingNow')}
               </button>
             );
-          })}
+              })}
+              <button
+                type="button"
+                aria-label={t('players.search.openAria')}
+                onClick={() => setSearchExpanded(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 2,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexShrink: 0,
+                }}
+              >
+                <Search size={15} color={INK} strokeWidth={2.5} />
+              </button>
+            </>
+          )}
         </div>
       </div>
 
