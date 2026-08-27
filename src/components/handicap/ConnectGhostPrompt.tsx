@@ -148,7 +148,7 @@ export const ConnectGhostPrompt: React.FC<Props> = ({
             height: 26,
             borderRadius: 8,
             border: 'none',
-            background: 'rgba(15,23,42,0.05)',
+            background: NEUTRAL_BG,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
