@@ -206,17 +206,10 @@ const DossierCard: React.FC<DossierCardProps> = ({
       {/* EXPANDED */}
       {expanded && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {/* Sub-scores - shared band scale */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              columnGap: 16,
-              rowGap: 10,
-            }}
-          >
+          {/* Sub-scores - shared band scale, single row like Courses page */}
+          <div style={{ display: 'flex', gap: 10 }}>
             {bars.map(({ label, score }) =>
-              score != null ? <SubScoreBar key={label} label={label} score={score} /> : null,
+              score != null ? <SubScoreStack key={label} label={label} score={score} /> : null,
             )}
           </div>
 
