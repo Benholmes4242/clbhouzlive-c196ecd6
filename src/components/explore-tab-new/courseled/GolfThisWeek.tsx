@@ -1482,7 +1482,10 @@ export function GolfThisWeek({
     return out;
   };
   /** §2 — one place per member, best kept, at most three places. */
+  /** §2 — one place per member, best kept, at most three places. */
   const topThree = (rows: CircleRoundRow[]) => rankAll(rows).slice(0, 3);
+  void topThree;
+
 
 
   /* THE FLOORS APPLY TO EVERY PLACE (§3): a runner-up clears the same floor as
