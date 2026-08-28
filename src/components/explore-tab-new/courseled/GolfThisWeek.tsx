@@ -1388,6 +1388,11 @@ export function GolfThisWeek({
   const scoreIds = useMemo(() => ordered.map((r) => r.score_id), [ordered]);
   const holeShapes = useRoundHoleShapes(scoreIds);
 
+  /* NET (BRIEF_BOARD_LOWEST_NET §S1): ONE read of gam_round_net for the whole
+     window, keyed on the SAME whs_score_id set the hole shapes and reactions
+     already use, so the map joins straight onto the rows the board holds. */
+  const netByScore = useRoundNetScores(scoreIds);
+
   /* REACTIONS (BRIEF_GOLF_THIS_WEEK_P2 §S1): ONE batched read for the whole
      visible window, keyed by the round's whs_score id exactly as
      FriendsPlayedRail does — content_reactions is canonical for rounds, so the
