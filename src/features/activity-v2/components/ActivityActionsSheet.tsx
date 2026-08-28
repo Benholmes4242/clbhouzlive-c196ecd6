@@ -44,12 +44,25 @@ export const ActivityActionsSheet: React.FC<Props> = ({ open, row, onClose }) =>
   if (!row) return null;
 
   const type = row.notif_type;
-  const actorId = row.actor_user_id;
+  /**
+   * MUTE THE THING THE BUTTON NAMES. The label reads actor_display_name, which
+   * since the business-actor work is the BUSINESS on a business-sourced row,
+   * while actor_user_id stays the PERSON who acted. Writing the person's id
+   * behind a "Mute clbhouz" label silenced somebody the member never chose.
+   * So the target follows actor_kind:
+   *   business -> actor_route_id  -> muted_business_ids  (one mute covers that
+   *               business's mentions AND its posts — both carry
+   *               source_actor_type = 'business')
+   *   personal -> actor_user_id   -> muted_user_ids      (unchanged)
+   */
+  const isBusinessActor = row.actor_kind === 'business';
+  const muteTargetId = isBusinessActor ? row.actor_route_id : row.actor_user_id;
   const actorName = row.actor_display_name || row.actor_username || 'this user';
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ['activity-v2'] });
     qc.invalidateQueries({ queryKey: ['activity-feed'] });
+    qc.invalidateQueries({ queryKey: ['activity-unread-count'] });
   };
 
   const handleMuteType = async () => {
@@ -79,29 +92,31 @@ export const ActivityActionsSheet: React.FC<Props> = ({ open, row, onClose }) =>
     onClose();
   };
 
-  const handleMuteUser = async () => {
-    if (!user?.id || !actorId) return;
+  const handleMuteActor = async () => {
+    if (!user?.id || !muteTargetId) return;
+    const column = isBusinessActor ? 'muted_business_ids' : 'muted_user_ids';
     try {
       const { data: existing } = await supabase
         .from('notification_preferences')
-        .select('muted_user_ids')
+        .select('muted_user_ids, muted_business_ids')
         .eq('user_id', user.id)
         .maybeSingle();
-      const cur: string[] = existing?.muted_user_ids || [];
-      if (!cur.includes(actorId)) {
+      const cur: string[] =
+        ((existing as Record<string, string[] | null> | null)?.[column] as string[] | null) || [];
+      if (!cur.includes(muteTargetId)) {
         await supabase
           .from('notification_preferences')
           .upsert(
-            { user_id: user.id, muted_user_ids: [...cur, actorId] },
+            { user_id: user.id, [column]: [...cur, muteTargetId] },
             { onConflict: 'user_id' },
           );
         invalidate();
-        toast.success('User muted', {
+        toast.success('Muted', {
           description: `You won't see notifications from ${actorName} anymore.`,
         });
       }
     } catch (err) {
-      console.error('[ActivityActionsSheet] muteUser failed', err);
+      console.error('[ActivityActionsSheet] muteActor failed', err);
     }
     onClose();
   };
