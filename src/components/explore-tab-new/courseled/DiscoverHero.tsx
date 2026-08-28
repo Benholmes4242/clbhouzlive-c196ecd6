@@ -500,7 +500,7 @@ export function DiscoverHero({
                   count={reaction.count}
                   reacted={reaction.mine}
                   onToggle={() => reactions.toggle('round', row.score_id)}
-                  label={t('discover.golfThisWeek.react', 'Like this round')}
+                  label={t('discover.reactions.action', 'Like this round')}
                   tone="glass"
                   size={17}
                   readOnly={!!row.is_self}
