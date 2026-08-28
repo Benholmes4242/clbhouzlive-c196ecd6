@@ -937,7 +937,12 @@ function GolfThisWeekCard({
   viewerUserId,
   reference = null,
   onPress,
+  reactionCount = 0,
+  reactionMine = false,
+  reactionHidden = true,
+  onToggleReaction,
 }: CardProps) {
+
   const { t } = useTranslation('courses');
   const toPar = toParFor(row);
   const toParUnder =
