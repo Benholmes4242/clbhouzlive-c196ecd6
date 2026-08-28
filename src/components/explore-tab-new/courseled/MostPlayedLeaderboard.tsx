@@ -660,9 +660,7 @@ export function MostPlayedLeaderboard({
         {shown.map((r) => {
           const m = meta?.get(r.courseId);
           const name = m?.name ?? r.courseName ?? t('discover.unknownCourse', 'Course');
-          const bestPlayer = r.players[0];
            const isWeekBestCourse = r.courseId === weekBestCourseId;
-           const cardAccent = isWeekBestCourse ? GOLD : DISCOVER_FACT;
           const open = openId === r.courseId;
           const toggle = () => setOpenId(open ? null : r.courseId);
           return (
