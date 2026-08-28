@@ -913,8 +913,9 @@ function GolfThisWeekCard({
     [shape, row.course_record_fact],
   );
   /* THE KICKER AND THE MOMENT SENTENCE COME OFF THE CARD (BRIEF_ROUND_CARD_
-     STRIP_BACK §S2). momentLabel/momentSentence STAY EXPORTED — the see-all
-     sheet and the scorecard sheet still print them. */
+     STRIP_BACK §S2). momentLabel/momentSentence remain exported here and are
+     now UNCALLED — reported, left in place rather than deleted blind, since the
+     templates are the single home of the moment copy. */
 
 
   const delta = row.delta_index;
