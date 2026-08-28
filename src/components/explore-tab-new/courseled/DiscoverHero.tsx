@@ -1,14 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { animate, useReducedMotion } from 'framer-motion';
 
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { HERO_CANON_SCRIM } from '@/features/tourhub/_shared/heroGradient';
+import { useMyCourseBests } from '@/features/tourhub/hooks/useMyCourseBests';
 
 
 import { relativeDay } from './discoverWhen';
 import { DISCOVER_FACT, DISCOVER_QUIET, NUMF, SANS } from './tokens';
+import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+import { ReactionAction } from './ReactionAction';
+import { buildReferenceLadder, type ReferenceT } from './referenceLadder';
+
 import {
   ROW_DARK_INDEX_FELL,
   ROW_DARK_TOPAR_UNDER,
