@@ -1917,6 +1917,7 @@ export function GolfThisWeek({
                 textTransform: 'uppercase',
                 color: DISCOVER_FACT,
                 textShadow: '0 2px 12px rgba(0,0,0,0.55)',
+                cursor: 'default',
               }}
             >
               {activeBoard.label}
