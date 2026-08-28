@@ -2305,9 +2305,9 @@ export function GolfThisWeek({
               </div>
 
               {/* `own` drives the AMBER TREATMENT and is true wherever the
-                  viewer appears — in the ranked five or pinned. `pinnedRow`
-                  only switches the LABEL ("You") and the SUB-LINE (gap), which
-                  exist to locate a member who is out of context. */}
+                  viewer appears — in the ranked five or pinned. The NAME is
+                  resolved identically in both cases (`r.display_name`);
+                  `pinnedRow` only switches the SUB-LINE to the gap text. */}
               {[...rows.map((r, i) => ({
                   r,
                   pos: positions[i],
