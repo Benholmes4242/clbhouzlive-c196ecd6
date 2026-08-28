@@ -1513,6 +1513,17 @@ export function GolfThisWeek({
       }),
   );
 
+  /* §1.1 — LOWEST NET. The FLOOR IS THE FIELD ITSELF: `net` is
+     adjusted_gross MINUS course_handicap, computed in useCircleLatestRounds, and
+     a row without it DOES NOT QUALIFY. It is never approximated from
+     hcp_at_time — that is the handicap INDEX, not the course-specific playing
+     handicap (see the hook's own comment). Lower wins. */
+  const netRanked = rankAll(
+    ordered
+      .filter((r) => r.net != null && Number.isFinite(r.net))
+      .sort((a, b) => (a.net as number) - (b.net as number) || byDateDesc(a, b)),
+  );
+
   const improvedRanked = rankAll(
     ordered
       .filter(
