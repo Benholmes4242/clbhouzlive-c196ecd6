@@ -2299,9 +2299,20 @@ export function GolfThisWeek({
                   : null}
               </div>
 
-              {[...rows.map((r, i) => ({ r, pos: positions[i], own: false })),
-                ...(pinned ? [{ r: pinned, pos: positions[selfIdx], own: true }] : []),
-              ].map(({ r, pos, own }) => {
+              {/* `own` drives the AMBER TREATMENT and is true wherever the
+                  viewer appears — in the ranked five or pinned. `pinnedRow`
+                  only switches the LABEL ("You") and the SUB-LINE (gap), which
+                  exist to locate a member who is out of context. */}
+              {[...rows.map((r, i) => ({
+                  r,
+                  pos: positions[i],
+                  own: !!userId && !!r.is_self,
+                  pinnedRow: false,
+                })),
+                ...(pinned
+                  ? [{ r: pinned, pos: positions[selfIdx], own: true, pinnedRow: true }]
+                  : []),
+              ].map(({ r, pos, own, pinnedRow }) => {
                 const tp = board.hasPar ? toParOf(r) : null;
                 return (
                   <div
