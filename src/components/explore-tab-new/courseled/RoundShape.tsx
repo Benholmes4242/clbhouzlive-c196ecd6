@@ -86,8 +86,8 @@ export function RoundShape({
    * where the rule was computed to clip the fill and never drawn.
    */
   showBaseline?: boolean;
-  /** Curve stroke. 1.8 by default; the rail tile passes 1.6 now that the
-   *  MiniScorecard beneath it carries the hole-by-hole detail (§S2.2). */
+  /** Curve stroke. 1.8 by default; the rail tile passes 1.6 — it draws the curve
+   *  alone, with no hole grid beneath it. */
   strokeWidth?: number;
 }) {
 
@@ -881,34 +881,9 @@ function NineRow({
   );
 }
 
-/**
- * A ROUND WITH NO HOLE DATA RENDERS NO GRID (§S0.2) — the caller passes
- * `shape === null` for the three-point fallback and this returns null, with no
- * placeholder and no reserved height.
- */
-export function MiniScorecard({
-  shape,
-  well = MINI_WELL,
-  marked,
-  momentTone,
-}: {
-  shape: HoleShape | null;
-  /** The tinted well behind the grid — the outer rings take it (§S4.7). */
-  well?: string;
-  /** THE MOMENT'S HOLES (§3): a TINTED BAND BEHIND the cells in the moment tone.
-   *  Nothing in the grid may take a moment tone ON a CELL. */
-  marked?: ReadonlySet<number>;
-  momentTone?: string;
-}) {
-  const { t } = useTranslation(['courses']);
-  if (!shape || shape.holes.length === 0) return null;
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: NINE_GAP }}>
-      <NineRow holes={shape.holes} from={1} to={9} label={t('courses:scorecard.out')} well={well} marked={marked} momentTone={momentTone} />
-      <NineRow holes={shape.holes} from={10} to={18} label={t('courses:scorecard.in')} well={well} marked={marked} momentTone={momentTone} />
-    </div>
-  );
-}
-
+/* BRIEF_DISCOVER_LOOSE_ENDS §S4 — MiniScorecard is DELETED: the compressed
+   Recent-rounds card no longer draws a hole grid, and nothing else called it.
+   NineRow and NINE_GAP are left in place as the grid primitives the scorecard
+   sheet grammar is built from. */
 
 export default RoundShape;

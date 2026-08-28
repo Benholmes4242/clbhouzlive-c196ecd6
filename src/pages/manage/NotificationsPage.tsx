@@ -14,9 +14,13 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 // strings — every DB `type` we emit for that category, so a single toggle
 // covers all the aliases the sender may use.
 const CATEGORIES: { key: string; label: string; sub: string; types: string[] }[] = [
+  /* 'reaction' is the Discover round/review reaction type. KNOWN COUPLING
+     (BRIEF_DISCOVER_LOOSE_ENDS §S3.3): tg_notify_content_reaction emits ONE type
+     for rounds, reviews and ratings, so muting Likes mutes review likes too.
+     Separating them needs distinct types at the trigger, not here. */
   { key: 'likes',        label: 'Likes',
-    sub: 'When someone likes your posts',
-    types: ['like', 'like_post'] },
+    sub: 'When someone likes your posts or rounds',
+    types: ['like', 'like_post', 'reaction'] },
   { key: 'comments',     label: 'Comments and replies',
     sub: 'Comments on your posts and replies to you',
     types: ['comment', 'comment_post', 'comment_reply', 'top_ten_comment', 'top_ten_reply'] },
