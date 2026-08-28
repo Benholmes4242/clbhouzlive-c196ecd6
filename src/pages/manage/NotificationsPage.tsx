@@ -95,14 +95,84 @@ export default function NotificationsPage() {
     if (!userId) return;
     supabase
       .from('notification_preferences')
-      .select('muted_types, muted_user_ids')
+      .select('muted_types, muted_user_ids, muted_business_ids')
       .eq('user_id', userId)
       .maybeSingle()
       .then(({ data }) => {
         setMutedTypes((data?.muted_types as string[]) ?? []);
         setMutedUserIds((data?.muted_user_ids as string[]) ?? []);
+        setMutedBusinessIds((data?.muted_business_ids as string[]) ?? []);
       });
   }, [userId]);
+
+  // Resolve the muted ids to names/avatars. Two lookups, two tables; anything
+  // unresolved simply has no entry here and renders as an unnamed row.
+  useEffect(() => {
+    if (mutedUserIds.length === 0 && mutedBusinessIds.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const next: Record<string, { name: string; photo: string | null }> = {};
+      if (mutedUserIds.length > 0) {
+        const { data } = await supabase
+          .from('user_profiles')
+          .select('id, display_name, username, profile_photo_url')
+          .in('id', mutedUserIds);
+        for (const p of data ?? []) {
+          next[p.id] = {
+            name: p.display_name || p.username || '',
+            photo: p.profile_photo_url ?? null,
+          };
+        }
+      }
+      if (mutedBusinessIds.length > 0) {
+        const { data } = await supabase
+          .from('business_accounts')
+          .select('id, name, slug, logo_url')
+          .in('id', mutedBusinessIds);
+        for (const b of data ?? []) {
+          next[b.id] = { name: b.name || b.slug || '', photo: b.logo_url ?? null };
+        }
+      }
+      if (!cancelled) setMutedMeta((prev) => ({ ...prev, ...next }));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [mutedUserIds, mutedBusinessIds]);
+
+  /* One list, two arrays. The row remembers which array it came from so Unmute
+     writes back to the right column. */
+  const mutedRows = useMemo(
+    () => [
+      ...mutedUserIds.map((id) => ({ id, kind: 'person' as const })),
+      ...mutedBusinessIds.map((id) => ({ id, kind: 'business' as const })),
+    ],
+    [mutedUserIds, mutedBusinessIds],
+  );
+
+  const handleUnmute = async (id: string, kind: 'person' | 'business') => {
+    if (!userId) return;
+    const column = kind === 'business' ? 'muted_business_ids' : 'muted_user_ids';
+    const prev = kind === 'business' ? mutedBusinessIds : mutedUserIds;
+    const next = prev.filter((x) => x !== id);
+    const setter = kind === 'business' ? setMutedBusinessIds : setMutedUserIds;
+    setter(next);
+    setUnmuting(id);
+    try {
+      const { error } = await supabase
+        .from('notification_preferences')
+        .upsert({ user_id: userId, [column]: next }, { onConflict: 'user_id' });
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-v2'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
+    } catch {
+      setter(prev);
+      toast.error('Could not unmute.');
+    } finally {
+      setUnmuting(null);
+    }
+  };
 
   // A category is ON when NONE of its types appear in muted_types. Partial
   // overlap (a single type muted via the per-notification sheet) renders as
