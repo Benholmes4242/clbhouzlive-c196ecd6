@@ -47,12 +47,13 @@ const LABEL_READ: React.CSSProperties = { ...LABEL, fontSize: 11 };
 
 const CAPTION: React.CSSProperties = { fontSize: 12.5, lineHeight: 1.5, color: A.MUTE, margin: 0 };
 /**
- * THE TWO SENTENCES are the best copy in the sheet and must read LIGHTER than
- * the figures they explain: BODY 12/600, never a figure weight.
+ * BRIEF_ROUND_SHEET_SPLIT §2 — THE THREE SENTENCES BECAME THREE FIGURES.
+ * The prose SENTENCE role is gone: nothing in this sheet names the member in a
+ * sentence any more. The figure rail below the summary carries the same facts
+ * as figure-over-label pairs, and every derivation behind them is unchanged.
  */
-const SENTENCE: React.CSSProperties = {
-  fontSize: 12, fontWeight: 600, lineHeight: 1.45, color: A.BODY, margin: 0,
-};
+const RAIL_FIG: React.CSSProperties = { ...NUM, fontSize: 15, lineHeight: 1.05 };
+
 
 /*
  * The chart legend keys and FIELD_LINE_SWATCH are GONE
