@@ -2305,9 +2305,9 @@ export function GolfThisWeek({
               </div>
 
               {/* `own` drives the AMBER TREATMENT and is true wherever the
-                  viewer appears — in the ranked five or pinned. `pinnedRow`
-                  only switches the LABEL ("You") and the SUB-LINE (gap), which
-                  exist to locate a member who is out of context. */}
+                  viewer appears — in the ranked five or pinned. The NAME is
+                  resolved identically in both cases (`r.display_name`);
+                  `pinnedRow` only switches the SUB-LINE to the gap text. */}
               {[...rows.map((r, i) => ({
                   r,
                   pos: positions[i],
@@ -2381,7 +2381,7 @@ export function GolfThisWeek({
                             color: own ? AMBER : INK,
                           }}
                         >
-                          {pinnedRow ? t('discover.golfThisWeek.you', 'You') : r.display_name}
+                          {r.display_name}
                         </span>
                         {/* On the pinned row the sub-line is the GAP TO THE
                             LEADER with its per-category unit and derived
