@@ -465,7 +465,7 @@ export function DiscoverHero({
                         fontWeight: 700,
                         lineHeight: 1,
                         letterSpacing: '-0.02em',
-                        color: figureColor,
+                        color: momentIsAboutScore ? figureColor : DISCOVER_FACT,
                       }}
                     >
                       {String(row.gross)}
@@ -487,10 +487,48 @@ export function DiscoverHero({
                   )}
                 </div>
               )}
+
+              {/* THE REACTION (§1.3-1.6). Right-aligned on this row, on the
+                  scrim. THE COUNT ALWAYS SHOWS (§1.4) — the same round on the
+                  card below must never read a different number. The control's
+                  44px tap target is padding cancelled by a negative margin, so
+                  it has NO layout footprint and the row's height is identical at
+                  0, 1 and 3 digits (§1.7). No score id, or signed out, and
+                  nothing renders at all. */}
+              <div style={{ flex: 'none', display: 'flex', alignItems: 'center' }}>
+                <ReactionAction
+                  count={reaction.count}
+                  reacted={reaction.mine}
+                  onToggle={() => reactions.toggle('round', row.score_id)}
+                  label={t('discover.golfThisWeek.react', 'Like this round')}
+                  tone="glass"
+                  size={17}
+                  readOnly={!!row.is_self}
+                  hidden={!row.score_id || !reactions.viewerId || reactions.unavailable}
+                />
+              </div>
             </div>
           );
         })()}
+
+        {/* THE REFERENCE LINE (§2). One line, QUIET ink, beneath the member and
+            course row. NOTHING RESOLVES, NOTHING RENDERS — no reserved height
+            (§2.5). The ladder is shared with the round cards. */}
+        {reference && (
+          <div
+            style={{
+              marginTop: 8,
+              fontSize: 11.5,
+              fontWeight: 500,
+              lineHeight: 1.2,
+              color: DISCOVER_QUIET,
+            }}
+          >
+            {reference}
+          </div>
+        )}
       </div>
+
 
     </div>
   );
