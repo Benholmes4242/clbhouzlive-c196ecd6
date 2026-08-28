@@ -30,6 +30,8 @@ import { useContentReactions, type ReactionTarget } from './hooks/useContentReac
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
 import { useMyCourseBests } from '@/features/tourhub/hooks/useMyCourseBests';
+import { buildReferenceLadder, type ReferenceT } from './referenceLadder';
+
 
 import {
   DEFAULT_WEEK_SCOPE,
