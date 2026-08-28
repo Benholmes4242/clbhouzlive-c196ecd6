@@ -1894,20 +1894,30 @@ export function GolfThisWeek({
           {/* THE LOWER THIRD — PhotoBand's column: 20px gutters, 8px off the
               bottom edge, 10px between the title and the line beneath it. */}
           <div style={{ padding: '0 20px 8px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {/* THE CATEGORY NAMES ITSELF ONCE ON THE PAGE BODY, HERE, in the
-                hero's title type — 30px/0.96 with the broadcast text shadow,
-                the same as the tournament title on Tour Overview. Read from
-                `activeBoard`, never from the selection. */}
+            {/* THE CATEGORY NAMES ITSELF ONCE ON THE PAGE BODY, HERE, as a
+                caps masthead — 21/800 with 0.06em tracking and the broadcast
+                text shadow. Read from `activeBoard`, never from the selection.
+
+                THE TITLE IS NOT TAPPABLE: no chevron, no cursor, no hit area.
+                The control stays in the chrome island.
+
+                RECORDED OBJECTION (BRIEF_MICRO_BOARD_TITLE_MASTHEAD): the island
+                capsule and this title both name the category, roughly 60px apart,
+                and caps makes that echo more visible than sentence case did. Ben
+                accepted the duplication as a deliberate trade for keeping the
+                control in the chrome. */}
             <h2
               style={{
                 margin: 0,
                 fontFamily: SANS,
-                fontSize: 30,
-                fontWeight: 700,
-                lineHeight: 0.96,
-                letterSpacing: '-0.025em',
-                color: 'white',
+                fontSize: 21,
+                fontWeight: 800,
+                lineHeight: 1,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: DISCOVER_FACT,
                 textShadow: '0 2px 12px rgba(0,0,0,0.55)',
+                cursor: 'default',
               }}
             >
               {activeBoard.label}
