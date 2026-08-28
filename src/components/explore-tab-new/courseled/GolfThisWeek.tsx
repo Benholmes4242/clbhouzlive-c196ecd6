@@ -1740,6 +1740,11 @@ export function GolfThisWeek({
    * §1.4 — POSITIONS WITH TIES. Standard competition ranking over the full
    * ranked list; equal values share a position and take the T prefix, exactly
    * as the band tiles printed T3.
+   *
+   * THE RULE: 1, T2, T2, 4 — two players tied for second means two people have
+   * finished ahead of the next player, so there is no third place. This was
+   * QUESTIONED AND CONFIRMED CORRECT; it is what the tour leaderboard in this
+   * app does. Do not "fix" it to 1, T2, T2, 3.
    */
   const positionsFor = (b: BoardSpec) => {
     const out: string[] = [];
@@ -2210,12 +2215,16 @@ export function GolfThisWeek({
       {activeBoard && activeBoard.ranked.length > 0 && (() => {
         const board = activeBoard;
         const positions = positionsFor(board);
-        const rows = board.ranked.slice(0, 6);
+        /* FIVE RANKED ROWS, NEVER SIX. Five plus at most one pinned row keeps
+           the board to six rows total so the pinned row cannot fall below the
+           fold on a small phone. */
+        const rows = board.ranked.slice(0, 5);
         const selfIdx = userId ? board.ranked.findIndex((r) => r.is_self) : -1;
-        /* §1.5 — THE THREE NO-PIN STATES: already in the top six, no qualifying
-           round in the window (findIndex === -1), and signed out (selfIdx
-           forced to -1 above). None of them renders a placeholder. */
-        const pinned = selfIdx >= 6 ? board.ranked[selfIdx] : null;
+        /* THE THREE NO-PIN STATES: already inside the visible five (marked in
+           place in full amber instead), no qualifying round in the window
+           (findIndex === -1), and signed out (selfIdx forced to -1 above).
+           Marking in place and pinning are alternatives, never both. */
+        const pinned = selfIdx >= 5 ? board.ranked[selfIdx] : null;
 
         const headCell = (text: string, align: 'left' | 'center' | 'right') => (
           <span
@@ -2295,13 +2304,24 @@ export function GolfThisWeek({
                   : null}
               </div>
 
-              {[...rows.map((r, i) => ({ r, pos: positions[i], own: false })),
-                ...(pinned ? [{ r: pinned, pos: positions[selfIdx], own: true }] : []),
-              ].map(({ r, pos, own }) => {
+              {/* `own` drives the AMBER TREATMENT and is true wherever the
+                  viewer appears — in the ranked five or pinned. `pinnedRow`
+                  only switches the LABEL ("You") and the SUB-LINE (gap), which
+                  exist to locate a member who is out of context. */}
+              {[...rows.map((r, i) => ({
+                  r,
+                  pos: positions[i],
+                  own: !!userId && !!r.is_self,
+                  pinnedRow: false,
+                })),
+                ...(pinned
+                  ? [{ r: pinned, pos: positions[selfIdx], own: true, pinnedRow: true }]
+                  : []),
+              ].map(({ r, pos, own, pinnedRow }) => {
                 const tp = board.hasPar ? toParOf(r) : null;
                 return (
                   <div
-                    key={own ? `you-${r.round_id}` : r.round_id}
+                    key={pinnedRow ? `you-${r.round_id}` : r.round_id}
                     data-board-row={own ? 'you' : 'member'}
                     role="button"
                     tabIndex={0}
@@ -2361,13 +2381,13 @@ export function GolfThisWeek({
                             color: own ? AMBER : INK,
                           }}
                         >
-                          {own ? t('discover.golfThisWeek.you', 'You') : r.display_name}
+                          {pinnedRow ? t('discover.golfThisWeek.you', 'You') : r.display_name}
                         </span>
                         {/* On the pinned row the sub-line is the GAP TO THE
                             LEADER with its per-category unit and derived
                             direction (§1.5); on every other row it is WHERE. */}
                         <span
-                          className={own ? 'tabular-nums' : undefined}
+                          className={pinnedRow ? 'tabular-nums' : undefined}
                           style={{
                             display: 'block',
                             marginTop: 0,
@@ -2375,13 +2395,13 @@ export function GolfThisWeek({
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
                             fontSize: 11,
-                            fontWeight: own ? 700 : 600,
+                            fontWeight: pinnedRow ? 700 : 600,
                             lineHeight: 1.1,
-                            letterSpacing: own ? '0.06em' : undefined,
+                            letterSpacing: pinnedRow ? '0.06em' : undefined,
                             color: own ? AMBER : BAND_FAINT,
                           }}
                         >
-                          {own ? pinnedGap(board, r) : courseNameFor(r)}
+                          {pinnedRow ? pinnedGap(board, r) : courseNameFor(r)}
                         </span>
                       </span>
                     </span>
