@@ -877,7 +877,14 @@ interface CardProps {
   /** §2.2 — read from the SAME cached following-id set that drives showFollow. */
   isFollowed: boolean;
   viewerUserId: string | undefined;
+  /**
+   * §2.1 — THE REFERENCE LINE, already resolved by the section (one tier or
+   * none). A card NEVER fabricates a comparison and reserves no height for a
+   * missing one.
+   */
+  reference?: string | null;
   onPress: () => void;
+
 }
 
 /**
