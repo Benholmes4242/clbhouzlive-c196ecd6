@@ -7413,6 +7413,7 @@ export type Database = {
       notifications: {
         Row: {
           actor_id: string | null
+          actor_type: string | null
           created_at: string
           data: Json | null
           entity_id: string | null
@@ -7431,6 +7432,7 @@ export type Database = {
         }
         Insert: {
           actor_id?: string | null
+          actor_type?: string | null
           created_at?: string
           data?: Json | null
           entity_id?: string | null
@@ -7449,6 +7451,7 @@ export type Database = {
         }
         Update: {
           actor_id?: string | null
+          actor_type?: string | null
           created_at?: string
           data?: Json | null
           entity_id?: string | null

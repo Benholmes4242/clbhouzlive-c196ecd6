@@ -47,7 +47,7 @@ import {
 import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegionCounts';
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
-import { PodiumAvatarRing } from './PodiumAvatarRing';
+import { BoardPicker } from './BoardPicker';
 import {
   FINISHED_IN_RED_TONE,
   selectMoment,
@@ -1354,6 +1354,14 @@ export function GolfThisWeek({
   style,
 }: Props) {
   const { t } = useTranslation('courses');
+  /**
+   * BRIEF_DISCOVER_THE_BOARD §2 — THE SELECTED board category. This is the
+   * SELECTION only; what the board RENDERS is `activeBoard` below, which falls
+   * back when a category has no qualifiers, and every label reads that instead
+   * (§2.3). Component state, not URL: the scope pills answer "which rounds",
+   * this answers "which board", and only the former is shareable today.
+   */
+  const [boardCategory, setBoardCategory] = useState<'gross' | 'stableford' | 'birdies'>('gross');
   /* THE SCOPE FILTERS AT THE QUERY (§E): Top 100 and Played resolve to a course
      allow-list that goes into SQL. `undefined` means not yet resolved. */
   const scopeCourses = useWeekScopeCourses(userId, scope);
@@ -1588,214 +1596,171 @@ export function GolfThisWeek({
      chevron on every row, and the qualifier either per-row (best) or once on
      the eyebrow as a column header (§2).
 
-  /* BRIEF_BAND_TILES_REFINEMENT — the bottom line is the COURSE on every tile,
-     and anything QUALIFYING the figure (a to-par, a unit) sits beside it on the
-     figure's baseline. Colour appears only where it MEANS something: red on an
-     under-par to-par, red on a birdie count, green on a falling index. The emoji
-     marks the category; nothing else needs to. No accent bar, no tint. */
-  type PodiumFigure = {
-    text: string;
-    tone: string;
-    qual?: string;
-    qualTone?: string;
-  };
+  /* ================= THE BOARD (BRIEF_DISCOVER_THE_BOARD §S1) ==============
+     THE TWO SIDE-BY-SIDE BAND TILES ARE GONE. Discover holds the same shape of
+     data as the tour overview — a field of members over fourteen days — and now
+     renders it the same way: ONE ranked table for ONE selected category, with
+     positions, columns and a header strip.
 
-  const bandTiles: {
-    key: string;
-    emoji?: string;
+     NOTHING ABOUT THE DATA CHANGED (§1.2): bestRanked / stablefordRanked /
+     birdiesRanked are the SAME ranked, member-deduped arrays with the SAME
+     floors (Stableford >= 36, birdies >= 3). No new query, no new sort.
+
+     MOST IMPROVED HAS NO BOARD. The brief names three categories twice (§1.6's
+     units GROSS / PTS / BIRDIES and §4.1's three titles) and gives improved
+     neither a label nor a unit, so its ranked list is computed and unused rather
+     than silently retitled. Flagged in the report — it is a real loss of a
+     comparison and it is Ben's call, not this brief's. */
+  void best;
+
+  type BoardKey = 'gross' | 'stableford' | 'birdies';
+
+  interface BoardSpec {
+    key: BoardKey;
+    /** §4.1 — the hero title, and the sheet row. */
     label: string;
-    /** §2 — the UNIT, printed once on the eyebrow row as a column header.
-        Absent on BEST THIS WEEK, whose qualifier is data and stays per-row. */
-    unit?: string;
-    row: CircleRoundRow;
-    /** §2 — places 2 and 3, member-capped. Empty is a normal week. */
-    runners: CircleRoundRow[];
+    /** §2.2 — the island capsule's short form. */
+    short: string;
+    /** §1.6 — the VALUE column's header. */
+    unit: string;
     /**
-     * §1.1 — THE FULL RANKED LIST for this tile, deduped by member, in the same
-     * order. The pinned own-member row's RANK is its index here; the three
-     * rendered rows are a slice of it.
+     * §1.6 — THE PAR COLUMN ONLY EXISTS WHERE A TO-PAR EXISTS. Stableford and
+     * birdies have none, so the column AND its header are absent and the grid
+     * is one column shorter. Decided ONCE per render at table level (this flag),
+     * never per row.
      */
+    hasPar: boolean;
+    /** §1.2 — the existing ranked list, untouched. */
     ranked: CircleRoundRow[];
-    /**
-     * §1.3 — the UNIT the pinned row's gap carries. The DIRECTION is derived
-     * from `lowerWins` and `valueOf`, never hard-coded: gross is lower-wins, so
-     * a chaser's gross is HIGHER than the leader's; Stableford and birdies are
-     * higher-wins, so a chaser's figure is LOWER. Both read "{n} <unit> off".
-     */
-    offUnit: 'shots' | 'points' | 'birdies' | 'index';
-
-    /** The tile's comparison for ONE row: the figure, and — only where the
-        qualifier varies by round — that row's qualifier. */
-    figureOf: (r: CircleRoundRow) => PodiumFigure;
-    /** ONE DIRECTION FLAG (§4): lower figures win only BEST THIS WEEK. */
+    /** ONE direction flag: only gross is lower-wins. */
     lowerWins: boolean;
-    /** Numeric comparison value. Improved uses positive improvement magnitude. */
     valueOf: (r: CircleRoundRow) => number;
-    accent: string;
-    chipGround: string;
-    gapKind: 'shots' | 'points' | 'clear';
-    /* §1 (BRIEF_PODIUM_BANDS_FIXES) — ONE precision per tile, read by BOTH the
-       leader CLEAR chip and the chaser deficit. Without it the chip printed raw
-       IEEE 754 float residue ("0.09999999999999998 CLEAR") on the improved
-       tile, where the deficit column was already rounding. */
+    /** The VALUE cell's text. */
+    format: (r: CircleRoundRow) => string;
     precision: number;
-  }[] = [];
+    /** The unit the pinned row's gap carries. */
+    offUnit: 'shots' | 'points' | 'birdies';
+  }
 
-
-  /* §2 — BEST THIS WEEK's to-par is DATA, not a unit: it differs per round, so
-     it is the one qualifier that stays beside every figure in the ladder. */
+  /**
+   * §3.1/§3.2 — THE TO-PAR COLOUR LAW, as scoreColor.ts states it and as the
+   * tour board already renders it: UNDER PAR IS RED, OVER PAR IS THE NEUTRAL
+   * FACT INK, LEVEL PAR IS MUTED. +4, +5 and +6 are NOT red.
+   *
+   * THE DARK RED, not TOPAR_RED (#C8102E): these figures sit on A.PANEL, where
+   * the light-surface red goes muddy at 12.5px.
+   */
   const toParOf = (r: CircleRoundRow) => {
     if (r.gross == null || r.course_par == null) return null;
     const d = (r.gross as number) - (r.course_par as number);
     return {
       text: d === 0 ? 'E' : d < 0 ? `\u2212${Math.abs(d)}` : `+${d}`,
-      /* §3.2 (BRIEF_DISCOVER_WORLD_CLASS) — THE DARK RED, NOT TOPAR_RED. The
-         chips sit on A.PANEL, and TOPAR_RED (#C8102E) is the LIGHT-surface red:
-         at 12px on a dark panel it goes muddy and stops reading as red at all.
-         Same canonical call the hero and the member row make. */
-      tone: d < 0 ? ROW_DARK_TOPAR_UNDER : A.MUTE,
+      tone: d < 0 ? ROW_DARK_TOPAR_UNDER : d > 0 ? DISCOVER_FACT : A.MUTE,
     };
   };
 
-  if (best) {
-    bandTiles.push({
-      key: 'best',
-      emoji: '\uD83D\uDD25', // FIRE
-      label: t('discover.golfThisWeek.bestLabel', 'Best in 14 days'),
-      row: best.row,
-      /* The hero is `bestOfWeek`'s winner, unchanged; the sort's first place is
-         the same row, so the runners are places 2 and 3 of that same list. */
-      runners: bestRanked.slice(1, 3),
+  const boards: BoardSpec[] = [
+    {
+      key: 'gross',
+      label: t('discover.golfThisWeek.board.grossLabel', 'Lowest gross'),
+      short: t('discover.golfThisWeek.board.grossShort', 'GROSS'),
+      unit: t('discover.golfThisWeek.board.grossUnit', 'GROSS'),
+      hasPar: true,
       ranked: bestRanked,
-      offUnit: 'shots' as const,
       lowerWins: true,
       valueOf: (r) => r.gross as number,
-      accent: PODIUM_ACCENT.gold,
-      chipGround: PODIUM_GROUND.gold,
-      gapKind: 'shots',
+      format: (r) => String(r.gross ?? '\u2014'),
       precision: 0,
-      /* GOLD REPORTS THE WIN (§0), not under/over par. The whole line remains
-         gold even when the winning round's qualifier is +3. */
-      figureOf: (r) => {
-        const tp = toParOf(r);
-        return {
-          text: String(r.gross ?? '\u2014'),
-          tone: PODIUM_ACCENT.gold,
-          qual: tp?.text,
-          qualTone: PODIUM_ACCENT.gold,
-        };
-      },
-    });
-  }
-  if (bestStableford) {
-    bandTiles.push({
+      offUnit: 'shots',
+    },
+    {
       key: 'stableford',
-      emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
-      label: t('discover.golfThisWeek.stablefordLabel', 'Best Stableford'),
-      row: bestStableford,
-      runners: stablefordRanked.slice(1, 3),
+      label: t('discover.golfThisWeek.board.stablefordLabel', 'Stableford'),
+      short: t('discover.golfThisWeek.board.stablefordShort', 'STABLEFORD'),
+      unit: t('discover.golfThisWeek.board.stablefordUnit', 'PTS'),
+      hasPar: false,
       ranked: stablefordRanked,
-      offUnit: 'points' as const,
       lowerWins: false,
       valueOf: (r) => r.stableford_points as number,
-      accent: PODIUM_ACCENT.white,
-      chipGround: PODIUM_GROUND.white,
-      gapKind: 'points',
+      format: (r) => String(r.stableford_points),
       precision: 0,
-      figureOf: (r) => ({ text: String(r.stableford_points), tone: PODIUM_ACCENT.white }),
-    });
-  }
-  if (mostBirdies) {
-    bandTiles.push({
+      offUnit: 'points',
+    },
+    {
       key: 'birdies',
-      emoji: '\uD83D\uDC26', // BIRD
-      label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
-      row: mostBirdies,
-      runners: birdiesRanked.slice(1, 3),
+      label: t('discover.golfThisWeek.board.birdiesLabel', 'Most birdies'),
+      short: t('discover.golfThisWeek.board.birdiesShort', 'BIRDIES'),
+      unit: t('discover.golfThisWeek.board.birdiesUnit', 'BIRDIES'),
+      hasPar: false,
       ranked: birdiesRanked,
-      offUnit: 'birdies' as const,
       lowerWins: false,
       valueOf: (r) => r.birdies as number,
-      accent: PODIUM_ACCENT.red,
-      chipGround: PODIUM_GROUND.red,
-      gapKind: 'clear',
+      format: (r) => String(r.birdies),
       precision: 0,
-      /* A birdie count IS a count of under-par holes, so the red is literal. */
-      figureOf: (r) => ({ text: String(r.birdies), tone: ROW_DARK_TOPAR_UNDER }),
-    });
-  }
-  if (mostImproved) {
-    bandTiles.push({
-      key: 'improved',
-      emoji: '\uD83D\uDCAA', // FLEXED ARM
-      label: t('discover.golfThisWeek.improvedLabel', 'Most improved'),
-      row: mostImproved,
-      runners: improvedRanked.slice(1, 3),
-      ranked: improvedRanked,
-      offUnit: 'index' as const,
-      lowerWins: false,
-      /* Convert negative deltas to positive improvement magnitudes. This keeps
-         one higher-wins deficit formula: −0.4 leads −0.2, and the chaser is
-         0.2 behind, never 0.2 ahead. */
-      valueOf: (r) => Math.abs(r.delta_index as number),
-      accent: PODIUM_ACCENT.green,
-      chipGround: PODIUM_GROUND.green,
-      gapKind: 'clear',
-      precision: 1,
-      figureOf: (r) => ({
-        text: `\u2212${Math.abs(r.delta_index as number).toFixed(1)}`,
-        tone: PODIUM_ACCENT.green,
-      }),
-    });
-  }
+      offUnit: 'birdies',
+    },
+  ];
 
-  const podiumGap = (tile: (typeof bandTiles)[number], gap: number) => {
-    if (gap === 0) return t('discover.golfThisWeek.gap.tied', 'TIED');
-    if (tile.gapKind === 'shots') {
-      return t('discover.golfThisWeek.gap.shots', '{{count}} SHOTS CLEAR', { count: gap });
-    }
-    if (tile.gapKind === 'points') {
-      return t('discover.golfThisWeek.gap.points', '{{count}} POINTS CLEAR', { count: gap });
-    }
-    return t('discover.golfThisWeek.gap.clear', '{{count}} CLEAR', { count: gap });
+  /**
+   * §2.3/§4.3 — ONE VALUE, HOISTED. The board that is ACTUALLY RENDERED is
+   * resolved here, once, and the island capsule, the hero title and the column
+   * header all read it. A stale or empty selection FALLS BACK, and the labels
+   * fall back with it — the tour picker's fault (a label derived from a
+   * selection rather than from the list on screen) cannot recur.
+   */
+  const activeBoard =
+    boards.find((b) => b.key === boardCategory && b.ranked.length > 0) ??
+    boards.find((b) => b.ranked.length > 0) ??
+    null;
+
+  /**
+   * §1.4 — POSITIONS WITH TIES. Standard competition ranking over the full
+   * ranked list; equal values share a position and take the T prefix, exactly
+   * as the band tiles printed T3.
+   */
+  const positionsFor = (b: BoardSpec) => {
+    const out: string[] = [];
+    let pos = 1;
+    b.ranked.forEach((r, i) => {
+      if (i > 0 && b.valueOf(r) !== b.valueOf(b.ranked[i - 1])) pos = i + 1;
+      out.push(String(pos));
+    });
+    const tally = new Map<string, number>();
+    out.forEach((p) => tally.set(p, (tally.get(p) ?? 0) + 1));
+    return out.map((p) => ((tally.get(p) ?? 0) > 1 ? `T${p}` : p));
   };
 
   /**
-   * §1.3 — THE PINNED ROW'S GAP TO THE LEADER. The DIRECTION IS DERIVED, not
-   * written: `lowerWins` says which way the tile counts, so the signed gap is
-   * (own − leader) on a lower-wins tile and (leader − own) everywhere else. Both
-   * are positive for a member behind the leader, which is the only case a pinned
-   * row exists in, and the UNIT comes from the tile's own offUnit.
+   * §1.5 — THE PINNED ROW'S GAP TO THE LEADER, unchanged in behaviour. The
+   * DIRECTION IS DERIVED from `lowerWins`, never hard-coded: (own − leader) on a
+   * lower-wins board, (leader − own) everywhere else. Both are positive for a
+   * member behind the leader, which is the only case a pinned row exists in.
    */
-  const pinnedGap = (tile: (typeof bandTiles)[number], own: CircleRoundRow) => {
-    const leaderValue = tile.valueOf(tile.row);
-    const ownValue = tile.valueOf(own);
-    const signed = tile.lowerWins ? ownValue - leaderValue : leaderValue - ownValue;
-    const gap = Number(Math.abs(signed).toFixed(tile.precision));
+  const pinnedGap = (b: BoardSpec, own: CircleRoundRow) => {
+    const leaderValue = b.valueOf(b.ranked[0]);
+    const ownValue = b.valueOf(own);
+    const signed = b.lowerWins ? ownValue - leaderValue : leaderValue - ownValue;
+    const gap = Number(Math.abs(signed).toFixed(b.precision));
     if (gap === 0) return t('discover.golfThisWeek.gap.tied', 'TIED');
-    if (tile.offUnit === 'shots') {
+    if (b.offUnit === 'shots') {
       return t('discover.golfThisWeek.gap.shotsOff', '{{count}} SHOTS OFF', { count: gap });
     }
-    if (tile.offUnit === 'points') {
+    if (b.offUnit === 'points') {
       return t('discover.golfThisWeek.gap.pointsOff', '{{count}} POINTS OFF', { count: gap });
     }
-    if (tile.offUnit === 'birdies') {
-      return t('discover.golfThisWeek.gap.birdiesOff', '{{count}} BIRDIES OFF', { count: gap });
-    }
-    return t('discover.golfThisWeek.gap.off', '{{count}} OFF', { count: gap });
+    return t('discover.golfThisWeek.gap.birdiesOff', '{{count}} BIRDIES OFF', { count: gap });
   };
 
+  const courseNameFor = (r: CircleRoundRow) =>
+    (r.course_id ? meta?.get(r.course_id)?.name : null) ??
+    r.course_name ??
+    t('discover.golfThisWeek.unknownCourse', 'Unknown course');
 
-  const podiumDeficit = (
-    tile: (typeof bandTiles)[number],
-    row: CircleRoundRow,
-  ) => {
-    const leaderValue = tile.valueOf(tile.row);
-    const rowValue = tile.valueOf(row);
-    const gap = tile.lowerWins ? rowValue - leaderValue : leaderValue - rowValue;
-    const magnitude = Math.abs(gap).toFixed(tile.precision);
-    return `${tile.lowerWins ? '+' : '\u2212'}${magnitude}`;
-  };
+  /* §1.4 — ONE GRID DEFINITION, derived from the PAR flag (§1.6). Header strip,
+     every row and the pinned row all read this single string. */
+  const BOARD_GRID = activeBoard?.hasPar
+    ? '30px minmax(0, 1fr) 40px 34px'
+    : '30px minmax(0, 1fr) 40px';
 
 
 
@@ -1818,7 +1783,9 @@ export function GolfThisWeek({
       <div
         style={{
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: 3,
           /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
              gives 16px of clearance everywhere. */
           paddingTop: chromeClearance
@@ -1828,6 +1795,26 @@ export function GolfThisWeek({
           minWidth: 0,
         }}
       >
+        {/* §4.1 — THE TITLE IS THE CATEGORY LABEL, and it is read from
+            `activeBoard` (§4.3), the same value the island capsule and the
+            column header read. Not a fixed string, not "The board". With no
+            qualifying board at all there is no category to name, so the title
+            is absent rather than guessed. */}
+        {activeBoard && (
+          <h2
+            style={{
+              margin: 0,
+              fontFamily: SANS,
+              fontSize: 17,
+              fontWeight: 700,
+              lineHeight: 1.15,
+              letterSpacing: '-0.01em',
+              color: DISCOVER_FACT,
+            }}
+          >
+            {activeBoard.label}
+          </h2>
+        )}
         {/* Not a label - the filter's readout. It is the only thing on screen
             that responds when a pill or a region changes, so it must always
             describe what is CURRENTLY rendered. */}
@@ -1986,427 +1973,226 @@ export function GolfThisWeek({
         </div>
       )}
 
-      {bandTiles.length > 0 && (
-        <div
-          className="scrollbar-hide"
-          style={{
-            display: 'flex',
-            /* Sparse podiums deliberately collapse to their own content height.
-               Ben chose compact sparse cards over equal-height empty space. */
-            alignItems: 'flex-start',
-            gap: 9,
-            overflowX: 'auto',
-            marginBottom: 12,
-          }}
-        >
-          {bandTiles.map((tile) => (
+      {/* ==================== THE BOARD (§S1) ====================
+          ONE ranked table for the category the picker selected, six rows deep,
+          plus the pinned viewer row. Every row opens that member's scorecard —
+          the same sheet the round cards open.
+
+          §1.3 — THERE IS NO "FULL LEADERBOARD" ROW. No destination exists for
+          these categories: the only see-all surface on this section is
+          GolfThisWeekSheet, which is a DATE-GROUPED LIST OF ROUNDS, not a ranked
+          board for a category — pointing a row labelled FULL LEADERBOARD at it
+          would lie about where it goes. Per the brief's own instruction the row
+          is REPORTED and not built; a category leaderboard destination is its
+          own brief. The See all rounds action below the cards is untouched. */}
+      {activeBoard && activeBoard.ranked.length > 0 && (() => {
+        const board = activeBoard;
+        const positions = positionsFor(board);
+        const rows = board.ranked.slice(0, 6);
+        const selfIdx = userId ? board.ranked.findIndex((r) => r.is_self) : -1;
+        /* §1.5 — THE THREE NO-PIN STATES: already in the top six, no qualifying
+           round in the window (findIndex === -1), and signed out (selfIdx
+           forced to -1 above). None of them renders a placeholder. */
+        const pinned = selfIdx >= 6 ? board.ranked[selfIdx] : null;
+
+        const headCell = (text: string, align: 'left' | 'right') => (
+          <span
+            style={{
+              /* AXIS 10 — a column header is a coordinate, not language. */
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: BAND_FAINT,
+              textAlign: align,
+            }}
+          >
+            {text}
+          </span>
+        );
+
+        return (
+          <>
+            {/* §2 — THE CATEGORY PICKER LIVES IN THE CHROME ISLAND. It mounts
+                with the board, so it cannot survive onto another Discover tab,
+                and its label is `board.label`'s own short form — the value the
+                board is rendering, never the raw selection. */}
+            <BoardPicker
+              category={board.key}
+              options={boards.map((b) => ({
+                key: b.key,
+                label: b.label,
+                short: b.short,
+                count: b.ranked.length,
+              }))}
+              onSelect={(k) => setBoardCategory(k as BoardKey)}
+              sheetEyebrow={t('discover.golfThisWeek.board.pickerEyebrow', 'Discover')}
+              sheetTitle={t('discover.golfThisWeek.board.pickerTitle', 'Select board')}
+              ariaLabel={t('discover.golfThisWeek.board.pickerAria', 'Change board: {{label}}', {
+                label: board.label,
+              })}
+            />
+
             <div
-              key={tile.key}
-              data-band-podium={tile.key}
-              /* EVERY BAND TILE IS ITS OWN ROUND, so tapping one opens THAT
-                 round's scorecard — the same sheet the round tiles open. Not a
-                 <button>: these tiles sit in the same family as the round tiles,
-                 which cannot be buttons (a follow button lives inside them). */
-              role="button"
-              tabIndex={0}
-              onClick={() => onCardPress(tile.row)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-                  e.preventDefault();
-                  onCardPress(tile.row);
-                }
-              }}
+              data-discover-board={board.key}
               style={{
-                cursor: 'pointer',
-                /* §S4.3 — the card loses its border and takes a shadow. Same
-                   treatment as the round tiles: it sits on the page rather than
-                   being drawn onto it. */
                 background: A.PANEL,
-                border: 'none',
                 borderRadius: CARD_RADIUS,
                 boxShadow: CARD_SHADOW,
                 overflow: 'hidden',
-                /* FOUR TILES DO NOT SHRINK (§3.1): the figure is the content, so
-                   the band scrolls at 320px instead.
-                   230, NOT 154 (BRIEF_BAND_TILES_TOP_THREE §4). 154 was set when
-                   the chip held three lines; it now holds up to seven. At 154 a
-                   real account name — "Notascratchgolfer", ~112px at 12/700 —
-                   leaves no room for a rank, an avatar and a figure on one line
-                   in ANY order. The WIDTH was out of date, not the row. About
-                   2.2 chips fit across instead of 3, and the partly visible
-                   third also signals that the rail scrolls. */
-                flex: '1 0 230px',
-                minWidth: 230,
-                padding: '11px 12px 12px',
-
+                marginBottom: 12,
                 fontFamily: SANS,
               }}
             >
-              {/* THE EYEBROW ROW CARRIES THE UNIT (§2), right-aligned opposite
-                  the label. Once three rows share one figure column, printing
-                  "points" three times is noise — printed once at the top it is
-                  a COLUMN HEADER, which is what it always was. BEST THIS WEEK
-                  shows no unit: its to-par varies by round, so it is data and
-                  stays beside every figure. */}
+              {/* THE HEADER STRIP (§1.6). The PAR header is absent wherever the
+                  PAR column is — one flag, one grid, decided at table level. */}
               <div
                 style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                  color: BAND_FAINT,
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  gap: 4,
+                  display: 'grid',
+                  gridTemplateColumns: BOARD_GRID,
+                  alignItems: 'center',
+                  columnGap: 8,
+                  padding: '8px 16px',
+                  borderBottom: `1px solid ${WELL_RULE}`,
                 }}
               >
-                {/* Emoji remain deliberate on celebratory band tiles and sit
-                    directly on the tile background with no local surface. */}
-                <span
-                  style={{
-                    width: 11,
-                    height: 11,
-                    flex: '0 0 11px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 11,
-                    lineHeight: 1,
-                    color: DISCOVER_FACT,
-                    WebkitTextFillColor: 'initial',
-                    fontFamily:
-                      '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
-                    fontWeight: 400,
-                    fontStyle: 'normal',
-                    fontVariantEmoji: 'emoji',
-                  }}
-                >
-                  {tile.emoji}
-                </span>
-                {tile.label}
+                {headCell(t('discover.golfThisWeek.board.pos', 'POS'), 'left')}
+                {headCell(t('discover.golfThisWeek.board.member', 'MEMBER'), 'left')}
+                {headCell(board.unit, 'right')}
+                {board.hasPar
+                  ? headCell(t('discover.golfThisWeek.board.par', 'PAR'), 'right')
+                  : null}
               </div>
 
-              {/* BRIEF_BAND_TILES_PODIUM — one leader with a face, the margin,
-                  then up to two chasers. No field-relative progress bar: the
-                  exact deficit is the comparison. */}
-              <div
-                style={{
-                  marginTop: 8,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'stretch',
-                }}
-              >
-                {(() => {
-                  const leaderFigure = tile.figureOf(tile.row);
-                  const second = tile.runners[0];
-                  /* §1 — ROUND BEFORE COMPARING. Number(...) so the gap === 0
-                     tie test below still matches: toFixed returns a string. */
-                  const gap = second
-                    ? Number(
-                        Math.abs(tile.valueOf(tile.row) - tile.valueOf(second)).toFixed(
-                          tile.precision,
-                        ),
-                      )
-                    : null;
-                  return (
-                    <>
-                      <div
-                        data-podium-row="leader"
-                        role="button"
-                        tabIndex={0}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onCardPress(tile.row);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onCardPress(tile.row);
-                          }
-                        }}
+              {[...rows.map((r, i) => ({ r, pos: positions[i], own: false })),
+                ...(pinned ? [{ r: pinned, pos: positions[selfIdx], own: true }] : []),
+              ].map(({ r, pos, own }) => {
+                const tp = board.hasPar ? toParOf(r) : null;
+                return (
+                  <div
+                    key={own ? `you-${r.round_id}` : r.round_id}
+                    data-board-row={own ? 'you' : 'member'}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => onCardPress(r)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                        e.preventDefault();
+                        onCardPress(r);
+                      }
+                    }}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: BOARD_GRID,
+                      alignItems: 'center',
+                      columnGap: 8,
+                      padding: '10px 16px',
+                      borderBottom: `1px solid ${WELL_RULE}`,
+                      /* §1.5 — THE PINNED ROW IS A ROW IN THIS TABLE, same grid
+                         and same columns, distinguished by COLOUR ONLY. */
+                      background: own ? AMBER_WASH : 'transparent',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <span
+                      className="tabular-nums"
+                      style={{
+                        fontSize: 12.5,
+                        fontWeight: 700,
+                        color: own ? AMBER : BAND_FAINT,
+                      }}
+                    >
+                      {pos}
+                    </span>
+
+                    <span
+                      style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}
+                    >
+                      <SquircleAvatar
+                        src={r.profile_photo_url}
+                        userId={r.user_id}
+                        alt={r.display_name}
+                        size={26}
+                      />
+                      <span style={{ minWidth: 0 }}>
+                        <span
+                          style={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            fontSize: 13.5,
+                            fontWeight: 700,
+                            lineHeight: 1.15,
+                            color: own ? AMBER : INK,
+                          }}
+                        >
+                          {own ? t('discover.golfThisWeek.you', 'You') : r.display_name}
+                        </span>
+                        {/* On the pinned row the sub-line is the GAP TO THE
+                            LEADER with its per-category unit and derived
+                            direction (§1.5); on every other row it is WHERE. */}
+                        <span
+                          className={own ? 'tabular-nums' : undefined}
+                          style={{
+                            display: 'block',
+                            marginTop: 2,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            fontSize: 11,
+                            fontWeight: own ? 700 : 600,
+                            lineHeight: 1.15,
+                            letterSpacing: own ? '0.06em' : undefined,
+                            color: own ? AMBER : BAND_FAINT,
+                          }}
+                        >
+                          {own ? pinnedGap(board, r) : courseNameFor(r)}
+                        </span>
+                      </span>
+                    </span>
+
+                    <span
+                      className="tabular-nums"
+                      style={{
+                        ...NUMF,
+                        fontSize: 15,
+                        fontWeight: 700,
+                        textAlign: 'right',
+                        /* §3.3 — THE VALUE IS NOT A TO-PAR. A gross, a points
+                           total and a birdie count are neutral facts on a board:
+                           the band tiles painted the whole gross line GOLD even
+                           when the winning round was +3, and the birdie count
+                           red, both of which read as "under par" on a surface
+                           where red MEANS under par. Both are gone. */
+                        color: own ? AMBER : DISCOVER_FACT,
+                      }}
+                    >
+                      {board.format(r)}
+                    </span>
+
+                    {board.hasPar ? (
+                      <span
+                        className="tabular-nums"
                         style={{
-                          display: 'grid',
-                          gridTemplateColumns: '40px minmax(0, 1fr)',
-                          alignItems: 'center',
-                          columnGap: 10,
-                          minHeight: 64,
-                          cursor: 'pointer',
+                          fontSize: 12.5,
+                          fontWeight: 600,
+                          textAlign: 'right',
+                          /* §3.4 — AMBER OUTRANKS THE SCORE COLOUR on the
+                             viewing member's row, including its to-par. */
+                          color: own ? AMBER : tp?.tone ?? A.MUTE,
                         }}
                       >
-                        <PodiumAvatarRing
-                          avatarSize={40}
-                          src={tile.row.profile_photo_url}
-                          userId={tile.row.user_id}
-                          alt={tile.row.display_name}
-                          ringColor={tile.accent}
-                        />
-                        <span style={{ minWidth: 0 }}>
-                          <span
-                            style={{
-                              display: 'flex',
-                              alignItems: 'flex-end',
-                              gap: 4,
-                              color: tile.accent,
-                            }}
-                          >
-                            <span
-                              style={{
-                                ...NUMF,
-                                fontSize: 34,
-                                fontWeight: 700,
-                                lineHeight: 0.92,
-                                color: tile.accent,
-                              }}
-                            >
-                              {leaderFigure.text}
-                            </span>
-                            {leaderFigure.qual ? (
-                              <span
-                                style={{
-                                  ...NUMF,
-                                  fontSize: 13,
-                                  lineHeight: 1,
-                                  color: tile.accent,
-                                }}
-                              >
-                                {leaderFigure.qual}
-                              </span>
-                            ) : null}
-                          </span>
-                          <span
-                            style={{
-                              display: 'block',
-                              marginTop: 5,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              fontSize: 12,
-                              fontWeight: 700,
-                              lineHeight: 1,
-                              color: tile.row.is_self ? AMBER : INK,
-                            }}
-                          >
-                            {tile.row.display_name}
-                          </span>
-                        </span>
-                      </div>
-
-                      {gap != null ? (
-                        <>
-                          <div style={{ marginTop: 8 }}>
-                            <span
-                              className="tabular-nums"
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                minHeight: 20,
-                                padding: '4px 7px',
-                                boxSizing: 'border-box',
-                                borderRadius: CHIP_RADIUS,
-                                background: gap === 0 ? PODIUM_GROUND.tie : tile.chipGround,
-                                color: gap === 0 ? DISCOVER_QUIET : tile.accent,
-                                fontSize: 11,
-                                fontWeight: 700,
-                                lineHeight: 1,
-                                letterSpacing: '0.08em',
-                                textTransform: 'uppercase',
-                              }}
-                            >
-                              {podiumGap(tile, gap)}
-                            </span>
-                          </div>
-                          <div style={{ height: 1, background: WELL_RULE, margin: '12px 0 0' }} />
-                          {tile.runners.map((r, i) => {
-                            const figure = tile.figureOf(r);
-                            /* BRIEF_HERO_ROW_AND_DEFICIT §2 — the improved tile
-                               drops the grey deficit: two negative numbers on one
-                               row, in two colours, measuring different things. */
-                            const showDeficit = tile.key === 'best';
-                            return (
-                              <div
-                                key={r.round_id}
-                                data-podium-row="chaser"
-                                role="button"
-                                tabIndex={0}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onCardPress(r);
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    onCardPress(r);
-                                  }
-                                }}
-                                style={{
-                                  display: 'grid',
-                                  gridTemplateColumns: showDeficit
-                                    ? '12px 16px minmax(0, 1fr) auto auto'
-                                    : '12px 16px minmax(0, 1fr) auto',
-                                  alignItems: 'center',
-                                  gap: 6,
-                                  minHeight: 34,
-                                  borderTop: i === 0 ? 'none' : `1px solid ${WELL_RULE}`,
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                <span style={{
-                                  /* AXIS — STATED EXCEPTION: a rank marker is a
-                                     coordinate, not language. Floor 10. */
-                                  fontSize: 10, fontWeight: 700, color: BAND_FAINT }}>
-                                  {i + 2}
-                                </span>
-                                <SquircleAvatar
-                                  src={r.profile_photo_url}
-                                  userId={r.user_id}
-                                  alt={r.display_name}
-                                  size={16}
-                                  hideRing
-                                />
-                                <span
-                                  style={{
-                                    minWidth: 0,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    fontSize: 11,
-                                    fontWeight: 700,
-                                    color: r.is_self ? AMBER : INK,
-                                  }}
-                                >
-                                  {r.display_name}
-                                </span>
-                                <span
-                                  className="tabular-nums"
-                                  style={{ fontSize: 11, fontWeight: 700, color: tile.accent }}
-                                >
-                                  {figure.text}
-                                </span>
-                                {showDeficit ? (
-                                  <span
-                                    className="tabular-nums"
-                                    /* FLOOR (item 2) — the podium deficit is a
-                                       read figure, not a coordinate: 10 -> 11. */
-                                    style={{ fontSize: 11, fontWeight: 700, color: DISCOVER_QUIET }}
-                                  >
-                                    {podiumDeficit(tile, r)}
-                                  </span>
-                                ) : null}
-                              </div>
-                            );
-                          })}
-                        </>
-                      ) : null}
-
-                      {/* ============ THE PINNED OWN-MEMBER ROW (§1.3) ============
-                          A FOURTH ROW IN THE SAME LADDER, distinguished by
-                          COLOUR, not by shape: same rank / avatar / name /
-                          figure grammar as a chaser, on the amber own-member
-                          wash, with the gap to the leader carrying its unit.
-                          IT ONLY EXISTS OUTSIDE THE TOP THREE (§1.4): a member
-                          already on the podium is not shown twice, a member with
-                          no qualifying round in the window gets NOTHING (no
-                          placeholder, no prompt), a member below the tile's floor
-                          is not ranked here at all, and signed out renders the
-                          tile exactly as before. */}
-                      {(() => {
-                        if (!userId) return null;
-                        const selfIdx = tile.ranked.findIndex((r) => r.is_self);
-                        if (selfIdx < 3) return null;
-                        const own = tile.ranked[selfIdx];
-                        const figure = tile.figureOf(own);
-                        return (
-                          <div
-                            data-podium-row="you"
-                            role="button"
-                            tabIndex={0}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onCardPress(own);
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                onCardPress(own);
-                              }
-                            }}
-                            style={{
-                              marginTop: 8,
-                              padding: '0 6px',
-                              borderRadius: 6,
-                              background: AMBER_WASH,
-                              borderTop: `1px solid ${WELL_RULE}`,
-                              display: 'grid',
-                              gridTemplateColumns: '14px 16px minmax(0, 1fr) auto auto',
-                              alignItems: 'center',
-                              gap: 6,
-                              minHeight: 34,
-                              cursor: 'pointer',
-                            }}
-                          >
-                            <span
-                              className="tabular-nums"
-                              style={{ fontSize: 10, fontWeight: 700, color: AMBER }}
-                            >
-                              {selfIdx + 1}
-                            </span>
-                            <SquircleAvatar
-                              src={own.profile_photo_url}
-                              userId={own.user_id}
-                              alt={own.display_name}
-                              size={16}
-                              hideRing
-                            />
-                            <span style={{ fontSize: 11, fontWeight: 700, color: AMBER }}>
-                              {t('discover.golfThisWeek.you', 'You')}
-                            </span>
-                            <span
-                              className="tabular-nums"
-                              style={{
-                                fontSize: 10,
-                                fontWeight: 700,
-                                letterSpacing: '0.06em',
-                                color: AMBER,
-                              }}
-                            >
-                              {pinnedGap(tile, own)}
-                            </span>
-                            <span
-                              className="tabular-nums"
-                              style={{ fontSize: 11, fontWeight: 700, color: AMBER }}
-                            >
-                              {figure.text}
-                            </span>
-                          </div>
-                        );
-                      })()}
-                    </>
-
-                  );
-                })()}
-              </div>
-              {/* §1.1/§1.2 (BRIEF_DISCOVER_FINISHING_PASS) — THE COURSE LINE IS
-                  GONE. This OVERTURNS BRIEF_BAND_TILES_REFINEMENT ("the bottom
-                  line is the COURSE on every tile"), kept on the record rather
-                  than deleted.
-                  WHY: at 12/700 the line truncates before the informative part —
-                  "Sundridge Park Gol..." does not separate East from West, the
-                  one thing a member needs from it. The chip is tappable and the
-                  sheet it opens leads with the course in full.
-                  THE COST: the chip no longer says WHERE.
-
-                  ABSENT IS ABSENT (BRIEF_BAND_TILES_TOP_THREE §3): fewer than
-                  three qualifiers renders fewer rows — no dash, no placeholder,
-                  no reserved height. Sparse cards collapse to their content. */}
-
+                        {tp?.text ?? '\u2014'}
+                      </span>
+                    ) : null}
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
-      )}
+          </>
+        );
+      })()}
 
 
 

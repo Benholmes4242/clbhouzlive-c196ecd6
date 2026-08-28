@@ -1137,6 +1137,23 @@
         "fieldDay": "\uadf8\ub0a0 \ud544\ub4dc \ud3c9\uadfc\ubcf4\ub2e4 {{count}} \uc88b\uc74c",
         "yourBest": "\uc774\uacf3 \ucd5c\uace0 \uae30\ub85d\uc740 {{count}}",
         "betterThanBest": "\uc774\uacf3 \ucd5c\uace0 \uae30\ub85d\ubcf4\ub2e4 {{count}}\ud0c0 \uc88b\uc74c"
+      },
+      "board": {
+        "birdiesLabel": "Most birdies",
+        "birdiesShort": "BIRDIES",
+        "birdiesUnit": "BIRDIES",
+        "grossLabel": "Lowest gross",
+        "grossShort": "GROSS",
+        "grossUnit": "GROSS",
+        "member": "MEMBER",
+        "par": "PAR",
+        "pickerAria": "Change board: {{label}}",
+        "pickerEyebrow": "Discover",
+        "pickerTitle": "Select board",
+        "pos": "POS",
+        "stablefordLabel": "Stableford",
+        "stablefordShort": "STABLEFORD",
+        "stablefordUnit": "PTS"
       }
     },
     "week": {
