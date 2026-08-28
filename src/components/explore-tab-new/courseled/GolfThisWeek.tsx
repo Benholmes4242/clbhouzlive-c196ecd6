@@ -239,7 +239,20 @@ const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 const SHAPE_H = 49;
 const SHAPE_BLOCK_H = 53;
 const WELL_H = 139 + SHAPE_BLOCK_H;
-const CARD_MIN_H = 331 + SHAPE_BLOCK_H;
+void SHAPE_H;
+void WELL_H;
+
+/**
+ * BRIEF_GOLF_THIS_WEEK_P1_P3 §3.1/§3.4 — THE SCORECARD BLOCK IS BEHIND THE TAP.
+ * The card is now hero (132) + member row (35) + the FOOT (44: an optional
+ * reference line and the SEE THE CARD action). The foot's height is FIXED, so a
+ * card with no reference line and a card with no kicker are the same height and
+ * the rail stays level (§3.4).
+ */
+const FOOT_H = 44;
+const MEMBER_ROW_H = 35;
+const CARD_MIN_H = HERO_H + MEMBER_ROW_H + FOOT_H;
+
 
 /**
  * THE FILLS ARE MIXED ON THE WELL, NOT ON THE PANEL (§A5). TrajectoryLine's dark
