@@ -82,11 +82,15 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     expect(champagne?.dataset.honoursMetal).toBe(ALBATROSS_GROUND);
     expect(bone).toHaveLength(2);
     expect(bone.every((head) => head.dataset.honoursMetal === ACE_GROUND)).toBe(true);
-    expect(champagne?.parentElement?.style.background).not.toBe(ALBATROSS_GROUND);
-    expect(bone[0].parentElement?.style.background).not.toBe(ACE_GROUND);
+    /* ONE MATERIAL: the metal ground now lives on the card shell, full height;
+       the feat block carries no background of its own. */
+    expect(champagne?.parentElement?.style.background).toBe(ALBATROSS_GROUND);
+    expect(bone[0].parentElement?.style.background).toBe(ACE_GROUND);
+    expect(champagne?.style.background).toBe('');
+    expect(bone[0].style.background).toBe('');
   });
 
-  it('uses full ink for feat copy and a measured quiet ink for the year', () => {
+  it('uses full ink for feat copy, a measured quiet ink for the year, and ink for the course name on the one-material card', () => {
     const { container } = render(<HonoursBoard events={[ev({ id: 'a' })]} />);
     const head = container.querySelector<HTMLElement>('[data-honours-feat-block="ace"]');
     expect(head).toBeTruthy();
@@ -95,6 +99,9 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     expect(screen.getByText('Sam Fairway').style.color).toBe(ink);
     expect(screen.getByText(/Par 3/).style.color).toBe('rgba(11, 15, 20, 0.6)');
     expect(screen.getByText('2024').style.color).toBe('rgba(11, 15, 20, 0.6)');
+    const course = screen.getByText('Royal Test');
+    expect(course.style.color).toBe(ink);
+    expect(course.parentElement?.style.borderTop).toBe('1px solid rgba(216, 169, 60, 0.22)');
   });
 
   it('uses a lazy-loaded 40px squircle avatar in the unchanged 44px footprint', () => {
