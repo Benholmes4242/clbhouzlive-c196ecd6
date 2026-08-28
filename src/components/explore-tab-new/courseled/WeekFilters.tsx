@@ -96,8 +96,6 @@ export function scopeLabelKey(scope: WeekScope): { key: string; fallback: string
   switch (scope) {
     case 'circle':
       return { key: 'discover.week.scope.circle', fallback: 'Your Circle' };
-    case 'suggested':
-      return { key: 'discover.week.scope.suggested', fallback: 'Suggested' };
     case 'handicap_band':
       return { key: 'discover.week.scope.handicapBand', fallback: 'Near your handicap' };
     case 'top_100':
@@ -117,11 +115,6 @@ export function scopeEmptyKey(scope: WeekScope): { key: string; fallback: string
       return {
         key: 'discover.week.empty.circle',
         fallback: 'No rounds from your circle in the last 14 days.',
-      };
-    case 'suggested':
-      return {
-        key: 'discover.week.empty.suggested',
-        fallback: 'No suggested rounds in the last 14 days.',
       };
     case 'handicap_band':
       return {
