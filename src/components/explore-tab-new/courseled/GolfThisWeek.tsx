@@ -1807,7 +1807,7 @@ export function GolfThisWeek({
             position: 'relative',
             width: '100dvw',
             marginLeft: 'calc(50% - 50dvw)',
-            height: `calc(${BOARD_HERO_H}px + env(safe-area-inset-top, 0px))`,
+            height: `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`,
             marginBottom: 14,
             overflow: 'hidden',
             isolation: 'isolate',
