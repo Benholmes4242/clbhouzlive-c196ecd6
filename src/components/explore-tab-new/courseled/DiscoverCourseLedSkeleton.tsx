@@ -387,89 +387,25 @@ export function GolfThisWeekRail() {
                 />
               </div>
             </div>
-            <div style={{ padding: '0 10px 0' }}>
-              {/* THE DARK FEED WELL (BRIEF_DARK_ONLY_PART_B §2.2): header, its one
-                  rule, and the FIXED 96px scorecard region — the same height on
-                   every card, running to the card's bottom edge, with the same
-                   dark hairline inset on all four sides as the live tile. */}
-              <div
-                style={{
-                  /* THE WELL'S 8px OFFSET MOVED UP INTO THE DARK REGION'S BOTTOM
-                     PADDING (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §1) — the row's 8/8
-                     now sits inside the dark block, so keeping a margin here as well would
-                     add 8px to the tile. The total height is unchanged. */
-                  marginTop: 0,
-                  marginLeft: -10,
-                  marginRight: -10,
-                  /* 139 + THE SHAPE's 53 (BRIEF_ROUND_TILE_CURVE §5). The live
-                     tile grew by the curve and its eyebrow; the shell grows in
-                     the same pass or the first frame is the wrong height. */
-                  height: 192,
-                  background: 'rgba(11,13,16,0.66)',
-                  boxShadow: `inset 0 0 0 1px ${A.HAIRLINE}`,
-                   borderRadius: `0 0 ${WELL_RADIUS}px ${WELL_RADIUS}px`,
-                  padding: '6px 6px 9px',
-                  boxSizing: 'border-box',
-                }}
-              >
-
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingBottom: 6,
-                    borderBottom: `1px solid ${A.HAIRLINE}`,
-                  }}
-                >
-                  <Bar style={{ height: 8, width: 54 }} />
-                  <Bar style={{ height: 8, width: 66 }} />
-                </div>
-                {/* THE SHAPE's region, 53 = 4 + curve 49. NO EYEBROW — the live
-                    tile dropped it and the curve took the space. A FLAT ROW, not a
-                    fake curve: the shell states the height, nothing about content. */}
-                <div style={{ height: 53, paddingTop: 4, boxSizing: 'border-box' }}>
-                  <div style={{ height: 49, display: 'flex', alignItems: 'center' }}>
-                    <Bar style={{ height: 2, width: '100%' }} />
-                  </div>
-                </div>
-                <div
-                  style={{
-                    height: 96,
-                    marginTop: 7,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    gap: 4,
-                  }}
-                >
-                  {/* TWO ROWS OF NINE at the live 17px cell / 9px gap. */}
-                  {[0, 1].map((nine) => (
-                    <div key={nine}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          marginBottom: 4,
-                        }}
-                      >
-                        <Bar style={{ height: 8, width: 20 }} />
-                        <Bar style={{ height: 8, width: 34 }} />
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: 9 }}>
-                        {Array.from({ length: 9 }, (_, c) => (
-                          <Bar
-                            key={c}
-                            style={{ height: 17, width: 17, borderRadius: 999 }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-              </div>
+            {/* THE FOOT, 44 (BRIEF_GOLF_THIS_WEEK_P1_P3 §3.1/§3.4). THE WELL IS
+                GONE from the live card — the curve and the eighteen hole marks
+                moved behind SEE THE CARD — so the shell drops it in the same pass
+                rather than promising a scorecard the settled card does not draw.
+                One optional reference line and the action, both flat bars. */}
+            <div
+              style={{
+                height: 44,
+                boxSizing: 'border-box',
+                padding: '6px 12px 8px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Bar style={{ height: 9, width: 128 }} />
+              <Bar style={{ height: 8, width: 72 }} />
             </div>
+
 
           </div>
         ))}
