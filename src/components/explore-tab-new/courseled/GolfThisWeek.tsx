@@ -30,7 +30,7 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
 import { heroCanonScrimOn } from '@/features/tourhub/_shared/heroGradient';
-import { HERO_BOARD_SURFACE } from '@/features/tourhub/_shared/tokens';
+import { CHARCOAL } from '@/features/tourhub/_shared/tokens';
 
 import {
   COURSE_GRADIENT,
@@ -1846,9 +1846,9 @@ export function GolfThisWeek({
             />
           )}
           {/* THE ONE CANON SCRIM — a 260px bottom ramp, the same ramp and the
-              same height PhotoBand paints. It ends on the board surface, which
-              is what sits beneath this hero now that the board block is
-              full-bleed, so there is no seam. */}
+              same height PhotoBand paints. Per the canon it terminates on what
+              sits beneath it — the Discover canvas — so there is no seam where
+              the hero meets the scope pills. */}
           <div
             aria-hidden="true"
             style={{
@@ -1857,7 +1857,7 @@ export function GolfThisWeek({
               right: 0,
               bottom: 0,
               height: 260,
-              background: heroCanonScrimOn(HERO_BOARD_SURFACE),
+              background: heroCanonScrimOn(CHARCOAL),
               zIndex: -1,
             }}
           />
@@ -2142,10 +2142,15 @@ export function GolfThisWeek({
 
             <div
               data-discover-board={board.key}
+              /* FULL-BLEED, like the tour's leaderboard block: the board is the
+                 page's spine, not a card on it. It escapes the page gutter, drops
+                 the radius and the shadow, and keeps its own 20px column so its
+                 rows line up with the hero's lower third. */
               style={{
+                width: '100dvw',
+                marginLeft: 'calc(50% - 50dvw)',
                 background: A.PANEL,
-                borderRadius: CARD_RADIUS,
-                boxShadow: CARD_SHADOW,
+                borderTop: `1px solid ${WELL_RULE}`,
                 overflow: 'hidden',
                 marginBottom: 12,
                 fontFamily: SANS,
@@ -2159,7 +2164,7 @@ export function GolfThisWeek({
                   gridTemplateColumns: BOARD_GRID,
                   alignItems: 'center',
                   columnGap: 8,
-                  padding: '8px 16px',
+                  padding: '8px 20px',
                   borderBottom: `1px solid ${WELL_RULE}`,
                 }}
               >
@@ -2193,7 +2198,7 @@ export function GolfThisWeek({
                       gridTemplateColumns: BOARD_GRID,
                       alignItems: 'center',
                       columnGap: 8,
-                      padding: '6px 16px',
+                      padding: '6px 20px',
                       borderBottom: `1px solid ${WELL_RULE}`,
                       /* §1.5 — THE PINNED ROW IS A ROW IN THIS TABLE, same grid
                          and same columns, distinguished by COLOUR ONLY. */
