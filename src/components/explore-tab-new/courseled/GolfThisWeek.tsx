@@ -2517,6 +2517,13 @@ export function GolfThisWeek({
               viewerUserId={userId}
               reference={referenceByRound.get(r.round_id) ?? null}
               onPress={() => onCardPress(r)}
+              /* §S1.2/§2.4 — target is the whs_score id, and the control renders
+                 on your OWN round too (the trigger already skips self-notify). */
+              reactionCount={reactions.stateFor('round', r.score_id).count}
+              reactionMine={reactions.stateFor('round', r.score_id).mine}
+              reactionHidden={!r.score_id || !reactions.viewerId || reactions.unavailable}
+              onToggleReaction={() => reactions.toggle('round', r.score_id)}
+
 
             />
           );
