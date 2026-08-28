@@ -251,7 +251,14 @@ const PostDeepLinkPage: React.FC = () => {
 
     }
 
-    loadPost();
+    // Nothing in loadPost may strand the page on the scrim: any throw (mapper,
+    // network, RPC) resolves to the actionable load-error state.
+    loadPost().catch((err) => {
+      console.error('[PostDeepLink] loadPost threw', err);
+      setLoadError(true);
+      setIsLoading(false);
+    });
+
     if (postId) recordPostViewOnce(postId);
   }, [postId, user?.id, retryTick]);
 
