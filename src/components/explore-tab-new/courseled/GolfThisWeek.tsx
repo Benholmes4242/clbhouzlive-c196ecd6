@@ -1432,6 +1432,26 @@ export function GolfThisWeek({
       else groups.set(key, [r]);
     }
     const out = new Map<string, string>();
+
+    /* (b) then (a), own rounds only. Written first so (d) below never overwrites
+       a personal tier — the ladder takes the FIRST that resolves. */
+    for (const r of ordered) {
+      if (!r.is_self || !r.course_id || r.gross == null) continue;
+      const mine = myBests.get(r.course_id);
+      const bestGross = mine?.best_gross;
+      const roundsHere = mine?.rounds_here ?? 0;
+      if (bestGross == null || roundsHere < 4) continue;
+      if (r.gross > bestGross) {
+        out.set(
+          r.round_id,
+          t('discover.golfThisWeek.reference.yourBest', 'Your best here is {{count}}', {
+            count: bestGross,
+          }),
+        );
+      }
+      // r.gross === bestGross: this round IS the best, margin unknowable — fall through.
+    }
+
     for (const list of groups.values()) {
       if (list.length < 3) continue;
       const toPars = list.map((r) => (r.gross as number) - (r.course_par as number));
