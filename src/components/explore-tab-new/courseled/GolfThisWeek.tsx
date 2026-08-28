@@ -2381,7 +2381,7 @@ export function GolfThisWeek({
                   ? [{ r: pinned, pos: positions[selfIdx], own: true, pinnedRow: true }]
                   : []),
               ].map(({ r, pos, own, pinnedRow }) => {
-                const tp = board.hasPar ? toParOf(r) : null;
+                const tp = board.hasPar ? (board.parCell ?? toParOf)(r) : null;
                 return (
                   <div
                     key={pinnedRow ? `you-${r.round_id}` : r.round_id}
