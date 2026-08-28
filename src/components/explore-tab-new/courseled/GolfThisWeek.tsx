@@ -1691,8 +1691,9 @@ export function GolfThisWeek({
       offUnit: 'shots',
     },
     {
-      /* §1.1 — LOWEST NET. Ranked on the row's own `net`; the GROSS rides in the
-         fourth column so 68 net reads against the 88 it came from. */
+      /* LOWEST NET (BRIEF_BOARD_LOWEST_NET §2.3/§2.4). Ranked on gam_round_net's
+         net_score; the GROSS rides in the fourth column under a GROSS header so
+         67 net reads against the 79 it came from. */
       key: 'net',
       label: t('discover.golfThisWeek.board.netLabel', 'Lowest net'),
       short: t('discover.golfThisWeek.board.netShort', 'NET'),
