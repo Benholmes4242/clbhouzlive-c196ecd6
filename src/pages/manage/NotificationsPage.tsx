@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Switch } from '@/components/ui/switch';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -70,7 +71,14 @@ export default function NotificationsPage() {
 
   const [mutedTypes, setMutedTypes] = useState<string[]>([]);
   const [mutedUserIds, setMutedUserIds] = useState<string[]>([]);
+  const [mutedBusinessIds, setMutedBusinessIds] = useState<string[]>([]);
+  /* Resolved names/avatars for the muted list. An id that resolves to NOTHING
+     (deleted member, removed business) still gets a row — a mute nobody can
+     lift is worse than an unnamed row. */
+  const [mutedMeta, setMutedMeta] = useState<Record<string, { name: string; photo: string | null }>>({});
+  const [unmuting, setUnmuting] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
 
   const isPushEnabled = pushNotifications.state === 'enabled';
   const isPushUnavailable = pushNotifications.state === 'unavailable' && !pushNotifications.isLoading;
@@ -88,14 +96,84 @@ export default function NotificationsPage() {
     if (!userId) return;
     supabase
       .from('notification_preferences')
-      .select('muted_types, muted_user_ids')
+      .select('muted_types, muted_user_ids, muted_business_ids')
       .eq('user_id', userId)
       .maybeSingle()
       .then(({ data }) => {
         setMutedTypes((data?.muted_types as string[]) ?? []);
         setMutedUserIds((data?.muted_user_ids as string[]) ?? []);
+        setMutedBusinessIds((data?.muted_business_ids as string[]) ?? []);
       });
   }, [userId]);
+
+  // Resolve the muted ids to names/avatars. Two lookups, two tables; anything
+  // unresolved simply has no entry here and renders as an unnamed row.
+  useEffect(() => {
+    if (mutedUserIds.length === 0 && mutedBusinessIds.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const next: Record<string, { name: string; photo: string | null }> = {};
+      if (mutedUserIds.length > 0) {
+        const { data } = await supabase
+          .from('user_profiles')
+          .select('id, display_name, username, profile_photo_url')
+          .in('id', mutedUserIds);
+        for (const p of data ?? []) {
+          next[p.id] = {
+            name: p.display_name || p.username || '',
+            photo: p.profile_photo_url ?? null,
+          };
+        }
+      }
+      if (mutedBusinessIds.length > 0) {
+        const { data } = await supabase
+          .from('business_accounts')
+          .select('id, name, slug, logo_url')
+          .in('id', mutedBusinessIds);
+        for (const b of data ?? []) {
+          next[b.id] = { name: b.name || b.slug || '', photo: b.logo_url ?? null };
+        }
+      }
+      if (!cancelled) setMutedMeta((prev) => ({ ...prev, ...next }));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [mutedUserIds, mutedBusinessIds]);
+
+  /* One list, two arrays. The row remembers which array it came from so Unmute
+     writes back to the right column. */
+  const mutedRows = useMemo(
+    () => [
+      ...mutedUserIds.map((id) => ({ id, kind: 'person' as const })),
+      ...mutedBusinessIds.map((id) => ({ id, kind: 'business' as const })),
+    ],
+    [mutedUserIds, mutedBusinessIds],
+  );
+
+  const handleUnmute = async (id: string, kind: 'person' | 'business') => {
+    if (!userId) return;
+    const column = kind === 'business' ? 'muted_business_ids' : 'muted_user_ids';
+    const prev = kind === 'business' ? mutedBusinessIds : mutedUserIds;
+    const next = prev.filter((x) => x !== id);
+    const setter = kind === 'business' ? setMutedBusinessIds : setMutedUserIds;
+    setter(next);
+    setUnmuting(id);
+    try {
+      const { error } = await supabase
+        .from('notification_preferences')
+        .upsert({ user_id: userId, [column]: next }, { onConflict: 'user_id' });
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-v2'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
+    } catch {
+      setter(prev);
+      toast.error('Could not unmute.');
+    } finally {
+      setUnmuting(null);
+    }
+  };
 
   // A category is ON when NONE of its types appear in muted_types. Partial
   // overlap (a single type muted via the per-notification sheet) renders as
@@ -198,30 +276,63 @@ export default function NotificationsPage() {
           </p>
         </div>
 
-        {/* Muted people — only when the list is non-empty. */}
-        {mutedUserIds.length > 0 && (
+        {/* MUTED ACCOUNTS — people and businesses in one list, each with the way
+            back out. The old surface rendered a bare count, so a mute could be
+            made but never lifted. */}
+        {mutedRows.length > 0 && (
           <div>
             <p
               className="text-[11px] font-semibold uppercase tracking-[1.5px] px-1 mb-2"
               style={{ color: A.MUTE }}
             >
-              Muted people
+              Muted accounts
             </p>
             <div
               className="rounded-2xl overflow-hidden"
               style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
             >
-              <div
-                className="flex items-center justify-between px-4 py-3 min-h-[52px] cursor-default"
-              >
-                <p className="text-[15px] text-foreground">Muted accounts</p>
-                <span
-                  className="text-[13px] font-semibold rounded-full px-2 py-0.5"
-                  style={{ background: 'rgba(255,255,255,0.06)', color: A.MUTE }}
-                >
-                  {mutedUserIds.length}
-                </span>
-              </div>
+              {mutedRows.map((r, idx) => {
+                const meta = mutedMeta[r.id];
+                return (
+                  <div
+                    key={`${r.kind}:${r.id}`}
+                    className="flex items-center justify-between gap-3 px-4 py-3 min-h-[56px]"
+                    style={{ borderTop: idx === 0 ? 'none' : `0.5px solid ${A.BORDER}` }}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <SquircleAvatar
+                        size={34}
+                        src={meta?.photo ?? null}
+                        alt={meta?.name || 'Muted account'}
+                        userId={r.id}
+                        hairlineRing
+                      />
+                      <div className="min-w-0">
+                        <p className="text-[15px] text-foreground truncate">
+                          {meta?.name || 'Unavailable account'}
+                        </p>
+                        <p className="text-[12px]" style={{ color: A.MUTE }}>
+                          {r.kind === 'business' ? 'Business' : 'Member'}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleUnmute(r.id, r.kind)}
+                      disabled={unmuting === r.id}
+                      className="text-[13px] font-semibold rounded-full px-3 py-1.5 shrink-0"
+                      style={{
+                        background: 'rgba(255,255,255,0.06)',
+                        border: `1px solid ${A.BORDER}`,
+                        color: '#F8FAFC',
+                        opacity: unmuting === r.id ? 0.5 : 1,
+                      }}
+                    >
+                      Unmute
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
