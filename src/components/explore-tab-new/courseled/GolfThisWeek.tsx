@@ -2210,12 +2210,16 @@ export function GolfThisWeek({
       {activeBoard && activeBoard.ranked.length > 0 && (() => {
         const board = activeBoard;
         const positions = positionsFor(board);
-        const rows = board.ranked.slice(0, 6);
+        /* FIVE RANKED ROWS, NEVER SIX. Five plus at most one pinned row keeps
+           the board to six rows total so the pinned row cannot fall below the
+           fold on a small phone. */
+        const rows = board.ranked.slice(0, 5);
         const selfIdx = userId ? board.ranked.findIndex((r) => r.is_self) : -1;
-        /* §1.5 — THE THREE NO-PIN STATES: already in the top six, no qualifying
-           round in the window (findIndex === -1), and signed out (selfIdx
-           forced to -1 above). None of them renders a placeholder. */
-        const pinned = selfIdx >= 6 ? board.ranked[selfIdx] : null;
+        /* THE THREE NO-PIN STATES: already inside the visible five (marked in
+           place in full amber instead), no qualifying round in the window
+           (findIndex === -1), and signed out (selfIdx forced to -1 above).
+           Marking in place and pinning are alternatives, never both. */
+        const pinned = selfIdx >= 5 ? board.ranked[selfIdx] : null;
 
         const headCell = (text: string, align: 'left' | 'center' | 'right') => (
           <span
