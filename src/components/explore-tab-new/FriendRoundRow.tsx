@@ -81,6 +81,7 @@ interface Props {
     count: number;
     mine: boolean;
     hidden: boolean;
+    readOnly: boolean;
     label: string;
     onToggle: () => void;
   } | null;
@@ -258,6 +259,7 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight, shape = 
             <ReactionAction
               count={reaction.count}
               reacted={reaction.mine}
+              readOnly={reaction.readOnly}
               onToggle={reaction.onToggle}
               label={reaction.label}
             />

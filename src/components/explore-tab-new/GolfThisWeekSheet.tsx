@@ -16,6 +16,10 @@ import {
 } from './courseled/hooks/useGolfThisWeek';
 import { useCourseCardMeta } from './courseled/hooks/useCourseCardMeta';
 import {
+  useContentReactions,
+  type ReactionTarget,
+} from './courseled/hooks/useContentReactions';
+import {
   useWeekRegionCounts,
   type RegionSelection,
 } from './courseled/hooks/useWeekRegionCounts';
@@ -75,6 +79,20 @@ export function GolfThisWeekSheet({
   const insights = useMemo(() => buildInsightMap(rounds, t as never), [rounds, t]);
   const scoreIds = useMemo(() => rounds.map((r) => r.score_id), [rounds]);
   const holeShapes = useRoundHoleShapes(scoreIds);
+
+  /* REACTIONS (BRIEF_DISCOVER_LOOSE_ENDS §S2). The sheet is the rail's "see all"
+     destination, so a round cannot carry a heart there and none here. ONE batched
+     read for the whole list, keyed on the same whs_score ids the rows already
+     hold, exactly as FriendsPlayedRail does — which is also why a tap here moves
+     the rail behind the sheet: the hook patches every cache window holding the id. */
+  const reactionTargets = useMemo<ReactionTarget[]>(
+    () =>
+      scoreIds
+        .filter((id): id is string => !!id)
+        .map((id) => ({ type: 'round' as const, id })),
+    [scoreIds],
+  );
+  const reactions = useContentReactions(reactionTargets);
 
   const days = useMemo(() => {
     const map = new Map<string, CircleRoundRow[]>();
@@ -193,6 +211,13 @@ export function GolfThisWeekSheet({
                 row={r}
                 insight={insights.get(r.round_id)?.text ?? referenceLine(r, t)}
                 shape={holeShapes?.get(r.score_id ?? '') ?? null}
+                reaction={{
+                  ...reactions.stateFor('round', r.score_id),
+                  hidden: !r.score_id || !reactions.viewerId || reactions.unavailable,
+                  readOnly: !!reactions.viewerId && r.user_id === reactions.viewerId,
+                  label: t('discover.reactions.action', 'Like this round'),
+                  onToggle: () => reactions.toggle('round', r.score_id),
+                }}
                 isLast={i === list.length - 1}
                 onPress={() => onRowPress(r.score_id, r.user_id)}
               />
