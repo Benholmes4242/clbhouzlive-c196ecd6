@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { Check, ChevronRight } from 'lucide-react';
+import { Check, ChevronDown, ChevronRight } from 'lucide-react';
 
 
 /**
@@ -1377,6 +1377,9 @@ export function GolfThisWeek({
    * this answers "which board", and only the former is shareable today.
    */
   const [boardCategory, setBoardCategory] = useState<'gross' | 'stableford' | 'birdies'>('gross');
+  /* ONE piece of state controls the category sheet, owned here because the
+     control (the hero title) and the sheet render in different blocks. */
+  const [pickerOpen, setPickerOpen] = useState(false);
   /* THE SCOPE FILTERS AT THE QUERY (§E): Top 100 and Played resolve to a course
      allow-list that goes into SQL. `undefined` means not yet resolved. */
   const scopeCourses = useWeekScopeCourses(userId, scope);
@@ -2157,11 +2160,11 @@ export function GolfThisWeek({
 
         return (
           <>
-            {/* §2 — THE CATEGORY PICKER LIVES IN THE CHROME ISLAND. It mounts
-                with the board, so it cannot survive onto another Discover tab,
-                and its label is `board.label`'s own short form — the value the
-                board is rendering, never the raw selection. */}
+            {/* THE CATEGORY SHEET, opened by the hero title. Its `category` is
+                the value the board is RENDERING, never the raw selection. */}
             <BoardPicker
+              open={pickerOpen}
+              onClose={() => setPickerOpen(false)}
               category={board.key}
               options={boards.map((b) => ({
                 key: b.key,
@@ -2172,9 +2175,6 @@ export function GolfThisWeek({
               onSelect={(k) => setBoardCategory(k as BoardKey)}
               sheetEyebrow={t('discover.golfThisWeek.board.pickerEyebrow', 'Discover')}
               sheetTitle={t('discover.golfThisWeek.board.pickerTitle', 'Select board')}
-              ariaLabel={t('discover.golfThisWeek.board.pickerAria', 'Change board: {{label}}', {
-                label: board.label,
-              })}
             />
 
             <div
