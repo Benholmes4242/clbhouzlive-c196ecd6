@@ -20405,6 +20405,10 @@ export type Database = {
           width: number
         }[]
       }
+      get_publication_stats: {
+        Args: { p_end: string; p_start: string }
+        Returns: Json
+      }
       get_push_health_summary: { Args: never; Returns: Json }
       get_recent_course_records: {
         Args: { p_limit?: number }
