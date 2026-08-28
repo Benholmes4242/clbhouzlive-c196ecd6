@@ -2101,7 +2101,7 @@ export function GolfThisWeek({
            forced to -1 above). None of them renders a placeholder. */
         const pinned = selfIdx >= 6 ? board.ranked[selfIdx] : null;
 
-        const headCell = (text: string, align: 'left' | 'right') => (
+        const headCell = (text: string, align: 'left' | 'center' | 'right') => (
           <span
             style={{
               /* AXIS 10 — a column header is a coordinate, not language. */
@@ -2167,11 +2167,11 @@ export function GolfThisWeek({
                   borderBottom: `1px solid ${WELL_RULE}`,
                 }}
               >
-                {headCell(t('discover.golfThisWeek.board.pos', 'POS'), 'left')}
+              {headCell(t('discover.golfThisWeek.board.pos', 'POS'), 'center')}
                 {headCell(t('discover.golfThisWeek.board.member', 'MEMBER'), 'left')}
-                {headCell(board.unit, 'right')}
+                {headCell(board.unit, 'center')}
                 {board.hasPar
-                  ? headCell(t('discover.golfThisWeek.board.par', 'PAR'), 'right')
+                  ? headCell(t('discover.golfThisWeek.board.par', 'PAR'), 'center')
                   : null}
               </div>
 
@@ -2197,7 +2197,7 @@ export function GolfThisWeek({
                       gridTemplateColumns: BOARD_GRID,
                       alignItems: 'center',
                       columnGap: 8,
-                      padding: '6px 20px',
+                      padding: '8px 20px',
                       borderBottom: `1px solid ${WELL_RULE}`,
                       /* §1.5 — THE PINNED ROW IS A ROW IN THIS TABLE, same grid
                          and same columns, distinguished by COLOUR ONLY. */
@@ -2210,6 +2210,7 @@ export function GolfThisWeek({
                       style={{
                         fontSize: 12.5,
                         fontWeight: 700,
+                        textAlign: 'center',
                         color: own ? AMBER : BAND_FAINT,
                       }}
                     >
@@ -2271,7 +2272,7 @@ export function GolfThisWeek({
                         ...NUMF,
                         fontSize: 15,
                         fontWeight: 700,
-                        textAlign: 'right',
+                        textAlign: 'center',
                         /* §3.3 — THE VALUE IS NOT A TO-PAR. A gross, a points
                            total and a birdie count are neutral facts on a board:
                            the band tiles painted the whole gross line GOLD even
@@ -2290,7 +2291,7 @@ export function GolfThisWeek({
                         style={{
                           fontSize: 12.5,
                           fontWeight: 600,
-                          textAlign: 'right',
+                          textAlign: 'center',
                           /* §3.4 — AMBER OUTRANKS THE SCORE COLOUR on the
                              viewing member's row, including its to-par. */
                           color: own ? AMBER : tp?.tone ?? A.MUTE,
