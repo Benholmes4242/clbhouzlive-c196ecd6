@@ -29,6 +29,7 @@ import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
+import { useMyCourseBests } from '@/features/tourhub/hooks/useMyCourseBests';
 
 import {
   DEFAULT_WEEK_SCOPE,
