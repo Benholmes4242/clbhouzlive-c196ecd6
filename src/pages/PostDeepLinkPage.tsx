@@ -144,17 +144,20 @@ const PostDeepLinkPage: React.FC = () => {
           .select('blocker_id, blocked_id')
           .in('blocker_id', pair)
           .in('blocked_id', pair)
-          .limit(1);
+          .limit(2);
         if (blockError) {
           // FAIL OPEN, deliberately: a transient lookup failure hiding a friend's
           // post is worse than a rare missed block, and the post fetch above is
           // already RLS-protected. Logged so it is never silent again.
           console.error('[PostDeepLink] block lookup failed, failing open', blockError);
-        } else if (blockRows && blockRows.length > 0) {
+        } else if ((blockRows ?? []).some((r) => r.blocker_id !== r.blocked_id)) {
+          // Self-rows (blocker === blocked) would also satisfy the two .in()
+          // filters; they are nonsense data and must not hide anyone's post.
           setNotFound(true);
           setIsLoading(false);
           return;
         }
+
       }
 
 
