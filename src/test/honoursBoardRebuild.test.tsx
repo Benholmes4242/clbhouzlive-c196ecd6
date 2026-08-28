@@ -103,7 +103,7 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     expect(screen.getByText('Sam Fairway').style.color).toBe('rgb(15, 18, 22)');
     const course = screen.getByText('Royal Test');
     expect(course.style.color).toBe('rgb(59, 66, 76)');
-    expect(course.parentElement?.style.borderTop.replace(/\s/g, '')).toBe('1pxsolidrgb(243,233,206)');
+    expect(course.parentElement?.style.borderTop.replace(/\s/g, '')).toBe('1pxsolid#F3E9CE');
   });
 
 
