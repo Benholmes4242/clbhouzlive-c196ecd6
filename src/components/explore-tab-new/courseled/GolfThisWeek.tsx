@@ -1643,6 +1643,7 @@ export function GolfThisWeek({
          the same row, so the runners are places 2 and 3 of that same list. */
       runners: bestRanked.slice(1, 3),
       ranked: bestRanked,
+      offUnit: 'shots' as const,
       lowerWins: true,
       valueOf: (r) => r.gross as number,
       accent: PODIUM_ACCENT.gold,
@@ -1670,6 +1671,7 @@ export function GolfThisWeek({
       row: bestStableford,
       runners: stablefordRanked.slice(1, 3),
       ranked: stablefordRanked,
+      offUnit: 'points' as const,
       lowerWins: false,
       valueOf: (r) => r.stableford_points as number,
       accent: PODIUM_ACCENT.white,
@@ -1687,6 +1689,7 @@ export function GolfThisWeek({
       row: mostBirdies,
       runners: birdiesRanked.slice(1, 3),
       ranked: birdiesRanked,
+      offUnit: 'birdies' as const,
       lowerWins: false,
       valueOf: (r) => r.birdies as number,
       accent: PODIUM_ACCENT.red,
@@ -1705,6 +1708,7 @@ export function GolfThisWeek({
       row: mostImproved,
       runners: improvedRanked.slice(1, 3),
       ranked: improvedRanked,
+      offUnit: 'index' as const,
       lowerWins: false,
       /* Convert negative deltas to positive improvement magnitudes. This keeps
          one higher-wins deficit formula: −0.4 leads −0.2, and the chaser is
