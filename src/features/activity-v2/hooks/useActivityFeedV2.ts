@@ -21,6 +21,11 @@ export interface ActivityFeedRowV2 {
   actor_username: string | null;
   actor_display_name: string | null;
   actor_avatar_url: string | null;
+  /** 'business' when the notification's source post was authored as a business.
+   *  actor_user_id stays the PERSON — blocking, mute-by-user and the friends
+   *  filter all key on it. These two are for NAVIGATION only. */
+  actor_kind: 'business' | 'personal' | null;
+  actor_route_id: string | null;
   liker_avatar_urls: unknown;
   target_course_name: string | null;
   target_course_image: string | null;

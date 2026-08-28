@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { resolvePostAuthRoute } from '@/lib/auth/postAuthRoute';
+import { followClbhouzOnSignup } from '@/lib/auth/followClbhouz';
 import {
   trackAuthMethodSelected,
   trackAuthInitiated,
@@ -210,6 +211,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
         // signup_success: verifyOtp lands the session; new users have created_at === last_sign_in_at
         if (data.user?.created_at && data.user?.last_sign_in_at && data.user.created_at === data.user.last_sign_in_at) {
           trackSignupSuccess('email', Date.now() - start);
+          // NEW MEMBERS FOLLOW clbhouz. Non-fatal and un-awaited: signup never
+          // waits on it and never fails because of it.
+          void followClbhouzOnSignup(data.session.user.id);
         }
         trackAuthComplete('email');
         onWillNavigate?.();
@@ -310,6 +314,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
           // signup_success: signInWithIdToken lands the session; new users have created_at === last_sign_in_at
           if (data.user?.created_at && data.user?.last_sign_in_at && data.user.created_at === data.user.last_sign_in_at) {
             trackSignupSuccess('apple');
+            // NEW MEMBERS FOLLOW clbhouz — non-fatal, never blocks signup.
+            void followClbhouzOnSignup(data.session.user.id);
           }
           trackAuthComplete('apple');
           onWillNavigate?.();
@@ -441,6 +447,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
           // signup_success: signInWithIdToken lands the session; new users have created_at === last_sign_in_at
           if (data.user?.created_at && data.user?.last_sign_in_at && data.user.created_at === data.user.last_sign_in_at) {
             trackSignupSuccess('google');
+            // NEW MEMBERS FOLLOW clbhouz — non-fatal, never blocks signup.
+            void followClbhouzOnSignup(data.session.user.id);
           }
           trackAuthComplete('google');
           onWillNavigate?.();

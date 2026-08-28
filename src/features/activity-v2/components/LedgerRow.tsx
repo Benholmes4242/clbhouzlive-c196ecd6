@@ -21,6 +21,7 @@ import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSharePromptFor, type SharePromptCandidate } from '../hooks/useSharePrompt';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 import { getActivityLink } from '../utils/activityLinks';
+import { getActorRouteByType } from '@/types/actor';
 import { resolveKind, composeCommentBody, ACT, type KindSpec } from './ledgerKinds';
 
 
@@ -57,7 +58,9 @@ const StackedLikers: React.FC<{
   actorUrl?: string | null;
   actorName?: string | null;
   actorUserId?: string | null;
-}> = ({ urls, actorUrl, actorName, actorUserId }) => {
+  /** Where the ACTOR face goes when it is the front avatar. */
+  onActorPress?: () => void;
+}> = ({ urls, actorUrl, actorName, actorUserId, onActorPress }) => {
   const list = urls.filter(Boolean).slice(0, 2);
   const frontIsLiker = !!list[0];
   const front = list[0] ?? actorUrl ?? null;
@@ -79,7 +82,10 @@ const StackedLikers: React.FC<{
           size={34}
           src={front}
           alt={frontIsLiker ? '' : (actorName ?? '')}
+          /* userId here is NOT a route — it only seeds the deterministic
+             fallback colour. Navigation comes from onActorPress. */
           userId={frontIsLiker ? null : actorUserId}
+          onClick={frontIsLiker ? undefined : onActorPress}
           hairlineRing
         />
       </div>
@@ -288,6 +294,25 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
     navigate(url);
   };
 
+  /* THE ACTOR'S DESTINATION IS THE ACTOR THAT IS SHOWN. A business-sourced
+     notification renders the business logo and name, so its avatar opens the
+     BUSINESS profile. actor_user_id remains the person for blocking, muting and
+     the friends filter; actor_kind + actor_route_id are navigation only. */
+  const actorRoute = (() => {
+    const id = row.actor_route_id ?? row.actor_user_id;
+    if (!id) return null;
+    return getActorRouteByType(row.actor_kind ?? 'personal', id);
+  })();
+  /* stopPropagation: the row itself is tappable, so an avatar tap must not also
+     fire the row's own destination. */
+  const goToActor = actorRoute
+    ? (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (heldRef.current) return;
+        navigate(actorRoute, row.actor_kind === 'business' ? { state: { source: 'activity' } } : undefined);
+      }
+    : undefined;
+
   // ------- Left visual -------
   let leftVisual: React.ReactNode = null;
   if (spec.left === 'tile' && spec.tile) {
@@ -300,6 +325,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         actorUrl={row.actor_avatar_url}
         actorName={row.actor_display_name}
         actorUserId={row.actor_user_id}
+        onActorPress={goToActor}
       />
     );
   } else {
@@ -308,7 +334,9 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         size={40}
         src={row.actor_avatar_url}
         alt={row.actor_display_name ?? ''}
+        /* userId seeds the fallback colour only — see goToActor for routing. */
         userId={row.actor_user_id}
+        onClick={goToActor}
         hairlineRing
       />
     );
