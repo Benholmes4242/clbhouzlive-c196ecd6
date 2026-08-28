@@ -896,8 +896,18 @@ interface CardProps {
    */
   reference?: string | null;
   onPress: () => void;
-
+  /**
+   * REACTIONS (BRIEF_GOLF_THIS_WEEK_P2): resolved by the section from ONE
+   * batched useContentReactions read keyed by the round's whs_score id — never
+   * per card. `reactionHidden` covers no score id, signed out and the table
+   * being unavailable: absent is absent, not a disabled glyph.
+   */
+  reactionCount?: number;
+  reactionMine?: boolean;
+  reactionHidden?: boolean;
+  onToggleReaction?: () => void;
 }
+
 
 /**
  * THE ROUND TILE IS A STORY, NOT A REPORT (BRIEF_ROUND_TILE_THE_MOMENT).
