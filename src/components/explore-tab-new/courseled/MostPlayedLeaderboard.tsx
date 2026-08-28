@@ -418,9 +418,7 @@ function MemberBoard({
               gap: 9,
               // FULL WIDTH (§S2.3): the tint bleeds to the card's own padding
               // rather than starting at a thumbnail-width indent.
-              // The bleed lives on the scroller when the list scrolls, so the
-              // row must NOT widen past it or hiding x would clip the gross.
-              margin: scrolls ? 0 : '0 -14px',
+              margin: '0 -13px',
               padding: '7px 14px',
               minWidth: 0,
               // §S2.8 — TINT ONLY.
