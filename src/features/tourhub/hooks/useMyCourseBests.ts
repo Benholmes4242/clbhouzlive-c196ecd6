@@ -18,6 +18,11 @@ export interface MyCourseBestRow {
   course_id: string;
   best_gross: number | null;
   best_to_par: number | null;
+  /* Second-lowest gross at the course (ROW_NUMBER rn = 2). NULL with exactly
+     one qualifying round — powers reference tier (b)'s margin over the
+     PREVIOUS best, which best_gross alone cannot express (it includes the
+     displayed round). */
+  second_best_gross: number | null;
   rounds_here: number | null;
   last_played: string | null;
 }

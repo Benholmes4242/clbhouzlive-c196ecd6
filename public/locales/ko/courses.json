@@ -1135,7 +1135,8 @@
       "you": "\ub098",
       "reference": {
         "fieldDay": "\uadf8\ub0a0 \ud544\ub4dc \ud3c9\uadfc\ubcf4\ub2e4 {{count}} \uc88b\uc74c",
-        "yourBest": "\uc774\uacf3 \ucd5c\uace0 \uae30\ub85d\uc740 {{count}}"
+        "yourBest": "\uc774\uacf3 \ucd5c\uace0 \uae30\ub85d\uc740 {{count}}",
+        "betterThanBest": "\uc774\uacf3 \ucd5c\uace0 \uae30\ub85d\ubcf4\ub2e4 {{count}}\ud0c0 \uc88b\uc74c"
       }
     },
     "week": {
