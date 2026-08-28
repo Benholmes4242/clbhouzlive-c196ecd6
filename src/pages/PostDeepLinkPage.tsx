@@ -132,18 +132,34 @@ const PostDeepLinkPage: React.FC = () => {
       }
 
       // Block filter — hide posts by users the viewer has blocked (or been blocked by).
+      // user_blocks has EXACTLY three columns: blocker_id, blocked_id, created_at.
+      // There is no `id`, and PostgREST rejects nested and(...) groups written into
+      // .or() the way this once was (that 400'd on every deep link). Two .in()
+      // filters over the same pair express "a row exists in either direction":
+      // the only possible matches are (a,b) and (b,a) — (a,a)/(b,b) can't exist.
       if (user?.id && (data as any).user_id && (data as any).user_id !== user.id) {
-        const { data: blockRow } = await supabase
+        const pair = [user.id, (data as any).user_id];
+        const { data: blockRows, error: blockError } = await supabase
           .from('user_blocks')
-          .select('id')
-          .or(`and(blocker_id.eq.${user.id},blocked_id.eq.${(data as any).user_id}),and(blocker_id.eq.${(data as any).user_id},blocked_id.eq.${user.id})`)
-          .maybeSingle();
-        if (blockRow) {
+          .select('blocker_id, blocked_id')
+          .in('blocker_id', pair)
+          .in('blocked_id', pair)
+          .limit(2);
+        if (blockError) {
+          // FAIL OPEN, deliberately: a transient lookup failure hiding a friend's
+          // post is worse than a rare missed block, and the post fetch above is
+          // already RLS-protected. Logged so it is never silent again.
+          console.error('[PostDeepLink] block lookup failed, failing open', blockError);
+        } else if ((blockRows ?? []).some((r) => r.blocker_id !== r.blocked_id)) {
+          // Self-rows (blocker === blocked) would also satisfy the two .in()
+          // filters; they are nonsense data and must not hide anyone's post.
           setNotFound(true);
           setIsLoading(false);
           return;
         }
+
       }
+
 
       const row = data as any;
       const profileRow = row.user_profiles ?? {};
@@ -238,7 +254,14 @@ const PostDeepLinkPage: React.FC = () => {
 
     }
 
-    loadPost();
+    // Nothing in loadPost may strand the page on the scrim: any throw (mapper,
+    // network, RPC) resolves to the actionable load-error state.
+    loadPost().catch((err) => {
+      console.error('[PostDeepLink] loadPost threw', err);
+      setLoadError(true);
+      setIsLoading(false);
+    });
+
     if (postId) recordPostViewOnce(postId);
   }, [postId, user?.id, retryTick]);
 
@@ -311,7 +334,9 @@ const PostDeepLinkPage: React.FC = () => {
   }
 
   // --- Not found ---
-  if (notFound || !post) {
+  // A signed-in member with no feedPost can NEVER fall through to the scrim:
+  // the scrim is only correct while the overlay is genuinely about to mount.
+  if (notFound || !post || (user && !feedPost)) {
     return (
       <div className="fixed inset-0 bg-[#0D0F11] flex flex-col items-center justify-center z-50 px-6">
         <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
