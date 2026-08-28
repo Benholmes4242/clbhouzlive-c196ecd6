@@ -2275,7 +2275,92 @@ export function GolfThisWeek({
                           })}
                         </>
                       ) : null}
+
+                      {/* ============ THE PINNED OWN-MEMBER ROW (§1.3) ============
+                          A FOURTH ROW IN THE SAME LADDER, distinguished by
+                          COLOUR, not by shape: same rank / avatar / name /
+                          figure grammar as a chaser, on the amber own-member
+                          wash, with the gap to the leader carrying its unit.
+                          IT ONLY EXISTS OUTSIDE THE TOP THREE (§1.4): a member
+                          already on the podium is not shown twice, a member with
+                          no qualifying round in the window gets NOTHING (no
+                          placeholder, no prompt), a member below the tile's floor
+                          is not ranked here at all, and signed out renders the
+                          tile exactly as before. */}
+                      {(() => {
+                        if (!userId) return null;
+                        const selfIdx = tile.ranked.findIndex((r) => r.is_self);
+                        if (selfIdx < 3) return null;
+                        const own = tile.ranked[selfIdx];
+                        const figure = tile.figureOf(own);
+                        return (
+                          <div
+                            data-podium-row="you"
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onCardPress(own);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onCardPress(own);
+                              }
+                            }}
+                            style={{
+                              marginTop: 8,
+                              padding: '0 6px',
+                              borderRadius: 6,
+                              background: AMBER_WASH,
+                              borderTop: `1px solid ${WELL_RULE}`,
+                              display: 'grid',
+                              gridTemplateColumns: '14px 16px minmax(0, 1fr) auto auto',
+                              alignItems: 'center',
+                              gap: 6,
+                              minHeight: 34,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <span
+                              className="tabular-nums"
+                              style={{ fontSize: 10, fontWeight: 700, color: AMBER }}
+                            >
+                              {selfIdx + 1}
+                            </span>
+                            <SquircleAvatar
+                              src={own.profile_photo_url}
+                              userId={own.user_id}
+                              alt={own.display_name}
+                              size={16}
+                              hideRing
+                            />
+                            <span style={{ fontSize: 11, fontWeight: 700, color: AMBER }}>
+                              {t('discover.golfThisWeek.you', 'You')}
+                            </span>
+                            <span
+                              className="tabular-nums"
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 700,
+                                letterSpacing: '0.06em',
+                                color: AMBER,
+                              }}
+                            >
+                              {pinnedGap(tile, own)}
+                            </span>
+                            <span
+                              className="tabular-nums"
+                              style={{ fontSize: 11, fontWeight: 700, color: AMBER }}
+                            >
+                              {figure.text}
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </>
+
                   );
                 })()}
               </div>
