@@ -1831,6 +1831,11 @@ export function GolfThisWeek({
     if (b.offUnit === 'points') {
       return t('discover.golfThisWeek.gap.pointsOff', '{{count}} POINTS OFF', { count: gap });
     }
+    if (b.offUnit === 'cut') {
+      /* MOST IMPROVED: the gap is in STROKES OF CUT, one decimal, so the unit
+         cannot be read as a score. */
+      return t('discover.golfThisWeek.gap.cutOff', '{{count}} OFF THE LEAD', { count: gap });
+    }
     return t('discover.golfThisWeek.gap.birdiesOff', '{{count}} BIRDIES OFF', { count: gap });
   };
 
