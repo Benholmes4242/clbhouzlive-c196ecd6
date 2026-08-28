@@ -1157,6 +1157,8 @@
         "pickerAria": "Change board: {{label}}",
         "pickerEyebrow": "Discover",
         "pickerTitle": "Select board",
+        "pickerRowSub_one": "필드 내 {{count}}명",
+        "pickerRowSub_other": "필드 내 {{count}}명",
         "pos": "POS",
         "stablefordLabel": "Stableford",
         "stablefordShort": "STABLEFORD",
