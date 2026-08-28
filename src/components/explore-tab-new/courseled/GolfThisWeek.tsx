@@ -1414,10 +1414,12 @@ export function GolfThisWeek({
    *       derived from the fortnight beside an all-time rounds_here would be two
    *       histories in one sentence.
    *   (d) "{n} better than the field that day" — any round, unchanged.
-   * (b) IS TESTED BEFORE (a). get_my_course_bests INCLUDES the displayed round,
-   * so a new best EQUALS best_gross — the margin over the previous best is not
-   * knowable from this function, so the equality case falls through to (d)
-   * rather than claiming a fabricated margin (§2.5).
+   * (b) IS TESTED BEFORE (a). get_my_course_bests now returns
+   * second_best_gross (rn = 2), so when the displayed round IS the best
+   * (gross === best_gross) the margin over the previous best is
+   * second_best_gross - gross — but only when STRICTLY positive. A tied best
+   * (second === best) has margin zero, "0 better" is not a thing, and the
+   * ladder falls through to (d).
    * FLOOR (§2.4): rounds_here >= 4, since rounds_here counts the displayed round.
    * OWN ROUNDS ONLY (§2.2): is_self gates (a)-(c) entirely.
    * THE FLOOR FOR (d) IS THREE ROUNDS in the same course/day group (FIELD_GATE).
@@ -1441,6 +1443,22 @@ export function GolfThisWeek({
       const bestGross = mine?.best_gross;
       const roundsHere = mine?.rounds_here ?? 0;
       if (bestGross == null || roundsHere < 4) continue;
+      // (b) strictly-better case, tested FIRST (§5): this round is the best,
+      // and the margin over the previous best is strictly positive. A TIE
+      // (second === best → margin 0) must fall through (§3).
+      if (
+        r.gross === bestGross &&
+        mine?.second_best_gross != null &&
+        mine.second_best_gross > r.gross
+      ) {
+        out.set(
+          r.round_id,
+          t('discover.golfThisWeek.reference.betterThanBest', '{{count}} better than your best here', {
+            count: mine.second_best_gross - r.gross,
+          }),
+        );
+        continue;
+      }
       if (r.gross > bestGross) {
         out.set(
           r.round_id,
@@ -1449,7 +1467,7 @@ export function GolfThisWeek({
           }),
         );
       }
-      // r.gross === bestGross: this round IS the best, margin unknowable — fall through.
+      // r.gross === bestGross with no positive margin: tied best — fall through.
     }
 
     for (const list of groups.values()) {

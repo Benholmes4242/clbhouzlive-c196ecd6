@@ -1201,7 +1201,8 @@
       "you": "Du",
       "reference": {
         "fieldDay": "{{count}} besser als das Feld an diesem Tag",
-        "yourBest": "Deine Bestleistung hier ist {{count}}"
+        "yourBest": "Deine Bestleistung hier ist {{count}}",
+        "betterThanBest": "{{count}} besser als deine Bestleistung hier"
       }
     },
     "week": {
