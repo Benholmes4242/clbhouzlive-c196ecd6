@@ -2360,7 +2360,10 @@ export function GolfThisWeek({
                 {headCell(t('discover.golfThisWeek.board.member', 'MEMBER'), 'left')}
                 {headCell(board.unit, 'center')}
                 {board.hasPar
-                  ? headCell(t('discover.golfThisWeek.board.par', 'PAR'), 'center')
+                  ? headCell(
+                      board.parHeader ?? t('discover.golfThisWeek.board.par', 'PAR'),
+                      'center',
+                    )
                   : null}
               </div>
 
