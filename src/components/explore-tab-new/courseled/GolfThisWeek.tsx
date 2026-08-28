@@ -49,8 +49,6 @@ import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
-import { useMyCourseBests } from '@/features/tourhub/hooks/useMyCourseBests';
-import { buildReferenceLadder, type ReferenceT } from './referenceLadder';
 
 
 import {
@@ -895,7 +893,6 @@ function GolfThisWeekCard({
   showFollow,
   isFollowed,
   viewerUserId,
-  reference = null,
   onPress,
   reactionCount = 0,
   reactionMine = false,
@@ -1236,21 +1233,6 @@ function GolfThisWeekCard({
           justifyContent: 'space-between',
         }}
       >
-        {reference ? (
-          <div
-            style={{
-              fontSize: 11.5,
-              fontWeight: 500,
-              lineHeight: 1.1,
-              color: MID,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {reference}
-          </div>
-        ) : null}
         {/* THE ACTION ROW (§2.1): SEE THE CARD leads, the reaction sits in the
             trailing slot. The control's 44px tap target is padding cancelled by
             a negative margin, so the foot is FOOT_H at every count — 0, 1 or 3
@@ -1388,24 +1370,10 @@ export function GolfThisWeek({
   const reactions = useContentReactions(reactionTargets);
 
 
-  /* PERSONAL HISTORY (BRIEF_ROUND_CARD_REFERENCE_LINE §S1): ONE batched
-     get_my_course_bests read for the whole visible window, keyed by the sorted,
-     deduped course-id set. A course absent from the map was never played. */
-  const windowCourseIds = useMemo(() => ordered.map((r) => r.course_id), [ordered]);
-  const myBests = useMyCourseBests(windowCourseIds, userId);
-
-  /**
-   * §2 — THE REFERENCE LINE, from the SHARED LADDER
-   * (BRIEF_DISCOVER_HERO_PARITY §2.4). The tier order, the is_self gate, the
-   * rounds_here >= 4 floor, the strictly-positive (b) margin and the field gate
-   * all live in referenceLadder.ts, so the hero above prints the same line for
-   * the same round. Do not reimplement any of it here.
-   */
-  const referenceByRound = useMemo(
-    () => buildReferenceLadder(ordered, myBests, t as ReferenceT),
-    [ordered, myBests, t],
-  );
-
+  /* THE PERSONAL-HISTORY READ IS GONE (BRIEF_ROUND_CARD_STRIP_BACK §S2.3/§2.4).
+     The batched get_my_course_bests hook and the shared tier ladder are no
+     longer consumed by this surface; the board above does the comparing. The
+     code is DELETED rather than left behind a false conditional. */
 
   /* NO INSIGHT MAP. The tile's prose is the MOMENT SENTENCE, generated from a
      fixed template per kind inside the card (BRIEF_ROUND_TILE_THE_MOMENT §S4.3).
@@ -2428,7 +2396,6 @@ export function GolfThisWeek({
               showFollow={!r.is_self && !!userId && !!following.data}
               isFollowed={!!following.data?.has(r.user_id)}
               viewerUserId={userId}
-              reference={referenceByRound.get(r.round_id) ?? null}
               onPress={() => onCardPress(r)}
               /* §S1.2/§2.4 — target is the whs_score id, and the control renders
                  on your OWN round too (the trigger already skips self-notify). */
