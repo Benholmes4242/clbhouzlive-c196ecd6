@@ -143,6 +143,15 @@ const GROSS_COL = 30;
 /** §S2.2 — position first, in a fixed column so names start on one line. */
 const POS_COL = 17;
 
+/* MICRO_BRIEF_COURSES_PLAYED_EXPANDED_TIDY §2.3 — a FIXED row height, not a
+ * guess: rows with a home club under the name are taller than rows without, so
+ * without locking the height a nine-row course and a fifteen-row course would
+ * open to different sizes. 42px fits the 24px face and the two-line name block. */
+const BOARD_ROW_H = 42;
+const BOARD_MAX_ROWS = 8;
+const BOARD_MAX_H = BOARD_ROW_H * BOARD_MAX_ROWS; // 336
+
+
 
 /* NO VIEWER MARKING ON THE COURSE HEADER. Ben's call
  * (BRIEF_SCORECARD_WIDTH_AND_VIEWER_RING §S2) — the amber ring and the "You"
