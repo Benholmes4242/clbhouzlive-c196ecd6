@@ -26,7 +26,10 @@ import {
 import { relativeDay } from './discoverWhen';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
+import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
+
 import {
   DEFAULT_WEEK_SCOPE,
   bestOfWeek,
