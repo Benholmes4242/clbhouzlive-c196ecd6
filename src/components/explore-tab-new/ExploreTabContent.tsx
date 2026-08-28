@@ -20,8 +20,6 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { GolfThisWeek } from './courseled/GolfThisWeek';
-import { DiscoverHero } from './courseled/DiscoverHero';
-import { useDiscoverHero } from './courseled/hooks/useDiscoverHero';
 import {
   DEFAULT_WEEK_SCOPE,
   type WeekScope,
@@ -269,13 +267,12 @@ export default function ExploreTabContent({
     [navigate],
   );
 
-  /* THE PAGE HERO (BRIEF_DISCOVER_WORLD_CLASS §1). It reads the SAME cached
-     queries the rounds section reads — zero new network requests — and returns
-     null when every round in the window is PLAIN, in which case NOTHING renders
-     and NO HEIGHT IS RESERVED: the page then opens exactly as it did before
-     (ACCEPTANCE c). The hero is CONTENT; the readout and the scope pills stay
-     beneath it inside the section, where they were (§1.5). */
-  const hero = useDiscoverHero(userId, weekScope, weekRegion);
+  /* THE PAGE HERO IS GONE (BRIEF_DISCOVER_BOARD_LEADS). The moment hero,
+     useDiscoverHero, the twelve-hour rotation and the lead slot are DELETED, not
+     disabled. The page now leads with the BOARD, whose own hero (category title,
+     counts, when chip) lives inside GolfThisWeek and pays the notch itself.
+     Nothing is lost: the moment round is still a card in the rounds rail below,
+     with the same reaction control and the same reference line. */
 
   const opener = useScorecardOpener();
   const handleFriendCard = useCallback(
@@ -474,15 +471,6 @@ export default function ExploreTabContent({
           (MICRO_BRIEF_ROUNDS_SECTION_CHROME S1.4).
           The rate prompt was removed from Discover deliberately. Nothing prompts
           a rating anywhere now - watch the review rate. */}
-      {hero.subject && (
-        /* FULL-BLEED: no page gutter, above everything except the chrome, which
-           floats over it. The hero pays the notch + island clearance itself, so
-           the rounds section drops its own (chromeClearance={false}). */
-        <DiscoverHero
-          subject={hero.subject}
-          onPress={() => handleFriendCard(hero.subject!.row)}
-        />
-      )}
       {/* Match Course Detail's immersive order: hero first, then the sentinel.
           This keeps the image at physical y=0 and raises the notch veil only
           after the hero has scrolled away. */}
@@ -494,13 +482,9 @@ export default function ExploreTabContent({
           // ONE SECTION RHYTHM: the rounds section sits outside the flex wrapper
           // below, so it must carry its own 28px to the first ranked section.
           marginBottom: 28,
-          // The hero owns the notch when it renders; the section then needs an
-          // ordinary gap above its readout instead of a clearance.
-          marginTop: hero.subject ? 20 : 0,
         }}
       >
         <GolfThisWeek
-          chromeClearance={!hero.subject}
           userId={userId}
           scope={weekScope}
           onScopeChange={handleScopeChange}

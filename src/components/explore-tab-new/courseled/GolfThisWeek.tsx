@@ -4,6 +4,17 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Check, ChevronRight } from 'lucide-react';
 
 
+/**
+ * BRIEF_DISCOVER_BOARD_LEADS §1.2 — THE BOARD HERO'S HEIGHT. 218, and the 372
+ * the moment hero held is NOT carried across: that exception was recorded in
+ * DiscoverHero.tsx and died with the file.
+ */
+const BOARD_HERO_H = 218;
+/** §1.3 — the neutral loading ground. FLAT, so it can never read as a gradient. */
+const BOARD_HERO_SHELL = 'rgba(255,255,255,0.05)';
+/** The when chip's ink. FAINT, one step below the counts' quiet. */
+const BOARD_HERO_FAINT = 'rgba(255,255,255,0.52)';
+
 /** ~1.2s: long enough to register, short enough not to be a state (§S3.4). */
 const CONFIRM_MS = 1200;
 
@@ -17,6 +28,7 @@ import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
+import { HERO_CANON_SCRIM } from '@/features/tourhub/_shared/heroGradient';
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
@@ -1764,90 +1776,164 @@ export function GolfThisWeek({
 
 
 
-
-
-
+  /**
+   * BRIEF_DISCOVER_BOARD_LEADS §1.3 — THE HERO'S PHOTOGRAPH IS THE LEADER'S
+   * COURSE. The board leads with that row, so the picture describes it, and it
+   * CHANGES WITH THE CATEGORY because the leader does. No new fetch: the URL
+   * comes out of `meta`, the batched course read the rows already resolve.
+   */
+  const heroLeader = activeBoard?.ranked[0] ?? null;
+  const heroCourseId = heroLeader?.course_id ?? null;
+  const heroImage = heroCourseId ? meta?.get(heroCourseId)?.imageUrl ?? null : null;
+  /* §1.3 — UNRESOLVED IS NOT ABSENT. While the course read is in flight the hero
+     holds a NEUTRAL SHELL: never the gradient first and the photograph second,
+     which is the swap the app's standing loading rule forbids. Once settled, a
+     course with no image resolves to the canonical course gradient. */
+  const heroImagePending = !!heroCourseId && metaQuery.isPending;
 
   return (
     <section style={style}>
-      {/* No heading. This section leads the page, directly under the chrome
-          island, and its pills state its scope more clearly than a title would.
-          Every section below it keeps the glyph-and-heading treatment — that rule
-          is intact, this is the one exception and it is because it is first. */}
-
-      {/* THE FILTER'S READOUT ROW. The count alone is the section's top edge.
-          BRIEF_DISCOVER_REGION_WELL_ON_PILL_ROW moved the region well down to
-          the pill row: the readout was this row's shrinking member and clipped
-          to "14 ..." at every viewport. It now owns the full width — do not put
-          anything else back on this row. */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          gap: 3,
-          /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
-             gives 16px of clearance everywhere. */
-          paddingTop: chromeClearance
-            ? 'calc(env(safe-area-inset-top, 0px) + 70px)'
-            : 0,
-          marginBottom: 12,
-          minWidth: 0,
-        }}
-      >
-        {/* §4.1 — THE TITLE IS THE CATEGORY LABEL, and it is read from
-            `activeBoard` (§4.3), the same value the island capsule and the
-            column header read. Not a fixed string, not "The board". With no
-            qualifying board at all there is no category to name, so the title
-            is absent rather than guessed. */}
-        {activeBoard && (
-          <h2
-            style={{
-              margin: 0,
-              fontFamily: SANS,
-              fontSize: 17,
-              fontWeight: 700,
-              lineHeight: 1.15,
-              letterSpacing: '-0.01em',
-              color: DISCOVER_FACT,
-            }}
-          >
-            {activeBoard.label}
-          </h2>
-        )}
-        {/* Not a label - the filter's readout. It is the only thing on screen
-            that responds when a pill or a region changes, so it must always
-            describe what is CURRENTLY rendered. */}
-        <span
-          className="tabular-nums"
-          /* READ, floor 11: the readout is language. Local override only —
-             the shared KICKER metric (9) is not repointed. */
-          /* At 11px the full template measures ~248px, so on a 320 viewport it
-             must be the row's shrinking member and ELLIPSIZE — never wrap, and
-             never squeeze the region well to nothing. */
+      {/* BRIEF_DISCOVER_BOARD_LEADS §1 — THE BOARD'S HERO. The moment hero is
+          GONE (DiscoverHero.tsx and useDiscoverHero.ts deleted with it): the page
+          leads with the board, and its header is this. THREE THINGS ONLY — the
+          category title, the counts, the when chip. 218px, NOT 372: this is a
+          header for a table, not a page-opening statement, and the old 372
+          exception died with the file that recorded it (§1.2).
+          FULL-BLEED: it escapes the page's 14px gutter and starts at physical
+          y=0, paying the notch and the floating island clearance itself. */}
+      {activeBoard ? (
+        <div
           style={{
-            ...KICKER, fontSize: 11, color: DISCOVER_QUIET,
-            flex: 'none', minWidth: 0,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            position: 'relative',
+            width: '100dvw',
+            marginLeft: 'calc(50% - 50dvw)',
+            height: `calc(${BOARD_HERO_H}px + env(safe-area-inset-top, 0px))`,
+            marginBottom: 14,
+            overflow: 'hidden',
+            isolation: 'isolate',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            /* THE SHELL, THE GRADIENT, THE PHOTOGRAPH — in that order and never
+               overlapping: a pending read paints the flat shell alone. */
+            background: heroImagePending ? BOARD_HERO_SHELL : COURSE_GRADIENT,
           }}
         >
-          {/* The window is a THIRD SEGMENT OF THE SAME TEMPLATE so a translator
-              can reorder all three. It is FIXED at GOLF_WEEK_DAYS (fourteen,
-              per BRIEF_DISCOVER_FOURTEEN_DAY_WINDOW) — never derived from the
-              oldest round, which would make the window look like it moves on a
-              quiet fortnight, and never a literal, which would let the readout
-              disagree with the query. */}
-          {t(
-            'discover.golfThisWeek.count',
-            '{{rounds}} rounds \u00B7 {{courses}} courses \u00B7 {{days}} days',
-            {
-              rounds: counts.rounds,
-              courses: counts.courses,
-              days: GOLF_WEEK_DAYS,
-            },
+          {!heroImagePending && heroImage && (
+            <img
+              src={heroImage}
+              alt=""
+              decoding="async"
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: '50% 55%',
+                zIndex: -1,
+              }}
+            />
           )}
-        </span>
-      </div>
+          {/* THE ONE CANON SCRIM, ending on the canvas so there is no seam where
+              the hero meets the pills. Held off the shell: a scrim over a flat
+              loading ground would read as a second, dimmer treatment. */}
+          {!heroImagePending && (
+            <div
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, background: HERO_CANON_SCRIM, zIndex: -1 }}
+            />
+          )}
+
+          {/* THE WHEN CHIP, top-right (§1.1), on the same notch + island
+              clearance the section's first row used to pay. */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              padding: 'calc(env(safe-area-inset-top, 0px) + 70px) 14px 0',
+              display: 'flex',
+              justifyContent: 'flex-end',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                lineHeight: 1,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: BOARD_HERO_FAINT,
+              }}
+            >
+              {t('discover.golfThisWeek.board.whenChip', 'LAST {{days}} DAYS', {
+                days: GOLF_WEEK_DAYS,
+              })}
+            </span>
+          </div>
+
+          <div style={{ padding: '0 14px 16px', minWidth: 0 }}>
+            {/* §1.1/§1.4 — THE CATEGORY NAMES ITSELF ONCE ON THE PAGE BODY, HERE.
+                The 17px heading that used to sit below the hero is deleted: two
+                headings naming the same board was the fault this brief closes.
+                Read from `activeBoard`, never from the selection. */}
+            <h2
+              style={{
+                margin: 0,
+                fontFamily: SANS,
+                fontSize: 24,
+                fontWeight: 700,
+                lineHeight: 1.08,
+                letterSpacing: '-0.025em',
+                color: DISCOVER_FACT,
+              }}
+            >
+              {activeBoard.label}
+            </h2>
+            {/* The counts, unchanged in content and key — only their home moved.
+                The window is FIXED at GOLF_WEEK_DAYS, never derived from the
+                oldest round, so the readout cannot disagree with the query. */}
+            <div
+              className="tabular-nums"
+              style={{
+                marginTop: 4,
+                fontFamily: SANS,
+                fontSize: 12.5,
+                fontWeight: 600,
+                lineHeight: 1.2,
+                color: DISCOVER_QUIET,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {t(
+                'discover.golfThisWeek.count',
+                '{{rounds}} rounds \u00B7 {{courses}} courses \u00B7 {{days}} days',
+                {
+                  rounds: counts.rounds,
+                  courses: counts.courses,
+                  days: GOLF_WEEK_DAYS,
+                },
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* NO QUALIFYING BOARD — no category to name, so no hero. The clearance
+           the hero pays still has to come from somewhere, so this row pays it
+           and nothing else. */
+        <div
+          aria-hidden
+          style={{
+            height: chromeClearance ? 'calc(env(safe-area-inset-top, 0px) + 70px)' : 0,
+          }}
+        />
+      )}
+
 
       {/* SCOPE PILLS AND THE REGION WELL — one row beneath the readout. Per
           BRIEF_DISCOVER_PILL_PEEK the well FLOATS OVER THE SCROLLER'S LEFT EDGE
