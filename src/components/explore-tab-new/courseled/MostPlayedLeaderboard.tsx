@@ -13,7 +13,6 @@ import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { PodiumAvatarRing } from './PodiumAvatarRing';
 
 
 /**
@@ -129,10 +128,6 @@ function MoveMark({
  * NOTE: nothing was ever truncated by twelve in current data — the list is
  * PEOPLE (one entry per distinct member, §S1.4) and the count is ROUNDS. */
 
-/** §2 — a whole number of rows, so a partial row shows there is more. */
-const BOARD_ROW_H = 43;
-const BOARD_MAX_ROWS = 8.5;
-const BOARD_MAX_H = Math.round(BOARD_ROW_H * BOARD_MAX_ROWS);
 
 /** Ink ramp of the round tiles, shared so the board reads as one family. */
 const INK = DISCOVER_FACT;
@@ -148,103 +143,6 @@ const GROSS_COL = 30;
 /** §S2.2 — position first, in a fixed column so names start on one line. */
 const POS_COL = 17;
 
-const FACE_SIZE = 26;
-const FACE_OVERLAP = -7;
-const FACE_LIMIT = 4;
-
-/**
- * The collapsed pile is descriptive, never interactive: the containing course
- * header remains the single disclosure target. `SquircleAvatar` owns the
- * canonical deterministic-initial fallback and lazy image loading.
- */
-function PlayerFacepile({ players, accent }: { players: MostPlayedPlayer[]; accent: string }) {
-  const visible = players.slice(0, FACE_LIMIT);
-  const overflow = players.length - visible.length;
-
-  return (
-    <span
-      aria-hidden
-      style={{ display: 'inline-flex', alignItems: 'center', flex: 'none', minWidth: 0 }}
-    >
-      {visible.map((player, index) => (
-        index === 0 ? (
-          <PodiumAvatarRing
-            key={player.userId}
-            avatarSize={FACE_SIZE}
-            src={player.avatarUrl}
-            alt={player.name}
-            userId={player.userId}
-            ringColor={accent}
-            style={{
-              zIndex: visible.length - index + (overflow > 0 ? 1 : 0),
-            }}
-          />
-        ) : (
-          <span
-            key={player.userId}
-            style={{
-              position: 'relative',
-              zIndex: visible.length - index + (overflow > 0 ? 1 : 0),
-              width: FACE_SIZE,
-              height: FACE_SIZE,
-              marginLeft: FACE_OVERLAP,
-              borderRadius: '34%',
-              boxShadow: `0 0 0 1.5px ${A.PANEL}`,
-              flex: 'none',
-            }}
-          >
-            <SquircleAvatar
-              size={FACE_SIZE}
-              src={player.avatarUrl}
-              alt={player.name}
-              userId={player.userId}
-              hideRing
-              className="[&>div]:!aspect-square"
-            />
-          </span>
-        )
-      ))}
-      {overflow > 0 && (
-        <span
-          style={{
-            position: 'relative',
-            /* THE CHIP SITS ABOVE EVERY AVATAR (MICRO_BRIEF_MOST_PLAYED_HEADER_AND_FACEPILE §2).
-               Avatars descend from visible.length down to 1, so anything lower
-               than that — zIndex 0, as this was — is painted UNDER the avatar
-               before it, and FACE_OVERLAP (-7) then eats 7px of the chip's 26px.
-               The chip is a COUNT and must be readable whole; an avatar is
-               decorative and already overlaps its neighbour, so the overlap must
-               cut into the avatar, not into the figure. Hence the top of the
-               stack, and its A.PANEL cut-out ring now scores the avatar beneath
-               it — the same separation the pile uses throughout, cutting the
-               other way. */
-            zIndex: visible.length + 2,
-            width: FACE_SIZE,
-
-            height: FACE_SIZE,
-            marginLeft: FACE_OVERLAP,
-            borderRadius: '34%',
-            background: A.TRACK,
-            boxShadow: `0 0 0 1.5px ${A.PANEL}`,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: DISCOVER_QUIET,
-            /* AXIS-CLASS EXCEPTION: this figure is an avatar GLYPH bound by
-               FACE_SIZE (26) geometry, not text on the card. Floor 10. */
-            fontSize: 11,
-            fontWeight: 800,
-            lineHeight: 1,
-            fontVariantNumeric: 'tabular-nums lining-nums',
-            flex: 'none',
-          }}
-        >
-          +{formatNumber(overflow)}
-        </span>
-      )}
-    </span>
-  );
-}
 
 /* NO VIEWER MARKING ON THE COURSE HEADER. Ben's call
  * (BRIEF_SCORECARD_WIDTH_AND_VIEWER_RING §S2) — the amber ring and the "You"
@@ -332,49 +230,93 @@ function MemberBoard({
   const { t } = useTranslation('courses');
   /** §2 — NO CAP. Every resolved player is rendered. */
   const listed = row.players;
-  const scrolls = listed.length > BOARD_MAX_ROWS;
-  const scrollerRef = React.useRef<HTMLDivElement | null>(null);
-  /** The fade hides itself at the end, so it never reads as a cut-off edge. */
-  const [atEnd, setAtEnd] = useState(false);
-  const onScroll = () => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    setAtEnd(el.scrollTop + el.clientHeight >= el.scrollHeight - 2);
-  };
+  /* BRIEF_COURSES_PLAYED_COURSE_LED §2.3 — NO NESTED SCROLL AREA. The internal
+     scroller, its max height, its fade and its at-end state are gone: the list
+     renders inline and the PAGE scrolls. A scroll region nested in a scrolling
+     page always feels wrong on a phone, whatever overscroll-behavior does. */
+  const single = listed.length === 1 ? listed[0] : null;
+
   if (listed.length === 0) return null;
 
-  return (
-    <div style={{ paddingBottom: 10, position: 'relative' }}>
-      <div
-        ref={scrollerRef}
-        onScroll={scrolls ? onScroll : undefined}
-        style={
-          scrolls
-            ? {
-                maxHeight: BOARD_MAX_H,
-                overflowY: 'auto',
-                // §1 — THE X AXIS IS LOCKED. With overflow-y:auto the spec
-                // promotes a visible x axis to auto, which is where the
-                // sideways drag came from.
-                overflowX: 'hidden',
-                // THE ONE PROPERTY §S2.5's OBJECTION TURNED ON: the scroll
-                // chain stops here, so a swipe that begins on the page keeps
-                // moving the page and the page can never feel stuck.
-                overscrollBehavior: 'contain',
-                // No horizontal swipe on the list can start a back gesture.
-                overscrollBehaviorX: 'none',
-                WebkitOverflowScrolling: 'touch',
-                // §2 — THE CAUSE: the rows used to bleed with margin 0 -14px,
-                // which made the CONTENT 28px wider than this box (14px of it
-                // reachable to the right, taking the gross with it). The bleed
-                // now lives on the scroller, so rows fit exactly and nothing
-                // is clipped once x is hidden.
-                margin: '0 -14px',
-              }
-            : undefined
-        }
+  /* §2.4 — ONE ROUND IS A SENTENCE, NOT A ONE-ROW BOARD. */
+  if (single) {
+    return (
+      <div style={{ paddingBottom: 10, paddingTop: 8 }}>
+        <p
+          style={{
+            margin: 0,
+            fontFamily: SANS,
+            fontSize: 12.5,
+            fontWeight: 600,
+            lineHeight: 1.35,
+            color: viewerId === single.userId ? A.AMBER_DEEP : INK,
+          }}
+        >
+          {t('discover.mostPlayedOneRoundLine', 'One round here: {{name}} shot {{gross}}.', {
+            count: row.count,
+            name: single.name,
+            gross: single.gross != null ? formatNumber(single.gross) : '\u2014',
+          })}
+        </p>
+        {/* §2.4 — the one MEMBER may have played more than once; the rounds
+            figure on the collapsed row says so, and this hands off to them. */}
+        {row.count > 1 && onSeeAllAtCourse && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSeeAllAtCourse();
+            }}
+            style={{
+              ...LABEL,
+              display: 'block',
+              fontSize: 11,
+              letterSpacing: '0.10em',
+              color: MID,
+              border: 'none',
+              background: 'transparent',
+              padding: '8px 0 0',
+              textAlign: 'left',
+              cursor: 'pointer',
+            }}
+          >
+            {t('discover.mostPlayedAllRoundsHere', 'ALL {{count}} ROUNDS HERE', { count: row.count })}
+          </button>
+        )}
+        {onSeeAllAtCourse && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSeeAllAtCourse();
+            }}
+            style={{
+              ...LABEL,
+              fontSize: 11,
+              letterSpacing: '0.10em',
+              color: INK,
+              border: 'none',
+              background: 'transparent',
+              padding: '8px 0 0',
+              textAlign: 'left',
+              cursor: 'pointer',
+            }}
+          >
+            {t('discover.mostPlayedSeeAllAtCourse', 'Visit this course')}
+          </button>
+        )}
+      </div>
+    );
+  }
 
-      >
+  return (
+    <div style={{ paddingBottom: 10, paddingTop: 8 }}>
+      {/* §2.1 — THE EXPANDED STATE NAMES WHAT IT IS. */}
+      <div style={{ ...LABEL, fontSize: 11, letterSpacing: '0.14em', color: FAINT, marginBottom: 4 }}>
+        {t('discover.mostPlayedBestRoundsHere', 'BEST ROUNDS HERE')}
+      </div>
+      <div>
+
       {listed.map((p) => {
         const isViewer = viewerId != null && p.userId === viewerId;
         const under = p.toPar != null && p.toPar < 0;
@@ -400,9 +342,7 @@ function MemberBoard({
               gap: 9,
               // FULL WIDTH (§S2.3): the tint bleeds to the card's own padding
               // rather than starting at a thumbnail-width indent.
-              // The bleed lives on the scroller when the list scrolls, so the
-              // row must NOT widen past it or hiding x would clip the gross.
-              margin: scrolls ? 0 : '0 -14px',
+              margin: '0 -13px',
               padding: '7px 14px',
               minWidth: 0,
               // §S2.8 — TINT ONLY.
@@ -506,23 +446,33 @@ function MemberBoard({
         );
       })}
       </div>
-      {/* §2 — THE BOTTOM FADE: transparent to the card's own colour, and it
-          removes itself once the list is at its end so it never looks like a
-          cut edge. Not a scrollbar. */}
-      {scrolls && !atEnd && (
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            left: -14,
-            right: -14,
-            bottom: 10,
-            height: 28,
-            pointerEvents: 'none',
-            background: `linear-gradient(to bottom, transparent, ${A.PANEL})`,
+      {/* §2.4 — MORE ROUNDS THAN ROWS: the list is one row per MEMBER, so a
+          course with more rounds than resolved members says so quietly and
+          hands off to the course's own sheet. */}
+      {row.count > listed.length && onSeeAllAtCourse && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSeeAllAtCourse();
           }}
-        />
+          style={{
+            ...LABEL,
+            display: 'block',
+            fontSize: 11,
+            letterSpacing: '0.10em',
+            color: MID,
+            border: 'none',
+            background: 'transparent',
+            padding: '8px 0 0',
+            textAlign: 'left',
+            cursor: 'pointer',
+          }}
+        >
+          {t('discover.mostPlayedAllRoundsHere', 'ALL {{count}} ROUNDS HERE', { count: row.count })}
+        </button>
       )}
+
       {/* THE SEE-ALL ROW STAYS (§2): it opens the course's own sheet, which is
           a different destination from a longer list. */}
       {onSeeAllAtCourse && (
@@ -634,9 +584,7 @@ export function MostPlayedLeaderboard({
         {shown.map((r) => {
           const m = meta?.get(r.courseId);
           const name = m?.name ?? r.courseName ?? t('discover.unknownCourse', 'Course');
-          const bestPlayer = r.players[0];
            const isWeekBestCourse = r.courseId === weekBestCourseId;
-           const cardAccent = isWeekBestCourse ? GOLD : DISCOVER_FACT;
           const open = openId === r.courseId;
           const toggle = () => setOpenId(open ? null : r.courseId);
           return (
@@ -663,6 +611,11 @@ export function MostPlayedLeaderboard({
                   role="button", tabIndex and Enter/Space; the faces, the names
                   and the "see all" action inside it stay REAL buttons, each
                   stopping propagation so a name tap navigates without toggling. */}
+              {/* BRIEF_COURSES_PLAYED_COURSE_LED §1 — THE ROW LEADS WITH THE
+                  COURSE. No player is named, no score is shown and no avatar
+                  appears on a collapsed row (§1.4): the section answers "where
+                  has everyone been playing and how did those courses play",
+                  which is a different question from the board above it. */}
               <div
                 role="button"
                 tabIndex={0}
@@ -675,184 +628,167 @@ export function MostPlayedLeaderboard({
                   }
                 }}
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: '52px minmax(0, 1fr) 15px',
-                  alignItems: 'center',
-                  columnGap: 11,
-                  rowGap: 0,
                   width: '100%',
-                  padding: '6px 0 0',
+                  padding: '10px 0',
                   background: 'transparent',
                   textAlign: 'left',
                   fontFamily: SANS,
                   cursor: 'pointer',
                 }}
               >
-                {/* §S1.2 — NO RANK NUMBER. With three rows tied at one or two
-                    rounds it was decoration, and it invited a member to read a
-                    contest into a list of places people happened to play. The
-                    ORDER is unchanged (§S1.3); only the badge is gone. */}
-                <CourseImageFallback
-                  courseId={r.courseId}
-                  courseName={name}
-                  imageUrl={m?.imageUrl}
-                  initialsSize={13}
-                  pending={thumbPending}
-                  style={{ width: 52, height: 52, borderRadius: THUMBNAIL_RADIUS, flexShrink: 0 }}
-                />
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  {/* TWO LINES, NOT A TRUNCATION: the parenthetical on a
-                      two-course club is the only thing telling the two apart. */}
-                  <span
-                    style={{
-                      display: '-webkit-box',
-                      WebkitBoxOrient: 'vertical',
-                      WebkitLineClamp: 2,
-                      fontSize: 14,
-                      fontWeight: 700,
-                       color: DISCOVER_FACT,
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1.2,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {name}
+                {/* §1.1 — 48px THUMBNAIL, NAME, REGION, CHEVRON. */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '48px minmax(0, 1fr) 15px',
+                    alignItems: 'center',
+                    columnGap: 11,
+                    minWidth: 0,
+                  }}
+                >
+                  <CourseImageFallback
+                    courseId={r.courseId}
+                    courseName={name}
+                    imageUrl={m?.imageUrl}
+                    initialsSize={13}
+                    pending={thumbPending}
+                    style={{ width: 48, height: 48, borderRadius: THUMBNAIL_RADIUS, flexShrink: 0 }}
+                  />
+                  <span style={{ minWidth: 0 }}>
+                    <span
+                      style={{
+                        display: 'block',
+                        fontSize: 13.5,
+                        fontWeight: 700,
+                        color: DISCOVER_FACT,
+                        letterSpacing: '-0.02em',
+                        lineHeight: 1.2,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {name}
+                    </span>
+                    {m?.region && (
+                      <span
+                        style={{
+                          display: 'block',
+                          marginTop: 3,
+                          fontSize: 11.5,
+                          fontWeight: 500,
+                          letterSpacing: 0,
+                          lineHeight: 1.2,
+                          color: MID,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {m.region}
+                      </span>
+                    )}
                   </span>
-                   {/* BRIEF_COURSE_CARD_REGION_AND_BEST §1 — REGION OWNS THIS
-                       LINE. It deliberately declares every type property rather
-                       than spreading LABEL, whose uppercase transform previously
-                       changed sentence-case database values such as "Kent". */}
-                   {/* REGION + ROUNDS share the meta line. The resolved-player
-                       count is represented only by the pile below.
-
-                      SUPERSEDED (BRIEF_MOST_PLAYED_META_LINE): §S2.2 recorded
-                      "the round count is A.MID and the region is A.FAINT on the
-                      same line, on purpose. One is a fact and one is a caption."
-                      That reasoning was sound — it fixed a line where BOTH were
-                      dim grey and the count vanished — but it is out of date.
-                      The same problem is now solved the other way: the WHOLE
-                      line sits in A.INK at ONE size (11 / 700), matching the
-                      treatment the leader chips on this same page took in
-                      BRIEF_BAND_TILE_TYPE_SCALE. Two sections on one page
-                      agreeing beats each solving one problem differently.
-                       The region now sits alone above this line. */}
-                  <span
+                  <ChevronDown
+                    size={15}
+                    strokeWidth={2.4}
+                    aria-hidden
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      marginTop: 2,
-                      minWidth: 0,
-                      fontVariantNumeric: 'tabular-nums lining-nums',
+                      flexShrink: 0,
+                      color: GHOST,
+                      transform: open ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 160ms ease',
                     }}
-                  >
-                     {m?.region && (
-                       <>
-                         <span
-                           style={{
-                             minWidth: 0,
-                             overflow: 'hidden',
-                             textOverflow: 'ellipsis',
-                             whiteSpace: 'nowrap',
-                             fontSize: 11,
-                             fontWeight: 700,
-                             lineHeight: 1,
-                             letterSpacing: 0,
-                             color: DISCOVER_FACT,
-                           }}
-                         >
-                           {m.region}
-                         </span>
-                         <span aria-hidden style={{ flex: 'none', width: 2.5, height: 2.5, borderRadius: '50%', background: GHOST, margin: '0 7px' }} />
-                       </>
-                     )}
-                    {/* §S4.2 — A PLURAL RULE, NEVER A CONCATENATION: i18next
-                        count pluralisation, so "1 round" / "11 rounds" and
-                        every language's own rule both work. */}
+                  />
+                </div>
+
+                {/* §1.2 — THE COURSE'S OWN FACTS. PLAYS TO leads because it is
+                    the most interesting figure on the row, and it is HANDICAP
+                    NEUTRAL: how a course played is the same fact off 4 or 24.
+                    §1.5 — NEW and the movement marker sit right-aligned here. */}
+                <div
+                  style={{
+                    marginTop: 8,
+                    paddingTop: 8,
+                    borderTop: `1px solid ${A.HAIRLINE}`,
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    gap: 16,
+                    minWidth: 0,
+                  }}
+                >
+                  {r.avgToPar != null && (
+                    <span style={{ flex: 'none' }}>
+                      <span
+                        style={{
+                          ...NUMF,
+                          display: 'block',
+                          fontSize: 14,
+                          fontWeight: 700,
+                          lineHeight: 1,
+                          /* COURSE-DIFFICULTY CONVENTION, NOT THE PLAYER ONE.
+                             This is how the COURSE played, so HARDER (over par)
+                             is A.RED and EASIER (under par) is A.GREEN — the
+                             opposite sense to a member's score, where UNDER par
+                             is the red achievement. Level is muted. */
+                          color:
+                            r.avgToPar > 0
+                              ? A.RED
+                              : r.avgToPar < 0
+                                ? A.GREEN
+                                : MID,
+                        }}
+                      >
+                        {formatToPar(r.avgToPar)}
+                      </span>
+                      <span
+                        style={{
+                          ...LABEL,
+                          display: 'block',
+                          marginTop: 4,
+                          fontSize: 9.5,
+                          fontWeight: 700,
+                          letterSpacing: '0.14em',
+                          color: FAINT,
+                        }}
+                      >
+                        {t('discover.mostPlayedPlaysTo', 'PLAYS TO')}
+                      </span>
+                    </span>
+                  )}
+                  <span style={{ flex: 'none' }}>
                     <span
                       style={{
                         ...NUMF,
-                         flex: 'none',
-                        fontSize: 11,
+                        display: 'block',
+                        fontSize: 14,
                         fontWeight: 700,
                         lineHeight: 1,
-                         color: DISCOVER_FACT,
-                        marginRight: 7,
+                        color: DISCOVER_FACT,
                       }}
                     >
-                      {t('discover.mostPlayedRoundCount', '{{count}} round', {
-                        count: r.count,
-                      })}
+                      {formatNumber(r.count)}
                     </span>
-
-                     {/* Week-on-week events modify the round count, so this
-                         slot belongs before the separator. Down and level
-                         return null and reserve no width. */}
-                     <MoveMark row={r} t={t} />
-
+                    <span
+                      style={{
+                        ...LABEL,
+                        display: 'block',
+                        marginTop: 4,
+                        fontSize: 9.5,
+                        fontWeight: 700,
+                        letterSpacing: '0.14em',
+                        color: FAINT,
+                      }}
+                    >
+                      {t('discover.mostPlayedRoundsLabel', 'ROUNDS')}
+                    </span>
                   </span>
-                 </span>
-                {/* WITHOUT IT NOTHING SAYS THE ROW OPENS (§S2.2). */}
-                <ChevronDown
-                  size={15}
-                  strokeWidth={2.4}
-                  aria-hidden
-                  style={{
-                    flexShrink: 0,
-                    // CORRECTION §S3.4 — GHOST, and it sits after played-to.
-                    color: GHOST,
-                    transform: open ? 'rotate(180deg)' : 'none',
-                    transition: 'transform 160ms ease',
-                  }}
-                />
-                {/* The count is now embodied by the faces. The pile and the low
-                    round share one compact row; neither introduces a nested tap
-                    target, so every point in the collapsed card still toggles. */}
-                {bestPlayer && (
-                  <div
-                  style={{
-                     width: '100%',
-                     gridColumn: '1 / -1',
-                     paddingTop: 4,
-                     paddingBottom: 5,
-                     marginTop: 4,
-                     borderTop: `1px solid ${A.HAIRLINE}`,
-                     display: 'grid',
-                     gridTemplateColumns: 'auto minmax(0, 1fr) auto',
-                     alignItems: 'center',
-                     columnGap: 10,
-                     minWidth: 0,
-                   }}
-                  >
-                    <PlayerFacepile players={r.players} accent={cardAccent} />
-                    <span style={{ minWidth: 0 }}>
-                      <span style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 0 }}>
-                        <span style={{ flex: 'none', fontSize: 19, fontWeight: 800, lineHeight: 1, color: cardAccent, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                          {bestPlayer.gross != null ? formatNumber(bestPlayer.gross) : '\u2014'}
-                        </span>
-                        <span style={{ flex: 'none', fontSize: 11.5, fontWeight: 800, lineHeight: 1, color: isWeekBestCourse ? GOLD : bestPlayer.toPar != null && bestPlayer.toPar < 0 ? TOPAR_RED : DISCOVER_QUIET, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                          {bestPlayer.toPar != null ? formatRelInt(bestPlayer.toPar) : ''}
-                        </span>
-                        <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 11.5, fontWeight: 700, lineHeight: 1.2, color: viewerId === bestPlayer.userId ? A.AMBER_DEEP : DISCOVER_FACT }}>
-                          {bestPlayer.name}
-                        </span>
-                      </span>
-                      <span style={{ ...LABEL, display: 'block', marginTop: 4, fontSize: 11, letterSpacing: '0.14em', color: FAINT }}>
-                        {t('discover.mostPlayedLowLabel', 'LOWEST IN 14 DAYS', { count: r.players.length })}
-                      </span>
-                    </span>
-                    {r.avgToPar != null && (
-                      <span style={{ flex: 'none', textAlign: 'right' }}>
-                        <span style={{ ...NUMF, display: 'block', fontSize: 12.5, lineHeight: 1, color: DISCOVER_QUIET }}>
-                          {formatToPar(r.avgToPar)}
-                        </span>
-                        <span style={{ ...LABEL, display: 'block', marginTop: 4, fontSize: 11, letterSpacing: '0.14em', color: FAINT }}>
-                          {t('discover.mostPlayedField', 'FIELD')}
-                        </span>
-                      </span>
-                    )}
-                  </div>
-                )}
+                  <span style={{ flex: 1, minWidth: 0, display: 'flex', justifyContent: 'flex-end' }}>
+                    <MoveMark row={r} t={t} />
+                  </span>
+                </div>
               </div>
+
               {open && <div style={{ height: 1, margin: '0 -14px', background: A.BORDER }} />}
 
               {/* The LOW line is part of this disclosure header and has no
