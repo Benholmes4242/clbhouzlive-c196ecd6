@@ -34,12 +34,31 @@ export const MentionText: React.FC<Props> = ({
   as: Tag = 'span',
 }) => {
   const navigate = useNavigate();
-  const segments = React.useMemo(() => parseMentionSegments(text ?? ''), [text]);
+
+  /**
+   * Paragraph normalisation (see BRIEF_MENTIONTEXT_PARAGRAPHS):
+   * - CRLF/CR folded to LF so \r\n authored text behaves identically.
+   * - 3+ consecutive newlines collapse to exactly two (one paragraph break).
+   * - Leading/trailing whitespace trimmed so stray returns at the end of a
+   *   post cannot open a gap above the action rail.
+   * Interior whitespace is deliberately untouched — it is the thing being fixed.
+   */
+  const normalised = React.useMemo(() => {
+    const raw = text ?? '';
+    return raw
+      .replace(/\r\n?/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }, [text]);
+
+  const segments = React.useMemo(() => parseMentionSegments(normalised), [normalised]);
 
   if (!segments.length) return null;
 
   return (
-    <Tag className={className} style={style}>
+    // pre-wrap (not pre) preserves the member's newlines while still wrapping
+    // long lines at the container width. Caller style wins on collision.
+    <Tag className={className} style={{ whiteSpace: 'pre-wrap', ...style }}>
       {segments.map((seg, i) => {
         if (seg.kind === 'text') {
           return <span key={i}>{seg.text}</span>;
