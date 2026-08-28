@@ -331,7 +331,9 @@ const PostDeepLinkPage: React.FC = () => {
   }
 
   // --- Not found ---
-  if (notFound || !post) {
+  // A signed-in member with no feedPost can NEVER fall through to the scrim:
+  // the scrim is only correct while the overlay is genuinely about to mount.
+  if (notFound || !post || (user && !feedPost)) {
     return (
       <div className="fixed inset-0 bg-[#0D0F11] flex flex-col items-center justify-center z-50 px-6">
         <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
