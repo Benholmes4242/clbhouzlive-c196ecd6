@@ -1865,7 +1865,7 @@ export function GolfThisWeek({
               top: 0,
               left: 0,
               right: 0,
-              padding: 'calc(env(safe-area-inset-top, 0px) + 70px) 14px 0',
+              padding: 'calc(env(safe-area-inset-top, 0px) + 70px) 20px 0',
               display: 'flex',
               justifyContent: 'flex-end',
             }}
