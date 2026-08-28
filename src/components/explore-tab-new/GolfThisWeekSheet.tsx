@@ -125,7 +125,9 @@ export function GolfThisWeekSheet({
             : t('discover.friendsRounds.entryPlural', 'ROUNDS')}
         </div>
         <div id="golf-this-week-title" style={{ ...TITLE_METRICS, color: A.INK }}>
-          {t('discover.golfThisWeek.heading', 'Golf this week')}
+          {/* §S4 — the section says FOURTEEN DAYS, so it is no longer titled
+              "Golf this week". "Recent rounds" is accurate and reads plainly. */}
+          {t('discover.golfThisWeek.heading', 'Recent rounds')}
         </div>
       </div>
 
