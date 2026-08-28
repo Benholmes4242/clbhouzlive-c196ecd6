@@ -340,7 +340,12 @@
     "vsOthersWorse_one": "[~~{{n}} šhőţš wőřšé ţháñ {{whose}} őţhéř řőúñd héřé.~~]",
     "vsOthersWorse_other": "[~~{{n}} šhőţš wőřšé ţháñ {{whose}} őţhéř {{count}} řőúñdš héřé.~~]",
     "vsOthersWorseNeutral_one": "[~~{{n}} šhőţš wőřšé ţháñ ţhé őţhéř řőúñd héřé.~~]",
-    "vsOthersWorseNeutral_other": "[~~{{n}} šhőţš wőřšé ţháñ ţhé őţhéř {{count}} řőúñdš héřé.~~]"
+    "vsOthersWorseNeutral_other": "[~~{{n}} šhőţš wőřšé ţháñ ţhé őţhéř {{count}} řőúñdš héřé.~~]",
+    "theCard": "[THE CARD]",
+    "figBest": "[BEST]",
+    "figOf": "[OF {{count}}]",
+    "figVsAvg": "[VS AVG]",
+    "figBeatField": "[BEAT FIELD]"
   },
   "card": {
     "friendsPlayed_one": "[~~Ƥļáýéđ ƀý {{count}} ƒříéñđ~~]",
