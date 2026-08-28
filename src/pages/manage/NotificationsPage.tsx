@@ -275,30 +275,63 @@ export default function NotificationsPage() {
           </p>
         </div>
 
-        {/* Muted people — only when the list is non-empty. */}
-        {mutedUserIds.length > 0 && (
+        {/* MUTED ACCOUNTS — people and businesses in one list, each with the way
+            back out. The old surface rendered a bare count, so a mute could be
+            made but never lifted. */}
+        {mutedRows.length > 0 && (
           <div>
             <p
               className="text-[11px] font-semibold uppercase tracking-[1.5px] px-1 mb-2"
               style={{ color: A.MUTE }}
             >
-              Muted people
+              Muted accounts
             </p>
             <div
               className="rounded-2xl overflow-hidden"
               style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
             >
-              <div
-                className="flex items-center justify-between px-4 py-3 min-h-[52px] cursor-default"
-              >
-                <p className="text-[15px] text-foreground">Muted accounts</p>
-                <span
-                  className="text-[13px] font-semibold rounded-full px-2 py-0.5"
-                  style={{ background: 'rgba(255,255,255,0.06)', color: A.MUTE }}
-                >
-                  {mutedUserIds.length}
-                </span>
-              </div>
+              {mutedRows.map((r, idx) => {
+                const meta = mutedMeta[r.id];
+                return (
+                  <div
+                    key={`${r.kind}:${r.id}`}
+                    className="flex items-center justify-between gap-3 px-4 py-3 min-h-[56px]"
+                    style={{ borderTop: idx === 0 ? 'none' : `0.5px solid ${A.BORDER}` }}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <SquircleAvatar
+                        size={34}
+                        src={meta?.photo ?? null}
+                        alt={meta?.name || 'Muted account'}
+                        userId={r.id}
+                        hairlineRing
+                      />
+                      <div className="min-w-0">
+                        <p className="text-[15px] text-foreground truncate">
+                          {meta?.name || 'Unavailable account'}
+                        </p>
+                        <p className="text-[12px]" style={{ color: A.MUTE }}>
+                          {r.kind === 'business' ? 'Business' : 'Member'}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleUnmute(r.id, r.kind)}
+                      disabled={unmuting === r.id}
+                      className="text-[13px] font-semibold rounded-full px-3 py-1.5 shrink-0"
+                      style={{
+                        background: 'rgba(255,255,255,0.06)',
+                        border: `1px solid ${A.BORDER}`,
+                        color: '#F8FAFC',
+                        opacity: unmuting === r.id ? 0.5 : 1,
+                      }}
+                    >
+                      Unmute
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
