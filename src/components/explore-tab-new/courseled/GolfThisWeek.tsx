@@ -1469,7 +1469,7 @@ export function GolfThisWeek({
       });
     }
     return out;
-  }, [ordered, t]);
+  }, [ordered, myBests, t]);
 
   /* NO INSIGHT MAP. The tile's prose is the MOMENT SENTENCE, generated from a
      fixed template per kind inside the card (BRIEF_ROUND_TILE_THE_MOMENT §S4.3).
