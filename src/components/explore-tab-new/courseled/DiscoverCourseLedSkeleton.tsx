@@ -334,7 +334,7 @@ export function GolfThisWeekRail() {
             key={i}
             style={{
               ...CARD_SHELL,
-              width: 256,
+              width: 268,
               flexShrink: 0,
               padding: 0,
               /* The live card lost its border for a shadow
