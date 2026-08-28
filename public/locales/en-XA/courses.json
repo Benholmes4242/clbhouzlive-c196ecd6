@@ -1651,6 +1651,8 @@
         "pickerAria": "[Change board: {{label}}]",
         "pickerEyebrow": "[Discover]",
         "pickerTitle": "[Select board]",
+        "pickerRowSub_one": "[{{count}} íñ ţĥé ƒíéļđ one]",
+        "pickerRowSub_other": "[{{count}} íñ ţĥé ƒíéļđ other]",
         "pos": "[POS]",
         "stablefordLabel": "[Stableford]",
         "stablefordShort": "[STABLEFORD]",

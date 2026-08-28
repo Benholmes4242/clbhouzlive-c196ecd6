@@ -38,7 +38,9 @@ export interface BoardCategoryOption<K extends string> {
   short: string;
   /** Second line, the tour picker's tournament-name slot. */
   subtitle?: string;
-  /** How many ranked members this board holds right now. 0 dims the row. */
+  /** How many ranked members this board holds right now. 0 dims the row.
+   *  This count is NOT rendered at the trailing edge of the row (see
+   *  MICRO_BRIEF_PICKER_COUNT_LABEL). */
   count: number;
 }
 
@@ -142,18 +144,6 @@ export function BoardPicker<K extends string>({
                   </div>
                 ) : null}
               </div>
-              <span
-                className="tabular-nums"
-                style={{
-                  flexShrink: 0,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.16em',
-                  color: INK_ALPHA_45,
-                }}
-              >
-                {o.count}
-              </span>
             </button>
           );
         })}

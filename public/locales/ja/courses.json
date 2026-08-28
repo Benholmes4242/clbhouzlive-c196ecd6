@@ -1157,6 +1157,7 @@
         "pickerAria": "Change board: {{label}}",
         "pickerEyebrow": "Discover",
         "pickerTitle": "Select board",
+        "pickerRowSub": "{{count}} in the field",
         "pos": "POS",
         "stablefordLabel": "Stableford",
         "stablefordShort": "STABLEFORD",

@@ -1223,6 +1223,8 @@
         "pickerAria": "Tabelle wechseln: {{label}}",
         "pickerEyebrow": "Entdecken",
         "pickerTitle": "Tabelle wahlen",
+        "pickerRowSub_one": "{{count}} im Feld",
+        "pickerRowSub_other": "{{count}} im Feld",
         "pos": "POS",
         "stablefordLabel": "Stableford",
         "stablefordShort": "STABLEFORD",

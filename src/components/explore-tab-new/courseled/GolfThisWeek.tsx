@@ -2329,7 +2329,7 @@ export function GolfThisWeek({
                 key: b.key,
                 label: b.label,
                 short: b.short,
-                subtitle: t('discover.golfThisWeek.board.pickerRowSub', '{{count}} qualifying rounds', {
+                subtitle: t('discover.golfThisWeek.board.pickerRowSub', '{{count}} in the field', {
                   count: b.ranked.length,
                 }),
                 count: b.ranked.length,
