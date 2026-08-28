@@ -1781,6 +1781,12 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
 
   const newTopUser = arr[0]?.user_id ?? null;
   if (newTopUser !== prevTopUser) {
+    // §3 — computed once for both sides. The board write above has ALREADY
+    // happened, so a suppressed notice never changes what is true, only who is
+    // told. This sits BEFORE enqueueNotification, so a suppressed row never
+    // reaches dedupKey / the 24h trigger skip / urgency at all (§6).
+    const notify = isTriggerFreshForCrownNotice(trigger, courseId, cfg.category);
+
     // Course name is needed by BOTH sides (legend_lost and legend_earned), so
     // it is resolved once here. golf_courses ONLY — never read
     // whs_friends/whs_friend_matches, those hold England Golf PII. Degrades to
@@ -1797,7 +1803,7 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
     } catch { /* non-fatal */ }
 
     if (prevTopUser) {
-      if (newTopUser) {
+      if (newTopUser && notify) {
         // Look up taker display name from user_profiles ONLY. Same PII rule as
         // above; degrades to null. Loser side only — meaningless to the gainer.
         let takerName: string | null = null;
@@ -1822,21 +1828,30 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
           taken_by: newTopUser,
           taker_name: takerName,
           course_name: courseName,
+          // §2 — enqueueNotification reads trigger_whs_score_id from here.
+          // Without it every crown row in the outbox had a null trigger and
+          // there was no way to ask which round caused one.
+          whs_score_id: trigger?.whs_score_id ?? null,
         });
       }
       // Loser side: their rank-1 count went down — recompute authoritatively.
+      // Runs regardless of the notification gate: titles are truth, not telling.
       await recomputeLegendTitles(prevTopUser);
     }
     if (newTopUser) {
-      await enqueueNotification(newTopUser, "legend_earned", {
-        course_id: courseId,
-        category: cfg.category,
-        course_name: courseName,
-      });
+      if (notify) {
+        await enqueueNotification(newTopUser, "legend_earned", {
+          course_id: courseId,
+          category: cfg.category,
+          course_name: courseName,
+          whs_score_id: trigger?.whs_score_id ?? null,
+        });
+      }
 
       // Gainer side: single code path for the tiered badge + milestone.
       await recomputeLegendTitles(newTopUser);
     }
+  }
   }
 }
 
