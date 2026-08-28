@@ -240,6 +240,7 @@ export function FeatCard({
     <button
       type="button"
       disabled={!tappable}
+      data-honours-card-ground={ace ? ACE_GROUND : ALBATROSS_GROUND}
       onClick={tappable ? () => onPress?.(e) : undefined}
       style={{
         width,

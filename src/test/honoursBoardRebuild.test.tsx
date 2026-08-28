@@ -84,9 +84,10 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     expect(bone.every((head) => head.dataset.honoursMetal === ACE_GROUND)).toBe(true);
     /* ONE MATERIAL: the metal ground now lives on the card shell, full height;
        the feat block carries no background of its own. jsdom's CSSOM drops
-       gradients from parsed style values, so assert the raw attribute. */
-    expect(champagne?.parentElement?.getAttribute('style')).toContain(ALBATROSS_GROUND);
-    expect(bone[0].parentElement?.getAttribute('style')).toContain(ACE_GROUND);
+       gradients from parsed style values, so the shell exposes the ground on
+       data-honours-card-ground for verification. */
+    expect(champagne?.parentElement?.dataset.honoursCardGround).toBe(ALBATROSS_GROUND);
+    expect(bone[0].parentElement?.dataset.honoursCardGround).toBe(ACE_GROUND);
     expect(champagne?.getAttribute('style')).not.toContain('linear-gradient');
     expect(bone[0].getAttribute('style')).not.toContain('linear-gradient');
   });
