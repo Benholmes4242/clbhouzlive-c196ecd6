@@ -1894,34 +1894,62 @@ export function GolfThisWeek({
           {/* THE LOWER THIRD — PhotoBand's column: 20px gutters, 8px off the
               bottom edge, 10px between the title and the line beneath it. */}
           <div style={{ padding: '0 20px 8px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {/* THE CATEGORY NAMES ITSELF ONCE ON THE PAGE BODY, HERE, as a
-                caps masthead — 21/800 with 0.06em tracking and the broadcast
-                text shadow. Read from `activeBoard`, never from the selection.
+            {/* THE CATEGORY NAMES ITSELF ONCE ON THE PAGE, HERE, as a caps
+                masthead — 21/800 with 0.06em tracking and the broadcast text
+                shadow. Read from `activeBoard`, never from the selection.
 
-                THE TITLE IS NOT TAPPABLE: no chevron, no cursor, no hit area.
-                The control stays in the chrome island.
-
-                RECORDED OBJECTION (BRIEF_MICRO_BOARD_TITLE_MASTHEAD): the island
-                capsule and this title both name the category, roughly 60px apart,
-                and caps makes that echo more visible than sentence case did. Ben
-                accepted the duplication as a deliberate trade for keeping the
-                control in the chrome. */}
-            <h2
+                MICRO_BRIEF_BOARD_PICKER_ON_TITLE: the title IS the control. The
+                chevron carries the affordance — no pill, no background, no
+                underline. The 44px hit height comes from padding plus a matching
+                negative margin, so the visual position of the title and the
+                counts line beneath it is unchanged. */}
+            <button
+              type="button"
+              onClick={() => setPickerOpen(true)}
+              aria-haspopup="dialog"
+              aria-expanded={pickerOpen}
+              aria-label={t('discover.golfThisWeek.board.pickerAria', 'Change board: {{label}}', {
+                label: activeBoard.label,
+              })}
+              className="active:scale-[0.97]"
               style={{
-                margin: 0,
-                fontFamily: SANS,
-                fontSize: 21,
-                fontWeight: 800,
-                lineHeight: 1,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                color: DISCOVER_FACT,
-                textShadow: '0 2px 12px rgba(0,0,0,0.55)',
-                cursor: 'default',
+                alignSelf: 'flex-start',
+                display: 'inline-flex',
+                alignItems: 'baseline',
+                gap: 8,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '12px 12px 12px 0',
+                margin: '-12px -12px -12px 0',
+                minHeight: 44,
+                textAlign: 'left',
               }}
             >
-              {activeBoard.label}
-            </h2>
+              <h2
+                style={{
+                  margin: 0,
+                  fontFamily: SANS,
+                  fontSize: 21,
+                  fontWeight: 800,
+                  lineHeight: 1,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  color: DISCOVER_FACT,
+                  textShadow: '0 2px 12px rgba(0,0,0,0.55)',
+                }}
+              >
+                {activeBoard.label}
+              </h2>
+              <ChevronDown
+                size={13}
+                strokeWidth={2.6}
+                color={DISCOVER_QUIET}
+                aria-hidden
+                style={{ flexShrink: 0, transform: 'translateY(1px)' }}
+              />
+            </button>
+
             {/* The counts, unchanged in content and key — only their type now
                 matches the hero's venue line. The window is FIXED at
                 GOLF_WEEK_DAYS, never derived from the oldest round, so the
