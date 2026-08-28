@@ -52,11 +52,23 @@ const AVATAR = 44;
  * covers the WHOLE CARD — shell to foot. The board is the page's one
  * deliberately light element; an A.PANEL foot was a dark strip through it.
  */
-export const ALBATROSS_GROUND = 'linear-gradient(150deg, #FAF3E4 0%, #EADCBD 48%, #C2AE86 100%)';
-export const ACE_GROUND = 'linear-gradient(150deg, #FBFAF6 0%, #E7E3D8 48%, #C3BDAC 100%)';
-export const METAL_INK = '#0B0F14';
-export const METAL_YEAR = 'rgba(11,15,20,0.60)';
-export const METAL_SUPPORT = 'rgba(11,15,20,0.60)';
+/* MATCHED TO BEN'S MOCK-UP: the ground is FLAT IVORY #FDFBF5 top to bottom, not
+   a gradient that darkens at the foot, and the two feats no longer separate by
+   the card's colour — they separate by the GOLD INK the card carries, which is
+   what the mock shows. Kept as *_GROUND names and as gradient-shaped strings so
+   the shell's backgroundImage and the suite's reads are unchanged. */
+export const ALBATROSS_GROUND = 'linear-gradient(150deg, #FDFBF5 0%, #FDFBF5 100%)';
+export const ACE_GROUND = 'linear-gradient(150deg, #FDFBF5 0%, #FDFBF5 100%)';
+export const METAL_INK = '#0F1216';
+/* THE GOLD INK of the mock: feat label, year and the hole-and-par line. */
+export const METAL_GOLD = '#A47821';
+export const METAL_YEAR = METAL_GOLD;
+export const METAL_SUPPORT = METAL_GOLD;
+/* The course name at the foot reads SLATE, quieter than the member's name. */
+export const METAL_COURSE = '#3B424C';
+/* 1px of gold along the card's top edge, and the foot's separator. */
+export const METAL_TOP_EDGE = '#EFDEB7';
+export const METAL_HAIRLINE = '#F3E9CE';
 export const METAL_AVATAR_RING = 'rgba(11,15,20,0.28)';
 
 /**
@@ -256,6 +268,8 @@ export function FeatCard({
            shorthand, and the suite reads this value. */
         backgroundImage: ace ? ACE_GROUND : ALBATROSS_GROUND,
         boxShadow: CARD_SHADOW,
+        /* The mock's gold top edge — an inset line, so it cannot shift layout. */
+        borderTop: `1px solid ${METAL_TOP_EDGE}`,
         overflow: 'hidden',
         textAlign: 'left',
         fontFamily: SANS,
@@ -290,7 +304,7 @@ export function FeatCard({
             fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.18em',
-             color: METAL_INK,
+             color: METAL_GOLD,
           }}
         >
           {kindLabel(e)}
@@ -370,7 +384,7 @@ export function FeatCard({
           justifyContent: 'center',
           flex: 1,
           padding: '0 12px',
-          borderTop: '1px solid rgba(216,169,60,0.22)',
+          borderTop: `1px solid ${METAL_HAIRLINE}`,
         }}
       >
         <span
@@ -379,7 +393,7 @@ export function FeatCard({
             fontSize: 13,
             fontWeight: 700,
             letterSpacing: '-0.02em',
-            color: METAL_INK,
+            color: METAL_COURSE,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
