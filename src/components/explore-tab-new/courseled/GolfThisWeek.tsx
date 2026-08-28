@@ -1736,6 +1736,32 @@ export function GolfThisWeek({
     return t('discover.golfThisWeek.gap.clear', '{{count}} CLEAR', { count: gap });
   };
 
+  /**
+   * §1.3 — THE PINNED ROW'S GAP TO THE LEADER. The DIRECTION IS DERIVED, not
+   * written: `lowerWins` says which way the tile counts, so the signed gap is
+   * (own − leader) on a lower-wins tile and (leader − own) everywhere else. Both
+   * are positive for a member behind the leader, which is the only case a pinned
+   * row exists in, and the UNIT comes from the tile's own offUnit.
+   */
+  const pinnedGap = (tile: (typeof bandTiles)[number], own: CircleRoundRow) => {
+    const leaderValue = tile.valueOf(tile.row);
+    const ownValue = tile.valueOf(own);
+    const signed = tile.lowerWins ? ownValue - leaderValue : leaderValue - ownValue;
+    const gap = Number(Math.abs(signed).toFixed(tile.precision));
+    if (gap === 0) return t('discover.golfThisWeek.gap.tied', 'TIED');
+    if (tile.offUnit === 'shots') {
+      return t('discover.golfThisWeek.gap.shotsOff', '{{count}} SHOTS OFF', { count: gap });
+    }
+    if (tile.offUnit === 'points') {
+      return t('discover.golfThisWeek.gap.pointsOff', '{{count}} POINTS OFF', { count: gap });
+    }
+    if (tile.offUnit === 'birdies') {
+      return t('discover.golfThisWeek.gap.birdiesOff', '{{count}} BIRDIES OFF', { count: gap });
+    }
+    return t('discover.golfThisWeek.gap.off', '{{count}} OFF', { count: gap });
+  };
+
+
   const podiumDeficit = (
     tile: (typeof bandTiles)[number],
     row: CircleRoundRow,
