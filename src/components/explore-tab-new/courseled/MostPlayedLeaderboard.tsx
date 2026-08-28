@@ -6,7 +6,7 @@ import { ArrowUp, ChevronDown } from 'lucide-react';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import type { MostPlayedPlayer, MostPlayedRow } from './hooks/useMostPlayedThisWeek';
-import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, Eyebrow, GOLD, InkAction, LABEL, NUMF, SANS, THUMBNAIL_RADIUS } from './tokens';
+import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, Eyebrow, InkAction, LABEL, NUMF, SANS, THUMBNAIL_RADIUS } from './tokens';
 import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
@@ -528,18 +528,12 @@ export function MostPlayedLeaderboard({
   // while the rest of the row reads straight away.
   const thumbPending = shown.length > 0 && metaQuery.isPending;
 
-  /* GOLD MEANS BEST in all three Discover appearances: the BEST THIS WEEK
-     podium, its winning round tile, and this course card. Resolve the winning
-     course against ALL supplied rows before slicing; if it is outside the
-     visible list, no visible card is promoted. `find` intentionally awards at
-     most one course if equal gross values occur. */
-  const weekBestGross = rows.reduce<number | null>(
-    (best, row) => row.bestGross == null ? best : best == null ? row.bestGross : Math.min(best, row.bestGross),
-    null,
-  );
-  const weekBestCourseId = weekBestGross == null
-    ? null
-    : rows.find((row) => row.bestGross === weekBestGross)?.courseId ?? null;
+  /* MICRO_BRIEF_COURSES_PLAYED_EXPANDED_TIDY §1.1 — THE GOLD HIGHLIGHT IS GONE.
+     The lowest-gross course of the window no longer takes a gold border, wash or
+     accent: every course card uses the same neutral treatment. Nothing else read
+     the flag — it was purely a border, and it drove no label, sort or analytics
+     value, so the whole weekBestGross / weekBestCourseId resolution is deleted
+     with it. */
 
   const openMember = (userId: string) => navigate(`/profile/${userId}`);
 
@@ -585,7 +579,6 @@ export function MostPlayedLeaderboard({
         {shown.map((r) => {
           const m = meta?.get(r.courseId);
           const name = m?.name ?? r.courseName ?? t('discover.unknownCourse', 'Course');
-           const isWeekBestCourse = r.courseId === weekBestCourseId;
           const open = openId === r.courseId;
           const toggle = () => setOpenId(open ? null : r.courseId);
           return (
@@ -600,7 +593,7 @@ export function MostPlayedLeaderboard({
               key={r.courseId}
               style={{
                 background: A.PANEL,
-                 border: `1px solid ${isWeekBestCourse ? GOLD : 'transparent'}`,
+                 border: '1px solid transparent',
                 borderRadius: CARD_RADIUS,
                 overflow: 'hidden',
                 boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
