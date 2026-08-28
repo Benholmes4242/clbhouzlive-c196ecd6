@@ -1595,14 +1595,12 @@ export function GolfThisWeek({
      birdiesRanked are the SAME ranked, member-deduped arrays with the SAME
      floors (Stableford >= 36, birdies >= 3). No new query, no new sort.
 
-     MOST IMPROVED HAS NO BOARD. The brief names three categories twice (§1.6's
-     units GROSS / PTS / BIRDIES and §4.1's three titles) and gives improved
-     neither a label nor a unit, so its ranked list is computed and unused rather
-     than silently retitled. Flagged in the report — it is a real loss of a
-     comparison and it is Ben's call, not this brief's. */
+      FIVE CATEGORIES NOW (BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S1): lowest
+     net and most improved join, because gross and birdies both reward
+     ball-striking and the board read as weighted to low handicaps. Net,
+     Stableford and improved are winnable by anyone. FEWEST BLOW-UPS was
+     proposed and REJECTED — do not add it (§1.3). */
   void best;
-
-  type BoardKey = 'gross' | 'stableford' | 'birdies';
 
   interface BoardSpec {
     key: BoardKey;
