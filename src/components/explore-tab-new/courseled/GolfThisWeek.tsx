@@ -1319,7 +1319,12 @@ export function GolfThisWeek({
    * (§2.3). Component state, not URL: the scope pills answer "which rounds",
    * this answers "which board", and only the former is shareable today.
    */
-  const [boardCategory, setBoardCategory] = useState<'gross' | 'stableford' | 'birdies'>('gross');
+  /**
+   * BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S2 — NULL MEANS "NOT CHOSEN YET",
+   * and the rotation supplies the default. An EXPLICIT pick writes here and
+   * therefore beats the rotation for the rest of the session (§2.3).
+   */
+  const [boardCategory, setBoardCategory] = useState<BoardKey | null>(null);
   /* ONE piece of state controls the category sheet, owned here because the
      control (the hero title) and the sheet render in different blocks. */
   const [pickerOpen, setPickerOpen] = useState(false);
