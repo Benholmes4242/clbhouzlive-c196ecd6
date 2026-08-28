@@ -372,21 +372,28 @@ export function DiscoverHero({
           )}
         </div>
 
-        {/* ONE ROW CARRIES MEMBER, COURSE AND SCORE (§5). The member and their
-            course are a two-line stack on the left; the gross sits over the
-            to-par on the right, right-aligned and flex: none.
+        {/* ONE ROW CARRIES MEMBER, COURSE, SCORE AND THE REACTION (§5,
+            BRIEF_DISCOVER_HERO_PARITY §1.3). The member and their course are a
+            two-line stack on the left; the gross sits over the to-par on the
+            right, right-aligned and flex: none, with the heart trailing it.
 
-            TONE: the gross carries figureColor, the ACHIEVEMENT's colour. THE
-            QUALIFIER'S COLOUR IS A FUNCTION OF WHAT THE MOMENT CLAIMS, NOT OF
-            THE NUMBER'S SIGN: only when the moment is itself about the score
-            (course record, finished in the red) does the to-par carry the
-            achievement colour. Everywhere else — the run, birdie haul, strong
-            finish, grind, eagle — it is CONTEXT beside the claim and renders in
-            the neutral fact tone. Never inverted to red: a red +4 beside a green
-            9 would read as criticism of a good round.
+            TONE: THE GROSS FOLLOWS momentIsAboutScore, exactly as the qualifier
+            does, and for the same reason. It used to carry figureColor
+            unconditionally, which painted a GREEN 77 on a run that finished +6 —
+            green means better on every other member surface in this app. The
+            achievement is THE RUN; the gross is the score of the round the run
+            happened in, and only one of those is being celebrated. So a course
+            record or an under-par round keeps its coloured gross, and the run,
+            birdie haul, strong finish and grind render it in the neutral fact
+            tone. The 56px figure is untouched and keeps the moment tone in every
+            case — that IS the achievement, and on a run it should be the only
+            coloured thing on the hero.
+            Never inverted to red: a red +4 beside a green 9 would read as
+            criticism of a good round.
             ABSENT IS ABSENT: neither value renders NO right-hand block and no
             gap, never a dash. ON A COURSE RECORD the 56px figure ALREADY IS the
             gross, so only the to-par renders. */}
+
         {(() => {
           const toPar = moment.facts.toPar;
           const showGross = row.gross != null && !isGrossScore;
