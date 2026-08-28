@@ -6,7 +6,7 @@
     "errorTitle": "Couldn't load media",
     "errorBody": "Please check your connection and try again.",
     "emptyTitle": "No media yet",
-    "emptyBody": "Be the first to capture <1>{{courseName}}</1> — photos and videos from your round help fellow golfers discover it.",
+    "emptyBody": "Be the first to capture <1>{{courseName}}</1> \u2014 photos and videos from your round help fellow golfers discover it.",
     "emptyCourseFallback": "this course",
     "shareExperience": "Share your experience",
     "uploadVideo": "Upload a video",
@@ -48,15 +48,15 @@
     "sortByDifficulty": "By difficulty",
     "errorLoading": "Couldn't load hole analysis.",
     "credibilityKicker": "OFFICIAL HOLE DATA",
-    "credibilitySuffix": " · Official WHS",
+    "credibilitySuffix": " \u00b7 Official WHS",
     "hardestTitle": "Hardest",
     "easiestTitle": "Easiest",
     "playsToInline": "Plays to {{playsTo}}",
-    "parAndSi": "Par {{par}} · SI {{si}}",
+    "parAndSi": "Par {{par}} \u00b7 SI {{si}}",
     "empty": {
       "eyebrow": "Official hole data",
       "title": "Hole insights are coming",
-      "body": "When global golfers holding official WHS handicaps log rounds with hole scores at <1>{{courseName}}</1>, we'll break down every hole — average score, hardest and easiest, and the full birdie-to-double spread.",
+      "body": "When global golfers holding official WHS handicaps log rounds with hole scores at <1>{{courseName}}</1>, we'll break down every hole \u2014 average score, hardest and easiest, and the full birdie-to-double spread.",
       "thisCourse": "this course"
     },
     "scoringKey": {
@@ -78,17 +78,17 @@
     "aceA11y": "Hole in one",
     "clubGuide": {
       "title": "How the course plays",
-      "bodySignedIn_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
-      "bodySignedIn_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole, with your own game alongside.",
-      "bodySignedOut_one": "Built from {{count}} round with hole-by-hole detail — the community's scoring on every hole.",
-      "bodySignedOut_other": "Built from {{count}} rounds with hole-by-hole detail — the community's scoring on every hole."
+      "bodySignedIn_one": "Built from {{count}} round with hole-by-hole detail \u2014 the community's scoring on every hole, with your own game alongside.",
+      "bodySignedIn_other": "Built from {{count}} rounds with hole-by-hole detail \u2014 the community's scoring on every hole, with your own game alongside.",
+      "bodySignedOut_one": "Built from {{count}} round with hole-by-hole detail \u2014 the community's scoring on every hole.",
+      "bodySignedOut_other": "Built from {{count}} rounds with hole-by-hole detail \u2014 the community's scoring on every hole."
     },
     "holeByHole": "Hole by hole",
     "birdieRingNote": "A red dot by a hole number means you've birdied it.",
     "shapeOfCourse": "The shape of the course",
     "legendEveryone": "Everyone",
     "legendYou": "You",
-    "theBeastSuffix": " · the beast",
+    "theBeastSuffix": " \u00b7 the beast",
     "youAvg": "You {{avg}}",
     "preview": {
       "eyebrow": "Hole by hole",
@@ -100,57 +100,57 @@
       "seeAll_one": "See all {{count}} hole",
       "seeAll_other": "See all {{count}} holes",
       "showLess": "Show less",
-      "seeAllShort": "전체 {{count}}"
+      "seeAllShort": "\uc804\uccb4 {{count}}"
     },
     "yourCourses": {
       "roundsLabel": "Raundeu"
     },
     "scoringBreakdown": {
-      "vsFieldLegend": "평균",
-      "vsBetter": "이 홀은 평균보다 좋음",
-      "vsWorse": "이 홀은 평균보다 나쁨",
-      "vsLevel": "평균과 동일",
-      "mergeTitle": "타수가 새는 곳",
-      "mergeAside": "이 코스에서 플레이한 모든 홀",
-      "shareTop": "{{share}}%가 이 홀들에서",
-      "shareRest": "나머지 {{count}}홀에서 {{share}}%",
-      "doublesShare_one": "더블 {{count}} · 전체의 {{share}}%",
-      "doublesShare_other": "더블 {{count}} · 전체의 {{share}}%",
-      "s1Advice": "{{holes}}은 그린 중앙을 겨냥하고 필요하면 보기를 받아들이세요.",
-      "parTypeTitle": "파별 플레이",
-      "parTypeAside": "라운드당 오버파",
-      "parLabel": "파 {{n}}",
-      "parTypeTotal": "합계",
-      "s3AdviceEven": "첫 티에 오르기 전 충분히 몸을 풀고 몇 홀마다 물과 간식을 챙기세요.",
-      "s3AdviceLate": "12번 홀 즈음 물과 간식을 챙기세요. 흐름이 떨어지기 전에.",
-      "s3AdviceEarly": "티오프 전에 몇 개 치고 퍼팅을 굴려 보세요.",
-      "s3AdviceMiddle": "턴을 지나는 구간에서는 매 샷 목표를 정하세요. 집중이 흐트러지는 곳입니다.",
-      "formTitle": "이 코스에서의 폼",
-      "formAside": "최근 {{count}}라운드",
-      "formLast10": "이곳에서의 최근 10라운드",
-      "formLevel": "이전 10라운드와 동일",
-      "formBetter": "이전 10라운드보다 {{n}} 좋음",
-      "formWorse": "이전 10라운드보다 {{n}} 나쁨",
-      "formBest": "베스트 {{n}}",
-      "formWorstHere": "워스트 {{n}}",
-      "bestHere": "이곳 베스트",
-      "reachTitle": "손에 닿는 목표",
-      "reachAside": "이 코스에서의 다음 단계",
-      "reachBirdies": "버디를 잡은 홀",
-      "reachOf": "{{of}} 중 {{done}}",
-      "reachChaseLevel": "보유자와 동일",
-      "reachChaseGap": "{{gap}} 차이",
-      "bogey": "보기",
-      "third1": "1-6번 홀",
-      "third2": "7-12번 홀",
-      "third3": "13-18번 홀",
-      "holeOne": "{{n}}번 홀",
-      "holeMany": "{{list}}번 홀",
-      "nHoles_one": "{{count}}홀",
-      "nHoles_other": "{{count}}홀",
-      "parYouAvg": "파 {{par}} · 평균 {{avg}}",
-      "s1Sub": "난이도가 아니라 잃은 타수 순",
-      "moreRoundsHint": "이 코스에서 몇 라운드 더 치면 패턴을 보여드립니다."
+      "vsFieldLegend": "\ud3c9\uade0",
+      "vsBetter": "\uc774 \ud640\uc740 \ud3c9\uade0\ubcf4\ub2e4 \uc88b\uc74c",
+      "vsWorse": "\uc774 \ud640\uc740 \ud3c9\uade0\ubcf4\ub2e4 \ub098\uc068",
+      "vsLevel": "\ud3c9\uade0\uacfc \ub3d9\uc77c",
+      "mergeTitle": "\ud0c0\uc218\uac00 \uc0c8\ub294 \uacf3",
+      "mergeAside": "\uc774 \ucf54\uc2a4\uc5d0\uc11c \ud50c\ub808\uc774\ud55c \ubaa8\ub4e0 \ud640",
+      "shareTop": "{{share}}%\uac00 \uc774 \ud640\ub4e4\uc5d0\uc11c",
+      "shareRest": "\ub098\uba38\uc9c0 {{count}}\ud640\uc5d0\uc11c {{share}}%",
+      "doublesShare_one": "\ub354\ube14 {{count}} \u00b7 \uc804\uccb4\uc758 {{share}}%",
+      "doublesShare_other": "\ub354\ube14 {{count}} \u00b7 \uc804\uccb4\uc758 {{share}}%",
+      "s1Advice": "{{holes}}\uc740 \uadf8\ub9b0 \uc911\uc559\uc744 \uaca8\ub0e5\ud558\uace0 \ud544\uc694\ud558\uba74 \ubcf4\uae30\ub97c \ubc1b\uc544\ub4e4\uc774\uc138\uc694.",
+      "parTypeTitle": "\ud30c\ubcc4 \ud50c\ub808\uc774",
+      "parTypeAside": "\ub77c\uc6b4\ub4dc\ub2f9 \uc624\ubc84\ud30c",
+      "parLabel": "\ud30c {{n}}",
+      "parTypeTotal": "\ud569\uacc4",
+      "s3AdviceEven": "\uccab \ud2f0\uc5d0 \uc624\ub974\uae30 \uc804 \ucda9\ubd84\ud788 \ubab8\uc744 \ud480\uace0 \uba87 \ud640\ub9c8\ub2e4 \ubb3c\uacfc \uac04\uc2dd\uc744 \ucc59\uae30\uc138\uc694.",
+      "s3AdviceLate": "12\ubc88 \ud640 \uc988\uc74c \ubb3c\uacfc \uac04\uc2dd\uc744 \ucc59\uae30\uc138\uc694. \ud750\ub984\uc774 \ub5a8\uc5b4\uc9c0\uae30 \uc804\uc5d0.",
+      "s3AdviceEarly": "\ud2f0\uc624\ud504 \uc804\uc5d0 \uba87 \uac1c \uce58\uace0 \ud37c\ud305\uc744 \uad74\ub824 \ubcf4\uc138\uc694.",
+      "s3AdviceMiddle": "\ud134\uc744 \uc9c0\ub098\ub294 \uad6c\uac04\uc5d0\uc11c\ub294 \ub9e4 \uc0f7 \ubaa9\ud45c\ub97c \uc815\ud558\uc138\uc694. \uc9d1\uc911\uc774 \ud750\ud2b8\ub7ec\uc9c0\ub294 \uacf3\uc785\ub2c8\ub2e4.",
+      "formTitle": "\uc774 \ucf54\uc2a4\uc5d0\uc11c\uc758 \ud3fc",
+      "formAside": "\ucd5c\uadfc {{count}}\ub77c\uc6b4\ub4dc",
+      "formLast10": "\uc774\uacf3\uc5d0\uc11c\uc758 \ucd5c\uadfc 10\ub77c\uc6b4\ub4dc",
+      "formLevel": "\uc774\uc804 10\ub77c\uc6b4\ub4dc\uc640 \ub3d9\uc77c",
+      "formBetter": "\uc774\uc804 10\ub77c\uc6b4\ub4dc\ubcf4\ub2e4 {{n}} \uc88b\uc74c",
+      "formWorse": "\uc774\uc804 10\ub77c\uc6b4\ub4dc\ubcf4\ub2e4 {{n}} \ub098\uc068",
+      "formBest": "\ubca0\uc2a4\ud2b8 {{n}}",
+      "formWorstHere": "\uc6cc\uc2a4\ud2b8 {{n}}",
+      "bestHere": "\uc774\uacf3 \ubca0\uc2a4\ud2b8",
+      "reachTitle": "\uc190\uc5d0 \ub2ff\ub294 \ubaa9\ud45c",
+      "reachAside": "\uc774 \ucf54\uc2a4\uc5d0\uc11c\uc758 \ub2e4\uc74c \ub2e8\uacc4",
+      "reachBirdies": "\ubc84\ub514\ub97c \uc7a1\uc740 \ud640",
+      "reachOf": "{{of}} \uc911 {{done}}",
+      "reachChaseLevel": "\ubcf4\uc720\uc790\uc640 \ub3d9\uc77c",
+      "reachChaseGap": "{{gap}} \ucc28\uc774",
+      "bogey": "\ubcf4\uae30",
+      "third1": "1-6\ubc88 \ud640",
+      "third2": "7-12\ubc88 \ud640",
+      "third3": "13-18\ubc88 \ud640",
+      "holeOne": "{{n}}\ubc88 \ud640",
+      "holeMany": "{{list}}\ubc88 \ud640",
+      "nHoles_one": "{{count}}\ud640",
+      "nHoles_other": "{{count}}\ud640",
+      "parYouAvg": "\ud30c {{par}} \u00b7 \ud3c9\uade0 {{avg}}",
+      "s1Sub": "\ub09c\uc774\ub3c4\uac00 \uc544\ub2c8\ub77c \uc783\uc740 \ud0c0\uc218 \uc21c",
+      "moreRoundsHint": "\uc774 \ucf54\uc2a4\uc5d0\uc11c \uba87 \ub77c\uc6b4\ub4dc \ub354 \uce58\uba74 \ud328\ud134\uc744 \ubcf4\uc5ec\ub4dc\ub9bd\ub2c8\ub2e4."
     }
   },
   "scorecard": {
@@ -170,8 +170,8 @@
     "beatFieldOnPartial": "You matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
     "beatFieldOnTourPartial": "Matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
     "beatFieldVoicePartial": "{{who}} matched or beat the field average on {{beat}} of the {{scored}} holes with field data.",
-    "holeByHole": "전체 스코어카드",
-    "hideHoleByHole": "전체 스코어카드 숨기기",
+    "holeByHole": "\uc804\uccb4 \uc2a4\ucf54\uc5b4\uce74\ub4dc",
+    "hideHoleByHole": "\uc804\uccb4 \uc2a4\ucf54\uc5b4\uce74\ub4dc \uc228\uae30\uae30",
     "vsOthersLevel_one": "Right on {{whose}} other round here.",
     "vsOthersLevel_other": "Right on {{whose}} other {{count}} rounds here.",
     "vsOthersLevelNeutral_one": "Right on the other round here.",
@@ -211,12 +211,12 @@
     "aiQuoteLoading": "Generating quote...",
     "aiQuoteFallback": "A golf experience like no other",
     "experiencePoints": "Experience Points Earned",
-    "yourRounds": "내 라운드"
+    "yourRounds": "\ub0b4 \ub77c\uc6b4\ub4dc"
   },
   "explorer": {
     "unableToLoadTitle": "Unable to load courses",
     "unableToLoadBody": "We couldn't fetch the courses. Please check your connection and try again.",
-    "loadMoreRetry": "Couldn't load more courses · Tap to retry",
+    "loadMoreRetry": "Couldn't load more courses \u00b7 Tap to retry",
     "allSubRegions": "All sub-regions",
     "chooseRegionFirst": "Choose a region first",
     "subRegionA11y": "Select sub-region",
@@ -228,7 +228,7 @@
     "results_one": "<1>{{formattedCount}}</1> result",
     "results_other": "<1>{{formattedCount}}</1> results",
     "resetFilters": "Reset filters",
-    "searchPlaceholder": "Search by name, county or area…",
+    "searchPlaceholder": "Search by name, county or area\u2026",
     "searchA11y": "Search golf courses",
     "searching": "Searching",
     "filtersA11y": "Course filters",
@@ -245,15 +245,15 @@
     "outOfTen": "/ 10",
     "added": "Added",
     "retry": "Retry",
-    "ratingBullet": "• "
+    "ratingBullet": "\u2022 "
   },
   "rateSheet": {
     "subtitle": "Search any course you've played",
     "emptyLong": "Type a course name to get started",
-    "searching": "Searching…",
+    "searching": "Searching\u2026",
     "noResults": "No courses found for \"{{query}}\"",
-    "rateAction": "Rate →",
-    "searchPlaceholder": "Search courses…"
+    "rateAction": "Rate \u2192",
+    "searchPlaceholder": "Search courses\u2026"
   },
   "tabs": {
     "explore": "Explore"
@@ -283,7 +283,7 @@
     "rateCta": "Rate",
     "playedEyebrow": "YOU HAVEN'T RATED YET",
     "suggestedEyebrow": "TRY RATING",
-    "playedSubWithRegion": "{{region}} · Played, not rated",
+    "playedSubWithRegion": "{{region}} \u00b7 Played, not rated",
     "playedSubNoRegion": "Played, not rated",
     "suggestedForYou": "Suggested for you"
   },
@@ -292,7 +292,7 @@
       "headline": "Can't find a course?",
       "headlineWithQuery": "Can't find \"{{query}}\"?",
       "body": "If a course is missing, tell us and we'll add it to the map.",
-      "perkQuick": "Takes 20 seconds – just name and location",
+      "perkQuick": "Takes 20 seconds \u2013 just name and location",
       "perkNotify": "We'll notify you the moment it's live",
       "cta": "Request this course"
     },
@@ -302,7 +302,7 @@
       "subtitle": "Still not the one? Tap to request it."
     },
     "sheet": {
-      "successTitle": "Thanks — we've got it.",
+      "successTitle": "Thanks \u2014 we've got it.",
       "successBody": "We'll email you when this course is added.",
       "done": "Done",
       "title": "Request a course",
@@ -312,9 +312,9 @@
       "locationPlaceholder": "Town, region, country",
       "noteLabel": "Note",
       "optional": "(optional)",
-      "notePlaceholder": "Anything else? New opening, alternative name…",
+      "notePlaceholder": "Anything else? New opening, alternative name\u2026",
       "submit": "Request course",
-      "sending": "Sending…",
+      "sending": "Sending\u2026",
       "error": "Something went wrong. Please try again."
     }
   },
@@ -324,8 +324,8 @@
     "listsA11y": "Top 100 lists",
     "metaResults_one": "<1>{{count}}</1> result",
     "metaResults_other": "<1>{{count}}</1> results",
-    "metaCourses_one": "<1>{{count}}</1> course · {{listLabel}}",
-    "metaCourses_other": "<1>{{count}}</1> courses · {{listLabel}}",
+    "metaCourses_one": "<1>{{count}}</1> course \u00b7 {{listLabel}}",
+    "metaCourses_other": "<1>{{count}}</1> courses \u00b7 {{listLabel}}",
     "clearSearch": "Clear search",
     "resetFilters": "Reset filters",
     "sectionTitle": "The world's best",
@@ -345,10 +345,10 @@
       "clubhouse": "Clubhouse",
       "noRoundsTitle": "Rated, but no rounds tracked here yet.",
       "noRoundsCta": "Be the first.",
-      "ratingLabel": "평점",
-      "avgToParLabel": "평균 대비 파",
-      "harderThanLabel": "더 어려움",
-      "easierThanLabel": "더 쉬움"
+      "ratingLabel": "\ud3c9\uc810",
+      "avgToParLabel": "\ud3c9\uade0 \ub300\ube44 \ud30c",
+      "harderThanLabel": "\ub354 \uc5b4\ub824\uc6c0",
+      "easierThanLabel": "\ub354 \uc26c\uc6c0"
     },
     "verdict": {
       "higher": "Rated above its rank",
@@ -389,7 +389,7 @@
     "regionalSortView": "Sort & View",
     "regionalAddCourses": "Add Courses",
     "showingRegion": "Showing {{region}} courses",
-    "regionalAddCoursesEmoji": "📍",
+    "regionalAddCoursesEmoji": "\ud83d\udccd",
     "emptyTop100OwnTitle": "No Top 100 courses rated yet",
     "emptyTop100OtherTitle": "{{name}} hasn't rated any Top 100 courses yet",
     "emptyTop100OwnBody": "Explore the world's greatest golf courses and rate them to track your journey",
@@ -441,7 +441,7 @@
       "title": "Played here?",
       "body": "Your rating helps golfers worldwide",
       "rate": "Rate",
-      "emoji": "⭐"
+      "emoji": "\u2b50"
     },
     "reportA11y": "Report review",
     "sort": {
@@ -481,14 +481,14 @@
       "kicker": "WHAT TO INCLUDE"
     },
     "search": {
-      "placeholder": "Search reviews…",
+      "placeholder": "Search reviews\u2026",
       "openA11y": "Search reviews",
       "cancel": "Cancel"
     },
     "sortA11y": "Sort reviews",
     "filterA11y": "Filter reviews: {{label}} ({{count}})",
     "editYours": "Edit yours",
-    "writePromptInline": "⭐ Write your review",
+    "writePromptInline": "\u2b50 Write your review",
     "noMatches": {
       "body": "No reviews match your criteria.",
       "clear": "Clear filters"
@@ -503,70 +503,70 @@
     },
     "wizard": {
       "rail": {
-        "score": "점수",
-        "breakdown": "세부 평가",
-        "words": "후기"
+        "score": "\uc810\uc218",
+        "breakdown": "\uc138\ubd80 \ud3c9\uac00",
+        "words": "\ud6c4\uae30"
       },
-      "backA11y": "뒤로",
-      "deleteA11y": "리뷰 삭제",
-      "a11yStep": "3단계 중 {{n}}단계, {{label}}",
-      "continue": "계속",
-      "save": "리뷰 저장",
-      "post": "리뷰 게시",
-      "saving": "저장 중...",
-      "posting": "게시 중...",
+      "backA11y": "\ub4a4\ub85c",
+      "deleteA11y": "\ub9ac\ubdf0 \uc0ad\uc81c",
+      "a11yStep": "3\ub2e8\uacc4 \uc911 {{n}}\ub2e8\uacc4, {{label}}",
+      "continue": "\uacc4\uc18d",
+      "save": "\ub9ac\ubdf0 \uc800\uc7a5",
+      "post": "\ub9ac\ubdf0 \uac8c\uc2dc",
+      "saving": "\uc800\uc7a5 \uc911...",
+      "posting": "\uac8c\uc2dc \uc911...",
       "step0": {
-        "heading": "10점 만점에 몇 점인가요?",
-        "captionEmpty": "드래그해서 점수를 정하세요",
-        "captionSet": "내 종합 점수",
-        "gate": "점수를 정하세요",
-        "a11y": "종합 점수, 1에서 10",
+        "heading": "10\uc810 \ub9cc\uc810\uc5d0 \uba87 \uc810\uc778\uac00\uc694?",
+        "captionEmpty": "\ub4dc\ub798\uadf8\ud574\uc11c \uc810\uc218\ub97c \uc815\ud558\uc138\uc694",
+        "captionSet": "\ub0b4 \uc885\ud569 \uc810\uc218",
+        "gate": "\uc810\uc218\ub97c \uc815\ud558\uc138\uc694",
+        "a11y": "\uc885\ud569 \uc810\uc218, 1\uc5d0\uc11c 10",
         "bandLow": "Below 5.0",
         "bandMid": "5.0 to 8.9",
         "bandHigh": "9.0 and up",
         "calibration": "Would be your {{ordinal}} highest of {{count}}"
       },
       "step1": {
-        "heading": "세부 평가",
-        "body": "네 항목 모두 필요합니다. 그래야 커뮤니티 수치가 의미를 가집니다.",
-        "gate_one": "{{count}}개 항목 남음",
-        "gate_other": "{{count}}개 항목 남음"
+        "heading": "\uc138\ubd80 \ud3c9\uac00",
+        "body": "\ub124 \ud56d\ubaa9 \ubaa8\ub450 \ud544\uc694\ud569\ub2c8\ub2e4. \uadf8\ub798\uc57c \ucee4\ubba4\ub2c8\ud2f0 \uc218\uce58\uac00 \uc758\ubbf8\ub97c \uac00\uc9d1\ub2c8\ub2e4.",
+        "gate_one": "{{count}}\uac1c \ud56d\ubaa9 \ub0a8\uc74c",
+        "gate_other": "{{count}}\uac1c \ud56d\ubaa9 \ub0a8\uc74c"
       },
       "hint": {
-        "design": "루팅, 샷의 다양성, 기억에 남는 정도",
-        "condition": "그날의 그린, 페어웨이, 벙커",
-        "clubhouse": "응대, 음식, 분위기",
-        "facilities": "연습장, 연습 구역, 탈의실"
+        "design": "\ub8e8\ud305, \uc0f7\uc758 \ub2e4\uc591\uc131, \uae30\uc5b5\uc5d0 \ub0a8\ub294 \uc815\ub3c4",
+        "condition": "\uadf8\ub0a0\uc758 \uadf8\ub9b0, \ud398\uc5b4\uc6e8\uc774, \ubc99\ucee4",
+        "clubhouse": "\uc751\ub300, \uc74c\uc2dd, \ubd84\uc704\uae30",
+        "facilities": "\uc5f0\uc2b5\uc7a5, \uc5f0\uc2b5 \uad6c\uc5ed, \ud0c8\uc758\uc2e4"
       },
       "step2": {
-        "wordsEyebrow": "내 후기",
-        "placeholder": "다른 골퍼가 플레이 전에 알아야 할 점은?",
-        "optionalNote": "선택 사항입니다. 아래 항목도 모두 선택 사항입니다.",
-        "photosEyebrow": "사진",
-        "teesEyebrow": "플레이한 티",
-        "shareTitle": "클럽하우스에 공유",
-        "shareSub": "리뷰가 피드에 표시됩니다"
+        "wordsEyebrow": "\ub0b4 \ud6c4\uae30",
+        "placeholder": "\ub2e4\ub978 \uace8\ud37c\uac00 \ud50c\ub808\uc774 \uc804\uc5d0 \uc54c\uc544\uc57c \ud560 \uc810\uc740?",
+        "optionalNote": "\uc120\ud0dd \uc0ac\ud56d\uc785\ub2c8\ub2e4. \uc544\ub798 \ud56d\ubaa9\ub3c4 \ubaa8\ub450 \uc120\ud0dd \uc0ac\ud56d\uc785\ub2c8\ub2e4.",
+        "photosEyebrow": "\uc0ac\uc9c4",
+        "teesEyebrow": "\ud50c\ub808\uc774\ud55c \ud2f0",
+        "shareTitle": "\ud074\ub7fd\ud558\uc6b0\uc2a4\uc5d0 \uacf5\uc720",
+        "shareSub": "\ub9ac\ubdf0\uac00 \ud53c\ub4dc\uc5d0 \ud45c\uc2dc\ub429\ub2c8\ub2e4"
       },
       "receipt": {
-        "eyebrow": "리뷰가 게시되었습니다",
-        "didEyebrow": "이 리뷰의 영향",
-        "rowA": "회원 <cnt>{{count}}</cnt>명이 {{course}}을(를) <avg>{{avg}}</avg>로 평가",
-        "rowADeltaAbove": "평균보다 {{delta}} 높게 평가했습니다",
-        "rowADeltaBelow": "평균보다 {{delta}} 낮게 평가했습니다",
-        "rowB": "이 코스를 처음으로 평가했습니다",
-        "rowBSub": "내 점수가 커뮤니티 평균이 됩니다",
-        "rowC": "{{list}} Top 100 <b>#{{rank}}</b>위",
-        "rowCRight_one": "{{count}}곳 평가",
-        "rowCRight_other": "{{count}}곳 평가",
-        "rowD": "내가 <b>{{ordinal}}</b> 번째로 높게 평가한 코스",
-        "rowDRight_one": "{{count}}곳 중",
-        "rowDRight_other": "{{count}}곳 중",
-        "nextEyebrow_one": "아직 평가하지 않은 플레이 코스 {{count}}곳",
-        "nextEyebrow_other": "아직 평가하지 않은 플레이 코스 {{count}}곳",
-        "nextPlayed": "{{date}} 플레이",
-        "nextRate": "평가하기",
-        "actionClubhouse": "클럽하우스에서 보기",
-        "actionBack": "{{course}}(으)로 돌아가기",
+        "eyebrow": "\ub9ac\ubdf0\uac00 \uac8c\uc2dc\ub418\uc5c8\uc2b5\ub2c8\ub2e4",
+        "didEyebrow": "\uc774 \ub9ac\ubdf0\uc758 \uc601\ud5a5",
+        "rowA": "\ud68c\uc6d0 <cnt>{{count}}</cnt>\uba85\uc774 {{course}}\uc744(\ub97c) <avg>{{avg}}</avg>\ub85c \ud3c9\uac00",
+        "rowADeltaAbove": "\ud3c9\uade0\ubcf4\ub2e4 {{delta}} \ub192\uac8c \ud3c9\uac00\ud588\uc2b5\ub2c8\ub2e4",
+        "rowADeltaBelow": "\ud3c9\uade0\ubcf4\ub2e4 {{delta}} \ub0ae\uac8c \ud3c9\uac00\ud588\uc2b5\ub2c8\ub2e4",
+        "rowB": "\uc774 \ucf54\uc2a4\ub97c \ucc98\uc74c\uc73c\ub85c \ud3c9\uac00\ud588\uc2b5\ub2c8\ub2e4",
+        "rowBSub": "\ub0b4 \uc810\uc218\uac00 \ucee4\ubba4\ub2c8\ud2f0 \ud3c9\uade0\uc774 \ub429\ub2c8\ub2e4",
+        "rowC": "{{list}} Top 100 <b>#{{rank}}</b>\uc704",
+        "rowCRight_one": "{{count}}\uacf3 \ud3c9\uac00",
+        "rowCRight_other": "{{count}}\uacf3 \ud3c9\uac00",
+        "rowD": "\ub0b4\uac00 <b>{{ordinal}}</b> \ubc88\uc9f8\ub85c \ub192\uac8c \ud3c9\uac00\ud55c \ucf54\uc2a4",
+        "rowDRight_one": "{{count}}\uacf3 \uc911",
+        "rowDRight_other": "{{count}}\uacf3 \uc911",
+        "nextEyebrow_one": "\uc544\uc9c1 \ud3c9\uac00\ud558\uc9c0 \uc54a\uc740 \ud50c\ub808\uc774 \ucf54\uc2a4 {{count}}\uacf3",
+        "nextEyebrow_other": "\uc544\uc9c1 \ud3c9\uac00\ud558\uc9c0 \uc54a\uc740 \ud50c\ub808\uc774 \ucf54\uc2a4 {{count}}\uacf3",
+        "nextPlayed": "{{date}} \ud50c\ub808\uc774",
+        "nextRate": "\ud3c9\uac00\ud558\uae30",
+        "actionClubhouse": "\ud074\ub7fd\ud558\uc6b0\uc2a4\uc5d0\uc11c \ubcf4\uae30",
+        "actionBack": "{{course}}(\uc73c)\ub85c \ub3cc\uc544\uac00\uae30",
         "categoryAverage": "Your categories average <avg>{{avg}}</avg>"
       }
     }
@@ -584,7 +584,7 @@
       },
       "profileLink": {
         "manages": "Manages this course",
-        "visit": "Visit profile →"
+        "visit": "Visit profile \u2192"
       },
       "sheet": {
         "title": "Claim {{clubName}}",
@@ -619,7 +619,7 @@
       "websiteLabel": "Website",
       "cancel": "Cancel",
       "submit": "Submit suggestion for review",
-      "submitting": "Submitting…",
+      "submitting": "Submitting\u2026",
       "successTitle": "Suggestion submitted",
       "successBody": "Your suggestion has been submitted. We'll review it shortly.",
       "noChangesTitle": "No changes",
@@ -628,34 +628,34 @@
       "errorBody": "Failed to submit suggestion. Please try again."
     },
     "mediaStrip": {
-      "helpDiscover": "Help fellow golfers discover this course — share your experience.",
+      "helpDiscover": "Help fellow golfers discover this course \u2014 share your experience.",
       "share": "Share your experience",
       "seeAll": "See all"
     },
     "communityScore": {
-      "dashPlaceholder": "–",
+      "dashPlaceholder": "\u2013",
       "beFirst": "Be the first to rate this course",
-      "noOneRated": "No one's scored {{courseName}} yet. Give it a 0–10 and help fellow golfers discover it.",
+      "noOneRated": "No one's scored {{courseName}} yet. Give it a 0\u201310 and help fellow golfers discover it.",
       "thisCourse": "this course",
       "rateThis": "Rate this course",
       "basedOn_one": "Based on 1 rating",
       "basedOn_other": "Based on {{count}} ratings",
-      "onlyYouSuffix": " · Only you",
+      "onlyYouSuffix": " \u00b7 Only you",
       "categoryScores": "Category Scores",
       "seeAllReviews": "See all reviews"
     },
     "handicapCue": {
-      "bannerAction": "Connect →",
-      "cardCta": "Connect your handicap →",
+      "bannerAction": "Connect \u2192",
+      "cardCta": "Connect your handicap \u2192",
       "cardFootnote": "Works with WHS handicaps worldwide",
       "variants": {
         "about": {
           "benefit": "See how your handicap compares here",
-          "sub": "Friends, members and the world’s best at this course"
+          "sub": "Friends, members and the world\u2019s best at this course"
         },
         "holes": {
           "benefit": "See your scoring on every hole",
-          "sub": "Your average vs everyone who’s played {{name}}, hole by hole."
+          "sub": "Your average vs everyone who\u2019s played {{name}}, hole by hole."
         },
         "champions": {
           "benefit": "See where you rank at this course",
@@ -663,23 +663,23 @@
         },
         "progress": {
           "benefit": "Fill in your Top 100 automatically",
-          "sub": "Connect your handicap and every round you play counts itself — no manual logging."
+          "sub": "Connect your handicap and every round you play counts itself \u2014 no manual logging."
         },
         "leaderboard": {
           "benefit": "See where you rank worldwide",
           "sub": "Connect your handicap to join the championship and climb the global rankings."
         },
         "discover": {
-          "benefit": "See which of these you’ve played",
+          "benefit": "See which of these you\u2019ve played",
           "sub": "Connect your handicap to see how you scored at every course."
         },
         "tour-venue": {
           "benefit": "See how you'd score at {{name}}",
-          "sub": "Connect your WHS handicap to compare your game to this week’s venue."
+          "sub": "Connect your WHS handicap to compare your game to this week\u2019s venue."
         },
         "tour-holes": {
           "benefit": "See your scoring on these holes vs the field",
-          "sub": "Connect your WHS handicap to measure your game against the pros’, hole by hole."
+          "sub": "Connect your WHS handicap to measure your game against the pros\u2019, hole by hole."
         }
       }
     },
@@ -689,7 +689,7 @@
       "officialWebsite": "Official Course Website"
     },
     "locationPills": {
-      "separator": "›"
+      "separator": "\u203a"
     },
     "a11y": {
       "openMediaTab": "Open Media tab",
@@ -717,17 +717,17 @@
       "seeFullShort": "See the full card",
       "fullCard": "Full card",
       "standardMark": "Standard {{standard}}",
-      "rampEasier": "쉬움",
-      "rampHarder": "어려움",
-      "a11yTeeRow": "{{tee}} 티, 슬로프 {{slope}}",
-      "a11yTeeRowNoSlope": "{{tee}} 티, 슬로프 없음",
+      "rampEasier": "\uc26c\uc6c0",
+      "rampHarder": "\uc5b4\ub824\uc6c0",
+      "a11yTeeRow": "{{tee}} \ud2f0, \uc2ac\ub85c\ud504 {{slope}}",
+      "a11yTeeRowNoSlope": "{{tee}} \ud2f0, \uc2ac\ub85c\ud504 \uc5c6\uc74c",
       "shape": {
-        "longest": "최장 홀",
-        "strokeIndexOne": "스트로크 인덱스 1",
-        "toughestRun": "가장 어려운 구간",
-        "holeTail": "{{n}}번 홀",
-        "yardsTail": "{{yards}} 야드",
-        "parN": "파 {{n}}"
+        "longest": "\ucd5c\uc7a5 \ud640",
+        "strokeIndexOne": "\uc2a4\ud2b8\ub85c\ud06c \uc778\ub371\uc2a4 1",
+        "toughestRun": "\uac00\uc7a5 \uc5b4\ub824\uc6b4 \uad6c\uac04",
+        "holeTail": "{{n}}\ubc88 \ud640",
+        "yardsTail": "{{yards}} \uc57c\ub4dc",
+        "parN": "\ud30c {{n}}"
       },
       "compare": {
         "kicker": "OUT AGAINST IN",
@@ -751,8 +751,8 @@
       "difficultyRank": "Difficulty rank",
       "rankOf": "{{rank}} of {{total}}",
       "yourGap": "Your gap",
-      "scaleLabel": "난이도 스케일",
-      "yourGapVsField": "필드와의 차이",
+      "scaleLabel": "\ub09c\uc774\ub3c4 \uc2a4\ucf00\uc77c",
+      "yourGapVsField": "\ud544\ub4dc\uc640\uc758 \ucc28\uc774",
       "courseAverageMark": "Tick marks the course average"
     },
     "records": {
@@ -767,11 +767,11 @@
         "birdies": "Birdies",
         "diff": "Diff"
       },
-      "youRankOf": "{{count}}명 중 {{rank}}위",
-      "youRank": "{{rank}}위"
+      "youRankOf": "{{count}}\uba85 \uc911 {{rank}}\uc704",
+      "youRank": "{{rank}}\uc704"
     },
     "you": {
-      "oneToGoHole": "One to go · hole {{n}}",
+      "oneToGoHole": "One to go \u00b7 hole {{n}}",
       "fieldHere": "The field here",
       "gapBetter": "Better than the field here",
       "gapWorse": "Worse than the field here",
@@ -781,10 +781,10 @@
       "doublesARound": "Doubles a round",
       "roundsLabel": "Rounds",
       "colCostARound": "Cost a round",
-      "gapBetterShots": "이 코스 평균보다 좋은 타수",
-      "gapWorseShots": "이 코스 평균보다 나쁜 타수",
-      "youHere": "나",
-      "fieldOnHole": "평균"
+      "gapBetterShots": "\uc774 \ucf54\uc2a4 \ud3c9\uade0\ubcf4\ub2e4 \uc88b\uc740 \ud0c0\uc218",
+      "gapWorseShots": "\uc774 \ucf54\uc2a4 \ud3c9\uade0\ubcf4\ub2e4 \ub098\uc05c \ud0c0\uc218",
+      "youHere": "\ub098",
+      "fieldOnHole": "\ud3c9\uade0"
     },
     "parTypes": {
       "kicker": "HOW EACH PAR PLAYS",
@@ -798,8 +798,8 @@
       "pros": "Tour pros",
       "membersSub": "Every round tracked here by clbhouz golfers",
       "prosSub": "How the professional field played it",
-      "proBasis_one": "{{tournaments}} tournament · {{rounds}} player-rounds",
-      "proBasis_other": "{{tournaments}} tournaments · {{rounds}} player-rounds",
+      "proBasis_one": "{{tournaments}} tournament \u00b7 {{rounds}} player-rounds",
+      "proBasis_other": "{{tournaments}} tournaments \u00b7 {{rounds}} player-rounds",
       "proTournaments_one": "{{tournaments}} tournament tracked",
       "proTournaments_other": "{{tournaments}} tournaments tracked",
       "proRounds_one": "{{rounds}} pro round",
@@ -810,7 +810,7 @@
     }
   },
   "network": {
-    "emojiFlag": "⛳",
+    "emojiFlag": "\u26f3",
     "viewCourseA11y": "View {{name}}",
     "badge": {
       "playedByFriends_one": "Played by {{count}} friend",
@@ -819,11 +819,11 @@
       "topRated": "Top rated",
       "trending": "Trending"
     },
-    "unseenReviewsTitle": "🔔 New review from your network",
-    "unseenReviewsBody": "<name>{{name}}</name> reviewed <course>{{course}}</course> · <rating>{{rating}}</rating>",
+    "unseenReviewsTitle": "\ud83d\udd14 New review from your network",
+    "unseenReviewsBody": "<name>{{name}}</name> reviewed <course>{{course}}</course> \u00b7 <rating>{{rating}}</rating>",
     "unseenReviewsMore_one": " +{{count}} more",
     "unseenReviewsMore_other": " +{{count}} more",
-    "viewArrow": "View →",
+    "viewArrow": "View \u2192",
     "circleKicker": "YOUR CIRCLE",
     "friendsPlayedTitle": "Courses played by friends"
   },
@@ -875,7 +875,7 @@
       "ordinal_ordinal_other": "{{count}}th"
     },
     "hero": {
-      "viewScorecard": "스코어카드 보기"
+      "viewScorecard": "\uc2a4\ucf54\uc5b4\uce74\ub4dc \ubcf4\uae30"
     },
     "lens": {
       "suggested": "Suggested",
@@ -896,13 +896,13 @@
       "ratedChip": "Rated",
       "someone": "A member",
       "sheetCaption": "{{count}} reviews",
-      "featured": "추천"
+      "featured": "\ucd94\ucc9c"
     },
     "prompt": {
       "whenPlayed": "Played {{when}}",
       "whenRated": "Rated {{when}}",
       "statusNoDate": "On your card",
-      "statusFinishNoDate": "Rated · detail missing",
+      "statusFinishNoDate": "Rated \u00b7 detail missing",
       "actionRate": "RATE",
       "actionFinish": "FINISH",
       "actionPhoto": "ADD",
@@ -911,15 +911,15 @@
       "friendsStatus": "Geu-deul-ui seukoeo-ga yeogi",
       "actionFriends": "CHATGI"
     },
-    "live": "라이브",
+    "live": "\ub77c\uc774\ube0c",
     "latest": "Latest",
-    "roundThru": "R{{round}} · {{thru}}홀 진행",
-    "thruOnly": "{{thru}}홀 진행",
-    "leader": "선두",
-    "tiedLead": "공동 선두",
-    "roundFinished": "R{{round}} · 종료",
-    "playersTied": "{{count}}명 공동",
-    "playersTied_one": "{{count}}명 공동",
+    "roundThru": "R{{round}} \u00b7 {{thru}}\ud640 \uc9c4\ud589",
+    "thruOnly": "{{thru}}\ud640 \uc9c4\ud589",
+    "leader": "\uc120\ub450",
+    "tiedLead": "\uacf5\ub3d9 \uc120\ub450",
+    "roundFinished": "R{{round}} \u00b7 \uc885\ub8cc",
+    "playersTied": "{{count}}\uba85 \uacf5\ub3d9",
+    "playersTied_one": "{{count}}\uba85 \uacf5\ub3d9",
     "row": {
       "underPar": "Round under par",
       "bogeyFree": "Bogey-free round",
@@ -933,7 +933,7 @@
       "bestHere": "Their best here, of {{count}} rounds",
       "betterThanAvg": "{{figure}} better than their average here",
       "worseThanAvg": "{{figure}} worse than their average here",
-      "onAvg": "이 코스 평균과 동일",
+      "onAvg": "\uc774 \ucf54\uc2a4 \ud3c9\uade0\uacfc \ub3d9\uc77c",
       "insight": {
         "record": "A new course record here",
         "ace": "A hole in one",
@@ -941,8 +941,8 @@
         "albatross": "An albatross",
         "albatrossAtHole": "An albatross at the {{hole}}",
         "firstSub80": "Their first round under 80",
-        "nines": "전반 {{front}}, 후반 {{back}}",
-        "parLevel": "이븐",
+        "nines": "\uc804\ubc18 {{front}}, \ud6c4\ubc18 {{back}}",
+        "parLevel": "\uc774\ube10",
         "parUnder": "-{{n}}",
         "parOver": "+{{n}}",
         "bogeyFree": "A bogey-free card",
@@ -954,7 +954,7 @@
         "eagles": "{{count}} eagles",
         "eagles_one": "{{count}} eagle"
       },
-      "birdies_other": "버디 {{count}}개"
+      "birdies_other": "\ubc84\ub514 {{count}}\uac1c"
     },
     "tour": {
       "round": "Round",
@@ -965,9 +965,9 @@
       "clear_one": "{{count}} clear",
       "nTied": "{{count}} tied"
     },
-    "honoursCaptionCount": "보드에 오른 홀인원과 앨버트로스 {{count}}건",
-    "aroundTheWorld": "돋보이는 라운드",
-    "kickerFeats": "기록",
+    "honoursCaptionCount": "\ubcf4\ub4dc\uc5d0 \uc624\ub978 \ud640\uc778\uc6d0\uacfc \uc568\ubc84\ud2b8\ub85c\uc2a4 {{count}}\uac74",
+    "aroundTheWorld": "\ub3cb\ubcf4\uc774\ub294 \ub77c\uc6b4\ub4dc",
+    "kickerFeats": "\uae30\ub85d",
     "findGolfers": {
       "kicker": "Membeo",
       "title": "Golpeo chatgi",
@@ -994,183 +994,193 @@
     "momentsFromCommunity": "From the community",
     "momentsCount": "{{count}} moments",
     "momentsCount_one": "{{count}} moment",
-    "whosBeenPlaying": "내 써클",
-    "suggestedMark": "추천",
+    "whosBeenPlaying": "\ub0b4 \uc368\ud074",
+    "suggestedMark": "\ucd94\ucc9c",
     "creator": {
-      "chip": "크리에이터",
-      "clips_other": "클립 {{count}}개",
-      "photos_other": "사진 {{count}}장"
+      "chip": "\ud06c\ub9ac\uc5d0\uc774\ud130",
+      "clips_other": "\ud074\ub9bd {{count}}\uac1c",
+      "photos_other": "\uc0ac\uc9c4 {{count}}\uc7a5"
     },
-    "honoursSeeAllPlain": "전체 보기",
+    "honoursSeeAllPlain": "\uc804\uccb4 \ubcf4\uae30",
     "honours": {
-      "badgeAce": "홀인원",
-      "badgeAlbatross": "알바트로스",
-      "badgeCount": "{{label}} ×{{count}}",
-      "more": "{{count}}개 더",
-      "showLess": "접기",
-      "headlineAces_other": "홀인원 {{count}}회.",
-      "headlineAlbatrosses_other": "알바트로스 {{count}}회.",
-      "subRecent": "clbhouz 역사",
-      "subLeaders_other": "골퍼 {{count}}명",
-      "modeRecent": "최근",
-      "modeLeaders": "리더",
-      "featCount_other": "기록",
-      "featCountWith_other": "{{count}}개 기록",
-      "latestAt": "최근 {{year}} · {{course}}",
-      "expandFeats": "{{count}}개 더",
-      "expandFeats_one": "{{count}}개 더",
-      "collapseFeats": "접기",
-      "countAces_other": "홀인원 {{count}}회",
-      "countAlbatrosses_other": "알바트로스 {{count}}회",
-      "yards": "야드",
-      "holeAndPar": "{{hole}} · 파 {{par}}",
-      "sublineAces_other": "홀인원 {{count}}회",
-      "sublineAlbatrosses_other": "알바트로스 {{count}}회",
-      "sublineBoth": "역대 {{aces}}, {{albatrosses}}. 희귀한 순, 그다음 최신순입니다. 홀인원 확률은 보통 12,500 대 1로 알려져 있습니다.",
-      "sublineOne": "역대 {{feats}}. 희귀한 순, 그다음 최신순입니다. 홀인원 확률은 보통 12,500 대 1로 알려져 있습니다."
+      "badgeAce": "\ud640\uc778\uc6d0",
+      "badgeAlbatross": "\uc54c\ubc14\ud2b8\ub85c\uc2a4",
+      "badgeCount": "{{label}} \u00d7{{count}}",
+      "more": "{{count}}\uac1c \ub354",
+      "showLess": "\uc811\uae30",
+      "headlineAces_other": "\ud640\uc778\uc6d0 {{count}}\ud68c.",
+      "headlineAlbatrosses_other": "\uc54c\ubc14\ud2b8\ub85c\uc2a4 {{count}}\ud68c.",
+      "subRecent": "clbhouz \uc5ed\uc0ac",
+      "subLeaders_other": "\uace8\ud37c {{count}}\uba85",
+      "modeRecent": "\ucd5c\uadfc",
+      "modeLeaders": "\ub9ac\ub354",
+      "featCount_other": "\uae30\ub85d",
+      "featCountWith_other": "{{count}}\uac1c \uae30\ub85d",
+      "latestAt": "\ucd5c\uadfc {{year}} \u00b7 {{course}}",
+      "expandFeats": "{{count}}\uac1c \ub354",
+      "expandFeats_one": "{{count}}\uac1c \ub354",
+      "collapseFeats": "\uc811\uae30",
+      "countAces_other": "\ud640\uc778\uc6d0 {{count}}\ud68c",
+      "countAlbatrosses_other": "\uc54c\ubc14\ud2b8\ub85c\uc2a4 {{count}}\ud68c",
+      "yards": "\uc57c\ub4dc",
+      "holeAndPar": "{{hole}} \u00b7 \ud30c {{par}}",
+      "sublineAces_other": "\ud640\uc778\uc6d0 {{count}}\ud68c",
+      "sublineAlbatrosses_other": "\uc54c\ubc14\ud2b8\ub85c\uc2a4 {{count}}\ud68c",
+      "sublineBoth": "\uc5ed\ub300 {{aces}}, {{albatrosses}}. \ud76c\uadc0\ud55c \uc21c, \uadf8\ub2e4\uc74c \ucd5c\uc2e0\uc21c\uc785\ub2c8\ub2e4. \ud640\uc778\uc6d0 \ud655\ub960\uc740 \ubcf4\ud1b5 12,500 \ub300 1\ub85c \uc54c\ub824\uc838 \uc788\uc2b5\ub2c8\ub2e4.",
+      "sublineOne": "\uc5ed\ub300 {{feats}}. \ud76c\uadc0\ud55c \uc21c, \uadf8\ub2e4\uc74c \ucd5c\uc2e0\uc21c\uc785\ub2c8\ub2e4. \ud640\uc778\uc6d0 \ud655\ub960\uc740 \ubcf4\ud1b5 12,500 \ub300 1\ub85c \uc54c\ub824\uc838 \uc788\uc2b5\ub2c8\ub2e4."
     },
     "feat": {
       "group": {
-        "records": "레코드 경신",
-        "firsts": "일생에 한 번",
-        "milestones": "코스 정복"
+        "records": "\ub808\ucf54\ub4dc \uacbd\uc2e0",
+        "firsts": "\uc77c\uc0dd\uc5d0 \ud55c \ubc88",
+        "milestones": "\ucf54\uc2a4 \uc815\ubcf5"
       },
       "kind": {
-        "ace": "홀인원",
-        "albatross": "알바트로스",
-        "crown": "코스 레코드",
-        "bogeyFree": "보기 없는 라운드",
-        "underPar": "언더파 라운드",
-        "birdieHaul": "버디 러시"
+        "ace": "\ud640\uc778\uc6d0",
+        "albatross": "\uc54c\ubc14\ud2b8\ub85c\uc2a4",
+        "crown": "\ucf54\uc2a4 \ub808\ucf54\ub4dc",
+        "bogeyFree": "\ubcf4\uae30 \uc5c6\ub294 \ub77c\uc6b4\ub4dc",
+        "underPar": "\uc5b8\ub354\ud30c \ub77c\uc6b4\ub4dc",
+        "birdieHaul": "\ubc84\ub514 \ub7ec\uc2dc"
       }
     },
     "pb": {
-      "afterRounds": "{{count}}라운드 만에",
-      "gain": "이전보다 {{count}} 향상",
+      "afterRounds": "{{count}}\ub77c\uc6b4\ub4dc \ub9cc\uc5d0",
+      "gain": "\uc774\uc804\ubcf4\ub2e4 {{count}} \ud5a5\uc0c1",
       "group": {
-        "firsts": "생애 첫",
-        "best": "큰 수확",
-        "most": "새로운 최다 기록"
+        "firsts": "\uc0dd\uc560 \uccab",
+        "best": "\ud070 \uc218\ud655",
+        "most": "\uc0c8\ub85c\uc6b4 \ucd5c\ub2e4 \uae30\ub85d"
       },
-      "after": "경과"
+      "after": "\uacbd\uacfc"
     },
-    "mostPlayedAvgToParBy_other": "{{value}} · {{count}}명",
-    "mostPlayedMembers_other": "{{count}}명",
-    "mostPlayedSheetCaption_other": "{{count}}개 코스",
-    "mostPlayed": "최근 14일간 플레이한 코스",
-    "whereTheyPlayed": "최근 14일간 플레이한 곳",
-    "mostPlayedRoundCount": "{{count}} 라운드",
-    "mostPlayedRoundCount_other": "{{count}} 라운드",
-    "mostPlayedGolferCount": "{{count}}명",
-    "mostPlayedGolferCount_other": "{{count}}명",
-    "mostPlayedPlayedToLabel": "기록",
+    "mostPlayedAvgToParBy_other": "{{value}} \u00b7 {{count}}\uba85",
+    "mostPlayedMembers_other": "{{count}}\uba85",
+    "mostPlayedSheetCaption_other": "{{count}}\uac1c \ucf54\uc2a4",
+    "mostPlayed": "\ucd5c\uadfc 14\uc77c\uac04 \ud50c\ub808\uc774\ud55c \ucf54\uc2a4",
+    "whereTheyPlayed": "\ucd5c\uadfc 14\uc77c\uac04 \ud50c\ub808\uc774\ud55c \uacf3",
+    "mostPlayedRoundCount": "{{count}} \ub77c\uc6b4\ub4dc",
+    "mostPlayedRoundCount_other": "{{count}} \ub77c\uc6b4\ub4dc",
+    "mostPlayedGolferCount": "{{count}}\uba85",
+    "mostPlayedGolferCount_other": "{{count}}\uba85",
+    "mostPlayedPlayedToLabel": "\uae30\ub85d",
     "mostPlayedAvgToPar": "{{value}}",
-    "mostPlayedLowest": "최저",
-    "mostPlayedLowLabel": "유일한 라운드",
-    "mostPlayedLowLabel_other": "최근 14일간 최저",
-    "mostPlayedField": "필드",
-    "mostPlayedNew": "신규",
-    "trackedRounds": "기록된 라운드",
-    "videosHeading": "최신 영상",
-    "videosAction": "모든 영상",
-    "clipsHeading": "클립",
-    "clipsAction": "모든 클립",
+    "mostPlayedLowest": "\ucd5c\uc800",
+    "mostPlayedLowLabel": "\uc720\uc77c\ud55c \ub77c\uc6b4\ub4dc",
+    "mostPlayedLowLabel_other": "\ucd5c\uadfc 14\uc77c\uac04 \ucd5c\uc800",
+    "mostPlayedField": "\ud544\ub4dc",
+    "mostPlayedNew": "\uc2e0\uaddc",
+    "trackedRounds": "\uae30\ub85d\ub41c \ub77c\uc6b4\ub4dc",
+    "videosHeading": "\ucd5c\uc2e0 \uc601\uc0c1",
+    "videosAction": "\ubaa8\ub4e0 \uc601\uc0c1",
+    "clipsHeading": "\ud074\ub9bd",
+    "clipsAction": "\ubaa8\ub4e0 \ud074\ub9bd",
     "golfThisWeek": {
-      "bestLabel": "최근 14일간 베스트 라운드",
-      "stablefordLabel": "최고 스테이블포드 포인트",
-      "birdiesLabel": "한 라운드 최다 버디",
-      "improvedLabel": "핸디캡 최다 향상",
-      "stablefordUnit": "포인트",
+      "bestLabel": "\ucd5c\uadfc 14\uc77c\uac04 \ubca0\uc2a4\ud2b8 \ub77c\uc6b4\ub4dc",
+      "stablefordLabel": "\ucd5c\uace0 \uc2a4\ud14c\uc774\ube14\ud3ec\ub4dc \ud3ec\uc778\ud2b8",
+      "birdiesLabel": "\ud55c \ub77c\uc6b4\ub4dc \ucd5c\ub2e4 \ubc84\ub514",
+      "improvedLabel": "\ud578\ub514\ucea1 \ucd5c\ub2e4 \ud5a5\uc0c1",
+      "stablefordUnit": "\ud3ec\uc778\ud2b8",
       "gap": {
-        "shots_one": "{{count}}타 차",
-        "shots_other": "{{count}}타 차",
-        "points_one": "{{count}}포인트 차",
-        "points_other": "{{count}}포인트 차",
-        "clear": "{{count}} 차",
-        "tied": "동률"
+        "shots_one": "{{count}}\ud0c0 \ucc28",
+        "shots_other": "{{count}}\ud0c0 \ucc28",
+        "points_one": "{{count}}\ud3ec\uc778\ud2b8 \ucc28",
+        "points_other": "{{count}}\ud3ec\uc778\ud2b8 \ucc28",
+        "clear": "{{count}} \ucc28",
+        "tied": "\ub3d9\ub960",
+        "shotsOff_other": "{{count}}\ud440 \ub4a4\uc9d0",
+        "pointsOff_other": "{{count}}\uc810 \ub4a4\uc9d0",
+        "birdiesOff_other": "\ubc84\ub514 {{count}}\uac1c \ub4a4\uc9d0",
+        "off_other": "{{count}} \ub4a4\uc9d0"
       },
       "moment": {
-        "theCard": "스코어카드",
-        "fullScorecard": "전체 스코어카드",
+        "theCard": "\uc2a4\ucf54\uc5b4\uce74\ub4dc",
+        "fullScorecard": "\uc804\uccb4 \uc2a4\ucf54\uc5b4\uce74\ub4dc",
         "label": {
           "eagle": "EAGLE",
           "ace": "ACE",
           "albatross": "ALBATROSS",
-          "courseRecord": "코스 레코드",
-          "run": "연속",
-          "grind": "버텨낸 라운드",
-          "finishedInRed": "언더파로 마감",
-          "birdieHaul": "버디 사냥",
-          "strongFinish": "강한 마무리"
+          "courseRecord": "\ucf54\uc2a4 \ub808\ucf54\ub4dc",
+          "run": "\uc5f0\uc18d",
+          "grind": "\ubc84\ud168\ub0b8 \ub77c\uc6b4\ub4dc",
+          "finishedInRed": "\uc5b8\ub354\ud30c\ub85c \ub9c8\uac10",
+          "birdieHaul": "\ubc84\ub514 \uc0ac\ub0e5",
+          "strongFinish": "\uac15\ud55c \ub9c8\ubb34\ub9ac"
         },
         "figure": {
-          "hole": "{n}번 홀",
-          "holes": "{n} 홀",
-          "inThree": "3홀 중 {n}",
-          "inARow": "{n} 파 연속",
-          "birdies": "버디 {n}개"
+          "hole": "{n}\ubc88 \ud640",
+          "holes": "{n} \ud640",
+          "inThree": "3\ud640 \uc911 {n}",
+          "inARow": "{n} \ud30c \uc5f0\uc18d",
+          "birdies": "\ubc84\ub514 {n}\uac1c"
         },
         "sentence": {
-          "eagle": "파 {{1}} 홀에서 {{0}}.",
-          "courseRecord_one": "{{1}}의 {{2}}보다 {{0}}타 낮았습니다.",
-          "courseRecord_other": "{{1}}의 {{2}}보다 {{0}}타 낮았습니다.",
-          "courseRecordUnknown_one": "이전 기록 {{2}}보다 {{0}}타 낮았습니다.",
-          "courseRecordUnknown_other": "이전 기록 {{2}}보다 {{0}}타 낮았습니다.",
-          "run": "{{0}}번부터 {{1}}번까지 파 이상.",
-          "grind": "라운드 내내 보기보다 나쁜 홀이 없었습니다.",
-          "plain": "{{1}} 홀 중 {{0}} 홀을 파 이상.",
-          "noHoles": "라운드는 기록되었지만 홀별 상세는 없습니다.",
-          "finishedInRed": "18홀을 언더파로 마쳤습니다.",
-          "birdieHaul": "{{1}} 홀에서 버디 {{0}}개.",
-          "strongFinish": "마지막 세 홀에서 버디 이상, {{0}}로 마무리."
-        }
+          "eagle": "\ud30c {{1}} \ud640\uc5d0\uc11c {{0}}.",
+          "courseRecord_one": "{{1}}\uc758 {{2}}\ubcf4\ub2e4 {{0}}\ud0c0 \ub0ae\uc558\uc2b5\ub2c8\ub2e4.",
+          "courseRecord_other": "{{1}}\uc758 {{2}}\ubcf4\ub2e4 {{0}}\ud0c0 \ub0ae\uc558\uc2b5\ub2c8\ub2e4.",
+          "courseRecordUnknown_one": "\uc774\uc804 \uae30\ub85d {{2}}\ubcf4\ub2e4 {{0}}\ud0c0 \ub0ae\uc558\uc2b5\ub2c8\ub2e4.",
+          "courseRecordUnknown_other": "\uc774\uc804 \uae30\ub85d {{2}}\ubcf4\ub2e4 {{0}}\ud0c0 \ub0ae\uc558\uc2b5\ub2c8\ub2e4.",
+          "run": "{{0}}\ubc88\ubd80\ud130 {{1}}\ubc88\uae4c\uc9c0 \ud30c \uc774\uc0c1.",
+          "grind": "\ub77c\uc6b4\ub4dc \ub0b4\ub0b4 \ubcf4\uae30\ubcf4\ub2e4 \ub098\uc05c \ud640\uc774 \uc5c6\uc5c8\uc2b5\ub2c8\ub2e4.",
+          "plain": "{{1}} \ud640 \uc911 {{0}} \ud640\uc744 \ud30c \uc774\uc0c1.",
+          "noHoles": "\ub77c\uc6b4\ub4dc\ub294 \uae30\ub85d\ub418\uc5c8\uc9c0\ub9cc \ud640\ubcc4 \uc0c1\uc138\ub294 \uc5c6\uc2b5\ub2c8\ub2e4.",
+          "finishedInRed": "18\ud640\uc744 \uc5b8\ub354\ud30c\ub85c \ub9c8\ucce4\uc2b5\ub2c8\ub2e4.",
+          "birdieHaul": "{{1}} \ud640\uc5d0\uc11c \ubc84\ub514 {{0}}\uac1c.",
+          "strongFinish": "\ub9c8\uc9c0\ub9c9 \uc138 \ud640\uc5d0\uc11c \ubc84\ub514 \uc774\uc0c1, {{0}}\ub85c \ub9c8\ubb34\ub9ac."
+        },
+        "seeTheCard": "\uc2a4\uc79c\uce74\ub4dc \ubcf4\uae30"
       },
-      "count": "{{rounds}} 라운드 · {{courses}} 코스 · {{days}}일"
-    },
-    "week": {
-      "scopeAria": "라운드 범위",
-      "allRegions": "전체 지역",
-      "selectRegionA11y": "지역으로 라운드 필터",
-      "areaLabel": "지역",
-      "scope": {
-        "circle": "내 서클",
-        "suggested": "추천",
-        "top100": "톱 100",
-        "played": "플레이한 코스",
-        "worldwide": "전 세계"
-      },
-      "empty": {
-        "circle": "최근 14일간 서클 라운드가 없습니다.",
-        "suggested": "최근 14일간 추천 라운드가 없습니다.",
-        "top100": "최근 14일간 톱 100 라운드가 없습니다.",
-        "played": "최근 14일간 내 코스 라운드가 없습니다.",
-        "worldwide": "최근 14일간 라운드가 없습니다."
+      "count": "{{rounds}} \ub77c\uc6b4\ub4dc \u00b7 {{courses}} \ucf54\uc2a4 \u00b7 {{days}}\uc77c",
+      "heading": "\ucd5c\uadfc \ub77c\uc6b4\ub4dc",
+      "you": "\ub098",
+      "reference": {
+        "fieldDay": "\uadf8\ub0a0 \ud544\ub4dc \ud3c9\uadfc\ubcf4\ub2e4 {{count}} \uc88b\uc74c"
       }
     },
-    "mostPlayedSeeAllAtCourse": "이 코스 방문하기",
-    "seam": "전기간 · 모든 사람"
+    "week": {
+      "scopeAria": "\ub77c\uc6b4\ub4dc \ubc94\uc704",
+      "allRegions": "\uc804\uccb4 \uc9c0\uc5ed",
+      "selectRegionA11y": "\uc9c0\uc5ed\uc73c\ub85c \ub77c\uc6b4\ub4dc \ud544\ud130",
+      "areaLabel": "\uc9c0\uc5ed",
+      "scope": {
+        "circle": "\ub0b4 \uc11c\ud074",
+        "suggested": "\ucd94\ucc9c",
+        "top100": "\ud1b1 100",
+        "played": "\ud50c\ub808\uc774\ud55c \ucf54\uc2a4",
+        "worldwide": "\uc804 \uc138\uacc4"
+      },
+      "empty": {
+        "circle": "\ucd5c\uadfc 14\uc77c\uac04 \uc11c\ud074 \ub77c\uc6b4\ub4dc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.",
+        "suggested": "\ucd5c\uadfc 14\uc77c\uac04 \ucd94\ucc9c \ub77c\uc6b4\ub4dc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.",
+        "top100": "\ucd5c\uadfc 14\uc77c\uac04 \ud1b1 100 \ub77c\uc6b4\ub4dc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.",
+        "played": "\ucd5c\uadfc 14\uc77c\uac04 \ub0b4 \ucf54\uc2a4 \ub77c\uc6b4\ub4dc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.",
+        "worldwide": "\ucd5c\uadfc 14\uc77c\uac04 \ub77c\uc6b4\ub4dc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4."
+      }
+    },
+    "mostPlayedSeeAllAtCourse": "\uc774 \ucf54\uc2a4 \ubc29\ubb38\ud558\uae30",
+    "seam": "\uc804\uae30\uac04 \u00b7 \ubaa8\ub4e0 \uc0ac\ub78c"
   },
   "statBrowse": {
-    "colArea": "지역",
-    "colRegion": "지방",
-    "colCountsCountry": "라운드 있음 / 디렉토리",
-    "colCountsRegion": "라운드 있음",
-    "countAll_one": " WHS 공식 핸디캡으로 기록된 코스는 {{total}}개 중 {{count}}개입니다.",
-    "countAll_other": " WHS 공식 핸디캡으로 기록된 코스는 {{total}}개 중 {{count}}개입니다.",
-    "countCountry_one": " {{country}}에서는 WHS 공식 핸디캡으로 기록된 코스가 {{total}}개 중 {{count}}개입니다.",
-    "countCountry_other": " {{country}}에서는 WHS 공식 핸디캡으로 기록된 코스가 {{total}}개 중 {{count}}개입니다.",
-    "countRegion_one": " {{country}} {{region}}에서는 WHS 공식 핸디캡으로 기록된 코스가 {{count}}개입니다.",
-    "countRegion_other": " {{country}} {{region}}에서는 WHS 공식 핸디캡으로 기록된 코스가 {{count}}개입니다.",
+    "colArea": "\uc9c0\uc5ed",
+    "colRegion": "\uc9c0\ubc29",
+    "colCountsCountry": "\ub77c\uc6b4\ub4dc \uc788\uc74c / \ub514\ub809\ud1a0\ub9ac",
+    "colCountsRegion": "\ub77c\uc6b4\ub4dc \uc788\uc74c",
+    "countAll_one": " WHS \uacf5\uc2dd \ud578\ub514\ucea1\uc73c\ub85c \uae30\ub85d\ub41c \ucf54\uc2a4\ub294 {{total}}\uac1c \uc911 {{count}}\uac1c\uc785\ub2c8\ub2e4.",
+    "countAll_other": " WHS \uacf5\uc2dd \ud578\ub514\ucea1\uc73c\ub85c \uae30\ub85d\ub41c \ucf54\uc2a4\ub294 {{total}}\uac1c \uc911 {{count}}\uac1c\uc785\ub2c8\ub2e4.",
+    "countCountry_one": " {{country}}\uc5d0\uc11c\ub294 WHS \uacf5\uc2dd \ud578\ub514\ucea1\uc73c\ub85c \uae30\ub85d\ub41c \ucf54\uc2a4\uac00 {{total}}\uac1c \uc911 {{count}}\uac1c\uc785\ub2c8\ub2e4.",
+    "countCountry_other": " {{country}}\uc5d0\uc11c\ub294 WHS \uacf5\uc2dd \ud578\ub514\ucea1\uc73c\ub85c \uae30\ub85d\ub41c \ucf54\uc2a4\uac00 {{total}}\uac1c \uc911 {{count}}\uac1c\uc785\ub2c8\ub2e4.",
+    "countRegion_one": " {{country}} {{region}}\uc5d0\uc11c\ub294 WHS \uacf5\uc2dd \ud578\ub514\ucea1\uc73c\ub85c \uae30\ub85d\ub41c \ucf54\uc2a4\uac00 {{count}}\uac1c\uc785\ub2c8\ub2e4.",
+    "countRegion_other": " {{country}} {{region}}\uc5d0\uc11c\ub294 WHS \uacf5\uc2dd \ud578\ub514\ucea1\uc73c\ub85c \uae30\ub85d\ub41c \ucf54\uc2a4\uac00 {{count}}\uac1c\uc785\ub2c8\ub2e4.",
     "directory": {
-      "title": "다른 곳을 찾고 있나요?",
-      "body": "전체 코스 목록에는 {{total}}개의 코스가 더 있습니다.",
-      "cta": "전체 코스 목록 보기"
+      "title": "\ub2e4\ub978 \uacf3\uc744 \ucc3e\uace0 \uc788\ub098\uc694?",
+      "body": "\uc804\uccb4 \ucf54\uc2a4 \ubaa9\ub85d\uc5d0\ub294 {{total}}\uac1c\uc758 \ucf54\uc2a4\uac00 \ub354 \uc788\uc2b5\ub2c8\ub2e4.",
+      "cta": "\uc804\uccb4 \ucf54\uc2a4 \ubaa9\ub85d \ubcf4\uae30"
     },
     "reviews": {
-      "heading": "회원들의 평가",
-      "actionRail": "모두 보기",
-      "actionFeatured": "전체 리뷰",
-      "outOfTen": "10점 만점"
+      "heading": "\ud68c\uc6d0\ub4e4\uc758 \ud3c9\uac00",
+      "actionRail": "\ubaa8\ub450 \ubcf4\uae30",
+      "actionFeatured": "\uc804\uccb4 \ub9ac\ubdf0",
+      "outOfTen": "10\uc810 \ub9cc\uc810"
     }
   },
   "directorySheet": {
@@ -1234,7 +1244,7 @@
   },
   "teeCard": {
     "col": {
-      "length": "거리"
+      "length": "\uac70\ub9ac"
     }
   }
 }

@@ -151,10 +151,14 @@ import {
    THE PHOTOGRAPH IS GONE (§S0.4). PHOTO_H, the scrim and the glass chip tokens
    went with it; the hero gradient carries the top of the card. */
 
-const CARD_W = 256;
+/* BRIEF_GOLF_THIS_WEEK_P1_P3 §3.3 — the card narrows so more than two reach a
+   screen. The brief says 300 -> 268; the shipped width was 256, not 300, so the
+   TARGET (268) is honoured and the brief's starting number is recorded as wrong. */
+const CARD_W = 268;
 
-/** §S2.1 — the gradient hero. */
-const HERO_H = 156;
+/** §S2.1 — the gradient hero. §3.3: 168 -> 132 (shipped value was 156). */
+const HERO_H = 132;
+
 
 /* THE GRID REGION. 96px, not 88: at 88 the two marker rows and their outer
    rings did not fit the region and the bottom row's circles and boxes were
@@ -235,7 +239,20 @@ const CARD_SHADOW = '0 1px 2px rgba(11,15,20,0.05)';
 const SHAPE_H = 49;
 const SHAPE_BLOCK_H = 53;
 const WELL_H = 139 + SHAPE_BLOCK_H;
-const CARD_MIN_H = 331 + SHAPE_BLOCK_H;
+void SHAPE_H;
+void WELL_H;
+
+/**
+ * BRIEF_GOLF_THIS_WEEK_P1_P3 §3.1/§3.4 — THE SCORECARD BLOCK IS BEHIND THE TAP.
+ * The card is now hero (132) + member row (35) + the FOOT (44: an optional
+ * reference line and the SEE THE CARD action). The foot's height is FIXED, so a
+ * card with no reference line and a card with no kicker are the same height and
+ * the rail stays level (§3.4).
+ */
+const FOOT_H = 44;
+const MEMBER_ROW_H = 35;
+const CARD_MIN_H = HERO_H + MEMBER_ROW_H + FOOT_H;
+
 
 /**
  * THE FILLS ARE MIXED ON THE WELL, NOT ON THE PANEL (§A5). TrajectoryLine's dark
@@ -250,6 +267,9 @@ const SHAPE_FILL_UNDER = '#4A2A2E';
 
 /** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
+/** §1.3 — the own-member WASH: the same amber, at the alpha a ground can carry. */
+const AMBER_WASH = 'rgba(247, 147, 30, 0.10)';
+
 
 /* THE LIGHT-SURFACE INDEX MOVEMENT PAIR IS GONE FROM THIS FILE
    (BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §5.3): the only movement figure on this
@@ -349,6 +369,15 @@ function ShapeReveal({ children }: { children: React.ReactNode }) {
   );
 
 }
+/* §3.2 — NOTHING IS DELETED. The card no longer draws a scorecard, so the reveal
+   wrapper and the mini-grid are unreferenced HERE; both are kept intact because
+   the sheet's grammar is the same and a future inline use must not re-invent
+   them. Referenced so lint sees the intent rather than dead code. */
+void ShapeReveal;
+void MiniScorecard;
+void SHAPE_BLOCK_H;
+
+
 
 /**
  * §S3 — THREE STATES, ONE OF THEM EMPTY:
@@ -860,7 +889,14 @@ interface CardProps {
   /** §2.2 — read from the SAME cached following-id set that drives showFollow. */
   isFollowed: boolean;
   viewerUserId: string | undefined;
+  /**
+   * §2.1 — THE REFERENCE LINE, already resolved by the section (one tier or
+   * none). A card NEVER fabricates a comparison and reserves no height for a
+   * missing one.
+   */
+  reference?: string | null;
   onPress: () => void;
+
 }
 
 /**
@@ -889,6 +925,7 @@ function GolfThisWeekCard({
   showFollow,
   isFollowed,
   viewerUserId,
+  reference = null,
   onPress,
 }: CardProps) {
   const { t } = useTranslation('courses');
@@ -897,24 +934,19 @@ function GolfThisWeekCard({
     row.gross != null && row.course_par != null && row.gross - row.course_par < 0;
 
   /* THE SELECTOR IS PURE AND LIVES IN ITS OWN MODULE (§S1.8). A round with no
-     hole data returns PLAIN with no counts, and the well renders empty (§S1.7). */
+     hole data returns PLAIN with no counts. The SHAPE is still read for the
+     moment — the eighteen marks and the curve now live in the sheet (§3.1). */
   const moment = useMemo(
     () => selectMoment(shape?.holes ?? [], row.course_record_fact),
     [shape, row.course_record_fact],
   );
   const label = momentLabel(moment, t as TFn);
   const sentence = momentSentence(moment, t as TFn);
-  const marked = useMemo(() => new Set(moment.markedHoles), [moment.markedHoles]);
 
   const delta = row.delta_index;
   const hasMovement =
     delta != null && Number.isFinite(delta) && Math.abs(delta as number) >= 0.05;
 
-  /* ONE CHART ONLY (§S0.3): the scorecard. `shape === null` renders NOTHING and
-     the well keeps its height — never a placeholder grid (§S1.7). */
-  const grid = shape ? (
-    <MiniScorecard shape={shape} well={WELL} marked={marked} momentTone={moment.tone} />
-  ) : null;
 
 
   return (
@@ -1255,129 +1287,57 @@ function GolfThisWeekCard({
         </div>
       </div>
 
-      {/* THE SCORECARD HALF. The well keeps its own container so it still bleeds to
-          the card edges. */}
-      <div style={{ padding: '0 10px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        {/* ===================== THE SCORECARD WELL (§S4) =====================
-            A DARK FEED WELL WITH A HAIRLINE (BRIEF_DARK_ONLY_PART_B §2.2). The
-            boundary is DRAWN rather than implied by a tone. The tint and the
-            border are ALTERNATIVES, not additions.
-            IT RUNS TO THE CARD'S BOTTOM EDGE: the well finishing 10px short of
-            the tile read as an unfinished panel, so the bottom corners take the
-            CARD's radius and the card has no padding beneath it. Its height is
-            fixed whatever it holds, so an empty well keeps the rail level
-            (ACCEPTANCE K, Q). */}
-
-        <div
+      {/* ===================== THE FOOT (§2.1, §3.1) =====================
+          THE SCORECARD BLOCK IS GONE FROM THE CARD, NOT FROM THE APP: the
+          trajectory curve, the OUT/IN rows and the eighteen hole marks are all
+          rendered by CardScorecardSheet, which this card already opens, so
+          nothing moved — the card's copies simply went.
+          THE FOOT'S HEIGHT IS FIXED (§3.4): a card with a reference line and a
+          card without are the same height, and the missing line reserves
+          nothing of its own — the action just sits at the foot's bottom. */}
+      <div
+        style={{
+          height: FOOT_H,
+          flexShrink: 0,
+          boxSizing: 'border-box',
+          padding: '6px 12px 8px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
+        {reference ? (
+          <div
+            style={{
+              fontSize: 11.5,
+              fontWeight: 500,
+              lineHeight: 1.1,
+              color: MID,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {reference}
+          </div>
+        ) : null}
+        <span
           style={{
-            /* THE WELL'S 8px OFFSET MOVED UP INTO THE DARK REGION'S BOTTOM
-               PADDING (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §1) — the row's 8/8
-               now sits inside the dark block, so keeping a margin here as well would
-               add 8px to the tile. The total height is unchanged. */
-            marginTop: 0,
-            marginLeft: -10,
-            marginRight: -10,
-            marginBottom: 0,
-            minHeight: WELL_H,
-            flex: 1,
-            background: WELL,
-            /* §2 (BRIEF_ROUND_TILE_WHITE_WELL, superseding §2 of
-               BRIEF_DISCOVER_FINISHING_PASS) — THE WELL'S EDGE IS DRAWN ON ALL
-               FOUR SIDES. WELL is now the card's colour, so without a boundary the
-               well has no edge at all. The rule is WELL_RULE, the token that
-               already exists for the header line — not a second rule colour.
-               INSET BOX-SHADOW, NOT A BORDER: the well is box-sizing: border-box
-               with a fixed minHeight, so a 1px border would take 2px off the inner
-               height AND 2px off the 244px inner width the marker/gap table in
-               RoundShape is measured at. An inset shadow costs no layout.
-               NOT a darker fill (the markers use `well` as their ring spacer) and
-               NOT an outer shadow (the CARD already carries CARD_SHADOW). */
-            boxShadow: `inset 0 0 0 1px ${WELL_RULE}`,
-
-            borderRadius: `0 0 ${WELL_RADIUS}px ${WELL_RADIUS}px`,
-            padding: `6px ${WELL_PAD_X}px 9px`,
-            boxSizing: 'border-box',
+            ...LABEL,
+            fontSize: 11,
+            color: DISCOVER_QUIET,
+            display: 'inline-flex',
+            alignItems: 'center',
+            alignSelf: 'flex-start',
+            marginTop: 'auto',
+            gap: 2,
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              justifyContent: 'space-between',
-              gap: 6,
-              paddingBottom: 6,
-              borderBottom: `1px solid ${WELL_RULE}`,
-            }}
-          >
-            {/* §3 — the row label darkens to the card's ink with the rest of the
-                chrome. */}
-            <span style={{ ...LABEL, fontSize: 11, color: DISCOVER_QUIET }}>
-              {t('discover.golfThisWeek.moment.theCard', 'The card')}
-            </span>
-            {/* THE TAP AFFORDANCE, ON EVERY CARD (§S4.2). A hero with a hidden
-                scorecard is a card nobody taps. */}
-            <span
-              style={{
-                ...LABEL,
-                fontSize: 11,
-                /* §3 — the action and its chevron darken to the card's ink. */
-                color: DISCOVER_QUIET,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 2,
-              }}
-            >
-              {t('discover.golfThisWeek.moment.fullScorecard', 'Full scorecard')}
-              <ChevronRight size={9} strokeWidth={3} />
-            </span>
-          </div>
-
-          {/* ===================== THE SHAPE (BRIEF_ROUND_TILE_CURVE §2) =========
-              THE EXISTING TrajectoryLine, IMPORTED — not a second curve. Its own
-              colour rules govern and are not overridden: the graded stroke, the
-              level-par fill split, earned red, and gold-only beads. THE WINNER'S
-              GOLD DOES NOT RECOLOUR IT. It uses TrajectoryLine's native
-              per-round self-scaling, matching Clubhouse. The only things this
-              caller supplies are geometry (height, viewWidth, no ticks) and the
-              fills mixed on the well (§A5).
-              NOT "ENERGY", NOT "POWER", NOT "FORM" — THE SHAPE. */}
-          <div style={{ height: SHAPE_BLOCK_H, boxSizing: 'border-box', paddingTop: 4 }}>
-            <div style={{ height: SHAPE_H, position: 'relative' }}>
-              {shape && (
-                <TrajectoryLine
-                  holes={shape.holes}
-                  surface="dark"
-                  height={SHAPE_H}
-                  viewWidth={WELL_INNER}
-                  showTicks={false}
-                  padY={0}
-                  strokeWidth={1.6}
-                  fillOverColor={SHAPE_FILL_OVER}
-                  fillUnderColor={SHAPE_FILL_UNDER}
-                />
-              )}
-            </div>
-          </div>
-
-          <div
-            style={{
-              height: GRID_H,
-              marginTop: 7,
-              paddingBottom: 4,
-              boxSizing: 'border-box',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-            }}
-          >
-            {/* A ROUND WITH NO HOLE DATA RENDERS AN EMPTY WELL (§S1.7, Q) — the
-                height is held so the rail stays level, and there is no
-                placeholder grid. */}
-            <ShapeReveal>{grid}</ShapeReveal>
-          </div>
-        </div>
-
+          {t('discover.golfThisWeek.moment.seeTheCard', 'SEE THE CARD')}
+          <ChevronRight size={9} strokeWidth={3} />
+        </span>
       </div>
+
     </div>
   );
 }
@@ -1449,6 +1409,45 @@ export function GolfThisWeek({
   const scoreIds = useMemo(() => ordered.map((r) => r.score_id), [ordered]);
   const holeShapes = useRoundHoleShapes(scoreIds);
 
+  /**
+   * §2 — THE REFERENCE LINE, tier (d) ONLY: "{n} better than the field that day".
+   * WHY ONLY (d): tiers (a)-(c) need get_my_course_best, which is NOT called
+   * anywhere in this section's tree (it is used by Course of the Week), and the
+   * brief forbids adding the call here — so (d), which is free from `ordered`, is
+   * the one that ships (§2.2/§2.3).
+   * THE FLOOR IS THREE ROUNDS in the same course/day group (§2.4, FIELD_GATE): an
+   * "average" of two rounds is not a field. A round that is not better than the
+   * field, or is in an ungated group, resolves to NOTHING — never a fabricated
+   * "first round here" (§2.5).
+   */
+  const referenceByRound = useMemo(() => {
+    const groups = new Map<string, CircleRoundRow[]>();
+    for (const r of ordered) {
+      if (!r.course_id || r.gross == null || r.course_par == null) continue;
+      const key = `${r.course_id}|${String(r.play_date ?? '').slice(0, 10)}`;
+      const list = groups.get(key);
+      if (list) list.push(r);
+      else groups.set(key, [r]);
+    }
+    const out = new Map<string, string>();
+    for (const list of groups.values()) {
+      if (list.length < 3) continue;
+      const toPars = list.map((r) => (r.gross as number) - (r.course_par as number));
+      const avg = toPars.reduce((a, b) => a + b, 0) / toPars.length;
+      list.forEach((r, i) => {
+        const better = avg - toPars[i];
+        if (better < 1) return;
+        out.set(
+          r.round_id,
+          t('discover.golfThisWeek.reference.fieldDay', '{{count}} better than the field that day', {
+            count: Math.round(better),
+          }),
+        );
+      });
+    }
+    return out;
+  }, [ordered, t]);
+
   /* NO INSIGHT MAP. The tile's prose is the MOMENT SENTENCE, generated from a
      fixed template per kind inside the card (BRIEF_ROUND_TILE_THE_MOMENT §S4.3).
      buildInsightMap survives for the see-all sheet, which still renders rows. */
@@ -1516,23 +1515,34 @@ export function GolfThisWeek({
   const byDateDesc = (a: CircleRoundRow, b: CircleRoundRow) =>
     String(b.play_date).localeCompare(String(a.play_date));
 
-  /** §2 — one place per member, best kept, at most three places. */
-  const topThree = (rows: CircleRoundRow[]) => {
+  /**
+   * §1.1 — RANK OVER THE FULL LIST. The dedupe-and-keep-best pass now returns
+   * EVERY qualifying member in order; `topThree` is a slice of it. The pinned
+   * own-member row needs a rank that can be 9th, and a top three cannot supply
+   * one. Because the array is deduped by user_id the member appears at most
+   * once, and that entry is already their best qualifying round (§1.2).
+   */
+  const rankAll = (rows: CircleRoundRow[]) => {
     const seen = new Set<string>();
     const out: CircleRoundRow[] = [];
     for (const r of rows) {
       if (seen.has(r.user_id)) continue;
       seen.add(r.user_id);
       out.push(r);
-      if (out.length === 3) break;
     }
     return out;
   };
+  /** §2 — one place per member, best kept, at most three places. */
+  /** §2 — one place per member, best kept, at most three places. */
+  const topThree = (rows: CircleRoundRow[]) => rankAll(rows).slice(0, 3);
+  void topThree;
+
+
 
   /* THE FLOORS APPLY TO EVERY PLACE (§3): a runner-up clears the same floor as
      the winner, so a tile with one qualifier shows the hero and NOTHING else —
      no second row, no dash, no placeholder. That is a normal week. */
-  const bestRanked = topThree(
+  const bestRanked = rankAll(
     ordered
       .filter((r) => r.gross != null && r.course_par != null)
       .sort((a, b) => {
@@ -1544,7 +1554,7 @@ export function GolfThisWeek({
       }),
   );
 
-  const improvedRanked = topThree(
+  const improvedRanked = rankAll(
     ordered
       .filter(
         (r) =>
@@ -1560,7 +1570,7 @@ export function GolfThisWeek({
 
   /* NULL STABLEFORD FAILS THE FILTER, never contributes a 0 (§1.3). FLOOR 36 —
      the par-equivalent every club golfer knows. */
-  const stablefordRanked = topThree(
+  const stablefordRanked = rankAll(
     ordered
       .filter(
         (r) =>
@@ -1576,7 +1586,7 @@ export function GolfThisWeek({
   );
 
   /* FLOOR 3 — "1 birdie" is not a comparison, and a two-way tie on 1 is worse. */
-  const birdiesRanked = topThree(
+  const birdiesRanked = rankAll(
     ordered
       .filter(
         (r) => r.birdies != null && Number.isFinite(r.birdies) && (r.birdies as number) >= 3,
@@ -1627,6 +1637,20 @@ export function GolfThisWeek({
     row: CircleRoundRow;
     /** §2 — places 2 and 3, member-capped. Empty is a normal week. */
     runners: CircleRoundRow[];
+    /**
+     * §1.1 — THE FULL RANKED LIST for this tile, deduped by member, in the same
+     * order. The pinned own-member row's RANK is its index here; the three
+     * rendered rows are a slice of it.
+     */
+    ranked: CircleRoundRow[];
+    /**
+     * §1.3 — the UNIT the pinned row's gap carries. The DIRECTION is derived
+     * from `lowerWins` and `valueOf`, never hard-coded: gross is lower-wins, so
+     * a chaser's gross is HIGHER than the leader's; Stableford and birdies are
+     * higher-wins, so a chaser's figure is LOWER. Both read "{n} <unit> off".
+     */
+    offUnit: 'shots' | 'points' | 'birdies' | 'index';
+
     /** The tile's comparison for ONE row: the figure, and — only where the
         qualifier varies by round — that row's qualifier. */
     figureOf: (r: CircleRoundRow) => PodiumFigure;
@@ -1668,7 +1692,9 @@ export function GolfThisWeek({
       row: best.row,
       /* The hero is `bestOfWeek`'s winner, unchanged; the sort's first place is
          the same row, so the runners are places 2 and 3 of that same list. */
-      runners: bestRanked.slice(1),
+      runners: bestRanked.slice(1, 3),
+      ranked: bestRanked,
+      offUnit: 'shots' as const,
       lowerWins: true,
       valueOf: (r) => r.gross as number,
       accent: PODIUM_ACCENT.gold,
@@ -1694,7 +1720,9 @@ export function GolfThisWeek({
       emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
       label: t('discover.golfThisWeek.stablefordLabel', 'Best Stableford'),
       row: bestStableford,
-      runners: stablefordRanked.slice(1),
+      runners: stablefordRanked.slice(1, 3),
+      ranked: stablefordRanked,
+      offUnit: 'points' as const,
       lowerWins: false,
       valueOf: (r) => r.stableford_points as number,
       accent: PODIUM_ACCENT.white,
@@ -1710,7 +1738,9 @@ export function GolfThisWeek({
       emoji: '\uD83D\uDC26', // BIRD
       label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
       row: mostBirdies,
-      runners: birdiesRanked.slice(1),
+      runners: birdiesRanked.slice(1, 3),
+      ranked: birdiesRanked,
+      offUnit: 'birdies' as const,
       lowerWins: false,
       valueOf: (r) => r.birdies as number,
       accent: PODIUM_ACCENT.red,
@@ -1727,7 +1757,9 @@ export function GolfThisWeek({
       emoji: '\uD83D\uDCAA', // FLEXED ARM
       label: t('discover.golfThisWeek.improvedLabel', 'Most improved'),
       row: mostImproved,
-      runners: improvedRanked.slice(1),
+      runners: improvedRanked.slice(1, 3),
+      ranked: improvedRanked,
+      offUnit: 'index' as const,
       lowerWins: false,
       /* Convert negative deltas to positive improvement magnitudes. This keeps
          one higher-wins deficit formula: −0.4 leads −0.2, and the chaser is
@@ -1754,6 +1786,32 @@ export function GolfThisWeek({
     }
     return t('discover.golfThisWeek.gap.clear', '{{count}} CLEAR', { count: gap });
   };
+
+  /**
+   * §1.3 — THE PINNED ROW'S GAP TO THE LEADER. The DIRECTION IS DERIVED, not
+   * written: `lowerWins` says which way the tile counts, so the signed gap is
+   * (own − leader) on a lower-wins tile and (leader − own) everywhere else. Both
+   * are positive for a member behind the leader, which is the only case a pinned
+   * row exists in, and the UNIT comes from the tile's own offUnit.
+   */
+  const pinnedGap = (tile: (typeof bandTiles)[number], own: CircleRoundRow) => {
+    const leaderValue = tile.valueOf(tile.row);
+    const ownValue = tile.valueOf(own);
+    const signed = tile.lowerWins ? ownValue - leaderValue : leaderValue - ownValue;
+    const gap = Number(Math.abs(signed).toFixed(tile.precision));
+    if (gap === 0) return t('discover.golfThisWeek.gap.tied', 'TIED');
+    if (tile.offUnit === 'shots') {
+      return t('discover.golfThisWeek.gap.shotsOff', '{{count}} SHOTS OFF', { count: gap });
+    }
+    if (tile.offUnit === 'points') {
+      return t('discover.golfThisWeek.gap.pointsOff', '{{count}} POINTS OFF', { count: gap });
+    }
+    if (tile.offUnit === 'birdies') {
+      return t('discover.golfThisWeek.gap.birdiesOff', '{{count}} BIRDIES OFF', { count: gap });
+    }
+    return t('discover.golfThisWeek.gap.off', '{{count}} OFF', { count: gap });
+  };
+
 
   const podiumDeficit = (
     tile: (typeof bandTiles)[number],
@@ -2268,7 +2326,92 @@ export function GolfThisWeek({
                           })}
                         </>
                       ) : null}
+
+                      {/* ============ THE PINNED OWN-MEMBER ROW (§1.3) ============
+                          A FOURTH ROW IN THE SAME LADDER, distinguished by
+                          COLOUR, not by shape: same rank / avatar / name /
+                          figure grammar as a chaser, on the amber own-member
+                          wash, with the gap to the leader carrying its unit.
+                          IT ONLY EXISTS OUTSIDE THE TOP THREE (§1.4): a member
+                          already on the podium is not shown twice, a member with
+                          no qualifying round in the window gets NOTHING (no
+                          placeholder, no prompt), a member below the tile's floor
+                          is not ranked here at all, and signed out renders the
+                          tile exactly as before. */}
+                      {(() => {
+                        if (!userId) return null;
+                        const selfIdx = tile.ranked.findIndex((r) => r.is_self);
+                        if (selfIdx < 3) return null;
+                        const own = tile.ranked[selfIdx];
+                        const figure = tile.figureOf(own);
+                        return (
+                          <div
+                            data-podium-row="you"
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onCardPress(own);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onCardPress(own);
+                              }
+                            }}
+                            style={{
+                              marginTop: 8,
+                              padding: '0 6px',
+                              borderRadius: 6,
+                              background: AMBER_WASH,
+                              borderTop: `1px solid ${WELL_RULE}`,
+                              display: 'grid',
+                              gridTemplateColumns: '14px 16px minmax(0, 1fr) auto auto',
+                              alignItems: 'center',
+                              gap: 6,
+                              minHeight: 34,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <span
+                              className="tabular-nums"
+                              style={{ fontSize: 10, fontWeight: 700, color: AMBER }}
+                            >
+                              {selfIdx + 1}
+                            </span>
+                            <SquircleAvatar
+                              src={own.profile_photo_url}
+                              userId={own.user_id}
+                              alt={own.display_name}
+                              size={16}
+                              hideRing
+                            />
+                            <span style={{ fontSize: 11, fontWeight: 700, color: AMBER }}>
+                              {t('discover.golfThisWeek.you', 'You')}
+                            </span>
+                            <span
+                              className="tabular-nums"
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 700,
+                                letterSpacing: '0.06em',
+                                color: AMBER,
+                              }}
+                            >
+                              {pinnedGap(tile, own)}
+                            </span>
+                            <span
+                              className="tabular-nums"
+                              style={{ fontSize: 11, fontWeight: 700, color: AMBER }}
+                            >
+                              {figure.text}
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </>
+
                   );
                 })()}
               </div>
@@ -2316,7 +2459,9 @@ export function GolfThisWeek({
               showFollow={!r.is_self && !!userId && !!following.data}
               isFollowed={!!following.data?.has(r.user_id)}
               viewerUserId={userId}
+              reference={referenceByRound.get(r.round_id) ?? null}
               onPress={() => onCardPress(r)}
+
             />
           );
         })}
