@@ -1586,6 +1586,20 @@ export function GolfThisWeek({
     row: CircleRoundRow;
     /** §2 — places 2 and 3, member-capped. Empty is a normal week. */
     runners: CircleRoundRow[];
+    /**
+     * §1.1 — THE FULL RANKED LIST for this tile, deduped by member, in the same
+     * order. The pinned own-member row's RANK is its index here; the three
+     * rendered rows are a slice of it.
+     */
+    ranked: CircleRoundRow[];
+    /**
+     * §1.3 — the UNIT the pinned row's gap carries. The DIRECTION is derived
+     * from `lowerWins` and `valueOf`, never hard-coded: gross is lower-wins, so
+     * a chaser's gross is HIGHER than the leader's; Stableford and birdies are
+     * higher-wins, so a chaser's figure is LOWER. Both read "{n} <unit> off".
+     */
+    offUnit: 'shots' | 'points' | 'birdies' | 'index';
+
     /** The tile's comparison for ONE row: the figure, and — only where the
         qualifier varies by round — that row's qualifier. */
     figureOf: (r: CircleRoundRow) => PodiumFigure;
