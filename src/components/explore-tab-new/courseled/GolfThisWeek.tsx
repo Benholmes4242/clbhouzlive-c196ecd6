@@ -1519,15 +1519,23 @@ export function GolfThisWeek({
       }),
   );
 
-  /* §1.1 — LOWEST NET. The FLOOR IS THE FIELD ITSELF: `net` is
-     adjusted_gross MINUS course_handicap, computed in useCircleLatestRounds, and
-     a row without it DOES NOT QUALIFY. It is never approximated from
-     hcp_at_time — that is the handicap INDEX, not the course-specific playing
-     handicap (see the hook's own comment). Lower wins. */
+  /* LOWEST NET (BRIEF_BOARD_LOWEST_NET §S2, superseding
+     BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §1.1). The net comes from the
+     gam_round_net VIEW, joined on whs_score_id — NOT from the row's own `net`,
+     which derives from whs_scores.course_handicap, a column the England Golf
+     sync has never populated (null on every row ever recorded), so that board
+     could never hold a single qualifier.
+     THE FLOOR IS THE FIELD ITSELF: a round with no net_score DOES NOT QUALIFY
+     (§2.2) — it is never defaulted and never substituted with gross. Roughly 4%
+     of rounds have no net because the course has no slope, rating or par.
+     NO WHS ARITHMETIC HERE (§3.1/§3.2): the formula lives once, in
+     whs_course_handicap. Lower wins. */
+  const netOf = (r: CircleRoundRow) =>
+    (r.score_id ? netByScore.get(r.score_id)?.net : undefined) ?? null;
   const netRanked = rankAll(
     ordered
-      .filter((r) => r.net != null && Number.isFinite(r.net))
-      .sort((a, b) => (a.net as number) - (b.net as number) || byDateDesc(a, b)),
+      .filter((r) => netOf(r) != null)
+      .sort((a, b) => (netOf(a) as number) - (netOf(b) as number) || byDateDesc(a, b)),
   );
 
   const improvedRanked = rankAll(
