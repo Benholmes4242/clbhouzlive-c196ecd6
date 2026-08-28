@@ -737,102 +737,114 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     >
       <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>
         {/*
-          HEADER — DATE / COURSE / REGION / MEMBER / ACTIONS
-          (BRIEF_SCORECARD_SHEET_HEADER, option B with ACTIONS UP).
+          S1 — THE FIXED SUMMARY (BRIEF_ROUND_SHEET_SPLIT).
 
-          The identity and the two actions used to sit at the BOTTOM of the
-          sheet, below the trajectory, the grid, the key and the breakdown — so a
-          member scrolled a whole scorecard to learn whose round it was. They are
-          header rows now. This also serves :722: the card's score-column label
-          is blank in the third person because the reader is told the name
-          ABOVE the card, which only works if the name is above it.
+          The score used to appear only at the FOOT of the expanded grid, after a
+          date, a course, a handicap index and two links. It is now the first
+          thing on the sheet and it does not scroll: the card, the breakdown and
+          the chart scroll beneath this block.
 
-          THE COURSE KEEPS THE FULL WIDTH ON ITS OWN LINE. That is why B was
-          chosen over the split layout: nothing sits beside the course name and
-          nothing competes with it for horizontal space, so the parenthetical
-          that separates East from West survives.
-
-          NO TILE. The identity was a Panel because it was a standalone block at
-          the end of a scroll; in the header it is part of the header — no panel,
-          no border, no separate ground, one hairline above it.
+          DISMISS IS SAFE. BottomSheet binds its touch drag handlers to the
+          GRABBER ROW ONLY, not to the sheet body, so a non-scrolling header
+          inside the sheet cannot capture the dismiss gesture. This block sits
+          BELOW that grabber and never sees those events.
         */}
-        <div style={{ padding: '10px 16px 12px', background: A.CANVAS, borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
-          <div style={{ minWidth: 0 }}>
-            {!!eyebrowText && (
-               <div style={{ ...KICKER, color: A.MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {eyebrowText}
-              </div>
-            )}
-            <div
-              style={{
-                ...TITLE, marginTop: 3, lineHeight: 1.22,
-                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-              }}
-            >
-              {courseName}
-            </div>
-            {courseLocation && (
-              <div style={{ fontSize: 12.5, color: A.MUTE, marginTop: 2 }}>{courseLocation}</div>
-            )}
-          </div>
-
-          {(showIdentity || onShareRound || onViewProfile || onViewCourse) && (
-            <Hairline style={{ margin: '10px 0 0' }} />
-          )}
-
-          {/* MEMBER ROW. With NO NAME this does not render at all — no avatar,
-              no placeholder, no avatar-shaped hole — and the actions row falls
-              directly under the region, still beneath its hairline. */}
-          {showIdentity && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
-              <SquircleAvatar
-                src={playerAvatarUrl ?? null}
-                alt={playerName}
-                userId={playerUserId ?? undefined}
-                size={34}
-                hairlineRing
-              />
-              {/* The name is the ONLY elastic cell: minWidth 0 + ellipsis, so a
-                  long display name yields to the figure rather than pushing it
-                  off. The figure column is auto and never shrinks. */}
+        <div
+          style={{
+            padding: '12px 16px 10px',
+            background: A.PANEL,
+            borderBottom: `1px solid ${A.BORDER}`,
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+            {/* LEFT — date, course, member */}
+            <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+              {!!eyebrowText && (
+                <div style={{ ...KICKER, color: A.MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {eyebrowText}
+                </div>
+              )}
               <div
                 style={{
-                  flex: '1 1 auto', minWidth: 0,
-                  fontSize: 13.5, fontWeight: 700,
-                  color: isOwner ? A.AMBER : A.INK,
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  fontSize: 16, fontWeight: 700, color: A.INK, marginTop: 3, lineHeight: 1.22,
+                  display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                 }}
-                title={isOwner ? undefined : playerName}
               >
-                {/* OWN ROUND (§3, option b): the app's viewing-member marker,
-                    amber "You", with the avatar kept. The row's shape is
-                    identical in both cases. */}
-                {isOwner ? t('courses:scorecard.voiceYou') : playerName}
+                {courseName}
               </div>
-              {(identityStat || playerHcp != null) && (
-                <div style={{ flex: 'none', textAlign: 'right' }}>
-                  <div style={{ ...NUM, fontSize: 20, color: A.INK, lineHeight: 1.05 }}>
-                    {identityStat ? identityStat.value : formatHcp(playerHcp as number)}
-                  </div>
-                  <div style={{ ...LABEL, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
-                    <span>{identityStat ? identityStat.label : t('courses:scorecard.handicapIndex')}</span>
-                    {!identityStat && showChip && <HandicapChip delta={playerHcpDelta as number} />}
-                  </div>
+              {courseLocation && (
+                <div style={{ fontSize: 12, color: A.MUTE, marginTop: 2 }}>{courseLocation}</div>
+              )}
+              {/* MEMBER ROW. With NO NAME nothing renders — no avatar, no
+                  avatar-shaped hole. Amber marks the viewer's own round. */}
+              {showIdentity && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, minWidth: 0 }}>
+                  <SquircleAvatar
+                    src={playerAvatarUrl ?? null}
+                    alt={playerName}
+                    userId={playerUserId ?? undefined}
+                    size={22}
+                    hairlineRing
+                  />
+                  <span
+                    style={{
+                      fontSize: 12.5, fontWeight: 700,
+                      color: isOwner ? A.AMBER : A.INK,
+                      minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}
+                    title={playerName}
+                  >
+                    {playerName}
+                  </span>
+                  {showChip && <HandicapChip delta={playerHcpDelta as number} />}
                 </div>
               )}
             </div>
-          )}
 
-          {(onShareRound || onViewProfile || onViewCourse) && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', marginTop: showIdentity ? 4 : 8 }}>
-              {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} align="left" />}
-              {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} align="left" />}
-              {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} align="left" />}
-            </div>
+            {/* RIGHT — THE SCORE. Visible the moment the sheet opens. */}
+            {totals.played && (
+              <div style={{ flex: 'none', textAlign: 'right' }}>
+                <div
+                  style={{
+                    ...NUM, fontSize: 38, fontWeight: 800, lineHeight: 0.9,
+                    letterSpacing: '-0.05em', color: A.INK,
+                  }}
+                >
+                  {totals.gross}
+                </div>
+                <div
+                  style={{
+                    ...NUM, fontSize: 13, marginTop: 6,
+                    color: heroMuted ? EVEN_GRAY : toParColor(totals.toPar),
+                  }}
+                >
+                  {fmtRel(totals.toPar)}
+                </div>
+                {(cardTotalPar > 0 || coursePar != null) && (
+                  <div style={{ ...LABEL_READ, marginTop: 3 }}>
+                    {t('courses:scorecard.parN', { n: cardTotalPar > 0 ? cardTotalPar : coursePar })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* S1.3 — THE RAIL. Nothing renders when no figure resolves. */}
+          {rail.length > 0 && (
+            <>
+              <Hairline style={{ margin: '12px 0 10px' }} />
+              <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                {rail.map((it) => (
+                  <div key={it.key} style={{ minWidth: 0 }}>
+                    <div style={{ ...RAIL_FIG, color: it.tone ?? A.INK }}>{it.value}</div>
+                    <div style={{ ...LABEL, fontSize: 9.5, letterSpacing: '0.12em', marginTop: 3 }}>{it.label}</div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
-
 
         <div
           style={{
@@ -880,147 +892,85 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             <SyncingMiddle />
           ) : (
             <>
-              {/* PANEL 1 — the round */}
-              <Panel>
-                {statItems.length > 0 && <StatRow items={statItems} size={24} style={{ marginBottom: 20 }} />}
+              {/*
+                S4.1 — THE CARD LEADS, because that is what the sheet is for. It
+                is no longer behind a "Full scorecard" toggle: the grid was on
+                the same screen as its own CTA. The scoring key stays with the
+                card, directly beneath it (S4.2).
+              */}
+              <Panel kicker={t('courses:scorecard.theCard')}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <Nine rows={out} label={t('courses:scorecard.out')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
+                  {back.length > 0 && (
+                    <Nine rows={back} label={t('courses:scorecard.in')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
+                  )}
 
-                <Hairline style={{ margin: '18px 0 14px' }} />
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10, gap: 12 }}>
-                  <span style={{ ...SECTION_TITLE, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {t('courses:scorecard.howItUnfolded')}
-                  </span>
                   {/*
-                    The heading row's action slot. This is a TOGGLE - it expands
-                    the card in place - so the copy never promises a destination.
+                    TOTALS BLOCK — a member of the HOLE / PAR / YOU family. Two
+                    rows on the same NINE_GRID so every figure lines up down the
+                    right edge. On a nine-hole card OUT spans the nine columns
+                    and no IN segment renders.
                   */}
-                  <Action
-                    align="left"
-                    style={{ flexShrink: 0, minHeight: 0 }}
-                    tone={A.AMBER}
-                    label={showCard
-                      ? t('courses:scorecard.hideHoleByHole')
-                      : t('courses:scorecard.holeByHole')}
-                    onClick={() => {
-                      setShowCard((v) => {
-                        if (!v) {
-                          analyticsEvents.track('scorecard_card_expanded', {
-                            surface,
-                            holes: holes.length,
-                          });
-                        }
-                        return !v;
-                      });
-                    }}
-                  />
-                </div>
-
-                {/*
-                  THE PLOT SITS IN THE TEXT COLUMN (BRIEF_SCORECARD_CHART_ALIGNMENT
-                  §1). This SUPERSEDES the full-bleed decision of
-                  BRIEF_SCORECARD_TRAJECTORY_WHOOP §3: the chart no longer breaks
-                  out of the Panel's 16px padding, so its left edge lands under the
-                  "H" of "How it unfolded" and its right edge under the chevron of
-                  "Full scorecard ›". One column, one x-scale — which is also what
-                  fixed the uneven tick spacing (§3): the tick row was remapping x
-                  against a plot 32px wider than itself.
-
-                  The chart legend row that used to sit here is GONE (§8): the
-                  field key had nothing left to point at once the field line was
-                  removed, and a single-colour swatch cannot represent a stroke
-                  graded per hole.
-                */}
-                <TrajectoryLine holes={holes} height={120} surface="dark" interactive />
-
-
-                {(captions.length > 0 || fieldCaption) && (
-                  <>
-                    <Hairline style={{ margin: '14px 0' }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      {captions.length > 0 && <p style={SENTENCE}>{captions.join(' ')}</p>}
-                      {fieldCaption && <p style={SENTENCE}>{fieldCaption}</p>}
-                    </div>
-                  </>
-                )}
-
-
-
-
-                {showCard && (
-                  <div style={{ paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    <Nine rows={out} label={t('courses:scorecard.out')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
-                    {back.length > 0 && (
-                      <Nine rows={back} label={t('courses:scorecard.in')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
-                    )}
-
-                    <Legend holes={played} />
-
-                    {/*
-                      TOTALS BLOCK - a member of the HOLE / PAR / YOU family, not
-                      a summary line floating beneath it. Two rows on the same
-                      NINE_GRID: row 1 carries TOTAL, the OUT and IN segments and
-                      the gross in the totals column, directly under the nine
-                      totals above; row 2 carries PAR n as a caps label and the
-                      to-par beneath the gross. Every figure lines up down the
-                      right edge. On a nine-hole card the OUT segment spans the
-                      full nine columns and no IN segment renders.
-                    */}
-                    <div>
-                      <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-                        <span style={{ ...LABEL_READ, color: A.INK }}>{t('courses:scorecard.total')}</span>
+                  <div>
+                    <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
+                      <span style={{ ...LABEL_READ, color: A.INK }}>{t('courses:scorecard.total')}</span>
+                      <span
+                        style={{
+                          gridColumn: backSummary ? 'span 4' : 'span 9',
+                          ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {t('courses:scorecard.outN', { n: outSummary.strokes })}
+                      </span>
+                      {backSummary && (
                         <span
                           style={{
-                            gridColumn: backSummary ? 'span 4' : 'span 9',
+                            gridColumn: 'span 5',
                             ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
                           }}
                         >
-                          {t('courses:scorecard.outN', { n: outSummary.strokes })}
+                          {t('courses:scorecard.inN', { n: backSummary.strokes })}
                         </span>
-                        {backSummary && (
-                          <span
-                            style={{
-                              gridColumn: 'span 5',
-                              ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {t('courses:scorecard.inN', { n: backSummary.strokes })}
-                          </span>
-                        )}
-                        <span style={{ ...NUM, fontSize: 16, color: A.INK, textAlign: 'center' }}>{cardGross}</span>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-                        <span style={{ ...LABEL_READ, color: A.MUTE, whiteSpace: 'nowrap' }}>
-                          {t('courses:scorecard.parN', { n: cardTotalPar })}
-                        </span>
-                        <span style={{ gridColumn: 'span 9' }} />
-                        <span style={{ ...NUM, fontSize: 13, color: toParColor(totals.toPar), textAlign: 'center' }}>
-                          {fmtRel(totals.toPar)}
-                        </span>
-                      </div>
+                      )}
+                      <span style={{ ...NUM, fontSize: 16, color: A.INK, textAlign: 'center' }}>{cardGross}</span>
                     </div>
 
-
+                    <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
+                      <span style={{ ...LABEL_READ, color: A.MUTE, whiteSpace: 'nowrap' }}>
+                        {t('courses:scorecard.parN', { n: cardTotalPar })}
+                      </span>
+                      <span style={{ gridColumn: 'span 9' }} />
+                      <span style={{ ...NUM, fontSize: 13, color: toParColor(totals.toPar), textAlign: 'center' }}>
+                        {fmtRel(totals.toPar)}
+                      </span>
+                    </div>
                   </div>
-                )}
+
+                  <Legend holes={played} />
+                </div>
               </Panel>
 
-              {/* PANEL 2 — how the round broke down */}
-              <Panel title={t('courses:scorecard.howItBrokeDown')}>
+              {/* HOW IT BROKE DOWN — the birdie+ figure keeps its RED (S4.3). */}
+              <Panel kicker={t('courses:scorecard.howItBrokeDown')}>
                 <RoundSplit split={split} />
+              </Panel>
+
+              {/* HOW IT UNFOLDED — last, the most decorative and least
+                  referenced element. Construction and monotonePath unchanged. */}
+              <Panel kicker={t('courses:scorecard.howItUnfolded')}>
+                <TrajectoryLine holes={holes} height={120} surface="dark" interactive />
               </Panel>
             </>
           )}
 
-          {/*
-            NOTHING FOLLOWS THE BREAKDOWN (BRIEF_SCORECARD_SHEET_HEADER §4).
-            The identity panel and the anonymous-round footer that used to sit
-            here are BOTH gone: the member row and both actions live in the
-            header, and the anonymous path is served there too (member row
-            omitted, actions row still rendered). Do not add a footer back.
-          */}
-
-
+          {/* S3.3 — EXITS BELONG AT THE END. */}
+          {(onViewProfile || onViewCourse || onShareRound) && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', paddingTop: 2 }}>
+              {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} align="left" />}
+              {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} align="left" />}
+              {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} align="left" />}
+            </div>
+          )}
         </div>
       </div>
     </BottomSheet>
@@ -1028,3 +978,4 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 };
 
 export default CardScorecardSheet;
+
