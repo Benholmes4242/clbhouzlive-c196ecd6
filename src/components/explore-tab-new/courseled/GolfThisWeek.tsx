@@ -12,7 +12,6 @@ import { Check, ChevronRight } from 'lucide-react';
  * same 20px gutter / 8px baseline column with the same type.
  */
 /** §1.3 — the neutral loading ground. FLAT, so it can never read as a gradient. */
-const BOARD_HERO_SHELL = 'rgba(255,255,255,0.05)';
 /** The when chip's ink — the hero's marker ink (PhotoBand momentLabel). */
 const BOARD_HERO_FAINT = 'rgba(255,255,255,0.65)';
 
