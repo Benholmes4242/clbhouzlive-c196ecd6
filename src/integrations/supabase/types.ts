@@ -20041,6 +20041,7 @@ export type Database = {
           course_id: string
           last_played: string
           rounds_here: number
+          second_best_gross: number
         }[]
       }
       get_my_course_scoring_breakdown: {
