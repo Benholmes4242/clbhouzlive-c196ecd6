@@ -1423,7 +1423,15 @@ async function applyCourseLegends(stats: any) {
     );
     return;
   }
-  for (const cfg of LEGEND_CATS) await recomputeLegend(stats.course_id, cfg);
+  // BRIEF_CROWN_NOTIFICATION_FRESHNESS — the trigger round is threaded into
+  // recomputeLegend so crown notifications are (a) traceable via
+  // trigger_whs_score_id and (b) gated on the round's PLAY date. The board
+  // itself is recomputed unconditionally, exactly as before.
+  const trigger = {
+    whs_score_id: (stats.whs_score_id as string | null) ?? null,
+    play_date: (stats.play_date as string | null) ?? null,
+  };
+  for (const cfg of LEGEND_CATS) await recomputeLegend(stats.course_id, cfg, trigger);
   // G2 — crown_taken / crown_lost. Bounded, silent-fail; contract owned by
   // Ben's SQL that populates `discover_rail_cache.course_regular:{course_id}`.
   await maybeEmitCrownDelta(stats.course_id).catch((e) => {
