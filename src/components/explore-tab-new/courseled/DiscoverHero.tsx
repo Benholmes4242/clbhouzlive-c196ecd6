@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChevronRight } from 'lucide-react';
 import { animate, useReducedMotion } from 'framer-motion';
 
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -324,111 +325,95 @@ export function DiscoverHero({
         </span>
       </div>
 
-      {/* THE CONTENT STACK, bottom-aligned: THREE BLOCKS ONLY
-          (BRIEF_DISCOVER_HERO_HIERARCHY) — eyebrow, headline row, and one
-          member-course-score row. THE SENTENCE IS GONE: the eyebrow named the
-          moment, the headline named it again and the sentence named it a third
-          time, so the only unseen facts (who, where) were last and smallest.
-          The run's hole span — the one detail the sentence carried that the
-          headline could not — is folded onto the headline as a qualifier. */}
-      <div style={{ padding: '0 14px 18px', minWidth: 0 }}>
-        {label && (
+      {/* THE LOWER THIRD (BRIEF_DISCOVER_HERO_LOWER_THIRD §1). DATA and ACTIONS
+          now sit on DIFFERENT GROUND: the claim, the people row and the
+          reference line share the padded block; the action bar below carries its
+          own surface, flush to the hero's bottom edge. That separation is the
+          point of the design — the reaction stops crowding the score and the
+          scorecard link stops costing a stacked row. */}
+      <div style={{ padding: '0 16px 14px', minWidth: 0 }}>
+        {/* THE CLAIM BLOCK, behind a 2px LEFT RULE in the moment tone with 12px
+            between rule and text (§1.2). The rule replaces the kicker's old job
+            of colouring the whole line. */}
+        <div style={{ borderLeft: `2px solid ${momentTone}`, paddingLeft: 12, minWidth: 0 }}>
+          {label && (
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                lineHeight: 1,
+                marginBottom: 8,
+                color: momentTone,
+              }}
+            >
+              {label}
+            </div>
+          )}
+
+          {/* THE LARGEST NUMERAL IN THE APP, now 60px and in FACT INK (§2.1).
+              The noun keeps its placement from the ONE translatable template —
+              before an IDENTITY, after a QUANTITY — so a translator can still
+              reorder. */}
           <div
             style={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              lineHeight: 1,
-              marginBottom: 8,
-              /* THE TILE'S RULE, UNCHANGED: the eyebrow is white-at-alpha, with
-                 the two existing exceptions — THE RUN takes the falling-index
-                 green, FINISHED IN THE RED takes the under-par red. */
-              color:
-                moment.kind === 'run'
-                  ? ROW_DARK_INDEX_FELL
-                  : moment.kind === 'finishedInRed'
-                    ? ROW_DARK_TOPAR_UNDER
-                    : DISCOVER_QUIET,
+              display: 'flex',
+              alignItems: 'baseline',
+              flexWrap: 'wrap',
+              gap: 8,
+              minWidth: 0,
             }}
           >
-            {label}
+            {parts.before && <span style={wordStyle}>{parts.before}</span>}
+            <CountUpFigure
+              value={figure}
+              format={isScore && !isGrossScore ? fmtRel : (n) => String(n)}
+              style={{
+                ...NUMF,
+                fontSize: 60,
+                fontWeight: 800,
+                lineHeight: 0.9,
+                letterSpacing: '-0.06em',
+                color: DISCOVER_FACT,
+              }}
+            />
+            {parts.after && <span style={wordStyle}>{parts.after}</span>}
           </div>
-        )}
 
-        {/* THE LARGEST NUMERAL IN THE APP (§1.2). The noun keeps its placement
-            from the ONE translatable template — before an IDENTITY, after a
-            QUANTITY — so a translator can still reorder.
-
-            THE SPAN IS RUN-ONLY (§2). roundMoment.ts carries facts.from and
-            facts.to on the RUN alone; birdie haul and strong finish carry count,
-            toPar and played and NO span. So the qualifier renders only when BOTH
-            bounds exist, and otherwise renders NOTHING — no separator, no
-            reserved width, and never an adjacent fact (`played`, `count`)
-            substituted in: a qualifier meaning a different thing per kind is
-            worse than no qualifier. It needs no locale key — an en dash between
-            two existing numbers. The row keeps flexWrap so a long noun plus a
-            span takes a second line rather than truncating. */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            flexWrap: 'wrap',
-            gap: 9,
-            minWidth: 0,
-          }}
-        >
-          {parts.before && <span style={wordStyle}>{parts.before}</span>}
-          <CountUpFigure
-            value={figure}
-            format={isScore && !isGrossScore ? fmtRel : (n) => String(n)}
-            style={{
-              ...NUMF,
-              fontSize: 56,
-              fontWeight: 800,
-              lineHeight: 1,
-              letterSpacing: '-0.06em',
-              color: figureColor,
-            }}
-          />
-          {parts.after && <span style={wordStyle}>{parts.after}</span>}
+          {/* THE HOLE SPAN IS RUN-ONLY (§1.2). roundMoment.ts carries facts.from
+              and facts.to on the RUN alone, so this renders only when BOTH
+              bounds exist and otherwise renders NOTHING — no separator, no
+              reserved height, and never an adjacent fact substituted in. It
+              needs no locale key: an en dash between two existing numbers. */}
           {moment.facts.from != null && moment.facts.to != null && (
-            <span
+            <div
               className="tabular-nums"
               style={{
-                fontSize: 13,
+                marginTop: 6,
+                fontSize: 12,
                 fontWeight: 600,
                 lineHeight: 1,
                 color: HERO_FAINT,
               }}
             >
               {`${moment.facts.from}\u2013${moment.facts.to}`}
-            </span>
+            </div>
           )}
         </div>
 
-        {/* ONE ROW CARRIES MEMBER, COURSE, SCORE AND THE REACTION (§5,
-            BRIEF_DISCOVER_HERO_PARITY §1.3). The member and their course are a
-            two-line stack on the left; the gross sits over the to-par on the
-            right, right-aligned and flex: none, with the heart trailing it.
+        {/* THE PEOPLE ROW, 16px below the claim (§1.3). Member over
+            course-and-region on the left; the score right-aligned on ONE
+            baseline — gross 19/700 beside to-par 12/600, not stacked, because
+            the reaction has left this row for the bar below.
 
-            TONE: THE GROSS FOLLOWS momentIsAboutScore, exactly as the qualifier
-            does, and for the same reason. It used to carry figureColor
-            unconditionally, which painted a GREEN 77 on a run that finished +6 —
-            green means better on every other member surface in this app. The
-            achievement is THE RUN; the gross is the score of the round the run
-            happened in, and only one of those is being celebrated. So a course
-            record or an under-par round keeps its coloured gross, and the run,
-            birdie haul, strong finish and grind render it in the neutral fact
-            tone. The 56px figure is untouched and keeps the moment tone in every
-            case — that IS the achievement, and on a run it should be the only
-            coloured thing on the hero.
-            Never inverted to red: a red +4 beside a green 9 would read as
-            criticism of a good round.
-            ABSENT IS ABSENT: neither value renders NO right-hand block and no
-            gap, never a dash. ON A COURSE RECORD the 56px figure ALREADY IS the
-            gross, so only the to-par renders. */}
-
+            TONE: THE GROSS FOLLOWS momentIsAboutScore (§2.2). A course record or
+            an under-par round shows a toned gross; the +6 run shows a neutral
+            77 — green means better on every other member surface, and the run,
+            not the score, is the achievement. The to-par stays QUIET in both
+            cases. ABSENT IS ABSENT: no value renders no block and no gap, never
+            a dash. On a course record the 60px figure ALREADY IS the gross, so
+            only the to-par renders. */}
         {(() => {
           const toPar = moment.facts.toPar;
           const showGross = row.gross != null && !isGrossScore;
@@ -438,7 +423,7 @@ export function DiscoverHero({
           return (
             <div
               style={{
-                marginTop: 13,
+                marginTop: 16,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
@@ -467,8 +452,8 @@ export function DiscoverHero({
                 >
                   {row.display_name}
                 </div>
-                {/* The course WRAPS to a second line rather than truncating: a
-                    clipped course name is a course the member cannot identify. */}
+                {/* ONE LINE, ELLIPSISED (§1.3) — the hero's height is fixed, so
+                    the course line can no longer take a second line. */}
                 <div
                   style={{
                     marginTop: 3,
@@ -477,10 +462,9 @@ export function DiscoverHero({
                     fontWeight: 600,
                     lineHeight: 1.25,
                     color: DISCOVER_QUIET,
-                    display: '-webkit-box',
-                    WebkitBoxOrient: 'vertical',
-                    WebkitLineClamp: 2,
                     overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {courseName ??
@@ -491,63 +475,50 @@ export function DiscoverHero({
               </div>
 
               {(showGross || showQual) && (
-                <div style={{ flex: 'none', textAlign: 'right' }}>
+                <div
+                  style={{
+                    flex: 'none',
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 6,
+                  }}
+                >
                   {showGross && (
-                    <div
+                    <span
                       className="tabular-nums"
                       style={{
-                        fontSize: 17,
+                        fontSize: 19,
                         fontWeight: 700,
                         lineHeight: 1,
                         letterSpacing: '-0.02em',
-                        color: momentIsAboutScore ? figureColor : DISCOVER_FACT,
+                        color: momentIsAboutScore ? momentTone : DISCOVER_FACT,
                       }}
                     >
                       {String(row.gross)}
-                    </div>
+                    </span>
                   )}
                   {showQual && (
-                    <div
+                    <span
                       className="tabular-nums"
                       style={{
-                        marginTop: showGross ? 4 : 0,
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: 600,
                         lineHeight: 1,
-                        color: momentIsAboutScore ? figureColor : DISCOVER_FACT,
+                        color: DISCOVER_QUIET,
                       }}
                     >
                       {fmtRel(toPar as number)}
-                    </div>
+                    </span>
                   )}
                 </div>
               )}
-
-              {/* THE REACTION (§1.3-1.6). Right-aligned on this row, on the
-                  scrim. THE COUNT ALWAYS SHOWS (§1.4) — the same round on the
-                  card below must never read a different number. The control's
-                  44px tap target is padding cancelled by a negative margin, so
-                  it has NO layout footprint and the row's height is identical at
-                  0, 1 and 3 digits (§1.7). No score id, or signed out, and
-                  nothing renders at all. */}
-              <div style={{ flex: 'none', display: 'flex', alignItems: 'center' }}>
-                <ReactionAction
-                  count={reaction.count}
-                  reacted={reaction.mine}
-                  onToggle={() => reactions.toggle('round', row.score_id)}
-                  label={t('discover.reactions.action', 'Like this round')}
-                  tone="glass"
-                  size={17}
-                  hidden={!row.score_id || !reactions.viewerId || reactions.unavailable}
-                />
-              </div>
             </div>
           );
         })()}
 
-        {/* THE REFERENCE LINE (§2). One line, QUIET ink, beneath the member and
-            course row. NOTHING RESOLVES, NOTHING RENDERS — no reserved height
-            (§2.5). The ladder is shared with the round cards. */}
+        {/* THE REFERENCE LINE (BRIEF_DISCOVER_HERO_PARITY §S2, landed). One
+            line, 11.5/500 QUIET, between the people row and the action bar
+            (§4.3). NOTHING RESOLVES, NOTHING RENDERS — no reserved height. */}
         {reference && (
           <div
             style={{
@@ -556,11 +527,69 @@ export function DiscoverHero({
               fontWeight: 500,
               lineHeight: 1.2,
               color: DISCOVER_QUIET,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
             {reference}
           </div>
         )}
+      </div>
+
+      {/* THE ACTION BAR (§1.4) — full width, flush to the hero's bottom edge,
+          1px top hairline, its own slightly darker ground over the gradient's
+          end stop (see LOWER_THIRD_SCRIM for the composite that keeps the seam
+          at zero). The whole hero remains tappable to the scorecard; this
+          LABELS that gesture rather than being the only target (§4.5), so it is
+          text, not a button. The reaction sits right, BARE — no pill, no border,
+          because the bar is already its own surface — and stops propagation so
+          reacting never opens the scorecard. THE COUNT ALWAYS SHOWS, and its
+          44px tap target is padding cancelled by a negative margin, so the bar's
+          height is identical at 0, 1 and 3 digits. */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8,
+          padding: '11px 16px',
+          background: BAR_GROUND,
+          borderTop: `1px solid ${BAR_HAIRLINE}`,
+          minWidth: 0,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            lineHeight: 1,
+            color: DISCOVER_QUIET,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 3,
+            minWidth: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {t('discover.golfThisWeek.moment.fullScorecard', 'Full scorecard')}
+          <ChevronRight size={10} strokeWidth={3} />
+        </span>
+        <span style={{ flex: 'none', display: 'inline-flex', alignItems: 'center' }}>
+          <ReactionAction
+            count={reaction.count}
+            reacted={reaction.mine}
+            onToggle={() => reactions.toggle('round', row.score_id)}
+            label={t('discover.reactions.action', 'Like this round')}
+            tone="glass"
+            size={17}
+            hidden={!row.score_id || !reactions.viewerId || reactions.unavailable}
+          />
+        </span>
       </div>
 
 
