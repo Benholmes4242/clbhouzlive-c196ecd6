@@ -1906,7 +1906,9 @@ export function GolfThisWeek({
 
           {/* THE LOWER THIRD — PhotoBand's column: 20px gutters, 8px off the
               bottom edge, 10px between the title and the line beneath it. */}
-          <div style={{ padding: '0 20px 8px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {/* gap 0: the hairline and the rail own their own top margins (11 and
+              10) so the vertical rhythm is stated once, in one place. */}
+          <div style={{ padding: '0 20px 8px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0 }}>
             {/* THE CATEGORY NAMES ITSELF ONCE ON THE PAGE, HERE, as a caps
                 masthead — 21/800 with 0.06em tracking and the broadcast text
                 shadow. Read from `activeBoard`, never from the selection.
