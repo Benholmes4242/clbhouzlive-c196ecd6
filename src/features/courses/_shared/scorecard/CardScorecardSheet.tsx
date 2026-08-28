@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, Table } from 'lucide-react';
 
@@ -17,7 +17,6 @@ import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
   A, SANS, FIGS, NUM, KICKER, Panel, StatRow, Action, Hairline,
-  toParParts, type StatItem,
 } from '@/features/courses/components/holes/analytical/tokens';
 import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
@@ -27,8 +26,12 @@ import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS } from '@/lib/tokens/typ
  */
 const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.MUTE };
 const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
-/** Panel headings sit below the sheet title: same role, 13px as before. */
-const SECTION_TITLE: React.CSSProperties = { ...TITLE, fontSize: 13 };
+/*
+ * BRIEF_ROUND_SHEET_SPLIT §3.4 — SECTION TITLES ARE CAPS-TRACKED LABELS.
+ * The sentence-case SECTION_TITLE role is gone: each panel passes `kicker`, the
+ * app's caps-tracked panel label, so these sections read like every other
+ * section in the app rather than like headings unique to this sheet.
+ */
 
 /**
  * MICRO_BRIEF_SHEETS_TYPE_SCALE — TWO LOCAL LABEL ROLES.
