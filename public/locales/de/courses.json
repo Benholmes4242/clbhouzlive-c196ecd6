@@ -1261,6 +1261,7 @@
     "seam": "Alle Zeiten · von allen",
     "mostPlayedPlaysTo": "SPIELT ZU",
     "mostPlayedRoundsLabel": "RUNDEN",
+    "mostPlayedBestScore": "BESTES ERGEBNIS",
     "mostPlayedBestRoundsHere": "BESTE RUNDEN HIER",
     "mostPlayedAllRoundsHere": "ALLE {{count}} RUNDEN HIER",
     "mostPlayedOneRoundLine": "Eine Runde hier: {{name}} spielte {{gross}}.",

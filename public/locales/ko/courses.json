@@ -1195,6 +1195,7 @@
     "seam": "전기간 · 모든 사람",
     "mostPlayedPlaysTo": "PLAYS TO",
     "mostPlayedRoundsLabel": "ROUNDS",
+    "mostPlayedBestScore": "BEST SCORE",
     "mostPlayedBestRoundsHere": "BEST ROUNDS HERE",
     "mostPlayedAllRoundsHere": "ALL {{count}} ROUNDS HERE",
     "mostPlayedOneRoundLine": "One round here: {{name}} shot {{gross}}.",

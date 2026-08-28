@@ -6,7 +6,7 @@ import { ArrowUp, ChevronDown } from 'lucide-react';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import type { MostPlayedPlayer, MostPlayedRow } from './hooks/useMostPlayedThisWeek';
-import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, Eyebrow, GOLD, InkAction, LABEL, NUMF, SANS, THUMBNAIL_RADIUS } from './tokens';
+import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, Eyebrow, InkAction, LABEL, NUMF, SANS, THUMBNAIL_RADIUS } from './tokens';
 import { formatNumber } from '@/i18n/format';
 import { MostPlayedPanel as MostPlayedPanelShell } from './DiscoverCourseLedSkeleton';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
@@ -143,6 +143,15 @@ const GROSS_COL = 30;
 /** §S2.2 — position first, in a fixed column so names start on one line. */
 const POS_COL = 17;
 
+/* MICRO_BRIEF_COURSES_PLAYED_EXPANDED_TIDY §2.3 — a FIXED row height, not a
+ * guess: rows with a home club under the name are taller than rows without, so
+ * without locking the height a nine-row course and a fifteen-row course would
+ * open to different sizes. 42px fits the 24px face and the two-line name block. */
+const BOARD_ROW_H = 42;
+const BOARD_MAX_ROWS = 8;
+const BOARD_MAX_H = BOARD_ROW_H * BOARD_MAX_ROWS; // 336
+
+
 
 /* NO VIEWER MARKING ON THE COURSE HEADER. Ben's call
  * (BRIEF_SCORECARD_WIDTH_AND_VIEWER_RING §S2) — the amber ring and the "You"
@@ -228,61 +237,51 @@ function MemberBoard({
   onSeeAllAtCourse: () => void;
 }) {
   const { t } = useTranslation('courses');
-  /** §2 — NO CAP. Every resolved player is rendered. */
+  /** §2 — NO CAP ON RESOLUTION; the CONTAINER caps what is visible. */
   const listed = row.players;
-  /* BRIEF_COURSES_PLAYED_COURSE_LED §2.3 — NO NESTED SCROLL AREA. The internal
-     scroller, its max height, its fade and its at-end state are gone: the list
-     renders inline and the PAGE scrolls. A scroll region nested in a scrolling
-     page always feels wrong on a phone, whatever overscroll-behavior does. */
+  /* MICRO_BRIEF_COURSES_PLAYED_EXPANDED_TIDY §2 — REVERSES
+     BRIEF_COURSES_PLAYED_COURSE_LED §2.3 ("no nested scroll area") DELIBERATELY:
+     fifteen rows inline pushed the rest of the page a long way down. The list is
+     now capped at EIGHT ROWS with an internal scroller, made safe on iOS by
+     `overscrollBehavior: 'contain'` (§3.1) and NO `touch-action` (§3.2 — the
+     ComingUp `pan-x` bug: touch-action restricts which gestures are permitted,
+     it does not delegate them). */
   const single = listed.length === 1 ? listed[0] : null;
 
   if (listed.length === 0) return null;
 
-  /* §2.4 — ONE ROUND IS A SENTENCE, NOT A ONE-ROW BOARD. */
+  /* §4 — ONE MEMBER IS A LABELLED FIGURE, NOT A SENTENCE AND NOT A ONE-ROW
+     BOARD. The member's name is deliberately not shown (§4.3). */
   if (single) {
     return (
       <div style={{ paddingBottom: 10, paddingTop: 8 }}>
-        <p
-          style={{
-            margin: 0,
-            fontFamily: SANS,
-            fontSize: 12.5,
-            fontWeight: 600,
-            lineHeight: 1.35,
-            color: viewerId === single.userId ? A.AMBER_DEEP : INK,
-          }}
-        >
-          {t('discover.mostPlayedOneRoundLine', 'One round here: {{name}} shot {{gross}}.', {
-            count: row.count,
-            name: single.name,
-            gross: single.gross != null ? formatNumber(single.gross) : '\u2014',
-          })}
-        </p>
-        {/* §2.4 — the one MEMBER may have played more than once; the rounds
-            figure on the collapsed row says so, and this hands off to them. */}
-        {row.count > 1 && onSeeAllAtCourse && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onSeeAllAtCourse();
+        <span style={{ display: 'block' }}>
+          <span
+            style={{
+              ...NUMF,
+              display: 'block',
+              fontSize: 14,
+              fontWeight: 700,
+              lineHeight: 1,
+              color: viewerId === single.userId ? A.AMBER_DEEP : INK,
             }}
+          >
+            {single.gross != null ? formatNumber(single.gross) : '\u2014'}
+          </span>
+          <span
             style={{
               ...LABEL,
               display: 'block',
-              fontSize: 11,
-              letterSpacing: '0.10em',
-              color: MID,
-              border: 'none',
-              background: 'transparent',
-              padding: '8px 0 0',
-              textAlign: 'left',
-              cursor: 'pointer',
+              marginTop: 4,
+              fontSize: 9.5,
+              fontWeight: 700,
+              letterSpacing: '0.14em',
+              color: FAINT,
             }}
           >
-            {t('discover.mostPlayedAllRoundsHere', 'ALL {{count}} ROUNDS HERE', { count: row.count })}
-          </button>
-        )}
+            {t('discover.mostPlayedBestScore', 'BEST SCORE')}
+          </span>
+        </span>
         {onSeeAllAtCourse && (
           <button
             type="button"
@@ -297,7 +296,7 @@ function MemberBoard({
               color: INK,
               border: 'none',
               background: 'transparent',
-              padding: '8px 0 0',
+              padding: '10px 0 0',
               textAlign: 'left',
               cursor: 'pointer',
             }}
@@ -309,13 +308,34 @@ function MemberBoard({
     );
   }
 
+  /* §2.3 — EIGHT ROWS EXACTLY. A fixed row height is what makes a nine-row and a
+     fifteen-row course open to the SAME size, so the row itself is height-locked
+     (the home-club line would otherwise make rows differ). §2.4 — at or below the
+     cap the container sizes to content and never scrolls. */
+  const scrolls = listed.length > BOARD_MAX_ROWS;
+
   return (
     <div style={{ paddingBottom: 10, paddingTop: 8 }}>
       {/* §2.1 — THE EXPANDED STATE NAMES WHAT IT IS. */}
       <div style={{ ...LABEL, fontSize: 11, letterSpacing: '0.14em', color: FAINT, marginBottom: 4 }}>
         {t('discover.mostPlayedBestRoundsHere', 'BEST ROUNDS HERE')}
       </div>
-      <div>
+      <div
+        className="no-scrollbar"
+        style={
+          scrolls
+            ? {
+                height: BOARD_MAX_H,
+                overflowY: 'auto',
+                // §3.1 — STOPS THE SCROLL CHAINING TO THE PAGE at the list's edge.
+                overscrollBehavior: 'contain',
+                WebkitOverflowScrolling: 'touch',
+                // §3.2 — NO touch-action HERE. Deliberate.
+              }
+            : undefined
+        }
+      >
+
 
       {listed.map((p) => {
         const isViewer = viewerId != null && p.userId === viewerId;
@@ -343,11 +363,15 @@ function MemberBoard({
               // FULL WIDTH (§S2.3): the tint bleeds to the card's own padding
               // rather than starting at a thumbnail-width indent.
               margin: '0 -13px',
-              padding: '7px 14px',
+              padding: '0 14px',
+              // §2.3 — HEIGHT-LOCKED so eight rows are always BOARD_MAX_H tall.
+              height: BOARD_ROW_H,
+              boxSizing: 'border-box',
               minWidth: 0,
               // §S2.8 — TINT ONLY.
               background: isViewer ? VIEWER_TINT : 'transparent',
             }}
+
           >
             {/* §S2.2 — POSITION FIRST. The leader's position is INK; the rest
                 are GHOST, so the board has one focal point per course. */}
@@ -446,35 +470,12 @@ function MemberBoard({
         );
       })}
       </div>
-      {/* §2.4 — MORE ROUNDS THAN ROWS: the list is one row per MEMBER, so a
-          course with more rounds than resolved members says so quietly and
-          hands off to the course's own sheet. */}
-      {row.count > listed.length && onSeeAllAtCourse && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onSeeAllAtCourse();
-          }}
-          style={{
-            ...LABEL,
-            display: 'block',
-            fontSize: 11,
-            letterSpacing: '0.10em',
-            color: MID,
-            border: 'none',
-            background: 'transparent',
-            padding: '8px 0 0',
-            textAlign: 'left',
-            cursor: 'pointer',
-          }}
-        >
-          {t('discover.mostPlayedAllRoundsHere', 'ALL {{count}} ROUNDS HERE', { count: row.count })}
-        </button>
-      )}
+      {/* §2.2 — "ALL {n} ROUNDS HERE" IS GONE. The internal scroll replaces it;
+          the sheet remains reachable through VISIT THIS COURSE below. */}
 
-      {/* THE SEE-ALL ROW STAYS (§2): it opens the course's own sheet, which is
-          a different destination from a longer list. */}
+      {/* §2.5 — VISIT THIS COURSE SITS OUTSIDE THE SCROLLER so it cannot scroll
+          away. */}
+
       {onSeeAllAtCourse && (
         <button
           type="button"
@@ -527,18 +528,12 @@ export function MostPlayedLeaderboard({
   // while the rest of the row reads straight away.
   const thumbPending = shown.length > 0 && metaQuery.isPending;
 
-  /* GOLD MEANS BEST in all three Discover appearances: the BEST THIS WEEK
-     podium, its winning round tile, and this course card. Resolve the winning
-     course against ALL supplied rows before slicing; if it is outside the
-     visible list, no visible card is promoted. `find` intentionally awards at
-     most one course if equal gross values occur. */
-  const weekBestGross = rows.reduce<number | null>(
-    (best, row) => row.bestGross == null ? best : best == null ? row.bestGross : Math.min(best, row.bestGross),
-    null,
-  );
-  const weekBestCourseId = weekBestGross == null
-    ? null
-    : rows.find((row) => row.bestGross === weekBestGross)?.courseId ?? null;
+  /* MICRO_BRIEF_COURSES_PLAYED_EXPANDED_TIDY §1.1 — THE GOLD HIGHLIGHT IS GONE.
+     The lowest-gross course of the window no longer takes a gold border, wash or
+     accent: every course card uses the same neutral treatment. Nothing else read
+     the flag — it was purely a border, and it drove no label, sort or analytics
+     value, so the whole weekBestGross / weekBestCourseId resolution is deleted
+     with it. */
 
   const openMember = (userId: string) => navigate(`/profile/${userId}`);
 
@@ -584,7 +579,6 @@ export function MostPlayedLeaderboard({
         {shown.map((r) => {
           const m = meta?.get(r.courseId);
           const name = m?.name ?? r.courseName ?? t('discover.unknownCourse', 'Course');
-           const isWeekBestCourse = r.courseId === weekBestCourseId;
           const open = openId === r.courseId;
           const toggle = () => setOpenId(open ? null : r.courseId);
           return (
@@ -599,7 +593,7 @@ export function MostPlayedLeaderboard({
               key={r.courseId}
               style={{
                 background: A.PANEL,
-                 border: `1px solid ${isWeekBestCourse ? GOLD : 'transparent'}`,
+                 border: '1px solid transparent',
                 borderRadius: CARD_RADIUS,
                 overflow: 'hidden',
                 boxShadow: '0 1px 2px rgba(11,15,20,0.05)',

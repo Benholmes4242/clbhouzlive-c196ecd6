@@ -1261,6 +1261,7 @@
     "seam": "Todos los tiempos · de todos",
     "mostPlayedPlaysTo": "JUEGA A",
     "mostPlayedRoundsLabel": "VUELTAS",
+    "mostPlayedBestScore": "MEJOR RESULTADO",
     "mostPlayedBestRoundsHere": "MEJORES VUELTAS AQUI",
     "mostPlayedAllRoundsHere": "LAS {{count}} VUELTAS AQUI",
     "mostPlayedOneRoundLine": "Una vuelta aqui: {{name}} hizo {{gross}}.",
