@@ -1886,36 +1886,40 @@ export function GolfThisWeek({
             </span>
           </div>
 
-          <div style={{ padding: '0 14px 16px', minWidth: 0 }}>
-            {/* §1.1/§1.4 — THE CATEGORY NAMES ITSELF ONCE ON THE PAGE BODY, HERE.
-                The 17px heading that used to sit below the hero is deleted: two
-                headings naming the same board was the fault this brief closes.
-                Read from `activeBoard`, never from the selection. */}
+          {/* THE LOWER THIRD — PhotoBand's column: 20px gutters, 8px off the
+              bottom edge, 10px between the title and the line beneath it. */}
+          <div style={{ padding: '0 20px 8px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* THE CATEGORY NAMES ITSELF ONCE ON THE PAGE BODY, HERE, in the
+                hero's title type — 30px/0.96 with the broadcast text shadow,
+                the same as the tournament title on Tour Overview. Read from
+                `activeBoard`, never from the selection. */}
             <h2
               style={{
                 margin: 0,
                 fontFamily: SANS,
-                fontSize: 24,
+                fontSize: 30,
                 fontWeight: 700,
-                lineHeight: 1.08,
+                lineHeight: 0.96,
                 letterSpacing: '-0.025em',
-                color: DISCOVER_FACT,
+                color: 'white',
+                textShadow: '0 2px 12px rgba(0,0,0,0.55)',
               }}
             >
               {activeBoard.label}
             </h2>
-            {/* The counts, unchanged in content and key — only their home moved.
-                The window is FIXED at GOLF_WEEK_DAYS, never derived from the
-                oldest round, so the readout cannot disagree with the query. */}
+            {/* The counts, unchanged in content and key — only their type now
+                matches the hero's venue line. The window is FIXED at
+                GOLF_WEEK_DAYS, never derived from the oldest round, so the
+                readout cannot disagree with the query. */}
             <div
               className="tabular-nums"
               style={{
-                marginTop: 4,
                 fontFamily: SANS,
-                fontSize: 12.5,
+                fontSize: 11.5,
                 fontWeight: 600,
-                lineHeight: 1.2,
-                color: DISCOVER_QUIET,
+                letterSpacing: '0.01em',
+                color: 'rgba(255,255,255,0.75)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.45)',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
