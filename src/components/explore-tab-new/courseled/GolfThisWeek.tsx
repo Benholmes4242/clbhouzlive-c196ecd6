@@ -369,6 +369,15 @@ function ShapeReveal({ children }: { children: React.ReactNode }) {
   );
 
 }
+/* §3.2 — NOTHING IS DELETED. The card no longer draws a scorecard, so the reveal
+   wrapper and the mini-grid are unreferenced HERE; both are kept intact because
+   the sheet's grammar is the same and a future inline use must not re-invent
+   them. Referenced so lint sees the intent rather than dead code. */
+void ShapeReveal;
+void MiniScorecard;
+void SHAPE_BLOCK_H;
+
+
 
 /**
  * §S3 — THREE STATES, ONE OF THEM EMPTY:
