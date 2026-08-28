@@ -1611,23 +1611,37 @@ export function GolfThisWeek({
     /** §1.6 — the VALUE column's header. */
     unit: string;
     /**
-     * §1.6 — THE PAR COLUMN ONLY EXISTS WHERE A TO-PAR EXISTS. Stableford and
-     * birdies have none, so the column AND its header are absent and the grid
-     * is one column shorter. Decided ONCE per render at table level (this flag),
-     * never per row.
+     * §1.6 — THE FOURTH COLUMN ONLY EXISTS WHERE A QUALIFIER EXISTS. Gross
+     * carries its TO-PAR there; net carries the GROSS the net came from, so a
+     * member reads 68 net against 88 gross, and it is TONED BY THE SAME TO-PAR
+     * COLOUR LAW so the law still applies to both scoring boards. Stableford,
+     * improved and birdies have no qualifier, so the column AND its header are
+     * absent and the grid is one column shorter. Decided ONCE per render at
+     * table level (this flag), never per row.
      */
     hasPar: boolean;
+    /** The fourth column's header where hasPar. */
+    parHeader?: string;
+    /** The fourth column's cell where hasPar. */
+    parCell?: (r: CircleRoundRow) => { text: string; tone: string } | null;
     /** §1.2 — the existing ranked list, untouched. */
     ranked: CircleRoundRow[];
-    /** ONE direction flag: only gross is lower-wins. */
+    /**
+     * §1.5 — DERIVED, NOT HARD-CODED: gross and net are lower-wins, the other
+     * three are higher-is-better in their own terms. The pinned row's gap
+     * direction and unit read from this.
+     */
     lowerWins: boolean;
     valueOf: (r: CircleRoundRow) => number;
     /** The VALUE cell's text. */
     format: (r: CircleRoundRow) => string;
     precision: number;
     /** The unit the pinned row's gap carries. */
-    offUnit: 'shots' | 'points' | 'birdies';
+    offUnit: 'shots' | 'points' | 'birdies' | 'cut';
   }
+
+  /** §1.5 — the one place the direction is stated; every spec derives from it. */
+  const LOWER_WINS: BoardKey[] = ['gross', 'net'];
 
   /**
    * §3.1/§3.2 — THE TO-PAR COLOUR LAW, as scoreColor.ts states it and as the
