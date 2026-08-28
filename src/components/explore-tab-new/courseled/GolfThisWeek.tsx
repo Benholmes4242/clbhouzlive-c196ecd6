@@ -1275,129 +1275,57 @@ function GolfThisWeekCard({
         </div>
       </div>
 
-      {/* THE SCORECARD HALF. The well keeps its own container so it still bleeds to
-          the card edges. */}
-      <div style={{ padding: '0 10px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        {/* ===================== THE SCORECARD WELL (§S4) =====================
-            A DARK FEED WELL WITH A HAIRLINE (BRIEF_DARK_ONLY_PART_B §2.2). The
-            boundary is DRAWN rather than implied by a tone. The tint and the
-            border are ALTERNATIVES, not additions.
-            IT RUNS TO THE CARD'S BOTTOM EDGE: the well finishing 10px short of
-            the tile read as an unfinished panel, so the bottom corners take the
-            CARD's radius and the card has no padding beneath it. Its height is
-            fixed whatever it holds, so an empty well keeps the rail level
-            (ACCEPTANCE K, Q). */}
-
-        <div
+      {/* ===================== THE FOOT (§2.1, §3.1) =====================
+          THE SCORECARD BLOCK IS GONE FROM THE CARD, NOT FROM THE APP: the
+          trajectory curve, the OUT/IN rows and the eighteen hole marks are all
+          rendered by CardScorecardSheet, which this card already opens, so
+          nothing moved — the card's copies simply went.
+          THE FOOT'S HEIGHT IS FIXED (§3.4): a card with a reference line and a
+          card without are the same height, and the missing line reserves
+          nothing of its own — the action just sits at the foot's bottom. */}
+      <div
+        style={{
+          height: FOOT_H,
+          flexShrink: 0,
+          boxSizing: 'border-box',
+          padding: '6px 12px 8px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
+        {reference ? (
+          <div
+            style={{
+              fontSize: 11.5,
+              fontWeight: 500,
+              lineHeight: 1.1,
+              color: MID,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {reference}
+          </div>
+        ) : null}
+        <span
           style={{
-            /* THE WELL'S 8px OFFSET MOVED UP INTO THE DARK REGION'S BOTTOM
-               PADDING (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §1) — the row's 8/8
-               now sits inside the dark block, so keeping a margin here as well would
-               add 8px to the tile. The total height is unchanged. */
-            marginTop: 0,
-            marginLeft: -10,
-            marginRight: -10,
-            marginBottom: 0,
-            minHeight: WELL_H,
-            flex: 1,
-            background: WELL,
-            /* §2 (BRIEF_ROUND_TILE_WHITE_WELL, superseding §2 of
-               BRIEF_DISCOVER_FINISHING_PASS) — THE WELL'S EDGE IS DRAWN ON ALL
-               FOUR SIDES. WELL is now the card's colour, so without a boundary the
-               well has no edge at all. The rule is WELL_RULE, the token that
-               already exists for the header line — not a second rule colour.
-               INSET BOX-SHADOW, NOT A BORDER: the well is box-sizing: border-box
-               with a fixed minHeight, so a 1px border would take 2px off the inner
-               height AND 2px off the 244px inner width the marker/gap table in
-               RoundShape is measured at. An inset shadow costs no layout.
-               NOT a darker fill (the markers use `well` as their ring spacer) and
-               NOT an outer shadow (the CARD already carries CARD_SHADOW). */
-            boxShadow: `inset 0 0 0 1px ${WELL_RULE}`,
-
-            borderRadius: `0 0 ${WELL_RADIUS}px ${WELL_RADIUS}px`,
-            padding: `6px ${WELL_PAD_X}px 9px`,
-            boxSizing: 'border-box',
+            ...LABEL,
+            fontSize: 11,
+            color: DISCOVER_QUIET,
+            display: 'inline-flex',
+            alignItems: 'center',
+            alignSelf: 'flex-start',
+            marginTop: 'auto',
+            gap: 2,
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              justifyContent: 'space-between',
-              gap: 6,
-              paddingBottom: 6,
-              borderBottom: `1px solid ${WELL_RULE}`,
-            }}
-          >
-            {/* §3 — the row label darkens to the card's ink with the rest of the
-                chrome. */}
-            <span style={{ ...LABEL, fontSize: 11, color: DISCOVER_QUIET }}>
-              {t('discover.golfThisWeek.moment.theCard', 'The card')}
-            </span>
-            {/* THE TAP AFFORDANCE, ON EVERY CARD (§S4.2). A hero with a hidden
-                scorecard is a card nobody taps. */}
-            <span
-              style={{
-                ...LABEL,
-                fontSize: 11,
-                /* §3 — the action and its chevron darken to the card's ink. */
-                color: DISCOVER_QUIET,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 2,
-              }}
-            >
-              {t('discover.golfThisWeek.moment.fullScorecard', 'Full scorecard')}
-              <ChevronRight size={9} strokeWidth={3} />
-            </span>
-          </div>
-
-          {/* ===================== THE SHAPE (BRIEF_ROUND_TILE_CURVE §2) =========
-              THE EXISTING TrajectoryLine, IMPORTED — not a second curve. Its own
-              colour rules govern and are not overridden: the graded stroke, the
-              level-par fill split, earned red, and gold-only beads. THE WINNER'S
-              GOLD DOES NOT RECOLOUR IT. It uses TrajectoryLine's native
-              per-round self-scaling, matching Clubhouse. The only things this
-              caller supplies are geometry (height, viewWidth, no ticks) and the
-              fills mixed on the well (§A5).
-              NOT "ENERGY", NOT "POWER", NOT "FORM" — THE SHAPE. */}
-          <div style={{ height: SHAPE_BLOCK_H, boxSizing: 'border-box', paddingTop: 4 }}>
-            <div style={{ height: SHAPE_H, position: 'relative' }}>
-              {shape && (
-                <TrajectoryLine
-                  holes={shape.holes}
-                  surface="dark"
-                  height={SHAPE_H}
-                  viewWidth={WELL_INNER}
-                  showTicks={false}
-                  padY={0}
-                  strokeWidth={1.6}
-                  fillOverColor={SHAPE_FILL_OVER}
-                  fillUnderColor={SHAPE_FILL_UNDER}
-                />
-              )}
-            </div>
-          </div>
-
-          <div
-            style={{
-              height: GRID_H,
-              marginTop: 7,
-              paddingBottom: 4,
-              boxSizing: 'border-box',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-            }}
-          >
-            {/* A ROUND WITH NO HOLE DATA RENDERS AN EMPTY WELL (§S1.7, Q) — the
-                height is held so the rail stays level, and there is no
-                placeholder grid. */}
-            <ShapeReveal>{grid}</ShapeReveal>
-          </div>
-        </div>
-
+          {t('discover.golfThisWeek.moment.seeTheCard', 'SEE THE CARD')}
+          <ChevronRight size={9} strokeWidth={3} />
+        </span>
       </div>
+
     </div>
   );
 }
