@@ -913,6 +913,7 @@ function GolfThisWeekCard({
   showFollow,
   isFollowed,
   viewerUserId,
+  reference = null,
   onPress,
 }: CardProps) {
   const { t } = useTranslation('courses');
@@ -921,24 +922,19 @@ function GolfThisWeekCard({
     row.gross != null && row.course_par != null && row.gross - row.course_par < 0;
 
   /* THE SELECTOR IS PURE AND LIVES IN ITS OWN MODULE (§S1.8). A round with no
-     hole data returns PLAIN with no counts, and the well renders empty (§S1.7). */
+     hole data returns PLAIN with no counts. The SHAPE is still read for the
+     moment — the eighteen marks and the curve now live in the sheet (§3.1). */
   const moment = useMemo(
     () => selectMoment(shape?.holes ?? [], row.course_record_fact),
     [shape, row.course_record_fact],
   );
   const label = momentLabel(moment, t as TFn);
   const sentence = momentSentence(moment, t as TFn);
-  const marked = useMemo(() => new Set(moment.markedHoles), [moment.markedHoles]);
 
   const delta = row.delta_index;
   const hasMovement =
     delta != null && Number.isFinite(delta) && Math.abs(delta as number) >= 0.05;
 
-  /* ONE CHART ONLY (§S0.3): the scorecard. `shape === null` renders NOTHING and
-     the well keeps its height — never a placeholder grid (§S1.7). */
-  const grid = shape ? (
-    <MiniScorecard shape={shape} well={WELL} marked={marked} momentTone={moment.tone} />
-  ) : null;
 
 
   return (
