@@ -503,7 +503,6 @@ export function DiscoverHero({
                   label={t('discover.reactions.action', 'Like this round')}
                   tone="glass"
                   size={17}
-                  readOnly={!!row.is_self}
                   hidden={!row.score_id || !reactions.viewerId || reactions.unavailable}
                 />
               </div>
