@@ -272,9 +272,9 @@ void WELL_H;
 /**
  * BRIEF_GOLF_THIS_WEEK_P1_P3 §3.1/§3.4 — THE SCORECARD BLOCK IS BEHIND THE TAP.
  * The card is now hero (132) + member row (35) + the FOOT (44: an optional
- * reference line and the SEE THE CARD action). The foot's height is FIXED, so a
- * card with no reference line and a card with no kicker are the same height and
- * the rail stays level (§3.4).
+ * SEE THE CARD action and the reaction). The foot's height is FIXED and the foot
+ * is PINNED TO THE BOTTOM of the card (BRIEF_ROUND_CARD_STRIP_BACK §S3.3), so
+ * every card's action row sits on the same line whatever is above it.
  */
 const FOOT_H = 44;
 const MEMBER_ROW_H = 35;
@@ -607,7 +607,7 @@ const PHOTO_BOTTOM_SCRIM_H = Math.round(DARK_REGION_H * 0.909);  // 174
    COURSE_GRADIENT's sand bottom stop (#d4c89c) casts beneath the member row.
    The exported constant is untouched; other surfaces use it. */
 const TILE_BOTTOM_SCRIM =
-  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,1) 100%)';
+  'linear-gradient(180deg, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.70) 58%, rgba(0,0,0,0.94) 100%)';
 
 /* NO PHOTO CAP (BRIEF_GOLF_THIS_WEEK_UNCAP §2). Every tile carries its course
    photograph. The old six-tile limit saved requests that were never going to
@@ -1219,12 +1219,12 @@ function GolfThisWeekCard({
           trajectory curve, the OUT/IN rows and the eighteen hole marks are all
           rendered by CardScorecardSheet, which this card already opens, so
           nothing moved — the card's copies simply went.
-          THE FOOT'S HEIGHT IS FIXED (§3.4): a card with a reference line and a
-          card without are the same height, and the missing line reserves
-          nothing of its own — the action just sits at the foot's bottom. */}
+          THE FOOT IS PINNED TO THE BOTTOM (§S3.3) and holds ONLY the action
+          row now: the reference line and its tier ladder are retired. */}
       <div
         style={{
           height: FOOT_H,
+          marginTop: 'auto',
           flexShrink: 0,
           boxSizing: 'border-box',
           padding: '6px 12px 8px',
