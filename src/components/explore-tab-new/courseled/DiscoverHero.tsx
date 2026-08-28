@@ -4,7 +4,6 @@ import { animate, useReducedMotion } from 'framer-motion';
 
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
-import { HERO_CANON_SCRIM } from '@/features/tourhub/_shared/heroGradient';
 import { useMyCourseBests } from '@/features/tourhub/hooks/useMyCourseBests';
 
 
@@ -69,8 +68,36 @@ import type { DiscoverHeroSubject } from './hooks/useDiscoverHero';
  * job" by swapping it for HERO_MIN_H.
  */
 
-/** Full-bleed and tall enough to be the page's opening, not a banner. */
+/** Full-bleed and tall enough to be the page's opening, not a banner (§3.3). */
 const HERO_H = 372;
+
+/* A kind with no tone of its own gets a quiet white rule rather than a borrowed
+   hue. NO NEW HUE EXISTS IN THIS FILE. */
+const RULE_NEUTRAL = 'rgba(255,255,255,0.42)';
+
+/**
+ * THE LOWER-THIRD SCRIM (§3.1-3.2).
+ *
+ * Lighter than the canon ramp because the text now occupies a smaller area and
+ * the action bar carries its own ground: 0 -> 0.10 @38% -> 0.80 @72% -> an
+ * opaque end stop at 100%.
+ *
+ * THE END STOP IS NOT THE CANVAS ANY MORE, and that is the whole of §3.2. The
+ * bottom of the hero is the ACTION BAR, painted at rgba(11,13,18,0.55) OVER the
+ * gradient's own end. Ending on the canvas (#15171F) would composite the bar to
+ * 0.55*(11,13,18) + 0.45*(21,23,31) = rgb(16,18,24) — darker than the canvas
+ * beneath the hero, i.e. a visible seam. So the end stop is lifted to
+ * rgb(33,35,47), the colour that makes the BAR composite to exactly #15171F:
+ *   0.55*(11,13,18) + 0.45*(33,35,47) = (21.0, 23.0, 31.0) = #15171F.
+ * The seam is therefore zero by construction, not by eye, and the canvas — which
+ * is not the thing that moved — is untouched.
+ */
+const LOWER_THIRD_SCRIM =
+  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.10) 38%, rgba(0,0,0,0.80) 72%, rgb(33,35,47) 100%)';
+
+/** The action bar's own ground and its hairline (§1.4). */
+const BAR_GROUND = 'rgba(11,13,18,0.55)';
+const BAR_HAIRLINE = 'rgba(255,255,255,0.10)';
 
 
 /** §4.1 — ~400ms, ease-out, once. */
@@ -165,15 +192,23 @@ export function DiscoverHero({
      THE RUN, which carries the falling-index green through figure and noun, the
      same rule the round tile's MomentFigure applies. */
   const isRun = moment.kind === 'run';
-  const figureColor = isRun
-    ? ROW_DARK_INDEX_FELL
-    : isGrossScore && (moment.facts.toPar ?? 0) < 0
-      ? ROW_DARK_TOPAR_UNDER
-      : DISCOVER_FACT;
 
-  const wordStyle: React.CSSProperties = isRun
-    ? { ...heroWordStyle, color: ROW_DARK_INDEX_FELL }
-    : heroWordStyle;
+  /* THE MOMENT TONE (BRIEF_DISCOVER_HERO_LOWER_THIRD §2.1). It now appears in
+     exactly TWO places — the 2px left rule and the label above it — and NOT on
+     the figure. With a coloured rule doing the identifying, a coloured 60px
+     numeral is the same statement made twice, which is what made the score's
+     colour impossible to settle. No new hue: the run keeps the falling-index
+     green, an under-par record and FINISHED IN THE RED keep the under-par red,
+     and every other kind has no tone of its own, so its rule is a quiet white. */
+  const momentTone = isRun
+    ? ROW_DARK_INDEX_FELL
+    : (isGrossScore && (moment.facts.toPar ?? 0) < 0) || moment.kind === 'finishedInRed'
+      ? ROW_DARK_TOPAR_UNDER
+      : RULE_NEUTRAL;
+
+  /* THE NOUN beside the figure: 16/700, FACT ink, SENTENCE CASE (§1.2). It no
+     longer carries the moment tone — the rule does. */
+  const wordStyle: React.CSSProperties = heroWordStyle;
 
   /* PARITY WITH THE CARDS (BRIEF_DISCOVER_HERO_PARITY §S1, §S2). NO NEW DATA:
      both additions read the score id and course id the subject already carries.
@@ -256,7 +291,7 @@ export function DiscoverHero({
       {/* THE ONE GRADIENT (MICRO_BRIEF_DISCOVER_HERO_CANON_LAYERING §1-2). */}
       <div
         aria-hidden="true"
-        style={{ position: 'absolute', inset: 0, background: HERO_CANON_SCRIM, zIndex: -1 }}
+        style={{ position: 'absolute', inset: 0, background: LOWER_THIRD_SCRIM, zIndex: -1 }}
       />
 
 
@@ -538,12 +573,10 @@ export function DiscoverHero({
 const HERO_FAINT = DISCOVER_QUIET;
 
 const heroWordStyle: React.CSSProperties = {
-
-  fontSize: 14,
+  fontSize: 16,
   fontWeight: 700,
-  letterSpacing: '0.14em',
+  letterSpacing: '-0.01em',
   lineHeight: 1,
-  textTransform: 'uppercase',
   color: DISCOVER_FACT,
 };
 
