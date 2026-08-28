@@ -1079,54 +1079,33 @@ function GolfThisWeekCard({
             justifyContent: 'flex-end',
           }}
         >
-        {/* THE TOP LINE CARRIES ONE THING ONLY — THE COURSE NAME
-            (MICRO_BRIEF_ROUND_CARD_TRUNCATION §1). At 224 wide a line may hold
-            ONE flexible element and nothing that competes with it; the
-            when-chip that used to sit here cost the name ~40px and moved to
-            the foot of the photo band, beside the short figure. */}
         <div
           style={{
             position: 'absolute',
             top: 11,
             left: 12,
             right: 12,
-            fontSize: 11.5,
-            fontWeight: 700,
-            lineHeight: 1.15,
-            letterSpacing: '-0.01em',
-            color: DISCOVER_FACT,
-            /* THE NAME STILL TRUNCATES RATHER THAN WRAPPING (§5): a two-line
-               name would collide with the figure beneath on a fixed-height
-               card — the one accepted clip in the app. */
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
-        </div>
-
-        {/* THE FIGURE AND ITS NOUN (§S3.1) WITH THE WHEN-CHIP AT BOTTOM-RIGHT
-            (MICRO_BRIEF_ROUND_CARD_TRUNCATION §1). The figure is one or two
-            characters, so the room the top line never had lives here. The
-            noun stays: a green 9 with no noun could be anything, and colour
-            says THAT something is notable, never WHAT. The colour rule is
-            unchanged (§S3.2). */}
-        <div
-          style={{
             display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
+            alignItems: 'baseline',
             gap: 8,
-            minWidth: 0,
           }}
         >
-          <FigureLine
-            moment={moment}
-            gross={row.gross ?? null}
-            toParText={toPar?.text ?? null}
-            t={t as TFn}
-          />
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: 11.5,
+              fontWeight: 700,
+              lineHeight: 1.15,
+              letterSpacing: '-0.01em',
+              color: DISCOVER_FACT,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
+          </div>
           <span
             style={{
               flex: 'none',
@@ -1136,13 +1115,21 @@ function GolfThisWeekCard({
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: DISCOVER_QUIET,
-              /* Level with the figure's baseline, not the 46px box bottom. */
-              paddingBottom: 2,
             }}
           >
             {relativeDay(row.play_date, t)}
           </span>
         </div>
+
+        {/* THE FIGURE AND ITS NOUN (§S3.1). The noun stays: a green 9 with no
+            noun could be anything, and colour says THAT something is notable,
+            never WHAT. The colour rule is unchanged (§S3.2). */}
+        <FigureLine
+          moment={moment}
+          gross={row.gross ?? null}
+          toParText={toPar?.text ?? null}
+          t={t as TFn}
+        />
         </div>
 
 
@@ -1239,11 +1226,14 @@ function GolfThisWeekCard({
             )}
           </span>
 
-          {/* FOLLOW IS GONE FROM THIS ROW (MICRO_BRIEF_ROUND_CARD_TRUNCATION
-              §2): the row is avatar, name (the ONE flexible element), gross
-              and to-par — facts, not actions. FOLLOW lives in the action row
-              at the foot, so a card where it renders and a card where it does
-              not have an IDENTICAL member row. */}
+          {showFollow && (
+            <FollowButton
+              targetUserId={row.user_id}
+              isFollowed={isFollowed}
+              viewerUserId={viewerUserId}
+              align="gap"
+            />
+          )}
         </div>
         </div>
       </div>
@@ -1294,30 +1284,15 @@ function GolfThisWeekCard({
             {t('discover.golfThisWeek.moment.seeTheCard', 'SEE THE CARD')}
             <ChevronRight size={9} strokeWidth={3} />
           </span>
-          {/* FOLLOW MOVED HERE FROM THE MEMBER ROW
-              (MICRO_BRIEF_ROUND_CARD_TRUNCATION §2): this row already holds
-              actions and has the room the fact row did not. It renders only
-              where there is something to do, so a followed member's card shows
-              SEE THE CARD + the reaction exactly as before. */}
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
-            {showFollow && (
-              <FollowButton
-                targetUserId={row.user_id}
-                isFollowed={isFollowed}
-                viewerUserId={viewerUserId}
-                align="gap"
-              />
-            )}
-            <ReactionSlot>
-              <ReactionAction
-                hidden={reactionHidden}
-                count={reactionCount}
-                reacted={reactionMine}
-                onToggle={() => onToggleReaction?.()}
-                label={t('discover.reactions.action', 'Like this round')}
-              />
-            </ReactionSlot>
-          </span>
+          <ReactionSlot>
+            <ReactionAction
+              hidden={reactionHidden}
+              count={reactionCount}
+              reacted={reactionMine}
+              onToggle={() => onToggleReaction?.()}
+              label={t('discover.reactions.action', 'Like this round')}
+            />
+          </ReactionSlot>
         </div>
       </div>
 
