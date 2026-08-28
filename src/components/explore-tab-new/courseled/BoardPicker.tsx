@@ -11,14 +11,24 @@
  * board is ACTUALLY rendering (after any fallback), never as a raw selection.
  */
 import React from 'react';
+import { Trophy } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 
-import { A, DISCOVER_FACT, DISCOVER_QUIET, SANS } from './tokens';
+import {
+  AMBER_TINT_04,
+  FONT,
+  INK,
+  INK_ALPHA_45,
+  INK_TINT_07,
+} from '@/features/tourhub/_shared/tokens';
 
-const AMBER = '#F7931E';
-const AMBER_WASH = 'rgba(247,147,30,0.10)';
+/* PARITY WITH THE TOUR PICKER: this sheet borrows the Tour Hub picker's row
+   construction wholesale — 28px logo tile, 13/700 caps title, 12/500 subtitle,
+   right-hand 10/700 status marker, 12x16 padding, 0.5px hairline, amber tint on
+   the active row — so the two pickers read as one control in two places. */
+const SUBTITLE_COLOR = '#8A9099';
 
 export interface BoardCategoryOption<K extends string> {
   key: K;
@@ -26,6 +36,8 @@ export interface BoardCategoryOption<K extends string> {
   label: string;
   /** Short form — retained for callers; unused now the island slot is gone. */
   short: string;
+  /** Second line, the tour picker's tournament-name slot. */
+  subtitle?: string;
   /** How many ranked members this board holds right now. 0 dims the row. */
   count: number;
 }
@@ -60,12 +72,13 @@ export function BoardPicker<K extends string>({
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {options.map((o) => {
           const isActive = o.key === category;
+          const empty = o.count === 0;
           return (
             <button
               key={o.key}
               type="button"
               aria-pressed={isActive}
-              disabled={o.count === 0}
+              disabled={empty}
               onClick={() => {
                 onSelect(o.key);
                 onClose();
@@ -73,34 +86,71 @@ export function BoardPicker<K extends string>({
               style={{
                 /* A board with no qualifiers is DIMMED, never hidden — a picker
                    whose contents change week to week reads as broken. */
-                opacity: o.count === 0 ? 0.35 : 1,
+                opacity: empty ? 0.35 : 1,
                 width: '100%',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                padding: '13px 16px',
-                background: isActive ? AMBER_WASH : 'transparent',
+                padding: '12px 16px',
+                background: isActive ? AMBER_TINT_04 : 'transparent',
                 border: 'none',
-                borderBottom: `0.5px solid ${A.HAIRLINE}`,
-                cursor: o.count === 0 ? 'default' : 'pointer',
+                borderBottom: `0.5px solid ${INK_TINT_07}`,
+                cursor: empty ? 'default' : 'pointer',
                 textAlign: 'left',
-                fontFamily: SANS,
+                fontFamily: FONT,
               }}
             >
-              <span
+              <div
                 style={{
-                  flex: 1,
-                  minWidth: 0,
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: isActive ? AMBER : DISCOVER_FACT,
+                  width: 28,
+                  height: 28,
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 6,
+                  background: INK_TINT_07,
                 }}
               >
-                {o.label}
-              </span>
+                <Trophy size={15} strokeWidth={2.2} color={INK} aria-hidden />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: INK,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {o.label}
+                </div>
+                {o.subtitle ? (
+                  <div
+                    style={{
+                      marginTop: 2,
+                      fontSize: 12,
+                      fontWeight: 500,
+                      color: SUBTITLE_COLOR,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {o.subtitle}
+                  </div>
+                ) : null}
+              </div>
               <span
                 className="tabular-nums"
-                style={{ fontSize: 12, fontWeight: 700, color: DISCOVER_QUIET }}
+                style={{
+                  flexShrink: 0,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  color: INK_ALPHA_45,
+                }}
               >
                 {o.count}
               </span>
@@ -108,6 +158,8 @@ export function BoardPicker<K extends string>({
           );
         })}
       </div>
+
+      <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
     </BottomSheet>
   );
 }

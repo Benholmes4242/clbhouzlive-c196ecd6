@@ -18602,6 +18602,8 @@ export type Database = {
         Returns: {
           actor_avatar_url: string
           actor_display_name: string
+          actor_kind: string
+          actor_route_id: string
           actor_user_id: string
           actor_username: string
           created_at: string
