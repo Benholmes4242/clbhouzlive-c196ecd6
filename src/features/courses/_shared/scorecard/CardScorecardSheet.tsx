@@ -586,145 +586,84 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const statItems: StatItem[] = useMemo(() => {
-    const items: StatItem[] = [];
-    if (totals.played) {
+  /**
+   * BRIEF_ROUND_SHEET_SPLIT §2 — THE RAIL.
+   *
+   * Three facts, three figure-over-label pairs, in this order: rank here,
+   * this round against the member's OTHER rounds here, holes matched or beaten
+   * against the field. ANY FIGURE WHOSE SOURCE IS NULL PUSHES NOTHING — no
+   * cell, no dash — and the rail closes up because it is a flex row.
+   *
+   * THE DERIVATIONS ARE THE ONES THAT WERE BEHIND THE SENTENCES, unchanged:
+   *
+   *  - vs-avg is gated on avgToParOthers being non-null, NOT on roundsHere > 1.
+   *    The null is the honest signal: a member's only round at a course cannot
+   *    be compared with their others, and the RPC returns null for exactly that
+   *    case. othersCount stays Math.max(roundsHere - 1, 1) and is retained as
+   *    the sample size behind the comparison even though the rail no longer
+   *    prints it.
+   *  - the field figure counts strokes <= fieldAvg, so a MATCHED hole counts.
+   *    The denominator is fieldHoles.length (holes with both a score and a
+   *    field average), never 18 and never played.length.
+   *  - rank 1 does not take an ordinal (formatOrdinal(1) -> "1st", which read
+   *    as "1st of 19"). It prints BEST instead, the same correction the
+   *    neutral-best sentence carried.
+   */
+  const rail = useMemo(() => {
+    const items: { key: string; value: string; label: string; tone?: string }[] = [];
+    if (!isTour && courseContext) {
+      const roundsHere = courseContext.roundsHere ?? 0;
+      if (courseContext.rankHere != null && roundsHere > 0) {
+        items.push({
+          key: 'rank',
+          value: courseContext.rankHere === 1
+            ? t('courses:scorecard.figBest')
+            : formatOrdinal(courseContext.rankHere),
+          label: t('courses:scorecard.figOf', { count: roundsHere }),
+        });
+      }
+      const avgOthers = courseContext.avgToParOthers;
+      const othersCount = Math.max(roundsHere - 1, 1);
+      void othersCount;
+      if (avgOthers != null && totals.played) {
+        const diff = Math.round((totals.toPar - avgOthers) * 10) / 10;
+        items.push({
+          key: 'vsavg',
+          value: Math.abs(diff) < 0.05
+            ? 'E'
+            : diff < 0
+              ? `\u2212${Math.abs(diff).toFixed(1)}`
+              : `+${diff.toFixed(1)}`,
+          label: t('courses:scorecard.figVsAvg'),
+          tone: Math.abs(diff) < 0.05 ? EVEN_GRAY : toParColor(diff < 0 ? -1 : 1),
+        });
+      }
+    }
+    if (withField && beatFieldOn != null) {
       items.push({
-        label: isTour ? t('courses:scorecard.round') : t('courses:scorecard.gross'),
-        value: totals.gross,
-      });
-      items.push({
-        label: t('courses:scorecard.toPar'),
-        value: fmtRel(totals.toPar),
-        tone: heroMuted ? EVEN_GRAY : toParColor(totals.toPar),
+        key: 'field',
+        value: `${beatFieldOn}/${fieldHoles.length}`,
+        label: t('courses:scorecard.figBeatField'),
       });
     }
-    if (isTour) {
-      if (fieldRoundTotal != null) {
-        items.push({
-          label: t('courses:scorecard.fieldAvg'),
-          value: (Math.round(fieldRoundTotal * 10) / 10).toFixed(1),
-          sub: t('courses:scorecard.throughN', { n: fieldHoles.length }),
-        });
-      }
-    } else if (courseContext?.yourAvgToPar != null) {
-      const avgHere = courseContext.yourAvgToPar;
-      const parts = toParParts(avgHere);
-      if (parts) {
-        items.push({
-          label: isOwner
-            ? t('courses:scorecard.yourAvgHere')
-            : impersonal
-              // No name: a neutral label, never a bare possessive.
-              ? t('courses:scorecard.avgHereNeutral')
-              : t('courses:scorecard.avgHereOther', { whose: whoseCap }),
-          value: parts.text,
-          // The member's own scoring average is a PLAYER SCORE, so it takes the
-          // to-par rule. The label already says "Your"; amber is not needed to
-          // carry the possessive. Amber means the viewing member, so it belongs
-          // only on the member's own card.
-          tone: isOwner ? A.AMBER_DEEP : toParColor(avgHere),
-          sub: courseContext.roundsHere != null
-            ? t('courses:scorecard.roundsHere', { count: courseContext.roundsHere })
-            : undefined,
-        });
-      }
+    /**
+     * The tour position and the member's handicap index used to sit in the
+     * header's right column. The right column now belongs to the score, so
+     * they join the rail as figures rather than being dropped — the tour caller
+     * passes identityStat and would otherwise lose "T4".
+     */
+    if (identityStat) {
+      items.push({ key: 'identity', value: identityStat.value, label: identityStat.label });
+    } else if (playerHcp != null) {
+      items.push({
+        key: 'hcp',
+        value: formatHcp(playerHcp),
+        label: t('courses:scorecard.handicapIndex'),
+      });
     }
     return items;
-  }, [totals, isTour, heroMuted, fieldRoundTotal, fieldHoles.length, courseContext, isOwner, impersonal, whoseCap, t]);
+  }, [isTour, courseContext, totals, withField, beatFieldOn, fieldHoles.length, identityStat, playerHcp, t]);
 
-  const captions = useMemo(() => {
-    const out: string[] = [];
-    if (!isTour && courseContext) {
-      /*
-       * THE CAPTION COMPARES AGAINST THE OTHER ROUNDS, NOT AN AVERAGE THAT
-       * CONTAINS THIS ROUND. The hero cell keeps the inclusive average — it is
-       * labelled "their average here" and that is what it is. The two figures
-       * differ on one card and that is intended.
-       *
-       * Gated on avg_to_par_others being non-null, not on roundsHere > 1: the
-       * null is the honest signal and cannot drift.
-       */
-      const avgOthers = courseContext.avgToParOthers;
-      const roundsHere = courseContext.roundsHere ?? 0;
-      const othersCount = Math.max(roundsHere - 1, 1);
-      if (avgOthers != null && totals.played) {
-        const diff = totals.toPar - avgOthers;
-        const d = Math.abs(Math.round(diff * 10) / 10);
-        // Impersonal variants carry no subject at all, so a missing name can
-        // never produce a line that opens with an apostrophe.
-        if (d < 0.5) {
-          out.push(impersonal
-            ? t('courses:scorecard.vsOthersLevelNeutral', { count: othersCount })
-            : t('courses:scorecard.vsOthersLevel', { whose, count: othersCount }));
-        } else if (diff < 0) {
-          out.push(impersonal
-            ? t('courses:scorecard.vsOthersBetterNeutral', { n: d.toFixed(1), count: othersCount })
-            : t('courses:scorecard.vsOthersBetter', { n: d.toFixed(1), whose, count: othersCount }));
-        } else {
-          out.push(impersonal
-            ? t('courses:scorecard.vsOthersWorseNeutral', { n: d.toFixed(1), count: othersCount })
-            : t('courses:scorecard.vsOthersWorse', { n: d.toFixed(1), whose, count: othersCount }));
-        }
-      }
-      if (courseContext.rankHere != null && roundsHere > 0) {
-        /*
-         * RANK 1 TAKES NO ORDINAL (BRIEF_SCORECARD_TRAJECTORY_WHOOP §9.3):
-         * formatOrdinal(1) returns "1st", so the caption read "1st best of 2
-         * rounds here". THE RANK ITSELF IS CORRECT - a round belongs in its own
-         * ranking - only the wording changes.
-         */
-        const best = courseContext.rankHere === 1;
-        out.push(impersonal
-          ? best
-            ? t('courses:scorecard.rankHereNeutralBest', { count: roundsHere })
-            : t('courses:scorecard.rankHereNeutral', {
-                ordinal: formatOrdinal(courseContext.rankHere),
-                count: roundsHere,
-              })
-          : best
-            ? t('courses:scorecard.rankHereVoiceBest', { whose: whoseCap, count: roundsHere })
-            : t('courses:scorecard.rankHereVoice', {
-                whose: whoseCap,
-                ordinal: formatOrdinal(courseContext.rankHere),
-                count: roundsHere,
-              }));
-      }
-    }
-    return out;
-  }, [isTour, courseContext, totals, whose, whoseCap, impersonal, t]);
-
-  /**
-   * The caption must state what it measures. Two faults it must not repeat:
-   *
-   *  - The comparison at :485 is `strokes <= fieldAvg`, so a hole MATCHED is
-   *    counted. The words are "matched or beat", never "beat".
-   *  - The denominator is fieldHoles.length: holes with BOTH the member's
-   *    strokes and a field average. When the community lacks data on a hole
-   *    that number falls, which has nothing to do with the round's progress -
-   *    so no form of this caption says "so far". When some scored holes have
-   *    no field average we name the sample instead ("holes with field data").
-   *
-   * The test is fieldHoles.length against played.length, the holes the member
-   * actually scored - NOT 18. A nine-hole round has played.length 9 and is
-   * never described as missing field data for the back nine.
-   *
-   * With no subject to name, use the subject-less form (capital M, no leading
-   * space) rather than interpolating an empty string into "{{who}} matched ...".
-   */
-  const fieldPartial = fieldHoles.length < played.length;
-  const fieldCaption = withField && beatFieldOn != null
-    ? t(
-        (isTour || impersonal)
-          ? (fieldPartial ? 'courses:scorecard.beatFieldOnTourPartial' : 'courses:scorecard.beatFieldOnTour')
-          : (fieldPartial ? 'courses:scorecard.beatFieldVoicePartial' : 'courses:scorecard.beatFieldVoice'),
-        {
-          who: subject,
-          beat: beatFieldOn,
-          scored: fieldHoles.length,
-        },
-      )
-    : null;
 
 
 
