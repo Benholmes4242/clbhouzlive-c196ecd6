@@ -1628,7 +1628,8 @@
       "heading": "[Recent rounds]",
       "you": "[You]",
       "reference": {
-        "fieldDay": "[{{count}} better than the field that day]"
+        "fieldDay": "[{{count}} better than the field that day]",
+        "yourBest": "[Your best here is {{count}}]"
       }
     },
     "week": {

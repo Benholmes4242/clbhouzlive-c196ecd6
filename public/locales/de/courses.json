@@ -1200,7 +1200,8 @@
       "heading": "Letzte Runden",
       "you": "Du",
       "reference": {
-        "fieldDay": "{{count}} besser als das Feld an diesem Tag"
+        "fieldDay": "{{count}} besser als das Feld an diesem Tag",
+        "yourBest": "Deine Bestleistung hier ist {{count}}"
       }
     },
     "week": {
