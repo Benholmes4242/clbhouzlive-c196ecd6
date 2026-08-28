@@ -1336,22 +1336,45 @@ function GolfThisWeekCard({
             {reference}
           </div>
         ) : null}
-        <span
+        {/* THE ACTION ROW (§2.1): SEE THE CARD leads, the reaction sits in the
+            trailing slot. The control's 44px tap target is padding cancelled by
+            a negative margin, so the foot is FOOT_H at every count — 0, 1 or 3
+            digits — and every rail card stays the same height. */}
+        <div
           style={{
-            ...LABEL,
-            fontSize: 11,
-            color: DISCOVER_QUIET,
-            display: 'inline-flex',
-            alignItems: 'center',
-            alignSelf: 'flex-start',
             marginTop: 'auto',
-            gap: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+            minWidth: 0,
           }}
         >
-          {t('discover.golfThisWeek.moment.seeTheCard', 'SEE THE CARD')}
-          <ChevronRight size={9} strokeWidth={3} />
-        </span>
+          <span
+            style={{
+              ...LABEL,
+              fontSize: 11,
+              color: DISCOVER_QUIET,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+            }}
+          >
+            {t('discover.golfThisWeek.moment.seeTheCard', 'SEE THE CARD')}
+            <ChevronRight size={9} strokeWidth={3} />
+          </span>
+          <ReactionSlot>
+            <ReactionAction
+              hidden={reactionHidden}
+              count={reactionCount}
+              reacted={reactionMine}
+              onToggle={() => onToggleReaction?.()}
+              label={t('discover.reactions.action', 'Like this round')}
+            />
+          </ReactionSlot>
+        </div>
       </div>
+
 
     </div>
   );
