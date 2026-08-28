@@ -49,8 +49,6 @@ import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
-import { useMyCourseBests } from '@/features/tourhub/hooks/useMyCourseBests';
-import { buildReferenceLadder, type ReferenceT } from './referenceLadder';
 
 
 import {
@@ -274,9 +272,9 @@ void WELL_H;
 /**
  * BRIEF_GOLF_THIS_WEEK_P1_P3 §3.1/§3.4 — THE SCORECARD BLOCK IS BEHIND THE TAP.
  * The card is now hero (132) + member row (35) + the FOOT (44: an optional
- * reference line and the SEE THE CARD action). The foot's height is FIXED, so a
- * card with no reference line and a card with no kicker are the same height and
- * the rail stays level (§3.4).
+ * SEE THE CARD action and the reaction). The foot's height is FIXED and the foot
+ * is PINNED TO THE BOTTOM of the card (BRIEF_ROUND_CARD_STRIP_BACK §S3.3), so
+ * every card's action row sits on the same line whatever is above it.
  */
 const FOOT_H = 44;
 const MEMBER_ROW_H = 35;
@@ -609,7 +607,7 @@ const PHOTO_BOTTOM_SCRIM_H = Math.round(DARK_REGION_H * 0.909);  // 174
    COURSE_GRADIENT's sand bottom stop (#d4c89c) casts beneath the member row.
    The exported constant is untouched; other surfaces use it. */
 const TILE_BOTTOM_SCRIM =
-  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,1) 100%)';
+  'linear-gradient(180deg, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.70) 58%, rgba(0,0,0,0.94) 100%)';
 
 /* NO PHOTO CAP (BRIEF_GOLF_THIS_WEEK_UNCAP §2). Every tile carries its course
    photograph. The old six-tile limit saved requests that were never going to
@@ -849,12 +847,12 @@ interface CardProps {
   /** §2.2 — read from the SAME cached following-id set that drives showFollow. */
   isFollowed: boolean;
   viewerUserId: string | undefined;
-  /**
-   * §2.1 — THE REFERENCE LINE, already resolved by the section (one tier or
-   * none). A card NEVER fabricates a comparison and reserves no height for a
-   * missing one.
-   */
-  reference?: string | null;
+  /* THE REFERENCE LINE AND ITS TIER LADDER ARE RETIRED
+     (BRIEF_ROUND_CARD_STRIP_BACK §S2.3). The board directly above does all the
+     comparing, so the card carries none: the prop, the derivation and the
+     batched get_my_course_bests read are DELETED, not disabled. Do not
+     reinstate — MICRO_BRIEF_REFERENCE_TIER_B is WITHDRAWN. */
+
   onPress: () => void;
   /**
    * REACTIONS (BRIEF_GOLF_THIS_WEEK_P2): resolved by the section from ONE
@@ -895,7 +893,6 @@ function GolfThisWeekCard({
   showFollow,
   isFollowed,
   viewerUserId,
-  reference = null,
   onPress,
   reactionCount = 0,
   reactionMine = false,
@@ -915,8 +912,11 @@ function GolfThisWeekCard({
     () => selectMoment(shape?.holes ?? [], row.course_record_fact),
     [shape, row.course_record_fact],
   );
-  const label = momentLabel(moment, t as TFn);
-  const sentence = momentSentence(moment, t as TFn);
+  /* THE KICKER AND THE MOMENT SENTENCE COME OFF THE CARD (BRIEF_ROUND_CARD_
+     STRIP_BACK §S2). momentLabel/momentSentence remain exported here and are
+     now UNCALLED — reported, left in place rather than deleted blind, since the
+     templates are the single home of the moment copy. */
+
 
   const delta = row.delta_index;
   const hasMovement =
@@ -1036,126 +1036,79 @@ function GolfThisWeekCard({
               }}
             />
         </>
-        {/* THE HERO'S OWN CONTENT BOX. HERO_H is unchanged (156) — §1 extends
-            the dark REGION, not the hero's content box. */}
+        {/* THE HERO'S OWN CONTENT BOX (BRIEF_ROUND_CARD_STRIP_BACK §S1).
+            THE COURSE NAME PINS TO THE TOP, absolutely, with the when-chip on
+            the same line at the right; THE FIGURE ANCHORS TO THE BOTTOM. They
+            are in separate layers, so however long the course name runs it can
+            never share a line with the figure — the collision Ben saw.
+            THE KICKER AND THE MOMENT SENTENCE ARE GONE (§S2.1, §S2.2): the
+            kicker said what the figure's noun already says, and the sentence
+            restated the figure in words. */}
         <div
           style={{
             height: HERO_H,
             flexShrink: 0,
+            position: 'relative',
             padding: '11px 12px 11px',
+            boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
+            justifyContent: 'flex-end',
           }}
         >
-        {/* §S2.3 — course, region beneath, the day top-right. */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 12.5,
-                fontWeight: 700,
-                lineHeight: 1.15,
-                letterSpacing: '-0.01em',
-                 color: DISCOVER_FACT,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
-            </div>
-            {region && (
-              <div
-                style={{
-                  marginTop: 2,
-                  fontSize: 11,
-                  fontWeight: 600,
-                  lineHeight: 1,
-                   color: DISCOVER_QUIET,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {region}
-              </div>
-            )}
+        <div
+          style={{
+            position: 'absolute',
+            top: 11,
+            left: 12,
+            right: 12,
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 8,
+          }}
+        >
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: 11.5,
+              fontWeight: 700,
+              lineHeight: 1.15,
+              letterSpacing: '-0.01em',
+              color: DISCOVER_FACT,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
           </div>
           <span
             style={{
-              flexShrink: 0,
+              flex: 'none',
               fontSize: 11,
               fontWeight: 700,
               lineHeight: 1,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-               color: DISCOVER_QUIET,
+              color: DISCOVER_QUIET,
             }}
           >
             {relativeDay(row.play_date, t)}
           </span>
         </div>
 
-        <div style={{ flex: 1 }} />
-
-        {/* §S2.4 — THREE STACKED LINES, read top to bottom.
-            THE LABEL IS AN EYEBROW, NOT A CLAUSE (§S2.5). It previously sat
-            ALONGSIDE the sentence and the two read as one run-on — "THE RUN Par
-            or better". A label is a heading, so it sits on its own line above
-            the figure and the sentence sits below it.
-            THE PLAIN CARD HAS NO LABEL AT ALL (§S2.7). */}
-        {label && (
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              lineHeight: 1,
-              marginBottom: 5,
-              /* §5.1 — the moment eyebrow loses its tone: PhotoBand's own label
-                 white-at-alpha, not a new value. The moments are distinguished
-                 by their WORDS now. TWO EXCEPTIONS: THE RUN carries the same
-                 green as a falling handicap index delta; FINISHED IN THE RED
-                 carries the same under-par red as the tile's to-par figure. */
-              color:
-                moment.kind === 'run'
-                  ? ROW_DARK_INDEX_FELL
-                  : moment.kind === 'finishedInRed'
-                    ? ROW_DARK_TOPAR_UNDER
-                    : DISCOVER_QUIET,
-            }}
-          >
-            {label}
-          </div>
-        )}
-
+        {/* THE FIGURE AND ITS NOUN (§S3.1). The noun stays: a green 9 with no
+            noun could be anything, and colour says THAT something is notable,
+            never WHAT. The colour rule is unchanged (§S3.2). */}
         <FigureLine
           moment={moment}
           gross={row.gross ?? null}
           toParText={toPar?.text ?? null}
           t={t as TFn}
         />
+        </div>
 
-        {/* THE SENTENCE, at the very bottom of the hero, from a fixed template.
-            IT NEVER REPEATS THE FIGURE (§S2.8): the figure states, the sentence
-            explains. */}
-        <div
-          style={{
-            marginTop: 7,
-            fontSize: 11,
-            fontWeight: 500,
-            lineHeight: 1.3,
-            color: DISCOVER_FACT,
-            display: '-webkit-box',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
-            overflow: 'hidden',
-          }}
-        >
-          {sentence}
-        </div>
-        </div>
 
         {/* THE MEMBER ROW, NOW INSIDE THE DARK REGION (§1, §2). Its STRUCTURE,
             sizes, weights, padding and 7px gap are untouched — only the colours
@@ -1267,12 +1220,12 @@ function GolfThisWeekCard({
           trajectory curve, the OUT/IN rows and the eighteen hole marks are all
           rendered by CardScorecardSheet, which this card already opens, so
           nothing moved — the card's copies simply went.
-          THE FOOT'S HEIGHT IS FIXED (§3.4): a card with a reference line and a
-          card without are the same height, and the missing line reserves
-          nothing of its own — the action just sits at the foot's bottom. */}
+          THE FOOT IS PINNED TO THE BOTTOM (§S3.3) and holds ONLY the action
+          row now: the reference line and its tier ladder are retired. */}
       <div
         style={{
           height: FOOT_H,
+          marginTop: 'auto',
           flexShrink: 0,
           boxSizing: 'border-box',
           padding: '6px 12px 8px',
@@ -1281,21 +1234,6 @@ function GolfThisWeekCard({
           justifyContent: 'space-between',
         }}
       >
-        {reference ? (
-          <div
-            style={{
-              fontSize: 11.5,
-              fontWeight: 500,
-              lineHeight: 1.1,
-              color: MID,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {reference}
-          </div>
-        ) : null}
         {/* THE ACTION ROW (§2.1): SEE THE CARD leads, the reaction sits in the
             trailing slot. The control's 44px tap target is padding cancelled by
             a negative margin, so the foot is FOOT_H at every count — 0, 1 or 3
@@ -1433,24 +1371,10 @@ export function GolfThisWeek({
   const reactions = useContentReactions(reactionTargets);
 
 
-  /* PERSONAL HISTORY (BRIEF_ROUND_CARD_REFERENCE_LINE §S1): ONE batched
-     get_my_course_bests read for the whole visible window, keyed by the sorted,
-     deduped course-id set. A course absent from the map was never played. */
-  const windowCourseIds = useMemo(() => ordered.map((r) => r.course_id), [ordered]);
-  const myBests = useMyCourseBests(windowCourseIds, userId);
-
-  /**
-   * §2 — THE REFERENCE LINE, from the SHARED LADDER
-   * (BRIEF_DISCOVER_HERO_PARITY §2.4). The tier order, the is_self gate, the
-   * rounds_here >= 4 floor, the strictly-positive (b) margin and the field gate
-   * all live in referenceLadder.ts, so the hero above prints the same line for
-   * the same round. Do not reimplement any of it here.
-   */
-  const referenceByRound = useMemo(
-    () => buildReferenceLadder(ordered, myBests, t as ReferenceT),
-    [ordered, myBests, t],
-  );
-
+  /* THE PERSONAL-HISTORY READ IS GONE (BRIEF_ROUND_CARD_STRIP_BACK §S2.3/§2.4).
+     The batched get_my_course_bests hook and the shared tier ladder are no
+     longer consumed by this surface; the board above does the comparing. The
+     code is DELETED rather than left behind a false conditional. */
 
   /* NO INSIGHT MAP. The tile's prose is the MOMENT SENTENCE, generated from a
      fixed template per kind inside the card (BRIEF_ROUND_TILE_THE_MOMENT §S4.3).
@@ -2473,7 +2397,6 @@ export function GolfThisWeek({
               showFollow={!r.is_self && !!userId && !!following.data}
               isFollowed={!!following.data?.has(r.user_id)}
               viewerUserId={userId}
-              reference={referenceByRound.get(r.round_id) ?? null}
               onPress={() => onCardPress(r)}
               /* §S1.2/§2.4 — target is the whs_score id, and the control renders
                  on your OWN round too (the trigger already skips self-notify). */
