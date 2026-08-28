@@ -13,7 +13,6 @@ import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
-import { PodiumAvatarRing } from './PodiumAvatarRing';
 
 
 /**
