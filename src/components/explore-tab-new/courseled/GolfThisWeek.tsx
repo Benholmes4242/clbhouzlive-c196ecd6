@@ -1355,6 +1355,10 @@ export function GolfThisWeek({
   const scopeCourses = useWeekScopeCourses(userId, scope);
   const roundsQuery = useGolfThisWeek(userId, scope, scopeCourses.courseIds);
   const all = roundsQuery.data ?? [];
+  /* §2.2b — THE SAME INDEX SOURCE AS THE HANDICAP BAND: eg_handicap_index with
+     manual_handicap_index as the fallback. Read here (before any early return)
+     so the rotation can lean on it; a null index is a valid answer (§2.2c). */
+  const viewerIndex = useViewerHandicapIndex(userId).index;
 
   const courseIds = useMemo(
     () => all.map((r) => r.course_id).filter((v): v is string => !!v),
