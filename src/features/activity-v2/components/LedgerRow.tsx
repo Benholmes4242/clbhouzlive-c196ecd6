@@ -303,8 +303,11 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
     if (!id) return null;
     return getActorRouteByType(row.actor_kind ?? 'personal', id);
   })();
+  /* stopPropagation: the row itself is tappable, so an avatar tap must not also
+     fire the row's own destination. */
   const goToActor = actorRoute
-    ? () => {
+    ? (e?: React.MouseEvent) => {
+        e?.stopPropagation();
         if (heldRef.current) return;
         navigate(actorRoute, row.actor_kind === 'business' ? { state: { source: 'activity' } } : undefined);
       }
