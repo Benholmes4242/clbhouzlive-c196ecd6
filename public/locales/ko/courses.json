@@ -194,7 +194,12 @@
     "vsAvgWorse": "{{n}} shots worse than {{whose}} average here.",
     "vsAvgLevelNeutral": "Right on the average here.",
     "vsAvgBetterNeutral": "{{n}} shots better than the average here.",
-    "vsAvgWorseNeutral": "{{n}} shots worse than the average here."
+    "vsAvgWorseNeutral": "{{n}} shots worse than the average here.",
+    "theCard": "THE CARD",
+    "figBest": "BEST",
+    "figOf": "OF {{count}}",
+    "figVsAvg": "VS AVG",
+    "figBeatField": "BEAT FIELD"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",

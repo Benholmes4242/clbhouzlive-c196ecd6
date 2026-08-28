@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, Table } from 'lucide-react';
 
@@ -17,7 +17,6 @@ import { formatOrdinal } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
   A, SANS, FIGS, NUM, KICKER, Panel, StatRow, Action, Hairline,
-  toParParts, type StatItem,
 } from '@/features/courses/components/holes/analytical/tokens';
 import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
@@ -27,8 +26,12 @@ import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS } from '@/lib/tokens/typ
  */
 const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.MUTE };
 const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
-/** Panel headings sit below the sheet title: same role, 13px as before. */
-const SECTION_TITLE: React.CSSProperties = { ...TITLE, fontSize: 13 };
+/*
+ * BRIEF_ROUND_SHEET_SPLIT §3.4 — SECTION TITLES ARE CAPS-TRACKED LABELS.
+ * The sentence-case SECTION_TITLE role is gone: each panel passes `kicker`, the
+ * app's caps-tracked panel label, so these sections read like every other
+ * section in the app rather than like headings unique to this sheet.
+ */
 
 /**
  * MICRO_BRIEF_SHEETS_TYPE_SCALE — TWO LOCAL LABEL ROLES.
@@ -47,12 +50,13 @@ const LABEL_READ: React.CSSProperties = { ...LABEL, fontSize: 11 };
 
 const CAPTION: React.CSSProperties = { fontSize: 12.5, lineHeight: 1.5, color: A.MUTE, margin: 0 };
 /**
- * THE TWO SENTENCES are the best copy in the sheet and must read LIGHTER than
- * the figures they explain: BODY 12/600, never a figure weight.
+ * BRIEF_ROUND_SHEET_SPLIT §2 — THE THREE SENTENCES BECAME THREE FIGURES.
+ * The prose SENTENCE role is gone: nothing in this sheet names the member in a
+ * sentence any more. The figure rail below the summary carries the same facts
+ * as figure-over-label pairs, and every derivation behind them is unchanged.
  */
-const SENTENCE: React.CSSProperties = {
-  fontSize: 12, fontWeight: 600, lineHeight: 1.45, color: A.BODY, margin: 0,
-};
+const RAIL_FIG: React.CSSProperties = { ...NUM, fontSize: 15, lineHeight: 1.05 };
+
 
 /*
  * The chart legend keys and FIELD_LINE_SWATCH are GONE
@@ -538,34 +542,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const isTour = surface === 'tour';
   const { user } = useSupabaseSession();
   /**
-   * VOICE — this sheet opens over other members' rounds from the Clubhouse feed
-   * as often as over the viewer's own history, so running copy must not claim a
-   * stranger's round as theirs. Derived, never passed: a caller that forgets the
-   * prop would silently produce the wrong (and worse) reading. When ownership
-   * cannot be resolved we fall to the third person.
+   * OWNERSHIP is still derived, never passed — it drives the amber own-member
+   * rule on the member row and the card's score-column stub. The VOICE
+   * machinery (possessives, impersonal fallbacks, subject slots) is gone with
+   * the sentences: a figure rail has no subject to name, so an empty
+   * playerName can no longer produce a bare apostrophe anywhere.
    */
   const isOwner = !isTour && !!playerUserId && !!user?.id && playerUserId === user.id;
-  const firstName = (playerName || '').trim().split(/\s+/)[0] ?? '';
-  /**
-   * NO NAME IS A STATE, NOT AN EMPTY STRING. An empty or whitespace-only
-   * playerName must NEVER be poured into a possessive or a subject slot: the
-   * result renders as a bare apostrophe ("'s average here") or as a leading
-   * space followed by a lowercase verb (" beat the field average"). This sheet
-   * has more than one caller and will acquire more, so it defends itself here
-   * rather than trusting every caller to pass a name. With no name and no
-   * ownership we use the IMPERSONAL forms, which read correctly with no subject.
-   */
-  const hasName = firstName.trim().length > 0;
-  // A first name already ending in s takes a bare apostrophe: "James' average".
-  const namePossessive = /s$/i.test(firstName) ? `${firstName}\u2019` : `${firstName}\u2019s`;
-  /** Impersonal voice: no owner and no name to speak of. */
-  const impersonal = !isOwner && !hasName;
-  const subject = isOwner ? t('courses:scorecard.voiceYou') : firstName;
-  const whose = isOwner ? t('courses:scorecard.voiceYour') : namePossessive;
-  const whoseCap = isOwner ? t('courses:scorecard.voiceYourCap') : namePossessive;
 
-  const [showCard, setShowCard] = useState(false);
-  useEffect(() => { if (!open) setShowCard(false); }, [open]);
 
   const played = useMemo(
     () => holes.filter((h) => h.strokes != null && h.strokes > 0 && h.par != null),
@@ -605,145 +589,84 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const statItems: StatItem[] = useMemo(() => {
-    const items: StatItem[] = [];
-    if (totals.played) {
+  /**
+   * BRIEF_ROUND_SHEET_SPLIT §2 — THE RAIL.
+   *
+   * Three facts, three figure-over-label pairs, in this order: rank here,
+   * this round against the member's OTHER rounds here, holes matched or beaten
+   * against the field. ANY FIGURE WHOSE SOURCE IS NULL PUSHES NOTHING — no
+   * cell, no dash — and the rail closes up because it is a flex row.
+   *
+   * THE DERIVATIONS ARE THE ONES THAT WERE BEHIND THE SENTENCES, unchanged:
+   *
+   *  - vs-avg is gated on avgToParOthers being non-null, NOT on roundsHere > 1.
+   *    The null is the honest signal: a member's only round at a course cannot
+   *    be compared with their others, and the RPC returns null for exactly that
+   *    case. othersCount stays Math.max(roundsHere - 1, 1) and is retained as
+   *    the sample size behind the comparison even though the rail no longer
+   *    prints it.
+   *  - the field figure counts strokes <= fieldAvg, so a MATCHED hole counts.
+   *    The denominator is fieldHoles.length (holes with both a score and a
+   *    field average), never 18 and never played.length.
+   *  - rank 1 does not take an ordinal (formatOrdinal(1) -> "1st", which read
+   *    as "1st of 19"). It prints BEST instead, the same correction the
+   *    neutral-best sentence carried.
+   */
+  const rail = useMemo(() => {
+    const items: { key: string; value: string; label: string; tone?: string }[] = [];
+    if (!isTour && courseContext) {
+      const roundsHere = courseContext.roundsHere ?? 0;
+      if (courseContext.rankHere != null && roundsHere > 0) {
+        items.push({
+          key: 'rank',
+          value: courseContext.rankHere === 1
+            ? t('courses:scorecard.figBest')
+            : formatOrdinal(courseContext.rankHere),
+          label: t('courses:scorecard.figOf', { count: roundsHere }),
+        });
+      }
+      const avgOthers = courseContext.avgToParOthers;
+      const othersCount = Math.max(roundsHere - 1, 1);
+      void othersCount;
+      if (avgOthers != null && totals.played) {
+        const diff = Math.round((totals.toPar - avgOthers) * 10) / 10;
+        items.push({
+          key: 'vsavg',
+          value: Math.abs(diff) < 0.05
+            ? 'E'
+            : diff < 0
+              ? `\u2212${Math.abs(diff).toFixed(1)}`
+              : `+${diff.toFixed(1)}`,
+          label: t('courses:scorecard.figVsAvg'),
+          tone: Math.abs(diff) < 0.05 ? EVEN_GRAY : toParColor(diff < 0 ? -1 : 1),
+        });
+      }
+    }
+    if (withField && beatFieldOn != null) {
       items.push({
-        label: isTour ? t('courses:scorecard.round') : t('courses:scorecard.gross'),
-        value: totals.gross,
-      });
-      items.push({
-        label: t('courses:scorecard.toPar'),
-        value: fmtRel(totals.toPar),
-        tone: heroMuted ? EVEN_GRAY : toParColor(totals.toPar),
+        key: 'field',
+        value: `${beatFieldOn}/${fieldHoles.length}`,
+        label: t('courses:scorecard.figBeatField'),
       });
     }
-    if (isTour) {
-      if (fieldRoundTotal != null) {
-        items.push({
-          label: t('courses:scorecard.fieldAvg'),
-          value: (Math.round(fieldRoundTotal * 10) / 10).toFixed(1),
-          sub: t('courses:scorecard.throughN', { n: fieldHoles.length }),
-        });
-      }
-    } else if (courseContext?.yourAvgToPar != null) {
-      const avgHere = courseContext.yourAvgToPar;
-      const parts = toParParts(avgHere);
-      if (parts) {
-        items.push({
-          label: isOwner
-            ? t('courses:scorecard.yourAvgHere')
-            : impersonal
-              // No name: a neutral label, never a bare possessive.
-              ? t('courses:scorecard.avgHereNeutral')
-              : t('courses:scorecard.avgHereOther', { whose: whoseCap }),
-          value: parts.text,
-          // The member's own scoring average is a PLAYER SCORE, so it takes the
-          // to-par rule. The label already says "Your"; amber is not needed to
-          // carry the possessive. Amber means the viewing member, so it belongs
-          // only on the member's own card.
-          tone: isOwner ? A.AMBER_DEEP : toParColor(avgHere),
-          sub: courseContext.roundsHere != null
-            ? t('courses:scorecard.roundsHere', { count: courseContext.roundsHere })
-            : undefined,
-        });
-      }
+    /**
+     * The tour position and the member's handicap index used to sit in the
+     * header's right column. The right column now belongs to the score, so
+     * they join the rail as figures rather than being dropped — the tour caller
+     * passes identityStat and would otherwise lose "T4".
+     */
+    if (identityStat) {
+      items.push({ key: 'identity', value: identityStat.value, label: identityStat.label });
+    } else if (playerHcp != null) {
+      items.push({
+        key: 'hcp',
+        value: formatHcp(playerHcp),
+        label: t('courses:scorecard.handicapIndex'),
+      });
     }
     return items;
-  }, [totals, isTour, heroMuted, fieldRoundTotal, fieldHoles.length, courseContext, isOwner, impersonal, whoseCap, t]);
+  }, [isTour, courseContext, totals, withField, beatFieldOn, fieldHoles.length, identityStat, playerHcp, t]);
 
-  const captions = useMemo(() => {
-    const out: string[] = [];
-    if (!isTour && courseContext) {
-      /*
-       * THE CAPTION COMPARES AGAINST THE OTHER ROUNDS, NOT AN AVERAGE THAT
-       * CONTAINS THIS ROUND. The hero cell keeps the inclusive average — it is
-       * labelled "their average here" and that is what it is. The two figures
-       * differ on one card and that is intended.
-       *
-       * Gated on avg_to_par_others being non-null, not on roundsHere > 1: the
-       * null is the honest signal and cannot drift.
-       */
-      const avgOthers = courseContext.avgToParOthers;
-      const roundsHere = courseContext.roundsHere ?? 0;
-      const othersCount = Math.max(roundsHere - 1, 1);
-      if (avgOthers != null && totals.played) {
-        const diff = totals.toPar - avgOthers;
-        const d = Math.abs(Math.round(diff * 10) / 10);
-        // Impersonal variants carry no subject at all, so a missing name can
-        // never produce a line that opens with an apostrophe.
-        if (d < 0.5) {
-          out.push(impersonal
-            ? t('courses:scorecard.vsOthersLevelNeutral', { count: othersCount })
-            : t('courses:scorecard.vsOthersLevel', { whose, count: othersCount }));
-        } else if (diff < 0) {
-          out.push(impersonal
-            ? t('courses:scorecard.vsOthersBetterNeutral', { n: d.toFixed(1), count: othersCount })
-            : t('courses:scorecard.vsOthersBetter', { n: d.toFixed(1), whose, count: othersCount }));
-        } else {
-          out.push(impersonal
-            ? t('courses:scorecard.vsOthersWorseNeutral', { n: d.toFixed(1), count: othersCount })
-            : t('courses:scorecard.vsOthersWorse', { n: d.toFixed(1), whose, count: othersCount }));
-        }
-      }
-      if (courseContext.rankHere != null && roundsHere > 0) {
-        /*
-         * RANK 1 TAKES NO ORDINAL (BRIEF_SCORECARD_TRAJECTORY_WHOOP §9.3):
-         * formatOrdinal(1) returns "1st", so the caption read "1st best of 2
-         * rounds here". THE RANK ITSELF IS CORRECT - a round belongs in its own
-         * ranking - only the wording changes.
-         */
-        const best = courseContext.rankHere === 1;
-        out.push(impersonal
-          ? best
-            ? t('courses:scorecard.rankHereNeutralBest', { count: roundsHere })
-            : t('courses:scorecard.rankHereNeutral', {
-                ordinal: formatOrdinal(courseContext.rankHere),
-                count: roundsHere,
-              })
-          : best
-            ? t('courses:scorecard.rankHereVoiceBest', { whose: whoseCap, count: roundsHere })
-            : t('courses:scorecard.rankHereVoice', {
-                whose: whoseCap,
-                ordinal: formatOrdinal(courseContext.rankHere),
-                count: roundsHere,
-              }));
-      }
-    }
-    return out;
-  }, [isTour, courseContext, totals, whose, whoseCap, impersonal, t]);
-
-  /**
-   * The caption must state what it measures. Two faults it must not repeat:
-   *
-   *  - The comparison at :485 is `strokes <= fieldAvg`, so a hole MATCHED is
-   *    counted. The words are "matched or beat", never "beat".
-   *  - The denominator is fieldHoles.length: holes with BOTH the member's
-   *    strokes and a field average. When the community lacks data on a hole
-   *    that number falls, which has nothing to do with the round's progress -
-   *    so no form of this caption says "so far". When some scored holes have
-   *    no field average we name the sample instead ("holes with field data").
-   *
-   * The test is fieldHoles.length against played.length, the holes the member
-   * actually scored - NOT 18. A nine-hole round has played.length 9 and is
-   * never described as missing field data for the back nine.
-   *
-   * With no subject to name, use the subject-less form (capital M, no leading
-   * space) rather than interpolating an empty string into "{{who}} matched ...".
-   */
-  const fieldPartial = fieldHoles.length < played.length;
-  const fieldCaption = withField && beatFieldOn != null
-    ? t(
-        (isTour || impersonal)
-          ? (fieldPartial ? 'courses:scorecard.beatFieldOnTourPartial' : 'courses:scorecard.beatFieldOnTour')
-          : (fieldPartial ? 'courses:scorecard.beatFieldVoicePartial' : 'courses:scorecard.beatFieldVoice'),
-        {
-          who: subject,
-          beat: beatFieldOn,
-          scored: fieldHoles.length,
-        },
-      )
-    : null;
 
 
 
@@ -817,102 +740,114 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
     >
       <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>
         {/*
-          HEADER — DATE / COURSE / REGION / MEMBER / ACTIONS
-          (BRIEF_SCORECARD_SHEET_HEADER, option B with ACTIONS UP).
+          S1 — THE FIXED SUMMARY (BRIEF_ROUND_SHEET_SPLIT).
 
-          The identity and the two actions used to sit at the BOTTOM of the
-          sheet, below the trajectory, the grid, the key and the breakdown — so a
-          member scrolled a whole scorecard to learn whose round it was. They are
-          header rows now. This also serves :722: the card's score-column label
-          is blank in the third person because the reader is told the name
-          ABOVE the card, which only works if the name is above it.
+          The score used to appear only at the FOOT of the expanded grid, after a
+          date, a course, a handicap index and two links. It is now the first
+          thing on the sheet and it does not scroll: the card, the breakdown and
+          the chart scroll beneath this block.
 
-          THE COURSE KEEPS THE FULL WIDTH ON ITS OWN LINE. That is why B was
-          chosen over the split layout: nothing sits beside the course name and
-          nothing competes with it for horizontal space, so the parenthetical
-          that separates East from West survives.
-
-          NO TILE. The identity was a Panel because it was a standalone block at
-          the end of a scroll; in the header it is part of the header — no panel,
-          no border, no separate ground, one hairline above it.
+          DISMISS IS SAFE. BottomSheet binds its touch drag handlers to the
+          GRABBER ROW ONLY, not to the sheet body, so a non-scrolling header
+          inside the sheet cannot capture the dismiss gesture. This block sits
+          BELOW that grabber and never sees those events.
         */}
-        <div style={{ padding: '10px 16px 12px', background: A.CANVAS, borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
-          <div style={{ minWidth: 0 }}>
-            {!!eyebrowText && (
-               <div style={{ ...KICKER, color: A.MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {eyebrowText}
-              </div>
-            )}
-            <div
-              style={{
-                ...TITLE, marginTop: 3, lineHeight: 1.22,
-                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-              }}
-            >
-              {courseName}
-            </div>
-            {courseLocation && (
-              <div style={{ fontSize: 12.5, color: A.MUTE, marginTop: 2 }}>{courseLocation}</div>
-            )}
-          </div>
-
-          {(showIdentity || onShareRound || onViewProfile || onViewCourse) && (
-            <Hairline style={{ margin: '10px 0 0' }} />
-          )}
-
-          {/* MEMBER ROW. With NO NAME this does not render at all — no avatar,
-              no placeholder, no avatar-shaped hole — and the actions row falls
-              directly under the region, still beneath its hairline. */}
-          {showIdentity && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
-              <SquircleAvatar
-                src={playerAvatarUrl ?? null}
-                alt={playerName}
-                userId={playerUserId ?? undefined}
-                size={34}
-                hairlineRing
-              />
-              {/* The name is the ONLY elastic cell: minWidth 0 + ellipsis, so a
-                  long display name yields to the figure rather than pushing it
-                  off. The figure column is auto and never shrinks. */}
+        <div
+          style={{
+            padding: '12px 16px 10px',
+            background: A.PANEL,
+            borderBottom: `1px solid ${A.BORDER}`,
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+            {/* LEFT — date, course, member */}
+            <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+              {!!eyebrowText && (
+                <div style={{ ...KICKER, color: A.MUTE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {eyebrowText}
+                </div>
+              )}
               <div
                 style={{
-                  flex: '1 1 auto', minWidth: 0,
-                  fontSize: 13.5, fontWeight: 700,
-                  color: isOwner ? A.AMBER : A.INK,
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  fontSize: 16, fontWeight: 700, color: A.INK, marginTop: 3, lineHeight: 1.22,
+                  display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                 }}
-                title={isOwner ? undefined : playerName}
               >
-                {/* OWN ROUND (§3, option b): the app's viewing-member marker,
-                    amber "You", with the avatar kept. The row's shape is
-                    identical in both cases. */}
-                {isOwner ? t('courses:scorecard.voiceYou') : playerName}
+                {courseName}
               </div>
-              {(identityStat || playerHcp != null) && (
-                <div style={{ flex: 'none', textAlign: 'right' }}>
-                  <div style={{ ...NUM, fontSize: 20, color: A.INK, lineHeight: 1.05 }}>
-                    {identityStat ? identityStat.value : formatHcp(playerHcp as number)}
-                  </div>
-                  <div style={{ ...LABEL, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
-                    <span>{identityStat ? identityStat.label : t('courses:scorecard.handicapIndex')}</span>
-                    {!identityStat && showChip && <HandicapChip delta={playerHcpDelta as number} />}
-                  </div>
+              {courseLocation && (
+                <div style={{ fontSize: 12, color: A.MUTE, marginTop: 2 }}>{courseLocation}</div>
+              )}
+              {/* MEMBER ROW. With NO NAME nothing renders — no avatar, no
+                  avatar-shaped hole. Amber marks the viewer's own round. */}
+              {showIdentity && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, minWidth: 0 }}>
+                  <SquircleAvatar
+                    src={playerAvatarUrl ?? null}
+                    alt={playerName}
+                    userId={playerUserId ?? undefined}
+                    size={22}
+                    hairlineRing
+                  />
+                  <span
+                    style={{
+                      fontSize: 12.5, fontWeight: 700,
+                      color: isOwner ? A.AMBER : A.INK,
+                      minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}
+                    title={playerName}
+                  >
+                    {playerName}
+                  </span>
+                  {showChip && <HandicapChip delta={playerHcpDelta as number} />}
                 </div>
               )}
             </div>
-          )}
 
-          {(onShareRound || onViewProfile || onViewCourse) && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', marginTop: showIdentity ? 4 : 8 }}>
-              {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} align="left" />}
-              {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} align="left" />}
-              {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} align="left" />}
-            </div>
+            {/* RIGHT — THE SCORE. Visible the moment the sheet opens. */}
+            {totals.played && (
+              <div style={{ flex: 'none', textAlign: 'right' }}>
+                <div
+                  style={{
+                    ...NUM, fontSize: 38, fontWeight: 800, lineHeight: 0.9,
+                    letterSpacing: '-0.05em', color: A.INK,
+                  }}
+                >
+                  {totals.gross}
+                </div>
+                <div
+                  style={{
+                    ...NUM, fontSize: 13, marginTop: 6,
+                    color: heroMuted ? EVEN_GRAY : toParColor(totals.toPar),
+                  }}
+                >
+                  {fmtRel(totals.toPar)}
+                </div>
+                {(cardTotalPar > 0 || coursePar != null) && (
+                  <div style={{ ...LABEL_READ, marginTop: 3 }}>
+                    {t('courses:scorecard.parN', { n: cardTotalPar > 0 ? cardTotalPar : coursePar })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* S1.3 — THE RAIL. Nothing renders when no figure resolves. */}
+          {rail.length > 0 && (
+            <>
+              <Hairline style={{ margin: '12px 0 10px' }} />
+              <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                {rail.map((it) => (
+                  <div key={it.key} style={{ minWidth: 0 }}>
+                    <div style={{ ...RAIL_FIG, color: it.tone ?? A.INK }}>{it.value}</div>
+                    <div style={{ ...LABEL, fontSize: 9.5, letterSpacing: '0.12em', marginTop: 3 }}>{it.label}</div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
-
 
         <div
           style={{
@@ -960,147 +895,85 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             <SyncingMiddle />
           ) : (
             <>
-              {/* PANEL 1 — the round */}
-              <Panel>
-                {statItems.length > 0 && <StatRow items={statItems} size={24} style={{ marginBottom: 20 }} />}
+              {/*
+                S4.1 — THE CARD LEADS, because that is what the sheet is for. It
+                is no longer behind a "Full scorecard" toggle: the grid was on
+                the same screen as its own CTA. The scoring key stays with the
+                card, directly beneath it (S4.2).
+              */}
+              <Panel kicker={t('courses:scorecard.theCard')}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <Nine rows={out} label={t('courses:scorecard.out')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
+                  {back.length > 0 && (
+                    <Nine rows={back} label={t('courses:scorecard.in')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
+                  )}
 
-                <Hairline style={{ margin: '18px 0 14px' }} />
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10, gap: 12 }}>
-                  <span style={{ ...SECTION_TITLE, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {t('courses:scorecard.howItUnfolded')}
-                  </span>
                   {/*
-                    The heading row's action slot. This is a TOGGLE - it expands
-                    the card in place - so the copy never promises a destination.
+                    TOTALS BLOCK — a member of the HOLE / PAR / YOU family. Two
+                    rows on the same NINE_GRID so every figure lines up down the
+                    right edge. On a nine-hole card OUT spans the nine columns
+                    and no IN segment renders.
                   */}
-                  <Action
-                    align="left"
-                    style={{ flexShrink: 0, minHeight: 0 }}
-                    tone={A.AMBER}
-                    label={showCard
-                      ? t('courses:scorecard.hideHoleByHole')
-                      : t('courses:scorecard.holeByHole')}
-                    onClick={() => {
-                      setShowCard((v) => {
-                        if (!v) {
-                          analyticsEvents.track('scorecard_card_expanded', {
-                            surface,
-                            holes: holes.length,
-                          });
-                        }
-                        return !v;
-                      });
-                    }}
-                  />
-                </div>
-
-                {/*
-                  THE PLOT SITS IN THE TEXT COLUMN (BRIEF_SCORECARD_CHART_ALIGNMENT
-                  §1). This SUPERSEDES the full-bleed decision of
-                  BRIEF_SCORECARD_TRAJECTORY_WHOOP §3: the chart no longer breaks
-                  out of the Panel's 16px padding, so its left edge lands under the
-                  "H" of "How it unfolded" and its right edge under the chevron of
-                  "Full scorecard ›". One column, one x-scale — which is also what
-                  fixed the uneven tick spacing (§3): the tick row was remapping x
-                  against a plot 32px wider than itself.
-
-                  The chart legend row that used to sit here is GONE (§8): the
-                  field key had nothing left to point at once the field line was
-                  removed, and a single-colour swatch cannot represent a stroke
-                  graded per hole.
-                */}
-                <TrajectoryLine holes={holes} height={120} surface="dark" interactive />
-
-
-                {(captions.length > 0 || fieldCaption) && (
-                  <>
-                    <Hairline style={{ margin: '14px 0' }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      {captions.length > 0 && <p style={SENTENCE}>{captions.join(' ')}</p>}
-                      {fieldCaption && <p style={SENTENCE}>{fieldCaption}</p>}
-                    </div>
-                  </>
-                )}
-
-
-
-
-                {showCard && (
-                  <div style={{ paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    <Nine rows={out} label={t('courses:scorecard.out')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
-                    {back.length > 0 && (
-                      <Nine rows={back} label={t('courses:scorecard.in')} withField={showFieldRow} scoreLabel={cardScoreLabel} />
-                    )}
-
-                    <Legend holes={played} />
-
-                    {/*
-                      TOTALS BLOCK - a member of the HOLE / PAR / YOU family, not
-                      a summary line floating beneath it. Two rows on the same
-                      NINE_GRID: row 1 carries TOTAL, the OUT and IN segments and
-                      the gross in the totals column, directly under the nine
-                      totals above; row 2 carries PAR n as a caps label and the
-                      to-par beneath the gross. Every figure lines up down the
-                      right edge. On a nine-hole card the OUT segment spans the
-                      full nine columns and no IN segment renders.
-                    */}
-                    <div>
-                      <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-                        <span style={{ ...LABEL_READ, color: A.INK }}>{t('courses:scorecard.total')}</span>
+                  <div>
+                    <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
+                      <span style={{ ...LABEL_READ, color: A.INK }}>{t('courses:scorecard.total')}</span>
+                      <span
+                        style={{
+                          gridColumn: backSummary ? 'span 4' : 'span 9',
+                          ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {t('courses:scorecard.outN', { n: outSummary.strokes })}
+                      </span>
+                      {backSummary && (
                         <span
                           style={{
-                            gridColumn: backSummary ? 'span 4' : 'span 9',
+                            gridColumn: 'span 5',
                             ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
                           }}
                         >
-                          {t('courses:scorecard.outN', { n: outSummary.strokes })}
+                          {t('courses:scorecard.inN', { n: backSummary.strokes })}
                         </span>
-                        {backSummary && (
-                          <span
-                            style={{
-                              gridColumn: 'span 5',
-                              ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {t('courses:scorecard.inN', { n: backSummary.strokes })}
-                          </span>
-                        )}
-                        <span style={{ ...NUM, fontSize: 16, color: A.INK, textAlign: 'center' }}>{cardGross}</span>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
-                        <span style={{ ...LABEL_READ, color: A.MUTE, whiteSpace: 'nowrap' }}>
-                          {t('courses:scorecard.parN', { n: cardTotalPar })}
-                        </span>
-                        <span style={{ gridColumn: 'span 9' }} />
-                        <span style={{ ...NUM, fontSize: 13, color: toParColor(totals.toPar), textAlign: 'center' }}>
-                          {fmtRel(totals.toPar)}
-                        </span>
-                      </div>
+                      )}
+                      <span style={{ ...NUM, fontSize: 16, color: A.INK, textAlign: 'center' }}>{cardGross}</span>
                     </div>
 
-
+                    <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
+                      <span style={{ ...LABEL_READ, color: A.MUTE, whiteSpace: 'nowrap' }}>
+                        {t('courses:scorecard.parN', { n: cardTotalPar })}
+                      </span>
+                      <span style={{ gridColumn: 'span 9' }} />
+                      <span style={{ ...NUM, fontSize: 13, color: toParColor(totals.toPar), textAlign: 'center' }}>
+                        {fmtRel(totals.toPar)}
+                      </span>
+                    </div>
                   </div>
-                )}
+
+                  <Legend holes={played} />
+                </div>
               </Panel>
 
-              {/* PANEL 2 — how the round broke down */}
-              <Panel title={t('courses:scorecard.howItBrokeDown')}>
+              {/* HOW IT BROKE DOWN — the birdie+ figure keeps its RED (S4.3). */}
+              <Panel kicker={t('courses:scorecard.howItBrokeDown')}>
                 <RoundSplit split={split} />
+              </Panel>
+
+              {/* HOW IT UNFOLDED — last, the most decorative and least
+                  referenced element. Construction and monotonePath unchanged. */}
+              <Panel kicker={t('courses:scorecard.howItUnfolded')}>
+                <TrajectoryLine holes={holes} height={120} surface="dark" interactive />
               </Panel>
             </>
           )}
 
-          {/*
-            NOTHING FOLLOWS THE BREAKDOWN (BRIEF_SCORECARD_SHEET_HEADER §4).
-            The identity panel and the anonymous-round footer that used to sit
-            here are BOTH gone: the member row and both actions live in the
-            header, and the anonymous path is served there too (member row
-            omitted, actions row still rendered). Do not add a footer back.
-          */}
-
-
+          {/* S3.3 — EXITS BELONG AT THE END. */}
+          {(onViewProfile || onViewCourse || onShareRound) && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', paddingTop: 2 }}>
+              {onViewProfile && <Action label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} align="left" />}
+              {onViewCourse && <Action label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} align="left" />}
+              {onShareRound && <Action label={t('courses:scorecard.shareRound')} onClick={onShareRound} align="left" />}
+            </div>
+          )}
         </div>
       </div>
     </BottomSheet>
@@ -1108,3 +981,4 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
 };
 
 export default CardScorecardSheet;
+

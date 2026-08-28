@@ -345,7 +345,12 @@
     "vsOthersWorse_one": "{{n}} shots worse than {{whose}} other round here.",
     "vsOthersWorse_other": "{{n}} shots worse than {{whose}} other {{count}} rounds here.",
     "vsOthersWorseNeutral_one": "{{n}} shots worse than the other round here.",
-    "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here."
+    "vsOthersWorseNeutral_other": "{{n}} shots worse than the other {{count}} rounds here.",
+    "theCard": "THE CARD",
+    "figBest": "BEST",
+    "figOf": "OF {{count}}",
+    "figVsAvg": "VS AVG",
+    "figBeatField": "BEAT FIELD"
   },
   "card": {
     "friendsPlayed_one": "Played by {{count}} friend",
