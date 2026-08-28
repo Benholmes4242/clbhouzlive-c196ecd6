@@ -255,7 +255,12 @@ const PostDeepLinkPage: React.FC = () => {
       openCommentsInitially: shouldOpenComments,
       initialCommentId: navState?.initialCommentId ?? null,
       openedFrom: 'post-deep-link',
-      onClose: () => {
+      onClose: (info) => {
+        // A close with reason 'navigating' means the viewer is stepping aside
+        // for a destination navigation already in flight (profile / course).
+        // Popping history here would land the member back on Activity and
+        // cancel that jump — so do nothing and let this page unmount.
+        if (info?.reason === 'navigating') return;
         // Go back if there's history; otherwise land on Clubhouse.
         if (window.history.length > 1) {
           navigate(-1);

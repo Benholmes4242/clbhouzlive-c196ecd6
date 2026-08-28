@@ -335,7 +335,11 @@ export function FullscreenFeedOverlay() {
   // All in-overlay callers (ESC, top-action-bar close, deep-link back) should
   // route through this. Route-change navigation that bypasses close still
   // gets handled by the isOpen-effect cleanup below (using borrowRef).
-  const handleClose = useCallback(() => {
+  // Carries the close REASON across the animated-close tail, where the actual
+  // store close() runs later from the closeAnimDone effect.
+  const closeInfoRef = useRef<{ reason?: 'navigating' } | undefined>(undefined);
+  const handleClose = useCallback((info?: { reason?: 'navigating' }) => {
+    closeInfoRef.current = info;
     if (closeAnim !== 'idle') return; // animation already in flight
     const b = borrowRef.current;
     const o = origin;
@@ -374,7 +378,7 @@ export function FullscreenFeedOverlay() {
         returnBorrow(b, 'close');
         borrowRef.current = null;
       }
-      close();
+      close(info);
       return;
     }
 
@@ -443,7 +447,8 @@ export function FullscreenFeedOverlay() {
       returnBorrow(b, 'close');
       borrowRef.current = null;
     }
-    close();
+    close(closeInfoRef.current);
+    closeInfoRef.current = undefined;
   }, [closeAnimDone, close]);
 
 
@@ -527,7 +532,9 @@ export function FullscreenFeedOverlay() {
 
   const handleViewProfile = useCallback(() => {
     if (!activePost) return;
-    handleClose();
+    // 'navigating' — the deep-link page must not fire its own back-navigation,
+    // otherwise the close and this profile jump fight and the close wins.
+    handleClose({ reason: 'navigating' });
     navigate(getActorRouteByType(activePost.actorType, activePost.actorId), { state: activePost.actorType === 'business' ? { source: 'feed' } : undefined });
   }, [activePost, handleClose, navigate]);
 
@@ -976,7 +983,7 @@ export function FullscreenFeedOverlay() {
                     isOwnPost={isOwnPost}
                     golfCourse={golfCourse}
                     readOnly={readOnly}
-                    onBeforeNavigate={handleClose}
+                    onBeforeNavigate={() => handleClose({ reason: 'navigating' })}
                     feedEnded={!hasNextPage && activeIndex >= posts.length}
                   />
 

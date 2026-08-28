@@ -59,6 +59,13 @@ export interface BorrowDescriptor {
    *  single source of truth for restore-time mute (see returnBorrow). */
 }
 
+export interface CloseInfo {
+  /** 'navigating' — the viewer is closing because a destination navigation is
+   *  already in flight (profile / course / review). Deep-link pages must not
+   *  add their own back-navigation on top of it. */
+  reason?: 'navigating';
+}
+
 interface OpenOptions {
   openCommentsInitially?: boolean;
   /** Origin geometry for the FLIP tile→viewer expand transition. When
@@ -70,7 +77,7 @@ interface OpenOptions {
   initialCommentId?: string | null;
   /** Called when the overlay close button is tapped. Use for deep-link routes
    *  that need to navigate back instead of just hiding the overlay. */
-  onClose?: () => void;
+  onClose?: (info?: CloseInfo) => void;
   /** Pagination handoff — opener (typically a grid that owns the data hook)
    *  passes its current pagination signals so the overlay can ask for more
    *  pages as the user nears the end of the loaded set. Optional; surfaces
@@ -114,7 +121,10 @@ interface FullscreenFeedState {
   activeIndex: number;
   openCommentsInitially: boolean;
   initialCommentId: string | null;
-  onCloseCallback: (() => void) | null;
+  /** Receives the close reason so deep-link routes can tell a member
+   *  dismissal (undefined) from a close that precedes a navigation
+   *  ({ reason: 'navigating' }) — the latter must NOT navigate back. */
+  onCloseCallback: ((info?: CloseInfo) => void) | null;
   // Pagination — owned by the opener, mirrored in this store so the overlay
   // can read them reactively without holding a hook reference.
   hasNextPage: boolean;
@@ -160,7 +170,7 @@ interface FullscreenFeedState {
   removePausedOwnerKey: (k: string) => void;
 
   open: (posts: FeedPost[], startIndex?: number, options?: OpenOptions) => void;
-  close: () => void;
+  close: (info?: CloseInfo) => void;
   appendPosts: (newPosts: FeedPost[]) => void;
   setActiveIndex: (idx: number) => void;
   consumeOpenCommentsInitially: () => void;
@@ -327,7 +337,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     });
 
   },
-  close: () => {
+  close: (info?: CloseInfo) => {
     const cb = get().onCloseCallback;
     const borrow = get().borrow;
     // Close-transition fix: freeze lastPos to the element's true fs playback
@@ -461,7 +471,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     });
 
     if (cb) {
-      try { cb(); } catch {}
+      try { cb(info); } catch {}
     }
   },
   clearBorrow: () => set({ borrow: null }),
