@@ -161,6 +161,7 @@ export function GolfThisWeekSheet({
         <WeekScopePills
           scope={scope}
           onChange={(s) => onScopeChange?.(s)}
+          userId={userId}
           style={{ padding: '12px 16px', width: '100%', boxSizing: 'border-box' }}
         />
       </div>

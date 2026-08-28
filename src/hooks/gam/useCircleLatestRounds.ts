@@ -61,6 +61,13 @@ export interface CircleRoundRow {
   net: number | null;
   /** current handicap index minus hcp_at_time. Negative = handicap dropped (good). */
   hcp_delta: number | null;
+  /**
+   * The player's handicap INDEX at the time of the round (never the
+   * course-specific playing handicap). Already selected for hcp_delta; surfaced
+   * for the "Near your handicap" band (BRIEF_GOLF_THIS_WEEK_P4 §S2.2). NULL when
+   * absent OR when can_view_handicap() withheld it — either way, not comparable.
+   */
+  hcp_at_time: number | null;
   /** Up to two feats, rarest first. */
   feats: RoundFeat[];
 
@@ -632,6 +639,7 @@ export function useCircleLatestRounds(
 
           net,
           hcp_delta: hcpDelta,
+          hcp_at_time: r.hcp_at_time == null ? null : Number(r.hcp_at_time),
           feats: featsForRound(r),
 
           birdies: r.birdies,

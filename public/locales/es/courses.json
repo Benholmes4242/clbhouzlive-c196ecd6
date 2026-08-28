@@ -1214,14 +1214,16 @@
         "suggested": "Sugeridas",
         "top100": "Top 100",
         "played": "Jugados",
-        "worldwide": "Mundial"
+        "worldwide": "Mundial",
+        "handicapBand": "Cerca de tu handicap"
       },
       "empty": {
         "circle": "Esta semana no hay rondas de tu c\u00edrculo.",
         "suggested": "Esta semana no hay rondas sugeridas.",
         "top100": "Esta semana no hay rondas del Top 100.",
         "played": "Esta semana no hay rondas en tus campos.",
-        "worldwide": "Esta semana no hay rondas."
+        "worldwide": "Esta semana no hay rondas.",
+        "handicapBand": "No hay rondas cerca de tu handicap en los ultimos 14 dias."
       }
     },
     "mostPlayedSeeAllAtCourse": "Visitar este campo",

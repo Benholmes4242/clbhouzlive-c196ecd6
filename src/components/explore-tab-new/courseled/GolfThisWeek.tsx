@@ -1934,6 +1934,7 @@ export function GolfThisWeek({
         <WeekScopePills
           scope={scope}
           onChange={(s) => onScopeChange?.(s)}
+          userId={userId}
           /* THE COUPLING IS IN CODE, NOT ONLY IN A COMMENT (§3.5): paddingLeft is
              DERIVED from the same constants the mask uses, so the 8px proud edge
              always lands on the gap between the well and the first pill. Widen the

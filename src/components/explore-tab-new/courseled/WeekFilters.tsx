@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, MapPin } from 'lucide-react';
 
@@ -11,7 +12,11 @@ import {
 } from '@/components/ui/select';
 import { A, DISCOVER_FACT, DISCOVER_QUIET, LABEL, SANS, SCOPE_PILL_RADIUS } from './tokens';
 import { PillFilterRow } from './PillFilterRow';
-import { WEEK_SCOPES, type WeekScope } from './hooks/useGolfThisWeek';
+import {
+  DEFAULT_WEEK_SCOPE,
+  useAvailableWeekScopes,
+  type WeekScope,
+} from './hooks/useGolfThisWeek';
 import type { RegionSelection, WeekRegions } from './hooks/useWeekRegionCounts';
 
 /**
@@ -52,19 +57,34 @@ export function WeekScopePills({
   scope,
   onChange,
   style,
+  userId,
 }: {
   scope: WeekScope;
   onChange: (s: WeekScope) => void;
   style?: React.CSSProperties;
+  /** Needed only to decide whether the handicap band pill exists (§S1.2). */
+  userId?: string;
 }) {
   const { t } = useTranslation('courses');
+  /* THE ROW DERIVES FROM A FILTERED LIST, NEVER SIX HARD-CODED PILLS
+     (BRIEF_GOLF_THIS_WEEK_P4 §S1.2): a member with no index has no band pill. */
+  const { scopes, ready } = useAvailableWeekScopes(userId);
+
+  /* §S1.3 — the selected scope stopped existing (no handicap, or it went away
+     mid-session): fall back to the default rather than render an empty rail on a
+     scope that is no longer in the row. */
+  useEffect(() => {
+    if (!ready) return;
+    if (!scopes.includes(scope)) onChange(DEFAULT_WEEK_SCOPE);
+  }, [ready, scopes, scope, onChange]);
+
   return (
     <PillFilterRow
       value={scope}
       onChange={onChange}
       ariaLabel={t('discover.week.scopeAria', 'Rounds scope')}
       style={style}
-      options={WEEK_SCOPES.map((id) => ({
+      options={scopes.map((id) => ({
         value: id,
         label: t(scopeLabelKey(id).key, scopeLabelKey(id).fallback),
       }))}
@@ -78,6 +98,8 @@ export function scopeLabelKey(scope: WeekScope): { key: string; fallback: string
       return { key: 'discover.week.scope.circle', fallback: 'Your Circle' };
     case 'suggested':
       return { key: 'discover.week.scope.suggested', fallback: 'Suggested' };
+    case 'handicap_band':
+      return { key: 'discover.week.scope.handicapBand', fallback: 'Near your handicap' };
     case 'top_100':
       return { key: 'discover.week.scope.top100', fallback: 'Top 100' };
     case 'played':
@@ -100,6 +122,11 @@ export function scopeEmptyKey(scope: WeekScope): { key: string; fallback: string
       return {
         key: 'discover.week.empty.suggested',
         fallback: 'No suggested rounds in the last 14 days.',
+      };
+    case 'handicap_band':
+      return {
+        key: 'discover.week.empty.handicapBand',
+        fallback: 'No rounds near your handicap in the last 14 days.',
       };
     case 'top_100':
       return {
