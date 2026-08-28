@@ -1701,11 +1701,29 @@ export function GolfThisWeek({
       unit: t('discover.golfThisWeek.board.stablefordUnit', 'PTS'),
       hasPar: false,
       ranked: stablefordRanked,
-      lowerWins: false,
+      lowerWins: LOWER_WINS.includes('stableford'),
       valueOf: (r) => r.stableford_points as number,
       format: (r) => String(r.stableford_points),
       precision: 0,
       offUnit: 'points',
+    },
+    {
+      /* §1.2 — MOST IMPROVED reuses improvedRanked EXACTLY as it stands: the
+         floor is "a cut only" (delta_index < 0) and the biggest cut leads. The
+         FIGURE IS THE ABSOLUTE CUT to one decimal, so -1.4 shows as 1.4. */
+      key: 'improved',
+      label: t('discover.golfThisWeek.board.improvedLabel', 'Most improved'),
+      short: t('discover.golfThisWeek.board.improvedShort', 'IMPROVED'),
+      unit: t('discover.golfThisWeek.board.improvedUnit', 'CUT'),
+      hasPar: false,
+      ranked: improvedRanked,
+      lowerWins: LOWER_WINS.includes('improved'),
+      /* Higher-is-better IN ITS OWN TERMS: the bigger the cut, the better, so
+         the value is the ABSOLUTE cut and the comparison needs no sign. */
+      valueOf: (r) => Math.abs(r.delta_index as number),
+      format: (r) => Math.abs(r.delta_index as number).toFixed(1),
+      precision: 1,
+      offUnit: 'cut',
     },
     {
       key: 'birdies',
