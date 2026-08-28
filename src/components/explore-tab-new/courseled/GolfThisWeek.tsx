@@ -2187,7 +2187,7 @@ export function GolfThisWeek({
                       gridTemplateColumns: BOARD_GRID,
                       alignItems: 'center',
                       columnGap: 8,
-                      padding: '10px 16px',
+                      padding: '6px 16px',
                       borderBottom: `1px solid ${WELL_RULE}`,
                       /* §1.5 — THE PINNED ROW IS A ROW IN THIS TABLE, same grid
                          and same columns, distinguished by COLOUR ONLY. */
@@ -2214,6 +2214,8 @@ export function GolfThisWeek({
                         userId={r.user_id}
                         alt={r.display_name}
                         size={26}
+                        hairlineRing
+                        ringColor={DARK_HAIRLINE}
                       />
                       <span style={{ minWidth: 0 }}>
                         <span
@@ -2224,7 +2226,7 @@ export function GolfThisWeek({
                             whiteSpace: 'nowrap',
                             fontSize: 13.5,
                             fontWeight: 700,
-                            lineHeight: 1.15,
+                            lineHeight: 1.1,
                             color: own ? AMBER : INK,
                           }}
                         >
@@ -2237,13 +2239,13 @@ export function GolfThisWeek({
                           className={own ? 'tabular-nums' : undefined}
                           style={{
                             display: 'block',
-                            marginTop: 2,
+                            marginTop: 0,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
                             fontSize: 11,
                             fontWeight: own ? 700 : 600,
-                            lineHeight: 1.15,
+                            lineHeight: 1.1,
                             letterSpacing: own ? '0.06em' : undefined,
                             color: own ? AMBER : BAND_FAINT,
                           }}

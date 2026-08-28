@@ -36,9 +36,9 @@ const LOGO_SRC = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 /* /explore resolves tone 'light' in registry.ts (a known separate fault on a
    dark-only app — REPORTED, not fixed here), so the capsule ink is the light
    tone's ink, exactly as ChromeIsland's inkFor(tone) would give it. */
-const CAPSULE_INK = '#0F172A';
-const CAPSULE_DIVIDER = 'rgba(15,23,42,0.14)';
-const CAPSULE_CHEVRON = 'rgba(15,23,42,0.55)';
+const CAPSULE_INK = '#FFFFFF';
+const CAPSULE_DIVIDER = 'rgba(255,255,255,0.18)';
+const CAPSULE_CHEVRON = 'rgba(255,255,255,0.62)';
 
 const AMBER = '#F7931E';
 const AMBER_WASH = 'rgba(247,147,30,0.10)';
