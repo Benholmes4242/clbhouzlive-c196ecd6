@@ -170,6 +170,32 @@ export function DiscoverHero({
     ? { ...heroWordStyle, color: ROW_DARK_INDEX_FELL }
     : heroWordStyle;
 
+  /* PARITY WITH THE CARDS (BRIEF_DISCOVER_HERO_PARITY §S1, §S2). NO NEW DATA:
+     both additions read the score id and course id the subject already carries.
+
+     THE WINDOWS ARE SINGLE-ELEMENT AND THAT IS DELIBERATE (§1.2, §2.2). The hero
+     renders ABOVE the rounds section and must not wait on it, so it subscribes
+     with its own one-id set. useContentReactions patches EVERY cache entry
+     holding the id, so a tap here still moves the card and the sheet below. */
+  const reactionTargets = useMemo<ReactionTarget[]>(
+    () => (row.score_id ? [{ type: 'round' as const, id: row.score_id }] : []),
+    [row.score_id],
+  );
+  const reactions = useContentReactions(reactionTargets);
+  const reaction = reactions.stateFor('round', row.score_id);
+
+  const myBests = useMyCourseBests(
+    useMemo(() => [row.course_id], [row.course_id]),
+    reactions.viewerId,
+  );
+  /* THE SHARED LADDER, one implementation for the hero and the cards (§2.4).
+     Called with ONE row, so tier (d) cannot resolve — it needs a field, and the
+     hero holds none. Personal tiers (b) then (a) are unaffected. */
+  const reference =
+    buildReferenceLadder([row], myBests, t as ReferenceT).get(row.round_id) ?? null;
+
+
+
   return (
     <div
       role="button"
