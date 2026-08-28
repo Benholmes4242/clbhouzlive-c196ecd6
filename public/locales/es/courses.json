@@ -1157,7 +1157,9 @@
         "birdiesOff_one": "{{count}} BIRDIE ATRAS",
         "birdiesOff_other": "{{count}} BIRDIES ATRAS",
         "off_one": "{{count}} ATRAS",
-        "off_other": "{{count}} ATRAS"
+        "off_other": "{{count}} ATRAS",
+        "cutOff_one": "{{count}} DEL LIDER",
+        "cutOff_other": "{{count}} DEL LIDER"
       },
       "moment": {
         "theCard": "La tarjeta",
@@ -1223,7 +1225,14 @@
         "whenChip": "LAST {{days}} DAYS",
         "railRounds": "RONDAS",
         "railCourses": "CAMPOS",
-        "railDays": "DIAS"
+        "railDays": "DIAS",
+        "netLabel": "Neto mas bajo",
+        "netShort": "NETO",
+        "netUnit": "NETO",
+        "netSecondary": "BRUTO",
+        "improvedLabel": "Mayor mejora",
+        "improvedShort": "MEJORA",
+        "improvedUnit": "REBAJA"
       }
     },
     "week": {

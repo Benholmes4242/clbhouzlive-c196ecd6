@@ -1157,7 +1157,9 @@
         "birdiesOff_one": "{{count}} BIRDIE ZURUECK",
         "birdiesOff_other": "{{count}} BIRDIES ZURUECK",
         "off_one": "{{count}} ZURUECK",
-        "off_other": "{{count}} ZURUECK"
+        "off_other": "{{count}} ZURUECK",
+        "cutOff_one": "{{count}} ZURUECK",
+        "cutOff_other": "{{count}} ZURUECK"
       },
       "moment": {
         "theCard": "Die Karte",
@@ -1223,7 +1225,14 @@
         "whenChip": "LAST {{days}} DAYS",
         "railRounds": "RUNDEN",
         "railCourses": "PLAETZE",
-        "railDays": "TAGE"
+        "railDays": "TAGE",
+        "netLabel": "Niedrigstes Netto",
+        "netShort": "NETTO",
+        "netUnit": "NETTO",
+        "netSecondary": "BRUTTO",
+        "improvedLabel": "Groesste Verbesserung",
+        "improvedShort": "VERBESSERT",
+        "improvedUnit": "ABZUG"
       }
     },
     "week": {

@@ -1607,7 +1607,9 @@
         "birdiesOff_one": "{{count}} BIRDIE OFF",
         "birdiesOff_other": "{{count}} BIRDIES OFF",
         "off_one": "{{count}} OFF",
-        "off_other": "{{count}} OFF"
+        "off_other": "{{count}} OFF",
+        "cutOff_one": "{{count}} OFF THE LEAD",
+        "cutOff_other": "{{count}} OFF THE LEAD"
       },
       "moment": {
         "theCard": "The card",
@@ -1671,7 +1673,14 @@
         "whenChip": "LAST {{days}} DAYS",
         "railRounds": "ROUNDS",
         "railCourses": "COURSES",
-        "railDays": "DAYS"
+        "railDays": "DAYS",
+        "netLabel": "Lowest net",
+        "netShort": "NET",
+        "netUnit": "NET",
+        "netSecondary": "GROSS",
+        "improvedLabel": "Most improved",
+        "improvedShort": "IMPROVED",
+        "improvedUnit": "CUT"
       }
     },
     "week": {
