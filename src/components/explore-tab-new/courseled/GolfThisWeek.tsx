@@ -35,7 +35,7 @@ import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
   HERO_TOP_SCRIM,
-  PHOTO_BAND_HEIGHT,
+  
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 /* MICRO_BRIEF_BOARD_HERO_CHIP_AND_RAIL §3 — the board hero's own height. Fixed,
