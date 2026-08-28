@@ -6,6 +6,7 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape } from './courseled/hooks/useRoundHoleShapes';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { ReactionAction, ReactionSlot } from './courseled/ReactionAction';
 import {
   movementFor,
   insightFor,
@@ -68,9 +69,24 @@ interface Props {
    * fetched per row — thirty rows would be thirty queries.
    */
   shape?: HoleShape | null;
+  /**
+   * OPTIONAL REACTION CONTROL (BRIEF_DISCOVER_LOOSE_ENDS §S2). Supplied by the
+   * Recent-rounds see-all sheet so a round carries the same heart it carries on
+   * the rail one tap up. Omitted, the row renders exactly as before — the trailing
+   * slot is not even present, so surfaces without reactions keep their geometry.
+   * The slot is fixed-width and the glyph's 44px target is absorbed by negative
+   * margins, so ROW HEIGHT IS IDENTICAL at counts 0, 1 and 3 digits (§2.6).
+   */
+  reaction?: {
+    count: number;
+    mine: boolean;
+    hidden: boolean;
+    label: string;
+    onToggle: () => void;
+  } | null;
 }
 
-export function FriendRoundRow({ row, isLast = false, onPress, insight, shape = null }: Props) {
+export function FriendRoundRow({ row, isLast = false, onPress, insight, shape = null, reaction = null }: Props) {
   const {
     display_name,
     profile_photo_url,
@@ -235,6 +251,17 @@ export function FriendRoundRow({ row, isLast = false, onPress, insight, shape = 
           </div>
         ) : (
           <div style={{ flexShrink: 0, width: SCORE_COL_W }} />
+        )}
+
+        {reaction && !reaction.hidden && (
+          <ReactionSlot>
+            <ReactionAction
+              count={reaction.count}
+              reacted={reaction.mine}
+              onToggle={reaction.onToggle}
+              label={reaction.label}
+            />
+          </ReactionSlot>
         )}
       </div>
 
