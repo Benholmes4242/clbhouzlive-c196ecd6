@@ -1740,6 +1740,11 @@ export function GolfThisWeek({
    * §1.4 — POSITIONS WITH TIES. Standard competition ranking over the full
    * ranked list; equal values share a position and take the T prefix, exactly
    * as the band tiles printed T3.
+   *
+   * THE RULE: 1, T2, T2, 4 — two players tied for second means two people have
+   * finished ahead of the next player, so there is no third place. This was
+   * QUESTIONED AND CONFIRMED CORRECT; it is what the tour leaderboard in this
+   * app does. Do not "fix" it to 1, T2, T2, 3.
    */
   const positionsFor = (b: BoardSpec) => {
     const out: string[] = [];
