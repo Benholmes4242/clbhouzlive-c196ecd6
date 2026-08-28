@@ -181,8 +181,8 @@ export const ActivityActionsSheet: React.FC<Props> = ({ open, row, onClose }) =>
             </span>
           </button>
 
-          {actorId && (
-            <button onClick={handleMuteUser} style={rowStyle}>
+          {muteTargetId && (
+            <button onClick={handleMuteActor} style={rowStyle}>
               <UserX className="h-5 w-5" style={{ color: ACT.INK_45 }} />
               <span style={{ fontSize: 14, fontWeight: 500, color: ACT.INK }}>
                 Mute {actorName}
