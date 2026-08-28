@@ -34,6 +34,7 @@ import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
   HERO_TOP_SCRIM,
+  PHOTO_BAND_HEIGHT,
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 import { relativeDay } from './discoverWhen';
