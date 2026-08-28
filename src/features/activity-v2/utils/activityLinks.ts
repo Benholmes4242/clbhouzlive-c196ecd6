@@ -65,7 +65,6 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     entity_type,
     entity_id,
     data: rawData,
-    actor_user_id,
   } = row;
   const data = (rawData && typeof rawData === 'object' ? rawData : {}) as Record<string, string | undefined>;
 
