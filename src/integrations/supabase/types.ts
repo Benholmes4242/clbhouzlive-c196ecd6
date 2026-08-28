@@ -17017,6 +17017,79 @@ export type Database = {
         }
         Relationships: []
       }
+      gam_round_net: {
+        Row: {
+          course_handicap: number | null
+          course_id: string | null
+          gross_score: number | null
+          net_score: number | null
+          play_date: string | null
+          user_id: string | null
+          whs_score_id: string | null
+        }
+        Insert: {
+          course_handicap?: never
+          course_id?: string | null
+          gross_score?: number | null
+          net_score?: never
+          play_date?: string | null
+          user_id?: string | null
+          whs_score_id?: string | null
+        }
+        Update: {
+          course_handicap?: never
+          course_id?: string | null
+          gross_score?: number | null
+          net_score?: never
+          play_date?: string | null
+          user_id?: string | null
+          whs_score_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gam_round_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: true
+            referencedRelation: "whs_friend_course_bests"
+            referencedColumns: ["best_score_id"]
+          },
+          {
+            foreignKeyName: "gam_round_stats_whs_score_id_fkey"
+            columns: ["whs_score_id"]
+            isOneToOne: true
+            referencedRelation: "whs_scores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gam_user_course_record_view: {
         Row: {
           course_id: string | null
@@ -23557,6 +23630,15 @@ export type Database = {
       whs_connection_publicly_visible: {
         Args: { p_connection_id: string }
         Returns: boolean
+      }
+      whs_course_handicap: {
+        Args: {
+          p_course_rating: number
+          p_index: number
+          p_par: number
+          p_slope_rating: number
+        }
+        Returns: number
       }
       whs_imported_counts: {
         Args: { p_connection_id: string }

@@ -47,6 +47,7 @@ import { relativeDay } from './discoverWhen';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+import { useRoundNetScores } from './hooks/useRoundNetScores';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
 
@@ -1387,6 +1388,11 @@ export function GolfThisWeek({
   const scoreIds = useMemo(() => ordered.map((r) => r.score_id), [ordered]);
   const holeShapes = useRoundHoleShapes(scoreIds);
 
+  /* NET (BRIEF_BOARD_LOWEST_NET §S1): ONE read of gam_round_net for the whole
+     window, keyed on the SAME whs_score_id set the hole shapes and reactions
+     already use, so the map joins straight onto the rows the board holds. */
+  const netByScore = useRoundNetScores(scoreIds);
+
   /* REACTIONS (BRIEF_GOLF_THIS_WEEK_P2 §S1): ONE batched read for the whole
      visible window, keyed by the round's whs_score id exactly as
      FriendsPlayedRail does — content_reactions is canonical for rounds, so the
@@ -1513,15 +1519,23 @@ export function GolfThisWeek({
       }),
   );
 
-  /* §1.1 — LOWEST NET. The FLOOR IS THE FIELD ITSELF: `net` is
-     adjusted_gross MINUS course_handicap, computed in useCircleLatestRounds, and
-     a row without it DOES NOT QUALIFY. It is never approximated from
-     hcp_at_time — that is the handicap INDEX, not the course-specific playing
-     handicap (see the hook's own comment). Lower wins. */
+  /* LOWEST NET (BRIEF_BOARD_LOWEST_NET §S2, superseding
+     BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §1.1). The net comes from the
+     gam_round_net VIEW, joined on whs_score_id — NOT from the row's own `net`,
+     which derives from whs_scores.course_handicap, a column the England Golf
+     sync has never populated (null on every row ever recorded), so that board
+     could never hold a single qualifier.
+     THE FLOOR IS THE FIELD ITSELF: a round with no net_score DOES NOT QUALIFY
+     (§2.2) — it is never defaulted and never substituted with gross. Roughly 4%
+     of rounds have no net because the course has no slope, rating or par.
+     NO WHS ARITHMETIC HERE (§3.1/§3.2): the formula lives once, in
+     whs_course_handicap. Lower wins. */
+  const netOf = (r: CircleRoundRow) =>
+    (r.score_id ? netByScore.get(r.score_id)?.net : undefined) ?? null;
   const netRanked = rankAll(
     ordered
-      .filter((r) => r.net != null && Number.isFinite(r.net))
-      .sort((a, b) => (a.net as number) - (b.net as number) || byDateDesc(a, b)),
+      .filter((r) => netOf(r) != null)
+      .sort((a, b) => (netOf(a) as number) - (netOf(b) as number) || byDateDesc(a, b)),
   );
 
   const improvedRanked = rankAll(
@@ -1677,8 +1691,9 @@ export function GolfThisWeek({
       offUnit: 'shots',
     },
     {
-      /* §1.1 — LOWEST NET. Ranked on the row's own `net`; the GROSS rides in the
-         fourth column so 68 net reads against the 88 it came from. */
+      /* LOWEST NET (BRIEF_BOARD_LOWEST_NET §2.3/§2.4). Ranked on gam_round_net's
+         net_score; the GROSS rides in the fourth column under a GROSS header so
+         67 net reads against the 79 it came from. */
       key: 'net',
       label: t('discover.golfThisWeek.board.netLabel', 'Lowest net'),
       short: t('discover.golfThisWeek.board.netShort', 'NET'),
@@ -1689,8 +1704,8 @@ export function GolfThisWeek({
         r.gross == null ? null : { text: String(r.gross), tone: toParOf(r)?.tone ?? A.MUTE },
       ranked: netRanked,
       lowerWins: LOWER_WINS.includes('net'),
-      valueOf: (r) => r.net as number,
-      format: (r) => String(r.net ?? '\u2014'),
+      valueOf: (r) => netOf(r) as number,
+      format: (r) => String(netOf(r) ?? '\u2014'),
       precision: 0,
       offUnit: 'shots',
     },
