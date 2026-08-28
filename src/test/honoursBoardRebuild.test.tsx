@@ -83,11 +83,12 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     expect(bone).toHaveLength(2);
     expect(bone.every((head) => head.dataset.honoursMetal === ACE_GROUND)).toBe(true);
     /* ONE MATERIAL: the metal ground now lives on the card shell, full height;
-       the feat block carries no background of its own. */
-    expect(champagne?.parentElement?.style.backgroundImage).toBe(ALBATROSS_GROUND);
-    expect(bone[0].parentElement?.style.backgroundImage).toBe(ACE_GROUND);
-    expect(champagne?.style.background).toBe('');
-    expect(bone[0].style.background).toBe('');
+       the feat block carries no background of its own. jsdom's CSSOM drops
+       gradients from parsed style values, so assert the raw attribute. */
+    expect(champagne?.parentElement?.getAttribute('style')).toContain(ALBATROSS_GROUND);
+    expect(bone[0].parentElement?.getAttribute('style')).toContain(ACE_GROUND);
+    expect(champagne?.getAttribute('style')).not.toContain('linear-gradient');
+    expect(bone[0].getAttribute('style')).not.toContain('linear-gradient');
   });
 
   it('uses full ink for feat copy, a measured quiet ink for the year, and ink for the course name on the one-material card', () => {
