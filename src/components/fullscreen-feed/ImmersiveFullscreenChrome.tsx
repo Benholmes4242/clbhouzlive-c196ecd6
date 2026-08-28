@@ -211,11 +211,13 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // The navigate is deferred one frame so the overlay unmounts cleanly.
   const handleMentionTap = useCallback(
     (m: { entityType: 'user' | 'business'; entityId: string; display: string }) => {
-      onClose();
+      // Prefer the navigation-aware close (carries reason: 'navigating') so a
+      // deep-link route doesn't also pop history. Falls back to plain close.
+      if (onBeforeNavigate) onBeforeNavigate(); else onClose();
       const to = m.entityType === 'business' ? `/business/${m.entityId}` : `/profile/${m.entityId}`;
       requestAnimationFrame(() => navigate(to));
     },
-    [onClose, navigate],
+    [onClose, onBeforeNavigate, navigate],
   );
   const carouselPositions = useClubhouseStore((s) => s.carouselPositions);
   const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
