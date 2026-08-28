@@ -1036,126 +1036,79 @@ function GolfThisWeekCard({
               }}
             />
         </>
-        {/* THE HERO'S OWN CONTENT BOX. HERO_H is unchanged (156) — §1 extends
-            the dark REGION, not the hero's content box. */}
+        {/* THE HERO'S OWN CONTENT BOX (BRIEF_ROUND_CARD_STRIP_BACK §S1).
+            THE COURSE NAME PINS TO THE TOP, absolutely, with the when-chip on
+            the same line at the right; THE FIGURE ANCHORS TO THE BOTTOM. They
+            are in separate layers, so however long the course name runs it can
+            never share a line with the figure — the collision Ben saw.
+            THE KICKER AND THE MOMENT SENTENCE ARE GONE (§S2.1, §S2.2): the
+            kicker said what the figure's noun already says, and the sentence
+            restated the figure in words. */}
         <div
           style={{
             height: HERO_H,
             flexShrink: 0,
+            position: 'relative',
             padding: '11px 12px 11px',
+            boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
+            justifyContent: 'flex-end',
           }}
         >
-        {/* §S2.3 — course, region beneath, the day top-right. */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 12.5,
-                fontWeight: 700,
-                lineHeight: 1.15,
-                letterSpacing: '-0.01em',
-                 color: DISCOVER_FACT,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
-            </div>
-            {region && (
-              <div
-                style={{
-                  marginTop: 2,
-                  fontSize: 11,
-                  fontWeight: 600,
-                  lineHeight: 1,
-                   color: DISCOVER_QUIET,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {region}
-              </div>
-            )}
+        <div
+          style={{
+            position: 'absolute',
+            top: 11,
+            left: 12,
+            right: 12,
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 8,
+          }}
+        >
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: 11.5,
+              fontWeight: 700,
+              lineHeight: 1.15,
+              letterSpacing: '-0.01em',
+              color: DISCOVER_FACT,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {courseName ?? row.course_name ?? t('discover.golfThisWeek.unknownCourse', 'A course')}
           </div>
           <span
             style={{
-              flexShrink: 0,
+              flex: 'none',
               fontSize: 11,
               fontWeight: 700,
               lineHeight: 1,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-               color: DISCOVER_QUIET,
+              color: DISCOVER_QUIET,
             }}
           >
             {relativeDay(row.play_date, t)}
           </span>
         </div>
 
-        <div style={{ flex: 1 }} />
-
-        {/* §S2.4 — THREE STACKED LINES, read top to bottom.
-            THE LABEL IS AN EYEBROW, NOT A CLAUSE (§S2.5). It previously sat
-            ALONGSIDE the sentence and the two read as one run-on — "THE RUN Par
-            or better". A label is a heading, so it sits on its own line above
-            the figure and the sentence sits below it.
-            THE PLAIN CARD HAS NO LABEL AT ALL (§S2.7). */}
-        {label && (
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              lineHeight: 1,
-              marginBottom: 5,
-              /* §5.1 — the moment eyebrow loses its tone: PhotoBand's own label
-                 white-at-alpha, not a new value. The moments are distinguished
-                 by their WORDS now. TWO EXCEPTIONS: THE RUN carries the same
-                 green as a falling handicap index delta; FINISHED IN THE RED
-                 carries the same under-par red as the tile's to-par figure. */
-              color:
-                moment.kind === 'run'
-                  ? ROW_DARK_INDEX_FELL
-                  : moment.kind === 'finishedInRed'
-                    ? ROW_DARK_TOPAR_UNDER
-                    : DISCOVER_QUIET,
-            }}
-          >
-            {label}
-          </div>
-        )}
-
+        {/* THE FIGURE AND ITS NOUN (§S3.1). The noun stays: a green 9 with no
+            noun could be anything, and colour says THAT something is notable,
+            never WHAT. The colour rule is unchanged (§S3.2). */}
         <FigureLine
           moment={moment}
           gross={row.gross ?? null}
           toParText={toPar?.text ?? null}
           t={t as TFn}
         />
+        </div>
 
-        {/* THE SENTENCE, at the very bottom of the hero, from a fixed template.
-            IT NEVER REPEATS THE FIGURE (§S2.8): the figure states, the sentence
-            explains. */}
-        <div
-          style={{
-            marginTop: 7,
-            fontSize: 11,
-            fontWeight: 500,
-            lineHeight: 1.3,
-            color: DISCOVER_FACT,
-            display: '-webkit-box',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
-            overflow: 'hidden',
-          }}
-        >
-          {sentence}
-        </div>
-        </div>
 
         {/* THE MEMBER ROW, NOW INSIDE THE DARK REGION (§1, §2). Its STRUCTURE,
             sizes, weights, padding and 7px gap are untouched — only the colours
