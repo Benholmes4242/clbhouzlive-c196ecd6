@@ -5,15 +5,16 @@ import { Check, ChevronRight } from 'lucide-react';
 
 
 /**
- * BRIEF_DISCOVER_BOARD_LEADS §1.2 — THE BOARD HERO'S HEIGHT. 218, and the 372
- * the moment hero held is NOT carried across: that exception was recorded in
- * DiscoverHero.tsx and died with the file.
+ * THE BOARD HERO IS THE TOUR OVERVIEW HERO. One photo-led hero treatment
+ * across the app: the height is the canonical PHOTO BAND height
+ * (`PHOTO_BAND_HEIGHT`, 286 + the safe-area inset absorbed, exactly as
+ * PhotoBand does), the ramp is the canon scrim, and the lower third is the
+ * same 20px gutter / 8px baseline column with the same type.
  */
-const BOARD_HERO_H = 218;
 /** §1.3 — the neutral loading ground. FLAT, so it can never read as a gradient. */
 const BOARD_HERO_SHELL = 'rgba(255,255,255,0.05)';
-/** The when chip's ink. FAINT, one step below the counts' quiet. */
-const BOARD_HERO_FAINT = 'rgba(255,255,255,0.52)';
+/** The when chip's ink — the hero's marker ink (PhotoBand momentLabel). */
+const BOARD_HERO_FAINT = 'rgba(255,255,255,0.65)';
 
 /** ~1.2s: long enough to register, short enough not to be a state (§S3.4). */
 const CONFIRM_MS = 1200;
