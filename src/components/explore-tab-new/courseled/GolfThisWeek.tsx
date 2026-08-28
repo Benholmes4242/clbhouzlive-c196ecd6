@@ -1457,6 +1457,7 @@ export function GolfThisWeek({
       const toPars = list.map((r) => (r.gross as number) - (r.course_par as number));
       const avg = toPars.reduce((a, b) => a + b, 0) / toPars.length;
       list.forEach((r, i) => {
+        if (out.has(r.round_id)) return; // a personal tier already won the ladder
         const better = avg - toPars[i];
         if (better < 1) return;
         out.set(
