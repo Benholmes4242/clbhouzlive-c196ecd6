@@ -1852,7 +1852,6 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
       await recomputeLegendTitles(newTopUser);
     }
   }
-  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
