@@ -539,34 +539,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const isTour = surface === 'tour';
   const { user } = useSupabaseSession();
   /**
-   * VOICE — this sheet opens over other members' rounds from the Clubhouse feed
-   * as often as over the viewer's own history, so running copy must not claim a
-   * stranger's round as theirs. Derived, never passed: a caller that forgets the
-   * prop would silently produce the wrong (and worse) reading. When ownership
-   * cannot be resolved we fall to the third person.
+   * OWNERSHIP is still derived, never passed — it drives the amber own-member
+   * rule on the member row and the card's score-column stub. The VOICE
+   * machinery (possessives, impersonal fallbacks, subject slots) is gone with
+   * the sentences: a figure rail has no subject to name, so an empty
+   * playerName can no longer produce a bare apostrophe anywhere.
    */
   const isOwner = !isTour && !!playerUserId && !!user?.id && playerUserId === user.id;
-  const firstName = (playerName || '').trim().split(/\s+/)[0] ?? '';
-  /**
-   * NO NAME IS A STATE, NOT AN EMPTY STRING. An empty or whitespace-only
-   * playerName must NEVER be poured into a possessive or a subject slot: the
-   * result renders as a bare apostrophe ("'s average here") or as a leading
-   * space followed by a lowercase verb (" beat the field average"). This sheet
-   * has more than one caller and will acquire more, so it defends itself here
-   * rather than trusting every caller to pass a name. With no name and no
-   * ownership we use the IMPERSONAL forms, which read correctly with no subject.
-   */
-  const hasName = firstName.trim().length > 0;
-  // A first name already ending in s takes a bare apostrophe: "James' average".
-  const namePossessive = /s$/i.test(firstName) ? `${firstName}\u2019` : `${firstName}\u2019s`;
-  /** Impersonal voice: no owner and no name to speak of. */
-  const impersonal = !isOwner && !hasName;
-  const subject = isOwner ? t('courses:scorecard.voiceYou') : firstName;
-  const whose = isOwner ? t('courses:scorecard.voiceYour') : namePossessive;
-  const whoseCap = isOwner ? t('courses:scorecard.voiceYourCap') : namePossessive;
 
-  const [showCard, setShowCard] = useState(false);
-  useEffect(() => { if (!open) setShowCard(false); }, [open]);
 
   const played = useMemo(
     () => holes.filter((h) => h.strokes != null && h.strokes > 0 && h.par != null),
