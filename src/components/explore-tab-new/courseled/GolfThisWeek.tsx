@@ -12,7 +12,6 @@ import { Check, ChevronRight } from 'lucide-react';
  * same 20px gutter / 8px baseline column with the same type.
  */
 /** §1.3 — the neutral loading ground. FLAT, so it can never read as a gradient. */
-const BOARD_HERO_SHELL = 'rgba(255,255,255,0.05)';
 /** The when chip's ink — the hero's marker ink (PhotoBand momentLabel). */
 const BOARD_HERO_FAINT = 'rgba(255,255,255,0.65)';
 
@@ -29,7 +28,9 @@ import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
-import { HERO_CANON_SCRIM } from '@/features/tourhub/_shared/heroGradient';
+import { heroCanonScrimOn } from '@/features/tourhub/_shared/heroGradient';
+import { CHARCOAL } from '@/features/tourhub/_shared/tokens';
+
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
@@ -1814,11 +1815,18 @@ export function GolfThisWeek({
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end',
-            /* THE SHELL, THE GRADIENT, THE PHOTOGRAPH — in that order and never
-               overlapping: a pending read paints the flat shell alone. */
-            background: heroImagePending ? BOARD_HERO_SHELL : COURSE_GRADIENT,
           }}
         >
+          {/* PhotoBand's LAYERING, exactly: base gradient, photo, one canon
+              ramp. The base gradient is ALWAYS painted (a pending course read
+              no longer swaps a flat shell in for it — the photograph fades over
+              the same ground the tour hero uses), and the ramp is always on, so
+              the lower-third type has the same legibility ground at every
+              state. */}
+          <div
+            aria-hidden="true"
+            style={{ position: 'absolute', inset: 0, background: COURSE_GRADIENT, zIndex: -2 }}
+          />
           {!heroImagePending && heroImage && (
             <img
               src={heroImage}
@@ -1836,26 +1844,23 @@ export function GolfThisWeek({
               }}
             />
           )}
-          {/* THE ONE CANON SCRIM, laid EXACTLY as PhotoBand lays it — a 260px
-              bottom ramp, not a full-inset wash — so the photograph keeps the
-              same open upper third the Tour Overview hero has. It ends on the
-              canvas, so there is no seam where the hero meets the pills. Held
-              off the shell: a scrim over a flat loading ground would read as a
-              second, dimmer treatment. */}
-          {!heroImagePending && (
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: 260,
-                background: HERO_CANON_SCRIM,
-                zIndex: -1,
-              }}
-            />
-          )}
+          {/* THE ONE CANON SCRIM — a 260px bottom ramp, the same ramp and the
+              same height PhotoBand paints. Per the canon it terminates on what
+              sits beneath it — the Discover canvas — so there is no seam where
+              the hero meets the scope pills. */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 260,
+              background: heroCanonScrimOn(CHARCOAL),
+              zIndex: -1,
+            }}
+          />
+
 
           {/* THE WHEN CHIP, top-right (§1.1), on the same notch + island
               clearance the section's first row used to pay. */}
@@ -2136,10 +2141,15 @@ export function GolfThisWeek({
 
             <div
               data-discover-board={board.key}
+              /* FULL-BLEED, like the tour's leaderboard block: the board is the
+                 page's spine, not a card on it. It escapes the page gutter, drops
+                 the radius and the shadow, and keeps its own 20px column so its
+                 rows line up with the hero's lower third. */
               style={{
+                width: '100dvw',
+                marginLeft: 'calc(50% - 50dvw)',
                 background: A.PANEL,
-                borderRadius: CARD_RADIUS,
-                boxShadow: CARD_SHADOW,
+                borderTop: `1px solid ${WELL_RULE}`,
                 overflow: 'hidden',
                 marginBottom: 12,
                 fontFamily: SANS,
@@ -2153,7 +2163,7 @@ export function GolfThisWeek({
                   gridTemplateColumns: BOARD_GRID,
                   alignItems: 'center',
                   columnGap: 8,
-                  padding: '8px 16px',
+                  padding: '8px 20px',
                   borderBottom: `1px solid ${WELL_RULE}`,
                 }}
               >
@@ -2187,7 +2197,7 @@ export function GolfThisWeek({
                       gridTemplateColumns: BOARD_GRID,
                       alignItems: 'center',
                       columnGap: 8,
-                      padding: '6px 16px',
+                      padding: '6px 20px',
                       borderBottom: `1px solid ${WELL_RULE}`,
                       /* §1.5 — THE PINNED ROW IS A ROW IN THIS TABLE, same grid
                          and same columns, distinguished by COLOUR ONLY. */
