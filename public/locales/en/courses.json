@@ -1662,14 +1662,16 @@
         "suggested": "Suggested",
         "top100": "Top 100",
         "played": "Played",
-        "worldwide": "Worldwide"
+        "worldwide": "Worldwide",
+        "handicapBand": "Near your handicap"
       },
       "empty": {
         "circle": "No rounds from your circle in the last 14 days.",
         "suggested": "No suggested rounds in the last 14 days.",
         "top100": "No Top 100 rounds in the last 14 days.",
         "played": "No rounds at your courses in the last 14 days.",
-        "worldwide": "No rounds in the last 14 days."
+        "worldwide": "No rounds in the last 14 days.",
+        "handicapBand": "No rounds near your handicap in the last 14 days."
       }
     },
     "seam": "All time \u00b7 from everyone",
