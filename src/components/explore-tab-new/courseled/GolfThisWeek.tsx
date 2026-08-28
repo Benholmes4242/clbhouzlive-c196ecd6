@@ -1795,12 +1795,10 @@ export function GolfThisWeek({
 
   return (
     <section style={style}>
-      {/* BRIEF_DISCOVER_BOARD_LEADS §1 — THE BOARD'S HERO. The moment hero is
-          GONE (DiscoverHero.tsx and useDiscoverHero.ts deleted with it): the page
-          leads with the board, and its header is this. THREE THINGS ONLY — the
-          category title, the counts, the when chip. 218px, NOT 372: this is a
-          header for a table, not a page-opening statement, and the old 372
-          exception died with the file that recorded it (§1.2).
+      {/* THE BOARD'S HERO — the SAME photo hero as Tour Overview. Height,
+          gradient base, photo focal point, canon scrim and lower-third type all
+          come from PhotoBand so the two surfaces read as one treatment. THREE
+          THINGS ONLY — the category title, the counts, the when chip.
           FULL-BLEED: it escapes the page's 14px gutter and starts at physical
           y=0, paying the notch and the floating island clearance itself. */}
       {activeBoard ? (
