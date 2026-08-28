@@ -228,61 +228,51 @@ function MemberBoard({
   onSeeAllAtCourse: () => void;
 }) {
   const { t } = useTranslation('courses');
-  /** §2 — NO CAP. Every resolved player is rendered. */
+  /** §2 — NO CAP ON RESOLUTION; the CONTAINER caps what is visible. */
   const listed = row.players;
-  /* BRIEF_COURSES_PLAYED_COURSE_LED §2.3 — NO NESTED SCROLL AREA. The internal
-     scroller, its max height, its fade and its at-end state are gone: the list
-     renders inline and the PAGE scrolls. A scroll region nested in a scrolling
-     page always feels wrong on a phone, whatever overscroll-behavior does. */
+  /* MICRO_BRIEF_COURSES_PLAYED_EXPANDED_TIDY §2 — REVERSES
+     BRIEF_COURSES_PLAYED_COURSE_LED §2.3 ("no nested scroll area") DELIBERATELY:
+     fifteen rows inline pushed the rest of the page a long way down. The list is
+     now capped at EIGHT ROWS with an internal scroller, made safe on iOS by
+     `overscrollBehavior: 'contain'` (§3.1) and NO `touch-action` (§3.2 — the
+     ComingUp `pan-x` bug: touch-action restricts which gestures are permitted,
+     it does not delegate them). */
   const single = listed.length === 1 ? listed[0] : null;
 
   if (listed.length === 0) return null;
 
-  /* §2.4 — ONE ROUND IS A SENTENCE, NOT A ONE-ROW BOARD. */
+  /* §4 — ONE MEMBER IS A LABELLED FIGURE, NOT A SENTENCE AND NOT A ONE-ROW
+     BOARD. The member's name is deliberately not shown (§4.3). */
   if (single) {
     return (
       <div style={{ paddingBottom: 10, paddingTop: 8 }}>
-        <p
-          style={{
-            margin: 0,
-            fontFamily: SANS,
-            fontSize: 12.5,
-            fontWeight: 600,
-            lineHeight: 1.35,
-            color: viewerId === single.userId ? A.AMBER_DEEP : INK,
-          }}
-        >
-          {t('discover.mostPlayedOneRoundLine', 'One round here: {{name}} shot {{gross}}.', {
-            count: row.count,
-            name: single.name,
-            gross: single.gross != null ? formatNumber(single.gross) : '\u2014',
-          })}
-        </p>
-        {/* §2.4 — the one MEMBER may have played more than once; the rounds
-            figure on the collapsed row says so, and this hands off to them. */}
-        {row.count > 1 && onSeeAllAtCourse && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onSeeAllAtCourse();
+        <span style={{ display: 'block' }}>
+          <span
+            style={{
+              ...NUMF,
+              display: 'block',
+              fontSize: 14,
+              fontWeight: 700,
+              lineHeight: 1,
+              color: viewerId === single.userId ? A.AMBER_DEEP : INK,
             }}
+          >
+            {single.gross != null ? formatNumber(single.gross) : '\u2014'}
+          </span>
+          <span
             style={{
               ...LABEL,
               display: 'block',
-              fontSize: 11,
-              letterSpacing: '0.10em',
-              color: MID,
-              border: 'none',
-              background: 'transparent',
-              padding: '8px 0 0',
-              textAlign: 'left',
-              cursor: 'pointer',
+              marginTop: 4,
+              fontSize: 9.5,
+              fontWeight: 700,
+              letterSpacing: '0.14em',
+              color: FAINT,
             }}
           >
-            {t('discover.mostPlayedAllRoundsHere', 'ALL {{count}} ROUNDS HERE', { count: row.count })}
-          </button>
-        )}
+            {t('discover.mostPlayedBestScore', 'BEST SCORE')}
+          </span>
+        </span>
         {onSeeAllAtCourse && (
           <button
             type="button"
@@ -297,7 +287,7 @@ function MemberBoard({
               color: INK,
               border: 'none',
               background: 'transparent',
-              padding: '8px 0 0',
+              padding: '10px 0 0',
               textAlign: 'left',
               cursor: 'pointer',
             }}
@@ -309,13 +299,34 @@ function MemberBoard({
     );
   }
 
+  /* §2.3 — EIGHT ROWS EXACTLY. A fixed row height is what makes a nine-row and a
+     fifteen-row course open to the SAME size, so the row itself is height-locked
+     (the home-club line would otherwise make rows differ). §2.4 — at or below the
+     cap the container sizes to content and never scrolls. */
+  const scrolls = listed.length > BOARD_MAX_ROWS;
+
   return (
     <div style={{ paddingBottom: 10, paddingTop: 8 }}>
       {/* §2.1 — THE EXPANDED STATE NAMES WHAT IT IS. */}
       <div style={{ ...LABEL, fontSize: 11, letterSpacing: '0.14em', color: FAINT, marginBottom: 4 }}>
         {t('discover.mostPlayedBestRoundsHere', 'BEST ROUNDS HERE')}
       </div>
-      <div>
+      <div
+        className="no-scrollbar"
+        style={
+          scrolls
+            ? {
+                height: BOARD_MAX_H,
+                overflowY: 'auto',
+                // §3.1 — STOPS THE SCROLL CHAINING TO THE PAGE at the list's edge.
+                overscrollBehavior: 'contain',
+                WebkitOverflowScrolling: 'touch',
+                // §3.2 — NO touch-action HERE. Deliberate.
+              }
+            : undefined
+        }
+      >
+
 
       {listed.map((p) => {
         const isViewer = viewerId != null && p.userId === viewerId;
