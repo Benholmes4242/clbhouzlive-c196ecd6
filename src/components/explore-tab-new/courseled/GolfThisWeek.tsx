@@ -2316,7 +2316,7 @@ export function GolfThisWeek({
                 const tp = board.hasPar ? toParOf(r) : null;
                 return (
                   <div
-                    key={own ? `you-${r.round_id}` : r.round_id}
+                    key={pinnedRow ? `you-${r.round_id}` : r.round_id}
                     data-board-row={own ? 'you' : 'member'}
                     role="button"
                     tabIndex={0}
@@ -2376,13 +2376,13 @@ export function GolfThisWeek({
                             color: own ? AMBER : INK,
                           }}
                         >
-                          {own ? t('discover.golfThisWeek.you', 'You') : r.display_name}
+                          {pinnedRow ? t('discover.golfThisWeek.you', 'You') : r.display_name}
                         </span>
                         {/* On the pinned row the sub-line is the GAP TO THE
                             LEADER with its per-category unit and derived
                             direction (§1.5); on every other row it is WHERE. */}
                         <span
-                          className={own ? 'tabular-nums' : undefined}
+                          className={pinnedRow ? 'tabular-nums' : undefined}
                           style={{
                             display: 'block',
                             marginTop: 0,
@@ -2390,13 +2390,13 @@ export function GolfThisWeek({
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
                             fontSize: 11,
-                            fontWeight: own ? 700 : 600,
+                            fontWeight: pinnedRow ? 700 : 600,
                             lineHeight: 1.1,
-                            letterSpacing: own ? '0.06em' : undefined,
+                            letterSpacing: pinnedRow ? '0.06em' : undefined,
                             color: own ? AMBER : BAND_FAINT,
                           }}
                         >
-                          {own ? pinnedGap(board, r) : courseNameFor(r)}
+                          {pinnedRow ? pinnedGap(board, r) : courseNameFor(r)}
                         </span>
                       </span>
                     </span>
