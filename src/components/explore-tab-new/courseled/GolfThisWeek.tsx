@@ -1811,7 +1811,12 @@ export function GolfThisWeek({
             position: 'relative',
             width: '100dvw',
             marginLeft: 'calc(50% - 50dvw)',
-            height: `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+            /* MICRO_BRIEF_BOARD_HERO_CHIP_AND_RAIL §3.1 — the board hero is
+               pinned at EXACTLY 246 (plus the notch inset it absorbs) so the
+               hairline and the stat rail have room and nothing below moves.
+               This is a LOCAL height: the tour's PHOTO_BAND_HEIGHT stays where
+               it is and is no longer the term here. */
+            height: `calc(${BOARD_HERO_HEIGHT}px + env(safe-area-inset-top, 0px))`,
             marginBottom: 14,
             overflow: 'hidden',
             isolation: 'isolate',
