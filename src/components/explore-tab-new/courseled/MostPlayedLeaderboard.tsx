@@ -470,35 +470,12 @@ function MemberBoard({
         );
       })}
       </div>
-      {/* §2.4 — MORE ROUNDS THAN ROWS: the list is one row per MEMBER, so a
-          course with more rounds than resolved members says so quietly and
-          hands off to the course's own sheet. */}
-      {row.count > listed.length && onSeeAllAtCourse && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onSeeAllAtCourse();
-          }}
-          style={{
-            ...LABEL,
-            display: 'block',
-            fontSize: 11,
-            letterSpacing: '0.10em',
-            color: MID,
-            border: 'none',
-            background: 'transparent',
-            padding: '8px 0 0',
-            textAlign: 'left',
-            cursor: 'pointer',
-          }}
-        >
-          {t('discover.mostPlayedAllRoundsHere', 'ALL {{count}} ROUNDS HERE', { count: row.count })}
-        </button>
-      )}
+      {/* §2.2 — "ALL {n} ROUNDS HERE" IS GONE. The internal scroll replaces it;
+          the sheet remains reachable through VISIT THIS COURSE below. */}
 
-      {/* THE SEE-ALL ROW STAYS (§2): it opens the course's own sheet, which is
-          a different destination from a longer list. */}
+      {/* §2.5 — VISIT THIS COURSE SITS OUTSIDE THE SCROLLER so it cannot scroll
+          away. */}
+
       {onSeeAllAtCourse && (
         <button
           type="button"
