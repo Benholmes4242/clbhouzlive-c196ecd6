@@ -257,6 +257,31 @@ function MemberBoard({
             gross: single.gross != null ? formatNumber(single.gross) : '\u2014',
           })}
         </p>
+        {/* §2.4 — the one MEMBER may have played more than once; the rounds
+            figure on the collapsed row says so, and this hands off to them. */}
+        {row.count > 1 && onSeeAllAtCourse && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSeeAllAtCourse();
+            }}
+            style={{
+              ...LABEL,
+              display: 'block',
+              fontSize: 11,
+              letterSpacing: '0.10em',
+              color: MID,
+              border: 'none',
+              background: 'transparent',
+              padding: '8px 0 0',
+              textAlign: 'left',
+              cursor: 'pointer',
+            }}
+          >
+            {t('discover.mostPlayedAllRoundsHere', 'ALL {{count}} ROUNDS HERE', { count: row.count })}
+          </button>
+        )}
         {onSeeAllAtCourse && (
           <button
             type="button"
