@@ -2101,7 +2101,7 @@ export function GolfThisWeek({
            forced to -1 above). None of them renders a placeholder. */
         const pinned = selfIdx >= 6 ? board.ranked[selfIdx] : null;
 
-        const headCell = (text: string, align: 'left' | 'right') => (
+        const headCell = (text: string, align: 'left' | 'center' | 'right') => (
           <span
             style={{
               /* AXIS 10 — a column header is a coordinate, not language. */
