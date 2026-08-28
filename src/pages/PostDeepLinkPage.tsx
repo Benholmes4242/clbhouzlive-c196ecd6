@@ -166,6 +166,43 @@ const PostDeepLinkPage: React.FC = () => {
       const courseRow = row.golf_courses ?? null;
       const ratingRow = row.course_ratings ?? null;
 
+      // ── MEDIA-LESS POSTS MUST NOT BE SENT TO THE FULLSCREEN VIEWER.
+      // fullscreenFeedStore.open() filters on media presence and RETURNS
+      // SILENTLY when the tapped post has none (it would paint a black slide
+      // under live chrome). Round posts — which is what every `new_post`
+      // notification points at — carry no post_media rows, so the open was a
+      // no-op and this page sat on its black scrim forever. That is the black
+      // screen. A round notification's real destination is the ROUND, so
+      // redirect to the scorecard sheet: own rounds open on /handicap, another
+      // member's on /handicap/:userId (friend view mounts the same sheet).
+      // Guests are never redirected — they keep the logged-out preview below.
+      const mediaCount = Array.isArray(row.post_media)
+        ? row.post_media.filter((m: any) => m.media_url || m.stream_id).length
+        : 0;
+      if (user?.id && mediaCount === 0) {
+        const scoreId = row.whs_score_id ?? null;
+        if (scoreId) {
+          const base = row.user_id === user.id ? '/handicap' : `/handicap/${row.user_id}`;
+          navigate(`${base}?score=${encodeURIComponent(scoreId)}`, { replace: true });
+          return;
+        }
+        // A text-only post has no viewer of its own; the author's profile is
+        // the nearest true surface (its feed carries the post).
+        const authorRoute = row.actor_type === 'business' && row.actor_id
+          ? `/business/${row.actor_id}`
+          : row.user_id
+            ? `/profile/${row.user_id}`
+            : null;
+        if (authorRoute) {
+          navigate(authorRoute, { replace: true });
+          return;
+        }
+        setNotFound(true);
+        setIsLoading(false);
+        return;
+      }
+
+
       // Lightweight preview shape used by the guest viewer
       setPost({
         id: row.id,
@@ -292,6 +329,16 @@ const PostDeepLinkPage: React.FC = () => {
         }
       },
     });
+
+    // open() can refuse (its media guard returns silently). If it did, the
+    // scrim below would be the whole screen — show the actionable state
+    // instead. Belt-and-braces: the media-less case is already redirected above.
+    if (!useFullscreenFeedStore.getState().isOpen) {
+      console.error('[PostDeepLink] fullscreen open() refused the post', feedPost.id);
+      setNotFound(true);
+    }
+
+
 
   }, [authLoading, user, isLoading, feedPost, navigate, navState, searchParams]);
 
