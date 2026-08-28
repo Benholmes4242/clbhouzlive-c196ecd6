@@ -334,7 +334,7 @@ export function GolfThisWeekRail() {
             key={i}
             style={{
               ...CARD_SHELL,
-              width: 268,
+              width: 224,
               flexShrink: 0,
               padding: 0,
               /* The live card lost its border for a shadow
@@ -411,7 +411,7 @@ export function GolfThisWeekRail() {
         ))}
       </div>
       {/* See-all placeholder sits below the first card and does NOT scroll. */}
-      <div style={{ marginTop: 8, width: 268 }}>
+      <div style={{ marginTop: 8, width: 224 }}>
         <TextBar w={110} h={10} />
       </div>
     </section>

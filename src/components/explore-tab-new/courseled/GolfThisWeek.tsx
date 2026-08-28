@@ -44,7 +44,6 @@ import {
 import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegionCounts';
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
-import { MiniScorecard } from './RoundShape';
 import { PodiumAvatarRing } from './PodiumAvatarRing';
 import {
   FINISHED_IN_RED_TONE,
@@ -154,10 +153,14 @@ import {
    THE PHOTOGRAPH IS GONE (§S0.4). PHOTO_H, the scrim and the glass chip tokens
    went with it; the hero gradient carries the top of the card. */
 
-/* BRIEF_GOLF_THIS_WEEK_P1_P3 §3.3 — the card narrows so more than two reach a
-   screen. The brief says 300 -> 268; the shipped width was 256, not 300, so the
-   TARGET (268) is honoured and the brief's starting number is recorded as wrong. */
-const CARD_W = 268;
+/* THE CARD IS 224 WIDE (BRIEF_DISCOVER_LOOSE_ENDS §S1). The real history: it
+   SHIPPED at 256, BRIEF_GOLF_THIS_WEEK_P1_P3 §3.3 wrongly described that as 300
+   and asked for 268 — which made the card WIDER, not narrower. Corrected to 224,
+   which is not a new number: FriendsPlayedRail.tsx:58 is CARD_W = 224, chosen for
+   "two-plus-a-slice at 390dp", the slice being the affordance that says the rail
+   scrolls. Two rails on one page at two widths was the drift; matching is the fix.
+   The 211px fixed height is untouched. */
+const CARD_W = 224;
 
 /** §S2.1 — the gradient hero. §3.3: 168 -> 132 (shipped value was 156). */
 const HERO_H = 132;
@@ -304,80 +307,11 @@ export const ROW_DARK_TOPAR_UNDER = FINISHED_IN_RED_TONE;
 
 
 
-/**
- * §6.1 — the shape draws itself once on arrival, ~600ms, the round replaying.
- * ONE easing, taken from the existing draw animations in this feature family
- * rather than a third curve, and expressed as a clip-path sweep so nothing about
- * RoundShape's geometry changes.
- */
-const DRAW_MS = 600;
-const DRAW_EASE = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+/* BRIEF_DISCOVER_LOOSE_ENDS §S4 — ShapeReveal and MiniScorecard are DELETED,
+   not silenced. The card compression removed their last callers, and the `void`
+   statements that kept them warning-free were the proof of that. The scorecard
+   sheet keeps its own grid and trajectory curve; nothing here needs them. */
 
-function ShapeReveal({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [drawn, setDrawn] = useState(false);
-  const reduced =
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  useEffect(() => {
-    // NOT FOR CARDS OFF SCREEN (§6.1): a rail is horizontally scrolled, so the
-    // eighth card must animate when it is reached, not while it is out of view.
-    if (reduced) return;
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setDrawn(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.4 },
-    );
-    io.observe(el);
-    /* A CURVE MUST NEVER BE PERMANENTLY INVISIBLE. If the observer is starved
-       for any reason (clipping, containment, a rail measured at zero), the
-       shape reveals itself anyway. */
-    const failsafe = window.setTimeout(() => setDrawn(true), 1500);
-    return () => {
-      io.disconnect();
-      window.clearTimeout(failsafe);
-    };
-  }, [reduced]);
-
-
-  const complete = reduced || drawn;
-  /* THE OBSERVED ELEMENT MUST NOT BE THE CLIPPED ELEMENT. A self-clipped node
-     (inset(0 100% 0 0)) reports a zero-area intersection rect in Chrome, so the
-     observer never fires and the curve stays hidden forever — the defect this
-     splits apart. Outer node = measured, inner node = clipped. */
-  return (
-    <div ref={ref}>
-      <div
-        style={{
-          /* THE CLIP IS RELEASED WHEN THE DRAW ENDS. inset(0 0 0 0) still clips
-             at the border box, and the mini-grid's markers paint their outer
-             RING 3px OUTSIDE their own box — so a settled card was shaving the
-             bottom of the bottom row's circles and boxes. A wipe needs no clip
-             once it has finished, so there is none. */
-          clipPath: complete ? 'inset(-8px -8px -8px -8px)' : 'inset(-8px 100% -8px -8px)',
-          transition: reduced ? undefined : `clip-path ${DRAW_MS}ms ${DRAW_EASE}`,
-        }}
-      >
-        {children}
-      </div>
-    </div>
-  );
-
-}
-/* §3.2 — NOTHING IS DELETED. The card no longer draws a scorecard, so the reveal
-   wrapper and the mini-grid are unreferenced HERE; both are kept intact because
-   the sheet's grammar is the same and a future inline use must not re-invent
-   them. Referenced so lint sees the intent rather than dead code. */
-void ShapeReveal;
-void MiniScorecard;
 void SHAPE_BLOCK_H;
 
 
