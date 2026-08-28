@@ -1091,7 +1091,9 @@
         "shotsOff_other": "{{count}}\u6253\u5dee",
         "pointsOff_other": "{{count}}\u30dd\u30a4\u30f3\u30c8\u5dee",
         "birdiesOff_other": "\u30d0\u30fc\u30c7\u30a3\u30fc{{count}}\u5dee",
-        "off_other": "{{count}}\u5dee"
+        "off_other": "{{count}}\u5dee",
+        "cutOff_one": "{{count}} OFF THE LEAD",
+        "cutOff_other": "{{count}} OFF THE LEAD"
       },
       "moment": {
         "theCard": "\u30b9\u30b3\u30a2\u30ab\u30fc\u30c9",
@@ -1157,7 +1159,14 @@
         "whenChip": "LAST {{days}} DAYS",
         "railRounds": "ROUNDS",
         "railCourses": "COURSES",
-        "railDays": "DAYS"
+        "railDays": "DAYS",
+        "netLabel": "Lowest net",
+        "netShort": "NET",
+        "netUnit": "NET",
+        "netSecondary": "GROSS",
+        "improvedLabel": "Most improved",
+        "improvedShort": "IMPROVED",
+        "improvedUnit": "CUT"
       }
     },
     "week": {

@@ -60,8 +60,30 @@ import {
   GOLF_WEEK_DAYS,
   useWeekCounts,
   useWeekScopeCourses,
+  useViewerHandicapIndex,
   type WeekScope,
 } from './hooks/useGolfThisWeek';
+
+/**
+ * BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S2 — THE FIVE CATEGORIES, at module
+ * scope so the session's rotation can be held beside them.
+ */
+type BoardKey = 'gross' | 'net' | 'stableford' | 'improved' | 'birdies';
+
+/**
+ * §2.5 — THE SESSION'S ROTATED DEFAULT lives in a MODULE-LEVEL variable, not in
+ * React state and not in storage. That is deliberate on both sides:
+ *   - it survives unmount, so tabbing away from Discover and back does not
+ *     reshuffle the board under the member (§2.1);
+ *   - it dies with the JS module, i.e. on a cold launch, so tomorrow rotates
+ *     again and NOTHING is persisted (§2.4). No "last shown" store.
+ * It is written ONCE per session, the first time a non-empty board exists.
+ */
+let sessionBoardKey: BoardKey | null = null;
+
+/** §2.2b — the handicap lean. Under 5 leans ball-striking, 5+ leans the rest. */
+const LOW_INDEX_LEAN: BoardKey[] = ['gross', 'birdies'];
+const HIGH_INDEX_LEAN: BoardKey[] = ['net', 'stableford', 'improved'];
 import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegionCounts';
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
@@ -1319,7 +1341,12 @@ export function GolfThisWeek({
    * (§2.3). Component state, not URL: the scope pills answer "which rounds",
    * this answers "which board", and only the former is shareable today.
    */
-  const [boardCategory, setBoardCategory] = useState<'gross' | 'stableford' | 'birdies'>('gross');
+  /**
+   * BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S2 — NULL MEANS "NOT CHOSEN YET",
+   * and the rotation supplies the default. An EXPLICIT pick writes here and
+   * therefore beats the rotation for the rest of the session (§2.3).
+   */
+  const [boardCategory, setBoardCategory] = useState<BoardKey | null>(null);
   /* ONE piece of state controls the category sheet, owned here because the
      control (the hero title) and the sheet render in different blocks. */
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -1328,6 +1355,10 @@ export function GolfThisWeek({
   const scopeCourses = useWeekScopeCourses(userId, scope);
   const roundsQuery = useGolfThisWeek(userId, scope, scopeCourses.courseIds);
   const all = roundsQuery.data ?? [];
+  /* §2.2b — THE SAME INDEX SOURCE AS THE HANDICAP BAND: eg_handicap_index with
+     manual_handicap_index as the fallback. Read here (before any early return)
+     so the rotation can lean on it; a null index is a valid answer (§2.2c). */
+  const viewerIndex = useViewerHandicapIndex(userId).index;
 
   const courseIds = useMemo(
     () => all.map((r) => r.course_id).filter((v): v is string => !!v),
@@ -1482,6 +1513,17 @@ export function GolfThisWeek({
       }),
   );
 
+  /* §1.1 — LOWEST NET. The FLOOR IS THE FIELD ITSELF: `net` is
+     adjusted_gross MINUS course_handicap, computed in useCircleLatestRounds, and
+     a row without it DOES NOT QUALIFY. It is never approximated from
+     hcp_at_time — that is the handicap INDEX, not the course-specific playing
+     handicap (see the hook's own comment). Lower wins. */
+  const netRanked = rankAll(
+    ordered
+      .filter((r) => r.net != null && Number.isFinite(r.net))
+      .sort((a, b) => (a.net as number) - (b.net as number) || byDateDesc(a, b)),
+  );
+
   const improvedRanked = rankAll(
     ordered
       .filter(
@@ -1553,14 +1595,12 @@ export function GolfThisWeek({
      birdiesRanked are the SAME ranked, member-deduped arrays with the SAME
      floors (Stableford >= 36, birdies >= 3). No new query, no new sort.
 
-     MOST IMPROVED HAS NO BOARD. The brief names three categories twice (§1.6's
-     units GROSS / PTS / BIRDIES and §4.1's three titles) and gives improved
-     neither a label nor a unit, so its ranked list is computed and unused rather
-     than silently retitled. Flagged in the report — it is a real loss of a
-     comparison and it is Ben's call, not this brief's. */
+      FIVE CATEGORIES NOW (BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S1): lowest
+     net and most improved join, because gross and birdies both reward
+     ball-striking and the board read as weighted to low handicaps. Net,
+     Stableford and improved are winnable by anyone. FEWEST BLOW-UPS was
+     proposed and REJECTED — do not add it (§1.3). */
   void best;
-
-  type BoardKey = 'gross' | 'stableford' | 'birdies';
 
   interface BoardSpec {
     key: BoardKey;
@@ -1571,23 +1611,37 @@ export function GolfThisWeek({
     /** §1.6 — the VALUE column's header. */
     unit: string;
     /**
-     * §1.6 — THE PAR COLUMN ONLY EXISTS WHERE A TO-PAR EXISTS. Stableford and
-     * birdies have none, so the column AND its header are absent and the grid
-     * is one column shorter. Decided ONCE per render at table level (this flag),
-     * never per row.
+     * §1.6 — THE FOURTH COLUMN ONLY EXISTS WHERE A QUALIFIER EXISTS. Gross
+     * carries its TO-PAR there; net carries the GROSS the net came from, so a
+     * member reads 68 net against 88 gross, and it is TONED BY THE SAME TO-PAR
+     * COLOUR LAW so the law still applies to both scoring boards. Stableford,
+     * improved and birdies have no qualifier, so the column AND its header are
+     * absent and the grid is one column shorter. Decided ONCE per render at
+     * table level (this flag), never per row.
      */
     hasPar: boolean;
+    /** The fourth column's header where hasPar. */
+    parHeader?: string;
+    /** The fourth column's cell where hasPar. */
+    parCell?: (r: CircleRoundRow) => { text: string; tone: string } | null;
     /** §1.2 — the existing ranked list, untouched. */
     ranked: CircleRoundRow[];
-    /** ONE direction flag: only gross is lower-wins. */
+    /**
+     * §1.5 — DERIVED, NOT HARD-CODED: gross and net are lower-wins, the other
+     * three are higher-is-better in their own terms. The pinned row's gap
+     * direction and unit read from this.
+     */
     lowerWins: boolean;
     valueOf: (r: CircleRoundRow) => number;
     /** The VALUE cell's text. */
     format: (r: CircleRoundRow) => string;
     precision: number;
     /** The unit the pinned row's gap carries. */
-    offUnit: 'shots' | 'points' | 'birdies';
+    offUnit: 'shots' | 'points' | 'birdies' | 'cut';
   }
+
+  /** §1.5 — the one place the direction is stated; every spec derives from it. */
+  const LOWER_WINS: BoardKey[] = ['gross', 'net'];
 
   /**
    * §3.1/§3.2 — THE TO-PAR COLOUR LAW, as scoreColor.ts states it and as the
@@ -1613,10 +1667,30 @@ export function GolfThisWeek({
       short: t('discover.golfThisWeek.board.grossShort', 'GROSS'),
       unit: t('discover.golfThisWeek.board.grossUnit', 'GROSS'),
       hasPar: true,
+      parHeader: t('discover.golfThisWeek.board.par', 'PAR'),
+      parCell: toParOf,
       ranked: bestRanked,
-      lowerWins: true,
+      lowerWins: LOWER_WINS.includes('gross'),
       valueOf: (r) => r.gross as number,
       format: (r) => String(r.gross ?? '\u2014'),
+      precision: 0,
+      offUnit: 'shots',
+    },
+    {
+      /* §1.1 — LOWEST NET. Ranked on the row's own `net`; the GROSS rides in the
+         fourth column so 68 net reads against the 88 it came from. */
+      key: 'net',
+      label: t('discover.golfThisWeek.board.netLabel', 'Lowest net'),
+      short: t('discover.golfThisWeek.board.netShort', 'NET'),
+      unit: t('discover.golfThisWeek.board.netUnit', 'NET'),
+      hasPar: true,
+      parHeader: t('discover.golfThisWeek.board.netSecondary', 'GROSS'),
+      parCell: (r) =>
+        r.gross == null ? null : { text: String(r.gross), tone: toParOf(r)?.tone ?? A.MUTE },
+      ranked: netRanked,
+      lowerWins: LOWER_WINS.includes('net'),
+      valueOf: (r) => r.net as number,
+      format: (r) => String(r.net ?? '\u2014'),
       precision: 0,
       offUnit: 'shots',
     },
@@ -1627,11 +1701,29 @@ export function GolfThisWeek({
       unit: t('discover.golfThisWeek.board.stablefordUnit', 'PTS'),
       hasPar: false,
       ranked: stablefordRanked,
-      lowerWins: false,
+      lowerWins: LOWER_WINS.includes('stableford'),
       valueOf: (r) => r.stableford_points as number,
       format: (r) => String(r.stableford_points),
       precision: 0,
       offUnit: 'points',
+    },
+    {
+      /* §1.2 — MOST IMPROVED reuses improvedRanked EXACTLY as it stands: the
+         floor is "a cut only" (delta_index < 0) and the biggest cut leads. The
+         FIGURE IS THE ABSOLUTE CUT to one decimal, so -1.4 shows as 1.4. */
+      key: 'improved',
+      label: t('discover.golfThisWeek.board.improvedLabel', 'Most improved'),
+      short: t('discover.golfThisWeek.board.improvedShort', 'IMPROVED'),
+      unit: t('discover.golfThisWeek.board.improvedUnit', 'CUT'),
+      hasPar: false,
+      ranked: improvedRanked,
+      lowerWins: LOWER_WINS.includes('improved'),
+      /* Higher-is-better IN ITS OWN TERMS: the bigger the cut, the better, so
+         the value is the ABSOLUTE cut and the comparison needs no sign. */
+      valueOf: (r) => Math.abs(r.delta_index as number),
+      format: (r) => Math.abs(r.delta_index as number).toFixed(1),
+      precision: 1,
+      offUnit: 'cut',
     },
     {
       key: 'birdies',
@@ -1640,7 +1732,7 @@ export function GolfThisWeek({
       unit: t('discover.golfThisWeek.board.birdiesUnit', 'BIRDIES'),
       hasPar: false,
       ranked: birdiesRanked,
-      lowerWins: false,
+      lowerWins: LOWER_WINS.includes('birdies'),
       valueOf: (r) => r.birdies as number,
       format: (r) => String(r.birdies),
       precision: 0,
@@ -1655,8 +1747,47 @@ export function GolfThisWeek({
    * fall back with it — the tour picker's fault (a label derived from a
    * selection rather than from the list on screen) cannot recur.
    */
+  /**
+   * BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S2 — THE ROTATED DEFAULT, chosen
+   * ONCE PER SESSION and held in the module-level `sessionBoardKey`. The weight
+   * order is the brief's: (a) categories where the VIEWER HAS A QUALIFYING ROUND
+   * first — the same test the pinned row uses — (b) among those, lean on the
+   * handicap index, (c) qualifying nowhere or no index, choose from all five,
+   * (d) NEVER a category with no ranked rows at all.
+   *
+   * WHY IT IS NOT REACT STATE: a mount-scoped default would reshuffle the page
+   * every time the member tabs away from Discover and back (§2.1). WHY IT IS NOT
+   * STORAGE: the rotation must NOT persist across a cold launch (§2.4).
+   */
+  if (sessionBoardKey == null) {
+    const nonEmpty = boards.filter((b) => b.ranked.length > 0);
+    if (nonEmpty.length > 0) {
+      const qualifying = userId
+        ? nonEmpty.filter((b) => b.ranked.some((r) => r.is_self))
+        : [];
+      let pool = qualifying.length > 0 ? qualifying : nonEmpty;
+      if (qualifying.length > 0 && viewerIndex != null) {
+        const lean = viewerIndex < 5 ? LOW_INDEX_LEAN : HIGH_INDEX_LEAN;
+        const leaning = qualifying.filter((b) => lean.includes(b.key));
+        if (leaning.length > 0) pool = leaning;
+      }
+      sessionBoardKey = pool[Math.floor(Math.random() * pool.length)].key;
+    }
+  }
+
+  /**
+   * §2.3/§4.3 — ONE VALUE, HOISTED. The board that is ACTUALLY RENDERED is
+   * resolved here, once, and the island capsule, the hero title and the column
+   * header all read it. A stale or empty selection FALLS BACK, and the labels
+   * fall back with it — the tour picker's fault (a label derived from a
+   * selection rather than from the list on screen) cannot recur.
+   *
+   * §2.3 — AN EXPLICIT PICK (`boardCategory`) BEATS THE ROTATION; with no pick
+   * yet the session's rotated key stands in.
+   */
+  const effectiveCategory: BoardKey | null = boardCategory ?? sessionBoardKey;
   const activeBoard =
-    boards.find((b) => b.key === boardCategory && b.ranked.length > 0) ??
+    boards.find((b) => b.key === effectiveCategory && b.ranked.length > 0) ??
     boards.find((b) => b.ranked.length > 0) ??
     null;
 
@@ -1699,6 +1830,11 @@ export function GolfThisWeek({
     }
     if (b.offUnit === 'points') {
       return t('discover.golfThisWeek.gap.pointsOff', '{{count}} POINTS OFF', { count: gap });
+    }
+    if (b.offUnit === 'cut') {
+      /* MOST IMPROVED: the gap is in STROKES OF CUT, one decimal, so the unit
+         cannot be read as a score. */
+      return t('discover.golfThisWeek.gap.cutOff', '{{count}} OFF THE LEAD', { count: gap });
     }
     return t('discover.golfThisWeek.gap.birdiesOff', '{{count}} BIRDIES OFF', { count: gap });
   };
@@ -2224,7 +2360,10 @@ export function GolfThisWeek({
                 {headCell(t('discover.golfThisWeek.board.member', 'MEMBER'), 'left')}
                 {headCell(board.unit, 'center')}
                 {board.hasPar
-                  ? headCell(t('discover.golfThisWeek.board.par', 'PAR'), 'center')
+                  ? headCell(
+                      board.parHeader ?? t('discover.golfThisWeek.board.par', 'PAR'),
+                      'center',
+                    )
                   : null}
               </div>
 
@@ -2242,7 +2381,7 @@ export function GolfThisWeek({
                   ? [{ r: pinned, pos: positions[selfIdx], own: true, pinnedRow: true }]
                   : []),
               ].map(({ r, pos, own, pinnedRow }) => {
-                const tp = board.hasPar ? toParOf(r) : null;
+                const tp = board.hasPar ? (board.parCell ?? toParOf)(r) : null;
                 return (
                   <div
                     key={pinnedRow ? `you-${r.round_id}` : r.round_id}
