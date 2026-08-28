@@ -29,6 +29,7 @@ import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
+import { useMyCourseBests } from '@/features/tourhub/hooks/useMyCourseBests';
 
 import {
   DEFAULT_WEEK_SCOPE,
@@ -1399,16 +1400,27 @@ export function GolfThisWeek({
   const reactions = useContentReactions(reactionTargets);
 
 
+  /* PERSONAL HISTORY (BRIEF_ROUND_CARD_REFERENCE_LINE §S1): ONE batched
+     get_my_course_bests read for the whole visible window, keyed by the sorted,
+     deduped course-id set. A course absent from the map was never played. */
+  const windowCourseIds = useMemo(() => ordered.map((r) => r.course_id), [ordered]);
+  const myBests = useMyCourseBests(windowCourseIds, userId);
+
   /**
-   * §2 — THE REFERENCE LINE, tier (d) ONLY: "{n} better than the field that day".
-   * WHY ONLY (d): tiers (a)-(c) need get_my_course_best, which is NOT called
-   * anywhere in this section's tree (it is used by Course of the Week), and the
-   * brief forbids adding the call here — so (d), which is free from `ordered`, is
-   * the one that ships (§2.2/§2.3).
-   * THE FLOOR IS THREE ROUNDS in the same course/day group (§2.4, FIELD_GATE): an
-   * "average" of two rounds is not a field. A round that is not better than the
-   * field, or is in an ungated group, resolves to NOTHING — never a fabricated
-   * "first round here" (§2.5).
+   * §2 — THE REFERENCE LINE. Ladder, first that resolves; nothing if none do:
+   *   (b) "{n} better than your best here"  — own round that beat the best
+   *   (a) "Your best here is {n}"           — own round that did not
+   *   (c) SKIPPED (§2.3): get_my_course_bests returns no mean, and an average
+   *       derived from the fortnight beside an all-time rounds_here would be two
+   *       histories in one sentence.
+   *   (d) "{n} better than the field that day" — any round, unchanged.
+   * (b) IS TESTED BEFORE (a). get_my_course_bests INCLUDES the displayed round,
+   * so a new best EQUALS best_gross — the margin over the previous best is not
+   * knowable from this function, so the equality case falls through to (d)
+   * rather than claiming a fabricated margin (§2.5).
+   * FLOOR (§2.4): rounds_here >= 4, since rounds_here counts the displayed round.
+   * OWN ROUNDS ONLY (§2.2): is_self gates (a)-(c) entirely.
+   * THE FLOOR FOR (d) IS THREE ROUNDS in the same course/day group (FIELD_GATE).
    */
   const referenceByRound = useMemo(() => {
     const groups = new Map<string, CircleRoundRow[]>();
@@ -1420,11 +1432,32 @@ export function GolfThisWeek({
       else groups.set(key, [r]);
     }
     const out = new Map<string, string>();
+
+    /* (b) then (a), own rounds only. Written first so (d) below never overwrites
+       a personal tier — the ladder takes the FIRST that resolves. */
+    for (const r of ordered) {
+      if (!r.is_self || !r.course_id || r.gross == null) continue;
+      const mine = myBests.get(r.course_id);
+      const bestGross = mine?.best_gross;
+      const roundsHere = mine?.rounds_here ?? 0;
+      if (bestGross == null || roundsHere < 4) continue;
+      if (r.gross > bestGross) {
+        out.set(
+          r.round_id,
+          t('discover.golfThisWeek.reference.yourBest', 'Your best here is {{count}}', {
+            count: bestGross,
+          }),
+        );
+      }
+      // r.gross === bestGross: this round IS the best, margin unknowable — fall through.
+    }
+
     for (const list of groups.values()) {
       if (list.length < 3) continue;
       const toPars = list.map((r) => (r.gross as number) - (r.course_par as number));
       const avg = toPars.reduce((a, b) => a + b, 0) / toPars.length;
       list.forEach((r, i) => {
+        if (out.has(r.round_id)) return; // a personal tier already won the ladder
         const better = avg - toPars[i];
         if (better < 1) return;
         out.set(
@@ -1436,7 +1469,7 @@ export function GolfThisWeek({
       });
     }
     return out;
-  }, [ordered, t]);
+  }, [ordered, myBests, t]);
 
   /* NO INSIGHT MAP. The tile's prose is the MOMENT SENTENCE, generated from a
      fixed template per kind inside the card (BRIEF_ROUND_TILE_THE_MOMENT §S4.3).

@@ -1134,7 +1134,8 @@
       "heading": "\ucd5c\uadfc \ub77c\uc6b4\ub4dc",
       "you": "\ub098",
       "reference": {
-        "fieldDay": "\uadf8\ub0a0 \ud544\ub4dc \ud3c9\uadfc\ubcf4\ub2e4 {{count}} \uc88b\uc74c"
+        "fieldDay": "\uadf8\ub0a0 \ud544\ub4dc \ud3c9\uadfc\ubcf4\ub2e4 {{count}} \uc88b\uc74c",
+        "yourBest": "\uc774\uacf3 \ucd5c\uace0 \uae30\ub85d\uc740 {{count}}"
       }
     },
     "week": {

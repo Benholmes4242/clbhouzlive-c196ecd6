@@ -1200,7 +1200,8 @@
       "heading": "Rondas recientes",
       "you": "Tu",
       "reference": {
-        "fieldDay": "{{count}} mejor que el campo ese dia"
+        "fieldDay": "{{count}} mejor que el campo ese dia",
+        "yourBest": "Tu mejor marca aqui es {{count}}"
       }
     },
     "week": {
