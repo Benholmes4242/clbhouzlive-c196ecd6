@@ -1423,7 +1423,15 @@ async function applyCourseLegends(stats: any) {
     );
     return;
   }
-  for (const cfg of LEGEND_CATS) await recomputeLegend(stats.course_id, cfg);
+  // BRIEF_CROWN_NOTIFICATION_FRESHNESS — the trigger round is threaded into
+  // recomputeLegend so crown notifications are (a) traceable via
+  // trigger_whs_score_id and (b) gated on the round's PLAY date. The board
+  // itself is recomputed unconditionally, exactly as before.
+  const trigger = {
+    whs_score_id: (stats.whs_score_id as string | null) ?? null,
+    play_date: (stats.play_date as string | null) ?? null,
+  };
+  for (const cfg of LEGEND_CATS) await recomputeLegend(stats.course_id, cfg, trigger);
   // G2 — crown_taken / crown_lost. Bounded, silent-fail; contract owned by
   // Ben's SQL that populates `discover_rail_cache.course_regular:{course_id}`.
   await maybeEmitCrownDelta(stats.course_id).catch((e) => {
@@ -1602,7 +1610,66 @@ async function maybeEmitRateCoursePrompt(
 
 
 
-async function recomputeLegend(courseId: string, cfg: LegendCfg) {
+// The round that caused this recompute. Threaded from applyCourseLegends so the
+// crown enqueues can carry a traceable trigger id and be freshness-gated.
+type LegendTrigger = { whs_score_id: string | null; play_date: string | null };
+
+// FRESHNESS GATE (BRIEF_CROWN_NOTIFICATION_FRESHNESS).
+//
+// Measured, not suspected: in the 30 days to 27 Aug 2026 this evaluator wrote
+// 1,014 crown notifications (337 legend_earned / 677 legend_lost) to just 17
+// recipients — ~2 per person per day from a platform producing ~4 notable
+// rounds a week. Bursts of 54/44/42 landed in a single minute alongside
+// handicap backfill batches carrying play dates back to 2018 and 2021.
+// Backfilled history legitimately rewrites ALL-TIME crowns wholesale, so every
+// displaced holder was told they lost a crown — a TRUE statement about nothing,
+// because nobody played anything.
+//
+// So: the board still updates from historic rounds (gam_course_legends is
+// written before this test and is untouched); only the TELLING is suppressed.
+//
+// 2 days, not 1: a round played Saturday and synced Monday morning is still
+// news to the member. A round from March is not. The test is play_date, never
+// created_at — a row created today and played in 2021 is indistinguishable
+// from a fresh one by sync time alone.
+const LEGEND_NOTIFY_MAX_AGE_DAYS = 2;
+
+function isTriggerFreshForCrownNotice(trigger: LegendTrigger | undefined, courseId: string, category: string): boolean {
+  const playDate = trigger?.play_date ?? null;
+  if (!playDate) {
+    // §5 — an unknown date is not a fresh one. Board still updated above.
+    console.log('[gam-evaluator] crown notice suppressed — trigger play_date missing', {
+      courseId,
+      category,
+      whs_score_id: trigger?.whs_score_id ?? null,
+    });
+    return false;
+  }
+  const played = Date.parse(`${String(playDate).slice(0, 10)}T00:00:00Z`);
+  if (!Number.isFinite(played)) {
+    console.log('[gam-evaluator] crown notice suppressed — trigger play_date unparseable', {
+      courseId,
+      category,
+      play_date: playDate,
+    });
+    return false;
+  }
+  const todayUtc = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`);
+  const ageDays = Math.floor((todayUtc - played) / 86400_000);
+  if (ageDays > LEGEND_NOTIFY_MAX_AGE_DAYS) {
+    console.log('[gam-evaluator] crown notice suppressed — historic round', {
+      courseId,
+      category,
+      play_date: playDate,
+      ageDays,
+      whs_score_id: trigger?.whs_score_id ?? null,
+    });
+    return false;
+  }
+  return true;
+}
+
+async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: LegendTrigger) {
   // Current stored board — the FULL field for this course/category, no cap.
   const { data: prev } = await supabase
     .from("gam_course_legends")
@@ -1714,6 +1781,12 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
 
   const newTopUser = arr[0]?.user_id ?? null;
   if (newTopUser !== prevTopUser) {
+    // §3 — computed once for both sides. The board write above has ALREADY
+    // happened, so a suppressed notice never changes what is true, only who is
+    // told. This sits BEFORE enqueueNotification, so a suppressed row never
+    // reaches dedupKey / the 24h trigger skip / urgency at all (§6).
+    const notify = isTriggerFreshForCrownNotice(trigger, courseId, cfg.category);
+
     // Course name is needed by BOTH sides (legend_lost and legend_earned), so
     // it is resolved once here. golf_courses ONLY — never read
     // whs_friends/whs_friend_matches, those hold England Golf PII. Degrades to
@@ -1730,7 +1803,7 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
     } catch { /* non-fatal */ }
 
     if (prevTopUser) {
-      if (newTopUser) {
+      if (newTopUser && notify) {
         // Look up taker display name from user_profiles ONLY. Same PII rule as
         // above; degrades to null. Loser side only — meaningless to the gainer.
         let takerName: string | null = null;
@@ -1755,17 +1828,25 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg) {
           taken_by: newTopUser,
           taker_name: takerName,
           course_name: courseName,
+          // §2 — enqueueNotification reads trigger_whs_score_id from here.
+          // Without it every crown row in the outbox had a null trigger and
+          // there was no way to ask which round caused one.
+          whs_score_id: trigger?.whs_score_id ?? null,
         });
       }
       // Loser side: their rank-1 count went down — recompute authoritatively.
+      // Runs regardless of the notification gate: titles are truth, not telling.
       await recomputeLegendTitles(prevTopUser);
     }
     if (newTopUser) {
-      await enqueueNotification(newTopUser, "legend_earned", {
-        course_id: courseId,
-        category: cfg.category,
-        course_name: courseName,
-      });
+      if (notify) {
+        await enqueueNotification(newTopUser, "legend_earned", {
+          course_id: courseId,
+          category: cfg.category,
+          course_name: courseName,
+          whs_score_id: trigger?.whs_score_id ?? null,
+        });
+      }
 
       // Gainer side: single code path for the tiered badge + milestone.
       await recomputeLegendTitles(newTopUser);
