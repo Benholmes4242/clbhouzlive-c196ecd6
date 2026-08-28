@@ -151,10 +151,14 @@ import {
    THE PHOTOGRAPH IS GONE (§S0.4). PHOTO_H, the scrim and the glass chip tokens
    went with it; the hero gradient carries the top of the card. */
 
-const CARD_W = 256;
+/* BRIEF_GOLF_THIS_WEEK_P1_P3 §3.3 — the card narrows so more than two reach a
+   screen. The brief says 300 -> 268; the shipped width was 256, not 300, so the
+   TARGET (268) is honoured and the brief's starting number is recorded as wrong. */
+const CARD_W = 268;
 
-/** §S2.1 — the gradient hero. */
-const HERO_H = 156;
+/** §S2.1 — the gradient hero. §3.3: 168 -> 132 (shipped value was 156). */
+const HERO_H = 132;
+
 
 /* THE GRID REGION. 96px, not 88: at 88 the two marker rows and their outer
    rings did not fit the region and the bottom row's circles and boxes were
