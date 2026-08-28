@@ -2450,7 +2450,9 @@ export function GolfThisWeek({
               showFollow={!r.is_self && !!userId && !!following.data}
               isFollowed={!!following.data?.has(r.user_id)}
               viewerUserId={userId}
+              reference={referenceByRound.get(r.round_id) ?? null}
               onPress={() => onCardPress(r)}
+
             />
           );
         })}
