@@ -70,7 +70,14 @@ export default function NotificationsPage() {
 
   const [mutedTypes, setMutedTypes] = useState<string[]>([]);
   const [mutedUserIds, setMutedUserIds] = useState<string[]>([]);
+  const [mutedBusinessIds, setMutedBusinessIds] = useState<string[]>([]);
+  /* Resolved names/avatars for the muted list. An id that resolves to NOTHING
+     (deleted member, removed business) still gets a row — a mute nobody can
+     lift is worse than an unnamed row. */
+  const [mutedMeta, setMutedMeta] = useState<Record<string, { name: string; photo: string | null }>>({});
+  const [unmuting, setUnmuting] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
 
   const isPushEnabled = pushNotifications.state === 'enabled';
   const isPushUnavailable = pushNotifications.state === 'unavailable' && !pushNotifications.isLoading;
