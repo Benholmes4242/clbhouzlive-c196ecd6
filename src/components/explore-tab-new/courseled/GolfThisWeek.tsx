@@ -1954,42 +1954,105 @@ export function GolfThisWeek({
               >
                 {activeBoard.label}
               </h2>
-              <ChevronDown
-                size={13}
-                strokeWidth={2.6}
-                color={DISCOVER_QUIET}
+              {/* §S1 — THE CHIP. A 26px circular glass chip, this app's
+                  existing icon-button shape. The chevron inside is FACT ink:
+                  inside a container it is an icon, not a hint. The title itself
+                  carries no border, background or underline — the whole
+                  title-and-chip group is the control. */}
+              <span
                 aria-hidden
-                style={{ flexShrink: 0, transform: 'translateY(1px)' }}
-              />
+                style={{
+                  flexShrink: 0,
+                  width: 26,
+                  height: 26,
+                  borderRadius: 999,
+                  background: 'rgba(255,255,255,0.14)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  alignSelf: 'center',
+                }}
+              >
+                <ChevronDown size={12} strokeWidth={2.6} color={DISCOVER_FACT} />
+              </span>
             </button>
 
-            {/* The counts, unchanged in content and key — only their type now
-                matches the hero's venue line. The window is FIXED at
-                GOLF_WEEK_DAYS, never derived from the oldest round, so the
-                readout cannot disagree with the query. */}
+            {/* §S2 — THE STAT RAIL. A hairline separates, so the pairs carry no
+                dot between them. The labels are caps because they are labels;
+                the figures stay figures and are tabular so the rail cannot
+                reflow when 9 becomes 10.
+                NOTE: ROUNDS and COURSES are counts, DAYS is the WINDOW —
+                GOLF_WEEK_DAYS, a constant. It sits here because it is what makes
+                the other two mean anything. Do not make it dynamic. */}
             <div
-              className="tabular-nums"
+              aria-hidden
               style={{
-                fontFamily: SANS,
-                fontSize: 11.5,
-                fontWeight: 600,
-                letterSpacing: '0.01em',
-                color: 'rgba(255,255,255,0.75)',
-                textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
+                marginTop: 11,
+                height: 1,
+                background: 'rgba(255,255,255,0.18)',
+                width: '100%',
+              }}
+            />
+            <div
+              style={{
+                marginTop: 10,
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 18,
+                minWidth: 0,
               }}
             >
-              {t(
-                'discover.golfThisWeek.count',
-                '{{rounds}} rounds \u00B7 {{courses}} courses \u00B7 {{days}} days',
+              {[
                 {
-                  rounds: counts.rounds,
-                  courses: counts.courses,
-                  days: GOLF_WEEK_DAYS,
+                  key: 'rounds',
+                  figure: counts.rounds,
+                  label: t('discover.golfThisWeek.board.railRounds', 'ROUNDS'),
                 },
-              )}
+                {
+                  key: 'courses',
+                  figure: counts.courses,
+                  label: t('discover.golfThisWeek.board.railCourses', 'COURSES'),
+                },
+                {
+                  key: 'days',
+                  figure: GOLF_WEEK_DAYS,
+                  label: t('discover.golfThisWeek.board.railDays', 'DAYS'),
+                },
+              ].map((pair) => (
+                <div
+                  key={pair.key}
+                  style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 0 }}
+                >
+                  <span
+                    className="tabular-nums"
+                    style={{
+                      fontFamily: SANS,
+                      fontSize: 15,
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      color: DISCOVER_FACT,
+                      textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                    }}
+                  >
+                    {pair.figure}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: SANS,
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: BOARD_HERO_FAINT,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {pair.label}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
