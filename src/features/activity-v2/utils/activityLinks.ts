@@ -212,11 +212,29 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
 
   // --- new_post --------------------------------------------------------
   if (type === 'new_post') {
+    // ROUND NOTIFICATIONS ROUTE TO THE ROUND, AT LINK TIME (Aug 2026).
+    // create_new_post_notifications now writes post_type / whs_score_id /
+    // is_round onto the notification, so a round no longer has to be
+    // discovered by fetching the post. is_round is only true when the post is
+    // a round AND carries a score id; a legacy/hand-written row missing the
+    // score id falls through to the post branch below.
+    // The scorecard sheet's only mount point is the handicap page (see the
+    // RoundDetailSheet at HandicapPage.tsx:619) — /handicap/:userId works for
+    // your own round as well as another member's, because the page treats an
+    // id equal to the viewer as self.
+    const isRound = (data as Record<string, unknown>).is_round === true;
+    const scoreId = data.whs_score_id;
+    const roundOwner = row.actor_user_id;
+    if (isRound && scoreId && roundOwner) {
+      return `/handicap/${roundOwner}?score=${encodeURIComponent(scoreId)}`;
+    }
+
     const pid = data.post_id ?? (entity_type === 'post' ? entity_id : null);
     if (pid) return `/post/${pid}`;
     const actorRoute = actorProfileRoute(row);
     if (actorRoute) return actorRoute;
   }
+
 
   // --- achievements ----------------------------------------------------
   if (type === 'achievement' || type === 'achievement_unlocked' || type === 'milestone_reached') {
