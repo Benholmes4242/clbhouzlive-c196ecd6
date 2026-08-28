@@ -1203,6 +1203,23 @@
         "fieldDay": "{{count}} besser als das Feld an diesem Tag",
         "yourBest": "Deine Bestleistung hier ist {{count}}",
         "betterThanBest": "{{count}} besser als deine Bestleistung hier"
+      },
+      "board": {
+        "birdiesLabel": "Meiste Birdies",
+        "birdiesShort": "BIRDIES",
+        "birdiesUnit": "BIRDIES",
+        "grossLabel": "Niedrigstes Brutto",
+        "grossShort": "BRUTTO",
+        "grossUnit": "BRUTTO",
+        "member": "MITGLIED",
+        "par": "PAR",
+        "pickerAria": "Tabelle wechseln: {{label}}",
+        "pickerEyebrow": "Entdecken",
+        "pickerTitle": "Tabelle wahlen",
+        "pos": "POS",
+        "stablefordLabel": "Stableford",
+        "stablefordShort": "STABLEFORD",
+        "stablefordUnit": "PKT"
       }
     },
     "week": {

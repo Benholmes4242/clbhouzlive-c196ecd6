@@ -1651,6 +1651,23 @@
         "fieldDay": "{{count}} better than the field that day",
         "yourBest": "Your best here is {{count}}",
         "betterThanBest": "{{count}} better than your best here"
+      },
+      "board": {
+        "birdiesLabel": "Most birdies",
+        "birdiesShort": "BIRDIES",
+        "birdiesUnit": "BIRDIES",
+        "grossLabel": "Lowest gross",
+        "grossShort": "GROSS",
+        "grossUnit": "GROSS",
+        "member": "MEMBER",
+        "par": "PAR",
+        "pickerAria": "Change board: {{label}}",
+        "pickerEyebrow": "Discover",
+        "pickerTitle": "Select board",
+        "pos": "POS",
+        "stablefordLabel": "Stableford",
+        "stablefordShort": "STABLEFORD",
+        "stablefordUnit": "PTS"
       }
     },
     "week": {
