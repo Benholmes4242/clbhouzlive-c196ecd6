@@ -1488,7 +1488,7 @@ export function GolfThisWeek({
   /* THE FLOORS APPLY TO EVERY PLACE (§3): a runner-up clears the same floor as
      the winner, so a tile with one qualifier shows the hero and NOTHING else —
      no second row, no dash, no placeholder. That is a normal week. */
-  const bestRanked = topThree(
+  const bestRanked = rankAll(
     ordered
       .filter((r) => r.gross != null && r.course_par != null)
       .sort((a, b) => {
@@ -1500,7 +1500,7 @@ export function GolfThisWeek({
       }),
   );
 
-  const improvedRanked = topThree(
+  const improvedRanked = rankAll(
     ordered
       .filter(
         (r) =>
@@ -1516,7 +1516,7 @@ export function GolfThisWeek({
 
   /* NULL STABLEFORD FAILS THE FILTER, never contributes a 0 (§1.3). FLOOR 36 —
      the par-equivalent every club golfer knows. */
-  const stablefordRanked = topThree(
+  const stablefordRanked = rankAll(
     ordered
       .filter(
         (r) =>
@@ -1532,7 +1532,7 @@ export function GolfThisWeek({
   );
 
   /* FLOOR 3 — "1 birdie" is not a comparison, and a two-way tie on 1 is worse. */
-  const birdiesRanked = topThree(
+  const birdiesRanked = rankAll(
     ordered
       .filter(
         (r) => r.birdies != null && Number.isFinite(r.birdies) && (r.birdies as number) >= 3,
@@ -1624,7 +1624,8 @@ export function GolfThisWeek({
       row: best.row,
       /* The hero is `bestOfWeek`'s winner, unchanged; the sort's first place is
          the same row, so the runners are places 2 and 3 of that same list. */
-      runners: bestRanked.slice(1),
+      runners: bestRanked.slice(1, 3),
+      ranked: bestRanked,
       lowerWins: true,
       valueOf: (r) => r.gross as number,
       accent: PODIUM_ACCENT.gold,
@@ -1650,7 +1651,8 @@ export function GolfThisWeek({
       emoji: '\uD83C\uDFAF', // DIRECT HIT / DART BOARD
       label: t('discover.golfThisWeek.stablefordLabel', 'Best Stableford'),
       row: bestStableford,
-      runners: stablefordRanked.slice(1),
+      runners: stablefordRanked.slice(1, 3),
+      ranked: stablefordRanked,
       lowerWins: false,
       valueOf: (r) => r.stableford_points as number,
       accent: PODIUM_ACCENT.white,
@@ -1666,7 +1668,8 @@ export function GolfThisWeek({
       emoji: '\uD83D\uDC26', // BIRD
       label: t('discover.golfThisWeek.birdiesLabel', 'Most birdies'),
       row: mostBirdies,
-      runners: birdiesRanked.slice(1),
+      runners: birdiesRanked.slice(1, 3),
+      ranked: birdiesRanked,
       lowerWins: false,
       valueOf: (r) => r.birdies as number,
       accent: PODIUM_ACCENT.red,
@@ -1683,7 +1686,8 @@ export function GolfThisWeek({
       emoji: '\uD83D\uDCAA', // FLEXED ARM
       label: t('discover.golfThisWeek.improvedLabel', 'Most improved'),
       row: mostImproved,
-      runners: improvedRanked.slice(1),
+      runners: improvedRanked.slice(1, 3),
+      ranked: improvedRanked,
       lowerWins: false,
       /* Convert negative deltas to positive improvement magnitudes. This keeps
          one higher-wins deficit formula: −0.4 leads −0.2, and the chaser is
