@@ -250,8 +250,10 @@ export function FeatCard({
         padding: 0,
         border: 'none',
         borderRadius: CARD_RADIUS,
-        /* The metal is the card's shell, full height — one panel, not two. */
-        background: ace ? ACE_GROUND : ALBATROSS_GROUND,
+        /* The metal is the card's shell, full height — one panel, not two.
+           backgroundImage, not background: jsdom drops gradients from the
+           shorthand, and the suite reads this value. */
+        backgroundImage: ace ? ACE_GROUND : ALBATROSS_GROUND,
         boxShadow: CARD_SHADOW,
         overflow: 'hidden',
         textAlign: 'left',

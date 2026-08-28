@@ -84,8 +84,8 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     expect(bone.every((head) => head.dataset.honoursMetal === ACE_GROUND)).toBe(true);
     /* ONE MATERIAL: the metal ground now lives on the card shell, full height;
        the feat block carries no background of its own. */
-    expect(champagne?.parentElement?.style.background).toBe(ALBATROSS_GROUND);
-    expect(bone[0].parentElement?.style.background).toBe(ACE_GROUND);
+    expect(champagne?.parentElement?.style.backgroundImage).toBe(ALBATROSS_GROUND);
+    expect(bone[0].parentElement?.style.backgroundImage).toBe(ACE_GROUND);
     expect(champagne?.style.background).toBe('');
     expect(bone[0].style.background).toBe('');
   });
@@ -101,7 +101,7 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     expect(screen.getByText('2024').style.color).toBe('rgba(11, 15, 20, 0.6)');
     const course = screen.getByText('Royal Test');
     expect(course.style.color).toBe(ink);
-    expect(course.parentElement?.style.borderTop).toBe('1px solid rgba(216, 169, 60, 0.22)');
+    expect(course.parentElement?.style.borderTop.replace(/\s/g, '')).toBe('1pxsolidrgba(216,169,60,0.22)');
   });
 
   it('uses a lazy-loaded 40px squircle avatar in the unchanged 44px footprint', () => {
