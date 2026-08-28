@@ -5,15 +5,16 @@ import { Check, ChevronRight } from 'lucide-react';
 
 
 /**
- * BRIEF_DISCOVER_BOARD_LEADS §1.2 — THE BOARD HERO'S HEIGHT. 218, and the 372
- * the moment hero held is NOT carried across: that exception was recorded in
- * DiscoverHero.tsx and died with the file.
+ * THE BOARD HERO IS THE TOUR OVERVIEW HERO. One photo-led hero treatment
+ * across the app: the height is the canonical PHOTO BAND height
+ * (`PHOTO_BAND_HEIGHT`, 286 + the safe-area inset absorbed, exactly as
+ * PhotoBand does), the ramp is the canon scrim, and the lower third is the
+ * same 20px gutter / 8px baseline column with the same type.
  */
-const BOARD_HERO_H = 218;
 /** §1.3 — the neutral loading ground. FLAT, so it can never read as a gradient. */
 const BOARD_HERO_SHELL = 'rgba(255,255,255,0.05)';
-/** The when chip's ink. FAINT, one step below the counts' quiet. */
-const BOARD_HERO_FAINT = 'rgba(255,255,255,0.52)';
+/** The when chip's ink — the hero's marker ink (PhotoBand momentLabel). */
+const BOARD_HERO_FAINT = 'rgba(255,255,255,0.65)';
 
 /** ~1.2s: long enough to register, short enough not to be a state (§S3.4). */
 const CONFIRM_MS = 1200;
@@ -33,6 +34,7 @@ import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
   HERO_TOP_SCRIM,
+  PHOTO_BAND_HEIGHT,
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 import { relativeDay } from './discoverWhen';
@@ -1793,12 +1795,10 @@ export function GolfThisWeek({
 
   return (
     <section style={style}>
-      {/* BRIEF_DISCOVER_BOARD_LEADS §1 — THE BOARD'S HERO. The moment hero is
-          GONE (DiscoverHero.tsx and useDiscoverHero.ts deleted with it): the page
-          leads with the board, and its header is this. THREE THINGS ONLY — the
-          category title, the counts, the when chip. 218px, NOT 372: this is a
-          header for a table, not a page-opening statement, and the old 372
-          exception died with the file that recorded it (§1.2).
+      {/* THE BOARD'S HERO — the SAME photo hero as Tour Overview. Height,
+          gradient base, photo focal point, canon scrim and lower-third type all
+          come from PhotoBand so the two surfaces read as one treatment. THREE
+          THINGS ONLY — the category title, the counts, the when chip.
           FULL-BLEED: it escapes the page's 14px gutter and starts at physical
           y=0, paying the notch and the floating island clearance itself. */}
       {activeBoard ? (
@@ -1807,7 +1807,7 @@ export function GolfThisWeek({
             position: 'relative',
             width: '100dvw',
             marginLeft: 'calc(50% - 50dvw)',
-            height: `calc(${BOARD_HERO_H}px + env(safe-area-inset-top, 0px))`,
+            height: `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`,
             marginBottom: 14,
             overflow: 'hidden',
             isolation: 'isolate',
@@ -1836,13 +1836,24 @@ export function GolfThisWeek({
               }}
             />
           )}
-          {/* THE ONE CANON SCRIM, ending on the canvas so there is no seam where
-              the hero meets the pills. Held off the shell: a scrim over a flat
-              loading ground would read as a second, dimmer treatment. */}
+          {/* THE ONE CANON SCRIM, laid EXACTLY as PhotoBand lays it — a 260px
+              bottom ramp, not a full-inset wash — so the photograph keeps the
+              same open upper third the Tour Overview hero has. It ends on the
+              canvas, so there is no seam where the hero meets the pills. Held
+              off the shell: a scrim over a flat loading ground would read as a
+              second, dimmer treatment. */}
           {!heroImagePending && (
             <div
               aria-hidden="true"
-              style={{ position: 'absolute', inset: 0, background: HERO_CANON_SCRIM, zIndex: -1 }}
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 260,
+                background: HERO_CANON_SCRIM,
+                zIndex: -1,
+              }}
             />
           )}
 
@@ -1854,7 +1865,7 @@ export function GolfThisWeek({
               top: 0,
               left: 0,
               right: 0,
-              padding: 'calc(env(safe-area-inset-top, 0px) + 70px) 14px 0',
+              padding: 'calc(env(safe-area-inset-top, 0px) + 70px) 20px 0',
               display: 'flex',
               justifyContent: 'flex-end',
             }}
@@ -1875,36 +1886,40 @@ export function GolfThisWeek({
             </span>
           </div>
 
-          <div style={{ padding: '0 14px 16px', minWidth: 0 }}>
-            {/* §1.1/§1.4 — THE CATEGORY NAMES ITSELF ONCE ON THE PAGE BODY, HERE.
-                The 17px heading that used to sit below the hero is deleted: two
-                headings naming the same board was the fault this brief closes.
-                Read from `activeBoard`, never from the selection. */}
+          {/* THE LOWER THIRD — PhotoBand's column: 20px gutters, 8px off the
+              bottom edge, 10px between the title and the line beneath it. */}
+          <div style={{ padding: '0 20px 8px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* THE CATEGORY NAMES ITSELF ONCE ON THE PAGE BODY, HERE, in the
+                hero's title type — 30px/0.96 with the broadcast text shadow,
+                the same as the tournament title on Tour Overview. Read from
+                `activeBoard`, never from the selection. */}
             <h2
               style={{
                 margin: 0,
                 fontFamily: SANS,
-                fontSize: 24,
+                fontSize: 30,
                 fontWeight: 700,
-                lineHeight: 1.08,
+                lineHeight: 0.96,
                 letterSpacing: '-0.025em',
-                color: DISCOVER_FACT,
+                color: 'white',
+                textShadow: '0 2px 12px rgba(0,0,0,0.55)',
               }}
             >
               {activeBoard.label}
             </h2>
-            {/* The counts, unchanged in content and key — only their home moved.
-                The window is FIXED at GOLF_WEEK_DAYS, never derived from the
-                oldest round, so the readout cannot disagree with the query. */}
+            {/* The counts, unchanged in content and key — only their type now
+                matches the hero's venue line. The window is FIXED at
+                GOLF_WEEK_DAYS, never derived from the oldest round, so the
+                readout cannot disagree with the query. */}
             <div
               className="tabular-nums"
               style={{
-                marginTop: 4,
                 fontFamily: SANS,
-                fontSize: 12.5,
+                fontSize: 11.5,
                 fontWeight: 600,
-                lineHeight: 1.2,
-                color: DISCOVER_QUIET,
+                letterSpacing: '0.01em',
+                color: 'rgba(255,255,255,0.75)',
+                textShadow: '0 1px 3px rgba(0,0,0,0.45)',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
