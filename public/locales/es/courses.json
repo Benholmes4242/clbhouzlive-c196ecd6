@@ -1263,7 +1263,8 @@
     "mostPlayedRoundsLabel": "VUELTAS",
     "mostPlayedBestRoundsHere": "MEJORES VUELTAS AQUI",
     "mostPlayedAllRoundsHere": "LAS {{count}} VUELTAS AQUI",
-    "mostPlayedOneRoundLine": "Una vuelta aqui: {{name}} hizo {{gross}}."
+    "mostPlayedOneRoundLine": "Una vuelta aqui: {{name}} hizo {{gross}}.",
+    "mostPlayedOneRoundLine_other": "Solo {{name}} ha jugado aqui, mejor {{gross}}."
   },
   "statBrowse": {
     "colArea": "Zona",

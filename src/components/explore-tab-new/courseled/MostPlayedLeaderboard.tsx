@@ -253,6 +253,7 @@ function MemberBoard({
           }}
         >
           {t('discover.mostPlayedOneRoundLine', 'One round here: {{name}} shot {{gross}}.', {
+            count: row.count,
             name: single.name,
             gross: single.gross != null ? formatNumber(single.gross) : '\u2014',
           })}
