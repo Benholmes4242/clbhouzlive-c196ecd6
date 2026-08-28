@@ -46,25 +46,25 @@ export const GOLF_WEEK_FETCH = 120;
 
 
 /**
- * The scopes (§S2.1, extended by BRIEF_GOLF_THIS_WEEK_P4 §S4.1). Worldwide leads
- * and is the default. 'handicap_band' sits after 'suggested' and before
- * 'top_100': it is a RELEVANCE filter like circle and suggested, not a catalogue
- * filter like top_100 and played.
+ * The scopes (§S2.1, extended by BRIEF_GOLF_THIS_WEEK_P4 §S4.1, narrowed by
+ * MICRO_BRIEF_REMOVE_SUGGESTED_SCOPE). Worldwide leads and is the default.
+ * BEN'S ORDER: the three RELEVANCE scopes lead (worldwide, circle,
+ * handicap_band) and the two CATALOGUE scopes follow (played, top_100) — which
+ * is why 'played' now sits above 'top_100'. 'suggested' is removed: an unknown
+ * inbound value falls back to DEFAULT_WEEK_SCOPE, it never errors.
  */
 export type WeekScope =
   | 'worldwide'
   | 'circle'
-  | 'suggested'
   | 'handicap_band'
-  | 'top_100'
-  | 'played';
+  | 'played'
+  | 'top_100';
 export const WEEK_SCOPES: WeekScope[] = [
   'worldwide',
   'circle',
-  'suggested',
   'handicap_band',
-  'top_100',
   'played',
+  'top_100',
 ];
 export const DEFAULT_WEEK_SCOPE: WeekScope = 'worldwide';
 
@@ -205,13 +205,11 @@ export function useGolfThisWeek(
 ) {
   /* THE BAND HAS NO SERVER SCOPE: it is a player filter over the everyone read,
      narrowed client-side below (§S4.2). */
-  const hookScope =
-    scope === 'circle' ? 'circle' : scope === 'suggested' ? 'suggested' : 'everyone';
+  const hookScope = scope === 'circle' ? 'circle' : 'everyone';
   const query = useCircleLatestRounds(courseIds === undefined ? undefined : userId, {
     scope: hookScope,
     windowDays: GOLF_WEEK_DAYS,
     limit: GOLF_WEEK_FETCH,
-    includeSuggested: scope === 'suggested',
     oneRoundPerMember: false,
     courseIds: courseIds ?? null,
   });
