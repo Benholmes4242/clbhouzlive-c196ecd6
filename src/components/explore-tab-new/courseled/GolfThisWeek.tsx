@@ -4,6 +4,17 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Check, ChevronRight } from 'lucide-react';
 
 
+/**
+ * BRIEF_DISCOVER_BOARD_LEADS §1.2 — THE BOARD HERO'S HEIGHT. 218, and the 372
+ * the moment hero held is NOT carried across: that exception was recorded in
+ * DiscoverHero.tsx and died with the file.
+ */
+const BOARD_HERO_H = 218;
+/** §1.3 — the neutral loading ground. FLAT, so it can never read as a gradient. */
+const BOARD_HERO_SHELL = 'rgba(255,255,255,0.05)';
+/** The when chip's ink. FAINT, one step below the counts' quiet. */
+const BOARD_HERO_FAINT = 'rgba(255,255,255,0.52)';
+
 /** ~1.2s: long enough to register, short enough not to be a state (§S3.4). */
 const CONFIRM_MS = 1200;
 
@@ -17,6 +28,7 @@ import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
+import { HERO_CANON_SCRIM } from '@/features/tourhub/_shared/heroGradient';
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
