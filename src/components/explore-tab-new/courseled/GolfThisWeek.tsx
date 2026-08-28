@@ -915,8 +915,10 @@ function GolfThisWeekCard({
     () => selectMoment(shape?.holes ?? [], row.course_record_fact),
     [shape, row.course_record_fact],
   );
-  const label = momentLabel(moment, t as TFn);
-  const sentence = momentSentence(moment, t as TFn);
+  /* THE KICKER AND THE MOMENT SENTENCE COME OFF THE CARD (BRIEF_ROUND_CARD_
+     STRIP_BACK §S2). momentLabel/momentSentence STAY EXPORTED — the see-all
+     sheet and the scorecard sheet still print them. */
+
 
   const delta = row.delta_index;
   const hasMovement =
