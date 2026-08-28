@@ -33,6 +33,7 @@
  *  unknown                                 -> /profile/:actor or '/'
  */
 
+import { getActorRouteByType } from '@/types/actor';
 import type { ActivityFeedRowV2 } from '../hooks/useActivityFeedV2';
 
 const FOLLOW_TYPES = new Set([
@@ -44,6 +45,19 @@ const FOLLOW_TYPES = new Set([
   'friend_declined',
   'friend_cancelled',
 ]);
+
+/**
+ * THE TAP ROUTES TO WHAT IT SHOWS. A notification sourced from a business post
+ * renders the business's name and logo, so its profile destination must be the
+ * BUSINESS. actor_user_id stays the person (blocking / mute / friends filter);
+ * actor_route_id + actor_kind are the navigation pair. Pre-Aug-2026 rows carry
+ * no actor_kind, so this collapses to /profile/:actor_user_id exactly as before.
+ */
+function actorProfileRoute(row: ActivityFeedRowV2): string | null {
+  const id = row.actor_route_id ?? row.actor_user_id;
+  if (!id) return null;
+  return getActorRouteByType(row.actor_kind ?? 'personal', id);
+}
 
 export function getActivityLink(row: ActivityFeedRowV2): string {
   const {
@@ -194,14 +208,15 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
       if (fType === 'business' && fId) return `/business/${fId}`;
       if (fType === 'personal' && fId) return `/profile/${fId}`;
     }
-    return actor_user_id ? `/profile/${actor_user_id}` : '/';
+    return actorProfileRoute(row) ?? '/';
   }
 
   // --- new_post --------------------------------------------------------
   if (type === 'new_post') {
     const pid = data.post_id ?? (entity_type === 'post' ? entity_id : null);
     if (pid) return `/post/${pid}`;
-    if (actor_user_id) return `/profile/${actor_user_id}`;
+    const actorRoute = actorProfileRoute(row);
+    if (actorRoute) return actorRoute;
   }
 
   // --- achievements ----------------------------------------------------
@@ -288,7 +303,7 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
 
 
   // --- unknown ---------------------------------------------------------
-  return actor_user_id ? `/profile/${actor_user_id}` : '/';
+  return actorProfileRoute(row) ?? '/';
 }
 
 function buildTopTenLink(row: ActivityFeedRowV2, data: Record<string, string | undefined>): string {
