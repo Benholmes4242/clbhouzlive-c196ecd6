@@ -45,16 +45,105 @@ export const GOLF_WEEK_DAYS = 14;
 export const GOLF_WEEK_FETCH = 120;
 
 
-/** The five scopes (§S2.1). Worldwide leads and is the default. */
-export type WeekScope = 'worldwide' | 'circle' | 'suggested' | 'top_100' | 'played';
+/**
+ * The scopes (§S2.1, extended by BRIEF_GOLF_THIS_WEEK_P4 §S4.1). Worldwide leads
+ * and is the default. 'handicap_band' sits after 'suggested' and before
+ * 'top_100': it is a RELEVANCE filter like circle and suggested, not a catalogue
+ * filter like top_100 and played.
+ */
+export type WeekScope =
+  | 'worldwide'
+  | 'circle'
+  | 'suggested'
+  | 'handicap_band'
+  | 'top_100'
+  | 'played';
 export const WEEK_SCOPES: WeekScope[] = [
   'worldwide',
   'circle',
   'suggested',
+  'handicap_band',
   'top_100',
   'played',
 ];
 export const DEFAULT_WEEK_SCOPE: WeekScope = 'worldwide';
+
+/** Within 2.0 strokes either side, inclusive (§S2.1, Ben's decision). */
+export const HANDICAP_BAND_STROKES = 2.0;
+
+/**
+ * THE VIEWER'S INDEX (§S1.1): eg_handicap_index first, manual_handicap_index as
+ * the fallback when there is no sync. NEITHER PRESENT = null, and a null index
+ * means the scope does not exist for this member at all (§S1.2).
+ */
+export function useViewerHandicapIndex(userId: string | undefined) {
+  const query = useQuery<number | null>({
+    queryKey: ['courseled', 'viewer-handicap-index', userId ?? null],
+    enabled: !!userId,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('eg_handicap_index, manual_handicap_index')
+        .eq('id', userId as string)
+        .maybeSingle();
+      if (error || !data) return null;
+      const eg = data.eg_handicap_index;
+      const manual = data.manual_handicap_index;
+      if (eg != null) return Number(eg);
+      if (manual != null) return Number(manual);
+      return null;
+    },
+  });
+  return { index: query.data ?? null, ready: !userId || !query.isPending };
+}
+
+/**
+ * THE PILL LIST IS DERIVED, NEVER HARD-CODED (§S1.2). A member with no index
+ * gets a five-pill row with no gap where the sixth would be — not a disabled
+ * pill and not an empty scope.
+ */
+export function useAvailableWeekScopes(userId: string | undefined) {
+  const { index, ready } = useViewerHandicapIndex(userId);
+  const scopes = useMemo(
+    () => (index == null ? WEEK_SCOPES.filter((s) => s !== 'handicap_band') : WEEK_SCOPES),
+    [index],
+  );
+  return { scopes, viewerIndex: index, ready };
+}
+
+/**
+ * THE BAND FILTER (§S2). A PLAYER filter, so it cannot run through
+ * useWeekScopeCourses — it is applied to the fetched rows instead.
+ *
+ * TWO DECISIONS RECORDED HERE ON PURPOSE (§S3.3):
+ *   1. user_profiles.show_in_handicap_leaderboards IS DELIBERATELY NOT CONSULTED.
+ *      Ben was told the opposite view and overruled it explicitly: a member who
+ *      opts out of handicap LEADERBOARDS still appears in other members' bands.
+ *      Its absence here is a decision, not an oversight.
+ *   2. can_view_handicap() UPSTREAM is what actually governs whether a handicap
+ *      is visible at all — it enforces user_profiles.handicap_visibility and
+ *      requires an accepted friendship for anyone set to 'friends'. That gate is
+ *      NOT overruled and is NOT worked around: when it withholds a handicap,
+ *      hcp_at_time arrives null and the round simply does not qualify.
+ *
+ * hcp_at_time IS THE HANDICAP INDEX at the time of the round, not the
+ * course-specific playing handicap (useCircleLatestRounds.ts:23-24) — which is
+ * exactly the quantity this band compares. course_handicap is a different number
+ * and is never substituted. A NULL hcp_at_time IS EXCLUDED (§S2.3): never
+ * defaulted to the viewer's index, never treated as zero.
+ */
+export function filterToHandicapBand(
+  rows: readonly CircleRoundRow[],
+  viewerIndex: number | null,
+): CircleRoundRow[] {
+  if (viewerIndex == null) return [];
+  return rows.filter((r) => {
+    const played = r.hcp_at_time;
+    if (played == null) return false;
+    return Math.abs(Number(played) - viewerIndex) <= HANDICAP_BAND_STROKES;
+  });
+}
 
 /** Every course id on an ACTIVE published Top 100 list. Cached for the session. */
 export function useTop100CourseIds() {
@@ -114,6 +203,8 @@ export function useGolfThisWeek(
   scope: WeekScope = DEFAULT_WEEK_SCOPE,
   courseIds: string[] | null | undefined = null,
 ) {
+  /* THE BAND HAS NO SERVER SCOPE: it is a player filter over the everyone read,
+     narrowed client-side below (§S4.2). */
   const hookScope =
     scope === 'circle' ? 'circle' : scope === 'suggested' ? 'suggested' : 'everyone';
   const query = useCircleLatestRounds(courseIds === undefined ? undefined : userId, {
@@ -124,7 +215,17 @@ export function useGolfThisWeek(
     oneRoundPerMember: false,
     courseIds: courseIds ?? null,
   });
-  return query;
+
+  /* THE FILTER LIVES HERE (§S4.2) so the rail and the see-all sheet band
+     identically off one read. The band never widens itself when the result is
+     thin (§S4.4) — an empty scope renders the ordinary empty sentence. */
+  const { viewerIndex } = useAvailableWeekScopes(userId);
+  const data = useMemo(() => {
+    if (scope !== 'handicap_band') return query.data;
+    return filterToHandicapBand(query.data ?? [], viewerIndex);
+  }, [query.data, scope, viewerIndex]);
+
+  return { ...query, data } as typeof query;
 }
 
 /**
