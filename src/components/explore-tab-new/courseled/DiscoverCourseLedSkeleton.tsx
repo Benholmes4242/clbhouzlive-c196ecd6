@@ -345,14 +345,15 @@ export function GolfThisWeekRail() {
               boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
             }}
           >
-            {/* THE DARK REGION, 191 = the 156 hero + the member row's 8/19/8
-                (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW §4). The live tile's
-                photograph and scrim now run behind the row, so the shell's dark
-                block extends and the row's bars sit ON it rather than below it.
-                A skeleton updated later is a skeleton that is already wrong. */}
+            {/* THE DARK REGION, 167 = the 132 hero (BRIEF_GOLF_THIS_WEEK_P1_P3
+                §3.3) + the member row's 8/19/8. The live tile's hero runs behind
+                the row, so the shell's dark block extends and the row's bars sit
+                ON it rather than below it. A skeleton updated later is a skeleton
+                that is already wrong. */}
             <div
               style={{
-                height: 191,
+                height: 167,
+
                 width: '100%',
                 background: SK_ROUND_HERO_BG,
                 display: 'flex',
