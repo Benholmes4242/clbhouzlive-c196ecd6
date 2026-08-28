@@ -259,11 +259,12 @@ export function ComingUp({ tour }: { tour: TourId | null }) {
               // computed `visible` resolves to `auto` when the other axis is
               // not visible, which made the fixed-height track scroll on both.
               overflowY: 'hidden',
-              // Load-bearing: tells the compositor this element consumes
-              // horizontal pans only, so a vertical/diagonal drag is handed
-              // straight to the page scroller instead of being absorbed here.
-              // Do not remove while tidying styles.
-              touchAction: 'pan-x',
+              // overflow-y hidden is what prevents this fixed-height track
+              // scrolling its own content vertically. touch-action permits
+              // BOTH axes so a vertical drag reaches the page scroller;
+              // pan-x alone was tried and discarded because it silently
+              // swallows vertical drags.
+              touchAction: 'pan-x pan-y',
               scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch',
               scrollbarWidth: 'none',
