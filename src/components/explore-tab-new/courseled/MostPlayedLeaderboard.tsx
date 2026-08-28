@@ -332,19 +332,67 @@ function MemberBoard({
   const { t } = useTranslation('courses');
   /** §2 — NO CAP. Every resolved player is rendered. */
   const listed = row.players;
-  const scrolls = listed.length > BOARD_MAX_ROWS;
-  const scrollerRef = React.useRef<HTMLDivElement | null>(null);
-  /** The fade hides itself at the end, so it never reads as a cut-off edge. */
-  const [atEnd, setAtEnd] = useState(false);
-  const onScroll = () => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    setAtEnd(el.scrollTop + el.clientHeight >= el.scrollHeight - 2);
-  };
+  /* BRIEF_COURSES_PLAYED_COURSE_LED §2.3 — NO NESTED SCROLL AREA. The internal
+     scroller, its max height, its fade and its at-end state are gone: the list
+     renders inline and the PAGE scrolls. A scroll region nested in a scrolling
+     page always feels wrong on a phone, whatever overscroll-behavior does. */
+  const single = listed.length === 1 ? listed[0] : null;
+
   if (listed.length === 0) return null;
 
+  /* §2.4 — ONE ROUND IS A SENTENCE, NOT A ONE-ROW BOARD. */
+  if (single) {
+    return (
+      <div style={{ paddingBottom: 10, paddingTop: 8 }}>
+        <p
+          style={{
+            margin: 0,
+            fontFamily: SANS,
+            fontSize: 12.5,
+            fontWeight: 600,
+            lineHeight: 1.35,
+            color: viewerId === single.userId ? A.AMBER_DEEP : INK,
+          }}
+        >
+          {t('discover.mostPlayedOneRoundLine', 'One round here: {{name}} shot {{gross}}.', {
+            name: single.name,
+            gross: single.gross != null ? formatNumber(single.gross) : '\u2014',
+          })}
+        </p>
+        {onSeeAllAtCourse && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSeeAllAtCourse();
+            }}
+            style={{
+              ...LABEL,
+              fontSize: 11,
+              letterSpacing: '0.10em',
+              color: INK,
+              border: 'none',
+              background: 'transparent',
+              padding: '8px 0 0',
+              textAlign: 'left',
+              cursor: 'pointer',
+            }}
+          >
+            {t('discover.mostPlayedSeeAllAtCourse', 'Visit this course')}
+          </button>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div style={{ paddingBottom: 10, position: 'relative' }}>
+    <div style={{ paddingBottom: 10, paddingTop: 8 }}>
+      {/* §2.1 — THE EXPANDED STATE NAMES WHAT IT IS. */}
+      <div style={{ ...LABEL, fontSize: 11, letterSpacing: '0.14em', color: FAINT, marginBottom: 4 }}>
+        {t('discover.mostPlayedBestRoundsHere', 'BEST ROUNDS HERE')}
+      </div>
+      <div>
+
       <div
         ref={scrollerRef}
         onScroll={scrolls ? onScroll : undefined}
