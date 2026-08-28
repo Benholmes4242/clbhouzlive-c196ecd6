@@ -1400,16 +1400,27 @@ export function GolfThisWeek({
   const reactions = useContentReactions(reactionTargets);
 
 
+  /* PERSONAL HISTORY (BRIEF_ROUND_CARD_REFERENCE_LINE §S1): ONE batched
+     get_my_course_bests read for the whole visible window, keyed by the sorted,
+     deduped course-id set. A course absent from the map was never played. */
+  const windowCourseIds = useMemo(() => ordered.map((r) => r.course_id), [ordered]);
+  const myBests = useMyCourseBests(windowCourseIds, userId);
+
   /**
-   * §2 — THE REFERENCE LINE, tier (d) ONLY: "{n} better than the field that day".
-   * WHY ONLY (d): tiers (a)-(c) need get_my_course_best, which is NOT called
-   * anywhere in this section's tree (it is used by Course of the Week), and the
-   * brief forbids adding the call here — so (d), which is free from `ordered`, is
-   * the one that ships (§2.2/§2.3).
-   * THE FLOOR IS THREE ROUNDS in the same course/day group (§2.4, FIELD_GATE): an
-   * "average" of two rounds is not a field. A round that is not better than the
-   * field, or is in an ungated group, resolves to NOTHING — never a fabricated
-   * "first round here" (§2.5).
+   * §2 — THE REFERENCE LINE. Ladder, first that resolves; nothing if none do:
+   *   (b) "{n} better than your best here"  — own round that beat the best
+   *   (a) "Your best here is {n}"           — own round that did not
+   *   (c) SKIPPED (§2.3): get_my_course_bests returns no mean, and an average
+   *       derived from the fortnight beside an all-time rounds_here would be two
+   *       histories in one sentence.
+   *   (d) "{n} better than the field that day" — any round, unchanged.
+   * (b) IS TESTED BEFORE (a). get_my_course_bests INCLUDES the displayed round,
+   * so a new best EQUALS best_gross — the margin over the previous best is not
+   * knowable from this function, so the equality case falls through to (d)
+   * rather than claiming a fabricated margin (§2.5).
+   * FLOOR (§2.4): rounds_here >= 4, since rounds_here counts the displayed round.
+   * OWN ROUNDS ONLY (§2.2): is_self gates (a)-(c) entirely.
+   * THE FLOOR FOR (d) IS THREE ROUNDS in the same course/day group (FIELD_GATE).
    */
   const referenceByRound = useMemo(() => {
     const groups = new Map<string, CircleRoundRow[]>();
