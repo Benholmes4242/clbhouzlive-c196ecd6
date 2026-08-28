@@ -330,6 +330,16 @@ const PostDeepLinkPage: React.FC = () => {
       },
     });
 
+    // open() can refuse (its media guard returns silently). If it did, the
+    // scrim below would be the whole screen — show the actionable state
+    // instead. Belt-and-braces: the media-less case is already redirected above.
+    if (!useFullscreenFeedStore.getState().isOpen) {
+      console.error('[PostDeepLink] fullscreen open() refused the post', feedPost.id);
+      setNotFound(true);
+    }
+
+
+
   }, [authLoading, user, isLoading, feedPost, navigate, navState, searchParams]);
 
   // --- Loading ---
