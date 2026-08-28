@@ -2189,7 +2189,11 @@ export function GolfThisWeek({
               style={{
                 width: '100dvw',
                 marginLeft: 'calc(50% - 50dvw)',
-                background: A.PANEL,
+                 /* CANVAS, not PANEL. The tour's leaderboard block sits on the
+                    canvas (#15171F) — the exact stop the hero scrim ends on — so
+                    the hero fades INTO the board with no seam. A.PANEL (#1B1E27)
+                    read as a charcoal slab floating on the page. */
+                 background: A.CANVAS,
                 borderTop: `1px solid ${WELL_RULE}`,
                 overflow: 'hidden',
                 marginBottom: 12,
