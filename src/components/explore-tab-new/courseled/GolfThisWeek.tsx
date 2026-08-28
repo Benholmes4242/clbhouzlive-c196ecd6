@@ -1450,6 +1450,21 @@ export function GolfThisWeek({
   const scoreIds = useMemo(() => ordered.map((r) => r.score_id), [ordered]);
   const holeShapes = useRoundHoleShapes(scoreIds);
 
+  /* REACTIONS (BRIEF_GOLF_THIS_WEEK_P2 §S1): ONE batched read for the whole
+     visible window, keyed by the round's whs_score id exactly as
+     FriendsPlayedRail does — content_reactions is canonical for rounds, so the
+     same round reads identically in both sections. Rounds without a score id
+     contribute no target and render no control. */
+  const reactionTargets = useMemo<ReactionTarget[]>(
+    () =>
+      ordered
+        .filter((r) => !!r.score_id)
+        .map((r) => ({ type: 'round' as const, id: r.score_id as string })),
+    [ordered],
+  );
+  const reactions = useContentReactions(reactionTargets);
+
+
   /**
    * §2 — THE REFERENCE LINE, tier (d) ONLY: "{n} better than the field that day".
    * WHY ONLY (d): tiers (a)-(c) need get_my_course_best, which is NOT called
