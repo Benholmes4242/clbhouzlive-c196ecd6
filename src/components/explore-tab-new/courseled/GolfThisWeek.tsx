@@ -849,12 +849,12 @@ interface CardProps {
   /** §2.2 — read from the SAME cached following-id set that drives showFollow. */
   isFollowed: boolean;
   viewerUserId: string | undefined;
-  /**
-   * §2.1 — THE REFERENCE LINE, already resolved by the section (one tier or
-   * none). A card NEVER fabricates a comparison and reserves no height for a
-   * missing one.
-   */
-  reference?: string | null;
+  /* THE REFERENCE LINE AND ITS TIER LADDER ARE RETIRED
+     (BRIEF_ROUND_CARD_STRIP_BACK §S2.3). The board directly above does all the
+     comparing, so the card carries none: the prop, the derivation and the
+     batched get_my_course_bests read are DELETED, not disabled. Do not
+     reinstate — MICRO_BRIEF_REFERENCE_TIER_B is WITHDRAWN. */
+
   onPress: () => void;
   /**
    * REACTIONS (BRIEF_GOLF_THIS_WEEK_P2): resolved by the section from ONE
