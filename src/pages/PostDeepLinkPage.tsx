@@ -132,18 +132,31 @@ const PostDeepLinkPage: React.FC = () => {
       }
 
       // Block filter — hide posts by users the viewer has blocked (or been blocked by).
+      // user_blocks has EXACTLY three columns: blocker_id, blocked_id, created_at.
+      // There is no `id`, and PostgREST rejects nested and(...) groups written into
+      // .or() the way this once was (that 400'd on every deep link). Two .in()
+      // filters over the same pair express "a row exists in either direction":
+      // the only possible matches are (a,b) and (b,a) — (a,a)/(b,b) can't exist.
       if (user?.id && (data as any).user_id && (data as any).user_id !== user.id) {
-        const { data: blockRow } = await supabase
+        const pair = [user.id, (data as any).user_id];
+        const { data: blockRows, error: blockError } = await supabase
           .from('user_blocks')
-          .select('id')
-          .or(`and(blocker_id.eq.${user.id},blocked_id.eq.${(data as any).user_id}),and(blocker_id.eq.${(data as any).user_id},blocked_id.eq.${user.id})`)
-          .maybeSingle();
-        if (blockRow) {
+          .select('blocker_id, blocked_id')
+          .in('blocker_id', pair)
+          .in('blocked_id', pair)
+          .limit(1);
+        if (blockError) {
+          // FAIL OPEN, deliberately: a transient lookup failure hiding a friend's
+          // post is worse than a rare missed block, and the post fetch above is
+          // already RLS-protected. Logged so it is never silent again.
+          console.error('[PostDeepLink] block lookup failed, failing open', blockError);
+        } else if (blockRows && blockRows.length > 0) {
           setNotFound(true);
           setIsLoading(false);
           return;
         }
       }
+
 
       const row = data as any;
       const profileRow = row.user_profiles ?? {};
