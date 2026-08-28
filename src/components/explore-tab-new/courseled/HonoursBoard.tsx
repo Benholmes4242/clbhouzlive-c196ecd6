@@ -46,7 +46,11 @@ const AVATAR = 44;
  *
  * THESE TWO SEPARATE BY SATURATION, NOT VALUE. Champagne is the richer card,
  * not a lighter or darker card. Do not introduce a value difference to make the
- * hierarchy louder. Both three-stop grounds remain confined to the feat block.
+ * hierarchy louder.
+ *
+ * ONE MATERIAL, TOP TO BOTTOM (MICRO_BRIEF_HONOURS_CARD_ALL_CREAM): the ground
+ * covers the WHOLE CARD — shell to foot. The board is the page's one
+ * deliberately light element; an A.PANEL foot was a dark strip through it.
  */
 export const ALBATROSS_GROUND = 'linear-gradient(150deg, #FAF3E4 0%, #EADCBD 48%, #C2AE86 100%)';
 export const ACE_GROUND = 'linear-gradient(150deg, #FBFAF6 0%, #E7E3D8 48%, #C3BDAC 100%)';
@@ -246,7 +250,8 @@ export function FeatCard({
         padding: 0,
         border: 'none',
         borderRadius: CARD_RADIUS,
-        background: A.PANEL,
+        /* The metal is the card's shell, full height — one panel, not two. */
+        background: ace ? ACE_GROUND : ALBATROSS_GROUND,
         boxShadow: CARD_SHADOW,
         overflow: 'hidden',
         textAlign: 'left',
@@ -257,7 +262,8 @@ export function FeatCard({
         opacity: 1,
       }}
     >
-      {/* THE FEAT BLOCK — champagne ranks above bone; the panel foot stays dark. */}
+      {/* THE FEAT BLOCK — champagne ranks above bone; the ground is the
+          shell's, so this block carries no background of its own. */}
       <span
         data-honours-feat-block={ace ? 'ace' : 'albatross'}
         data-honours-metal={ace ? ACE_GROUND : ALBATROSS_GROUND}
@@ -268,7 +274,6 @@ export function FeatCard({
           justifyContent: 'flex-end',
           height: HEAD_H,
           flex: '0 0 auto',
-          background: ace ? ACE_GROUND : ALBATROSS_GROUND,
           padding: '11px 12px 12px',
           boxSizing: 'border-box',
         }}
@@ -353,7 +358,8 @@ export function FeatCard({
         </span>
       </span>
 
-      {/* The member appears once, on the metal. The dark foot carries course only. */}
+      {/* The member appears once, in the feat block. The foot sits on the SAME
+          ground, separated by a gold hairline — never a change of material. */}
       <span
         style={{
           display: 'flex',
@@ -361,6 +367,7 @@ export function FeatCard({
           justifyContent: 'center',
           flex: 1,
           padding: '0 12px',
+          borderTop: '1px solid rgba(216,169,60,0.22)',
         }}
       >
         <span
@@ -369,7 +376,7 @@ export function FeatCard({
             fontSize: 13,
             fontWeight: 700,
             letterSpacing: '-0.02em',
-            color: DISCOVER_FACT,
+            color: METAL_INK,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
