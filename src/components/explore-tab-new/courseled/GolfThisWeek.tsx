@@ -1732,7 +1732,7 @@ export function GolfThisWeek({
       unit: t('discover.golfThisWeek.board.birdiesUnit', 'BIRDIES'),
       hasPar: false,
       ranked: birdiesRanked,
-      lowerWins: false,
+      lowerWins: LOWER_WINS.includes('birdies'),
       valueOf: (r) => r.birdies as number,
       format: (r) => String(r.birdies),
       precision: 0,
