@@ -2017,7 +2017,7 @@ export function GolfThisWeek({
                 with the board, so it cannot survive onto another Discover tab,
                 and its label is `board.label`'s own short form — the value the
                 board is rendering, never the raw selection. */}
-            <BoardPicker<BoardKey>
+            <BoardPicker
               category={board.key}
               options={boards.map((b) => ({
                 key: b.key,
@@ -2025,7 +2025,7 @@ export function GolfThisWeek({
                 short: b.short,
                 count: b.ranked.length,
               }))}
-              onSelect={setBoardCategory}
+              onSelect={(k) => setBoardCategory(k as BoardKey)}
               sheetEyebrow={t('discover.golfThisWeek.board.pickerEyebrow', 'Discover')}
               sheetTitle={t('discover.golfThisWeek.board.pickerTitle', 'Select board')}
               ariaLabel={t('discover.golfThisWeek.board.pickerAria', 'Change board: {{label}}', {
