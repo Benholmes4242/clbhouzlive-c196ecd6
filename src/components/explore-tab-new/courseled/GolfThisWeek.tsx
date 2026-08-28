@@ -1294,15 +1294,30 @@ function GolfThisWeekCard({
             {t('discover.golfThisWeek.moment.seeTheCard', 'SEE THE CARD')}
             <ChevronRight size={9} strokeWidth={3} />
           </span>
-          <ReactionSlot>
-            <ReactionAction
-              hidden={reactionHidden}
-              count={reactionCount}
-              reacted={reactionMine}
-              onToggle={() => onToggleReaction?.()}
-              label={t('discover.reactions.action', 'Like this round')}
-            />
-          </ReactionSlot>
+          {/* FOLLOW MOVED HERE FROM THE MEMBER ROW
+              (MICRO_BRIEF_ROUND_CARD_TRUNCATION §2): this row already holds
+              actions and has the room the fact row did not. It renders only
+              where there is something to do, so a followed member's card shows
+              SEE THE CARD + the reaction exactly as before. */}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+            {showFollow && (
+              <FollowButton
+                targetUserId={row.user_id}
+                isFollowed={isFollowed}
+                viewerUserId={viewerUserId}
+                align="gap"
+              />
+            )}
+            <ReactionSlot>
+              <ReactionAction
+                hidden={reactionHidden}
+                count={reactionCount}
+                reacted={reactionMine}
+                onToggle={() => onToggleReaction?.()}
+                label={t('discover.reactions.action', 'Like this round')}
+              />
+            </ReactionSlot>
+          </span>
         </div>
       </div>
 
