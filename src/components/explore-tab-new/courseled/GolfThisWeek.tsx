@@ -2381,7 +2381,7 @@ export function GolfThisWeek({
                             color: own ? AMBER : INK,
                           }}
                         >
-                          {pinnedRow ? t('discover.golfThisWeek.you', 'You') : r.display_name}
+                          {r.display_name}
                         </span>
                         {/* On the pinned row the sub-line is the GAP TO THE
                             LEADER with its per-category unit and derived
