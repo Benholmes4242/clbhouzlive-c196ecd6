@@ -1400,6 +1400,45 @@ export function GolfThisWeek({
   const scoreIds = useMemo(() => ordered.map((r) => r.score_id), [ordered]);
   const holeShapes = useRoundHoleShapes(scoreIds);
 
+  /**
+   * §2 — THE REFERENCE LINE, tier (d) ONLY: "{n} better than the field that day".
+   * WHY ONLY (d): tiers (a)-(c) need get_my_course_best, which is NOT called
+   * anywhere in this section's tree (it is used by Course of the Week), and the
+   * brief forbids adding the call here — so (d), which is free from `ordered`, is
+   * the one that ships (§2.2/§2.3).
+   * THE FLOOR IS THREE ROUNDS in the same course/day group (§2.4, FIELD_GATE): an
+   * "average" of two rounds is not a field. A round that is not better than the
+   * field, or is in an ungated group, resolves to NOTHING — never a fabricated
+   * "first round here" (§2.5).
+   */
+  const referenceByRound = useMemo(() => {
+    const groups = new Map<string, CircleRoundRow[]>();
+    for (const r of ordered) {
+      if (!r.course_id || r.gross == null || r.course_par == null) continue;
+      const key = `${r.course_id}|${String(r.play_date ?? '').slice(0, 10)}`;
+      const list = groups.get(key);
+      if (list) list.push(r);
+      else groups.set(key, [r]);
+    }
+    const out = new Map<string, string>();
+    for (const list of groups.values()) {
+      if (list.length < 3) continue;
+      const toPars = list.map((r) => (r.gross as number) - (r.course_par as number));
+      const avg = toPars.reduce((a, b) => a + b, 0) / toPars.length;
+      list.forEach((r, i) => {
+        const better = avg - toPars[i];
+        if (better < 1) return;
+        out.set(
+          r.round_id,
+          t('discover.golfThisWeek.reference.fieldDay', '{{count}} better than the field that day', {
+            count: Math.round(better),
+          }),
+        );
+      });
+    }
+    return out;
+  }, [ordered, t]);
+
   /* NO INSIGHT MAP. The tile's prose is the MOMENT SENTENCE, generated from a
      fixed template per kind inside the card (BRIEF_ROUND_TILE_THE_MOMENT §S4.3).
      buildInsightMap survives for the see-all sheet, which still renders rows. */
