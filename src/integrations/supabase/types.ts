@@ -20033,6 +20033,16 @@ export type Database = {
           rounds_here: number
         }[]
       }
+      get_my_course_bests: {
+        Args: { p_course_ids: string[] }
+        Returns: {
+          best_gross: number
+          best_to_par: number
+          course_id: string
+          last_played: string
+          rounds_here: number
+        }[]
+      }
       get_my_course_scoring_breakdown: {
         Args: { p_golf_course_id: string }
         Returns: {
