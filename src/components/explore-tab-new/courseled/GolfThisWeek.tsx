@@ -267,6 +267,9 @@ const SHAPE_FILL_UNDER = '#4A2A2E';
 
 /** Amber is the viewing member and nothing else (§7). */
 const AMBER = '#F7931E';
+/** §1.3 — the own-member WASH: the same amber, at the alpha a ground can carry. */
+const AMBER_WASH = 'rgba(247, 147, 30, 0.10)';
+
 
 /* THE LIGHT-SURFACE INDEX MOVEMENT PAIR IS GONE FROM THIS FILE
    (BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §5.3): the only movement figure on this
