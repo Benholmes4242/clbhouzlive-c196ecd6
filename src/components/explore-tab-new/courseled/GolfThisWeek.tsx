@@ -1464,18 +1464,26 @@ export function GolfThisWeek({
   const byDateDesc = (a: CircleRoundRow, b: CircleRoundRow) =>
     String(b.play_date).localeCompare(String(a.play_date));
 
-  /** §2 — one place per member, best kept, at most three places. */
-  const topThree = (rows: CircleRoundRow[]) => {
+  /**
+   * §1.1 — RANK OVER THE FULL LIST. The dedupe-and-keep-best pass now returns
+   * EVERY qualifying member in order; `topThree` is a slice of it. The pinned
+   * own-member row needs a rank that can be 9th, and a top three cannot supply
+   * one. Because the array is deduped by user_id the member appears at most
+   * once, and that entry is already their best qualifying round (§1.2).
+   */
+  const rankAll = (rows: CircleRoundRow[]) => {
     const seen = new Set<string>();
     const out: CircleRoundRow[] = [];
     for (const r of rows) {
       if (seen.has(r.user_id)) continue;
       seen.add(r.user_id);
       out.push(r);
-      if (out.length === 3) break;
     }
     return out;
   };
+  /** §2 — one place per member, best kept, at most three places. */
+  const topThree = (rows: CircleRoundRow[]) => rankAll(rows).slice(0, 3);
+
 
   /* THE FLOORS APPLY TO EVERY PLACE (§3): a runner-up clears the same floor as
      the winner, so a tile with one qualifier shows the hero and NOTHING else —
