@@ -1836,13 +1836,24 @@ export function GolfThisWeek({
               }}
             />
           )}
-          {/* THE ONE CANON SCRIM, ending on the canvas so there is no seam where
-              the hero meets the pills. Held off the shell: a scrim over a flat
-              loading ground would read as a second, dimmer treatment. */}
+          {/* THE ONE CANON SCRIM, laid EXACTLY as PhotoBand lays it — a 260px
+              bottom ramp, not a full-inset wash — so the photograph keeps the
+              same open upper third the Tour Overview hero has. It ends on the
+              canvas, so there is no seam where the hero meets the pills. Held
+              off the shell: a scrim over a flat loading ground would read as a
+              second, dimmer treatment. */}
           {!heroImagePending && (
             <div
               aria-hidden="true"
-              style={{ position: 'absolute', inset: 0, background: HERO_CANON_SCRIM, zIndex: -1 }}
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 260,
+                background: HERO_CANON_SCRIM,
+                zIndex: -1,
+              }}
             />
           )}
 
