@@ -38,6 +38,11 @@ import {
   PHOTO_BAND_HEIGHT,
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
+/* MICRO_BRIEF_BOARD_HERO_CHIP_AND_RAIL §3 — the board hero's own height. Fixed,
+   never derived from content, so it is 246 in every category and every state. */
+const BOARD_HERO_HEIGHT = 246;
+
+
 import { relativeDay } from './discoverWhen';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
