@@ -131,33 +131,27 @@ const PostDeepLinkPage: React.FC = () => {
         return;
       }
 
-      // Block filter — hide posts by users the viewer has blocked (or been blocked by).
-      // user_blocks has EXACTLY three columns: blocker_id, blocked_id, created_at.
-      // There is no `id`, and PostgREST rejects nested and(...) groups written into
-      // .or() the way this once was (that 400'd on every deep link). Two .in()
-      // filters over the same pair express "a row exists in either direction":
-      // the only possible matches are (a,b) and (b,a) — (a,a)/(b,b) can't exist.
+      // Block filter — hide posts by users the viewer has blocked (or been
+      // blocked by). USES THE DATABASE FUNCTION are_users_blocked(a, b), the
+      // same one the notification trigger uses, so the two agree by
+      // construction. The previous hand-rolled user_blocks query reinvented it
+      // and got it wrong (nested and() inside .or(), plus a non-existent `id`
+      // column), so it 400'd from the day it was written.
       if (user?.id && (data as any).user_id && (data as any).user_id !== user.id) {
-        const pair = [user.id, (data as any).user_id];
-        const { data: blockRows, error: blockError } = await supabase
-          .from('user_blocks')
-          .select('blocker_id, blocked_id')
-          .in('blocker_id', pair)
-          .in('blocked_id', pair)
-          .limit(2);
+        const { data: blocked, error: blockError } = await supabase.rpc('are_users_blocked', {
+          user_a: user.id,
+          user_b: (data as any).user_id,
+        });
         if (blockError) {
           // FAIL OPEN, deliberately: a transient lookup failure hiding a friend's
           // post is worse than a rare missed block, and the post fetch above is
           // already RLS-protected. Logged so it is never silent again.
-          console.error('[PostDeepLink] block lookup failed, failing open', blockError);
-        } else if ((blockRows ?? []).some((r) => r.blocker_id !== r.blocked_id)) {
-          // Self-rows (blocker === blocked) would also satisfy the two .in()
-          // filters; they are nonsense data and must not hide anyone's post.
+          console.error('[PostDeepLink] are_users_blocked failed, failing open', blockError);
+        } else if (blocked === true) {
           setNotFound(true);
           setIsLoading(false);
           return;
         }
-
       }
 
 
@@ -166,16 +160,18 @@ const PostDeepLinkPage: React.FC = () => {
       const courseRow = row.golf_courses ?? null;
       const ratingRow = row.course_ratings ?? null;
 
-      // ── MEDIA-LESS POSTS MUST NOT BE SENT TO THE FULLSCREEN VIEWER.
-      // fullscreenFeedStore.open() filters on media presence and RETURNS
-      // SILENTLY when the tapped post has none (it would paint a black slide
-      // under live chrome). Round posts — which is what every `new_post`
-      // notification points at — carry no post_media rows, so the open was a
-      // no-op and this page sat on its black scrim forever. That is the black
-      // screen. A round notification's real destination is the ROUND, so
-      // redirect to the scorecard sheet: own rounds open on /handicap, another
-      // member's on /handicap/:userId (friend view mounts the same sheet).
+      // ── LEGACY PATH (added Aug 2026) — DELETE ONCE PRE-AUG-2026
+      // NOTIFICATIONS HAVE AGED OUT OF THE INBOX.
+      // Round notifications are now routed to the scorecard sheet at LINK time
+      // (activityLinks.ts, `new_post` case) because the trigger writes
+      // is_round / whs_score_id onto the notification row. Notifications
+      // written BEFORE that change carry only post_id, so they still land here.
+      // fullscreenFeedStore.open() filters on media presence and returns
+      // SILENTLY for a media-less post, which is what left this page sitting on
+      // its black scrim. So a media-less post is redirected, never opened:
+      // a round goes to its scorecard, anything else to its author.
       // Guests are never redirected — they keep the logged-out preview below.
+
       const mediaCount = Array.isArray(row.post_media)
         ? row.post_media.filter((m: any) => m.media_url || m.stream_id).length
         : 0;
