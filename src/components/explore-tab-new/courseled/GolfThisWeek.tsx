@@ -1747,8 +1747,47 @@ export function GolfThisWeek({
    * fall back with it — the tour picker's fault (a label derived from a
    * selection rather than from the list on screen) cannot recur.
    */
+  /**
+   * BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S2 — THE ROTATED DEFAULT, chosen
+   * ONCE PER SESSION and held in the module-level `sessionBoardKey`. The weight
+   * order is the brief's: (a) categories where the VIEWER HAS A QUALIFYING ROUND
+   * first — the same test the pinned row uses — (b) among those, lean on the
+   * handicap index, (c) qualifying nowhere or no index, choose from all five,
+   * (d) NEVER a category with no ranked rows at all.
+   *
+   * WHY IT IS NOT REACT STATE: a mount-scoped default would reshuffle the page
+   * every time the member tabs away from Discover and back (§2.1). WHY IT IS NOT
+   * STORAGE: the rotation must NOT persist across a cold launch (§2.4).
+   */
+  if (sessionBoardKey == null) {
+    const nonEmpty = boards.filter((b) => b.ranked.length > 0);
+    if (nonEmpty.length > 0) {
+      const qualifying = userId
+        ? nonEmpty.filter((b) => b.ranked.some((r) => r.is_self))
+        : [];
+      let pool = qualifying.length > 0 ? qualifying : nonEmpty;
+      if (qualifying.length > 0 && viewerIndex != null) {
+        const lean = viewerIndex < 5 ? LOW_INDEX_LEAN : HIGH_INDEX_LEAN;
+        const leaning = qualifying.filter((b) => lean.includes(b.key));
+        if (leaning.length > 0) pool = leaning;
+      }
+      sessionBoardKey = pool[Math.floor(Math.random() * pool.length)].key;
+    }
+  }
+
+  /**
+   * §2.3/§4.3 — ONE VALUE, HOISTED. The board that is ACTUALLY RENDERED is
+   * resolved here, once, and the island capsule, the hero title and the column
+   * header all read it. A stale or empty selection FALLS BACK, and the labels
+   * fall back with it — the tour picker's fault (a label derived from a
+   * selection rather than from the list on screen) cannot recur.
+   *
+   * §2.3 — AN EXPLICIT PICK (`boardCategory`) BEATS THE ROTATION; with no pick
+   * yet the session's rotated key stands in.
+   */
+  const effectiveCategory: BoardKey | null = boardCategory ?? sessionBoardKey;
   const activeBoard =
-    boards.find((b) => b.key === boardCategory && b.ranked.length > 0) ??
+    boards.find((b) => b.key === effectiveCategory && b.ranked.length > 0) ??
     boards.find((b) => b.ranked.length > 0) ??
     null;
 
