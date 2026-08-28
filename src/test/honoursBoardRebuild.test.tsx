@@ -92,19 +92,20 @@ describe('BRIEF_HONOURS_BOARD_THE_HOLE', () => {
     expect(bone[0].getAttribute('style')).not.toContain('linear-gradient');
   });
 
-  it('uses full ink for feat copy, a measured quiet ink for the year, and ink for the course name on the one-material card', () => {
+  it('matches the mock-up inks: gold feat label, year and hole line, dark member, slate course name', () => {
     const { container } = render(<HonoursBoard events={[ev({ id: 'a' })]} />);
     const head = container.querySelector<HTMLElement>('[data-honours-feat-block="ace"]');
     expect(head).toBeTruthy();
-    const ink = 'rgb(11, 15, 20)';
-    expect(screen.getByText('Ace').style.color).toBe(ink);
-    expect(screen.getByText('Sam Fairway').style.color).toBe(ink);
-    expect(screen.getByText(/Par 3/).style.color).toBe('rgba(11, 15, 20, 0.6)');
-    expect(screen.getByText('2024').style.color).toBe('rgba(11, 15, 20, 0.6)');
+    const gold = 'rgb(164, 120, 33)';
+    expect(screen.getByText('Ace').style.color).toBe(gold);
+    expect(screen.getByText(/Par 3/).style.color).toBe(gold);
+    expect(screen.getByText('2024').style.color).toBe(gold);
+    expect(screen.getByText('Sam Fairway').style.color).toBe('rgb(15, 18, 22)');
     const course = screen.getByText('Royal Test');
-    expect(course.style.color).toBe(ink);
-    expect(course.parentElement?.style.borderTop.replace(/\s/g, '')).toBe('1pxsolidrgba(216,169,60,0.22)');
+    expect(course.style.color).toBe('rgb(59, 66, 76)');
+    expect(course.parentElement?.style.borderTop.replace(/\s/g, '')).toBe('1pxsolid#F3E9CE');
   });
+
 
   it('uses a lazy-loaded 40px squircle avatar in the unchanged 44px footprint', () => {
     const { container } = render(
