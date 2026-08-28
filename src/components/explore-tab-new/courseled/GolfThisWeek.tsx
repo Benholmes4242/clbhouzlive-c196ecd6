@@ -60,8 +60,30 @@ import {
   GOLF_WEEK_DAYS,
   useWeekCounts,
   useWeekScopeCourses,
+  useViewerHandicapIndex,
   type WeekScope,
 } from './hooks/useGolfThisWeek';
+
+/**
+ * BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S2 — THE FIVE CATEGORIES, at module
+ * scope so the session's rotation can be held beside them.
+ */
+type BoardKey = 'gross' | 'net' | 'stableford' | 'improved' | 'birdies';
+
+/**
+ * §2.5 — THE SESSION'S ROTATED DEFAULT lives in a MODULE-LEVEL variable, not in
+ * React state and not in storage. That is deliberate on both sides:
+ *   - it survives unmount, so tabbing away from Discover and back does not
+ *     reshuffle the board under the member (§2.1);
+ *   - it dies with the JS module, i.e. on a cold launch, so tomorrow rotates
+ *     again and NOTHING is persisted (§2.4). No "last shown" store.
+ * It is written ONCE per session, the first time a non-empty board exists.
+ */
+let sessionBoardKey: BoardKey | null = null;
+
+/** §2.2b — the handicap lean. Under 5 leans ball-striking, 5+ leans the rest. */
+const LOW_INDEX_LEAN: BoardKey[] = ['gross', 'birdies'];
+const HIGH_INDEX_LEAN: BoardKey[] = ['net', 'stableford', 'improved'];
 import { useWeekRegionCounts, type RegionSelection } from './hooks/useWeekRegionCounts';
 import { RegionDropdown, WeekScopePills, scopeEmptyKey } from './WeekFilters';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
