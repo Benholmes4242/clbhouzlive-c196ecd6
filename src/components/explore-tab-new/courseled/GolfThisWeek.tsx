@@ -29,7 +29,9 @@ import { DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { toParFor, IndexMovementTriangle } from '../friendRoundParts';
-import { HERO_CANON_SCRIM } from '@/features/tourhub/_shared/heroGradient';
+import { heroCanonScrimOn } from '@/features/tourhub/_shared/heroGradient';
+import { HERO_BOARD_SURFACE } from '@/features/tourhub/_shared/tokens';
+
 import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
