@@ -1239,14 +1239,11 @@ function GolfThisWeekCard({
             )}
           </span>
 
-          {showFollow && (
-            <FollowButton
-              targetUserId={row.user_id}
-              isFollowed={isFollowed}
-              viewerUserId={viewerUserId}
-              align="gap"
-            />
-          )}
+          {/* FOLLOW IS GONE FROM THIS ROW (MICRO_BRIEF_ROUND_CARD_TRUNCATION
+              §2): the row is avatar, name (the ONE flexible element), gross
+              and to-par — facts, not actions. FOLLOW lives in the action row
+              at the foot, so a card where it renders and a card where it does
+              not have an IDENTICAL member row. */}
         </div>
         </div>
       </div>
