@@ -30,6 +30,8 @@ import { useContentReactions, type ReactionTarget } from './hooks/useContentReac
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
 import { useMyCourseBests } from '@/features/tourhub/hooks/useMyCourseBests';
+import { buildReferenceLadder, type ReferenceT } from './referenceLadder';
+
 
 import {
   DEFAULT_WEEK_SCOPE,
@@ -1407,87 +1409,17 @@ export function GolfThisWeek({
   const myBests = useMyCourseBests(windowCourseIds, userId);
 
   /**
-   * §2 — THE REFERENCE LINE. Ladder, first that resolves; nothing if none do:
-   *   (b) "{n} better than your best here"  — own round that beat the best
-   *   (a) "Your best here is {n}"           — own round that did not
-   *   (c) SKIPPED (§2.3): get_my_course_bests returns no mean, and an average
-   *       derived from the fortnight beside an all-time rounds_here would be two
-   *       histories in one sentence.
-   *   (d) "{n} better than the field that day" — any round, unchanged.
-   * (b) IS TESTED BEFORE (a). get_my_course_bests now returns
-   * second_best_gross (rn = 2), so when the displayed round IS the best
-   * (gross === best_gross) the margin over the previous best is
-   * second_best_gross - gross — but only when STRICTLY positive. A tied best
-   * (second === best) has margin zero, "0 better" is not a thing, and the
-   * ladder falls through to (d).
-   * FLOOR (§2.4): rounds_here >= 4, since rounds_here counts the displayed round.
-   * OWN ROUNDS ONLY (§2.2): is_self gates (a)-(c) entirely.
-   * THE FLOOR FOR (d) IS THREE ROUNDS in the same course/day group (FIELD_GATE).
+   * §2 — THE REFERENCE LINE, from the SHARED LADDER
+   * (BRIEF_DISCOVER_HERO_PARITY §2.4). The tier order, the is_self gate, the
+   * rounds_here >= 4 floor, the strictly-positive (b) margin and the field gate
+   * all live in referenceLadder.ts, so the hero above prints the same line for
+   * the same round. Do not reimplement any of it here.
    */
-  const referenceByRound = useMemo(() => {
-    const groups = new Map<string, CircleRoundRow[]>();
-    for (const r of ordered) {
-      if (!r.course_id || r.gross == null || r.course_par == null) continue;
-      const key = `${r.course_id}|${String(r.play_date ?? '').slice(0, 10)}`;
-      const list = groups.get(key);
-      if (list) list.push(r);
-      else groups.set(key, [r]);
-    }
-    const out = new Map<string, string>();
+  const referenceByRound = useMemo(
+    () => buildReferenceLadder(ordered, myBests, t as ReferenceT),
+    [ordered, myBests, t],
+  );
 
-    /* (b) then (a), own rounds only. Written first so (d) below never overwrites
-       a personal tier — the ladder takes the FIRST that resolves. */
-    for (const r of ordered) {
-      if (!r.is_self || !r.course_id || r.gross == null) continue;
-      const mine = myBests.get(r.course_id);
-      const bestGross = mine?.best_gross;
-      const roundsHere = mine?.rounds_here ?? 0;
-      if (bestGross == null || roundsHere < 4) continue;
-      // (b) strictly-better case, tested FIRST (§5): this round is the best,
-      // and the margin over the previous best is strictly positive. A TIE
-      // (second === best → margin 0) must fall through (§3).
-      if (
-        r.gross === bestGross &&
-        mine?.second_best_gross != null &&
-        mine.second_best_gross > r.gross
-      ) {
-        out.set(
-          r.round_id,
-          t('discover.golfThisWeek.reference.betterThanBest', '{{count}} better than your best here', {
-            count: mine.second_best_gross - r.gross,
-          }),
-        );
-        continue;
-      }
-      if (r.gross > bestGross) {
-        out.set(
-          r.round_id,
-          t('discover.golfThisWeek.reference.yourBest', 'Your best here is {{count}}', {
-            count: bestGross,
-          }),
-        );
-      }
-      // r.gross === bestGross with no positive margin: tied best — fall through.
-    }
-
-    for (const list of groups.values()) {
-      if (list.length < 3) continue;
-      const toPars = list.map((r) => (r.gross as number) - (r.course_par as number));
-      const avg = toPars.reduce((a, b) => a + b, 0) / toPars.length;
-      list.forEach((r, i) => {
-        if (out.has(r.round_id)) return; // a personal tier already won the ladder
-        const better = avg - toPars[i];
-        if (better < 1) return;
-        out.set(
-          r.round_id,
-          t('discover.golfThisWeek.reference.fieldDay', '{{count}} better than the field that day', {
-            count: Math.round(better),
-          }),
-        );
-      });
-    }
-    return out;
-  }, [ordered, myBests, t]);
 
   /* NO INSIGHT MAP. The tile's prose is the MOMENT SENTENCE, generated from a
      fixed template per kind inside the card (BRIEF_ROUND_TILE_THE_MOMENT §S4.3).

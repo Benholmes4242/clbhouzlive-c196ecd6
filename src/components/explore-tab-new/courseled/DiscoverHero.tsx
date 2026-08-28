@@ -1,14 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { animate, useReducedMotion } from 'framer-motion';
 
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { HERO_CANON_SCRIM } from '@/features/tourhub/_shared/heroGradient';
+import { useMyCourseBests } from '@/features/tourhub/hooks/useMyCourseBests';
 
 
 import { relativeDay } from './discoverWhen';
 import { DISCOVER_FACT, DISCOVER_QUIET, NUMF, SANS } from './tokens';
+import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+import { ReactionAction } from './ReactionAction';
+import { buildReferenceLadder, type ReferenceT } from './referenceLadder';
+
 import {
   ROW_DARK_INDEX_FELL,
   ROW_DARK_TOPAR_UNDER,
@@ -169,6 +174,32 @@ export function DiscoverHero({
   const wordStyle: React.CSSProperties = isRun
     ? { ...heroWordStyle, color: ROW_DARK_INDEX_FELL }
     : heroWordStyle;
+
+  /* PARITY WITH THE CARDS (BRIEF_DISCOVER_HERO_PARITY §S1, §S2). NO NEW DATA:
+     both additions read the score id and course id the subject already carries.
+
+     THE WINDOWS ARE SINGLE-ELEMENT AND THAT IS DELIBERATE (§1.2, §2.2). The hero
+     renders ABOVE the rounds section and must not wait on it, so it subscribes
+     with its own one-id set. useContentReactions patches EVERY cache entry
+     holding the id, so a tap here still moves the card and the sheet below. */
+  const reactionTargets = useMemo<ReactionTarget[]>(
+    () => (row.score_id ? [{ type: 'round' as const, id: row.score_id }] : []),
+    [row.score_id],
+  );
+  const reactions = useContentReactions(reactionTargets);
+  const reaction = reactions.stateFor('round', row.score_id);
+
+  const myBests = useMyCourseBests(
+    useMemo(() => [row.course_id], [row.course_id]),
+    reactions.viewerId,
+  );
+  /* THE SHARED LADDER, one implementation for the hero and the cards (§2.4).
+     Called with ONE row, so tier (d) cannot resolve — it needs a field, and the
+     hero holds none. Personal tiers (b) then (a) are unaffected. */
+  const reference =
+    buildReferenceLadder([row], myBests, t as ReferenceT).get(row.round_id) ?? null;
+
+
 
   return (
     <div
@@ -341,21 +372,28 @@ export function DiscoverHero({
           )}
         </div>
 
-        {/* ONE ROW CARRIES MEMBER, COURSE AND SCORE (§5). The member and their
-            course are a two-line stack on the left; the gross sits over the
-            to-par on the right, right-aligned and flex: none.
+        {/* ONE ROW CARRIES MEMBER, COURSE, SCORE AND THE REACTION (§5,
+            BRIEF_DISCOVER_HERO_PARITY §1.3). The member and their course are a
+            two-line stack on the left; the gross sits over the to-par on the
+            right, right-aligned and flex: none, with the heart trailing it.
 
-            TONE: the gross carries figureColor, the ACHIEVEMENT's colour. THE
-            QUALIFIER'S COLOUR IS A FUNCTION OF WHAT THE MOMENT CLAIMS, NOT OF
-            THE NUMBER'S SIGN: only when the moment is itself about the score
-            (course record, finished in the red) does the to-par carry the
-            achievement colour. Everywhere else — the run, birdie haul, strong
-            finish, grind, eagle — it is CONTEXT beside the claim and renders in
-            the neutral fact tone. Never inverted to red: a red +4 beside a green
-            9 would read as criticism of a good round.
+            TONE: THE GROSS FOLLOWS momentIsAboutScore, exactly as the qualifier
+            does, and for the same reason. It used to carry figureColor
+            unconditionally, which painted a GREEN 77 on a run that finished +6 —
+            green means better on every other member surface in this app. The
+            achievement is THE RUN; the gross is the score of the round the run
+            happened in, and only one of those is being celebrated. So a course
+            record or an under-par round keeps its coloured gross, and the run,
+            birdie haul, strong finish and grind render it in the neutral fact
+            tone. The 56px figure is untouched and keeps the moment tone in every
+            case — that IS the achievement, and on a run it should be the only
+            coloured thing on the hero.
+            Never inverted to red: a red +4 beside a green 9 would read as
+            criticism of a good round.
             ABSENT IS ABSENT: neither value renders NO right-hand block and no
             gap, never a dash. ON A COURSE RECORD the 56px figure ALREADY IS the
             gross, so only the to-par renders. */}
+
         {(() => {
           const toPar = moment.facts.toPar;
           const showGross = row.gross != null && !isGrossScore;
@@ -427,7 +465,7 @@ export function DiscoverHero({
                         fontWeight: 700,
                         lineHeight: 1,
                         letterSpacing: '-0.02em',
-                        color: figureColor,
+                        color: momentIsAboutScore ? figureColor : DISCOVER_FACT,
                       }}
                     >
                       {String(row.gross)}
@@ -449,10 +487,47 @@ export function DiscoverHero({
                   )}
                 </div>
               )}
+
+              {/* THE REACTION (§1.3-1.6). Right-aligned on this row, on the
+                  scrim. THE COUNT ALWAYS SHOWS (§1.4) — the same round on the
+                  card below must never read a different number. The control's
+                  44px tap target is padding cancelled by a negative margin, so
+                  it has NO layout footprint and the row's height is identical at
+                  0, 1 and 3 digits (§1.7). No score id, or signed out, and
+                  nothing renders at all. */}
+              <div style={{ flex: 'none', display: 'flex', alignItems: 'center' }}>
+                <ReactionAction
+                  count={reaction.count}
+                  reacted={reaction.mine}
+                  onToggle={() => reactions.toggle('round', row.score_id)}
+                  label={t('discover.reactions.action', 'Like this round')}
+                  tone="glass"
+                  size={17}
+                  hidden={!row.score_id || !reactions.viewerId || reactions.unavailable}
+                />
+              </div>
             </div>
           );
         })()}
+
+        {/* THE REFERENCE LINE (§2). One line, QUIET ink, beneath the member and
+            course row. NOTHING RESOLVES, NOTHING RENDERS — no reserved height
+            (§2.5). The ladder is shared with the round cards. */}
+        {reference && (
+          <div
+            style={{
+              marginTop: 8,
+              fontSize: 11.5,
+              fontWeight: 500,
+              lineHeight: 1.2,
+              color: DISCOVER_QUIET,
+            }}
+          >
+            {reference}
+          </div>
+        )}
       </div>
+
 
     </div>
   );
