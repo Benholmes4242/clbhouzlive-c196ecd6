@@ -26,7 +26,10 @@ import {
 import { relativeDay } from './discoverWhen';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
+import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
+import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
+
 import {
   DEFAULT_WEEK_SCOPE,
   bestOfWeek,
@@ -896,8 +899,18 @@ interface CardProps {
    */
   reference?: string | null;
   onPress: () => void;
-
+  /**
+   * REACTIONS (BRIEF_GOLF_THIS_WEEK_P2): resolved by the section from ONE
+   * batched useContentReactions read keyed by the round's whs_score id — never
+   * per card. `reactionHidden` covers no score id, signed out and the table
+   * being unavailable: absent is absent, not a disabled glyph.
+   */
+  reactionCount?: number;
+  reactionMine?: boolean;
+  reactionHidden?: boolean;
+  onToggleReaction?: () => void;
 }
+
 
 /**
  * THE ROUND TILE IS A STORY, NOT A REPORT (BRIEF_ROUND_TILE_THE_MOMENT).
@@ -927,7 +940,12 @@ function GolfThisWeekCard({
   viewerUserId,
   reference = null,
   onPress,
+  reactionCount = 0,
+  reactionMine = false,
+  reactionHidden = true,
+  onToggleReaction,
 }: CardProps) {
+
   const { t } = useTranslation('courses');
   const toPar = toParFor(row);
   const toParUnder =
@@ -1321,22 +1339,45 @@ function GolfThisWeekCard({
             {reference}
           </div>
         ) : null}
-        <span
+        {/* THE ACTION ROW (§2.1): SEE THE CARD leads, the reaction sits in the
+            trailing slot. The control's 44px tap target is padding cancelled by
+            a negative margin, so the foot is FOOT_H at every count — 0, 1 or 3
+            digits — and every rail card stays the same height. */}
+        <div
           style={{
-            ...LABEL,
-            fontSize: 11,
-            color: DISCOVER_QUIET,
-            display: 'inline-flex',
-            alignItems: 'center',
-            alignSelf: 'flex-start',
             marginTop: 'auto',
-            gap: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+            minWidth: 0,
           }}
         >
-          {t('discover.golfThisWeek.moment.seeTheCard', 'SEE THE CARD')}
-          <ChevronRight size={9} strokeWidth={3} />
-        </span>
+          <span
+            style={{
+              ...LABEL,
+              fontSize: 11,
+              color: DISCOVER_QUIET,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 2,
+            }}
+          >
+            {t('discover.golfThisWeek.moment.seeTheCard', 'SEE THE CARD')}
+            <ChevronRight size={9} strokeWidth={3} />
+          </span>
+          <ReactionSlot>
+            <ReactionAction
+              hidden={reactionHidden}
+              count={reactionCount}
+              reacted={reactionMine}
+              onToggle={() => onToggleReaction?.()}
+              label={t('discover.reactions.action', 'Like this round')}
+            />
+          </ReactionSlot>
+        </div>
       </div>
+
 
     </div>
   );
@@ -1408,6 +1449,21 @@ export function GolfThisWeek({
   /* ONE batched hole-shape read for the whole rail — never one per card. */
   const scoreIds = useMemo(() => ordered.map((r) => r.score_id), [ordered]);
   const holeShapes = useRoundHoleShapes(scoreIds);
+
+  /* REACTIONS (BRIEF_GOLF_THIS_WEEK_P2 §S1): ONE batched read for the whole
+     visible window, keyed by the round's whs_score id exactly as
+     FriendsPlayedRail does — content_reactions is canonical for rounds, so the
+     same round reads identically in both sections. Rounds without a score id
+     contribute no target and render no control. */
+  const reactionTargets = useMemo<ReactionTarget[]>(
+    () =>
+      ordered
+        .filter((r) => !!r.score_id)
+        .map((r) => ({ type: 'round' as const, id: r.score_id as string })),
+    [ordered],
+  );
+  const reactions = useContentReactions(reactionTargets);
+
 
   /**
    * §2 — THE REFERENCE LINE, tier (d) ONLY: "{n} better than the field that day".
@@ -2461,6 +2517,13 @@ export function GolfThisWeek({
               viewerUserId={userId}
               reference={referenceByRound.get(r.round_id) ?? null}
               onPress={() => onCardPress(r)}
+              /* §S1.2/§2.4 — target is the whs_score id, and the control renders
+                 on your OWN round too (the trigger already skips self-notify). */
+              reactionCount={reactions.stateFor('round', r.score_id).count}
+              reactionMine={reactions.stateFor('round', r.score_id).mine}
+              reactionHidden={!r.score_id || !reactions.viewerId || reactions.unavailable}
+              onToggleReaction={() => reactions.toggle('round', r.score_id)}
+
 
             />
           );
