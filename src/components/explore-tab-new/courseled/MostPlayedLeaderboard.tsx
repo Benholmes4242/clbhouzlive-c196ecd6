@@ -363,11 +363,15 @@ function MemberBoard({
               // FULL WIDTH (§S2.3): the tint bleeds to the card's own padding
               // rather than starting at a thumbnail-width indent.
               margin: '0 -13px',
-              padding: '7px 14px',
+              padding: '0 14px',
+              // §2.3 — HEIGHT-LOCKED so eight rows are always BOARD_MAX_H tall.
+              height: BOARD_ROW_H,
+              boxSizing: 'border-box',
               minWidth: 0,
               // §S2.8 — TINT ONLY.
               background: isViewer ? VIEWER_TINT : 'transparent',
             }}
+
           >
             {/* §S2.2 — POSITION FIRST. The leader's position is INK; the rest
                 are GHOST, so the board has one focal point per course. */}
