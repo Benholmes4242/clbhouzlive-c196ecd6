@@ -344,7 +344,7 @@ const KEY_MARK_SIZE = 22;
    The box is the mark size exactly; it exists to equalise item widths. */
 const KEY_MARK_BOX = KEY_MARK_SIZE;
 
-const Legend: React.FC<{ holes: CardScorecardHole[] }> = ({ holes }) => {
+const Legend: React.FC<{ holes: CardScorecardHole[]; hasUnplayed?: boolean }> = ({ holes, hasUnplayed }) => {
   const { t } = useTranslation(['courses']);
 
   const rarities = React.useMemo(() => {
