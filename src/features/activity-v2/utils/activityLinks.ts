@@ -16,6 +16,7 @@
  *  friend_course_review / course_review*   -> /courses/:course_id?tab=reviews&review=:review_id
  *  review_response_posted                  -> /courses/:course_id?tab=reviews&review=:review_id
  *  follow / friend_*                       -> /profile/:actor (or /business/:id when follower is business)
+ *  new_post (round)                        -> /round/:whs_score_id
  *  new_post                                -> /post/:entity_id (fallback /profile/:actor)
  *  achievement / achievement_unlocked      -> /achievements
  *  crown_* / legend_* / rival_played       -> /courses/:course_id (inert if absent)
@@ -218,15 +219,13 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     // discovered by fetching the post. is_round is only true when the post is
     // a round AND carries a score id; a legacy/hand-written row missing the
     // score id falls through to the post branch below.
-    // The scorecard sheet's only mount point is the handicap page (see the
-    // RoundDetailSheet at HandicapPage.tsx:619) — /handicap/:userId works for
-    // your own round as well as another member's, because the page treats an
-    // id equal to the viewer as self.
+    // BRIEF_ROUND_PAGE §3.1/§3.2 — the destination is now the round's OWN page
+    // (/round/:whsScoreId). This SUPERSEDES /handicap/:userId?score=, which
+    // borrowed the viewer's handicap surface to host someone else's card.
     const isRound = (data as Record<string, unknown>).is_round === true;
     const scoreId = data.whs_score_id;
-    const roundOwner = row.actor_user_id;
-    if (isRound && scoreId && roundOwner) {
-      return `/handicap/${roundOwner}?score=${encodeURIComponent(scoreId)}`;
+    if (isRound && scoreId) {
+      return `/round/${encodeURIComponent(scoreId)}`;
     }
 
     const pid = data.post_id ?? (entity_type === 'post' ? entity_id : null);

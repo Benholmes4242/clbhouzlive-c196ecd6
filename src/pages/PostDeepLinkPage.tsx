@@ -178,8 +178,8 @@ const PostDeepLinkPage: React.FC = () => {
       if (user?.id && mediaCount === 0) {
         const scoreId = row.whs_score_id ?? null;
         if (scoreId) {
-          const base = row.user_id === user.id ? '/handicap' : `/handicap/${row.user_id}`;
-          navigate(`${base}?score=${encodeURIComponent(scoreId)}`, { replace: true });
+          // BRIEF_ROUND_PAGE §3.2 — the round's own page, not the handicap page.
+          navigate(`/round/${encodeURIComponent(scoreId)}`, { replace: true });
           return;
         }
         // A text-only post has no viewer of its own; the author's profile is
