@@ -744,8 +744,13 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       open={open}
       onClose={onClose}
       variant="dark"
-      surfaceColor={A.CANVAS}
-      style={{ background: A.CANVAS, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column', ...sheetStyle }}
+      // The grabber strip is the only place the BottomSheet surface itself
+      // shows through — everything below it is painted by the content column
+      // (fixed summary header on PANEL, scrolling body on CANVAS). So the
+      // surface takes PANEL, or the grabber sits on a visibly different band
+      // from the header directly under it.
+      surfaceColor={A.PANEL}
+      style={{ background: A.PANEL, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column', ...sheetStyle }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>
         {/*
