@@ -1182,8 +1182,8 @@
         },
         "figure": {
           "hole": "LOCH {n}",
-          "holes": "{n} LÖCHER",
-          "inThree": "{n} VON DREI",
+          "holes": "{n} SAUBERE LOCHER",
+          "inThree": "{n} AUF DEN LETZTEN DREI",
           "inARow": "{n} PARS IN FOLGE",
           "birdies": "{n} BIRDIES"
         },
