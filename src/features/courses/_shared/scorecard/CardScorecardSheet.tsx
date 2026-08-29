@@ -745,7 +745,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       onClose={onClose}
       variant="dark"
       surfaceColor={A.CANVAS}
-      style={{ background: A.CANVAS, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}
+      style={{ background: A.CANVAS, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column', ...sheetStyle }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>
         {/*
