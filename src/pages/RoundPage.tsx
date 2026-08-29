@@ -91,7 +91,7 @@ const StateShell: React.FC<{
       <div
         style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          gap: 10, padding: '18px 0 6px', color: A.MUTE, ...SANS,
+          gap: 10, padding: '18px 0 6px', color: A.MUTE, fontFamily: SANS,
         }}
       >
         <Table size={22} strokeWidth={1.6} />
