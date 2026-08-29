@@ -172,28 +172,40 @@ export const TournamentHoleRow: React.FC<{
         <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>
           {row.hole_no}
         </span>
-        {/* AXIS: par is a COLUMN VALUE in a 26px fixed column, centred under no
-            header — a coordinate. Already above the AXIS floor of 10, so it holds
-            at 12. Yardage, by contrast, is a read figure (see DetailFigure). */}
-        <span style={{ fontSize: 12, fontWeight: 700, color: A.BODY, textAlign: 'center', ...FIGS }}>
-          {row.par}
+        {/* AXIS: par is a COLUMN VALUE in a 26px fixed column, labelled like the
+            course row's PAR column so the numeral never explains itself. */}
+        <span style={{ display: 'block', textAlign: 'center' }}>
+          <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: A.BODY, ...FIGS }}>
+            {row.par}
+          </span>
+          <span style={{ ...LABEL, display: 'block', marginTop: 1 }}>
+            {t('courses:courseDetail.holes.colPar')}
+          </span>
         </span>
 
         <span style={{ display: 'block', minWidth: 0 }}>
-          {/* Ramp bar with the field-average tick — the only marker here. */}
+          {/* Ramp bar with the field-average tick — the only marker here. Segment
+              geometry (1.5px gaps, 2px hairline for a zero bucket at 0.28) is the
+              course row's, so the two surfaces read identically. A hole with no
+              scores yet is FOUR HAIRLINES, never a filled grey bar. */}
           <span style={{ position: 'relative', display: 'block', paddingTop: 2 }}>
-            <span
-              style={{
-                height: 7,
-                borderRadius: 3,
-                overflow: 'hidden',
-                display: 'flex',
-                background: A.TRACK,
-              }}
-            >
-              {segs.map((s) => (
-                <i key={s.key} style={{ width: `${(s.pctValue / total) * 100}%`, background: s.bg }} />
-              ))}
+            <span style={{ display: 'flex', gap: 1.5, height: 8 }}>
+              {segs.map((s, i) => {
+                const empty = s.pctValue <= 0;
+                return (
+                  <i
+                    key={s.key}
+                    style={{
+                      width: empty ? 2 : `${(s.pctValue / total) * 100}%`,
+                      flexShrink: 0,
+                      background: s.bg,
+                      opacity: empty ? 0.28 : 1,
+                      borderRadius:
+                        i === 0 ? '4px 0 0 4px' : i === segs.length - 1 ? '0 4px 4px 0' : 0,
+                    }}
+                  />
+                );
+              })}
             </span>
             {Number.isFinite(row.avg_to_par) && (
               <i
