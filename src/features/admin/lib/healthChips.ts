@@ -85,6 +85,28 @@ export function computeErrorsChip(
   return { tone: 'danger', label: 'Errors', detail: `${count24h} in 24h` };
 }
 
+/**
+ * BRIEF_HEALTH_DELETION_INTEGRITY. Thresholds are not negotiable:
+ * live_sessions > 0 is RED (a deleted account can currently write to the
+ * app) and OUTRANKS amber; unbanned > 0 alone is AMBER (contained but not
+ * erased). Both zero is OK. Loading or an errored/unavailable RPC (a
+ * non-admin, per the brief) is idle - never an error on the board.
+ */
+export function computeDeletionChip(
+  data: { live_sessions: number; unbanned: number } | null | undefined,
+  isLoading: boolean,
+): ChipState {
+  if (isLoading) return { tone: 'idle', label: 'Deletions', detail: 'Loading' };
+  if (!data) return { tone: 'idle', label: 'Deletions', detail: 'Unavailable' };
+  if (data.live_sessions > 0) {
+    return { tone: 'danger', label: 'Deletions', detail: `${data.live_sessions} with live access` };
+  }
+  if (data.unbanned > 0) {
+    return { tone: 'warn', label: 'Deletions', detail: `${data.unbanned} not erased` };
+  }
+  return { tone: 'ok', label: 'Deletions', detail: 'clean' };
+}
+
 export function useHealthChips() {
   const echo = useEchoEngineHealth();
   const push = usePushHealth();

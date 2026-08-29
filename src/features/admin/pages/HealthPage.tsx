@@ -27,7 +27,7 @@ import VideoPerfPage from './VideoPerfPage';
 import StabilityTab from './StabilityTab';
 
 type TabId = 'status' | 'stability' | 'video' | 'audit' | 'tools' | 'settings';
-type SubsystemId = 'eg' | 'cron' | 'echo' | 'push' | 'pipeline' | 'errors';
+type SubsystemId = 'eg' | 'cron' | 'echo' | 'push' | 'pipeline' | 'errors' | 'deletion';
 
 /**
  * ONE duration formatter for the console. chartPrimitives' thresholds (s / m /
