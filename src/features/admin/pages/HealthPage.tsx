@@ -258,7 +258,7 @@ function StatusTab({
               </div>
               <span style={{ color: t.inkMuted, fontSize: 12, fontWeight: 600 }}>{active.chip.detail}</span>
             </div>
-            <DetailBody id={active.id} echo={echo} push={push} eg={eg} ops={ops} />
+            <DetailBody id={active.id} echo={echo} push={push} eg={eg} ops={ops} deletion={deletion} />
           </div>
           <DetailFooter id={active.id} echo={echo} eg={eg} />
         </section>
@@ -591,20 +591,51 @@ function EchoRunFooter({ echo }: { echo: ReturnType<typeof useEchoEngineHealth> 
 }
 
 function DetailBody({
-  id, echo, push, eg, ops,
+  id, echo, push, eg, ops, deletion,
 }: {
   id: SubsystemId;
   echo: ReturnType<typeof useEchoEngineHealth>;
   push: ReturnType<typeof usePushHealth>;
   eg:   ReturnType<typeof useDashboard>['egSyncHealth'];
   ops:  ReturnType<typeof useOpsHealth>;
+  deletion: ReturnType<typeof useDeletionIntegrity>;
 }) {
   if (id === 'eg')       return <EgSyncDetail eg={eg} />;
   if (id === 'cron')     return <CronDetail eg={eg} />;
   if (id === 'echo')     return <EchoDetail echo={echo} />;
   if (id === 'push')     return <PushDetail push={push} />;
   if (id === 'pipeline') return <PipelineDetail ops={ops} />;
+  if (id === 'deletion') return <DeletionDetail deletion={deletion} />;
   return <ErrorsDetail ops={ops} />;
+}
+
+// ─── Deletions ────────────────────────────────────────────────────────────────
+
+/**
+ * BRIEF_HEALTH_DELETION_INTEGRITY §5. Counts in plain words, never the
+ * column names; worst_seen rendered as an age. NO account is ever named -
+ * the count is the alert; identifying accounts is a SQL job for Ben, and
+ * user ids on an admin board invite action outside the erasure flow.
+ */
+function DeletionDetail({ deletion }: { deletion: ReturnType<typeof useDeletionIntegrity> }) {
+  const d = deletion.data;
+  if (deletion.isLoading) return <CardSkeleton />;
+  if (!d) return <AdminErrorState message="Could not load deletion integrity." onRetry={() => deletion.refetch()} />;
+  return (
+    <>
+      <StatRow stats={[
+        { label: 'Still signed in', value: d.live_sessions, bad: d.live_sessions > 0 },
+        { label: 'Contained, not erased', value: d.unbanned, bad: d.unbanned > 0 },
+        { label: 'Fully erased', value: d.orphan_profiles },
+        ...(d.worst_seen ? [{ label: 'Oldest unresolved', value: age(d.worst_seen), bad: true }] : []),
+      ]} />
+      {d.live_sessions > 0 && (
+        <div style={{ color: t.dangerText, fontSize: 12, fontWeight: 600 }}>
+          A deleted account can currently sign in and write to the app.
+        </div>
+      )}
+    </>
+  );
 }
 
 // ─── EG sync ──────────────────────────────────────────────────────────────────
