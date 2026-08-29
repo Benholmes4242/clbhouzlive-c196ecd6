@@ -591,6 +591,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext,
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, identityStat,
+  playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound,
   sheetStyle,
 }) => {
