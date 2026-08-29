@@ -184,11 +184,20 @@ export const WhsConnectScreen: React.FC<Props> = ({
     setSubmitting(true);
     setError(null);
 
+    // S3.1: credentials are passed to the API call and NOWHERE else. No event
+    // prop ever carries membershipNumber, password, or anything derived.
+    analyticsEvents.track('whs_connect_submitted', { country: country?.id ?? null });
+
     try {
       const data = await callConnectWhs(membershipNumber, password);
       if (data.ok === false) {
         const code = data.error_code ?? 'internal_error';
         setError(ERROR_MESSAGES[code] ?? data.message ?? ERROR_MESSAGES.internal_error);
+        // Categorised, never the raw message (S3.2).
+        analyticsEvents.track('whs_connect_failed', {
+          category: categorizeWhsError(code, null),
+          country: country?.id ?? null,
+        });
         return;
       }
       // Auto-restore: connected users have earned the live index chip.
@@ -210,9 +219,18 @@ export const WhsConnectScreen: React.FC<Props> = ({
       if (user?.id) {
         await queryClient.invalidateQueries({ queryKey: whsKeys.connection(user.id) });
       }
+      /* Latch BEFORE setSuccessData: the abandoned-on-unmount guard reads this
+         ref, so succeeded and abandoned can never both fire (acceptance D). */
+      succeededRef.current = true;
+      analyticsEvents.track('whs_connect_succeeded', { country: country?.id ?? null });
       setSuccessData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      // Name/shape only — the message string never leaves this function (S3.2).
+      analyticsEvents.track('whs_connect_failed', {
+        category: categorizeWhsError(null, err),
+        country: country?.id ?? null,
+      });
     } finally {
       setSubmitting(false);
     }
