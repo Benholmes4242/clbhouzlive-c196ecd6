@@ -4,6 +4,7 @@ import { RefreshCw, Table } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { TrajectoryLine } from './TrajectoryLine';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
@@ -140,6 +141,16 @@ export interface CardScorecardSheetProps {
   playerHcp?: number | null;
   playerHcpDelta?: number | null;
   playerUserId?: string | null;
+  /**
+   * S3 — TOUR ONLY. sr_players.photo_url is populated for 2 of 2,879 players, so
+   * reading it alone showed initials for nearly every tour player. With these two
+   * the tour branch goes through resolvePlayerAvatarCandidates — the canonical
+   * resolver the player profile page uses — which builds the ordered storage-path
+   * chain from the player's name. The MEMBER branch is untouched: a member avatar
+   * is user_profiles.profile_photo_url and is unrelated.
+   */
+  playerTourSlug?: string | null;
+  playerHeadshotOverride?: string | null;
   /** Tour: shows a position ("T4") in place of the handicap index. */
   identityStat?: { label: string; value: string } | null;
   // FOOTER
@@ -209,10 +220,31 @@ const CardRow: React.FC<{
  * their par/strokes through this helper so the two can never be derived from
  * different filters and disagree on screen.
  */
-function nineSummary(rows: CardScorecardHole[]): { par: number; strokes: number } {
+/**
+ * BRIEF_TOUR_SCORECARD_SHEET_FOUR_FAULTS S1 — A PARTIAL NINE IS NOT A NINE.
+ *
+ * `strokes` and `par` keep their old meaning (the full nine's arithmetic, which
+ * the gross invariant at the totals block depends on). Two fields are ADDED:
+ *
+ *  - playedCount: how many holes on this nine carry a real score. Zero means
+ *    the nine has not started, and a nine that has not started shows NOTHING —
+ *    a 0 there is a claim, and it is false.
+ *  - parPlayed: par for exactly the holes played, so a partial nine's strokes
+ *    are compared against a par that covers the same holes (30 against 31 at
+ *    eight holes, never 30 against 35).
+ */
+function nineSummary(rows: CardScorecardHole[]): {
+  par: number;
+  strokes: number;
+  playedCount: number;
+  parPlayed: number;
+} {
+  const scored = rows.filter((h) => h.strokes != null && h.strokes > 0);
   return {
     par: rows.reduce((s, h) => s + (h.par ?? 0), 0),
-    strokes: rows.reduce((s, h) => s + (h.strokes != null && h.strokes > 0 ? h.strokes : 0), 0),
+    strokes: scored.reduce((s, h) => s + (h.strokes as number), 0),
+    playedCount: scored.length,
+    parPlayed: scored.reduce((s, h) => s + (h.par ?? 0), 0),
   };
 }
 
@@ -233,7 +265,18 @@ const Nine: React.FC<{
   scoreLabel: string;
 }> = ({ rows, label, withField, scoreLabel }) => {
   const { t } = useTranslation(['courses']);
-  const { par, strokes } = nineSummary(rows);
+  const { par, strokes, playedCount, parPlayed } = nineSummary(rows);
+  /**
+   * S1.2 / S1.3 — the nine's two totals.
+   *  - No hole played: BOTH totals are absent (empty, not 0, not a dash).
+   *    A completed nine and a genuine nine-hole round are unaffected.
+   *  - Part played: par covers the holes played, so the strokes beside it mean
+   *    something. Fully played: the nine's par, exactly as before.
+   */
+  const started = playedCount > 0;
+  const partial = started && playedCount < rows.length;
+  const parTotal = !started ? '' : partial ? parPlayed : (par || '\u2014');
+  const strokesTotal = started ? strokes : '';
 
   const fieldRel = withField
     ? rows.reduce(
@@ -245,13 +288,13 @@ const Nine: React.FC<{
   return (
     <div>
       <CardRow label={t('courses:scorecard.hole')} cells={rows.map((h) => h.holeNo)} total={label} muted />
-      <CardRow label={t('courses:scorecard.par')} cells={rows.map((h) => h.par ?? '\u2014')} total={par || '\u2014'} muted />
+      <CardRow label={t('courses:scorecard.par')} cells={rows.map((h) => h.par ?? '\u2014')} total={parTotal} muted />
       <CardRow
         label={scoreLabel}
         cells={rows.map((h) => (
           <ScoreMark key={h.holeNo} strokes={h.strokes} par={h.par ?? 4} size={22} surface="dark" />
         ))}
-        total={strokes || '\u2014'}
+        total={strokesTotal}
       />
 
       {withField && (
@@ -312,7 +355,7 @@ const KEY_MARK_SIZE = 22;
    The box is the mark size exactly; it exists to equalise item widths. */
 const KEY_MARK_BOX = KEY_MARK_SIZE;
 
-const Legend: React.FC<{ holes: CardScorecardHole[] }> = ({ holes }) => {
+const Legend: React.FC<{ holes: CardScorecardHole[]; hasUnplayed?: boolean }> = ({ holes, hasUnplayed }) => {
   const { t } = useTranslation(['courses']);
 
   const rarities = React.useMemo(() => {
@@ -329,7 +372,7 @@ const Legend: React.FC<{ holes: CardScorecardHole[] }> = ({ holes }) => {
     return { eagle, ace, alba };
   }, [holes]);
 
-  const keys: { strokes: number; label: string }[] = [
+  const keys: { strokes: number | null; label: string; showStroke?: boolean }[] = [
     { strokes: 3, label: t('courses:scorecard.legendBirdie') },
   ];
   if (rarities.eagle) keys.push({ strokes: 2, label: t('courses:scorecard.legendEagle') });
@@ -340,6 +383,16 @@ const Legend: React.FC<{ holes: CardScorecardHole[] }> = ({ holes }) => {
   else if (rarities.ace) keys.push({ strokes: 1, label: t('courses:scorecard.legendAce') });
   keys.push({ strokes: 5, label: t('courses:scorecard.legendBogey') });
   keys.push({ strokes: 6, label: t('courses:scorecard.legendDouble') });
+  /**
+   * S4 — THE FOURTH TREATMENT IS THE UNPLAYED HOLE, AND IT IS NOW NAMED.
+   * Par stays deliberately unmarked (marking every hole marks nothing), so the
+   * only unexplained cell on a live card was the empty one. ScoreMark already
+   * renders it as a faint mid-dot — no new glyph — and this entry appears ONLY
+   * while holes remain unplayed, so a completed card's key is unchanged.
+   */
+  if (hasUnplayed) {
+    keys.push({ strokes: null, label: t('courses:scorecard.legendNotPlayed'), showStroke: true });
+  }
 
   return (
     <div>
@@ -362,7 +415,7 @@ const Legend: React.FC<{ holes: CardScorecardHole[] }> = ({ holes }) => {
                 justifyContent: 'center',
               }}
             >
-              <ScoreMark strokes={k.strokes} par={4} size={KEY_MARK_SIZE} surface="dark" showStroke={false} />
+              <ScoreMark strokes={k.strokes} par={4} size={KEY_MARK_SIZE} surface="dark" showStroke={k.showStroke === true} />
             </span>
             <span style={{ ...LABEL_READ }}>{k.label}</span>
           </span>
@@ -539,6 +592,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   emptyVariant, emptyGross, emptyToPar,
   surface = 'member', courseContext,
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, identityStat,
+  playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound,
   sheetStyle,
 }) => {
@@ -549,6 +603,23 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   void nineHole;
 
   const isTour = surface === 'tour';
+  /**
+   * S3 — the tour avatar's ordered candidate chain, from the ONE canonical
+   * resolver (consumed, never re-implemented). photo_url still wins when it is
+   * there; otherwise SquircleAvatar walks the name-derived storage paths and
+   * falls back to initials only when every candidate misses.
+   */
+  const tourAvatarCandidates = React.useMemo(
+    () => (isTour
+      ? resolvePlayerAvatarCandidates({
+          name: playerName,
+          photoUrl: playerAvatarUrl ?? null,
+          tourSlug: playerTourSlug ?? null,
+          headshotOverride: playerHeadshotOverride ?? null,
+        })
+      : []),
+    [isTour, playerName, playerAvatarUrl, playerTourSlug, playerHeadshotOverride],
+  );
   const { user } = useSupabaseSession();
   /**
    * OWNERSHIP is still derived, never passed — it drives the amber own-member
@@ -708,6 +779,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const cardGross = outSummary.strokes + (backSummary?.strokes ?? 0);
   const cardTotalPar = outSummary.par + (backSummary?.par ?? 0);
   const totalPar = played.reduce((s, h) => s + (h.par as number), 0);
+  /**
+   * S1.3 — WHICH PAR THE ROUND IS SHOWN AGAINST. A completed card (18 or a
+   * genuine nine) reads against the card's own par, exactly as before. A round
+   * still in progress reads against the par of the holes played — the same par
+   * totals.toPar is measured against — so the figures agree with each other.
+   * cardGross and cardTotalPar are untouched: the invariant and the DEV warning
+   * above keep their original inputs.
+   */
+  const allHolesPlayed = holes.length > 0 && played.length === holes.length;
+  const shownPar = allHolesPlayed ? cardTotalPar : totalPar;
+  const showOutSeg = outSummary.playedCount > 0;
+  const showInSeg = (backSummary?.playedCount ?? 0) > 0;
   if (import.meta.env.DEV) {
     // The visible sum must agree with the hero/stat gross. A mismatch means the
     // nines and the round totals were filtered differently - loud, not silent.
@@ -798,7 +881,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               {showIdentity && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, minWidth: 0 }}>
                   <SquircleAvatar
-                    src={playerAvatarUrl ?? null}
+                    {...(isTour
+                      ? { srcCandidates: tourAvatarCandidates }
+                      : { src: playerAvatarUrl ?? null })}
                     alt={playerName}
                     userId={playerUserId ?? undefined}
                     size={22}
@@ -838,9 +923,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 >
                   {fmtRel(totals.toPar)}
                 </div>
-                {(cardTotalPar > 0 || coursePar != null) && (
+                {(shownPar > 0 || coursePar != null) && (
                   <div style={{ ...LABEL_READ, marginTop: 3 }}>
-                    {t('courses:scorecard.parN', { n: cardTotalPar > 0 ? cardTotalPar : coursePar })}
+                    {t('courses:scorecard.parN', { n: shownPar > 0 ? shownPar : coursePar })}
                   </div>
                 )}
               </div>
@@ -882,17 +967,24 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     type="button"
                     onClick={() => rounds.onSelect(r)}
                     aria-pressed={active}
+                    aria-label={t('courses:scorecard.roundN', { n: r })}
                     style={{
+                      // S2 — flexShrink: 0. Inside an overflowX scroller the
+                      // pills were shrinkable flex items and collapsed onto
+                      // their padding box, painting as bare capsules. Every
+                      // other pill row in the app pins this for the same reason.
+                      flexShrink: 0,
+                      minWidth: 44, textAlign: 'center',
                       padding: '6px 13px', borderRadius: 999,
                       background: active ? A.INK : A.PANEL,
-                      color: active ? A.PANEL : A.INK,
+                      color: active ? A.CANVAS : A.INK,
                       border: `1px solid ${active ? A.INK : A.BORDER}`,
-                      fontFamily: SANS, fontSize: 11.5, fontWeight: 700,
+                      fontFamily: SANS, fontSize: 11.5, fontWeight: 700, lineHeight: 1.2,
                       letterSpacing: '0.04em', cursor: 'pointer', whiteSpace: 'nowrap',
                       WebkitTapHighlightColor: 'transparent',
                     }}
                   >
-                    R{r}
+                    {t('courses:scorecard.roundShort', { n: r })}
                   </button>
                 );
               })}
@@ -931,30 +1023,36 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   <div>
                     <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
                       <span style={{ ...LABEL_READ, color: A.INK }}>{t('courses:scorecard.total')}</span>
-                      <span
-                        style={{
-                          gridColumn: backSummary ? 'span 4' : 'span 9',
-                          ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {t('courses:scorecard.outN', { n: outSummary.strokes })}
-                      </span>
-                      {backSummary && (
+                      {/* S1.2 — a nine that has not started contributes NO segment.
+                          "IN 0" was a false claim; absence is the truth. The gross
+                          on the right is unchanged, so OUT + IN still equals it. */}
+                      {showOutSeg && (
                         <span
                           style={{
-                            gridColumn: 'span 5',
+                            gridColumn: showInSeg ? 'span 4' : 'span 9',
+                            ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {t('courses:scorecard.outN', { n: outSummary.strokes })}
+                        </span>
+                      )}
+                      {showInSeg && backSummary && (
+                        <span
+                          style={{
+                            gridColumn: showOutSeg ? 'span 5' : 'span 9',
                             ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
                           }}
                         >
                           {t('courses:scorecard.inN', { n: backSummary.strokes })}
                         </span>
                       )}
+                      {!showOutSeg && !showInSeg && <span style={{ gridColumn: 'span 9' }} />}
                       <span style={{ ...NUM, fontSize: 16, color: A.INK, textAlign: 'center' }}>{cardGross}</span>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
                       <span style={{ ...LABEL_READ, color: A.MUTE, whiteSpace: 'nowrap' }}>
-                        {t('courses:scorecard.parN', { n: cardTotalPar })}
+                        {t('courses:scorecard.parN', { n: shownPar })}
                       </span>
                       <span style={{ gridColumn: 'span 9' }} />
                       <span style={{ ...NUM, fontSize: 13, color: toParColor(totals.toPar), textAlign: 'center' }}>
@@ -963,7 +1061,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     </div>
                   </div>
 
-                  <Legend holes={played} />
+                  <Legend holes={played} hasUnplayed={!allHolesPlayed} />
                 </div>
               </Panel>
 
