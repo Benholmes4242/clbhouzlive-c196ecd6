@@ -17,7 +17,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsFor } from '../_shared/cors.ts';
 
-export const FUNCTION_VERSION = '2026-08-10T06:10:00Z-v5-revoke-first';
+export const FUNCTION_VERSION = '2026-08-29T04:43:00Z-v6-verify-auth-delete';
 
 
 // -------- URL parsing helpers (public storage URL convention). ----------
