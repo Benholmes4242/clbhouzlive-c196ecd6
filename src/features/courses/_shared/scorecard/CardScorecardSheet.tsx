@@ -936,17 +936,24 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     type="button"
                     onClick={() => rounds.onSelect(r)}
                     aria-pressed={active}
+                    aria-label={t('courses:scorecard.roundN', { n: r })}
                     style={{
+                      // S2 — flexShrink: 0. Inside an overflowX scroller the
+                      // pills were shrinkable flex items and collapsed onto
+                      // their padding box, painting as bare capsules. Every
+                      // other pill row in the app pins this for the same reason.
+                      flexShrink: 0,
+                      minWidth: 44, textAlign: 'center',
                       padding: '6px 13px', borderRadius: 999,
                       background: active ? A.INK : A.PANEL,
-                      color: active ? A.PANEL : A.INK,
+                      color: active ? A.CANVAS : A.INK,
                       border: `1px solid ${active ? A.INK : A.BORDER}`,
-                      fontFamily: SANS, fontSize: 11.5, fontWeight: 700,
+                      fontFamily: SANS, fontSize: 11.5, fontWeight: 700, lineHeight: 1.2,
                       letterSpacing: '0.04em', cursor: 'pointer', whiteSpace: 'nowrap',
                       WebkitTapHighlightColor: 'transparent',
                     }}
                   >
-                    R{r}
+                    {t('courses:scorecard.roundShort', { n: r })}
                   </button>
                 );
               })}
