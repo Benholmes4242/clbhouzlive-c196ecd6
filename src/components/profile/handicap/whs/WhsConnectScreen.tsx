@@ -1,4 +1,5 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { callConnectWhs } from '@/lib/whs/api';
 import type { ConnectWhsSuccess } from '@/lib/whs/types';
