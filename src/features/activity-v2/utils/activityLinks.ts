@@ -69,6 +69,21 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   } = row;
   const data = (rawData && typeof rawData === 'object' ? rawData : {}) as Record<string, string | undefined>;
 
+  // --- rounds win outright (MICRO_BRIEF_ROUND_LINK_FLASH S1.2) -----------
+  // This check USED to live in the `new_post` case at the bottom of the
+  // resolver, where it never ran: a round notification carries
+  // entity_type 'post', so the GENERIC ENTITY FALLBACK below
+  // (`entity_type === 'post' -> /post/:id`) returned first. That sent the tap
+  // through PostDeepLinkPage, which flashed its unavailable state before
+  // redirecting here anyway. Resolved first, so no ordering change downstream
+  // can shadow it again. is_round is only true when the trigger also wrote a
+  // score id; a legacy row without one still falls through to /post/.
+  if (type === 'new_post' && (rawData as Record<string, unknown> | null)?.is_round === true && data.whs_score_id) {
+    return `/round/${encodeURIComponent(data.whs_score_id)}`;
+  }
+
+
+
   // --- game family (Crowns chip) ---------------------------------------
   if (
     type === 'crown_taken' || type === 'crown_lost' ||
