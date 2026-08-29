@@ -18079,6 +18079,15 @@ export type Database = {
             }
             Returns: string
           }
+      admin_deletion_integrity: {
+        Args: never
+        Returns: {
+          live_sessions: number
+          orphan_profiles: number
+          unbanned: number
+          worst_seen: string
+        }[]
+      }
       admin_guard: { Args: never; Returns: undefined }
       admin_launch_authority: {
         Args: { _body_name: string; _country_id: string }
