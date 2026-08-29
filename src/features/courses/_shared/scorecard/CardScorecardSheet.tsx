@@ -1005,7 +1005,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     </div>
                   </div>
 
-                  <Legend holes={played} />
+                  <Legend holes={played} hasUnplayed={!allHolesPlayed} />
                 </div>
               </Panel>
 
