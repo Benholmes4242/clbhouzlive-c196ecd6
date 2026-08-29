@@ -55,7 +55,18 @@ const PostDeepLinkPage: React.FC = () => {
   const hasOpenedFullscreen = useRef(false);
 
   useEffect(() => {
+    // MICRO_BRIEF_ROUND_LINK_FLASH S2.2 — DO NOT DECIDE BEFORE AUTH SETTLES.
+    // loadPost's behaviour DEPENDS on whether there is a viewer: a media-less
+    // post is a REDIRECT for a member and a GUEST PREVIEW for a visitor. When
+    // this ran while useSupabaseSession was still resolving, a member got the
+    // guest path first — the fullscreen store refused the media-less post and
+    // the unavailable state flashed before the second pass redirected. Gated on
+    // `authLoading` (the hook's own resolved flag), NOT on `user` being truthy,
+    // which would never fire for genuine guests. While unresolved the render
+    // path below holds the loading state.
+    if (authLoading) return;
     async function loadPost() {
+
       setLoadError(false);
       setNotFound(false);
       setIsLoading(true);
