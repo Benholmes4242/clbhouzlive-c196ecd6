@@ -75,6 +75,8 @@ import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton'
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { HandicapPageSkeleton } from '@/components/skeletons/HandicapPageSkeleton';
+import { RoundPageSkeleton } from '@/components/skeletons/RoundPageSkeleton';
+
 import { CoursesHubSkeleton } from '@/components/skeletons/CoursesHubSkeleton';
 import DiscoverCourseLedSkeleton from '@/components/explore-tab-new/courseled/DiscoverCourseLedSkeleton';
 
@@ -576,7 +578,7 @@ function AppRoutes() {
         
         {/* Post deep link for notifications */}
         {/* Round deep link (notifications, shares, link previews) */}
-        <Route path="/round/:whsScoreId" element={<Suspense fallback={<HandicapPageSkeleton />}><RoundPage /></Suspense>} />
+        <Route path="/round/:whsScoreId" element={<Suspense fallback={<RoundPageSkeleton />}><RoundPage /></Suspense>} />
         <Route path="/post/:postId" element={<Suspense fallback={<GenericPageSkeleton />}><PostDeepLinkPage /></Suspense>} />
         <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={<GenericPageSkeleton />}><CommentDeepLinkPage /></Suspense>} />
         

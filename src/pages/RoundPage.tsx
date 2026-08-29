@@ -33,6 +33,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { A, SANS, Panel } from '@/features/courses/components/holes/analytical/tokens';
+import { RoundPageSkeleton } from '@/components/skeletons/RoundPageSkeleton';
+import { usePageReady } from '@/perf/usePageReady';
+
 
 /**
  * Who played this round. The sheet needs the owner for the player identity
@@ -138,9 +141,20 @@ const RoundPage: React.FC = () => {
 
   const missingId = !whsScoreId;
   const signedOut = !authLoading && !user;
+  /**
+   * MICRO_BRIEF_ROUND_LINK_FLASH S3.2 — the page's OWN pending state, not just
+   * the lazy-chunk one. Until the session has settled and the round's owner has
+   * resolved, the sheet would mount with a null player identity and reflow when
+   * it arrived, so hold the content-shaped skeleton instead.
+   */
+  const pending = !missingId && (authLoading || ownerQuery.isLoading);
+  usePageReady(!pending);
 
   const content = useMemo(() => {
+    if (pending) return <RoundPageSkeleton />;
+
     if (missingId) {
+
       return (
         <StateShell
           title={t('courses:scorecard.unavailableTitle')}
@@ -175,7 +189,7 @@ const RoundPage: React.FC = () => {
       </div>
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [missingId, signedOut, whsScoreId, ownerId, t, hasHistory, authLoading]);
+  }, [pending, missingId, signedOut, whsScoreId, ownerId, t, hasHistory, authLoading]);
 
   return content;
 };
