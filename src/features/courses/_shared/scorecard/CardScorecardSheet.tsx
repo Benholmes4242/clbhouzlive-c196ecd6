@@ -361,7 +361,7 @@ const Legend: React.FC<{ holes: CardScorecardHole[]; hasUnplayed?: boolean }> = 
     return { eagle, ace, alba };
   }, [holes]);
 
-  const keys: { strokes: number; label: string }[] = [
+  const keys: { strokes: number | null; label: string; showStroke?: boolean }[] = [
     { strokes: 3, label: t('courses:scorecard.legendBirdie') },
   ];
   if (rarities.eagle) keys.push({ strokes: 2, label: t('courses:scorecard.legendEagle') });
