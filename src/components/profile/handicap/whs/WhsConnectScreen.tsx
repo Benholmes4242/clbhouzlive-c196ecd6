@@ -32,6 +32,42 @@ const ERROR_MESSAGES: Record<string, string> = {
   internal_error: 'Something went wrong on our side. Please try again in a moment.',
 };
 
+/**
+ * BRIEF_WHS_CONNECT_INSTRUMENTATION — error categories for
+ * whs_connect_failed. Analytics NEVER carries a raw provider message: a raw
+ * message can contain identifying detail and lands in a table queried in
+ * front of other people. The mapping lives in ONE place — here — so a new
+ * failure mode cannot leak through unclassified.
+ */
+type WhsErrorCategory =
+  | 'invalid_credentials'
+  | 'provider_unavailable'
+  | 'already_connected'
+  | 'invalid_request'
+  | 'not_authenticated'
+  | 'network'
+  | 'timeout'
+  | 'unknown';
+
+const ERROR_CODE_CATEGORY: Record<string, WhsErrorCategory> = {
+  eg_auth_failed: 'invalid_credentials',
+  eg_unavailable: 'provider_unavailable',
+  already_connected: 'already_connected',
+  invalid_request: 'invalid_request',
+  not_authenticated: 'not_authenticated',
+  internal_error: 'unknown',
+};
+
+function categorizeWhsError(code: string | null, err: unknown): WhsErrorCategory {
+  if (code && ERROR_CODE_CATEGORY[code]) return ERROR_CODE_CATEGORY[code];
+  if (err instanceof Error) {
+    if (err.name === 'AbortError' || err.name === 'TimeoutError') return 'timeout';
+    // fetch() network failure surfaces as a bare TypeError in every browser.
+    if (err instanceof TypeError) return 'network';
+  }
+  return 'unknown';
+}
+
 interface Props {
   onConnected: () => void | Promise<void>;
   onDecline?: () => void;
