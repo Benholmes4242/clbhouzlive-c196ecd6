@@ -1,4 +1,5 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { callConnectWhs } from '@/lib/whs/api';
 import type { ConnectWhsSuccess } from '@/lib/whs/types';
@@ -31,6 +32,42 @@ const ERROR_MESSAGES: Record<string, string> = {
   internal_error: 'Something went wrong on our side. Please try again in a moment.',
 };
 
+/**
+ * BRIEF_WHS_CONNECT_INSTRUMENTATION — error categories for
+ * whs_connect_failed. Analytics NEVER carries a raw provider message: a raw
+ * message can contain identifying detail and lands in a table queried in
+ * front of other people. The mapping lives in ONE place — here — so a new
+ * failure mode cannot leak through unclassified.
+ */
+type WhsErrorCategory =
+  | 'invalid_credentials'
+  | 'provider_unavailable'
+  | 'already_connected'
+  | 'invalid_request'
+  | 'not_authenticated'
+  | 'network'
+  | 'timeout'
+  | 'unknown';
+
+const ERROR_CODE_CATEGORY: Record<string, WhsErrorCategory> = {
+  eg_auth_failed: 'invalid_credentials',
+  eg_unavailable: 'provider_unavailable',
+  already_connected: 'already_connected',
+  invalid_request: 'invalid_request',
+  not_authenticated: 'not_authenticated',
+  internal_error: 'unknown',
+};
+
+function categorizeWhsError(code: string | null, err: unknown): WhsErrorCategory {
+  if (code && ERROR_CODE_CATEGORY[code]) return ERROR_CODE_CATEGORY[code];
+  if (err instanceof Error) {
+    if (err.name === 'AbortError' || err.name === 'TimeoutError') return 'timeout';
+    // fetch() network failure surfaces as a bare TypeError in every browser.
+    if (err instanceof TypeError) return 'network';
+  }
+  return 'unknown';
+}
+
 interface Props {
   onConnected: () => void | Promise<void>;
   onDecline?: () => void;
@@ -57,6 +94,60 @@ export const WhsConnectScreen: React.FC<Props> = ({
   const [successData, setSuccessData] = useState<ConnectWhsSuccess | null>(null);
 
   const immersive = layout === 'page';
+
+  /* ---- BRIEF_WHS_CONNECT_INSTRUMENTATION ----------------------------------
+     The connect flow is the single gate on the product and previously emitted
+     nothing. Every event below is derived from state that already existed;
+     the flow's behaviour, copy, steps and layout are unchanged.
+
+     Entry point: both mount sites resolve here — the immersive page at
+     /manage/handicap (own profile) and the embedded friend view inside the
+     /handicap tab. `page` in props already carries the path. */
+  const entryPoint = immersive ? 'manage_handicap' : 'handicap_embedded';
+  const preselected = Boolean(
+    (location.state as { preselectCountryId?: string } | null)?.preselectCountryId,
+  );
+
+  // whs_connect_viewed — the screen mounted. Fires once per mount.
+  useEffect(() => {
+    analyticsEvents.track('whs_connect_viewed', {
+      entry_point: entryPoint,
+      preselected_country: preselected,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // whs_connect_step — the funnel spine. One effect on `step` catches every
+  // transition, including the preselect jump, so no setter path can skip it.
+  const prevStepRef = useRef(step);
+  useEffect(() => {
+    const from = prevStepRef.current;
+    if (from !== step) {
+      analyticsEvents.track('whs_connect_step', { from, to: step });
+      prevStepRef.current = step;
+    }
+  }, [step]);
+
+  /* whs_connect_abandoned — THE point of the brief. Fires on unmount whenever
+     no connection was produced: back-navigation, route change away, sheet
+     closed. succeededRef is latched (never reset by WelcomeAboard's
+     continue action clearing successData), so abandoned and succeeded are
+     mutually exclusive by construction — succeeded sets the latch before
+     any unmount can run. */
+  const stepRef = useRef(step);
+  stepRef.current = step;
+  const succeededRef = useRef(false);
+  useEffect(() => {
+    return () => {
+      if (!succeededRef.current) {
+        analyticsEvents.track('whs_connect_abandoned', {
+          step: stepRef.current,
+          entry_point: entryPoint,
+        });
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /* Page layout owns the whole viewport: the app chrome stops drawing a header
      (one back, one title) and the wash paints from physical y=0 behind the
@@ -86,17 +177,27 @@ export const WhsConnectScreen: React.FC<Props> = ({
     setCountryId(c.id);
     setStep('chosen');
     setError(null);
+    analyticsEvents.track('whs_connect_country', { country: c.id });
   };
 
   const handleSubmit = async (membershipNumber: string, password: string) => {
     setSubmitting(true);
     setError(null);
 
+    // S3.1: credentials are passed to the API call and NOWHERE else. No event
+    // prop ever carries membershipNumber, password, or anything derived.
+    analyticsEvents.track('whs_connect_submitted', { country: country?.id ?? null });
+
     try {
       const data = await callConnectWhs(membershipNumber, password);
       if (data.ok === false) {
         const code = data.error_code ?? 'internal_error';
         setError(ERROR_MESSAGES[code] ?? data.message ?? ERROR_MESSAGES.internal_error);
+        // Categorised, never the raw message (S3.2).
+        analyticsEvents.track('whs_connect_failed', {
+          category: categorizeWhsError(code, null),
+          country: country?.id ?? null,
+        });
         return;
       }
       // Auto-restore: connected users have earned the live index chip.
@@ -118,9 +219,18 @@ export const WhsConnectScreen: React.FC<Props> = ({
       if (user?.id) {
         await queryClient.invalidateQueries({ queryKey: whsKeys.connection(user.id) });
       }
+      /* Latch BEFORE setSuccessData: the abandoned-on-unmount guard reads this
+         ref, so succeeded and abandoned can never both fire (acceptance D). */
+      succeededRef.current = true;
+      analyticsEvents.track('whs_connect_succeeded', { country: country?.id ?? null });
       setSuccessData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      // Name/shape only — the message string never leaves this function (S3.2).
+      analyticsEvents.track('whs_connect_failed', {
+        category: categorizeWhsError(null, err),
+        country: country?.id ?? null,
+      });
     } finally {
       setSubmitting(false);
     }
