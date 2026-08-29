@@ -322,18 +322,23 @@ function MemberBoard({
       </div>
       <div
         className="no-scrollbar"
-        style={
-          scrolls
-            ? {
-                height: BOARD_MAX_H,
-                overflowY: 'auto',
-                // §3.1 — STOPS THE SCROLL CHAINING TO THE PAGE at the list's edge.
-                overscrollBehavior: 'contain',
-                WebkitOverflowScrolling: 'touch',
-                // §3.2 — NO touch-action HERE. Deliberate.
-              }
-            : undefined
-        }
+        data-best-rounds-scroller="true"
+        style={{
+          /* The old rows carried margin: 0 -13px inside an unexpanded scroller,
+             making every row 26px wider than its scrollport. Move that bleed to
+             the scrollport itself: its physical edges stay unchanged, while a
+             row at width: 100% can no longer create horizontal overflow. */
+          width: 'calc(100% + 26px)',
+          margin: '0 -13px',
+          boxSizing: 'border-box',
+          ...(scrolls ? { height: BOARD_MAX_H } : null),
+          overflowY: scrolls ? 'auto' : 'hidden',
+          overflowX: 'hidden',
+          // §3.1 — STOPS THE SCROLL CHAINING TO THE PAGE at the list's edge.
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch',
+          // §3.2 — NO touch-action HERE. Deliberate.
+        }}
       >
 
 
@@ -360,9 +365,9 @@ function MemberBoard({
               display: 'flex',
               alignItems: 'center',
               gap: 9,
-              // FULL WIDTH (§S2.3): the tint bleeds to the card's own padding
-              // rather than starting at a thumbnail-width indent.
-              margin: '0 -13px',
+               // FULL WIDTH (§S2.3): the SCROLLER owns the card-padding bleed;
+               // each row now fits that scrollport exactly.
+               width: '100%',
               padding: '0 14px',
               // §2.3 — HEIGHT-LOCKED so eight rows are always BOARD_MAX_H tall.
               height: BOARD_ROW_H,
@@ -442,6 +447,8 @@ function MemberBoard({
               style={{
                 ...NUMF,
                 flex: 'none',
+                 width: 28,
+                 textAlign: 'right',
                 fontSize: 12,
                 lineHeight: 1,
                 color: under ? TOPAR_RED : INK,
