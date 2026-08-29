@@ -21,14 +21,32 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { TournamentHole } from '../data/useTournamentHoleAnalysis';
+import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import {
-  A, FIGS, Hairline, LABEL, RAMP, SANS, toParParts,
+  A, FIGS, Hairline, LABEL, SANS, toParParts,
 } from '@/features/courses/components/holes/analytical/tokens';
 import {
+  BUCKETS,
+  DistributionStrip,
+  courseBucketShares,
   markerOffset,
   rankHolesByDifficulty,
+  type BucketShares,
 } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { formatNumber } from '@/i18n/format';
+
+export { DistributionStrip };
+export type { BucketShares };
+
+/**
+ * The tournament surface's aggregate distribution, summed across the VISIBLE
+ * holes of the current round filter. Delegates to the course page's
+ * courseBucketShares so the two surfaces cannot compute the same four buckets
+ * two different ways - the dist shape is identical, only the row type differs.
+ */
+export function tourBucketShares(holes: ReadonlyArray<TournamentHole>): BucketShares | null {
+  return courseBucketShares(holes as unknown as CourseHole[]);
+}
 
 /** HoleRowV2's HOLE_GRID_V2 minus the SI column. Columns never size to content. */
 export const TOUR_HOLE_GRID = '26px 26px 1fr';
