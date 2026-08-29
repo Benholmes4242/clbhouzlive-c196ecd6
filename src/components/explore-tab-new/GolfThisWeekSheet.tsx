@@ -54,7 +54,7 @@ interface Props {
   onRowPress: (scoreId: string | null, userId: string) => void;
 }
 
-const ROW_HEIGHT = 70;
+const ROW_HEIGHT = 64;
 const AVATAR_SIZE = 30;
 const SHAPE_WIDTH = 62;
 const SHAPE_HEIGHT = 26;
@@ -404,6 +404,7 @@ export function GolfThisWeekSheet({
         {days.map(([key, list], dayIdx) => (
           <div key={key || `day-${dayIdx}`}>
             <div
+              data-round-day-header="true"
               style={{
                 position: 'sticky',
                 top: 0,
