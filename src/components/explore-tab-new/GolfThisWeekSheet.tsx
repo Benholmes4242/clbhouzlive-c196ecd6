@@ -5,7 +5,7 @@ import { Heart } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { buildInsightMap, referenceLine } from './friendRoundParts';
 import { relativeDay } from './courseled/discoverWhen';
-import { useRoundHoleShapes } from './courseled/hooks/useRoundHoleShapes';
+import { useRoundHoleShapes, type HoleShape } from './courseled/hooks/useRoundHoleShapes';
 import {
   DEFAULT_WEEK_SCOPE,
   GOLF_WEEK_DAYS,
@@ -63,7 +63,7 @@ const SCORE_WIDTH = 40;
 interface CompactRoundRowProps {
   row: CircleRoundRow;
   reason: string | null;
-  shape: ReturnType<typeof useRoundHoleShapes> extends Map<string, infer T> ? T | null : never;
+  shape: HoleShape | null;
   reaction: {
     count: number;
     mine: boolean;
