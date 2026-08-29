@@ -277,13 +277,13 @@ const Nine: React.FC<{
   return (
     <div>
       <CardRow label={t('courses:scorecard.hole')} cells={rows.map((h) => h.holeNo)} total={label} muted />
-      <CardRow label={t('courses:scorecard.par')} cells={rows.map((h) => h.par ?? '\u2014')} total={par || '\u2014'} muted />
+      <CardRow label={t('courses:scorecard.par')} cells={rows.map((h) => h.par ?? '\u2014')} total={parTotal} muted />
       <CardRow
         label={scoreLabel}
         cells={rows.map((h) => (
           <ScoreMark key={h.holeNo} strokes={h.strokes} par={h.par ?? 4} size={22} surface="dark" />
         ))}
-        total={strokes || '\u2014'}
+        total={strokesTotal}
       />
 
       {withField && (
