@@ -151,8 +151,10 @@ const RoundPage: React.FC = () => {
   usePageReady(!pending);
 
   const content = useMemo(() => {
+    if (pending) return <RoundPageSkeleton />;
 
     if (missingId) {
+
       return (
         <StateShell
           title={t('courses:scorecard.unavailableTitle')}
