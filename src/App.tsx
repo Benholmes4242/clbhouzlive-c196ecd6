@@ -576,7 +576,7 @@ function AppRoutes() {
         
         {/* Post deep link for notifications */}
         {/* Round deep link (notifications, shares, link previews) */}
-        <Route path="/round/:whsScoreId" element={<Suspense fallback={<HandicapPageSkeleton />}><RoundPage /></Suspense>} />
+        <Route path="/round/:whsScoreId" element={<Suspense fallback={<RoundPageSkeleton />}><RoundPage /></Suspense>} />
         <Route path="/post/:postId" element={<Suspense fallback={<GenericPageSkeleton />}><PostDeepLinkPage /></Suspense>} />
         <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={<GenericPageSkeleton />}><CommentDeepLinkPage /></Suspense>} />
         
