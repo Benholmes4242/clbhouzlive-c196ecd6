@@ -140,6 +140,16 @@ export interface CardScorecardSheetProps {
   playerHcp?: number | null;
   playerHcpDelta?: number | null;
   playerUserId?: string | null;
+  /**
+   * S3 — TOUR ONLY. sr_players.photo_url is populated for 2 of 2,879 players, so
+   * reading it alone showed initials for nearly every tour player. With these two
+   * the tour branch goes through resolvePlayerAvatarCandidates — the canonical
+   * resolver the player profile page uses — which builds the ordered storage-path
+   * chain from the player's name. The MEMBER branch is untouched: a member avatar
+   * is user_profiles.profile_photo_url and is unrelated.
+   */
+  playerTourSlug?: string | null;
+  playerHeadshotOverride?: string | null;
   /** Tour: shows a position ("T4") in place of the handicap index. */
   identityStat?: { label: string; value: string } | null;
   // FOOTER
