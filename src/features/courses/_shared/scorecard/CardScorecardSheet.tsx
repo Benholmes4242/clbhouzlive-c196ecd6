@@ -881,7 +881,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               {showIdentity && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, minWidth: 0 }}>
                   <SquircleAvatar
-                    src={playerAvatarUrl ?? null}
+                    {...(isTour
+                      ? { srcCandidates: tourAvatarCandidates }
+                      : { src: playerAvatarUrl ?? null })}
                     alt={playerName}
                     userId={playerUserId ?? undefined}
                     size={22}
