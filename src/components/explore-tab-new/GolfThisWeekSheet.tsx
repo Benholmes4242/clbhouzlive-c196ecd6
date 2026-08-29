@@ -218,30 +218,32 @@ function CompactRoundRow({
       </div>
 
       <ReactionSlot>
-        {!reaction.hidden && (reaction.readOnly ? (
-          <span
-            aria-label={reaction.label}
-            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}
-          >
-            <Heart size={15} strokeWidth={2} color={A.MUTE} fill="none" aria-hidden />
-            {reaction.count > 0 && (
-              <span
-                className="tabular-nums"
-                style={{ ...FIGS, minWidth: 13, color: A.MUTE, fontSize: 11.5, fontWeight: 700, lineHeight: 1 }}
-              >
-                {reaction.count}
-              </span>
-            )}
-          </span>
-        ) : (
-          <ReactionAction
-            count={reaction.count}
-            reacted={reaction.mine}
-            onToggle={reaction.onToggle}
-            label={reaction.label}
-            reserveCount
-          />
-        ))}
+        <span style={{ width: 42, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+          {!reaction.hidden && (reaction.readOnly ? (
+            <span
+              aria-label={reaction.label}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            >
+              <Heart size={15} strokeWidth={2} color={A.MUTE} fill="none" aria-hidden />
+              {reaction.count > 0 && (
+                <span
+                  className="tabular-nums"
+                  style={{ ...FIGS, color: A.MUTE, fontSize: 11.5, fontWeight: 700, lineHeight: 1 }}
+                >
+                  {reaction.count}
+                </span>
+              )}
+            </span>
+          ) : (
+            <ReactionAction
+              count={reaction.count}
+              reacted={reaction.mine}
+              onToggle={reaction.onToggle}
+              label={reaction.label}
+              reserveCount
+            />
+          ))}
+        </span>
       </ReactionSlot>
     </div>
   );
