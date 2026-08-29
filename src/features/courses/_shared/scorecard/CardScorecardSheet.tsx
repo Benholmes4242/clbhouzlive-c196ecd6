@@ -121,6 +121,14 @@ export interface CardScorecardSheetProps {
   emptyGross?: number | null;
   emptyToPar?: number | null;
 
+  /**
+   * Optional overrides merged into the BottomSheet surface style LAST. Used
+   * by the /round page to host the sheet full-height so its charcoal surface
+   * continues to the top of the viewport instead of stopping at 85dvh and
+   * leaving a backdrop-dimmed band above it.
+   */
+  sheetStyle?: React.CSSProperties;
+
   /** 'member' (default) or 'tour'. Changes copy and stat labels only. */
   surface?: 'member' | 'tour';
   /** Member enrichment — omitted for a pro, who has no history at the venue. */
