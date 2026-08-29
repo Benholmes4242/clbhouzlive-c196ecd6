@@ -169,6 +169,9 @@ export function ScorecardSheet({ open, onClose, tournamentId, target }: Props) {
       } : undefined}
       playerName={target.playerName}
       playerAvatarUrl={target.playerPhotoUrl ?? null}
+      // S3 — tour slug + name drive the canonical headshot candidate chain, so a
+      // player with a NULL sr_players.photo_url still shows his photograph.
+      playerTourSlug={meta.data?.tour_code ?? null}
       playerHcp={null}
       playerHcpDelta={null}
       playerUserId={target.playerId}
