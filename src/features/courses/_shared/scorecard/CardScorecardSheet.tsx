@@ -121,6 +121,14 @@ export interface CardScorecardSheetProps {
   emptyGross?: number | null;
   emptyToPar?: number | null;
 
+  /**
+   * Optional overrides merged into the BottomSheet surface style LAST. Used
+   * by the /round page to host the sheet full-height so its charcoal surface
+   * continues to the top of the viewport instead of stopping at 85dvh and
+   * leaving a backdrop-dimmed band above it.
+   */
+  sheetStyle?: React.CSSProperties;
+
   /** 'member' (default) or 'tour'. Changes copy and stat labels only. */
   surface?: 'member' | 'tour';
   /** Member enrichment — omitted for a pro, who has no history at the venue. */
@@ -532,6 +540,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   surface = 'member', courseContext,
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, identityStat,
   onViewProfile, onViewCourse, onShareRound,
+  sheetStyle,
 }) => {
   const { t } = useTranslation(['courses']);
   void emptyMessage;
@@ -736,7 +745,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
       onClose={onClose}
       variant="dark"
       surfaceColor={A.CANVAS}
-      style={{ background: A.CANVAS, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}
+      style={{ background: A.CANVAS, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column', ...sheetStyle }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', fontFamily: SANS, background: A.CANVAS, flex: 1, minHeight: 0, ...FIGS }}>
         {/*
