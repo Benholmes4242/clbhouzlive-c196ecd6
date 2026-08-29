@@ -404,7 +404,7 @@ const Legend: React.FC<{ holes: CardScorecardHole[]; hasUnplayed?: boolean }> = 
                 justifyContent: 'center',
               }}
             >
-              <ScoreMark strokes={k.strokes} par={4} size={KEY_MARK_SIZE} surface="dark" showStroke={false} />
+              <ScoreMark strokes={k.strokes} par={4} size={KEY_MARK_SIZE} surface="dark" showStroke={k.showStroke === true} />
             </span>
             <span style={{ ...LABEL_READ }}>{k.label}</span>
           </span>
