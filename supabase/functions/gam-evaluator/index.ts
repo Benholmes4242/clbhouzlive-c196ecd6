@@ -1785,7 +1785,25 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
     // happened, so a suppressed notice never changes what is true, only who is
     // told. This sits BEFORE enqueueNotification, so a suppressed row never
     // reaches dedupKey / the 24h trigger skip / urgency at all (§6).
-    const notify = isTriggerFreshForCrownNotice(trigger, courseId, cfg.category);
+    //
+    // BRIEF_CROWN_NOTIFICATION_COALESCING S1 (2026-08-29). 90-DAY CROWNS DO NOT
+    // NOTIFY — neither side. The test is the CONFIG (windowDays), never the
+    // category name, so renaming a category or adding a third window cannot
+    // silently re-open the fan-out. windowDays === null means all-time.
+    // SQL TWIN: public.gam_emit_legend_pulse_event() tests
+    //   NEW.category LIKE '%\_all\_time'
+    // because the trigger has no access to LEGEND_CATS. These two tests are a
+    // PAIR — change one, change the other.
+    const isAllTimeCategory = cfg.windowDays === null;
+    const notify = isAllTimeCategory && isTriggerFreshForCrownNotice(trigger, courseId, cfg.category);
+    if (!isAllTimeCategory) {
+      console.log('[gam-evaluator] crown notice suppressed — 90-day window', {
+        courseId,
+        category: cfg.category,
+        windowDays: cfg.windowDays,
+      });
+    }
+
 
     // Course name is needed by BOTH sides (legend_lost and legend_earned), so
     // it is resolved once here. golf_courses ONLY — never read
