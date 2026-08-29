@@ -372,6 +372,16 @@ const Legend: React.FC<{ holes: CardScorecardHole[]; hasUnplayed?: boolean }> = 
   else if (rarities.ace) keys.push({ strokes: 1, label: t('courses:scorecard.legendAce') });
   keys.push({ strokes: 5, label: t('courses:scorecard.legendBogey') });
   keys.push({ strokes: 6, label: t('courses:scorecard.legendDouble') });
+  /**
+   * S4 — THE FOURTH TREATMENT IS THE UNPLAYED HOLE, AND IT IS NOW NAMED.
+   * Par stays deliberately unmarked (marking every hole marks nothing), so the
+   * only unexplained cell on a live card was the empty one. ScoreMark already
+   * renders it as a faint mid-dot — no new glyph — and this entry appears ONLY
+   * while holes remain unplayed, so a completed card's key is unchanged.
+   */
+  if (hasUnplayed) {
+    keys.push({ strokes: null, label: t('courses:scorecard.legendNotPlayed'), showStroke: true });
+  }
 
   return (
     <div>
