@@ -189,7 +189,7 @@ const RoundPage: React.FC = () => {
       </div>
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [missingId, signedOut, whsScoreId, ownerId, t, hasHistory, authLoading]);
+  }, [pending, missingId, signedOut, whsScoreId, ownerId, t, hasHistory, authLoading]);
 
   return content;
 };
