@@ -209,10 +209,31 @@ const CardRow: React.FC<{
  * their par/strokes through this helper so the two can never be derived from
  * different filters and disagree on screen.
  */
-function nineSummary(rows: CardScorecardHole[]): { par: number; strokes: number } {
+/**
+ * BRIEF_TOUR_SCORECARD_SHEET_FOUR_FAULTS S1 — A PARTIAL NINE IS NOT A NINE.
+ *
+ * `strokes` and `par` keep their old meaning (the full nine's arithmetic, which
+ * the gross invariant at the totals block depends on). Two fields are ADDED:
+ *
+ *  - playedCount: how many holes on this nine carry a real score. Zero means
+ *    the nine has not started, and a nine that has not started shows NOTHING —
+ *    a 0 there is a claim, and it is false.
+ *  - parPlayed: par for exactly the holes played, so a partial nine's strokes
+ *    are compared against a par that covers the same holes (30 against 31 at
+ *    eight holes, never 30 against 35).
+ */
+function nineSummary(rows: CardScorecardHole[]): {
+  par: number;
+  strokes: number;
+  playedCount: number;
+  parPlayed: number;
+} {
+  const scored = rows.filter((h) => h.strokes != null && h.strokes > 0);
   return {
     par: rows.reduce((s, h) => s + (h.par ?? 0), 0),
-    strokes: rows.reduce((s, h) => s + (h.strokes != null && h.strokes > 0 ? h.strokes : 0), 0),
+    strokes: scored.reduce((s, h) => s + (h.strokes as number), 0),
+    playedCount: scored.length,
+    parPlayed: scored.reduce((s, h) => s + (h.par ?? 0), 0),
   };
 }
 
