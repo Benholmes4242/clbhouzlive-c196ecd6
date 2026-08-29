@@ -892,9 +892,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 >
                   {fmtRel(totals.toPar)}
                 </div>
-                {(cardTotalPar > 0 || coursePar != null) && (
+                {(shownPar > 0 || coursePar != null) && (
                   <div style={{ ...LABEL_READ, marginTop: 3 }}>
-                    {t('courses:scorecard.parN', { n: cardTotalPar > 0 ? cardTotalPar : coursePar })}
+                    {t('courses:scorecard.parN', { n: shownPar > 0 ? shownPar : coursePar })}
                   </div>
                 )}
               </div>
