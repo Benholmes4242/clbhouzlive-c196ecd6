@@ -242,6 +242,16 @@ export const TournamentHoleRow: React.FC<{
                 <span style={{ fontSize: 12, fontWeight: 700, color: A.INK, ...FIGS }}>{field.text}</span>
               </span>
             )}
+            {/* YARDS on every row: a 495-yard par 5 and a 160-yard par 3 are not
+                the same hole and par alone does not say which one this is. */}
+            {row.yards != null && (
+              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+                <span style={LABEL}>{t('courses:courseDetail.holes.yards')}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: A.BODY, ...FIGS }}>
+                  {formatNumber(row.yards)}
+                </span>
+              </span>
+            )}
           </span>
         </span>
       </button>
