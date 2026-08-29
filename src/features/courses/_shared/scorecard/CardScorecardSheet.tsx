@@ -758,7 +758,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
    * cardGross and cardTotalPar are untouched: the invariant and the DEV warning
    * above keep their original inputs.
    */
-  const allHolesPlayed = hasHoles && played.length === holes.length;
+  const allHolesPlayed = holes.length > 0 && played.length === holes.length;
   const shownPar = allHolesPlayed ? cardTotalPar : totalPar;
   const showOutSeg = outSummary.playedCount > 0;
   const showInSeg = (backSummary?.playedCount ?? 0) > 0;
