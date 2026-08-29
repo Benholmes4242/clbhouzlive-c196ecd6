@@ -169,7 +169,7 @@ export default function HealthPage() {
       {tab === 'status' && can.manageAdmins && (
         <StatusTab
           subsystems={subsystems}
-          echo={echo} push={push} eg={eg} ops={ops}
+          echo={echo} push={push} eg={eg} ops={ops} deletion={deletion}
         />
       )}
       {tab === 'stability' && can.manageAdmins && <StabilityTab />}
@@ -218,13 +218,14 @@ function VerdictRow({ degraded }: { degraded: Subsystem[] }) {
 // ─── Status tab: the board ────────────────────────────────────────────────────
 
 function StatusTab({
-  subsystems, echo, push, eg, ops,
+  subsystems, echo, push, eg, ops, deletion,
 }: {
   subsystems: Subsystem[];
   echo: ReturnType<typeof useEchoEngineHealth>;
   push: ReturnType<typeof usePushHealth>;
   eg:   ReturnType<typeof useDashboard>['egSyncHealth'];
   ops:  ReturnType<typeof useOpsHealth>;
+  deletion: ReturnType<typeof useDeletionIntegrity>;
 }) {
   // Nothing is auto-selected, not even a degraded subsystem: an admin who
   // arrives to check one thing should not have the page choose for them.
