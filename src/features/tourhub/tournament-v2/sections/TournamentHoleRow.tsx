@@ -83,34 +83,25 @@ export function buildTourHoleScale(holes: ReadonlyArray<TournamentHole>): TourHo
 }
 
 /**
- * Band mapping. ace + albatross + eagle + birdie collapse into ONE lightest
- * "birdie or better" band: an ace band would be a sliver of nothing on
- * seventeen holes and a misleading spike on the eighteenth.
+ * Band mapping. Buckets, their key order AND their tones come from the course
+ * page's BUCKETS (RAMP_TOPAR) - BRIEF_TOURNAMENT_HOLES_MATCH_COURSE. The
+ * previous neutral RAMP made this surface answer the same question in grey and
+ * is deliberately not used here any more. No second palette is defined.
  */
 function bands(row: TournamentHole, t: (k: string) => string) {
-  const d = row.dist ?? ({} as TournamentHole['dist']);
-  return [
-    {
-      key: 'birdie',
-      pctValue: (d.ace ?? 0) + (d.albatross ?? 0) + (d.eagle ?? 0) + (d.birdie ?? 0),
-      bg: RAMP.birdie,
-      label: t('courses:holes.preview.legendBirdie'),
-    },
-    { key: 'par', pctValue: d.par ?? 0, bg: RAMP.par, label: t('courses:holes.preview.legendPar') },
-    { key: 'bogey', pctValue: d.bogey ?? 0, bg: RAMP.bogey, label: t('courses:holes.preview.legendBogey') },
-    { key: 'double', pctValue: d.double ?? 0, bg: RAMP.double, label: t('courses:holes.preview.legendDouble') },
-  ];
+  const d = (row.dist ?? {}) as unknown as Record<string, number>;
+  return BUCKETS.map((b) => ({
+    key: b.key,
+    pctValue: b.keys.reduce((s, k) => s + (d[k as string] ?? 0), 0),
+    bg: b.bg,
+    label: t(b.labelKey),
+  }));
 }
 
-/** Legend for the ink ramp. Rendered ONCE per surface, above the rows. */
+/** Legend for the ramp. Rendered ONCE per surface, above the rows. */
 export const TourHoleRampLegend: React.FC = () => {
   const { t } = useTranslation(['courses']);
-  const items = [
-    { bg: RAMP.birdie, label: t('courses:holes.preview.legendBirdie') },
-    { bg: RAMP.par, label: t('courses:holes.preview.legendPar') },
-    { bg: RAMP.bogey, label: t('courses:holes.preview.legendBogey') },
-    { bg: RAMP.double, label: t('courses:holes.preview.legendDouble') },
-  ];
+  const items = BUCKETS.map((b) => ({ bg: b.bg, label: t(b.labelKey) }));
   return (
     <div
       style={{
