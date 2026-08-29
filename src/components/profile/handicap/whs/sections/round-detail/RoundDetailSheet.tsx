@@ -46,10 +46,12 @@ interface Props {
   profileUserId?: string | null;
   /** IGNORED — sheet is always light. Kept for back-compat. */
   variant?: 'dark' | 'light';
+  /** Optional BottomSheet surface style overrides (see CardScorecardSheet). */
+  sheetStyle?: React.CSSProperties;
 }
 
 export const RoundDetailSheet: React.FC<Props> = ({
-  open, onClose, scoreId, handicapDelta, profileUserId,
+  open, onClose, scoreId, handicapDelta, profileUserId, sheetStyle,
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
