@@ -33,6 +33,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { A, SANS, Panel } from '@/features/courses/components/holes/analytical/tokens';
+import { RoundPageSkeleton } from '@/components/skeletons/RoundPageSkeleton';
+import { usePageReady } from '@/perf/usePageReady';
+
 
 /**
  * Who played this round. The sheet needs the owner for the player identity
