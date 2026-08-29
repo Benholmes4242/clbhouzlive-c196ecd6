@@ -750,6 +750,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   const cardGross = outSummary.strokes + (backSummary?.strokes ?? 0);
   const cardTotalPar = outSummary.par + (backSummary?.par ?? 0);
   const totalPar = played.reduce((s, h) => s + (h.par as number), 0);
+  /**
+   * S1.3 — WHICH PAR THE ROUND IS SHOWN AGAINST. A completed card (18 or a
+   * genuine nine) reads against the card's own par, exactly as before. A round
+   * still in progress reads against the par of the holes played — the same par
+   * totals.toPar is measured against — so the figures agree with each other.
+   * cardGross and cardTotalPar are untouched: the invariant and the DEV warning
+   * above keep their original inputs.
+   */
+  const allHolesPlayed = hasHoles && played.length === holes.length;
+  const shownPar = allHolesPlayed ? cardTotalPar : totalPar;
+  const showOutSeg = outSummary.playedCount > 0;
+  const showInSeg = (backSummary?.playedCount ?? 0) > 0;
   if (import.meta.env.DEV) {
     // The visible sum must agree with the hero/stat gross. A mismatch means the
     // nines and the round totals were filtered differently - loud, not silent.
