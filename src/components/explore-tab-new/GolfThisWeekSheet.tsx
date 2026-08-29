@@ -1,13 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Heart } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { FriendRoundRow } from './FriendRoundRow';
 import { buildInsightMap, referenceLine } from './friendRoundParts';
 import { relativeDay } from './courseled/discoverWhen';
 import { useRoundHoleShapes } from './courseled/hooks/useRoundHoleShapes';
 import {
   DEFAULT_WEEK_SCOPE,
+  GOLF_WEEK_DAYS,
   orderForWeek,
   usePlayedCourseIds,
   useGolfThisWeek,
@@ -24,9 +25,13 @@ import {
   type RegionSelection,
 } from './courseled/hooks/useWeekRegionCounts';
 import { WeekScopePills } from './courseled/WeekFilters';
+import { RoundShape } from './courseled/RoundShape';
+import { selectMoment } from './courseled/roundMoment';
+import { ReactionAction, ReactionSlot } from './courseled/ReactionAction';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
-import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 
 
 /**
@@ -47,6 +52,199 @@ interface Props {
   onScopeChange?: (scope: WeekScope) => void;
   region?: RegionSelection | null;
   onRowPress: (scoreId: string | null, userId: string) => void;
+}
+
+const ROW_HEIGHT = 70;
+const AVATAR_SIZE = 30;
+const SHAPE_WIDTH = 62;
+const SHAPE_HEIGHT = 26;
+const SCORE_WIDTH = 40;
+
+interface CompactRoundRowProps {
+  row: CircleRoundRow;
+  reason: string | null;
+  shape: ReturnType<typeof useRoundHoleShapes> extends Map<string, infer T> ? T | null : never;
+  reaction: {
+    count: number;
+    mine: boolean;
+    hidden: boolean;
+    readOnly: boolean;
+    label: string;
+    onToggle: () => void;
+  };
+  isLast: boolean;
+  onPress: () => void;
+}
+
+function CompactRoundRow({
+  row,
+  reason,
+  shape,
+  reaction,
+  isLast,
+  onPress,
+}: CompactRoundRowProps) {
+  const moment = useMemo(
+    () => selectMoment(shape?.holes ?? [], row.course_record_fact),
+    [row.course_record_fact, shape],
+  );
+  const showShape = moment.kind !== 'plain';
+  const toPar = row.gross != null && row.course_par != null ? row.gross - row.course_par : null;
+  const toParText = toPar == null ? '' : toPar < 0 ? `\u2212${Math.abs(toPar)}` : toPar > 0 ? `+${toPar}` : 'E';
+  const toParTone = toPar != null && toPar < 0 ? TOPAR_RED : A.MUTE;
+
+  const activate = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    onPress();
+  };
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      data-round-row="true"
+      data-moment-kind={moment.kind}
+      onClick={onPress}
+      onKeyDown={activate}
+      style={{
+        boxSizing: 'border-box',
+        display: 'grid',
+        gridTemplateColumns: `${AVATAR_SIZE}px minmax(0, 1fr) ${SHAPE_WIDTH}px ${SCORE_WIDTH}px 42px`,
+        alignItems: 'center',
+        columnGap: 6,
+        width: '100%',
+        height: ROW_HEIGHT,
+        padding: '8px 16px',
+        background: 'transparent',
+        borderBottom: isLast ? 'none' : `1px solid ${A.BORDER}`,
+        cursor: 'pointer',
+      }}
+    >
+      <SquircleAvatar
+        size={AVATAR_SIZE}
+        srcCandidates={row.profile_photo_url ? [row.profile_photo_url] : []}
+        alt={row.display_name}
+        fallback={getInitialsFromName(row.display_name)}
+        userId={row.user_id ?? undefined}
+        hairlineRing
+      />
+
+      <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div
+          style={{
+            minWidth: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            color: A.INK,
+            fontSize: 12.5,
+            fontWeight: 700,
+            lineHeight: 1.15,
+          }}
+        >
+          {row.display_name}
+        </div>
+        <div
+          style={{
+            minWidth: 0,
+            marginTop: 2,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            color: A.MUTE,
+            fontSize: 11,
+            fontWeight: 600,
+            lineHeight: 1.15,
+          }}
+        >
+          {row.course_name ?? ''}
+        </div>
+        <div
+          style={{
+            minWidth: 0,
+            minHeight: 12,
+            marginTop: 2,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            color: A.DIM,
+            fontSize: 10.5,
+            fontWeight: 600,
+            lineHeight: 1.15,
+          }}
+        >
+          {reason ?? ''}
+        </div>
+      </div>
+
+      <div
+        data-round-shape={showShape ? 'visible' : 'reserved'}
+        style={{ width: SHAPE_WIDTH, height: SHAPE_HEIGHT, display: 'flex', alignItems: 'center' }}
+      >
+        {showShape && (
+          <RoundShape
+            row={row}
+            shape={shape}
+            width={SHAPE_WIDTH}
+            height={SHAPE_HEIGHT}
+            showMeta={false}
+            strokeWidth={1.6}
+          />
+        )}
+      </div>
+
+      <div style={{ width: SCORE_WIDTH, minWidth: 0, textAlign: 'right' }}>
+        <div
+          className="tabular-nums"
+          style={{ ...FIGS, color: A.INK, fontSize: 17, fontWeight: 800, lineHeight: 1 }}
+        >
+          {row.gross ?? '\u2014'}
+        </div>
+        <div
+          className="tabular-nums"
+          style={{
+            ...FIGS,
+            minHeight: 12,
+            marginTop: 4,
+            color: toParTone,
+            fontSize: 11.5,
+            fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
+          {toParText}
+        </div>
+      </div>
+
+      <ReactionSlot>
+        {!reaction.hidden && (reaction.readOnly ? (
+          <span
+            aria-label={reaction.label}
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}
+          >
+            <Heart size={15} strokeWidth={2} color={A.MUTE} fill="none" aria-hidden />
+            {reaction.count > 0 && (
+              <span
+                className="tabular-nums"
+                style={{ ...FIGS, minWidth: 13, color: A.MUTE, fontSize: 11.5, fontWeight: 700, lineHeight: 1 }}
+              >
+                {reaction.count}
+              </span>
+            )}
+          </span>
+        ) : (
+          <ReactionAction
+            count={reaction.count}
+            reacted={reaction.mine}
+            onToggle={reaction.onToggle}
+            label={reaction.label}
+            reserveCount
+          />
+        ))}
+      </ReactionSlot>
+    </div>
+  );
 }
 
 export function GolfThisWeekSheet({
@@ -75,6 +273,14 @@ export function GolfThisWeekSheet({
     [all, regions, region, playedSet],
   );
   const total = rounds.length;
+  const courseTotal = useMemo(() => {
+    const keys = new Set<string>();
+    for (const round of rounds) {
+      const key = round.course_id ?? round.course_name?.trim().toLocaleLowerCase();
+      if (key) keys.add(key);
+    }
+    return keys.size;
+  }, [rounds]);
 
   const insights = useMemo(() => buildInsightMap(rounds, t as never), [rounds, t]);
   const scoreIds = useMemo(() => rounds.map((r) => r.score_id), [rounds]);
@@ -129,23 +335,43 @@ export function GolfThisWeekSheet({
       >
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 600,
+            fontSize: 19,
+            fontWeight: 800,
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
-            color: A.MUTE,
-            marginBottom: 4,
+            color: A.INK,
+            lineHeight: 1.05,
           }}
+          id="golf-this-week-title"
         >
-          {t('discover.golfThisWeek.overline', 'THIS WEEK')} {'\u00B7'} {total}{' '}
-          {total === 1
-            ? t('discover.friendsRounds.entrySingular', 'ROUND')
-            : t('discover.friendsRounds.entryPlural', 'ROUNDS')}
-        </div>
-        <div id="golf-this-week-title" style={{ ...TITLE_METRICS, color: A.INK }}>
-          {/* §S4 — the section says FOURTEEN DAYS, so it is no longer titled
-              "Golf this week". "Recent rounds" is accurate and reads plainly. */}
           {t('discover.golfThisWeek.heading', 'Recent rounds')}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginTop: 12 }}>
+          {[
+            { figure: total, label: t('discover.golfThisWeek.board.railRounds', 'ROUNDS') },
+            { figure: courseTotal, label: t('discover.golfThisWeek.board.railCourses', 'COURSES') },
+            { figure: GOLF_WEEK_DAYS, label: t('discover.golfThisWeek.board.railDays', 'DAYS') },
+          ].map((pair) => (
+            <div key={pair.label} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span
+                className="tabular-nums"
+                style={{ ...FIGS, color: A.INK, fontSize: 13.5, fontWeight: 700, lineHeight: 1 }}
+              >
+                {pair.figure}
+              </span>
+              <span
+                style={{
+                  color: A.DIM,
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: '0.14em',
+                  lineHeight: 1,
+                }}
+              >
+                {pair.label}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -207,10 +433,10 @@ export function GolfThisWeekSheet({
             </div>
 
             {list.map((r, i) => (
-              <FriendRoundRow
+              <CompactRoundRow
                 key={r.round_id}
                 row={r}
-                insight={insights.get(r.round_id)?.text ?? referenceLine(r, t)}
+                reason={insights.get(r.round_id)?.text ?? referenceLine(r, t)}
                 shape={holeShapes?.get(r.score_id ?? '') ?? null}
                 reaction={{
                   ...reactions.stateFor('round', r.score_id),
