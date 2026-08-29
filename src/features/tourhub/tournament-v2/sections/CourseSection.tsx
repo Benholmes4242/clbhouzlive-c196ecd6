@@ -25,6 +25,8 @@ import {
   TourHoleRampLegend,
   TOUR_PREVIEW_COUNT,
   buildTourHoleScale,
+  tourBucketShares,
+  DistributionStrip,
 } from './TournamentHoleRow';
 import { formatNumber } from '@/i18n/format';
 import { ScopeSegment, type ScopeSegmentOption } from '@/components/shared/ScopeSegment';
@@ -54,6 +56,11 @@ export function CourseSection({ tournamentId }: Props) {
   // The marker domain spans ALL EIGHTEEN played holes, so a tick further right
   // always means a harder hole. Never per visible row.
   const scale = buildTourHoleScale(played);
+  /**
+   * How the course is playing, before a single row is read: the per-hole counts
+   * summed across every played hole. The preview panel is always all rounds.
+   */
+  const previewShares = tourBucketShares(played);
 
   /**
    * The four most notable holes: two playing hardest, two playing easiest,
@@ -103,6 +110,7 @@ export function CourseSection({ tournamentId }: Props) {
         {hardest.hole_no !== easiest.hole_no && (
           <FeaturePair hardest={hardest} easiest={easiest} />
         )}
+        {previewShares && <DistributionStrip shares={previewShares} />}
         <TourHoleRampLegend />
         {preview.map((h, i) => (
           <TournamentHoleRow
@@ -163,6 +171,11 @@ function HolesSheet({
     .filter((h) => Number.isFinite(h.avg_to_par))
     .sort((a, b) => a.hole_no - b.hole_no);
   const sheetScale = buildTourHoleScale(played);
+  /**
+   * THE SUMMARY FOLLOWS THE ROUND FILTER: `played` is already the filtered
+   * round's holes, so on R3 this is R3's distribution, not the tournament's.
+   */
+  const sheetShares = tourBucketShares(played);
   const sorted = [...played].sort((a, b) => b.avg_to_par - a.avg_to_par);
   const hardest = sorted[0];
   const easiest = sorted[sorted.length - 1];
@@ -260,6 +273,7 @@ function HolesSheet({
                 <FeaturePair hardest={hardest} easiest={easiest} />
               )}
 
+              {sheetShares && <DistributionStrip shares={sheetShares} />}
               <TourHoleRampLegend />
               {played.map((h, i) => (
                 <TournamentHoleRow

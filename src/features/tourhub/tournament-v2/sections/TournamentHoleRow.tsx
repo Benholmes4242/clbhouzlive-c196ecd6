@@ -21,14 +21,32 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { TournamentHole } from '../data/useTournamentHoleAnalysis';
+import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import {
-  A, FIGS, Hairline, LABEL, RAMP, SANS, toParParts,
+  A, FIGS, Hairline, LABEL, SANS, toParParts,
 } from '@/features/courses/components/holes/analytical/tokens';
 import {
+  BUCKETS,
+  DistributionStrip,
+  courseBucketShares,
   markerOffset,
   rankHolesByDifficulty,
+  type BucketShares,
 } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { formatNumber } from '@/i18n/format';
+
+export { DistributionStrip };
+export type { BucketShares };
+
+/**
+ * The tournament surface's aggregate distribution, summed across the VISIBLE
+ * holes of the current round filter. Delegates to the course page's
+ * courseBucketShares so the two surfaces cannot compute the same four buckets
+ * two different ways - the dist shape is identical, only the row type differs.
+ */
+export function tourBucketShares(holes: ReadonlyArray<TournamentHole>): BucketShares | null {
+  return courseBucketShares(holes as unknown as CourseHole[]);
+}
 
 /** HoleRowV2's HOLE_GRID_V2 minus the SI column. Columns never size to content. */
 export const TOUR_HOLE_GRID = '26px 26px 1fr';
@@ -65,34 +83,25 @@ export function buildTourHoleScale(holes: ReadonlyArray<TournamentHole>): TourHo
 }
 
 /**
- * Band mapping. ace + albatross + eagle + birdie collapse into ONE lightest
- * "birdie or better" band: an ace band would be a sliver of nothing on
- * seventeen holes and a misleading spike on the eighteenth.
+ * Band mapping. Buckets, their key order AND their tones come from the course
+ * page's BUCKETS (RAMP_TOPAR) - BRIEF_TOURNAMENT_HOLES_MATCH_COURSE. The
+ * previous neutral RAMP made this surface answer the same question in grey and
+ * is deliberately not used here any more. No second palette is defined.
  */
 function bands(row: TournamentHole, t: (k: string) => string) {
-  const d = row.dist ?? ({} as TournamentHole['dist']);
-  return [
-    {
-      key: 'birdie',
-      pctValue: (d.ace ?? 0) + (d.albatross ?? 0) + (d.eagle ?? 0) + (d.birdie ?? 0),
-      bg: RAMP.birdie,
-      label: t('courses:holes.preview.legendBirdie'),
-    },
-    { key: 'par', pctValue: d.par ?? 0, bg: RAMP.par, label: t('courses:holes.preview.legendPar') },
-    { key: 'bogey', pctValue: d.bogey ?? 0, bg: RAMP.bogey, label: t('courses:holes.preview.legendBogey') },
-    { key: 'double', pctValue: d.double ?? 0, bg: RAMP.double, label: t('courses:holes.preview.legendDouble') },
-  ];
+  const d = (row.dist ?? {}) as unknown as Record<string, number>;
+  return BUCKETS.map((b) => ({
+    key: b.key,
+    pctValue: b.keys.reduce((s, k) => s + (d[k as string] ?? 0), 0),
+    bg: b.bg,
+    label: t(b.labelKey),
+  }));
 }
 
-/** Legend for the ink ramp. Rendered ONCE per surface, above the rows. */
+/** Legend for the ramp. Rendered ONCE per surface, above the rows. */
 export const TourHoleRampLegend: React.FC = () => {
   const { t } = useTranslation(['courses']);
-  const items = [
-    { bg: RAMP.birdie, label: t('courses:holes.preview.legendBirdie') },
-    { bg: RAMP.par, label: t('courses:holes.preview.legendPar') },
-    { bg: RAMP.bogey, label: t('courses:holes.preview.legendBogey') },
-    { bg: RAMP.double, label: t('courses:holes.preview.legendDouble') },
-  ];
+  const items = BUCKETS.map((b) => ({ bg: b.bg, label: t(b.labelKey) }));
   return (
     <div
       style={{
@@ -163,28 +172,40 @@ export const TournamentHoleRow: React.FC<{
         <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>
           {row.hole_no}
         </span>
-        {/* AXIS: par is a COLUMN VALUE in a 26px fixed column, centred under no
-            header — a coordinate. Already above the AXIS floor of 10, so it holds
-            at 12. Yardage, by contrast, is a read figure (see DetailFigure). */}
-        <span style={{ fontSize: 12, fontWeight: 700, color: A.BODY, textAlign: 'center', ...FIGS }}>
-          {row.par}
+        {/* AXIS: par is a COLUMN VALUE in a 26px fixed column, labelled like the
+            course row's PAR column so the numeral never explains itself. */}
+        <span style={{ display: 'block', textAlign: 'center' }}>
+          <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: A.BODY, ...FIGS }}>
+            {row.par}
+          </span>
+          <span style={{ ...LABEL, display: 'block', marginTop: 1 }}>
+            {t('courses:courseDetail.holes.colPar')}
+          </span>
         </span>
 
         <span style={{ display: 'block', minWidth: 0 }}>
-          {/* Ramp bar with the field-average tick — the only marker here. */}
+          {/* Ramp bar with the field-average tick — the only marker here. Segment
+              geometry (1.5px gaps, 2px hairline for a zero bucket at 0.28) is the
+              course row's, so the two surfaces read identically. A hole with no
+              scores yet is FOUR HAIRLINES, never a filled grey bar. */}
           <span style={{ position: 'relative', display: 'block', paddingTop: 2 }}>
-            <span
-              style={{
-                height: 7,
-                borderRadius: 3,
-                overflow: 'hidden',
-                display: 'flex',
-                background: A.TRACK,
-              }}
-            >
-              {segs.map((s) => (
-                <i key={s.key} style={{ width: `${(s.pctValue / total) * 100}%`, background: s.bg }} />
-              ))}
+            <span style={{ display: 'flex', gap: 1.5, height: 8 }}>
+              {segs.map((s, i) => {
+                const empty = s.pctValue <= 0;
+                return (
+                  <i
+                    key={s.key}
+                    style={{
+                      width: empty ? 2 : `${(s.pctValue / total) * 100}%`,
+                      flexShrink: 0,
+                      background: s.bg,
+                      opacity: empty ? 0.28 : 1,
+                      borderRadius:
+                        i === 0 ? '4px 0 0 4px' : i === segs.length - 1 ? '0 4px 4px 0' : 0,
+                    }}
+                  />
+                );
+              })}
             </span>
             {Number.isFinite(row.avg_to_par) && (
               <i
@@ -219,6 +240,16 @@ export const TournamentHoleRow: React.FC<{
                   {t('courses:courseDetail.plays.legendField')}
                 </span>
                 <span style={{ fontSize: 12, fontWeight: 700, color: A.INK, ...FIGS }}>{field.text}</span>
+              </span>
+            )}
+            {/* YARDS on every row: a 495-yard par 5 and a 160-yard par 3 are not
+                the same hole and par alone does not say which one this is. */}
+            {row.yards != null && (
+              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+                <span style={LABEL}>{t('courses:courseDetail.holes.yards')}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: A.BODY, ...FIGS }}>
+                  {formatNumber(row.yards)}
+                </span>
               </span>
             )}
           </span>
