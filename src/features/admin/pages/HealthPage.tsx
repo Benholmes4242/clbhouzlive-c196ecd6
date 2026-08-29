@@ -10,9 +10,10 @@ import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../hooks/usePushHealth';
 import { useDashboard } from '../hooks/useDashboard';
 import { useOpsHealth, type OpsHealth } from '../hooks/useOpsHealth';
+import { useDeletionIntegrity } from '../hooks/useDeletionIntegrity';
 import {
   computeEchoChip, computePushChip, computeEgChip, computeCronChip,
-  computeErrorsChip, toneColor,
+  computeErrorsChip, computeDeletionChip, toneColor,
   type ChipState,
 } from '../lib/healthChips';
 import { pipelineTone, PIPELINE_EXPLAINER } from '../components/SystemPanels';
@@ -447,6 +448,7 @@ const DETAIL_TITLE: Record<SubsystemId, string> = {
   push: 'Push delivery',
   pipeline: 'Evaluation pipeline',
   errors: 'Client errors',
+  deletion: 'Deleted accounts',
 };
 
 /**
