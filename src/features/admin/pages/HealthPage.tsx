@@ -101,6 +101,7 @@ export default function HealthPage() {
   const eg = dashboard.egSyncHealth;
   const errors = useErrorCount24h();
   const ops = useOpsHealth(7);
+  const deletion = useDeletionIntegrity();
 
   const echoChip = useMemo(() => computeEchoChip(echo), [echo.isLoading, echo.isError, echo.data]);
   const pushChip = useMemo(() => computePushChip(push), [push.isLoading, push.isError, push.data]);
@@ -109,6 +110,10 @@ export default function HealthPage() {
   const errorsChip = useMemo(
     () => computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError),
     [errors.data, errors.isLoading, errors.isError],
+  );
+  const deletionChip = useMemo(
+    () => computeDeletionChip(deletion.data ?? null, deletion.isLoading),
+    [deletion.data, deletion.isLoading],
   );
 
   /**
@@ -138,10 +143,21 @@ export default function HealthPage() {
         headline: p ? `${p.unprocessed.toLocaleString()} waiting` : '-' },
       { id: 'errors', label: 'Errors', chip: errorsChip,
         headline: e ? e.errors_24h.toLocaleString() : (errors.data != null ? String(errors.data) : '-') },
+      /* BRIEF_HEALTH_DELETION_INTEGRITY - seventh, last. The headline is the
+         urgent figure: live logins when any, else contained-not-erased,
+         else 0. It should read 0 forever; that is the point. */
+      { id: 'deletion', label: 'Deletions', chip: deletionChip,
+        headline: deletion.data
+          ? String(deletion.data.live_sessions > 0
+              ? deletion.data.live_sessions
+              : deletion.data.unbanned > 0
+              ? deletion.data.unbanned
+              : 0)
+          : '-' },
     ];
-  }, [egChip, cronChip, echoChip, pushChip, errorsChip, eg.data, echo.data, push.data, ops.data, ops.isLoading, errors.data]);
+  }, [egChip, cronChip, echoChip, pushChip, errorsChip, deletionChip, eg.data, echo.data, push.data, ops.data, ops.isLoading, errors.data, deletion.data, deletion.isLoading]);
 
-  const anyLoading = echo.isLoading || push.isLoading || eg.isLoading || errors.isLoading || ops.isLoading;
+  const anyLoading = echo.isLoading || push.isLoading || eg.isLoading || errors.isLoading || ops.isLoading || deletion.isLoading;
   const degraded = subsystems.filter(s => s.chip.tone !== 'ok' && s.chip.tone !== 'idle');
 
   return (
