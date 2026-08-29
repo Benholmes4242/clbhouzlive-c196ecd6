@@ -332,7 +332,7 @@ function MemberBoard({
           margin: '0 -13px',
           boxSizing: 'border-box',
           ...(scrolls ? { height: BOARD_MAX_H } : null),
-          overflowY: scrolls ? 'auto' : 'hidden',
+          overflowY: 'auto',
           overflowX: 'hidden',
           // §3.1 — STOPS THE SCROLL CHAINING TO THE PAGE at the list's edge.
           overscrollBehavior: 'contain',
