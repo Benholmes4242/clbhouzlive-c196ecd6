@@ -171,15 +171,6 @@ const RoundPage: React.FC = () => {
           onClose={goBack}
           scoreId={whsScoreId}
           profileUserId={ownerId}
-          // Full-height host: the sheet is 85dvh by default, which leaves a
-          // backdrop-dimmed band of page above it. On this page the sheet IS
-          // the page, so the charcoal continues to the top of the viewport.
-          sheetStyle={{
-            maxHeight: '100dvh',
-            height: '100dvh',
-            borderRadius: 0,
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)',
-          }}
         />
       </div>
     );
