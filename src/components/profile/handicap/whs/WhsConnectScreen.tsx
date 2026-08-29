@@ -95,6 +95,60 @@ export const WhsConnectScreen: React.FC<Props> = ({
 
   const immersive = layout === 'page';
 
+  /* ---- BRIEF_WHS_CONNECT_INSTRUMENTATION ----------------------------------
+     The connect flow is the single gate on the product and previously emitted
+     nothing. Every event below is derived from state that already existed;
+     the flow's behaviour, copy, steps and layout are unchanged.
+
+     Entry point: both mount sites resolve here — the immersive page at
+     /manage/handicap (own profile) and the embedded friend view inside the
+     /handicap tab. `page` in props already carries the path. */
+  const entryPoint = immersive ? 'manage_handicap' : 'handicap_embedded';
+  const preselected = Boolean(
+    (location.state as { preselectCountryId?: string } | null)?.preselectCountryId,
+  );
+
+  // whs_connect_viewed — the screen mounted. Fires once per mount.
+  useEffect(() => {
+    analyticsEvents.track('whs_connect_viewed', {
+      entry_point: entryPoint,
+      preselected_country: preselected,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // whs_connect_step — the funnel spine. One effect on `step` catches every
+  // transition, including the preselect jump, so no setter path can skip it.
+  const prevStepRef = useRef(step);
+  useEffect(() => {
+    const from = prevStepRef.current;
+    if (from !== step) {
+      analyticsEvents.track('whs_connect_step', { from, to: step });
+      prevStepRef.current = step;
+    }
+  }, [step]);
+
+  /* whs_connect_abandoned — THE point of the brief. Fires on unmount whenever
+     no connection was produced: back-navigation, route change away, sheet
+     closed. succeededRef is latched (never reset by WelcomeAboard's
+     continue action clearing successData), so abandoned and succeeded are
+     mutually exclusive by construction — succeeded sets the latch before
+     any unmount can run. */
+  const stepRef = useRef(step);
+  stepRef.current = step;
+  const succeededRef = useRef(false);
+  useEffect(() => {
+    return () => {
+      if (!succeededRef.current) {
+        analyticsEvents.track('whs_connect_abandoned', {
+          step: stepRef.current,
+          entry_point: entryPoint,
+        });
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   /* Page layout owns the whole viewport: the app chrome stops drawing a header
      (one back, one title) and the wash paints from physical y=0 behind the
      notch. Reuses the existing data-immersive-route mechanism via
