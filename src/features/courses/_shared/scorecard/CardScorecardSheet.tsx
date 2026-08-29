@@ -4,6 +4,7 @@ import { RefreshCw, Table } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { TrajectoryLine } from './TrajectoryLine';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
