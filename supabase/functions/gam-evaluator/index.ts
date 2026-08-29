@@ -2045,9 +2045,19 @@ function dedupKey(type: string, userId: string, payload: any): string {
     // Unified with public.gam_emit_legend_pulse_event() — the SQL trigger that
     // also emits legend_lost. Both sides use the venue-agnostic UTC date so the
     // two strings match exactly and either emitter suppresses the other.
-    // Key: legend_lost:{userId}:{course_id}:{category}:{YYYY-MM-DD (UTC)}
-    case "legend_lost": return `legend_lost:${userId}:${payload.course_id}:${payload.category}:${new Date().toISOString().slice(0, 10)}`;
-    case "legend_earned": return `legend_earned:${userId}:${payload.course_id}:${payload.category}`;
+    //
+    // BRIEF_CROWN_NOTIFICATION_COALESCING S2 (2026-08-29). THE CATEGORY IS GONE
+    // FROM BOTH KEYS. One round can take several all-time records at one course
+    // (four at Addington on 28 Aug), and each used to be its own notification
+    // with word-for-word identical copy. The key now collapses to member +
+    // course + UTC day, so the first record inserts and the rest are absorbed
+    // and counted into that one row (see coalesceCrownActivityRow).
+    // The 24h trigger-side skip is UNAFFECTED: the key still carries the UTC
+    // date, so it is only coarser, never longer-lived.
+    // Key: legend_lost:{userId}:{course_id}:{YYYY-MM-DD (UTC)}
+    case "legend_lost": return `legend_lost:${userId}:${payload.course_id}:${new Date().toISOString().slice(0, 10)}`;
+    case "legend_earned": return `legend_earned:${userId}:${payload.course_id}:${new Date().toISOString().slice(0, 10)}`;
+
     case "streak_at_risk": return `streak_risk:${userId}:${payload.streak_type}`;
     case "streak_broken": return `streak_broken:${userId}:${payload.streak_type}:${new Date().toISOString().slice(0, 10)}`;
     case "rival_played": return `rival:${userId}:${payload.rival_user_id}:${payload.course_id}:${payload.play_date}`;
