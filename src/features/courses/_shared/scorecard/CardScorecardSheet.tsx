@@ -602,6 +602,23 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   void nineHole;
 
   const isTour = surface === 'tour';
+  /**
+   * S3 — the tour avatar's ordered candidate chain, from the ONE canonical
+   * resolver (consumed, never re-implemented). photo_url still wins when it is
+   * there; otherwise SquircleAvatar walks the name-derived storage paths and
+   * falls back to initials only when every candidate misses.
+   */
+  const tourAvatarCandidates = React.useMemo(
+    () => (isTour
+      ? resolvePlayerAvatarCandidates({
+          name: playerName,
+          photoUrl: playerAvatarUrl ?? null,
+          tourSlug: playerTourSlug ?? null,
+          headshotOverride: playerHeadshotOverride ?? null,
+        })
+      : []),
+    [isTour, playerName, playerAvatarUrl, playerTourSlug, playerHeadshotOverride],
+  );
   const { user } = useSupabaseSession();
   /**
    * OWNERSHIP is still derived, never passed — it drives the amber own-member
