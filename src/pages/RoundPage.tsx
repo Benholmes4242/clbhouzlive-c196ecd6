@@ -138,8 +138,17 @@ const RoundPage: React.FC = () => {
 
   const missingId = !whsScoreId;
   const signedOut = !authLoading && !user;
+  /**
+   * MICRO_BRIEF_ROUND_LINK_FLASH S3.2 — the page's OWN pending state, not just
+   * the lazy-chunk one. Until the session has settled and the round's owner has
+   * resolved, the sheet would mount with a null player identity and reflow when
+   * it arrived, so hold the content-shaped skeleton instead.
+   */
+  const pending = !missingId && (authLoading || ownerQuery.isLoading);
+  usePageReady(!pending);
 
   const content = useMemo(() => {
+
     if (missingId) {
       return (
         <StateShell
