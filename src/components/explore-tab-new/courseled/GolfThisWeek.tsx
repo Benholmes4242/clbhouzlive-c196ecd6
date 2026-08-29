@@ -1205,7 +1205,7 @@ function GolfThisWeekCard({
           <span
             style={{
               minWidth: 0,
-              flex: '0 1 auto',
+              flex: '1 1 auto',
               fontSize: 12,
               fontWeight: 600,
               /* AMBER IS THE ONE DELIBERATE DIVERGENCE FROM PhotoBand's
@@ -1223,57 +1223,59 @@ function GolfThisWeekCard({
             {row.display_name}
           </span>
 
-          <span
-            style={{
-              marginLeft: 'auto',
-              display: 'inline-flex',
-              alignItems: 'baseline',
-              gap: 5,
-              flexShrink: 0,
-            }}
-          >
-            {/* §2.2 — the gross: INK -> white. */}
-            <span style={{ ...NUMF, fontSize: 14, lineHeight: 1, color: ROW_DARK_INK }}>
-              {row.gross ?? '\u2014'}
-            </span>
-            {toPar && (
-              <span
-                style={{
-                  ...NUMF,
-                  /* FLOOR (item 2) — CONTENT-unchanged applies only to figures
-                     already at or above 11. This one was below it. 10.5 -> 11. */
-                  fontSize: 11,
-                  lineHeight: 1,
-                  /* §5.3 — the canonical dark under-par red via getScoreColor,
-                     white-at-alpha for over/level. Never TOPAR_RED, never grey. */
-                  color: toParUnder ? ROW_DARK_TOPAR_UNDER : ROW_DARK_QUIET,
-                }}
-              >
-                {toPar.text}
+          {moment.figureRole !== 'score' && (
+            <span
+              style={{
+                marginLeft: 'auto',
+                display: 'inline-flex',
+                alignItems: 'baseline',
+                gap: 5,
+                flexShrink: 0,
+              }}
+            >
+              {/* §2.2 — the gross: INK -> white. */}
+              <span style={{ ...NUMF, fontSize: 14, lineHeight: 1, color: ROW_DARK_INK }}>
+                {row.gross ?? '\u2014'}
               </span>
-            )}
-            {hasMovement && (
-              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
-                <IndexMovementTriangle
-                  direction={(delta as number) < 0 ? 'down' : 'up'}
-                  /* §2 — the DIRECTION rule is unchanged and the COLOUR is back. */
-                  color={(delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE}
-                  size={7}
-                />
+              {toPar && (
                 <span
                   style={{
                     ...NUMF,
-                    /* FLOOR (item 2) — index delta lifted 10.5 -> 11. */
+                    /* FLOOR (item 2) — CONTENT-unchanged applies only to figures
+                       already at or above 11. This one was below it. 10.5 -> 11. */
                     fontSize: 11,
                     lineHeight: 1,
-                    color: (delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE,
+                    /* §5.3 — the canonical dark under-par red via getScoreColor,
+                       white-at-alpha for over/level. Never TOPAR_RED, never grey. */
+                    color: toParUnder ? ROW_DARK_TOPAR_UNDER : ROW_DARK_QUIET,
                   }}
                 >
-                  {Math.abs(delta as number).toFixed(1)}
+                  {toPar.text}
                 </span>
-              </span>
-            )}
-          </span>
+              )}
+              {hasMovement && (
+                <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
+                  <IndexMovementTriangle
+                    direction={(delta as number) < 0 ? 'down' : 'up'}
+                    /* §2 — the DIRECTION rule is unchanged and the COLOUR is back. */
+                    color={(delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE}
+                    size={7}
+                  />
+                  <span
+                    style={{
+                      ...NUMF,
+                      /* FLOOR (item 2) — index delta lifted 10.5 -> 11. */
+                      fontSize: 11,
+                      lineHeight: 1,
+                      color: (delta as number) < 0 ? ROW_DARK_INDEX_FELL : ROW_DARK_INDEX_ROSE,
+                    }}
+                  >
+                    {Math.abs(delta as number).toFixed(1)}
+                  </span>
+                </span>
+              )}
+            </span>
+          )}
 
           {showFollow && (
             <FollowButton
