@@ -75,6 +75,8 @@ import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton'
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { HandicapPageSkeleton } from '@/components/skeletons/HandicapPageSkeleton';
+import { RoundPageSkeleton } from '@/components/skeletons/RoundPageSkeleton';
+
 import { CoursesHubSkeleton } from '@/components/skeletons/CoursesHubSkeleton';
 import DiscoverCourseLedSkeleton from '@/components/explore-tab-new/courseled/DiscoverCourseLedSkeleton';
 
