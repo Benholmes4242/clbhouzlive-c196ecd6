@@ -2116,7 +2116,22 @@ async function enqueueNotification(userId: string, type: string, payload: any) {
     // row is written on the same condition, never on a suppressed push.
     if (Array.isArray(inserted) && inserted.length > 0) {
       await writeActivityRow(userId, type, payload);
+    } else if (type === "legend_earned") {
+      // BRIEF_CROWN_NOTIFICATION_COALESCING S2 (2026-08-29). The insert was
+      // absorbed by the collapsed dedup key, which means this member has
+      // ALREADY been told about a record at this course today — so this is the
+      // 2nd..nth record of the same burst. Bump the count on that one row and
+      // rewrite its sentence rather than adding another.
+      //
+      // OWNERSHIP: the evaluator coalesces legend_earned ONLY.
+      // public.gam_emit_legend_pulse_event() owns legend_lost end to end (it
+      // writes both the outbox row and the Activity row, which is why the
+      // evaluator's legend_lost upsert always no-ops), so its own ON CONFLICT
+      // branch does the bumping there. Exactly one bumper per type, or the
+      // count would double.
+      await coalesceCrownActivityRow(userId, "legend_earned", payload?.course_id ?? null);
     }
+
   } catch (e) {
     console.warn("[enqueueNotification]", type, (e as Error).message);
   }
