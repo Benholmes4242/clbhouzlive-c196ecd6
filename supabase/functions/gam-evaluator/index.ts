@@ -1785,7 +1785,25 @@ async function recomputeLegend(courseId: string, cfg: LegendCfg, trigger?: Legen
     // happened, so a suppressed notice never changes what is true, only who is
     // told. This sits BEFORE enqueueNotification, so a suppressed row never
     // reaches dedupKey / the 24h trigger skip / urgency at all (§6).
-    const notify = isTriggerFreshForCrownNotice(trigger, courseId, cfg.category);
+    //
+    // BRIEF_CROWN_NOTIFICATION_COALESCING S1 (2026-08-29). 90-DAY CROWNS DO NOT
+    // NOTIFY — neither side. The test is the CONFIG (windowDays), never the
+    // category name, so renaming a category or adding a third window cannot
+    // silently re-open the fan-out. windowDays === null means all-time.
+    // SQL TWIN: public.gam_emit_legend_pulse_event() tests
+    //   NEW.category LIKE '%\_all\_time'
+    // because the trigger has no access to LEGEND_CATS. These two tests are a
+    // PAIR — change one, change the other.
+    const isAllTimeCategory = cfg.windowDays === null;
+    const notify = isAllTimeCategory && isTriggerFreshForCrownNotice(trigger, courseId, cfg.category);
+    if (!isAllTimeCategory) {
+      console.log('[gam-evaluator] crown notice suppressed — 90-day window', {
+        courseId,
+        category: cfg.category,
+        windowDays: cfg.windowDays,
+      });
+    }
+
 
     // Course name is needed by BOTH sides (legend_lost and legend_earned), so
     // it is resolved once here. golf_courses ONLY — never read
@@ -2027,9 +2045,19 @@ function dedupKey(type: string, userId: string, payload: any): string {
     // Unified with public.gam_emit_legend_pulse_event() — the SQL trigger that
     // also emits legend_lost. Both sides use the venue-agnostic UTC date so the
     // two strings match exactly and either emitter suppresses the other.
-    // Key: legend_lost:{userId}:{course_id}:{category}:{YYYY-MM-DD (UTC)}
-    case "legend_lost": return `legend_lost:${userId}:${payload.course_id}:${payload.category}:${new Date().toISOString().slice(0, 10)}`;
-    case "legend_earned": return `legend_earned:${userId}:${payload.course_id}:${payload.category}`;
+    //
+    // BRIEF_CROWN_NOTIFICATION_COALESCING S2 (2026-08-29). THE CATEGORY IS GONE
+    // FROM BOTH KEYS. One round can take several all-time records at one course
+    // (four at Addington on 28 Aug), and each used to be its own notification
+    // with word-for-word identical copy. The key now collapses to member +
+    // course + UTC day, so the first record inserts and the rest are absorbed
+    // and counted into that one row (see coalesceCrownActivityRow).
+    // The 24h trigger-side skip is UNAFFECTED: the key still carries the UTC
+    // date, so it is only coarser, never longer-lived.
+    // Key: legend_lost:{userId}:{course_id}:{YYYY-MM-DD (UTC)}
+    case "legend_lost": return `legend_lost:${userId}:${payload.course_id}:${new Date().toISOString().slice(0, 10)}`;
+    case "legend_earned": return `legend_earned:${userId}:${payload.course_id}:${new Date().toISOString().slice(0, 10)}`;
+
     case "streak_at_risk": return `streak_risk:${userId}:${payload.streak_type}`;
     case "streak_broken": return `streak_broken:${userId}:${payload.streak_type}:${new Date().toISOString().slice(0, 10)}`;
     case "rival_played": return `rival:${userId}:${payload.rival_user_id}:${payload.course_id}:${payload.play_date}`;
@@ -2088,11 +2116,70 @@ async function enqueueNotification(userId: string, type: string, payload: any) {
     // row is written on the same condition, never on a suppressed push.
     if (Array.isArray(inserted) && inserted.length > 0) {
       await writeActivityRow(userId, type, payload);
+    } else if (type === "legend_earned") {
+      // BRIEF_CROWN_NOTIFICATION_COALESCING S2 (2026-08-29). The insert was
+      // absorbed by the collapsed dedup key, which means this member has
+      // ALREADY been told about a record at this course today — so this is the
+      // 2nd..nth record of the same burst. Bump the count on that one row and
+      // rewrite its sentence rather than adding another.
+      //
+      // OWNERSHIP: the evaluator coalesces legend_earned ONLY.
+      // public.gam_emit_legend_pulse_event() owns legend_lost end to end (it
+      // writes both the outbox row and the Activity row, which is why the
+      // evaluator's legend_lost upsert always no-ops), so its own ON CONFLICT
+      // branch does the bumping there. Exactly one bumper per type, or the
+      // count would double.
+      await coalesceCrownActivityRow(userId, "legend_earned", payload?.course_id ?? null);
     }
+
   } catch (e) {
     console.warn("[enqueueNotification]", type, (e as Error).message);
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BRIEF_CROWN_NOTIFICATION_COALESCING S2 (2026-08-29).
+//
+// Roll the 2nd..nth all-time record of the same burst into the ONE Activity row
+// already written for this member + course + UTC day, instead of a second
+// sentence. Scoped by entity_id so two courses in the same batch stay two
+// notifications (2.4). Non-fatal throughout: a failed bump leaves the truthful
+// n=1 sentence in place, which is the safe degradation.
+// ─────────────────────────────────────────────────────────────────────────────
+async function coalesceCrownActivityRow(userId: string, type: string, courseId: string | null) {
+  if (!courseId) return;
+  try {
+    const todayUtc = new Date().toISOString().slice(0, 10);
+    const { data: row } = await supabase
+      .from("notifications")
+      .select("id, data")
+      .eq("user_id", userId)
+      .eq("type", type)
+      .eq("entity_id", courseId)
+      .gte("created_at", `${todayUtc}T00:00:00Z`)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (!row) return;
+
+    const data = (row as any).data ?? {};
+    const count = Number(data.record_count ?? 1) + 1;
+    const course = (data.course_name as string | null) || "this course";
+    const message = `You now hold ${count} course records at ${course}.`;
+
+    await supabase
+      .from("notifications")
+      .update({
+        message,
+        data: { ...data, record_count: count, coalesced: true },
+      })
+      .eq("id", (row as any).id);
+  } catch (e) {
+    console.warn("[coalesceCrownActivityRow]", type, (e as Error).message);
+  }
+}
+
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Activity ledger mirror.
