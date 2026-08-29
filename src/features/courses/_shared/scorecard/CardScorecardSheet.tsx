@@ -254,7 +254,18 @@ const Nine: React.FC<{
   scoreLabel: string;
 }> = ({ rows, label, withField, scoreLabel }) => {
   const { t } = useTranslation(['courses']);
-  const { par, strokes } = nineSummary(rows);
+  const { par, strokes, playedCount, parPlayed } = nineSummary(rows);
+  /**
+   * S1.2 / S1.3 — the nine's two totals.
+   *  - No hole played: BOTH totals are absent (empty, not 0, not a dash).
+   *    A completed nine and a genuine nine-hole round are unaffected.
+   *  - Part played: par covers the holes played, so the strokes beside it mean
+   *    something. Fully played: the nine's par, exactly as before.
+   */
+  const started = playedCount > 0;
+  const partial = started && playedCount < rows.length;
+  const parTotal = !started ? '' : partial ? parPlayed : (par || '\u2014');
+  const strokesTotal = started ? strokes : '';
 
   const fieldRel = withField
     ? rows.reduce(
