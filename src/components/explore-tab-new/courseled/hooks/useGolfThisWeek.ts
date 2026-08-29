@@ -68,8 +68,15 @@ export const WEEK_SCOPES: WeekScope[] = [
 ];
 export const DEFAULT_WEEK_SCOPE: WeekScope = 'worldwide';
 
-/** Within 2.0 strokes either side, inclusive (§S2.1, Ben's decision). */
-export const HANDICAP_BAND_STROKES = 2.0;
+/**
+ * Within 4.0 strokes either side, inclusive. MICRO_BRIEF_HANDICAP_BAND_WIDTH:
+ * widened from the original 2.0 (BRIEF_GOLF_THIS_WEEK_P4 §S2.1) because that
+ * band was too thin at the current membership size (~11 qualifying rounds
+ * against 35 worldwide); 4.0 roughly doubles the field and a 1.8 index
+ * against a 5.8 is still a fair comparison. Fixed for everyone — the band
+ * NEVER widens automatically when results are thin.
+ */
+export const HANDICAP_BAND_STROKES = 4.0;
 
 /**
  * THE VIEWER'S INDEX (§S1.1): eg_handicap_index first, manual_handicap_index as
