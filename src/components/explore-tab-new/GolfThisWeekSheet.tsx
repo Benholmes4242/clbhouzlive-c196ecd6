@@ -259,7 +259,7 @@ export function GolfThisWeekSheet({
   const { t } = useTranslation('courses');
   const scopeCourses = useWeekScopeCourses(userId, scope);
   const roundsQuery = useGolfThisWeek(userId, scope, scopeCourses.courseIds);
-  const all = roundsQuery.data ?? [];
+  const all = useMemo(() => roundsQuery.data ?? [], [roundsQuery.data]);
   const courseIds = useMemo(
     () => all.map((r) => r.course_id).filter((v): v is string => !!v),
     [all],
