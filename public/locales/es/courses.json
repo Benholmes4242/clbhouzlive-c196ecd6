@@ -1182,8 +1182,8 @@
         },
         "figure": {
           "hole": "HOYO {n}",
-          "holes": "{n} HOYOS",
-          "inThree": "{n} DE TRES",
+          "holes": "{n} HOYOS LIMPIOS",
+          "inThree": "{n} EN LOS TRES ULTIMOS",
           "inARow": "{n} PARS SEGUIDOS",
           "birdies": "{n} BIRDIES"
         },

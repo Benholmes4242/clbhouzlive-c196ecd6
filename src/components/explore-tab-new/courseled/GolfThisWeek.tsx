@@ -666,10 +666,28 @@ const LABEL_FALLBACK: Record<string, string> = {
   grind: 'THE GRIND',
 };
 
+/**
+ * MICRO_BRIEF_MOMENT_NOUNS_STAND_ALONE — THE NOUN CARRIES THE CLAIM ALONE.
+ * The sentence and the kicker were removed beneath these words, so a noun that
+ * only made sense above an explaining sentence now states nothing, or worse.
+ *
+ *   holes    was "{n} HOLES"     — on a golf app that reads as a ROUND LENGTH.
+ *   inThree  was "{n} IN THREE"  — meaningless on its own.
+ *
+ * MEASURED AT 224 (inner 200 = 224 - 12 - 12 padding, minus the 7px gap):
+ *   "AT PAR OR BETTER" is 154.3 and a two-digit grind figure is 45.7 -> 207.
+ *   It does not fit, so §S2.3's shorter fallback "{n} CLEAN HOLES" (113.2 ->
+ *   165.9) is used. "IN THE LAST THREE" is 158.8 against a one-digit 22.8 ->
+ *   188.6, which DOES fit, so the longer, clearer form is kept there.
+ *
+ * `hole` stays a bare position because the KICKER above it names the feat for
+ * identity moments (§S3.4) — "EAGLE ON HOLE 7" under an "EAGLE" kicker would
+ * say it twice.
+ */
 const FIGURE_FALLBACK: Record<string, string> = {
   hole: `HOLE ${FIGURE_PLACEHOLDER}`,
-  holes: `${FIGURE_PLACEHOLDER} HOLES`,
-  inThree: `${FIGURE_PLACEHOLDER} IN THREE`,
+  holes: `${FIGURE_PLACEHOLDER} CLEAN HOLES`,
+  inThree: `${FIGURE_PLACEHOLDER} IN THE LAST THREE`,
   inARow: `${FIGURE_PLACEHOLDER} PARS IN A ROW`,
   /* A QUANTITY TAKES ITS NOUN AFTER THE FIGURE (§S2.6). */
   birdies: `${FIGURE_PLACEHOLDER} BIRDIES`,
@@ -1120,6 +1138,37 @@ function GolfThisWeekCard({
             {relativeDay(row.play_date, t)}
           </span>
         </div>
+
+        {/* THE KICKER RETURNS FOR IDENTITY FIGURES ONLY
+            (MICRO_BRIEF_MOMENT_NOUNS_STAND_ALONE §S3). STRIP_BACK removed the
+            kicker because "THE RUN" over "9 PARS IN A ROW" said the same thing
+            twice — TRUE FOR EVERY QUANTITY AND SCORE MOMENT, FALSE FOR THE
+            IDENTITY ONES. On an eagle the labelKey IS the feat and the noun is
+            only a position, so with no kicker "HOLE 7" carried a claim it cannot
+            make.
+
+            THE GATE IS figureRole === 'identity', NEVER A KIND NAME, so a future
+            identity moment inherits this automatically.
+
+            IT COSTS NO HEIGHT. The hero is a FIXED HERO_H box whose content is
+            bottom-aligned, and the figure line is 46px inside 132px — the kicker
+            occupies space already reserved, so a card with one and a card
+            without are the same height (§S3.5). */}
+        {moment.figureRole === 'identity' && momentLabel(moment, t as TFn) && (
+          <div
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: '0.16em',
+              lineHeight: 1,
+              textTransform: 'uppercase',
+              color: moment.tone,
+              marginBottom: 4,
+            }}
+          >
+            {momentLabel(moment, t as TFn)}
+          </div>
+        )}
 
         {/* THE FIGURE AND ITS NOUN (§S3.1). The noun stays: a green 9 with no
             noun could be anything, and colour says THAT something is notable,
