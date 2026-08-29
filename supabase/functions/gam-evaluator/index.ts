@@ -2138,6 +2138,50 @@ async function enqueueNotification(userId: string, type: string, payload: any) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// BRIEF_CROWN_NOTIFICATION_COALESCING S2 (2026-08-29).
+//
+// Roll the 2nd..nth all-time record of the same burst into the ONE Activity row
+// already written for this member + course + UTC day, instead of a second
+// sentence. Scoped by entity_id so two courses in the same batch stay two
+// notifications (2.4). Non-fatal throughout: a failed bump leaves the truthful
+// n=1 sentence in place, which is the safe degradation.
+// ─────────────────────────────────────────────────────────────────────────────
+async function coalesceCrownActivityRow(userId: string, type: string, courseId: string | null) {
+  if (!courseId) return;
+  try {
+    const todayUtc = new Date().toISOString().slice(0, 10);
+    const { data: row } = await supabase
+      .from("notifications")
+      .select("id, data")
+      .eq("user_id", userId)
+      .eq("type", type)
+      .eq("entity_id", courseId)
+      .gte("created_at", `${todayUtc}T00:00:00Z`)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (!row) return;
+
+    const data = (row as any).data ?? {};
+    const count = Number(data.record_count ?? 1) + 1;
+    const course = (data.course_name as string | null) || "this course";
+    const message = `You now hold ${count} course records at ${course}.`;
+
+    await supabase
+      .from("notifications")
+      .update({
+        message,
+        data: { ...data, record_count: count, coalesced: true },
+      })
+      .eq("id", (row as any).id);
+  } catch (e) {
+    console.warn("[coalesceCrownActivityRow]", type, (e as Error).message);
+  }
+}
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Activity ledger mirror.
 //
 // gam_notification_outbox stays a pure DELIVERY QUEUE (status/scheduled_for/
