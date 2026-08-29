@@ -973,30 +973,36 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   <div>
                     <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
                       <span style={{ ...LABEL_READ, color: A.INK }}>{t('courses:scorecard.total')}</span>
-                      <span
-                        style={{
-                          gridColumn: backSummary ? 'span 4' : 'span 9',
-                          ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {t('courses:scorecard.outN', { n: outSummary.strokes })}
-                      </span>
-                      {backSummary && (
+                      {/* S1.2 — a nine that has not started contributes NO segment.
+                          "IN 0" was a false claim; absence is the truth. The gross
+                          on the right is unchanged, so OUT + IN still equals it. */}
+                      {showOutSeg && (
                         <span
                           style={{
-                            gridColumn: 'span 5',
+                            gridColumn: showInSeg ? 'span 4' : 'span 9',
+                            ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {t('courses:scorecard.outN', { n: outSummary.strokes })}
+                        </span>
+                      )}
+                      {showInSeg && backSummary && (
+                        <span
+                          style={{
+                            gridColumn: showOutSeg ? 'span 5' : 'span 9',
                             ...LABEL_READ, color: A.MUTE, textAlign: 'center', whiteSpace: 'nowrap',
                           }}
                         >
                           {t('courses:scorecard.inN', { n: backSummary.strokes })}
                         </span>
                       )}
+                      {!showOutSeg && !showInSeg && <span style={{ gridColumn: 'span 9' }} />}
                       <span style={{ ...NUM, fontSize: 16, color: A.INK, textAlign: 'center' }}>{cardGross}</span>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: NINE_GRID, alignItems: 'center', gap: 2, padding: '3px 0' }}>
                       <span style={{ ...LABEL_READ, color: A.MUTE, whiteSpace: 'nowrap' }}>
-                        {t('courses:scorecard.parN', { n: cardTotalPar })}
+                        {t('courses:scorecard.parN', { n: shownPar })}
                       </span>
                       <span style={{ gridColumn: 'span 9' }} />
                       <span style={{ ...NUM, fontSize: 13, color: toParColor(totals.toPar), textAlign: 'center' }}>
