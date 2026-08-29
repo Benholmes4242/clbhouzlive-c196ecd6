@@ -392,6 +392,9 @@ const LegalDocumentPage = lazy(() => import("./pages/legal/LegalDocumentPage"));
 // PostsTabTestPage removed — Posts tab now integrated into profiles
 // CreateMomentPage removed — PostStudio is now the sole creation flow
 const PostDeepLinkPage = lazy(() => import("./pages/PostDeepLinkPage"));
+// BRIEF_ROUND_PAGE — a round's own address, and the intended target for future
+// Open Graph tags on a shared scorecard.
+const RoundPage = lazy(() => import("./pages/RoundPage"));
 const CommentDeepLinkPage = lazy(() => import("./features/comments-v2/CommentDeepLinkV2"));
 
 // Import season wrap modal
@@ -572,6 +575,8 @@ function AppRoutes() {
         <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
         
         {/* Post deep link for notifications */}
+        {/* Round deep link (notifications, shares, link previews) */}
+        <Route path="/round/:whsScoreId" element={<Suspense fallback={<HandicapPageSkeleton />}><RoundPage /></Suspense>} />
         <Route path="/post/:postId" element={<Suspense fallback={<GenericPageSkeleton />}><PostDeepLinkPage /></Suspense>} />
         <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={<GenericPageSkeleton />}><CommentDeepLinkPage /></Suspense>} />
         
