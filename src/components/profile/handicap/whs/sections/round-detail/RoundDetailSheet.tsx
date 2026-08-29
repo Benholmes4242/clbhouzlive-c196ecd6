@@ -204,6 +204,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       emptyVariant={emptyVariant}
       emptyGross={grossVal}
       emptyToPar={toParVal}
+      sheetStyle={sheetStyle}
     />
   );
 };
