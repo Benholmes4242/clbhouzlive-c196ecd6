@@ -540,6 +540,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   surface = 'member', courseContext,
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, identityStat,
   onViewProfile, onViewCourse, onShareRound,
+  sheetStyle,
 }) => {
   const { t } = useTranslation(['courses']);
   void emptyMessage;
