@@ -10,9 +10,10 @@ import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../hooks/usePushHealth';
 import { useDashboard } from '../hooks/useDashboard';
 import { useOpsHealth, type OpsHealth } from '../hooks/useOpsHealth';
+import { useDeletionIntegrity } from '../hooks/useDeletionIntegrity';
 import {
   computeEchoChip, computePushChip, computeEgChip, computeCronChip,
-  computeErrorsChip, toneColor,
+  computeErrorsChip, computeDeletionChip, toneColor,
   type ChipState,
 } from '../lib/healthChips';
 import { pipelineTone, PIPELINE_EXPLAINER } from '../components/SystemPanels';
@@ -27,7 +28,7 @@ import VideoPerfPage from './VideoPerfPage';
 import StabilityTab from './StabilityTab';
 
 type TabId = 'status' | 'stability' | 'video' | 'audit' | 'tools' | 'settings';
-type SubsystemId = 'eg' | 'cron' | 'echo' | 'push' | 'pipeline' | 'errors';
+type SubsystemId = 'eg' | 'cron' | 'echo' | 'push' | 'pipeline' | 'errors' | 'deletion';
 
 /**
  * ONE duration formatter for the console. chartPrimitives' thresholds (s / m /
@@ -100,6 +101,7 @@ export default function HealthPage() {
   const eg = dashboard.egSyncHealth;
   const errors = useErrorCount24h();
   const ops = useOpsHealth(7);
+  const deletion = useDeletionIntegrity();
 
   const echoChip = useMemo(() => computeEchoChip(echo), [echo.isLoading, echo.isError, echo.data]);
   const pushChip = useMemo(() => computePushChip(push), [push.isLoading, push.isError, push.data]);
@@ -108,6 +110,10 @@ export default function HealthPage() {
   const errorsChip = useMemo(
     () => computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError),
     [errors.data, errors.isLoading, errors.isError],
+  );
+  const deletionChip = useMemo(
+    () => computeDeletionChip(deletion.data ?? null, deletion.isLoading),
+    [deletion.data, deletion.isLoading],
   );
 
   /**
@@ -137,10 +143,21 @@ export default function HealthPage() {
         headline: p ? `${p.unprocessed.toLocaleString()} waiting` : '-' },
       { id: 'errors', label: 'Errors', chip: errorsChip,
         headline: e ? e.errors_24h.toLocaleString() : (errors.data != null ? String(errors.data) : '-') },
+      /* BRIEF_HEALTH_DELETION_INTEGRITY - seventh, last. The headline is the
+         urgent figure: live logins when any, else contained-not-erased,
+         else 0. It should read 0 forever; that is the point. */
+      { id: 'deletion', label: 'Deletions', chip: deletionChip,
+        headline: deletion.data
+          ? String(deletion.data.live_sessions > 0
+              ? deletion.data.live_sessions
+              : deletion.data.unbanned > 0
+              ? deletion.data.unbanned
+              : 0)
+          : '-' },
     ];
-  }, [egChip, cronChip, echoChip, pushChip, errorsChip, eg.data, echo.data, push.data, ops.data, ops.isLoading, errors.data]);
+  }, [egChip, cronChip, echoChip, pushChip, errorsChip, deletionChip, eg.data, echo.data, push.data, ops.data, ops.isLoading, errors.data, deletion.data, deletion.isLoading]);
 
-  const anyLoading = echo.isLoading || push.isLoading || eg.isLoading || errors.isLoading || ops.isLoading;
+  const anyLoading = echo.isLoading || push.isLoading || eg.isLoading || errors.isLoading || ops.isLoading || deletion.isLoading;
   const degraded = subsystems.filter(s => s.chip.tone !== 'ok' && s.chip.tone !== 'idle');
 
   return (
@@ -152,7 +169,7 @@ export default function HealthPage() {
       {tab === 'status' && can.manageAdmins && (
         <StatusTab
           subsystems={subsystems}
-          echo={echo} push={push} eg={eg} ops={ops}
+          echo={echo} push={push} eg={eg} ops={ops} deletion={deletion}
         />
       )}
       {tab === 'stability' && can.manageAdmins && <StabilityTab />}
@@ -201,13 +218,14 @@ function VerdictRow({ degraded }: { degraded: Subsystem[] }) {
 // ─── Status tab: the board ────────────────────────────────────────────────────
 
 function StatusTab({
-  subsystems, echo, push, eg, ops,
+  subsystems, echo, push, eg, ops, deletion,
 }: {
   subsystems: Subsystem[];
   echo: ReturnType<typeof useEchoEngineHealth>;
   push: ReturnType<typeof usePushHealth>;
   eg:   ReturnType<typeof useDashboard>['egSyncHealth'];
   ops:  ReturnType<typeof useOpsHealth>;
+  deletion: ReturnType<typeof useDeletionIntegrity>;
 }) {
   // Nothing is auto-selected, not even a degraded subsystem: an admin who
   // arrives to check one thing should not have the page choose for them.
@@ -240,7 +258,7 @@ function StatusTab({
               </div>
               <span style={{ color: t.inkMuted, fontSize: 12, fontWeight: 600 }}>{active.chip.detail}</span>
             </div>
-            <DetailBody id={active.id} echo={echo} push={push} eg={eg} ops={ops} />
+            <DetailBody id={active.id} echo={echo} push={push} eg={eg} ops={ops} deletion={deletion} />
           </div>
           <DetailFooter id={active.id} echo={echo} eg={eg} />
         </section>
@@ -447,6 +465,7 @@ const DETAIL_TITLE: Record<SubsystemId, string> = {
   push: 'Push delivery',
   pipeline: 'Evaluation pipeline',
   errors: 'Client errors',
+  deletion: 'Deleted accounts',
 };
 
 /**
@@ -572,20 +591,51 @@ function EchoRunFooter({ echo }: { echo: ReturnType<typeof useEchoEngineHealth> 
 }
 
 function DetailBody({
-  id, echo, push, eg, ops,
+  id, echo, push, eg, ops, deletion,
 }: {
   id: SubsystemId;
   echo: ReturnType<typeof useEchoEngineHealth>;
   push: ReturnType<typeof usePushHealth>;
   eg:   ReturnType<typeof useDashboard>['egSyncHealth'];
   ops:  ReturnType<typeof useOpsHealth>;
+  deletion: ReturnType<typeof useDeletionIntegrity>;
 }) {
   if (id === 'eg')       return <EgSyncDetail eg={eg} />;
   if (id === 'cron')     return <CronDetail eg={eg} />;
   if (id === 'echo')     return <EchoDetail echo={echo} />;
   if (id === 'push')     return <PushDetail push={push} />;
   if (id === 'pipeline') return <PipelineDetail ops={ops} />;
+  if (id === 'deletion') return <DeletionDetail deletion={deletion} />;
   return <ErrorsDetail ops={ops} />;
+}
+
+// ─── Deletions ────────────────────────────────────────────────────────────────
+
+/**
+ * BRIEF_HEALTH_DELETION_INTEGRITY §5. Counts in plain words, never the
+ * column names; worst_seen rendered as an age. NO account is ever named -
+ * the count is the alert; identifying accounts is a SQL job for Ben, and
+ * user ids on an admin board invite action outside the erasure flow.
+ */
+function DeletionDetail({ deletion }: { deletion: ReturnType<typeof useDeletionIntegrity> }) {
+  const d = deletion.data;
+  if (deletion.isLoading) return <CardSkeleton />;
+  if (!d) return <AdminErrorState message="Could not load deletion integrity." onRetry={() => deletion.refetch()} />;
+  return (
+    <>
+      <StatRow stats={[
+        { label: 'Still signed in', value: d.live_sessions, bad: d.live_sessions > 0 },
+        { label: 'Contained, not erased', value: d.unbanned, bad: d.unbanned > 0 },
+        { label: 'Fully erased', value: d.orphan_profiles },
+        ...(d.worst_seen ? [{ label: 'Oldest unresolved', value: age(d.worst_seen), bad: true }] : []),
+      ]} />
+      {d.live_sessions > 0 && (
+        <div style={{ color: t.dangerText, fontSize: 12, fontWeight: 600 }}>
+          A deleted account can currently sign in and write to the app.
+        </div>
+      )}
+    </>
+  );
 }
 
 // ─── EG sync ──────────────────────────────────────────────────────────────────
