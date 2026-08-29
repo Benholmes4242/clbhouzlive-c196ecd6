@@ -177,6 +177,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
     setCountryId(c.id);
     setStep('chosen');
     setError(null);
+    analyticsEvents.track('whs_connect_country', { country: c.id });
   };
 
   const handleSubmit = async (membershipNumber: string, password: string) => {
