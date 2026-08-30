@@ -1638,7 +1638,8 @@
           "birdieHaul": "{{0}} birdies across {{1}} holes.",
           "strongFinish": "Birdie or better coming home, to finish on {{0}}."
         },
-        "seeTheCard": "[SEE THE CARD]"
+        "seeTheCard": "[SEE THE CARD]",
+        "scorecard": "SCORECARD"
       },
       "count": "[~~{{rounds}} řőúñđš · {{courses}} çőúřšéš · {{days}} đáýš~~]",
       "heading": "[Recent rounds]",

@@ -47,7 +47,7 @@ function ActionSlot({ children }: { children?: React.ReactNode }) {
   );
 }
 
-export function RoundEngagementActions({ comment, like, size = 15, gap = 4 }: Props) {
+export function RoundEngagementActions({ comment, like, size = 15, gap = 10 }: Props) {
   return (
     <span
       data-round-engagement="comment-heart"

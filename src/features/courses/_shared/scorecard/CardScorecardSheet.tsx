@@ -912,13 +912,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     style={{
                       fontSize: 12.5, fontWeight: 700,
                       color: isOwner ? A.AMBER : A.INK,
-                      flex: '0 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                       flex: '1 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     }}
                     title={playerName}
                   >
                     {playerName}
                   </span>
-                  {engagement && (
+                   {engagement && (
+                     <span style={{ marginLeft: 12, flexShrink: 0 }}>
                     <RoundEngagementActions
                       comment={engagement.comment ?? null}
                       like={{
@@ -929,6 +930,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                         label: engagement.likeLabel,
                       }}
                     />
+                     </span>
                   )}
                   {showChip && <HandicapChip delta={playerHcpDelta as number} />}
                 </div>
