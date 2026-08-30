@@ -64,8 +64,8 @@ export function CommentAction({
         gap: count > 0 ? 5 : 0,
         fontFamily: SANS,
         cursor: 'pointer',
-        padding: '13px 8px',
-        margin: '-13px -8px',
+        padding: '13px 0',
+        margin: '-13px 0',
         WebkitTapHighlightColor: 'transparent',
       }}
     >
