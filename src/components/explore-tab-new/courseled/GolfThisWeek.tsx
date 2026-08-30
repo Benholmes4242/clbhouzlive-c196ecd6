@@ -1485,13 +1485,15 @@ export function GolfThisWeek({
         .map((r) => ({ type: 'round' as const, id: r.score_id as string })),
     [ordered],
   );
-  const reactions = useContentReactions(reactionTargets);
-
   /* COMMENTS (BRIEF_ROUND_COMMENTS_EVERYWHERE §S1.5): ONE post-id resolution
      for the whole window, keyed on the same whs_score_id set. Comments live on
-     the post, reactions on the score id — this is the only bridge. */
+     the post, reactions on the score id — this is the only bridge, and the
+     reaction hook borrows it so a like patches the Clubhouse feed too. */
   const roundPosts = useRoundPostComments(scoreIds);
   const [commentsPostId, setCommentsPostId] = useState<string | null>(null);
+  const reactions = useContentReactions(reactionTargets, {
+    postIdFor: (id) => roundPosts.infoFor(id)?.postId ?? null,
+  });
 
 
   /* THE PERSONAL-HISTORY READ IS GONE (BRIEF_ROUND_CARD_STRIP_BACK §S2.3/§2.4).

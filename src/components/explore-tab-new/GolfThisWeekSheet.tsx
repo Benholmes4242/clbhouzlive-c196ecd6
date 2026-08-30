@@ -319,11 +319,12 @@ export function GolfThisWeekSheet({
         .map((id) => ({ type: 'round' as const, id })),
     [scoreIds],
   );
-  const reactions = useContentReactions(reactionTargets);
-
   /* ONE post-id resolution for the whole sheet (§S1.5). */
   const roundPosts = useRoundPostComments(scoreIds);
   const [commentsPostId, setCommentsPostId] = useState<string | null>(null);
+  const reactions = useContentReactions(reactionTargets, {
+    postIdFor: (id) => roundPosts.infoFor(id)?.postId ?? null,
+  });
 
   const days = useMemo(() => {
     const map = new Map<string, CircleRoundRow[]>();

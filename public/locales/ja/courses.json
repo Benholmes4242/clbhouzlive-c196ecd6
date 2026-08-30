@@ -1218,7 +1218,10 @@
     "mostPlayedBestRoundsHere": "BEST ROUNDS HERE",
     "mostPlayedAllRoundsHere": "ALL {{count}} ROUNDS HERE",
     "mostPlayedOneRoundLine": "One round here: {{name}} shot {{gross}}.",
-    "mostPlayedOneRoundLine_other": "Only {{name}} has played here, best of {{gross}}."
+    "mostPlayedOneRoundLine_other": "Only {{name}} has played here, best of {{gross}}.",
+    "comments": {
+      "action": "Comment on this round"
+    }
   },
   "statBrowse": {
     "colArea": "エリア",

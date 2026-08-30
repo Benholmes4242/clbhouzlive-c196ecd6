@@ -187,14 +187,15 @@ export const RoundDetailSheet: React.FC<Props> = ({
    * whs_score_id mapping; with no post there is no comment control.
    */
   const scoreIdList = useMemo(() => (scoreId ? [scoreId] : []), [scoreId]);
+  const roundPosts = useRoundPostComments(scoreIdList);
+  const postInfo = roundPosts.infoFor(scoreId);
   const reactions = useContentReactions(
     useMemo(
       () => (scoreId ? [{ type: 'round' as const, id: scoreId }] : []),
       [scoreId],
     ),
+    { postIdFor: () => postInfo?.postId ?? null },
   );
-  const roundPosts = useRoundPostComments(scoreIdList);
-  const postInfo = roundPosts.infoFor(scoreId);
   const [commentsOpen, setCommentsOpen] = useState(false);
 
   const engagement = scoreId
