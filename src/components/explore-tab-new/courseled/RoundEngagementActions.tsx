@@ -39,7 +39,7 @@ function ActionSlot({ children }: { children?: React.ReactNode }) {
         flex: `0 0 ${REACTION_SLOT_W}px`,
         display: 'inline-flex',
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'flex-end',
       }}
     >
       {children}

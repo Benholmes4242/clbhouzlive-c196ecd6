@@ -89,6 +89,7 @@ export function ReactionAction({
         aria-label={label}
         style={{
           display: 'inline-flex',
+         flexDirection: reserveCount ? 'row-reverse' : 'row',
           alignItems: 'center',
           gap: 4,
           fontFamily: SANS,
@@ -119,6 +120,7 @@ export function ReactionAction({
       }}
       style={{
         display: 'inline-flex',
+       flexDirection: reserveCount ? 'row-reverse' : 'row',
         alignItems: 'center',
         gap: 4,
         fontFamily: SANS,
