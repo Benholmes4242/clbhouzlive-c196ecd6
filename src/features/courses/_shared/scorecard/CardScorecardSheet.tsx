@@ -912,13 +912,12 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     style={{
                       fontSize: 12.5, fontWeight: 700,
                       color: isOwner ? A.AMBER : A.INK,
-                      flex: '1 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      flex: '0 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     }}
                     title={playerName}
                   >
                     {playerName}
                   </span>
-                  {showChip && <HandicapChip delta={playerHcpDelta as number} />}
                   {engagement && (
                     <RoundEngagementActions
                       comment={engagement.comment ?? null}
@@ -931,6 +930,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                       }}
                     />
                   )}
+                  {showChip && <HandicapChip delta={playerHcpDelta as number} />}
                 </div>
               )}
             </div>
