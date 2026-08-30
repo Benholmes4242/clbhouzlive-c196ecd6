@@ -1370,5 +1370,18 @@
         "subline": "Only where a course was tagged"
       }
     }
+  },
+  "toReview": {
+    "title": "Campos por valorar",
+    "titleBreakdowns": "Anadir detalles",
+    "subline": "Jugados pero sin valorar - mas recientes primero.",
+    "sublineBreakdowns": "Faltan valoraciones detalladas - mas recientes primero.",
+    "bandThisYear": "ESTE ANO",
+    "bandLastYear": "ANO PASADO",
+    "bandEarlier": "ANTERIOR",
+    "railCourses": "CAMPOS",
+    "railYears": "ANOS",
+    "rate": "VALORAR",
+    "close": "Cerrar"
   }
 }
