@@ -330,11 +330,26 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     return '/profile';
   }
 
-
-
+  // --- tour digests (system-authored, NO actor, NO target) ------------
+  // tour_preview (Thursday) and tour_roundup (Sunday) carry null entity_type,
+  // null entity_id and no ids in data, so there is nothing to deep-link to.
+  // FIXED ROUTE to the Tour Hub overview — the same path the bottom nav's
+  // Tour tab uses (see components/bottom-navigation/navigationTabs.ts).
+  // No ?tab and no tour slug: the overview's own picker rules decide the
+  // default tour.
+  if (type === 'tour_preview' || type === 'tour_roundup') {
+    return '/tourhub';
+  }
 
   // --- unknown ---------------------------------------------------------
+  if (import.meta.env.DEV) {
+    // An unhandled type still returns a valid route, so it fails SILENTLY on
+    // Clubhouse. Log it so the next one is found in a console, not a
+    // screenshot.
+    console.warn('[activityLinks] unhandled notification type:', type, row);
+  }
   return actorProfileRoute(row) ?? '/';
+
 }
 
 function buildTopTenLink(row: ActivityFeedRowV2, data: Record<string, string | undefined>): string {
