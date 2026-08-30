@@ -2622,17 +2622,20 @@ export function GolfThisWeek({
                             color: own ? AMBER : BAND_FAINT,
                           }}
                         >
-                          {pinnedRow ? pinnedGap(board, r) : courseNameFor(r)}
+                          {pinnedRow ? pinnedGap(board, r, selfIdx) : courseNameFor(r)}
                         </span>
                       </span>
                     </span>
 
                     <span
-                      className="tabular-nums"
+                      className={board.byTime ? undefined : 'tabular-nums'}
                       style={{
                         ...NUMF,
-                        fontSize: 15,
+                        /* BRIEF_BOARD_MOST_RECENT §3.1 — a DATE is a caps word,
+                           not a figure: smaller, tracked, and not tabular. */
+                        fontSize: board.byTime ? 11 : 15,
                         fontWeight: 700,
+                        letterSpacing: board.byTime ? '0.06em' : undefined,
                         textAlign: 'center',
                         /* §3.3 — THE VALUE IS NOT A TO-PAR. A gross, a points
                            total and a birdie count are neutral facts on a board:
