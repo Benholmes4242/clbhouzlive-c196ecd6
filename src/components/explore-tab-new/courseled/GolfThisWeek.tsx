@@ -49,6 +49,9 @@ import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { useRoundNetScores } from './hooks/useRoundNetScores';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
+import { CommentAction } from './CommentAction';
+import { useRoundPostComments } from './hooks/useRoundPostComments';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
 
 
@@ -911,6 +914,14 @@ interface CardProps {
   reactionMine?: boolean;
   reactionHidden?: boolean;
   onToggleReaction?: () => void;
+  /**
+   * COMMENTS (BRIEF_ROUND_COMMENTS_EVERYWHERE §S2.1): the post id is resolved
+   * ONCE per window by the section (useRoundPostComments) — never per card. A
+   * round with no post passes `commentHidden` and shows no affordance.
+   */
+  commentCount?: number;
+  commentHidden?: boolean;
+  onOpenComments?: () => void;
 }
 
 
@@ -945,6 +956,9 @@ function GolfThisWeekCard({
   reactionMine = false,
   reactionHidden = true,
   onToggleReaction,
+  commentCount = 0,
+  commentHidden = true,
+  onOpenComments,
 }: CardProps) {
 
   const { t } = useTranslation('courses');
@@ -1341,7 +1355,16 @@ function GolfThisWeekCard({
             {t('discover.golfThisWeek.moment.seeTheCard', 'SEE THE CARD')}
             <ChevronRight size={9} strokeWidth={3} />
           </span>
-          <ReactionSlot>
+          {/* THE TRAILING CONTROLS. Both carry their own 44px tap target as
+              padding cancelled by a negative margin, so the foot is FOOT_H at
+              every count and the card stays 211px (§2.4). */}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+            <CommentAction
+              hidden={commentHidden}
+              count={commentCount}
+              onOpen={() => onOpenComments?.()}
+              label={t('discover.comments.action', 'Comment on this round')}
+            />
             <ReactionAction
               hidden={reactionHidden}
               count={reactionCount}
@@ -1349,7 +1372,7 @@ function GolfThisWeekCard({
               onToggle={() => onToggleReaction?.()}
               label={t('discover.reactions.action', 'Like this round')}
             />
-          </ReactionSlot>
+          </span>
         </div>
       </div>
 
@@ -1463,6 +1486,12 @@ export function GolfThisWeek({
     [ordered],
   );
   const reactions = useContentReactions(reactionTargets);
+
+  /* COMMENTS (BRIEF_ROUND_COMMENTS_EVERYWHERE §S1.5): ONE post-id resolution
+     for the whole window, keyed on the same whs_score_id set. Comments live on
+     the post, reactions on the score id — this is the only bridge. */
+  const roundPosts = useRoundPostComments(scoreIds);
+  const [commentsPostId, setCommentsPostId] = useState<string | null>(null);
 
 
   /* THE PERSONAL-HISTORY READ IS GONE (BRIEF_ROUND_CARD_STRIP_BACK §S2.3/§2.4).
@@ -2720,8 +2749,12 @@ export function GolfThisWeek({
               reactionMine={reactions.stateFor('round', r.score_id).mine}
               reactionHidden={!r.score_id || !reactions.viewerId || reactions.unavailable}
               onToggleReaction={() => reactions.toggle('round', r.score_id)}
-
-
+              commentCount={roundPosts.infoFor(r.score_id)?.commentCount ?? 0}
+              commentHidden={!roundPosts.infoFor(r.score_id)}
+              onOpenComments={() => {
+                const info = roundPosts.infoFor(r.score_id);
+                if (info) setCommentsPostId(info.postId);
+              }}
             />
           );
         })}
@@ -2740,6 +2773,17 @@ export function GolfThisWeek({
             })}
           </InkAction>
         </div>
+      )}
+
+      {/* THE EXISTING CLUBHOUSE COMMENT SURFACE (§4.1) — same table, same
+          notifications, same threading. Nothing here is a second composer. */}
+      {commentsPostId && (
+        <CommentsSheetV2
+          isOpen
+          onClose={() => setCommentsPostId(null)}
+          targetType="post"
+          targetId={commentsPostId}
+        />
       )}
 
     </section>
