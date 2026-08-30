@@ -28,6 +28,7 @@ import {
 import {
   BUCKETS,
   DistributionStrip,
+  HoleDistributionBar,
   courseBucketShares,
   markerOffset,
   rankHolesByDifficulty,
@@ -188,41 +189,10 @@ export const TournamentHoleRow: React.FC<{
               geometry (1.5px gaps, 2px hairline for a zero bucket at 0.28) is the
               course row's, so the two surfaces read identically. A hole with no
               scores yet is FOUR HAIRLINES, never a filled grey bar. */}
-          <span style={{ position: 'relative', display: 'block', paddingTop: 2 }}>
-            <span style={{ display: 'flex', gap: 1.5, height: 8 }}>
-              {segs.map((s, i) => {
-                const empty = s.pctValue <= 0;
-                return (
-                  <i
-                    key={s.key}
-                    style={{
-                      width: empty ? 2 : `${(s.pctValue / total) * 100}%`,
-                      flexShrink: 0,
-                      background: s.bg,
-                      opacity: empty ? 0.28 : 1,
-                      borderRadius:
-                        i === 0 ? '4px 0 0 4px' : i === segs.length - 1 ? '0 4px 4px 0' : 0,
-                    }}
-                  />
-                );
-              })}
-            </span>
-            {Number.isFinite(row.avg_to_par) && (
-              <i
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  top: -1,
-                  left: markerOffset(row.avg_to_par, scale.min, scale.max),
-                  width: 2,
-                  height: 13,
-                  marginLeft: -1,
-                  background: A.BODY,
-                  borderRadius: 1,
-                }}
-              />
-            )}
-          </span>
+          <HoleDistributionBar
+            values={segs.map((segment) => segment.pctValue)}
+            marker={Number.isFinite(row.avg_to_par) ? markerOffset(row.avg_to_par, scale.min, scale.max) : null}
+          />
 
           {/* Labelled figure. A bare number is never left to explain itself. */}
           <span
