@@ -1904,5 +1904,18 @@
         "subline": "Only where a course was tagged"
       }
     }
+  },
+  "toReview": {
+    "title": "[Courses to review]",
+    "titleBreakdowns": "[Add breakdowns]",
+    "subline": "[Played but not rated - newest first.]",
+    "sublineBreakdowns": "[Missing breakdown ratings - newest first.]",
+    "bandThisYear": "[THIS YEAR]",
+    "bandLastYear": "[LAST YEAR]",
+    "bandEarlier": "[EARLIER]",
+    "railCourses": "[COURSES]",
+    "railYears": "[YEARS]",
+    "rate": "[RATE]",
+    "close": "[Close]"
   }
 }

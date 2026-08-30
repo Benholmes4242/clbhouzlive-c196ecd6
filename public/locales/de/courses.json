@@ -1370,5 +1370,18 @@
         "subline": "Only where a course was tagged"
       }
     }
+  },
+  "toReview": {
+    "title": "Zu bewertende Platze",
+    "titleBreakdowns": "Details hinzufugen",
+    "subline": "Gespielt, aber nicht bewertet - neueste zuerst.",
+    "sublineBreakdowns": "Detailbewertungen fehlen - neueste zuerst.",
+    "bandThisYear": "DIESES JAHR",
+    "bandLastYear": "LETZTES JAHR",
+    "bandEarlier": "FRUHER",
+    "railCourses": "PLATZE",
+    "railYears": "JAHRE",
+    "rate": "BEWERTEN",
+    "close": "Schliessen"
   }
 }
