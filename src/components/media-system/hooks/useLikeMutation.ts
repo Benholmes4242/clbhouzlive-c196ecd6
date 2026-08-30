@@ -37,6 +37,12 @@ export function useLikeMutation() {
         isLikedByMe: !variables.isLiked,
         likeCountDelta: variables.isLiked ? -1 : +1,
       });
+      /* A ROUND POST'S LIKE LIVES IN content_reactions (the RPC routes it
+         there), which is what the Discover cards, the see-all sheet and the
+         scorecard sheet read. Invalidating that family makes the heart agree on
+         every surface without a manual refresh
+         (BRIEF_ROUND_COMMENTS_EVERYWHERE §S3.1). */
+      queryClient.invalidateQueries({ queryKey: ['content-reactions'] });
     },
   });
 }

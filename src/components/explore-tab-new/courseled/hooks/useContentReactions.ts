@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
+import { patchEngagement } from '@/lib/engagementCache';
 
 /**
  * useContentReactions (BRIEF_DISCOVER_REACTIONS, section 3).
@@ -51,7 +52,21 @@ type CacheShape = { rows: Row[]; unavailable: boolean };
 
 const EMPTY: ReactionState = { count: 0, mine: false };
 
-export function useContentReactions(targets: readonly ReactionTarget[]) {
+export interface UseContentReactionsOptions {
+  /**
+   * THE ROUND-POST BRIDGE (BRIEF_ROUND_COMMENTS_EVERYWHERE §S3.3). A round's
+   * like is ONE like: content_reactions is canonical and a DB trigger keeps the
+   * post's like_count in step. The DATA is unified, but the Clubhouse feed
+   * caches are not — so when the caller can resolve the round's post id, the
+   * same delta is patched into every feed cache through the canonical helper.
+   */
+  postIdFor?: (targetId: string) => string | null | undefined;
+}
+
+export function useContentReactions(
+  targets: readonly ReactionTarget[],
+  options: UseContentReactionsOptions = {},
+) {
   const { user } = useSupabaseSession();
   const viewerId = user?.id ?? null;
   const queryClient = useQueryClient();
@@ -154,6 +169,13 @@ export function useContentReactions(targets: readonly ReactionTarget[]) {
             )
           : [...prev.rows, { target_type: type, target_id: id, user_id: viewerId }];
         queryClient.setQueryData<CacheShape>(key as readonly unknown[], { ...prev, rows });
+      }
+      const postId = options.postIdFor?.(id);
+      if (postId) {
+        patchEngagement(queryClient, postId, {
+          isLikedByMe: !mine,
+          likeCountDelta: mine ? -1 : +1,
+        });
       }
       return { previous };
     },
