@@ -2472,9 +2472,15 @@ export function GolfThisWeek({
                 key: b.key,
                 label: b.label,
                 short: b.short,
-                subtitle: t('discover.golfThisWeek.board.pickerRowSub', '{{count}} in the field', {
-                  count: b.ranked.length,
-                }),
+                /* §4.4 — the count and the label must AGREE: five of the six
+                   boards count MEMBERS ("in the field"), Most recent counts
+                   ROUNDS because it does not dedupe. The spec carries its own
+                   sub-line where the shared phrasing would be a lie. */
+                subtitle:
+                  b.pickerSub ??
+                  t('discover.golfThisWeek.board.pickerRowSub', '{{count}} in the field', {
+                    count: b.ranked.length,
+                  }),
                 count: b.ranked.length,
               }))}
               onSelect={(k) => setBoardCategory(k as BoardKey)}
