@@ -899,16 +899,18 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               {/* MEMBER ROW. With NO NAME nothing renders — no avatar, no
                   avatar-shaped hole. Amber marks the viewer's own round. */}
               {showIdentity && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, minWidth: 0 }}>
-                  <SquircleAvatar
-                    {...(isTour
-                      ? { srcCandidates: tourAvatarCandidates }
-                      : { src: playerAvatarUrl ?? null })}
-                    alt={playerName}
-                    userId={playerUserId ?? undefined}
-                    size={22}
-                    hairlineRing
-                  />
+                <div style={{ display: 'flex', alignItems: 'center', marginTop: 8, minWidth: 0 }}>
+                  <span style={{ flexShrink: 0, marginRight: 8 }}>
+                    <SquircleAvatar
+                      {...(isTour
+                        ? { srcCandidates: tourAvatarCandidates }
+                        : { src: playerAvatarUrl ?? null })}
+                      alt={playerName}
+                      userId={playerUserId ?? undefined}
+                      size={22}
+                      hairlineRing
+                    />
+                  </span>
                   <span
                     style={{
                       fontSize: 12.5, fontWeight: 700,
@@ -933,7 +935,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     />
                      </span>
                   )}
-                  {showChip && <HandicapChip delta={playerHcpDelta as number} />}
+                  {showChip && <span style={{ marginLeft: 8, flexShrink: 0 }}><HandicapChip delta={playerHcpDelta as number} /></span>}
                 </div>
               )}
             </div>
