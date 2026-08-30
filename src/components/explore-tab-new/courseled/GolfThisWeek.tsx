@@ -48,8 +48,7 @@ import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useRoundHoleShapes, type HoleShape } from './hooks/useRoundHoleShapes';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { useRoundNetScores } from './hooks/useRoundNetScores';
-import { ReactionAction, ReactionSlot } from './ReactionAction';
-import { CommentAction } from './CommentAction';
+import { RoundEngagementActions } from './RoundEngagementActions';
 import { useRoundPostComments } from './hooks/useRoundPostComments';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { useFollowingIdSet } from './hooks/useFollowingIdSet';
@@ -1358,21 +1357,20 @@ function GolfThisWeekCard({
           {/* THE TRAILING CONTROLS. Both carry their own 44px tap target as
               padding cancelled by a negative margin, so the foot is FOOT_H at
               every count and the card stays 211px (§2.4). */}
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-            <CommentAction
-              hidden={commentHidden}
-              count={commentCount}
-              onOpen={() => onOpenComments?.()}
-              label={t('discover.comments.action', 'Comment on this round')}
-            />
-            <ReactionAction
-              hidden={reactionHidden}
-              count={reactionCount}
-              reacted={reactionMine}
-              onToggle={() => onToggleReaction?.()}
-              label={t('discover.reactions.action', 'Like this round')}
-            />
-          </span>
+          <RoundEngagementActions
+            comment={commentHidden ? null : {
+              count: commentCount,
+              onOpen: () => onOpenComments?.(),
+              label: t('discover.comments.action', 'Comment on this round'),
+            }}
+            like={{
+              hidden: reactionHidden,
+              count: reactionCount,
+              reacted: reactionMine,
+              onToggle: () => onToggleReaction?.(),
+              label: t('discover.reactions.action', 'Like this round'),
+            }}
+          />
         </div>
       </div>
 
