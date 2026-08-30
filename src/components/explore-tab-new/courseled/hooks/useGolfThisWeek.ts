@@ -234,28 +234,27 @@ export function useGolfThisWeek(
 }
 
 /**
- * THE ORDER (§3). Filtering happens in SQL, so this only ORDERS:
- *   1. the viewer's own round, always first
- *   2. rounds at courses the viewer has never played (widest spread)
- *   3. recency
- * then a single adjacency pass so the same course never renders twice in a row.
+ * THE ORDER (MICRO_BRIEF_ROUNDS_RAIL_ORDER_AND_HEADING §S1). Filtering happens
+ * in SQL, so this only ORDERS: recency, newest first, then a single adjacency
+ * pass so the same course never renders twice in a row.
+ *
+ * REMOVED, DELIBERATELY — do not reinstate:
+ *   - own-round-first: the viewer already knows about their own rounds, so
+ *     leading with them opened the rail with its least new information. The
+ *     amber treatment on those cards stays wherever they land.
+ *   - new-course-first: it competed with recency for no stated reason and
+ *     between them the two made the order impossible to infer.
+ * Both made the rail's dates jump and diverge from the see-all sheet's
+ * strictly chronological order over the same data.
  */
 export function orderForWeek(
   rows: readonly CircleRoundRow[],
-  playedIds: ReadonlySet<string>,
+  _playedIds: ReadonlySet<string>,
 ): CircleRoundRow[] {
   const byRecency = (a: CircleRoundRow, b: CircleRoundRow) =>
     String(b.play_date).localeCompare(String(a.play_date));
 
-  const ranked = [...rows].sort((a, b) => {
-    if (a.is_self !== b.is_self) return a.is_self ? -1 : 1;
-    const aNew = !a.course_id || !playedIds.has(a.course_id);
-    const bNew = !b.course_id || !playedIds.has(b.course_id);
-    if (aNew !== bNew) return aNew ? -1 : 1;
-    return byRecency(a, b);
-  });
-
-  return spreadCourses(ranked);
+  return spreadCourses([...rows].sort(byRecency));
 }
 
 /**
