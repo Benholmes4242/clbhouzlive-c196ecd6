@@ -1,6 +1,5 @@
 import { useMemo, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Heart } from 'lucide-react';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { buildInsightMap, referenceLine } from './friendRoundParts';
@@ -27,8 +26,7 @@ import {
 import { WeekScopePills } from './courseled/WeekFilters';
 import { RoundShape } from './courseled/RoundShape';
 import { selectMoment } from './courseled/roundMoment';
-import { ReactionAction, ReactionSlot } from './courseled/ReactionAction';
-import { CommentAction } from './courseled/CommentAction';
+import { RoundEngagementActions } from './courseled/RoundEngagementActions';
 import { useRoundPostComments } from './courseled/hooks/useRoundPostComments';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -116,7 +114,7 @@ function CompactRoundRow({
       style={{
         boxSizing: 'border-box',
         display: 'grid',
-        gridTemplateColumns: `${AVATAR_SIZE}px minmax(0, 1fr) ${SHAPE_WIDTH}px ${SCORE_WIDTH}px 34px 42px`,
+        gridTemplateColumns: `${AVATAR_SIZE}px minmax(0, 1fr) ${SHAPE_WIDTH}px ${SCORE_WIDTH}px 88px`,
         alignItems: 'center',
         columnGap: 6,
         width: '100%',
@@ -223,47 +221,17 @@ function CompactRoundRow({
         </div>
       </div>
 
-      {/* THE COMMENT COLUMN. Fixed width whether or not it renders, so the
-          hearts stay on one x down the list and ROW_HEIGHT never moves. */}
-      <div style={{ width: 34, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-        {comment && (
-          <CommentAction
-            count={comment.count}
-            onOpen={comment.onOpen}
-            label={comment.label}
-            reserveCount
-          />
-        )}
-      </div>
-
-      <ReactionSlot>
-        <span style={{ width: 42, display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-          {!reaction.hidden && (reaction.readOnly ? (
-            <span
-              aria-label={reaction.label}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
-            >
-              <Heart size={15} strokeWidth={2} color={A.MUTE} fill="none" aria-hidden />
-              {reaction.count > 0 && (
-                <span
-                  className="tabular-nums"
-                  style={{ ...FIGS, color: A.MUTE, fontSize: 11.5, fontWeight: 700, lineHeight: 1 }}
-                >
-                  {reaction.count}
-                </span>
-              )}
-            </span>
-          ) : (
-            <ReactionAction
-              count={reaction.count}
-              reacted={reaction.mine}
-              onToggle={reaction.onToggle}
-              label={reaction.label}
-              reserveCount
-            />
-          ))}
-        </span>
-      </ReactionSlot>
+      <RoundEngagementActions
+        comment={comment}
+        like={{
+          hidden: reaction.hidden,
+          readOnly: reaction.readOnly,
+          count: reaction.count,
+          reacted: reaction.mine,
+          onToggle: reaction.onToggle,
+          label: reaction.label,
+        }}
+      />
     </div>
   );
 }

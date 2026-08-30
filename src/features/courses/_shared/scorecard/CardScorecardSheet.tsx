@@ -7,8 +7,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { TrajectoryLine } from './TrajectoryLine';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
-import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
-import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
+import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
   TREND_UP, TREND_DOWN,
@@ -913,13 +912,25 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     style={{
                       fontSize: 12.5, fontWeight: 700,
                       color: isOwner ? A.AMBER : A.INK,
-                      minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      flex: '1 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     }}
                     title={playerName}
                   >
                     {playerName}
                   </span>
                   {showChip && <HandicapChip delta={playerHcpDelta as number} />}
+                  {engagement && (
+                    <RoundEngagementActions
+                      comment={engagement.comment ?? null}
+                      like={{
+                        hidden: engagement.likeHidden,
+                        count: engagement.likeCount,
+                        reacted: engagement.likeMine,
+                        onToggle: engagement.onToggleLike,
+                        label: engagement.likeLabel,
+                      }}
+                    />
+                  )}
                 </div>
               )}
             </div>
@@ -1097,37 +1108,6 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 <TrajectoryLine holes={holes} height={120} surface="dark" interactive />
               </Panel>
             </>
-          )}
-
-          {/* THE RESPONSE ROW (§S2.2). Quiet at zero: the glyph alone, never
-              "0 comments" and never a prompt (§S5.2). */}
-          {engagement && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 20,
-                paddingTop: 4,
-                paddingBottom: 2,
-              }}
-            >
-              <ReactionAction
-                hidden={engagement.likeHidden}
-                count={engagement.likeCount}
-                reacted={engagement.likeMine}
-                onToggle={engagement.onToggleLike}
-                label={engagement.likeLabel}
-                size={17}
-              />
-              {engagement.comment && (
-                <CommentAction
-                  count={engagement.comment.count}
-                  onOpen={engagement.comment.onOpen}
-                  label={engagement.comment.label}
-                  size={17}
-                />
-              )}
-            </div>
           )}
 
           {/* S3.3 — EXITS BELONG AT THE END. */}
