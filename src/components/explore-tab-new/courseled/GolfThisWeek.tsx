@@ -1897,7 +1897,12 @@ export function GolfThisWeek({
    * STORAGE: the rotation must NOT persist across a cold launch (§2.4).
    */
   if (sessionBoardKey == null) {
-    const nonEmpty = boards.filter((b) => b.ranked.length > 0);
+    /* BRIEF_BOARD_MOST_RECENT §4.3 — MOST RECENT IS EXCLUDED FROM THE ROTATION
+       POOL. Every member with a round qualifies for it, so a pool weighted
+       toward "where the viewer qualifies" would hand it the default almost
+       every session — and the default is exactly what the weakest board must
+       never be. It is reachable ONLY by an explicit pick in the picker. */
+    const nonEmpty = boards.filter((b) => b.ranked.length > 0 && b.key !== 'recent');
     if (nonEmpty.length > 0) {
       const qualifying = userId
         ? nonEmpty.filter((b) => b.ranked.some((r) => r.is_self))
