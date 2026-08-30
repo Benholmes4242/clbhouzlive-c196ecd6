@@ -919,7 +919,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     {playerName}
                   </span>
                    {engagement && (
-                     <span style={{ marginLeft: 12, flexShrink: 0 }}>
+                     <span style={{ marginLeft: 20, flexShrink: 0 }}>
                     <RoundEngagementActions
                       comment={engagement.comment ?? null}
                       like={{
