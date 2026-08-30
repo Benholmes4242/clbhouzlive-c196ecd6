@@ -82,11 +82,11 @@ export function ReactionAction({
       </span>
     ) : null;
 
-  // OWN CONTENT — the count without a tappable glyph.
+  // OWN CONTENT — the same glyph/count treatment without a tappable wrapper.
   if (readOnly) {
-    if (!figure) return null;
     return (
       <span
+        aria-label={label}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -94,6 +94,7 @@ export function ReactionAction({
           fontFamily: SANS,
         }}
       >
+        <Heart size={size} strokeWidth={2} color={idle} fill="none" aria-hidden />
         {figure}
       </span>
     );
