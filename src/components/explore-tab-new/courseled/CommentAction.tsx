@@ -61,7 +61,7 @@ export function CommentAction({
         display: 'inline-flex',
          flexDirection: reserveCount ? 'row-reverse' : 'row',
         alignItems: 'center',
-        gap: 4,
+        gap: count > 0 ? 5 : 0,
         fontFamily: SANS,
         cursor: 'pointer',
         padding: '13px 8px',

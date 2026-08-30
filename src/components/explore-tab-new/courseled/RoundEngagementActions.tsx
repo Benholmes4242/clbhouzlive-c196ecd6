@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { CommentAction } from './CommentAction';
-import { ReactionAction, REACTION_SLOT_W } from './ReactionAction';
+import { ReactionAction } from './ReactionAction';
 
 /**
  * One canonical round-engagement pair for every round surface.
- * Order is invariant: COMMENT, then HEART. Each action owns a fixed-width slot
- * so count changes never move either glyph or resize the parent surface.
+ * Order is invariant: COMMENT, then HEART. The pair is deliberately content-
+ * sized: zero counts render no node and reserve no width.
  */
 
 interface RoundCommentAction {
@@ -31,51 +31,29 @@ interface Props {
   gap?: number;
 }
 
-function ActionSlot({ children }: { children?: React.ReactNode }) {
-  return (
-    <span
-      style={{
-        width: REACTION_SLOT_W,
-        flex: `0 0 ${REACTION_SLOT_W}px`,
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-      }}
-    >
-      {children}
-    </span>
-  );
-}
-
-export function RoundEngagementActions({ comment, like, size = 15, gap = 10 }: Props) {
+export function RoundEngagementActions({ comment, like, size = 15, gap = 12 }: Props) {
   return (
     <span
       data-round-engagement="comment-heart"
-      style={{ display: 'inline-flex', alignItems: 'center', gap, flexShrink: 0 }}
+      style={{ display: 'inline-flex', alignItems: 'center', gap, flexShrink: 0, whiteSpace: 'nowrap' }}
     >
-      <ActionSlot>
-        {comment && (
-          <CommentAction
-            count={comment.count}
-            onOpen={comment.onOpen}
-            label={comment.label}
-            size={size}
-            reserveCount
-          />
-        )}
-      </ActionSlot>
-      <ActionSlot>
-        <ReactionAction
-          hidden={like.hidden}
-          readOnly={like.readOnly}
-          count={like.count}
-          reacted={like.reacted}
-          onToggle={like.onToggle}
-          label={like.label}
+      {comment && (
+        <CommentAction
+          count={comment.count}
+          onOpen={comment.onOpen}
+          label={comment.label}
           size={size}
-          reserveCount
         />
-      </ActionSlot>
+      )}
+      <ReactionAction
+        hidden={like.hidden}
+        readOnly={like.readOnly}
+        count={like.count}
+        reacted={like.reacted}
+        onToggle={like.onToggle}
+        label={like.label}
+        size={size}
+      />
     </span>
   );
 }

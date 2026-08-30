@@ -58,6 +58,7 @@ const CAPTION: React.CSSProperties = { fontSize: 12.5, lineHeight: 1.5, color: A
  * as figure-over-label pairs, and every derivation behind them is unchanged.
  */
 const RAIL_FIG: React.CSSProperties = { ...NUM, fontSize: 15, lineHeight: 1.05 };
+const STAT_RAIL_ITEM_GAP = 20;
 
 
 /*
@@ -912,14 +913,14 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                     style={{
                       fontSize: 12.5, fontWeight: 700,
                       color: isOwner ? A.AMBER : A.INK,
-                       flex: '1 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                       flex: '0 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     }}
                     title={playerName}
                   >
                     {playerName}
                   </span>
                    {engagement && (
-                     <span style={{ marginLeft: 20, flexShrink: 0 }}>
+                     <span style={{ marginLeft: STAT_RAIL_ITEM_GAP, flexShrink: 0 }}>
                     <RoundEngagementActions
                       comment={engagement.comment ?? null}
                       like={{
@@ -970,7 +971,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           {rail.length > 0 && (
             <>
               <Hairline style={{ margin: '12px 0 10px' }} />
-              <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: STAT_RAIL_ITEM_GAP, flexWrap: 'wrap' }}>
                 {rail.map((it) => (
                   <div key={it.key} style={{ minWidth: 0 }}>
                     <div style={{ ...RAIL_FIG, color: it.tone ?? A.INK }}>{it.value}</div>
