@@ -103,6 +103,7 @@ import {
   CHIP_RADIUS,
   DISCOVER_FACT,
   DISCOVER_QUIET,
+  Eyebrow,
   InkAction,
   KICKER,
   LABEL,
@@ -2580,6 +2581,14 @@ export function GolfThisWeek({
 
 
 
+
+      {/* THE HEADING (MICRO_BRIEF_ROUNDS_RAIL_ORDER_AND_HEADING §S2): without
+          it the rail sat directly under a board titled LOWEST GROSS and read as
+          THAT board's rounds — it is not. Same words as the see-all sheet's
+          masthead, same key; the scope pills above already name the scope. */}
+      {ordered.length > 0 && (
+        <Eyebrow>{t('discover.golfThisWeek.heading', 'Recent rounds')}</Eyebrow>
+      )}
 
       {/* Cards only in the horizontal rail; the See-all action sits below the
           first card in a fixed position and does NOT scroll with the carousel. */}
