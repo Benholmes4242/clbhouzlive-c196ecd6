@@ -2001,9 +2001,12 @@ export function GolfThisWeek({
 
   /* §1.4 — ONE GRID DEFINITION, derived from the PAR flag (§1.6). Header strip,
      every row and the pinned row all read this single string. */
+  /* BRIEF_BOARD_MOST_RECENT §3.1 — the value column widens where the value is a
+     DATE ("YESTERDAY" does not fit a numeral's 40px). Still ONE definition. */
+  const BOARD_VALUE_W = activeBoard?.valueWidth ?? 40;
   const BOARD_GRID = activeBoard?.hasPar
-    ? '30px minmax(0, 1fr) 40px 34px'
-    : '30px minmax(0, 1fr) 40px';
+    ? `30px minmax(0, 1fr) ${BOARD_VALUE_W}px 34px`
+    : `30px minmax(0, 1fr) ${BOARD_VALUE_W}px`;
 
 
 
