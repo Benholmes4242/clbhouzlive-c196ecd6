@@ -91,7 +91,7 @@ export function ReactionAction({
           display: 'inline-flex',
          flexDirection: reserveCount ? 'row-reverse' : 'row',
           alignItems: 'center',
-          gap: 4,
+          gap: count > 0 ? 5 : 0,
           fontFamily: SANS,
         }}
       >
@@ -122,7 +122,7 @@ export function ReactionAction({
         display: 'inline-flex',
        flexDirection: reserveCount ? 'row-reverse' : 'row',
         alignItems: 'center',
-        gap: 4,
+        gap: count > 0 ? 5 : 0,
         fontFamily: SANS,
         cursor: 'pointer',
         // 44px tap target without a layout footprint.
