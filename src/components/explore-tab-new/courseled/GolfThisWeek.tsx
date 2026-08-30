@@ -69,7 +69,12 @@ import {
  * BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S2 — THE FIVE CATEGORIES, at module
  * scope so the session's rotation can be held beside them.
  */
-type BoardKey = 'gross' | 'net' | 'stableford' | 'improved' | 'birdies';
+/**
+ * BRIEF_BOARD_MOST_RECENT — 'recent' is the SIXTH category and the only one
+ * ranked on TIME rather than on merit, and the only one that does NOT dedupe by
+ * member. It is deliberately excluded from the rotation pool (§4.3).
+ */
+type BoardKey = 'gross' | 'net' | 'stableford' | 'improved' | 'birdies' | 'recent';
 
 /**
  * §2.5 — THE SESSION'S ROTATED DEFAULT lives in a MODULE-LEVEL variable, not in
@@ -1554,6 +1559,22 @@ export function GolfThisWeek({
   const topThree = (rows: CircleRoundRow[]) => rankAll(rows).slice(0, 3);
   void topThree;
 
+  /**
+   * BRIEF_BOARD_MOST_RECENT §1.3 — MOST RECENT'S OWN ORDERING FUNCTION, kept
+   * SEPARATE from rankAll on purpose. rankAll's contract is "one row per member",
+   * and the pinned row's findIndex(is_self) depends on that guarantee; a flag
+   * that switched the guarantee off for one caller would break the assumption
+   * silently. So rankAll is untouched and this path never dedupes: five rounds
+   * can be three from one member, which is exactly what the board reports (§1.2).
+   *
+   * THE TIEBREAK (§3.5): the sort is STABLE and the input is `ordered`, the very
+   * array the see-all sheet groups by day, so two rounds sharing a play_date keep
+   * the sheet's own within-day order — the two surfaces agree by construction
+   * rather than by a second, invented rule.
+   */
+  const recentOrdered = (rows: CircleRoundRow[]) =>
+    rows.filter((r) => !!r.play_date).slice().sort(byDateDesc);
+
 
 
   /* THE FLOORS APPLY TO EVERY PLACE (§3): a runner-up clears the same floor as
@@ -1630,6 +1651,10 @@ export function GolfThisWeek({
       .sort((a, b) => (b.birdies as number) - (a.birdies as number) || byDateDesc(a, b)),
   );
 
+  /* BRIEF_BOARD_MOST_RECENT §1.3 — NOT rankAll: its own ordering function, no
+     dedupe, no floor beyond having a play_date at all. */
+  const recentRanked = recentOrdered(ordered);
+
   const bestStableford = stablefordRanked[0] ?? null;
   const mostBirdies = birdiesRanked[0] ?? null;
   const mostImproved = improvedRanked[0] ?? null;
@@ -1703,7 +1728,19 @@ export function GolfThisWeek({
     format: (r: CircleRoundRow) => string;
     precision: number;
     /** The unit the pinned row's gap carries. */
-    offUnit: 'shots' | 'points' | 'birdies' | 'cut';
+    offUnit: 'shots' | 'points' | 'birdies' | 'cut' | 'time';
+    /**
+     * BRIEF_BOARD_MOST_RECENT — TRUE ONLY ON MOST RECENT. It says three things
+     * at once, all of which follow from ranking on TIME rather than on merit:
+     * positions are an ordering with NO TIES (§3.4/§3.5), the pinned row's gap
+     * is a COUNT OF ROUNDS rather than a score gap (§2.2), and the value column
+     * is a DATE so it needs width and caps rather than tabular numerals (§3.1).
+     */
+    byTime?: boolean;
+    /** §3.1 — the value column's width; a date needs more than a numeral. */
+    valueWidth?: number;
+    /** §4.4 — the picker's sub-line where "in the field" would be wrong. */
+    pickerSub?: string;
   }
 
   /** §1.5 — the one place the direction is stated; every spec derives from it. */
@@ -1805,6 +1842,39 @@ export function GolfThisWeek({
       precision: 0,
       offUnit: 'birdies',
     },
+    {
+      /* BRIEF_BOARD_MOST_RECENT — LAST IN THE PICKER (§4.2): it is the weakest of
+         the six and must not be reached before the merit boards. NO DEDUPE
+         (§1.1/§1.2): a member with two rounds in the window appears twice.
+         THE COLUMN THAT CARRIES THE RANK IS THE DATE (§3.1) and the GROSS rides
+         in the fourth column, the slot the to-par occupies on the gross board
+         (§3.2). The date vocabulary is relativeDay's — the SAME words the see-all
+         sheet's day headers use (§3.3); no second vocabulary for one window. */
+      key: 'recent',
+      label: t('discover.golfThisWeek.board.recentLabel', 'Most recent'),
+      short: t('discover.golfThisWeek.board.recentShort', 'RECENT'),
+      /* §4.1 — the column carries dates, so the header names the AXIS, not a
+         unit: WHEN. "DATE" would be a data type, not a question. */
+      unit: t('discover.golfThisWeek.board.recentUnit', 'WHEN'),
+      hasPar: true,
+      parHeader: t('discover.golfThisWeek.board.recentSecondary', 'GROSS'),
+      parCell: (r) =>
+        r.gross == null ? null : { text: String(r.gross), tone: toParOf(r)?.tone ?? A.MUTE },
+      ranked: recentRanked,
+      lowerWins: false,
+      /* Not a merit figure; it exists so the shared code paths have a number.
+         Positions and the pinned gap both go down the byTime branch instead. */
+      valueOf: (r) => new Date(`${String(r.play_date).slice(0, 10)}T12:00:00`).getTime(),
+      format: (r) => relativeDay(r.play_date, t as never).toUpperCase(),
+      precision: 0,
+      offUnit: 'time',
+      byTime: true,
+      valueWidth: 68,
+      /* §4.4 — ROUNDS, not members, and the only category where that is true. */
+      pickerSub: t('discover.golfThisWeek.board.pickerRowSubRounds', '{{count}} rounds', {
+        count: recentRanked.length,
+      }),
+    },
   ];
 
   /**
@@ -1827,7 +1897,12 @@ export function GolfThisWeek({
    * STORAGE: the rotation must NOT persist across a cold launch (§2.4).
    */
   if (sessionBoardKey == null) {
-    const nonEmpty = boards.filter((b) => b.ranked.length > 0);
+    /* BRIEF_BOARD_MOST_RECENT §4.3 — MOST RECENT IS EXCLUDED FROM THE ROTATION
+       POOL. Every member with a round qualifies for it, so a pool weighted
+       toward "where the viewer qualifies" would hand it the default almost
+       every session — and the default is exactly what the weakest board must
+       never be. It is reachable ONLY by an explicit pick in the picker. */
+    const nonEmpty = boards.filter((b) => b.ranked.length > 0 && b.key !== 'recent');
     if (nonEmpty.length > 0) {
       const qualifying = userId
         ? nonEmpty.filter((b) => b.ranked.some((r) => r.is_self))
@@ -1869,6 +1944,11 @@ export function GolfThisWeek({
    * app does. Do not "fix" it to 1, T2, T2, 3.
    */
   const positionsFor = (b: BoardSpec) => {
+    /* BRIEF_BOARD_MOST_RECENT §3.4/§3.5 — NO TIES ON A TIME ORDERING. Two rounds
+       cannot share a position in a sequence, so the column is a plain 1..n
+       ordering; it is shared with the other five boards, and a board with no
+       numerals beside them would read as broken. */
+    if (b.byTime) return b.ranked.map((_, i) => String(i + 1));
     const out: string[] = [];
     let pos = 1;
     b.ranked.forEach((r, i) => {
@@ -1886,7 +1966,15 @@ export function GolfThisWeek({
    * lower-wins board, (leader − own) everywhere else. Both are positive for a
    * member behind the leader, which is the only case a pinned row exists in.
    */
-  const pinnedGap = (b: BoardSpec, own: CircleRoundRow) => {
+  const pinnedGap = (b: BoardSpec, own: CircleRoundRow, idx: number) => {
+    /* BRIEF_BOARD_MOST_RECENT §2.2 — ON A TIME BOARD THE GAP IS TIME. A score gap
+       would be meaningless here: nothing on this board was ranked on score. The
+       pinned round is the viewer's MOST RECENT (the first is_self entry in a
+       time-descending list), and the sub-line counts the rounds that have been
+       played since it, which is the distance the ordering actually measures. */
+    if (b.byTime) {
+      return t('discover.golfThisWeek.gap.roundsAgo', '{{count}} ROUNDS AGO', { count: idx });
+    }
     const leaderValue = b.valueOf(b.ranked[0]);
     const ownValue = b.valueOf(own);
     const signed = b.lowerWins ? ownValue - leaderValue : leaderValue - ownValue;
@@ -1913,9 +2001,12 @@ export function GolfThisWeek({
 
   /* §1.4 — ONE GRID DEFINITION, derived from the PAR flag (§1.6). Header strip,
      every row and the pinned row all read this single string. */
+  /* BRIEF_BOARD_MOST_RECENT §3.1 — the value column widens where the value is a
+     DATE ("YESTERDAY" does not fit a numeral's 40px). Still ONE definition. */
+  const BOARD_VALUE_W = activeBoard?.valueWidth ?? 40;
   const BOARD_GRID = activeBoard?.hasPar
-    ? '30px minmax(0, 1fr) 40px 34px'
-    : '30px minmax(0, 1fr) 40px';
+    ? `30px minmax(0, 1fr) ${BOARD_VALUE_W}px 34px`
+    : `30px minmax(0, 1fr) ${BOARD_VALUE_W}px`;
 
 
 
@@ -2381,9 +2472,15 @@ export function GolfThisWeek({
                 key: b.key,
                 label: b.label,
                 short: b.short,
-                subtitle: t('discover.golfThisWeek.board.pickerRowSub', '{{count}} in the field', {
-                  count: b.ranked.length,
-                }),
+                /* §4.4 — the count and the label must AGREE: five of the six
+                   boards count MEMBERS ("in the field"), Most recent counts
+                   ROUNDS because it does not dedupe. The spec carries its own
+                   sub-line where the shared phrasing would be a lie. */
+                subtitle:
+                  b.pickerSub ??
+                  t('discover.golfThisWeek.board.pickerRowSub', '{{count}} in the field', {
+                    count: b.ranked.length,
+                  }),
                 count: b.ranked.length,
               }))}
               onSelect={(k) => setBoardCategory(k as BoardKey)}
@@ -2531,17 +2628,20 @@ export function GolfThisWeek({
                             color: own ? AMBER : BAND_FAINT,
                           }}
                         >
-                          {pinnedRow ? pinnedGap(board, r) : courseNameFor(r)}
+                          {pinnedRow ? pinnedGap(board, r, selfIdx) : courseNameFor(r)}
                         </span>
                       </span>
                     </span>
 
                     <span
-                      className="tabular-nums"
+                      className={board.byTime ? undefined : 'tabular-nums'}
                       style={{
                         ...NUMF,
-                        fontSize: 15,
+                        /* BRIEF_BOARD_MOST_RECENT §3.1 — a DATE is a caps word,
+                           not a figure: smaller, tracked, and not tabular. */
+                        fontSize: board.byTime ? 11 : 15,
                         fontWeight: 700,
+                        letterSpacing: board.byTime ? '0.06em' : undefined,
                         textAlign: 'center',
                         /* §3.3 — THE VALUE IS NOT A TO-PAR. A gross, a points
                            total and a birdie count are neutral facts on a board:

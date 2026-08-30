@@ -1171,7 +1171,9 @@
         "off_one": "{{count}} ATRAS",
         "off_other": "{{count}} ATRAS",
         "cutOff_one": "{{count}} DEL LIDER",
-        "cutOff_other": "{{count}} DEL LIDER"
+        "cutOff_other": "{{count}} DEL LIDER",
+        "roundsAgo_one": "HACE {{count}} RONDA",
+        "roundsAgo_other": "HACE {{count}} RONDAS"
       },
       "moment": {
         "theCard": "La tarjeta",
@@ -1246,7 +1248,13 @@
         "netSecondary": "BRUTO",
         "improvedLabel": "Mayor mejora",
         "improvedShort": "MEJORA",
-        "improvedUnit": "REBAJA"
+        "improvedUnit": "REBAJA",
+        "recentLabel": "Mas recientes",
+        "recentShort": "RECIENTE",
+        "recentUnit": "CUANDO",
+        "recentSecondary": "BRUTO",
+        "pickerRowSubRounds_one": "{{count}} ronda",
+        "pickerRowSubRounds_other": "{{count}} rondas"
       }
     },
     "week": {

@@ -1105,7 +1105,8 @@
         "birdiesOff_other": "バーディー{{count}}差",
         "off_other": "{{count}}差",
         "cutOff_one": "{{count}} OFF THE LEAD",
-        "cutOff_other": "{{count}} OFF THE LEAD"
+        "cutOff_other": "{{count}} OFF THE LEAD",
+        "roundsAgo": "{{count}} ROUNDS AGO"
       },
       "moment": {
         "theCard": "スコアカード",
@@ -1179,7 +1180,12 @@
         "netSecondary": "GROSS",
         "improvedLabel": "Most improved",
         "improvedShort": "IMPROVED",
-        "improvedUnit": "CUT"
+        "improvedUnit": "CUT",
+        "recentLabel": "Most recent",
+        "recentShort": "RECENT",
+        "recentUnit": "WHEN",
+        "recentSecondary": "GROSS",
+        "pickerRowSubRounds": "{{count}} rounds"
       }
     },
     "week": {
