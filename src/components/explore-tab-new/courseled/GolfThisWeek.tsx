@@ -1559,6 +1559,22 @@ export function GolfThisWeek({
   const topThree = (rows: CircleRoundRow[]) => rankAll(rows).slice(0, 3);
   void topThree;
 
+  /**
+   * BRIEF_BOARD_MOST_RECENT §1.3 — MOST RECENT'S OWN ORDERING FUNCTION, kept
+   * SEPARATE from rankAll on purpose. rankAll's contract is "one row per member",
+   * and the pinned row's findIndex(is_self) depends on that guarantee; a flag
+   * that switched the guarantee off for one caller would break the assumption
+   * silently. So rankAll is untouched and this path never dedupes: five rounds
+   * can be three from one member, which is exactly what the board reports (§1.2).
+   *
+   * THE TIEBREAK (§3.5): the sort is STABLE and the input is `ordered`, the very
+   * array the see-all sheet groups by day, so two rounds sharing a play_date keep
+   * the sheet's own within-day order — the two surfaces agree by construction
+   * rather than by a second, invented rule.
+   */
+  const recentOrdered = (rows: CircleRoundRow[]) =>
+    rows.filter((r) => !!r.play_date).slice().sort(byDateDesc);
+
 
 
   /* THE FLOORS APPLY TO EVERY PLACE (§3): a runner-up clears the same floor as
