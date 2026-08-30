@@ -1210,7 +1210,8 @@
           "birdieHaul": "{{0}} Birdies auf {{1}} Löchern.",
           "strongFinish": "Birdie oder besser auf den Schlusslöchern, Endstand {{0}}."
         },
-        "seeTheCard": "KARTE ANSEHEN"
+        "seeTheCard": "KARTE ANSEHEN",
+        "scorecard": "SCORECARD"
       },
       "count": "{{rounds}} Runden · {{courses}} Plätze · {{days}} Tage",
       "heading": "Letzte Runden",

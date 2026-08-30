@@ -1109,7 +1109,7 @@ function GolfThisWeekCard({
             height: HERO_H,
             flexShrink: 0,
             position: 'relative',
-            padding: '11px 12px 11px',
+            padding: '11px 10px 11px',
             boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
@@ -1120,8 +1120,8 @@ function GolfThisWeekCard({
           style={{
             position: 'absolute',
             top: 11,
-            left: 12,
-            right: 12,
+             left: 10,
+             right: 10,
             display: 'flex',
             alignItems: 'baseline',
             gap: 8,
@@ -1321,13 +1321,13 @@ function GolfThisWeekCard({
           marginTop: 'auto',
           flexShrink: 0,
           boxSizing: 'border-box',
-          padding: '6px 12px 8px',
+          padding: '6px 10px 8px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
         }}
       >
-        {/* THE ACTION ROW (§2.1): SEE THE CARD leads, the reaction sits in the
+        {/* THE ACTION ROW (§2.1): SCORECARD leads, the reaction pair sits in the
             trailing slot. The control's 44px tap target is padding cancelled by
             a negative margin, so the foot is FOOT_H at every count — 0, 1 or 3
             digits — and every rail card stays the same height. */}
@@ -1336,8 +1336,7 @@ function GolfThisWeekCard({
             marginTop: 'auto',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 8,
+             gap: 0,
             minWidth: 0,
           }}
         >
@@ -1349,15 +1348,22 @@ function GolfThisWeekCard({
               display: 'inline-flex',
               alignItems: 'center',
               gap: 2,
+               minWidth: 0,
+               whiteSpace: 'nowrap',
+               overflow: 'hidden',
+               textOverflow: 'ellipsis',
             }}
           >
-            {t('discover.golfThisWeek.moment.seeTheCard', 'SEE THE CARD')}
-            <ChevronRight size={9} strokeWidth={3} />
+             <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+               {t('discover.golfThisWeek.moment.scorecard', 'SCORECARD')}
+             </span>
+             <ChevronRight size={9} strokeWidth={3} style={{ flexShrink: 0 }} />
           </span>
           {/* THE TRAILING CONTROLS. Both carry their own 44px tap target as
               padding cancelled by a negative margin, so the foot is FOOT_H at
               every count and the card stays 211px (§2.4). */}
-          <span style={{ marginLeft: 'auto', flexShrink: 0 }}>
+          <span style={{ flex: 1, minWidth: 0 }} aria-hidden="true" />
+          <span style={{ flexShrink: 0 }}>
             <RoundEngagementActions
               comment={commentHidden ? null : {
                 count: commentCount,

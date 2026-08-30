@@ -59,6 +59,7 @@ export function CommentAction({
       }}
       style={{
         display: 'inline-flex',
+         flexDirection: reserveCount ? 'row-reverse' : 'row',
         alignItems: 'center',
         gap: 4,
         fontFamily: SANS,

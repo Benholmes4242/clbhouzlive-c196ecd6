@@ -1210,7 +1210,8 @@
           "birdieHaul": "{{0}} birdies en {{1}} hoyos.",
           "strongFinish": "Birdie o mejor en la vuelta a casa, para acabar en {{0}}."
         },
-        "seeTheCard": "VER LA TARJETA"
+        "seeTheCard": "VER LA TARJETA",
+        "scorecard": "SCORECARD"
       },
       "count": "{{rounds}} rondas · {{courses}} campos · {{days}} días",
       "heading": "Rondas recientes",

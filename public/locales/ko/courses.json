@@ -1144,7 +1144,8 @@
           "birdieHaul": "{{1}} 홀에서 버디 {{0}}개.",
           "strongFinish": "마지막 세 홀에서 버디 이상, {{0}}로 마무리."
         },
-        "seeTheCard": "스잜카드 보기"
+        "seeTheCard": "스잜카드 보기",
+        "scorecard": "SCORECARD"
       },
       "count": "{{rounds}} 라운드 · {{courses}} 코스 · {{days}}일",
       "heading": "최근 라운드",

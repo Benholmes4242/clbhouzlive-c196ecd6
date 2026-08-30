@@ -89,6 +89,7 @@ export function ReactionAction({
         aria-label={label}
         style={{
           display: 'inline-flex',
+         flexDirection: reserveCount ? 'row-reverse' : 'row',
           alignItems: 'center',
           gap: 4,
           fontFamily: SANS,
@@ -119,6 +120,7 @@ export function ReactionAction({
       }}
       style={{
         display: 'inline-flex',
+       flexDirection: reserveCount ? 'row-reverse' : 'row',
         alignItems: 'center',
         gap: 4,
         fontFamily: SANS,
@@ -150,10 +152,10 @@ export function ReactionAction({
  * renders nothing but still occupies its width, so the figure axis is identical
  * on every row.
  *
- * WIDTH: 42px — the 15px glyph + 4px gap + a three-digit count at 11.5px/700
- * tabular (~22px), which is the widest realistic count on these surfaces.
+ * WIDTH: 34px — the 15px glyph + 4px gap + a reserved two-digit count at
+ * 11.5px/700. The count may disappear, but the glyph axis never moves.
  */
-export const REACTION_SLOT_W = 42;
+export const REACTION_SLOT_W = 34;
 
 export function ReactionSlot({ children }: { children?: React.ReactNode }) {
   return (

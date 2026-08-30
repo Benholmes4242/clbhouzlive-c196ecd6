@@ -1143,7 +1143,8 @@
           "birdieHaul": "{{1}} ホールで {{0}} バーディー。",
           "strongFinish": "上がり3ホールでバーディー以上、{{0}} でフィニッシュ。"
         },
-        "seeTheCard": "スコアカードを見る"
+        "seeTheCard": "スコアカードを見る",
+        "scorecard": "SCORECARD"
       },
       "count": "{{rounds}} ラウンド · {{courses}} コース · {{days}}日間",
       "heading": "最近のラウンド",
