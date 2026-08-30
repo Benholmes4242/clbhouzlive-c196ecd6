@@ -1944,6 +1944,11 @@ export function GolfThisWeek({
    * app does. Do not "fix" it to 1, T2, T2, 3.
    */
   const positionsFor = (b: BoardSpec) => {
+    /* BRIEF_BOARD_MOST_RECENT §3.4/§3.5 — NO TIES ON A TIME ORDERING. Two rounds
+       cannot share a position in a sequence, so the column is a plain 1..n
+       ordering; it is shared with the other five boards, and a board with no
+       numerals beside them would read as broken. */
+    if (b.byTime) return b.ranked.map((_, i) => String(i + 1));
     const out: string[] = [];
     let pos = 1;
     b.ranked.forEach((r, i) => {
