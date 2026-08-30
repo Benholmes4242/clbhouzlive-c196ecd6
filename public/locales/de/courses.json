@@ -1171,7 +1171,9 @@
         "off_one": "{{count}} ZURUECK",
         "off_other": "{{count}} ZURUECK",
         "cutOff_one": "{{count}} ZURUECK",
-        "cutOff_other": "{{count}} ZURUECK"
+        "cutOff_other": "{{count}} ZURUECK",
+        "roundsAgo_one": "VOR {{count}} RUNDE",
+        "roundsAgo_other": "VOR {{count}} RUNDEN"
       },
       "moment": {
         "theCard": "Die Karte",
@@ -1246,7 +1248,13 @@
         "netSecondary": "BRUTTO",
         "improvedLabel": "Groesste Verbesserung",
         "improvedShort": "VERBESSERT",
-        "improvedUnit": "ABZUG"
+        "improvedUnit": "ABZUG",
+        "recentLabel": "Neueste Runden",
+        "recentShort": "NEUESTE",
+        "recentUnit": "WANN",
+        "recentSecondary": "BRUTTO",
+        "pickerRowSubRounds_one": "{{count}} Runde",
+        "pickerRowSubRounds_other": "{{count}} Runden"
       }
     },
     "week": {
