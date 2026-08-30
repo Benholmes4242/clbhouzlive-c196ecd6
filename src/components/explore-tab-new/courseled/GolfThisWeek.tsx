@@ -1359,9 +1359,9 @@ function GolfThisWeekCard({
              </span>
              <ChevronRight size={9} strokeWidth={3} style={{ flexShrink: 0 }} />
           </span>
-          {/* THE TRAILING CONTROLS. Both carry their own 44px tap target as
-              padding cancelled by a negative margin, so the foot is FOOT_H at
-              every count and the card stays 211px (§2.4). */}
+          {/* THE TRAILING CONTROLS. The pair is content-sized and right-aligned:
+              zero counts create no count node or reserved hole. Both controls
+              retain 44px tap height without changing FOOT_H or card height. */}
           <span style={{ flex: 1, minWidth: 0 }} aria-hidden="true" />
           <span style={{ flexShrink: 0 }}>
             <RoundEngagementActions
