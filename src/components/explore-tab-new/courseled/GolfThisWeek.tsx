@@ -1966,7 +1966,15 @@ export function GolfThisWeek({
    * lower-wins board, (leader − own) everywhere else. Both are positive for a
    * member behind the leader, which is the only case a pinned row exists in.
    */
-  const pinnedGap = (b: BoardSpec, own: CircleRoundRow) => {
+  const pinnedGap = (b: BoardSpec, own: CircleRoundRow, idx: number) => {
+    /* BRIEF_BOARD_MOST_RECENT §2.2 — ON A TIME BOARD THE GAP IS TIME. A score gap
+       would be meaningless here: nothing on this board was ranked on score. The
+       pinned round is the viewer's MOST RECENT (the first is_self entry in a
+       time-descending list), and the sub-line counts the rounds that have been
+       played since it, which is the distance the ordering actually measures. */
+    if (b.byTime) {
+      return t('discover.golfThisWeek.gap.roundsAgo', '{{count}} ROUNDS AGO', { count: idx });
+    }
     const leaderValue = b.valueOf(b.ranked[0]);
     const ownValue = b.valueOf(own);
     const signed = b.lowerWins ? ownValue - leaderValue : leaderValue - ownValue;
