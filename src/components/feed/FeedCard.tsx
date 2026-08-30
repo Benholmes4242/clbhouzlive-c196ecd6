@@ -54,6 +54,7 @@ import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { PostRoundShell } from '@/components/feed/PostRoundShell';
 import { PostRoundDegraded } from '@/components/feed/PostRoundDegraded';
+import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 
 
 
@@ -582,9 +583,15 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               {postRound.grossScore}
             </span>
             {postRound.coursePar != null && (
-              <span style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.62)' }}>
+              <span
+                style={{
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: getScoreColor(postRound.grossScore - postRound.coursePar, 'dark'),
+                }}
+              >
                 {(() => {
-                  const d = postRound.grossScore! - postRound.coursePar!;
+                  const d = postRound.grossScore - postRound.coursePar;
                   return d === 0 ? 'E' : d > 0 ? `+${d}` : `${d}`;
                 })()}
               </span>
