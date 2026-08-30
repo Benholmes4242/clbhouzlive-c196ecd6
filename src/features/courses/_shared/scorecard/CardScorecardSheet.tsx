@@ -911,7 +911,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   style={{
                     ...NUM, fontSize: 38, fontWeight: 800, lineHeight: 0.9,
                     letterSpacing: '-0.05em',
-                    color: heroMuted ? EVEN_GRAY : toParColor(totals.toPar),
+                    color: heroMuted ? EVEN_GRAY : A.INK,
                   }}
                 >
                   {totals.gross}
@@ -919,7 +919,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 <div
                   style={{
                     ...NUM, fontSize: 13, marginTop: 6,
-                    color: EVEN_GRAY,
+                    color: heroMuted ? EVEN_GRAY : toParColor(totals.toPar),
                   }}
                 >
                   {fmtRel(totals.toPar)}
