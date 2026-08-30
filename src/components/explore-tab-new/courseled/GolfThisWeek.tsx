@@ -1724,7 +1724,19 @@ export function GolfThisWeek({
     format: (r: CircleRoundRow) => string;
     precision: number;
     /** The unit the pinned row's gap carries. */
-    offUnit: 'shots' | 'points' | 'birdies' | 'cut';
+    offUnit: 'shots' | 'points' | 'birdies' | 'cut' | 'time';
+    /**
+     * BRIEF_BOARD_MOST_RECENT — TRUE ONLY ON MOST RECENT. It says three things
+     * at once, all of which follow from ranking on TIME rather than on merit:
+     * positions are an ordering with NO TIES (§3.4/§3.5), the pinned row's gap
+     * is a COUNT OF ROUNDS rather than a score gap (§2.2), and the value column
+     * is a DATE so it needs width and caps rather than tabular numerals (§3.1).
+     */
+    byTime?: boolean;
+    /** §3.1 — the value column's width; a date needs more than a numeral. */
+    valueWidth?: number;
+    /** §4.4 — the picker's sub-line where "in the field" would be wrong. */
+    pickerSub?: string;
   }
 
   /** §1.5 — the one place the direction is stated; every spec derives from it. */
