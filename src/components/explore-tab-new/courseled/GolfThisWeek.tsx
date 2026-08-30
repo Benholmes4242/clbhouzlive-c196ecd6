@@ -1651,6 +1651,10 @@ export function GolfThisWeek({
       .sort((a, b) => (b.birdies as number) - (a.birdies as number) || byDateDesc(a, b)),
   );
 
+  /* BRIEF_BOARD_MOST_RECENT §1.3 — NOT rankAll: its own ordering function, no
+     dedupe, no floor beyond having a play_date at all. */
+  const recentRanked = recentOrdered(ordered);
+
   const bestStableford = stablefordRanked[0] ?? null;
   const mostBirdies = birdiesRanked[0] ?? null;
   const mostImproved = improvedRanked[0] ?? null;
