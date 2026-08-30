@@ -69,7 +69,12 @@ import {
  * BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S2 — THE FIVE CATEGORIES, at module
  * scope so the session's rotation can be held beside them.
  */
-type BoardKey = 'gross' | 'net' | 'stableford' | 'improved' | 'birdies';
+/**
+ * BRIEF_BOARD_MOST_RECENT — 'recent' is the SIXTH category and the only one
+ * ranked on TIME rather than on merit, and the only one that does NOT dedupe by
+ * member. It is deliberately excluded from the rotation pool (§4.3).
+ */
+type BoardKey = 'gross' | 'net' | 'stableford' | 'improved' | 'birdies' | 'recent';
 
 /**
  * §2.5 — THE SESSION'S ROTATED DEFAULT lives in a MODULE-LEVEL variable, not in
