@@ -28,14 +28,13 @@ interface Props {
   comment: RoundCommentAction | null;
   like: RoundLikeAction;
   size?: number;
-  gap?: number;
 }
 
-export function RoundEngagementActions({ comment, like, size = 15, gap = 12 }: Props) {
+export function RoundEngagementActions({ comment, like, size = 15 }: Props) {
   return (
     <span
       data-round-engagement="comment-heart"
-      style={{ display: 'inline-flex', alignItems: 'center', gap, flexShrink: 0, whiteSpace: 'nowrap' }}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 12, flexShrink: 0, whiteSpace: 'nowrap' }}
     >
       {comment && (
         <CommentAction

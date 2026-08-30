@@ -126,8 +126,8 @@ export function ReactionAction({
         fontFamily: SANS,
         cursor: 'pointer',
         // 44px tap target without a layout footprint.
-        padding: '13px 0',
-        margin: '-13px 0',
+        padding: '13px 10px',
+        margin: '-13px -10px',
         WebkitTapHighlightColor: 'transparent',
       }}
     >
