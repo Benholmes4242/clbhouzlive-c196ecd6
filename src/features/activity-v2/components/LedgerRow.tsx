@@ -281,6 +281,12 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
     holdTimer.current = null;
   };
 
+  /* AN INERT ROW LOOKS INERT. A notification that resolves to no route (an
+     announcement that is the whole message) must not present as a link: no
+     button role, no pointer cursor, no navigation. Long-press (mute) still
+     works — that is a row action, not a destination. */
+  const isInert = !getActivityLink(row);
+
   const handleClick = () => {
     if (heldRef.current) return;
     if (isUnread) onMarkRead(row.notif_id);
@@ -293,6 +299,7 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
     }
     navigate(url);
   };
+
 
   /* THE ACTOR'S DESTINATION IS THE ACTOR THAT IS SHOWN. A business-sourced
      notification renders the business logo and name, so its avatar opens the
