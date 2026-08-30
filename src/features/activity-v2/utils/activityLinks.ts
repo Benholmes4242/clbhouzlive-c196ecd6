@@ -206,6 +206,27 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     if (cid) return `/courses/${cid}?tab=reviews`;
   }
 
+  // --- video ready (system-authored) -----------------------------------
+  // Payload carries { post_id, stream_id } and entity_type 'post' /
+  // entity_id = the post id, so the video's own post is the destination.
+  // No usable target -> the member's OWN profile, never Clubhouse.
+  if (type === 'video_ready') {
+    const pid = data.post_id ?? (entity_type === 'post' ? entity_id : null);
+    if (pid) return `/post/${pid}`;
+    return '/profile';
+  }
+
+  // --- service announcement (app-wide, from clbhouz) -------------------
+  // These carry { campaign, route } and nothing else. A route of '/' is
+  // Clubhouse, i.e. NOT a destination — the announcement is the whole
+  // message. Route only to a REAL carried target; otherwise return '' so the
+  // row is INERT (LedgerRow's !url guard + non-tappable presentation).
+  if (type === 'service_announcement') {
+    const target = data.route ?? data.url ?? null;
+    if (target && target !== '/' && target.startsWith('/')) return target;
+    return '';
+  }
+
   // --- entity fallbacks ------------------------------------------------
   if (entity_type === 'post' && entity_id) return `/post/${entity_id}`;
   if (entity_type === 'comment' && data.post_id) {
