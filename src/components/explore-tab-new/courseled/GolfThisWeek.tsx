@@ -1838,6 +1838,39 @@ export function GolfThisWeek({
       precision: 0,
       offUnit: 'birdies',
     },
+    {
+      /* BRIEF_BOARD_MOST_RECENT — LAST IN THE PICKER (§4.2): it is the weakest of
+         the six and must not be reached before the merit boards. NO DEDUPE
+         (§1.1/§1.2): a member with two rounds in the window appears twice.
+         THE COLUMN THAT CARRIES THE RANK IS THE DATE (§3.1) and the GROSS rides
+         in the fourth column, the slot the to-par occupies on the gross board
+         (§3.2). The date vocabulary is relativeDay's — the SAME words the see-all
+         sheet's day headers use (§3.3); no second vocabulary for one window. */
+      key: 'recent',
+      label: t('discover.golfThisWeek.board.recentLabel', 'Most recent'),
+      short: t('discover.golfThisWeek.board.recentShort', 'RECENT'),
+      /* §4.1 — the column carries dates, so the header names the AXIS, not a
+         unit: WHEN. "DATE" would be a data type, not a question. */
+      unit: t('discover.golfThisWeek.board.recentUnit', 'WHEN'),
+      hasPar: true,
+      parHeader: t('discover.golfThisWeek.board.recentSecondary', 'GROSS'),
+      parCell: (r) =>
+        r.gross == null ? null : { text: String(r.gross), tone: toParOf(r)?.tone ?? A.MUTE },
+      ranked: recentRanked,
+      lowerWins: false,
+      /* Not a merit figure; it exists so the shared code paths have a number.
+         Positions and the pinned gap both go down the byTime branch instead. */
+      valueOf: (r) => new Date(`${String(r.play_date).slice(0, 10)}T12:00:00`).getTime(),
+      format: (r) => relativeDay(r.play_date, t as never).toUpperCase(),
+      precision: 0,
+      offUnit: 'time',
+      byTime: true,
+      valueWidth: 68,
+      /* §4.4 — ROUNDS, not members, and the only category where that is true. */
+      pickerSub: t('discover.golfThisWeek.board.pickerRowSubRounds', '{{count}} rounds', {
+        count: recentRanked.length,
+      }),
+    },
   ];
 
   /**
