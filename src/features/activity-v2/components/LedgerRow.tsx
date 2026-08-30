@@ -416,9 +416,9 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
 
   return (
     <div
-      role="button"
-      tabIndex={0}
-      onClick={handleClick}
+      role={isInert ? undefined : 'button'}
+      tabIndex={isInert ? undefined : 0}
+      onClick={isInert ? undefined : handleClick}
       onPointerDown={startHold}
       onPointerUp={cancelHold}
       onPointerLeave={cancelHold}
@@ -433,7 +433,8 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
         // dark. The amber dot below is the second, redundant signal.
         background: isUnread ? 'rgba(247,147,30,0.10)' : 'transparent',
         opacity: 1,
-        cursor: 'pointer',
+        cursor: isInert ? 'default' : 'pointer',
+
         fontFamily: SF_STACK,
         borderBottom: `0.5px solid ${ACT.HAIR}`,
         userSelect: 'none',
