@@ -169,6 +169,58 @@ export const BUCKETS = [
 export type BucketShares = Record<'birdie' | 'par' | 'bogey' | 'double', number>;
 
 /**
+ * ONE distribution-bar renderer for both member-course and tournament holes.
+ * Keeping the palette and the segment geometry in this module prevents the tour
+ * surface silently retaining the old dark neutral track when this ramp changes.
+ */
+export const HoleDistributionBar: React.FC<{
+  values: ReadonlyArray<number>;
+  marker?: number | string | null;
+}> = ({ values, marker = null }) => {
+  const total = values.reduce((sum, value) => sum + Math.max(0, value), 0);
+  const hasScores = total > 0;
+
+  return (
+    <span style={{ position: 'relative', display: 'block', paddingTop: marker == null ? 0 : 2 }}>
+      <span style={{ display: 'flex', gap: 1.5, height: 8 }}>
+        {BUCKETS.map((bucket, index) => {
+          const value = Math.max(0, values[index] ?? 0);
+          const empty = !hasScores || value <= 0;
+          return (
+            <i
+              key={bucket.key}
+              style={{
+                width: empty ? 2 : `${(value / total) * 100}%`,
+                flexShrink: 0,
+                background: bucket.bg,
+                opacity: empty ? 0.28 : 1,
+                borderRadius:
+                  index === 0 ? '4px 0 0 4px' : index === BUCKETS.length - 1 ? '0 4px 4px 0' : 0,
+              }}
+            />
+          );
+        })}
+      </span>
+      {marker != null && (
+        <i
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: -1,
+            left: marker,
+            width: 2,
+            height: 13,
+            marginLeft: -1,
+            background: A.BODY,
+            borderRadius: 1,
+          }}
+        />
+      )}
+    </span>
+  );
+};
+
+/**
  * THE WHOLE COURSE'S SPREAD (BRIEF_COURSE_TAB_AND_SHEETS_CHART_LED A5): the
  * per-hole distributions already loaded, summed. Shares are 0..1 fractions of
  * every hole-round on the course. Returns null when nothing is counted.
@@ -328,8 +380,6 @@ export const HoleRowV2: React.FC<{
     return difficultyRampColor(0.52 + tint * 0.48);
   })();
 
-  const lastIdx = segs.length - 1;
-
   /** ONE domain for the hole's shares and the course's, so the marks compare. */
   const shareDomain = Math.max(
     0.05,
@@ -412,31 +462,7 @@ export const HoleRowV2: React.FC<{
 
         {/* The ramp: a pure distribution of rounds. Nothing is plotted on it. */}
         <span style={{ display: 'block', minWidth: 0 }}>
-          <span style={{ display: 'flex', gap: 1.5, height: 8 }}>
-            {segs.map((s, i) => {
-              const empty = s.pctValue <= 0;
-              return (
-                <i
-                  key={s.key}
-                  style={{
-                    // A ZERO bucket keeps a hairline in its own tone at reduced
-                    // opacity, so the bar always reads as four parts and agrees
-                    // with the 0% the expanded detail prints.
-                    width: empty ? 2 : `${(s.pctValue / total) * 100}%`,
-                    flexShrink: 0,
-                    background: s.bg,
-                    opacity: empty ? 0.28 : 1,
-                    borderRadius:
-                      i === 0
-                        ? '4px 0 0 4px'
-                        : i === lastIdx
-                          ? '0 4px 4px 0'
-                          : 0,
-                  }}
-                />
-              );
-            })}
-          </span>
+          <HoleDistributionBar values={segs.map((segment) => segment.pctValue)} />
         </span>
 
 
