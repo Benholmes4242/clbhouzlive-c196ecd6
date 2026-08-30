@@ -1357,20 +1357,22 @@ function GolfThisWeekCard({
           {/* THE TRAILING CONTROLS. Both carry their own 44px tap target as
               padding cancelled by a negative margin, so the foot is FOOT_H at
               every count and the card stays 211px (§2.4). */}
-          <RoundEngagementActions
-            comment={commentHidden ? null : {
-              count: commentCount,
-              onOpen: () => onOpenComments?.(),
-              label: t('discover.comments.action', 'Comment on this round'),
-            }}
-            like={{
-              hidden: reactionHidden,
-              count: reactionCount,
-              reacted: reactionMine,
-              onToggle: () => onToggleReaction?.(),
-              label: t('discover.reactions.action', 'Like this round'),
-            }}
-          />
+          <span style={{ marginLeft: 'auto', flexShrink: 0 }}>
+            <RoundEngagementActions
+              comment={commentHidden ? null : {
+                count: commentCount,
+                onOpen: () => onOpenComments?.(),
+                label: t('discover.comments.action', 'Comment on this round'),
+              }}
+              like={{
+                hidden: reactionHidden,
+                count: reactionCount,
+                reacted: reactionMine,
+                onToggle: () => onToggleReaction?.(),
+                label: t('discover.reactions.action', 'Like this round'),
+              }}
+            />
+          </span>
         </div>
       </div>
 
