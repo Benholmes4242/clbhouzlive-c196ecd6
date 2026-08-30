@@ -2687,7 +2687,9 @@ export function GolfThisWeek({
           THAT board's rounds — it is not. Same words as the see-all sheet's
           masthead, same key; the scope pills above already name the scope. */}
       {ordered.length > 0 && (
-        <Eyebrow>{t('discover.golfThisWeek.heading', 'Recent rounds')}</Eyebrow>
+        <div style={{ marginTop: 12 }}>
+          <Eyebrow>{t('discover.golfThisWeek.heading', 'Recent rounds')}</Eyebrow>
+        </div>
       )}
 
       {/* Cards only in the horizontal rail; the See-all action sits below the
