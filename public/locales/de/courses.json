@@ -1287,7 +1287,10 @@
     "mostPlayedBestRoundsHere": "BESTE RUNDEN HIER",
     "mostPlayedAllRoundsHere": "ALLE {{count}} RUNDEN HIER",
     "mostPlayedOneRoundLine": "Eine Runde hier: {{name}} spielte {{gross}}.",
-    "mostPlayedOneRoundLine_other": "Nur {{name}} hat hier gespielt, bestes {{gross}}."
+    "mostPlayedOneRoundLine_other": "Nur {{name}} hat hier gespielt, bestes {{gross}}.",
+    "comments": {
+      "action": "Comment on this round"
+    }
   },
   "statBrowse": {
     "colArea": "Gebiet",

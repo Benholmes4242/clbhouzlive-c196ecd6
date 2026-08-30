@@ -7,6 +7,8 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { TrajectoryLine } from './TrajectoryLine';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
   TREND_UP, TREND_DOWN,
@@ -158,6 +160,24 @@ export interface CardScorecardSheetProps {
   onViewCourse?: () => void;
   /** C3 — shown only for the viewer's own round; opens the composer pre-filled. */
   onShareRound?: () => void;
+  /**
+   * ENGAGEMENT (BRIEF_ROUND_COMMENTS_EVERYWHERE §S2.2). The sheet is where a
+   * member lands from a round notification, so it carries BOTH a like and a
+   * comment control. The host resolves both (content_reactions on the score id,
+   * comments_v2 on the resolved post) — this component only draws them, and
+   * draws nothing when the prop is absent, so the tour surface is untouched.
+   */
+  engagement?: CardScorecardEngagement | null;
+}
+
+export interface CardScorecardEngagement {
+  likeHidden?: boolean;
+  likeCount: number;
+  likeMine: boolean;
+  onToggleLike: () => void;
+  likeLabel: string;
+  /** Absent when the round has no post — no comment affordance at all (§1.6). */
+  comment?: { count: number; label: string; onOpen: () => void } | null;
 }
 
 /** Integer to-par: rounds first, then branches. Never `-0`. */
@@ -593,7 +613,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   surface = 'member', courseContext,
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, identityStat,
   playerTourSlug, playerHeadshotOverride,
-  onViewProfile, onViewCourse, onShareRound,
+  onViewProfile, onViewCourse, onShareRound, engagement = null,
   sheetStyle,
 }) => {
   const { t } = useTranslation(['courses']);
@@ -1077,6 +1097,37 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                 <TrajectoryLine holes={holes} height={120} surface="dark" interactive />
               </Panel>
             </>
+          )}
+
+          {/* THE RESPONSE ROW (§S2.2). Quiet at zero: the glyph alone, never
+              "0 comments" and never a prompt (§S5.2). */}
+          {engagement && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 20,
+                paddingTop: 4,
+                paddingBottom: 2,
+              }}
+            >
+              <ReactionAction
+                hidden={engagement.likeHidden}
+                count={engagement.likeCount}
+                reacted={engagement.likeMine}
+                onToggle={engagement.onToggleLike}
+                label={engagement.likeLabel}
+                size={17}
+              />
+              {engagement.comment && (
+                <CommentAction
+                  count={engagement.comment.count}
+                  onOpen={engagement.comment.onOpen}
+                  label={engagement.comment.label}
+                  size={17}
+                />
+              )}
+            </div>
           )}
 
           {/* S3.3 — EXITS BELONG AT THE END. */}

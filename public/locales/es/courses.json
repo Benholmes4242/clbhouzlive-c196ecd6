@@ -1287,7 +1287,10 @@
     "mostPlayedBestRoundsHere": "MEJORES VUELTAS AQUI",
     "mostPlayedAllRoundsHere": "LAS {{count}} VUELTAS AQUI",
     "mostPlayedOneRoundLine": "Una vuelta aqui: {{name}} hizo {{gross}}.",
-    "mostPlayedOneRoundLine_other": "Solo {{name}} ha jugado aqui, mejor {{gross}}."
+    "mostPlayedOneRoundLine_other": "Solo {{name}} ha jugado aqui, mejor {{gross}}.",
+    "comments": {
+      "action": "Comment on this round"
+    }
   },
   "statBrowse": {
     "colArea": "Zona",

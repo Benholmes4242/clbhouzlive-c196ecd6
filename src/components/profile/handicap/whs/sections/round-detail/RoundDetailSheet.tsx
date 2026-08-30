@@ -7,7 +7,8 @@
  * still compile. `variant` is IGNORED (light-only sheet).
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
 import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
@@ -21,6 +22,9 @@ import { formatWeekdayShortGB, formatMonthShortGB } from '@/i18n/format';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
+import { useRoundPostComments } from '@/components/explore-tab-new/courseled/hooks/useRoundPostComments';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 
 function strokesOf(h: WhsScoreHole): number | null {
   return h.adjusted_gross ?? h.actual_gross ?? null;
@@ -54,6 +58,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
   open, onClose, scoreId, handicapDelta, profileUserId, sheetStyle,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   const openPostStudioForCourse = usePostStudioStore((st) => st.openPostStudioForCourse);
   const userQuery = useRoundDetail(scoreId, open);
@@ -174,7 +179,44 @@ export const RoundDetailSheet: React.FC<Props> = ({
       }
     : undefined;
 
+  /**
+   * ENGAGEMENT (BRIEF_ROUND_COMMENTS_EVERYWHERE §S2.2). The like is the SAME
+   * content_reactions row Discover writes — the hook patches every cache window
+   * holding this score id, so the heart agrees the moment either surface moves.
+   * The comment target is the round's post, resolved through the one-to-one
+   * whs_score_id mapping; with no post there is no comment control.
+   */
+  const scoreIdList = useMemo(() => (scoreId ? [scoreId] : []), [scoreId]);
+  const roundPosts = useRoundPostComments(scoreIdList);
+  const postInfo = roundPosts.infoFor(scoreId);
+  const reactions = useContentReactions(
+    useMemo(
+      () => (scoreId ? [{ type: 'round' as const, id: scoreId }] : []),
+      [scoreId],
+    ),
+    { postIdFor: () => postInfo?.postId ?? null },
+  );
+  const [commentsOpen, setCommentsOpen] = useState(false);
+
+  const engagement = scoreId
+    ? {
+        likeHidden: !reactions.viewerId || reactions.unavailable,
+        likeCount: reactions.stateFor('round', scoreId).count,
+        likeMine: reactions.stateFor('round', scoreId).mine,
+        onToggleLike: () => reactions.toggle('round', scoreId),
+        likeLabel: t('discover.reactions.action', 'Like this round'),
+        comment: postInfo
+          ? {
+              count: postInfo.commentCount,
+              label: t('discover.comments.action', 'Comment on this round'),
+              onOpen: () => setCommentsOpen(true),
+            }
+          : null,
+      }
+    : null;
+
   return (
+    <>
     <CardScorecardSheet
       open={open}
       onClose={onClose}
@@ -205,7 +247,17 @@ export const RoundDetailSheet: React.FC<Props> = ({
       emptyGross={grossVal}
       emptyToPar={toParVal}
       sheetStyle={sheetStyle}
+      engagement={engagement}
     />
+    {commentsOpen && postInfo && (
+      <CommentsSheetV2
+        isOpen
+        onClose={() => setCommentsOpen(false)}
+        targetType="post"
+        targetId={postInfo.postId}
+      />
+    )}
+    </>
   );
 };
 
