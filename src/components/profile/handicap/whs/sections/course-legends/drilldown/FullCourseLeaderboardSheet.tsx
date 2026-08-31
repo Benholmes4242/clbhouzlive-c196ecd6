@@ -18,7 +18,6 @@
  * because every member is already present and pinning would duplicate them.
  * The viewer's row is scrolled to on open when it starts off-screen.
  */
-import { GAM } from '../../../gam/tokens';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { type LucideIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
