@@ -11,7 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useMoreFromTheWire, useStoryTournament, useTourStory } from './useTourStories';
+import { useMoreFromTheWire, useStoryTournament, useTourStory, type TourStory } from './useTourStories';
 import { StoryRow } from './NewsTab';
 import { StoryBody } from './StoryBody';
 import { storyTime } from './storyTime';
@@ -99,6 +99,82 @@ function LiveTournamentCard({ tournamentId }: { tournamentId: string }) {
   );
 }
 
+/**
+ * StoryArticle — the story itself: lead image, headline, standfirst, the blocks
+ * and the live tournament card. Extracted from the page so the ADMIN PREVIEW can
+ * render the REAL article rather than an approximation of it. If the preview and
+ * the live page could disagree, the preview would be worthless.
+ *
+ * Everything above it (the sticky masthead, the loading state, MORE FROM THE
+ * WIRE) belongs to the page, not the article.
+ */
+export function StoryArticle({ story }: { story: TourStory }) {
+  const { t } = useTranslation('tourhub');
+  return (
+    <>
+      {story.image_url && (
+        <div style={{ position: 'relative', height: 232, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
+          <img
+            src={story.image_url}
+            alt={story.headline}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.35) 100%)',
+            }}
+          />
+          {story.kicker && (
+            <div style={{ position: 'absolute', top: 12, left: 14, right: 14 }}>
+              <span style={{ ...KICKER, color: '#FFFFFF' }}>{story.kicker}</span>
+            </div>
+          )}
+          {story.image_credit && (
+            <div style={{ position: 'absolute', bottom: 8, right: 14, fontSize: 9, color: 'rgba(255,255,255,0.72)' }}>
+              {story.image_credit}
+            </div>
+          )}
+        </div>
+      )}
+
+      <div style={{ padding: '16px 14px 0' }}>
+        {!story.image_url && story.kicker && (
+          <div style={{ ...KICKER, color: INK_FAINT, marginBottom: 8 }}>{story.kicker}</div>
+        )}
+        <h1 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em', color: INK, margin: 0 }}>
+          {story.headline}
+        </h1>
+        <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ ...KICKER, color: INK_FAINT }}>{storyTime(story.published_at)}</span>
+          {story.tour_slug && TOUR_TAG[story.tour_slug] && (
+            <>
+              <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT }} />
+              <span style={{ ...KICKER, color: INK_FAINT }}>{TOUR_TAG[story.tour_slug]}</span>
+            </>
+          )}
+        </div>
+
+        {story.standfirst && (
+          <p style={{ marginTop: 14, fontSize: 15, fontWeight: 600, lineHeight: 1.45, color: INK, whiteSpace: 'pre-wrap' }}>
+            {story.standfirst}
+          </p>
+        )}
+        {story.body_blocks.length > 0 && (
+          <div style={{ marginTop: 12 }}>
+            <StoryBody blocks={story.body_blocks} />
+          </div>
+        )}
+
+        {story.tournament_id && <LiveTournamentCard tournamentId={story.tournament_id} />}
+      </div>
+      {/* t is read so the article owns its own translation scope */}
+      <span hidden>{t('news.masthead', 'THE WIRE')}</span>
+    </>
+  );
+}
+
 export function StoryPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -142,63 +218,7 @@ export function StoryPage() {
         </div>
       ) : (
         <>
-          {story.image_url && (
-            <div style={{ position: 'relative', height: 232, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
-              <img
-                src={story.image_url}
-                alt={story.headline}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-              />
-              <div
-                aria-hidden
-                style={{
-                  position: 'absolute', inset: 0,
-                  background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.35) 100%)',
-                }}
-              />
-              {story.kicker && (
-                <div style={{ position: 'absolute', top: 12, left: 14, right: 14 }}>
-                  <span style={{ ...KICKER, color: '#FFFFFF' }}>{story.kicker}</span>
-                </div>
-              )}
-              {story.image_credit && (
-                <div style={{ position: 'absolute', bottom: 8, right: 14, fontSize: 9, color: 'rgba(255,255,255,0.72)' }}>
-                  {story.image_credit}
-                </div>
-              )}
-            </div>
-          )}
-
-          <div style={{ padding: '16px 14px 0' }}>
-            {!story.image_url && story.kicker && (
-              <div style={{ ...KICKER, color: INK_FAINT, marginBottom: 8 }}>{story.kicker}</div>
-            )}
-            <h1 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em', color: INK, margin: 0 }}>
-              {story.headline}
-            </h1>
-            <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ ...KICKER, color: INK_FAINT }}>{storyTime(story.published_at)}</span>
-              {story.tour_slug && TOUR_TAG[story.tour_slug] && (
-                <>
-                  <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT }} />
-                  <span style={{ ...KICKER, color: INK_FAINT }}>{TOUR_TAG[story.tour_slug]}</span>
-                </>
-              )}
-            </div>
-
-            {story.standfirst && (
-              <p style={{ marginTop: 14, fontSize: 15, fontWeight: 600, lineHeight: 1.45, color: INK, whiteSpace: 'pre-wrap' }}>
-                {story.standfirst}
-              </p>
-            )}
-            {story.body_blocks.length > 0 && (
-              <div style={{ marginTop: 12 }}>
-                <StoryBody blocks={story.body_blocks} />
-              </div>
-            )}
-
-            {story.tournament_id && <LiveTournamentCard tournamentId={story.tournament_id} />}
-          </div>
+          <StoryArticle story={story} />
 
           {(more?.length ?? 0) > 0 && (
             <div style={{ marginTop: 28 }}>
