@@ -560,6 +560,13 @@ function AppRoutes() {
         <Route path="/watch/videos" element={<WatchGate><Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense></WatchGate>} />
         <Route path="/explore" element={<Suspense fallback={<DiscoverCourseLedSkeleton />}><ExplorePage /></Suspense>} />
 
+        {/* Amateur News. Declared BEFORE /discover/* so the index is not eaten by
+            a broader discover route, and both are gate-exempt so a shared link
+            reads for a guest. */}
+        <Route path="/discover/news" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurNewsPage /></Suspense>} />
+        <Route path="/discover/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurStoryPage /></Suspense>} />
+
+
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
 
