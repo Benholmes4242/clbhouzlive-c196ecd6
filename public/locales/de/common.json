@@ -378,5 +378,36 @@
     "footnote": "DAUERT 30 SEKUNDEN · WIR POSTEN NIE FÜR DICH",
     "slimCta": "Verbinden →",
     "dismissA11y": "Schließen"
+  },
+  "suggestedGolfers": {
+    "heading": "Golfers to follow",
+    "seeAll": "See all",
+    "pageSub": "Every suggestion comes with a reason.",
+    "searchEntry": "Search for a golfer",
+    "empty": "No suggestions right now",
+    "error": "Couldn't load suggestions",
+    "retry": "Retry",
+    "findGolfers": "Find golfers",
+    "reason": {
+      "club": "Also at {{club}}.",
+      "course": "You have both played {{course}}.",
+      "mutual": "Followed by {{count}} golfers you follow.",
+      "active": "{{count}} rounds in the last fortnight."
+    },
+    "subline": {
+      "rounds": "{{count}} rounds",
+      "index": "{{index}} index"
+    },
+    "group": {
+      "club": "At your club",
+      "course": "Courses you both play",
+      "mutual": "Followed by golfers you follow",
+      "active": "Active recently"
+    },
+    "prompt": {
+      "title": "Nobody saw that round",
+      "sub": "Follow a few golfers and your next one lands in their feed.",
+      "notNow": "Not now"
+    }
   }
 }
