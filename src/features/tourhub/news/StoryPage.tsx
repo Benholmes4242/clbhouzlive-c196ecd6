@@ -9,8 +9,14 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useLogout } from '@/hooks/useLogout';
+import { safeGoBack } from '@/utils/navigation';
+import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
+import { TourSideMenu } from '../components/TourSideMenu';
+
 import { useMoreFromTheWire, useStoryTournament, useTourStory, type TourStory } from './useTourStories';
 import { StoryRow } from './NewsTab';
 import { StoryBody } from './StoryBody';
