@@ -20,6 +20,7 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { GolfThisWeek } from './courseled/GolfThisWeek';
+import { AmateurNewsSection } from '@/features/amateur/news/AmateurNewsSection';
 import {
   DEFAULT_WEEK_SCOPE,
   type WeekScope,
