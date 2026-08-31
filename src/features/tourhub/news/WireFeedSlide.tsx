@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { TourStory } from './useTourStories';
 import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './StoryImageText';
-import { AMBER, AMBER_TINT_04, FONT, INK_MUTE, INK_SOFT, SLATE_100 } from '../_shared/tokens';
+import { AMBER, FONT, INK_MUTE, INK_SOFT } from '../_shared/tokens';
+import { SLAB } from '@/components/feed/feedSurfaces';
 
 export function WireFeedSlide({ story }: { story: TourStory }) {
   const { t } = useTranslation('tourhub');
@@ -11,7 +12,7 @@ export function WireFeedSlide({ story }: { story: TourStory }) {
   const openStory = () => navigate(`/tour/news/${story.slug}`);
 
   return (
-    <article style={{ background: AMBER_TINT_04, fontFamily: FONT }} data-wire-slide>
+    <article style={{ background: SLAB, fontFamily: FONT }} data-wire-slide>
       <button
         type="button"
         onClick={openStory}
@@ -26,9 +27,9 @@ export function WireFeedSlide({ story }: { story: TourStory }) {
           <StoryRelativeTime at={story.published_at} />
         </div>
 
-        <div style={{ position: 'relative', height: 176, overflow: 'hidden', background: SLATE_100 }}>
+        <div style={{ position: 'relative', height: 176, overflow: 'hidden', background: SLAB }}>
           <img src={story.image_url ?? ''} alt="" loading="lazy" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 30%' }} />
-          <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.12) 22%, rgba(0,0,0,0.84) 100%)' }} />
+          <div aria-hidden style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, transparent 22%, ${SLAB} 100%)` }} />
           <div style={{ position: 'absolute', left: 14, right: 14, bottom: 13 }}>
             {story.kicker && <StoryImageKicker>{story.kicker}</StoryImageKicker>}
             <div style={{ marginTop: story.kicker ? 5 : 0 }}><StoryImageHeadline feed>{story.headline}</StoryImageHeadline></div>
