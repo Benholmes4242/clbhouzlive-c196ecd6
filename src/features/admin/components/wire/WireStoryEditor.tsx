@@ -29,6 +29,7 @@ import { adminTheme as t } from '../../theme';
 import StatusPill from '../StatusPill';
 import ConfirmDialog from '../ConfirmDialog';
 import { ImageThumb, WireBlockEditor } from './WireBlockEditor';
+import { LeadImageUpload } from '../shared/LeadImageUpload';
 import {
   storyState,
   useSlugCollision,
@@ -375,6 +376,7 @@ export default function WireStoryEditor({
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
                     <input value={f.imageUrl} onChange={(e) => set('imageUrl', e.target.value)} placeholder="Image URL" style={input} />
                     <input value={f.imageCredit} onChange={(e) => set('imageCredit', e.target.value)} placeholder="Credit" style={input} />
+                    <LeadImageUpload onUploaded={(url) => set('imageUrl', url)} disabled={saving} />
                   </div>
                 </div>
                 <div style={{ marginTop: 6, fontSize: 11, color: t.inkFaint }}>
