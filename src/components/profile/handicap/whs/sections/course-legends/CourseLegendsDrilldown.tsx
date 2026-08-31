@@ -20,8 +20,6 @@ import type { CourseSelection } from './types';
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
 
 import { ChampionsYouCard } from './drilldown/ChampionsYouCard';
-import { ChampionsDuelCard } from './drilldown/ChampionsDuelCard';
-import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
 import { ChampionsBoard } from './drilldown/ChampionsBoard';
 
 
@@ -32,7 +30,6 @@ import { WindowToggle } from './_shared/WindowToggle';
 
 import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
 import { ChampionsInfoCarousel } from './drilldown/ChampionsInfoCarousel';
-import { formatGapFromChampion } from './drilldown/_shared/helpers';
 import { chaseCtaLine } from './drilldown/_shared/duelTension';
 import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME, orderWithWomensRecord } from './_shared/championsOrder';
 import { useProBenchmarks } from '@/hooks/gam/useProBenchmarks';
