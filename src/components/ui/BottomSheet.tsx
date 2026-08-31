@@ -137,7 +137,14 @@ export function BottomSheet({
           maxHeight,
           minHeight: 0,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
-          ...(variant === 'dark' ? { background: surfaceColor ?? '#0F172A' } : null),
+          /* The sheet itself owns the entire rounded surface, including the
+             strip behind its grabber. Apply explicit surfaces to both legacy
+             variants so underlying photography can never leak above children. */
+          ...(surfaceColor
+            ? { background: surfaceColor }
+            : variant === 'dark'
+              ? { background: '#0F172A' }
+              : null),
           ...style,
         }}
         role="dialog"

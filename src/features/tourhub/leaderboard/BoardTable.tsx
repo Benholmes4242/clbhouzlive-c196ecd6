@@ -5,16 +5,16 @@
  * renders itself (parents no longer print their own column header, so header
  * and rows can never drift):
  *
- *   POS(+MOV) | PLAYER | R1..Rn | THRU (conditional) | TOT
+ *   [MOV] | POS | PLAYER | R1..Rn | THRU (conditional) | TOT
  *
  * The width for a four-round single line came from four deliberate losses:
  *  1. The country flag is OUT of the row. Do not reintroduce it.
- *  2. MOVEMENT folds into the POS cell — movement describes a change in
- *     POSITION, so it lives with position. There is no MOV column.
+ *  2. MOVEMENT is the unheaded outer-left modifier for POS. Its fixed track
+ *     keeps the POS label centred over position numerals alone.
  *  3. THRU renders ONLY while a round is in progress: no header cell and no
  *     grid track otherwise. Decided ONCE per table, never per row.
- *  4. Tighter geometry: name 13px, gap 4, round cells 26 (floor 22), POS 38,
- *     TOT 40.
+ *  4. Tighter geometry: name 13px, gap 4, round cells 26 (floor 22), MOV 24,
+ *     POS 24, TOT 40.
  *
  * THE NAME NEVER CLIPS. Table-level degradation ladder, one tier for the whole
  * table so the grid stays square: full name -> initial+surname (shortenName
@@ -64,7 +64,8 @@ const CANVAS = TOUR_SLATE_50;
 const LEADER_WASH = 'rgba(255,255,255,0.05)';
 
 /** TIGHTENED GEOMETRY (2.4). */
-const POS_W = 38;
+const MOV_W = 24;
+const POS_W = 24;
 const TOT_W = 40;
 const THRU_W = 26;
 const CELL_W = 26;
@@ -121,6 +122,9 @@ interface Props {
   surface?: string;
   /** playerId -> R1 tee time label, used by the pre-tournament board only. */
   teeTimes?: Record<string, string>;
+  /** Optional complete field used only to calculate movement when `entries`
+   * is a truncated inline board. No additional query is required. */
+  movementEntries?: BoardEntry[];
 }
 
 function houseColor(score: number | null | undefined): string {
@@ -252,6 +256,7 @@ export function boardGridTemplate(c: BoardColumns): string {
   if (c.preTournament) return `minmax(0,1fr) ${PRE_TEE_W}px`;
   const rounds = c.rounds.map(() => `${c.cellW}px`).join(' ');
   return [
+    `${MOV_W}px`,
     `${POS_W}px`,
     'minmax(0,1fr)',
     rounds,
@@ -302,9 +307,10 @@ function resolveLayout(
 ): { columns: BoardColumns; tier: NameTier } {
   if (base.preTournament || !containerW) return { columns: base, tier: 'full' };
   const font = `700 ${NAME_SIZE}px ${F}`;
-  const trackCount = 2 + base.rounds.length + (base.showThru ? 1 : 0) + 1;
+  const trackCount = 3 + base.rounds.length + (base.showThru ? 1 : 0) + 1;
   const fixed =
     ROW_PAD_X * 2 +
+    MOV_W +
     POS_W +
     TOT_W +
     (base.showThru ? THRU_W : 0) +
@@ -362,6 +368,7 @@ export function BoardTable({
   headerTop,
   surface = CANVAS,
   teeTimes,
+  movementEntries,
 }: Props) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
@@ -397,8 +404,8 @@ export function BoardTable({
 
   // Computed round-start deltas (empty in R1 / when unavailable).
   const movementMap = useMemo(
-    () => boardMovementMap(entries, currentRound ?? null),
-    [entries, currentRound],
+    () => boardMovementMap(movementEntries ?? entries, currentRound ?? null),
+    [entries, movementEntries, currentRound],
   );
 
   // Partition: active rows first (in incoming order), demoted after.
@@ -503,7 +510,8 @@ export function BoardTable({
           </>
         ) : (
           <>
-            <div style={labelStyle}>{t('board.columns.pos')}</div>
+            <div aria-hidden />
+            <div style={{ ...labelStyle, textAlign: 'center' }}>{t('board.columns.pos')}</div>
             <div style={{ ...labelStyle, minWidth: 0 }}>{t('board.columns.player')}</div>
             {columns.rounds.map((r) => (
               <div
@@ -607,12 +615,12 @@ export function BoardTable({
           </>
         ) : (
           <>
-            {/* POS — movement folds in here; there is no MOV column. */}
+            {/* MOVEMENT — an unheaded, fixed-width modifier for position. */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 2,
+                justifyContent: 'flex-end',
                 whiteSpace: 'nowrap',
                 minWidth: 0,
               }}
@@ -642,19 +650,21 @@ export function BoardTable({
                     {Math.abs(mov)}
                   </span>
                 ))}
-              <span
-                style={{
-                  // AXIS 10: the position column. Demoted (cut-line) rows read
-                  // at the floor; live rows hold at 13.
-                  fontSize: demotedRow ? 10 : 13,
-                  fontWeight: 700,
-                  color: demotedRow ? SECONDARY : isLeader ? A.INK : A.BODY,
-                  fontVariantNumeric: 'tabular-nums lining-nums',
-                  letterSpacing: demotedRow ? '0.06em' : undefined,
-                }}
-              >
-                {posText}
-              </span>
+            </div>
+
+            {/* POS — centred independently beneath its own header. */}
+            <div
+              style={{
+                textAlign: 'center',
+                fontSize: demotedRow ? 10 : 13,
+                fontWeight: 700,
+                color: demotedRow ? SECONDARY : isLeader ? A.INK : A.BODY,
+                fontVariantNumeric: 'tabular-nums lining-nums',
+                letterSpacing: demotedRow ? '0.06em' : undefined,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {posText}
             </div>
 
             {/* PLAYER — never ellipsised, never a truncated surname. The tier

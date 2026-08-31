@@ -143,6 +143,17 @@ function LeaderboardBlock({ tournamentId }: { tournamentId: string }) {
 
   const rows = (entries ?? []) as BoardEntry[];
   const shown = rows.slice(0, INLINE_BOARD_ROWS);
+  // Closed events can outlive a stale/null current_round metadata value. The
+  // board rows already carry the authoritative completed rounds, so derive the
+  // movement round from those same cached rows rather than issuing a query.
+  const latestPlayedRound = rows.reduce((latest, entry) => {
+    const rounds = [entry.round_1, entry.round_2, entry.round_3, entry.round_4];
+    for (let i = rounds.length - 1; i >= 0; i -= 1) {
+      if (rounds[i] != null) return Math.max(latest, i + 1);
+    }
+    return latest;
+  }, 0);
+  const boardRound = currentRound ?? (latestPlayedRound > 0 ? latestPlayedRound : null);
 
   const cutDisplay = resolveCutDisplay({
     status,
@@ -200,10 +211,11 @@ function LeaderboardBlock({ tournamentId }: { tournamentId: string }) {
 
       <BoardTable
         entries={shown}
+        movementEntries={rows}
         cutState={cutState}
         /* A FINISHED board has no current round to highlight — the amber column
            header would claim a round is still being played. */
-        currentRound={isLive ? currentRound : null}
+        currentRound={boardRound}
         surface={EMBED_BG}
         onRowClick={() => navigate(`/tourhub/tournament/${tournamentId}`)}
       />
