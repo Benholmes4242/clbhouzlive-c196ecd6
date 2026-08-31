@@ -1134,6 +1134,10 @@
     "back": "Back",
     "live": "LIVE",
     "liveRound": "LIVE \u00b7 ROUND {{n}}",
+    "finalResult": "FINAL RESULT",
+    "players": "PLAYERS",
+    "par": "PAR",
+    "leader": "LEADER",
     "tournament": "TOURNAMENT",
     "player": "PLAYER",
     "andCoLead": "+{{count}}"

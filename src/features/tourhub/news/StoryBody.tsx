@@ -24,8 +24,10 @@ import { useTournamentMeta } from '../leaderboard/useTournamentMeta';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
 import { resolveCutDisplay } from '../_shared/cutDisplay';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
+import { getScoreColor } from '../_shared/scoreColor';
+import { fmtScore } from '../utils/fmtScore';
 import type { StoryBlock } from './blocks';
-import { FONT, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SLATE_100, AMBER } from '../_shared/tokens';
+import { FONT, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, LIVE_INK, SLATE_100, AMBER } from '../_shared/tokens';
 
 /** Inline embeds sit on the panel wash, not the page canvas. */
 const EMBED_BG = 'rgba(255,255,255,0.04)';
@@ -143,6 +145,12 @@ function LeaderboardBlock({ tournamentId }: { tournamentId: string }) {
 
   const rows = (entries ?? []) as BoardEntry[];
   const shown = rows.slice(0, INLINE_BOARD_ROWS);
+  const fieldSize = rows.length > 0 ? rows.length : null;
+  const leaderScore = rows.find((entry) => entry.position === 1 && entry.score != null)?.score
+    ?? rows.reduce<number | null>((best, entry) => {
+      if (entry.score == null || !Number.isFinite(entry.score)) return best;
+      return best == null || entry.score < best ? entry.score : best;
+    }, null);
   // Closed events can outlive a stale/null current_round metadata value. The
   // board rows already carry the authoritative completed rounds, so derive the
   // movement round from those same cached rows rather than issuing a query.
@@ -176,6 +184,8 @@ function LeaderboardBlock({ tournamentId }: { tournamentId: string }) {
     <section
       style={{
         margin: '18px 0 20px',
+        // One owner for the translucent panel wash. BoardTable is transparent
+        // below so the same alpha is never composited twice.
         background: EMBED_BG,
         border: `1px solid ${HAIRLINE_INK_10}`,
         borderRadius: 14,
@@ -185,28 +195,64 @@ function LeaderboardBlock({ tournamentId }: { tournamentId: string }) {
     >
       <div
         style={{
-          display: 'flex', alignItems: 'center', gap: 6,
-          padding: '11px 16px 0',
+          padding: '12px 16px 11px',
+          borderBottom: `1px solid ${HAIRLINE_INK_10}`,
         }}
       >
-        {isLive && (
-          <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981' }} />
-        )}
-        <span
-          style={{
-            fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase',
-            color: isLive ? '#10B981' : INK_FAINT,
-          }}
-        >
-          {isLive
-            ? currentRound
-              ? t('news.liveRound', { defaultValue: 'LIVE \u00b7 ROUND {{n}}', n: currentRound })
-              : t('news.live', 'LIVE')
-            : t('news.finalBoard', 'FINAL')}
-        </span>
-        <span style={{ fontSize: 11, fontWeight: 700, color: INK, marginLeft: 4, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            {isLive && (
+              <span aria-hidden style={{ width: 6, height: 6, flex: '0 0 6px', borderRadius: '50%', background: LIVE_INK }} />
+            )}
+            <span
+              style={{
+                fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase',
+                color: isLive ? LIVE_INK : INK_FAINT, whiteSpace: 'nowrap',
+              }}
+            >
+              {isLive
+                ? currentRound
+                  ? t('news.liveRound', { defaultValue: 'LIVE \u00b7 ROUND {{n}}', n: currentRound })
+                  : t('news.live', 'LIVE')
+                : t('news.finalResult', 'FINAL RESULT')}
+            </span>
+          </div>
+          {meta?.venue_name && (
+            <span
+              style={{
+                marginLeft: 'auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK_FAINT,
+              }}
+            >
+              {meta.venue_name}
+            </span>
+          )}
+        </div>
+        <div style={{ marginTop: 6, fontSize: 15, lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.015em', color: INK, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {meta?.name ?? ''}
-        </span>
+        </div>
+        {(fieldSize != null || meta?.venue_par != null || leaderScore != null) && (
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginTop: 10 }}>
+            {fieldSize != null && (
+              <div>
+                <div style={{ fontSize: 13, lineHeight: 1, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums' }}>{fieldSize}</div>
+                <div style={{ marginTop: 4, fontSize: 8, lineHeight: 1, fontWeight: 700, letterSpacing: '0.14em', color: INK_FAINT }}>{t('news.players', 'PLAYERS')}</div>
+              </div>
+            )}
+            {meta?.venue_par != null && (
+              <div>
+                <div style={{ fontSize: 13, lineHeight: 1, fontWeight: 700, color: INK, fontVariantNumeric: 'tabular-nums' }}>{meta.venue_par}</div>
+                <div style={{ marginTop: 4, fontSize: 8, lineHeight: 1, fontWeight: 700, letterSpacing: '0.14em', color: INK_FAINT }}>{t('news.par', 'PAR')}</div>
+              </div>
+            )}
+            {leaderScore != null && (
+              <div>
+                <div style={{ fontSize: 13, lineHeight: 1, fontWeight: 700, color: getScoreColor(leaderScore, 'dark'), fontVariantNumeric: 'tabular-nums' }}>{fmtScore(leaderScore)}</div>
+                <div style={{ marginTop: 4, fontSize: 8, lineHeight: 1, fontWeight: 700, letterSpacing: '0.14em', color: INK_FAINT }}>{t('news.leader', 'LEADER')}</div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <BoardTable
@@ -216,7 +262,7 @@ function LeaderboardBlock({ tournamentId }: { tournamentId: string }) {
         /* A FINISHED board has no current round to highlight — the amber column
            header would claim a round is still being played. */
         currentRound={boardRound}
-        surface={EMBED_BG}
+        surface="transparent"
         onRowClick={() => navigate(`/tourhub/tournament/${tournamentId}`)}
       />
 
