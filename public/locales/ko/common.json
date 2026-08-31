@@ -414,5 +414,14 @@
       "sub": "Follow a few golfers and your next one lands in their feed.",
       "notNow": "Not now"
     }
+  },
+  "story": {
+    "likeAria": "이 기사에 좋아요",
+    "unlikeAria": "좋아요 취소",
+    "commentsAria": "댓글",
+    "commentsEmpty": "아직 댓글이 없습니다. 대화를 시작해 보세요.",
+    "viewComment": "댓글 1개 보기",
+    "viewComments": "댓글 {{count}}개 모두 보기",
+    "guestPrompt": "clbhouz에 가입하고 대화를 확인하세요"
   }
 }

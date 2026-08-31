@@ -15,7 +15,14 @@ import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
 import { patchEngagement } from '@/lib/engagementCache';
 import { commentsKeys, commentsScope, viewerId } from '@/lib/queryKeys';
 
-export type TargetType = 'post' | 'top_ten' | 'editorial';
+/**
+ * 'tour_story' | 'amateur_story' (BRIEF_STORY_ENGAGEMENT §S5). Both story beats
+ * comment through this engine unchanged. The post-only branches below (the
+ * engagement-cache patches) are correctly skipped for a story, and the DB's
+ * comments_v2_notify falls through to its no-recipient ELSE for a top-level
+ * story comment while still notifying the parent author on a REPLY.
+ */
+export type TargetType = 'post' | 'top_ten' | 'editorial' | 'tour_story' | 'amateur_story';
 
 export interface CommentActorInfo {
   actor_type: 'personal' | 'business';

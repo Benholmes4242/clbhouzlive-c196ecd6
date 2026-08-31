@@ -414,5 +414,14 @@
       "sub": "Follow a few golfers and your next one lands in their feed.",
       "notNow": "Not now"
     }
+  },
+  "story": {
+    "likeAria": "この記事にいいね",
+    "unlikeAria": "いいねを取り消す",
+    "commentsAria": "コメント",
+    "commentsEmpty": "まだコメントはありません。最初のコメントを投稿しましょう。",
+    "viewComment": "コメントを1件表示",
+    "viewComments": "{{count}}件のコメントをすべて表示",
+    "guestPrompt": "clbhouz に参加してコメントを見る"
   }
 }

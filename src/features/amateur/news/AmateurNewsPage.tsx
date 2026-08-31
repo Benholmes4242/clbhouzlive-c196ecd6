@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { LeadStory, StoryRow } from '@/features/tourhub/news/NewsTab';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { OVERVIEW_HERO_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { FONT, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
 
@@ -122,6 +123,12 @@ export function AmateurNewsPage() {
 
   const open = (slug: string) => navigate(`/discover/news/${slug}`);
 
+  /* ONE READ PER WINDOW, never per row: every visible id in a single RPC. */
+  const { engagementFor } = useStoryEngagement(
+    'amateur_story',
+    React.useMemo(() => stories.map((s) => s.id), [stories]),
+  );
+
   return (
     <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
       {isPending ? (
@@ -135,7 +142,7 @@ export function AmateurNewsPage() {
       ) : (
         <>
           {lead ? (
-            <LeadStory story={lead} onOpen={() => open(lead.slug)} />
+            <LeadStory story={lead} onOpen={() => open(lead.slug)} engagement={engagementFor(lead.id)} />
           ) : (
             <div aria-hidden style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
           )}
@@ -154,7 +161,7 @@ export function AmateurNewsPage() {
             <div>
               {rows.map((s, i) => (
                 <div key={s.id} style={{ borderTop: i === 0 ? 'none' : `1px solid ${HAIRLINE_INK_10}` }}>
-                  <StoryRow story={s} onOpen={() => open(s.slug)} />
+                  <StoryRow story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} />
                 </div>
               ))}
             </div>

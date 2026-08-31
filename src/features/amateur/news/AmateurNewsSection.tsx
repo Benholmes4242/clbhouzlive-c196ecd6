@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { LeadStory, StoryRow } from '@/features/tourhub/news/NewsTab';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { HAIRLINE_INK_10 } from '@/features/tourhub/_shared/tokens';
 import { SectionShell } from '@/features/tourhub/overview/sections/SectionShell';
 
@@ -27,6 +28,13 @@ export function AmateurNewsSection() {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { stories, isPending } = useAmateurStories(null);
+
+  /* ONE read for the three-story window, before any early return. */
+  const { engagementFor } = useStoryEngagement(
+    'amateur_story',
+    React.useMemo(() => stories.slice(0, 3).map((s) => s.id), [stories]),
+  );
+
 
   if (isPending) {
     return (
@@ -57,14 +65,14 @@ export function AmateurNewsSection() {
         linkLabel={t('amateurNews.allStories', 'ALL STORIES')}
         onLinkClick={() => navigate('/discover/news')}
       >
-        {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} compact />}
+        {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} compact engagement={engagementFor(lead.id)} />}
         <div style={{ marginTop: lead ? 8 : 0 }}>
           {rows.map((s, i) => (
             <div
               key={s.id}
               style={{ borderTop: i === 0 && !lead ? 'none' : `1px solid ${HAIRLINE_INK_10}` }}
             >
-              <StoryRow story={s} onOpen={() => open(s.slug)} compact />
+              <StoryRow story={s} onOpen={() => open(s.slug)} compact engagement={engagementFor(s.id)} />
             </div>
           ))}
         </div>

@@ -19,6 +19,8 @@ import { useTourStories, type TourStory } from './useTourStories';
 import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './StoryImageText';
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
 import { heroCanonScrimOn } from '../_shared/heroGradient';
+import { StoryRowEngagement } from '@/features/stories/StoryRowEngagement';
+import { useStoryEngagement, type StoryEngagement } from '@/features/stories/useStoryEngagement';
 import {
   FONT,
   HAIRLINE_INK_10,
@@ -51,7 +53,7 @@ function KickerLine({ kicker, at, compact = false }: { kicker: string | null; at
   );
 }
 
-export function LeadStory({ story, onOpen, compact = false }: { story: TourStory; onOpen: () => void; compact?: boolean }) {
+export function LeadStory({ story, onOpen, compact = false, engagement }: { story: TourStory; onOpen: () => void; compact?: boolean; engagement?: StoryEngagement | null }) {
   const bandPadding = compact ? 6 : 8;
   const sidePadding = compact ? 17 : 14;
   const standfirstPad = compact ? 4 : 6;
@@ -84,6 +86,12 @@ export function LeadStory({ story, onOpen, compact = false }: { story: TourStory
         </div>
         <div style={{ position: 'absolute', bottom: bandPadding, left: sidePadding, right: sidePadding }}>
           <StoryImageHeadline compact={compact}>{story.headline}</StoryImageHeadline>
+          {/* Bottom-left of the photo band, beneath the headline, on glass:
+              white-72 is what ReactionAction's own glass tone uses on
+              photography (BRIEF_STORY_ENGAGEMENT §S4). Read-only. */}
+          <div style={{ marginTop: 6 }}>
+            <StoryRowEngagement engagement={engagement} tone="glass" />
+          </div>
         </div>
       </div>
       {story.standfirst && (
@@ -95,7 +103,7 @@ export function LeadStory({ story, onOpen, compact = false }: { story: TourStory
   );
 }
 
-export function StoryRow({ story, onOpen, compact = false }: { story: TourStory; onOpen: () => void; compact?: boolean }) {
+export function StoryRow({ story, onOpen, compact = false, engagement }: { story: TourStory; onOpen: () => void; compact?: boolean; engagement?: StoryEngagement | null }) {
   return (
     <button
       type="button"
@@ -116,6 +124,12 @@ export function StoryRow({ story, onOpen, compact = false }: { story: TourStory;
             {story.standfirst}
           </div>
         )}
+        {/* THE META LINE, beneath the headline in the same faint ink as the
+            time above it. It renders on the COMPACT variant too, where the
+            standfirst is suppressed. */}
+        <div style={{ marginTop: 6 }}>
+          <StoryRowEngagement engagement={engagement} inkColor={INK_FAINT} />
+        </div>
       </div>
       {story.image_url && (
         <img
@@ -156,6 +170,12 @@ export function NewsTab() {
 
   const open = (slug: string) => navigate(`/tour/news/${slug}`);
 
+  /* ONE READ PER WINDOW, never per row: every visible id in a single RPC. */
+  const { engagementFor } = useStoryEngagement(
+    'tour_story',
+    useMemo(() => stories.map((s) => s.id), [stories]),
+  );
+
   return (
     <div style={{ fontFamily: FONT, paddingBottom: 24 }}>
       {isLoading ? (
@@ -172,14 +192,14 @@ export function NewsTab() {
         </div>
       ) : (
         <>
-          {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} />}
+          {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} engagement={engagementFor(lead.id)} />}
           <div style={{ marginTop: lead ? 14 : 0 }}>
             {rest.map((s, i) => (
               <div
                 key={s.id}
                 style={{ borderTop: i === 0 && !lead ? 'none' : `1px solid ${HAIRLINE_INK_10}` }}
               >
-                <StoryRow story={s} onOpen={() => open(s.slug)} />
+                <StoryRow story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} />
               </div>
             ))}
           </div>
