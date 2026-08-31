@@ -9,8 +9,14 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useLogout } from '@/hooks/useLogout';
+import { safeGoBack } from '@/utils/navigation';
+import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
+import { TourSideMenu } from '../components/TourSideMenu';
+
 import { useMoreFromTheWire, useStoryTournament, useTourStory, type TourStory } from './useTourStories';
 import { StoryRow } from './NewsTab';
 import { StoryBody } from './StoryBody';
@@ -172,6 +178,73 @@ export function StoryArticle({ story }: { story: TourStory }) {
   );
 }
 
+/**
+ * StoryIslandLeft — the story page's left-capsule content: back to the wire,
+ * then the tour burger. NO TOUR PICKER: a reader inside one article has nothing
+ * to filter, and a tour label there would state something the page does not do.
+ *
+ * The burger only renders for a signed-in member — the drawer's tail is
+ * Settings / Profile / Sign out, none of which mean anything to a guest on a
+ * shared link. A guest gets the back arrow alone.
+ */
+function StoryChromeBridge() {
+  const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
+  const { user } = useSupabaseSession();
+  const { logout } = useLogout();
+  const [menuOpen, setMenuOpen] = React.useState(false);
+
+  const back = React.useCallback(
+    () => safeGoBack(navigate, '/tourhub?tab=news'),
+    [navigate],
+  );
+
+  const slot = React.useMemo(
+    () => (
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, height: '100%' }}>
+        <button
+          type="button"
+          aria-label={t('news.back', 'Back')}
+          onClick={back}
+          className="active:scale-[0.94]"
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
+        >
+          <ChevronLeft size={17} color="#FFFFFF" strokeWidth={2.2} />
+        </button>
+        {user && (
+          <>
+            <span aria-hidden style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.18)', flexShrink: 0 }} />
+            <button
+              type="button"
+              aria-label={t('picker.openMenuAria')}
+              onClick={() => setMenuOpen(true)}
+              className="active:scale-[0.94]"
+              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
+            >
+              <Menu size={15} color="#FFFFFF" strokeWidth={2.2} />
+            </button>
+          </>
+        )}
+      </div>
+    ),
+    [back, t, user],
+  );
+
+  useSetChromeLeftSlot(slot);
+
+  return (
+    <TourSideMenu
+      open={menuOpen}
+      onClose={() => setMenuOpen(false)}
+      activeTab="news"
+      onSelectTab={(id) => { setMenuOpen(false); navigate(`/tourhub?tab=${id}`); }}
+      onSettings={() => navigate('/edit-profile?tab=settings')}
+      onProfile={() => navigate('/profile')}
+      onSignOut={() => { void logout(); }}
+    />
+  );
+}
+
 export function StoryPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -180,28 +253,19 @@ export function StoryPage() {
   const { data: more } = useMoreFromTheWire(story?.id);
 
   return (
-    <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
-      <div
-        style={{
-          position: 'sticky', top: 0, zIndex: 20, background: SLATE_50,
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          paddingBottom: 8, paddingLeft: 8, paddingRight: 14,
-          borderBottom: `1px solid ${HAIRLINE_INK_10}`,
-          display: 'flex', alignItems: 'center', gap: 6,
-        }}
-      >
-        <button
-          type="button"
-          aria-label={t('news.back', 'Back')}
-          onClick={() => navigate('/tourhub?tab=news')}
-          style={{ background: 'none', border: 'none', padding: 6, cursor: 'pointer', display: 'flex' }}
-        >
-          <ChevronLeft size={20} color={INK} strokeWidth={2.2} />
-        </button>
-        <span style={{ ...KICKER, letterSpacing: '0.14em', fontSize: 12, color: INK }}>
-          {t('news.masthead', 'THE WIRE')}
-        </span>
-      </div>
+    <div
+      style={{
+        background: SLATE_50,
+        minHeight: '100dvh',
+        fontFamily: FONT,
+        /* The ChromeIsland owns the top of this page now (bleed:false), so the
+           article starts clear of it — the island sits on the canvas, never on
+           the photograph and never on the headline. */
+        paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 27px)',
+      }}
+    >
+      <StoryChromeBridge />
+
 
       {isLoading ? (
         <div style={{ padding: 14 }}>

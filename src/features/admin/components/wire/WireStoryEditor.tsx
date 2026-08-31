@@ -189,6 +189,18 @@ export default function WireStoryEditor({
     await onSave(toInput({ ...f, slug }));
   };
 
+  /* S1 — AN EMPTY BODY CANNOT GO OUT. The reader's article is body_blocks; a
+     story published with none of them renders a headline, a standfirst and
+     nothing else, which is what happened to the first four. The gate reads the
+     SAVED record, not the form: publishing writes published_at against what is
+     in the database, so what is in the database is what has to be checked. A
+     parse that has not been saved is therefore still blocked — correctly. */
+  const savedBlockCount = story?.body_blocks.length ?? 0;
+  const publishBlocked = savedBlockCount === 0;
+  /* Text that has never been parsed. This is the exact state of the four broken
+     stories and it must not read as a quiet zero. */
+  const unparsed = f.sourceText.trim().length > 0 && f.blocks.length === 0;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {/* Action bar. Save on the left with the work, publishing on the right,
@@ -216,11 +228,24 @@ export default function WireStoryEditor({
               title="Leave empty to publish now"
               style={{ ...input, width: 'auto', padding: '7px 9px', fontSize: 12 }}
             />
-            <button type="button" onClick={() => setConfirm('publish')} style={btn()}>
+            <button
+              type="button"
+              disabled={publishBlocked}
+              title={publishBlocked ? 'This story has no body' : undefined}
+              onClick={() => {
+                if (publishBlocked) {
+                  toast.error('This story has no body — press Parse, then Save, before publishing.');
+                  return;
+                }
+                setConfirm('publish');
+              }}
+              style={{ ...btn(), opacity: publishBlocked ? 0.45 : 1, cursor: publishBlocked ? 'not-allowed' : 'pointer' }}
+            >
               {scheduleAt ? 'Schedule' : 'Publish'}
             </button>
           </>
         )}
+
         {story && state !== 'draft' && (
           <button type="button" onClick={() => setConfirm('unpublish')} style={btn()}>
             <RotateCcw size={14} /> Unpublish
@@ -232,6 +257,27 @@ export default function WireStoryEditor({
           </button>
         )}
       </div>
+
+      {/* S1.2 — the loud state. Text that has never been parsed is a story with
+          no article in it, and the admin has to say so where the author cannot
+          miss it, not as a "0" further down the page. */}
+      {unparsed && (
+        <div style={{
+          padding: '11px 13px', borderRadius: t.radius.lg,
+          background: t.dangerSoft, color: t.dangerText,
+          border: `1px solid ${t.dangerText}44`,
+          fontSize: 13, fontWeight: 700, lineHeight: 1.45,
+        }}>
+          THIS STORY HAS TEXT BUT NO BODY — IT HAS NEVER BEEN PARSED.
+          <div style={{ marginTop: 4, fontSize: 12, fontWeight: 500 }}>
+            {state === 'published'
+              ? 'It is live right now and readers see a headline with no article. Press Parse, then Save.'
+              : 'Press Parse to turn the pasted text into blocks, then Save. It cannot be published until you do.'}
+          </div>
+        </div>
+      )}
+
+
 
       <div className="wire-editor-grid">
         {/* ── Left: the work ── */}
@@ -347,7 +393,10 @@ export default function WireStoryEditor({
           </div>
 
           <div style={panel}>
-            <div style={{ ...KICKER_STYLE, marginBottom: 10 }}>Blocks · {f.blocks.length}</div>
+            <div style={{ ...KICKER_STYLE, marginBottom: 10, color: unparsed ? t.dangerText : t.inkFaint }}>
+              Blocks · {f.blocks.length}{unparsed ? ' · NOT PARSED' : ''}
+            </div>
+
             <WireBlockEditor blocks={f.blocks} onChange={(next) => set('blocks', next)} />
           </div>
         </div>

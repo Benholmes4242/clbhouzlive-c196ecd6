@@ -37,6 +37,7 @@ import {
 // player names, tournament names, team names.
 const TOUR_LABEL: Record<string, string> = {
   all: 'ALL TOURS',
+  major: 'MAJORS',
   pga: 'PGA TOUR',
   lpga: 'LPGA',
   euro: 'DP WORLD TOUR',
@@ -47,6 +48,7 @@ const TOUR_LABEL: Record<string, string> = {
 
 const TOUR_LABEL_SHORT: Record<string, string> = {
   all: 'ALL TOURS',
+  major: 'MAJORS',
   pga: 'PGA',
   lpga: 'LPGA',
   euro: 'DP WORLD',
@@ -54,6 +56,16 @@ const TOUR_LABEL_SHORT: Record<string, string> = {
   champ: 'CHAMPIONS',
   liv: 'LIV',
 };
+
+/**
+ * THE ROW LIST IS NOT THE LABEL MAP. It used to be: the sheet looped
+ * Object.entries(TOUR_LABEL), which carries `all` (and now `major`) for the
+ * readout hooks — so a second, permanently-disabled "ALL TOURS" row rendered
+ * below the real one and read as a duplicate. `all` and `major` have their own
+ * hand-built rows at the top of the sheet; only real tours belong in the loop.
+ */
+const TOUR_ROW_SLUGS = ['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'] as const;
+
 
 const GOLD_TINT_10 = 'rgba(255,184,0,0.10)';
 const GOLD_TINT_18 = 'rgba(255,184,0,0.18)';
@@ -291,7 +303,9 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
             )}
           </button>
         )}
-        {Object.entries(TOUR_LABEL).flatMap(([slug, label]) => {
+        {TOUR_ROW_SLUGS.flatMap((slug) => {
+          const label = TOUR_LABEL[slug];
+
           const tourSlides = slidesByTour[slug] ?? [];
           const seasonDone = seasonCompleteByTour[slug];
 

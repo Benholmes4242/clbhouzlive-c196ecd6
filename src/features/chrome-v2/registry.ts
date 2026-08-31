@@ -289,7 +289,26 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, note: EDITORIAL_NOTE } },
   { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
   { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+  // A Wire story (/tour/news/:slug). Declared BEFORE the /tour/ backstop so the
+  // reader page gets its own chrome: island, back to the wire list (history
+  // first so in-app taps unwind naturally, fallback for a cold-launched share
+  // link), dark tone. bleed FALSE deliberately — not every story carries a lead
+  // photograph, and a bleeding island would sit on the headline of the ones that
+  // do not. The page applies its own sat+64 top padding. The page also registers
+  // a left slot (back + burger, no tour picker: a reader inside one article has
+  // nothing to filter).
+  {
+    match: { test: (p) => /^\/tour\/news\/[^/]+/.test(p) },
+    spec: {
+      chrome: 'island',
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=news' },
+      tone: 'dark',
+      bleed: false,
+      note: 'wire story — back + burger slot, no picker',
+    },
+  },
   // Backstop for any /tourhub/* or /tour/* path not matched above. Tour sub-tabs
+
   // are query params on the exact hubs, so nothing real lands here today — but
   // anything that does gets Pattern A chrome (opaque island, back, safe area)
   // rather than no chrome at all. tone flipped light -> dark (dark-only app).
