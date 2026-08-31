@@ -496,6 +496,8 @@ export const ActivityPageV2: React.FC = () => {
       <div style={{ background: PAGE, fontFamily: SF_STACK, minHeight: '100%' }}>
         {featured && <FeaturedMomentCard row={featured} />}
         <FriendRequestsRail />
+        {/* S3.2 - after a round syncs: once per round, 7-day dismissal. */}
+        <NobodySawThatRound />
 
         {feed.isLoading && <ActivityRowsSkeleton buckets={2} />}
 
