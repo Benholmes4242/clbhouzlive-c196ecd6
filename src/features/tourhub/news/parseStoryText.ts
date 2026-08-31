@@ -90,10 +90,13 @@ export interface ParseContext {
 }
 
 
-export function parseStoryText(source: string): ParseResult {
+export function parseStoryText(source: string, ctx: ParseContext = {}): ParseResult {
   const blocks: StoryBlock[] = [];
   const counts = emptyCounts();
   const reclassified: string[] = [];
+  const unresolved: string[] = [];
+  const pendingPlayers: PendingPlayer[] = [];
+  const storyTournamentId = (ctx.tournamentId ?? '').trim();
 
   // Paragraph text accumulates across consecutive plain lines so a soft-wrapped
   // paste stays ONE paragraph; a blank line or any marker line closes it.
@@ -133,9 +136,29 @@ export function parseStoryText(source: string): ParseResult {
 
     const embed = EMBED_RE.exec(line);
     if (embed) {
-      const id = embed[2].trim();
-      if (embed[1].toLowerCase() === 'leaderboard') push({ type: 'leaderboard', tournament_id: id });
-      else push({ type: 'player', player_id: id });
+      const arg = (embed[2] ?? '').trim();
+      if (embed[1].toLowerCase() === 'leaderboard') {
+        // Bare `[leaderboard]` means THIS story's tournament; an explicit uuid
+        // overrides it for the rare cross-tournament embed.
+        const id = arg || storyTournamentId;
+        if (id) push({ type: 'leaderboard', tournament_id: id });
+        else {
+          flush();
+          unresolved.push('leaderboard block has no tournament — pick one above');
+        }
+      } else if (!arg) {
+        flush();
+        unresolved.push('player block has no name');
+      } else if (UUID_RE.test(arg)) {
+        push({ type: 'player', player_id: arg });
+      } else {
+        // A NAME. It gets a placeholder block whose id is filled in by the
+        // resolver; if the name does not resolve, the block is dropped.
+        flush();
+        pendingPlayers.push({ blockIndex: blocks.length, name: arg });
+        blocks.push({ type: 'player', player_id: '' });
+        counts.player += 1;
+      }
       continue;
     }
 
@@ -157,8 +180,9 @@ export function parseStoryText(source: string): ParseResult {
   }
   flush();
 
-  return { blocks, counts, reclassified };
+  return { blocks, counts, reclassified, unresolved, pendingPlayers };
 }
+
 
 /**
  * Blocks back to source text. The round trip exists so a story authored before
