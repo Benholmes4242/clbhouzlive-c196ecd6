@@ -2136,7 +2136,10 @@ export function GolfThisWeek({
 
 
           {/* THE WHEN CHIP, top-right (§1.1), on the same notch + island
-              clearance the section's first row used to pay. */}
+              clearance the section's first row used to pay. It carries its
+              own glass carrier because the canon scrim stops well below this
+              y-position; without a dark surface beneath it, 65% white on a
+              bright photograph is illegible. */}
           <div
             style={{
               position: 'absolute',
@@ -2155,7 +2158,13 @@ export function GolfThisWeek({
                 lineHeight: 1,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                color: BOARD_HERO_FAINT,
+                color: DISCOVER_FACT,
+                background: 'rgba(10,14,20,0.42)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,0.14)',
+                borderRadius: 999,
+                padding: '5px 10px',
               }}
             >
               {t('discover.golfThisWeek.board.whenChip', 'LAST {{days}} DAYS', {
@@ -2169,6 +2178,29 @@ export function GolfThisWeek({
           {/* gap 0: the hairline and the rail own their own top margins (11 and
               10) so the vertical rhythm is stated once, in one place. */}
           <div style={{ padding: '0 20px 8px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {/* THE CONSTANT SURFACE LABEL. The title beneath it rotates through
+                five categories; this label stays fixed so the masthead always
+                reads "THE AMATEUR CIRCUIT / LOWEST GROSS". It is not inside the
+                picker button — it is not tappable and must not be announced as
+                part of that control.
+                marginBottom: 21 is deliberate: the title button pulls 12px up
+                into its negative margin, so 21 - 12 = 9px visual gap. */}
+            <div
+              style={{
+                marginBottom: 21,
+                fontFamily: SANS,
+                fontSize: 10,
+                fontWeight: 700,
+                lineHeight: 1,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: BOARD_HERO_FAINT,
+                textShadow: '0 1px 6px rgba(0,0,0,0.6)',
+              }}
+            >
+              {t('discover.golfThisWeek.board.circuitEyebrow', 'The amateur circuit')}
+            </div>
+
             {/* THE CATEGORY NAMES ITSELF ONCE ON THE PAGE, HERE, as a caps
                 masthead — 21/800 with 0.06em tracking and the broadcast text
                 shadow. Read from `activeBoard`, never from the selection.
