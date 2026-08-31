@@ -51,6 +51,7 @@ export interface TourSideMenuProps {
 // activeTab/onSelectTab comparisons enum-safe.
 const DESTINATIONS: { id: string; labelKey: string; Icon: LucideIcon }[] = [
   { id: 'overview',     labelKey: 'nav.overview',     Icon: Compass },
+  { id: 'news',         labelKey: 'nav.news',         Icon: Newspaper },
   { id: 'live',         labelKey: 'nav.leaderboards', Icon: Trophy },
   { id: 'schedule',     labelKey: 'nav.schedule',     Icon: CalendarDays },
   { id: 'players',      labelKey: 'nav.players',      Icon: Users },
