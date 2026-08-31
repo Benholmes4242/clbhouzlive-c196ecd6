@@ -109,7 +109,7 @@ export default function TheWireTab() {
       {isLoading && <div style={{ fontSize: 13, color: t.inkFaint }}>Loading…</div>}
 
       {!isLoading && stories.length === 0 && (
-        <EmptyState title="Nothing on the wire" body="Write the first story and it appears on every member’s Tour Hub." />
+        <EmptyState title="Nothing on the wire" subtitle="Write the first story and it appears on every member’s Tour Hub." />
       )}
 
       {stories.length > 0 && (
