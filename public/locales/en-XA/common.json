@@ -723,5 +723,14 @@
       "sub": "Follow a few golfers and your next one lands in their feed.",
       "notNow": "Not now"
     }
+  },
+  "story": {
+    "likeAria": "[Like this story]",
+    "unlikeAria": "[Unlike this story]",
+    "commentsAria": "[Comments]",
+    "commentsEmpty": "[No comments yet. Start the discussion.]",
+    "viewComment": "[View 1 comment]",
+    "viewComments": "[View all {{count}} comments]",
+    "guestPrompt": "[Join clbhouz to see the discussion]"
   }
 }
