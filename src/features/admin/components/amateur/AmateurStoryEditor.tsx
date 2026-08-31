@@ -138,12 +138,19 @@ function toPreviewStory(f: Form, existing: AdminAmateurStory | null): AmateurSto
  * THREE SOURCES, deliberately: `unresolved` carries the boards and rounds,
  * `pendingPlayers` carries the player and stat cards, and `blocks` is checked
  * as belt and braces in case a future parser puts an embed there directly.
+ * `pendingPlayers` and `blocks` overlap by design: every pending marker leaves
+ * a placeholder block at its own `blockIndex`, so those indices are skipped
+ * when scanning `blocks` to avoid double-counting.
  */
 function droppedTags(result: ReturnType<typeof parseStoryText>): string[] {
   const out: string[] = [];
   for (const u of result.unresolved) out.push(u.replace(/ —.*$/, '').replace(/ - .*$/, ''));
   for (const p of result.pendingPlayers) out.push(`[${p.kind}:${p.name}]`);
-  for (const b of result.blocks) if (!RENDERABLE.has(b.type)) out.push(`[${b.type}]`);
+  const pendingIndices = new Set(result.pendingPlayers.map((p) => p.blockIndex));
+  result.blocks.forEach((b, i) => {
+    if (pendingIndices.has(i)) return;
+    if (!RENDERABLE.has(b.type)) out.push(`[${b.type}]`);
+  });
   return out;
 }
 
