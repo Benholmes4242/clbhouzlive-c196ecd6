@@ -16,6 +16,7 @@ import { useLogout } from '@/hooks/useLogout';
 import { safeGoBack } from '@/utils/navigation';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { TourSideMenu } from '../components/TourSideMenu';
+import { NAV_CLEARANCE } from '@/components/GlobalBottomNavigation';
 
 import { useMoreFromTheWire, useStoryTournament, useTourStory, type TourStory } from './useTourStories';
 import { StoryRow } from './NewsTab';
@@ -293,7 +294,10 @@ export function StoryPage() {
               ))}
             </div>
           )}
-          <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 32px)' }} />
+          <div
+            aria-hidden
+            style={{ height: `calc(env(safe-area-inset-bottom, 0px) + ${NAV_CLEARANCE} + 16px)` }}
+          />
         </>
       )}
     </div>

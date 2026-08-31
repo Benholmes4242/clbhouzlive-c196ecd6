@@ -882,6 +882,7 @@
     "live": "LIVE",
     "liveRound": "LIVE \u00b7 ROUND {{n}}",
     "tournament": "TOURNAMENT",
+    "player": "PLAYER",
     "andCoLead": "+{{count}}"
   }
 }
