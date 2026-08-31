@@ -20,8 +20,7 @@ import type { CourseSelection } from './types';
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
 
 import { ChampionsYouCard } from './drilldown/ChampionsYouCard';
-import { ChampionsDuelCard } from './drilldown/ChampionsDuelCard';
-import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
+import { ChampionsBoard } from './drilldown/ChampionsBoard';
 
 
 
@@ -31,7 +30,6 @@ import { WindowToggle } from './_shared/WindowToggle';
 
 import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
 import { ChampionsInfoCarousel } from './drilldown/ChampionsInfoCarousel';
-import { formatGapFromChampion } from './drilldown/_shared/helpers';
 import { chaseCtaLine } from './drilldown/_shared/duelTension';
 import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME, orderWithWomensRecord } from './_shared/championsOrder';
 import { useProBenchmarks } from '@/hooks/gam/useProBenchmarks';
@@ -81,22 +79,6 @@ const UNITS: Record<LegendCategory, string> = {
 };
 
 
-function formatHeldDuration(attainedAtIso: string): string {
-  const attainedAt = new Date(attainedAtIso);
-  if (isNaN(attainedAt.getTime())) return '—';
-  const diffMs = Date.now() - attainedAt.getTime();
-  if (diffMs < 0) return '—';
-  const days = Math.floor(diffMs / 86400000);
-  if (days === 0) return 'today';
-  if (days === 1) return '1d';
-  if (days < 7) return `${days}d`;
-  const weeks = Math.floor(days / 7);
-  if (weeks < 5) return `${weeks}w`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months}mo`;
-  const years = Math.floor(days / 365);
-  return `${years}y`;
-}
 
 interface SectionRow {
   rank: number;
@@ -492,59 +474,16 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
 
 
-          {visibleCategories.map((cat, i) => {
-            const entry = groupedWithTotals.get(cat);
-            const banded = i % 2 === 1;
-            if (!entry || entry.rows.length === 0) {
-              return (
-                <div key={cat} data-category={cat}>
-                  <ChampionsUnclaimedCard
-                    category={cat}
-                    categoryLabel={legendCategoryLabel[cat]}
-                    categoryIcon={legendCategoryIcon[cat]}
-                    banded={banded}
-                    theme={theme}
-                  />
-                </div>
-              );
-            }
-            const champion = entry.rows[0];
-            const sectionRows = entry.rows.map((r) => ({
-              rank: r.rank,
-              name: r.isSelf ? 'You' : r.name,
-              photoUrl: r.photoUrl,
-              valueDisplay: r.valueDisplay,
-              value: r.value,
-              isSelf: r.isSelf,
-              gapToChampion: r.rank === champion.rank ? null : formatGapFromChampion(cat, r.value, champion.value),
-              userId: r.userId,
-              rank30d: r.rank30d,
-              delta: r.delta,
-            }));
-            return (
-              <div key={cat} data-category={cat}>
-                <ChampionsDuelCard
-                  category={cat}
-                  categoryLabel={legendCategoryLabel[cat]}
-                  categoryIcon={legendCategoryIcon[cat]}
-                  rows={sectionRows}
-                  yourRank={yourRanks[cat] ?? null}
-                  holdDuration={`Held ${formatHeldDuration(champion.attained_at)}`}
-                  totalCount={entry.total}
-                  unitLabel={UNITS[cat] || SHORT_LABELS[cat]}
-                  onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
-                  proBenchmark={
-                    proBenchmarkPick && cat === `${proBenchmarkPick.base}_all_time`
-                      ? proBenchmarkPick
-                      : null
-                  }
-                  theme={theme}
-                  banded={banded}
-                />
-              </div>
-            );
+          {/* BRIEF_CHAMPIONS_BOARD — one category as a full ranked board, with
+              a pill picker above it that keeps the other records visible. */}
+          <ChampionsBoard
+            categories={sheetCategoryDescriptors}
+            grouped={groupedWithTotals}
+            window={window}
+            coursePar={meta?.course_par ?? null}
+            onOpenFull={(cat) => setFullLeaderboardCategory(cat)}
+          />
 
-          })}
 
         </>
       )}

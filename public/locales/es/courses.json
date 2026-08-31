@@ -1387,5 +1387,19 @@
     "railYears": "ANOS",
     "rate": "VALORAR",
     "close": "Cerrar"
+  },
+  "champions": {
+    "board": {
+      "pos": "POS",
+      "member": "MEMBER",
+      "when": "WHEN",
+      "mark": "MARK",
+      "allTime": "ALL TIME",
+      "last90Days": "LAST 90 DAYS",
+      "members": "{{count}} MEMBERS",
+      "rounds": "{{count}} ROUNDS",
+      "unclaimedShort": "--",
+      "seeAll": "SEE ALL {{count}}"
+    }
   }
 }

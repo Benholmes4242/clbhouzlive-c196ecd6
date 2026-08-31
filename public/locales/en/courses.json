@@ -1896,7 +1896,19 @@
     "levelWithName": "Level with {{name}}",
     "nearest": "Nearest {{value}}",
     "youHoldIt": "You hold it",
-    "jointChampion": "Joint champion"
+    "jointChampion": "Joint champion",
+    "board": {
+      "pos": "POS",
+      "member": "MEMBER",
+      "when": "WHEN",
+      "mark": "MARK",
+      "allTime": "ALL TIME",
+      "last90Days": "LAST 90 DAYS",
+      "members": "{{count}} MEMBERS",
+      "rounds": "{{count}} ROUNDS",
+      "unclaimedShort": "--",
+      "seeAll": "SEE ALL {{count}}"
+    }
   },
   "search": {
     "yourRounds": "Your rounds"
