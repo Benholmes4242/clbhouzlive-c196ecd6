@@ -41,14 +41,15 @@ const LEAD_FOCAL_Y = '18%';
 /** Gradient height scales with the band so the visible wash keeps the same density. */
 const COMPACT_LEAD_GRADIENT_HEIGHT = 312; // 260 * 1.2
 
-function KickerLine({ kicker, at, compact = false }: { kicker: string | null; at: string | null; compact?: boolean }) {
+function KickerLine({ kicker, at, compact = false, trailing }: { kicker: string | null; at: string | null; compact?: boolean; trailing?: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
       {kicker && (
-        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><StoryImageKicker color={INK} compact={compact}>{kicker}</StoryImageKicker></span>
+        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}><StoryImageKicker color={INK} compact={compact}>{kicker}</StoryImageKicker></span>
       )}
       {kicker && at && <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT, flexShrink: 0 }} />}
-      <StoryRelativeTime at={at} />
+      <span style={{ flexShrink: 0 }}><StoryRelativeTime at={at} /></span>
+      {trailing && <span style={{ marginLeft: 'auto', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>{trailing}</span>}
     </div>
   );
 }
