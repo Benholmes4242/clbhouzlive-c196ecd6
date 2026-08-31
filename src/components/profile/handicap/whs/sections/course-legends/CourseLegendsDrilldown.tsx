@@ -22,6 +22,7 @@ import { DrilldownHeader } from './drilldown/DrilldownHeader';
 import { ChampionsYouCard } from './drilldown/ChampionsYouCard';
 import { ChampionsDuelCard } from './drilldown/ChampionsDuelCard';
 import { ChampionsUnclaimedCard } from './drilldown/ChampionsUnclaimedCard';
+import { ChampionsBoard } from './drilldown/ChampionsBoard';
 
 
 
