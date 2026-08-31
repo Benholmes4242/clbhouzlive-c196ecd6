@@ -18,7 +18,12 @@ export type StoryBlock =
   | { type: 'image'; url: string; caption?: string | null; credit?: string | null }
   | { type: 'quote'; text: string; attribution?: string | null }
   | { type: 'leaderboard'; tournament_id: string }
-  | { type: 'player'; player_id: string };
+  | { type: 'player'; player_id: string }
+  /** Season statistics card. Only the id is stored; figures are read LIVE. */
+  | { type: 'stat'; player_id: string }
+  /** What a player did at ONE tournament. Both ids stored, figures read LIVE. */
+  | { type: 'round'; player_id: string; tournament_id: string };
+
 
 /**
  * Read a story's jsonb into blocks, dropping anything this client cannot
@@ -61,6 +66,18 @@ export function parseStoryBlocks(raw: unknown): StoryBlock[] {
         if (id) out.push({ type: 'player', player_id: id });
         break;
       }
+      case 'stat': {
+        const id = str('player_id').trim();
+        if (id) out.push({ type: 'stat', player_id: id });
+        break;
+      }
+      case 'round': {
+        const pid = str('player_id').trim();
+        const tid = str('tournament_id').trim();
+        if (pid && tid) out.push({ type: 'round', player_id: pid, tournament_id: tid });
+        break;
+      }
+
       default:
         // Unknown type: render nothing, break nothing.
         break;

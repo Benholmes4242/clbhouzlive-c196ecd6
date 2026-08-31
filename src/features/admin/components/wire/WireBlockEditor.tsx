@@ -19,9 +19,13 @@ const TYPE_LABEL: Record<StoryBlock['type'], string> = {
   quote: 'Quote',
   leaderboard: 'Leaderboard',
   player: 'Player',
+  stat: 'Season stats',
+  round: 'Tournament week',
 };
 
-const INSERTABLE: StoryBlock['type'][] = ['paragraph', 'heading', 'image', 'quote', 'leaderboard', 'player'];
+const INSERTABLE: StoryBlock['type'][] = [
+  'paragraph', 'heading', 'image', 'quote', 'leaderboard', 'player', 'stat', 'round',
+];
 
 function blankBlock(type: StoryBlock['type']): StoryBlock {
   switch (type) {
@@ -30,9 +34,12 @@ function blankBlock(type: StoryBlock['type']): StoryBlock {
     case 'quote': return { type: 'quote', text: '', attribution: null };
     case 'leaderboard': return { type: 'leaderboard', tournament_id: '' };
     case 'player': return { type: 'player', player_id: '' };
+    case 'stat': return { type: 'stat', player_id: '' };
+    case 'round': return { type: 'round', player_id: '', tournament_id: '' };
     default: return { type: 'paragraph', text: '' };
   }
 }
+
 
 const input: React.CSSProperties = {
   width: '100%', padding: '8px 10px', borderRadius: 8,
@@ -144,7 +151,7 @@ export function WireBlockEditor({
             />
           )}
 
-          {b.type === 'player' && (
+          {(b.type === 'player' || b.type === 'stat') && (
             <input
               value={b.player_id}
               placeholder="Player id"
@@ -152,6 +159,24 @@ export function WireBlockEditor({
               style={{ ...input, fontFamily: 'ui-monospace, monospace', fontSize: 12 }}
             />
           )}
+
+          {b.type === 'round' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <input
+                value={b.player_id}
+                placeholder="Player id"
+                onChange={(e) => replace(i, { ...b, player_id: e.target.value.trim() })}
+                style={{ ...input, fontFamily: 'ui-monospace, monospace', fontSize: 12 }}
+              />
+              <input
+                value={b.tournament_id}
+                placeholder="Tournament id"
+                onChange={(e) => replace(i, { ...b, tournament_id: e.target.value.trim() })}
+                style={{ ...input, fontFamily: 'ui-monospace, monospace', fontSize: 12 }}
+              />
+            </div>
+          )}
+
 
           <div style={{ marginTop: 8 }}>
             <InsertRow onInsert={(type) => insertAfter(i, type)} />
