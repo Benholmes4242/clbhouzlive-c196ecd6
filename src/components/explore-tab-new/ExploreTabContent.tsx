@@ -481,8 +481,8 @@ export default function ExploreTabContent({
         style={{
           padding: '0 14px',
           // ONE SECTION RHYTHM: the rounds section sits outside the flex wrapper
-          // below, so it must carry its own 28px to the first ranked section.
-          marginBottom: 28,
+          // below, so it must carry its own 36px to the first ranked section.
+          marginBottom: 36,
         }}
       >
         <GolfThisWeek
