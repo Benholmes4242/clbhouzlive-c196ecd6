@@ -42,12 +42,7 @@ import { safeInitialState } from './feedSnapshot';
 import { setIslandEdgeScrolled } from '@/features/chrome-v2/islandEdge';
 import { WireFeedSlide } from '@/features/tourhub/news/WireFeedSlide';
 import type { ClubhouseFeedItem } from './injectWireStories';
-
-const CANVAS = '#05070A';
-/** Post slab colour (FeedCard CARD). The resting header zone paints this so
- *  the safe area, the island's surroundings and the first post are ONE
- *  continuous surface — no step, no seam. */
-const SLAB = '#10151C';
+import { CANVAS, SLAB } from './feedSurfaces';
 
 /** How many neighbours on each side of the active card may mount a <video>. */
 const VIDEO_NEIGHBOUR_RADIUS = 1; // matches iOS ~3-decoder cap (active ±1 = 3)
