@@ -34,6 +34,8 @@ const NEWS_SLUGS = ['all', 'pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'];
 
 /** Compact lead band used by the Wire section on the Tour Overview. */
 const COMPACT_LEAD_HEIGHT = 180;
+/** Focal point for lead photos. LOWER number = subject sits LOWER in frame. */
+const LEAD_FOCAL_Y = '18%';
 /** Gradient height scales with the band so the visible wash keeps the same density. */
 const COMPACT_LEAD_GRADIENT_HEIGHT = 312; // 260 * 1.2
 

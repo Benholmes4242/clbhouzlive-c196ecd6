@@ -42,6 +42,19 @@ const TOUR_TAG: Record<string, string> = {
   liv: 'LIV GOLF',
 };
 
+/**
+ * How far the photograph's subject moves DOWN inside the hero frame.
+ *
+ * object-position cannot do this here: at 390x345 a landscape photo covers
+ * the box by cropping the SIDES, so vertical overflow is zero and a focal
+ * point has nothing to travel through. Instead the image box is made taller
+ * than the frame and the frame clips the bottom.
+ *
+ * The image is anchored to the top, so extra height of 2x moves the centre
+ * of the picture down by x. These two numbers only ever change together.
+ */
+const HERO_SUBJECT_DROP = 26;
+
 const KICKER: React.CSSProperties = {
   fontSize: 9,
   fontWeight: 700,
