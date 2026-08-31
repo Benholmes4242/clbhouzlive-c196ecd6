@@ -12612,7 +12612,7 @@ export type Database = {
       }
       tour_stories: {
         Row: {
-          body: string | null
+          body_blocks: Json
           created_at: string
           headline: string
           id: string
@@ -12627,7 +12627,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          body?: string | null
+          body_blocks?: Json
           created_at?: string
           headline: string
           id?: string
@@ -12642,7 +12642,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          body?: string | null
+          body_blocks?: Json
           created_at?: string
           headline?: string
           id?: string
