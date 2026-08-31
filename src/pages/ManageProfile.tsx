@@ -43,6 +43,7 @@ import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
 import { CoverGuidance } from '@/components/profile/edit-v2/CoverGuidance';
 import { ProfilePhotoCard, type ProfilePhotoCardHandle } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
+import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
 import { AdditionalClubsList } from '@/components/profile/edit-v2/AdditionalClubsList';
 
 import { HandicapInput } from '@/components/profile/edit-v2/HandicapInput';
@@ -495,6 +496,8 @@ function ProfileTabBody({
   navigate, showSocial, setShowSocial,
   handleSave, isDisabled, isSaving, isDirty,
 }: ProfileTabBodyProps) {
+  const { user } = useSupabaseSession();
+  const homeClubStatus = useHomeClubStatus(user?.id);
   const profilePickerRef = useRef<ProfilePhotoCardHandle>(null);
   const hasAvatar = Boolean(form.profilePhotoBlob || form.profilePhotoUrl);
   const hasHeader = Boolean(form.headerPhotoBlob || form.headerPhotoUrl);
@@ -690,6 +693,7 @@ function ProfileTabBody({
               setField('primaryClubId', id);
             }}
             onVisibilityChange={(v) => setField('homeClubVisibility', v)}
+            pendingName={homeClubStatus.state === 'pending' ? homeClubStatus.pendingName : null}
           />
           {!form.homeClubName && (
             <Nudge icon={<Flag size={12} strokeWidth={2.25} />}>

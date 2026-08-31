@@ -13,6 +13,12 @@ interface RequestCourseCTAProps {
    */
   tone?: 'light' | 'dark';
   className?: string;
+  /**
+   * Marks the request as a HOME CLUB request for the signed-in member
+   * (BRIEF_HOME_CLUB_PICKER §3.3) — resolving it later connects them
+   * automatically. Ordinary course requests leave this off.
+   */
+  homeClub?: boolean;
   /** Called immediately before the sheet opens — use to close the parent overlay/sheet. */
   onBeforeOpen?: () => void;
 }
@@ -39,18 +45,21 @@ export function RequestCourseCTA({
   className = '',
   onBeforeOpen,
   tone = 'light',
+  homeClub = false,
 }: RequestCourseCTAProps) {
   const dark = tone === 'dark';
   const { t } = useTranslation('courses');
   const handleOpen = () => {
     onBeforeOpen?.();
     // Defer a tick so any parent close animations can start cleanly first
-    setTimeout(() => openRequestCourseSheet(prefillName), 0);
+    setTimeout(() => openRequestCourseSheet(prefillName, { homeClub }), 0);
   };
 
   if (variant === 'hero') {
     const q = (prefillName ?? '').trim();
-    const headline = q ? t('request.hero.headlineWithQuery', { query: truncate(q) }) : t('request.hero.headline');
+    const headline = homeClub
+      ? (q ? t('request.hero.clubHeadlineWithQuery', { query: truncate(q) }) : t('request.hero.clubHeadline'))
+      : (q ? t('request.hero.headlineWithQuery', { query: truncate(q) }) : t('request.hero.headline'));
     return (
       <div
         className={`mx-auto w-full overflow-hidden rounded-2xl ${className}`}
@@ -101,7 +110,7 @@ export function RequestCourseCTA({
               marginTop: 6,
             }}
           >
-            {t('request.hero.body')}
+            {t(homeClub ? 'request.hero.clubBody' : 'request.hero.body')}
           </p>
         </div>
 
@@ -117,7 +126,7 @@ export function RequestCourseCTA({
             <div className="flex items-center gap-2.5">
               <Bell size={17} color={dark ? A.AMBER : HERO_ACCENT} strokeWidth={2.25} />
               <span className={`text-[13px] ${dark ? '' : 'text-muted-foreground'}`} style={dark ? { color: A.MUTE } : undefined}>
-                {t('request.hero.perkNotify')}
+                {t(homeClub ? 'request.hero.clubPerkNotify' : 'request.hero.perkNotify')}
               </span>
             </div>
           </div>
@@ -135,7 +144,7 @@ export function RequestCourseCTA({
             }}
           >
             <Plus size={18} color="#fff" strokeWidth={2.5} />
-            {t('request.hero.cta')}
+            {t(homeClub ? 'request.hero.clubCta' : 'request.hero.cta')}
           </button>
         </div>
       </div>

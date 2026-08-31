@@ -48,6 +48,9 @@ serve(async (req) => {
     const location = (body?.location ?? "").toString().trim();
     const country = (body?.country ?? "").toString().trim() || null;
     const note = (body?.note ?? "").toString().trim() || null;
+    // BRIEF_HOME_CLUB_PICKER §3.3 — a home-club request records WHO asked, so
+    // resolving it can connect them (and everyone else who asked) automatically.
+    const isHomeClub = body?.home_club === true;
 
     if (!course_name) return json({ ok: false, error: "Missing course_name" }, 400);
     if (!location) return json({ ok: false, error: "Missing location" }, 400);
@@ -55,28 +58,67 @@ serve(async (req) => {
       return json({ ok: false, error: "Input too long" }, 400);
     }
 
-    const { data: dupes } = await supabaseAdmin
-      .from("course_requests")
-      .select("id")
-      .eq("status", "pending")
-      .ilike("course_name", course_name)
-      .limit(1);
-    if (dupes && dupes.length > 0) {
-      return json(
-        { ok: true, duplicate: true, message: "That course has already been requested — we're on it." },
-        200,
-      );
+    if (isHomeClub) {
+      // Dedupe PER MEMBER, not per club: several members may (and should) be
+      // able to request the same missing club so resolving it connects them all.
+      const { data: mine } = await supabaseAdmin
+        .from("course_requests")
+        .select("id")
+        .eq("status", "pending")
+        .eq("home_club_for_user_id", user.id)
+        .limit(1);
+      if (mine && mine.length > 0) {
+        return json(
+          { ok: true, duplicate: true, message: "You've already asked us for a club — we'll connect you as soon as it's added." },
+          200,
+        );
+      }
+    } else {
+      const { data: dupes } = await supabaseAdmin
+        .from("course_requests")
+        .select("id")
+        .eq("status", "pending")
+        .ilike("course_name", course_name)
+        .limit(1);
+      if (dupes && dupes.length > 0) {
+        return json(
+          { ok: true, duplicate: true, message: "That course has already been requested — we're on it." },
+          200,
+        );
+      }
     }
 
     const { data: inserted, error: insErr } = await supabaseAdmin
       .from("course_requests")
-      .insert({ requested_by: user.id, course_name, location, country, note })
+      .insert({
+        requested_by: user.id,
+        course_name,
+        location,
+        country,
+        note,
+        home_club_for_user_id: isHomeClub ? user.id : null,
+      })
       .select("id, created_at")
       .single();
 
     if (insErr) {
       console.error("course_requests insert failed:", insErr.message);
       return json({ ok: false, error: "Could not save request" }, 500);
+    }
+
+    if (isHomeClub) {
+      // §3.5 — show the member their own answer as a PENDING placeholder.
+      // It is never a real club: no id is written and nothing joins to it.
+      const key = course_name.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const { error: pendErr } = await supabaseAdmin
+        .from("user_profiles")
+        .update({
+          home_club_pending_name: course_name,
+          home_club_pending_key: key || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", user.id);
+      if (pendErr) console.error("pending home club write failed:", pendErr.message);
     }
 
     let requesterName = "A user";
@@ -92,7 +134,9 @@ serve(async (req) => {
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (resendApiKey) {
-      const subject = `New course request: ${course_name}`;
+      const subject = isHomeClub
+        ? `Home club request: ${course_name}`
+        : `New course request: ${course_name}`;
       const text =
         `New course request on Clbhouz\n\n` +
         `Course: ${course_name}\n` +

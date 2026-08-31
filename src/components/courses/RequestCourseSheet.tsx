@@ -5,17 +5,21 @@ import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { TITLE } from '@/lib/tokens/type';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface RequestCourseSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   prefillName?: string;
+  /** Records the request as a home-club request for the signed-in member. */
+  homeClub?: boolean;
   zIndexBase?: number;
 }
 
 type Status = 'form' | 'submitting' | 'success';
 
-export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase = 10300 }: RequestCourseSheetProps) {
+export function RequestCourseSheet({ open, onOpenChange, prefillName, homeClub = false, zIndexBase = 10300 }: RequestCourseSheetProps) {
+  const queryClient = useQueryClient();
   const { t } = useTranslation('courses');
   const [status, setStatus] = useState<Status>('form');
   const [name, setName] = useState('');
@@ -48,12 +52,19 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, zIndexBase
           course_name: name.trim(),
           location: location.trim(),
           note: note.trim() || undefined,
+          home_club: homeClub || undefined,
         },
       });
       if (invokeError) throw invokeError;
       if (data?.ok) {
         if (data.duplicate && data.message) {
           setSuccessMessage(data.message);
+        }
+        if (homeClub) {
+          // The member's typed name is now their PENDING club — refresh the
+          // surfaces that read it so it shows immediately.
+          queryClient.invalidateQueries({ queryKey: ['home-club-status'] });
+          queryClient.invalidateQueries({ queryKey: ['user-profile'] });
         }
         setStatus('success');
       } else {

@@ -86,6 +86,8 @@ import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
+import { HomeClubPrompt } from '@/features/home-club/HomeClubPrompt';
+import { openHomeClubPicker } from '@/features/home-club/homeClubPickerStore';
 import { GolfJourneyProgress } from '@/components/profile/phase6';
 import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRail';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
@@ -119,12 +121,19 @@ const ClubsSectionWrapper: React.FC<{
   return (
     // Reduced mb: mb-6 → mb-4 (16px from clubs to tabs)
     <section className="px-4 mb-4">
+      {/* §2.2/§3.5 — owner-only home club prompt / pending treatment. */}
+      {isSelf && (
+        <div className="mb-3">
+          <HomeClubPrompt userId={profileId} />
+        </div>
+      )}
       <ClubsCard
         homeClub={homeClub}
         secondaryClubs={secondaryClubs}
         isOwner={isSelf}
         isPrivate={isPrivate}
         onEditClick={() => navigate(editRoute)}
+        onSetHomeClub={() => openHomeClubPicker()}
       />
     </section>
   );
