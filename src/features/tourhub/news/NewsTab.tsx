@@ -83,16 +83,15 @@ export function LeadStory({ story, onOpen, compact = false, engagement }: { stor
           }}
         />
         <div style={{ position: 'absolute', top: compact ? 14 : 'calc(env(safe-area-inset-top, 0px) + 68px)', left: sidePadding, right: sidePadding }}>
-          <KickerLine kicker={story.kicker} at={story.published_at} compact={compact} />
+          <KickerLine
+            kicker={story.kicker}
+            at={story.published_at}
+            compact={compact}
+            trailing={<StoryRowEngagement engagement={engagement} tone="glass" />}
+          />
         </div>
         <div style={{ position: 'absolute', bottom: bandPadding, left: sidePadding, right: sidePadding }}>
           <StoryImageHeadline compact={compact}>{story.headline}</StoryImageHeadline>
-          {/* Bottom-left of the photo band, beneath the headline, on glass:
-              white-72 is what ReactionAction's own glass tone uses on
-              photography (BRIEF_STORY_ENGAGEMENT §S4). Read-only. */}
-          <div style={{ marginTop: 6 }}>
-            <StoryRowEngagement engagement={engagement} tone="glass" />
-          </div>
         </div>
       </div>
       {story.standfirst && (
