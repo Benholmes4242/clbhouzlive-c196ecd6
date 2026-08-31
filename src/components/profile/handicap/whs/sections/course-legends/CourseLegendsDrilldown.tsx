@@ -492,59 +492,16 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
 
 
-          {visibleCategories.map((cat, i) => {
-            const entry = groupedWithTotals.get(cat);
-            const banded = i % 2 === 1;
-            if (!entry || entry.rows.length === 0) {
-              return (
-                <div key={cat} data-category={cat}>
-                  <ChampionsUnclaimedCard
-                    category={cat}
-                    categoryLabel={legendCategoryLabel[cat]}
-                    categoryIcon={legendCategoryIcon[cat]}
-                    banded={banded}
-                    theme={theme}
-                  />
-                </div>
-              );
-            }
-            const champion = entry.rows[0];
-            const sectionRows = entry.rows.map((r) => ({
-              rank: r.rank,
-              name: r.isSelf ? 'You' : r.name,
-              photoUrl: r.photoUrl,
-              valueDisplay: r.valueDisplay,
-              value: r.value,
-              isSelf: r.isSelf,
-              gapToChampion: r.rank === champion.rank ? null : formatGapFromChampion(cat, r.value, champion.value),
-              userId: r.userId,
-              rank30d: r.rank30d,
-              delta: r.delta,
-            }));
-            return (
-              <div key={cat} data-category={cat}>
-                <ChampionsDuelCard
-                  category={cat}
-                  categoryLabel={legendCategoryLabel[cat]}
-                  categoryIcon={legendCategoryIcon[cat]}
-                  rows={sectionRows}
-                  yourRank={yourRanks[cat] ?? null}
-                  holdDuration={`Held ${formatHeldDuration(champion.attained_at)}`}
-                  totalCount={entry.total}
-                  unitLabel={UNITS[cat] || SHORT_LABELS[cat]}
-                  onFullLeaderboardTap={() => setFullLeaderboardCategory(cat)}
-                  proBenchmark={
-                    proBenchmarkPick && cat === `${proBenchmarkPick.base}_all_time`
-                      ? proBenchmarkPick
-                      : null
-                  }
-                  theme={theme}
-                  banded={banded}
-                />
-              </div>
-            );
+          {/* BRIEF_CHAMPIONS_BOARD — one category as a full ranked board, with
+              a pill picker above it that keeps the other records visible. */}
+          <ChampionsBoard
+            categories={sheetCategoryDescriptors}
+            grouped={groupedWithTotals}
+            window={window}
+            coursePar={meta?.course_par ?? null}
+            onOpenFull={(cat) => setFullLeaderboardCategory(cat)}
+          />
 
-          })}
 
         </>
       )}
