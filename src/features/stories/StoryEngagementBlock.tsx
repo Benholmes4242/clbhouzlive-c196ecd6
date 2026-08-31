@@ -1,0 +1,148 @@
+/**
+ * StoryEngagementBlock (BRIEF_STORY_ENGAGEMENT §S3).
+ *
+ * The engagement row and comment section at the foot of a story, on BOTH beats:
+ * the heart with its count, the comment glyph with its count, a hairline, then
+ * the comment section. Rendered below the article and above MORE FROM THE WIRE /
+ * MORE AMATEUR NEWS.
+ *
+ * NOTHING HERE IS NEW MACHINERY. Likes are public.content_reactions through
+ * useContentReactions + ReactionAction; comments are public.comments_v2 through
+ * CommentsSheetV2, which already takes `targetType` as a prop. The only new
+ * thing in the stack is two target-type values.
+ *
+ * THE SECTION IS ALWAYS PRESENT FOR A MEMBER, INCLUDING AT ZERO — deliberately
+ * overriding the app's usual hide-at-zero rule, because a member must be able to
+ * see that a story is open for discussion before anyone has discussed it. It
+ * never renders "0 comments".
+ *
+ * A GUEST sees the article and the like count, and no comments at all: reading
+ * comments is members-only. The heart is not tappable and no comment count is
+ * shown, because the count would describe something they cannot see.
+ */
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
+import useContentReactions from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
+import {
+  FONT,
+  HAIRLINE_INK_10,
+  INK,
+  INK_MUTE,
+} from '@/features/tourhub/_shared/tokens';
+
+import { useStoryEngagement, type StoryTargetType } from './useStoryEngagement';
+
+/** The route the download gate's join prompt already uses. */
+const JOIN_ROUTE = '/join';
+
+interface Props {
+  targetType: StoryTargetType;
+  storyId: string;
+}
+
+export function StoryEngagementBlock({ targetType, storyId }: Props) {
+  const { t } = useTranslation('common');
+  const { user } = useSupabaseSession();
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const targets = useMemo(
+    () => [{ type: targetType, id: storyId }] as const,
+    [targetType, storyId],
+  );
+  // content_reactions is canonical for the like, and this hook already carries
+  // the optimistic patch and the cross-window reconcile.
+  const { stateFor, toggle, unavailable, viewerId } = useContentReactions(targets);
+  const like = stateFor(targetType, storyId);
+
+  // The comment count is READ LIVE — stories carry no counter column.
+  const { engagementFor } = useStoryEngagement(targetType, [storyId]);
+  const commentCount = engagementFor(storyId).commentCount;
+
+  const signedIn = !!viewerId;
+
+  return (
+    <div style={{ marginTop: 26, fontFamily: FONT }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 18,
+          padding: '0 14px 12px',
+        }}
+      >
+        <ReactionAction
+          count={like.count}
+          reacted={like.mine}
+          onToggle={() => toggle(targetType, storyId)}
+          label={
+            like.mine
+              ? t('story.unlikeAria', 'Unlike this story')
+              : t('story.likeAria', 'Like this story')
+          }
+          // A guest sees the honest count with no tappable glyph.
+          readOnly={!signedIn}
+          hidden={unavailable}
+        />
+        {signedIn && (
+          <CommentAction
+            count={commentCount}
+            onOpen={() => setSheetOpen(true)}
+            label={t('story.commentsAria', 'Comments')}
+          />
+        )}
+      </div>
+
+      <div style={{ borderTop: `1px solid ${HAIRLINE_INK_10}` }} />
+
+      {signedIn ? (
+        <button
+          type="button"
+          onClick={() => setSheetOpen(true)}
+          className="active:opacity-80"
+          style={{
+            display: 'block',
+            width: '100%',
+            textAlign: 'left',
+            background: 'none',
+            border: 'none',
+            padding: '14px',
+            cursor: 'pointer',
+            fontFamily: FONT,
+            fontSize: 13,
+            lineHeight: 1.45,
+            color: commentCount > 0 ? INK : INK_MUTE,
+          }}
+        >
+          {commentCount === 0
+            ? t('story.commentsEmpty', 'No comments yet. Start the discussion.')
+            : commentCount === 1
+              ? t('story.viewComment', 'View 1 comment')
+              : t('story.viewComments', 'View all {{count}} comments', { count: commentCount })}
+        </button>
+      ) : (
+        <div style={{ padding: '14px', fontSize: 13, lineHeight: 1.45, color: INK_MUTE }}>
+          <Link to={JOIN_ROUTE} style={{ color: INK, textDecoration: 'underline' }}>
+            {t('story.guestPrompt', 'Join clbhouz to see the discussion')}
+          </Link>
+        </div>
+      )}
+
+      {signedIn && (
+        <CommentsSheetV2
+          isOpen={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          targetType={targetType}
+          targetId={storyId}
+        />
+      )}
+    </div>
+  );
+}
+
+export default StoryEngagementBlock;
