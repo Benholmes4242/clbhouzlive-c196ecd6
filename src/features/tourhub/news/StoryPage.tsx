@@ -109,7 +109,6 @@ function LiveTournamentCard({ tournamentId }: { tournamentId: string }) {
  * WIRE) belongs to the page, not the article.
  */
 export function StoryArticle({ story }: { story: TourStory }) {
-  const { t } = useTranslation('tourhub');
   return (
     <>
       {story.image_url && (
@@ -169,8 +168,6 @@ export function StoryArticle({ story }: { story: TourStory }) {
 
         {story.tournament_id && <LiveTournamentCard tournamentId={story.tournament_id} />}
       </div>
-      {/* t is read so the article owns its own translation scope */}
-      <span hidden>{t('news.masthead', 'THE WIRE')}</span>
     </>
   );
 }

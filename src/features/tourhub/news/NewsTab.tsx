@@ -60,7 +60,7 @@ function KickerLine({ kicker, at }: { kicker: string | null; at: string | null }
   );
 }
 
-function LeadStory({ story, onOpen }: { story: TourStory; onOpen: () => void }) {
+export function LeadStory({ story, onOpen }: { story: TourStory; onOpen: () => void }) {
   return (
     <button
       type="button"
