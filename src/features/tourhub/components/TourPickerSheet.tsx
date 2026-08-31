@@ -303,7 +303,9 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
             )}
           </button>
         )}
-        {Object.entries(TOUR_LABEL).flatMap(([slug, label]) => {
+        {TOUR_ROW_SLUGS.flatMap((slug) => {
+          const label = TOUR_LABEL[slug];
+
           const tourSlides = slidesByTour[slug] ?? [];
           const seasonDone = seasonCompleteByTour[slug];
 
