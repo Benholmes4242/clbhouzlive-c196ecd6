@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { TourStory } from './useTourStories';
 import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './StoryImageText';
-import { FONT, INK_MUTE, INK_SOFT } from '../_shared/tokens';
-import { FEED_DATE_INK, SLAB } from '@/components/feed/feedSurfaces';
+import { AMBER, FONT, INK_MUTE, INK_SOFT } from '../_shared/tokens';
+import { SLAB } from '@/components/feed/feedSurfaces';
 
 export function WireFeedSlide({ story }: { story: TourStory }) {
   const { t } = useTranslation('tourhub');
