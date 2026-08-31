@@ -65,14 +65,14 @@ export function AmateurNewsSection() {
         linkLabel={t('amateurNews.allStories', 'ALL STORIES')}
         onLinkClick={() => navigate('/discover/news')}
       >
-        {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} compact />}
+        {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} compact engagement={engagementFor(lead.id)} />}
         <div style={{ marginTop: lead ? 8 : 0 }}>
           {rows.map((s, i) => (
             <div
               key={s.id}
               style={{ borderTop: i === 0 && !lead ? 'none' : `1px solid ${HAIRLINE_INK_10}` }}
             >
-              <StoryRow story={s} onOpen={() => open(s.slug)} compact />
+              <StoryRow story={s} onOpen={() => open(s.slug)} compact engagement={engagementFor(s.id)} />
             </div>
           ))}
         </div>
