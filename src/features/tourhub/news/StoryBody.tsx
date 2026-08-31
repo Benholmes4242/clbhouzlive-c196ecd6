@@ -344,8 +344,322 @@ function PlayerBlock({ playerId }: { playerId: string }) {
   );
 }
 
+/* ------------------------------------------------------------------ *
+ * The two stat blocks
+ * ------------------------------------------------------------------ */
+
+/** A figure and its label. `value` null means the figure is OMITTED entirely. */
+interface Figure { label: string; value: string | null }
+
+/**
+ * The figure rail both stat blocks share: three per row, hairline gutters, no
+ * placeholders. A null figure is dropped BEFORE layout, so four figures lay out
+ * as four and never as four and a dash (S1.5).
+ */
+function FigureGrid({ figures }: { figures: Figure[] }) {
+  const shown = figures.filter((f) => f.value !== null);
+  if (shown.length === 0) return null;
+  return (
+    <div
+      style={{
+        marginTop: 12,
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+        gap: '12px 8px',
+      }}
+    >
+      {shown.map((f) => (
+        <div key={f.label} style={{ minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 8,
+              fontWeight: 700,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: INK_FAINT,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {f.label}
+          </div>
+          <div
+            style={{
+              marginTop: 3,
+              fontSize: 17,
+              fontWeight: 700,
+              color: INK,
+              lineHeight: 1.1,
+              fontVariantNumeric: 'tabular-nums',
+              fontFeatureSettings: '"kern" 1, "liga" 1',
+            }}
+          >
+            {f.value}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Header row shared by both blocks: avatar, name, flag, kicker and a subline. */
+function StatHeader({
+  player,
+  kicker,
+  subline,
+}: {
+  player: any;
+  kicker: string;
+  subline: string | null;
+}) {
+  const name = player.full_name || [player.first_name, player.last_name].filter(Boolean).join(' ') || '';
+  const primaryTour = player.tour_codes?.[0]?.toLowerCase() ?? null;
+  const candidates = resolvePlayerAvatarCandidates({
+    name,
+    photoUrl: player.photo_url ?? null,
+    tourSlug: primaryTour,
+  });
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <SquircleAvatar size={40} srcCandidates={candidates} alt={name} userId={player.id} hairlineRing />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: INK_FAINT }}>
+          {kicker}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, minWidth: 0 }}>
+          <span
+            style={{
+              fontSize: 14.5, fontWeight: 700, color: INK, lineHeight: 1.25,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}
+          >
+            {name}
+          </span>
+          <CountryFlag country={player.country ?? player.country_code ?? null} size="sm" />
+        </div>
+        {subline && (
+          <div style={{ marginTop: 2, fontSize: 11, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
+            {subline}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const CARD: React.CSSProperties = {
+  margin: '18px 0 20px',
+  padding: '14px 12px',
+  background: EMBED_BG,
+  border: `1px solid ${HAIRLINE_INK_10}`,
+  borderRadius: 14,
+  fontFamily: FONT,
+};
+
+const num = (v: unknown): number | null => {
+  const n = typeof v === 'string' ? Number(v) : (v as number);
+  return typeof n === 'number' && Number.isFinite(n) ? n : null;
+};
+const dec = (v: unknown, places: number): string | null => {
+  const n = num(v);
+  return n === null ? null : n.toFixed(places);
+};
+const pct = (v: unknown): string | null => {
+  const n = num(v);
+  return n === null ? null : `${n.toFixed(1)}%`;
+};
+/** Strokes gained is signed and uses a TRUE minus, never a hyphen. */
+const signed = (v: unknown, places: number): string | null => {
+  const n = num(v);
+  if (n === null) return null;
+  if (n === 0) return (0).toFixed(places);
+  return n > 0 ? `+${n.toFixed(places)}` : `\u2212${Math.abs(n).toFixed(places)}`;
+};
+
+/**
+ * [stat:...] — a player's SEASON card, read live from sr_player_statistics.
+ *
+ * A player can hold a row per season, so the LATEST season wins. Nothing is
+ * frozen at parse time: only the player id is stored (S3.6).
+ */
+function StatBlock({ playerId }: { playerId: string }) {
+  const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
+  const { data } = useQuery({
+    queryKey: ['tour-stories', 'stat-embed', playerId],
+    staleTime: 10 * 60_000,
+    enabled: !!playerId,
+    queryFn: async () => {
+      const { data: p } = await supabase
+        .from('sr_players')
+        .select('id, full_name, first_name, last_name, country, country_code, photo_url, tour_codes')
+        .eq('id', playerId)
+        .maybeSingle();
+      if (!p) return null;
+
+      const { data: rows } = await supabase
+        .from('sr_player_statistics')
+        .select(
+          'season_id, scoring_average, driving_distance, driving_accuracy, greens_in_reg, strokes_gained_putting, fedex_rank',
+        )
+        .eq('player_id', playerId);
+      const stats = (rows ?? []) as any[];
+      if (stats.length === 0) return null;
+
+      // Pick the newest season. sr_player_statistics carries no year of its own.
+      let stat = stats[0];
+      if (stats.length > 1) {
+        const ids = stats.map((r) => r.season_id).filter(Boolean);
+        const { data: seasons } = await supabase.from('sr_seasons').select('id, year').in('id', ids);
+        const yearOf = new Map((seasons ?? []).map((s: any) => [s.id, s.year ?? 0]));
+        stat = stats.reduce((best, r) =>
+          (yearOf.get(r.season_id) ?? 0) > (yearOf.get(best.season_id) ?? 0) ? r : best,
+        );
+      }
+
+      // Newest snapshot, not the best one the player ever held.
+      const { data: r } = await supabase
+        .from('sr_world_rankings')
+        .select('rank, ranking_date')
+        .eq('player_id', playerId)
+        .order('ranking_date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      return { player: p as any, stat, worldRank: (r as any)?.rank ?? null };
+    },
+  });
+
+  if (!data?.stat) return null;
+  const { player, stat } = data;
+
+  const fedex = num(stat.fedex_rank);
+  const world = num(data.worldRank);
+  const subline =
+    fedex && fedex > 0
+      ? t('news.fedexRank', { defaultValue: 'FedExCup No. {{n}}', n: fedex })
+      : world && world > 0
+        ? t('news.worldRank', { defaultValue: 'World No. {{n}}', n: world })
+        : null;
+
+  const figures: Figure[] = [
+    { label: t('news.fig.scoringAvg', 'SCORING AVG'), value: dec(stat.scoring_average, 2) },
+    { label: t('news.fig.drivingDist', 'DRIVING DIST'), value: dec(stat.driving_distance, 1) },
+    { label: t('news.fig.drivingAcc', 'DRIVING ACC'), value: pct(stat.driving_accuracy) },
+    { label: t('news.fig.greensInReg', 'GREENS IN REG'), value: pct(stat.greens_in_reg) },
+    { label: t('news.fig.sgPutting', 'SG PUTTING'), value: signed(stat.strokes_gained_putting, 2) },
+  ];
+
+  return (
+    <button
+      type="button"
+      onClick={() => navigate(`/tourhub/player/${player.id}`)}
+      className="active:scale-[0.99]"
+      style={{ ...CARD, display: 'block', width: '100%', textAlign: 'left', cursor: 'pointer' }}
+    >
+      <StatHeader player={player} kicker={t('news.season', 'THE SEASON')} subline={subline} />
+      <FigureGrid figures={figures} />
+    </button>
+  );
+}
+
+/**
+ * [round:...] — what a player did at ONE tournament, read live from
+ * sr_scorecards.
+ *
+ * THE HOLE-1 QUIRK, and it is not a bug: sr_scorecards holds one row per hole,
+ * but the ROUND-level summary counts — birdies, pars, bogeys, eagles,
+ * round_strokes, round_score — are written ONLY on the hole_number = 1 row of
+ * each round. Holes 2-18 carry nulls in those columns. Reading every hole row
+ * and summing would therefore return the same totals with 18x the payload;
+ * reading hole 7 would return nothing at all and look like missing data. So the
+ * query filters hole_number = 1 and each returned row IS one round.
+ */
+function RoundBlock({ playerId, tournamentId }: { playerId: string; tournamentId: string }) {
+  const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
+  const { data } = useQuery({
+    queryKey: ['tour-stories', 'round-embed', playerId, tournamentId],
+    staleTime: 2 * 60_000,
+    enabled: !!playerId && !!tournamentId,
+    queryFn: async () => {
+      const { data: p } = await supabase
+        .from('sr_players')
+        .select('id, full_name, first_name, last_name, country, country_code, photo_url, tour_codes')
+        .eq('id', playerId)
+        .maybeSingle();
+      if (!p) return null;
+
+      // hole_number = 1 ONLY — see the block comment above.
+      const { data: rows } = await supabase
+        .from('sr_scorecards')
+        .select('round_number, birdies, eagles, pars, bogeys, round_strokes, round_score')
+        .eq('player_id', playerId)
+        .eq('tournament_id', tournamentId)
+        .eq('hole_number', 1)
+        .order('round_number', { ascending: true });
+      const rounds = (rows ?? []) as any[];
+      if (rounds.length === 0) return null;
+
+      const { data: meta } = await supabase
+        .from('sr_tournaments')
+        .select('name')
+        .eq('id', tournamentId)
+        .maybeSingle();
+
+      const sum = (key: string) =>
+        rounds.reduce<number | null>((acc, r) => {
+          const n = num(r[key]);
+          return n === null ? acc : (acc ?? 0) + n;
+        }, null);
+
+      const strokes = rounds.map((r) => num(r.round_strokes)).filter((n): n is number => n !== null);
+
+      return {
+        player: p as any,
+        tournamentName: (meta as any)?.name ?? null,
+        birdies: sum('birdies'),
+        eagles: sum('eagles'),
+        pars: sum('pars'),
+        bogeys: sum('bogeys'),
+        roundCount: rounds.length,
+        bestRound: strokes.length > 0 ? Math.min(...strokes) : null,
+      };
+    },
+  });
+
+  if (!data) return null;
+
+  const figures: Figure[] = [
+    { label: t('news.fig.birdies', 'BIRDIES'), value: data.birdies === null ? null : String(data.birdies) },
+    { label: t('news.fig.eagles', 'EAGLES'), value: data.eagles === null ? null : String(data.eagles) },
+    { label: t('news.fig.rounds', 'ROUNDS'), value: String(data.roundCount) },
+    { label: t('news.fig.bestRound', 'BEST ROUND'), value: data.bestRound === null ? null : String(data.bestRound) },
+    { label: t('news.fig.pars', 'PARS'), value: data.pars === null ? null : String(data.pars) },
+    { label: t('news.fig.bogeys', 'BOGEYS'), value: data.bogeys === null ? null : String(data.bogeys) },
+  ];
+
+  return (
+    <button
+      type="button"
+      onClick={() => navigate(`/tourhub/tournament/${tournamentId}`)}
+      className="active:scale-[0.99]"
+      style={{ ...CARD, display: 'block', width: '100%', textAlign: 'left', cursor: 'pointer' }}
+    >
+      <StatHeader
+        player={data.player}
+        kicker={t('news.theWeek', 'THE WEEK')}
+        subline={data.tournamentName}
+      />
+      <FigureGrid figures={figures} />
+    </button>
+  );
+}
+
 export function StoryBody({ blocks }: { blocks: StoryBlock[] }) {
   return (
+
     <div style={{ fontFamily: FONT }}>
       {blocks.map((b, i) => {
         switch (b.type) {
@@ -361,6 +675,11 @@ export function StoryBody({ blocks }: { blocks: StoryBlock[] }) {
             return <LeaderboardBlock key={i} tournamentId={b.tournament_id} />;
           case 'player':
             return <PlayerBlock key={i} playerId={b.player_id} />;
+          case 'stat':
+            return <StatBlock key={i} playerId={b.player_id} />;
+          case 'round':
+            return <RoundBlock key={i} playerId={b.player_id} tournamentId={b.tournament_id} />;
+
           default:
             return null;
         }

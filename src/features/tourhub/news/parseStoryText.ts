@@ -22,6 +22,9 @@
  *   [leaderboard:<uuid>]          a different tournament
  *   [player:Full Name]            resolved to a uuid at parse time
  *   [player:<uuid>]               still works
+ *   [stat:Full Name]              season statistics card
+ *   [round:Full Name]             that player's week at the STORY'S tournament
+
  *
  * MARKERS ARE WRITTEN BY NAME, NOT BY UUID. Ben writes elsewhere, in a tool
  * with no database, so requiring ids would mean hand-copying uuids three times
@@ -35,8 +38,9 @@ const IMAGE_RE = /^!\[([^\]]*)\]\(([^)\s]+)\s*\)$/;
 const HEADING_RE = /^#{1,3}\s+(.*)$/;
 const QUOTE_RE = /^>\s*(.*)$/;
 /** The argument is OPTIONAL — `[leaderboard]` is the primary form. */
-const EMBED_RE = /^\[(leaderboard|player)(?::\s*([^\]]*))?\]$/i;
+const EMBED_RE = /^\[(leaderboard|player|stat|round)(?::\s*([^\]]*))?\]$/i;
 export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 
 /**
  * Attribution separator. Accepts an em dash, an en dash or a hyphen after the
@@ -45,11 +49,22 @@ export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f
  */
 const ATTRIB_SPLIT = /\s*\|\s*[—–-]?\s*/;
 
+/** The three marker kinds written by NAME and resolved to a uuid at parse time. */
+export type PendingKind = 'player' | 'stat' | 'round';
+
 export interface PendingPlayer {
   /** Index into `blocks` of the placeholder awaiting a uuid. */
   blockIndex: number;
   /** The name exactly as written, so problems can be reported verbatim. */
   name: string;
+  /**
+   * Which block shape is waiting. `stat` additionally requires a statistics
+   * row and `round` a scorecard at the story's tournament, so the resolver has
+   * to know which check to run.
+   */
+  kind: PendingKind;
+  /** For `round` only: the story's tournament the appearance is checked against. */
+  tournamentId?: string;
 }
 
 export interface ParseResult {
@@ -71,9 +86,22 @@ export interface ParseResult {
   pendingPlayers: PendingPlayer[];
 }
 
+/**
+ * The block a pending marker occupies until the resolver fills in its uuid. It
+ * is written with an EMPTY player_id on purpose: parseStoryBlocks drops a block
+ * with no id, so an unresolved marker that somehow reaches storage renders
+ * nothing rather than a broken card.
+ */
+function placeholder(kind: PendingKind, tournamentId: string): StoryBlock {
+  if (kind === 'stat') return { type: 'stat', player_id: '' };
+  if (kind === 'round') return { type: 'round', player_id: '', tournament_id: tournamentId };
+  return { type: 'player', player_id: '' };
+}
+
 const emptyCounts = (): Record<StoryBlock['type'], number> => ({
-  paragraph: 0, heading: 0, image: 0, quote: 0, leaderboard: 0, player: 0,
+  paragraph: 0, heading: 0, image: 0, quote: 0, leaderboard: 0, player: 0, stat: 0, round: 0,
 });
+
 
 /**
  * Anything bracket- or bang-shaped that MEANT to be a marker and missed. Kept
@@ -136,8 +164,9 @@ export function parseStoryText(source: string, ctx: ParseContext = {}): ParseRes
 
     const embed = EMBED_RE.exec(line);
     if (embed) {
+      const kind = embed[1].toLowerCase() as 'leaderboard' | PendingKind;
       const arg = (embed[2] ?? '').trim();
-      if (embed[1].toLowerCase() === 'leaderboard') {
+      if (kind === 'leaderboard') {
         // Bare `[leaderboard]` means THIS story's tournament; an explicit uuid
         // overrides it for the rare cross-tournament embed.
         const id = arg || storyTournamentId;
@@ -146,21 +175,42 @@ export function parseStoryText(source: string, ctx: ParseContext = {}): ParseRes
           flush();
           unresolved.push('leaderboard block has no tournament — pick one above');
         }
+      } else if (kind === 'round' && !storyTournamentId) {
+        // A tournament week with no tournament is not a block. Same rule as a
+        // bare `[leaderboard]` with nothing selected.
+        flush();
+        unresolved.push(`round block "${arg || '?'}" has no tournament — pick one above`);
       } else if (!arg) {
         flush();
-        unresolved.push('player block has no name');
+        unresolved.push(`${kind} block has no name`);
       } else if (UUID_RE.test(arg)) {
-        push({ type: 'player', player_id: arg });
+        // A uuid still needs its data checked (a statistics row, an appearance),
+        // so it joins the pending list exactly as a name does.
+        flush();
+        pendingPlayers.push({
+          blockIndex: blocks.length,
+          name: arg,
+          kind,
+          tournamentId: kind === 'round' ? storyTournamentId : undefined,
+        });
+        blocks.push(placeholder(kind, storyTournamentId));
+        counts[kind] += 1;
       } else {
         // A NAME. It gets a placeholder block whose id is filled in by the
         // resolver; if the name does not resolve, the block is dropped.
         flush();
-        pendingPlayers.push({ blockIndex: blocks.length, name: arg });
-        blocks.push({ type: 'player', player_id: '' });
-        counts.player += 1;
+        pendingPlayers.push({
+          blockIndex: blocks.length,
+          name: arg,
+          kind,
+          tournamentId: kind === 'round' ? storyTournamentId : undefined,
+        });
+        blocks.push(placeholder(kind, storyTournamentId));
+        counts[kind] += 1;
       }
       continue;
     }
+
 
     const quote = QUOTE_RE.exec(line);
     if (quote && quote[1].trim()) {
@@ -202,6 +252,9 @@ export function blocksToText(blocks: StoryBlock[]): string {
         case 'quote': return `> ${b.text}${b.attribution ? ` |\u2014 ${b.attribution}` : ''}`;
         case 'leaderboard': return `[leaderboard:${b.tournament_id}]`;
         case 'player': return `[player:${b.player_id}]`;
+        case 'stat': return `[stat:${b.player_id}]`;
+        case 'round': return `[round:${b.player_id}]`;
+
         default: return '';
       }
     })
