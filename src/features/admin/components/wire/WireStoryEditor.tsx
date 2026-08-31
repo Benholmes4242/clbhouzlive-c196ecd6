@@ -258,6 +258,27 @@ export default function WireStoryEditor({
         )}
       </div>
 
+      {/* S1.2 — the loud state. Text that has never been parsed is a story with
+          no article in it, and the admin has to say so where the author cannot
+          miss it, not as a "0" further down the page. */}
+      {unparsed && (
+        <div style={{
+          padding: '11px 13px', borderRadius: t.radius.lg,
+          background: t.dangerSoft, color: t.dangerText,
+          border: `1px solid ${t.dangerText}44`,
+          fontSize: 13, fontWeight: 700, lineHeight: 1.45,
+        }}>
+          THIS STORY HAS TEXT BUT NO BODY — IT HAS NEVER BEEN PARSED.
+          <div style={{ marginTop: 4, fontSize: 12, fontWeight: 500 }}>
+            {state === 'published'
+              ? 'It is live right now and readers see a headline with no article. Press Parse, then Save.'
+              : 'Press Parse to turn the pasted text into blocks, then Save. It cannot be published until you do.'}
+          </div>
+        </div>
+      )}
+
+
+
       <div className="wire-editor-grid">
         {/* ── Left: the work ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
