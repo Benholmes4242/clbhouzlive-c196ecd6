@@ -115,7 +115,11 @@ export function StoryRow({ story, onOpen, compact = false, engagement }: { story
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
-        <KickerLine kicker={story.kicker} at={story.published_at} />
+        <KickerLine
+          kicker={story.kicker}
+          at={story.published_at}
+          trailing={<StoryRowEngagement engagement={engagement} inkColor={INK_FAINT} />}
+        />
         <div style={{ marginTop: 5, fontSize: compact ? 13.5 : 14.5, fontWeight: 700, lineHeight: 1.25, letterSpacing: '-0.01em', color: INK }}>
           {story.headline}
         </div>
@@ -124,12 +128,6 @@ export function StoryRow({ story, onOpen, compact = false, engagement }: { story
             {story.standfirst}
           </div>
         )}
-        {/* THE META LINE, beneath the headline in the same faint ink as the
-            time above it. It renders on the COMPACT variant too, where the
-            standfirst is suppressed. */}
-        <div style={{ marginTop: 6 }}>
-          <StoryRowEngagement engagement={engagement} inkColor={INK_FAINT} />
-        </div>
       </div>
       {story.image_url && (
         <img
