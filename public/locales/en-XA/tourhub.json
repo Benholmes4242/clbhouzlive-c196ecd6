@@ -1,71 +1,72 @@
 {
   "status": {
-    "live": "[~~ĻÍṼÉ~~]",
-    "upcoming": "[~~ÚƤĈŐṀÍÑĜ~~]",
-    "final": "[~~ƑÍÑÁĻ~~]",
-    "results": "[~~ŘÉŠÚĻŢŠ~~]",
-    "noEvent": "[~~ÑŐ ÉṼÉÑŢ~~]"
+    "live": "[~~\u013b\u00cd\u1e7c\u00c9~~]",
+    "upcoming": "[~~\u00da\u01a4\u0108\u0150\u1e40\u00cd\u00d1\u011c~~]",
+    "final": "[~~\u0191\u00cd\u00d1\u00c1\u013b~~]",
+    "results": "[~~\u0158\u00c9\u0160\u00da\u013b\u0162\u0160~~]",
+    "noEvent": "[~~\u00d1\u0150 \u00c9\u1e7c\u00c9\u00d1\u0162~~]"
   },
   "pill": {
-    "updated": "[~~Úƥđáţéđ {{time}}~~]",
-    "tourEyebrow": "[~~Ţőúř~~]",
-    "majorEyebrow": "[~~Ṁáĵőř~~]"
+    "updated": "[~~\u00da\u01a5\u0111\u00e1\u0163\u00e9\u0111 {{time}}~~]",
+    "tourEyebrow": "[~~\u0162\u0151\u00fa\u0159~~]",
+    "majorEyebrow": "[~~\u1e40\u00e1\u0135\u0151\u0159~~]"
   },
   "picker": {
-    "eyebrow": "[~~ŠŴÍŢĈĤ ŢŐÚŘ~~]",
-    "title": "[~~Šéļéĉţ ţőúř~~]",
-    "noEventsThisWeek": "[~~Ñő éṽéñţš ţĥíš ŵééǩ~~]",
-    "openMenuAria": "[~~Őƥéñ ɱéñú~~]",
-    "switchTourAria": "[~~Šŵíţĉĥ ţőúř~~]",
-    "switchTourCurrentAria": "[~~Šŵíţĉĥ ţőúř — ĉúřřéñţ {{label}}~~]"
+    "eyebrow": "[~~\u0160\u0174\u00cd\u0162\u0108\u0124 \u0162\u0150\u00da\u0158~~]",
+    "title": "[~~\u0160\u00e9\u013c\u00e9\u0109\u0163 \u0163\u0151\u00fa\u0159~~]",
+    "noEventsThisWeek": "[~~\u00d1\u0151 \u00e9\u1e7d\u00e9\u00f1\u0163\u0161 \u0163\u0125\u00ed\u0161 \u0175\u00e9\u00e9\u01e9~~]",
+    "openMenuAria": "[~~\u0150\u01a5\u00e9\u00f1 \u0271\u00e9\u00f1\u00fa~~]",
+    "switchTourAria": "[~~\u0160\u0175\u00ed\u0163\u0109\u0125 \u0163\u0151\u00fa\u0159~~]",
+    "switchTourCurrentAria": "[~~\u0160\u0175\u00ed\u0163\u0109\u0125 \u0163\u0151\u00fa\u0159 \u2014 \u0109\u00fa\u0159\u0159\u00e9\u00f1\u0163 {{label}}~~]"
   },
   "nav": {
     "group": {
-      "tour": "[~~Ţőúř~~]",
-      "account": "[~~Áĉĉőúñţ~~]"
+      "tour": "[~~\u0162\u0151\u00fa\u0159~~]",
+      "account": "[~~\u00c1\u0109\u0109\u0151\u00fa\u00f1\u0163~~]"
     },
-    "overview": "[~~Őṽéřṽíéŵ~~]",
-    "leaderboards": "[~~Ļéáđéřƀőářđš~~]",
-    "schedule": "[~~Šĉĥéđúļé~~]",
-    "players": "[~~Ƥļáýéřš~~]",
-    "leaders": "[~~Ļéáđéřš~~]",
-    "college": "[~~Ĉőļļéĝé~~]",
-    "settings": "[~~Šéţţíñĝš~~]",
-    "profile": "[~~Ƥřőƒíļé~~]",
-    "signOut": "[~~Šíĝñ őúţ~~]"
+    "overview": "[~~\u0150\u1e7d\u00e9\u0159\u1e7d\u00ed\u00e9\u0175~~]",
+    "leaderboards": "[~~\u013b\u00e9\u00e1\u0111\u00e9\u0159\u0180\u0151\u00e1\u0159\u0111\u0161~~]",
+    "schedule": "[~~\u0160\u0109\u0125\u00e9\u0111\u00fa\u013c\u00e9~~]",
+    "players": "[~~\u01a4\u013c\u00e1\u00fd\u00e9\u0159\u0161~~]",
+    "leaders": "[~~\u013b\u00e9\u00e1\u0111\u00e9\u0159\u0161~~]",
+    "college": "[~~\u0108\u0151\u013c\u013c\u00e9\u011d\u00e9~~]",
+    "settings": "[~~\u0160\u00e9\u0163\u0163\u00ed\u00f1\u011d\u0161~~]",
+    "profile": "[~~\u01a4\u0159\u0151\u0192\u00ed\u013c\u00e9~~]",
+    "signOut": "[~~\u0160\u00ed\u011d\u00f1 \u0151\u00fa\u0163~~]",
+    "news": "News"
   },
   "section": {
-    "retryAria": "[~~Řéţřý ļőáđíñĝ {{section}}~~]"
+    "retryAria": "[~~\u0158\u00e9\u0163\u0159\u00fd \u013c\u0151\u00e1\u0111\u00ed\u00f1\u011d {{section}}~~]"
   },
   "schedule": {
     "eyebrow": {
-      "season": "[~~ŢĤÉ ŠÉÁŠŐÑ~~]"
+      "season": "[~~\u0162\u0124\u00c9 \u0160\u00c9\u00c1\u0160\u0150\u00d1~~]"
     },
     "progress": {
-      "eventOf": "[~~ÉṼÉÑŢ {{current}} ŐƑ {{total}}~~]"
+      "eventOf": "[~~\u00c9\u1e7c\u00c9\u00d1\u0162 {{current}} \u0150\u0191 {{total}}~~]"
     },
     "error": {
-      "title": "[~~Ĉőúļđñ'ţ ļőáđ ţĥé šĉĥéđúļé~~]",
-      "body": "[~~Šőɱéţĥíñĝ ŵéñţ ŵřőñĝ. Ƥļéášé ţřý áĝáíñ.~~]"
+      "title": "[~~\u0108\u0151\u00fa\u013c\u0111\u00f1'\u0163 \u013c\u0151\u00e1\u0111 \u0163\u0125\u00e9 \u0161\u0109\u0125\u00e9\u0111\u00fa\u013c\u00e9~~]",
+      "body": "[~~\u0160\u0151\u0271\u00e9\u0163\u0125\u00ed\u00f1\u011d \u0175\u00e9\u00f1\u0163 \u0175\u0159\u0151\u00f1\u011d. \u01a4\u013c\u00e9\u00e1\u0161\u00e9 \u0163\u0159\u00fd \u00e1\u011d\u00e1\u00ed\u00f1.~~]"
     },
     "floating": {
-      "thisWeek": "[~~Ţĥíš ŵééǩ~~]",
-      "today": "[ⓉⓄⒹⒶⓎ]"
+      "thisWeek": "[~~\u0162\u0125\u00ed\u0161 \u0175\u00e9\u00e9\u01e9~~]",
+      "today": "[\u24c9\u24c4\u24b9\u24b6\u24ce]"
     },
     "badge": {
-      "major": "[~~ṀÁĴŐŘ~~]",
-      "playoffs": "[~~ƤĻÁÝŐƑƑŠ~~]",
-      "champion": "[~~ĈĤÁṀƤÍŐÑ~~]"
+      "major": "[~~\u1e40\u00c1\u0134\u0150\u0158~~]",
+      "playoffs": "[~~\u01a4\u013b\u00c1\u00dd\u0150\u0191\u0191\u0160~~]",
+      "champion": "[~~\u0108\u0124\u00c1\u1e40\u01a4\u00cd\u0150\u00d1~~]"
     },
     "rail": {
-      "daysUnit_one": "[~~ĐÁÝ~~]",
-      "daysUnit_other": "[~~ĐÁÝŠ~~]"
+      "daysUnit_one": "[~~\u0110\u00c1\u00dd~~]",
+      "daysUnit_other": "[~~\u0110\u00c1\u00dd\u0160~~]"
     },
     "leader": {
-      "suffix": "[~~ļéáđš~~]"
+      "suffix": "[~~\u013c\u00e9\u00e1\u0111\u0161~~]"
     },
     "champion": {
-      "defendsSuffix": "[~~{{name}} đéƒéñđš~~]"
+      "defendsSuffix": "[~~{{name}} \u0111\u00e9\u0192\u00e9\u00f1\u0111\u0161~~]"
     },
     "row": {
       "countdownIn": "[~~IN {{n}}D~~]"
@@ -73,155 +74,155 @@
   },
   "overview": {
     "connectHandicap": {
-      "title": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ~~]",
-      "description": "[~~Šýñĉ ŴĤŠ áñđ šéé ŵĥéřé ýőú šţáñđ.~~]",
-      "cta": "[~~Ĉőññéĉţ~~]"
+      "title": "[~~\u0108\u0151\u00f1\u00f1\u00e9\u0109\u0163 \u00fd\u0151\u00fa\u0159 \u0125\u00e1\u00f1\u0111\u00ed\u0109\u00e1\u01a5~~]",
+      "description": "[~~\u0160\u00fd\u00f1\u0109 \u0174\u0124\u0160 \u00e1\u00f1\u0111 \u0161\u00e9\u00e9 \u0175\u0125\u00e9\u0159\u00e9 \u00fd\u0151\u00fa \u0161\u0163\u00e1\u00f1\u0111.~~]",
+      "cta": "[~~\u0108\u0151\u00f1\u00f1\u00e9\u0109\u0163~~]"
     },
     "cancelled": {
-      "eyebrow": "[~~Ñő Řéšúļţ~~]",
-      "reasonDefault": "[~~Ţĥíš éṽéñţ đíđ ñőţ ĉőɱƥļéţé éñőúĝĥ řőúñđš ƒőř áñ őƒƒíĉíáļ řéšúļţ.~~]"
+      "eyebrow": "[~~\u00d1\u0151 \u0158\u00e9\u0161\u00fa\u013c\u0163~~]",
+      "reasonDefault": "[~~\u0162\u0125\u00ed\u0161 \u00e9\u1e7d\u00e9\u00f1\u0163 \u0111\u00ed\u0111 \u00f1\u0151\u0163 \u0109\u0151\u0271\u01a5\u013c\u00e9\u0163\u00e9 \u00e9\u00f1\u0151\u00fa\u011d\u0125 \u0159\u0151\u00fa\u00f1\u0111\u0161 \u0192\u0151\u0159 \u00e1\u00f1 \u0151\u0192\u0192\u00ed\u0109\u00ed\u00e1\u013c \u0159\u00e9\u0161\u00fa\u013c\u0163.~~]"
     },
     "ticker": {
-      "top10Label": "[~~ŢŐƤ 10~~]",
-      "alsoOutLabel": "[ĀĻŠŐ ŌŨŢ]",
+      "top10Label": "[~~\u0162\u0150\u01a4 10~~]",
+      "alsoOutLabel": "[\u0100\u013b\u0160\u0150 \u014c\u0168\u0162]",
       "fullLeaderboard": "[Full leaderboard]"
     },
     "fieldStrength": {
-      "eyebrow": "[~~ƑÍÉĻĐ~~]",
-      "playersCount": "[~~{{count}} ƥļáýéřš~~]",
-      "topRankedLine": "[~~{{topRanked}} őƒ ŵőřļđ ţőƥ {{threshold}}~~]",
-      "inFieldLabel": "[~~ÍÑ ƑÍÉĻĐ~~]"
+      "eyebrow": "[~~\u0191\u00cd\u00c9\u013b\u0110~~]",
+      "playersCount": "[~~{{count}} \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161~~]",
+      "topRankedLine": "[~~{{topRanked}} \u0151\u0192 \u0175\u0151\u0159\u013c\u0111 \u0163\u0151\u01a5 {{threshold}}~~]",
+      "inFieldLabel": "[~~\u00cd\u00d1 \u0191\u00cd\u00c9\u013b\u0110~~]"
     },
     "champion": {
-      "scoreLabelToPar": "[~~ŢŐ ƤÁŘ~~]",
-      "eyebrow": "[~~ĈĤÁṀƤÍŐÑ~~]",
-      "eyebrowPlayoff": "[~~ĈĤÁṀƤÍŐÑ · ƤĻÁÝŐƑƑ~~]",
-      "resultPending": "[~~Řéšúļţ ƥéñđíñĝ~~]"
+      "scoreLabelToPar": "[~~\u0162\u0150 \u01a4\u00c1\u0158~~]",
+      "eyebrow": "[~~\u0108\u0124\u00c1\u1e40\u01a4\u00cd\u0150\u00d1~~]",
+      "eyebrowPlayoff": "[~~\u0108\u0124\u00c1\u1e40\u01a4\u00cd\u0150\u00d1 \u00b7 \u01a4\u013b\u00c1\u00dd\u0150\u0191\u0191~~]",
+      "resultPending": "[~~\u0158\u00e9\u0161\u00fa\u013c\u0163 \u01a5\u00e9\u00f1\u0111\u00ed\u00f1\u011d~~]"
     },
     "cancelledStrip": {
-      "eyebrow": "[~~ĈÁÑĈÉĻĻÉĐ~~]"
+      "eyebrow": "[~~\u0108\u00c1\u00d1\u0108\u00c9\u013b\u013b\u00c9\u0110~~]"
     },
     "playoff": {
-      "eyebrow": "[~~ÁŴÁÍŢÍÑĜ ƤĻÁÝŐƑƑ~~]",
-      "tiedAtTop": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]"
+      "eyebrow": "[~~\u00c1\u0174\u00c1\u00cd\u0162\u00cd\u00d1\u011c \u01a4\u013b\u00c1\u00dd\u0150\u0191\u0191~~]",
+      "tiedAtTop": "[~~{{count}} \u0163\u00ed\u00e9\u0111 \u00e1\u0163 \u0163\u0125\u00e9 \u0163\u0151\u01a5~~]"
     },
     "middleBand": {
-      "cancelledDefault": "[~~Ñő ƥļáý — ţőúřñáɱéñţ ĉáñĉéļļéđ.~~]"
+      "cancelledDefault": "[~~\u00d1\u0151 \u01a5\u013c\u00e1\u00fd \u2014 \u0163\u0151\u00fa\u0159\u00f1\u00e1\u0271\u00e9\u00f1\u0163 \u0109\u00e1\u00f1\u0109\u00e9\u013c\u013c\u00e9\u0111.~~]"
     },
     "upcoming": {
-      "defendingEyebrow": "[~~ĐÉƑÉÑĐÍÑĜ~~]",
-      "previewTitle": "[~~Ţőúřñáɱéñţ Ƥřéṽíéŵ~~]",
-      "previewEyebrow": "[~~ƤŘÉṼÍÉŴ~~]"
+      "defendingEyebrow": "[~~\u0110\u00c9\u0191\u00c9\u00d1\u0110\u00cd\u00d1\u011c~~]",
+      "previewTitle": "[~~\u0162\u0151\u00fa\u0159\u00f1\u00e1\u0271\u00e9\u00f1\u0163 \u01a4\u0159\u00e9\u1e7d\u00ed\u00e9\u0175~~]",
+      "previewEyebrow": "[~~\u01a4\u0158\u00c9\u1e7c\u00cd\u00c9\u0174~~]"
     },
     "rankings": {
-      "sectionEyebrow": "[~~Ŵőřļđ řáñǩíñĝš~~]",
-      "linkLabel": "[~~Ƒúļļ řáñǩíñĝš~~]",
-      "worldNo1Label": "[~~Ŵőřļđ Ñő. 1~~]",
-      "pointsLabel": "[~~ƤŐÍÑŢŠ~~]",
+      "sectionEyebrow": "[~~\u0174\u0151\u0159\u013c\u0111 \u0159\u00e1\u00f1\u01e9\u00ed\u00f1\u011d\u0161~~]",
+      "linkLabel": "[~~\u0191\u00fa\u013c\u013c \u0159\u00e1\u00f1\u01e9\u00ed\u00f1\u011d\u0161~~]",
+      "worldNo1Label": "[~~\u0174\u0151\u0159\u013c\u0111 \u00d1\u0151. 1~~]",
+      "pointsLabel": "[~~\u01a4\u0150\u00cd\u00d1\u0162\u0160~~]",
       "boards": {
-        "owgr": "[~~Őƒƒíĉíáļ Ŵőřļđ Ĝőļƒ Řáñǩíñĝ~~]",
-        "r2d": "[~~Řáĉé ţő Đúƀáí~~]",
-        "rolex": "[~~Řőļéẋ Řáñǩíñĝš~~]"
+        "owgr": "[~~\u0150\u0192\u0192\u00ed\u0109\u00ed\u00e1\u013c \u0174\u0151\u0159\u013c\u0111 \u011c\u0151\u013c\u0192 \u0158\u00e1\u00f1\u01e9\u00ed\u00f1\u011d~~]",
+        "r2d": "[~~\u0158\u00e1\u0109\u00e9 \u0163\u0151 \u0110\u00fa\u0180\u00e1\u00ed~~]",
+        "rolex": "[~~\u0158\u0151\u013c\u00e9\u1e8b \u0158\u00e1\u00f1\u01e9\u00ed\u00f1\u011d\u0161~~]"
       },
       "seasonNo1Label": "[~~Season No. 1~~]"
     },
     "teamWinnerStrip": {
-      "eyebrow": "[~~ŢÉÁṀ ŴÍÑÑÉŘ~~]",
-      "labelVsPar": "[~~ṼŠ ƤÁŘ~~]",
-      "labelStrokes": "[~~ŠŢŘŐǨÉŠ~~]"
+      "eyebrow": "[~~\u0162\u00c9\u00c1\u1e40 \u0174\u00cd\u00d1\u00d1\u00c9\u0158~~]",
+      "labelVsPar": "[~~\u1e7c\u0160 \u01a4\u00c1\u0158~~]",
+      "labelStrokes": "[~~\u0160\u0162\u0158\u0150\u01e8\u00c9\u0160~~]"
     },
     "leaderRow": {
-      "tiedAtRank_one": "[~~{{count}} ţíéđ áţ {{rank}}~~]",
-      "tiedAtRank_other": "[~~{{count}} ţíéđ áţ {{rank}}~~]",
-      "tiedAtRankAria_one": "[~~{{count}} ƥļáýéř ţíéđ áţ {{rank}} ŵíţĥ šĉőřé {{score}}, áṽéřáĝé ţřáĵéĉţőřý~~]",
-      "tiedAtRankAria_other": "[~~{{count}} ƥļáýéřš ţíéđ áţ {{rank}} ŵíţĥ šĉőřé {{score}}, áṽéřáĝé ţřáĵéĉţőřý~~]",
-      "tiedAtTop_one": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]",
-      "tiedAtTop_other": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]",
-      "tiedAtTopAria_one": "[~~{{count}} ƥļáýéř ţíéđ áţ ţĥé ţőƥ ŵíţĥ šĉőřé {{score}}~~]",
-      "tiedAtTopAria_other": "[~~{{count}} ƥļáýéřš ţíéđ áţ ţĥé ţőƥ ŵíţĥ šĉőřé {{score}}~~]",
-      "playoffMarker": "[~~* ƤĻÁÝŐƑƑ~~]",
-      "championIconLabel": "[~~Ĉĥáɱƥíőñ~~]"
+      "tiedAtRank_one": "[~~{{count}} \u0163\u00ed\u00e9\u0111 \u00e1\u0163 {{rank}}~~]",
+      "tiedAtRank_other": "[~~{{count}} \u0163\u00ed\u00e9\u0111 \u00e1\u0163 {{rank}}~~]",
+      "tiedAtRankAria_one": "[~~{{count}} \u01a5\u013c\u00e1\u00fd\u00e9\u0159 \u0163\u00ed\u00e9\u0111 \u00e1\u0163 {{rank}} \u0175\u00ed\u0163\u0125 \u0161\u0109\u0151\u0159\u00e9 {{score}}, \u00e1\u1e7d\u00e9\u0159\u00e1\u011d\u00e9 \u0163\u0159\u00e1\u0135\u00e9\u0109\u0163\u0151\u0159\u00fd~~]",
+      "tiedAtRankAria_other": "[~~{{count}} \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161 \u0163\u00ed\u00e9\u0111 \u00e1\u0163 {{rank}} \u0175\u00ed\u0163\u0125 \u0161\u0109\u0151\u0159\u00e9 {{score}}, \u00e1\u1e7d\u00e9\u0159\u00e1\u011d\u00e9 \u0163\u0159\u00e1\u0135\u00e9\u0109\u0163\u0151\u0159\u00fd~~]",
+      "tiedAtTop_one": "[~~{{count}} \u0163\u00ed\u00e9\u0111 \u00e1\u0163 \u0163\u0125\u00e9 \u0163\u0151\u01a5~~]",
+      "tiedAtTop_other": "[~~{{count}} \u0163\u00ed\u00e9\u0111 \u00e1\u0163 \u0163\u0125\u00e9 \u0163\u0151\u01a5~~]",
+      "tiedAtTopAria_one": "[~~{{count}} \u01a5\u013c\u00e1\u00fd\u00e9\u0159 \u0163\u00ed\u00e9\u0111 \u00e1\u0163 \u0163\u0125\u00e9 \u0163\u0151\u01a5 \u0175\u00ed\u0163\u0125 \u0161\u0109\u0151\u0159\u00e9 {{score}}~~]",
+      "tiedAtTopAria_other": "[~~{{count}} \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161 \u0163\u00ed\u00e9\u0111 \u00e1\u0163 \u0163\u0125\u00e9 \u0163\u0151\u01a5 \u0175\u00ed\u0163\u0125 \u0161\u0109\u0151\u0159\u00e9 {{score}}~~]",
+      "playoffMarker": "[~~* \u01a4\u013b\u00c1\u00dd\u0150\u0191\u0191~~]",
+      "championIconLabel": "[~~\u0108\u0125\u00e1\u0271\u01a5\u00ed\u0151\u00f1~~]"
     },
     "photoBand": {
       "insightKickerCourse": "COURSE INTELLIGENCE",
       "insightKickerResult": "HOW IT FINISHED",
-      "wonBy": "[~~Ŵőñ ƀý {{winnerName}}~~]"
+      "wonBy": "[~~\u0174\u0151\u00f1 \u0180\u00fd {{winnerName}}~~]"
     },
     "trajectorySparkline": {
-      "ariaLabel": "[~~Ţřáĵéĉţőřý: řőúñđš {{rounds}}~~]",
-      "ariaLabelRoundOf": "[~~Ţřáĵéĉţőřý: řőúñđš {{rounds}} (řőúñđ {{current}} őƒ {{total}})~~]"
+      "ariaLabel": "[~~\u0162\u0159\u00e1\u0135\u00e9\u0109\u0163\u0151\u0159\u00fd: \u0159\u0151\u00fa\u00f1\u0111\u0161 {{rounds}}~~]",
+      "ariaLabelRoundOf": "[~~\u0162\u0159\u00e1\u0135\u00e9\u0109\u0163\u0151\u0159\u00fd: \u0159\u0151\u00fa\u00f1\u0111\u0161 {{rounds}} (\u0159\u0151\u00fa\u00f1\u0111 {{current}} \u0151\u0192 {{total}})~~]"
     },
     "statWatch": {
-      "eyebrow": "[~~Šţáţ ŵáţĉĥ~~]",
-      "allStatsLink": "[~~Áļļ šţáţš~~]",
-      "seasonLeaders": "[~~Šéášőñ ļéáđéřš · {{tourLabel}}~~]"
+      "eyebrow": "[~~\u0160\u0163\u00e1\u0163 \u0175\u00e1\u0163\u0109\u0125~~]",
+      "allStatsLink": "[~~\u00c1\u013c\u013c \u0161\u0163\u00e1\u0163\u0161~~]",
+      "seasonLeaders": "[~~\u0160\u00e9\u00e1\u0161\u0151\u00f1 \u013c\u00e9\u00e1\u0111\u00e9\u0159\u0161 \u00b7 {{tourLabel}}~~]"
     },
     "sectionTourLens": {
-      "allTours": "[~~Áļļ Ţőúřš~~]",
-      "filterAriaLabel": "[~~Ƒíļţéř šéĉţíőñ ƀý ţőúř~~]"
+      "allTours": "[~~\u00c1\u013c\u013c \u0162\u0151\u00fa\u0159\u0161~~]",
+      "filterAriaLabel": "[~~\u0191\u00ed\u013c\u0163\u00e9\u0159 \u0161\u00e9\u0109\u0163\u00ed\u0151\u00f1 \u0180\u00fd \u0163\u0151\u00fa\u0159~~]"
     },
     "page": {
-      "offlineBanner": "[~~Ýőú'řé őƒƒļíñé. Šőɱé đáţá ɱáý ƀé őúţđáţéđ.~~]"
+      "offlineBanner": "[~~\u00dd\u0151\u00fa'\u0159\u00e9 \u0151\u0192\u0192\u013c\u00ed\u00f1\u00e9. \u0160\u0151\u0271\u00e9 \u0111\u00e1\u0163\u00e1 \u0271\u00e1\u00fd \u0180\u00e9 \u0151\u00fa\u0163\u0111\u00e1\u0163\u00e9\u0111.~~]"
     },
     "hero": {
-      "prevAria": "[~~Ƥřéṽíőúš ţőúřñáɱéñţ~~]",
-      "nextAria": "[~~Ñéẋţ ţőúřñáɱéñţ~~]",
+      "prevAria": "[~~\u01a4\u0159\u00e9\u1e7d\u00ed\u0151\u00fa\u0161 \u0163\u0151\u00fa\u0159\u00f1\u00e1\u0271\u00e9\u00f1\u0163~~]",
+      "nextAria": "[~~\u00d1\u00e9\u1e8b\u0163 \u0163\u0151\u00fa\u0159\u00f1\u00e1\u0271\u00e9\u00f1\u0163~~]",
       "counter": "[~~{{current}} / {{total}}~~]"
     },
     "leaderboardBand": {
-      "ctaLive": "[~~ŐƤÉÑ ĻÍṼÉ ĻÉÁĐÉŘƁŐÁŘĐ~~]",
-      "ctaCancelled": "[~~ṼÍÉŴ ŢŐÚŘ ŠĈĤÉĐÚĻÉ~~]",
-      "ctaAwaitingPlayoff": "[~~ṼÍÉŴ ĻÍṼÉ ƤĻÁÝŐƑƑ~~]",
-      "ctaResults": "[~~ṼÍÉŴ ƑÚĻĻ ŘÉŠÚĻŢŠ~~]",
-      "ctaImminent": "[~~ṼÍÉŴ ÁĻĻ ŢÉÉ ŢÍṀÉŠ~~]",
-      "ctaUpcoming": "[~~ṼÍÉŴ ŢŐÚŘÑÁṀÉÑŢ~~]",
-      "inauguralPlaceholder": "[~~ÍÑÁÚĜÚŘÁĻ ÉṼÉÑŢ · ÑŐ ƤŘÍŐŘ ŘÉŠÚĻŢŠ~~]",
-      "previewUnavailable": "[~~Ţőúřñáɱéñţ ƥřéṽíéŵ ñőţ áṽáíļáƀļé.~~]",
-      "fieldEyebrow": "[~~Ƒíéļđ~~]",
-      "playersSuffix_one": "[~~ ƥļáýéř~~]",
-      "playersSuffix_other": "[~~ ƥļáýéřš~~]"
+      "ctaLive": "[~~\u0150\u01a4\u00c9\u00d1 \u013b\u00cd\u1e7c\u00c9 \u013b\u00c9\u00c1\u0110\u00c9\u0158\u0181\u0150\u00c1\u0158\u0110~~]",
+      "ctaCancelled": "[~~\u1e7c\u00cd\u00c9\u0174 \u0162\u0150\u00da\u0158 \u0160\u0108\u0124\u00c9\u0110\u00da\u013b\u00c9~~]",
+      "ctaAwaitingPlayoff": "[~~\u1e7c\u00cd\u00c9\u0174 \u013b\u00cd\u1e7c\u00c9 \u01a4\u013b\u00c1\u00dd\u0150\u0191\u0191~~]",
+      "ctaResults": "[~~\u1e7c\u00cd\u00c9\u0174 \u0191\u00da\u013b\u013b \u0158\u00c9\u0160\u00da\u013b\u0162\u0160~~]",
+      "ctaImminent": "[~~\u1e7c\u00cd\u00c9\u0174 \u00c1\u013b\u013b \u0162\u00c9\u00c9 \u0162\u00cd\u1e40\u00c9\u0160~~]",
+      "ctaUpcoming": "[~~\u1e7c\u00cd\u00c9\u0174 \u0162\u0150\u00da\u0158\u00d1\u00c1\u1e40\u00c9\u00d1\u0162~~]",
+      "inauguralPlaceholder": "[~~\u00cd\u00d1\u00c1\u00da\u011c\u00da\u0158\u00c1\u013b \u00c9\u1e7c\u00c9\u00d1\u0162 \u00b7 \u00d1\u0150 \u01a4\u0158\u00cd\u0150\u0158 \u0158\u00c9\u0160\u00da\u013b\u0162\u0160~~]",
+      "previewUnavailable": "[~~\u0162\u0151\u00fa\u0159\u00f1\u00e1\u0271\u00e9\u00f1\u0163 \u01a5\u0159\u00e9\u1e7d\u00ed\u00e9\u0175 \u00f1\u0151\u0163 \u00e1\u1e7d\u00e1\u00ed\u013c\u00e1\u0180\u013c\u00e9.~~]",
+      "fieldEyebrow": "[~~\u0191\u00ed\u00e9\u013c\u0111~~]",
+      "playersSuffix_one": "[~~ \u01a5\u013c\u00e1\u00fd\u00e9\u0159~~]",
+      "playersSuffix_other": "[~~ \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161~~]"
     },
     "courseStats": {
-      "eyebrow": "[~~ĈŐÚŘŠÉ~~]",
-      "parLabel": "[~~ƤÁŘ~~]",
-      "recordLabel": "[~~Řéĉőřđ: {{value}}~~]",
-      "recordLabelWithHolder": "[~~Řéĉőřđ: {{value}} · {{holder}}~~]",
-      "fallbackSummary": "[~~Ĉőúřšé ƥřéṽíéŵ~~]"
+      "eyebrow": "[~~\u0108\u0150\u00da\u0158\u0160\u00c9~~]",
+      "parLabel": "[~~\u01a4\u00c1\u0158~~]",
+      "recordLabel": "[~~\u0158\u00e9\u0109\u0151\u0159\u0111: {{value}}~~]",
+      "recordLabelWithHolder": "[~~\u0158\u00e9\u0109\u0151\u0159\u0111: {{value}} \u00b7 {{holder}}~~]",
+      "fallbackSummary": "[~~\u0108\u0151\u00fa\u0159\u0161\u00e9 \u01a5\u0159\u00e9\u1e7d\u00ed\u00e9\u0175~~]"
     },
     "comingUp": {
-      "eyebrow": "[~~Ŵĥáţ'š ĉőɱíñĝ úƥ~~]",
-      "linkLabel": "[~~Ƒúļļ šĉĥéđúļé~~]",
-      "chipPlayoffs": "[~~Ƥļáýőƒƒš~~]",
-      "daysLabel": "[~~ĐÁÝŠ~~]",
-      "venueDefendsSep": "[~~ · {{name}} đéƒéñđš~~]",
-      "subline": "[~~Ţĥé ţőúŕ šçĥéðúļé~~]"
+      "eyebrow": "[~~\u0174\u0125\u00e1\u0163'\u0161 \u0109\u0151\u0271\u00ed\u00f1\u011d \u00fa\u01a5~~]",
+      "linkLabel": "[~~\u0191\u00fa\u013c\u013c \u0161\u0109\u0125\u00e9\u0111\u00fa\u013c\u00e9~~]",
+      "chipPlayoffs": "[~~\u01a4\u013c\u00e1\u00fd\u0151\u0192\u0192\u0161~~]",
+      "daysLabel": "[~~\u0110\u00c1\u00dd\u0160~~]",
+      "venueDefendsSep": "[~~ \u00b7 {{name}} \u0111\u00e9\u0192\u00e9\u00f1\u0111\u0161~~]",
+      "subline": "[~~\u0162\u0125\u00e9 \u0163\u0151\u00fa\u0155 \u0161\u00e7\u0125\u00e9\u00f0\u00fa\u013c\u00e9~~]"
     },
     "onTheCourse": {
-      "eyebrow": "[~~Őñ ţĥé ĉőúřšé~~]",
-      "rightMeta_one": "[~~{{count}} ĝřőúƥ~~]",
-      "rightMeta_other": "[~~{{count}} ĝřőúƥš~~]",
-      "rightMetaWithRound_one": "[~~{{count}} ĝřőúƥ · Ř{{round}}~~]",
-      "rightMetaWithRound_other": "[~~{{count}} ĝřőúƥš · Ř{{round}}~~]",
-      "roundOnly": "[~~Ř{{round}}~~]",
-      "teeLabel": "[~~ŢÉÉ {{time}}~~]",
-      "thruLabel": "[~~ŢĤŘÚ {{value}}~~]",
-      "holeLabel": "[~~ĤŐĻÉ {{hole}}~~]",
-      "featuredBadge": "[~~★ ƑÉÁŢÚŘÉĐ~~]",
-      "allGroups": "[~~Áļļ ĝřőúƥš~~]",
-      "fullField": "[~~ƒúļļ ƒíéļđ~~]",
-      "moreCount": "[~~{{count}} ɱőřé~~]",
-      "fullFieldDivider": "[~~ƑÚĻĻ ƑÍÉĻĐ~~]",
-      "backLine1": "[~~Ɓáĉǩ ţő~~]",
-      "backLine2": "[~~ƒéáţúřéđ~~]",
-      "showAllAria": "[~~Šĥőŵ áļļ ĝřőúƥš~~]",
-      "backAria": "[~~Ɓáĉǩ ţő ƒéáţúřéđ~~]",
-      "rightMetaWithRound": "[~~{{count}} gróúpš · R{{round}}~~]",
+      "eyebrow": "[~~\u0150\u00f1 \u0163\u0125\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9~~]",
+      "rightMeta_one": "[~~{{count}} \u011d\u0159\u0151\u00fa\u01a5~~]",
+      "rightMeta_other": "[~~{{count}} \u011d\u0159\u0151\u00fa\u01a5\u0161~~]",
+      "rightMetaWithRound_one": "[~~{{count}} \u011d\u0159\u0151\u00fa\u01a5 \u00b7 \u0158{{round}}~~]",
+      "rightMetaWithRound_other": "[~~{{count}} \u011d\u0159\u0151\u00fa\u01a5\u0161 \u00b7 \u0158{{round}}~~]",
+      "roundOnly": "[~~\u0158{{round}}~~]",
+      "teeLabel": "[~~\u0162\u00c9\u00c9 {{time}}~~]",
+      "thruLabel": "[~~\u0162\u0124\u0158\u00da {{value}}~~]",
+      "holeLabel": "[~~\u0124\u0150\u013b\u00c9 {{hole}}~~]",
+      "featuredBadge": "[~~\u2605 \u0191\u00c9\u00c1\u0162\u00da\u0158\u00c9\u0110~~]",
+      "allGroups": "[~~\u00c1\u013c\u013c \u011d\u0159\u0151\u00fa\u01a5\u0161~~]",
+      "fullField": "[~~\u0192\u00fa\u013c\u013c \u0192\u00ed\u00e9\u013c\u0111~~]",
+      "moreCount": "[~~{{count}} \u0271\u0151\u0159\u00e9~~]",
+      "fullFieldDivider": "[~~\u0191\u00da\u013b\u013b \u0191\u00cd\u00c9\u013b\u0110~~]",
+      "backLine1": "[~~\u0181\u00e1\u0109\u01e9 \u0163\u0151~~]",
+      "backLine2": "[~~\u0192\u00e9\u00e1\u0163\u00fa\u0159\u00e9\u0111~~]",
+      "showAllAria": "[~~\u0160\u0125\u0151\u0175 \u00e1\u013c\u013c \u011d\u0159\u0151\u00fa\u01a5\u0161~~]",
+      "backAria": "[~~\u0181\u00e1\u0109\u01e9 \u0163\u0151 \u0192\u00e9\u00e1\u0163\u00fa\u0159\u00e9\u0111~~]",
+      "rightMetaWithRound": "[~~{{count}} gr\u00f3\u00fap\u0161 \u00b7 R{{round}}~~]",
       "roundShort": "[~~R{{round}}~~]",
-      "teeTimeLabel": "[~~TÉÉ {{time}}~~]",
-      "holeLabelSep": "[~~ · HÓLÉ {{hole}}~~]",
-      "backToFeaturedAria": "[~~Báçk tó féátúréd~~]",
-      "backToLine1": "[~~Báçk tó~~]",
-      "backToLine2": "[~~féátúréd~~]",
+      "teeTimeLabel": "[~~T\u00c9\u00c9 {{time}}~~]",
+      "holeLabelSep": "[~~ \u00b7 H\u00d3L\u00c9 {{hole}}~~]",
+      "backToFeaturedAria": "[~~B\u00e1\u00e7k t\u00f3 f\u00e9\u00e1t\u00far\u00e9d~~]",
+      "backToLine1": "[~~B\u00e1\u00e7k t\u00f3~~]",
+      "backToLine2": "[~~f\u00e9\u00e1t\u00far\u00e9d~~]",
       "fieldAverageToday": "Field average today",
       "fromNRoundsIn": "from {{n}} rounds",
       "lowRoundLabel": "Low round",
@@ -237,350 +238,350 @@
       "underParTodaySub": "players in",
       "axisEasier": "[Easier]",
       "axisHarder": "[Harder]",
-      "finishedLabel": "[Fïnïshéd]",
-      "todaySuffix": "[{{value}} tódáý]",
+      "finishedLabel": "[F\u00efn\u00efsh\u00e9d]",
+      "todaySuffix": "[{{value}} t\u00f3d\u00e1\u00fd]",
       "fieldAverageWaiting": "[Field average once {{n}} rounds are in]",
-      "courseShapeLabel": "[Çöûrsé shåpé]",
+      "courseShapeLabel": "[\u00c7\u00f6\u00fbrs\u00e9 sh\u00e5p\u00e9]",
       "ourPicksLabel": "[Our picks]",
       "ourPicksAll": "[All picks and the case for each]",
       "ourPicksProvenance": "[Model confidence {{confidence}}%]",
       "ourPicksStale": "[Being refreshed]"
     },
     "tiPicks": {
-      "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",
-      "subline": "[~~Óúr píçkš ƒőŕ ţĥé ţőúřñáméñţ~~]",
-      "explainer": "[~~Őúř ÁÍ řéáđš ţĥé ƒíélđ ƀéƒőřé ƥláý ƀéĝíñš. Íţ ŵéíĝĥš ĥíšţőříĉál ƥéřƒőřmáñĉé áţ ţĥé ĉőúřšé, ĉúřřéñţ ƒőřm, íñĵúřý ñéŵš, ŵéáţĥéř áñđ ƥláýéř šţáţš šúĉĥ áš đříṽíñĝ đíšţáñĉé, áĉĉúřáĉý áñđ šĥőřţ ĝámé, ţő ƥřőĵéĉţ íţš ƥíĉǩš ƒőř ţĥé ŵééǩ.~~]",
-      "linkLabel": "[~~Áll píçkš~~]",
-      "confidenceHigh": "[~~Ĥíĝĥ~~]",
-      "confidenceSolid": "[~~Šőļíđ~~]",
-      "confidenceLive": "[~~Ļíṽé~~]",
-      "theCase": "[~~Ţĥé ĉášé ›~~]",
-      "pickLabel": "[~~Ƥíĉǩ {{rank}}~~]",
-      "won": "[~~Ŵőñ~~]",
-      "hit": "[~~Ĥíţ~~]",
-      "miss": "[~~Ṁíšš~~]",
-      "missWithCut": "[~~Ṁíšš · {{cut}}~~]",
-      "wonBadge": "[~~ŴŐÑ · {{score}}~~]",
-      "hitBadge": "[~~ĤÍŢ · {{pos}} · {{score}}~~]",
-      "missBadge": "[~~ṀÍŠŠ · {{pos}} · {{score}}~~]",
-      "missShort": "[~~ṀÍŠŠ~~]",
-      "missWithCutBadge": "[~~ṀÍŠŠ · {{cut}}~~]",
-      "thruLabel": "[~~ţĥřú {{value}}~~]",
-      "caseFor": "[~~Ţĥé ĉášé ƒőř~~]",
-      "boardTitle": "[~~Ţĥé ƀőářđ~~]",
-      "boardMeta_one": "[~~{{count}} ƤÍĈǨ · ŢÁƤ ƑŐŘ ŢĤÉ ĈÁŠÉ~~]",
-      "boardMeta_other": "[~~{{count}} ƤÍĈǨŠ · ŢÁƤ ƑŐŘ ŢĤÉ ĈÁŠÉ~~]",
-      "courseFit": "[~~ĉőúřšé ƒíţ {{score}}~~]",
-      "concernLabel": "[~~Ĉőñĉéřñ~~]",
-      "finalLine": "[~~{{pos}} · {{score}}~~]",
+      "eyebrow": "[~~T\u00f3\u00far\u00f1\u00e1m\u00e9\u00f1t \u00ed\u00f1t\u00e9ll\u00edg\u00e9\u00f1\u00e7\u00e9~~]",
+      "subline": "[~~\u00d3\u00far p\u00ed\u00e7k\u0161 \u0192\u0151\u0155 \u0163\u0125\u00e9 \u0163\u0151\u00fa\u0159\u00f1\u00e1m\u00e9\u00f1\u0163~~]",
+      "explainer": "[~~\u0150\u00fa\u0159 \u00c1\u00cd \u0159\u00e9\u00e1\u0111\u0161 \u0163\u0125\u00e9 \u0192\u00ed\u00e9l\u0111 \u0180\u00e9\u0192\u0151\u0159\u00e9 \u01a5l\u00e1\u00fd \u0180\u00e9\u011d\u00ed\u00f1\u0161. \u00cd\u0163 \u0175\u00e9\u00ed\u011d\u0125\u0161 \u0125\u00ed\u0161\u0163\u0151\u0159\u00ed\u0109\u00e1l \u01a5\u00e9\u0159\u0192\u0151\u0159m\u00e1\u00f1\u0109\u00e9 \u00e1\u0163 \u0163\u0125\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9, \u0109\u00fa\u0159\u0159\u00e9\u00f1\u0163 \u0192\u0151\u0159m, \u00ed\u00f1\u0135\u00fa\u0159\u00fd \u00f1\u00e9\u0175\u0161, \u0175\u00e9\u00e1\u0163\u0125\u00e9\u0159 \u00e1\u00f1\u0111 \u01a5l\u00e1\u00fd\u00e9\u0159 \u0161\u0163\u00e1\u0163\u0161 \u0161\u00fa\u0109\u0125 \u00e1\u0161 \u0111\u0159\u00ed\u1e7d\u00ed\u00f1\u011d \u0111\u00ed\u0161\u0163\u00e1\u00f1\u0109\u00e9, \u00e1\u0109\u0109\u00fa\u0159\u00e1\u0109\u00fd \u00e1\u00f1\u0111 \u0161\u0125\u0151\u0159\u0163 \u011d\u00e1m\u00e9, \u0163\u0151 \u01a5\u0159\u0151\u0135\u00e9\u0109\u0163 \u00ed\u0163\u0161 \u01a5\u00ed\u0109\u01e9\u0161 \u0192\u0151\u0159 \u0163\u0125\u00e9 \u0175\u00e9\u00e9\u01e9.~~]",
+      "linkLabel": "[~~\u00c1ll p\u00ed\u00e7k\u0161~~]",
+      "confidenceHigh": "[~~\u0124\u00ed\u011d\u0125~~]",
+      "confidenceSolid": "[~~\u0160\u0151\u013c\u00ed\u0111~~]",
+      "confidenceLive": "[~~\u013b\u00ed\u1e7d\u00e9~~]",
+      "theCase": "[~~\u0162\u0125\u00e9 \u0109\u00e1\u0161\u00e9 \u203a~~]",
+      "pickLabel": "[~~\u01a4\u00ed\u0109\u01e9 {{rank}}~~]",
+      "won": "[~~\u0174\u0151\u00f1~~]",
+      "hit": "[~~\u0124\u00ed\u0163~~]",
+      "miss": "[~~\u1e40\u00ed\u0161\u0161~~]",
+      "missWithCut": "[~~\u1e40\u00ed\u0161\u0161 \u00b7 {{cut}}~~]",
+      "wonBadge": "[~~\u0174\u0150\u00d1 \u00b7 {{score}}~~]",
+      "hitBadge": "[~~\u0124\u00cd\u0162 \u00b7 {{pos}} \u00b7 {{score}}~~]",
+      "missBadge": "[~~\u1e40\u00cd\u0160\u0160 \u00b7 {{pos}} \u00b7 {{score}}~~]",
+      "missShort": "[~~\u1e40\u00cd\u0160\u0160~~]",
+      "missWithCutBadge": "[~~\u1e40\u00cd\u0160\u0160 \u00b7 {{cut}}~~]",
+      "thruLabel": "[~~\u0163\u0125\u0159\u00fa {{value}}~~]",
+      "caseFor": "[~~\u0162\u0125\u00e9 \u0109\u00e1\u0161\u00e9 \u0192\u0151\u0159~~]",
+      "boardTitle": "[~~\u0162\u0125\u00e9 \u0180\u0151\u00e1\u0159\u0111~~]",
+      "boardMeta_one": "[~~{{count}} \u01a4\u00cd\u0108\u01e8 \u00b7 \u0162\u00c1\u01a4 \u0191\u0150\u0158 \u0162\u0124\u00c9 \u0108\u00c1\u0160\u00c9~~]",
+      "boardMeta_other": "[~~{{count}} \u01a4\u00cd\u0108\u01e8\u0160 \u00b7 \u0162\u00c1\u01a4 \u0191\u0150\u0158 \u0162\u0124\u00c9 \u0108\u00c1\u0160\u00c9~~]",
+      "courseFit": "[~~\u0109\u0151\u00fa\u0159\u0161\u00e9 \u0192\u00ed\u0163 {{score}}~~]",
+      "concernLabel": "[~~\u0108\u0151\u00f1\u0109\u00e9\u0159\u00f1~~]",
+      "finalLine": "[~~{{pos}} \u00b7 {{score}}~~]",
       "confidence": {
-        "high": "[~~Hígh~~]",
-        "solid": "[~~Šólíd~~]",
-        "live": "[~~Lívé~~]"
+        "high": "[~~H\u00edgh~~]",
+        "solid": "[~~\u0160\u00f3l\u00edd~~]",
+        "live": "[~~L\u00edv\u00e9~~]"
       },
       "verdict": {
-        "won": "[~~WÓÑ · {{score}}~~]",
-        "hit": "[~~HÍT · {{pos}} · {{score}}~~]",
-        "miss": "[~~MÍŠŠ · {{pos}} · {{score}}~~]",
-        "missOnly": "[~~MÍŠŠ~~]",
-        "missCut": "[~~MÍŠŠ · {{cut}}~~]"
+        "won": "[~~W\u00d3\u00d1 \u00b7 {{score}}~~]",
+        "hit": "[~~H\u00cdT \u00b7 {{pos}} \u00b7 {{score}}~~]",
+        "miss": "[~~M\u00cd\u0160\u0160 \u00b7 {{pos}} \u00b7 {{score}}~~]",
+        "missOnly": "[~~M\u00cd\u0160\u0160~~]",
+        "missCut": "[~~M\u00cd\u0160\u0160 \u00b7 {{cut}}~~]"
       },
       "chip": {
-        "won": "[~~Wóñ~~]",
-        "hit": "[~~Hít~~]",
-        "miss": "[~~Míšš~~]",
-        "missCut": "[~~Míšš · {{cut}}~~]"
+        "won": "[~~W\u00f3\u00f1~~]",
+        "hit": "[~~H\u00edt~~]",
+        "miss": "[~~M\u00ed\u0161\u0161~~]",
+        "missCut": "[~~M\u00ed\u0161\u0161 \u00b7 {{cut}}~~]"
       },
       "card": {
-        "theCase": "[~~Thé çášé ›~~]",
-        "pickLabel": "[~~Píçk {{rank}}~~]",
-        "pickOf": "[Pîçk {{n}} öf {{total}}]",
-        "courseFitLabel": "[~~Çóúršé fít~~]"
+        "theCase": "[~~Th\u00e9 \u00e7\u00e1\u0161\u00e9 \u203a~~]",
+        "pickLabel": "[~~P\u00ed\u00e7k {{rank}}~~]",
+        "pickOf": "[P\u00ee\u00e7k {{n}} \u00f6f {{total}}]",
+        "courseFitLabel": "[~~\u00c7\u00f3\u00far\u0161\u00e9 f\u00edt~~]"
       },
       "case": {
-        "eyebrow": "[~~Thé çášé fór~~]",
-        "concernLabel": "[~~Çóñçérñ~~]",
-        "courseFit": "[~~çóúršé fít {{score}}~~]"
+        "eyebrow": "[~~Th\u00e9 \u00e7\u00e1\u0161\u00e9 f\u00f3r~~]",
+        "concernLabel": "[~~\u00c7\u00f3\u00f1\u00e7\u00e9r\u00f1~~]",
+        "courseFit": "[~~\u00e7\u00f3\u00far\u0161\u00e9 f\u00edt {{score}}~~]"
       },
       "sheet": {
-        "picksHeader": "[~~{{count}} PÍÇKŠ · TÁP FÓR THÉ ÇÁŠÉ~~]",
-        "title": "[~~Thé bóárd~~]"
+        "picksHeader": "[~~{{count}} P\u00cd\u00c7K\u0160 \u00b7 T\u00c1P F\u00d3R TH\u00c9 \u00c7\u00c1\u0160\u00c9~~]",
+        "title": "[~~Th\u00e9 b\u00f3\u00e1rd~~]"
       },
       "thru": {
         "finished": "[~~F~~]",
-        "thruN": "[~~thrú {{n}}~~]"
+        "thruN": "[~~thr\u00fa {{n}}~~]"
       },
-      "thruSep": "[~~ · {{value}}~~]",
+      "thruSep": "[~~ \u00b7 {{value}}~~]",
       "board": {
-        "titleCount_one": "[~~Óúr píçk~~]",
-        "titleCount_other": "[~~Óúr {{count}} píçkš~~]",
-        "methodology": "[~~Ƥíĉǩš ářé lőĉǩéđ ƀéƒőřé ţĥé ƒířšţ ţéé ţímé áñđ ñéṽéř ĉĥáñĝé. Ṽéřđíĉţš šéţţlé ŵíţĥ ţĥé ƒíñál léáđéřƀőářđ.~~]"
+        "titleCount_one": "[~~\u00d3\u00far p\u00ed\u00e7k~~]",
+        "titleCount_other": "[~~\u00d3\u00far {{count}} p\u00ed\u00e7k\u0161~~]",
+        "methodology": "[~~\u01a4\u00ed\u0109\u01e9\u0161 \u00e1\u0159\u00e9 l\u0151\u0109\u01e9\u00e9\u0111 \u0180\u00e9\u0192\u0151\u0159\u00e9 \u0163\u0125\u00e9 \u0192\u00ed\u0159\u0161\u0163 \u0163\u00e9\u00e9 \u0163\u00edm\u00e9 \u00e1\u00f1\u0111 \u00f1\u00e9\u1e7d\u00e9\u0159 \u0109\u0125\u00e1\u00f1\u011d\u00e9. \u1e7c\u00e9\u0159\u0111\u00ed\u0109\u0163\u0161 \u0161\u00e9\u0163\u0163l\u00e9 \u0175\u00ed\u0163\u0125 \u0163\u0125\u00e9 \u0192\u00ed\u00f1\u00e1l l\u00e9\u00e1\u0111\u00e9\u0159\u0180\u0151\u00e1\u0159\u0111.~~]"
       },
       "method": {
-        "heading": "[~~Hów wé píçk~~]",
-        "lede": "[~~Óúr ÁÍ réádš thé fíéld béfóré pláy bégíñš. Ít wéíghš híštóríçál pérfórmáñçé át thé çóúršé, çúrréñt fórm, íñjúry ñéwš, wéáthér áñd pláyér štátš šúçh áš drívíñg díštáñçé, áççúráçy áñd šhórt gámé, tó prójéçt ítš píçkš fór thé wéék.~~]",
-        "playerLabel": "[~~Thé pláyér~~]",
+        "heading": "[~~H\u00f3w w\u00e9 p\u00ed\u00e7k~~]",
+        "lede": "[~~\u00d3\u00far \u00c1\u00cd r\u00e9\u00e1d\u0161 th\u00e9 f\u00ed\u00e9ld b\u00e9f\u00f3r\u00e9 pl\u00e1y b\u00e9g\u00ed\u00f1\u0161. \u00cdt w\u00e9\u00edgh\u0161 h\u00ed\u0161t\u00f3r\u00ed\u00e7\u00e1l p\u00e9rf\u00f3rm\u00e1\u00f1\u00e7\u00e9 \u00e1t th\u00e9 \u00e7\u00f3\u00far\u0161\u00e9, \u00e7\u00farr\u00e9\u00f1t f\u00f3rm, \u00ed\u00f1j\u00fary \u00f1\u00e9w\u0161, w\u00e9\u00e1th\u00e9r \u00e1\u00f1d pl\u00e1y\u00e9r \u0161t\u00e1t\u0161 \u0161\u00fa\u00e7h \u00e1\u0161 dr\u00edv\u00ed\u00f1g d\u00ed\u0161t\u00e1\u00f1\u00e7\u00e9, \u00e1\u00e7\u00e7\u00far\u00e1\u00e7y \u00e1\u00f1d \u0161h\u00f3rt g\u00e1m\u00e9, t\u00f3 pr\u00f3j\u00e9\u00e7t \u00edt\u0161 p\u00ed\u00e7k\u0161 f\u00f3r th\u00e9 w\u00e9\u00e9k.~~]",
+        "playerLabel": "[~~Th\u00e9 pl\u00e1y\u00e9r~~]",
         "playerItems": [
-          "[~~Drívíñg díštáñçé~~]",
-          "[~~Drívíñg áççúráçy~~]",
-          "[~~Grééñš íñ régúlátíóñ~~]",
-          "[~~Sçrámblíñg~~]",
-          "[~~Púttíñg~~]",
-          "[~~Strókéš gáíñéd: óff thé téé~~]",
-          "[~~Strókéš gáíñéd: áppróáçh~~]",
-          "[~~Strókéš gáíñéd: áróúñd thé grééñ~~]",
-          "[~~Strókéš gáíñéd: púttíñg~~]",
-          "[~~Strókéš gáíñéd: tótál~~]",
-          "[~~Bírdíéš pér róúñd~~]",
-          "[~~Sçóríñg ávérágé~~]"
+          "[~~Dr\u00edv\u00ed\u00f1g d\u00ed\u0161t\u00e1\u00f1\u00e7\u00e9~~]",
+          "[~~Dr\u00edv\u00ed\u00f1g \u00e1\u00e7\u00e7\u00far\u00e1\u00e7y~~]",
+          "[~~Gr\u00e9\u00e9\u00f1\u0161 \u00ed\u00f1 r\u00e9g\u00fal\u00e1t\u00ed\u00f3\u00f1~~]",
+          "[~~S\u00e7r\u00e1mbl\u00ed\u00f1g~~]",
+          "[~~P\u00fatt\u00ed\u00f1g~~]",
+          "[~~Str\u00f3k\u00e9\u0161 g\u00e1\u00ed\u00f1\u00e9d: \u00f3ff th\u00e9 t\u00e9\u00e9~~]",
+          "[~~Str\u00f3k\u00e9\u0161 g\u00e1\u00ed\u00f1\u00e9d: \u00e1ppr\u00f3\u00e1\u00e7h~~]",
+          "[~~Str\u00f3k\u00e9\u0161 g\u00e1\u00ed\u00f1\u00e9d: \u00e1r\u00f3\u00fa\u00f1d th\u00e9 gr\u00e9\u00e9\u00f1~~]",
+          "[~~Str\u00f3k\u00e9\u0161 g\u00e1\u00ed\u00f1\u00e9d: p\u00fatt\u00ed\u00f1g~~]",
+          "[~~Str\u00f3k\u00e9\u0161 g\u00e1\u00ed\u00f1\u00e9d: t\u00f3t\u00e1l~~]",
+          "[~~B\u00edrd\u00ed\u00e9\u0161 p\u00e9r r\u00f3\u00fa\u00f1d~~]",
+          "[~~S\u00e7\u00f3r\u00ed\u00f1g \u00e1v\u00e9r\u00e1g\u00e9~~]"
         ],
-        "courseLabel": "[~~Thé çóúršé~~]",
+        "courseLabel": "[~~Th\u00e9 \u00e7\u00f3\u00far\u0161\u00e9~~]",
         "courseItems": [
-          "[~~Fívé yéárš óf réšúltš héré~~]",
-          "[~~Whát háš áçtúálly wóñ át thíš véñúé~~]",
-          "[~~Pár, léñgth áñd çóúršé typé~~]"
+          "[~~F\u00edv\u00e9 y\u00e9\u00e1r\u0161 \u00f3f r\u00e9\u0161\u00falt\u0161 h\u00e9r\u00e9~~]",
+          "[~~Wh\u00e1t h\u00e1\u0161 \u00e1\u00e7t\u00fa\u00e1lly w\u00f3\u00f1 \u00e1t th\u00ed\u0161 v\u00e9\u00f1\u00fa\u00e9~~]",
+          "[~~P\u00e1r, l\u00e9\u00f1gth \u00e1\u00f1d \u00e7\u00f3\u00far\u0161\u00e9 typ\u00e9~~]"
         ],
-        "weekLabel": "[~~Thíš wéék~~]",
+        "weekLabel": "[~~Th\u00ed\u0161 w\u00e9\u00e9k~~]",
         "weekItems": [
-          "[~~Fórm óvér thé lášt fóúr évéñtš~~]",
-          "[~~Cóñfírméd wíthdráwálš áñd íñjúríéš~~]",
-          "[~~Wíñd áñd ráíñ fóréçášt~~]",
-          "[~~Stréñgth óf thé fíéld~~]"
+          "[~~F\u00f3rm \u00f3v\u00e9r th\u00e9 l\u00e1\u0161t f\u00f3\u00far \u00e9v\u00e9\u00f1t\u0161~~]",
+          "[~~C\u00f3\u00f1f\u00edrm\u00e9d w\u00edthdr\u00e1w\u00e1l\u0161 \u00e1\u00f1d \u00ed\u00f1j\u00far\u00ed\u00e9\u0161~~]",
+          "[~~W\u00ed\u00f1d \u00e1\u00f1d r\u00e1\u00ed\u00f1 f\u00f3r\u00e9\u00e7\u00e1\u0161t~~]",
+          "[~~Str\u00e9\u00f1gth \u00f3f th\u00e9 f\u00ed\u00e9ld~~]"
         ],
         "rules": [
-          "[~~Lóçkéd béfóré thé fíršt téé~~]",
-          "[~~Névér édítéd~~]",
-          "[~~Grádéd óñ thé fíñál léádérbóárd~~]"
+          "[~~L\u00f3\u00e7k\u00e9d b\u00e9f\u00f3r\u00e9 th\u00e9 f\u00edr\u0161t t\u00e9\u00e9~~]",
+          "[~~N\u00e9v\u00e9r \u00e9d\u00edt\u00e9d~~]",
+          "[~~Gr\u00e1d\u00e9d \u00f3\u00f1 th\u00e9 f\u00ed\u00f1\u00e1l l\u00e9\u00e1d\u00e9rb\u00f3\u00e1rd~~]"
         ],
-        "closing": "[~~Tóúrñáméñt Íñtéllígéñçé íš áñályšíš, ñót ádvíçé.~~]"
+        "closing": "[~~T\u00f3\u00far\u00f1\u00e1m\u00e9\u00f1t \u00cd\u00f1t\u00e9ll\u00edg\u00e9\u00f1\u00e7\u00e9 \u00ed\u0161 \u00e1\u00f1\u00e1ly\u0161\u00ed\u0161, \u00f1\u00f3t \u00e1dv\u00ed\u00e7\u00e9.~~]"
       }
     },
     "collegeFranchise": {
-      "eyebrow": "[~~ÇÓLLÉGÉ FRÁÑÇHÍŠÉ~~]",
-      "linkLabel": "[~~Áll fráñçhíšéš~~]",
-      "vs": "[~~VŠ~~]",
-      "tugLabel": "[~~ŠÉÁŠÓÑ ÁLÚMÑÍ ÉÁRÑÍÑGŠ~~]",
-      "captainLabel": "[~~· ĈÁƤŢÁÍÑ~~]",
-      "onTour_one": "[~~{{count}} őñ ţőúř~~]",
-      "onTour_other": "[~~{{count}} őñ ţőúř~~]",
-      "onTourCaptainSuffix": "[~~ · {{name}} ĉáƥţáíñš~~]",
-      "headlineFallbackWide": "[~~{{leader}} řúñš áŵáý ŵíţĥ íţ.~~]",
-      "headlineFallbackClose": "[~~{{leader}} ļéáđš. {{chaser}} íš ĉļőšíñĝ.~~]",
-      "captainSuffix": "[~~· ÇÁPTÁÍÑ~~]",
-      "headlineRunaway": "[~~<0>{{leader}} rúñš áwáy wíth ít.</0>~~]",
-      "headlineClosing": "[~~<0>{{leader}} léádš. {{chaser}} íš çlóšíñg.</0>~~]",
-      "rowMetaWithCaptain": "[~~{{count}} óñ tóúr · {{captain}} çáptáíñš~~]",
-      "rowMeta": "[~~{{count}} óñ tóúr~~]"
+      "eyebrow": "[~~\u00c7\u00d3LL\u00c9G\u00c9 FR\u00c1\u00d1\u00c7H\u00cd\u0160\u00c9~~]",
+      "linkLabel": "[~~\u00c1ll fr\u00e1\u00f1\u00e7h\u00ed\u0161\u00e9\u0161~~]",
+      "vs": "[~~V\u0160~~]",
+      "tugLabel": "[~~\u0160\u00c9\u00c1\u0160\u00d3\u00d1 \u00c1L\u00daM\u00d1\u00cd \u00c9\u00c1R\u00d1\u00cd\u00d1G\u0160~~]",
+      "captainLabel": "[~~\u00b7 \u0108\u00c1\u01a4\u0162\u00c1\u00cd\u00d1~~]",
+      "onTour_one": "[~~{{count}} \u0151\u00f1 \u0163\u0151\u00fa\u0159~~]",
+      "onTour_other": "[~~{{count}} \u0151\u00f1 \u0163\u0151\u00fa\u0159~~]",
+      "onTourCaptainSuffix": "[~~ \u00b7 {{name}} \u0109\u00e1\u01a5\u0163\u00e1\u00ed\u00f1\u0161~~]",
+      "headlineFallbackWide": "[~~{{leader}} \u0159\u00fa\u00f1\u0161 \u00e1\u0175\u00e1\u00fd \u0175\u00ed\u0163\u0125 \u00ed\u0163.~~]",
+      "headlineFallbackClose": "[~~{{leader}} \u013c\u00e9\u00e1\u0111\u0161. {{chaser}} \u00ed\u0161 \u0109\u013c\u0151\u0161\u00ed\u00f1\u011d.~~]",
+      "captainSuffix": "[~~\u00b7 \u00c7\u00c1PT\u00c1\u00cd\u00d1~~]",
+      "headlineRunaway": "[~~<0>{{leader}} r\u00fa\u00f1\u0161 \u00e1w\u00e1y w\u00edth \u00edt.</0>~~]",
+      "headlineClosing": "[~~<0>{{leader}} l\u00e9\u00e1d\u0161. {{chaser}} \u00ed\u0161 \u00e7l\u00f3\u0161\u00ed\u00f1g.</0>~~]",
+      "rowMetaWithCaptain": "[~~{{count}} \u00f3\u00f1 t\u00f3\u00far \u00b7 {{captain}} \u00e7\u00e1pt\u00e1\u00ed\u00f1\u0161~~]",
+      "rowMeta": "[~~{{count}} \u00f3\u00f1 t\u00f3\u00far~~]"
     },
     "cinematic": {
-      "championEyebrow": "[!! ★ Chámpíón !!]",
-      "championLabel": "[!! Chámpíón !!]",
-      "defendingChampionEyebrow": "[!! ★ Déféndíng chámpíón !!]",
-      "defendingChampionLabel": "[!! Déféndíng Chámpíón !!]",
-      "defendingChampionYearLabel": "[!! {{year}} Déféndíng Chámpíón !!]",
-      "wonYearScore": "[!! Wón {{year}} · {{score}} !!]",
-      "wonInPlayoff": "[!! Wón ín pláyóff !!]",
-      "wonByMargin": "[!! Wón by {{margin}} !!]",
-      "finalResult": "[!! FÍNÁL RÉSÚLT !!]",
-      "finalResults": "[!! Fínál résúlts !!]",
-      "finalLeaderboardCount": "[!! FÍNÁL LÉÁDÉRBÓÁRD · {{count}} !!]",
-      "fullLeaderboard": "[!! Fúll léádérbóárd !!]",
-      "fullLeaderboardWithField_one": "[!! Fúll léádérbóárd · {{count}} pláyér !!]",
-      "fullLeaderboardWithField_other": "[!! Fúll léádérbóárd · {{count}} pláyérs !!]",
-      "viewTournament": "[!! Víéw tóúrnámént !!]",
-      "viewTournamentWithField_one": "[!! Víéw tóúrnámént · {{count}} ín thé fíéld !!]",
-      "viewTournamentWithField_other": "[!! Víéw tóúrnámént · {{count}} ín thé fíéld !!]",
-      "openTournamentAria": "[!! Ópén tóúrnámént !!]",
-      "openLeaderboardAria": "[!! Ópén léádérbóárd !!]",
-      "openFullLeaderboardAria": "[!! Ópén fúll léádérbóárd !!]",
-      "finalTournamentAria": "[!! Fínál tóúrnámént !!]",
-      "finalLeaderboardAria": "[!! Fínál léádérbóárd !!]",
-      "viewTournamentAria": "[!! Víéw tóúrnámént !!]",
-      "majorAria": "[!! Májór chámpíónshíp !!]",
-      "eyebrowPlayoff": "[!! PLÁYÓFF !!]",
-      "eyebrowFinal": "[!! 🏆 FÍNÁL !!]",
-      "eyebrowUpcoming": "[!! ÚPCÓMÍNG !!]",
-      "eyebrowUpcomingMajor": "[!! ÚPCÓMÍNG · MÁJÓR CHÁMPÍÓNSHÍP !!]",
-      "eyebrowSuffix": "[!!  · {{tour}} !!]",
+      "championEyebrow": "[!! \u2605 Ch\u00e1mp\u00ed\u00f3n !!]",
+      "championLabel": "[!! Ch\u00e1mp\u00ed\u00f3n !!]",
+      "defendingChampionEyebrow": "[!! \u2605 D\u00e9f\u00e9nd\u00edng ch\u00e1mp\u00ed\u00f3n !!]",
+      "defendingChampionLabel": "[!! D\u00e9f\u00e9nd\u00edng Ch\u00e1mp\u00ed\u00f3n !!]",
+      "defendingChampionYearLabel": "[!! {{year}} D\u00e9f\u00e9nd\u00edng Ch\u00e1mp\u00ed\u00f3n !!]",
+      "wonYearScore": "[!! W\u00f3n {{year}} \u00b7 {{score}} !!]",
+      "wonInPlayoff": "[!! W\u00f3n \u00edn pl\u00e1y\u00f3ff !!]",
+      "wonByMargin": "[!! W\u00f3n by {{margin}} !!]",
+      "finalResult": "[!! F\u00cdN\u00c1L R\u00c9S\u00daLT !!]",
+      "finalResults": "[!! F\u00edn\u00e1l r\u00e9s\u00falts !!]",
+      "finalLeaderboardCount": "[!! F\u00cdN\u00c1L L\u00c9\u00c1D\u00c9RB\u00d3\u00c1RD \u00b7 {{count}} !!]",
+      "fullLeaderboard": "[!! F\u00fall l\u00e9\u00e1d\u00e9rb\u00f3\u00e1rd !!]",
+      "fullLeaderboardWithField_one": "[!! F\u00fall l\u00e9\u00e1d\u00e9rb\u00f3\u00e1rd \u00b7 {{count}} pl\u00e1y\u00e9r !!]",
+      "fullLeaderboardWithField_other": "[!! F\u00fall l\u00e9\u00e1d\u00e9rb\u00f3\u00e1rd \u00b7 {{count}} pl\u00e1y\u00e9rs !!]",
+      "viewTournament": "[!! V\u00ed\u00e9w t\u00f3\u00farn\u00e1m\u00e9nt !!]",
+      "viewTournamentWithField_one": "[!! V\u00ed\u00e9w t\u00f3\u00farn\u00e1m\u00e9nt \u00b7 {{count}} \u00edn th\u00e9 f\u00ed\u00e9ld !!]",
+      "viewTournamentWithField_other": "[!! V\u00ed\u00e9w t\u00f3\u00farn\u00e1m\u00e9nt \u00b7 {{count}} \u00edn th\u00e9 f\u00ed\u00e9ld !!]",
+      "openTournamentAria": "[!! \u00d3p\u00e9n t\u00f3\u00farn\u00e1m\u00e9nt !!]",
+      "openLeaderboardAria": "[!! \u00d3p\u00e9n l\u00e9\u00e1d\u00e9rb\u00f3\u00e1rd !!]",
+      "openFullLeaderboardAria": "[!! \u00d3p\u00e9n f\u00fall l\u00e9\u00e1d\u00e9rb\u00f3\u00e1rd !!]",
+      "finalTournamentAria": "[!! F\u00edn\u00e1l t\u00f3\u00farn\u00e1m\u00e9nt !!]",
+      "finalLeaderboardAria": "[!! F\u00edn\u00e1l l\u00e9\u00e1d\u00e9rb\u00f3\u00e1rd !!]",
+      "viewTournamentAria": "[!! V\u00ed\u00e9w t\u00f3\u00farn\u00e1m\u00e9nt !!]",
+      "majorAria": "[!! M\u00e1j\u00f3r ch\u00e1mp\u00ed\u00f3nsh\u00edp !!]",
+      "eyebrowPlayoff": "[!! PL\u00c1Y\u00d3FF !!]",
+      "eyebrowFinal": "[!! \ud83c\udfc6 F\u00cdN\u00c1L !!]",
+      "eyebrowUpcoming": "[!! \u00daPC\u00d3M\u00cdNG !!]",
+      "eyebrowUpcomingMajor": "[!! \u00daPC\u00d3M\u00cdNG \u00b7 M\u00c1J\u00d3R CH\u00c1MP\u00cd\u00d3NSH\u00cdP !!]",
+      "eyebrowSuffix": "[!!  \u00b7 {{tour}} !!]",
       "countdownHoursLabel": "[!! HRS !!]",
-      "countdownMinutesLabel": "[!! MÍN !!]",
-      "teeingOffSoon": "[!! Tééíng óff sóón !!]",
-      "teesOffIn": "[!! TÉÉS ÓFF ÍN !!]",
-      "roundAwaitingScores": "[!! Róúnd {{round}} · Áwáítíng scórés !!]",
-      "fieldPreviewPlayers_one": "[!! {{count}} pláyér !!]",
-      "fieldPreviewPlayers_other": "[!! {{count}} pláyérs !!]",
-      "topRankedWorld": "[!!  · #{{rank}} wórld !!]",
-      "inTheField_one": "[!! {{count}} ín thé fíéld !!]",
-      "inTheField_other": "[!! {{count}} ín thé fíéld !!]",
-      "ctaTournament": "[!! TÓÚRNÁMÉNT !!]",
-      "colToday": "[!! TÓDÁY !!]",
-      "colTotal": "[!! TÓTÁL !!]",
-      "colTotalShort": "[!! TÓT !!]",
-      "colThru": "[!! THRÚ !!]",
-      "colPurse": "[!! PÚRSÉ !!]",
+      "countdownMinutesLabel": "[!! M\u00cdN !!]",
+      "teeingOffSoon": "[!! T\u00e9\u00e9\u00edng \u00f3ff s\u00f3\u00f3n !!]",
+      "teesOffIn": "[!! T\u00c9\u00c9S \u00d3FF \u00cdN !!]",
+      "roundAwaitingScores": "[!! R\u00f3\u00fand {{round}} \u00b7 \u00c1w\u00e1\u00edt\u00edng sc\u00f3r\u00e9s !!]",
+      "fieldPreviewPlayers_one": "[!! {{count}} pl\u00e1y\u00e9r !!]",
+      "fieldPreviewPlayers_other": "[!! {{count}} pl\u00e1y\u00e9rs !!]",
+      "topRankedWorld": "[!!  \u00b7 #{{rank}} w\u00f3rld !!]",
+      "inTheField_one": "[!! {{count}} \u00edn th\u00e9 f\u00ed\u00e9ld !!]",
+      "inTheField_other": "[!! {{count}} \u00edn th\u00e9 f\u00ed\u00e9ld !!]",
+      "ctaTournament": "[!! T\u00d3\u00daRN\u00c1M\u00c9NT !!]",
+      "colToday": "[!! T\u00d3D\u00c1Y !!]",
+      "colTotal": "[!! T\u00d3T\u00c1L !!]",
+      "colTotalShort": "[!! T\u00d3T !!]",
+      "colThru": "[!! THR\u00da !!]",
+      "colPurse": "[!! P\u00daRS\u00c9 !!]",
       "colYards": "[!! YDS !!]",
-      "colYardsFull": "[!! YÁRDS !!]",
-      "tiedForLead_one": "[!! {{count}} tíéd fór thé léád !!]",
-      "tiedForLead_other": "[!! {{count}} tíéd fór thé léád !!]",
-      "playersTiedCount_one": "[!! {{count}} pláyér !!]",
-      "playersTiedCount_other": "[!! {{count}} pláyérs !!]",
-      "inPlayoffCount_one": "[!! {{count}} ín pláyóff !!]",
-      "inPlayoffCount_other": "[!! {{count}} ín pláyóff !!]",
-      "fieldStrengthEyebrow": "[!! Fíéld Stréngth !!]"
+      "colYardsFull": "[!! Y\u00c1RDS !!]",
+      "tiedForLead_one": "[!! {{count}} t\u00ed\u00e9d f\u00f3r th\u00e9 l\u00e9\u00e1d !!]",
+      "tiedForLead_other": "[!! {{count}} t\u00ed\u00e9d f\u00f3r th\u00e9 l\u00e9\u00e1d !!]",
+      "playersTiedCount_one": "[!! {{count}} pl\u00e1y\u00e9r !!]",
+      "playersTiedCount_other": "[!! {{count}} pl\u00e1y\u00e9rs !!]",
+      "inPlayoffCount_one": "[!! {{count}} \u00edn pl\u00e1y\u00f3ff !!]",
+      "inPlayoffCount_other": "[!! {{count}} \u00edn pl\u00e1y\u00f3ff !!]",
+      "fieldStrengthEyebrow": "[!! F\u00ed\u00e9ld Str\u00e9ngth !!]"
     },
     "hybridHero": {
-      "majorChampionship": "[!! MÁJÓR CHÁMPÍÓNSHÍP !!]",
-      "teamFallback": "[!! Téám !!]"
+      "majorChampionship": "[!! M\u00c1J\u00d3R CH\u00c1MP\u00cd\u00d3NSH\u00cdP !!]",
+      "teamFallback": "[!! T\u00e9\u00e1m !!]"
     },
     "status": {
       "finished": "FINISHED",
       "thru": "THRU {{n}}"
     },
     "board": {
-      "clbhouzPick": "[çlbhöûz pïçk]"
+      "clbhouzPick": "[\u00e7lbh\u00f6\u00fbz p\u00ef\u00e7k]"
     }
   },
   "empty": {
     "leaderboard": {
       "noLive": {
-        "eyebrow": "[~~Ļéáđéřƀőářđ~~]",
-        "title": "[~~Ñő ļíṽé ţőúřñáɱéñţš~~]",
-        "body": "[~~Ŵĥéñ áñ éṽéñţ ţééš őƒƒ, íţš ļíṽé ļéáđéřƀőářđ ŵíļļ áƥƥéář ĥéřé.~~]"
+        "eyebrow": "[~~\u013b\u00e9\u00e1\u0111\u00e9\u0159\u0180\u0151\u00e1\u0159\u0111~~]",
+        "title": "[~~\u00d1\u0151 \u013c\u00ed\u1e7d\u00e9 \u0163\u0151\u00fa\u0159\u00f1\u00e1\u0271\u00e9\u00f1\u0163\u0161~~]",
+        "body": "[~~\u0174\u0125\u00e9\u00f1 \u00e1\u00f1 \u00e9\u1e7d\u00e9\u00f1\u0163 \u0163\u00e9\u00e9\u0161 \u0151\u0192\u0192, \u00ed\u0163\u0161 \u013c\u00ed\u1e7d\u00e9 \u013c\u00e9\u00e1\u0111\u00e9\u0159\u0180\u0151\u00e1\u0159\u0111 \u0175\u00ed\u013c\u013c \u00e1\u01a5\u01a5\u00e9\u00e1\u0159 \u0125\u00e9\u0159\u00e9.~~]"
       },
       "noPlayersMatch": {
-        "eyebrow": "[~~Ļéáđéřƀőářđ~~]",
-        "title": "[~~Ñő ƥļáýéřš ɱáţĉĥ~~]",
-        "body": "[~~Ţřý á đíƒƒéřéñţ ñáɱé.~~]"
+        "eyebrow": "[~~\u013b\u00e9\u00e1\u0111\u00e9\u0159\u0180\u0151\u00e1\u0159\u0111~~]",
+        "title": "[~~\u00d1\u0151 \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161 \u0271\u00e1\u0163\u0109\u0125~~]",
+        "body": "[~~\u0162\u0159\u00fd \u00e1 \u0111\u00ed\u0192\u0192\u00e9\u0159\u00e9\u00f1\u0163 \u00f1\u00e1\u0271\u00e9.~~]"
       },
       "notPosted": {
-        "eyebrow": "[~~Ļéáđéřƀőářđ~~]",
-        "title": "[~~Šĉőříñĝ ñőţ ýéţ ƥőšţéđ~~]",
-        "body": "[~~Šĉőříñĝ ŵíļļ ƥőƥúļáţé áš ƥļáýéřš ƥőšţ ñúɱƀéřš.~~]"
+        "eyebrow": "[~~\u013b\u00e9\u00e1\u0111\u00e9\u0159\u0180\u0151\u00e1\u0159\u0111~~]",
+        "title": "[~~\u0160\u0109\u0151\u0159\u00ed\u00f1\u011d \u00f1\u0151\u0163 \u00fd\u00e9\u0163 \u01a5\u0151\u0161\u0163\u00e9\u0111~~]",
+        "body": "[~~\u0160\u0109\u0151\u0159\u00ed\u00f1\u011d \u0175\u00ed\u013c\u013c \u01a5\u0151\u01a5\u00fa\u013c\u00e1\u0163\u00e9 \u00e1\u0161 \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161 \u01a5\u0151\u0161\u0163 \u00f1\u00fa\u0271\u0180\u00e9\u0159\u0161.~~]"
       }
     }
   },
   "board": {
     "columns": {
-      "pos": "[~~ƤŐŠ~~]",
-      "player": "[~~ƤĻÁÝÉŘ~~]",
-      "tot": "[~~ŢŐŢ~~]",
-      "thru": "[~~ŢĤŘÚ~~]",
-      "today": "[~~ŢŐĐÁÝ~~]",
+      "pos": "[~~\u01a4\u0150\u0160~~]",
+      "player": "[~~\u01a4\u013b\u00c1\u00dd\u00c9\u0158~~]",
+      "tot": "[~~\u0162\u0150\u0162~~]",
+      "thru": "[~~\u0162\u0124\u0158\u00da~~]",
+      "today": "[~~\u0162\u0150\u0110\u00c1\u00dd~~]",
       "round": "[Round]",
-      "mov": "[~~ MŐṼ ~~]"
+      "mov": "[~~ M\u0150\u1e7c ~~]"
     },
     "status": {
-      "inProgress": "[~~Ř{{round}} · ÍÑ ƤŘŐĜŘÉŠŠ~~]",
-      "final": "[~~ƑÍÑÁĻ~~]",
-      "startsOn": "[~~ŠŢÁŘŢŠ {{date}}~~]",
-      "upcoming": "[~~ÚƤĈŐṀÍÑĜ~~]"
+      "inProgress": "[~~\u0158{{round}} \u00b7 \u00cd\u00d1 \u01a4\u0158\u0150\u011c\u0158\u00c9\u0160\u0160~~]",
+      "final": "[~~\u0191\u00cd\u00d1\u00c1\u013b~~]",
+      "startsOn": "[~~\u0160\u0162\u00c1\u0158\u0162\u0160 {{date}}~~]",
+      "upcoming": "[~~\u00da\u01a4\u0108\u0150\u1e40\u00cd\u00d1\u011c~~]"
     },
     "search": {
-      "placeholder": "[~~Šéářĉĥ ƥļáýéřš~~]",
-      "openAria": "[~~Šéářĉĥ ƥļáýéřš~~]",
-      "closeAria": "[~~Ĉļőšé šéářĉĥ~~]"
+      "placeholder": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161~~]",
+      "openAria": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161~~]",
+      "closeAria": "[~~\u0108\u013c\u0151\u0161\u00e9 \u0161\u00e9\u00e1\u0159\u0109\u0125~~]"
     },
     "meta": {
-      "par": "[~~Ƥář {{par}}~~]",
-      "yardage": "[~~{{yardage}} ýářđš~~]"
+      "par": "[~~\u01a4\u00e1\u0159 {{par}}~~]",
+      "yardage": "[~~{{yardage}} \u00fd\u00e1\u0159\u0111\u0161~~]"
     },
-    "unknownPlayer": "[~~Úñǩñőŵñ~~]",
-    "footnote": "[~~Ƒ Ƒíñíšĥéđ~~]",
+    "unknownPlayer": "[~~\u00da\u00f1\u01e9\u00f1\u0151\u0175\u00f1~~]",
+    "footnote": "[~~\u0191 \u0191\u00ed\u00f1\u00ed\u0161\u0125\u00e9\u0111~~]",
     "cut": {
-      "projected": "[~~Ƥřőĵéĉţéđ ĉúţ~~]",
-      "actual": "[~~Ţĥé ƒőļļőŵíñĝ ƥļáýéřš ƒáíļéđ ţő ɱáǩé ţĥé ĉúţ~~]"
+      "projected": "[~~\u01a4\u0159\u0151\u0135\u00e9\u0109\u0163\u00e9\u0111 \u0109\u00fa\u0163~~]",
+      "actual": "[~~\u0162\u0125\u00e9 \u0192\u0151\u013c\u013c\u0151\u0175\u00ed\u00f1\u011d \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161 \u0192\u00e1\u00ed\u013c\u00e9\u0111 \u0163\u0151 \u0271\u00e1\u01e9\u00e9 \u0163\u0125\u00e9 \u0109\u00fa\u0163~~]"
     },
     "movement": {
-      "up": "[~~Úƥ {{count}}~~]",
-      "down": "[~~Đőŵñ {{count}}~~]"
+      "up": "[~~\u00da\u01a5 {{count}}~~]",
+      "down": "[~~\u0110\u0151\u0175\u00f1 {{count}}~~]"
     }
   },
   "tournament": {
     "scorecard": {
-      "roundEyebrow": "[~~ŘŐÚÑĐ {{round}}~~]",
-      "eyebrowFallback": "[~~ŠĈŐŘÉĈÁŘĐ~~]",
-      "courseFallback": "[~~Šĉőřéĉářđ~~]"
+      "roundEyebrow": "[~~\u0158\u0150\u00da\u00d1\u0110 {{round}}~~]",
+      "eyebrowFallback": "[~~\u0160\u0108\u0150\u0158\u00c9\u0108\u00c1\u0158\u0110~~]",
+      "courseFallback": "[~~\u0160\u0109\u0151\u0159\u00e9\u0109\u00e1\u0159\u0111~~]"
     },
     "shell": {
       "board": {
-        "eyebrow": "[~~Ţĥé Ɓőářđ~~]",
-        "action": "[~~Ƒúļļ ļéáđéřƀőářđ~~]"
+        "eyebrow": "[~~\u0162\u0125\u00e9 \u0181\u0151\u00e1\u0159\u0111~~]",
+        "action": "[~~\u0191\u00fa\u013c\u013c \u013c\u00e9\u00e1\u0111\u00e9\u0159\u0180\u0151\u00e1\u0159\u0111~~]"
       },
       "leaderboard": {
-        "finalEyebrow": "[~~Ƒíñáļ Ļéáđéřƀőářđ~~]",
-        "fullBoardAction": "[~~Ƒúļļ ƀőářđ~~]"
+        "finalEyebrow": "[~~\u0191\u00ed\u00f1\u00e1\u013c \u013b\u00e9\u00e1\u0111\u00e9\u0159\u0180\u0151\u00e1\u0159\u0111~~]",
+        "fullBoardAction": "[~~\u0191\u00fa\u013c\u013c \u0180\u0151\u00e1\u0159\u0111~~]"
       },
       "teeTimes": {
-        "eyebrow": "[~~Ţéé Ţíɱéš~~]",
-        "allAction": "[~~Áļļ ţíɱéš~~]"
+        "eyebrow": "[~~\u0162\u00e9\u00e9 \u0162\u00ed\u0271\u00e9\u0161~~]",
+        "allAction": "[~~\u00c1\u013c\u013c \u0163\u00ed\u0271\u00e9\u0161~~]"
       },
       "field": {
-        "eyebrow": "[~~Ţĥé Ƒíéļđ~~]",
-        "playersSuffix": "[~~ ƥļáýéřš~~]",
-        "headlinedBySep": "[~~ · ĥéáđļíñéđ ƀý ~~]",
-        "firstTeeSep": "[~~ · ƒířšţ ţéé ~~]",
-        "startsInSep": "[~~ · šţářţš íñ ~~]",
-        "daysSuffix_one": "[~~ đáý~~]",
-        "daysSuffix_other": "[~~ đáýš~~]",
-        "emptyFallback": "[~~Ţĥé ƒíéļđ áñđ ţéé ţíɱéš ŵíļļ áƥƥéář ĥéřé ĉļőšéř ţő ţĥé šţářţ.~~]"
+        "eyebrow": "[~~\u0162\u0125\u00e9 \u0191\u00ed\u00e9\u013c\u0111~~]",
+        "playersSuffix": "[~~ \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161~~]",
+        "headlinedBySep": "[~~ \u00b7 \u0125\u00e9\u00e1\u0111\u013c\u00ed\u00f1\u00e9\u0111 \u0180\u00fd ~~]",
+        "firstTeeSep": "[~~ \u00b7 \u0192\u00ed\u0159\u0161\u0163 \u0163\u00e9\u00e9 ~~]",
+        "startsInSep": "[~~ \u00b7 \u0161\u0163\u00e1\u0159\u0163\u0161 \u00ed\u00f1 ~~]",
+        "daysSuffix_one": "[~~ \u0111\u00e1\u00fd~~]",
+        "daysSuffix_other": "[~~ \u0111\u00e1\u00fd\u0161~~]",
+        "emptyFallback": "[~~\u0162\u0125\u00e9 \u0192\u00ed\u00e9\u013c\u0111 \u00e1\u00f1\u0111 \u0163\u00e9\u00e9 \u0163\u00ed\u0271\u00e9\u0161 \u0175\u00ed\u013c\u013c \u00e1\u01a5\u01a5\u00e9\u00e1\u0159 \u0125\u00e9\u0159\u00e9 \u0109\u013c\u0151\u0161\u00e9\u0159 \u0163\u0151 \u0163\u0125\u00e9 \u0161\u0163\u00e1\u0159\u0163.~~]"
       }
     },
     "hero": {
       "chip": {
-        "majorStarts": "[~~ṀÁĴŐŘ · ŠŢÁŘŢŠ {{date}}~~]",
-        "starts": "[~~ŠŢÁŘŢŠ {{date}}~~]",
+        "majorStarts": "[~~\u1e40\u00c1\u0134\u0150\u0158 \u00b7 \u0160\u0162\u00c1\u0158\u0162\u0160 {{date}}~~]",
+        "starts": "[~~\u0160\u0162\u00c1\u0158\u0162\u0160 {{date}}~~]",
         "roundN": "Round {{round}}"
       },
-      "leaderLabel": "[~~Ļéáđéř~~]",
-      "daysLabel": "[~~Đáýš~~]",
-      "defendingLabel": "[~~Đéƒéñđíñĝ~~]",
-      "purseLabel": "[~~Ƥúřšé~~]",
-      "tbdPlayer": "[~~ŢƁĐ~~]",
-      "championFallback": "[~~Ĉĥáɱƥíőñ~~]",
+      "leaderLabel": "[~~\u013b\u00e9\u00e1\u0111\u00e9\u0159~~]",
+      "daysLabel": "[~~\u0110\u00e1\u00fd\u0161~~]",
+      "defendingLabel": "[~~\u0110\u00e9\u0192\u00e9\u00f1\u0111\u00ed\u00f1\u011d~~]",
+      "purseLabel": "[~~\u01a4\u00fa\u0159\u0161\u00e9~~]",
+      "tbdPlayer": "[~~\u0162\u0181\u0110~~]",
+      "championFallback": "[~~\u0108\u0125\u00e1\u0271\u01a5\u00ed\u0151\u00f1~~]",
       "winningLabel": "[Winning score]",
       "marginLabel": "[Margin]"
     },
     "story": {
-      "eyebrow": "[~~Ţĥé Šţőřý~~]",
-      "readMore": "[~~Řéáđ ɱőřé~~]"
+      "eyebrow": "[~~\u0162\u0125\u00e9 \u0160\u0163\u0151\u0159\u00fd~~]",
+      "readMore": "[~~\u0158\u00e9\u00e1\u0111 \u0271\u0151\u0159\u00e9~~]"
     },
     "moments": {
-      "eyebrow": "[~~Ṁőɱéñţš~~]",
-      "emptyBody": "[~~Ṁőɱéñţš ƒřőɱ ţĥíš ţőúřñáɱéñţ ŵíļļ áƥƥéář ĥéřé áš ɱéɱƀéřš šĥářé ţĥéɱ.~~]",
-      "shareCta": "[~~Šĥářé á ɱőɱéñţ~~]",
-      "allAction": "[~~Áļļ ɱőɱéñţš~~]",
-      "sheetTitle": "[~~Áļļ Ṁőɱéñţš~~]"
+      "eyebrow": "[~~\u1e40\u0151\u0271\u00e9\u00f1\u0163\u0161~~]",
+      "emptyBody": "[~~\u1e40\u0151\u0271\u00e9\u00f1\u0163\u0161 \u0192\u0159\u0151\u0271 \u0163\u0125\u00ed\u0161 \u0163\u0151\u00fa\u0159\u00f1\u00e1\u0271\u00e9\u00f1\u0163 \u0175\u00ed\u013c\u013c \u00e1\u01a5\u01a5\u00e9\u00e1\u0159 \u0125\u00e9\u0159\u00e9 \u00e1\u0161 \u0271\u00e9\u0271\u0180\u00e9\u0159\u0161 \u0161\u0125\u00e1\u0159\u00e9 \u0163\u0125\u00e9\u0271.~~]",
+      "shareCta": "[~~\u0160\u0125\u00e1\u0159\u00e9 \u00e1 \u0271\u0151\u0271\u00e9\u00f1\u0163~~]",
+      "allAction": "[~~\u00c1\u013c\u013c \u0271\u0151\u0271\u00e9\u00f1\u0163\u0161~~]",
+      "sheetTitle": "[~~\u00c1\u013c\u013c \u1e40\u0151\u0271\u00e9\u00f1\u0163\u0161~~]"
     },
     "fullBoard": {
-      "title": "[~~Ƒúļļ Ɓőářđ~~]"
+      "title": "[~~\u0191\u00fa\u013c\u013c \u0181\u0151\u00e1\u0159\u0111~~]"
     },
     "eventInfo": {
-      "dates": "[~~Đáţéš~~]",
-      "venue": "[~~Ṽéñúé~~]",
-      "parYardageLabel": "[~~Ƥář / Ýářđáĝé~~]",
-      "tv": "[~~ŢṼ~~]",
-      "teeTimes": "[~~Ţéé ţíɱéš~~]",
-      "round": "[~~Řőúñđ {{round}}~~]",
-      "yardageShort": "[~~{{yardage}} ýđš~~]",
-      "eyebrow": "[~~Éṽéñţ Íñƒő~~]"
+      "dates": "[~~\u0110\u00e1\u0163\u00e9\u0161~~]",
+      "venue": "[~~\u1e7c\u00e9\u00f1\u00fa\u00e9~~]",
+      "parYardageLabel": "[~~\u01a4\u00e1\u0159 / \u00dd\u00e1\u0159\u0111\u00e1\u011d\u00e9~~]",
+      "tv": "[~~\u0162\u1e7c~~]",
+      "teeTimes": "[~~\u0162\u00e9\u00e9 \u0163\u00ed\u0271\u00e9\u0161~~]",
+      "round": "[~~\u0158\u0151\u00fa\u00f1\u0111 {{round}}~~]",
+      "yardageShort": "[~~{{yardage}} \u00fd\u0111\u0161~~]",
+      "eyebrow": "[~~\u00c9\u1e7d\u00e9\u00f1\u0163 \u00cd\u00f1\u0192\u0151~~]"
     },
     "course": {
-      "title": "[~~Ţĥé Ĉőúřšé~~]",
-      "allHolesAction": "[~~Áļļ 18 ĥőļéš~~]",
-      "allHolesTitle": "[~~Áļļ 18 Ĥőļéš~~]",
-      "avgVsPar": "[~~Áṽĝ ṽš ƥář~~]",
-      "fieldScoringSuffix": "[~~ · ƒíéļđ šĉőříñĝ~~]"
+      "title": "[~~\u0162\u0125\u00e9 \u0108\u0151\u00fa\u0159\u0161\u00e9~~]",
+      "allHolesAction": "[~~\u00c1\u013c\u013c 18 \u0125\u0151\u013c\u00e9\u0161~~]",
+      "allHolesTitle": "[~~\u00c1\u013c\u013c 18 \u0124\u0151\u013c\u00e9\u0161~~]",
+      "avgVsPar": "[~~\u00c1\u1e7d\u011d \u1e7d\u0161 \u01a5\u00e1\u0159~~]",
+      "fieldScoringSuffix": "[~~ \u00b7 \u0192\u00ed\u00e9\u013c\u0111 \u0161\u0109\u0151\u0159\u00ed\u00f1\u011d~~]"
     },
     "featuredGroups": {
-      "eyebrow": "[~~Őñ ţĥé Ĉőúřšé~~]",
-      "holeLabel": "[~~ĤŐĻÉ {{hole}}~~]",
-      "onCourse": "[~~ŐÑ ĈŐÚŘŠÉ~~]"
+      "eyebrow": "[~~\u0150\u00f1 \u0163\u0125\u00e9 \u0108\u0151\u00fa\u0159\u0161\u00e9~~]",
+      "holeLabel": "[~~\u0124\u0150\u013b\u00c9 {{hole}}~~]",
+      "onCourse": "[~~\u0150\u00d1 \u0108\u0150\u00da\u0158\u0160\u00c9~~]"
     },
     "teeTimes": {
-      "teeChip": "[~~Ţéé {{hole}}~~]"
+      "teeChip": "[~~\u0162\u00e9\u00e9 {{hole}}~~]"
     },
     "allTeeTimes": {
-      "title": "[~~Áļļ Ţéé Ţíɱéš~~]",
+      "title": "[~~\u00c1\u013c\u013c \u0162\u00e9\u00e9 \u0162\u00ed\u0271\u00e9\u0161~~]",
       "roundShort": "R{{round}}",
       "roundScopeAria": "Round",
       "roundEmpty": "Draw released after Round {{prev}}",
@@ -588,266 +589,266 @@
     },
     "teeTimesBand": {
       "title": "Tee times",
-      "subline": "Round {{round}} · {{count}} groups",
+      "subline": "Round {{round}} \u00b7 {{count}} groups",
       "notReleased": "Draw not yet released"
     }
   },
   "leaders": {
-    "footer": "[~~Šéášőñ ƀőářđš · ļíṽé đőţ = őñ ţĥé ĉőúřšé říĝĥţ ñőŵ~~]",
-    "fullList": "[~~Ƒúļļ ļíšţ~~]",
+    "footer": "[~~\u0160\u00e9\u00e1\u0161\u0151\u00f1 \u0180\u0151\u00e1\u0159\u0111\u0161 \u00b7 \u013c\u00ed\u1e7d\u00e9 \u0111\u0151\u0163 = \u0151\u00f1 \u0163\u0125\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u0159\u00ed\u011d\u0125\u0163 \u00f1\u0151\u0175~~]",
+    "fullList": "[~~\u0191\u00fa\u013c\u013c \u013c\u00ed\u0161\u0163~~]",
     "sheet": {
-      "eyebrow_one": "[~~{{tourLabel}} · {{year}} · {{count}} ƤĻÁÝÉŘ~~]",
-      "eyebrow_other": "[~~{{tourLabel}} · {{year}} · {{count}} ƤĻÁÝÉŘŠ~~]",
-      "empty": "[~~Ñő ƥļáýéřš řáñǩéđ íñ ţĥíš ĉáţéĝőřý.~~]"
+      "eyebrow_one": "[~~{{tourLabel}} \u00b7 {{year}} \u00b7 {{count}} \u01a4\u013b\u00c1\u00dd\u00c9\u0158~~]",
+      "eyebrow_other": "[~~{{tourLabel}} \u00b7 {{year}} \u00b7 {{count}} \u01a4\u013b\u00c1\u00dd\u00c9\u0158\u0160~~]",
+      "empty": "[~~\u00d1\u0151 \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161 \u0159\u00e1\u00f1\u01e9\u00e9\u0111 \u00ed\u00f1 \u0163\u0125\u00ed\u0161 \u0109\u00e1\u0163\u00e9\u011d\u0151\u0159\u00fd.~~]"
     },
     "tourChip": {
-      "pga": "[~~ƤĜÁ~~]",
-      "lpga": "[~~ĻƤĜÁ~~]",
-      "euro": "[~~ĐƤ ŴŐŘĻĐ~~]",
-      "pgad": "[~~ǨŐŘÑ ƑÉŘŘÝ~~]",
-      "champ": "[~~ĈĤÁṀƤÍŐÑŠ~~]",
-      "liv": "[~~ĻÍṼ~~]"
+      "pga": "[~~\u01a4\u011c\u00c1~~]",
+      "lpga": "[~~\u013b\u01a4\u011c\u00c1~~]",
+      "euro": "[~~\u0110\u01a4 \u0174\u0150\u0158\u013b\u0110~~]",
+      "pgad": "[~~\u01e8\u0150\u0158\u00d1 \u0191\u00c9\u0158\u0158\u00dd~~]",
+      "champ": "[~~\u0108\u0124\u00c1\u1e40\u01a4\u00cd\u0150\u00d1\u0160~~]",
+      "liv": "[~~\u013b\u00cd\u1e7c~~]"
     },
     "stat": {
       "earnings": {
-        "label": "[~~Šéášőñ Éářñíñĝš~~]",
-        "short": "[~~ÉÁŘÑÍÑĜŠ~~]",
-        "unit": "[~~ÚŠĐ~~]"
+        "label": "[~~\u0160\u00e9\u00e1\u0161\u0151\u00f1 \u00c9\u00e1\u0159\u00f1\u00ed\u00f1\u011d\u0161~~]",
+        "short": "[~~\u00c9\u00c1\u0158\u00d1\u00cd\u00d1\u011c\u0160~~]",
+        "unit": "[~~\u00da\u0160\u0110~~]"
       },
       "scoring_avg": {
-        "label": "[~~Šĉőříñĝ Áṽéřáĝé~~]",
-        "short": "[~~ŠĈŐŘÍÑĜ~~]",
-        "unit": "[~~ÁṼĜ~~]"
+        "label": "[~~\u0160\u0109\u0151\u0159\u00ed\u00f1\u011d \u00c1\u1e7d\u00e9\u0159\u00e1\u011d\u00e9~~]",
+        "short": "[~~\u0160\u0108\u0150\u0158\u00cd\u00d1\u011c~~]",
+        "unit": "[~~\u00c1\u1e7c\u011c~~]"
       },
       "wins": {
-        "label": "[~~Ŵíñš~~]",
-        "short": "[~~ŴÍÑŠ~~]",
-        "unit": "[~~ŴÍÑŠ~~]"
+        "label": "[~~\u0174\u00ed\u00f1\u0161~~]",
+        "short": "[~~\u0174\u00cd\u00d1\u0160~~]",
+        "unit": "[~~\u0174\u00cd\u00d1\u0160~~]"
       },
       "top_10": {
-        "label": "[~~Ţőƥ 10 Ƒíñíšĥéš~~]",
-        "short": "[~~ŢŐƤ 10~~]",
-        "unit": "[~~ŢŐƤ 10~~]"
+        "label": "[~~\u0162\u0151\u01a5 10 \u0191\u00ed\u00f1\u00ed\u0161\u0125\u00e9\u0161~~]",
+        "short": "[~~\u0162\u0150\u01a4 10~~]",
+        "unit": "[~~\u0162\u0150\u01a4 10~~]"
       },
       "drive_avg": {
-        "label": "[~~Đříṽíñĝ Đíšţáñĉé~~]",
-        "short": "[~~ĐŘÍṼÍÑĜ~~]",
-        "unit": "[~~ÝĐŠ~~]"
+        "label": "[~~\u0110\u0159\u00ed\u1e7d\u00ed\u00f1\u011d \u0110\u00ed\u0161\u0163\u00e1\u00f1\u0109\u00e9~~]",
+        "short": "[~~\u0110\u0158\u00cd\u1e7c\u00cd\u00d1\u011c~~]",
+        "unit": "[~~\u00dd\u0110\u0160~~]"
       },
       "drive_acc": {
-        "label": "[~~Đříṽíñĝ Áĉĉúřáĉý~~]",
-        "short": "[~~ÁĈĈÚŘÁĈÝ~~]",
+        "label": "[~~\u0110\u0159\u00ed\u1e7d\u00ed\u00f1\u011d \u00c1\u0109\u0109\u00fa\u0159\u00e1\u0109\u00fd~~]",
+        "short": "[~~\u00c1\u0108\u0108\u00da\u0158\u00c1\u0108\u00dd~~]",
         "unit": "[~~%~~]"
       },
       "gir_pct": {
-        "label": "[~~Ĝřééñš íñ Řéĝúļáţíőñ~~]",
-        "short": "[~~ĜÍŘ~~]",
+        "label": "[~~\u011c\u0159\u00e9\u00e9\u00f1\u0161 \u00ed\u00f1 \u0158\u00e9\u011d\u00fa\u013c\u00e1\u0163\u00ed\u0151\u00f1~~]",
+        "short": "[~~\u011c\u00cd\u0158~~]",
         "unit": "[~~%~~]"
       },
       "sand_saves_pct": {
-        "label": "[~~Šáñđ Šáṽéš~~]",
-        "short": "[~~ŠÁÑĐ ŠÁṼÉŠ~~]",
+        "label": "[~~\u0160\u00e1\u00f1\u0111 \u0160\u00e1\u1e7d\u00e9\u0161~~]",
+        "short": "[~~\u0160\u00c1\u00d1\u0110 \u0160\u00c1\u1e7c\u00c9\u0160~~]",
         "unit": "[~~%~~]"
       },
       "putt_avg": {
-        "label": "[~~Ƥúţţíñĝ Áṽéřáĝé~~]",
-        "short": "[~~ƤÚŢŢÍÑĜ~~]",
-        "unit": "[~~ƤÚŢŢŠ~~]"
+        "label": "[~~\u01a4\u00fa\u0163\u0163\u00ed\u00f1\u011d \u00c1\u1e7d\u00e9\u0159\u00e1\u011d\u00e9~~]",
+        "short": "[~~\u01a4\u00da\u0162\u0162\u00cd\u00d1\u011c~~]",
+        "unit": "[~~\u01a4\u00da\u0162\u0162\u0160~~]"
       },
       "strokes_gained_tee_green": {
-        "label": "[~~Šţřőǩéš Ĝáíñéđ Ţ2Ĝ~~]",
-        "short": "[~~ŠĜ Ţ2Ĝ~~]",
-        "unit": "[~~ŠĜ~~]"
+        "label": "[~~\u0160\u0163\u0159\u0151\u01e9\u00e9\u0161 \u011c\u00e1\u00ed\u00f1\u00e9\u0111 \u01622\u011c~~]",
+        "short": "[~~\u0160\u011c \u01622\u011c~~]",
+        "unit": "[~~\u0160\u011c~~]"
       },
       "strokes_gained_putting": {
-        "label": "[~~Šţřőǩéš Ĝáíñéđ Ƥúţţíñĝ~~]",
-        "short": "[~~ŠĜ ƤÚŢŢ~~]",
-        "unit": "[~~ŠĜ~~]"
+        "label": "[~~\u0160\u0163\u0159\u0151\u01e9\u00e9\u0161 \u011c\u00e1\u00ed\u00f1\u00e9\u0111 \u01a4\u00fa\u0163\u0163\u00ed\u00f1\u011d~~]",
+        "short": "[~~\u0160\u011c \u01a4\u00da\u0162\u0162~~]",
+        "unit": "[~~\u0160\u011c~~]"
       },
       "world_rank": {
-        "label": "[~~Ŵőřļđ Řáñǩíñĝ~~]",
-        "short": "[~~ŴŐŘĻĐ~~]",
-        "unit": "[~~ŐŴĜŘ~~]"
+        "label": "[~~\u0174\u0151\u0159\u013c\u0111 \u0158\u00e1\u00f1\u01e9\u00ed\u00f1\u011d~~]",
+        "short": "[~~\u0174\u0150\u0158\u013b\u0110~~]",
+        "unit": "[~~\u0150\u0174\u011c\u0158~~]"
       },
       "points": {
-        "label": "[~~Šéášőñ Ƥőíñţš~~]",
-        "short": "[~~ƤŐÍÑŢŠ~~]",
-        "unit": "[~~ƤŢŠ~~]"
+        "label": "[~~\u0160\u00e9\u00e1\u0161\u0151\u00f1 \u01a4\u0151\u00ed\u00f1\u0163\u0161~~]",
+        "short": "[~~\u01a4\u0150\u00cd\u00d1\u0162\u0160~~]",
+        "unit": "[~~\u01a4\u0162\u0160~~]"
       },
       "events_played": {
-        "label": "[~~Éṽéñţš Ƥļáýéđ~~]",
-        "short": "[~~ÉṼÉÑŢŠ~~]",
-        "unit": "[~~ÉṼÉÑŢŠ~~]"
+        "label": "[~~\u00c9\u1e7d\u00e9\u00f1\u0163\u0161 \u01a4\u013c\u00e1\u00fd\u00e9\u0111~~]",
+        "short": "[~~\u00c9\u1e7c\u00c9\u00d1\u0162\u0160~~]",
+        "unit": "[~~\u00c9\u1e7c\u00c9\u00d1\u0162\u0160~~]"
       },
       "top_25": {
-        "label": "[~~Ţőƥ 25 Ƒíñíšĥéš~~]",
-        "short": "[~~ŢŐƤ 25~~]",
-        "unit": "[~~ŢŐƤ 25~~]"
+        "label": "[~~\u0162\u0151\u01a5 25 \u0191\u00ed\u00f1\u00ed\u0161\u0125\u00e9\u0161~~]",
+        "short": "[~~\u0162\u0150\u01a4 25~~]",
+        "unit": "[~~\u0162\u0150\u01a4 25~~]"
       },
       "cuts_made": {
-        "label": "[~~Ĉúţš Ṁáđé~~]",
-        "short": "[~~ĈÚŢŠ ṀÁĐÉ~~]",
-        "unit": "[~~ĈÚŢŠ~~]"
+        "label": "[~~\u0108\u00fa\u0163\u0161 \u1e40\u00e1\u0111\u00e9~~]",
+        "short": "[~~\u0108\u00da\u0162\u0160 \u1e40\u00c1\u0110\u00c9~~]",
+        "unit": "[~~\u0108\u00da\u0162\u0160~~]"
       },
       "birdies_per_round": {
-        "label": "[~~Ɓířđíéš Ƥéř Řőúñđ~~]",
-        "short": "[~~ƁÍŘĐÍÉŠ / ŘĐ~~]",
-        "unit": "[~~ÁṼĜ~~]"
+        "label": "[~~\u0181\u00ed\u0159\u0111\u00ed\u00e9\u0161 \u01a4\u00e9\u0159 \u0158\u0151\u00fa\u00f1\u0111~~]",
+        "short": "[~~\u0181\u00cd\u0158\u0110\u00cd\u00c9\u0160 / \u0158\u0110~~]",
+        "unit": "[~~\u00c1\u1e7c\u011c~~]"
       },
       "scrambling": {
-        "label": "[~~Šĉřáɱƀļíñĝ~~]",
-        "short": "[~~ŠĈŘÁṀƁĻÍÑĜ~~]",
+        "label": "[~~\u0160\u0109\u0159\u00e1\u0271\u0180\u013c\u00ed\u00f1\u011d~~]",
+        "short": "[~~\u0160\u0108\u0158\u00c1\u1e40\u0181\u013b\u00cd\u00d1\u011c~~]",
         "unit": "[~~%~~]"
       },
       "strokes_gained_total": {
-        "label": "[~~Šţřőǩéš Ĝáíñéđ Ţőţáļ~~]",
-        "short": "[~~ŠĜ: ŢŐŢÁĻ~~]",
-        "unit": "[~~ŠĜ~~]"
+        "label": "[~~\u0160\u0163\u0159\u0151\u01e9\u00e9\u0161 \u011c\u00e1\u00ed\u00f1\u00e9\u0111 \u0162\u0151\u0163\u00e1\u013c~~]",
+        "short": "[~~\u0160\u011c: \u0162\u0150\u0162\u00c1\u013b~~]",
+        "unit": "[~~\u0160\u011c~~]"
       },
       "strokes_gained_around_green": {
-        "label": "[~~Šţřőǩéš Ĝáíñéđ Ářőúñđ Ĝřééñ~~]",
-        "short": "[~~ŠĜ: ÁŘŐÚÑĐ~~]",
-        "unit": "[~~ŠĜ~~]"
+        "label": "[~~\u0160\u0163\u0159\u0151\u01e9\u00e9\u0161 \u011c\u00e1\u00ed\u00f1\u00e9\u0111 \u00c1\u0159\u0151\u00fa\u00f1\u0111 \u011c\u0159\u00e9\u00e9\u00f1~~]",
+        "short": "[~~\u0160\u011c: \u00c1\u0158\u0150\u00da\u00d1\u0110~~]",
+        "unit": "[~~\u0160\u011c~~]"
       }
     },
     "pointsBrand": {
-      "euro": "[~~Řáĉé ţő Đúƀáí~~]",
-      "lpga": "[~~ĈṀÉ Ƥőíñţš~~]",
-      "liv": "[~~ĻÍṼ Ƥőíñţš~~]",
+      "euro": "[~~\u0158\u00e1\u0109\u00e9 \u0163\u0151 \u0110\u00fa\u0180\u00e1\u00ed~~]",
+      "lpga": "[~~\u0108\u1e40\u00c9 \u01a4\u0151\u00ed\u00f1\u0163\u0161~~]",
+      "liv": "[~~\u013b\u00cd\u1e7c \u01a4\u0151\u00ed\u00f1\u0163\u0161~~]",
       "pgad": "Korn Ferry Points"
     },
     "almanac": {
       "world": {
-        "overline": "⟦⟦ÓFFÍCÍÁL WÓRLD RÁNKÍNG⟧⟧",
-        "title": "⟦⟦Thé wórld órdér⟧⟧",
-        "no1": "⟦⟦WÓRLD NÓ. 1⟧⟧"
+        "overline": "\u27e6\u27e6\u00d3FF\u00cdC\u00cd\u00c1L W\u00d3RLD R\u00c1NK\u00cdNG\u27e7\u27e7",
+        "title": "\u27e6\u27e6Th\u00e9 w\u00f3rld \u00f3rd\u00e9r\u27e7\u27e7",
+        "no1": "\u27e6\u27e6W\u00d3RLD N\u00d3. 1\u27e7\u27e7"
       },
       "pointsMarquee": {
-        "title": "⟦⟦Thé séásón léádérs⟧⟧"
+        "title": "\u27e6\u27e6Th\u00e9 s\u00e9\u00e1s\u00f3n l\u00e9\u00e1d\u00e9rs\u27e7\u27e7"
       },
       "marquee": {
-        "no1": "⟦⟦TÓÚR LÉÁDÉR⟧⟧"
+        "no1": "\u27e6\u27e6T\u00d3\u00daR L\u00c9\u00c1D\u00c9R\u27e7\u27e7"
       },
       "money": {
-        "title": "⟦⟦Thé mónéy líst⟧⟧"
+        "title": "\u27e6\u27e6Th\u00e9 m\u00f3n\u00e9y l\u00edst\u27e7\u27e7"
       },
       "scoring": {
-        "title": "⟦⟦Thé púrést róúnds⟧⟧",
-        "leader": "⟦⟦LÉÁDS THÉ TÓÚR⟧⟧",
-        "behind": "⟦⟦+⟧{{delta}}⟦ béhínd⟧⟧"
+        "title": "\u27e6\u27e6Th\u00e9 p\u00far\u00e9st r\u00f3\u00fands\u27e7\u27e7",
+        "leader": "\u27e6\u27e6L\u00c9\u00c1DS TH\u00c9 T\u00d3\u00daR\u27e7\u27e7",
+        "behind": "\u27e6\u27e6+\u27e7{{delta}}\u27e6 b\u00e9h\u00ednd\u27e7\u27e7"
       },
       "winners": {
-        "title": "⟦⟦Thé wínnérs' círclé⟧⟧"
+        "title": "\u27e6\u27e6Th\u00e9 w\u00ednn\u00e9rs' c\u00edrcl\u00e9\u27e7\u27e7"
       }
     }
   },
   "players": {
     "search": {
-      "placeholder": "[~~Šéářĉĥ ƥļáýéřš~~]",
-      "openAria": "[~~Šéářĉĥ ƥļáýéřš~~]",
-      "closeAria": "[~~Ĉļéář šéářĉĥ~~]"
+      "placeholder": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161~~]",
+      "openAria": "[~~\u0160\u00e9\u00e1\u0159\u0109\u0125 \u01a5\u013c\u00e1\u00fd\u00e9\u0159\u0161~~]",
+      "closeAria": "[~~\u0108\u013c\u00e9\u00e1\u0159 \u0161\u00e9\u00e1\u0159\u0109\u0125~~]"
     },
     "editorial": {
-      "leaderAt": "[~~{{tournament}} — {{leader}} ĻÉÁĐŠ ÁŢ {{score}}~~]",
-      "startsOn": "[~~{{tournament}} ŠŢÁŘŢŠ {{day}}~~]"
+      "leaderAt": "[~~{{tournament}} \u2014 {{leader}} \u013b\u00c9\u00c1\u0110\u0160 \u00c1\u0162 {{score}}~~]",
+      "startsOn": "[~~{{tournament}} \u0160\u0162\u00c1\u0158\u0162\u0160 {{day}}~~]"
     },
     "field": {
-      "eyebrow": "[~~ŢĤÉ ƑÍÉĻĐ~~]"
+      "eyebrow": "[~~\u0162\u0124\u00c9 \u0191\u00cd\u00c9\u013b\u0110~~]"
     },
     "sort": {
-      "ranking": "[~~Řáñǩíñĝ~~]",
-      "playingNow": "[~~Ƥļáýíñĝ ñőŵ~~]"
+      "ranking": "[~~\u0158\u00e1\u00f1\u01e9\u00ed\u00f1\u011d~~]",
+      "playingNow": "[~~\u01a4\u013c\u00e1\u00fd\u00ed\u00f1\u011d \u00f1\u0151\u0175~~]"
     },
     "sub": {
-      "wins_one": "[~~{{count}} ŴÍÑ~~]",
-      "wins_other": "[~~{{count}} ŴÍÑŠ~~]",
-      "top10s": "[~~{{count}} ŢŐƤ-10~~]"
+      "wins_one": "[~~{{count}} \u0174\u00cd\u00d1~~]",
+      "wins_other": "[~~{{count}} \u0174\u00cd\u00d1\u0160~~]",
+      "top10s": "[~~{{count}} \u0162\u0150\u01a4-10~~]"
     },
     "footer": {
-      "synced": "[~~Šéášőñ řáñǩíñĝ · ļíṽé đőţ = őñ ţĥé ĉőúřšé říĝĥţ ñőŵ~~]",
-      "unsynced": "[~~Řáñǩéđ ƀý ŵőřļđ řáñǩíñĝ — šéášőñ šţáţíšţíĉš ářříṽé ŵíţĥ ţĥé šýñĉ~~]"
+      "synced": "[~~\u0160\u00e9\u00e1\u0161\u0151\u00f1 \u0159\u00e1\u00f1\u01e9\u00ed\u00f1\u011d \u00b7 \u013c\u00ed\u1e7d\u00e9 \u0111\u0151\u0163 = \u0151\u00f1 \u0163\u0125\u00e9 \u0109\u0151\u00fa\u0159\u0161\u00e9 \u0159\u00ed\u011d\u0125\u0163 \u00f1\u0151\u0175~~]",
+      "unsynced": "[~~\u0158\u00e1\u00f1\u01e9\u00e9\u0111 \u0180\u00fd \u0175\u0151\u0159\u013c\u0111 \u0159\u00e1\u00f1\u01e9\u00ed\u00f1\u011d \u2014 \u0161\u00e9\u00e1\u0161\u0151\u00f1 \u0161\u0163\u00e1\u0163\u00ed\u0161\u0163\u00ed\u0109\u0161 \u00e1\u0159\u0159\u00ed\u1e7d\u00e9 \u0175\u00ed\u0163\u0125 \u0163\u0125\u00e9 \u0161\u00fd\u00f1\u0109~~]"
     },
     "podium": {
-      "rank": "[~~Ñő.{{rank}}~~]",
-      "rankWithStat": "[~~Ñő.{{rank}} · {{statLabel}}~~]"
+      "rank": "[~~\u00d1\u0151.{{rank}}~~]",
+      "rankWithStat": "[~~\u00d1\u0151.{{rank}} \u00b7 {{statLabel}}~~]"
     },
     "statLabel": {
-      "pga": "[~~ƑÉĐÉẊ ƤŢŠ~~]",
-      "euro": "[~~ŘŢĐ ƤŢŠ~~]",
-      "lpga": "[~~ĈṀÉ ƤŢŠ~~]",
-      "pgad": "[~~ƤŐÍÑŢŠ~~]",
-      "liv": "[~~ĻÍṼ ƤŢŠ~~]"
+      "pga": "[~~\u0191\u00c9\u0110\u00c9\u1e8a \u01a4\u0162\u0160~~]",
+      "euro": "[~~\u0158\u0162\u0110 \u01a4\u0162\u0160~~]",
+      "lpga": "[~~\u0108\u1e40\u00c9 \u01a4\u0162\u0160~~]",
+      "pgad": "[~~\u01a4\u0150\u00cd\u00d1\u0162\u0160~~]",
+      "liv": "[~~\u013b\u00cd\u1e7c \u01a4\u0162\u0160~~]"
     }
   },
   "player": {
     "error": {
-      "loadFailed": "[~~Ĉőúļđñ'ţ ļőáđ ƥļáýéř đáţá~~]",
-      "retry": "[~~Řéţřý~~]"
+      "loadFailed": "[~~\u0108\u0151\u00fa\u013c\u0111\u00f1'\u0163 \u013c\u0151\u00e1\u0111 \u01a5\u013c\u00e1\u00fd\u00e9\u0159 \u0111\u00e1\u0163\u00e1~~]",
+      "retry": "[~~\u0158\u00e9\u0163\u0159\u00fd~~]"
     },
     "hero": {
-      "tourSuffix": "[~~{{tour}} ŢŐÚŘ~~]",
-      "fallback": "[~~ƤĻÁÝÉŘ~~]",
-      "worldNo": "[~~Ŵőřļđ Ñő. {{rank}}~~]",
-      "fedexNo": "[~~ƑéđÉẋ Ñő. {{rank}}~~]"
+      "tourSuffix": "[~~{{tour}} \u0162\u0150\u00da\u0158~~]",
+      "fallback": "[~~\u01a4\u013b\u00c1\u00dd\u00c9\u0158~~]",
+      "worldNo": "[~~\u0174\u0151\u0159\u013c\u0111 \u00d1\u0151. {{rank}}~~]",
+      "fedexNo": "[~~\u0191\u00e9\u0111\u00c9\u1e8b \u00d1\u0151. {{rank}}~~]"
     },
     "live": {
-      "badge": "[~~ĻÍṼÉ~~]",
-      "roundSuffix": "[~~ · Ř{{round}}~~]",
-      "thru": "[~~ţĥřú {{holes}}~~]",
-      "finished": "[~~Ƒ~~]"
+      "badge": "[~~\u013b\u00cd\u1e7c\u00c9~~]",
+      "roundSuffix": "[~~ \u00b7 \u0158{{round}}~~]",
+      "thru": "[~~\u0163\u0125\u0159\u00fa {{holes}}~~]",
+      "finished": "[~~\u0191~~]"
     },
     "form": {
-      "eyebrow": "[~~Ļášţ 6 · Ṁőšţ Řéĉéñţ Ƒířšţ~~]",
+      "eyebrow": "[~~\u013b\u00e1\u0161\u0163 6 \u00b7 \u1e40\u0151\u0161\u0163 \u0158\u00e9\u0109\u00e9\u00f1\u0163 \u0191\u00ed\u0159\u0161\u0163~~]",
       "status": {
-        "mc": "[~~ṀĈ~~]",
-        "wd": "[~~ŴĐ~~]",
-        "dq": "[~~ĐǪ~~]",
-        "noResult": "[~~—~~]"
+        "mc": "[~~\u1e40\u0108~~]",
+        "wd": "[~~\u0174\u0110~~]",
+        "dq": "[~~\u0110\u01ea~~]",
+        "noResult": "[~~\u2014~~]"
       }
     },
     "tournaments": {
-      "eyebrow": "[~~Ţőúřñáɱéñţš~~]",
-      "winChip": "[~~ŴÍÑ~~]",
-      "liveChip": "[~~ĻÍṼÉ~~]",
-      "expand": "[~~Ƒúļļ šéášőñ ›~~]",
+      "eyebrow": "[~~\u0162\u0151\u00fa\u0159\u00f1\u00e1\u0271\u00e9\u00f1\u0163\u0161~~]",
+      "winChip": "[~~\u0174\u00cd\u00d1~~]",
+      "liveChip": "[~~\u013b\u00cd\u1e7c\u00c9~~]",
+      "expand": "[~~\u0191\u00fa\u013c\u013c \u0161\u00e9\u00e1\u0161\u0151\u00f1 \u203a~~]",
       "status": {
-        "mc": "[~~ṀĈ~~]",
-        "wd": "[~~ŴĐ~~]",
-        "dq": "[~~ĐǪ~~]",
-        "noResult": "[~~—~~]"
+        "mc": "[~~\u1e40\u0108~~]",
+        "wd": "[~~\u0174\u0110~~]",
+        "dq": "[~~\u0110\u01ea~~]",
+        "noResult": "[~~\u2014~~]"
       }
     },
     "season": {
-      "eyebrow": "[~~Ţĥíš Šéášőñ~~]",
-      "allStats": "[~~Áļļ šţáţš~~]",
+      "eyebrow": "[~~\u0162\u0125\u00ed\u0161 \u0160\u00e9\u00e1\u0161\u0151\u00f1~~]",
+      "allStats": "[~~\u00c1\u013c\u013c \u0161\u0163\u00e1\u0163\u0161~~]",
       "card": {
-        "top10s": "[~~ŢŐƤ 10š~~]",
-        "wins": "[~~ŴÍÑŠ~~]",
-        "scoring": "[~~ŠĈŐŘÍÑĜ~~]",
-        "earnings": "[~~ÉÁŘÑÍÑĜŠ~~]",
-        "events": "[~~ÉṼÉÑŢŠ~~]",
-        "bestFinish": "[~~ƁÉŠŢ ƑÍÑÍŠĤ~~]",
-        "madeCuts": "[~~ṀÁĐÉ ĈÚŢŠ~~]"
+        "top10s": "[~~\u0162\u0150\u01a4 10\u0161~~]",
+        "wins": "[~~\u0174\u00cd\u00d1\u0160~~]",
+        "scoring": "[~~\u0160\u0108\u0150\u0158\u00cd\u00d1\u011c~~]",
+        "earnings": "[~~\u00c9\u00c1\u0158\u00d1\u00cd\u00d1\u011c\u0160~~]",
+        "events": "[~~\u00c9\u1e7c\u00c9\u00d1\u0162\u0160~~]",
+        "bestFinish": "[~~\u0181\u00c9\u0160\u0162 \u0191\u00cd\u00d1\u00cd\u0160\u0124~~]",
+        "madeCuts": "[~~\u1e40\u00c1\u0110\u00c9 \u0108\u00da\u0162\u0160~~]"
       }
     },
     "about": {
-      "eyebrow": "[~~Áƀőúţ~~]",
+      "eyebrow": "[~~\u00c1\u0180\u0151\u00fa\u0163~~]",
       "field": {
-        "born": "[~~Ɓőřñ~~]",
-        "age": "[~~Áĝé~~]",
-        "turnedPro": "[~~Ţúřñéđ Ƥřő~~]",
-        "height": "[~~Ĥéíĝĥţ~~]",
-        "college": "[~~Ĉőļļéĝé~~]",
-        "residence": "[~~Řéšíđéñĉé~~]"
+        "born": "[~~\u0181\u0151\u0159\u00f1~~]",
+        "age": "[~~\u00c1\u011d\u00e9~~]",
+        "turnedPro": "[~~\u0162\u00fa\u0159\u00f1\u00e9\u0111 \u01a4\u0159\u0151~~]",
+        "height": "[~~\u0124\u00e9\u00ed\u011d\u0125\u0163~~]",
+        "college": "[~~\u0108\u0151\u013c\u013c\u00e9\u011d\u00e9~~]",
+        "residence": "[~~\u0158\u00e9\u0161\u00ed\u0111\u00e9\u00f1\u0109\u00e9~~]"
       }
     },
     "stats": {
-      "eyebrow": "[~~Šéášőñ Šţáţíšţíĉš~~]",
+      "eyebrow": "[~~\u0160\u00e9\u00e1\u0161\u0151\u00f1 \u0160\u0163\u00e1\u0163\u00ed\u0161\u0163\u00ed\u0109\u0161~~]",
       "section": {
-        "overview": "[~~Őṽéřṽíéŵ~~]",
-        "ballStriking": "[~~Ɓáļļ Šţříǩíñĝ~~]",
-        "shortGame": "[~~Šĥőřţ Ĝáɱé~~]",
-        "strokesGained": "[~~Šţřőǩéš Ĝáíñéđ~~]"
+        "overview": "[~~\u0150\u1e7d\u00e9\u0159\u1e7d\u00ed\u00e9\u0175~~]",
+        "ballStriking": "[~~\u0181\u00e1\u013c\u013c \u0160\u0163\u0159\u00ed\u01e9\u00ed\u00f1\u011d~~]",
+        "shortGame": "[~~\u0160\u0125\u0151\u0159\u0163 \u011c\u00e1\u0271\u00e9~~]",
+        "strokesGained": "[~~\u0160\u0163\u0159\u0151\u01e9\u00e9\u0161 \u011c\u00e1\u00ed\u00f1\u00e9\u0111~~]"
       }
     }
   },
@@ -855,5 +856,17 @@
     "parValue": "[Par {{par}}]",
     "yardsValue": "[{{yards}} yds]",
     "fieldInline": "[Field {{v}} from {{n}}]"
+  },
+  "news": {
+    "masthead": "THE WIRE",
+    "updated": "Updated {{time}}",
+    "empty": "No stories on the wire yet.",
+    "more": "MORE FROM THE WIRE",
+    "notFound": "This story is no longer available.",
+    "back": "Back",
+    "live": "LIVE",
+    "liveRound": "LIVE \u00b7 ROUND {{n}}",
+    "tournament": "TOURNAMENT",
+    "andCoLead": "+{{count}}"
   }
 }
