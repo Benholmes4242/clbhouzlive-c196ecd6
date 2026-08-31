@@ -51,9 +51,13 @@ const emptyCounts = (): Record<StoryBlock['type'], number> => ({
   paragraph: 0, heading: 0, image: 0, quote: 0, leaderboard: 0, player: 0,
 });
 
-/** Anything bracket- or bang-shaped that MEANT to be a marker and missed. */
+/**
+ * Anything bracket- or bang-shaped that MEANT to be a marker and missed. Kept
+ * DELIBERATELY loose — `[leaderbord:…]` is the mistake that will actually be
+ * made, and matching only the correct spellings would never catch it.
+ */
 function looksLikeAMarker(line: string): boolean {
-  return /^!\[/.test(line) || /^\[(leaderboard|player)/i.test(line);
+  return /^!\[/.test(line) || /^\[[^\]]*:[^\]]*\]$/.test(line);
 }
 
 export function parseStoryText(source: string): ParseResult {
