@@ -42,6 +42,19 @@ const TOUR_TAG: Record<string, string> = {
   liv: 'LIV GOLF',
 };
 
+/**
+ * How far the photograph's subject moves DOWN inside the hero frame.
+ *
+ * object-position cannot do this here: at 390x345 a landscape photo covers
+ * the box by cropping the SIDES, so vertical overflow is zero and a focal
+ * point has nothing to travel through. Instead the image box is made taller
+ * than the frame and the frame clips the bottom.
+ *
+ * The image is anchored to the top, so extra height of 2x moves the centre
+ * of the picture down by x. These two numbers only ever change together.
+ */
+const HERO_SUBJECT_DROP = 26;
+
 const KICKER: React.CSSProperties = {
   fontSize: 9,
   fontWeight: 700,
@@ -142,7 +155,16 @@ export function StoryArticle({ story, immersiveHero = false, tagLabel }: {
           <img
             src={story.image_url}
             alt={story.headline}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            style={{
+              width: '100%',
+              height: `calc(100% + ${HERO_SUBJECT_DROP * 2}px)`,
+              objectFit: 'cover',
+              // objectPosition is the default; it is written out to stop future
+              // edits trying to "tune" a focal point that has no vertical travel
+              // on this nearly-square hero (landscape photos crop at the sides).
+              objectPosition: '50% 50%',
+              display: 'block',
+            }}
           />
           <div
             aria-hidden
