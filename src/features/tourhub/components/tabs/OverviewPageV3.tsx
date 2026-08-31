@@ -4,6 +4,7 @@
  * Hero: the self-contained Hero River carousel (OverviewHero). Editorial modules follow in lazy sections.
  */
 
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ComingUpSlot } from '../overview-v3/ComingUpSlot';
@@ -31,7 +32,14 @@ export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
   // READ-ONLY: keyed here purely to drive the OTC + Schedule synchronized fade so
   // the hero-lensed unit visibly changes together. Must not write back.
-  const { viewingTournamentId, viewingIsLive } = useTourSelection();
+  const { viewingTournamentId, viewingIsLive, selectedTourSlug, setAppliedTourSlug } = useTourSelection();
+
+  // The overview's island label describes the lens used by its sections, not
+  // the tour of whichever tournament happens to be visible in the hero.
+  useEffect(() => {
+    setAppliedTourSlug(selectedTourSlug ?? 'all');
+    return () => setAppliedTourSlug(null);
+  }, [selectedTourSlug, setAppliedTourSlug]);
 
 
   return (

@@ -1,25 +1,20 @@
 /**
  * WorldRankingsSlot — mounts the v4 WorldRankings section on the live
- * Overview with a per-section tour lens.
- *
- * No "All Tours" pill: default PGA, chips filter to a specific tour.
+ * Overview driven by the global Tour Hub lens. All Tours resolves to the OWGR,
+ * the app's genuine world list. Unsupported boards hide rather than substitute.
  */
-import { useState } from 'react';
 import { WorldRankings } from '@/features/tourhub/overview/sections/WorldRankings';
-import { SectionTourLens } from '@/features/tourhub/overview/sections/SectionTourLens';
+import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 
+const RANKING_TOURS = new Set<string>(['pga', 'lpga', 'euro', 'liv', 'pgad']);
+
 export function WorldRankingsSlot() {
-  const [tour, setTour] = useState<TourId>('pga');
-  return (
-    <>
-      {/* Champions is the ONE tour with no row in tour_season_rankings. liv and
-          pgad DO have boards — keep this array in step with TOUR_TO_BOARD in
-          WorldRankings.tsx. */}
-      <SectionTourLens value={tour} onChange={setTour} showAllTours={false} excludeTours={['champ']} />
-      <WorldRankings tour={tour} />
-    </>
-  );
+  const { selectedTourSlug } = useTourSelection();
+  const active = selectedTourSlug ?? 'all';
+  if (active === 'all') return <WorldRankings tour="pga" />;
+  if (!RANKING_TOURS.has(active)) return null;
+  return <WorldRankings tour={active as TourId} />;
 }
 
 export default WorldRankingsSlot;

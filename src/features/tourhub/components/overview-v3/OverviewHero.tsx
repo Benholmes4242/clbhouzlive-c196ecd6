@@ -2,7 +2,8 @@
  * OverviewHero — Hero River. The carousel crosses ALL tours in the
  * editorial order returned by useHeroCarouselData (LIVE→majors→rest).
  * Swipe / chevrons change the tournament AND the tour. The picker becomes a
- * jump-to shortcut via selectionNonce. Display reporting is debounced 250ms
+  * jump-to shortcut via selectionNonce. The hero never changes the selected
+  * lens. Display reporting is debounced 250ms
  * so a rapid multi-slide swipe doesn't fan out pulse/OTC/TI fetches per
  * intermediate slide.
  *
@@ -59,7 +60,6 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
     selectedTourSlug,
     selectedTournamentId,
     selectionNonce,
-    applyLandingSelection,
     setViewingTourSlug,
     setViewingTournamentId,
     setViewingIsLive,
@@ -75,20 +75,6 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
     [slides],
   );
 
-  // Land-time live-first: as soon as slides resolve, tell the context which
-  // tours are live so it can override the stored/default tour once. The
-  // context guards against re-runs after user interaction.
-  const liveTourSignature = useMemo(() => {
-    const set = new Set<string>();
-    for (const s of slides) if (s.type === 'live') set.add(s.tournament.tourSlug);
-    return Array.from(set).sort().join('|');
-  }, [slides]);
-  useEffect(() => {
-    if (count === 0) return;
-    applyLandingSelection(liveTourSignature ? liveTourSignature.split('|') : []);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count, liveTourSignature]);
-
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Track the currently-viewed tournament id so we can restore position
@@ -100,7 +86,19 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
     if (count === 0) return;
     const prevId = prevIdRef.current;
     const nextIdx = prevId ? slides.findIndex((s) => s.tournament.id === prevId) : -1;
-    setActiveIndex(nextIdx >= 0 ? nextIdx : 0);
+    if (nextIdx >= 0) {
+      setActiveIndex(nextIdx);
+      return;
+    }
+    if (selectedTourSlug && selectedTourSlug !== 'all') {
+      const liveIdx = slides.findIndex(
+        (s) => s.tournament.tourSlug === selectedTourSlug && s.type === 'live',
+      );
+      const tourIdx = slides.findIndex((s) => s.tournament.tourSlug === selectedTourSlug);
+      setActiveIndex(liveIdx >= 0 ? liveIdx : tourIdx >= 0 ? tourIdx : 0);
+      return;
+    }
+    setActiveIndex(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idSignature]);
 

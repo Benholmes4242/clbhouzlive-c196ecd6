@@ -22,6 +22,7 @@ export const TOUR_STORAGE_KEY = 'tourhub:selectedTour';
 
 /** Canonical tour slugs used by the hero carousel + picker. */
 export const CANONICAL_TOUR_SLUGS = [
+  'all',
   'pga',
   'lpga',
   'euro',

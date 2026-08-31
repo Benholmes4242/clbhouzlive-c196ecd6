@@ -87,7 +87,7 @@ function plainSlug(slug: string): string {
  */
 export function useTourPillLabel(): string {
   const { selectedTourSlug, viewingTourSlug, appliedTourSlug } = useTourSelection();
-  const activeTourSlug = appliedTourSlug ?? viewingTourSlug ?? selectedTourSlug ?? 'pga';
+  const activeTourSlug = appliedTourSlug ?? selectedTourSlug ?? viewingTourSlug ?? 'all';
   if (activeTourSlug === 'major') return 'THE MAJORS';
   return TOUR_LABEL[activeTourSlug] ?? plainSlug(activeTourSlug);
 }
@@ -98,7 +98,7 @@ export function useTourPillLabel(): string {
  */
 export function useTourShortLabel(): string {
   const { selectedTourSlug, viewingTourSlug, appliedTourSlug } = useTourSelection();
-  const activeTourSlug = appliedTourSlug ?? viewingTourSlug ?? selectedTourSlug ?? 'pga';
+  const activeTourSlug = appliedTourSlug ?? selectedTourSlug ?? viewingTourSlug ?? 'all';
   if (activeTourSlug === 'major') return 'MAJORS';
   return TOUR_LABEL_SHORT[activeTourSlug] ?? activeTourSlug.toUpperCase();
 }
