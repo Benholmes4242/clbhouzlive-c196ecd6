@@ -29,7 +29,8 @@ export async function resolveStoryMarkers(result: ParseResult): Promise<ParseRes
     const { data } = await supabase
       .from('sr_players')
       .select('id, full_name, first_name, last_name')
-      .ilike('full_name', n)
+      // Escape wildcards so a stray % in a name cannot widen the match.
+      .ilike('full_name', n.replace(/[%_]/g, (c) => `\\${c}`))
       .limit(20);
     rows.push(...((data ?? []) as typeof rows));
   }
