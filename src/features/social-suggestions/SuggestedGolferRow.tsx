@@ -70,7 +70,7 @@ export function SuggestedGolferRow({
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const row = toRow(golfer);
-  const isClub = golfer.reason_type === 'club';
+  const isClub = reasonIsAmber(golfer.reason_type);
 
   // S2.4 - the subline omits what it does not have. No placeholders.
   const parts: string[] = [];
