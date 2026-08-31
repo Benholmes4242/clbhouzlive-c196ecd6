@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { TourStory } from './useTourStories';
 import { StoryRelativeTime } from './StoryImageText';
-import { AMBER, FONT, INK_MUTE, INK_SOFT } from '../_shared/tokens';
+import { AMBER, FONT, INK, INK_MUTE, INK_SOFT } from '../_shared/tokens';
 import { SLAB } from '@/components/feed/feedSurfaces';
 
 export function WireFeedSlide({ story }: { story: TourStory }) {
@@ -35,7 +35,7 @@ export function WireFeedSlide({ story }: { story: TourStory }) {
                 {story.kicker}
               </span>
             )}
-            <div style={{ marginTop: story.kicker ? 6 : 0, color: 'inherit', fontSize: 21, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>
+            <div style={{ marginTop: story.kicker ? 6 : 0, color: INK, fontSize: 21, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>
               {story.headline}
             </div>
           </div>
