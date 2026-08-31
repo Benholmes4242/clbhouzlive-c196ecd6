@@ -29,6 +29,7 @@ import {
   hasToPar,
   positionsFor,
 } from './_shared/boardParts';
+import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 
 export interface ChampionsBoardCategory {
