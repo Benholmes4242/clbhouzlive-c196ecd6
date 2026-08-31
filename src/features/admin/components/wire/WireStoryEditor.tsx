@@ -393,7 +393,10 @@ export default function WireStoryEditor({
           </div>
 
           <div style={panel}>
-            <div style={{ ...KICKER_STYLE, marginBottom: 10 }}>Blocks · {f.blocks.length}</div>
+            <div style={{ ...KICKER_STYLE, marginBottom: 10, color: unparsed ? t.dangerText : t.inkFaint }}>
+              Blocks · {f.blocks.length}{unparsed ? ' · NOT PARSED' : ''}
+            </div>
+
             <WireBlockEditor blocks={f.blocks} onChange={(next) => set('blocks', next)} />
           </div>
         </div>
