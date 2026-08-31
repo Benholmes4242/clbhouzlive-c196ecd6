@@ -27,12 +27,6 @@ import {
 import { AMATEUR_CATEGORIES, AMATEUR_CATEGORY_LABEL } from './categories';
 import { useAmateurStories, type AmateurStory } from './useAmateurStories';
 
-const KICKER: React.CSSProperties = {
-  fontSize: 9,
-  fontWeight: 700,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase',
-};
 
 /** Text-only lens row, per the platform's tab/filter law: no fill, no outline. */
 function CategoryRow({
