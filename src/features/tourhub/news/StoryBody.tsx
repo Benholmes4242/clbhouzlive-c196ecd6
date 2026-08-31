@@ -189,7 +189,9 @@ function LeaderboardBlock({ tournamentId }: { tournamentId: string }) {
       <BoardTable
         entries={shown}
         cutState={cutState}
-        currentRound={currentRound}
+        /* A FINISHED board has no current round to highlight — the amber column
+           header would claim a round is still being played. */
+        currentRound={isLive ? currentRound : null}
         surface={EMBED_BG}
         onRowClick={() => navigate(`/tourhub/tournament/${tournamentId}`)}
       />
