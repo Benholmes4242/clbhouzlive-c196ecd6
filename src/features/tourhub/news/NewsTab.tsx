@@ -170,6 +170,12 @@ export function NewsTab() {
 
   const open = (slug: string) => navigate(`/tour/news/${slug}`);
 
+  /* ONE READ PER WINDOW, never per row: every visible id in a single RPC. */
+  const { engagementFor } = useStoryEngagement(
+    'tour_story',
+    useMemo(() => stories.map((s) => s.id), [stories]),
+  );
+
   return (
     <div style={{ fontFamily: FONT, paddingBottom: 24 }}>
       {isLoading ? (
@@ -186,14 +192,14 @@ export function NewsTab() {
         </div>
       ) : (
         <>
-          {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} />}
+          {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} engagement={engagementFor(lead.id)} />}
           <div style={{ marginTop: lead ? 14 : 0 }}>
             {rest.map((s, i) => (
               <div
                 key={s.id}
                 style={{ borderTop: i === 0 && !lead ? 'none' : `1px solid ${HAIRLINE_INK_10}` }}
               >
-                <StoryRow story={s} onOpen={() => open(s.slug)} />
+                <StoryRow story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} />
               </div>
             ))}
           </div>
