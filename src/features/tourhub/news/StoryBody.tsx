@@ -518,11 +518,12 @@ function StatBlock({ playerId }: { playerId: string }) {
         );
       }
 
+      // Newest snapshot, not the best one the player ever held.
       const { data: r } = await supabase
         .from('sr_world_rankings')
-        .select('rank')
+        .select('rank, ranking_date')
         .eq('player_id', playerId)
-        .order('rank', { ascending: true })
+        .order('ranking_date', { ascending: false })
         .limit(1)
         .maybeSingle();
 
