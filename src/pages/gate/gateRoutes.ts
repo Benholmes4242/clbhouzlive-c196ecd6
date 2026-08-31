@@ -16,7 +16,7 @@ export type GateState =
   | { kind: 'profile'; username: string }
   | { kind: 'none' };
 
-const EXEMPT_PREFIXES = ['/post/', '/tour/news/', '/privacy', '/terms', '/legal/'];
+const EXEMPT_PREFIXES = ['/post/', '/tour/news/', '/discover/news', '/privacy', '/terms', '/legal/'];
 
 export function isGateExemptPath(pathname: string): boolean {
   return EXEMPT_PREFIXES.some((p) => pathname === p || pathname.startsWith(p));

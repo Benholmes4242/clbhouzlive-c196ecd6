@@ -36,8 +36,9 @@ import { saveDraft, loadDraft, clearDraft, draftKeys, draftsEqual } from '../lib
 import HelpArticlesTab from '../components/HelpArticlesTab';
 import LegalDocumentsTab from '../components/LegalDocumentsTab';
 import TheWireTab from '../components/wire/TheWireTab';
+import AmateurNewsTab from '../components/amateur/AmateurNewsTab';
 
-type TabId = 'courses' | 'wire' | 'tour' | 'players' | 'help' | 'legal';
+type TabId = 'courses' | 'wire' | 'amateur' | 'tour' | 'players' | 'help' | 'legal';
 
 export default function ContentPage() {
   const { role } = usePanelRole();
@@ -54,7 +55,7 @@ export default function ContentPage() {
   const isAllowed = (id: TabId): boolean => {
     if (id === 'courses') return true;
     if (id === 'help' || id === 'legal') return can.viewModeration;
-    if (id === 'tour' || id === 'players' || id === 'wire') return can.manageAdmins;
+    if (id === 'tour' || id === 'players' || id === 'wire' || id === 'amateur') return can.manageAdmins;
     return false;
   };
   const tab: TabId = isAllowed(requested) ? requested : 'courses';
@@ -69,6 +70,7 @@ export default function ContentPage() {
     const base: { id: TabId; label: string }[] = [{ id: 'courses', label: 'Courses' }];
     if (can.manageAdmins) {
       base.push({ id: 'wire', label: 'The Wire' });
+      base.push({ id: 'amateur', label: 'Amateur' });
       base.push({ id: 'tour', label: 'Tour data' });
       base.push({ id: 'players', label: 'Players' });
     }
@@ -86,6 +88,7 @@ export default function ContentPage() {
       {tab === 'help' && (can.viewModeration ? <HelpArticlesTab /> : <AdminAccessDenied />)}
       {tab === 'legal' && (can.viewModeration ? <LegalDocumentsTab /> : <AdminAccessDenied />)}
       {tab === 'wire' && (can.manageAdmins ? <TheWireTab /> : <AdminAccessDenied />)}
+      {tab === 'amateur' && (can.manageAdmins ? <AmateurNewsTab /> : <AdminAccessDenied />)}
       {tab === 'tour' && (can.manageAdmins ? <TourDataTab /> : <AdminAccessDenied />)}
       {tab === 'players' && (can.manageAdmins ? <TourPlayersTab /> : <AdminAccessDenied />)}
     </div>

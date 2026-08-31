@@ -115,7 +115,19 @@ function LiveTournamentCard({ tournamentId }: { tournamentId: string }) {
  * Everything above it (the sticky masthead, the loading state, MORE FROM THE
  * WIRE) belongs to the page, not the article.
  */
-export function StoryArticle({ story, immersiveHero = false }: { story: TourStory; immersiveHero?: boolean }) {
+export function StoryArticle({ story, immersiveHero = false, tagLabel }: {
+  story: TourStory;
+  immersiveHero?: boolean;
+  /**
+   * The tag beside the timestamp, when the caller knows it better than the tour
+   * map does. Amateur News passes its category line plus the free-text event
+   * name, because there is no tour to name. Omitted, tour behaviour is
+   * unchanged: the tour_slug resolves through TOUR_TAG.
+   */
+  tagLabel?: string | null;
+}) {
+  const tag = tagLabel ?? (story.tour_slug ? TOUR_TAG[story.tour_slug] ?? null : null);
+
   return (
     <>
       {/* S4: the band used to sit on SLATE_100, a lighter wash than the page
@@ -161,12 +173,13 @@ export function StoryArticle({ story, immersiveHero = false }: { story: TourStor
         </h1>
         <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ ...KICKER, color: INK_FAINT }}>{storyTime(story.published_at)}</span>
-          {story.tour_slug && TOUR_TAG[story.tour_slug] && (
+          {tag && (
             <>
               <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT }} />
-              <span style={{ ...KICKER, color: INK_FAINT }}>{TOUR_TAG[story.tour_slug]}</span>
+              <span style={{ ...KICKER, color: INK_FAINT }}>{tag}</span>
             </>
           )}
+
         </div>
 
         {story.standfirst && (

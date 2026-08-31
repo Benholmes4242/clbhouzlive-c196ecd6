@@ -338,11 +338,41 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // /profile/quest — declared earlier alongside the /profile family.
 
 
+  // Amateur News (/discover/news and /discover/news/:slug). BOTH are declared
+
+  // before the /discover prefix backstop below, which would otherwise hand them
+  // the logo island and leave a reader with no way back.
+  //
+  // The story page falls back to /discover/news; the index falls back to
+  // /explore, NOT /discover — a cold-launched share link has no history, and
+  // /explore is the surface the section is mounted on.
+  {
+    match: { test: (p) => /^\/discover\/news\/[^/]+/.test(p) },
+    spec: {
+      chrome: 'island',
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/discover/news' },
+      tone: 'dark',
+      bleed: true,
+      note: 'amateur story — back island, hero bleeds to the notch',
+    },
+  },
+  {
+    match: { exact: '/discover/news' },
+    spec: {
+      chrome: 'island',
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/explore' },
+      tone: 'dark',
+      bleed: true,
+      note: 'amateur news index — back island, lead photo bleeds to the notch',
+    },
+  },
+
   // Discover sub-pages (region/theme lists, video sections). Prefix rules for
   // discover/explore region already emitted as chrome:'none' above; theme routes
   // are back-arrow island (page renders under CompactHeader today).
   {
     match: { prefix: '/discover/explore/theme/' },
+
     spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: '/explore' }, tone: 'light', bleed: false },
   },
   {

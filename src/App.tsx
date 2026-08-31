@@ -303,6 +303,9 @@ const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
 
 // Tour Hub pages
 const TourNewsStoryPage = lazy(() => import("./features/tourhub/news/StoryPage").then(m => ({ default: m.StoryPage })));
+const AmateurNewsPage = lazy(() => import("./features/amateur/news/AmateurNewsPage"));
+const AmateurStoryPage = lazy(() => import("./features/amateur/news/AmateurStoryPage"));
+
 const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubMainPage })));
 
 const TournamentDetailPage = lazy(() => import("./features/tourhub/tournament-v2/TournamentPage").then(m => ({ default: m.TournamentPage })));
@@ -556,6 +559,13 @@ function AppRoutes() {
         <Route path="/watch/clips" element={<WatchGate><Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense></WatchGate>} />
         <Route path="/watch/videos" element={<WatchGate><Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense></WatchGate>} />
         <Route path="/explore" element={<Suspense fallback={<DiscoverCourseLedSkeleton />}><ExplorePage /></Suspense>} />
+
+        {/* Amateur News. Declared BEFORE /discover/* so the index is not eaten by
+            a broader discover route, and both are gate-exempt so a shared link
+            reads for a guest. */}
+        <Route path="/discover/news" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurNewsPage /></Suspense>} />
+        <Route path="/discover/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurStoryPage /></Suspense>} />
+
 
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
