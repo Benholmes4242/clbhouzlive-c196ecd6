@@ -3,7 +3,7 @@ import React from 'react';
 import { Crown, type LucideIcon } from 'lucide-react';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import type { WindowToggleVariant } from '../types';
-import { ScopeSegment } from '@/components/shared/ScopeSegment';
+import { WindowToggle } from '../_shared/WindowToggle';
 
 
 export interface CabinetSlot {
@@ -260,16 +260,7 @@ export const CrownCabinet: React.FC<CrownCabinetProps> = ({
         })}
       </div>
       <div style={{ marginTop: 12, display: 'flex', justifyContent: 'flex-start' }}>
-        <ScopeSegment
-              tone="dark"
-          value={window}
-          onChange={onWindowChange}
-          ariaLabel="Time window"
-          options={[
-            { value: 'all_time', label: 'All time' },
-            { value: '90d', label: '90 days' },
-          ]}
-        />
+        <WindowToggle window={window} setWindow={onWindowChange} variant={toggleVariant} />
       </div>
 
 
