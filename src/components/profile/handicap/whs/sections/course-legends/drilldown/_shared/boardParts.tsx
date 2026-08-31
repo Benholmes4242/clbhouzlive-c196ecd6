@@ -14,6 +14,7 @@
  *     and these boards carry their meaning in the figures instead
  */
 import React from 'react';
+import { Crown } from 'lucide-react';
 import { A, LABEL, NUM, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { MovementCell } from './MovementCell';
 
@@ -275,3 +276,232 @@ export const HeldGauge: React.FC<{
     </div>
   );
 };
+
+/* ============================================================================
+ * BRIEF_CHAMPIONS_SHEET_MATCHES_BOARD — THE ONE CHAMPIONS ROW.
+ *
+ * The Champions board on the tab and the full-course leaderboard sheet held
+ * separate copies of this row and drifted. There is now exactly one:
+ *   [MOVEMENT?] [POS] [avatar] [MEMBER] [WHEN] [MARK]
+ * POS is centred over the numerals alone; MOVEMENT is an unheaded column
+ * OUTSIDE it, present only when the category's window is 90 days.
+ *
+ * What the SHEET adds through props, not through a fork: a subline under the
+ * member (the gap from the champion) and the NEW badge. The board passes
+ * neither, so its rows are unchanged.
+ * ========================================================================== */
+
+const MINUS = '\u2212';
+
+export const championsGrid = (movement: boolean) =>
+  `${movement ? '26px ' : ''}34px 26px 1fr 58px 62px`;
+export const CHAMPIONS_GAP = 10;
+export const CHAMPIONS_ROW_PADDING_X = 16;
+
+/** 90-DAY vs ALL-TIME is read from the category's window, not its name. */
+export function categoryWindowDays(cat: string): number | null {
+  return String(cat).endsWith('_90d') ? 90 : null;
+}
+
+/** Gross categories are the only ones with a to-par to state. */
+export function hasToPar(cat: string): boolean {
+  return String(cat).startsWith('lowest_gross');
+}
+
+export function formatToPar(value: number, par: number): string {
+  const d = Math.round(value - par);
+  if (d === 0) return 'E';
+  return d > 0 ? `+${d}` : `${MINUS}${Math.abs(d)}`;
+}
+
+export function toParColor(value: number, par: number): string {
+  const d = Math.round(value - par);
+  if (d < 0) return A.RED;
+  if (d === 0) return A.DIM;
+  return A.MUTE;
+}
+
+export function formatChampionsWhen(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }).toUpperCase();
+}
+
+/** Positions with proper tie handling: 1, T3, T3, 5. */
+export function positionsFor(rows: ReadonlyArray<{ value: number }>): string[] {
+  const out: string[] = [];
+  let i = 0;
+  while (i < rows.length) {
+    let j = i;
+    while (j + 1 < rows.length && rows[j + 1].value === rows[i].value) j += 1;
+    const pos = i + 1;
+    const tied = j > i;
+    for (let k = i; k <= j; k += 1) out.push(tied ? `T${pos}` : String(pos));
+    i = j + 1;
+  }
+  return out;
+}
+
+export interface ChampionsRowData {
+  name: string;
+  photoUrl: string | null;
+  value: number;
+  valueDisplay: string;
+  attained_at: string;
+  isSelf: boolean;
+  userId?: string | null;
+  rank30d?: number | null;
+  delta?: number | null;
+}
+
+export const ChampionsRow: React.FC<{
+  row: ChampionsRowData;
+  /** Tie-aware position string: "1", "T2", … */
+  pos: string;
+  /** Board-level, gated on the category's window. Never branch per row. */
+  showMovement?: boolean;
+  /** Gross categories only, and only when the course par is known. */
+  coursePar?: number | null;
+  showToPar?: boolean;
+  /** Hairline above the row. False for the first row of a board. */
+  rule?: boolean;
+  /** SHEET ONLY — the gap from the champion, already signed. */
+  subline?: string | null;
+  /** SHEET ONLY — a mark set within NEW_BADGE_DAYS. */
+  isNew?: boolean;
+  rowRef?: React.Ref<HTMLDivElement>;
+}> = ({
+  row,
+  pos,
+  showMovement = false,
+  coursePar = null,
+  showToPar = false,
+  rule = true,
+  subline = null,
+  isNew = false,
+  rowRef,
+}) => {
+  const tone = row.isSelf ? A.AMBER : A.INK;
+  return (
+    <div
+      ref={rowRef}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: championsGrid(showMovement),
+        gap: CHAMPIONS_GAP,
+        alignItems: 'center',
+        padding: `9px ${CHAMPIONS_ROW_PADDING_X}px`,
+        fontFamily: SANS,
+        background: row.isSelf ? 'rgba(247,147,30,0.07)' : undefined,
+        borderTop: rule ? `1px solid ${A.HAIRLINE}` : undefined,
+      }}
+    >
+      {showMovement && (
+        <span style={{ display: 'flex', justifyContent: 'center' }}>
+          <MovementCell delta={row.delta} rank30d={row.rank30d} theme="dark" size="figure" />
+        </span>
+      )}
+      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+        {pos === '1' && (
+          <Crown size={12} strokeWidth={2.5} fill={A.AMBER} style={{ color: A.AMBER, flexShrink: 0 }} />
+        )}
+        <span style={{ ...NUM, fontSize: 12.5, color: row.isSelf ? A.AMBER : A.DIM }}>{pos}</span>
+      </span>
+      <BoardAvatar photoUrl={row.photoUrl} name={row.name} />
+      <span style={{ minWidth: 0 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: tone,
+              letterSpacing: '-0.01em',
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {row.name}
+          </span>
+          {isNew && (
+            <span
+              style={{
+                ...LABEL,
+                fontSize: 8.5,
+                letterSpacing: '0.10em',
+                color: A.GREEN,
+                flexShrink: 0,
+              }}
+            >
+              NEW
+            </span>
+          )}
+        </span>
+        {subline && (
+          <span
+            style={{
+              ...NUM,
+              display: 'block',
+              marginTop: 2,
+              fontSize: 10.5,
+              fontWeight: 600,
+              color: A.DIM,
+              lineHeight: 1,
+            }}
+          >
+            {`${subline.replace('-', MINUS)} from champion`}
+          </span>
+        )}
+      </span>
+      <span style={{ ...LABEL, fontSize: 10.5, color: A.DIM, textAlign: 'right' }}>
+        {formatChampionsWhen(row.attained_at)}
+      </span>
+      <span style={{ textAlign: 'right', minWidth: 0 }}>
+        <span style={{ ...NUM, fontSize: 15, fontWeight: 700, color: tone, display: 'block', lineHeight: 1 }}>
+          {row.valueDisplay}
+        </span>
+        {showToPar && coursePar != null && (
+          <span
+            style={{
+              ...NUM,
+              fontSize: 10.5,
+              display: 'block',
+              marginTop: 2,
+              lineHeight: 1,
+              color: row.isSelf ? A.AMBER : toParColor(row.value, coursePar),
+            }}
+          >
+            {formatToPar(row.value, coursePar)}
+          </span>
+        )}
+      </span>
+    </div>
+  );
+};
+
+/** Column headers for ChampionsRow. POS centred over the numerals alone. */
+export const ChampionsColumnHeader: React.FC<{
+  showMovement?: boolean;
+  posLabel: string;
+  memberLabel: string;
+  whenLabel: string;
+  markLabel: string;
+}> = ({ showMovement = false, posLabel, memberLabel, whenLabel, markLabel }) => (
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: championsGrid(showMovement),
+      gap: CHAMPIONS_GAP,
+      padding: `0 ${CHAMPIONS_ROW_PADDING_X}px 5px`,
+      fontFamily: SANS,
+    }}
+  >
+    {showMovement && <span aria-hidden />}
+    <span style={{ ...LABEL, textAlign: 'center' }}>{posLabel}</span>
+    <span aria-hidden />
+    <span style={{ ...LABEL }}>{memberLabel}</span>
+    <span style={{ ...LABEL, textAlign: 'right' }}>{whenLabel}</span>
+    <span style={{ ...LABEL, textAlign: 'right' }}>{markLabel}</span>
+  </div>
+);

@@ -1,18 +1,36 @@
-import { GAM } from '../../../gam/tokens';
+/**
+ * BRIEF_CHAMPIONS_SHEET_MATCHES_BOARD — the deep view of one course record.
+ *
+ * THE ROW IS THE BOARD'S ROW. ChampionsRow in _shared/boardParts.tsx is the
+ * single implementation: [MOVEMENT?] [POS] [avatar] [MEMBER] [WHEN] [MARK],
+ * tie-aware positions (1, T3, T3, 5), a crown on position one only, the amber
+ * own-row, and MOVEMENT gated on the category's WINDOW — present on 90-day
+ * categories, ABSENT on all-time ones. The sheet does not hold a copy.
+ *
+ * WHAT THE SHEET KEEPS THAT THE BOARD DOES NOT — it is the deep view, and the
+ * board omits these for space, not because they are wrong:
+ *   formatGapFromChampion   the gap on every row beneath the holder
+ *   formatHeldFor           beside the champion in the header
+ *   daysSince/NEW_BADGE_DAYS the recently-taken marker
+ *   duelLine                the tension between the top two
+ *
+ * The sheet shows the FULL FIELD — no five-row slice and NO PINNED VIEWER ROW,
+ * because every member is already present and pinning would duplicate them.
+ * The viewer's row is scrolled to on open when it starts off-screen.
+ */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { type LucideIcon, ChevronDown, ChevronUp, Crown } from 'lucide-react';
+import { type LucideIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useTranslation } from 'react-i18next';
+import { A, LABEL, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import {
-  ChampionsListRow,
-  champsGrid,
-  CHAMPS_GRID_GAP_FULL,
-  CHAMPS_ROW_PADDING_X,
-  CHAMPS_COL_30D_FULL,
-  CHAMPS_COL_SCORE_FULL,
-} from './ChampionsListRow';
-import { MovementCell } from './_shared/MovementCell';
+  ChampionsRow,
+  ChampionsColumnHeader,
+  categoryWindowDays,
+  hasToPar,
+  positionsFor,
+} from './_shared/boardParts';
 import { formatGapFromChampion, formatHeldFor, daysSince, NEW_BADGE_DAYS } from './_shared/helpers';
 import { duelLine } from './_shared/duelTension';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
@@ -25,7 +43,7 @@ interface SectionRow {
   valueDisplay: string;
   attained_at: string;
   isSelf: boolean;
-  /** Member UUID — threaded to SquircleAvatar for the deterministic initial. */
+  /** Member UUID — threaded through for the deterministic avatar initial. */
   userId?: string | null;
   rank30d?: number | null;
   delta?: number | null;
@@ -49,42 +67,13 @@ interface Props {
   window: LegendWindow;
   /** Map of category -> viewer's rank (1 = champion). Drilldown already computes this. */
   yourRanks: Partial<Record<LegendCategory, number | null>>;
-  /** Backdrop theme. Default 'dark' preserves handicap drilldown look. */
+  /** Course par — the only way a gross mark can state a to-par. */
+  coursePar?: number | null;
+  /** Backdrop theme. Retained for callers; the analytical board is dark-only. */
   theme?: 'light' | 'dark';
 }
 
-// Sheet portals outside the .hcp-light/.hcp-dark scope, so every color is a
-// hardcoded literal. `theme` picks between dark (handicap host) and light
-// (course-details host) palettes. Do NOT introduce var(--hcp-*) here.
-const DEEP_AMBER = '#F7931E';
-const GOLD = '#F7931E';
-
-const DARK = {
-  ink: '#F2F4F7',
-  ink55: 'rgba(242,244,247,0.55)',
-  ink40: 'rgba(242,244,247,0.38)',
-  hairline: 'rgba(255,255,255,0.08)',
-  surface: '#15171F',
-  card: '#1B1E27',
-  avatarRing: 'rgba(255,255,255,0.22)',
-  pillYouBg: 'rgba(255,255,255,0.06)',
-} as const;
-
-const LIGHT = {
-  ink: '#0F172A',
-  ink55: '#64748B',
-  ink40: '#94A3B8',
-  hairline: 'rgba(15,23,42,0.08)',
-  surface: '#F8FAFC',
-  card: '#FFFFFF',
-  avatarRing: 'rgba(15,23,42,0.12)',
-  pillYouBg: 'rgba(15,23,42,0.05)',
-} as const;
-
-/* The bespoke BannerAvatar that used to live here drew a slate gradient with no
-   initial. SquircleAvatar is canonical and owns the deterministic-initial
-   fallback; the champion's ring is composed with hairlineRing + ringColor. */
-
+const DEEP_AMBER = A.AMBER;
 
 export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   open,
@@ -95,15 +84,10 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   initialCategory,
   window: legendWindow,
   yourRanks,
+  coursePar = null,
   theme = 'dark',
 }) => {
-  const T = theme === 'light' ? LIGHT : DARK;
-  const INK = T.ink;
-  const INK_55 = T.ink55;
-  const INK_40 = T.ink40;
-  const HAIRLINE = T.hairline;
-  const SURFACE = T.surface;
-  const CARD = T.card;
+  const { t } = useTranslation('courses');
   const [activeCategory, setActiveCategory] = useState<LegendCategory>(initialCategory);
 
   useEffect(() => {
@@ -111,55 +95,44 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
   }, [open, initialCategory]);
 
   const tabsToShow = useMemo(
-    () =>
-      visibleCategories.filter(
-        (cat) => (groupedRows.get(cat.key)?.rows.length ?? 0) > 0,
-      ),
+    () => visibleCategories.filter((cat) => (groupedRows.get(cat.key)?.rows.length ?? 0) > 0),
     [visibleCategories, groupedRows],
   );
 
   const activeEntry = groupedRows.get(activeCategory);
   const activeRows = activeEntry?.rows ?? [];
-  const activeDescriptor = tabsToShow.find((c) => c.key === activeCategory);
-  const totalForActive = activeEntry?.total ?? 0;
+  const activeDescriptor =
+    tabsToShow.find((c) => c.key === activeCategory) ??
+    visibleCategories.find((c) => c.key === activeCategory);
+  const totalForActive = activeEntry?.total ?? activeRows.length;
 
   const champion = activeRows[0];
   const selfRow = activeRows.find((r) => r.isSelf);
   const defending = champion?.isSelf === true;
   const standsAlone = activeRows.length === 1;
   const selfRank = selfRow?.rank ?? null;
-
   const runnerUp = activeRows.find((r) => !r.isSelf) ?? null;
 
-  // Rows in the scrollable list = everything except the pinned champion.
-  const listRows = activeRows.slice(1);
-
-  /* MOVEMENT COLLAPSE. Computed over the WHOLE rendered set - champion row
-     included - so the pinned banner, the header and the scrolling list share
-     one grid. New entrants (rank30d == null) carry the NEW badge and do not
-     count as movement. All-time gross / score-diff / stableford boards never
-     move, so the column disappears rather than printing a dash on every row. */
-  const anyMovement = useMemo(
-    () => activeRows.some((r) => r.rank30d != null && r.delta != null && r.delta !== 0),
-    [activeRows],
-  );
-  const GRID = champsGrid(false, anyMovement);
+  const positions = useMemo(() => positionsFor(activeRows), [activeRows]);
+  /* MOVEMENT IS GATED ON THE WINDOW, exactly as on the board. An all-time
+     record does not move for months, so the column is absent rather than a
+     column of dashes. The test is the category's window, never its name. */
+  const showMovement = categoryWindowDays(activeCategory) != null;
+  const showToPar = hasToPar(activeCategory) && coursePar != null;
 
   const listRef = useRef<HTMLDivElement>(null);
   const selfRowRef = useRef<HTMLDivElement>(null);
   const [selfOffscreen, setSelfOffscreen] = useState<null | 'above' | 'below'>(null);
 
-  // Reset scroll + observer wiring on category switch.
+  // Reset scroll on category switch.
   useEffect(() => {
     setSelfOffscreen(null);
-    if (listRef.current) {
-      listRef.current.scrollTo({ top: 0 });
-    }
+    listRef.current?.scrollTo({ top: 0 });
   }, [activeCategory]);
 
   useEffect(() => {
     setSelfOffscreen(null);
-    if (defending) return; // pinned: viewer is the champion, no jump pill needed
+    if (defending) return; // the viewer is row one; nothing to find
     const rowEl = selfRowRef.current;
     const rootEl = listRef.current;
     if (!rowEl || !rootEl || !open) return;
@@ -179,16 +152,29 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
     return () => obs.disconnect();
   }, [activeCategory, activeRows, open, defending]);
 
+  /* SCROLL TO THE VIEWER ON OPEN. Deferred past the sheet's entry transform:
+     scrolling a translating element mid-animation lands on the wrong offset,
+     so this waits for the sheet to settle before it moves. */
+  useEffect(() => {
+    if (!open || defending || !selfRow) return;
+    const id = window.setTimeout(() => {
+      const rowEl = selfRowRef.current;
+      const rootEl = listRef.current;
+      if (!rowEl || !rootEl) return;
+      if (rowEl.offsetTop > rootEl.clientHeight - 40) {
+        rootEl.scrollTo({ top: Math.max(0, rowEl.offsetTop - rootEl.clientHeight / 2), behavior: 'smooth' });
+      }
+    }, 420);
+    return () => window.clearTimeout(id);
+  }, [open, activeCategory, defending, selfRow]);
+
   const jumpToSelf = () => {
     selfRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
-  const windowLabel = legendWindow === '90d' ? '90 DAYS' : 'ALL TIME';
-  const eyebrow = `LEADERBOARD · ${windowLabel}`;
+  const windowLabel =
+    legendWindow === '90d' ? t('champions.board.last90Days') : t('champions.board.allTime');
 
-  // Chase line + status pill
-  /* One condition for the jump pill: it gates both the pill itself and the
-     scroller's bottom padding that keeps rows out from under it. */
   const pillMounted = selfOffscreen != null && selfRank != null && !defending;
 
   const opponentValue = defending
@@ -198,28 +184,40 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
 
   const chaseLine = champion
     ? selfRow || standsAlone
-      ? duelLine(activeCategory, champion.value, opponentValue, defending, chaseStandsAlone, (champion.name ?? '').split(' ')[0])
+      ? duelLine(
+          activeCategory,
+          champion.value,
+          opponentValue,
+          defending,
+          chaseStandsAlone,
+          (champion.name ?? '').split(' ')[0],
+        )
       : 'Not on the board yet'
     : '';
 
-  const championValueDisplay = champion?.valueDisplay ?? '—';
   const championName = champion ? (champion.isSelf ? 'You' : champion.name) : '';
-  const championHoldDuration = champion
-    ? formatHeldFor(daysSince(champion.attained_at))
-    : null;
+  const championHoldDuration = champion ? formatHeldFor(daysSince(champion.attained_at)) : null;
+
+  const roundsTotal = useMemo(() => {
+    const roundsCat = visibleCategories.find((c) => String(c.key).startsWith('most_rounds'));
+    const r = roundsCat ? groupedRows.get(roundsCat.key)?.rows ?? [] : [];
+    return r.reduce((s, x) => s + (x.value || 0), 0);
+  }, [visibleCategories, groupedRows]);
 
   return (
     <BottomSheet
       open={open}
       onClose={onClose}
       ariaLabelledBy="course-legends-full-sheet-title"
-      variant={theme === 'light' ? 'light' : 'dark'}
-      surfaceColor={theme === 'dark' ? SURFACE : undefined}
+      variant="dark"
+      /* THE SURFACE REACHES THE SHEET'S OWN TOP EDGE, grabber on it. Passed
+         unconditionally so no host theme can leave a strip above the header. */
+      surfaceColor={A.CANVAS}
       style={{
-        maxHeight: '85dvh',
+        maxHeight: '95dvh',
         display: 'flex',
         flexDirection: 'column',
-        background: SURFACE,
+        background: A.CANVAS,
       }}
     >
       <div
@@ -229,28 +227,81 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
           flex: 1,
           minHeight: 0,
           position: 'relative',
-          fontFamily: GAM.FONT_SF,
-          color: INK,
-          background: SURFACE,
+          fontFamily: SANS,
+          color: A.INK,
+          background: A.CANVAS,
         }}
       >
         <SheetHeader
-          eyebrow={eyebrow}
-          title={<span id="course-legends-full-sheet-title">{courseName}</span>}
+          eyebrow={courseName}
+          title={
+            <span
+              id="course-legends-full-sheet-title"
+              style={{
+                fontSize: 17,
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: A.INK,
+              }}
+            >
+              {activeDescriptor?.label ?? courseName}
+            </span>
+          }
           onClose={onClose}
           borderBottom={false}
-          dark={theme === 'dark'}
+          dark
         />
 
+        {/* STAT RAIL — members, rounds, and the window, which is load-bearing:
+            a member must know whether this is all time or three months. */}
+        <div
+          style={{
+            ...LABEL,
+            padding: '0 16px',
+            display: 'flex',
+            gap: 10,
+            flexWrap: 'wrap',
+            color: A.DIM,
+            fontVariantNumeric: 'tabular-nums lining-nums',
+            flexShrink: 0,
+          }}
+        >
+          <span>{t('champions.board.members', { count: totalForActive })}</span>
+          {roundsTotal > 0 && <span>{t('champions.board.rounds', { count: roundsTotal })}</span>}
+          <span style={{ color: A.MUTE }}>{windowLabel}</span>
+        </div>
 
-        {/* Chase line + status pill (replaces the old "Gross Record · N entries" sub) */}
+        {/* THE CHAMPION AND HOW LONG THEY HAVE HELD IT. "held for 94 days" is
+            the sentence that makes a course record feel like a record. */}
         {champion && (
+          <div
+            style={{
+              padding: '8px 16px 0',
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 8,
+              flexWrap: 'wrap',
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}>
+              {championName}
+            </span>
+            {championHoldDuration && (
+              <span style={{ ...LABEL, fontSize: 10.5, color: DEEP_AMBER }}>{championHoldDuration}</span>
+            )}
+          </div>
+        )}
+
+        {/* THE DUEL LINE — the tension between the top two. */}
+        {champion && chaseLine && (
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              padding: '0 16px',
+              padding: '6px 16px 0',
               marginBottom: 12,
               flexShrink: 0,
               flexWrap: 'wrap',
@@ -260,347 +311,146 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               style={{
                 fontSize: 13,
                 fontWeight: 600,
-                color: defending ? DEEP_AMBER : INK_55,
+                color: defending ? DEEP_AMBER : A.MUTE,
                 letterSpacing: '-0.005em',
                 minWidth: 0,
               }}
             >
               {chaseLine}
             </span>
-            {defending ? (
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.10em',
-                  textTransform: 'uppercase',
-                  padding: '3px 8px',
-                  borderRadius: 999,
-                  background: 'rgba(247,147,30,0.14)',
-                  color: DEEP_AMBER,
-                }}
-              >
-                YOUR CROWN
-              </span>
-            ) : selfRow ? (
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.10em',
-                  textTransform: 'uppercase',
-                  padding: '3px 8px',
-                  borderRadius: 999,
-                  background: T.pillYouBg,
-                  color: INK_55,
-                }}
-              >
-                {`YOU'RE #${selfRank}`}
-              </span>
-            ) : null}
           </div>
         )}
 
-        {/* Category pill rail */}
+        {/* CATEGORY PILLS — a member moves between records without closing. */}
         <div
+          className="hcp-full-lb-tabs"
           style={{
             display: 'flex',
             gap: 8,
             overflowX: 'auto',
             padding: '0 16px 12px',
-            background: SURFACE,
-            borderBottom: `0.5px solid ${HAIRLINE}`,
+            background: A.CANVAS,
             scrollbarWidth: 'none',
             WebkitOverflowScrolling: 'touch',
             flexShrink: 0,
           }}
-          className="hcp-full-lb-tabs"
         >
           <style>{`.hcp-full-lb-tabs::-webkit-scrollbar { display: none; }`}</style>
           {tabsToShow.map((cat) => {
-            const Icon = cat.icon;
             const isActive = cat.key === activeCategory;
             const youHold = yourRanks[cat.key] === 1;
+            const mark = groupedRows.get(cat.key)?.rows[0]?.valueDisplay ?? '';
             return (
               <button
                 key={cat.key}
+                type="button"
                 onClick={() => setActiveCategory(cat.key)}
                 style={{
                   flexShrink: 0,
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 7,
+                  gap: 6,
                   padding: '6px 11px',
                   borderRadius: 999,
-                  background: isActive ? INK : CARD,
-                  border: isActive ? `1px solid ${INK}` : `1px solid ${HAIRLINE}`,
-                  color: isActive ? SURFACE : INK,
+                  background: isActive ? A.INK : 'transparent',
+                  border: `1px solid ${isActive ? A.INK : A.BORDER}`,
+                  color: isActive ? A.CANVAS : A.MUTE,
                   fontSize: 11,
-                  fontWeight: isActive ? 700 : 700,
-                  fontFamily: GAM.FONT_SF,
+                  fontWeight: 700,
+                  fontFamily: SANS,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
                   letterSpacing: '0.01em',
                 }}
               >
-                <Icon size={11} strokeWidth={2.4} />
                 {cat.short}
-                {youHold && (
-                  <span
-                    aria-hidden
-                    style={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: 999,
-                      background: GOLD,
-                      boxShadow: `0 0 0 1.5px ${isActive ? INK : SURFACE}`,
-                      flexShrink: 0,
-                    }}
-                  />
-                )}
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    fontVariantNumeric: 'tabular-nums lining-nums',
+                    color: isActive ? A.CANVAS : youHold ? DEEP_AMBER : A.INK,
+                  }}
+                >
+                  {mark}
+                </span>
               </button>
             );
           })}
         </div>
 
-        {/* PINNED CHAMPION BANNER — static, never scrolls. Uses the shared
-            column grid so 30D + SCORE align with the header + list rows. */}
-        {champion && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: GRID,
-              gap: CHAMPS_GRID_GAP_FULL,
-              alignItems: 'center',
-              padding: `12px ${CHAMPS_ROW_PADDING_X}px`,
-              background: 'linear-gradient(180deg, rgba(247,147,30,0.12), rgba(247,147,30,0.05))',
-              borderTop: `2px solid ${GOLD}`,
-              borderBottom: `0.5px solid ${HAIRLINE}`,
-              flexShrink: 0,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <Crown size={17} strokeWidth={2.5} fill={GOLD} style={{ color: DEEP_AMBER }} />
-            </div>
-            <SquircleAvatar
-              size={40}
-              src={champion.photoUrl}
-              alt={champion.name}
-              userId={champion.userId}
-              hairlineRing
-              ringColor={T.avatarRing}
-            />
-            <div style={{ minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: INK,
-                  letterSpacing: '-0.015em',
-                  lineHeight: 1.15,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {championName}
-              </div>
-              <div
-                style={{
-                  fontSize: 11.5,
-                  fontWeight: 600,
-                  color: DEEP_AMBER,
-                  marginTop: 2,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {championHoldDuration ? `${championHoldDuration} · Champion` : 'Champion'}
-              </div>
-            </div>
-            {/* 30D column — omitted with the rest of the set when nothing moved */}
-            {anyMovement && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <MovementCell
-                  delta={champion.delta}
-                  rank30d={champion.rank30d}
-                  theme={theme}
-                  size="row"
-                />
-              </div>
-            )}
-            {/* SCORE column — centered under the header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div
-                style={{
-                  fontSize: 22,
-                  fontWeight: 700,
-                  color: INK,
-                  letterSpacing: '-0.02em',
-                  fontVariantNumeric: 'tabular-nums lining-nums',
-                  lineHeight: 1,
-                }}
-              >
-                {championValueDisplay}
-              </div>
-            </div>
-          </div>
+        {activeRows.length > 0 && (
+          <ChampionsColumnHeader
+            showMovement={showMovement}
+            posLabel={t('champions.board.pos')}
+            memberLabel={t('champions.board.member')}
+            whenLabel={t('champions.board.when')}
+            markLabel={t('champions.board.mark')}
+          />
         )}
 
-        {/* Column header — micro-caps "30D" and "SCORE" centered above their
-            fixed-width columns. Same grid template as every row below. */}
-        {champion && !standsAlone && listRows.length > 0 && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: GRID,
-              gap: CHAMPS_GRID_GAP_FULL,
-              alignItems: 'center',
-              padding: `10px ${CHAMPS_ROW_PADDING_X}px 6px`,
-              background: SURFACE,
-              borderBottom: `0.5px solid ${HAIRLINE}`,
-              flexShrink: 0,
-              fontFamily: GAM.FONT_SF,
-            }}
-          >
-            <span />
-            <span />
-            <span />
-            {anyMovement && (
-              <span
-                style={{
-                  textAlign: 'center',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: INK_55,
-                }}
-              >
-                30D
-              </span>
-            )}
-            <span
-              style={{
-                textAlign: 'center',
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: INK_55,
-              }}
-            >
-              {activeDescriptor?.unit?.toUpperCase() || 'SCORE'}
-            </span>
-          </div>
-        )}
-
-        {/* Scrollable list — ranks 2+.
-            Scrollbar is hidden so the list's 30D/SCORE columns line up
-            pixel-perfect with the header row and pinned champion banner
-            above (which sit outside this scroller and therefore aren't
-            offset by any reserved scrollbar gutter). */}
+        {/* THE FULL FIELD. Scrolls, and pays the bottom safe-area inset on the
+            scrolling content so the last row clears the home indicator. */}
         <div
           ref={listRef}
           className="hcp-champs-list-scroller"
-          style={{
-            flex: 1,
-            minHeight: 0,
-            overflowY: 'auto',
-            padding: '8px 0 0',
-            /* PAY FOR THE JUMP PILL. It floats absolutely at bottom
-               calc(14px + safe-area) over this scroller and would otherwise
-               cover the last rows' subline. 36px pill + 14px offset + 10px
-               breathing room, applied only while the pill is mounted. */
-            paddingBottom: pillMounted
-              ? 'calc(60px + env(safe-area-inset-bottom, 0px))'
-              : undefined,
-            WebkitOverflowScrolling: 'touch',
-            background: SURFACE,
-            scrollbarWidth: 'none',
-          } as React.CSSProperties}
+          style={
+            {
+              flex: 1,
+              minHeight: 0,
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              background: A.CANVAS,
+              scrollbarWidth: 'none',
+              paddingBottom: pillMounted
+                ? 'calc(60px + env(safe-area-inset-bottom, 0px))'
+                : 'calc(24px + env(safe-area-inset-bottom, 0px))',
+            } as React.CSSProperties
+          }
         >
           <style>{`.hcp-champs-list-scroller::-webkit-scrollbar { display: none; }`}</style>
           {activeRows.length === 0 ? (
-            <div
-              style={{
-                padding: '40px 16px',
-                textAlign: 'center',
-                color: INK_55,
-                fontSize: 13,
-                lineHeight: 1.5,
-              }}
-            >
+            <div style={{ padding: '40px 16px', textAlign: 'center', color: A.MUTE, fontSize: 13 }}>
               No entries in this category yet.
             </div>
-          ) : standsAlone ? (
-            <div
-              style={{
-                padding: '24px 16px',
-                textAlign: 'center',
-                color: INK_55,
-                fontSize: 12.5,
-                fontStyle: 'italic',
-                lineHeight: 1.5,
-              }}
-            >
-              The champion stands alone. Be the first to challenge.
-            </div>
           ) : (
-            listRows.map((row, i) => {
-              const championRow = activeRows[0];
-              return (
-                <div
-                  key={`${row.rank}-${row.attained_at}-${i}`}
-                  ref={row.isSelf ? selfRowRef : undefined}
-                  style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 61px' } as React.CSSProperties}
-                >
-                  <ChampionsListRow
-                    rank={row.rank}
-                    name={row.isSelf ? 'You' : row.name}
-                    photoUrl={row.photoUrl}
-                    userId={row.userId}
-                    fallbackName={row.name}
-                    valueDisplay={row.valueDisplay}
-                    unitLabel={activeDescriptor?.unit ?? ''}
-                    isSelf={row.isSelf}
-                    isChampion={false}
-                    /* SUBLINE by design: "-2 from champion". The inline duel
-                       board (_shared/boardParts.tsx) shows this same gap as a
-                       column paired with the score, because that five-row panel
-                       has no room for the word "champion". */
-                    gapToChampion={formatGapFromChampion(activeCategory, row.value, championRow.value)}
-                    holdDuration={null}
-                    isNew={daysSince(row.attained_at) < NEW_BADGE_DAYS}
-                    theme={theme}
-                    rank30d={row.rank30d}
-                    delta={row.delta}
-                    showMovement={anyMovement}
-                  />
-                </div>
-              );
-            })
+            activeRows.map((row, i) => (
+              <ChampionsRow
+                key={`${row.userId ?? row.name}-${row.attained_at}-${i}`}
+                rowRef={row.isSelf ? selfRowRef : undefined}
+                row={row}
+                pos={positions[i]}
+                showMovement={showMovement}
+                showToPar={showToPar}
+                coursePar={coursePar}
+                rule={i !== 0}
+                /* THE GAP FROM THE CHAMPION — the sheet's most useful figure,
+                   on every row beneath the holder. The holder passes null:
+                   zero is not a fact there, it is what being first means. */
+                subline={
+                  i === 0
+                    ? null
+                    : formatGapFromChampion(activeCategory, row.value, activeRows[0].value)
+                }
+                isNew={daysSince(row.attained_at) < NEW_BADGE_DAYS}
+              />
+            ))
           )}
 
-          {/* Footer entry count */}
           {totalForActive > 0 && (
             <div
               style={{
-                padding: '12px 16px',
-                paddingBottom: 'calc(20px + env(safe-area-inset-bottom, 0px))',
+                ...LABEL,
+                padding: '14px 16px 4px',
                 textAlign: 'center',
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                color: INK_40,
-                textTransform: 'uppercase',
+                color: A.DIM,
               }}
             >
-              {totalForActive} ON THE BOARD
+              {`${totalForActive} ON THE BOARD`}
             </div>
           )}
         </div>
+
         {pillMounted && (
           <button
             type="button"
@@ -618,13 +468,10 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
               height: 36,
               padding: '0 14px',
               borderRadius: 999,
-              /* FOLLOWS THE THEME. This pill was slate-on-white regardless of
-                 T, so on the dark sheet it read as a hole punched in the
-                 surface. T.card / T.ink keeps the label legible in both. */
-              background: T.card,
-              color: T.ink,
-              border: `1px solid ${T.hairline}`,
-              fontFamily: GAM.FONT_SF,
+              background: A.PANEL,
+              color: A.INK,
+              border: `1px solid ${A.BORDER}`,
+              fontFamily: SANS,
               fontSize: 11.5,
               fontWeight: 700,
               letterSpacing: '0.06em',
