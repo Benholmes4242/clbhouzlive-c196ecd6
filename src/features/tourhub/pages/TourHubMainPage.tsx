@@ -217,6 +217,8 @@ export function TourHubMainPage() {
     switch (activeTab) {
       case 'overview':
         return <OverviewTab />;
+      case 'news':
+        return <NewsTab />;
       case 'live':
         return <LeaderboardTab />;
       case 'schedule':
