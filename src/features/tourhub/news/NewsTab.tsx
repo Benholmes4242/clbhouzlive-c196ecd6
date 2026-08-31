@@ -32,11 +32,16 @@ import {
 /** Slugs the news list can express. 'major' has no tour_slug counterpart. */
 const NEWS_SLUGS = ['all', 'pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'];
 
-function KickerLine({ kicker, at }: { kicker: string | null; at: string | null }) {
+/** Compact lead band used by the Wire section on the Tour Overview. */
+const COMPACT_LEAD_HEIGHT = 180;
+/** Gradient height scales with the band so the visible wash keeps the same density. */
+const COMPACT_LEAD_GRADIENT_HEIGHT = 312; // 260 * 1.2
+
+function KickerLine({ kicker, at, compact = false }: { kicker: string | null; at: string | null; compact?: boolean }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
       {kicker && (
-        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><StoryImageKicker color={INK}>{kicker}</StoryImageKicker></span>
+        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><StoryImageKicker color={INK} compact={compact}>{kicker}</StoryImageKicker></span>
       )}
       {kicker && at && <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT, flexShrink: 0 }} />}
       <StoryRelativeTime at={at} />
@@ -45,6 +50,8 @@ function KickerLine({ kicker, at }: { kicker: string | null; at: string | null }
 }
 
 export function LeadStory({ story, onOpen, compact = false }: { story: TourStory; onOpen: () => void; compact?: boolean }) {
+  const bandPadding = compact ? 14 : 12;
+  const sidePadding = compact ? 17 : 14;
   return (
     <button
       type="button"
@@ -55,7 +62,7 @@ export function LeadStory({ story, onOpen, compact = false }: { story: TourStory
         border: 'none', padding: 0, cursor: 'pointer', fontFamily: FONT,
       }}
     >
-      <div style={{ position: 'relative', height: compact ? 150 : OVERVIEW_HERO_HEIGHT, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
+      <div style={{ position: 'relative', height: compact ? COMPACT_LEAD_HEIGHT : OVERVIEW_HERO_HEIGHT, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
         <img
           src={story.image_url as string}
           alt={story.headline}
@@ -65,15 +72,15 @@ export function LeadStory({ story, onOpen, compact = false }: { story: TourStory
         <div
           aria-hidden
           style={{
-             position: 'absolute', left: 0, right: 0, bottom: 0, height: 260,
+             position: 'absolute', left: 0, right: 0, bottom: 0, height: compact ? COMPACT_LEAD_GRADIENT_HEIGHT : 260,
              background: heroCanonScrimOn(SLATE_50),
           }}
         />
-        <div style={{ position: 'absolute', top: compact ? 12 : 'calc(env(safe-area-inset-top, 0px) + 68px)', left: 14, right: 14 }}>
-          <KickerLine kicker={story.kicker} at={story.published_at} />
+        <div style={{ position: 'absolute', top: compact ? bandPadding : 'calc(env(safe-area-inset-top, 0px) + 68px)', left: sidePadding, right: sidePadding }}>
+          <KickerLine kicker={story.kicker} at={story.published_at} compact={compact} />
         </div>
-        <div style={{ position: 'absolute', bottom: 12, left: 14, right: 14 }}>
-          <StoryImageHeadline>{story.headline}</StoryImageHeadline>
+        <div style={{ position: 'absolute', bottom: bandPadding, left: sidePadding, right: sidePadding }}>
+          <StoryImageHeadline compact={compact}>{story.headline}</StoryImageHeadline>
         </div>
       </div>
       {story.standfirst && (
