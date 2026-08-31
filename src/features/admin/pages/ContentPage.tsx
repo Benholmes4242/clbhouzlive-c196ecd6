@@ -38,7 +38,7 @@ import LegalDocumentsTab from '../components/LegalDocumentsTab';
 import TheWireTab from '../components/wire/TheWireTab';
 import AmateurNewsTab from '../components/wire/AmateurNewsTab';
 
-type TabId = 'courses' | 'wire' | 'tour' | 'players' | 'help' | 'legal';
+type TabId = 'courses' | 'wire' | 'amateur' | 'tour' | 'players' | 'help' | 'legal';
 
 export default function ContentPage() {
   const { role } = usePanelRole();
@@ -55,7 +55,7 @@ export default function ContentPage() {
   const isAllowed = (id: TabId): boolean => {
     if (id === 'courses') return true;
     if (id === 'help' || id === 'legal') return can.viewModeration;
-    if (id === 'tour' || id === 'players' || id === 'wire') return can.manageAdmins;
+    if (id === 'tour' || id === 'players' || id === 'wire' || id === 'amateur') return can.manageAdmins;
     return false;
   };
   const tab: TabId = isAllowed(requested) ? requested : 'courses';
