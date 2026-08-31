@@ -68,7 +68,7 @@ export function LeadStory({ story, onOpen, compact = false }: { story: TourStory
           src={story.image_url as string}
           alt={story.headline}
           loading="lazy"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 30%', display: 'block' }}
         />
         <div
           aria-hidden
@@ -108,10 +108,10 @@ export function StoryRow({ story, onOpen, compact = false }: { story: TourStory;
     >
       <div style={{ flex: 1, minWidth: 0 }}>
         <KickerLine kicker={story.kicker} at={story.published_at} />
-        <div style={{ marginTop: 5, fontSize: 14.5, fontWeight: 700, lineHeight: 1.25, letterSpacing: '-0.01em', color: INK }}>
+        <div style={{ marginTop: 5, fontSize: compact ? 13.5 : 14.5, fontWeight: 700, lineHeight: 1.25, letterSpacing: '-0.01em', color: INK }}>
           {story.headline}
         </div>
-        {story.standfirst && (
+        {!compact && story.standfirst && (
           <div style={{ marginTop: 4, fontSize: 12, lineHeight: 1.45, color: INK_MUTE }}>
             {story.standfirst}
           </div>
