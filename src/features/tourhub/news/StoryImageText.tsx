@@ -1,12 +1,19 @@
 import React from 'react';
-import { INK, INK_SOFT } from '../_shared/tokens';
+import { storyTime } from './storyTime';
+import { INK, INK_MUTE, INK_SOFT } from '../_shared/tokens';
 
-export function StoryImageKicker({ children }: { children: React.ReactNode }) {
+export function StoryImageKicker({ children, color = INK_SOFT }: { children: React.ReactNode; color?: string }) {
   return (
-    <div style={{ fontSize: 9, fontWeight: 700, lineHeight: 1.2, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK_SOFT }}>
+    <span style={{ fontSize: 9, fontWeight: 700, lineHeight: 1.2, letterSpacing: '0.16em', textTransform: 'uppercase', color }}>
       {children}
-    </div>
+    </span>
   );
+}
+
+export function StoryRelativeTime({ at }: { at: string | null | undefined }) {
+  const label = storyTime(at);
+  if (!label) return null;
+  return <time dateTime={at ?? undefined} style={{ color: INK_MUTE, fontSize: 9, fontWeight: 700, lineHeight: 1.2, whiteSpace: 'nowrap' }}>{label}</time>;
 }
 
 export function StoryImageHeadline({ children, feed = false }: { children: React.ReactNode; feed?: boolean }) {

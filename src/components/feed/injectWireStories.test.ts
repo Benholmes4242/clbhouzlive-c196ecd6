@@ -15,16 +15,21 @@ const story = (id: string, overrides: Partial<TourStory> = {}): TourStory => ({
 describe('injectWireStories', () => {
   it('uses the requested cadence and injects after complete groups only', () => {
     expect(WIRE_SLIDE_CADENCE).toBe(3);
+    expect(injectWireStories(posts(0), [story('a')], NOW)).toEqual([]);
     expect(injectWireStories(posts(2), [story('a')], NOW).map((x) => x.kind)).toEqual(['post', 'post']);
+    expect(injectWireStories(posts(3), [story('a')], NOW).map((x) => x.kind)).toEqual(['post', 'post', 'post', 'wire']);
     expect(injectWireStories(posts(6), [story('a'), story('b')], NOW).map((x) => x.kind)).toEqual([
       'post', 'post', 'post', 'wire', 'post', 'post', 'post', 'wire',
     ]);
   });
 
   it('caps slides by unique eligible stories and continues with posts', () => {
-    const merged = injectWireStories(posts(30), [story('a'), story('a'), story('b')], NOW);
-    expect(merged.filter((x) => x.kind === 'wire').map((x) => x.story.id)).toEqual(['a', 'b']);
-    expect(merged.filter((x) => x.kind === 'post')).toHaveLength(30);
+    const available = Array.from({ length: 12 }, (_, index) => story(`s${index}`));
+    const merged = injectWireStories(posts(30), available, NOW);
+    expect(merged.filter((x) => x.kind === 'wire')).toHaveLength(10);
+    const exhausted = injectWireStories(posts(30), [story('a'), story('a'), story('b')], NOW);
+    expect(exhausted.filter((x) => x.kind === 'wire').map((x) => x.story.id)).toEqual(['a', 'b']);
+    expect(exhausted.filter((x) => x.kind === 'post')).toHaveLength(30);
   });
 
   it('skips image-less, stale, draft, and scheduled stories', () => {

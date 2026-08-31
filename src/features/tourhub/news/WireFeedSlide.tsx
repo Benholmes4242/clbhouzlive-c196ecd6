@@ -2,8 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { TourStory } from './useTourStories';
-import { storyTime } from './storyTime';
-import { StoryImageHeadline, StoryImageKicker } from './StoryImageText';
+import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './StoryImageText';
 import { AMBER, AMBER_TINT_04, FONT, INK_MUTE, INK_SOFT, SLATE_100 } from '../_shared/tokens';
 
 export function WireFeedSlide({ story }: { story: TourStory }) {
@@ -24,9 +23,7 @@ export function WireFeedSlide({ story }: { story: TourStory }) {
             <span aria-hidden style={{ width: 3, height: 12, flexShrink: 0, background: AMBER }} />
             <span>{t('news.fromWire')}</span>
           </div>
-          <time dateTime={story.published_at ?? undefined} style={{ color: INK_MUTE, fontSize: 9, fontWeight: 700, lineHeight: 1.2, whiteSpace: 'nowrap' }}>
-            {storyTime(story.published_at)}
-          </time>
+          <StoryRelativeTime at={story.published_at} />
         </div>
 
         <div style={{ position: 'relative', height: 176, overflow: 'hidden', background: SLATE_100 }}>

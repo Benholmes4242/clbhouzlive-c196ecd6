@@ -15,8 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { useTourStories, type TourStory } from './useTourStories';
-import { storyTime } from './storyTime';
-import { StoryImageHeadline } from './StoryImageText';
+import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './StoryImageText';
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
 import {
   FONT,
@@ -39,16 +38,13 @@ const KICKER: React.CSSProperties = {
 };
 
 function KickerLine({ kicker, at }: { kicker: string | null; at: string | null }) {
-  const time = storyTime(at);
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
       {kicker && (
-        <span style={{ ...KICKER, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {kicker}
-        </span>
+        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><StoryImageKicker color={INK}>{kicker}</StoryImageKicker></span>
       )}
-      {kicker && time && <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT, flexShrink: 0 }} />}
-      {time && <span style={{ ...KICKER, whiteSpace: 'nowrap' }}>{time}</span>}
+      {kicker && at && <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT, flexShrink: 0 }} />}
+      <StoryRelativeTime at={at} />
     </div>
   );
 }
