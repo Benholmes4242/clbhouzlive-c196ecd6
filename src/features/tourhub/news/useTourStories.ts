@@ -9,6 +9,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { parseStoryBlocks, type StoryBlock } from './blocks';
 
 export interface TourStory {
   id: string;
@@ -16,7 +17,7 @@ export interface TourStory {
   kicker: string | null;
   headline: string;
   standfirst: string | null;
-  body: string | null;
+  body_blocks: StoryBlock[];
   image_url: string | null;
   image_credit: string | null;
   tour_slug: string | null;
@@ -25,7 +26,12 @@ export interface TourStory {
 }
 
 const COLS =
-  'id, slug, kicker, headline, standfirst, body, image_url, image_credit, tour_slug, tournament_id, published_at';
+  'id, slug, kicker, headline, standfirst, body_blocks, image_url, image_credit, tour_slug, tournament_id, published_at';
+
+/** Rows arrive with body_blocks as raw jsonb; narrow it once, here. */
+function toStory(row: any): TourStory {
+  return { ...row, body_blocks: parseStoryBlocks(row?.body_blocks) } as TourStory;
+}
 
 function nowIso() {
   return new Date().toISOString();
@@ -52,7 +58,7 @@ export function useTourStories(tourSlug: string | null) {
         .order('published_at', { ascending: false })
         .limit(40);
       if (error) throw error;
-      return (data ?? []) as TourStory[];
+      return (data ?? []).map(toStory);
     },
   });
 
@@ -80,7 +86,7 @@ export function useTourStory(slug: string | undefined) {
         .lte('published_at', nowIso())
         .maybeSingle();
       if (error) throw error;
-      return (data ?? null) as TourStory | null;
+      return data ? toStory(data) : null;
     },
   });
 }
@@ -101,7 +107,7 @@ export function useMoreFromTheWire(excludeId: string | undefined) {
       if (excludeId) query = query.neq('id', excludeId);
       const { data, error } = await query;
       if (error) throw error;
-      return ((data ?? []) as TourStory[]).slice(0, 3);
+      return (data ?? []).map(toStory).slice(0, 3);
     },
   });
 }

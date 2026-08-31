@@ -13,6 +13,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMoreFromTheWire, useStoryTournament, useTourStory } from './useTourStories';
 import { StoryRow } from './NewsTab';
+import { StoryBody } from './StoryBody';
 import { storyTime } from './storyTime';
 import {
   FONT,
@@ -190,9 +191,9 @@ export function StoryPage() {
                 {story.standfirst}
               </p>
             )}
-            {story.body && (
-              <div style={{ marginTop: 12, fontSize: 14.5, lineHeight: 1.65, color: INK_MUTE, whiteSpace: 'pre-wrap' }}>
-                {story.body}
+            {story.body_blocks.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <StoryBody blocks={story.body_blocks} />
               </div>
             )}
 
