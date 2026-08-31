@@ -142,6 +142,15 @@ export default function TheWireTab() {
                   <div style={{ marginTop: 3, fontSize: 11, color: t.inkFaint }}>
                     {when(s)} · {s.body_blocks.length} blocks{s.image_url ? '' : ' · no image'}
                   </div>
+                  {/* S1.2 — an unparsed story is a story with no article in it.
+                      Said in the list too, so the fault is visible before the
+                      row is opened. */}
+                  {s.body_blocks.length === 0 && (
+                    <div style={{ marginTop: 4, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', color: t.dangerText }}>
+                      {(s.source_text ?? '').trim() ? 'NO BODY — NEVER PARSED' : 'NO BODY'}
+                    </div>
+                  )}
+
                 </button>
                 <StatusPill tone={state === 'published' ? 'ok' : state === 'scheduled' ? 'brand' : 'neutral'}>
                   {state === 'published' ? 'Live' : state === 'scheduled' ? 'Scheduled' : 'Draft'}
