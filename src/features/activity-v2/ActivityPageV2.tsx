@@ -26,6 +26,9 @@ import { LedgerRow } from './components/LedgerRow';
 import { ActivityActionsSheet } from './components/ActivityActionsSheet';
 import { ActivityRowsSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
+// BRIEF_SUGGESTED_GOLFERS S3.1 / S3.2 - reason-led suggestions inside the feed.
+import { SuggestedGolfersBlock } from '@/features/social-suggestions/SuggestedGolfersBlock';
+import { NobodySawThatRound } from '@/features/social-suggestions/NobodySawThatRound';
 
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
