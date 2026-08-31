@@ -202,7 +202,20 @@ export default function WireStoryEditor({
           {story ? 'Save' : 'Create draft'}
         </button>
         {story && state !== 'published' && (
-          <button type="button" onClick={() => setConfirm('publish')} style={btn()}>Publish</button>
+          <>
+            {/* The schedule field sits BESIDE Publish, not inside the confirm:
+                the author decides the time before committing, not after. */}
+            <input
+              type="datetime-local"
+              value={scheduleAt}
+              onChange={(e) => setScheduleAt(e.target.value)}
+              title="Leave empty to publish now"
+              style={{ ...input, width: 'auto', padding: '7px 9px', fontSize: 12 }}
+            />
+            <button type="button" onClick={() => setConfirm('publish')} style={btn()}>
+              {scheduleAt ? 'Schedule' : 'Publish'}
+            </button>
+          </>
         )}
         {story && state !== 'draft' && (
           <button type="button" onClick={() => setConfirm('unpublish')} style={btn()}>
@@ -361,11 +374,11 @@ export default function WireStoryEditor({
 
       <ConfirmDialog
         open={confirm === 'publish'}
-        title="Publish to The Wire?"
-        message={
+        title={scheduleAt ? 'Schedule for The Wire?' : 'Publish to The Wire?'}
+        description={
           scheduleAt
-            ? `This story goes live at ${new Date(scheduleAt).toLocaleString()}.`
-            : 'This story goes live immediately, on every member’s Tour Hub. Save first if you have unsaved edits.'
+            ? `This story goes live at ${new Date(scheduleAt).toLocaleString()}. Until then it stays invisible to members.`
+            : 'This story goes live immediately, on every member\u2019s Tour Hub. Save first if you have unsaved edits.'
         }
         confirmLabel={scheduleAt ? 'Schedule' : 'Publish now'}
         onConfirm={async () => {
@@ -373,36 +386,27 @@ export default function WireStoryEditor({
           setConfirm(null);
           setScheduleAt('');
         }}
-        onCancel={() => { setConfirm(null); setScheduleAt(''); }}
-      >
-        <div style={{ marginTop: 12 }}>
-          <div style={{ ...KICKER_STYLE, marginBottom: 6 }}>Or schedule for</div>
-          <input
-            type="datetime-local"
-            value={scheduleAt}
-            onChange={(e) => setScheduleAt(e.target.value)}
-            style={input}
-          />
-        </div>
-      </ConfirmDialog>
+        onClose={() => setConfirm(null)}
+      />
 
       <ConfirmDialog
         open={confirm === 'unpublish'}
         title="Return to draft?"
-        message="The story disappears from The Wire and its link stops resolving. Nothing is deleted."
+        description="The story disappears from The Wire and its link stops resolving. Nothing is deleted."
         confirmLabel="Unpublish"
         onConfirm={async () => { await onPublish(null); setConfirm(null); }}
-        onCancel={() => setConfirm(null)}
+        onClose={() => setConfirm(null)}
       />
 
       <ConfirmDialog
         open={confirm === 'delete'}
         title="Delete this story?"
-        message="This cannot be undone. Unpublish instead if you only want it off the wire."
+        description="This cannot be undone. Unpublish instead if you only want it off the wire."
         confirmLabel="Delete"
-        destructive
+        tone="danger"
+        requireText={story?.headline}
         onConfirm={async () => { await onDelete?.(); setConfirm(null); }}
-        onCancel={() => setConfirm(null)}
+        onClose={() => setConfirm(null)}
       />
 
       <style>{`
