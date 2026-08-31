@@ -26,6 +26,9 @@ import { LedgerRow } from './components/LedgerRow';
 import { ActivityActionsSheet } from './components/ActivityActionsSheet';
 import { ActivityRowsSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
+// BRIEF_SUGGESTED_GOLFERS S3.1 / S3.2 - reason-led suggestions inside the feed.
+import { SuggestedGolfersBlock } from '@/features/social-suggestions/SuggestedGolfersBlock';
+import { NobodySawThatRound } from '@/features/social-suggestions/NobodySawThatRound';
 
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -493,6 +496,8 @@ export const ActivityPageV2: React.FC = () => {
       <div style={{ background: PAGE, fontFamily: SF_STACK, minHeight: '100%' }}>
         {featured && <FeaturedMomentCard row={featured} />}
         <FriendRequestsRail />
+        {/* S3.2 - after a round syncs: once per round, 7-day dismissal. */}
+        <NobodySawThatRound />
 
         {feed.isLoading && <ActivityRowsSkeleton buckets={2} />}
 
@@ -549,11 +554,23 @@ export const ActivityPageV2: React.FC = () => {
               renderBucket(BUCKET_LABELS.new, buckets.new, 'new')
             ) : (
               <>
-                {renderBucket(BUCKET_LABELS.new, buckets.new, 'new')}
-                {renderBucket(BUCKET_LABELS.today, buckets.today)}
-                {renderBucket(BUCKET_LABELS.yesterday, buckets.yesterday)}
-                {renderBucket(BUCKET_LABELS.thisWeek, buckets.thisWeek)}
-                {renderBucket(BUCKET_LABELS.earlier, buckets.earlier)}
+                {/* S3.1 - the suggestion block sits AFTER the first day group. */}
+                {(() => {
+                  const rendered = [
+                    renderBucket(BUCKET_LABELS.new, buckets.new, 'new'),
+                    renderBucket(BUCKET_LABELS.today, buckets.today),
+                    renderBucket(BUCKET_LABELS.yesterday, buckets.yesterday),
+                    renderBucket(BUCKET_LABELS.thisWeek, buckets.thisWeek),
+                    renderBucket(BUCKET_LABELS.earlier, buckets.earlier),
+                  ];
+                  const firstIdx = rendered.findIndex((n) => n !== null);
+                  const out: React.ReactNode[] = [];
+                  rendered.forEach((node, i) => {
+                    if (node) out.push(node);
+                    if (i === firstIdx) out.push(<SuggestedGolfersBlock key="suggested" />);
+                  });
+                  return out;
+                })()}
               </>
             )}
 

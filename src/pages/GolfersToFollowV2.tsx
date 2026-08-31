@@ -1,97 +1,57 @@
 /**
- * GolfersToFollowV2 — reason-led suggestions page.
+ * GolfersToFollowV2 - BRIEF_SUGGESTED_GOLFERS S5.
  *
- * REUSES the search overlay's `useSearchEmptyStateV2` RPC (single source
- * of truth for people-to-follow) and the shared row primitives from
- * social-lists-v2/rowParts (identical avatars / sublines / follow pill).
+ * Rebuilt on the DEDICATED public.get_suggested_golfers rpc (NOT
+ * search_empty_state_v2, which continues to serve the search overlay).
+ * Rows come from the shared SuggestedGolferRow so the page and the Activity /
+ * after-a-round blocks are one component.
  *
- * RPC field mapping used for the reason eyebrow:
- *   suggested_people[].reason_type   — one of 'followed_by' | 'plays' | 'popular' | …
- *   suggested_people[].reason_detail — human copy (e.g. "@alex", "Pebble Beach")
- * When neither is present we fall back to 'SUGGESTED FOR YOU'.
- * Fields NOT exposed by the RPC today: mutual_count, home_club,
- * business_location. The shared subline gracefully hides when missing.
+ * Grouped by reason - club, course, mutual, active - with empty groups hidden.
+ * Following a row leaves it in place; it goes on the next load.
  */
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useSearchEmptyStateV2, type EmptyStateSuggestion } from '@/features/search-v2/hooks/useSearchEmptyStateV2';
-import { getProfilePathById } from '@/lib/profileRoutes';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import {
-  RowAvatar,
-  RowSubline,
-  FollowButton,
-  ROW_FONT,
-  type RowActorLike,
-} from '@/features/social-lists-v2/rowParts';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { ROW_FONT } from '@/features/social-lists-v2/rowParts';
 import { ListSkeleton } from '@/features/social-lists-v2/SocialListPage';
+import { SuggestedGolferRow } from '@/features/social-suggestions/SuggestedGolferRow';
+import {
+  useSuggestedGolfers,
+  type SuggestedGolfer,
+  type SuggestionReason,
+} from '@/features/social-suggestions/useSuggestedGolfers';
 
-
-
-/* ── reason eyebrow copy mapping ─────────────────────────────────────── */
-function reasonEyebrow(s: EmptyStateSuggestion): string {
-  const detail = (s.reason_detail ?? '').trim();
-  switch (s.reason_type) {
-    case 'followed_by':
-      return detail ? `FOLLOWED BY @${detail.replace(/^@/, '').toUpperCase()}` : 'FOLLOWED BY FRIENDS';
-    case 'plays':
-      return detail ? `PLAYS ${detail.toUpperCase()}` : 'PLAYS COURSES YOU FOLLOW';
-    case 'popular':
-      return 'POPULAR ON CLBHOUZ';
-    default:
-      return 'SUGGESTED FOR YOU';
-  }
-}
-
-/* ── adapter: EmptyStateSuggestion → RowActorLike ────────────────────── */
-function toRow(s: EmptyStateSuggestion): RowActorLike {
-  return {
-    actor_type: 'personal',
-    actor_id: s.id,
-    display_name: s.display_name,
-    username: s.username,
-    avatar_url: s.profile_photo_url,
-    viewer_follows: false,
-    mutual_count: s.reason_type === 'followed_by' ? 1 : 0,
-    mutual_usernames: s.reason_type === 'followed_by' && s.reason_detail
-      ? [s.reason_detail.replace(/^@/, '')]
-      : null,
-    home_club: s.reason_type === 'plays' ? s.reason_detail : null,
-  };
-}
+const GROUP_ORDER: SuggestionReason[] = ['club', 'course', 'mutual', 'active'];
+const GROUP_KEY: Record<SuggestionReason, string> = {
+  club: 'suggestedGolfers.group.club',
+  course: 'suggestedGolfers.group.course',
+  mutual: 'suggestedGolfers.group.mutual',
+  active: 'suggestedGolfers.group.active',
+};
 
 export default function GolfersToFollowV2() {
   const navigate = useNavigate();
-  const { user: viewer } = useSupabaseSession();
-  const q = useSearchEmptyStateV2(true);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const { t } = useTranslation('common');
+  const q = useSuggestedGolfers(48);
 
-  const people = useMemo(
-    () => (q.data?.suggested_people ?? []).filter((s) => !viewer?.id || s.id !== viewer.id),
-    [q.data?.suggested_people, viewer?.id],
-  );
+  const groups = useMemo(() => {
+    const map = new Map<SuggestionReason, SuggestedGolfer[]>();
+    for (const g of q.data ?? []) {
+      const list = map.get(g.reason_type) ?? [];
+      list.push(g);
+      map.set(g.reason_type, list);
+    }
+    return GROUP_ORDER.map((r) => ({ reason: r, people: map.get(r) ?? [] })).filter(
+      (g) => g.people.length > 0,
+    );
+  }, [q.data]);
 
   const goBack = () => {
     if (window.history.length > 1) navigate(-1);
     else navigate('/clubhouse');
-  };
-
-  const onFollowChange = (id: string) => (following: boolean) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (following) next.add(id);
-      else next.delete(id);
-      return next;
-    });
-  };
-
-  const openProfile = (id: string) => {
-    const path = getProfilePathById(id);
-    if (path) navigate(path);
   };
 
   return (
@@ -101,11 +61,10 @@ export default function GolfersToFollowV2() {
         background: A.CANVAS,
         fontFamily: ROW_FONT,
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 108px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 40px)',
       }}
     >
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '0 16px' }}>
-        {/* Back pill */}
         <button
           type="button"
           onClick={goBack}
@@ -130,8 +89,7 @@ export default function GolfersToFollowV2() {
           Back
         </button>
 
-        {/* Masthead */}
-        <div style={{ marginTop: 18, marginBottom: 18 }}>
+        <div style={{ marginTop: 18, marginBottom: 14 }}>
           <div
             style={{
               fontSize: 10.5,
@@ -155,126 +113,80 @@ export default function GolfersToFollowV2() {
           >
             Golfers to follow
           </h1>
-          <div style={{ fontSize: 13, fontWeight: 500, color: A.BODY }}>
-            Fill your feed with players, friends, and courses you care about.
+          <div style={{ fontSize: 13, fontWeight: 500, color: A.DIM }}>
+            {t('suggestedGolfers.pageSub')}
           </div>
         </div>
 
-        {/* Body */}
-        {q.isLoading ? (
-          <Card title="SUGGESTED FOR YOU">
-            <ListSkeleton />
-          </Card>
-        ) : q.isError ? (
-          <Card title="SUGGESTED FOR YOU">
-            <ErrorBlock onRetry={() => q.refetch()} />
-          </Card>
-        ) : people.length === 0 ? (
-          <Card title="SUGGESTED FOR YOU">
-            <EmptyBlock onFind={() => navigate('/search')} />
-          </Card>
-        ) : (
-          <>
-            <Card title="SUGGESTED FOR YOU">
-              {people.map((s, i) => (
-                <SuggestionRow
-                  key={s.id}
-                  suggestion={s}
-                  eyebrow={reasonEyebrow(s)}
-                  showDivider={i < people.length - 1}
-                  onFollowChange={onFollowChange(s.id)}
-                  onOpen={() => openProfile(s.id)}
-                />
-              ))}
-            </Card>
-
-            <div style={{ height: 16 }} />
-
-            <Card title="VERIFIED ON CLBHOUZ">
-              <div
-                style={{
-                  padding: '18px 16px',
-                  fontSize: 12.5,
-                  color: A.BODY,
-                  fontWeight: 500,
-                }}
-              >
-                No verified accounts to show yet.
-              </div>
-            </Card>
-          </>
-        )}
-      </div>
-
-      {/* Bottom bar */}
-      <div
-        style={{
-          position: 'fixed',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          padding:
-            'calc(env(safe-area-inset-bottom, 0px) + 12px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px)',
-          background: `linear-gradient(180deg, rgba(21,23,31,0) 0%, ${A.CANVAS} 40%)`,
-          display: 'flex',
-          justifyContent: 'center',
-          zIndex: 20,
-        }}
-      >
-        <div
+        {/* S5.5 - the search entry point stays at the top of the page. */}
+        <button
+          type="button"
+          onClick={() => navigate('/search')}
           style={{
             display: 'flex',
+            alignItems: 'center',
             gap: 8,
             width: '100%',
-            maxWidth: 520,
+            height: 42,
+            padding: '0 14px',
+            marginBottom: 16,
+            borderRadius: 14,
+            background: A.PANEL,
+            border: `0.5px solid ${A.BORDER}`,
+            color: A.DIM,
+            fontSize: 13.5,
+            fontWeight: 500,
+            fontFamily: ROW_FONT,
+            cursor: 'pointer',
+            textAlign: 'left',
           }}
         >
-          <button
-            type="button"
-            onClick={goBack}
-            style={{
-              flex: '0 0 auto',
-              height: 46,
-              padding: '0 18px',
-              borderRadius: 23,
-              background: 'transparent',
-              border: `1px solid ${A.BORDER}`,
-              color: A.BODY,
-              fontSize: 14,
-              fontWeight: 600,
-              fontFamily: ROW_FONT,
-              cursor: 'pointer',
-            }}
-          >
-            Skip for now
-          </button>
-          <button
-            type="button"
-            onClick={goBack}
-            disabled={selected.size < 1}
-            style={{
-              flex: 1,
-              height: 46,
-              borderRadius: 23,
-              background: selected.size >= 1 ? A.INK : 'rgba(255,255,255,0.08)',
-              color: selected.size >= 1 ? A.CANVAS : 'rgba(248,250,252,0.38)',
-              border: 'none',
-              fontSize: 14,
-              fontWeight: 700,
-              fontFamily: ROW_FONT,
-              cursor: selected.size >= 1 ? 'pointer' : 'default',
-            }}
-          >
-            {selected.size >= 1 ? `Continue · following ${selected.size}` : 'Continue'}
-          </button>
-        </div>
+          <Search size={15} strokeWidth={2.4} />
+          <span style={{ flex: 1 }}>{t('suggestedGolfers.searchEntry')}</span>
+          <ChevronRight size={15} strokeWidth={2.4} />
+        </button>
+
+        {q.isLoading ? (
+          <Panel title={t('suggestedGolfers.heading')}>
+            <ListSkeleton />
+          </Panel>
+        ) : q.isError ? (
+          <Panel title={t('suggestedGolfers.heading')}>
+            <Notice
+              text={t('suggestedGolfers.error')}
+              action={t('suggestedGolfers.retry')}
+              onAction={() => q.refetch()}
+            />
+          </Panel>
+        ) : groups.length === 0 ? (
+          <Panel title={t('suggestedGolfers.heading')}>
+            <Notice
+              text={t('suggestedGolfers.empty')}
+              action={t('suggestedGolfers.findGolfers')}
+              onAction={() => navigate('/search')}
+            />
+          </Panel>
+        ) : (
+          groups.map((g, gi) => (
+            <div key={g.reason} style={{ marginBottom: gi < groups.length - 1 ? 16 : 0 }}>
+              <Panel title={t(GROUP_KEY[g.reason])}>
+                {g.people.map((p, i) => (
+                  <SuggestedGolferRow
+                    key={p.user_id}
+                    golfer={p}
+                    showDivider={i < g.people.length - 1}
+                  />
+                ))}
+              </Panel>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
 }
 
-/* ── card shell ─────────────────────────────────────────────────────── */
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section
       style={{
@@ -286,11 +198,12 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
     >
       <div
         style={{
-          padding: '14px 16px 10px',
-          fontSize: 10.5,
+          padding: '14px 16px 8px',
+          fontSize: 9,
           fontWeight: 700,
-          letterSpacing: '0.16em',
-          color: A.BODY,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: A.DIM,
         }}
       >
         {title}
@@ -300,79 +213,15 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
-/* ── suggestion row (shared parts + amber eyebrow) ──────────────────── */
-function SuggestionRow({
-  suggestion,
-  eyebrow,
-  showDivider,
-  onFollowChange,
-  onOpen,
+function Notice({
+  text,
+  action,
+  onAction,
 }: {
-  suggestion: EmptyStateSuggestion;
-  eyebrow: string;
-  showDivider: boolean;
-  onFollowChange: (following: boolean) => void;
-  onOpen: () => void;
+  text: string;
+  action: string;
+  onAction: () => void;
 }) {
-  const row = toRow(suggestion);
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onOpen}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') onOpen();
-      }}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        padding: '11px 16px',
-        cursor: 'pointer',
-        borderTop: showDivider ? undefined : undefined,
-        borderBottom: showDivider ? `0.5px solid ${A.BORDER}` : undefined,
-      }}
-    >
-      <RowAvatar row={row} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            color: A.AMBER,
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            marginBottom: 2,
-          }}
-        >
-          {eyebrow}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              color: A.INK,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {row.display_name ?? row.username}
-          </div>
-        </div>
-        <RowSubline row={row} />
-      </div>
-      <FollowButton row={row} onFollowChange={onFollowChange} />
-    </div>
-  );
-}
-
-/* ── error / empty blocks (in-card) ──────────────────────────────────── */
-function ErrorBlock({ onRetry }: { onRetry: () => void }) {
   return (
     <div
       style={{
@@ -381,14 +230,15 @@ function ErrorBlock({ onRetry }: { onRetry: () => void }) {
         flexDirection: 'column',
         alignItems: 'center',
         gap: 10,
-        color: A.BODY,
+        color: A.DIM,
         fontSize: 13,
+        textAlign: 'center',
       }}
     >
-      Couldn't load suggestions
+      {text}
       <button
         type="button"
-        onClick={onRetry}
+        onClick={onAction}
         style={{
           background: A.INK,
           color: A.CANVAS,
@@ -401,52 +251,8 @@ function ErrorBlock({ onRetry }: { onRetry: () => void }) {
           cursor: 'pointer',
         }}
       >
-        Retry
+        {action}
       </button>
     </div>
   );
 }
-
-function EmptyBlock({ onFind }: { onFind: () => void }) {
-  return (
-    <div
-      style={{
-        padding: '28px 20px 24px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 10,
-        color: A.BODY,
-        fontSize: 13,
-        textAlign: 'center',
-      }}
-    >
-      No suggestions right now
-      <button
-        type="button"
-        onClick={onFind}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          background: A.INK,
-          color: A.CANVAS,
-          border: 'none',
-          borderRadius: 999,
-          padding: '8px 14px',
-          fontSize: 13,
-          fontWeight: 700,
-          fontFamily: ROW_FONT,
-          cursor: 'pointer',
-        }}
-      >
-        <Search size={14} strokeWidth={2.4} />
-        Find golfers
-        <ChevronRight size={14} strokeWidth={2.4} />
-      </button>
-    </div>
-  );
-}
-
-// Kept import to satisfy tree-shaking in case future rows need it.
-void VerifiedBadge;
