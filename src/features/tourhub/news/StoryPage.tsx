@@ -28,7 +28,6 @@ import {
   INK_FAINT,
   INK_MUTE,
   SLATE_50,
-  SLATE_100,
   STATUS_LIVE,
 } from '../_shared/tokens';
 
