@@ -1340,5 +1340,27 @@
       "unclaimedShort": "--",
       "seeAll": "SEE ALL {{count}}"
     }
+  },
+  "amateurNews": {
+    "section": "Amateur news",
+    "allStories": "ALL STORIES",
+    "all": "All",
+    "filterAria": "Filter amateur news",
+    "more": "MORE AMATEUR NEWS",
+    "emptyAll": "The first stories are on their way.",
+    "emptyFilter": "Nothing filed under this yet.",
+    "notFound": "This story is no longer available.",
+    "categories": {
+      "mens": "Men's",
+      "womens": "Women's",
+      "boys": "Boys",
+      "girls": "Girls",
+      "seniors": "Seniors",
+      "midam": "Mid-Am",
+      "club": "Club",
+      "county": "County",
+      "university": "University",
+      "international": "International"
+    }
   }
 }
