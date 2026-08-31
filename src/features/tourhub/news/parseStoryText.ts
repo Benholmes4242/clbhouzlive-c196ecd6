@@ -18,8 +18,15 @@
  *   plain line                    paragraph
  *   ![caption|credit](url)        image
  *   > text |— Attribution         quote
- *   [leaderboard:<uuid>]          inline live board
- *   [player:<uuid>]               inline player card
+ *   [leaderboard]                 the STORY'S OWN tournament (primary form)
+ *   [leaderboard:<uuid>]          a different tournament
+ *   [player:Full Name]            resolved to a uuid at parse time
+ *   [player:<uuid>]               still works
+ *
+ * MARKERS ARE WRITTEN BY NAME, NOT BY UUID. Ben writes elsewhere, in a tool
+ * with no database, so requiring ids would mean hand-copying uuids three times
+ * a week. Names resolve ONCE, here, and the stored block always holds the uuid
+ * — a player who changes name later cannot break a published story.
  */
 import type { StoryBlock } from './blocks';
 
@@ -27,7 +34,9 @@ import type { StoryBlock } from './blocks';
 const IMAGE_RE = /^!\[([^\]]*)\]\(([^)\s]+)\s*\)$/;
 const HEADING_RE = /^#{1,3}\s+(.*)$/;
 const QUOTE_RE = /^>\s*(.*)$/;
-const EMBED_RE = /^\[(leaderboard|player):\s*([^\]]+)\]$/i;
+/** The argument is OPTIONAL — `[leaderboard]` is the primary form. */
+const EMBED_RE = /^\[(leaderboard|player)(?::\s*([^\]]*))?\]$/i;
+export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Attribution separator. Accepts an em dash, an en dash or a hyphen after the
@@ -35,6 +44,13 @@ const EMBED_RE = /^\[(leaderboard|player):\s*([^\]]+)\]$/i;
  * dash silently changed and that must not cost the author the attribution.
  */
 const ATTRIB_SPLIT = /\s*\|\s*[—–-]?\s*/;
+
+export interface PendingPlayer {
+  /** Index into `blocks` of the placeholder awaiting a uuid. */
+  blockIndex: number;
+  /** The name exactly as written, so problems can be reported verbatim. */
+  name: string;
+}
 
 export interface ParseResult {
   blocks: StoryBlock[];
@@ -45,6 +61,14 @@ export interface ParseResult {
    * prose. Reported, never thrown: the author decides whether it was a typo.
    */
   reclassified: string[];
+  /**
+   * Markers that were understood but could not be turned into a block —
+   * a board with no tournament, a player name that matched nothing or several.
+   * The block is DROPPED, so an unresolvable embed can never be saved.
+   */
+  unresolved: string[];
+  /** Player blocks still holding a placeholder id, awaiting name resolution. */
+  pendingPlayers: PendingPlayer[];
 }
 
 const emptyCounts = (): Record<StoryBlock['type'], number> => ({
@@ -57,8 +81,14 @@ const emptyCounts = (): Record<StoryBlock['type'], number> => ({
  * made, and matching only the correct spellings would never catch it.
  */
 function looksLikeAMarker(line: string): boolean {
-  return /^!\[/.test(line) || /^\[[^\]]*:[^\]]*\]$/.test(line);
+  return /^!\[/.test(line) || /^\[[^\]]*:?[^\]]*\]$/.test(line);
 }
+
+export interface ParseContext {
+  /** The story's own tournament, used by the bare `[leaderboard]` form. */
+  tournamentId?: string | null;
+}
+
 
 export function parseStoryText(source: string): ParseResult {
   const blocks: StoryBlock[] = [];
