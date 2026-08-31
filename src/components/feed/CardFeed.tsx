@@ -40,6 +40,8 @@ import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { safeInitialState } from './feedSnapshot';
 import { setIslandEdgeScrolled } from '@/features/chrome-v2/islandEdge';
+import { WireFeedSlide } from '@/features/tourhub/news/WireFeedSlide';
+import type { ClubhouseFeedItem } from './injectWireStories';
 
 const CANVAS = '#05070A';
 /** Post slab colour (FeedCard CARD). The resting header zone paints this so
@@ -86,6 +88,7 @@ const FeedItemGate: React.FC<{
 
 export interface CardFeedProps {
   posts: FeedPost[];
+  feedItems?: ClubhouseFeedItem[];
   onLike: (post: FeedPost, actor?: ActiveActor | null) => void;
   onComment: (post: FeedPost, actor?: ActiveActor | null) => void;
   onShare: (post: FeedPost) => void;
@@ -138,6 +141,7 @@ const PTR_MAX_PULL = 96;
 
 export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardFeed({
   posts = [],
+  feedItems,
   onLike,
   onComment,
   onShare,
@@ -167,6 +171,11 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   postRoundsSettled = true,
   onRoundTap,
 }, ref) {
+
+  const items = useMemo<ClubhouseFeedItem[]>(
+    () => feedItems ?? posts.map((post, postIndex) => ({ kind: 'post', key: `post:${post.id}`, post, postIndex })),
+    [feedItems, posts],
+  );
 
   const virtuosoRef = useRef<VirtuosoHandle | null>(null);
   const scrollerElRef = useRef<HTMLElement | null>(null);
@@ -212,7 +221,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // a snapshot captured at length N must not be applied to a list with
   // fewer items than its recorded ranges reference (crashes Virtuoso with
   // "Cannot read properties of undefined (reading 'index')").
-  const validatedInitialState = safeInitialState(initialState, posts.length);
+  const validatedInitialState = safeInitialState(initialState, items.length);
   const restoreScrollTopRef = useRef<number | null>(
     validatedInitialState && typeof (validatedInitialState as any).scrollTop === 'number' && (validatedInitialState as any).scrollTop > 0
       ? (validatedInitialState as any).scrollTop
@@ -685,7 +694,17 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   }, [posts]);
 
   const itemContent = useCallback(
-    (index: number, post: FeedPost) => {
+    (_listIndex: number, item: ClubhouseFeedItem) => {
+      if (item.kind === 'wire') {
+        return (
+          <div data-wire-story-id={item.story.id}>
+            <WireFeedSlide story={item.story} />
+            <div aria-hidden style={{ height: 8, background: 'transparent' }} />
+          </div>
+        );
+      }
+
+      const { post, postIndex: index } = item;
       const likeState = getLikeState(post);
 
 
@@ -1005,9 +1024,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
             // scroller receives no events.
             if (node) registerNavScroller(node);
           }}
-          data={posts}
+          data={items}
           itemContent={itemContent}
-          computeItemKey={(_, post) => post.id}
+          computeItemKey={(_, item) => item.key}
           rangeChanged={handleRangeChanged}
           endReached={handleEndReached}
           // Symmetric viewport-anchored keep window. Top was previously 400

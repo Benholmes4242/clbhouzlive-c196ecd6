@@ -37,6 +37,8 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 // ── Data hooks ──
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useTourStories } from '@/features/tourhub/news/useTourStories';
+import { injectWireStories } from '@/components/feed/injectWireStories';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
 // ── Clubhouse UI overlays ──
@@ -178,9 +180,10 @@ const ClubhouseContent = () => {
 
 
   // ── Feed hooks ──
-  // Editorial cards (PGA This Week, Course of the Week) moved to Home in Phase 2.
-  // Clubhouse feed is now purely social posts + algorithmic suggestions.
+  // Ranked posts remain social-only; Wire stories are injected client-side
+  // below and never enter the RPC or ranking pipeline.
   const activeFeed = useSuggestedFeed(user?.id);
+  const wireQuery = useTourStories(null);
 
   /**
    * Batch-idiom scope for this surface (src/lib/queryKeys.ts). What the list
@@ -189,6 +192,12 @@ const ClubhouseContent = () => {
   const FEED_SCOPE = 'clubhouse:suggested';
 
   const posts = activeFeed.posts;
+  // Reversible editorial injection: remove this one call and pass `posts`
+  // directly to CardFeed to restore a social-only Clubhouse feed.
+  const feedItems = useMemo(
+    () => injectWireStories(posts, wireQuery.isError ? [] : wireQuery.stories),
+    [posts, wireQuery.isError, wireQuery.stories],
+  );
 
   // C1 — batched course data for the whole visible page. ONE rpc call for all
   // posts; never one per card. Passed down into CardFeed -> FeedCard.
@@ -542,9 +551,10 @@ const ClubhouseContent = () => {
             <CardFeed
               key={`${FEED_TAB}:${feedResetKey}`}
               tab={FEED_TAB}
-              initialState={safeInitialState(virtuosoSnapshots.current[FEED_TAB], posts.length)}
+               initialState={safeInitialState(virtuosoSnapshots.current[FEED_TAB], feedItems.length)}
               onSnapshot={(s) => { virtuosoSnapshots.current[FEED_TAB] = s; }}
               posts={posts}
+               feedItems={feedItems}
               courseContextMap={courseContextMap}
               resolveCourseId={resolvePostCourseId}
               postScoreIdMap={postScoreIdMap}

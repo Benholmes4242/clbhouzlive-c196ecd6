@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { useTourStories, type TourStory } from './useTourStories';
-import { storyTime } from './storyTime';
+import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './StoryImageText';
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
 import {
   FONT,
@@ -29,25 +29,14 @@ import {
 /** Slugs the news list can express. 'major' has no tour_slug counterpart. */
 const NEWS_SLUGS = ['all', 'pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'];
 
-const KICKER: React.CSSProperties = {
-  fontSize: 9,
-  fontWeight: 700,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase',
-  color: INK_FAINT,
-};
-
 function KickerLine({ kicker, at }: { kicker: string | null; at: string | null }) {
-  const time = storyTime(at);
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
       {kicker && (
-        <span style={{ ...KICKER, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {kicker}
-        </span>
+        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><StoryImageKicker color={INK}>{kicker}</StoryImageKicker></span>
       )}
-      {kicker && time && <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT, flexShrink: 0 }} />}
-      {time && <span style={{ ...KICKER, whiteSpace: 'nowrap' }}>{time}</span>}
+      {kicker && at && <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT, flexShrink: 0 }} />}
+      <StoryRelativeTime at={at} />
     </div>
   );
 }
@@ -81,9 +70,7 @@ export function LeadStory({ story, onOpen, compact = false }: { story: TourStory
           <KickerLine kicker={story.kicker} at={story.published_at} />
         </div>
         <div style={{ position: 'absolute', bottom: 12, left: 14, right: 14 }}>
-          <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.015em', color: '#FFFFFF' }}>
-            {story.headline}
-          </div>
+          <StoryImageHeadline>{story.headline}</StoryImageHeadline>
         </div>
       </div>
       {story.standfirst && (
