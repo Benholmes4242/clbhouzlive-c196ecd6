@@ -674,6 +674,11 @@ export function StoryBody({ blocks }: { blocks: StoryBlock[] }) {
             return <LeaderboardBlock key={i} tournamentId={b.tournament_id} />;
           case 'player':
             return <PlayerBlock key={i} playerId={b.player_id} />;
+          case 'stat':
+            return <StatBlock key={i} playerId={b.player_id} />;
+          case 'round':
+            return <RoundBlock key={i} playerId={b.player_id} tournamentId={b.tournament_id} />;
+
           default:
             return null;
         }
