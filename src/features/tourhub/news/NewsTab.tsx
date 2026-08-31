@@ -29,14 +29,6 @@ import {
 /** Slugs the news list can express. 'major' has no tour_slug counterpart. */
 const NEWS_SLUGS = ['all', 'pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'];
 
-const KICKER: React.CSSProperties = {
-  fontSize: 9,
-  fontWeight: 700,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase',
-  color: INK_FAINT,
-};
-
 function KickerLine({ kicker, at }: { kicker: string | null; at: string | null }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
