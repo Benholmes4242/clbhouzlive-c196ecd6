@@ -21109,6 +21109,22 @@ export type Database = {
           width: number
         }[]
       }
+      get_suggested_golfers: {
+        Args: { p_limit?: number }
+        Returns: {
+          display_name: string
+          handicap_index: number
+          mutual_count: number
+          profile_photo_url: string
+          reason_club_name: string
+          reason_course_name: string
+          reason_type: string
+          recent_rounds: number
+          rounds_total: number
+          user_id: string
+          username: string
+        }[]
+      }
       get_system_state_history: { Args: { p_days?: number }; Returns: Json }
       get_thread: {
         Args: { p_before?: string; p_conversation_id: string; p_limit?: number }
