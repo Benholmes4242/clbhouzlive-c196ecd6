@@ -23,7 +23,17 @@ import { patchEngagement } from '@/lib/engagementCache';
  * Notifications are the trigger's job — nothing here writes one.
  */
 
-export type ReactionTargetType = 'round' | 'review';
+/**
+ * 'tour_story' | 'amateur_story' (BRIEF_STORY_ENGAGEMENT). Stories go on
+ * content_reactions with everything else — NOT on editorial_card_likes. There
+ * are two story TABLES, so there are two target types: a single 'story' value
+ * would force anything resolving a target to probe both.
+ *
+ * A story has NO member author, so reaction_target_owner() returns NULL for
+ * these types (verified) and the notification trigger writes nothing. That is
+ * the intended behaviour and it needs no trigger change.
+ */
+export type ReactionTargetType = 'round' | 'review' | 'tour_story' | 'amateur_story';
 
 export interface ReactionTarget {
   type: ReactionTargetType;
