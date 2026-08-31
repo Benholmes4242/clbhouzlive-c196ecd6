@@ -1,0 +1,50 @@
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import type { TourStory } from './useTourStories';
+import { storyTime } from './storyTime';
+import { StoryImageHeadline, StoryImageKicker } from './StoryImageText';
+import { AMBER, AMBER_TINT_04, FONT, INK_MUTE, INK_SOFT, SLATE_100 } from '../_shared/tokens';
+
+export function WireFeedSlide({ story }: { story: TourStory }) {
+  const { t } = useTranslation('tourhub');
+  const navigate = useNavigate();
+  const openStory = () => navigate(`/tour/news/${story.slug}`);
+
+  return (
+    <article style={{ background: AMBER_TINT_04, fontFamily: FONT }} data-wire-slide>
+      <button
+        type="button"
+        onClick={openStory}
+        aria-label={`${t('news.readStory')}: ${story.headline}`}
+        style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', font: 'inherit' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, color: INK_SOFT, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.2 }}>
+            <span aria-hidden style={{ width: 3, height: 12, flexShrink: 0, background: AMBER }} />
+            <span>{t('news.fromWire')}</span>
+          </div>
+          <time dateTime={story.published_at ?? undefined} style={{ color: INK_MUTE, fontSize: 9, fontWeight: 700, lineHeight: 1.2, whiteSpace: 'nowrap' }}>
+            {storyTime(story.published_at)}
+          </time>
+        </div>
+
+        <div style={{ position: 'relative', height: 176, overflow: 'hidden', background: SLATE_100 }}>
+          <img src={story.image_url ?? ''} alt="" loading="lazy" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 30%' }} />
+          <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.12) 22%, rgba(0,0,0,0.84) 100%)' }} />
+          <div style={{ position: 'absolute', left: 14, right: 14, bottom: 13 }}>
+            {story.kicker && <StoryImageKicker>{story.kicker}</StoryImageKicker>}
+            <div style={{ marginTop: story.kicker ? 5 : 0 }}><StoryImageHeadline feed>{story.headline}</StoryImageHeadline></div>
+          </div>
+        </div>
+
+        <div style={{ padding: '11px 14px 14px' }}>
+          {story.standfirst && <p style={{ margin: 0, color: INK_MUTE, fontSize: 13, lineHeight: 1.45 }}>{story.standfirst}</p>}
+          <div style={{ marginTop: story.standfirst ? 12 : 0, color: INK_SOFT, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.2 }}>
+            {t('news.readStory')}
+          </div>
+        </div>
+      </button>
+    </article>
+  );
+}
