@@ -384,13 +384,21 @@ export function useInboxFeed(): InboxFeedResult {
     if (canUsers && courseReqAll.data) {
       for (const row of courseReqAll.data) {
         if (row.status === 'pending') {
+          // BRIEF_HOME_CLUB_PICKER §4.1 — home-club requests are marked and
+          // prioritised: a member is waiting on each one.
+          const isHomeClub = !!row.homeClubForUserId;
+          const who = row.username ? `@${row.username}` : (row.displayName ?? 'user');
           open.push({
             id: row.id,
             type: 'courseRequest',
-            title: `New course request: ${row.courseName}`,
-            meta: `Course requests - ${row.displayName ?? row.username ?? 'user'}`,
+            title: isHomeClub
+              ? `Home club request: ${row.courseName}`
+              : `New course request: ${row.courseName}`,
+            meta: isHomeClub
+              ? `Home club - ${who} is waiting`
+              : `Course requests - ${row.displayName ?? row.username ?? 'user'}`,
             createdAt: row.createdAt,
-            isHighPriority: false,
+            isHighPriority: isHomeClub,
             payload: row,
           });
         }
