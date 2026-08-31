@@ -79,22 +79,6 @@ const UNITS: Record<LegendCategory, string> = {
 };
 
 
-function formatHeldDuration(attainedAtIso: string): string {
-  const attainedAt = new Date(attainedAtIso);
-  if (isNaN(attainedAt.getTime())) return '—';
-  const diffMs = Date.now() - attainedAt.getTime();
-  if (diffMs < 0) return '—';
-  const days = Math.floor(diffMs / 86400000);
-  if (days === 0) return 'today';
-  if (days === 1) return '1d';
-  if (days < 7) return `${days}d`;
-  const weeks = Math.floor(days / 7);
-  if (weeks < 5) return `${weeks}w`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months}mo`;
-  const years = Math.floor(days / 365);
-  return `${years}y`;
-}
 
 interface SectionRow {
   rank: number;
