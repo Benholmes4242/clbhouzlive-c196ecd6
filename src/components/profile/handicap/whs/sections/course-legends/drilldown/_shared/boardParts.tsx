@@ -14,6 +14,7 @@
  *     and these boards carry their meaning in the figures instead
  */
 import React from 'react';
+import { Crown } from 'lucide-react';
 import { A, LABEL, NUM, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { MovementCell } from './MovementCell';
 
