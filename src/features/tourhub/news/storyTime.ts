@@ -2,7 +2,7 @@
  * storyTime — the ONE relative-time reading for a Wire story.
  *
  * It writes no time maths of its own. Inside a week it delegates to the app's
- * existing `formatRelativeAgo` (with the `yesterday` opt-in), and beyond a week
+ * existing `formatRelativeAgo` (with the `yesterday` and `weekday` opt-ins), and beyond a week
  * it delegates to the existing GB short date formatter. Two existing helpers,
  * composed; no third relative-time implementation.
  */
@@ -15,5 +15,5 @@ export function storyTime(iso: string | null | undefined): string {
   const t = new Date(iso).getTime();
   if (!Number.isFinite(t)) return '';
   if (Date.now() - t >= WEEK_MS) return formatDayMonthShortGB(new Date(t));
-  return formatRelativeAgo(new Date(t), { yesterday: true });
+  return formatRelativeAgo(new Date(t), { yesterday: true, weekday: true });
 }

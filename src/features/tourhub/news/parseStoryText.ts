@@ -18,8 +18,15 @@
  *   plain line                    paragraph
  *   ![caption|credit](url)        image
  *   > text |— Attribution         quote
- *   [leaderboard:<uuid>]          inline live board
- *   [player:<uuid>]               inline player card
+ *   [leaderboard]                 the STORY'S OWN tournament (primary form)
+ *   [leaderboard:<uuid>]          a different tournament
+ *   [player:Full Name]            resolved to a uuid at parse time
+ *   [player:<uuid>]               still works
+ *
+ * MARKERS ARE WRITTEN BY NAME, NOT BY UUID. Ben writes elsewhere, in a tool
+ * with no database, so requiring ids would mean hand-copying uuids three times
+ * a week. Names resolve ONCE, here, and the stored block always holds the uuid
+ * — a player who changes name later cannot break a published story.
  */
 import type { StoryBlock } from './blocks';
 
@@ -27,7 +34,9 @@ import type { StoryBlock } from './blocks';
 const IMAGE_RE = /^!\[([^\]]*)\]\(([^)\s]+)\s*\)$/;
 const HEADING_RE = /^#{1,3}\s+(.*)$/;
 const QUOTE_RE = /^>\s*(.*)$/;
-const EMBED_RE = /^\[(leaderboard|player):\s*([^\]]+)\]$/i;
+/** The argument is OPTIONAL — `[leaderboard]` is the primary form. */
+const EMBED_RE = /^\[(leaderboard|player)(?::\s*([^\]]*))?\]$/i;
+export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Attribution separator. Accepts an em dash, an en dash or a hyphen after the
@@ -35,6 +44,13 @@ const EMBED_RE = /^\[(leaderboard|player):\s*([^\]]+)\]$/i;
  * dash silently changed and that must not cost the author the attribution.
  */
 const ATTRIB_SPLIT = /\s*\|\s*[—–-]?\s*/;
+
+export interface PendingPlayer {
+  /** Index into `blocks` of the placeholder awaiting a uuid. */
+  blockIndex: number;
+  /** The name exactly as written, so problems can be reported verbatim. */
+  name: string;
+}
 
 export interface ParseResult {
   blocks: StoryBlock[];
@@ -45,6 +61,14 @@ export interface ParseResult {
    * prose. Reported, never thrown: the author decides whether it was a typo.
    */
   reclassified: string[];
+  /**
+   * Markers that were understood but could not be turned into a block —
+   * a board with no tournament, a player name that matched nothing or several.
+   * The block is DROPPED, so an unresolvable embed can never be saved.
+   */
+  unresolved: string[];
+  /** Player blocks still holding a placeholder id, awaiting name resolution. */
+  pendingPlayers: PendingPlayer[];
 }
 
 const emptyCounts = (): Record<StoryBlock['type'], number> => ({
@@ -57,13 +81,22 @@ const emptyCounts = (): Record<StoryBlock['type'], number> => ({
  * made, and matching only the correct spellings would never catch it.
  */
 function looksLikeAMarker(line: string): boolean {
-  return /^!\[/.test(line) || /^\[[^\]]*:[^\]]*\]$/.test(line);
+  return /^!\[/.test(line) || /^\[[^\]]*:?[^\]]*\]$/.test(line);
 }
 
-export function parseStoryText(source: string): ParseResult {
+export interface ParseContext {
+  /** The story's own tournament, used by the bare `[leaderboard]` form. */
+  tournamentId?: string | null;
+}
+
+
+export function parseStoryText(source: string, ctx: ParseContext = {}): ParseResult {
   const blocks: StoryBlock[] = [];
   const counts = emptyCounts();
   const reclassified: string[] = [];
+  const unresolved: string[] = [];
+  const pendingPlayers: PendingPlayer[] = [];
+  const storyTournamentId = (ctx.tournamentId ?? '').trim();
 
   // Paragraph text accumulates across consecutive plain lines so a soft-wrapped
   // paste stays ONE paragraph; a blank line or any marker line closes it.
@@ -103,9 +136,29 @@ export function parseStoryText(source: string): ParseResult {
 
     const embed = EMBED_RE.exec(line);
     if (embed) {
-      const id = embed[2].trim();
-      if (embed[1].toLowerCase() === 'leaderboard') push({ type: 'leaderboard', tournament_id: id });
-      else push({ type: 'player', player_id: id });
+      const arg = (embed[2] ?? '').trim();
+      if (embed[1].toLowerCase() === 'leaderboard') {
+        // Bare `[leaderboard]` means THIS story's tournament; an explicit uuid
+        // overrides it for the rare cross-tournament embed.
+        const id = arg || storyTournamentId;
+        if (id) push({ type: 'leaderboard', tournament_id: id });
+        else {
+          flush();
+          unresolved.push('leaderboard block has no tournament — pick one above');
+        }
+      } else if (!arg) {
+        flush();
+        unresolved.push('player block has no name');
+      } else if (UUID_RE.test(arg)) {
+        push({ type: 'player', player_id: arg });
+      } else {
+        // A NAME. It gets a placeholder block whose id is filled in by the
+        // resolver; if the name does not resolve, the block is dropped.
+        flush();
+        pendingPlayers.push({ blockIndex: blocks.length, name: arg });
+        blocks.push({ type: 'player', player_id: '' });
+        counts.player += 1;
+      }
       continue;
     }
 
@@ -127,8 +180,9 @@ export function parseStoryText(source: string): ParseResult {
   }
   flush();
 
-  return { blocks, counts, reclassified };
+  return { blocks, counts, reclassified, unresolved, pendingPlayers };
 }
+
 
 /**
  * Blocks back to source text. The round trip exists so a story authored before
