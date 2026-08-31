@@ -190,9 +190,9 @@ export function StoryPage() {
                 {story.standfirst}
               </p>
             )}
-            {story.body && (
-              <div style={{ marginTop: 12, fontSize: 14.5, lineHeight: 1.65, color: INK_MUTE, whiteSpace: 'pre-wrap' }}>
-                {story.body}
+            {story.body_blocks.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <StoryBody blocks={story.body_blocks} />
               </div>
             )}
 
