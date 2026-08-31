@@ -20,7 +20,7 @@ export function WireFeedSlide({ story }: { story: TourStory }) {
         style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', font: 'inherit' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 14px' }}>
-          <span style={{ minWidth: 0, color: FEED_DATE_INK, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.2 }}>
+          <span style={{ minWidth: 0, color: AMBER, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.2 }}>
             {t('news.fromWire')}
           </span>
           <StoryRelativeTime at={story.published_at} />
