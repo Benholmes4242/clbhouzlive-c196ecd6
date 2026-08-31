@@ -392,7 +392,10 @@
       "club": "Also at {{club}}.",
       "course": "You have both played {{course}}.",
       "mutual": "Followed by {{count}} golfers you follow.",
-      "active": "{{count}} rounds in the last fortnight."
+      "active": "{{count}} rounds in the last fortnight.",
+      "reciprocal": "Folgt dir.",
+      "clubmate_mutual": "Gefolgt von Golfern bei {{club}}.",
+      "recently_joined": "Neu bei clbhouz."
     },
     "subline": {
       "rounds": "{{count}} rounds",
@@ -402,7 +405,10 @@
       "club": "At your club",
       "course": "Courses you both play",
       "mutual": "Followed by golfers you follow",
-      "active": "Active recently"
+      "active": "Active recently",
+      "reciprocal": "Folgt dir",
+      "clubmate_mutual": "Gefolgt von Golfern in deinem Club",
+      "recently_joined": "Neu bei clbhouz"
     },
     "prompt": {
       "title": "Nobody saw that round",

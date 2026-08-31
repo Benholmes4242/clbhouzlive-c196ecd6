@@ -27,13 +27,24 @@ export function reasonText(
   switch (g.reason_type) {
     case 'club':
       return t('suggestedGolfers.reason.club', { club: g.reason_club_name ?? '' });
+    case 'reciprocal':
+      return t('suggestedGolfers.reason.reciprocal');
     case 'course':
       return t('suggestedGolfers.reason.course', { course: g.reason_course_name ?? '' });
+    case 'clubmate_mutual':
+      return t('suggestedGolfers.reason.clubmate_mutual', { club: g.reason_club_name ?? '' });
     case 'mutual':
       return t('suggestedGolfers.reason.mutual', { count: g.mutual_count ?? 0 });
+    case 'recently_joined':
+      return t('suggestedGolfers.reason.recently_joined');
     default:
       return t('suggestedGolfers.reason.active', { count: g.recent_rounds ?? 0 });
   }
+}
+
+/** A4.4 - club and reciprocal describe real relationships, so they take amber. */
+export function reasonIsAmber(r: SuggestedGolfer['reason_type']): boolean {
+  return r === 'club' || r === 'reciprocal';
 }
 
 function toRow(g: SuggestedGolfer): RowActorLike {
@@ -59,7 +70,7 @@ export function SuggestedGolferRow({
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const row = toRow(golfer);
-  const isClub = golfer.reason_type === 'club';
+  const isClub = reasonIsAmber(golfer.reason_type);
 
   // S2.4 - the subline omits what it does not have. No placeholders.
   const parts: string[] = [];
