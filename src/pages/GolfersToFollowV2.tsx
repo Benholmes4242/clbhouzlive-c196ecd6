@@ -24,12 +24,23 @@ import {
   type SuggestionReason,
 } from '@/features/social-suggestions/useSuggestedGolfers';
 
-const GROUP_ORDER: SuggestionReason[] = ['club', 'course', 'mutual', 'active'];
+const GROUP_ORDER: SuggestionReason[] = [
+  'club',
+  'reciprocal',
+  'course',
+  'clubmate_mutual',
+  'mutual',
+  'active',
+  'recently_joined',
+];
 const GROUP_KEY: Record<SuggestionReason, string> = {
   club: 'suggestedGolfers.group.club',
+  reciprocal: 'suggestedGolfers.group.reciprocal',
   course: 'suggestedGolfers.group.course',
+  clubmate_mutual: 'suggestedGolfers.group.clubmate_mutual',
   mutual: 'suggestedGolfers.group.mutual',
   active: 'suggestedGolfers.group.active',
+  recently_joined: 'suggestedGolfers.group.recently_joined',
 };
 
 export default function GolfersToFollowV2() {
