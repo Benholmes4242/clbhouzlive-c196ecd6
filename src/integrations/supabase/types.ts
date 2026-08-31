@@ -20986,6 +20986,15 @@ export type Database = {
         }[]
       }
       get_stat_browse_facets: { Args: never; Returns: Json }
+      get_story_engagement: {
+        Args: { p_ids: string[]; p_target_type: string }
+        Returns: {
+          comment_count: number
+          like_count: number
+          target_id: string
+          viewer_liked: boolean
+        }[]
+      }
       get_suggested_creators: {
         Args: { p_limit?: number; p_user_id: string }
         Returns: {
