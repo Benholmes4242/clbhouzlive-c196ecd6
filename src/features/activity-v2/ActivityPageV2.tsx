@@ -552,11 +552,23 @@ export const ActivityPageV2: React.FC = () => {
               renderBucket(BUCKET_LABELS.new, buckets.new, 'new')
             ) : (
               <>
-                {renderBucket(BUCKET_LABELS.new, buckets.new, 'new')}
-                {renderBucket(BUCKET_LABELS.today, buckets.today)}
-                {renderBucket(BUCKET_LABELS.yesterday, buckets.yesterday)}
-                {renderBucket(BUCKET_LABELS.thisWeek, buckets.thisWeek)}
-                {renderBucket(BUCKET_LABELS.earlier, buckets.earlier)}
+                {/* S3.1 - the suggestion block sits AFTER the first day group. */}
+                {(() => {
+                  const rendered = [
+                    renderBucket(BUCKET_LABELS.new, buckets.new, 'new'),
+                    renderBucket(BUCKET_LABELS.today, buckets.today),
+                    renderBucket(BUCKET_LABELS.yesterday, buckets.yesterday),
+                    renderBucket(BUCKET_LABELS.thisWeek, buckets.thisWeek),
+                    renderBucket(BUCKET_LABELS.earlier, buckets.earlier),
+                  ];
+                  const firstIdx = rendered.findIndex((n) => n !== null);
+                  const out: React.ReactNode[] = [];
+                  rendered.forEach((node, i) => {
+                    if (node) out.push(node);
+                    if (i === firstIdx) out.push(<SuggestedGolfersBlock key="suggested" />);
+                  });
+                  return out;
+                })()}
               </>
             )}
 
