@@ -13,6 +13,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMoreFromTheWire, useStoryTournament, useTourStory } from './useTourStories';
 import { StoryRow } from './NewsTab';
+import { StoryBody } from './StoryBody';
 import { storyTime } from './storyTime';
 import {
   FONT,

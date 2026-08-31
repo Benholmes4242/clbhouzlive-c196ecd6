@@ -23,7 +23,11 @@ export interface RankedPlayer {
 }
 
 export interface RankedPlayerRowProps {
-  rank: number;
+  /**
+   * A position, or '' where the surface has no ranking to state (the Wire's
+   * inline player embed). The cell holds its width either way.
+   */
+  rank: number | string;
   player: RankedPlayer;
   stat?: number | null;
   /** Pre-formatted string override for `stat` (e.g. "$30.1M", "72.3%"). */
