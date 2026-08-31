@@ -23,6 +23,7 @@ import { safeGoBack } from '@/utils/navigation';
 import { useLogout } from '@/hooks/useLogout';
 
 const TAB_TITLES: Record<string, string> = {
+  news: 'News',
   live: 'Live',
   schedule: 'Schedule',
   players: 'Players',
