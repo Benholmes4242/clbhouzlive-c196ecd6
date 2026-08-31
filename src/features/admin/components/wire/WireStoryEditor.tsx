@@ -23,6 +23,7 @@ import { StoryArticle } from '@/features/tourhub/news/StoryPage';
 import { LeadStory, StoryRow } from '@/features/tourhub/news/NewsTab';
 import type { TourStory } from '@/features/tourhub/news/useTourStories';
 import { blocksToText, parseStoryText, slugifyHeadline } from '@/features/tourhub/news/parseStoryText';
+import { parseAndResolveStoryText, parseSummary } from '@/features/tourhub/news/resolveStoryMarkers';
 import { SLATE_50 } from '@/features/tourhub/_shared/tokens';
 import { adminTheme as t } from '../../theme';
 import StatusPill from '../StatusPill';
@@ -170,11 +171,14 @@ export default function WireStoryEditor({
   const state = story ? storyState(story) : 'draft';
   const preview = React.useMemo(() => toPreviewStory({ ...f, slug }, story), [f, slug, story]);
 
-  const parse = () => {
-    const result = parseStoryText(f.sourceText);
+  // Names resolve against the database, so parsing is async. The story's own
+  // tournament is handed in so a bare `[leaderboard]` can land.
+  const parse = async () => {
+    const result = await parseAndResolveStoryText(f.sourceText, { tournamentId: f.tournamentId });
     setParsed(result);
     setF((p) => ({ ...p, blocks: result.blocks }));
     if (result.blocks.length === 0) toast.error('Nothing to parse');
+    else if (result.unresolved.length > 0) toast.error(`${result.unresolved.length} embed(s) could not be resolved`);
     else toast.success(`${result.blocks.length} blocks parsed`);
   };
 
@@ -243,8 +247,8 @@ export default function WireStoryEditor({
                 'A paragraph.\n\n' +
                 '![Caption|Credit](https://…)\n' +
                 '> A quote |— Attribution\n' +
-                '[leaderboard:tournament-id]\n' +
-                '[player:player-id]'
+                '[leaderboard]\n' +
+                '[player:Scottie Scheffler]'
               }
               rows={14}
               style={{
@@ -261,13 +265,21 @@ export default function WireStoryEditor({
               </button>
               {parsed && (
                 <span style={{ fontSize: 12, color: t.inkMuted }}>
-                  {Object.entries(parsed.counts)
-                    .filter(([, n]) => n > 0)
-                    .map(([k, n]) => `${n} ${k}${n > 1 ? 's' : ''}`)
-                    .join(' · ') || 'nothing'}
+                  {parseSummary(parsed)}
                 </span>
               )}
             </div>
+            {parsed && parsed.unresolved.length > 0 && (
+              <div style={{
+                marginTop: 10, padding: '8px 10px', borderRadius: 8,
+                background: t.dangerSoft, color: t.dangerText, fontSize: 12, lineHeight: 1.5,
+              }}>
+                Not saved — these embeds did not resolve:
+                {parsed.unresolved.slice(0, 5).map((l, i) => (
+                  <div key={i} style={{ fontSize: 11.5, marginTop: 4 }}>{l}</div>
+                ))}
+              </div>
+            )}
             {parsed && parsed.reclassified.length > 0 && (
               <div style={{
                 marginTop: 10, padding: '8px 10px', borderRadius: 8,

@@ -596,13 +596,14 @@ export function formatOrdinal(n: number): string {
  *   < 60m          → "{m}m ago"
  *   < 24h          → "{h}h ago"
  *   1d & yesterday → "yesterday"      (opt-in via options.yesterday)
+ *   2–6d & weekday → "Wed"            (opt-in via options.weekday)
  *   < 30d          → "{d}d ago"
  *   < 12mo         → "{mo}mo ago"
  *   else           → "{y}y ago"
  */
 export function formatRelativeAgo(
   d: DateInput | null | undefined,
-  options: { yesterday?: boolean } = {},
+  options: { yesterday?: boolean; weekday?: boolean } = {},
 ): string {
   if (d == null) return '';
   const date = toDate(d);
@@ -620,6 +621,12 @@ export function formatRelativeAgo(
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
     if (options.yesterday && days === 1) return 'yesterday';
+    // A weekday says WHICH update you are looking at; "3d ago" makes the
+    // reader do arithmetic. Opt-in, because surfaces that measure elapsed
+    // time (a sync, a streak) are worse for it.
+    if (options.weekday && days >= 2 && days <= 6) {
+      return date.toLocaleDateString('en-GB', { weekday: 'short' });
+    }
     if (days < 30) return `${days}d ago`;
     if (months < 12) return `${months}mo ago`;
     return `${years}y ago`;
