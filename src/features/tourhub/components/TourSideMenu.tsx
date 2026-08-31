@@ -17,6 +17,7 @@ import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import type { LucideIcon } from 'lucide-react';
 import {
   Compass,
+  Newspaper,
   Trophy,
   CalendarDays,
   Users,
