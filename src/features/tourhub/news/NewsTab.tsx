@@ -70,7 +70,7 @@ export function LeadStory({ story, onOpen, compact = false }: { story: TourStory
           src={story.image_url as string}
           alt={story.headline}
           loading="lazy"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 30%', display: 'block' }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: `50% ${LEAD_FOCAL_Y}`, display: 'block' }}
         />
         <div
           aria-hidden

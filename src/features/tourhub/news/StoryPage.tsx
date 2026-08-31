@@ -155,7 +155,16 @@ export function StoryArticle({ story, immersiveHero = false, tagLabel }: {
           <img
             src={story.image_url}
             alt={story.headline}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            style={{
+              width: '100%',
+              height: `calc(100% + ${HERO_SUBJECT_DROP * 2}px)`,
+              objectFit: 'cover',
+              // objectPosition is the default; it is written out to stop future
+              // edits trying to "tune" a focal point that has no vertical travel
+              // on this nearly-square hero (landscape photos crop at the sides).
+              objectPosition: '50% 50%',
+              display: 'block',
+            }}
           />
           <div
             aria-hidden
