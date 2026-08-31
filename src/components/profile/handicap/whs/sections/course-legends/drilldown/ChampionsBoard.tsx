@@ -19,15 +19,17 @@
  * Reuses BoardAvatar from _shared/boardParts. No SQL, no query change.
  */
 import React, { useMemo, useState } from 'react';
-import { Crown } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { A, LABEL, NUM, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { BoardAvatar } from './_shared/boardParts';
-import { MovementCell } from './_shared/MovementCell';
+import {
+  ChampionsRow,
+  ChampionsColumnHeader,
+  categoryWindowDays as sharedCategoryWindowDays,
+  hasToPar,
+  positionsFor,
+} from './_shared/boardParts';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
-
-const MINUS = '\u2212';
 
 export interface ChampionsBoardCategory {
   key: LegendCategory;
@@ -63,53 +65,9 @@ interface Props {
 
 /** 90-DAY vs ALL-TIME is read from the category's window, not its name. */
 export function categoryWindowDays(cat: LegendCategory): number | null {
-  return String(cat).endsWith('_90d') ? 90 : null;
+  return sharedCategoryWindowDays(cat);
 }
 
-/** Gross categories are the only ones with a to-par to state. */
-function hasToPar(cat: LegendCategory): boolean {
-  return String(cat).startsWith('lowest_gross');
-}
-
-function formatToPar(value: number, par: number): string {
-  const d = Math.round(value - par);
-  if (d === 0) return 'E';
-  return d > 0 ? `+${d}` : `${MINUS}${Math.abs(d)}`;
-}
-
-function toParColor(value: number, par: number): string {
-  const d = Math.round(value - par);
-  if (d < 0) return A.RED;
-  if (d === 0) return A.DIM;
-  return A.MUTE;
-}
-
-function formatWhen(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '';
-  return d
-    .toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
-    .toUpperCase();
-}
-
-/** Positions with proper tie handling: 1, T3, T3, 5. */
-function positionsFor(rows: ChampionsBoardRow[]): string[] {
-  const out: string[] = [];
-  let i = 0;
-  while (i < rows.length) {
-    let j = i;
-    while (j + 1 < rows.length && rows[j + 1].value === rows[i].value) j += 1;
-    const pos = i + 1;
-    const tied = j > i;
-    for (let k = i; k <= j; k += 1) out.push(tied ? `T${pos}` : String(pos));
-    i = j + 1;
-  }
-  return out;
-}
-
-const GRID = (movement: boolean) =>
-  `${movement ? '26px ' : ''}34px 26px 1fr 58px 62px`;
-const GAP = 10;
 
 export const ChampionsBoard: React.FC<Props> = ({
   categories,
@@ -153,73 +111,17 @@ export const ChampionsBoard: React.FC<Props> = ({
     return r.reduce((s, x) => s + (x.value || 0), 0);
   }, [categories, grouped]);
 
-  const renderRow = (row: ChampionsBoardRow, pos: string, first: boolean, pinned = false) => {
-    const tone = row.isSelf ? A.AMBER : A.INK;
-    return (
-      <div
-        key={`${row.userId ?? row.name}-${pos}-${pinned ? 'pin' : 'row'}`}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: GRID(showMovement),
-          gap: GAP,
-          alignItems: 'center',
-          padding: '9px 16px',
-          fontFamily: SANS,
-          background: row.isSelf ? 'rgba(247,147,30,0.07)' : undefined,
-          borderTop: first ? undefined : `1px solid ${A.HAIRLINE}`,
-        }}
-      >
-        {showMovement && (
-          <span style={{ display: 'flex', justifyContent: 'center' }}>
-            <MovementCell delta={row.delta} rank30d={row.rank30d} theme="dark" size="figure" />
-          </span>
-        )}
-        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-          {pos === '1' && (
-            <Crown size={12} strokeWidth={2.5} fill={A.AMBER} style={{ color: A.AMBER, flexShrink: 0 }} />
-          )}
-          <span style={{ ...NUM, fontSize: 12.5, color: row.isSelf ? A.AMBER : A.DIM }}>{pos}</span>
-        </span>
-        <BoardAvatar photoUrl={row.photoUrl} name={row.name} />
-        <span
-          style={{
-            fontSize: 13,
-            fontWeight: 700,
-            color: tone,
-            letterSpacing: '-0.01em',
-            minWidth: 0,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {row.name}
-        </span>
-        <span style={{ ...LABEL, fontSize: 10.5, color: A.DIM, textAlign: 'right' }}>
-          {formatWhen(row.attained_at)}
-        </span>
-        <span style={{ textAlign: 'right', minWidth: 0 }}>
-          <span style={{ ...NUM, fontSize: 15, fontWeight: 700, color: tone, display: 'block', lineHeight: 1 }}>
-            {row.valueDisplay}
-          </span>
-          {showToPar && (
-            <span
-              style={{
-                ...NUM,
-                fontSize: 10.5,
-                display: 'block',
-                marginTop: 2,
-                lineHeight: 1,
-                color: row.isSelf ? A.AMBER : toParColor(row.value, coursePar as number),
-              }}
-            >
-              {formatToPar(row.value, coursePar as number)}
-            </span>
-          )}
-        </span>
-      </div>
-    );
-  };
+  const renderRow = (row: ChampionsBoardRow, pos: string, first: boolean, pinned = false) => (
+    <ChampionsRow
+      key={`${row.userId ?? row.name}-${pos}-${pinned ? 'pin' : 'row'}`}
+      row={row}
+      pos={pos}
+      showMovement={showMovement}
+      showToPar={showToPar}
+      coursePar={coursePar}
+      rule={!first}
+    />
+  );
 
   return (
     <div style={{ background: A.PANEL, fontFamily: SANS, paddingBottom: 4 }}>
@@ -314,21 +216,13 @@ export const ChampionsBoard: React.FC<Props> = ({
 
       {/* COLUMN HEADERS. POS is centred over the numerals alone; movement,
           where present, is an unheaded column outside it. */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: GRID(showMovement),
-          gap: GAP,
-          padding: '0 16px 5px',
-        }}
-      >
-        {showMovement && <span aria-hidden />}
-        <span style={{ ...LABEL, textAlign: 'center' }}>{t('champions.board.pos')}</span>
-        <span aria-hidden />
-        <span style={{ ...LABEL }}>{t('champions.board.member')}</span>
-        <span style={{ ...LABEL, textAlign: 'right' }}>{t('champions.board.when')}</span>
-        <span style={{ ...LABEL, textAlign: 'right' }}>{t('champions.board.mark')}</span>
-      </div>
+      <ChampionsColumnHeader
+        showMovement={showMovement}
+        posLabel={t('champions.board.pos')}
+        memberLabel={t('champions.board.member')}
+        whenLabel={t('champions.board.when')}
+        markLabel={t('champions.board.mark')}
+      />
 
       {shown.map((row, i) => renderRow(row, positions[i], i === 0))}
 
