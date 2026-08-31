@@ -9,6 +9,7 @@ import { LeadersTab as LeadersTabV2 } from '@/features/tourhub/leaders-v2/Leader
 import { PlayersTab as PlayersTabV2 } from '@/features/tourhub/players-v2/PlayersTab';
 import { ScheduleTab as ScheduleTabV2 } from '@/features/tourhub/schedule-v2/ScheduleTab';
 import { LeaderboardTab } from '@/features/tourhub/leaderboard/LeaderboardTab';
+import { NewsTab } from '@/features/tourhub/news/NewsTab';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
