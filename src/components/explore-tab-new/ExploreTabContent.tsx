@@ -506,9 +506,14 @@ export default function ExploreTabContent({
           gap: RHYTHM,
         }}
       >
+        {/* Amateur News — the beat this app's members actually play in, so it
+            leads the page. Its own section rhythm comes from this flex gap. */}
+        <AmateurNewsSection />
+
         {/* BRIEF_DISCOVER_ORDER_AND_LABELS §1 — the RANKED sections precede the
             MEDIA sections. */}
         <MostPlayedLeaderboard
+
           rows={mostPlayedList}
           isPending={mostPlayedQuery.isPending}
           onRowPress={handleMostPlayed}
