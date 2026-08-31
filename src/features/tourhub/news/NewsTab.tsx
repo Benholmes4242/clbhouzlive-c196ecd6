@@ -52,7 +52,7 @@ function KickerLine({ kicker, at }: { kicker: string | null; at: string | null }
   );
 }
 
-export function LeadStory({ story, onOpen }: { story: TourStory; onOpen: () => void }) {
+export function LeadStory({ story, onOpen, compact = false }: { story: TourStory; onOpen: () => void; compact?: boolean }) {
   return (
     <button
       type="button"
@@ -63,7 +63,7 @@ export function LeadStory({ story, onOpen }: { story: TourStory; onOpen: () => v
         border: 'none', padding: 0, cursor: 'pointer', fontFamily: FONT,
       }}
     >
-      <div style={{ position: 'relative', height: OVERVIEW_HERO_HEIGHT, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
+      <div style={{ position: 'relative', height: compact ? 150 : OVERVIEW_HERO_HEIGHT, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
         <img
           src={story.image_url as string}
           alt={story.headline}
@@ -77,7 +77,7 @@ export function LeadStory({ story, onOpen }: { story: TourStory; onOpen: () => v
             background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 42%, rgba(0,0,0,0.78) 100%)',
           }}
         />
-        <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 68px)', left: 14, right: 14 }}>
+        <div style={{ position: 'absolute', top: compact ? 12 : 'calc(env(safe-area-inset-top, 0px) + 68px)', left: 14, right: 14 }}>
           <KickerLine kicker={story.kicker} at={story.published_at} />
         </div>
         <div style={{ position: 'absolute', bottom: 12, left: 14, right: 14 }}>
@@ -95,7 +95,7 @@ export function LeadStory({ story, onOpen }: { story: TourStory; onOpen: () => v
   );
 }
 
-export function StoryRow({ story, onOpen }: { story: TourStory; onOpen: () => void }) {
+export function StoryRow({ story, onOpen, compact = false }: { story: TourStory; onOpen: () => void; compact?: boolean }) {
   return (
     <button
       type="button"
@@ -122,7 +122,7 @@ export function StoryRow({ story, onOpen }: { story: TourStory; onOpen: () => vo
           src={story.image_url}
           alt=""
           loading="lazy"
-          style={{ width: 62, height: 62, borderRadius: 8, objectFit: 'cover', flexShrink: 0, background: SLATE_100 }}
+          style={{ width: compact ? 54 : 62, height: compact ? 54 : 62, borderRadius: 8, objectFit: 'cover', flexShrink: 0, background: SLATE_100 }}
         />
       )}
     </button>

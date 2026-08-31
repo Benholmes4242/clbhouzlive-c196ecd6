@@ -15,6 +15,7 @@ import { LazySection } from '../overview-v3/LazySection';
 
 import { WorldRankingsSlot } from '../overview-v3/WorldRankingsSlot';
 import { StatWatchSlot } from '../overview-v3/StatWatchSlot';
+import { WireOverviewSection } from '../../news/WireOverviewSection';
 
 import { OverviewHero } from '../overview-v3/OverviewHero';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
@@ -91,6 +92,7 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 88 }}>
+            <WireOverviewSection />
             <LazySection minHeight={400}>
               <WorldRankingsSlot />
             </LazySection>

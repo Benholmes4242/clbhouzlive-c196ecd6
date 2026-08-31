@@ -870,6 +870,7 @@
   },
   "news": {
     "masthead": "THE WIRE",
+    "allStories": "ALL STORIES",
     "updated": "Updated {{time}}",
     "empty": "No stories on the wire yet.",
     "more": "MORE FROM THE WIRE",
