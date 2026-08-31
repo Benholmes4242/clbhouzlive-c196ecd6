@@ -690,6 +690,10 @@ function AppRoutes() {
         
         {/* Tour Hub routes */}
         <Route path="/tour/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><TourNewsStoryPage /></Suspense>} />
+
+        {/* Amateur News — the Discover half of the news programme. Guest-readable. */}
+        <Route path="/discover/news" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurNewsPage /></Suspense>} />
+        <Route path="/discover/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurNewsStoryPage /></Suspense>} />
         <Route path="/tourhub" element={<Suspense fallback={<TourHubOverviewSkeleton />}><TourHubMainPage /></Suspense>} />
         <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<TournamentPageSkeleton />}><TournamentDetailPage /></Suspense>} />
         
