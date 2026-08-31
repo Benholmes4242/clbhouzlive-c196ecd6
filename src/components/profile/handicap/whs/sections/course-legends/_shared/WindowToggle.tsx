@@ -27,8 +27,14 @@ export const WindowToggle: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation('common');
   const isLight = variant === 'light';
-  const activeColor = isLight ? '#0F172A' : '#FFFFFF';
-  const idleColor = isLight ? '#94A3B8' : 'rgba(255,255,255,0.45)';
+
+  // Canonical shell-tab pill geometry (FilterChips): SCOPE_PILL_RADIUS,
+  // 8/14 padding, 12.5/700 type, selected = ink fill, idle = panel + hairline.
+  const activeFill = isLight ? '#0F172A' : A.INK;
+  const activeInk = isLight ? '#FFFFFF' : A.PANEL;
+  const idleFill = isLight ? 'transparent' : A.PANEL;
+  const idleInk = isLight ? '#0F172A' : A.INK;
+  const idleBorder = isLight ? 'rgba(15,23,42,0.14)' : A.BORDER;
 
   const options: Array<{ value: LegendWindow; label: string }> = [
     { value: '90d', label: t('handicap.legends.window90d') },
@@ -36,7 +42,7 @@ export const WindowToggle: React.FC<Props> = ({
   ];
 
   return (
-    <div style={{ display: 'inline-flex', flexShrink: 0, gap: 14 }}>
+    <div style={{ display: 'inline-flex', flexShrink: 0, gap: 8 }}>
       {options.map((o) => {
         const active = window === o.value;
         return (
@@ -46,16 +52,17 @@ export const WindowToggle: React.FC<Props> = ({
             onClick={() => setWindow(o.value)}
             aria-pressed={active}
             style={{
-              background: 'none',
-              border: 'none',
-              padding: 0,
+              flexShrink: 0,
               cursor: 'pointer',
+              padding: '8px 14px',
+              borderRadius: SCOPE_PILL_RADIUS,
+              whiteSpace: 'nowrap',
               fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-              fontSize: 11,
-              fontWeight: active ? 700 : 700,
-              letterSpacing: '0.13em',
-              textTransform: 'uppercase',
-              color: active ? activeColor : idleColor,
+              fontSize: 12.5,
+              fontWeight: 700,
+              background: active ? activeFill : idleFill,
+              color: active ? activeInk : idleInk,
+              border: `1px solid ${active ? activeFill : idleBorder}`,
             }}
           >
             {o.label}
