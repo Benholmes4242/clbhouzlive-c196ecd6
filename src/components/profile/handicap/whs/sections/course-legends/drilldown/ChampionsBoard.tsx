@@ -153,15 +153,14 @@ export const ChampionsBoard: React.FC<Props> = ({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
-                padding: '6px 11px',
-                borderRadius: 999,
+                padding: '8px 14px',
+                borderRadius: SCOPE_PILL_RADIUS,
                 border: `1px solid ${isActive ? A.INK : A.BORDER}`,
-                background: isActive ? A.INK : 'transparent',
-                color: isActive ? A.CANVAS : unclaimed ? A.DIM : A.MUTE,
+                background: isActive ? A.INK : A.PANEL,
+                color: isActive ? A.PANEL : unclaimed ? A.DIM : A.INK,
                 fontFamily: SANS,
-                fontSize: 11,
+                fontSize: 12.5,
                 fontWeight: 700,
-                letterSpacing: '0.01em',
                 whiteSpace: 'nowrap',
                 cursor: unclaimed ? 'default' : 'pointer',
                 opacity: unclaimed ? 0.55 : 1,
@@ -171,9 +170,9 @@ export const ChampionsBoard: React.FC<Props> = ({
               <span
                 style={{
                   ...NUM,
-                  fontSize: 11,
+                  fontSize: 12.5,
                   fontWeight: 700,
-                  color: isActive ? A.CANVAS : unclaimed ? A.DIM : A.INK,
+                  color: isActive ? A.PANEL : unclaimed ? A.DIM : A.INK,
                 }}
               >
                 {unclaimed ? t('champions.board.unclaimedShort') : catRows[0].valueDisplay}
