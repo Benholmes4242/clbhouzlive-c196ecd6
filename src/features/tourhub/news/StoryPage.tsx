@@ -22,6 +22,7 @@ import { StoryRow } from './NewsTab';
 import { StoryBody } from './StoryBody';
 import { storyTime } from './storyTime';
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
+import { heroCanonScrimOn } from '../_shared/heroGradient';
 import {
   FONT,
   HAIRLINE_INK_10,
@@ -134,8 +135,8 @@ export function StoryArticle({ story, immersiveHero = false }: { story: TourStor
           <div
             aria-hidden
             style={{
-              position: 'absolute', inset: 0,
-              background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.35) 100%)',
+              position: 'absolute', left: 0, right: 0, bottom: 0, height: 260,
+              background: heroCanonScrimOn(SLATE_50),
             }}
           />
           {story.kicker && (

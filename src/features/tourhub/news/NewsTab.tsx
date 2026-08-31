@@ -18,6 +18,7 @@ import { readStoredTour } from '../hooks/useTourSelection';
 import { useTourStories, type TourStory } from './useTourStories';
 import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './StoryImageText';
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
+import { heroCanonScrimOn } from '../_shared/heroGradient';
 import {
   FONT,
   HAIRLINE_INK_10,
@@ -63,8 +64,8 @@ export function LeadStory({ story, onOpen, compact = false }: { story: TourStory
         <div
           aria-hidden
           style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 42%, rgba(0,0,0,0.78) 100%)',
+             position: 'absolute', left: 0, right: 0, bottom: 0, height: 260,
+             background: heroCanonScrimOn(SLATE_50),
           }}
         />
         <div style={{ position: 'absolute', top: compact ? 12 : 'calc(env(safe-area-inset-top, 0px) + 68px)', left: 14, right: 14 }}>
