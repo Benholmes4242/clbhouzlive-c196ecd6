@@ -2,9 +2,9 @@
  * StoryBody — walks a story's body_blocks IN ORDER and renders each by type.
  *
  * The embeds are the point of the format. The leaderboard block REUSES the
- * existing BoardTable (the same component the Leaderboard tab paints) rather
- * than a cut-down copy, and the player block reuses RankedPlayerRow. Neither is
- * re-implemented here — this file only positions them and feeds them data.
+ * existing BoardTable (the same component the Leaderboard tab paints), while
+ * the player block has a story-specific presentation paired with the story's
+ * tournament card.
  *
  * An unrecognised block never reaches this component: parseStoryBlocks drops it,
  * so a new server-side block type is invisible on an old client and breaks
@@ -17,11 +17,13 @@ import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import CountryFlag from '@/components/ui/country-flag';
 import { BoardTable, type BoardEntry, type CutState } from '../leaderboard/BoardTable';
 import { useTournamentMeta } from '../leaderboard/useTournamentMeta';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
 import { resolveCutDisplay } from '../_shared/cutDisplay';
-import { RankedPlayerRow } from '../players-v2/RankedPlayerRow';
+import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import type { StoryBlock } from './blocks';
 import { FONT, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SLATE_100, AMBER } from '../_shared/tokens';
 
@@ -30,6 +32,16 @@ const EMBED_BG = 'rgba(255,255,255,0.04)';
 
 /** How many rows an INLINE board shows before it defers to the full board. */
 const INLINE_BOARD_ROWS = 10;
+
+const PLAYER_TOUR_LABEL: Record<string, string> = {
+  pga: 'PGA Tour',
+  lpga: 'LPGA',
+  euro: 'DP World Tour',
+  dpwt: 'DP World Tour',
+  pgad: 'Korn Ferry Tour',
+  champ: 'PGA Tour Champions',
+  liv: 'LIV Golf',
+};
 
 function Paragraph({ text }: { text: string }) {
   return (
@@ -218,6 +230,7 @@ function LeaderboardBlock({ tournamentId }: { tournamentId: string }) {
 
 function PlayerBlock({ playerId }: { playerId: string }) {
   const navigate = useNavigate();
+  const { t } = useTranslation('tourhub');
   const { data } = useQuery({
     queryKey: ['tour-stories', 'player-embed', playerId],
     staleTime: 10 * 60_000,
@@ -243,30 +256,79 @@ function PlayerBlock({ playerId }: { playerId: string }) {
   const p = data.player;
   const name =
     p.full_name || [p.first_name, p.last_name].filter(Boolean).join(' ') || '';
+  const primaryTour = p.tour_codes?.[0]?.toLowerCase() ?? null;
+  const tour = primaryTour ? (PLAYER_TOUR_LABEL[primaryTour] ?? primaryTour.toUpperCase()) : null;
+  const rank = typeof data.rank === 'number' && data.rank > 0 ? `World No. ${data.rank}` : null;
+  const subline = [tour, rank].filter(Boolean).join(' \u00b7 ');
+  const avatarCandidates = resolvePlayerAvatarCandidates({
+    name,
+    photoUrl: p.photo_url ?? null,
+    tourSlug: primaryTour,
+  });
 
   return (
-    <div
+    <button
+      type="button"
+      onClick={() => navigate(`/tourhub/player/${p.id}`)}
+      className="active:scale-[0.99]"
       style={{
+        display: 'block',
+        width: '100%',
+        textAlign: 'left',
         margin: '18px 0 20px',
+        padding: '14px 12px',
         background: EMBED_BG,
         border: `1px solid ${HAIRLINE_INK_10}`,
         borderRadius: 14,
-        overflow: 'hidden',
+        cursor: 'pointer',
+        fontFamily: FONT,
       }}
     >
-      <RankedPlayerRow
-        rank={data.rank ?? ''}
-        player={{
-          playerId: p.id,
-          name,
-          country: p.country ?? null,
-          countryCode: p.country_code ?? null,
-          photoUrl: p.photo_url ?? null,
-          tourCode: p.tour_codes?.[0] ?? 'pga',
+      <div
+        style={{
+          fontSize: 9.5,
+          fontWeight: 700,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: INK_FAINT,
         }}
-        onClick={() => navigate(`/tourhub/player/${p.id}`)}
-      />
-    </div>
+      >
+        {t('news.player', 'PLAYER')}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+        <SquircleAvatar
+          size={40}
+          srcCandidates={avatarCandidates}
+          alt={name}
+          userId={p.id}
+          hairlineRing
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <span
+              style={{
+                fontSize: 14.5,
+                fontWeight: 700,
+                color: INK,
+                lineHeight: 1.25,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {name}
+            </span>
+            <CountryFlag country={p.country ?? p.country_code ?? null} size="sm" />
+          </div>
+          {subline && (
+            <div style={{ marginTop: 3, fontSize: 12, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
+              {subline}
+            </div>
+          )}
+        </div>
+        <ChevronRight size={16} color={INK_FAINT} strokeWidth={2.2} aria-hidden />
+      </div>
+    </button>
   );
 }
 

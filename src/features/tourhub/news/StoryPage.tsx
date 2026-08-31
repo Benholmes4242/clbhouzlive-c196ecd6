@@ -293,7 +293,10 @@ export function StoryPage() {
               ))}
             </div>
           )}
-          <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 32px)' }} />
+          <div
+            aria-hidden
+            style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 88px) + 16px)' }}
+          />
         </>
       )}
     </div>
