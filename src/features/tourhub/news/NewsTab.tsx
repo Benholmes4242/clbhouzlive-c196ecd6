@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
 import { useTourStories, type TourStory } from './useTourStories';
 import { storyTime } from './storyTime';
+import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
 import {
   FONT,
   HAIRLINE_INK_10,
@@ -27,15 +28,6 @@ import {
 
 /** Slugs the news list can express. 'major' has no tour_slug counterpart. */
 const NEWS_SLUGS = ['all', 'pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'];
-
-const MASTHEAD: React.CSSProperties = {
-  fontSize: 20,
-  fontWeight: 700,
-  letterSpacing: '0.14em',
-  textTransform: 'uppercase',
-  color: INK,
-  lineHeight: 1,
-};
 
 const KICKER: React.CSSProperties = {
   fontSize: 9,
@@ -71,7 +63,7 @@ export function LeadStory({ story, onOpen }: { story: TourStory; onOpen: () => v
         border: 'none', padding: 0, cursor: 'pointer', fontFamily: FONT,
       }}
     >
-      <div style={{ position: 'relative', height: 176, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
+      <div style={{ position: 'relative', height: OVERVIEW_HERO_HEIGHT, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
         <img
           src={story.image_url as string}
           alt={story.headline}
@@ -85,7 +77,7 @@ export function LeadStory({ story, onOpen }: { story: TourStory; onOpen: () => v
             background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 42%, rgba(0,0,0,0.78) 100%)',
           }}
         />
-        <div style={{ position: 'absolute', top: 12, left: 14, right: 14 }}>
+        <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 68px)', left: 14, right: 14 }}>
           <KickerLine kicker={story.kicker} at={story.published_at} />
         </div>
         <div style={{ position: 'absolute', bottom: 12, left: 14, right: 14 }}>
@@ -148,7 +140,7 @@ export function NewsTab() {
     tourLens ?? 'all',
   );
 
-  const { stories, isLoading, latestAt } = useTourStories(tourLens);
+  const { stories, isLoading } = useTourStories(tourLens);
 
   const [lead, rest] = useMemo(() => {
     if (stories.length === 0) return [null, [] as TourStory[]];
@@ -163,28 +155,16 @@ export function NewsTab() {
 
   return (
     <div style={{ fontFamily: FONT, paddingBottom: 24 }}>
-      <div
-        style={{
-          display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-          gap: 12, padding: '18px 14px 14px',
-        }}
-      >
-        <h2 style={MASTHEAD}>{t('news.masthead', 'THE WIRE')}</h2>
-        {latestAt && (
-          <span style={{ fontSize: 11, fontWeight: 600, color: INK_FAINT, whiteSpace: 'nowrap' }}>
-            {t('news.updated', { defaultValue: 'Updated {{time}}', time: storyTime(latestAt) })}
-          </span>
-        )}
-      </div>
-
       {isLoading ? (
-        <div style={{ padding: '0 14px' }}>
-          <Skeleton style={{ height: 176, width: '100%', borderRadius: 0 }} />
-          <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
-          <Skeleton style={{ height: 62, width: '100%', marginTop: 12 }} />
+        <div>
+          <Skeleton style={{ height: OVERVIEW_HERO_HEIGHT, width: '100%', borderRadius: 0 }} />
+          <div style={{ padding: '0 14px' }}>
+            <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
+            <Skeleton style={{ height: 62, width: '100%', marginTop: 12 }} />
+          </div>
         </div>
       ) : stories.length === 0 ? (
-        <div style={{ padding: '4px 14px 0', fontSize: 13, color: INK_MUTE }}>
+        <div style={{ padding: 'calc(env(safe-area-inset-top, 0px) + 76px) 14px 0', fontSize: 13, color: INK_MUTE }}>
           {t('news.empty', 'No stories on the wire yet.')}
         </div>
       ) : (

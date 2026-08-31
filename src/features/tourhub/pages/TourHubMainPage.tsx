@@ -207,7 +207,7 @@ export function TourHubMainPage() {
   }, [setSearchParams]);
 
   const heroIsCinematic = useHeroFullBleed();
-  const fullBleedHero = activeTab === 'overview' && heroIsCinematic;
+  const fullBleedHero = activeTab === 'news' || (activeTab === 'overview' && heroIsCinematic);
 
   // H4a: no longer suppress the global island on cinematic overview — the
   // ChromeIsland paints with a page-provided left capsule (see TourHubChromeBridge).
@@ -263,9 +263,9 @@ export function TourHubMainPage() {
           pickerOpen={pickerOpen}
           setPickerOpen={setPickerOpen}
         />
-        {activeTab === 'overview' ? (
+        {activeTab === 'overview' || activeTab === 'news' ? (
           <>
-            {/* Overview keeps its cinematic hero overlay chrome (the island). */}
+            {/* Photo-led surfaces keep the overview island over a notch-bleeding hero. */}
             <div>{renderTab()}</div>
           </>
         ) : (

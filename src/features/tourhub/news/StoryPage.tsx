@@ -21,6 +21,7 @@ import { useMoreFromTheWire, useStoryTournament, useTourStory, type TourStory } 
 import { StoryRow } from './NewsTab';
 import { StoryBody } from './StoryBody';
 import { storyTime } from './storyTime';
+import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
 import {
   FONT,
   HAIRLINE_INK_10,
@@ -113,7 +114,7 @@ function LiveTournamentCard({ tournamentId }: { tournamentId: string }) {
  * Everything above it (the sticky masthead, the loading state, MORE FROM THE
  * WIRE) belongs to the page, not the article.
  */
-export function StoryArticle({ story }: { story: TourStory }) {
+export function StoryArticle({ story, immersiveHero = false }: { story: TourStory; immersiveHero?: boolean }) {
   return (
     <>
       {/* S4: the band used to sit on SLATE_100, a lighter wash than the page
@@ -122,7 +123,7 @@ export function StoryArticle({ story }: { story: TourStory }) {
           the CANVAS behind a photograph, not a panel, so it takes the page
           surface and the surface is now continuous. */}
       {story.image_url && (
-        <div style={{ position: 'relative', height: 232, width: '100%', overflow: 'hidden', background: SLATE_50 }}>
+        <div style={{ position: 'relative', height: immersiveHero ? OVERVIEW_HERO_HEIGHT : 232, width: '100%', overflow: 'hidden', background: SLATE_50 }}>
 
 
           <img
@@ -138,7 +139,7 @@ export function StoryArticle({ story }: { story: TourStory }) {
             }}
           />
           {story.kicker && (
-            <div style={{ position: 'absolute', top: 12, left: 14, right: 14 }}>
+            <div style={{ position: 'absolute', top: immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 68px)' : 12, left: 14, right: 14 }}>
               <span style={{ ...KICKER, color: '#FFFFFF' }}>{story.kicker}</span>
             </div>
           )}
@@ -264,10 +265,6 @@ export function StoryPage() {
         background: SLATE_50,
         minHeight: '100dvh',
         fontFamily: FONT,
-        /* The ChromeIsland owns the top of this page now (bleed:false), so the
-           article starts clear of it — the island sits on the canvas, never on
-           the photograph and never on the headline. */
-        paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 27px)',
       }}
     >
       <StoryChromeBridge />
@@ -275,7 +272,7 @@ export function StoryPage() {
 
       {isLoading ? (
         <div style={{ padding: 14 }}>
-          <Skeleton style={{ height: 232, width: '100%' }} />
+          <Skeleton style={{ height: OVERVIEW_HERO_HEIGHT, width: '100%' }} />
           <Skeleton style={{ height: 22, width: '80%', marginTop: 14 }} />
           <Skeleton style={{ height: 90, width: '100%', marginTop: 12 }} />
         </div>
@@ -285,7 +282,7 @@ export function StoryPage() {
         </div>
       ) : (
         <>
-          <StoryArticle story={story} />
+          <StoryArticle story={story} immersiveHero />
 
           {(more?.length ?? 0) > 0 && (
             <div style={{ marginTop: 28 }}>

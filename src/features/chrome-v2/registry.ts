@@ -292,9 +292,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // A Wire story (/tour/news/:slug). Declared BEFORE the /tour/ backstop so the
   // reader page gets its own chrome: island, back to the wire list (history
   // first so in-app taps unwind naturally, fallback for a cold-launched share
-  // link), dark tone. bleed FALSE deliberately — not every story carries a lead
-  // photograph, and a bleeding island would sit on the headline of the ones that
-  // do not. The page applies its own sat+64 top padding. The page also registers
+  // link), dark tone. The page registers
   // a left slot (back + burger, no tour picker: a reader inside one article has
   // nothing to filter).
   {
@@ -303,7 +301,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       chrome: 'island',
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=news' },
       tone: 'dark',
-      bleed: false,
+      bleed: true,
       note: 'wire story — back + burger slot, no picker',
     },
   },
