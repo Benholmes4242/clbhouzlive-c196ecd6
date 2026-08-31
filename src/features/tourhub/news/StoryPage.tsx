@@ -115,7 +115,19 @@ function LiveTournamentCard({ tournamentId }: { tournamentId: string }) {
  * Everything above it (the sticky masthead, the loading state, MORE FROM THE
  * WIRE) belongs to the page, not the article.
  */
-export function StoryArticle({ story, immersiveHero = false }: { story: TourStory; immersiveHero?: boolean }) {
+export function StoryArticle({
+  story,
+  immersiveHero = false,
+  tagLabel,
+}: {
+  story: TourStory;
+  immersiveHero?: boolean;
+  /**
+   * Overrides the tour tag beside the timestamp. Amateur News passes its
+   * category line and free-text event name here — there is no tour to name.
+   */
+  tagLabel?: string | null;
+}) {
   return (
     <>
       {/* S4: the band used to sit on SLATE_100, a lighter wash than the page
@@ -159,14 +171,18 @@ export function StoryArticle({ story, immersiveHero = false }: { story: TourStor
         <h1 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em', color: INK, margin: 0 }}>
           {story.headline}
         </h1>
-        <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <span style={{ ...KICKER, color: INK_FAINT }}>{storyTime(story.published_at)}</span>
-          {story.tour_slug && TOUR_TAG[story.tour_slug] && (
-            <>
-              <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT }} />
-              <span style={{ ...KICKER, color: INK_FAINT }}>{TOUR_TAG[story.tour_slug]}</span>
-            </>
-          )}
+          {(() => {
+            const tag = tagLabel ?? (story.tour_slug ? TOUR_TAG[story.tour_slug] : null);
+            if (!tag) return null;
+            return (
+              <>
+                <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT }} />
+                <span style={{ ...KICKER, color: INK_FAINT }}>{tag}</span>
+              </>
+            );
+          })()}
         </div>
 
         {story.standfirst && (

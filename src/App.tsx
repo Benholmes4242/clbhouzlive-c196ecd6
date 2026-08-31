@@ -303,6 +303,8 @@ const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
 
 // Tour Hub pages
 const TourNewsStoryPage = lazy(() => import("./features/tourhub/news/StoryPage").then(m => ({ default: m.StoryPage })));
+const AmateurNewsPage = lazy(() => import("./features/amateur/news/AmateurNewsPage").then(m => ({ default: m.AmateurNewsPage })));
+const AmateurNewsStoryPage = lazy(() => import("./features/amateur/news/AmateurStoryPage").then(m => ({ default: m.AmateurStoryPage })));
 const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubMainPage })));
 
 const TournamentDetailPage = lazy(() => import("./features/tourhub/tournament-v2/TournamentPage").then(m => ({ default: m.TournamentPage })));
@@ -688,6 +690,10 @@ function AppRoutes() {
         
         {/* Tour Hub routes */}
         <Route path="/tour/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><TourNewsStoryPage /></Suspense>} />
+
+        {/* Amateur News — the Discover half of the news programme. Guest-readable. */}
+        <Route path="/discover/news" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurNewsPage /></Suspense>} />
+        <Route path="/discover/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurNewsStoryPage /></Suspense>} />
         <Route path="/tourhub" element={<Suspense fallback={<TourHubOverviewSkeleton />}><TourHubMainPage /></Suspense>} />
         <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<TournamentPageSkeleton />}><TournamentDetailPage /></Suspense>} />
         

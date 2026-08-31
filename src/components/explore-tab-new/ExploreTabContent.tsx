@@ -20,6 +20,7 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { GolfThisWeek } from './courseled/GolfThisWeek';
+import { AmateurNewsSection } from '@/features/amateur/news/AmateurNewsSection';
 import {
   DEFAULT_WEEK_SCOPE,
   type WeekScope,
@@ -506,6 +507,11 @@ export default function ExploreTabContent({
           gap: RHYTHM,
         }}
       >
+        {/* AMATEUR NEWS — the amateur half of the news programme, the same
+            components as the tour wire pointed at amateur_stories. Self-hides
+            until the first story is filed. */}
+        <AmateurNewsSection />
+
         {/* BRIEF_DISCOVER_ORDER_AND_LABELS §1 — the RANKED sections precede the
             MEDIA sections. */}
         <MostPlayedLeaderboard
