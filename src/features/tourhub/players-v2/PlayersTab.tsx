@@ -17,6 +17,7 @@ import { Search, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
+import { readStoredTour } from '../hooks/useTourSelection';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
@@ -52,10 +53,13 @@ export function PlayersTab() {
   // -- Per-section tour lens (local state, NO All Tours, PGA default).
   // ?tour= is honored once on mount for deep-link parity.
   const inboundTour = searchParams.get('tour');
+  const storedTour = readStoredTour();
   const initialTour: PlayersTourId =
     inboundTour && inboundTour in TOUR_CONFIG && inboundTour !== 'champ'
       ? (inboundTour as PlayersTourId)
-      : 'pga';
+      : storedTour && storedTour in TOUR_CONFIG && storedTour !== 'champ'
+        ? (storedTour as PlayersTourId)
+        : 'pga';
   const [activeTour, setActiveTour] = useState<PlayersTourId>(initialTour);
 
   // -- Sort (honor inbound ?sort=)

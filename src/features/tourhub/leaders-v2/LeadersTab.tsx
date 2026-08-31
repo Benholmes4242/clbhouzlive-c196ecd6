@@ -17,6 +17,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TourHubEmptyState } from '../components/TourHubEmptyState';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
+import { readStoredTour } from '../hooks/useTourSelection';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 
 import { useLivePlayerIds } from '../players-v2/data/useLivePlayerIds';
@@ -58,10 +59,13 @@ export function LeadersTab() {
   // Champions is intentionally omitted here (insufficient stat coverage);
   // if the URL passes ?tour=champ we fall through to PGA.
   const inboundTour = searchParams.get('tour');
+  const storedTour = readStoredTour();
   const initialTour: TourId =
     inboundTour && inboundTour in TOUR_CONFIG && inboundTour !== 'champ'
       ? (inboundTour as TourId)
-      : 'pga';
+      : storedTour && storedTour in TOUR_CONFIG && storedTour !== 'champ'
+        ? (storedTour as TourId)
+        : 'pga';
   const [activeTour, setActiveTour] = useState<TourId>(initialTour);
 
 

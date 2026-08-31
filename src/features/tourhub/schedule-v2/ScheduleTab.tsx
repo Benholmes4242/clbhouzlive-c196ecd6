@@ -18,6 +18,7 @@ import { AlertCircle } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
+import { readStoredTour } from '../hooks/useTourSelection';
 import { TOUR_CONFIG, type TourId } from '../hooks/useOverviewData';
 
 import { tournamentRoute } from '../routes';
@@ -84,6 +85,10 @@ export function ScheduleTab() {
     const param = searchParams.get('tour');
     if (param && Object.prototype.hasOwnProperty.call(TOUR_CONFIG, param)) {
       return param as TourId;
+    }
+    const stored = readStoredTour();
+    if (stored && Object.prototype.hasOwnProperty.call(TOUR_CONFIG, stored)) {
+      return stored as TourId;
     }
     return null;
   });

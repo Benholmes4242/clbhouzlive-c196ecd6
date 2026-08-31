@@ -115,7 +115,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
   const { selectedTourSlug, selectTour, viewingTourSlug, viewingTournamentId, isSlugAcceptable } = useTourSelection();
   const { t } = useTranslation('tourhub');
 
-  const activeTourSlug = viewingTourSlug ?? selectedTourSlug ?? 'pga';
+  const activeTourSlug = appliedTourSlug ?? selectedTourSlug ?? viewingTourSlug ?? 'all';
   const isMajorActive = activeTourSlug === 'major';
 
   const slidesByTour = useMemo(() => {
