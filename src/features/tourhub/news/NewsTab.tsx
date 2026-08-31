@@ -41,14 +41,15 @@ const LEAD_FOCAL_Y = '18%';
 /** Gradient height scales with the band so the visible wash keeps the same density. */
 const COMPACT_LEAD_GRADIENT_HEIGHT = 312; // 260 * 1.2
 
-function KickerLine({ kicker, at, compact = false }: { kicker: string | null; at: string | null; compact?: boolean }) {
+function KickerLine({ kicker, at, compact = false, trailing }: { kicker: string | null; at: string | null; compact?: boolean; trailing?: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
       {kicker && (
-        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><StoryImageKicker color={INK} compact={compact}>{kicker}</StoryImageKicker></span>
+        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}><StoryImageKicker color={INK} compact={compact}>{kicker}</StoryImageKicker></span>
       )}
       {kicker && at && <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT, flexShrink: 0 }} />}
-      <StoryRelativeTime at={at} />
+      <span style={{ flexShrink: 0 }}><StoryRelativeTime at={at} /></span>
+      {trailing && <span style={{ marginLeft: 'auto', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>{trailing}</span>}
     </div>
   );
 }
@@ -82,16 +83,15 @@ export function LeadStory({ story, onOpen, compact = false, engagement }: { stor
           }}
         />
         <div style={{ position: 'absolute', top: compact ? 14 : 'calc(env(safe-area-inset-top, 0px) + 68px)', left: sidePadding, right: sidePadding }}>
-          <KickerLine kicker={story.kicker} at={story.published_at} compact={compact} />
+          <KickerLine
+            kicker={story.kicker}
+            at={story.published_at}
+            compact={compact}
+            trailing={<StoryRowEngagement engagement={engagement} tone="glass" />}
+          />
         </div>
         <div style={{ position: 'absolute', bottom: bandPadding, left: sidePadding, right: sidePadding }}>
           <StoryImageHeadline compact={compact}>{story.headline}</StoryImageHeadline>
-          {/* Bottom-left of the photo band, beneath the headline, on glass:
-              white-72 is what ReactionAction's own glass tone uses on
-              photography (BRIEF_STORY_ENGAGEMENT §S4). Read-only. */}
-          <div style={{ marginTop: 6 }}>
-            <StoryRowEngagement engagement={engagement} tone="glass" />
-          </div>
         </div>
       </div>
       {story.standfirst && (
@@ -115,7 +115,11 @@ export function StoryRow({ story, onOpen, compact = false, engagement }: { story
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
-        <KickerLine kicker={story.kicker} at={story.published_at} />
+        <KickerLine
+          kicker={story.kicker}
+          at={story.published_at}
+          trailing={<StoryRowEngagement engagement={engagement} inkColor={INK_FAINT} />}
+        />
         <div style={{ marginTop: 5, fontSize: compact ? 13.5 : 14.5, fontWeight: 700, lineHeight: 1.25, letterSpacing: '-0.01em', color: INK }}>
           {story.headline}
         </div>
@@ -124,12 +128,6 @@ export function StoryRow({ story, onOpen, compact = false, engagement }: { story
             {story.standfirst}
           </div>
         )}
-        {/* THE META LINE, beneath the headline in the same faint ink as the
-            time above it. It renders on the COMPACT variant too, where the
-            standfirst is suppressed. */}
-        <div style={{ marginTop: 6 }}>
-          <StoryRowEngagement engagement={engagement} inkColor={INK_FAINT} />
-        </div>
       </div>
       {story.image_url && (
         <img
