@@ -30,7 +30,6 @@ import React, {
 import {
   readStoredTour,
   writeStoredTour,
-  resolveLandingTour,
 } from '@/features/tourhub/hooks/useTourSelection';
 
 interface SelectTourOptions {
