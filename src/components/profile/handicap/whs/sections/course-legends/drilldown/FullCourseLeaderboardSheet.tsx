@@ -23,6 +23,7 @@ import { type LucideIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { useTranslation } from 'react-i18next';
+import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
 import { A, LABEL, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import {
   ChampionsRow,
@@ -350,12 +351,12 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 6,
-                  padding: '6px 11px',
-                  borderRadius: 999,
-                  background: isActive ? A.INK : 'transparent',
+                  padding: '8px 14px',
+                  borderRadius: SCOPE_PILL_RADIUS,
+                  background: isActive ? A.INK : A.PANEL,
                   border: `1px solid ${isActive ? A.INK : A.BORDER}`,
-                  color: isActive ? A.CANVAS : A.MUTE,
-                  fontSize: 11,
+                  color: isActive ? A.PANEL : A.INK,
+                  fontSize: 12.5,
                   fontWeight: 700,
                   fontFamily: SANS,
                   cursor: 'pointer',
@@ -366,10 +367,10 @@ export const FullCourseLeaderboardSheet: React.FC<Props> = ({
                 {cat.short}
                 <span
                   style={{
-                    fontSize: 11,
+                    fontSize: 12.5,
                     fontWeight: 700,
                     fontVariantNumeric: 'tabular-nums lining-nums',
-                    color: isActive ? A.CANVAS : youHold ? DEEP_AMBER : A.INK,
+                    color: isActive ? A.PANEL : youHold ? DEEP_AMBER : A.INK,
                   }}
                 >
                   {mark}
