@@ -9,6 +9,7 @@ import { LeadersTab as LeadersTabV2 } from '@/features/tourhub/leaders-v2/Leader
 import { PlayersTab as PlayersTabV2 } from '@/features/tourhub/players-v2/PlayersTab';
 import { ScheduleTab as ScheduleTabV2 } from '@/features/tourhub/schedule-v2/ScheduleTab';
 import { LeaderboardTab } from '@/features/tourhub/leaderboard/LeaderboardTab';
+import { NewsTab } from '@/features/tourhub/news/NewsTab';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
@@ -23,6 +24,7 @@ import { safeGoBack } from '@/utils/navigation';
 import { useLogout } from '@/hooks/useLogout';
 
 const TAB_TITLES: Record<string, string> = {
+  news: 'News',
   live: 'Live',
   schedule: 'Schedule',
   players: 'Players',
@@ -216,6 +218,8 @@ export function TourHubMainPage() {
     switch (activeTab) {
       case 'overview':
         return <OverviewTab />;
+      case 'news':
+        return <NewsTab />;
       case 'live':
         return <LeaderboardTab />;
       case 'schedule':

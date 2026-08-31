@@ -12610,6 +12610,69 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_stories: {
+        Row: {
+          body: string | null
+          created_at: string
+          headline: string
+          id: string
+          image_credit: string | null
+          image_url: string | null
+          kicker: string | null
+          published_at: string | null
+          slug: string
+          standfirst: string | null
+          tour_slug: string | null
+          tournament_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          headline: string
+          id?: string
+          image_credit?: string | null
+          image_url?: string | null
+          kicker?: string | null
+          published_at?: string | null
+          slug: string
+          standfirst?: string | null
+          tour_slug?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          headline?: string
+          id?: string
+          image_credit?: string | null
+          image_url?: string | null
+          kicker?: string | null
+          published_at?: string | null
+          slug?: string
+          standfirst?: string | null
+          tour_slug?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_stories_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
+          {
+            foreignKeyName: "tour_stories_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tourhub_event_enrichment: {
         Row: {
           created_at: string
