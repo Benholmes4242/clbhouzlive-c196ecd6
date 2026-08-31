@@ -567,57 +567,6 @@ export type Database = {
           },
         ]
       }
-      amateur_stories: {
-        Row: {
-          body_blocks: Json
-          categories: string[]
-          created_at: string
-          headline: string
-          id: string
-          image_credit: string | null
-          image_url: string | null
-          kicker: string | null
-          published_at: string | null
-          slug: string
-          source_text: string | null
-          standfirst: string | null
-          tournament_name: string | null
-          updated_at: string
-        }
-        Insert: {
-          body_blocks?: Json
-          categories?: string[]
-          created_at?: string
-          headline: string
-          id?: string
-          image_credit?: string | null
-          image_url?: string | null
-          kicker?: string | null
-          published_at?: string | null
-          slug: string
-          source_text?: string | null
-          standfirst?: string | null
-          tournament_name?: string | null
-          updated_at?: string
-        }
-        Update: {
-          body_blocks?: Json
-          categories?: string[]
-          created_at?: string
-          headline?: string
-          id?: string
-          image_credit?: string | null
-          image_url?: string | null
-          kicker?: string | null
-          published_at?: string | null
-          slug?: string
-          source_text?: string | null
-          standfirst?: string | null
-          tournament_name?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       analytics_events: {
         Row: {
           created_at: string
