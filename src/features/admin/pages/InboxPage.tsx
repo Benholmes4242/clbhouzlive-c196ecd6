@@ -27,6 +27,8 @@ import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import { supabase } from '@/integrations/supabase/client';
 import { useVerifications, type VerificationRow } from '../hooks/useVerifications';
+import { useCourseRequests } from '../hooks/useCourseRequests';
+import { useHomeClubSearch } from '@/features/home-club/useHomeClubSearch';
 import { VerificationDetailBody } from '../components/VerificationsReview';
 import { reasonRequiresNote, type ReviewReason } from '@/components/business/verification/reviewReasons';
 import type { ModerationQueueRow } from '../hooks/useModerationQueue';
@@ -980,7 +982,7 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
             {pickedClub ? (
               <div style={{ fontSize: 13 }}>
                 Selected: <b>{pickedClub.name}</b>{' '}
-                <button type="button" onClick={() => setPickedClub(null)} style={{ ...btnGhost(), padding: '2px 8px', marginLeft: 6 }}>
+                <button type="button" onClick={() => setPickedClub(null)} style={{ background: 'transparent', border: `1px solid ${t.line}`, borderRadius: t.radius.md, color: t.inkMuted, fontSize: 12, padding: '2px 8px', marginLeft: 6, cursor: 'pointer' }}>
                   Change
                 </button>
               </div>
@@ -1020,7 +1022,12 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
                   await resolveHomeClubRequest.mutateAsync({ id: row.id, clubId: pickedClub.id });
                   onClose();
                 }}
-                style={{ ...btnPrimary(busy), opacity: !pickedClub || busy ? 0.55 : 1 }}
+                style={{
+                  height: 34, padding: '0 12px', borderRadius: t.radius.md, border: 'none',
+                  background: t.brand, color: '#0F172A', fontSize: 12.5, fontWeight: 700,
+                  cursor: !pickedClub || busy ? 'default' : 'pointer',
+                  opacity: !pickedClub || busy ? 0.55 : 1,
+                }}
               >
                 {alsoWaiting.length > 0
                   ? `Resolve and set as home club for ${alsoWaiting.length + 1} members`
@@ -1033,7 +1040,12 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
                   await rejectHomeClubRequest.mutateAsync({ id: row.id });
                   onClose();
                 }}
-                style={btnGhost()}
+                style={{
+                  height: 34, padding: '0 12px', borderRadius: t.radius.md,
+                  border: `1px solid ${t.line}`, background: 'transparent',
+                  color: t.inkMuted, fontSize: 12.5, fontWeight: 600,
+                  cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.55 : 1,
+                }}
               >
                 Reject and clear pending
               </button>
