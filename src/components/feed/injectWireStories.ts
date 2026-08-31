@@ -13,7 +13,7 @@ export function injectWireStories(
   stories: TourStory[],
   nowMs = Date.now(),
 ): ClubhouseFeedItem[] {
-  const postItems: ClubhouseFeedItem[] = posts.map((post, postIndex) => ({
+  const postItems: Array<Extract<ClubhouseFeedItem, { kind: 'post' }>> = posts.map((post, postIndex) => ({
     kind: 'post',
     key: `post:${post.id}`,
     post,
