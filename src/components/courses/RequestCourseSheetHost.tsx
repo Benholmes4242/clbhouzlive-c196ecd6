@@ -7,12 +7,13 @@ import { useRequestCourseSheetState, closeRequestCourseSheet } from './requestCo
  * that triggers it (search overlay, course search sheet, etc.) unmounting.
  */
 export function RequestCourseSheetHost() {
-  const { open, prefillName } = useRequestCourseSheetState();
+  const { open, prefillName, homeClub } = useRequestCourseSheetState();
   return (
     <RequestCourseSheet
       open={open}
       onOpenChange={(o) => { if (!o) closeRequestCourseSheet(); }}
       prefillName={prefillName}
+      homeClub={homeClub}
     />
   );
 }

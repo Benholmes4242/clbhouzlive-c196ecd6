@@ -3822,6 +3822,7 @@ export type Database = {
           country: string | null
           course_name: string
           created_at: string
+          home_club_for_user_id: string | null
           id: string
           location: string
           note: string | null
@@ -3835,6 +3836,7 @@ export type Database = {
           country?: string | null
           course_name: string
           created_at?: string
+          home_club_for_user_id?: string | null
           id?: string
           location: string
           note?: string | null
@@ -3848,6 +3850,7 @@ export type Database = {
           country?: string | null
           course_name?: string
           created_at?: string
+          home_club_for_user_id?: string | null
           id?: string
           location?: string
           note?: string | null
@@ -3856,7 +3859,36 @@ export type Database = {
           resolved_by?: string | null
           status?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "course_requests_home_club_for_user_id_fkey"
+            columns: ["home_club_for_user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "course_requests_home_club_for_user_id_fkey"
+            columns: ["home_club_for_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "course_requests_home_club_for_user_id_fkey"
+            columns: ["home_club_for_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_requests_home_club_for_user_id_fkey"
+            columns: ["home_club_for_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       course_review_media: {
         Row: {
@@ -22662,6 +22694,10 @@ export type Database = {
         Args: { _admin_note: string; _request_id: string }
         Returns: undefined
       }
+      reject_home_club_request: {
+        Args: { p_admin_notes?: string; p_request_id: string }
+        Returns: Json
+      }
       release_orchestrator_lock: {
         Args: { lock_name: string }
         Returns: boolean
@@ -22724,6 +22760,14 @@ export type Database = {
       reset_watch_personalization: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      resolve_home_club_request: {
+        Args: {
+          p_admin_notes?: string
+          p_club_id: string
+          p_request_id: string
+        }
+        Returns: Json
       }
       revoke_business_verification: {
         Args: {

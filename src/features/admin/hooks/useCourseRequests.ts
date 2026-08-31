@@ -16,6 +16,11 @@ export interface CourseRequestRow {
   resolvedBy: string | null;
   resolvedAt: string | null;
   createdAt: string;
+  /**
+   * BRIEF_HOME_CLUB_PICKER §3.3 — set when the request is a HOME CLUB request
+   * for that member, so resolving it can connect them (§3.4).
+   */
+  homeClubForUserId?: string | null;
   displayName?: string | null;
   username?: string | null;
   avatarUrl?: string | null;
@@ -31,7 +36,7 @@ const STATUS_ORDER: Record<string, number> = {
 export async function fetchCourseRequests(): Promise<CourseRequestRow[]> {
   const { data, error } = await supabase
     .from('course_requests')
-    .select('id, requested_by, course_name, location, country, note, status, admin_notes, resolved_by, resolved_at, created_at')
+    .select('id, requested_by, course_name, location, country, note, status, admin_notes, resolved_by, resolved_at, created_at, home_club_for_user_id')
     .order('created_at', { ascending: false });
   if (error) throw error;
 
@@ -47,6 +52,7 @@ export async function fetchCourseRequests(): Promise<CourseRequestRow[]> {
     resolvedBy: r.resolved_by,
     resolvedAt: r.resolved_at,
     createdAt: r.created_at,
+    homeClubForUserId: r.home_club_for_user_id ?? null,
   }));
 
   const userIds = [...new Set(rows.map(r => r.requestedBy).filter(Boolean))] as string[];
@@ -114,7 +120,64 @@ export function useCourseRequests() {
     },
   });
 
+  /**
+   * §3.4/§4.3 — resolving a home-club request connects EVERY member who asked
+   * for the same club, in one server-side transaction. The member never
+   * returns.
+   */
+  const resolveHomeClubRequest = useMutation({
+    mutationFn: async ({ id, clubId, adminNotes }: { id: string; clubId: string; adminNotes?: string | null }) => {
+      const { data: result, error } = await supabase.rpc('resolve_home_club_request', {
+        p_request_id: id,
+        p_club_id: clubId,
+        p_admin_notes: adminNotes ?? null,
+      });
+      if (error) throw error;
+      return result as {
+        club_name: string;
+        requests_resolved: number;
+        members_connected: number;
+        members: Array<{ user_id: string; username: string | null; display_name: string | null }>;
+      };
+    },
+    onSuccess: (result) => {
+      const n = result?.members_connected ?? 0;
+      toast.success(
+        n > 1
+          ? `${result.club_name} set as home club for ${n} members`
+          : `${result.club_name} set as home club`,
+      );
+    },
+    onError: (e: any) => {
+      toast.error(e?.message || 'Failed to resolve home-club request');
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'course-requests'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox', 'course-requests'] });
+    },
+  });
+
+  /** §3.7 — rejecting clears the pending placeholder; no dead-end state. */
+  const rejectHomeClubRequest = useMutation({
+    mutationFn: async ({ id, adminNotes }: { id: string; adminNotes?: string | null }) => {
+      const { error } = await supabase.rpc('reject_home_club_request', {
+        p_request_id: id,
+        p_admin_notes: adminNotes ?? null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => toast.success('Request rejected — pending club cleared'),
+    onError: (e: any) => toast.error(e?.message || 'Failed to reject request'),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'course-requests'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox', 'course-requests'] });
+    },
+  });
+
   const pendingCount = data.filter(r => r.status === 'pending').length;
 
-  return { data, isLoading, refetch, pendingCount, resolveCourseRequest };
+  return {
+    data, isLoading, refetch, pendingCount,
+    resolveCourseRequest, resolveHomeClubRequest, rejectHomeClubRequest,
+  };
 }

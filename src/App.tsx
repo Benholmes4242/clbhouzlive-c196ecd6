@@ -61,6 +61,7 @@ import { GlobalPostComposer } from '@/components/post-composer/GlobalPostCompose
 import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
 import { ReviewBottomSheetPortal } from '@/components/posts/ReviewBottomSheetPortal';
 import { RequestCourseSheetHost } from '@/components/courses/RequestCourseSheetHost';
+import { HomeClubPickerHost } from '@/features/home-club/HomeClubPickerHost';
 
 
 
@@ -1057,6 +1058,7 @@ const AppInner: React.FC = () => {
                                             {/* Unified ReviewBottomSheet portal — single mount, store-driven */}
                                             <ReviewBottomSheetPortal />
                                             <RequestCourseSheetHost />
+                                            <HomeClubPickerHost />
                                             </InviteSheetProvider>
                                           </FriendSheetProvider>
                                         </DeletedAccountGate>

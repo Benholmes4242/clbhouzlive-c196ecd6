@@ -906,19 +906,141 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
 
 // ---------- course request sheet ----------
 
+/**
+ * BRIEF_HOME_CLUB_PICKER §4 — home-club requests are triaged here, marked as
+ * such, and resolving one offers to connect the member (and everyone else who
+ * asked for the same club) in a single action.
+ */
 function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | null; onClose: () => void }) {
+  const isHomeClub = !!row?.homeClubForUserId;
+  const { data: allRequests, resolveHomeClubRequest, rejectHomeClubRequest } = useCourseRequests();
+  const [clubQuery, setClubQuery] = useState('');
+  const [pickedClub, setPickedClub] = useState<{ id: string; name: string } | null>(null);
+  const { data: clubHits, loading: clubsLoading } = useHomeClubSearch(clubQuery);
+
+  useEffect(() => {
+    setClubQuery(row?.courseName ?? '');
+    setPickedClub(null);
+  }, [row?.id, row?.courseName]);
+
   if (!row) return null;
+
+  const who = row.username ? `@${row.username}` : (row.displayName ?? 'this member');
+
+  // §4.3 — several members may have asked for the same club. Resolving once
+  // connects all of them, so say how many are waiting before the admin acts.
+  const alsoWaiting = isHomeClub
+    ? (allRequests ?? []).filter(r =>
+        r.id !== row.id &&
+        !!r.homeClubForUserId &&
+        r.status === 'pending' &&
+        r.courseName.trim().toLowerCase() === row.courseName.trim().toLowerCase(),
+      )
+    : [];
+
+  const busy = resolveHomeClubRequest.isPending || rejectHomeClubRequest.isPending;
+
   return (
     <AdminSheet
       open={row !== null}
       onClose={onClose}
       title={row.courseName}
-      subtitle="Course request"
+      subtitle={isHomeClub ? `Home club request - ${who}` : 'Course request'}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, color: t.ink }}>
+        {isHomeClub && (
+          <div style={{
+            background: 'rgba(247,147,30,0.10)', border: `1px solid ${t.line}`,
+            borderRadius: t.radius.md, padding: '8px 10px', color: t.ink, lineHeight: 1.45,
+          }}>
+            <b>{who}</b> is waiting on this club.
+            {alsoWaiting.length > 0 && (
+              <> {alsoWaiting.length} other member{alsoWaiting.length === 1 ? '' : 's'} asked for the same club — resolving connects all {alsoWaiting.length + 1}.</>
+            )}
+          </div>
+        )}
         {row.location && <div><b>Location:</b> {row.location}</div>}
         {row.country && <div><b>Country:</b> {row.country}</div>}
         {row.note && <div style={{ color: t.inkMuted, lineHeight: 1.5 }}>{row.note}</div>}
+
+        {isHomeClub && row.status === 'pending' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+            <div style={{ color: t.inkMuted, fontSize: 12 }}>
+              Match to a club in the catalogue, then connect the member.
+            </div>
+            <input
+              value={clubQuery}
+              onChange={(e) => { setClubQuery(e.target.value); setPickedClub(null); }}
+              placeholder="Search golf_clubs"
+              style={{
+                height: 36, padding: '0 10px', borderRadius: t.radius.md,
+                border: `1px solid ${t.line}`, background: t.canvas, color: t.ink, fontSize: 13,
+              }}
+            />
+            {pickedClub ? (
+              <div style={{ fontSize: 13 }}>
+                Selected: <b>{pickedClub.name}</b>{' '}
+                <button type="button" onClick={() => setPickedClub(null)} style={{ ...btnGhost(), padding: '2px 8px', marginLeft: 6 }}>
+                  Change
+                </button>
+              </div>
+            ) : clubsLoading ? (
+              <div style={{ color: t.inkMuted, fontSize: 12 }}>Searching…</div>
+            ) : clubHits.length === 0 && clubQuery.trim().length >= 2 ? (
+              <div style={{ color: t.inkMuted, fontSize: 12 }}>
+                No catalogue match — the club still needs creating before this can be connected.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 180, overflowY: 'auto' }}>
+                {clubHits.map(c => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setPickedClub({ id: c.id, name: c.name })}
+                    style={{
+                      textAlign: 'left', background: 'transparent', border: 'none',
+                      borderBottom: `1px solid ${t.line}`, padding: '7px 2px', cursor: 'pointer',
+                    }}
+                  >
+                    <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{c.name}</div>
+                    <div style={{ fontSize: 11.5, color: t.inkMuted }}>
+                      {[c.sub_country, c.region].filter(Boolean).join(' · ')}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 8, marginTop: 2, flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                disabled={!pickedClub || busy}
+                onClick={async () => {
+                  if (!pickedClub) return;
+                  await resolveHomeClubRequest.mutateAsync({ id: row.id, clubId: pickedClub.id });
+                  onClose();
+                }}
+                style={{ ...btnPrimary(busy), opacity: !pickedClub || busy ? 0.55 : 1 }}
+              >
+                {alsoWaiting.length > 0
+                  ? `Resolve and set as home club for ${alsoWaiting.length + 1} members`
+                  : `Resolve and set as home club for ${who}`}
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={async () => {
+                  await rejectHomeClubRequest.mutateAsync({ id: row.id });
+                  onClose();
+                }}
+                style={btnGhost()}
+              >
+                Reject and clear pending
+              </button>
+            </div>
+          </div>
+        )}
+
         <div style={{ marginTop: 8 }}>
           <Link
             to="/admin-v2/content"

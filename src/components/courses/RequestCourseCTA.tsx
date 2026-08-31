@@ -13,6 +13,12 @@ interface RequestCourseCTAProps {
    */
   tone?: 'light' | 'dark';
   className?: string;
+  /**
+   * Marks the request as a HOME CLUB request for the signed-in member
+   * (BRIEF_HOME_CLUB_PICKER §3.3) — resolving it later connects them
+   * automatically. Ordinary course requests leave this off.
+   */
+  homeClub?: boolean;
   /** Called immediately before the sheet opens — use to close the parent overlay/sheet. */
   onBeforeOpen?: () => void;
 }
@@ -39,13 +45,14 @@ export function RequestCourseCTA({
   className = '',
   onBeforeOpen,
   tone = 'light',
+  homeClub = false,
 }: RequestCourseCTAProps) {
   const dark = tone === 'dark';
   const { t } = useTranslation('courses');
   const handleOpen = () => {
     onBeforeOpen?.();
     // Defer a tick so any parent close animations can start cleanly first
-    setTimeout(() => openRequestCourseSheet(prefillName), 0);
+    setTimeout(() => openRequestCourseSheet(prefillName, { homeClub }), 0);
   };
 
   if (variant === 'hero') {

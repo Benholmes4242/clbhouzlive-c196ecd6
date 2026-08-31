@@ -16,6 +16,11 @@ interface ClubsCardProps {
   isOwner: boolean;
   isPrivate?: boolean;
   onEditClick?: () => void;
+  /**
+   * BRIEF_HOME_CLUB_PICKER §2.3 — the durable route to the picker. Present on
+   * the owner's own profile whether or not they ever saw a prompt.
+   */
+  onSetHomeClub?: () => void;
   className?: string;
 }
 
@@ -27,6 +32,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
   isOwner,
   isPrivate = false,
   onEditClick,
+  onSetHomeClub,
   className
 }) => {
   const hasClubs = homeClub || secondaryClubs.length > 0;
@@ -48,7 +54,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           Add your home club and any clubs you play at.
         </p>
         <motion.button
-          onClick={onEditClick}
+          onClick={onSetHomeClub ?? onEditClick}
           whileTap={{ scale: 0.985 }}
           transition={{ duration: 0.1 }}
           className={cn(
@@ -57,7 +63,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           )}
         >
           <Plus className="w-4 h-4" />
-          Add clubs
+          {onSetHomeClub ? 'Add home club' : 'Add clubs'}
         </motion.button>
       </motion.div>
     );
@@ -105,14 +111,19 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       </div>
 
       {homeClub && (
-        <div className="flex flex-col items-start gap-1">
+        <button
+          type="button"
+          onClick={isOwner && onSetHomeClub ? onSetHomeClub : undefined}
+          disabled={!isOwner || !onSetHomeClub}
+          className="flex flex-col items-start gap-1 text-left disabled:cursor-default"
+        >
           <span
             className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#F7931E]"
           >
             Home club
           </span>
           <span className="text-sm font-semibold text-foreground">{homeClub.name}</span>
-        </div>
+        </button>
       )}
 
       {displayedSecondary.length > 0 && (
