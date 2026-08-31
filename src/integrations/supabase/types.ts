@@ -12621,6 +12621,7 @@ export type Database = {
           kicker: string | null
           published_at: string | null
           slug: string
+          source_text: string | null
           standfirst: string | null
           tour_slug: string | null
           tournament_id: string | null
@@ -12636,6 +12637,7 @@ export type Database = {
           kicker?: string | null
           published_at?: string | null
           slug: string
+          source_text?: string | null
           standfirst?: string | null
           tour_slug?: string | null
           tournament_id?: string | null
@@ -12651,6 +12653,7 @@ export type Database = {
           kicker?: string | null
           published_at?: string | null
           slug?: string
+          source_text?: string | null
           standfirst?: string | null
           tour_slug?: string | null
           tournament_id?: string | null
