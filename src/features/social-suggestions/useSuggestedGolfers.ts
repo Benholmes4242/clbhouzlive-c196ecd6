@@ -15,7 +15,15 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 /** S4.1/4.2 - suggestions are for members who follow almost nobody. Tunable. */
 export const SUGGESTION_FOLLOW_THRESHOLD = 5;
 
-export type SuggestionReason = 'club' | 'course' | 'mutual' | 'active';
+/** Priority order, first match wins. See get_suggested_golfers. */
+export type SuggestionReason =
+  | 'club'
+  | 'reciprocal'
+  | 'course'
+  | 'clubmate_mutual'
+  | 'mutual'
+  | 'active'
+  | 'recently_joined';
 
 export interface SuggestedGolfer {
   user_id: string;
