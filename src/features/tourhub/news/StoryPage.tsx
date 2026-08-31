@@ -118,7 +118,13 @@ export function StoryArticle({ story }: { story: TourStory }) {
   return (
     <>
       {story.image_url && (
-        <div style={{ position: 'relative', height: 232, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
+        {/* S4: the band used to sit on SLATE_100, a lighter wash than the page
+            canvas, so the strip above the photograph read as a different grey
+            while the image loaded (and permanently on a short image). The band
+            is the CANVAS behind a photograph, not a panel, so it takes the page
+            surface and the surface is now continuous. */}
+        <div style={{ position: 'relative', height: 232, width: '100%', overflow: 'hidden', background: SLATE_50 }}>
+
           <img
             src={story.image_url}
             alt={story.headline}
