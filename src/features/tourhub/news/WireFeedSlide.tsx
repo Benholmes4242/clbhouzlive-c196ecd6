@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { TourStory } from './useTourStories';
 import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './StoryImageText';
-import { AMBER, FONT, INK_MUTE, INK_SOFT } from '../_shared/tokens';
-import { SLAB } from '@/components/feed/feedSurfaces';
+import { FONT, INK_MUTE, INK_SOFT } from '../_shared/tokens';
+import { FEED_DATE_INK, SLAB } from '@/components/feed/feedSurfaces';
 
 export function WireFeedSlide({ story }: { story: TourStory }) {
   const { t } = useTranslation('tourhub');
@@ -20,10 +20,9 @@ export function WireFeedSlide({ story }: { story: TourStory }) {
         style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', font: 'inherit' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 14px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, color: INK_SOFT, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.2 }}>
-            <span aria-hidden style={{ width: 3, height: 12, flexShrink: 0, background: AMBER }} />
-            <span>{t('news.fromWire')}</span>
-          </div>
+          <span style={{ minWidth: 0, color: FEED_DATE_INK, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.2 }}>
+            {t('news.fromWire')}
+          </span>
           <StoryRelativeTime at={story.published_at} />
         </div>
 
