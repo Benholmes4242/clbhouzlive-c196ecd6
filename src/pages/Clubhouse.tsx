@@ -180,8 +180,8 @@ const ClubhouseContent = () => {
 
 
   // ── Feed hooks ──
-  // Editorial cards (PGA This Week, Course of the Week) moved to Home in Phase 2.
-  // Clubhouse feed is now purely social posts + algorithmic suggestions.
+  // Ranked posts remain social-only; Wire stories are injected client-side
+  // below and never enter the RPC or ranking pipeline.
   const activeFeed = useSuggestedFeed(user?.id);
   const wireQuery = useTourStories(null);
 

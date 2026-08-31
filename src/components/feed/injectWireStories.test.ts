@@ -42,4 +42,12 @@ describe('injectWireStories', () => {
     ], NOW);
     expect(result.filter((x) => x.kind === 'wire').map((x) => x.story.id)).toEqual(['valid']);
   });
+
+  it('consumes eligible stories newest first', () => {
+    const result = injectWireStories(posts(6), [
+      story('older', { published_at: new Date(NOW - 3 * 24 * 60 * 60 * 1000).toISOString() }),
+      story('newer', { published_at: new Date(NOW - 60 * 60 * 1000).toISOString() }),
+    ], NOW);
+    expect(result.filter((x) => x.kind === 'wire').map((x) => x.story.id)).toEqual(['newer', 'older']);
+  });
 });

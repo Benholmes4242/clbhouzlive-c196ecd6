@@ -24,13 +24,15 @@ export function injectWireStories(
 
   const oldestAllowedMs = nowMs - WIRE_STORY_MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
   const seenStoryIds = new Set<string>();
-  const eligibleStories = stories.filter((story) => {
-    if (seenStoryIds.has(story.id) || !story.image_url || !story.published_at) return false;
-    const publishedMs = new Date(story.published_at).getTime();
-    if (!Number.isFinite(publishedMs) || publishedMs > nowMs || publishedMs < oldestAllowedMs) return false;
-    seenStoryIds.add(story.id);
-    return true;
-  });
+  const eligibleStories = stories
+    .filter((story) => {
+      if (seenStoryIds.has(story.id) || !story.image_url || !story.published_at) return false;
+      const publishedMs = new Date(story.published_at).getTime();
+      if (!Number.isFinite(publishedMs) || publishedMs > nowMs || publishedMs < oldestAllowedMs) return false;
+      seenStoryIds.add(story.id);
+      return true;
+    })
+    .sort((a, b) => new Date(b.published_at as string).getTime() - new Date(a.published_at as string).getTime());
 
   if (eligibleStories.length === 0) return postItems;
 
