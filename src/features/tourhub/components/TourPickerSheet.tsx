@@ -112,7 +112,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
   const { data: heroSlides } = useHeroCarouselData();
   const { data: cache } = useTournamentsCache();
   const activeMajor = useActiveMensMajor();
-  const { selectedTourSlug, selectTour, viewingTourSlug, viewingTournamentId, isSlugAcceptable } = useTourSelection();
+  const { selectedTourSlug, selectTour, viewingTourSlug, viewingTournamentId, appliedTourSlug, isSlugAcceptable } = useTourSelection();
   const { t } = useTranslation('tourhub');
 
   const activeTourSlug = appliedTourSlug ?? selectedTourSlug ?? viewingTourSlug ?? 'all';
