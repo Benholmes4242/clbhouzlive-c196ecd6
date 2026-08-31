@@ -656,8 +656,9 @@ function RoundBlock({ playerId, tournamentId }: { playerId: string; tournamentId
   );
 }
 
-
+export function StoryBody({ blocks }: { blocks: StoryBlock[] }) {
   return (
+
     <div style={{ fontFamily: FONT }}>
       {blocks.map((b, i) => {
         switch (b.type) {
