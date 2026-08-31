@@ -194,8 +194,8 @@ export function AmateurNewsPage() {
         aria-hidden
         style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 88px) + 16px)' }}
       />
-      <div style={{ ...KICKER, display: 'none' }} />
     </div>
+
   );
 }
 
