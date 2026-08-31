@@ -465,7 +465,12 @@
       "body": "If a course is missing, tell us and we'll add it to the map.",
       "perkQuick": "Takes 20 seconds – just name and location",
       "perkNotify": "We'll notify you the moment it's live",
-      "cta": "Request this course"
+      "cta": "Request this course",
+      "clubHeadline": "Can't find your club?",
+      "clubHeadlineWithQuery": "Can't find \"{{query}}\"?",
+      "clubBody": "Tell us the name and location and we'll add it, then set it as your home club for you.",
+      "clubPerkNotify": "We'll connect you the moment it's added",
+      "clubCta": "Request this club"
     },
     "buttonCta": "Request a course",
     "row": {

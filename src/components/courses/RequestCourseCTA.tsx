@@ -57,7 +57,9 @@ export function RequestCourseCTA({
 
   if (variant === 'hero') {
     const q = (prefillName ?? '').trim();
-    const headline = q ? t('request.hero.headlineWithQuery', { query: truncate(q) }) : t('request.hero.headline');
+    const headline = homeClub
+      ? (q ? t('request.hero.clubHeadlineWithQuery', { query: truncate(q) }) : t('request.hero.clubHeadline'))
+      : (q ? t('request.hero.headlineWithQuery', { query: truncate(q) }) : t('request.hero.headline'));
     return (
       <div
         className={`mx-auto w-full overflow-hidden rounded-2xl ${className}`}
@@ -108,7 +110,7 @@ export function RequestCourseCTA({
               marginTop: 6,
             }}
           >
-            {t('request.hero.body')}
+            {t(homeClub ? 'request.hero.clubBody' : 'request.hero.body')}
           </p>
         </div>
 
@@ -124,7 +126,7 @@ export function RequestCourseCTA({
             <div className="flex items-center gap-2.5">
               <Bell size={17} color={dark ? A.AMBER : HERO_ACCENT} strokeWidth={2.25} />
               <span className={`text-[13px] ${dark ? '' : 'text-muted-foreground'}`} style={dark ? { color: A.MUTE } : undefined}>
-                {t('request.hero.perkNotify')}
+                {t(homeClub ? 'request.hero.clubPerkNotify' : 'request.hero.perkNotify')}
               </span>
             </div>
           </div>
@@ -142,7 +144,7 @@ export function RequestCourseCTA({
             }}
           >
             <Plus size={18} color="#fff" strokeWidth={2.5} />
-            {t('request.hero.cta')}
+            {t(homeClub ? 'request.hero.clubCta' : 'request.hero.cta')}
           </button>
         </div>
       </div>
