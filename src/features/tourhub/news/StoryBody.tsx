@@ -200,6 +200,7 @@ function LeaderboardBlock({ tournamentId }: { tournamentId: string }) {
 
       <BoardTable
         entries={shown}
+        movementEntries={rows}
         cutState={cutState}
         /* A FINISHED board has no current round to highlight — the amber column
            header would claim a round is still being played. */
