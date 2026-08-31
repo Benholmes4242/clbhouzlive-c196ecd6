@@ -16,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { LeadStory, StoryRow } from '@/features/tourhub/news/NewsTab';
 import { HAIRLINE_INK_10 } from '@/features/tourhub/_shared/tokens';
-import { Eyebrow, InkAction } from '@/components/explore-tab-new/courseled/tokens';
+import { SectionShell } from '@/features/tourhub/overview/sections/SectionShell';
 
 import { useAmateurStories } from './useAmateurStories';
 
@@ -30,14 +30,16 @@ export function AmateurNewsSection() {
 
   if (isPending) {
     return (
-      <section aria-busy="true">
-        <Eyebrow>{t('amateurNews.section', 'Amateur news')}</Eyebrow>
-        <div>
+      <div
+        aria-busy="true"
+        style={{ marginInline: -14, width: 'calc(100% + 28px)' }}
+      >
+        <SectionShell eyebrow={t('amateurNews.section', 'Amateur news')}>
           <Skeleton style={{ height: COMPACT_LEAD_HEIGHT, width: '100%', borderRadius: 0 }} />
-          <Skeleton style={{ height: 54, width: '100%', marginTop: 14 }} />
+          <Skeleton style={{ height: 54, width: '100%', marginTop: 8 }} />
           <Skeleton style={{ height: 54, width: '100%', marginTop: 12 }} />
-        </div>
-      </section>
+        </SectionShell>
+      </div>
     );
   }
 
@@ -49,19 +51,14 @@ export function AmateurNewsSection() {
   const open = (slug: string) => navigate(`/discover/news/${slug}`);
 
   return (
-    <section>
-      <Eyebrow
-        aside={
-          <InkAction onClick={() => navigate('/discover/news')}>
-            {t('amateurNews.allStories', 'ALL STORIES')}
-          </InkAction>
-        }
+    <div style={{ marginInline: -14, width: 'calc(100% + 28px)' }}>
+      <SectionShell
+        eyebrow={t('amateurNews.section', 'Amateur news')}
+        linkLabel={t('amateurNews.allStories', 'ALL STORIES')}
+        onLinkClick={() => navigate('/discover/news')}
       >
-        {t('amateurNews.section', 'Amateur news')}
-      </Eyebrow>
-      <div>
         {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} compact />}
-        <div style={{ marginTop: lead ? 14 : 0 }}>
+        <div style={{ marginTop: lead ? 8 : 0 }}>
           {rows.map((s, i) => (
             <div
               key={s.id}
@@ -71,8 +68,8 @@ export function AmateurNewsSection() {
             </div>
           ))}
         </div>
-      </div>
-    </section>
+      </SectionShell>
+    </div>
   );
 }
 
