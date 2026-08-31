@@ -50,8 +50,9 @@ function KickerLine({ kicker, at, compact = false }: { kicker: string | null; at
 }
 
 export function LeadStory({ story, onOpen, compact = false }: { story: TourStory; onOpen: () => void; compact?: boolean }) {
-  const bandPadding = compact ? 14 : 12;
+  const bandPadding = compact ? 6 : 8;
   const sidePadding = compact ? 17 : 14;
+  const standfirstPad = compact ? 4 : 6;
   return (
     <button
       type="button"
@@ -76,7 +77,7 @@ export function LeadStory({ story, onOpen, compact = false }: { story: TourStory
              background: heroCanonScrimOn(SLATE_50),
           }}
         />
-        <div style={{ position: 'absolute', top: compact ? bandPadding : 'calc(env(safe-area-inset-top, 0px) + 68px)', left: sidePadding, right: sidePadding }}>
+        <div style={{ position: 'absolute', top: compact ? 14 : 'calc(env(safe-area-inset-top, 0px) + 68px)', left: sidePadding, right: sidePadding }}>
           <KickerLine kicker={story.kicker} at={story.published_at} compact={compact} />
         </div>
         <div style={{ position: 'absolute', bottom: bandPadding, left: sidePadding, right: sidePadding }}>
@@ -84,7 +85,7 @@ export function LeadStory({ story, onOpen, compact = false }: { story: TourStory
         </div>
       </div>
       {story.standfirst && (
-        <div style={{ padding: '10px 14px 0', fontSize: 13, lineHeight: 1.45, color: INK_MUTE }}>
+        <div style={{ padding: `${standfirstPad}px 14px 0`, fontSize: 13, lineHeight: 1.45, color: INK_MUTE }}>
           {story.standfirst}
         </div>
       )}
