@@ -19,6 +19,8 @@ import { TourSideMenu } from '../components/TourSideMenu';
 
 import { useMoreFromTheWire, useStoryTournament, useTourStory, type TourStory } from './useTourStories';
 import { StoryRow } from './NewsTab';
+import { StoryEngagementBlock } from '@/features/stories/StoryEngagementBlock';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { StoryBody } from './StoryBody';
 import { storyTime } from './storyTime';
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
@@ -295,6 +297,12 @@ export function StoryPage() {
   const { data: story, isLoading } = useTourStory(slug);
   const { data: more } = useMoreFromTheWire(story?.id);
 
+  /* ONE read for the MORE FROM THE WIRE window. */
+  const { engagementFor } = useStoryEngagement(
+    'tour_story',
+    React.useMemo(() => (more ?? []).map((s) => s.id), [more]),
+  );
+
   return (
     <div
       style={{
@@ -320,6 +328,9 @@ export function StoryPage() {
         <>
           <StoryArticle story={story} immersiveHero />
 
+          {/* Below the article, above MORE FROM THE WIRE. */}
+          <StoryEngagementBlock targetType="tour_story" storyId={story.id} />
+
           {(more?.length ?? 0) > 0 && (
             <div style={{ marginTop: 28 }}>
               <div style={{ ...KICKER, color: INK, padding: '0 14px 6px', letterSpacing: '0.14em', fontSize: 11 }}>
@@ -327,7 +338,7 @@ export function StoryPage() {
               </div>
               {(more ?? []).map((s, i) => (
                 <div key={s.id} style={{ borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
-                  <StoryRow story={s} onOpen={() => navigate(`/tour/news/${s.slug}`)} />
+                  <StoryRow story={s} onOpen={() => navigate(`/tour/news/${s.slug}`)} engagement={engagementFor(s.id)} />
                 </div>
               ))}
             </div>

@@ -17,6 +17,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { StoryArticle } from '@/features/tourhub/news/StoryPage';
 import { StoryRow } from '@/features/tourhub/news/NewsTab';
+import { StoryEngagementBlock } from '@/features/stories/StoryEngagementBlock';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { OVERVIEW_HERO_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { FONT, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
 
@@ -52,6 +54,12 @@ export function AmateurStoryPage() {
   const { data: story, isPending } = useAmateurStory(slug);
   const { data: more } = useMoreAmateurNews(story?.id);
 
+  /* ONE read for the MORE AMATEUR NEWS window. */
+  const { engagementFor } = useStoryEngagement(
+    'amateur_story',
+    React.useMemo(() => (more ?? []).map((s) => s.id), [more]),
+  );
+
   const label = (value: string, fallback: string) => t(`amateurNews.categories.${value}`, fallback);
 
   return (
@@ -70,6 +78,9 @@ export function AmateurStoryPage() {
         <>
           <StoryArticle story={story} immersiveHero tagLabel={amateurTag(story, label)} />
 
+          {/* Below the article, above MORE AMATEUR NEWS. */}
+          <StoryEngagementBlock targetType="amateur_story" storyId={story.id} />
+
           {(more?.length ?? 0) > 0 && (
             <div style={{ marginTop: 28 }}>
               <div style={{ ...KICKER, color: INK, padding: '0 14px 6px' }}>
@@ -77,7 +88,7 @@ export function AmateurStoryPage() {
               </div>
               {(more ?? []).map((s) => (
                 <div key={s.id} style={{ borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
-                  <StoryRow story={s} onOpen={() => navigate(`/discover/news/${s.slug}`)} />
+                  <StoryRow story={s} onOpen={() => navigate(`/discover/news/${s.slug}`)} engagement={engagementFor(s.id)} />
                 </div>
               ))}
             </div>
