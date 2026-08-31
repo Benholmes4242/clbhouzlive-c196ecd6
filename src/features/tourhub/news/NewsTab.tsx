@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTourLensFromPicker } from '../hooks/useTourLensFromPicker';
+import { readStoredTour } from '../hooks/useTourSelection';
 import { useTourStories, type TourStory } from './useTourStories';
 import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './StoryImageText';
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
@@ -119,7 +120,10 @@ export function StoryRow({ story, onOpen, compact = false }: { story: TourStory;
 export function NewsTab() {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
-  const [tourLens, setTourLens] = useState<string | null>(null);
+  const [tourLens, setTourLens] = useState<string | null>(() => {
+    const stored = readStoredTour();
+    return stored && NEWS_SLUGS.includes(stored) && stored !== 'all' ? stored : null;
+  });
 
   useTourLensFromPicker<string | null>(
     (slug) => (NEWS_SLUGS.includes(slug) ? (slug === 'all' ? null : slug) : undefined),

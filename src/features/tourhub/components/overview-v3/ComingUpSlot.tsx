@@ -13,8 +13,8 @@ import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 const SCHEDULE_TOURS = new Set<string>(['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv']);
 
 export function ComingUpSlot() {
-  const { selectedTourSlug, viewingTourSlug } = useTourSelection();
-  const active = viewingTourSlug ?? selectedTourSlug ?? 'pga';
+  const { selectedTourSlug } = useTourSelection();
+  const active = selectedTourSlug ?? 'all';
   const tour = SCHEDULE_TOURS.has(active) ? (active as TourId) : null;
   return <ComingUp tour={tour} />;
 }

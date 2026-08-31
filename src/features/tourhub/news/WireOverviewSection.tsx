@@ -14,8 +14,8 @@ const NEWS_TOURS = new Set(['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv']);
 export function WireOverviewSection() {
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
-  const { viewingTourSlug, selectedTourSlug } = useTourSelection();
-  const active = viewingTourSlug ?? selectedTourSlug ?? 'pga';
+  const { selectedTourSlug } = useTourSelection();
+  const active = selectedTourSlug ?? 'all';
   const lens = NEWS_TOURS.has(active) ? active : null;
   const { stories, isLoading } = useTourStories(lens);
 
