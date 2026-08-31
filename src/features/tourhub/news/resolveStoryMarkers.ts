@@ -22,13 +22,19 @@ export async function resolveStoryMarkers(result: ParseResult): Promise<ParseRes
   const names = Array.from(new Set(result.pendingPlayers.map((p) => norm(p.name))));
   const matches = new Map<string, string[]>();
 
-  const { data } = await supabase
-    .from('sr_players')
-    .select('id, full_name, first_name, last_name')
-    .or(names.map((n) => `full_name.ilike.${n}`).join(','))
-    .limit(200);
+  // One query per distinct name: a name contains spaces and commas break the
+  // `or()` filter grammar, and three names a story is not a load worth batching.
+  const rows: Array<{ id: string; full_name: string | null; first_name: string | null; last_name: string | null }> = [];
+  for (const n of names) {
+    const { data } = await supabase
+      .from('sr_players')
+      .select('id, full_name, first_name, last_name')
+      .ilike('full_name', n)
+      .limit(20);
+    rows.push(...((data ?? []) as typeof rows));
+  }
 
-  for (const row of (data ?? []) as Array<{ id: string; full_name: string | null; first_name: string | null; last_name: string | null }>) {
+  for (const row of rows) {
     const candidates = new Set(
       [row.full_name, [row.first_name, row.last_name].filter(Boolean).join(' ')]
         .filter(Boolean)
