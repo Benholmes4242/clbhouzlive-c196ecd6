@@ -16,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { LeadStory, StoryRow } from '@/features/tourhub/news/NewsTab';
 import { HAIRLINE_INK_10 } from '@/features/tourhub/_shared/tokens';
-import { Eyebrow, HEAD_GAP, InkAction } from '@/components/explore-tab-new/courseled/tokens';
+import { Eyebrow, InkAction } from '@/components/explore-tab-new/courseled/tokens';
 
 import { useAmateurStories } from './useAmateurStories';
 
@@ -32,7 +32,7 @@ export function AmateurNewsSection() {
     return (
       <section aria-busy="true">
         <Eyebrow>{t('amateurNews.section', 'Amateur news')}</Eyebrow>
-        <div style={{ marginTop: HEAD_GAP }}>
+        <div>
           <Skeleton style={{ height: COMPACT_LEAD_HEIGHT, width: '100%', borderRadius: 0 }} />
           <Skeleton style={{ height: 54, width: '100%', marginTop: 14 }} />
           <Skeleton style={{ height: 54, width: '100%', marginTop: 12 }} />
@@ -59,7 +59,7 @@ export function AmateurNewsSection() {
       >
         {t('amateurNews.section', 'Amateur news')}
       </Eyebrow>
-      <div style={{ marginTop: HEAD_GAP }}>
+      <div>
         {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} compact />}
         <div style={{ marginTop: lead ? 14 : 0 }}>
           {rows.map((s, i) => (

@@ -44,6 +44,7 @@ import { CommunityVideoRow } from './courseled/community/CommunityVideoRow';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { mediaTarget } from '@/utils/mediaEngagement';
 import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
+import { AmateurNewsSection } from '@/features/amateur/news/AmateurNewsSection';
 import { MostPlayedSheet } from './courseled/MostPlayedSheet';
 
 import {
