@@ -12,6 +12,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { LegendWindow } from '@/lib/gam/types';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens';
 import type { WindowToggleVariant } from '../types';
 
 interface Props {
