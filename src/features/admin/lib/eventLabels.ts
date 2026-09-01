@@ -7,6 +7,7 @@ export const EVENT_LABELS: Record<string, string> = {
   // ─── App lifecycle / navigation ───────────────────────────────
   session_start: 'Session started',
   page_view: 'Page viewed',
+  onboarding_nudge_opened: 'Onboarding nudge opened',
   page_exit: 'Page exited',
   nav_tab_tap: 'Nav tab tapped',
   feed_tab_switch: 'Feed tab switched',
