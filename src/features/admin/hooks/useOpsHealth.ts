@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { currentBuildId } from '@/lib/buildFreshness';
 
 /**
  * get_admin_ops_health - the RPC owns the definition of "member", "bot" and
@@ -30,7 +31,13 @@ export interface OpsErrorTop {
 
 export interface OpsErrors {
   top: OpsErrorTop[];
+  /** CURRENT-BUILD ONLY. Errors reported by outdated clients are separated. */
   errors_24h: number;
+  /** Errors whose reporting client was not on this build (or was unlabelled). */
+  outdated_errors_24h: number;
+  outdated_users_24h: number;
+  /** Distinct build ids seen across the error window — the stuck-client count. */
+  distinct_builds: number;
   /** MEMBER-ONLY denominator. Bots and anonymous traffic are excluded. */
   sessions_24h: number;
   users_hit_24h: number;
@@ -85,10 +92,13 @@ export interface OpsHealth {
 
 
 export function useOpsHealth(days = 7) {
+  // The build id travels with the request: the figure has to describe the build
+  // the viewer is running or it cannot be acted on.
+  const buildId = currentBuildId();
   return useQuery<OpsHealth>({
-    queryKey: ['admin-v2', 'ops-health', days],
+    queryKey: ['admin-v2', 'ops-health', days, buildId],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_admin_ops_health', { p_days: days });
+      const { data, error } = await supabase.rpc('get_admin_ops_health', { p_days: days, p_build_id: buildId });
       if (error) throw error;
       return data as unknown as OpsHealth;
     },
