@@ -251,7 +251,7 @@ export function BarVerdict({ claimed, barMet }: { claimed: ClaimedSignals; barMe
   );
 }
 
-/** §1.1 — three signals, each PASS or NOT CLAIMED, evidence beneath. */
+/** §2 — three signals, each PASS / NOT SUPPLIED (amber) / NOT CLAIMED (quiet). */
 export function SignalsPanel({
   signals,
   renderDocument,
