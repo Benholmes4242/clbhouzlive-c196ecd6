@@ -22,7 +22,7 @@ import { SectionShell } from '@/features/tourhub/overview/sections/SectionShell'
 import { useAmateurStories } from './useAmateurStories';
 
 /** Must match COMPACT_LEAD_HEIGHT in the wire's NewsTab. */
-const COMPACT_LEAD_HEIGHT = 180;
+const COMPACT_LEAD_HEIGHT = 212;
 
 export function AmateurNewsSection() {
   const { t } = useTranslation('courses');
