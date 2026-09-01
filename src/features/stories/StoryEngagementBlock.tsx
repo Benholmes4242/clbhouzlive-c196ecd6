@@ -88,12 +88,16 @@ export function StoryEngagementBlock({ targetType, storyId }: Props) {
           // A guest sees the honest count with no tappable glyph.
           readOnly={!signedIn}
           hidden={unavailable}
+          size={16}
+          figureSize={12.5}
         />
         {signedIn && (
           <CommentAction
             count={commentCount}
             onOpen={() => setSheetOpen(true)}
             label={t('story.commentsAria', 'Comments')}
+            size={16}
+            figureSize={12.5}
           />
         )}
       </div>

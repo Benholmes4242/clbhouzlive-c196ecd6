@@ -38,7 +38,7 @@ export function StoryRowEngagement({
   engagement,
   tone = 'ink',
   inkColor = 'rgba(248,250,252,0.42)',
-  size = 12.5,
+  size = 14,
 }: Props) {
   const { user } = useSupabaseSession();
   const color = tone === 'glass' ? WHITE_72 : inkColor;
@@ -51,7 +51,7 @@ export function StoryRowEngagement({
     n > 0 ? (
       <span
         className="tabular-nums"
-        style={{ fontSize: 10.5, fontWeight: 700, color: tint, lineHeight: 1 }}
+        style={{ fontSize: 11.5, fontWeight: 700, color: tint, lineHeight: 1 }}
       >
         {n}
       </span>
