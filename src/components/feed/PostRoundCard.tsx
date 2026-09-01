@@ -29,6 +29,7 @@ import { formatWeekdayShortGB, formatDayMonthShortGB } from '@/i18n/format';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import { courseDifficultyTail, DIFFICULTY_MIN_ROUNDS } from './courseDifficultyTail';
+import { roundScore } from './roundGross';
 
 const INK = '#F4F7F9';
 const MUTE = 'rgba(255,255,255,0.62)';
@@ -226,7 +227,12 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
       // above. The CELLS below still print `gross`: the member sees the strokes
       // they took, the totals state the round of record, and the faint
       // played/adjusted line beneath the nines explains the gap.
-      total += h.adjGross ?? h.gross;
+      // BRIEF_ROUND_CARD_GROSS_AND_NET S1 — THE NINES READ THE STROKES TAKEN,
+      // the same values the cells print and the same values the header is now
+      // the sum of. The previous brief made these read the SUBMITTED value to
+      // agree with a header that printed the adjusted gross; the header has
+      // been fixed at source, so the totals go back to the round as played.
+      total += h.gross;
       par += h.par;
       any = true;
     }
@@ -520,29 +526,13 @@ export const PostRoundCard: React.FC<Props> = ({
     return () => io.disconnect();
   }, [hasHoles, playedHoles, scoredHoles, postId, notability, showCrown, round.whsScoreId]);
 
-  const gross = round.grossScore;
-  const toPar = gross != null && round.coursePar != null ? gross - round.coursePar : null;
+  // ONE definition, shared with the header (roundGross.ts): the sum of the
+  // holes when the round was completed, the WHS adjusted gross when it was not.
+  const score = useMemo(() => roundScore(round), [round]);
+  const gross = score.gross;
+  const toPar = score.toPar;
   const kicker = dateKicker(round.playDate);
 
-  /**
-   * MICRO_BRIEF_ROUND_CARD_GROSS_RECONCILIATION §3 — EXPLAIN THE GAP RATHER THAN
-   * HIDE IT. When every played hole is scored and the strokes actually taken add
-   * up to more than the round of record, the difference is a real WHS fact (net
-   * double bogey), so the card states both figures in one faint line. NOTHING IS
-   * COMPUTED: the played total is the sum of the member's own cells and the
-   * adjusted total is the submitted gross the header already prints. No cap is
-   * ever derived client-side.
-   */
-  const playedTotal = useMemo(() => {
-    let sum = 0;
-    for (const h of holes) {
-      if (h.played === false) continue;
-      if (h.gross == null || h.par == null) return null;
-      sum += h.gross;
-    }
-    return sum > 0 ? sum : null;
-  }, [holes]);
-  const showAdjustedNote = playedTotal != null && gross != null && playedTotal !== gross;
 
   /**
    * BRIEF_ROUND_CARD_CONTEXT S1 — THIS ROUND AGAINST THE FIELD.
@@ -556,7 +546,7 @@ export const PostRoundCard: React.FC<Props> = ({
    *    hedging against a field average is worse than saying nothing, so a
    *    picked-up or capped round makes no comparison at all.
    */
-  const reconciled = playedTotal != null && gross != null && playedTotal === gross && toPar != null;
+  const reconciled = score.source === 'holes' && toPar != null;
   const fieldAvg = courseCtx?.avg_over_par ?? null;
   const fieldRounds = courseCtx?.rounds_tracked ?? 0;
   const showFieldLine = reconciled && fieldAvg != null && fieldRounds >= DIFFICULTY_MIN_ROUNDS;
@@ -736,12 +726,6 @@ export const PostRoundCard: React.FC<Props> = ({
                     field: fmtAvgToPar(fieldAvg as number),
                     count: fieldRounds,
                   })}
-                </div>
-              )}
-              {showAdjustedNote && (
-                <div style={{ marginTop: 6, fontSize: 11.5, fontWeight: 600, color: DIM }}>
-                  <span style={NUM}>{playedTotal}</span> played {'\u00B7'}{' '}
-                  <span style={NUM}>{gross}</span> adjusted for handicap
                 </div>
               )}
             </>
