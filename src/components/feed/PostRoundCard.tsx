@@ -51,6 +51,16 @@ function fmtToPar(n: number | null): string {
   return n === 0 ? 'E' : n > 0 ? `+${n}` : `${n}`;
 }
 
+/**
+ * The FIELD's average to par. One decimal, true minus, 'E' at level — the same
+ * notation as fmtToPar, which cannot be reused because it prints integers.
+ */
+function fmtAvgToPar(n: number): string {
+  const v = Math.round(n * 10) / 10;
+  if (v === 0) return 'E';
+  return v > 0 ? `+${v.toFixed(1)}` : `\u2212${Math.abs(v).toFixed(1)}`;
+}
+
 function toParColor(n: number | null): string {
   if (n == null) return MUTE;
   if (n === 0) return INK;
@@ -534,6 +544,26 @@ export const PostRoundCard: React.FC<Props> = ({
   }, [holes]);
   const showAdjustedNote = playedTotal != null && gross != null && playedTotal !== gross;
 
+  /**
+   * BRIEF_ROUND_CARD_CONTEXT S1 — THIS ROUND AGAINST THE FIELD.
+   *
+   * Suppressed on three tests, all of them the SAME rules already in force
+   * elsewhere rather than new ones:
+   *  - the sample floor is the band's own DIFFICULTY_MIN_ROUNDS (3),
+   *  - avg_over_par must exist,
+   *  - and the round's to-par must RECONCILE (every played hole scored and the
+   *    cells summing to the header). Comparing a figure the card is already
+   *    hedging against a field average is worse than saying nothing, so a
+   *    picked-up or capped round makes no comparison at all.
+   */
+  const reconciled = playedTotal != null && gross != null && playedTotal === gross && toPar != null;
+  const fieldAvg = courseCtx?.avg_over_par ?? null;
+  const fieldRounds = courseCtx?.rounds_tracked ?? 0;
+  const showFieldLine = reconciled && fieldAvg != null && fieldRounds >= DIFFICULTY_MIN_ROUNDS;
+
+  /** S3 — the slope gloss, gated by the SHARED tail predicate. */
+  const slopeTail = courseDifficultyTail(courseCtx);
+
 
   // The card-level backdrop and glass now live in FeedCard. This block is
   // transparent and never applies a backdrop filter of its own.
@@ -650,6 +680,21 @@ export const PostRoundCard: React.FC<Props> = ({
             {round.slopeRating != null && (
               <span style={{ color: DIM }}>
                 Slope <span style={{ ...NUM, color: INK }}>{round.slopeRating}</span>
+                {/* S3 — the figure STAYS and is glossed, never replaced: plenty
+                    of members read 134 correctly. The gloss appears only in the
+                    tails, from the SHARED predicate, because a percentile
+                    mid-distribution states nothing. */}
+                {slopeTail ? (
+                  <span style={{ color: DIM, textTransform: 'none', letterSpacing: 0, fontWeight: 600 }}>
+                    {` ${'\u00B7'} `}
+                    {t(
+                      slopeTail.tail === 'hard'
+                        ? 'feed.roundCard.slopeHarder'
+                        : 'feed.roundCard.slopeEasier',
+                      { pct: slopeTail.pct },
+                    )}
+                  </span>
+                ) : null}
               </span>
             )}
             {/* INDEX MOVEMENT — arrow = direction, colour = good or bad, figure =
@@ -678,6 +723,21 @@ export const PostRoundCard: React.FC<Props> = ({
               <BreakdownBar holes={holes} />
               <NineGrid label="Out" holes={holes.filter((h) => h.holeNo <= 9)} />
               <NineGrid label="In" holes={holes.filter((h) => h.holeNo > 9 && h.holeNo <= 18)} />
+              {showFieldLine && (
+                /* A SENTENCE, NOT A STAT: body weight, no figure treatment.
+                   The ROUND's to-par takes the under-par law (red under, ink
+                   over); the field's figure stays neutral because it is a
+                   benchmark, not an achievement. Colouring both would read as a
+                   contest between them. */
+                <div style={{ marginTop: 6, fontSize: 12.5, fontWeight: 600, color: MUTE }}>
+                  <span style={{ ...NUM, color: toParColor(toPar) }}>{fmtToPar(toPar)}</span>
+                  {'  \u00B7  '}
+                  {t('feed.roundCard.fieldLine', {
+                    field: fmtAvgToPar(fieldAvg as number),
+                    count: fieldRounds,
+                  })}
+                </div>
+              )}
               {showAdjustedNote && (
                 <div style={{ marginTop: 6, fontSize: 11.5, fontWeight: 600, color: DIM }}>
                   <span style={NUM}>{playedTotal}</span> played {'\u00B7'}{' '}
