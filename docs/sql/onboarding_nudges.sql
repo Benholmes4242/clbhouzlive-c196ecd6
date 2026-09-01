@@ -48,7 +48,8 @@ CREATE POLICY "Members read own unsubscribe" ON public.email_unsubscribes
 GRANT SELECT ON public.email_unsubscribes TO authenticated;
 
 -- ── 3. THE DAILY JOB — 04:20 UTC, off-peak, once ─────────────────────────────
--- Replace <CRON_SECRET> with the CRON_SECRET function secret.
+-- Replace <CRON_SECRET> with the INTERNAL_FN_SECRET function secret (CRON_SECRET
+-- is not provisioned on this project; the function accepts either).
 -- The jobname is picked up automatically by public.get_cron_job_health().
 SELECT cron.unschedule('onboarding-nudge-sequence')
 WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'onboarding-nudge-sequence');

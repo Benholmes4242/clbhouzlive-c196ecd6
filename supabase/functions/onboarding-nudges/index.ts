@@ -18,7 +18,7 @@
  * notification_preferences check. This function never writes
  * push_notification_queue directly.
  *
- * Auth: x-cron-secret.
+ * Auth: x-cron-secret (CRON_SECRET or INTERNAL_FN_SECRET).
  */
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsFor } from '../_shared/cors.ts';
@@ -326,8 +326,12 @@ Deno.serve(async (req) => {
   const cors = corsFor(req.headers.get('origin'));
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
 
-  const secret = Deno.env.get('CRON_SECRET');
-  if (!secret || req.headers.get('x-cron-secret') !== secret) {
+  // CRON_SECRET is not provisioned on this project today, so INTERNAL_FN_SECRET
+  // (which is) is accepted as well. Either header value authorises the run.
+  const provided = req.headers.get('x-cron-secret') ?? '';
+  const accepted = [Deno.env.get('CRON_SECRET'), Deno.env.get('INTERNAL_FN_SECRET')]
+    .filter((v): v is string => !!v);
+  if (accepted.length === 0 || !accepted.includes(provided)) {
     return new Response(JSON.stringify({ error: 'unauthorized' }), {
       status: 401,
       headers: { ...cors, 'Content-Type': 'application/json' },
