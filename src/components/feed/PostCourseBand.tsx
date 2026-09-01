@@ -22,6 +22,7 @@ import { ChevronRight } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatRatingValue } from '@/utils/formatters';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
+import { courseDifficultyTail, DIFFICULTY_MIN_ROUNDS } from './courseDifficultyTail';
 
 /**
  * TONE MAP — the band renders on the dark Clubhouse slab AND on the light
@@ -125,7 +126,7 @@ export function pickCourseBandFigure(
     };
   }
 
-  if (rounds < 3 || ctx.avg_over_par == null || ctx.harder_than_pct == null) {
+  if (rounds < DIFFICULTY_MIN_ROUNDS || ctx.avg_over_par == null || ctx.harder_than_pct == null) {
     return {
       key: 'rounds',
       figure: String(rounds),
@@ -135,20 +136,21 @@ export function pickCourseBandFigure(
     };
   }
 
-  const HARD_TAIL = 85;
-  const EASY_TAIL = 15;
-
-  // harder_than_pct is the share of courses this one is HARDER than, so the
-  // two tails are NOT the same sum: hardest is 100 - pct, easiest is pct.
-  // Both clamp at 1 - "top 0% hardest" is not a sentence.
+  // THE TAIL DECISION IS SHARED (BRIEF_ROUND_CARD_CONTEXT §3): the thresholds
+  // and the sample floor now live in courseDifficultyTail, which the round
+  // card's slope gloss reads too. The COPY stays here and is unchanged —
+  // harder_than_pct is the share of courses this one is HARDER than, so the two
+  // tails are NOT the same sum: hardest is 100 - pct, easiest is pct. Both
+  // clamp at 1: "top 0% hardest" is not a sentence.
+  const tail = courseDifficultyTail(ctx);
   let label: string;
   let color: string;
-  if (ctx.harder_than_pct >= HARD_TAIL) {
+  if (tail?.tail === 'hard') {
     label = t('feed.courseBand.topHardest', {
       pct: Math.max(1, 100 - ctx.harder_than_pct),
     });
     color = C.over;
-  } else if (ctx.harder_than_pct <= EASY_TAIL) {
+  } else if (tail?.tail === 'easy') {
     label = t('feed.courseBand.topEasiest', {
       pct: Math.max(1, ctx.harder_than_pct),
     });
@@ -159,6 +161,7 @@ export function pickCourseBandFigure(
     label = t('feed.courseBand.roundTracked', { count: rounds });
     color = C.mute;
   }
+
 
   return {
     key: 'difficulty',

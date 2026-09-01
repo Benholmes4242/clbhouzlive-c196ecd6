@@ -94,6 +94,12 @@
       "most_albatrosses_all_time": "Meiste Albatrosse",
       "most_eagles_all_time": "Meiste Eagles",
       "most_birdies_all_time": "Meiste Birdies"
+    },
+    "roundCard": {
+      "fieldLine_one": "das Feld spielt hier im Schnitt {{field}}, aus {{count}} Runde",
+      "fieldLine_other": "das Feld spielt hier im Schnitt {{field}}, aus {{count}} Runden",
+      "slopeHarder": "schwerer als {{pct}}%",
+      "slopeEasier": "leichter als {{pct}}%"
     }
   },
   "business": {

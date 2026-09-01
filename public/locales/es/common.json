@@ -94,6 +94,12 @@
       "most_albatrosses_all_time": "Mas albatros",
       "most_eagles_all_time": "Mas eagles",
       "most_birdies_all_time": "Mas birdies"
+    },
+    "roundCard": {
+      "fieldLine_one": "el campo promedia {{field}} aquí, de {{count}} ronda",
+      "fieldLine_other": "el campo promedia {{field}} aquí, de {{count}} rondas",
+      "slopeHarder": "más difícil que el {{pct}}%",
+      "slopeEasier": "más fácil que el {{pct}}%"
     }
   },
   "business": {
