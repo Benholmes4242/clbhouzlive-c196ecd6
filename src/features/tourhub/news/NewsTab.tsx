@@ -35,7 +35,7 @@ import {
 const NEWS_SLUGS = ['all', 'pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'];
 
 /** Compact lead band used by the Wire section on the Tour Overview. */
-const COMPACT_LEAD_HEIGHT = 180;
+const COMPACT_LEAD_HEIGHT = 212;
 /**
  * How far the photograph's subject moves DOWN inside the compact hero frame.
  * The image box is made taller than its container and the container clips the
