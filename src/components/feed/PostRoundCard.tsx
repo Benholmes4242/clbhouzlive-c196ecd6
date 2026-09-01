@@ -199,7 +199,14 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
   let any = false;
   for (const h of holes) {
     if (h.played && h.gross != null && h.par != null) {
-      total += h.gross;
+      // MICRO_BRIEF_ROUND_CARD_GROSS_RECONCILIATION — THE NINE TOTALS READ THE
+      // SUBMITTED VALUE, the same figure the header's gross is the sum of. It
+      // used to read `gross` (the actual strokes), so a net-double-bogey cap on
+      // one hole made OUT + IN total a different round from the header 20px
+      // above. The CELLS below still print `gross`: the member sees the strokes
+      // they took, the totals state the round of record, and the faint
+      // played/adjusted line beneath the nines explains the gap.
+      total += h.adjGross ?? h.gross;
       par += h.par;
       any = true;
     }
@@ -213,6 +220,7 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
         toPar={showTotals ? total - par : null}
         note={any && hasGap ? 'No total \u00B7 picked up' : null}
       />
+
 
       <div style={{ display: 'flex', gap: 3 }}>
         {holes.map((h) => (
@@ -259,32 +267,33 @@ const Trajectory: React.FC<{ holes: Hole[]; toPar: number | null }> = ({ holes, 
       strokes: h.lineGross,
       played: h.played,
     }));
-    // The final cumulative, computed from the same values the line draws — but
-    // the FIGURE may only claim a to-par the cells support
-    // (BRIEF_POST_TRAJECTORY_ENDPOINT_DISAGREES §1).
+    // MICRO_BRIEF_ROUND_CARD_GROSS_RECONCILIATION §2 — DO NOT GUESS WHICH HOLES
+    // MIGHT DIFFER. Enumerating the causes (picked up, capped, missing) was
+    // always going to miss the next one: the previous guard tested
+    // `h.gross == null`, which is only true for a PICKED-UP hole, so a
+    // net-double-bogey CAP (a real 7 submitted as a 6) printed the cell sum
+    // beside a header that disagreed.
     //
-    // Testing `lineGross == null` is INSUFFICIENT: §1.2 defines lineGross as
-    // `gross ?? adjusted_gross`, so it is essentially never null and the old
-    // guard was close to dead code. A picked-up hole has no gross but does have
-    // an adjusted_gross, so `cum` counted it at a value the header's submitted
-    // gross does not imply — two to-par figures for one round, 200px apart.
+    // So test THE THING THAT MATTERS: whether the cells reconcile to the
+    // header. Every played hole must carry a gross and a par, and their to-par
+    // must equal the header's. Anything else — for ANY reason, today's or a
+    // source we have not seen — falls back to the header's figure.
     //
-    // So `broken` ALSO fires on the same test NineGrid uses for suppression,
-    // `h.played && h.gross == null`. The LINE is untouched and still draws
-    // through lineGross: drawing through an adjusted value is honest, PRINTING
-    // it as the round's to-par is not. When broken, the endpoint falls back to
-    // the score row's figure (§4.2), so panel and header always agree.
+    // The LINE is untouched and still draws through lineGross: drawing the
+    // round's real shape is honest, PRINTING an adjusted total as its to-par is
+    // not.
     let cum = 0;
-    let broken = false;
+    let complete = true;
     for (const h of holes) {
       if (h.played === false) continue;
-      if (h.gross == null || h.lineGross == null || h.par == null) {
-        broken = true;
+      if (h.gross == null || h.par == null) {
+        complete = false;
         continue;
       }
-      cum += h.lineGross - h.par;
+      cum += h.gross - h.par;
     }
-    return { series: s, endpoint: broken ? toPar : cum };
+    const reconciles = complete && (toPar == null || cum === toPar);
+    return { series: s, endpoint: reconciles ? cum : toPar };
 
   }, [holes, toPar]);
 
@@ -493,6 +502,27 @@ export const PostRoundCard: React.FC<Props> = ({
   const toPar = gross != null && round.coursePar != null ? gross - round.coursePar : null;
   const kicker = dateKicker(round.playDate);
 
+  /**
+   * MICRO_BRIEF_ROUND_CARD_GROSS_RECONCILIATION §3 — EXPLAIN THE GAP RATHER THAN
+   * HIDE IT. When every played hole is scored and the strokes actually taken add
+   * up to more than the round of record, the difference is a real WHS fact (net
+   * double bogey), so the card states both figures in one faint line. NOTHING IS
+   * COMPUTED: the played total is the sum of the member's own cells and the
+   * adjusted total is the submitted gross the header already prints. No cap is
+   * ever derived client-side.
+   */
+  const playedTotal = useMemo(() => {
+    let sum = 0;
+    for (const h of holes) {
+      if (h.played === false) continue;
+      if (h.gross == null || h.par == null) return null;
+      sum += h.gross;
+    }
+    return sum > 0 ? sum : null;
+  }, [holes]);
+  const showAdjustedNote = playedTotal != null && gross != null && playedTotal !== gross;
+
+
   // The card-level backdrop and glass now live in FeedCard. This block is
   // transparent and never applies a backdrop filter of its own.
   const panelStyle: React.CSSProperties = {
@@ -636,6 +666,12 @@ export const PostRoundCard: React.FC<Props> = ({
               <BreakdownBar holes={holes} />
               <NineGrid label="Out" holes={holes.filter((h) => h.holeNo <= 9)} />
               <NineGrid label="In" holes={holes.filter((h) => h.holeNo > 9 && h.holeNo <= 18)} />
+              {showAdjustedNote && (
+                <div style={{ marginTop: 6, fontSize: 11.5, fontWeight: 600, color: DIM }}>
+                  <span style={NUM}>{playedTotal}</span> played {'\u00B7'}{' '}
+                  <span style={NUM}>{gross}</span> adjusted for handicap
+                </div>
+              )}
             </>
           )}
 
