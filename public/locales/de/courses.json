@@ -1240,7 +1240,6 @@
         "stablefordLabel": "Stableford",
         "stablefordShort": "STABLEFORD",
         "stablefordUnit": "PKT",
-        
         "railRounds": "RUNDEN",
         "railCourses": "PLAETZE",
         "railDays": "TAGE",
@@ -1266,6 +1265,7 @@
       "areaLabel": "Region",
       "scope": {
         "circle": "Dein Kreis",
+        "homeClub": "Heimatclub",
         "suggested": "Vorgeschlagen",
         "top100": "Top 100",
         "played": "Gespielt",

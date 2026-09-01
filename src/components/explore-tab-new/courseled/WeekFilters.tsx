@@ -96,6 +96,8 @@ export function scopeLabelKey(scope: WeekScope): { key: string; fallback: string
   switch (scope) {
     case 'circle':
       return { key: 'discover.week.scope.circle', fallback: 'Your Circle' };
+    case 'home_club':
+      return { key: 'discover.week.scope.homeClub', fallback: 'Home Club' };
     case 'handicap_band':
       return { key: 'discover.week.scope.handicapBand', fallback: 'Near your handicap' };
     case 'top_100':

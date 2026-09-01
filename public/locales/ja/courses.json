@@ -1172,7 +1172,6 @@
         "stablefordLabel": "Stableford",
         "stablefordShort": "STABLEFORD",
         "stablefordUnit": "PTS",
-        
         "railRounds": "ROUNDS",
         "railCourses": "COURSES",
         "railDays": "DAYS",
@@ -1197,6 +1196,7 @@
       "areaLabel": "地域",
       "scope": {
         "circle": "サークル",
+        "homeClub": "ホームクラブ",
         "suggested": "おすすめ",
         "top100": "トップ100",
         "played": "プレー済み",

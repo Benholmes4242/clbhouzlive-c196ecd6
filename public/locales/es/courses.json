@@ -1240,7 +1240,6 @@
         "stablefordLabel": "Stableford",
         "stablefordShort": "STABLEFORD",
         "stablefordUnit": "PTS",
-        
         "railRounds": "RONDAS",
         "railCourses": "CAMPOS",
         "railDays": "DIAS",
@@ -1266,6 +1265,7 @@
       "areaLabel": "Zona",
       "scope": {
         "circle": "Tu círculo",
+        "homeClub": "Club de origen",
         "suggested": "Sugeridas",
         "top100": "Top 100",
         "played": "Jugados",
