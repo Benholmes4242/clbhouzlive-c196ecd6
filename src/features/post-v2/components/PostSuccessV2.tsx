@@ -13,13 +13,14 @@
 //   - 'scheduled' (text-only or media): calendar glyph confirmation.
 //   - 'published' (text-only, and the edit-save path): the card, resolved.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Clock, AlertTriangle, MapPin } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import type { SubmitResult } from '../hooks/usePostSubmit';
 import { formatSchedule } from '../lib/formatSchedule';
 import { subscribeToJob, getJobSnapshot } from '../lib/postUploadController';
+import type { UploadJobSnapshot } from '../lib/postUploadController';
 import { ImmersiveSuccessShell } from './ImmersiveSuccessShell';
 import { CT, CT_DARK } from '@/features/_shared/composerTokens';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -102,6 +103,7 @@ function PostedScreen({ result, onDone }: Props) {
 }
 
 type Phase = 'running' | 'complete' | 'failed';
+type UploadStage = UploadJobSnapshot['stage'];
 
 function UploadingState({ result, onDone }: Props) {
   const { t } = useTranslation(['composer', 'common']);
@@ -112,6 +114,10 @@ function UploadingState({ result, onDone }: Props) {
   const [total, setTotal] = useState<number>(initial?.totalFiles ?? (result.mediaPreviews?.length ?? 0));
   const [phase, setPhase] = useState<Phase>((initial?.phase as Phase) ?? 'running');
   const [errorText, setErrorText] = useState<string | null>(initial?.error ?? null);
+  const [progress, setProgress] = useState<number>(initial?.overallProgress ?? 0);
+  const [stage, setStage] = useState<UploadStage>(initial?.stage ?? 'preparing');
+  const [bytesUploaded, setBytesUploaded] = useState<number>(initial?.bytesUploaded ?? 0);
+  const [bytesTotal, setBytesTotal] = useState<number>(initial?.bytesTotal ?? 0);
 
   useEffect(() => {
     if (!jobId) return;
@@ -119,6 +125,10 @@ function UploadingState({ result, onDone }: Props) {
       setCompleted(s.completedFiles);
       setTotal(s.totalFiles);
       setPhase(s.phase as Phase);
+      setProgress(s.overallProgress);
+      setStage(s.stage);
+      setBytesUploaded(s.bytesUploaded);
+      setBytesTotal(s.bytesTotal);
       if (s.error) setErrorText(s.error);
     });
   }, [jobId]);
@@ -178,6 +188,7 @@ function UploadingState({ result, onDone }: Props) {
         <Status
           eyebrow={honestEyebrow(total, completed, isScheduled, t)}
           eyebrowColor={AMBER}
+          progress={isScheduled ? undefined : { pct: progress, stage, bytesUploaded, bytesTotal }}
           headline={isScheduled ? t('composer:success.scheduled') : t('composer:success.posting')}
           reassure
           body={isScheduled && result.scheduledAt
@@ -190,11 +201,12 @@ function UploadingState({ result, onDone }: Props) {
 }
 
 /**
- * §2.3 — THE PROGRESS IS HONEST TO WHAT THE UPLOAD REPORTS.
- * The controller reports PER-ITEM COMPLETION reliably (completedFiles is
- * incremented after each item, sequentially, and emitted). Bytes are NOT
- * uniformly smooth: an image only reports 50 then 100, so a percentage sits
- * still for most of an image-only post. So:
+ * §2.3 - THE PROGRESS IS HONEST TO WHAT THE UPLOAD REPORTS.
+ * A percentage was previously refused here because an image only ever reported
+ * 50 then 100. That is fixed: uploadToCloudflareR2 now posts over XHR and
+ * reports real bytes through xhr.upload's progress event, so the bar beneath
+ * this eyebrow is a continuous byte figure. The eyebrow remains the ITEM
+ * counter - a different fact, and both are now true:
  *   > 1 item  -> "UPLOADING · N OF M"  (items-completed, the honest figure)
  *   1 item    -> "UPLOADING"           (no "1 OF 1", no stuck percentage)
  */
@@ -390,18 +402,27 @@ function Cell({ item, pending }: { item: { url: string; type: 'image' | 'video' 
 
 // ---------- status beneath the card ----------
 
+interface ProgressFacts {
+  pct: number;
+  stage: UploadStage;
+  bytesUploaded: number;
+  bytesTotal: number;
+}
+
 function Status({
   eyebrow,
   eyebrowColor,
   headline,
   body,
   reassure,
+  progress,
 }: {
   eyebrow: string;
   eyebrowColor?: string;
   headline: string;
   body?: string;
   reassure?: boolean;
+  progress?: ProgressFacts;
 }) {
   const reduce = useReducedMotion();
   return (
@@ -419,11 +440,98 @@ function Status({
       >
         {eyebrow}
       </motion.div>
+      {progress && <ProgressBar {...progress} />}
       <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, color: 'rgba(255,255,255,0.96)' }}>
         {headline}
       </div>
       {reassure && <Reassurance />}
       {body && <Body>{body}</Body>}
+    </div>
+  );
+}
+
+const INK_FAINT = 'rgba(255,255,255,0.45)';
+/** Rate EMA smoothing. An instantaneous sample is far too jittery on mobile. */
+const RATE_ALPHA = 0.3;
+/** No countdown before this much sampling, nor below MIN_ETA seconds. */
+const MIN_SAMPLE_MS = 1500;
+const MIN_ETA_S = 3;
+
+/**
+ * BRIEF_UPLOAD_PROGRESS S3 - the byte figure beneath the eyebrow. Reads the
+ * same job snapshot the eyebrow does; no new subscription or state source.
+ */
+function ProgressBar({ pct, stage, bytesUploaded, bytesTotal }: ProgressFacts) {
+  const { t } = useTranslation('composer');
+  const reduce = useReducedMotion();
+  const startRef = useRef<number>(Date.now());
+  const lastRef = useRef<{ t: number; bytes: number } | null>(null);
+  const rateRef = useRef<number>(0);
+  const [eta, setEta] = useState<number | null>(null);
+  // Once a countdown is shown it must not vanish mid-upload.
+  const lockedRef = useRef(false);
+
+  useEffect(() => {
+    const now = Date.now();
+    const last = lastRef.current;
+    if (last && now > last.t) {
+      const inst = ((bytesUploaded - last.bytes) * 1000) / (now - last.t);
+      if (inst >= 0) {
+        rateRef.current = rateRef.current > 0
+          ? RATE_ALPHA * inst + (1 - RATE_ALPHA) * rateRef.current
+          : inst;
+      }
+    }
+    lastRef.current = { t: now, bytes: bytesUploaded };
+
+    const sampled = now - startRef.current >= MIN_SAMPLE_MS;
+    const remaining = Math.max(0, bytesTotal - bytesUploaded);
+    const secs = rateRef.current > 0 ? Math.round(remaining / rateRef.current) : 0;
+
+    if (stage !== 'uploading' && !lockedRef.current) { setEta(null); return; }
+    if (lockedRef.current) { setEta(Math.max(0, secs)); return; }
+    if (sampled && secs > MIN_ETA_S) { lockedRef.current = true; setEta(secs); }
+  }, [bytesUploaded, bytesTotal, stage]);
+
+  const stageWord = stage === 'preparing'
+    ? t('success.stagePreparing')
+    : stage === 'publishing'
+      ? t('success.stagePublishing')
+      : t('success.stageUploading');
+
+  const right = eta != null && eta > 0
+    ? (eta < 60
+        ? t('success.timeLeftSeconds', { n: eta })
+        : t('success.timeLeftMinutes', { m: Math.floor(eta / 60), s: eta % 60 }))
+    : `${Math.round(pct)}%`;
+
+  return (
+    <div style={{ width: '100%', marginTop: 2, marginBottom: 4 }}>
+      <div style={{ height: 3, borderRadius: 999, background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
+        <div
+          style={{
+            height: '100%',
+            width: `${Math.max(0, Math.min(100, pct))}%`,
+            borderRadius: 999,
+            background: AMBER,
+            transition: reduce ? 'none' : 'width .18s linear',
+          }}
+        />
+      </div>
+      <div
+        style={{
+          marginTop: 5,
+          display: 'flex',
+          justifyContent: 'space-between',
+          fontSize: 11.5,
+          fontWeight: 600,
+          color: INK_FAINT,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        <span>{stageWord}</span>
+        <span>{right}</span>
+      </div>
     </div>
   );
 }

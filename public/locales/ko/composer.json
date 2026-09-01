@@ -21,7 +21,12 @@
     "statToPar": "파 대비",
     "statBirdies": "버디",
     "statPhotos": "사진",
-    "statVideos": "동영상"
+    "statVideos": "동영상",
+    "stagePreparing": "준비 중",
+    "stageUploading": "업로드 중",
+    "stagePublishing": "게시 중",
+    "timeLeftSeconds": "{{n}}초 남음",
+    "timeLeftMinutes": "{{m}}분 {{s}}초 남음"
   },
   "emptyState": {
     "headline": "Put it on the wall",

@@ -47,6 +47,22 @@ export interface UploadJobSnapshot {
   completedFiles: number;
   failedFiles: number;
   overallProgress: number; // 0..100
+  /**
+   * BRIEF_UPLOAD_PROGRESS S2 - the phase model. A percentage alone lies at the
+   * start: bake and compress happen before a single byte moves.
+   *   preparing  - job start until the first progress event of the current item
+   *   uploading  - bytes are moving
+   *   publishing - every item done, finalize_post_v2 in flight
+   */
+  stage: 'preparing' | 'uploading' | 'publishing';
+  /** Bytes moved so far across every item. */
+  bytesUploaded: number;
+  /**
+   * Known total. GROWS during a multi-image post because item 3's compressed
+   * size is unknown until item 3 is compressed. Never estimated from original
+   * file sizes - a wrong estimate would make the bar retreat.
+   */
+  bytesTotal: number;
   error?: string;
 }
 
@@ -57,6 +73,7 @@ interface InternalJob {
   items: StageMediaItem[];
   snapshot: UploadJobSnapshot;
   perFile: Record<string, number>;
+  bytesById: Record<string, { uploaded: number; total: number }>;
   listeners: Set<Listener>;
 }
 
@@ -66,7 +83,15 @@ const globalListeners = new Set<Listener>();
 function emitSnapshot(job: InternalJob) {
   const total = job.items.length || 1;
   const sum = Object.values(job.perFile).reduce((acc, v) => acc + v, 0);
-  job.snapshot.overallProgress = Math.min(100, Math.round(sum / total));
+  const next = Math.min(100, Math.round(sum / total));
+  // MONOTONIC: a bar that retreats destroys trust in every other figure on the
+  // screen. If a recomputation would lower the value, hold the previous one.
+  job.snapshot.overallProgress = Math.max(job.snapshot.overallProgress, next);
+  let up = 0;
+  let tot = 0;
+  for (const b of Object.values(job.bytesById)) { up += b.uploaded; tot += b.total; }
+  job.snapshot.bytesUploaded = up;
+  job.snapshot.bytesTotal = tot;
   for (const l of job.listeners) l(job.snapshot);
   for (const l of globalListeners) l(job.snapshot);
 }
@@ -112,20 +137,38 @@ async function runImage(job: InternalJob, item: StageMediaItem, displayOrder: nu
   }
 
   const compressed = await compressImage(sourceFile, COMPRESSION_PRESETS.feed);
-  job.perFile[item.id] = 50;
-  uploadEventBus.emit('file:upload-progress', {
-    type: 'file:upload-progress',
-    jobId: ctx.jobId,
-    fileId: item.id,
-    progress: 50,
-  });
+  // bytesTotal only becomes known here - the compressed size, never an estimate.
+  job.bytesById[item.id] = { uploaded: 0, total: compressed.file.size };
   emitSnapshot(job);
 
-  const result = await uploadToCloudflareR2(compressed.file, 'clbhouz-post-images', compressed.file.name);
+  const result = await uploadToCloudflareR2(
+    compressed.file,
+    'clbhouz-post-images',
+    compressed.file.name,
+    (bytesUploaded, bytesTotal) => {
+      const pct = bytesTotal > 0 ? Math.round((bytesUploaded / bytesTotal) * 100) : 0;
+      job.perFile[item.id] = pct;
+      job.bytesById[item.id] = { uploaded: bytesUploaded, total: bytesTotal };
+      job.snapshot.stage = 'uploading';
+      uploadEventBus.emit('file:upload-progress', {
+        type: 'file:upload-progress',
+        jobId: ctx.jobId,
+        fileId: item.id,
+        progress: pct,
+        bytesUploaded,
+        bytesTotal,
+      });
+      emitSnapshot(job);
+    },
+  );
   if (!result.success || !result.publicUrl) {
     throw new Error(result.error || 'Image upload failed');
   }
   job.perFile[item.id] = 100;
+  {
+    const known = job.bytesById[item.id];
+    if (known) job.bytesById[item.id] = { uploaded: known.total, total: known.total };
+  }
   uploadEventBus.emit('file:upload-progress', {
     type: 'file:upload-progress',
     jobId: ctx.jobId,
@@ -168,6 +211,8 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
       onProgress: (bytesUploaded, bytesTotal) => {
         const pct = bytesTotal > 0 ? Math.round((bytesUploaded / bytesTotal) * 100) : 0;
         job.perFile[item.id] = pct;
+        job.bytesById[item.id] = { uploaded: bytesUploaded, total: bytesTotal };
+        job.snapshot.stage = 'uploading';
         uploadEventBus.emit('file:upload-progress', {
           type: 'file:upload-progress',
           jobId: ctx.jobId,
@@ -225,6 +270,8 @@ async function runJob(job: InternalJob): Promise<void> {
   const failedIndices: number[] = [];
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
+    job.snapshot.stage = 'preparing';
+    emitSnapshot(job);
     try {
       if (item.type === 'video') {
         await runVideo(job, item, offset + i);
@@ -259,6 +306,9 @@ async function runJob(job: InternalJob): Promise<void> {
       totalFiles: items.length,
     });
   }
+
+  job.snapshot.stage = 'publishing';
+  emitSnapshot(job);
 
   if (!ctx.skipFinalize) {
     const { data: fin, error } = await supabase.rpc('finalize_post_v2', { p_post_id: ctx.postId });
@@ -298,6 +348,7 @@ export function startPostUpload(ctx: UploadJobContext, items: StageMediaItem[]):
     ctx,
     items,
     perFile: {},
+    bytesById: {},
     listeners: new Set(),
     snapshot: {
       jobId: ctx.jobId,
@@ -307,6 +358,9 @@ export function startPostUpload(ctx: UploadJobContext, items: StageMediaItem[]):
       completedFiles: 0,
       failedFiles: 0,
       overallProgress: 0,
+      stage: 'preparing',
+      bytesUploaded: 0,
+      bytesTotal: 0,
     },
   };
   jobs.set(ctx.jobId, job);

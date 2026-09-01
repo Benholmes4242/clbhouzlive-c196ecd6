@@ -24,7 +24,12 @@
     "statVideos": "Videos",
     "uploadingSimple": "Uploading",
     "keepUsing": "You can keep using the app",
-    "keepUsingSub": "We'll finish this in the background."
+    "keepUsingSub": "We'll finish this in the background.",
+    "stagePreparing": "Preparing",
+    "stageUploading": "Uploading",
+    "stagePublishing": "Publishing",
+    "timeLeftSeconds": "{{n}}s left",
+    "timeLeftMinutes": "{{m}}m {{s}}s left"
   },
   "emptyState": {
     "headline": "Put it on the wall",

@@ -21,7 +21,12 @@
     "statToPar": "Zu Par",
     "statBirdies": "Birdies",
     "statPhotos": "Fotos",
-    "statVideos": "Videos"
+    "statVideos": "Videos",
+    "stagePreparing": "Wird vorbereitet",
+    "stageUploading": "Wird geladen",
+    "stagePublishing": "Wird veroeffentlicht",
+    "timeLeftSeconds": "noch {{n}}s",
+    "timeLeftMinutes": "noch {{m}}m {{s}}s"
   },
   "emptyState": {
     "headline": "Put it on the wall",
