@@ -1207,6 +1207,12 @@ export default function VerificationFlowSheet({
                           : `${missingDetailCount} details are missing. You can still submit, but adding them speeds up review.`}
                       </p>
                     )}
+                    {unevidencedSignals.map((line) => (
+                      <p key={line} style={{ ...BIZ_BODY, fontSize: 12.5, margin: '8px 0 0' }}>
+                        {line}
+                      </p>
+                    ))}
+
                     <div className="pt-3">
                       <Link
                         to={`/business/${businessId}/edit`}
