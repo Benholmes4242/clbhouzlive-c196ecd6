@@ -593,6 +593,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   letterSpacing: '-0.03em',
                   lineHeight: 1,
                   color: '#FFFFFF',
+                  paddingRight: 20,
                 }}
               >
                 {headerScore.gross}
@@ -608,6 +609,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                       fontFeatureSettings: '"zero" 0',
                       color: getScoreColor(headerScore.toPar, 'dark'),
                       whiteSpace: 'nowrap',
+                      lineHeight: 1,
                     }}
                   >
                     {headerScore.toPar < 0
