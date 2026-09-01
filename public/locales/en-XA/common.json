@@ -196,7 +196,10 @@
       "fieldLine_one": "[~~ţĥé ƒíéļđ áṽéřáĝéš {{field}} ĥéřé, ƒřőm {{count}} řőúñđ~~]",
       "fieldLine_other": "[~~ţĥé ƒíéļđ áṽéřáĝéš {{field}} ĥéřé, ƒřőm {{count}} řőúñđš~~]",
       "slopeHarder": "[~~ĥářđéř ţĥáñ {{pct}}%~~]",
-      "slopeEasier": "[~~éášíéř ţĥáñ {{pct}}%~~]"
+      "slopeEasier": "[~~éášíéř ţĥáñ {{pct}}%~~]",
+      "net": "Net",
+      "adjustedNotCompleted_one": "adjusted, {{count}} hole not completed",
+      "adjustedNotCompleted_other": "adjusted, {{count}} holes not completed"
     },
     "courseBand": {
       "avg": "[~~áṽĝ~~]",

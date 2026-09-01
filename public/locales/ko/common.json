@@ -99,7 +99,10 @@
       "fieldLine_one": "이 코스 평균은 {{field}} ({{count}}라운드 기준)",
       "fieldLine_other": "이 코스 평균은 {{field}} ({{count}}라운드 기준)",
       "slopeHarder": "코스 {{pct}}%보다 어려움",
-      "slopeEasier": "코스 {{pct}}%보다 쉬움"
+      "slopeEasier": "코스 {{pct}}%보다 쉬움",
+      "net": "네트",
+      "adjustedNotCompleted_one": "조정됨, 미완료 홀 {{count}}개",
+      "adjustedNotCompleted_other": "조정됨, 미완료 홀 {{count}}개"
     }
   },
   "business": {
