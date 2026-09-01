@@ -586,23 +586,29 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             >
               <span
                 style={{
-                  position: 'relative',
-                  display: 'inline-block',
-                  fontSize: 30,
-                  fontWeight: 700,
-                  letterSpacing: '-0.03em',
-                  lineHeight: 1,
-                  color: '#FFFFFF',
-                  paddingRight: 20,
+                  display: 'inline-flex',
+                  alignItems: 'baseline',
+                  gap: 2.5,
+                  fontVariantNumeric: 'tabular-nums',
+                  fontFeatureSettings: '"zero" 0',
                 }}
               >
-                {headerScore.gross}
+                <span
+                  style={{
+                    fontSize: 30,
+                    fontWeight: 700,
+                    letterSpacing: '-0.03em',
+                    lineHeight: 1,
+                    color: '#FFFFFF',
+                    fontVariantNumeric: 'tabular-nums',
+                    fontFeatureSettings: '"zero" 0',
+                  }}
+                >
+                  {headerScore.gross}
+                </span>
                 {headerScore.toPar != null && (
                   <span
                     style={{
-                      position: 'absolute',
-                      left: 'calc(100% + 2.5px)',
-                      bottom: 0,
                       fontSize: 11,
                       fontWeight: 700,
                       fontVariantNumeric: 'tabular-nums',
