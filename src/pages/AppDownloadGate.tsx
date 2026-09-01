@@ -205,9 +205,12 @@ const AppDownloadGate: React.FC = () => {
       const headline = headlineRef.current;
       if (!identity || !headline) return;
 
-      const currentCenter = identity.getBoundingClientRect().top + identity.offsetHeight / 2;
       const targetCenter = headline.getBoundingClientRect().top / 2;
-      setIdentityShift(Math.round(targetCenter - currentCenter));
+      setIdentityShift((currentShift) => {
+        const renderedCenter = identity.getBoundingClientRect().top + identity.offsetHeight / 2;
+        const unshiftedCenter = renderedCenter - currentShift;
+        return Math.round(targetCenter - unshiftedCenter);
+      });
     };
 
     positionIdentity();
