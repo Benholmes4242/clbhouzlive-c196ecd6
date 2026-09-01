@@ -66,7 +66,21 @@ export interface PostRoundHole {
 
 export interface PostRound {
   whsScoreId: string;
+  /**
+   * whs adjusted gross (net double bogey applied). NOT the header figure any
+   * more — see roundGross.ts. Kept because it is the round of record and the
+   * fallback when a hole was not completed.
+   */
   grossScore: number | null;
+  /**
+   * BRIEF_ROUND_CARD_GROSS_AND_NET S2 — public.gam_round_net.net_score, read in
+   * the SAME batched call as the rest of the round (one query per feed page,
+   * never one per card). ABSENT (null) for roughly 4% of rounds: overseas
+   * courses outside rating coverage, where a course handicap cannot be computed.
+   * Absent renders NOTHING — no slot, no dash, no zero. The view is
+   * security_invoker, so RLS is enforced through it exactly as on gam_round_stats.
+   */
+  netScore: number | null;
   coursePar: number | null;
   deltaIndex: number | null;
   playDate: string | null;
@@ -222,7 +236,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
     queryFn: async (): Promise<PostRoundMap> => {
       // Three reads for the whole page, run together: the round counters, the
       // hole-by-hole shape, and the crowns taken, all for the same score ids.
-      const [statsRes, holesRes, crownsRes] = await Promise.all([
+      const [statsRes, holesRes, crownsRes, netRes] = await Promise.all([
         supabase
           .from('gam_round_stats')
           .select(
@@ -235,11 +249,26 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
           .in('score_id', ids)
           .order('hole_no', { ascending: true }),
         supabase.rpc('get_round_crowns', { p_score_ids: ids }),
+        // S2 — ONE read of gam_round_net for the whole page, keyed on the same
+        // id list. Net is the view's number: there is deliberately no course
+        // handicap arithmetic here, because a second copy of the WHS formula in
+        // the client is how the two drift.
+        supabase.from('gam_round_net' as never).select('whs_score_id, net_score').in('whs_score_id', ids),
       ]);
 
       if (statsRes.error) throw statsRes.error;
       if (holesRes.error) throw holesRes.error;
       if (crownsRes.error) throw crownsRes.error;
+      // A missing/unreachable view must not take the whole round batch down:
+      // net is additive, so it degrades to absent.
+      if (netRes.error) console.warn('[feed] gam_round_net unavailable', netRes.error.message);
+
+      const nets = new Map<string, number>();
+      for (const n of ((netRes.data ?? []) as unknown) as { whs_score_id: string; net_score: number | null }[]) {
+        if (n.whs_score_id && n.net_score != null && Number.isFinite(Number(n.net_score))) {
+          nets.set(n.whs_score_id, Number(n.net_score));
+        }
+      }
 
       // At most one row per score id; a round with no crown simply has no row.
       const crowns = new Map<
@@ -290,6 +319,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
         map.set(id, {
           whsScoreId: id,
           grossScore: (r.gross_score as number | null) ?? null,
+          netScore: nets.get(id) ?? null,
           coursePar: (r.course_par as number | null) ?? null,
           deltaIndex: (r.delta_index as number | null) ?? null,
           playDate: (r.play_date as string | null) ?? null,
