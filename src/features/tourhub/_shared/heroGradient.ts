@@ -39,7 +39,7 @@ export function heroTintGradient(brandHex: string | null, amount = 0.3): string 
  * tournament) uses this and nothing else.
  */
 export function heroCanonScrimOn(endColour: string): string {
-  return `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.20) 42%, rgba(0,0,0,0.62) 74%, ${endColour} 100%)`;
+  return `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.10) 42%, rgba(0,0,0,0.34) 74%, ${endColour} 100%)`;
 }
 
 /**
