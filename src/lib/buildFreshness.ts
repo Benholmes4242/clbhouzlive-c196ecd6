@@ -97,7 +97,4 @@ export function installBuildFreshnessCheck(): void {
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) void checkBuildFreshness();
   });
-  // Seed the throttle window at boot without a probe: the document we are
-  // running was just fetched, so it is current by definition on a cold start.
-  lastCheck = Date.now();
 }
