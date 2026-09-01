@@ -16,6 +16,7 @@
  * whole feed; tapping any media opens the immersive `FullscreenFeedOverlay`.
  */
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
@@ -49,6 +50,7 @@ import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
 import { PostCourseBand } from './PostCourseBand';
 import { CourseStatsSheet } from './CourseStatsSheet';
 import { PostRoundCard } from './PostRoundCard';
+import { roundScore } from './roundGross';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
@@ -451,6 +453,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // The backdrop is claimed by the shell too, so the card surface does not
   // change under the member when the round lands.
   const hasRoundBackdrop = Boolean((postRound || postRoundPending) && post.courseThumbnailImage);
+
+  const { t } = useTranslation('common');
+  // ONE definition of the round's score for the header and the card body.
+  const headerScore = useMemo(() => (postRound ? roundScore(postRound) : null), [postRound]);
 
   return (
     <article
