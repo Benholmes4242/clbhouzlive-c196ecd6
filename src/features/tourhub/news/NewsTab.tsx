@@ -36,10 +36,12 @@ const NEWS_SLUGS = ['all', 'pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'];
 
 /** Compact lead band used by the Wire section on the Tour Overview. */
 const COMPACT_LEAD_HEIGHT = 180;
-/** Focal point for lead photos. LOWER number = subject sits LOWER in frame. */
-const LEAD_FOCAL_Y = '18%';
-/** Gradient height scales with the band so the visible wash keeps the same density. */
-const COMPACT_LEAD_GRADIENT_HEIGHT = 312; // 260 * 1.2
+/**
+ * How far the photograph's subject moves DOWN inside the compact hero frame.
+ * The image box is made taller than its container and the container clips the
+ * bottom, matching the treatment on the full story page (StoryArticle).
+ */
+const HERO_SUBJECT_DROP = 26;
 
 function KickerLine({ kicker, at, compact = false, trailing }: { kicker: string | null; at: string | null; compact?: boolean; trailing?: React.ReactNode }) {
   return (
@@ -73,12 +75,21 @@ export function LeadStory({ story, onOpen, compact = false, engagement }: { stor
           src={story.image_url as string}
           alt={story.headline}
           loading="lazy"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: `50% ${LEAD_FOCAL_Y}`, display: 'block' }}
+          style={{
+            width: '100%',
+            height: `calc(100% + ${HERO_SUBJECT_DROP * 2}px)`,
+            objectFit: 'cover',
+            // objectPosition is the default; it is written out to stop future
+            // edits trying to "tune" a focal point that has no vertical travel
+            // on this nearly-square hero (landscape photos crop at the sides).
+            objectPosition: '50% 50%',
+            display: 'block',
+          }}
         />
         <div
           aria-hidden
           style={{
-             position: 'absolute', left: 0, right: 0, bottom: 0, height: compact ? COMPACT_LEAD_GRADIENT_HEIGHT : 260,
+             position: 'absolute', left: 0, right: 0, bottom: 0, height: 260,
              background: heroCanonScrimOn(SLATE_50),
           }}
         />
