@@ -23,6 +23,7 @@ interface Props {
   tone?: 'ink' | 'glass';
   hidden?: boolean;
   size?: number;
+  figureSize?: number;
   /** Reserve the count column so glyphs line up down a column. */
   reserveCount?: boolean;
 }
@@ -34,6 +35,7 @@ export function CommentAction({
   tone = 'ink',
   hidden = false,
   size = 15,
+  figureSize = 11.5,
   reserveCount = false,
 }: Props) {
   if (hidden) return null;
@@ -75,7 +77,7 @@ export function CommentAction({
           className="tabular-nums"
           style={{
             ...FIGS,
-            fontSize: 11.5,
+            fontSize: figureSize,
             fontWeight: 700,
             color,
             lineHeight: 1,

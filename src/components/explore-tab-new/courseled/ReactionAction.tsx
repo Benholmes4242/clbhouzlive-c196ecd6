@@ -39,6 +39,7 @@ interface Props {
   /** Missing target id, signed out, or table unavailable: render nothing. */
   hidden?: boolean;
   size?: number;
+  figureSize?: number;
   /**
    * RESERVES THE COUNT COLUMN whether or not a count renders, so the GLYPH
    * itself lands on the same x on every row of a column — not just the slot's
@@ -57,6 +58,7 @@ export function ReactionAction({
   readOnly = false,
   hidden = false,
   size = 15,
+  figureSize = 11.5,
   reserveCount = false,
 }: Props) {
   if (hidden) return null;
@@ -71,7 +73,7 @@ export function ReactionAction({
       <span
         style={{
           ...FIGS,
-          fontSize: 11.5,
+          fontSize: figureSize,
           fontWeight: 700,
           color: countColor,
           lineHeight: 1,
