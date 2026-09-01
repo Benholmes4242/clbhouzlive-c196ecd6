@@ -1,42 +1,42 @@
 {
   "status": {
-    "live": "\ub77c\uc774\ube0c",
-    "upcoming": "\uc608\uc815",
-    "final": "\uc885\ub8cc",
-    "results": "\uacb0\uacfc",
-    "noEvent": "\ub300\ud68c \uc5c6\uc74c"
+    "live": "라이브",
+    "upcoming": "예정",
+    "final": "종료",
+    "results": "결과",
+    "noEvent": "대회 없음"
   },
   "pill": {
-    "updated": "\uc5c5\ub370\uc774\ud2b8 {{time}}",
-    "tourEyebrow": "\ud22c\uc5b4",
-    "majorEyebrow": "\uba54\uc774\uc800"
+    "updated": "업데이트 {{time}}",
+    "tourEyebrow": "투어",
+    "majorEyebrow": "메이저"
   },
   "picker": {
-    "eyebrow": "\ud22c\uc5b4 \uc804\ud658",
-    "title": "\ud22c\uc5b4 \uc120\ud0dd",
-    "noEventsThisWeek": "\uc774\ubc88 \uc8fc \ub300\ud68c \uc5c6\uc74c",
-    "openMenuAria": "\uba54\ub274 \uc5f4\uae30",
-    "switchTourAria": "\ud22c\uc5b4 \uc804\ud658",
-    "switchTourCurrentAria": "\ud22c\uc5b4 \uc804\ud658 \u2014 \ud604\uc7ac {{label}}"
+    "eyebrow": "투어 전환",
+    "title": "투어 선택",
+    "noEventsThisWeek": "이번 주 대회 없음",
+    "openMenuAria": "메뉴 열기",
+    "switchTourAria": "투어 전환",
+    "switchTourCurrentAria": "투어 전환 — 현재 {{label}}"
   },
   "nav": {
     "group": {
-      "tour": "\ud22c\uc5b4",
-      "account": "\uacc4\uc815"
+      "tour": "투어",
+      "account": "계정"
     },
-    "overview": "\uac1c\uc694",
-    "leaderboards": "\ub9ac\ub354\ubcf4\ub4dc",
-    "schedule": "\uc77c\uc815",
-    "players": "\uc120\uc218",
-    "leaders": "\ub9ac\ub354",
-    "college": "\ub300\ud559",
-    "settings": "\uc124\uc815",
-    "profile": "\ud504\ub85c\ud544",
-    "signOut": "\ub85c\uadf8\uc544\uc6c3",
+    "overview": "개요",
+    "leaderboards": "리더보드",
+    "schedule": "일정",
+    "players": "선수",
+    "leaders": "리더",
+    "college": "대학",
+    "settings": "설정",
+    "profile": "프로필",
+    "signOut": "로그아웃",
     "news": "News"
   },
   "section": {
-    "retryAria": "{{section}} \ub2e4\uc2dc \ubd88\ub7ec\uc624\uae30"
+    "retryAria": "{{section}} 다시 불러오기"
   },
   "schedule": {
     "eyebrow": {
@@ -84,8 +84,8 @@
     },
     "ticker": {
       "top10Label": "TOP 10",
-      "alsoOutLabel": "\ub2e4\ub978 \uc120\uc218",
-      "fullLeaderboard": "\uc804\uccb4 \ub9ac\ub354\ubcf4\ub4dc"
+      "alsoOutLabel": "다른 선수",
+      "fullLeaderboard": "전체 리더보드"
     },
     "fieldStrength": {
       "eyebrow": "FIELD",
@@ -96,7 +96,7 @@
     "champion": {
       "scoreLabelToPar": "TO PAR",
       "eyebrow": "CHAMPION",
-      "eyebrowPlayoff": "CHAMPION \u00b7 PLAYOFF",
+      "eyebrowPlayoff": "CHAMPION · PLAYOFF",
       "resultPending": "Result pending"
     },
     "cancelledStrip": {
@@ -107,7 +107,7 @@
       "tiedAtTop": "{{count}} tied at the top"
     },
     "middleBand": {
-      "cancelledDefault": "No play \u2014 tournament cancelled."
+      "cancelledDefault": "No play — tournament cancelled."
     },
     "upcoming": {
       "defendingEyebrow": "DEFENDING",
@@ -155,7 +155,7 @@
     "statWatch": {
       "eyebrow": "Stat watch",
       "allStatsLink": "All stats",
-      "seasonLeaders": "Season leaders \u00b7 {{tourLabel}}"
+      "seasonLeaders": "Season leaders · {{tourLabel}}"
     },
     "sectionTourLens": {
       "allTours": "All Tours",
@@ -176,7 +176,7 @@
       "ctaResults": "VIEW FULL RESULTS",
       "ctaImminent": "VIEW ALL TEE TIMES",
       "ctaUpcoming": "VIEW TOURNAMENT",
-      "inauguralPlaceholder": "INAUGURAL EVENT \u00b7 NO PRIOR RESULTS",
+      "inauguralPlaceholder": "INAUGURAL EVENT · NO PRIOR RESULTS",
       "previewUnavailable": "Tournament preview not available.",
       "fieldEyebrow": "Field",
       "playersSuffix_one": " player",
@@ -186,7 +186,7 @@
       "eyebrow": "COURSE",
       "parLabel": "PAR",
       "recordLabel": "Record: {{value}}",
-      "recordLabelWithHolder": "Record: {{value}} \u00b7 {{holder}}",
+      "recordLabelWithHolder": "Record: {{value}} · {{holder}}",
       "fallbackSummary": "Course preview"
     },
     "comingUp": {
@@ -194,20 +194,20 @@
       "linkLabel": "Full schedule",
       "chipPlayoffs": "Playoffs",
       "daysLabel": "DAYS",
-      "venueDefendsSep": " \u00b7 {{name}} defends",
-      "subline": "\ud22c\uc5b4 \uc77c\uc815"
+      "venueDefendsSep": " · {{name}} defends",
+      "subline": "투어 일정"
     },
     "onTheCourse": {
       "eyebrow": "On the course",
       "rightMeta_one": "{{count}} group",
       "rightMeta_other": "{{count}} groups",
-      "rightMetaWithRound_one": "{{count}} group \u00b7 R{{round}}",
-      "rightMetaWithRound_other": "{{count}} groups \u00b7 R{{round}}",
+      "rightMetaWithRound_one": "{{count}} group · R{{round}}",
+      "rightMetaWithRound_other": "{{count}} groups · R{{round}}",
       "roundOnly": "R{{round}}",
       "teeLabel": "TEE {{time}}",
       "thruLabel": "THRU {{value}}",
       "holeLabel": "HOLE {{hole}}",
-      "featuredBadge": "\u2605 FEATURED",
+      "featuredBadge": "★ FEATURED",
       "allGroups": "All groups",
       "fullField": "full field",
       "moreCount": "{{count}} more",
@@ -216,86 +216,86 @@
       "backLine2": "featured",
       "showAllAria": "Show all groups",
       "backAria": "Back to featured",
-      "rightMetaWithRound": "{{count}} groups \u00b7 R{{round}}",
+      "rightMetaWithRound": "{{count}} groups · R{{round}}",
       "roundShort": "R{{round}}",
       "teeTimeLabel": "TEE {{time}}",
-      "holeLabelSep": " \u00b7 HOLE {{hole}}",
+      "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
       "backToLine1": "Back to",
       "backToLine2": "featured",
-      "fieldAverageToday": "\uc624\ub298 \ud544\ub4dc \ud3c9\uade0",
-      "fromNRoundsIn": "{{n}} \ub77c\uc6b4\ub4dc \uae30\uc900",
-      "lowRoundLabel": "\ubca0\uc2a4\ud2b8 \ub77c\uc6b4\ub4dc",
-      "awaitingPlayers": "{{range}} \uc9d1\uacc4 \ub300\uae30",
+      "fieldAverageToday": "오늘 필드 평균",
+      "fromNRoundsIn": "{{n}} 라운드 기준",
+      "lowRoundLabel": "베스트 라운드",
+      "awaitingPlayers": "{{range}} 집계 대기",
       "nShare_one": "{{count}} players",
       "nShare_other": "{{count}} players",
-      "playingHardest": "\uac00\uc7a5 \uc5b4\ub824\uc6b4",
-      "playingEasiest": "\uac00\uc7a5 \uc26c\uc6b4",
-      "parShort": "\ud30c {{par}}",
-      "featuredGroupLabel": "\uc8fc\ubaa9 \uadf8\ub8f9",
-      "underParTodayLabel": "\uc624\ub298 \uc5b8\ub354\ud30c",
-      "underParTodayValue": "{{m}}\uba85 \uc911 {{n}}\uba85",
-      "underParTodaySub": "\ud604\uc7ac\uae4c\uc9c0 \uc120\uc218",
-      "axisEasier": "\uc26c\uc6c0",
-      "axisHarder": "\uc5b4\ub824\uc6c0",
-      "finishedLabel": "\uc885\ub8cc",
-      "todaySuffix": "\uc624\ub298 {{value}}",
-      "fieldAverageWaiting": "{{n}}\ub77c\uc6b4\ub4dc\uac00 \ubaa8\uc774\uba74 \ud544\ub4dc \ud3c9\uade0 \ud45c\uc2dc",
-      "courseShapeLabel": "\ucf54\uc2a4 \ub09c\uc774\ub3c4",
-      "ourPicksLabel": "\uc8fc\ubaa9 \uc120\uc218",
-      "ourPicksAll": "\ubaa8\ub4e0 \uc8fc\ubaa9 \uc120\uc218\uc640 \uadfc\uac70",
-      "ourPicksProvenance": "\ubaa8\ub378 \uc2e0\ub8b0\ub3c4 {{confidence}}%",
-      "ourPicksStale": "\uc5c5\ub370\uc774\ud2b8 \uc911"
+      "playingHardest": "가장 어려운",
+      "playingEasiest": "가장 쉬운",
+      "parShort": "파 {{par}}",
+      "featuredGroupLabel": "주목 그룹",
+      "underParTodayLabel": "오늘 언더파",
+      "underParTodayValue": "{{m}}명 중 {{n}}명",
+      "underParTodaySub": "현재까지 선수",
+      "axisEasier": "쉬움",
+      "axisHarder": "어려움",
+      "finishedLabel": "종료",
+      "todaySuffix": "오늘 {{value}}",
+      "fieldAverageWaiting": "{{n}}라운드가 모이면 필드 평균 표시",
+      "courseShapeLabel": "코스 난이도",
+      "ourPicksLabel": "주목 선수",
+      "ourPicksAll": "모든 주목 선수와 근거",
+      "ourPicksProvenance": "모델 신뢰도 {{confidence}}%",
+      "ourPicksStale": "업데이트 중"
     },
     "tiPicks": {
       "eyebrow": "Tournament intelligence",
       "subline": "Our picks for the tournament",
-      "explainer": "AI\ub294 \uacbd\uae30\uac00 \uc2dc\uc791\ub418\uae30 \uc804\uc5d0 \ucd9c\uc804 \uc120\uc218\ub2e8\uc744 \ubd84\uc11d\ud569\ub2c8\ub2e4. \uc774 \ucf54\uc2a4\uc5d0\uc11c\uc758 \uacfc\uac70 \uc131\uc801, \ud604\uc7ac \ud3fc, \ubd80\uc0c1 \uad00\ub828 \uc18c\uc2dd, \ub0a0\uc528, \uadf8\ub9ac\uace0 \ub4dc\ub77c\uc774\ubc84 \ube44\uac70\ub9ac\uc640 \uc815\ud655\ub3c4, \uc1fc\ud2b8 \uac8c\uc784 \uac19\uc740 \uc120\uc218 \uc9c0\ud45c\ub97c \uc885\ud569\ud574 \uadf8 \uc8fc\uc758 \uc608\uc0c1\uc744 \ub3c4\ucd9c\ud569\ub2c8\ub2e4.",
+      "explainer": "AI는 경기가 시작되기 전에 출전 선수단을 분석합니다. 이 코스에서의 과거 성적, 현재 폼, 부상 관련 소식, 날씨, 그리고 드라이버 비거리와 정확도, 쇼트 게임 같은 선수 지표를 종합해 그 주의 예상을 도출합니다.",
       "linkLabel": "All picks",
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",
       "confidenceLive": "Live",
-      "theCase": "The case \u203a",
+      "theCase": "The case ›",
       "pickLabel": "Pick {{rank}}",
       "won": "Won",
       "hit": "Hit",
       "miss": "Miss",
-      "missWithCut": "Miss \u00b7 {{cut}}",
-      "wonBadge": "WON \u00b7 {{score}}",
-      "hitBadge": "HIT \u00b7 {{pos}} \u00b7 {{score}}",
-      "missBadge": "MISS \u00b7 {{pos}} \u00b7 {{score}}",
+      "missWithCut": "Miss · {{cut}}",
+      "wonBadge": "WON · {{score}}",
+      "hitBadge": "HIT · {{pos}} · {{score}}",
+      "missBadge": "MISS · {{pos}} · {{score}}",
       "missShort": "MISS",
-      "missWithCutBadge": "MISS \u00b7 {{cut}}",
+      "missWithCutBadge": "MISS · {{cut}}",
       "thruLabel": "thru {{value}}",
       "caseFor": "The case for",
       "boardTitle": "The board",
-      "boardMeta_one": "{{count}} PICK \u00b7 TAP FOR THE CASE",
-      "boardMeta_other": "{{count}} PICKS \u00b7 TAP FOR THE CASE",
+      "boardMeta_one": "{{count}} PICK · TAP FOR THE CASE",
+      "boardMeta_other": "{{count}} PICKS · TAP FOR THE CASE",
       "courseFit": "course fit {{score}}",
       "concernLabel": "Concern",
-      "finalLine": "{{pos}} \u00b7 {{score}}",
+      "finalLine": "{{pos}} · {{score}}",
       "confidence": {
         "high": "High",
         "solid": "Solid",
         "live": "Live"
       },
       "verdict": {
-        "won": "WON \u00b7 {{score}}",
-        "hit": "HIT \u00b7 {{pos}} \u00b7 {{score}}",
-        "miss": "MISS \u00b7 {{pos}} \u00b7 {{score}}",
+        "won": "WON · {{score}}",
+        "hit": "HIT · {{pos}} · {{score}}",
+        "miss": "MISS · {{pos}} · {{score}}",
         "missOnly": "MISS",
-        "missCut": "MISS \u00b7 {{cut}}"
+        "missCut": "MISS · {{cut}}"
       },
       "chip": {
         "won": "Won",
         "hit": "Hit",
         "miss": "Miss",
-        "missCut": "Miss \u00b7 {{cut}}"
+        "missCut": "Miss · {{cut}}"
       },
       "card": {
-        "theCase": "The case \u203a",
+        "theCase": "The case ›",
         "pickLabel": "Pick {{rank}}",
-        "pickOf": "\ud53d {{n}} / {{total}}",
+        "pickOf": "픽 {{n}} / {{total}}",
         "courseFitLabel": "Course fit"
       },
       "case": {
@@ -304,54 +304,54 @@
         "courseFit": "course fit {{score}}"
       },
       "sheet": {
-        "picksHeader": "{{count}} PICKS \u00b7 TAP FOR THE CASE",
+        "picksHeader": "{{count}} PICKS · TAP FOR THE CASE",
         "title": "The board"
       },
       "thru": {
         "finished": "F",
         "thruN": "thru {{n}}"
       },
-      "thruSep": " \u00b7 {{value}}",
+      "thruSep": " · {{value}}",
       "board": {
-        "methodology": "\uc608\uce21\uc740 \uccab \ud2f0\uc624\ud504 \uc804\uc5d0 \ud655\uc815\ub418\uba70 \uc774\ud6c4 \ubcc0\uacbd\ub418\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4. \ud310\uc815\uc740 \ucd5c\uc885 \ub9ac\ub354\ubcf4\ub4dc\ub85c \uacb0\uc815\ub429\ub2c8\ub2e4."
+        "methodology": "예측은 첫 티오프 전에 확정되며 이후 변경되지 않습니다. 판정은 최종 리더보드로 결정됩니다."
       },
       "method": {
-        "heading": "\uc120\uc815 \ubc29\uc2dd",
-        "lede": "AI\ub294 \uacbd\uae30\uac00 \uc2dc\uc791\ub418\uae30 \uc804\uc5d0 \ucd9c\uc804 \uc120\uc218\ub4e4\uc744 \ubd84\uc11d\ud569\ub2c8\ub2e4. \uc774 \ucf54\uc2a4\uc5d0\uc11c\uc758 \uacfc\uac70 \uc131\uc801, \ud604\uc7ac \ucee8\ub514\uc158, \ubd80\uc0c1 \uad00\ub828 \uc18c\uc2dd, \ub0a0\uc528, \uadf8\ub9ac\uace0 \ub4dc\ub77c\uc774\ubc84 \ube44\uac70\ub9ac, \uc815\ud655\ub3c4, \uc20f\uac8c\uc784 \uac19\uc740 \uc120\uc218 \uc9c0\ud45c\ub97c \uc885\ud569\ud574 \uadf8 \uc8fc\uc758 \uc608\uce21\uc744 \ub0b4\ub193\uc2b5\ub2c8\ub2e4.",
-        "playerLabel": "\uc120\uc218",
+        "heading": "선정 방식",
+        "lede": "AI는 경기가 시작되기 전에 출전 선수들을 분석합니다. 이 코스에서의 과거 성적, 현재 컨디션, 부상 관련 소식, 날씨, 그리고 드라이버 비거리, 정확도, 숏게임 같은 선수 지표를 종합해 그 주의 예측을 내놓습니다.",
+        "playerLabel": "선수",
         "playerItems": [
-          "\ub4dc\ub77c\uc774\ubc84 \ube44\uac70\ub9ac",
-          "\ub4dc\ub77c\uc774\ubc84 \uc815\ud655\ub3c4",
-          "\uadf8\ub9b0 \uc801\uc911\ub960",
-          "\uc2a4\ud06c\ub7a8\ube14\ub9c1",
-          "\ud37c\ud305",
-          "\uc2a4\ud2b8\ub85c\ud06c \uac8c\uc778\ub4dc: \ud2f0\uc0f7",
-          "\uc2a4\ud2b8\ub85c\ud06c \uac8c\uc778\ub4dc: \uc5b4\ud504\ub85c\uce58",
-          "\uc2a4\ud2b8\ub85c\ud06c \uac8c\uc778\ub4dc: \uadf8\ub9b0 \uc8fc\ubcc0",
-          "\uc2a4\ud2b8\ub85c\ud06c \uac8c\uc778\ub4dc: \ud37c\ud305",
-          "\uc2a4\ud2b8\ub85c\ud06c \uac8c\uc778\ub4dc: \ud569\uacc4",
-          "\ub77c\uc6b4\ub4dc\ub2f9 \ubc84\ub514",
-          "\ud3c9\uade0 \ud0c0\uc218"
+          "드라이버 비거리",
+          "드라이버 정확도",
+          "그린 적중률",
+          "스크램블링",
+          "퍼팅",
+          "스트로크 게인드: 티샷",
+          "스트로크 게인드: 어프로치",
+          "스트로크 게인드: 그린 주변",
+          "스트로크 게인드: 퍼팅",
+          "스트로크 게인드: 합계",
+          "라운드당 버디",
+          "평균 타수"
         ],
-        "courseLabel": "\ucf54\uc2a4",
+        "courseLabel": "코스",
         "courseItems": [
-          "\uc774\uacf3\uc5d0\uc11c\uc758 \ucd5c\uadfc 5\ub144 \uc131\uc801",
-          "\uc774 \ucf54\uc2a4\uc5d0\uc11c \uc2e4\uc81c\ub85c \uc6b0\uc2b9\ud55c \uc2a4\ucf54\uc5b4",
-          "\ud30c, \uae38\uc774, \ucf54\uc2a4 \uc720\ud615"
+          "이곳에서의 최근 5년 성적",
+          "이 코스에서 실제로 우승한 스코어",
+          "파, 길이, 코스 유형"
         ],
-        "weekLabel": "\uc774\ubc88 \uc8fc",
+        "weekLabel": "이번 주",
         "weekItems": [
-          "\ucd5c\uadfc 4\uac1c \ub300\ud68c\uc758 \ucee8\ub514\uc158",
-          "\ud655\uc815\ub41c \uae30\uad8c\uacfc \ubd80\uc0c1",
-          "\ubc14\ub78c\uacfc \ube44 \uc608\ubcf4",
-          "\ucd9c\uc804 \uc120\uc218\uce35\uc758 \uc218\uc900"
+          "최근 4개 대회의 컨디션",
+          "확정된 기권과 부상",
+          "바람과 비 예보",
+          "출전 선수층의 수준"
         ],
         "rules": [
-          "\uccab \ud2f0\uc624\ud504 \uc804\uc5d0 \ud655\uc815",
-          "\uc774\ud6c4 \uc218\uc815 \uc5c6\uc74c",
-          "\ucd5c\uc885 \ub9ac\ub354\ubcf4\ub4dc\ub85c \ucc44\uc810"
+          "첫 티오프 전에 확정",
+          "이후 수정 없음",
+          "최종 리더보드로 채점"
         ],
-        "closing": "Tournament Intelligence\ub294 \ubd84\uc11d\uc774\uba70 \uc870\uc5b8\uc774 \uc544\ub2d9\ub2c8\ub2e4."
+        "closing": "Tournament Intelligence는 분석이며 조언이 아닙니다."
       }
     },
     "collegeFranchise": {
@@ -359,36 +359,36 @@
       "linkLabel": "All franchises",
       "vs": "VS",
       "tugLabel": "SEASON ALUMNI EARNINGS",
-      "captainLabel": "\u00b7 CAPTAIN",
+      "captainLabel": "· CAPTAIN",
       "onTour_one": "{{count}} on tour",
       "onTour_other": "{{count}} on tour",
-      "onTourCaptainSuffix": " \u00b7 {{name}} captains",
+      "onTourCaptainSuffix": " · {{name}} captains",
       "headlineFallbackWide": "{{leader}} runs away with it.",
       "headlineFallbackClose": "{{leader}} leads. {{chaser}} is closing.",
-      "captainSuffix": "\u00b7 CAPTAIN",
+      "captainSuffix": "· CAPTAIN",
       "headlineRunaway": "<0>{{leader}} runs away with it.</0>",
       "headlineClosing": "<0>{{leader}} leads. {{chaser}} is closing.</0>",
-      "rowMetaWithCaptain": "{{count}} on tour \u00b7 {{captain}} captains",
+      "rowMetaWithCaptain": "{{count}} on tour · {{captain}} captains",
       "rowMeta": "{{count}} on tour"
     },
     "cinematic": {
-      "championEyebrow": "\u2605 Champion",
+      "championEyebrow": "★ Champion",
       "championLabel": "Champion",
-      "defendingChampionEyebrow": "\u2605 Defending champion",
+      "defendingChampionEyebrow": "★ Defending champion",
       "defendingChampionLabel": "Defending Champion",
       "defendingChampionYearLabel": "{{year}} Defending Champion",
-      "wonYearScore": "Won {{year}} \u00b7 {{score}}",
+      "wonYearScore": "Won {{year}} · {{score}}",
       "wonInPlayoff": "Won in playoff",
       "wonByMargin": "Won by {{margin}}",
       "finalResult": "FINAL RESULT",
       "finalResults": "Final results",
-      "finalLeaderboardCount": "FINAL LEADERBOARD \u00b7 {{count}}",
+      "finalLeaderboardCount": "FINAL LEADERBOARD · {{count}}",
       "fullLeaderboard": "Full leaderboard",
-      "fullLeaderboardWithField_one": "Full leaderboard \u00b7 {{count}} player",
-      "fullLeaderboardWithField_other": "Full leaderboard \u00b7 {{count}} players",
+      "fullLeaderboardWithField_one": "Full leaderboard · {{count}} player",
+      "fullLeaderboardWithField_other": "Full leaderboard · {{count}} players",
       "viewTournament": "View tournament",
-      "viewTournamentWithField_one": "View tournament \u00b7 {{count}} in the field",
-      "viewTournamentWithField_other": "View tournament \u00b7 {{count}} in the field",
+      "viewTournamentWithField_one": "View tournament · {{count}} in the field",
+      "viewTournamentWithField_other": "View tournament · {{count}} in the field",
       "openTournamentAria": "Open tournament",
       "openLeaderboardAria": "Open leaderboard",
       "openFullLeaderboardAria": "Open full leaderboard",
@@ -397,18 +397,18 @@
       "viewTournamentAria": "View tournament",
       "majorAria": "Major championship",
       "eyebrowPlayoff": "PLAYOFF",
-      "eyebrowFinal": "\ud83c\udfc6 FINAL",
+      "eyebrowFinal": "🏆 FINAL",
       "eyebrowUpcoming": "UPCOMING",
-      "eyebrowUpcomingMajor": "UPCOMING \u00b7 MAJOR CHAMPIONSHIP",
-      "eyebrowSuffix": " \u00b7 {{tour}}",
+      "eyebrowUpcomingMajor": "UPCOMING · MAJOR CHAMPIONSHIP",
+      "eyebrowSuffix": " · {{tour}}",
       "countdownHoursLabel": "HRS",
       "countdownMinutesLabel": "MIN",
       "teeingOffSoon": "Teeing off soon",
       "teesOffIn": "TEES OFF IN",
-      "roundAwaitingScores": "Round {{round}} \u00b7 Awaiting scores",
+      "roundAwaitingScores": "Round {{round}} · Awaiting scores",
       "fieldPreviewPlayers_one": "{{count}} player",
       "fieldPreviewPlayers_other": "{{count}} players",
-      "topRankedWorld": " \u00b7 #{{rank}} world",
+      "topRankedWorld": " · #{{rank}} world",
       "inTheField_one": "{{count}} in the field",
       "inTheField_other": "{{count}} in the field",
       "ctaTournament": "TOURNAMENT",
@@ -432,11 +432,11 @@
       "teamFallback": "Team"
     },
     "status": {
-      "finished": "\uc885\ub8cc",
-      "thru": "{{n}}\ud640"
+      "finished": "종료",
+      "thru": "{{n}}홀"
     },
     "board": {
-      "clbhouzPick": "clbhouz \uc8fc\ubaa9 \uc120\uc218"
+      "clbhouzPick": "clbhouz 주목 선수"
     }
   },
   "empty": {
@@ -465,11 +465,11 @@
       "tot": "TOT",
       "thru": "THRU",
       "today": "TODAY",
-      "round": "\ub77c\uc6b4\ub4dc",
+      "round": "라운드",
       "mov": "MOV"
     },
     "status": {
-      "inProgress": "R{{round}} \u00b7 IN PROGRESS",
+      "inProgress": "R{{round}} · IN PROGRESS",
       "final": "FINAL",
       "startsOn": "STARTS {{date}}",
       "upcoming": "UPCOMING"
@@ -516,9 +516,9 @@
       "field": {
         "eyebrow": "The Field",
         "playersSuffix": " players",
-        "headlinedBySep": " \u00b7 headlined by ",
-        "firstTeeSep": " \u00b7 first tee ",
-        "startsInSep": " \u00b7 starts in ",
+        "headlinedBySep": " · headlined by ",
+        "firstTeeSep": " · first tee ",
+        "startsInSep": " · starts in ",
         "daysSuffix_one": " day",
         "daysSuffix_other": " days",
         "emptyFallback": "The field and tee times will appear here closer to the start."
@@ -526,7 +526,7 @@
     },
     "hero": {
       "chip": {
-        "majorStarts": "MAJOR \u00b7 STARTS {{date}}",
+        "majorStarts": "MAJOR · STARTS {{date}}",
         "starts": "STARTS {{date}}",
         "roundN": "Round {{round}}"
       },
@@ -536,8 +536,8 @@
       "purseLabel": "Purse",
       "tbdPlayer": "TBD",
       "championFallback": "Champion",
-      "winningLabel": "\uc6b0\uc2b9 \uc2a4\ucf54\uc5b4",
-      "marginLabel": "\ucc28\uc774"
+      "winningLabel": "우승 스코어",
+      "marginLabel": "차이"
     },
     "story": {
       "eyebrow": "The Story",
@@ -568,7 +568,7 @@
       "allHolesAction": "All 18 holes",
       "allHolesTitle": "All 18 Holes",
       "avgVsPar": "Avg vs par",
-      "fieldScoringSuffix": " \u00b7 field scoring"
+      "fieldScoringSuffix": " · field scoring"
     },
     "featuredGroups": {
       "eyebrow": "On the Course",
@@ -587,16 +587,16 @@
     },
     "teeTimesBand": {
       "title": "Tee times",
-      "subline": "Round {{round}} \u00b7 {{count}} groups",
+      "subline": "Round {{round}} · {{count}} groups",
       "notReleased": "Draw not yet released"
     }
   },
   "leaders": {
-    "footer": "Season boards \u00b7 live dot = on the course right now",
+    "footer": "Season boards · live dot = on the course right now",
     "fullList": "Full list",
     "sheet": {
-      "eyebrow_one": "{{tourLabel}} \u00b7 {{year}} \u00b7 {{count}} PLAYER",
-      "eyebrow_other": "{{tourLabel}} \u00b7 {{year}} \u00b7 {{count}} PLAYERS",
+      "eyebrow_one": "{{tourLabel}} · {{year}} · {{count}} PLAYER",
+      "eyebrow_other": "{{tourLabel}} · {{year}} · {{count}} PLAYERS",
       "empty": "No players ranked in this category."
     },
     "tourChip": {
@@ -739,17 +739,17 @@
         "title": "The winners' circle"
       },
       "titles": {
-        "earnings": "\uc0c1\uae08 \uc21c\uc704",
-        "drive_avg": "\ud3c9\uade0 \ub4dc\ub77c\uc774\ube0c \uac70\ub9ac",
-        "drive_acc": "\ud398\uc5b4\uc6e8\uc774 \uc548\ucc29\ub960",
-        "gir_pct": "\uadf8\ub9b0 \uc801\uc911\ub960",
-        "sand_saves_pct": "\uc0cc\ub4dc \uc138\uc774\ube0c",
-        "strokes_gained_tee_green": "\uc2a4\ud2b8\ub85c\ud06c \uac8c\uc778\ub4dc \ud2f0\ud22c\uadf8\ub9b0",
-        "strokes_gained_putting": "\uc2a4\ud2b8\ub85c\ud06c \uac8c\uc778\ub4dc \ud37c\ud305",
-        "scoring_avg": "\ud3c9\uade0 \ud0c0\uc218",
-        "putt_avg": "\ud3c9\uade0 \ud37c\ud305",
-        "wins": "\ucd5c\ub2e4 \uc6b0\uc2b9",
-        "top_10": "\ucd5c\ub2e4 \ud1b110"
+        "earnings": "상금 순위",
+        "drive_avg": "평균 드라이브 거리",
+        "drive_acc": "페어웨이 안착률",
+        "gir_pct": "그린 적중률",
+        "sand_saves_pct": "샌드 세이브",
+        "strokes_gained_tee_green": "스트로크 게인드 티투그린",
+        "strokes_gained_putting": "스트로크 게인드 퍼팅",
+        "scoring_avg": "평균 타수",
+        "putt_avg": "평균 퍼팅",
+        "wins": "최다 우승",
+        "top_10": "최다 톱10"
       }
     }
   },
@@ -760,7 +760,7 @@
       "closeAria": "Clear search"
     },
     "editorial": {
-      "leaderAt": "{{tournament}} \u2014 {{leader}} LEADS AT {{score}}",
+      "leaderAt": "{{tournament}} — {{leader}} LEADS AT {{score}}",
       "startsOn": "{{tournament}} STARTS {{day}}"
     },
     "field": {
@@ -776,12 +776,12 @@
       "top10s": "{{count}} TOP-10"
     },
     "footer": {
-      "synced": "Season ranking \u00b7 live dot = on the course right now",
-      "unsynced": "Ranked by world ranking \u2014 season statistics arrive with the sync"
+      "synced": "Season ranking · live dot = on the course right now",
+      "unsynced": "Ranked by world ranking — season statistics arrive with the sync"
     },
     "podium": {
       "rank": "No.{{rank}}",
-      "rankWithStat": "No.{{rank}} \u00b7 {{statLabel}}"
+      "rankWithStat": "No.{{rank}} · {{statLabel}}"
     },
     "statLabel": {
       "pga": "FEDEX PTS",
@@ -804,29 +804,29 @@
     },
     "live": {
       "badge": "LIVE",
-      "roundSuffix": " \u00b7 R{{round}}",
+      "roundSuffix": " · R{{round}}",
       "thru": "thru {{holes}}",
       "finished": "F"
     },
     "form": {
-      "eyebrow": "Last 6 \u00b7 Most Recent First",
+      "eyebrow": "Last 6 · Most Recent First",
       "status": {
         "mc": "MC",
         "wd": "WD",
         "dq": "DQ",
-        "noResult": "\u2014"
+        "noResult": "—"
       }
     },
     "tournaments": {
       "eyebrow": "Tournaments",
       "winChip": "WIN",
       "liveChip": "LIVE",
-      "expand": "Full season \u203a",
+      "expand": "Full season ›",
       "status": {
         "mc": "MC",
         "wd": "WD",
         "dq": "DQ",
-        "noResult": "\u2014"
+        "noResult": "—"
       }
     },
     "season": {
@@ -880,13 +880,17 @@
     "notFound": "This story is no longer available.",
     "back": "Back",
     "live": "LIVE",
-    "liveRound": "LIVE \u00b7 ROUND {{n}}",
+    "liveRound": "LIVE · ROUND {{n}}",
     "finalResult": "FINAL RESULT",
     "players": "PLAYERS",
     "par": "PAR",
     "leader": "LEADER",
     "tournament": "TOURNAMENT",
     "player": "PLAYER",
-    "andCoLead": "+{{count}}"
+    "andCoLead": "+{{count}}",
+    "strip": {
+      "startsIn": "시작까지",
+      "awaitingScores": "스코어 대기 중"
+    }
   }
 }

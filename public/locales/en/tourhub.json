@@ -18,7 +18,7 @@
     "noEventsThisWeek": "No events this week",
     "openMenuAria": "Open menu",
     "switchTourAria": "Switch tour",
-    "switchTourCurrentAria": "Switch tour \u2014 current {{label}}",
+    "switchTourCurrentAria": "Switch tour — current {{label}}",
     "allTours": "All tours",
     "allToursSub": "Every tour, soonest first"
   },
@@ -108,7 +108,7 @@
     "champion": {
       "scoreLabelToPar": "TO PAR",
       "eyebrow": "CHAMPION",
-      "eyebrowPlayoff": "CHAMPION \u00b7 PLAYOFF",
+      "eyebrowPlayoff": "CHAMPION · PLAYOFF",
       "resultPending": "Result pending"
     },
     "cancelledStrip": {
@@ -119,7 +119,7 @@
       "tiedAtTop": "{{count}} tied at the top"
     },
     "middleBand": {
-      "cancelledDefault": "No play \u2014 tournament cancelled."
+      "cancelledDefault": "No play — tournament cancelled."
     },
     "upcoming": {
       "defendingEyebrow": "DEFENDING",
@@ -171,7 +171,7 @@
     },
     "pillState": {
       "cancelled": "CANCELLED",
-      "playoff": "PLAYOFF \u00b7 FINAL",
+      "playoff": "PLAYOFF · FINAL",
       "final": "FINAL",
       "upcoming": "UPCOMING"
     },
@@ -182,7 +182,7 @@
     "statWatch": {
       "eyebrow": "Stat watch",
       "allStatsLink": "All stats",
-      "seasonLeaders": "Season leaders \u00b7 {{tourLabel}}",
+      "seasonLeaders": "Season leaders · {{tourLabel}}",
       "pickerAriaLabel": "Choose a statistic",
       "higherIsBetter": "Higher is better",
       "lowerIsBetter": "Lower is better",
@@ -214,7 +214,7 @@
       "ctaResults": "VIEW FULL RESULTS",
       "ctaImminent": "VIEW ALL TEE TIMES",
       "ctaUpcoming": "VIEW TOURNAMENT",
-      "inauguralPlaceholder": "INAUGURAL EVENT \u00b7 NO PRIOR RESULTS",
+      "inauguralPlaceholder": "INAUGURAL EVENT · NO PRIOR RESULTS",
       "previewUnavailable": "Tournament preview not available.",
       "fieldEyebrow": "Field",
       "playersSuffix_one": " player",
@@ -224,7 +224,7 @@
       "eyebrow": "COURSE",
       "parLabel": "PAR",
       "recordLabel": "Record: {{value}}",
-      "recordLabelWithHolder": "Record: {{value}} \u00b7 {{holder}}",
+      "recordLabelWithHolder": "Record: {{value}} · {{holder}}",
       "fallbackSummary": "Course preview"
     },
     "comingUp": {
@@ -242,13 +242,13 @@
       "eyebrow": "On the course",
       "rightMeta_one": "{{count}} group",
       "rightMeta_other": "{{count}} groups",
-      "rightMetaWithRound_one": "{{count}} group \u00b7 R{{round}}",
-      "rightMetaWithRound_other": "{{count}} groups \u00b7 R{{round}}",
+      "rightMetaWithRound_one": "{{count}} group · R{{round}}",
+      "rightMetaWithRound_other": "{{count}} groups · R{{round}}",
       "roundOnly": "R{{round}}",
       "teeLabel": "TEE {{time}}",
       "thruLabel": "THRU {{value}}",
       "holeLabel": "HOLE {{hole}}",
-      "featuredBadge": "\u2605 FEATURED",
+      "featuredBadge": "★ FEATURED",
       "allGroups": "All groups",
       "fullField": "full field",
       "moreCount": "{{count}} more",
@@ -257,10 +257,10 @@
       "backLine2": "featured",
       "showAllAria": "Show all groups",
       "backAria": "Back to featured",
-      "rightMetaWithRound": "{{count}} groups \u00b7 R{{round}}",
+      "rightMetaWithRound": "{{count}} groups · R{{round}}",
       "roundShort": "R{{round}}",
       "teeTimeLabel": "TEE {{time}}",
-      "holeLabelSep": " \u00b7 HOLE {{hole}}",
+      "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
       "backToLine1": "Back to",
       "backToLine2": "featured",
@@ -298,25 +298,25 @@
       "confidenceHigh": "High",
       "confidenceSolid": "Solid",
       "confidenceLive": "Live",
-      "theCase": "The case \u203a",
+      "theCase": "The case ›",
       "pickLabel": "Pick {{rank}}",
       "won": "Won",
       "hit": "Hit",
       "miss": "Miss",
-      "missWithCut": "Miss \u00b7 {{cut}}",
-      "wonBadge": "WON \u00b7 {{score}}",
-      "hitBadge": "HIT \u00b7 {{pos}} \u00b7 {{score}}",
-      "missBadge": "MISS \u00b7 {{pos}} \u00b7 {{score}}",
+      "missWithCut": "Miss · {{cut}}",
+      "wonBadge": "WON · {{score}}",
+      "hitBadge": "HIT · {{pos}} · {{score}}",
+      "missBadge": "MISS · {{pos}} · {{score}}",
       "missShort": "MISS",
-      "missWithCutBadge": "MISS \u00b7 {{cut}}",
+      "missWithCutBadge": "MISS · {{cut}}",
       "thruLabel": "thru {{value}}",
       "caseFor": "The case for",
       "boardTitle": "The board",
-      "boardMeta_one": "{{count}} PICK \u00b7 TAP FOR THE CASE",
-      "boardMeta_other": "{{count}} PICKS \u00b7 TAP FOR THE CASE",
+      "boardMeta_one": "{{count}} PICK · TAP FOR THE CASE",
+      "boardMeta_other": "{{count}} PICKS · TAP FOR THE CASE",
       "courseFit": "course fit {{score}}",
       "concernLabel": "Concern",
-      "finalLine": "{{pos}} \u00b7 {{score}}",
+      "finalLine": "{{pos}} · {{score}}",
       "confidence": {
         "high": "High",
         "solid": "Solid",
@@ -324,20 +324,20 @@
       },
       "verdict": {
         "won": "WON",
-        "hit": "HIT \u00b7 {{pos}} \u00b7 {{score}}",
-        "miss": "MISS \u00b7 {{pos}} \u00b7 {{score}}",
+        "hit": "HIT · {{pos}} · {{score}}",
+        "miss": "MISS · {{pos}} · {{score}}",
         "missOnly": "MISS",
-        "missCut": "MISS \u00b7 {{cut}}",
+        "missCut": "MISS · {{cut}}",
         "mc": "MC"
       },
       "chip": {
         "won": "Won",
         "hit": "Hit",
         "miss": "Miss",
-        "missCut": "Miss \u00b7 {{cut}}"
+        "missCut": "Miss · {{cut}}"
       },
       "card": {
-        "theCase": "The case \u203a",
+        "theCase": "The case ›",
         "pickLabel": "Pick {{rank}}",
         "courseFit": "COURSE FIT {{score}}",
         "pickOf": "Pick {{n}} of {{total}}",
@@ -359,21 +359,21 @@
         "top10sTile": "TOP 10s",
         "sgTotalTile": "SG TOTAL",
         "wonIt": "WON IT",
-        "mostRecentRight": "OLDEST \u2192 MOST RECENT",
+        "mostRecentRight": "OLDEST → MOST RECENT",
         "whyWePicked": "WHY WE PICKED HIM"
       },
       "sheet": {
-        "picksHeader": "{{count}} PICKS \u00b7 TAP FOR THE CASE",
+        "picksHeader": "{{count}} PICKS · TAP FOR THE CASE",
         "title": "The board"
       },
       "thru": {
         "finished": "F",
         "thruN": "thru {{n}}"
       },
-      "thruSep": " \u00b7 {{value}}",
+      "thruSep": " · {{value}}",
       "board": {
         "title": "The board",
-        "eyebrow": "{{n}} PICKS \u00b7 TAP FOR THE CASE",
+        "eyebrow": "{{n}} PICKS · TAP FOR THE CASE",
         "record": "{{inside}} OF {{total}} INSIDE THE TOP 20",
         "fit": "FIT {{score}}",
         "methodology": "Picks are locked before the first tee time and never change. Verdicts settle with the final leaderboard.",
@@ -428,39 +428,39 @@
       "linkLabel": "All franchises",
       "vs": "VS",
       "tugLabel": "SEASON ALUMNI EARNINGS",
-      "captainLabel": "\u00b7 CAPTAIN",
+      "captainLabel": "· CAPTAIN",
       "onTour_one": "{{count}} on tour",
       "onTour_other": "{{count}} on tour",
-      "onTourCaptainSuffix": " \u00b7 {{name}} captains",
+      "onTourCaptainSuffix": " · {{name}} captains",
       "headlineFallbackWide": "{{leader}} runs away with it.",
       "headlineFallbackClose": "{{leader}} leads. {{chaser}} is closing.",
-      "captainSuffix": "\u00b7 CAPTAIN",
+      "captainSuffix": "· CAPTAIN",
       "headlineRunaway": "<0>{{leader}} runs away with it.</0>",
       "headlineClosing": "<0>{{leader}} leads. {{chaser}} is closing.</0>",
-      "rowMetaWithCaptain": "{{count}} on tour \u00b7 {{captain}} captains",
+      "rowMetaWithCaptain": "{{count}} on tour · {{captain}} captains",
       "rowMeta": "{{count}} on tour",
       "behindThem": "AND BEHIND THEM",
       "supportingWide": "<0>{{gap}}</0> clear of {{chaser}}, with <1>{{count}}</1> alumni on tour.",
       "supportingClose": "Just <0>{{gap}}</0> between them, with <1>{{count}}</1> alumni on tour."
     },
     "cinematic": {
-      "championEyebrow": "\u2605 Champion",
+      "championEyebrow": "★ Champion",
       "championLabel": "Champion",
-      "defendingChampionEyebrow": "\u2605 Defending champion",
+      "defendingChampionEyebrow": "★ Defending champion",
       "defendingChampionLabel": "Defending Champion",
       "defendingChampionYearLabel": "{{year}} Defending Champion",
-      "wonYearScore": "Won {{year}} \u00b7 {{score}}",
+      "wonYearScore": "Won {{year}} · {{score}}",
       "wonInPlayoff": "Won in playoff",
       "wonByMargin": "Won by {{margin}}",
       "finalResult": "FINAL RESULT",
       "finalResults": "Final results",
-      "finalLeaderboardCount": "FINAL LEADERBOARD \u00b7 {{count}}",
+      "finalLeaderboardCount": "FINAL LEADERBOARD · {{count}}",
       "fullLeaderboard": "Full leaderboard",
-      "fullLeaderboardWithField_one": "Full leaderboard \u00b7 {{count}} player",
-      "fullLeaderboardWithField_other": "Full leaderboard \u00b7 {{count}} players",
+      "fullLeaderboardWithField_one": "Full leaderboard · {{count}} player",
+      "fullLeaderboardWithField_other": "Full leaderboard · {{count}} players",
       "viewTournament": "View tournament",
-      "viewTournamentWithField_one": "View tournament \u00b7 {{count}} in the field",
-      "viewTournamentWithField_other": "View tournament \u00b7 {{count}} in the field",
+      "viewTournamentWithField_one": "View tournament · {{count}} in the field",
+      "viewTournamentWithField_other": "View tournament · {{count}} in the field",
       "openTournamentAria": "Open tournament",
       "openLeaderboardAria": "Open leaderboard",
       "openFullLeaderboardAria": "Open full leaderboard",
@@ -469,18 +469,18 @@
       "viewTournamentAria": "View tournament",
       "majorAria": "Major championship",
       "eyebrowPlayoff": "PLAYOFF",
-      "eyebrowFinal": "\ud83c\udfc6 FINAL",
+      "eyebrowFinal": "🏆 FINAL",
       "eyebrowUpcoming": "UPCOMING",
-      "eyebrowUpcomingMajor": "UPCOMING \u00b7 MAJOR CHAMPIONSHIP",
-      "eyebrowSuffix": " \u00b7 {{tour}}",
+      "eyebrowUpcomingMajor": "UPCOMING · MAJOR CHAMPIONSHIP",
+      "eyebrowSuffix": " · {{tour}}",
       "countdownHoursLabel": "HRS",
       "countdownMinutesLabel": "MIN",
       "teeingOffSoon": "Teeing off soon",
       "teesOffIn": "TEES OFF IN",
-      "roundAwaitingScores": "Round {{round}} \u00b7 Awaiting scores",
+      "roundAwaitingScores": "Round {{round}} · Awaiting scores",
       "fieldPreviewPlayers_one": "{{count}} player",
       "fieldPreviewPlayers_other": "{{count}} players",
-      "topRankedWorld": " \u00b7 #{{rank}} world",
+      "topRankedWorld": " · #{{rank}} world",
       "inTheField_one": "{{count}} in the field",
       "inTheField_other": "{{count}} in the field",
       "ctaTournament": "TOURNAMENT",
@@ -552,7 +552,7 @@
       "mov": "MOV"
     },
     "status": {
-      "inProgress": "R{{round}} \u00b7 IN PROGRESS",
+      "inProgress": "R{{round}} · IN PROGRESS",
       "final": "FINAL",
       "startsOn": "STARTS {{date}}",
       "upcoming": "UPCOMING"
@@ -607,9 +607,9 @@
       "field": {
         "eyebrow": "The Field",
         "playersSuffix": " players",
-        "headlinedBySep": " \u00b7 headlined by ",
-        "firstTeeSep": " \u00b7 first tee ",
-        "startsInSep": " \u00b7 starts in ",
+        "headlinedBySep": " · headlined by ",
+        "firstTeeSep": " · first tee ",
+        "startsInSep": " · starts in ",
         "daysSuffix_one": " day",
         "daysSuffix_other": " days",
         "emptyFallback": "The field and tee times will appear here closer to the start."
@@ -617,7 +617,7 @@
     },
     "hero": {
       "chip": {
-        "majorStarts": "MAJOR \u00b7 STARTS {{date}}",
+        "majorStarts": "MAJOR · STARTS {{date}}",
         "starts": "STARTS {{date}}",
         "roundN": "Round {{round}}"
       },
@@ -659,7 +659,7 @@
       "allHolesAction": "All 18 holes",
       "allHolesTitle": "All 18 Holes",
       "avgVsPar": "Avg vs par",
-      "fieldScoringSuffix": " \u00b7 field scoring",
+      "fieldScoringSuffix": " · field scoring",
       "holeN": "Hole {{n}}",
       "fromPlayers": "FROM {{count}} PLAYERS",
       "seeAllHoles": "See all 18 holes",
@@ -693,12 +693,12 @@
     },
     "teeTimesBand": {
       "title": "Tee times",
-      "subline": "Round {{round}} \u00b7 {{count}} groups",
+      "subline": "Round {{round}} · {{count}} groups",
       "notReleased": "Draw not yet released"
     }
   },
   "leaders": {
-    "footer": "Season boards \u00b7 live dot = on the course right now",
+    "footer": "Season boards · live dot = on the course right now",
     "fullList": "Full list",
     "error": {
       "title": "Couldn't load the boards",
@@ -706,10 +706,10 @@
       "retry": "Retry"
     },
     "sheet": {
-      "eyebrow_one": "{{tourLabel}} \u00b7 {{year}} \u00b7 {{count}} PLAYER",
-      "eyebrow_other": "{{tourLabel}} \u00b7 {{year}} \u00b7 {{count}} PLAYERS",
+      "eyebrow_one": "{{tourLabel}} · {{year}} · {{count}} PLAYER",
+      "eyebrow_other": "{{tourLabel}} · {{year}} · {{count}} PLAYERS",
       "empty": "No players ranked in this category.",
-      "eyebrowSliced": "{{tourLabel}} \u00b7 {{year}} \u00b7 TOP {{shown}} OF {{pool}}",
+      "eyebrowSliced": "{{tourLabel}} · {{year}} · TOP {{shown}} OF {{pool}}",
       "searchPlaceholder": "Search this board",
       "noMatch": "No match in the top {{shown}}. This board ranks the top {{shown}} of {{pool}}."
     },
@@ -898,8 +898,8 @@
       "tourRank": "{{label}} {{rank}}"
     },
     "footer": {
-      "synced": "Season ranking \u00b7 live dot = on the course right now",
-      "unsynced": "Ranked by world ranking \u2014 season statistics arrive with the sync",
+      "synced": "Season ranking · live dot = on the course right now",
+      "unsynced": "Ranked by world ranking — season statistics arrive with the sync",
       "sample": "Top {{count}} by season ranking . live dot = on the course now",
       "sampleSorted": "Top {{count}} by season ranking, sorted by {{stat}} . live dot = on the course now"
     },
@@ -910,7 +910,7 @@
     },
     "podium": {
       "rank": "No.{{rank}}",
-      "rankWithStat": "No.{{rank}} \u00b7 {{statLabel}}"
+      "rankWithStat": "No.{{rank}} · {{statLabel}}"
     },
     "statLabel": {
       "pga": "FEDEX PTS",
@@ -953,29 +953,29 @@
     },
     "live": {
       "badge": "LIVE",
-      "roundSuffix": " \u00b7 R{{round}}",
+      "roundSuffix": " · R{{round}}",
       "thru": "thru {{holes}}",
       "finished": "F"
     },
     "form": {
-      "eyebrow": "Last 6 \u00b7 Most Recent First",
+      "eyebrow": "Last 6 · Most Recent First",
       "status": {
         "mc": "MC",
         "wd": "WD",
         "dq": "DQ",
-        "noResult": "\u2014"
+        "noResult": "—"
       }
     },
     "tournaments": {
       "eyebrow": "Tournaments",
       "winChip": "WIN",
       "liveChip": "LIVE",
-      "expand": "Full season \u203a",
+      "expand": "Full season ›",
       "status": {
         "mc": "MC",
         "wd": "WD",
         "dq": "DQ",
-        "noResult": "\u2014"
+        "noResult": "—"
       }
     },
     "season": {
@@ -1038,7 +1038,7 @@
     "projectedCut": "Projected cut",
     "cut": "Cut",
     "nAdvance": "{{n}} advance",
-    "movementLegend": "Movement is places gained today \u00b7 tap a player for their card",
+    "movementLegend": "Movement is places gained today · tap a player for their card",
     "menu": {
       "inActionNow": "In action now",
       "nLive": "{{count}} live",
@@ -1079,7 +1079,7 @@
       "pickTwo": "Pick two schools to compare",
       "pickOneMore": "Pick one more school",
       "empty": "No franchises ranked yet this season.",
-      "footer": "{{year}} season \u00b7 ranked by alumni earnings \u00b7 live dot = on the course now"
+      "footer": "{{year}} season · ranked by alumni earnings · live dot = on the course now"
     },
     "profile": {
       "thisWeek": "THIS WEEK",
@@ -1104,7 +1104,7 @@
       "rosterError": "Couldn't load the roster.",
       "rosterRetry": "Retry",
       "rosterEmpty": "No alumni found for this program.",
-      "footer": "{{year}} season \u00b7 ranked by earnings \u00b7 live dot = on the course now"
+      "footer": "{{year}} season · ranked by earnings · live dot = on the course now"
     },
     "compare": {
       "headToHead": "HEAD TO HEAD",
@@ -1122,7 +1122,7 @@
       "tied": "Tied",
       "change": "CHANGE",
       "unranked": "Unranked",
-      "footer": "{{year}} season \u00b7 averages cover only alumni with that stat recorded"
+      "footer": "{{year}} season · averages cover only alumni with that stat recorded"
     }
   },
   "news": {
@@ -1137,13 +1137,17 @@
     "notFound": "This story is no longer available.",
     "back": "Back",
     "live": "LIVE",
-    "liveRound": "LIVE \u00b7 ROUND {{n}}",
+    "liveRound": "LIVE · ROUND {{n}}",
     "finalResult": "FINAL RESULT",
     "players": "PLAYERS",
     "par": "PAR",
     "leader": "LEADER",
     "tournament": "TOURNAMENT",
     "player": "PLAYER",
-    "andCoLead": "+{{count}}"
+    "andCoLead": "+{{count}}",
+    "strip": {
+      "startsIn": "STARTS IN",
+      "awaitingScores": "AWAITING SCORES"
+    }
   }
 }
