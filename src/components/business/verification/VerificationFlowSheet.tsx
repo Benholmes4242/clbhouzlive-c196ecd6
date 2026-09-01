@@ -263,7 +263,24 @@ export default function VerificationFlowSheet({
     [claimed, domainReady, documentReady, presenceReady],
   );
 
+  /**
+   * §3 — claimed signals with NOTHING behind them, derived from the SAME
+   * readiness flags buildSignals() writes as `provided`. A domain with an email
+   * entered but no code counts as provided: it gets checked by hand.
+   */
+  const unevidencedSignals = useMemo(() => {
+    const out: string[] = [];
+    if (claimed.domain && !domainReady)
+      out.push('You marked a business domain but have not confirmed one. You can still submit; it will be checked by hand.');
+    if (claimed.document && !documentReady)
+      out.push('You marked a document but have not attached one. You can still submit; it will be checked by hand.');
+    if (claimed.presence && !presenceReady)
+      out.push('You marked presence but have not given anything to check. You can still submit; it will be checked by hand.');
+    return out;
+  }, [claimed, domainReady, documentReady, presenceReady]);
+
   const detailsReady = !!business?.website && !!business?.email;
+
 
   // ---- §1.5 signal payload ----
   const buildSignals = () => {
