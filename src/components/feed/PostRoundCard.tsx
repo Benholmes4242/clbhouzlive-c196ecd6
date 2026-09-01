@@ -27,6 +27,8 @@ import { shapeSentence, IndexMovementTriangle, movementFor } from '@/components/
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { formatWeekdayShortGB, formatDayMonthShortGB } from '@/i18n/format';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
+import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
+import { courseDifficultyTail, DIFFICULTY_MIN_ROUNDS } from './courseDifficultyTail';
 
 const INK = '#F4F7F9';
 const MUTE = 'rgba(255,255,255,0.62)';
@@ -75,6 +77,14 @@ interface Props {
   courseRegion?: string | null;
   /** Only rendered when a previous holder can be resolved. */
   crown?: RoundCrown | null;
+  /**
+   * BRIEF_ROUND_CARD_CONTEXT — the SAME batched course context the band below
+   * already receives (usePostCourseContext, one RPC per feed page). No new
+   * fetch, no new field: the field average, its sample and the difficulty
+   * percentile were fetched for every card and thrown away for any viewer who
+   * had played the course.
+   */
+  courseCtx?: PostCourseContext | null;
 }
 
 type Hole = NonNullable<PostRound['holeShape']>[number];
@@ -452,7 +462,9 @@ export const PostRoundCard: React.FC<Props> = ({
   courseName,
   courseRegion,
   crown,
+  courseCtx,
 }) => {
+  const { t } = useTranslation('common');
   const ref = useRef<HTMLDivElement | null>(null);
   const firedRef = useRef(false);
 
