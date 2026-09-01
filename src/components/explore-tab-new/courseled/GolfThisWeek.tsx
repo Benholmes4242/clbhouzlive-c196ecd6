@@ -2135,43 +2135,6 @@ export function GolfThisWeek({
           />
 
 
-          {/* THE WHEN CHIP, top-right (§1.1), on the same notch + island
-              clearance the section's first row used to pay. It carries its
-              own glass carrier because the canon scrim stops well below this
-              y-position; without a dark surface beneath it, 65% white on a
-              bright photograph is illegible. */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              padding: 'calc(env(safe-area-inset-top, 0px) + 70px) 20px 0',
-              display: 'flex',
-              justifyContent: 'flex-end',
-            }}
-          >
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                lineHeight: 1,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: DISCOVER_FACT,
-                background: 'rgba(10,14,20,0.42)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255,255,255,0.14)',
-                borderRadius: 999,
-                padding: '5px 10px',
-              }}
-            >
-              {t('discover.golfThisWeek.board.whenChip', 'LAST {{days}} DAYS', {
-                days: GOLF_WEEK_DAYS,
-              })}
-            </span>
-          </div>
 
           {/* THE LOWER THIRD — PhotoBand's column: 20px gutters, 8px off the
               bottom edge, 10px between the title and the line beneath it. */}
