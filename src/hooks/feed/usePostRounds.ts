@@ -47,6 +47,14 @@ export interface PostRoundHole {
    */
   lineGross: number | null;
   /**
+   * THE SUBMITTED VALUE for this hole (whs_score_holes.adjusted_gross), i.e.
+   * gross after any net-double-bogey cap. MICRO_BRIEF_ROUND_CARD_GROSS_
+   * RECONCILIATION: the header's gross IS the sum of these, so the nine totals
+   * read them and can never sum to a different round than the header states.
+   * NEVER PRINTED IN A CELL — a member who wrote 7 on the card sees 7.
+   */
+  adjGross: number | null;
+  /**
    * BRIEF §1.4 — the shape keeps ALL EIGHTEEN positions, so the cell carries
    * its own state:
    *   played true,  gross present -> the score
@@ -147,7 +155,7 @@ function renderableShape(
   return shape
     .slice()
     .sort((a, b) => a.holeNo - b.holeNo)
-    .map(({ holeNo, par, gross, lineGross, played }) => ({ holeNo, par, gross, lineGross, played }));
+    .map(({ holeNo, par, gross, lineGross, adjGross, played }) => ({ holeNo, par, gross, lineGross, adjGross, played }));
 }
 
 /** Batched post_id -> whs_score_id for one feed page. */
@@ -269,6 +277,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
           par: h.par ?? null,
           gross: h.actual_gross ?? null,
           lineGross: h.actual_gross ?? h.adjusted_gross ?? null,
+          adjGross: h.adjusted_gross ?? null,
           played: h.played !== false,
         });
         shapes.set(h.score_id, list);
