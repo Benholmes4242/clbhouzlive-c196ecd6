@@ -854,21 +854,30 @@ export default function VerificationFlowSheet({
                           not count as a domain signal. Use an address on your own domain — or
                           go back and claim a document instead.
                         </p>
-                      ) : (
+                      ) : otpEmailVerified ? (
                         <p
                           style={{
                             fontFamily: SF_STACK,
                             fontSize: 13,
                             fontWeight: 400,
                             marginTop: 6,
-                            color: domainReady ? GREEN : INK_45,
+                            color: GREEN,
                           }}
                         >
+                          {emailDomain(proofEmail)} is a business domain, not a mailbox provider.
+                        </p>
+                      ) : (
+                        /* The OTP is a fast path, never a gate — but skipping it
+                           must not be silent. Same voice as the missing-details
+                           line on the review step. Gated on claimed.domain by
+                           construction: this screen only exists when it is ticked. */
+                        <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '6px 0 0' }}>
                           {domainReady
-                            ? `${emailDomain(proofEmail)} is a business domain, not a mailbox provider.`
-                            : 'Verifying the code now speeds up review.'}
+                            ? 'Enter the code to confirm this now, or continue and we will check it by hand — that takes longer.'
+                            : 'You can continue without this. Your domain will be checked by hand, which takes longer.'}
                         </p>
                       )}
+
                     </FieldGroup>
 
                     {otpSent && !otpEmailVerified && (
