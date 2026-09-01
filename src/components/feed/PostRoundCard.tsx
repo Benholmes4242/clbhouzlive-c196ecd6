@@ -47,7 +47,7 @@ const NUM: React.CSSProperties = {
 /** Once-per-session impression guard. */
 const seenRoundPosts = new Set<string>();
 
-function fmtToPar(n: number | null): string {
+export function fmtToPar(n: number | null): string {
   if (n == null) return '—';
   return n === 0 ? 'E' : n > 0 ? `+${n}` : `${n}`;
 }

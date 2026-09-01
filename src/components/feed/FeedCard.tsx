@@ -49,7 +49,7 @@ import { formatCountKilo as formatCount, formatRelativeWithSeconds as timeAgo } 
 import { useImpressionObserver } from '@/lib/impressions/useImpressionObserver';
 import { PostCourseBand } from './PostCourseBand';
 import { CourseStatsSheet } from './CourseStatsSheet';
-import { PostRoundCard } from './PostRoundCard';
+import { PostRoundCard, fmtToPar } from './PostRoundCard';
 import { roundScore } from './roundGross';
 import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
@@ -586,6 +586,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             >
               <span
                 style={{
+                  position: 'relative',
+                  display: 'inline-block',
                   fontSize: 30,
                   fontWeight: 700,
                   letterSpacing: '-0.03em',
@@ -594,22 +596,26 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 }}
               >
                 {headerScore.gross}
+                {headerScore.toPar != null && (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: 'calc(100% + 2.5px)',
+                      bottom: 0,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      fontVariantNumeric: 'tabular-nums',
+                      fontFeatureSettings: '"zero" 0',
+                      color: getScoreColor(headerScore.toPar, 'dark'),
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {headerScore.toPar < 0
+                      ? `\u2212${Math.abs(headerScore.toPar)}`
+                      : fmtToPar(headerScore.toPar)}
+                  </span>
+                )}
               </span>
-              {headerScore.toPar != null && (
-                <span
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: getScoreColor(headerScore.toPar, 'dark'),
-                  }}
-                >
-                  {headerScore.toPar === 0
-                    ? 'E'
-                    : headerScore.toPar > 0
-                      ? `+${headerScore.toPar}`
-                      : `${headerScore.toPar}`}
-                </span>
-              )}
               {postRound.netScore != null && (
                 <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
                   <span
