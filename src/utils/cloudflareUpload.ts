@@ -53,35 +53,47 @@ export const uploadToCloudflareR2 = async (
     formData.append('fileName', originalFileName || file.name);
     formData.append('bucketType', bucketType);
 
-    console.log('[UPLOAD/R2] invoke -> cloudflare-r2-upload', {
+    console.log('[UPLOAD/R2] xhr -> cloudflare-r2-upload', {
       formKeys: ['file', 'fileName', 'bucketType'],
     });
-    // Call the Cloudflare R2 upload edge function
-    const { data, error } = await supabase.functions.invoke('cloudflare-r2-upload', {
-      body: formData,
-      headers: {
-        'Authorization': `Bearer ${session.access_token}`,
-      },
-    });
 
-    if (error) {
-      console.error('[UPLOAD/R2] invoke error', {
-        name: (error as any)?.name, message: error.message,
-      });
-      const ctx: any = (error as any).context;
-      if (ctx && typeof ctx.text === 'function') {
-        try {
-          const status = ctx.status;
-          const body = await ctx.text();
-          console.error('[UPLOAD/R2] invoke error response', {
-            status, body: body?.slice(0, 500),
-          });
-        } catch (e) {
-          console.error('[UPLOAD/R2] could not read error.context', e);
-        }
+    // XHR transport (same endpoint, FormData, auth and response shape as the
+    // previous functions.invoke call) so upload progress can be observed.
+    const data = await new Promise<CloudflareUploadResult>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      if (onProgress) {
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) onProgress(e.loaded, e.total);
+        });
       }
-      throw new Error(error.message);
-    }
+
+      xhr.addEventListener('load', () => {
+        let parsed: any = null;
+        try {
+          parsed = JSON.parse(xhr.responseText);
+        } catch {
+          reject(new Error('Invalid response from server'));
+          return;
+        }
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(parsed as CloudflareUploadResult);
+        } else {
+          console.error('[UPLOAD/R2] xhr error response', {
+            status: xhr.status, body: String(xhr.responseText).slice(0, 500),
+          });
+          reject(new Error(parsed?.error || `Upload failed: ${xhr.status}`));
+        }
+      });
+
+      xhr.addEventListener('error', () => reject(new Error('Network error during upload')));
+      xhr.addEventListener('timeout', () => reject(new Error('Upload timed out')));
+      xhr.addEventListener('abort', () => reject(new Error('Upload cancelled')));
+
+      xhr.open('POST', `${SUPABASE_URL}/functions/v1/cloudflare-r2-upload`);
+      xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+      xhr.send(formData);
+    });
 
     console.log('[UPLOAD/R2] ok', {
       name: file.name, hasUrl: !!(data && (data as any).publicUrl),
