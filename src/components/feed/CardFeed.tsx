@@ -693,7 +693,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       if (item.kind === 'wire') {
         return (
           <div data-wire-story-id={item.story.id}>
-            <WireFeedSlide story={item.story} />
+            <WireFeedSlide story={item.story} beat={item.beat} />
             <div aria-hidden style={{ height: 8, background: 'transparent' }} />
           </div>
         );
