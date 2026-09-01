@@ -1240,7 +1240,7 @@
         "stablefordLabel": "Stableford",
         "stablefordShort": "STABLEFORD",
         "stablefordUnit": "PTS",
-        "whenChip": "LAST {{days}} DAYS",
+        
         "railRounds": "RONDAS",
         "railCourses": "CAMPOS",
         "railDays": "DIAS",
