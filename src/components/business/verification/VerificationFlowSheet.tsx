@@ -263,7 +263,24 @@ export default function VerificationFlowSheet({
     [claimed, domainReady, documentReady, presenceReady],
   );
 
+  /**
+   * §3 — claimed signals with NOTHING behind them, derived from the SAME
+   * readiness flags buildSignals() writes as `provided`. A domain with an email
+   * entered but no code counts as provided: it gets checked by hand.
+   */
+  const unevidencedSignals = useMemo(() => {
+    const out: string[] = [];
+    if (claimed.domain && !domainReady)
+      out.push('You marked a business domain but have not confirmed one. You can still submit; it will be checked by hand.');
+    if (claimed.document && !documentReady)
+      out.push('You marked a document but have not attached one. You can still submit; it will be checked by hand.');
+    if (claimed.presence && !presenceReady)
+      out.push('You marked presence but have not given anything to check. You can still submit; it will be checked by hand.');
+    return out;
+  }, [claimed, domainReady, documentReady, presenceReady]);
+
   const detailsReady = !!business?.website && !!business?.email;
+
 
   // ---- §1.5 signal payload ----
   const buildSignals = () => {
@@ -854,21 +871,30 @@ export default function VerificationFlowSheet({
                           not count as a domain signal. Use an address on your own domain — or
                           go back and claim a document instead.
                         </p>
-                      ) : (
+                      ) : otpEmailVerified ? (
                         <p
                           style={{
                             fontFamily: SF_STACK,
                             fontSize: 13,
                             fontWeight: 400,
                             marginTop: 6,
-                            color: domainReady ? GREEN : INK_45,
+                            color: GREEN,
                           }}
                         >
+                          {emailDomain(proofEmail)} is a business domain, not a mailbox provider.
+                        </p>
+                      ) : (
+                        /* The OTP is a fast path, never a gate — but skipping it
+                           must not be silent. Same voice as the missing-details
+                           line on the review step. Gated on claimed.domain by
+                           construction: this screen only exists when it is ticked. */
+                        <p style={{ ...BIZ_BODY, fontSize: 12.5, margin: '6px 0 0' }}>
                           {domainReady
-                            ? `${emailDomain(proofEmail)} is a business domain, not a mailbox provider.`
-                            : 'Verifying the code now speeds up review.'}
+                            ? 'Enter the code to confirm this now, or continue and we will check it by hand — that takes longer.'
+                            : 'You can continue without this. Your domain will be checked by hand, which takes longer.'}
                         </p>
                       )}
+
                     </FieldGroup>
 
                     {otpSent && !otpEmailVerified && (
@@ -1181,6 +1207,12 @@ export default function VerificationFlowSheet({
                           : `${missingDetailCount} details are missing. You can still submit, but adding them speeds up review.`}
                       </p>
                     )}
+                    {unevidencedSignals.map((line) => (
+                      <p key={line} style={{ ...BIZ_BODY, fontSize: 12.5, margin: '8px 0 0' }}>
+                        {line}
+                      </p>
+                    ))}
+
                     <div className="pt-3">
                       <Link
                         to={`/business/${businessId}/edit`}
