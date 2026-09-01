@@ -96,10 +96,10 @@
       "most_birdies_all_time": "Mas birdies"
     },
     "roundCard": {
-      "fieldLine_one": "el campo promedia {{field}} aqui, de {{count}} ronda",
-      "fieldLine_other": "el campo promedia {{field}} aqui, de {{count}} rondas",
-      "slopeHarder": "mas dificil que el {{pct}}%",
-      "slopeEasier": "mas facil que el {{pct}}%"
+      "fieldLine_one": "el campo promedia {{field}} aquí, de {{count}} ronda",
+      "fieldLine_other": "el campo promedia {{field}} aquí, de {{count}} rondas",
+      "slopeHarder": "más difícil que el {{pct}}%",
+      "slopeEasier": "más fácil que el {{pct}}%"
     }
   },
   "business": {
