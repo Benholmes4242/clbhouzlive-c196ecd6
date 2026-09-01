@@ -666,6 +666,12 @@ export const PostRoundCard: React.FC<Props> = ({
               <BreakdownBar holes={holes} />
               <NineGrid label="Out" holes={holes.filter((h) => h.holeNo <= 9)} />
               <NineGrid label="In" holes={holes.filter((h) => h.holeNo > 9 && h.holeNo <= 18)} />
+              {showAdjustedNote && (
+                <div style={{ marginTop: 6, fontSize: 11.5, fontWeight: 600, color: DIM }}>
+                  <span style={NUM}>{playedTotal}</span> played {'\u00B7'}{' '}
+                  <span style={NUM}>{gross}</span> adjusted for handicap
+                </div>
+              )}
             </>
           )}
 
