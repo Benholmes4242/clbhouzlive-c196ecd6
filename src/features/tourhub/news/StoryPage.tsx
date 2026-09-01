@@ -195,15 +195,14 @@ export function StoryArticle({ story, immersiveHero = false, tagLabel }: {
         <h1 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em', color: INK, margin: 0 }}>
           {story.headline}
         </h1>
-        <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ ...KICKER, color: INK_FAINT }}>{storyTime(story.published_at)}</span>
+        <div style={{ marginTop: 8, display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+          <span style={{ ...KICKER, color: INK_FAINT, whiteSpace: 'nowrap', flexShrink: 0 }}>{storyTime(story.published_at)}</span>
           {tag && (
             <>
-              <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT }} />
-              <span style={{ ...KICKER, color: INK_FAINT }}>{tag}</span>
+              <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT, flexShrink: 0, marginTop: 4 }} />
+              <span style={{ ...KICKER, color: INK_FAINT, minWidth: 0 }}>{tag}</span>
             </>
           )}
-
         </div>
 
         {story.standfirst && (
