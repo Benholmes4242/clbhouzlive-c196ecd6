@@ -1240,7 +1240,7 @@
         "stablefordLabel": "Stableford",
         "stablefordShort": "STABLEFORD",
         "stablefordUnit": "PKT",
-        "whenChip": "LAST {{days}} DAYS",
+        
         "railRounds": "RUNDEN",
         "railCourses": "PLAETZE",
         "railDays": "TAGE",

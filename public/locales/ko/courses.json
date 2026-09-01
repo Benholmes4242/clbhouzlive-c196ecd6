@@ -1174,7 +1174,7 @@
         "stablefordLabel": "Stableford",
         "stablefordShort": "STABLEFORD",
         "stablefordUnit": "PTS",
-        "whenChip": "LAST {{days}} DAYS",
+        
         "railRounds": "ROUNDS",
         "railCourses": "COURSES",
         "railDays": "DAYS",
