@@ -88,6 +88,8 @@ export function resolveSignals(row: VerificationRow): {
   signals: ResolvedSignal[];
   claimed: ClaimedSignals;
   legacy: boolean;
+  /** §3 — what the FLOW recorded at submission. null when the row predates it. */
+  barMet: boolean | null;
 } {
   const meta = asObject(row.proofMetadata);
   const nested = asObject(meta.signals);
@@ -96,6 +98,19 @@ export function resolveSignals(row: VerificationRow): {
   const domainMeta = asObject(nested.domain);
   const documentMeta = asObject(nested.document);
   const presenceMeta = asObject(nested.presence);
+
+  /**
+   * §1 STOP CONDITION — a nested object written before the hardening carries no
+   * `provided`. Those rows are inferred exactly as legacy rows are.
+   */
+  const hardened = [domainMeta, documentMeta, presenceMeta].some(
+    (m) => typeof m.provided === 'boolean',
+  );
+  const stated = (m: Record<string, unknown>, claimedKey: boolean): SignalState => {
+    if (!claimedKey) return 'not_claimed';
+    return m.provided === true ? 'pass' : 'not_supplied';
+  };
+
 
   /* ── DOMAIN ── */
   const domainEmail = str(domainMeta.email) ?? str(meta.email) ?? (legacy && row.proofMethod === 'business_email' ? str(row.proofValue) : null);
