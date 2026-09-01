@@ -99,7 +99,10 @@
       "fieldLine_one": "das Feld spielt hier im Schnitt {{field}}, aus {{count}} Runde",
       "fieldLine_other": "das Feld spielt hier im Schnitt {{field}}, aus {{count}} Runden",
       "slopeHarder": "schwerer als {{pct}}%",
-      "slopeEasier": "leichter als {{pct}}%"
+      "slopeEasier": "leichter als {{pct}}%",
+      "net": "Netto",
+      "adjustedNotCompleted_one": "angepasst, {{count}} Loch nicht beendet",
+      "adjustedNotCompleted_other": "angepasst, {{count}} Locher nicht beendet"
     }
   },
   "business": {

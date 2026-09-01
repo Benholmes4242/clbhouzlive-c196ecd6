@@ -196,7 +196,10 @@
       "fieldLine_one": "the field averages {{field}} here, from {{count}} round",
       "fieldLine_other": "the field averages {{field}} here, from {{count}} rounds",
       "slopeHarder": "harder than {{pct}}%",
-      "slopeEasier": "easier than {{pct}}%"
+      "slopeEasier": "easier than {{pct}}%",
+      "net": "Net",
+      "adjustedNotCompleted_one": "adjusted, {{count}} hole not completed",
+      "adjustedNotCompleted_other": "adjusted, {{count}} holes not completed"
     },
     "courseBand": {
       "avg": "avg",

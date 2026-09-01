@@ -99,7 +99,10 @@
       "fieldLine_one": "el campo promedia {{field}} aquí, de {{count}} ronda",
       "fieldLine_other": "el campo promedia {{field}} aquí, de {{count}} rondas",
       "slopeHarder": "más difícil que el {{pct}}%",
-      "slopeEasier": "más fácil que el {{pct}}%"
+      "slopeEasier": "más fácil que el {{pct}}%",
+      "net": "Neto",
+      "adjustedNotCompleted_one": "ajustado, {{count}} hoyo sin terminar",
+      "adjustedNotCompleted_other": "ajustado, {{count}} hoyos sin terminar"
     }
   },
   "business": {

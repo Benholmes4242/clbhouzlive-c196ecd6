@@ -99,7 +99,10 @@
       "fieldLine_one": "このコースの平均は {{field}}（{{count}} ラウンド）",
       "fieldLine_other": "このコースの平均は {{field}}（{{count}} ラウンド）",
       "slopeHarder": "{{pct}}% のコースより難しい",
-      "slopeEasier": "{{pct}}% のコースより易しい"
+      "slopeEasier": "{{pct}}% のコースより易しい",
+      "net": "ネット",
+      "adjustedNotCompleted_one": "調整済み、未完了のホールが{{count}}",
+      "adjustedNotCompleted_other": "調整済み、未完了のホールが{{count}}"
     }
   },
   "business": {
