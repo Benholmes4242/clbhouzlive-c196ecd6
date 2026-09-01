@@ -222,7 +222,7 @@ const AppDownloadGate: React.FC = () => {
       observer.disconnect();
       window.removeEventListener('resize', positionIdentity);
     };
-  }, [headLines.join('|')]);
+  }, [headLines.join('|'), reachPending, figuresUsable]);
 
   return (
     <div
