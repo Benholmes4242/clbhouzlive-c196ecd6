@@ -106,6 +106,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
+    buildIdEndpoint(),
     mode === 'development' && componentTagger(),
     mode === 'production' && visualizer({ 
       filename: 'dist/stats.html', 
