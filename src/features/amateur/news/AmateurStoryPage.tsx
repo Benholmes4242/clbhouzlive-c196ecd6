@@ -38,12 +38,14 @@ const KICKER: React.CSSProperties = {
  * nothing there. Exported because the admin preview must show the same string.
  */
 export function amateurTag(
-  story: Pick<AmateurStory, 'categories' | 'tournament_name'>,
+  story: Pick<AmateurStory, 'categories' | 'tournament_name' | 'kicker'>,
   resolve?: (value: string, fallback: string) => string,
 ): string | null {
   const cats = categoriesLine(story.categories, resolve);
   const event = (story.tournament_name ?? '').trim().toUpperCase() || null;
-  const parts = [cats, event].filter(Boolean) as string[];
+  const kicker = (story.kicker ?? '').trim().toUpperCase() || null;
+  const eventDeduped = event && event === kicker ? null : event;
+  const parts = [cats, eventDeduped].filter(Boolean) as string[];
   return parts.length > 0 ? parts.join(' \u00b7 ') : null;
 }
 
