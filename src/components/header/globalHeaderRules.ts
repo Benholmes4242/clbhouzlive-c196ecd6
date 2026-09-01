@@ -14,6 +14,7 @@ export const IMMERSIVE_ROUTE_PREFIXES = [
   '/tour',            // Tour alias
   
   '/discover/explore/region/', // Region pages
+  '/discover/news',   // Amateur News index + story — lead photo bleeds to the notch, same as /tour/news
 ] as const;
 
 export const IMMERSIVE_EXACT_ROUTES = [
