@@ -21,6 +21,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
@@ -51,6 +52,26 @@ function Notice({ kicker, headline, body }: { kicker: string; headline: string; 
     </div>
   );
 }
+
+/**
+ * §2 — A SECTION THROWING COSTS THAT SECTION, NOT THE PAGE. Reuses the app's
+ * existing ErrorBoundary (the one AppShell mounts) with a card-shaped fallback,
+ * so a single null formatter can no longer send a club to "Something went
+ * wrong". No new boundary pattern was introduced.
+ */
+const SectionGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ErrorBoundary
+    fallback={
+      <Panel kicker="Not shown" style={{ borderRadius: 12, padding: 16 }}>
+        <p style={{ ...BIZ_BODY, margin: 0 }}>
+          This part of the page could not be drawn. The rest of your figures are unaffected.
+        </p>
+      </Panel>
+    }
+  >
+    {children}
+  </ErrorBoundary>
+);
 
 /* ───────────────────────── ONE COURSE BLOCK ───────────────────────── */
 
@@ -155,23 +176,25 @@ const CourseBlock: React.FC<{
           {!isLoading && result?.state === 'ok' && (
             <>
               {/* §1b — THE VERDICT STRIP LEADS: mean gross, hardest hole, comp share. */}
-              <VerdictStrip data={result.data} />
+              <SectionGuard><VerdictStrip data={result.data} /></SectionGuard>
               {/* §7 — the sample is stated before the rest of the figures. */}
-              <SampleSection data={result.data} />
-              <HoleBySection data={result.data} />
+              <SectionGuard><SampleSection data={result.data} /></SectionGuard>
+              <SectionGuard><HoleBySection data={result.data} /></SectionGuard>
               {/* §2 — the ladder is the one thing no other product shows a club. */}
-              <IndexDisagreesSection data={result.data} />
-              <StrokeIndexSection data={result.data} />
-              <ScoringSection data={result.data} />
+              <SectionGuard><IndexDisagreesSection data={result.data} /></SectionGuard>
+              <SectionGuard><StrokeIndexSection data={result.data} /></SectionGuard>
+              <SectionGuard><ScoringSection data={result.data} /></SectionGuard>
               {/* §5 — values only. Names live on the course's Champions tab. */}
-              <RecordBookSection
-                data={result.data}
-                onSeeChampions={() => navigate(`/courses/${course.course_id}?tab=legends`)}
-              />
-              <TeesSection data={result.data} />
-              <SeasonalitySection data={result.data} />
-              <WhoPlaysSection data={result.data} />
-              <CompetitionSection data={result.data} />
+              <SectionGuard>
+                <RecordBookSection
+                  data={result.data}
+                  onSeeChampions={() => navigate(`/courses/${course.course_id}?tab=legends`)}
+                />
+              </SectionGuard>
+              <SectionGuard><TeesSection data={result.data} /></SectionGuard>
+              <SectionGuard><SeasonalitySection data={result.data} /></SectionGuard>
+              <SectionGuard><WhoPlaysSection data={result.data} /></SectionGuard>
+              <SectionGuard><CompetitionSection data={result.data} /></SectionGuard>
             </>
           )}
         </div>
