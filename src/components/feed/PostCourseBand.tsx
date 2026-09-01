@@ -22,6 +22,7 @@ import { ChevronRight } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatRatingValue } from '@/utils/formatters';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
+import { courseDifficultyTail, DIFFICULTY_MIN_ROUNDS } from './courseDifficultyTail';
 
 /**
  * TONE MAP — the band renders on the dark Clubhouse slab AND on the light
