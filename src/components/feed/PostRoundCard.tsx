@@ -502,6 +502,27 @@ export const PostRoundCard: React.FC<Props> = ({
   const toPar = gross != null && round.coursePar != null ? gross - round.coursePar : null;
   const kicker = dateKicker(round.playDate);
 
+  /**
+   * MICRO_BRIEF_ROUND_CARD_GROSS_RECONCILIATION §3 — EXPLAIN THE GAP RATHER THAN
+   * HIDE IT. When every played hole is scored and the strokes actually taken add
+   * up to more than the round of record, the difference is a real WHS fact (net
+   * double bogey), so the card states both figures in one faint line. NOTHING IS
+   * COMPUTED: the played total is the sum of the member's own cells and the
+   * adjusted total is the submitted gross the header already prints. No cap is
+   * ever derived client-side.
+   */
+  const playedTotal = useMemo(() => {
+    let sum = 0;
+    for (const h of holes) {
+      if (h.played === false) continue;
+      if (h.gross == null || h.par == null) return null;
+      sum += h.gross;
+    }
+    return sum > 0 ? sum : null;
+  }, [holes]);
+  const showAdjustedNote = playedTotal != null && gross != null && playedTotal !== gross;
+
+
   // The card-level backdrop and glass now live in FeedCard. This block is
   // transparent and never applies a backdrop filter of its own.
   const panelStyle: React.CSSProperties = {
