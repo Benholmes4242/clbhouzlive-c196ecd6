@@ -94,6 +94,17 @@ function Headline({ loading, data }: { loading: boolean; data: ReturnType<typeof
           {primary}
         </div>
         <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 2 }}>{detail}</div>
+        {/* Stale-build errors are separated, never discarded: this line rising
+            is the signal that the update mechanism itself is failing. */}
+        {!loading && (data?.outdatedErrors ?? 0) > 0 && (
+          <div style={{ color: t.inkFaint, fontSize: 11.5, marginTop: 2 }}>
+            {data!.outdatedErrors} error{data!.outdatedErrors === 1 ? '' : 's'} from outdated clients
+            {data!.outdatedUsers > 0
+              ? ` · ${data!.outdatedUsers} member${data!.outdatedUsers === 1 ? '' : 's'}`
+              : ''}
+            {data!.distinctBuilds > 1 ? ` · ${data!.distinctBuilds} build ids (14d)` : ''}
+          </div>
+        )}
       </div>
     </section>
   );
