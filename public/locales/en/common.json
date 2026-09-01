@@ -192,7 +192,11 @@
       "kicker": "Round posted",
       "index": "Index",
       "under": "Under",
-      "over": "Over"
+      "over": "Over",
+      "fieldLine_one": "the field averages {{field}} here, from {{count}} round",
+      "fieldLine_other": "the field averages {{field}} here, from {{count}} rounds",
+      "slopeHarder": "harder than {{pct}}%",
+      "slopeEasier": "easier than {{pct}}%"
     },
     "courseBand": {
       "avg": "avg",

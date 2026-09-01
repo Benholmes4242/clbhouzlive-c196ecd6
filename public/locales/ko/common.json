@@ -94,6 +94,12 @@
       "most_albatrosses_all_time": "알바트로스 최다",
       "most_eagles_all_time": "이글 최다",
       "most_birdies_all_time": "버디 최다"
+    },
+    "roundCard": {
+      "fieldLine_one": "이 코스 평균은 {{field}} ({{count}}라운드 기준)",
+      "fieldLine_other": "이 코스 평균은 {{field}} ({{count}}라운드 기준)",
+      "slopeHarder": "코스 {{pct}}%보다 어려움",
+      "slopeEasier": "코스 {{pct}}%보다 쉬움"
     }
   },
   "business": {

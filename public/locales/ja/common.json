@@ -94,6 +94,12 @@
       "most_albatrosses_all_time": "アルバトロス最多",
       "most_eagles_all_time": "イーグル最多",
       "most_birdies_all_time": "バーディー最多"
+    },
+    "roundCard": {
+      "fieldLine_one": "このコースの平均は {{field}}（{{count}} ラウンド）",
+      "fieldLine_other": "このコースの平均は {{field}}（{{count}} ラウンド）",
+      "slopeHarder": "{{pct}}% のコースより難しい",
+      "slopeEasier": "{{pct}}% のコースより易しい"
     }
   },
   "business": {
