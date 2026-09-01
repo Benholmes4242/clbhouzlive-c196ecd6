@@ -75,12 +75,21 @@ export function LeadStory({ story, onOpen, compact = false, engagement }: { stor
           src={story.image_url as string}
           alt={story.headline}
           loading="lazy"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: `50% ${LEAD_FOCAL_Y}`, display: 'block' }}
+          style={{
+            width: '100%',
+            height: `calc(100% + ${HERO_SUBJECT_DROP * 2}px)`,
+            objectFit: 'cover',
+            // objectPosition is the default; it is written out to stop future
+            // edits trying to "tune" a focal point that has no vertical travel
+            // on this nearly-square hero (landscape photos crop at the sides).
+            objectPosition: '50% 50%',
+            display: 'block',
+          }}
         />
         <div
           aria-hidden
           style={{
-             position: 'absolute', left: 0, right: 0, bottom: 0, height: compact ? COMPACT_LEAD_GRADIENT_HEIGHT : 260,
+             position: 'absolute', left: 0, right: 0, bottom: 0, height: 260,
              background: heroCanonScrimOn(SLATE_50),
           }}
         />
