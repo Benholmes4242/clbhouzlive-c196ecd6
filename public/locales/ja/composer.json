@@ -21,7 +21,12 @@
     "statToPar": "パー差",
     "statBirdies": "バーディ",
     "statPhotos": "写真",
-    "statVideos": "動画"
+    "statVideos": "動画",
+    "stagePreparing": "準備中",
+    "stageUploading": "アップロード中",
+    "stagePublishing": "公開中",
+    "timeLeftSeconds": "残り{{n}}秒",
+    "timeLeftMinutes": "残り{{m}}分{{s}}秒"
   },
   "emptyState": {
     "headline": "Put it on the wall",

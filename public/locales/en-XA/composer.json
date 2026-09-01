@@ -21,7 +21,12 @@
     "statToPar": "[~~Ţő ƥář~~]",
     "statBirdies": "[~~Ɓířđíéš~~]",
     "statPhotos": "[~~Ƥĥőţőš~~]",
-    "statVideos": "[~~Ṽíđéőš~~]"
+    "statVideos": "[~~Ṽíđéőš~~]",
+    "stagePreparing": "Preparing",
+    "stageUploading": "Uploading",
+    "stagePublishing": "Publishing",
+    "timeLeftSeconds": "{{n}}s left",
+    "timeLeftMinutes": "{{m}}m {{s}}s left"
   },
   "emptyState": {
     "headline": "[~~Ƥúţ íţ őñ ţĥé ŵáļļ~~]",
