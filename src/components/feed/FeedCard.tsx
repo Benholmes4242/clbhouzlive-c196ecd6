@@ -824,7 +824,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           <>
             <PostCourseBand
               courseName={post.courseName}
-              courseLocation={courseLocation || null}
+              /**
+               * BRIEF_ROUND_CARD_CONTEXT S2 — THE REGION IS PRINTED ONCE PER
+               * CARD. On a round post PostRoundCard already states
+               * "Kent, Britain & Ireland" under the course name 600px above, so
+               * the band's copy is pure duplication and goes. The band KEEPS the
+               * course name (it is the label of the tap target) and keeps the
+               * region on every OTHER kind of post, where the band is the only
+               * place the region appears at all.
+               */
+              courseLocation={postRound ? null : courseLocation || null}
               courseRating={post.courseRating ?? null}
               ctx={courseContext ?? null}
               onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
