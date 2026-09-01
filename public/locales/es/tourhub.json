@@ -891,7 +891,6 @@
     "leader": "LEADER",
     "tournament": "TOURNAMENT",
     "player": "PLAYER",
-    "andCoLead": "+{{count}}",
     "strip": {
       "startsIn": "EMPIEZA EN",
       "awaitingScores": "ESPERANDO RESULTADOS"

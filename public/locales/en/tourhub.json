@@ -1144,7 +1144,6 @@
     "leader": "LEADER",
     "tournament": "TOURNAMENT",
     "player": "PLAYER",
-    "andCoLead": "+{{count}}",
     "strip": {
       "startsIn": "STARTS IN",
       "awaitingScores": "AWAITING SCORES"
