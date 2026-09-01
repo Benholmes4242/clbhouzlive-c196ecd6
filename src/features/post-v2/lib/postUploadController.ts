@@ -165,6 +165,10 @@ async function runImage(job: InternalJob, item: StageMediaItem, displayOrder: nu
     throw new Error(result.error || 'Image upload failed');
   }
   job.perFile[item.id] = 100;
+  {
+    const known = job.bytesById[item.id];
+    if (known) job.bytesById[item.id] = { uploaded: known.total, total: known.total };
+  }
   uploadEventBus.emit('file:upload-progress', {
     type: 'file:upload-progress',
     jobId: ctx.jobId,
