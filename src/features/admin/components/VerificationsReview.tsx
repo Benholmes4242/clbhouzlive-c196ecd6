@@ -437,7 +437,7 @@ export function VerificationDetailBody({
       {/* PHASE 4 §1 — SIGNALS, not a proof field. The verdict states itself first. */}
       {row.type === 'business' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <BarVerdict claimed={resolved.claimed} />
+          <BarVerdict claimed={resolved.claimed} barMet={resolved.barMet} />
           {resolved.legacy && (
             <div style={{ fontSize: 12, color: t.inkMuted, lineHeight: 1.4 }}>
               Submitted before the signal model - signals below are inferred from the
