@@ -1668,7 +1668,6 @@
         "stablefordLabel": "[Stableford]",
         "stablefordShort": "[STABLEFORD]",
         "stablefordUnit": "[PTS]",
-        
         "railRounds": "ROUNDS",
         "railCourses": "COURSES",
         "railDays": "DAYS",
@@ -1694,6 +1693,7 @@
       "areaLabel": "Area",
       "scope": {
         "circle": "Your Circle",
+        "homeClub": "[Home Club]",
         "suggested": "Suggested",
         "top100": "Top 100",
         "played": "Played",

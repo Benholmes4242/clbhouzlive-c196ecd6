@@ -56,12 +56,17 @@ export const GOLF_WEEK_FETCH = 120;
 export type WeekScope =
   | 'worldwide'
   | 'circle'
+  | 'home_club'
   | 'handicap_band'
   | 'played'
   | 'top_100';
 export const WEEK_SCOPES: WeekScope[] = [
   'worldwide',
   'circle',
+  /* HOME CLUB sits with the relational scopes, directly after `circle` — your
+     club is the tightest circle a member has (BRIEF_HOME_CLUB_LENS §S3). It is
+     CONDITIONAL: see HOME_CLUB_MIN_MEMBERS and useAvailableWeekScopes. */
+  'home_club',
   'handicap_band',
   'played',
   'top_100',
@@ -106,17 +111,87 @@ export function useViewerHandicapIndex(userId: string | undefined) {
 }
 
 /**
+ * TWO DISTINCT MEMBERS, MINIMUM (BRIEF_HOME_CLUB_LENS §S1). A field of one is a
+ * mirror, not a leaderboard, and a club running two rounds a fortnight would
+ * blink the pill on and off between visits. The floor removes both cases at once
+ * and is NEVER lowered to make the pill appear more widely.
+ */
+export const HOME_CLUB_MIN_MEMBERS = 2;
+
+/** The viewer's canonical home club. `home_club` (free text) is never consulted. */
+export function useViewerHomeClubId(userId: string | undefined) {
+  const query = useQuery<string | null>({
+    queryKey: ['courseled', 'viewer-home-club', userId ?? null],
+    enabled: !!userId,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('primary_club_id')
+        .eq('id', userId as string)
+        .maybeSingle();
+      if (error || !data) return null;
+      return data.primary_club_id ?? null;
+    },
+  });
+  return { clubId: query.data ?? null, ready: !userId || !query.isPending };
+}
+
+/**
+ * THE CLUB FILTER. A PLAYER filter over the same fetched pool the other scopes
+ * filter — no second query for the rounds themselves (§S3). Includes the
+ * member's own rounds, as every scope does.
+ */
+export function filterToHomeClub(
+  rows: readonly CircleRoundRow[],
+  clubId: string | null,
+): CircleRoundRow[] {
+  if (!clubId) return [];
+  return rows.filter((r) => r.player_club_id === clubId);
+}
+
+/**
  * THE PILL LIST IS DERIVED, NEVER HARD-CODED (§S1.2). A member with no index
  * gets a five-pill row with no gap where the sixth would be — not a disabled
  * pill and not an empty scope.
  */
 export function useAvailableWeekScopes(userId: string | undefined) {
   const { index, ready } = useViewerHandicapIndex(userId);
-  const scopes = useMemo(
-    () => (index == null ? WEEK_SCOPES.filter((s) => s !== 'handicap_band') : WEEK_SCOPES),
-    [index],
-  );
-  return { scopes, viewerIndex: index, ready };
+  const { clubId, ready: clubReady } = useViewerHomeClubId(userId);
+
+  /* ONE SOURCE, ONE TRUTH (§S2, option A): the availability count reads the SAME
+     pool the lens filters — identical args to the board's worldwide read, so this
+     shares its cache rather than issuing a second query. */
+  const pool = useCircleLatestRounds(userId, {
+    scope: 'everyone',
+    windowDays: GOLF_WEEK_DAYS,
+    limit: GOLF_WEEK_FETCH,
+    oneRoundPerMember: false,
+    courseIds: null,
+  });
+
+  const homeClubMembers = useMemo(() => {
+    if (!clubId) return 0;
+    const members = new Set<string>();
+    for (const r of pool.data ?? []) if (r.player_club_id === clubId) members.add(r.user_id);
+    return members.size;
+  }, [pool.data, clubId]);
+
+  const homeClubAvailable = homeClubMembers >= HOME_CLUB_MIN_MEMBERS;
+
+  const scopes = useMemo(() => {
+    let list = WEEK_SCOPES;
+    if (index == null) list = list.filter((s) => s !== 'handicap_band');
+    if (!homeClubAvailable) list = list.filter((s) => s !== 'home_club');
+    return list;
+  }, [index, homeClubAvailable]);
+
+  return {
+    scopes,
+    viewerIndex: index,
+    homeClubId: clubId,
+    ready: ready && clubReady && !pool.isPending,
+  };
 }
 
 /**
@@ -224,11 +299,12 @@ export function useGolfThisWeek(
   /* THE FILTER LIVES HERE (§S4.2) so the rail and the see-all sheet band
      identically off one read. The band never widens itself when the result is
      thin (§S4.4) — an empty scope renders the ordinary empty sentence. */
-  const { viewerIndex } = useAvailableWeekScopes(userId);
+  const { viewerIndex, homeClubId } = useAvailableWeekScopes(userId);
   const data = useMemo(() => {
-    if (scope !== 'handicap_band') return query.data;
-    return filterToHandicapBand(query.data ?? [], viewerIndex);
-  }, [query.data, scope, viewerIndex]);
+    if (scope === 'handicap_band') return filterToHandicapBand(query.data ?? [], viewerIndex);
+    if (scope === 'home_club') return filterToHomeClub(query.data ?? [], homeClubId);
+    return query.data;
+  }, [query.data, scope, viewerIndex, homeClubId]);
 
   return { ...query, data } as typeof query;
 }

@@ -44,6 +44,13 @@ export interface CircleRoundRow {
   user_id: string;
   display_name: string;
   profile_photo_url: string | null;
+  /**
+   * The ROUND OWNER'S home club (user_profiles.primary_club_id) — canonical id,
+   * never the free-text `home_club` name, so two members who typed their club
+   * differently still match. Powers the HOME CLUB scope and its availability
+   * gate off ONE source (BRIEF_HOME_CLUB_LENS §S2, option A).
+   */
+  player_club_id: string | null;
   play_date: string; // ISO date (YYYY-MM-DD)
   course_name: string | null;
   /** Catalogue course id when the round is matched — drives course-led routing. */
@@ -420,11 +427,18 @@ export function useCircleLatestRounds(
       const surfacedUserIds = Array.from(new Set(rowsWindow.map((r) => r.user_id)));
       const { data: profiles } = await supabase
         .from('user_profiles')
-        .select('id, display_name, profile_photo_url')
+        .select('id, display_name, profile_photo_url, primary_club_id')
         .in('id', surfacedUserIds);
-      const profileById = new Map<string, { display_name: string | null; profile_photo_url: string | null }>();
-      for (const p of (profiles ?? []) as Array<{ id: string; display_name: string | null; profile_photo_url: string | null }>) {
-        profileById.set(p.id, { display_name: p.display_name, profile_photo_url: p.profile_photo_url });
+      const profileById = new Map<
+        string,
+        { display_name: string | null; profile_photo_url: string | null; primary_club_id: string | null }
+      >();
+      for (const p of (profiles ?? []) as Array<{ id: string; display_name: string | null; profile_photo_url: string | null; primary_club_id: string | null }>) {
+        profileById.set(p.id, {
+          display_name: p.display_name,
+          profile_photo_url: p.profile_photo_url,
+          primary_club_id: p.primary_club_id ?? null,
+        });
       }
 
 
@@ -628,6 +642,7 @@ export function useCircleLatestRounds(
           user_id: r.user_id,
           display_name: profile?.display_name ?? 'Player',
           profile_photo_url: profile?.profile_photo_url ?? null,
+          player_club_id: profile?.primary_club_id ?? null,
           play_date: r.play_date,
           course_name: r.course_name,
           course_id: r.course_id ?? null,

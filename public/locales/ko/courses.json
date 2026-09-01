@@ -1174,7 +1174,6 @@
         "stablefordLabel": "Stableford",
         "stablefordShort": "STABLEFORD",
         "stablefordUnit": "PTS",
-        
         "railRounds": "ROUNDS",
         "railCourses": "COURSES",
         "railDays": "DAYS",
@@ -1200,6 +1199,7 @@
       "areaLabel": "지역",
       "scope": {
         "circle": "내 서클",
+        "homeClub": "홈 클럽",
         "suggested": "추천",
         "top100": "톱 100",
         "played": "플레이한 코스",
