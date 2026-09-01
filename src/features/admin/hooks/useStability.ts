@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { currentBuildId } from '@/lib/buildFreshness';
 
 const DAY = 86_400_000;
 
@@ -12,6 +13,7 @@ export interface ErrorRow {
     message?: string;
     stack?: string;
     route?: string;
+    build_id?: string;
   } | null;
 }
 
@@ -32,6 +34,12 @@ export interface StabilityData {
   totalErrors: number;
   totalErrors7d: number;
   sessions7d: number;
+  /** Separated, not discarded — errors reported by clients on another build. */
+  outdatedErrors: number;
+  outdatedUsers: number;
+  outdatedErrors24h: number;
+  /** Distinct build ids seen in the 14d error window: the stuck-client count. */
+  distinctBuilds: number;
 }
 
 // 24h rolling count — feeds the Errors health chip.
@@ -40,10 +48,13 @@ export function useErrorCount24h() {
     queryKey: ['admin-v2', 'stability', 'count24h'],
     queryFn: async () => {
       const since = new Date(Date.now() - DAY).toISOString();
+      // Current build only. An old client's errors are a different fault and
+      // must not sit inside this chip.
       const { count, error } = await supabase
         .from('analytics_events')
         .select('id', { count: 'exact', head: true })
         .eq('name', 'app_error')
+        .eq('props->>build_id', currentBuildId())
         .gte('created_at', since);
       if (error) throw error;
       return count ?? 0;
@@ -84,7 +95,16 @@ export function useStabilityData() {
       if (errRes.error) throw errRes.error;
       if (sessRes.error) throw sessRes.error;
 
-      const errRows = (errRes.data ?? []) as ErrorRow[];
+      const allErrRows = (errRes.data ?? []) as ErrorRow[];
+      const build = currentBuildId();
+      // SEPARATE, DO NOT DISCARD: current-build rows drive every figure below;
+      // the rest are counted on their own line so a stuck client is visible
+      // rather than hidden inside the crash-free rate.
+      const errRows = allErrRows.filter((r) => r.props?.build_id === build);
+      const outdatedRows = allErrRows.filter((r) => r.props?.build_id !== build);
+      const distinctBuilds = new Set(
+        allErrRows.map((r) => r.props?.build_id ?? '(unlabelled)'),
+      ).size;
       const sessRows = (sessRes.data ?? []) as { user_id: string }[];
 
       // ── Crash-free sessions over 7d ─────────────────────────────
@@ -163,6 +183,12 @@ export function useStabilityData() {
         totalErrors: errRows.length,
         totalErrors7d: errIn7.length,
         sessions7d: denom,
+        outdatedErrors: outdatedRows.length,
+        outdatedUsers: new Set(outdatedRows.map((r) => r.user_id).filter(Boolean)).size,
+        outdatedErrors24h: outdatedRows.filter(
+          (r) => r.created_at >= new Date(now - DAY).toISOString(),
+        ).length,
+        distinctBuilds,
       };
     },
     staleTime: 60_000,

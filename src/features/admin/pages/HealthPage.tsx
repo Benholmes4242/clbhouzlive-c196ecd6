@@ -875,7 +875,15 @@ function ErrorsDetail({ ops }: { ops: ReturnType<typeof useOpsHealth> }) {
         <div style={{ ...FIG, color: t.ink, fontSize: 28, fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
           {e.errors_24h.toLocaleString()}
         </div>
-        <div style={{ color: t.inkMuted, fontSize: 12, fontWeight: 600 }}>in the last 24 hours</div>
+        <div style={{ color: t.inkMuted, fontSize: 12, fontWeight: 600 }}>in the last 24 hours, on this build</div>
+        {(e.outdated_errors_24h ?? 0) > 0 && (
+          <div style={{ color: t.inkFaint, fontSize: 12, fontWeight: 600 }}>
+            {e.outdated_errors_24h.toLocaleString()} error{e.outdated_errors_24h === 1 ? '' : 's'} from outdated clients
+            {(e.outdated_users_24h ?? 0) > 0
+              ? ` · ${e.outdated_users_24h.toLocaleString()} member${e.outdated_users_24h === 1 ? '' : 's'}`
+              : ''}
+          </div>
+        )}
       </div>
 
       <StatRow stats={[

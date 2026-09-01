@@ -141,6 +141,16 @@ export function OpsErrorsPanel({ data, loading }: { data?: OpsHealth; loading: b
               ? ` - ${num(e.users_hit_24h)} member${e.users_hit_24h === 1 ? '' : 's'} hit`
               : ''}
           </div>
+          {/* SEPARATED, NOT DISCARDED. A rising figure here means the update
+              mechanism is failing, not that the current build is worse. */}
+          {(e.outdated_errors_24h ?? 0) > 0 && (
+            <div style={{ ...LABEL, ...FIG, color: t.inkFaint }}>
+              {num(e.outdated_errors_24h)} error{e.outdated_errors_24h === 1 ? '' : 's'} from outdated clients
+              {(e.outdated_users_24h ?? 0) > 0
+                ? ` - ${num(e.outdated_users_24h)} member${e.outdated_users_24h === 1 ? '' : 's'}`
+                : ''}
+            </div>
+          )}
 
           {e.top.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
