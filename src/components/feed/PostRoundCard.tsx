@@ -199,7 +199,14 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
   let any = false;
   for (const h of holes) {
     if (h.played && h.gross != null && h.par != null) {
-      total += h.gross;
+      // MICRO_BRIEF_ROUND_CARD_GROSS_RECONCILIATION — THE NINE TOTALS READ THE
+      // SUBMITTED VALUE, the same figure the header's gross is the sum of. It
+      // used to read `gross` (the actual strokes), so a net-double-bogey cap on
+      // one hole made OUT + IN total a different round from the header 20px
+      // above. The CELLS below still print `gross`: the member sees the strokes
+      // they took, the totals state the round of record, and the faint
+      // played/adjusted line beneath the nines explains the gap.
+      total += h.adjGross ?? h.gross;
       par += h.par;
       any = true;
     }
@@ -213,6 +220,7 @@ const NineGrid: React.FC<{ label: string; holes: Hole[] }> = ({ label, holes }) 
         toPar={showTotals ? total - par : null}
         note={any && hasGap ? 'No total \u00B7 picked up' : null}
       />
+
 
       <div style={{ display: 'flex', gap: 3 }}>
         {holes.map((h) => (
