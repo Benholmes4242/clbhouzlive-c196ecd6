@@ -3,13 +3,13 @@
  * shareable, and it MUST render for a guest: a share that hits a login wall is
  * worthless. Nothing on this page reads the viewing member.
  *
- * The live tournament card is the point of the page: a story about a leader,
- * sitting above the live board that shows him leading.
+ * A story about an event carries that event's leaderboard strip between the
+ * standfirst and the first paragraph, so the reader starts already oriented.
  */
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
+import { ChevronLeft, Menu } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLogout } from '@/hooks/useLogout';
@@ -17,7 +17,8 @@ import { safeGoBack } from '@/utils/navigation';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { TourSideMenu } from '../components/TourSideMenu';
 
-import { useMoreFromTheWire, useStoryTournament, useTourStory, type TourStory } from './useTourStories';
+import { useMoreFromTheWire, useTourStory, type TourStory } from './useTourStories';
+import StoryLeaderboardStrip from './StoryLeaderboardStrip';
 import { StoryRow } from './NewsTab';
 import { StoryEngagementBlock } from '@/features/stories/StoryEngagementBlock';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
@@ -32,7 +33,6 @@ import {
   INK_FAINT,
   INK_MUTE,
   SLATE_50,
-  STATUS_LIVE,
 } from '../_shared/tokens';
 
 const TOUR_TAG: Record<string, string> = {
@@ -63,63 +63,6 @@ const KICKER: React.CSSProperties = {
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
 };
-
-function toParText(n: number | null): string {
-  if (n === null) return '';
-  if (n === 0) return 'E';
-  return n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`;
-}
-
-function LiveTournamentCard({ tournamentId }: { tournamentId: string }) {
-  const navigate = useNavigate();
-  const { t } = useTranslation('tourhub');
-  const { data } = useStoryTournament(tournamentId);
-  if (!data) return null;
-
-  const leader =
-    data.leaderName && data.leaderToPar !== null
-      ? data.leaderCount > 1
-        ? `${data.leaderName} ${t('news.andCoLead', { defaultValue: '+{{count}}', count: data.leaderCount - 1 })} ${toParText(data.leaderToPar)}`
-        : `${data.leaderName} ${toParText(data.leaderToPar)}`
-      : null;
-
-  return (
-    <button
-      type="button"
-      onClick={() => navigate(`/tourhub/tournament/${data.id}`)}
-      className="active:scale-[0.99]"
-      style={{
-        display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left',
-        marginTop: 22, padding: '14px 12px', cursor: 'pointer', fontFamily: FONT,
-        background: 'rgba(255,255,255,0.05)', border: `1px solid ${HAIRLINE_INK_10}`, borderRadius: 14,
-      }}
-    >
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {data.isLive && (
-            <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_LIVE, flexShrink: 0 }} />
-          )}
-          <span style={{ ...KICKER, color: data.isLive ? STATUS_LIVE : INK_FAINT }}>
-            {data.isLive
-              ? data.currentRound
-                ? t('news.liveRound', { defaultValue: 'LIVE \u00b7 ROUND {{n}}', n: data.currentRound })
-                : t('news.live', 'LIVE')
-              : t('news.tournament', 'TOURNAMENT')}
-          </span>
-        </div>
-        <div style={{ marginTop: 5, fontSize: 14.5, fontWeight: 700, color: INK, lineHeight: 1.25 }}>
-          {data.name}
-        </div>
-        {leader && (
-          <div style={{ marginTop: 3, fontSize: 12, color: INK_MUTE, fontVariantNumeric: 'tabular-nums' }}>
-            {leader}
-          </div>
-        )}
-      </div>
-      <ChevronRight size={16} color={INK_FAINT} strokeWidth={2.2} aria-hidden />
-    </button>
-  );
-}
 
 /**
  * StoryArticle — the story itself: lead image, headline, standfirst, the blocks
@@ -210,13 +153,18 @@ export function StoryArticle({ story, immersiveHero = false, tagLabel }: {
             {story.standfirst}
           </p>
         )}
+        {/* MICRO_BRIEF_STRIP_ON_STORY_PAGE — context before the read, not after
+            it. Self-contained: no event ⇒ nothing mounted, no space reserved. */}
+        {story.tournament_id && (
+          <div style={{ marginTop: 14 }}>
+            <StoryLeaderboardStrip tournamentId={story.tournament_id} />
+          </div>
+        )}
         {story.body_blocks.length > 0 && (
           <div style={{ marginTop: 12 }}>
             <StoryBody blocks={story.body_blocks} />
           </div>
         )}
-
-        {story.tournament_id && <LiveTournamentCard tournamentId={story.tournament_id} />}
       </div>
     </>
   );

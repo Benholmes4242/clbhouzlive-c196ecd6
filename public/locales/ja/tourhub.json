@@ -887,7 +887,6 @@
     "leader": "LEADER",
     "tournament": "TOURNAMENT",
     "player": "PLAYER",
-    "andCoLead": "+{{count}}",
     "strip": {
       "startsIn": "開始まで",
       "awaitingScores": "スコア待ち"
