@@ -23,7 +23,9 @@ import {
   type SystemDayState,
 } from '../hooks/useSystemStateHistory';
 import { useErrorCount24h } from '../hooks/useStability';
+import CronHealthCard from '../components/CronHealthCard';
 import { AuditLogTab, DevToolsTab, SettingsTab } from './SystemPage';
+
 import VideoPerfPage from './VideoPerfPage';
 import StabilityTab from './StabilityTab';
 
@@ -289,8 +291,10 @@ function StatusTab({
         </section>
       )}
 
+      <CronHealthCard />
       <AllSystemsPanel subsystems={subsystems} />
       <RecentChangesPanel subsystems={subsystems} />
+
     </div>
   );
 }
