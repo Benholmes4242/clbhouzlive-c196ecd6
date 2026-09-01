@@ -104,19 +104,17 @@ function Figure({
   delta,
   label,
   locale,
-  lead = false,
 }: {
   total: number;
   delta: number;
   label: string;
   locale: string;
-  lead?: boolean;
 }) {
   return (
     <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
       <div
         style={{
-          fontSize: lead ? 27 : 20,
+          fontSize: 27,
           fontWeight: 700,
           letterSpacing: '-0.03em',
           lineHeight: 1,
@@ -145,6 +143,9 @@ function Figure({
 }
 
 const AppDownloadGate: React.FC = () => {
+  const identityRef = React.useRef<HTMLDivElement>(null);
+  const headlineRef = React.useRef<HTMLHeadingElement>(null);
+  const [identityShift, setIdentityShift] = React.useState(0);
   const location = useLocation();
   const { t, i18n } = useTranslation('common');
   const locale = i18n.language || 'en';
@@ -196,6 +197,30 @@ const AppDownloadGate: React.FC = () => {
   // THE ZERO TRAP. An errored or empty RPC yields zeros — suppress the block.
   const figuresUsable = !reachError && !!reach && reach.coursesTotal > 0;
 
+  // Keep the complete identity lockup centred in the open space between the
+  // physical top of the viewport and the first line of the statement.
+  React.useLayoutEffect(() => {
+    const positionIdentity = () => {
+      const identity = identityRef.current;
+      const headline = headlineRef.current;
+      if (!identity || !headline) return;
+
+      const currentCenter = identity.getBoundingClientRect().top + identity.offsetHeight / 2;
+      const targetCenter = headline.getBoundingClientRect().top / 2;
+      setIdentityShift(Math.round(targetCenter - currentCenter));
+    };
+
+    positionIdentity();
+    const observer = new ResizeObserver(positionIdentity);
+    if (identityRef.current) observer.observe(identityRef.current);
+    if (headlineRef.current) observer.observe(headlineRef.current);
+    window.addEventListener('resize', positionIdentity);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', positionIdentity);
+    };
+  }, [headLines.join('|')]);
+
   return (
     <div
       style={{
@@ -222,11 +247,13 @@ const AppDownloadGate: React.FC = () => {
       >
         {/* ───────────────── band 1 — identity ───────────────── */}
         <div
+          ref={identityRef}
           style={{
             flex: '0 0 auto',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            transform: `translateY(${identityShift}px)`,
           }}
         >
           <img
@@ -264,6 +291,7 @@ const AppDownloadGate: React.FC = () => {
           }}
         >
           <h1
+            ref={headlineRef}
             style={{
               margin: 0,
               fontSize: 28,
@@ -296,7 +324,6 @@ const AppDownloadGate: React.FC = () => {
                 }}
               >
                 <Figure
-                  lead
                   total={reach.coursesTotal}
                   delta={reach.coursesDelta}
                   locale={locale}
