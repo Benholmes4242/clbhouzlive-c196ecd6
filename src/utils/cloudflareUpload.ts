@@ -11,7 +11,14 @@ export interface CloudflareUploadResult {
 export const uploadToCloudflareR2 = async (
   file: File,
   bucketType: 'clbhouz-profile-images' | 'clbhouz-profile-banners' | 'clbhouz-post-images' | 'clbhouz-course-images' | 'clbhouz-review-images' | 'clbhouz-club-logos' | 'clbhouz-system-assets',
-  originalFileName?: string
+  originalFileName?: string,
+  /**
+   * BRIEF_UPLOAD_PROGRESS S1 — optional byte-level progress. Present because
+   * supabase.functions.invoke is fetch-based and cannot report upload
+   * progress; the transport below is XHR for exactly this reason. Optional so
+   * every existing caller is untouched.
+   */
+  onProgress?: (bytesUploaded: number, bytesTotal: number) => void,
 ): Promise<CloudflareUploadResult> => {
   try {
     console.log('[UPLOAD/R2] begin', {
