@@ -446,6 +446,10 @@ export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
 
   if (!ready) {
     const threshold = gate?.threshold ?? 200;
+    // A null count from a course with no rounds is zero, never NaN.
+    const lowRows = gate?.min_low_rows ?? 0;
+    const highRows = gate?.min_high_rows ?? 0;
+    const highRounds = Math.max(1, Math.round(highRows / 18));
     return (
       <Panel kicker="Stroke index check" aside="Locked" style={CARD}>
         <div style={{ ...BIZ_TITLE, marginBottom: 8 }}>We will not rank your stroke index on this sample</div>
@@ -459,8 +463,8 @@ export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
             <div style={{ ...BIZ_LABEL, marginBottom: 10 }}>What we hold on your thinnest hole</div>
             <div style={{ display: 'flex', gap: 22 }}>
               {[
-                { label: 'Lower handicaps', value: gate.min_low_rows },
-                { label: 'Higher handicaps', value: gate.min_high_rows },
+                { label: 'Lower handicaps', value: lowRows },
+                { label: 'Higher handicaps', value: highRows },
                 { label: 'Needed, each', value: threshold },
               ].map((s) => (
                 <div key={s.label}>
@@ -475,11 +479,9 @@ export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
         )}
         <Body style={{ marginTop: 12 }}>
           {gate
-            ? `Your higher-handicap side stands at ${fmt(gate.min_high_rows)} hole ${
-                gate.min_high_rows === 1 ? 'row' : 'rows'
-              } on the thinnest hole — roughly ${Math.max(1, Math.round(gate.min_high_rows / 18))} ${
-                Math.round(gate.min_high_rows / 18) === 1 ? 'round' : 'rounds'
-              }. We need ${fmt(threshold)} on every hole in both bands before we will put a recommendation in front of your handicap secretary.`
+            ? `Your higher-handicap side stands at ${fmt(highRows)} hole ${
+                highRows === 1 ? 'row' : 'rows'
+              } on the thinnest hole — roughly ${highRounds} ${highRounds === 1 ? 'round' : 'rounds'}. We need ${fmt(threshold)} on every hole in both bands before we will put a recommendation in front of your handicap secretary.`
             : `We need ${fmt(threshold)} hole rows in each handicap band, on every hole, before we will put a recommendation in front of your handicap secretary.`}{' '}
           Every higher-handicap member who connects to clbhouz moves that number, and they are the members this
           measurement is waiting on.
