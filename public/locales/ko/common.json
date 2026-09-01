@@ -432,5 +432,29 @@
     "viewComment": "댓글 1개 보기",
     "viewComments": "댓글 {{count}}개 모두 보기",
     "guestPrompt": "clbhouz에 가입하고 대화를 확인하세요"
+  },
+  "gate": {
+    "head": {
+      "line1": "당신이 치는 모든 라운드.",
+      "line2": "당신이 찾는 모든 코스.",
+      "invite": "{{name}}님이 초대했습니다",
+      "inviteAnon": "초대를 받았습니다",
+      "profile": "clbhouz의 {{name}}"
+    },
+    "sub": {
+      "default": "코스는 실제로 플레이된 라운드로 측정되고, 당신의 골프는 홀마다 그 기준과 비교해 읽힙니다.",
+      "invite": "두 사람이 치는 모든 라운드를 같은 코스 기준으로 측정합니다.",
+      "profile": "핸디캡, 최근 흐름, 그리고 플레이한 모든 코스."
+    },
+    "figures": {
+      "courses": "코스",
+      "rounds": "기록된 라운드",
+      "reviews": "코스 리뷰",
+      "note": "플랫폼 실시간 수치입니다. 초록색은 최근 30일입니다."
+    },
+    "appStore": "App Store에서 clbhouz 받기",
+    "playSoon": "Google Play 출시 예정",
+    "terms": "이용약관",
+    "privacy": "개인정보"
   }
 }

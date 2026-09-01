@@ -739,5 +739,29 @@
     "viewComment": "[View 1 comment]",
     "viewComments": "[View all {{count}} comments]",
     "guestPrompt": "[Join clbhouz to see the discussion]"
+  },
+  "gate": {
+    "head": {
+      "line1": "Every round you play.",
+      "line2": "Every course you visit.",
+      "invite": "{{name}} invited you",
+      "inviteAnon": "You have been invited",
+      "profile": "{{name}} on clbhouz"
+    },
+    "sub": {
+      "default": "Courses measured from the rounds actually played on them, and your golf read hole by hole against them.",
+      "invite": "Every round you both play, measured on the same courses.",
+      "profile": "Their index, their form, and every course they have played."
+    },
+    "figures": {
+      "courses": "Courses",
+      "rounds": "Rounds tracked",
+      "reviews": "Course reviews",
+      "note": "Live from the platform. Green is the last 30 days."
+    },
+    "appStore": "Download clbhouz on the App Store",
+    "playSoon": "Coming soon to Google Play",
+    "terms": "Terms",
+    "privacy": "Privacy"
   }
 }

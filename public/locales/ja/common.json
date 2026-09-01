@@ -432,5 +432,29 @@
     "viewComment": "コメントを1件表示",
     "viewComments": "{{count}}件のコメントをすべて表示",
     "guestPrompt": "clbhouz に参加してコメントを見る"
+  },
+  "gate": {
+    "head": {
+      "line1": "プレーしたすべてのラウンド。",
+      "line2": "訪れたすべてのコース。",
+      "invite": "{{name}}さんからの招待です",
+      "inviteAnon": "招待が届いています",
+      "profile": "clbhouz の {{name}}"
+    },
+    "sub": {
+      "default": "コースは実際にプレーされたラウンドから評価され、あなたのゴルフは1ホールずつそれと比べて読み解かれます。",
+      "invite": "二人がプレーするすべてのラウンドを、同じコース基準で測ります。",
+      "profile": "ハンディキャップ、調子、そしてプレーしたすべてのコース。"
+    },
+    "figures": {
+      "courses": "コース",
+      "rounds": "記録ラウンド",
+      "reviews": "コースレビュー",
+      "note": "プラットフォームからのライブ数値。緑は直近30日間です。"
+    },
+    "appStore": "App Store で clbhouz をダウンロード",
+    "playSoon": "Google Play で近日公開",
+    "terms": "利用規約",
+    "privacy": "プライバシー"
   }
 }
