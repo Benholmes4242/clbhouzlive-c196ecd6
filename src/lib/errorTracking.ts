@@ -13,6 +13,7 @@
 //        route; never include user content.
 //   SR5  No behaviour change when no error occurs — this module only listens.
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { currentBuildId } from '@/lib/buildFreshness';
 
 const MAX_MSG = 200;
 const MAX_STACK = 400;
@@ -72,11 +73,14 @@ export function trackError(input: {
         typeof window !== 'undefined' ? window.location.pathname : '';
 
       // Fire-and-forget — analyticsEvents.track already swallows internally.
+      // build_id — every reported error names the build that produced it, so
+      // the stability surface can separate stale clients from real regressions.
       analyticsEvents.track('app_error', {
         kind: input.kind,
         message,
         stack,
         route,
+        build_id: currentBuildId(),
       });
     } finally {
       tracking = false;
