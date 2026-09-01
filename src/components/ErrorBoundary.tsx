@@ -37,6 +37,25 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // THE ONE CASE WORTH RELOADING WITHOUT ASKING.
+    // A failed dynamic import means this bundle is already broken: the member
+    // is staring at a blank or half-rendered route, so there is no input to
+    // lose. Reload once, guarded by a session flag so a genuinely missing
+    // chunk cannot loop.
+    try {
+      const msg = String(error?.message ?? '');
+      const isChunk =
+        msg.includes('Failed to fetch dynamically imported module') ||
+        msg.includes('Importing a module script failed') ||
+        msg.includes('ChunkLoadError') ||
+        msg.includes('Loading chunk');
+      if (isChunk && sessionStorage.getItem('chunk_reload_done') !== '1') {
+        sessionStorage.setItem('chunk_reload_done', '1');
+        window.location.reload();
+        return;
+      }
+    } catch { /* never let recovery throw */ }
+
     console.error('[ErrorBoundary] Caught error:', {
       error,
       errorInfo,

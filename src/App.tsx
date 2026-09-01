@@ -56,6 +56,7 @@ import { PostEventsBridge } from '@/events/PostEventsBridge';
 import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
 import { PendingPostsController } from '@/uploads/PendingPostsController';
 import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
+import UpdateReadyBar from '@/components/system/UpdateReadyBar';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { GlobalPostComposer } from '@/components/post-composer/GlobalPostComposer';
 import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
@@ -1138,6 +1139,7 @@ const App: React.FC = () => {
                           <UploadToastsBridge />
                           <PendingPostsController />
                           <UploadProgressBanner />
+                          <UpdateReadyBar />
                           <AppInner />
                         </PostEventsBridge>
                       </RehydrationProvider>
