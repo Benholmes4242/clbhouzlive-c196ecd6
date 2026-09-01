@@ -1,18 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { TourStory } from './useTourStories';
 import { StoryRelativeTime } from './StoryImageText';
 import { AMBER, FONT, INK, INK_MUTE, INK_SOFT } from '../_shared/tokens';
 import { SLAB } from '@/components/feed/feedSurfaces';
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
+import useContentReactions from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
+import type { StoryBeat } from '@/components/feed/injectWireStories';
 
-export function WireFeedSlide({ story }: { story: TourStory }) {
+/**
+ * A FEED CARD IS AN OBJECT YOU ACT ON, so the slide carries a live heart and a
+ * live comment glyph — unlike the news list rows, where the row itself is
+ * navigation. One slide, two beats: `beat` drives the route, the eyebrow, and
+ * the engagement target type.
+ */
+export function WireFeedSlide({ story, beat = 'tour' }: { story: TourStory; beat?: StoryBeat }) {
   const { t } = useTranslation('tourhub');
+  const { t: tc } = useTranslation('common');
   const navigate = useNavigate();
-  const openStory = () => navigate(`/tour/news/${story.slug}`);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const targetType = beat === 'amateur' ? ('amateur_story' as const) : ('tour_story' as const);
+  const openStory = () =>
+    navigate(beat === 'amateur' ? `/discover/news/${story.slug}` : `/tour/news/${story.slug}`);
+
+  const { stateFor, toggle, unavailable, viewerId } = useContentReactions([
+    { type: targetType, id: story.id },
+  ]);
+  const like = stateFor(targetType, story.id);
+  const { engagementFor } = useStoryEngagement(targetType, [story.id]);
+  const commentCount = engagementFor(story.id).commentCount;
+  const signedIn = !!viewerId;
 
   return (
-    <article style={{ height: 341, background: SLAB, fontFamily: FONT }} data-wire-slide>
+    <article style={{ height: 341, background: SLAB, fontFamily: FONT }} data-wire-slide data-wire-beat={beat}>
       <button
         type="button"
         onClick={openStory}
@@ -21,7 +46,7 @@ export function WireFeedSlide({ story }: { story: TourStory }) {
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 14px' }}>
           <span style={{ minWidth: 0, color: AMBER, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.2 }}>
-            {t('news.fromWire')}
+            {beat === 'amateur' ? t('news.amateurNews') : t('news.fromWire')}
           </span>
           <StoryRelativeTime at={story.published_at} />
         </div>
@@ -45,11 +70,44 @@ export function WireFeedSlide({ story }: { story: TourStory }) {
           <div style={{ height: 41 }}>
             {story.standfirst && <p style={{ margin: 0, color: INK_MUTE, fontSize: 14, lineHeight: 1.45, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{story.standfirst}</p>}
           </div>
-          <div style={{ marginTop: story.standfirst ? 12 : 0, color: INK_SOFT, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.2 }}>
-            {t('news.readStory')}
+          <div style={{ marginTop: story.standfirst ? 12 : 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <span style={{ color: INK_SOFT, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.2 }}>
+              {t('news.readStory')}
+            </span>
+            {/* Both controls stopPropagation, so a like never navigates. */}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 18, flexShrink: 0 }}>
+              <ReactionAction
+                count={like.count}
+                reacted={like.mine}
+                onToggle={() => toggle(targetType, story.id)}
+                label={like.mine ? tc('story.unlikeAria') : tc('story.likeAria')}
+                readOnly={!signedIn}
+                hidden={unavailable}
+                size={16}
+                figureSize={12.5}
+              />
+              {signedIn && (
+                <CommentAction
+                  count={commentCount}
+                  onOpen={() => setSheetOpen(true)}
+                  label={tc('story.commentsAria')}
+                  size={16}
+                  figureSize={12.5}
+                />
+              )}
+            </span>
           </div>
         </div>
       </button>
+
+      {signedIn && (
+        <CommentsSheetV2
+          isOpen={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          targetType={targetType}
+          targetId={story.id}
+        />
+      )}
     </article>
   );
 }

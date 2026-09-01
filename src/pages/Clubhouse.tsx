@@ -38,6 +38,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useTourStories } from '@/features/tourhub/news/useTourStories';
+import { useAmateurStories } from '@/features/amateur/news/useAmateurStories';
 import { injectWireStories } from '@/components/feed/injectWireStories';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
@@ -184,6 +185,9 @@ const ClubhouseContent = () => {
   // below and never enter the RPC or ranking pipeline.
   const activeFeed = useSuggestedFeed(user?.id);
   const wireQuery = useTourStories(null);
+  // Same hook and query key ('amateur-stories','list') the news surfaces use, so
+  // the feed shares their cache and costs no extra fetch.
+  const amateurQuery = useAmateurStories(null);
 
   /**
    * Batch-idiom scope for this surface (src/lib/queryKeys.ts). What the list
@@ -195,8 +199,13 @@ const ClubhouseContent = () => {
   // Reversible editorial injection: remove this one call and pass `posts`
   // directly to CardFeed to restore a social-only Clubhouse feed.
   const feedItems = useMemo(
-    () => injectWireStories(posts, wireQuery.isError ? [] : wireQuery.stories),
-    [posts, wireQuery.isError, wireQuery.stories],
+    () =>
+      injectWireStories(
+        posts,
+        wireQuery.isError ? [] : wireQuery.stories,
+        amateurQuery.isError ? [] : amateurQuery.stories,
+      ),
+    [posts, wireQuery.isError, wireQuery.stories, amateurQuery.isError, amateurQuery.stories],
   );
 
   // C1 — batched course data for the whole visible page. ONE rpc call for all

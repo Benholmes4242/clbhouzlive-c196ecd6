@@ -871,6 +871,7 @@
   "news": {
     "masthead": "THE WIRE",
     "allStories": "ALL STORIES",
+    "amateurNews": "아마추어 뉴스",
     "fromWire": "FROM THE WIRE",
     "readStory": "READ THE STORY",
     "updated": "Updated {{time}}",
