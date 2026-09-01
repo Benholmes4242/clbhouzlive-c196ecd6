@@ -65,8 +65,8 @@ const KICKER: React.CSSProperties = {
 };
 
 /**
- * StoryArticle — the story itself: lead image, headline, standfirst, the blocks
- * and the live tournament card. Extracted from the page so the ADMIN PREVIEW can
+ * StoryArticle — the story itself: lead image, headline, standfirst, the event
+ * strip and the blocks. Extracted from the page so the ADMIN PREVIEW can
  * render the REAL article rather than an approximation of it. If the preview and
  * the live page could disagree, the preview would be worthless.
  *
