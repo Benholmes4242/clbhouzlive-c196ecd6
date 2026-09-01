@@ -154,13 +154,28 @@ export function resolveSignals(row: VerificationRow): {
   if (presenceKind) presenceEvidence.push({ label: 'Kind', value: PRESENCE_KIND_LABEL[presenceKind] ?? presenceKind });
   if (presenceValue) presenceEvidence.push({ label: 'Evidence', value: presenceValue, href: href(presenceValue, presenceKind ?? undefined) });
 
+  /**
+   * §1 — for a hardened row the FLOW already decided. The drawer shows that
+   * decision; it does not reach its own. Legacy and pre-hardening rows keep
+   * today's inference untouched.
+   */
+  const domainState: SignalState = hardened
+    ? stated(domainMeta, domainClaimed)
+    : domainPass ? 'pass' : 'not_claimed';
+  const documentState: SignalState = hardened
+    ? stated(documentMeta, documentClaimed)
+    : documentPass ? 'pass' : 'not_claimed';
+  const presenceState: SignalState = hardened
+    ? stated(presenceMeta, presenceClaimed)
+    : presencePass ? 'pass' : 'not_claimed';
+
   const signals: ResolvedSignal[] = [
     {
       key: 'domain',
       label: LABELS.domain,
-      state: domainPass ? 'pass' : 'not_claimed',
+      state: domainState,
       evidence: domainClaimed ? domainEvidence : [],
-      caveat: !domainPass && domainClaimed
+      caveat: domainState !== 'pass' && domainClaimed
         ? freeProvider
           ? 'Claimed, but the address is on a free mailbox provider — not a domain signal.'
           : !otpConfirmed
@@ -171,33 +186,40 @@ export function resolveSignals(row: VerificationRow): {
     {
       key: 'document',
       label: LABELS.document,
-      state: documentPass ? 'pass' : 'not_claimed',
+      state: documentState,
       evidence: documentClaimed ? documentEvidence : [],
       documentPath: docPath ?? undefined,
-      caveat: !documentPass && documentClaimed ? 'Claimed, but no file was uploaded.' : undefined,
+      caveat: documentState !== 'pass' && documentClaimed ? 'Claimed, but no file was uploaded.' : undefined,
     },
     {
       key: 'presence',
       label: LABELS.presence,
-      state: presencePass ? 'pass' : 'not_claimed',
+      state: presenceState,
       evidence: presenceClaimed ? presenceEvidence : [],
-      caveat: !presencePass && presenceClaimed ? 'Claimed, but no evidence was given.' : undefined,
+      caveat: presenceState !== 'pass' && presenceClaimed ? 'Claimed, but no evidence was given.' : undefined,
     },
   ];
 
   return {
     signals,
-    claimed: { domain: domainPass, document: documentPass, presence: presencePass },
+    /** §2 — PROVIDED signals, never merely claimed ones. */
+    claimed: {
+      domain: domainState === 'pass',
+      document: documentState === 'pass',
+      presence: presenceState === 'pass',
+    },
     legacy,
+    barMet: hardened && typeof meta.bar_met === 'boolean' ? (meta.bar_met as boolean) : null,
   };
 }
 
 /** §1.2 — the verdict, before the decision. Same arithmetic the applicant saw. */
-export function BarVerdict({ claimed }: { claimed: ClaimedSignals }) {
+export function BarVerdict({ claimed, barMet }: { claimed: ClaimedSignals; barMet?: boolean | null }) {
   const { met } = evaluateBar(claimed);
   const passing = (Object.keys(claimed) as SignalKey[]).filter((k) => claimed[k]);
   const names = passing.map((k) => LABELS[k].toLowerCase());
   const summary = names.length ? names.join(' + ') : 'no signals';
+  const shortfall = (Object.keys(claimed) as SignalKey[]).filter((k) => !claimed[k]).map((k) => LABELS[k].toLowerCase());
 
   return (
     <div
@@ -212,6 +234,13 @@ export function BarVerdict({ claimed }: { claimed: ClaimedSignals }) {
       <div style={{ fontSize: 13, fontWeight: 700, color: met ? t.okText : t.warnText, lineHeight: 1.35 }}>
         {met ? 'Meets the bar' : 'Below the bar'} — {summary}
       </div>
+      {/* §3 — what the flow recorded when the request arrived. Information, not a gate. */}
+      {barMet === false && (
+        <div style={{ fontSize: 12, fontWeight: 600, color: t.warnText, marginTop: 4, lineHeight: 1.4 }}>
+          Below the bar when it was submitted — missing {shortfall.length ? shortfall.join(' and ') : 'evidence'}.
+          The member was told, and submitted anyway.
+        </div>
+      )}
       {!met && (
         <div style={{ fontSize: 12, color: t.warnText, opacity: 0.9, marginTop: 3, lineHeight: 1.4 }}>
           Two signals are required, one of them domain or document. This is not an
