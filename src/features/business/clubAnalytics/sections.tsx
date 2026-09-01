@@ -45,7 +45,7 @@ const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 /** A share below PCT_MIN_N is an absolute, not a percentage. */
 function share(count: number, total: number): string {
-  if (total < PCT_MIN_N) return count.toLocaleString();
+  if (total < PCT_MIN_N) return fmt(count);
   const pct = (count / total) * 100;
   if (count === 0) return '0%';
   return pct >= 1 ? `${Math.round(pct)}%` : `${pct.toFixed(1)}%`;
@@ -86,7 +86,10 @@ const Body: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }>
   <p style={{ ...BIZ_BODY, margin: 0, ...style }}>{children}</p>
 );
 
-const roundsLabel = (n: number) => `${n.toLocaleString()} ${n === 1 ? 'round' : 'rounds'}`;
+/** ONE WAY OF FORMATTING A COUNT. A null cannot find a gap (§1). */
+const fmt = (v: number | null | undefined) => (v ?? 0).toLocaleString();
+
+const roundsLabel = (n: number | null | undefined) => `${fmt(n)} ${n === 1 ? 'round' : 'rounds'}`;
 
 /* ─────────────────── THE THREE-FIGURE STRIP ─────────────────── */
 
@@ -170,7 +173,7 @@ export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({
   <SiLadder
     ladder={buildSiLadder(data.holes ?? [], data.complete_rounds)}
     voice="club"
-    basis={`${(data.complete_rounds ?? 0).toLocaleString()} full rounds`}
+    basis={`${fmt(data.complete_rounds)} full rounds`}
     style={CARD}
   />
 );
@@ -191,8 +194,8 @@ export const SampleSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
     <Panel kicker="The sample" style={CARD}>
       <StatStrip
         cells={[
-          { figure: data.members.toLocaleString(), label: data.members === 1 ? 'Member' : 'Members' },
-          { figure: data.rounds.toLocaleString(), label: data.rounds === 1 ? 'Round' : 'Rounds' },
+          { figure: fmt(data.members), label: data.members === 1 ? 'Member' : 'Members' },
+          { figure: fmt(data.rounds), label: data.rounds === 1 ? 'Round' : 'Rounds' },
           { figure: sinceYear ?? '—', label: 'Since' },
         ]}
       />
@@ -202,7 +205,7 @@ export const SampleSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
         gets — each one adds rounds to every figure below, and to the stroke index check.
       </Body>
       <Body style={{ marginTop: 10, fontSize: 12, color: A.DIM }}>
-        {data.complete_rounds.toLocaleString()} of those rounds carry all 18 holes, and hole figures are taken from
+        {fmt(data.complete_rounds)} of those rounds carry all 18 holes, and hole figures are taken from
         those. {data.avg_gross != null ? `The mean 18-hole gross returned here is ${data.avg_gross}.` : ''}
       </Body>
     </Panel>
@@ -243,7 +246,7 @@ const DistributionStrip: React.FC<{ counts: number[]; total: number }> = ({ coun
         <span key={t.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <i style={{ width: 7, height: 7, borderRadius: 2, background: t.colour, flexShrink: 0 }} />
           <span style={{ ...LABEL, fontSize: 9 }}>{t.label}</span>
-          <span style={bizFigure(12, A.INK)}>{(counts[i] ?? 0).toLocaleString()}</span>
+          <span style={bizFigure(12, A.INK)}>{fmt(counts[i])}</span>
           <span style={bizFigure(11, A.DIM)}>{share(counts[i] ?? 0, total)}</span>
         </span>
       ))}
@@ -284,7 +287,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
   return (
     <Panel
       kicker="Hole by hole"
-      aside={`${data.complete_rounds.toLocaleString()} full rounds`}
+      aside={`${fmt(data.complete_rounds)} full rounds`}
       subline="Your declared stroke index beside the position each hole actually plays in, 1 being the hardest."
       style={CARD}
     >
@@ -386,7 +389,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
               <div style={{ paddingBottom: 10 }}>
                 <Inset style={{ padding: 12 }}>
                   <div style={{ ...LABEL, fontSize: 9, marginBottom: 10 }}>
-                    Hole {h.hole_no} · {holeTotal.toLocaleString()} rounds
+                    Hole {h.hole_no} · {fmt(holeTotal)} rounds
                   </div>
                   <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: A.TRACK }}>
                     {SPLIT_TIERS.map((tier) => {
@@ -400,7 +403,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
                       <span key={tier.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                         <i style={{ width: 7, height: 7, borderRadius: 2, background: tier.colour, flexShrink: 0 }} />
                         <span style={{ ...LABEL, fontSize: 9 }}>{tier.label}</span>
-                        <span style={bizFigure(12, A.INK)}>{(h[tier.key] ?? 0).toLocaleString()}</span>
+                        <span style={bizFigure(12, A.INK)}>{fmt(h[tier.key])}</span>
                       </span>
                     ))}
                   </div>
@@ -413,7 +416,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
 
       <Body style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
         SI is the stroke index your card declares. Rank is where the hole sits on mean strokes over par across
-        {` ${data.complete_rounds.toLocaleString()} `}
+        {` ${fmt(data.complete_rounds)} `}
         full rounds. Tap a hole for its own split. A dash means we hold no figure for that hole.
       </Body>
     </Panel>
@@ -462,7 +465,7 @@ export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
               ].map((s) => (
                 <div key={s.label}>
                   <div style={bizFigure(19, s.value < threshold ? TOPAR_RED : A.INK)}>
-                    {s.value.toLocaleString()}
+                    {fmt(s.value)}
                   </div>
                   <div style={{ ...LABEL, marginTop: 4 }}>{s.label}</div>
                 </div>
@@ -472,12 +475,12 @@ export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
         )}
         <Body style={{ marginTop: 12 }}>
           {gate
-            ? `Your higher-handicap side stands at ${gate.min_high_rows.toLocaleString()} hole ${
+            ? `Your higher-handicap side stands at ${fmt(gate.min_high_rows)} hole ${
                 gate.min_high_rows === 1 ? 'row' : 'rows'
               } on the thinnest hole — roughly ${Math.max(1, Math.round(gate.min_high_rows / 18))} ${
                 Math.round(gate.min_high_rows / 18) === 1 ? 'round' : 'rounds'
-              }. We need ${threshold.toLocaleString()} on every hole in both bands before we will put a recommendation in front of your handicap secretary.`
-            : `We need ${threshold.toLocaleString()} hole rows in each handicap band, on every hole, before we will put a recommendation in front of your handicap secretary.`}{' '}
+              }. We need ${fmt(threshold)} on every hole in both bands before we will put a recommendation in front of your handicap secretary.`
+            : `We need ${fmt(threshold)} hole rows in each handicap band, on every hole, before we will put a recommendation in front of your handicap secretary.`}{' '}
           Every higher-handicap member who connects to clbhouz moves that number, and they are the members this
           measurement is waiting on.
         </Body>
@@ -489,7 +492,7 @@ export const StrokeIndexSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
   return (
     <Panel
       kicker="Stroke index check"
-      aside={`${data.complete_rounds.toLocaleString()} full rounds`}
+      aside={`${fmt(data.complete_rounds)} full rounds`}
       subline="Where a higher handicapper needs the shot most, measured against the index your card declares."
       style={CARD}
     >
@@ -587,7 +590,7 @@ export const ScoringSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }
       : `No ${absentNames.length === 1 ? absentNames[0] : `${absentNames.slice(0, -1).join(', ')} or ${absentNames[absentNames.length - 1]}`} recorded here yet.`;
 
   return (
-    <Panel kicker="What gets made here" aside={`${total.toLocaleString()} holes`}
+    <Panel kicker="What gets made here" aside={`${fmt(total)} holes`}
       subline="Every scored hole on your course, worst to best." style={CARD}>
       <Inset>
         <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: A.TRACK }}>
@@ -607,7 +610,7 @@ export const ScoringSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }
                     <span style={{ fontSize: 12.5, fontWeight: 600, color: A.BODY }}>{r.label}</span>
                   </span>
                   <span style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                    <span style={bizFigure(15, A.INK)}>{r.count.toLocaleString()}</span>
+                    <span style={bizFigure(15, A.INK)}>{fmt(r.count)}</span>
                     <span style={{ fontSize: 11.5, fontWeight: 600, color: A.DIM, minWidth: 34, textAlign: 'right' }}>
                       {share(r.count, total)}
                     </span>
@@ -668,10 +671,10 @@ export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChamp
   }
 
   const cells: { label: string; value: string }[] = [];
-  if (birdies?.value != null) cells.push({ label: 'Most birdies here', value: birdies.value.toLocaleString() });
-  if (stableford?.value != null) cells.push({ label: 'Best Stableford', value: stableford.value.toLocaleString() });
-  if (holders != null) cells.push({ label: holders === 1 ? 'Holder, all time' : 'Holders, all time', value: holders.toLocaleString() });
-  if (since != null) cells.push({ label: 'Rounds since', value: since.toLocaleString() });
+  if (birdies?.value != null) cells.push({ label: 'Most birdies here', value: fmt(birdies.value) });
+  if (stableford?.value != null) cells.push({ label: 'Best Stableford', value: fmt(stableford.value) });
+  if (holders != null) cells.push({ label: holders === 1 ? 'Holder, all time' : 'Holders, all time', value: fmt(holders) });
+  if (since != null) cells.push({ label: 'Rounds since', value: fmt(since) });
 
   // The "has stood since" story belongs to whichever record is actually old —
   // derived from attained_at, never assumed.
@@ -784,7 +787,7 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
   return (
     <Panel
       kicker="Your tees"
-      aside={`${totalRounds.toLocaleString()} rounds`}
+      aside={`${fmt(totalRounds)} rounds`}
       subline={
         tees.length === 1
           ? 'Every measured round was played off one yardage.'
@@ -805,7 +808,7 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
                   <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8 }}>
                     <span style={bizFigure(13, parts?.tone ?? A.INK)}>{parts?.text ?? '0'}</span>
                     <span style={{ fontSize: 11.5, fontWeight: 600, color: A.DIM }}>
-                      {t.rounds.toLocaleString()}
+                      {fmt(t.rounds)}
                     </span>
                   </span>
                 </div>
@@ -820,7 +823,7 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
                   />
                 </div>
                 <div style={{ fontSize: 12, fontWeight: 600, color: A.BODY, marginTop: 7 }}>
-                  {who ?? `Mix not available — ${(t.with_index ?? 0).toLocaleString()} indexed rounds`}
+                  {who ?? `Mix not available — ${fmt(t.with_index)} indexed rounds`}
                   {t.mean_index != null && who ? ` · mean index ${t.mean_index.toFixed(1)}` : ''}
                 </div>
               </div>
@@ -901,7 +904,7 @@ export const SeasonalitySection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
   const partialYear = years.find((y) => y.partial);
 
   return (
-    <Panel kicker="When your course plays" aside={`${total.toLocaleString()} rounds`} style={CARD}>
+    <Panel kicker="When your course plays" aside={`${fmt(total)} rounds`} style={CARD}>
       <div style={{ ...BIZ_LABEL, marginBottom: 8 }}>Across the year</div>
       <Inset>
         <BarRow labels={MONTHS.map((m) => m[0])} values={values} />
@@ -972,7 +975,7 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
   return (
     <Panel
       kicker="Who plays here"
-      aside={`${total.toLocaleString()} rounds`}
+      aside={`${fmt(total)} rounds`}
       subline="The handicap index each player held at the time of the round, not the index they hold today."
       style={CARD}
     >
@@ -983,7 +986,7 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
                 <span style={{ fontSize: 12.5, fontWeight: 600, color: A.BODY }}>{b.label}</span>
                 <span style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                  <span style={bizFigure(15, A.INK)}>{b.rounds.toLocaleString()}</span>
+                  <span style={bizFigure(15, A.INK)}>{fmt(b.rounds)}</span>
                   <span style={{ fontSize: 11.5, fontWeight: 600, color: A.DIM, minWidth: 34, textAlign: 'right' }}>
                     {share(b.rounds, total)}
                   </span>
@@ -996,7 +999,7 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
               </div>
               {/* A BAND WITH 400 ROUNDS FROM 2 MEMBERS IS NOT 400 GOLFERS. */}
               <div style={{ ...LABEL, fontSize: 10, marginTop: 5 }}>
-                {b.members.toLocaleString()} {b.members === 1 ? 'member' : 'members'}
+                {fmt(b.members)} {b.members === 1 ? 'member' : 'members'}
               </div>
             </div>
           ))}
@@ -1004,7 +1007,7 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
       </Inset>
       {/* §6.3 — THE COUNTS ADD TO MORE THAN THE MEMBER TOTAL ON PURPOSE. */}
       <Body style={{ marginTop: 12, fontSize: 11.5, color: A.DIM }}>
-        These member counts add to {memberSum.toLocaleString()}, more than the {data.members.toLocaleString()} members
+        These member counts add to {fmt(memberSum)}, more than the {fmt(data.members)} members
         behind this course, and that is correct: an index moves over the years, so one person appears in every band they
         have played to. Rounds and members are separate figures — a band can carry hundreds of rounds from a handful of
         regulars, and it should not be read as a headcount.
@@ -1032,7 +1035,7 @@ export const CompetitionSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
   ];
 
   return (
-    <Panel kicker="Competition or social" aside={`${total.toLocaleString()} rounds`} style={CARD}>
+    <Panel kicker="Competition or social" aside={`${fmt(total)} rounds`} style={CARD}>
       <Inset>
         <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: A.TRACK }}>
           {rows.map((r) =>
@@ -1044,7 +1047,7 @@ export const CompetitionSection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
         <div style={{ marginTop: 14, display: 'flex', gap: 24 }}>
           {rows.map((r) => (
             <div key={r.label}>
-              <div style={bizFigure(19, A.INK)}>{r.count.toLocaleString()}</div>
+              <div style={bizFigure(19, A.INK)}>{fmt(r.count)}</div>
               <div style={{ ...LABEL, marginTop: 4 }}>
                 {r.label} · {share(r.count, total)}
               </div>
