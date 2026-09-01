@@ -559,45 +559,81 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         {/* THE ROUND SCORE SITS HERE (BRIEF_ROUND_POST_ENRICHMENT §2). The
             author row already had empty space on its right, so the score costs
             no height at all and the course name below keeps the full width. The
-            username truncates rather than pushing the score. */}
-        {postRound && postRound.grossScore != null && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 6,
-              flexShrink: 0,
-              fontVariantNumeric: 'tabular-nums',
-              fontFeatureSettings: '"zero" 0',
-            }}
-          >
-            <span
+            username truncates rather than pushing the score.
+
+            BRIEF_ROUND_CARD_GROSS_AND_NET — the figure is what the member SHOT
+            (the sum of their own cells), from the SHARED roundScore(). Only a
+            round with an uncompleted hole falls back to the WHS adjusted gross,
+            and then it says so. NET sits beside it, subordinate: smaller weight,
+            dim caps label, never coloured by the under-par law because net
+            against par is a different comparison from gross against par. */}
+        {postRound && headerScore && headerScore.gross != null && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0, gap: 2 }}>
+            <div
               style={{
-                fontSize: 30,
-                fontWeight: 700,
-                letterSpacing: '-0.03em',
-                lineHeight: 1,
-                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: 8,
+                fontVariantNumeric: 'tabular-nums',
+                fontFeatureSettings: '"zero" 0',
               }}
             >
-              {postRound.grossScore}
-            </span>
-            {postRound.coursePar != null && (
               <span
                 style={{
-                  fontSize: 15,
+                  fontSize: 30,
                   fontWeight: 700,
-                  color: getScoreColor(postRound.grossScore - postRound.coursePar, 'dark'),
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1,
+                  color: '#FFFFFF',
                 }}
               >
-                {(() => {
-                  const d = postRound.grossScore - postRound.coursePar;
-                  return d === 0 ? 'E' : d > 0 ? `+${d}` : `${d}`;
-                })()}
+                {headerScore.gross}
+              </span>
+              {headerScore.toPar != null && (
+                <span
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 700,
+                    color: getScoreColor(headerScore.toPar, 'dark'),
+                  }}
+                >
+                  {headerScore.toPar === 0
+                    ? 'E'
+                    : headerScore.toPar > 0
+                      ? `+${headerScore.toPar}`
+                      : `${headerScore.toPar}`}
+                </span>
+              )}
+              {postRound.netScore != null && (
+                <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: T60,
+                    }}
+                  >
+                    {t('feed.roundCard.net')}
+                  </span>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#FFFFFF' }}>
+                    {postRound.netScore}
+                  </span>
+                </span>
+              )}
+            </div>
+            {headerScore.source === 'whs' && headerScore.unscoredHoles > 0 && (
+              /* The card already refuses to total a NINE containing an
+                 uncompleted hole; this removes the contradiction of totalling
+                 the eighteen anyway without saying which figure it is. */
+              <span style={{ fontSize: 10.5, fontWeight: 600, color: T60, textAlign: 'right' }}>
+                {t('feed.roundCard.adjustedNotCompleted', { count: headerScore.unscoredHoles })}
               </span>
             )}
           </div>
         )}
+
 
         {/* Right chips */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
