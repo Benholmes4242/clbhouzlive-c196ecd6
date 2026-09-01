@@ -329,6 +329,17 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     if (tid) return `/support/thread/${tid}`;
   }
   if (type === 'message') return '/messages';
+
+  // Onboarding nudge: the row's whole job is the setup step it names, so it
+  // routes to that step's own screen, carrying the ?src marker the arrival
+  // tracker reads. The gap is authoritative; data.link is only a display echo.
+  if (type === 'onboarding_nudge') {
+    const gap = data.gap;
+    if (gap === 'whs') return '/handicap?src=nudge_whs';
+    if (gap === 'club') return '/edit-profile?src=nudge_club';
+    if (gap === 'username') return '/edit-profile?src=nudge_username';
+    return '/edit-profile';
+  }
   if (type === 'handicap_authority_live') return '/handicap';
 
   // --- rate-a-course prompt ------------------------------------------

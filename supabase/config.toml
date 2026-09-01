@@ -254,3 +254,9 @@ verify_jwt = false
 
 [functions.verify-business-request-info]
 verify_jwt = false
+
+[functions.onboarding-nudges]
+verify_jwt = false
+
+[functions.onboarding-unsubscribe]
+verify_jwt = false

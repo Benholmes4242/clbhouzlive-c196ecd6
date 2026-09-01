@@ -6,6 +6,7 @@ import { trackedLazy } from '@/perf/navTiming';
 const lazy = <T extends { default: React.ComponentType<any> }>(factory: () => Promise<T>) =>
   trackedLazy('route', factory);
 import { usePageTracking } from '@/hooks/usePageTracking';
+import { useNudgeArrival } from '@/hooks/useNudgeArrival';
 import { useFullScreenSurface } from '@/stores/fullScreenSurfaceStore';
 
 
@@ -432,6 +433,7 @@ function NavigationRefSetter() {
 // Routes component that handles background location pattern for Hub overlays and Video modal
 function AppRoutes() {
   usePageTracking();
+  useNudgeArrival();
   const location = useLocation();
   const state = location.state as { backgroundLocation?: RouterLocation; fromHub?: boolean; fromVideo?: boolean } | null;
   const { shouldHideHeader } = useModalContext();
