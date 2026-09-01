@@ -433,5 +433,29 @@
     "viewComment": "Ver 1 comentario",
     "viewComments": "Ver los {{count}} comentarios",
     "guestPrompt": "Unete a clbhouz para ver la conversacion"
+  },
+  "gate": {
+    "head": {
+      "line1": "Cada vuelta que juegas.",
+      "line2": "Cada campo que visitas.",
+      "invite": "{{name}} te ha invitado",
+      "inviteAnon": "Te han invitado",
+      "profile": "{{name}} en clbhouz"
+    },
+    "sub": {
+      "default": "Campos medidos a partir de las vueltas realmente jugadas en ellos, y tu juego leido hoyo a hoyo frente a ellos.",
+      "invite": "Cada vuelta que jugais los dos, medida en los mismos campos.",
+      "profile": "Su handicap, su forma y todos los campos que ha jugado."
+    },
+    "figures": {
+      "courses": "Campos",
+      "rounds": "Vueltas registradas",
+      "reviews": "Resenas de campos",
+      "note": "En directo desde la plataforma. El verde son los ultimos 30 dias."
+    },
+    "appStore": "Descarga clbhouz en el App Store",
+    "playSoon": "Pronto en Google Play",
+    "terms": "Terminos",
+    "privacy": "Privacidad"
   }
 }

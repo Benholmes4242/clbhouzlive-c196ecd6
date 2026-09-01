@@ -433,5 +433,29 @@
     "viewComment": "1 Kommentar ansehen",
     "viewComments": "Alle {{count}} Kommentare ansehen",
     "guestPrompt": "Tritt clbhouz bei, um die Diskussion zu sehen"
+  },
+  "gate": {
+    "head": {
+      "line1": "Jede Runde, die du spielst.",
+      "line2": "Jeder Platz, den du besuchst.",
+      "invite": "{{name}} hat dich eingeladen",
+      "inviteAnon": "Du wurdest eingeladen",
+      "profile": "{{name}} auf clbhouz"
+    },
+    "sub": {
+      "default": "Platze, gemessen an den Runden, die wirklich dort gespielt wurden, und dein Golf Loch fur Loch dagegen gelesen.",
+      "invite": "Jede Runde, die ihr beide spielt, gemessen auf denselben Platzen.",
+      "profile": "Sein Handicap, seine Form und jeder Platz, den er gespielt hat."
+    },
+    "figures": {
+      "courses": "Platze",
+      "rounds": "Erfasste Runden",
+      "reviews": "Platzbewertungen",
+      "note": "Live von der Plattform. Grun sind die letzten 30 Tage."
+    },
+    "appStore": "clbhouz im App Store laden",
+    "playSoon": "Bald bei Google Play",
+    "terms": "AGB",
+    "privacy": "Datenschutz"
   }
 }
