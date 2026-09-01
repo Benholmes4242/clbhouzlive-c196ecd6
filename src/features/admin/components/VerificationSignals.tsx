@@ -265,18 +265,21 @@ export function SignalsPanel({
       {signals.map((s) => {
         const Icon = ICONS[s.key];
         const pass = s.state === 'pass';
+        const notSupplied = s.state === 'not_supplied';
+        const edge = pass ? t.ok : notSupplied ? t.warn : t.line;
+        const tone = pass ? t.okText : notSupplied ? t.warnText : t.inkFaint;
         return (
           <div
             key={s.key}
             style={{
-              background: t.surface,
-              border: `1px solid ${pass ? t.ok : t.line}`,
+              background: notSupplied ? t.warnSoft : t.surface,
+              border: `1px solid ${edge}`,
               borderRadius: t.radius.md,
               padding: 10,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Icon size={14} color={pass ? t.okText : t.inkFaint} />
+              <Icon size={14} color={tone} />
               <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: t.inkMuted }}>
                 {s.label}
               </span>
@@ -287,10 +290,10 @@ export function SignalsPanel({
                   fontWeight: 700,
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
-                  color: pass ? t.okText : t.inkFaint,
+                  color: tone,
                 }}
               >
-                {pass ? 'Pass' : 'Not claimed'}
+                {pass ? 'Pass' : notSupplied ? 'Not supplied' : 'Not claimed'}
               </span>
             </div>
 
