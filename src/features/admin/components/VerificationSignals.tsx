@@ -15,7 +15,12 @@ import { evaluateBar, isFreeEmailDomain, type ClaimedSignals, type SignalKey } f
 import { adminTheme as t } from '../theme';
 import type { VerificationRow } from '../hooks/useVerifications';
 
-type SignalState = 'pass' | 'not_claimed';
+/**
+ * BRIEF_REVIEWER_READS_PROVIDED §2 — three states, not two. `not_supplied` is a
+ * signal the member ticked and then did not deliver; `not_claimed` was never
+ * offered. They mean opposite things and must not share a look.
+ */
+type SignalState = 'pass' | 'not_supplied' | 'not_claimed';
 
 export interface ResolvedSignal {
   key: SignalKey;
