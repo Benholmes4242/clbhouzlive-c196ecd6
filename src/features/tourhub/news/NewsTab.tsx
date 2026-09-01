@@ -20,7 +20,9 @@ import { StoryImageHeadline, StoryImageKicker, StoryRelativeTime } from './Story
 import { OVERVIEW_HERO_HEIGHT } from '../components/overview-v3/OverviewHero';
 import { heroCanonScrimOn } from '../_shared/heroGradient';
 import { StoryRowEngagement } from '@/features/stories/StoryRowEngagement';
+import { StoryLeaderboardStrip } from './StoryLeaderboardStrip';
 import { useStoryEngagement, type StoryEngagement } from '@/features/stories/useStoryEngagement';
+
 import {
   FONT,
   HAIRLINE_INK_10,
@@ -202,7 +204,11 @@ export function NewsTab() {
       ) : (
         <>
           {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} engagement={engagementFor(lead.id)} />}
+          {/* BRIEF_WIRE_INDEX_TICKER — bound to the LEAD's event. No lead or no
+              tournament_id ⇒ not mounted, and no height reserved. */}
+          {lead?.tournament_id && <StoryLeaderboardStrip tournamentId={lead.tournament_id} />}
           <div style={{ marginTop: lead ? 14 : 0 }}>
+
             {rest.map((s, i) => (
               <div
                 key={s.id}
