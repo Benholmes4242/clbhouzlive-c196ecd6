@@ -39,7 +39,7 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
-import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
 import { ProfileHero, HeroPill } from '@/components/profile/hero/ProfileHero';
 import { ProfileTopTenRail } from '@/components/profile/hero/ProfileTopTenRail';
@@ -1167,6 +1167,7 @@ const ProfilePageV2Content: React.FC = () => {
         onClose={() => setIsAvatarLightboxOpen(false)}
         imageUrl={profile?.profile_photo_url || ''}
         altText={`${displayName}'s profile photo`}
+        subjectId={profileUserId}
         shape="squircle"
         fallbackInitial={avatarInitials}
       />

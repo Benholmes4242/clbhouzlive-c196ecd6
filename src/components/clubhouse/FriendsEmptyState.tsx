@@ -245,6 +245,7 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
                   size={52}
                   src={profile?.profile_photo_url ?? null}
                   alt={profile?.display_name ?? 'You'}
+                  userId={user?.id ?? null}
                   fallback={userInitials}
                   hairlineRing
                   ringColor={AMBER}
@@ -267,6 +268,7 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
                   size={52}
                   src={seed.avatarUrl}
                   alt={seed.displayName}
+                  userId={seed.userId}
                   fallback={initials}
                   hairlineRing
                 />
@@ -457,6 +459,7 @@ const SuggestionRow: React.FC<SuggestionRowProps> = ({
           size={46}
           src={creator.avatarUrl}
           alt={creator.displayName}
+          userId={creator.userId}
           fallback={initials}
           hairlineRing
         />

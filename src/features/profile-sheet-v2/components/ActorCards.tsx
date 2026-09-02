@@ -149,6 +149,7 @@ export default function ActorCards({
                     size={42}
                     src={p.avatarUrl}
                     alt={p.name}
+                    userId={p.id}
                     hairlineRing
                     ringColor={DARK_HAIRLINE}
                   />

@@ -22,7 +22,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, Search } from 'lucide-react';
-import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { formatRelativeAgo } from '@/i18n/format';
 import { CHART, CHART_FONT } from '../../charts';
 import { DARK_ROW_TITLE } from '../../sections/_shared/darkAtoms';
@@ -63,7 +63,7 @@ const PersonRow: React.FC<{
   sharedCount: number;
 }> = ({ person, sharedCount }) => {
   const { t } = useTranslation('common');
-  const fbBg = getAvatarFallbackColor(person.userId);
+  const fbBg = getAvatarFallbackGradient(person.userId);
   const when = person.lastPlayedAt
     ? formatRelativeAgo(person.lastPlayedAt, { yesterday: true })
     : null;

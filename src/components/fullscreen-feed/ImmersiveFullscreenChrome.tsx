@@ -511,6 +511,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             size={40}
             src={activePost.avatarUrl}
             alt={activePost.displayName}
+            userId={activePost.actorId ?? activePost.userId}
             fallback={activePost.displayName?.[0] ?? '?'}
             hairlineRing
           />

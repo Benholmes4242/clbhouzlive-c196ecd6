@@ -291,7 +291,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
 
               {row.kind === 'user' && row.targetUser && (
                 <div style={cardStyle()}>
-                  <SquircleAvatar src={row.targetUser.profile_photo_url ?? undefined} alt={row.targetUser.display_name ?? undefined} size={44}
+                  <SquircleAvatar src={row.targetUser.profile_photo_url ?? undefined} alt={row.targetUser.display_name ?? undefined} userId={row.targetUser.id} size={44}
                     hairlineRing
                   />
                   <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
@@ -305,7 +305,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
               {row.kind === 'post' && row.targetPost && (
                 <div style={{ ...cardStyle(), flexDirection: 'column', alignItems: 'stretch', gap: 10 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <SquircleAvatar src={row.targetPost.author?.profile_photo_url ?? undefined} alt={row.targetPost.author?.display_name ?? undefined} size={32}
+                    <SquircleAvatar src={row.targetPost.author?.profile_photo_url ?? undefined} alt={row.targetPost.author?.display_name ?? undefined} userId={row.targetPost.author?.id ?? null} size={32}
                       hairlineRing
                     />
                     <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
@@ -332,7 +332,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
                     <div key={r.raw.id} style={{ padding: 12, border: `1px solid ${t.line}`, borderRadius: t.radius.md, background: t.surface }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <SquircleAvatar src={r.reporter?.profile_photo_url ?? undefined} alt={r.reporter?.display_name ?? undefined} size={24}
+                          <SquircleAvatar src={r.reporter?.profile_photo_url ?? undefined} alt={r.reporter?.display_name ?? undefined} userId={r.reporter?.id ?? null} size={24}
                             hairlineRing
                           />
                           <span style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>

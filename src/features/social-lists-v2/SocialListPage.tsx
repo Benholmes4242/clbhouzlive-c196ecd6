@@ -510,6 +510,7 @@ function PendingRow({
       <SquircleAvatar
         src={row.avatar_url ?? undefined}
         alt={row.display_name ?? row.username ?? ''}
+        userId={row.actor_id}
         size={38}
         fallback={(row.display_name ?? row.username ?? '?').charAt(0)}
         hairlineRing

@@ -12,7 +12,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
 
 export interface ComparePerson {
@@ -43,7 +43,7 @@ export const ComparePersonRow: React.FC<Props> = ({
   onSelect,
 }) => {
   const { t } = useTranslation('common');
-  const fbBg = getAvatarFallbackColor(person.userId);
+  const fbBg = getAvatarFallbackGradient(person.userId);
 
   return (
     <button

@@ -93,6 +93,7 @@ export default function ApprovalDetailDrawer({ open, onClose, row }: Props) {
                 <SquircleAvatar
                   src={row.target?.profile_photo_url ?? undefined}
                   alt={row.target?.display_name ?? undefined}
+                  userId={row.target_user_id ?? null}
                   size={40}
                   hairlineRing
                 />
@@ -114,6 +115,7 @@ export default function ApprovalDetailDrawer({ open, onClose, row }: Props) {
                 <SquircleAvatar
                   src={row.requester?.profile_photo_url ?? undefined}
                   alt={row.requester?.display_name ?? undefined}
+                  userId={row.requested_by ?? null}
                   size={32}
                   hairlineRing
                 />

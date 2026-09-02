@@ -8,7 +8,7 @@ import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
-import { getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { getAvatarFallbackColor, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 
 export interface AvatarLightboxProps {
@@ -18,6 +18,11 @@ export interface AvatarLightboxProps {
   altText?: string;
   shape?: 'circle' | 'squircle';
   fallbackInitial?: string;
+  /** Subject's id. THE fallback key; altText is a last resort. */
+  subjectId?: string | null;
+  /** HUE IS A PERSON, THE SLATE PALETTE IS AN ENTITY. This lightbox is shared
+   *  by a member's photo and a business logo, so the caller says which. */
+  subject?: 'member' | 'entity';
 }
 
 export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
@@ -27,7 +32,14 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
   altText = 'Profile photo',
   shape = 'squircle',
   fallbackInitial,
+  subjectId,
+  subject = 'member',
 }) => {
+  const fallbackKey = subjectId || altText;
+  const fallbackFill =
+    subject === 'entity'
+      ? getAvatarFallbackColor(fallbackKey)
+      : getAvatarFallbackGradient(fallbackKey);
   const [imgFailed, setImgFailed] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const { ref: zoomRef, imgRef, style: zoomStyle, scale, reset: resetZoom } = usePinchZoomPointer();
@@ -132,7 +144,7 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
               fallbackInitial ? (
                 <div
                   className="w-full h-full flex items-center justify-center"
-                  style={{ background: getAvatarFallbackColor(altText || fallbackInitial) }}
+                  style={{ background: fallbackFill }}
                 >
                   <span className="text-6xl sm:text-7xl md:text-8xl font-bold text-white">
                     {fallbackInitial}
@@ -141,7 +153,7 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
               ) : (
                 <div
                   className="w-full h-full flex items-center justify-center"
-                  style={{ background: getAvatarFallbackColor(altText) }}
+                  style={{ background: fallbackFill }}
                 >
                   <span className="text-white/70 text-sm">No image</span>
                 </div>

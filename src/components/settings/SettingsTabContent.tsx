@@ -196,6 +196,7 @@ export function SettingsTabContent() {
           <SquircleAvatar
             src={p?.profile_photo_url}
             alt={p?.display_name || ''}
+            userId={p?.id ?? user?.id ?? null}
             size={52}
             fallback={p?.display_name?.charAt(0) || '?'}
             hairlineRing

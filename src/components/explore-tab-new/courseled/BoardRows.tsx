@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getAvatarFallbackGradient, getInitialsFromName } from '@/lib/avatarFallback';
+import { getInitialsFromName } from '@/lib/avatarFallback';
 import { A, SANS } from './tokens';
 import { relativeDayCompact } from './discoverWhen';
 import { boardCountsRounds, isFeatBoard, type BoardKey } from './boardFilters';
@@ -202,43 +202,20 @@ export function gapText(
  * lightness keep every tile at the same visual weight. AN AVATAR IS NEVER
  * AMBER, including the member's own.
  */
+/* S4 — THE FORK IS FOLDED BACK. The board no longer builds its own fallback
+   tile: SquircleAvatar now carries the same hue, so the photo row and the
+   fallback row finally share one geometry. */
 export function BoardAvatar({ row, size = 28 }: { row: Row; size?: number }) {
   const { t } = useTranslation('courses');
-  if (row.profile_photo_url) {
-    return (
-      <SquircleAvatar
-        src={row.profile_photo_url}
-        alt={row.display_name ?? ''}
-        userId={row.user_id}
-        size={size}
-        hairlineRing
-      />
-    );
-  }
-  const initials = getInitialsFromName(row.display_name).slice(0, 2);
   return (
-    <span
-      aria-label={row.display_name ?? t('discover.aMember', 'A member')}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: size,
-        height: size,
-        borderRadius: '34%',
-        background: getAvatarFallbackGradient(row.user_id),
-        border: `1px solid ${A.BORDER}`,
-        boxSizing: 'border-box',
-        fontFamily: SANS,
-        fontSize: Math.round(size * 0.36),
-        fontWeight: 800,
-        lineHeight: 1,
-        color: 'rgba(248,250,252,0.82)',
-        userSelect: 'none',
-      }}
-    >
-      {initials || '\u00B7'}
-    </span>
+    <SquircleAvatar
+      src={row.profile_photo_url ?? null}
+      alt={row.display_name ?? t('discover.aMember', 'A member')}
+      userId={row.user_id}
+      fallback={getInitialsFromName(row.display_name).slice(0, 2)}
+      size={size}
+      hairlineRing
+    />
   );
 }
 

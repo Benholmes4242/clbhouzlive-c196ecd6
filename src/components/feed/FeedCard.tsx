@@ -516,7 +516,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onClick={() => onProfile(post)}
           style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
         >
-          <SquircleAvatar src={buildImageThumbnailUrl(post.avatarUrl, { width: 72, height: 72 })} alt={post.displayName} size={34} hairlineRing />
+          <SquircleAvatar src={buildImageThumbnailUrl(post.avatarUrl, { width: 72, height: 72 })} alt={post.displayName} userId={post.actorId ?? post.userId} size={34} hairlineRing />
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
           <button
@@ -921,6 +921,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onOpenComments={() => onComment(post, effectiveActor)}
           viewerAvatarUrl={effectiveActor?.avatarUrl ?? null}
           viewerName={effectiveActor?.name ?? null}
+          viewerId={effectiveActor?.id ?? null}
         />
       )}
       </div>

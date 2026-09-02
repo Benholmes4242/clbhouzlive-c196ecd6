@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { getTop100Club } from '@/lib/top100Club';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
-import { getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import {
   Tooltip,
   TooltipContent,
@@ -13,6 +13,9 @@ import {
 interface ProfileAvatarRingProps {
   photoUrl: string | null | undefined;
   displayName: string;
+  /** Member's user id. THE fallback key — the display name is a last resort
+   *  and produces a colour that will not match that member elsewhere. */
+  userId?: string | null;
   totalTop100Played: number;
   isPersonal: boolean;
   isOwnProfile: boolean;
@@ -39,6 +42,7 @@ const RING_ANIMATED_KEY = 'clbhouz:ringAnimated:v1';
 const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   photoUrl,
   displayName,
+  userId,
   totalTop100Played,
   isPersonal,
   isOwnProfile,
@@ -120,7 +124,7 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   ) : (
     <div 
       className="w-full h-full flex items-center justify-center font-semibold text-white"
-      style={{ fontSize: `${fallbackFontSize}px`, background: getAvatarFallbackColor(displayName) }}
+      style={{ fontSize: `${fallbackFontSize}px`, background: getAvatarFallbackGradient(userId || displayName) }}
     >
       {initials}
     </div>

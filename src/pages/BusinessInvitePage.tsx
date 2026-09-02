@@ -129,6 +129,7 @@ export default function BusinessInvitePage() {
                 <SquircleAvatar
                   src={pickedUser.profile_photo_url || undefined}
                   alt={pickedUser.display_name || pickedUser.username}
+                  userId={pickedUser.id}
                   size={40}
                   hairlineRing
                   ringColor={DARK_HAIRLINE}
@@ -188,6 +189,7 @@ export default function BusinessInvitePage() {
                           <SquircleAvatar
                             src={u.profile_photo_url || undefined}
                             alt={u.display_name || u.username}
+                            userId={u.id}
                             size={36}
                             hairlineRing
                             ringColor={DARK_HAIRLINE}

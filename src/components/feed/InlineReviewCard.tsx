@@ -26,6 +26,8 @@ export interface InlineReviewCardProps {
   courseRating?: number | null;
   reviewText?: string | null;
   reviewer: {
+    /** Reviewer's user id — keys the avatar fallback hue. */
+    id?: string | null;
     name: string;
     avatar?: string | null;
   };
@@ -154,6 +156,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
             size={28}
             src={reviewer.avatar || undefined}
             alt={reviewer.name}
+            userId={reviewer.id ?? null}
             fallback={initials}
             hairlineRing
           />

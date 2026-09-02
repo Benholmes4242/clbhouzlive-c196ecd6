@@ -87,6 +87,7 @@ export default function AppealDetailDrawer({ open, onClose, row }: Props) {
                 <SquircleAvatar
                   src={row.appellant?.profile_photo_url ?? undefined}
                   alt={row.appellant?.display_name ?? undefined}
+                  userId={row.user_id ?? null}
                   size={40}
                   hairlineRing
                 />

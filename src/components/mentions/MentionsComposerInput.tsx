@@ -311,6 +311,8 @@ function renderSuggestion(
         size={30}
         src={s.avatarUrl ?? undefined}
         alt={s.display}
+        /* id is encoded `${kind}:${uuid}` — the hue keys on the bare uuid. */
+        userId={s.kind === 'user' ? s.id.slice(2) : null}
         fallback={s.display.charAt(0).toUpperCase()}
         hairlineRing
         ringColor={DARK_HAIRLINE}

@@ -492,6 +492,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     return {
       id: review.id,
       user: {
+        id: review.user_id,
         name: displayName,
         avatarUrl: profile?.profile_photo_url || null,
         initials: getInitials(displayName),

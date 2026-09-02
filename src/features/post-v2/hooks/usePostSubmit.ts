@@ -72,6 +72,8 @@ export interface SubmitResult {
   actorName?: string;
   /** Posting actor's avatar. */
   actorAvatarUrl?: string | null;
+  /** Posting actor's id — keys the avatar fallback hue. */
+  actorId?: string | null;
   /** Ordered local previews for the card's media block. */
   mediaPreviews?: { url: string; type: 'image' | 'video' }[];
 }
@@ -194,6 +196,8 @@ export function usePostSubmit() {
           caption: input.caption,
           actorName: input.authorName,
           actorAvatarUrl: input.authorAvatarUrl,
+        actorId: input.actorId,
+          actorId: input.actorId,
         };
       }
 
@@ -225,6 +229,7 @@ export function usePostSubmit() {
         caption: input.caption,
         actorName: input.authorName,
         actorAvatarUrl: input.authorAvatarUrl,
+        actorId: input.actorId,
         mediaPreviews: input.media.map((m) => ({ url: m.previewUrl, type: m.type })),
       };
     } catch (e) {

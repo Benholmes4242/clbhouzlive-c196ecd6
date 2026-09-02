@@ -32,7 +32,7 @@ import { useEntityPickerSearch } from '@/features/search-v2/hooks/useEntityPicke
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { useCompareIdentities } from './useCompareIdentities';
 import { useCompareRecent } from './useCompareRecent';
-import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { formatRelativeAgo } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
@@ -485,7 +485,7 @@ export const CompareSheet: React.FC<Props> = ({
         height: 44,
         borderRadius: '34%',
         overflow: 'hidden',
-        background: src ? CHART.PANEL_2 : getAvatarFallbackColor(seed),
+        background: src ? CHART.PANEL_2 : getAvatarFallbackGradient(seed),
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

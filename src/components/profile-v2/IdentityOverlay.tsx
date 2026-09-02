@@ -9,6 +9,8 @@ import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface IdentityOverlayProps {
   displayName: string;
+  /** Member's user id — keys the avatar fallback hue. */
+  userId?: string | null;
   username: string;
   clubName?: string;
   handicapIndex?: number;
@@ -28,6 +30,7 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
   clubName,
   handicapIndex,
   avatarUrl,
+  userId,
   top100Count = 0,
   xpValue,
   isVerified,
@@ -47,6 +50,7 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
       <AvatarXPRing
         avatarUrl={avatarUrl}
         displayName={displayName}
+        userId={userId}
         top100Count={top100Count}
         size="xl"
         onClick={onAvatarClick}
