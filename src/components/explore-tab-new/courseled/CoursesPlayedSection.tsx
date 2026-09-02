@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, ArrowDown, ArrowUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronRight, ArrowDown, ArrowUp } from 'lucide-react';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CourseImageFallback } from './CourseImageFallback';
 import { A, KICKER, SANS, FIGS, DISCOVER_FACT } from './tokens';
 import type { BoardFilters } from './boardFilters';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
@@ -308,16 +309,20 @@ function PlaysTo({ value }: { value: number | null }) {
 /** C5.3 / C5.6 — the panel holds a shell at the height it will occupy. */
 function CoursePlayers({
   courseId,
+  courseName,
   expectedRows,
   userId,
   filters,
   onMemberPress,
+  onCoursePress,
 }: {
   courseId: string;
+  courseName: string | null;
   expectedRows: number;
   userId: string | undefined;
   filters: BoardFilters;
   onMemberPress?: (userId: string) => void;
+  onCoursePress?: (courseId: string) => void;
 }) {
   const { t } = useTranslation('courses');
   const players = useBoardCoursePlayers(userId, courseId, filters);
@@ -330,7 +335,6 @@ function CoursePlayers({
   }
 
   const list = players.data ?? [];
-  if (list.length === 0) return null;
 
   return (
     <div style={{ paddingBottom: 8 }}>
@@ -405,6 +409,32 @@ function CoursePlayers({
           </span>
         </button>
       ))}
+
+      {/* D2.2 / D2.3 — who played here, THEN go to the course. */}
+      <button
+        type="button"
+        onClick={() => onCoursePress?.(courseId)}
+        aria-label={courseName ?? undefined}
+        style={{
+          width: '100%',
+          minHeight: 34,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          gap: 4,
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          fontFamily: SANS,
+          textAlign: 'left',
+          cursor: 'pointer',
+          ...KICKER,
+          color: A.BODY,
+        }}
+      >
+        <span>{t('discover.coursesPlayed.openCourse', 'Open course')}</span>
+        <ChevronRight size={13} aria-hidden />
+      </button>
     </div>
   );
 }
