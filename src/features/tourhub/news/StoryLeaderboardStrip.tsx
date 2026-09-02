@@ -31,9 +31,9 @@ import type { HeroTournament } from '../hooks/useHeroCarouselData';
 import { HeroWireTicker, type TickerFact } from '../components/overview-v3/HybridHeroBands/HeroWireTicker';
 import {
   FONT,
-  HERO_BOARD_SURFACE,
   LIVE_INK,
 } from '../_shared/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /** Caption line + 36px ticker. Held as a constant so the pending shell matches. */
 const CAPTION_HEIGHT = 28;
