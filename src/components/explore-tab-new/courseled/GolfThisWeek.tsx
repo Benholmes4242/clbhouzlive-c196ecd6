@@ -66,6 +66,8 @@ import {
   useViewerHandicapIndex,
   type WeekScope,
 } from './hooks/useGolfThisWeek';
+import { useLeaderboardOptOuts } from './hooks/useLeaderboardOptOuts';
+
 
 /**
  * BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S2 — THE FIVE CATEGORIES, at module
@@ -1470,6 +1472,25 @@ export function GolfThisWeek({
   const counts = useWeekCounts(ordered);
   const best = useMemo(() => bestOfWeek(ordered), [ordered]);
 
+  /* THE BOARD POOL (BRIEF_LEADERBOARD_ROW_PROVENANCE_AND_OPTOUT §S3.1). A member
+     who has set show_in_exploration_leaderboards = false is EXCLUDED from the
+     ranked board on EVERY scope, and from the hero's stat rail with it, so
+     positions close up and the rail agrees with the rows shown. It is applied
+     HERE — one layer above the six ranked lists and the rail — rather than in
+     useCircleLatestRounds, because that read also feeds the RECENT ROUNDS strip,
+     the see-all sheet and the reaction/hole-shape batches, none of which is a
+     leaderboard and none of which this brief changes. */
+  const boardOptOuts = useLeaderboardOptOuts(
+    useMemo(() => ordered.map((r) => r.user_id), [ordered]),
+  );
+  const boardPool = useMemo(
+    () => ordered.filter((r) => !boardOptOuts.has(r.user_id)),
+    [ordered, boardOptOuts],
+  );
+  /** The hero rail counts the BOARD's field, never the strip's. */
+  const boardCounts = useWeekCounts(boardPool);
+
+
   /* ONE batched hole-shape read for the whole rail — never one per card. */
   const scoreIds = useMemo(() => ordered.map((r) => r.score_id), [ordered]);
   const holeShapes = useRoundHoleShapes(scoreIds);
@@ -1618,7 +1639,7 @@ export function GolfThisWeek({
      the winner, so a tile with one qualifier shows the hero and NOTHING else —
      no second row, no dash, no placeholder. That is a normal week. */
   const bestRanked = rankAll(
-    ordered
+    boardPool
       .filter((r) => r.gross != null && r.course_par != null)
       .sort((a, b) => {
         const at = (a.gross as number) - (a.course_par as number);
@@ -1643,13 +1664,13 @@ export function GolfThisWeek({
   const netOf = (r: CircleRoundRow) =>
     (r.score_id ? netByScore.get(r.score_id)?.net : undefined) ?? null;
   const netRanked = rankAll(
-    ordered
+    boardPool
       .filter((r) => netOf(r) != null)
       .sort((a, b) => (netOf(a) as number) - (netOf(b) as number) || byDateDesc(a, b)),
   );
 
   const improvedRanked = rankAll(
-    ordered
+    boardPool
       .filter(
         (r) =>
           r.delta_index != null &&
@@ -1665,7 +1686,7 @@ export function GolfThisWeek({
   /* NULL STABLEFORD FAILS THE FILTER, never contributes a 0 (§1.3). FLOOR 36 —
      the par-equivalent every club golfer knows. */
   const stablefordRanked = rankAll(
-    ordered
+    boardPool
       .filter(
         (r) =>
           r.stableford_points != null &&
@@ -1681,7 +1702,7 @@ export function GolfThisWeek({
 
   /* FLOOR 3 — "1 birdie" is not a comparison, and a two-way tie on 1 is worse. */
   const birdiesRanked = rankAll(
-    ordered
+    boardPool
       .filter(
         (r) => r.birdies != null && Number.isFinite(r.birdies) && (r.birdies as number) >= 3,
       )
@@ -1690,7 +1711,7 @@ export function GolfThisWeek({
 
   /* BRIEF_BOARD_MOST_RECENT §1.3 — NOT rankAll: its own ordering function, no
      dedupe, no floor beyond having a play_date at all. */
-  const recentRanked = recentOrdered(ordered);
+  const recentRanked = recentOrdered(boardPool);
 
   const bestStableford = stablefordRanked[0] ?? null;
   const mostBirdies = birdiesRanked[0] ?? null;
@@ -2263,12 +2284,12 @@ export function GolfThisWeek({
               {[
                 {
                   key: 'rounds',
-                  figure: counts.rounds,
+                  figure: boardCounts.rounds,
                   label: t('discover.golfThisWeek.board.railRounds', 'ROUNDS'),
                 },
                 {
                   key: 'courses',
-                  figure: counts.courses,
+                  figure: boardCounts.courses,
                   label: t('discover.golfThisWeek.board.railCourses', 'COURSES'),
                 },
                 {
