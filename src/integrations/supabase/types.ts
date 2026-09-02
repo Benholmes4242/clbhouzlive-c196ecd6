@@ -4700,6 +4700,27 @@ export type Database = {
           },
         ]
       }
+      email_unsubscribes: {
+        Row: {
+          email: string | null
+          source: string | null
+          unsubscribed_at: string
+          user_id: string
+        }
+        Insert: {
+          email?: string | null
+          source?: string | null
+          unsubscribed_at?: string
+          user_id: string
+        }
+        Update: {
+          email?: string | null
+          source?: string | null
+          unsubscribed_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       event_leaderboard: {
         Row: {
           event_id: string
@@ -7641,6 +7662,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      onboarding_nudges: {
+        Row: {
+          channel: string
+          gap: string
+          id: string
+          resolved_at: string | null
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          gap: string
+          id?: string
+          resolved_at?: string | null
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          gap?: string
+          id?: string
+          resolved_at?: string | null
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       page_path_map: {
         Row: {
@@ -17052,6 +17100,21 @@ export type Database = {
           },
         ]
       }
+      cron_job_health: {
+        Row: {
+          active: boolean | null
+          failed_24h: number | null
+          jobid: number | null
+          jobname: string | null
+          last_message: string | null
+          last_run_at: string | null
+          last_status: string | null
+          last_success_at: string | null
+          ok_24h: number | null
+          schedule: string | null
+        }
+        Relationships: []
+      }
       explore_moments: {
         Row: {
           aspect_ratio: number | null
@@ -19464,6 +19527,27 @@ export type Database = {
         }[]
       }
       get_course_tee_sets: { Args: { p_golf_course_id: string }; Returns: Json }
+      get_cron_job_health: {
+        Args: never
+        Returns: {
+          active: boolean | null
+          failed_24h: number | null
+          jobid: number | null
+          jobname: string | null
+          last_message: string | null
+          last_run_at: string | null
+          last_status: string | null
+          last_success_at: string | null
+          ok_24h: number | null
+          schedule: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "cron_job_health"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_current_username: { Args: { _user_id: string }; Returns: string }
       get_deleted_message_ids_for_me: {
         Args: { p_conversation_id: string }

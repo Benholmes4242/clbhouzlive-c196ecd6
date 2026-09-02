@@ -223,13 +223,18 @@ async function sendPush(
     .limit(1);
   if (!devices || devices.length === 0) return { outcome: 'no_device' };
 
+  // actor_id carries TWO FKs at once — user_profiles(id) AND auth.users(id) —
+  // so it can only ever hold a real member. A business id satisfies neither.
+  // A system nudge is not from a person, so it stays NULL: the type and copy
+  // carry the clbhouz identity. Both recipient_* columns are NOT NULL, and
+  // is_read is written alongside the legacy `read` mirror.
   const { error } = await supabase.from('notifications').insert({
     user_id: userId,
     type: NUDGE_NOTIFICATION_TYPE,
     title: COPY[gap].subject,
     message: COPY[gap].body,
-    actor_type: 'business',
-    actor_id: CLBHOUZ_BUSINESS_ID,
+    actor_type: 'system',
+    actor_id: null,
     recipient_actor_type: 'personal',
     recipient_actor_id: userId,
     entity_type: 'onboarding_nudge',
@@ -237,6 +242,7 @@ async function sendPush(
     is_read: false,
     data: { gap, link: linkFor(gap) },
   });
+
   if (error) return { outcome: 'no_device', error: error.message };
   return { outcome: 'sent' };
 }
