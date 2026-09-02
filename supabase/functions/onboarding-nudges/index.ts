@@ -25,7 +25,14 @@ import { corsFor } from '../_shared/cors.ts';
 
 export const FUNCTION_VERSION = '2026-09-01-v1-onboarding-nudges';
 
-const APP_ORIGIN = 'https://clbhouz.com';
+/**
+ * EMAIL ONLY. clbhouz.co.uk is the canonical host (.com only 301s to it).
+ * The DM and the push carry RELATIVE in-app routes: a full URL tapped inside
+ * the Median WebView leaves for the browser, where any non gate-exempt path
+ * renders the download gate at a member who is already in the app.
+ */
+const EMAIL_ORIGIN = 'https://clbhouz.co.uk';
+
 /** The clbhouz business account. Sends the DM and owns the push actor. */
 const CLBHOUZ_BUSINESS_ID = 'b54c35bf-caa8-4d4f-bd38-e0de8c80ecd7';
 const NUDGE_NOTIFICATION_TYPE = 'onboarding_nudge';
