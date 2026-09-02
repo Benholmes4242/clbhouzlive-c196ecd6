@@ -91,6 +91,7 @@ function PanelRow({
   count,
   value,
   valueChanged,
+  valueCaps,
   active,
   disabled,
   chevron,
@@ -102,6 +103,8 @@ function PanelRow({
   value?: string;
   /** Root drilldown values recede until changed from their default. */
   valueChanged?: boolean;
+  /** Board names are display caps without altering the localized string. */
+  valueCaps?: boolean;
   active?: boolean;
   disabled?: boolean;
   chevron?: boolean;
@@ -125,7 +128,7 @@ function PanelRow({
           minWidth: 0,
           fontSize: 14,
           fontWeight: active ? 700 : 600,
-          color: A.INK,
+          color: active ? A.AMBER : A.INK,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -139,6 +142,8 @@ function PanelRow({
             fontSize: 12.5,
             fontWeight: 700,
             color: valueChanged ? A.INK : A.DIM,
+            letterSpacing: valueCaps ? '0.005em' : 0,
+            textTransform: valueCaps ? 'uppercase' : 'none',
             flexShrink: 0,
             maxWidth: 150,
             overflow: 'hidden',
@@ -346,6 +351,7 @@ export function BoardFilterPanel({
               label={t('discover.filterBoard.rankedBy', 'Ranked by')}
               value={t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
               valueChanged={board !== 'gross'}
+              valueCaps
               chevron
               onClick={() => setScreen('board')}
             />
