@@ -31,6 +31,18 @@ const ROW_H = 54;
 const PLAYS_TO_W = 62;
 const CHEVRON_W = 22;
 
+/**
+ * P1 — THE EXPANDED PANEL IS CAPPED. One player row is PLAYER_H tall and the
+ * list shows at most PANEL_VISIBLE_ROWS of them; the ceiling is DERIVED from the
+ * row height (P1.2) so changing the row cannot leave a stale pixel constant
+ * behind. P3 — the fetch is raised to 50 so a scrollable list is not silently
+ * truncated at the default twelve.
+ */
+const PLAYER_H = 40;
+const PANEL_VISIBLE_ROWS = 10;
+const PANEL_MAX_H = PLAYER_H * PANEL_VISIBLE_ROWS;
+const PLAYERS_FETCH_LIMIT = 50;
+
 export interface CoursesPlayedSectionProps {
   userId: string | undefined;
   /** The page's CURRENT filter state. The board key is deliberately absent. */
