@@ -18411,7 +18411,6 @@ export type Database = {
           p_competition?: string
           p_course_id?: string
           p_courses?: string
-          p_feat?: string
           p_region_kind?: string
           p_region_value?: string
           p_scope?: string
@@ -18437,7 +18436,6 @@ export type Database = {
           ok_band: boolean
           ok_competition: boolean
           ok_courses: boolean
-          ok_feat: boolean
           ok_region: boolean
           ok_scope: boolean
           ok_window: boolean
@@ -18452,9 +18450,13 @@ export type Database = {
       }
       board_qualifies: {
         Args: {
+          p_ace?: number
+          p_alb?: number
           p_birdies: number
           p_board: string
+          p_clean?: boolean
           p_delta: number
+          p_eagle?: number
           p_gross: number
           p_net: number
           p_par: number
@@ -19096,7 +19098,6 @@ export type Database = {
           p_competition?: string
           p_course_id?: string
           p_courses?: string
-          p_feat?: string
           p_region_kind?: string
           p_region_value?: string
           p_scope?: string
@@ -19117,7 +19118,6 @@ export type Database = {
           p_competition?: string
           p_course_id?: string
           p_courses?: string
-          p_feat?: string
           p_limit?: number
           p_offset?: number
           p_region_kind?: string

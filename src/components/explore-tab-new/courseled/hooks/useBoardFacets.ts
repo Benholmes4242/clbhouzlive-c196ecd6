@@ -19,7 +19,7 @@ import { boardRpcArgs } from './useBoardPage';
  * a zero. `settled` is what the panel reads to decide between those two states.
  *
  * RETURN SHAPE: (axis, key, label, n). axis is one of scope, window,
- * region_country, region_sub, courses, course, band, feat, board.
+ * region_country, region_sub, courses, course, band, competition, board.
  */
 
 export type FacetAxis =
@@ -30,7 +30,7 @@ export type FacetAxis =
   | 'courses'
   | 'course'
   | 'band'
-  | 'feat'
+  | 'competition'
   | 'board';
 
 interface FacetRow {

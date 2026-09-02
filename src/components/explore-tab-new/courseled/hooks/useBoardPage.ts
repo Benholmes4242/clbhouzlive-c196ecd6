@@ -61,7 +61,8 @@ export function boardRpcArgs(
     p_courses: f.courses,
     p_course_id: f.courseId,
     p_band: f.band,
-    p_feat: f.feat,
+    /* B0 — p_feat IS GONE from the RPC; p_competition sits in its place. */
+    p_competition: f.competition,
   };
 }
 
