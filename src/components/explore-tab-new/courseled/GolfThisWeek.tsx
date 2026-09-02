@@ -12,8 +12,13 @@ import { useBoardPage, type BoardRow } from './hooks/useBoardPage';
 import { BoardHeaderRow, BoardRowView, gapText } from './BoardRows';
 import { BoardFilterPanel } from './BoardFilterPanel';
 import { BoardSeeAllSheet } from './BoardSeeAllSheet';
-import { useBoardRotation } from './hooks/useBoardRotation';
-import { FALLBACK_PICK } from './boardRotation';
+/* H3.2 — boardRotation.ts and useBoardRotation.ts are intentionally LEFT IN
+   PLACE but unwired; they are wanted for a separate surface. */
+import {
+  DEFAULT_BOARD_FALLBACK,
+  useHandicapDefaultBoard,
+} from './hooks/useHandicapDefaultBoard';
+
 import {
   BAND_OPTIONS,
   BOARD_LABELS,
