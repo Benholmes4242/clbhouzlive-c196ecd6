@@ -168,7 +168,15 @@ export interface CardScorecardSheetProps {
    * draws nothing when the prop is absent, so the tour surface is untouched.
    */
   engagement?: CardScorecardEngagement | null;
+  /**
+   * THE HONOURS TREATMENT (BRIEF_DISCOVER_FILTER_LED_BOARD S5.6/S8.3). The
+   * honours board rail is deleted; its metal survives HERE, on the one surface
+   * that shows a single feat round. Null for an ordinary round, which is nearly
+   * all of them, and then nothing renders.
+   */
+  feat?: HonoursFeat | null;
 }
+
 
 export interface CardScorecardEngagement {
   likeHidden?: boolean;
