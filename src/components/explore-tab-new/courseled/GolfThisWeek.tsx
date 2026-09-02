@@ -47,7 +47,7 @@ import {
  * returns `pos`, `is_tie` and `total_count`; NOTHING HERE RE-SORTS ITS OUTPUT.
  *
  * ONE BOARD ON SCREEN, ALWAYS (S4.3). Seven boards, one at a time, chosen from
- * the picker on the title. An empty board is a SENTENCE, never a hidden section:
+ * the filter panel. An empty board is a SENTENCE, never a hidden section:
  * a board that disappears when a filter bites teaches a member nothing.
  */
 
@@ -55,7 +55,7 @@ import {
 const VISIBLE_POSITIONS = 10;
 
 /**
- * ONE READ SERVES THE PAGE AND THE PIN. The page shows twenty; the read takes
+ * ONE READ SERVES THE PAGE AND THE PIN. The page shows ten positions; the read takes
  * two hundred so the member's own row can be FOUND and pinned without a second
  * query (S5.4). Past two hundred the pin is simply absent — a member ranked
  * 300th is told their position by the see-all sheet, not by a third round trip.
@@ -140,9 +140,7 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
     setFilters(next);
   }, []);
 
-  const unitCount = boardCountsRounds(board)
-    ? t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })
-    : t('discover.filterBoard.nMembers', '{{count}} members', { count: total });
+  const unitCount = t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total });
 
   return (
     <section style={{ margin: '0 -14px', fontFamily: SANS, ...FIGS }}>
@@ -274,6 +272,7 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
         userId={userId}
         board={board}
         onBoardChange={changeBoard}
+        resultCount={total}
         filters={filters}
         onChange={changeFilters}
         facets={facets}

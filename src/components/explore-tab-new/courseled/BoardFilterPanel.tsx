@@ -159,6 +159,7 @@ export interface BoardFilterPanelProps {
   userId: string | undefined;
   board: BoardKey;
   onBoardChange: (next: BoardKey) => void;
+  resultCount: number;
   filters: BoardFilters;
   onChange: (next: BoardFilters) => void;
   facets: BoardFacets;
@@ -170,6 +171,7 @@ export function BoardFilterPanel({
   userId,
   board,
   onBoardChange,
+  resultCount,
   filters,
   onChange,
   facets,
@@ -213,13 +215,11 @@ export function BoardFilterPanel({
 
   /* THE FOOTER'S FIGURE IS THE ACTIVE BOARD'S OWN COUNT under these filters,
      which is the number the board will render (S3.2). */
-  const footN = facets.countFor('board', board);
+  const footN = resultCount;
   const footDisabled = footN === 0;
   const footLabel = footDisabled
     ? t('discover.filterBoard.noMatch', 'No rounds match')
-    : boardCountsRounds(board)
-      ? t('discover.filterBoard.showRounds', 'Show {{count}} rounds', { count: footN ?? 0 })
-      : t('discover.filterBoard.showMembers', 'Show {{count}} members', { count: footN ?? 0 });
+    : t('discover.filterBoard.showRounds', 'Show {{count}} rounds', { count: footN });
 
   /* S3.6 — SELECTING A FEAT WIDENS When TO ALL TIME when the current window
      holds none of it, and the applied line says so. Production holds 5 aces and
