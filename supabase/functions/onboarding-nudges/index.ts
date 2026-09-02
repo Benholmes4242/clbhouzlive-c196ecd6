@@ -513,23 +513,36 @@ Deno.serve(async (req) => {
       continue;
     }
 
-    // 3. One ask. Highest-priority open gap with an unsent channel.
+    /* 3. WHICH GAP — TWO SEPARATE TESTS, NEVER CONFLATED (S3).
+       TEST ONE, HERE: the gap is the member's highest-priority OPEN gap, read
+       from their ACTUAL STATE and nothing else. A ledger row records that we
+       ASKED, never that the member DID anything, so it takes no part in this
+       choice. The previous version required the candidate to have an unsent
+       channel before it would `break`, so a fully-sent whs gap fell THROUGH to
+       club while the whs gap was still open — five members got a club ask seven
+       minutes after their handicap ask.
+       TEST TWO, BELOW: whether anything is left to send on that ONE gap. If all
+       three channels are already on the ledger the member receives NOTHING.
+       They do NOT advance. The chain advances only when the MEMBER advances. */
     const done = sentChannels.get(userId) ?? new Set<string>();
-    let gap: Gap | null = null;
-    for (const candidate of GAP_PRIORITY) {
-      if (!open[candidate]) continue;
-      const missing = (['dm', 'push', 'email'] as Channel[]).some(
-        (ch) => !done.has(`${candidate}:${ch}`),
-      );
-      if (missing) {
-        gap = candidate;
-        break;
-      }
-    }
+    const gap = GAP_PRIORITY.find((candidate) => open[candidate]) ?? null;
     if (!gap) {
       skippedNothingOpen++;
       continue;
     }
+    const channelsLeft = (['dm', 'push', 'email'] as Channel[]).some(
+      (ch) => !done.has(`${gap}:${ch}`),
+    );
+    if (!channelsLeft) {
+      skippedAlreadyAsked++;
+      continue;
+    }
+    /* S4 — one ask per day, whatever their state. */
+    if (contactedToday.has(userId)) {
+      skippedSameDay++;
+      continue;
+    }
+
 
     const result: Result = { user_id: userId, gap, dm: 'skipped', push: 'skipped', email: 'skipped' };
 
