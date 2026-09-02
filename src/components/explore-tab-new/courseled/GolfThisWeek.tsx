@@ -70,9 +70,19 @@ export interface GolfThisWeekProps {
   userId: string | undefined;
   /** A row is a ROUND: the host opens the scorecard sheet for it. */
   onRowPress?: (row: BoardRow) => void;
+  /**
+   * BRIEF_DISCOVER_COURSES_SECTION C2.1 — ONE FILTER BAR GOVERNS THE PAGE, and
+   * this is the only way out of it. Sections below (Courses played) READ the
+   * applied filter state and never write to it. Null until the rotation's pick
+   * has landed, because unresolved is not absent.
+   *
+   * THE BOARD KEY IS NOT REPORTED (C2.2): it is separate state here and stays
+   * here, so no consumer can scope itself by the leaderboard on screen.
+   */
+  onAppliedFiltersChange?: (filters: BoardFilters | null) => void;
 }
 
-export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
+export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange }: GolfThisWeekProps) {
   const { t } = useTranslation('courses');
 
   /* COMPONENT STATE, NEVER THE URL — a filter tap must not enter the back
