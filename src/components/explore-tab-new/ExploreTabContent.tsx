@@ -498,31 +498,12 @@ export default function ExploreTabContent({
             leads the page. Its own section rhythm comes from this flex gap. */}
         <AmateurNewsSection />
 
-        {/* BRIEF_DISCOVER_ORDER_AND_LABELS §1 — the RANKED sections precede the
-            MEDIA sections. */}
-        <MostPlayedLeaderboard
+        {/* COURSES PLAYED AND THE HONOURS BOARD ARE DELETED AS SECTIONS
+            (BRIEF_DISCOVER_FILTER_LED_BOARD S8). Both asked a question the board
+            now answers under a filter — "where" for courses played, "feats" for
+            honours — so keeping them would be the same answer told twice. The
+            honours TREATMENT survives on the scorecard sheet. */}
 
-          rows={mostPlayedList}
-          isPending={mostPlayedQuery.isPending}
-          onRowPress={handleMostPlayed}
-          onPlayerPress={handleMostPlayedPlayer}
-          onSeeAll={mostPlayedList.length > 5 ? () => setMostPlayedSheet(true) : undefined}
-        />
-
-        {/* 6 — THE HINGE (§1.1). Data, so it speaks act one's language; all-time
-            and unscoped, so it sits on the join without lying about which side it
-            is on. It stays ABOVE the media bar because a chip row that heads it
-            would imply the honours board is a media type.
-            It is structurally outside the media-controlled subtree below. */}
-        <div data-act-one-honours style={{ display: 'contents' }}>
-          <HonoursBoard
-            events={honours}
-            isPending={wireLoading}
-            onRowPress={handleHonoursRow}
-            limit={20}
-            onSeeAll={openHonoursSheet}
-          />
-        </div>
 
         {/* THE CHAPTER BREAK IS NOW A CONTROL (§4). ActSeam is deleted: a
             decorative rule with a caption that had to explain itself is a rule
