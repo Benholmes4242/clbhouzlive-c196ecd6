@@ -101,7 +101,7 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
   const [panelOpen, setPanelOpen] = useState(false);
   const [seeAll, setSeeAll] = useState(false);
 
-  const facets = useBoardFacets(userId, board, filters);
+  const facets = useBoardFacets(userId, board, filters, { enabled: ready });
   const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: ready });
 
   const rows = page.data?.rows ?? [];
@@ -227,7 +227,7 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
         }}
       >
         <span style={{ ...KICKER, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: A.BODY }}>
-          <AppliedFilterLine parts={appliedParts} />
+          {ready && <AppliedFilterLine parts={appliedParts} />}
         </span>
         <span style={{ ...KICKER, display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, color: A.INK }}>
           <ListFilter size={13} strokeWidth={2.4} aria-hidden />

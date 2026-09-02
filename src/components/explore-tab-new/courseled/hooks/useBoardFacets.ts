@@ -64,11 +64,15 @@ export function useBoardFacets(
   viewerId: string | undefined,
   board: BoardKey,
   filters: BoardFilters,
+  /* The rotation parks this read until the landing combination is known, so no
+     facet answer is fetched for a combination that is never rendered. */
+  options?: { enabled?: boolean },
 ): BoardFacets {
   const args = boardRpcArgs(viewerId, board, filters);
 
   const query = useQuery<FacetRow[]>({
     queryKey: ['discover', 'board-facets', args],
+    enabled: options?.enabled ?? true,
     staleTime: 60_000,
     placeholderData: keepPreviousData,
     queryFn: async () => {
