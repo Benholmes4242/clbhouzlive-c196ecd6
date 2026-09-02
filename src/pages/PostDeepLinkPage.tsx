@@ -17,6 +17,8 @@ interface PostPreview {
   post_type: string | null;
   created_at: string;
   user_profiles: {
+    /** Author's user id — keys the avatar fallback hue. */
+    id: string | null;
     username: string;
     display_name: string | null;
     avatar_url: string | null;
@@ -225,6 +227,7 @@ const PostDeepLinkPage: React.FC = () => {
         post_type: row.post_type ?? null,
         created_at: row.created_at,
         user_profiles: profileRow ? {
+          id: row.user_id ?? null,
           username: profileRow.username,
           display_name: profileRow.display_name,
           avatar_url: profileRow.profile_photo_url ?? null,
@@ -489,7 +492,7 @@ const PostDeepLinkPage: React.FC = () => {
                 className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold"
                 style={{
                   /* Shared hue — the same tile as the feed and the profile. */
-                  background: getAvatarFallbackGradient(post.user_id || displayName),
+                  background: getAvatarFallbackGradient(profile?.id || displayName),
                   color: 'rgba(248,250,252,0.82)',
                 }}
               >
