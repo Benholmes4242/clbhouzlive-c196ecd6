@@ -80,9 +80,9 @@ export function BoardSeeAllSheet({
       onClose={onClose}
       variant="dark"
       surfaceColor={A.CANVAS}
-      maxHeight="95dvh"
+      maxHeight="75dvh"
       ariaLabelledBy="board-see-all-title"
-      style={{ height: '95dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
+      style={{ height: '75dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
     >
       <div
         style={{
