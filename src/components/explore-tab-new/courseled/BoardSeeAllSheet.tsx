@@ -13,7 +13,8 @@ import { BoardHeaderRow, BoardRowView } from './BoardRows';
 /**
  * SEE ALL (BRIEF_DISCOVER_FILTER_LED_BOARD S5.1).
  *
- * THE SAME RPC, PAGED. The board renders the first twenty rows of
+ * THE SAME RPC, PAGED. The board renders the first ten places, with a tie at
+ * the cut kept whole, from
  * get_board_page; this sheet pages the SAME call with p_offset, so positions
  * continue rather than restart and the sheet can never disagree with the board
  * about who is fourth.

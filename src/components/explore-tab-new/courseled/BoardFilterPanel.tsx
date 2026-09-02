@@ -15,7 +15,6 @@ import {
   FEAT_OPTIONS,
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
-  boardCountsRounds,
   type BandKey,
   type BoardFilters,
   type BoardKey,
@@ -122,8 +121,7 @@ function PanelRow({
           minWidth: 0,
           fontSize: 14,
           fontWeight: active ? 700 : 600,
-          /* THE ACTIVE FILTER LABEL IS THE OTHER AMBER ON THIS SURFACE. */
-          color: active ? A.AMBER : A.INK,
+          color: A.INK,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -314,7 +312,7 @@ export function BoardFilterPanel({
               fontFamily: SANS,
               fontSize: 13.5,
               fontWeight: 700,
-              color: A.AMBER,
+              color: A.INK,
               cursor: 'pointer',
             }}
           >

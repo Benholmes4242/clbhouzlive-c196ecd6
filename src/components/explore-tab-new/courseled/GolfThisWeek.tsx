@@ -19,7 +19,6 @@ import {
   FEAT_OPTIONS,
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
-  boardCountsRounds,
   filtersAreDefault,
   type BoardFilters,
   type BoardKey,
@@ -86,8 +85,11 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
   const rows = page.data?.rows ?? [];
   const total = page.data?.total ?? 0;
   const visible = useMemo(() => {
-    const firstOutsideCut = rows.findIndex((row) => row.pos > VISIBLE_POSITIONS);
-    return firstOutsideCut === -1 ? rows : rows.slice(0, firstOutsideCut);
+    if (rows.length <= VISIBLE_POSITIONS) return rows;
+    let end = VISIBLE_POSITIONS;
+    const cutPosition = rows[VISIBLE_POSITIONS - 1]?.pos;
+    while (end < rows.length && rows[end]?.pos === cutPosition) end += 1;
+    return rows.slice(0, end);
   }, [rows]);
 
   /* S5.4 — the member's own row, pinned only when it is NOT already on screen. */
