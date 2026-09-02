@@ -97,6 +97,12 @@ export const readSessionPick = (): BoardPick | null =>
 export const readLastPick = (): BoardPick | null =>
   parsePick(safeGet('local', ROTATION_LAST_KEY));
 
+/** F1.1b — null (or a throwing store, F1.5) reads as "the day's first session". */
+export const readLastSeenDate = (): string | null => safeGet('local', LAST_SEEN_DATE_KEY);
+
+export const writeLastSeenDate = (date: string = localDateKey()) =>
+  safeSet('local', LAST_SEEN_DATE_KEY, date);
+
 /** R1.3 / R2.4 — written ONCE, at the moment a pick is made. */
 export function persistPick(pick: BoardPick) {
   safeSet('session', ROTATION_SESSION_KEY, comboId(pick));
