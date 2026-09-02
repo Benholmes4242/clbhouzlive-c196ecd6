@@ -16,13 +16,11 @@ import {
   BAND_OPTIONS,
   BOARD_LABELS,
   COURSES_SET_OPTIONS,
+  COMPETITION_OPTIONS,
   DEFAULT_FILTERS,
-  FEAT_OPTIONS,
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
-  ROLL_LABELS,
   filtersAreDefault,
-  isRollFeat,
   type BoardFilters,
   type BoardKey,
 } from './boardFilters';
@@ -134,18 +132,15 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
       window: next.window,
       courses: next.courses,
       band: next.band,
-      feat: next.feat,
+      competition: next.competition,
       region: next.regionKind ?? 'all',
     });
     setFilters(next);
   }, []);
 
-  /* S5 — A ROLL OF HONOUR, not a ranked board: the two rare feats ride the
-     `recent` board's date ordering with the feat axis set. */
-  const isRoll = isRollFeat(filters.feat);
-  const boardTitle = isRoll
-    ? t(ROLL_LABELS[filters.feat as 'ace' | 'albatross'].i18n, ROLL_LABELS[filters.feat as 'ace' | 'albatross'].label)
-    : t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
+  /* B1 — A FEAT IS A BOARD, so its title comes from the same place as any
+     other board's and no second vocabulary exists. */
+  const boardTitle = t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
 
   const unitCount = t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total });
 
@@ -227,20 +222,17 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
           <EmptyAnswer board={board} filters={filters} onReset={() => changeFilters({ ...DEFAULT_FILTERS })} />
         ) : (
           <>
-            <BoardHeaderRow board={board} roll={isRoll} />
+            <BoardHeaderRow board={board} />
             {visible.map((r) => (
               <BoardRowView
                 key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
                 row={r}
                 board={board}
                 isSelf={!!userId && r.user_id === userId}
-                roll={isRoll}
                 onPress={onRowPress}
               />
             ))}
-            {/* NO PINNED GAP ROW ON A ROLL OF HONOUR: there is no position to
-                be behind and no unit to be behind it in. */}
-            {!isRoll && minePinned && mine && leader && (
+            {minePinned && mine && leader && (
               <div style={{ marginTop: 6, borderTop: `1px solid ${A.BORDER}` }}>
                 <BoardRowView
                   row={mine}
@@ -292,7 +284,6 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
         board={board}
         filters={filters}
         appliedParts={appliedParts}
-        roll={isRoll}
         title={boardTitle}
         onRowPress={onRowPress}
       />
@@ -348,9 +339,10 @@ export function describeFilterParts(
     const b = BAND_OPTIONS.find((o) => o.key === f.band);
     if (b) parts.push(t(b.i18n, b.label));
   }
-  if (f.feat !== 'any') {
-    const ft = FEAT_OPTIONS.find((o) => o.key === f.feat);
-    if (ft) parts.push(t(ft.i18n, ft.label));
+  /* B3.4 — COMPETITION JOINS THE APPLIED LINE when set. */
+  if (f.competition !== 'any') {
+    const c = COMPETITION_OPTIONS.find((o) => o.key === f.competition);
+    if (c) parts.push(t(c.i18n, c.label));
   }
   return parts;
 }
