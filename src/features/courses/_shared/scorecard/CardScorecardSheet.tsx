@@ -8,6 +8,15 @@ import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolv
 import { TrajectoryLine } from './TrajectoryLine';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
+import {
+  honoursGround,
+  METAL_GOLD,
+  METAL_HAIRLINE,
+  METAL_INK,
+  METAL_TOP_EDGE,
+  type HonoursFeat,
+} from './honoursTreatment';
+
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
   TREND_UP, TREND_DOWN,
