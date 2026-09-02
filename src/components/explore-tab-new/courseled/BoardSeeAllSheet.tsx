@@ -3,8 +3,9 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { supabase } from '@/integrations/supabase/client';
-import { A, FIGS, SANS } from './tokens';
+import { FIGS, SANS } from './tokens';
 import { BOARD_LABELS, boardCountsRounds, type BoardFilters, type BoardKey } from './boardFilters';
 import { boardRpcArgs, type BoardRow } from './hooks/useBoardPage';
 import { BoardHeaderRow, BoardRowView } from './BoardRows';
@@ -93,14 +94,14 @@ export function BoardSeeAllSheet({
       >
         <h2
           id="board-see-all-title"
-          style={{ margin: 0, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.INK }}
+          style={{ ...KICKER, margin: 0, color: A.INK }}
         >
           {t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
         </h2>
         <button
           type="button"
           onClick={onClose}
-          style={{ padding: '8px 0', background: 'transparent', border: 'none', fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: A.INK, cursor: 'pointer' }}
+          style={{ ...KICKER, padding: '8px 0', background: 'transparent', border: 'none', fontFamily: SANS, color: A.AMBER, cursor: 'pointer' }}
         >
           {t('discover.filterBoard.done', 'Done')}
         </button>
@@ -111,7 +112,7 @@ export function BoardSeeAllSheet({
             ? t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })
             : t('discover.filterBoard.nMembers', '{{count}} members', { count: total })}
         </div>
-        <div style={{ marginTop: 6, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.BODY }}>
+        <div style={{ ...KICKER, marginTop: 6, color: A.MUTE }}>
           {appliedParts.map((part, index) => (
             <span key={`${part}:${index}`}>{index > 0 ? <> {'\u00B7'} </> : null}{part}</span>
           ))}
@@ -153,10 +154,7 @@ export function BoardSeeAllSheet({
               background: 'transparent',
               border: 'none',
               fontFamily: SANS,
-              fontSize: 12,
-              fontWeight: 700,
-              letterSpacing: '0.10em',
-              textTransform: 'uppercase',
+              ...KICKER,
               color: A.MUTE,
               cursor: 'pointer',
             }}

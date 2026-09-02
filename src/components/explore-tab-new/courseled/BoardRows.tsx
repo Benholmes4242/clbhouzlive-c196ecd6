@@ -181,9 +181,9 @@ export function BoardHeaderRow({ board }: { board: BoardKey }) {
   const { t } = useTranslation('courses');
   const cols = boardColumns(board);
   const cap: React.CSSProperties = {
-    fontSize: 9,
+    fontSize: 9.5,
     fontWeight: 700,
-    letterSpacing: '0.12em',
+    letterSpacing: '0.13em',
     textTransform: 'uppercase',
     color: A.DIM,
   };
