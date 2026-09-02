@@ -31,9 +31,9 @@ import type { HeroTournament } from '../hooks/useHeroCarouselData';
 import { HeroWireTicker, type TickerFact } from '../components/overview-v3/HybridHeroBands/HeroWireTicker';
 import {
   FONT,
-  HERO_BOARD_SURFACE,
   LIVE_INK,
 } from '../_shared/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /** Caption line + 36px ticker. Held as a constant so the pending shell matches. */
 const CAPTION_HEIGHT = 28;
@@ -42,7 +42,7 @@ export const STORY_STRIP_HEIGHT = CAPTION_HEIGHT + TICKER_HEIGHT;
 
 function Shell({ children }: { children?: React.ReactNode }) {
   return (
-    <div style={{ background: HERO_BOARD_SURFACE, width: '100%', minHeight: STORY_STRIP_HEIGHT, fontFamily: FONT }}>
+    <div style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', minHeight: STORY_STRIP_HEIGHT, fontFamily: FONT }}>
       {children}
     </div>
   );
@@ -143,7 +143,7 @@ export function StoryLeaderboardStrip({ tournamentId }: { tournamentId: string }
         if (e.key === 'Enter' || e.key === ' ') navigate(`/tourhub/tournament/${tournamentId}`);
       }}
       aria-label={`${caption} \u00b7 ${(tournament as any).name ?? ''}`}
-      style={{ background: HERO_BOARD_SURFACE, width: '100%', fontFamily: FONT, cursor: 'pointer' }}
+      style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', fontFamily: FONT, cursor: 'pointer' }}
     >
       <div
         style={{
