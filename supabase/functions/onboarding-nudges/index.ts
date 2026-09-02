@@ -427,7 +427,11 @@ Deno.serve(async (req) => {
   const [{ data: whsRows }, { data: ledgerRows }, { data: prefRows }, { data: unsubRows }] =
     await Promise.all([
       supabase.from('whs_connections').select('user_id').in('user_id', ids).is('deleted_at', null),
-      supabase.from('onboarding_nudges').select('user_id, gap, channel, resolved_at').in('user_id', ids),
+      supabase
+        .from('onboarding_nudges')
+        .select('user_id, gap, channel, resolved_at, sent_at')
+        .in('user_id', ids),
+
       supabase
         .from('notification_preferences')
         .select('user_id, muted_types, muted_business_ids')
@@ -444,22 +448,33 @@ Deno.serve(async (req) => {
   const sentChannels = new Map<string, Set<string>>(); // userId -> "gap:channel"
   const contactedGaps = new Map<string, Set<Gap>>();
   const openLedger = new Map<string, { gap: Gap; channel: Channel }[]>();
+  /* THE SAME-DAY RULE (MICRO_BRIEF_NUDGE_PRIORITY_CHAIN_BROKEN S4). A member who
+     closes a gap at 10am must not be asked about the next one at 10:05. Enforced
+     on the LEDGER, not a timer: any row sent today stops every send today. */
+  const contactedToday = new Set<string>();
+  const today = new Date().toISOString().slice(0, 10);
   for (const row of ledgerRows ?? []) {
     const key = row.user_id as string;
     if (!sentChannels.has(key)) sentChannels.set(key, new Set());
     sentChannels.get(key)!.add(`${row.gap}:${row.channel}`);
     if (!contactedGaps.has(key)) contactedGaps.set(key, new Set());
     contactedGaps.get(key)!.add(row.gap as Gap);
+    if (typeof row.sent_at === 'string' && row.sent_at.slice(0, 10) === today) {
+      contactedToday.add(key);
+    }
     if (!row.resolved_at) {
       if (!openLedger.has(key)) openLedger.set(key, []);
       openLedger.get(key)!.push({ gap: row.gap as Gap, channel: row.channel as Channel });
     }
   }
 
+
   const results: Result[] = [];
   let resolvedCount = 0;
   let skippedCapped = 0;
   let skippedNothingOpen = 0;
+  let skippedAlreadyAsked = 0;
+  let skippedSameDay = 0;
 
   for (const member of members ?? []) {
     const userId = member.id as string;
@@ -500,23 +515,36 @@ Deno.serve(async (req) => {
       continue;
     }
 
-    // 3. One ask. Highest-priority open gap with an unsent channel.
+    /* 3. WHICH GAP — TWO SEPARATE TESTS, NEVER CONFLATED (S3).
+       TEST ONE, HERE: the gap is the member's highest-priority OPEN gap, read
+       from their ACTUAL STATE and nothing else. A ledger row records that we
+       ASKED, never that the member DID anything, so it takes no part in this
+       choice. The previous version required the candidate to have an unsent
+       channel before it would `break`, so a fully-sent whs gap fell THROUGH to
+       club while the whs gap was still open — five members got a club ask seven
+       minutes after their handicap ask.
+       TEST TWO, BELOW: whether anything is left to send on that ONE gap. If all
+       three channels are already on the ledger the member receives NOTHING.
+       They do NOT advance. The chain advances only when the MEMBER advances. */
     const done = sentChannels.get(userId) ?? new Set<string>();
-    let gap: Gap | null = null;
-    for (const candidate of GAP_PRIORITY) {
-      if (!open[candidate]) continue;
-      const missing = (['dm', 'push', 'email'] as Channel[]).some(
-        (ch) => !done.has(`${candidate}:${ch}`),
-      );
-      if (missing) {
-        gap = candidate;
-        break;
-      }
-    }
+    const gap = GAP_PRIORITY.find((candidate) => open[candidate]) ?? null;
     if (!gap) {
       skippedNothingOpen++;
       continue;
     }
+    const channelsLeft = (['dm', 'push', 'email'] as Channel[]).some(
+      (ch) => !done.has(`${gap}:${ch}`),
+    );
+    if (!channelsLeft) {
+      skippedAlreadyAsked++;
+      continue;
+    }
+    /* S4 — one ask per day, whatever their state. */
+    if (contactedToday.has(userId)) {
+      skippedSameDay++;
+      continue;
+    }
+
 
     const result: Result = { user_id: userId, gap, dm: 'skipped', push: 'skipped', email: 'skipped' };
 
@@ -602,6 +630,8 @@ Deno.serve(async (req) => {
       resolved: resolvedCount,
       skipped_capped: skippedCapped,
       skipped_nothing_open: skippedNothingOpen,
+      skipped_already_asked: skippedAlreadyAsked,
+      skipped_same_day: skippedSameDay,
     }),
     { headers: { ...cors, 'Content-Type': 'application/json' } },
   );
