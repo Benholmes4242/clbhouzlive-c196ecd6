@@ -203,16 +203,10 @@ export default function ExploreTabContent({
      newest first) — the same hook the /community destination reads, so the
      sample and the full pool can never disagree. */
   const library = useCommunityLibrary();
-  const mostPlayedQuery = useMostPlayedThisWeek();
-
-  const mostPlayed = mostPlayedQuery.data;
-
-  const [golfWeekSheet, setGolfWeekSheet] = useState(false);
   const [findGolfers, setFindGolfers] = useState(false);
-  const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
-  const [honoursSheet, setHonoursSheet] = useState(false);
-  const [honoursMode, setHonoursMode] = useState<HonoursMode>('recent');
-  const [honoursFocus, setHonoursFocus] = useState<string | null>(null);
+  /* The feat the tapped board row was ranked on, handed to the scorecard sheet.
+     Null for an ordinary round, which is nearly all of them. */
+  const [boardFeat, setBoardFeat] = useState<HonoursFeat | null>(null);
 
   /**
    * LATEST REVIEWS LEFT THIS PAGE (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL
@@ -221,20 +215,7 @@ export default function ExploreTabContent({
    * Courses browse, where the review pool is country/region scoped.
    */
 
-  const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
 
-
-  const handleScopeChange = useCallback(
-    (next: WeekScope) => {
-      if (next === weekScope) return;
-      analyticsEvents.track('discover_lens_change', { lens: next });
-      /* A SCOPE CHANGE RESETS THE AREA (§S3.5): the counts belong to the scope,
-         so an area holding nothing under the new pill must not survive it. */
-      setWeekScope(next);
-      setWeekRegion(null);
-    },
-    [weekScope],
-  );
 
   /**
    * THE LENS MACHINERY MOVED INTO THE SECTION (BRIEF_GOLF_THIS_WEEK §3). The
