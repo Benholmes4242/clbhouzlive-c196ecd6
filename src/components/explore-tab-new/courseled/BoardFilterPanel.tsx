@@ -222,7 +222,18 @@ export function BoardFilterPanel({
     return o ? label(o) : label(COURSES_SET_OPTIONS[0]);
   })();
   const bandLabel = label(BAND_OPTIONS.find((o) => o.key === filters.band) ?? BAND_OPTIONS[0]);
-  const featLabel = label(FEAT_OPTIONS.find((o) => o.key === filters.feat) ?? FEAT_OPTIONS[0]);
+
+  /* THE Ranked by VALUE. A roll of honour names the FEAT, not the `recent`
+     board carrying it, so the row reads back the option that was tapped. */
+  const rankedByLabel = isRollFeat(filters.feat)
+    ? t(ROLL_LABELS[filters.feat].i18n, ROLL_LABELS[filters.feat].label)
+    : t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
+
+  /* S5 — ONLY THE RARE FEATS THAT HOLD SOMETHING IN THIS SCOPE. A null count is
+     UNRESOLVED and renders nothing, so it is excluded too rather than shown
+     bare: an option that may lead nowhere is worse than an absent one. */
+  const rollRows = ROLL_KEYS.map((key) => ({ key, count: facets.countFor('feat', key) }))
+    .filter((r): r is { key: typeof r.key; count: number } => (r.count ?? 0) > 0);
 
   /* THE FOOTER'S FIGURE IS THE ACTIVE BOARD'S OWN COUNT under these filters,
      which is the number the board will render (S3.2). */
@@ -234,19 +245,6 @@ export function BoardFilterPanel({
       ? t('discover.filterBoard.showRounds', 'Show {{count}} rounds', { count: footN })
       : t('discover.filterBoard.showMembers', 'Show {{count}} members', { count: footN });
 
-  /* S3.6 — SELECTING A FEAT WIDENS When TO ALL TIME when the current window
-     holds none of it, and the applied line says so. Production holds 5 aces and
-     1 albatross all time and none this year: without this rule, tapping "Hole in
-     one" on the default fortnight lands on an empty board. */
-  const pickFeat = (key: FeatKey) => {
-    const n = facets.countFor('feat', key);
-    if (key !== 'any' && n === 0 && filters.window !== 'all') {
-      set({ feat: key, window: 'all' });
-    } else {
-      set({ feat: key });
-    }
-    setScreen('root');
-  };
 
   const courseRows = facets.openList('course');
   const needle = courseSearch.trim().toLowerCase();
