@@ -15,7 +15,7 @@
  * list with the remainder greyed is not an option.
  */
 
-export type BoardKey =
+export type RankingBoardKey =
   | 'gross'
   | 'topar'
   | 'net'
@@ -24,8 +24,16 @@ export type BoardKey =
   | 'birdies'
   | 'recent';
 
-/** S4 — seven boards, always all seven present in the picker (S4.3). */
-export const BOARD_KEYS: BoardKey[] = [
+/**
+ * BRIEF_DISCOVER_BOARD_FEAT_BOARDS B1 — A FEAT IS A BOARD, NOT A FILTER AXIS.
+ * p_feat no longer exists; these four are BOARD VALUES the RPC ranks itself.
+ */
+export type FeatBoardKey = 'ace' | 'albatross' | 'eagle' | 'clean_card';
+
+export type BoardKey = RankingBoardKey | FeatBoardKey;
+
+/** B1.2 — the RANKINGS section: seven boards that rank members. */
+export const RANKING_BOARD_KEYS: RankingBoardKey[] = [
   'gross',
   'topar',
   'net',
@@ -35,7 +43,22 @@ export const BOARD_KEYS: BoardKey[] = [
   'recent',
 ];
 
+/**
+ * B1.2 — the FEATS section: four boards that LIST EVENTS. Plural labels, date
+ * order, no deduping, and greyed most of the time (B1.6) because production
+ * holds five aces and one albatross across 3,412 rounds.
+ */
+export const FEAT_BOARD_KEYS: FeatBoardKey[] = ['ace', 'albatross', 'eagle', 'clean_card'];
+
+export const isFeatBoard = (board: BoardKey): board is FeatBoardKey =>
+  (FEAT_BOARD_KEYS as string[]).includes(board);
+
+/** All eleven, in picker order. */
+export const BOARD_KEYS: BoardKey[] = [...RANKING_BOARD_KEYS, ...FEAT_BOARD_KEYS];
+
 export type ScopeKey = 'everyone' | 'circle' | 'club' | 'you';
+/** B3 — the COMPETITION axis, new and fully populated in production. */
+export type CompetitionKey = 'any' | 'competition' | 'social';
 export type WindowKey = '14' | '30' | '90' | 'year' | 'all';
 export type CoursesKey = 'any' | 'top100' | 'played' | 'one';
 export type BandKey =
@@ -48,14 +71,6 @@ export type BandKey =
   | 'b15'
   | 'b20'
   | 'b28';
-export type FeatKey =
-  | 'any'
-  | 'ace'
-  | 'albatross'
-  | 'eagle'
-  | 'clean_card'
-  | 'beat_par'
-  | 'sub_80';
 export type RegionKind = 'country' | 'sub_country';
 
 export interface BoardFilters {
@@ -66,7 +81,7 @@ export interface BoardFilters {
   courses: CoursesKey;
   courseId: string | null;
   band: BandKey;
-  feat: FeatKey;
+  competition: CompetitionKey;
 }
 
 /**
@@ -83,7 +98,7 @@ export const DEFAULT_FILTERS: BoardFilters = {
   courses: 'any',
   courseId: null,
   band: 'any',
-  feat: 'any',
+  competition: 'any',
 };
 
 export interface FixedOption<K extends string> {
@@ -99,7 +114,9 @@ export const SCOPE_OPTIONS: FixedOption<ScopeKey>[] = [
   { key: 'everyone', i18n: 'discover.filterBoard.scope.everyone', label: 'Everyone' },
   { key: 'circle', i18n: 'discover.filterBoard.scope.circle', label: 'Your circle' },
   { key: 'club', i18n: 'discover.filterBoard.scope.club', label: 'Your club' },
-  { key: 'you', i18n: 'discover.filterBoard.scope.you', label: 'Just you' },
+  /* B2 — "JUST YOU" IS GONE. A single-row leaderboard is not a leaderboard, and
+     a member's own history is better served on their profile. p_scope='you'
+     still resolves in the RPC; we simply stop offering it. */
 ];
 
 /** S3.5 — When. 'year' IS THE CALENDAR YEAR, from 1 January (the RPC's own cutoff). */
@@ -144,45 +161,15 @@ export const BAND_OPTIONS: FixedOption<BandKey>[] = [
 ];
 
 /**
- * BRIEF_FILTERS_SHEET_CASE_AND_FEATS S4 — THE FEATS ROW IS GONE FROM THE FILTER
- * PANEL. These labels remain because the FEAT AXIS still exists in the RPC and
- * in the applied line, and because the two RARE FEATS below are expressed
- * through it. eagle / clean_card / beat_par / sub_80 are ORPHANED UI-side: no
- * surface can select them any more. The RPC parameter, the pool columns and the
- * indexes are untouched (S4 keep-the-data rule).
+ * B3.2 — THE COMPETITION AXIS. THE THREE COUNTS DO NOT SUM TO THE TOTAL and must
+ * never be drawn as a split: on a members board a member with both a competition
+ * and a social round is counted in BOTH. Plain counts on rows, like every axis.
  */
-export const FEAT_OPTIONS: FixedOption<FeatKey>[] = [
-  { key: 'any', i18n: 'discover.filterBoard.feat.any', label: 'Any' },
-  { key: 'ace', i18n: 'discover.filterBoard.feat.ace', label: 'Hole in one' },
-  { key: 'albatross', i18n: 'discover.filterBoard.feat.albatross', label: 'Albatross' },
-  { key: 'eagle', i18n: 'discover.filterBoard.feat.eagle', label: 'Eagle' },
-  { key: 'clean_card', i18n: 'discover.filterBoard.feat.cleanCard', label: 'Bogey-free round' },
-  { key: 'beat_par', i18n: 'discover.filterBoard.feat.beatPar', label: 'Under par' },
-  { key: 'sub_80', i18n: 'discover.filterBoard.feat.sub80', label: 'Broke 80' },
+export const COMPETITION_OPTIONS: FixedOption<CompetitionKey>[] = [
+  { key: 'any', i18n: 'discover.filterBoard.competition.any', label: 'Any round' },
+  { key: 'competition', i18n: 'discover.filterBoard.competition.competition', label: 'Competition' },
+  { key: 'social', i18n: 'discover.filterBoard.competition.social', label: 'Social' },
 ];
-
-/**
- * S5 — THE TWO RARE FEATS ARE NOT BOARDS. They live at the foot of WHICH BOARD
- * under their own section label and each renders as a ROLL OF HONOUR: the
- * members who have recorded one, most recent first, with no position column and
- * no ranking figure. A "most albatrosses" column would be a list of 1s.
- *
- * MECHANICALLY they are the `recent` board (which orders by date) with the feat
- * axis set, so nothing new is asked of the database.
- */
-export type RollKey = Extract<FeatKey, 'ace' | 'albatross'>;
-
-export const ROLL_KEYS: RollKey[] = ['ace', 'albatross'];
-
-export const ROLL_LABELS: Record<RollKey, { i18n: string; label: string }> = {
-  ace: { i18n: 'discover.filterBoard.feat.ace', label: 'Hole in one' },
-  albatross: { i18n: 'discover.filterBoard.feat.albatross', label: 'Albatross' },
-};
-
-/** True where the surface is a dated roll of honour rather than a ranked board. */
-export const isRollFeat = (feat: FeatKey): feat is RollKey =>
-  feat === 'ace' || feat === 'albatross';
-
 
 export const BOARD_LABELS: Record<BoardKey, { i18n: string; label: string }> = {
   gross: { i18n: 'discover.filterBoard.board.gross', label: 'Lowest gross' },
@@ -192,10 +179,20 @@ export const BOARD_LABELS: Record<BoardKey, { i18n: string; label: string }> = {
   improved: { i18n: 'discover.filterBoard.board.improved', label: 'Most improved' },
   birdies: { i18n: 'discover.filterBoard.board.birdies', label: 'Most birdies' },
   recent: { i18n: 'discover.filterBoard.board.recent', label: 'Most recent' },
+  /* PLURAL: each is a list of EVENTS rather than a ranking of members (B1.2). */
+  ace: { i18n: 'discover.filterBoard.board.ace', label: 'Holes in one' },
+  albatross: { i18n: 'discover.filterBoard.board.albatross', label: 'Albatrosses' },
+  eagle: { i18n: 'discover.filterBoard.board.eagle', label: 'Eagles' },
+  clean_card: { i18n: 'discover.filterBoard.board.cleanCard', label: 'Bogey-free rounds' },
 };
 
-/** True where the board counts ROUNDS rather than MEMBERS (S3.2). */
-export const boardCountsRounds = (board: BoardKey) => board === 'recent';
+/**
+ * True where the board counts ROUNDS rather than MEMBERS (S3.2). B1.4 — all four
+ * feat boards read "rounds", never "members", because a member with two aces
+ * holds two rows.
+ */
+export const boardCountsRounds = (board: BoardKey) =>
+  board === 'recent' || isFeatBoard(board);
 
 export function filtersAreDefault(f: BoardFilters): boolean {
   return (
@@ -205,6 +202,6 @@ export function filtersAreDefault(f: BoardFilters): boolean {
     f.courses === 'any' &&
     f.courseId == null &&
     f.band === 'any' &&
-    f.feat === 'any'
+    f.competition === 'any'
   );
 }
