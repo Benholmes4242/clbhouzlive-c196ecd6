@@ -20,7 +20,9 @@ import {
   FEAT_OPTIONS,
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
+  ROLL_LABELS,
   filtersAreDefault,
+  isRollFeat,
   type BoardFilters,
   type BoardKey,
 } from './boardFilters';
@@ -138,6 +140,13 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
     setFilters(next);
   }, []);
 
+  /* S5 — A ROLL OF HONOUR, not a ranked board: the two rare feats ride the
+     `recent` board's date ordering with the feat axis set. */
+  const isRoll = isRollFeat(filters.feat);
+  const boardTitle = isRoll
+    ? t(ROLL_LABELS[filters.feat as 'ace' | 'albatross'].i18n, ROLL_LABELS[filters.feat as 'ace' | 'albatross'].label)
+    : t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
+
   const unitCount = t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total });
 
   return (
@@ -180,7 +189,7 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
             {t('discover.board.circuitEyebrow', 'The amateur circuit')}
           </span>
           <h2 style={{ margin: '6px 0 0', fontSize: 25, fontWeight: 700, letterSpacing: '0.005em', textTransform: 'uppercase', color: DISCOVER_FACT }}>
-            {t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
+            {boardTitle}
           </h2>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 12, whiteSpace: 'nowrap' }}>
             <Stat value={String(total)} label={t('discover.filterBoard.col.rounds', 'ROUNDS')} />
@@ -218,17 +227,20 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
           <EmptyAnswer board={board} filters={filters} onReset={() => changeFilters({ ...DEFAULT_FILTERS })} />
         ) : (
           <>
-            <BoardHeaderRow board={board} />
+            <BoardHeaderRow board={board} roll={isRoll} />
             {visible.map((r) => (
               <BoardRowView
                 key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
                 row={r}
                 board={board}
                 isSelf={!!userId && r.user_id === userId}
+                roll={isRoll}
                 onPress={onRowPress}
               />
             ))}
-            {minePinned && mine && leader && (
+            {/* NO PINNED GAP ROW ON A ROLL OF HONOUR: there is no position to
+                be behind and no unit to be behind it in. */}
+            {!isRoll && minePinned && mine && leader && (
               <div style={{ marginTop: 6, borderTop: `1px solid ${A.BORDER}` }}>
                 <BoardRowView
                   row={mine}
@@ -280,6 +292,8 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
         board={board}
         filters={filters}
         appliedParts={appliedParts}
+        roll={isRoll}
+        title={boardTitle}
         onRowPress={onRowPress}
       />
     </section>
