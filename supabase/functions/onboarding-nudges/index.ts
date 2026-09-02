@@ -52,9 +52,13 @@ type Channel = 'dm' | 'push' | 'email';
 const GAP_PRIORITY: Gap[] = ['whs', 'club', 'username'];
 
 interface Copy {
-  /** Push title and email subject: the one ask, never a summary of the app. */
+  /** Push title, email subject and the DM action label: the one ask. */
   subject: string;
-  /** Body, British English, straight apostrophes, no em dashes. */
+  /**
+   * Body, British English, straight apostrophes, spaced hyphens, no
+   * exclamation marks. The instruction lives on the action row, so the body is
+   * a sentence to a person. `{username}` is substituted where present.
+   */
   body: string;
   path: string;
   src: string;
@@ -64,31 +68,44 @@ const COPY: Record<Gap, Copy> = {
   whs: {
     subject: 'Connect your handicap',
     body:
-      'Your rounds are waiting. Connect your handicap and every round you play ' +
-      'arrives on its own, scored hole by hole against the course you played it on.',
+      'Once you connect your handicap, every round you play turns up here on its ' +
+      'own, scored hole by hole against the course you played it on. Nothing to type in.',
     path: '/handicap',
     src: 'nudge_whs',
   },
   club: {
     subject: 'Set your home club',
     body:
-      'Set your home club and you will see how your club\'s members are scoring, ' +
+      'Add your home club and you will see how your club\'s members are scoring, ' +
       'and find the ones already on clbhouz.',
     path: '/edit-profile',
     src: 'nudge_club',
   },
   username: {
     subject: 'Pick a username',
-    body: 'Pick a username so the golfers you play with can find you.',
+    body:
+      'You are down as {username} at the moment. Pick something the golfers you ' +
+      'play with will recognise.',
     path: '/edit-profile',
     src: 'nudge_username',
   },
 };
 
-function linkFor(gap: Gap): string {
-  const c = COPY[gap];
-  return `${APP_ORIGIN}${c.path}?src=${c.src}`;
+function bodyFor(gap: Gap, username: string | null): string {
+  return COPY[gap].body.replace('{username}', username ?? 'a generated name');
 }
+
+/** Relative, internal route. Used by the DM action and the push payload. */
+function routeFor(gap: Gap): string {
+  const c = COPY[gap];
+  return `${c.path}?src=${c.src}`;
+}
+
+/** Absolute, canonical host. EMAIL ONLY — it opens outside the app. */
+function emailLinkFor(gap: Gap): string {
+  return `${EMAIL_ORIGIN}${routeFor(gap)}`;
+}
+
 
 // ─── Unsubscribe token ───────────────────────────────────────────────────────
 // HMAC over the user id with a server-only secret. Nothing guessable and
