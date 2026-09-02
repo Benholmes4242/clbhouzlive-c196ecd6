@@ -1379,7 +1379,13 @@
       "daysAgo_one": "{{count}} day ago",
       "lastWeek": "Last week",
       "weeksAgo": "{{count}}w ago",
-      "monthsAgo": "{{count}}mo ago"
+      "monthsAgo": "{{count}}mo ago",
+      "relToday": "today",
+      "relYest": "yest",
+      "relDaysAgo": "{{n}}d ago",
+      "relWeeksAgo": "{{n}}w ago",
+      "relMonthsAgo": "{{n}}mo ago",
+      "relYearsAgo": "{{n}}y ago"
     },
     "rarest": {
       "aceAt": "Hole in one, {{hole}}",
