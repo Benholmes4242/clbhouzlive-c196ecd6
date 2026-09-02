@@ -12,7 +12,19 @@ export type MessageType =
   | 'location'
   | 'course_share'
   | 'tee_time_share'
-  | 'moment_share';
+  | 'moment_share'
+  /**
+   * SERVER-AUTHORED ONLY (msg_send rejects it). Prose in `body` plus a single
+   * relative in-app route in metadata.action. Nothing in the client writes it.
+   */
+  | 'action';
+
+/** metadata.action on a type='action' message. */
+export interface MessageAction {
+  label: string;
+  /** Relative, internal route only. Absolute URLs are rendered inert. */
+  route: string;
+}
 
 export interface InboxParticipant {
   actor_type: ActorType;
