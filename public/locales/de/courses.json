@@ -1292,6 +1292,14 @@
     "mostPlayedOneRoundLine_other": "Nur {{name}} hat hier gespielt, bestes {{gross}}.",
     "comments": {
       "action": "Comment on this round"
+    },
+    "when": {
+      "relToday": "heute",
+      "relYest": "gestern",
+      "relDaysAgo": "vor {{n}} T",
+      "relWeeksAgo": "vor {{n}} Wo",
+      "relMonthsAgo": "vor {{n}} Mon",
+      "relYearsAgo": "vor {{n}} J"
     }
   },
   "statBrowse": {
