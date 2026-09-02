@@ -417,7 +417,9 @@ function CoursePlayers({
 
   if (players.isPending) {
     return (
-      <div aria-hidden style={{ paddingBottom: 8, height: expectedRows * PLAYER_H }} />
+      /* The shell stands at the panel's eventual height: count line, the capped
+         rows, then the action. */
+      <div aria-hidden style={{ paddingBottom: 8, height: 20 + expectedRows * PLAYER_H + 34 }} />
     );
   }
 
