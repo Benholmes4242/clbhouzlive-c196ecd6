@@ -622,7 +622,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, identityStat,
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
+  feat = null,
   sheetStyle,
+
 }) => {
   const { t } = useTranslation(['courses']);
   void emptyMessage;
