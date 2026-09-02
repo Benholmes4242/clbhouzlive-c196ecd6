@@ -15,6 +15,7 @@ import {
   FEAT_OPTIONS,
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
+  boardCountsRounds,
   type BandKey,
   type BoardFilters,
   type BoardKey,
@@ -63,7 +64,7 @@ const rowBase: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 12,
-  padding: '14px 16px',
+  padding: '16px',
   background: 'transparent',
   border: 'none',
   borderBottom: `1px solid ${A.BORDER}`,
@@ -89,6 +90,7 @@ function PanelRow({
   label,
   count,
   value,
+  valueChanged,
   active,
   disabled,
   chevron,
@@ -98,6 +100,8 @@ function PanelRow({
   count?: number | null;
   /** The drilldown's current selection, shown at the right (S3.3). */
   value?: string;
+  /** Root drilldown values recede until changed from their default. */
+  valueChanged?: boolean;
   active?: boolean;
   disabled?: boolean;
   chevron?: boolean;
@@ -134,7 +138,7 @@ function PanelRow({
           style={{
             fontSize: 12.5,
             fontWeight: 700,
-            color: A.MUTE,
+            color: valueChanged ? A.INK : A.DIM,
             flexShrink: 0,
             maxWidth: 150,
             overflow: 'hidden',
@@ -217,7 +221,9 @@ export function BoardFilterPanel({
   const footDisabled = footN === 0;
   const footLabel = footDisabled
     ? t('discover.filterBoard.noMatch', 'No rounds match')
-    : t('discover.filterBoard.showRounds', 'Show {{count}} rounds', { count: footN });
+    : boardCountsRounds(board)
+      ? t('discover.filterBoard.showRounds', 'Show {{count}} rounds', { count: footN })
+      : t('discover.filterBoard.showMembers', 'Show {{count}} members', { count: footN });
 
   /* S3.6 — SELECTING A FEAT WIDENS When TO ALL TIME when the current window
      holds none of it, and the applied line says so. Production holds 5 aces and
@@ -279,7 +285,7 @@ export function BoardFilterPanel({
           flexShrink: 0,
           paddingTop: HEADER_PAD_TOP,
           borderBottom: `1px solid ${A.BORDER}`,
-          background: A.PANEL,
+          background: A.CANVAS,
         }}
       >
         <div
@@ -293,9 +299,9 @@ export function BoardFilterPanel({
         >
           <span
             style={{
-              fontSize: 13,
+              fontSize: 10,
               fontWeight: 700,
-              letterSpacing: '0.10em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: A.INK,
             }}
@@ -323,13 +329,23 @@ export function BoardFilterPanel({
         </div>
       </div>
 
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          willChange: 'transform',
+        }}
+      >
         {screen === 'root' && (
           <>
             <SectionLabel>{t('discover.filterBoard.eyebrow', 'The board')}</SectionLabel>
             <PanelRow
               label={t('discover.filterBoard.rankedBy', 'Ranked by')}
               value={t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
+              valueChanged={board !== 'gross'}
               chevron
               onClick={() => setScreen('board')}
             />
@@ -350,30 +366,35 @@ export function BoardFilterPanel({
             <PanelRow
               label={t('discover.filterBoard.axis.when', 'When')}
               value={windowLabel}
+              valueChanged={filters.window !== DEFAULT_FILTERS.window}
               chevron
               onClick={() => setScreen('window')}
             />
             <PanelRow
               label={t('discover.filterBoard.axis.where', 'Where')}
               value={whereLabel}
+              valueChanged={filters.regionKind != null || filters.regionValue != null}
               chevron
               onClick={() => setScreen('where')}
             />
             <PanelRow
               label={t('discover.filterBoard.axis.courses', 'Courses')}
               value={coursesLabel}
+              valueChanged={filters.courses !== DEFAULT_FILTERS.courses || filters.courseId != null}
               chevron
               onClick={() => setScreen('courses')}
             />
             <PanelRow
               label={t('discover.filterBoard.axis.handicap', 'Handicap')}
               value={bandLabel}
+              valueChanged={filters.band !== DEFAULT_FILTERS.band}
               chevron
               onClick={() => setScreen('band')}
             />
             <PanelRow
               label={t('discover.filterBoard.axis.feats', 'Feats')}
               value={featLabel}
+              valueChanged={filters.feat !== DEFAULT_FILTERS.feat}
               chevron
               onClick={() => setScreen('feat')}
             />
@@ -559,7 +580,7 @@ export function BoardFilterPanel({
         style={{
           flexShrink: 0,
           borderTop: `1px solid ${A.BORDER}`,
-          background: A.PANEL,
+          background: A.CANVAS,
           padding: '12px 16px calc(env(safe-area-inset-bottom, 0px) + 12px)',
         }}
       >
@@ -592,7 +613,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        padding: '18px 16px 8px',
+        padding: '22px 16px 9px',
         fontSize: 10,
         fontWeight: 700,
         letterSpacing: '0.14em',

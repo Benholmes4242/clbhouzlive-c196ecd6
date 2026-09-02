@@ -3,7 +3,6 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SheetHeader } from '@/components/ui/SheetHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { A, FIGS, SANS } from './tokens';
 import { BOARD_LABELS, boardCountsRounds, type BoardFilters, type BoardKey } from './boardFilters';
@@ -33,8 +32,8 @@ export interface BoardSeeAllSheetProps {
   userId: string | undefined;
   board: BoardKey;
   filters: BoardFilters;
-  /** The applied-filter line, verbatim from the board (S5.2). */
-  appliedLine: string;
+  /** The applied-filter parts, preserving the page's JSX separator treatment. */
+  appliedParts: string[];
   onRowPress?: (row: BoardRow) => void;
 }
 
@@ -44,7 +43,7 @@ export function BoardSeeAllSheet({
   userId,
   board,
   filters,
-  appliedLine,
+  appliedParts,
   onRowPress,
 }: BoardSeeAllSheetProps) {
   const { t } = useTranslation('courses');
@@ -72,22 +71,68 @@ export function BoardSeeAllSheet({
   const total = rows.length > 0 ? Number(rows[0].total_count) : 0;
 
   return (
-    <BottomSheet open={open} onClose={onClose} variant="dark" ariaLabelledBy="board-see-all-title">
-      <SheetHeader
-        dark
-        eyebrow={t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
-        title={
-          <span id="board-see-all-title">
-            {boardCountsRounds(board)
-              ? t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })
-              : t('discover.filterBoard.nMembers', '{{count}} members', { count: total })}
-          </span>
-        }
-        sub={appliedLine}
-        onClose={onClose}
-      />
-      <div style={{ padding: '8px 16px 0', fontFamily: SANS, ...FIGS }}>
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      variant="dark"
+      surfaceColor={A.CANVAS}
+      maxHeight="95dvh"
+      ariaLabelledBy="board-see-all-title"
+      style={{ height: '95dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
+    >
+      <div
+        style={{
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          padding: '10px 16px 12px',
+          borderBottom: `1px solid ${A.BORDER}`,
+        }}
+      >
+        <h2
+          id="board-see-all-title"
+          style={{ margin: 0, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.INK }}
+        >
+          {t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
+        </h2>
+        <button
+          type="button"
+          onClick={onClose}
+          style={{ padding: '8px 0', background: 'transparent', border: 'none', fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: A.INK, cursor: 'pointer' }}
+        >
+          {t('discover.filterBoard.done', 'Done')}
+        </button>
+      </div>
+      <div style={{ flexShrink: 0, padding: '16px 16px 12px', borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS, ...FIGS }}>
+        <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 700, color: A.INK }}>
+          {boardCountsRounds(board)
+            ? t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })
+            : t('discover.filterBoard.nMembers', '{{count}} members', { count: total })}
+        </div>
+        <div style={{ marginTop: 6, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.BODY }}>
+          {appliedParts.map((part, index) => (
+            <span key={`${part}:${index}`}>{index > 0 ? <> {'\u00B7'} </> : null}{part}</span>
+          ))}
+        </div>
+      </div>
+      <div style={{ flexShrink: 0, padding: '8px 16px 0', fontFamily: SANS, ...FIGS }}>
         <BoardHeaderRow board={board} />
+      </div>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          willChange: 'transform',
+          padding: '0 16px calc(env(safe-area-inset-bottom, 0px) + 24px)',
+          fontFamily: SANS,
+          ...FIGS,
+        }}
+      >
         {rows.map((r) => (
           <BoardRowView
             key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
@@ -122,7 +167,6 @@ export function BoardSeeAllSheet({
           </button>
         )}
       </div>
-      <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }} />
     </BottomSheet>
   );
 }
