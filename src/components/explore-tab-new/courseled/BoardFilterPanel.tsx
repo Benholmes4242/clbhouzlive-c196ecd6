@@ -23,7 +23,6 @@ import {
   type BoardFilters,
   type BoardKey,
   type CoursesKey,
-  type FeatKey,
   type WindowKey,
 } from './boardFilters';
 
@@ -56,7 +55,7 @@ import {
  * a club under HOME_CLUB_MIN_MEMBERS gets NO "Your club" row.
  */
 
-type Screen = 'root' | 'board' | 'window' | 'where' | 'courses' | 'band' | 'feat';
+type Screen = 'root' | 'board' | 'window' | 'where' | 'courses' | 'band';
 
 /** S3.5 — a search field appears only past this many individual course rows. */
 const COURSE_SEARCH_THRESHOLD = 60;
@@ -265,8 +264,6 @@ export function BoardFilterPanel({
         return t('discover.filterBoard.axis.courses', 'Courses');
       case 'band':
         return t('discover.filterBoard.axis.handicap', 'Handicap');
-      case 'feat':
-        return t('discover.filterBoard.axis.feats', 'Feats');
       default:
         return t('discover.filterBoard.title', 'Filters');
     }
