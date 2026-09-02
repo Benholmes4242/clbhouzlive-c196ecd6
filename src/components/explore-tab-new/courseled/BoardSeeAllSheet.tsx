@@ -101,13 +101,13 @@ export function BoardSeeAllSheet({
         <button
           type="button"
           onClick={onClose}
-          style={{ ...KICKER, padding: '8px 0', background: 'transparent', border: 'none', fontFamily: SANS, color: A.AMBER, cursor: 'pointer' }}
+          style={{ ...KICKER, padding: '8px 0', background: 'transparent', border: 'none', fontFamily: SANS, color: A.INK, cursor: 'pointer' }}
         >
           {t('discover.filterBoard.done', 'Done')}
         </button>
       </div>
       <div style={{ flexShrink: 0, padding: '16px 16px 12px', borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS, ...FIGS }}>
-        <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 700, color: A.INK }}>
+        <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 700, color: A.INK, textTransform: 'uppercase' }}>
           {boardCountsRounds(board)
             ? t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })
             : t('discover.filterBoard.nMembers', '{{count}} members', { count: total })}
