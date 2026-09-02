@@ -8,6 +8,8 @@ import { useAvailableWeekScopes } from './hooks/useGolfThisWeek';
 import type { BoardFacets } from './hooks/useBoardFacets';
 import {
   BAND_OPTIONS,
+  BOARD_KEYS,
+  BOARD_LABELS,
   COURSES_SET_OPTIONS,
   DEFAULT_FILTERS,
   FEAT_OPTIONS,
@@ -50,7 +52,7 @@ import {
  * a club under HOME_CLUB_MIN_MEMBERS gets NO "Your club" row.
  */
 
-type Screen = 'root' | 'window' | 'where' | 'courses' | 'band' | 'feat';
+type Screen = 'root' | 'board' | 'window' | 'where' | 'courses' | 'band' | 'feat';
 
 /** S3.5 — a search field appears only past this many individual course rows. */
 const COURSE_SEARCH_THRESHOLD = 60;
@@ -156,6 +158,7 @@ export interface BoardFilterPanelProps {
   onClose: () => void;
   userId: string | undefined;
   board: BoardKey;
+  onBoardChange: (next: BoardKey) => void;
   filters: BoardFilters;
   onChange: (next: BoardFilters) => void;
   facets: BoardFacets;
@@ -166,6 +169,7 @@ export function BoardFilterPanel({
   onClose,
   userId,
   board,
+  onBoardChange,
   filters,
   onChange,
   facets,
@@ -240,6 +244,8 @@ export function BoardFilterPanel({
 
   const headerTitle = () => {
     switch (screen) {
+      case 'board':
+        return t('discover.filterBoard.pickBoard', 'Which board');
       case 'window':
         return t('discover.filterBoard.axis.when', 'When');
       case 'where':
@@ -322,6 +328,14 @@ export function BoardFilterPanel({
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
         {screen === 'root' && (
           <>
+            <SectionLabel>{t('discover.filterBoard.eyebrow', 'The board')}</SectionLabel>
+            <PanelRow
+              label={t('discover.filterBoard.rankedBy', 'Ranked by')}
+              value={t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
+              chevron
+              onClick={() => setScreen('board')}
+            />
+
             <SectionLabel>{t('discover.filterBoard.who', 'Who')}</SectionLabel>
             {SCOPE_OPTIONS.filter((o) => (o.key === 'club' ? clubApplies : true)).map((o) => (
               <PanelRow
@@ -383,6 +397,24 @@ export function BoardFilterPanel({
             </button>
           </>
         )}
+
+        {screen === 'board' &&
+          BOARD_KEYS.map((key) => {
+            const count = facets.countFor('board', key);
+            return (
+              <PanelRow
+                key={key}
+                label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
+                count={count}
+                active={board === key}
+                disabled={count === 0}
+                onClick={() => {
+                  onBoardChange(key);
+                  setScreen('root');
+                }}
+              />
+            );
+          })}
 
         {screen === 'window' &&
           WINDOW_OPTIONS.map((o) => (
