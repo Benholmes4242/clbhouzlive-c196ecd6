@@ -132,7 +132,7 @@ export const COURSES_SET_OPTIONS: FixedOption<Exclude<CoursesKey, 'one'>>[] = [
  * vocabulary and ARE NOT TO BE ADJUSTED here or anywhere else.
  */
 export const BAND_OPTIONS: FixedOption<BandKey>[] = [
-  { key: 'any', i18n: 'discover.filterBoard.band.any', label: 'Any handicap' },
+  { key: 'any', i18n: 'discover.filterBoard.band.all', label: 'All handicaps' },
   { key: 'near', i18n: 'discover.filterBoard.band.near', label: 'Near yours' },
   { key: 'plus', i18n: 'discover.filterBoard.band.plus', label: 'Plus' },
   { key: 'b0', i18n: 'discover.filterBoard.band.b0', label: 'Scratch to 4.9' },
@@ -144,9 +144,12 @@ export const BAND_OPTIONS: FixedOption<BandKey>[] = [
 ];
 
 /**
- * S3.5 — Feats. NO ACE OR ALBATROSS BOARD (S4.2): they are an axis here, and
- * only here. COURSE RECORD IS DELIBERATELY ABSENT (S9) — it comes from a
- * separate RPC rather than a column on the round.
+ * BRIEF_FILTERS_SHEET_CASE_AND_FEATS S4 — THE FEATS ROW IS GONE FROM THE FILTER
+ * PANEL. These labels remain because the FEAT AXIS still exists in the RPC and
+ * in the applied line, and because the two RARE FEATS below are expressed
+ * through it. eagle / clean_card / beat_par / sub_80 are ORPHANED UI-side: no
+ * surface can select them any more. The RPC parameter, the pool columns and the
+ * indexes are untouched (S4 keep-the-data rule).
  */
 export const FEAT_OPTIONS: FixedOption<FeatKey>[] = [
   { key: 'any', i18n: 'discover.filterBoard.feat.any', label: 'Any' },
@@ -157,6 +160,29 @@ export const FEAT_OPTIONS: FixedOption<FeatKey>[] = [
   { key: 'beat_par', i18n: 'discover.filterBoard.feat.beatPar', label: 'Under par' },
   { key: 'sub_80', i18n: 'discover.filterBoard.feat.sub80', label: 'Broke 80' },
 ];
+
+/**
+ * S5 — THE TWO RARE FEATS ARE NOT BOARDS. They live at the foot of WHICH BOARD
+ * under their own section label and each renders as a ROLL OF HONOUR: the
+ * members who have recorded one, most recent first, with no position column and
+ * no ranking figure. A "most albatrosses" column would be a list of 1s.
+ *
+ * MECHANICALLY they are the `recent` board (which orders by date) with the feat
+ * axis set, so nothing new is asked of the database.
+ */
+export type RollKey = Extract<FeatKey, 'ace' | 'albatross'>;
+
+export const ROLL_KEYS: RollKey[] = ['ace', 'albatross'];
+
+export const ROLL_LABELS: Record<RollKey, { i18n: string; label: string }> = {
+  ace: { i18n: 'discover.filterBoard.feat.ace', label: 'Hole in one' },
+  albatross: { i18n: 'discover.filterBoard.feat.albatross', label: 'Albatross' },
+};
+
+/** True where the surface is a dated roll of honour rather than a ranked board. */
+export const isRollFeat = (feat: FeatKey): feat is RollKey =>
+  feat === 'ace' || feat === 'albatross';
+
 
 export const BOARD_LABELS: Record<BoardKey, { i18n: string; label: string }> = {
   gross: { i18n: 'discover.filterBoard.board.gross', label: 'Lowest gross' },

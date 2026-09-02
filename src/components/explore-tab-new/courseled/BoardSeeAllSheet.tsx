@@ -35,6 +35,10 @@ export interface BoardSeeAllSheetProps {
   filters: BoardFilters;
   /** The applied-filter parts, preserving the page's JSX separator treatment. */
   appliedParts: string[];
+  /** A dated ROLL OF HONOUR rather than a ranked board (S5). */
+  roll?: boolean;
+  /** The surface's own title, which on a roll names the feat, not the board. */
+  title?: string;
   onRowPress?: (row: BoardRow) => void;
 }
 
@@ -45,6 +49,8 @@ export function BoardSeeAllSheet({
   board,
   filters,
   appliedParts,
+  roll,
+  title,
   onRowPress,
 }: BoardSeeAllSheetProps) {
   const { t } = useTranslation('courses');
@@ -96,7 +102,7 @@ export function BoardSeeAllSheet({
           id="board-see-all-title"
           style={{ ...KICKER, margin: 0, color: A.INK }}
         >
-          {t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
+          {title ?? t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
         </h2>
         <button
           type="button"
@@ -108,7 +114,7 @@ export function BoardSeeAllSheet({
       </div>
       <div style={{ flexShrink: 0, padding: '16px 16px 12px', borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS, ...FIGS }}>
         <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 700, color: A.INK, textTransform: 'uppercase' }}>
-          {boardCountsRounds(board)
+          {roll || boardCountsRounds(board)
             ? t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })
             : t('discover.filterBoard.nMembers', '{{count}} members', { count: total })}
         </div>
@@ -119,7 +125,7 @@ export function BoardSeeAllSheet({
         </div>
       </div>
       <div style={{ flexShrink: 0, padding: '8px 16px 0', fontFamily: SANS, ...FIGS }}>
-        <BoardHeaderRow board={board} />
+        <BoardHeaderRow board={board} roll={roll} />
       </div>
       <div
         style={{
@@ -140,6 +146,7 @@ export function BoardSeeAllSheet({
             row={r}
             board={board}
             isSelf={!!userId && r.user_id === userId}
+            roll={roll}
             onPress={onRowPress}
           />
         ))}
