@@ -13,7 +13,9 @@ export function StoryImageKicker({ children, color = INK_SOFT, compact = false }
 export function StoryRelativeTime({ at }: { at: string | null | undefined }) {
   const label = storyTime(at);
   if (!label) return null;
-  return <time dateTime={at ?? undefined} style={{ color: INK_MUTE, fontSize: 9, fontWeight: 700, lineHeight: 1.2, whiteSpace: 'nowrap' }}>{label}</time>;
+  /* Meta lines are uniformly caps app-wide. Cased in CSS, never on the string,
+     so locale files and aria labels keep the underlying sentence case. */
+  return <time dateTime={at ?? undefined} style={{ color: INK_MUTE, fontSize: 9, fontWeight: 700, lineHeight: 1.2, whiteSpace: 'nowrap', textTransform: 'uppercase' }}>{label}</time>;
 }
 
 export function StoryImageHeadline({ children, feed = false, compact = false }: { children: React.ReactNode; feed?: boolean; compact?: boolean }) {

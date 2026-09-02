@@ -51,7 +51,9 @@ function KickerLine({ kicker, at, compact = false, trailing }: { kicker: string 
       {kicker && (
         <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}><StoryImageKicker color={INK} compact={compact}>{kicker}</StoryImageKicker></span>
       )}
-      {kicker && at && <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT, flexShrink: 0 }} />}
+      {/* A CHARACTER, not a sized div: it shares the text baseline and optical
+          centre by construction, and inherits size and colour from the line. */}
+      {kicker && at && <span aria-hidden style={{ flexShrink: 0 }}>{'\u00b7'}</span>}
       <span style={{ flexShrink: 0 }}><StoryRelativeTime at={at} /></span>
       {trailing && <span style={{ marginLeft: 'auto', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>{trailing}</span>}
     </div>
