@@ -436,24 +436,27 @@ export default function ExploreTabContent({
           userId={userId}
           onRowPress={handleBoardRow}
           onAppliedFiltersChange={setBoardFilters}
-        />
+        >
 
         {/* COURSES PLAYED — THE BOARD IS WHO, THIS IS WHERE
             (BRIEF_DISCOVER_COURSES_SECTION C1.1). It sits directly beneath the
             leaderboard and above Amateur News because the two are a pair;
             separating them with a news block breaks it. It takes the page's
             APPLIED FILTERS and NOT the board key (C2.2). Unresolved is not
-            absent: nothing renders until the filter state has landed. */}
+            absent: nothing renders until the filter state has landed.
+            BRIEF_DISCOVER_STICKY_FILTER_BAR G1.1/G3 — it now renders INSIDE the
+            board's section so the sticky filter bar stays pinned over it, and
+            the seam between the two (hairline + 20px) is owned there. The page's
+            36px to Amateur News below is untouched (G3.3). */}
         {boardFilters && (
-          <div style={{ marginTop: RHYTHM }}>
             <CoursesPlayedSection
               userId={userId}
               filters={boardFilters}
               onCoursePress={(courseId) => navigate(`/courses/${courseId}`)}
               onMemberPress={(memberId) => opener.openProfile(memberId)}
             />
-          </div>
         )}
+        </GolfThisWeek>
       </div>
 
       {/* ONE SECTION RHYTHM, ONE CONSTANT (BRIEF_DISCOVER_ONE_PAGE §6): RHYTHM
