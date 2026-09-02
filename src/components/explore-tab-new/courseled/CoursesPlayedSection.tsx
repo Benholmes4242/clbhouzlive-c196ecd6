@@ -219,16 +219,17 @@ function CourseRow({
           <PlaysTo value={row.plays_to} />
 
           <Chevron size={16} color={A.DIM} aria-hidden style={{ flexShrink: 0 }} />
-        </button>
-      </div>
+      </button>
 
       {open && (
         <CoursePlayers
           courseId={row.course_id}
+          courseName={row.name}
           expectedRows={Math.max(1, Math.min(row.members, 6))}
           userId={userId}
           filters={filters}
           onMemberPress={onMemberPress}
+          onCoursePress={onCoursePress}
         />
       )}
     </div>
