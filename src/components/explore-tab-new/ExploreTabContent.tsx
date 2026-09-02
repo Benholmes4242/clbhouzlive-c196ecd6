@@ -39,7 +39,6 @@ import { CommunityVideoRow } from './courseled/community/CommunityVideoRow';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { mediaTarget } from '@/utils/mediaEngagement';
 import { AmateurNewsSection } from '@/features/amateur/news/AmateurNewsSection';
-import type { HonoursFeat } from '@/features/courses/_shared/scorecard/honoursTreatment';
 
 
 
@@ -203,9 +202,6 @@ export default function ExploreTabContent({
      sample and the full pool can never disagree. */
   const library = useCommunityLibrary();
   const [findGolfers, setFindGolfers] = useState(false);
-  /* The feat the tapped board row was ranked on, handed to the scorecard sheet.
-     Null for an ordinary round, which is nearly all of them. */
-  const [boardFeat, setBoardFeat] = useState<HonoursFeat | null>(null);
 
   /**
    * LATEST REVIEWS LEFT THIS PAGE (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL
@@ -262,21 +258,14 @@ export default function ExploreTabContent({
 
 
   /* A BOARD ROW IS A ROUND: it opens the scorecard bottom sheet. The row carries
-     the score id of the exact round the board is showing, and the feat it was
-     ranked on travels with it so the sheet can wear the honours treatment
-     (S5.6) — the one thing salvaged from the retired honours board. */
+     the score id of the exact round the board is showing. The sheet reads the
+     honours feat off the card itself (S5.6), so nothing is passed for it. */
   const handleBoardRow = useCallback(
     (row: BoardRow) => {
       analyticsEvents.track('discover_board_row_tapped', {
         pos: row.pos,
         has_score: !!row.whs_score_id,
       });
-      const feat: HonoursFeat | null = (row.albatrosses ?? 0) > 0
-        ? 'albatross'
-        : (row.holes_in_one ?? 0) > 0
-          ? 'ace'
-          : null;
-      setBoardFeat(feat);
       if (row.whs_score_id) opener.openByScore(row.whs_score_id, null, row.user_id);
       else opener.openProfile(row.user_id);
     },

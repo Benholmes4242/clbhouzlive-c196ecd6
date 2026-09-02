@@ -11,6 +11,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { CardScorecardSheet } from '@/features/courses/_shared/scorecard/CardScorecardSheet';
+import type { HonoursFeat } from '@/features/courses/_shared/scorecard/honoursTreatment';
 import { useRoundDetail, useWhsCourseId } from '@/lib/whs/hooks';
 import { useRoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
@@ -241,6 +242,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
       coursePar={coursePar}
       courseSlope={courseSlope}
       holes={cardHoles}
+      feat={feat}
       nineHole={!!userData?.is_nine_hole}
       loading={isRoundLoading || contextQuery.isLoading || analysisQuery.isLoading}
       surface="member"
