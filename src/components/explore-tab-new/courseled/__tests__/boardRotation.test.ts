@@ -62,3 +62,19 @@ describe('pickRotation', () => {
     });
   });
 });
+
+describe('pickRotation — F2.3 the handicap default board is excluded', () => {
+  it('never draws the excluded board, and falls back when nothing survives', () => {
+    const rows = [row('net', '14', 21), row('gross', '14', 21), row('recent', 'all', 3412)];
+    const seen = new Set<string>();
+    for (let i = 0; i < 500; i += 1) {
+      seen.add(pickRotation(rows, { excludeBoard: 'net' }).board);
+    }
+    expect(seen.has('net')).toBe(false);
+
+    const onlyNet = [row('net', '14', 21)];
+    expect(
+      pickRotation(onlyNet, { excludeBoard: 'net', fallback: { board: 'net', window: '14' } }),
+    ).toEqual({ board: 'net', window: '14' });
+  });
+});

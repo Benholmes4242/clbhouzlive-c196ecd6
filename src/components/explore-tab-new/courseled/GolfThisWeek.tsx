@@ -12,12 +12,10 @@ import { useBoardPage, type BoardRow } from './hooks/useBoardPage';
 import { BoardHeaderRow, BoardRowView, gapText } from './BoardRows';
 import { BoardFilterPanel } from './BoardFilterPanel';
 import { BoardSeeAllSheet } from './BoardSeeAllSheet';
-/* H3.2 — boardRotation.ts and useBoardRotation.ts are intentionally LEFT IN
-   PLACE but unwired; they are wanted for a separate surface. */
-import {
-  DEFAULT_BOARD_FALLBACK,
-  useHandicapDefaultBoard,
-} from './hooks/useHandicapDefaultBoard';
+/* F1 — the day's FIRST session lands on the handicap default; later sessions
+   the same day rotate. One hook decides which. */
+import { useDiscoverEntryBoard } from './hooks/useDiscoverEntryBoard';
+import { DEFAULT_BOARD_FALLBACK } from './hooks/useHandicapDefaultBoard';
 
 import {
   BAND_OPTIONS,
@@ -92,23 +90,23 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange }: Gol
 
   /* COMPONENT STATE, NEVER THE URL — a filter tap must not enter the back
      stack, which is the rule the retired scope pills already held. */
-  /* H1 — THE LANDING BOARD COMES FROM THE MEMBER'S OWN INDEX, and everything
-     else about the default is the same for everyone (H1.2). The session
-     rotation is gone (H3.1): a board that changes between sessions costs the
-     member the ability to ask "am I still fourth?". This component owns the
-     applied combination; the default only supplies its INITIAL value, and the
-     first drawer change (H2.1) puts it out of the way for the session. */
-  const fallback = useHandicapDefaultBoard(userId);
+  /* F1 — THE LANDING COMBINATION: the day's first session is the member's own
+     handicap default, every later session that day is a rotated board. This
+     component owns the APPLIED combination; the entry pick only supplies its
+     INITIAL value, and the first drawer change (F4.1) puts it out of the way
+     for the rest of the session. */
+  const entry = useDiscoverEntryBoard(userId);
   const [pickedBoard, setBoard] = useState<BoardKey | null>(null);
   const [pickedFilters, setFilters] = useState<BoardFilters | null>(null);
 
-  /* Nothing is special-cased downstream: the default is applied as a board plus
-     the standard filters, exactly as a member's own selection would be. */
+  /* Nothing is special-cased downstream: the entry pick is applied as a board
+     plus the standard filters, exactly as a member's own selection would be
+     (F3.2 — only the board and the window can differ). */
   useEffect(() => {
-    if (pickedBoard || !fallback.resolved) return;
-    setBoard(fallback.board);
-    setFilters({ ...DEFAULT_FILTERS });
-  }, [pickedBoard, fallback.resolved, fallback.board]);
+    if (pickedBoard || !entry.resolved || !entry.board) return;
+    setBoard(entry.board);
+    setFilters({ ...DEFAULT_FILTERS, window: entry.window });
+  }, [pickedBoard, entry.resolved, entry.board, entry.window]);
 
   /* H4.2 — BEFORE THE INDEX RESOLVES THERE IS NO BOARD. The reads stay parked
      and the section holds its loading state rather than rendering gross and

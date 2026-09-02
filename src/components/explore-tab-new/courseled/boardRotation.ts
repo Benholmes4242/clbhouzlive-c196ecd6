@@ -40,8 +40,22 @@ export const FALLBACK_PICK: BoardPick = {
 
 /** R1.3 — ONE key, this session's chosen combination. */
 export const ROTATION_SESSION_KEY = 'clbhouz.discover.rotation.pick.v1';
-/** R2.4 — outlives the session, so the next one can exclude it. */
+/** R2.4 / F2.6 — outlives the session, so the next one can exclude it. */
 export const ROTATION_LAST_KEY = 'clbhouz.discover.rotation.last.v1';
+/**
+ * F1.4 — the last calendar day Discover was entered, as a LOCAL YYYY-MM-DD
+ * string. A date string, not a timestamp: F1.3 forbids a rolling 24 hours,
+ * which would drift the "first" visit an hour later every day.
+ */
+export const LAST_SEEN_DATE_KEY = 'clbhouz.discover.lastSeenDate.v1';
+
+/** F1.3 — the member's OWN local calendar date. Never UTC, never rolling. */
+export function localDateKey(now: Date = new Date()): string {
+  const y = now.getFullYear();
+  const m = `${now.getMonth() + 1}`.padStart(2, '0');
+  const d = `${now.getDate()}`.padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
 
 /** Windows shortest-first: R2.1 keeps the shortest of a tied group. */
 const WINDOW_ORDER: WindowKey[] = ['14', '30', '90', 'year', 'all'];
@@ -83,6 +97,12 @@ export const readSessionPick = (): BoardPick | null =>
 export const readLastPick = (): BoardPick | null =>
   parsePick(safeGet('local', ROTATION_LAST_KEY));
 
+/** F1.1b — null (or a throwing store, F1.5) reads as "the day's first session". */
+export const readLastSeenDate = (): string | null => safeGet('local', LAST_SEEN_DATE_KEY);
+
+export const writeLastSeenDate = (date: string = localDateKey()) =>
+  safeSet('local', LAST_SEEN_DATE_KEY, date);
+
 /** R1.3 / R2.4 — written ONCE, at the moment a pick is made. */
 export function persistPick(pick: BoardPick) {
   safeSet('session', ROTATION_SESSION_KEY, comboId(pick));
@@ -99,20 +119,37 @@ export function persistPick(pick: BoardPick) {
  * R2.3 a board the member renders on (viewer_pos 1..10) gets DOUBLE weight at
  * the board step. Two visits in three, not a mirror.
  * R2.4 never the immediately previous session's combination.
+ *
+ * F2.3 the member's HANDICAP DEFAULT BOARD is excluded outright — rotating onto
+ * the board they would have landed on anyway is not a rotation. The BOARD is
+ * excluded, not the combination: net at 90 days is still net.
+ * F2.7 anything left empty falls back SILENTLY to `opts.fallback` (the handicap
+ * default) rather than to an empty board or an error.
  */
 export function pickRotation(
   rows: RotationRow[] | null | undefined,
-  opts?: { last?: BoardPick | null; random?: () => number },
+  opts?: {
+    last?: BoardPick | null;
+    random?: () => number;
+    excludeBoard?: BoardKey | null;
+    fallback?: BoardPick;
+  },
 ): BoardPick {
   const random = opts?.random ?? Math.random;
   const last = opts?.last ?? null;
   const lastId = last ? comboId(last) : null;
+  const excludeBoard = opts?.excludeBoard ?? null;
+  const fallbackPick = opts?.fallback ?? FALLBACK_PICK;
 
   /* Only combinations this client can actually express are candidates. */
   const clean = (rows ?? []).filter(
-    (r) => isBoardKey(r.board) && isWindowKey(r.win) && Number(r.n) > 0,
+    (r) =>
+      isBoardKey(r.board) &&
+      isWindowKey(r.win) &&
+      Number(r.n) > 0 &&
+      r.board !== excludeBoard,
   );
-  if (clean.length === 0) return FALLBACK_PICK;
+  if (clean.length === 0) return fallbackPick;
 
   const byBoard = new Map<BoardKey, RotationRow[]>();
   for (const row of clean) {
@@ -160,7 +197,7 @@ export function pickRotation(
      rather than showing an empty board. */
   let candidates = buildCandidates(lastId);
   if (candidates.length === 0) candidates = buildCandidates(null);
-  if (candidates.length === 0) return FALLBACK_PICK;
+  if (candidates.length === 0) return fallbackPick;
 
   /* R2.2 + R2.3 — weight is per BOARD: 1, doubled where the member renders. */
   const weights = candidates.map((c) => (c.visible ? 2 : 1));
