@@ -18408,6 +18408,7 @@ export type Database = {
       board_pool: {
         Args: {
           p_band?: string
+          p_competition?: string
           p_course_id?: string
           p_courses?: string
           p_feat?: string
@@ -18431,8 +18432,10 @@ export type Database = {
           gross_score: number
           hcp_at_time: number
           holes_in_one: number
+          is_competition: boolean
           net_score: number
           ok_band: boolean
+          ok_competition: boolean
           ok_courses: boolean
           ok_feat: boolean
           ok_region: boolean
@@ -18440,6 +18443,7 @@ export type Database = {
           ok_window: boolean
           play_date: string
           stableford_points: number
+          sub_70: boolean
           sub_80: boolean
           sub_country: string
           user_id: string
@@ -19089,6 +19093,7 @@ export type Database = {
         Args: {
           p_band?: string
           p_board?: string
+          p_competition?: string
           p_course_id?: string
           p_courses?: string
           p_feat?: string
@@ -19109,6 +19114,7 @@ export type Database = {
         Args: {
           p_band?: string
           p_board?: string
+          p_competition?: string
           p_course_id?: string
           p_courses?: string
           p_feat?: string
@@ -19134,6 +19140,7 @@ export type Database = {
           gross_score: number
           hcp_at_time: number
           holes_in_one: number
+          is_competition: boolean
           is_tie: boolean
           net_score: number
           play_date: string
@@ -19141,6 +19148,7 @@ export type Database = {
           profile_photo_url: string
           sort_value: number
           stableford_points: number
+          sub_70: boolean
           sub_80: boolean
           total_count: number
           user_id: string
