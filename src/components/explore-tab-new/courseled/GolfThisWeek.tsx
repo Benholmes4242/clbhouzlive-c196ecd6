@@ -2,8 +2,9 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ListFilter } from 'lucide-react';
 
+import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { A, DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from './tokens';
+import { DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from './tokens';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useBoardFacets } from './hooks/useBoardFacets';
@@ -175,7 +176,7 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
             padding: 'env(safe-area-inset-top, 0px) 14px 16px',
           }}
         >
-          <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', color: DISCOVER_QUIET }}>
+          <span style={{ ...KICKER, color: A.BODY }}>
             {t('discover.board.circuitEyebrow', 'The amateur circuit')}
           </span>
           <h2 style={{ margin: '6px 0 0', fontSize: 25, fontWeight: 700, letterSpacing: '0.005em', textTransform: 'uppercase', color: DISCOVER_FACT }}>
@@ -200,10 +201,10 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
           borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS, cursor: 'pointer', textAlign: 'left',
         }}
       >
-        <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.BODY }}>
+        <span style={{ ...KICKER, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: A.BODY }}>
           <AppliedFilterLine parts={appliedParts} />
         </span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: A.INK, textTransform: 'uppercase' }}>
+        <span style={{ ...KICKER, display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, color: A.INK }}>
           <ListFilter size={13} strokeWidth={2.4} aria-hidden />
           {t('discover.filterBoard.filters', 'Filters')}
         </span>
@@ -248,11 +249,8 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
                   background: 'transparent',
                   border: 'none',
                   fontFamily: SANS,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.10em',
-                  textTransform: 'uppercase',
-                  color: DISCOVER_QUIET,
+                  ...KICKER,
+                  color: A.BODY,
                   cursor: 'pointer',
                 }}
               >
@@ -294,7 +292,7 @@ function Stat({ value, label }: { value: string; label: string }) {
       <span className="tabular-nums" style={{ fontSize: 17, fontWeight: 700, color: DISCOVER_FACT, lineHeight: 1 }}>
         {value}
       </span>
-      <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', color: DISCOVER_QUIET }}>
+      <span style={{ ...KICKER, color: A.MUTE }}>
         {label}
       </span>
     </span>

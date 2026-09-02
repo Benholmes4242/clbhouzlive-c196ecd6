@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 
 import { Z } from '@/config/zIndex';
-import { A, SANS } from './tokens';
+import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { SANS } from './tokens';
 import { useAvailableWeekScopes } from './hooks/useGolfThisWeek';
 import type { BoardFacets } from './hooks/useBoardFacets';
 import {
@@ -304,10 +305,7 @@ export function BoardFilterPanel({
         >
           <span
             style={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
+              ...KICKER,
               color: A.INK,
             }}
           >
@@ -321,9 +319,8 @@ export function BoardFilterPanel({
               border: 'none',
               padding: '8px 0',
               fontFamily: SANS,
-              fontSize: 13.5,
-              fontWeight: 700,
-              color: A.INK,
+              ...KICKER,
+              color: A.AMBER,
               cursor: 'pointer',
             }}
           >
@@ -619,11 +616,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
+        ...KICKER,
         padding: '22px 16px 9px',
-        fontSize: 10,
-        fontWeight: 700,
-        letterSpacing: '0.14em',
-        textTransform: 'uppercase',
         color: A.DIM,
       }}
     >
