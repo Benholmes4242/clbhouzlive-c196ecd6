@@ -2023,7 +2023,14 @@ export function GolfThisWeek({
    * DIRECTION IS DERIVED from `lowerWins`, never hard-coded: (own − leader) on a
    * lower-wins board, (leader − own) everywhere else. Both are positive for a
    * member behind the leader, which is the only case a pinned row exists in.
+   *
+   * DELIBERATE EXCEPTION, NOT DRIFT (BRIEF_LEADERBOARD_OPTOUT_RECONCILIATION):
+   * every other row's sub-line is the COURSE, always; the pinned row carries the
+   * GAP instead because a member reading their own row is better served by the
+   * distance to the leader than by the name of a course they know they played.
+   * Do not "unify" this in a later sweep.
    */
+
   const pinnedGap = (b: BoardSpec, own: CircleRoundRow, idx: number) => {
     /* BRIEF_BOARD_MOST_RECENT §2.2 — ON A TIME BOARD THE GAP IS TIME. A score gap
        would be meaningless here: nothing on this board was ranked on score. The
