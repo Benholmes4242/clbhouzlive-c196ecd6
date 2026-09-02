@@ -226,6 +226,7 @@ export function BoardRowView({
   board,
   isSelf,
   gap,
+  roll,
   onPress,
 }: {
   row: Row;
@@ -233,11 +234,15 @@ export function BoardRowView({
   isSelf: boolean;
   /** Only the PINNED copy of the member's row carries this (S5.4). */
   gap?: string | null;
+  /** A ROLL OF HONOUR entry: member, course, date. No position, no figure (S5). */
+  roll?: boolean;
   onPress?: (row: Row) => void;
 }) {
   const { t } = useTranslation('courses');
-  const value = boardValue(row, board, t as never);
-  const second = boardSecondary(row, board);
+  const value = roll
+    ? { text: relativeDay(row.play_date, t as never, 'short'), tone: A.INK }
+    : boardValue(row, board, t as never);
+  const second = roll ? null : boardSecondary(row, board);
   const ink = isSelf ? A.AMBER : A.INK;
   const feat =
     (row.holes_in_one ?? 0) > 0
@@ -264,20 +269,23 @@ export function BoardRowView({
         cursor: onPress ? 'pointer' : 'default',
       }}
     >
-      <span
-        className="tabular-nums"
-        style={{
-          width: POS_W,
-          flexShrink: 0,
-          textAlign: 'center',
-          fontSize: 13,
-          fontWeight: 700,
-          color: isSelf ? A.AMBER : A.MUTE,
-        }}
-      >
-        {/* A TIE STATES ITSELF: T4, never a silent second 4. */}
-        {row.is_tie ? `T${row.pos}` : row.pos}
-      </span>
+      {!roll && (
+        <span
+          className="tabular-nums"
+          style={{
+            width: POS_W,
+            flexShrink: 0,
+            textAlign: 'center',
+            fontSize: 13,
+            fontWeight: 700,
+            color: isSelf ? A.AMBER : A.MUTE,
+          }}
+        >
+          {/* A TIE STATES ITSELF: T4, never a silent second 4. */}
+          {row.is_tie ? `T${row.pos}` : row.pos}
+        </span>
+      )}
+
       <span style={{ flexShrink: 0 }}>
         <SquircleAvatar
           src={row.profile_photo_url ?? null}
