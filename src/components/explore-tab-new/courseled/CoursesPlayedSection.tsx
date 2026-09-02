@@ -411,8 +411,9 @@ function CoursePlayers({
   onCoursePress?: (courseId: string) => void;
 }) {
   const { t } = useTranslation('courses');
-  const players = useBoardCoursePlayers(userId, courseId, filters);
-  const PLAYER_H = 40;
+  const players = useBoardCoursePlayers(userId, courseId, filters, {
+    limit: PLAYERS_FETCH_LIMIT,
+  });
 
   if (players.isPending) {
     return (
@@ -421,10 +422,36 @@ function CoursePlayers({
   }
 
   const list = players.data ?? [];
+  /* P1.4 — ten or fewer players is the panel's NATURAL height: no maxHeight, no
+     scroll area, nothing padded out to a fixed size. */
+  const scrolls = list.length > PANEL_VISIBLE_ROWS;
 
   return (
     <div style={{ paddingBottom: 8 }}>
-      {list.map((p) => (
+      {/* P2 — the count sits ABOVE the list and does not move with it. Derived
+          from the rows already in hand (P2.3), never a second call. */}
+      <div style={{ ...KICKER, color: A.MUTE, padding: '2px 0 6px' }}>
+        {list.length === 1
+          ? t('discover.coursesPlayed.oneMember', '1 member')
+          : t('discover.coursesPlayed.nMembers', '{{count}} members', { count: list.length })}
+      </div>
+
+      <div
+        style={
+          scrolls
+            ? {
+                maxHeight: PANEL_MAX_H,
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                /* P1.3 — REQUIRED: without contain, the end of this list scrolls
+                   the page, or the See all sheet, behind it. */
+                overscrollBehavior: 'contain',
+                willChange: 'transform',
+              }
+            : undefined
+        }
+      >
+        {list.map((p) => (
         <button
           key={p.user_id}
           type="button"
