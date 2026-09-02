@@ -31,6 +31,18 @@ const ROW_H = 54;
 const PLAYS_TO_W = 62;
 const CHEVRON_W = 22;
 
+/**
+ * P1 — THE EXPANDED PANEL IS CAPPED. One player row is PLAYER_H tall and the
+ * list shows at most PANEL_VISIBLE_ROWS of them; the ceiling is DERIVED from the
+ * row height (P1.2) so changing the row cannot leave a stale pixel constant
+ * behind. P3 — the fetch is raised to 50 so a scrollable list is not silently
+ * truncated at the default twelve.
+ */
+const PLAYER_H = 40;
+const PANEL_VISIBLE_ROWS = 10;
+const PANEL_MAX_H = PLAYER_H * PANEL_VISIBLE_ROWS;
+const PLAYERS_FETCH_LIMIT = 50;
+
 export interface CoursesPlayedSectionProps {
   userId: string | undefined;
   /** The page's CURRENT filter state. The board key is deliberately absent. */
@@ -304,7 +316,7 @@ export function CourseRow({
         <CoursePlayers
           courseId={row.course_id}
           courseName={row.name}
-          expectedRows={Math.max(1, Math.min(row.members, 6))}
+          expectedRows={Math.max(1, Math.min(row.members, PANEL_VISIBLE_ROWS))}
           userId={userId}
           filters={filters}
           onMemberPress={onMemberPress}
@@ -399,20 +411,49 @@ function CoursePlayers({
   onCoursePress?: (courseId: string) => void;
 }) {
   const { t } = useTranslation('courses');
-  const players = useBoardCoursePlayers(userId, courseId, filters);
-  const PLAYER_H = 40;
+  const players = useBoardCoursePlayers(userId, courseId, filters, {
+    limit: PLAYERS_FETCH_LIMIT,
+  });
 
   if (players.isPending) {
     return (
-      <div aria-hidden style={{ paddingBottom: 8, height: expectedRows * PLAYER_H }} />
+      /* The shell stands at the panel's eventual height: count line, the capped
+         rows, then the action. */
+      <div aria-hidden style={{ paddingBottom: 8, height: 20 + expectedRows * PLAYER_H + 34 }} />
     );
   }
 
   const list = players.data ?? [];
+  /* P1.4 — ten or fewer players is the panel's NATURAL height: no maxHeight, no
+     scroll area, nothing padded out to a fixed size. */
+  const scrolls = list.length > PANEL_VISIBLE_ROWS;
 
   return (
     <div style={{ paddingBottom: 8 }}>
-      {list.map((p) => (
+      {/* P2 — the count sits ABOVE the list and does not move with it. Derived
+          from the rows already in hand (P2.3), never a second call. */}
+      <div style={{ ...KICKER, color: A.MUTE, padding: '2px 0 6px' }}>
+        {list.length === 1
+          ? t('discover.coursesPlayed.oneMember', '1 member')
+          : t('discover.coursesPlayed.nMembers', '{{count}} members', { count: list.length })}
+      </div>
+
+      <div
+        style={
+          scrolls
+            ? {
+                maxHeight: PANEL_MAX_H,
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                /* P1.3 — REQUIRED: without contain, the end of this list scrolls
+                   the page, or the See all sheet, behind it. */
+                overscrollBehavior: 'contain',
+                willChange: 'transform',
+              }
+            : undefined
+        }
+      >
+        {list.map((p) => (
         <button
           key={p.user_id}
           type="button"
@@ -482,9 +523,11 @@ function CoursePlayers({
                   : `+${p.best_to_par}`}
           </span>
         </button>
-      ))}
+        ))}
+      </div>
 
-      {/* D2.2 / D2.3 — who played here, THEN go to the course. */}
+      {/* D2.2 / D2.3 / P4 — who played here, THEN go to the course. It sits
+          BELOW the scrolling list and stays reachable without scrolling it. */}
       <button
         type="button"
         onClick={() => onCoursePress?.(courseId)}
