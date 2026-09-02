@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ListFilter } from 'lucide-react';
 
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { DISCOVER_STICKY_FILTER_Z } from '@/lib/zLayers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from './tokens';
 import { CourseImageFallback } from './CourseImageFallback';
@@ -83,9 +84,16 @@ export interface GolfThisWeekProps {
    * here, so no consumer can scope itself by the leaderboard on screen.
    */
   onAppliedFiltersChange?: (filters: BoardFilters | null) => void;
+  /**
+   * G1.1 — THE GOVERNED REGION. Sections that the filter bar governs render as
+   * children of this section so the sticky bar's containing block spans them and
+   * it stays pinned to the bottom of the region. They are NOT given the board
+   * key (G6.2) and carry no filter control of their own (G6.1).
+   */
+  children?: ReactNode;
 }
 
-export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange }: GolfThisWeekProps) {
+export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, children }: GolfThisWeekProps) {
   const { t } = useTranslation('courses');
 
   /* COMPONENT STATE, NEVER THE URL — a filter tap must not enter the back
@@ -115,6 +123,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange }: Gol
   const board = pickedBoard ?? DEFAULT_BOARD_FALLBACK;
   const filters = pickedFilters ?? DEFAULT_FILTERS;
 
+  const boardRef = useRef<HTMLDivElement | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [seeAll, setSeeAll] = useState(false);
 
@@ -179,6 +188,14 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange }: Gol
       region: next.regionKind ?? 'all',
     });
     setFilters(next);
+    /* G1.5 — THE BAR MUST NEVER SIT ON TOP OF THE FIRST ROW. When the list
+       re-renders under a stuck bar, bring the board's own top back to just
+       below it (scroll-margin carries the bar height), so whatever position the
+       member was at, the row under the bar stays readable. */
+    const el = boardRef.current;
+    if (el && el.getBoundingClientRect().top < 0) {
+      el.scrollIntoView({ block: 'start', behavior: 'auto' });
+    }
   }, []);
 
   /* B1 — A FEAT IS A BOARD, so its title comes from the same place as any
