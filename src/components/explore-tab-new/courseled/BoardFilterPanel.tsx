@@ -598,22 +598,8 @@ export function BoardFilterPanel({
               }}
             />
           ))}
-
-        {screen === 'feat' &&
-          FEAT_OPTIONS.map((o) => (
-            <PanelRow
-              key={o.key}
-              label={label(o)}
-              count={facets.countFor('feat', o.key)}
-              active={filters.feat === o.key}
-              /* NOT DISABLED AT ZERO: a feat with none in this window is still
-                 selectable, because picking it WIDENS the window (S3.6). Only a
-                 feat with none AT ALL TIME can be greyed, which the RPC's
-                 all-time facet answers on the next call. */
-              onClick={() => pickFeat(o.key as FeatKey)}
-            />
-          ))}
       </div>
+
 
       <div
         style={{
