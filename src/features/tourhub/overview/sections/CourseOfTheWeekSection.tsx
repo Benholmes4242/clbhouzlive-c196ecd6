@@ -145,7 +145,7 @@ export function CourseOfTheWeekSection() {
         <SectionShell
           eyebrow="COURSE OF THE WEEK"
           linkLabel="Top 100"
-          onLinkClick={() => navigate('/top100')}
+          onLinkClick={() => navigate('/courses?tab=top100')}
         >
           <div style={{ padding: `0 ${SPACE.pagePadX}px` }}>
             {/* THE WHOLE CARD IS THE TAP TARGET. It was not before — only the
