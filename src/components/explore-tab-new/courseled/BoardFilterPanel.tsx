@@ -423,23 +423,55 @@ export function BoardFilterPanel({
           </>
         )}
 
-        {screen === 'board' &&
-          BOARD_KEYS.map((key) => {
-            const count = facets.countFor('board', key);
-            return (
-              <PanelRow
-                key={key}
-                label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
-                count={count}
-                active={board === key}
-                disabled={count === 0}
-                onClick={() => {
-                  onBoardChange(key);
-                  setScreen('root');
-                }}
-              />
-            );
-          })}
+        {screen === 'board' && (
+          <>
+            {BOARD_KEYS.map((key) => {
+              const count = facets.countFor('board', key);
+              return (
+                <PanelRow
+                  key={key}
+                  label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
+                  count={count}
+                  active={board === key && !isRollFeat(filters.feat)}
+                  disabled={count === 0}
+                  onClick={() => {
+                    /* LEAVING A ROLL OF HONOUR CLEARS ITS FEAT: a ranked board
+                       must not silently inherit "albatross only". */
+                    if (isRollFeat(filters.feat)) set({ feat: 'any' });
+                    onBoardChange(key);
+                    setScreen('root');
+                  }}
+                />
+              );
+            })}
+            {/* S5 — RARE FEATS. AN OPTION WITH A ZERO COUNT IS OMITTED ENTIRELY,
+                never greyed and never tappable into an empty roll; if neither
+                survives the current scope the SECTION ITSELF does not render. */}
+            {rollRows.length > 0 && (
+              <>
+                <SectionLabel>
+                  {t('discover.filterBoard.rareFeats', 'Rare feats')}
+                </SectionLabel>
+                {rollRows.map(({ key, count }) => (
+                  <PanelRow
+                    key={key}
+                    label={t(ROLL_LABELS[key].i18n, ROLL_LABELS[key].label)}
+                    count={count}
+                    active={filters.feat === key}
+                    onClick={() => {
+                      /* THE ROLL IS THE `recent` BOARD (date order) WITH THE
+                         FEAT AXIS SET. No new ranking is asked of the RPC. */
+                      onBoardChange('recent');
+                      set({ feat: key });
+                      setScreen('root');
+                    }}
+                  />
+                ))}
+              </>
+            )}
+          </>
+        )}
+
 
         {screen === 'window' &&
           WINDOW_OPTIONS.map((o) => (
