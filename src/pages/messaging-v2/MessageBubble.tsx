@@ -304,7 +304,39 @@ export const MessageBubble: React.FC<Props> = ({
                 ) : null}
               </span>
             ) : null}
+
+            {action ? (
+              <button
+                type="button"
+                onClick={() => navigate(action.route)}
+                className="w-full active:opacity-60"
+                style={{
+                  position: 'relative',
+                  marginTop: 6,
+                  paddingTop: 8,
+                  borderTop: `0.5px solid ${isOutgoing ? 'rgba(5,7,10,0.12)' : HAIRLINE}`,
+                  background: 'transparent',
+                  border: 'none',
+                  borderTopWidth: '0.5px',
+                  borderTopStyle: 'solid',
+                  borderTopColor: isOutgoing ? 'rgba(5,7,10,0.12)' : HAIRLINE,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: fg,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <span>{action.label}</span>
+                <ChevronRight size={14} strokeWidth={2.5} />
+              </button>
+            ) : null}
           </>
+
         )}
       </div>
 
