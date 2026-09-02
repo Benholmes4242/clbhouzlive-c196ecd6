@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ListFilter } from 'lucide-react';
 
@@ -12,6 +12,8 @@ import { useBoardPage, type BoardRow } from './hooks/useBoardPage';
 import { BoardHeaderRow, BoardRowView, gapText } from './BoardRows';
 import { BoardFilterPanel } from './BoardFilterPanel';
 import { BoardSeeAllSheet } from './BoardSeeAllSheet';
+import { useBoardRotation } from './hooks/useBoardRotation';
+import { FALLBACK_PICK } from './boardRotation';
 import {
   BAND_OPTIONS,
   BOARD_LABELS,
@@ -75,13 +77,32 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
 
   /* COMPONENT STATE, NEVER THE URL — a filter tap must not enter the back
      stack, which is the rule the retired scope pills already held. */
-  const [board, setBoard] = useState<BoardKey>('gross');
-  const [filters, setFilters] = useState<BoardFilters>(DEFAULT_FILTERS);
+  /* R1 — THE LANDING COMBINATION IS ROTATED, ONCE PER SESSION. This component
+     owns the applied combination; the rotation only supplies its INITIAL value,
+     and the first drawer change (R1.5) puts it out of the way for the session. */
+  const rotation = useBoardRotation(userId);
+  const [pickedBoard, setBoard] = useState<BoardKey | null>(null);
+  const [pickedFilters, setFilters] = useState<BoardFilters | null>(null);
+
+  /* R4.1 — nothing special-cased downstream: the rotated pick is applied as a
+     board plus a window, exactly as a member's own selection would be. */
+  useEffect(() => {
+    if (pickedBoard || !rotation.pick) return;
+    setBoard(rotation.pick.board);
+    setFilters({ ...DEFAULT_FILTERS, window: rotation.pick.window });
+  }, [pickedBoard, rotation.pick]);
+
+  /* R3.2 — BEFORE THE PICK LANDS THERE IS NO BOARD. The reads stay parked and
+     the section holds its loading state rather than rendering gross / 14 days
+     and swapping it out from under the member. */
+  const ready = pickedBoard !== null && pickedFilters !== null;
+  const board = pickedBoard ?? FALLBACK_PICK.board;
+  const filters = pickedFilters ?? DEFAULT_FILTERS;
   const [panelOpen, setPanelOpen] = useState(false);
   const [seeAll, setSeeAll] = useState(false);
 
-  const facets = useBoardFacets(userId, board, filters);
-  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH });
+  const facets = useBoardFacets(userId, board, filters, { enabled: ready });
+  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: ready });
 
   const rows = page.data?.rows ?? [];
   const total = page.data?.total ?? 0;
@@ -184,9 +205,9 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
             {t('discover.board.circuitEyebrow', 'The amateur circuit')}
           </span>
           <h2 style={{ margin: '6px 0 0', fontSize: 25, fontWeight: 700, letterSpacing: '0.005em', textTransform: 'uppercase', color: DISCOVER_FACT }}>
-            {boardTitle}
+            {ready ? boardTitle : '\u00a0'}
           </h2>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 12, whiteSpace: 'nowrap' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 12, whiteSpace: 'nowrap', visibility: ready ? 'visible' : 'hidden' }}>
             <Stat value={String(total)} label={t('discover.filterBoard.col.rounds', 'ROUNDS')} />
             <Stat value={String(courseCount)} label={t('discover.filterBoard.col.courses', 'COURSES')} />
             <Stat value={String(memberCount)} label={t('discover.filterBoard.col.members', 'MEMBERS')} />
@@ -206,7 +227,7 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
         }}
       >
         <span style={{ ...KICKER, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: A.BODY }}>
-          <AppliedFilterLine parts={appliedParts} />
+          {ready && <AppliedFilterLine parts={appliedParts} />}
         </span>
         <span style={{ ...KICKER, display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, color: A.INK }}>
           <ListFilter size={13} strokeWidth={2.4} aria-hidden />
@@ -216,7 +237,7 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
 
       {/* THE BOARD */}
       <div style={{ marginTop: 16, padding: '0 14px' }}>
-        {page.isPending ? (
+        {!ready || page.isPending ? (
           <div style={{ height: 240 }} aria-hidden />
         ) : total === 0 ? (
           <EmptyAnswer board={board} filters={filters} onReset={() => changeFilters({ ...DEFAULT_FILTERS })} />
