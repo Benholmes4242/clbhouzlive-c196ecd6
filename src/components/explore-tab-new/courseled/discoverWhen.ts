@@ -34,3 +34,43 @@ export function relativeDay(
   });
 }
 
+
+/**
+ * relativeDayCompact — THE BOARD'S WHEN COLUMN (BRIEF_DISCOVER_BOARD_AVATARS
+ * AND_RECENT A2). A weekday name only disambiguates inside seven days; the
+ * default window is fourteen days and All time is unbounded, so the board reads
+ * a relative day on a fixed ladder instead:
+ *
+ *   0 -> TODAY, 1 -> YEST, 2-6 -> {n}D AGO, 7-69 -> {n}W AGO (nearest week),
+ *   70-364 -> {n}MO AGO (nearest month), 365+ -> {n}Y AGO.
+ *
+ * Uppercasing is the caller's, via textTransform.
+ */
+export function relativeDayCompact(
+  iso: string | null | undefined,
+  t: (k: string, o?: any) => string,
+): string {
+  if (!iso) return '\u2014';
+  const then = new Date(`${iso.slice(0, 10)}T12:00:00`).getTime();
+  if (!Number.isFinite(then)) return '\u2014';
+  const days = Math.max(0, Math.round((Date.now() - then) / 86_400_000));
+  if (days === 0) return t('discover.when.relToday', { defaultValue: 'today' });
+  if (days === 1) return t('discover.when.relYest', { defaultValue: 'yest' });
+  if (days < 7) return t('discover.when.relDaysAgo', { defaultValue: '{{n}}d ago', n: days });
+  if (days < 70) {
+    return t('discover.when.relWeeksAgo', {
+      defaultValue: '{{n}}w ago',
+      n: Math.max(1, Math.round(days / 7)),
+    });
+  }
+  if (days < 365) {
+    return t('discover.when.relMonthsAgo', {
+      defaultValue: '{{n}}mo ago',
+      n: Math.max(1, Math.round(days / 30.44)),
+    });
+  }
+  return t('discover.when.relYearsAgo', {
+    defaultValue: '{{n}}y ago',
+    n: Math.max(1, Math.round(days / 365.25)),
+  });
+}

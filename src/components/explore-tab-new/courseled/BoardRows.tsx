@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getAvatarFallbackGradient, getInitialsFromName } from '@/lib/avatarFallback';
 import { A, SANS } from './tokens';
-import { relativeDay } from './discoverWhen';
+import { relativeDayCompact } from './discoverWhen';
 import { boardCountsRounds, isFeatBoard, type BoardKey } from './boardFilters';
 import type { BoardRow as Row } from './hooks/useBoardPage';
 
@@ -57,9 +58,16 @@ export function boardColumns(board: BoardKey): BoardColumns {
         value: { i18n: 'discover.filterBoard.col.birdies', label: 'BIRDIES' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
       };
-    /* B1.3 — THE FEAT BOARDS BEHAVE LIKE MOST RECENT: value column WHEN,
-       secondary column GROSS, date order newest first from the RPC. */
+    /* A3.1 — MOST RECENT CARRIES TO PAR, NOT GROSS. The board spans many
+       courses, so a bare 71 beside an 85 is two unrelated numbers; to-par is
+       the figure that travels between courses. */
     case 'recent':
+      return {
+        value: { i18n: 'discover.filterBoard.col.when', label: 'WHEN' },
+        secondary: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
+      };
+    /* B1.3 / A3.5 — THE FEAT BOARDS KEEP GROSS: they are event lists where the
+       interesting fact is the feat and gross is context, not comparison. */
     default:
       return {
         value: { i18n: 'discover.filterBoard.col.when', label: 'WHEN' },
@@ -117,8 +125,9 @@ export function boardValue(
       return { text: r.birdies != null ? String(r.birdies) : '\u2014', tone: A.INK };
     case 'recent':
     default:
-      /* Feat boards land here too: their value IS the date (B1.3). */
-      return { text: relativeDay(r.play_date, t as never, 'short'), tone: A.INK };
+      /* Feat boards land here too: their value IS the date (B1.3), now on the
+         relative-day ladder so a 2024 ace never reads as a weekday (A2.2). */
+      return { text: relativeDayCompact(r.play_date, t as never), tone: A.INK };
   }
 }
 
@@ -130,11 +139,19 @@ export function boardSecondary(r: Row, board: BoardKey): Cell | null {
     }
     case 'improved':
       return null;
+    /* A3.1/A3.3/A3.4 — TO PAR under the standard colour law; a round with no
+       usable par states an em-dash in A.DIM, never a zero and never a blank. */
+    case 'recent': {
+      const p = toParOf(r);
+      return {
+        text: fmtToPar(p),
+        tone: p == null ? A.DIM : p < 0 ? TOPAR_UNDER : p === 0 ? A.MUTE : A.INK,
+      };
+    }
     case 'topar':
     case 'net':
     case 'stableford':
     case 'birdies':
-    case 'recent':
     default:
       return {
         text: r.gross_score != null ? String(r.gross_score) : '\u2014',
@@ -174,6 +191,55 @@ export function gapText(
     default:
       return t('discover.filterBoard.gapShots', '{{n}} shots back', { n: Math.round(d) });
   }
+}
+
+/**
+ * THE BOARD'S AVATAR (A1). A member with a photo renders the photo, unchanged,
+ * through the canonical SquircleAvatar. Only the FALLBACK differs: the shared
+ * AVATAR_FALLBACK_PALETTE is twelve near-identical desaturated slates, which on
+ * this dark canvas read as one block of grey, so the fallback here takes a
+ * HUE-ONLY fill derived from the stable user id (A1.2). Fixed saturation and
+ * lightness keep every tile at the same visual weight. AN AVATAR IS NEVER
+ * AMBER, including the member's own.
+ */
+export function BoardAvatar({ row, size = 28 }: { row: Row; size?: number }) {
+  const { t } = useTranslation('courses');
+  if (row.profile_photo_url) {
+    return (
+      <SquircleAvatar
+        src={row.profile_photo_url}
+        alt={row.display_name ?? ''}
+        userId={row.user_id}
+        size={size}
+        hairlineRing
+      />
+    );
+  }
+  const initials = getInitialsFromName(row.display_name).slice(0, 2);
+  return (
+    <span
+      aria-label={row.display_name ?? t('discover.aMember', 'A member')}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: size,
+        height: size,
+        borderRadius: '34%',
+        background: getAvatarFallbackGradient(row.user_id),
+        border: `1px solid ${A.BORDER}`,
+        boxSizing: 'border-box',
+        fontFamily: SANS,
+        fontSize: Math.round(size * 0.36),
+        fontWeight: 800,
+        lineHeight: 1,
+        color: 'rgba(248,250,252,0.82)',
+        userSelect: 'none',
+      }}
+    >
+      {initials || '\u00B7'}
+    </span>
+  );
 }
 
 const POS_W = 28;
@@ -279,13 +345,7 @@ export function BoardRowView({
         </span>
 
       <span style={{ flexShrink: 0 }}>
-        <SquircleAvatar
-          src={row.profile_photo_url ?? null}
-          alt={row.display_name ?? ''}
-          userId={row.user_id}
-          size={28}
-          hairlineRing
-        />
+        <BoardAvatar row={row} size={28} />
       </span>
       <span style={{ flex: 1, minWidth: 0 }}>
         <span
@@ -344,6 +404,7 @@ export function BoardRowView({
           fontSize: 15,
           fontWeight: 700,
           color: isSelf ? A.AMBER : value.tone,
+          textTransform: 'uppercase',
         }}
       >
         {value.text}

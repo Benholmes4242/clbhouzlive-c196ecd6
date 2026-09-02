@@ -66,3 +66,29 @@ export function getInitialsFromName(
   }
   return tokens[0].charAt(0).toUpperCase();
 }
+
+/**
+ * HUE-DERIVED FALLBACK FILL (BRIEF_DISCOVER_BOARD_AVATARS_AND_RECENT A1.2).
+ *
+ * AVATAR_FALLBACK_PALETTE above is twelve near-identical desaturated slates —
+ * on a dark canvas ten consecutive tiles read as one block of grey. This helper
+ * derives only the HUE from the stable user id and fixes saturation/lightness,
+ * so every tile carries the same visual weight while the hue actually reads.
+ *
+ * Keys on the USER ID ALONE — never display name, initials or row position — so
+ * a member's colour is identical on the board, in the see-all sheet and across
+ * sessions. Additive: existing callers of getAvatarFallbackColor are untouched.
+ */
+export function stableHue(key: string | null | undefined): number {
+  if (!key) return 0;
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash * 31 + key.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash) % 360;
+}
+
+export function getAvatarFallbackGradient(userId: string | null | undefined): string {
+  const h = stableHue(userId);
+  return `linear-gradient(150deg, hsl(${h}, 22%, 30%) 0%, hsl(${h}, 20%, 20%) 100%)`;
+}

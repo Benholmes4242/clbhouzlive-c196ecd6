@@ -1226,6 +1226,14 @@
     "mostPlayedOneRoundLine_other": "Only {{name}} has played here, best of {{gross}}.",
     "comments": {
       "action": "Comment on this round"
+    },
+    "when": {
+      "relToday": "오늘",
+      "relYest": "어제",
+      "relDaysAgo": "{{n}}일 전",
+      "relWeeksAgo": "{{n}}주 전",
+      "relMonthsAgo": "{{n}}개월 전",
+      "relYearsAgo": "{{n}}년 전"
     }
   },
   "statBrowse": {

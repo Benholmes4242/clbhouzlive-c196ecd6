@@ -1363,7 +1363,13 @@
       "daysAgo_one": "[~~{{count}} đáý áĝő~~]",
       "lastWeek": "[~~Ļášţ ŵééǩ~~]",
       "weeksAgo": "[~~{{count}}ŵ áĝő~~]",
-      "monthsAgo": "[~~{{count}}ɱő áĝő~~]"
+      "monthsAgo": "[~~{{count}}ɱő áĝő~~]",
+      "relToday": "[today]",
+      "relYest": "[yest]",
+      "relDaysAgo": "[{{n}}d ago]",
+      "relWeeksAgo": "[{{n}}w ago]",
+      "relMonthsAgo": "[{{n}}mo ago]",
+      "relYearsAgo": "[{{n}}y ago]"
     },
     "rarest": {
       "aceAt": "[~~Ĥőļé íñ őñé, {{hole}}~~]",
