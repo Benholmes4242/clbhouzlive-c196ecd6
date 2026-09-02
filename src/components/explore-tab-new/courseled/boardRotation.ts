@@ -40,8 +40,22 @@ export const FALLBACK_PICK: BoardPick = {
 
 /** R1.3 — ONE key, this session's chosen combination. */
 export const ROTATION_SESSION_KEY = 'clbhouz.discover.rotation.pick.v1';
-/** R2.4 — outlives the session, so the next one can exclude it. */
+/** R2.4 / F2.6 — outlives the session, so the next one can exclude it. */
 export const ROTATION_LAST_KEY = 'clbhouz.discover.rotation.last.v1';
+/**
+ * F1.4 — the last calendar day Discover was entered, as a LOCAL YYYY-MM-DD
+ * string. A date string, not a timestamp: F1.3 forbids a rolling 24 hours,
+ * which would drift the "first" visit an hour later every day.
+ */
+export const LAST_SEEN_DATE_KEY = 'clbhouz.discover.lastSeenDate.v1';
+
+/** F1.3 — the member's OWN local calendar date. Never UTC, never rolling. */
+export function localDateKey(now: Date = new Date()): string {
+  const y = now.getFullYear();
+  const m = `${now.getMonth() + 1}`.padStart(2, '0');
+  const d = `${now.getDate()}`.padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
 
 /** Windows shortest-first: R2.1 keeps the shortest of a tied group. */
 const WINDOW_ORDER: WindowKey[] = ['14', '30', '90', 'year', 'all'];
