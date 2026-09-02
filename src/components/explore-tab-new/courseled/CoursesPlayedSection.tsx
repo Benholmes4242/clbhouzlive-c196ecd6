@@ -521,9 +521,11 @@ function CoursePlayers({
                   : `+${p.best_to_par}`}
           </span>
         </button>
-      ))}
+        ))}
+      </div>
 
-      {/* D2.2 / D2.3 — who played here, THEN go to the course. */}
+      {/* D2.2 / D2.3 / P4 — who played here, THEN go to the course. It sits
+          BELOW the scrolling list and stays reachable without scrolling it. */}
       <button
         type="button"
         onClick={() => onCoursePress?.(courseId)}
