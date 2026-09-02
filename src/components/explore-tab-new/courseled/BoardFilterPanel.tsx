@@ -351,9 +351,10 @@ export function BoardFilterPanel({
             <SectionLabel>{t('discover.filterBoard.eyebrow', 'The board')}</SectionLabel>
             <PanelRow
               label={t('discover.filterBoard.rankedBy', 'Ranked by')}
-              value={t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
-              valueChanged={board !== 'gross'}
-              valueCaps
+              /* SENTENCE CASE — a VALUE, not a label (brief 2). It matches the
+                 option label in WHICH BOARD exactly. */
+              value={rankedByLabel}
+              valueChanged={board !== 'gross' || isRollFeat(filters.feat)}
               chevron
               onClick={() => setScreen('board')}
             />
@@ -399,13 +400,9 @@ export function BoardFilterPanel({
               chevron
               onClick={() => setScreen('band')}
             />
-            <PanelRow
-              label={t('discover.filterBoard.axis.feats', 'Feats')}
-              value={featLabel}
-              valueChanged={filters.feat !== DEFAULT_FILTERS.feat}
-              chevron
-              onClick={() => setScreen('feat')}
-            />
+            {/* S4 — NO FEATS ROW. It stacked a second filtering layer on the
+                ranking, and every option but the two rare ones duplicated a
+                board. The two survivors are in WHICH BOARD under RARE FEATS. */}
 
             <button
               type="button"
@@ -414,14 +411,15 @@ export function BoardFilterPanel({
                 ...rowBase,
                 borderBottom: 'none',
                 justifyContent: 'center',
-                fontSize: 12.5,
-                fontWeight: 700,
+                /* A BUTTON LABEL: all caps, wide tracking, CSS not locale. */
+                ...KICKER,
                 color: A.MUTE,
                 cursor: 'pointer',
               }}
             >
               {t('discover.filterBoard.reset', 'Reset all filters')}
             </button>
+
           </>
         )}
 
