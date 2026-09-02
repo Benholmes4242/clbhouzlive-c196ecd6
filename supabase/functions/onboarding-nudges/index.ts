@@ -403,7 +403,7 @@ Deno.serve(async (req) => {
 
   const { data: members, error: membersErr } = await supabase
     .from('user_profiles')
-    .select('id, username, username_is_custom, primary_club_id, created_at')
+    .select('id, username, username_is_custom, primary_club_id, hide_handicap_chip, created_at')
     .is('deleted_at', null)
     .lt('created_at', newest)
     .gt('created_at', oldest)
@@ -464,7 +464,14 @@ Deno.serve(async (req) => {
   for (const member of members ?? []) {
     const userId = member.id as string;
     const open: Record<Gap, boolean> = {
-      whs: !hasWhs.has(userId),
+      // The 76 members without a whs_connections row are NOT one population.
+      // Some have not got round to connecting; others tapped "I don't hold an
+      // official handicap" and hide_handicap_chip was persisted - the product
+      // has already told them that is fine. Only the first group is a
+      // conversion problem; the second is behaving correctly and must be left
+      // alone. hide_handicap_chip is the ONLY explicit decline signal - never
+      // infer a decline from inactivity, country or anything else.
+      whs: !hasWhs.has(userId) && !member.hide_handicap_chip,
       club: !member.primary_club_id,
       // username_is_custom is the only honest signal: signup GENERATES a
       // username, so "is it blank" never fires. NULL means unknown - do not
