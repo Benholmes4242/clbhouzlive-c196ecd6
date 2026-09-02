@@ -113,6 +113,7 @@ export function ProfileSwitcherPopover({
                       size={32}
                       src={profile.avatarUrl}
                       alt={profile.name}
+                      userId={profile.id}
                       fallback={profile.name?.charAt(0)?.toUpperCase() ?? '?'}
                       hairlineRing
                     />

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
-import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { 
   getRingColorForTotalPlayed,
   THEME_COLORS,
@@ -65,7 +65,8 @@ export interface SquircleAvatarProps {
   hairlineRing?: boolean;
   /** Fallback text (e.g., initials). If omitted, derived from `alt`. */
   fallback?: string;
-  /** User UUID — used to derive deterministic fallback colour. If absent, hashes `alt` instead. */
+  /** User UUID — THE fallback key. EVERY MEMBER CALL SITE MUST PASS THIS.
+   *  If absent, hashes `alt`, which will not match that member elsewhere. */
   userId?: string | null;
   /** Additional CSS classes */
   className?: string;
@@ -240,7 +241,10 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   // Initials kept for aria-label accessibility and fallback rendering.
   const fallbackInitials = fallback || getInitialsFromName(alt) || '?';
   const hasInitials = fallbackInitials && fallbackInitials !== '?';
-  const fallbackBg = getAvatarFallbackColor(userId || alt);
+  /* HUE IS A PERSON. The hue is derived from the user id; `alt` is the last
+     resort for a subject with genuinely no id and will not match that member
+     elsewhere. Entities that build their own tile keep the slate palette. */
+  const fallbackBg = getAvatarFallbackGradient(userId || alt);
   const initialsFontSize = Math.max(10, Math.round(pixelSize * 0.38));
 
   // Three render states:

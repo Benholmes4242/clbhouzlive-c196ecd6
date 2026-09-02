@@ -94,42 +94,47 @@ The `<SquircleAvatar
 />
 ```
 
-## Fallback Behaviour (Updated)
+## Fallback Behaviour — HUE IS A PERSON
 
-When no `src` is provided or the image fails to load, `SquircleAvatar` renders
-initials on a deterministic coloured background:
+**A HUE MEANS A PERSON. THE TWELVE-SLATE PALETTE MEANS AN ENTITY.**
 
-- **Colour** is derived from the user's UUID (preferred) or their display name
-  (fallback). Same user → same colour every time, everywhere in the app.
-- **Initials** are auto-derived from `alt` (the user's display name). Two
-  characters max. Override via `fallback` prop if needed.
+When no `src` is given, or the image fails, `SquircleAvatar` renders initials on
+a **hue-derived gradient** keyed on the member's UUID. A business, a club, a
+tour player keeps the flat twelve-slate `AVATAR_FALLBACK_PALETTE`. Courses keep
+their own landscape gradients. That distinction is a rule, not an accident: it
+is the only thing that tells a member apart from a business when both fall back.
+
+### `userId` IS NOT OPTIONAL FOR A MEMBER
 
 ```tsx
-// Recommended — colour is consistent across the whole app for this user
 <SquircleAvatar
-  src={user.profile_photo_url}
-  alt={user.display_name}
-  userId={user.id}
-  size="md"
-/>
-
-// If UUID isn't available (rare), colour hashes from the name
-<SquircleAvatar
-  src={null}
-  alt="Chris Leeson"
-  size="md"
-/>
-
-// Manual override for edge cases
-<SquircleAvatar
-  src={null}
-  alt="Guest"
-  fallback="G"
+  src={member.profile_photo_url}
+  alt={member.display_name}
+  userId={member.id}        // ← THE KEY. Not a nice-to-have.
   size="md"
 />
 ```
 
-Palette and hash live in `src/lib/avatarFallback.ts`. Do not fork.
+The hue comes from `userId || alt`. Passing only `alt` is a bug with a delay on
+it: the same member renders as two obviously different coloured tiles — one hue
+in the feed keyed on their name, another on their profile keyed on their id.
+Twelve near-identical slates used to hide that. The hue does not.
+
+**If the payload has no id, add it to the query.** Do not invent a key, do not
+fall back to the name and call it done, do not hash a row index or an email.
+
+### Choosing the helper
+
+| Subject | Helper | Result |
+| --- | --- | --- |
+| Member | `getAvatarFallbackGradient(userId)` | hue-derived gradient |
+| Business, club, tour player | `getAvatarFallbackColor(id)` | flat slate |
+| Course | its own landscape gradient | unchanged |
+
+Both live in `src/lib/avatarFallback.ts`. **Do not fork them, do not add a
+local palette, do not tune a hue at a call site.** A shared subject — a
+lightbox, a switcher — takes an explicit `subject` / `entity` flag from its
+caller rather than guessing.
 
 ## Achievement Ring Colors
 
@@ -168,3 +173,11 @@ See `src/components/ui/SquircleAvatar.tsx` for the implementation details.
 - New `CoverPhotoFallback` component unifies the empty cover-photo state
   across `ProfilePageV2` and `CinematicProfileHeader`.
 
+### 2026-06 — Hue-derived member fallback, app-wide
+- `SquircleAvatar` fallback flipped from the flat slate to
+  `getAvatarFallbackGradient`. `userId` plumbed into every member call site
+  first, so no member renders two different colours.
+- Businesses, clubs and tour players deliberately KEPT the slate palette.
+  `AvatarLightbox` takes `subject="entity"` for a business logo.
+- The Discover board-local fallback tile was folded back into
+  `SquircleAvatar`; photo rows and fallback rows now share one geometry.

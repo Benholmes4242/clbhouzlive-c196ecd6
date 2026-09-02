@@ -254,6 +254,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
                     <SquircleAvatar
                       src={request.requester.profile_photo_url || undefined}
                       alt={requesterName}
+                      userId={request.requester_user_profile_id}
                       size={40}
                       hairlineRing
                     />

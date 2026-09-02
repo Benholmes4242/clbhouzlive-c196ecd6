@@ -89,6 +89,7 @@ export function CommentCard({
             size={34}
             src={comment.avatar_url}
             alt={comment.display_name}
+            userId={comment.actor_id ?? comment.user_id}
             fallback={comment.display_name?.charAt(0) || '?'}
             hairlineRing ringColor={DARK_HAIRLINE}
           />

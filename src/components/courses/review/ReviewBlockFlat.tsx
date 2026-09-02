@@ -13,6 +13,8 @@ import { stripMentionMarkup } from '@/lib/mentions/format';
 interface Review {
   id: string;
   user: {
+    /** Reviewer's user id — keys the avatar fallback hue. */
+    id?: string | null;
     name: string;
     avatarUrl: string | null;
     initials: string;
@@ -132,53 +134,13 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
             onClick={(e) => { e.stopPropagation(); onUserClick(); }}
             style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flexShrink: 0 }}
           >
-            {user.avatarUrl ? (
-              <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} hairlineRing ringColor={DARK_HAIRLINE} />
-
-            ) : (
-              <div
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 10,
-                  background: '#3B82F6',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#fff',
-                  fontSize: 13,
-                  fontWeight: 700,
-                  letterSpacing: '0.02em',
-                }}
-              >
-                {user.initials}
-              </div>
-            )}
+            <SquircleAvatar src={user.avatarUrl} alt={user.name} userId={user.id ?? null} fallback={user.initials} size={40} hairlineRing ringColor={DARK_HAIRLINE} />
           </button>
         ) : (
-          user.avatarUrl ? (
-            <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} hairlineRing ringColor={DARK_HAIRLINE} />
-          ) : (
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 10,
-                background: '#3B82F6',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                fontSize: 13,
-                fontWeight: 700,
-                flexShrink: 0,
-              }}
-            >
-              {user.initials}
-            </div>
-          )
+          <SquircleAvatar src={user.avatarUrl} alt={user.name} userId={user.id ?? null} fallback={user.initials} size={40} hairlineRing ringColor={DARK_HAIRLINE} />
         )}
 
+        
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.96)', lineHeight: 1.3 }}>{user.name}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 1, flexWrap: 'wrap' }}>

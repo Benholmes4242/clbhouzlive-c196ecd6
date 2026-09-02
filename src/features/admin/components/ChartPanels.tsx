@@ -154,7 +154,7 @@ export function RightNowPanel({
               {/* ALWAYS render the avatar: SquircleAvatar draws deterministic
                   initials on a null src, and it occupies the 20px slot either
                   way, so rows still align. */}
-              <SquircleAvatar src={u.avatarUrl} alt={u.displayName} size={20} hairlineRing />
+              <SquircleAvatar src={u.avatarUrl} alt={u.displayName} userId={u.userId} size={20} hairlineRing />
 
               <span style={{ color: t.ink, fontSize: 13, fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {u.displayName}

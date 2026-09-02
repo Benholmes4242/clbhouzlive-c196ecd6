@@ -167,6 +167,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
             size={32}
             src={selfActor?.avatarUrl}
             alt={selfActor?.name || 'You'}
+            userId={selfActor?.id ?? null}
             fallback={selfActor?.name?.charAt(0) || '?'}
             hairlineRing ringColor={DARK_HAIRLINE}
           />
@@ -192,6 +193,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
                   size={22}
                   src={a.avatarUrl}
                   alt={a.name}
+                  userId={a.id}
                   fallback={a.name?.charAt(0) || '?'}
                   hairlineRing ringColor={DARK_HAIRLINE}
                 />

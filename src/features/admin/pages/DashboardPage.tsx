@@ -594,7 +594,7 @@ function FeedGroup({
           color: 'inherit',
         }}
       >
-        <SquircleAvatar src={head.avatarUrl} alt={head.memberName} size={28} hairlineRing ringColor={t.line} />
+        <SquircleAvatar src={head.avatarUrl} alt={head.memberName} userId={head.memberId} size={28} hairlineRing ringColor={t.line} />
         <span style={{
           color: t.ink, fontSize: 13, fontWeight: 700, minWidth: 0,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -714,7 +714,7 @@ function FeedRow({
       {/* The avatar belongs to the MEMBER, always: `subject` is the COURSE on a
           review row, so alt is memberName. SquircleAvatar always occupies the
           28px slot, so rows align with and without a photo. */}
-      <SquircleAvatar src={item.avatarUrl} alt={item.memberName} size={28} hairlineRing ringColor={t.line} />
+      <SquircleAvatar src={item.avatarUrl} alt={item.memberName} userId={item.memberId} size={28} hairlineRing ringColor={t.line} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
           <span style={{ color: t.ink, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

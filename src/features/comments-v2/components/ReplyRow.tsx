@@ -62,6 +62,7 @@ export function ReplyRow({ comment, registerRef, highlighted, onLike, onMore, on
           size={28}
           src={comment.avatar_url}
           alt={comment.display_name}
+          userId={comment.actor_id ?? comment.user_id}
           fallback={comment.display_name?.charAt(0) || '?'}
           hairlineRing ringColor={DARK_HAIRLINE}
         />

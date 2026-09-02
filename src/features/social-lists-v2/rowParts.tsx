@@ -97,6 +97,8 @@ export function RowAvatar({
     <SquircleAvatar
       src={row.avatar_url ?? undefined}
       alt={row.display_name ?? row.username ?? ''}
+      /* Personal branch only — the business branch above keeps the slate. */
+      userId={row.actor_id}
       size={size}
       fallback={initial}
       hairlineRing

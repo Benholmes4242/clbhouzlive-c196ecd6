@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Loader2, MapPin } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -16,6 +17,8 @@ interface PostPreview {
   post_type: string | null;
   created_at: string;
   user_profiles: {
+    /** Author's user id — keys the avatar fallback hue. */
+    id: string | null;
     username: string;
     display_name: string | null;
     avatar_url: string | null;
@@ -224,6 +227,7 @@ const PostDeepLinkPage: React.FC = () => {
         post_type: row.post_type ?? null,
         created_at: row.created_at,
         user_profiles: profileRow ? {
+          id: row.user_id ?? null,
           username: profileRow.username,
           display_name: profileRow.display_name,
           avatar_url: profileRow.profile_photo_url ?? null,
@@ -484,7 +488,14 @@ const PostDeepLinkPage: React.FC = () => {
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
             ) : (
-              <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white/60 text-[13px] font-semibold">
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold"
+                style={{
+                  /* Shared hue — the same tile as the feed and the profile. */
+                  background: getAvatarFallbackGradient(profile?.id || displayName),
+                  color: 'rgba(248,250,252,0.82)',
+                }}
+              >
                 {displayName.charAt(0).toUpperCase()}
               </div>
             )}

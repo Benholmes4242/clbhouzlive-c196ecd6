@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { 
   getRingColorForTotalPlayed,
@@ -17,6 +18,8 @@ import {
 interface AvatarXPRingProps {
   avatarUrl?: string;
   displayName: string;
+  /** Member's user id. THE fallback key; the display name is a last resort. */
+  userId?: string | null;
   /** Top 100 courses played count - determines ring tier color */
   top100Count?: number;
   /** Legacy xpValue prop (ignored, kept for backwards compatibility) */
@@ -86,6 +89,7 @@ function lightenHex(hex: string, percent: number): string {
 export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
   avatarUrl,
   displayName,
+  userId,
   top100Count = 0,
   xpValue, // kept for backwards compat but unused
   size = 'lg',
@@ -186,12 +190,15 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
         />
       ) : (
         <div
-          className="absolute flex items-center justify-center bg-muted text-muted-foreground font-semibold"
+          className="absolute flex items-center justify-center font-semibold"
           style={{
             width: dimensions.avatar,
             height: avatarHeight,
             borderRadius: SDS_AVATAR_BORDER_RADIUS,
             fontSize: `${Math.round(dimensions.avatar * 0.38)}px`,
+            /* Shared hue — see lib/avatarFallback.ts. Never a local palette. */
+            background: getAvatarFallbackGradient(userId || displayName),
+            color: 'rgba(248,250,252,0.82)',
           }}
         >
           {displayName.charAt(0).toUpperCase()}

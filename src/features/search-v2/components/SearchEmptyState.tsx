@@ -346,6 +346,7 @@ function SuggestionRow({
         size={42}
         src={suggestion.profile_photo_url ?? undefined}
         alt={name}
+        userId={suggestion.id}
         fallback={initials}
         hairlineRing
         ringColor={DARK_HAIRLINE}

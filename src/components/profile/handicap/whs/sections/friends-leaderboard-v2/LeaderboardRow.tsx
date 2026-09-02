@@ -1,6 +1,6 @@
 import React from 'react';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
-import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { reformatFriendName } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
 import { DARK_ROW_TITLE } from '../_shared/darkAtoms';
@@ -184,7 +184,7 @@ export const LeaderboardRow: React.FC<Props> = ({ entry, rank, isStaleRow, onCli
       {/* Avatar */}
       {(() => {
         const avatarSrc = pickAvatarSrc(entry.friend_thumbnail_url, entry.friend_profile_photo_url);
-        const fbBg = getAvatarFallbackColor(
+        const fbBg = getAvatarFallbackGradient(
           entry.friend_user_id ?? (entry as { friend_row_id?: string | null }).friend_row_id ?? entry.friend_name
         );
         return (

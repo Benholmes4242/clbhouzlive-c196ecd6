@@ -256,6 +256,7 @@ function PostCard({ result, completedFiles, resolved }: { result: SubmitResult; 
             <SquircleAvatar
               src={result.actorAvatarUrl ?? null}
               alt={result.actorName}
+              userId={result.actorId ?? null}
               size={26}
               fallback={result.actorName[0]}
               hairlineRing

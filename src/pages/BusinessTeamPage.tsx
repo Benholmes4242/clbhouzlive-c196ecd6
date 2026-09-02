@@ -245,6 +245,7 @@ export default function BusinessTeamPage() {
         <SquircleAvatar
           src={profile?.profile_photo_url || undefined}
           alt={name}
+          userId={m.user_profile_id}
           size={44}
           hairlineRing
           ringColor={DARK_HAIRLINE}
@@ -457,6 +458,7 @@ export default function BusinessTeamPage() {
                       <SquircleAvatar
                         src={invite.invitee_profile.profile_photo_url || undefined}
                         alt={label}
+                        userId={invite.invitee_user_id}
                         size={40}
                         hairlineRing
                         ringColor={DARK_HAIRLINE}

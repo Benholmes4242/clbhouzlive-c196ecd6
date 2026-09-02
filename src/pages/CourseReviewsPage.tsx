@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { formatRatingValue } from '@/utils/formatters';
 import { formatDateNumeric } from '@/i18n/format';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
@@ -241,7 +242,13 @@ const CourseReviewsPage: React.FC = () => {
                       }
                       className="flex items-center gap-2 text-left hover:opacity-80 transition-opacity"
                     >
-                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-slate/80 text-[11px] font-medium text-white">
+                      <div
+                        className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-medium"
+                        style={{
+                          background: getAvatarFallbackGradient(r.user_id || name),
+                          color: 'rgba(248,250,252,0.82)',
+                        }}
+                      >
                         {name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex flex-col">

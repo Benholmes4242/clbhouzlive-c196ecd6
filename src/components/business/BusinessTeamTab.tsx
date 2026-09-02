@@ -90,6 +90,7 @@ export const BusinessTeamTab: React.FC<BusinessTeamTabProps> = ({ businessId }) 
               size={40}
               src={m.user_profile?.profile_photo_url || undefined}
               alt={name}
+              userId={m.user_profile?.id ?? m.user_profile_id}
               fallback={name.charAt(0).toUpperCase()}
               hairlineRing
             />

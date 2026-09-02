@@ -11,6 +11,8 @@ interface StickyMiniHeaderProps {
   visible: boolean;
   avatarUrl?: string;
   displayName: string;
+  /** Member's user id — keys the avatar fallback hue. */
+  userId?: string | null;
   isOwnProfile?: boolean;
   onBack?: () => void;
   onSettings?: () => void;
@@ -22,6 +24,7 @@ export const StickyMiniHeader: React.FC<StickyMiniHeaderProps> = ({
   visible,
   avatarUrl,
   displayName,
+  userId,
   isOwnProfile = true,
   onBack,
   onSettings,
@@ -61,6 +64,7 @@ export const StickyMiniHeader: React.FC<StickyMiniHeaderProps> = ({
           <div className="flex items-center gap-2">
             <SquircleAvatar
               src={avatarUrl}
+              userId={userId ?? null}
               fallback={displayName.substring(0, 2)}
               size="sm"
               hairlineRing

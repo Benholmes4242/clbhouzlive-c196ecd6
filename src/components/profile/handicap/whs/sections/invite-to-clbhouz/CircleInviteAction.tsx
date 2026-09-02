@@ -29,7 +29,7 @@ import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
-import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { displayName } from '@/lib/whs/utils/initials';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { fmtHcp } from '@/lib/whs/format';
@@ -233,7 +233,7 @@ const InviteRow: React.FC<{
             height: 34,
             flex: '0 0 34px',
             borderRadius: 11,
-            background: getAvatarFallbackColor(
+            background: getAvatarFallbackGradient(
               friend.friend_user_id ?? friend.friend_row_id ?? friend.friend_name,
             ),
             color: '#FFFFFF',

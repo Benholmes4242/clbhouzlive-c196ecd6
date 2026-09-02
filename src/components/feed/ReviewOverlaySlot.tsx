@@ -38,6 +38,7 @@ export const ReviewOverlaySlot: React.FC<ReviewOverlaySlotProps> = ({
       courseRating={activePost.courseRating ?? null}
       reviewText={review.reviewText ?? null}
       reviewer={{
+        id: activePost.actorId ?? activePost.userId,
         name: activePost.displayName,
         avatar: activePost.avatarUrl,
       }}

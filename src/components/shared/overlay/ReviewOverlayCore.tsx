@@ -378,7 +378,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 }}
                 aria-label={`View ${user.name}'s profile`}
               >
-                <SquircleAvatar size={20} src={user.avatar} alt={user.name} fallback={initials} hairlineRing />
+                <SquircleAvatar size={20} src={user.avatar} alt={user.name} userId={user?.id ?? null} fallback={initials} hairlineRing />
                 <span
                   style={{
                     fontSize: 12,

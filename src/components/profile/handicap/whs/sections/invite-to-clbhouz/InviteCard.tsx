@@ -5,7 +5,7 @@ import { toast } from '@/lib/toast';
 import { callCreateInvite } from '@/lib/whs/api';
 import { shareInvite } from '@/lib/whs/share';
 import { firstName, displayName } from '@/lib/whs/utils/initials';
-import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
+import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { pickAvatarSrc } from '@/lib/whs/utils/avatarSrc';
 import { fmtRelative } from '@/lib/whs/utils/nameFormat';
 import { whsKeys } from '@/lib/whs/hooks';
@@ -82,7 +82,7 @@ export const InviteCard: React.FC<Props> = ({ friend }) => {
           <div
             style={{
               width: 42, height: 42, borderRadius: 12,
-              background: getAvatarFallbackColor(friend.friend_user_id ?? friend.friend_row_id ?? friend.friend_name),
+              background: getAvatarFallbackGradient(friend.friend_user_id ?? friend.friend_row_id ?? friend.friend_name),
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#fff', fontSize: 15, fontWeight: 700,
             }}

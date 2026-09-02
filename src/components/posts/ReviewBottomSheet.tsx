@@ -756,6 +756,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   size={28}
                   src={user.avatar}
                   alt={user.name}
+                  userId={user.id}
                   fallback={initials}
                   hairlineRing
                   ringColor={DARK_HAIRLINE}

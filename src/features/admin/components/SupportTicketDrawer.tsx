@@ -148,6 +148,7 @@ export default function SupportTicketDrawer({ ticket, onClose }: Props) {
         <SquircleAvatar
           src={ticket.profile?.profile_photo_url ?? undefined}
           alt={userName}
+          userId={ticket.user_id}
           size={36}
           hairlineRing
         />

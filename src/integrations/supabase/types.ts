@@ -19155,6 +19155,14 @@ export type Database = {
           whs_score_id: string
         }[]
       }
+      get_board_rotation: {
+        Args: { p_min_rows?: number; p_viewer: string }
+        Returns: {
+          board: string
+          n: number
+          win: string
+        }[]
+      }
       get_business_access_level: {
         Args: { p_business_id: string; p_user_profile_id: string }
         Returns: string

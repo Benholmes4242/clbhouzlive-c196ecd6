@@ -151,6 +151,7 @@ function ReplySheet({
               <SquircleAvatar
                 src={review.reviewer.profile_photo_url || undefined}
                 alt={review.reviewer.display_name || 'Reviewer'}
+                userId={review.reviewer.id}
                 size={28}
                 hairlineRing
                 ringColor={DARK_HAIRLINE}
@@ -327,6 +328,7 @@ function ReviewCard({
         <SquircleAvatar
           src={r.reviewer.profile_photo_url || undefined}
           alt={name}
+          userId={r.reviewer.id}
           size={40}
           hairlineRing
           ringColor={DARK_HAIRLINE}

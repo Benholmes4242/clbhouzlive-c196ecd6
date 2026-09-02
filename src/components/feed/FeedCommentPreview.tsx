@@ -67,6 +67,8 @@ interface Props {
   /** Viewing member's avatar for the prompt row. */
   viewerAvatarUrl?: string | null;
   viewerName?: string | null;
+  /** Viewing actor's id — keys the fallback hue. Never the display name. */
+  viewerId?: string | null;
   /** Which card this block is sitting in. Decides the ink tiers, nothing else. */
   surface?: CommentPreviewSurface;
 }
@@ -77,6 +79,7 @@ export const FeedCommentPreview: React.FC<Props> = ({
   onOpenComments,
   viewerAvatarUrl,
   viewerName,
+  viewerId,
   surface = 'dark',
 }) => {
   const { ink: INK, mid: MID, dim: DIM, line: LINE } = TONES[surface];
@@ -137,6 +140,7 @@ export const FeedCommentPreview: React.FC<Props> = ({
           <SquircleAvatar
             src={preview!.avatar_url}
             alt={preview!.display_name}
+            userId={preview!.actor_id}
             size={24}
             hairlineRing
           />
@@ -188,7 +192,7 @@ export const FeedCommentPreview: React.FC<Props> = ({
           textAlign: 'left',
         }}
       >
-        <SquircleAvatar src={viewerAvatarUrl ?? null} alt={viewerName ?? 'You'} size={22} hairlineRing />
+        <SquircleAvatar src={viewerAvatarUrl ?? null} alt={viewerName ?? 'You'} userId={viewerId ?? null} size={22} hairlineRing />
         <span style={{ color: DIM, fontSize: 12.5, fontWeight: 600 }}>Add a comment…</span>
       </button>
     </div>
