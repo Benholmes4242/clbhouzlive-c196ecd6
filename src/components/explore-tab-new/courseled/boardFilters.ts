@@ -6,7 +6,7 @@
  * vocabulary, so nothing is translated on the way to SQL and no second set of
  * names can drift from it (S1.6).
  *
- * THE FIXED LISTS LIVE HERE (S2.4). scope, window, band, feat, the three
+ * THE FIXED LISTS LIVE HERE (S2.4). scope, window, band, competition, the three
  * courses set-options and the seven boards are HARDCODED CLIENT-SIDE; the RPC
  * supplies only their COUNTS, and an option missing from the facet result means
  * ZERO — the row still renders, greyed and unselectable. course, region_country
