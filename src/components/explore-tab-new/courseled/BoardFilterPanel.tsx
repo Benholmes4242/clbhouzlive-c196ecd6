@@ -13,10 +13,12 @@ import {
   BOARD_LABELS,
   COURSES_SET_OPTIONS,
   DEFAULT_FILTERS,
-  FEAT_OPTIONS,
+  ROLL_KEYS,
+  ROLL_LABELS,
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
   boardCountsRounds,
+  isRollFeat,
   type BandKey,
   type BoardFilters,
   type BoardKey,
@@ -24,6 +26,7 @@ import {
   type FeatKey,
   type WindowKey,
 } from './boardFilters';
+
 
 /**
  * THE FILTER PANEL (BRIEF_DISCOVER_FILTER_LED_BOARD S3).
