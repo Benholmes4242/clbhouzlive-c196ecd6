@@ -111,6 +111,11 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange }: Gol
   const [panelOpen, setPanelOpen] = useState(false);
   const [seeAll, setSeeAll] = useState(false);
 
+  /* C2.1 — publish the applied FILTERS ONLY, never the board. */
+  useEffect(() => {
+    onAppliedFiltersChange?.(pickedFilters);
+  }, [pickedFilters, onAppliedFiltersChange]);
+
   const facets = useBoardFacets(userId, board, filters, { enabled: ready });
   const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: ready });
 
