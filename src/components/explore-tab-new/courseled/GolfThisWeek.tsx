@@ -66,6 +66,8 @@ import {
   useViewerHandicapIndex,
   type WeekScope,
 } from './hooks/useGolfThisWeek';
+import { useLeaderboardOptOuts } from './hooks/useLeaderboardOptOuts';
+
 
 /**
  * BRIEF_BOARD_FIVE_CATEGORIES_AND_ROTATION §S2 — THE FIVE CATEGORIES, at module
