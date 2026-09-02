@@ -163,12 +163,11 @@ export default function ExploreTabContent({
 
   useMarkDiscoverSeenOnExit(markSeen);
 
-  /* ONE ROUNDS SECTION (BRIEF_MERGE_CIRCLE_AND_GOLF_THIS_WEEK §S1). Your Circle
-     and Golf this week were the same section shown twice; the merged rail keeps
-     its scope and area here so the see-all sheet inherits both. Component state,
-     not the URL: a filter tap must not enter the back stack. */
-  const [weekScope, setWeekScope] = useState<WeekScope>(DEFAULT_WEEK_SCOPE);
-  const [weekRegion, setWeekRegion] = useState<RegionSelection | null>(null);
+  /* THE SCOPE AND AREA STATE IS GONE (BRIEF_DISCOVER_FILTER_LED_BOARD S3.7).
+     Scope pills and the area sheet were absorbed into the board's own filter
+     panel, which owns WHO and WHERE together, so the page no longer holds
+     either. */
+
 
   // Sticky-bar veil: mirrors CoursesContent so the notch strip paints the
   // moment the pills pin (no gap, no colour seam).
