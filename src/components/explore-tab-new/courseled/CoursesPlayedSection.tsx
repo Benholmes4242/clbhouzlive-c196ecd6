@@ -316,7 +316,7 @@ export function CourseRow({
         <CoursePlayers
           courseId={row.course_id}
           courseName={row.name}
-          expectedRows={Math.max(1, Math.min(row.members, 6))}
+          expectedRows={Math.max(1, Math.min(row.members, PANEL_VISIBLE_ROWS))}
           userId={userId}
           filters={filters}
           onMemberPress={onMemberPress}
