@@ -25,7 +25,14 @@ import { corsFor } from '../_shared/cors.ts';
 
 export const FUNCTION_VERSION = '2026-09-01-v1-onboarding-nudges';
 
-const APP_ORIGIN = 'https://clbhouz.com';
+/**
+ * EMAIL ONLY. clbhouz.co.uk is the canonical host (.com only 301s to it).
+ * The DM and the push carry RELATIVE in-app routes: a full URL tapped inside
+ * the Median WebView leaves for the browser, where any non gate-exempt path
+ * renders the download gate at a member who is already in the app.
+ */
+const EMAIL_ORIGIN = 'https://clbhouz.co.uk';
+
 /** The clbhouz business account. Sends the DM and owns the push actor. */
 const CLBHOUZ_BUSINESS_ID = 'b54c35bf-caa8-4d4f-bd38-e0de8c80ecd7';
 const NUDGE_NOTIFICATION_TYPE = 'onboarding_nudge';
@@ -45,9 +52,13 @@ type Channel = 'dm' | 'push' | 'email';
 const GAP_PRIORITY: Gap[] = ['whs', 'club', 'username'];
 
 interface Copy {
-  /** Push title and email subject: the one ask, never a summary of the app. */
+  /** Push title, email subject and the DM action label: the one ask. */
   subject: string;
-  /** Body, British English, straight apostrophes, no em dashes. */
+  /**
+   * Body, British English, straight apostrophes, spaced hyphens, no
+   * exclamation marks. The instruction lives on the action row, so the body is
+   * a sentence to a person. `{username}` is substituted where present.
+   */
   body: string;
   path: string;
   src: string;
@@ -57,31 +68,44 @@ const COPY: Record<Gap, Copy> = {
   whs: {
     subject: 'Connect your handicap',
     body:
-      'Your rounds are waiting. Connect your handicap and every round you play ' +
-      'arrives on its own, scored hole by hole against the course you played it on.',
+      'Once you connect your handicap, every round you play turns up here on its ' +
+      'own, scored hole by hole against the course you played it on. Nothing to type in.',
     path: '/handicap',
     src: 'nudge_whs',
   },
   club: {
     subject: 'Set your home club',
     body:
-      'Set your home club and you will see how your club\'s members are scoring, ' +
+      'Add your home club and you will see how your club\'s members are scoring, ' +
       'and find the ones already on clbhouz.',
     path: '/edit-profile',
     src: 'nudge_club',
   },
   username: {
     subject: 'Pick a username',
-    body: 'Pick a username so the golfers you play with can find you.',
+    body:
+      'You are down as {username} at the moment. Pick something the golfers you ' +
+      'play with will recognise.',
     path: '/edit-profile',
     src: 'nudge_username',
   },
 };
 
-function linkFor(gap: Gap): string {
-  const c = COPY[gap];
-  return `${APP_ORIGIN}${c.path}?src=${c.src}`;
+function bodyFor(gap: Gap, username: string | null): string {
+  return COPY[gap].body.replace('{username}', username ?? 'a generated name');
 }
+
+/** Relative, internal route. Used by the DM action and the push payload. */
+function routeFor(gap: Gap): string {
+  const c = COPY[gap];
+  return `${c.path}?src=${c.src}`;
+}
+
+/** Absolute, canonical host. EMAIL ONLY — it opens outside the app. */
+function emailLinkFor(gap: Gap): string {
+  return `${EMAIL_ORIGIN}${routeFor(gap)}`;
+}
+
 
 // ─── Unsubscribe token ───────────────────────────────────────────────────────
 // HMAC over the user id with a server-only secret. Nothing guessable and
@@ -132,7 +156,7 @@ async function senderUserId(): Promise<string | null> {
  * contract; that RPC cannot be used here because it authorises against
  * auth.uid(), which is null on a service-role call.
  */
-async function sendDm(userId: string, gap: Gap): Promise<string | null> {
+async function sendDm(userId: string, gap: Gap, username: string | null): Promise<string | null> {
   const sender = await senderUserId();
   if (!sender) return 'no clbhouz business owner to send as';
 
@@ -169,15 +193,20 @@ async function sendDm(userId: string, gap: Gap): Promise<string | null> {
     if (memberErr) return memberErr.message;
   }
 
-  const body = `${COPY[gap].body}\n\n${linkFor(gap)}`;
+  // No URL in the body: one route out, carried by the action. The prose is
+  // still the message, so a client that does not know type='action' renders a
+  // perfectly usable text bubble.
   const { error: msgErr } = await supabase.from('messages').insert({
     conversation_id: conversationId,
     sender_actor_type: 'business',
     sender_actor_id: CLBHOUZ_BUSINESS_ID,
     sender_user_id: sender,
-    type: 'text',
-    body,
-    metadata: { onboarding_nudge: gap },
+    type: 'action',
+    body: bodyFor(gap, username),
+    metadata: {
+      onboarding_nudge: gap,
+      action: { label: COPY[gap].subject, route: routeFor(gap) },
+    },
   });
   if (msgErr) return msgErr.message;
 
@@ -208,6 +237,7 @@ async function sendPush(
   userId: string,
   gap: Gap,
   prefs: Prefs | undefined,
+  username: string | null,
 ): Promise<{ outcome: 'sent' | 'no_device' | 'muted'; error?: string }> {
   if (prefs?.muted_types?.includes(NUDGE_NOTIFICATION_TYPE)) return { outcome: 'muted' };
   // The trigger's personal branch reads muted_types and muted_user_ids but not
@@ -232,7 +262,7 @@ async function sendPush(
     user_id: userId,
     type: NUDGE_NOTIFICATION_TYPE,
     title: COPY[gap].subject,
-    message: COPY[gap].body,
+    message: bodyFor(gap, username),
     actor_type: 'system',
     actor_id: null,
     recipient_actor_type: 'personal',
@@ -240,7 +270,7 @@ async function sendPush(
     entity_type: 'onboarding_nudge',
     read: false,
     is_read: false,
-    data: { gap, link: linkFor(gap) },
+    data: { gap, link: routeFor(gap) },
   });
 
   if (error) return { outcome: 'no_device', error: error.message };
@@ -252,6 +282,7 @@ async function sendEmail(
   userId: string,
   email: string,
   gap: Gap,
+  username: string | null,
 ): Promise<{ sent: boolean; skipped?: string; error?: string }> {
   const apiKey = Deno.env.get('RESEND_API_KEY');
   if (!apiKey) {
@@ -263,13 +294,14 @@ async function sendEmail(
   const unsubUrl =
     `${Deno.env.get('SUPABASE_URL')}/functions/v1/onboarding-unsubscribe` +
     `?u=${encodeURIComponent(userId)}&t=${token}`;
-  const link = linkFor(gap);
+  const link = emailLinkFor(gap);
+  const prose = bodyFor(gap, username);
 
-  const text = `${COPY[gap].body}\n\n${link}\n\nUnsubscribe: ${unsubUrl}`;
+  const text = `${prose}\n\n${link}\n\nUnsubscribe: ${unsubUrl}`;
   const html = `
 <!doctype html>
 <html><body style="margin:0;padding:24px;background:#15171F;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#E7E9EE">
-  <p style="font-size:15px;line-height:1.55;margin:0 0 20px">${COPY[gap].body}</p>
+  <p style="font-size:15px;line-height:1.55;margin:0 0 20px">${prose}</p>
   <p style="margin:0 0 28px">
     <a href="${link}" style="display:inline-block;padding:11px 18px;border-radius:8px;background:#F7931E;color:#15171F;font-size:13px;font-weight:700;text-decoration:none">${COPY[gap].subject}</a>
   </p>
@@ -358,7 +390,7 @@ Deno.serve(async (req) => {
 
   const { data: members, error: membersErr } = await supabase
     .from('user_profiles')
-    .select('id, username, primary_club_id, created_at')
+    .select('id, username, username_is_custom, primary_club_id, created_at')
     .is('deleted_at', null)
     .lt('created_at', newest)
     .gt('created_at', oldest)
@@ -421,7 +453,10 @@ Deno.serve(async (req) => {
     const open: Record<Gap, boolean> = {
       whs: !hasWhs.has(userId),
       club: !member.primary_club_id,
-      username: !member.username || String(member.username).trim() === '',
+      // username_is_custom is the only honest signal: signup GENERATES a
+      // username, so "is it blank" never fires. NULL means unknown - do not
+      // chase. Only an explicit false qualifies.
+      username: member.username_is_custom === false,
     };
 
     // 1. Stamp resolved_at on anything they have since done. Never chased again.
@@ -474,7 +509,7 @@ Deno.serve(async (req) => {
     // theirs must not stop its ledger row.
     if (!done.has(`${gap}:dm`)) {
       try {
-        const err = await sendDm(userId, gap);
+        const err = await sendDm(userId, gap, member.username as string | null);
         if (err) {
           result.dm = `failed: ${err}`;
           console.error('dm failed for', userId, err);
@@ -493,7 +528,7 @@ Deno.serve(async (req) => {
     // Push — via notifications, so auto_queue_push_notification still decides.
     if (!done.has(`${gap}:push`)) {
       try {
-        const { outcome, error } = await sendPush(userId, gap, prefs.get(userId));
+        const { outcome, error } = await sendPush(userId, gap, prefs.get(userId), member.username as string | null);
         if (outcome === 'sent') {
           await recordSent(userId, gap, 'push');
           result.push = 'sent';
@@ -521,7 +556,7 @@ Deno.serve(async (req) => {
         if (!email) {
           result.email = 'no_address';
         } else {
-          const out = await sendEmail(userId, email, gap);
+          const out = await sendEmail(userId, email, gap, member.username as string | null);
           if (out.sent) {
             await recordSent(userId, gap, 'email');
             result.email = 'sent';
