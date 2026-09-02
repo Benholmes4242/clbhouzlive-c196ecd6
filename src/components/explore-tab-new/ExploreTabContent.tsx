@@ -281,24 +281,28 @@ export default function ExploreTabContent({
 
 
 
-  const handleMostPlayed = useCallback(
-    (r: MostPlayedRow) => goCourse(r.courseId, 'most_played'),
-    [goCourse],
-  );
-
-  /* A BOARD ROW IS A ROUND: it opens the scorecard bottom sheet, the same one
-     the round tiles and the honours board open. The row carries the score id of
-     the exact round the board is showing, and the component only calls this when
-     that id exists. */
-  const handleMostPlayedPlayer = useCallback(
-    (p: MostPlayedPlayer) => {
-      analyticsEvents.track('discover_most_played_row_tapped', {
-        has_score: !!p.scoreId,
+  /* A BOARD ROW IS A ROUND: it opens the scorecard bottom sheet. The row carries
+     the score id of the exact round the board is showing, and the feat it was
+     ranked on travels with it so the sheet can wear the honours treatment
+     (S5.6) — the one thing salvaged from the retired honours board. */
+  const handleBoardRow = useCallback(
+    (row: BoardRow) => {
+      analyticsEvents.track('discover_board_row_tapped', {
+        pos: row.pos,
+        has_score: !!row.whs_score_id,
       });
-      if (p.scoreId) opener.openByScore(p.scoreId, null, p.userId);
+      const feat: HonoursFeat | null = (row.albatrosses ?? 0) > 0
+        ? 'albatross'
+        : (row.holes_in_one ?? 0) > 0
+          ? 'ace'
+          : null;
+      setBoardFeat(feat);
+      if (row.whs_score_id) opener.openByScore(row.whs_score_id, null, row.user_id);
+      else opener.openProfile(row.user_id);
     },
     [opener],
   );
+
 
   /**
    * PHOTOS LEAD THE MEDIA (§1.2), and the reasoning is recorded so it is not
