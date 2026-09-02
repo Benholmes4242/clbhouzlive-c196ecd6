@@ -320,7 +320,11 @@ export function BoardFilterPanel({
               padding: '8px 0',
               fontFamily: SANS,
               ...KICKER,
-              color: A.AMBER,
+              /* BRIEF_FILTERS_SHEET_CASE_AND_FEATS 1 — QUIET ACTIONS TAKE THE
+                 SURFACE INK, which on this canvas is white. A.AMBER is a SHARED
+                 analytical token and is NOT repointed; this is a callsite
+                 override, and amber stays on the active selection. */
+              color: A.INK,
               cursor: 'pointer',
             }}
           >
@@ -328,6 +332,7 @@ export function BoardFilterPanel({
               ? t('discover.filterBoard.done', 'Done')
               : t('discover.filterBoard.back', 'Back')}
           </button>
+
         </div>
       </div>
 
