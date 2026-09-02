@@ -138,6 +138,8 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </button>
         ) : (
           <SquircleAvatar src={user.avatarUrl} alt={user.name} userId={user.id ?? null} fallback={user.initials} size={40} hairlineRing ringColor={DARK_HAIRLINE} />
+        )}
+
         
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.96)', lineHeight: 1.3 }}>{user.name}</div>
