@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ListFilter } from 'lucide-react';
 
@@ -75,8 +75,22 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
 
   /* COMPONENT STATE, NEVER THE URL — a filter tap must not enter the back
      stack, which is the rule the retired scope pills already held. */
-  const [board, setBoard] = useState<BoardKey>('gross');
-  const [filters, setFilters] = useState<BoardFilters>(DEFAULT_FILTERS);
+  /* R1 — THE LANDING COMBINATION IS ROTATED, ONCE PER SESSION. This component
+     owns the applied combination; the rotation only supplies its INITIAL value,
+     and the first drawer change (R1.5) puts it out of the way for the session. */
+  const rotation = useBoardRotation(userId);
+  const [board, setBoard] = useState<BoardKey | null>(null);
+  const [filters, setFilters] = useState<BoardFilters | null>(null);
+
+  /* R4.1 — nothing special-cased downstream: the rotated pick is applied as a
+     board plus a window, exactly as a member's own selection would be. */
+  useEffect(() => {
+    if (board || !rotation.pick) return;
+    setBoard(rotation.pick.board);
+    setFilters({ ...DEFAULT_FILTERS, window: rotation.pick.window });
+  }, [board, rotation.pick]);
+
+  const ready = !!board && !!filters;
   const [panelOpen, setPanelOpen] = useState(false);
   const [seeAll, setSeeAll] = useState(false);
 
