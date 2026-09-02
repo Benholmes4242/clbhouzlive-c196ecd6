@@ -177,7 +177,7 @@ const POS_W = 28;
 const VALUE_W = 58;
 const SECOND_W = 46;
 
-export function BoardHeaderRow({ board }: { board: BoardKey }) {
+export function BoardHeaderRow({ board, roll }: { board: BoardKey; roll?: boolean }) {
   const { t } = useTranslation('courses');
   const cols = boardColumns(board);
   const cap: React.CSSProperties = {
@@ -197,22 +197,28 @@ export function BoardHeaderRow({ board }: { board: BoardKey }) {
         borderBottom: `1px solid ${A.BORDER}`,
       }}
     >
-      <span style={{ ...cap, width: POS_W, textAlign: 'center', flexShrink: 0 }}>
-        {t('discover.filterBoard.col.pos', 'POS')}
-      </span>
+      {/* A ROLL OF HONOUR HAS NO POSITION AND NO RANKING FIGURE (S5). */}
+      {!roll && (
+        <span style={{ ...cap, width: POS_W, textAlign: 'center', flexShrink: 0 }}>
+          {t('discover.filterBoard.col.pos', 'POS')}
+        </span>
+      )}
       <span style={{ ...cap, flex: 1, minWidth: 0 }}>
         {t('discover.filterBoard.col.member', 'MEMBER')}
       </span>
-      {cols.secondary && (
+      {!roll && cols.secondary && (
         <span style={{ ...cap, width: SECOND_W, textAlign: 'center', flexShrink: 0 }}>
           {t(cols.secondary.i18n, cols.secondary.label)}
         </span>
       )}
       <span style={{ ...cap, width: VALUE_W, textAlign: 'center', flexShrink: 0 }}>
-        {t(cols.value.i18n, cols.value.label)}
+        {roll
+          ? t('discover.filterBoard.col.when', 'WHEN')
+          : t(cols.value.i18n, cols.value.label)}
       </span>
     </div>
   );
+
 }
 
 export function BoardRowView({
