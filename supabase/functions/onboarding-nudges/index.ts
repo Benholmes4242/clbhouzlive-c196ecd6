@@ -427,7 +427,11 @@ Deno.serve(async (req) => {
   const [{ data: whsRows }, { data: ledgerRows }, { data: prefRows }, { data: unsubRows }] =
     await Promise.all([
       supabase.from('whs_connections').select('user_id').in('user_id', ids).is('deleted_at', null),
-      supabase.from('onboarding_nudges').select('user_id, gap, channel, resolved_at').in('user_id', ids),
+      supabase
+        .from('onboarding_nudges')
+        .select('user_id, gap, channel, resolved_at, sent_at')
+        .in('user_id', ids),
+
       supabase
         .from('notification_preferences')
         .select('user_id, muted_types, muted_business_ids')
