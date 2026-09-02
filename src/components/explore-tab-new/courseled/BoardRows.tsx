@@ -203,14 +203,14 @@ export function BoardHeaderRow({ board }: { board: BoardKey }) {
       <span style={{ ...cap, flex: 1, minWidth: 0 }}>
         {t('discover.filterBoard.col.member', 'MEMBER')}
       </span>
-      <span style={{ ...cap, width: VALUE_W, textAlign: 'center', flexShrink: 0 }}>
-        {t(cols.value.i18n, cols.value.label)}
-      </span>
       {cols.secondary && (
         <span style={{ ...cap, width: SECOND_W, textAlign: 'center', flexShrink: 0 }}>
           {t(cols.secondary.i18n, cols.secondary.label)}
         </span>
       )}
+      <span style={{ ...cap, width: VALUE_W, textAlign: 'center', flexShrink: 0 }}>
+        {t(cols.value.i18n, cols.value.label)}
+      </span>
     </div>
   );
 }
@@ -314,19 +314,6 @@ export function BoardRowView({
               : (row.course_name ?? t('discover.unknownCourse', 'A course')))}
         </span>
       </span>
-      <span
-        className="tabular-nums"
-        style={{
-          width: VALUE_W,
-          flexShrink: 0,
-          textAlign: 'center',
-          fontSize: 15,
-          fontWeight: 700,
-          color: isSelf ? A.AMBER : value.tone,
-        }}
-      >
-        {value.text}
-      </span>
       {second && (
         <span
           className="tabular-nums"
@@ -342,6 +329,19 @@ export function BoardRowView({
           {second.text}
         </span>
       )}
+      <span
+        className="tabular-nums"
+        style={{
+          width: VALUE_W,
+          flexShrink: 0,
+          textAlign: 'center',
+          fontSize: 15,
+          fontWeight: 700,
+          color: isSelf ? A.AMBER : value.tone,
+        }}
+      >
+        {value.text}
+      </span>
     </button>
   );
 }
