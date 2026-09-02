@@ -422,30 +422,10 @@ export default function ExploreTabContent({
   );
 
 
-  const honours = useMemo(() => sortHonours(legendary), [legendary]);
+  /* The honours sorting, its mode state and the focus id went with the rail
+     (S8). Nothing on this page ranks feats any more — the board does, under a
+     filter. */
 
-  const handleHonoursRow = useCallback(
-    (e: WireEvent) => {
-      analyticsEvents.track('discover_honours_row_tap', {
-        kind: e.kind,
-        year: new Date(e.at).getFullYear(),
-        course_id: e.courseId ?? null,
-      });
-      if (e.scoreId) opener.openByScore(e.scoreId, null, e.userId);
-    },
-    [opener],
-  );
-
-  const openHonoursSheet = useCallback(() => {
-    analyticsEvents.track('discover_honours_sheet_open', { total: honours.length });
-    setHonoursMode('recent');
-    setHonoursFocus(null);
-    setHonoursSheet(true);
-  }, [honours.length]);
-
-  /* BRIEF_HONOURS_BOARD_THE_HOLE §S4.1 — the rail no longer groups by member,
-     so there is no "{{n}} more" affordance and no leader-focused open. The
-     sheet still accepts a focus id; nothing on this page supplies one. */
 
   return (
     <div style={{ background: A.CANVAS, minHeight: '100vh', fontFamily: SANS, ...FIGS }}>
