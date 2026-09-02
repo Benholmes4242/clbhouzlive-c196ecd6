@@ -20,19 +20,14 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { GolfThisWeek } from './courseled/GolfThisWeek';
-import {
-  DEFAULT_WEEK_SCOPE,
-  type WeekScope,
-} from './courseled/hooks/useGolfThisWeek';
-import type { RegionSelection } from './courseled/hooks/useWeekRegionCounts';
-import { GolfThisWeekSheet } from './GolfThisWeekSheet';
+import type { BoardRow } from './courseled/hooks/useBoardPage';
 
 
 import { ClipsRail, LatestVideosRail } from './courseled/CommunityMediaRails';
 import { useCommunityVideos } from './courseled/hooks/useCommunityVideos';
 import { MediaActBar, type MediaChipId } from './courseled/MediaActBar';
 import { ProgressiveReveal } from './courseled/ProgressiveReveal';
-import { ACT_GAP, CHIP_GAP, Eyebrow, HEAD_GAP, InkAction, PAGE_GUTTER, RHYTHM } from './courseled/tokens';
+import { ACT_GAP, Eyebrow, HEAD_GAP, InkAction, PAGE_GUTTER, RHYTHM } from './courseled/tokens';
 import {
   useCommunityLibrary,
   type CommunityLibraryItem,
@@ -43,17 +38,9 @@ import { CommunityClipMosaic } from './courseled/community/CommunityClipMosaic';
 import { CommunityVideoRow } from './courseled/community/CommunityVideoRow';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { mediaTarget } from '@/utils/mediaEngagement';
-import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
 import { AmateurNewsSection } from '@/features/amateur/news/AmateurNewsSection';
-import { MostPlayedSheet } from './courseled/MostPlayedSheet';
+import type { HonoursFeat } from '@/features/courses/_shared/scorecard/honoursTreatment';
 
-import {
-  HonoursBoard,
-  sortHonours,
-  type HonoursMode,
-} from './courseled/HonoursBoard';
-import { HonoursBoardSheet } from './courseled/HonoursBoardSheet';
-import { useMostPlayedThisWeek, type MostPlayedPlayer, type MostPlayedRow } from './courseled/hooks/useMostPlayedThisWeek';
 
 
 /**
@@ -702,37 +689,12 @@ export default function ExploreTabContent({
         />
       </div>
 
-      <GolfThisWeekSheet
-        open={golfWeekSheet}
-        onClose={() => setGolfWeekSheet(false)}
-        userId={userId}
-        scope={weekScope}
-        onScopeChange={handleScopeChange}
-        region={weekRegion}
-        onRowPress={(scoreId, uid) => {
-          if (scoreId) opener.openByScore(scoreId, null, uid);
-          else opener.openProfile(uid);
-        }}
-      />
-
+      {/* THE ROUNDS SEE-ALL, MOST PLAYED AND HONOURS SHEETS ARE DELETED
+          (BRIEF_DISCOVER_FILTER_LED_BOARD S8). The board owns its own see-all,
+          and "courses played" and "honours" are now FILTER AXES on it rather
+          than sections with their own pagination. */}
       <FindGolfersSheet open={findGolfers} onClose={() => setFindGolfers(false)} />
 
-      <MostPlayedSheet
-        open={mostPlayedSheet}
-        onClose={() => setMostPlayedSheet(false)}
-        rows={mostPlayedList}
-        onRowPress={handleMostPlayed}
-        onPlayerPress={handleMostPlayedPlayer}
-      />
-
-      <HonoursBoardSheet
-        open={honoursSheet}
-        onClose={() => setHonoursSheet(false)}
-        events={honours}
-        onRowPress={handleHonoursRow}
-        initialMode={honoursMode}
-        focusUserId={honoursFocus}
-      />
 
 
 

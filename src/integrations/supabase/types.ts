@@ -18405,6 +18405,60 @@ export type Database = {
       backfill_unmapped_round_stats: { Args: never; Returns: Json }
       base_club_name: { Args: { p_course_name: string }; Returns: string }
       block_user: { Args: { p_blocked_id: string }; Returns: undefined }
+      board_pool: {
+        Args: {
+          p_band?: string
+          p_course_id?: string
+          p_courses?: string
+          p_feat?: string
+          p_region_kind?: string
+          p_region_value?: string
+          p_scope?: string
+          p_viewer: string
+          p_window?: string
+        }
+        Returns: {
+          albatrosses: number
+          beat_par: boolean
+          birdies: number
+          clean_card: boolean
+          country: string
+          course_id: string
+          course_name: string
+          course_par: number
+          delta_index: number
+          eagles: number
+          gross_score: number
+          hcp_at_time: number
+          holes_in_one: number
+          net_score: number
+          ok_band: boolean
+          ok_courses: boolean
+          ok_feat: boolean
+          ok_region: boolean
+          ok_scope: boolean
+          ok_window: boolean
+          play_date: string
+          stableford_points: number
+          sub_80: boolean
+          sub_country: string
+          user_id: string
+          whs_score_id: string
+        }[]
+      }
+      board_qualifies: {
+        Args: {
+          p_birdies: number
+          p_board: string
+          p_delta: number
+          p_gross: number
+          p_net: number
+          p_par: number
+          p_play_date: string
+          p_sf: number
+        }
+        Returns: boolean
+      }
       build_tour_sunday_message: {
         Args: { p_as_of?: string }
         Returns: {
@@ -19029,6 +19083,68 @@ export type Database = {
         Args: { _user_id: string }
         Returns: {
           blocked_id: string
+        }[]
+      }
+      get_board_facets: {
+        Args: {
+          p_band?: string
+          p_board?: string
+          p_course_id?: string
+          p_courses?: string
+          p_feat?: string
+          p_region_kind?: string
+          p_region_value?: string
+          p_scope?: string
+          p_viewer: string
+          p_window?: string
+        }
+        Returns: {
+          axis: string
+          key: string
+          label: string
+          n: number
+        }[]
+      }
+      get_board_page: {
+        Args: {
+          p_band?: string
+          p_board?: string
+          p_course_id?: string
+          p_courses?: string
+          p_feat?: string
+          p_limit?: number
+          p_offset?: number
+          p_region_kind?: string
+          p_region_value?: string
+          p_scope?: string
+          p_viewer: string
+          p_window?: string
+        }
+        Returns: {
+          albatrosses: number
+          beat_par: boolean
+          birdies: number
+          clean_card: boolean
+          course_id: string
+          course_name: string
+          course_par: number
+          delta_index: number
+          display_name: string
+          eagles: number
+          gross_score: number
+          hcp_at_time: number
+          holes_in_one: number
+          is_tie: boolean
+          net_score: number
+          play_date: string
+          pos: number
+          profile_photo_url: string
+          sort_value: number
+          stableford_points: number
+          sub_80: boolean
+          total_count: number
+          user_id: string
+          whs_score_id: string
         }[]
       }
       get_business_access_level: {
