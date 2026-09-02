@@ -130,59 +130,42 @@ function CourseRow({
 
   return (
     <div style={{ borderTop: first ? 'none' : `1px solid ${A.BORDER}` }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: ROW_H }}>
-        {/* C3.1 — a null thumbnail is a FLAT PANEL TILE. Courses are not people:
-            no hue, no initials. The thumbnail is also the one navigation tap on
-            the row; everything else expands. */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onCoursePress) onCoursePress(row.course_id);
-            else onToggle();
-          }}
-          aria-label={row.name ?? undefined}
-          style={{
-            width: 44,
-            height: 44,
-            flexShrink: 0,
-            padding: 0,
-            borderRadius: 8,
-            border: `1px solid ${A.BORDER}`,
-            background: A.PANEL,
-            overflow: 'hidden',
-            cursor: 'pointer',
-          }}
-        >
-          {row.thumbnail_image && (
-            <img
-              src={row.thumbnail_image}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            />
-          )}
-        </button>
+      {/* D2.1 — THE WHOLE COLLAPSED ROW EXPANDS, thumbnail included. One row,
+          one behaviour; the course page is reached from the expanded panel. */}
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          minHeight: ROW_H,
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          fontFamily: SANS,
+          textAlign: 'left',
+          cursor: 'pointer',
+        }}
+      >
+          {/* D1 — the shared course fallback: the hashed gradient with course
+              initials, exactly as every other course surface renders it. */}
+          <CourseImageFallback
+            courseId={row.course_id}
+            courseName={row.name}
+            imageUrl={row.thumbnail_image}
+            initialsSize={13}
+            style={{
+              width: 44,
+              height: 44,
+              flexShrink: 0,
+              borderRadius: 8,
+              border: `1px solid ${A.BORDER}`,
+            }}
+          />
 
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-expanded={open}
-          style={{
-            flex: 1,
-            minWidth: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            fontFamily: SANS,
-            textAlign: 'left',
-            cursor: 'pointer',
-          }}
-        >
           <span style={{ flex: 1, minWidth: 0 }}>
             <span
               style={{
