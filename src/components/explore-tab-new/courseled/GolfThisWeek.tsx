@@ -238,14 +238,29 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange }: Gol
         </div>
       </div>
 
+      {/* G1 — THE BAR STICKS. It scrolls up with the hero first, then pins
+          BENEATH the app chrome: `--chrome-total-h` composes --header-h, --sat
+          (env(safe-area-inset-top)) and --shell-extra-h, so the bar can never
+          enter the notch and never needs a hardcoded number (G1.2).
+          Its containing block is this <section>, which now also holds the
+          sections below the board (see `children`), so it stays pinned for the
+          rest of the governed region (G1.1). z-index comes from the registry
+          (G1.6) and is the lowest entry there: every sheet, the filter panel and
+          the fullscreen viewer cover it completely. */}
       <button
         type="button"
         onClick={() => setPanelOpen(true)}
         aria-label={t('discover.filterBoard.open', 'Filter the board')}
         style={{
+          position: 'sticky',
+          top: 'var(--chrome-total-h, 55px)',
+          zIndex: DISCOVER_STICKY_FILTER_Z,
           width: '100%', minHeight: 48, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 12,
           background: A.PANEL, border: 'none', borderTop: `1px solid ${A.BORDER}`,
-          borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS, cursor: 'pointer', textAlign: 'left',
+          /* G1.3 — settled chrome, not a floating card: full width, no radius,
+             no shadow, the hairline on the BOTTOM edge. */
+          borderBottom: `1px solid ${A.BORDER}`, borderRadius: 0, boxShadow: 'none',
+          fontFamily: SANS, cursor: 'pointer', textAlign: 'left',
         }}
       >
         <span style={{ ...KICKER, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: A.BODY }}>
@@ -258,7 +273,8 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange }: Gol
       </button>
 
       {/* THE BOARD */}
-      <div style={{ marginTop: 16, padding: '0 14px' }}>
+      <div ref={boardRef} style={{ marginTop: 16, padding: '0 14px', scrollMarginTop: 'calc(var(--chrome-total-h, 55px) + 56px)' }}>
+
         {!ready || page.isPending ? (
           <div style={{ height: 240 }} aria-hidden />
         ) : total === 0 ? (
