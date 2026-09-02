@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
-import { Check, AlertCircle, Clock, Flag } from 'lucide-react';
+import { Check, AlertCircle, Clock, Flag, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { ReportSheet } from "@/components/moderation/ReportSheet";
-import type { ThreadMessage, MessageReaction, MessageAttachment } from '@/types/messaging';
+import type { ThreadMessage, MessageReaction, MessageAttachment, MessageAction } from '@/types/messaging';
 import { MessageImage } from './MessageImage';
 import { VoiceNote } from './VoiceNote';
 import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
@@ -80,6 +81,7 @@ export const MessageBubble: React.FC<Props> = ({
   onRetry,
 }) => {
   const { t } = useTranslation('messaging');
+  const navigate = useNavigate();
   const isDeleted = message.deleted_at != null;
   const isSending = message.status === 'sending';
   const isFailed = message.status === 'failed';
@@ -97,6 +99,25 @@ export const MessageBubble: React.FC<Props> = ({
     : `${topInner}px ${R_LG}px ${R_LG}px ${bottomInner}px`;
 
   const reactions = groupReactions(message.reactions ?? []);
+
+  /**
+   * BRIEF_NUDGE_MESSAGES_AND_ACTIONS S2 — a server-authored action row.
+   * The route must be RELATIVE and INTERNAL: an absolute URL (or a
+   * protocol-relative one) is rendered INERT rather than followed, because a
+   * message that can open arbitrary URLs on tap is an injection surface. The
+   * prose in `body` is always rendered regardless, so an old client that does
+   * not know this type still shows a usable message.
+   */
+  const action: MessageAction | null = (() => {
+    if (isDeleted) return null;
+    const raw = (message.metadata as { action?: unknown } | null)?.action as
+      | Partial<MessageAction>
+      | undefined;
+    if (!raw || typeof raw.label !== 'string' || typeof raw.route !== 'string') return null;
+    const route = raw.route.trim();
+    if (!route.startsWith('/') || route.startsWith('//') || route.includes('://')) return null;
+    return { label: raw.label, route };
+  })();
 
   const atts: MessageAttachment[] = Array.isArray(message.attachments)
     ? (message.attachments as unknown as MessageAttachment[])
