@@ -1470,6 +1470,25 @@ export function GolfThisWeek({
   const counts = useWeekCounts(ordered);
   const best = useMemo(() => bestOfWeek(ordered), [ordered]);
 
+  /* THE BOARD POOL (BRIEF_LEADERBOARD_ROW_PROVENANCE_AND_OPTOUT §S3.1). A member
+     who has set show_in_exploration_leaderboards = false is EXCLUDED from the
+     ranked board on EVERY scope, and from the hero's stat rail with it, so
+     positions close up and the rail agrees with the rows shown. It is applied
+     HERE — one layer above the six ranked lists and the rail — rather than in
+     useCircleLatestRounds, because that read also feeds the RECENT ROUNDS strip,
+     the see-all sheet and the reaction/hole-shape batches, none of which is a
+     leaderboard and none of which this brief changes. */
+  const boardOptOuts = useLeaderboardOptOuts(
+    useMemo(() => ordered.map((r) => r.user_id), [ordered]),
+  );
+  const boardPool = useMemo(
+    () => ordered.filter((r) => !boardOptOuts.has(r.user_id)),
+    [ordered, boardOptOuts],
+  );
+  /** The hero rail counts the BOARD's field, never the strip's. */
+  const boardCounts = useWeekCounts(boardPool);
+
+
   /* ONE batched hole-shape read for the whole rail — never one per card. */
   const scoreIds = useMemo(() => ordered.map((r) => r.score_id), [ordered]);
   const holeShapes = useRoundHoleShapes(scoreIds);
