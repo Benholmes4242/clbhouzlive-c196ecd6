@@ -12,8 +12,13 @@ import { useBoardPage, type BoardRow } from './hooks/useBoardPage';
 import { BoardHeaderRow, BoardRowView, gapText } from './BoardRows';
 import { BoardFilterPanel } from './BoardFilterPanel';
 import { BoardSeeAllSheet } from './BoardSeeAllSheet';
-import { useBoardRotation } from './hooks/useBoardRotation';
-import { FALLBACK_PICK } from './boardRotation';
+/* H3.2 — boardRotation.ts and useBoardRotation.ts are intentionally LEFT IN
+   PLACE but unwired; they are wanted for a separate surface. */
+import {
+  DEFAULT_BOARD_FALLBACK,
+  useHandicapDefaultBoard,
+} from './hooks/useHandicapDefaultBoard';
+
 import {
   BAND_OPTIONS,
   BOARD_LABELS,
@@ -73,7 +78,7 @@ export interface GolfThisWeekProps {
   /**
    * BRIEF_DISCOVER_COURSES_SECTION C2.1 — ONE FILTER BAR GOVERNS THE PAGE, and
    * this is the only way out of it. Sections below (Courses played) READ the
-   * applied filter state and never write to it. Null until the rotation's pick
+   * applied filter state and never write to it. Null until the handicap default
    * has landed, because unresolved is not absent.
    *
    * THE BOARD KEY IS NOT REPORTED (C2.2): it is separate state here and stays
@@ -87,27 +92,31 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange }: Gol
 
   /* COMPONENT STATE, NEVER THE URL — a filter tap must not enter the back
      stack, which is the rule the retired scope pills already held. */
-  /* R1 — THE LANDING COMBINATION IS ROTATED, ONCE PER SESSION. This component
-     owns the applied combination; the rotation only supplies its INITIAL value,
-     and the first drawer change (R1.5) puts it out of the way for the session. */
-  const rotation = useBoardRotation(userId);
+  /* H1 — THE LANDING BOARD COMES FROM THE MEMBER'S OWN INDEX, and everything
+     else about the default is the same for everyone (H1.2). The session
+     rotation is gone (H3.1): a board that changes between sessions costs the
+     member the ability to ask "am I still fourth?". This component owns the
+     applied combination; the default only supplies its INITIAL value, and the
+     first drawer change (H2.1) puts it out of the way for the session. */
+  const fallback = useHandicapDefaultBoard(userId);
   const [pickedBoard, setBoard] = useState<BoardKey | null>(null);
   const [pickedFilters, setFilters] = useState<BoardFilters | null>(null);
 
-  /* R4.1 — nothing special-cased downstream: the rotated pick is applied as a
-     board plus a window, exactly as a member's own selection would be. */
+  /* Nothing is special-cased downstream: the default is applied as a board plus
+     the standard filters, exactly as a member's own selection would be. */
   useEffect(() => {
-    if (pickedBoard || !rotation.pick) return;
-    setBoard(rotation.pick.board);
-    setFilters({ ...DEFAULT_FILTERS, window: rotation.pick.window });
-  }, [pickedBoard, rotation.pick]);
+    if (pickedBoard || !fallback.resolved) return;
+    setBoard(fallback.board);
+    setFilters({ ...DEFAULT_FILTERS });
+  }, [pickedBoard, fallback.resolved, fallback.board]);
 
-  /* R3.2 — BEFORE THE PICK LANDS THERE IS NO BOARD. The reads stay parked and
-     the section holds its loading state rather than rendering gross / 14 days
-     and swapping it out from under the member. */
+  /* H4.2 — BEFORE THE INDEX RESOLVES THERE IS NO BOARD. The reads stay parked
+     and the section holds its loading state rather than rendering gross and
+     swapping it out from under the member. */
   const ready = pickedBoard !== null && pickedFilters !== null;
-  const board = pickedBoard ?? FALLBACK_PICK.board;
+  const board = pickedBoard ?? DEFAULT_BOARD_FALLBACK;
   const filters = pickedFilters ?? DEFAULT_FILTERS;
+
   const [panelOpen, setPanelOpen] = useState(false);
   const [seeAll, setSeeAll] = useState(false);
 
