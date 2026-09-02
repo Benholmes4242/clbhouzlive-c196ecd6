@@ -341,6 +341,20 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
         )}
       </div>
 
+      {/* G3 — ONE CONTINUOUS GOVERNED REGION. The dead screen-height between the
+          board's see-all and the next section is gone: a single hairline rule
+          plus a deliberate 20px step keeps the two DISTINGUISHABLE without
+          reading as two unrelated pages stacked (G3.1, G3.2). The larger gap to
+          Amateur News is owned by the page, and stays (G3.3). */}
+      {children ? (
+        <div style={{ marginTop: 20, padding: '0 14px' }}>
+          <div aria-hidden style={{ height: 1, background: A.BORDER, margin: '0 0 20px' }} />
+          {children}
+        </div>
+      ) : null}
+
+
+
       <BoardFilterPanel
         open={panelOpen}
         onClose={() => setPanelOpen(false)}
