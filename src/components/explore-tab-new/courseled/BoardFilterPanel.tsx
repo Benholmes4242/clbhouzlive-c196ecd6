@@ -11,17 +11,18 @@ import {
   BAND_OPTIONS,
   BOARD_KEYS,
   BOARD_LABELS,
+  COMPETITION_OPTIONS,
   COURSES_SET_OPTIONS,
   DEFAULT_FILTERS,
-  ROLL_KEYS,
-  ROLL_LABELS,
+  FEAT_BOARD_KEYS,
+  RANKING_BOARD_KEYS,
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
   boardCountsRounds,
-  isRollFeat,
   type BandKey,
   type BoardFilters,
   type BoardKey,
+  type CompetitionKey,
   type CoursesKey,
   type WindowKey,
 } from './boardFilters';
@@ -55,7 +56,7 @@ import {
  * a club under HOME_CLUB_MIN_MEMBERS gets NO "Your club" row.
  */
 
-type Screen = 'root' | 'board' | 'window' | 'where' | 'courses' | 'band';
+type Screen = 'root' | 'board' | 'window' | 'where' | 'courses' | 'band' | 'competition';
 
 /** S3.5 — a search field appears only past this many individual course rows. */
 const COURSE_SEARCH_THRESHOLD = 60;
@@ -222,17 +223,12 @@ export function BoardFilterPanel({
   })();
   const bandLabel = label(BAND_OPTIONS.find((o) => o.key === filters.band) ?? BAND_OPTIONS[0]);
 
-  /* THE Ranked by VALUE. A roll of honour names the FEAT, not the `recent`
-     board carrying it, so the row reads back the option that was tapped. */
-  const rankedByLabel = isRollFeat(filters.feat)
-    ? t(ROLL_LABELS[filters.feat].i18n, ROLL_LABELS[filters.feat].label)
-    : t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
-
-  /* S5 — ONLY THE RARE FEATS THAT HOLD SOMETHING IN THIS SCOPE. A null count is
-     UNRESOLVED and renders nothing, so it is excluded too rather than shown
-     bare: an option that may lead nowhere is worse than an absent one. */
-  const rollRows = ROLL_KEYS.map((key) => ({ key, count: facets.countFor('feat', key) }))
-    .filter((r): r is { key: typeof r.key; count: number } => (r.count ?? 0) > 0);
+  /* THE Ranked by VALUE is the board's own label — feat boards included, since a
+     feat IS a board now rather than an axis laid over one (B1). */
+  const rankedByLabel = t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
+  const competitionLabel = label(
+    COMPETITION_OPTIONS.find((o) => o.key === filters.competition) ?? COMPETITION_OPTIONS[0],
+  );
 
   /* THE FOOTER'S FIGURE IS THE ACTIVE BOARD'S OWN COUNT under these filters,
      which is the number the board will render (S3.2). */
@@ -264,6 +260,8 @@ export function BoardFilterPanel({
         return t('discover.filterBoard.axis.courses', 'Courses');
       case 'band':
         return t('discover.filterBoard.axis.handicap', 'Handicap');
+      case 'competition':
+        return t('discover.filterBoard.axis.competition', 'Competition');
       default:
         return t('discover.filterBoard.title', 'Filters');
     }
@@ -352,7 +350,7 @@ export function BoardFilterPanel({
               /* SENTENCE CASE — a VALUE, not a label (brief 2). It matches the
                  option label in WHICH BOARD exactly. */
               value={rankedByLabel}
-              valueChanged={board !== 'gross' || isRollFeat(filters.feat)}
+              valueChanged={board !== 'gross'}
               chevron
               onClick={() => setScreen('board')}
             />
@@ -398,9 +396,16 @@ export function BoardFilterPanel({
               chevron
               onClick={() => setScreen('band')}
             />
-            {/* S4 — NO FEATS ROW. It stacked a second filtering layer on the
-                ranking, and every option but the two rare ones duplicated a
-                board. The two survivors are in WHICH BOARD under RARE FEATS. */}
+            {/* B3.1 — COMPETITION, the last of the five NARROW IT rows. */}
+            <PanelRow
+              label={t('discover.filterBoard.axis.competition', 'Competition')}
+              value={competitionLabel}
+              valueChanged={filters.competition !== DEFAULT_FILTERS.competition}
+              chevron
+              onClick={() => setScreen('competition')}
+            />
+            {/* B1.1 — NO FEATS ROW AND NO FEAT DRILLDOWN. There is no p_feat
+                parameter any more; the four feats are BOARDS (B1.2). */}
 
             <button
               type="button"
@@ -423,53 +428,40 @@ export function BoardFilterPanel({
 
         {screen === 'board' && (
           <>
-            {BOARD_KEYS.map((key) => {
-              const count = facets.countFor('board', key);
-              return (
-                <PanelRow
-                  key={key}
-                  label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
-                  count={count}
-                  active={board === key && !isRollFeat(filters.feat)}
-                  disabled={count === 0}
-                  onClick={() => {
-                    /* LEAVING A ROLL OF HONOUR CLEARS ITS FEAT: a ranked board
-                       must not silently inherit "albatross only". */
-                    if (isRollFeat(filters.feat)) set({ feat: 'any' });
-                    onBoardChange(key);
-                    setScreen('root');
-                  }}
-                />
-              );
-            })}
-            {/* S5 — RARE FEATS. AN OPTION WITH A ZERO COUNT IS OMITTED ENTIRELY,
-                never greyed and never tappable into an empty roll; if neither
-                survives the current scope the SECTION ITSELF does not render. */}
-            {rollRows.length > 0 && (
-              <>
-                <SectionLabel>
-                  {t('discover.filterBoard.rareFeats', 'Rare feats')}
-                </SectionLabel>
-                {rollRows.map(({ key, count }) => (
-                  <PanelRow
-                    key={key}
-                    label={t(ROLL_LABELS[key].i18n, ROLL_LABELS[key].label)}
-                    count={count}
-                    active={filters.feat === key}
-                    onClick={() => {
-                      /* THE ROLL IS THE `recent` BOARD (date order) WITH THE
-                         FEAT AXIS SET. No new ranking is asked of the RPC. */
-                      onBoardChange('recent');
-                      set({ feat: key });
-                      setScreen('root');
-                    }}
-                  />
-                ))}
-              </>
-            )}
+            {/* B1.2 — ELEVEN BOARDS IN TWO LABELLED SECTIONS. Both sections are
+                FIXED LISTS: an option absent from the facet result counts ZERO
+                and renders GREYED, never omitted (facet contract). A feat board
+                is greyed most of the time and that is not a bug (B1.6). */}
+            <SectionLabel>{t('discover.filterBoard.rankings', 'Rankings')}</SectionLabel>
+            {RANKING_BOARD_KEYS.map((key) => (
+              <BoardOption
+                key={key}
+                boardKey={key}
+                active={board === key}
+                count={facets.countFor('board', key)}
+                label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
+                onPick={() => {
+                  onBoardChange(key);
+                  setScreen('root');
+                }}
+              />
+            ))}
+            <SectionLabel>{t('discover.filterBoard.feats', 'Feats')}</SectionLabel>
+            {FEAT_BOARD_KEYS.map((key) => (
+              <BoardOption
+                key={key}
+                boardKey={key}
+                active={board === key}
+                count={facets.countFor('board', key)}
+                label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
+                onPick={() => {
+                  onBoardChange(key);
+                  setScreen('root');
+                }}
+              />
+            ))}
           </>
         )}
-
 
         {screen === 'window' &&
           WINDOW_OPTIONS.map((o) => (
@@ -595,6 +587,24 @@ export function BoardFilterPanel({
               }}
             />
           ))}
+
+        {/* B3.3 — PLAIN COUNTS ON ROWS. NOT A SPLIT: the three do not sum to the
+            total, because a member with a competition round and a social round is
+            counted in both. No bar, no percentage, no "X of Y". */}
+        {screen === 'competition' &&
+          COMPETITION_OPTIONS.map((o) => (
+            <PanelRow
+              key={o.key}
+              label={label(o)}
+              count={facets.countFor('competition', o.key)}
+              active={filters.competition === o.key}
+              disabled={facets.countFor('competition', o.key) === 0}
+              onClick={() => {
+                set({ competition: o.key as CompetitionKey });
+                setScreen('root');
+              }}
+            />
+          ))}
       </div>
 
 
@@ -628,6 +638,32 @@ export function BoardFilterPanel({
         </button>
       </div>
     </div>
+  );
+}
+
+/** A board row in WHICH BOARD. A zero count greys it and makes it unselectable. */
+function BoardOption({
+  boardKey,
+  label,
+  count,
+  active,
+  onPick,
+}: {
+  boardKey: BoardKey;
+  label: string;
+  count: number | null;
+  active: boolean;
+  onPick: () => void;
+}) {
+  return (
+    <PanelRow
+      key={boardKey}
+      label={label}
+      count={count}
+      active={active}
+      disabled={count === 0}
+      onClick={onPick}
+    />
   );
 }
 
