@@ -84,13 +84,10 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
 
   const rows = page.data?.rows ?? [];
   const total = page.data?.total ?? 0;
-  const visible = useMemo(() => {
-    if (rows.length <= VISIBLE_POSITIONS) return rows;
-    let end = VISIBLE_POSITIONS;
-    const cutPosition = rows[VISIBLE_POSITIONS - 1]?.pos;
-    while (end < rows.length && rows[end]?.pos === cutPosition) end += 1;
-    return rows.slice(0, end);
-  }, [rows]);
+  const visible = useMemo(
+    () => rows.filter((row) => row.pos <= VISIBLE_POSITIONS),
+    [rows],
+  );
 
   /* S5.4 — the member's own row, pinned only when it is NOT already on screen. */
   const mine = useMemo(
@@ -116,8 +113,8 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
      the RPC's own count for the whole board; the courses figure is the size of
      the facet's course axis, which is counted over the same qualifying set. */
   const courseCount = facets.openList('course').length;
-  const memberCount = useMemo(() => new Set(rows.map((row) => row.user_id)).size, [rows]);
-  const days = filters.window === 'all' ? '\u221e' : filters.window === 'year' ? 'YTD' : filters.window;
+  const memberCount = facets.countFor('board', 'gross') ?? new Set(rows.map((row) => row.user_id)).size;
+  const days = windowDays(filters.window);
 
   const appliedParts = useMemo(
     () => describeFilterParts(filters, t as never),
@@ -308,6 +305,14 @@ function Stat({ value, label }: { value: string; label: string }) {
 
 function AppliedFilterLine({ parts }: { parts: string[] }) {
   return <>{parts.map((part, index) => <span key={`${part}:${index}`}>{index > 0 ? <> {'\u00B7'} </> : null}{part}</span>)}</>;
+}
+
+function windowDays(window: BoardFilters['window']): string {
+  if (window === 'all') return '\u221e';
+  if (window !== 'year') return window;
+  const now = new Date();
+  const yearStart = Date.UTC(now.getUTCFullYear(), 0, 1);
+  return String(Math.floor((Date.now() - yearStart) / 86_400_000) + 1);
 }
 
 /**
