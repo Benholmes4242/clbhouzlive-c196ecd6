@@ -143,7 +143,7 @@ export function StoryLeaderboardStrip({ tournamentId }: { tournamentId: string }
         if (e.key === 'Enter' || e.key === ' ') navigate(`/tourhub/tournament/${tournamentId}`);
       }}
       aria-label={`${caption} \u00b7 ${(tournament as any).name ?? ''}`}
-      style={{ background: HERO_BOARD_SURFACE, width: '100%', fontFamily: FONT, cursor: 'pointer' }}
+      style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', fontFamily: FONT, cursor: 'pointer' }}
     >
       <div
         style={{
