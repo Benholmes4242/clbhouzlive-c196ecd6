@@ -448,17 +448,26 @@ Deno.serve(async (req) => {
   const sentChannels = new Map<string, Set<string>>(); // userId -> "gap:channel"
   const contactedGaps = new Map<string, Set<Gap>>();
   const openLedger = new Map<string, { gap: Gap; channel: Channel }[]>();
+  /* THE SAME-DAY RULE (MICRO_BRIEF_NUDGE_PRIORITY_CHAIN_BROKEN S4). A member who
+     closes a gap at 10am must not be asked about the next one at 10:05. Enforced
+     on the LEDGER, not a timer: any row sent today stops every send today. */
+  const contactedToday = new Set<string>();
+  const today = new Date().toISOString().slice(0, 10);
   for (const row of ledgerRows ?? []) {
     const key = row.user_id as string;
     if (!sentChannels.has(key)) sentChannels.set(key, new Set());
     sentChannels.get(key)!.add(`${row.gap}:${row.channel}`);
     if (!contactedGaps.has(key)) contactedGaps.set(key, new Set());
     contactedGaps.get(key)!.add(row.gap as Gap);
+    if (typeof row.sent_at === 'string' && row.sent_at.slice(0, 10) === today) {
+      contactedToday.add(key);
+    }
     if (!row.resolved_at) {
       if (!openLedger.has(key)) openLedger.set(key, []);
       openLedger.get(key)!.push({ gap: row.gap as Gap, channel: row.channel as Channel });
     }
   }
+
 
   const results: Result[] = [];
   let resolvedCount = 0;
