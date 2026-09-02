@@ -403,7 +403,7 @@ Deno.serve(async (req) => {
 
   const { data: members, error: membersErr } = await supabase
     .from('user_profiles')
-    .select('id, username, username_is_custom, primary_club_id, created_at')
+    .select('id, username, username_is_custom, primary_club_id, hide_handicap_chip, created_at')
     .is('deleted_at', null)
     .lt('created_at', newest)
     .gt('created_at', oldest)
