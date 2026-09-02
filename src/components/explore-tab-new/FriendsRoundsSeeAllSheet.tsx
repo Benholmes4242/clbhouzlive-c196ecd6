@@ -61,7 +61,7 @@ export function FriendsRoundsSeeAllSheet({ open, onClose, userId, onRowPress }: 
       surfaceColor={A.CANVAS}
       style={{
         height: 'auto',
-        maxHeight: '85dvh',
+        maxHeight: '75dvh',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: FONT,
