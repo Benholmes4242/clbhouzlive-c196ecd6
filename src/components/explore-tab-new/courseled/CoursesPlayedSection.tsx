@@ -361,7 +361,6 @@ function Badges({ row }: { row: BoardCourseRow }) {
  * under par is red with a TRUE MINUS. A null figure is an em-dash, never 0.0.
  */
 function PlaysTo({ value }: { value: number | null }) {
-  const { t } = useTranslation('courses');
   const text =
     value == null
       ? '\u2014'
