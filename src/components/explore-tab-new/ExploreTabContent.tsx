@@ -20,19 +20,14 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { GolfThisWeek } from './courseled/GolfThisWeek';
-import {
-  DEFAULT_WEEK_SCOPE,
-  type WeekScope,
-} from './courseled/hooks/useGolfThisWeek';
-import type { RegionSelection } from './courseled/hooks/useWeekRegionCounts';
-import { GolfThisWeekSheet } from './GolfThisWeekSheet';
+import type { BoardRow } from './courseled/hooks/useBoardPage';
 
 
 import { ClipsRail, LatestVideosRail } from './courseled/CommunityMediaRails';
 import { useCommunityVideos } from './courseled/hooks/useCommunityVideos';
 import { MediaActBar, type MediaChipId } from './courseled/MediaActBar';
 import { ProgressiveReveal } from './courseled/ProgressiveReveal';
-import { ACT_GAP, CHIP_GAP, Eyebrow, HEAD_GAP, InkAction, PAGE_GUTTER, RHYTHM } from './courseled/tokens';
+import { ACT_GAP, Eyebrow, HEAD_GAP, InkAction, PAGE_GUTTER, RHYTHM } from './courseled/tokens';
 import {
   useCommunityLibrary,
   type CommunityLibraryItem,
@@ -43,17 +38,9 @@ import { CommunityClipMosaic } from './courseled/community/CommunityClipMosaic';
 import { CommunityVideoRow } from './courseled/community/CommunityVideoRow';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { mediaTarget } from '@/utils/mediaEngagement';
-import { MostPlayedLeaderboard } from './courseled/MostPlayedLeaderboard';
 import { AmateurNewsSection } from '@/features/amateur/news/AmateurNewsSection';
-import { MostPlayedSheet } from './courseled/MostPlayedSheet';
+import type { HonoursFeat } from '@/features/courses/_shared/scorecard/honoursTreatment';
 
-import {
-  HonoursBoard,
-  sortHonours,
-  type HonoursMode,
-} from './courseled/HonoursBoard';
-import { HonoursBoardSheet } from './courseled/HonoursBoardSheet';
-import { useMostPlayedThisWeek, type MostPlayedPlayer, type MostPlayedRow } from './courseled/hooks/useMostPlayedThisWeek';
 
 
 /**
@@ -176,12 +163,11 @@ export default function ExploreTabContent({
 
   useMarkDiscoverSeenOnExit(markSeen);
 
-  /* ONE ROUNDS SECTION (BRIEF_MERGE_CIRCLE_AND_GOLF_THIS_WEEK §S1). Your Circle
-     and Golf this week were the same section shown twice; the merged rail keeps
-     its scope and area here so the see-all sheet inherits both. Component state,
-     not the URL: a filter tap must not enter the back stack. */
-  const [weekScope, setWeekScope] = useState<WeekScope>(DEFAULT_WEEK_SCOPE);
-  const [weekRegion, setWeekRegion] = useState<RegionSelection | null>(null);
+  /* THE SCOPE AND AREA STATE IS GONE (BRIEF_DISCOVER_FILTER_LED_BOARD S3.7).
+     Scope pills and the area sheet were absorbed into the board's own filter
+     panel, which owns WHO and WHERE together, so the page no longer holds
+     either. */
+
 
   // Sticky-bar veil: mirrors CoursesContent so the notch strip paints the
   // moment the pills pin (no gap, no colour seam).
@@ -216,16 +202,10 @@ export default function ExploreTabContent({
      newest first) — the same hook the /community destination reads, so the
      sample and the full pool can never disagree. */
   const library = useCommunityLibrary();
-  const mostPlayedQuery = useMostPlayedThisWeek();
-
-  const mostPlayed = mostPlayedQuery.data;
-
-  const [golfWeekSheet, setGolfWeekSheet] = useState(false);
   const [findGolfers, setFindGolfers] = useState(false);
-  const [mostPlayedSheet, setMostPlayedSheet] = useState(false);
-  const [honoursSheet, setHonoursSheet] = useState(false);
-  const [honoursMode, setHonoursMode] = useState<HonoursMode>('recent');
-  const [honoursFocus, setHonoursFocus] = useState<string | null>(null);
+  /* The feat the tapped board row was ranked on, handed to the scorecard sheet.
+     Null for an ordinary round, which is nearly all of them. */
+  const [boardFeat, setBoardFeat] = useState<HonoursFeat | null>(null);
 
   /**
    * LATEST REVIEWS LEFT THIS PAGE (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL
@@ -234,20 +214,7 @@ export default function ExploreTabContent({
    * Courses browse, where the review pool is country/region scoped.
    */
 
-  const mostPlayedList = useMemo(() => mostPlayed ?? [], [mostPlayed]);
 
-
-  const handleScopeChange = useCallback(
-    (next: WeekScope) => {
-      if (next === weekScope) return;
-      analyticsEvents.track('discover_lens_change', { lens: next });
-      /* A SCOPE CHANGE RESETS THE AREA (§S3.5): the counts belong to the scope,
-         so an area holding nothing under the new pill must not survive it. */
-      setWeekScope(next);
-      setWeekRegion(null);
-    },
-    [weekScope],
-  );
 
   /**
    * THE LENS MACHINERY MOVED INTO THE SECTION (BRIEF_GOLF_THIS_WEEK §3). The
@@ -294,24 +261,28 @@ export default function ExploreTabContent({
 
 
 
-  const handleMostPlayed = useCallback(
-    (r: MostPlayedRow) => goCourse(r.courseId, 'most_played'),
-    [goCourse],
-  );
-
-  /* A BOARD ROW IS A ROUND: it opens the scorecard bottom sheet, the same one
-     the round tiles and the honours board open. The row carries the score id of
-     the exact round the board is showing, and the component only calls this when
-     that id exists. */
-  const handleMostPlayedPlayer = useCallback(
-    (p: MostPlayedPlayer) => {
-      analyticsEvents.track('discover_most_played_row_tapped', {
-        has_score: !!p.scoreId,
+  /* A BOARD ROW IS A ROUND: it opens the scorecard bottom sheet. The row carries
+     the score id of the exact round the board is showing, and the feat it was
+     ranked on travels with it so the sheet can wear the honours treatment
+     (S5.6) — the one thing salvaged from the retired honours board. */
+  const handleBoardRow = useCallback(
+    (row: BoardRow) => {
+      analyticsEvents.track('discover_board_row_tapped', {
+        pos: row.pos,
+        has_score: !!row.whs_score_id,
       });
-      if (p.scoreId) opener.openByScore(p.scoreId, null, p.userId);
+      const feat: HonoursFeat | null = (row.albatrosses ?? 0) > 0
+        ? 'albatross'
+        : (row.holes_in_one ?? 0) > 0
+          ? 'ace'
+          : null;
+      setBoardFeat(feat);
+      if (row.whs_score_id) opener.openByScore(row.whs_score_id, null, row.user_id);
+      else opener.openProfile(row.user_id);
     },
     [opener],
   );
+
 
   /**
    * PHOTOS LEAD THE MEDIA (§1.2), and the reasoning is recorded so it is not
@@ -435,30 +406,10 @@ export default function ExploreTabContent({
   );
 
 
-  const honours = useMemo(() => sortHonours(legendary), [legendary]);
+  /* The honours sorting, its mode state and the focus id went with the rail
+     (S8). Nothing on this page ranks feats any more — the board does, under a
+     filter. */
 
-  const handleHonoursRow = useCallback(
-    (e: WireEvent) => {
-      analyticsEvents.track('discover_honours_row_tap', {
-        kind: e.kind,
-        year: new Date(e.at).getFullYear(),
-        course_id: e.courseId ?? null,
-      });
-      if (e.scoreId) opener.openByScore(e.scoreId, null, e.userId);
-    },
-    [opener],
-  );
-
-  const openHonoursSheet = useCallback(() => {
-    analyticsEvents.track('discover_honours_sheet_open', { total: honours.length });
-    setHonoursMode('recent');
-    setHonoursFocus(null);
-    setHonoursSheet(true);
-  }, [honours.length]);
-
-  /* BRIEF_HONOURS_BOARD_THE_HOLE §S4.1 — the rail no longer groups by member,
-     so there is no "{{n}} more" affordance and no leader-focused open. The
-     sheet still accepts a focus id; nothing on this page supplies one. */
 
   return (
     <div style={{ background: A.CANVAS, minHeight: '100vh', fontFamily: SANS, ...FIGS }}>
@@ -485,15 +436,8 @@ export default function ExploreTabContent({
           marginBottom: 36,
         }}
       >
-        <GolfThisWeek
-          userId={userId}
-          scope={weekScope}
-          onScopeChange={handleScopeChange}
-          region={weekRegion}
-          onRegionChange={setWeekRegion}
-          onCardPress={handleFriendCard}
-          onSeeAll={() => setGolfWeekSheet(true)}
-        />
+        <GolfThisWeek userId={userId} onRowPress={handleBoardRow} />
+
       </div>
 
       {/* ONE SECTION RHYTHM, ONE CONSTANT (BRIEF_DISCOVER_ONE_PAGE §6): RHYTHM
@@ -511,31 +455,12 @@ export default function ExploreTabContent({
             leads the page. Its own section rhythm comes from this flex gap. */}
         <AmateurNewsSection />
 
-        {/* BRIEF_DISCOVER_ORDER_AND_LABELS §1 — the RANKED sections precede the
-            MEDIA sections. */}
-        <MostPlayedLeaderboard
+        {/* COURSES PLAYED AND THE HONOURS BOARD ARE DELETED AS SECTIONS
+            (BRIEF_DISCOVER_FILTER_LED_BOARD S8). Both asked a question the board
+            now answers under a filter — "where" for courses played, "feats" for
+            honours — so keeping them would be the same answer told twice. The
+            honours TREATMENT survives on the scorecard sheet. */}
 
-          rows={mostPlayedList}
-          isPending={mostPlayedQuery.isPending}
-          onRowPress={handleMostPlayed}
-          onPlayerPress={handleMostPlayedPlayer}
-          onSeeAll={mostPlayedList.length > 5 ? () => setMostPlayedSheet(true) : undefined}
-        />
-
-        {/* 6 — THE HINGE (§1.1). Data, so it speaks act one's language; all-time
-            and unscoped, so it sits on the join without lying about which side it
-            is on. It stays ABOVE the media bar because a chip row that heads it
-            would imply the honours board is a media type.
-            It is structurally outside the media-controlled subtree below. */}
-        <div data-act-one-honours style={{ display: 'contents' }}>
-          <HonoursBoard
-            events={honours}
-            isPending={wireLoading}
-            onRowPress={handleHonoursRow}
-            limit={20}
-            onSeeAll={openHonoursSheet}
-          />
-        </div>
 
         {/* THE CHAPTER BREAK IS NOW A CONTROL (§4). ActSeam is deleted: a
             decorative rule with a caption that had to explain itself is a rule
@@ -702,37 +627,12 @@ export default function ExploreTabContent({
         />
       </div>
 
-      <GolfThisWeekSheet
-        open={golfWeekSheet}
-        onClose={() => setGolfWeekSheet(false)}
-        userId={userId}
-        scope={weekScope}
-        onScopeChange={handleScopeChange}
-        region={weekRegion}
-        onRowPress={(scoreId, uid) => {
-          if (scoreId) opener.openByScore(scoreId, null, uid);
-          else opener.openProfile(uid);
-        }}
-      />
-
+      {/* THE ROUNDS SEE-ALL, MOST PLAYED AND HONOURS SHEETS ARE DELETED
+          (BRIEF_DISCOVER_FILTER_LED_BOARD S8). The board owns its own see-all,
+          and "courses played" and "honours" are now FILTER AXES on it rather
+          than sections with their own pagination. */}
       <FindGolfersSheet open={findGolfers} onClose={() => setFindGolfers(false)} />
 
-      <MostPlayedSheet
-        open={mostPlayedSheet}
-        onClose={() => setMostPlayedSheet(false)}
-        rows={mostPlayedList}
-        onRowPress={handleMostPlayed}
-        onPlayerPress={handleMostPlayedPlayer}
-      />
-
-      <HonoursBoardSheet
-        open={honoursSheet}
-        onClose={() => setHonoursSheet(false)}
-        events={honours}
-        onRowPress={handleHonoursRow}
-        initialMode={honoursMode}
-        focusUserId={honoursFocus}
-      />
 
 
 

@@ -8,6 +8,15 @@ import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolv
 import { TrajectoryLine } from './TrajectoryLine';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
 import { RoundEngagementActions } from '@/components/explore-tab-new/courseled/RoundEngagementActions';
+import {
+  honoursGround,
+  METAL_GOLD,
+  METAL_HAIRLINE,
+  METAL_INK,
+  METAL_TOP_EDGE,
+  type HonoursFeat,
+} from './honoursTreatment';
+
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
   TREND_UP, TREND_DOWN,
@@ -168,7 +177,15 @@ export interface CardScorecardSheetProps {
    * draws nothing when the prop is absent, so the tour surface is untouched.
    */
   engagement?: CardScorecardEngagement | null;
+  /**
+   * THE HONOURS TREATMENT (BRIEF_DISCOVER_FILTER_LED_BOARD S5.6/S8.3). The
+   * honours board rail is deleted; its metal survives HERE, on the one surface
+   * that shows a single feat round. Null for an ordinary round, which is nearly
+   * all of them, and then nothing renders.
+   */
+  feat?: HonoursFeat | null;
 }
+
 
 export interface CardScorecardEngagement {
   likeHidden?: boolean;
@@ -614,7 +631,9 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   playerName, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, identityStat,
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
+  feat = null,
   sheetStyle,
+
 }) => {
   const { t } = useTranslation(['courses']);
   void emptyMessage;
@@ -869,7 +888,40 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           inside the sheet cannot capture the dismiss gesture. This block sits
           BELOW that grabber and never sees those events.
         */}
+        {/* THE HONOURS BAND. Champagne for the albatross, bone for the ace —
+            they separate by SATURATION, never by value. It sits above the
+            summary because the feat is why this round is worth a look. */}
+        {feat && (
+          <div
+            style={{
+              flexShrink: 0,
+              background: honoursGround(feat),
+              borderTop: `1px solid ${METAL_TOP_EDGE}`,
+              borderBottom: `1px solid ${METAL_HAIRLINE}`,
+              padding: '8px 16px',
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 8,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: METAL_GOLD,
+              }}
+            >
+              {feat === 'ace' ? 'Hole in one' : 'Albatross'}
+            </span>
+            <span style={{ fontSize: 11.5, fontWeight: 600, color: METAL_INK, opacity: 0.62 }}>
+              {feat === 'ace' ? 'Honours' : 'Honours · rarest of all'}
+            </span>
+          </div>
+        )}
         <div
+
           style={{
             padding: '12px 16px 10px',
             background: A.PANEL,
