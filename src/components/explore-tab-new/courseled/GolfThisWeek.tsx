@@ -1,27 +1,24 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SlidersHorizontal } from 'lucide-react';
+import { ListFilter } from 'lucide-react';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { A, CARD_RADIUS, DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from './tokens';
+import { A, DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from './tokens';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useBoardFacets } from './hooks/useBoardFacets';
 import { useBoardPage, type BoardRow } from './hooks/useBoardPage';
 import { BoardHeaderRow, BoardRowView, gapText } from './BoardRows';
-import { BoardPicker, type BoardCategoryOption } from './BoardPicker';
 import { BoardFilterPanel } from './BoardFilterPanel';
 import { BoardSeeAllSheet } from './BoardSeeAllSheet';
 import {
   BAND_OPTIONS,
-  BOARD_KEYS,
   BOARD_LABELS,
   COURSES_SET_OPTIONS,
   DEFAULT_FILTERS,
   FEAT_OPTIONS,
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
-  WINDOW_SHORT,
   boardCountsRounds,
   filtersAreDefault,
   type BoardFilters,
@@ -54,8 +51,8 @@ import {
  * a board that disappears when a filter bites teaches a member nothing.
  */
 
-/** S5.1 — twenty rows on the page, then "See all N". */
-const VISIBLE_ROWS = 20;
+/** Ten POSITIONS on the page. A tie crossing T10 is kept whole. */
+const VISIBLE_POSITIONS = 10;
 
 /**
  * ONE READ SERVES THE PAGE AND THE PIN. The page shows twenty; the read takes
@@ -65,7 +62,7 @@ const VISIBLE_ROWS = 20;
  */
 const PAGE_FETCH = 200;
 
-const HERO_H = 188;
+const HERO_H = 300;
 
 export interface GolfThisWeekProps {
   userId: string | undefined;
@@ -80,7 +77,6 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
      stack, which is the rule the retired scope pills already held. */
   const [board, setBoard] = useState<BoardKey>('gross');
   const [filters, setFilters] = useState<BoardFilters>(DEFAULT_FILTERS);
-  const [pickerOpen, setPickerOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [seeAll, setSeeAll] = useState(false);
 
@@ -89,14 +85,17 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
 
   const rows = page.data?.rows ?? [];
   const total = page.data?.total ?? 0;
-  const visible = rows.slice(0, VISIBLE_ROWS);
+  const visible = useMemo(() => {
+    const firstOutsideCut = rows.findIndex((row) => row.pos > VISIBLE_POSITIONS);
+    return firstOutsideCut === -1 ? rows : rows.slice(0, firstOutsideCut);
+  }, [rows]);
 
   /* S5.4 — the member's own row, pinned only when it is NOT already on screen. */
   const mine = useMemo(
     () => (userId ? rows.find((r) => r.user_id === userId) ?? null : null),
     [rows, userId],
   );
-  const minePinned = !!mine && mine.pos > VISIBLE_ROWS;
+  const minePinned = !!mine && !visible.some((row) => row.user_id === mine.user_id);
 
   /* S6.1 — THE HERO IS THE LEADER'S COURSE. Not a rotation, not a curated
      photograph: the board's own first row supplies the image, so the picture
@@ -115,25 +114,14 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
      the RPC's own count for the whole board; the courses figure is the size of
      the facet's course axis, which is counted over the same qualifying set. */
   const courseCount = facets.openList('course').length;
+  const memberCount = useMemo(() => new Set(rows.map((row) => row.user_id)).size, [rows]);
+  const days = filters.window === 'all' ? '\u221e' : filters.window === 'year' ? 'YTD' : filters.window;
 
-  const appliedLine = useMemo(
-    () => describeFilters(filters, t as never),
+  const appliedParts = useMemo(
+    () => describeFilterParts(filters, t as never),
     [filters, t],
   );
-
-  const boardOptions: BoardCategoryOption<BoardKey>[] = useMemo(
-    () =>
-      BOARD_KEYS.map((k) => ({
-        key: k,
-        label: t(BOARD_LABELS[k].i18n, BOARD_LABELS[k].label),
-        short: t(BOARD_LABELS[k].i18n, BOARD_LABELS[k].label),
-        subtitle: boardSubtitle(k, t as never),
-        /* S4.3 — a board with no qualifiers is DIMMED, never removed. Until the
-           first facet answer arrives every board is selectable (count 1). */
-        count: facets.countFor('board', k) ?? 1,
-      })),
-    [facets, t],
-  );
+  const appliedLine = appliedParts.join(' \u00B7 ');
 
   const changeBoard = useCallback((next: BoardKey) => {
     analyticsEvents.track('discover_board_category_change', { board: next });
