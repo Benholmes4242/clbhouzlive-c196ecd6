@@ -5,9 +5,10 @@ import { ChevronDown, ChevronUp, ChevronRight, ArrowDown, ArrowUp } from 'lucide
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CourseImageFallback } from './CourseImageFallback';
 import { A, KICKER, SANS, FIGS, DISCOVER_FACT } from './tokens';
-import type { BoardFilters } from './boardFilters';
+import { WINDOW_SHORT, type BoardFilters } from './boardFilters';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
 import { useBoardCoursePlayers } from './hooks/useBoardCoursePlayers';
+import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
 
 /**
  * COURSES PLAYED (BRIEF_DISCOVER_COURSES_SECTION).
@@ -43,6 +44,10 @@ export function CoursesPlayedSection({
   const { t } = useTranslation('courses');
   /* C5.5 — one row open at a time. */
   const [openId, setOpenId] = useState<string | null>(null);
+  const [seeAll, setSeeAll] = useState(false);
+
+  const win = WINDOW_SHORT[filters.window];
+  const windowLabel = t(win.i18n, win.label);
 
   const courses = useBoardCourses(userId, filters, { limit: 6 });
   const rows = courses.data?.rows ?? [];
@@ -80,12 +85,35 @@ export function CoursesPlayedSection({
   return (
     <section style={{ fontFamily: SANS, ...FIGS }}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+        {/* G2 — THE HEADER STATES ITS WINDOW, AND ONLY ITS WINDOW (G2.2): the bar
+            above already states the full selection, and the window is the axis
+            that changes what "played" means. A real U+00B7 as a JSX expression
+            (G2.3), never a sized div. */}
         <span style={{ ...KICKER, color: A.INK }}>
           {t('discover.coursesPlayed.title', 'Courses played')}
+          <span aria-hidden>{' '}{'\u00b7'}{' '}</span>
+          {windowLabel}
         </span>
-        <span style={{ ...KICKER, color: A.MUTE }}>
-          {t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: total })}
-        </span>
+        {/* G5.4 — the control exists ONLY when there is more to see than the six
+            rows below. At six or fewer: nothing, not a disabled control. */}
+        {total > 6 && (
+          <button
+            type="button"
+            onClick={() => setSeeAll(true)}
+            style={{
+              ...KICKER,
+              flexShrink: 0,
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              fontFamily: SANS,
+              color: A.MUTE,
+              cursor: 'pointer',
+            }}
+          >
+            {t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: total })}
+          </button>
+        )}
       </div>
 
       <div style={{ marginTop: 12 }}>
@@ -103,11 +131,23 @@ export function CoursesPlayedSection({
           />
         ))}
       </div>
+
+      {/* G5 — THE SEE ALL DOES SOMETHING. Same RPC, same filter state, p_limit
+          raised; the sheet's rows are the SAME row component as here (G5.3). */}
+      <CoursesPlayedSeeAllSheet
+        open={seeAll}
+        onClose={() => setSeeAll(false)}
+        userId={userId}
+        filters={filters}
+        windowLabel={windowLabel}
+        onCoursePress={onCoursePress}
+        onMemberPress={onMemberPress}
+      />
     </section>
   );
 }
 
-function CourseRow({
+export function CourseRow({
   row,
   first,
   open,
