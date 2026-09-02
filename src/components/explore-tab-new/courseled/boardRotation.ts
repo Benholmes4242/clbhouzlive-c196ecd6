@@ -119,20 +119,37 @@ export function persistPick(pick: BoardPick) {
  * R2.3 a board the member renders on (viewer_pos 1..10) gets DOUBLE weight at
  * the board step. Two visits in three, not a mirror.
  * R2.4 never the immediately previous session's combination.
+ *
+ * F2.3 the member's HANDICAP DEFAULT BOARD is excluded outright — rotating onto
+ * the board they would have landed on anyway is not a rotation. The BOARD is
+ * excluded, not the combination: net at 90 days is still net.
+ * F2.7 anything left empty falls back SILENTLY to `opts.fallback` (the handicap
+ * default) rather than to an empty board or an error.
  */
 export function pickRotation(
   rows: RotationRow[] | null | undefined,
-  opts?: { last?: BoardPick | null; random?: () => number },
+  opts?: {
+    last?: BoardPick | null;
+    random?: () => number;
+    excludeBoard?: BoardKey | null;
+    fallback?: BoardPick;
+  },
 ): BoardPick {
   const random = opts?.random ?? Math.random;
   const last = opts?.last ?? null;
   const lastId = last ? comboId(last) : null;
+  const excludeBoard = opts?.excludeBoard ?? null;
+  const fallbackPick = opts?.fallback ?? FALLBACK_PICK;
 
   /* Only combinations this client can actually express are candidates. */
   const clean = (rows ?? []).filter(
-    (r) => isBoardKey(r.board) && isWindowKey(r.win) && Number(r.n) > 0,
+    (r) =>
+      isBoardKey(r.board) &&
+      isWindowKey(r.win) &&
+      Number(r.n) > 0 &&
+      r.board !== excludeBoard,
   );
-  if (clean.length === 0) return FALLBACK_PICK;
+  if (clean.length === 0) return fallbackPick;
 
   const byBoard = new Map<BoardKey, RotationRow[]>();
   for (const row of clean) {
