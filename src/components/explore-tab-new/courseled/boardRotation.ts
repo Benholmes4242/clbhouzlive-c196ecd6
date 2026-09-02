@@ -197,7 +197,7 @@ export function pickRotation(
      rather than showing an empty board. */
   let candidates = buildCandidates(lastId);
   if (candidates.length === 0) candidates = buildCandidates(null);
-  if (candidates.length === 0) return FALLBACK_PICK;
+  if (candidates.length === 0) return fallbackPick;
 
   /* R2.2 + R2.3 — weight is per BOARD: 1, doubled where the member renders. */
   const weights = candidates.map((c) => (c.visible ? 2 : 1));
