@@ -473,6 +473,8 @@ Deno.serve(async (req) => {
   let resolvedCount = 0;
   let skippedCapped = 0;
   let skippedNothingOpen = 0;
+  let skippedAlreadyAsked = 0;
+  let skippedSameDay = 0;
 
   for (const member of members ?? []) {
     const userId = member.id as string;
@@ -628,6 +630,8 @@ Deno.serve(async (req) => {
       resolved: resolvedCount,
       skipped_capped: skippedCapped,
       skipped_nothing_open: skippedNothingOpen,
+      skipped_already_asked: skippedAlreadyAsked,
+      skipped_same_day: skippedSameDay,
     }),
     { headers: { ...cors, 'Content-Type': 'application/json' } },
   );
