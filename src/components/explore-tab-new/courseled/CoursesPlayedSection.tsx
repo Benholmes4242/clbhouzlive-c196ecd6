@@ -9,6 +9,8 @@ import { WINDOW_SHORT, type BoardFilters } from './boardFilters';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
 import { useBoardCoursePlayers } from './hooks/useBoardCoursePlayers';
 import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
+import { ListTerminalRow } from './ListTerminalRow';
+import { windowDays } from './GolfThisWeek';
 
 /**
  * COURSES PLAYED (BRIEF_DISCOVER_COURSES_SECTION).
@@ -25,7 +27,9 @@ import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
  */
 
 const TOPAR_UNDER = '#E5484D';
-const ROW_H = 62;
+const ROW_H = 54;
+const PLAYS_TO_W = 62;
+const CHEVRON_W = 22;
 
 export interface CoursesPlayedSectionProps {
   userId: string | undefined;
@@ -48,6 +52,7 @@ export function CoursesPlayedSection({
 
   const win = WINDOW_SHORT[filters.window];
   const windowLabel = t(win.i18n, win.label);
+  const days = windowDays(filters.window);
 
   const courses = useBoardCourses(userId, filters, { limit: 6 });
   const rows = courses.data?.rows ?? [];
@@ -66,7 +71,12 @@ export function CoursesPlayedSection({
     return (
       <section aria-hidden style={{ fontFamily: SANS }}>
         <div style={{ height: 14, width: 130, background: A.PANEL, borderRadius: 3 }} />
-        <div style={{ marginTop: 12 }}>
+        <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
+          <div style={{ height: 15, width: 72, background: A.PANEL, borderRadius: 3 }} />
+          <div style={{ height: 15, width: 58, background: A.PANEL, borderRadius: 3 }} />
+        </div>
+        <div style={{ height: 20, marginTop: 12, borderBottom: `1px solid ${A.BORDER}` }} />
+        <div>
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
@@ -84,39 +94,18 @@ export function CoursesPlayedSection({
 
   return (
     <section style={{ fontFamily: SANS, ...FIGS }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
-        {/* G2 — THE HEADER STATES ITS WINDOW, AND ONLY ITS WINDOW (G2.2): the bar
-            above already states the full selection, and the window is the axis
-            that changes what "played" means. A real U+00B7 as a JSX expression
-            (G2.3), never a sized div. */}
-        <span style={{ ...KICKER, color: A.INK }}>
+      <div>
+        <span style={{ ...KICKER, display: 'block', color: A.INK }}>
           {t('discover.coursesPlayed.title', 'Courses played')}
-          <span aria-hidden>{' '}{'\u00b7'}{' '}</span>
-          {windowLabel}
         </span>
-        {/* G5.4 — the control exists ONLY when there is more to see than the six
-            rows below. At six or fewer: nothing, not a disabled control. */}
-        {total > 6 && (
-          <button
-            type="button"
-            onClick={() => setSeeAll(true)}
-            style={{
-              ...KICKER,
-              flexShrink: 0,
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              fontFamily: SANS,
-              color: A.MUTE,
-              cursor: 'pointer',
-            }}
-          >
-            {t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: total })}
-          </button>
-        )}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginTop: 8 }}>
+          <CourseStat value={String(total)} label={t('discover.filterBoard.col.courses', 'COURSES')} />
+          <CourseStat value={days} label={t('discover.filterBoard.col.days', 'DAYS')} />
+        </div>
       </div>
 
       <div style={{ marginTop: 12 }}>
+        <CourseHeaderRow />
         {rows.map((row, index) => (
           <CourseRow
             key={row.course_id}
@@ -130,6 +119,12 @@ export function CoursesPlayedSection({
             onMemberPress={onMemberPress}
           />
         ))}
+        {total > 6 && (
+          <ListTerminalRow
+            label={t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: total })}
+            onPress={() => setSeeAll(true)}
+          />
+        )}
       </div>
 
       {/* G5 — THE SEE ALL DOES SOMETHING. Same RPC, same filter state, p_limit
@@ -144,6 +139,44 @@ export function CoursesPlayedSection({
         onMemberPress={onMemberPress}
       />
     </section>
+  );
+}
+
+function CourseStat({ value, label }: { value: string; label: string }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+      <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, lineHeight: 1, color: A.INK }}>
+        {value}
+      </span>
+      <span style={{ ...KICKER, fontSize: 10, color: A.MUTE }}>{label}</span>
+    </span>
+  );
+}
+
+export function CourseHeaderRow() {
+  const { t } = useTranslation('courses');
+  const cap = {
+    fontSize: 9.5,
+    fontWeight: 700,
+    letterSpacing: '0.13em',
+    textTransform: 'uppercase' as const,
+    color: A.DIM,
+  };
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `minmax(0, 1fr) ${PLAYS_TO_W}px ${CHEVRON_W}px`,
+        alignItems: 'center',
+        columnGap: 10,
+        padding: '0 0 6px',
+        borderBottom: `1px solid ${A.BORDER}`,
+      }}
+    >
+      <span style={cap}>{t('discover.coursesPlayed.course', 'Course')}</span>
+      <span style={{ ...cap, textAlign: 'right' }}>{t('discover.coursesPlayed.playsTo', 'Plays to')}</span>
+      <span aria-hidden />
+    </div>
   );
 }
 
@@ -179,9 +212,10 @@ export function CourseRow({
         aria-expanded={open}
         style={{
           width: '100%',
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: `minmax(0, 1fr) ${PLAYS_TO_W}px ${CHEVRON_W}px`,
           alignItems: 'center',
-          gap: 10,
+          columnGap: 10,
           minHeight: ROW_H,
           background: 'transparent',
           border: 'none',
@@ -193,21 +227,22 @@ export function CourseRow({
       >
           {/* D1 — the shared course fallback: the hashed gradient with course
               initials, exactly as every other course surface renders it. */}
-          <CourseImageFallback
-            courseId={row.course_id}
-            courseName={row.name}
-            imageUrl={row.thumbnail_image}
-            initialsSize={13}
-            style={{
-              width: 44,
-              height: 44,
-              flexShrink: 0,
-              borderRadius: 8,
-              border: `1px solid ${A.BORDER}`,
-            }}
-          />
+          <span style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <CourseImageFallback
+              courseId={row.course_id}
+              courseName={row.name}
+              imageUrl={row.thumbnail_image}
+              initialsSize={13}
+              style={{
+                width: 44,
+                height: 44,
+                flexShrink: 0,
+                borderRadius: 8,
+                border: `1px solid ${A.BORDER}`,
+              }}
+            />
 
-          <span style={{ flex: 1, minWidth: 0 }}>
+            <span style={{ flex: 1, minWidth: 0 }}>
             <span
               style={{
                 display: 'block',
@@ -255,11 +290,14 @@ export function CourseRow({
               </span>
               <Badges row={row} />
             </span>
+            </span>
           </span>
 
           <PlaysTo value={row.plays_to} />
 
-          <Chevron size={16} color={A.DIM} aria-hidden style={{ flexShrink: 0 }} />
+          <span style={{ width: CHEVRON_W, display: 'flex', justifyContent: 'flex-end' }}>
+            <Chevron size={16} color={A.DIM} aria-hidden />
+          </span>
       </button>
 
       {open && (
@@ -323,7 +361,6 @@ function Badges({ row }: { row: BoardCourseRow }) {
  * under par is red with a TRUE MINUS. A null figure is an em-dash, never 0.0.
  */
 function PlaysTo({ value }: { value: number | null }) {
-  const { t } = useTranslation('courses');
   const text =
     value == null
       ? '\u2014'
@@ -335,12 +372,9 @@ function PlaysTo({ value }: { value: number | null }) {
   const tone = value == null ? A.DIM : value < 0 ? TOPAR_UNDER : A.INK;
 
   return (
-    <span style={{ flexShrink: 0, textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
-      <span className="tabular-nums" style={{ fontSize: 13.5, fontWeight: 700, color: tone, lineHeight: 1 }}>
+    <span style={{ width: PLAYS_TO_W, flexShrink: 0, textAlign: 'right' }}>
+      <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, color: tone, lineHeight: 1 }}>
         {text}
-      </span>
-      <span style={{ ...KICKER, fontSize: 9, color: A.DIM }}>
-        {t('discover.coursesPlayed.playsTo', 'Plays to')}
       </span>
     </span>
   );

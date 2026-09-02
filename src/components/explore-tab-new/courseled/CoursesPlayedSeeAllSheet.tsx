@@ -6,7 +6,7 @@ import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens
 import { FIGS, SANS } from './tokens';
 import type { BoardFilters } from './boardFilters';
 import { useBoardCourses } from './hooks/useBoardCourses';
-import { CourseRow } from './CoursesPlayedSection';
+import { CourseHeaderRow, CourseRow } from './CoursesPlayedSection';
 
 /**
  * COURSES PLAYED — SEE ALL (BRIEF_DISCOVER_STICKY_FILTER_BAR G5).
@@ -106,6 +106,7 @@ export function CoursesPlayedSeeAllSheet({
           ...FIGS,
         }}
       >
+        <CourseHeaderRow />
         {rows.map((row, index) => (
           <CourseRow
             key={row.course_id}
