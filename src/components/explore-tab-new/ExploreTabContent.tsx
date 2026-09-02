@@ -21,6 +21,8 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import { FindGolfersSheet } from './FindGolfersSheet';
 import { GolfThisWeek } from './courseled/GolfThisWeek';
 import type { BoardRow } from './courseled/hooks/useBoardPage';
+import { CoursesPlayedSection } from './courseled/CoursesPlayedSection';
+import type { BoardFilters } from './courseled/boardFilters';
 
 
 import { ClipsRail, LatestVideosRail } from './courseled/CommunityMediaRails';
@@ -239,6 +241,11 @@ export default function ExploreTabContent({
      with the same reaction control and the same reference line. */
 
   const opener = useScorecardOpener();
+
+  /* ONE FILTER BAR GOVERNS THE PAGE (BRIEF_DISCOVER_COURSES_SECTION C2). The
+     board owns the filter state and reports it here; sections below READ it.
+     The board KEY is deliberately not reported and not held. */
+  const [boardFilters, setBoardFilters] = useState<BoardFilters | null>(null);
   const handleFriendCard = useCallback(
     (r: CircleRoundRow) => {
       analyticsEvents.track('discover_friend_round_tapped', {
@@ -425,8 +432,28 @@ export default function ExploreTabContent({
           marginBottom: 36,
         }}
       >
-        <GolfThisWeek userId={userId} onRowPress={handleBoardRow} />
+        <GolfThisWeek
+          userId={userId}
+          onRowPress={handleBoardRow}
+          onAppliedFiltersChange={setBoardFilters}
+        />
 
+        {/* COURSES PLAYED — THE BOARD IS WHO, THIS IS WHERE
+            (BRIEF_DISCOVER_COURSES_SECTION C1.1). It sits directly beneath the
+            leaderboard and above Amateur News because the two are a pair;
+            separating them with a news block breaks it. It takes the page's
+            APPLIED FILTERS and NOT the board key (C2.2). Unresolved is not
+            absent: nothing renders until the filter state has landed. */}
+        {boardFilters && (
+          <div style={{ marginTop: RHYTHM }}>
+            <CoursesPlayedSection
+              userId={userId}
+              filters={boardFilters}
+              onCoursePress={(courseId) => navigate(`/courses/${courseId}`)}
+              onMemberPress={(memberId) => opener.openProfile(memberId)}
+            />
+          </div>
+        )}
       </div>
 
       {/* ONE SECTION RHYTHM, ONE CONSTANT (BRIEF_DISCOVER_ONE_PAGE §6): RHYTHM
