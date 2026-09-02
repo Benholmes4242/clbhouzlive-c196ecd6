@@ -78,7 +78,7 @@ export interface GolfThisWeekProps {
   /**
    * BRIEF_DISCOVER_COURSES_SECTION C2.1 — ONE FILTER BAR GOVERNS THE PAGE, and
    * this is the only way out of it. Sections below (Courses played) READ the
-   * applied filter state and never write to it. Null until the rotation's pick
+   * applied filter state and never write to it. Null until the handicap default
    * has landed, because unresolved is not absent.
    *
    * THE BOARD KEY IS NOT REPORTED (C2.2): it is separate state here and stays
