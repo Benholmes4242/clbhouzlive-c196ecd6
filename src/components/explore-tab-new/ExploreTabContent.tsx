@@ -472,15 +472,8 @@ export default function ExploreTabContent({
           marginBottom: 36,
         }}
       >
-        <GolfThisWeek
-          userId={userId}
-          scope={weekScope}
-          onScopeChange={handleScopeChange}
-          region={weekRegion}
-          onRegionChange={setWeekRegion}
-          onCardPress={handleFriendCard}
-          onSeeAll={() => setGolfWeekSheet(true)}
-        />
+        <GolfThisWeek userId={userId} onRowPress={handleBoardRow} />
+
       </div>
 
       {/* ONE SECTION RHYTHM, ONE CONSTANT (BRIEF_DISCOVER_ONE_PAGE §6): RHYTHM
