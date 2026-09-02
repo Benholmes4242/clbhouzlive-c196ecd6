@@ -120,8 +120,6 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
     () => describeFilterParts(filters, t as never),
     [filters, t],
   );
-  const appliedLine = appliedParts.join(' \u00B7 ');
-
   const changeBoard = useCallback((next: BoardKey) => {
     analyticsEvents.track('discover_board_category_change', { board: next });
     setBoard(next);
@@ -178,9 +176,9 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
           }}
         >
           <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', color: DISCOVER_QUIET }}>
-            {t('discover.filterBoard.eyebrow', 'The board')}
+            {t('discover.board.circuitEyebrow', 'The amateur circuit')}
           </span>
-          <h2 style={{ margin: '6px 0 0', fontSize: 25, fontWeight: 700, color: DISCOVER_FACT }}>
+          <h2 style={{ margin: '6px 0 0', fontSize: 25, fontWeight: 700, letterSpacing: '0.005em', textTransform: 'uppercase', color: DISCOVER_FACT }}>
             {t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
           </h2>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 12, whiteSpace: 'nowrap' }}>
@@ -202,10 +200,10 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
           borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS, cursor: 'pointer', textAlign: 'left',
         }}
       >
-        <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 600, color: A.BODY }}>
+        <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.BODY }}>
           <AppliedFilterLine parts={appliedParts} />
         </span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, fontSize: 9, fontWeight: 700, color: A.AMBER, textTransform: 'uppercase' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: A.INK, textTransform: 'uppercase' }}>
           <ListFilter size={13} strokeWidth={2.4} aria-hidden />
           {t('discover.filterBoard.filters', 'Filters')}
         </span>
@@ -283,7 +281,7 @@ export function GolfThisWeek({ userId, onRowPress }: GolfThisWeekProps) {
         userId={userId}
         board={board}
         filters={filters}
-        appliedLine={appliedLine}
+        appliedParts={appliedParts}
         onRowPress={onRowPress}
       />
     </section>
@@ -327,20 +325,20 @@ export function describeFilterParts(
   const scope = SCOPE_OPTIONS.find((o) => o.key === f.scope);
   if (scope) parts.push(t(scope.i18n, scope.label));
   const win = WINDOW_OPTIONS.find((o) => o.key === f.window);
-  if (win) parts.push(t(win.i18n, win.label).toLowerCase());
+  if (win) parts.push(t(win.i18n, win.label));
   if (f.regionValue) parts.push(f.regionValue);
   if (f.courses === 'one') parts.push(t('discover.filterBoard.courses.oneCourse', 'one course'));
   else if (f.courses !== 'any') {
     const c = COURSES_SET_OPTIONS.find((o) => o.key === f.courses);
-    if (c) parts.push(t(c.i18n, c.label).toLowerCase());
+    if (c) parts.push(t(c.i18n, c.label));
   }
   if (f.band !== 'any') {
     const b = BAND_OPTIONS.find((o) => o.key === f.band);
-    if (b) parts.push(t(b.i18n, b.label).toLowerCase());
+    if (b) parts.push(t(b.i18n, b.label));
   }
   if (f.feat !== 'any') {
     const ft = FEAT_OPTIONS.find((o) => o.key === f.feat);
-    if (ft) parts.push(t(ft.i18n, ft.label).toLowerCase());
+    if (ft) parts.push(t(ft.i18n, ft.label));
   }
   return parts;
 }
