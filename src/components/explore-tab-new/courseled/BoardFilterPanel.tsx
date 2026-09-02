@@ -8,12 +8,13 @@ import { useAvailableWeekScopes } from './hooks/useGolfThisWeek';
 import type { BoardFacets } from './hooks/useBoardFacets';
 import {
   BAND_OPTIONS,
+  BOARD_KEYS,
+  BOARD_LABELS,
   COURSES_SET_OPTIONS,
   DEFAULT_FILTERS,
   FEAT_OPTIONS,
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
-  boardCountsRounds,
   type BandKey,
   type BoardFilters,
   type BoardKey,
@@ -50,7 +51,7 @@ import {
  * a club under HOME_CLUB_MIN_MEMBERS gets NO "Your club" row.
  */
 
-type Screen = 'root' | 'window' | 'where' | 'courses' | 'band' | 'feat';
+type Screen = 'root' | 'board' | 'window' | 'where' | 'courses' | 'band' | 'feat';
 
 /** S3.5 — a search field appears only past this many individual course rows. */
 const COURSE_SEARCH_THRESHOLD = 60;
@@ -120,8 +121,7 @@ function PanelRow({
           minWidth: 0,
           fontSize: 14,
           fontWeight: active ? 700 : 600,
-          /* THE ACTIVE FILTER LABEL IS THE OTHER AMBER ON THIS SURFACE. */
-          color: active ? A.AMBER : A.INK,
+          color: A.INK,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -156,6 +156,8 @@ export interface BoardFilterPanelProps {
   onClose: () => void;
   userId: string | undefined;
   board: BoardKey;
+  onBoardChange: (next: BoardKey) => void;
+  resultCount: number;
   filters: BoardFilters;
   onChange: (next: BoardFilters) => void;
   facets: BoardFacets;
@@ -166,6 +168,8 @@ export function BoardFilterPanel({
   onClose,
   userId,
   board,
+  onBoardChange,
+  resultCount,
   filters,
   onChange,
   facets,
@@ -209,13 +213,11 @@ export function BoardFilterPanel({
 
   /* THE FOOTER'S FIGURE IS THE ACTIVE BOARD'S OWN COUNT under these filters,
      which is the number the board will render (S3.2). */
-  const footN = facets.countFor('board', board);
+  const footN = resultCount;
   const footDisabled = footN === 0;
   const footLabel = footDisabled
     ? t('discover.filterBoard.noMatch', 'No rounds match')
-    : boardCountsRounds(board)
-      ? t('discover.filterBoard.showRounds', 'Show {{count}} rounds', { count: footN ?? 0 })
-      : t('discover.filterBoard.showMembers', 'Show {{count}} members', { count: footN ?? 0 });
+    : t('discover.filterBoard.showRounds', 'Show {{count}} rounds', { count: footN });
 
   /* S3.6 — SELECTING A FEAT WIDENS When TO ALL TIME when the current window
      holds none of it, and the applied line says so. Production holds 5 aces and
@@ -240,6 +242,8 @@ export function BoardFilterPanel({
 
   const headerTitle = () => {
     switch (screen) {
+      case 'board':
+        return t('discover.filterBoard.pickBoard', 'Which board');
       case 'window':
         return t('discover.filterBoard.axis.when', 'When');
       case 'where':
@@ -308,7 +312,7 @@ export function BoardFilterPanel({
               fontFamily: SANS,
               fontSize: 13.5,
               fontWeight: 700,
-              color: A.AMBER,
+              color: A.INK,
               cursor: 'pointer',
             }}
           >
@@ -322,6 +326,14 @@ export function BoardFilterPanel({
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
         {screen === 'root' && (
           <>
+            <SectionLabel>{t('discover.filterBoard.eyebrow', 'The board')}</SectionLabel>
+            <PanelRow
+              label={t('discover.filterBoard.rankedBy', 'Ranked by')}
+              value={t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
+              chevron
+              onClick={() => setScreen('board')}
+            />
+
             <SectionLabel>{t('discover.filterBoard.who', 'Who')}</SectionLabel>
             {SCOPE_OPTIONS.filter((o) => (o.key === 'club' ? clubApplies : true)).map((o) => (
               <PanelRow
@@ -383,6 +395,24 @@ export function BoardFilterPanel({
             </button>
           </>
         )}
+
+        {screen === 'board' &&
+          BOARD_KEYS.map((key) => {
+            const count = facets.countFor('board', key);
+            return (
+              <PanelRow
+                key={key}
+                label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
+                count={count}
+                active={board === key}
+                disabled={count === 0}
+                onClick={() => {
+                  onBoardChange(key);
+                  setScreen('root');
+                }}
+              />
+            );
+          })}
 
         {screen === 'window' &&
           WINDOW_OPTIONS.map((o) => (
