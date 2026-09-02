@@ -19160,6 +19160,7 @@ export type Database = {
         Returns: {
           board: string
           n: number
+          viewer_pos: number
           win: string
         }[]
       }
