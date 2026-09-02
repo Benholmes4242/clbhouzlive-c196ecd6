@@ -114,6 +114,21 @@ export const RoundDetailSheet: React.FC<Props> = ({
     [sortedHoles, fieldByHole],
   );
 
+  /* THE FEAT IS READ FROM THE CARD, NOT PASSED IN (BRIEF_DISCOVER_FILTER_LED_BOARD
+     S5.6). The holes already say whether this round holds an ace or an
+     albatross, so every one of the sheet's callers gets the honours band without
+     plumbing a prop through eight surfaces. Albatross outranks the ace. */
+  const feat = useMemo<HonoursFeat | null>(() => {
+    let ace = false;
+    for (const h of cardHoles) {
+      if (h.strokes == null) continue;
+      if (h.par != null && h.strokes - h.par <= -3) return 'albatross';
+      if (h.strokes === 1) ace = true;
+    }
+    return ace ? 'ace' : null;
+  }, [cardHoles]);
+
+
   const totalPar = sortedHoles.reduce((a, h) => a + (h.par ?? 0), 0);
 
   const grossVal = userData
