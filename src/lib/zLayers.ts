@@ -36,3 +36,15 @@ export const REVIEW_SHEET_Z   = 240;   // ReviewBottomSheet scrim (panel = +1)
 /** MediaPreviewViewer's own `z-[9999]` class. Mirrored here so the ordering is
  *  reviewable in one place; change both together. */
 export const MEDIA_PREVIEW_Z  = 9999;  // MediaPreviewViewer (portals to body)
+
+/**
+ * BRIEF_DISCOVER_STICKY_FILTER_BAR G1.6 — Discover's sticky filter bar.
+ *
+ * IN-PAGE CHROME, NOT AN OVERLAY. It is deliberately the LOWEST entry here: it
+ * must sit below the fixed app chrome (ShellSlot, z 29), below every bottom
+ * sheet (Z.sheetBackdrop 12002 / Z.sheet 12003), below the board's filter panel
+ * and the scorecard sheet (both bottom sheets), and below the fullscreen media
+ * viewer (FS_OVERLAY_Z 200, portalled to body). Its only job is to out-rank the
+ * page rows it scrolls over.
+ */
+export const DISCOVER_STICKY_FILTER_Z = 20;
