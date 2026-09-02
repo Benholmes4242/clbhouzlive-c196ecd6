@@ -13,6 +13,7 @@ import { useBoardPage, type BoardRow } from './hooks/useBoardPage';
 import { BoardHeaderRow, BoardRowView, gapText } from './BoardRows';
 import { BoardFilterPanel } from './BoardFilterPanel';
 import { BoardSeeAllSheet } from './BoardSeeAllSheet';
+import { ListTerminalRow } from './ListTerminalRow';
 /* F1 — the day's FIRST session lands on the handicap default; later sessions
    the same day rotate. One hook decides which. */
 import { useDiscoverEntryBoard } from './hooks/useDiscoverEntryBoard';
@@ -320,35 +321,19 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
               </div>
             )}
             {total > visible.length && (
-              <button
-                type="button"
-                onClick={() => setSeeAll(true)}
-                style={{
-                  width: '100%',
-                  padding: '14px 0',
-                  background: 'transparent',
-                  border: 'none',
-                  fontFamily: SANS,
-                  ...KICKER,
-                  color: A.BODY,
-                  cursor: 'pointer',
-                }}
-              >
-                {t('discover.filterBoard.seeAll', 'See all {{unit}}', { unit: unitCount })}
-              </button>
+              <ListTerminalRow
+                label={t('discover.filterBoard.seeAll', 'See all {{unit}}', { unit: unitCount })}
+                onPress={() => setSeeAll(true)}
+              />
             )}
           </>
         )}
       </div>
 
-      {/* G3 — ONE CONTINUOUS GOVERNED REGION. The dead screen-height between the
-          board's see-all and the next section is gone: a single hairline rule
-          plus a deliberate 20px step keeps the two DISTINGUISHABLE without
-          reading as two unrelated pages stacked (G3.1, G3.2). The larger gap to
-          Amateur News is owned by the page, and stays (G3.3). */}
+      {/* R4 — the shared terminal row ends the board. The courses masthead is
+          the next break, after one deliberate 30px step and no duplicate rule. */}
       {children ? (
-        <div style={{ marginTop: 20, padding: '0 14px' }}>
-          <div aria-hidden style={{ height: 1, background: A.BORDER, margin: '0 0 20px' }} />
+        <div style={{ marginTop: 30, padding: '0 14px' }}>
           {children}
         </div>
       ) : null}
@@ -398,7 +383,7 @@ function AppliedFilterLine({ parts }: { parts: string[] }) {
   return <>{parts.map((part, index) => <span key={`${part}:${index}`}>{index > 0 ? <> {'\u00B7'} </> : null}{part}</span>)}</>;
 }
 
-function windowDays(window: BoardFilters['window']): string {
+export function windowDays(window: BoardFilters['window']): string {
   if (window === 'all') return '\u221e';
   if (window !== 'year') return window;
   const now = new Date();

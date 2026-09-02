@@ -444,9 +444,9 @@ export default function ExploreTabContent({
             separating them with a news block breaks it. It takes the page's
             APPLIED FILTERS and NOT the board key (C2.2). Unresolved is not
             absent: nothing renders until the filter state has landed.
-            BRIEF_DISCOVER_STICKY_FILTER_BAR G1.1/G3 — it now renders INSIDE the
-            board's section so the sticky filter bar stays pinned over it, and
-            the seam between the two (hairline + 20px) is owned there. The page's
+            BRIEF_DISCOVER_BOARD_COURSES_REGION R4 — it renders INSIDE the board's
+            section so the sticky filter bar stays pinned over it, and the seam
+            between the two is a rule-free 30px step. The page's
             36px to Amateur News below is untouched (G3.3). */}
         {boardFilters && (
             <CoursesPlayedSection
