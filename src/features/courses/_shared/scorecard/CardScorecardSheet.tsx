@@ -888,7 +888,40 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           inside the sheet cannot capture the dismiss gesture. This block sits
           BELOW that grabber and never sees those events.
         */}
+        {/* THE HONOURS BAND. Champagne for the albatross, bone for the ace —
+            they separate by SATURATION, never by value. It sits above the
+            summary because the feat is why this round is worth a look. */}
+        {feat && (
+          <div
+            style={{
+              flexShrink: 0,
+              background: honoursGround(feat),
+              borderTop: `1px solid ${METAL_TOP_EDGE}`,
+              borderBottom: `1px solid ${METAL_HAIRLINE}`,
+              padding: '8px 16px',
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 8,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: METAL_GOLD,
+              }}
+            >
+              {feat === 'ace' ? 'Hole in one' : 'Albatross'}
+            </span>
+            <span style={{ fontSize: 11.5, fontWeight: 600, color: METAL_INK, opacity: 0.62 }}>
+              {feat === 'ace' ? 'Honours' : 'Honours · rarest of all'}
+            </span>
+          </div>
+        )}
         <div
+
           style={{
             padding: '12px 16px 10px',
             background: A.PANEL,
