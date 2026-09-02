@@ -12,12 +12,10 @@ import { useBoardPage, type BoardRow } from './hooks/useBoardPage';
 import { BoardHeaderRow, BoardRowView, gapText } from './BoardRows';
 import { BoardFilterPanel } from './BoardFilterPanel';
 import { BoardSeeAllSheet } from './BoardSeeAllSheet';
-/* H3.2 — boardRotation.ts and useBoardRotation.ts are intentionally LEFT IN
-   PLACE but unwired; they are wanted for a separate surface. */
-import {
-  DEFAULT_BOARD_FALLBACK,
-  useHandicapDefaultBoard,
-} from './hooks/useHandicapDefaultBoard';
+/* F1 — the day's FIRST session lands on the handicap default; later sessions
+   the same day rotate. One hook decides which. */
+import { useDiscoverEntryBoard } from './hooks/useDiscoverEntryBoard';
+import { DEFAULT_BOARD_FALLBACK } from './hooks/useHandicapDefaultBoard';
 
 import {
   BAND_OPTIONS,
