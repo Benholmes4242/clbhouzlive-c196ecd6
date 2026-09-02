@@ -62,6 +62,12 @@ interface Copy {
   body: string;
   path: string;
   src: string;
+  /**
+   * EMAIL ONLY. The short key on the /go/ handoff page. Emails cannot open the
+   * app reliably, so they land on an exempt doormat that keeps the destination
+   * rather than on the download gate, which drops it.
+   */
+  goKey: string;
 }
 
 const COPY: Record<Gap, Copy> = {
@@ -72,6 +78,7 @@ const COPY: Record<Gap, Copy> = {
       'own, scored hole by hole against the course you played it on. Nothing to type in.',
     path: '/handicap',
     src: 'nudge_whs',
+    goKey: 'handicap',
   },
   club: {
     subject: 'Set your home club',
@@ -80,6 +87,7 @@ const COPY: Record<Gap, Copy> = {
       'and find the ones already on clbhouz.',
     path: '/edit-profile',
     src: 'nudge_club',
+    goKey: 'profile',
   },
   username: {
     subject: 'Pick a username',
@@ -88,6 +96,7 @@ const COPY: Record<Gap, Copy> = {
       'play with will recognise.',
     path: '/edit-profile',
     src: 'nudge_username',
+    goKey: 'profile',
   },
 };
 
@@ -101,9 +110,13 @@ function routeFor(gap: Gap): string {
   return `${c.path}?src=${c.src}`;
 }
 
-/** Absolute, canonical host. EMAIL ONLY — it opens outside the app. */
+/**
+ * Absolute, canonical host, pointing at the /go/ handoff. EMAIL ONLY — it
+ * opens outside the app, where the in-app route would hit the download gate.
+ */
 function emailLinkFor(gap: Gap): string {
-  return `${EMAIL_ORIGIN}${routeFor(gap)}`;
+  const c = COPY[gap];
+  return `${EMAIL_ORIGIN}/go/${c.goKey}?src=${c.src}`;
 }
 
 

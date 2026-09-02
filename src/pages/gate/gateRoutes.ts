@@ -16,7 +16,13 @@ export type GateState =
   | { kind: 'profile'; username: string }
   | { kind: 'none' };
 
-const EXEMPT_PREFIXES = ['/post/', '/tour/news/', '/discover/news', '/privacy', '/terms', '/legal/'];
+/**
+ * `/go/` is the email handoff doormat (BRIEF_EMAIL_HANDOFF_PAGE). It is exempt
+ * BY DESIGN, not by exception: it holds no data and needs no session, which is
+ * exactly why emails point at it instead of at /handicap. Signed-in surfaces
+ * must never be added to this list.
+ */
+const EXEMPT_PREFIXES = ['/post/', '/tour/news/', '/discover/news', '/privacy', '/terms', '/legal/', '/go/'];
 
 export function isGateExemptPath(pathname: string): boolean {
   return EXEMPT_PREFIXES.some((p) => pathname === p || pathname.startsWith(p));
