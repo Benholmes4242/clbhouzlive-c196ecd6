@@ -42,7 +42,7 @@ export const STORY_STRIP_HEIGHT = CAPTION_HEIGHT + TICKER_HEIGHT;
 
 function Shell({ children }: { children?: React.ReactNode }) {
   return (
-    <div style={{ background: HERO_BOARD_SURFACE, width: '100%', minHeight: STORY_STRIP_HEIGHT, fontFamily: FONT }}>
+    <div style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', minHeight: STORY_STRIP_HEIGHT, fontFamily: FONT }}>
       {children}
     </div>
   );
