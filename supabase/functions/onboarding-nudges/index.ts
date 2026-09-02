@@ -156,7 +156,7 @@ async function senderUserId(): Promise<string | null> {
  * contract; that RPC cannot be used here because it authorises against
  * auth.uid(), which is null on a service-role call.
  */
-async function sendDm(userId: string, gap: Gap): Promise<string | null> {
+async function sendDm(userId: string, gap: Gap, username: string | null): Promise<string | null> {
   const sender = await senderUserId();
   if (!sender) return 'no clbhouz business owner to send as';
 
@@ -193,15 +193,20 @@ async function sendDm(userId: string, gap: Gap): Promise<string | null> {
     if (memberErr) return memberErr.message;
   }
 
-  const body = `${COPY[gap].body}\n\n${linkFor(gap)}`;
+  // No URL in the body: one route out, carried by the action. The prose is
+  // still the message, so a client that does not know type='action' renders a
+  // perfectly usable text bubble.
   const { error: msgErr } = await supabase.from('messages').insert({
     conversation_id: conversationId,
     sender_actor_type: 'business',
     sender_actor_id: CLBHOUZ_BUSINESS_ID,
     sender_user_id: sender,
-    type: 'text',
-    body,
-    metadata: { onboarding_nudge: gap },
+    type: 'action',
+    body: bodyFor(gap, username),
+    metadata: {
+      onboarding_nudge: gap,
+      action: { label: COPY[gap].subject, route: routeFor(gap) },
+    },
   });
   if (msgErr) return msgErr.message;
 
@@ -232,6 +237,7 @@ async function sendPush(
   userId: string,
   gap: Gap,
   prefs: Prefs | undefined,
+  username: string | null,
 ): Promise<{ outcome: 'sent' | 'no_device' | 'muted'; error?: string }> {
   if (prefs?.muted_types?.includes(NUDGE_NOTIFICATION_TYPE)) return { outcome: 'muted' };
   // The trigger's personal branch reads muted_types and muted_user_ids but not
@@ -256,7 +262,7 @@ async function sendPush(
     user_id: userId,
     type: NUDGE_NOTIFICATION_TYPE,
     title: COPY[gap].subject,
-    message: COPY[gap].body,
+    message: bodyFor(gap, username),
     actor_type: 'system',
     actor_id: null,
     recipient_actor_type: 'personal',
@@ -264,7 +270,7 @@ async function sendPush(
     entity_type: 'onboarding_nudge',
     read: false,
     is_read: false,
-    data: { gap, link: linkFor(gap) },
+    data: { gap, link: routeFor(gap) },
   });
 
   if (error) return { outcome: 'no_device', error: error.message };
@@ -276,6 +282,7 @@ async function sendEmail(
   userId: string,
   email: string,
   gap: Gap,
+  username: string | null,
 ): Promise<{ sent: boolean; skipped?: string; error?: string }> {
   const apiKey = Deno.env.get('RESEND_API_KEY');
   if (!apiKey) {
@@ -287,13 +294,14 @@ async function sendEmail(
   const unsubUrl =
     `${Deno.env.get('SUPABASE_URL')}/functions/v1/onboarding-unsubscribe` +
     `?u=${encodeURIComponent(userId)}&t=${token}`;
-  const link = linkFor(gap);
+  const link = emailLinkFor(gap);
+  const prose = bodyFor(gap, username);
 
-  const text = `${COPY[gap].body}\n\n${link}\n\nUnsubscribe: ${unsubUrl}`;
+  const text = `${prose}\n\n${link}\n\nUnsubscribe: ${unsubUrl}`;
   const html = `
 <!doctype html>
 <html><body style="margin:0;padding:24px;background:#15171F;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#E7E9EE">
-  <p style="font-size:15px;line-height:1.55;margin:0 0 20px">${COPY[gap].body}</p>
+  <p style="font-size:15px;line-height:1.55;margin:0 0 20px">${prose}</p>
   <p style="margin:0 0 28px">
     <a href="${link}" style="display:inline-block;padding:11px 18px;border-radius:8px;background:#F7931E;color:#15171F;font-size:13px;font-weight:700;text-decoration:none">${COPY[gap].subject}</a>
   </p>
@@ -382,7 +390,7 @@ Deno.serve(async (req) => {
 
   const { data: members, error: membersErr } = await supabase
     .from('user_profiles')
-    .select('id, username, primary_club_id, created_at')
+    .select('id, username, username_is_custom, primary_club_id, created_at')
     .is('deleted_at', null)
     .lt('created_at', newest)
     .gt('created_at', oldest)
@@ -445,7 +453,10 @@ Deno.serve(async (req) => {
     const open: Record<Gap, boolean> = {
       whs: !hasWhs.has(userId),
       club: !member.primary_club_id,
-      username: !member.username || String(member.username).trim() === '',
+      // username_is_custom is the only honest signal: signup GENERATES a
+      // username, so "is it blank" never fires. NULL means unknown - do not
+      // chase. Only an explicit false qualifies.
+      username: member.username_is_custom === false,
     };
 
     // 1. Stamp resolved_at on anything they have since done. Never chased again.
@@ -498,7 +509,7 @@ Deno.serve(async (req) => {
     // theirs must not stop its ledger row.
     if (!done.has(`${gap}:dm`)) {
       try {
-        const err = await sendDm(userId, gap);
+        const err = await sendDm(userId, gap, member.username as string | null);
         if (err) {
           result.dm = `failed: ${err}`;
           console.error('dm failed for', userId, err);
@@ -517,7 +528,7 @@ Deno.serve(async (req) => {
     // Push — via notifications, so auto_queue_push_notification still decides.
     if (!done.has(`${gap}:push`)) {
       try {
-        const { outcome, error } = await sendPush(userId, gap, prefs.get(userId));
+        const { outcome, error } = await sendPush(userId, gap, prefs.get(userId), member.username as string | null);
         if (outcome === 'sent') {
           await recordSent(userId, gap, 'push');
           result.push = 'sent';
@@ -545,7 +556,7 @@ Deno.serve(async (req) => {
         if (!email) {
           result.email = 'no_address';
         } else {
-          const out = await sendEmail(userId, email, gap);
+          const out = await sendEmail(userId, email, gap, member.username as string | null);
           if (out.sent) {
             await recordSent(userId, gap, 'email');
             result.email = 'sent';
