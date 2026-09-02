@@ -1639,7 +1639,7 @@ export function GolfThisWeek({
      the winner, so a tile with one qualifier shows the hero and NOTHING else —
      no second row, no dash, no placeholder. That is a normal week. */
   const bestRanked = rankAll(
-    ordered
+    boardPool
       .filter((r) => r.gross != null && r.course_par != null)
       .sort((a, b) => {
         const at = (a.gross as number) - (a.course_par as number);
@@ -1664,13 +1664,13 @@ export function GolfThisWeek({
   const netOf = (r: CircleRoundRow) =>
     (r.score_id ? netByScore.get(r.score_id)?.net : undefined) ?? null;
   const netRanked = rankAll(
-    ordered
+    boardPool
       .filter((r) => netOf(r) != null)
       .sort((a, b) => (netOf(a) as number) - (netOf(b) as number) || byDateDesc(a, b)),
   );
 
   const improvedRanked = rankAll(
-    ordered
+    boardPool
       .filter(
         (r) =>
           r.delta_index != null &&
@@ -1686,7 +1686,7 @@ export function GolfThisWeek({
   /* NULL STABLEFORD FAILS THE FILTER, never contributes a 0 (§1.3). FLOOR 36 —
      the par-equivalent every club golfer knows. */
   const stablefordRanked = rankAll(
-    ordered
+    boardPool
       .filter(
         (r) =>
           r.stableford_points != null &&
@@ -1702,7 +1702,7 @@ export function GolfThisWeek({
 
   /* FLOOR 3 — "1 birdie" is not a comparison, and a two-way tie on 1 is worse. */
   const birdiesRanked = rankAll(
-    ordered
+    boardPool
       .filter(
         (r) => r.birdies != null && Number.isFinite(r.birdies) && (r.birdies as number) >= 3,
       )
@@ -1711,7 +1711,7 @@ export function GolfThisWeek({
 
   /* BRIEF_BOARD_MOST_RECENT §1.3 — NOT rankAll: its own ordering function, no
      dedupe, no floor beyond having a play_date at all. */
-  const recentRanked = recentOrdered(ordered);
+  const recentRanked = recentOrdered(boardPool);
 
   const bestStableford = stablefordRanked[0] ?? null;
   const mostBirdies = birdiesRanked[0] ?? null;
@@ -2284,12 +2284,12 @@ export function GolfThisWeek({
               {[
                 {
                   key: 'rounds',
-                  figure: counts.rounds,
+                  figure: boardCounts.rounds,
                   label: t('discover.golfThisWeek.board.railRounds', 'ROUNDS'),
                 },
                 {
                   key: 'courses',
-                  figure: counts.courses,
+                  figure: boardCounts.courses,
                   label: t('discover.golfThisWeek.board.railCourses', 'COURSES'),
                 },
                 {
