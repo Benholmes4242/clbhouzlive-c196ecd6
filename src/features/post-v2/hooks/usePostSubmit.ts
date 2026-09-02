@@ -196,7 +196,6 @@ export function usePostSubmit() {
           caption: input.caption,
           actorName: input.authorName,
           actorAvatarUrl: input.authorAvatarUrl,
-        actorId: input.actorId,
           actorId: input.actorId,
         };
       }

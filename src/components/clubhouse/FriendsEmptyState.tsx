@@ -245,7 +245,7 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
                   size={52}
                   src={profile?.profile_photo_url ?? null}
                   alt={profile?.display_name ?? 'You'}
-                  userId={user?.id ?? null}
+                  userId={userId ?? null}
                   fallback={userInitials}
                   hairlineRing
                   ringColor={AMBER}
