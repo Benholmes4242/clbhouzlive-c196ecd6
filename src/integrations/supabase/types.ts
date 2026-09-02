@@ -19091,6 +19091,52 @@ export type Database = {
           blocked_id: string
         }[]
       }
+      get_board_course_players: {
+        Args: {
+          p_band?: string
+          p_competition?: string
+          p_course_id: string
+          p_limit?: number
+          p_scope?: string
+          p_viewer: string
+          p_window?: string
+        }
+        Returns: {
+          best_gross: number
+          best_to_par: number
+          display_name: string
+          last_played: string
+          profile_photo_url: string
+          rounds: number
+          user_id: string
+        }[]
+      }
+      get_board_courses: {
+        Args: {
+          p_band?: string
+          p_competition?: string
+          p_course_id?: string
+          p_courses?: string
+          p_limit?: number
+          p_region_kind?: string
+          p_region_value?: string
+          p_scope?: string
+          p_viewer: string
+          p_window?: string
+        }
+        Returns: {
+          area: string
+          course_id: string
+          is_new: boolean
+          members: number
+          name: string
+          plays_to: number
+          prev_rounds: number
+          rounds: number
+          thumbnail_image: string
+          total_courses: number
+        }[]
+      }
       get_board_facets: {
         Args: {
           p_band?: string
