@@ -32,12 +32,11 @@ import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 
 import {
-  PHOTO_BAND_HEIGHT,
   COURSE_GRADIENT,
   COURSE_GRADIENT_DUSK,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { FONT } from '../../../_shared/tokens';
+import { FONT, HERO_STRIP_H } from '../../../_shared/tokens';
 import { heroCanonBackground } from '../../../_shared/heroGradient';
 import { getScoreColor } from '../../../_shared/scoreColor';
 
@@ -125,13 +124,13 @@ export function PhotoBand({
         position: 'relative',
         width: '100%',
         // HARD height, not a floor. It ABSORBS the safe-area inset so the hero
-        // column (photo + 36px ticker) exactly fills OVERVIEW_HERO_TOTAL_HEIGHT
+        // column (photo + 36px ticker) exactly fills OVERVIEW_STRIP_TOTAL_HEIGHT
         // — otherwise the inset showed as a white gap above the live board.
-        height: `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+        height: `calc(${HERO_STRIP_H}px + env(safe-area-inset-top, 0px))`,
         // MICRO_BRIEF_TOUR_OVERVIEW_HERO_CANON_LAYERING took this hero's RAMP
         // and LAYERING onto the canon but DELIBERATELY NOT its height: HERO_MIN_H
-        // ADDS the inset and is a floor, while PHOTO_BAND_HEIGHT is a term in
-        // TOTAL_HERO_HEIGHT_TARGET and must ABSORB the inset. Do not "finish the
+        // ADDS the inset and is a floor, while HERO_STRIP_H is a definite content
+        // height and must ABSORB the inset. Do not "finish the
         // job" by swapping in HERO_MIN_H — it re-opens the white-gap bug.
 
         flexGrow: 0,
@@ -164,9 +163,9 @@ export function PhotoBand({
             margin: 0,
             color: 'white',
             fontFamily: FONT,
-            fontSize: title.length > 30 ? 25 : 30,
+            fontSize: title.length > 30 ? 21 : 25,
             fontWeight: 700,
-            lineHeight: 0.96,
+            lineHeight: 1,
             letterSpacing: '-0.025em',
             textShadow: '0 2px 12px rgba(0,0,0,0.55)',
             textWrap: 'balance',
