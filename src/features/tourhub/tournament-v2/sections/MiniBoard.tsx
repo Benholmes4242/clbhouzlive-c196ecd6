@@ -7,11 +7,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CountryFlag from '@/components/ui/country-flag';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { todayFromEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  HERO_BOARD_SURFACE, WHITE_ALPHA_65, WHITE_ALPHA_12, AMBER,
+  WHITE_ALPHA_65, WHITE_ALPHA_12, AMBER,
 } from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
@@ -43,9 +44,8 @@ interface Props {
    *  - 'panel' (default): the tournament page (TournamentPage:233 live board and
    *    :255 final board). Its ground is the #15171F app canvas, so the board is
    *    a PANEL that must read as a step UP — SURFACE (#1B1E27).
-   *  - 'heroBoard': the Tour Overview hybrid hero (HeroBoardBand:331). Its ground
-   *    is the photo-backed hero block, so the board takes HERO_BOARD_SURFACE
-   *    (#0B0F14) and is continuous with the block around it.
+   *  - 'heroBoard': the Tour Overview hybrid hero (HeroBoardBand). Its board
+   *    resolves onto A.CANVAS and is continuous with the page around it.
    *  - 'light': legacy light chrome islands. No live callsite; retained because
    *    the light ramp has not been deleted.
    */
@@ -69,13 +69,13 @@ interface Props {
  * Surface tokens per ground. INK has no named dark counterpart — plain white.
  *
  * 'panel' and 'heroBoard' share the ink ramp and differ ONLY in surface: the
- * panel rises above the #15171F canvas, the hero board sinks into the photo
- * block. Same component on two grounds — the ground is passed in, never guessed.
+ * panel rises above the app canvas while the hero board resolves into it. Same
+ * component on two grounds — the ground is passed in, never guessed.
  */
 const THEME_TOKENS = {
   light: { surface: SURFACE, ink: INK, mute: INK_MUTE, faint: INK_FAINT, hairline: HAIRLINE_INK_8, press: 'active:bg-black/[0.03]' },
   panel: { surface: SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
-  heroBoard: { surface: HERO_BOARD_SURFACE, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
+  heroBoard: { surface: A.CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_12, press: 'active:bg-white/[0.06]' },
 } as const;
 
 
