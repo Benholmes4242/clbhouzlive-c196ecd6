@@ -125,15 +125,52 @@ export const readSessionPick = (): BoardPick | null =>
 export const readLastPick = (): BoardPick | null =>
   parsePick(safeGet('local', ROTATION_LAST_KEY));
 
-/** F1.1b — null (or a throwing store, F1.5) reads as "the day's first session". */
+/** DEPRECATED with LAST_SEEN_DATE_KEY (S1.1). No live caller. */
 export const readLastSeenDate = (): string | null => safeGet('local', LAST_SEEN_DATE_KEY);
 
+/** DEPRECATED with LAST_SEEN_DATE_KEY (S1.1). No live caller. */
 export const writeLastSeenDate = (date: string = localDateKey()) =>
   safeSet('local', LAST_SEEN_DATE_KEY, date);
 
+export interface DaySessions {
+  date: string;
+  n: number;
+}
+
+/** S1.2 — the record as stored, or null when absent/unreadable/malformed. */
+export function readDaySessions(): DaySessions | null {
+  const raw = safeGet('local', DAY_SESSIONS_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Partial<DaySessions>;
+    if (typeof parsed?.date !== 'string' || !Number.isFinite(Number(parsed?.n))) return null;
+    return { date: parsed.date, n: Number(parsed.n) };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * S1.2 — advance the counter and return which session TODAY this is.
+ *
+ * Called ONCE per browser session, from the entry hook's useState initialiser,
+ * never during render and never from an effect (S2.3).
+ *
+ * S1.3 — a throwing or unavailable store returns 1, so the member lands on the
+ * recent board rather than on nothing.
+ */
+export function bumpDaySessions(): number {
+  const today = localDateKey();
+  const rec = readDaySessions();
+  const n = rec && rec.date === today ? rec.n + 1 : 1;
+  safeSet('local', DAY_SESSIONS_KEY, JSON.stringify({ date: today, n }));
+  return n;
+}
+
 /** R1.3 / R2.4 — written ONCE, at the moment a pick is made. */
 export function persistPick(pick: BoardPick) {
-  safeSet('session', ROTATION_SESSION_KEY, comboId(pick));
+  safeSet('session', ROTATION_SESSION_KEY, sessionId(pick));
+
   safeSet('local', ROTATION_LAST_KEY, comboId(pick));
 }
 
