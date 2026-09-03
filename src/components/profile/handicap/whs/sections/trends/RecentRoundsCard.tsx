@@ -505,9 +505,6 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
   const dayOfMonth = d.getDate();
   const weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][d.getDay()];
 
-  // ONE statement about the index per row. Never both, never "counts".
-  const showNotCounted = !deltaInfo && !round.is_counter;
-
   return (
     <button
       type="button"
@@ -568,22 +565,6 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
               <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
               <span style={{ color: deltaInfo.color, fontWeight: 700, letterSpacing: '0.02em' }}>
                 HCP {deltaInfo.sign} {deltaInfo.value}
-              </span>
-            </>
-          )}
-          {showNotCounted && (
-            <>
-              <span aria-hidden style={{ width: 2.5, height: 2.5, borderRadius: '50%', background: 'var(--hcp-t-30)' }} />
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                  color: T.inkFaded,
-                }}
-              >
-                {labels.notInBest8}
               </span>
             </>
           )}
