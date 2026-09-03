@@ -79,7 +79,9 @@ export function useBoardCourses(
         is_new: r.is_new === true,
         total_courses: Number(r.total_courses ?? 0),
       }));
-      return { rows, total: rows.length > 0 ? rows[0].total_courses : 0 };
+      const rpcTotal = rows.length > 0 ? rows[0].total_courses : 0;
+
+      return { rows, total: Math.max(rpcTotal, rows.length) };
     },
   });
 }
