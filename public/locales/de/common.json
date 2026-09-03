@@ -306,7 +306,7 @@
       "archive": {
         "gross": "Gross",
         "playedTo": "Played to",
-        "notInBest8": "Not in your best 8",
+        
         "roundsTitle_one": "{{count}} round",
         "roundsTitle_other": "{{count}} rounds"
       }
