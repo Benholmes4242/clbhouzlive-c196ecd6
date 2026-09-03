@@ -154,7 +154,7 @@ export function PhotoBand({
           position: 'absolute',
           left: 20, right: 20, bottom: 8,
           zIndex: 3,
-          display: 'flex', flexDirection: 'column', gap: 10,
+          display: 'flex', flexDirection: 'column', gap: 8,
         }}
       >
         {/* Title — clamped to two lines; long sponsor-prefixed names step down
@@ -164,7 +164,7 @@ export function PhotoBand({
             margin: 0,
             color: 'white',
             fontFamily: FONT,
-            fontSize: title.length > 30 ? 25 : 30,
+            fontSize: title.length > 30 ? 21 : 25,
             fontWeight: 700,
             lineHeight: 0.96,
             letterSpacing: '-0.025em',
@@ -189,7 +189,7 @@ export function PhotoBand({
         {venueName && (
           <div
             style={{
-              fontSize: 11.5,
+              fontSize: 10.5,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.75)',
               textShadow: '0 1px 3px rgba(0,0,0,0.45)',
@@ -208,7 +208,7 @@ export function PhotoBand({
         {(momentName || onCtaTap) && (
           <div
             style={{
-              marginTop: 4,
+              marginTop: 2,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -221,7 +221,7 @@ export function PhotoBand({
                   display: 'inline-flex',
                   alignItems: 'baseline',
                   gap: 8,
-                  padding: '6px 10px',
+                  padding: '5px 9px',
                   background: 'rgba(255,255,255,0.10)',
                   border: '0.5px solid rgba(255,255,255,0.18)',
                   borderRadius: 6,
@@ -234,7 +234,7 @@ export function PhotoBand({
                 {momentLabel && (
                   <span
                     style={{
-                      fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
+                      fontSize: 9.5 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
                       fontWeight: 700,
                       letterSpacing: '0.14em',
                       color: 'rgba(255,255,255,0.65)',
@@ -246,7 +246,7 @@ export function PhotoBand({
                 )}
                 <span
                   style={{
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: 700,
                     color: 'white',
                     whiteSpace: 'nowrap',
@@ -261,7 +261,7 @@ export function PhotoBand({
                   <span
                     style={{
                       ...NUMERIC_STYLE,
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: 700,
                       color: momentScoreColour(momentScore),
                     }}
@@ -288,7 +288,7 @@ export function PhotoBand({
                   margin: '-6px -4px',
                   cursor: 'pointer',
                   fontFamily: FONT,
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                   // Quiet action on a dark hero band: white-62, never amber
