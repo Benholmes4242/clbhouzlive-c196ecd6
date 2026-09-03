@@ -248,7 +248,22 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           <h2 style={{ margin: '6px 0 0', fontSize: 25, fontWeight: 700, letterSpacing: '0.005em', textTransform: 'uppercase', color: DISCOVER_FACT }}>
             {ready ? boardTitle : '\u00a0'}
           </h2>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 12, whiteSpace: 'nowrap', visibility: ready ? 'visible' : 'hidden' }}>
+          {/* NOTHING ON THIS SURFACE MAY OVERFLOW ITS CONTAINER AT ANY WIDTH.
+              A row of caps labels gets ONE of: a flex child with minWidth 0
+              that ellipses, a wrap, or a gap that shrinks. Never a hard gap
+              plus nowrap — that combination cannot recover and fails only on
+              phones nobody tests on. A fixed cell must also fit its own label. */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              flexWrap: 'wrap',
+              columnGap: 'clamp(9px, 3.2vw, 18px)',
+              rowGap: 7,
+              marginTop: 12,
+              visibility: ready ? 'visible' : 'hidden',
+            }}
+          >
             <Stat value={String(pool.rounds)} label={t('discover.filterBoard.railRounds', 'ROUNDS', { count: pool.rounds })} />
             <Stat value={String(pool.courses)} label={t('discover.filterBoard.railCourses', 'COURSES', { count: pool.courses })} />
             <Stat value={String(pool.members)} label={t('discover.filterBoard.railMembers', 'MEMBERS', { count: pool.members })} />
@@ -369,11 +384,11 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, whiteSpace: 'nowrap' }}>
       <span className="tabular-nums" style={{ fontSize: 17, fontWeight: 700, color: DISCOVER_FACT, lineHeight: 1 }}>
         {value}
       </span>
-      <span style={{ ...KICKER, color: A.MUTE }}>
+      <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: A.MUTE }}>
         {label}
       </span>
     </span>
