@@ -83,14 +83,22 @@ const WINDOW_ORDER: WindowKey[] = ['14', '30', '90', 'year', 'all'];
 const isBoardKey = (v: string): v is BoardKey => (BOARD_KEYS as string[]).includes(v);
 const isWindowKey = (v: string): v is WindowKey => (WINDOW_ORDER as string[]).includes(v);
 
+const SCOPE_KEYS: ScopeKey[] = ['everyone', 'circle', 'club', 'you'];
+const isScopeKey = (v: string): v is ScopeKey => (SCOPE_KEYS as string[]).includes(v);
+
+/** R2.4 — the LAST-key identity stays the board/window combination only. */
 const comboId = (p: BoardPick) => `${p.board}:${p.window}`;
+/** S3.6 — the SESSION pick additionally records the scope that was used. */
+const sessionId = (p: BoardPick) =>
+  p.scope ? `${p.board}:${p.window}:${p.scope}` : comboId(p);
 
 function parsePick(raw: string | null): BoardPick | null {
   if (!raw) return null;
-  const [board, window] = raw.split(':');
+  const [board, window, scope] = raw.split(':');
   if (!board || !window || !isBoardKey(board) || !isWindowKey(window)) return null;
-  return { board, window };
+  return scope && isScopeKey(scope) ? { board, window, scope } : { board, window };
 }
+
 
 /* Storage is wrapped because private-mode Safari throws on access. A member
    whose storage is unavailable simply re-picks; nothing else breaks. */
