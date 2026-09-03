@@ -45,6 +45,12 @@ export interface BoardRow {
   hcp_at_time: number | null;
   sort_value: number | null;
   total_count: number;
+  /** Every qualifying round in the current filter state (the pool, not the ranked rows). */
+  pool_rounds: number;
+  /** Distinct courses among the qualifying rounds. */
+  pool_courses: number;
+  /** Distinct members among the qualifying rounds. */
+  pool_members: number;
 }
 
 export function boardRpcArgs(
