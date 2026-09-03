@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ListFilter } from 'lucide-react';
 
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { HERO_STRIP_H } from '@/features/tourhub/_shared/tokens';
 import { DISCOVER_STICKY_FILTER_Z } from '@/lib/zLayers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from './tokens';
@@ -68,8 +69,6 @@ const VISIBLE_POSITIONS = 10;
  * 300th is told their position by the see-all sheet, not by a third round trip.
  */
 const PAGE_FETCH = 200;
-
-const HERO_H = 132;
 
 export interface GolfThisWeekProps {
   userId: string | undefined;
@@ -211,7 +210,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
       <div
         style={{
           position: 'relative',
-          height: `calc(${HERO_H}px + env(safe-area-inset-top, 0px))`,
+          height: `calc(${HERO_STRIP_H}px + env(safe-area-inset-top, 0px))`,
           overflow: 'hidden',
           background: A.PANEL,
         }}

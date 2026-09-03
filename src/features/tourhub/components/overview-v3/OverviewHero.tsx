@@ -26,7 +26,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HybridHero } from './HybridHero';
 import { PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { useTourSelection } from '../../context/TourSelectionContext';
-import { INK_TINT_06 } from '../../_shared/tokens';
+import { HERO_STRIP_H, INK_TINT_06 } from '../../_shared/tokens';
 
 const NOOP = () => {};
 
@@ -34,12 +34,7 @@ interface OverviewHeroProps {
   height?: number | string;
 }
 
-/**
- * Canonical PHOTO BAND height — matches the Courses Discover hero
- * (`CoursesPageHero`) and the Course Details cinematic hero
- * (`CinematicHeroFullBleed`). The wire ticker (36px) sits BELOW this,
- * so the full overview hero container is `OVERVIEW_HERO_TOTAL_HEIGHT`.
- */
+/** Legacy news/story image height; no longer describes the Tour Overview hero. */
 export const OVERVIEW_HERO_HEIGHT =
   `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`;
 
@@ -50,7 +45,15 @@ export const OVERVIEW_HERO_TICKER_HEIGHT = 36;
 export const OVERVIEW_HERO_TOTAL_HEIGHT =
   `calc(${OVERVIEW_HERO_HEIGHT} + ${OVERVIEW_HERO_TICKER_HEIGHT}px)`;
 
-export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHeroProps) {
+/** Tour Overview strip height, including the safe-area inset it absorbs. */
+export const OVERVIEW_STRIP_HEIGHT =
+  `calc(${HERO_STRIP_H}px + env(safe-area-inset-top, 0px))`;
+
+/** Full Tour Overview hero = strip + wire ticker. */
+export const OVERVIEW_STRIP_TOTAL_HEIGHT =
+  `calc(${OVERVIEW_STRIP_HEIGHT} + ${OVERVIEW_HERO_TICKER_HEIGHT}px)`;
+
+export function OverviewHero({ height = OVERVIEW_STRIP_TOTAL_HEIGHT }: OverviewHeroProps) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { data: rawSlides = [], isLoading } = useHeroCarouselData();

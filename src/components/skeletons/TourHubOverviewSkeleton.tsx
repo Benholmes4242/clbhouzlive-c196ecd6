@@ -31,7 +31,7 @@
  */
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { INK_TINT_06 } from '@/features/tourhub/_shared/tokens';
-import { OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
+import { OVERVIEW_STRIP_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 
 /**
  * Shimmer block. The base fill is INLINE because `.clb-shimmer-dark` sets the
@@ -204,7 +204,7 @@ export const TourHubOverviewSkeleton = () => {
           chunk-load -> hero-loading -> hero is one continuous frame. */}
       <div
         style={{
-          height: OVERVIEW_HERO_TOTAL_HEIGHT,
+          height: OVERVIEW_STRIP_TOTAL_HEIGHT,
           borderRadius: 20,
           background: `linear-gradient(135deg, ${INK_TINT_06}, ${A.CANVAS})`,
         }}
