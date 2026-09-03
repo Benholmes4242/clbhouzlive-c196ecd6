@@ -9,7 +9,6 @@ import { useAvailableWeekScopes } from './hooks/useGolfThisWeek';
 import type { BoardFacets } from './hooks/useBoardFacets';
 import {
   BAND_OPTIONS,
-  BOARD_KEYS,
   BOARD_LABELS,
   COMPETITION_OPTIONS,
   COURSES_SET_OPTIONS,
@@ -19,6 +18,7 @@ import {
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
   boardCountsRounds,
+  filtersAreDefault,
   type BandKey,
   type BoardFilters,
   type BoardKey,
@@ -29,34 +29,43 @@ import {
 
 
 /**
- * THE FILTER PANEL (BRIEF_DISCOVER_FILTER_LED_BOARD S3).
+ * THE FILTER PANEL (BRIEF_DISCOVER_FILTER_SHEET_WHEN_FIRST).
  *
- * A FULL-SCREEN PANEL, NOT A BOTTOM SHEET: it holds five drilldowns and a
- * course list that can run to hundreds of rows, and a sheet that tall is a
- * sheet pretending to be a page.
+ * A FULL-SCREEN PANEL, NOT A BOTTOM SHEET: it still holds two open lists, and a
+ * sheet tall enough for 254 courses is a sheet pretending to be a page.
  *
- * S3.1 — THE FOOTER BUTTON IS A.INK FILL WITH A.CANVAS LABEL, the app's
- * primary-action treatment. IT IS NOT AMBER. On this surface AMBER MEANS "YOU"
- * and it is spent on the member's own row and the active filter label only.
+ * THE ROOT IS CHIPS, AND WHEN LEADS. The window is the only axis whose change
+ * moves EVERY other count on the screen, so it is chosen first: each count is
+ * then read once, already in the right scale.
  *
- * S2.4 — TWO KINDS OF ABSENCE, and the whole panel hangs off the difference:
- *   FIXED LISTS  (scope, window, band, feat, the three courses set-options)
- *     come from the hardcoded lists imported above. A missing facet row means
- *     ZERO: the row RENDERS, greyed and unselectable.
+ * THE SHOWING HEADER IS THE WHOLE ANSWER TO "SELECTING GIVES NO FEEDBACK"
+ * (S1.3). The WHO counts deliberately DO NOT move when WHO changes, because
+ * get_board_facets counts each axis with its OWN predicate excluded — a count
+ * states what you WOULD get. The acknowledgement is the figure at the top, which
+ * is the SAME `resultCount` the footer button carries, so the two cannot
+ * disagree. NOTHING here apologises for the faceting and no helper text explains
+ * it: the counts do the teaching.
+ *
+ * TWO KINDS OF ABSENCE, and the whole panel still hangs off the difference:
+ *   FIXED LISTS  (window, scope, board, band, competition, the courses set-
+ *     options) come from the hardcoded lists imported above. A missing facet row
+ *     means ZERO: the chip RENDERS, greyed and unselectable.
  *   OPEN LISTS   (course, region_country, region_sub)
  *     are enumerated FROM the facet result. A missing option does not render at
  *     all. 23,295 courses exist; 254 have ever carried a round.
  *
- * S2.6 — UNRESOLVED IS NOT ABSENT. `facets.countFor` returns null until the
- * first answer of the session; a null renders NO COUNT and greys nothing. A row
- * greys because the answer is zero, never because we have not asked yet.
+ * UNRESOLVED IS NOT ABSENT (S3.6). `facets.countFor` returns null until the
+ * first answer of the session; a null renders NO COUNT and greys nothing.
  *
- * S3.4 — A ROW IS PRESENT IF IT APPLIES TO YOU, GREY IF IT HOLDS NOTHING. Those
- * are different statements: a member with no index gets NO "Near yours" row, and
- * a club under HOME_CLUB_MIN_MEMBERS gets NO "Your club" row.
+ * A CHIP IS PRESENT IF IT APPLIES TO YOU, GREY IF IT HOLDS NOTHING (S2.4).
+ * Those are different statements: a member with no index gets NO "Near yours"
+ * chip, and a club under HOME_CLUB_MIN_MEMBERS gets NO "Your club" chip.
+ *
+ * NO AMBER ANYWHERE (S3.7). Amber means "you" — the member's own row on the
+ * board and nothing else. A selected chip is A.INK.
  */
 
-type Screen = 'root' | 'board' | 'window' | 'where' | 'courses' | 'band' | 'competition';
+type Screen = 'root' | 'where' | 'courses';
 
 /** S3.5 — a search field appears only past this many individual course rows. */
 const COURSE_SEARCH_THRESHOLD = 60;
@@ -78,7 +87,7 @@ const rowBase: React.CSSProperties = {
 };
 
 function Count({ n }: { n: number | null }) {
-  /* NEVER A ZERO ON AN UNSETTLED ROW (S2.6): null renders nothing at all. */
+  /* NEVER A ZERO ON AN UNSETTLED ROW: null renders nothing at all. */
   if (n == null) return null;
   return (
     <span
@@ -95,7 +104,6 @@ function PanelRow({
   count,
   value,
   valueChanged,
-  valueCaps,
   active,
   disabled,
   chevron,
@@ -103,12 +111,10 @@ function PanelRow({
 }: {
   label: string;
   count?: number | null;
-  /** The drilldown's current selection, shown at the right (S3.3). */
+  /** The drilldown's current selection, shown at the right. */
   value?: string;
   /** Root drilldown values recede until changed from their default. */
   valueChanged?: boolean;
-  /** Board names are display caps without altering the localized string. */
-  valueCaps?: boolean;
   active?: boolean;
   disabled?: boolean;
   chevron?: boolean;
@@ -132,7 +138,7 @@ function PanelRow({
           minWidth: 0,
           fontSize: 14,
           fontWeight: active ? 700 : 600,
-          color: active ? A.AMBER : A.INK,
+          color: A.INK,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -146,8 +152,6 @@ function PanelRow({
             fontSize: 12.5,
             fontWeight: 700,
             color: valueChanged ? A.INK : A.DIM,
-            letterSpacing: valueCaps ? '0.005em' : 0,
-            textTransform: valueCaps ? 'uppercase' : 'none',
             flexShrink: 0,
             maxWidth: 150,
             overflow: 'hidden',
@@ -161,6 +165,81 @@ function PanelRow({
       <Count n={count ?? null} />
       {chevron ? <ChevronRight size={15} strokeWidth={2.4} color={A.DIM} aria-hidden /> : null}
     </button>
+  );
+}
+
+/**
+ * THE CHIP AND ITS FIVE STATES (S3).
+ *
+ * S3.2 vs S3.3 is the settled "defaults recede, changed values come forward"
+ * rule expressed as a chip: SELECTED-AND-DEFAULT keeps the panel fill and takes
+ * an ink OUTLINE; SELECTED-AND-CHANGED takes the ink FILL. Do not collapse them:
+ * together they are how the member sees which axes they have actually moved.
+ */
+function Chip({
+  label,
+  count,
+  selected,
+  isDefault,
+  onClick,
+}: {
+  label: string;
+  count: number | null;
+  selected: boolean;
+  /** True when this option IS the axis default. */
+  isDefault: boolean;
+  onClick: () => void;
+}) {
+  /* S3.5 — a REAL zero on a fixed list greys and disables. S3.6 — a null is
+     UNRESOLVED and greys nothing. */
+  const disabled = count === 0 && !selected;
+  const filled = selected && !isDefault;
+
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={selected}
+      disabled={disabled}
+      onClick={onClick}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 7,
+        padding: '8px 11px',
+        borderRadius: 8,
+        border: `1px solid ${selected ? A.INK : A.BORDER}`,
+        background: filled ? A.INK : A.PANEL,
+        fontFamily: SANS,
+        opacity: disabled ? 0.35 : 1,
+        cursor: disabled ? 'default' : 'pointer',
+      }}
+    >
+      <span
+        style={{
+          fontSize: 12.5,
+          fontWeight: 700,
+          color: filled ? A.CANVAS : A.INK,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {label}
+      </span>
+      {count == null ? null : (
+        <span
+          className="tabular-nums"
+          style={{ fontSize: 11, fontWeight: 700, color: filled ? A.CANVAS : A.MUTE }}
+        >
+          {count}
+        </span>
+      )}
+    </button>
+  );
+}
+
+function ChipWrap({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '0 16px' }}>{children}</div>
   );
 }
 
@@ -191,8 +270,8 @@ export function BoardFilterPanel({
   const [screen, setScreen] = useState<Screen>('root');
   const [courseSearch, setCourseSearch] = useState('');
 
-  /* S3.4 — the SAME conditional logic the retired scope pills used, now deciding
-     whether a ROW EXISTS rather than whether a pill exists. */
+  /* S2.4 — the SAME conditional logic the retired scope pills used, now deciding
+     whether a CHIP EXISTS rather than whether a pill exists. */
   const { scopes } = useAvailableWeekScopes(userId);
   const clubApplies = scopes.includes('home_club');
   const nearApplies = scopes.includes('handicap_band');
@@ -205,11 +284,8 @@ export function BoardFilterPanel({
 
   const set = (patch: Partial<BoardFilters>) => onChange({ ...filters, ...patch });
 
-  const label = <K extends string>(o: { i18n: string; label: string }) => t(o.i18n, o.label);
+  const label = (o: { i18n: string; label: string }) => t(o.i18n, o.label);
 
-  const windowLabel = label(
-    WINDOW_OPTIONS.find((o) => o.key === filters.window) ?? WINDOW_OPTIONS[0],
-  );
   const whereLabel = filters.regionValue
     ? filters.regionValue
     : t('discover.filterBoard.where.everywhere', 'Everywhere');
@@ -221,25 +297,22 @@ export function BoardFilterPanel({
     const o = COURSES_SET_OPTIONS.find((x) => x.key === filters.courses);
     return o ? label(o) : label(COURSES_SET_OPTIONS[0]);
   })();
-  const bandLabel = label(BAND_OPTIONS.find((o) => o.key === filters.band) ?? BAND_OPTIONS[0]);
 
-  /* THE Ranked by VALUE is the board's own label — feat boards included, since a
-     feat IS a board now rather than an axis laid over one (B1). */
-  const rankedByLabel = t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
-  const competitionLabel = label(
-    COMPETITION_OPTIONS.find((o) => o.key === filters.competition) ?? COMPETITION_OPTIONS[0],
-  );
-
-  /* THE FOOTER'S FIGURE IS THE ACTIVE BOARD'S OWN COUNT under these filters,
-     which is the number the board will render (S3.2). */
+  /* S1.2 — ONE SOURCE FOR THE FIGURE. The header and the footer button read the
+     SAME prop, so feedback and commitment can never disagree. */
   const footN = resultCount;
   const footDisabled = footN === 0;
+  const countsRounds = boardCountsRounds(board);
   const footLabel = footDisabled
     ? t('discover.filterBoard.noMatch', 'No rounds match')
-    : boardCountsRounds(board)
+    : countsRounds
       ? t('discover.filterBoard.showRounds', 'Show {{count}} rounds', { count: footN })
       : t('discover.filterBoard.showMembers', 'Show {{count}} members', { count: footN });
+  const unitLabel = countsRounds
+    ? t('discover.filterBoard.railRounds', { count: footN, defaultValue_one: 'ROUND', defaultValue_other: 'ROUNDS' })
+    : t('discover.filterBoard.railMembers', { count: footN, defaultValue_one: 'MEMBER', defaultValue_other: 'MEMBERS' });
 
+  const atDefaults = filtersAreDefault(filters);
 
   const courseRows = facets.openList('course');
   const needle = courseSearch.trim().toLowerCase();
@@ -250,18 +323,10 @@ export function BoardFilterPanel({
 
   const headerTitle = () => {
     switch (screen) {
-      case 'board':
-        return t('discover.filterBoard.pickBoard', 'Which board');
-      case 'window':
-        return t('discover.filterBoard.axis.when', 'When');
       case 'where':
         return t('discover.filterBoard.axis.where', 'Where');
       case 'courses':
         return t('discover.filterBoard.axis.courses', 'Courses');
-      case 'band':
-        return t('discover.filterBoard.axis.handicap', 'Handicap');
-      case 'competition':
-        return t('discover.filterBoard.axis.competition', 'Competition');
       default:
         return t('discover.filterBoard.title', 'Filters');
     }
@@ -299,14 +364,7 @@ export function BoardFilterPanel({
             padding: '10px 16px 12px',
           }}
         >
-          <span
-            style={{
-              ...KICKER,
-              color: A.INK,
-            }}
-          >
-            {headerTitle()}
-          </span>
+          <span style={{ ...KICKER, color: A.INK }}>{headerTitle()}</span>
           <button
             type="button"
             onClick={() => (screen === 'root' ? onClose() : setScreen('root'))}
@@ -316,10 +374,8 @@ export function BoardFilterPanel({
               padding: '8px 0',
               fontFamily: SANS,
               ...KICKER,
-              /* BRIEF_FILTERS_SHEET_CASE_AND_FEATS 1 — QUIET ACTIONS TAKE THE
-                 SURFACE INK, which on this canvas is white. A.AMBER is a SHARED
-                 analytical token and is NOT repointed; this is a callsite
-                 override, and amber stays on the active selection. */
+              /* QUIET ACTIONS TAKE THE SURFACE INK, which on this canvas is
+                 white. Amber is not spent on controls (S3.7). */
               color: A.INK,
               cursor: 'pointer',
             }}
@@ -328,8 +384,55 @@ export function BoardFilterPanel({
               ? t('discover.filterBoard.done', 'Done')
               : t('discover.filterBoard.back', 'Back')}
           </button>
-
         </div>
+      </div>
+
+      {/* S1 — THE SHOWING HEADER. Outside the scroller, so it never scrolls
+          away: every tap on any chip moves this figure where the eye already is. */}
+      <div
+        style={{
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'space-between',
+          gap: 12,
+          padding: '12px 16px 14px',
+          borderBottom: `1px solid ${A.BORDER}`,
+          background: A.CANVAS,
+        }}
+      >
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: A.DIM }}>
+            {t('discover.filterBoard.showing', 'Showing')}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, marginTop: 4 }}>
+            <span
+              className="tabular-nums"
+              style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK, lineHeight: 1 }}
+            >
+              {footN}
+            </span>
+            <span style={{ ...KICKER, color: A.MUTE }}>{unitLabel}</span>
+          </div>
+        </div>
+        {/* S1.4 — RESET lives here now. Disabled and dim at defaults. */}
+        <button
+          type="button"
+          disabled={atDefaults}
+          onClick={() => onChange({ ...DEFAULT_FILTERS })}
+          style={{
+            flexShrink: 0,
+            background: 'transparent',
+            border: 'none',
+            padding: '8px 0',
+            fontFamily: SANS,
+            ...KICKER,
+            color: atDefaults ? A.DIM : A.MUTE,
+            cursor: atDefaults ? 'default' : 'pointer',
+          }}
+        >
+          {t('discover.filterBoard.reset', 'Reset all filters')}
+        </button>
       </div>
 
       <div
@@ -344,139 +447,119 @@ export function BoardFilterPanel({
       >
         {screen === 'root' && (
           <>
-            <SectionLabel>{t('discover.filterBoard.eyebrow', 'The board')}</SectionLabel>
-            <PanelRow
-              label={t('discover.filterBoard.rankedBy', 'Ranked by')}
-              /* SENTENCE CASE — a VALUE, not a label (brief 2). It matches the
-                 option label in WHICH BOARD exactly. */
-              value={rankedByLabel}
-              valueChanged={board !== 'gross'}
-              chevron
-              onClick={() => setScreen('board')}
-            />
+            {/* S2 — WHEN LEADS. It is the only axis whose change moves every
+                other count on the screen. */}
+            <SectionLabel>{t('discover.filterBoard.axis.when', 'When')}</SectionLabel>
+            <ChipWrap>
+              {WINDOW_OPTIONS.map((o) => (
+                <Chip
+                  key={o.key}
+                  label={label(o)}
+                  count={facets.countFor('window', o.key)}
+                  selected={filters.window === o.key}
+                  isDefault={o.key === DEFAULT_FILTERS.window}
+                  onClick={() => set({ window: o.key as WindowKey })}
+                />
+              ))}
+            </ChipWrap>
 
             <SectionLabel>{t('discover.filterBoard.who', 'Who')}</SectionLabel>
-            {SCOPE_OPTIONS.filter((o) => (o.key === 'club' ? clubApplies : true)).map((o) => (
+            <ChipWrap>
+              {SCOPE_OPTIONS.filter((o) => (o.key === 'club' ? clubApplies : true)).map((o) => (
+                <Chip
+                  key={o.key}
+                  label={label(o)}
+                  count={facets.countFor('scope', o.key)}
+                  selected={filters.scope === o.key}
+                  isDefault={o.key === DEFAULT_FILTERS.scope}
+                  onClick={() => set({ scope: o.key })}
+                />
+              ))}
+            </ChipWrap>
+
+            {/* S2.2 — RANKED BY keeps the Rankings / Feats split. A feat IS a
+                board, not an axis laid over one, and the split is how that reads. */}
+            <SectionLabel>{t('discover.filterBoard.rankedBy', 'Ranked by')}</SectionLabel>
+            <SubLabel>{t('discover.filterBoard.rankings', 'Rankings')}</SubLabel>
+            <ChipWrap>
+              {RANKING_BOARD_KEYS.map((key) => (
+                <Chip
+                  key={key}
+                  label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
+                  count={facets.countFor('board', key)}
+                  selected={board === key}
+                  isDefault={key === 'gross'}
+                  onClick={() => onBoardChange(key)}
+                />
+              ))}
+            </ChipWrap>
+            <SubLabel>{t('discover.filterBoard.feats', 'Feats')}</SubLabel>
+            <ChipWrap>
+              {FEAT_BOARD_KEYS.map((key) => (
+                <Chip
+                  key={key}
+                  label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
+                  count={facets.countFor('board', key)}
+                  selected={board === key}
+                  isDefault={false}
+                  onClick={() => onBoardChange(key)}
+                />
+              ))}
+            </ChipWrap>
+
+            <SectionLabel>{t('discover.filterBoard.axis.handicap', 'Handicap')}</SectionLabel>
+            <ChipWrap>
+              {BAND_OPTIONS.filter((o) => (o.key === 'near' ? nearApplies : true)).map((o) => (
+                <Chip
+                  key={o.key}
+                  label={label(o)}
+                  count={facets.countFor('band', o.key)}
+                  selected={filters.band === o.key}
+                  isDefault={o.key === DEFAULT_FILTERS.band}
+                  onClick={() => set({ band: o.key as BandKey })}
+                />
+              ))}
+            </ChipWrap>
+
+            {/* PLAIN COUNTS. NOT A SPLIT: the three do not sum to the total,
+                because a member with a competition round and a social round is
+                counted in both. */}
+            <SectionLabel>{t('discover.filterBoard.axis.competition', 'Competition')}</SectionLabel>
+            <ChipWrap>
+              {COMPETITION_OPTIONS.map((o) => (
+                <Chip
+                  key={o.key}
+                  label={label(o)}
+                  count={facets.countFor('competition', o.key)}
+                  selected={filters.competition === o.key}
+                  isDefault={o.key === DEFAULT_FILTERS.competition}
+                  onClick={() => set({ competition: o.key as CompetitionKey })}
+                />
+              ))}
+            </ChipWrap>
+
+            {/* S2.1 — THE TWO OPEN LISTS ARE THE ONLY THINGS THAT STILL DRILL IN:
+                5 countries with 14 sub-countries, and 254 courses out of a
+                23,295 catalogue. Neither can be a chip row. */}
+            <div style={{ marginTop: 22, borderTop: `1px solid ${A.BORDER}` }}>
               <PanelRow
-                key={o.key}
-                label={label(o)}
-                count={facets.countFor('scope', o.key)}
-                active={filters.scope === o.key}
-                disabled={facets.countFor('scope', o.key) === 0}
-                onClick={() => set({ scope: o.key })}
+                label={t('discover.filterBoard.axis.where', 'Where')}
+                value={whereLabel}
+                valueChanged={filters.regionKind != null || filters.regionValue != null}
+                chevron
+                onClick={() => setScreen('where')}
               />
-            ))}
-
-            <SectionLabel>{t('discover.filterBoard.narrow', 'Narrow it')}</SectionLabel>
-            <PanelRow
-              label={t('discover.filterBoard.axis.when', 'When')}
-              value={windowLabel}
-              valueChanged={filters.window !== DEFAULT_FILTERS.window}
-              chevron
-              onClick={() => setScreen('window')}
-            />
-            <PanelRow
-              label={t('discover.filterBoard.axis.where', 'Where')}
-              value={whereLabel}
-              valueChanged={filters.regionKind != null || filters.regionValue != null}
-              chevron
-              onClick={() => setScreen('where')}
-            />
-            <PanelRow
-              label={t('discover.filterBoard.axis.courses', 'Courses')}
-              value={coursesLabel}
-              valueChanged={filters.courses !== DEFAULT_FILTERS.courses || filters.courseId != null}
-              chevron
-              onClick={() => setScreen('courses')}
-            />
-            <PanelRow
-              label={t('discover.filterBoard.axis.handicap', 'Handicap')}
-              value={bandLabel}
-              valueChanged={filters.band !== DEFAULT_FILTERS.band}
-              chevron
-              onClick={() => setScreen('band')}
-            />
-            {/* B3.1 — COMPETITION, the last of the five NARROW IT rows. */}
-            <PanelRow
-              label={t('discover.filterBoard.axis.competition', 'Competition')}
-              value={competitionLabel}
-              valueChanged={filters.competition !== DEFAULT_FILTERS.competition}
-              chevron
-              onClick={() => setScreen('competition')}
-            />
-            {/* B1.1 — NO FEATS ROW AND NO FEAT DRILLDOWN. There is no p_feat
-                parameter any more; the four feats are BOARDS (B1.2). */}
-
-            <button
-              type="button"
-              onClick={() => onChange({ ...DEFAULT_FILTERS })}
-              style={{
-                ...rowBase,
-                borderBottom: 'none',
-                justifyContent: 'center',
-                /* A BUTTON LABEL: all caps, wide tracking, CSS not locale. */
-                ...KICKER,
-                color: A.MUTE,
-                cursor: 'pointer',
-              }}
-            >
-              {t('discover.filterBoard.reset', 'Reset all filters')}
-            </button>
-
+              <PanelRow
+                label={t('discover.filterBoard.axis.courses', 'Courses')}
+                value={coursesLabel}
+                valueChanged={filters.courses !== DEFAULT_FILTERS.courses || filters.courseId != null}
+                chevron
+                onClick={() => setScreen('courses')}
+              />
+            </div>
+            <div style={{ height: 24 }} />
           </>
         )}
-
-        {screen === 'board' && (
-          <>
-            {/* B1.2 — ELEVEN BOARDS IN TWO LABELLED SECTIONS. Both sections are
-                FIXED LISTS: an option absent from the facet result counts ZERO
-                and renders GREYED, never omitted (facet contract). A feat board
-                is greyed most of the time and that is not a bug (B1.6). */}
-            <SectionLabel>{t('discover.filterBoard.rankings', 'Rankings')}</SectionLabel>
-            {RANKING_BOARD_KEYS.map((key) => (
-              <BoardOption
-                key={key}
-                boardKey={key}
-                active={board === key}
-                count={facets.countFor('board', key)}
-                label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
-                onPick={() => {
-                  onBoardChange(key);
-                  setScreen('root');
-                }}
-              />
-            ))}
-            <SectionLabel>{t('discover.filterBoard.feats', 'Feats')}</SectionLabel>
-            {FEAT_BOARD_KEYS.map((key) => (
-              <BoardOption
-                key={key}
-                boardKey={key}
-                active={board === key}
-                count={facets.countFor('board', key)}
-                label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
-                onPick={() => {
-                  onBoardChange(key);
-                  setScreen('root');
-                }}
-              />
-            ))}
-          </>
-        )}
-
-        {screen === 'window' &&
-          WINDOW_OPTIONS.map((o) => (
-            <PanelRow
-              key={o.key}
-              label={label(o)}
-              count={facets.countFor('window', o.key)}
-              active={filters.window === o.key}
-              disabled={facets.countFor('window', o.key) === 0}
-              onClick={() => {
-                set({ window: o.key as WindowKey });
-                setScreen('root');
-              }}
-            />
-          ))}
 
         {screen === 'where' && (
           <>
@@ -489,7 +572,7 @@ export function BoardFilterPanel({
               }}
             />
             {/* OPEN LISTS. Nations carry their parent country in the facet
-                LABEL column (S2.5) and are grouped by it rather than re-derived. */}
+                LABEL column and are grouped by it rather than re-derived. */}
             {facets.openList('region_country').map((c) => (
               <div key={c.key}>
                 <PanelRow
@@ -572,39 +655,6 @@ export function BoardFilterPanel({
             ))}
           </>
         )}
-
-        {screen === 'band' &&
-          BAND_OPTIONS.filter((o) => (o.key === 'near' ? nearApplies : true)).map((o) => (
-            <PanelRow
-              key={o.key}
-              label={label(o)}
-              count={facets.countFor('band', o.key)}
-              active={filters.band === o.key}
-              disabled={facets.countFor('band', o.key) === 0}
-              onClick={() => {
-                set({ band: o.key as BandKey });
-                setScreen('root');
-              }}
-            />
-          ))}
-
-        {/* B3.3 — PLAIN COUNTS ON ROWS. NOT A SPLIT: the three do not sum to the
-            total, because a member with a competition round and a social round is
-            counted in both. No bar, no percentage, no "X of Y". */}
-        {screen === 'competition' &&
-          COMPETITION_OPTIONS.map((o) => (
-            <PanelRow
-              key={o.key}
-              label={label(o)}
-              count={facets.countFor('competition', o.key)}
-              active={filters.competition === o.key}
-              disabled={facets.countFor('competition', o.key) === 0}
-              onClick={() => {
-                set({ competition: o.key as CompetitionKey });
-                setScreen('root');
-              }}
-            />
-          ))}
       </div>
 
 
@@ -625,7 +675,7 @@ export function BoardFilterPanel({
             minHeight: 48,
             borderRadius: 8,
             border: 'none',
-            /* S3.1 — INK FILL, CANVAS LABEL. Never amber. */
+            /* S5.1 — INK FILL, CANVAS LABEL. Never amber. */
             background: footDisabled ? A.TRACK : A.INK,
             color: footDisabled ? A.DIM : A.CANVAS,
             fontFamily: SANS,
@@ -641,39 +691,35 @@ export function BoardFilterPanel({
   );
 }
 
-/** A board row in WHICH BOARD. A zero count greys it and makes it unselectable. */
-function BoardOption({
-  boardKey,
-  label,
-  count,
-  active,
-  onPick,
-}: {
-  boardKey: BoardKey;
-  label: string;
-  count: number | null;
-  active: boolean;
-  onPick: () => void;
-}) {
-  return (
-    <PanelRow
-      key={boardKey}
-      label={label}
-      count={count}
-      active={active}
-      disabled={count === 0}
-      onClick={onPick}
-    />
-  );
-}
-
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        ...KICKER,
+        fontSize: 9.5,
+        fontWeight: 700,
+        letterSpacing: '0.13em',
+        textTransform: 'uppercase',
         padding: '22px 16px 9px',
         color: A.DIM,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** S2.2 — the Rankings / Feats sub-labels inside RANKED BY. */
+function SubLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        fontSize: 9.5,
+        fontWeight: 700,
+        letterSpacing: '0.13em',
+        textTransform: 'uppercase',
+        padding: '4px 16px 8px',
+        color: A.DIM,
+        opacity: 0.85,
       }}
     >
       {children}
