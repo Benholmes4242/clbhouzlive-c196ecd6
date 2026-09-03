@@ -68,9 +68,9 @@ interface Props {
 /**
  * Surface tokens per ground. INK has no named dark counterpart — plain white.
  *
- * 'panel' and 'heroBoard' share the ink ramp and differ ONLY in surface: the
- * panel rises above the #15171F canvas, the hero board sinks into the photo
- * block. Same component on two grounds — the ground is passed in, never guessed.
+ * 'panel' rises above the canvas; 'heroBoard' stays flush with the canonical
+ * #15171F page ground. Same component on two grounds — the ground is passed in,
+ * never guessed.
  */
 const THEME_TOKENS = {
   light: { surface: SURFACE, ink: INK, mute: INK_MUTE, faint: INK_FAINT, hairline: HAIRLINE_INK_8, press: 'active:bg-black/[0.03]' },
