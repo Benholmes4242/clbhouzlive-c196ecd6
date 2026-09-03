@@ -60,7 +60,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
     <section
       className={cn('relative', !isDark && 'bg-background', className)}
       style={{
-        background: isDark ? '#0A0E14' : undefined,
+        background: isDark ? 'hsl(var(--background))' : undefined,
         borderBottom: hideBorder
           ? 'none'
           : isDark
@@ -137,7 +137,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
             width: 28,
             pointerEvents: 'none',
             background: isDark
-              ? 'linear-gradient(to right, rgba(10,14,20,0), #0A0E14)'
+              ? 'linear-gradient(to right, rgba(21,23,31,0), #15171F)'
               : 'linear-gradient(to right, rgba(248,250,252,0), #F8FAFC)',
           }}
         />

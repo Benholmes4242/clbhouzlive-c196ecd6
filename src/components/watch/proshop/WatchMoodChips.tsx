@@ -1,6 +1,7 @@
 import { memo, useRef } from 'react';
 import { WATCH_MOODS, type WatchMoodId } from './hooks/useWatchMood';
 import { useEdgeFades } from '../shared/useEdgeFades';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface WatchMoodChipsProps {
   active: WatchMoodId;
@@ -21,7 +22,7 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
     <div
       ref={wrapperRef}
       className="relative hrail-edge-fade"
-      style={{ background: '#F8FAFC' }}
+      style={{ background: A.CANVAS }}
     >
       <div
         ref={scrollerRef}
@@ -46,9 +47,9 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
                 fontSize: 12,
                 fontWeight: 600,
                 borderRadius: 15,
-                background: isActive ? 'rgba(15,23,42,0.06)' : 'transparent',
-                border: isActive ? '1px solid rgba(15,23,42,0.20)' : '1px solid rgba(15,23,42,0.07)',
-                color: isActive ? '#0F172A' : '#64748B',
+                background: isActive ? 'rgba(255,255,255,0.10)' : 'transparent',
+                border: isActive ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
+                color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
                 letterSpacing: '-0.01em',
                 gap: 5,
               }}
@@ -66,7 +67,7 @@ function WatchMoodChipsInner({ active, onChange }: WatchMoodChipsProps) {
         className="pointer-events-none absolute top-0 left-0 h-full hrail-fade hrail-fade-left"
         style={{
           width: 5,
-          background: 'linear-gradient(to right, rgba(248,250,252,0) 0%, #F8FAFC 100%)',
+          background: `linear-gradient(to right, rgba(21,23,31,0) 0%, ${A.CANVAS} 100%)`,
           opacity: 0,
           transition: 'opacity 150ms ease',
         }}
