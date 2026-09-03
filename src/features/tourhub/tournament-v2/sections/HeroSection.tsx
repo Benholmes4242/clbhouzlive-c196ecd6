@@ -85,7 +85,7 @@ function Figure({ value, label, tone }: { value: string; label: string; tone?: s
     <div style={{ flex: 1, minWidth: 0 }}>
       <div
         style={{
-          fontSize: 19,
+          fontSize: 17,
           fontWeight: 700,
           lineHeight: 1,
           color: tone ?? '#fff',
@@ -97,12 +97,11 @@ function Figure({ value, label, tone }: { value: string; label: string; tone?: s
       </div>
       <div
         style={{
-          marginTop: 5,
-          // AXIS 10 (hero exception): stat-band column label over photography,
-          // where tracked caps read larger than their point size.
-          fontSize: 10,
+          marginTop: 4,
+          // Settled kicker exception: caps column labels in a constrained row.
+          fontSize: 9.5,
           fontWeight: 700,
-          letterSpacing: '0.14em',
+          letterSpacing: '0.13em',
           color: 'rgba(255,255,255,0.62)',
           textTransform: 'uppercase',
           overflow: 'hidden',
@@ -147,11 +146,11 @@ function PersonLockup({
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
+        gap: 8,
         minWidth: 0,
         background: A.CANVAS,
         borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
-        padding: '11px 16px',
+        padding: '9px 16px',
       }}
     >
       {showAvatar && (
@@ -160,19 +159,19 @@ function PersonLockup({
           playerName={name}
           tourCode={tourCode}
           photoUrl={photoUrl ?? null}
-          size="md"
+          size="sm"
         />
       )}
       <div
         style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 5,
+          gap: 4,
           flexShrink: 0,
-          // AXIS 10 (hero exception): band label / marker, not a sentence.
-          fontSize: 10,
+          // Settled kicker exception: tracked caps band label in a tight row.
+          fontSize: 9.5,
           fontWeight: 700,
-          letterSpacing: '0.16em',
+          letterSpacing: '0.13em',
           color: labelTone ?? 'rgba(255,255,255,0.62)',
           textTransform: 'uppercase',
         }}
@@ -183,7 +182,7 @@ function PersonLockup({
       <div
         style={{
           minWidth: 0,
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: 700,
           color: '#fff',
           overflow: 'hidden',
@@ -198,7 +197,7 @@ function PersonLockup({
           style={{
             marginLeft: 'auto',
             flexShrink: 0,
-            fontSize: 11,
+            fontSize: 10,
             fontWeight: 600,
             color: WHITE_ALPHA_65,
             fontVariantNumeric: 'tabular-nums lining-nums',
@@ -434,12 +433,12 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           justifyContent: 'flex-end',
         }}
       >
-        <div style={{ padding: '10px 16px 12px' }}>
+        <div style={{ padding: '8px 16px 10px' }}>
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              padding: '4px 8px',
+              padding: '3px 7px',
               borderRadius: 4,
               background: chip.bg,
               border: `1px solid ${chip.border}`,
@@ -449,7 +448,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
               color: chip.color,
               letterSpacing: '0.10em',
               textTransform: 'uppercase',
-              marginBottom: 8,
+              marginBottom: 6,
             }}
           >
             {chip.label}
@@ -457,7 +456,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
 
           <h1
             style={{
-              fontSize: 'clamp(22px, 7.2vw, 28px)',
+              fontSize: 'clamp(20px, 6.4vw, 25px)',
               fontWeight: 700,
               color: '#fff',
               lineHeight: 1.04,
@@ -475,10 +474,10 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           {venueLine && (
             <div
               style={{
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: 500,
                 color: 'rgba(255,255,255,0.65)',
-                marginTop: 4,
+                marginTop: 3,
                 fontVariantNumeric: 'tabular-nums lining-nums',
               }}
             >
@@ -495,10 +494,10 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
         <div
           style={{
             background: A.PANEL,
-            padding: '12px 16px 14px',
+            padding: '10px 16px 12px',
             display: 'flex',
             alignItems: 'flex-start',
-            gap: 10,
+            gap: 8,
           }}
         >
           {figures.map((f) => (
@@ -562,7 +561,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           borderLeft: 'none',
           borderRight: 'none',
           borderBottom: 'none',
-          padding: '11px 16px',
+          padding: '9px 16px',
           textAlign: 'left',
           cursor: 'pointer',
           fontFamily: FONT,
@@ -570,17 +569,17 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
       >
         <span
           style={{
-            // AXIS 10 (hero exception): disclosure label, tracked caps.
-            fontSize: 10,
+            // Settled kicker exception: tracked caps disclosure label.
+            fontSize: 9.5,
             fontWeight: 700,
-            letterSpacing: '0.16em',
+            letterSpacing: '0.13em',
             textTransform: 'uppercase',
             color: WHITE_ALPHA_65,
           }}
         >
           {actionLabel}
         </span>
-        <ChevronRight size={14} strokeWidth={2.5} color={WHITE_ALPHA_65} style={{ marginLeft: 'auto' }} aria-hidden />
+        <ChevronRight size={13} strokeWidth={2.5} color={WHITE_ALPHA_65} style={{ marginLeft: 'auto' }} aria-hidden />
       </button>
     </div>
   );
