@@ -3,7 +3,6 @@ import { EXPLORE_MOODS, type ExploreMoodId } from '@/components/explore-tab-new/
 import RegionSheet from '@/components/explore-tab-new/RegionSheet';
 import { useExploreRegionChips } from '@/components/explore-tab-new/hooks/useExploreRegionChips';
 import { scrollPageToTop } from '@/lib/getScrollParent';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface DiscoverExploreShellRowProps {
   activeMood: ExploreMoodId;
@@ -35,7 +34,7 @@ function DiscoverExploreShellRowInner({
     <div
       className="relative"
       style={{
-        background: A.CANVAS,
+        background: '#0A0E14',
         borderBottom: '0.5px solid rgba(255,255,255,0.06)',
       }}
     >
@@ -110,7 +109,7 @@ function DiscoverExploreShellRowInner({
         className="pointer-events-none absolute top-0 right-0 h-full"
         style={{
           width: 28,
-          background: `linear-gradient(to right, rgba(21,23,31,0) 0%, ${A.CANVAS} 100%)`,
+          background: 'linear-gradient(to right, rgba(10,14,20,0) 0%, #0A0E14 100%)',
         }}
       />
 

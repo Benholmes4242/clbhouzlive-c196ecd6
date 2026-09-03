@@ -37,7 +37,7 @@ import {
   COURSE_GRADIENT_DUSK,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
-import { CHARCOAL, FONT } from '../../../_shared/tokens';
+import { FONT, HERO_BOARD_SURFACE } from '../../../_shared/tokens';
 import { heroCanonScrimOn } from '../../../_shared/heroGradient';
 import { getScoreColor } from '../../../_shared/scoreColor';
 
@@ -165,14 +165,17 @@ export function PhotoBand({
           scrim are deleted; this is the canon ramp shared with the other six
           heroes.
 
-          The ramp ends on the shared page canvas so the photograph, ticker,
-          leaderboard and the content below read as one continuous surface. */}
+          THE RECORDED EXCEPTION: it ends on HERO_BOARD_SURFACE, not the canvas.
+          The canon's rule is "no seam against what sits beneath", and what sits
+          beneath this hero is the board. Ending on rgba(0,0,0,0.92) was tried
+          and rejected: the green base gradient bled through as a cast at the top
+          of the board. */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute',
           left: 0, right: 0, bottom: 0, height: 260,
-          background: heroCanonScrimOn(CHARCOAL),
+          background: heroCanonScrimOn(HERO_BOARD_SURFACE),
           zIndex: 2,
         }}
       />

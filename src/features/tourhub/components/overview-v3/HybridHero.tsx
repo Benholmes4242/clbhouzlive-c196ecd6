@@ -46,7 +46,7 @@ import {
 import { BG, INK_15 } from './HybridHero.constants';
 
 
-import { CHARCOAL, SLATE_700, SLATE_800, WHITE_ALPHA_04 } from '../../_shared/tokens';
+import { SLATE_700, SLATE_800 } from '../../_shared/tokens';
 
 // ---------- Skeleton -------------------------------------------------------
 
@@ -60,7 +60,7 @@ export function HybridHeroSkeleton() {
           opacity: 0.6,
         }}
       />
-      <div style={{ height: 56, background: CHARCOAL }} />
+      <div style={{ height: 56, background: '#0F172A', opacity: 0.85 }} />
       <div style={{ flex: 1, background: BG }}>
         {[0, 1, 2, 3].map(i => (
           <div
@@ -68,7 +68,7 @@ export function HybridHeroSkeleton() {
             style={{
               height: i === 0 ? 64 : 48,
               borderBottom: `0.5px solid ${INK_15}`,
-              background: `linear-gradient(90deg, ${CHARCOAL} 0%, ${WHITE_ALPHA_04} 50%, ${CHARCOAL} 100%)`,
+              background: 'linear-gradient(90deg, rgba(15,23,42,0.04) 0%, rgba(15,23,42,0.08) 50%, rgba(15,23,42,0.04) 100%)',
             }}
           />
         ))}

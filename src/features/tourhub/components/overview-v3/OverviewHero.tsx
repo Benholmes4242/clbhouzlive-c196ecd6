@@ -26,7 +26,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HybridHero } from './HybridHero';
 import { PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { useTourSelection } from '../../context/TourSelectionContext';
-import { CHARCOAL, WHITE_ALPHA_04 } from '../../_shared/tokens';
+import { INK_TINT_06 } from '../../_shared/tokens';
 
 const NOOP = () => {};
 
@@ -204,8 +204,7 @@ export function OverviewHero({ height = OVERVIEW_HERO_TOTAL_HEIGHT }: OverviewHe
         style={{
           height,
           borderRadius: 20,
-          background: `linear-gradient(90deg, ${CHARCOAL} 0%, ${WHITE_ALPHA_04} 50%, ${CHARCOAL} 100%)`,
-          backgroundSize: '200% 100%',
+          background: `linear-gradient(135deg, ${INK_TINT_06}, rgba(15,23,42,0.02))`,
         }}
         aria-busy={isLoading}
       />
