@@ -18,12 +18,14 @@
  * If upcoming state ever clips, raise this number — don't tear down the
  * load-bearing definite-height contract for HeroCarousel descendants.
  */
-export const PHOTO_BAND_HEIGHT = 286;   // 360 → 306 (Pass 7.0.2) → 260 (Pass 8) → 286 (Pass 8.1)
+// Pass 9: the overview hero now matches the canonical tour hero height
+// (HERO_MIN_H floor, 280px) — photo band 244 + 36px wire ticker = 280.
+export const PHOTO_BAND_HEIGHT = 244;   // 360 → 306 → 260 → 286 → 244 (Pass 9, match HERO_MIN_H)
 
 export const STRIP_HEIGHT = 62;
 export const ROW_HEIGHT_LEADER = 64;
 export const ROW_HEIGHT_CHASER = 40;
-export const TOTAL_HERO_HEIGHT_TARGET = 657;  // 731 → 677 → 631 → 657 (PHOTO_BAND_HEIGHT 260→286, +26)
+export const TOTAL_HERO_HEIGHT_TARGET = 615;  // 731 → 677 → 631 → 657 → 615 (PHOTO_BAND_HEIGHT 286→244)
 
 // Colours — re-exported from _shared/tokens.ts for hero-internal use.
 // These re-exports preserve existing band-file imports (`import { INK, AMBER, ... } from '../HybridHero.constants'`)
