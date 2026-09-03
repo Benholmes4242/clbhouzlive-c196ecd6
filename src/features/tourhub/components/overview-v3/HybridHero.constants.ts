@@ -18,8 +18,8 @@
  * If upcoming state ever clips, raise this number — don't tear down the
  * load-bearing definite-height contract for HeroCarousel descendants.
  */
-// Pass 9: the overview hero now matches the canonical tour hero height
-// (HERO_MIN_H floor, 280px) — photo band 244 + 36px wire ticker = 280.
+// Pass 9: the overview hero photo band matches the canonical tour hero height
+// (HERO_MIN_H floor, 244px). The 36px wire ticker makes the full carousel 280px.
 export const PHOTO_BAND_HEIGHT = 244;   // 360 → 306 → 260 → 286 → 244 (Pass 9, match HERO_MIN_H)
 
 export const STRIP_HEIGHT = 62;
