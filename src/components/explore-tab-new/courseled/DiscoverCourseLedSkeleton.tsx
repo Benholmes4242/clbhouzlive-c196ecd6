@@ -5,39 +5,9 @@ import {
   CARD_SHELL,
   CHIP_RADIUS,
   RHYTHM,
-  SCOPE_PILL_RADIUS,
   THUMBNAIL_RADIUS,
   WELL_RADIUS,
 } from './tokens';
-
-import {
-  COURSE_GRADIENT,
-  COURSE_SCRIMS,
-  HERO_TOP_SCRIM,
-} from '@/features/tourhub/components/overview-v3/HybridHero.constants';
-
-/**
- * THE ROUND TILE'S DARK REGION, MODELLED WITH THE LIVE TILE'S OWN CONSTANTS
- * (BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §6). The tile's fallback is no longer the
- * near-black HERO_BASE — it is the TOUR'S COURSE_GRADIENT under COURSE_SCRIMS
- * and the two scaled scrims. A shell still painted near-black would model a
- * colour the page no longer has, so it composes the same stack at the same
- * heights rather than approximating it with a hex.
- *
- * BRIEF_ROUND_TILE_HERO_TOUR_MATCH §7: the heights are now the TOUR'S
- * PROPORTIONS against the 191px dark region (28.0% -> 53, 90.9% -> 174), and
- * the bottom layer is the tile's own inline gradient ending at FULL opacity —
- * NOT a scrim that stops at 0.92, which would let
- * COURSE_GRADIENT's sand bottom stop cast through.
- */
-const SK_TILE_BOTTOM_SCRIM =
-  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,1) 100%)';
-const SK_ROUND_HERO_BG = [
-  `${HERO_TOP_SCRIM} top / 100% 53px no-repeat`,
-  `${SK_TILE_BOTTOM_SCRIM} bottom / 100% 174px no-repeat`,
-  COURSE_SCRIMS,
-  COURSE_GRADIENT,
-].join(', ');
 
 /**
  * DISCOVER, COURSE-LED — loading silhouette.
