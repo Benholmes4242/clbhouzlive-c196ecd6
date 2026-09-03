@@ -30,7 +30,15 @@ export interface RotationRow {
 export interface BoardPick {
   board: BoardKey;
   window: WindowKey;
+  /**
+   * BRIEF_DISCOVER_RECENT_FIRST_DEFAULT S3.6 — the scope the session ACTUALLY
+   * landed on, recorded so a remount never re-evaluates the thin-circle
+   * fallback. Absent on the rotated/handicap picks, which always carry
+   * DEFAULT_FILTERS.scope.
+   */
+  scope?: ScopeKey;
 }
+
 
 /** R3.1 — the silent fallback. No error state, no empty board, no retry. */
 export const FALLBACK_PICK: BoardPick = {
