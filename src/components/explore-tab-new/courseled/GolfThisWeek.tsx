@@ -58,11 +58,11 @@ import {
  * a board that disappears when a filter bites teaches a member nothing.
  */
 
-/** Six POSITIONS on the page. A tie crossing T6 is kept whole. */
-const VISIBLE_POSITIONS = 6;
+/** Eight POSITIONS on the page. A tie crossing T8 is kept whole. */
+const VISIBLE_POSITIONS = 8;
 
 /**
- * ONE READ SERVES THE PAGE AND THE PIN. The page shows six positions; the read takes
+ * ONE READ SERVES THE PAGE AND THE PIN. The page shows eight positions; the read takes
  * two hundred so the member's own row can be FOUND and pinned without a second
  * query (S5.4). Past two hundred the pin is simply absent — a member ranked
  * 300th is told their position by the see-all sheet, not by a third round trip.
