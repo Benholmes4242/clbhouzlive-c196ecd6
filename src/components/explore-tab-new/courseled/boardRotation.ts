@@ -52,10 +52,22 @@ export const ROTATION_SESSION_KEY = 'clbhouz.discover.rotation.pick.v1';
 export const ROTATION_LAST_KEY = 'clbhouz.discover.rotation.last.v1';
 /**
  * F1.4 — the last calendar day Discover was entered, as a LOCAL YYYY-MM-DD
- * string. A date string, not a timestamp: F1.3 forbids a rolling 24 hours,
- * which would drift the "first" visit an hour later every day.
+ * string.
+ *
+ * DEPRECATED (BRIEF_DISCOVER_RECENT_FIRST_DEFAULT S1.1). The landing sequence is
+ * three deep per calendar day, so a yes/no "was this the first session today" is
+ * no longer enough; DAY_SESSIONS_KEY answers "which session today is this".
+ * Exported unused for one release so nothing else breaks.
  */
 export const LAST_SEEN_DATE_KEY = 'clbhouz.discover.lastSeenDate.v1';
+
+/**
+ * S1.1 — THE DAY'S SESSION COUNTER, in localStorage as
+ * { date: 'YYYY-MM-DD', n: 2 }. The date is the member's OWN local calendar
+ * date (S1.4), so the daily reset cannot drift.
+ */
+export const DAY_SESSIONS_KEY = 'clbhouz.discover.daySessions.v1';
+
 
 /** F1.3 — the member's OWN local calendar date. Never UTC, never rolling. */
 export function localDateKey(now: Date = new Date()): string {
