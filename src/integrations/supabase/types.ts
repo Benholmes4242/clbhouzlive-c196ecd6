@@ -19190,6 +19190,9 @@ export type Database = {
           is_tie: boolean
           net_score: number
           play_date: string
+          pool_courses: number
+          pool_members: number
+          pool_rounds: number
           pos: number
           profile_photo_url: string
           sort_value: number
