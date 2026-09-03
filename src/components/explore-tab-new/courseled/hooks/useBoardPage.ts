@@ -8,9 +8,10 @@ import type { BoardFilters, BoardKey } from '../boardFilters';
  *
  * RANKING IS THE DATABASE'S JOB. public.get_board_page returns the page ALREADY
  * ORDERED, already deduped one row per member where that applies, with `pos`,
- * `is_tie` and a `total_count` on every row. There is no client-side sort, no
- * client-side dedupe and NO CLIENT-SIDE CAP: the only limit is p_limit
- * (S1.1/S1.3). The old GOLF_WEEK_FETCH = 120 made any window wider than a
+ * `is_tie`, `total_count` and the pool columns `pool_rounds`, `pool_courses`,
+ * `pool_members` on every row. There is no client-side sort, no client-side
+ * dedupe and NO CLIENT-SIDE CAP: the only limit is p_limit (S1.1/S1.3). The
+ * old GOLF_WEEK_FETCH = 120 made any window wider than a
  * fortnight silently mean "the most recent 120 rounds".
  *
  * THE RANK COLUMN IS `pos`, NOT `position` (S1.2) — `position` is reserved in
