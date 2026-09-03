@@ -109,13 +109,15 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
   const [pickedFilters, setFilters] = useState<BoardFilters | null>(null);
 
   /* Nothing is special-cased downstream: the entry pick is applied as a board
-     plus the standard filters, exactly as a member's own selection would be
-     (F3.2 — only the board and the window can differ). */
+     plus the standard filters, exactly as a member's own selection would be.
+     S4.1 — the entry supplies board AND scope; the applied filter line then
+     reads the real state (S4.2) and says YOUR CIRCLE or EVERYONE accordingly. */
   useEffect(() => {
     if (pickedBoard || !entry.resolved || !entry.board) return;
     setBoard(entry.board);
-    setFilters({ ...DEFAULT_FILTERS, window: entry.window });
-  }, [pickedBoard, entry.resolved, entry.board, entry.window]);
+    setFilters({ ...DEFAULT_FILTERS, window: entry.window, scope: entry.scope });
+  }, [pickedBoard, entry.resolved, entry.board, entry.window, entry.scope]);
+
 
   /* H4.2 — BEFORE THE INDEX RESOLVES THERE IS NO BOARD. The reads stay parked
      and the section holds its loading state rather than rendering gross and
