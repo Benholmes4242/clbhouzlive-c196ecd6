@@ -69,7 +69,7 @@ const VISIBLE_POSITIONS = 10;
  */
 const PAGE_FETCH = 200;
 
-const HERO_H = 300;
+const HERO_H = 132;
 
 export interface GolfThisWeekProps {
   userId: string | undefined;
@@ -221,7 +221,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           courseName={leader?.course_name ?? null}
           imageUrl={heroImage}
           pending={heroCourseIds.length > 0 && heroMeta.isPending}
-          initialsSize={34}
+          initialsSize={26}
           style={{ position: 'absolute', inset: 0 }}
         />
         <div
@@ -229,7 +229,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           style={{
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(to top, ${A.CANVAS} 0%, rgba(21,23,31,0.82) 20%, rgba(21,23,31,0.34) 58%, rgba(21,23,31,0.08) 100%)`,
+            background: `linear-gradient(to top, ${A.CANVAS} 0%, rgba(21,23,31,0.80) 34%, rgba(21,23,31,0.30) 72%, rgba(21,23,31,0.06) 100%)`,
           }}
         />
         <div
@@ -248,13 +248,39 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           <h2 style={{ margin: '6px 0 0', fontSize: 25, fontWeight: 700, letterSpacing: '0.005em', textTransform: 'uppercase', color: DISCOVER_FACT }}>
             {ready ? boardTitle : '\u00a0'}
           </h2>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 12, whiteSpace: 'nowrap', visibility: ready ? 'visible' : 'hidden' }}>
-            <Stat value={String(pool.rounds)} label={t('discover.filterBoard.railRounds', 'ROUNDS', { count: pool.rounds })} />
-            <Stat value={String(pool.courses)} label={t('discover.filterBoard.railCourses', 'COURSES', { count: pool.courses })} />
-            <Stat value={String(pool.members)} label={t('discover.filterBoard.railMembers', 'MEMBERS', { count: pool.members })} />
-            <Stat value={days} label={t('discover.filterBoard.railDays', 'DAYS', { count: Number(days) || 2 })} />
-          </div>
         </div>
+      </div>
+
+      {ready && leader?.course_name ? (
+        <div
+          style={{
+            ...KICKER,
+            padding: '8px 14px 0',
+            color: A.DIM,
+            textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {leader.course_name}
+        </div>
+      ) : null}
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 18,
+          padding: '10px 14px 12px',
+          whiteSpace: 'nowrap',
+          visibility: ready ? 'visible' : 'hidden',
+        }}
+      >
+        <Stat value={String(pool.rounds)} label={t('discover.filterBoard.railRounds', 'ROUNDS', { count: pool.rounds })} />
+        <Stat value={String(pool.courses)} label={t('discover.filterBoard.railCourses', 'COURSES', { count: pool.courses })} />
+        <Stat value={String(pool.members)} label={t('discover.filterBoard.railMembers', 'MEMBERS', { count: pool.members })} />
+        <Stat value={days} label={t('discover.filterBoard.railDays', 'DAYS', { count: Number(days) || 2 })} />
       </div>
 
       {/* G1 — THE BAR STICKS. It scrolls up with the hero first, then pins

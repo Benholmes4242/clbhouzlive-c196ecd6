@@ -5,39 +5,9 @@ import {
   CARD_SHELL,
   CHIP_RADIUS,
   RHYTHM,
-  SCOPE_PILL_RADIUS,
   THUMBNAIL_RADIUS,
   WELL_RADIUS,
 } from './tokens';
-
-import {
-  COURSE_GRADIENT,
-  COURSE_SCRIMS,
-  HERO_TOP_SCRIM,
-} from '@/features/tourhub/components/overview-v3/HybridHero.constants';
-
-/**
- * THE ROUND TILE'S DARK REGION, MODELLED WITH THE LIVE TILE'S OWN CONSTANTS
- * (BRIEF_ROUND_TILE_HERO_TOUR_COLOUR §6). The tile's fallback is no longer the
- * near-black HERO_BASE — it is the TOUR'S COURSE_GRADIENT under COURSE_SCRIMS
- * and the two scaled scrims. A shell still painted near-black would model a
- * colour the page no longer has, so it composes the same stack at the same
- * heights rather than approximating it with a hex.
- *
- * BRIEF_ROUND_TILE_HERO_TOUR_MATCH §7: the heights are now the TOUR'S
- * PROPORTIONS against the 191px dark region (28.0% -> 53, 90.9% -> 174), and
- * the bottom layer is the tile's own inline gradient ending at FULL opacity —
- * NOT a scrim that stops at 0.92, which would let
- * COURSE_GRADIENT's sand bottom stop cast through.
- */
-const SK_TILE_BOTTOM_SCRIM =
-  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,1) 100%)';
-const SK_ROUND_HERO_BG = [
-  `${HERO_TOP_SCRIM} top / 100% 53px no-repeat`,
-  `${SK_TILE_BOTTOM_SCRIM} bottom / 100% 174px no-repeat`,
-  COURSE_SCRIMS,
-  COURSE_GRADIENT,
-].join(', ');
 
 /**
  * DISCOVER, COURSE-LED — loading silhouette.
@@ -191,228 +161,40 @@ export function FriendsRail() {
   );
 }
 
-/**
- * GOLF THIS WEEK. MEASURED off GolfThisWeek.tsx after BRIEF_ROUND_TILE_THE_MOMENT:
- * 256 wide, no border and a 1px shadow, then a 191px DARK REGION — the 156px
- * hero plus the member row, which now sits ON the photograph and its scrims
- * (BRIEF_ROUND_TILE_PHOTO_THROUGH_MEMBER_ROW, BRIEF_ROUND_TILE_HERO_TOUR_COLOUR), then the dark feed well (hairline on all four sides) at a FIXED 135px running to the
- * card's bottom edge: its header rule and the 96px two-rows-of-nine scorecard. Above the rail: the
- * count/region readout row, the pills row and the best-of-week band, all of
- * which the live section renders before its first card and none of which may
- * appear later.
- */
-
-
 export function GolfThisWeekRail() {
   return (
-    <section>
-      {/* No heading. This section leads the page, directly under the chrome
-          island, and its pills state its scope more clearly than a title would.
-          Every section below it keeps the glyph-and-heading treatment. */}
+    <section style={{ margin: '0 -14px' }}>
       <div
         style={{
+          height: 'calc(132px + env(safe-area-inset-top, 0px))',
+          background: A.PANEL,
           display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: 12,
-          /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
-             gives 16px of clearance everywhere. THIS IS THE ONLY PLACE THE SHELL
-             APPLIES IT — the default export's wrapper used to apply it again
-             (BRIEF_DISCOVER_SKELETON_RESYNC §2), which started the shell ~70px
-             LOW and made the page settle UPWARD. It lives here because that is
-             where the live page puts it (GolfThisWeek, MICRO_BRIEF_ROUNDS_
-             SECTION_CHROME S1.4), and GolfThisWeek renders this shell itself. */
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
-          marginBottom: 12,
-          minWidth: 0,
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          padding: 'env(safe-area-inset-top, 0px) 14px 16px',
+          boxSizing: 'border-box',
         }}
       >
-
-        {/* THE READOUT: "12 rounds · 4 courses · 7 days" at KICKER (10 / 700 /
-            0.16em / uppercase) MEASURES 208 at 524px. The old 118 modelled the
-            two-part string that BRIEF_DISCOVER_ORDER_AND_LABELS replaced. */}
-        <Bar style={{ height: 9, width: 206 }} />
-        <Bar style={{ height: 34, width: 100, borderRadius: 999 }} />
-      </div>
-      <div style={{ display: 'flex', gap: 8, padding: '2px 0 14px' }}>
-        {[64, 74, 60, 56].map((w, i) => (
-          <Bar key={i} style={{ height: 34, width: w, borderRadius: SCOPE_PILL_RADIUS }} />
-        ))}
-      </div>
-      {/* BRIEF_BAND_TILES_PODIUM §7 — measured against a full live podium:
-          eyebrow, 40px face + 34px leader figure, margin chip, hairline, and two
-          compact chasers. Sparse live cards collapse, by explicit decision;
-          this shell models the full state so resolving content never pushes the
-          round rail downward.
-
-          WHY THREE ROWS AND NOT ONE: in the current data
-          three of the four categories clear their floor with three or more
-          distinct members. A one-row shell would under-measure the common full
-          state by 89px and strand the band exactly as the old strip did.
-          THREE CHIPS, NOT FOUR: MOST IMPROVED renders only when a falling index
-          exists, and a skeleton is never larger than the smallest settled state. */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 12 }}>
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            data-band-podium-skeleton
-            style={{
-              background: A.PANEL,
-              border: 'none',
-              borderRadius: CARD_RADIUS,
-              boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
-              overflow: 'hidden',
-              flex: '1 0 230px',
-              minWidth: 230,
-              padding: '11px 12px 12px',
-              boxSizing: 'border-box',
-            }}
-          >
-            {/* The eyebrow row: label left, unit right (§2). */}
-            <div
-              style={{
-                height: 12,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Bar style={{ height: 8, width: 66 }} />
-              <Bar style={{ height: 8, width: 26 }} />
-            </div>
-
-            {/* Leader: 40px face, 34px figure and name. */}
-            <div style={{ marginTop: 8 }}>
-              <div
-                style={{
-                  minHeight: 64,
-                  display: 'grid',
-                  gridTemplateColumns: '40px minmax(0, 1fr)',
-                  alignItems: 'center',
-                  gap: 10,
-                }}
-              >
-                <Bar style={{ height: 42, width: 40, borderRadius: '34%' }} />
-                <div>
-                  <Bar style={{ height: 31, width: 58 }} />
-                  <Bar style={{ height: 10, width: 84, marginTop: 5 }} />
-                </div>
-              </div>
-              <Bar style={{ height: 20, width: 76, marginTop: 8 }} />
-              <div style={{ height: 1, background: A.HAIRLINE, marginTop: 12 }} />
-              {[0, 1].map((j) => (
-                <div
-                  key={j}
-                  style={{
-                    height: 34,
-                    borderTop: j === 0 ? 'none' : `1px solid ${A.HAIRLINE}`,
-                    boxSizing: 'border-box',
-                    display: 'grid',
-                    gridTemplateColumns: '12px 16px minmax(0, 1fr) 22px 18px',
-                    alignItems: 'center',
-                    gap: 6,
-                  }}
-                >
-                  <Bar style={{ height: 8, width: 7 }} />
-                  <Bar style={{ height: 16, width: 16, borderRadius: '34%' }} />
-                  <Bar style={{ height: 10, width: j === 0 ? 84 : 66 }} />
-                  <Bar style={{ height: 10, width: 22 }} />
-                  <Bar style={{ height: 9, width: 18 }} />
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+        <Bar style={{ height: 9, width: 112 }} />
+        <Bar style={{ height: 25, width: 190, marginTop: 6 }} />
       </div>
 
-
-
-      <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            style={{
-              ...CARD_SHELL,
-              width: 224,
-              flexShrink: 0,
-              padding: 0,
-              /* The live card lost its border for a shadow
-                 (BRIEF_ROUND_TILE_LIGHT_REFINEMENT §S1.5) — so does its
-                 placeholder, or the first frame outlines a card the second
-                 frame does not. */
-              border: 'none',
-              boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
-            }}
-          >
-            {/* THE DARK REGION, 167 = the 132 hero (BRIEF_GOLF_THIS_WEEK_P1_P3
-                §3.3) + the member row's 8/19/8. The live tile's hero runs behind
-                the row, so the shell's dark block extends and the row's bars sit
-                ON it rather than below it. A skeleton updated later is a skeleton
-                that is already wrong. */}
-            <div
-              style={{
-                height: 167,
-
-                width: '100%',
-                background: SK_ROUND_HERO_BG,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
-                padding: '8px 10px 8px',
-                boxSizing: 'border-box',
-              }}
-            >
-              {/* The member row carries the score. A.TRACK would vanish on this
-                  fill, so the bars take a white at 16%. */}
-              <div style={{ height: 19, display: 'flex', alignItems: 'center', gap: 7 }}>
-                <Bar
-                  style={{
-                    height: 19,
-                    width: 19,
-                    borderRadius: '34%',
-                    backgroundColor: 'rgba(255,255,255,0.16)',
-                  }}
-                />
-                <Bar
-                  style={{ height: 11, width: 92, backgroundColor: 'rgba(255,255,255,0.16)' }}
-                />
-                <Bar
-                  style={{
-                    height: 12,
-                    width: 34,
-                    marginLeft: 'auto',
-                    backgroundColor: 'rgba(255,255,255,0.16)',
-                  }}
-                />
-              </div>
-            </div>
-            {/* THE FOOT, 44 (BRIEF_GOLF_THIS_WEEK_P1_P3 §3.1/§3.4). THE WELL IS
-                GONE from the live card — the curve and the eighteen hole marks
-                moved behind SEE THE CARD — so the shell drops it in the same pass
-                rather than promising a scorecard the settled card does not draw.
-                One optional reference line and the action, both flat bars. */}
-            <div
-              style={{
-                height: 44,
-                boxSizing: 'border-box',
-                padding: '6px 12px 8px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Bar style={{ height: 9, width: 128 }} />
-              <Bar style={{ height: 8, width: 72 }} />
-            </div>
-
-
-          </div>
-        ))}
+      {/* The optional course caption renders only after row 1 resolves, so the
+          unresolved shell reserves no caption height. The stat rail does reserve
+          its settled line exactly as the live visibility hold does. */}
+      <div style={{ height: 39, padding: '10px 14px 12px', boxSizing: 'border-box' }}>
+        <Bar style={{ height: 17, width: 270 }} />
       </div>
-      {/* See-all placeholder sits below the first card and does NOT scroll. */}
-      <div style={{ marginTop: 8, width: 224 }}>
-        <TextBar w={110} h={10} />
+
+      <div style={{ height: 48, background: A.PANEL, borderTop: `1px solid ${A.BORDER}`, borderBottom: `1px solid ${A.BORDER}` }} />
+
+      <div style={{ marginTop: 16, padding: '0 14px' }}>
+        <div style={{ height: 240 }} />
+      </div>
+
+      {/* Courses played settles as one closed terminal-style row. */}
+      <div style={{ marginTop: 30, padding: '0 14px' }}>
+        <div style={{ height: 47, borderBottom: `1px solid ${A.BORDER}` }} />
       </div>
     </section>
   );
