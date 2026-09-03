@@ -936,6 +936,16 @@
     "hero": {
       "viewScorecard": "Ver tarjeta"
     },
+    "filterBoard": {
+      "railRounds_one": "RONDA",
+      "railRounds_other": "RONDAS",
+      "railCourses_one": "CAMPO",
+      "railCourses_other": "CAMPOS",
+      "railMembers_one": "MIEMBRO",
+      "railMembers_other": "MIEMBROS",
+      "railDays_one": "DÍA",
+      "railDays_other": "DÍAS"
+    },
     "lens": {
       "suggested": "Suggested",
       "top100": "Top 100",
