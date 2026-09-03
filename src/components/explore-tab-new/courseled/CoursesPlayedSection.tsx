@@ -61,7 +61,6 @@ export function CoursesPlayedSection({
   /* C5.5 — one row open at a time. */
   const [openId, setOpenId] = useState<string | null>(null);
   const [seeAll, setSeeAll] = useState(false);
-  const [sectionOpen, setSectionOpen] = useState(false);
 
   const win = WINDOW_SHORT[filters.window];
   const windowLabel = t(win.i18n, win.label);
@@ -78,11 +77,25 @@ export function CoursesPlayedSection({
   /* C2.3 — the member has already said which course they care about. */
   if (filters.courses === 'one') return null;
 
-  /* C6.2 — the section now settles closed, so its shell holds that one row. */
+  /* C6.2 — a skeleton at the height the section will occupy; it expands
+     outwards only, and never renders short and grows. */
   if (courses.isPending) {
     return (
       <section aria-hidden style={{ fontFamily: SANS }}>
-        <div style={{ height: 47, borderBottom: `1px solid ${A.BORDER}` }} />
+        <div style={{ height: 14, width: 130, background: A.PANEL, borderRadius: 3 }} />
+        <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
+          <div style={{ height: 15, width: 72, background: A.PANEL, borderRadius: 3 }} />
+          <div style={{ height: 15, width: 58, background: A.PANEL, borderRadius: 3 }} />
+        </div>
+        <div style={{ height: 20, marginTop: 12, borderBottom: `1px solid ${A.BORDER}` }} />
+        <div>
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <div
+              key={i}
+              style={{ height: ROW_H, borderTop: i === 0 ? 'none' : `1px solid ${A.BORDER}` }}
+            />
+          ))}
+        </div>
       </section>
     );
   }
@@ -93,71 +106,38 @@ export function CoursesPlayedSection({
 
   return (
     <section style={{ fontFamily: SANS, ...FIGS }}>
-      <button
-        type="button"
-        onClick={() => setSectionOpen((current) => !current)}
-        aria-expanded={sectionOpen}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-          padding: '14px 0',
-          background: 'transparent',
-          border: 'none',
-          borderBottom: `1px solid ${A.BORDER}`,
-          fontFamily: SANS,
-          cursor: 'pointer',
-          textAlign: 'left',
-        }}
-      >
-        <span style={{ ...KICKER, color: A.INK }}>
+      <div>
+        <span style={{ ...KICKER, display: 'block', color: A.INK }}>
           {t('discover.coursesPlayed.title', 'Courses played')}
         </span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <span style={{ ...KICKER, color: A.MUTE }}>
-            {t('discover.coursesPlayed.nCourses', '{{count}} courses', { count: total })}
-          </span>
-          {sectionOpen ? (
-            <ChevronUp size={16} strokeWidth={2} color={A.MUTE} aria-hidden />
-          ) : (
-            <ChevronDown size={16} strokeWidth={2} color={A.MUTE} aria-hidden />
-          )}
-        </span>
-      </button>
-
-      {sectionOpen ? (
-        <div style={{ paddingTop: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginTop: 8 }}>
           <CourseStat value={String(total)} label={t('discover.filterBoard.col.courses', 'COURSES')} />
           <CourseStat value={days} label={t('discover.filterBoard.col.days', 'DAYS')} />
-          </div>
-
-          <div style={{ marginTop: 12 }}>
-            <CourseHeaderRow />
-            {rows.map((row, index) => (
-              <CourseRow
-                key={row.course_id}
-                row={row}
-                first={index === 0}
-                open={openId === row.course_id}
-                onToggle={() => toggle(row.course_id)}
-                userId={userId}
-                filters={filters}
-                onCoursePress={onCoursePress}
-                onMemberPress={onMemberPress}
-              />
-            ))}
-            {total > 6 && (
-              <ListTerminalRow
-                label={t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: total })}
-                onPress={() => setSeeAll(true)}
-              />
-            )}
-          </div>
         </div>
-      ) : null}
+      </div>
+
+      <div style={{ marginTop: 12 }}>
+        <CourseHeaderRow />
+        {rows.map((row, index) => (
+          <CourseRow
+            key={row.course_id}
+            row={row}
+            first={index === 0}
+            open={openId === row.course_id}
+            onToggle={() => toggle(row.course_id)}
+            userId={userId}
+            filters={filters}
+            onCoursePress={onCoursePress}
+            onMemberPress={onMemberPress}
+          />
+        ))}
+        {total > 6 && (
+          <ListTerminalRow
+            label={t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: total })}
+            onPress={() => setSeeAll(true)}
+          />
+        )}
+      </div>
 
       {/* G5 — THE SEE ALL DOES SOMETHING. Same RPC, same filter state, p_limit
           raised; the sheet's rows are the SAME row component as here (G5.3). */}
