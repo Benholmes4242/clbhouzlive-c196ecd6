@@ -32,11 +32,10 @@ import { useTranslation } from 'react-i18next';
 import { TickerShell } from '@/components/shared/wire/TickerShell';
 import { fmtScore, type TickerRow } from '../HybridHero.utils';
 import { NUMERIC_STYLE } from '../HybridHero.constants';
-import { HERO_BOARD_SURFACE, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { CHARCOAL, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 
-// ONE CONTINUOUS SURFACE with the hero board below it — never a local copy of
-// CHARCOAL again, or deepening the board silently leaves a seam here.
-const BG = HERO_BOARD_SURFACE;
+// One continuous surface with the page canvas and hero board below it.
+const BG = CHARCOAL;
 const AMBER = '#F7931E';
 const GOLD = '#FDE68A';
 
