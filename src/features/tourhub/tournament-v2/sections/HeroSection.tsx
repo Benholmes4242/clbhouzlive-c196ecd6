@@ -30,7 +30,7 @@ import {
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { HERO_MIN_H } from '../../_shared/tokens';
-import { heroCanonScrimOn } from '../../_shared/heroGradient';
+import { heroCanonBackground } from '../../_shared/heroGradient';
 
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 
@@ -41,11 +41,9 @@ import type { EventState } from '../../components/overview-v3/useTournamentPulse
 // course detail hero (GolfClubView). Do not re-declare it locally.
 
 /**
- * ONE canon scrim — heroCanonScrimOn (BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON).
- * The canon is that the ramp ends on whatever surface sits BENEATH the photo.
- * That surface is no longer the canvas: it is the stat strip, so the gradient
- * and the flat fallback both terminate on HERO_BOARD_SURFACE_SOFT (#121820).
- * No text shadow, no second layer.
+ * ONE canon scrim — heroCanonBackground (BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON).
+ * It matches Course Detail and the canonical Discover/Courses hero treatment:
+ * one full-frame ramp terminating on the dark canvas. No second layer.
  */
 const FALLBACK_BG = `linear-gradient(180deg, #1A2130 0%, ${HERO_BOARD_SURFACE_SOFT} 100%)`;
 const IMAGE_FOCAL = '50% 72%';
@@ -227,12 +225,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
     state === 'upcoming' ? meta.id : null,
   );
 
-  // heroCanonBackground() hard-codes the CANVAS termination, so the canon's own
-  // heroCanonScrimOn() is used with the surface beneath this hero instead.
-  const scrim = heroCanonScrimOn(HERO_BOARD_SURFACE_SOFT);
-  const background = imageUrl
-    ? `${scrim}, url("${imageUrl}") ${IMAGE_FOCAL} / cover no-repeat`
-    : `${scrim}, ${FALLBACK_BG}`;
+  const background = heroCanonBackground(imageUrl, FALLBACK_BG, IMAGE_FOCAL);
 
 
   const leader =
