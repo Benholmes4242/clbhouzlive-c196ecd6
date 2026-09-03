@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { ListFilter } from 'lucide-react';
 
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
-import { HERO_STRIP_H } from '@/features/tourhub/_shared/tokens';
 import { DISCOVER_STICKY_FILTER_Z } from '@/lib/zLayers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from './tokens';
@@ -59,16 +58,18 @@ import {
  * a board that disappears when a filter bites teaches a member nothing.
  */
 
-/** Ten POSITIONS on the page. A tie crossing T10 is kept whole. */
-const VISIBLE_POSITIONS = 10;
+/** Six POSITIONS on the page. A tie crossing T6 is kept whole. */
+const VISIBLE_POSITIONS = 6;
 
 /**
- * ONE READ SERVES THE PAGE AND THE PIN. The page shows ten positions; the read takes
+ * ONE READ SERVES THE PAGE AND THE PIN. The page shows six positions; the read takes
  * two hundred so the member's own row can be FOUND and pinned without a second
  * query (S5.4). Past two hundred the pin is simply absent — a member ranked
  * 300th is told their position by the see-all sheet, not by a third round trip.
  */
 const PAGE_FETCH = 200;
+
+const HERO_H = 300;
 
 export interface GolfThisWeekProps {
   userId: string | undefined;
@@ -210,7 +211,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
       <div
         style={{
           position: 'relative',
-          height: `calc(${HERO_STRIP_H}px + env(safe-area-inset-top, 0px))`,
+          height: `calc(${HERO_H}px + env(safe-area-inset-top, 0px))`,
           overflow: 'hidden',
           background: A.PANEL,
         }}
@@ -220,7 +221,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           courseName={leader?.course_name ?? null}
           imageUrl={heroImage}
           pending={heroCourseIds.length > 0 && heroMeta.isPending}
-          initialsSize={26}
+          initialsSize={34}
           style={{ position: 'absolute', inset: 0 }}
         />
         <div
@@ -228,7 +229,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           style={{
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(to top, ${A.CANVAS} 0%, rgba(21,23,31,0.80) 34%, rgba(21,23,31,0.30) 72%, rgba(21,23,31,0.06) 100%)`,
+            background: `linear-gradient(to top, ${A.CANVAS} 0%, rgba(21,23,31,0.82) 20%, rgba(21,23,31,0.34) 58%, rgba(21,23,31,0.08) 100%)`,
           }}
         />
         <div
@@ -238,32 +239,22 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end',
-            padding: 'env(safe-area-inset-top, 0px) 14px 10px',
+            padding: 'env(safe-area-inset-top, 0px) 14px 16px',
           }}
         >
           <span style={{ ...KICKER, color: A.BODY }}>
             {t('discover.board.circuitEyebrow', 'The amateur circuit')}
           </span>
-          <h2 style={{ margin: '4px 0 0', fontSize: 25, fontWeight: 700, letterSpacing: '0.005em', textTransform: 'uppercase', color: DISCOVER_FACT }}>
+          <h2 style={{ margin: '6px 0 0', fontSize: 25, fontWeight: 700, letterSpacing: '0.005em', textTransform: 'uppercase', color: DISCOVER_FACT }}>
             {ready ? boardTitle : '\u00a0'}
           </h2>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 12, whiteSpace: 'nowrap', visibility: ready ? 'visible' : 'hidden' }}>
+            <Stat value={String(pool.rounds)} label={t('discover.filterBoard.railRounds', 'ROUNDS', { count: pool.rounds })} />
+            <Stat value={String(pool.courses)} label={t('discover.filterBoard.railCourses', 'COURSES', { count: pool.courses })} />
+            <Stat value={String(pool.members)} label={t('discover.filterBoard.railMembers', 'MEMBERS', { count: pool.members })} />
+            <Stat value={days} label={t('discover.filterBoard.railDays', 'DAYS', { count: Number(days) || 2 })} />
+          </div>
         </div>
-      </div>
-
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: 18,
-          padding: '9px 14px 12px',
-          whiteSpace: 'nowrap',
-          visibility: ready ? 'visible' : 'hidden',
-        }}
-      >
-        <Stat value={String(pool.rounds)} label={t('discover.filterBoard.railRounds', 'ROUNDS', { count: pool.rounds })} />
-        <Stat value={String(pool.courses)} label={t('discover.filterBoard.railCourses', 'COURSES', { count: pool.courses })} />
-        <Stat value={String(pool.members)} label={t('discover.filterBoard.railMembers', 'MEMBERS', { count: pool.members })} />
-        <Stat value={days} label={t('discover.filterBoard.railDays', 'DAYS', { count: Number(days) || 2 })} />
       </div>
 
       {/* G1 — THE BAR STICKS. It scrolls up with the hero first, then pins
@@ -283,7 +274,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           position: 'sticky',
           top: 'var(--chrome-total-h, 55px)',
           zIndex: DISCOVER_STICKY_FILTER_Z,
-          width: '100%', minHeight: 40, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 12,
+           width: '100%', minHeight: 40, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 10,
           background: A.PANEL, border: 'none', borderTop: `1px solid ${A.BORDER}`,
           /* G1.3 — settled chrome, not a floating card: full width, no radius,
              no shadow, the hairline on the BOTTOM edge. */
@@ -301,7 +292,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
       </button>
 
       {/* THE BOARD */}
-      <div ref={boardRef} style={{ marginTop: 8, padding: '0 14px', scrollMarginTop: 'calc(var(--chrome-total-h, 55px) + 56px)' }}>
+      <div ref={boardRef} style={{ marginTop: 8, padding: '0 14px', scrollMarginTop: 'calc(var(--chrome-total-h, 55px) + 48px)' }}>
 
         {!ready || page.isPending ? (
           <div style={{ height: 240 }} aria-hidden />
@@ -320,7 +311,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
               />
             ))}
             {minePinned && mine && leader && (
-              <div style={{ marginTop: 6, borderTop: `1px solid ${A.BORDER}` }}>
+              <div style={{ marginTop: 4 }}>
                 <BoardRowView
                   row={mine}
                   board={board}
@@ -340,10 +331,10 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
         )}
       </div>
 
-      {/* R4 — the closed Courses played row continues the board's own row rhythm
-          and is separated from See all by its hairline alone. */}
+      {/* R4 — the shared terminal row ends the board. The courses masthead is
+          the next break, after one deliberate 30px step and no duplicate rule. */}
       {children ? (
-        <div style={{ padding: '0 14px' }}>
+        <div style={{ marginTop: 30, padding: '0 14px' }}>
           {children}
         </div>
       ) : null}

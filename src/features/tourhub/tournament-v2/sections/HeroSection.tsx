@@ -25,10 +25,11 @@ import { formatPurse } from '../../_shared/formatPurse';
 import { formatNumber } from '@/i18n/format';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import {
-  FONT, HERO_STRIP_H, WHITE_ALPHA_65, WHITE_ALPHA_12,
+  FONT, WHITE_ALPHA_65, WHITE_ALPHA_12,
 } from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
+import { HERO_MIN_H } from '../../_shared/tokens';
 import { heroCanonBackground } from '../../_shared/heroGradient';
 
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
@@ -36,8 +37,8 @@ import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingC
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
 
-// The shared strip is a definite content height; this surface adds its own
-// floating-chrome clearance rather than inheriting the full-stage hero floor.
+// Canonical hero height: HERO_MIN_H from _shared/tokens, sourced from the
+// course detail hero (GolfClubView). Do not re-declare it locally.
 
 /**
  * ONE canon scrim — heroCanonBackground (BRIEF_HERO_GRADIENT_AND_HEIGHT_CANON).
@@ -425,7 +426,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
       <div
         style={{
           position: 'relative',
-          height: `calc(${HERO_STRIP_H}px + max(env(safe-area-inset-top, 0px), 48px))`,
+          minHeight: HERO_MIN_H,
           paddingTop: 'max(env(safe-area-inset-top, 0px), 48px)',
           background,
           display: 'flex',
@@ -456,7 +457,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
 
           <h1
             style={{
-              fontSize: 'clamp(20px, 6.4vw, 25px)',
+              fontSize: 'clamp(22px, 7.2vw, 28px)',
               fontWeight: 700,
               color: '#fff',
               lineHeight: 1.04,

@@ -241,19 +241,3 @@ export const BAR_NEUTRAL = 'rgba(255,255,255,0.18)';                        // l
  */
 export const HERO_MIN_H =
   'calc(clamp(280px, 35dvh, 390px) + env(safe-area-inset-top, 0px))';
-
-/**
- * THE STRIP. A photo-led head that is a BAND, not a stage: identity only
- * (eyebrow or chip, title, one meta line), with figures and controls on the
- * canvas beneath it. This is the CONTENT height below the chrome - every
- * consumer adds its own safe-area or chrome padding on top, exactly as the
- * Discover board does.
- *
- * Consumers, and ONLY these three: the Discover board head (GolfThisWeek),
- * the Tour Overview photo band (PhotoBand), the Tournament detail head
- * (tournament-v2 HeroSection).
- *
- * NOT the same thing as HERO_MIN_H, which is a FLOOR for full-stage heroes
- * (course detail, Courses, player, college) and stays as it is.
- */
-export const HERO_STRIP_H = 132;

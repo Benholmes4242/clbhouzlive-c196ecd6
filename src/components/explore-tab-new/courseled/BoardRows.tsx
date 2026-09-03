@@ -299,7 +299,6 @@ export function BoardRowView({
         padding: '6px 2px',
         background: 'transparent',
         border: 'none',
-        borderBottom: `1px solid ${A.BORDER}`,
         textAlign: 'left',
         fontFamily: SANS,
         cursor: onPress ? 'pointer' : 'default',
@@ -322,19 +321,28 @@ export function BoardRowView({
         </span>
 
       <span style={{ flexShrink: 0 }}>
-        <BoardAvatar row={row} size={26} />
+        <BoardAvatar row={row} size={28} />
       </span>
-      <span style={{ flex: 1, minWidth: 0 }}>
+      <span
+        style={{
+          flex: 1,
+          minWidth: 0,
+          height: 28,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
+      >
         <span
           style={{
             display: 'block',
             fontSize: 13.5,
             fontWeight: 700,
-            lineHeight: 1.2,
             color: ink,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
+            lineHeight: '14px',
           }}
         >
           {row.display_name ?? t('discover.aMember', 'A member')}
@@ -343,13 +351,14 @@ export function BoardRowView({
         <span
           style={{
             display: 'block',
-            fontSize: 10.5,
+            marginTop: 1,
+            fontSize: 11.5,
             fontWeight: 600,
-            lineHeight: 1.25,
             color: A.MUTE,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
+            lineHeight: '12px',
           }}
         >
           {gap ??
