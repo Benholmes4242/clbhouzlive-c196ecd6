@@ -58,11 +58,11 @@ import {
  * a board that disappears when a filter bites teaches a member nothing.
  */
 
-/** Ten POSITIONS on the page. A tie crossing T10 is kept whole. */
-const VISIBLE_POSITIONS = 10;
+/** Six POSITIONS on the page. A tie crossing T6 is kept whole. */
+const VISIBLE_POSITIONS = 6;
 
 /**
- * ONE READ SERVES THE PAGE AND THE PIN. The page shows ten positions; the read takes
+ * ONE READ SERVES THE PAGE AND THE PIN. The page shows six positions; the read takes
  * two hundred so the member's own row can be FOUND and pinned without a second
  * query (S5.4). Past two hundred the pin is simply absent — a member ranked
  * 300th is told their position by the see-all sheet, not by a third round trip.
@@ -274,7 +274,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           position: 'sticky',
           top: 'var(--chrome-total-h, 55px)',
           zIndex: DISCOVER_STICKY_FILTER_Z,
-          width: '100%', minHeight: 48, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 12,
+           width: '100%', minHeight: 40, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 10,
           background: A.PANEL, border: 'none', borderTop: `1px solid ${A.BORDER}`,
           /* G1.3 — settled chrome, not a floating card: full width, no radius,
              no shadow, the hairline on the BOTTOM edge. */
@@ -292,7 +292,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
       </button>
 
       {/* THE BOARD */}
-      <div ref={boardRef} style={{ marginTop: 16, padding: '0 14px', scrollMarginTop: 'calc(var(--chrome-total-h, 55px) + 56px)' }}>
+      <div ref={boardRef} style={{ marginTop: 8, padding: '0 14px', scrollMarginTop: 'calc(var(--chrome-total-h, 55px) + 48px)' }}>
 
         {!ready || page.isPending ? (
           <div style={{ height: 240 }} aria-hidden />
@@ -311,7 +311,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
               />
             ))}
             {minePinned && mine && leader && (
-              <div style={{ marginTop: 6, borderTop: `1px solid ${A.BORDER}` }}>
+              <div style={{ marginTop: 4 }}>
                 <BoardRowView
                   row={mine}
                   board={board}
