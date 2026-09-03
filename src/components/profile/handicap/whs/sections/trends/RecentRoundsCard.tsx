@@ -483,7 +483,7 @@ const MonthDivider: React.FC<{ month: string; count: number }> = ({
 interface FeedCardProps {
   round: RoundWithDelta;
   onTap: () => void;
-  labels: { gross: string; playedTo: string; notInBest8: string };
+  labels: { gross: string; playedTo: string };
 }
 
 const FIGURE_LABEL: React.CSSProperties = {
