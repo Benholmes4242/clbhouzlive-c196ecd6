@@ -239,40 +239,24 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end',
-            padding: 'env(safe-area-inset-top, 0px) 14px 16px',
+            padding: 'env(safe-area-inset-top, 0px) 14px 10px',
           }}
         >
           <span style={{ ...KICKER, color: A.BODY }}>
             {t('discover.board.circuitEyebrow', 'The amateur circuit')}
           </span>
-          <h2 style={{ margin: '6px 0 0', fontSize: 25, fontWeight: 700, letterSpacing: '0.005em', textTransform: 'uppercase', color: DISCOVER_FACT }}>
+          <h2 style={{ margin: '4px 0 0', fontSize: 25, fontWeight: 700, letterSpacing: '0.005em', textTransform: 'uppercase', color: DISCOVER_FACT }}>
             {ready ? boardTitle : '\u00a0'}
           </h2>
         </div>
       </div>
-
-      {ready && leader?.course_name ? (
-        <div
-          style={{
-            ...KICKER,
-            padding: '8px 14px 0',
-            color: A.DIM,
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {leader.course_name}
-        </div>
-      ) : null}
 
       <div
         style={{
           display: 'flex',
           alignItems: 'baseline',
           gap: 18,
-          padding: '10px 14px 12px',
+          padding: '9px 14px 12px',
           whiteSpace: 'nowrap',
           visibility: ready ? 'visible' : 'hidden',
         }}
@@ -300,7 +284,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           position: 'sticky',
           top: 'var(--chrome-total-h, 55px)',
           zIndex: DISCOVER_STICKY_FILTER_Z,
-          width: '100%', minHeight: 48, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 12,
+          width: '100%', minHeight: 40, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 12,
           background: A.PANEL, border: 'none', borderTop: `1px solid ${A.BORDER}`,
           /* G1.3 — settled chrome, not a floating card: full width, no radius,
              no shadow, the hairline on the BOTTOM edge. */
@@ -318,7 +302,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
       </button>
 
       {/* THE BOARD */}
-      <div ref={boardRef} style={{ marginTop: 16, padding: '0 14px', scrollMarginTop: 'calc(var(--chrome-total-h, 55px) + 56px)' }}>
+      <div ref={boardRef} style={{ marginTop: 8, padding: '0 14px', scrollMarginTop: 'calc(var(--chrome-total-h, 55px) + 56px)' }}>
 
         {!ready || page.isPending ? (
           <div style={{ height: 240 }} aria-hidden />
@@ -357,10 +341,10 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
         )}
       </div>
 
-      {/* R4 — the shared terminal row ends the board. The courses masthead is
-          the next break, after one deliberate 30px step and no duplicate rule. */}
+      {/* R4 — the closed Courses played row continues the board's own row rhythm
+          and is separated from See all by its hairline alone. */}
       {children ? (
-        <div style={{ marginTop: 30, padding: '0 14px' }}>
+        <div style={{ padding: '0 14px' }}>
           {children}
         </div>
       ) : null}
