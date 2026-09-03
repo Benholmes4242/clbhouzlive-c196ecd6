@@ -163,11 +163,12 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
     ? heroMeta.data?.get(leader.course_id)?.imageUrl ?? null
     : null;
 
-  /* S6.2 — THE RAIL AND THE SEE-ALL FIGURE ARE THE SAME NUMBER. total_count is
-     the RPC's own count for the whole board; the courses figure is the size of
-     the facet's course axis, which is counted over the same qualifying set. */
-  const courseCount = facets.openList('course').length;
-  const memberCount = facets.countFor('board', 'gross') ?? new Set(rows.map((row) => row.user_id)).size;
+  /* S6.2 — THE RAIL DESCRIBES THE POOL THE BOARD IS DRAWN FROM, not the ranked
+     rows it rendered. pool_rounds/pool_courses/pool_members are identical on
+     every board for the same filter state because they describe the qualifying
+     set. total_count stays reserved for the ranked row count (See all, filter
+     footer, sheet subject block). */
+  const pool = page.data?.pool ?? { rounds: 0, courses: 0, members: 0 };
   const days = windowDays(filters.window);
 
   const appliedParts = useMemo(
@@ -248,10 +249,10 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
             {ready ? boardTitle : '\u00a0'}
           </h2>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 12, whiteSpace: 'nowrap', visibility: ready ? 'visible' : 'hidden' }}>
-            <Stat value={String(total)} label={t('discover.filterBoard.col.rounds', 'ROUNDS')} />
-            <Stat value={String(courseCount)} label={t('discover.filterBoard.col.courses', 'COURSES')} />
-            <Stat value={String(memberCount)} label={t('discover.filterBoard.col.members', 'MEMBERS')} />
-            <Stat value={days} label={t('discover.filterBoard.col.days', 'DAYS')} />
+            <Stat value={String(pool.rounds)} label={t('discover.filterBoard.railRounds', 'ROUNDS', { count: pool.rounds })} />
+            <Stat value={String(pool.courses)} label={t('discover.filterBoard.railCourses', 'COURSES', { count: pool.courses })} />
+            <Stat value={String(pool.members)} label={t('discover.filterBoard.railMembers', 'MEMBERS', { count: pool.members })} />
+            <Stat value={days} label={t('discover.filterBoard.railDays', 'DAYS', { count: Number(days) || 2 })} />
           </div>
         </div>
       </div>

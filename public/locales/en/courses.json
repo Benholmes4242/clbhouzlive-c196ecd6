@@ -1257,6 +1257,16 @@
       "ordinal_ordinal_other": "{{count}}th"
     },
     "kicker": "The amateur circuit",
+    "filterBoard": {
+      "railRounds_one": "ROUND",
+      "railRounds_other": "ROUNDS",
+      "railCourses_one": "COURSE",
+      "railCourses_other": "COURSES",
+      "railMembers_one": "MEMBER",
+      "railMembers_other": "MEMBERS",
+      "railDays_one": "DAY",
+      "railDays_other": "DAYS"
+    },
     "headline": "What's been happening",
     "hero": {
       "viewScorecard": "View scorecard"

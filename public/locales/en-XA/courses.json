@@ -1245,6 +1245,16 @@
     "hero": {
       "viewScorecard": "[~~Ṽíéŵ šĉőřéĉářđ~~]"
     },
+    "filterBoard": {
+      "railRounds_one": "[~~ŔŐŮŃĐ~~]",
+      "railRounds_other": "[~~ŔŐŮŃĐŠ~~]",
+      "railCourses_one": "[~~ĈŐŮŔŠÉ~~]",
+      "railCourses_other": "[~~ĈŐŮŔŠÉŠ~~]",
+      "railMembers_one": "[~~ṀÉṀƁÉŔ~~]",
+      "railMembers_other": "[~~ṀÉṀƁÉŔŠ~~]",
+      "railDays_one": "[~~ĐÁÝ~~]",
+      "railDays_other": "[~~ĐÁÝŠ~~]"
+    },
     "eventCount_one": "[~~{{count}} éṽéñţ~~]",
     "eventCount_other": "[~~{{count}} éṽéñţš~~]",
     "newsTitle": "[~~Ĉőúřšéš íñ ţĥé ñéŵš~~]",

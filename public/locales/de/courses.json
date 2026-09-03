@@ -936,6 +936,16 @@
     "hero": {
       "viewScorecard": "Scorecard ansehen"
     },
+    "filterBoard": {
+      "railRounds_one": "RUNDE",
+      "railRounds_other": "RUNDEN",
+      "railCourses_one": "KURS",
+      "railCourses_other": "KURSE",
+      "railMembers_one": "MITGLIED",
+      "railMembers_other": "MITGLIEDER",
+      "railDays_one": "TAG",
+      "railDays_other": "TAGE"
+    },
     "lens": {
       "suggested": "Suggested",
       "top100": "Top 100",

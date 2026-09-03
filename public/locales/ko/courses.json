@@ -889,6 +889,16 @@
     "hero": {
       "viewScorecard": "스코어카드 보기"
     },
+    "filterBoard": {
+      "railRounds_one": "라운드",
+      "railRounds_other": "라운드",
+      "railCourses_one": "코스",
+      "railCourses_other": "코스",
+      "railMembers_one": "멤버",
+      "railMembers_other": "멤버",
+      "railDays_one": "일",
+      "railDays_other": "일"
+    },
     "lens": {
       "suggested": "Suggested",
       "top100": "Top 100",

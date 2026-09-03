@@ -889,6 +889,16 @@
     "hero": {
       "viewScorecard": "スコアカードを見る"
     },
+    "filterBoard": {
+      "railRounds_one": "ラウンド",
+      "railRounds_other": "ラウンド",
+      "railCourses_one": "コース",
+      "railCourses_other": "コース",
+      "railMembers_one": "メンバー",
+      "railMembers_other": "メンバー",
+      "railDays_one": "日",
+      "railDays_other": "日"
+    },
     "lens": {
       "suggested": "Suggested",
       "top100": "Top 100",
