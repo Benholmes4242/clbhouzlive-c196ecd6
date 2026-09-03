@@ -15,7 +15,7 @@
  * the drawer wins for the rest of the session.
  */
 
-import type { BoardKey, WindowKey } from './boardFilters';
+import type { BoardKey, ScopeKey, WindowKey } from './boardFilters';
 import { BOARD_KEYS, DEFAULT_FILTERS } from './boardFilters';
 
 /** One row of public.get_board_rotation. */
@@ -30,7 +30,15 @@ export interface RotationRow {
 export interface BoardPick {
   board: BoardKey;
   window: WindowKey;
+  /**
+   * BRIEF_DISCOVER_RECENT_FIRST_DEFAULT S3.6 — the scope the session ACTUALLY
+   * landed on, recorded so a remount never re-evaluates the thin-circle
+   * fallback. Absent on the rotated/handicap picks, which always carry
+   * DEFAULT_FILTERS.scope.
+   */
+  scope?: ScopeKey;
 }
+
 
 /** R3.1 — the silent fallback. No error state, no empty board, no retry. */
 export const FALLBACK_PICK: BoardPick = {
@@ -44,10 +52,22 @@ export const ROTATION_SESSION_KEY = 'clbhouz.discover.rotation.pick.v1';
 export const ROTATION_LAST_KEY = 'clbhouz.discover.rotation.last.v1';
 /**
  * F1.4 — the last calendar day Discover was entered, as a LOCAL YYYY-MM-DD
- * string. A date string, not a timestamp: F1.3 forbids a rolling 24 hours,
- * which would drift the "first" visit an hour later every day.
+ * string.
+ *
+ * DEPRECATED (BRIEF_DISCOVER_RECENT_FIRST_DEFAULT S1.1). The landing sequence is
+ * three deep per calendar day, so a yes/no "was this the first session today" is
+ * no longer enough; DAY_SESSIONS_KEY answers "which session today is this".
+ * Exported unused for one release so nothing else breaks.
  */
 export const LAST_SEEN_DATE_KEY = 'clbhouz.discover.lastSeenDate.v1';
+
+/**
+ * S1.1 — THE DAY'S SESSION COUNTER, in localStorage as
+ * { date: 'YYYY-MM-DD', n: 2 }. The date is the member's OWN local calendar
+ * date (S1.4), so the daily reset cannot drift.
+ */
+export const DAY_SESSIONS_KEY = 'clbhouz.discover.daySessions.v1';
+
 
 /** F1.3 — the member's OWN local calendar date. Never UTC, never rolling. */
 export function localDateKey(now: Date = new Date()): string {
@@ -63,14 +83,22 @@ const WINDOW_ORDER: WindowKey[] = ['14', '30', '90', 'year', 'all'];
 const isBoardKey = (v: string): v is BoardKey => (BOARD_KEYS as string[]).includes(v);
 const isWindowKey = (v: string): v is WindowKey => (WINDOW_ORDER as string[]).includes(v);
 
+const SCOPE_KEYS: ScopeKey[] = ['everyone', 'circle', 'club', 'you'];
+const isScopeKey = (v: string): v is ScopeKey => (SCOPE_KEYS as string[]).includes(v);
+
+/** R2.4 — the LAST-key identity stays the board/window combination only. */
 const comboId = (p: BoardPick) => `${p.board}:${p.window}`;
+/** S3.6 — the SESSION pick additionally records the scope that was used. */
+const sessionId = (p: BoardPick) =>
+  p.scope ? `${p.board}:${p.window}:${p.scope}` : comboId(p);
 
 function parsePick(raw: string | null): BoardPick | null {
   if (!raw) return null;
-  const [board, window] = raw.split(':');
+  const [board, window, scope] = raw.split(':');
   if (!board || !window || !isBoardKey(board) || !isWindowKey(window)) return null;
-  return { board, window };
+  return scope && isScopeKey(scope) ? { board, window, scope } : { board, window };
 }
+
 
 /* Storage is wrapped because private-mode Safari throws on access. A member
    whose storage is unavailable simply re-picks; nothing else breaks. */
@@ -97,15 +125,52 @@ export const readSessionPick = (): BoardPick | null =>
 export const readLastPick = (): BoardPick | null =>
   parsePick(safeGet('local', ROTATION_LAST_KEY));
 
-/** F1.1b — null (or a throwing store, F1.5) reads as "the day's first session". */
+/** DEPRECATED with LAST_SEEN_DATE_KEY (S1.1). No live caller. */
 export const readLastSeenDate = (): string | null => safeGet('local', LAST_SEEN_DATE_KEY);
 
+/** DEPRECATED with LAST_SEEN_DATE_KEY (S1.1). No live caller. */
 export const writeLastSeenDate = (date: string = localDateKey()) =>
   safeSet('local', LAST_SEEN_DATE_KEY, date);
 
+export interface DaySessions {
+  date: string;
+  n: number;
+}
+
+/** S1.2 — the record as stored, or null when absent/unreadable/malformed. */
+export function readDaySessions(): DaySessions | null {
+  const raw = safeGet('local', DAY_SESSIONS_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Partial<DaySessions>;
+    if (typeof parsed?.date !== 'string' || !Number.isFinite(Number(parsed?.n))) return null;
+    return { date: parsed.date, n: Number(parsed.n) };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * S1.2 — advance the counter and return which session TODAY this is.
+ *
+ * Called ONCE per browser session, from the entry hook's useState initialiser,
+ * never during render and never from an effect (S2.3).
+ *
+ * S1.3 — a throwing or unavailable store returns 1, so the member lands on the
+ * recent board rather than on nothing.
+ */
+export function bumpDaySessions(): number {
+  const today = localDateKey();
+  const rec = readDaySessions();
+  const n = rec && rec.date === today ? rec.n + 1 : 1;
+  safeSet('local', DAY_SESSIONS_KEY, JSON.stringify({ date: today, n }));
+  return n;
+}
+
 /** R1.3 / R2.4 — written ONCE, at the moment a pick is made. */
 export function persistPick(pick: BoardPick) {
-  safeSet('session', ROTATION_SESSION_KEY, comboId(pick));
+  safeSet('session', ROTATION_SESSION_KEY, sessionId(pick));
+
   safeSet('local', ROTATION_LAST_KEY, comboId(pick));
 }
 
