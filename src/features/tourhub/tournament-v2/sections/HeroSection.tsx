@@ -4,8 +4,8 @@
  *
  * The PHOTOGRAPH carries three things only: the state chip, the h1 and the
  * venue line. Every fact sits in stacked bands BENEATH it — a stat strip on
- * HERO_BOARD_SURFACE_SOFT, a one-row person band and a disclosure row on
- * HERO_BOARD_SURFACE. No hairline over the image, no figures over foliage.
+ * A.PANEL, with a one-row person band and disclosure row on A.CANVAS. No
+ * hairline over the image, no figures over foliage.
  * No board or ticker band lives here: TournamentPage mounts MiniBoard directly
  * below this hero, and a second board would print the same rows twice.
  *
@@ -23,9 +23,9 @@ import { Trophy, Star, ChevronRight } from 'lucide-react';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { formatPurse } from '../../_shared/formatPurse';
 import { formatNumber } from '@/i18n/format';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import {
   FONT, WHITE_ALPHA_65, WHITE_ALPHA_12,
-  HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT,
 } from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
@@ -45,7 +45,7 @@ import type { EventState } from '../../components/overview-v3/useTournamentPulse
  * It matches Course Detail and the canonical Discover/Courses hero treatment:
  * one full-frame ramp terminating on the dark canvas. No second layer.
  */
-const FALLBACK_BG = `linear-gradient(180deg, #1A2130 0%, ${HERO_BOARD_SURFACE_SOFT} 100%)`;
+const FALLBACK_BG = `linear-gradient(180deg, ${A.PANEL} 0%, ${A.CANVAS} 100%)`;
 const IMAGE_FOCAL = '50% 72%';
 
 
@@ -149,7 +149,7 @@ function PersonLockup({
         alignItems: 'center',
         gap: 10,
         minWidth: 0,
-        background: HERO_BOARD_SURFACE,
+        background: A.CANVAS,
         borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
         padding: '11px 16px',
       }}
@@ -488,13 +488,13 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
         </div>
       </div>
 
-      {/* STAT STRIP — three figures on HERO_BOARD_SURFACE_SOFT, the surface the
+      {/* STAT STRIP — three figures on A.PANEL, one step above the canvas the
           photo gradient terminates on. Renders whatever the state produced;
           never padded to three. */}
       {figures.length > 0 && (
         <div
           style={{
-            background: HERO_BOARD_SURFACE_SOFT,
+            background: A.PANEL,
             padding: '12px 16px 14px',
             display: 'flex',
             alignItems: 'flex-start',
@@ -507,7 +507,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
         </div>
       )}
 
-      {/* PERSON BAND — one row on HERO_BOARD_SURFACE. */}
+      {/* PERSON BAND — one row on A.CANVAS. */}
       {state === 'live' && leader && (
         <PersonLockup
           label={t('tournament.hero.leaderLabel')}
@@ -557,7 +557,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          background: HERO_BOARD_SURFACE,
+          background: A.CANVAS,
           borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
           borderLeft: 'none',
           borderRight: 'none',

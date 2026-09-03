@@ -30,13 +30,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TickerShell } from '@/components/shared/wire/TickerShell';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { fmtScore, type TickerRow } from '../HybridHero.utils';
 import { NUMERIC_STYLE } from '../HybridHero.constants';
-import { HERO_BOARD_SURFACE, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 
 // ONE CONTINUOUS SURFACE with the hero board below it — never a local copy of
 // CHARCOAL again, or deepening the board silently leaves a seam here.
-const BG = HERO_BOARD_SURFACE;
+const BG = A.CANVAS;
 const AMBER = '#F7931E';
 const GOLD = '#FDE68A';
 

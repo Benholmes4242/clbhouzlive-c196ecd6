@@ -51,7 +51,8 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
-import { FONT, GOLD, HERO_BOARD_SURFACE, HERO_BOARD_SURFACE_SOFT, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { FONT, GOLD, WHITE_ALPHA_12, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
 import { PlayerAvatar } from '../../PlayerAvatar';
@@ -380,7 +381,7 @@ export function HeroBoardSection({
   return (
     <div
       style={{
-        background: HERO_BOARD_SURFACE,
+        background: A.CANVAS,
         fontFamily: FONT,
         overflow: 'hidden',
       }}
@@ -436,7 +437,7 @@ export function HeroBoardSection({
             display: 'flex',
             gap: 10,
             padding: '12px 16px 16px',
-            background: HERO_BOARD_SURFACE,
+            background: A.CANVAS,
             borderTop: `0.5px solid ${WHITE_ALPHA_12}`,
           }}
         >
@@ -666,7 +667,7 @@ function PicksPanel({
   const hasConfidence = predictions?.isAIPowered;
 
   return (
-    <div style={{ background: HERO_BOARD_SURFACE_SOFT, borderTop: `0.5px solid ${WHITE_ALPHA_12}` }}>
+    <div style={{ background: A.PANEL, borderTop: `0.5px solid ${WHITE_ALPHA_12}` }}>
       {/* Editorial framing when populated — and NO empty row when it is not. */}
       {predictions?.editorialFraming ? (
         <div
