@@ -107,7 +107,16 @@ export function useBoardPage(
       } as never);
       if (error) throw error;
       const rows = ((data ?? []) as unknown) as BoardRow[];
-      return { rows, total: rows.length > 0 ? Number(rows[0].total_count) : 0 };
+      const first = rows[0];
+      return {
+        rows,
+        total: rows.length > 0 ? Number(first.total_count) : 0,
+        pool: {
+          rounds: first ? Number(first.pool_rounds) : 0,
+          courses: first ? Number(first.pool_courses) : 0,
+          members: first ? Number(first.pool_members) : 0,
+        },
+      };
     },
   });
 }
