@@ -14,6 +14,7 @@ import {
   COURSE_GRADIENT,
   COURSE_SCRIMS,
   HERO_TOP_SCRIM,
+  PHOTO_BAND_HEIGHT,
 } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 
 /**
@@ -205,130 +206,52 @@ export function FriendsRail() {
 
 export function GolfThisWeekRail() {
   return (
-    <section>
-      {/* No heading. This section leads the page, directly under the chrome
-          island, and its pills state its scope more clearly than a title would.
-          Every section below it keeps the glyph-and-heading treatment. */}
+    <section style={{ margin: '0 -14px', background: A.CANVAS }}>
       <div
         style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: 12,
-          /* The floating header sits at sat + 10 and is 44px tall, so sat + 70
-             gives 16px of clearance everywhere. THIS IS THE ONLY PLACE THE SHELL
-             APPLIES IT — the default export's wrapper used to apply it again
-             (BRIEF_DISCOVER_SKELETON_RESYNC §2), which started the shell ~70px
-             LOW and made the page settle UPWARD. It lives here because that is
-             where the live page puts it (GolfThisWeek, MICRO_BRIEF_ROUNDS_
-             SECTION_CHROME S1.4), and GolfThisWeek renders this shell itself. */
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 70px)',
-          marginBottom: 12,
-          minWidth: 0,
+          height: `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+          position: 'relative',
+          overflow: 'hidden',
+          background: COURSE_GRADIENT,
         }}
       >
-
-        {/* THE READOUT: "12 rounds · 4 courses · 7 days" at KICKER (10 / 700 /
-            0.16em / uppercase) MEASURES 208 at 524px. The old 118 modelled the
-            two-part string that BRIEF_DISCOVER_ORDER_AND_LABELS replaced. */}
-        <Bar style={{ height: 9, width: 206 }} />
-        <Bar style={{ height: 34, width: 100, borderRadius: 999 }} />
+        <div style={{ position: 'absolute', inset: 'auto 20px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <Bar style={{ height: 8, width: 112, backgroundColor: 'rgba(255,255,255,0.14)' }} />
+          <Bar style={{ height: 29, width: 218, backgroundColor: 'rgba(255,255,255,0.16)' }} />
+          <Bar style={{ height: 10, width: 154, backgroundColor: 'rgba(255,255,255,0.12)' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+            {[44, 50, 54, 42].map((w, index) => <Bar key={index} style={{ height: 14, width: w, backgroundColor: 'rgba(255,255,255,0.14)' }} />)}
+          </div>
+        </div>
       </div>
-      <div style={{ display: 'flex', gap: 8, padding: '2px 0 14px' }}>
-        {[64, 74, 60, 56].map((w, i) => (
-          <Bar key={i} style={{ height: 34, width: w, borderRadius: SCOPE_PILL_RADIUS }} />
-        ))}
+      <div
+        style={{
+          height: 48,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          borderTop: `0.5px solid ${A.BORDER}`,
+          borderBottom: `0.5px solid ${A.BORDER}`,
+        }}
+      >
+        <Bar style={{ height: 9, width: 176 }} />
+        <Bar style={{ height: 11, width: 68 }} />
       </div>
-      {/* BRIEF_BAND_TILES_PODIUM §7 — measured against a full live podium:
-          eyebrow, 40px face + 34px leader figure, margin chip, hairline, and two
-          compact chasers. Sparse live cards collapse, by explicit decision;
-          this shell models the full state so resolving content never pushes the
-          round rail downward.
-
-          WHY THREE ROWS AND NOT ONE: in the current data
-          three of the four categories clear their floor with three or more
-          distinct members. A one-row shell would under-measure the common full
-          state by 89px and strand the band exactly as the old strip did.
-          THREE CHIPS, NOT FOUR: MOST IMPROVED renders only when a falling index
-          exists, and a skeleton is never larger than the smallest settled state. */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 12 }}>
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            data-band-podium-skeleton
-            style={{
-              background: A.PANEL,
-              border: 'none',
-              borderRadius: CARD_RADIUS,
-              boxShadow: '0 1px 2px rgba(11,15,20,0.05)',
-              overflow: 'hidden',
-              flex: '1 0 230px',
-              minWidth: 230,
-              padding: '11px 12px 12px',
-              boxSizing: 'border-box',
-            }}
-          >
-            {/* The eyebrow row: label left, unit right (§2). */}
-            <div
-              style={{
-                height: 12,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Bar style={{ height: 8, width: 66 }} />
-              <Bar style={{ height: 8, width: 26 }} />
-            </div>
-
-            {/* Leader: 40px face, 34px figure and name. */}
-            <div style={{ marginTop: 8 }}>
-              <div
-                style={{
-                  minHeight: 64,
-                  display: 'grid',
-                  gridTemplateColumns: '40px minmax(0, 1fr)',
-                  alignItems: 'center',
-                  gap: 10,
-                }}
-              >
-                <Bar style={{ height: 42, width: 40, borderRadius: '34%' }} />
-                <div>
-                  <Bar style={{ height: 31, width: 58 }} />
-                  <Bar style={{ height: 10, width: 84, marginTop: 5 }} />
-                </div>
-              </div>
-              <Bar style={{ height: 20, width: 76, marginTop: 8 }} />
-              <div style={{ height: 1, background: A.HAIRLINE, marginTop: 12 }} />
-              {[0, 1].map((j) => (
-                <div
-                  key={j}
-                  style={{
-                    height: 34,
-                    borderTop: j === 0 ? 'none' : `1px solid ${A.HAIRLINE}`,
-                    boxSizing: 'border-box',
-                    display: 'grid',
-                    gridTemplateColumns: '12px 16px minmax(0, 1fr) 22px 18px',
-                    alignItems: 'center',
-                    gap: 6,
-                  }}
-                >
-                  <Bar style={{ height: 8, width: 7 }} />
-                  <Bar style={{ height: 16, width: 16, borderRadius: '34%' }} />
-                  <Bar style={{ height: 10, width: j === 0 ? 84 : 66 }} />
-                  <Bar style={{ height: 10, width: 22 }} />
-                  <Bar style={{ height: 9, width: 18 }} />
-                </div>
-              ))}
-            </div>
+      <div style={{ height: 29, borderBottom: `0.5px solid ${A.BORDER}` }} />
+      <div>
+        {Array.from({ length: 6 }, (_, index) => (
+          <div key={index} style={{ height: 58, margin: '0 16px', borderBottom: `0.5px solid ${A.BORDER}`, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Bar style={{ width: 18, height: 10 }} />
+            <Bar style={{ width: 30, height: 30, borderRadius: '34%' }} />
+            <div style={{ flex: 1 }}><Bar style={{ width: index % 2 ? 92 : 116, height: 11 }} /><Bar style={{ width: 78, height: 8, marginTop: 5 }} /></div>
+            <Bar style={{ width: 32, height: 12 }} />
+            <Bar style={{ width: 34, height: 14 }} />
           </div>
         ))}
       </div>
-
-
-
-      <div style={{ display: 'flex', gap: 10, overflow: 'hidden' }}>
+      <div style={{ height: 43, margin: '0 16px', borderBottom: `0.5px solid ${A.BORDER}` }} />
+      <div style={{ display: 'none', gap: 10, overflow: 'hidden' }}>
         {[0, 1, 2].map((i) => (
           <div
             key={i}
@@ -409,10 +332,6 @@ export function GolfThisWeekRail() {
 
           </div>
         ))}
-      </div>
-      {/* See-all placeholder sits below the first card and does NOT scroll. */}
-      <div style={{ marginTop: 8, width: 224 }}>
-        <TextBar w={110} h={10} />
       </div>
     </section>
   );
