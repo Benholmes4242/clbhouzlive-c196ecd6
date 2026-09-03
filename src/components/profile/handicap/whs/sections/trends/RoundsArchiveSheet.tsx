@@ -124,7 +124,7 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
           minHeight: 0,
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
-          paddingBottom: 24,
+          padding: '0 16px 24px',
         }}
       >
         <RecentRoundsCard

@@ -212,7 +212,7 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
 
 
 
-      <div style={{ padding: '0 16px' }}>
+      <div style={{ padding: inSheet ? 0 : '0 16px' }}>
       {!isLoading && rounds.length > 0 && (
         <FilterChips
           filter={filter}
@@ -488,9 +488,9 @@ interface FeedCardProps {
 }
 
 const FIGURE_LABEL: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 9.5,
   fontWeight: 700,
-  letterSpacing: '0.16em',
+  letterSpacing: '0.13em',
   textTransform: 'uppercase',
   color: T.inkFaded,
   marginTop: 4,
@@ -592,7 +592,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ round, onTap, labels }) => {
       </div>
 
       {/* Played to - a figure in ink. No pill, no tint, no green. */}
-      <div style={{ width: 52, flexShrink: 0, textAlign: 'right' }}>
+      <div style={{ width: 70, flexShrink: 0, textAlign: 'right' }}>
         <div
           style={{
             fontSize: 15,
