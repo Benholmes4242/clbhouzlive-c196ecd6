@@ -18465,6 +18465,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      board_window_from: { Args: { p_window: string }; Returns: string }
       build_tour_sunday_message: {
         Args: { p_as_of?: string }
         Returns: {

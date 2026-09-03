@@ -268,7 +268,7 @@
       "moversToday": "Movers today",
       "nShare_one": "{{count}} player",
       "nShare_other": "{{count}} players",
-      "fieldAverageToday": "Field average today",
+      "fieldAverageToday": "Field Average",
       "fromNRoundsIn": "from {{n}} rounds",
       "lowRoundLabel": "Low round",
       "awaitingPlayers": "{{range}} awaiting players",
