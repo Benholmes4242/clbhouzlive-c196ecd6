@@ -249,10 +249,10 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
             {ready ? boardTitle : '\u00a0'}
           </h2>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 12, whiteSpace: 'nowrap', visibility: ready ? 'visible' : 'hidden' }}>
-            <Stat value={String(total)} label={t('discover.filterBoard.col.rounds', 'ROUNDS')} />
-            <Stat value={String(courseCount)} label={t('discover.filterBoard.col.courses', 'COURSES')} />
-            <Stat value={String(memberCount)} label={t('discover.filterBoard.col.members', 'MEMBERS')} />
-            <Stat value={days} label={t('discover.filterBoard.col.days', 'DAYS')} />
+            <Stat value={String(pool.rounds)} label={t('discover.filterBoard.railRounds', 'ROUNDS', { count: pool.rounds })} />
+            <Stat value={String(pool.courses)} label={t('discover.filterBoard.railCourses', 'COURSES', { count: pool.courses })} />
+            <Stat value={String(pool.members)} label={t('discover.filterBoard.railMembers', 'MEMBERS', { count: pool.members })} />
+            <Stat value={days} label={t('discover.filterBoard.railDays', 'DAYS', { count: Number(days) || 2 })} />
           </div>
         </div>
       </div>
