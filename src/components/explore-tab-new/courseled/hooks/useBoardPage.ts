@@ -77,6 +77,12 @@ export interface BoardPage {
   rows: BoardRow[];
   /** The RPC's own total for the WHOLE board, not the page. */
   total: number;
+  /** Pool figures describe the qualifying set the board is drawn from. */
+  pool: {
+    rounds: number;
+    courses: number;
+    members: number;
+  };
 }
 
 export function useBoardPage(
