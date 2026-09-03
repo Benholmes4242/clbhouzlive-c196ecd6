@@ -14,8 +14,6 @@ import { BoardHeaderRow, BoardRowView, gapText } from './BoardRows';
 import { BoardFilterPanel } from './BoardFilterPanel';
 import { BoardSeeAllSheet } from './BoardSeeAllSheet';
 import { ListTerminalRow } from './ListTerminalRow';
-import { PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
-import { heroCanonScrimOn } from '@/features/tourhub/_shared/heroGradient';
 /* F1 — the day's FIRST session lands on the handicap default; later sessions
    the same day rotate. One hook decides which. */
 import { useDiscoverEntryBoard } from './hooks/useDiscoverEntryBoard';
@@ -60,8 +58,8 @@ import {
  * a board that disappears when a filter bites teaches a member nothing.
  */
 
-/** Match the Tour Overview hero board: six positions, retaining a boundary tie. */
-const VISIBLE_POSITIONS = 6;
+/** Ten POSITIONS on the page. A tie crossing T10 is kept whole. */
+const VISIBLE_POSITIONS = 10;
 
 /**
  * ONE READ SERVES THE PAGE AND THE PIN. The page shows ten positions; the read takes
@@ -70,6 +68,8 @@ const VISIBLE_POSITIONS = 6;
  * 300th is told their position by the see-all sheet, not by a third round trip.
  */
 const PAGE_FETCH = 200;
+
+const HERO_H = 300;
 
 export interface GolfThisWeekProps {
   userId: string | undefined;
@@ -207,13 +207,13 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
   const unitCount = t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total });
 
   return (
-    <section style={{ margin: '0 -14px', fontFamily: SANS, background: A.CANVAS, ...FIGS }}>
+    <section style={{ margin: '0 -14px', fontFamily: SANS, ...FIGS }}>
       <div
         style={{
           position: 'relative',
-          height: `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+          height: `calc(${HERO_H}px + env(safe-area-inset-top, 0px))`,
           overflow: 'hidden',
-          background: A.CANVAS,
+          background: A.PANEL,
         }}
       >
         <CourseImageFallback
@@ -229,9 +229,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           style={{
             position: 'absolute',
             inset: 0,
-            top: 'auto',
-            height: 260,
-            background: heroCanonScrimOn(A.CANVAS),
+            background: `linear-gradient(to top, ${A.CANVAS} 0%, rgba(21,23,31,0.82) 20%, rgba(21,23,31,0.34) 58%, rgba(21,23,31,0.08) 100%)`,
           }}
         />
         <div
@@ -241,21 +239,16 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end',
-            padding: 'env(safe-area-inset-top, 0px) 20px 12px',
+            padding: 'env(safe-area-inset-top, 0px) 14px 16px',
           }}
         >
-          <span style={{ ...KICKER, fontSize: 10, color: A.MUTE }}>
+          <span style={{ ...KICKER, color: A.BODY }}>
             {t('discover.board.circuitEyebrow', 'The amateur circuit')}
           </span>
-          <h2 style={{ margin: '6px 0 0', fontSize: 30, lineHeight: 0.96, fontWeight: 700, letterSpacing: 0, textTransform: 'uppercase', color: DISCOVER_FACT, textWrap: 'balance' }}>
+          <h2 style={{ margin: '6px 0 0', fontSize: 25, fontWeight: 700, letterSpacing: '0.005em', textTransform: 'uppercase', color: DISCOVER_FACT }}>
             {ready ? boardTitle : '\u00a0'}
           </h2>
-          {leader?.course_name && (
-            <div style={{ marginTop: 7, fontSize: 11.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {leader.course_name}
-            </div>
-          )}
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginTop: 12, whiteSpace: 'nowrap', visibility: ready ? 'visible' : 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 12, whiteSpace: 'nowrap', visibility: ready ? 'visible' : 'hidden' }}>
             <Stat value={String(pool.rounds)} label={t('discover.filterBoard.railRounds', 'ROUNDS', { count: pool.rounds })} />
             <Stat value={String(pool.courses)} label={t('discover.filterBoard.railCourses', 'COURSES', { count: pool.courses })} />
             <Stat value={String(pool.members)} label={t('discover.filterBoard.railMembers', 'MEMBERS', { count: pool.members })} />
@@ -281,11 +274,11 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
           position: 'sticky',
           top: 'var(--chrome-total-h, 55px)',
           zIndex: DISCOVER_STICKY_FILTER_Z,
-           width: '100%', minHeight: 48, padding: '0 16px', display: 'flex', alignItems: 'center', gap: 12,
-           background: A.CANVAS, border: 'none', borderTop: `0.5px solid ${A.BORDER}`,
+          width: '100%', minHeight: 48, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 12,
+          background: A.PANEL, border: 'none', borderTop: `1px solid ${A.BORDER}`,
           /* G1.3 — settled chrome, not a floating card: full width, no radius,
              no shadow, the hairline on the BOTTOM edge. */
-           borderBottom: `0.5px solid ${A.BORDER}`, borderRadius: 0, boxShadow: 'none',
+          borderBottom: `1px solid ${A.BORDER}`, borderRadius: 0, boxShadow: 'none',
           fontFamily: SANS, cursor: 'pointer', textAlign: 'left',
         }}
       >
@@ -299,10 +292,10 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
       </button>
 
       {/* THE BOARD */}
-      <div ref={boardRef} style={{ scrollMarginTop: 'calc(var(--chrome-total-h, 55px) + 56px)' }}>
+      <div ref={boardRef} style={{ marginTop: 16, padding: '0 14px', scrollMarginTop: 'calc(var(--chrome-total-h, 55px) + 56px)' }}>
 
         {!ready || page.isPending ? (
-          <BoardLoadingRows />
+          <div style={{ height: 240 }} aria-hidden />
         ) : total === 0 ? (
           <EmptyAnswer board={board} filters={filters} onReset={() => changeFilters({ ...DEFAULT_FILTERS })} />
         ) : (
@@ -329,12 +322,10 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
               </div>
             )}
             {total > visible.length && (
-              <div style={{ padding: '0 16px' }}>
-                <ListTerminalRow
-                  label={t('discover.filterBoard.seeAll', 'See all {{unit}}', { unit: unitCount })}
-                  onPress={() => setSeeAll(true)}
-                />
-              </div>
+              <ListTerminalRow
+                label={t('discover.filterBoard.seeAll', 'See all {{unit}}', { unit: unitCount })}
+                onPress={() => setSeeAll(true)}
+              />
             )}
           </>
         )}
@@ -378,7 +369,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
       <span className="tabular-nums" style={{ fontSize: 17, fontWeight: 700, color: DISCOVER_FACT, lineHeight: 1 }}>
         {value}
       </span>
@@ -386,25 +377,6 @@ function Stat({ value, label }: { value: string; label: string }) {
         {label}
       </span>
     </span>
-  );
-}
-
-function BoardLoadingRows() {
-  return (
-    <div aria-hidden style={{ background: A.CANVAS }}>
-      <div style={{ height: 29, borderBottom: `0.5px solid ${A.BORDER}` }} />
-      {Array.from({ length: VISIBLE_POSITIONS }, (_, index) => (
-        <div
-          key={index}
-          style={{
-            height: 58,
-            margin: '0 16px',
-            borderBottom: `0.5px solid ${A.BORDER}`,
-            background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%)`,
-          }}
-        />
-      ))}
-    </div>
   );
 }
 

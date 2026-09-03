@@ -219,8 +219,8 @@ export function BoardAvatar({ row, size = 28 }: { row: Row; size?: number }) {
   );
 }
 
-const POS_W = 34;
-const VALUE_W = 46;
+const POS_W = 28;
+const VALUE_W = 58;
 const SECOND_W = 46;
 
 export function BoardHeaderRow({ board }: { board: BoardKey }) {
@@ -238,10 +238,9 @@ export function BoardHeaderRow({ board }: { board: BoardKey }) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
-        minHeight: 29,
-        padding: '0 16px',
-        borderBottom: `0.5px solid ${A.BORDER}`,
+        gap: 10,
+        padding: '0 2px 6px',
+        borderBottom: `1px solid ${A.BORDER}`,
       }}
     >
       <span style={{ ...cap, width: POS_W, textAlign: 'center', flexShrink: 0 }}>
@@ -296,12 +295,11 @@ export function BoardRowView({
         width: '100%',
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
-        minHeight: 58,
-        padding: '8px 16px',
+        gap: 10,
+        padding: '9px 2px',
         background: 'transparent',
         border: 'none',
-        borderBottom: `0.5px solid ${A.BORDER}`,
+        borderBottom: `1px solid ${A.BORDER}`,
         textAlign: 'left',
         fontFamily: SANS,
         cursor: onPress ? 'pointer' : 'default',
@@ -324,7 +322,7 @@ export function BoardRowView({
         </span>
 
       <span style={{ flexShrink: 0 }}>
-        <BoardAvatar row={row} size={30} />
+        <BoardAvatar row={row} size={28} />
       </span>
       <span style={{ flex: 1, minWidth: 0 }}>
         <span
