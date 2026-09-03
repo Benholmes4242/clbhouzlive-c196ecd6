@@ -15,7 +15,7 @@
  * the drawer wins for the rest of the session.
  */
 
-import type { BoardKey, WindowKey } from './boardFilters';
+import type { BoardKey, ScopeKey, WindowKey } from './boardFilters';
 import { BOARD_KEYS, DEFAULT_FILTERS } from './boardFilters';
 
 /** One row of public.get_board_rotation. */
