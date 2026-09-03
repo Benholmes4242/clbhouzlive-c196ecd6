@@ -69,7 +69,7 @@ const VISIBLE_POSITIONS = 8;
  */
 const PAGE_FETCH = 200;
 
-const HERO_H = 240;
+const HERO_H = 216;
 
 export interface GolfThisWeekProps {
   userId: string | undefined;
