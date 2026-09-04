@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
 
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
@@ -165,16 +164,21 @@ export function CourseHolePanel({ courseId, userId, onCoursePress }: CourseHoleP
       )}
 
       {/* BLOCK 3 — HOLE BY HOLE (S5.5). */}
+      {/* E2.1 — "All 18" is a PLAIN LABEL now. One route to the course page, not
+          two: the terminal row below is the discoverable target. */}
       <Block
         title={t('holes.preview.eyebrow', 'Hole by hole')}
-        action={{
-          label: t('discover.coursesPlayed.allHoles', 'All {{count}}', { count: holes.length }),
-          onPress: () => onCoursePress?.(courseId),
-        }}
+        note={t('discover.coursesPlayed.allHoles', 'All {{count}}', { count: holes.length })}
       >
         {shares && <DistributionStrip shares={shares} />}
         <Extremes hardest={hardest} easiest={easiest} />
       </Block>
+
+      {/* E1 — THE TERMINAL VIEW COURSE ROW. Same grammar as the See all rows. */}
+      <ListTerminalRow
+        label={t('discover.coursesPlayed.viewCourse', 'View course')}
+        onPress={() => onCoursePress?.(courseId)}
+      />
     </div>
   );
 }
@@ -182,13 +186,11 @@ export function CourseHolePanel({ courseId, userId, onCoursePress }: CourseHoleP
 function Block({
   title,
   note,
-  action,
   first,
   children,
 }: {
   title: string;
   note?: string;
-  action?: { label: string; onPress: () => void };
   first?: boolean;
   children: React.ReactNode;
 }) {
@@ -202,28 +204,6 @@ function Block({
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
         <span style={BLOCK_TITLE}>{title}</span>
         {note ? <span style={{ ...CAP, marginLeft: 'auto' }}>{note}</span> : null}
-        {action ? (
-          <button
-            type="button"
-            onClick={action.onPress}
-            style={{
-              marginLeft: 'auto',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 2,
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              fontFamily: SANS,
-              ...CAP,
-              color: A.BODY,
-            }}
-          >
-            {action.label}
-            <ChevronRight size={12} aria-hidden />
-          </button>
-        ) : null}
       </div>
       {children}
     </div>
