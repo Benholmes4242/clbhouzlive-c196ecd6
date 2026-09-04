@@ -4,7 +4,10 @@ import { ChevronDown, ChevronUp, ArrowDown, ArrowUp } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { A, SANS, FIGS, DISCOVER_FACT, PODIUM_ACCENT } from './tokens';
-import { WINDOW_SHORT, type BoardFilters } from './boardFilters';
+import { type BoardFilters } from './boardFilters';
+/* S3.3 — THE SHEET STATES THE SAME APPLIED LINE AS THE PAGE, from the page's own
+   formatter. No second wording lives here. */
+import { describeFilterParts } from './GolfThisWeek';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
 import { useBoardCoursePlayers, type BoardCoursePlayer } from './hooks/useBoardCoursePlayers';
@@ -73,8 +76,7 @@ export function CoursesPlayedSection({
   const [openId, setOpenId] = useState<string | null>(null);
   const [seeAll, setSeeAll] = useState(false);
 
-  const win = WINDOW_SHORT[filters.window];
-  const windowLabel = t(win.i18n, win.label);
+  const appliedParts = describeFilterParts(filters, t as never);
   const courses = useBoardCourses(userId, filters, { limit: 5 });
   const rows = courses.data?.rows ?? [];
   const total = courses.data?.total ?? 0;
@@ -164,7 +166,7 @@ export function CoursesPlayedSection({
         onClose={() => setSeeAll(false)}
         userId={userId}
         filters={filters}
-        windowLabel={windowLabel}
+        appliedParts={appliedParts}
         onCoursePress={onCoursePress}
         onMemberPress={onMemberPress}
       />
@@ -831,11 +833,20 @@ function PlaysTo({
   weight?: number;
   color?: string;
 }) {
-  if (value == null) return <span style={{ width }} aria-hidden />;
-
+  /* S2.3 — A NULL FIGURE READS AS UNKNOWN, NOT AS BLANK. A course with no usable
+     par has no plays-to, and an empty column beside a full row reads as a failed
+     load. An em dash in A.DIM at the figure's own size says the question was
+     asked and has no answer. The SCALE BAR stays absent (S2.4): a bar needs a
+     value, a dash does not. */
   const text =
-    value > 0 ? `+${value.toFixed(1)}` : value < 0 ? `\u2212${Math.abs(value).toFixed(1)}` : '0.0';
-  const tone = color ?? (value < 0 ? TOPAR_UNDER : A.INK);
+    value == null
+      ? '\u2014'
+      : value > 0
+        ? `+${value.toFixed(1)}`
+        : value < 0
+          ? `\u2212${Math.abs(value).toFixed(1)}`
+          : '0.0';
+  const tone = value == null ? A.DIM : color ?? (value < 0 ? TOPAR_UNDER : A.INK);
 
   return (
     <span style={{ width, flexShrink: 0, textAlign: 'right' }}>

@@ -8,7 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { FIGS, SANS } from './tokens';
 import { BOARD_LABELS, boardCountsRounds, type BoardFilters, type BoardKey } from './boardFilters';
 import { boardRpcArgs, type BoardRow } from './hooks/useBoardPage';
-import { BoardHeaderRow, BoardRowView } from './BoardRows';
+import { BoardHeaderRow, BoardRowView, boardColumns } from './BoardRows';
+import { relativeDayFull } from './discoverWhen';
 
 /**
  * SEE ALL (BRIEF_DISCOVER_FILTER_LED_BOARD S5.1).
@@ -74,6 +75,23 @@ export function BoardSeeAllSheet({
   const rows = useMemo(() => (query.data?.pages ?? []).flat(), [query.data]);
   const total = rows.length > 0 ? Number(rows[0].total_count) : 0;
 
+  /* S4.5 — DAY GROUPING BELONGS TO THE FIVE EVENT BOARDS ONLY, where the ranked
+     value IS the date. The six ranking boards keep their figure column and no
+     headers: grouping a gross board by day would hide the thing it ranks on. */
+  const grouped = boardColumns(board).valueIsText;
+  const groups = useMemo(() => {
+    if (!grouped) return null;
+    const out: { key: string; label: string; rows: BoardRow[] }[] = [];
+    for (const r of rows) {
+      const key = String(r.play_date ?? '').slice(0, 10);
+      const last = out[out.length - 1];
+      if (last && last.key === key) last.rows.push(r);
+      else out.push({ key, label: relativeDayFull(r.play_date, t as never), rows: [r] });
+    }
+    return out;
+  }, [grouped, rows, t]);
+
+
   return (
     <BottomSheet
       open={open}
@@ -122,7 +140,7 @@ export function BoardSeeAllSheet({
         </div>
       </div>
       <div style={{ flexShrink: 0, padding: '8px 16px 0', fontFamily: SANS, ...FIGS }}>
-        <BoardHeaderRow board={board} />
+        <BoardHeaderRow board={board} hideValue={grouped} />
       </div>
       <div
         style={{
@@ -137,15 +155,43 @@ export function BoardSeeAllSheet({
           ...FIGS,
         }}
       >
-        {rows.map((r) => (
-          <BoardRowView
-            key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
-            row={r}
-            board={board}
-            isSelf={!!userId && r.user_id === userId}
-            onPress={onRowPress}
-          />
-        ))}
+        {groups
+          ? groups.map((g, gi) => (
+              <div key={`${g.key}:${gi}`}>
+                {/* S4.2/S4.6/S4.7 — one header per day, no count, not sticky.
+                    POS keeps counting through the groups (S4.4): the rows carry
+                    the RPC's own positions and nothing restarts here. */}
+                <div
+                  style={{
+                    ...KICKER,
+                    fontSize: 10,
+                    color: A.DIM,
+                    padding: gi === 0 ? '10px 2px 6px' : '18px 2px 6px',
+                  }}
+                >
+                  {g.label}
+                </div>
+                {g.rows.map((r) => (
+                  <BoardRowView
+                    key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
+                    row={r}
+                    board={board}
+                    isSelf={!!userId && r.user_id === userId}
+                    hideValue
+                    onPress={onRowPress}
+                  />
+                ))}
+              </div>
+            ))
+          : rows.map((r) => (
+              <BoardRowView
+                key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
+                row={r}
+                board={board}
+                isSelf={!!userId && r.user_id === userId}
+                onPress={onRowPress}
+              />
+            ))}
         {query.hasNextPage && (
           <button
             type="button"

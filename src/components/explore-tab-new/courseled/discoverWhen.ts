@@ -77,3 +77,33 @@ export function relativeDayCompact(
     n: Math.max(1, Math.round(days / 365.25)),
   });
 }
+
+/**
+ * relativeDayFull — THE SEE-ALL SHEET'S DAY-GROUP HEADER
+ * (BRIEF_DISCOVER_SEE_ALL_SHEETS S4.2). Same ladder as relativeDayCompact, in
+ * full words: TODAY, YESTERDAY, 2 DAYS AGO, 3 WEEKS AGO, 4 MONTHS AGO, 2 YEARS
+ * AGO. A header has the width the WHEN column never had, so nothing is
+ * abbreviated. Uppercasing stays the caller's, via textTransform.
+ */
+export function relativeDayFull(
+  iso: string | null | undefined,
+  t: (k: string, o?: any) => string,
+): string {
+  if (!iso) return '\u2014';
+  const then = new Date(`${iso.slice(0, 10)}T12:00:00`).getTime();
+  if (!Number.isFinite(then)) return '\u2014';
+  const days = Math.max(0, Math.round((Date.now() - then) / 86_400_000));
+  if (days === 0) return t('discover.when.today', { defaultValue: 'Today' });
+  if (days === 1) return t('discover.when.yesterday', { defaultValue: 'Yesterday' });
+  if (days < 7) return t('discover.when.fullDaysAgo', { defaultValue: '{{count}} days ago', count: days });
+  if (days < 70) {
+    const n = Math.max(1, Math.round(days / 7));
+    return t('discover.when.fullWeeksAgo', { defaultValue: '{{count}} weeks ago', count: n });
+  }
+  if (days < 365) {
+    const n = Math.max(1, Math.round(days / 30.44));
+    return t('discover.when.fullMonthsAgo', { defaultValue: '{{count}} months ago', count: n });
+  }
+  const n = Math.max(1, Math.round(days / 365.25));
+  return t('discover.when.fullYearsAgo', { defaultValue: '{{count}} years ago', count: n });
+}

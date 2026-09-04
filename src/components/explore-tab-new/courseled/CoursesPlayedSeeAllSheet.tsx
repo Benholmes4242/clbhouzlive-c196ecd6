@@ -30,8 +30,13 @@ export interface CoursesPlayedSeeAllSheetProps {
   onClose: () => void;
   userId: string | undefined;
   filters: BoardFilters;
-  /** The applied WINDOW only, exactly as the section header states it. */
-  windowLabel: string;
+  /**
+   * S3.2 — THE FULL APPLIED FILTER LINE, built by the page's own
+   * describeFilterParts and passed in exactly as the rounds sheet receives it.
+   * One filter governs both sheets; a second formatter here is how the two
+   * wordings drifted apart in the first place (S3.3).
+   */
+  appliedParts: string[];
   onCoursePress?: (courseId: string) => void;
   onMemberPress?: (userId: string) => void;
 }
@@ -41,7 +46,7 @@ export function CoursesPlayedSeeAllSheet({
   onClose,
   userId,
   filters,
-  windowLabel,
+  appliedParts,
   onCoursePress,
 }: CoursesPlayedSeeAllSheetProps) {
   const { t } = useTranslation('courses');
@@ -93,7 +98,11 @@ export function CoursesPlayedSeeAllSheet({
         <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 700, color: A.INK, textTransform: 'uppercase' }}>
           {t('discover.coursesPlayed.nCourses', '{{count}} courses', { count: total })}
         </div>
-        <div style={{ ...KICKER, marginTop: 6, color: A.MUTE }}>{windowLabel}</div>
+        <div style={{ ...KICKER, marginTop: 6, color: A.MUTE }}>
+          {appliedParts.map((part, index) => (
+            <span key={`${part}:${index}`}>{index > 0 ? <> {'\u00B7'} </> : null}{part}</span>
+          ))}
+        </div>
       </div>
 
       <div

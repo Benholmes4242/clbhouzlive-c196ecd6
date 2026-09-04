@@ -253,7 +253,7 @@ const POS_W = 28;
 const VALUE_W = 58;
 const SECOND_W = 46;
 
-export function BoardHeaderRow({ board }: { board: BoardKey }) {
+export function BoardHeaderRow({ board, hideValue }: { board: BoardKey; hideValue?: boolean }) {
   const { t } = useTranslation('courses');
   const cols = boardColumns(board);
   const cap: React.CSSProperties = {
@@ -284,9 +284,13 @@ export function BoardHeaderRow({ board }: { board: BoardKey }) {
           {t(cols.secondary.i18n, cols.secondary.label)}
         </span>
       )}
-      <span style={{ ...cap, width: VALUE_W, textAlign: 'center', flexShrink: 0 }}>
-        {t(cols.value.i18n, cols.value.label)}
-      </span>
+      {/* S4.3 — on a DAY-GROUPED sheet the WHEN value is stated once per group,
+          so neither the column nor its header belongs on the row. */}
+      {!hideValue && (
+        <span style={{ ...cap, width: VALUE_W, textAlign: 'center', flexShrink: 0 }}>
+          {t(cols.value.i18n, cols.value.label)}
+        </span>
+      )}
     </div>
   );
 
@@ -297,6 +301,7 @@ export function BoardRowView({
   board,
   isSelf,
   gap,
+  hideValue,
   onPress,
 }: {
   row: Row;
@@ -304,6 +309,8 @@ export function BoardRowView({
   isSelf: boolean;
   /** Only the PINNED copy of the member's row carries this (S5.4). */
   gap?: string | null;
+  /** S4.3 — the day-grouped sheet states WHEN in its group header instead. */
+  hideValue?: boolean;
   onPress?: (row: Row) => void;
 }) {
   const { t } = useTranslation('courses');
@@ -329,7 +336,9 @@ export function BoardRowView({
         alignItems: 'center',
         gap: 10,
         padding: '6px 2px',
-        background: 'transparent',
+        /* S1.2 — the member's own row carries the amber tint wherever it lands,
+           on the board and in the long sheet alike. */
+        background: isSelf ? 'rgba(247,147,30,0.08)' : 'transparent',
         border: 'none',
         textAlign: 'left',
         fontFamily: SANS,
@@ -414,22 +423,27 @@ export function BoardRowView({
           {second.text}
         </span>
       )}
-      <span
-        className="tabular-nums"
-        style={{
-          width: VALUE_W,
-          flexShrink: 0,
-          textAlign: 'center',
-          /* B4.2 — WORDS at 12.5, FIGURES at 15. VALUE_W stays 58 either way
-             (B4.5) so the right edge aligns across boards. */
-          fontSize: valueIsText ? 12.5 : 15,
-          fontWeight: 700,
-          color: isSelf ? A.AMBER : value.tone,
-          textTransform: 'uppercase',
-        }}
-      >
-        {value.text}
-      </span>
+      {!hideValue && (
+        <span
+          className="tabular-nums"
+          style={{
+            width: VALUE_W,
+            flexShrink: 0,
+            textAlign: 'center',
+            /* B4.2 — WORDS at 12.5, FIGURES at 15. VALUE_W stays 58 either way
+               (B4.5) so the right edge aligns across boards. */
+            fontSize: valueIsText ? 12.5 : 15,
+            fontWeight: 700,
+            /* S1.3 — THE RANKED FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER:
+               under par red, over par ink, level muted, on the member's own row
+               as on any other. Amber marks the position and the name only. */
+            color: value.tone,
+            textTransform: 'uppercase',
+          }}
+        >
+          {value.text}
+        </span>
+      )}
     </button>
   );
 }
