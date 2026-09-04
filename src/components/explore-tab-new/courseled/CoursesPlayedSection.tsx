@@ -39,10 +39,8 @@ const TREND_UP = PODIUM_ACCENT.green;
 const FEATURED_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.04) 32%, rgba(0,0,0,0.76))';
 const TILE_DEPTH_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0) 58%, rgba(0,0,0,0.18))';
 const SMALL_TILE_IMAGE_H = 76;
-/* Two name lines plus two data baselines cannot fit the brief's estimated 62px
-   strip with 19px vertical padding. 79px is the smallest non-overlapping fixed
-   strip at the specified type sizes, making every small card 155px tall. */
-const SMALL_TILE_STRIP_H = 79;
+/* Amendment I: two reserved name lines and one aligned data baseline. */
+const SMALL_TILE_STRIP_H = 62;
 const SMALL_TILE_H = SMALL_TILE_IMAGE_H + SMALL_TILE_STRIP_H;
 
 const CAP = {
@@ -52,12 +50,6 @@ const CAP = {
   textTransform: 'uppercase' as const,
   color: A.DIM,
 };
-
-function formatTileToPar(value: number | null): string | null {
-  if (value == null) return null;
-  if (value === 0) return 'E';
-  return value < 0 ? `\u2212${Math.abs(value)}` : `+${value}`;
-}
 
 export interface CoursesPlayedSectionProps {
   userId: string | undefined;
@@ -272,8 +264,6 @@ function CourseMosaicTile({
 }) {
   const { t } = useTranslation('courses');
   const height = featured ? 132 : SMALL_TILE_H;
-  const lowToPar = formatTileToPar(row.low_to_par);
-  const lowTone = row.low_to_par == null ? A.DIM : row.low_to_par < 0 ? TOPAR_UNDER : row.low_to_par === 0 ? A.MUTE : A.INK;
   return (
     <button
       type="button"
@@ -373,7 +363,7 @@ function CourseMosaicTile({
               height: SMALL_TILE_STRIP_H,
               flexDirection: 'column',
               boxSizing: 'border-box',
-              padding: '9px 10px 10px',
+               padding: '8px 10px',
               background: A.PANEL,
               color: A.INK,
             }}
@@ -393,27 +383,12 @@ function CourseMosaicTile({
             >
               {row.name ?? '\u2014'}
             </span>
-            <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 6, marginTop: 2 }}>
-              <span style={CAP}>
+             <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 6, marginTop: 3, minHeight: 14 }}>
+               <span style={{ ...CAP, lineHeight: 1 }}>
                 {t('discover.coursesPlayed.nRounds', '{{count}} rounds', { count: row.rounds })}
               </span>
-              <PlaysTo value={row.plays_to} width="auto" fontSize={13.5} weight={800} />
+               <PlaysTo value={row.plays_to} width="auto" fontSize={13.5} weight={800} />
             </span>
-            {row.low_gross != null ? (
-              <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 6, marginTop: 2 }}>
-                <span style={CAP}>{t('discover.coursesPlayed.low', 'Low')}</span>
-                <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
-                  <span className="tabular-nums" style={{ fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1 }}>
-                    {row.low_gross}
-                  </span>
-                  {lowToPar ? (
-                    <span className="tabular-nums" style={{ fontSize: 10, fontWeight: 700, color: lowTone, lineHeight: 1 }}>
-                      {lowToPar}
-                    </span>
-                  ) : null}
-                </span>
-              </span>
-            ) : null}
           </span>
         </>
       )}
