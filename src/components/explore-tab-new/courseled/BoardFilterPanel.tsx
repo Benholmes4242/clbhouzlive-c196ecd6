@@ -488,7 +488,7 @@ export function BoardFilterPanel({
                   label={t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
                   count={facets.countFor('board', key)}
                   selected={board === key}
-                  isDefault={key === 'gross'}
+                  isDefault={key === 'topar'}
                   onClick={() => onBoardChange(key)}
                 />
               ))}

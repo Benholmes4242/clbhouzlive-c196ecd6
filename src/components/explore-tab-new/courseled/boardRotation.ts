@@ -42,7 +42,8 @@ export interface BoardPick {
 
 /** R3.1 — the silent fallback. No error state, no empty board, no retry. */
 export const FALLBACK_PICK: BoardPick = {
-  board: 'gross',
+  /* BRIEF_RETIRE_GROSS_BOARD — the retired 'gross' board is never landed on. */
+  board: 'topar',
   window: DEFAULT_FILTERS.window,
 };
 
@@ -81,6 +82,11 @@ export function localDateKey(now: Date = new Date()): string {
 const WINDOW_ORDER: WindowKey[] = ['14', '30', '90', 'year', 'all'];
 
 const isBoardKey = (v: string): v is BoardKey => (BOARD_KEYS as string[]).includes(v);
+/** A rotation candidate must be a board the drawer still OFFERS ('gross' is
+    retired, so the rotation can never hand a member a board they cannot pick
+    again). */
+const isOfferedBoard = (v: string): v is BoardKey =>
+  isBoardKey(v) && v !== 'gross';
 const isWindowKey = (v: string): v is WindowKey => (WINDOW_ORDER as string[]).includes(v);
 
 const SCOPE_KEYS: ScopeKey[] = ['everyone', 'circle', 'club', 'you'];
@@ -209,7 +215,7 @@ export function pickRotation(
   /* Only combinations this client can actually express are candidates. */
   const clean = (rows ?? []).filter(
     (r) =>
-      isBoardKey(r.board) &&
+      isOfferedBoard(r.board) &&
       isWindowKey(r.win) &&
       Number(r.n) > 0 &&
       r.board !== excludeBoard,

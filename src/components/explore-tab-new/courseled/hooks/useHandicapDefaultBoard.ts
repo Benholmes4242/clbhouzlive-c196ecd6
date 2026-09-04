@@ -18,8 +18,10 @@ import type { BoardKey } from '../boardFilters';
  * H1.2 — only the BOARD varies. The window stays 14 for everyone.
  */
 export const HANDICAP_BOARD_BOUNDARY = 5;
-/** H1.1 / H4.3 — no index, or an index that never resolves, is gross. */
-export const DEFAULT_BOARD_FALLBACK: BoardKey = 'gross';
+/** H1.1 / H4.3 — no index, or an index that never resolves, is the gross board
+    ('topar' since BRIEF_RETIRE_GROSS_BOARD; the label still reads "Lowest
+    gross" and it ranks on gross-to-par). */
+export const DEFAULT_BOARD_FALLBACK: BoardKey = 'topar';
 
 export function boardForIndex(index: number | null | undefined): BoardKey {
   if (index == null || !Number.isFinite(index)) return DEFAULT_BOARD_FALLBACK;

@@ -4,10 +4,10 @@ import { boardForIndex } from '../hooks/useHandicapDefaultBoard';
 
 /** H1.1 / H1.5 — one boundary, 5.0 exactly, and 5.0 gets net. */
 describe('boardForIndex', () => {
-  it('lands an index under 5 on gross', () => {
-    expect(boardForIndex(-1.4)).toBe('gross');
-    expect(boardForIndex(0)).toBe('gross');
-    expect(boardForIndex(4.9)).toBe('gross');
+  it('lands an index under 5 on the gross board', () => {
+    expect(boardForIndex(-1.4)).toBe('topar');
+    expect(boardForIndex(0)).toBe('topar');
+    expect(boardForIndex(4.9)).toBe('topar');
   });
 
   it('lands 5.0 exactly, and everything above it, on net', () => {
@@ -16,9 +16,9 @@ describe('boardForIndex', () => {
     expect(boardForIndex(24)).toBe('net');
   });
 
-  it('lands a missing or unusable index on gross', () => {
-    expect(boardForIndex(null)).toBe('gross');
-    expect(boardForIndex(undefined)).toBe('gross');
-    expect(boardForIndex(Number.NaN)).toBe('gross');
+  it('lands a missing or unusable index on the gross board', () => {
+    expect(boardForIndex(null)).toBe('topar');
+    expect(boardForIndex(undefined)).toBe('topar');
+    expect(boardForIndex(Number.NaN)).toBe('topar');
   });
 });
