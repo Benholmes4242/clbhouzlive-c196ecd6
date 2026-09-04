@@ -68,7 +68,7 @@ export function relativeDayCompact(
   }
   if (days < 365) {
     return t('discover.when.relMonthsAgo', {
-      defaultValue: '{{n}}mo ago',
+      defaultValue: '{{n}}m ago',
       n: Math.max(1, Math.round(days / 30.44)),
     });
   }
