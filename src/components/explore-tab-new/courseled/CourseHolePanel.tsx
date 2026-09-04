@@ -17,6 +17,7 @@ import {
 } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { buildParTypeRows } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
 import { SANS } from './tokens';
+import { ListTerminalRow } from './ListTerminalRow';
 
 /**
  * HOW A COURSE PLAYS, INSIDE A DISCOVER ROW (BRIEF_COURSES_HOW_THEY_PLAYED S5-S7).
