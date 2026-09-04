@@ -170,6 +170,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
           <span
             key={i}
             aria-hidden="true"
+            data-score-ring={i + 1}
             style={{
               position: 'absolute',
               inset: i * ringStep,
@@ -182,6 +183,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
         {variant === 'bogey' && (
           <span
             aria-hidden="true"
+            data-score-outline="bogey"
             style={{
               position: 'absolute',
               inset: 0,
@@ -194,6 +196,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
         {hasMark && variant !== 'bogey' && (
           <span
             aria-hidden="true"
+            data-score-fill={variant}
             style={{
               position: 'absolute',
               inset: markInset,

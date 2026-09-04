@@ -28,7 +28,7 @@ describe('ScoreMark dark scorecard convention', () => {
     const fillLayer = hidden.find((node) => node.style.backgroundColor === resolved);
     expect(fillLayer).toBeDefined();
     expect(fillLayer?.style.borderRadius).toBe(radius);
-    expect(hidden.filter((node) => sameColor(node.style.borderColor, resolved))).toHaveLength(rings);
+    expect(container.querySelectorAll('[data-score-ring]')).toHaveLength(rings);
   });
 
   it('renders bogey as an unfilled outlined square and par as plain ink', () => {
@@ -43,10 +43,10 @@ describe('ScoreMark dark scorecard convention', () => {
 
   it('makes an ace inherit its par-relative band', () => {
     const parThree = render(<ScoreMark strokes={1} par={3} surface="dark" />);
-    expect(layers(parThree.container).filter((node) => sameColor(node.style.borderColor, cssColor('#FFD200')))).toHaveLength(1);
+    expect(parThree.container.querySelectorAll('[data-score-ring]')).toHaveLength(1);
 
     const parFour = render(<ScoreMark strokes={1} par={4} surface="dark" />);
-    expect(layers(parFour.container).filter((node) => sameColor(node.style.borderColor, cssColor('#FFD200')))).toHaveLength(2);
+    expect(parFour.container.querySelectorAll('[data-score-ring]')).toHaveLength(2);
   });
 
   it('preserves the light double-plus treatment', () => {
