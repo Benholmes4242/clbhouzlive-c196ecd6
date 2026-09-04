@@ -159,10 +159,10 @@ export const LEADER_GOLD_TINT_10 = 'rgba(251,188,46,0.10)';  // medium leader ti
 // red across every golf surface (leaderboard, hero, schedule, player history,
 // college, TI). All prior SCORE_* tokens have been removed in favour of these.
 export const TOPAR_UNDER_LIGHT = '#D2222D';
-// One bright red for under par on every dark surface. This consolidates the
-// former #DC2626 canonical token, #FF6B5E scorecard birdie, #FF5D5D glass
-// override and duplicate #FF6B60 trajectory/analytical declarations.
-export const TOPAR_UNDER_DARK  = '#FF6B60';
+// One deep, AA-safe red for under par on every dark surface. #E24B3F measures
+// 4.52:1 against the canonical #15171F canvas; do not deepen it without
+// re-measuring text contrast. Fill-only score marks use their own darker red.
+export const TOPAR_UNDER_DARK  = '#E24B3F';
 export const TOPAR_OVER_LIGHT  = '#0F172A';                  // the FORMER INK value, pinned: the light path's over-par ink. HOLD — INK is now near-white.
 export const TOPAR_OVER_DARK   = 'rgba(242,244,247,0.62)';
 export const TOPAR_EVEN_LIGHT  = '#8A9099';

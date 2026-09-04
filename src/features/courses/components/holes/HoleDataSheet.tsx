@@ -12,7 +12,13 @@ import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { formatNumber } from '@/i18n/format';
 import { HoleGlyph, HoleGlyphDefs, type HoleGlyphKind } from './HoleGlyph';
-import { SC_BIRDIE_DARK } from './_constants';
+import {
+  SC_BIRDIE_DARK,
+  SC_BOGEY_DARK,
+  SC_DOUBLE_DARK,
+  SC_EAGLE_DARK,
+  SC_FILL_GOLD,
+} from './_constants';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import { ScoringBreakdownSection } from './ScoringBreakdownSection';
 import { AddHolePhotoRow } from './AddHolePhotoRow';
@@ -107,11 +113,11 @@ const NUM: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
  * Used by the mix strip on every hole row and by the collapsed-state legend.
  */
 export const DIST_SEG_COLORS = {
-  eaglePlus: GOLD,
-  birdie: `linear-gradient(90deg, ${GOLD} 0%, ${GOLD_2} 100%)`,
+  eaglePlus: SC_FILL_GOLD,
+  birdie: SC_BIRDIE_DARK,
   par: INK_20,
-  bogey: INK_55,
-  double: INK_85,
+  bogey: SC_BOGEY_DARK,
+  double: SC_DOUBLE_DARK,
 } as const;
 
 
@@ -1211,11 +1217,11 @@ const ExpandedCard: React.FC<{
   }
 
   const bars: { kind: HoleGlyphKind; label: string; pct: number; gold: boolean; fill: string }[] = [
-    { kind: 'eagle-or-better', label: 'EAG+', pct: pctSum(row, ['ace', 'albatross', 'eagle']), gold: true, fill: GOLD },
-    { kind: 'birdie', label: 'BIRD', pct: row.dist.birdie ?? 0, gold: true, fill: GOLD_GRAD_V },
+    { kind: 'eagle-or-better', label: 'EAG+', pct: pctSum(row, ['ace', 'albatross', 'eagle']), gold: true, fill: SC_FILL_GOLD },
+    { kind: 'birdie', label: 'BIRD', pct: row.dist.birdie ?? 0, gold: false, fill: SC_BIRDIE_DARK },
     { kind: 'par', label: 'PAR', pct: row.dist.par ?? 0, gold: false, fill: INK_20 },
-    { kind: 'bogey', label: 'BOG', pct: row.dist.bogey ?? 0, gold: false, fill: INK_55 },
-    { kind: 'double-plus', label: 'DBL+', pct: row.dist.double ?? 0, gold: false, fill: INK_85 },
+    { kind: 'bogey', label: 'BOG', pct: row.dist.bogey ?? 0, gold: false, fill: SC_BOGEY_DARK },
+    { kind: 'double-plus', label: 'DBL+', pct: row.dist.double ?? 0, gold: false, fill: SC_DOUBLE_DARK },
   ];
   const maxPct = Math.max(1, ...bars.map((b) => b.pct));
   const CHART_H = 88;
@@ -1250,7 +1256,7 @@ const ExpandedCard: React.FC<{
                 style={{
                   fontSize: 12,
                   fontWeight: 700,
-                  color: b.gold ? GOLD_INK : INK,
+                  color: b.gold ? SC_EAGLE_DARK : b.fill,
                   ...NUM,
                   lineHeight: 1,
                   marginBottom: 4,

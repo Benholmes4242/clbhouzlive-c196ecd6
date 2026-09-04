@@ -25,7 +25,13 @@
  * point and can be removed once that mount is retired.
  */
 import React from 'react';
-import { INK, SC_FILL_GOLD, SC_BIRDIE_DARK } from './_constants';
+import {
+  SC_FILL_BIRDIE_DK,
+  SC_FILL_BOGEY_DK,
+  SC_FILL_DOUBLE_DK,
+  SC_FILL_GOLD,
+  SC_FILL_TRIPLE_DK,
+} from './_constants';
 
 export type HoleGlyphKind =
   /** Kept for the callers that cannot yet tell an eagle from an ace: RED ring. */
@@ -36,10 +42,9 @@ export type HoleGlyphKind =
   | 'birdie'
   | 'par'
   | 'bogey'
-  | 'double-plus';
+  | 'double-plus'
+  | 'triple-plus';
 
-const BOGEY_GROUND = 'rgba(248,250,252,0.28)';
-const DOUBLE_GROUND = 'rgba(248,250,252,0.62)';
 const STRIP_STROKE = 1.4;
 
 export const HoleGlyph: React.FC<{ kind: HoleGlyphKind; size?: number }> = ({
@@ -47,19 +52,23 @@ export const HoleGlyph: React.FC<{ kind: HoleGlyphKind; size?: number }> = ({
   size = 20,
 }) => {
   const under = kind === 'birdie' || kind === 'eagle' || kind === 'eagle-or-better' || kind === 'ace-or-albatross';
-  const over = kind === 'bogey' || kind === 'double-plus';
-  const ring =
-    kind === 'eagle' || kind === 'eagle-or-better' || kind === 'ace-or-albatross' || kind === 'double-plus';
-  const goldRing = kind === 'ace-or-albatross';
+  const over = kind === 'bogey' || kind === 'double-plus' || kind === 'triple-plus';
+  const ringCount = kind === 'ace-or-albatross'
+    ? 2
+    : kind === 'eagle' || kind === 'eagle-or-better' || kind === 'triple-plus'
+      ? 1
+      : 0;
+  const ring = ringCount > 0;
+  const gold = kind === 'eagle' || kind === 'eagle-or-better' || kind === 'ace-or-albatross';
 
   const fill = under
-    ? SC_BIRDIE_DARK
+    ? gold ? SC_FILL_GOLD : SC_FILL_BIRDIE_DK
     : kind === 'double-plus'
-      ? DOUBLE_GROUND
-      : kind === 'bogey'
-        ? BOGEY_GROUND
+      ? SC_FILL_DOUBLE_DK
+      : kind === 'triple-plus'
+        ? SC_FILL_TRIPLE_DK
         : 'none';
-  const ringTone = goldRing ? SC_FILL_GOLD : under ? SC_BIRDIE_DARK : INK;
+  const ringTone = gold ? SC_FILL_GOLD : SC_FILL_TRIPLE_DK;
 
   const RING_GAP = 1.4;
   const discInset = ring ? STRIP_STROKE + RING_GAP : 0;
@@ -74,19 +83,28 @@ export const HoleGlyph: React.FC<{ kind: HoleGlyphKind; size?: number }> = ({
       style={{ display: 'block' }}
       aria-hidden
     >
-      {ring && ringR > 0 && (
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={ringR}
-          fill="none"
-          stroke={ringTone}
-          strokeWidth={STRIP_STROKE}
-          vectorEffect="non-scaling-stroke"
-        />
+      {Array.from({ length: ringCount }, (_, i) => {
+        const radius = ringR - i * (STRIP_STROKE + RING_GAP);
+        return radius > 0 ? (
+          <circle
+            key={i}
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke={ringTone}
+            strokeWidth={STRIP_STROKE}
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null;
+      })}
+      {kind === 'bogey' && (
+        <rect x={1} y={1} width={size - 2} height={size - 2} fill="none" stroke={SC_FILL_BOGEY_DK} strokeWidth={STRIP_STROKE} />
       )}
       {fill !== 'none' && discR > 0 && (
-        <circle cx={size / 2} cy={size / 2} r={discR} fill={fill} />
+        under
+          ? <circle cx={size / 2} cy={size / 2} r={discR} fill={fill} />
+          : <rect x={discInset} y={discInset} width={size - discInset * 2} height={size - discInset * 2} fill={fill} />
       )}
     </svg>
   );
