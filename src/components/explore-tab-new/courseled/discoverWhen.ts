@@ -42,7 +42,10 @@ export function relativeDay(
  * a relative day on a fixed ladder instead:
  *
  *   0 -> TODAY, 1 -> YEST, 2-6 -> {n}D AGO, 7-69 -> {n}W AGO (nearest week),
- *   70-364 -> {n}MO AGO (nearest month), 365+ -> {n}Y AGO.
+ *   70-364 -> {n}M AGO (nearest month), 365+ -> {n}Y AGO.
+ *
+ * Units are single letters throughout (D, W, M, Y) so the board's WHEN column
+ * never wraps to a second line.
  *
  * Uppercasing is the caller's, via textTransform.
  */
