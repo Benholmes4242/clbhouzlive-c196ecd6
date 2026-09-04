@@ -588,6 +588,10 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   const totalRounds =
     activeView === 'pros' ? (pro?.total_rounds ?? 0) : (data?.total_rounds ?? 0);
 
+  /** Every round posted at this course - the hero's own ROUNDS figure. */
+  const courseRoundsTracked = Number(courseStats?.rounds_tracked ?? 0);
+
+
   /* The member's own rows decide whether a field exists at all; until that
      query resolves the panel cannot know which anatomy to render. */
   const awaitingMine =
