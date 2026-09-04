@@ -468,16 +468,16 @@ function LowRoundLine({
         padding: '2px 0 10px',
       }}
     >
+      {/* S3.3 — the lazy shell holds ONE LINE's height, never the old list's. */}
+      {players.isPending ? (
+        <span aria-hidden style={{ display: 'inline-block', width: 22, height: 22 }} />
+      ) : (
+        <AvatarStack players={players.data ?? []} lowBy={row.low_by} viewerId={userId} />
+      )}
       <span style={{ ...CAP, color: A.MUTE }}>
         {t('discover.coursesPlayed.lowRoundBy', 'Low round by {{name}}', {
           name: row.low_by ?? '\u2014',
         })}
-        {row.eagle_rounds > 0 ? (
-          <>
-            {' \u00b7 '}
-            {t('discover.coursesPlayed.nEagles', '{{count}} eagles', { count: row.eagle_rounds })}
-          </>
-        ) : null}
       </span>
       <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
         <span className="tabular-nums" style={{ fontSize: 17, fontWeight: 800, color: A.INK, lineHeight: 1 }}>
