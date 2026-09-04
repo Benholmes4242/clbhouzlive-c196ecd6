@@ -41,6 +41,17 @@ export const REVIEW_SHEET_Z   = 240;   // ReviewBottomSheet scrim (panel = +1)
 export const MEDIA_PREVIEW_Z  = 9999;  // MediaPreviewViewer (portals to body)
 
 /**
+ * Post composer (StageComposer, portalled to body by GlobalPostComposer).
+ *
+ * Sits above the fullscreen viewer and every bottom sheet because it is reached
+ * FROM them (MoreOptionsDrawer at MORE_SHEET_Z opens it) — RANKING FOLLOWS WHO
+ * OPENED WHOM. The value 12000 is unchanged from the previously hardcoded one;
+ * it is registered here so the rest of the app can reason about it. All six of
+ * StageComposer's root states share it and must never drift apart.
+ */
+export const POST_COMPOSER_Z  = 12000;
+
+/**
  * BRIEF_DISCOVER_STICKY_FILTER_BAR G1.6 — Discover's sticky filter bar.
  *
  * IN-PAGE CHROME, NOT AN OVERLAY. It is deliberately the LOWEST entry here: it
