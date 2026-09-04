@@ -130,6 +130,42 @@ Deno.serve(async (req) => {
   const checked = results.filter((r) => r.fetched).length;
   const totalHoles = results.reduce((sum, r) => sum + r.holesUpserted, 0);
 
+  // RE-EVALUATE WHAT WE JUST ENRICHED. The evaluator runs when a round is
+  // created and races this backfill: whenever it wins, the round was evaluated
+  // with no hole rows and its course_par (and every hole-derived figure) was
+  // stored null with nothing to re-run it. Writing hole rows is exactly the
+  // event that makes a re-evaluation worthwhile, so queue it here. The
+  // evaluator's own version guard keeps the replay side-effect free — badges,
+  // streaks and notifications do not fire twice; only gam_round_stats is
+  // rewritten. Non-fatal: a queue failure must not fail the backfill.
+  const enrichedIds = results.filter((r) => r.fetched && r.holesUpserted > 0).map((r) => r.scoreId);
+  let requeued = 0;
+  if (enrichedIds.length > 0) {
+    try {
+      const { data: queued, error: qErr } = await admin
+        .from("gam_evaluation_queue")
+        .upsert(
+          enrichedIds.map((id) => ({
+            user_id: user.id,
+            whs_score_id: id,
+            evaluator_version: 1,
+            status: "queued",
+            attempts: 0,
+            error: null,
+            processed_at: null,
+            enqueued_at: new Date().toISOString(),
+          })),
+          { onConflict: "user_id,whs_score_id,evaluator_version" },
+        )
+        .select("whs_score_id");
+      if (qErr) throw qErr;
+      requeued = queued?.length ?? 0;
+    } catch (e) {
+      console.error("[backfill] re-evaluation enqueue failed (non-fatal):", e);
+    }
+  }
+
+
   const { count: remaining } = await admin
     .from("whs_scores")
     .select("id", { count: "exact", head: true })
@@ -174,6 +210,8 @@ Deno.serve(async (req) => {
     checked,
     enriched,
     holes_upserted: totalHoles,
+    requeued_for_evaluation: requeued,
+
     remaining: remaining ?? 0,
     has_more: hasMore,
     chain_position: chainPosition,
