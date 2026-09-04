@@ -31,6 +31,12 @@ describe('pickRotation', () => {
     expect([...picks].sort()).toEqual(['topar:14', 'topar:90']);
   });
 
+  it('BRIEF_RETIRE_GROSS_BOARD — a retired gross row is never a candidate', () => {
+    const rows = [row('gross', '14', 40), row('net', '14', 18)];
+    for (let i = 0; i < 50; i += 1) expect(pickRotation(rows).board).toBe('net');
+    expect(pickRotation([row('gross', '14', 40)])).toEqual(FALLBACK_PICK);
+  });
+
   it('R2.2 — the board is drawn uniformly, not by row count', () => {
     const rows = [row('recent', 'all', 3412), row('topar', '14', 18)];
     expect(pickRotation(rows, { random: first }).board).toBe('recent');
