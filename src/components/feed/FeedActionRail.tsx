@@ -40,6 +40,8 @@ interface FeedActionRailProps {
   likesCount: number | null;
   commentsCount: number | null;
   onLike: () => void;
+  /** Opens the likers sheet from the count beneath the heart. */
+  onOpenLikes?: () => void;
   onComment: () => void;
   onShare: () => void;
   onMore: () => void;
@@ -152,6 +154,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
   likesCount,
   commentsCount,
   onLike,
+  onOpenLikes,
   onComment,
   onShare,
   onMore,
@@ -335,21 +338,74 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
       {/* Read-only: render only the creator avatar above. Skip all interactive controls. */}
       {!readOnly && (
         <>
-          {/* Like */}
-          <ActionButton
-            onClick={onLike}
-            ariaLabel={hasLiked ? 'Unlike' : 'Like'}
-            count={formatCount(likesCount)}
-            accentCount={hasLiked}
-            animateKey={likeAnimKey}
-          >
-            <Heart
-              size={28}
-              fill={hasLiked ? '#F7931E' : 'transparent'}
-              stroke={hasLiked ? '#F7931E' : '#fff'}
-              strokeWidth={FLOAT_STROKE}
-            />
-          </ActionButton>
+          {/* Like. SHOW WHO LIKED A POST — over media there is no room for an
+              avatar row, so the COUNT BENEATH THE HEART is the tap target that
+              opens the likers sheet. The heart itself keeps toggling the like:
+              the two targets are deliberately NOT merged. */}
+          {onOpenLikes && (likesCount ?? 0) > 0 ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 3,
+                pointerEvents: 'auto',
+              }}
+            >
+              <ActionButton
+                onClick={onLike}
+                ariaLabel={hasLiked ? 'Unlike' : 'Like'}
+                animateKey={likeAnimKey}
+              >
+                <Heart
+                  size={28}
+                  fill={hasLiked ? '#F7931E' : 'transparent'}
+                  stroke={hasLiked ? '#F7931E' : '#fff'}
+                  strokeWidth={FLOAT_STROKE}
+                />
+              </ActionButton>
+              <button
+                type="button"
+                aria-label="See who liked this"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenLikes();
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: hasLiked ? '#F7931E' : '#fff',
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1,
+                  textShadow: COUNT_TEXT_SHADOW,
+                  filter: FLOAT_SHADOW,
+                  pointerEvents: 'auto',
+                  touchAction: 'pan-y',
+                }}
+              >
+                {formatCount(likesCount)}
+              </button>
+            </div>
+          ) : (
+            <ActionButton
+              onClick={onLike}
+              ariaLabel={hasLiked ? 'Unlike' : 'Like'}
+              count={formatCount(likesCount)}
+              accentCount={hasLiked}
+              animateKey={likeAnimKey}
+            >
+              <Heart
+                size={28}
+                fill={hasLiked ? '#F7931E' : 'transparent'}
+                stroke={hasLiked ? '#F7931E' : '#fff'}
+                strokeWidth={FLOAT_STROKE}
+              />
+            </ActionButton>
+          )}
 
           {/* Comment */}
           <ActionButton

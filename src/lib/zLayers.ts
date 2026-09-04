@@ -8,6 +8,7 @@
  * Order (higher = on top):
  *   FS_OVERLAY_Z      fullscreen feed viewer (FullscreenFeedOverlay)
  *   COMMENTS_SHEET_Z  comments sheet opened FROM the viewer — must sit above it
+ *   LIKES_SHEET_Z     likers sheet opened FROM the viewer or a card — above it
  *   MORE_SHEET_Z      more-options sheet opened FROM the viewer — above it
  *   REVIEW_SHEET_Z    read-review sheet opened FROM the viewer — above it
  *   MEDIA_PREVIEW_Z   read-only media viewer (MediaPreviewViewer) opened FROM a
@@ -31,6 +32,8 @@
 
 export const FS_OVERLAY_Z     = 200;   // FullscreenFeedOverlay root
 export const COMMENTS_SHEET_Z = 210;   // CommentsSheetV2 scrim (panel = +1)
+/** Likes sheet opened FROM the feed viewer or a card — above the viewer. */
+export const LIKES_SHEET_Z    = 220;
 export const MORE_SHEET_Z     = 230;   // MoreOptions sheet scrim (panel = +1)
 export const REVIEW_SHEET_Z   = 240;   // ReviewBottomSheet scrim (panel = +1)
 /** MediaPreviewViewer's own `z-[9999]` class. Mirrored here so the ordering is

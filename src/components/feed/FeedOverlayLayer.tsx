@@ -9,6 +9,7 @@ import { Z } from '@/config/zIndex';
 import { ReviewOverlaySlot } from './ReviewOverlaySlot';
 import { formatRelative } from '@/i18n/format';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
+import { LikesSheet } from '@/components/likes/LikesSheet';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface FeedOverlayLayerProps {
@@ -84,6 +85,9 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
 
   const [captionExpanded, setCaptionExpanded] = useState(false);
+  // SHOW WHO LIKED A POST — the sheet opens ABOVE the viewer (LIKES_SHEET_Z),
+  // so the media stays put behind it and dismissing returns to the same post.
+  const [likesOpen, setLikesOpen] = useState(false);
 
   useEffect(() => {
     setCaptionExpanded(false);
@@ -231,6 +235,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           likesCount={likeState.count}
           commentsCount={commentCount}
           onLike={() => onLike(activePost)}
+          onOpenLikes={readOnly ? undefined : () => setLikesOpen(true)}
           onComment={onComment}
           onShare={() => onShare(activePost)}
           onMore={onMore}
@@ -295,6 +300,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           likesCount={likeState.count}
           commentsCount={commentCount}
           onLike={() => onLike(activePost)}
+          onOpenLikes={readOnly ? undefined : () => setLikesOpen(true)}
           onComment={onComment}
           onShare={() => onShare(activePost)}
           onMore={onMore}
@@ -325,6 +331,14 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           <MuteButton size="sm" />
         </div>
       )}
+
+      {/* Likers sheet — opened by the count beside/beneath the heart. */}
+      <LikesSheet
+        open={likesOpen}
+        onClose={() => setLikesOpen(false)}
+        postId={activePost.id}
+        count={likeState.count}
+      />
     </div>
   );
 });

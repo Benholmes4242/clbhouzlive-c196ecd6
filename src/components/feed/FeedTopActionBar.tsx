@@ -32,6 +32,8 @@ interface FeedTopActionBarProps {
   likesCount: number | null;
   commentsCount: number | null;
   onLike: () => void;
+  /** Opens the likers sheet from the count beside the heart. */
+  onOpenLikes?: () => void;
   onComment: () => void;
   onShare: () => void;
   onMore: () => void;
@@ -87,6 +89,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
   likesCount,
   commentsCount,
   onLike,
+  onOpenLikes,
   onComment,
   onShare,
   onMore,
@@ -151,6 +154,10 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
         {/* RIGHT cluster — hidden in read-only (gallery) mode. */}
         {!readOnly && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(5px, 2vw, 8px)' }}>
+            {/* SHOW WHO LIKED A POST — the HEART stays the like toggle; the
+                COUNT is its own target and opens the likers sheet above the
+                viewer. They are split into two buttons so a tap on the number
+                can never toggle the like. */}
             <button
               type="button"
               onClick={(e) => {
@@ -158,7 +165,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
                 onLike();
               }}
               aria-label={hasLiked ? 'Unlike' : 'Like'}
-              style={likeStr ? chipWithCount : chipBase}
+              style={likeStr && !onOpenLikes ? chipWithCount : chipBase}
             >
               <Heart
                 size={24}
@@ -166,7 +173,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
                 stroke={hasLiked ? '#F7931E' : '#fff'}
                 strokeWidth={2}
               />
-              {likeStr && (
+              {likeStr && !onOpenLikes && (
                 <span
                   style={{
                     color: hasLiked ? '#F7931E' : '#fff',
@@ -177,6 +184,27 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
                 </span>
               )}
             </button>
+
+            {likeStr && onOpenLikes && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenLikes();
+                }}
+                aria-label="See who liked this"
+                style={{
+                  ...chipBase,
+                  minWidth: 0,
+                  padding: '0 2px',
+                  marginLeft: -4,
+                  color: hasLiked ? '#F7931E' : '#fff',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {likeStr}
+              </button>
+            )}
 
             <button
               type="button"
