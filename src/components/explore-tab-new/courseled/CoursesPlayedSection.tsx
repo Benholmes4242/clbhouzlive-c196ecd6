@@ -41,6 +41,8 @@ const TILE_DEPTH_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0
 const SMALL_TILE_IMAGE_H = 76;
 /* Amendment I: two reserved name lines and one aligned data baseline. */
 const SMALL_TILE_STRIP_H = 62;
+/* M2.1 — the open tile's ring: 1px at 38% ink, the weight of the avatar-stack rings. */
+const TILE_RING = 'rgba(248,250,252,0.38)';
 const SMALL_TILE_H = SMALL_TILE_IMAGE_H + SMALL_TILE_STRIP_H;
 
 const CAP = {
@@ -130,8 +132,6 @@ export function CoursesPlayedSection({
         >
           <FeaturedCourseCard
             row={featured}
-            detailsOpen={openId === featured.course_id}
-            onToggleDetails={() => toggle(featured.course_id)}
             userId={userId}
             filters={filters}
             onCoursePress={onCoursePress}
@@ -209,15 +209,11 @@ function CourseMosaicPair({
 
 function FeaturedCourseCard({
   row,
-  detailsOpen,
-  onToggleDetails,
   userId,
   filters,
   onCoursePress,
 }: {
   row: BoardCourseRow;
-  detailsOpen: boolean;
-  onToggleDetails: () => void;
   userId: string | undefined;
   filters: BoardFilters;
   onCoursePress?: (courseId: string) => void;
@@ -236,7 +232,7 @@ function FeaturedCourseCard({
         row={row}
         featured
         open={false}
-        onToggle={onToggleDetails}
+        onToggle={() => {}}
         embedded
       />
       <div style={{ padding: '12px 14px 0' }}>
@@ -247,8 +243,6 @@ function FeaturedCourseCard({
         userId={userId}
         onCoursePress={onCoursePress}
         mode="featured"
-        detailsOpen={detailsOpen}
-        onToggleDetails={onToggleDetails}
       />
     </div>
   );
@@ -291,7 +285,7 @@ function CourseMosaicTile({
         fontFamily: SANS,
         textAlign: 'left',
         cursor: 'pointer',
-        boxShadow: !embedded && open ? `inset 0 0 0 1.5px ${A.INK}` : 'none',
+        boxShadow: 'none',
       }}
     >
       {featured ? (
@@ -417,7 +411,7 @@ function CourseMosaicTile({
           </span>
         </>
       )}
-      {!embedded && open ? <span aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 10, boxShadow: `inset 0 0 0 1.5px ${A.INK}`, zIndex: 2, pointerEvents: 'none' }} /> : null}
+      {!embedded && open ? <span aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 10, boxShadow: `inset 0 0 0 1px ${TILE_RING}`, zIndex: 2, pointerEvents: 'none' }} /> : null}
     </button>
   );
 }
