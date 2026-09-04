@@ -768,7 +768,7 @@ function NineRow({
               fontWeight: 700,
               /* §3 — the nine's to-par keeps the tour colour rule: red under
                  par, INK at level or over. Colour only where it means something. */
-              color: totals && totals.toPar < 0 ? UNDER_INK : MINI_INK,
+              color: totals && totals.toPar < 0 ? TOPAR_RED : MINI_INK,
               ...FIGS,
             }}
           >
