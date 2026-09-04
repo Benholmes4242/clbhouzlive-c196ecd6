@@ -21,6 +21,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Discover course tiles: preserve the tap affordance when the 320pt data line is tight. */
+@media (max-width: 339px) {
+  .course-mosaic-tile__avg {
+    display: none;
+  }
+}
+
 /* Player silhouette fallback — always show on off-white, never transparent/checkerboard */
 img[src*="Silhouette"] {
   background-color: #F8FAFC;

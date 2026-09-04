@@ -399,13 +399,39 @@ function CourseMosaicTile({
             >
               {row.name ?? '\u2014'}
             </span>
-             <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 6, marginTop: 3, minHeight: 14, flexShrink: 0 }}>
-               <span style={{ ...CAP, lineHeight: 1 }}>
+             <span
+               data-course-tile-data-line
+               style={{
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'space-between',
+                 gap: 6,
+                 marginTop: 3,
+                 minHeight: 14,
+                 flexShrink: 0,
+                 whiteSpace: 'nowrap',
+               }}
+             >
+               <span style={{ ...CAP, lineHeight: 1, flexShrink: 0 }}>
                 {t('discover.coursesPlayed.nRounds', '{{count}} rounds', { count: row.rounds })}
               </span>
-                <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
+                 <span style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
                   <PlaysTo value={row.plays_to} width="auto" fontSize={13.5} weight={800} />
-                  <span style={{ ...CAP, lineHeight: 1, color: A.DIM }}>AVG</span>
+                   <span className="course-mosaic-tile__avg" style={{ ...CAP, marginLeft: 4, lineHeight: 1, color: A.DIM }}>
+                     AVG
+                   </span>
+                   <ChevronDown
+                     data-course-tile-chevron
+                     size={11}
+                     color={A.MUTE}
+                     aria-hidden
+                     style={{
+                       flexShrink: 0,
+                       marginLeft: 6,
+                       transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+                       transition: 'transform 160ms ease',
+                     }}
+                   />
                 </span>
             </span>
           </span>
