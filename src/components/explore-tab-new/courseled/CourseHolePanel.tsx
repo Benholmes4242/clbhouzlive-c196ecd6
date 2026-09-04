@@ -17,6 +17,7 @@ import {
   courseBucketShares,
 } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { buildParTypeRows } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
+import { monotonePath, roundedCourseBarPath } from '@/features/courses/components/holes/analytical/chartGeometry';
 import { SANS } from './tokens';
 import { ListTerminalRow } from './ListTerminalRow';
 
@@ -84,7 +85,7 @@ export function CourseHolePanel({
   const settling = analysis.isPending || (Boolean(userId) && mine.isPending);
   if (settling) {
     return mode === 'featured' ? (
-      <div aria-hidden style={{ minHeight: 330, padding: '0 12px' }} />
+      <div aria-hidden style={{ minHeight: 330 }} />
     ) : null;
   }
 
@@ -92,7 +93,7 @@ export function CourseHolePanel({
      get_course_hole_analysis returns available: false with zero rounds. */
   if (!analysis.data?.available || holes.length === 0 || totalRounds < SAMPLE_FLOOR) {
     return (
-      <div style={{ ...CAP, padding: mode === 'featured' ? '0 12px 14px' : '2px 0 4px', lineHeight: 1.5 }}>
+      <div style={{ ...CAP, padding: mode === 'featured' ? '0 14px 14px' : '2px 0 4px', lineHeight: 1.5 }}>
         {t(
           'discover.coursesPlayed.notEnoughDetail',
           '{{count}} rounds here carry hole detail \u2014 not enough for a course picture yet',
@@ -133,9 +134,9 @@ export function CourseHolePanel({
   const featured = mode === 'featured';
 
   return (
-    <div style={{ fontFamily: SANS, ...FIGS, padding: featured ? '0 12px' : undefined, minHeight: featured ? 330 : undefined }}>
+    <div style={{ fontFamily: SANS, ...FIGS, minHeight: featured ? 330 : undefined }}>
       {/* BLOCK 1 — HOW IT PLAYS (S5.3). */}
-      <Block title={t('discover.coursesPlayed.howItPlays', 'How it plays')} note={basis} first={!featured}>
+      <Block title={t('discover.coursesPlayed.howItPlays', 'How it plays')} note={basis} first={!featured} fullBleed={featured}>
         <HoleChart
           holes={holes}
           myByHole={myByHole}
@@ -178,7 +179,7 @@ export function CourseHolePanel({
 
       {/* BLOCK 2 — HOW EACH PAR PLAYS (S5.4). */}
       {parRows.length > 0 && (
-        <Block title={t('discover.coursesPlayed.howEachPar', 'How each par plays')} note={basis}>
+        <Block title={t('discover.coursesPlayed.howEachPar', 'How each par plays')} note={basis} fullBleed={featured}>
           <ParBars rows={parRows} fieldIsOnlyYou={fieldIsOnlyYou} />
         </Block>
       )}
@@ -192,14 +193,16 @@ export function CourseHolePanel({
           />
           {detailsOpen && (
             <>
-              <div style={{ padding: '12px 0' }}>
+              <div style={{ padding: '12px 14px' }}>
                 {shares && <DistributionStrip shares={shares} />}
                 <Extremes hardest={hardest} easiest={easiest} />
               </div>
-              <ListTerminalRow
-                label={t('discover.coursesPlayed.viewCourse', 'View course')}
-                onPress={() => onCoursePress?.(courseId)}
-              />
+              <div style={{ padding: '0 14px' }}>
+                <ListTerminalRow
+                  label={t('discover.coursesPlayed.viewCourse', 'View course')}
+                  onPress={() => onCoursePress?.(courseId)}
+                />
+              </div>
             </>
           )}
         </>
@@ -236,7 +239,7 @@ function DisclosureRow({ label, open, onPress }: { label: string; open: boolean;
         justifyContent: 'space-between',
         gap: 12,
         marginTop: -1,
-        padding: '14px 0',
+        padding: '14px',
         background: 'transparent',
         border: 'none',
         borderTop: `1px solid ${A.BORDER}`,
@@ -262,18 +265,20 @@ function Block({
   title,
   note,
   first,
+  fullBleed,
   children,
 }: {
   title: string;
   note?: string;
   first?: boolean;
+  fullBleed?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div
       style={{
         borderTop: first ? 'none' : `1px solid ${A.BORDER}`,
-        padding: first ? '2px 0 12px' : '12px 0',
+        padding: fullBleed ? (first ? '2px 14px 12px' : '12px 14px') : (first ? '2px 0 12px' : '12px 0'),
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
@@ -367,10 +372,7 @@ function HoleChart({
         })
         .filter((p): p is { x: number; y: number } => p !== null)
     : [];
-  const linePath =
-    linePts.length > 1
-      ? linePts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ')
-      : '';
+  const linePath = linePts.length > 1 ? monotonePath(linePts) : '';
 
   const selHole = holes[sel];
   const selMine = myByHole.get(selHole.hole_no)?.avg_to_par ?? null;
@@ -429,13 +431,11 @@ function HoleChart({
               const yv = y(h.avg_to_par);
               const top = Math.min(yv, yBase);
               const height = Math.max(2, Math.abs(yBase - yv));
+              const x = i * slot + (slot - barW) / 2;
               return (
-                <rect
+                <path
                   key={h.hole_no}
-                  x={i * slot + (slot - barW) / 2}
-                  y={top}
-                  width={barW}
-                  height={height}
+                  d={roundedCourseBarPath(x, top, barW, height)}
                   fill={difficultyRampColor((h.avg_to_par - fMin) / fSpan)}
                 />
               );
