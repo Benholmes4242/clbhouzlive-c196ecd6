@@ -1774,6 +1774,8 @@
     },
     "coursesPlayed": {
       "title": "How the courses played",
+      "bridge": "Those rounds were played across {{count}} courses.",
+      "bridgeSubline": "How each of them played",
       "fieldPlaysTo": "Field plays to",
       "lowRoundBy": "Low round by {{name}}",
       "nEagles": "{{count}} eagles",

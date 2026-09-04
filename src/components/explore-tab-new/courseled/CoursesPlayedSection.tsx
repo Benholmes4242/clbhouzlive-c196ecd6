@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, ArrowDown, ArrowUp } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
-import { A, KICKER, SANS, FIGS, DISCOVER_FACT, PODIUM_ACCENT } from './tokens';
+import { A, SANS, FIGS, DISCOVER_FACT, PODIUM_ACCENT } from './tokens';
 import { WINDOW_SHORT, type BoardFilters } from './boardFilters';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
@@ -11,10 +11,9 @@ import { useBoardCoursePlayers, type BoardCoursePlayer } from './hooks/useBoardC
 import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
 import { CourseHolePanel } from './CourseHolePanel';
 import { ListTerminalRow } from './ListTerminalRow';
-import { windowDays } from './GolfThisWeek';
 
 /**
- * HOW THE COURSES PLAYED (BRIEF_COURSES_HOW_THEY_PLAYED).
+ * COURSES MOSAIC (BRIEF_COURSES_HOW_THEY_PLAYED — AMENDMENT F).
  *
  * IT ANSWERS HOW EACH COURSE PLAYED — that is what each row CONTAINS, not the
  * order they are in. get_board_courses ORDERS BY ROUNDS DESC (AMENDMENT B), so
@@ -35,9 +34,9 @@ const ROW_H = 46;
 const RANK_W = 14;
 const PLAYS_TO_W = 62;
 const CHEVRON_W = 22;
-const CARD_PAD = 12;
 /** S2.3 — a rise is GREEN, a fall is A.DIM. Red on this page means UNDER PAR. */
 const TREND_UP = PODIUM_ACCENT.green;
+const TILE_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.04) 32%, rgba(0,0,0,0.76))';
 
 const CAP = {
   fontSize: 9.5,
@@ -68,12 +67,9 @@ export function CoursesPlayedSection({
 
   const win = WINDOW_SHORT[filters.window];
   const windowLabel = t(win.i18n, win.label);
-  const days = windowDays(filters.window);
-
-  const courses = useBoardCourses(userId, filters, { limit: 6 });
+  const courses = useBoardCourses(userId, filters, { limit: 5 });
   const rows = courses.data?.rows ?? [];
   const total = courses.data?.total ?? 0;
-  const roundsShown = rows.reduce((s, r) => s + r.rounds, 0);
 
   const toggle = useCallback((id: string) => {
     setOpenId((cur) => (cur === id ? null : id));
@@ -85,16 +81,12 @@ export function CoursesPlayedSection({
   if (courses.isPending) {
     return (
       <section aria-hidden style={{ fontFamily: SANS }}>
-        <div style={{ height: 14, width: 176, background: A.PANEL, borderRadius: 3 }} />
-        <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
-          <div style={{ height: 15, width: 72, background: A.PANEL, borderRadius: 3 }} />
-          <div style={{ height: 15, width: 64, background: A.PANEL, borderRadius: 3 }} />
-          <div style={{ height: 15, width: 58, background: A.PANEL, borderRadius: 3 }} />
-        </div>
-        <div style={{ marginTop: 12, background: A.PANEL, borderRadius: 12, overflow: 'hidden' }}>
-          <div style={{ height: 22 }} />
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div key={i} style={{ height: ROW_H + 8 }} />
+        <div style={{ height: 19, width: 254, background: A.PANEL, borderRadius: 3 }} />
+        <div style={{ height: 10, width: 142, marginTop: 6, background: A.PANEL, borderRadius: 3 }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, marginTop: 12 }}>
+          <div style={{ gridColumn: '1 / -1', height: 132, background: A.PANEL, borderRadius: 10 }} />
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} style={{ height: 104, background: A.PANEL, borderRadius: 10 }} />
           ))}
         </div>
       </section>
@@ -103,57 +95,49 @@ export function CoursesPlayedSection({
 
   if (rows.length === 0) return null;
 
-  /* S2.4 — the scale bar reads against the range of the ROWS SHOWN. */
-  const playsTo = rows.map((r) => r.plays_to).filter((v): v is number => v != null);
-  const scaleMax = playsTo.length > 0 ? Math.max(...playsTo) : 0;
-  const scaleMin = playsTo.length > 0 ? Math.min(...playsTo) : 0;
+  const featured = rows[0];
+  const pairs: BoardCourseRow[][] = [];
+  for (let index = 1; index < rows.length; index += 2) pairs.push(rows.slice(index, index + 2));
 
   return (
     <section style={{ fontFamily: SANS, ...FIGS }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-        <span style={{ ...KICKER, color: A.INK }}>
-          {t('discover.coursesPlayed.title', 'How the courses played')}
-        </span>
+      <div style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.4, color: A.INK }}>
+        {t('discover.coursesPlayed.bridge', 'Those rounds were played across {{count}} courses.', { count: total })}
       </div>
-
-
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginTop: 8 }}>
-        <CourseStat value={String(total)} label={t('discover.filterBoard.col.courses', 'COURSES')} />
-        <CourseStat value={String(roundsShown)} label={t('discover.filterBoard.col.rounds', 'ROUNDS')} />
-        <CourseStat value={days} label={t('discover.filterBoard.col.days', 'DAYS')} />
+      <div style={{ ...CAP, marginTop: 3 }}>
+        {t('discover.coursesPlayed.bridgeSubline', 'How each of them played')}
       </div>
-
-      {/* S1.4 — CONTAINMENT GOES LIGHTER, NEVER DARKER. */}
       <div
         style={{
           marginTop: 12,
-          background: A.PANEL,
-          borderRadius: 12,
-          overflow: 'hidden',
-          padding: `0 ${CARD_PAD}px`,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          gap: 8,
         }}
       >
-        <CourseHeaderRow />
-        {rows.map((row, index) => (
-          <CourseRow
-            key={row.course_id}
-            row={row}
-            rank={index + 1}
-            first={index === 0}
-            open={openId === row.course_id}
-            onToggle={() => toggle(row.course_id)}
+        <CourseMosaicTile row={featured} featured open={openId === featured.course_id} onToggle={() => toggle(featured.course_id)} />
+        {openId === featured.course_id && (
+          <CourseMosaicPanel row={featured} userId={userId} filters={filters} onCoursePress={onCoursePress} />
+        )}
+
+        {pairs.map((pair) => (
+          <CourseMosaicPair
+            key={pair.map((row) => row.course_id).join(':')}
+            rows={pair}
+            openId={openId}
+            onToggle={toggle}
             userId={userId}
             filters={filters}
-            scaleMin={scaleMin}
-            scaleMax={scaleMax}
             onCoursePress={onCoursePress}
           />
         ))}
-        {total > 6 && (
-          <ListTerminalRow
-            label={t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: total })}
-            onPress={() => setSeeAll(true)}
-          />
+        {total > 5 && (
+          <div style={{ gridColumn: '1 / -1' }}>
+            <ListTerminalRow
+              label={t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: total })}
+              onPress={() => setSeeAll(true)}
+            />
+          </div>
         )}
       </div>
 
@@ -170,14 +154,158 @@ export function CoursesPlayedSection({
   );
 }
 
-function CourseStat({ value, label }: { value: string; label: string }) {
+function CourseMosaicPair({
+  rows,
+  openId,
+  onToggle,
+  userId,
+  filters,
+  onCoursePress,
+}: {
+  rows: BoardCourseRow[];
+  openId: string | null;
+  onToggle: (id: string) => void;
+  userId: string | undefined;
+  filters: BoardFilters;
+  onCoursePress?: (courseId: string) => void;
+}) {
+  const openRow = rows.find((row) => row.course_id === openId);
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
-      <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, lineHeight: 1, color: A.INK }}>
-        {value}
-      </span>
-      <span style={{ ...KICKER, fontSize: 10, color: A.MUTE }}>{label}</span>
-    </span>
+    <>
+      {rows.map((row) => (
+        <CourseMosaicTile
+          key={row.course_id}
+          row={row}
+          featured={false}
+          open={openId === row.course_id}
+          onToggle={() => onToggle(row.course_id)}
+          fullWidth={rows.length === 1}
+        />
+      ))}
+      {openRow && (
+        <CourseMosaicPanel row={openRow} userId={userId} filters={filters} onCoursePress={onCoursePress} />
+      )}
+    </>
+  );
+}
+
+function CourseMosaicTile({
+  row,
+  featured,
+  open,
+  onToggle,
+  fullWidth = false,
+}: {
+  row: BoardCourseRow;
+  featured: boolean;
+  open: boolean;
+  onToggle: () => void;
+  fullWidth?: boolean;
+}) {
+  const { t } = useTranslation('courses');
+  const height = featured ? 132 : 104;
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      style={{
+        gridColumn: featured || fullWidth ? '1 / -1' : undefined,
+        height,
+        minWidth: 0,
+        padding: 0,
+        border: 'none',
+        borderRadius: 10,
+        overflow: 'hidden',
+        background: A.PANEL,
+        fontFamily: SANS,
+        textAlign: 'left',
+        cursor: 'pointer',
+        boxShadow: open ? `inset 0 0 0 1.5px ${A.INK}` : 'none',
+      }}
+    >
+      <CourseImageFallback
+        courseId={row.course_id}
+        courseName={row.name}
+        imageUrl={row.thumbnail_image}
+        initialsSize={featured ? 28 : 20}
+        style={{ width: '100%', height: '100%', borderRadius: 10 }}
+      >
+        <span aria-hidden style={{ position: 'absolute', inset: 0, background: TILE_SCRIM }} />
+        <span
+          style={{
+            position: 'absolute',
+            inset: featured ? 'auto 11px 9px' : 'auto 9px 8px',
+            zIndex: 1,
+            minWidth: 0,
+            color: DISCOVER_FACT,
+          }}
+        >
+          <span
+            style={{
+              display: 'block',
+              fontSize: featured ? 15 : 11.5,
+              fontWeight: featured ? 800 : 700,
+              lineHeight: featured ? 1.2 : 1.25,
+              whiteSpace: featured ? 'normal' : 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              textShadow: '0 1px 2px rgba(0,0,0,0.72)',
+            }}
+          >
+            {row.name ?? '\u2014'}
+          </span>
+          <span style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0, marginTop: 3 }}>
+            <span
+              style={{
+                ...CAP,
+                color: DISCOVER_FACT,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                minWidth: 0,
+                flex: 1,
+                textShadow: '0 1px 2px rgba(0,0,0,0.72)',
+              }}
+            >
+              {featured && row.area ? (
+                <>
+                  <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.area}</span>
+                  <span aria-hidden>·</span>
+                </>
+              ) : null}
+              <span style={{ flexShrink: 0 }}>
+                {row.rounds === 1
+                  ? t('discover.coursesPlayed.oneRound', '1 round')
+                  : t('discover.coursesPlayed.nRounds', '{{count}} rounds', { count: row.rounds })}
+              </span>
+              {featured ? <Badges row={row} /> : null}
+            </span>
+            <PlaysTo value={row.plays_to} width="auto" fontSize={featured ? 15 : 12.5} weight={800} color={DISCOVER_FACT} />
+          </span>
+        </span>
+        {open ? <span aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 10, boxShadow: `inset 0 0 0 1.5px ${A.INK}`, zIndex: 2 }} /> : null}
+      </CourseImageFallback>
+    </button>
+  );
+}
+
+function CourseMosaicPanel({
+  row,
+  userId,
+  filters,
+  onCoursePress,
+}: {
+  row: BoardCourseRow;
+  userId: string | undefined;
+  filters: BoardFilters;
+  onCoursePress?: (courseId: string) => void;
+}) {
+  return (
+    <div style={{ gridColumn: '1 / -1', padding: '12px 12px 10px', background: A.PANEL, borderRadius: 10, overflow: 'hidden' }}>
+      <LowRoundLine row={row} userId={userId} filters={filters} />
+      <CourseHolePanel courseId={row.course_id} userId={userId} onCoursePress={onCoursePress} />
+    </div>
   );
 }
 
@@ -538,16 +666,28 @@ function Badges({ row }: { row: BoardCourseRow }) {
  * is red with a TRUE MINUS. S2.6 — a null figure (no usable par, and it now sorts
  * LAST) renders NOTHING, not a zero and not a dash.
  */
-function PlaysTo({ value }: { value: number | null }) {
-  if (value == null) return <span style={{ width: PLAYS_TO_W }} aria-hidden />;
+function PlaysTo({
+  value,
+  width = PLAYS_TO_W,
+  fontSize = 15,
+  weight = 700,
+  color,
+}: {
+  value: number | null;
+  width?: number | 'auto';
+  fontSize?: number;
+  weight?: number;
+  color?: string;
+}) {
+  if (value == null) return <span style={{ width }} aria-hidden />;
 
   const text =
     value > 0 ? `+${value.toFixed(1)}` : value < 0 ? `\u2212${Math.abs(value).toFixed(1)}` : '0.0';
-  const tone = value < 0 ? TOPAR_UNDER : A.INK;
+  const tone = color ?? (value < 0 ? TOPAR_UNDER : A.INK);
 
   return (
     <span style={{ width: PLAYS_TO_W, flexShrink: 0, textAlign: 'right' }}>
-      <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, color: tone, lineHeight: 1 }}>
+      <span className="tabular-nums" style={{ fontSize, fontWeight: weight, color: tone, lineHeight: 1, textShadow: color ? '0 1px 2px rgba(0,0,0,0.72)' : undefined }}>
         {text}
       </span>
     </span>
