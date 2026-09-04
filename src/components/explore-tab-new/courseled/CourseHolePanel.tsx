@@ -279,7 +279,10 @@ function HoleChart({
 
   const W = 340;
   const H = 74;
-  const TOP = 6;
+  /* Reserve a fixed label lane above the tallest possible bar. The plot starts
+     below it, so the selected figure cannot clip or collide with the block
+     heading/readout even when the hardest hole owns the domain maximum. */
+  const TOP = 16;
   const n = holes.length;
 
   const values = holes.flatMap((h) => {
@@ -319,6 +322,7 @@ function HoleChart({
   const selField = toParParts(selHole.avg_to_par);
   const selYou = toParParts(selMine);
   const dotY = selMine == null ? null : y(selMine);
+  const selectedBarTop = Math.min(y(selHole.avg_to_par), yBase);
 
   return (
     <div>
@@ -335,9 +339,6 @@ function HoleChart({
         <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK }}>
           {t('discover.coursesPlayed.holeN', 'Hole {{n}}', { n: selHole.hole_no })}
         </span>
-        {!fieldIsOnlyYou && selField && (
-          <InlineFigure label={t('courseDetail.holes.colField', 'Field')} value={selField.text} tone={selField.tone} />
-        )}
         {hasYou && selYou && (
           <InlineFigure label={t('courseDetail.holes.colYou', 'You')} value={selYou.text} tone={A.AMBER} />
         )}
@@ -365,14 +366,6 @@ function HoleChart({
           style={{ display: 'block' }}
           aria-hidden="true"
         >
-          {/* S6.4 — a soft column highlight behind the selected hole. */}
-          <rect
-            x={sel * slot}
-            y={0}
-            width={slot}
-            height={H}
-            fill="rgba(255,255,255,0.07)"
-          />
           {!fieldIsOnlyYou &&
             holes.map((h, i) => {
               const yv = y(h.avg_to_par);
@@ -401,6 +394,27 @@ function HoleChart({
             />
           )}
         </svg>
+
+        {/* Amendment A: the field figure is the sole selection indicator. */}
+        {!fieldIsOnlyYou && selField && (
+          <span
+            className="tabular-nums"
+            style={{
+              position: 'absolute',
+              left: `${(cx(sel) / W) * 100}%`,
+              top: Math.max(0, selectedBarTop - 13),
+              transform: 'translateX(-50%)',
+              color: selField.tone,
+              fontSize: 8.5,
+              fontWeight: 700,
+              lineHeight: 1,
+              whiteSpace: 'nowrap',
+              pointerEvents: 'none',
+            }}
+          >
+            {selField.text}
+          </span>
+        )}
 
         {/* The amber dot moves to the member's value on the selected hole. */}
         {hasYou && dotY != null && (
