@@ -92,8 +92,6 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
     }
   };
 
-  const showGhost = value == null;
-
   return (
     <div>
       <div
@@ -105,7 +103,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
           color: value == null ? RV2.muted : color,
         }}
       >
-        {value == null ? '--' : value.toFixed(1)}
+        {value == null ? '\u2014' : value.toFixed(1)}
       </div>
       <div style={{ fontSize: 13, color: RV2.secondary, margin: '6px 0 18px', minHeight: 17 }}>
         {caption}
@@ -167,47 +165,39 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
             }}
           />
         ))}
-        {value != null && (
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: `${fillPct}%`,
-              transform: 'translate(-50%, -50%)',
-              width: 26,
-              height: 26,
-              borderRadius: '50%',
-              background: RV2.ink,
-              border: `2.5px solid ${color}`,
-              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-              pointerEvents: 'none',
-            }}
-          />
-        )}
-        {showGhost && (
-          <div
-            aria-hidden
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              startDrag(true);
-            }}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: `${toPct(MIN)}%`,
-              transform: 'translate(-50%, -50%)',
-              width: 26,
-              height: 26,
-              borderRadius: '50%',
-              background: 'transparent',
-              border: `1.5px solid ${RV2.muted}`,
-              boxShadow: 'none',
-              cursor: 'pointer',
-              touchAction: 'none',
-            }}
-          />
-        )}
+        {/* THE HANDLE. Unset and set render IDENTICALLY: same 26px, same solid
+            off-white fill, same shadow. A hollow ring read as unloaded content
+            on device. The unset state is carried by the EMPTY TRACK and the
+            BLANK NUMERAL, not by a weaker handle.
+            bandColor(null) is the neutral grey, so no band colour leaks in
+            before the member has scored. */}
+        <div
+          aria-hidden
+          onPointerDown={value == null ? (e) => {
+            // TAP IS NOT A SCORE. A solid handle invites a tap, and a tap that
+            // committed would silently score the course 1.0. Arm the drag but
+            // write NOTHING: only pointermove commits a value. Stopping
+            // propagation keeps the track's own tap-to-commit off the handle.
+            e.stopPropagation();
+            startDrag(true);
+          } : undefined}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: `${fillPct}%`,
+            transform: 'translate(-50%, -50%)',
+            width: 26,
+            height: 26,
+            borderRadius: '50%',
+            background: RV2.ink,
+            border: `2.5px solid ${color}`,
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+            pointerEvents: value == null ? 'auto' : 'none',
+            cursor: value == null ? 'pointer' : undefined,
+            touchAction: 'none',
+            transition: dragging ? 'none' : 'left 120ms ease',
+          }}
+        />
       </div>
       </div>
 
