@@ -837,32 +837,48 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           .join(', ');
         const hasCourse = Boolean(post.courseName || courseContext);
 
+        /* SHOW WHO LIKED A POST — the avatar row is the SINGLE entry point on a
+           card. The like count in the actions row stays untappable: two targets
+           six pixels apart is a mis-tap. Zero likes renders no row and no gap. */
+        const showLikedBy = likeCount > 0;
+
         const actionsRow = (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '10px 14px 12px',
-            }}
-          >
-            <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
-            <FooterButton
-              icon={Heart}
-              label={formatCount(likeCount)}
-              active={liked}
-              onClick={() => onLike(post, effectiveActor)}
-              activeColor={AMBER}
-              haptic={!liked ? 'selection' : 'none'}
-            />
-            <FooterButton
-              icon={MessageCircle}
-              label={formatCount(commentCount)}
-              onClick={() => onComment(post, effectiveActor)}
-            />
-            <FooterButton icon={Share} onClick={() => onShare(post)} />
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: showLikedBy ? '10px 14px 6px' : '10px 14px 12px',
+              }}
+            >
+              <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
+              <FooterButton
+                icon={Heart}
+                label={formatCount(likeCount)}
+                active={liked}
+                onClick={() => onLike(post, effectiveActor)}
+                activeColor={AMBER}
+                haptic={!liked ? 'selection' : 'none'}
+              />
+              <FooterButton
+                icon={MessageCircle}
+                label={formatCount(commentCount)}
+                onClick={() => onComment(post, effectiveActor)}
+              />
+              <FooterButton icon={Share} onClick={() => onShare(post)} />
+            </div>
+            {showLikedBy && (
+              <LikedByRow
+                postId={post.id}
+                count={likeCount}
+                surfaceColor={CARD}
+                style={{ padding: '0 14px 12px' }}
+              />
+            )}
           </div>
         );
+
 
         if (!hasCourse) {
           return (
