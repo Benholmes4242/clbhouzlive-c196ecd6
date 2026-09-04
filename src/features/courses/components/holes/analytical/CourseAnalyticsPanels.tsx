@@ -571,8 +571,17 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
     }).length;
     const hardest = holes.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), holes[0]);
     const easiest = holes.reduce((m, h) => (h.avg_to_par < m.avg_to_par ? h : m), holes[0]);
-    return { fieldAvg, yourAvg, beat, withYou: mineRows.length, hardest, easiest };
-  }, [holes, myByHole]);
+    /* NO FIELD (BRIEF_HOW_IT_PLAYS_NO_FIELD): the pool is only a field when it
+       contains rounds beyond the viewer's own. times_played is the viewer's
+       OWN round count per hole; total_rounds is every round in the pool. When
+       the viewer's rounds account for the whole pool, FIELD AVG is their own
+       average renamed and 0/18 means "you did not beat yourself". Members
+       view only - the pros pool never contains the viewer. */
+    const myRounds = Math.max(0, ...mineRows.map((r) => Number(r.times_played) || 0));
+    const fieldIsOnlyYou =
+      activeView === 'members' && hasYou && totalRounds > 0 && myRounds >= totalRounds;
+    return { fieldAvg, yourAvg, beat, withYou: mineRows.length, hardest, easiest, fieldIsOnlyYou };
+  }, [holes, myByHole, hasYou, totalRounds, activeView]);
 
   const toggle = (holeNo: number, surface: 'preview' | 'sheet') => {
     setOpenHoles((prev) => {
