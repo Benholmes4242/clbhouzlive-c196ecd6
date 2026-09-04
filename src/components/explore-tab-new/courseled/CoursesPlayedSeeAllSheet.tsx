@@ -13,7 +13,7 @@ import { CourseHeaderRow, CourseRow } from './CoursesPlayedSection';
  *
  * THE SAME CALL, A RAISED LIMIT. get_board_courses is asked the same question
  * with the same applied filter state and no board key, so the sheet can never
- * disagree with the six rows behind it about which courses were played.
+ * disagree with the five mosaic tiles behind it about which courses were played.
  *
  * IT IS THE BOARD'S SEE-ALL SHEET'S TWIN, NOT ITS REUSE (G5.2): A.CANVAS
  * surface, uppercase name left, Done right, a subject block giving the count and
