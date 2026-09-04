@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown } from 'lucide-react';
 
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
@@ -56,8 +55,6 @@ export interface CourseHolePanelProps {
   /** The featured course keeps its first two blocks visible and owns one
    * disclosure row for the final block. Other callers retain the full panel. */
   mode?: 'full' | 'featured';
-  detailsOpen?: boolean;
-  onToggleDetails?: () => void;
 }
 
 export function CourseHolePanel({
@@ -65,8 +62,6 @@ export function CourseHolePanel({
   userId,
   onCoursePress,
   mode = 'full',
-  detailsOpen = false,
-  onToggleDetails,
 }: CourseHolePanelProps) {
   const { t } = useTranslation('courses');
   const analysis = useCourseHoleAnalysis(courseId);
@@ -220,41 +215,6 @@ export function CourseHolePanel({
         </>
       )}
     </div>
-  );
-}
-
-function DisclosureRow({ label, open, onPress }: { label: string; open: boolean; onPress: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onPress}
-      aria-expanded={open}
-      style={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
-        marginTop: -1,
-        padding: '14px',
-        background: 'transparent',
-        border: 'none',
-        borderTop: `1px solid ${A.BORDER}`,
-        fontFamily: SANS,
-        cursor: 'pointer',
-        textAlign: 'left',
-        color: A.INK,
-      }}
-    >
-      <span style={BLOCK_TITLE}>{label}</span>
-      <ChevronDown
-        size={16}
-        strokeWidth={2}
-        color={A.MUTE}
-        aria-hidden
-        style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 160ms ease' }}
-      />
-    </button>
   );
 }
 
