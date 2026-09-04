@@ -253,7 +253,7 @@ const POS_W = 28;
 const VALUE_W = 58;
 const SECOND_W = 46;
 
-export function BoardHeaderRow({ board }: { board: BoardKey }) {
+export function BoardHeaderRow({ board, hideValue }: { board: BoardKey; hideValue?: boolean }) {
   const { t } = useTranslation('courses');
   const cols = boardColumns(board);
   const cap: React.CSSProperties = {
@@ -284,9 +284,13 @@ export function BoardHeaderRow({ board }: { board: BoardKey }) {
           {t(cols.secondary.i18n, cols.secondary.label)}
         </span>
       )}
-      <span style={{ ...cap, width: VALUE_W, textAlign: 'center', flexShrink: 0 }}>
-        {t(cols.value.i18n, cols.value.label)}
-      </span>
+      {/* S4.3 — on a DAY-GROUPED sheet the WHEN value is stated once per group,
+          so neither the column nor its header belongs on the row. */}
+      {!hideValue && (
+        <span style={{ ...cap, width: VALUE_W, textAlign: 'center', flexShrink: 0 }}>
+          {t(cols.value.i18n, cols.value.label)}
+        </span>
+      )}
     </div>
   );
 
