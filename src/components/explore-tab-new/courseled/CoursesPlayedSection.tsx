@@ -362,12 +362,83 @@ export function CourseRow({
 }
 
 /**
+ * S5 — THE AVATAR STACK. Five faces maximum, then a remainder.
+ *
+ * S5.2 — THE LOW-ROUND MEMBER LEADS: the sentence beside the faces names them, so
+ * the first face must be theirs. The rest follow by rounds descending. This is the
+ * ONE client-side re-sort in the section and it exists only to keep the face and
+ * the sentence in agreement — it never reorders the courses themselves.
+ *
+ * S5.4 — userId goes to EVERY avatar: the fallback hue means a PERSON, and hashing
+ * a display name instead would give the same member two colours on two surfaces.
+ */
+const STACK_CAP = 5;
+
+function AvatarStack({
+  players,
+  lowBy,
+  viewerId,
+}: {
+  players: BoardCoursePlayer[];
+  lowBy: string | null;
+  viewerId: string | undefined;
+}) {
+  if (players.length === 0) return null;
+
+  const ordered = [...players].sort((a, b) => {
+    if (lowBy) {
+      const aLow = a.display_name === lowBy ? 1 : 0;
+      const bLow = b.display_name === lowBy ? 1 : 0;
+      if (aLow !== bLow) return bLow - aLow;
+    }
+    return b.rounds - a.rounds;
+  });
+  const faces = ordered.slice(0, STACK_CAP);
+  const rest = ordered.length - faces.length;
+
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
+      {faces.map((p, i) => (
+        <span key={p.user_id} style={{ marginLeft: i === 0 ? 0 : -7, display: 'inline-flex' }}>
+          <SquircleAvatar
+            size={22}
+            src={p.profile_photo_url}
+            alt={p.display_name ?? ''}
+            userId={p.user_id}
+            thinRing
+            /* S5.3 — the viewer's ring is amber. It is the only amber in the panel. */
+            ringColor={viewerId && p.user_id === viewerId ? A.AMBER : A.PANEL}
+          />
+        </span>
+      ))}
+      {rest > 0 && (
+        <span style={{ ...CAP, color: A.MUTE, marginLeft: 7 }}>{`+${rest}`}</span>
+      )}
+    </span>
+  );
+}
+
+/**
  * S4 — THE LOW ROUND LINE. The figure sits NEXT TO THE NAME (S4.2), never pushed
  * to the row's right edge: the name and the figure are one statement. When
  * low_gross is null the line renders NOTHING — no dash, no reserved height.
+ *
+ * S4.3 — NO EAGLE COUNT HERE. eagle_rounds counts rounds by ANYONE at the course,
+ * so inside a sentence about one member it reads as that member's eagle, which
+ * live data proved false. It stays in the row type, unread.
  */
-function LowRoundLine({ row }: { row: BoardCourseRow }) {
+function LowRoundLine({
+  row,
+  userId,
+  filters,
+}: {
+  row: BoardCourseRow;
+  userId: string | undefined;
+  filters: BoardFilters;
+}) {
   const { t } = useTranslation('courses');
+  /* S3.2 — the same lazy read, now feeding faces rather than a list. */
+  const players = useBoardCoursePlayers(userId, row.course_id, filters);
   if (row.low_gross == null) return null;
 
   const toPar = row.low_to_par;
