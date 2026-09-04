@@ -663,12 +663,21 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           })}
         </span>
       </span>
+    ) : courseRoundsTracked > totalRounds ? (
+      /* THE TWO NUMBERS DISAGREE, SO SAY SO. The hero's ROUNDS counts every
+         round posted here; only rounds carrying hole detail can be pooled. */
+      t('courses:courseDetail.plays.roundsWithDetail', {
+        count: totalRounds,
+        pooled: formatNumber(totalRounds),
+        total: formatNumber(courseRoundsTracked),
+      })
     ) : (
       t('courses:courseDetail.plays.rounds', {
         count: totalRounds,
         rounds: formatNumber(totalRounds),
       })
     );
+
 
   const field = toParParts(stats.fieldAvg);
   const you = toParParts(stats.yourAvg);
