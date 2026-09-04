@@ -5,7 +5,9 @@ import { ChevronDown, ChevronUp, ArrowDown, ArrowUp } from 'lucide-react';
 import { CourseImageFallback } from './CourseImageFallback';
 import { A, KICKER, SANS, FIGS, DISCOVER_FACT, PODIUM_ACCENT } from './tokens';
 import { WINDOW_SHORT, type BoardFilters } from './boardFilters';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
+import { useBoardCoursePlayers, type BoardCoursePlayer } from './hooks/useBoardCoursePlayers';
 import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
 import { CourseHolePanel } from './CourseHolePanel';
 import { ListTerminalRow } from './ListTerminalRow';
@@ -141,6 +143,7 @@ export function CoursesPlayedSection({
             open={openId === row.course_id}
             onToggle={() => toggle(row.course_id)}
             userId={userId}
+            filters={filters}
             scaleMin={scaleMin}
             scaleMax={scaleMax}
             onCoursePress={onCoursePress}
@@ -209,6 +212,7 @@ export function CourseRow({
   open,
   onToggle,
   userId,
+  filters,
   scaleMin,
   scaleMax,
   onCoursePress,
@@ -219,6 +223,8 @@ export function CourseRow({
   open: boolean;
   onToggle: () => void;
   userId: string | undefined;
+  /** The page's filter state — for the lazy face-pile read only (S3.2). */
+  filters: BoardFilters;
   scaleMin: number;
   scaleMax: number;
   onCoursePress?: (courseId: string) => void;
@@ -353,7 +359,7 @@ export function CourseRow({
 
       {open && (
         <div style={{ paddingBottom: 10 }}>
-          <LowRoundLine row={row} />
+          <LowRoundLine row={row} userId={userId} filters={filters} />
           <CourseHolePanel courseId={row.course_id} userId={userId} onCoursePress={onCoursePress} />
         </div>
       )}
@@ -362,12 +368,83 @@ export function CourseRow({
 }
 
 /**
+ * S5 — THE AVATAR STACK. Five faces maximum, then a remainder.
+ *
+ * S5.2 — THE LOW-ROUND MEMBER LEADS: the sentence beside the faces names them, so
+ * the first face must be theirs. The rest follow by rounds descending. This is the
+ * ONE client-side re-sort in the section and it exists only to keep the face and
+ * the sentence in agreement — it never reorders the courses themselves.
+ *
+ * S5.4 — userId goes to EVERY avatar: the fallback hue means a PERSON, and hashing
+ * a display name instead would give the same member two colours on two surfaces.
+ */
+const STACK_CAP = 5;
+
+function AvatarStack({
+  players,
+  lowBy,
+  viewerId,
+}: {
+  players: BoardCoursePlayer[];
+  lowBy: string | null;
+  viewerId: string | undefined;
+}) {
+  if (players.length === 0) return null;
+
+  const ordered = [...players].sort((a, b) => {
+    if (lowBy) {
+      const aLow = a.display_name === lowBy ? 1 : 0;
+      const bLow = b.display_name === lowBy ? 1 : 0;
+      if (aLow !== bLow) return bLow - aLow;
+    }
+    return b.rounds - a.rounds;
+  });
+  const faces = ordered.slice(0, STACK_CAP);
+  const rest = ordered.length - faces.length;
+
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
+      {faces.map((p, i) => (
+        <span key={p.user_id} style={{ marginLeft: i === 0 ? 0 : -7, display: 'inline-flex' }}>
+          <SquircleAvatar
+            size={22}
+            src={p.profile_photo_url}
+            alt={p.display_name ?? ''}
+            userId={p.user_id}
+            thinRing
+            /* S5.3 — the viewer's ring is amber. It is the only amber in the panel. */
+            ringColor={viewerId && p.user_id === viewerId ? A.AMBER : A.PANEL}
+          />
+        </span>
+      ))}
+      {rest > 0 && (
+        <span style={{ ...CAP, color: A.MUTE, marginLeft: 7 }}>{`+${rest}`}</span>
+      )}
+    </span>
+  );
+}
+
+/**
  * S4 — THE LOW ROUND LINE. The figure sits NEXT TO THE NAME (S4.2), never pushed
  * to the row's right edge: the name and the figure are one statement. When
  * low_gross is null the line renders NOTHING — no dash, no reserved height.
+ *
+ * S4.3 — NO EAGLE COUNT HERE. eagle_rounds counts rounds by ANYONE at the course,
+ * so inside a sentence about one member it reads as that member's eagle, which
+ * live data proved false. It stays in the row type, unread.
  */
-function LowRoundLine({ row }: { row: BoardCourseRow }) {
+function LowRoundLine({
+  row,
+  userId,
+  filters,
+}: {
+  row: BoardCourseRow;
+  userId: string | undefined;
+  filters: BoardFilters;
+}) {
   const { t } = useTranslation('courses');
+  /* S3.2 — the same lazy read, now feeding faces rather than a list. */
+  const players = useBoardCoursePlayers(userId, row.course_id, filters);
   if (row.low_gross == null) return null;
 
   const toPar = row.low_to_par;
@@ -385,22 +462,21 @@ function LowRoundLine({ row }: { row: BoardCourseRow }) {
     <div
       style={{
         display: 'flex',
-        alignItems: 'baseline',
-        flexWrap: 'wrap',
+        alignItems: 'center',
         gap: 8,
         padding: '2px 0 10px',
       }}
     >
+      {/* S3.3 — the lazy shell holds ONE LINE's height, never the old list's. */}
+      {players.isPending ? (
+        <span aria-hidden style={{ display: 'inline-block', width: 22, height: 22 }} />
+      ) : (
+        <AvatarStack players={players.data ?? []} lowBy={row.low_by} viewerId={userId} />
+      )}
       <span style={{ ...CAP, color: A.MUTE }}>
         {t('discover.coursesPlayed.lowRoundBy', 'Low round by {{name}}', {
           name: row.low_by ?? '\u2014',
         })}
-        {row.eagle_rounds > 0 ? (
-          <>
-            {' \u00b7 '}
-            {t('discover.coursesPlayed.nEagles', '{{count}} eagles', { count: row.eagle_rounds })}
-          </>
-        ) : null}
       </span>
       <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
         <span className="tabular-nums" style={{ fontSize: 17, fontWeight: 800, color: A.INK, lineHeight: 1 }}>
