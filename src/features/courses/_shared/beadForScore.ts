@@ -3,7 +3,7 @@ import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 /**
  * beadForScore — the ONE trajectory-bead rule.
  *
- *   ace / albatross   solid GOLD bead
+ *   eagle or better   solid GOLD bead
  *   EVERYTHING ELSE   no bead
  *
  * BEADS MARK THE EXTRAORDINARY; COLOUR MARKS THE ORDINARY. Both curves that use
@@ -18,10 +18,8 @@ import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
  * at all — SC_FILL_GOLD is broadcast gold, a separate family — so it does not
  * compete with the ramp the stroke is using.
  *
- * WHY EAGLES DO NOT: a good player makes several a season, and a bead that
- * appears a few times a round stops reading as an event and starts reading as
- * chart furniture, which is the thing this change removes. The eagle is in the
- * scorecard for anyone who wants the inventory.
+ * The bead follows the same par-relative band as the score mark: an ace on a
+ * par three is an eagle, while an ace on a par four is an albatross.
  *
  * THE CONSUMERS ARE TWO: TrajectoryLine (which serves the scorecard sheet AND
  * the Clubhouse feed — feed/PostRoundCard renders TrajectoryLine itself, so it
@@ -46,7 +44,7 @@ export function beadForScore(
 ): Bead | null {
   if (strokes == null || par == null || strokes <= 0) return null;
   const d = strokes - par;
-  if (d <= -3) return { tone: SC_FILL_GOLD, radius: 5 };
+  if (d <= -2) return { tone: SC_FILL_GOLD, radius: 5 };
   return null;
 }
 

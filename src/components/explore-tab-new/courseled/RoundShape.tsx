@@ -495,7 +495,7 @@ function ShapeMeta({ buckets }: { buckets: Record<BucketKey, number> | null }) {
 
 
    PAR IS NOT PRINTED. The MARKER is the par statement — solid-red birdie,
-   ink-ground bogey, ringed double-or-worse — so a par row would be the same fact
+   outlined-blue bogey, solid-blue double and ringed deep-blue triple+ — so a par row would be the same fact
    twice. The full Clubhouse card prints par because it has the room and because
    it IS a scorecard; this is a summary.
 
@@ -540,10 +540,9 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
   return 'triple';
 }
 
-/** THE PILL GRAMMAR AT 17PX. Every event mark is circular. Under par is a solid
- *  red disc with white ink; over par is an ink-alpha ground with ink. A ring is
- *  symmetrical magnitude — eagle and double both get one — while gold is
- *  reserved for the ace/albatross ring. The outer 1px border is the ring and
+/** THE DARK SCORE GRAMMAR AT 17PX. Under par is circular; over par is square.
+ *  Eagle-or-better is gold, birdie red, bogey outlined blue, double solid blue,
+ *  and triple+ deep blue with one ring. The outer 1px border is the ring and
  *  the inset 1px `well` shadow is its surface-aware gap; nothing paints outside
  *  CELL x CELL.
  *

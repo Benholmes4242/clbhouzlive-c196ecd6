@@ -26,9 +26,10 @@
 import React from 'react';
 import { A, SANS, FIGS, LABEL, Panel, bizFigure, BIZ_BODY } from '@/features/courses/components/holes/analytical/tokens';
 import type { SiLadder as SiLadderData, SiLadderRow } from './siLadder';
+import { SC_FILL_BIRDIE_DK } from '@/features/courses/components/holes/_constants';
 
 /** §2 — the verdict's two colours. Nothing else on the chart is coloured. */
-const HARDER = '#FF6B60';
+const HARDER = SC_FILL_BIRDIE_DK;
 const EASIER = '#34D399';
 const LINE_QUIET = 'rgba(255,255,255,0.13)';
 
