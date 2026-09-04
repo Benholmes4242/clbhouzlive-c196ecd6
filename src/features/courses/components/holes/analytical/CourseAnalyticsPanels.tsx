@@ -153,7 +153,11 @@ const ShapeChart: React.FC<{
   easiestText: string;
   flat: boolean;
   hasYou: boolean;
-}> = ({ holes, myByHole, hardestHole, hardestText, easiestHole, easiestText, flat, hasYou }) => {
+  /** NO FIELD (BRIEF_HOW_IT_PLAYS_NO_FIELD): the pool is the viewer's own
+   *  rounds, so the field bars would redraw the member's line under another
+   *  name. Drop them; the line alone carries the shape. */
+  fieldIsOnlyYou: boolean;
+}> = ({ holes, myByHole, hardestHole, hardestText, easiestHole, easiestText, flat, hasYou, fieldIsOnlyYou }) => {
 
   const W = 340;
   /** Condensed plot (BRIEF §6): 92 -> 78, headroom included. */
@@ -220,7 +224,7 @@ const ShapeChart: React.FC<{
           style={{ display: 'block' }}
           aria-hidden="true"
         >
-          {holes.map((h, i) => {
+          {!fieldIsOnlyYou && holes.map((h, i) => {
             const yv = y(h.avg_to_par);
             const top = Math.min(yv, yBase);
             const height = Math.max(2, Math.abs(yBase - yv));
@@ -390,7 +394,7 @@ export function buildParTypeRows(
     });
 }
 
-const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows, fieldAvg }) => {
+const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number; fieldIsOnlyYou: boolean }> = ({ rows, fieldAvg, fieldIsOnlyYou }) => {
   const { t } = useTranslation(['courses']);
   if (rows.length === 0) return null;
 
@@ -452,7 +456,7 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
                     display: 'block',
                   }}
                 />
-                {r.you != null && (
+                {r.you != null && !fieldIsOnlyYou && (
                   <i
                     aria-hidden="true"
                     style={{
@@ -477,18 +481,9 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
                   whiteSpace: 'nowrap',
                 }}
               >
-                <span
-                  style={{
-                    fontSize: 13.5,
-                    fontWeight: 700,
-                    color: fieldFig ? fieldFig.tone : A.INK,
-                    minWidth: 34,
-                    textAlign: 'right',
-                  }}
-                >
-                  {fieldFig ? fieldFig.text : ''}
-                </span>
-                {anyYou && (
+                {fieldIsOnlyYou ? (
+                  /* NO FIELD: one figure per par type - the member's own,
+                     amber as everywhere the member's figure appears. */
                   <span
                     style={{
                       fontSize: 13.5,
@@ -498,8 +493,35 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
                       textAlign: 'right',
                     }}
                   >
-                    {youFig ? youFig.text : ''}
+                    {youFig ? youFig.text : fieldFig ? fieldFig.text : ''}
                   </span>
+                ) : (
+                  <>
+                    <span
+                      style={{
+                        fontSize: 13.5,
+                        fontWeight: 700,
+                        color: fieldFig ? fieldFig.tone : A.INK,
+                        minWidth: 34,
+                        textAlign: 'right',
+                      }}
+                    >
+                      {fieldFig ? fieldFig.text : ''}
+                    </span>
+                    {anyYou && (
+                      <span
+                        style={{
+                          fontSize: 13.5,
+                          fontWeight: 700,
+                          color: A.AMBER_DEEP,
+                          minWidth: 34,
+                          textAlign: 'right',
+                        }}
+                      >
+                        {youFig ? youFig.text : ''}
+                      </span>
+                    )}
+                  </>
                 )}
               </span>
             </div>
@@ -507,12 +529,15 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
         })}
       </div>
 
-      {/* SAID ONCE, beneath the rows - never on every row. */}
-      <div style={{ ...LABEL, marginTop: 11 }}>
-        {anyYou
-          ? t('courses:courseDetail.parTypes.keyBoth')
-          : t('courses:courseDetail.parTypes.keyField')}
-      </div>
+      {/* SAID ONCE, beneath the rows - never on every row. With no field
+          there is no bar-versus-line to explain, so no caption. */}
+      {!fieldIsOnlyYou && (
+        <div style={{ ...LABEL, marginTop: 11 }}>
+          {anyYou
+            ? t('courses:courseDetail.parTypes.keyBoth')
+            : t('courses:courseDetail.parTypes.keyField')}
+        </div>
+      )}
     </Panel>
   );
 };
@@ -552,6 +577,14 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
   const hasYou = myByHole.size > 0 && holes.some((h) => myByHole.has(h.hole_no));
 
+  const totalRounds =
+    activeView === 'pros' ? (pro?.total_rounds ?? 0) : (data?.total_rounds ?? 0);
+
+  /* The member's own rows decide whether a field exists at all; until that
+     query resolves the panel cannot know which anatomy to render. */
+  const awaitingMine =
+    activeView === 'members' && Boolean(user?.id && courseId && connection) && myPerf == null;
+
   const stats = useMemo(() => {
     if (holes.length === 0) return null;
     const fieldAvg = holes.reduce((s, h) => s + h.avg_to_par, 0) / holes.length;
@@ -567,8 +600,17 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
     }).length;
     const hardest = holes.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), holes[0]);
     const easiest = holes.reduce((m, h) => (h.avg_to_par < m.avg_to_par ? h : m), holes[0]);
-    return { fieldAvg, yourAvg, beat, withYou: mineRows.length, hardest, easiest };
-  }, [holes, myByHole]);
+    /* NO FIELD (BRIEF_HOW_IT_PLAYS_NO_FIELD): the pool is only a field when it
+       contains rounds beyond the viewer's own. times_played is the viewer's
+       OWN round count per hole; total_rounds is every round in the pool. When
+       the viewer's rounds account for the whole pool, FIELD AVG is their own
+       average renamed and 0/18 means "you did not beat yourself". Members
+       view only - the pros pool never contains the viewer. */
+    const myRounds = Math.max(0, ...mineRows.map((r) => Number(r.times_played) || 0));
+    const fieldIsOnlyYou =
+      activeView === 'members' && hasYou && totalRounds > 0 && myRounds >= totalRounds;
+    return { fieldAvg, yourAvg, beat, withYou: mineRows.length, hardest, easiest, fieldIsOnlyYou };
+  }, [holes, myByHole, hasYou, totalRounds, activeView]);
 
   const toggle = (holeNo: number, surface: 'preview' | 'sheet') => {
     setOpenHoles((prev) => {
@@ -590,8 +632,11 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   const sourceAvailable = activeView === 'pros' ? hasPro : Boolean(data?.available);
   if (!courseId || !sourceAvailable || holes.length === 0 || !stats) return null;
 
-  const totalRounds =
-    activeView === 'pros' ? (pro?.total_rounds ?? 0) : (data?.total_rounds ?? 0);
+  /* HOLD UNTIL BOTH QUERIES SETTLE (acceptance §7): a connected member's own
+     rows decide whether there IS a field, so render nothing rather than a
+     field comparison that then disappears. */
+  if (awaitingMine) return null;
+
   /* THE BASIS LINE states what was pooled - tournaments and player-rounds. */
   const basis =
     activeView === 'pros' ? (
@@ -712,6 +757,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           easiestText={bestFig ? bestFig.text : ''}
           flat={flatShape}
           hasYou={hasYou}
+          fieldIsOnlyYou={stats.fieldIsOnlyYou}
         />
 
 
@@ -746,7 +792,32 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
         {/* THE HARDEST / EASIEST SUMMARY LINE IS GONE (§A2) - both figures now sit
             on their own bars in the chart above, so the figures beneath carry only
             what the chart cannot say. */}
-        {hasYou ? (
+        {stats.fieldIsOnlyYou ? (
+          /* NO FIELD: the pool is the member's own rounds, so FIELD AVG and
+             YOU BEAT FIELD ON would judge them against themselves. Two true
+             figures instead, and one line stating the fact about the pool. */
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+              {you && (
+                <Figure
+                  label={t('courses:courseDetail.plays.yourAvg')}
+                  value={you.text}
+                  tone={A.AMBER_DEEP}
+                />
+              )}
+              <Figure
+                label={t('courses:courseDetail.plays.roundsHere', 'Rounds here')}
+                value={formatNumber(totalRounds)}
+              />
+            </div>
+            <div style={{ ...LABEL, color: A.DIM, textAlign: 'center', marginTop: 8 }}>
+              {t(
+                'courses:courseDetail.plays.noFieldYet',
+                'No one else has posted a hole-by-hole round here yet',
+              )}
+            </div>
+          </>
+        ) : hasYou ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
             <Figure
               label={t('courses:courseDetail.plays.fieldAvg')}
@@ -777,7 +848,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
       </Panel>
 
       {/* §A4 - How each par plays, between How it plays and Hole by hole. */}
-      <ParTypePanel rows={parRows} fieldAvg={stats.fieldAvg} />
+      <ParTypePanel rows={parRows} fieldAvg={stats.fieldAvg} fieldIsOnlyYou={stats.fieldIsOnlyYou} />
 
 
       {/* Block 3 - Hole by hole. THE NARRATION IS GONE (§A1): the columns beneath
