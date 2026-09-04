@@ -49,14 +49,18 @@ export function GlobalPostComposer() {
 
   if (!isOpen) return null;
 
-  return (
+  // SSR / test renderers without a DOM: render nothing rather than throwing.
+  if (typeof document === 'undefined' || !document.body) return null;
+
+  return createPortal(
     <StageComposer
       onClose={handleClose}
       editPostId={editPostId}
       draftId={draftId}
       initialMedia={initialMedia}
       awaitingMedia={awaitingMedia}
-    />
+    />,
+    document.body,
   );
 }
 
