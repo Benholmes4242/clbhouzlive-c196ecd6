@@ -210,6 +210,8 @@ Deno.serve(async (req) => {
     checked,
     enriched,
     holes_upserted: totalHoles,
+    requeued_for_evaluation: requeued,
+
     remaining: remaining ?? 0,
     has_more: hasMore,
     chain_position: chainPosition,
