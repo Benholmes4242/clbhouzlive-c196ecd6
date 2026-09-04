@@ -111,14 +111,14 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   const under = variant === 'birdie' || variant === 'eagle' || variant === 'alba' || variant === 'hio';
   const over = variant === 'bogey' || variant === 'doub' || variant === 'triple';
   const hasMark = under || over;
-  const magnitudeRing = variant === 'eagle' || variant === 'alba' || variant === 'hio' || variant === 'doub';
+  const magnitudeRing = variant === 'eagle' || variant === 'alba' || variant === 'hio' || variant === 'doub' || variant === 'triple';
   const goldRing = variant === 'alba' || variant === 'hio';
 
   const overInk = surface === 'dark' ? OVER_INK_DARK : OVER_INK_LIGHT;
   const parInk = surface === 'dark' ? SC_PAR_DARK : SC_PAR;
   const emptyInk = surface === 'dark' ? 'rgba(242,244,247,0.35)' : '#CBD5E1';
   const underRed = surface === 'dark' ? TOPAR_UNDER_DARK : SC_FILL_BIRDIE;
-  const overGround = variant === 'doub'
+  const overGround = variant === 'doub' || variant === 'triple'
     ? surface === 'dark' ? DARK_DOUBLE_GROUND : LIGHT_DOUBLE_GROUND
     : surface === 'dark' ? DARK_BOGEY_GROUND : LIGHT_BOGEY_GROUND;
   const fill = under ? underRed : over ? overGround : 'transparent';
