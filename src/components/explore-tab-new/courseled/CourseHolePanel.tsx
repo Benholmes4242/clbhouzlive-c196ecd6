@@ -126,16 +126,13 @@ export function CourseHolePanel({
 
   return (
     <div style={{ fontFamily: SANS, ...FIGS, minHeight: featured ? 330 : undefined }}>
-      {/* The analytics are COURSE-WIDE while the page above them is filtered. That is a
-          sample-size decision, not a preference: at the time of writing, filtering to the
-          window left three of the five courses shown below the five-round gate, and one
-          of them with a single member. Revisit when the connected base is large enough
-          that a 14 day window holds a real field - at which point this line changes and
-          the analytics take the filter. */}
+      {/* P1 — The analytics are COURSE-WIDE while the page above them is filtered. The
+          basis line is now the single heading for everything beneath it: chart, By par,
+          and Hole by hole. */}
       <AnalyticsBasis count={totalRounds} featured={featured} />
 
-      {/* BLOCK 1 — HOW IT PLAYS (S5.3). */}
-      <Block title={t('discover.coursesPlayed.howItPlays', 'How it plays')} first fullBleed={featured}>
+      {/* BLOCK 1 — the chart, directly beneath the basis heading (P1.3). */}
+      <Block first fullBleed={featured}>
         <HoleChart
           holes={holes}
           myByHole={myByHole}
@@ -177,9 +174,9 @@ export function CourseHolePanel({
         )}
       </Block>
 
-      {/* BLOCK 2 — HOW EACH PAR PLAYS (S5.4). */}
+      {/* BLOCK 2 — BY PAR (P2.1). */}
       {parRows.length > 0 && (
-        <Block title={t('discover.coursesPlayed.howEachPar', 'How each par plays')} fullBleed={featured}>
+        <Block title={t('discover.coursesPlayed.howEachPar', 'By par')} fullBleed={featured}>
           <ParBars rows={parRows} fieldIsOnlyYou={fieldIsOnlyYou} />
         </Block>
       )}
@@ -194,8 +191,10 @@ export function CourseHolePanel({
             {shares && <DistributionStrip shares={shares} />}
             <Extremes hardest={hardest} easiest={easiest} />
           </Block>
-          <div style={{ padding: '0 14px' }}>
+          {/* P3 — 12px bottom padding + 8px grid gap = 20px break before tiles; no hairline. */}
+          <div style={{ padding: '0 14px 12px' }}>
             <ListTerminalRow
+              borderless
               label={t('discover.coursesPlayed.viewCourse', 'View course')}
               onPress={() => onCoursePress?.(courseId)}
             />
@@ -203,11 +202,7 @@ export function CourseHolePanel({
         </>
       ) : (
         <>
-          {/* E2.1 — "All 18" is a plain label in the full panel. */}
-          <Block
-            title={t('holes.preview.eyebrow', 'Hole by hole')}
-            note={t('discover.coursesPlayed.allHoles', 'All {{count}}', { count: holes.length })}
-          >
+          <Block title={t('holes.preview.eyebrow', 'Hole by hole')}>
             {shares && <DistributionStrip shares={shares} />}
             <Extremes hardest={hardest} easiest={easiest} />
           </Block>
@@ -235,10 +230,20 @@ function AnalyticsBasis({ count, featured }: { count: number; featured: boolean 
         whiteSpace: 'nowrap',
       }}
     >
-      <span style={{ ...CAP, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      {/* P1.2 — the phrase is the bright heading; the count is the muted sample note. */}
+      <span
+        style={{
+          ...KICKER,
+          fontSize: 10,
+          color: A.INK,
+          minWidth: 0,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
         {t('discover.coursesPlayed.courseWideBasis', 'How this course has always played')}
       </span>
-      <span style={{ ...CAP, color: A.MUTE, flexShrink: 0 }}>
+      <span style={{ ...CAP, color: A.DIM, flexShrink: 0 }}>
         {t('discover.coursesPlayed.roundCount', '{{count}} rounds', { count })}
       </span>
     </div>
@@ -252,7 +257,7 @@ function Block({
   fullBleed,
   children,
 }: {
-  title: string;
+  title?: string;
   note?: string;
   first?: boolean;
   fullBleed?: boolean;
@@ -265,10 +270,12 @@ function Block({
         padding: fullBleed ? (first ? '2px 14px 12px' : '12px 14px') : (first ? '2px 0 12px' : '12px 0'),
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-        <span style={BLOCK_TITLE}>{title}</span>
-        {note ? <span style={{ ...CAP, marginLeft: 'auto' }}>{note}</span> : null}
-      </div>
+      {title ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          <span style={BLOCK_TITLE}>{title}</span>
+          {note ? <span style={{ ...CAP, marginLeft: 'auto' }}>{note}</span> : null}
+        </div>
+      ) : null}
       {children}
     </div>
   );
