@@ -11,6 +11,9 @@ const cssColor = (value: string) => {
   return node.style.color;
 };
 
+const sameColor = (left: string, right: string) =>
+  left.replaceAll(' ', '').toLowerCase() === right.replaceAll(' ', '').toLowerCase();
+
 describe('ScoreMark dark scorecard convention', () => {
   it.each([
     { name: 'birdie', strokes: 3, par: 4, fill: '#C8372B', radius: '50%', rings: 0 },
@@ -25,13 +28,13 @@ describe('ScoreMark dark scorecard convention', () => {
     const fillLayer = hidden.find((node) => node.style.backgroundColor === resolved);
     expect(fillLayer).toBeDefined();
     expect(fillLayer?.style.borderRadius).toBe(radius);
-    expect(hidden.filter((node) => node.style.borderColor === resolved)).toHaveLength(rings);
+    expect(hidden.filter((node) => sameColor(node.style.borderColor, resolved))).toHaveLength(rings);
   });
 
   it('renders bogey as an unfilled outlined square and par as plain ink', () => {
     const bogey = render(<ScoreMark strokes={5} par={4} surface="dark" />);
     expect(layers(bogey.container)).toHaveLength(1);
-    expect(layers(bogey.container)[0].style.borderColor).toBe(cssColor('rgba(248,250,252,0.55)'));
+    expect(sameColor(layers(bogey.container)[0].style.borderColor, cssColor('rgba(248,250,252,0.55)'))).toBe(true);
     expect(layers(bogey.container)[0].style.background).toBe('');
 
     const par = render(<ScoreMark strokes={4} par={4} surface="dark" />);
@@ -40,10 +43,10 @@ describe('ScoreMark dark scorecard convention', () => {
 
   it('makes an ace inherit its par-relative band', () => {
     const parThree = render(<ScoreMark strokes={1} par={3} surface="dark" />);
-    expect(layers(parThree.container).filter((node) => node.style.borderColor === cssColor('#FFD200'))).toHaveLength(1);
+    expect(layers(parThree.container).filter((node) => sameColor(node.style.borderColor, cssColor('#FFD200')))).toHaveLength(1);
 
     const parFour = render(<ScoreMark strokes={1} par={4} surface="dark" />);
-    expect(layers(parFour.container).filter((node) => node.style.borderColor === cssColor('#FFD200'))).toHaveLength(2);
+    expect(layers(parFour.container).filter((node) => sameColor(node.style.borderColor, cssColor('#FFD200')))).toHaveLength(2);
   });
 
   it('preserves the light double-plus treatment', () => {
