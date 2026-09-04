@@ -33,8 +33,11 @@ export type FeatBoardKey = 'ace' | 'albatross' | 'eagle' | 'clean_card';
 export type BoardKey = RankingBoardKey | FeatBoardKey;
 
 /** B1.2 — the RANKINGS section: seven boards that rank members. */
+/* BRIEF_RETIRE_GROSS_BOARD S1.3 — 'gross' IS RETIRED-BUT-VALID. The key still
+   parses out of storage and still resolves in the RPC; it is simply never
+   OFFERED. The surviving scoring board is 'topar', which ranks on gross-to-par
+   and carries the vernacular label "Lowest gross" (Amendment B1.1). */
 export const RANKING_BOARD_KEYS: RankingBoardKey[] = [
-  'gross',
   'topar',
   'net',
   'stableford',
@@ -53,7 +56,7 @@ export const FEAT_BOARD_KEYS: FeatBoardKey[] = ['ace', 'albatross', 'eagle', 'cl
 export const isFeatBoard = (board: BoardKey): board is FeatBoardKey =>
   (FEAT_BOARD_KEYS as string[]).includes(board);
 
-/** All eleven, in picker order. */
+/** All offered boards, in picker order (ten: 'gross' is retired). */
 export const BOARD_KEYS: BoardKey[] = [...RANKING_BOARD_KEYS, ...FEAT_BOARD_KEYS];
 
 export type ScopeKey = 'everyone' | 'circle' | 'club' | 'you';
@@ -172,8 +175,10 @@ export const COMPETITION_OPTIONS: FixedOption<CompetitionKey>[] = [
 ];
 
 export const BOARD_LABELS: Record<BoardKey, { i18n: string; label: string }> = {
+  /* Retired (S1.3): never offered, kept so a stored key still labels. */
   gross: { i18n: 'discover.filterBoard.board.gross', label: 'Lowest gross' },
-  topar: { i18n: 'discover.filterBoard.board.topar', label: 'Best to par' },
+  /* B1.1 — the KEY stays 'topar'; the LABEL is the vernacular one. */
+  topar: { i18n: 'discover.filterBoard.board.topar', label: 'Lowest gross' },
   net: { i18n: 'discover.filterBoard.board.net', label: 'Lowest net' },
   stableford: { i18n: 'discover.filterBoard.board.stableford', label: 'Stableford' },
   improved: { i18n: 'discover.filterBoard.board.improved', label: 'Most improved' },

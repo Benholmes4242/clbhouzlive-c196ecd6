@@ -88,6 +88,12 @@ function toParOf(r: Row): number | null {
   return r.gross_score - r.course_par;
 }
 
+/** B2.1 — the net board's RANKED quantity: net against the course's par. */
+function netToParOf(r: Row): number | null {
+  if (r.net_score == null || r.course_par == null) return null;
+  return r.net_score - r.course_par;
+}
+
 /** One decimal, true minus — the index-movement figure grammar. */
 function fmtCut(n: number | null): string {
   if (n == null) return '\u2014';
@@ -112,8 +118,15 @@ export function boardValue(
       const p = toParOf(r);
       return { text: fmtToPar(p), tone: p != null && p < 0 ? TOPAR_UNDER : A.INK };
     }
-    case 'net':
-      return { text: r.net_score != null ? String(Math.round(r.net_score)) : '\u2014', tone: A.INK };
+    /* AMENDMENT B2.1/B2.2 — THE NET BOARD RENDERS ITS RANKED FIGURE. The RPC
+       ranks 'net' on (net_score - course_par), so the column must show net TO
+       PAR or the board sorts on one number and displays another. The label
+       stays NET: "nett five under" is how a comp leaderboard reads. B2.4 — the
+       under-par colour law applies, true minus and never a hyphen. */
+    case 'net': {
+      const n = netToParOf(r);
+      return { text: fmtToPar(n), tone: n != null && n < 0 ? TOPAR_UNDER : A.INK };
+    }
     case 'stableford':
       return {
         text: r.stableford_points != null ? String(r.stableford_points) : '\u2014',
