@@ -23,7 +23,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostLikes, type PostLiker } from '@/hooks/usePostLikes';
 
 export interface PostLikerEnriched extends PostLiker {
@@ -51,7 +51,7 @@ export function usePostLikers(
   enabled: boolean,
   source: 'post' | 'editorial' = 'post',
 ) {
-  const { user } = useAuth();
+  const { user } = useSupabaseSession();
   const base = usePostLikes(postId, enabled, source);
   const likers = base.data ?? [];
 
