@@ -84,7 +84,7 @@ export function CourseHolePanel({
   const settling = analysis.isPending || (Boolean(userId) && mine.isPending);
   if (settling) {
     return mode === 'featured' ? (
-      <div aria-hidden style={{ minHeight: 286, padding: '0 12px' }} />
+      <div aria-hidden style={{ minHeight: 330, padding: '0 12px' }} />
     ) : null;
   }
 
@@ -133,7 +133,7 @@ export function CourseHolePanel({
   const featured = mode === 'featured';
 
   return (
-    <div style={{ fontFamily: SANS, ...FIGS, padding: featured ? '0 12px' : undefined }}>
+    <div style={{ fontFamily: SANS, ...FIGS, padding: featured ? '0 12px' : undefined, minHeight: featured ? 330 : undefined }}>
       {/* BLOCK 1 — HOW IT PLAYS (S5.3). */}
       <Block title={t('discover.coursesPlayed.howItPlays', 'How it plays')} note={basis} first={!featured}>
         <HoleChart
