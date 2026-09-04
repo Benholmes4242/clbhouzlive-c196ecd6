@@ -423,22 +423,27 @@ export function BoardRowView({
           {second.text}
         </span>
       )}
-      <span
-        className="tabular-nums"
-        style={{
-          width: VALUE_W,
-          flexShrink: 0,
-          textAlign: 'center',
-          /* B4.2 — WORDS at 12.5, FIGURES at 15. VALUE_W stays 58 either way
-             (B4.5) so the right edge aligns across boards. */
-          fontSize: valueIsText ? 12.5 : 15,
-          fontWeight: 700,
-          color: isSelf ? A.AMBER : value.tone,
-          textTransform: 'uppercase',
-        }}
-      >
-        {value.text}
-      </span>
+      {!hideValue && (
+        <span
+          className="tabular-nums"
+          style={{
+            width: VALUE_W,
+            flexShrink: 0,
+            textAlign: 'center',
+            /* B4.2 — WORDS at 12.5, FIGURES at 15. VALUE_W stays 58 either way
+               (B4.5) so the right edge aligns across boards. */
+            fontSize: valueIsText ? 12.5 : 15,
+            fontWeight: 700,
+            /* S1.3 — THE RANKED FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER:
+               under par red, over par ink, level muted, on the member's own row
+               as on any other. Amber marks the position and the name only. */
+            color: value.tone,
+            textTransform: 'uppercase',
+          }}
+        >
+          {value.text}
+        </span>
+      )}
     </button>
   );
 }
