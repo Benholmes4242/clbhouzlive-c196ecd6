@@ -19128,7 +19128,11 @@ export type Database = {
         Returns: {
           area: string
           course_id: string
+          eagle_rounds: number
           is_new: boolean
+          low_by: string
+          low_gross: number
+          low_to_par: number
           members: number
           name: string
           plays_to: number

@@ -43,7 +43,6 @@ export function CoursesPlayedSeeAllSheet({
   filters,
   windowLabel,
   onCoursePress,
-  onMemberPress,
 }: CoursesPlayedSeeAllSheetProps) {
   const { t } = useTranslation('courses');
   /* One row open at a time, exactly as in the section. */
@@ -52,6 +51,10 @@ export function CoursesPlayedSeeAllSheet({
   const courses = useBoardCourses(userId, filters, { limit: SHEET_LIMIT, enabled: open });
   const rows = courses.data?.rows ?? [];
   const total = courses.data?.total ?? 0;
+  /* The scale bar reads against the range of the rows THIS surface shows. */
+  const playsTo = rows.map((r) => r.plays_to).filter((v): v is number => v != null);
+  const scaleMax = playsTo.length > 0 ? Math.max(...playsTo) : 0;
+  const scaleMin = playsTo.length > 0 ? Math.min(...playsTo) : 0;
 
   return (
     <BottomSheet
@@ -111,13 +114,14 @@ export function CoursesPlayedSeeAllSheet({
           <CourseRow
             key={row.course_id}
             row={row}
+            rank={index + 1}
             first={index === 0}
             open={openId === row.course_id}
             onToggle={() => setOpenId((cur) => (cur === row.course_id ? null : row.course_id))}
             userId={userId}
-            filters={filters}
+            scaleMin={scaleMin}
+            scaleMax={scaleMax}
             onCoursePress={onCoursePress}
-            onMemberPress={onMemberPress}
           />
         ))}
       </div>

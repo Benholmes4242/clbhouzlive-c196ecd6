@@ -20,6 +20,15 @@ export interface BoardCourseRow {
   rounds: number;
   members: number;
   plays_to: number | null;
+  /**
+   * THE LOW ROUND AT THAT COURSE. low_gross and low_to_par always describe the
+   * SAME round and low_by is that round's member (S4.6) — never recombine them
+   * with a figure from anywhere else.
+   */
+  low_gross: number | null;
+  low_to_par: number | null;
+  low_by: string | null;
+  eagle_rounds: number;
   /** NULL at the All time window: there is no previous period (C4.3). */
   prev_rounds: number | null;
   is_new: boolean;
@@ -75,6 +84,12 @@ export function useBoardCourses(
         rounds: Number(r.rounds ?? 0),
         members: Number(r.members ?? 0),
         plays_to: r.plays_to == null ? null : Number(r.plays_to),
+        /* BY NAME, NEVER POSITIONALLY: the four low-round columns sit BEFORE
+           is_new in the RPC's row shape. */
+        low_gross: r.low_gross == null ? null : Number(r.low_gross),
+        low_to_par: r.low_to_par == null ? null : Number(r.low_to_par),
+        low_by: (r.low_by as string | null) ?? null,
+        eagle_rounds: Number(r.eagle_rounds ?? 0),
         prev_rounds: r.prev_rounds == null ? null : Number(r.prev_rounds),
         is_new: r.is_new === true,
         total_courses: Number(r.total_courses ?? 0),
