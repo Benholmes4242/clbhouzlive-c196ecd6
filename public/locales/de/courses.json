@@ -1310,7 +1310,7 @@
       "relYest": "gestern",
       "relDaysAgo": "vor {{n}} T",
       "relWeeksAgo": "vor {{n}} Wo",
-      "relMonthsAgo": "vor {{n}} Mon",
+      "relMonthsAgo": "vor {{n}} M",
       "relYearsAgo": "vor {{n}} J"
     }
   },

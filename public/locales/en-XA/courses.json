@@ -1380,7 +1380,7 @@
       "relYest": "[yest]",
       "relDaysAgo": "[{{n}}d ago]",
       "relWeeksAgo": "[{{n}}w ago]",
-      "relMonthsAgo": "[{{n}}mo ago]",
+      "relMonthsAgo": "[{{n}}m ago]",
       "relYearsAgo": "[{{n}}y ago]"
     },
     "rarest": {
