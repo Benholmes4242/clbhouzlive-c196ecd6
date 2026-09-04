@@ -111,10 +111,8 @@ export function CoursesPlayedSection({
         <span style={{ ...KICKER, color: A.INK }}>
           {t('discover.coursesPlayed.title', 'How the courses played')}
         </span>
-        <span style={{ ...CAP, marginLeft: 'auto' }}>
-          {t('discover.coursesPlayed.hardestFirst', 'Hardest first')}
-        </span>
       </div>
+
 
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginTop: 8 }}>
         <CourseStat value={String(total)} label={t('discover.filterBoard.col.courses', 'COURSES')} />
