@@ -559,6 +559,11 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   const totalRounds =
     activeView === 'pros' ? (pro?.total_rounds ?? 0) : (data?.total_rounds ?? 0);
 
+  /* The member's own rows decide whether a field exists at all; until that
+     query resolves the panel cannot know which anatomy to render. */
+  const awaitingMine =
+    activeView === 'members' && Boolean(user?.id && courseId && connection) && myPerf == null;
+
   const stats = useMemo(() => {
     if (holes.length === 0) return null;
     const fieldAvg = holes.reduce((s, h) => s + h.avg_to_par, 0) / holes.length;
@@ -731,6 +736,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           easiestText={bestFig ? bestFig.text : ''}
           flat={flatShape}
           hasYou={hasYou}
+          fieldIsOnlyYou={stats.fieldIsOnlyYou}
         />
 
 
