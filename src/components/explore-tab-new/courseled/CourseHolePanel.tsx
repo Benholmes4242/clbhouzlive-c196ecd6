@@ -26,9 +26,9 @@ import { ListTerminalRow } from './ListTerminalRow';
  * THE SOURCE IS get_course_hole_analysis, LAZILY (S5.1) — the same RPC and the
  * same shapes that power the course detail page. NO NEW SQL.
  *
- * IT IS COURSE-WIDE AND IGNORES THE BOARD'S FILTERS (S5.2), so every block that
- * reads it states its own basis: "All N rounds here". Two unlabelled bases in one
- * panel is the exact fault removed from the course page this week.
+ * IT IS COURSE-WIDE AND IGNORES THE BOARD'S FILTERS (S5.2). One seam above the
+ * analytics states that basis once, separating filtered course results above
+ * from the course-wide picture below.
  */
 
 /** S7.1 — below this many hole-detail rounds there is no course picture. */
@@ -119,10 +119,6 @@ export function CourseHolePanel({
   const parRows = buildParTypeRows(holes, myByHole);
   const shares = courseBucketShares(holes);
 
-  const basis = t('discover.coursesPlayed.allRoundsHere', 'All {{count}} rounds here', {
-    count: totalRounds,
-  });
-
   const field = toParParts(fieldAvg);
   const you = toParParts(yourAvg);
 
@@ -130,8 +126,16 @@ export function CourseHolePanel({
 
   return (
     <div style={{ fontFamily: SANS, ...FIGS, minHeight: featured ? 330 : undefined }}>
+      {/* The analytics are COURSE-WIDE while the page above them is filtered. That is a
+          sample-size decision, not a preference: at the time of writing, filtering to the
+          window left three of the five courses shown below the five-round gate, and one
+          of them with a single member. Revisit when the connected base is large enough
+          that a 14 day window holds a real field - at which point this line changes and
+          the analytics take the filter. */}
+      <AnalyticsBasis count={totalRounds} featured={featured} />
+
       {/* BLOCK 1 — HOW IT PLAYS (S5.3). */}
-      <Block title={t('discover.coursesPlayed.howItPlays', 'How it plays')} note={basis} first={!featured} fullBleed={featured}>
+      <Block title={t('discover.coursesPlayed.howItPlays', 'How it plays')} first fullBleed={featured}>
         <HoleChart
           holes={holes}
           myByHole={myByHole}
@@ -175,7 +179,7 @@ export function CourseHolePanel({
 
       {/* BLOCK 2 — HOW EACH PAR PLAYS (S5.4). */}
       {parRows.length > 0 && (
-        <Block title={t('discover.coursesPlayed.howEachPar', 'How each par plays')} note={basis} fullBleed={featured}>
+        <Block title={t('discover.coursesPlayed.howEachPar', 'How each par plays')} fullBleed={featured}>
           <ParBars rows={parRows} fieldIsOnlyYou={fieldIsOnlyYou} />
         </Block>
       )}
@@ -185,7 +189,6 @@ export function CourseHolePanel({
         <>
           <Block
             title={t('holes.preview.eyebrow', 'Hole by hole')}
-            note={basis}
             fullBleed
           >
             {shares && <DistributionStrip shares={shares} />}
@@ -214,6 +217,30 @@ export function CourseHolePanel({
           />
         </>
       )}
+    </div>
+  );
+}
+
+function AnalyticsBasis({ count, featured }: { count: number; featured: boolean }) {
+  const { t } = useTranslation('courses');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'space-between',
+        gap: 12,
+        padding: featured ? '12px 14px 0' : '12px 0 0',
+        borderTop: `1px solid ${A.BORDER}`,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      <span style={{ ...CAP, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {t('discover.coursesPlayed.courseWideBasis', 'How this course has always played')}
+      </span>
+      <span style={{ ...CAP, color: A.MUTE, flexShrink: 0 }}>
+        {t('discover.coursesPlayed.roundCount', '{{count}} rounds', { count })}
+      </span>
     </div>
   );
 }
