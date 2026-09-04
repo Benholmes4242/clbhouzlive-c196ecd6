@@ -1,47 +1,48 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, ChevronRight, ArrowDown, ArrowUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowDown, ArrowUp } from 'lucide-react';
 
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CourseImageFallback } from './CourseImageFallback';
-import { A, KICKER, SANS, FIGS, DISCOVER_FACT } from './tokens';
+import { A, KICKER, SANS, FIGS, DISCOVER_FACT, PODIUM_ACCENT } from './tokens';
 import { WINDOW_SHORT, type BoardFilters } from './boardFilters';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
-import { useBoardCoursePlayers } from './hooks/useBoardCoursePlayers';
 import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
+import { CourseHolePanel } from './CourseHolePanel';
 import { ListTerminalRow } from './ListTerminalRow';
 import { windowDays } from './GolfThisWeek';
 
 /**
- * COURSES PLAYED (BRIEF_DISCOVER_COURSES_SECTION).
+ * HOW THE COURSES PLAYED (BRIEF_COURSES_HOW_THEY_PLAYED).
  *
- * THE BOARD IS WHO, THIS IS WHERE. It sits directly beneath the leaderboard and
- * above Amateur News (C1.1) because the two are a pair.
+ * IT ANSWERS HOW EACH COURSE PLAYED, NOT WHERE ROUNDS HAPPENED. get_board_courses
+ * now ORDERS BY plays_to DESC and its LIMIT selects on that same axis, so
+ * THE ROWS RENDER IN THE RPC'S OWN ORDER AND NOTHING IS SORTED CLIENT-SIDE
+ * (S1.3). Sorting the survivors of a most-played limit would rank an arbitrary
+ * subset and call it hardest first.
  *
- * IT READS THE PAGE'S ONE FILTER BAR AND NEVER WRITES TO IT (C2.4): there is no
- * sort toggle, no window chip and no filter row of its own here. It is also NOT
- * scoped by the active board (C2.2) — switching Ranked by leaves it untouched.
+ * THE PANEL DOES NOT LIST MEMBERS (S3.1). It duplicated the board directly above
+ * it and cost a query per open; the course's own analytics stand there instead.
  *
- * A ROW EXPANDS IN PLACE (C5.1). It is a display, not navigation; the chevron
- * therefore points DOWN when shut and UP when open, never right.
+ * It still reads the page's one filter bar, still takes NO board key, and
+ * switching Ranked by must leave it completely unchanged.
  */
 
-const TOPAR_UNDER = '#E5484D';
-const ROW_H = 54;
+const TOPAR_UNDER = A.RED;
+const ROW_H = 46;
+const RANK_W = 14;
 const PLAYS_TO_W = 62;
 const CHEVRON_W = 22;
+const CARD_PAD = 12;
+/** S2.3 — a rise is GREEN, a fall is A.DIM. Red on this page means UNDER PAR. */
+const TREND_UP = PODIUM_ACCENT.green;
 
-/**
- * P1 — THE EXPANDED PANEL IS CAPPED. One player row is PLAYER_H tall and the
- * list shows at most PANEL_VISIBLE_ROWS of them; the ceiling is DERIVED from the
- * row height (P1.2) so changing the row cannot leave a stale pixel constant
- * behind. P3 — the fetch is raised to 50 so a scrollable list is not silently
- * truncated at the default twelve.
- */
-const PLAYER_H = 40;
-const PANEL_VISIBLE_ROWS = 10;
-const PANEL_MAX_H = PLAYER_H * PANEL_VISIBLE_ROWS;
-const PLAYERS_FETCH_LIMIT = 50;
+const CAP = {
+  fontSize: 9.5,
+  fontWeight: 700,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase' as const,
+  color: A.DIM,
+};
 
 export interface CoursesPlayedSectionProps {
   userId: string | undefined;
@@ -58,7 +59,7 @@ export function CoursesPlayedSection({
   onMemberPress,
 }: CoursesPlayedSectionProps) {
   const { t } = useTranslation('courses');
-  /* C5.5 — one row open at a time. */
+  /* S2.5 — one row open at a time. */
   const [openId, setOpenId] = useState<string | null>(null);
   const [seeAll, setSeeAll] = useState(false);
 
@@ -69,66 +70,81 @@ export function CoursesPlayedSection({
   const courses = useBoardCourses(userId, filters, { limit: 6 });
   const rows = courses.data?.rows ?? [];
   const total = courses.data?.total ?? 0;
+  const roundsShown = rows.reduce((s, r) => s + r.rounds, 0);
 
   const toggle = useCallback((id: string) => {
     setOpenId((cur) => (cur === id ? null : id));
   }, []);
 
-  /* C2.3 — the member has already said which course they care about. */
+  /* The member has already said which course they care about. */
   if (filters.courses === 'one') return null;
 
-  /* C6.2 — a skeleton at the height the section will occupy; it expands
-     outwards only, and never renders short and grows. */
   if (courses.isPending) {
     return (
       <section aria-hidden style={{ fontFamily: SANS }}>
-        <div style={{ height: 14, width: 130, background: A.PANEL, borderRadius: 3 }} />
+        <div style={{ height: 14, width: 176, background: A.PANEL, borderRadius: 3 }} />
         <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
           <div style={{ height: 15, width: 72, background: A.PANEL, borderRadius: 3 }} />
+          <div style={{ height: 15, width: 64, background: A.PANEL, borderRadius: 3 }} />
           <div style={{ height: 15, width: 58, background: A.PANEL, borderRadius: 3 }} />
         </div>
-        <div style={{ height: 20, marginTop: 12, borderBottom: `1px solid ${A.BORDER}` }} />
-        <div>
+        <div style={{ marginTop: 12, background: A.PANEL, borderRadius: 12, overflow: 'hidden' }}>
+          <div style={{ height: 22 }} />
           {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              style={{ height: ROW_H, borderTop: i === 0 ? 'none' : `1px solid ${A.BORDER}` }}
-            />
+            <div key={i} style={{ height: ROW_H + 8 }} />
           ))}
         </div>
       </section>
     );
   }
 
-  /* C6.1 — nothing to show hides the section, header included. The board above
-     has already told the member their filters are narrow. */
   if (rows.length === 0) return null;
+
+  /* S2.4 — the scale bar reads against the range of the ROWS SHOWN. */
+  const playsTo = rows.map((r) => r.plays_to).filter((v): v is number => v != null);
+  const scaleMax = playsTo.length > 0 ? Math.max(...playsTo) : 0;
+  const scaleMin = playsTo.length > 0 ? Math.min(...playsTo) : 0;
 
   return (
     <section style={{ fontFamily: SANS, ...FIGS }}>
-      <div>
-        <span style={{ ...KICKER, display: 'block', color: A.INK }}>
-          {t('discover.coursesPlayed.title', 'Courses played')}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+        <span style={{ ...KICKER, color: A.INK }}>
+          {t('discover.coursesPlayed.title', 'How the courses played')}
         </span>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginTop: 8 }}>
-          <CourseStat value={String(total)} label={t('discover.filterBoard.col.courses', 'COURSES')} />
-          <CourseStat value={days} label={t('discover.filterBoard.col.days', 'DAYS')} />
-        </div>
+        <span style={{ ...CAP, marginLeft: 'auto' }}>
+          {t('discover.coursesPlayed.hardestFirst', 'Hardest first')}
+        </span>
       </div>
 
-      <div style={{ marginTop: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginTop: 8 }}>
+        <CourseStat value={String(total)} label={t('discover.filterBoard.col.courses', 'COURSES')} />
+        <CourseStat value={String(roundsShown)} label={t('discover.filterBoard.col.rounds', 'ROUNDS')} />
+        <CourseStat value={days} label={t('discover.filterBoard.col.days', 'DAYS')} />
+      </div>
+
+      {/* S1.4 — CONTAINMENT GOES LIGHTER, NEVER DARKER. */}
+      <div
+        style={{
+          marginTop: 12,
+          background: A.PANEL,
+          borderRadius: 12,
+          overflow: 'hidden',
+          padding: `0 ${CARD_PAD}px`,
+        }}
+      >
         <CourseHeaderRow />
         {rows.map((row, index) => (
           <CourseRow
             key={row.course_id}
             row={row}
+            rank={index + 1}
             first={index === 0}
             open={openId === row.course_id}
             onToggle={() => toggle(row.course_id)}
             userId={userId}
-            filters={filters}
+            scaleMin={scaleMin}
+            scaleMax={scaleMax}
             onCoursePress={onCoursePress}
-            onMemberPress={onMemberPress}
           />
         ))}
         {total > 6 && (
@@ -139,8 +155,6 @@ export function CoursesPlayedSection({
         )}
       </div>
 
-      {/* G5 — THE SEE ALL DOES SOMETHING. Same RPC, same filter state, p_limit
-          raised; the sheet's rows are the SAME row component as here (G5.3). */}
       <CoursesPlayedSeeAllSheet
         open={seeAll}
         onClose={() => setSeeAll(false)}
@@ -165,28 +179,25 @@ function CourseStat({ value, label }: { value: string; label: string }) {
   );
 }
 
+/** S1.5 — COURSE left, FIELD PLAYS TO right, at the column-header scale. */
 export function CourseHeaderRow() {
   const { t } = useTranslation('courses');
-  const cap = {
-    fontSize: 9.5,
-    fontWeight: 700,
-    letterSpacing: '0.13em',
-    textTransform: 'uppercase' as const,
-    color: A.DIM,
-  };
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: `minmax(0, 1fr) ${PLAYS_TO_W}px ${CHEVRON_W}px`,
+        gridTemplateColumns: `${RANK_W}px minmax(0, 1fr) ${PLAYS_TO_W}px ${CHEVRON_W}px`,
         alignItems: 'center',
         columnGap: 10,
-        padding: '0 0 6px',
+        padding: '10px 0 6px',
         borderBottom: `1px solid ${A.BORDER}`,
       }}
     >
-      <span style={cap}>{t('discover.coursesPlayed.course', 'Course')}</span>
-      <span style={{ ...cap, textAlign: 'right' }}>{t('discover.coursesPlayed.playsTo', 'Plays to')}</span>
+      <span aria-hidden />
+      <span style={CAP}>{t('discover.coursesPlayed.course', 'Course')}</span>
+      <span style={{ ...CAP, textAlign: 'right' }}>
+        {t('discover.coursesPlayed.fieldPlaysTo', 'Field plays to')}
+      </span>
       <span aria-hidden />
     </div>
   );
@@ -194,30 +205,35 @@ export function CourseHeaderRow() {
 
 export function CourseRow({
   row,
+  rank,
   first,
   open,
   onToggle,
   userId,
-  filters,
+  scaleMin,
+  scaleMax,
   onCoursePress,
-  onMemberPress,
 }: {
   row: BoardCourseRow;
+  rank: number;
   first: boolean;
   open: boolean;
   onToggle: () => void;
   userId: string | undefined;
-  filters: BoardFilters;
+  scaleMin: number;
+  scaleMax: number;
   onCoursePress?: (courseId: string) => void;
-  onMemberPress?: (userId: string) => void;
 }) {
   const { t } = useTranslation('courses');
   const Chevron = open ? ChevronUp : ChevronDown;
 
+  /* S2.4 — difficulty as a shape, so the column is read once. */
+  const span = Math.max(0.1, scaleMax - scaleMin);
+  const fill =
+    row.plays_to == null ? 0 : Math.max(4, Math.min(100, ((row.plays_to - scaleMin) / span) * 100));
+
   return (
     <div style={{ borderTop: first ? 'none' : `1px solid ${A.BORDER}` }}>
-      {/* D2.1 — THE WHOLE COLLAPSED ROW EXPANDS, thumbnail included. One row,
-          one behaviour; the course page is reached from the expanded panel. */}
       <button
         type="button"
         onClick={onToggle}
@@ -225,36 +241,32 @@ export function CourseRow({
         style={{
           width: '100%',
           display: 'grid',
-          gridTemplateColumns: `minmax(0, 1fr) ${PLAYS_TO_W}px ${CHEVRON_W}px`,
+          gridTemplateColumns: `${RANK_W}px minmax(0, 1fr) ${PLAYS_TO_W}px ${CHEVRON_W}px`,
           alignItems: 'center',
           columnGap: 10,
           minHeight: ROW_H,
           background: 'transparent',
           border: 'none',
-          padding: 0,
+          padding: '6px 0 0',
           fontFamily: SANS,
           textAlign: 'left',
           cursor: 'pointer',
         }}
       >
-          {/* D1 — the shared course fallback: the hashed gradient with course
-              initials, exactly as every other course surface renders it. */}
-          <span style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-            <CourseImageFallback
-              courseId={row.course_id}
-              courseName={row.name}
-              imageUrl={row.thumbnail_image}
-              initialsSize={13}
-              style={{
-                width: 44,
-                height: 44,
-                flexShrink: 0,
-                borderRadius: 8,
-                border: `1px solid ${A.BORDER}`,
-              }}
-            />
+        <span className="tabular-nums" style={{ fontSize: 12.5, fontWeight: 700, color: A.MUTE }}>
+          {rank}
+        </span>
 
-            <span style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
+          <CourseImageFallback
+            courseId={row.course_id}
+            courseName={row.name}
+            imageUrl={row.thumbnail_image}
+            initialsSize={9}
+            style={{ width: 34, height: 26, flexShrink: 0, borderRadius: 5 }}
+          />
+
+          <span style={{ flex: 1, minWidth: 0 }}>
             <span
               style={{
                 display: 'block',
@@ -268,23 +280,22 @@ export function CourseRow({
             >
               {row.name ?? '\u2014'}
             </span>
+            {/* S2.2 — area · N rounds [trend] · N members. */}
             <span
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 6,
-                marginTop: 3,
-                ...KICKER,
-                fontSize: 9.5,
+                gap: 5,
+                marginTop: 2,
+                ...CAP,
                 color: A.MUTE,
               }}
             >
-              {/* C3.3 — no leading interpunct and no gap when area is absent. */}
               {row.area ? (
                 <>
                   <span
                     style={{
-                      maxWidth: 130,
+                      maxWidth: 110,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -301,48 +312,129 @@ export function CourseRow({
                   : t('discover.coursesPlayed.nRounds', '{{count}} rounds', { count: row.rounds })}
               </span>
               <Badges row={row} />
-            </span>
+              <span aria-hidden>{'\u00b7'}</span>
+              <span>
+                {row.members === 1
+                  ? t('discover.coursesPlayed.oneMember', '1 member')
+                  : t('discover.coursesPlayed.nMembers', '{{count}} members', { count: row.members })}
+              </span>
             </span>
           </span>
+        </span>
 
-          <PlaysTo value={row.plays_to} />
+        <PlaysTo value={row.plays_to} />
 
-          <span style={{ width: CHEVRON_W, display: 'flex', justifyContent: 'flex-end' }}>
-            <Chevron size={16} color={A.DIM} aria-hidden />
-          </span>
+        <span style={{ width: CHEVRON_W, display: 'flex', justifyContent: 'flex-end' }}>
+          <Chevron size={16} color={A.DIM} aria-hidden />
+        </span>
       </button>
 
+      {/* S2.4 — the 3px scale bar, indented past the rank. */}
+      <div
+        aria-hidden
+        style={{
+          marginLeft: RANK_W + 10,
+          marginTop: 6,
+          marginBottom: 8,
+          height: 3,
+          borderRadius: 2,
+          background: A.TRACK,
+          overflow: 'hidden',
+        }}
+      >
+        {row.plays_to != null && (
+          <i
+            style={{
+              display: 'block',
+              height: '100%',
+              width: `${fill}%`,
+              borderRadius: 2,
+              background: A.MUTE,
+            }}
+          />
+        )}
+      </div>
+
       {open && (
-        <CoursePlayers
-          courseId={row.course_id}
-          courseName={row.name}
-          expectedRows={Math.max(1, Math.min(row.members, PANEL_VISIBLE_ROWS))}
-          userId={userId}
-          filters={filters}
-          onMemberPress={onMemberPress}
-          onCoursePress={onCoursePress}
-        />
+        <div style={{ paddingBottom: 10 }}>
+          <LowRoundLine row={row} />
+          <CourseHolePanel courseId={row.course_id} userId={userId} onCoursePress={onCoursePress} />
+        </div>
       )}
     </div>
   );
 }
 
 /**
- * C4 — NEW WINS, AND A ROW NEVER CARRIES BOTH (C4.4).
+ * S4 — THE LOW ROUND LINE. The figure sits NEXT TO THE NAME (S4.2), never pushed
+ * to the row's right edge: the name and the figure are one statement. When
+ * low_gross is null the line renders NOTHING — no dash, no reserved height.
+ */
+function LowRoundLine({ row }: { row: BoardCourseRow }) {
+  const { t } = useTranslation('courses');
+  if (row.low_gross == null) return null;
+
+  const toPar = row.low_to_par;
+  const toParText =
+    toPar == null
+      ? null
+      : toPar === 0
+        ? 'E'
+        : toPar < 0
+          ? `\u2212${Math.abs(toPar)}`
+          : `+${toPar}`;
+  const toParTone = toPar == null ? A.DIM : toPar < 0 ? TOPAR_UNDER : toPar === 0 ? A.MUTE : A.INK;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        flexWrap: 'wrap',
+        gap: 8,
+        padding: '2px 0 10px',
+      }}
+    >
+      <span style={{ ...CAP, color: A.MUTE }}>
+        {t('discover.coursesPlayed.lowRoundBy', 'Low round by {{name}}', {
+          name: row.low_by ?? '\u2014',
+        })}
+        {row.eagle_rounds > 0 ? (
+          <>
+            {' \u00b7 '}
+            {t('discover.coursesPlayed.nEagles', '{{count}} eagles', { count: row.eagle_rounds })}
+          </>
+        ) : null}
+      </span>
+      <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
+        <span className="tabular-nums" style={{ fontSize: 17, fontWeight: 800, color: A.INK, lineHeight: 1 }}>
+          {row.low_gross}
+        </span>
+        {toParText && (
+          <span className="tabular-nums" style={{ fontSize: 11, fontWeight: 700, color: toParTone }}>
+            {toParText}
+          </span>
+        )}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * NEW WINS, AND A ROW NEVER CARRIES BOTH.
  *
- * C4.3 — ZERO IS NOT NULL. prev_rounds = 0 is a genuine rise from nothing and
- * renders; prev_rounds IS NULL (All time, where there is no previous period)
- * renders NOTHING. A zero change is never drawn, and there is no flat arrow.
+ * S2.3 — a RISE is green; a FALL is A.DIM. NEVER RED: red means under par on this
+ * page, and a red "down 12" beneath a red minus-2 would make one colour mean two
+ * opposite things on one screen.
  */
 function Badges({ row }: { row: BoardCourseRow }) {
   const { t } = useTranslation('courses');
 
-  /* C4.1 — NOT AMBER. Amber means "you" on this surface and appears nowhere here. */
   if (row.is_new) {
     return (
       <span
         style={{
-          ...KICKER,
+          ...CAP,
           fontSize: 9,
           color: A.INK,
           border: `1px solid ${A.BORDER}`,
@@ -358,10 +450,13 @@ function Badges({ row }: { row: BoardCourseRow }) {
   if (row.prev_rounds == null) return null;
   const change = row.rounds - row.prev_rounds;
   if (change === 0) return null;
-  const Arrow = change > 0 ? ArrowUp : ArrowDown;
+  const up = change > 0;
+  const Arrow = up ? ArrowUp : ArrowDown;
 
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 1, color: A.MUTE }}>
+    <span
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 1, color: up ? TREND_UP : A.DIM }}
+    >
       <Arrow size={10} aria-hidden />
       <span className="tabular-nums">{Math.abs(change)}</span>
     </span>
@@ -369,19 +464,16 @@ function Badges({ row }: { row: BoardCourseRow }) {
 }
 
 /**
- * C3.4 — PLAYS TO takes the to-par colour law: over par is A.INK with a plus,
- * under par is red with a TRUE MINUS. A null figure is an em-dash, never 0.0.
+ * PLAYS TO takes the to-par colour law: over par is A.INK with a plus, under par
+ * is red with a TRUE MINUS. S2.6 — a null figure (no usable par, and it now sorts
+ * LAST) renders NOTHING, not a zero and not a dash.
  */
 function PlaysTo({ value }: { value: number | null }) {
+  if (value == null) return <span style={{ width: PLAYS_TO_W }} aria-hidden />;
+
   const text =
-    value == null
-      ? '\u2014'
-      : value > 0
-        ? `+${value.toFixed(1)}`
-        : value < 0
-          ? `\u2212${Math.abs(value).toFixed(1)}`
-          : '0.0';
-  const tone = value == null ? A.DIM : value < 0 ? TOPAR_UNDER : A.INK;
+    value > 0 ? `+${value.toFixed(1)}` : value < 0 ? `\u2212${Math.abs(value).toFixed(1)}` : '0.0';
+  const tone = value < 0 ? TOPAR_UNDER : A.INK;
 
   return (
     <span style={{ width: PLAYS_TO_W, flexShrink: 0, textAlign: 'right' }}>
@@ -389,170 +481,6 @@ function PlaysTo({ value }: { value: number | null }) {
         {text}
       </span>
     </span>
-  );
-}
-
-/** C5.3 / C5.6 — the panel holds a shell at the height it will occupy. */
-function CoursePlayers({
-  courseId,
-  courseName,
-  expectedRows,
-  userId,
-  filters,
-  onMemberPress,
-  onCoursePress,
-}: {
-  courseId: string;
-  courseName: string | null;
-  expectedRows: number;
-  userId: string | undefined;
-  filters: BoardFilters;
-  onMemberPress?: (userId: string) => void;
-  onCoursePress?: (courseId: string) => void;
-}) {
-  const { t } = useTranslation('courses');
-  const players = useBoardCoursePlayers(userId, courseId, filters, {
-    limit: PLAYERS_FETCH_LIMIT,
-  });
-
-  if (players.isPending) {
-    return (
-      /* The shell stands at the panel's eventual height: count line, the capped
-         rows, then the action. */
-      <div aria-hidden style={{ paddingBottom: 8, height: 20 + expectedRows * PLAYER_H + 34 }} />
-    );
-  }
-
-  const list = players.data ?? [];
-  /* P1.4 — ten or fewer players is the panel's NATURAL height: no maxHeight, no
-     scroll area, nothing padded out to a fixed size. */
-  const scrolls = list.length > PANEL_VISIBLE_ROWS;
-
-  return (
-    <div style={{ paddingBottom: 8 }}>
-      {/* P2 — the count sits ABOVE the list and does not move with it. Derived
-          from the rows already in hand (P2.3), never a second call. */}
-      <div style={{ ...KICKER, color: A.MUTE, padding: '2px 0 6px' }}>
-        {list.length === 1
-          ? t('discover.coursesPlayed.oneMember', '1 member')
-          : t('discover.coursesPlayed.nMembers', '{{count}} members', { count: list.length })}
-      </div>
-
-      <div
-        style={
-          scrolls
-            ? {
-                maxHeight: PANEL_MAX_H,
-                overflowY: 'auto',
-                WebkitOverflowScrolling: 'touch',
-                /* P1.3 — REQUIRED: without contain, the end of this list scrolls
-                   the page, or the See all sheet, behind it. */
-                overscrollBehavior: 'contain',
-                willChange: 'transform',
-              }
-            : undefined
-        }
-      >
-        {list.map((p) => (
-        <button
-          key={p.user_id}
-          type="button"
-          onClick={() => onMemberPress?.(p.user_id)}
-          style={{
-            width: '100%',
-            minHeight: PLAYER_H,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            fontFamily: SANS,
-            textAlign: 'left',
-            cursor: 'pointer',
-          }}
-        >
-          {/* C5.3 — the app-wide member fallback: hue from the user id. */}
-          <SquircleAvatar
-            size={26}
-            src={p.profile_photo_url}
-            alt={p.display_name ?? ''}
-            userId={p.user_id}
-            hairlineRing
-          />
-          <span
-            style={{
-              flex: 1,
-              minWidth: 0,
-              fontSize: 12.5,
-              fontWeight: 600,
-              color: DISCOVER_FACT,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {p.display_name ?? '\u2014'}
-          </span>
-          {p.rounds > 1 && (
-            <span style={{ ...KICKER, fontSize: 9, color: A.DIM }}>
-              {t('discover.coursesPlayed.nRounds', '{{count}} rounds', { count: p.rounds })}
-            </span>
-          )}
-          {/* C5.4 — no usable par is an em-dash, not a zero. */}
-          <span
-            className="tabular-nums"
-            style={{
-              flexShrink: 0,
-              fontSize: 12.5,
-              fontWeight: 700,
-              color:
-                p.best_to_par == null
-                  ? A.DIM
-                  : p.best_to_par < 0
-                    ? TOPAR_UNDER
-                    : A.INK,
-            }}
-          >
-            {p.best_to_par == null
-              ? '\u2014'
-              : p.best_to_par === 0
-                ? 'E'
-                : p.best_to_par < 0
-                  ? `\u2212${Math.abs(p.best_to_par)}`
-                  : `+${p.best_to_par}`}
-          </span>
-        </button>
-        ))}
-      </div>
-
-      {/* D2.2 / D2.3 / P4 — who played here, THEN go to the course. It sits
-          BELOW the scrolling list and stays reachable without scrolling it. */}
-      <button
-        type="button"
-        onClick={() => onCoursePress?.(courseId)}
-        aria-label={courseName ?? undefined}
-        style={{
-          width: '100%',
-          minHeight: 34,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          gap: 4,
-          background: 'transparent',
-          border: 'none',
-          padding: 0,
-          fontFamily: SANS,
-          textAlign: 'left',
-          cursor: 'pointer',
-          ...KICKER,
-          color: A.BODY,
-        }}
-      >
-        <span>{t('discover.coursesPlayed.openCourse', 'Open course')}</span>
-        <ChevronRight size={13} aria-hidden />
-      </button>
-    </div>
   );
 }
 

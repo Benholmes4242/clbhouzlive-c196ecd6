@@ -1267,7 +1267,10 @@
       "railMembers_one": "MEMBER",
       "railMembers_other": "MEMBERS",
       "railDays_one": "DAY",
-      "railDays_other": "DAYS"
+      "railDays_other": "DAYS",
+      "col": {
+        "rounds": "ROUNDS"
+      }
     },
     "headline": "What's been happening",
     "hero": {
@@ -1768,6 +1771,23 @@
     "mostPlayedOneRoundLine_other": "Only {{name}} has played here, best of {{gross}}.",
     "comments": {
       "action": "Comment on this round"
+    },
+    "coursesPlayed": {
+      "title": "How the courses played",
+      "hardestFirst": "Hardest first",
+      "fieldPlaysTo": "Field plays to",
+      "lowRoundBy": "Low round by {{name}}",
+      "nEagles": "{{count}} eagles",
+      "howItPlays": "How it plays",
+      "howEachPar": "How each par plays",
+      "allRoundsHere": "All {{count}} rounds here",
+      "allHoles": "All {{count}}",
+      "holeN": "Hole {{n}}",
+      "barIsField": "Bar is the field",
+      "tickIsYou": "tick is you",
+      "hardest": "Hardest",
+      "easiest": "Easiest",
+      "notEnoughDetail": "{{count}} rounds here carry hole detail — not enough for a course picture yet"
     }
   },
   "statBrowse": {
