@@ -831,11 +831,20 @@ function PlaysTo({
   weight?: number;
   color?: string;
 }) {
-  if (value == null) return <span style={{ width }} aria-hidden />;
-
+  /* S2.3 — A NULL FIGURE READS AS UNKNOWN, NOT AS BLANK. A course with no usable
+     par has no plays-to, and an empty column beside a full row reads as a failed
+     load. An em dash in A.DIM at the figure's own size says the question was
+     asked and has no answer. The SCALE BAR stays absent (S2.4): a bar needs a
+     value, a dash does not. */
   const text =
-    value > 0 ? `+${value.toFixed(1)}` : value < 0 ? `\u2212${Math.abs(value).toFixed(1)}` : '0.0';
-  const tone = color ?? (value < 0 ? TOPAR_UNDER : A.INK);
+    value == null
+      ? '\u2014'
+      : value > 0
+        ? `+${value.toFixed(1)}`
+        : value < 0
+          ? `\u2212${Math.abs(value).toFixed(1)}`
+          : '0.0';
+  const tone = value == null ? A.DIM : color ?? (value < 0 ? TOPAR_UNDER : A.INK);
 
   return (
     <span style={{ width, flexShrink: 0, textAlign: 'right' }}>
