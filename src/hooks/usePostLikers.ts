@@ -25,6 +25,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostLikes, type PostLiker } from '@/hooks/usePostLikes';
+import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
 
 export interface PostLikerEnriched extends PostLiker {
   /** Handicap index for personal actors. Null for business actors and for
@@ -52,6 +53,7 @@ export function usePostLikers(
   source: 'post' | 'editorial' = 'post',
 ) {
   const { user } = useSupabaseSession();
+  const blockedIds = useBlockedUserIds(user?.id ?? null);
   const base = usePostLikes(postId, enabled, source);
   const likers = base.data ?? [];
 
@@ -147,7 +149,7 @@ export function usePostLikers(
       ...enrichedList.filter((l) => l.isFollowing),
       ...enrichedList.filter((l) => !l.isFollowing),
     ];
-  }, [likers, enrichment.data]);
+  }, [likers, enrichment.data, blockedIds]);
 
   return {
     likers: ordered,
