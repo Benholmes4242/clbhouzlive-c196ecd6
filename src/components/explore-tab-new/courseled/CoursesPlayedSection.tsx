@@ -462,8 +462,7 @@ function LowRoundLine({
     <div
       style={{
         display: 'flex',
-        alignItems: 'baseline',
-        flexWrap: 'wrap',
+        alignItems: 'center',
         gap: 8,
         padding: '2px 0 10px',
       }}
