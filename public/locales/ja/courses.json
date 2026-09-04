@@ -757,7 +757,9 @@
       "holeN": "Hole {{hole}}",
       "hardestHole": "Hardest hole",
       "legendEasier": "Easier",
-      "legendHarder": "Harder"
+      "legendHarder": "Harder",
+      "roundsWithDetail_one": "{{total}} ラウンド中 {{pooled}} にホール詳細あり",
+      "roundsWithDetail_other": "{{total}} ラウンド中 {{pooled}} にホール詳細あり"
     },
     "holes": {
       "difficultyRank": "Difficulty rank",

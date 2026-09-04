@@ -986,7 +986,9 @@
       "easiestHole": "[~~Éášíéšţ ĥőļé~~]",
       "holeN": "[~~Ĥőļé {{hole}}~~]",
       "legendEasier": "[~~Éášíéř~~]",
-      "legendHarder": "[~~Ĥářđéř~~]"
+      "legendHarder": "[~~Ĥářđéř~~]",
+      "roundsWithDetail_one": "[[{{pooled}} of {{total}} round has hole detail]]",
+      "roundsWithDetail_other": "[[{{pooled}} of {{total}} rounds have hole detail]]"
     },
     "holes": {
       "tapHint": "[~~Ţáƥ á ĥőļé ƒőř đéţáíļ~~]",

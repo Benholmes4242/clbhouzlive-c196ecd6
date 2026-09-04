@@ -17,6 +17,8 @@ import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useCourseProHoleAnalysis } from '@/hooks/gam/useCourseProHoleAnalysis';
+import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
+
 
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -549,9 +551,15 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   const { data: connection } = useWhsConnection(user?.id);
   const { data } = useCourseHoleAnalysis(courseId);
   const { data: pro } = useCourseProHoleAnalysis(courseId);
+  /* THE HERO'S OWN FIGURE. The hero counts every round posted at the course;
+     this panel can only pool rounds that carry hole detail, so the two numbers
+     sit inches apart and disagree. Reading the hero's number here lets the
+     basis line say WHY. Same query key as the hero, so no extra request. */
+  const { data: courseStats } = useCourseStatsDetail(courseId, true);
   const { data: myPerf } = useMyHolePerformance(user?.id, courseId, {
     enabled: Boolean(user?.id && courseId && connection),
   });
+
 
   const [holesSheetOpen, setHolesSheetOpen] = useState(false);
   const [openHoles, setOpenHoles] = useState<Set<number>>(() => new Set());
@@ -579,6 +587,10 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
   const totalRounds =
     activeView === 'pros' ? (pro?.total_rounds ?? 0) : (data?.total_rounds ?? 0);
+
+  /** Every round posted at this course - the hero's own ROUNDS figure. */
+  const courseRoundsTracked = Number(courseStats?.rounds_tracked ?? 0);
+
 
   /* The member's own rows decide whether a field exists at all; until that
      query resolves the panel cannot know which anatomy to render. */
@@ -655,12 +667,21 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           })}
         </span>
       </span>
+    ) : courseRoundsTracked > totalRounds ? (
+      /* THE TWO NUMBERS DISAGREE, SO SAY SO. The hero's ROUNDS counts every
+         round posted here; only rounds carrying hole detail can be pooled. */
+      t('courses:courseDetail.plays.roundsWithDetail', {
+        count: totalRounds,
+        pooled: formatNumber(totalRounds),
+        total: formatNumber(courseRoundsTracked),
+      })
     ) : (
       t('courses:courseDetail.plays.rounds', {
         count: totalRounds,
         rounds: formatNumber(totalRounds),
       })
     );
+
 
   const field = toParParts(stats.fieldAvg);
   const you = toParParts(stats.yourAvg);

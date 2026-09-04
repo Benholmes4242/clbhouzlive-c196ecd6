@@ -762,7 +762,9 @@
       "holeN": "Hole {{hole}}",
       "hardestHole": "Hardest hole",
       "legendEasier": "Easier",
-      "legendHarder": "Harder"
+      "legendHarder": "Harder",
+      "roundsWithDetail_one": "{{pooled}} von {{total}} Runde hat Lochdetails",
+      "roundsWithDetail_other": "{{pooled}} von {{total}} Runden haben Lochdetails"
     },
     "holes": {
       "difficultyRank": "Difficulty rank",
