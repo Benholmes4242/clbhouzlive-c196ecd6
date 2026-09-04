@@ -10,10 +10,6 @@ import {
   SC_PAR,
   SC_PAR_DARK,
 } from '@/features/courses/components/holes/_constants';
-import {
-  TOPAR_UNDER_DARK,
-  WHITE_ALPHA_18,
-} from '@/features/tourhub/_shared/tokens';
 
 /**
  * ScoreMark - the universal scoring-mark renderer.
@@ -54,7 +50,6 @@ const variantFor = (strokes: number | null | undefined, par: number): Variant =>
 };
 
 const OVER_INK_LIGHT = INK;
-const OVER_INK_DARK = '#F2F4F7';
 
 /** These three are PINNED LOCALLY, not sourced from the tour ramp: that ramp is
     going dark and these serve the light path. Their values are unchanged from the
@@ -66,12 +61,6 @@ const LIGHT_DOUBLE_GROUND = 'rgba(15,23,42,0.12)';
     regardless of theme. It is not a surface token and must never be repointed by
     a surface change — that mis-naming (as SURFACE) was the original fault. */
 const MARK_NUMERAL_ON_FILL = '#FFFFFF';
-/* DARK-ONLY PART C: bogey and double deliberately share the same legible
-   ground. At 17px their ONE distinction is the double's 1.5px magnitude ring;
-   that ring can never be softened without reopening this contrast decision. */
-const DARK_BOGEY_GROUND = WHITE_ALPHA_18;
-const DARK_DOUBLE_GROUND = WHITE_ALPHA_18;
-
 export interface ScoreMarkProps {
   strokes: number | null | undefined;
   par: number;
@@ -101,13 +90,13 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   const magnitudeRing = variant === 'eagle' || variant === 'alba' || variant === 'doub' || variant === 'triple';
   const goldRing = variant === 'alba';
 
-  const overInk = surface === 'dark' ? OVER_INK_DARK : OVER_INK_LIGHT;
+  const overInk = OVER_INK_LIGHT;
   const parInk = surface === 'dark' ? SC_PAR_DARK : SC_PAR;
   const emptyInk = surface === 'dark' ? 'rgba(242,244,247,0.35)' : '#CBD5E1';
-  const underRed = surface === 'dark' ? TOPAR_UNDER_DARK : SC_FILL_BIRDIE;
+  const underRed = SC_FILL_BIRDIE;
   const overGround = variant === 'doub' || variant === 'triple'
-    ? surface === 'dark' ? DARK_DOUBLE_GROUND : LIGHT_DOUBLE_GROUND
-    : surface === 'dark' ? DARK_BOGEY_GROUND : LIGHT_BOGEY_GROUND;
+    ? LIGHT_DOUBLE_GROUND
+    : LIGHT_BOGEY_GROUND;
   const fill = under ? underRed : over ? overGround : 'transparent';
   const ringTone = goldRing ? SC_FILL_GOLD : under ? underRed : overInk;
 
@@ -170,6 +159,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
           <span
             key={i}
             aria-hidden="true"
+            data-score-ring={i + 1}
             style={{
               position: 'absolute',
               inset: i * ringStep,
@@ -182,6 +172,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
         {variant === 'bogey' && (
           <span
             aria-hidden="true"
+            data-score-outline="bogey"
             style={{
               position: 'absolute',
               inset: 0,
@@ -194,6 +185,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
         {hasMark && variant !== 'bogey' && (
           <span
             aria-hidden="true"
+            data-score-fill={variant}
             style={{
               position: 'absolute',
               inset: markInset,

@@ -120,8 +120,8 @@ export const RAMP_TOPAR = {
  * MICRO_BRIEF_COURSE_CARD_TEE_ROWS and RAMP_TOPAR.bogey by
  * MICRO_BRIEF_RAMP_TOPAR_DARK - so that relationship no longer holds and the
  * note is removed rather than left to claim a match that does not exist. The
- * two ramps are now separated by KIND, not by lightness: this one is warm/red,
- * RAMP_TOPAR's over-par half is pure neutral.
+ * two ramps are now separated by KIND, not by lightness: this one is slate-to-red,
+ * while RAMP_TOPAR's over-par half is the conventional scorecard blue.
 
  *
  * RED MEANS DEMANDING. Nothing on this tab is a score or a member, so this is

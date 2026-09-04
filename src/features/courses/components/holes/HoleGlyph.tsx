@@ -5,18 +5,18 @@
  * §1/§2, authored in `ScoreMark.tsx`; HoleGlyph is only the SVG expression of it
  * for the Course Hole Data Sheet and the notation key.
  *
- * Grammar (light surfaces only — the Holes area is white):
- *   EVERY MARK IS A CIRCLE. Nothing is square.
- *   FILL   solid = under par · ground = over par · bare = par
- *   TONE   RED = under · INK = over · GOLD = ace / albatross ONLY
- *   RING   present when |strokes - par| >= 2, either direction
+ * Grammar (dark Holes surfaces):
+ *   SHAPE  circles = under par · squares = over par · bare = par
+ *   TONE   GOLD = eagle or better · RED = birdie · BLUE = over par
+ *   RINGS  increase with distance from par
  *
- *   ace / albatross  solid RED + GOLD ring
- *   eagle            solid RED + RED ring
+ *   ace / albatross  solid GOLD + two GOLD rings
+ *   eagle            solid GOLD + GOLD ring
  *   birdie           solid RED
  *   par              BARE
- *   bogey            SOFT ink ground
- *   double+          DEEP ink ground + INK ring
+ *   bogey            outlined BLUE square
+ *   double           solid BLUE square
+ *   triple+          deep BLUE square + BLUE ring
  *
  * The old amber gradient stroke (url(#hsAmberGoldStroke)) is gone: gold now
  * appears a handful of times a year and uses the flat SC_FILL_GOLD token that
