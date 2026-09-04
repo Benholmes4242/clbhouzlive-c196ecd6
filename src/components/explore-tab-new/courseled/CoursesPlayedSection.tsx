@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, ArrowDown, ArrowUp } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
-import { A, KICKER, SANS, FIGS, DISCOVER_FACT, PODIUM_ACCENT } from './tokens';
+import { A, SANS, FIGS, DISCOVER_FACT, PODIUM_ACCENT } from './tokens';
 import { WINDOW_SHORT, type BoardFilters } from './boardFilters';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
@@ -34,7 +34,6 @@ const ROW_H = 46;
 const RANK_W = 14;
 const PLAYS_TO_W = 62;
 const CHEVRON_W = 22;
-const CARD_PAD = 12;
 /** S2.3 — a rise is GREEN, a fall is A.DIM. Red on this page means UNDER PAR. */
 const TREND_UP = PODIUM_ACCENT.green;
 const TILE_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.04) 32%, rgba(0,0,0,0.76))';
