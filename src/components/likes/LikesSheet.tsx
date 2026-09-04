@@ -97,9 +97,9 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post' }: Li
                 onClick={() => {
                   onClose();
                   if (isBusiness) {
-                    if (l.username) navigate(`/business/${l.username}`);
+                    if (l.username) navigate(`/business/${l.actorId ?? l.userId}`);
                   } else if (l.username) {
-                    navigate(`/u/${l.username}`);
+                    navigate(`/profile/${l.username}`);
                   }
                 }}
                 style={{
