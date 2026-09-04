@@ -53,6 +53,12 @@ const CAP = {
   color: A.DIM,
 };
 
+function formatTileToPar(value: number | null): string | null {
+  if (value == null) return null;
+  if (value === 0) return 'E';
+  return value < 0 ? `\u2212${Math.abs(value)}` : `+${value}`;
+}
+
 export interface CoursesPlayedSectionProps {
   userId: string | undefined;
   /** The page's CURRENT filter state. The board key is deliberately absent. */
@@ -266,7 +272,7 @@ function CourseMosaicTile({
 }) {
   const { t } = useTranslation('courses');
   const height = featured ? 132 : SMALL_TILE_H;
-  const lowToPar = toParText(row.low_to_par);
+  const lowToPar = formatTileToPar(row.low_to_par);
   const lowTone = row.low_to_par == null ? A.DIM : row.low_to_par < 0 ? TOPAR_UNDER : row.low_to_par === 0 ? A.MUTE : A.INK;
   return (
     <button
@@ -812,7 +818,7 @@ function PlaysTo({
   const tone = color ?? (value < 0 ? TOPAR_UNDER : A.INK);
 
   return (
-    <span style={{ width: PLAYS_TO_W, flexShrink: 0, textAlign: 'right' }}>
+    <span style={{ width, flexShrink: 0, textAlign: 'right' }}>
       <span className="tabular-nums" style={{ fontSize, fontWeight: weight, color: tone, lineHeight: 1, textShadow: color ? '0 1px 2px rgba(0,0,0,0.72)' : undefined }}>
         {text}
       </span>
