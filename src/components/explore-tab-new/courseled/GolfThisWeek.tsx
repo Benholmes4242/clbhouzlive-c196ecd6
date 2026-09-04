@@ -29,6 +29,7 @@ import {
   WINDOW_OPTIONS,
   filtersAreDefault,
   type BoardFilters,
+  normalizeFilters,
   type BoardKey,
 } from './boardFilters';
 
@@ -115,7 +116,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
   useEffect(() => {
     if (pickedBoard || !entry.resolved || !entry.board) return;
     setBoard(entry.board);
-    setFilters({ ...DEFAULT_FILTERS, window: entry.window, scope: entry.scope });
+    setFilters(normalizeFilters({ ...DEFAULT_FILTERS, window: entry.window, scope: entry.scope }));
   }, [pickedBoard, entry.resolved, entry.board, entry.window, entry.scope]);
 
 
@@ -191,7 +192,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
       competition: next.competition,
       region: next.regionKind ?? 'all',
     });
-    setFilters(next);
+    setFilters(normalizeFilters(next));
     /* G1.5 — THE BAR MUST NEVER SIT ON TOP OF THE FIRST ROW. When the list
        re-renders under a stuck bar, bring the board's own top back to just
        below it (scroll-margin carries the bar height), so whatever position the

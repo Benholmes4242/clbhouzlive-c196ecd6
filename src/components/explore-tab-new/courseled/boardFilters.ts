@@ -37,13 +37,17 @@ export type BoardKey = RankingBoardKey | FeatBoardKey;
    parses out of storage and still resolves in the RPC; it is simply never
    OFFERED. The surviving scoring board is 'topar', which ranks on gross-to-par
    and carries the vernacular label "Lowest gross" (Amendment B1.1). */
+/* BRIEF_FILTER_SHEET_ORDER_AND_BANDS S1.1 — MOST RECENT LEADS. It is the board
+   the day's first session lands on, so it is the one a member returns to the
+   drawer looking for. PICKER ORDER ONLY (S1.5): the rotation weighting, the
+   handicap default and every entry mode read their own lists. */
 export const RANKING_BOARD_KEYS: RankingBoardKey[] = [
+  'recent',
   'topar',
   'net',
   'stableford',
   'improved',
   'birdies',
-  'recent',
 ];
 
 /**
@@ -104,6 +108,17 @@ export const DEFAULT_FILTERS: BoardFilters = {
   competition: 'any',
 };
 
+/**
+ * S2.4 — A STORED 'near' MUST NOT STRAND ANYONE. A retired band is unselectable,
+ * so a filter state still carrying it would show a filtered board with no chip
+ * lit and no way out but Reset. Every restored or externally supplied filter
+ * state passes through here and resolves 'near' to 'any'; the applied filter
+ * line then reads real state and cannot print "Near yours" (S2.5).
+ */
+export function normalizeFilters(f: BoardFilters): BoardFilters {
+  return f.band === 'near' ? { ...f, band: 'any' } : f;
+}
+
 export interface FixedOption<K extends string> {
   key: K;
   /** i18n key. */
@@ -151,9 +166,12 @@ export const COURSES_SET_OPTIONS: FixedOption<Exclude<CoursesKey, 'one'>>[] = [
  * S3.5 — THE CLUB ANALYTICS BANDS. The boundaries are the app's one handicap
  * vocabulary and ARE NOT TO BE ADJUSTED here or anywhere else.
  */
+/* S2.1/S2.3 — 'near' IS RETIRED-BUT-VALID. The named bands already say exactly
+   which range they cover, which "Near yours" never did, so the axis offers eight
+   chips. BandKey still accepts 'near', its i18n key stays, and the SQL band
+   predicate is untouched; it is simply never OFFERED. */
 export const BAND_OPTIONS: FixedOption<BandKey>[] = [
   { key: 'any', i18n: 'discover.filterBoard.band.all', label: 'All handicaps' },
-  { key: 'near', i18n: 'discover.filterBoard.band.near', label: 'Near yours' },
   { key: 'plus', i18n: 'discover.filterBoard.band.plus', label: 'Plus' },
   { key: 'b0', i18n: 'discover.filterBoard.band.b0', label: 'Scratch to 4.9' },
   { key: 'b5', i18n: 'discover.filterBoard.band.b5', label: '5 to 9.9' },
