@@ -119,6 +119,7 @@ export function CoursesPlayedSeeAllSheet({
             open={openId === row.course_id}
             onToggle={() => setOpenId((cur) => (cur === row.course_id ? null : row.course_id))}
             userId={userId}
+            filters={filters}
             scaleMin={scaleMin}
             scaleMax={scaleMax}
             onCoursePress={onCoursePress}
