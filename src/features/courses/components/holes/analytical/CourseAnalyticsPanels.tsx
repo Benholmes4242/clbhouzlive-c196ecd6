@@ -771,7 +771,32 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
         {/* THE HARDEST / EASIEST SUMMARY LINE IS GONE (§A2) - both figures now sit
             on their own bars in the chart above, so the figures beneath carry only
             what the chart cannot say. */}
-        {hasYou ? (
+        {stats.fieldIsOnlyYou ? (
+          /* NO FIELD: the pool is the member's own rounds, so FIELD AVG and
+             YOU BEAT FIELD ON would judge them against themselves. Two true
+             figures instead, and one line stating the fact about the pool. */
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+              {you && (
+                <Figure
+                  label={t('courses:courseDetail.plays.yourAvg')}
+                  value={you.text}
+                  tone={A.AMBER_DEEP}
+                />
+              )}
+              <Figure
+                label={t('courses:courseDetail.plays.roundsHere', 'Rounds here')}
+                value={formatNumber(totalRounds)}
+              />
+            </div>
+            <div style={{ ...LABEL, color: A.DIM, textAlign: 'center', marginTop: 8 }}>
+              {t(
+                'courses:courseDetail.plays.noFieldYet',
+                'No one else has posted a hole-by-hole round here yet',
+              )}
+            </div>
+          </>
+        ) : hasYou ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
             <Figure
               label={t('courses:courseDetail.plays.fieldAvg')}
