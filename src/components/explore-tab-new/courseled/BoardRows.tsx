@@ -24,6 +24,15 @@ const TOPAR_UNDER = '#E5484D';
 export interface BoardColumns {
   value: { i18n: string; label: string };
   secondary: { i18n: string; label: string } | null;
+  /**
+   * B4.3 — TRUE WHEN THE VALUE CELL HOLDS WORDS RATHER THAN A FIGURE. Only the
+   * five WHEN boards ('recent' and the four feats). Four to six uppercase
+   * letters carry far more mass than a two-digit figure at the same size, so
+   * the row renders a textual value at 12.5 instead of 15. boardColumns() is
+   * the one place that knows what each column holds; the row never re-derives
+   * it from a board-key list.
+   */
+  valueIsText: boolean;
 }
 
 export function boardColumns(board: BoardKey): BoardColumns {
@@ -32,31 +41,37 @@ export function boardColumns(board: BoardKey): BoardColumns {
       return {
         value: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         secondary: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
+        valueIsText: false,
       };
     case 'topar':
       return {
         value: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
+        valueIsText: false,
       };
     case 'net':
       return {
         value: { i18n: 'discover.filterBoard.col.net', label: 'NET' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
+        valueIsText: false,
       };
     case 'stableford':
       return {
         value: { i18n: 'discover.filterBoard.col.points', label: 'PTS' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
+        valueIsText: false,
       };
     case 'improved':
       return {
         value: { i18n: 'discover.filterBoard.col.cut', label: 'CUT' },
         secondary: null,
+        valueIsText: false,
       };
     case 'birdies':
       return {
         value: { i18n: 'discover.filterBoard.col.birdies', label: 'BIRDIES' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
+        valueIsText: false,
       };
     /* A3.1 — MOST RECENT CARRIES TO PAR, NOT GROSS. The board spans many
        courses, so a bare 71 beside an 85 is two unrelated numbers; to-par is
@@ -65,6 +80,7 @@ export function boardColumns(board: BoardKey): BoardColumns {
       return {
         value: { i18n: 'discover.filterBoard.col.when', label: 'WHEN' },
         secondary: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
+        valueIsText: true,
       };
     /* B1.3 / A3.5 — THE FEAT BOARDS KEEP GROSS: they are event lists where the
        interesting fact is the feat and gross is context, not comparison. */
@@ -72,6 +88,7 @@ export function boardColumns(board: BoardKey): BoardColumns {
       return {
         value: { i18n: 'discover.filterBoard.col.when', label: 'WHEN' },
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
+        valueIsText: true,
       };
   }
 }
@@ -401,7 +418,9 @@ export function BoardRowView({
           width: VALUE_W,
           flexShrink: 0,
           textAlign: 'center',
-          fontSize: 15,
+          /* B4.2 — WORDS at 12.5, FIGURES at 15. VALUE_W stays 58 either way
+             (B4.5) so the right edge aligns across boards. */
+          fontSize: boardColumns(board).valueIsText ? 12.5 : 15,
           fontWeight: 700,
           color: isSelf ? A.AMBER : value.tone,
           textTransform: 'uppercase',
