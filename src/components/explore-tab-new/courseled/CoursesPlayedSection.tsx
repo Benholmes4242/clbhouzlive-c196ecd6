@@ -351,7 +351,19 @@ function CourseMosaicTile({
                 </span>
                 <Badges row={row} />
               </span>
-              <PlaysTo value={row.plays_to} width="auto" fontSize={15} weight={800} color={DISCOVER_FACT} />
+              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
+                <PlaysTo value={row.plays_to} width="auto" fontSize={15} weight={800} color={DISCOVER_FACT} />
+                <span
+                  style={{
+                    ...CAP,
+                    color: 'rgba(248,250,252,0.62)',
+                    lineHeight: 1,
+                    textShadow: '0 1px 2px rgba(0,0,0,0.72)',
+                  }}
+                >
+                  AVG
+                </span>
+              </span>
             </span>
           </span>
         </CourseImageFallback>
@@ -381,6 +393,9 @@ function CourseMosaicTile({
               style={{
                 display: '-webkit-box',
                 height: 29,
+                minHeight: 29,
+                maxHeight: 29,
+                flexShrink: 0,
                 overflow: 'hidden',
                 WebkitBoxOrient: 'vertical',
                 WebkitLineClamp: 2,
@@ -392,11 +407,14 @@ function CourseMosaicTile({
             >
               {row.name ?? '\u2014'}
             </span>
-             <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 6, marginTop: 3, minHeight: 14 }}>
+             <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 6, marginTop: 3, minHeight: 14, flexShrink: 0 }}>
                <span style={{ ...CAP, lineHeight: 1 }}>
                 {t('discover.coursesPlayed.nRounds', '{{count}} rounds', { count: row.rounds })}
               </span>
-               <PlaysTo value={row.plays_to} width="auto" fontSize={13.5} weight={800} />
+                <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, flexShrink: 0 }}>
+                  <PlaysTo value={row.plays_to} width="auto" fontSize={13.5} weight={800} />
+                  <span style={{ ...CAP, lineHeight: 1, color: A.DIM }}>AVG</span>
+                </span>
             </span>
           </span>
         </>
