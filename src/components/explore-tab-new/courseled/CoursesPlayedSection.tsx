@@ -211,6 +211,7 @@ export function CourseRow({
   open,
   onToggle,
   userId,
+  filters,
   scaleMin,
   scaleMax,
   onCoursePress,
@@ -221,6 +222,8 @@ export function CourseRow({
   open: boolean;
   onToggle: () => void;
   userId: string | undefined;
+  /** The page's filter state — for the lazy face-pile read only (S3.2). */
+  filters: BoardFilters;
   scaleMin: number;
   scaleMax: number;
   onCoursePress?: (courseId: string) => void;
