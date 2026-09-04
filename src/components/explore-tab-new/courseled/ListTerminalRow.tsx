@@ -6,10 +6,12 @@ interface ListTerminalRowProps {
   label: string;
   onPress: () => void;
   expanded?: boolean;
+  /** Hide the top hairline, used when the row sits flush against a following surface. */
+  borderless?: boolean;
 }
 
 /** Shared terminal action for the board and Courses Played lists. */
-export function ListTerminalRow({ label, onPress, expanded }: ListTerminalRowProps) {
+export function ListTerminalRow({ label, onPress, expanded, borderless }: ListTerminalRowProps) {
   const disclosure = expanded != null;
   return (
     <button
@@ -22,11 +24,11 @@ export function ListTerminalRow({ label, onPress, expanded }: ListTerminalRowPro
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 12,
-        marginTop: -1,
+        marginTop: borderless ? 0 : -1,
         padding: '14px 0',
         background: 'transparent',
         border: 'none',
-        borderTop: `1px solid ${A.HAIRLINE}`,
+        borderTop: borderless ? 'none' : `1px solid ${A.HAIRLINE}`,
         fontFamily: SANS,
         cursor: 'pointer',
         textAlign: 'left',

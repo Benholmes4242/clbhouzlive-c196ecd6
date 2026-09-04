@@ -247,7 +247,7 @@ function Block({
   fullBleed,
   children,
 }: {
-  title: string;
+  title?: string;
   note?: string;
   first?: boolean;
   fullBleed?: boolean;
@@ -260,10 +260,12 @@ function Block({
         padding: fullBleed ? (first ? '2px 14px 12px' : '12px 14px') : (first ? '2px 0 12px' : '12px 0'),
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-        <span style={BLOCK_TITLE}>{title}</span>
-        {note ? <span style={{ ...CAP, marginLeft: 'auto' }}>{note}</span> : null}
-      </div>
+      {title ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          <span style={BLOCK_TITLE}>{title}</span>
+          {note ? <span style={{ ...CAP, marginLeft: 'auto' }}>{note}</span> : null}
+        </div>
+      ) : null}
       {children}
     </div>
   );
