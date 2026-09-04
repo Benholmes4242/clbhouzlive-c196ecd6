@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChevronDown } from 'lucide-react';
 
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
@@ -51,9 +52,21 @@ export interface CourseHolePanelProps {
   courseId: string;
   userId: string | undefined;
   onCoursePress?: (courseId: string) => void;
+  /** The featured course keeps its first two blocks visible and owns one
+   * disclosure row for the final block. Other callers retain the full panel. */
+  mode?: 'full' | 'featured';
+  detailsOpen?: boolean;
+  onToggleDetails?: () => void;
 }
 
-export function CourseHolePanel({ courseId, userId, onCoursePress }: CourseHolePanelProps) {
+export function CourseHolePanel({
+  courseId,
+  userId,
+  onCoursePress,
+  mode = 'full',
+  detailsOpen = false,
+  onToggleDetails,
+}: CourseHolePanelProps) {
   const { t } = useTranslation('courses');
   const analysis = useCourseHoleAnalysis(courseId);
   const mine = useMyHolePerformance(userId, courseId, { enabled: Boolean(userId) });
@@ -69,13 +82,17 @@ export function CourseHolePanel({ courseId, userId, onCoursePress }: CourseHoleP
 
   /* Acceptance 12 — nothing renders then swaps. Both reads settle first. */
   const settling = analysis.isPending || (Boolean(userId) && mine.isPending);
-  if (settling) return null;
+  if (settling) {
+    return mode === 'featured' ? (
+      <div aria-hidden style={{ minHeight: 330, padding: '0 12px' }} />
+    ) : null;
+  }
 
   /* S7.1 — the sample gate. A course with no hole data at all lands here too:
      get_course_hole_analysis returns available: false with zero rounds. */
   if (!analysis.data?.available || holes.length === 0 || totalRounds < SAMPLE_FLOOR) {
     return (
-      <div style={{ ...CAP, padding: '2px 0 4px', lineHeight: 1.5 }}>
+      <div style={{ ...CAP, padding: mode === 'featured' ? '0 12px 14px' : '2px 0 4px', lineHeight: 1.5 }}>
         {t(
           'discover.coursesPlayed.notEnoughDetail',
           '{{count}} rounds here carry hole detail \u2014 not enough for a course picture yet',
@@ -113,10 +130,12 @@ export function CourseHolePanel({ courseId, userId, onCoursePress }: CourseHoleP
   const field = toParParts(fieldAvg);
   const you = toParParts(yourAvg);
 
+  const featured = mode === 'featured';
+
   return (
-    <div style={{ fontFamily: SANS, ...FIGS }}>
+    <div style={{ fontFamily: SANS, ...FIGS, padding: featured ? '0 12px' : undefined, minHeight: featured ? 330 : undefined }}>
       {/* BLOCK 1 — HOW IT PLAYS (S5.3). */}
-      <Block title={t('discover.coursesPlayed.howItPlays', 'How it plays')} note={basis} first>
+      <Block title={t('discover.coursesPlayed.howItPlays', 'How it plays')} note={basis} first={!featured}>
         <HoleChart
           holes={holes}
           myByHole={myByHole}
@@ -164,23 +183,78 @@ export function CourseHolePanel({ courseId, userId, onCoursePress }: CourseHoleP
         </Block>
       )}
 
-      {/* BLOCK 3 — HOLE BY HOLE (S5.5). */}
-      {/* E2.1 — "All 18" is a PLAIN LABEL now. One route to the course page, not
-          two: the terminal row below is the discoverable target. */}
-      <Block
-        title={t('holes.preview.eyebrow', 'Hole by hole')}
-        note={t('discover.coursesPlayed.allHoles', 'All {{count}}', { count: holes.length })}
-      >
-        {shares && <DistributionStrip shares={shares} />}
-        <Extremes hardest={hardest} easiest={easiest} />
-      </Block>
-
-      {/* E1 — THE TERMINAL VIEW COURSE ROW. Same grammar as the See all rows. */}
-      <ListTerminalRow
-        label={t('discover.coursesPlayed.viewCourse', 'View course')}
-        onPress={() => onCoursePress?.(courseId)}
-      />
+      {featured ? (
+        <>
+          <DisclosureRow
+            label={t('holes.preview.eyebrow', 'Hole by hole')}
+            open={detailsOpen}
+            onPress={() => onToggleDetails?.()}
+          />
+          {detailsOpen && (
+            <>
+              <div style={{ padding: '12px 0' }}>
+                {shares && <DistributionStrip shares={shares} />}
+                <Extremes hardest={hardest} easiest={easiest} />
+              </div>
+              <ListTerminalRow
+                label={t('discover.coursesPlayed.viewCourse', 'View course')}
+                onPress={() => onCoursePress?.(courseId)}
+              />
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          {/* E2.1 — "All 18" is a plain label in the full panel. */}
+          <Block
+            title={t('holes.preview.eyebrow', 'Hole by hole')}
+            note={t('discover.coursesPlayed.allHoles', 'All {{count}}', { count: holes.length })}
+          >
+            {shares && <DistributionStrip shares={shares} />}
+            <Extremes hardest={hardest} easiest={easiest} />
+          </Block>
+          <ListTerminalRow
+            label={t('discover.coursesPlayed.viewCourse', 'View course')}
+            onPress={() => onCoursePress?.(courseId)}
+          />
+        </>
+      )}
     </div>
+  );
+}
+
+function DisclosureRow({ label, open, onPress }: { label: string; open: boolean; onPress: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onPress}
+      aria-expanded={open}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        marginTop: -1,
+        padding: '14px 0',
+        background: 'transparent',
+        border: 'none',
+        borderTop: `1px solid ${A.BORDER}`,
+        fontFamily: SANS,
+        cursor: 'pointer',
+        textAlign: 'left',
+        color: A.INK,
+      }}
+    >
+      <span style={BLOCK_TITLE}>{label}</span>
+      <ChevronDown
+        size={16}
+        strokeWidth={2}
+        color={A.MUTE}
+        aria-hidden
+        style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 160ms ease' }}
+      />
+    </button>
   );
 }
 

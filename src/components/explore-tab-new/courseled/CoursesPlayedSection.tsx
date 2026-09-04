@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, ArrowDown, ArrowUp } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
-import { A, SANS, FIGS, DISCOVER_FACT, PODIUM_ACCENT } from './tokens';
+import { A, SANS, FIGS, DISCOVER_FACT, FEATURED_COURSE_SHADOW, PODIUM_ACCENT } from './tokens';
 import { WINDOW_SHORT, type BoardFilters } from './boardFilters';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
@@ -115,10 +115,14 @@ export function CoursesPlayedSection({
           gap: 8,
         }}
       >
-        <CourseMosaicTile row={featured} featured open={openId === featured.course_id} onToggle={() => toggle(featured.course_id)} />
-        {openId === featured.course_id && (
-          <CourseMosaicPanel row={featured} userId={userId} filters={filters} onCoursePress={onCoursePress} />
-        )}
+        <FeaturedCourseCard
+          row={featured}
+          detailsOpen={openId === featured.course_id}
+          onToggleDetails={() => toggle(featured.course_id)}
+          userId={userId}
+          filters={filters}
+          onCoursePress={onCoursePress}
+        />
 
         {pairs.map((pair) => (
           <CourseMosaicPair
@@ -189,18 +193,69 @@ function CourseMosaicPair({
   );
 }
 
+function FeaturedCourseCard({
+  row,
+  detailsOpen,
+  onToggleDetails,
+  userId,
+  filters,
+  onCoursePress,
+}: {
+  row: BoardCourseRow;
+  detailsOpen: boolean;
+  onToggleDetails: () => void;
+  userId: string | undefined;
+  filters: BoardFilters;
+  onCoursePress?: (courseId: string) => void;
+}) {
+  return (
+    <div
+      style={{
+        gridColumn: '1 / -1',
+        minWidth: 0,
+        borderRadius: 10,
+        overflow: 'hidden',
+        background: A.PANEL,
+        border: `1px solid ${A.BORDER}`,
+        boxShadow: FEATURED_COURSE_SHADOW,
+      }}
+    >
+      <CourseMosaicTile
+        row={row}
+        featured
+        open={false}
+        onToggle={onToggleDetails}
+        embedded
+      />
+      <div style={{ padding: '12px 12px 0' }}>
+        <LowRoundLine row={row} userId={userId} filters={filters} />
+      </div>
+      <CourseHolePanel
+        courseId={row.course_id}
+        userId={userId}
+        onCoursePress={onCoursePress}
+        mode="featured"
+        detailsOpen={detailsOpen}
+        onToggleDetails={onToggleDetails}
+      />
+    </div>
+  );
+}
+
 function CourseMosaicTile({
   row,
   featured,
   open,
   onToggle,
   fullWidth = false,
+  embedded = false,
 }: {
   row: BoardCourseRow;
   featured: boolean;
   open: boolean;
   onToggle: () => void;
   fullWidth?: boolean;
+  embedded?: boolean;
 }) {
   const { t } = useTranslation('courses');
   const height = featured ? 132 : 104;
@@ -215,13 +270,13 @@ function CourseMosaicTile({
         minWidth: 0,
         padding: 0,
         border: 'none',
-        borderRadius: 10,
+        borderRadius: embedded ? 0 : 10,
         overflow: 'hidden',
         background: A.PANEL,
         fontFamily: SANS,
         textAlign: 'left',
         cursor: 'pointer',
-        boxShadow: open ? `inset 0 0 0 1.5px ${A.INK}` : 'none',
+        boxShadow: !embedded && open ? `inset 0 0 0 1.5px ${A.INK}` : 'none',
       }}
     >
       <CourseImageFallback
@@ -229,7 +284,7 @@ function CourseMosaicTile({
         courseName={row.name}
         imageUrl={row.thumbnail_image}
         initialsSize={featured ? 28 : 20}
-        style={{ width: '100%', height: '100%', borderRadius: 10 }}
+        style={{ width: '100%', height: '100%', borderRadius: embedded ? 0 : 10 }}
       >
         <span aria-hidden style={{ position: 'absolute', inset: 0, background: TILE_SCRIM }} />
         <span
@@ -284,7 +339,7 @@ function CourseMosaicTile({
             <PlaysTo value={row.plays_to} width="auto" fontSize={featured ? 15 : 12.5} weight={800} color={DISCOVER_FACT} />
           </span>
         </span>
-        {open ? <span aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 10, boxShadow: `inset 0 0 0 1.5px ${A.INK}`, zIndex: 2 }} /> : null}
+        {!embedded && open ? <span aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 10, boxShadow: `inset 0 0 0 1.5px ${A.INK}`, zIndex: 2 }} /> : null}
       </CourseImageFallback>
     </button>
   );
