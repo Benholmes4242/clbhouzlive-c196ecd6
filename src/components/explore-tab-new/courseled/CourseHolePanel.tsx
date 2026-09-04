@@ -378,6 +378,9 @@ function HoleChart({
   const selYou = toParParts(selMine);
   const dotY = selMine == null ? null : y(selMine);
   const selectedBarTop = Math.min(y(selHole.avg_to_par), yBase);
+  /* Amendment I: clear whichever sits higher, the field bar or the member
+     trace. The fixed TOP lane keeps this baseline inside the plot. */
+  const selectedLabelY = Math.max(9, Math.min(selectedBarTop, dotY ?? selectedBarTop) - 5);
 
   return (
     <div>
@@ -448,46 +451,36 @@ function HoleChart({
               vectorEffect="non-scaling-stroke"
             />
           )}
+
+          {/* The member dot paints above the line. */}
+          {hasYou && dotY != null && (
+            <circle
+              cx={cx(sel)}
+              cy={dotY}
+              r={3.5}
+              fill={A.AMBER}
+              stroke={A.PANEL}
+              strokeWidth={2}
+              vectorEffect="non-scaling-stroke"
+            />
+          )}
+
+          {/* Amendment I: LAST SVG CHILD so line and dot can never cover it. */}
+          {!fieldIsOnlyYou && selField && (
+            <text
+              className="tabular-nums"
+              x={cx(sel)}
+              y={selectedLabelY}
+              fill={selField.tone}
+              fontSize={8.5}
+              fontWeight={700}
+              textAnchor="middle"
+              pointerEvents="none"
+            >
+              {selField.text}
+            </text>
+          )}
         </svg>
-
-        {/* Amendment A: the field figure is the sole selection indicator. */}
-        {!fieldIsOnlyYou && selField && (
-          <span
-            className="tabular-nums"
-            style={{
-              position: 'absolute',
-              left: `${(cx(sel) / W) * 100}%`,
-              top: Math.max(0, selectedBarTop - 13),
-              transform: 'translateX(-50%)',
-              color: selField.tone,
-              fontSize: 8.5,
-              fontWeight: 700,
-              lineHeight: 1,
-              whiteSpace: 'nowrap',
-              pointerEvents: 'none',
-            }}
-          >
-            {selField.text}
-          </span>
-        )}
-
-        {/* The amber dot moves to the member's value on the selected hole. */}
-        {hasYou && dotY != null && (
-          <span
-            aria-hidden
-            style={{
-              position: 'absolute',
-              left: `${(cx(sel) / W) * 100}%`,
-              top: dotY,
-              transform: 'translate(-50%, -50%)',
-              width: 7,
-              height: 7,
-              borderRadius: '50%',
-              background: A.AMBER,
-              boxShadow: `0 0 0 2px ${A.PANEL}`,
-            }}
-          />
-        )}
       </div>
     </div>
   );
@@ -505,11 +498,8 @@ function ParBars({
   const fMin = Math.min(...rows.map((r) => r.field));
   const fMax = Math.max(...rows.map((r) => r.field));
   const fSpan = Math.max(0.01, fMax - fMin);
-  const anyYou = !fieldIsOnlyYou && rows.some((r) => r.you != null);
-
   return (
-    <div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
         {rows.map((r) => {
           const fig = toParParts(r.field);
           return (
@@ -575,18 +565,6 @@ function ParBars({
             </div>
           );
         })}
-      </div>
-      {!fieldIsOnlyYou && (
-        <div style={{ ...CAP, marginTop: 9 }}>
-          {t('discover.coursesPlayed.barIsField', 'Bar is the field')}
-          {anyYou ? (
-            <>
-              {' \u00b7 '}
-              {t('discover.coursesPlayed.tickIsYou', 'tick is you')}
-            </>
-          ) : null}
-        </div>
-      )}
     </div>
   );
 }
