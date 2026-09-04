@@ -24,6 +24,7 @@ import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/use
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, DIFFICULTY_HARD_HEX, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
+import { monotonePath, roundedCourseBarPath } from './chartGeometry';
 import {
   DistributionStrip,
   HoleRowV2,
@@ -66,62 +67,6 @@ const Figure: React.FC<{ label: string; value: React.ReactNode; tone?: string; s
 interface Props {
   courseId: string | undefined;
 }
-
-/**
- * Monotone cubic interpolation, Fritsch-Carlson tangents.
- *
- * Implemented here rather than pulled from d3 (curveMonotoneX) to avoid the
- * dependency: the guarantee we need is that the curve NEVER leaves the range
- * of its own data, so the member's line cannot dip under par on a hole they
- * bogeyed. A Catmull-Rom / naive spline overshoots exactly there.
- */
-function monotonePath(pts: { x: number; y: number }[]): string {
-  const n = pts.length;
-  if (n < 2) return '';
-  const dx: number[] = [];
-  const dy: number[] = [];
-  const slope: number[] = [];
-  for (let i = 0; i < n - 1; i++) {
-    dx.push(pts[i + 1].x - pts[i].x);
-    dy.push(pts[i + 1].y - pts[i].y);
-    slope.push(dx[i] === 0 ? 0 : dy[i] / dx[i]);
-  }
-  // Initial tangents = average of neighbouring slopes.
-  const m: number[] = new Array(n);
-  m[0] = slope[0];
-  m[n - 1] = slope[n - 2];
-  for (let i = 1; i < n - 1; i++) {
-    if (slope[i - 1] * slope[i] <= 0) m[i] = 0;
-    else m[i] = (slope[i - 1] + slope[i]) / 2;
-  }
-  // Fritsch-Carlson limiter - clamps tangents so no segment overshoots.
-  for (let i = 0; i < n - 1; i++) {
-    if (slope[i] === 0) {
-      m[i] = 0;
-      m[i + 1] = 0;
-      continue;
-    }
-    const a = m[i] / slope[i];
-    const b = m[i + 1] / slope[i];
-    const s = a * a + b * b;
-    if (s > 9) {
-      const tau = 3 / Math.sqrt(s);
-      m[i] = tau * a * slope[i];
-      m[i + 1] = tau * b * slope[i];
-    }
-  }
-  let d = `M ${pts[0].x.toFixed(2)} ${pts[0].y.toFixed(2)}`;
-  for (let i = 0; i < n - 1; i++) {
-    const h = dx[i] / 3;
-    const c1x = pts[i].x + h;
-    const c1y = pts[i].y + m[i] * h;
-    const c2x = pts[i + 1].x - h;
-    const c2y = pts[i + 1].y - m[i + 1] * h;
-    d += ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}, ${c2x.toFixed(2)} ${c2y.toFixed(2)}, ${pts[i + 1].x.toFixed(2)} ${pts[i + 1].y.toFixed(2)}`;
-  }
-  return d;
-}
-
 
 /**
  * DIFFICULTY RAMP - one hue, varying intensity, across the course's OWN spread.
@@ -231,19 +176,7 @@ const ShapeChart: React.FC<{
             const top = Math.min(yv, yBase);
             const height = Math.max(2, Math.abs(yBase - yv));
             const x = i * slot + (slot - barW) / 2;
-            const r = Math.min(3, barW / 2);
-            const rb = Math.min(1, barW / 2);
-            const d = [
-              `M ${x} ${top + r}`,
-              `Q ${x} ${top} ${x + r} ${top}`,
-              `L ${x + barW - r} ${top}`,
-              `Q ${x + barW} ${top} ${x + barW} ${top + r}`,
-              `L ${x + barW} ${top + height - rb}`,
-              `Q ${x + barW} ${top + height} ${x + barW - rb} ${top + height}`,
-              `L ${x + rb} ${top + height}`,
-              `Q ${x} ${top + height} ${x} ${top + height - rb}`,
-              'Z',
-            ].join(' ');
+            const d = roundedCourseBarPath(x, top, barW, height);
             return <path key={h.hole_no} d={d} fill={rampColor(tint(h.avg_to_par))} />;
           })}
           {linePath && (
