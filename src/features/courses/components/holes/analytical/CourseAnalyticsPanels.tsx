@@ -556,6 +556,9 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
   const hasYou = myByHole.size > 0 && holes.some((h) => myByHole.has(h.hole_no));
 
+  const totalRounds =
+    activeView === 'pros' ? (pro?.total_rounds ?? 0) : (data?.total_rounds ?? 0);
+
   const stats = useMemo(() => {
     if (holes.length === 0) return null;
     const fieldAvg = holes.reduce((s, h) => s + h.avg_to_par, 0) / holes.length;
@@ -603,8 +606,11 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   const sourceAvailable = activeView === 'pros' ? hasPro : Boolean(data?.available);
   if (!courseId || !sourceAvailable || holes.length === 0 || !stats) return null;
 
-  const totalRounds =
-    activeView === 'pros' ? (pro?.total_rounds ?? 0) : (data?.total_rounds ?? 0);
+  /* HOLD UNTIL BOTH QUERIES SETTLE (acceptance §7): a connected member's own
+     rows decide whether there IS a field, so render nothing rather than a
+     field comparison that then disappears. */
+  if (awaitingMine) return null;
+
   /* THE BASIS LINE states what was pooled - tournaments and player-rounds. */
   const basis =
     activeView === 'pros' ? (
