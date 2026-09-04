@@ -17,13 +17,18 @@ export const SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI
 // the same direction: damage gains emphasis as it worsens (light deepens,
 // dark gains saturation). Never move one bucket without its pair.
 //
-// SC_FILL_GOLD and SC_FILL_BIRDIE are the only live FILL tokens.
+// TEXT and FILL are separate ramps. Text colours stay light enough to read on
+// #15171F; the deeper fill colours carry #F8FAFC numerals inside score marks.
 // IMPORTANT: SC_FILL_GOLD #FFD200 is scorecard-genre broadcast gold. It is
 // NOT the achievement gold (#B36B00 / #F5D061) used for majors, champions
 // and No.1 surfaces. Do not substitute one for the other.
 // -----------------------------------------------------------------------------
 
-export const SC_FILL_GOLD   = '#FFD200'; // ace / albatross rarity ring
+export const SC_FILL_GOLD      = '#FFD200'; // eagle-or-better chip + rings
+export const SC_FILL_BIRDIE_DK = '#C8372B'; // dark-surface birdie chip only
+export const SC_FILL_BOGEY_DK  = 'rgba(248,250,252,0.55)'; // outline only
+export const SC_FILL_DOUBLE_DK = '#2F63A8'; // dark-surface double chip only
+export const SC_FILL_TRIPLE_DK = '#1E4577'; // dark-surface triple+ chip only
 // Canonical under-par red lives in tourhub/_shared/tokens (TOPAR_UNDER_LIGHT).
 // SC_FILL_BIRDIE is a re-export alias so #D2222D is declared exactly once.
 export { TOPAR_UNDER_LIGHT as SC_FILL_BIRDIE } from '@/features/tourhub/_shared/tokens';
@@ -46,13 +51,9 @@ export const SC_EAGLE_DARK     = '#F5C842';
 // Dark birdies share the canonical dark to-par red; no independent pink-red.
 export { TOPAR_UNDER_DARK as SC_BIRDIE_DARK } from '@/features/tourhub/_shared/tokens';
 export const SC_PAR_DARK       = 'rgba(242,244,247,0.42)';
-// Bogey / double+ were '#A6C2F0' and '#7AA6EC' - a deliberate pair, paler blue
-// for lighter damage and more saturated blue for worse. Retired by
-// MICRO_BRIEF_SC_DARK_NEUTRAL_RAMP: blue carried no other meaning in this app
-// (red = under par, neutral = over par, amber = the viewing member, green =
-// movement, gold = celebration), and the same four buckets were drawn in three
-// palettes across the analytics sheet, the holes tree and here. The lighter-vs-
-// worse distinction survives, carried by BRIGHTNESS instead of hue. Values are
-// RAMP_TOPAR.bogey / .double verbatim so the two ramps agree by construction.
-export const SC_BOGEY_DARK     = 'rgba(248,250,252,0.56)';
-export const SC_DOUBLE_DARK    = 'rgba(248,250,252,0.72)';
+// The dark over-par text ramp restores golf's blue convention. Severity is
+// carried by saturation, not darkness: all three remain AA-safe as figures on
+// #15171F. These are TEXT colours, never score-mark fills.
+export const SC_BOGEY_DARK     = '#A6C2F0';
+export const SC_DOUBLE_DARK    = '#7AA6EC';
+export const SC_TRIPLE_DARK    = '#5E8FD9';

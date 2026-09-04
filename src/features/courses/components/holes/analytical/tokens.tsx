@@ -25,6 +25,7 @@
 
 import React from 'react';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+import { SC_BOGEY_DARK, SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { BAND_GREEN_DARK } from '@/features/courses/_shared/scoreBands';
 
@@ -60,7 +61,7 @@ export const A = {
    */
   IMPROVED: INDEX_DELTA.dark.improved,
   DRIFTED: INDEX_DELTA.dark.drifted,
-  TRACK: '#272C37',
+  TRACK: 'rgba(255,255,255,0.08)',
   /**
    * The ONLY internal rule permitted inside a panel, and only to separate a
    * headline from its supporting figures, or a table body from its summary row.
@@ -91,19 +92,14 @@ export const RAMP = {
  * the friends tile, the round post and the scorecard sheet - it is NOT an error
  * and must not be "corrected" to green.
  *
- * REPOINTED FOR THE DARK GROUND by MICRO_BRIEF_RAMP_TOPAR_DARK. The convention
- * did not change; the VALUE OF INK did. On white, ink was #0F172A and worse
- * meant DARKER - which on #15171F made double+ invisible. On dark, ink is
- * near-white, so worse means progressively BRIGHTER NEUTRAL. This is the same
- * neutral ramp Ben chose for the course analytics sheet's four-bucket bar, and
- * for the same reason: a second red for double+ would put one red meaning
- * under par and one meaning over par in a single bar.
+ * The over-par half follows the restored dark scorecard blue convention.
+ * These are distribution/text tones, distinct from the deeper chip-fill ramp.
  */
 export const RAMP_TOPAR = {
   birdie: TOPAR_UNDER_DARK,
   par: 'rgba(248,250,252,0.42)',
-  bogey: 'rgba(248,250,252,0.56)',
-  double: 'rgba(248,250,252,0.72)',
+  bogey: SC_BOGEY_DARK,
+  double: SC_DOUBLE_DARK,
 } as const;
 
 
@@ -129,23 +125,20 @@ export const RAMP_TOPAR = {
 
  *
  * RED MEANS DEMANDING. Nothing on this tab is a score or a member, so this is
- * neither the to-par red nor the member amber.
+ * neither the to-par text red nor the member amber.
  *
  * THIS IS THE ONLY DEFINITION IN THE CODEBASE. Every consumer imports it.
  */
-/* REPOINTED FOR THE DARK GROUND by MICRO_BRIEF_COURSE_CARD_TEE_ROWS §1. The
-   reasoning above survives intact - six stops, a neutral-to-red arc, and never
-   a faint red at the easy end. Only the VALUES moved. On white, harder meant
-   DARKER; on #15171F the deep maroons went muddy and the hardest stop - the one
-   that must read - was the muddiest of all. On dark, harder means BRIGHTER, so
-   the arc now runs TOWARD the red rather than away from it. */
+/* The course's own easiest-to-hardest spread runs slate to deep fill-red. The
+   hardest stop is intentionally darker, not brighter: these tones fill bars and
+   marks and are never used as small text. */
 export const DIFFICULTY_RAMP = [
-  'rgba(248,250,252,0.34)', // 0 easiest - a solid neutral, never a faint red
-  'rgba(248,250,252,0.50)', // 1
-  '#E08B70', // 2 warm middle
-  '#E5604E', // 3
-  '#F0554A', // 4
-  '#FF6B60', // 5 hardest - A.RED, the dark-surface red
+  'rgba(120,128,140,0.42)', // 0 easiest — slate
+  '#786F78', // 1
+  '#8E5F63', // 2
+  '#A64E4B', // 3
+  '#B94338', // 4
+  '#C8372B', // 5 hardest — fill-only deep red
 ] as const;
 
 export const DIFFICULTY_HARD_HEX = DIFFICULTY_RAMP[5];
