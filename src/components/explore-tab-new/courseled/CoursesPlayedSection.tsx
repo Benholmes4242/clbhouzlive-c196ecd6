@@ -14,11 +14,12 @@ import { windowDays } from './GolfThisWeek';
 /**
  * HOW THE COURSES PLAYED (BRIEF_COURSES_HOW_THEY_PLAYED).
  *
- * IT ANSWERS HOW EACH COURSE PLAYED, NOT WHERE ROUNDS HAPPENED. get_board_courses
- * now ORDERS BY plays_to DESC and its LIMIT selects on that same axis, so
- * THE ROWS RENDER IN THE RPC'S OWN ORDER AND NOTHING IS SORTED CLIENT-SIDE
- * (S1.3). Sorting the survivors of a most-played limit would rank an arbitrary
- * subset and call it hardest first.
+ * IT ANSWERS HOW EACH COURSE PLAYED — that is what each row CONTAINS, not the
+ * order they are in. get_board_courses ORDERS BY ROUNDS DESC (AMENDMENT B), so
+ * the most-played course leads. THE ROWS RENDER IN THE RPC'S OWN ORDER AND
+ * NOTHING IS SORTED CLIENT-SIDE (S1.3): a single round at +12.0 leading a
+ * section is a claim the data cannot support.
+
  *
  * THE PANEL DOES NOT LIST MEMBERS (S3.1). It duplicated the board directly above
  * it and cost a query per open; the course's own analytics stand there instead.
@@ -111,10 +112,8 @@ export function CoursesPlayedSection({
         <span style={{ ...KICKER, color: A.INK }}>
           {t('discover.coursesPlayed.title', 'How the courses played')}
         </span>
-        <span style={{ ...CAP, marginLeft: 'auto' }}>
-          {t('discover.coursesPlayed.hardestFirst', 'Hardest first')}
-        </span>
       </div>
+
 
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginTop: 8 }}>
         <CourseStat value={String(total)} label={t('discover.filterBoard.col.courses', 'COURSES')} />
@@ -280,7 +279,7 @@ export function CourseRow({
             >
               {row.name ?? '\u2014'}
             </span>
-            {/* S2.2 — area · N rounds [trend] · N members. */}
+            {/* S2.2 (AMENDMENT B2) — area · N rounds [trend]. No member count. */}
             <span
               style={{
                 display: 'flex',
@@ -289,13 +288,15 @@ export function CourseRow({
                 marginTop: 2,
                 ...CAP,
                 color: A.MUTE,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
               }}
             >
               {row.area ? (
                 <>
                   <span
                     style={{
-                      maxWidth: 110,
+                      minWidth: 0,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -306,19 +307,14 @@ export function CourseRow({
                   <span aria-hidden>{'\u00b7'}</span>
                 </>
               ) : null}
-              <span>
+              <span style={{ flexShrink: 0 }}>
                 {row.rounds === 1
                   ? t('discover.coursesPlayed.oneRound', '1 round')
                   : t('discover.coursesPlayed.nRounds', '{{count}} rounds', { count: row.rounds })}
               </span>
               <Badges row={row} />
-              <span aria-hidden>{'\u00b7'}</span>
-              <span>
-                {row.members === 1
-                  ? t('discover.coursesPlayed.oneMember', '1 member')
-                  : t('discover.coursesPlayed.nMembers', '{{count}} members', { count: row.members })}
-              </span>
             </span>
+
           </span>
         </span>
 

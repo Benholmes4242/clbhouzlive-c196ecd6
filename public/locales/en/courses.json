@@ -1774,7 +1774,6 @@
     },
     "coursesPlayed": {
       "title": "How the courses played",
-      "hardestFirst": "Hardest first",
       "fieldPlaysTo": "Field plays to",
       "lowRoundBy": "Low round by {{name}}",
       "nEagles": "{{count}} eagles",
