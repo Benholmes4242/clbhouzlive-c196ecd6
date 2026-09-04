@@ -74,6 +74,23 @@ export function BoardSeeAllSheet({
   const rows = useMemo(() => (query.data?.pages ?? []).flat(), [query.data]);
   const total = rows.length > 0 ? Number(rows[0].total_count) : 0;
 
+  /* S4.5 — DAY GROUPING BELONGS TO THE FIVE EVENT BOARDS ONLY, where the ranked
+     value IS the date. The six ranking boards keep their figure column and no
+     headers: grouping a gross board by day would hide the thing it ranks on. */
+  const grouped = boardColumns(board).valueIsText;
+  const groups = useMemo(() => {
+    if (!grouped) return null;
+    const out: { key: string; label: string; rows: BoardRow[] }[] = [];
+    for (const r of rows) {
+      const key = String(r.play_date ?? '').slice(0, 10);
+      const last = out[out.length - 1];
+      if (last && last.key === key) last.rows.push(r);
+      else out.push({ key, label: relativeDayFull(r.play_date, t as never), rows: [r] });
+    }
+    return out;
+  }, [grouped, rows, t]);
+
+
   return (
     <BottomSheet
       open={open}
