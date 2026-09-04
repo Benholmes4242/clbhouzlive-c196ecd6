@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, ArrowDown, ArrowUp } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
-import { A, SANS, FIGS, DISCOVER_FACT, PODIUM_ACCENT } from './tokens';
+import { A, SANS, FIGS, DISCOVER_FACT, FEATURED_COURSE_SHADOW, PODIUM_ACCENT } from './tokens';
 import { WINDOW_SHORT, type BoardFilters } from './boardFilters';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
@@ -216,7 +216,8 @@ function FeaturedCourseCard({
         borderRadius: 10,
         overflow: 'hidden',
         background: A.PANEL,
-        boxShadow: '0 8px 22px rgba(0,0,0,0.16)',
+        border: `1px solid ${A.BORDER}`,
+        boxShadow: FEATURED_COURSE_SHADOW,
       }}
     >
       <CourseMosaicTile
