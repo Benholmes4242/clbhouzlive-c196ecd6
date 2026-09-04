@@ -143,6 +143,7 @@ export function CoursesPlayedSection({
             open={openId === row.course_id}
             onToggle={() => toggle(row.course_id)}
             userId={userId}
+            filters={filters}
             scaleMin={scaleMin}
             scaleMax={scaleMax}
             onCoursePress={onCoursePress}
