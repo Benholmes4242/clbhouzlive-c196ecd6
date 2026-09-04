@@ -103,8 +103,6 @@ function CategoryRow({
     }
   };
 
-  const showGhost = value == null;
-
   return (
     <div
       style={{
@@ -122,7 +120,7 @@ function CategoryRow({
             color: value == null ? RV2.muted : color,
           }}
         >
-          {value == null ? '--' : value.toFixed(1)}
+          {value == null ? '\u2014' : value.toFixed(1)}
         </span>
       </div>
       <div style={{ fontSize: 11, color: RV2.secondary, marginBottom: 10 }}>{hint}</div>
@@ -168,47 +166,32 @@ function CategoryRow({
             transition: dragging ? 'none' : 'width 120ms ease',
           }}
         />
-        {value != null && (
-          <div
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: `${fillPct}%`,
-              transform: 'translate(-50%, -50%)',
-              width: 18,
-              height: 18,
-              borderRadius: '50%',
-              background: RV2.ink,
-              border: `2px solid ${color}`,
-              boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-              pointerEvents: 'none',
-            }}
-          />
-        )}
-        {showGhost && (
-          <div
-            aria-hidden
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              startDrag(true);
-            }}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: `${toPct(MIN)}%`,
-              transform: 'translate(-50%, -50%)',
-              width: 18,
-              height: 18,
-              borderRadius: '50%',
-              background: 'transparent',
-              border: `1.5px solid ${RV2.muted}`,
-              boxShadow: 'none',
-              cursor: 'pointer',
-              touchAction: 'none',
-            }}
-          />
-        )}
+        {/* THE HANDLE — identical unset and set (see OverallScrubber). The row's
+            unset state is the empty track and the em-dash, never a weaker dot. */}
+        <div
+          aria-hidden
+          onPointerDown={value == null ? (e) => {
+            // Tap is not a score: arm the drag, commit only on pointermove.
+            e.stopPropagation();
+            startDrag(true);
+          } : undefined}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: `${fillPct}%`,
+            transform: 'translate(-50%, -50%)',
+            width: 18,
+            height: 18,
+            borderRadius: '50%',
+            background: RV2.ink,
+            border: `2px solid ${color}`,
+            boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+            pointerEvents: value == null ? 'auto' : 'none',
+            cursor: value == null ? 'pointer' : undefined,
+            touchAction: 'none',
+            transition: dragging ? 'none' : 'left 120ms ease',
+          }}
+        />
       </div>
       </div>
     </div>
