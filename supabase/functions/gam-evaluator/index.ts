@@ -247,6 +247,29 @@ async function processSingle(whsScoreId: string) {
     holes = hRows ?? [];
   }
 
+  // COURSE PAR FALLBACK. hole_by_hole_fetched is written by the hole backfill,
+  // which races this evaluator: when the evaluator wins the race the flag is
+  // still false and course_par would be stored null forever (the round is never
+  // re-evaluated on its own). Read the hole pars directly — the rows may exist
+  // even when the flag says otherwise — and sum them. Non-fatal.
+  if (clbhouzCoursePar == null && holes.length === 0) {
+    try {
+      const { data: parRows } = await supabase
+        .from("whs_score_holes")
+        .select("par, played")
+        .eq("score_id", whsScoreId);
+      const pars = (parRows ?? [])
+        .filter((r: any) => r.played !== false && r.par != null)
+        .map((r: any) => Number(r.par));
+      if (pars.length >= 9) {
+        clbhouzCoursePar = pars.reduce((a, b) => a + b, 0);
+      }
+    } catch (e) {
+      console.warn("[course_par] hole fallback", (e as Error).message);
+    }
+  }
+
+
   // delta_index — read the member's score ladder so this round's movement can
   // be computed. Non-fatal, exactly as the courseName lookup is: a ladder read
   // failure leaves delta_index null and the evaluation continues.
