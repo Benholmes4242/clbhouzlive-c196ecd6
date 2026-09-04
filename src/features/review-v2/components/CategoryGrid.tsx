@@ -42,6 +42,8 @@ function CategoryRow({
 }) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [dragging, setDragging] = useState(false);
+  const ghostDragRef = useRef(false);
+  const movedRef = useRef(false);
   const color = bandColor(value);
   const fillPct = value == null ? 0 : toPct(value);
 
@@ -53,10 +55,27 @@ function CategoryRow({
     onChange(snap(MIN + pct * (MAX - MIN)));
   }, [onChange]);
 
+  const startDrag = useCallback((fromGhost: boolean) => {
+    setDragging(true);
+    ghostDragRef.current = fromGhost;
+    movedRef.current = false;
+  }, []);
+
+  const endDrag = useCallback(() => {
+    setDragging(false);
+    ghostDragRef.current = false;
+    movedRef.current = false;
+  }, []);
+
   useEffect(() => {
     if (!dragging) return;
-    const onMove = (e: PointerEvent) => pointerToValue(e.clientX);
-    const onUp = () => setDragging(false);
+    const onMove = (e: PointerEvent) => {
+      if (ghostDragRef.current && value == null && !movedRef.current) {
+        movedRef.current = true;
+      }
+      pointerToValue(e.clientX);
+    };
+    const onUp = () => endDrag();
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
@@ -65,7 +84,7 @@ function CategoryRow({
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
     };
-  }, [dragging, pointerToValue]);
+  }, [dragging, pointerToValue, endDrag, value]);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     const current = value ?? MIN;
@@ -84,6 +103,8 @@ function CategoryRow({
     }
   };
 
+  const showGhost = value == null;
+
   return (
     <div
       style={{
@@ -98,7 +119,7 @@ function CategoryRow({
             fontSize: 18,
             ...FIGURE,
             letterSpacing: '-0.03em',
-            color: value == null ? RV2.secondary : color,
+            color: value == null ? RV2.muted : color,
           }}
         >
           {value == null ? '--' : value.toFixed(1)}
@@ -110,10 +131,11 @@ function CategoryRow({
         tabIndex={0}
         aria-valuemin={1}
         aria-valuemax={10}
-        aria-valuenow={value ?? 1}
+        aria-valuenow={value ?? undefined}
+        aria-valuetext={value == null ? 'Not scored' : undefined}
         aria-label={label}
         onPointerDown={(e) => {
-          setDragging(true);
+          startDrag(false);
           pointerToValue(e.clientX);
         }}
         onKeyDown={onKeyDown}
@@ -134,37 +156,58 @@ function CategoryRow({
           background: RV2.track,
         }}
       >
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: `${fillPct}%`,
+            background: value == null ? 'transparent' : color,
+            borderRadius: 999,
+            transition: dragging ? 'none' : 'width 120ms ease',
+          }}
+        />
         {value != null && (
-          <>
-            <div
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                bottom: 0,
-                width: `${fillPct}%`,
-                background: color,
-                borderRadius: 999,
-                transition: dragging ? 'none' : 'width 120ms ease',
-              }}
-            />
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: `${fillPct}%`,
-                transform: 'translate(-50%, -50%)',
-                width: 18,
-                height: 18,
-                borderRadius: '50%',
-                background: RV2.ink,
-                border: `2px solid ${color}`,
-                boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-                pointerEvents: 'none',
-              }}
-            />
-          </>
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: `${fillPct}%`,
+              transform: 'translate(-50%, -50%)',
+              width: 18,
+              height: 18,
+              borderRadius: '50%',
+              background: RV2.ink,
+              border: `2px solid ${color}`,
+              boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+        {showGhost && (
+          <div
+            aria-hidden
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              startDrag(true);
+            }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: `${toPct(MIN)}%`,
+              transform: 'translate(-50%, -50%)',
+              width: 18,
+              height: 18,
+              borderRadius: '50%',
+              background: 'transparent',
+              border: `1.5px solid ${RV2.muted}`,
+              boxShadow: 'none',
+              cursor: 'pointer',
+              touchAction: 'none',
+            }}
+          />
         )}
       </div>
       </div>
