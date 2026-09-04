@@ -18,29 +18,17 @@ import {
 /**
  * ScoreMark - the universal scoring-mark renderer.
  *
- * SCORE MARK PILL — one grammar, three independent channels.
- *
- * Commit f9eb4521 (2 Aug 2026) removed the old “World Feed” filled-chip
- * system: red birdie, GOLD eagle, BLUE bogey and NAVY double, with hue carrying
- * magnitude and fills shared across light/dark. CORRECTION_ONE_SCORING_MARK
- * made the outline scorecard grammar universal. This treatment keeps that
- * correction's semantic rule — RED means under par, INK means over par, GOLD
- * means rarity only — while deliberately replacing outlines with fills.
- * Magnitude now has one symmetrical signal: a ring whenever |score - par| >= 2.
- *
- * Fills are explicitly NOT shared across surfaces. Over-par grounds invert
- * from ink-alpha on light to light-alpha on dark, and under-par uses the
- * surface-specific canonical red. The ring gap is transparent, exposing the
- * actual host surface rather than assuming white.
+ * Dark scorecards follow the paper-card convention: gold circles for eagle or
+ * better, red circle for birdie, bare par, outlined-square bogey, blue square
+ * double and deep-blue ringed square triple+. Rings encode degree. Light keeps
+ * its established treatment unchanged.
  * Shared across:
  *  - Card scorecard sheet (CardScorecardSheet)
  *  - Handicap personal scorecard
  *  - Course Holes tab legend
  *  - Clubhouse feed round card (surface="dark")
  *
- * Every mark is circular. Solid fill says under; ground says over; bare says
- * par. Ring says two-or-more from par on either side. Ace/albatross remain RED
- * filled with a GOLD rarity ring — never a gold fill.
+ * An ace has no bespoke branch: its mark is derived from strokes minus par.
  */
 
 type Variant =
@@ -49,7 +37,6 @@ type Variant =
   | 'birdie'
   | 'eagle'
   | 'alba'
-  | 'hio'
   | 'bogey'
   | 'doub'
   | 'triple';
@@ -108,11 +95,11 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
 }) => {
   const variant = variantFor(strokes, par);
 
-  const under = variant === 'birdie' || variant === 'eagle' || variant === 'alba' || variant === 'hio';
+  const under = variant === 'birdie' || variant === 'eagle' || variant === 'alba';
   const over = variant === 'bogey' || variant === 'doub' || variant === 'triple';
   const hasMark = under || over;
-  const magnitudeRing = variant === 'eagle' || variant === 'alba' || variant === 'hio' || variant === 'doub' || variant === 'triple';
-  const goldRing = variant === 'alba' || variant === 'hio';
+  const magnitudeRing = variant === 'eagle' || variant === 'alba' || variant === 'doub' || variant === 'triple';
+  const goldRing = variant === 'alba';
 
   const overInk = surface === 'dark' ? OVER_INK_DARK : OVER_INK_LIGHT;
   const parInk = surface === 'dark' ? SC_PAR_DARK : SC_PAR;
