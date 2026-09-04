@@ -12,7 +12,7 @@ const cssColor = (value: string) => {
 };
 
 const sameColor = (left: string, right: string) =>
-  left.replaceAll(' ', '').toLowerCase() === right.replaceAll(' ', '').toLowerCase();
+  left.replace(/\s/g, '').toLowerCase() === right.replace(/\s/g, '').toLowerCase();
 
 describe('ScoreMark dark scorecard convention', () => {
   it.each([
