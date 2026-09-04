@@ -51,12 +51,6 @@ const CAP = {
   color: A.DIM,
 };
 
-function formatTileToPar(value: number | null): string | null {
-  if (value == null) return null;
-  if (value === 0) return 'E';
-  return value < 0 ? `\u2212${Math.abs(value)}` : `+${value}`;
-}
-
 export interface CoursesPlayedSectionProps {
   userId: string | undefined;
   /** The page's CURRENT filter state. The board key is deliberately absent. */
