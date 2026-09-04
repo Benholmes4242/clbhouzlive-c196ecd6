@@ -309,6 +309,8 @@ export function BoardRowView({
   const { t } = useTranslation('courses');
   const value = boardValue(row, board, t as never);
   const second = boardSecondary(row, board);
+  /* B4.3 — the column, not the row, decides whether the value is words. */
+  const valueIsText = boardColumns(board).valueIsText;
   const ink = isSelf ? A.AMBER : A.INK;
   const feat =
     (row.holes_in_one ?? 0) > 0
@@ -420,7 +422,7 @@ export function BoardRowView({
           textAlign: 'center',
           /* B4.2 — WORDS at 12.5, FIGURES at 15. VALUE_W stays 58 either way
              (B4.5) so the right edge aligns across boards. */
-          fontSize: boardColumns(board).valueIsText ? 12.5 : 15,
+          fontSize: valueIsText ? 12.5 : 15,
           fontWeight: 700,
           color: isSelf ? A.AMBER : value.tone,
           textTransform: 'uppercase',
