@@ -186,26 +186,22 @@ export function CourseHolePanel({
       )}
 
       {featured ? (
+        /* M1 — no chevron. Hole by hole and View course are always visible. */
         <>
-          <DisclosureRow
-            label={t('holes.preview.eyebrow', 'Hole by hole')}
-            open={detailsOpen}
-            onPress={() => onToggleDetails?.()}
-          />
-          {detailsOpen && (
-            <>
-              <div style={{ padding: '12px 14px' }}>
-                {shares && <DistributionStrip shares={shares} />}
-                <Extremes hardest={hardest} easiest={easiest} />
-              </div>
-              <div style={{ padding: '0 14px' }}>
-                <ListTerminalRow
-                  label={t('discover.coursesPlayed.viewCourse', 'View course')}
-                  onPress={() => onCoursePress?.(courseId)}
-                />
-              </div>
-            </>
-          )}
+          <Block
+            title={t('holes.preview.eyebrow', 'Hole by hole')}
+            note={basis}
+            fullBleed
+          >
+            {shares && <DistributionStrip shares={shares} />}
+            <Extremes hardest={hardest} easiest={easiest} />
+          </Block>
+          <div style={{ padding: '0 14px' }}>
+            <ListTerminalRow
+              label={t('discover.coursesPlayed.viewCourse', 'View course')}
+              onPress={() => onCoursePress?.(courseId)}
+            />
+          </div>
         </>
       ) : (
         <>
