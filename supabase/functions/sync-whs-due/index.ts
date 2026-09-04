@@ -232,7 +232,35 @@ async function syncOneConnection(
     if (newScores && newScores.length > 0) {
       const holeResults = await enrichScoresWithHoles(admin, token, newScores, 200);
       holesEnriched = holeResults.reduce((sum, r) => sum + r.holesUpserted, 0);
+      // Re-evaluate rounds that were already evaluated before holes arrived.
+      // Same race as backfill-whs-holes: evaluator can win before hole rows
+      // exist and store null course_par forever. Non-fatal.
+      const enrichedIds = holeResults
+        .filter((r) => r.fetched && r.holesUpserted > 0)
+        .map((r) => r.scoreId);
+      if (enrichedIds.length > 0) {
+        try {
+          await admin
+            .from("gam_evaluation_queue")
+            .upsert(
+              enrichedIds.map((id) => ({
+                user_id: user.id,
+                whs_score_id: id,
+                evaluator_version: 1,
+                status: "queued",
+                attempts: 0,
+                error: null,
+                processed_at: null,
+                enqueued_at: new Date().toISOString(),
+              })),
+              { onConflict: "user_id,whs_score_id,evaluator_version" },
+            );
+        } catch (e) {
+          console.error("[sync-whs-due] re-evaluation enqueue failed (non-fatal):", e);
+        }
+      }
     }
+
   } catch (err) {
     console.warn(`[sync] hole enrichment partial-failed for ${conn.id} (non-fatal):`, err);
   }
