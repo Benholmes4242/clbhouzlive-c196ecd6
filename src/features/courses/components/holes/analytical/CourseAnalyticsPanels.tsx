@@ -549,9 +549,15 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   const { data: connection } = useWhsConnection(user?.id);
   const { data } = useCourseHoleAnalysis(courseId);
   const { data: pro } = useCourseProHoleAnalysis(courseId);
+  /* THE HERO'S OWN FIGURE. The hero counts every round posted at the course;
+     this panel can only pool rounds that carry hole detail, so the two numbers
+     sit inches apart and disagree. Reading the hero's number here lets the
+     basis line say WHY. Same query key as the hero, so no extra request. */
+  const { data: courseStats } = useCourseStatsDetail(courseId, true);
   const { data: myPerf } = useMyHolePerformance(user?.id, courseId, {
     enabled: Boolean(user?.id && courseId && connection),
   });
+
 
   const [holesSheetOpen, setHolesSheetOpen] = useState(false);
   const [openHoles, setOpenHoles] = useState<Set<number>>(() => new Set());
