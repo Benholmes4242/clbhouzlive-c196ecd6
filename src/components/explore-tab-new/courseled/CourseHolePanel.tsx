@@ -230,10 +230,20 @@ function AnalyticsBasis({ count, featured }: { count: number; featured: boolean 
         whiteSpace: 'nowrap',
       }}
     >
-      <span style={{ ...CAP, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      {/* P1.2 — the phrase is the bright heading; the count is the muted sample note. */}
+      <span
+        style={{
+          ...KICKER,
+          fontSize: 10,
+          color: A.INK,
+          minWidth: 0,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
         {t('discover.coursesPlayed.courseWideBasis', 'How this course has always played')}
       </span>
-      <span style={{ ...CAP, color: A.MUTE, flexShrink: 0 }}>
+      <span style={{ ...CAP, color: A.DIM, flexShrink: 0 }}>
         {t('discover.coursesPlayed.roundCount', '{{count}} rounds', { count })}
       </span>
     </div>
