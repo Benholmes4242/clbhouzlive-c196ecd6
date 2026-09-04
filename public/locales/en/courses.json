@@ -996,7 +996,9 @@
       "easiestHole": "Easiest hole",
       "holeN": "Hole {{hole}}",
       "legendEasier": "Easier",
-      "legendHarder": "Harder"
+      "legendHarder": "Harder",
+      "roundsWithDetail_one": "{{pooled}} of {{total}} round has hole detail",
+      "roundsWithDetail_other": "{{pooled}} of {{total}} rounds have hole detail"
     },
     "holes": {
       "tapHint": "Tap a hole for detail",
