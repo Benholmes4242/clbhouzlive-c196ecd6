@@ -8,7 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { FIGS, SANS } from './tokens';
 import { BOARD_LABELS, boardCountsRounds, type BoardFilters, type BoardKey } from './boardFilters';
 import { boardRpcArgs, type BoardRow } from './hooks/useBoardPage';
-import { BoardHeaderRow, BoardRowView } from './BoardRows';
+import { BoardHeaderRow, BoardRowView, boardColumns } from './BoardRows';
+import { relativeDayFull } from './discoverWhen';
 
 /**
  * SEE ALL (BRIEF_DISCOVER_FILTER_LED_BOARD S5.1).
