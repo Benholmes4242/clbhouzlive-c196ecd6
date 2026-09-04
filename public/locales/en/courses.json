@@ -1400,7 +1400,14 @@
       "relDaysAgo": "{{n}}d ago",
       "relWeeksAgo": "{{n}}w ago",
       "relMonthsAgo": "{{n}}m ago",
-      "relYearsAgo": "{{n}}y ago"
+      "relYearsAgo": "{{n}}y ago",
+      "fullDaysAgo": "{{count}} days ago",
+      "fullWeeksAgo": "{{count}} weeks ago",
+      "fullWeeksAgo_one": "{{count}} week ago",
+      "fullMonthsAgo": "{{count}} months ago",
+      "fullMonthsAgo_one": "{{count}} month ago",
+      "fullYearsAgo": "{{count}} years ago",
+      "fullYearsAgo_one": "{{count}} year ago"
     },
     "rarest": {
       "aceAt": "Hole in one, {{hole}}",
