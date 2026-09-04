@@ -14,11 +14,12 @@ import { windowDays } from './GolfThisWeek';
 /**
  * HOW THE COURSES PLAYED (BRIEF_COURSES_HOW_THEY_PLAYED).
  *
- * IT ANSWERS HOW EACH COURSE PLAYED, NOT WHERE ROUNDS HAPPENED. get_board_courses
- * now ORDERS BY plays_to DESC and its LIMIT selects on that same axis, so
- * THE ROWS RENDER IN THE RPC'S OWN ORDER AND NOTHING IS SORTED CLIENT-SIDE
- * (S1.3). Sorting the survivors of a most-played limit would rank an arbitrary
- * subset and call it hardest first.
+ * IT ANSWERS HOW EACH COURSE PLAYED — that is what each row CONTAINS, not the
+ * order they are in. get_board_courses ORDERS BY ROUNDS DESC (AMENDMENT B), so
+ * the most-played course leads. THE ROWS RENDER IN THE RPC'S OWN ORDER AND
+ * NOTHING IS SORTED CLIENT-SIDE (S1.3): a single round at +12.0 leading a
+ * section is a claim the data cannot support.
+
  *
  * THE PANEL DOES NOT LIST MEMBERS (S3.1). It duplicated the board directly above
  * it and cost a query per open; the course's own analytics stand there instead.
