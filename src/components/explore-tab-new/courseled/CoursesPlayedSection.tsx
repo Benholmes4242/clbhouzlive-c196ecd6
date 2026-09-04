@@ -359,7 +359,7 @@ export function CourseRow({
 
       {open && (
         <div style={{ paddingBottom: 10 }}>
-          <LowRoundLine row={row} />
+          <LowRoundLine row={row} userId={userId} filters={filters} />
           <CourseHolePanel courseId={row.course_id} userId={userId} onCoursePress={onCoursePress} />
         </div>
       )}
