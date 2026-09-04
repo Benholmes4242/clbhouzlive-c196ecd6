@@ -22,6 +22,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { applyRouteChrome } from '@/lib/routeChrome';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { POST_COMPOSER_Z } from '@/lib/zLayers';
 
 import { useStageComposer, MAX_MEDIA, type StageMediaItem } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
@@ -584,7 +585,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
   if (saveSuccess) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', zIndex: POST_COMPOSER_Z }}>
         <PostSuccessV2
           result={{ kind: 'published', postId: editPostId ?? '' }}
           onDone={() => { setSaveSuccess(false); onPosted?.(); onClose(); }}
@@ -595,7 +596,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
   if (success) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', zIndex: 12000 }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', zIndex: POST_COMPOSER_Z }}>
         <PostSuccessV2 result={success} onDone={() => { setSuccess(null); onPosted?.(); onClose(); }} />
       </div>
     );
@@ -625,7 +626,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   // SETTLED IS NOT "NOT LOADING": useEditablePost is gated on postId + viewerId.
   if (isEditMode && editable.isFetched && !editable.data) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: POST_COMPOSER_Z, padding: 24, gap: 12 }}>
         <div style={{ fontSize: 16, fontWeight: 600, color: CT_DARK.ink }}>Couldn't load this post</div>
         <div style={{ fontSize: 13, color: CT_DARK.mute, textAlign: 'center' }}>It may have been deleted, or your connection dropped.</div>
         <button onClick={onClose} style={{ background: CT_DARK.elev, color: CT_DARK.ink, border: 0, borderRadius: 999, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Close</button>
@@ -636,7 +637,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   // Ownership guard: if edit target isn't manageable, close out.
   if (isEditMode && editable.data && !editable.data.canManage) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 12000, padding: 24, gap: 12 }}>
+      <div style={{ position: 'fixed', inset: 0, background: CT_DARK.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: POST_COMPOSER_Z, padding: 24, gap: 12 }}>
         <div style={{ fontSize: 16, fontWeight: 600, color: CT_DARK.ink }}>Can't edit this post</div>
         <div style={{ fontSize: 13, color: CT_DARK.mute, textAlign: 'center' }}>
           {editable.data.blockedReason === 'review-derived'
@@ -759,7 +760,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   // ---- PAGE 1 — MEDIA, DARK -------------------------------------------------
   if (page === 1) {
     return (
-      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT_DARK.bg, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT_DARK.bg, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
         {/* Top bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT_DARK.bg, flex: 'none' }}>
           <button onClick={handleClose} aria-label="Close" style={closeButtonStyle}>
@@ -963,7 +964,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
   // ---- PAGE 2 — WORDS, DARK ----------------------------------------------
   return (
-    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 12000 }}>
+    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
       {/* Top bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: PAGE2.canvas, flex: 'none' }}>
         <button
