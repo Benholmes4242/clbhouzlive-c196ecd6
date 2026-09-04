@@ -140,7 +140,7 @@ export function BoardSeeAllSheet({
         </div>
       </div>
       <div style={{ flexShrink: 0, padding: '8px 16px 0', fontFamily: SANS, ...FIGS }}>
-        <BoardHeaderRow board={board} />
+        <BoardHeaderRow board={board} hideValue={grouped} />
       </div>
       <div
         style={{
@@ -155,15 +155,43 @@ export function BoardSeeAllSheet({
           ...FIGS,
         }}
       >
-        {rows.map((r) => (
-          <BoardRowView
-            key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
-            row={r}
-            board={board}
-            isSelf={!!userId && r.user_id === userId}
-            onPress={onRowPress}
-          />
-        ))}
+        {groups
+          ? groups.map((g, gi) => (
+              <div key={`${g.key}:${gi}`}>
+                {/* S4.2/S4.6/S4.7 — one header per day, no count, not sticky.
+                    POS keeps counting through the groups (S4.4): the rows carry
+                    the RPC's own positions and nothing restarts here. */}
+                <div
+                  style={{
+                    ...KICKER,
+                    fontSize: 10,
+                    color: A.DIM,
+                    padding: gi === 0 ? '10px 2px 6px' : '18px 2px 6px',
+                  }}
+                >
+                  {g.label}
+                </div>
+                {g.rows.map((r) => (
+                  <BoardRowView
+                    key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
+                    row={r}
+                    board={board}
+                    isSelf={!!userId && r.user_id === userId}
+                    hideValue
+                    onPress={onRowPress}
+                  />
+                ))}
+              </div>
+            ))
+          : rows.map((r) => (
+              <BoardRowView
+                key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
+                row={r}
+                board={board}
+                isSelf={!!userId && r.user_id === userId}
+                onPress={onRowPress}
+              />
+            ))}
         {query.hasNextPage && (
           <button
             type="button"
