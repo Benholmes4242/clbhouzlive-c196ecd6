@@ -58,8 +58,6 @@ export const PODIUM_GROUND = {
   tie: 'rgba(255,255,255,0.08)',
 } as const;
 
-/** One outer shadow for the featured course's unified photograph + analytics card. */
-export const FEATURED_COURSE_SHADOW = '0 8px 22px rgba(0,0,0,0.16)';
 export { A, SANS, FIGS };
 
 /** Discover content geometry: one master, all subordinate radii derived. */

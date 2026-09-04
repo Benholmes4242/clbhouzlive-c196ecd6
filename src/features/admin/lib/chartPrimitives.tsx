@@ -1,5 +1,8 @@
 import React from 'react';
 import { adminTheme as t } from '../theme';
+import { monotonePath } from '@/features/courses/components/holes/analytical/chartGeometry';
+
+export { monotonePath };
 
 /**
  * Shared Dashboard primitives. Built once, used by every panel.
@@ -73,50 +76,6 @@ export function formatDurationShort(seconds: number): string {
   const h = Math.floor(m / 60);
   if (h < 48) return `${h}h`;
   return `${Math.floor(h / 24)}d`;
-}
-
-// ─── S2 Monotone cubic (Fritsch-Carlson) ──────────────────────────────────────
-
-/**
- * Fritsch-Carlson monotone cubic interpolation. NOT a cardinal spline: a naive
- * spline overshoots between points and would draw member activity that never
- * happened. The t[i] = 0 clamp at a direction change is what prevents it.
- */
-export function monotonePath(pts: { x: number; y: number }[]): string {
-  const n = pts.length;
-  if (n === 0) return '';
-  if (n === 1) return `M${pts[0].x},${pts[0].y}`;
-  if (n === 2) return `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y}`;
-
-  const m: number[] = [];
-  for (let i = 0; i < n - 1; i++) {
-    const dx = pts[i + 1].x - pts[i].x;
-    m.push(dx === 0 ? 0 : (pts[i + 1].y - pts[i].y) / dx);
-  }
-
-  const tan: number[] = new Array(n);
-  tan[0] = m[0];
-  tan[n - 1] = m[n - 2];
-  for (let i = 1; i < n - 1; i++) {
-    if (m[i - 1] * m[i] <= 0) {
-      tan[i] = 0;
-    } else {
-      const avg = (m[i - 1] + m[i]) / 2;
-      const cap = 3 * Math.min(Math.abs(m[i - 1]), Math.abs(m[i]));
-      tan[i] = Math.sign(m[i - 1]) * Math.min(Math.abs(avg), cap);
-    }
-  }
-
-  let d = `M${pts[0].x.toFixed(2)},${pts[0].y.toFixed(2)}`;
-  for (let i = 0; i < n - 1; i++) {
-    const dx = pts[i + 1].x - pts[i].x;
-    const c1x = pts[i].x + dx / 3;
-    const c1y = pts[i].y + (tan[i] * dx) / 3;
-    const c2x = pts[i + 1].x - dx / 3;
-    const c2y = pts[i + 1].y - (tan[i + 1] * dx) / 3;
-    d += ` C${c1x.toFixed(2)},${c1y.toFixed(2)} ${c2x.toFixed(2)},${c2y.toFixed(2)} ${pts[i + 1].x.toFixed(2)},${pts[i + 1].y.toFixed(2)}`;
-  }
-  return d;
 }
 
 // ─── S3 Real-pixel end dot ────────────────────────────────────────────────────

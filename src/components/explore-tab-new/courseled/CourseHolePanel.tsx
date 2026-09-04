@@ -143,6 +143,7 @@ export function CourseHolePanel({
           hasYou={hasYou}
           fieldIsOnlyYou={fieldIsOnlyYou}
           initialHole={hardest.hole_no}
+          surface={featured ? A.CANVAS : A.PANEL}
         />
         {!fieldIsOnlyYou && (
           <div
@@ -313,12 +314,14 @@ function HoleChart({
   hasYou,
   fieldIsOnlyYou,
   initialHole,
+  surface,
 }: {
   holes: CourseHole[];
   myByHole: Map<number, MyHolePerformanceRow>;
   hasYou: boolean;
   fieldIsOnlyYou: boolean;
   initialHole: number;
+  surface: string;
 }) {
   const { t } = useTranslation('courses');
   const [sel, setSel] = useState(() => Math.max(0, holes.findIndex((h) => h.hole_no === initialHole)));
@@ -459,7 +462,7 @@ function HoleChart({
               cy={dotY}
               r={3.5}
               fill={A.AMBER}
-              stroke={A.PANEL}
+               stroke={surface}
               strokeWidth={2}
               vectorEffect="non-scaling-stroke"
             />
