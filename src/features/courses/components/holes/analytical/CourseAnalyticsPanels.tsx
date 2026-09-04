@@ -153,7 +153,11 @@ const ShapeChart: React.FC<{
   easiestText: string;
   flat: boolean;
   hasYou: boolean;
-}> = ({ holes, myByHole, hardestHole, hardestText, easiestHole, easiestText, flat, hasYou }) => {
+  /** NO FIELD (BRIEF_HOW_IT_PLAYS_NO_FIELD): the pool is the viewer's own
+   *  rounds, so the field bars would redraw the member's line under another
+   *  name. Drop them; the line alone carries the shape. */
+  fieldIsOnlyYou: boolean;
+}> = ({ holes, myByHole, hardestHole, hardestText, easiestHole, easiestText, flat, hasYou, fieldIsOnlyYou }) => {
 
   const W = 340;
   /** Condensed plot (BRIEF §6): 92 -> 78, headroom included. */
@@ -220,7 +224,7 @@ const ShapeChart: React.FC<{
           style={{ display: 'block' }}
           aria-hidden="true"
         >
-          {holes.map((h, i) => {
+          {!fieldIsOnlyYou && holes.map((h, i) => {
             const yv = y(h.avg_to_par);
             const top = Math.min(yv, yBase);
             const height = Math.max(2, Math.abs(yBase - yv));
