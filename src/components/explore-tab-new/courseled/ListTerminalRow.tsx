@@ -1,18 +1,21 @@
-import { ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 import { A, KICKER, SANS } from './tokens';
 
 interface ListTerminalRowProps {
   label: string;
   onPress: () => void;
+  expanded?: boolean;
 }
 
 /** Shared terminal action for the board and Courses Played lists. */
-export function ListTerminalRow({ label, onPress }: ListTerminalRowProps) {
+export function ListTerminalRow({ label, onPress, expanded }: ListTerminalRowProps) {
+  const disclosure = expanded != null;
   return (
     <button
       type="button"
       onClick={onPress}
+      aria-expanded={disclosure ? expanded : undefined}
       style={{
         width: '100%',
         display: 'flex',
@@ -31,7 +34,20 @@ export function ListTerminalRow({ label, onPress }: ListTerminalRowProps) {
       }}
     >
       <span style={{ ...KICKER, color: A.BODY }}>{label}</span>
-      <ChevronRight size={16} strokeWidth={2} color={A.BODY} aria-hidden />
+      {disclosure ? (
+        <ChevronDown
+          size={16}
+          strokeWidth={2}
+          color={A.MUTE}
+          aria-hidden
+          style={{
+            transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 160ms ease',
+          }}
+        />
+      ) : (
+        <ChevronRight size={16} strokeWidth={2} color={A.BODY} aria-hidden />
+      )}
     </button>
   );
 }

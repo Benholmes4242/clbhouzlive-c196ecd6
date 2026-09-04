@@ -66,6 +66,7 @@ export function CoursesPlayedSection({
   onMemberPress,
 }: CoursesPlayedSectionProps) {
   const { t } = useTranslation('courses');
+  const [expanded, setExpanded] = useState(true);
   /* S2.5 — one row open at a time. */
   const [openId, setOpenId] = useState<string | null>(null);
   const [seeAll, setSeeAll] = useState(false);
@@ -78,6 +79,13 @@ export function CoursesPlayedSection({
 
   const toggle = useCallback((id: string) => {
     setOpenId((cur) => (cur === id ? null : id));
+  }, []);
+
+  const toggleSection = useCallback(() => {
+    setExpanded((current) => {
+      if (current) setOpenId(null);
+      return !current;
+    });
   }, []);
 
   /* The member has already said which course they care about. */
@@ -106,49 +114,50 @@ export function CoursesPlayedSection({
 
   return (
     <section style={{ fontFamily: SANS, ...FIGS }}>
-      <div style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.4, color: A.INK }}>
-        {t('discover.coursesPlayed.bridge', 'Those rounds were played across {{count}} courses.', { count: total })}
-      </div>
-      <div style={{ ...CAP, marginTop: 3 }}>
-        {t('discover.coursesPlayed.bridgeSubline', 'How each of them played')}
-      </div>
-      <div
-        style={{
-          marginTop: 12,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          gap: 8,
-        }}
-      >
-        <FeaturedCourseCard
-          row={featured}
-          detailsOpen={openId === featured.course_id}
-          onToggleDetails={() => toggle(featured.course_id)}
-          userId={userId}
-          filters={filters}
-          onCoursePress={onCoursePress}
-        />
-
-        {pairs.map((pair) => (
-          <CourseMosaicPair
-            key={pair.map((row) => row.course_id).join(':')}
-            rows={pair}
-            openId={openId}
-            onToggle={toggle}
+      <ListTerminalRow
+        label={t('discover.coursesPlayed.title', 'How the courses played')}
+        onPress={toggleSection}
+        expanded={expanded}
+      />
+      {expanded ? (
+        <div
+          style={{
+            marginTop: 8,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+            gap: 8,
+          }}
+        >
+          <FeaturedCourseCard
+            row={featured}
+            detailsOpen={openId === featured.course_id}
+            onToggleDetails={() => toggle(featured.course_id)}
             userId={userId}
             filters={filters}
             onCoursePress={onCoursePress}
           />
-        ))}
-        {total > 5 && (
-          <div style={{ gridColumn: '1 / -1' }}>
-            <ListTerminalRow
-              label={t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: total })}
-              onPress={() => setSeeAll(true)}
+
+          {pairs.map((pair) => (
+            <CourseMosaicPair
+              key={pair.map((row) => row.course_id).join(':')}
+              rows={pair}
+              openId={openId}
+              onToggle={toggle}
+              userId={userId}
+              filters={filters}
+              onCoursePress={onCoursePress}
             />
-          </div>
-        )}
-      </div>
+          ))}
+          {total > 5 && (
+            <div style={{ gridColumn: '1 / -1' }}>
+              <ListTerminalRow
+                label={t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: total })}
+                onPress={() => setSeeAll(true)}
+              />
+            </div>
+          )}
+        </div>
+      ) : null}
 
       <CoursesPlayedSeeAllSheet
         open={seeAll}
