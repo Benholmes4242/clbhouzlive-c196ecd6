@@ -4,7 +4,10 @@ import { ChevronDown, ChevronUp, ArrowDown, ArrowUp } from 'lucide-react';
 
 import { CourseImageFallback } from './CourseImageFallback';
 import { A, SANS, FIGS, DISCOVER_FACT, PODIUM_ACCENT } from './tokens';
-import { WINDOW_SHORT, type BoardFilters } from './boardFilters';
+import { type BoardFilters } from './boardFilters';
+/* S3.3 — THE SHEET STATES THE SAME APPLIED LINE AS THE PAGE, from the page's own
+   formatter. No second wording lives here. */
+import { describeFilterParts } from './GolfThisWeek';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
 import { useBoardCoursePlayers, type BoardCoursePlayer } from './hooks/useBoardCoursePlayers';
@@ -73,8 +76,7 @@ export function CoursesPlayedSection({
   const [openId, setOpenId] = useState<string | null>(null);
   const [seeAll, setSeeAll] = useState(false);
 
-  const win = WINDOW_SHORT[filters.window];
-  const windowLabel = t(win.i18n, win.label);
+  const appliedParts = describeFilterParts(filters, t as never);
   const courses = useBoardCourses(userId, filters, { limit: 5 });
   const rows = courses.data?.rows ?? [];
   const total = courses.data?.total ?? 0;
@@ -164,7 +166,7 @@ export function CoursesPlayedSection({
         onClose={() => setSeeAll(false)}
         userId={userId}
         filters={filters}
-        windowLabel={windowLabel}
+        appliedParts={appliedParts}
         onCoursePress={onCoursePress}
         onMemberPress={onMemberPress}
       />
