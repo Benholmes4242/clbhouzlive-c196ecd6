@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import type { BoardKey, ScopeKey } from '../boardFilters';
+import type { BoardKey, ScopeKey, WindowKey } from '../boardFilters';
 import { DEFAULT_FILTERS } from '../boardFilters';
 import type { BoardPick } from '../boardRotation';
 import { bumpDaySessions, persistPick, readSessionPick } from '../boardRotation';
@@ -54,9 +54,9 @@ function decideEntry(): Entry {
   return sessionDecision;
 }
 
-/** S3.3 — three rows is not a leaderboard. FOUR is the benchmark. */
+/** S3.4 — three rows is not a leaderboard. FOUR RANKED ROWS is the benchmark. */
 export const CIRCLE_ROW_FLOOR = 4;
-/** S3.2 — the probe reads the same board and window the entry would render. */
+/** S3.2 — each rung reads the same board the entry would render. */
 const RECENT_PROBE_LIMIT = 10;
 
 export function useDiscoverEntryBoard(userId: string | undefined) {
@@ -74,28 +74,52 @@ export function useDiscoverEntryBoard(userId: string | undefined) {
     fallback: fallbackPick,
   });
 
-  /* S3 — THE THIN-CIRCLE PROBE. The recent entry's own page query, scoped to the
-     member's circle: fewer than four ranked rows and the entry resolves to
-     everyone instead. S3.4 — it HOLDS behind the skeleton; the circle board is
-     never rendered and then swapped. */
+  /* S3 — THE FALLBACK LADDER. Three rungs, tried in order; the first that returns
+     four or more RANKED ROWS wins and the rungs below it are never evaluated.
+       rung 1  Most recent / Your circle / 14 days
+       rung 2  Most recent / Everyone    / 14 days
+       rung 3  Most recent / Everyone    / 90 days   TERMINAL, never tested (S3.3)
+     Rung 3 needs no query of its own: whatever it returns is what renders, so
+     there is nothing to threshold. S3.7 — the ladder HOLDS behind the skeleton;
+     no rung is ever rendered and then swapped. S3.8 — it is silent.
+     S3.9 — it runs ONLY for the session-1 recent entry. */
   const isRecent = entry.mode === 'recent';
-  const circleFilters = useMemo(
-    () => ({ ...DEFAULT_FILTERS, scope: 'circle' as ScopeKey, window: DEFAULT_FILTERS.window }),
+
+  const rung1Filters = useMemo(
+    () => ({ ...DEFAULT_FILTERS, scope: 'circle' as ScopeKey, window: '14' as WindowKey }),
     [],
   );
-  const circleProbe = useBoardPage(userId, 'recent', circleFilters, {
+  const rung2Filters = useMemo(
+    () => ({ ...DEFAULT_FILTERS, scope: 'everyone' as ScopeKey, window: '14' as WindowKey }),
+    [],
+  );
+
+  const rung1 = useBoardPage(userId, 'recent', rung1Filters, {
     limit: RECENT_PROBE_LIMIT,
     enabled: isRecent,
   });
-  const probeSettled = circleProbe.isSuccess || circleProbe.isError;
-  /* A failed probe is a silent fallback to everyone, never an error state. */
-  const recentScope: ScopeKey | null = !isRecent
-    ? null
-    : !probeSettled
-      ? null
-      : circleProbe.isSuccess && (circleProbe.data?.total ?? 0) >= CIRCLE_ROW_FLOOR
-        ? 'circle'
-        : 'everyone';
+  const rung1Settled = rung1.isSuccess || rung1.isError;
+  /* S3.4 — the rows the board would render. A failed rung is a silent step down,
+     never an error state. */
+  const rung1Ok = rung1.isSuccess && (rung1.data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
+
+  const rung2 = useBoardPage(userId, 'recent', rung2Filters, {
+    limit: RECENT_PROBE_LIMIT,
+    enabled: isRecent && rung1Settled && !rung1Ok,
+  });
+  const rung2Settled = rung2.isSuccess || rung2.isError;
+  const rung2Ok = rung2.isSuccess && (rung2.data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
+
+  /* The resolved recent pick, or null while the ladder is still climbing. */
+  let recentPick: { scope: ScopeKey; window: WindowKey } | null = null;
+  if (isRecent) {
+    if (!rung1Settled) recentPick = null;
+    else if (rung1Ok) recentPick = { scope: 'circle', window: '14' };
+    else if (!rung2Settled) recentPick = null;
+    else if (rung2Ok) recentPick = { scope: 'everyone', window: '14' };
+    /* S3.3 / S3.6 — rung 3 is terminal: 90 days, not all time. */
+    else recentPick = { scope: 'everyone', window: '90' };
+  }
 
   let board: BoardKey | null = null;
   let window: BoardPick['window'] = DEFAULT_FILTERS.window;
@@ -107,10 +131,10 @@ export function useDiscoverEntryBoard(userId: string | undefined) {
     /* S3.6 — the scope the session actually used, not a re-evaluation. */
     scope = entry.pick.scope ?? DEFAULT_FILTERS.scope;
   } else if (isRecent) {
-    if (recentScope) {
+    if (recentPick) {
       board = 'recent';
-      window = DEFAULT_FILTERS.window;
-      scope = recentScope;
+      window = recentPick.window;
+      scope = recentPick.scope;
     }
   } else if (entry.mode === 'first') {
     if (fallback.resolved) board = fallback.board;
