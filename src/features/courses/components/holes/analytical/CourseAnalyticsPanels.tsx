@@ -17,6 +17,8 @@ import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useCourseProHoleAnalysis } from '@/hooks/gam/useCourseProHoleAnalysis';
+import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
+
 
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
