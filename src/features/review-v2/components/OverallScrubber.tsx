@@ -31,6 +31,8 @@ const MARK_9 = toPct(9);
 export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabels, calibration }: Props) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [dragging, setDragging] = useState(false);
+  const ghostDragRef = useRef(false);
+  const movedRef = useRef(false);
   const color = bandColor(value);
   const fillPct = value == null ? 0 : toPct(value);
 
@@ -42,10 +44,27 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
     onChange(snap(MIN + pct * (MAX - MIN)));
   }, [onChange]);
 
+  const startDrag = useCallback((fromGhost: boolean) => {
+    setDragging(true);
+    ghostDragRef.current = fromGhost;
+    movedRef.current = false;
+  }, []);
+
+  const endDrag = useCallback(() => {
+    setDragging(false);
+    ghostDragRef.current = false;
+    movedRef.current = false;
+  }, []);
+
   useEffect(() => {
     if (!dragging) return;
-    const onMove = (e: PointerEvent) => pointerToValue(e.clientX);
-    const onUp = () => setDragging(false);
+    const onMove = (e: PointerEvent) => {
+      if (ghostDragRef.current && value == null && !movedRef.current) {
+        movedRef.current = true;
+      }
+      pointerToValue(e.clientX);
+    };
+    const onUp = () => endDrag();
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
@@ -54,7 +73,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
     };
-  }, [dragging, pointerToValue]);
+  }, [dragging, pointerToValue, endDrag, value]);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     const current = value ?? MIN;
@@ -73,6 +92,8 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
     }
   };
 
+  const showGhost = value == null;
+
   return (
     <div>
       <div
@@ -81,7 +102,7 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
           ...FIGURE,
           lineHeight: 1,
           letterSpacing: '-0.035em',
-          color,
+          color: value == null ? RV2.muted : color,
         }}
       >
         {value == null ? '--' : value.toFixed(1)}
@@ -95,10 +116,11 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
         tabIndex={0}
         aria-valuemin={1}
         aria-valuemax={10}
-        aria-valuenow={value ?? 1}
+        aria-valuenow={value ?? undefined}
+        aria-valuetext={value == null ? 'Not scored' : undefined}
         aria-label={ariaLabel}
         onPointerDown={(e) => {
-          setDragging(true);
+          startDrag(false);
           pointerToValue(e.clientX);
         }}
         onKeyDown={onKeyDown}
@@ -160,6 +182,29 @@ export function OverallScrubber({ value, onChange, caption, ariaLabel, bandLabel
               border: `2.5px solid ${color}`,
               boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
               pointerEvents: 'none',
+            }}
+          />
+        )}
+        {showGhost && (
+          <div
+            aria-hidden
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              startDrag(true);
+            }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: `${toPct(MIN)}%`,
+              transform: 'translate(-50%, -50%)',
+              width: 26,
+              height: 26,
+              borderRadius: '50%',
+              background: 'transparent',
+              border: `1.5px solid ${RV2.muted}`,
+              boxShadow: 'none',
+              cursor: 'pointer',
+              touchAction: 'none',
             }}
           />
         )}
