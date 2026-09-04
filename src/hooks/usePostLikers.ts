@@ -125,16 +125,21 @@ export function usePostLikers(
 
   const ordered = useMemo<PostLikerEnriched[]>(() => {
     const meta = enrichment.data;
-    const enrichedList = likers.map((l) => {
-      const actorId = l.actorId ?? l.userId;
-      const isBusiness = l.actorType === 'business';
-      return {
-        ...l,
-        handicapIndex: isBusiness ? null : meta?.hcp.get(actorId) ?? null,
-        businessType: isBusiness ? meta?.types.get(actorId) ?? null : null,
-        isFollowing: !isBusiness && !!meta?.following.has(actorId),
-      } as PostLikerEnriched;
-    });
+    const enrichedList = likers
+      // Blocked members are excluded from the LIST only. The count shown to the
+      // member comes from the surface's own like count, so it does not move.
+      .filter((l) => (l.actorType === 'business' ? true : !blockedIds.has(l.actorId ?? l.userId)))
+      .map((l) => {
+        const actorId = l.actorId ?? l.userId;
+        const isBusiness = l.actorType === 'business';
+        return {
+          ...l,
+          handicapIndex: isBusiness ? null : meta?.hcp.get(actorId) ?? null,
+          businessType: isBusiness ? meta?.types.get(actorId) ?? null : null,
+          isFollowing: !isBusiness && !!meta?.following.has(actorId),
+        } as PostLikerEnriched;
+      });
+
 
     // Stable partition: followed first, then everyone else. usePostLikes
     // already ordered most-recent-first, so recency survives inside groups.
