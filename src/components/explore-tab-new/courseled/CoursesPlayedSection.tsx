@@ -36,7 +36,14 @@ const PLAYS_TO_W = 62;
 const CHEVRON_W = 22;
 /** S2.3 — a rise is GREEN, a fall is A.DIM. Red on this page means UNDER PAR. */
 const TREND_UP = PODIUM_ACCENT.green;
-const TILE_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.04) 32%, rgba(0,0,0,0.76))';
+const FEATURED_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.04) 32%, rgba(0,0,0,0.76))';
+const TILE_DEPTH_SCRIM = 'linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0) 58%, rgba(0,0,0,0.18))';
+const SMALL_TILE_IMAGE_H = 76;
+/* Two name lines plus two data baselines cannot fit the brief's estimated 62px
+   strip with 19px vertical padding. 79px is the smallest non-overlapping fixed
+   strip at the specified type sizes, making every small card 155px tall. */
+const SMALL_TILE_STRIP_H = 79;
+const SMALL_TILE_H = SMALL_TILE_IMAGE_H + SMALL_TILE_STRIP_H;
 
 const CAP = {
   fontSize: 9.5,
@@ -45,6 +52,12 @@ const CAP = {
   textTransform: 'uppercase' as const,
   color: A.DIM,
 };
+
+function formatTileToPar(value: number | null): string | null {
+  if (value == null) return null;
+  if (value === 0) return 'E';
+  return value < 0 ? `\u2212${Math.abs(value)}` : `+${value}`;
+}
 
 export interface CoursesPlayedSectionProps {
   userId: string | undefined;
@@ -86,7 +99,7 @@ export function CoursesPlayedSection({
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, marginTop: 12 }}>
           <div style={{ gridColumn: '1 / -1', height: 132, background: A.PANEL, borderRadius: 10 }} />
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} style={{ height: 104, background: A.PANEL, borderRadius: 10 }} />
+            <div key={i} style={{ height: SMALL_TILE_H, background: A.PANEL, borderRadius: 10 }} />
           ))}
         </div>
       </section>
@@ -258,7 +271,9 @@ function CourseMosaicTile({
   embedded?: boolean;
 }) {
   const { t } = useTranslation('courses');
-  const height = featured ? 132 : 104;
+  const height = featured ? 132 : SMALL_TILE_H;
+  const lowToPar = formatTileToPar(row.low_to_par);
+  const lowTone = row.low_to_par == null ? A.DIM : row.low_to_par < 0 ? TOPAR_UNDER : row.low_to_par === 0 ? A.MUTE : A.INK;
   return (
     <button
       type="button"
@@ -267,6 +282,9 @@ function CourseMosaicTile({
       style={{
         gridColumn: featured || fullWidth ? '1 / -1' : undefined,
         height,
+        width: '100%',
+        display: 'block',
+        position: 'relative',
         minWidth: 0,
         padding: 0,
         border: 'none',
@@ -279,68 +297,127 @@ function CourseMosaicTile({
         boxShadow: !embedded && open ? `inset 0 0 0 1.5px ${A.INK}` : 'none',
       }}
     >
-      <CourseImageFallback
-        courseId={row.course_id}
-        courseName={row.name}
-        imageUrl={row.thumbnail_image}
-        initialsSize={featured ? 28 : 20}
-        style={{ width: '100%', height: '100%', borderRadius: embedded ? 0 : 10 }}
-      >
-        <span aria-hidden style={{ position: 'absolute', inset: 0, background: TILE_SCRIM }} />
-        <span
-          style={{
-            position: 'absolute',
-            inset: featured ? 'auto 11px 9px' : 'auto 9px 8px',
-            zIndex: 1,
-            minWidth: 0,
-            color: DISCOVER_FACT,
-          }}
+      {featured ? (
+        <CourseImageFallback
+          courseId={row.course_id}
+          courseName={row.name}
+          imageUrl={row.thumbnail_image}
+          initialsSize={28}
+          style={{ display: 'block', width: '100%', height: 132, borderRadius: 0 }}
         >
+          <span aria-hidden style={{ position: 'absolute', inset: 0, background: FEATURED_SCRIM }} />
           <span
             style={{
-              display: 'block',
-              fontSize: featured ? 15 : 11.5,
-              fontWeight: featured ? 800 : 700,
-              lineHeight: featured ? 1.2 : 1.25,
-              whiteSpace: featured ? 'normal' : 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              textShadow: '0 1px 2px rgba(0,0,0,0.72)',
+              position: 'absolute',
+              inset: 'auto 11px 9px',
+              zIndex: 1,
+              minWidth: 0,
+              color: DISCOVER_FACT,
             }}
           >
-            {row.name ?? '\u2014'}
-          </span>
-          <span style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0, marginTop: 3 }}>
             <span
               style={{
-                ...CAP,
-                color: DISCOVER_FACT,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-                minWidth: 0,
-                flex: 1,
+                display: 'block',
+                fontSize: 15,
+                fontWeight: 800,
+                lineHeight: 1.2,
                 textShadow: '0 1px 2px rgba(0,0,0,0.72)',
               }}
             >
-              {featured && row.area ? (
-                <>
-                  <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.area}</span>
-                  <span aria-hidden>·</span>
-                </>
-              ) : null}
-              <span style={{ flexShrink: 0 }}>
-                {row.rounds === 1
-                  ? t('discover.coursesPlayed.oneRound', '1 round')
-                  : t('discover.coursesPlayed.nRounds', '{{count}} rounds', { count: row.rounds })}
-              </span>
-              {featured ? <Badges row={row} /> : null}
+              {row.name ?? '\u2014'}
             </span>
-            <PlaysTo value={row.plays_to} width="auto" fontSize={featured ? 15 : 12.5} weight={800} color={DISCOVER_FACT} />
+            <span style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0, marginTop: 3 }}>
+              <span
+                style={{
+                  ...CAP,
+                  color: DISCOVER_FACT,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  minWidth: 0,
+                  flex: 1,
+                  textShadow: '0 1px 2px rgba(0,0,0,0.72)',
+                }}
+              >
+                {row.area ? (
+                  <>
+                    <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.area}</span>
+                    <span aria-hidden>·</span>
+                  </>
+                ) : null}
+                <span style={{ flexShrink: 0 }}>
+                  {row.rounds === 1
+                    ? t('discover.coursesPlayed.oneRound', '1 round')
+                    : t('discover.coursesPlayed.nRounds', '{{count}} rounds', { count: row.rounds })}
+                </span>
+                <Badges row={row} />
+              </span>
+              <PlaysTo value={row.plays_to} width="auto" fontSize={15} weight={800} color={DISCOVER_FACT} />
+            </span>
           </span>
-        </span>
-        {!embedded && open ? <span aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 10, boxShadow: `inset 0 0 0 1.5px ${A.INK}`, zIndex: 2 }} /> : null}
-      </CourseImageFallback>
+        </CourseImageFallback>
+      ) : (
+        <>
+          <CourseImageFallback
+            courseId={row.course_id}
+            courseName={row.name}
+            imageUrl={row.thumbnail_image}
+            initialsSize={20}
+            style={{ display: 'block', width: '100%', height: SMALL_TILE_IMAGE_H, borderRadius: 0 }}
+          >
+            <span aria-hidden style={{ position: 'absolute', inset: 0, background: TILE_DEPTH_SCRIM }} />
+          </CourseImageFallback>
+          <span
+            style={{
+              display: 'flex',
+              height: SMALL_TILE_STRIP_H,
+              flexDirection: 'column',
+              boxSizing: 'border-box',
+              padding: '9px 10px 10px',
+              background: A.PANEL,
+              color: A.INK,
+            }}
+          >
+            <span
+              style={{
+                display: '-webkit-box',
+                height: 29,
+                overflow: 'hidden',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 2,
+                fontSize: 11.5,
+                fontWeight: 700,
+                lineHeight: 1.25,
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {row.name ?? '\u2014'}
+            </span>
+            <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 6, marginTop: 2 }}>
+              <span style={CAP}>
+                {t('discover.coursesPlayed.nRounds', '{{count}} rounds', { count: row.rounds })}
+              </span>
+              <PlaysTo value={row.plays_to} width="auto" fontSize={13.5} weight={800} />
+            </span>
+            {row.low_gross != null ? (
+              <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 6, marginTop: 2 }}>
+                <span style={CAP}>{t('discover.coursesPlayed.low', 'Low')}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+                  <span className="tabular-nums" style={{ fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1 }}>
+                    {row.low_gross}
+                  </span>
+                  {lowToPar ? (
+                    <span className="tabular-nums" style={{ fontSize: 10, fontWeight: 700, color: lowTone, lineHeight: 1 }}>
+                      {lowToPar}
+                    </span>
+                  ) : null}
+                </span>
+              </span>
+            ) : null}
+          </span>
+        </>
+      )}
+      {!embedded && open ? <span aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 10, boxShadow: `inset 0 0 0 1.5px ${A.INK}`, zIndex: 2, pointerEvents: 'none' }} /> : null}
     </button>
   );
 }
@@ -741,7 +818,7 @@ function PlaysTo({
   const tone = color ?? (value < 0 ? TOPAR_UNDER : A.INK);
 
   return (
-    <span style={{ width: PLAYS_TO_W, flexShrink: 0, textAlign: 'right' }}>
+    <span style={{ width, flexShrink: 0, textAlign: 'right' }}>
       <span className="tabular-nums" style={{ fontSize, fontWeight: weight, color: tone, lineHeight: 1, textShadow: color ? '0 1px 2px rgba(0,0,0,0.72)' : undefined }}>
         {text}
       </span>
