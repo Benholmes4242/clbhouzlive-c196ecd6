@@ -38,6 +38,7 @@ import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import { MediaCarousel } from './MediaCarousel';
 import { FeedFollowPill } from './FeedFollowPill';
+import { LikedByRow } from '@/components/likes/LikedByRow';
 import { FeedActorPicker } from './FeedActorPicker';
 import Pressable from '@/components/ui/Pressable';
 import { HeartBurst } from './HeartBurst';
