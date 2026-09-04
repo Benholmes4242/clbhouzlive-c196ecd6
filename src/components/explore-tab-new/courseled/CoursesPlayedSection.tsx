@@ -383,11 +383,9 @@ const STACK_CAP = 5;
 function AvatarStack({
   players,
   lowBy,
-  viewerId,
 }: {
   players: BoardCoursePlayer[];
   lowBy: string | null;
-  viewerId: string | undefined;
 }) {
   if (players.length === 0) return null;
 
@@ -411,9 +409,9 @@ function AvatarStack({
             src={p.profile_photo_url}
             alt={p.display_name ?? ''}
             userId={p.user_id}
-            thinRing
-            /* S5.3 — the viewer's ring is amber. It is the only amber in the panel. */
-            ringColor={viewerId && p.user_id === viewerId ? A.AMBER : A.PANEL}
+            /* The canonical hairline ring, identical to the board's avatars.
+               NO amber: an avatar is never amber, including the viewer's own. */
+            hairlineRing
           />
         </span>
       ))}
@@ -471,9 +469,9 @@ function LowRoundLine({
       {players.isPending ? (
         <span aria-hidden style={{ display: 'inline-block', width: 22, height: 22 }} />
       ) : (
-        <AvatarStack players={players.data ?? []} lowBy={row.low_by} viewerId={userId} />
+        <AvatarStack players={players.data ?? []} lowBy={row.low_by} />
       )}
-      <span style={{ ...CAP, color: A.MUTE }}>
+      <span style={{ ...CAP, color: A.MUTE, marginLeft: 'auto' }}>
         {t('discover.coursesPlayed.lowRoundBy', 'Low round by {{name}}', {
           name: row.low_by ?? '\u2014',
         })}
