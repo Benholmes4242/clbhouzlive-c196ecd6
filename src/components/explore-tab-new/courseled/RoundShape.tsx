@@ -1,11 +1,17 @@
 import { useTranslation } from 'react-i18next';
 import type { CSSProperties, ReactNode } from 'react';
 import { TrajectoryLine } from '@/features/courses/_shared/scorecard/TrajectoryLine';
-import { SC_BIRDIE_DARK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import {
+  SC_FILL_BIRDIE_DK,
+  SC_FILL_BOGEY_DK,
+  SC_FILL_DOUBLE_DK,
+  SC_FILL_GOLD,
+  SC_FILL_TRIPLE_DK,
+} from '@/features/courses/components/holes/_constants';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { TOPAR_EVEN_LIGHT, WHITE_ALPHA_18 } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
 
 import { A, CHIP_RADIUS } from './tokens';
@@ -512,23 +518,17 @@ const MINI_FAINT = A.MUTE;
 void MINI_FAINT;
 const MINI_GHOST = A.DIM;
 const ACE_GOLD = SC_FILL_GOLD;
-const UNDER_INK = SC_BIRDIE_DARK;
-/* Match ScoreMark exactly on dark: both over-par marks use WHITE_ALPHA_18.
-   At this 17px size the double's 1px ring is the entire magnitude distinction;
-   do not soften it without reopening the shared contrast decision. */
-const BOGEY_GROUND = WHITE_ALPHA_18;
-const DOUBLE_GROUND = WHITE_ALPHA_18;
+const UNDER_FILL = SC_FILL_BIRDIE_DK;
 
 /** Dark-only fallback for the surface the grid sits on. Callers pass their
  * exact host well so ring spacers always trace the rendered surface. */
 export const MINI_WELL = A.PANEL;
 
 /** §S1.3 — the Clubhouse card's own key, not a second vocabulary. */
-type Marker = 'ace' | 'albatross' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double';
+type Marker = 'albatross' | 'eagle' | 'birdie' | 'par' | 'bogey' | 'double' | 'triple';
 
 function markerFor(strokes: number | null, par: number | null): Marker | null {
   if (strokes == null || !Number.isFinite(strokes)) return null;
-  if (strokes === 1) return 'ace';
   if (par == null) return 'par';
   const d = strokes - par;
   if (d <= -3) return 'albatross';
@@ -536,7 +536,8 @@ function markerFor(strokes: number | null, par: number | null): Marker | null {
   if (d === -1) return 'birdie';
   if (d === 0) return 'par';
   if (d === 1) return 'bogey';
-  return 'double';
+  if (d === 2) return 'double';
+  return 'triple';
 }
 
 /** THE PILL GRAMMAR AT 17PX. Every event mark is circular. Under par is a solid
@@ -586,17 +587,21 @@ function markerStyle(m: Marker | null, well: string): CSSProperties {
     color,
   });
   switch (m) {
-    case 'ace':
     case 'albatross':
-      return magnitude(ACE_GOLD, UNDER_INK, A.INK);
+      return {
+        ...magnitude(ACE_GOLD, ACE_GOLD, A.CANVAS),
+        boxShadow: `inset 0 0 0 1px ${well}, 0 0 0 1px ${well}, 0 0 0 2px ${ACE_GOLD}`,
+      };
     case 'eagle':
-      return magnitude(UNDER_INK, UNDER_INK, A.INK);
+      return magnitude(ACE_GOLD, ACE_GOLD, A.CANVAS);
     case 'birdie':
-      return { ...base, ...filled, background: UNDER_INK, color: A.INK };
+      return { ...base, ...filled, background: UNDER_FILL, color: A.INK };
     case 'bogey':
-      return { ...base, ...filled, background: BOGEY_GROUND };
+      return { ...base, border: `1px solid ${SC_FILL_BOGEY_DK}` };
     case 'double':
-      return magnitude(MINI_INK, DOUBLE_GROUND, MINI_INK);
+      return { ...base, background: SC_FILL_DOUBLE_DK, color: A.INK };
+    case 'triple':
+      return magnitude(SC_FILL_TRIPLE_DK, SC_FILL_TRIPLE_DK, A.INK);
     default:
       /* PAR IS BARE INK — no ring, no box, no tint, MARKED OR NOT. The baseline
          recedes. */

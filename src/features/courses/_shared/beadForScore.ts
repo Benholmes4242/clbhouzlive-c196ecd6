@@ -46,7 +46,7 @@ export function beadForScore(
 ): Bead | null {
   if (strokes == null || par == null || strokes <= 0) return null;
   const d = strokes - par;
-  if (strokes === 1 || d <= -3) return { tone: SC_FILL_GOLD, radius: 5 };
+  if (d <= -3) return { tone: SC_FILL_GOLD, radius: 5 };
   return null;
 }
 

@@ -3,6 +3,10 @@ import {
   INK,
   SC_FILL_GOLD,
   SC_FILL_BIRDIE,
+  SC_FILL_BIRDIE_DK,
+  SC_FILL_BOGEY_DK,
+  SC_FILL_DOUBLE_DK,
+  SC_FILL_TRIPLE_DK,
   SC_PAR,
   SC_PAR_DARK,
 } from '@/features/courses/components/holes/_constants';
@@ -47,18 +51,19 @@ type Variant =
   | 'alba'
   | 'hio'
   | 'bogey'
-  | 'doub';
+  | 'doub'
+  | 'triple';
 
 const variantFor = (strokes: number | null | undefined, par: number): Variant => {
   if (strokes == null || strokes <= 0) return 'empty';
-  if (strokes === 1) return 'hio';
   const diff = strokes - par;
   if (diff <= -3) return 'alba';
   if (diff === -2) return 'eagle';
   if (diff === -1) return 'birdie';
   if (diff === 0) return 'par';
   if (diff === 1) return 'bogey';
-  return 'doub';
+  if (diff === 2) return 'doub';
+  return 'triple';
 };
 
 const OVER_INK_LIGHT = INK;
@@ -104,7 +109,7 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   const variant = variantFor(strokes, par);
 
   const under = variant === 'birdie' || variant === 'eagle' || variant === 'alba' || variant === 'hio';
-  const over = variant === 'bogey' || variant === 'doub';
+  const over = variant === 'bogey' || variant === 'doub' || variant === 'triple';
   const hasMark = under || over;
   const magnitudeRing = variant === 'eagle' || variant === 'alba' || variant === 'hio' || variant === 'doub';
   const goldRing = variant === 'alba' || variant === 'hio';
@@ -133,6 +138,103 @@ export const ScoreMark: React.FC<ScoreMarkProps> = ({
   else numColour = overInk;
 
   const numWeight = 700;
+
+  if (surface === 'dark') {
+    const ringCount = variant === 'alba' ? 2 : variant === 'eagle' || variant === 'triple' ? 1 : 0;
+    const shape = over ? '0%' : '50%';
+    const darkFill =
+      variant === 'birdie'
+        ? SC_FILL_BIRDIE_DK
+        : variant === 'eagle' || variant === 'alba'
+          ? SC_FILL_GOLD
+          : variant === 'doub'
+            ? SC_FILL_DOUBLE_DK
+            : variant === 'triple'
+              ? SC_FILL_TRIPLE_DK
+              : 'transparent';
+    const darkTone = variant === 'bogey' ? SC_FILL_BOGEY_DK : darkFill;
+    const darkNumeral =
+      colourOverride ??
+      (variant === 'empty'
+        ? emptyInk
+        : variant === 'par'
+          ? parInk
+          : variant === 'eagle' || variant === 'alba'
+            ? '#15171F'
+            : INK);
+    const ringStep = STROKE + RING_GAP;
+    const markInset = ringCount * ringStep;
+
+    return (
+      <span
+        style={{
+          position: 'relative',
+          width: size,
+          height: size,
+          flex: 'none',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 1,
+          overflow: 'visible',
+        }}
+      >
+        {Array.from({ length: ringCount }, (_, i) => (
+          <span
+            key={i}
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              inset: i * ringStep,
+              borderRadius: shape,
+              border: `${STROKE}px solid ${darkTone}`,
+              pointerEvents: 'none',
+            }}
+          />
+        ))}
+        {variant === 'bogey' && (
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: 0,
+              border: `${STROKE}px solid ${SC_FILL_BOGEY_DK}`,
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+        {hasMark && variant !== 'bogey' && (
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              inset: markInset,
+              borderRadius: shape,
+              background: darkFill,
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+        {showStroke && (
+          <span
+            style={{
+              position: 'relative',
+              fontSize: Math.round(size * 0.42),
+              fontWeight: numWeight,
+              lineHeight: 1,
+              letterSpacing: '-0.02em',
+              fontVariantNumeric: 'tabular-nums',
+              fontFeatureSettings: '"zero" 0',
+              color: darkNumeral,
+            }}
+          >
+            {numeral}
+          </span>
+        )}
+      </span>
+    );
+  }
 
   return (
     <span
