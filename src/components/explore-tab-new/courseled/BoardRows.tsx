@@ -301,6 +301,7 @@ export function BoardRowView({
   board,
   isSelf,
   gap,
+  hideValue,
   onPress,
 }: {
   row: Row;
@@ -308,6 +309,8 @@ export function BoardRowView({
   isSelf: boolean;
   /** Only the PINNED copy of the member's row carries this (S5.4). */
   gap?: string | null;
+  /** S4.3 — the day-grouped sheet states WHEN in its group header instead. */
+  hideValue?: boolean;
   onPress?: (row: Row) => void;
 }) {
   const { t } = useTranslation('courses');
@@ -333,7 +336,9 @@ export function BoardRowView({
         alignItems: 'center',
         gap: 10,
         padding: '6px 2px',
-        background: 'transparent',
+        /* S1.2 — the member's own row carries the amber tint wherever it lands,
+           on the board and in the long sheet alike. */
+        background: isSelf ? 'rgba(247,147,30,0.08)' : 'transparent',
         border: 'none',
         textAlign: 'left',
         fontFamily: SANS,
