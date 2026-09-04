@@ -10,8 +10,6 @@ import {
   SC_PAR,
   SC_PAR_DARK,
 } from '@/features/courses/components/holes/_constants';
-import {
-} from '@/features/tourhub/_shared/tokens';
 
 /**
  * ScoreMark - the universal scoring-mark renderer.
