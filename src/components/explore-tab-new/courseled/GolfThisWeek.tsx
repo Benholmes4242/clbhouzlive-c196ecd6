@@ -349,10 +349,10 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
         )}
       </div>
 
-      {/* R4 — the shared terminal row ends the board. The courses masthead is
-          the next break, after one deliberate 30px step and no duplicate rule. */}
+      {/* Amendment J — the courses disclosure is the board's second terminal
+          row, with no section gap between the two siblings. */}
       {children ? (
-        <div style={{ marginTop: 30, padding: '0 14px' }}>
+        <div style={{ padding: '0 14px' }}>
           {children}
         </div>
       ) : null}
