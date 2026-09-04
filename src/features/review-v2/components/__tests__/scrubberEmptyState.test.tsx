@@ -9,6 +9,13 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { OverallScrubber } from '../OverallScrubber';
 
+/** The handle is the last child of the track, inside the slider. */
+function handleOf(container: HTMLElement): HTMLElement {
+  const slider = container.querySelector('[role="slider"]')!;
+  const track = slider.firstElementChild!;
+  return track.lastElementChild as HTMLElement;
+}
+
 const props = {
   caption: '',
   ariaLabel: 'Overall',
@@ -33,9 +40,7 @@ describe('OverallScrubber empty state', () => {
     const { container } = render(
       <OverallScrubber value={null} onChange={onChange} {...props} />,
     );
-    // The handle is the last absolutely-positioned child of the track.
-    const handle = container.querySelectorAll('[aria-hidden]');
-    const target = handle[handle.length - 1] as HTMLElement;
+    const target = handleOf(container);
     fireEvent.pointerDown(target, { clientX: 10 });
     fireEvent.pointerUp(window);
     expect(onChange).not.toHaveBeenCalled();
@@ -46,8 +51,7 @@ describe('OverallScrubber empty state', () => {
     const { container } = render(
       <OverallScrubber value={null} onChange={onChange} {...props} />,
     );
-    const nodes = container.querySelectorAll('[aria-hidden]');
-    const target = nodes[nodes.length - 1] as HTMLElement;
+    const target = handleOf(container);
     fireEvent.pointerDown(target, { clientX: 10 });
     fireEvent.pointerMove(window, { clientX: 120 });
     expect(onChange).toHaveBeenCalled();
