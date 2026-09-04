@@ -98,7 +98,11 @@ export function CoursesPlayedSeeAllSheet({
         <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 700, color: A.INK, textTransform: 'uppercase' }}>
           {t('discover.coursesPlayed.nCourses', '{{count}} courses', { count: total })}
         </div>
-        <div style={{ ...KICKER, marginTop: 6, color: A.MUTE }}>{windowLabel}</div>
+        <div style={{ ...KICKER, marginTop: 6, color: A.MUTE }}>
+          {appliedParts.map((part, index) => (
+            <span key={`${part}:${index}`}>{index > 0 ? <> {'\u00B7'} </> : null}{part}</span>
+          ))}
+        </div>
       </div>
 
       <div
