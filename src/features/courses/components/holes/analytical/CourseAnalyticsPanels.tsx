@@ -394,7 +394,7 @@ export function buildParTypeRows(
     });
 }
 
-const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows, fieldAvg }) => {
+const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number; fieldIsOnlyYou: boolean }> = ({ rows, fieldAvg, fieldIsOnlyYou }) => {
   const { t } = useTranslation(['courses']);
   if (rows.length === 0) return null;
 
@@ -456,7 +456,7 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
                     display: 'block',
                   }}
                 />
-                {r.you != null && (
+                {r.you != null && !fieldIsOnlyYou && (
                   <i
                     aria-hidden="true"
                     style={{
@@ -481,18 +481,9 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
                   whiteSpace: 'nowrap',
                 }}
               >
-                <span
-                  style={{
-                    fontSize: 13.5,
-                    fontWeight: 700,
-                    color: fieldFig ? fieldFig.tone : A.INK,
-                    minWidth: 34,
-                    textAlign: 'right',
-                  }}
-                >
-                  {fieldFig ? fieldFig.text : ''}
-                </span>
-                {anyYou && (
+                {fieldIsOnlyYou ? (
+                  /* NO FIELD: one figure per par type - the member's own,
+                     amber as everywhere the member's figure appears. */
                   <span
                     style={{
                       fontSize: 13.5,
@@ -502,8 +493,35 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
                       textAlign: 'right',
                     }}
                   >
-                    {youFig ? youFig.text : ''}
+                    {youFig ? youFig.text : fieldFig ? fieldFig.text : ''}
                   </span>
+                ) : (
+                  <>
+                    <span
+                      style={{
+                        fontSize: 13.5,
+                        fontWeight: 700,
+                        color: fieldFig ? fieldFig.tone : A.INK,
+                        minWidth: 34,
+                        textAlign: 'right',
+                      }}
+                    >
+                      {fieldFig ? fieldFig.text : ''}
+                    </span>
+                    {anyYou && (
+                      <span
+                        style={{
+                          fontSize: 13.5,
+                          fontWeight: 700,
+                          color: A.AMBER_DEEP,
+                          minWidth: 34,
+                          textAlign: 'right',
+                        }}
+                      >
+                        {youFig ? youFig.text : ''}
+                      </span>
+                    )}
+                  </>
                 )}
               </span>
             </div>
@@ -511,12 +529,15 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number }> = ({ rows
         })}
       </div>
 
-      {/* SAID ONCE, beneath the rows - never on every row. */}
-      <div style={{ ...LABEL, marginTop: 11 }}>
-        {anyYou
-          ? t('courses:courseDetail.parTypes.keyBoth')
-          : t('courses:courseDetail.parTypes.keyField')}
-      </div>
+      {/* SAID ONCE, beneath the rows - never on every row. With no field
+          there is no bar-versus-line to explain, so no caption. */}
+      {!fieldIsOnlyYou && (
+        <div style={{ ...LABEL, marginTop: 11 }}>
+          {anyYou
+            ? t('courses:courseDetail.parTypes.keyBoth')
+            : t('courses:courseDetail.parTypes.keyField')}
+        </div>
+      )}
     </Panel>
   );
 };
@@ -827,7 +848,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
       </Panel>
 
       {/* §A4 - How each par plays, between How it plays and Hole by hole. */}
-      <ParTypePanel rows={parRows} fieldAvg={stats.fieldAvg} />
+      <ParTypePanel rows={parRows} fieldAvg={stats.fieldAvg} fieldIsOnlyYou={stats.fieldIsOnlyYou} />
 
 
       {/* Block 3 - Hole by hole. THE NARRATION IS GONE (§A1): the columns beneath
