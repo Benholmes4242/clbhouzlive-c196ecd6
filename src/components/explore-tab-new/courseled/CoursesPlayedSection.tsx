@@ -280,7 +280,7 @@ export function CourseRow({
             >
               {row.name ?? '\u2014'}
             </span>
-            {/* S2.2 — area · N rounds [trend] · N members. */}
+            {/* S2.2 (AMENDMENT B2) — area · N rounds [trend]. No member count. */}
             <span
               style={{
                 display: 'flex',
@@ -289,13 +289,15 @@ export function CourseRow({
                 marginTop: 2,
                 ...CAP,
                 color: A.MUTE,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
               }}
             >
               {row.area ? (
                 <>
                   <span
                     style={{
-                      maxWidth: 110,
+                      minWidth: 0,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -306,19 +308,14 @@ export function CourseRow({
                   <span aria-hidden>{'\u00b7'}</span>
                 </>
               ) : null}
-              <span>
+              <span style={{ flexShrink: 0 }}>
                 {row.rounds === 1
                   ? t('discover.coursesPlayed.oneRound', '1 round')
                   : t('discover.coursesPlayed.nRounds', '{{count}} rounds', { count: row.rounds })}
               </span>
               <Badges row={row} />
-              <span aria-hidden>{'\u00b7'}</span>
-              <span>
-                {row.members === 1
-                  ? t('discover.coursesPlayed.oneMember', '1 member')
-                  : t('discover.coursesPlayed.nMembers', '{{count}} members', { count: row.members })}
-              </span>
             </span>
+
           </span>
         </span>
 
