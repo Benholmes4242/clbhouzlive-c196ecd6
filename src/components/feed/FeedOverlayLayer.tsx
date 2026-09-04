@@ -231,6 +231,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           likesCount={likeState.count}
           commentsCount={commentCount}
           onLike={() => onLike(activePost)}
+          onOpenLikes={readOnly ? undefined : () => setLikesOpen(true)}
           onComment={onComment}
           onShare={() => onShare(activePost)}
           onMore={onMore}
@@ -295,6 +296,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           likesCount={likeState.count}
           commentsCount={commentCount}
           onLike={() => onLike(activePost)}
+          onOpenLikes={readOnly ? undefined : () => setLikesOpen(true)}
           onComment={onComment}
           onShare={() => onShare(activePost)}
           onMore={onMore}
