@@ -52,16 +52,12 @@ export interface CourseHolePanelProps {
   courseId: string;
   userId: string | undefined;
   onCoursePress?: (courseId: string) => void;
-  /** The featured course keeps its first two blocks visible and owns one
-   * disclosure row for the final block. Other callers retain the full panel. */
-  mode?: 'full' | 'featured';
 }
 
 export function CourseHolePanel({
   courseId,
   userId,
   onCoursePress,
-  mode = 'full',
 }: CourseHolePanelProps) {
   const { t } = useTranslation('courses');
   const analysis = useCourseHoleAnalysis(courseId);
@@ -79,16 +75,14 @@ export function CourseHolePanel({
   /* Acceptance 12 — nothing renders then swaps. Both reads settle first. */
   const settling = analysis.isPending || (Boolean(userId) && mine.isPending);
   if (settling) {
-    return mode === 'featured' ? (
-      <div aria-hidden style={{ minHeight: 330 }} />
-    ) : null;
+    return <div aria-hidden style={{ minHeight: 330 }} />;
   }
 
   /* S7.1 — the sample gate. A course with no hole data at all lands here too:
      get_course_hole_analysis returns available: false with zero rounds. */
   if (!analysis.data?.available || holes.length === 0 || totalRounds < SAMPLE_FLOOR) {
     return (
-      <div style={{ ...CAP, padding: mode === 'featured' ? '0 14px 14px' : '2px 0 4px', lineHeight: 1.5 }}>
+      <div style={{ ...CAP, padding: '2px 0 4px', lineHeight: 1.5 }}>
         {t(
           'discover.coursesPlayed.notEnoughDetail',
           '{{count}} rounds here carry hole detail \u2014 not enough for a course picture yet',
@@ -122,24 +116,22 @@ export function CourseHolePanel({
   const field = toParParts(fieldAvg);
   const you = toParParts(yourAvg);
 
-  const featured = mode === 'featured';
-
   return (
-    <div style={{ fontFamily: SANS, ...FIGS, minHeight: featured ? 330 : undefined }}>
+    <div style={{ fontFamily: SANS, ...FIGS, minHeight: 330 }}>
       {/* P1 — The analytics are COURSE-WIDE while the page above them is filtered. The
           basis line is now the single heading for everything beneath it: chart, By par,
           and Hole by hole. */}
-      <AnalyticsBasis count={totalRounds} featured={featured} />
+      <AnalyticsBasis count={totalRounds} />
 
       {/* BLOCK 1 — the chart, directly beneath the basis heading (P1.3). */}
-      <Block first fullBleed={featured}>
+      <Block first>
         <HoleChart
           holes={holes}
           myByHole={myByHole}
           hasYou={hasYou}
           fieldIsOnlyYou={fieldIsOnlyYou}
           initialHole={hardest.hole_no}
-          surface={featured ? A.CANVAS : A.PANEL}
+          surface={A.PANEL}
         />
         {!fieldIsOnlyYou && (
           <div
@@ -176,47 +168,25 @@ export function CourseHolePanel({
 
       {/* BLOCK 2 — BY PAR (P2.1). */}
       {parRows.length > 0 && (
-        <Block title={t('discover.coursesPlayed.howEachPar', 'By par')} fullBleed={featured}>
+        <Block title={t('discover.coursesPlayed.howEachPar', 'By par')}>
           <ParBars rows={parRows} fieldIsOnlyYou={fieldIsOnlyYou} />
         </Block>
       )}
 
-      {featured ? (
-        /* M1 — no chevron. Hole by hole and View course are always visible. */
-        <>
-          <Block
-            title={t('holes.preview.eyebrow', 'Hole by hole')}
-            fullBleed
-          >
-            {shares && <DistributionStrip shares={shares} />}
-            <Extremes hardest={hardest} easiest={easiest} />
-          </Block>
-          {/* P3 — 12px bottom padding + 8px grid gap = 20px break before tiles; no hairline. */}
-          <div style={{ padding: '0 14px 12px' }}>
-            <ListTerminalRow
-              borderless
-              label={t('discover.coursesPlayed.viewCourse', 'View course')}
-              onPress={() => onCoursePress?.(courseId)}
-            />
-          </div>
-        </>
-      ) : (
-        <>
-          <Block title={t('holes.preview.eyebrow', 'Hole by hole')}>
-            {shares && <DistributionStrip shares={shares} />}
-            <Extremes hardest={hardest} easiest={easiest} />
-          </Block>
-          <ListTerminalRow
-            label={t('discover.coursesPlayed.viewCourse', 'View course')}
-            onPress={() => onCoursePress?.(courseId)}
-          />
-        </>
-      )}
+      {/* M1 / Q2.5 — no disclosure: the final analytical block is always visible. */}
+      <Block title={t('holes.preview.eyebrow', 'Hole by hole')}>
+        {shares && <DistributionStrip shares={shares} />}
+        <Extremes hardest={hardest} easiest={easiest} />
+      </Block>
+      <ListTerminalRow
+        label={t('discover.coursesPlayed.viewCourse', 'View course')}
+        onPress={() => onCoursePress?.(courseId)}
+      />
     </div>
   );
 }
 
-function AnalyticsBasis({ count, featured }: { count: number; featured: boolean }) {
+function AnalyticsBasis({ count }: { count: number }) {
   const { t } = useTranslation('courses');
   return (
     <div
@@ -225,7 +195,7 @@ function AnalyticsBasis({ count, featured }: { count: number; featured: boolean 
         alignItems: 'baseline',
         justifyContent: 'space-between',
         gap: 12,
-        padding: featured ? '12px 14px 0' : '12px 0 0',
+        padding: '12px 0 0',
         borderTop: `1px solid ${A.BORDER}`,
         whiteSpace: 'nowrap',
       }}
@@ -254,20 +224,18 @@ function Block({
   title,
   note,
   first,
-  fullBleed,
   children,
 }: {
   title?: string;
   note?: string;
   first?: boolean;
-  fullBleed?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div
       style={{
         borderTop: first ? 'none' : `1px solid ${A.BORDER}`,
-        padding: fullBleed ? (first ? '2px 14px 12px' : '12px 14px') : (first ? '2px 0 12px' : '12px 0'),
+        padding: first ? '2px 0 12px' : '12px 0',
       }}
     >
       {title ? (

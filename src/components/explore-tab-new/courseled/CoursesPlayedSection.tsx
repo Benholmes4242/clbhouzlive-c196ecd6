@@ -237,15 +237,14 @@ function FeaturedCourseCard({
         onToggle={() => {}}
         embedded
       />
-      <div style={{ padding: '12px 14px 0' }}>
-        <LowRoundLine row={row} userId={userId} filters={filters} />
+      <div style={{ margin: '10px 14px 12px' }}>
+        <CourseAnalyticsCard
+          row={row}
+          userId={userId}
+          filters={filters}
+          onCoursePress={onCoursePress}
+        />
       </div>
-      <CourseHolePanel
-        courseId={row.course_id}
-        userId={userId}
-        onCoursePress={onCoursePress}
-        mode="featured"
-      />
     </div>
   );
 }
@@ -456,7 +455,37 @@ function CourseMosaicPanel({
   onCoursePress?: (courseId: string) => void;
 }) {
   return (
-    <div style={{ gridColumn: '1 / -1', padding: '12px 12px 10px', background: A.PANEL, borderRadius: 10, overflow: 'hidden' }}>
+    <div style={{ gridColumn: '1 / -1' }}>
+      <CourseAnalyticsCard row={row} userId={userId} filters={filters} onCoursePress={onCoursePress} />
+    </div>
+  );
+}
+
+/**
+ * Amendment Q — the featured analytics and an opened tile are the same object.
+ * The photograph is deliberately owned by the caller and never enters this card.
+ */
+function CourseAnalyticsCard({
+  row,
+  userId,
+  filters,
+  onCoursePress,
+}: {
+  row: BoardCourseRow;
+  userId: string | undefined;
+  filters: BoardFilters;
+  onCoursePress?: (courseId: string) => void;
+}) {
+  return (
+    <div
+      data-course-analytics-card
+      style={{
+        padding: '12px 12px 10px',
+        background: A.PANEL,
+        borderRadius: 12,
+        overflow: 'hidden',
+      }}
+    >
       <LowRoundLine row={row} userId={userId} filters={filters} />
       <CourseHolePanel courseId={row.course_id} userId={userId} onCoursePress={onCoursePress} />
     </div>
