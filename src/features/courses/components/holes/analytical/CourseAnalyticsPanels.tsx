@@ -169,8 +169,9 @@ const ShapeChart: React.FC<{
 
   /* §4.1 - 1, 9, 18. THREE COORDINATES, NOT FOUR AND NOT EIGHTEEN: the ends are
      read, the turn orients, and anything more is a second chart competing with
-     the first. The datum is named separately, at the axis's right. */
+     the first. PAR sits on its own row above the datum at the left. */
   const axisIdx = Array.from(new Set([0, Math.min(n - 1, 8), n - 1])).sort((a, b) => a - b);
+  const datumLabelClearance = 24;
 
   return (
     <>
@@ -190,7 +191,7 @@ const ShapeChart: React.FC<{
               above it. Without a drawn zero, a level hole is a bar of no height
               with nothing to be level with. */}
           <line
-            x1={0}
+            x1={datumLabelClearance}
             x2={W}
             y1={yBase}
             y2={yBase}
@@ -198,6 +199,16 @@ const ShapeChart: React.FC<{
             strokeWidth={1}
             vectorEffect="non-scaling-stroke"
           />
+          <text
+            x={0}
+            y={yBase - 4}
+            fill={A.DIM}
+            fontSize={8.5}
+            fontWeight={700}
+            textAnchor="start"
+          >
+            PAR
+          </text>
           {!fieldIsOnlyYou && holes.map((h, i) => {
             const yv = y(h.avg_to_par);
             const top = Math.min(yv, yBase);
@@ -266,7 +277,8 @@ const ShapeChart: React.FC<{
         )}
 
 
-        {/* End dot in real pixels so it stays circular. */}
+        {/* End dot in real pixels so it stays circular. Amber is the fill; the
+            thin canvas stroke only separates it from the bar beneath. */}
         {endPt && (
           <span
             style={{
@@ -274,11 +286,12 @@ const ShapeChart: React.FC<{
               left: `${(endPt.x / W) * 100}%`,
               top: endPt.y,
               transform: 'translate(-50%, -50%)',
-              width: 7,
-              height: 7,
+              width: 6.8,
+              height: 6.8,
               borderRadius: '50%',
               background: A.AMBER,
-              boxShadow: `0 0 0 2.5px ${A.INK}`,
+              border: `1.2px solid ${A.CANVAS}`,
+              boxSizing: 'border-box',
             }}
           />
         )}
@@ -306,18 +319,6 @@ const ShapeChart: React.FC<{
             </span>
           );
         })}
-        <span
-          style={{
-            ...LABEL,
-            position: 'absolute',
-            right: 0,
-            fontSize: 10,
-            fontWeight: 600,
-            color: A.DIM,
-          }}
-        >
-          {'PAR'}
-        </span>
       </div>
     </>
   );
