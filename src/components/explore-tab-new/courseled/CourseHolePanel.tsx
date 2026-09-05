@@ -131,7 +131,6 @@ export function CourseHolePanel({
           hasYou={hasYou}
           fieldIsOnlyYou={fieldIsOnlyYou}
           initialHole={hardest.hole_no}
-          surface={A.PANEL}
         />
         {!fieldIsOnlyYou && (
           <div
@@ -272,14 +271,12 @@ function HoleChart({
   hasYou,
   fieldIsOnlyYou,
   initialHole,
-  surface,
 }: {
   holes: CourseHole[];
   myByHole: Map<number, MyHolePerformanceRow>;
   hasYou: boolean;
   fieldIsOnlyYou: boolean;
   initialHole: number;
-  surface: string;
 }) {
   const { t } = useTranslation('courses');
   const [sel, setSel] = useState(() => Math.max(0, holes.findIndex((h) => h.hole_no === initialHole)));
