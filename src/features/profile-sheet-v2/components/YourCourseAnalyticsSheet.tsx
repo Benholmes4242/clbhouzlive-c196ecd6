@@ -29,7 +29,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
 import { useMyRoundsByCourse, type CourseRoundPoint } from '@/hooks/gam/useMyRoundsByCourse';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { RAMP_DIST } from '@/features/courses/components/holes/analytical/tokens';
 
 import monotonePath from '@/lib/charts/monotonePath';
 
@@ -66,10 +66,13 @@ const DOT = '\u00B7';
  * viewing member.
  */
 const DIST = {
-  eagles: SC_FILL_GOLD,
-  birdies: A.RED,
-  pars: A.DIM,
-  bogeys: 'rgba(248,250,252,0.66)',
+  eagles: RAMP_DIST.eagles,
+  birdies: RAMP_DIST.birdie,
+  pars: RAMP_DIST.par,
+  /* BOGEYS+ IS BLUE, NOT A WHITE ALPHA (§5.3). The former neutral tail read as
+     a faded par and made a four-segment bar a two-colour bar. The scorecard
+     blue is a HUE, so it separates from par without adding a second red. */
+  bogeys: RAMP_DIST.bogey,
 } as const;
 
 /**

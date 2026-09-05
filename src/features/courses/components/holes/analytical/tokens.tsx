@@ -25,7 +25,7 @@
 
 import React from 'react';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
-import { SC_BOGEY_DARK, SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
+import { SC_BOGEY_DARK, SC_DOUBLE_DARK, SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { BAND_GREEN_DARK } from '@/features/courses/_shared/scoreBands';
 
@@ -101,6 +101,24 @@ export const RAMP_TOPAR = {
   bogey: SC_BOGEY_DARK,
   double: SC_DOUBLE_DARK,
 } as const;
+
+/**
+ * THE FIVE-BUCKET DISTRIBUTION SET (BRIEF_COURSE_ANALYTICS_SHARPEN §5.2).
+ *
+ * RAMP_TOPAR plus the EAGLES+ bucket, for the bars that split eagles-or-better
+ * out of birdies. The values are READ from the score palette, never restated at
+ * a call site: SC_FILL_GOLD is the scorecard's broadcast gold, and the over-par
+ * half is the restored scorecard BLUE - which is what lets bogeys+ sit in the
+ * same bar as the under-par red without two reds fighting.
+ */
+export const RAMP_DIST = {
+  eagles: SC_FILL_GOLD,
+  birdie: RAMP_TOPAR.birdie,
+  par: RAMP_TOPAR.par,
+  bogey: RAMP_TOPAR.bogey,
+  double: RAMP_TOPAR.double,
+} as const;
+
 
 
 /**

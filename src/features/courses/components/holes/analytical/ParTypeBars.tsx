@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { A, DIFFICULTY_HARD_HEX, FIGS, toParParts } from './tokens';
+import { A, FIGS, toParParts } from './tokens';
 import type { ParTypeRow } from './CourseAnalyticsPanels';
 
 export interface SignedParScale {
@@ -44,16 +44,35 @@ export function buildSignedParScale(rows: ReadonlyArray<ParTypeRow>): SignedParS
 }
 
 /**
- * The COURSE SHAPE law, not the to-par law: this row answers "is this par type
- * easier or harder than par", so under par is the easier GREEN and over par is
- * the shape chart's hardest RED. Level stays muted.
+ * THE ZONE LAW, NOT THE TO-PAR LAW (BRIEF_COURSE_ANALYTICS_SHARPEN §1.5/§1.6).
+ *
+ * This block answers "is this par type EASIER or HARDER than par", which is a
+ * zone question, so it takes the zone convention THROUGHOUT: green easy, red
+ * hard, muted at level, BAR AND FIGURE TOGETHER. What must never happen is a
+ * green bar beside a red figure for the same value.
+ *
+ * Every OTHER figure on these surfaces keeps the to-par law (under par red,
+ * over par ink, level muted) via toParParts. The two conventions are kept apart
+ * BY BLOCK, deliberately - see the note in YourCourseAnalyticsSheet.
  */
-function shapeTone(v: number): string {
+function zoneTone(v: number): string {
   const r = Math.round(v * 10) / 10;
   if (r < 0) return A.GREEN;
-  if (r > 0) return DIFFICULTY_HARD_HEX;
+  if (r > 0) return A.RED;
   return A.MUTE;
 }
+
+/** The zero rule: the reference every bar is read against. */
+const ZERO_RULE = 'rgba(255,255,255,0.20)';
+
+/** PAR 3S / PAR 4S / PAR 5S - column-header scale, the block's only label. */
+const PAR_LABEL: React.CSSProperties = {
+  fontSize: 9.5,
+  fontWeight: 700,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase',
+  color: A.MUTE,
+};
 
 /** Signed position in the track, 0% = far left, 50% = par, 100% = far right. */
 function posPct(value: number, bound: number): number {
@@ -74,11 +93,12 @@ export const ParTypeBars: React.FC<{
   const { bound } = buildSignedParScale(rows);
   const anyYou = rows.some((r) => r.you != null);
   const compact = density === 'compact';
-  const trackH = compact ? 7 : 8;
+  /* §3.3 - a 34px pitch: a 9px track inside a 22px row with 12px between rows. */
+  const trackH = 9;
   const figSize = compact ? 12.5 : 13.5;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: compact ? 9 : 10, ...FIGS }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, ...FIGS }}>
       {rows.map((r) => {
         const fieldFig = toParParts(r.field);
         const youFig = toParParts(r.you);
@@ -92,12 +112,15 @@ export const ParTypeBars: React.FC<{
             key={r.par}
             style={{
               display: 'grid',
-              gridTemplateColumns: compact ? '44px 1fr 40px' : '46px 1fr auto',
+              /* §3.2 - a FIXED 46px label, a 10px gap, then the track takes every
+                 remaining pixel to the figure column. */
+              gridTemplateColumns: '46px 1fr auto',
               alignItems: 'center',
               gap: 10,
+              minHeight: 22,
             }}
           >
-            <span style={{ fontSize: compact ? 12 : 12.5, fontWeight: 700, color: A.INK }}>
+            <span style={PAR_LABEL}>
               {t('courseDetail.parTypes.parNPlural', { n: r.par, defaultValue: 'Par {{n}}s' })}
             </span>
 
@@ -117,7 +140,7 @@ export const ParTypeBars: React.FC<{
                   bottom: 0,
                   left: '50%',
                   width: 1,
-                  background: A.BORDER,
+                  background: ZERO_RULE,
                   display: 'block',
                 }}
               />
@@ -130,7 +153,7 @@ export const ParTypeBars: React.FC<{
                   left: `${left}%`,
                   width: `${width}%`,
                    borderRadius: under ? '4px 1px 1px 4px' : '1px 4px 4px 1px',
-                  background: under ? A.GREEN : DIFFICULTY_HARD_HEX,
+                  background: under ? A.GREEN : A.RED,
                    opacity: 0.85,
                   display: 'block',
                 }}
@@ -174,7 +197,7 @@ export const ParTypeBars: React.FC<{
                       style={{
                         fontSize: figSize,
                         fontWeight: 700,
-                        color: fieldFig ? shapeTone(r.field) : A.INK,
+                        color: fieldFig ? zoneTone(r.field) : A.INK,
                         minWidth: 34,
                         textAlign: 'right',
                       }}
@@ -204,7 +227,7 @@ export const ParTypeBars: React.FC<{
                   fontSize: figSize,
                   fontWeight: 700,
                   textAlign: 'right',
-                  color: fieldFig ? shapeTone(r.field) : A.INK,
+                  color: fieldFig ? zoneTone(r.field) : A.INK,
                 }}
               >
                 {fieldFig ? fieldFig.text : ''}

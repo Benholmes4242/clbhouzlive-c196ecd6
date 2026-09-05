@@ -23,7 +23,7 @@ import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { A, DIFFICULTY_HARD_HEX, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
+import { A, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
 import { monotonePath, roundedCourseBarPath } from './chartGeometry';
 import { ParTypeBars } from './ParTypeBars';
 import {
@@ -80,7 +80,6 @@ interface Props {
  */
 /* Values live in ./tokens as difficultyRampColor so the hole rows grade on the
    SAME ramp as this chart (BRIEF_HOLE_BY_HOLE_COLOUR §2). Unchanged tones. */
-const RAMP_HARD_HEX = DIFFICULTY_HARD_HEX;
 const rampColor = difficultyRampColor;
 
 /**
@@ -97,15 +96,30 @@ const ShapeChart: React.FC<{
   myByHole: Map<number, MyHolePerformanceRow>;
   hardestHole: number;
   hardestText: string;
+  /** To-par tone for the hardest figure (§2.2) - never the difficulty ramp. */
+  hardestTone?: string;
   easiestHole: number;
   easiestText: string;
+  easiestTone?: string;
   flat: boolean;
   hasYou: boolean;
   /** NO FIELD (BRIEF_HOW_IT_PLAYS_NO_FIELD): the pool is the viewer's own
    *  rounds, so the field bars would redraw the member's line under another
    *  name. Drop them; the line alone carries the shape. */
   fieldIsOnlyYou: boolean;
-}> = ({ holes, myByHole, hardestHole, hardestText, easiestHole, easiestText, flat, hasYou, fieldIsOnlyYou }) => {
+}> = ({
+  holes,
+  myByHole,
+  hardestHole,
+  hardestText,
+  hardestTone = A.INK,
+  easiestHole,
+  easiestText,
+  easiestTone = A.INK,
+  flat,
+  hasYou,
+  fieldIsOnlyYou,
+}) => {
 
   const W = 340;
   /** Condensed plot (BRIEF §6): 92 -> 78, headroom included. */
@@ -153,10 +167,10 @@ const ShapeChart: React.FC<{
   const easiestTopY = easiestIdx >= 0 ? Math.min(y(holes[easiestIdx].avg_to_par), yBase) : null;
 
 
-  // 1, 6, 12, 18 - the ends are read, the middles orient.
-  const axisIdx = Array.from(
-    new Set([0, Math.min(n - 1, 5), Math.min(n - 1, 11), n - 1]),
-  ).sort((a, b) => a - b);
+  /* §4.1 - 1, 9, 18. THREE COORDINATES, NOT FOUR AND NOT EIGHTEEN: the ends are
+     read, the turn orients, and anything more is a second chart competing with
+     the first. The datum is named separately, at the axis's right. */
+  const axisIdx = Array.from(new Set([0, Math.min(n - 1, 8), n - 1])).sort((a, b) => a - b);
 
   return (
     <>
@@ -172,6 +186,18 @@ const ShapeChart: React.FC<{
           style={{ display: 'block' }}
           aria-hidden="true"
         >
+          {/* THE PAR DATUM (§4.2). FIRST CHILD, so bars, curve and dot all sit
+              above it. Without a drawn zero, a level hole is a bar of no height
+              with nothing to be level with. */}
+          <line
+            x1={0}
+            x2={W}
+            y1={yBase}
+            y2={yBase}
+            stroke="rgba(255,255,255,0.18)"
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+          />
           {!fieldIsOnlyYou && holes.map((h, i) => {
             const yv = y(h.avg_to_par);
             const top = Math.min(yv, yBase);
@@ -193,8 +219,11 @@ const ShapeChart: React.FC<{
           )}
         </svg>
 
-        {/* THE TWO EXTREMES CARRY THEIR OWN FIGURES, each above its own bar: the
-            hardest in the ramp's deep red, the easiest in its light end's ink. */}
+        {/* THE TWO EXTREMES CARRY THEIR OWN FIGURES, each above its own bar.
+            §2.2: BOTH obey the to-par law - over par is ink, under par is red -
+            because the difficulty ramp is carried by the BARS. A red figure here
+            used to mean "hardest" while a red figure everywhere else meant
+            "under par", which is two meanings for one colour. */}
         {!flat && hardestTopY != null && hardestText && (
           <span
             style={{
@@ -207,7 +236,7 @@ const ShapeChart: React.FC<{
               fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '-0.025em',
-              color: RAMP_HARD_HEX,
+              color: hardestTone,
               whiteSpace: 'nowrap',
               ...FIGS,
             }}
@@ -227,7 +256,7 @@ const ShapeChart: React.FC<{
               fontSize: 10.5,
               fontWeight: 700,
               letterSpacing: '-0.025em',
-              color: A.BODY,
+              color: easiestTone,
               whiteSpace: 'nowrap',
               ...FIGS,
             }}
@@ -277,6 +306,18 @@ const ShapeChart: React.FC<{
             </span>
           );
         })}
+        <span
+          style={{
+            ...LABEL,
+            position: 'absolute',
+            right: 0,
+            fontSize: 10,
+            fontWeight: 600,
+            color: A.DIM,
+          }}
+        >
+          {'PAR'}
+        </span>
       </div>
     </>
   );
@@ -578,8 +619,10 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
           myByHole={myByHole}
           hardestHole={stats.hardest.hole_no}
           hardestText={beastFig ? beastFig.text : ''}
+          hardestTone={beastFig ? beastFig.tone : A.INK}
           easiestHole={stats.easiest.hole_no}
           easiestText={bestFig ? bestFig.text : ''}
+          easiestTone={bestFig ? bestFig.tone : A.INK}
           flat={flatShape}
           hasYou={hasYou}
           fieldIsOnlyYou={stats.fieldIsOnlyYou}
