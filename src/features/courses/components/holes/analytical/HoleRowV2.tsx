@@ -572,7 +572,7 @@ export const HoleRowV2: React.FC<{
                       width: '76%',
                       height: 4,
                       marginTop: 4,
-                      borderRadius: 2,
+                      borderRadius: BAR_RADIUS,
                       background: A.TRACK,
                     }}
                   >
