@@ -14,7 +14,6 @@ export const IMMERSIVE_ROUTE_PREFIXES = [
   '/tour',            // Tour alias
   
   '/discover/explore/region/', // Region pages
-  '/discover/news',   // Amateur News index + story — lead photo bleeds to the notch, same as /tour/news
 ] as const;
 
 export const IMMERSIVE_EXACT_ROUTES = [
@@ -93,6 +92,9 @@ export function isImmersiveRoute(pathname: string): boolean {
   // The review composer is a plain light page, not a hero page — it must
   // never mount immersive (the post-mount flip caused device paint bugs).
   if (/^\/courses\/[^/]+\/rate\/?$/.test(pathname)) return false;
+  // Wire index + stories use the solid island bar below the safe area. This
+  // explicit exception must win over the retained immersive `/tour` prefix.
+  if (/^\/tour\/news(\/|$)/.test(pathname)) return false;
   // Connect flow only — the connected manage surface stays non-immersive.
   if (pathname === WHS_CONNECT_PATH) return whsConnectImmersive;
   if (isBusinessProfilePath(pathname)) return true;

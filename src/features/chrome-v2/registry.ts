@@ -289,20 +289,25 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, note: EDITORIAL_NOTE } },
   { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
   { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
-  // A Wire story (/tour/news/:slug). Declared BEFORE the /tour/ backstop so the
-  // reader page gets its own chrome: island, back to the wire list (history
-  // first so in-app taps unwind naturally, fallback for a cold-launched share
-  // link), dark tone. The page registers
-  // a left slot (back + burger, no tour picker: a reader inside one article has
-  // nothing to filter).
+  // Wire index + stories are non-bleeding solid-bar pages. Their page-provided
+  // slots add the fixed section label and deliberately suppress the tour picker.
+  {
+    match: { exact: '/tour/news' },
+    spec: {
+      chrome: 'island',
+      tone: 'dark',
+      bleed: false,
+      note: 'wire index — menu + fixed section label, no picker',
+    },
+  },
   {
     match: { test: (p) => /^\/tour\/news\/[^/]+/.test(p) },
     spec: {
       chrome: 'island',
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=news' },
       tone: 'dark',
-      bleed: true,
-      note: 'wire story — back + burger slot, no picker',
+      bleed: false,
+      note: 'wire story — back + fixed section label + menu, no picker',
     },
   },
   // Backstop for any /tourhub/* or /tour/* path not matched above. Tour sub-tabs
@@ -352,18 +357,18 @@ export const CHROME_REGISTRY: ChromeRule[] = [
       chrome: 'island',
       left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/discover/news' },
       tone: 'dark',
-      bleed: true,
-      note: 'amateur story — back island, hero bleeds to the notch',
+      bleed: false,
+      note: 'amateur story — back + fixed section label + menu, no picker',
     },
   },
   {
     match: { exact: '/discover/news' },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/explore' },
+      left: { kind: 'logo' },
       tone: 'dark',
-      bleed: true,
-      note: 'amateur news index — back island, lead photo bleeds to the notch',
+      bleed: false,
+      note: 'amateur news index — menu + fixed section label, no picker',
     },
   },
 

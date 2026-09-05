@@ -305,6 +305,7 @@ const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
 
 // Tour Hub pages
 const TourNewsStoryPage = lazy(() => import("./features/tourhub/news/StoryPage").then(m => ({ default: m.StoryPage })));
+const WireNewsPage = lazy(() => import("./features/tourhub/news/WireNewsPage"));
 const AmateurNewsPage = lazy(() => import("./features/amateur/news/AmateurNewsPage"));
 const AmateurStoryPage = lazy(() => import("./features/amateur/news/AmateurStoryPage"));
 
@@ -701,6 +702,7 @@ function AppRoutes() {
         <Route path="/nearby" element={<Navigate to="/clubhouse" replace />} />
         
         {/* Tour Hub routes */}
+        <Route path="/tour/news" element={<Suspense fallback={<GenericPageSkeleton />}><WireNewsPage /></Suspense>} />
         <Route path="/tour/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><TourNewsStoryPage /></Suspense>} />
         <Route path="/tourhub" element={<Suspense fallback={<TourHubOverviewSkeleton />}><TourHubMainPage /></Suspense>} />
         <Route path="/tourhub/tournament/:tournamentId" element={<Suspense fallback={<TournamentPageSkeleton />}><TournamentDetailPage /></Suspense>} />

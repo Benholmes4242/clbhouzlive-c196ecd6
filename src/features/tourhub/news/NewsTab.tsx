@@ -60,7 +60,7 @@ function KickerLine({ kicker, at, compact = false, trailing }: { kicker: string 
   );
 }
 
-export function LeadStory({ story, onOpen, compact = false, engagement }: { story: TourStory; onOpen: () => void; compact?: boolean; engagement?: StoryEngagement | null }) {
+export function LeadStory({ story, onOpen, compact = false, immersiveHero = true, engagement }: { story: TourStory; onOpen: () => void; compact?: boolean; immersiveHero?: boolean; engagement?: StoryEngagement | null }) {
   const bandPadding = compact ? 6 : 8;
   const sidePadding = compact ? 17 : 14;
   const standfirstPad = compact ? 4 : 6;
@@ -74,7 +74,7 @@ export function LeadStory({ story, onOpen, compact = false, engagement }: { stor
         border: 'none', padding: 0, cursor: 'pointer', fontFamily: FONT,
       }}
     >
-      <div style={{ position: 'relative', height: compact ? COMPACT_LEAD_HEIGHT : OVERVIEW_HERO_HEIGHT, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
+      <div style={{ position: 'relative', height: compact ? COMPACT_LEAD_HEIGHT : immersiveHero ? OVERVIEW_HERO_HEIGHT : 232, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
         <img
           src={story.image_url as string}
           alt={story.headline}
@@ -97,7 +97,7 @@ export function LeadStory({ story, onOpen, compact = false, engagement }: { stor
              background: heroCanonScrimOn(SLATE_50),
           }}
         />
-        <div style={{ position: 'absolute', top: compact ? 14 : 'calc(env(safe-area-inset-top, 0px) + 68px)', left: sidePadding, right: sidePadding }}>
+        <div style={{ position: 'absolute', top: compact ? 14 : immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 68px)' : 12, left: sidePadding, right: sidePadding }}>
           <KickerLine
             kicker={story.kicker}
             at={story.published_at}
@@ -156,7 +156,7 @@ export function StoryRow({ story, onOpen, compact = false, engagement }: { story
   );
 }
 
-export function NewsTab() {
+export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const [tourLens, setTourLens] = useState<string | null>(() => {
@@ -193,19 +193,19 @@ export function NewsTab() {
     <div style={{ fontFamily: FONT, paddingBottom: 24 }}>
       {isLoading ? (
         <div>
-          <Skeleton style={{ height: OVERVIEW_HERO_HEIGHT, width: '100%', borderRadius: 0 }} />
+          <Skeleton style={{ height: immersiveHero ? OVERVIEW_HERO_HEIGHT : 232, width: '100%', borderRadius: 0 }} />
           <div style={{ padding: '0 14px' }}>
             <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
             <Skeleton style={{ height: 62, width: '100%', marginTop: 12 }} />
           </div>
         </div>
       ) : stories.length === 0 ? (
-        <div style={{ padding: 'calc(env(safe-area-inset-top, 0px) + 76px) 14px 0', fontSize: 13, color: INK_MUTE }}>
+        <div style={{ padding: immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 76px) 14px 0' : '18px 14px 0', fontSize: 13, color: INK_MUTE }}>
           {t('news.empty', 'No stories on the wire yet.')}
         </div>
       ) : (
         <>
-          {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} engagement={engagementFor(lead.id)} />}
+          {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} immersiveHero={immersiveHero} engagement={engagementFor(lead.id)} />}
           {/* BRIEF_WIRE_INDEX_TICKER — bound to the LEAD's event. No lead or no
               tournament_id ⇒ not mounted, and no height reserved. */}
           {lead?.tournament_id && <StoryLeaderboardStrip tournamentId={lead.tournament_id} />}
