@@ -83,7 +83,7 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
     if (info.offset.y > 100 || info.velocity.y > 500) onClose();
   };
 
-  const shapeClass = shape === 'circle' ? 'rounded-full' : 'clbhouz-squircle';
+  const shapeClass = shape === 'circle' ? 'rounded-r-pill' : 'rounded-r-avatar';
   const showFallback = !imageUrl || imgFailed;
 
   const content = (
