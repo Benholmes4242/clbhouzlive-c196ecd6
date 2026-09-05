@@ -487,7 +487,9 @@ const UpForGrabs: React.FC<{
               <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}>
                 {unclaimedCount === 1 ? 'Crown never claimed' : 'Crowns never claimed'}
               </div>
-              <div style={{ ...bizFigure(24, DIFFICULTY_HARD_HEX), whiteSpace: 'nowrap' }}>{unclaimedCount}</div>
+              {/* A COUNT OF UNCLAIMED CROWNS CARRIES NO SCORING DIRECTION, so it
+                  cannot wear the under-par red. Default ink, like the record figure. */}
+              <div style={{ ...bizFigure(24, A.INK), whiteSpace: 'nowrap' }}>{unclaimedCount}</div>
             </div>
           </>
         )}
