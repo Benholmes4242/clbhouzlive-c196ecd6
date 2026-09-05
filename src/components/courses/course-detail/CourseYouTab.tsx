@@ -35,7 +35,6 @@ import { ParTypeBars } from '@/features/courses/components/holes/analytical/ParT
 import { BAR_RADIUS } from '@/features/courses/components/holes/analytical/tokens';
 import {
   A,
-  DIFFICULTY_HARD_HEX,
   EmptyState,
   FIGS,
   Hairline,
@@ -487,7 +486,9 @@ const UpForGrabs: React.FC<{
               <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}>
                 {unclaimedCount === 1 ? 'Crown never claimed' : 'Crowns never claimed'}
               </div>
-              <div style={{ ...bizFigure(24, DIFFICULTY_HARD_HEX), whiteSpace: 'nowrap' }}>{unclaimedCount}</div>
+              {/* A COUNT OF UNCLAIMED CROWNS CARRIES NO SCORING DIRECTION, so it
+                  cannot wear the under-par red. Default ink, like the record figure. */}
+              <div style={{ ...bizFigure(24, A.INK), whiteSpace: 'nowrap' }}>{unclaimedCount}</div>
             </div>
           </>
         )}
@@ -560,7 +561,15 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
   }, [analysis]);
 
   const hasPlayed = status?.status === 'played';
-  const emptyState: 'not_connected' | 'not_played' | null = !user || statusLoading || !status
+
+  // SETTLED-STATE RULE (e8b6a14 / 9de5a23). Both empty states ASSERT AN ABSENCE,
+  // so neither may render off `!isLoading`: in react-query v5 a disabled query
+  // reports isLoading false while pending, having never run. The WHS connection
+  // query is the second link in the chain — the ChromeIsland case taught that a
+  // chained query has to be in the settled flag too, and it was missing here, so
+  // "connect your handicap" could paint for a connected member on a slow network.
+  const settled = Boolean(user) && !statusLoading && Boolean(status) && !connectionLoading;
+  const emptyState: 'not_connected' | 'not_played' | null = !settled
     ? null
     : !connection
       ? 'not_connected'
