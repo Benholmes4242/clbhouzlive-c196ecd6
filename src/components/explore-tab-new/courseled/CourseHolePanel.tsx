@@ -211,7 +211,7 @@ function AnalyticsBasis({ count }: { count: number }) {
           textOverflow: 'ellipsis',
         }}
       >
-        {t('discover.coursesPlayed.courseWideBasis', 'How this course has always played')}
+        {t('discover.coursesPlayed.courseWideBasis', 'How the course plays')}
       </span>
       <span style={{ ...CAP, color: A.DIM, flexShrink: 0 }}>
         {t('discover.coursesPlayed.roundCount', '{{count}} rounds', { count })}
