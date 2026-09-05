@@ -6,7 +6,7 @@ import { useMomentsOfTheWeek, type Moment } from './hooks/useMomentsOfTheWeek';
 import { countNewSince, useReportNewCount } from './newSince';
 import { Eyebrow, InkAction } from './tokens';
 
-import { MomentsMosaic as MomentsMosaicShell } from './DiscoverCourseLedSkeleton';
+import { MomentsMosaic as MomentsMosaicShell } from './DiscoverSectionShells';
 
 /**
  * Section 4 — FROM THE COMMUNITY (BRIEF_MOMENTS_COMMUNITY_GRID).

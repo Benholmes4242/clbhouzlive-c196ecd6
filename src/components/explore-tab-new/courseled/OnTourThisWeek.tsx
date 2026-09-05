@@ -13,7 +13,7 @@ import {
   type LivePeek,
   type PeekPosition,
 } from './hooks/useTourLivePeek';
-import { TourRail as TourRailShell } from './DiscoverCourseLedSkeleton';
+import { TourRail as TourRailShell } from './DiscoverSectionShells';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import {
