@@ -31,6 +31,7 @@ import { formatLegendValueCompact } from '@/lib/gam/visuals';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ParTypeBars } from '@/features/courses/components/holes/analytical/ParTypeBars';
 import {
   A,
   DIFFICULTY_HARD_HEX,
@@ -149,7 +150,9 @@ const FieldChart: React.FC<{ shape: FieldShape }> = ({ shape }) => {
                 fontSize: 10,
                 fontWeight: 700,
                 letterSpacing: '-0.03em',
-                color: isHardest ? DIFFICULTY_HARD_HEX : A.MUTE,
+                /* §2.2 - the to-par law, not the difficulty ramp: the ramp is
+                   already carried by the bar beneath this figure. */
+                color: A.INK,
                 whiteSpace: 'nowrap',
                 lineHeight: 1,
               }}
@@ -178,9 +181,16 @@ const FieldChart: React.FC<{ shape: FieldShape }> = ({ shape }) => {
         })}
       </div>
 
-      <div style={{ display: 'flex', gap: 2, marginTop: 5 }}>
-        {holes.map((h) => {
+      {/* §4.2 - the PAR DATUM under the bars: they all grow from par. */}
+      <div style={{ height: 1, background: 'rgba(255,255,255,0.18)', marginTop: 1 }} />
+
+      {/* §4.1 - 1, 9, 18 and the datum's name. Eighteen numerals under an
+          eighteen-bar strip is a second chart competing with the first. */}
+      <div style={{ display: 'flex', gap: 2, marginTop: 5, alignItems: 'baseline' }}>
+        {holes.map((h, i) => {
+          const shown = i === 0 || i === 8 || i === holes.length - 1;
           const isExtreme = !flat && (h.holeNo === hardest.holeNo || h.holeNo === easiest.holeNo);
+          if (!shown) return <div key={h.holeNo} style={{ flex: 1 }} />;
           return (
             <div
               key={h.holeNo}
@@ -246,7 +256,8 @@ const FieldHero: React.FC<{
 
       {shape ? (
         <>
-          <div style={{ ...bizFigure(46, DIFFICULTY_HARD_HEX), marginBottom: 6 }}>{shape.fieldAvg}</div>
+          {/* §2.2 - a to-par figure takes the to-par law: over par is ink. */}
+          <div style={{ ...bizFigure(46, A.INK), marginBottom: 6 }}>{shape.fieldAvg}</div>
           <div style={{ fontSize: 13, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}>
             {`What the field plays ${courseName} to`}
           </div>
@@ -330,7 +341,8 @@ const ReferencePanel: React.FC<{ shape: FieldShape }> = ({ shape }) => {
   rows.push({
     label: 'Shots over par a round',
     figure: fieldAvg,
-    tone: DIFFICULTY_HARD_HEX,
+    /* §2.2 - to-par figure, to-par law. */
+    tone: A.INK,
     sub: `${rounds} ${rounds === 1 ? 'round' : 'rounds'}`,
   });
   if (!flat) {
@@ -377,32 +389,15 @@ const ReferencePanel: React.FC<{ shape: FieldShape }> = ({ shape }) => {
           <>
             <Hairline style={{ margin: '16px 0 14px' }} />
             <div style={{ ...LABEL_MUTE, marginBottom: 12 }}>How each par plays</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {parRows.map((r) => {
-                const t = parSpan > 0 ? (r.mean - parMin) / parSpan : 0.5;
-                const width = parMax > 0 ? Math.max(6, Math.round((r.mean / parMax) * 100)) : 6;
-                return (
-                  <div key={r.par} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 44, flexShrink: 0, fontSize: 12.5, fontWeight: 700, color: A.INK, ...FIGS }}>
-                      {`Par ${r.par}`}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0, height: 6, background: A.TRACK, borderRadius: 3 }}>
-                      <div
-                        style={{
-                          width: `${width}%`,
-                          height: '100%',
-                          borderRadius: 3,
-                          background: parSpan > 0 ? difficultyRampColor(t) : difficultyRampStop(2),
-                        }}
-                      />
-                    </div>
-                    <div style={{ ...bizFigure(13, A.INK), width: 38, textAlign: 'right', flexShrink: 0 }}>
-                      {fmtToPar(r.mean, 1)}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            {/* §1 - ONE By-par implementation app-wide. This screen has no member
+                figure, so the rows pass you: null and the amber tick is simply
+                not drawn; the signed zone scale is identical to Discover's and
+                the Course tab's. */}
+            <ParTypeBars
+              rows={parRows.map((r) => ({ par: r.par, holes: r.count, field: r.mean, you: null }))}
+              fieldIsOnlyYou={false}
+              density="default"
+            />
           </>
         )}
       </Panel>

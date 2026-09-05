@@ -981,6 +981,7 @@
       }
     },
     "plays": {
+      "par": "Par",
       "fieldAvg": "Field avg",
       "yourAvg": "Your avg",
       "youBeat": "You beat field on",

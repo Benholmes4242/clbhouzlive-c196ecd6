@@ -5,7 +5,6 @@ import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHol
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import {
   A,
-  DIFFICULTY_HARD_HEX,
   FIGS,
   KICKER,
   difficultyRampColor,
@@ -388,6 +387,18 @@ function HoleChart({
           style={{ display: 'block' }}
           aria-hidden="true"
         >
+          {/* THE PAR DATUM (§4.2). Painted FIRST so every bar and the member
+              trace sit above it: a level hole is a bar of no height, and
+              without a drawn zero there is nothing for it to be level with. */}
+          <line
+            x1={0}
+            x2={W}
+            y1={yBase}
+            y2={yBase}
+            stroke="rgba(255,255,255,0.18)"
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+          />
           {!fieldIsOnlyYou &&
             holes.map((h, i) => {
               const yv = y(h.avg_to_par);
@@ -444,6 +455,36 @@ function HoleChart({
           )}
         </svg>
       </div>
+
+      {/* §4.1 - THREE COORDINATES, NOT EIGHTEEN. 1, 9 and 18 orient the strip;
+          the fourth mark names the datum. Eighteen numerals under a 340px
+          chart is a second chart competing with the first. */}
+      <div
+        style={{
+          position: 'relative',
+          height: 12,
+          marginTop: 2,
+        }}
+      >
+        {[0, 8, n - 1].map((i) => (
+          <span
+            key={i}
+            className="tabular-nums"
+            style={{
+              position: 'absolute',
+              left: `${(cx(i) / W) * 100}%`,
+              transform: 'translateX(-50%)',
+              ...CAP,
+              fontSize: 8.5,
+            }}
+          >
+            {holes[i]?.hole_no ?? ''}
+          </span>
+        ))}
+        <span style={{ position: 'absolute', right: 0, ...CAP, fontSize: 8.5 }}>
+          {t('courseDetail.plays.par', 'Par')}
+        </span>
+      </div>
     </div>
   );
 }
@@ -457,11 +498,9 @@ function Extremes({ hardest, easiest }: { hardest: CourseHole; easiest: CourseHo
   const { t } = useTranslation('courses');
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', marginTop: 10 }}>
-      <Extreme
-        label={t('discover.coursesPlayed.hardest', 'Hardest')}
-        hole={hardest}
-        tone={DIFFICULTY_HARD_HEX}
-      />
+      {/* §2.2 - the hardest hole's FIGURE obeys the to-par law like every
+          other figure; the difficulty ramp lives in the BARS, not here. */}
+      <Extreme label={t('discover.coursesPlayed.hardest', 'Hardest')} hole={hardest} />
       <Extreme label={t('discover.coursesPlayed.easiest', 'Easiest')} hole={easiest} />
     </div>
   );
