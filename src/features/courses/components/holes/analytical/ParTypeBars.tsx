@@ -173,7 +173,7 @@ export const ParTypeBars: React.FC<{
                       style={{
                         fontSize: figSize,
                         fontWeight: 700,
-                        color: fieldFig ? fieldFig.tone : A.INK,
+                        color: fieldFig ? shapeTone(r.field) : A.INK,
                         minWidth: 34,
                         textAlign: 'right',
                       }}
