@@ -155,6 +155,7 @@ export function CoursesPlayedSection({
               <ListTerminalRow
                 label={t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: total })}
                 onPress={() => setSeeAll(true)}
+                borderless
               />
             </div>
           )}
