@@ -52,7 +52,30 @@ export function NewsMediaTab({ onOpenPost }: { onOpenPost: (items: CommunityLibr
   const mediaQuery = useDiscoverMediaPreview(true);
   const media = mediaQuery.data;
   const momentsQuery = useMomentsOfTheWeek(30, { enabled: true, candidateLimit: 72 });
-  const moments = (momentsQuery.data ?? []).slice(0, 6);
+  const moments = useMemo(() => (momentsQuery.data ?? []).slice(0, 6), [momentsQuery.data]);
+  // Tapping a tile opens the fullscreen viewer on the same six-tile set, so the
+  // member swipes the section rather than routing to a duplicate archive.
+  const momentItems = useMemo<CommunityLibraryItem[]>(() => moments.map((moment) => ({
+    key: moment.key,
+    postId: moment.post.id,
+    userId: moment.post.userId,
+    createdAt: moment.post.createdAt,
+    title: (moment.post.caption ?? '').split('\n')[0]?.trim() ?? '',
+    likeCount: moment.post.likeCount ?? 0,
+    durationSeconds: moment.durationSeconds ?? 0,
+    duration: moment.durationSeconds ?? null,
+    kind: moment.mediaType === 'video' ? 'video' : 'photo',
+    thumbnail: moment.thumbnail,
+    hlsUrl: null,
+    displayName: moment.post.displayName,
+    avatarUrl: moment.post.avatarUrl || null,
+    courseName: moment.courseName,
+    courseId: moment.courseId,
+    aspect: moment.aspect ?? null,
+    post: moment.post,
+    mediaIndex: moment.mediaIndex ?? 0,
+    mediaId: moment.mediaId ?? '',
+  })), [moments]);
   const lead = visibleStories[0];
   const remaining = visibleStories.slice(1);
 
