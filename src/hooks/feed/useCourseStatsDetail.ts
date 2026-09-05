@@ -14,6 +14,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 export interface CourseStatsDetail {
   course_id: string;
@@ -32,10 +33,15 @@ export interface CourseStatsDetail {
 }
 
 export function useCourseStatsDetail(courseId: string | null | undefined, open: boolean) {
+  const { user } = useSupabaseSession();
+
   return useQuery<CourseStatsDetail | null>({
     // enabled ONLY when the sheet is open and a course id is set.
     enabled: Boolean(open && courseId),
-    queryKey: ['course-stats-detail', courseId],
+    // The RPC contains viewer-scoped `your_*` fields. Keep anonymous/public
+    // course figures cacheable, but never share a signed-in member's PB/count
+    // with another identity after an account switch.
+    queryKey: ['course-stats-detail', courseId, user?.id ?? 'anon'],
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     queryFn: async () => {

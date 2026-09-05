@@ -23,7 +23,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
-import { PersonalSection } from '@/components/courses/phase5';
+import { CourseStatusToggle, PersonalSection } from '@/components/courses/phase5';
 import CourseHolesTab from '@/features/courses/components/holes/CourseHolesTab';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
@@ -501,7 +501,15 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: connection, isLoading: connectionLoading } = useWhsConnection(user?.id);
-  const { status, isLoading: statusLoading, setWantToPlay, isUpdating } =
+  const {
+    status,
+    isLoading: statusLoading,
+    hasTrackedRounds,
+    trackedRoundCount,
+    roundsSettled,
+    setWantToPlay,
+    isUpdating,
+  } =
     useCoursePersonalStatus(courseId);
   const { data: analysis } = useCourseHoleAnalysis(courseId);
   const { courseRecord, unclaimedCount } = useCourseRecordSummary(courseId, user?.id ?? null);
@@ -560,21 +568,21 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
     };
   }, [analysis]);
 
-  const hasPlayed = status?.status === 'played';
-
   // SETTLED-STATE RULE (e8b6a14 / 9de5a23). Both empty states ASSERT AN ABSENCE,
   // so neither may render off `!isLoading`: in react-query v5 a disabled query
   // reports isLoading false while pending, having never run. The WHS connection
   // query is the second link in the chain — the ChromeIsland case taught that a
   // chained query has to be in the settled flag too, and it was missing here, so
   // "connect your handicap" could paint for a connected member on a slow network.
-  const settled = Boolean(user) && !statusLoading && Boolean(status) && !connectionLoading;
-  const emptyState: 'not_connected' | 'not_played' | null = !settled
+  const settled = Boolean(user) && !statusLoading && Boolean(status) && !connectionLoading && roundsSettled;
+  const emptyState: 'not_connected' | 'not_played' | 'rated_without_rounds' | null = !settled
     ? null
     : !connection
       ? 'not_connected'
-      : !hasPlayed
-        ? 'not_played'
+      : !hasTrackedRounds
+        ? status?.status === 'played'
+          ? 'rated_without_rounds'
+          : 'not_played'
         : null;
 
   // Fire once per mount of the You tab when an empty state renders.
@@ -610,7 +618,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
 
   // An empty state is a claim about the data. While either query is in flight we
   // show a skeleton, never a statement that there is nothing here.
-  if (statusLoading || !status || connectionLoading) {
+  if (statusLoading || !status || connectionLoading || !roundsSettled) {
     return wrap(
       <div style={{ paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ padding: '0 16px' }}>
@@ -642,8 +650,23 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
     );
   }
 
-  // State B - connected, but nothing logged here yet.
-  if (!hasPlayed) {
+  // Rated declaration, but no objective tracked round. This is not the
+  // never-played state: the member has explicitly told us they played here.
+  if (!hasTrackedRounds && status.status === 'played') {
+    return wrap(
+      <div style={{ paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <HookCard
+          headline="No tracked rounds here yet"
+          body="You've rated this course, but none of your rounds here have been tracked."
+        />
+        <UpForGrabs recordLabel={recordLabel} holderName={holderName} unclaimedCount={unclaimedCount} />
+      </div>,
+    );
+  }
+
+  // Connected, no tracked rounds and no rating declaration. A shortlist still
+  // means “want to play”, so the established never-played copy remains true.
+  if (!hasTrackedRounds) {
     const body = shape && shape.beastPct !== null
       ? `The field plays it to ${shape.fieldAvg}, and the ${shape.beastHoleLabel} beats ${shape.beastPct}% of everyone who walks up it. Post a round here and this page fills in on its own.`
       : shape
@@ -661,14 +684,21 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
               : { label: isUpdating ? 'Adding...' : 'Add to my list', onClick: () => setWantToPlay(true) }
           }
         />
+        {status.status === 'want_to_play' && (
+          <PersonalSection courseId={courseId} courseName={courseName} />
+        )}
         <UpForGrabs recordLabel={recordLabel} holderName={holderName} unclaimedCount={unclaimedCount} />
       </div>,
     );
   }
 
-  // State A - played.
+  // Tracked rounds exist. `trackedRoundCount` is the hero RPC's full-round
+  // sample; the existence gate above also admits a nine-hole-only history.
   return wrap(
     <>
+      <div style={{ padding: '16px 16px 0', ...LABEL_MUTE }}>
+        {`${trackedRoundCount} ${trackedRoundCount === 1 ? 'full round' : 'full rounds'} tracked`}
+      </div>
       <PersonalSection courseId={courseId} courseName={courseName} />
       <CourseHolesTab
         courseId={courseId}
