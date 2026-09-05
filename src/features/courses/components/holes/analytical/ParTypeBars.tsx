@@ -6,7 +6,9 @@
  *
  * THE SCALE IS SIGNED. Bars grow LEFT of a centred zero rule when a par type
  * plays under par and RIGHT when it plays over, so direction is legible from the
- * shape and not only from the colour of the figure. The domain is symmetric
+ * shape and not only from the colour of the figure. Like the Tour Overview
+ * ladder, the track itself is transparent: only the centre rule, signed bar,
+ * and optional member marker are drawn, with no ghost rail behind them. The domain is symmetric
  * around zero and shared by every row, so lengths are comparable between rows
  * and between courses. The tint spread is deliberately gone from these rows: a
  * relative easiest-to-hardest ramp over three values cannot also carry
@@ -104,8 +106,6 @@ export const ParTypeBars: React.FC<{
                 position: 'relative',
                 display: 'block',
                 height: trackH,
-                borderRadius: 4,
-                background: A.TRACK,
               }}
             >
               {/* The reference every bar is read against - on EVERY row. */}
@@ -129,8 +129,9 @@ export const ParTypeBars: React.FC<{
                   bottom: 0,
                   left: `${left}%`,
                   width: `${width}%`,
-                  borderRadius: 4,
+                   borderRadius: under ? '4px 1px 1px 4px' : '1px 4px 4px 1px',
                   background: under ? A.GREEN : DIFFICULTY_HARD_HEX,
+                   opacity: 0.85,
                   display: 'block',
                 }}
               />
