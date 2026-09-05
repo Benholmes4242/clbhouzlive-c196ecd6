@@ -35,7 +35,6 @@ import { ParTypeBars } from '@/features/courses/components/holes/analytical/ParT
 import { BAR_RADIUS } from '@/features/courses/components/holes/analytical/tokens';
 import {
   A,
-  DIFFICULTY_HARD_HEX,
   EmptyState,
   FIGS,
   Hairline,
