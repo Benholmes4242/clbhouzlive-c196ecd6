@@ -86,9 +86,13 @@ function streamThumb(streamId: string): string {
  *                    hold separate cache entries and never overwrite one
  *                    another.
  */
-export function useMomentsOfTheWeek(windowDays: number | null = WINDOW_DAYS) {
+export function useMomentsOfTheWeek(
+  windowDays: number | null = WINDOW_DAYS,
+  options: { enabled?: boolean; candidateLimit?: number } = {},
+) {
   return useQuery({
     queryKey: [...MOMENTS_KEY, windowDays ?? 'all'],
+    enabled: options.enabled ?? true,
     queryFn: async (): Promise<Moment[]> => {
       let q = supabase
         .from('posts')
@@ -107,7 +111,7 @@ export function useMomentsOfTheWeek(windowDays: number | null = WINDOW_DAYS) {
       }
       const { data, error } = await q
         .order('created_at', { ascending: false })
-        .limit(windowDays === null ? CANDIDATE_LIMIT_ALL_TIME : CANDIDATE_LIMIT);
+        .limit(options.candidateLimit ?? (windowDays === null ? CANDIDATE_LIMIT_ALL_TIME : CANDIDATE_LIMIT));
       if (error) throw error;
 
       type Row = {

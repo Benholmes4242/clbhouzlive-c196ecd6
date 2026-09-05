@@ -325,7 +325,10 @@ export const CHROME_REGISTRY: ChromeRule[] = [
 
   // Discover landing (bottom-nav tab). Same editorial geometry as /courses:
   // cinematic hero under a scroll-away glass island.
-  { match: { exact: '/explore' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+  // Discover owns a fixed ESPN-style header and tabs. The global header stays
+  // mounted, but resolves to no island on this route; immersive classification
+  // remains unchanged in globalHeaderRules.ts.
+  { match: { exact: '/explore' },                 spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'Discover owns fixed header + tabs' } },
 
   // Courses landing (editorial geometry; cinematic hero → glass overlay).
   // bleed + scrollAway stay TRUE deliberately: hero page, same as the tour hero

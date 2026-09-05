@@ -46,7 +46,7 @@ const ISLAND_H = 44;
 const TOP_GAP = 10;
 const HEADER_H = 70; // 10 gap + 44 island + 16 canon islandClearance
 
-const LOGO_SRC = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
+export const CHROME_LOGO_SRC = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 
 const HCP_IMPROVING = '#16a34a';
 const HCP_DRIFTING = '#dc2626';
@@ -217,7 +217,7 @@ const LeftCapsule: React.FC<{
       }}
     >
       <img
-        src={LOGO_SRC}
+        src={CHROME_LOGO_SRC}
         alt="clbhouz"
         style={{
           height: 26,
@@ -272,7 +272,7 @@ const HcpDivider: React.FC<{ color: string }> = ({ color }) => (
   <span aria-hidden style={{ width: 1, height: 18, background: color, flexShrink: 0 }} />
 );
 
-const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, dividerColor }) => {
+export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, dividerColor }) => {
   const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
   const { activeActor } = useActiveActor();
@@ -380,7 +380,7 @@ const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, d
 // ---------------------------------------------------------------------------
 // Avatar cell — trigger for PostingAsMenu (identical wiring to CompactHeader)
 // ---------------------------------------------------------------------------
-const AvatarCell: React.FC<{
+export const AvatarCell: React.FC<{
   tone: ChromeTone;
   onOpen: () => void;
   triggerRef: React.RefObject<HTMLButtonElement>;

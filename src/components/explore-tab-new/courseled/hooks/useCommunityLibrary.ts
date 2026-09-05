@@ -52,6 +52,8 @@ export interface CommunityLibraryItem extends CommunityVideo {
   mediaIndex: number;
   /** Stable id of the lead media. */
   mediaId: string;
+  /** Present for capped Discover previews that need the rounds-only subset. */
+  roundLinked?: boolean;
 }
 
 export interface CommunityLibraryResult {
