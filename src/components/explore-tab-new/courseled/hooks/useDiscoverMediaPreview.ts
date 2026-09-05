@@ -127,13 +127,13 @@ export function useDiscoverMediaPreview(enabled: boolean) {
           mediaIndex: 0,
           mediaId: lead.id,
           roundLinked: !!row.whs_score_id,
-        } as CommunityLibraryItem & { roundLinked: boolean }];
+        }];
       });
 
       return {
         clips: mapped.filter((item) => item.kind === 'video' && (item.duration == null || item.duration < 180)).slice(0, 12),
         videos: mapped.filter((item) => item.kind === 'video' && item.duration != null && item.duration >= 180).slice(0, 12),
-        rounds: mapped.filter((item) => (item as CommunityLibraryItem & { roundLinked?: boolean }).roundLinked).slice(0, 12),
+        rounds: mapped.filter((item) => item.roundLinked).slice(0, 12),
       };
     },
   });

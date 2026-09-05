@@ -23,12 +23,9 @@ export function DiscoverHeader({ active, onChange }: { active: DiscoverTab; onCh
 
   useLayoutEffect(() => {
     document.documentElement.style.setProperty('--discover-header-h', 'calc(env(safe-area-inset-top, 0px) + 89px)');
-    return () => document.documentElement.style.removeProperty('--discover-header-h');
-  }, []);
-  useEffect(() => () => {
-    setMenuOpen(false);
-    setSearchOpen(false);
-    return undefined;
+    return () => {
+      document.documentElement.style.removeProperty('--discover-header-h');
+    };
   }, []);
 
   return (
