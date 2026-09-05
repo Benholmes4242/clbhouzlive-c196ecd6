@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { A, FIGS, toParParts } from './tokens';
+import { A, BAR_RADIUS, FIGS, toParParts } from './tokens';
 import type { ParTypeRow } from './CourseAnalyticsPanels';
 
 export interface SignedParScale {
@@ -129,7 +129,7 @@ export const ParTypeBars: React.FC<{
                 position: 'relative',
                 display: 'block',
                 height: trackH,
-                borderRadius: 2,
+                borderRadius: BAR_RADIUS,
                 background: A.TRACK,
               }}
             >
@@ -154,7 +154,7 @@ export const ParTypeBars: React.FC<{
                   bottom: 0,
                   left: `${left}%`,
                   width: `${width}%`,
-                   borderRadius: 2,
+                  borderRadius: BAR_RADIUS,
                   background: under ? A.GREEN : A.RED,
                    opacity: 0.85,
                   display: 'block',

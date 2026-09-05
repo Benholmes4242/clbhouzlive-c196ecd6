@@ -69,6 +69,9 @@ export const A = {
   HAIRLINE: 'rgba(255,255,255,0.10)',
 } as const;
 
+/** Every analytical bar, track and segment. A measurement, not a pill. */
+export const BAR_RADIUS = 2;
+
 /**
  * NEUTRAL ink ramp for score-distribution bars.
  *
