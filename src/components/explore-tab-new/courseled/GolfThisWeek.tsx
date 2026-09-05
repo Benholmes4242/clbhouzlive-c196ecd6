@@ -93,9 +93,11 @@ export interface GolfThisWeekProps {
    * key (G6.2) and carry no filter control of their own (G6.1).
    */
   children?: ReactNode;
+  /** Discover's route-owned fixed header now clears the notch before this hero. */
+  belowDiscoverHeader?: boolean;
 }
 
-export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, children }: GolfThisWeekProps) {
+export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, children, belowDiscoverHeader = false }: GolfThisWeekProps) {
   const { t } = useTranslation('courses');
 
   /* COMPONENT STATE, NEVER THE URL — a filter tap must not enter the back
@@ -214,7 +216,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
       <div
         style={{
           position: 'relative',
-          height: `calc(${HERO_H}px + env(safe-area-inset-top, 0px))`,
+          height: belowDiscoverHeader ? HERO_H : `calc(${HERO_H}px + env(safe-area-inset-top, 0px))`,
           overflow: 'hidden',
           background: A.PANEL,
         }}
@@ -242,7 +244,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end',
-            padding: 'env(safe-area-inset-top, 0px) 14px 16px',
+            padding: belowDiscoverHeader ? '0 14px 16px' : 'env(safe-area-inset-top, 0px) 14px 16px',
           }}
         >
           <span style={{ ...KICKER, color: A.BODY }}>
@@ -290,7 +292,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
         aria-label={t('discover.filterBoard.open', 'Filter the board')}
         style={{
           position: 'sticky',
-          top: 'var(--chrome-total-h, 55px)',
+          top: belowDiscoverHeader ? 'var(--discover-header-h)' : 'var(--chrome-total-h, 55px)',
           zIndex: DISCOVER_STICKY_FILTER_Z,
            width: '100%', minHeight: 40, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 10,
           background: A.PANEL, border: 'none', borderTop: `1px solid ${A.BORDER}`,
@@ -310,7 +312,7 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
       </button>
 
       {/* THE BOARD */}
-      <div ref={boardRef} style={{ marginTop: 8, padding: '0 14px', scrollMarginTop: 'calc(var(--chrome-total-h, 55px) + 48px)' }}>
+      <div ref={boardRef} style={{ marginTop: 8, padding: '0 14px', scrollMarginTop: belowDiscoverHeader ? 'calc(var(--discover-header-h) + 48px)' : 'calc(var(--chrome-total-h, 55px) + 48px)' }}>
 
         {!ready || page.isPending ? (
           <div style={{ height: 240 }} aria-hidden />

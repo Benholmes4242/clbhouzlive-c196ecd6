@@ -44,6 +44,7 @@ export interface LatestReview {
   mediaUrl: string | null;
   mediaType: 'image' | 'video' | null;
   posterUrl: string | null;
+  mediaCount: number;
   courseCountry: string | null;
   courseRegion: string | null;
   courseSubCountry: string | null;
@@ -144,6 +145,7 @@ function mapRow(row: Row): LatestReview | null {
     mediaUrl: media?.media_url ?? null,
     mediaType: type as 'image' | 'video' | null,
     posterUrl: media?.poster_url ?? null,
+    mediaCount: (row.course_review_media ?? []).filter((item) => !!item.media_url).length,
     courseCountry: row.course.country ?? null,
     courseRegion: row.course.region ?? null,
     courseSubCountry: row.course.sub_country ?? null,
@@ -156,10 +158,11 @@ function mapRow(row: Row): LatestReview | null {
   };
 }
 
-export function useLatestReviews(pageSize = LATEST_REVIEWS_PAGE_SIZE) {
+export function useLatestReviews(pageSize = LATEST_REVIEWS_PAGE_SIZE, enabled = true) {
   const query = useInfiniteQuery({
     queryKey: [...LATEST_REVIEWS_KEY, pageSize],
     initialPageParam: 0,
+    enabled,
     queryFn: async ({ pageParam }) => {
       const page = Number(pageParam ?? 0);
       const from = page * pageSize;
