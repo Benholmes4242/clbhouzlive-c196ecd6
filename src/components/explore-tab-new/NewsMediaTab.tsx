@@ -90,8 +90,8 @@ export function NewsMediaTab({ onOpenPost }: { onOpenPost: (items: CommunityLibr
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 5 }}>{(media?.rounds ?? []).map((item) => <button key={item.key} type="button" aria-label={`Open ${item.displayName}'s round`} onClick={() => onOpenPost(media?.rounds ?? [], item, 'discover-rounds')} style={{ position: 'relative', aspectRatio: '1', padding: 0, border: 0, borderRadius: 6, overflow: 'hidden', background: A.PANEL, cursor: 'pointer' }}>{item.thumbnail && <img src={item.thumbnail} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}{item.kind === 'video' && <span style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', color: A.INK }}><Play size={18} fill="currentColor" /></span>}</button>)}</div>
         </section>
 
-        <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="Moments" action="See all" onAction={() => navigate('/community')} />
-          <MomentsGrid moments={moments} cap={6} gap={5} tall={250} radius={10} onTilePress={(moment) => navigate(`/post/${moment.post.id}`)} autoplayGroup="discover-news-moments" />
+        <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="Moments" />
+          <MomentsGrid moments={moments} cap={6} gap={5} tall={250} radius={10} onTilePress={(moment) => onOpenPost(momentItems, momentItems.find((entry) => entry.key === moment.key) ?? momentItems[0], 'discover-moments')} autoplayGroup="discover-news-moments" />
         </section>
 
         <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="Videos" />
