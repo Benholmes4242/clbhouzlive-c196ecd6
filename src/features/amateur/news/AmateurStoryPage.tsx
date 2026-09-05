@@ -67,19 +67,20 @@ export function AmateurStoryPage() {
   return (
     <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
       <NewsChromeBridge label="Amateur News" mode="back" backFallback="/discover/news" />
-      {isPending ? (
-        <div style={{ padding: 14 }}>
-          <Skeleton style={{ height: 232, width: '100%' }} />
-          <Skeleton style={{ height: 22, width: '80%', marginTop: 14 }} />
-          <Skeleton style={{ height: 90, width: '100%', marginTop: 12 }} />
-        </div>
-      ) : !story ? (
-        <div style={{ padding: '18px 14px', fontSize: 13, color: INK_MUTE }}>
-          {t('amateurNews.notFound', 'This story is no longer available.')}
-        </div>
-      ) : (
-        <>
-          <StoryArticle story={story} immersiveHero={false} tagLabel={amateurTag(story, label)} />
+      <div style={{ paddingTop: 'var(--header-h, 64px)' }}>
+        {isPending ? (
+          <div style={{ padding: 14 }}>
+            <Skeleton style={{ height: 232, width: '100%' }} />
+            <Skeleton style={{ height: 22, width: '80%', marginTop: 14 }} />
+            <Skeleton style={{ height: 90, width: '100%', marginTop: 12 }} />
+          </div>
+        ) : !story ? (
+          <div style={{ padding: '18px 14px', fontSize: 13, color: INK_MUTE }}>
+            {t('amateurNews.notFound', 'This story is no longer available.')}
+          </div>
+        ) : (
+          <>
+            <StoryArticle story={story} immersiveHero={false} tagLabel={amateurTag(story, label)} />
 
           {/* Below the article, above MORE AMATEUR NEWS. */}
           <StoryEngagementBlock targetType="amateur_story" storyId={story.id} />
@@ -96,8 +97,9 @@ export function AmateurStoryPage() {
               ))}
             </div>
           )}
-        </>
-      )}
+          </>
+        )}
+      </div>
 
       <div
         aria-hidden

@@ -9,7 +9,11 @@ export function WireNewsPage() {
   return (
     <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
       <NewsChromeBridge label="The Wire" mode="menu" backFallback="/tourhub" />
-      <NewsTab immersiveHero={false} />
+      {/* The app shell owns the safe-area inset; this pays only the fixed
+          non-bleeding island's published content height. */}
+      <div style={{ paddingTop: 'var(--header-h, 64px)' }}>
+        <NewsTab immersiveHero={false} />
+      </div>
     </div>
   );
 }

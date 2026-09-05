@@ -132,21 +132,20 @@ export function AmateurNewsPage() {
   return (
     <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
       <NewsChromeBridge label="Amateur News" mode="menu" backFallback="/explore" />
-      {isPending ? (
-        <div>
-          <Skeleton style={{ height: 232, width: '100%', borderRadius: 0 }} />
-          <div style={{ padding: '0 14px' }}>
-            <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
-            <Skeleton style={{ height: 62, width: '100%', marginTop: 12 }} />
+      <div style={{ paddingTop: 'var(--header-h, 64px)' }}>
+        {isPending ? (
+          <div>
+            <Skeleton style={{ height: 232, width: '100%', borderRadius: 0 }} />
+            <div style={{ padding: '0 14px' }}>
+              <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
+              <Skeleton style={{ height: 62, width: '100%', marginTop: 12 }} />
+            </div>
           </div>
-        </div>
-      ) : (
-        <>
-          {lead ? (
-            <LeadStory story={lead} onOpen={() => open(lead.slug)} immersiveHero={false} engagement={engagementFor(lead.id)} />
-          ) : (
-            <div aria-hidden style={{ height: 60 }} />
-          )}
+        ) : (
+          <>
+            {lead && (
+              <LeadStory story={lead} onOpen={() => open(lead.slug)} immersiveHero={false} engagement={engagementFor(lead.id)} />
+            )}
 
           {all.length > 0 && <CategoryRow all={all} active={category} onChange={setCategory} />}
 
@@ -167,8 +166,9 @@ export function AmateurNewsPage() {
               ))}
             </div>
           )}
-        </>
-      )}
+          </>
+        )}
+      </div>
 
       <div aria-hidden style={{ height: BOTTOM_SPACER }} />
     </div>

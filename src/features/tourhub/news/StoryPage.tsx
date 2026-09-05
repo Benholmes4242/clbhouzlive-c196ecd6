@@ -198,19 +198,20 @@ export function StoryPage() {
       <NewsChromeBridge label="The Wire" mode="back" backFallback="/tour/news" />
 
 
-      {isLoading ? (
-        <div style={{ padding: 14 }}>
-          <Skeleton style={{ height: 232, width: '100%' }} />
-          <Skeleton style={{ height: 22, width: '80%', marginTop: 14 }} />
-          <Skeleton style={{ height: 90, width: '100%', marginTop: 12 }} />
-        </div>
-      ) : !story ? (
-        <div style={{ padding: '18px 14px', fontSize: 13, color: INK_MUTE }}>
-          {t('news.notFound', 'This story is no longer available.')}
-        </div>
-      ) : (
-        <>
-          <StoryArticle story={story} immersiveHero={false} />
+      <div style={{ paddingTop: 'var(--header-h, 64px)' }}>
+        {isLoading ? (
+          <div style={{ padding: 14 }}>
+            <Skeleton style={{ height: 232, width: '100%' }} />
+            <Skeleton style={{ height: 22, width: '80%', marginTop: 14 }} />
+            <Skeleton style={{ height: 90, width: '100%', marginTop: 12 }} />
+          </div>
+        ) : !story ? (
+          <div style={{ padding: '18px 14px', fontSize: 13, color: INK_MUTE }}>
+            {t('news.notFound', 'This story is no longer available.')}
+          </div>
+        ) : (
+          <>
+            <StoryArticle story={story} immersiveHero={false} />
 
           {/* Below the article, above MORE FROM THE WIRE. */}
           <StoryEngagementBlock targetType="tour_story" storyId={story.id} />
@@ -231,8 +232,9 @@ export function StoryPage() {
             aria-hidden
             style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 88px) + 16px)' }}
           />
-        </>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
