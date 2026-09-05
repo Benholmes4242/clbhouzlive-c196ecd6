@@ -18,8 +18,8 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { LeadStory, StoryRow } from '@/features/tourhub/news/NewsTab';
+import { NewsChromeBridge } from '@/features/tourhub/news/NewsChromeBridge';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
-import { OVERVIEW_HERO_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { FONT, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
 
 import { AMATEUR_CATEGORIES, categoryLabel } from './categories';
@@ -131,21 +131,21 @@ export function AmateurNewsPage() {
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
-      {isPending ? (
-        <div>
-          <Skeleton style={{ height: OVERVIEW_HERO_HEIGHT, width: '100%', borderRadius: 0 }} />
-          <div style={{ padding: '0 14px' }}>
-            <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
-            <Skeleton style={{ height: 62, width: '100%', marginTop: 12 }} />
+      <NewsChromeBridge label="Amateur News" mode="menu" backFallback="/explore" />
+      <div style={{ paddingTop: 'var(--header-h, 64px)' }}>
+        {isPending ? (
+          <div>
+            <Skeleton style={{ height: 232, width: '100%', borderRadius: 0 }} />
+            <div style={{ padding: '0 14px' }}>
+              <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
+              <Skeleton style={{ height: 62, width: '100%', marginTop: 12 }} />
+            </div>
           </div>
-        </div>
-      ) : (
-        <>
-          {lead ? (
-            <LeadStory story={lead} onOpen={() => open(lead.slug)} engagement={engagementFor(lead.id)} />
-          ) : (
-            <div aria-hidden style={{ height: 'calc(env(safe-area-inset-top, 0px) + 60px)' }} />
-          )}
+        ) : (
+          <>
+            {lead && (
+              <LeadStory story={lead} onOpen={() => open(lead.slug)} immersiveHero={false} engagement={engagementFor(lead.id)} />
+            )}
 
           {all.length > 0 && <CategoryRow all={all} active={category} onChange={setCategory} />}
 
@@ -166,8 +166,9 @@ export function AmateurNewsPage() {
               ))}
             </div>
           )}
-        </>
-      )}
+          </>
+        )}
+      </div>
 
       <div aria-hidden style={{ height: BOTTOM_SPACER }} />
     </div>

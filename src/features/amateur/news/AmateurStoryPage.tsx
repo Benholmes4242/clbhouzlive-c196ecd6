@@ -16,10 +16,10 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { StoryArticle } from '@/features/tourhub/news/StoryPage';
+import { NewsChromeBridge } from '@/features/tourhub/news/NewsChromeBridge';
 import { StoryRow } from '@/features/tourhub/news/NewsTab';
 import { StoryEngagementBlock } from '@/features/stories/StoryEngagementBlock';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
-import { OVERVIEW_HERO_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { FONT, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
 
 import { categoriesLine } from './categories';
@@ -66,19 +66,21 @@ export function AmateurStoryPage() {
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
-      {isPending ? (
-        <div style={{ padding: 14 }}>
-          <Skeleton style={{ height: OVERVIEW_HERO_HEIGHT, width: '100%' }} />
-          <Skeleton style={{ height: 22, width: '80%', marginTop: 14 }} />
-          <Skeleton style={{ height: 90, width: '100%', marginTop: 12 }} />
-        </div>
-      ) : !story ? (
-        <div style={{ padding: '18px 14px', fontSize: 13, color: INK_MUTE }}>
-          {t('amateurNews.notFound', 'This story is no longer available.')}
-        </div>
-      ) : (
-        <>
-          <StoryArticle story={story} immersiveHero tagLabel={amateurTag(story, label)} />
+      <NewsChromeBridge label="Amateur News" mode="back" backFallback="/discover/news" />
+      <div style={{ paddingTop: 'var(--header-h, 64px)' }}>
+        {isPending ? (
+          <div style={{ padding: 14 }}>
+            <Skeleton style={{ height: 232, width: '100%' }} />
+            <Skeleton style={{ height: 22, width: '80%', marginTop: 14 }} />
+            <Skeleton style={{ height: 90, width: '100%', marginTop: 12 }} />
+          </div>
+        ) : !story ? (
+          <div style={{ padding: '18px 14px', fontSize: 13, color: INK_MUTE }}>
+            {t('amateurNews.notFound', 'This story is no longer available.')}
+          </div>
+        ) : (
+          <>
+            <StoryArticle story={story} immersiveHero={false} tagLabel={amateurTag(story, label)} />
 
           {/* Below the article, above MORE AMATEUR NEWS. */}
           <StoryEngagementBlock targetType="amateur_story" storyId={story.id} />
@@ -95,8 +97,9 @@ export function AmateurStoryPage() {
               ))}
             </div>
           )}
-        </>
-      )}
+          </>
+        )}
+      </div>
 
       <div
         aria-hidden
