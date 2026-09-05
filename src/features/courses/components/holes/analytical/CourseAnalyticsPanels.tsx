@@ -25,6 +25,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, DIFFICULTY_HARD_HEX, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
 import { monotonePath, roundedCourseBarPath } from './chartGeometry';
+import { ParTypeBars } from './ParTypeBars';
 import {
   DistributionStrip,
   HoleRowV2,
@@ -329,22 +330,9 @@ export function buildParTypeRows(
     });
 }
 
-const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number; fieldIsOnlyYou: boolean }> = ({ rows, fieldAvg, fieldIsOnlyYou }) => {
+const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number; fieldIsOnlyYou: boolean }> = ({ rows, fieldIsOnlyYou }) => {
   const { t } = useTranslation(['courses']);
   if (rows.length === 0) return null;
-
-  /* ONE domain across every row, floored, so the rows are comparable and a
-     course that plays close to par still draws bars. */
-  const domain = Math.max(
-    0.2,
-    ...rows.map((r) => r.field),
-    ...rows.map((r) => (r.you == null ? 0 : r.you)),
-  );
-
-  const fMin = Math.min(...rows.map((r) => r.field));
-  const fMax = Math.max(...rows.map((r) => r.field));
-  const fSpan = Math.max(0.01, fMax - fMin);
-  const anyYou = rows.some((r) => r.you != null);
 
   return (
     <Panel
@@ -352,127 +340,10 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number; fieldIsOnly
       headerGap={12}
       style={{ padding: '14px 13px 12px' }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {rows.map((r) => {
-          const fieldFig = toParParts(r.field);
-          const youFig = toParParts(r.you);
-          return (
-            <div
-              key={r.par}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '46px 1fr auto',
-                alignItems: 'center',
-                gap: 10,
-                ...FIGS,
-              }}
-            >
-              <span style={{ fontSize: 12.5, fontWeight: 700, color: A.INK }}>
-                {t('courses:courseDetail.parTypes.parNPlural', { n: r.par })}
-              </span>
-
-              <span
-                style={{
-                  position: 'relative',
-                  display: 'block',
-                  height: 8,
-                  borderRadius: 4,
-                  background: A.TRACK,
-                }}
-              >
-                <i
-                  aria-hidden="true"
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    width: `${Math.max(2, Math.min(100, (Math.max(0, r.field) / domain) * 100))}%`,
-                    borderRadius: 4,
-                    background: difficultyRampColor((r.field - fMin) / fSpan),
-                    display: 'block',
-                  }}
-                />
-                {r.you != null && !fieldIsOnlyYou && (
-                  <i
-                    aria-hidden="true"
-                    style={{
-                      position: 'absolute',
-                      top: -3,
-                      bottom: -3,
-                      left: `${Math.min(100, (Math.max(0, r.you) / domain) * 100)}%`,
-                      width: 2,
-                      borderRadius: 1,
-                      background: A.AMBER,
-                      display: 'block',
-                    }}
-                  />
-                )}
-              </span>
-
-              <span
-                style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  gap: 10,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {fieldIsOnlyYou ? (
-                  /* NO FIELD: one figure per par type - the member's own,
-                     amber as everywhere the member's figure appears. */
-                  <span
-                    style={{
-                      fontSize: 13.5,
-                      fontWeight: 700,
-                      color: A.AMBER_DEEP,
-                      minWidth: 34,
-                      textAlign: 'right',
-                    }}
-                  >
-                    {youFig ? youFig.text : fieldFig ? fieldFig.text : ''}
-                  </span>
-                ) : (
-                  <>
-                    <span
-                      style={{
-                        fontSize: 13.5,
-                        fontWeight: 700,
-                        color: fieldFig ? fieldFig.tone : A.INK,
-                        minWidth: 34,
-                        textAlign: 'right',
-                      }}
-                    >
-                      {fieldFig ? fieldFig.text : ''}
-                    </span>
-                    {anyYou && (
-                      <span
-                        style={{
-                          fontSize: 13.5,
-                          fontWeight: 700,
-                          color: A.AMBER_DEEP,
-                          minWidth: 34,
-                          textAlign: 'right',
-                        }}
-                      >
-                        {youFig ? youFig.text : ''}
-                      </span>
-                    )}
-                  </>
-                )}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* SAID ONCE, beneath the rows - never on every row. With no field
-          there is no bar-versus-line to explain, so no caption. */}
-      {!fieldIsOnlyYou && (
-        <div style={{ ...LABEL, marginTop: 11 }}>
-          {anyYou
-            ? t('courses:courseDetail.parTypes.keyBoth')
-            : t('courses:courseDetail.parTypes.keyField')}
-        </div>
-      )}
+      {/* ONE component with the Discover panel - BRIEF_BY_PAR_SIGNED_SCALE.
+          No caption: with a signed, centred scale the amber tick and the side of
+          the zero rule explain themselves. */}
+      <ParTypeBars rows={rows} fieldIsOnlyYou={fieldIsOnlyYou} density="default" showYouFigure />
     </Panel>
   );
 };
