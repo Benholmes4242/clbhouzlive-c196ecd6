@@ -181,10 +181,37 @@ const FieldChart: React.FC<{ shape: FieldShape }> = ({ shape }) => {
         })}
       </div>
 
-      {/* §4.2 - the PAR DATUM under the bars: they all grow from par. */}
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.18)', marginTop: 1 }} />
+      {/* §4.2 - PAR owns a separate row above the datum so it cannot collide
+          with the 1 / 9 / 18 baseline labels. */}
+      <div style={{ position: 'relative', height: 10, marginTop: 1 }}>
+        <span
+          style={{
+            ...FIGS,
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            color: A.DIM,
+            fontSize: 8.5,
+            fontWeight: 700,
+            lineHeight: 1,
+          }}
+        >
+          PAR
+        </span>
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: 24,
+            right: 0,
+            bottom: 0,
+            height: 1,
+            background: 'rgba(255,255,255,0.20)',
+          }}
+        />
+      </div>
 
-      {/* §4.1 - 1, 9, 18 and the datum's name. Eighteen numerals under an
+      {/* §4.1 - 1, 9 and 18. Eighteen numerals under an
           eighteen-bar strip is a second chart competing with the first. */}
       <div style={{ display: 'flex', gap: 2, marginTop: 5, alignItems: 'baseline' }}>
         {holes.map((h, i) => {
