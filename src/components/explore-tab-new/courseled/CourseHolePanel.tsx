@@ -16,6 +16,7 @@ import {
   courseBucketShares,
 } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { buildParTypeRows } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
+import { ParTypeBars } from '@/features/courses/components/holes/analytical/ParTypeBars';
 import { monotonePath, roundedCourseBarPath } from '@/features/courses/components/holes/analytical/chartGeometry';
 import { SANS } from './tokens';
 import { ListTerminalRow } from './ListTerminalRow';
@@ -169,7 +170,7 @@ export function CourseHolePanel({
       {/* BLOCK 2 — BY PAR (P2.1). */}
       {parRows.length > 0 && (
         <Block title={t('discover.coursesPlayed.howEachPar', 'By par')}>
-          <ParBars rows={parRows} fieldIsOnlyYou={fieldIsOnlyYou} />
+          <ParTypeBars rows={parRows} fieldIsOnlyYou={fieldIsOnlyYou} density="compact" />
         </Block>
       )}
 
@@ -443,89 +444,6 @@ function HoleChart({
           )}
         </svg>
       </div>
-    </div>
-  );
-}
-
-function ParBars({
-  rows,
-  fieldIsOnlyYou,
-}: {
-  rows: ReturnType<typeof buildParTypeRows>;
-  fieldIsOnlyYou: boolean;
-}) {
-  const { t } = useTranslation('courses');
-  const domain = Math.max(0.2, ...rows.map((r) => r.field), ...rows.map((r) => r.you ?? 0));
-  const fMin = Math.min(...rows.map((r) => r.field));
-  const fMax = Math.max(...rows.map((r) => r.field));
-  const fSpan = Math.max(0.01, fMax - fMin);
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-        {rows.map((r) => {
-          const fig = toParParts(r.field);
-          return (
-            <div
-              key={r.par}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '44px 1fr 40px',
-                alignItems: 'center',
-                gap: 10,
-              }}
-            >
-              <span style={{ fontSize: 12, fontWeight: 700, color: A.INK }}>
-                {t('courseDetail.parTypes.parNPlural', { n: r.par, defaultValue: 'Par {{n}}s' })}
-              </span>
-              <span
-                style={{
-                  position: 'relative',
-                  display: 'block',
-                  height: 7,
-                  borderRadius: 4,
-                  background: A.TRACK,
-                }}
-              >
-                <i
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    width: `${Math.max(2, Math.min(100, (Math.max(0, r.field) / domain) * 100))}%`,
-                    borderRadius: 4,
-                    background: difficultyRampColor((r.field - fMin) / fSpan),
-                    display: 'block',
-                  }}
-                />
-                {r.you != null && !fieldIsOnlyYou && (
-                  <i
-                    aria-hidden
-                    style={{
-                      position: 'absolute',
-                      top: -3,
-                      bottom: -3,
-                      left: `${Math.min(100, (Math.max(0, r.you) / domain) * 100)}%`,
-                      width: 2,
-                      borderRadius: 1,
-                      background: A.AMBER,
-                      display: 'block',
-                    }}
-                  />
-                )}
-              </span>
-              <span
-                className="tabular-nums"
-                style={{
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  textAlign: 'right',
-                  color: fig ? fig.tone : A.INK,
-                }}
-              >
-                {fig ? fig.text : ''}
-              </span>
-            </div>
-          );
-        })}
     </div>
   );
 }
