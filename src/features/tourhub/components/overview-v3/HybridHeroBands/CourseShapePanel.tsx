@@ -31,6 +31,7 @@ import { useTranslation } from 'react-i18next';
 
 import { WHITE_ALPHA_10, WHITE_ALPHA_55, WHITE_ALPHA_65, TOPAR_UNDER_DARK, FONT } from '../../../_shared/tokens';
 import { useTournamentHoleAverages, type HoleAverageRow } from '../../../overview/data/useTournamentHoleAverages';
+import { BAR_RADIUS } from '@/features/courses/components/holes/analytical/tokens';
 
 const FIGS = { fontVariantNumeric: 'tabular-nums' as const, fontFeatureSettings: '"kern" 1, "liga" 1' };
 
@@ -151,7 +152,7 @@ function DivergingRow({ r, maxAbs, first }: { r: LadderRow; maxAbs: number; firs
               right: over ? undefined : '50%',
               background: over ? HARD : EASY,
               opacity: 0.85,
-              borderRadius: over ? '1px 4px 4px 1px' : '4px 1px 1px 4px',
+              borderRadius: BAR_RADIUS,
             }}
           />
         )}
@@ -175,8 +176,8 @@ function PlainRow({ r, maxAbs, first }: { r: LadderRow; maxAbs: number; first: b
       }}
     >
       <HoleNumeral hole={r.hole} par={r.par} />
-      <div style={{ flex: 1, minWidth: 0, height: BAR_H, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
-        <div style={{ width: `${pct}%`, height: '100%', borderRadius: 2, background: HARD, opacity: 0.85 }} />
+      <div style={{ flex: 1, minWidth: 0, height: BAR_H, borderRadius: BAR_RADIUS, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+        <div style={{ width: `${pct}%`, height: '100%', borderRadius: BAR_RADIUS, background: HARD, opacity: 0.85 }} />
       </div>
       <Figure v={r.toPar} />
     </div>

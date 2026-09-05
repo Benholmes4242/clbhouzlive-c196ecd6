@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import type { TournamentHole } from '../data/useTournamentHoleAnalysis';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import {
-  A, FIGS, Hairline, LABEL, SANS, toParParts,
+  A, BAR_RADIUS, FIGS, Hairline, LABEL, SANS, toParParts,
 } from '@/features/courses/components/holes/analytical/tokens';
 import {
   BUCKETS,
@@ -246,9 +246,9 @@ export const TournamentHoleRow: React.FC<{
                       {Math.round(share)}%
                     </span>
                   </div>
-                  <div style={{ height: 4, borderRadius: 2, background: A.TRACK }}>
+                  <div style={{ height: 4, borderRadius: BAR_RADIUS, background: A.TRACK }}>
                     <div
-                      style={{ width: `${share}%`, height: '100%', borderRadius: 2, background: s.bg }}
+                      style={{ width: `${share}%`, height: '100%', borderRadius: BAR_RADIUS, background: s.bg }}
                     />
                   </div>
                 </div>

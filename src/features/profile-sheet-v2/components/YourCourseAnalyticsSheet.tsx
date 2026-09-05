@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import {
   A,
+  BAR_RADIUS,
   CAPTION,
   NUM,
   SANS,
@@ -278,7 +279,7 @@ const DistributionBar: React.FC<{ segs: Seg[] }> = ({ segs }) => {
       style={{
         display: 'flex',
         height: 9,
-        borderRadius: 3,
+        borderRadius: BAR_RADIUS,
         overflow: 'hidden',
         background: A.TRACK,
       }}
@@ -295,6 +296,7 @@ const DistributionBar: React.FC<{ segs: Seg[] }> = ({ segs }) => {
               flexShrink: 0,
               background: s.bg,
               opacity: empty ? 0.18 : 1,
+              borderRadius: BAR_RADIUS,
             }}
           />
         );
@@ -659,7 +661,7 @@ function AnalyticsCourseRow({
                 <div
                   style={{
                     height: 3,
-                    borderRadius: 2,
+                    borderRadius: BAR_RADIUS,
                     background: s.bg,
                     opacity: (s.count ?? 0) === 0 ? 0.18 : 1,
                     marginBottom: 6,

@@ -32,6 +32,7 @@ import { useCourseRecordSummary } from './useCourseRecordSummary';
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ParTypeBars } from '@/features/courses/components/holes/analytical/ParTypeBars';
+import { BAR_RADIUS } from '@/features/courses/components/holes/analytical/tokens';
 import {
   A,
   DIFFICULTY_HARD_HEX,
@@ -173,7 +174,7 @@ const FieldChart: React.FC<{ shape: FieldShape }> = ({ shape }) => {
               style={{
                 flex: 1,
                 height,
-                borderRadius: 2,
+                borderRadius: BAR_RADIUS,
                 background: span > 0 ? difficultyRampColor(t) : difficultyRampStop(2),
               }}
             />

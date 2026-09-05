@@ -1,3 +1,5 @@
+import { BAR_RADIUS } from './tokens';
+
 /**
  * Monotone cubic interpolation, Fritsch-Carlson tangents.
  *
@@ -51,7 +53,7 @@ export function monotonePath(pts: { x: number; y: number }[]): string {
 
 /** Course-chart bar: consistent 2px measurement-bar corners. */
 export function roundedCourseBarPath(x: number, top: number, width: number, height: number): string {
-  const topRadius = Math.min(2, width / 2, height / 2);
+  const topRadius = Math.min(BAR_RADIUS, width / 2, height / 2);
   const bottomRadius = topRadius;
   return [
     `M ${x} ${top + topRadius}`,

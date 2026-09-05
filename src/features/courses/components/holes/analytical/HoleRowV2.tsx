@@ -34,7 +34,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
-import { A, FIGS, Hairline, LABEL, RAMP_TOPAR, SANS, difficultyRampColor, toParParts } from './tokens';
+import { A, BAR_RADIUS, FIGS, Hairline, LABEL, RAMP_TOPAR, SANS, difficultyRampColor, toParParts } from './tokens';
 
 
 /** HOLE / PAR / SI / ramp / figures. Load-bearing: columns never size to content. */
@@ -194,8 +194,7 @@ export const HoleDistributionBar: React.FC<{
                 flexShrink: 0,
                 background: bucket.bg,
                 opacity: empty ? 0.28 : 1,
-                borderRadius:
-                  index === 0 ? '4px 0 0 4px' : index === BUCKETS.length - 1 ? '0 4px 4px 0' : 0,
+                borderRadius: BAR_RADIUS,
               }}
             />
           );
@@ -247,11 +246,10 @@ export const DistributionStrip: React.FC<{ shares: BucketShares; style?: React.C
   style,
 }) => {
   const { t } = useTranslation(['courses']);
-  const lastIdx = BUCKETS.length - 1;
   return (
     <div style={{ paddingBottom: 12, ...style }}>
       <div style={{ display: 'flex', gap: 1.5, height: 8 }}>
-        {BUCKETS.map((b, i) => {
+        {BUCKETS.map((b) => {
           const empty = shares[b.key] <= 0;
           return (
             <i
@@ -261,7 +259,7 @@ export const DistributionStrip: React.FC<{ shares: BucketShares; style?: React.C
                 flexShrink: 0,
                 background: b.bg,
                 opacity: empty ? 0.28 : 1,
-                borderRadius: i === 0 ? '4px 0 0 4px' : i === lastIdx ? '0 4px 4px 0' : 0,
+                borderRadius: BAR_RADIUS,
               }}
             />
           );
@@ -547,7 +545,7 @@ export const HoleRowV2: React.FC<{
                     style={{
                       width: 8,
                       height: 8,
-                      borderRadius: 2,
+                      borderRadius: BAR_RADIUS,
                       background: s.bg,
                       display: 'block',
                       flexShrink: 0,
@@ -574,7 +572,7 @@ export const HoleRowV2: React.FC<{
                       width: '76%',
                       height: 4,
                       marginTop: 4,
-                      borderRadius: 2,
+                      borderRadius: BAR_RADIUS,
                       background: A.TRACK,
                     }}
                   >
@@ -583,7 +581,7 @@ export const HoleRowV2: React.FC<{
                         position: 'absolute',
                         inset: 0,
                         width: `${Math.min(100, (holeShare / shareDomain) * 100)}%`,
-                        borderRadius: 2,
+                        borderRadius: BAR_RADIUS,
                         background: s.bg,
                         display: 'block',
                       }}
