@@ -343,7 +343,8 @@ function HoleChart({
   const selectedBarTop = Math.min(y(selHole.avg_to_par), yBase);
   /* Amendment I: clear whichever sits higher, the field bar or the member
      trace. The fixed TOP lane keeps this baseline inside the plot. */
-  const selectedLabelY = Math.max(9, Math.min(selectedBarTop, dotY ?? selectedBarTop) - 5);
+  const selectedLabelY = Math.min(selectedBarTop, dotY ?? selectedBarTop) - 6;
+  const datumLabelClearance = 24;
 
   return (
     <div>
@@ -391,7 +392,7 @@ function HoleChart({
               trace sit above it: a level hole is a bar of no height, and
               without a drawn zero there is nothing for it to be level with. */}
           <line
-            x1={0}
+            x1={datumLabelClearance}
             x2={W}
             y1={yBase}
             y2={yBase}
@@ -399,6 +400,16 @@ function HoleChart({
             strokeWidth={1}
             vectorEffect="non-scaling-stroke"
           />
+          <text
+            x={0}
+            y={yBase - 4}
+            fill={A.DIM}
+            fontSize={8.5}
+            fontWeight={700}
+            textAnchor="start"
+          >
+            PAR
+          </text>
           {!fieldIsOnlyYou &&
             holes.map((h, i) => {
               const yv = y(h.avg_to_par);
@@ -430,10 +441,10 @@ function HoleChart({
             <circle
               cx={cx(sel)}
               cy={dotY}
-              r={3.5}
+              r={3.4}
               fill={A.AMBER}
-               stroke={surface}
-              strokeWidth={2}
+              stroke={A.CANVAS}
+              strokeWidth={1.2}
               vectorEffect="non-scaling-stroke"
             />
           )}
@@ -457,7 +468,7 @@ function HoleChart({
       </div>
 
       {/* §4.1 - THREE COORDINATES, NOT EIGHTEEN. 1, 9 and 18 orient the strip;
-          the fourth mark names the datum. Eighteen numerals under a 340px
+          PAR names the datum on its own row inside the plot. Eighteen numerals under a 340px
           chart is a second chart competing with the first. */}
       <div
         style={{
@@ -481,9 +492,6 @@ function HoleChart({
             {holes[i]?.hole_no ?? ''}
           </span>
         ))}
-        <span style={{ position: 'absolute', right: 0, ...CAP, fontSize: 8.5 }}>
-          {t('courseDetail.plays.par', 'Par')}
-        </span>
       </div>
     </div>
   );
