@@ -28,6 +28,7 @@ export function DiscoverHeader({ active, onChange }: { active: DiscoverTab; onCh
   useEffect(() => () => {
     setMenuOpen(false);
     setSearchOpen(false);
+    return undefined;
   }, []);
 
   return (
