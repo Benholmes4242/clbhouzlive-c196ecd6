@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { Play, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import { LazyMediaImage } from '@/components/media/LazyMediaImage';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { useAmateurStories } from '@/features/amateur/news/useAmateurStories';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
@@ -31,12 +30,11 @@ function SectionHead({ title, action, onAction }: { title: string; action?: stri
 }
 
 function RailTile({ item, width, onPress }: { item: CommunityLibraryItem; width: number; onPress: () => void }) {
-  const duration = item.duration == null ? null : `${Math.floor(item.duration / 60)}:${String(Math.floor(item.duration % 60)).padStart(2, '0')}`;
   return (
     <button type="button" onClick={onPress} style={{ width, flex: `0 0 ${width}px`, padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}>
       <div style={{ position: 'relative', width, aspectRatio: width === 176 ? '3 / 4' : '16 / 10', overflow: 'hidden', borderRadius: 10, background: A.PANEL }}>
-        {item.thumbnail && <LazyMediaImage src={item.thumbnail} alt="" width="100%" height="100%" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-        {duration && <div style={{ position: 'absolute', right: 6, bottom: 6 }}><GlassDurationBadge label={duration} /></div>}
+        {item.thumbnail && <img src={item.thumbnail} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+        <GlassDurationBadge seconds={item.duration} />
       </div>
       <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.displayName}</div>
     </button>
@@ -46,15 +44,15 @@ function RailTile({ item, width, onPress }: { item: CommunityLibraryItem; width:
 export function NewsMediaTab({ onOpenPost }: { onOpenPost: (items: CommunityLibraryItem[], item: CommunityLibraryItem, source: string) => void }) {
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
-  const { stories = [] } = useAmateurStories();
+  const { stories = [] } = useAmateurStories(null);
   const visibleStories = stories.slice(0, 5);
-  const engagements = useStoryEngagement(visibleStories.map((story) => story.id));
+  const { engagementFor } = useStoryEngagement('amateur_story', visibleStories.map((story) => story.id));
   const reviewsQuery = useLatestReviews(8, true);
-  const reviews = useMemo(() => reviewsQuery.data?.pages.flatMap((page) => page.items).filter((review) => !!review.mediaUrl).slice(0, 8) ?? [], [reviewsQuery.data]);
+  const reviews = useMemo(() => reviewsQuery.reviews.filter((review) => !!review.mediaUrl).slice(0, 8), [reviewsQuery.reviews]);
   const mediaQuery = useDiscoverMediaPreview(true);
   const media = mediaQuery.data;
   const momentsQuery = useMomentsOfTheWeek(30, { enabled: true, candidateLimit: 72 });
-  const moments = (momentsQuery.data?.moments ?? []).slice(0, 6);
+  const moments = (momentsQuery.data ?? []).slice(0, 6);
   const lead = visibleStories[0];
   const remaining = visibleStories.slice(1);
 
@@ -71,8 +69,8 @@ export function NewsMediaTab({ onOpenPost }: { onOpenPost: (items: CommunityLibr
       <div style={{ padding: `28px ${GUTTER}px 110px` }}>
         <section style={{ marginBottom: SECTION_GAP }}>
           <SectionHead title="Amateur news" action="All stories" onAction={() => navigate('/discover/news')} />
-          {lead && <><LeadStory story={lead} compact={false} immersiveHero={false} onClick={() => navigate(`/discover/news/${lead.slug}`)} engagement={engagements.get(lead.id)} /><p style={{ margin: '10px 0 8px', color: A.BODY, fontSize: 13, lineHeight: 1.45 }}>{lead.standfirst}</p><StoryRowEngagement engagement={engagements.get(lead.id)} /></>}
-          <div style={{ marginTop: 14 }}>{remaining.map((story) => <StoryRow key={story.id} story={story} onClick={() => navigate(`/discover/news/${story.slug}`)} engagement={engagements.get(story.id)} />)}</div>
+          {lead && <><LeadStory story={lead} compact={false} immersiveHero={false} onOpen={() => navigate(`/discover/news/${lead.slug}`)} engagement={engagementFor(lead.id)} /><p style={{ margin: '10px 0 8px', color: A.BODY, fontSize: 13, lineHeight: 1.45 }}>{lead.standfirst}</p><StoryRowEngagement engagement={engagementFor(lead.id)} /></>}
+          <div style={{ marginTop: 14 }}>{remaining.map((story) => <StoryRow key={story.id} story={story} onOpen={() => navigate(`/discover/news/${story.slug}`)} engagement={engagementFor(story.id)} />)}</div>
           <ListTerminalRow label="All stories" onPress={() => navigate('/discover/news')} />
         </section>
 
@@ -81,15 +79,15 @@ export function NewsMediaTab({ onOpenPost }: { onOpenPost: (items: CommunityLibr
         </section>
 
         <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="From the reviews" />
-          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform', marginRight: -GUTTER, paddingRight: GUTTER }}>{reviews.map((review) => <button key={review.reviewId} type="button" onClick={() => navigate(`/courses/${review.courseId}`)} style={{ position: 'relative', width: 196, flex: '0 0 196px', padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}><div style={{ position: 'relative', aspectRatio: '4 / 5', borderRadius: 10, overflow: 'hidden', background: A.PANEL }}><LazyMediaImage src={review.posterUrl ?? review.mediaUrl ?? ''} alt="" width="100%" height="100%" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /><span style={{ position: 'absolute', left: 7, top: 7, borderRadius: 999, padding: '4px 7px', background: 'rgba(13,13,13,.82)', fontSize: 12, fontWeight: 700 }}>{review.rating.toFixed(1)}</span>{(review.mediaCount ?? 1) > 1 && <span style={{ position: 'absolute', right: 7, bottom: 7, borderRadius: 999, padding: '4px 7px', background: 'rgba(13,13,13,.82)', fontSize: 11, fontWeight: 700 }}>+{(review.mediaCount ?? 1) - 1}</span>}</div><div style={{ marginTop: 7, fontSize: 12, fontWeight: 700 }}>{review.courseName}</div><div style={{ marginTop: 2, fontSize: 11, color: A.MUTE }}>{review.reviewerName}</div></button>)}</div>
+          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform', marginRight: -GUTTER, paddingRight: GUTTER }}>{reviews.map((review) => <button key={review.reviewId} type="button" onClick={() => navigate(`/courses/${review.courseId}`)} style={{ position: 'relative', width: 196, flex: '0 0 196px', padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}><div style={{ position: 'relative', aspectRatio: '4 / 5', borderRadius: 10, overflow: 'hidden', background: A.PANEL }}><img src={review.posterUrl ?? review.mediaUrl ?? ''} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /><span style={{ position: 'absolute', left: 7, top: 7, borderRadius: 999, padding: '4px 7px', background: 'rgba(13,13,13,.82)', fontSize: 12, fontWeight: 700 }}>{review.rating.toFixed(1)}</span>{(review.mediaCount ?? 1) > 1 && <span style={{ position: 'absolute', right: 7, bottom: 7, borderRadius: 999, padding: '4px 7px', background: 'rgba(13,13,13,.82)', fontSize: 11, fontWeight: 700 }}>+{(review.mediaCount ?? 1) - 1}</span>}</div><div style={{ marginTop: 7, fontSize: 12, fontWeight: 700 }}>{review.courseName}</div><div style={{ marginTop: 2, fontSize: 11, color: A.MUTE }}>{review.reviewerName}</div></button>)}</div>
         </section>
 
         <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="From the rounds" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 5 }}>{(media?.rounds ?? []).map((item) => <button key={item.key} type="button" aria-label={`Open ${item.displayName}'s round`} onClick={() => onOpenPost(media?.rounds ?? [], item, 'discover-rounds')} style={{ position: 'relative', aspectRatio: '1', padding: 0, border: 0, borderRadius: 6, overflow: 'hidden', background: A.PANEL, cursor: 'pointer' }}>{item.thumbnail && <LazyMediaImage src={item.thumbnail} alt="" width="100%" height="100%" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}{item.kind === 'video' && <span style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', color: A.INK }}><Play size={18} fill="currentColor" /></span>}</button>)}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 5 }}>{(media?.rounds ?? []).map((item) => <button key={item.key} type="button" aria-label={`Open ${item.displayName}'s round`} onClick={() => onOpenPost(media?.rounds ?? [], item, 'discover-rounds')} style={{ position: 'relative', aspectRatio: '1', padding: 0, border: 0, borderRadius: 6, overflow: 'hidden', background: A.PANEL, cursor: 'pointer' }}>{item.thumbnail && <img src={item.thumbnail} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}{item.kind === 'video' && <span style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', color: A.INK }}><Play size={18} fill="currentColor" /></span>}</button>)}</div>
         </section>
 
         <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="Moments" action="See all" onAction={() => navigate('/community')} />
-          <MomentsGrid moments={moments} cap={6} gap={5} tall={250} radius={10} onTilePress={(moment) => navigate(`/post/${moment.postId}`)} autoplayGroup="discover-news-moments" />
+          <MomentsGrid moments={moments} cap={6} gap={5} tall={250} radius={10} onTilePress={(moment) => navigate(`/post/${moment.post.id}`)} autoplayGroup="discover-news-moments" />
         </section>
 
         <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="Videos" />
