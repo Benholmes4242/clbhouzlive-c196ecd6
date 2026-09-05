@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { r } from "./src/lib/radius";
 
 export default {
 	darkMode: ["class"],
@@ -146,6 +147,17 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)',
+				// Radius canon. The r-* names are the migration targets.
+				'r-none': r.none,
+				'r-bar': r.bar,
+				'r-xs': r.xs,
+				'r-sm': r.sm,
+				'r-md': r.md,
+				'r-lg': r.lg,
+				'r-xl': r.xl,
+				'r-sheet': r.sheet,
+				'r-pill': r.pill,
+				'r-avatar': r.avatar,
 				/**
 				 * SQUIRCLE DESIGN SYSTEM (SDS) - Global border radius tokens
 				 * ============================================================
@@ -163,11 +175,12 @@ export default {
 				 * INSTEAD USE: rounded-sq-xs, rounded-sq-sm, rounded-sq-md, rounded-sq-lg, rounded-sq-pill
 				 * EXCEPTION: rounded-full for truly circular elements (dots, avatar rings)
 				 */
-				'sq-xs': '10px',
-				'sq-sm': '14px',
-				'sq-md': '18px',
-				'sq-lg': '24px',
-				'sq-pill': '999px'
+				// Legacy aliases retain their exact rendered values during migration.
+				'sq-xs': r.sm,
+				'sq-sm': r.md,
+				'sq-md': r.lg,
+				'sq-lg': r.xl,
+				'sq-pill': r.pill
 			},
 			spacing: {
 				'header-mobile': 'var(--header-h-mobile)',
