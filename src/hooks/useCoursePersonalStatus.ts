@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { setWantToPlayRequest } from '@/hooks/shortlist/wantToPlayMutation';
+import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 
 
 export type CourseStatus = 'played' | 'want_to_play' | 'none';
@@ -21,9 +22,43 @@ export interface CoursePersonalStatus {
   createdAt?: string;
 }
 
+export type CourseTrackedState = 'populated' | 'rated_without_rounds' | 'never_played';
+
+export function resolveCourseTrackedState(
+  hasTrackedRounds: boolean,
+  declaration: CourseStatus,
+): CourseTrackedState {
+  if (hasTrackedRounds) return 'populated';
+  return declaration === 'played' ? 'rated_without_rounds' : 'never_played';
+}
+
 export function useCoursePersonalStatus(courseId: string | undefined) {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+
+  // DISPLAYED COUNT: the exact same cached RPC field used by the course hero.
+  // It is the member's 18-hole sample; do not independently recount it here.
+  const roundsCountQuery = useCourseStatsDetail(courseId, Boolean(user?.id && courseId));
+
+  // HAS PLAYED: deliberately an existence test, not another count. Unlike the
+  // hero's display sample, any tracked round qualifies, including nine holes.
+  const anyTrackedRoundQuery = useQuery({
+    queryKey: ['course-personal-status', 'any-tracked-round', courseId, user?.id],
+    enabled: Boolean(courseId && user?.id),
+    queryFn: async (): Promise<boolean> => {
+      if (!courseId || !user?.id) return false;
+      const { data, error } = await supabase
+        .from('gam_round_stats')
+        .select('whs_score_id')
+        .eq('course_id', courseId)
+        .eq('user_id', user.id)
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data != null;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
   const query = useQuery({
     queryKey: ['course-personal-status', courseId, user?.id],
@@ -105,6 +140,10 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
     // to handle the in-flight case instead of being told 'none' and being wrong.
     status: query.data ?? null,
     isLoading: query.isLoading,
+    hasTrackedRounds: anyTrackedRoundQuery.data ?? false,
+    trackedRoundCount: roundsCountQuery.data?.your_rounds ?? 0,
+    // Absence is safe to render only after BOTH round questions succeeded.
+    roundsSettled: anyTrackedRoundQuery.isSuccess && roundsCountQuery.isSuccess,
     setWantToPlay: (want: boolean) => setWantToPlayMutation.mutate(want),
     isUpdating: setWantToPlayMutation.isPending,
   };
