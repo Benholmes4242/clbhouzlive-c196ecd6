@@ -14,7 +14,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { A, FIGS, TOPAR_RED, toParParts } from './tokens';
+import { A, DIFFICULTY_HARD_HEX, FIGS, toParParts } from './tokens';
 import type { ParTypeRow } from './CourseAnalyticsPanels';
 
 export interface SignedParScale {
@@ -39,6 +39,18 @@ export function buildSignedParScale(rows: ReadonlyArray<ParTypeRow>): SignedParS
   // Headroom keeps the longest bar off the track's end; the floor stops three
   // dead-level par types dividing by ~0.
   return { bound: Math.max(0.2, peak * 1.15) };
+}
+
+/**
+ * The COURSE SHAPE law, not the to-par law: this row answers "is this par type
+ * easier or harder than par", so under par is the easier GREEN and over par is
+ * the shape chart's hardest RED. Level stays muted.
+ */
+function shapeTone(v: number): string {
+  const r = Math.round(v * 10) / 10;
+  if (r < 0) return A.GREEN;
+  if (r > 0) return DIFFICULTY_HARD_HEX;
+  return A.MUTE;
 }
 
 /** Signed position in the track, 0% = far left, 50% = par, 100% = far right. */
@@ -118,7 +130,7 @@ export const ParTypeBars: React.FC<{
                   left: `${left}%`,
                   width: `${width}%`,
                   borderRadius: 4,
-                  background: under ? TOPAR_RED : A.INK,
+                  background: under ? A.GREEN : DIFFICULTY_HARD_HEX,
                   display: 'block',
                 }}
               />
@@ -161,7 +173,7 @@ export const ParTypeBars: React.FC<{
                       style={{
                         fontSize: figSize,
                         fontWeight: 700,
-                        color: fieldFig ? fieldFig.tone : A.INK,
+                        color: fieldFig ? shapeTone(r.field) : A.INK,
                         minWidth: 34,
                         textAlign: 'right',
                       }}
@@ -191,7 +203,7 @@ export const ParTypeBars: React.FC<{
                   fontSize: figSize,
                   fontWeight: 700,
                   textAlign: 'right',
-                  color: fieldFig ? fieldFig.tone : A.INK,
+                  color: fieldFig ? shapeTone(r.field) : A.INK,
                 }}
               >
                 {fieldFig ? fieldFig.text : ''}
