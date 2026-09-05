@@ -90,9 +90,12 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
   const { data: liveTournaments, isFetched: liveFetched, isLoading: liveLoading } = useLiveTournaments();
-  const inProgress = (liveTournaments ?? []).filter((tt) => (tt.status || '').toLowerCase() === 'inprogress');
+  // Persisted query caches can briefly contain an old non-array response shape.
+  // The menu is navigation and must remain usable while that cache refreshes.
+  const tournamentRows = Array.isArray(liveTournaments) ? liveTournaments : [];
+  const inProgress = tournamentRows.filter((tt) => (tt.status || '').toLowerCase() === 'inprogress');
   const liveCount = inProgress.length;
-  const showLive = liveFetched && (liveTournaments?.length ?? 0) > 0;
+  const showLive = liveFetched && tournamentRows.length > 0;
 
 
   // Mount on open; unmount after exit transition.
