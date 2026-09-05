@@ -22,6 +22,16 @@ export interface CoursePersonalStatus {
   createdAt?: string;
 }
 
+export type CourseTrackedState = 'populated' | 'rated_without_rounds' | 'never_played';
+
+export function resolveCourseTrackedState(
+  hasTrackedRounds: boolean,
+  declaration: CourseStatus,
+): CourseTrackedState {
+  if (hasTrackedRounds) return 'populated';
+  return declaration === 'played' ? 'rated_without_rounds' : 'never_played';
+}
+
 export function useCoursePersonalStatus(courseId: string | undefined) {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
@@ -39,7 +49,7 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
       if (!courseId || !user?.id) return false;
       const { data, error } = await supabase
         .from('gam_round_stats')
-        .select('id')
+        .select('whs_score_id')
         .eq('course_id', courseId)
         .eq('user_id', user.id)
         .limit(1)

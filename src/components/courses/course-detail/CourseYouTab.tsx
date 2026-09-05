@@ -505,7 +505,6 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
     status,
     isLoading: statusLoading,
     hasTrackedRounds,
-    trackedRoundCount,
     roundsSettled,
     setWantToPlay,
     isUpdating,
@@ -685,20 +684,19 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
           }
         />
         {status.status === 'want_to_play' && (
-          <PersonalSection courseId={courseId} courseName={courseName} />
+          <div style={{ padding: '0 16px' }}>
+            <CourseStatusToggle courseId={courseId} courseName={courseName} />
+          </div>
         )}
         <UpForGrabs recordLabel={recordLabel} holderName={holderName} unclaimedCount={unclaimedCount} />
       </div>,
     );
   }
 
-  // Tracked rounds exist. `trackedRoundCount` is the hero RPC's full-round
-  // sample; the existence gate above also admits a nine-hole-only history.
+  // Tracked rounds exist. The existence gate also admits a nine-hole-only
+  // history; the additive hook's count retains the hero RPC's full-round sample.
   return wrap(
     <>
-      <div style={{ padding: '16px 16px 0', ...LABEL_MUTE }}>
-        {`${trackedRoundCount} ${trackedRoundCount === 1 ? 'full round' : 'full rounds'} tracked`}
-      </div>
       <PersonalSection courseId={courseId} courseName={courseName} />
       <CourseHolesTab
         courseId={courseId}
