@@ -1,18 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ListFilter } from 'lucide-react';
-
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
-import { DISCOVER_STICKY_FILTER_Z } from '@/lib/zLayers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { r } from '@/lib/radius';
 
 import { DISCOVER_FACT, FIGS, SANS } from './tokens';
-import { BoardHeaderRow, BoardRowView, gapText } from './BoardRows';
+import { BoardRowView, gapText } from './BoardRows';
 import { BoardFilterPanel } from './BoardFilterPanel';
 import { BoardSeeAllSheet } from './BoardSeeAllSheet';
 import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
-import { CourseBoardHeaderRow, CourseBoardRows } from './CourseBoardRows';
+import { CourseBoardRows } from './CourseBoardRows';
 import { HowTheyPlayedSection } from './HowTheyPlayedSection';
 import { ListTerminalRow } from './ListTerminalRow';
 import { describeFilterParts } from './GolfThisWeek';
@@ -21,10 +17,15 @@ import { useBoardPage, type BoardRow } from './hooks/useBoardPage';
 import { useBoardCourses } from './hooks/useBoardCourses';
 import {
   BOARD_LABELS,
+  BAND_OPTIONS,
+  COMPETITION_OPTIONS,
+  COURSES_SET_OPTIONS,
   COURSE_BOARD_KEYS,
   COURSE_BOARD_LABELS,
   DEFAULT_FILTERS,
+  SCOPE_OPTIONS,
   SCORES_MEMBER_BOARD_KEYS,
+  WINDOW_SHORT,
   normalizeFilters,
   filtersAreDefault,
   type BoardFilters,
@@ -62,12 +63,40 @@ const PAGE_FETCH = 200;
 /** S5.4 — five course rows, and the read takes exactly what it shows. */
 const COURSE_ROWS = 5;
 
+/** The filter rail always states its three base axes, then only active refinements. */
+function appliedFilterChips(
+  f: BoardFilters,
+  t: (key: string, fallback?: string, options?: object) => string,
+): string[] {
+  const chips: string[] = [];
+  const scope = SCOPE_OPTIONS.find((option) => option.key === f.scope);
+  if (scope) chips.push(t(scope.i18n, scope.label));
+  chips.push(t(WINDOW_SHORT[f.window].i18n, WINDOW_SHORT[f.window].label));
+
+  if (f.courses === 'one') {
+    chips.push(t('discover.filterBoard.courses.oneCourse', 'One course'));
+  } else {
+    const courses = COURSES_SET_OPTIONS.find((option) => option.key === f.courses);
+    if (courses) chips.push(t(courses.i18n, courses.label));
+  }
+  if (f.regionValue) chips.push(f.regionValue);
+  if (f.band !== 'any') {
+    const band = BAND_OPTIONS.find((option) => option.key === f.band);
+    if (band) chips.push(t(band.i18n, band.label));
+  }
+  if (f.competition !== 'any') {
+    const competition = COMPETITION_OPTIONS.find((option) => option.key === f.competition);
+    if (competition) chips.push(t(competition.i18n, competition.label));
+  }
+  return chips;
+}
+
 export interface ScoresTabProps {
   userId: string | undefined;
   onRowPress?: (row: BoardRow) => void;
   onCoursePress?: (courseId: string) => void;
   onMemberPress?: (memberId: string) => void;
-  /** Discover's route-owned fixed header supplies the sticky bar's offset. */
+  /** Retained for caller compatibility; the filter rail is no longer sticky. */
   belowDiscoverHeader?: boolean;
 }
 
@@ -76,7 +105,7 @@ export function ScoresTab({
   onRowPress,
   onCoursePress,
   onMemberPress,
-  belowDiscoverHeader = false,
+  belowDiscoverHeader: _belowDiscoverHeader = false,
 }: ScoresTabProps) {
   const { t } = useTranslation('courses');
 
@@ -127,6 +156,7 @@ export function ScoresTab({
     courseRows.find((row) => row.course_id === selectedCourse) ?? courseRows[0] ?? null;
 
   const appliedParts = useMemo(() => describeFilterParts(filters, t as never), [filters, t]);
+  const appliedChips = useMemo(() => appliedFilterChips(filters, t as never), [filters, t]);
 
   const changeFilters = useCallback((next: BoardFilters) => {
     analyticsEvents.track('discover_board_filter_change', {
@@ -150,73 +180,87 @@ export function ScoresTab({
   }, []);
 
   const boardTitle = t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
+  const courseBoardTitle = t(COURSE_BOARD_LABELS[courseBoard].i18n, COURSE_BOARD_LABELS[courseBoard].label);
   const memberUnit = t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total });
 
   return (
     <section style={{ fontFamily: SANS, ...FIGS }}>
-      {/* S2 — THE APPLIED FILTER, STICKY, GOVERNING BOTH HALVES. Settled chrome:
-          full width, no radius, no shadow, one hairline below it. The header's
-          own bottom edge was removed so the tab indicator sits on nothing. */}
-      <button
-        type="button"
-        onClick={() => setPanelOpen(true)}
-        aria-label={t('discover.filterBoard.open', 'Filter the board')}
+      {/* BRIEF_SCORES_SECTION_HEAD S1 — applied state is content, not chrome:
+          individual chips on the canvas, with no panel, border, or sticky owner. */}
+      <div
         style={{
-          position: 'sticky',
-          top: belowDiscoverHeader ? 'var(--discover-header-h)' : 'var(--chrome-total-h, 55px)',
-          zIndex: DISCOVER_STICKY_FILTER_Z,
-          width: 'calc(100% + 28px)',
-          /* S1.1 — 10px of clearance below the tab strip: the bar and the active
-             tab's underline were touching and read as one element. */
-          margin: '10px -14px 0',
-          minHeight: 40,
-          padding: '0 14px',
+          marginTop: 14,
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
-          boxSizing: 'border-box',
-          background: A.PANEL,
-          border: 'none',
-          borderBottom: `1px solid ${A.BORDER}`,
-          borderRadius: 0,
-          boxShadow: 'none',
-          fontFamily: SANS,
-          cursor: 'pointer',
-          textAlign: 'left',
+          gap: 8,
+          minWidth: 0,
         }}
       >
-        <span
+        <div
+          className="scrollbar-hide"
           style={{
-            ...KICKER,
+            display: 'flex',
+            gap: 6,
             flex: 1,
             minWidth: 0,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            color: A.BODY,
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            willChange: 'transform',
           }}
         >
-          {appliedParts.join(' \u00B7 ')}
-        </span>
-        <span style={{ ...KICKER, display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, color: A.INK }}>
-          <ListFilter size={13} strokeWidth={2.4} aria-hidden />
-          {t('discover.filterBoard.filters', 'Filters')}
-        </span>
-      </button>
+          {appliedChips.map((part, index) => (
+            <button
+              key={`${part}:${index}`}
+              type="button"
+              onClick={() => setPanelOpen(true)}
+              style={{
+                ...KICKER,
+                flexShrink: 0,
+                padding: '4px 9px',
+                border: 'none',
+                borderRadius: 9,
+                background: 'rgba(255,255,255,0.06)',
+                color: A.MUTE,
+                fontFamily: SANS,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {part}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => setPanelOpen(true)}
+          aria-label={t('discover.filterBoard.open', 'Filter the board')}
+          style={{
+            ...KICKER,
+            flexShrink: 0,
+            padding: '4px 0 4px 6px',
+            border: 'none',
+            background: 'transparent',
+            color: A.INK,
+            fontFamily: SANS,
+            fontSize: 10,
+            cursor: 'pointer',
+          }}
+        >
+          {t('discover.filterBoard.edit', 'Edit')}
+        </button>
+      </div>
 
       {/* ================= MEMBERS ================= */}
       <div
         ref={membersRef}
         style={{
           paddingTop: 18,
-          scrollMarginTop: belowDiscoverHeader
-            ? 'calc(var(--discover-header-h) + 48px)'
-            : 'calc(var(--chrome-total-h, 55px) + 48px)',
+          scrollMarginTop: 'var(--discover-header-h, var(--chrome-total-h, 55px))',
         }}
       >
         <HalfHeading
-          title={t('discover.scores.members', 'Members')}
-          count={t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })}
+          eyebrow={`${t('discover.scores.members', 'Members')} \u00B7 ${t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })}`}
+          headline={boardTitle}
         />
         <BoardRail
           keys={SCORES_MEMBER_BOARD_KEYS}
@@ -237,7 +281,6 @@ export function ScoresTab({
           />
         ) : (
           <>
-            <BoardHeaderRow board={board} />
             {visible.map((row) => (
               <BoardRowView
                 key={`${row.pos}:${row.whs_score_id ?? row.user_id}`}
@@ -269,10 +312,10 @@ export function ScoresTab({
       </div>
 
       {/* ================= COURSES ================= */}
-      <div style={{ paddingTop: 32 }}>
+      <div style={{ paddingTop: 30 }}>
         <HalfHeading
-          title={t('discover.scores.courses', 'Courses')}
-          count={t('discover.coursesPlayed.nCourses', '{{count}} courses', { count: courseTotal })}
+          eyebrow={`${t('discover.scores.courses', 'Courses')} \u00B7 ${t('discover.coursesPlayed.nCourses', '{{count}} courses', { count: courseTotal })}`}
+          headline={courseBoardTitle}
         />
         <BoardRail
           keys={COURSE_BOARD_KEYS}
@@ -293,7 +336,6 @@ export function ScoresTab({
           />
         ) : (
           <>
-            <CourseBoardHeaderRow board={courseBoard} />
             <CourseBoardRows
               rows={courseRows}
               board={courseBoard}
@@ -358,28 +400,24 @@ export function ScoresTab({
   );
 }
 
-/**
- * S3.1 — THE TWO HALVES ARE HEADED IDENTICALLY. Same type, same weight, same
- * count treatment: equal weight is stated by the page, not implied by order.
- */
-function HalfHeading({ title, count }: { title: string; count: string }) {
+/** Both halves use the same eyebrow/count and selected-board headline. */
+function HalfHeading({ eyebrow, headline }: { eyebrow: string; headline: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ ...KICKER, color: A.DIM, marginBottom: 4 }}>{eyebrow}</div>
       <h2
         style={{
           margin: 0,
-          /* S1.2 — 17/800. On a reference surface the FIGURES carry the most
-             weight; the labels above them must not be the largest type. */
-          fontSize: 17,
+          fontSize: 20,
           fontWeight: 800,
-          letterSpacing: '0.005em',
+          letterSpacing: '-0.01em',
           textTransform: 'uppercase',
           color: DISCOVER_FACT,
+          lineHeight: 1.1,
         }}
       >
-        {title}
+        {headline}
       </h2>
-      <span style={{ ...KICKER, color: A.MUTE, flexShrink: 0 }}>{count}</span>
     </div>
   );
 }
@@ -387,8 +425,8 @@ function HalfHeading({ title, count }: { title: string; count: string }) {
 /**
  * THE BOARD RAIL. One scrolling row of chips, breaking the page gutter so the
  * first chip lines up with the heading and the last can scroll clear of the edge.
- * The active chip is stated by INK ON PANEL, never by a colour: amber belongs to
- * the viewing member's own row.
+ * The active chip is stated by CANVAS ON INK, never by a colour: amber belongs
+ * to the viewing member's own row.
  */
 function BoardRail<K extends string>({
   keys,
@@ -426,7 +464,7 @@ function BoardRail<K extends string>({
               /* S1.3 — 12/700, 6 by 11: five and a half chips visible is what
                  says the rail scrolls. */
               padding: '6px 11px',
-              borderRadius: r.xs,
+              borderRadius: 11,
               border: `1px solid ${active ? 'transparent' : A.BORDER}`,
               background: active ? A.INK : 'transparent',
               color: active ? A.CANVAS : A.MUTE,
@@ -465,7 +503,7 @@ function EmptyHalf({
           style={{
             marginTop: 12,
             padding: '9px 14px',
-            borderRadius: r.xs,
+             borderRadius: 6,
             border: `1px solid ${A.BORDER}`,
             background: A.PANEL,
             color: DISCOVER_FACT,

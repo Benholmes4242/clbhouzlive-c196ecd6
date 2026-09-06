@@ -22,3 +22,10 @@
 - [ ] Reuse the Course page course card, chart, By par, and six-row hole preview
 - [ ] Preserve no-round/sample/viewer-only gates and add the full-analytics terminal row
 - [ ] Verify matching bars, 390px height, and 320px fit
+
+## Scores section heads (BRIEF_SCORES_SECTION_HEAD)
+- [x] Replace the sticky filter panel with a non-sticky applied-filter chip rail and Edit action
+- [x] Make each selected board name the headline beneath a category/count eyebrow
+- [x] Remove both universal column-header rows and match the two halves' construction
+- [x] Verify 320px headline fit, board switching, and filter scroll-away behavior
+- [x] Audit boards whose figures may need local labels without universal headers
