@@ -7,7 +7,7 @@ import { DISCOVER_STICKY_FILTER_Z } from '@/lib/zLayers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { r } from '@/lib/radius';
 
-import { DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from './tokens';
+import { DISCOVER_FACT, FIGS, SANS } from './tokens';
 import { BoardHeaderRow, BoardRowView, gapText } from './BoardRows';
 import { BoardFilterPanel } from './BoardFilterPanel';
 import { BoardSeeAllSheet } from './BoardSeeAllSheet';
