@@ -1,11 +1,12 @@
-import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 
 import { DiscoverHeader, type DiscoverTab } from './DiscoverHeader';
 import { NewsTabPage } from './NewsTabPage';
@@ -16,6 +17,11 @@ import type { BoardFilters } from './courseled/boardFilters';
 import type { BoardRow } from './courseled/hooks/useBoardPage';
 import type { CommunityLibraryItem } from './courseled/hooks/useCommunityLibrary';
 import { useScorecardOpener } from './useScorecardOpener';
+import {
+  readDiscoverReturn,
+  withDiscoverReturn,
+  withoutDiscoverReturn,
+} from './discoverReturnState';
 
 interface ExploreTabContentProps {
   embedded?: boolean;
@@ -29,12 +35,48 @@ interface ExploreTabContentProps {
  */
 export default function ExploreTabContent({ embedded = false }: ExploreTabContentProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSupabaseSession();
   const opener = useScorecardOpener();
-  const [activeTab, setActiveTab] = useState<DiscoverTab>('scores');
+  const initialReturn = useRef(readDiscoverReturn(location.state));
+  const [activeTab, setActiveTab] = useState<DiscoverTab>(() => initialReturn.current?.tab ?? 'scores');
   const [boardFilters, setBoardFilters] = useState<BoardFilters | null>(null);
 
+  useLayoutEffect(() => {
+    const snapshot = initialReturn.current;
+    if (!snapshot || embedded || activeTab !== snapshot.tab) return;
+
+    let frame = 0;
+    let animationFrame = 0;
+    const restore = () => {
+      scrollPageTo(snapshot.scrollY, 'instant');
+      frame += 1;
+      const restored = Math.abs(getPageScrollTop() - snapshot.scrollY) < 2;
+      if (!restored && frame < 180) {
+        animationFrame = window.requestAnimationFrame(restore);
+        return;
+      }
+
+      initialReturn.current = null;
+      navigate(`${location.pathname}${location.search}`, {
+        replace: true,
+        state: withoutDiscoverReturn(location.state),
+      });
+    };
+
+    animationFrame = window.requestAnimationFrame(restore);
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [activeTab, embedded, location.pathname, location.search, location.state, navigate]);
+
+  const rememberDiscoverPosition = useCallback((tab: DiscoverTab) => {
+    navigate(`${location.pathname}${location.search}`, {
+      replace: true,
+      state: withDiscoverReturn(location.state, { tab, scrollY: getPageScrollTop() }),
+    });
+  }, [location.pathname, location.search, location.state, navigate]);
+
   const changeTab = useCallback((next: DiscoverTab) => {
+    initialReturn.current = null;
     setActiveTab(next);
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, []);
@@ -49,6 +91,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
   }, [opener]);
 
   const openMedia = useCallback((pool: CommunityLibraryItem[], item: CommunityLibraryItem, openedFrom: string) => {
+    rememberDiscoverPosition('gallery');
     const posts = pool.map((entry) => entry.post);
     const index = Math.max(0, posts.findIndex((post) => post.id === item.postId));
     openWithOrigin({
@@ -60,7 +103,12 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
       mediaId: item.mediaId ?? null,
       openedFrom,
     });
-  }, []);
+  }, [rememberDiscoverPosition]);
+
+  const openNewsStory = useCallback((slug: string) => {
+    rememberDiscoverPosition('news');
+    navigate(`/discover/news/${slug}`);
+  }, [navigate, rememberDiscoverPosition]);
 
   return (
     <div style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, ...FIGS }}>
@@ -87,7 +135,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
           </div>
         </main>
       ) : activeTab === 'news' ? (
-        <NewsTabPage />
+        <NewsTabPage onOpenStory={openNewsStory} />
       ) : (
         <GalleryTab onOpenPost={openMedia} />
       )}

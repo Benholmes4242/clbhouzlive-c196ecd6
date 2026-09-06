@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { type AmateurStory, useAmateurStories } from '@/features/amateur/news/useAmateurStories';
@@ -24,8 +23,7 @@ import { r } from '@/lib/radius';
 const WIRE_PAGE_SIZE = 10;
 
 /** NEWS is editorial only and deliberately mounts no Discover media query. */
-export function NewsTabPage() {
-  const navigate = useNavigate();
+export function NewsTabPage({ onOpenStory }: { onOpenStory: (slug: string) => void }) {
   const { stories: allStories = [], isPending } = useAmateurStories(null);
   const [wireLimit, setWireLimit] = useState(WIRE_PAGE_SIZE);
   const [competition, setCompetition] = useState<string | null>(null);
@@ -56,7 +54,7 @@ export function NewsTabPage() {
     return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8);
   }, [allStories]);
 
-  const open = (story: AmateurStory) => navigate(`/discover/news/${story.slug}`);
+  const open = (story: AmateurStory) => onOpenStory(story.slug);
   const engagementAction = (story: AmateurStory, size = 13) => {
     const like = stateFor('amateur_story', story.id);
     return (

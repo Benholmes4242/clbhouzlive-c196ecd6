@@ -8,6 +8,7 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { scrollPageToTop } from '@/lib/getScrollParent';
+import { withoutDiscoverReturn } from '@/components/explore-tab-new/discoverReturnState';
 
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
@@ -72,6 +73,10 @@ export const useNavigationHandlers = () => {
           navigate('/tourhub', { replace: true, state: { from: 'nav' } });
         } else if (tab.id === 'tourhub') {
           navigate(tab.path, { replace: true, state: { from: 'nav' } });
+        } else if (tab.id === 'watch') {
+          // A deliberate bottom-nav entry is always a fresh Discover visit.
+          // Strip any history-carried story return snapshot so Scores wins.
+          navigate(tab.path, { replace: true, state: withoutDiscoverReturn(location.state) });
         } else {
           navigate(tab.path, { replace: true });
         }
