@@ -57,7 +57,7 @@ export default function MomentsLibraryPage() {
       <main style={{ paddingTop: 'var(--library-header-h)' }}>
         <div style={{ padding: `0 ${GUTTER}px 110px` }}>
           <LibraryHead total={totalQuery.data ?? null} title="Moments" />
-          <SortRail<MomentsSort> options={SORTS} value={sort} onChange={changeSort} />
+          <SortRail options={SORTS} value={sort} onChange={(next) => changeSort(next as MomentsSort)} />
 
           <MomentsGrid
             moments={visible}

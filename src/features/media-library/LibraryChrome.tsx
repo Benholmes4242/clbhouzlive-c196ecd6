@@ -83,14 +83,15 @@ export function LibraryHead({ total, title }: { total: number | null; title: str
   );
 }
 
-export function SortRail<T extends string>({
+/** Ids stay plain strings: JSX type arguments break the dev tagger plugin. */
+export function SortRail({
   options,
   value,
   onChange,
 }: {
-  options: Array<{ id: T; label: string }>;
-  value: T;
-  onChange: (next: T) => void;
+  options: Array<{ id: string; label: string }>;
+  value: string;
+  onChange: (next: string) => void;
 }) {
   return (
     <div
