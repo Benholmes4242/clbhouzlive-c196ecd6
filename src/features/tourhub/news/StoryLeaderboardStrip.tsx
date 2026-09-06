@@ -166,30 +166,33 @@ export function StoryLeaderboardStrip({ tournamentId }: { tournamentId: string }
           padding: '0 14px',
         }}
       >
-        {isLive && (
+        {isLive && !isNarrowestViewport && (
           <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: LIVE_INK, flexShrink: 0 }} />
         )}
+        {!isNarrowestViewport && (
+          <>
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                color: isLive ? LIVE_INK : 'rgba(255,255,255,0.50)',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
+              {caption}
+            </span>
+            <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.22)', flexShrink: 0 }} />
+          </>
+        )}
         <span
-          style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: isLive ? LIVE_INK : 'rgba(255,255,255,0.50)',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}
-        >
-          {caption}
-        </span>
-        <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.22)', flexShrink: 0 }} />
-        <span
+          data-story-strip-tournament-name
           style={{
             fontSize: 11,
             fontWeight: 600,
             color: 'rgba(255,255,255,0.82)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
             minWidth: 0,
           }}
