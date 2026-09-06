@@ -11,8 +11,8 @@ import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { DiscoverHeader, type DiscoverTab } from './DiscoverHeader';
 import { NewsTabPage } from './NewsTabPage';
 import { GalleryTab } from './GalleryTab';
-import { GolfThisWeek } from './courseled/GolfThisWeek';
-import { CoursesPlayedSection } from './courseled/CoursesPlayedSection';
+import { ScoresTab } from './courseled/ScoresTab';
+
 import type { BoardFilters } from './courseled/boardFilters';
 import type { BoardRow } from './courseled/hooks/useBoardPage';
 import type { CommunityLibraryItem } from './courseled/hooks/useCommunityLibrary';
