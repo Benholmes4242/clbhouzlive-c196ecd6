@@ -12,6 +12,7 @@ import { CourseAnalyticsCard } from './CoursesPlayedSection';
 import { CourseCardPanel } from '@/features/courses/components/holes/analytical/CourseCardPanel';
 import { ListTerminalRow } from './ListTerminalRow';
 import { CourseImageFallback } from './CourseImageFallback';
+import { SectionHeadline } from './SectionHeadline';
 import { useSearchedCourse } from './hooks/useSearchedCourse';
 import type { BoardCourseRow } from './hooks/useBoardCourses';
 import type { BoardFilters } from './boardFilters';
@@ -93,10 +94,9 @@ export function HowTheyPlayedSection({
     setQuery('');
   };
 
-  if (!subjectId) return null;
-
   return (
-    <div style={{ marginTop: 14, fontFamily: SANS, ...FIGS }}>
+    <div style={{ marginTop: 26, fontFamily: SANS, ...FIGS }}>
+      <SectionHeadline title={t('discover.scores.courseAnalytics', 'Course analytics')} />
       {/* S2.2 — the field, full width, above the card. */}
       <div style={{ position: 'relative', marginBottom: 10 }}>
         <div
@@ -217,7 +217,7 @@ export function HowTheyPlayedSection({
 
       {pickedId && picked.isPending ? (
         <div aria-hidden style={{ minHeight: 300 }} />
-      ) : subjectRow ? (
+      ) : subjectId && subjectRow ? (
         /* ROUNDS EXIST. The card is unchanged; the gate and the field-of-one
            guard inside it decide what the member sees. The photograph rides with
            it so a searched course always confirms itself (S3.3). */
@@ -239,7 +239,7 @@ export function HowTheyPlayedSection({
             ) : undefined
           }
         />
-      ) : (
+      ) : subjectId ? (
         /* NO ROUNDS AT ALL. Said plainly, in the present tense (S3.4). */
         <div data-course-analytics-card style={{ background: A.PANEL, borderRadius: r.md, overflow: 'hidden' }}>
           <div style={{ padding: '12px 12px 14px' }}>
@@ -268,7 +268,7 @@ export function HowTheyPlayedSection({
             />
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

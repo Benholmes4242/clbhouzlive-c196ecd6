@@ -29,3 +29,9 @@
 - [x] Remove both universal column-header rows and match the two halves' construction
 - [x] Verify 320px headline fit, board switching, and filter scroll-away behavior
 - [x] Audit boards whose figures may need local labels without universal headers
+
+## Scores three headlines (BRIEF_SCORES_THREE_HEADLINES)
+- [x] Replace Members/Courses eyebrows with shared headline-and-count rows
+- [x] Use board-aware member/round units for both headline and terminal action
+- [x] Add the matching Course Analytics heading and 26px section gaps
+- [x] Verify board switching, count agreement, and 320pt headline fit

@@ -11,6 +11,7 @@ import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
 import { CourseBoardRows } from './CourseBoardRows';
 import { HowTheyPlayedSection } from './HowTheyPlayedSection';
 import { ListTerminalRow } from './ListTerminalRow';
+import { SectionHeadline } from './SectionHeadline';
 import { describeFilterParts } from './GolfThisWeek';
 import { useBoardFacets } from './hooks/useBoardFacets';
 import { useBoardPage, type BoardRow } from './hooks/useBoardPage';
@@ -26,6 +27,7 @@ import {
   SCOPE_OPTIONS,
   SCORES_MEMBER_BOARD_KEYS,
   WINDOW_SHORT,
+  boardCountsRounds,
   normalizeFilters,
   filtersAreDefault,
   type BoardFilters,
@@ -128,7 +130,6 @@ export function ScoresTab({
 
   const rows = page.data?.rows ?? [];
   const total = page.data?.total ?? 0;
-  const poolRounds = page.data?.pool.rounds ?? 0;
   const visible = useMemo(() => rows.filter((row) => row.pos <= VISIBLE_POSITIONS), [rows]);
   const leader = rows[0] ?? null;
   const mine = useMemo(
@@ -182,7 +183,10 @@ export function ScoresTab({
 
   const boardTitle = t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
   const courseBoardTitle = t(COURSE_BOARD_LABELS[courseBoard].i18n, COURSE_BOARD_LABELS[courseBoard].label);
-  const memberUnit = t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total });
+  const memberUnit = boardCountsRounds(board)
+    ? t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })
+    : t('discover.coursesPlayed.nMembers', '{{count}} members', { count: total });
+  const courseUnit = t('discover.coursesPlayed.nCourses', '{{count}} courses', { count: courseTotal });
 
   return (
     <section style={{ fontFamily: SANS, ...FIGS }}>
@@ -259,10 +263,7 @@ export function ScoresTab({
           scrollMarginTop: 'var(--discover-header-h, var(--chrome-total-h, 55px))',
         }}
       >
-        <HalfHeading
-          eyebrow={`${t('discover.scores.members', 'Members')} \u00B7 ${t('discover.filterBoard.nRounds', '{{count}} rounds', { count: poolRounds })}`}
-          headline={boardTitle}
-        />
+        <SectionHeadline title={boardTitle} count={memberUnit} />
         <BoardRail
           keys={SCORES_MEMBER_BOARD_KEYS}
           activeKey={board}
@@ -313,11 +314,8 @@ export function ScoresTab({
       </div>
 
       {/* ================= COURSES ================= */}
-      <div style={{ paddingTop: 30 }}>
-        <HalfHeading
-          eyebrow={`${t('discover.scores.courses', 'Courses')} \u00B7 ${t('discover.coursesPlayed.nCourses', '{{count}} courses', { count: courseTotal })}`}
-          headline={courseBoardTitle}
-        />
+      <div style={{ paddingTop: 26 }}>
+        <SectionHeadline title={courseBoardTitle} count={courseUnit} />
         <BoardRail
           keys={COURSE_BOARD_KEYS}
           activeKey={courseBoard}
@@ -345,25 +343,24 @@ export function ScoresTab({
             />
             {courseTotal > courseRows.length && (
               <ListTerminalRow
-                label={t('discover.coursesPlayed.seeAll', 'See all {{count}} courses', { count: courseTotal })}
+                label={t('discover.filterBoard.seeAll', 'See all {{unit}}', { unit: courseUnit })}
                 onPress={() => setCoursesSeeAll(true)}
               />
             )}
 
-            {/* S6 — HOW THEY PLAYED. The selected row drives the unchanged
-                analytics card; nothing about its internals is touched.
-                BRIEF_SCORES_REFINEMENTS S2 — the section now also carries a
-                full-catalogue course search, so "how does Woburn play" is
-                answerable for a course nobody in the circuit has played. */}
-            <HowTheyPlayedSection
-              boardRow={selectedRow}
-              userId={userId}
-              filters={filters}
-              onCoursePress={onCoursePress}
-            />
           </>
         )}
       </div>
+
+      {/* COURSE ANALYTICS is a third peer section. It remains searchable even
+          when the filtered course board is empty because its catalogue is not
+          limited to the rows above. */}
+      <HowTheyPlayedSection
+        boardRow={selectedRow}
+        userId={userId}
+        filters={filters}
+        onCoursePress={onCoursePress}
+      />
 
       <BoardFilterPanel
         open={panelOpen}
@@ -398,28 +395,6 @@ export function ScoresTab({
         onMemberPress={onMemberPress}
       />
     </section>
-  );
-}
-
-/** Both halves use the same eyebrow/count and selected-board headline. */
-function HalfHeading({ eyebrow, headline }: { eyebrow: string; headline: string }) {
-  return (
-    <div style={{ marginBottom: 10 }}>
-      <div style={{ ...KICKER, color: A.DIM, marginBottom: 4 }}>{eyebrow}</div>
-      <h2
-        style={{
-          margin: 0,
-          fontSize: 20,
-          fontWeight: 800,
-          letterSpacing: '-0.01em',
-          textTransform: 'uppercase',
-          color: DISCOVER_FACT,
-          lineHeight: 1.1,
-        }}
-      >
-        {headline}
-      </h2>
-    </div>
   );
 }
 
