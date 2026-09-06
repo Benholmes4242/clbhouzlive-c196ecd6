@@ -22,7 +22,7 @@ export function DiscoverHeader({ active, onChange }: { active: DiscoverTab; onCh
   const avatarRef = useRef<HTMLButtonElement>(null);
 
   useLayoutEffect(() => {
-    document.documentElement.style.setProperty('--discover-header-h', 'calc(env(safe-area-inset-top, 0px) + 89px)');
+    document.documentElement.style.setProperty('--discover-header-h', 'calc(env(safe-area-inset-top, 0px) + 78px)');
     return () => {
       document.documentElement.style.removeProperty('--discover-header-h');
     };
@@ -38,11 +38,10 @@ export function DiscoverHeader({ active, onChange }: { active: DiscoverTab; onCh
           borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS,
         }}
       >
-        <div style={{ position: 'relative', height: 46, display: 'flex', alignItems: 'center', padding: '0 12px' }}>
+        <div style={{ position: 'relative', height: 42, display: 'flex', alignItems: 'center', padding: '0 12px' }}>
           <button type="button" aria-label="Go to Clubhouse" onClick={() => navigate('/clubhouse')} style={{ width: 36, height: 36, padding: 4, border: 0, background: 'transparent', cursor: 'pointer' }}>
             <img src={CHROME_LOGO_SRC} alt="clbhouz" style={{ width: 28, height: 28, borderRadius: 9, objectFit: 'contain' }} />
           </button>
-          <h1 style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', margin: 0, fontSize: 16, fontWeight: 700, letterSpacing: 0, color: A.INK }}>Discover</h1>
           <div style={{ marginLeft: 'auto', height: 36, display: 'flex', alignItems: 'center', gap: 9 }}>
             <button type="button" aria-label="Search" onClick={() => setSearchOpen(true)} style={{ width: 30, height: 34, display: 'grid', placeItems: 'center', padding: 0, border: 0, background: 'transparent', color: A.INK, cursor: 'pointer' }}>
               <Search size={16} strokeWidth={2.3} />
@@ -55,13 +54,13 @@ export function DiscoverHeader({ active, onChange }: { active: DiscoverTab; onCh
             )}
           </div>
         </div>
-        <nav aria-label="Discover sections" style={{ height: 43, display: 'flex', justifyContent: 'center', gap: 40 }}>
+        <nav aria-label="Discover sections" style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', gap: 22, padding: '8px 0 10px' }}>
           {([['circuit', 'The circuit'], ['media', 'News & media']] as const).map(([id, label]) => {
             const selected = active === id;
             return (
-              <button key={id} type="button" aria-current={selected ? 'page' : undefined} onClick={() => onChange(id)} style={{ position: 'relative', height: 43, padding: '0 2px', border: 0, background: 'transparent', color: selected ? A.INK : A.DIM, fontSize: 15, fontWeight: 700, letterSpacing: 0, cursor: 'pointer' }}>
+              <button key={id} type="button" aria-current={selected ? 'page' : undefined} onClick={() => onChange(id)} style={{ position: 'relative', padding: 0, border: 0, background: 'transparent', color: selected ? A.INK : A.MUTE, fontSize: 15, lineHeight: '18px', fontWeight: 700, letterSpacing: 0, cursor: 'pointer' }}>
                 {label}
-                {selected && <span aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: -1, height: 2.5, background: A.INK }} />}
+                {selected && <span aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: -11, height: 2.5, background: A.INK }} />}
               </button>
             );
           })}

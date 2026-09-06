@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Tighten the Discover header and tab geometry without changing its controls or behaviour.
 - [ ] Complete radius canon literal migration outside `src/features/admin`.
 - [x] Controls lose the pill — stage 1: bottom navigation and both chrome islands only.
 - [x] Capture stage-1 before/after evidence over photography and dark canvas.
