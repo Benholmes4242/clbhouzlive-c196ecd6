@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, ArrowDown, ArrowUp } from 'lucide-react';
 
@@ -9,6 +9,7 @@ import { type BoardFilters } from './boardFilters';
    formatter. No second wording lives here. */
 import { describeFilterParts } from './GolfThisWeek';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { r } from '@/lib/radius';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
 import { useBoardCoursePlayers, type BoardCoursePlayer } from './hooks/useBoardCoursePlayers';
 import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
@@ -226,26 +227,26 @@ function FeaturedCourseCard({
       style={{
         gridColumn: '1 / -1',
         minWidth: 0,
-        marginLeft: -14,
-        marginRight: -14,
-        background: A.CANVAS,
+        /* The grid contributes 8px beneath the card; this completes the P3 20px
+           break before the first tile row without changing tile-to-tile gaps. */
+        marginBottom: 12,
       }}
     >
-      <CourseMosaicTile
+      <CourseAnalyticsCard
         row={row}
-        featured
-        open={false}
-        onToggle={() => {}}
-        embedded
+        userId={userId}
+        filters={filters}
+        onCoursePress={onCoursePress}
+        media={
+          <CourseMosaicTile
+            row={row}
+            featured
+            open={false}
+            onToggle={() => {}}
+            embedded
+          />
+        }
       />
-      <div style={{ margin: '10px 14px 12px' }}>
-        <CourseAnalyticsCard
-          row={row}
-          userId={userId}
-          filters={filters}
-          onCoursePress={onCoursePress}
-        />
-      </div>
     </div>
   );
 }
@@ -463,32 +464,37 @@ function CourseMosaicPanel({
 }
 
 /**
- * Amendment Q — the featured analytics and an opened tile are the same object.
- * The photograph is deliberately owned by the caller and never enters this card.
+ * Amendment Q — the featured card and an opened tile share this one analytics
+ * card. The featured caller supplies its photograph as flush media; every
+ * hairline below it remains inset by the shared content padding.
  */
 function CourseAnalyticsCard({
   row,
   userId,
   filters,
   onCoursePress,
+  media,
 }: {
   row: BoardCourseRow;
   userId: string | undefined;
   filters: BoardFilters;
   onCoursePress?: (courseId: string) => void;
+  media?: ReactNode;
 }) {
   return (
     <div
       data-course-analytics-card
       style={{
-        padding: '12px 12px 10px',
         background: A.PANEL,
-        borderRadius: 12,
+        borderRadius: r.md,
         overflow: 'hidden',
       }}
     >
-      <LowRoundLine row={row} userId={userId} filters={filters} />
-      <CourseHolePanel courseId={row.course_id} userId={userId} onCoursePress={onCoursePress} />
+      {media}
+      <div style={{ padding: '12px 12px 10px' }}>
+        <LowRoundLine row={row} userId={userId} filters={filters} />
+        <CourseHolePanel courseId={row.course_id} userId={userId} onCoursePress={onCoursePress} />
+      </div>
     </div>
   );
 }
