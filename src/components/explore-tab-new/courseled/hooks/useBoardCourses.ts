@@ -33,6 +33,9 @@ export interface BoardCourseRow {
   prev_rounds: number | null;
   is_new: boolean;
   total_courses: number;
+  /** Members' average rating of the course, and its sample. Null when unrated. */
+  rating: number | null;
+  rating_count: number;
 }
 
 export interface BoardCourses {
@@ -41,7 +44,14 @@ export interface BoardCourses {
   total: number;
 }
 
-/** C2.1 — the page's current filter state, explicitly, with NO board key. */
+/**
+ * BRIEF_SCORES_TWO_HALVES S5.6 — THE COURSE HALF IS A BOARD, so the axis is a
+ * parameter of the read. The RPC orders AND limits on the same axis; nothing is
+ * re-sorted here.
+ */
+export type CourseBoardKey = 'played' | 'hardest' | 'easiest' | 'low' | 'new' | 'rated';
+
+/** C2.1 — the page's current filter state, explicitly, with NO member board key. */
 export function boardCoursesArgs(viewerId: string | undefined, f: BoardFilters) {
   return {
     p_viewer: viewerId ?? null,
@@ -55,6 +65,7 @@ export function boardCoursesArgs(viewerId: string | undefined, f: BoardFilters) 
     p_competition: f.competition,
   };
 }
+
 
 export function useBoardCourses(
   viewerId: string | undefined,
