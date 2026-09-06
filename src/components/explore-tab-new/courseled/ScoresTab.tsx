@@ -165,7 +165,9 @@ export function ScoresTab({
           top: belowDiscoverHeader ? 'var(--discover-header-h)' : 'var(--chrome-total-h, 55px)',
           zIndex: DISCOVER_STICKY_FILTER_Z,
           width: 'calc(100% + 28px)',
-          margin: '0 -14px',
+          /* S1.1 — 10px of clearance below the tab strip: the bar and the active
+             tab's underline were touching and read as one element. */
+          margin: '10px -14px 0',
           minHeight: 40,
           padding: '0 14px',
           display: 'flex',
@@ -366,8 +368,10 @@ function HalfHeading({ title, count }: { title: string; count: string }) {
       <h2
         style={{
           margin: 0,
-          fontSize: 19,
-          fontWeight: 700,
+          /* S1.2 — 17/800. On a reference surface the FIGURES carry the most
+             weight; the labels above them must not be the largest type. */
+          fontSize: 17,
+          fontWeight: 800,
           letterSpacing: '0.005em',
           textTransform: 'uppercase',
           color: DISCOVER_FACT,
@@ -419,7 +423,9 @@ function BoardRail<K extends string>({
             aria-pressed={active}
             style={{
               flexShrink: 0,
-              padding: '7px 11px',
+              /* S1.3 — 12/700, 6 by 11: five and a half chips visible is what
+                 says the rail scrolls. */
+              padding: '6px 11px',
               borderRadius: r.xs,
               border: `1px solid ${active ? 'transparent' : A.BORDER}`,
               background: active ? A.INK : 'transparent',
