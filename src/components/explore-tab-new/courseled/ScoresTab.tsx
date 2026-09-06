@@ -243,12 +243,12 @@ export function ScoresTab({
             background: 'transparent',
             color: A.INK,
             fontFamily: SANS,
-            fontSize: 10,
-            cursor: 'pointer',
-          }}
-        >
-          {t('discover.filterBoard.edit', 'Edit')}
-        </button>
+          fontSize: 10,
+          cursor: 'pointer',
+        }}
+      >
+        {t('discover.filterBoard.filter', 'Filter')}
+      </button>
       </div>
 
       {/* ================= MEMBERS ================= */}
