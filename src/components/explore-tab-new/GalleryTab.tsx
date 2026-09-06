@@ -144,7 +144,7 @@ export function GalleryTab({ onOpenPost, onOpenReview }: { onOpenPost: (items: C
 
         {moments.length > 0 && (
         <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="Moments" />
-          <MomentsGrid moments={moments} cap={6} gap={5} tall={250} radius={10} onTilePress={(moment) => onOpenPost(momentItems, momentItems.find((entry) => entry.key === moment.key) ?? momentItems[0], 'discover-moments')} autoplayGroup={GALLERY_AUTOPLAY_GROUP} />
+          <MomentsGrid moments={moments} cap={6} gap={5} tall={250} radius={10} onTilePress={(moment) => onOpenPost(momentItems, momentItems.find((entry) => entry.key === moment.key) ?? momentItems[0], 'discover-moments')} autoplayGroup="discover-gallery-moments" />
         </section>
         )}
 
