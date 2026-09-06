@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { ArrowLeft, Menu, Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
@@ -13,7 +13,7 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { Z } from '@/config/zIndex';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLogout } from '@/hooks/useLogout';
-import { safeGoBack } from '@/utils/navigation';
+import { DISCOVER_NEWS_FALLBACK_STATE } from '@/components/explore-tab-new/discoverReturnState';
 import { TourSideMenu } from '../components/TourSideMenu';
 
 interface NewsChromeBridgeProps {
@@ -28,6 +28,7 @@ interface NewsChromeBridgeProps {
  */
 export function NewsChromeBridge({ label, mode, backFallback }: NewsChromeBridgeProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSupabaseSession();
   const { activeActor, isLoading } = useActiveActor();
   const { logout } = useLogout();
@@ -46,8 +47,17 @@ export function NewsChromeBridge({ label, mode, backFallback }: NewsChromeBridge
   }, []);
 
   const back = React.useCallback(
-    () => safeGoBack(navigate, backFallback),
-    [backFallback, navigate],
+    () => {
+      if (location.key !== 'default') {
+        navigate(-1);
+        return;
+      }
+      navigate(backFallback, {
+        replace: true,
+        state: backFallback === '/explore' ? DISCOVER_NEWS_FALLBACK_STATE : undefined,
+      });
+    },
+    [backFallback, location.key, navigate],
   );
 
   return (
@@ -57,12 +67,7 @@ export function NewsChromeBridge({ label, mode, backFallback }: NewsChromeBridge
           <Button type="button" variant="ghost" size="icon" aria-label={mode === 'back' ? 'Back' : 'Tour menu'} onClick={mode === 'back' ? back : () => setMenuOpen(true)} style={{ width: 36, height: 36, padding: 0, color: A.INK }}>
             {mode === 'back' ? <ArrowLeft size={19} strokeWidth={2.2} aria-hidden /> : <Menu size={19} strokeWidth={2.2} aria-hidden />}
           </Button>
-          {mode === 'back' && label === 'The Wire' && (
-            <Button type="button" variant="ghost" size="icon" aria-label="Tour menu" onClick={() => setMenuOpen(true)} style={{ width: 32, height: 36, padding: 0, color: A.INK }}>
-              <Menu size={17} strokeWidth={2.2} aria-hidden />
-            </Button>
-          )}
-          <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', color: A.INK, fontSize: 16, fontWeight: 700, whiteSpace: 'nowrap', pointerEvents: 'none' }}>{label}</div>
+          {mode === 'menu' && <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', color: A.INK, fontSize: 16, fontWeight: 700, whiteSpace: 'nowrap', pointerEvents: 'none' }}>{label}</div>}
           <div style={{ marginLeft: 'auto', height: 36, display: 'flex', alignItems: 'center', gap: 9 }}>
             <Button type="button" variant="ghost" size="icon" aria-label="Search" onClick={() => setSearchOpen(true)} style={{ width: 30, height: 34, padding: 0, color: A.INK }}><Search size={16} strokeWidth={2.3} aria-hidden /></Button>
             <HcpCell tone="dark" dividerColor={A.BORDER} />
