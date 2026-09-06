@@ -14,7 +14,7 @@ import { NewsChromeBridge } from './NewsChromeBridge';
 
 import { useMoreFromTheWire, useTourStory, type TourStory } from './useTourStories';
 import StoryLeaderboardStrip from './StoryLeaderboardStrip';
-import { StoryRow } from './NewsTab';
+import { WorkhorseRow } from './StoryShapes';
 import { StoryEngagementBlock } from '@/features/stories/StoryEngagementBlock';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { StoryBody } from './StoryBody';
@@ -58,6 +58,16 @@ const KICKER: React.CSSProperties = {
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
 };
+
+function readingMinutes(story: TourStory) {
+  const text = story.body_blocks.flatMap((block) => {
+    if ('text' in block) return [block.text];
+    if (block.type === 'image') return [block.caption, block.credit].filter(Boolean) as string[];
+    return [];
+  }).join(' ');
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
 
 /**
  * StoryArticle — the story itself: lead image, headline, standfirst, the event
@@ -141,6 +151,8 @@ export function StoryArticle({ story, immersiveHero = false, tagLabel }: {
               <span style={{ ...KICKER, color: INK_FAINT, minWidth: 0 }}>{tag}</span>
             </>
           )}
+          <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: INK_FAINT, flexShrink: 0, marginTop: 4 }} />
+          <span style={{ ...KICKER, color: INK_FAINT, whiteSpace: 'nowrap', flexShrink: 0 }}>{readingMinutes(story)} min read</span>
         </div>
 
         {story.standfirst && (
@@ -198,7 +210,7 @@ export function StoryPage() {
       <NewsChromeBridge label="The Wire" mode="back" backFallback="/tour/news" />
 
 
-      <div style={{ paddingTop: 'var(--header-h, 64px)' }}>
+      <div style={{ paddingTop: 'var(--news-header-h)' }}>
         {isLoading ? (
           <div style={{ padding: 14 }}>
             <Skeleton style={{ height: 232, width: '100%' }} />
@@ -223,7 +235,7 @@ export function StoryPage() {
               </div>
               {(more ?? []).map((s, i) => (
                 <div key={s.id} style={{ borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
-                  <StoryRow story={s} onOpen={() => navigate(`/tour/news/${s.slug}`)} engagement={engagementFor(s.id)} />
+                  <WorkhorseRow story={s} onOpen={() => navigate(`/tour/news/${s.slug}`)} engagement={engagementFor(s.id)} />
                 </div>
               ))}
             </div>

@@ -17,7 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { StoryArticle } from '@/features/tourhub/news/StoryPage';
 import { NewsChromeBridge } from '@/features/tourhub/news/NewsChromeBridge';
-import { StoryRow } from '@/features/tourhub/news/NewsTab';
+import { WorkhorseRow } from '@/features/tourhub/news/StoryShapes';
 import { StoryEngagementBlock } from '@/features/stories/StoryEngagementBlock';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { FONT, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_50 } from '@/features/tourhub/_shared/tokens';
@@ -67,7 +67,7 @@ export function AmateurStoryPage() {
   return (
     <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
       <NewsChromeBridge label="Amateur News" mode="back" backFallback="/discover/news" />
-      <div style={{ paddingTop: 'var(--header-h, 64px)' }}>
+      <div style={{ paddingTop: 'var(--news-header-h)' }}>
         {isPending ? (
           <div style={{ padding: 14 }}>
             <Skeleton style={{ height: 232, width: '100%' }} />
@@ -92,7 +92,7 @@ export function AmateurStoryPage() {
               </div>
               {(more ?? []).map((s) => (
                 <div key={s.id} style={{ borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
-                  <StoryRow story={s} onOpen={() => navigate(`/discover/news/${s.slug}`)} engagement={engagementFor(s.id)} />
+                  <WorkhorseRow story={s} onOpen={() => navigate(`/discover/news/${s.slug}`)} engagement={engagementFor(s.id)} />
                 </div>
               ))}
             </div>

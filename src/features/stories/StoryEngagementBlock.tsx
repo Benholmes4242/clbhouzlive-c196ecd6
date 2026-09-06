@@ -23,9 +23,11 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
+import { Button } from '@/components/ui/button';
 import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
 import useContentReactions from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
@@ -73,7 +75,7 @@ export function StoryEngagementBlock({ targetType, storyId }: Props) {
           display: 'flex',
           alignItems: 'center',
           gap: 18,
-          padding: '0 14px 12px',
+          padding: '18px 14px',
         }}
       >
         <ReactionAction
@@ -88,7 +90,7 @@ export function StoryEngagementBlock({ targetType, storyId }: Props) {
           // A guest sees the honest count with no tappable glyph.
           readOnly={!signedIn}
           hidden={unavailable}
-          size={16}
+          size={18}
           figureSize={12.5}
         />
         {signedIn && (
@@ -96,7 +98,7 @@ export function StoryEngagementBlock({ targetType, storyId }: Props) {
             count={commentCount}
             onOpen={() => setSheetOpen(true)}
             label={t('story.commentsAria', 'Comments')}
-            size={16}
+            size={18}
             figureSize={12.5}
           />
         )}
@@ -105,16 +107,21 @@ export function StoryEngagementBlock({ targetType, storyId }: Props) {
       <div style={{ borderTop: `1px solid ${HAIRLINE_INK_10}` }} />
 
       {signedIn ? (
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => setSheetOpen(true)}
           className="active:opacity-80"
           style={{
-            display: 'block',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
             width: '100%',
+            height: 'auto',
             textAlign: 'left',
             background: 'none',
-            border: 'none',
+            border: 'none', borderRadius: 0,
             padding: '14px',
             cursor: 'pointer',
             fontFamily: FONT,
@@ -123,18 +130,20 @@ export function StoryEngagementBlock({ targetType, storyId }: Props) {
             color: commentCount > 0 ? INK : INK_MUTE,
           }}
         >
-          {commentCount === 0
-            ? t('story.commentsEmpty', 'No comments yet. Start the discussion.')
+          <span>{commentCount === 0
+            ? t('story.commentsEmpty', 'Be the first to comment')
             : commentCount === 1
               ? t('story.viewComment', 'View 1 comment')
-              : t('story.viewComments', 'View all {{count}} comments', { count: commentCount })}
-        </button>
+              : t('story.viewComments', 'View all {{count}} comments', { count: commentCount })}</span>
+          <ChevronRight size={16} color={INK_MUTE} strokeWidth={2.2} aria-hidden />
+        </Button>
       ) : (
-        <div style={{ padding: '14px', fontSize: 13, lineHeight: 1.45, color: INK_MUTE }}>
-          <Link to={JOIN_ROUTE} style={{ color: INK, textDecoration: 'underline' }}>
+        <Link to={JOIN_ROUTE} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '14px', fontSize: 13, lineHeight: 1.45, color: INK, textDecoration: 'none' }}>
+          <span>
             {t('story.guestPrompt', 'Join clbhouz to see the discussion')}
-          </Link>
-        </div>
+          </span>
+          <ChevronRight size={16} color={INK_MUTE} strokeWidth={2.2} aria-hidden />
+        </Link>
       )}
 
       {signedIn && (

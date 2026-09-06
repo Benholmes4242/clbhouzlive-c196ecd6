@@ -132,7 +132,7 @@ export function AmateurNewsPage() {
   return (
     <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
       <NewsChromeBridge label="Amateur News" mode="menu" backFallback="/explore" />
-      <div style={{ paddingTop: 'var(--header-h, 64px)' }}>
+      <div style={{ paddingTop: 'var(--news-header-h)' }}>
         {isPending ? (
           <div>
             <Skeleton style={{ height: 232, width: '100%', borderRadius: 0 }} />

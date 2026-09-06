@@ -428,7 +428,7 @@
     "likeAria": "この記事にいいね",
     "unlikeAria": "いいねを取り消す",
     "commentsAria": "コメント",
-    "commentsEmpty": "まだコメントはありません。最初のコメントを投稿しましょう。",
+    "commentsEmpty": "最初にコメントする",
     "viewComment": "コメントを1件表示",
     "viewComments": "{{count}}件のコメントをすべて表示",
     "guestPrompt": "clbhouz に参加してコメントを見る"
