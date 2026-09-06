@@ -13,9 +13,14 @@ export const USE_VIDEO_PROGRESS_SYNC_V1 = true;
 /**
  * Standalone Watch surface (/watch, /watch/videos, /watch/clips, /videos, /clips).
  * OFF = routes stay registered but redirect to /explore. Member video elsewhere
- * (feed posts, course media, moments) is unaffected. Flip to true to restore.
+ * (feed posts, course media, moments) is unaffected.
+ *
+ * BRIEF_WATCH_SEE_ALL S2.1 — ON. Watch's Clips and Videos See all lead to
+ * /watch/clips and /watch/videos, so the leaves must answer. WatchGate and its
+ * watch_redirect_hit tracking stay in place: this boolean still puts the whole
+ * surface back to sleep on its own.
  */
-export const WATCH_SURFACE = false;
+export const WATCH_SURFACE = true;
 
 
 

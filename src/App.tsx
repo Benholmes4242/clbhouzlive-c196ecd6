@@ -23,6 +23,7 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavi
 import { setNavigateRef, appNavigate } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
 import { WATCH_SURFACE } from '@/config/featureFlags';
+import { MomentsLibrarySkeleton, ReviewsLibrarySkeleton } from '@/components/skeletons/MediaLibrarySkeletons';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { clearAppBadge } from '@/utils/pushBadge';
 
@@ -227,6 +228,8 @@ const HomeLanding = lazy(() => import("./pages/HomeLanding"));
 const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
 const VideosPageV2 = lazy(() => import("./features/videos-v2/VideosPageV2"));
 const ClipsPageV2 = lazy(() => import("./features/clips-v2/ClipsPageV2"));
+const ReviewsLibraryPage = lazy(() => import("./features/media-library/ReviewsLibraryPage"));
+const MomentsLibraryPage = lazy(() => import("./features/media-library/MomentsLibraryPage"));
 const ExplorePage = lazy(() => import("./pages/ExplorePage"));
 
 
@@ -564,6 +567,10 @@ function AppRoutes() {
         <Route path="/clips" element={<WatchGate><Navigate to="/watch/clips" replace /></WatchGate>} />
         <Route path="/watch/clips" element={<WatchGate><Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense></WatchGate>} />
         <Route path="/watch/videos" element={<WatchGate><Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense></WatchGate>} />
+        {/* BRIEF_WATCH_SEE_ALL S3 — the two destinations Watch's review and
+            moment sections never had. */}
+        <Route path="/explore/reviews" element={<Suspense fallback={<ReviewsLibrarySkeleton />}><ReviewsLibraryPage /></Suspense>} />
+        <Route path="/explore/moments" element={<Suspense fallback={<MomentsLibrarySkeleton />}><MomentsLibraryPage /></Suspense>} />
         <Route path="/explore" element={<Suspense fallback={<DiscoverCourseLedSkeleton />}><ExplorePage /></Suspense>} />
 
         {/* Amateur News. Declared BEFORE /discover/* so the index is not eaten by

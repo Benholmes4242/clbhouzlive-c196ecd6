@@ -105,6 +105,13 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
     });
   }, [rememberDiscoverPosition]);
 
+  // BRIEF_WATCH_SEE_ALL — a See all leaves the Watch tab, so the return
+  // snapshot is recorded exactly as a tile open does.
+  const openSeeAll = useCallback((path: string) => {
+    rememberDiscoverPosition('gallery');
+    navigate(path);
+  }, [navigate, rememberDiscoverPosition]);
+
   const openNewsStory = useCallback((slug: string) => {
     rememberDiscoverPosition('news');
     navigate(`/discover/news/${slug}`);
@@ -149,7 +156,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
 
         <NewsTabPage onOpenStory={openNewsStory} />
       ) : (
-        <GalleryTab onOpenPost={openMedia} onOpenReview={openReviewMedia} />
+        <GalleryTab onOpenPost={openMedia} onOpenReview={openReviewMedia} onSeeAll={openSeeAll} />
       )}
 
       <RoundDetailSheet
