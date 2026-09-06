@@ -133,24 +133,20 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
       {activeTab === 'scores' ? (
         <main style={{ paddingTop: embedded ? 0 : 'var(--discover-header-h)' }}>
           <div style={{ padding: '0 14px 110px' }}>
-            <GolfThisWeek
+            {/* BRIEF_SCORES_TWO_HALVES — one reference surface, two equal halves
+                under one filter. The hero and the duplicate course tiles are
+                gone; GolfThisWeek is no longer mounted here. */}
+            <ScoresTab
               userId={user?.id}
               onRowPress={handleBoardRow}
-              onAppliedFiltersChange={setBoardFilters}
+              onCoursePress={(courseId) => navigate(`/courses/${courseId}`)}
+              onMemberPress={(memberId) => opener.openProfile(memberId)}
               belowDiscoverHeader={!embedded}
-            >
-              {boardFilters && (
-                <CoursesPlayedSection
-                  userId={user?.id}
-                  filters={boardFilters}
-                  onCoursePress={(courseId) => navigate(`/courses/${courseId}`)}
-                  onMemberPress={(memberId) => opener.openProfile(memberId)}
-                />
-              )}
-            </GolfThisWeek>
+            />
           </div>
         </main>
       ) : activeTab === 'news' ? (
+
         <NewsTabPage onOpenStory={openNewsStory} />
       ) : (
         <GalleryTab onOpenPost={openMedia} onOpenReview={openReviewMedia} />
