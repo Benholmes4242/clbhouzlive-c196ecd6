@@ -207,9 +207,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   // Labelled navigation: glyph, 3px gap, then the column-header label.
   const PILL_MAX_EXPANDED = 'min(396px, 100vw - 22px)';
   const PILL_MAX_CONDENSED = 'min(324px, 100vw - 36px)';
-  // Even integers so 1px strokes land on the device pixel grid — SF-crisp.
   const iconSize = 23;
-  const iconStroke = 1.9;
 
   const pillPadding = '6px 7px';
 
@@ -371,7 +369,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                             style={{
                               width: iconSize,
                               height: iconSize,
-                              strokeWidth: iconStroke,
                               // Snap sizes between states — no SVG resize
                               // transition (raster mid-tween reads soft).
                             }}
