@@ -86,12 +86,30 @@ function streamThumb(streamId: string): string {
  *                    hold separate cache entries and never overwrite one
  *                    another.
  */
+export type MomentsSort = 'ranked' | 'recent' | 'liked' | 'course';
+
 export function useMomentsOfTheWeek(
   windowDays: number | null = WINDOW_DAYS,
-  options: { enabled?: boolean; candidateLimit?: number } = {},
+  options: {
+    enabled?: boolean;
+    candidateLimit?: number;
+    /**
+     * BRIEF_WATCH_SEE_ALL S3.5 — /explore/moments offers Most recent, Most
+     * liked and By course. 'ranked' (the default) is the Discover section's
+     * freshness x engagement order and is untouched.
+     */
+    sort?: MomentsSort;
+    /**
+     * Tiles per post. The library page passes Infinity so its total equals the
+     * count query behind its See all; every other caller keeps the cap of 3.
+     */
+    maxPerPost?: number;
+  } = {},
 ) {
+  const sort: MomentsSort = options.sort ?? 'ranked';
+  const maxPerPost = options.maxPerPost ?? MAX_TILES_PER_POST;
   return useQuery({
-    queryKey: [...MOMENTS_KEY, windowDays ?? 'all'],
+    queryKey: [...MOMENTS_KEY, windowDays ?? 'all', sort, maxPerPost],
     enabled: options.enabled ?? true,
     queryFn: async (): Promise<Moment[]> => {
       let q = supabase
@@ -155,11 +173,17 @@ export function useMomentsOfTheWeek(
           (c): c is { row: Row; courseId: string; score: number } =>
             !!c.courseId && !!c.row.post_media && c.row.post_media.length > 0,
         )
-        .sort(
-          (a, b) =>
-            b.score - a.score ||
-            new Date(b.row.created_at).getTime() - new Date(a.row.created_at).getTime(),
-        );
+        .sort((a, b) => {
+          if (sort === 'recent' || sort === 'course') {
+            return new Date(b.row.created_at).getTime() - new Date(a.row.created_at).getTime();
+          }
+          if (sort === 'liked') {
+            return (b.row.like_count ?? 0) - (a.row.like_count ?? 0)
+              || new Date(b.row.created_at).getTime() - new Date(a.row.created_at).getTime();
+          }
+          return b.score - a.score
+            || new Date(b.row.created_at).getTime() - new Date(a.row.created_at).getTime();
+        });
 
       // Fill tiles under the per-post cap. The per-course cap is NOT applied
       // here: the sheet shows the full ranked list. Instead the first tile of
@@ -174,7 +198,7 @@ export function useMomentsOfTheWeek(
       }> = [];
       for (const cand of ranked) {
         const mediaCount = cand.row.post_media?.length ?? 0;
-        const take = Math.min(MAX_TILES_PER_POST, mediaCount);
+        const take = Math.min(maxPerPost, mediaCount);
         for (let i = 0; i < take; i += 1) {
           const used = perCourse.get(cand.courseId) ?? 0;
           picked.push({
@@ -230,7 +254,7 @@ export function useMomentsOfTheWeek(
         profileById.set(p.id, p);
       }
 
-      return picked.map(({ row, courseId, mediaIndex, isCourseLead }): Moment => {
+      const tiles = picked.map(({ row, courseId, mediaIndex, isCourseLead }): Moment => {
         const media = [...(row.post_media ?? [])].sort(
           (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0),
         );
@@ -305,6 +329,14 @@ export function useMomentsOfTheWeek(
           isCourseLead,
         };
       });
+
+      // BY COURSE groups the pool alphabetically; course names only exist after
+      // the join above, so the grouping is applied here rather than in ranking.
+      if (sort === 'course') {
+        tiles.sort((a, b) => String(a.courseName ?? '').localeCompare(String(b.courseName ?? ''))
+          || new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime());
+      }
+      return tiles;
     },
     // UNCHANGED at 10 min. The member's own photo appears immediately via
     // invalidateDiscoverMoments on upload completion, so this only governs
