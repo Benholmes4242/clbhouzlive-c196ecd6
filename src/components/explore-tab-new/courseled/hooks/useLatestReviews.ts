@@ -45,7 +45,7 @@ export interface LatestReview {
   mediaType: 'image' | 'video' | null;
   posterUrl: string | null;
   mediaCount?: number;
-  mediaId: string | null;
+  mediaId?: string | null;
   courseCountry: string | null;
   courseRegion: string | null;
   courseSubCountry: string | null;

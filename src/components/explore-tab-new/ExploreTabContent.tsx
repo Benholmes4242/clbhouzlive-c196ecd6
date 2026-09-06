@@ -16,6 +16,7 @@ import { CoursesPlayedSection } from './courseled/CoursesPlayedSection';
 import type { BoardFilters } from './courseled/boardFilters';
 import type { BoardRow } from './courseled/hooks/useBoardPage';
 import type { CommunityLibraryItem } from './courseled/hooks/useCommunityLibrary';
+import type { FeedPost } from '@/components/media-system/types/media';
 import { useScorecardOpener } from './useScorecardOpener';
 import {
   readDiscoverReturn,
@@ -110,6 +111,19 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
     navigate(`/discover/news/${slug}`);
   }, [navigate, rememberDiscoverPosition]);
 
+  const openReviewMedia = useCallback((posts: FeedPost[], mediaId: string | null, posterUrl: string | null) => {
+    rememberDiscoverPosition('gallery');
+    openWithOrigin({
+      posts,
+      index: 0,
+      originEl: null,
+      posterUrl,
+      mediaId,
+      openedFrom: 'discover-review-media',
+      options: { readOnly: true },
+    });
+  }, [rememberDiscoverPosition]);
+
   return (
     <div style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, ...FIGS }}>
       {!embedded && <DiscoverHeader active={activeTab} onChange={changeTab} />}
@@ -137,7 +151,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
       ) : activeTab === 'news' ? (
         <NewsTabPage onOpenStory={openNewsStory} />
       ) : (
-        <GalleryTab onOpenPost={openMedia} />
+        <GalleryTab onOpenPost={openMedia} onOpenReview={openReviewMedia} />
       )}
 
       <RoundDetailSheet
