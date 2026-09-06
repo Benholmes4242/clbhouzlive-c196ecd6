@@ -276,7 +276,7 @@ export function ScoresTab({
           keys={COURSE_BOARD_KEYS}
           activeKey={courseBoard}
           labelFor={(key) => t(COURSE_BOARD_LABELS[key].i18n, COURSE_BOARD_LABELS[key].label)}
-          onSelect={setCourseBoard}
+          onSelect={(key: CourseBoardKey) => setCourseBoard(key)}
         />
 
         {courses.isPending ? (
