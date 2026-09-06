@@ -29,6 +29,48 @@ export type Database = {
         }
         Relationships: []
       }
+      _par_race_test: {
+        Row: {
+          actual_gross: number | null
+          adjusted_gross: number | null
+          distance_yards: number | null
+          hole_alias: string | null
+          hole_no: number | null
+          id: number | null
+          par: number | null
+          played: boolean | null
+          score_id: string | null
+          stroke_index: number | null
+          strokes_allowed: number | null
+        }
+        Insert: {
+          actual_gross?: number | null
+          adjusted_gross?: number | null
+          distance_yards?: number | null
+          hole_alias?: string | null
+          hole_no?: number | null
+          id?: number | null
+          par?: number | null
+          played?: boolean | null
+          score_id?: string | null
+          stroke_index?: number | null
+          strokes_allowed?: number | null
+        }
+        Update: {
+          actual_gross?: number | null
+          adjusted_gross?: number | null
+          distance_yards?: number | null
+          hole_alias?: string | null
+          hole_no?: number | null
+          id?: number | null
+          par?: number | null
+          played?: boolean | null
+          score_id?: string | null
+          stroke_index?: number | null
+          strokes_allowed?: number | null
+        }
+        Relationships: []
+      }
       _round_post_fn_backup: {
         Row: {
           def: string | null
