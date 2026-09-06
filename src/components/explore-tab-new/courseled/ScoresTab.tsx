@@ -176,7 +176,6 @@ export function ScoresTab({
           boxSizing: 'border-box',
           background: A.PANEL,
           border: 'none',
-          borderTop: `1px solid ${A.BORDER}`,
           borderBottom: `1px solid ${A.BORDER}`,
           borderRadius: 0,
           boxShadow: 'none',
