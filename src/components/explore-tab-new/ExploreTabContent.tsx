@@ -29,7 +29,7 @@ interface ExploreTabContentProps {
 }
 
 /**
- * Discover has three local, non-persisted modes (Scores, News, Gallery). The route remains immersive and
+ * Discover has three local, non-persisted modes (Scores, News, Watch — tab id `gallery`, unchanged). The route remains immersive and
  * therefore this page owns the notch-safe fixed header; chrome-v2 resolves the
  * global island to `none` on /explore without unmounting GlobalHeader.
  */
@@ -110,16 +110,18 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
     navigate(`/discover/news/${slug}`);
   }, [navigate, rememberDiscoverPosition]);
 
-  const openReviewMedia = useCallback((posts: FeedPost[], mediaId: string | null, posterUrl: string | null) => {
+  // BRIEF_GALLERY_TO_WATCH S3 — opens the COURSE's media set at the tapped
+  // image, browsed vertically, through the course media tab's own viewer
+  // surface key. forceStartAtZero would defeat S3.4.
+  const openReviewMedia = useCallback((posts: FeedPost[], index: number, mediaId: string | null, posterUrl: string | null) => {
     rememberDiscoverPosition('gallery');
     openWithOrigin({
       posts,
-      index: 0,
+      index,
       originEl: null,
       posterUrl,
       mediaId,
-      openedFrom: 'discover-review-media',
-      forceStartAtZero: true,
+      openedFrom: 'course-media',
       options: { readOnly: true },
     });
   }, [rememberDiscoverPosition]);

@@ -6,11 +6,12 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { MomentsGrid } from './courseled/MomentsGrid';
 import { autoplayBlocked, registerReviewVideo } from './courseled/reviewVideoAutoplay';
 import { attachTileHls } from './courseled/tileHlsPlayer';
 import { useDiscoverMediaPreview } from './courseled/hooks/useDiscoverMediaPreview';
-import { useGalleryCourseReviewMedia } from './courseled/hooks/useGalleryCourseReviewMedia';
+import { useGalleryCourseMedia } from './courseled/hooks/useGalleryCourseMedia';
 import { useLatestReviews } from './courseled/hooks/useLatestReviews';
 import { useMomentsOfTheWeek } from './courseled/hooks/useMomentsOfTheWeek';
 import type { CommunityLibraryItem } from './courseled/hooks/useCommunityLibrary';
@@ -72,15 +73,16 @@ function RailTile({ item, index, width, onPress }: { item: CommunityLibraryItem;
 }
 
 /**
- * GALLERY holds every media section. It mounts no story query.
+ * WATCH (tab id `gallery`, unchanged) holds every media section. It mounts no story query.
  */
-export function GalleryTab({ onOpenPost, onOpenReview }: { onOpenPost: (items: CommunityLibraryItem[], item: CommunityLibraryItem, source: string) => void; onOpenReview: (posts: FeedPost[], mediaId: string | null, posterUrl: string | null) => void }) {
+export function GalleryTab({ onOpenPost, onOpenReview }: { onOpenPost: (items: CommunityLibraryItem[], item: CommunityLibraryItem, source: string) => void; onOpenReview: (posts: FeedPost[], index: number, mediaId: string | null, posterUrl: string | null) => void }) {
+  const { user } = useSupabaseSession();
   const [searchOpen, setSearchOpen] = useState(false);
-  const [pendingReview, setPendingReview] = useState<{ courseId: string; reviewId: string; mediaId: string | null; posterUrl: string | null } | null>(null);
+  const [pendingReview, setPendingReview] = useState<{ courseId: string; reviewId: string; mediaUrl: string | null; posterUrl: string | null } | null>(null);
   const reviewsQuery = useLatestReviews(8, true);
   const reviews = useMemo(() => reviewsQuery.reviews.filter((review) => !!review.mediaUrl).slice(0, 8), [reviewsQuery.reviews]);
   const mediaQuery = useDiscoverMediaPreview(true);
-  const courseReviewsQuery = useGalleryCourseReviewMedia(pendingReview?.courseId ?? null);
+  const courseMediaQuery = useGalleryCourseMedia(pendingReview?.courseId ?? null, user?.id);
   const media = mediaQuery.data;
   const momentsQuery = useMomentsOfTheWeek(30, { enabled: true, candidateLimit: 72 });
   const moments = useMemo(() => (momentsQuery.data ?? []).slice(0, 6), [momentsQuery.data]);
@@ -109,18 +111,25 @@ export function GalleryTab({ onOpenPost, onOpenReview }: { onOpenPost: (items: C
   const clips = media?.clips ?? [];
   const videos = media?.videos ?? [];
 
+  // S3 — the set is the COURSE's media, in the course page's own order, browsed
+  // vertically by the same viewer. Entry lands on the tapped image: find the
+  // slide that carries the tapped review's media and the media item itself.
   useEffect(() => {
-    if (!pendingReview || !courseReviewsQuery.data) return;
-    const selectedId = `gallery-review-${pendingReview.reviewId}`;
-    const selected = courseReviewsQuery.data.find((post) => post.id === selectedId);
-    if (!selected) {
+    if (!pendingReview || !courseMediaQuery.data) return;
+    const posts = courseMediaQuery.data;
+    const tappedUrl = pendingReview.mediaUrl;
+    let index = posts.findIndex((post) => post.review?.reviewId === pendingReview.reviewId
+      && post.mediaItems.some((media) => !!tappedUrl && (media.imageUrl === tappedUrl || media.thumbnailUrl === tappedUrl || media.mp4Url === tappedUrl)));
+    if (index < 0) index = posts.findIndex((post) => post.review?.reviewId === pendingReview.reviewId);
+    if (index < 0 || posts.length === 0) {
       setPendingReview(null);
       return;
     }
-    const ordered = [selected, ...courseReviewsQuery.data.filter((post) => post.id !== selectedId)];
-    onOpenReview(ordered, pendingReview.mediaId, pendingReview.posterUrl);
+    const media = posts[index].mediaItems.find((item) => !!tappedUrl && (item.imageUrl === tappedUrl || item.thumbnailUrl === tappedUrl || item.mp4Url === tappedUrl))
+      ?? posts[index].mediaItems[0];
+    onOpenReview(posts, index, media?.id ?? null, pendingReview.posterUrl);
     setPendingReview(null);
-  }, [courseReviewsQuery.data, onOpenReview, pendingReview]);
+  }, [courseMediaQuery.data, onOpenReview, pendingReview]);
 
   return (
     <main style={{ paddingTop: 'var(--discover-header-h)', minHeight: '100dvh', background: A.CANVAS, color: A.INK, fontFamily: SANS }}>
@@ -133,7 +142,7 @@ export function GalleryTab({ onOpenPost, onOpenReview }: { onOpenPost: (items: C
 
         {reviews.length > 0 && (
         <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="From the reviews" />
-          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform', marginRight: -GUTTER, paddingRight: GUTTER }}>{reviews.map((review) => <button key={review.reviewId} type="button" onClick={() => setPendingReview({ courseId: review.courseId, reviewId: review.reviewId, mediaId: review.mediaId ?? null, posterUrl: review.posterUrl ?? review.mediaUrl })} style={{ position: 'relative', width: 196, flex: '0 0 196px', padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}><div style={{ position: 'relative', aspectRatio: '4 / 5', borderRadius: 10, overflow: 'hidden', background: A.PANEL }}><img src={review.posterUrl ?? review.mediaUrl ?? ''} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /><span style={{ position: 'absolute', left: 7, top: 7, borderRadius: 999, padding: '4px 7px', background: 'rgba(13,13,13,.82)', fontSize: 12, fontWeight: 700 }}>{review.rating.toFixed(1)}</span>{(review.mediaCount ?? 1) > 1 && <span style={{ position: 'absolute', right: 7, bottom: 7, borderRadius: 999, padding: '4px 7px', background: 'rgba(13,13,13,.82)', fontSize: 11, fontWeight: 700 }}>+{(review.mediaCount ?? 1) - 1}</span>}</div><div style={{ marginTop: 7, fontSize: 12, fontWeight: 700 }}>{review.courseName}</div><div style={{ marginTop: 2, fontSize: 11, color: A.MUTE }}>{review.reviewerName}</div></button>)}</div>
+          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform', marginRight: -GUTTER, paddingRight: GUTTER }}>{reviews.map((review) => <button key={review.reviewId} type="button" onClick={() => setPendingReview({ courseId: review.courseId, reviewId: review.reviewId, mediaUrl: review.mediaUrl ?? null, posterUrl: review.posterUrl ?? review.mediaUrl })} style={{ position: 'relative', width: 196, flex: '0 0 196px', padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}><div style={{ position: 'relative', aspectRatio: '4 / 5', borderRadius: 10, overflow: 'hidden', background: A.PANEL }}><img src={review.posterUrl ?? review.mediaUrl ?? ''} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /><span style={{ position: 'absolute', left: 7, top: 7, borderRadius: 999, padding: '4px 7px', background: 'rgba(13,13,13,.82)', fontSize: 12, fontWeight: 700 }}>{review.rating.toFixed(1)}</span>{(review.mediaCount ?? 1) > 1 && <span style={{ position: 'absolute', right: 7, bottom: 7, borderRadius: 999, padding: '4px 7px', background: 'rgba(13,13,13,.82)', fontSize: 11, fontWeight: 700 }}>+{(review.mediaCount ?? 1) - 1}</span>}</div><div style={{ marginTop: 7, fontSize: 12, fontWeight: 700 }}>{review.courseName}</div><div style={{ marginTop: 2, fontSize: 11, color: A.MUTE }}>{review.reviewerName}</div></button>)}</div>
         </section>
         )}
 

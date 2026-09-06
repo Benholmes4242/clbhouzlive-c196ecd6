@@ -9,7 +9,7 @@ import { AvatarCell, CHROME_LOGO_SRC, HcpCell } from '@/features/chrome-v2/Chrom
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { Z } from '@/config/zIndex';
+import { DISCOVER_HEADER_Z } from '@/lib/zLayers';
 
 export type DiscoverTab = 'scores' | 'news' | 'gallery';
 
@@ -33,7 +33,7 @@ export function DiscoverHeader({ active, onChange }: { active: DiscoverTab; onCh
       <header
         data-discover-header
         style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: Z.header,
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: DISCOVER_HEADER_Z,
           paddingTop: 'env(safe-area-inset-top, 0px)', background: A.CANVAS,
           borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS,
         }}
@@ -55,7 +55,7 @@ export function DiscoverHeader({ active, onChange }: { active: DiscoverTab; onCh
           </div>
         </div>
         <nav aria-label="Discover sections" style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', gap: 22, padding: '8px 0 10px' }}>
-          {([['scores', 'SCORES'], ['news', 'NEWS'], ['gallery', 'GALLERY']] as const).map(([id, label]) => {
+          {([['scores', 'SCORES'], ['news', 'NEWS'], ['gallery', 'WATCH']] as const).map(([id, label]) => {
             const selected = active === id;
             return (
               <button key={id} type="button" aria-current={selected ? 'page' : undefined} onClick={() => onChange(id)} style={{ position: 'relative', padding: 0, border: 0, background: 'transparent', color: selected ? A.INK : A.MUTE, fontSize: 15, lineHeight: '18px', fontWeight: 700, letterSpacing: 0, cursor: 'pointer' }}>

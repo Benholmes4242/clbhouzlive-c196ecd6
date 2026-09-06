@@ -62,3 +62,18 @@ export const POST_COMPOSER_Z  = 12000;
  * page rows it scrolls over.
  */
 export const DISCOVER_STICKY_FILTER_Z = 20;
+
+/**
+ * BRIEF_GALLERY_TO_WATCH S2 — Discover's fixed header + tab strip.
+ *
+ * WHY THIS EXISTS: the header shipped on Z.header (1000, src/config/zIndex.ts),
+ * which sits ABOVE the portalled fullscreen viewer (FS_OVERLAY_Z 200) — so the
+ * header and tab strip stayed painted over an open viewer. Nothing about the
+ * viewer changed; the header's value overtook it. Discover's header is IN-PAGE
+ * CHROME, not an overlay: it belongs just above ShellSlot (29) and above the
+ * sticky filter bar (20), and BELOW every overlay registered here.
+ *
+ * Do not raise this above FS_OVERLAY_Z. If a future surface needs chrome above
+ * the viewer, it is an overlay and gets its own entry.
+ */
+export const DISCOVER_HEADER_Z = 30;
