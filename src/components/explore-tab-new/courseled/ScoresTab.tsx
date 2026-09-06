@@ -306,20 +306,16 @@ export function ScoresTab({
             )}
 
             {/* S6 — HOW THEY PLAYED. The selected row drives the unchanged
-                analytics card; nothing about its internals is touched. */}
-            {selectedRow && (
-              <div style={{ marginTop: 14 }}>
-                <span style={{ ...KICKER, display: 'block', marginBottom: 8, color: DISCOVER_QUIET }}>
-                  {t('discover.scores.howTheyPlayed', 'How they played')} {'\u00B7'} {selectedRow.name ?? '\u2014'}
-                </span>
-                <CourseAnalyticsCard
-                  row={selectedRow}
-                  userId={userId}
-                  filters={filters}
-                  onCoursePress={onCoursePress}
-                />
-              </div>
-            )}
+                analytics card; nothing about its internals is touched.
+                BRIEF_SCORES_REFINEMENTS S2 — the section now also carries a
+                full-catalogue course search, so "how does Woburn play" is
+                answerable for a course nobody in the circuit has played. */}
+            <HowTheyPlayedSection
+              boardRow={selectedRow}
+              userId={userId}
+              filters={filters}
+              onCoursePress={onCoursePress}
+            />
           </>
         )}
       </div>
