@@ -54,8 +54,8 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
 
 
 
-    // Bottom nav (64px) + safe area spacer (30px) = 94px clearance
-    const bottomPadding = hasBottomNav ? '94px' : undefined;
+    // Labelled bottom nav (~60px) + 20px float gap + 16px breathing room.
+    const bottomPadding = hasBottomNav ? 'var(--bottom-nav-height, 96px)' : undefined;
 
     // Option B: .app-shell padding-top is zeroed via CSS on immersive routes
     // (html[data-immersive-route='true']), so the hero already sits at physical

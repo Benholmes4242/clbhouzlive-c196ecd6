@@ -100,7 +100,7 @@ export const BreathingRoomBottomBar: React.FC<BreathingRoomBottomBarProps> = ({
     ? bottomCalc(20)
     : bottomOffset !== undefined
       ? `${bottomOffset + 20}px`
-      : 'calc(var(--bottom-nav-height, 88px) + 20px)';
+      : 'calc(var(--bottom-nav-height, 96px) + 20px)';
 
   // Fullscreen (bottomCalc provided) caps the readable column at 640px and
   // honours landscape safe-area-inset-left/right so notched devices in landscape

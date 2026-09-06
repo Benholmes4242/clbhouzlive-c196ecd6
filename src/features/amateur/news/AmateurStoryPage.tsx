@@ -103,7 +103,7 @@ export function AmateurStoryPage() {
 
       <div
         aria-hidden
-        style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 88px) + 16px)' }}
+        style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 96px) + 16px)' }}
       />
     </div>
   );

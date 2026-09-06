@@ -7,3 +7,4 @@
 - [x] Report total affected controls, boundary cases, semantic exceptions, and contradictions.
 - [x] Include the active bottom-navigation highlight in stage 1 using its measured size band.
 - [ ] Hold all remaining control categories until stage 1 is approved.
+- [x] Add labelled bottom navigation, replace the Amateur glyph, and verify route clearance.

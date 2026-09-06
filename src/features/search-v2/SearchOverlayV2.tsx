@@ -242,7 +242,7 @@ export function SearchOverlayV2({
             className="flex-1 overflow-y-auto overscroll-contain w-full md:max-w-[560px]"
             style={{
               WebkitOverflowScrolling: 'touch',
-              paddingBottom: 'var(--bottom-nav-height, 88px)',
+              paddingBottom: 'var(--bottom-nav-height, 96px)',
             }}
           >
             {!hasQuery && (

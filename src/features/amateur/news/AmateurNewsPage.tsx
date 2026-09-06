@@ -32,7 +32,7 @@ const KICKER: React.CSSProperties = {
   textTransform: 'uppercase',
 };
 
-const BOTTOM_SPACER = 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 88px) + 16px)';
+const BOTTOM_SPACER = 'calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-height, 96px) + 16px)';
 
 /**
  * The category row. TEXT ONLY, per the platform's tab/filter law: no fill, no

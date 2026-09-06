@@ -154,7 +154,7 @@ export function PlayerPage() {
 
         <div
           style={{
-            paddingBottom: 88,
+            paddingBottom: 'var(--bottom-nav-height, 96px)',
           }}
         />
       </div>

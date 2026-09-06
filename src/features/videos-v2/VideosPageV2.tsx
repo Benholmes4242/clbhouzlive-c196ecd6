@@ -84,7 +84,7 @@ export default function VideosPageV2() {
       <GlassHeaderPlate />
       <main
         style={{
-          paddingBottom: 88,
+          paddingBottom: 'var(--bottom-nav-height, 96px)',
           // Bleed route: --header-h publishes 0 and .app-shell no longer pads
           // --sat, so the page owns clearance for the floating island (62px).
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',

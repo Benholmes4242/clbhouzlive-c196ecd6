@@ -222,7 +222,7 @@ export function CollegeProfilePage() {
         )}
 
         {/* Bottom nav clearance */}
-        <div style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }} />
+        <div style={{ height: 'calc(var(--bottom-nav-height, 96px) + 16px)' }} />
       </div>
 
       </TourPageShell>

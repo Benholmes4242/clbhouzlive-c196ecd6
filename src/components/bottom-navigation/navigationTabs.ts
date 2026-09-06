@@ -1,6 +1,6 @@
 import MapPinIcon from '@/components/icons/MapPinIcon';
 import HouseIcon from '@/components/icons/HouseIcon';
-import PulseIcon from '@/components/icons/PulseIcon';
+import AmateurLaurelIcon from '@/components/icons/AmateurLaurelIcon';
 import PlusSquareIcon from '@/components/icons/PlusSquareIcon';
 import TrophyIcon from '@/components/icons/TrophyIcon';
 
@@ -14,8 +14,8 @@ import TrophyIcon from '@/components/icons/TrophyIcon';
 
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Home',      icon: HouseIcon,  path: '/' },
-  { id: 'watch',     label: 'Discover',  icon: PulseIcon,  path: '/explore' },
-  { id: 'post',      label: 'Share',     icon: PlusSquareIcon, path: null, isAction: true },
+  { id: 'watch',     label: 'Amateur',   icon: AmateurLaurelIcon, path: '/explore' },
+  { id: 'post',      label: 'Post',      icon: PlusSquareIcon, path: null, isAction: true },
   { id: 'courses',   label: 'Courses',   icon: MapPinIcon, path: '/courses' },
   { id: 'tourhub',   label: 'Tour',      icon: TrophyIcon, path: '/tourhub' },
 ];
@@ -26,7 +26,7 @@ export const navigationTabs = [
 // reads small (+1); House/Trophy hold the 31px baseline.
 export const ICON_SIZE: Record<string, number> = {
   clubhouse: 31,
-  watch: 31,
+  watch: 30,
   post: 29,
   courses: 32,
   tourhub: 31,
