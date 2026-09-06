@@ -4,8 +4,7 @@ import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
-import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
-import { FilterChips } from '@/components/ui/FilterChips';
+import { RailChips } from '@/components/ui/RailChips';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { VideosSortId } from './types';
 import { VideosFeedV2 } from './components/VideosFeedV2';
@@ -98,17 +97,18 @@ export default function VideosPageV2() {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            padding: '0 4px',
+            padding: '0 14px',
           }}
         >
           <div style={{ flex: 1, minWidth: 0 }}>
-            <UnderlineTabs
-              size="md"
-              align="center"
+            {/* Sort is the same object as the category rail below and as the
+                library pages' sort rails: one chip treatment, not underlines. */}
+            <RailChips
               options={SORT_OPTS}
               value={sort}
-              onChange={setSort}
+              onChange={(next) => setSort(next as VideosSortId)}
               ariaLabel="Sort videos"
+              style={{ margin: '0 -14px', padding: '0 14px' }}
             />
           </div>
           <button
@@ -120,7 +120,7 @@ export default function VideosPageV2() {
               height: 36,
               borderRadius: 999,
               border: `1px solid ${A.BORDER}`,
-              background: A.PANEL,
+              background: 'transparent',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -130,7 +130,7 @@ export default function VideosPageV2() {
               marginBottom: 6,
             }}
           >
-            <Search size={15} color={A.INK} />
+            <Search size={15} color={A.MUTE} />
           </button>
         </div>
 
@@ -142,14 +142,15 @@ export default function VideosPageV2() {
             zIndex: 10,
             background: A.CANVAS,
             borderBottom: `1px solid ${A.BORDER}`,
-            padding: '8px 0 10px',
+            padding: '8px 14px 10px',
           }}
         >
-          <FilterChips
+          <RailChips
             options={CATEGORY_OPTS}
             value={category}
-            onChange={setCategory}
+            onChange={(next) => setCategory(next as CategoryFilterId)}
             ariaLabel="Video category filter"
+            style={{ margin: '0 -14px', padding: '0 14px' }}
           />
         </div>
 

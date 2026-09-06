@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
+import { RailChips } from '@/components/ui/RailChips';
 import { Z } from '@/config/zIndex';
 import { useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -83,7 +84,13 @@ export function LibraryHead({ total, title }: { total: number | null; title: str
   );
 }
 
-/** Ids stay plain strings: JSX type arguments break the dev tagger plugin. */
+/**
+ * Ids stay plain strings: JSX type arguments break the dev tagger plugin.
+ *
+ * The rail is the canonical chip (RailChips) — the same object the Scores
+ * board rails and the two Watch destinations use. The old underlined-text
+ * treatment came from a brief that said "sort rail" without naming the chip.
+ */
 export function SortRail({
   options,
   value,
@@ -94,35 +101,13 @@ export function SortRail({
   onChange: (next: string) => void;
 }) {
   return (
-    <div
-      role="tablist"
-      aria-label="Sort"
-      style={{ display: 'flex', gap: 16, overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: 14 }}
-    >
-      {options.map((option) => {
-        const active = option.id === value;
-        return (
-          <button
-            key={option.id}
-            type="button"
-            role="tab"
-            aria-selected={active}
-            onClick={() => onChange(option.id)}
-            style={{
-              padding: 0,
-              border: 0,
-              background: 'transparent',
-              whiteSpace: 'nowrap',
-              cursor: 'pointer',
-              font: `${active ? 800 : 600} 13px/1 ${SANS}`,
-              color: active ? A.INK : A.MUTE,
-            }}
-          >
-            {option.label}
-          </button>
-        );
-      })}
-    </div>
+    <RailChips
+      options={options}
+      value={value}
+      onChange={onChange}
+      ariaLabel="Sort"
+      style={{ marginBottom: 14 }}
+    />
   );
 }
 

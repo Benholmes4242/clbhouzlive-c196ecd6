@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { RailChips } from '@/components/ui/RailChips';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { DISCOVER_FACT, FIGS, SANS } from './tokens';
@@ -437,46 +438,13 @@ function BoardRail<K extends string>({
   onSelect: (key: K) => void;
 }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        gap: 6,
-        margin: '0 -14px 12px',
-        padding: '0 14px',
-        overflowX: 'auto',
-        scrollbarWidth: 'none',
-        WebkitOverflowScrolling: 'touch',
-      }}
-    >
-      {keys.map((key) => {
-        const active = key === activeKey;
-        return (
-          <button
-            key={key}
-            type="button"
-            onClick={() => onSelect(key)}
-            aria-pressed={active}
-            style={{
-              flexShrink: 0,
-              /* S1.3 — 12/700, 6 by 11: five and a half chips visible is what
-                 says the rail scrolls. */
-              padding: '6px 11px',
-              borderRadius: 11,
-              border: `1px solid ${active ? 'transparent' : A.BORDER}`,
-              background: active ? A.INK : 'transparent',
-              color: active ? A.CANVAS : A.MUTE,
-              fontFamily: SANS,
-              fontSize: 12,
-              fontWeight: 700,
-              whiteSpace: 'nowrap',
-              cursor: 'pointer',
-            }}
-          >
-            {labelFor(key)}
-          </button>
-        );
-      })}
-    </div>
+    <RailChips
+      options={keys.map((key) => ({ id: key, label: labelFor(key) }))}
+      value={activeKey}
+      onChange={(next) => onSelect(next as K)}
+      ariaLabel="Board"
+      style={{ margin: '0 -14px 12px', padding: '0 14px' }}
+    />
   );
 }
 
