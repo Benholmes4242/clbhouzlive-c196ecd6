@@ -4,7 +4,6 @@ import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
-import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { RailChips } from '@/components/ui/RailChips';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { VideosSortId } from './types';
