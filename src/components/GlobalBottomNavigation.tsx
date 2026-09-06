@@ -9,7 +9,6 @@ import { warmChunk } from '@/routes/chunkLoaders';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { navigationTabs } from './bottom-navigation/navigationTabs';
 import { useDiscoverNewTotal } from '@/stores/discoverNewStore';
-import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 
 import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
@@ -112,9 +111,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   // reviews. It is derived from the data Discover already loaded: no extra
   // query, and leaving Discover writes the stamp, which zeroes it.
   const discoverNewCount = useDiscoverNewTotal();
-  const { data: tournamentsCache } = useTournamentsCache();
-  const liveTournamentCount = tournamentsCache?.live?.length ?? 0;
-  const isTourHubLive = liveTournamentCount > 0;
   const [createOpen, setCreateOpen] = useState(false);
 
   const theme = useNavTheme();
