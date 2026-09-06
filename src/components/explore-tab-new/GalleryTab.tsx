@@ -70,7 +70,6 @@ export function GalleryTab({ onOpenPost }: { onOpenPost: (items: CommunityLibrar
 
   const clips = media?.clips ?? [];
   const videos = media?.videos ?? [];
-  const rounds = media?.rounds ?? [];
 
   return (
     <main style={{ paddingTop: 'var(--discover-header-h)', minHeight: '100dvh', background: A.CANVAS, color: A.INK, fontFamily: SANS }}>
@@ -101,11 +100,10 @@ export function GalleryTab({ onOpenPost }: { onOpenPost: (items: CommunityLibrar
         </section>
         )}
 
-        {rounds.length > 0 && (
-        <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="From the rounds" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 5 }}>{rounds.map((item) => <button key={item.key} type="button" aria-label={`Open ${item.displayName}'s round`} onClick={() => onOpenPost(rounds, item, 'discover-rounds')} style={{ position: 'relative', aspectRatio: '1', padding: 0, border: 0, borderRadius: 6, overflow: 'hidden', background: A.PANEL, cursor: 'pointer' }}>{item.thumbnail && <img src={item.thumbnail} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}{item.kind === 'video' && <span style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', color: A.INK }}><Play size={18} fill="currentColor" /></span>}</button>)}</div>
-        </section>
-        )}
+        {/* FROM THE ROUNDS was removed: round posts are scorecard posts built from
+            round data and carry no post_media rows — 760 of them, none with a photo —
+            so the section could never fill. That stops it being rebuilt against the
+            same join later. */}
 
         {moments.length > 0 && (
         <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="Moments" />
