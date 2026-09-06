@@ -337,7 +337,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                           background: isActive ? tokens.lozenge : 'transparent',
                           color: isLive ? '#22C55E' : (isActive ? activeColor : inactiveColor),
                           padding: isActive ? lozengePad : inactivePad,
-                          borderRadius: 999,
+                          borderRadius: isActive ? r.xl : r.pill,
                           display: 'inline-flex',
                           alignItems: 'center',
                           justifyContent: 'center',
