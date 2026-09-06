@@ -15,7 +15,6 @@ function streamThumb(streamId: string): string {
 export interface DiscoverMediaPreview {
   clips: CommunityLibraryItem[];
   videos: CommunityLibraryItem[];
-  rounds: CommunityLibraryItem[];
 }
 
 export function useDiscoverMediaPreview(enabled: boolean) {
@@ -126,14 +125,12 @@ export function useDiscoverMediaPreview(enabled: boolean) {
           post,
           mediaIndex: 0,
           mediaId: lead.id,
-          roundLinked: !!row.whs_score_id,
         }];
       });
 
       return {
         clips: mapped.filter((item) => item.kind === 'video' && (item.duration == null || item.duration < 180)).slice(0, 12),
         videos: mapped.filter((item) => item.kind === 'video' && item.duration != null && item.duration >= 180).slice(0, 12),
-        rounds: mapped.filter((item) => item.roundLinked).slice(0, 12),
       };
     },
   });
