@@ -69,10 +69,8 @@ export default function ClipsPageV2() {
             position: 'sticky',
             top: 'var(--sat, 0px)',
             zIndex: 10,
-            background: 'rgba(248,250,252,0.72)',
-            backdropFilter: 'blur(14px)',
-            WebkitBackdropFilter: 'blur(14px)',
-            borderBottom: '1px solid rgba(0,0,0,0.07)',
+            background: A.CANVAS,
+            borderBottom: `1px solid ${A.BORDER}`,
             padding: '8px 4px 10px 0',
           }}
         >
