@@ -200,7 +200,7 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
 
   const [tournament, setTournament] = useState<string | null>(null);
   const [wireLimit, setWireLimit] = useState(WIRE_PAGE_SIZE);
-  const [heroCommentsOpen, setHeroCommentsOpen] = useState(false);
+  const [commentsStoryId, setCommentsStoryId] = useState<string | null>(null);
 
   /**
    * BY TOURNAMENT, NOT BY TOUR — the tour is already the page's context. A null
@@ -250,6 +250,23 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
   const { stateFor, toggle, unavailable, viewerId } = useContentReactions(
     useMemo(() => lensStories.map((s) => ({ type: 'tour_story' as const, id: s.id })), [lensStories]),
   );
+  const engagementAction = (story: TourStory, size = 13) => {
+    const like = stateFor('tour_story', story.id);
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 18 }}>
+        <ReactionAction
+          count={like.count}
+          reacted={like.mine}
+          onToggle={() => toggle('tour_story', story.id)}
+          label={like.mine ? 'Unlike story' : 'Like story'}
+          readOnly={!viewerId}
+          hidden={unavailable}
+          size={size}
+        />
+        {viewerId && <CommentAction count={engagementFor(story.id).commentCount} onOpen={() => setCommentsStoryId(story.id)} label="Open story comments" size={size} />}
+      </span>
+    );
+  };
 
   return (
     <div style={{ fontFamily: FONT, paddingBottom: 24 }}>
@@ -273,30 +290,14 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
             engagement={engagementFor(lead.id)}
             topOffset={immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 68px)' : 13}
             attachedContent={lead.tournament_id ? <StoryLeaderboardStrip tournamentId={lead.tournament_id} /> : undefined}
-            engagementAction={(() => {
-              const like = stateFor('tour_story', lead.id);
-              const comments = engagementFor(lead.id).commentCount;
-              return (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 18 }}>
-                  <ReactionAction
-                    count={like.count}
-                    reacted={like.mine}
-                    onToggle={() => toggle('tour_story', lead.id)}
-                    label={like.mine ? 'Unlike story' : 'Like story'}
-                    readOnly={!viewerId}
-                    hidden={unavailable}
-                  />
-                  {viewerId && <CommentAction count={comments} onOpen={() => setHeroCommentsOpen(true)} label="Open story comments" />}
-                </span>
-              );
-            })()}
+            engagementAction={engagementAction(lead, 14)}
           />
 
           <div style={{ padding: `0 ${GUTTER}px` }}>
             {twoUp.length === 2 && (
               <section aria-label="Featured stories" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 9, marginTop: 24 }}>
                 {twoUp.map((s) => (
-                  <FeatureStory key={s.id} story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} />
+                  <FeatureStory key={s.id} story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} engagementAction={engagementAction(s)} />
                 ))}
               </section>
             )}
@@ -305,7 +306,7 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
               <section aria-label="More stories" style={{ marginTop: 24 }}>
                 {rows.map((s, index) => (
                   <div key={s.id} style={{ borderTop: index === 0 ? `1px solid ${HAIRLINE_INK_10}` : 'none', borderBottom: `1px solid ${HAIRLINE_INK_10}` }}>
-                    <WorkhorseRow story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} />
+                    <WorkhorseRow story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} engagementAction={engagementAction(s)} />
                   </div>
                 ))}
               </section>
@@ -338,12 +339,12 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
               </section>
             )}
           </div>
-          {viewerId && (
+          {viewerId && commentsStoryId && (
             <CommentsSheetV2
-              isOpen={heroCommentsOpen}
-              onClose={() => setHeroCommentsOpen(false)}
+              isOpen
+              onClose={() => setCommentsStoryId(null)}
               targetType="tour_story"
-              targetId={lead.id}
+              targetId={commentsStoryId}
             />
           )}
         </>

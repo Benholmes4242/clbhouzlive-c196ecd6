@@ -29,7 +29,7 @@ export function NewsTabPage() {
   const { stories: allStories = [], isPending } = useAmateurStories(null);
   const [wireLimit, setWireLimit] = useState(WIRE_PAGE_SIZE);
   const [competition, setCompetition] = useState<string | null>(null);
-  const [heroCommentsOpen, setHeroCommentsOpen] = useState(false);
+  const [commentsStoryId, setCommentsStoryId] = useState<string | null>(null);
   const stories = useMemo(
     () => competition ? allStories.filter((story) => story.tournament_name?.trim() === competition) : allStories,
     [allStories, competition],
@@ -57,6 +57,23 @@ export function NewsTabPage() {
   }, [allStories]);
 
   const open = (story: AmateurStory) => navigate(`/discover/news/${story.slug}`);
+  const engagementAction = (story: AmateurStory, size = 13) => {
+    const like = stateFor('amateur_story', story.id);
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 18 }}>
+        <ReactionAction
+          count={like.count}
+          reacted={like.mine}
+          onToggle={() => toggle('amateur_story', story.id)}
+          label={like.mine ? 'Unlike story' : 'Like story'}
+          readOnly={!viewerId}
+          hidden={unavailable}
+          size={size}
+        />
+        {viewerId && <CommentAction count={engagementFor(story.id).commentCount} onOpen={() => setCommentsStoryId(story.id)} label="Open story comments" size={size} />}
+      </span>
+    );
+  };
 
   return (
     <main style={{ paddingTop: 'var(--discover-header-h)', minHeight: '100dvh', background: A.CANVAS, color: A.INK, fontFamily: SANS }}>
@@ -73,29 +90,13 @@ export function NewsTabPage() {
             story={lead}
             onOpen={() => open(lead)}
             engagement={engagementFor(lead.id)}
-            engagementAction={(() => {
-              const like = stateFor('amateur_story', lead.id);
-              const comments = engagementFor(lead.id).commentCount;
-              return (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 18 }}>
-                  <ReactionAction
-                    count={like.count}
-                    reacted={like.mine}
-                    onToggle={() => toggle('amateur_story', lead.id)}
-                    label={like.mine ? 'Unlike story' : 'Like story'}
-                    readOnly={!viewerId}
-                    hidden={unavailable}
-                  />
-                  {viewerId && <CommentAction count={comments} onOpen={() => setHeroCommentsOpen(true)} label="Open story comments" />}
-                </span>
-              );
-            })()}
+            engagementAction={engagementAction(lead, 14)}
           />
 
           <div style={{ padding: `0 ${GUTTER}px 110px` }}>
             {twoUp.length === 2 && (
               <section aria-label="Featured stories" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 9, marginTop: 24 }}>
-                {twoUp.map((story) => <FeatureStory key={story.id} story={story} onOpen={() => open(story)} engagement={engagementFor(story.id)} />)}
+                {twoUp.map((story) => <FeatureStory key={story.id} story={story} onOpen={() => open(story)} engagement={engagementFor(story.id)} engagementAction={engagementAction(story)} />)}
               </section>
             )}
 
@@ -103,7 +104,7 @@ export function NewsTabPage() {
               <section aria-label="Latest stories" style={{ marginTop: 24 }}>
                 {rows.map((story, index) => (
                   <div key={story.id} style={{ borderTop: index === 0 ? `1px solid ${A.HAIRLINE}` : 'none', borderBottom: `1px solid ${A.HAIRLINE}` }}>
-                    <WorkhorseRow story={story} onOpen={() => open(story)} engagement={engagementFor(story.id)} />
+                    <WorkhorseRow story={story} onOpen={() => open(story)} engagement={engagementFor(story.id)} engagementAction={engagementAction(story)} />
                   </div>
                 ))}
               </section>
@@ -135,12 +136,12 @@ export function NewsTabPage() {
               </section>
             )}
           </div>
-          {viewerId && (
+          {viewerId && commentsStoryId && (
             <CommentsSheetV2
-              isOpen={heroCommentsOpen}
-              onClose={() => setHeroCommentsOpen(false)}
+              isOpen
+              onClose={() => setCommentsStoryId(null)}
               targetType="amateur_story"
-              targetId={lead.id}
+              targetId={commentsStoryId}
             />
           )}
         </>

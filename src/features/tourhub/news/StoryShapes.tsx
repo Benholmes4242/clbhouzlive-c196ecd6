@@ -81,6 +81,8 @@ export interface StoryShapeProps {
   story: NewsStory;
   onOpen: () => void;
   engagement?: StoryEngagement | null;
+  /** Live controls supplied by an index page; kept outside navigation buttons. */
+  engagementAction?: React.ReactNode;
 }
 
 /**
@@ -138,38 +140,40 @@ export function HeroStory({
 }
 
 /** THE TWO-UP. Needs exactly two; one remainder falls through to the rows. */
-export function FeatureStory({ story, onOpen, engagement }: StoryShapeProps) {
+export function FeatureStory({ story, onOpen, engagement, engagementAction }: StoryShapeProps) {
   return (
-    <Button variant="ghost" onClick={onOpen} style={{ ...tapReset, display: 'block', height: '100%' }} aria-label={`Read ${story.headline}`}>
-      <article style={{ height: 199 }}>
+    <article style={{ height: 199 }}>
+      <Button variant="ghost" onClick={onOpen} style={{ ...tapReset, display: 'block' }} aria-label={`Read ${story.headline}`}>
         <div style={{ position: 'relative', width: '100%', height: 112, minHeight: 112, maxHeight: 112, flex: 'none', borderRadius: r.sm, overflow: 'hidden', background: A.PANEL }}>
           {story.image_url && <img src={story.image_url} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: 112, minHeight: 112, maxHeight: 112, objectFit: 'cover', display: 'block', flex: 'none' }} />}
           <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.76))' }} />
           <div style={{ ...COLUMN, position: 'absolute', left: 9, right: 9, bottom: 8, color: 'rgba(248,250,252,0.82)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tagFor(story)}</div>
         </div>
         <h2 style={{ margin: '9px 0 0', height: '53.76px', fontSize: 14, fontWeight: 700, lineHeight: 1.28, letterSpacing: 0, color: A.INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden', textOverflow: 'ellipsis', overflowWrap: 'anywhere' }}>{story.headline}</h2>
-        <div style={{ marginTop: 7, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
-          <span style={{ ...COLUMN, color: A.DIM, letterSpacing: 0, whiteSpace: 'nowrap' }}>{relativeDate(story)}</span>
-          <StoryRowEngagement engagement={engagement} inkColor={A.DIM} size={13} />
-        </div>
-      </article>
-    </Button>
+      </Button>
+      <div style={{ marginTop: 7, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+        <span style={{ ...COLUMN, color: A.DIM, letterSpacing: 0, whiteSpace: 'nowrap' }}>{relativeDate(story)}</span>
+        {engagementAction ?? <StoryRowEngagement engagement={engagement} inkColor={A.DIM} size={13} />}
+      </div>
+    </article>
   );
 }
 
 /** THE ROW. The workhorse: kicker and date, 14.5 headline, 74px thumbnail. */
-export function WorkhorseRow({ story, onOpen, engagement }: StoryShapeProps) {
+export function WorkhorseRow({ story, onOpen, engagement, engagementAction }: StoryShapeProps) {
   return (
-    <Button variant="ghost" onClick={onOpen} style={tapReset} aria-label={`Read ${story.headline}`}>
-      <article style={{ display: 'flex', gap: 12, width: '100%', height: 119, boxSizing: 'border-box', padding: '13px 0' }}>
+    <article style={{ position: 'relative', width: '100%', height: 119, boxSizing: 'border-box', padding: '13px 0' }}>
+      <Button variant="ghost" onClick={onOpen} style={{ ...tapReset, display: 'flex', gap: 12 }} aria-label={`Read ${story.headline}`}>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ ...COLUMN, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tagFor(story)}{relativeDate(story) ? ` · ${relativeDate(story)}` : ''}</div>
           <h2 style={{ margin: '5px 0 0', height: '56.55px', fontSize: 14.5, fontWeight: 700, lineHeight: 1.3, letterSpacing: 0, color: A.INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden', textOverflow: 'ellipsis', overflowWrap: 'anywhere' }}>{story.headline}</h2>
-          <div style={{ marginTop: 7 }}><StoryRowEngagement engagement={engagement} inkColor={A.DIM} size={13} /></div>
         </div>
         {story.image_url && <img src={story.image_url} alt="" loading="lazy" decoding="async" style={{ width: 74, height: 74, borderRadius: r.sm, objectFit: 'cover', flexShrink: 0, background: A.PANEL }} />}
-      </article>
-    </Button>
+      </Button>
+      <div style={{ position: 'absolute', left: 0, bottom: 13 }}>
+        {engagementAction ?? <StoryRowEngagement engagement={engagement} inkColor={A.DIM} size={13} />}
+      </div>
+    </article>
   );
 }
 
