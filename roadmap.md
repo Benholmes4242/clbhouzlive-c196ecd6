@@ -34,4 +34,4 @@
 - [x] Replace Members/Courses eyebrows with shared headline-and-count rows
 - [x] Use board-aware member/round units for both headline and terminal action
 - [x] Add the matching Course Analytics heading and 26px section gaps
-- [ ] Verify board switching, count agreement, and 320pt headline fit
+- [x] Verify board switching, count agreement, and 320pt headline fit

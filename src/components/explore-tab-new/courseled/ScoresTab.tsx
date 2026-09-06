@@ -348,20 +348,19 @@ export function ScoresTab({
               />
             )}
 
-            {/* S6 — HOW THEY PLAYED. The selected row drives the unchanged
-                analytics card; nothing about its internals is touched.
-                BRIEF_SCORES_REFINEMENTS S2 — the section now also carries a
-                full-catalogue course search, so "how does Woburn play" is
-                answerable for a course nobody in the circuit has played. */}
-            <HowTheyPlayedSection
-              boardRow={selectedRow}
-              userId={userId}
-              filters={filters}
-              onCoursePress={onCoursePress}
-            />
           </>
         )}
       </div>
+
+      {/* COURSE ANALYTICS is a third peer section. It remains searchable even
+          when the filtered course board is empty because its catalogue is not
+          limited to the rows above. */}
+      <HowTheyPlayedSection
+        boardRow={selectedRow}
+        userId={userId}
+        filters={filters}
+        onCoursePress={onCoursePress}
+      />
 
       <BoardFilterPanel
         open={panelOpen}
