@@ -1273,6 +1273,13 @@
         "rounds": "ROUNDS"
       }
     },
+    "scores": {
+      "searchAnyCourse": "Search any course for analytics",
+      "searchCourseForAnalytics": "Search a course for analytics",
+      "searching": "Searching",
+      "noCourseMatch": "No course by that name.",
+      "clearCourse": "Back to the board"
+    },
     "headline": "What's been happening",
     "hero": {
       "viewScorecard": "View scorecard"

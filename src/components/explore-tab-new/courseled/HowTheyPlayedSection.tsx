@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, X } from 'lucide-react';
 
@@ -62,6 +62,14 @@ export function HowTheyPlayedSection({
 
   const [query, setQuery] = useState('');
   const [pickedId, setPickedId] = useState<string | null>(null);
+  const [narrowPlaceholder, setNarrowPlaceholder] = useState(false);
+
+  useEffect(() => {
+    const update = () => setNarrowPlaceholder(window.innerWidth <= 360);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   const results = useCourseSearch(query);
   const picked = useSearchedCourse(userId, pickedId, filters);
@@ -111,8 +119,12 @@ export function HowTheyPlayedSection({
               setQuery(e.target.value);
               if (pickedId) setPickedId(null);
             }}
-            placeholder={t('discover.scores.searchAnyCourse', 'Search any course')}
-            aria-label={t('discover.scores.searchAnyCourse', 'Search any course')}
+            placeholder={
+              narrowPlaceholder
+                ? t('discover.scores.searchCourseForAnalytics', 'Search a course for analytics')
+                : t('discover.scores.searchAnyCourse', 'Search any course for analytics')
+            }
+            aria-label={t('discover.scores.searchAnyCourse', 'Search any course for analytics')}
             style={{
               flex: 1,
               minWidth: 0,
