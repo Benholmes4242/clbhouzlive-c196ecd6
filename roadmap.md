@@ -10,3 +10,4 @@
 - [x] Finish labelled bottom navigation with the exact leaderboard mark, 9px colour-matched labels, 46px targets, and named clearance checks.
 - [x] Match the Amateur navigation mark to the filled icon set and verify ink/mute weight.
 - [x] Rebuild Discover News as a descending hero, two-up, rows, and wire hierarchy.
+- [x] Align shared News/Wire card heights, activate hero reactions, and attach the lead tournament ticker.
