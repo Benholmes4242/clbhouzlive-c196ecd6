@@ -227,6 +227,7 @@ export function HowTheyPlayedSection({
           filters={filters}
           onCoursePress={onCoursePress}
           courseName={subjectName}
+          ctaBorderless
           media={
             pickedId ? (
               <CoursePhoto
