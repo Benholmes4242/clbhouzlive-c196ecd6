@@ -57,13 +57,16 @@ export default function ReviewsLibraryPage() {
             onChange={(next) => setSort(next as ReviewLibrarySort)}
           />
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
             {tiles.map((tile) => (
               <button
                 key={tile.reviewId}
                 type="button"
                 onClick={() => openTile(tile)}
-                style={{ padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}
+                /* GRID ITEMS DEFAULT TO min-width: auto — a long course name
+                   grows its own track past 1fr and pushes the right column off
+                   the viewport. minWidth 0 lets the label truncate instead. */
+                style={{ minWidth: 0, padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}
               >
                 <div style={{ position: 'relative', height: 132, borderRadius: 10, overflow: 'hidden', background: A.PANEL }}>
                   {tile.thumbnail && (
@@ -75,11 +78,13 @@ export default function ReviewsLibraryPage() {
                   </GlassBadge>
                   {tile.mediaCount > 1 && <GlassBadge>+{tile.mediaCount - 1}</GlassBadge>}
                 </div>
-                <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tile.courseName}</div>
+                {/* Two lines maximum, then an ellipsis — as on the Watch tiles. */}
+                <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere' }}>{tile.courseName}</div>
                 <div style={{ marginTop: 2, fontSize: 11, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tile.reviewerName}</div>
               </button>
             ))}
           </div>
+
 
           {query.hasNextPage && (
             <LoadMore busy={query.isFetchingNextPage} onPress={() => void query.fetchNextPage()} />
