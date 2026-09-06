@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { RailChips } from '@/components/ui/RailChips';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { DISCOVER_FACT, FIGS, SANS } from './tokens';

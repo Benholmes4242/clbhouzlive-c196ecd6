@@ -4,7 +4,7 @@ import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
-import { FilterChips } from '@/components/ui/FilterChips';
+import { RailChips } from '@/components/ui/RailChips';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import {
   CLIPS_V2_MOODS,
@@ -77,7 +77,7 @@ export default function ClipsPageV2() {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <FilterChips
+              <RailChips
                 options={moodOptions}
                 value={mood}
                 onChange={setMood}
@@ -93,7 +93,7 @@ export default function ClipsPageV2() {
                 height: 36,
                 borderRadius: 999,
                 border: `1px solid ${A.BORDER}`,
-                background: A.PANEL,
+                background: 'transparent',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -102,7 +102,7 @@ export default function ClipsPageV2() {
                 flexShrink: 0,
               }}
             >
-              <Search size={15} color={A.INK} />
+              <Search size={15} color={A.MUTE} />
             </button>
           </div>
         </div>

@@ -5,7 +5,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
-import { FilterChips } from '@/components/ui/FilterChips';
+import { RailChips } from '@/components/ui/RailChips';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { VideosSortId } from './types';
 import { VideosFeedV2 } from './components/VideosFeedV2';
@@ -120,7 +120,7 @@ export default function VideosPageV2() {
               height: 36,
               borderRadius: 999,
               border: `1px solid ${A.BORDER}`,
-              background: A.PANEL,
+              background: 'transparent',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -130,7 +130,7 @@ export default function VideosPageV2() {
               marginBottom: 6,
             }}
           >
-            <Search size={15} color={A.INK} />
+            <Search size={15} color={A.MUTE} />
           </button>
         </div>
 
@@ -145,7 +145,7 @@ export default function VideosPageV2() {
             padding: '8px 0 10px',
           }}
         >
-          <FilterChips
+          <RailChips
             options={CATEGORY_OPTS}
             value={category}
             onChange={setCategory}
