@@ -15,6 +15,7 @@ import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
 import { scrollPageToTop } from '@/lib/getScrollParent';
+import { r } from '@/lib/radius';
 import CreateSheetV2 from '@/features/post-v2/components/CreateSheetV2';
 
 // ---- Public token: total vertical space to reserve at the bottom of any
@@ -291,7 +292,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 background: tokens.fill,
                 border: tokens.hairline,
                 boxShadow: tokens.shadow,
-                borderRadius: 999,
+                borderRadius: r.xl,
                 padding: pillPadding,
                 transition: PILL_TRANSITION,
                 WebkitTapHighlightColor: 'transparent',

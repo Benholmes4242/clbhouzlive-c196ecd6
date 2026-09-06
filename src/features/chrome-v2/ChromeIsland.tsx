@@ -40,6 +40,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { safeGoBack } from '@/utils/navigation';
+import { r } from '@/lib/radius';
 import { subscribeIslandEdge, getIslandEdgeScrolled } from './islandEdge';
 
 const ISLAND_H = 44;
@@ -100,7 +101,7 @@ function glassStyle(tone: ChromeTone): React.CSSProperties {
   const isLight = tone === 'light';
   return {
     height: ISLAND_H,
-    borderRadius: 999,
+    borderRadius: r.xl,
     background: isLight ? 'rgba(255,255,255,0.72)' : 'rgba(20,22,28,0.72)',
     border: isLight
       ? '1px solid rgba(0,0,0,0.06)'
