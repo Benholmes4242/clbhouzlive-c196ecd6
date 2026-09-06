@@ -13,7 +13,6 @@ import { NewsTabPage } from './NewsTabPage';
 import { GalleryTab } from './GalleryTab';
 import { ScoresTab } from './courseled/ScoresTab';
 
-import type { BoardFilters } from './courseled/boardFilters';
 import type { BoardRow } from './courseled/hooks/useBoardPage';
 import type { CommunityLibraryItem } from './courseled/hooks/useCommunityLibrary';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -41,7 +40,6 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
   const opener = useScorecardOpener();
   const initialReturn = useRef(readDiscoverReturn(location.state));
   const [activeTab, setActiveTab] = useState<DiscoverTab>(() => initialReturn.current?.tab ?? 'scores');
-  const [boardFilters, setBoardFilters] = useState<BoardFilters | null>(null);
 
   useLayoutEffect(() => {
     const snapshot = initialReturn.current;
