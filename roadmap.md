@@ -39,4 +39,4 @@
 ## Scores canonical board entry (AMENDMENT_TO_BRIEF_SCORES_THREE_HEADLINES)
 - [x] Share the filter sheet's ranking and feat order with the member rail
 - [x] Let the existing recent/handicap/rotation ladder choose the opening board
-- [ ] Verify first-session Most recent, restored choices, and 320pt fit
+- [x] Verify first-session Most recent, restored choices, and 320pt fit
