@@ -478,6 +478,7 @@ export function CourseAnalyticsCard({
   onCoursePress,
   media,
   courseName,
+  ctaBorderless,
 }: {
   row: BoardCourseRow;
   userId: string | undefined;
@@ -485,6 +486,7 @@ export function CourseAnalyticsCard({
   onCoursePress?: (courseId: string) => void;
   media?: ReactNode;
   courseName?: string | null;
+  ctaBorderless?: boolean;
 }) {
   const { t } = useTranslation('courses');
   const analysis = useCourseHoleAnalysis(row.course_id);
@@ -541,6 +543,7 @@ export function CourseAnalyticsCard({
         <ListTerminalRow
           label={t('discover.coursesPlayed.seeFullAnalytics', 'See full course analytics')}
           onPress={() => onCoursePress?.(row.course_id)}
+          borderless={ctaBorderless}
         />
       </div>
     </div>
