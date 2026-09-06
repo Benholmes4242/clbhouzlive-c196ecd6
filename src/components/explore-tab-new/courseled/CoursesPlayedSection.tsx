@@ -506,10 +506,10 @@ export function CourseAnalyticsCard({
         <h3 style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 800, lineHeight: 1.25, color: A.INK }}>
           {courseName ?? row.name ?? '\u2014'}
         </h3>
+        <LowRoundLine row={row} userId={userId} filters={filters} />
       </div>
       {media}
       <div style={{ padding: '12px 12px 10px' }}>
-        <LowRoundLine row={row} userId={userId} filters={filters} />
         <CourseCardPanel courseId={row.course_id} courseName={courseName ?? row.name ?? undefined} embedded />
         {analysis.isPending ? (
           <div aria-hidden style={{ minHeight: 330 }} />
@@ -525,12 +525,17 @@ export function CourseAnalyticsCard({
             />
           </div>
         ) : (
-          <div style={{ ...CAP, padding: '14px 0 4px', lineHeight: 1.5 }}>
-            {t(
-              'discover.coursesPlayed.notEnoughDetail',
-              '{{count}} rounds here carry hole detail — not enough for a course picture yet',
-              { count: analysis.data?.total_rounds ?? 0 },
-            )}
+          <div style={{ padding: '14px 0 4px' }}>
+            <div style={{ ...KICKER, marginBottom: 5, color: A.MUTE }}>
+              {t('discover.coursesPlayed.courseWide', 'Course-wide')}
+            </div>
+            <div style={{ ...CAP, lineHeight: 1.5 }}>
+              {t(
+                'discover.coursesPlayed.notEnoughDetail',
+                '{{count}} rounds here carry hole detail — not enough for a course picture yet',
+                { count: analysis.data?.total_rounds ?? 0 },
+              )}
+            </div>
           </div>
         )}
         <ListTerminalRow
