@@ -19,9 +19,9 @@ import { r } from '@/lib/radius';
 import CreateSheetV2 from '@/features/post-v2/components/CreateSheetV2';
 
 // ---- Public token: total vertical space to reserve at the bottom of any
-// scrollable page so its last content clears the floating pill.
-// (~52 pill + 20 bottom gap + 16 breathing room = 88)
-export const NAV_CLEARANCE = '88px';
+// scrollable page so its last content clears the floating control.
+// (~60 bar + 20 bottom gap + 16 breathing room = 96)
+export const NAV_CLEARANCE = '96px';
 
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
@@ -208,7 +208,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     handleTabClick(tab);
   };
 
-  // Sizes (icons-only, no visible labels) — sized to match IG's pill.
+  // Labelled navigation: glyph, 3px gap, then the column-header label.
   const PILL_MAX_EXPANDED = 'min(396px, 100vw - 22px)';
   const PILL_MAX_CONDENSED = 'min(324px, 100vw - 36px)';
   // Even integers so 1px strokes land on the device pixel grid — SF-crisp.
@@ -216,8 +216,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const iconStroke = 2;
 
   const pillPadding = condensed ? '3px 7px' : '4px 7px';
-  const lozengePad = condensed ? '10px 20px' : '11px 24px';
-  const inactivePad = condensed ? '6px 12px' : '7px 16px';
 
   const badges = useMemo<Record<string, number>>(() => ({ courses: discoverNewCount }), [discoverNewCount]);
 
@@ -314,7 +312,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                   const isLive = tab.id === 'tourhub' && isTourHubLive;
                   const Icon = tab.icon;
                   const badgeCount = badges[tab.id] ?? 0;
-                  const displayLabel = isLive ? 'Live' : tab.label;
                   const activeColor = isLive ? '#22C55E' : tokens.ink;
                   const inactiveColor = tokens.dim;
 
@@ -336,18 +333,21 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                           border: 0,
                           background: isActive ? tokens.lozenge : 'transparent',
                           color: isLive ? '#22C55E' : (isActive ? activeColor : inactiveColor),
-                          padding: isActive ? lozengePad : inactivePad,
+                          padding: '7px 3px',
                           borderRadius: isActive ? r.xl : r.pill,
-                          display: 'inline-flex',
+                          display: 'flex',
+                          flexDirection: 'column',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          minHeight: 36,
+                          gap: 3,
+                          width: '100%',
+                          minWidth: 0,
                           fontFamily: 'inherit',
                           cursor: 'pointer',
                           transition: BUTTON_TRANSITION,
                         }}
                       >
-                        <span style={{ position: 'relative', display: 'inline-flex' }}>
+                        <span style={{ position: 'relative', display: 'inline-flex', flex: '0 0 auto' }}>
                           <Icon
                             aria-hidden="true"
                             strokeLinecap="round"
@@ -390,6 +390,20 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                               {badgeCount > 99 ? '99+' : badgeCount}
                             </span>
                           )}
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          style={{
+                            color: isActive ? tokens.ink : tokens.dim,
+                            fontSize: 9.5,
+                            fontWeight: 700,
+                            letterSpacing: '0.13em',
+                            lineHeight: 1,
+                            textTransform: 'uppercase',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {tab.label}
                         </span>
                         {/* Visually-hidden text label — always in DOM for
                             screen readers (clip-rect pattern). Icons-only UI. */}
