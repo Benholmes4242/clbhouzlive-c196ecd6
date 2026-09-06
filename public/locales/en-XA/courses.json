@@ -1257,6 +1257,13 @@
       "railDays_one": "[~~ĐÁÝ~~]",
       "railDays_other": "[~~ĐÁÝŠ~~]"
     },
+    "scores": {
+      "searchAnyCourse": "[~~Šéářĉĥ áñý ĉőúřšé ƒőř áñáļýťíĉš~~]",
+      "searchCourseForAnalytics": "[~~Šéářĉĥ á ĉőúřšé ƒőř áñáļýťíĉš~~]",
+      "searching": "[~~Šéářĉĥíñĝ~~]",
+      "noCourseMatch": "[~~Ñő ĉőúřšé ƀý ţĥáţ ñáɱé.~~]",
+      "clearCourse": "[~~ßáĉǩ ţő ţĥé ƀőáŕđ~~]"
+    },
     "eventCount_one": "[~~{{count}} éṽéñţ~~]",
     "eventCount_other": "[~~{{count}} éṽéñţš~~]",
     "newsTitle": "[~~Ĉőúřšéš íñ ţĥé ñéŵš~~]",
