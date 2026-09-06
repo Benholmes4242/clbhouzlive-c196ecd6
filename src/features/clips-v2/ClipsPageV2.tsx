@@ -5,6 +5,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { FilterChips } from '@/components/ui/FilterChips';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import {
   CLIPS_V2_MOODS,
   type ClipsV2Mood,
@@ -69,10 +70,8 @@ export default function ClipsPageV2() {
             position: 'sticky',
             top: 'var(--sat, 0px)',
             zIndex: 10,
-            background: 'rgba(248,250,252,0.72)',
-            backdropFilter: 'blur(14px)',
-            WebkitBackdropFilter: 'blur(14px)',
-            borderBottom: '1px solid rgba(0,0,0,0.07)',
+            background: A.CANVAS,
+            borderBottom: `1px solid ${A.BORDER}`,
             padding: '8px 4px 10px 0',
           }}
         >
@@ -93,8 +92,8 @@ export default function ClipsPageV2() {
                 width: 36,
                 height: 36,
                 borderRadius: 999,
-                border: '1px solid rgba(0,0,0,0.07)',
-                background: '#fff',
+                border: `1px solid ${A.BORDER}`,
+                background: A.PANEL,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -103,7 +102,7 @@ export default function ClipsPageV2() {
                 flexShrink: 0,
               }}
             >
-              <Search size={15} color="#0F172A" />
+              <Search size={15} color={A.INK} />
             </button>
           </div>
         </div>

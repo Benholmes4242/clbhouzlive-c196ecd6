@@ -6,6 +6,7 @@ import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { FilterChips } from '@/components/ui/FilterChips';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { VideosSortId } from './types';
 import { VideosFeedV2 } from './components/VideosFeedV2';
 import { VIDEOS_V2_CATEGORY_IDS, type VideosV2CategoryId } from './categories';
@@ -118,8 +119,8 @@ export default function VideosPageV2() {
               width: 36,
               height: 36,
               borderRadius: 999,
-              border: '1px solid rgba(0,0,0,0.07)',
-              background: '#fff',
+              border: `1px solid ${A.BORDER}`,
+              background: A.PANEL,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -129,7 +130,7 @@ export default function VideosPageV2() {
               marginBottom: 6,
             }}
           >
-            <Search size={15} color="#0F172A" />
+            <Search size={15} color={A.INK} />
           </button>
         </div>
 
@@ -139,10 +140,8 @@ export default function VideosPageV2() {
             position: 'sticky',
             top: 'var(--sat, 0px)',
             zIndex: 10,
-            background: 'rgba(248,250,252,0.72)',
-            backdropFilter: 'blur(14px)',
-            WebkitBackdropFilter: 'blur(14px)',
-            borderBottom: '1px solid rgba(0,0,0,0.07)',
+            background: A.CANVAS,
+            borderBottom: `1px solid ${A.BORDER}`,
             padding: '8px 0 10px',
           }}
         >
