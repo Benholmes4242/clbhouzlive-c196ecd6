@@ -129,9 +129,14 @@ function wireDate(at: string | null) {
 /** NEWS is editorial only and deliberately mounts no Discover media query. */
 export function NewsTabPage() {
   const navigate = useNavigate();
-  const { stories = [], isPending } = useAmateurStories(null);
+  const { stories: allStories = [], isPending } = useAmateurStories(null);
   const [wireLimit, setWireLimit] = useState(WIRE_PAGE_SIZE);
-  const { engagementFor } = useStoryEngagement('amateur_story', useMemo(() => stories.map((story) => story.id), [stories]));
+  const [competition, setCompetition] = useState<string | null>(null);
+  const stories = useMemo(
+    () => competition ? allStories.filter((story) => story.tournament_name?.trim() === competition) : allStories,
+    [allStories, competition],
+  );
+  const { engagementFor } = useStoryEngagement('amateur_story', useMemo(() => allStories.map((story) => story.id), [allStories]));
 
   const lead = stories[0];
   const afterLead = stories.slice(1);
@@ -143,12 +148,12 @@ export function NewsTabPage() {
 
   const competitions = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const story of stories) {
+    for (const story of allStories) {
       const name = story.tournament_name?.trim();
       if (name) counts.set(name, (counts.get(name) ?? 0) + 1);
     }
     return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8);
-  }, [stories]);
+  }, [allStories]);
 
   const open = (story: AmateurStory) => navigate(`/discover/news/${story.slug}`);
 
@@ -187,7 +192,7 @@ export function NewsTabPage() {
                 <h2 id="news-competitions" style={{ ...KICKER, margin: '0 0 10px', color: A.INK }}>By competition</h2>
                 <div className="scrollbar-hide" style={{ display: 'flex', gap: 8, overflowX: 'auto', flexWrap: 'nowrap', willChange: 'transform', paddingBottom: 1 }}>
                   {competitions.map(([name, count]) => (
-                    <Button key={name} variant="outline" onClick={() => navigate(`/discover/news?competition=${encodeURIComponent(name)}`)} style={{ flex: 'none', height: 'auto', padding: '9px 14px', borderRadius: r.sm, border: `1px solid ${A.BORDER}`, background: A.PANEL, color: A.INK, fontFamily: SANS, fontSize: 12.5, fontWeight: 700, letterSpacing: 0 }}>
+                    <Button key={name} variant="outline" aria-pressed={competition === name} onClick={() => { setCompetition((current) => current === name ? null : name); setWireLimit(WIRE_PAGE_SIZE); window.scrollTo({ top: 0, behavior: 'auto' }); }} style={{ flex: 'none', height: 'auto', padding: '9px 14px', borderRadius: r.sm, border: `1px solid ${competition === name ? A.INK : A.BORDER}`, background: A.PANEL, color: A.INK, fontFamily: SANS, fontSize: 12.5, fontWeight: 700, letterSpacing: 0 }}>
                       {name}<span className="tabular-nums" style={{ marginLeft: 7, fontSize: 11, color: A.DIM }}>{count}</span>
                     </Button>
                   ))}
