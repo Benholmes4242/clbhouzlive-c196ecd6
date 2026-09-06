@@ -62,6 +62,16 @@ Deno.serve(async (req) => {
     return Response.json({ ok: false, error: "no_connection" }, { status: 404 });
   }
 
+  // A manual sync is ADDITIVE: it fetches sooner, it never reschedules. This
+  // path must NEVER write next_sync_after - that field is owned solely by the
+  // sweep (sync-whs-due). Stamping it here pushed the member past the next
+  // cron tick, so the member who synced by hand most often was the one whose
+  // data went stale.
+  await admin
+    .from("whs_connections")
+    .update({ last_attempted_at: new Date().toISOString() })
+    .eq("id", conn.id);
+
   // Inline sync (same shape as syncOneConnection in sync-whs-due)
   let password: string;
   try {
@@ -165,7 +175,7 @@ Deno.serve(async (req) => {
         last_sync_status: "ok",
         last_sync_error: null,
         consecutive_failures: 0,
-        next_sync_after: new Date(Date.now() + 6 * 3600_000).toISOString(),
+        // next_sync_after intentionally NOT written here - sweep-owned field.
       })
       .eq("id", conn.id);
 
