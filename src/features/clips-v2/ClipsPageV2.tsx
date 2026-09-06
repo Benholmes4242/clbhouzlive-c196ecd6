@@ -80,7 +80,7 @@ export default function ClipsPageV2() {
               <RailChips
                 options={moodOptions}
                 value={mood}
-                onChange={setMood}
+                onChange={(next) => setMood(next as ClipsV2Mood)}
                 ariaLabel="Clips mood filter"
               />
             </div>

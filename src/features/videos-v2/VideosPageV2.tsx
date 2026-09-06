@@ -102,12 +102,12 @@ export default function VideosPageV2() {
           }}
         >
           <div style={{ flex: 1, minWidth: 0 }}>
-            <UnderlineTabs
-              size="md"
-              align="center"
+            {/* Sort is the same object as the category rail below and as the
+                library pages' sort rails: one chip treatment, not underlines. */}
+            <RailChips
               options={SORT_OPTS}
               value={sort}
-              onChange={setSort}
+              onChange={(next) => setSort(next as VideosSortId)}
               ariaLabel="Sort videos"
             />
           </div>
@@ -148,7 +148,7 @@ export default function VideosPageV2() {
           <RailChips
             options={CATEGORY_OPTS}
             value={category}
-            onChange={setCategory}
+            onChange={(next) => setCategory(next as CategoryFilterId)}
             ariaLabel="Video category filter"
           />
         </div>
