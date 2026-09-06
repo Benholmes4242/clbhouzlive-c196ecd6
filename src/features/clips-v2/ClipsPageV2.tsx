@@ -72,7 +72,7 @@ export default function ClipsPageV2() {
             zIndex: 10,
             background: A.CANVAS,
             borderBottom: `1px solid ${A.BORDER}`,
-            padding: '8px 4px 10px 0',
+            padding: '8px 14px 10px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -82,6 +82,7 @@ export default function ClipsPageV2() {
                 value={mood}
                 onChange={(next) => setMood(next as ClipsV2Mood)}
                 ariaLabel="Clips mood filter"
+                style={{ margin: '0 -14px', padding: '0 14px' }}
               />
             </div>
             <button

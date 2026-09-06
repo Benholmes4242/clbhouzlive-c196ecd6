@@ -97,7 +97,7 @@ export default function VideosPageV2() {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            padding: '0 4px',
+            padding: '0 14px',
           }}
         >
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -108,6 +108,7 @@ export default function VideosPageV2() {
               value={sort}
               onChange={(next) => setSort(next as VideosSortId)}
               ariaLabel="Sort videos"
+              style={{ margin: '0 -14px', padding: '0 14px' }}
             />
           </div>
           <button
@@ -141,7 +142,7 @@ export default function VideosPageV2() {
             zIndex: 10,
             background: A.CANVAS,
             borderBottom: `1px solid ${A.BORDER}`,
-            padding: '8px 0 10px',
+            padding: '8px 14px 10px',
           }}
         >
           <RailChips
@@ -149,6 +150,7 @@ export default function VideosPageV2() {
             value={category}
             onChange={(next) => setCategory(next as CategoryFilterId)}
             ariaLabel="Video category filter"
+            style={{ margin: '0 -14px', padding: '0 14px' }}
           />
         </div>
 
