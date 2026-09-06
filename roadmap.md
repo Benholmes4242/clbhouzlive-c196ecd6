@@ -1,8 +1,7 @@
 # Roadmap
 
-- [ ] Report Discover S5.1 source audit and blockers before implementation.
-- [ ] Build Discover-only fixed header and local tab state without changing other routes.
-- [ ] Keep Circuit content unchanged; move editorial/media into News & media.
-- [ ] Verify sticky offsets, tab scroll reset, other-route chrome, and notched safe-area behavior.
-- [ ] Report measurements, device comparison, and brief inconsistencies.
-- [ ] Resume radius canon migration after the newer Discover request.
+- [ ] Complete radius canon literal migration outside `src/features/admin`.
+- [x] Controls lose the pill — stage 1: bottom navigation and both chrome islands only.
+- [x] Capture stage-1 before/after evidence over photography and dark canvas.
+- [x] Report total affected controls, boundary cases, semantic exceptions, and contradictions.
+- [ ] Hold all remaining control categories until stage 1 is approved.
