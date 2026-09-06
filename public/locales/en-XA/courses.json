@@ -1738,6 +1738,15 @@
     "mostPlayedOneRoundLine_other": "[Only {{name}} has played here, best of {{gross}}.]",
     "comments": {
       "action": "Comment on this round"
+    },
+    "coursesPlayed": {
+      "low14DayBy": "[~~14-DAY LOW BY {{name}}~~]",
+      "low30DayBy": "[~~30-DAY LOW BY {{name}}~~]",
+      "low90DayBy": "[~~90-DAY LOW BY {{name}}~~]",
+      "lowThisYearBy": "[~~THIS YEAR'S LOW BY {{name}}~~]",
+      "lowAllTimeBy": "[~~ALL-TIME LOW BY {{name}}~~]",
+      "courseWide": "[~~COURSE-WIDE~~]",
+      "seeFullAnalytics": "[~~See full course analytics~~]"
     }
   },
   "statBrowse": {

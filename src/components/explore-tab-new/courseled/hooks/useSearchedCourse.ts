@@ -29,17 +29,30 @@ export interface SearchedCourse {
   thumbnail: string | null;
   /** NULL when no round in the circuit has ever been logged there. */
   row: BoardCourseRow | null;
+  /** Same course constrained by the currently applied Scores filters. */
+  filteredRow: BoardCourseRow | null;
 }
 
-export function useSearchedCourse(viewerId: string | undefined, courseId: string | null) {
+export function useSearchedCourse(viewerId: string | undefined, courseId: string | null, filters = DEFAULT_FILTERS) {
   return useQuery<SearchedCourse | null>({
-    queryKey: ['discover', 'searched-course', courseId, viewerId ?? null],
+    queryKey: [
+      'discover',
+      'searched-course',
+      courseId,
+      viewerId ?? null,
+      filters.scope,
+      filters.window,
+      filters.regionKind,
+      filters.regionValue,
+      filters.band,
+      filters.competition,
+    ],
     enabled: !!courseId,
     staleTime: 60_000,
     queryFn: async () => {
       const id = courseId as string;
 
-      const [record, agg] = await Promise.all([
+      const [record, agg, filteredAgg] = await Promise.all([
         supabase
           .from('golf_courses')
           .select('id, name, region, sub_country, thumbnail_image')
@@ -55,6 +68,11 @@ export function useSearchedCourse(viewerId: string | undefined, courseId: string
           p_limit: 1,
           p_sort: 'played',
         } as never),
+        supabase.rpc('get_board_courses' as never, {
+          ...boardCoursesArgs(viewerId, { ...filters, courses: 'one', courseId: id }),
+          p_limit: 1,
+          p_sort: 'played',
+        } as never),
       ]);
 
       if (record.error) throw record.error;
@@ -64,9 +82,7 @@ export function useSearchedCourse(viewerId: string | undefined, courseId: string
         | null;
       if (!c) return null;
 
-      const raw = ((agg.data ?? []) as unknown) as Array<Record<string, unknown>>;
-      const first = raw[0];
-      const row: BoardCourseRow | null = first
+      const toRow = (first: Record<string, unknown> | undefined): BoardCourseRow | null => first
         ? {
             course_id: String(first.course_id),
             name: (first.name as string | null) ?? c.name,
@@ -86,6 +102,10 @@ export function useSearchedCourse(viewerId: string | undefined, courseId: string
             rating_count: Number(first.rating_count ?? 0),
           }
         : null;
+      const raw = ((agg.data ?? []) as unknown) as Array<Record<string, unknown>>;
+      const filteredRaw = ((filteredAgg.data ?? []) as unknown) as Array<Record<string, unknown>>;
+      const row = toRow(raw[0]);
+      const filteredRow = toRow(filteredRaw[0]);
 
       return {
         courseId: id,
@@ -93,6 +113,7 @@ export function useSearchedCourse(viewerId: string | undefined, courseId: string
         area: c.region ?? c.sub_country ?? null,
         thumbnail: c.thumbnail_image,
         row,
+        filteredRow,
       };
     },
   });

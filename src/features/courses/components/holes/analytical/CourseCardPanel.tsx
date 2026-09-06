@@ -85,6 +85,8 @@ interface Props {
   courseId: string | undefined;
   /** Names the sheet. Falls back to the tee title when absent. */
   courseName?: string;
+  /** Removes only the page-level gutter when the canonical card is embedded. */
+  embedded?: boolean;
 }
 
 const DASH = '\u2014';
@@ -1159,7 +1161,7 @@ const SheetBody: React.FC<{
 };
 
 
-export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
+export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName, embedded = false }) => {
   const { t } = useTranslation(['courses']);
   const { profile } = useProfileData();
   const { data } = useCourseTeeSets(courseId);
@@ -1238,7 +1240,7 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName }) => {
     <>
       <section
         style={{
-          margin: '0 16px',
+          margin: embedded ? 0 : '0 16px',
           background: A.PANEL,
           border: `1px solid ${A.BORDER}`,
           borderRadius: 16,
