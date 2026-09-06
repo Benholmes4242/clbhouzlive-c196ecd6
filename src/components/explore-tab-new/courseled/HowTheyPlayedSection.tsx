@@ -229,16 +229,16 @@ export function HowTheyPlayedSection({
       ) : (
         /* NO ROUNDS AT ALL. Said plainly, in the present tense (S3.4). */
         <div data-course-analytics-card style={{ background: A.PANEL, borderRadius: r.md, overflow: 'hidden' }}>
-          <CoursePhoto
-            courseId={subjectId}
-            name={subjectName}
-            thumbnail={subjectThumb}
-            area={picked.data?.area ?? null}
-          />
           <div style={{ padding: '12px 12px 14px' }}>
             <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 800, lineHeight: 1.25, color: A.INK }}>
               {subjectName ?? '\u2014'}
             </h3>
+            <CoursePhoto
+              courseId={subjectId}
+              name={subjectName}
+              thumbnail={subjectThumb}
+              area={picked.data?.area ?? null}
+            />
             <CourseCardPanel courseId={subjectId} courseName={subjectName ?? undefined} embedded />
             <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: A.INK }}>
               {t('discover.scores.noOnePlayed', 'No one has played {{course}} yet.', {

@@ -13,8 +13,10 @@ import { r } from '@/lib/radius';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
 import { useBoardCoursePlayers, type BoardCoursePlayer } from './hooks/useBoardCoursePlayers';
 import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
+import { CourseHolePanel } from './CourseHolePanel';
 import { CourseCardPanel } from '@/features/courses/components/holes/analytical/CourseCardPanel';
 import { CourseAnalyticsPanels } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
+import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { ListTerminalRow } from './ListTerminalRow';
 
 /**
@@ -485,6 +487,12 @@ export function CourseAnalyticsCard({
   courseName?: string | null;
 }) {
   const { t } = useTranslation('courses');
+  const analysis = useCourseHoleAnalysis(row.course_id);
+  const hasAnalytics = Boolean(
+    analysis.data?.available &&
+    (analysis.data.holes?.length ?? 0) > 0 &&
+    (analysis.data.total_rounds ?? 0) >= 5,
+  );
   return (
     <div
       data-course-analytics-card
@@ -494,23 +502,37 @@ export function CourseAnalyticsCard({
         overflow: 'hidden',
       }}
     >
-      {media}
       <div style={{ padding: '12px 12px 10px' }}>
         <h3 style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 800, lineHeight: 1.25, color: A.INK }}>
           {courseName ?? row.name ?? '\u2014'}
         </h3>
+      </div>
+      {media}
+      <div style={{ padding: '12px 12px 10px' }}>
         <LowRoundLine row={row} userId={userId} filters={filters} />
         <CourseCardPanel courseId={row.course_id} courseName={courseName ?? row.name ?? undefined} embedded />
-        <div style={{ marginTop: 12 }}>
-          <CourseAnalyticsPanels
-            courseId={row.course_id}
-            userId={userId}
-            previewCount={6}
-            minRounds={5}
-            embedded
-            courseWideLabel
-          />
-        </div>
+        {analysis.isPending ? (
+          <div aria-hidden style={{ minHeight: 330 }} />
+        ) : hasAnalytics ? (
+          <div style={{ marginTop: 12 }}>
+            <CourseAnalyticsPanels
+              courseId={row.course_id}
+              userId={userId}
+              previewCount={6}
+              minRounds={5}
+              embedded
+              courseWideLabel
+            />
+          </div>
+        ) : (
+          <div style={{ ...CAP, padding: '14px 0 4px', lineHeight: 1.5 }}>
+            {t(
+              'discover.coursesPlayed.notEnoughDetail',
+              '{{count}} rounds here carry hole detail — not enough for a course picture yet',
+              { count: analysis.data?.total_rounds ?? 0 },
+            )}
+          </div>
+        )}
         <ListTerminalRow
           label={t('discover.coursesPlayed.seeFullAnalytics', 'See full course analytics')}
           onPress={() => onCoursePress?.(row.course_id)}
