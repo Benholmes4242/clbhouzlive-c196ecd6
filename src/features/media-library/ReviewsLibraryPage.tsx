@@ -51,7 +51,7 @@ export default function ReviewsLibraryPage() {
       <main style={{ paddingTop: 'var(--library-header-h)' }}>
         <div style={{ padding: `0 ${GUTTER}px 110px` }}>
           <LibraryHead total={totalQuery.data ?? null} title="From the reviews" />
-          <SortRail
+          <SortRail<ReviewLibrarySort>
             options={REVIEW_LIBRARY_SORTS.map((id) => ({ id, label: REVIEW_LIBRARY_SORT_LABELS[id] }))}
             value={sort}
             onChange={setSort}
