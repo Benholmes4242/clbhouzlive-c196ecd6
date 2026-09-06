@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
@@ -274,25 +275,18 @@ export function MomentTile({
             )}
             {/* DURATION BADGE — present in EVERY state, playing or not. */}
             {durationLabel && (
-              <span
-                aria-hidden
-                /* SAME GLASS AS THE FIGURE CHIP (liquid-glass.css). */
-                className="standout-figure-chip"
+              /* CANONICAL GLASS BADGE — same component, fill, blur, radius,
+                 weight and size as Clips, Videos and the review tiles. */
+              <GlassBadge
+                inline
                 style={{
                   flexShrink: 0,
                   marginLeft: 'auto',
-                  color: '#FFFFFF',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  borderRadius: 5,
-                  padding: '2px 5px',
-                  letterSpacing: 0,
                   fontVariantNumeric: 'tabular-nums lining-nums',
-                  pointerEvents: 'none',
                 }}
               >
                 {durationLabel}
-              </span>
+              </GlassBadge>
             )}
           </div>
         )}
