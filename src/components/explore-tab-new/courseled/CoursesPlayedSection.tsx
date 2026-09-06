@@ -468,7 +468,7 @@ function CourseMosaicPanel({
  * card. The featured caller supplies its photograph as flush media; every
  * hairline below it remains inset by the shared content padding.
  */
-function CourseAnalyticsCard({
+export function CourseAnalyticsCard({
   row,
   userId,
   filters,
@@ -856,7 +856,7 @@ function Badges({ row }: { row: BoardCourseRow }) {
  * is red with a TRUE MINUS. S2.6 — a null figure (no usable par, and it now sorts
  * LAST) renders NOTHING, not a zero and not a dash.
  */
-function PlaysTo({
+export function PlaysTo({
   value,
   width = PLAYS_TO_W,
   fontSize = 15,
