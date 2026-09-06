@@ -35,3 +35,8 @@
 - [x] Use board-aware member/round units for both headline and terminal action
 - [x] Add the matching Course Analytics heading and 26px section gaps
 - [x] Verify board switching, count agreement, and 320pt headline fit
+
+## Scores canonical board entry (AMENDMENT_TO_BRIEF_SCORES_THREE_HEADLINES)
+- [x] Share the filter sheet's ranking and feat order with the member rail
+- [x] Let the existing recent/handicap/rotation ladder choose the opening board
+- [x] Verify first-session Most recent, restored choices, and 320pt fit
