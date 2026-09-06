@@ -24,6 +24,7 @@ import { setNavigateRef, appNavigate } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
 import { WATCH_SURFACE } from '@/config/featureFlags';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { clearAppBadge } from '@/utils/pushBadge';
 
 import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { LockAnchorSync } from '@/components/LockAnchorSync';
@@ -904,7 +905,7 @@ const AppInner: React.FC = () => {
         // No listeners registered here.
 
         // Clear iOS app icon badge on cold open + on every foreground.
-        import('@/utils/pushBadge').then((m) => m.clearAppBadge());
+        clearAppBadge();
 
         const platform = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
           ? 'ios' : 'android';
@@ -921,7 +922,7 @@ const AppInner: React.FC = () => {
 
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
-        import('@/utils/pushBadge').then((m) => m.clearAppBadge());
+        clearAppBadge();
       }
     };
     document.addEventListener('visibilitychange', onVisible);
