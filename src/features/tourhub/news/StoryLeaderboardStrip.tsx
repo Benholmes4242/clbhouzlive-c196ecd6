@@ -42,7 +42,7 @@ export const STORY_STRIP_HEIGHT = CAPTION_HEIGHT + TICKER_HEIGHT;
 
 function Shell({ children }: { children?: React.ReactNode }) {
   return (
-    <div style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', minHeight: STORY_STRIP_HEIGHT, fontFamily: FONT }}>
+    <div style={{ boxSizing: 'border-box', background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', minHeight: STORY_STRIP_HEIGHT, fontFamily: FONT }}>
       {children}
     </div>
   );
@@ -143,7 +143,7 @@ export function StoryLeaderboardStrip({ tournamentId }: { tournamentId: string }
         if (e.key === 'Enter' || e.key === ' ') navigate(`/tourhub/tournament/${tournamentId}`);
       }}
       aria-label={`${caption} \u00b7 ${(tournament as any).name ?? ''}`}
-      style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', fontFamily: FONT, cursor: 'pointer' }}
+      style={{ boxSizing: 'border-box', background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', fontFamily: FONT, cursor: 'pointer' }}
     >
       <div
         style={{
