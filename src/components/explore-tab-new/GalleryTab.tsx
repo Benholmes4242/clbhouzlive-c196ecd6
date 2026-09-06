@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 
-import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
+import { GlassBadge, GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -142,7 +142,7 @@ export function GalleryTab({ onOpenPost, onOpenReview }: { onOpenPost: (items: C
 
         {reviews.length > 0 && (
         <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="From the reviews" />
-          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform', marginRight: -GUTTER, paddingRight: GUTTER }}>{reviews.map((review) => <button key={review.reviewId} type="button" onClick={() => setPendingReview({ courseId: review.courseId, reviewId: review.reviewId, mediaUrl: review.mediaUrl ?? null, posterUrl: review.posterUrl ?? review.mediaUrl })} style={{ position: 'relative', width: 196, flex: '0 0 196px', padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}><div style={{ position: 'relative', aspectRatio: '4 / 5', borderRadius: 10, overflow: 'hidden', background: A.PANEL }}><img src={review.posterUrl ?? review.mediaUrl ?? ''} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /><span style={{ position: 'absolute', left: 7, top: 7, borderRadius: 999, padding: '4px 7px', background: 'rgba(13,13,13,.82)', fontSize: 12, fontWeight: 700 }}>{review.rating.toFixed(1)}</span>{(review.mediaCount ?? 1) > 1 && <span style={{ position: 'absolute', right: 7, bottom: 7, borderRadius: 999, padding: '4px 7px', background: 'rgba(13,13,13,.82)', fontSize: 11, fontWeight: 700 }}>+{(review.mediaCount ?? 1) - 1}</span>}</div><div style={{ marginTop: 7, fontSize: 12, fontWeight: 700 }}>{review.courseName}</div><div style={{ marginTop: 2, fontSize: 11, color: A.MUTE }}>{review.reviewerName}</div></button>)}</div>
+          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform', marginRight: -GUTTER, paddingRight: GUTTER }}>{reviews.map((review) => <button key={review.reviewId} type="button" onClick={() => setPendingReview({ courseId: review.courseId, reviewId: review.reviewId, mediaUrl: review.mediaUrl ?? null, posterUrl: review.posterUrl ?? review.mediaUrl })} style={{ position: 'relative', width: 196, flex: '0 0 196px', padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}><div style={{ position: 'relative', aspectRatio: '4 / 5', borderRadius: 10, overflow: 'hidden', background: A.PANEL }}><img src={review.posterUrl ?? review.mediaUrl ?? ''} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /><GlassBadge corner="top-left"><span style={{ color: A.AMBER }}>{review.rating.toFixed(1)}</span><span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,.72)' }}>/10</span></GlassBadge>{(review.mediaCount ?? 1) > 1 && <GlassBadge>+{(review.mediaCount ?? 1) - 1}</GlassBadge>}</div><div style={{ marginTop: 7, fontSize: 12, fontWeight: 700 }}>{review.courseName}</div><div style={{ marginTop: 2, fontSize: 11, color: A.MUTE }}>{review.reviewerName}</div></button>)}</div>
         </section>
         )}
 
