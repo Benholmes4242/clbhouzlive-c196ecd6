@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
+import { RailChips } from '@/components/ui/RailChips';
 import { Z } from '@/config/zIndex';
 import { useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
