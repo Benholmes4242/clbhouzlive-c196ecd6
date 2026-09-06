@@ -40,7 +40,9 @@ export function NewsChromeBridge({ label, mode, backFallback }: NewsChromeBridge
 
   useLayoutEffect(() => {
     document.documentElement.style.setProperty('--news-header-h', 'calc(env(safe-area-inset-top, 0px) + 47px)');
-    return () => document.documentElement.style.removeProperty('--news-header-h');
+    return () => {
+      document.documentElement.style.removeProperty('--news-header-h');
+    };
   }, []);
 
   const back = React.useCallback(
