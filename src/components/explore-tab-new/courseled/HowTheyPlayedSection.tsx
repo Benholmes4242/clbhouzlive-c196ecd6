@@ -12,6 +12,7 @@ import { CourseAnalyticsCard } from './CoursesPlayedSection';
 import { CourseCardPanel } from '@/features/courses/components/holes/analytical/CourseCardPanel';
 import { ListTerminalRow } from './ListTerminalRow';
 import { CourseImageFallback } from './CourseImageFallback';
+import { SectionHeadline } from './SectionHeadline';
 import { useSearchedCourse } from './hooks/useSearchedCourse';
 import type { BoardCourseRow } from './hooks/useBoardCourses';
 import type { BoardFilters } from './boardFilters';
@@ -96,7 +97,8 @@ export function HowTheyPlayedSection({
   if (!subjectId) return null;
 
   return (
-    <div style={{ marginTop: 14, fontFamily: SANS, ...FIGS }}>
+    <div style={{ marginTop: 26, fontFamily: SANS, ...FIGS }}>
+      <SectionHeadline title={t('discover.scores.courseAnalytics', 'Course analytics')} />
       {/* S2.2 — the field, full width, above the card. */}
       <div style={{ position: 'relative', marginBottom: 10 }}>
         <div

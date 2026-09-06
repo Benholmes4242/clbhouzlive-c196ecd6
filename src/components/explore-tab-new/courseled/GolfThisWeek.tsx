@@ -27,6 +27,7 @@ import {
   DEFAULT_FILTERS,
   SCOPE_OPTIONS,
   WINDOW_OPTIONS,
+  boardCountsRounds,
   filtersAreDefault,
   type BoardFilters,
   normalizeFilters,
@@ -209,7 +210,9 @@ export function GolfThisWeek({ userId, onRowPress, onAppliedFiltersChange, child
      other board's and no second vocabulary exists. */
   const boardTitle = t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
 
-  const unitCount = t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total });
+  const unitCount = boardCountsRounds(board)
+    ? t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })
+    : t('discover.coursesPlayed.nMembers', '{{count}} members', { count: total });
 
   return (
     <section style={{ margin: '0 -14px', fontFamily: SANS, ...FIGS }}>
