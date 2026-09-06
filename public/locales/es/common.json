@@ -429,7 +429,7 @@
     "likeAria": "Me gusta esta noticia",
     "unlikeAria": "Quitar me gusta",
     "commentsAria": "Comentarios",
-    "commentsEmpty": "Aun no hay comentarios. Empieza la conversacion.",
+    "commentsEmpty": "Sé el primero en comentar",
     "viewComment": "Ver 1 comentario",
     "viewComments": "Ver los {{count}} comentarios",
     "guestPrompt": "Unete a clbhouz para ver la conversacion"
