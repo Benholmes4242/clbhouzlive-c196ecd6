@@ -35,7 +35,18 @@ export interface SearchedCourse {
 
 export function useSearchedCourse(viewerId: string | undefined, courseId: string | null, filters = DEFAULT_FILTERS) {
   return useQuery<SearchedCourse | null>({
-    queryKey: ['discover', 'searched-course', courseId, viewerId ?? null],
+    queryKey: [
+      'discover',
+      'searched-course',
+      courseId,
+      viewerId ?? null,
+      filters.scope,
+      filters.window,
+      filters.regionKind,
+      filters.regionValue,
+      filters.band,
+      filters.competition,
+    ],
     enabled: !!courseId,
     staleTime: 60_000,
     queryFn: async () => {

@@ -415,8 +415,9 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
      sit inches apart and disagree. Reading the hero's number here lets the
      basis line say WHY. Same query key as the hero, so no extra request. */
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
+  const canLoadMine = Boolean(viewerId && courseId && (userId || connection));
   const { data: myPerf } = useMyHolePerformance(viewerId, courseId, {
-    enabled: Boolean(viewerId && courseId && connection),
+    enabled: canLoadMine,
   });
 
 
@@ -454,7 +455,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
   /* The member's own rows decide whether a field exists at all; until that
      query resolves the panel cannot know which anatomy to render. */
   const awaitingMine =
-    activeView === 'members' && Boolean(viewerId && courseId && connection) && myPerf == null;
+    activeView === 'members' && canLoadMine && myPerf == null;
 
   const stats = useMemo(() => {
     if (holes.length === 0) return null;
