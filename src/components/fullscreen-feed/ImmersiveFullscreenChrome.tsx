@@ -321,6 +321,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     activePost.courseRating == null ? resolvedCourseId ?? undefined : undefined,
   );
   const courseRating =
+    activePost.viewerRating ??
     activePost.courseRating ??
     (ratingAggregate?.avg_overall_score != null ? Number(ratingAggregate.avg_overall_score) : null);
   const showCourseChip = courseRating != null;
@@ -432,7 +433,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
-                aria-label={`Community rating ${formatRatingValue(courseRating!)}`}
+                aria-label={`${activePost.viewerRating != null ? 'Review rating' : 'Community rating'} ${formatRatingValue(courseRating!)}`}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0,
                   background: 'rgba(255,255,255,0.08)',

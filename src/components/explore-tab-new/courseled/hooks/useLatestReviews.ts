@@ -45,6 +45,7 @@ export interface LatestReview {
   mediaType: 'image' | 'video' | null;
   posterUrl: string | null;
   mediaCount?: number;
+  mediaId: string | null;
   courseCountry: string | null;
   courseRegion: string | null;
   courseSubCountry: string | null;
@@ -146,6 +147,7 @@ function mapRow(row: Row): LatestReview | null {
     mediaType: type as 'image' | 'video' | null,
     posterUrl: media?.poster_url ?? null,
     mediaCount: (row.course_review_media ?? []).filter((item) => !!item.media_url).length,
+    mediaId: media?.id ?? null,
     courseCountry: row.course.country ?? null,
     courseRegion: row.course.region ?? null,
     courseSubCountry: row.course.sub_country ?? null,
