@@ -110,16 +110,18 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
     navigate(`/discover/news/${slug}`);
   }, [navigate, rememberDiscoverPosition]);
 
-  const openReviewMedia = useCallback((posts: FeedPost[], mediaId: string | null, posterUrl: string | null) => {
+  // BRIEF_GALLERY_TO_WATCH S3 — opens the COURSE's media set at the tapped
+  // image, browsed vertically, through the course media tab's own viewer
+  // surface key. forceStartAtZero would defeat S3.4.
+  const openReviewMedia = useCallback((posts: FeedPost[], index: number, mediaId: string | null, posterUrl: string | null) => {
     rememberDiscoverPosition('gallery');
     openWithOrigin({
       posts,
-      index: 0,
+      index,
       originEl: null,
       posterUrl,
       mediaId,
-      openedFrom: 'discover-review-media',
-      forceStartAtZero: true,
+      openedFrom: 'course-media',
       options: { readOnly: true },
     });
   }, [rememberDiscoverPosition]);
