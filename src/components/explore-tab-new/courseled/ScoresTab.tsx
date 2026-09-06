@@ -155,7 +155,8 @@ export function ScoresTab({
   return (
     <section style={{ fontFamily: SANS, ...FIGS }}>
       {/* S2 — THE APPLIED FILTER, STICKY, GOVERNING BOTH HALVES. Settled chrome:
-          full width, no radius, no shadow, hairlines top and bottom. */}
+          full width, no radius, no shadow, one hairline below it. The header's
+          own bottom edge was removed so the tab indicator sits on nothing. */}
       <button
         type="button"
         onClick={() => setPanelOpen(true)}

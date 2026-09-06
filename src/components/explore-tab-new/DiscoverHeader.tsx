@@ -35,7 +35,7 @@ export function DiscoverHeader({ active, onChange }: { active: DiscoverTab; onCh
         style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: DISCOVER_HEADER_Z,
           paddingTop: 'env(safe-area-inset-top, 0px)', background: A.CANVAS,
-          borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS,
+          fontFamily: SANS,
         }}
       >
         <div style={{ position: 'relative', height: 42, display: 'flex', alignItems: 'center', padding: '0 12px' }}>
