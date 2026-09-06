@@ -13,7 +13,8 @@ import { r } from '@/lib/radius';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
 import { useBoardCoursePlayers, type BoardCoursePlayer } from './hooks/useBoardCoursePlayers';
 import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
-import { CourseHolePanel } from './CourseHolePanel';
+import { CourseCardPanel } from '@/features/courses/components/holes/analytical/CourseCardPanel';
+import { CourseAnalyticsPanels } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
 import { ListTerminalRow } from './ListTerminalRow';
 
 /**
@@ -474,13 +475,16 @@ export function CourseAnalyticsCard({
   filters,
   onCoursePress,
   media,
+  courseName,
 }: {
   row: BoardCourseRow;
   userId: string | undefined;
   filters: BoardFilters;
   onCoursePress?: (courseId: string) => void;
   media?: ReactNode;
+  courseName?: string | null;
 }) {
+  const { t } = useTranslation('courses');
   return (
     <div
       data-course-analytics-card
@@ -492,8 +496,25 @@ export function CourseAnalyticsCard({
     >
       {media}
       <div style={{ padding: '12px 12px 10px' }}>
+        <h3 style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 800, lineHeight: 1.25, color: A.INK }}>
+          {courseName ?? row.name ?? '\u2014'}
+        </h3>
         <LowRoundLine row={row} userId={userId} filters={filters} />
-        <CourseHolePanel courseId={row.course_id} userId={userId} onCoursePress={onCoursePress} />
+        <CourseCardPanel courseId={row.course_id} courseName={courseName ?? row.name ?? undefined} embedded />
+        <div style={{ marginTop: 12 }}>
+          <CourseAnalyticsPanels
+            courseId={row.course_id}
+            userId={userId}
+            previewCount={6}
+            minRounds={5}
+            embedded
+            courseWideLabel
+          />
+        </div>
+        <ListTerminalRow
+          label={t('discover.coursesPlayed.seeFullAnalytics', 'See full course analytics')}
+          onPress={() => onCoursePress?.(row.course_id)}
+        />
       </div>
     </div>
   );
@@ -773,6 +794,13 @@ function LowRoundLine({
           ? `\u2212${Math.abs(toPar)}`
           : `+${toPar}`;
   const toParTone = toPar == null ? A.DIM : toPar < 0 ? TOPAR_UNDER : toPar === 0 ? A.MUTE : A.INK;
+  const lowLabel = {
+    '14': t('discover.coursesPlayed.low14DayBy', '14-DAY LOW BY {{name}}', { name: row.low_by ?? '\u2014' }),
+    '30': t('discover.coursesPlayed.low30DayBy', '30-DAY LOW BY {{name}}', { name: row.low_by ?? '\u2014' }),
+    '90': t('discover.coursesPlayed.low90DayBy', '90-DAY LOW BY {{name}}', { name: row.low_by ?? '\u2014' }),
+    year: t('discover.coursesPlayed.lowThisYearBy', "THIS YEAR'S LOW BY {{name}}", { name: row.low_by ?? '\u2014' }),
+    all: t('discover.coursesPlayed.lowAllTimeBy', 'ALL-TIME LOW BY {{name}}', { name: row.low_by ?? '\u2014' }),
+  }[filters.window];
 
   return (
     <div
@@ -790,9 +818,7 @@ function LowRoundLine({
         <AvatarStack players={players.data ?? []} lowBy={row.low_by} />
       )}
       <span style={{ ...CAP, color: A.MUTE, marginLeft: 'auto' }}>
-        {t('discover.coursesPlayed.lowRoundBy', 'Low round by {{name}}', {
-          name: row.low_by ?? '\u2014',
-        })}
+        {lowLabel}
       </span>
       <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
         <span className="tabular-nums" style={{ fontSize: 17, fontWeight: 800, color: A.INK, lineHeight: 1 }}>

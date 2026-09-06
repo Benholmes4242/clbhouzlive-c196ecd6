@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, X } from 'lucide-react';
 
@@ -9,6 +9,8 @@ import { r } from '@/lib/radius';
 
 import { DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from './tokens';
 import { CourseAnalyticsCard } from './CoursesPlayedSection';
+import { CourseCardPanel } from '@/features/courses/components/holes/analytical/CourseCardPanel';
+import { ListTerminalRow } from './ListTerminalRow';
 import { CourseImageFallback } from './CourseImageFallback';
 import { useSearchedCourse } from './hooks/useSearchedCourse';
 import type { BoardCourseRow } from './hooks/useBoardCourses';
@@ -62,24 +64,21 @@ export function HowTheyPlayedSection({
   const [pickedId, setPickedId] = useState<string | null>(null);
 
   const results = useCourseSearch(query);
-  const picked = useSearchedCourse(userId, pickedId);
+  const picked = useSearchedCourse(userId, pickedId, filters);
 
   const searching = query.trim().length >= 2 && pickedId == null;
 
   /* The subject: the searched course when there is one, else the board's top. */
   const searchedRow = picked.data?.row ?? null;
-  const subjectRow = pickedId ? searchedRow : boardRow;
+  const filteredSearchedRow = picked.data?.filteredRow ?? null;
+  const subjectRow = pickedId
+    ? searchedRow && { ...searchedRow, low_gross: filteredSearchedRow?.low_gross ?? null, low_to_par: filteredSearchedRow?.low_to_par ?? null, low_by: filteredSearchedRow?.low_by ?? null }
+    : boardRow;
   const subjectName = pickedId ? picked.data?.name ?? null : boardRow?.name ?? null;
   const subjectThumb = pickedId
     ? picked.data?.thumbnail ?? null
     : boardRow?.thumbnail_image ?? null;
   const subjectId = pickedId ?? boardRow?.course_id ?? null;
-
-  const heading = useMemo(
-    () =>
-      `${t('discover.scores.howTheyPlayed', 'How they played')} \u00B7 ${subjectName ?? '\u2014'}`,
-    [subjectName, t],
-  );
 
   const clear = () => {
     setPickedId(null);
@@ -90,20 +89,6 @@ export function HowTheyPlayedSection({
 
   return (
     <div style={{ marginTop: 14, fontFamily: SANS, ...FIGS }}>
-      <span
-        style={{
-          ...KICKER,
-          display: 'block',
-          marginBottom: 8,
-          color: DISCOVER_QUIET,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {heading}
-      </span>
-
       {/* S2.2 — the field, full width, above the card. */}
       <div style={{ position: 'relative', marginBottom: 10 }}>
         <div
@@ -229,6 +214,7 @@ export function HowTheyPlayedSection({
           userId={userId}
           filters={filters}
           onCoursePress={onCoursePress}
+          courseName={subjectName}
           media={
             pickedId ? (
               <CoursePhoto
@@ -242,7 +228,7 @@ export function HowTheyPlayedSection({
         />
       ) : (
         /* NO ROUNDS AT ALL. Said plainly, in the present tense (S3.4). */
-        <div style={{ background: A.PANEL, borderRadius: r.md, overflow: 'hidden' }}>
+        <div data-course-analytics-card style={{ background: A.PANEL, borderRadius: r.md, overflow: 'hidden' }}>
           <CoursePhoto
             courseId={subjectId}
             name={subjectName}
@@ -250,6 +236,10 @@ export function HowTheyPlayedSection({
             area={picked.data?.area ?? null}
           />
           <div style={{ padding: '12px 12px 14px' }}>
+            <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 800, lineHeight: 1.25, color: A.INK }}>
+              {subjectName ?? '\u2014'}
+            </h3>
+            <CourseCardPanel courseId={subjectId} courseName={subjectName ?? undefined} embedded />
             <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: A.INK }}>
               {t('discover.scores.noOnePlayed', 'No one has played {{course}} yet.', {
                 course: subjectName ?? '\u2014',
@@ -258,6 +248,10 @@ export function HowTheyPlayedSection({
             <p style={{ ...KICKER, margin: '6px 0 0', color: A.MUTE }}>
               {t('discover.scores.beTheFirst', 'Play it and you will be the first.')}
             </p>
+            <ListTerminalRow
+              label={t('discover.coursesPlayed.seeFullAnalytics', 'See full course analytics')}
+              onPress={() => onCoursePress?.(subjectId)}
+            />
           </div>
         </div>
       )}

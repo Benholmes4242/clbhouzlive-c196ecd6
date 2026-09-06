@@ -67,6 +67,11 @@ const Figure: React.FC<{ label: string; value: React.ReactNode; tone?: string; s
 
 interface Props {
   courseId: string | undefined;
+  userId?: string;
+  previewCount?: number;
+  minRounds?: number;
+  embedded?: boolean;
+  courseWideLabel?: boolean;
 }
 
 /**
@@ -391,10 +396,18 @@ const ParTypePanel: React.FC<{ rows: ParTypeRow[]; fieldAvg: number; fieldIsOnly
 };
 
 
-export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
+export const CourseAnalyticsPanels: React.FC<Props> = ({
+  courseId,
+  userId,
+  previewCount = PREVIEW_COUNT_V2,
+  minRounds = 0,
+  embedded = false,
+  courseWideLabel = false,
+}) => {
   const { t } = useTranslation(['courses']);
   const { user } = useSupabaseSession();
-  const { data: connection } = useWhsConnection(user?.id);
+  const viewerId = userId ?? user?.id;
+  const { data: connection } = useWhsConnection(viewerId);
   const { data } = useCourseHoleAnalysis(courseId);
   const { data: pro } = useCourseProHoleAnalysis(courseId);
   /* THE HERO'S OWN FIGURE. The hero counts every round posted at the course;
@@ -402,8 +415,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
      sit inches apart and disagree. Reading the hero's number here lets the
      basis line say WHY. Same query key as the hero, so no extra request. */
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
-  const { data: myPerf } = useMyHolePerformance(user?.id, courseId, {
-    enabled: Boolean(user?.id && courseId && connection),
+  const { data: myPerf } = useMyHolePerformance(viewerId, courseId, {
+    enabled: Boolean(viewerId && courseId && connection),
   });
 
 
@@ -441,7 +454,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   /* The member's own rows decide whether a field exists at all; until that
      query resolves the panel cannot know which anatomy to render. */
   const awaitingMine =
-    activeView === 'members' && Boolean(user?.id && courseId && connection) && myPerf == null;
+    activeView === 'members' && Boolean(viewerId && courseId && connection) && myPerf == null;
 
   const stats = useMemo(() => {
     if (holes.length === 0) return null;
@@ -488,7 +501,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
   };
 
   const sourceAvailable = activeView === 'pros' ? hasPro : Boolean(data?.available);
-  if (!courseId || !sourceAvailable || holes.length === 0 || !stats) return null;
+  if (!courseId || !sourceAvailable || holes.length === 0 || !stats || totalRounds < minRounds) return null;
 
   /* HOLD UNTIL BOTH QUERIES SETTLE (acceptance §7): a connected member's own
      rows decide whether there IS a field, so render nothing rather than a
@@ -559,7 +572,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: embedded ? 0 : '0 16px' }}>
       {/* GOLFERS / TOUR PROS — a segmented control in the tab's own pill shape. */}
       {hasPro && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -609,7 +622,9 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
 
       {/* Block 2 - How it plays: the chart leads, the figures support it. */}
       <Panel
-        kicker={t('courses:courseDetail.blocks.howItPlays')}
+        kicker={courseWideLabel
+          ? t('courses:discover.coursesPlayed.courseWide', 'Course-wide')
+          : t('courses:courseDetail.blocks.howItPlays')}
         aside={basis}
         headerGap={12}
         style={{ padding: '14px 13px 11px' }}
@@ -736,7 +751,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({ courseId }) => {
       >
         {courseShares && <DistributionStrip shares={courseShares} />}
 
-        {holes.slice(0, PREVIEW_COUNT_V2).map((h, i, arr) => (
+        {holes.slice(0, previewCount).map((h, i, arr) => (
           <HoleRowV2
             key={h.hole_no}
             row={h}
