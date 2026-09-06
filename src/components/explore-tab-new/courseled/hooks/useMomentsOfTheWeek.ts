@@ -329,6 +329,14 @@ export function useMomentsOfTheWeek(
           isCourseLead,
         };
       });
+
+      // BY COURSE groups the pool alphabetically; course names only exist after
+      // the join above, so the grouping is applied here rather than in ranking.
+      if (sort === 'course') {
+        tiles.sort((a, b) => String(a.courseName ?? '').localeCompare(String(b.courseName ?? ''))
+          || new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime());
+      }
+      return tiles;
     },
     // UNCHANGED at 10 min. The member's own photo appears immediately via
     // invalidateDiscoverMoments on upload completion, so this only governs
