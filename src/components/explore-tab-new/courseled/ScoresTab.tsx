@@ -128,6 +128,7 @@ export function ScoresTab({
 
   const rows = page.data?.rows ?? [];
   const total = page.data?.total ?? 0;
+  const poolRounds = page.data?.pool.rounds ?? 0;
   const visible = useMemo(() => rows.filter((row) => row.pos <= VISIBLE_POSITIONS), [rows]);
   const leader = rows[0] ?? null;
   const mine = useMemo(
@@ -259,7 +260,7 @@ export function ScoresTab({
         }}
       >
         <HalfHeading
-          eyebrow={`${t('discover.scores.members', 'Members')} \u00B7 ${t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })}`}
+          eyebrow={`${t('discover.scores.members', 'Members')} \u00B7 ${t('discover.filterBoard.nRounds', '{{count}} rounds', { count: poolRounds })}`}
           headline={boardTitle}
         />
         <BoardRail
