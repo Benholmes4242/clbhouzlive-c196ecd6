@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { type AmateurStory, useAmateurStories } from '@/features/amateur/news/useAmateurStories';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
+import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+import useContentReactions from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import {
   FeatureStory,
   GUTTER,
@@ -25,11 +29,15 @@ export function NewsTabPage() {
   const { stories: allStories = [], isPending } = useAmateurStories(null);
   const [wireLimit, setWireLimit] = useState(WIRE_PAGE_SIZE);
   const [competition, setCompetition] = useState<string | null>(null);
+  const [heroCommentsOpen, setHeroCommentsOpen] = useState(false);
   const stories = useMemo(
     () => competition ? allStories.filter((story) => story.tournament_name?.trim() === competition) : allStories,
     [allStories, competition],
   );
   const { engagementFor } = useStoryEngagement('amateur_story', useMemo(() => allStories.map((story) => story.id), [allStories]));
+  const { stateFor, toggle, unavailable, viewerId } = useContentReactions(
+    useMemo(() => allStories.map((story) => ({ type: 'amateur_story' as const, id: story.id })), [allStories]),
+  );
 
   const lead = stories[0];
   const afterLead = stories.slice(1);
@@ -61,7 +69,28 @@ export function NewsTabPage() {
         <div style={{ padding: `18px ${GUTTER}px 110px`, fontSize: 13, color: A.MUTE }}>The first stories are on their way.</div>
       ) : (
         <>
-          <HeroStory story={lead} onOpen={() => open(lead)} engagement={engagementFor(lead.id)} />
+          <HeroStory
+            story={lead}
+            onOpen={() => open(lead)}
+            engagement={engagementFor(lead.id)}
+            engagementAction={(() => {
+              const like = stateFor('amateur_story', lead.id);
+              const comments = engagementFor(lead.id).commentCount;
+              return (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 18 }}>
+                  <ReactionAction
+                    count={like.count}
+                    reacted={like.mine}
+                    onToggle={() => toggle('amateur_story', lead.id)}
+                    label={like.mine ? 'Unlike story' : 'Like story'}
+                    readOnly={!viewerId}
+                    hidden={unavailable}
+                  />
+                  {viewerId && <CommentAction count={comments} onOpen={() => setHeroCommentsOpen(true)} label="Open story comments" />}
+                </span>
+              );
+            })()}
+          />
 
           <div style={{ padding: `0 ${GUTTER}px 110px` }}>
             {twoUp.length === 2 && (
@@ -106,6 +135,14 @@ export function NewsTabPage() {
               </section>
             )}
           </div>
+          {viewerId && (
+            <CommentsSheetV2
+              isOpen={heroCommentsOpen}
+              onClose={() => setHeroCommentsOpen(false)}
+              targetType="amateur_story"
+              targetId={lead.id}
+            />
+          )}
         </>
       )}
     </main>

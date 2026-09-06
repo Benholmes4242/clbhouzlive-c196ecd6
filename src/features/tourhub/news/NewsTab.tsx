@@ -22,6 +22,10 @@ import { heroCanonScrimOn } from '../_shared/heroGradient';
 import { StoryRowEngagement } from '@/features/stories/StoryRowEngagement';
 import { StoryLeaderboardStrip } from './StoryLeaderboardStrip';
 import { useStoryEngagement, type StoryEngagement } from '@/features/stories/useStoryEngagement';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
+import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
+import useContentReactions from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import {
   FeatureStory,
   GUTTER,
@@ -196,6 +200,7 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
 
   const [tournament, setTournament] = useState<string | null>(null);
   const [wireLimit, setWireLimit] = useState(WIRE_PAGE_SIZE);
+  const [heroCommentsOpen, setHeroCommentsOpen] = useState(false);
 
   /**
    * BY TOURNAMENT, NOT BY TOUR — the tour is already the page's context. A null
@@ -242,6 +247,9 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
     'tour_story',
     useMemo(() => lensStories.map((s) => s.id), [lensStories]),
   );
+  const { stateFor, toggle, unavailable, viewerId } = useContentReactions(
+    useMemo(() => lensStories.map((s) => ({ type: 'tour_story' as const, id: s.id })), [lensStories]),
+  );
 
   return (
     <div style={{ fontFamily: FONT, paddingBottom: 24 }}>
@@ -264,10 +272,25 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
             onOpen={() => open(lead.slug)}
             engagement={engagementFor(lead.id)}
             topOffset={immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 68px)' : 13}
+            attachedContent={lead.tournament_id ? <StoryLeaderboardStrip tournamentId={lead.tournament_id} /> : undefined}
+            engagementAction={(() => {
+              const like = stateFor('tour_story', lead.id);
+              const comments = engagementFor(lead.id).commentCount;
+              return (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 18 }}>
+                  <ReactionAction
+                    count={like.count}
+                    reacted={like.mine}
+                    onToggle={() => toggle('tour_story', lead.id)}
+                    label={like.mine ? 'Unlike story' : 'Like story'}
+                    readOnly={!viewerId}
+                    hidden={unavailable}
+                  />
+                  {viewerId && <CommentAction count={comments} onOpen={() => setHeroCommentsOpen(true)} label="Open story comments" />}
+                </span>
+              );
+            })()}
           />
-          {/* BRIEF_WIRE_INDEX_TICKER — bound to the LEAD's event. No lead or no
-              tournament_id ⇒ not mounted, and no height reserved. */}
-          {lead.tournament_id && <StoryLeaderboardStrip tournamentId={lead.tournament_id} />}
 
           <div style={{ padding: `0 ${GUTTER}px` }}>
             {twoUp.length === 2 && (
@@ -315,6 +338,14 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
               </section>
             )}
           </div>
+          {viewerId && (
+            <CommentsSheetV2
+              isOpen={heroCommentsOpen}
+              onClose={() => setHeroCommentsOpen(false)}
+              targetType="tour_story"
+              targetId={lead.id}
+            />
+          )}
         </>
       )}
     </div>
