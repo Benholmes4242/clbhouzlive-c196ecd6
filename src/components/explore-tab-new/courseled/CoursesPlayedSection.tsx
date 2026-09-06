@@ -464,32 +464,37 @@ function CourseMosaicPanel({
 }
 
 /**
- * Amendment Q — the featured analytics and an opened tile are the same object.
- * The photograph is deliberately owned by the caller and never enters this card.
+ * Amendment Q — the featured card and an opened tile share this one analytics
+ * card. The featured caller supplies its photograph as flush media; every
+ * hairline below it remains inset by the shared content padding.
  */
 function CourseAnalyticsCard({
   row,
   userId,
   filters,
   onCoursePress,
+  media,
 }: {
   row: BoardCourseRow;
   userId: string | undefined;
   filters: BoardFilters;
   onCoursePress?: (courseId: string) => void;
+  media?: ReactNode;
 }) {
   return (
     <div
       data-course-analytics-card
       style={{
-        padding: '12px 12px 10px',
         background: A.PANEL,
-        borderRadius: 12,
+        borderRadius: r.md,
         overflow: 'hidden',
       }}
     >
-      <LowRoundLine row={row} userId={userId} filters={filters} />
-      <CourseHolePanel courseId={row.course_id} userId={userId} onCoursePress={onCoursePress} />
+      {media}
+      <div style={{ padding: '12px 12px 10px' }}>
+        <LowRoundLine row={row} userId={userId} filters={filters} />
+        <CourseHolePanel courseId={row.course_id} userId={userId} onCoursePress={onCoursePress} />
+      </div>
     </div>
   );
 }
