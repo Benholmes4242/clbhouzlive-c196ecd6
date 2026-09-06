@@ -8,7 +8,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 
 import { DiscoverHeader, type DiscoverTab } from './DiscoverHeader';
-import { NewsMediaTab } from './NewsMediaTab';
+import { NewsTabPage } from './NewsTabPage';
+import { GalleryTab } from './GalleryTab';
 import { GolfThisWeek } from './courseled/GolfThisWeek';
 import { CoursesPlayedSection } from './courseled/CoursesPlayedSection';
 import type { BoardFilters } from './courseled/boardFilters';
@@ -22,7 +23,7 @@ interface ExploreTabContentProps {
 }
 
 /**
- * Discover has two local, non-persisted modes. The route remains immersive and
+ * Discover has three local, non-persisted modes (Scores, News, Gallery). The route remains immersive and
  * therefore this page owns the notch-safe fixed header; chrome-v2 resolves the
  * global island to `none` on /explore without unmounting GlobalHeader.
  */
@@ -30,7 +31,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const opener = useScorecardOpener();
-  const [activeTab, setActiveTab] = useState<DiscoverTab>('circuit');
+  const [activeTab, setActiveTab] = useState<DiscoverTab>('scores');
   const [boardFilters, setBoardFilters] = useState<BoardFilters | null>(null);
 
   const changeTab = useCallback((next: DiscoverTab) => {
@@ -65,7 +66,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
     <div style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, ...FIGS }}>
       {!embedded && <DiscoverHeader active={activeTab} onChange={changeTab} />}
 
-      {activeTab === 'circuit' ? (
+      {activeTab === 'scores' ? (
         <main style={{ paddingTop: embedded ? 0 : 'var(--discover-header-h)' }}>
           <div style={{ padding: '0 14px 110px' }}>
             <GolfThisWeek
@@ -85,8 +86,10 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
             </GolfThisWeek>
           </div>
         </main>
+      ) : activeTab === 'news' ? (
+        <NewsTabPage />
       ) : (
-        <NewsMediaTab onOpenPost={openMedia} />
+        <GalleryTab onOpenPost={openMedia} />
       )}
 
       <RoundDetailSheet
