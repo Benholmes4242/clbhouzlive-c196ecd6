@@ -24,8 +24,9 @@ import {
   COURSE_BOARD_KEYS,
   COURSE_BOARD_LABELS,
   DEFAULT_FILTERS,
+  FEAT_BOARD_KEYS,
+  RANKING_BOARD_KEYS,
   SCOPE_OPTIONS,
-  SCORES_MEMBER_BOARD_KEYS,
   WINDOW_SHORT,
   boardCountsRounds,
   normalizeFilters,
@@ -34,6 +35,8 @@ import {
   type BoardKey,
   type CourseBoardKey,
 } from './boardFilters';
+import { DEFAULT_BOARD_FALLBACK } from './hooks/useHandicapDefaultBoard';
+import { useDiscoverEntryBoard } from './hooks/useDiscoverEntryBoard';
 
 /**
  * SCORES — TWO EQUAL HALVES (BRIEF_SCORES_TWO_HALVES).
@@ -64,6 +67,9 @@ const VISIBLE_POSITIONS = 8;
 const PAGE_FETCH = 200;
 /** S5.4 — five course rows, and the read takes exactly what it shows. */
 const COURSE_ROWS = 5;
+
+/** One canonical ordering shared with the filter sheet; no board order lives here. */
+const MEMBER_BOARD_KEYS: readonly BoardKey[] = [...RANKING_BOARD_KEYS, ...FEAT_BOARD_KEYS];
 
 /** The filter rail always states its three base axes, then only active refinements. */
 function appliedFilterChips(
@@ -111,11 +117,12 @@ export function ScoresTab({
 }: ScoresTabProps) {
   const { t } = useTranslation('courses');
 
-  /* S3.5 — component state, reset on entry. The member half opens on the
-     scoring board and the course half on most played; there is no rotation and
-     no stored pick, so the page a member returns to is the page they left. */
-  const [filters, setFilters] = useState<BoardFilters>(DEFAULT_FILTERS);
-  const [board, setBoard] = useState<BoardKey>('topar');
+  /* The existing entry ladder is authoritative: today's first session opens on
+     Most recent, then the handicap default, then rotation. Component state owns
+     later changes, while the entry pick only supplies the initial combination. */
+  const entry = useDiscoverEntryBoard(userId);
+  const [pickedFilters, setFilters] = useState<BoardFilters | null>(null);
+  const [pickedBoard, setBoard] = useState<BoardKey | null>(null);
   const [courseBoard, setCourseBoard] = useState<CourseBoardKey>('played');
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -124,9 +131,23 @@ export function ScoresTab({
 
   const membersRef = useRef<HTMLDivElement | null>(null);
 
-  const facets = useBoardFacets(userId, board, filters);
-  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH });
-  const courses = useBoardCourses(userId, filters, { limit: COURSE_ROWS, sort: courseBoard });
+  useEffect(() => {
+    if (pickedBoard || !entry.resolved || !entry.board) return;
+    setBoard(entry.board);
+    setFilters(normalizeFilters({ ...DEFAULT_FILTERS, window: entry.window, scope: entry.scope }));
+  }, [pickedBoard, entry.resolved, entry.board, entry.window, entry.scope]);
+
+  const ready = pickedBoard !== null && pickedFilters !== null;
+  const board = pickedBoard ?? entry.board ?? DEFAULT_BOARD_FALLBACK;
+  const filters = pickedFilters ?? DEFAULT_FILTERS;
+
+  const facets = useBoardFacets(userId, board, filters, { enabled: ready });
+  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: ready });
+  const courses = useBoardCourses(userId, filters, {
+    limit: COURSE_ROWS,
+    sort: courseBoard,
+    enabled: ready,
+  });
 
   const rows = page.data?.rows ?? [];
   const total = page.data?.total ?? 0;
@@ -265,7 +286,7 @@ export function ScoresTab({
       >
         <SectionHeadline title={boardTitle} count={memberUnit} />
         <BoardRail
-          keys={SCORES_MEMBER_BOARD_KEYS}
+          keys={MEMBER_BOARD_KEYS}
           activeKey={board}
           labelFor={(key) => t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}
           onSelect={changeBoard}
