@@ -11,7 +11,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { Z } from '@/config/zIndex';
 
-export type DiscoverTab = 'circuit' | 'media';
+export type DiscoverTab = 'scores' | 'news' | 'gallery';
 
 export function DiscoverHeader({ active, onChange }: { active: DiscoverTab; onChange: (tab: DiscoverTab) => void }) {
   const navigate = useNavigate();
@@ -55,7 +55,7 @@ export function DiscoverHeader({ active, onChange }: { active: DiscoverTab; onCh
           </div>
         </div>
         <nav aria-label="Discover sections" style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', gap: 22, padding: '8px 0 10px' }}>
-          {([['circuit', 'The circuit'], ['media', 'News & media']] as const).map(([id, label]) => {
+          {([['scores', 'SCORES'], ['news', 'NEWS'], ['gallery', 'GALLERY']] as const).map(([id, label]) => {
             const selected = active === id;
             return (
               <button key={id} type="button" aria-current={selected ? 'page' : undefined} onClick={() => onChange(id)} style={{ position: 'relative', padding: 0, border: 0, background: 'transparent', color: selected ? A.INK : A.MUTE, fontSize: 15, lineHeight: '18px', fontWeight: 700, letterSpacing: 0, cursor: 'pointer' }}>
