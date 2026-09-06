@@ -119,8 +119,12 @@ export function HowTheyPlayedSection({
               setQuery(e.target.value);
               if (pickedId) setPickedId(null);
             }}
-            placeholder={t('discover.scores.searchAnyCourse', 'Search any course')}
-            aria-label={t('discover.scores.searchAnyCourse', 'Search any course')}
+            placeholder={
+              narrowPlaceholder
+                ? t('discover.scores.searchCourseForAnalytics', 'Search a course for analytics')
+                : t('discover.scores.searchAnyCourse', 'Search any course for analytics')
+            }
+            aria-label={t('discover.scores.searchAnyCourse', 'Search any course for analytics')}
             style={{
               flex: 1,
               minWidth: 0,
