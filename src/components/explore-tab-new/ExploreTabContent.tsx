@@ -29,7 +29,7 @@ interface ExploreTabContentProps {
 }
 
 /**
- * Discover has three local, non-persisted modes (Scores, News, Gallery). The route remains immersive and
+ * Discover has three local, non-persisted modes (Scores, News, Watch — tab id `gallery`, unchanged). The route remains immersive and
  * therefore this page owns the notch-safe fixed header; chrome-v2 resolves the
  * global island to `none` on /explore without unmounting GlobalHeader.
  */
