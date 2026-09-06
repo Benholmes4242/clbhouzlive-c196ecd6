@@ -8,3 +8,4 @@
 - [x] Include the active bottom-navigation highlight in stage 1 using its measured size band.
 - [ ] Hold all remaining control categories until stage 1 is approved.
 - [x] Finish labelled bottom navigation with the exact leaderboard mark, 9px colour-matched labels, 46px targets, and named clearance checks.
+- [x] Match the Amateur navigation mark to the filled icon set and verify ink/mute weight.

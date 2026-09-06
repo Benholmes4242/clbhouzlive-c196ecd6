@@ -11,6 +11,8 @@ import TrophyIcon from '@/components/icons/TrophyIcon';
 //                    The id stays 'watch' on purpose - scroll-to-top logic and
 //                    analytics key off it.
 // Change labels/icons freely; do NOT rename IDs (scroll-to-top logic + analytics depend on them).
+// THE NAV ICON SET IS FILLED, NOT STROKED. Any new icon is a filled path matched
+// optically to the existing marks.
 
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Home',      icon: HouseIcon,  path: '/' },
