@@ -526,7 +526,7 @@ export function CourseAnalyticsCard({
           </div>
         ) : (
           <div style={{ padding: '14px 0 4px' }}>
-            <div style={{ ...KICKER, marginBottom: 5, color: A.MUTE }}>
+            <div style={{ ...CAP, marginBottom: 5, color: A.MUTE }}>
               {t('discover.coursesPlayed.courseWide', 'Course-wide')}
             </div>
             <div style={{ ...CAP, lineHeight: 1.5 }}>
