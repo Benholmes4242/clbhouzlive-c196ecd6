@@ -78,6 +78,8 @@ export interface FeedPost {
   isReview: boolean;
   isLikedByMe: boolean;
   isFollowedByMe: boolean;
+  /** Optional per-item score for fullscreen chrome (for example, a reviewer's rating). */
+  viewerRating?: number | null;
   // Phase 1 personalisation signals
   mutualFriendsCount?: number;
   countryMatch?: boolean;

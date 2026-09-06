@@ -55,6 +55,7 @@ interface Entry {
 }
 
 class Group {
+  constructor(private threshold: number, private maxPlaying: number) {}
   private io: IntersectionObserver | null = null;
   private entries = new Map<Element, Entry>();
 
@@ -101,11 +102,11 @@ class Group {
     const winners = new Set<Element>();
     if (!paused) {
       const eligible = [...this.entries.entries()]
-        .filter(([, e]) => e.ratio >= IN_VIEW_THRESHOLD)
+        .filter(([, e]) => e.ratio >= this.threshold)
         // Nearest the viewport centre wins. Ratio breaks a tie so a
         // two-column row resolves deterministically rather than by map order.
         .sort((a, b) => a[1].dist - b[1].dist || b[1].ratio - a[1].ratio)
-        .slice(0, MAX_PLAYING);
+        .slice(0, this.maxPlaying);
       for (const [el] of eligible) winners.add(el);
     }
 
@@ -121,18 +122,23 @@ class Group {
 
 const groups = new Map<string, Group>();
 
-function groupFor(key: string): Group {
+function groupFor(key: string, options?: { threshold?: number; maxPlaying?: number }): Group {
   let g = groups.get(key);
   if (!g) {
-    g = new Group();
+    g = new Group(options?.threshold ?? IN_VIEW_THRESHOLD, options?.maxPlaying ?? MAX_PLAYING);
     groups.set(key, g);
   }
   return g;
 }
 
 /** Register a tile element in a group. Returns the unregister function. */
-export function registerReviewVideo(groupKey: string, el: Element, cb: PlayCb): () => void {
-  return groupFor(groupKey).register(el, cb);
+export function registerReviewVideo(
+  groupKey: string,
+  el: Element,
+  cb: PlayCb,
+  options?: { threshold?: number; maxPlaying?: number },
+): () => void {
+  return groupFor(groupKey, options).register(el, cb);
 }
 
 // Backgrounding pauses everything; returning re-settles, so only tiles that

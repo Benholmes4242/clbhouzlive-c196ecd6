@@ -321,9 +321,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     activePost.courseRating == null ? resolvedCourseId ?? undefined : undefined,
   );
   const courseRating =
+    activePost.viewerRating ??
     activePost.courseRating ??
     (ratingAggregate?.avg_overall_score != null ? Number(ratingAggregate.avg_overall_score) : null);
   const showCourseChip = courseRating != null;
+  const courseRatingLabel = courseRating == null ? '' : formatRatingValue(courseRating);
 
   const likeStr = formatCount(likeState.count);
   const commentStr = formatCount(commentCount);
@@ -432,7 +434,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
-                aria-label={`Community rating ${formatRatingValue(courseRating!)}`}
+                aria-label={`${activePost.viewerRating != null ? 'Review rating' : 'Community rating'} ${courseRatingLabel}`}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0,
                   background: 'rgba(255,255,255,0.08)',
@@ -451,7 +453,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                   style={{ width: 20, height: 20, flexShrink: 0, objectFit: 'contain' }}
                 />
                 <span style={{ fontSize: 14, fontWeight: 700, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums lining-nums', lineHeight: 1 }}>
-                  {formatRatingValue(courseRating!)}
+                  {courseRatingLabel}
                 </span>
               </button>
             )}

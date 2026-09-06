@@ -109,6 +109,8 @@ interface OpenWithOriginArgs {
   mediaId?: string | null;
   /** REQUIRED surface tag. See fullscreenFeedStore's `useIsViewerOwnedBy`. */
   openedFrom: string;
+  /** Deliberate gallery opens start at frame zero instead of inheriting a prior session playhead. */
+  forceStartAtZero?: boolean;
 
   options?: {
     openCommentsInitially?: boolean;
@@ -130,6 +132,7 @@ export function openWithOrigin({
   mediaIndex,
   mediaId,
   openedFrom,
+  forceStartAtZero = false,
   options,
 }: OpenWithOriginArgs): void {
 
@@ -421,7 +424,9 @@ export function openWithOrigin({
   let railLaneCT = -1;
   let feedSnapCT = -1;
   let lastPosCT = -1;
-  if (borrow) {
+  if (forceStartAtZero) {
+    startSource = 'zero';
+  } else if (borrow) {
     startSource = 'borrow';
   } else {
     try {
@@ -463,7 +468,7 @@ export function openWithOrigin({
   {
     let feedSnapPostId: string | null = null;
     let feedSnapOwns = false;
-    if (!borrow) {
+    if (!borrow && !forceStartAtZero) {
       try {
         const s = VideoEngine.snapshot(feedLaneRoles.laneForRole('active'));
         feedSnapPostId = s.postId;
