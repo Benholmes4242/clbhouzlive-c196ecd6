@@ -30,7 +30,7 @@ const GALLERY_AUTOPLAY_GROUP = 'discover-gallery-video-rails';
 
 function RailTile({ item, index, width, onPress }: { item: CommunityLibraryItem; index: number; width: number; onPress: () => void }) {
   const reducedMotion = usePrefersReducedMotion();
-  const hostRef = useRef<HTMLDivElement | null>(null);
+  const hostRef = useRef<HTMLButtonElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [active, setActive] = useState(false);
   const [playing, setPlaying] = useState(false);
