@@ -148,7 +148,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
       return `calc(max(env(safe-area-inset-bottom, 0px), 24px) + ${base + extra}px)`;
     }
     if (bottomOffset !== undefined) return `${bottomOffset + extra}px`;
-    return `calc(var(--bottom-nav-height, 88px) + ${extra}px)`;
+    return `calc(var(--bottom-nav-height, 96px) + ${extra}px)`;
   };
 
   const reviewRightInset = topActionBar ? 16 : 80;
@@ -217,7 +217,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
               left: 0,
               right: 0,
               bottom: 0,
-              height: 'calc(var(--bottom-nav-height, 88px) + 36px)',
+              height: 'calc(var(--bottom-nav-height, 96px) + 36px)',
               background:
                 'linear-gradient(to top, #0A0E14 0%, #0A0E14 60%, rgba(10,14,20,0) 100%)',
               pointerEvents: 'none',
@@ -321,7 +321,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           style={{
             position: 'fixed',
             right: 16,
-            bottom: 'calc(var(--bottom-nav-height, 88px) + 48px)',
+            bottom: 'calc(var(--bottom-nav-height, 96px) + 48px)',
             zIndex: Z.echo,
             opacity: overlayVisible ? 1 : 0,
             transition: 'opacity 0.2s',

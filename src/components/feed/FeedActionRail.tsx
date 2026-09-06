@@ -214,7 +214,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
         bottom:
           bottomOffset !== undefined
             ? `${bottomOffset + 62}px`
-            : 'calc(var(--bottom-nav-height, 88px) + 24px)',
+            : 'calc(var(--bottom-nav-height, 96px) + 24px)',
         zIndex: Z.echo,
         display: 'flex',
         flexDirection: 'column',

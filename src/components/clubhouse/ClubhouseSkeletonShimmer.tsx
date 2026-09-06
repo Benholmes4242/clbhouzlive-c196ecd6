@@ -55,7 +55,7 @@ const ActionRailSkeleton: React.FC<{ isStatic?: boolean; isVideo?: boolean }> = 
     className="absolute flex flex-col items-center"
     style={{
       right: 12,
-      bottom: 'calc(var(--bottom-nav-height, 88px) + 24px)',
+      bottom: 'calc(var(--bottom-nav-height, 96px) + 24px)',
       gap: 18,
     }}
   >
@@ -104,7 +104,7 @@ const RegularBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =
   <div
     className="absolute flex flex-col"
     style={{
-      bottom: 'calc(var(--bottom-nav-height, 88px) + 20px)',
+      bottom: 'calc(var(--bottom-nav-height, 96px) + 20px)',
       left: 16,
       right: 80, // reserve space for action rail
       gap: 8,
@@ -145,7 +145,7 @@ const ReviewBottomSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) =>
     style={{
       left: 16,
       right: 80, // reserve space for action rail
-      bottom: 'calc(var(--bottom-nav-height, 88px) + 20px)',
+      bottom: 'calc(var(--bottom-nav-height, 96px) + 20px)',
       background: 'rgba(15, 20, 30, 0.42)',
       backdropFilter: 'blur(32px) saturate(180%)',
       WebkitBackdropFilter: 'blur(32px) saturate(180%)',
@@ -399,7 +399,7 @@ const CardFeedSkeleton: React.FC<{
         width: '100%',
         overflow: 'hidden',
         paddingTop: topPad,
-        paddingBottom: 'calc(var(--bottom-nav-height, 88px) + 12px)',
+        paddingBottom: 'calc(var(--bottom-nav-height, 96px) + 12px)',
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
