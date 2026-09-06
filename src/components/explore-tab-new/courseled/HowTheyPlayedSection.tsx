@@ -62,6 +62,14 @@ export function HowTheyPlayedSection({
 
   const [query, setQuery] = useState('');
   const [pickedId, setPickedId] = useState<string | null>(null);
+  const [narrowPlaceholder, setNarrowPlaceholder] = useState(false);
+
+  useEffect(() => {
+    const update = () => setNarrowPlaceholder(window.innerWidth <= 360);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   const results = useCourseSearch(query);
   const picked = useSearchedCourse(userId, pickedId, filters);
