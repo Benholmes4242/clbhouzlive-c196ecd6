@@ -264,6 +264,7 @@ export function HowTheyPlayedSection({
             <ListTerminalRow
               label={t('discover.coursesPlayed.seeFullAnalytics', 'See full course analytics')}
               onPress={() => onCoursePress?.(subjectId)}
+              borderless
             />
           </div>
         </div>
