@@ -163,7 +163,15 @@ export function StoryArticle({ story, immersiveHero = false, tagLabel }: {
         {/* MICRO_BRIEF_STRIP_ON_STORY_PAGE — context before the read, not after
             it. Self-contained: no event ⇒ nothing mounted, no space reserved. */}
         {story.tournament_id && (
-          <div style={{ marginTop: 14 }}>
+          <div
+            data-story-full-bleed-strip
+            style={{
+              marginTop: 14,
+              marginLeft: -14,
+              marginRight: -14,
+              width: 'calc(100% + 28px)',
+            }}
+          >
             <StoryLeaderboardStrip tournamentId={story.tournament_id} />
           </div>
         )}

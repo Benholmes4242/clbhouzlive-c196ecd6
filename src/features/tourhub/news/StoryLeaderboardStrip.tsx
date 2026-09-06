@@ -16,7 +16,7 @@
  * nothing; PENDING renders a shell of its own height so the story list is not
  * shoved down under the reader's thumb after the fact.
  */
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -42,7 +42,7 @@ export const STORY_STRIP_HEIGHT = CAPTION_HEIGHT + TICKER_HEIGHT;
 
 function Shell({ children }: { children?: React.ReactNode }) {
   return (
-    <div style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', minHeight: STORY_STRIP_HEIGHT, fontFamily: FONT }}>
+    <div style={{ boxSizing: 'border-box', background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', minHeight: STORY_STRIP_HEIGHT, fontFamily: FONT }}>
       {children}
     </div>
   );
@@ -51,6 +51,16 @@ function Shell({ children }: { children?: React.ReactNode }) {
 export function StoryLeaderboardStrip({ tournamentId }: { tournamentId: string }) {
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
+  const [isNarrowestViewport, setIsNarrowestViewport] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const query = window.matchMedia('(max-width: 320px)');
+    const update = () => setIsNarrowestViewport(query.matches);
+    update();
+    query.addEventListener?.('change', update);
+    return () => query.removeEventListener?.('change', update);
+  }, []);
 
   /**
    * The tournament RECORD. The story only carries an id, and deriveHeroState
@@ -103,7 +113,9 @@ export function StoryLeaderboardStrip({ tournamentId }: { tournamentId: string }
       facts.push({ label: t('overview.hero.venueLabel'), value: (tournament as any).venue_name });
     }
     const purse = (tournament as any).purse;
-    if (typeof purse === 'number' && purse > 0) {
+    // At the 320pt floor, keep the event and venue legible and drop the least
+    // load-bearing fact rather than allowing PURSE to be clipped at the edge.
+    if (!isNarrowestViewport && typeof purse === 'number' && purse > 0) {
       const m = purse / 1_000_000;
       facts.push({ label: t('overview.hero.purse'), value: m >= 10 ? `$${Math.round(m)}M` : `$${m.toFixed(1)}M` });
     }
@@ -143,7 +155,7 @@ export function StoryLeaderboardStrip({ tournamentId }: { tournamentId: string }
         if (e.key === 'Enter' || e.key === ' ') navigate(`/tourhub/tournament/${tournamentId}`);
       }}
       aria-label={`${caption} \u00b7 ${(tournament as any).name ?? ''}`}
-      style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', fontFamily: FONT, cursor: 'pointer' }}
+      style={{ boxSizing: 'border-box', background: A.PANEL, border: `1px solid ${A.BORDER}`, width: '100%', fontFamily: FONT, cursor: 'pointer' }}
     >
       <div
         style={{
@@ -154,30 +166,33 @@ export function StoryLeaderboardStrip({ tournamentId }: { tournamentId: string }
           padding: '0 14px',
         }}
       >
-        {isLive && (
+        {isLive && !isNarrowestViewport && (
           <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: LIVE_INK, flexShrink: 0 }} />
         )}
+        {!isNarrowestViewport && (
+          <>
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                color: isLive ? LIVE_INK : 'rgba(255,255,255,0.50)',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
+              {caption}
+            </span>
+            <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.22)', flexShrink: 0 }} />
+          </>
+        )}
         <span
-          style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: isLive ? LIVE_INK : 'rgba(255,255,255,0.50)',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}
-        >
-          {caption}
-        </span>
-        <span aria-hidden style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.22)', flexShrink: 0 }} />
-        <span
+          data-story-strip-tournament-name
           style={{
             fontSize: 11,
             fontWeight: 600,
             color: 'rgba(255,255,255,0.82)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
             minWidth: 0,
           }}
