@@ -212,10 +212,10 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const PILL_MAX_EXPANDED = 'min(396px, 100vw - 22px)';
   const PILL_MAX_CONDENSED = 'min(324px, 100vw - 36px)';
   // Even integers so 1px strokes land on the device pixel grid — SF-crisp.
-  const iconSize = condensed ? 22 : 24;
-  const iconStroke = 2;
+  const iconSize = 23;
+  const iconStroke = 1.9;
 
-  const pillPadding = condensed ? '3px 7px' : '4px 7px';
+  const pillPadding = '6px 7px';
 
   const badges = useMemo<Record<string, number>>(() => ({ courses: discoverNewCount }), [discoverNewCount]);
 
@@ -312,8 +312,14 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                   const isLive = tab.id === 'tourhub' && isTourHubLive;
                   const Icon = tab.icon;
                   const badgeCount = badges[tab.id] ?? 0;
-                  const activeColor = isLive ? '#22C55E' : tokens.ink;
-                  const inactiveColor = tokens.dim;
+                  const iconColor = tab.id === 'tourhub'
+                    ? '#22C55E'
+                    : (isActive ? tokens.ink : tokens.dim);
+                  const labelColor = tab.id === 'tourhub'
+                    ? '#22C55E'
+                    : tab.id === 'post'
+                      ? '#F7931E'
+                      : iconColor;
 
                   return (
                     <li key={tab.id} style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
@@ -332,9 +338,10 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                           appearance: 'none',
                           border: 0,
                           background: isActive ? tokens.lozenge : 'transparent',
-                          color: isLive ? '#22C55E' : (isActive ? activeColor : inactiveColor),
-                          padding: '7px 3px',
-                          borderRadius: isActive ? r.xl : r.pill,
+                          color: iconColor,
+                          padding: '0 3px',
+                          height: 46,
+                          borderRadius: r.md,
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
@@ -394,8 +401,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                         <span
                           aria-hidden="true"
                           style={{
-                            color: isActive ? tokens.ink : tokens.dim,
-                            fontSize: 9.5,
+                            color: labelColor,
+                            fontSize: 9,
                             fontWeight: 700,
                             letterSpacing: '0.13em',
                             lineHeight: 1,
