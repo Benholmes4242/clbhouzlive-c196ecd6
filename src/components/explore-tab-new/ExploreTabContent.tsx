@@ -103,6 +103,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
       mediaIndex: item.mediaIndex ?? 0,
       mediaId: item.mediaId ?? null,
       openedFrom,
+      forceStartAtZero: true,
     });
   }, [rememberDiscoverPosition]);
 
@@ -120,6 +121,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
       posterUrl,
       mediaId,
       openedFrom: 'discover-review-media',
+      forceStartAtZero: true,
       options: { readOnly: true },
     });
   }, [rememberDiscoverPosition]);
