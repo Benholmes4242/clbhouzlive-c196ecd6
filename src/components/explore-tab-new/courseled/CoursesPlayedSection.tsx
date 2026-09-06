@@ -478,6 +478,7 @@ export function CourseAnalyticsCard({
   onCoursePress,
   media,
   courseName,
+  ctaBorderless,
 }: {
   row: BoardCourseRow;
   userId: string | undefined;
@@ -485,6 +486,7 @@ export function CourseAnalyticsCard({
   onCoursePress?: (courseId: string) => void;
   media?: ReactNode;
   courseName?: string | null;
+  ctaBorderless?: boolean;
 }) {
   const { t } = useTranslation('courses');
   const analysis = useCourseHoleAnalysis(row.course_id);
