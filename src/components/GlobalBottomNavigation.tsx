@@ -307,14 +307,23 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                   const isActive = activeTab === tab.id;
                   const Icon = tab.icon;
                   const badgeCount = badges[tab.id] ?? 0;
-                  const iconColor = tab.id === 'tourhub'
-                    ? '#22C55E'
-                    : (isActive ? tokens.ink : tokens.dim);
-                  const labelColor = tab.id === 'tourhub'
-                    ? '#22C55E'
-                    : tab.id === 'post'
-                      ? '#F7931E'
-                      : iconColor;
+
+                  // A6-deliberate exceptions: Post is the app's only amber
+                  // control (create action), Tour keeps its green identity.
+                  // Home, Amateur and Courses follow the ink/mute pair.
+                  const iconColor =
+                    tab.id === 'tourhub'
+                      ? isActive
+                        ? '#22C55E'
+                        : 'rgba(74,222,128,0.55)'
+                      : tab.id === 'post'
+                        ? isActive
+                          ? '#F7931E'
+                          : 'rgba(247,147,30,0.72)'
+                        : isActive
+                          ? tokens.ink
+                          : tokens.dim;
+                  const labelColor = iconColor;
 
                   return (
                     <li key={tab.id} style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
