@@ -173,11 +173,17 @@ export function useMomentsOfTheWeek(
           (c): c is { row: Row; courseId: string; score: number } =>
             !!c.courseId && !!c.row.post_media && c.row.post_media.length > 0,
         )
-        .sort(
-          (a, b) =>
-            b.score - a.score ||
-            new Date(b.row.created_at).getTime() - new Date(a.row.created_at).getTime(),
-        );
+        .sort((a, b) => {
+          if (sort === 'recent' || sort === 'course') {
+            return new Date(b.row.created_at).getTime() - new Date(a.row.created_at).getTime();
+          }
+          if (sort === 'liked') {
+            return (b.row.like_count ?? 0) - (a.row.like_count ?? 0)
+              || new Date(b.row.created_at).getTime() - new Date(a.row.created_at).getTime();
+          }
+          return b.score - a.score
+            || new Date(b.row.created_at).getTime() - new Date(a.row.created_at).getTime();
+        });
 
       // Fill tiles under the per-post cap. The per-course cap is NOT applied
       // here: the sheet shows the full ranked list. Instead the first tile of
@@ -192,7 +198,7 @@ export function useMomentsOfTheWeek(
       }> = [];
       for (const cand of ranked) {
         const mediaCount = cand.row.post_media?.length ?? 0;
-        const take = Math.min(MAX_TILES_PER_POST, mediaCount);
+        const take = Math.min(maxPerPost, mediaCount);
         for (let i = 0; i < take; i += 1) {
           const used = perCourse.get(cand.courseId) ?? 0;
           picked.push({
@@ -248,7 +254,7 @@ export function useMomentsOfTheWeek(
         profileById.set(p.id, p);
       }
 
-      return picked.map(({ row, courseId, mediaIndex, isCourseLead }): Moment => {
+      const tiles = picked.map(({ row, courseId, mediaIndex, isCourseLead }): Moment => {
         const media = [...(row.post_media ?? [])].sort(
           (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0),
         );
