@@ -86,12 +86,30 @@ function streamThumb(streamId: string): string {
  *                    hold separate cache entries and never overwrite one
  *                    another.
  */
+export type MomentsSort = 'ranked' | 'recent' | 'liked' | 'course';
+
 export function useMomentsOfTheWeek(
   windowDays: number | null = WINDOW_DAYS,
-  options: { enabled?: boolean; candidateLimit?: number } = {},
+  options: {
+    enabled?: boolean;
+    candidateLimit?: number;
+    /**
+     * BRIEF_WATCH_SEE_ALL S3.5 — /explore/moments offers Most recent, Most
+     * liked and By course. 'ranked' (the default) is the Discover section's
+     * freshness x engagement order and is untouched.
+     */
+    sort?: MomentsSort;
+    /**
+     * Tiles per post. The library page passes Infinity so its total equals the
+     * count query behind its See all; every other caller keeps the cap of 3.
+     */
+    maxPerPost?: number;
+  } = {},
 ) {
+  const sort: MomentsSort = options.sort ?? 'ranked';
+  const maxPerPost = options.maxPerPost ?? MAX_TILES_PER_POST;
   return useQuery({
-    queryKey: [...MOMENTS_KEY, windowDays ?? 'all'],
+    queryKey: [...MOMENTS_KEY, windowDays ?? 'all', sort, maxPerPost],
     enabled: options.enabled ?? true,
     queryFn: async (): Promise<Moment[]> => {
       let q = supabase
