@@ -4,6 +4,7 @@ import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPos
 import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
 import { packColumns } from '@/components/feed-cards/packColumns';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useClipsWallFeed, type ClipsV2Mood, type ClipsWallRow } from '../hooks/useClipsWallFeed';
 
 const FONT_FAMILY =
@@ -13,30 +14,30 @@ function SkeletonTile() {
   return (
     <div style={{ marginBottom: 12 }}>
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         style={{
           width: '100%',
           aspectRatio: '9 / 14',
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          background: 'rgba(255,255,255,0.06)',
         }}
       />
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         style={{
           height: 12.5,
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          background: 'rgba(255,255,255,0.06)',
           marginTop: 6,
         }}
       />
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         style={{
           height: 11,
           width: '55%',
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          background: 'rgba(255,255,255,0.06)',
           marginTop: 2,
         }}
       />
@@ -47,7 +48,7 @@ function SkeletonTile() {
 export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
   const { user, loading: authLoading } = useSupabaseSession();
   const userId = user?.id;
-  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, isLoading, isError, refetch } =
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, isLoading, isError, error, refetch } =
     useClipsWallFeed({ userId, mood });
 
   const rows: ClipsWallRow[] = useMemo(
@@ -117,14 +118,28 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
   }
 
   if (isError) {
+    // THREE DISTINGUISHABLE FAILURES: a network drop, a fault at our end, and
+    // "nothing here" are different truths and must not share one message.
+    const raw = error as { message?: string; code?: string } | null;
+    const msg = raw?.message ?? '';
+    const isNetwork =
+      (typeof navigator !== 'undefined' && navigator.onLine === false) ||
+      /failed to fetch|networkerror|network request failed|load failed/i.test(msg);
+    const title = isNetwork ? "You're offline" : 'Clips are having a problem';
+    const detail = isNetwork
+      ? 'Check your connection and try again.'
+      : "Something went wrong at our end, not yours. We're on it.";
     return (
       <div style={{ padding: '40px 16px', textAlign: 'center', fontFamily: FONT_FAMILY }}>
-        <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>
-          Couldn't load clips
+        <div style={{ fontWeight: 700, fontSize: 14, color: A.INK }}>{title}</div>
+        <div style={{ fontWeight: 500, fontSize: 12, color: A.MUTE, marginTop: 4 }}>
+          {detail}
         </div>
-        <div style={{ fontWeight: 500, fontSize: 12, color: '#64748B', marginTop: 4 }}>
-          Check your connection and try again.
-        </div>
+        {!isNetwork && msg ? (
+          <div style={{ fontWeight: 500, fontSize: 11, color: A.MUTE, marginTop: 6, opacity: 0.8 }}>
+            {raw?.code ? `${raw.code}: ` : ''}{msg}
+          </div>
+        ) : null}
         <button
           type="button"
           onClick={() => refetch()}
@@ -132,15 +147,15 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
             marginTop: 12,
             padding: '8px 18px',
             borderRadius: 999,
-            border: 'none',
-            background: '#0F172A',
-            color: '#fff',
+            border: `1px solid ${A.BORDER}`,
+            background: A.INK,
+            color: A.CANVAS,
             fontWeight: 700,
             fontSize: 12.5,
             cursor: 'pointer',
           }}
         >
-          Retry
+          Try again
         </button>
       </div>
     );
@@ -149,8 +164,8 @@ export function ClipsWall({ mood }: { mood: ClipsV2Mood }) {
   if (rows.length === 0) {
     return (
       <div style={{ padding: '40px 16px', textAlign: 'center', fontFamily: FONT_FAMILY }}>
-        <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>No clips here yet</div>
-        <div style={{ fontWeight: 500, fontSize: 12, color: '#64748B', marginTop: 4 }}>
+        <div style={{ fontWeight: 700, fontSize: 14, color: A.INK }}>No clips here yet</div>
+        <div style={{ fontWeight: 500, fontSize: 12, color: A.MUTE, marginTop: 4 }}>
           {mood !== 'for_you' ? 'Try another mood' : 'Check back soon'}
         </div>
       </div>
