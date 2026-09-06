@@ -156,6 +156,16 @@ export function StoryRow({ story, onOpen, compact = false, engagement }: { story
   );
 }
 
+/**
+ * THE WIRE INDEX (BRIEF_WIRE_REDESIGN). Four shapes, each denser than the last:
+ * hero, two-up, rows, Latest. The shapes are the SHARED ones in StoryShapes —
+ * the amateur News tab renders the same components at the same sizes.
+ *
+ * The tour lens stays CLIENT-SIDE (see useTourStories) and re-derives every
+ * section, including which tournaments have enough stories for the rail.
+ */
+const WIRE_PAGE_SIZE = 10;
+
 export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
   const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
@@ -170,55 +180,128 @@ export function NewsTab({ immersiveHero = true }: { immersiveHero?: boolean }) {
     tourLens ?? 'all',
   );
 
-  const { stories, isLoading } = useTourStories(tourLens);
+  const { stories: lensStories, isLoading } = useTourStories(tourLens);
 
-  const [lead, rest] = useMemo(() => {
-    if (stories.length === 0) return [null, [] as TourStory[]];
-    const first = stories[0];
-    // A story with no image cannot be photo-led — it drops to a row and the
-    // list has no lead band that day.
-    if (!first.image_url) return [null, stories];
-    return [first, stories.slice(1)];
-  }, [stories]);
+  const [tournament, setTournament] = useState<string | null>(null);
+  const [wireLimit, setWireLimit] = useState(WIRE_PAGE_SIZE);
+
+  /**
+   * BY TOURNAMENT, NOT BY TOUR — the tour is already the page's context. A null
+   * tournament_id has nothing to group under and never becomes a chip, though
+   * the story still appears in the page's other shapes. The chip's label is the
+   * story's own kicker: tour_stories carries no tournament name and reading one
+   * would mean a new query, which this brief forbids.
+   */
+  const tournaments = useMemo(() => {
+    const groups = new Map<string, { label: string; count: number }>();
+    for (const s of lensStories) {
+      if (!s.tournament_id) continue;
+      const existing = groups.get(s.tournament_id);
+      if (existing) existing.count += 1;
+      else groups.set(s.tournament_id, { label: (s.kicker || 'Tournament').trim(), count: 1 });
+    }
+    return [...groups.entries()]
+      .map(([key, v]) => ({ key, label: v.label, count: v.count }))
+      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+  }, [lensStories]);
+
+  // TWO CHIPS IS NOT A NAVIGATION: below three tournaments there is no rail,
+  // and any active selection is dropped with it.
+  const railChips = tournaments.length >= 3 ? tournaments : [];
+  const activeTournament = railChips.some((c) => c.key === tournament) ? tournament : null;
+
+  const stories = useMemo(
+    () => (activeTournament ? lensStories.filter((s) => s.tournament_id === activeTournament) : lensStories),
+    [lensStories, activeTournament],
+  );
+
+  const lead = stories[0];
+  const afterLead = stories.slice(1);
+  const twoUp = afterLead.length >= 2 ? afterLead.slice(0, 2) : [];
+  const afterTwoUp = afterLead.slice(twoUp.length);
+  const rows = afterTwoUp.slice(0, 3);
+  const wire = afterTwoUp.slice(3);
+  const visibleWire = wire.slice(0, wireLimit);
 
   const open = (slug: string) => navigate(`/tour/news/${slug}`);
 
   /* ONE READ PER WINDOW, never per row: every visible id in a single RPC. */
   const { engagementFor } = useStoryEngagement(
     'tour_story',
-    useMemo(() => stories.map((s) => s.id), [stories]),
+    useMemo(() => lensStories.map((s) => s.id), [lensStories]),
   );
 
   return (
     <div style={{ fontFamily: FONT, paddingBottom: 24 }}>
       {isLoading ? (
         <div>
-          <Skeleton style={{ height: immersiveHero ? OVERVIEW_HERO_HEIGHT : 232, width: '100%', borderRadius: 0 }} />
+          <Skeleton style={{ height: 340, width: '100%', borderRadius: 0 }} />
           <div style={{ padding: '0 14px' }}>
             <Skeleton style={{ height: 62, width: '100%', marginTop: 16 }} />
             <Skeleton style={{ height: 62, width: '100%', marginTop: 12 }} />
           </div>
         </div>
-      ) : stories.length === 0 ? (
+      ) : !lead ? (
         <div style={{ padding: immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 76px) 14px 0' : '18px 14px 0', fontSize: 13, color: INK_MUTE }}>
           {t('news.empty', 'No stories on the wire yet.')}
         </div>
       ) : (
         <>
-          {lead && <LeadStory story={lead} onOpen={() => open(lead.slug)} immersiveHero={immersiveHero} engagement={engagementFor(lead.id)} />}
+          <HeroStory
+            story={lead}
+            onOpen={() => open(lead.slug)}
+            engagement={engagementFor(lead.id)}
+            topOffset={immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 68px)' : 13}
+          />
           {/* BRIEF_WIRE_INDEX_TICKER — bound to the LEAD's event. No lead or no
               tournament_id ⇒ not mounted, and no height reserved. */}
-          {lead?.tournament_id && <StoryLeaderboardStrip tournamentId={lead.tournament_id} />}
-          <div style={{ marginTop: lead ? 14 : 0 }}>
+          {lead.tournament_id && <StoryLeaderboardStrip tournamentId={lead.tournament_id} />}
 
-            {rest.map((s, i) => (
-              <div
-                key={s.id}
-                style={{ borderTop: i === 0 && !lead ? 'none' : `1px solid ${HAIRLINE_INK_10}` }}
-              >
-                <StoryRow story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} />
-              </div>
-            ))}
+          <div style={{ padding: `0 ${GUTTER}px` }}>
+            {twoUp.length === 2 && (
+              <section aria-label="Featured stories" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 9, marginTop: 24 }}>
+                {twoUp.map((s) => (
+                  <FeatureStory key={s.id} story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} />
+                ))}
+              </section>
+            )}
+
+            {rows.length > 0 && (
+              <section aria-label="More stories" style={{ marginTop: 24 }}>
+                {rows.map((s, index) => (
+                  <div key={s.id} style={{ borderTop: index === 0 ? `1px solid ${HAIRLINE_INK_10}` : 'none', borderBottom: `1px solid ${HAIRLINE_INK_10}` }}>
+                    <WorkhorseRow story={s} onOpen={() => open(s.slug)} engagement={engagementFor(s.id)} />
+                  </div>
+                ))}
+              </section>
+            )}
+
+            {railChips.length >= 3 && (
+              <StoryChipRail
+                id="wire-tournaments"
+                heading="By tournament"
+                chips={railChips}
+                selected={activeTournament}
+                onSelect={(key) => {
+                  setTournament(key);
+                  setWireLimit(WIRE_PAGE_SIZE);
+                  window.scrollTo({ top: 0, behavior: 'auto' });
+                }}
+              />
+            )}
+
+            {wire.length > 0 && (
+              <section aria-labelledby="wire-latest" style={{ marginTop: 26, borderRadius: r.md, overflow: 'hidden', background: A.PANEL, border: `1px solid ${A.BORDER}` }}>
+                {/* "Latest", NOT "The wire": the page itself is The Wire. */}
+                <h2 id="wire-latest" style={{ ...KICKER, margin: 0, padding: '13px 13px 9px', color: A.INK }}>Latest</h2>
+                {visibleWire.map((s) => (
+                  <WireItem key={s.id} story={s} onOpen={() => open(s.slug)} />
+                ))}
+                {visibleWire.length < wire.length && (
+                  <LoadMoreRow onClick={() => setWireLimit((current) => current + WIRE_PAGE_SIZE)} />
+                )}
+              </section>
+            )}
           </div>
         </>
       )}
