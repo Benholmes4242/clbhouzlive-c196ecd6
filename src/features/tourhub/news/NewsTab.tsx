@@ -22,6 +22,18 @@ import { heroCanonScrimOn } from '../_shared/heroGradient';
 import { StoryRowEngagement } from '@/features/stories/StoryRowEngagement';
 import { StoryLeaderboardStrip } from './StoryLeaderboardStrip';
 import { useStoryEngagement, type StoryEngagement } from '@/features/stories/useStoryEngagement';
+import {
+  FeatureStory,
+  GUTTER,
+  HeroStory,
+  KICKER,
+  LoadMoreRow,
+  StoryChipRail,
+  WireItem,
+  WorkhorseRow,
+} from './StoryShapes';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { r } from '@/lib/radius';
 
 import {
   FONT,
