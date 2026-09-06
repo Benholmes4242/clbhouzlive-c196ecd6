@@ -70,13 +70,14 @@ export function boardCoursesArgs(viewerId: string | undefined, f: BoardFilters) 
 export function useBoardCourses(
   viewerId: string | undefined,
   filters: BoardFilters,
-  options?: { limit?: number; enabled?: boolean },
+  options?: { limit?: number; enabled?: boolean; sort?: CourseBoardKey },
 ) {
   const limit = options?.limit ?? 6;
+  const sort: CourseBoardKey = options?.sort ?? 'played';
   const args = boardCoursesArgs(viewerId, filters);
 
   return useQuery<BoardCourses>({
-    queryKey: ['discover', 'board-courses', args, limit],
+    queryKey: ['discover', 'board-courses', args, limit, sort],
     /* C2.3 — a single-course filter answers "where" already; the section hides. */
     enabled: (options?.enabled ?? true) && filters.courses !== 'one',
     staleTime: 60_000,
@@ -84,6 +85,7 @@ export function useBoardCourses(
       const { data, error } = await supabase.rpc('get_board_courses' as never, {
         ...args,
         p_limit: limit,
+        p_sort: sort,
       } as never);
       if (error) throw error;
       const raw = ((data ?? []) as unknown) as Array<Record<string, unknown>>;
@@ -104,7 +106,10 @@ export function useBoardCourses(
         prev_rounds: r.prev_rounds == null ? null : Number(r.prev_rounds),
         is_new: r.is_new === true,
         total_courses: Number(r.total_courses ?? 0),
+        rating: r.rating == null ? null : Number(r.rating),
+        rating_count: Number(r.rating_count ?? 0),
       }));
+
       const rpcTotal = rows.length > 0 ? rows[0].total_courses : 0;
 
       return { rows, total: Math.max(rpcTotal, rows.length) };
