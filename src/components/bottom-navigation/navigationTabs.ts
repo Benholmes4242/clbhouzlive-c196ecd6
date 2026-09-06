@@ -1,6 +1,6 @@
 import MapPinIcon from '@/components/icons/MapPinIcon';
 import HouseIcon from '@/components/icons/HouseIcon';
-import AmateurLaurelIcon from '@/components/icons/AmateurLaurelIcon';
+import LeaderboardMarkIcon from '@/components/icons/LeaderboardMarkIcon';
 import PlusSquareIcon from '@/components/icons/PlusSquareIcon';
 import TrophyIcon from '@/components/icons/TrophyIcon';
 
@@ -14,23 +14,21 @@ import TrophyIcon from '@/components/icons/TrophyIcon';
 
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Home',      icon: HouseIcon,  path: '/' },
-  { id: 'watch',     label: 'Amateur',   icon: AmateurLaurelIcon, path: '/explore' },
+  { id: 'watch',     label: 'Amateur',   icon: LeaderboardMarkIcon, path: '/explore' },
   { id: 'post',      label: 'Post',      icon: PlusSquareIcon, path: null, isAction: true },
   { id: 'courses',   label: 'Courses',   icon: MapPinIcon, path: '/courses' },
   { id: 'tourhub',   label: 'Tour',      icon: TrophyIcon, path: '/tourhub' },
 ];
 
 // Per-tab optical size map (expanded). Keyed by the REAL tab ids above.
-// Rationale: PlusSquare carries corner ink and reads large (-1);
-// Pulse line is thinner and reads small at 30, so hold 31; the MapPin teardrop
-// reads small (+1); House/Trophy hold the 31px baseline.
+// The labelled bar uses a shared 23px optical box across all five marks.
 export const ICON_SIZE: Record<string, number> = {
-  clubhouse: 31,
-  watch: 30,
-  post: 29,
-  courses: 32,
-  tourhub: 31,
+  clubhouse: 23,
+  watch: 23,
+  post: 23,
+  courses: 23,
+  tourhub: 23,
 };
 
 // Uniform icon-box (tap target / centering). Sized to the largest glyph.
-export const ICON_BOX = 32;
+export const ICON_BOX = 23;

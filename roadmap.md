@@ -7,4 +7,4 @@
 - [x] Report total affected controls, boundary cases, semantic exceptions, and contradictions.
 - [x] Include the active bottom-navigation highlight in stage 1 using its measured size band.
 - [ ] Hold all remaining control categories until stage 1 is approved.
-- [x] Add labelled bottom navigation, replace the Amateur glyph, and verify route clearance.
+- [x] Finish labelled bottom navigation with the exact leaderboard mark, 9px colour-matched labels, 46px targets, and named clearance checks.
