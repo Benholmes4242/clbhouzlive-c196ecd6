@@ -60,7 +60,7 @@ export function DiscoverHeader({ active, onChange }: { active: DiscoverTab; onCh
             return (
               <button key={id} type="button" aria-current={selected ? 'page' : undefined} onClick={() => onChange(id)} style={{ position: 'relative', padding: 0, border: 0, background: 'transparent', color: selected ? A.INK : A.MUTE, fontSize: 15, lineHeight: '18px', fontWeight: 700, letterSpacing: 0, cursor: 'pointer' }}>
                 {label}
-                {selected && <span aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: -1, height: 2.5, background: A.INK }} />}
+                {selected && <span aria-hidden style={{ position: 'absolute', left: 0, right: 0, bottom: -11, height: 2.5, background: A.INK }} />}
               </button>
             );
           })}
