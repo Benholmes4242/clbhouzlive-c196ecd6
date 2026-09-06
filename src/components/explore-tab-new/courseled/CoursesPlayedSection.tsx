@@ -227,26 +227,26 @@ function FeaturedCourseCard({
       style={{
         gridColumn: '1 / -1',
         minWidth: 0,
-        marginLeft: -14,
-        marginRight: -14,
-        background: A.CANVAS,
+        /* The grid contributes 8px beneath the card; this completes the P3 20px
+           break before the first tile row without changing tile-to-tile gaps. */
+        marginBottom: 12,
       }}
     >
-      <CourseMosaicTile
+      <CourseAnalyticsCard
         row={row}
-        featured
-        open={false}
-        onToggle={() => {}}
-        embedded
+        userId={userId}
+        filters={filters}
+        onCoursePress={onCoursePress}
+        media={
+          <CourseMosaicTile
+            row={row}
+            featured
+            open={false}
+            onToggle={() => {}}
+            embedded
+          />
+        }
       />
-      <div style={{ margin: '10px 14px 12px' }}>
-        <CourseAnalyticsCard
-          row={row}
-          userId={userId}
-          filters={filters}
-          onCoursePress={onCoursePress}
-        />
-      </div>
     </div>
   );
 }
