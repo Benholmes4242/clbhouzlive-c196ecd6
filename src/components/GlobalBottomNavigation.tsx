@@ -309,7 +309,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               >
                 {navigationTabs.map((tab) => {
                   const isActive = activeTab === tab.id;
-                  const isLive = tab.id === 'tourhub' && isTourHubLive;
                   const Icon = tab.icon;
                   const badgeCount = badges[tab.id] ?? 0;
                   const iconColor = tab.id === 'tourhub'
