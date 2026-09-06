@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, ArrowDown, ArrowUp } from 'lucide-react';
 
@@ -9,6 +9,7 @@ import { type BoardFilters } from './boardFilters';
    formatter. No second wording lives here. */
 import { describeFilterParts } from './GolfThisWeek';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { r } from '@/lib/radius';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';
 import { useBoardCoursePlayers, type BoardCoursePlayer } from './hooks/useBoardCoursePlayers';
 import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
