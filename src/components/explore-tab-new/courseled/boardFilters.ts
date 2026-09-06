@@ -228,3 +228,43 @@ export function filtersAreDefault(f: BoardFilters): boolean {
     f.competition === 'any'
   );
 }
+
+/**
+ * BRIEF_SCORES_TWO_HALVES S3.2 — THE TEN MEMBER BOARDS, VISIBLE.
+ *
+ * The rail is how a member DISCOVERS that Stableford or Bogey-free exist; the
+ * filter sheet's own picker order (S1.1 above) is a different surface and is
+ * left alone. 'gross' stays retired (S1.3), so the requested "Lowest gross" and
+ * "To par" are ONE board — 'topar' ranks on gross-to-par under the vernacular
+ * label. Albatrosses takes the freed tenth place rather than offering the same
+ * board twice under two names.
+ */
+export const SCORES_MEMBER_BOARD_KEYS: BoardKey[] = [
+  'topar',
+  'net',
+  'stableford',
+  'birdies',
+  'improved',
+  'recent',
+  'ace',
+  'eagle',
+  'clean_card',
+  'albatross',
+];
+
+/**
+ * S5 — THE SIX COURSE BOARDS. Each is an ORDER inside public.get_board_courses
+ * (p_sort), which orders AND limits on the same axis, so a board never ranks the
+ * survivors of a most-played cut.
+ */
+export const COURSE_BOARD_KEYS = ['played', 'hardest', 'easiest', 'low', 'new', 'rated'] as const;
+export type CourseBoardKey = (typeof COURSE_BOARD_KEYS)[number];
+
+export const COURSE_BOARD_LABELS: Record<CourseBoardKey, { i18n: string; label: string }> = {
+  played: { i18n: 'discover.courseBoard.played', label: 'Most played' },
+  hardest: { i18n: 'discover.courseBoard.hardest', label: 'Hardest' },
+  easiest: { i18n: 'discover.courseBoard.easiest', label: 'Easiest' },
+  low: { i18n: 'discover.courseBoard.low', label: 'Lowest round' },
+  new: { i18n: 'discover.courseBoard.new', label: 'New this window' },
+  rated: { i18n: 'discover.courseBoard.rated', label: 'Best rated' },
+};

@@ -11,9 +11,8 @@ import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { DiscoverHeader, type DiscoverTab } from './DiscoverHeader';
 import { NewsTabPage } from './NewsTabPage';
 import { GalleryTab } from './GalleryTab';
-import { GolfThisWeek } from './courseled/GolfThisWeek';
-import { CoursesPlayedSection } from './courseled/CoursesPlayedSection';
-import type { BoardFilters } from './courseled/boardFilters';
+import { ScoresTab } from './courseled/ScoresTab';
+
 import type { BoardRow } from './courseled/hooks/useBoardPage';
 import type { CommunityLibraryItem } from './courseled/hooks/useCommunityLibrary';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -41,7 +40,6 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
   const opener = useScorecardOpener();
   const initialReturn = useRef(readDiscoverReturn(location.state));
   const [activeTab, setActiveTab] = useState<DiscoverTab>(() => initialReturn.current?.tab ?? 'scores');
-  const [boardFilters, setBoardFilters] = useState<BoardFilters | null>(null);
 
   useLayoutEffect(() => {
     const snapshot = initialReturn.current;
@@ -133,24 +131,20 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
       {activeTab === 'scores' ? (
         <main style={{ paddingTop: embedded ? 0 : 'var(--discover-header-h)' }}>
           <div style={{ padding: '0 14px 110px' }}>
-            <GolfThisWeek
+            {/* BRIEF_SCORES_TWO_HALVES — one reference surface, two equal halves
+                under one filter. The hero and the duplicate course tiles are
+                gone; GolfThisWeek is no longer mounted here. */}
+            <ScoresTab
               userId={user?.id}
               onRowPress={handleBoardRow}
-              onAppliedFiltersChange={setBoardFilters}
+              onCoursePress={(courseId) => navigate(`/courses/${courseId}`)}
+              onMemberPress={(memberId) => opener.openProfile(memberId)}
               belowDiscoverHeader={!embedded}
-            >
-              {boardFilters && (
-                <CoursesPlayedSection
-                  userId={user?.id}
-                  filters={boardFilters}
-                  onCoursePress={(courseId) => navigate(`/courses/${courseId}`)}
-                  onMemberPress={(memberId) => opener.openProfile(memberId)}
-                />
-              )}
-            </GolfThisWeek>
+            />
           </div>
         </main>
       ) : activeTab === 'news' ? (
+
         <NewsTabPage onOpenStory={openNewsStory} />
       ) : (
         <GalleryTab onOpenPost={openMedia} onOpenReview={openReviewMedia} />

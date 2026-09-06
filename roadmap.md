@@ -10,3 +10,9 @@
 - [x] Open review tiles into a review-first, course-bounded fullscreen media set.
 - [x] Add poster-first Gallery autoplay with a two-video page-wide limit and accessibility/data gates.
 - [ ] Verify Gallery behavior, viewer boundaries, 320px spacing, and autoplay cost.
+
+## Scores two halves (BRIEF_SCORES_TWO_HALVES)
+- [x] Course board axes in get_board_courses (p_sort) + rating/rating_count
+- [x] ScoresTab: no hero, sticky filter, MEMBERS + COURSES halves, 10 member boards, 6 course boards
+- [x] Course board rows + selected course drives How they played
+- [ ] Signed-in runtime check (anon RPCs return empty; auth=external_unmanaged)

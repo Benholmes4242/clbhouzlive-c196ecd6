@@ -19122,6 +19122,7 @@ export type Database = {
           p_region_kind?: string
           p_region_value?: string
           p_scope?: string
+          p_sort?: string
           p_viewer: string
           p_window?: string
         }
@@ -19137,6 +19138,8 @@ export type Database = {
           name: string
           plays_to: number
           prev_rounds: number
+          rating: number
+          rating_count: number
           rounds: number
           thumbnail_image: string
           total_courses: number
