@@ -16,3 +16,9 @@
 - [x] ScoresTab: no hero, sticky filter, MEMBERS + COURSES halves, 10 member boards, 6 course boards
 - [x] Course board rows + selected course drives How they played
 - [ ] Signed-in runtime check (anon RPCs return empty; auth=external_unmanaged)
+
+## Scores analytics card (BRIEF_SCORES_ANALYTICS_CARD)
+- [ ] Move course title inside the card and label the filtered low-round window
+- [ ] Reuse the Course page course card, chart, By par, and six-row hole preview
+- [ ] Preserve no-round/sample/viewer-only gates and add the full-analytics terminal row
+- [ ] Verify matching bars, 390px height, and 320px fit
