@@ -505,7 +505,7 @@ export function PlayersTab() {
       </div>
       )}
 
-      <div style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }} />
+      <div style={{ height: 'calc(var(--bottom-nav-height, 96px) + 16px)' }} />
     </div>
   );
 }

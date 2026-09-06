@@ -212,7 +212,7 @@ export function ComparePage() {
     return (
       <TourHubShell immersiveStatusBar>
         <TourPageShell immersive background={SLATE_50} title="Head to head" backFallback={collegeHubRoute()}>
-        <div style={{ background: SLATE_50, minHeight: '100vh', fontFamily: FONT, paddingBottom: 88 }}>
+        <div style={{ background: SLATE_50, minHeight: '100vh', fontFamily: FONT, paddingBottom: 'var(--bottom-nav-height, 96px)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' }}>
             <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 700, color: INK }}>
               Couldn't load the duel
@@ -249,7 +249,7 @@ export function ComparePage() {
           background: SLATE_50,
           minHeight: '100vh',
           fontFamily: FONT,
-          paddingBottom: 88,
+          paddingBottom: 'var(--bottom-nav-height, 96px)',
         }}
       >
         {/* Masthead - always renders (skeleton state below if loading) */}

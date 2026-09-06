@@ -15,7 +15,7 @@ export default function WatchHubV2({ embedded = false }: { embedded?: boolean })
       {!embedded && <GlassHeaderPlate />}
       <main
         style={{
-          paddingBottom: 88,
+          paddingBottom: 'var(--bottom-nav-height, 96px)',
           // Bleed route: --header-h publishes 0 and .app-shell no longer pads
           // --sat, so the page owns top clearance for the floating island.
           ...(embedded

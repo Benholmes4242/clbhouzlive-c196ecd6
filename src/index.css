@@ -1111,7 +1111,7 @@ html, body, #root {
   --eh-safe-right: max(env(safe-area-inset-right), 16px);
   
   /* Bottom nav height for consistent spacing */
-  --bottom-nav-height: 88px;
+  --bottom-nav-height: 96px;
   
   /* Top 100 Region Colors - Premium identity per list */
   --region-global: 180 140 70;      /* soft gold / champagne - prestige, pinnacle */

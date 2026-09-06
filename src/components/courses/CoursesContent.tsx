@@ -424,7 +424,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                     {/* Clears the floating bottom nav; 0px where it hides. */}
                     <div
                       aria-hidden="true"
-                      style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }}
+                      style={{ height: 'calc(var(--bottom-nav-height, 96px) + 16px)' }}
                     />
                   </div>
 

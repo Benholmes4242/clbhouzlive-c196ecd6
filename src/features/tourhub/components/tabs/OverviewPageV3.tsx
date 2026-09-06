@@ -99,7 +99,7 @@ export function OverviewPageV3() {
           id="content-below-hero"
           className="relative z-10"
         >
-          <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 88 }}>
+          <div className="bg-background" style={{ display: 'flex', flexDirection: 'column', gap: SPACE.sectionSection, paddingTop: SPACE.sectionSection, paddingBottom: 'var(--bottom-nav-height, 96px)' }}>
             <WireOverviewSection />
             <LazySection minHeight={400}>
               <WorldRankingsSlot />

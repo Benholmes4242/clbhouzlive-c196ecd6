@@ -470,7 +470,7 @@ export function ScheduleTab() {
             })}
             <div
               aria-hidden="true"
-              style={{ height: 'calc(var(--bottom-nav-height, 88px) + 16px)' }}
+              style={{ height: 'calc(var(--bottom-nav-height, 96px) + 16px)' }}
             />
           </>
         )}
