@@ -543,6 +543,7 @@ export function CourseAnalyticsCard({
         <ListTerminalRow
           label={t('discover.coursesPlayed.seeFullAnalytics', 'See full course analytics')}
           onPress={() => onCoursePress?.(row.course_id)}
+          borderless={ctaBorderless}
         />
       </div>
     </div>
