@@ -493,7 +493,12 @@ Deno.serve(async (req) => {
     //
     // ORDER BY last_attempted_at, NOT last_synced_at: a row that cannot be
     // synced must move to the back of the queue rather than blocking it.
-    const nowIso = new Date().toISOString();
+    // Due WINDOW, not an exact comparison. next_sync_after is stamped at the
+    // moment each connection is processed, so values stagger by the sweep's
+    // duration past the cron tick; a bare `<= now()` then skips the whole
+    // cycle and the cadence silently degrades to 12h. The 5-minute horizon
+    // removes the boundary regardless of sweep duration or member count.
+    const nowIso = new Date(Date.now() + 5 * 60_000).toISOString();
     let query = admin
       .from("whs_connections")
       .select("id, user_id, passport_id, membership_number, vault_secret_id, consecutive_failures, initial_sync_complete")
