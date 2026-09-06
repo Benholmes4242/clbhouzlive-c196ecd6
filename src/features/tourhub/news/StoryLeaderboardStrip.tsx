@@ -16,7 +16,7 @@
  * nothing; PENDING renders a shell of its own height so the story list is not
  * shoved down under the reader's thumb after the fact.
  */
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -51,6 +51,16 @@ function Shell({ children }: { children?: React.ReactNode }) {
 export function StoryLeaderboardStrip({ tournamentId }: { tournamentId: string }) {
   const navigate = useNavigate();
   const { t } = useTranslation('tourhub');
+  const [isNarrowestViewport, setIsNarrowestViewport] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const query = window.matchMedia('(max-width: 320px)');
+    const update = () => setIsNarrowestViewport(query.matches);
+    update();
+    query.addEventListener?.('change', update);
+    return () => query.removeEventListener?.('change', update);
+  }, []);
 
   /**
    * The tournament RECORD. The story only carries an id, and deriveHeroState
@@ -103,7 +113,9 @@ export function StoryLeaderboardStrip({ tournamentId }: { tournamentId: string }
       facts.push({ label: t('overview.hero.venueLabel'), value: (tournament as any).venue_name });
     }
     const purse = (tournament as any).purse;
-    if (typeof purse === 'number' && purse > 0) {
+    // At the 320pt floor, keep the event and venue legible and drop the least
+    // load-bearing fact rather than allowing PURSE to be clipped at the edge.
+    if (!isNarrowestViewport && typeof purse === 'number' && purse > 0) {
       const m = purse / 1_000_000;
       facts.push({ label: t('overview.hero.purse'), value: m >= 10 ? `$${Math.round(m)}M` : `$${m.toFixed(1)}M` });
     }
