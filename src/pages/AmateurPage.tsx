@@ -17,6 +17,8 @@ import { rememberAmateurScroll, restoreAmateurScroll, takeAmateurScroll } from '
 import { useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { NAV_CLEARANCE } from '@/lib/navClearance';
+
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /**
@@ -84,7 +86,11 @@ export default function AmateurPage() {
       />
       <AmateurHero userId={user?.id} />
 
-      <main style={{ padding: '14px 14px 88px' }}>
+      {/* THE SHARED CLEARANCE, never a page-local number: the floating pill's
+          measured height + its 20px gap + 16px breathing + the home indicator.
+          When the pill grows, this page moves with it. */}
+      <main style={{ padding: `14px 14px ${NAV_CLEARANCE}` }}>
+
         <AmateurFilterRail filters={state.filters} onOpen={state.openPanel} />
         <AmateurLeaderboardBlock userId={user?.id} state={state} onRowPress={handleRow} />
         <AmateurCoursesBlock userId={user?.id} state={state} onCoursePress={handleCourse} />

@@ -7,7 +7,7 @@ import { RailChips } from '@/components/ui/RailChips';
 import { Z } from '@/config/zIndex';
 import { useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { withDiscoverReturn } from '@/components/explore-tab-new/discoverReturnState';
+
 
 /**
  * BRIEF_WATCH_SEE_ALL S3.2 — the solid, notch-safe header the two new library
@@ -33,9 +33,10 @@ export function LibraryChrome({ label }: { label: string }) {
       navigate(-1);
       return;
     }
-    // Cold entry has no Watch tab to return to, so land on it explicitly.
-    navigate('/explore', { replace: true, state: withDiscoverReturn(null, { tab: 'gallery', scrollY: 0 }) });
+    // Cold entry has no tab to return to, so land on the Amateur destination.
+    navigate('/amateur', { replace: true });
   }, [location.key, navigate]);
+
 
   return (
     <header

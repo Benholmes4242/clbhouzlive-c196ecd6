@@ -28,10 +28,12 @@ export const useNavigationHandlers = () => {
       setActiveTab('tourhub');
     } else if (location.pathname.startsWith('/courses')) {
   setActiveTab('courses');
-    } else if (location.pathname === '/explore' || location.pathname === '/watch') {
-      // id 'watch' now owns the Discover surface at /explore. '/watch' is kept
-      // here only so a dormant-route visit still highlights the right tab.
+    } else if (location.pathname === '/amateur' || location.pathname === '/explore' || location.pathname === '/watch') {
+      // id 'watch' now owns the Amateur destination at /amateur. '/explore' and
+      // '/watch' are kept here only so a shim/dormant-route visit still
+      // highlights the right tab while the redirect runs.
       setActiveTab('watch');
+
     }
   }, [location.pathname]);
 

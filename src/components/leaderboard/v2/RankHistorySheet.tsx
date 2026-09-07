@@ -82,7 +82,7 @@ function EmptyState() {
       <Button
         variant="outline"
         size="sm"
-        onClick={() => navigate('/explore')}
+        onClick={() => navigate('/amateur')}
         className="gap-2"
       >
         <Plus className="w-4 h-4" />

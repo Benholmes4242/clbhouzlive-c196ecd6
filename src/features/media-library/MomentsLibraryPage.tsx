@@ -5,6 +5,7 @@ import { useMomentsOfTheWeek, type Moment, type MomentsSort } from '@/components
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { LibraryChrome, LibraryHead, LoadMore, SortRail } from './LibraryChrome';
+import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { useMomentsLibraryTotal } from './libraryTotals';
 
 const GUTTER = 14;
@@ -53,10 +54,10 @@ export default function MomentsLibraryPage() {
 
   return (
     <div style={{ background: A.CANVAS, minHeight: '100dvh', color: A.INK, fontFamily: SANS, ...FIGS }}>
-      <LibraryChrome label="Moments" />
+      <LibraryChrome label="Media" />
       <main style={{ paddingTop: 'var(--library-header-h)' }}>
-        <div style={{ padding: `0 ${GUTTER}px 110px` }}>
-          <LibraryHead total={totalQuery.data ?? null} title="Moments" />
+        <div style={{ padding: `0 ${GUTTER}px ${NAV_CLEARANCE}` }}>
+          <LibraryHead total={totalQuery.data ?? null} title="Media" />
           <SortRail options={SORTS} value={sort} onChange={(next) => changeSort(next as MomentsSort)} />
 
           <MomentsGrid

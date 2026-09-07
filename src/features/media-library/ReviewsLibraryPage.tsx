@@ -4,6 +4,7 @@ import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { LibraryChrome, LibraryHead, LoadMore, SortRail } from './LibraryChrome';
+import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { useReviewLibraryTotal } from './libraryTotals';
 import {
   REVIEW_LIBRARY_SORTS,
@@ -49,7 +50,7 @@ export default function ReviewsLibraryPage() {
     <div style={{ background: A.CANVAS, minHeight: '100dvh', color: A.INK, fontFamily: SANS, ...FIGS }}>
       <LibraryChrome label="From the reviews" />
       <main style={{ paddingTop: 'var(--library-header-h)' }}>
-        <div style={{ padding: `0 ${GUTTER}px 110px` }}>
+        <div style={{ padding: `0 ${GUTTER}px ${NAV_CLEARANCE}` }}>
           <LibraryHead total={totalQuery.data ?? null} title="From the reviews" />
           <SortRail
             options={REVIEW_LIBRARY_SORTS.map((id) => ({ id, label: REVIEW_LIBRARY_SORT_LABELS[id] }))}

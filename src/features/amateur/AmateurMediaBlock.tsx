@@ -269,7 +269,7 @@ export function AmateurMediaBlock({
         onRightPress={() => {
           analyticsEvents.track('amateur_media_see_all_opened', { total });
           /* THE EXISTING ROUTE until /explore/media exists at cutover. */
-          onSeeAll('/explore/moments');
+          onSeeAll('/media');
         }}
       />
 

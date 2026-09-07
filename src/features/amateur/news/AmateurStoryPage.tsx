@@ -66,7 +66,7 @@ export function AmateurStoryPage() {
 
   return (
     <div style={{ background: SLATE_50, minHeight: '100dvh', fontFamily: FONT }}>
-      <NewsChromeBridge label="Amateur News" mode="back" backFallback="/explore" />
+      <NewsChromeBridge label="Amateur News" mode="back" backFallback="/amateur" />
       <div style={{ paddingTop: 'var(--news-header-h)' }}>
         {isPending ? (
           <div style={{ padding: 14 }}>
