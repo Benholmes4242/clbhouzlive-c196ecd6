@@ -14444,6 +14444,7 @@ export type Database = {
           is_business_verified: boolean | null
           is_official_club: boolean | null
           is_public: boolean | null
+          is_staff_account: boolean
           is_suspended: boolean
           is_system_account: boolean
           is_test: boolean
@@ -14570,6 +14571,7 @@ export type Database = {
           is_business_verified?: boolean | null
           is_official_club?: boolean | null
           is_public?: boolean | null
+          is_staff_account?: boolean
           is_suspended?: boolean
           is_system_account?: boolean
           is_test?: boolean
@@ -14696,6 +14698,7 @@ export type Database = {
           is_business_verified?: boolean | null
           is_official_club?: boolean | null
           is_public?: boolean | null
+          is_staff_account?: boolean
           is_suspended?: boolean
           is_system_account?: boolean
           is_test?: boolean
@@ -19110,29 +19113,19 @@ export type Database = {
       }
       get_admin_audiences: { Args: never; Returns: Json }
       get_admin_dashboard_glance: { Args: { p_tz?: string }; Returns: Json }
-      get_admin_event_aggregates:
-        | {
-            Args: {
-              p_days?: number
-              p_limit?: number
-              p_offset?: number
-              p_search?: string
-              p_sort?: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_days?: number
-              p_limit?: number
-              p_offset?: number
-              p_search?: string
-              p_sort?: string
-              p_stopped_min_count?: number
-              p_stopped_min_users?: number
-            }
-            Returns: Json
-          }
+      get_admin_event_aggregates: {
+        Args: {
+          p_days?: number
+          p_include_staff?: boolean
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_sort?: string
+          p_stopped_min_count?: number
+          p_stopped_min_users?: number
+        }
+        Returns: Json
+      }
       get_admin_event_daily: {
         Args: { p_days?: number; p_name: string; p_tz?: string }
         Returns: Json
@@ -19176,7 +19169,10 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["admin_role"]
       }
-      get_admin_top_content: { Args: { p_days?: number }; Returns: Json }
+      get_admin_top_content: {
+        Args: { p_days?: number; p_include_staff?: boolean }
+        Returns: Json
+      }
       get_all_users_admin: {
         Args: never
         Returns: {
