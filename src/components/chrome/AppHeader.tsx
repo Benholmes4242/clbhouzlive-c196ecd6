@@ -132,6 +132,31 @@ export function AppHeader({
 
   const isSelf = inset === 'self';
 
+  /* OVER-HERO CROSS-FADE. One passive scroll listener, only when asked for, and
+     the opacity is written straight onto the band — no re-render per frame
+     beyond the state the fade needs. */
+  const [fade, setFade] = useState(0);
+  useLayoutEffect(() => {
+    if (!overHero) return;
+    let raf = 0;
+    const read = () => {
+      raf = 0;
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      const next = Math.min(1, Math.max(0, y / Math.max(1, overHeroRange)));
+      setFade((prev) => (Math.abs(prev - next) < 0.02 && next !== 0 && next !== 1 ? prev : next));
+    };
+    const onScroll = () => {
+      if (raf === 0) raf = window.requestAnimationFrame(read);
+    };
+    read();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, [overHero, overHeroRange]);
+
+
   return (
     <>
       <header
