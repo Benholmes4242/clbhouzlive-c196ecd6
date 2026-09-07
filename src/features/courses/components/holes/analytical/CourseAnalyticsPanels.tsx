@@ -407,6 +407,9 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
   minRounds = 0,
   embedded = false,
   courseWideLabel = false,
+  explainEmpty = false,
+  courseName = null,
+
 }) => {
   const { t } = useTranslation(['courses']);
   const { user } = useSupabaseSession();
