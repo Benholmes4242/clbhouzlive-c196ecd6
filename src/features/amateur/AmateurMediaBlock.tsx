@@ -315,7 +315,7 @@ export function AmateurMediaBlock({
         </div>
       )}
 
-      <div style={{ marginTop: 22 }}>
+      <div style={{ marginTop: 32 }}>
         <DiscoverSectionHeading
           title="From the community"
           right={total > 0 ? `See all ${total}` : null}
