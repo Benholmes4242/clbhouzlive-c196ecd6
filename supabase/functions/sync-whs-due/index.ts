@@ -253,7 +253,12 @@ async function syncOneConnection(
             .from("gam_evaluation_queue")
             .upsert(
               enrichedIds.map((id) => ({
-                user_id: user.id,
+                // BRIEF_STREAKS_DERIVE_NOT_INCREMENT §6. Was `user.id`, which is
+                // not in scope in this loop (the loop is over connections), so
+                // this whole hole-arrival re-enqueue threw at runtime and the
+                // cron path never requeued. Use the connection's owner, exactly
+                // as _shared/counter-requeue.ts already does.
+                user_id: conn.user_id,
                 whs_score_id: id,
                 evaluator_version: 1,
                 status: "queued",
