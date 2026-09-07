@@ -1683,7 +1683,9 @@ async function updateRoundPlayedStreak(userId: string, stats: any) {
 }
 
 async function checkStreakBadges(userId: string, streakType: string, count: number) {
+  if (REBUILD_SUPPRESS) return; // history correction: no badge writes
   const badgeId = STREAK_BADGE_MAP[streakType];
+
   if (!badgeId) return;
   const { data: badge } = await supabase
     .from("gam_badge_catalogue")
