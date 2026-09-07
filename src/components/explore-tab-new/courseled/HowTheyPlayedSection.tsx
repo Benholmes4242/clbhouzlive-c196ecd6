@@ -6,6 +6,7 @@ import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
 import { r } from '@/lib/radius';
+import { CatalogueSearchField } from '@/components/ui/CatalogueSearchField';
 
 import { DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from './tokens';
 import { CourseAnalyticsCard } from './CoursesPlayedSection';
