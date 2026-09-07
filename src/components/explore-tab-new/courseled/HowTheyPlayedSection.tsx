@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, X } from 'lucide-react';
 
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
@@ -43,8 +42,6 @@ import type { BoardFilters } from './boardFilters';
  *
  * The searched course is COMPONENT STATE and resets on entry (S2.5).
  */
-
-const FIELD_H = 44;
 
 export interface HowTheyPlayedSectionProps {
   /** The top row of the selected course board — the default subject (S2.1). */
