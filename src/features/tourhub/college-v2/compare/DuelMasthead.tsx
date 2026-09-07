@@ -22,6 +22,7 @@ import {
   AMBER,
   CHARCOAL,
   FONT,
+  TOUR_EYEBROW,
   TOUR_HERO_BAND_H,
   GOLD,
   STATUS_LIVE_ON_DARK,
@@ -189,11 +190,9 @@ function DuelMastheadInner({ left, right, liveLeft, liveRight, onChangeLeft, onC
     >
       <div
         style={{
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: AMBER,
+          /* S5: Watch eyebrow treatment — and amber is reserved for the
+             viewing member, so this eyebrow is A.DIM. */
+          ...TOUR_EYEBROW,
           textAlign: 'center',
           marginBottom: 12,
         }}

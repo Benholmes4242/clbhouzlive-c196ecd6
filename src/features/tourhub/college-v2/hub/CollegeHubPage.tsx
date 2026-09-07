@@ -26,6 +26,7 @@ import {
   FONT,
   HAIRLINE_INK_10,
   INK,
+  TOUR_EYEBROW,
   TOUR_HERO_BAND_H,
   INK_FAINT,
   INK_MUTE,
@@ -277,11 +278,8 @@ export function CollegeHubPage() {
           >
             <div
               style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-                color: AMBER,
+                /* S5: Watch eyebrow treatment; amber stays reserved. */
+                ...TOUR_EYEBROW,
                 marginBottom: 6,
               }}
             >

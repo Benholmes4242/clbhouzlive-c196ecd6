@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import {
   CHARCOAL,
   FONT,
+  TOUR_EYEBROW,
   TOUR_HERO_BAND_H,
   GOLD,
   STATUS_LIVE_ON_DARK,
@@ -191,11 +192,8 @@ export function CollegeHeroMasthead({
       <div style={{ width: '100%', minWidth: 0 }}>
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: WHITE_ALPHA_55,
+            /* S5: Watch eyebrow treatment. */
+            ...TOUR_EYEBROW,
             marginBottom: 2,
           }}
         >

@@ -255,3 +255,19 @@ export const HERO_MIN_H =
  * (/courses, /courses/:id, GolfClubView) and must not be changed.
  */
 export const TOUR_HERO_BAND_H = '244px';
+
+/**
+ * TOUR_EYEBROW — BRIEF_TOUR_FIXED_HEADER S5.
+ *
+ * The Watch tab's eyebrow, verbatim: 9.5 / 700 / 0.13em caps in A.DIM, cased by
+ * `textTransform` so the source string stays sentence case and translations are
+ * not shouted at by `toUpperCase()`. This is the eyebrow ONLY — section
+ * headings stay on the 11px kicker.
+ */
+export const TOUR_EYEBROW = {
+  fontSize: 9.5,
+  fontWeight: 700,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase' as const,
+  color: 'rgba(248,250,252,0.42)',
+};
