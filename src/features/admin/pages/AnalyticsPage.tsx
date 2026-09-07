@@ -591,20 +591,22 @@ function EarlyDataChip() {
  * to show, so the card says the dull true thing instead of the interesting
  * false one.
  */
-function TooThinToRank({ label, total, unit, overFloor, floor }: {
-  label: string; total: number; unit: string; overFloor: number; floor: number;
+function TooThinToRank({ total, unitLabel, itemNoun, overFloor, floor }: {
+  total: number; unitLabel: string; itemNoun: string; overFloor: number; floor: number;
 }) {
   return (
     <div style={{
       border: `1px solid ${t.line}`, borderRadius: 14, padding: 12, background: t.canvas,
     }}>
-      <div style={{ color: t.ink, fontSize: 13.5, fontWeight: 700 }}>
-        {fmtInt(total)} {unit} in this period
+      <div style={{ color: t.ink, fontSize: 13.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+        {fmtInt(total)} {unitLabel} in this period
       </div>
       <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 4, lineHeight: 1.45 }}>
-        Too thin to rank: {overFloor === 0 ? 'nothing' : `only ${fmtInt(overFloor)}`} clear{overFloor === 1 ? 's' : ''}{' '}
-        {floor} {unit.split(' ')[0]}, and a {label} needs at least {MIN_RANKABLE_ROWS}.
-        Ordering what is left would describe one member's afternoon.
+        Too thin to rank. {overFloor === 0
+          ? `No ${itemNoun} reached ${floor}`
+          : `Only ${fmtInt(overFloor)} ${overFloor === 1 ? itemNoun.replace(/s$/, '') : itemNoun} reached ${floor}`}
+        , and a ranking needs at least {MIN_RANKABLE_ROWS}. Ordering threes and fours
+        would look like knowledge without being it.
       </div>
     </div>
   );
@@ -642,9 +644,9 @@ function TopContentSection({ period }: { period: AnalyticsPeriod }) {
               <EmptyState title="No post engagement yet" />
             ) : data.postsOverFloor < MIN_RANKABLE_ROWS ? (
               <TooThinToRank
-                label="ranking"
                 total={data.postEngagementsTotal}
-                unit="post engagements"
+                unitLabel="post engagements"
+                itemNoun="posts"
                 overFloor={data.postsOverFloor}
                 floor={data.minSample}
               />
@@ -702,9 +704,9 @@ function TopContentSection({ period }: { period: AnalyticsPeriod }) {
               <EmptyState title="No course views yet" />
             ) : data.coursesOverFloor < MIN_RANKABLE_ROWS ? (
               <TooThinToRank
-                label="ranking"
                 total={data.courseViewsTotal}
-                unit="course views"
+                unitLabel="course views"
+                itemNoun="courses"
                 overFloor={data.coursesOverFloor}
                 floor={data.minSample}
               />
