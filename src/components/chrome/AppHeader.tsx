@@ -50,7 +50,17 @@ export interface AppHeaderProps {
   inset?: 'self' | 'shell';
   /** CSS custom property published with the measured band height. */
   heightVar?: string;
+  /**
+   * OVER-HERO MODE (opt-in, Amateur page). The band starts transparent so a
+   * full-bleed hero runs under it, and cross-fades to the solid canvas as the
+   * hero leaves. Omitted = the solid band every other surface already has.
+   */
+  overHero?: boolean;
+  /** Scroll distance the cross-fade completes over. Default 180px. */
+  overHeroRange?: number;
 }
+
+
 
 /** The Tour burger — glass values taken from GlassDurationBadge, not re-derived. */
 export function AppHeaderBurger({ onTap, label }: { onTap: () => void; label: string }) {
@@ -90,6 +100,9 @@ export function AppHeader({
   tabsAriaLabel = 'Sections',
   inset = 'self',
   heightVar = '--discover-header-h',
+  overHero = false,
+  overHeroRange = 180,
+
 }: AppHeaderProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -119,6 +132,31 @@ export function AppHeader({
 
   const isSelf = inset === 'self';
 
+  /* OVER-HERO CROSS-FADE. One passive scroll listener, only when asked for, and
+     the opacity is written straight onto the band — no re-render per frame
+     beyond the state the fade needs. */
+  const [fade, setFade] = useState(0);
+  useLayoutEffect(() => {
+    if (!overHero) return;
+    let raf = 0;
+    const read = () => {
+      raf = 0;
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      const next = Math.min(1, Math.max(0, y / Math.max(1, overHeroRange)));
+      setFade((prev) => (Math.abs(prev - next) < 0.02 && next !== 0 && next !== 1 ? prev : next));
+    };
+    const onScroll = () => {
+      if (raf === 0) raf = window.requestAnimationFrame(read);
+    };
+    read();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, [overHero, overHeroRange]);
+
+
   return (
     <>
       <header
@@ -133,8 +171,11 @@ export function AppHeader({
           zIndex: DISCOVER_HEADER_Z,
           // 'self' pays the notch; 'shell' must not — .app-shell already did.
           paddingTop: isSelf ? 'env(safe-area-inset-top, 0px)' : 0,
-          background: A.CANVAS,
-          borderBottom: `1px solid ${A.BORDER}`,
+          background: overHero
+            ? `color-mix(in srgb, ${A.CANVAS} ${Math.round(fade * 100)}%, transparent)`
+            : A.CANVAS,
+          borderBottom: overHero && fade < 0.98 ? '1px solid transparent' : `1px solid ${A.BORDER}`,
+
           fontFamily: SANS,
         }}
       >

@@ -313,6 +313,7 @@ const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
 const TourNewsStoryPage = lazy(() => import("./features/tourhub/news/StoryPage").then(m => ({ default: m.StoryPage })));
 const WireNewsPage = lazy(() => import("./features/tourhub/news/WireNewsPage"));
 const AmateurNewsPage = lazy(() => import("./features/amateur/news/AmateurNewsPage"));
+const AmateurPage = lazy(() => import("./pages/AmateurPage"));
 const AmateurStoryPage = lazy(() => import("./features/amateur/news/AmateurStoryPage"));
 
 const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubMainPage })));
@@ -578,6 +579,10 @@ function AppRoutes() {
         {/* Amateur News. Declared BEFORE /discover/* so the index is not eaten by
             a broader discover route, and both are gate-exempt so a shared link
             reads for a guest. */}
+        {/* BRIEF_AMATEUR_PAGE — the Amateur destination. Shell, header and hero
+            first; the four blocks land beneath the hero one at a time. */}
+        <Route path="/amateur" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurPage /></Suspense>} />
+
         <Route path="/discover/news" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurNewsPage /></Suspense>} />
         <Route path="/discover/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><AmateurStoryPage /></Suspense>} />
 
