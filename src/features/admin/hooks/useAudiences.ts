@@ -1,119 +1,88 @@
 /**
  * Audience segment head-counts for the Analytics > Growth "Audiences" grid.
  *
- * Reuses the EXACT predicates the Members page filter uses
- * (imported from ../lib/memberPredicates — single source of truth).
- * Uses cheap head-count queries where possible; falls back to a lightweight
- * profiles select when a segment can only be evaluated in JS. No history —
- * we have no snapshot table, so cards display current size only.
+ * SERVER-SIDE ONLY. Every figure comes from get_admin_audiences(), one row
+ * computed in Postgres.
+ *
+ * WHY NOT RAW SELECTS (do not reintroduce them):
+ * this hook used to pull analytics_events rows into the browser with a nominal
+ * 50,000 limit and count distinct users in JavaScript. PostgREST caps a
+ * response at 2000 rows whatever limit you ask for, and with no ORDER BY the
+ * rows returned are physical order — the OLDEST slice of an append-only table.
+ * Recent activity was therefore never seen: members active last week fell out
+ * of the active set and landed in dormant (89 shown against a true 59).
+ * Raising the limit does not fix it; adding .order() inverts the bug. The
+ * aggregation belongs in the database.
+ *
+ * POPULATION: user_profiles with deleted_at IS NULL and is_system_account =
+ * false — the same set MEMBERS counts, minus the flagged service account.
+ * Events belonging to deleted accounts stay as history but join to no member,
+ * so they cannot inflate any count.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  newThisWeekCutoffMs, active24hCutoffMs, dormantCutoffMs,
-  EG_AUTH_FAILED_STATUSES,
-} from '../lib/memberPredicates';
-
-async function headCount(builder: () => Promise<{ count: number | null }>): Promise<number> {
-  const { count } = await builder();
-  return count ?? 0;
-}
-
-async function fetchAudiences() {
-  const nowIso = new Date().toISOString();
-  void nowIso;
-
-  const newThisWeekISO = new Date(newThisWeekCutoffMs()).toISOString();
-  const active24hISO = new Date(active24hCutoffMs()).toISOString();
-  const dormantISO = new Date(dormantCutoffMs()).toISOString();
-
-  // 1) New this week: profiles created in the last 7d (head count).
-  const newThisWeekP = supabase
-    .from('user_profiles')
-    .select('id', { count: 'exact', head: true })
-    .is('deleted_at', null)
-    .gte('created_at', newThisWeekISO);
-
-  // 2) Active 24h: distinct user_ids on analytics_events in last 24h.
-  // Head-count cannot dedupe, so pull the id column bounded and count.
-  const active24hP = supabase
-    .from('analytics_events')
-    .select('user_id')
-    .gte('created_at', active24hISO)
-    .not('user_id', 'is', null)
-    .limit(50000);
-
-  // 3) Dormant 14d+: profiles NOT present in the active-in-last-14d set.
-  // Head-count total profiles, then subtract distinct active-in-14d.
-  const totalProfilesP = supabase
-    .from('user_profiles')
-    .select('id', { count: 'exact', head: true })
-    .is('deleted_at', null);
-  const active14dP = supabase
-    .from('analytics_events')
-    .select('user_id')
-    .gte('created_at', dormantISO)
-    .not('user_id', 'is', null)
-    .limit(50000);
-
-  // 4) EG linked: whs_connections row count (display-only card).
-  const egLinkedP = supabase
-    .from('whs_connections')
-    .select('user_id', { count: 'exact', head: true });
-
-  // 5) EG issues: whs_connections with auth_failed status.
-  const egIssuesP = supabase
-    .from('whs_connections')
-    .select('user_id', { count: 'exact', head: true })
-    .in('last_sync_status', EG_AUTH_FAILED_STATUSES as unknown as string[]);
-
-  // 6) Suspended: user_profiles.is_suspended = true.
-  const suspendedP = supabase
-    .from('user_profiles')
-    .select('id', { count: 'exact', head: true })
-    .is('deleted_at', null)
-    .eq('is_suspended', true);
-
-  const [
-    newThisWeek, active24hRows, totalProfiles, active14dRows,
-    egLinked, egIssues, suspended,
-  ] = await Promise.all([
-    headCount(async () => await newThisWeekP),
-    active24hP,
-    headCount(async () => await totalProfilesP),
-    active14dP,
-    headCount(async () => await egLinkedP),
-    headCount(async () => await egIssuesP),
-    headCount(async () => await suspendedP),
-  ]);
-
-  const active24hCount = new Set((active24hRows.data ?? []).map(r => r.user_id).filter(Boolean) as string[]).size;
-  const active14dCount = new Set((active14dRows.data ?? []).map(r => r.user_id).filter(Boolean) as string[]).size;
-  const dormantCount = Math.max(0, totalProfiles - active14dCount);
-
-  return {
-    new_this_week: newThisWeek,
-    active_24h: active24hCount,
-    dormant_14d: dormantCount,
-    eg_linked: egLinked,
-    eg_issues: egIssues,
-    suspended,
-  };
-}
 
 export interface AudienceSizes {
+  /** The population every segment below is a subset of. */
+  members: number;
   new_this_week: number;
   active_24h: number;
   dormant_14d: number;
   eg_linked: number;
   eg_issues: number;
   suspended: number;
+  /** Funnel figure, NOT an audience: accounts that never confirmed. */
+  incomplete_signups: number;
+  /** Midnight-anchored. */
+  dau_today: number;
+  wau: number;
+  mau: number;
+}
+
+const KEYS: (keyof AudienceSizes)[] = [
+  'members', 'new_this_week', 'active_24h', 'dormant_14d', 'eg_linked',
+  'eg_issues', 'suspended', 'incomplete_signups', 'dau_today', 'wau', 'mau',
+];
+
+function mapRow(raw: unknown): AudienceSizes {
+  if (!raw || typeof raw !== 'object') throw new Error('Audiences: no data returned');
+  const o = raw as Record<string, unknown>;
+  const out = {} as AudienceSizes;
+  for (const k of KEYS) {
+    const v = o[k];
+    const n = typeof v === 'string' ? Number(v) : v;
+    if (typeof n !== 'number' || !Number.isFinite(n)) {
+      throw new Error(`Audiences: ${k} missing from the RPC payload`);
+    }
+    out[k] = n;
+  }
+  return out;
+}
+
+/**
+ * ARITHMETIC IDENTITIES, not thresholds. A break means a count has stopped
+ * describing the member population — show an error, never a number.
+ */
+export function assertAudienceInvariants(a: AudienceSizes): void {
+  const fail = (msg: string) => { throw new Error(`Audiences invariant broken: ${msg}`); };
+  if (!(a.dau_today <= a.wau)) fail(`DAU ${a.dau_today} > WAU ${a.wau}`);
+  if (!(a.wau <= a.mau)) fail(`WAU ${a.wau} > MAU ${a.mau}`);
+  if (!(a.mau <= a.members)) fail(`MAU ${a.mau} > MEMBERS ${a.members}`);
+  if (!(a.wau + a.dormant_14d <= a.members)) fail(`WAU ${a.wau} + DORMANT ${a.dormant_14d} > MEMBERS ${a.members}`);
+  if (!(a.dormant_14d >= a.members - a.mau)) fail(`DORMANT ${a.dormant_14d} < MEMBERS ${a.members} - MAU ${a.mau}`);
+  if (!(a.active_24h + a.dormant_14d <= a.members)) fail(`ACTIVE 24H ${a.active_24h} + DORMANT ${a.dormant_14d} > MEMBERS ${a.members}`);
 }
 
 export function useAudiences() {
   return useQuery<AudienceSizes>({
     queryKey: ['admin-v2', 'analytics', 'audiences'],
-    queryFn: fetchAudiences,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_admin_audiences' as never);
+      if (error) throw error;
+      const mapped = mapRow(data);
+      assertAudienceInvariants(mapped);
+      return mapped;
+    },
     staleTime: 5 * 60_000,
   });
 }

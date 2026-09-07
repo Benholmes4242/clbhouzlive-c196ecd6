@@ -434,9 +434,15 @@ function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
         to="/admin-v2/analytics?tab=engagement"
         loading={wLoading}
       />
+      {/*
+        MIDNIGHT-ANCHORED, and the label says so. Audiences carries a ROLLING
+        24-hour count, which is legitimately a different (larger) number: two
+        cards must never appear to claim the same thing and disagree.
+      */}
       <MetricCard
-        label="DAU"
+        label="DAU (since midnight)"
         value={wLoading ? null : aw!.dau.current}
+
         delta={wLoading ? undefined : pctDelta(aw!.dau.current, aw!.dau.previous)}
         deltaLabel="vs same day last week"
         sparkline={aw?.daily.map(d => d.dau)}

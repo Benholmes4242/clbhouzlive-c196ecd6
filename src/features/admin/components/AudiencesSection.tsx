@@ -14,7 +14,7 @@ interface CardDef {
 
 const CARDS: CardDef[] = [
   { slug: 'new_this_week', name: 'New this week', definition: 'Members who joined in the last 7 days' },
-  { slug: 'active_24h',    name: 'Active 24h',    definition: 'Members with any event in the last 24 hours' },
+  { slug: 'active_24h',    name: 'Active 24h',    definition: 'Rolling 24 hours, not since midnight' },
   { slug: 'dormant_14d',   name: 'Dormant 14d+',  definition: 'No activity for 14 or more days' },
   { slug: 'eg_linked',     name: 'EG linked',     definition: 'Members with an England Golf connection' },
   { slug: 'eg_issues',     name: 'EG issues',     definition: 'EG connection sync is auth-failed' },
@@ -35,8 +35,14 @@ export default function AudiencesSection() {
       </div>
 
       {q.isError ? (
-        <AdminErrorState title="Couldn't load audiences" onRetry={() => q.refetch()} />
+        /* An invariant break lands here too: an error, never a number. */
+        <AdminErrorState
+          title="Couldn't load audiences"
+          message={q.error instanceof Error ? q.error.message : undefined}
+          onRetry={() => q.refetch()}
+        />
       ) : (
+        <>
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10,
         }}>
@@ -54,7 +60,26 @@ export default function AudiencesSection() {
             );
           })}
         </div>
+
+        {/*
+          SET APART DELIBERATELY. Incomplete signups is a FUNNEL figure, not an
+          audience: these accounts never confirmed, sit outside the member
+          population, and must never be counted as members.
+        */}
+        <div style={{ borderTop: `1px solid ${t.line}`, paddingTop: 12 }}>
+          <div style={{ maxWidth: 260 }}>
+            <CardBody
+              name="Incomplete signups"
+              size={q.data ? q.data.incomplete_signups : null}
+              definition="Started signing up, never confirmed"
+              clickable={false}
+              loading={q.isLoading}
+            />
+          </div>
+        </div>
+        </>
       )}
+
     </div>
   );
 }

@@ -14445,6 +14445,7 @@ export type Database = {
           is_official_club: boolean | null
           is_public: boolean | null
           is_suspended: boolean
+          is_system_account: boolean
           is_test: boolean
           is_verified: boolean | null
           is_verified_business: boolean
@@ -14570,6 +14571,7 @@ export type Database = {
           is_official_club?: boolean | null
           is_public?: boolean | null
           is_suspended?: boolean
+          is_system_account?: boolean
           is_test?: boolean
           is_verified?: boolean | null
           is_verified_business?: boolean
@@ -14695,6 +14697,7 @@ export type Database = {
           is_official_club?: boolean | null
           is_public?: boolean | null
           is_suspended?: boolean
+          is_system_account?: boolean
           is_test?: boolean
           is_verified?: boolean | null
           is_verified_business?: boolean
@@ -19101,6 +19104,7 @@ export type Database = {
         Args: { p_spark_days?: number }
         Returns: Json
       }
+      get_admin_audiences: { Args: never; Returns: Json }
       get_admin_funnel_cohorts: { Args: { p_weeks?: number }; Returns: Json }
       get_admin_member_actions: { Args: { p_days?: number }; Returns: Json }
       get_admin_ops_health: {
