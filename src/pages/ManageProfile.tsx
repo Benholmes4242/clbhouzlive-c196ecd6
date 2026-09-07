@@ -45,6 +45,7 @@ import { ProfilePhotoCard, type ProfilePhotoCardHandle } from '@/components/prof
 import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
 import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
 import { AdditionalClubsList } from '@/components/profile/edit-v2/AdditionalClubsList';
+import { VisibilityRow, type VisibilityValue } from '@/components/profile/edit-v2/VisibilityDropdown';
 
 import { HandicapInput } from '@/components/profile/edit-v2/HandicapInput';
 import { BioWebsitesSection } from '@/components/profile/edit-v2/BioWebsitesSection';
