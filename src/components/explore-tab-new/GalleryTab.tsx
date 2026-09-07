@@ -7,6 +7,7 @@ import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 import { MomentsGrid } from './courseled/MomentsGrid';
 import { autoplayBlocked, registerReviewVideo } from './courseled/reviewVideoAutoplay';
 import { attachTileHls } from './courseled/tileHlsPlayer';
@@ -20,30 +21,6 @@ import type { CommunityLibraryItem } from './courseled/hooks/useCommunityLibrary
 
 const GUTTER = 14;
 const SECTION_GAP = 36;
-
-/**
- * BRIEF_WATCH_SEE_ALL S1 — every section head carries a See all with its REAL
- * LIBRARY TOTAL, taken from a count query over the section's own source rather
- * than the length of the capped rail beside it. The action is withheld while
- * the count is unresolved: a See all with no number, or with a page-level
- * figure dressed as a library total, is worse than none.
- */
-function SectionHead({ title, total, onSeeAll }: { title: string; total?: number | null; onSeeAll?: () => void }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
-      <h2 style={{ margin: 0, font: `700 11px/1 ${SANS}`, letterSpacing: 0, color: A.INK, textTransform: 'uppercase' }}>{title}</h2>
-      {onSeeAll && typeof total === 'number' && total > 0 && (
-        <button
-          type="button"
-          onClick={onSeeAll}
-          style={{ padding: 0, border: 0, background: 'transparent', color: A.MUTE, font: `700 11px/1 ${SANS}`, cursor: 'pointer', whiteSpace: 'nowrap' }}
-        >
-          See all {total}
-        </button>
-      )}
-    </div>
-  );
-}
 
 const GALLERY_AUTOPLAY_GROUP = 'discover-gallery-video-rails';
 
@@ -158,13 +135,13 @@ export function GalleryTab({ onOpenPost, onOpenReview, onSeeAll }: { onOpenPost:
     <main style={{ paddingTop: 'var(--discover-header-h, calc(env(safe-area-inset-top, 0px) + 78px))', minHeight: '100dvh', background: A.CANVAS, color: A.INK, fontFamily: SANS }}>
       <div style={{ padding: `18px ${GUTTER}px 110px` }}>
         {clips.length > 0 && (
-        <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="Clips" total={hubCounts.data?.clip_count ?? null} onSeeAll={() => onSeeAll('/watch/clips')} />
+        <section style={{ marginBottom: SECTION_GAP }}><DiscoverSectionHeading title="Clips" right={typeof (hubCounts.data?.clip_count ?? null) === 'number' && (hubCounts.data?.clip_count ?? null) > 0 ? `See all ${(hubCounts.data?.clip_count ?? null)}` : null} onRightPress={() => onSeeAll('/watch/clips')} />
           <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform', marginRight: -GUTTER, paddingRight: GUTTER }}>{clips.map((item, index) => <RailTile key={item.key} item={item} index={index} width={176} onPress={() => onOpenPost(clips, item, 'discover-clips')} />)}</div>
         </section>
         )}
 
         {reviews.length > 0 && (
-        <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="From the reviews" total={reviewTotal.data ?? null} onSeeAll={() => onSeeAll('/explore/reviews')} />
+        <section style={{ marginBottom: SECTION_GAP }}><DiscoverSectionHeading title="From the reviews" right={typeof (reviewTotal.data ?? null) === 'number' && (reviewTotal.data ?? null) > 0 ? `See all ${(reviewTotal.data ?? null)}` : null} onRightPress={() => onSeeAll('/explore/reviews')} />
           <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform', marginRight: -GUTTER, paddingRight: GUTTER }}>{reviews.map((review) => <button key={review.reviewId} type="button" onClick={() => setPendingReview({ courseId: review.courseId, reviewId: review.reviewId, mediaUrl: review.mediaUrl ?? null, posterUrl: review.posterUrl ?? review.mediaUrl })} style={{ position: 'relative', width: 196, flex: '0 0 196px', padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}><div style={{ position: 'relative', aspectRatio: '4 / 5', borderRadius: 10, overflow: 'hidden', background: A.PANEL }}><img src={review.posterUrl ?? review.mediaUrl ?? ''} alt="" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /><GlassBadge corner="top-left"><span style={{ color: A.AMBER }}>{review.rating.toFixed(1)}</span><span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,.72)' }}>/10</span></GlassBadge>{(review.mediaCount ?? 1) > 1 && <GlassBadge>+{(review.mediaCount ?? 1) - 1}</GlassBadge>}</div><div style={{ marginTop: 7, fontSize: 12, fontWeight: 700 }}>{review.courseName}</div><div style={{ marginTop: 2, fontSize: 11, color: A.MUTE }}>{review.reviewerName}</div></button>)}</div>
         </section>
         )}
@@ -175,13 +152,13 @@ export function GalleryTab({ onOpenPost, onOpenReview, onSeeAll }: { onOpenPost:
             same join later. */}
 
         {moments.length > 0 && (
-        <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="Moments" total={momentsTotal.data ?? null} onSeeAll={() => onSeeAll('/explore/moments')} />
+        <section style={{ marginBottom: SECTION_GAP }}><DiscoverSectionHeading title="Moments" right={typeof (momentsTotal.data ?? null) === 'number' && (momentsTotal.data ?? null) > 0 ? `See all ${(momentsTotal.data ?? null)}` : null} onRightPress={() => onSeeAll('/explore/moments')} />
           <MomentsGrid moments={moments} cap={6} gap={5} tall={250} radius={10} onTilePress={(moment) => onOpenPost(momentItems, momentItems.find((entry) => entry.key === moment.key) ?? momentItems[0], 'discover-moments')} autoplayGroup={GALLERY_AUTOPLAY_GROUP} />
         </section>
         )}
 
         {videos.length > 0 && (
-        <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="Videos" total={hubCounts.data?.video_count ?? null} onSeeAll={() => onSeeAll('/watch/videos')} />
+        <section style={{ marginBottom: SECTION_GAP }}><DiscoverSectionHeading title="Videos" right={typeof (hubCounts.data?.video_count ?? null) === 'number' && (hubCounts.data?.video_count ?? null) > 0 ? `See all ${(hubCounts.data?.video_count ?? null)}` : null} onRightPress={() => onSeeAll('/watch/videos')} />
           <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform', marginRight: -GUTTER, paddingRight: GUTTER }}>{videos.map((item, index) => <RailTile key={item.key} item={item} index={clips.length + index} width={250} onPress={() => onOpenPost(videos, item, 'discover-videos')} />)}</div>
         </section>
         )}

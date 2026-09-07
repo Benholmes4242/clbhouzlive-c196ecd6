@@ -12,7 +12,7 @@ import { CoursesPlayedSeeAllSheet } from './CoursesPlayedSeeAllSheet';
 import { CourseBoardRows } from './CourseBoardRows';
 import { HowTheyPlayedSection } from './HowTheyPlayedSection';
 import { ListTerminalRow } from './ListTerminalRow';
-import { SectionHeadline } from './SectionHeadline';
+import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 import { describeFilterParts } from './GolfThisWeek';
 import { useBoardFacets } from './hooks/useBoardFacets';
 import { useBoardPage, type BoardRow } from './hooks/useBoardPage';
@@ -285,7 +285,7 @@ export function ScoresTab({
           scrollMarginTop: 'var(--discover-header-h, var(--chrome-total-h, 55px))',
         }}
       >
-        <SectionHeadline title={boardTitle} count={memberUnit} />
+        <DiscoverSectionHeading title={boardTitle} right={memberUnit} />
         <BoardRail
           keys={MEMBER_BOARD_KEYS}
           activeKey={board}
@@ -337,7 +337,7 @@ export function ScoresTab({
 
       {/* ================= COURSES ================= */}
       <div style={{ paddingTop: 26 }}>
-        <SectionHeadline title={courseBoardTitle} count={courseUnit} />
+        <DiscoverSectionHeading title={courseBoardTitle} right={courseUnit} />
         <BoardRail
           keys={COURSE_BOARD_KEYS}
           activeKey={courseBoard}

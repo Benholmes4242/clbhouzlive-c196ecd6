@@ -12,7 +12,7 @@ import { CourseAnalyticsCard } from './CoursesPlayedSection';
 import { CourseCardPanel } from '@/features/courses/components/holes/analytical/CourseCardPanel';
 import { ListTerminalRow } from './ListTerminalRow';
 import { CourseImageFallback } from './CourseImageFallback';
-import { SectionHeadline } from './SectionHeadline';
+import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 import { useSearchedCourse } from './hooks/useSearchedCourse';
 import type { BoardCourseRow } from './hooks/useBoardCourses';
 import type { BoardFilters } from './boardFilters';
@@ -94,7 +94,7 @@ export function HowTheyPlayedSection({
 
   return (
     <div style={{ marginTop: 26, fontFamily: SANS, ...FIGS }}>
-      <SectionHeadline title={t('discover.scores.courseAnalytics', 'Course analytics')} />
+      <DiscoverSectionHeading title={t('discover.scores.courseAnalytics', 'Course analytics')} />
       {/* S2.2 — the field, full width, above the card. Shared with the college Yearbook. */}
       <div style={{ position: 'relative', marginBottom: 10 }}>
         <CatalogueSearchField

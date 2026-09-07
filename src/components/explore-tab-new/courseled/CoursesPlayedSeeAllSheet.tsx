@@ -7,7 +7,7 @@ import { FIGS, SANS } from './tokens';
 import { COURSE_BOARD_KEYS, COURSE_BOARD_LABELS, type BoardFilters, type CourseBoardKey } from './boardFilters';
 import { useBoardCourses } from './hooks/useBoardCourses';
 import { CourseBoardRows } from './CourseBoardRows';
-import { SectionHeadline } from './SectionHeadline';
+import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 
 /**
  * COURSES — SEE ALL (BRIEF_SCORES_COURSE_ROWS_AND_SEE_ALL_SHEET S2).
@@ -80,7 +80,7 @@ export function CoursesPlayedSeeAllSheet({
           </button>
         </div>
         <div id="courses-see-all-title">
-          <SectionHeadline title={title} count={count} />
+          <DiscoverSectionHeading title={title} right={count} />
         </div>
         <div style={{ ...KICKER, marginTop: -4, marginBottom: 10, color: A.MUTE }}>
           {appliedParts.map((part, index) => (

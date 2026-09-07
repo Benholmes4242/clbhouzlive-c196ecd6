@@ -19,6 +19,7 @@ import { storyTime } from '@/features/tourhub/news/storyTime';
 import type { TourStory } from '@/features/tourhub/news/useTourStories';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { r } from '@/lib/radius';
+import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 
 /** A tour story, or an amateur story (which extends it with two extra fields). */
 export interface NewsStory extends TourStory {
@@ -193,16 +194,24 @@ export function WireItem({ story, onOpen }: StoryShapeProps) {
 }
 
 /** THE CHIP RAIL. One scrolling row, never wrapping, no right-hand action. */
-export function StoryChipRail({ heading, id, chips, selected, onSelect }: {
+export function StoryChipRail({ heading, id, chips, selected, onSelect, sentenceHeading }: {
   heading: string;
   id: string;
   chips: Array<{ key: string; label: string; count: number }>;
   selected: string | null;
   onSelect: (key: string | null) => void;
+  /**
+   * OPT-IN (BRIEF_DISCOVER_SECTION_HEADS_SENTENCE_CASE). Absent means the rail
+   * renders exactly as it always has, so Tour Hub's Wire is untouched by
+   * omission rather than by edit. Discover's NEWS tab passes it.
+   */
+  sentenceHeading?: boolean;
 }) {
   return (
     <section aria-labelledby={id} style={{ marginTop: 24 }}>
-      <h2 id={id} style={{ ...KICKER, margin: '0 0 10px', color: A.INK }}>{heading}</h2>
+      {sentenceHeading
+        ? <DiscoverSectionHeading id={id} title={heading} />
+        : <h2 id={id} style={{ ...KICKER, margin: '0 0 10px', color: A.INK }}>{heading}</h2>}
       <div className="scrollbar-hide" style={{ display: 'flex', gap: 8, overflowX: 'auto', flexWrap: 'nowrap', willChange: 'transform', paddingBottom: 1 }}>
         {chips.map((chip) => (
           <Button
