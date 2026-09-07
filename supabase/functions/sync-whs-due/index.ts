@@ -196,9 +196,16 @@ async function syncOneConnection(
     console.warn(`[sync] pre-upsert snapshot failed for ${conn.id} (non-fatal):`, err);
   }
 
+  // is_counter snapshot around the upsert (ADDENDUM A §2). Uses conn.user_id —
+  // the connection's owner — not the England Golf user details object.
+  const counterBefore = scores ? await snapshotCounterFlags(admin, conn.id) : null;
   const scoreUpsert = scores
     ? await upsertScores(admin, conn.id, scores.Scores)
     : { written: 0, rejected: 0, failures: [] as Array<{ whsScoreUid: string | null }> };
+  if (counterBefore) {
+    await requeueCounterFlips(admin, conn.id, conn.user_id, counterBefore);
+  }
+
   const scoresUpserted = scoreUpsert.written;
   const friendsUpserted = friends ? await upsertFriends(admin, conn.id, friends.Friends) : 0;
 
