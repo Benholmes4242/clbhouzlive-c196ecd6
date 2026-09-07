@@ -198,6 +198,9 @@ export function AmateurMediaBlock({
           mediaId: review.mediaId ?? undefined,
           isCourseLead: true,
           region: review.courseSubCountry,
+          /* THE RATING TRAVELS WITH THE PHOTOGRAPH. It was always on the review
+             row; it simply was not mapped, which is why no chip rendered. */
+          rating: review.rating,
           aspect: null,
         })),
     [reviewsQuery.reviews],
