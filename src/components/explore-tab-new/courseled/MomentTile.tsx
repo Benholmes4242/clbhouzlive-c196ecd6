@@ -242,6 +242,41 @@ export function MomentTile({
             }}
           />
         )}
+
+        {/* RATING CHIP — top-left, review photographs only. A moment carries no
+            rating and therefore no chip; the field is absent, not zero. The
+            figure is amber on dark (a rating is the one figure allowed it here)
+            and the scale suffix stays white at 70%. Same dark glass as the
+            review tile's chip, never a second treatment. */}
+        {typeof m.rating === 'number' && m.rating > 0 && (
+          <span
+            className="review-tile-chip"
+            style={{
+              position: 'absolute',
+              top: labelInset,
+              left: labelInset,
+              display: 'inline-flex',
+              alignItems: 'baseline',
+              gap: 2,
+              padding: '4px 8px',
+              borderRadius: 10,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                color: '#FFB25E',
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {m.rating.toFixed(1)}
+            </span>
+            <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.7)', lineHeight: 1 }}>/10</span>
+          </span>
+        )}
         {(labelled || durationLabel) && (
           <div
             style={{
