@@ -57,7 +57,7 @@ export function AmateurNewsBlock() {
     <section style={{ paddingTop: 26, fontFamily: SANS, ...FIGS }}>
       <DiscoverSectionHeading
         title={t('amateurNews.section', 'Amateur news')}
-        right={t('amateurNews.allStories', 'All stories')}
+        right={t('amateurNews.seeAllStories', 'All stories')}
         onRightPress={() => {
           analyticsEvents.track('amateur_news_see_all_opened', {});
           rememberAmateurScroll();
