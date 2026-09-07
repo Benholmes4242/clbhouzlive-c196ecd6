@@ -9,8 +9,13 @@
  * from the oldest ~2000 and the newest content could not rank at all.
  *
  * Everything is now aggregated in Postgres behind the admin-gated
- * get_admin_top_content(p_days) RPC, which returns one row: top 5 posts by
- * likes + comments + shares, and top 5 courses by view count.
+ * get_admin_top_content(p_days, p_include_staff) RPC, which returns one row:
+ * top 5 posts by likes + comments + shares, and top 5 courses by view count.
+ *
+ * STAFF ARE EXCLUDED BY DEFAULT. Two staff accounts were ~74% of all events in
+ * the 30-day window and 61% of course views were a single staff account, so a
+ * view-ranked leaderboard with staff in it ranks what one person looked at, not
+ * what members are drawn to. The "Include staff" toggle passes p_include_staff.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,14 +43,15 @@ function periodDays(period: AnalyticsPeriod): number {
   return period === '7d' ? 7 : period === '30d' ? 30 : period === '90d' ? 90 : 30;
 }
 
-export function useTopContent(period: AnalyticsPeriod) {
+export function useTopContent(period: AnalyticsPeriod, includeStaff = false) {
   return useQuery({
-    queryKey: ['admin-v2', 'top-content', period],
+    queryKey: ['admin-v2', 'top-content', period, includeStaff],
     staleTime: 90_000,
     queryFn: async (): Promise<{ posts: TopPost[]; courses: TopCourse[] }> => {
       const { data, error } = await supabase.rpc('get_admin_top_content', {
         p_days: periodDays(period),
-      });
+        p_include_staff: includeStaff,
+      } as never);
       if (error) throw error;
       const payload = (data ?? {}) as {
         posts?: {
