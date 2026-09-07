@@ -55,7 +55,8 @@ export default function AmateurPage() {
       <main style={{ padding: '14px 14px 88px' }}>
         <AmateurFilterRail filters={state.filters} onOpen={state.openPanel} />
         <AmateurLeaderboardBlock userId={user?.id} state={state} onRowPress={handleRow} />
-        {/* Blocks 2-4 land here, in order. */}
+        <AmateurCoursesBlock userId={user?.id} state={state} onCoursePress={handleCourse} />
+        {/* Blocks 3-4 land here, in order. */}
       </main>
 
       <BoardFilterPanel
