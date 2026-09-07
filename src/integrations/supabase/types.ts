@@ -19150,6 +19150,10 @@ export type Database = {
       get_admin_funnel_cohorts: { Args: { p_weeks?: number }; Returns: Json }
       get_admin_intraday: { Args: { p_tz?: string }; Returns: Json }
       get_admin_member_actions: { Args: { p_days?: number }; Returns: Json }
+      get_admin_member_activity: {
+        Args: { p_days?: number; p_user_id: string }
+        Returns: Json
+      }
       get_admin_member_last_seen: {
         Args: { p_days?: number }
         Returns: {
@@ -19172,6 +19176,7 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["admin_role"]
       }
+      get_admin_top_content: { Args: { p_days?: number }; Returns: Json }
       get_all_users_admin: {
         Args: never
         Returns: {

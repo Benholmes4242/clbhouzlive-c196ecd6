@@ -1692,8 +1692,9 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
                       )}
                       {!a.stopped && a.gapReason && (
                         <span style={{
-                          fontSize: 9, fontWeight: 800, letterSpacing: '0.1em',
-                          textTransform: 'uppercase', color: A.RED,
+                          flexShrink: 0, padding: '1px 6px', borderRadius: 999,
+                          border: `1px solid ${t.danger}`, color: t.danger,
+                          fontSize: 9.5, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
                         }}>Gap</span>
                       )}
                       {!a.stopped && !a.gapReason && a.retiredReason && (
@@ -1724,7 +1725,7 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
                       </div>
                     )}
                     {a.gapReason && (
-                      <div style={{ fontSize: 11, color: A.DIM, marginTop: 2 }}>
+                      <div style={{ color: t.inkMuted, fontSize: 10.5, marginTop: 2 }}>
                         Instrumentation gap: {a.gapReason}
                       </div>
                     )}
