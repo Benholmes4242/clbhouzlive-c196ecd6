@@ -701,7 +701,6 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName }) => {
       <CourseHolesTab
         courseId={courseId}
         section="you"
-        showTeeCard={false}
         showGhost={false}
         showEmptyState={false}
       />
