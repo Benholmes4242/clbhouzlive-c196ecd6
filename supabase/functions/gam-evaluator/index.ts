@@ -2397,6 +2397,8 @@ function dedupKey(type: string, userId: string, payload: any): string {
 }
 
 async function enqueueNotification(userId: string, type: string, payload: any) {
+  if (REBUILD_SUPPRESS) return; // history correction: no notifications
+
   // Write-time dedup semantics.
   //
   // The prior pending-only existence check was unsafe: the dispatcher flips
