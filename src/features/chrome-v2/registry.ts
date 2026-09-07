@@ -225,44 +225,38 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   {
     match: { prefix: '/tourhub/tournament/' },
     spec: {
-      chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=schedule' },
+      chrome: 'none',
       tone: 'dark',
-      bleed: true, // hero page: island rides over the cinematic hero
-      note: EDITORIAL_NOTE,
+      bleed: true,
+      note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.'
     },
   },
   {
     match: { prefix: '/tourhub/player/' },
     spec: {
-      chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=players' },
+      chrome: 'none',
       tone: 'dark',
-      bleed: true, // hero page: matches the tournament page
-      note: EDITORIAL_NOTE,
+      bleed: true,
+      note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.'
     },
   },
   {
     match: { exact: '/tourhub/college-golf' },
     spec: {
-      chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' },
+      chrome: 'none',
       tone: 'dark',
-      bleed: false,
-      // The hub's yearbook search lives in the LEFT capsule (ChromeLeftSlot),
-      // so the island's own magnifier would be a second one beside it.
+      bleed: true,
       hideSearch: true,
-      note: EDITORIAL_NOTE,
+      note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.'
     },
   },
   {
     match: { exact: '/tourhub/college-golf/compare' },
     spec: {
-      chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub/college-golf' },
+      chrome: 'none',
       tone: 'dark',
-      bleed: false,
-      note: EDITORIAL_NOTE,
+      bleed: true,
+      note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.'
     },
   },
   {
@@ -273,11 +267,10 @@ export const CHROME_REGISTRY: ChromeRule[] = [
         p !== '/tourhub/college-golf/compare',
     },
     spec: {
-      chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub/college-golf' },
+      chrome: 'none',
       tone: 'dark',
-      bleed: true, // hero page (CollegeHeroMasthead)
-      note: EDITORIAL_NOTE,
+      bleed: true,
+      note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.'
     },
 
   },
@@ -285,10 +278,8 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // Tour Hub top-level (logo + editorial geometry; cinematic overlay on overview).
   // Overview tab keeps fixed islands over the cinematic hero; every other tab
   // gets scrollAway islands (chips lock at the notch on scroll).
-  { match: { test: (p, s) => (p === '/tourhub' || p === '/tour') && (s.get('tab') ?? 'overview') === 'overview' },
-    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, note: EDITORIAL_NOTE } },
-  { match: { exact: '/tourhub' },                 spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
-  { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true,  scrollAway: true, note: EDITORIAL_NOTE } },
+  { match: { exact: '/tourhub' },                 spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.' } },
+  { match: { exact: '/tour' },                    spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.' } },
   // Wire index + stories are non-bleeding solid-bar pages. Their page-provided
   // slots add the fixed section label and deliberately suppress the tour picker.
   {
