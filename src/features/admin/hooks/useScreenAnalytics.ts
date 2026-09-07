@@ -21,6 +21,11 @@ export interface ScreenRow {
   prev_views: number;
   /** null when prev_views = 0 - never invent a trend */
   trend_pct: number | null;
+  /**
+   * Test/developer entry. It stays in the manifest on purpose so it remains
+   * visible and removable, but it must not dilute the dead-screen reading.
+   */
+  is_dev: boolean;
 }
 
 function num(v: unknown): number {
@@ -54,6 +59,7 @@ export function useScreenAnalytics(days: number) {
         events_fired: num(r.events_fired),
         prev_views: num(r.prev_views),
         trend_pct: numOrNull(r.trend_pct),
+        is_dev: r.is_dev === true,
       }));
     },
   });
