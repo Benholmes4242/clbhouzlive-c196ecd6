@@ -1,21 +1,18 @@
 /**
  * ⚠️ POSTGREST RETURNS AT MOST 2000 ROWS — whatever `.limit()` says.
  *
- * Measured 7 Sep 2026: a request for 50,000 rows against a 23,295-row table
- * came back with exactly 2000. analytics_events holds ~20,100 rows per
- * fortnight and ~50,100 per 30 days, so ANY raw select over a window wider
- * than roughly a day is silently truncated — and with no ORDER BY the 2000
- * you get are physical order, i.e. the OLDEST slice of an append-only table.
+ * REMEDIATED (batch 1): the metric series and the intraday ghost are now
+ * counted in Postgres by get_admin_overview_metrics / get_admin_intraday. The
+ * only raw select left here is the 5-minute live window, guarded by
+ * assertNotTruncated.
  *
- * Raising the limit does not help. Adding .order() only changes which slice
- * you lose. Distinct-user counts, totals and buckets computed in the browser
- * from a truncated pull are WRONG, not approximate.
- *
- * The fix is always the same: aggregate in Postgres behind an admin-gated RPC
- * (see get_admin_audiences / get_platform_activity) and return one row.
+ * STANDING RULE: no admin figure is computed by counting rows in the browser.
+ * Counting happens in Postgres. A new metric needs an RPC, not a select and a
+ * Set.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { assertNotTruncated, POSTGREST_ROW_CAP } from '../lib/rawReadGuard';
 
 const DAY = 86_400_000;
 
@@ -45,8 +42,11 @@ async function fetchLive(): Promise<LiveInApp> {
     .select('user_id, created_at')
     .gte('created_at', since)
     .not('user_id', 'is', null)
-    .limit(2000);
+    .limit(POSTGREST_ROW_CAP);
   if (error) throw error;
+  // 5-minute window: far under the cap today. If it ever hits it, this figure
+  // is truncated and must move into Postgres like the rest.
+  assertNotTruncated('useLiveInApp', 'last 5 minutes', data?.length);
   const latest = new Map<string, string>();
   for (const r of (data as { user_id: string; created_at: string }[]) ?? []) {
     if (!r.user_id) continue;
@@ -69,37 +69,25 @@ export function useLiveInApp() {
 }
 
 // ─── RIGHT NOW: today intraday + same-weekday-last-week ghost ──────────────────
+// Both day-long windows are counted in Postgres by get_admin_intraday. The
+// browser pull that preceded it compared a partial day (under the cap) against
+// a whole day (1,652 rows and climbing), so the ghost — and only the ghost —
+// was the side that would truncate first, flattering today.
 
 export interface HourPoint { hour: number; today: number | null; last: number | null }
 
 async function fetchIntraday(): Promise<HourPoint[]> {
-  const now = new Date();
-  const todayStart = startOfDay(now);
-  const lastWeekStart = new Date(todayStart.getTime() - 7 * DAY);
-  const lastWeekEnd = new Date(lastWeekStart.getTime() + DAY);
-  const currentHour = now.getHours();
-
-  const [todayRes, lastRes] = await Promise.all([
-    supabase.from('analytics_events').select('created_at').gte('created_at', todayStart.toISOString()).limit(20000),
-    supabase.from('analytics_events').select('created_at').gte('created_at', lastWeekStart.toISOString()).lt('created_at', lastWeekEnd.toISOString()).limit(20000),
-  ]);
-
-  const todayBuckets = new Array(24).fill(0);
-  const lastBuckets = new Array(24).fill(0);
-  for (const r of (todayRes.data as { created_at: string }[]) ?? []) {
-    const h = new Date(r.created_at).getHours();
-    if (h >= 0 && h < 24) todayBuckets[h]++;
-  }
-  for (const r of (lastRes.data as { created_at: string }[]) ?? []) {
-    const h = new Date(r.created_at).getHours();
-    if (h >= 0 && h < 24) lastBuckets[h]++;
-  }
-
-  const points: HourPoint[] = [];
-  for (let h = 0; h <= currentHour; h++) {
-    points.push({ hour: h, today: todayBuckets[h], last: lastBuckets[h] });
-  }
-  return points;
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  const { data, error } = await supabase.rpc('get_admin_intraday' as never, { p_tz: tz } as never);
+  if (error) throw error;
+  const payload = data as unknown as {
+    current_hour: number;
+    hours: { hour: number; today: number; last: number }[];
+  } | null;
+  if (!payload) throw new Error('get_admin_intraday returned no payload');
+  return (payload.hours ?? [])
+    .filter(h => h.hour <= payload.current_hour)
+    .map(h => ({ hour: h.hour, today: h.today, last: h.last }));
 }
 
 export function useRightNowHourly() {
@@ -111,7 +99,7 @@ export function useRightNowHourly() {
   });
 }
 
-// ─── METRIC SPARKLINES (14d daily counts, split client-side into 7d + 7d-prev) ─
+// ─── METRIC SPARKLINES (14 daily counts, split into current 7d + prior 7d) ─────
 
 export interface MetricSeries {
   current: number;
@@ -128,36 +116,36 @@ export interface MetricsBundle {
   totalUsers: number;
 }
 
-function bucketByDay(rows: { created_at: string }[], days: number): number[] {
-  const buckets: Record<string, number> = {};
-  for (let i = days - 1; i >= 0; i--) buckets[dayKey(daysAgo(i))] = 0;
-  for (const r of rows) {
-    const k = dayKey(new Date(r.created_at));
-    if (k in buckets) buckets[k]++;
-  }
-  return Object.values(buckets);
+interface OverviewSeriesRow {
+  date: string;
+  sessions: number;
+  signups: number;
+  posts: number;
+  reviews: number;
 }
 
 async function fetchMetrics(): Promise<MetricsBundle> {
-  const since14 = daysAgo(14).toISOString();
-  const [activityRes, sessionsRes, signupsRes, postsRes, reviewsRes, totalRes] = await Promise.all([
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  const [activityRes, metricsRes] = await Promise.all([
     // Distinct-user counting is an aggregation: it runs in the database.
     supabase.rpc('get_platform_activity', { p_days: 14 }),
-    supabase.from('analytics_events').select('created_at').eq('name', 'session_start').gte('created_at', since14).limit(20000),
-    supabase.from('user_profiles').select('created_at').is('deleted_at', null).gte('created_at', since14).limit(20000),
-    supabase.from('posts').select('created_at').gte('created_at', since14).limit(20000),
-    supabase.from('course_ratings').select('created_at').gte('created_at', since14).limit(20000),
-    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).eq('is_system_account', false),
+    // So is every per-day bucket behind the "vs last week" arrows.
+    supabase.rpc('get_admin_overview_metrics' as never, { p_days: 14, p_tz: tz } as never),
   ]);
+  if (metricsRes.error) throw metricsRes.error;
 
+  const payload = metricsRes.data as unknown as {
+    series: OverviewSeriesRow[];
+    total_users: number;
+  } | null;
+  if (!payload) throw new Error('get_admin_overview_metrics returned no payload');
+  const series = payload.series ?? [];
 
   const activity = Array.isArray(activityRes.data) ? activityRes.data[0] : undefined;
   const activityTrend = Array.isArray(activity?.trend) ? (activity!.trend as unknown as TrendPoint[]) : [];
   const dauDaily = activityTrend.map(p => p.value);
-  const sessionsDaily = bucketByDay((sessionsRes.data as { created_at: string }[]) ?? [], 14);
-  const signupsDaily = bucketByDay((signupsRes.data as { created_at: string }[]) ?? [], 14);
-  const postsDaily = bucketByDay((postsRes.data as { created_at: string }[]) ?? [], 14);
-  const reviewsDaily = bucketByDay((reviewsRes.data as { created_at: string }[]) ?? [], 14);
+
+  const column = (key: keyof Omit<OverviewSeriesRow, 'date'>) => series.map(r => r[key] ?? 0);
 
   const toSeries = (arr: number[]): MetricSeries => {
     const prev = arr.slice(0, 7);
@@ -175,11 +163,11 @@ async function fetchMetrics(): Promise<MetricsBundle> {
 
   return {
     dau: { current: dauToday, previous: dauLastWeek, sparkline: dauDaily.slice(7) },
-    signups: toSeries(signupsDaily),
-    sessions: toSeries(sessionsDaily),
-    posts: toSeries(postsDaily),
-    reviews: toSeries(reviewsDaily),
-    totalUsers: totalRes.count ?? 0,
+    signups: toSeries(column('signups')),
+    sessions: toSeries(column('sessions')),
+    posts: toSeries(column('posts')),
+    reviews: toSeries(column('reviews')),
+    totalUsers: payload.total_users ?? 0,
   };
 }
 

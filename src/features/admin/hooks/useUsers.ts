@@ -1,18 +1,15 @@
 /**
  * ⚠️ POSTGREST RETURNS AT MOST 2000 ROWS — whatever `.limit()` says.
  *
- * Measured 7 Sep 2026: a request for 50,000 rows against a 23,295-row table
- * came back with exactly 2000. analytics_events holds ~20,100 rows per
- * fortnight and ~50,100 per 30 days, so ANY raw select over a window wider
- * than roughly a day is silently truncated — and with no ORDER BY the 2000
- * you get are physical order, i.e. the OLDEST slice of an append-only table.
+ * REMEDIATED (batch 1): last-seen and the Active 24h / Dormant 14d sets came
+ * from a raw 14-day analytics_events select — 18,500 rows, of which the client
+ * received 2000 — so the list disagreed with the correct cards above it on the
+ * same page. Both now come from get_admin_member_last_seen, one row per
+ * member, sharing get_admin_audiences' population exactly.
  *
- * Raising the limit does not help. Adding .order() only changes which slice
- * you lose. Distinct-user counts, totals and buckets computed in the browser
- * from a truncated pull are WRONG, not approximate.
- *
- * The fix is always the same: aggregate in Postgres behind an admin-gated RPC
- * (see get_admin_audiences / get_platform_activity) and return one row.
+ * STANDING RULE: no admin figure is computed by counting rows in the browser.
+ * Counting happens in Postgres. A new metric needs an RPC, not a select and a
+ * Set.
  */
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -104,17 +101,13 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
     .limit(10000);
   const roleMap = new Map((roles ?? []).map(r => [r.user_id, r.role]));
 
-  // Extended to 14d so it doubles as the "dormant 14d+" filter source.
-  const { data: lastSeen } = await supabase
-    .from('analytics_events')
-    .select('user_id, created_at')
-    .not('user_id', 'is', null)
-    .gte('created_at', new Date(Date.now() - ANALYTICS_LOOKBACK_DAYS * 86400_000).toISOString())
-    .order('created_at', { ascending: false })
-    .limit(10000);
+  // One row per member, aggregated in Postgres. 14d so it also serves the
+  // "dormant 14d+" filter, and active_24h comes from the same max(created_at)
+  // as the last-seen column, so the column and the filters cannot disagree.
+  const lastSeenRows = await fetchMemberLastSeen();
   const lastSeenMap = new Map<string, string>();
-  for (const e of lastSeen ?? []) {
-    if (e.user_id && !lastSeenMap.has(e.user_id)) lastSeenMap.set(e.user_id, e.created_at);
+  for (const r of lastSeenRows) {
+    if (r.user_id && r.last_seen_at) lastSeenMap.set(r.user_id, r.last_seen_at);
   }
 
   return (profiles ?? []).map(p => ({
@@ -133,15 +126,24 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
   }));
 }
 
+interface MemberLastSeenRow {
+  user_id: string;
+  last_seen_at: string | null;
+  active_24h: boolean;
+}
+
+async function fetchMemberLastSeen(): Promise<MemberLastSeenRow[]> {
+  const { data, error } = await supabase.rpc(
+    'get_admin_member_last_seen' as never,
+    { p_days: ANALYTICS_LOOKBACK_DAYS } as never,
+  );
+  if (error) throw error;
+  return (data as unknown as MemberLastSeenRow[]) ?? [];
+}
+
 async function fetchActive24h(): Promise<string[]> {
-  const since = new Date(Date.now() - 24 * 3600_000).toISOString();
-  const { data } = await supabase
-    .from('analytics_events')
-    .select('user_id')
-    .gte('created_at', since)
-    .not('user_id', 'is', null)
-    .limit(10000);
-  return [...new Set((data ?? []).map(r => r.user_id).filter(Boolean) as string[])];
+  const rows = await fetchMemberLastSeen();
+  return rows.filter(r => r.active_24h).map(r => r.user_id);
 }
 
 async function fetchEgIssueUserIds(): Promise<string[]> {
