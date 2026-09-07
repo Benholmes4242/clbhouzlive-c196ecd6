@@ -98,6 +98,7 @@ export const CompareStatRow: React.FC<Props> = ({
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: CHART.DIM,
+            minWidth: 0,
           }}
         >
           {label}

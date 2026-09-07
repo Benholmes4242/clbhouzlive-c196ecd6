@@ -785,7 +785,7 @@ export const CompareSheet: React.FC<Props> = ({
                   marginBottom: 6,
                 }}
               >
-                <div style={{ ...LABEL_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.19em', color: CHART.MUTE }}>
+                <div style={{ ...LABEL_STYLE, fontSize: 11, fontWeight: 700, letterSpacing: '0.19em', color: CHART.MUTE, minWidth: 0 }}>
                   {isSharedMode
                     ? t('handicap.compare.headToHead')
                     : t('handicap.compare.thisSeason')}
@@ -798,6 +798,8 @@ export const CompareSheet: React.FC<Props> = ({
                       fontWeight: 700,
                       letterSpacing: '0.16em',
                       color: CHART.AMBER,
+                      minWidth: 0,
+                      flexShrink: 1,
                     }}
                   >
                     {t('handicap.compare.youLeadOf', {
