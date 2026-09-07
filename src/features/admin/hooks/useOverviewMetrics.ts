@@ -35,18 +35,43 @@ const gatedInterval = (ms: number) => () =>
     ? false
     : ms;
 
+/**
+ * DELIBERATE EXCEPTION to the standing rule, recorded so the next person does
+ * not have to rediscover the arithmetic.
+ *
+ * This is the ONLY raw analytics_events select left on Overview. It stays
+ * because the window is five minutes and the figure is "who is in the app
+ * right now", which wants the actual member ids, not a count.
+ *
+ * HEADROOM, measured 7 Sep 2026: ~1,420 events per day, i.e. ~5 events in an
+ * average 5-minute window against a 2000-row cap. That is 0.25% of the
+ * ceiling — roughly 400x headroom on the average.
+ *
+ * WHEN IT STOPS BEING SAFE: uniformly spread, the cap is reached at ~576,000
+ * events per day. Real traffic is peaky, so assume the busiest 5 minutes runs
+ * ~10x the average rate: that puts the practical break point at roughly
+ * 60,000 events per day, about 40x today's volume. Treat 20,000 events per day
+ * as the review threshold — at that point re-measure the busiest window, and
+ * if it clears 1,000 rows move this count into Postgres like the rest. The
+ * guard below will shout first either way.
+ */
 async function fetchLive(): Promise<LiveInApp> {
   const since = new Date(Date.now() - 5 * 60_000).toISOString();
+  // Probe with cap + 1 so a full response is provably the cap biting rather
+  // than a window that happens to hold exactly 2000 rows.
   const { data, error } = await supabase
     .from('analytics_events')
     .select('user_id, created_at')
     .gte('created_at', since)
     .not('user_id', 'is', null)
-    .limit(POSTGREST_ROW_CAP);
+    .limit(POSTGREST_PROBE_LIMIT);
   if (error) throw error;
-  // 5-minute window: far under the cap today. If it ever hits it, this figure
-  // is truncated and must move into Postgres like the rest.
-  assertNotTruncated('useLiveInApp', 'last 5 minutes', data?.length);
+  assertNotTruncated({
+    hook: 'useLiveInApp',
+    window: 'last 5 minutes',
+    received: data?.length,
+    probed: true,
+  });
   const latest = new Map<string, string>();
   for (const r of (data as { user_id: string; created_at: string }[]) ?? []) {
     if (!r.user_id) continue;
