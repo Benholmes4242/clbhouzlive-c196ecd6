@@ -90,6 +90,20 @@ export const ProfileTopTenRail: React.FC<Props> = ({
 
   if (isLoading) return null;
 
+  // Gate before anything renders: no header, no subtitle, no wrapper padding.
+  if (visibilityLoading && !isOwnProfile) return null;
+  if (!isOwnProfile && !canView) return null;
+
+  /** Uppercase audience marker beside the kicker, owner only, non-public only. */
+  const audienceMarker =
+    isOwnProfile && visibility !== 'public'
+      ? visibility === 'private'
+        ? 'Only me'
+        : visibility === 'friends'
+          ? 'Friends only'
+          : 'Followers & friends'
+      : null;
+
   const header = (
     <div
       style={{
