@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { AppHeader } from '@/components/chrome/AppHeader';
+
 import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
