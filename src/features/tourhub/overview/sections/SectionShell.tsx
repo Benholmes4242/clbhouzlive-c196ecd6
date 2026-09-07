@@ -1,4 +1,10 @@
 /**
+ * DUPLICATE OF src/features/tourhub/tournament-v2/sections/SectionEyebrow.tsx.
+ * Both are Tour Hub section headings, both render the same KICKER token, and
+ * they live in sibling directories (overview/sections and
+ * tournament-v2/sections). They do the same job. THE MERGE IS PENDING and is a
+ * treatment decision, not a mechanical one — do not fold them together here.
+ *
  * Shared SectionShell — dispatch section header + optional right link.
  * Spec (analytical): eyebrow is the KICKER token in surface ink (A.INK),
  * right link 11/700 muted. Eyebrows are never amber (EYEBROW INK FLIP) —
