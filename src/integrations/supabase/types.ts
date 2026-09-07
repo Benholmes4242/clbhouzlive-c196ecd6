@@ -5926,6 +5926,7 @@ export type Database = {
           birdies: number
           bogeys: number
           clean_card: boolean
+          counter_settled: boolean | null
           course_id: string | null
           course_name: string | null
           course_par: number | null
@@ -5937,6 +5938,7 @@ export type Database = {
           evaluator_version: number
           gross_score: number | null
           hcp_at_time: number | null
+          hole_detail_present: boolean | null
           holes_in_one: number
           holes_played: number | null
           is_competition: boolean | null
@@ -5966,6 +5968,7 @@ export type Database = {
           birdies?: number
           bogeys?: number
           clean_card?: boolean
+          counter_settled?: boolean | null
           course_id?: string | null
           course_name?: string | null
           course_par?: number | null
@@ -5977,6 +5980,7 @@ export type Database = {
           evaluator_version?: number
           gross_score?: number | null
           hcp_at_time?: number | null
+          hole_detail_present?: boolean | null
           holes_in_one?: number
           holes_played?: number | null
           is_competition?: boolean | null
@@ -6006,6 +6010,7 @@ export type Database = {
           birdies?: number
           bogeys?: number
           clean_card?: boolean
+          counter_settled?: boolean | null
           course_id?: string | null
           course_name?: string | null
           course_par?: number | null
@@ -6017,6 +6022,7 @@ export type Database = {
           evaluator_version?: number
           gross_score?: number | null
           hcp_at_time?: number | null
+          hole_detail_present?: boolean | null
           holes_in_one?: number
           holes_played?: number | null
           is_competition?: boolean | null
@@ -7407,60 +7413,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      mock_profile_clones: {
-        Row: {
-          background_image_url: string | null
-          bio: string | null
-          cloned_from_user_id: string | null
-          created_at: string | null
-          display_name: string | null
-          followers_count: number | null
-          header_photo_url: string | null
-          home_club: string | null
-          id: string
-          is_verified: boolean | null
-          profile_photo_url: string | null
-          profile_video_thumbnail_url: string | null
-          profile_video_url: string | null
-          updated_at: string | null
-          username: string | null
-        }
-        Insert: {
-          background_image_url?: string | null
-          bio?: string | null
-          cloned_from_user_id?: string | null
-          created_at?: string | null
-          display_name?: string | null
-          followers_count?: number | null
-          header_photo_url?: string | null
-          home_club?: string | null
-          id?: string
-          is_verified?: boolean | null
-          profile_photo_url?: string | null
-          profile_video_thumbnail_url?: string | null
-          profile_video_url?: string | null
-          updated_at?: string | null
-          username?: string | null
-        }
-        Update: {
-          background_image_url?: string | null
-          bio?: string | null
-          cloned_from_user_id?: string | null
-          created_at?: string | null
-          display_name?: string | null
-          followers_count?: number | null
-          header_photo_url?: string | null
-          home_club?: string | null
-          id?: string
-          is_verified?: boolean | null
-          profile_photo_url?: string | null
-          profile_video_thumbnail_url?: string | null
-          profile_video_url?: string | null
-          updated_at?: string | null
-          username?: string | null
-        }
-        Relationships: []
       }
       moderation_banned_terms: {
         Row: {
@@ -18623,10 +18575,6 @@ export type Database = {
       clear_typing_indicator: {
         Args: { p_conversation_id: string }
         Returns: undefined
-      }
-      clone_real_profiles_to_mock: {
-        Args: { limit_count?: number }
-        Returns: number
       }
       club_key_v2: { Args: { p_name: string }; Returns: string }
       compute_all_friend_featured_rounds: { Args: never; Returns: number }
