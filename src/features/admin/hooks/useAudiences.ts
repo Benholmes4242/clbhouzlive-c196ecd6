@@ -14,6 +14,10 @@
  * Raising the limit does not fix it; adding .order() inverts the bug. The
  * aggregation belongs in the database.
  *
+ * POPULATION: staff accounts (is_staff_account) ARE members and are counted
+ * here in full — the flag only removes them from EVENT-VOLUME figures. Only the
+ * service account is excluded.
+ *
  * POPULATION: user_profiles with deleted_at IS NULL and is_system_account =
  * false — the same set MEMBERS counts, minus the flagged service account.
  * Events belonging to deleted accounts stay as history but join to no member,
@@ -25,6 +29,8 @@ import { supabase } from '@/integrations/supabase/client';
 export interface AudienceSizes {
   /** The population every segment below is a subset of. */
   members: number;
+  /** How many of MEMBERS are staff. Display only; never subtracted. */
+  staff_accounts: number;
   new_this_week: number;
   active_24h: number;
   dormant_14d: number;
@@ -40,7 +46,7 @@ export interface AudienceSizes {
 }
 
 const KEYS: (keyof AudienceSizes)[] = [
-  'members', 'new_this_week', 'active_24h', 'dormant_14d', 'eg_linked',
+  'members', 'staff_accounts', 'new_this_week', 'active_24h', 'dormant_14d', 'eg_linked',
   'eg_issues', 'suspended', 'incomplete_signups', 'dau_today', 'wau', 'mau',
 ];
 
@@ -71,6 +77,8 @@ export function assertAudienceInvariants(a: AudienceSizes): void {
   if (!(a.wau + a.dormant_14d <= a.members)) fail(`WAU ${a.wau} + DORMANT ${a.dormant_14d} > MEMBERS ${a.members}`);
   if (!(a.dormant_14d >= a.members - a.mau)) fail(`DORMANT ${a.dormant_14d} < MEMBERS ${a.members} - MAU ${a.mau}`);
   if (!(a.active_24h + a.dormant_14d <= a.members)) fail(`ACTIVE 24H ${a.active_24h} + DORMANT ${a.dormant_14d} > MEMBERS ${a.members}`);
+  // Staff are a subset of members, never a separate population.
+  if (!(a.staff_accounts <= a.members)) fail(`STAFF ${a.staff_accounts} > MEMBERS ${a.members}`);
 }
 
 export function useAudiences() {

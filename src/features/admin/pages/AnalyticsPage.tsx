@@ -572,15 +572,22 @@ function EngagementTab({ period }: { period: AnalyticsPeriod }) {
 // ─── Top content ──────────────────────────────────────────────────────────────
 
 function TopContentSection({ period }: { period: AnalyticsPeriod }) {
-  const { data, isLoading } = useTopContent(period);
+  const [includeStaff, setIncludeStaff] = useState(false);
+  const { data, isLoading } = useTopContent(period, includeStaff);
   const [openPost, setOpenPost] = useState<string | null>(null);
   const [openCourse, setOpenCourse] = useState<string | null>(null);
 
   return (
     <Card>
-      <div style={{ color: t.ink, fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Top content</div>
+      <div style={{
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 4,
+      }}>
+        <div style={{ color: t.ink, fontWeight: 700, fontSize: 15 }}>Top content</div>
+        <IncludeStaffToggle on={includeStaff} onChange={setIncludeStaff} />
+      </div>
       <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 12 }}>
         Top posts (likes + comments + shares) and top courses (views), last {period}
+        {includeStaff ? ', staff included' : ', staff excluded'}
       </div>
 
       {isLoading ? (
@@ -1564,6 +1571,30 @@ function TopScreensRightNow({ events, loading }: { events: LiveEventRow[]; loadi
 // makes a broken event look healthy.
 // All figures come from Postgres. There is no row counting in this component.
 
+/**
+ * INCLUDE STAFF. Staff accounts (is_staff_account) are always counted as
+ * MEMBERS but are excluded from event-volume figures by default: two staff
+ * accounts were ~74% of all events in the 30-day window, so with them in these
+ * figures describe the people building the product rather than the people using
+ * it. The toggle exists because their usage is genuine and occasionally worth
+ * seeing — it is never the default.
+ */
+function IncludeStaffToggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      onClick={() => onChange(!on)}
+      style={{
+        padding: '6px 11px', borderRadius: 999, cursor: 'pointer',
+        border: `1px solid ${on ? t.ink : t.line}`,
+        background: on ? t.ink : 'transparent',
+        color: on ? t.canvas : t.inkMuted,
+        fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap',
+      }}
+      aria-pressed={on}
+    >Include staff</button>
+  );
+}
+
 const EVENT_SORTS: { id: EventSort; label: string }[] = [
   { id: 'count',     label: 'Count' },
   { id: 'users',     label: 'Members' },
@@ -1575,8 +1606,10 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<EventSort>('count');
   const [selected, setSelected] = useState<EventAggregate | null>(null);
+  const [includeStaff, setIncludeStaff] = useState(false);
   const search = useDebounced(query, 300);
-  const { aggregates, page, isLoading, isError, refetch } = useEventAggregates(period, { search, sort });
+  const { aggregates, page, isLoading, isError, refetch } =
+    useEventAggregates(period, { search, sort, includeStaff });
 
   return (
     <>
@@ -1593,6 +1626,18 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
           <div style={{ color: t.inkMuted, fontSize: 13.5, fontVariantNumeric: 'tabular-nums' }}>
             across {fmtInt(page?.distinctNames ?? 0)} distinct events, {fmtInt(page?.windowMembers ?? 0)} members
           </div>
+          <IncludeStaffToggle on={includeStaff} onChange={setIncludeStaff} />
+        </div>
+        <div style={{ color: t.inkFaint, fontSize: 11.5, lineHeight: 1.5 }}>
+          {includeStaff
+            ? `Staff included: ${fmtInt(page?.staffEvents ?? 0)} of these events are staff.`
+            : `Staff excluded: ${fmtInt(page?.staffEvents ?? 0)} further events came from staff accounts in this period.`}
+          {' '}
+          {/* Logged-out browsing is real traffic, not measurement loss. Bots are
+              blocked at write time, so a null user_id is a visitor without a
+              session. Stated here so nobody later reads it as a gap. */}
+          {fmtInt(page?.anonEvents ?? 0)} events across {fmtInt(page?.anonSessions ?? 0)} sessions have no member
+          attached: logged-out browsing, counted in the total and not a loss.
         </div>
       </Card>
 
@@ -1607,7 +1652,7 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
             </div>
           </div>
           <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 4 }}>
-            Fired at least {STOPPED_MIN_COUNT} times across {STOPPED_MIN_USERS}+ members in the previous {page.windowDays} days,
+            Fired at least {STOPPED_MIN_COUNT} times across {STOPPED_MIN_USERS}+ non-staff members in the previous {page.windowDays} days,
             nothing since. Usually a release broke tracking. Sorted to the top.
             {!!page.silentNames && ` ${fmtInt(page.silentNames)} further event${page.silentNames === 1 ? '' : 's'} quiet but below the alarm floor or retired.`}
           </div>
