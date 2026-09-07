@@ -12,6 +12,16 @@ const BATCH_SIZE = 15;
 const DRAIN_BUDGET_MS = 25000;
 const MAX_ATTEMPTS = 5;
 
+// ONE-OFF DERIVED-STREAK REBUILD (BRIEF_STREAKS_ONE_OFF_REBUILD).
+// Set for the duration of a rebuild invocation only. Every change a rebuild
+// produces is a correction to history, so nobody may be told their streak broke
+// or that they earned a badge because we fixed a bug: enqueueNotification and
+// checkStreakBadges both no-op while this is true.
+let REBUILD_SUPPRESS = false;
+const REBUILD_MEMBER_BATCH_SIZE = 50;
+const REBUILD_MAX_CHAIN_LENGTH = 20;
+
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Top 100 list mapping
