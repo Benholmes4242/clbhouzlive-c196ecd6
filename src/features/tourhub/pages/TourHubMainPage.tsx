@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { analyticsEvents } from '@/lib/analyticsEvents';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { TourHubShell } from '../components/TourHubShell';
 import { TourPageShell } from '../components/TourPageShell';
 import type { TourHubTab } from '../components/types';

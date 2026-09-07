@@ -34,7 +34,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, HAIRLINE_INK_12, INK, INK_MUTE, INK_TINT_05, SLATE_50 } from '@/features/courses/_shared/tokens';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
-import { analyticsEvents } from '@/lib/analyticsEvents';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /* ─── Rate a Course bottom sheet ─── */
 function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
