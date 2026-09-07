@@ -38,7 +38,6 @@ export const NAV_CLEARANCE = '96px';
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
   '/auth',
-  '/admin-setup',
   '/onboarding',
   
   '/notificationmessages',

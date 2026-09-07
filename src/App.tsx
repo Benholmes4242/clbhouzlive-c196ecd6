@@ -669,7 +669,6 @@ function AppRoutes() {
         <Route path="/achievementshub" element={<Navigate to="/profile" replace />} />
         <Route path="/achievements" element={<Navigate to="/profile" replace />} />
         <Route path="/achievements/:userId" element={<Navigate to="/profile" replace />} />
-        <Route path="/admin-setup" element={<Suspense fallback={<GenericPageSkeleton />}><AdminSetupPage /></Suspense>} />
         
         {/* Old /admin routes removed — redirected to admin-v2 */}
         <Route path="/admin" element={<Navigate to="/admin-v2/dashboard" replace />} />
