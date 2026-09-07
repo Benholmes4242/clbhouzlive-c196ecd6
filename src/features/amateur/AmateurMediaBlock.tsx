@@ -300,7 +300,7 @@ export function AmateurMediaBlock({
       )}
 
       {videos.length > 0 && (
-        <div style={{ marginTop: 22 }}>
+        <div style={{ marginTop: 32 }}>
           <DiscoverSectionHeading
             title="Longer watch"
             right={(hubCounts.data?.video_count ?? 0) > videos.length ? `See all ${hubCounts.data?.video_count}` : null}
