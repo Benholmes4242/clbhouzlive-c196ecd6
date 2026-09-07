@@ -20,9 +20,12 @@ import { monotonePath, useElementWidth, EndDot, AxisTicks, fourTickIndices } fro
 import { useLiveWindow30m, useProfilesByIds, type LiveEventRow, type LiteProfile } from '../hooks/useLiveStream';
 import {
   useEventAggregates,
-  useRecentOccurrences,
-  dailyForEvent,
+  useEventDaily,
+  useEventOccurrences,
+  useAppErrors,
+  useDebounced,
   type EventAggregate,
+  type EventSort,
 } from '../hooks/useEventsExplorer';
 import {
   AnalyticsPeriod,
@@ -1549,29 +1552,28 @@ function TopScreensRightNow({ events, loading }: { events: LiveEventRow[]; loadi
   );
 }
 
-// ═══ EVENTS TAB (Firebase events explorer) ════════════════════════════════════
+// ═══ EVENTS TAB — INSTRUMENTATION SURFACE ═════════════════════════════════════
+// Presence and continuity: does this event fire, how often, for how many
+// distinct members, when was it last seen, and has it STOPPED. Behaviour
+// measurement lives on Overview / North Star / Audiences / Screens / Funnels.
+// Every count carries its distinct-member sample: a count alone cannot tell one
+// heavy account firing 500 times from 500 members firing once, and the first
+// makes a broken event look healthy.
+// All figures come from Postgres. There is no row counting in this component.
+
+const EVENT_SORTS: { id: EventSort; label: string }[] = [
+  { id: 'count',     label: 'Count' },
+  { id: 'users',     label: 'Members' },
+  { id: 'last_seen', label: 'Last seen' },
+  { id: 'name',      label: 'Name' },
+];
 
 function EventsTab({ period }: { period: AnalyticsPeriod }) {
   const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<EventSort>('count');
   const [selected, setSelected] = useState<EventAggregate | null>(null);
-  const { aggregates, data: raw, isLoading, isError, refetch } = useEventAggregates(period);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return aggregates;
-    return aggregates.filter(a =>
-      a.name.toLowerCase().includes(q) || labelForEvent(a.name).toLowerCase().includes(q),
-    );
-  }, [aggregates, query]);
-
-  const totals = useMemo(() => {
-    let count = 0; const users = new Set<string>();
-    for (const a of aggregates) count += a.count;
-    if (raw) {
-      for (const r of raw.rows) if (r.created_at >= raw.cutoffISO && r.user_id) users.add(r.user_id);
-    }
-    return { count, users: users.size };
-  }, [aggregates, raw]);
+  const search = useDebounced(query, 300);
+  const { aggregates, page, isLoading, isError, refetch } = useEventAggregates(period, { search, sort });
 
   return (
     <>
@@ -1583,25 +1585,41 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
           <div style={{
             color: t.ink, fontSize: 38, fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
           }}>
-            {isLoading ? '-' : fmtInt(totals.count)}
+            {isLoading ? '-' : fmtInt(page?.windowEvents ?? 0)}
           </div>
           <div style={{ color: t.inkMuted, fontSize: 13.5, fontVariantNumeric: 'tabular-nums' }}>
-            across {fmtInt(aggregates.length)} distinct events, {fmtInt(totals.users)} members
+            across {fmtInt(page?.distinctNames ?? 0)} distinct events, {fmtInt(page?.windowMembers ?? 0)} members
           </div>
         </div>
       </Card>
+
+      <AppErrorsCard period={period} />
+
+      {!!page?.stoppedNames && (
+        <Card style={{ borderColor: t.danger }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <XCircle size={15} color={t.danger} />
+            <div style={{ color: t.ink, fontSize: 13.5, fontWeight: 700 }}>
+              {fmtInt(page.stoppedNames)} event{page.stoppedNames === 1 ? '' : 's'} stopped firing
+            </div>
+          </div>
+          <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 4 }}>
+            Fired in the previous {page.windowDays} days, silent since. Usually a release broke tracking. Sorted to the top of the list.
+          </div>
+        </Card>
+      )}
 
       <Card>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
           border: `1px solid ${t.line}`, borderRadius: 999, background: t.canvas,
-          padding: '8px 12px', marginBottom: 12,
+          padding: '8px 12px', marginBottom: 10,
         }}>
           <Search size={14} color={t.inkMuted} />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search event name or label"
+            placeholder="Search event name"
             style={{
               flex: 1, minWidth: 0, border: 'none', outline: 'none',
               background: 'transparent', color: t.ink, fontSize: 13,
@@ -1609,16 +1627,35 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
           />
         </div>
 
+        <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+          {EVENT_SORTS.map(s => {
+            const on = s.id === sort;
+            return (
+              <button
+                key={s.id}
+                onClick={() => setSort(s.id)}
+                style={{
+                  padding: '6px 11px', borderRadius: 999, cursor: 'pointer',
+                  border: `1px solid ${on ? t.ink : t.line}`,
+                  background: on ? t.ink : 'transparent',
+                  color: on ? t.canvas : t.inkMuted,
+                  fontSize: 12, fontWeight: 700,
+                }}
+              >{s.label}</button>
+            );
+          })}
+        </div>
+
         {isError ? (
           <AdminErrorState title="Couldn't load events" onRetry={() => refetch()} />
         ) : isLoading ? (
           <div style={{ height: 260, background: t.canvas, borderRadius: t.radius.md }} />
-        ) : filtered.length === 0 ? (
+        ) : aggregates.length === 0 ? (
           <EmptyState title="No events match" />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {filtered.map((a, i) => {
-              const isLast = i === filtered.length - 1;
+            {aggregates.map((a, i) => {
+              const isLast = i === aggregates.length - 1;
               return (
                 <button
                   key={a.name}
@@ -1633,14 +1670,26 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
                       color: t.ink, fontSize: 13.5, fontWeight: 700,
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    }}>{labelForEvent(a.name)}</div>
+                      overflow: 'hidden',
+                    }}>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {labelForEvent(a.name)}
+                      </span>
+                      {a.stopped && (
+                        <span style={{
+                          flexShrink: 0, padding: '1px 6px', borderRadius: 999,
+                          border: `1px solid ${t.danger}`, color: t.danger,
+                          fontSize: 9.5, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
+                        }}>Stopped</span>
+                      )}
+                    </div>
                     <div style={{
                       color: t.inkFaint, fontSize: 10.5,
                       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    }}>{a.name}</div>
+                    }}>{a.name}{a.lastSeenAt ? ` · last ${relTimeShort(a.lastSeenAt)}` : ''}</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                     <div style={{ textAlign: 'right' }}>
@@ -1649,9 +1698,12 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
                       }}>{fmtInt(a.count)}</div>
                       <div style={{
                         color: t.inkFaint, fontSize: 11, fontVariantNumeric: 'tabular-nums',
-                      }}>{fmtInt(a.users)} users</div>
+                      }}>{fmtInt(a.users)} members</div>
                     </div>
-                    <DeltaChip delta={a.deltaPct} />
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
+                      <DeltaChip delta={a.deltaCountPct} />
+                      <DeltaChip delta={a.deltaUsersPct} />
+                    </div>
                   </div>
                 </button>
               );
@@ -1663,35 +1715,99 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
       <EventDetailSheet
         aggregate={selected}
         period={period}
-        rows={raw?.rows ?? []}
-        cutoffISO={raw?.cutoffISO ?? null}
         onClose={() => setSelected(null)}
       />
     </>
   );
 }
 
+// app_error grouped by MESSAGE + BUILD. Grouping it by event name renders the
+// most valuable diagnostic on this screen as one useless row — four uncaught
+// crashes on real devices went unnoticed for five days on a 99-member platform.
+function AppErrorsCard({ period }: { period: AnalyticsPeriod }) {
+  const { data, isLoading, isError, refetch } = useAppErrors(period);
+  const rows = data?.rows ?? [];
+
+  return (
+    <Card>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
+        <div style={{ color: t.ink, fontSize: 14, fontWeight: 700 }}>App errors</div>
+        <div style={{ color: t.inkMuted, fontSize: 12, fontVariantNumeric: 'tabular-nums' }}>
+          {isLoading ? '-' : `${fmtInt(data?.totalErrors ?? 0)} in ${fmtInt(data?.distinctGroups ?? 0)} groups, ${fmtInt(data?.membersAffected ?? 0)} members`}
+        </div>
+      </div>
+      <div style={{ color: t.inkFaint, fontSize: 11.5, marginTop: 2, marginBottom: 10 }}>
+        Grouped by message and build, newest first
+      </div>
+      {isError ? (
+        <AdminErrorState title="Couldn't load app errors" onRetry={() => refetch()} />
+      ) : isLoading ? (
+        <div style={{ height: 120, background: t.canvas, borderRadius: t.radius.md }} />
+      ) : rows.length === 0 ? (
+        <EmptyState title="No app errors in this period" />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {rows.map((g, i) => (
+            <div
+              key={`${g.build}|${g.message}|${i}`}
+              style={{
+                display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0',
+                borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${t.line}`,
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  color: t.ink, fontSize: 13, fontWeight: 600,
+                  display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                }}>{g.message}</div>
+                <div style={{
+                  color: t.inkFaint, fontSize: 10.5,
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                }}>{g.build} · last {relTimeShort(g.lastSeenAt)}</div>
+              </div>
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <div style={{
+                  color: t.ink, fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
+                }}>{fmtInt(g.count)}</div>
+                <div style={{ color: t.inkFaint, fontSize: 11, fontVariantNumeric: 'tabular-nums' }}>
+                  {fmtInt(g.users)} members
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function EventDetailSheet({
-  aggregate, period, rows, cutoffISO, onClose,
+  aggregate, period, onClose,
 }: {
   aggregate: EventAggregate | null;
   period: AnalyticsPeriod;
-  rows: { name: string; user_id: string | null; created_at: string }[];
-  cutoffISO: string | null;
   onClose: () => void;
 }) {
-  const days = periodToDays(period);
-  const daily = useMemo(() => {
-    if (!aggregate || !cutoffISO) return [];
-    return dailyForEvent(rows, cutoffISO, aggregate.name, days);
-  }, [aggregate, cutoffISO, rows, days]);
+  const dailyQ = useEventDaily(aggregate?.name ?? null, period);
+  const daily = useMemo(
+    () => (dailyQ.data ?? []).map(p => ({
+      date: new Date(p.date).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' }),
+      value: p.count,
+      users: p.users,
+    })),
+    [dailyQ.data],
+  );
 
-  const occurrences = useRecentOccurrences(aggregate?.name ?? null, cutoffISO);
+  const occ = useEventOccurrences(aggregate?.name ?? null, period);
+  const occRows = useMemo(
+    () => (occ.data?.pages ?? []).flatMap(p => p.rows),
+    [occ.data],
+  );
   const ids = useMemo(() => {
     const s = new Set<string>();
-    for (const o of occurrences.data ?? []) if (o.user_id) s.add(o.user_id);
+    for (const o of occRows) if (o.user_id) s.add(o.user_id);
     return Array.from(s);
-  }, [occurrences.data]);
+  }, [occRows]);
   const profiles = useProfilesByIds(ids);
 
   const total = aggregate?.count ?? 0;
@@ -1708,16 +1824,31 @@ function EventDetailSheet({
     >
       {aggregate && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {aggregate.stopped && (
+            <div style={{
+              border: `1px solid ${t.danger}`, borderRadius: 14, padding: '10px 12px',
+              color: t.danger, fontSize: 12.5, fontWeight: 600,
+            }}>
+              Stopped firing. {fmtInt(aggregate.priorCount)} occurrences in the previous period, none in this one.
+            </div>
+          )}
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8,
           }}>
             <StatBox label="Total" value={fmtInt(total)} />
-            <StatBox label="Unique users" value={fmtInt(users)} />
-            <StatBox label="Per user" value={perUser.toFixed(1)} />
+            <StatBox label="Members" value={fmtInt(users)} />
+            <StatBox label="Per member" value={perUser.toFixed(1)} />
+            <StatBox label="Prior total" value={fmtInt(aggregate.priorCount)} />
+            <StatBox label="Prior members" value={fmtInt(aggregate.priorUsers)} />
+            <StatBox
+              label="Last seen"
+              value={aggregate.lastSeenAt ? relTimeShort(aggregate.lastSeenAt) : '-'}
+            />
           </div>
 
-          <ChartCard title="Daily count" subtitle={`Occurrences per day, last ${period}`} loading={false}
-            isEmpty={daily.every(d => d.value === 0)}>
+          <ChartCard title="Daily count" subtitle={`Occurrences per day, last ${period}`}
+            loading={dailyQ.isLoading}
+            isEmpty={daily.length === 0 || daily.every(d => d.value === 0)}>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={daily} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
                 <CartesianGrid stroke={t.line} vertical={false} strokeDasharray="3 3" />
@@ -1730,57 +1861,71 @@ function EventDetailSheet({
           </ChartCard>
 
           <div>
-            <div style={{ color: t.ink, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>Recent occurrences</div>
-            <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 10 }}>Latest 15 in the selected period</div>
-            {occurrences.isError ? (
-              <AdminErrorState title="Couldn't load occurrences" onRetry={() => occurrences.refetch()} />
-            ) : occurrences.isLoading ? (
+            <div style={{ color: t.ink, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>Occurrences</div>
+            <div style={{ color: t.inkMuted, fontSize: 12, marginBottom: 10 }}>
+              Newest first, with the full properties payload
+            </div>
+            {occ.isError ? (
+              <AdminErrorState title="Couldn't load occurrences" onRetry={() => occ.refetch()} />
+            ) : occ.isLoading ? (
               <div style={{ height: 180, background: t.canvas, borderRadius: t.radius.md }} />
-            ) : (occurrences.data ?? []).length === 0 ? (
+            ) : occRows.length === 0 ? (
               <EmptyState title="No recent occurrences" />
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {occurrences.data!.map((o, i) => {
-                  const isLast = i === occurrences.data!.length - 1;
-                  const p = o.user_id ? (profiles.data ?? {})[o.user_id] : null;
-                  const name = o.user_id ? displayNameOf(p) : 'System';
-                  const propsLine = o.props && Object.keys(o.props).length > 0
-                    ? (() => {
-                      const s = JSON.stringify(o.props);
-                      return s.length > 60 ? `${s.slice(0, 60)}…` : s;
-                    })()
-                    : null;
-                  const row = (
-                    <>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{
-                          color: t.ink, fontSize: 13, fontWeight: 600,
-                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                        }}>{name}</div>
-                        {propsLine && (
+              <>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {occRows.map((o, i) => {
+                    const isLast = i === occRows.length - 1;
+                    const p = o.user_id ? (profiles.data ?? {})[o.user_id] : null;
+                    const name = o.user_id ? displayNameOf(p) : 'System';
+                    const propsText = o.props && Object.keys(o.props).length > 0
+                      ? JSON.stringify(o.props, null, 1)
+                      : null;
+                    const row = (
+                      <>
+                        <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{
-                            color: t.inkFaint, fontSize: 11,
-                            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                            color: t.ink, fontSize: 13, fontWeight: 600,
                             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                          }}>{propsLine}</div>
-                        )}
-                      </div>
-                      <span style={{
-                        color: t.inkFaint, fontSize: 12, fontVariantNumeric: 'tabular-nums',
-                        textAlign: 'right', minWidth: 68,
-                      }}>{relTimeShort(o.created_at)}</span>
-                    </>
-                  );
-                  const style: React.CSSProperties = {
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '10px 0', textDecoration: 'none',
-                    borderBottom: isLast ? 'none' : `1px solid ${t.line}`,
-                  };
-                  return o.user_id
-                    ? <Link key={o.id} to={`/admin-v2/users?member=${o.user_id}`} style={style} onClick={onClose}>{row}</Link>
-                    : <div key={o.id} style={style}>{row}</div>;
-                })}
-              </div>
+                          }}>{name}</div>
+                          {propsText && (
+                            <pre style={{
+                              color: t.inkFaint, fontSize: 10.5, margin: '4px 0 0',
+                              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                              whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                              maxHeight: 132, overflow: 'hidden',
+                            }}>{propsText}</pre>
+                          )}
+                        </div>
+                        <span style={{
+                          color: t.inkFaint, fontSize: 12, fontVariantNumeric: 'tabular-nums',
+                          textAlign: 'right', minWidth: 68, flexShrink: 0,
+                        }}>{relTimeShort(o.created_at)}</span>
+                      </>
+                    );
+                    const style: React.CSSProperties = {
+                      display: 'flex', alignItems: 'flex-start', gap: 10,
+                      padding: '10px 0', textDecoration: 'none',
+                      borderBottom: isLast ? 'none' : `1px solid ${t.line}`,
+                    };
+                    return o.user_id
+                      ? <Link key={o.id} to={`/admin-v2/users?member=${o.user_id}`} style={style} onClick={onClose}>{row}</Link>
+                      : <div key={o.id} style={style}>{row}</div>;
+                  })}
+                </div>
+                {occ.hasNextPage && (
+                  <button
+                    onClick={() => occ.fetchNextPage()}
+                    disabled={occ.isFetchingNextPage}
+                    style={{
+                      marginTop: 10, width: '100%', padding: '10px 0',
+                      background: 'transparent', border: `1px solid ${t.line}`,
+                      borderRadius: 999, color: t.ink, fontSize: 12.5, fontWeight: 700,
+                      cursor: occ.isFetchingNextPage ? 'default' : 'pointer',
+                    }}
+                  >{occ.isFetchingNextPage ? 'Loading…' : 'Load more'}</button>
+                )}
+              </>
             )}
           </div>
 
