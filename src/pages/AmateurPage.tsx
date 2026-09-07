@@ -74,16 +74,9 @@ export default function AmateurPage() {
 
   return (
     <div style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, ...FIGS }}>
-      {/* The band is timed to land solid as the hero's last 90px pass under it,
-          not from the very top — otherwise it goes opaque while the hero is
-          still the whole screen. */}
-      <AppHeader
-        inset="self"
-        overHero
-        overHeroRange={90}
-        overHeroStart={AMATEUR_HERO_H - 43 - 90}
-        heightVar="--amateur-header-h"
-      />
+      {/* No page-owned header: /amateur wears the shared floating glass
+          islands (registry rule), the same object the feed and course detail
+          wear. The island pays the notch; the hero bleeds beneath it. */}
       <AmateurHero userId={user?.id} />
 
       {/* THE SHARED CLEARANCE, never a page-local number: the floating pill's
