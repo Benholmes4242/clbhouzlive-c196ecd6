@@ -8,6 +8,7 @@ import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { AmateurFilterRail } from '@/features/amateur/AmateurFilterRail';
+import { AmateurCoursesBlock } from '@/features/amateur/AmateurCoursesBlock';
 import { AmateurHero } from '@/features/amateur/AmateurHero';
 import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBlock';
 import { useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
@@ -45,6 +46,14 @@ export default function AmateurPage() {
       else opener.openProfile(row.user_id);
     },
     [opener],
+  );
+
+  /* A COURSE ROW IS A LINK: the whole row goes to that course's page. */
+  const handleCourse = useCallback(
+    (courseId: string) => {
+      navigate(`/courses/${courseId}`);
+    },
+    [navigate],
   );
 
   return (
