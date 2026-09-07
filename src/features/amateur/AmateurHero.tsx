@@ -8,6 +8,7 @@ import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks
 import { DISCOVER_FACT, DISCOVER_QUIET, KICKER, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
+import { useHeroCourseImage } from '@/features/amateur/useHeroCourseImage';
 import { FIGS, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
@@ -49,6 +50,9 @@ export function AmateurHero({ userId }: { userId: string | undefined }) {
   const scoreIds = useMemo(() => [row?.score_id ?? null], [row?.score_id]);
   const shapes = useRoundHoleShapes(scoreIds);
   const shape = shapes?.get(row?.score_id ?? '') ?? null;
+  /* THE PHOTOGRAPH. The rounds hook carries no image column, so the hero reads
+     golf_courses.thumbnail_image — the same field block 2's course rows use. */
+  const heroImage = useHeroCourseImage(row?.course_id);
 
   const par = row ? toPar(row) : null;
 
@@ -68,7 +72,9 @@ export function AmateurHero({ userId }: { userId: string | undefined }) {
       <CourseImageFallback
         courseId={row?.course_id ?? null}
         courseName={row?.course_name ?? null}
-        initialsSize={44}
+        imageUrl={heroImage.data ?? null}
+        /* NEVER A MONOGRAM AT HERO SCALE: no photograph = flat tone + scrim. */
+        flatWhenEmpty
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', borderRadius: 0 }}
       >
         <span aria-hidden style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />

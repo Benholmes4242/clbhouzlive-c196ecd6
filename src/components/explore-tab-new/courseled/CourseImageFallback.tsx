@@ -58,6 +58,12 @@ interface Props {
    * <img>. A fallback may only render once its source has settled.
    */
   pending?: boolean;
+  /**
+   * HERO SCALE (BRIEF_AMATEUR_PAGE). A monogram works at 44px on a row; at
+   * 340px it reads as an error. With this set, a course with no photograph gets
+   * a FLAT TONE for the scrim to sit over — never initials, never a gradient.
+   */
+  flatWhenEmpty?: boolean;
   style?: React.CSSProperties;
   children?: React.ReactNode;
 }
@@ -68,12 +74,13 @@ export function CourseImageFallback({
   imageUrl,
   initialsSize = 22,
   pending = false,
+  flatWhenEmpty = false,
   style,
   children,
 }: Props) {
   const [broken, setBroken] = useState(false);
   const showImage = !!imageUrl && !broken;
-  const initials = initialsForCourse(courseName);
+  const initials = flatWhenEmpty ? '' : initialsForCourse(courseName);
 
   if (pending) {
     return (
@@ -89,7 +96,7 @@ export function CourseImageFallback({
     <div
       style={{
         position: 'relative',
-        background: gradientForCourse(courseId),
+        background: flatWhenEmpty && !showImage ? '#1B241C' : gradientForCourse(courseId),
         overflow: 'hidden',
         ...style,
       }}
