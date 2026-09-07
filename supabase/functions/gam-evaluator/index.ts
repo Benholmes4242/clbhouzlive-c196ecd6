@@ -949,17 +949,40 @@ function compare(value: number, op: string, target: number): boolean {
   }
 }
 
+// Stats that only exist because hole rows were read. With no hole rows these
+// are all zero/false as an artefact of missing data, not as a fact about the
+// round, so no condition may be judged from them (BRIEF_EVALUATOR_HOLE_RACE §3).
+const HOLE_DERIVED_STAT_FIELDS = new Set([
+  "birdies", "eagles", "albatrosses", "holes_in_one",
+  "pars", "bogeys", "double_bogeys", "triple_plus",
+  "clean_card", "longest_birdie_run", "longest_par_or_better_run",
+  "max_birdie_streak",
+]);
+
+// Binary badge ids whose condition reads a hole-derived stat.
+const HOLE_DERIVED_BINARY_BADGES = new Set([
+  "first_birdie", "first_eagle", "first_albatross",
+  "five_birdie_round", "two_eagles", "birdie_train", "clean_card",
+]);
+
 function matchesBinary(badge: any, stats: any): boolean {
+  // Badges are earn-only (never revoked), so declining to judge is the same
+  // shape as skipping: the badge is simply not awarded on this pass, and the
+  // re-enqueue on hole arrival gives it another chance with real data.
+  const holesKnown = (stats as any).hole_detail_present !== false;
+
   if (badge.threshold_field && badge.threshold_op && badge.threshold_value != null) {
     // Gross-score badges (break_70/80/90/100) only fire on full 18-hole rounds.
     // Without this guard, a 9-hole 34 would trip all four break_X badges.
     if (badge.threshold_field === 'gross_score' && stats.holes_played !== 18) {
       return false;
     }
+    if (!holesKnown && HOLE_DERIVED_STAT_FIELDS.has(badge.threshold_field)) return false;
     const v = stats[badge.threshold_field];
     if (v == null) return false;
     return compare(Number(v), badge.threshold_op, Number(badge.threshold_value));
   }
+  if (!holesKnown && HOLE_DERIVED_BINARY_BADGES.has(badge.id)) return false;
   switch (badge.id) {
     case "first_birdie": return stats.birdies > 0;
     case "first_eagle": return stats.eagles > 0;
@@ -974,6 +997,7 @@ function matchesBinary(badge: any, stats: any): boolean {
     case "first_index": return stats.hcp_at_time != null;
     default: return false;
   }
+
 }
 
 
