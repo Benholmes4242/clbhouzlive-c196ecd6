@@ -1,4 +1,11 @@
 /**
+ * DUPLICATE OF src/features/tourhub/overview/sections/SectionShell.tsx. Both
+ * are Tour Hub section headings, both render the same KICKER token, and they
+ * live in sibling directories (tournament-v2/sections and overview/sections).
+ * They do the same job. THE MERGE IS PENDING and is a treatment decision, not
+ * a mechanical one — do not fold them together here. Note this component is
+ * also consumed OUTSIDE Tour Hub, by features/search-v2 (SearchEmptyState).
+ *
  * SectionEyebrow - TD1 section header: kicker + optional right action.
  *
  * Analytical grammar (BRIEF_TOUR_TOURNAMENT_PAGE): the kicker is the canonical

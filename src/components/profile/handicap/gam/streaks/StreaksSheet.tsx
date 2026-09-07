@@ -113,7 +113,10 @@ const Panel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </div>
 );
 
-const SectionHeader: React.FC<{ label: string; count: number }> = ({ label, count }) => (
+// Local streaks-sheet section label. Renamed from SectionHeader
+// (BRIEF_SECTION_HEADING_UNTANGLE addendum A fix 1): only
+// components/ui/SectionHeader carries that name. Rendered output unchanged.
+const StreaksSectionLabel: React.FC<{ label: string; count: number }> = ({ label, count }) => (
   <div style={{ ...LABEL, padding: '20px 16px 8px', display: 'flex', gap: 6 }}>
     <span>{label}</span>
     <span style={{ ...TABULAR, color: CHART.MUTE }}>{count}</span>
@@ -437,7 +440,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
           <>
             {active.length > 0 && (
               <>
-                <SectionHeader label={t('streaks.sectionRunning')} count={active.length} />
+                <StreaksSectionLabel label={t('streaks.sectionRunning')} count={active.length} />
                 <Panel>
                   {active.map((type, i) => (
                     <StreakRowView

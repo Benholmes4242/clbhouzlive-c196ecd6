@@ -9,7 +9,7 @@ import { S } from './lib/tokens';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { SearchField } from './components/SearchField';
 import { ScopeChips } from './components/ScopeChips';
-import { SectionHeader } from './components/SectionHeader';
+import { SearchSectionHeader } from './components/SearchSectionHeader';
 import { PersonRow } from './components/PersonRow';
 import { CourseRow } from './components/CourseRow';
 import { PlayerRow } from './components/PlayerRow';
@@ -299,7 +299,7 @@ export function SearchOverlayV2({
                   <>
                     {data.people.length > 0 && (
                       <div>
-                        <SectionHeader
+                        <SearchSectionHeader
                           label="People"
                           onSeeAll={
                             data.people.length >= 5 ? () => goScope('people') : undefined
@@ -318,7 +318,7 @@ export function SearchOverlayV2({
 
                     {data.courses.length > 0 && (
                       <div>
-                        <SectionHeader
+                        <SearchSectionHeader
                           label="Courses"
                           onSeeAll={
                             data.courses.length >= 5 ? () => goScope('courses') : undefined
@@ -337,7 +337,7 @@ export function SearchOverlayV2({
 
                     {data.players.length > 0 && (
                       <div>
-                        <SectionHeader
+                        <SearchSectionHeader
                           label="Players"
                           onSeeAll={
                             data.players.length >= 5 ? () => goScope('players') : undefined
@@ -356,7 +356,7 @@ export function SearchOverlayV2({
 
                     {data.clubs.length > 0 && (
                       <div>
-                        <SectionHeader
+                        <SearchSectionHeader
                           label="Clubs"
                           onSeeAll={
                             data.clubs.length >= 5 ? () => goScope('clubs') : undefined
@@ -375,7 +375,7 @@ export function SearchOverlayV2({
 
                     {data.videos.length > 0 && (
                       <div>
-                        <SectionHeader
+                        <SearchSectionHeader
                           label="Videos"
                           onSeeAll={
                             data.videos.length >= 5 ? () => goScope('videos') : undefined
@@ -403,7 +403,7 @@ export function SearchOverlayV2({
 
                     {data.posts.length > 0 && (
                       <div>
-                        <SectionHeader
+                        <SearchSectionHeader
                           label="Posts"
                           onSeeAll={
                             data.posts.length >= 5 ? () => goScope('posts') : undefined

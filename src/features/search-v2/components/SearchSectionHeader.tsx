@@ -19,8 +19,10 @@ interface Props {
   right?: React.ReactNode;
 }
 
-/** The ONLY definition of the search-overlay kicker style. */
-export function SectionHeader({ label, onSeeAll, right }: Props) {
+/** The ONLY definition of the search-overlay kicker style. Renamed from SectionHeader
+ * (BRIEF_SECTION_HEADING_UNTANGLE addendum A fix 1) so that only
+ * components/ui/SectionHeader carries that name. Rendered output unchanged. */
+export function SearchSectionHeader({ label, onSeeAll, right }: Props) {
   return (
     <div
       style={{
