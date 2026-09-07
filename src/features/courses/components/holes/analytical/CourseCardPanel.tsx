@@ -48,7 +48,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 import { useCourseTeeSets, type TeeSet } from '../../../hooks/useCourseTeeSets';
 import { shortCourseName } from '../../../_shared/courseLabel';
-import { resolveDefaultTee, storageKey } from '../CourseTeeCard';
+import { resolveDefaultTee, storageKey } from '../teePreference';
 import {
   A,
   DIFFICULTY_HARD_HEX,
@@ -1194,6 +1194,13 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName, embedde
     } catch {
       /* private mode - the selection is in-memory only */
     }
+    // Replaces the retired tee_card_tee_changed. Same act, new surface: the
+    // pick is instrumented HERE so the tee card's deletion closes the gap
+    // rather than recording one.
+    analyticsEvents.track('course_card_tee_changed', {
+      course_id: courseId ?? null,
+      tee_label: label,
+    });
   };
 
   const slope = active?.slope_rating && active.slope_rating > 0 ? Math.round(active.slope_rating) : null;

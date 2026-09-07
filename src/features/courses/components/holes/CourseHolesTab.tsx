@@ -11,15 +11,12 @@ import { FONT } from './_constants';
 import { INK_MUTE } from '@/features/courses/_shared/tokens';
 import ConnectGhostPrompt from '@/components/handicap/ConnectGhostPrompt';
 import { HoleDataSheet, type HoleDataSection } from './HoleDataSheet';
-import { CourseTeeCard } from './CourseTeeCard';
 import { A } from './analytical/tokens';
 
 interface Props {
   courseId: string | undefined;
   /** Which slice of HoleDataSheet to render. Default 'all' (legacy tab). */
   section?: HoleDataSection;
-  /** Render the tee card above the sheet. Default true (legacy tab). */
-  showTeeCard?: boolean;
   /** Render the connect-handicap ghost prompt. Default true (legacy tab). */
   showGhost?: boolean;
   /** Render the "no hole data" empty state. Default true (legacy tab). */
@@ -38,7 +35,6 @@ interface Props {
 export const CourseHolesTab: React.FC<Props> = ({
   courseId,
   section = 'all',
-  showTeeCard = true,
   showGhost = true,
   showEmptyState = true,
   suppressStatus = false,
@@ -127,13 +123,10 @@ export const CourseHolesTab: React.FC<Props> = ({
     />
   ) : null;
 
-  const teeCard = showTeeCard ? <CourseTeeCard courseId={courseId} /> : null;
-
   if (!data?.available || holes.length === 0) {
     return (
       <>
         {ghost}
-        {teeCard}
         {showEmptyState && <HolesEmptyState courseName={meta?.course_name ?? null} />}
       </>
     );
@@ -142,7 +135,6 @@ export const CourseHolesTab: React.FC<Props> = ({
   return (
     <>
       {ghost}
-      {teeCard}
       <HoleDataSheet
         courseName={meta?.course_name ?? ''}
         courseId={courseId}
