@@ -1,3 +1,19 @@
+/**
+ * ⚠️ POSTGREST RETURNS AT MOST 2000 ROWS — whatever `.limit()` says.
+ *
+ * Measured 7 Sep 2026: a request for 50,000 rows against a 23,295-row table
+ * came back with exactly 2000. analytics_events holds ~20,100 rows per
+ * fortnight and ~50,100 per 30 days, so ANY raw select over a window wider
+ * than roughly a day is silently truncated — and with no ORDER BY the 2000
+ * you get are physical order, i.e. the OLDEST slice of an append-only table.
+ *
+ * Raising the limit does not help. Adding .order() only changes which slice
+ * you lose. Distinct-user counts, totals and buckets computed in the browser
+ * from a truncated pull are WRONG, not approximate.
+ *
+ * The fix is always the same: aggregate in Postgres behind an admin-gated RPC
+ * (see get_admin_audiences / get_platform_activity) and return one row.
+ */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -47,7 +63,7 @@ async function fetchNorthStar(): Promise<NorthStarData> {
     supabase.rpc('get_platform_activity', { p_days: 30 }),
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).gte('created_at', sevenAgo.toISOString()),
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).gte('created_at', fourteenAgo.toISOString()).lt('created_at', sevenAgo.toISOString()),
-    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).eq('is_system_account', false),
     // D1 cohort: signed up 2 days ago (window 2d..1d)
     supabase.from('user_profiles').select('id').is('deleted_at', null).gte('created_at', new Date(now - 2 * day).toISOString()).lt('created_at', new Date(now - 1 * day).toISOString()).limit(2000),
     // D7 cohort: signed up 8 days ago (window 8d..7d)
@@ -77,6 +93,18 @@ async function fetchNorthStar(): Promise<NorthStarData> {
     ? Math.round((d7Cohort.filter(u => activeIds.has(u.id)).length / d7Cohort.length) * 100)
     : null;
 
+  const totalUsers = totalUsersRes.count ?? 0;
+
+  // ONE POPULATION. The Members tile and the Audiences grid count the same
+  // set: live profiles, service account excluded. These are arithmetic
+  // identities, not thresholds - a break means the tile has drifted off the
+  // population, so fail loudly rather than render a plausible number.
+  if (!(dauToday <= wau)) throw new Error(`North Star invariant broken: DAU ${dauToday} > WAU ${wau}`);
+  if (!(wau <= mau)) throw new Error(`North Star invariant broken: WAU ${wau} > MAU ${mau}`);
+  if (!(mau <= totalUsers)) throw new Error(`North Star invariant broken: MAU ${mau} > MEMBERS ${totalUsers}`);
+  if (!(signups7Res.count === null || (signups7Res.count ?? 0) <= totalUsers)) {
+    throw new Error(`North Star invariant broken: SIGNUPS 7D ${signups7Res.count} > MEMBERS ${totalUsers}`);
+  }
 
   return {
     dauToday,
@@ -88,9 +116,10 @@ async function fetchNorthStar(): Promise<NorthStarData> {
     signupsPrev7d: signupsPrev7Res.count ?? 0,
     d1Retention,
     d7Retention,
-    totalUsers: totalUsersRes.count ?? 0,
+    totalUsers,
   };
 }
+
 
 export function useNorthStar() {
   return useQuery({

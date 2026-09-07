@@ -1,3 +1,19 @@
+/**
+ * ⚠️ POSTGREST RETURNS AT MOST 2000 ROWS — whatever `.limit()` says.
+ *
+ * Measured 7 Sep 2026: a request for 50,000 rows against a 23,295-row table
+ * came back with exactly 2000. analytics_events holds ~20,100 rows per
+ * fortnight and ~50,100 per 30 days, so ANY raw select over a window wider
+ * than roughly a day is silently truncated — and with no ORDER BY the 2000
+ * you get are physical order, i.e. the OLDEST slice of an append-only table.
+ *
+ * Raising the limit does not help. Adding .order() only changes which slice
+ * you lose. Distinct-user counts, totals and buckets computed in the browser
+ * from a truncated pull are WRONG, not approximate.
+ *
+ * The fix is always the same: aggregate in Postgres behind an admin-gated RPC
+ * (see get_admin_audiences / get_platform_activity) and return one row.
+ */
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -75,6 +91,9 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
     .select(`id, display_name, username, profile_photo_url, country, home_club,
              eg_handicap_index, is_verified_golfer, is_suspended, created_at`)
     .is('deleted_at', null)
+    // ONE population governs every member figure: live profiles, service
+    // account excluded. Must match get_admin_audiences()'s members CTE.
+    .eq('is_system_account', false)
     .order('created_at', { ascending: false })
     .limit(10000);
   if (error) throw error;
