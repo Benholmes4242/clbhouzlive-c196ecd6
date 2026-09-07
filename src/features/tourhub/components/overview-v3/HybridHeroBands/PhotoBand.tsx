@@ -123,7 +123,13 @@ export function PhotoBand({
     <div
       style={{
         position: 'relative',
-        width: '100%',
+        /* S4: the hero photograph is INSET, not page-wide — 16px gutters and the
+           canonical 14pt radius. Horizontal only: the band's height is a term in
+           OVERVIEW_HERO_TOTAL_HEIGHT and a vertical margin would overflow it. */
+        width: 'calc(100% - 32px)',
+        marginLeft: 16,
+        marginRight: 16,
+        borderRadius: 14,
         // HARD height, not a floor. It ABSORBS the safe-area inset so the hero
         // column (photo + 36px ticker) exactly fills OVERVIEW_HERO_TOTAL_HEIGHT
         // — otherwise the inset showed as a white gap above the live board.
