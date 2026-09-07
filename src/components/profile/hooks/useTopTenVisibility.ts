@@ -75,7 +75,7 @@ export function useTopTenVisibility(
       // 'followers' — friends OR a follower of the owner.
       const { data: follow } = await supabase
         .from('user_follows')
-        .select('id')
+        .select('follower_id')
         .eq('follower_id', viewerId)
         .eq('following_id', ownerId!)
         .maybeSingle();
