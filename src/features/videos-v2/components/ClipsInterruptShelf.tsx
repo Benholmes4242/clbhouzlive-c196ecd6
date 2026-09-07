@@ -17,6 +17,7 @@ import { useRailLane } from '@/video/useRailLane';
 import { usePreroutePrefetch } from '@/video/usePreroutePrefetch';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { InterruptClipRow } from '../hooks/useInterruptClips';
 
 const FONT_FAMILY =
@@ -92,7 +93,7 @@ function ClipTile({
           aspectRatio: '9 / 14',
           borderRadius: 4,
           overflow: 'hidden',
-          background: '#e5e9ef',
+          background: A.PANEL,
           cursor: 'pointer',
         }}
       >
@@ -126,7 +127,7 @@ function ClipTile({
           marginTop: 6,
           fontWeight: 700,
           fontSize: 11,
-          color: '#0F172A',
+          color: A.INK,
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -167,9 +168,9 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
       style={{
         margin: '0 -4px 16px',
         padding: '12px 0',
-        background: 'rgba(247,147,30,0.06)',
-        borderTop: '1px solid rgba(0,0,0,0.07)',
-        borderBottom: '1px solid rgba(0,0,0,0.07)',
+        background: A.PANEL,
+        borderTop: `1px solid ${A.BORDER}`,
+        borderBottom: `1px solid ${A.BORDER}`,
         fontFamily: FONT_FAMILY,
       }}
     >
@@ -217,7 +218,7 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
             width: 143,
             aspectRatio: '9 / 14',
             borderRadius: 4,
-            border: '1.5px dashed rgba(0,0,0,0.14)',
+            border: `1.5px dashed ${A.BORDER}`,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -227,10 +228,10 @@ export function ClipsInterruptShelf({ clips, shelfIndex }: Props) {
             fontFamily: FONT_FAMILY,
           }}
         >
-          <div style={{ fontWeight: 700, fontSize: 16, color: '#94A3B8', lineHeight: 1 }}>
+          <div style={{ fontWeight: 700, fontSize: 16, color: A.DIM, lineHeight: 1 }}>
             {'\u203A'}
           </div>
-          <div style={{ marginTop: 4, fontWeight: 600, fontSize: 11, color: '#64748B' }}>
+          <div style={{ marginTop: 4, fontWeight: 600, fontSize: 11, color: A.MUTE }}>
             All clips
           </div>
         </div>
