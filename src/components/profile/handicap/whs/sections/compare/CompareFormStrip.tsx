@@ -70,8 +70,8 @@ export const CompareFormStrip: React.FC<{ rounds: SharedRoundResult[] }> = ({
           gap: 12,
         }}
       >
-        <span style={LABEL}>{t('handicap.compare.oldest')}</span>
-        <span style={{ ...LABEL, color: CHART.MUTE, textAlign: 'right' }}>
+        <span style={{ ...LABEL, minWidth: 0 }}>{t('handicap.compare.oldest')}</span>
+        <span style={{ ...LABEL, color: CHART.MUTE, textAlign: 'right', minWidth: 0 }}>
           {truncated
             ? t('handicap.compare.formTruncated', {
                 shown: shown.length,
