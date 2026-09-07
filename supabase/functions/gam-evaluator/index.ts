@@ -348,11 +348,19 @@ async function processSingle(whsScoreId: string) {
     delta_index: deltaIndexForThis,
   });
 
+  // ADDENDUM B §2. Both settledness markers are now COLUMNS on gam_round_stats
+  // and are written on EVERY evaluation, first and re-evaluation alike, from the
+  // in-memory determination made above. Nothing recomputes them from the stored
+  // row. NULL means unknown; this path never writes null.
+  (stats as any).hole_detail_present = holeDetailPresent;
+  (stats as any).counter_settled = counterSettled;
+
   // Persist gam_round_stats
   const { error: upErr } = await supabase
     .from("gam_round_stats")
     .upsert(stats, { onConflict: "whs_score_id" });
   if (upErr) throw upErr;
+
 
   // PREVIOUS-ROUND BACKFILL. The round being evaluated usually has no next
   // score yet, so its own movement is unknowable on this pass. But the round
