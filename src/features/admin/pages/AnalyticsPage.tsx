@@ -20,9 +20,12 @@ import { monotonePath, useElementWidth, EndDot, AxisTicks, fourTickIndices } fro
 import { useLiveWindow30m, useProfilesByIds, type LiveEventRow, type LiteProfile } from '../hooks/useLiveStream';
 import {
   useEventAggregates,
-  useRecentOccurrences,
-  dailyForEvent,
+  useEventDaily,
+  useEventOccurrences,
+  useAppErrors,
+  useDebounced,
   type EventAggregate,
+  type EventSort,
 } from '../hooks/useEventsExplorer';
 import {
   AnalyticsPeriod,
