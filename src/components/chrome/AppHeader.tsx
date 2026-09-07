@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+import { GLASS_CHROME } from '@/components/media/GlassDurationBadge';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useActiveActor } from '@/context/ActiveActorContext';
