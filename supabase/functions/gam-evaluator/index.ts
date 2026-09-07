@@ -1519,7 +1519,7 @@ async function deriveStreaks(userId: string) {
 
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
-      const met = derivedCondition(streakType, r, i === rows.length - 1);
+      const met = derivedCondition(streakType, r);
       if (met === null) continue; // stepped over: neither extends nor breaks
       lastJudgedRound = r.whs_score_id;
       if (met) {
