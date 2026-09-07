@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+import { GLASS_CHROME } from '@/components/media/GlassDurationBadge';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -66,9 +67,7 @@ export function AppHeaderBurger({ onTap, label }: { onTap: () => void; label: st
         placeItems: 'center',
         padding: 0,
         border: 0,
-        background: 'rgba(15,23,42,0.35)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
+        ...GLASS_CHROME,
         cursor: 'pointer',
         flexShrink: 0,
       }}

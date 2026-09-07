@@ -16,7 +16,7 @@ import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
 import { TourSideMenu } from '../components/TourSideMenu';
 import { TourIslandLeft } from '../components/TourIslandLeft';
 import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
-import { TourChipRail } from '../components/TourChipRail';
+import { TourPickerControl } from '../components/TourPickerControl';
 import { AppHeaderBurger } from '@/components/chrome/AppHeader';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { scrollPageToTop } from '@/lib/getScrollParent';
@@ -227,8 +227,15 @@ export function TourHubMainPage() {
             showBack={!isHubRoot}
             onBack={() => handleSelectTab('overview')}
             backFallback="/tourhub"
-            leftSlot={<AppHeaderBurger onTap={() => setMenuOpen(true)} label="Tour menu" />}
-            belowTitle={activeTab === 'live' ? undefined : <TourChipRail />}
+            leftSlot={
+              /* The left slot is the variant slot: burger + tour picker as one
+                 left-aligned group. NOTHING renders between the header border
+                 and the hero — the chip rail that used to sit there is gone. */
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                <AppHeaderBurger onTap={() => setMenuOpen(true)} label="Tour menu" />
+                {activeTab !== 'live' && <TourPickerControl onTap={() => setPickerOpen(true)} />}
+              </div>
+            }
           >
             {renderTab()}
           </TourPageShell>

@@ -8,7 +8,7 @@
  * whichever tour is currently in view on the hero.
  */
 import React, { useMemo } from 'react';
-import { Globe2, Trophy } from 'lucide-react';
+import { Check, Globe2, Trophy } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
@@ -219,6 +219,10 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
               {t('picker.allToursSub')}
             </div>
           </div>
+          {/* The current selection carries a tick, right-aligned. */}
+          {activeTourSlug === 'all' && (
+            <Check size={16} strokeWidth={2.6} color={INK} aria-hidden style={{ flexShrink: 0 }} />
+          )}
         </button>
         {activeMajor && (
 
@@ -408,6 +412,9 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
                   <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: INK_ALPHA_45 }}>
                     {t('status.upcoming')}
                   </span>
+                )}
+                {isActive && (
+                  <Check size={16} strokeWidth={2.6} color={INK} aria-hidden style={{ flexShrink: 0, marginLeft: 2 }} />
                 )}
               </button>
             );
