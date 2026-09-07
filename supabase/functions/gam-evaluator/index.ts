@@ -236,16 +236,34 @@ async function processSingle(whsScoreId: string) {
     }
   }
 
-  // Holes
-  let holes: any[] = [];
-  if (scoreRow.hole_by_hole_fetched) {
-    const { data: hRows } = await supabase
-      .from("whs_score_holes")
-      .select("*")
-      .eq("score_id", whsScoreId)
-      .order("hole_no", { ascending: true });
-    holes = hRows ?? [];
+  // HOLES — READ UNCONDITIONALLY (BRIEF_EVALUATOR_HOLE_RACE §1).
+  // hole_by_hole_fetched is written by the hole backfill, which races this
+  // evaluator. Gating this query on the flag meant a round whose hole rows had
+  // already landed was evaluated as if it had none: every hole-derived stat
+  // (birdies, pars, bogeys, clean_card, runs) was recorded as zero, silently.
+  // The rows are the truth; the flag is not consulted anywhere in this path.
+  const { data: hRows } = await supabase
+    .from("whs_score_holes")
+    .select("*")
+    .eq("score_id", whsScoreId)
+    .order("hole_no", { ascending: true });
+  const holes: any[] = hRows ?? [];
+
+  // Hole detail presence, derived from what the query RETURNED — never from
+  // hole_by_hole_fetched. When false, no hole-derived condition may be judged.
+  const holeDetailPresent = holes.length > 0;
+  if (!holeDetailPresent) {
+    console.log(
+      JSON.stringify({
+        evt: "gam_eval_no_hole_rows",
+        whs_score_id: whsScoreId,
+        hole_by_hole_fetched: scoreRow.hole_by_hole_fetched ?? null,
+        total_holes: scoreRow.total_holes ?? null,
+        note: "hole-derived stats stored as zero; hole-derived streaks and badges skipped",
+      }),
+    );
   }
+
 
   // COURSE PAR FALLBACK. hole_by_hole_fetched is written by the hole backfill,
   // which races this evaluator: when the evaluator wins the race the flag is
