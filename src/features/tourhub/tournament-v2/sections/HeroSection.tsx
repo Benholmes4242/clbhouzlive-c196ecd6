@@ -427,7 +427,12 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           position: 'relative',
           minHeight: TOUR_HERO_BAND_H,
           /* S4: no bleed. The fixed header is in flow above this band, so the
-             band pays a comfort pad only — never the safe-area inset. */
+             band pays a comfort pad only — never the safe-area inset. And the
+             photograph is INSET, not page-wide: 16px gutters, canonical 14pt
+             radius, clipped. */
+          margin: '12px 16px 0',
+          borderRadius: 14,
+          overflow: 'hidden',
           paddingTop: 20,
           background,
           display: 'flex',
@@ -435,7 +440,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
           justifyContent: 'flex-end',
         }}
       >
-        <div style={{ padding: '8px 16px 10px' }}>
+        <div style={{ padding: '8px 14px 12px' }}>
           <div
             style={{
               display: 'inline-flex',
