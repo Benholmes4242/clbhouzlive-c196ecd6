@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -59,9 +60,10 @@ export default function ClipsPageV2() {
       <main
         style={{
           paddingBottom: 'var(--bottom-nav-height, 96px)',
-          // Bleed route: --header-h publishes 0 and .app-shell no longer pads
-          // --sat, so the page owns clearance for the floating island (62px).
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
+          // THE ONE TOP CLEARANCE: the islands measure themselves into
+          // CHROME_CLEARANCE (src/lib/chromeClearance.ts). No number here — the
+          // chrome is the single safe-area owner and content starts below it.
+          paddingTop: CHROME_CLEARANCE,
           fontFamily: FONT_FAMILY,
         }}
       >

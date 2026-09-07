@@ -1,12 +1,18 @@
 import MapPinIcon from '@/components/icons/MapPinIcon';
 import HouseIcon from '@/components/icons/HouseIcon';
-import LeaderboardMarkIcon from '@/components/icons/LeaderboardMarkIcon';
+import CompassRoseIcon from '@/components/icons/CompassRoseIcon';
 import PlusSquareIcon from '@/components/icons/PlusSquareIcon';
 import TrophyIcon from '@/components/icons/TrophyIcon';
 
 // NOTE: tab IDs are historical and do NOT match labels.
 //   id 'clubhouse' = the immersive swipe FEED at '/'   (label "Explore")
-//   id 'watch'     = NOW the Amateur destination at '/amateur' (label "Amateur").
+//   id 'watch'     = the Explore destination, SERVED AT '/amateur' (label "Explore").
+//                    KNOWN, DELIBERATE MISMATCH: the label says Explore, the path
+//                    says /amateur, and '/explore' is a redirect shim pointing AT
+//                    '/amateur'. Swapping them means repointing eighteen call sites
+//                    for zero member-visible gain — members never see the path.
+//                    Do NOT 'fix' this in passing; straighten it only if we have
+//                    another reason to touch those routes.
 //                    It absorbed Discover's boards, courses, news and media;
 //                    '/explore' is a redirect shim to '/amateur' and the
 //                    standalone Watch hub stays dormant behind WATCH_SURFACE.
@@ -18,7 +24,7 @@ import TrophyIcon from '@/components/icons/TrophyIcon';
 
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Home',      icon: HouseIcon,  path: '/' },
-  { id: 'watch',     label: 'Amateur',   icon: LeaderboardMarkIcon, path: '/amateur' },
+  { id: 'watch',     label: 'Explore',   icon: CompassRoseIcon, path: '/amateur' },
   { id: 'post',      label: 'Post',      icon: PlusSquareIcon, path: null, isAction: true },
   { id: 'courses',   label: 'Courses',   icon: MapPinIcon, path: '/courses' },
   { id: 'tourhub',   label: 'Tour',      icon: TrophyIcon, path: '/tourhub' },
