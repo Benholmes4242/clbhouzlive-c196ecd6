@@ -147,7 +147,7 @@ async function fetchMetrics(): Promise<MetricsBundle> {
     supabase.from('user_profiles').select('created_at').is('deleted_at', null).gte('created_at', since14).limit(20000),
     supabase.from('posts').select('created_at').gte('created_at', since14).limit(20000),
     supabase.from('course_ratings').select('created_at').gte('created_at', since14).limit(20000),
-    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).eq('is_system_account', false),
   ]);
 
 

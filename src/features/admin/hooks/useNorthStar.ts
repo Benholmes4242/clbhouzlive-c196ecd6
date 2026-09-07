@@ -63,7 +63,7 @@ async function fetchNorthStar(): Promise<NorthStarData> {
     supabase.rpc('get_platform_activity', { p_days: 30 }),
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).gte('created_at', sevenAgo.toISOString()),
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).gte('created_at', fourteenAgo.toISOString()).lt('created_at', sevenAgo.toISOString()),
-    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).eq('is_system_account', false),
     // D1 cohort: signed up 2 days ago (window 2d..1d)
     supabase.from('user_profiles').select('id').is('deleted_at', null).gte('created_at', new Date(now - 2 * day).toISOString()).lt('created_at', new Date(now - 1 * day).toISOString()).limit(2000),
     // D7 cohort: signed up 8 days ago (window 8d..7d)

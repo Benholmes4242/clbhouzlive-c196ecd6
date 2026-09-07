@@ -59,7 +59,7 @@ async function fetchPlatform(period: AnalyticsPeriod): Promise<PlatformAnalytics
   const since = startOf(period).toISOString();
 
   const [allUsers, newUsers, activityRes, echoRes] = await Promise.all([
-    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).eq('is_system_account', false),
     supabase.from('user_profiles').select('created_at').gte('created_at', since).is('deleted_at', null),
     // Distinct-user counting is an aggregation: it runs in the database, not the browser.
     supabase.rpc('get_platform_activity', { p_days: days }),
@@ -498,7 +498,7 @@ async function fetchAuth(period: AnalyticsPeriod): Promise<AuthAnalyticsData> {
   const [authEvents, priorAuthEvents, totalProfilesRes, completedOnboardingRes] = await Promise.all([
     supabase.from('analytics_events').select('id, created_at, name, user_id, props').in('name', names).gte('created_at', since).order('created_at', { ascending: false }).limit(10000),
     supabase.from('analytics_events').select('name').in('name', names).gte('created_at', priorSince).lt('created_at', since).limit(10000),
-    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).eq('is_system_account', false),
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null).eq('has_completed_onboarding', true),
   ]);
 

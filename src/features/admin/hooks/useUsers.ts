@@ -91,6 +91,9 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
     .select(`id, display_name, username, profile_photo_url, country, home_club,
              eg_handicap_index, is_verified_golfer, is_suspended, created_at`)
     .is('deleted_at', null)
+    // ONE population governs every member figure: live profiles, service
+    // account excluded. Must match get_admin_audiences()'s members CTE.
+    .eq('is_system_account', false)
     .order('created_at', { ascending: false })
     .limit(10000);
   if (error) throw error;
