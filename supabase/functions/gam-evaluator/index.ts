@@ -409,16 +409,11 @@ async function processSingle(whsScoreId: string) {
   // to gam_round_stats (no column). max_birdie_streak mirrors longest_birdie_run.
   (stats as any).max_birdie_streak = stats.longest_birdie_run ?? 0;
 
-  // Transient. Set AFTER the gam_round_stats upsert above so it is never
-  // written to a column that does not exist. Downstream, a false value means
-  // "unresolved, not absent": hole-derived streaks and badge conditions are
-  // SKIPPED rather than judged as not met.
-  (stats as any).hole_detail_present = holeDetailPresent;
+  // hole_detail_present / counter_settled were set BEFORE the upsert above and
+  // are now persisted columns. They stay on `stats` for the badge matchers,
+  // where a false value still means "unresolved, not absent": hole-derived and
+  // counter-derived conditions are SKIPPED rather than judged as not met.
 
-  // Transient, same contract as hole_detail_present: false means "unresolved,
-  // not negative". gam_round_stats.is_counter remains a snapshot of the column;
-  // this only governs whether counter-derived streaks/badges may be judged.
-  (stats as any).counter_settled = counterSettled;
 
 
 
