@@ -19106,9 +19106,22 @@ export type Database = {
       }
       get_admin_audiences: { Args: never; Returns: Json }
       get_admin_funnel_cohorts: { Args: { p_weeks?: number }; Returns: Json }
+      get_admin_intraday: { Args: { p_tz?: string }; Returns: Json }
       get_admin_member_actions: { Args: { p_days?: number }; Returns: Json }
+      get_admin_member_last_seen: {
+        Args: { p_days?: number }
+        Returns: {
+          active_24h: boolean
+          last_seen_at: string
+          user_id: string
+        }[]
+      }
       get_admin_ops_health: {
         Args: { p_build_id?: string; p_days?: number }
+        Returns: Json
+      }
+      get_admin_overview_metrics: {
+        Args: { p_days?: number; p_tz?: string }
         Returns: Json
       }
       get_admin_retention: { Args: { p_days?: number }; Returns: Json }
