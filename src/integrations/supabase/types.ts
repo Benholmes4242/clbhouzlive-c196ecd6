@@ -14492,6 +14492,7 @@ export type Database = {
           suspension_reason: string | null
           tiktok_handle: string
           top_ten_comments_privacy: string | null
+          top_ten_visibility: string
           top100_visible: boolean | null
           tracker_visible: boolean | null
           twitter_handle: string
@@ -14619,6 +14620,7 @@ export type Database = {
           suspension_reason?: string | null
           tiktok_handle?: string
           top_ten_comments_privacy?: string | null
+          top_ten_visibility?: string
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
           twitter_handle?: string
@@ -14746,6 +14748,7 @@ export type Database = {
           suspension_reason?: string | null
           tiktok_handle?: string
           top_ten_comments_privacy?: string | null
+          top_ten_visibility?: string
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
           twitter_handle?: string
