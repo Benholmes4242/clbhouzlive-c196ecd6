@@ -65,6 +65,12 @@ export interface UserProfile {
   last_notifications_seen_at?: string | null;
   // Header chip visibility
   hide_handicap_chip?: boolean | null;
+  // Top 10 audience gate (BRIEF_TOP_TEN_VISIBILITY_ROUNDTRIP): the row already
+  // carries this, so ProfilePageV2 passes it to ProfileTopTenRail rather than
+  // the rail fetching it again. NOTE: public_profiles does NOT expose this
+  // column, so on the fallback path below it is undefined and coerces to
+  // 'public' — see report.
+  top_ten_visibility?: string | null;
 }
 
 /**

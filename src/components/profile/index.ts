@@ -6,6 +6,5 @@ export { useProfileClubs } from './hooks/useProfileClubs';
 // Courses tab components
 export { ProfileCoursesTab } from './ProfileCoursesTab';
 export { JourneySummaryCard } from './courses/JourneySummaryCard';
-export { FavouritesCarousel } from './courses/FavouritesCarousel';
 export { WantToPlaySection } from './courses/WantToPlaySection';
 export { AllCoursesList } from './courses/AllCoursesList';
