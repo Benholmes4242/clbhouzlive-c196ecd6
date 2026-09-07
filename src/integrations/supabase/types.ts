@@ -7757,6 +7757,7 @@ export type Database = {
         Row: {
           area: string
           is_active: boolean
+          is_dev: boolean
           is_shim: boolean
           label: string
           note: string | null
@@ -7766,6 +7767,7 @@ export type Database = {
         Insert: {
           area: string
           is_active?: boolean
+          is_dev?: boolean
           is_shim?: boolean
           label: string
           note?: string | null
@@ -7775,6 +7777,7 @@ export type Database = {
         Update: {
           area?: string
           is_active?: boolean
+          is_dev?: boolean
           is_shim?: boolean
           label?: string
           note?: string | null
@@ -21211,6 +21214,7 @@ export type Database = {
         Returns: {
           area: string
           events_fired: number
+          is_dev: boolean
           label: string
           median_dwell_sec: number
           prev_views: number
