@@ -18,6 +18,7 @@ import { RailChips } from '@/components/ui/RailChips';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
+import { basisLine } from './basisLine';
 import type { AmateurBoardState } from './useAmateurBoardState';
 
 /**
@@ -73,7 +74,7 @@ export function AmateurCoursesBlock({
 
   return (
     <section style={{ paddingTop: 26, fontFamily: SANS, ...FIGS }}>
-      <DiscoverSectionHeading title={title} right={unit} />
+      <DiscoverSectionHeading title={title} right={basisLine(unit, filters, t as never)} />
 
       <RailChips
         options={COURSE_BOARD_KEYS.map((key) => ({
