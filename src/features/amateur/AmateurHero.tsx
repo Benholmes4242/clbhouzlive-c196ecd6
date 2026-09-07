@@ -125,6 +125,9 @@ export function AmateurHero({ userId }: { userId: string | undefined }) {
               size={30}
               src={row.profile_photo_url ?? undefined}
               alt={row.display_name}
+              userId={row.user_id}
+              fallback={row.display_name?.slice(0, 2).toUpperCase()}
+              hairlineRing
             />
             <span
               style={{
