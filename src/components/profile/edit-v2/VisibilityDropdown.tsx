@@ -22,6 +22,12 @@ interface VisibilityDropdownProps {
   onChange: (value: VisibilityValue) => void;
   disabled?: boolean;
   className?: string;
+  /**
+   * Which values this control offers. Omitted = all four, exactly as before.
+   * A stored value outside the set collapses to the most private offered
+   * option for display only — nothing is written back.
+   */
+  allow?: VisibilityValue[];
 }
 
 /**
