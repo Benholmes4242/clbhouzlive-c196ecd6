@@ -32,6 +32,9 @@ interface Props {
   initialCourseId?: string | null;
   initialCommentId?: string | null;
   initialParentCommentId?: string | null;
+  /** Raw user_profiles.top_ten_visibility from the profile row already in memory
+   *  (ProfilePageV2 holds it). Never fetched here — BRIEF_..._ROUNDTRIP §1/§4. */
+  topTenVisibility?: string | null;
 }
 
 export const ProfileTopTenRail: React.FC<Props> = ({
@@ -41,6 +44,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   initialCourseId = null,
   initialCommentId = null,
   initialParentCommentId = null,
+  topTenVisibility,
 }) => {
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
@@ -55,7 +59,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
     canView,
     visibility,
     isLoading: visibilityLoading,
-  } = useTopTenVisibility(userId, viewerId);
+  } = useTopTenVisibility(userId, viewerId, topTenVisibility);
 
   const didAutoOpen = React.useRef(false);
   React.useEffect(() => {

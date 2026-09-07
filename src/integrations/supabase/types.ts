@@ -7757,21 +7757,27 @@ export type Database = {
         Row: {
           area: string
           is_active: boolean
+          is_shim: boolean
           label: string
+          note: string | null
           route_pattern: string
           sort_order: number
         }
         Insert: {
           area: string
           is_active?: boolean
+          is_shim?: boolean
           label: string
+          note?: string | null
           route_pattern: string
           sort_order?: number
         }
         Update: {
           area?: string
           is_active?: boolean
+          is_shim?: boolean
           label?: string
+          note?: string | null
           route_pattern?: string
           sort_order?: number
         }
