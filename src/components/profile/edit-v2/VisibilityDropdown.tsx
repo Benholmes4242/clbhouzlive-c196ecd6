@@ -53,8 +53,10 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
   // option available (display only — never written back).
   const effectiveValue = options.some(o => o.value === value)
     ? value
-    : options[options.length - 1].value;
-  const selectedOption = options.find(o => o.value === effectiveValue) || options[0];
+    : (options.length
+        ? PRIVACY_ORDER.slice().reverse().find(v => options.some(o => o.value === v)) || 'private'
+        : 'private');
+  const selectedOption = options.find(o => o.value === effectiveValue) || options[0] || VISIBILITY_OPTIONS[VISIBILITY_OPTIONS.length - 1];
   const Icon = selectedOption.icon;
 
   const handleSelect = (val: VisibilityValue) => {
