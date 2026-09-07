@@ -156,7 +156,9 @@ export const VisibilityRow: React.FC<{
   value: VisibilityValue;
   onChange: (v: VisibilityValue) => void;
   disabled?: boolean;
-}> = ({ value, onChange, disabled }) => (
+  /** Omitted = all four options, exactly as before. */
+  allow?: VisibilityValue[];
+}> = ({ value, onChange, disabled, allow }) => (
   <div
     style={{
       display: 'flex',
