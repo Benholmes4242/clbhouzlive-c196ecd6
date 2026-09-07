@@ -1,16 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 
-import { GlassBadge, GlassDurationBadge } from '@/components/media/GlassDurationBadge';
+import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
+import { MediaRailTile } from './courseled/MediaRailTile';
 import { MomentsGrid } from './courseled/MomentsGrid';
-import { autoplayBlocked, registerReviewVideo } from './courseled/reviewVideoAutoplay';
-import { attachTileHls } from './courseled/tileHlsPlayer';
 import { useWatchHubCounts } from '@/features/watch-v2/hooks/useWatchHubCounts';
 import { useMomentsLibraryTotal, useReviewLibraryTotal } from '@/features/media-library/libraryTotals';
 import { useDiscoverMediaPreview } from './courseled/hooks/useDiscoverMediaPreview';
@@ -24,47 +22,10 @@ const SECTION_GAP = 36;
 
 const GALLERY_AUTOPLAY_GROUP = 'discover-gallery-video-rails';
 
-function RailTile({ item, index, width, onPress }: { item: CommunityLibraryItem; index: number; width: number; onPress: () => void }) {
-  const reducedMotion = usePrefersReducedMotion();
-  const hostRef = useRef<HTMLButtonElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [active, setActive] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const mountVideo = item.kind === 'video' && !!item.hlsUrl && !failed && !autoplayBlocked(reducedMotion);
-
-  useEffect(() => {
-    const el = hostRef.current;
-    if (!mountVideo || !el) return;
-    return registerReviewVideo(GALLERY_AUTOPLAY_GROUP, el, setActive, { threshold: 0.5, maxPlaying: 2 });
-  }, [mountVideo]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!active || !video || !item.hlsUrl) return;
-    const attachment = attachTileHls(video, item.hlsUrl, () => setFailed(true));
-    video.muted = true;
-    video.currentTime = 0;
-    const play = video.play();
-    play?.catch(() => setPlaying(false));
-    return () => {
-      setPlaying(false);
-      video.pause();
-      video.currentTime = 0;
-      attachment.detach();
-    };
-  }, [active, item.hlsUrl]);
-
-  return (
-    <button ref={hostRef} data-gallery-video-index={index} type="button" onClick={onPress} style={{ width, flex: `0 0 ${width}px`, padding: 0, border: 0, background: 'transparent', color: A.INK, textAlign: 'left', cursor: 'pointer' }}>
-      <div style={{ position: 'relative', width, aspectRatio: width === 176 ? '3 / 4' : '16 / 10', overflow: 'hidden', borderRadius: 10, background: A.PANEL }}>
-        {item.thumbnail && <img src={item.thumbnail} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
-        {mountVideo && <video ref={videoRef} poster={item.thumbnail ?? undefined} muted loop playsInline preload="none" disableRemotePlayback aria-hidden tabIndex={-1} onPlaying={() => setPlaying(true)} onPause={() => setPlaying(false)} onError={(event) => { if (event.currentTarget.getAttribute('src')) setFailed(true); }} style={{ position: 'absolute', inset: 0, zIndex: 1, width: '100%', height: '100%', objectFit: 'cover', opacity: playing ? 1 : 0, transition: 'opacity 140ms linear', pointerEvents: 'none' }} />}
-        <GlassDurationBadge seconds={item.duration} />
-      </div>
-      <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.displayName}</div>
-    </button>
-  );
+/* THE TILE LIVES IN MediaRailTile now, so the Amateur clips rail runs the same
+   player. Only the autoplay group differs per surface. */
+function RailTile(props: { item: CommunityLibraryItem; index: number; width: number; onPress: () => void }) {
+  return <MediaRailTile {...props} autoplayGroup={GALLERY_AUTOPLAY_GROUP} />;
 }
 
 /**
