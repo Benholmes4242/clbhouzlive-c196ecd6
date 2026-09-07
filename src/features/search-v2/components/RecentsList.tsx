@@ -1,6 +1,6 @@
 import { Clock } from 'lucide-react';
 import type { RecentItem } from '../hooks/useRecentSearchesV2';
-import { SectionHeader, ACTION } from './SectionHeader';
+import { SearchSectionHeader, ACTION } from './SearchSectionHeader';
 import { S } from '../lib/tokens';
 
 interface Props {
@@ -13,7 +13,7 @@ export function RecentsList({ items, onPick, onClear }: Props) {
   if (items.length === 0) return null;
   return (
     <div>
-      <SectionHeader
+      <SearchSectionHeader
         label="Recent"
         right={
           <button type="button" onClick={onClear} style={ACTION}>
