@@ -822,7 +822,7 @@ export const CompareSheet: React.FC<Props> = ({
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '58px 1fr 58px',
+                  gridTemplateColumns: '58px minmax(0, 1fr) 58px',
                   gap: 8,
                   marginBottom: 4,
                   ...LABEL_STYLE,
