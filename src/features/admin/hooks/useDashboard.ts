@@ -1,18 +1,15 @@
 /**
  * ⚠️ POSTGREST RETURNS AT MOST 2000 ROWS — whatever `.limit()` says.
  *
- * Measured 7 Sep 2026: a request for 50,000 rows against a 23,295-row table
- * came back with exactly 2000. analytics_events holds ~20,100 rows per
- * fortnight and ~50,100 per 30 days, so ANY raw select over a window wider
- * than roughly a day is silently truncated — and with no ORDER BY the 2000
- * you get are physical order, i.e. the OLDEST slice of an append-only table.
+ * REMEDIATED (batch 2, pre-emptive). The glance card pulled a whole day of
+ * events to rank today's most active members: ~1,400 rows against the 2000
+ * cap, i.e. 70% of the ceiling. It would have broken on the busiest days only
+ * and looked correct again the following week. Both the hourly posts buckets
+ * and the top-three ranking are now counted by get_admin_dashboard_glance.
  *
- * Raising the limit does not help. Adding .order() only changes which slice
- * you lose. Distinct-user counts, totals and buckets computed in the browser
- * from a truncated pull are WRONG, not approximate.
- *
- * The fix is always the same: aggregate in Postgres behind an admin-gated RPC
- * (see get_admin_audiences / get_platform_activity) and return one row.
+ * STANDING RULE: no admin figure is computed by counting rows in the browser.
+ * Counting happens in Postgres. A new metric needs an RPC, not a select and a
+ * Set.
  */
 import { useQueries } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
