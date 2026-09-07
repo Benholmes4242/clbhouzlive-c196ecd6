@@ -1,26 +1,25 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { RailChips } from '@/components/ui/RailChips';
 import { FIGS, SANS } from './tokens';
-import type { BoardFilters } from './boardFilters';
+import { COURSE_BOARD_KEYS, COURSE_BOARD_LABELS, type BoardFilters, type CourseBoardKey } from './boardFilters';
 import { useBoardCourses } from './hooks/useBoardCourses';
-import { CourseHeaderRow, CourseRow } from './CoursesPlayedSection';
+import { CourseBoardRows } from './CourseBoardRows';
+import { SectionHeadline } from './SectionHeadline';
 
 /**
- * COURSES PLAYED — SEE ALL (BRIEF_DISCOVER_STICKY_FILTER_BAR G5).
+ * COURSES — SEE ALL (BRIEF_SCORES_COURSE_ROWS_AND_SEE_ALL_SHEET S2).
  *
- * THE SAME CALL, A RAISED LIMIT. get_board_courses is asked the same question
- * with the same applied filter state and no board key, so the sheet can never
- * disagree with the five mosaic tiles behind it about which courses were played.
- *
- * IT IS THE BOARD'S SEE-ALL SHEET'S TWIN, NOT ITS REUSE (G5.2): A.CANVAS
- * surface, uppercase name left, Done right, a subject block giving the count and
- * the applied window, then rows. BoardSeeAllSheet pages a RANKED member board
- * with POS columns; these rows are expandable course rows. Same anatomy, a
- * different subject — so the anatomy is matched, deliberately, rather than
- * forcing one component to be two things.
+ * THE SECTION AT FULL LENGTH, NOT A SECOND DESIGN. It opens on the board that
+ * was on screen, states that board's name and count in the section's own
+ * headline treatment, carries the section's chip rail so the board can be
+ * switched without dismissing, and renders CourseBoardRows — the SAME row
+ * component the section uses. The accordion, the column headers, the bespoke
+ * title and the field plays-to right-hand value are gone: every figure that
+ * lived in the accordion already exists in COURSE ANALYTICS and on the course
+ * page, so none of it is rebuilt here.
  */
 
 const SHEET_LIMIT = 300;
@@ -30,13 +29,11 @@ export interface CoursesPlayedSeeAllSheetProps {
   onClose: () => void;
   userId: string | undefined;
   filters: BoardFilters;
-  /**
-   * S3.2 — THE FULL APPLIED FILTER LINE, built by the page's own
-   * describeFilterParts and passed in exactly as the rounds sheet receives it.
-   * One filter governs both sheets; a second formatter here is how the two
-   * wordings drifted apart in the first place (S3.3).
-   */
+  /** The page's own applied-filter parts — one formatter, page and sheet. */
   appliedParts: string[];
+  /** The board on screen; the sheet opens on it and can change it. */
+  board: CourseBoardKey;
+  onBoardChange: (board: CourseBoardKey) => void;
   onCoursePress?: (courseId: string) => void;
   onMemberPress?: (userId: string) => void;
 }
@@ -47,19 +44,19 @@ export function CoursesPlayedSeeAllSheet({
   userId,
   filters,
   appliedParts,
+  board,
+  onBoardChange,
   onCoursePress,
 }: CoursesPlayedSeeAllSheetProps) {
   const { t } = useTranslation('courses');
-  /* One row open at a time, exactly as in the section. */
-  const [openId, setOpenId] = useState<string | null>(null);
 
-  const courses = useBoardCourses(userId, filters, { limit: SHEET_LIMIT, enabled: open });
+  const courses = useBoardCourses(userId, filters, { limit: SHEET_LIMIT, sort: board, enabled: open });
   const rows = courses.data?.rows ?? [];
   const total = courses.data?.total ?? 0;
-  /* The scale bar reads against the range of the rows THIS surface shows. */
-  const playsTo = rows.map((r) => r.plays_to).filter((v): v is number => v != null);
-  const scaleMax = playsTo.length > 0 ? Math.max(...playsTo) : 0;
-  const scaleMin = playsTo.length > 0 ? Math.min(...playsTo) : 0;
+
+  const title = t(COURSE_BOARD_LABELS[board].i18n, COURSE_BOARD_LABELS[board].label);
+  /* S3 — the same key and the same pre-limit total the section counts on. */
+  const count = t('discover.coursesPlayed.nCourses', '{{count}} courses', { count: total });
 
   return (
     <BottomSheet
@@ -71,38 +68,35 @@ export function CoursesPlayedSeeAllSheet({
       ariaLabelledBy="courses-see-all-title"
       style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
     >
-      <div
-        style={{
-          flexShrink: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-          padding: '10px 16px 12px',
-          borderBottom: `1px solid ${A.BORDER}`,
-        }}
-      >
-        <h2 id="courses-see-all-title" style={{ ...KICKER, margin: 0, color: A.INK }}>
-          {t('discover.coursesPlayed.title', 'Courses played')}
-        </h2>
-        <button
-          type="button"
-          onClick={onClose}
-          style={{ ...KICKER, padding: '8px 0', background: 'transparent', border: 'none', fontFamily: SANS, color: A.INK, cursor: 'pointer' }}
-        >
-          {t('discover.filterBoard.done', 'Done')}
-        </button>
-      </div>
-
-      <div style={{ flexShrink: 0, padding: '16px 16px 12px', borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS, ...FIGS }}>
-        <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 700, color: A.INK, textTransform: 'uppercase' }}>
-          {t('discover.coursesPlayed.nCourses', '{{count}} courses', { count: total })}
+      {/* S4b — ONE HORIZONTAL PADDING OWNER for every child of the sheet. */}
+      <div style={{ flexShrink: 0, padding: '4px 16px 0', fontFamily: SANS, ...FIGS }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{ ...KICKER, padding: '6px 0', background: 'transparent', border: 'none', fontFamily: SANS, color: A.INK, cursor: 'pointer' }}
+          >
+            {t('discover.filterBoard.done', 'Done')}
+          </button>
         </div>
-        <div style={{ ...KICKER, marginTop: 6, color: A.MUTE }}>
+        <div id="courses-see-all-title">
+          <SectionHeadline title={title} count={count} />
+        </div>
+        <div style={{ ...KICKER, marginTop: -4, marginBottom: 10, color: A.MUTE }}>
           {appliedParts.map((part, index) => (
             <span key={`${part}:${index}`}>{index > 0 ? <> {'\u00B7'} </> : null}{part}</span>
           ))}
         </div>
+        <RailChips
+          options={COURSE_BOARD_KEYS.map((key) => ({
+            id: key,
+            label: t(COURSE_BOARD_LABELS[key].i18n, COURSE_BOARD_LABELS[key].label),
+          }))}
+          value={board}
+          onChange={(next) => onBoardChange(next as CourseBoardKey)}
+          ariaLabel="Board"
+          style={{ margin: '0 -16px 12px', padding: '0 16px' }}
+        />
       </div>
 
       <div
@@ -118,22 +112,7 @@ export function CoursesPlayedSeeAllSheet({
           ...FIGS,
         }}
       >
-        <CourseHeaderRow />
-        {rows.map((row, index) => (
-          <CourseRow
-            key={row.course_id}
-            row={row}
-            rank={index + 1}
-            first={index === 0}
-            open={openId === row.course_id}
-            onToggle={() => setOpenId((cur) => (cur === row.course_id ? null : row.course_id))}
-            userId={userId}
-            filters={filters}
-            scaleMin={scaleMin}
-            scaleMax={scaleMax}
-            onCoursePress={onCoursePress}
-          />
-        ))}
+        <CourseBoardRows rows={rows} board={board} onCoursePress={onCoursePress} />
       </div>
     </BottomSheet>
   );
