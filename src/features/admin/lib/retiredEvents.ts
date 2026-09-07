@@ -30,11 +30,19 @@ export const RETIRED_EVENTS: Record<string, string> = {
   feed_tab_changed: 'Superseded by feed_tab_switch, then removed with the tabs (Sep 2026)',
   feed_course_line_shown: 'Feed course line removed in the course-led rebuild (Aug 2026)',
 
-  // Amateur/Discover cinematic hero: AmateurCircuitHero is left in the tree
-  // unreferenced — ExplorePage starts at the first rail.
-  hero_chips_shown: 'AmateurCircuitHero unmounted from ExplorePage (Aug 2026)',
-  hero_story_shown: 'AmateurCircuitHero unmounted from ExplorePage (Aug 2026)',
-  hero_context_shown: 'AmateurCircuitHero unmounted from ExplorePage (Aug 2026)',
+  // Amateur/Discover cinematic hero: AmateurCircuitHero.tsx was DELETED
+  // (Sep 2026, Ben's verdict). Discover opens on its first rail by design and
+  // a rotating story hero is not returning in that form.
+  hero_chips_shown: 'AmateurCircuitHero deleted from the codebase (Sep 2026)',
+  hero_story_shown: 'AmateurCircuitHero deleted from the codebase (Sep 2026)',
+  hero_context_shown: 'AmateurCircuitHero deleted from the codebase (Sep 2026)',
+
+  // Community page: /community was deleted and App.tsx redirects it to
+  // /explore. Only community_media_filter_selected survives, because those
+  // media tiles moved onto Discover.
+  community_page_open: '/community deleted; route redirects to /explore (Aug 2026)',
+  community_moment_tapped: '/community deleted; moments now live on Watch (Aug 2026)',
+
 
   // Discover rebuild: wire ticker, feats tab, scope switcher and month/rarest
   // affordances were all replaced by the board rails.

@@ -11,8 +11,9 @@ const ExploreTabContent = lazy(() => import('@/components/explore-tab-new/Explor
  * exists, otherwise by the "Your Circle" friends rail. The old cinematic hero and
  * wire ticker are unmounted here: the brief's page order starts directly with
  * the first rail. WireTicker survives as a component because the Tour Hub hybrid
- * hero still renders it; AmateurCircuitHero is left in the tree unreferenced
- * pending Ben's verdict.
+ * hero still renders it; AmateurCircuitHero was deleted (Sep 2026) and its
+ * events are retired.
+
  */
 export default function ExplorePage() {
   return (
