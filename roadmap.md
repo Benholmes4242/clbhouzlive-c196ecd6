@@ -40,3 +40,9 @@
 - [x] Share the filter sheet's ranking and feat order with the member rail
 - [x] Let the existing recent/handicap/rotation ladder choose the opening board
 - [x] Verify first-session Most recent, restored choices, and 320pt fit
+
+## BRIEF_TOP_TEN_VISIBILITY_ROUNDTRIP (7 Sep 2026)
+- [ ] useTopTenVisibility takes visibility as an argument; delete its user_profiles query
+- [ ] Resolve owner/public/private/no-viewer with zero queries; isLoading false when no query needed
+- [ ] ProfilePageV2 passes profile?.top_ten_visibility down to ProfileTopTenRail
+- [ ] Delete FavouritesCarousel + barrel line at src/components/profile/index.ts:9 (enumerate consumers first)
