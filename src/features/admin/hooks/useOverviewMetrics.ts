@@ -1,21 +1,18 @@
 /**
  * ⚠️ POSTGREST RETURNS AT MOST 2000 ROWS — whatever `.limit()` says.
  *
- * Measured 7 Sep 2026: a request for 50,000 rows against a 23,295-row table
- * came back with exactly 2000. analytics_events holds ~20,100 rows per
- * fortnight and ~50,100 per 30 days, so ANY raw select over a window wider
- * than roughly a day is silently truncated — and with no ORDER BY the 2000
- * you get are physical order, i.e. the OLDEST slice of an append-only table.
+ * REMEDIATED (batch 1): the metric series and the intraday ghost are now
+ * counted in Postgres by get_admin_overview_metrics / get_admin_intraday. The
+ * only raw select left here is the 5-minute live window, guarded by
+ * assertNotTruncated.
  *
- * Raising the limit does not help. Adding .order() only changes which slice
- * you lose. Distinct-user counts, totals and buckets computed in the browser
- * from a truncated pull are WRONG, not approximate.
- *
- * The fix is always the same: aggregate in Postgres behind an admin-gated RPC
- * (see get_admin_audiences / get_platform_activity) and return one row.
+ * STANDING RULE: no admin figure is computed by counting rows in the browser.
+ * Counting happens in Postgres. A new metric needs an RPC, not a select and a
+ * Set.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { assertNotTruncated, POSTGREST_ROW_CAP } from '../lib/rawReadGuard';
 
 const DAY = 86_400_000;
 
