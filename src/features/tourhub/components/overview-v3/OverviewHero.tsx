@@ -40,8 +40,7 @@ interface OverviewHeroProps {
  * (`CinematicHeroFullBleed`). The wire ticker (36px) sits BELOW this,
  * so the full overview hero container is `OVERVIEW_HERO_TOTAL_HEIGHT`.
  */
-export const OVERVIEW_HERO_HEIGHT =
-  `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`;
+export const OVERVIEW_HERO_HEIGHT = `${PHOTO_BAND_HEIGHT}px`;
 
 /** Wire-ticker band height (kept in sync with HeroWireTicker). */
 export const OVERVIEW_HERO_TICKER_HEIGHT = 36;

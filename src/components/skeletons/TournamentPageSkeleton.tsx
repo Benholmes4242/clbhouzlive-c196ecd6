@@ -5,7 +5,7 @@
  * jump-free.
  */
 import { Skeleton } from '@/components/ui/skeleton';
-import { HERO_MIN_H } from '@/features/tourhub/_shared/tokens';
+import { TOUR_HERO_BAND_H } from '@/features/tourhub/_shared/tokens';
 
 const SLATE_50 = '#15171F';
 const HAIRLINE_INK_8 = 'rgba(255,255,255,0.10)';
@@ -17,7 +17,7 @@ export const TournamentPageSkeleton = () => {
           like the real masthead */}
       <div
         style={{
-          minHeight: HERO_MIN_H,
+          minHeight: TOUR_HERO_BAND_H,
           background: '#0A0E14',
           display: 'flex',
           flexDirection: 'column',

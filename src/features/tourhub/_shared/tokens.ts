@@ -244,3 +244,14 @@ export const BAR_NEUTRAL = 'rgba(255,255,255,0.18)';                        // l
  */
 export const HERO_MIN_H =
   'calc(244px + env(safe-area-inset-top, 0px))';
+
+/**
+ * TOUR hero band height — BRIEF_TOUR_FIXED_HEADER S4.
+ *
+ * Same 244px as HERO_MIN_H WITHOUT the safe-area inset. Tour surfaces are no
+ * longer immersive: the app shell pays var(--sat) and the fixed header sits in
+ * flow above the band, so a band that also added the inset would double it.
+ * HERO_MIN_H keeps the inset for the routes that ARE still immersive
+ * (/courses, /courses/:id, GolfClubView) and must not be changed.
+ */
+export const TOUR_HERO_BAND_H = '244px';

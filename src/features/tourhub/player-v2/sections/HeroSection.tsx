@@ -17,7 +17,7 @@ import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar
 import { titleCaseCountry } from '../../utils/countryFlags';
 import { TOUR_LABEL, mapTourSlug } from '../../_shared/tourOrder';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
-import { HERO_MIN_H, WHITE_ALPHA_18 } from '../../_shared/tokens';
+import { TOUR_HERO_BAND_H, WHITE_ALPHA_18 } from '../../_shared/tokens';
 import { heroTintGradient } from '../../_shared/heroGradient';
 import { TOUR_CONFIG } from '../../hooks/useOverviewData';
 
@@ -92,8 +92,8 @@ export function HeroSection({ player, playerStats }: HeroSectionProps) {
     <div
       style={{
         background: heroBg,
-        minHeight: HERO_MIN_H,
-        paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)',
+        minHeight: TOUR_HERO_BAND_H,
+        paddingTop: 20,
         paddingBottom: 16,
         display: 'flex',
         flexDirection: 'column',

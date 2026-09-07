@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import {
   CHARCOAL,
   FONT,
-  HERO_MIN_H,
+  TOUR_HERO_BAND_H,
   GOLD,
   STATUS_LIVE_ON_DARK,
   WHITE_ALPHA_10,
@@ -127,8 +127,10 @@ export function CollegeHeroMasthead({
     <div
       style={{
         background: heroBackground,
-        minHeight: HERO_MIN_H,
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
+        minHeight: TOUR_HERO_BAND_H,
+        /* S4: header is in flow above — comfort pad only, no inset, no island
+           clearance. */
+        paddingTop: 20,
         paddingLeft: 16,
         paddingRight: 16,
         paddingBottom: 12,

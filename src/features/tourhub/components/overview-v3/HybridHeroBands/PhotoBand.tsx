@@ -127,7 +127,7 @@ export function PhotoBand({
         // HARD height, not a floor. It ABSORBS the safe-area inset so the hero
         // column (photo + 36px ticker) exactly fills OVERVIEW_HERO_TOTAL_HEIGHT
         // — otherwise the inset showed as a white gap above the live board.
-        height: `calc(${PHOTO_BAND_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+        height: `${PHOTO_BAND_HEIGHT}px`,
         // MICRO_BRIEF_TOUR_OVERVIEW_HERO_CANON_LAYERING took this hero's RAMP
         // and LAYERING onto the canon but DELIBERATELY NOT its height: HERO_MIN_H
         // ADDS the inset and is a floor, while PHOTO_BAND_HEIGHT is a term in

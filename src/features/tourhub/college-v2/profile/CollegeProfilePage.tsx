@@ -96,7 +96,7 @@ export function CollegeProfilePage() {
           <div
             style={{
               background: CHARCOAL,
-              paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
+              paddingTop: 20,
               paddingLeft: 16,
               paddingRight: 16,
               paddingBottom: 16,

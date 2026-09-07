@@ -26,7 +26,7 @@ import {
   FONT,
   HAIRLINE_INK_10,
   INK,
-  HERO_MIN_H,
+  TOUR_HERO_BAND_H,
   INK_FAINT,
   INK_MUTE,
   SLATE_50,
@@ -264,8 +264,8 @@ export function CollegeHubPage() {
           <header
             style={{
               background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
-              minHeight: HERO_MIN_H,
-              paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
+              minHeight: TOUR_HERO_BAND_H,
+              paddingTop: 20,
               paddingLeft: 16,
               paddingRight: 16,
               paddingBottom: 20,
