@@ -1693,7 +1693,7 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
                       {!a.stopped && a.gapReason && (
                         <span style={{
                           fontSize: 9, fontWeight: 800, letterSpacing: '0.1em',
-                          textTransform: 'uppercase', color: A.WARN ?? '#F7931E',
+                          textTransform: 'uppercase', color: A.RED,
                         }}>Gap</span>
                       )}
                       {!a.stopped && !a.gapReason && a.retiredReason && (
