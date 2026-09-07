@@ -25,6 +25,8 @@ import {
   decryptVaultSecret,
   enrichScoresWithHoles,
 } from "../_shared/eg-api.ts";
+import { snapshotCounterFlags, requeueCounterFlips } from "../_shared/counter-requeue.ts";
+
 
 // Configuration
 const BATCH_SIZE = 25;                    // max connections per cron run
