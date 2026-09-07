@@ -129,6 +129,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const theme = useNavTheme();
   const tokens = theme === 'dark' ? DARK_TOKENS : LIGHT_TOKENS;
   const navState = useNavScrollState();
+  // Live state for the Tour tab. Fails closed (false) while loading or on error.
+  const tourLive = useAnyTourLive();
+
   const condensed = navState === 'condensed' && !REDUCED_MOTION;
 
   const navRef = useRef<HTMLDivElement | null>(null);
