@@ -85,7 +85,19 @@ Deno.serve(async (req) => {
       return json({ ok: true, top100_only: true, result: res });
     }
 
+    // ONE-OFF DERIVED-STREAK REBUILD. Dry run unless apply === true.
+    if (body?.action === "rebuild_derived_streaks") {
+      const res = await rebuildDerivedStreaks({
+        apply: body?.apply === true,
+        chainPosition: typeof body?.chain_position === "number" ? body.chain_position : 0,
+        authHeader: req.headers.get("Authorization"),
+        totals: body?.totals,
+      });
+      return json(res);
+    }
+
     // Cron drain
+
     await reapStaleLocks();
     const rows = await fetchQueueBatch(BATCH_SIZE);
     console.log('[gam-evaluator] drain', { picked: rows.length, batchSize: BATCH_SIZE });
