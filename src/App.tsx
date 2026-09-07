@@ -227,7 +227,7 @@ const HomeLanding = lazy(() => import("./pages/HomeLanding"));
 const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
 const VideosPageV2 = lazy(() => import("./features/videos-v2/VideosPageV2"));
 const ClipsPageV2 = lazy(() => import("./features/clips-v2/ClipsPageV2"));
-const MomentsLibraryPage = lazy(() => import("./features/media-library/MomentsLibraryPage"));
+const MediaLibraryPage = lazy(() => import("./features/media-library/MediaLibraryPage"));
 
 
 
@@ -586,9 +586,10 @@ function AppRoutes() {
         <Route path="/clips" element={<WatchGate><Navigate to="/watch/clips" replace /></WatchGate>} />
         <Route path="/watch/clips" element={<WatchGate><Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense></WatchGate>} />
         <Route path="/watch/videos" element={<WatchGate><Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense></WatchGate>} />
-        {/* CUTOVER: /media is the one media destination. The whole course-tagged
-            member media pool, in the same mosaic the Amateur block shows. */}
-        <Route path="/media" element={<Suspense fallback={<MomentsLibrarySkeleton />}><MomentsLibraryPage /></Suspense>} />
+        {/* CUTOVER: /media is the one media destination, and it carries the
+            MERGED set the Amateur mosaic summarises — review photographs and
+            course-tagged member moments in one wall, one count. */}
+        <Route path="/media" element={<Suspense fallback={<MomentsLibrarySkeleton />}><MediaLibraryPage /></Suspense>} />
         {/* SHIM (cutover): the two legacy library URLs now land on /media. */}
         <Route path="/explore/reviews" element={<Shim to="/media" />} />
         <Route path="/explore/moments" element={<Shim to="/media" />} />
