@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { AppHeader } from '@/components/chrome/AppHeader';
@@ -11,7 +11,9 @@ import { AmateurFilterRail } from '@/features/amateur/AmateurFilterRail';
 import { AmateurCoursesBlock } from '@/features/amateur/AmateurCoursesBlock';
 import { AmateurHero } from '@/features/amateur/AmateurHero';
 import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBlock';
+import { AmateurMediaBlock } from '@/features/amateur/AmateurMediaBlock';
 import { AmateurNewsBlock } from '@/features/amateur/AmateurNewsBlock';
+import { rememberAmateurScroll, restoreAmateurScroll, takeAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import { useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -37,6 +39,16 @@ export default function AmateurPage() {
     analyticsEvents.track('amateur_page_viewed', {});
   }, []);
 
+  /* COMING BACK IS FREE. A see-all, a course row or a story leaves the page;
+     returning lands on the row that was tapped, not the hero. */
+  const returnTo = useRef<number | null>(takeAmateurScroll());
+  useLayoutEffect(() => {
+    const y = returnTo.current;
+    returnTo.current = null;
+    if (y == null || y < 2) return;
+    return restoreAmateurScroll(y);
+  }, []);
+
   const handleRow = useCallback(
     (row: BoardRow) => {
       analyticsEvents.track('amateur_board_row_tapped', {
@@ -52,6 +64,7 @@ export default function AmateurPage() {
   /* A COURSE ROW IS A LINK: the whole row goes to that course's page. */
   const handleCourse = useCallback(
     (courseId: string) => {
+      rememberAmateurScroll();
       navigate(`/courses/${courseId}`);
     },
     [navigate],
@@ -67,7 +80,14 @@ export default function AmateurPage() {
         <AmateurLeaderboardBlock userId={user?.id} state={state} onRowPress={handleRow} />
         <AmateurCoursesBlock userId={user?.id} state={state} onCoursePress={handleCourse} />
         <AmateurNewsBlock />
-        {/* Block 4 (media) lands here. */}
+        <AmateurMediaBlock
+          userId={user?.id}
+          onSeeAll={(path) => {
+            rememberAmateurScroll();
+            navigate(path);
+          }}
+          onDepart={rememberAmateurScroll}
+        />
       </main>
 
       <BoardFilterPanel

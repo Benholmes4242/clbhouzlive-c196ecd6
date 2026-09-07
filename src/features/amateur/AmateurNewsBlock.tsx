@@ -8,6 +8,7 @@ import { LeadStory, StoryRow } from '@/features/tourhub/news/NewsTab';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { HAIRLINE_INK_10 } from '@/features/tourhub/_shared/tokens';
 import { useAmateurStories } from '@/features/amateur/news/useAmateurStories';
+import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /**
@@ -48,6 +49,7 @@ export function AmateurNewsBlock() {
 
   const open = (slug: string) => {
     analyticsEvents.track('amateur_news_story_opened', { slug });
+    rememberAmateurScroll();
     navigate(`/discover/news/${slug}`);
   };
 
@@ -58,6 +60,7 @@ export function AmateurNewsBlock() {
         right={t('amateurNews.allStories', 'All stories')}
         onRightPress={() => {
           analyticsEvents.track('amateur_news_see_all_opened', {});
+          rememberAmateurScroll();
           navigate('/discover/news');
         }}
       />
