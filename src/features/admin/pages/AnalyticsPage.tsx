@@ -24,6 +24,9 @@ import {
   useEventOccurrences,
   useAppErrors,
   useDebounced,
+  STOPPED_MIN_COUNT,
+  STOPPED_MIN_USERS,
+
   type EventAggregate,
   type EventSort,
 } from '../hooks/useEventsExplorer';
