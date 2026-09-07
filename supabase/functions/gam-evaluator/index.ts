@@ -389,12 +389,12 @@ async function processSingle(whsScoreId: string) {
         .eq("whs_score_id", prev.id);
       if (prevErr) throw prevErr;
 
-      // DEFERRED INDEX STREAKS. The two index-dependent streak conditions can
-      // only be judged once the following round exists, which is now. Runs
-      // BEFORE this round's applyStreaks so the sequence stays chronological.
-      if (wasNull) {
-        await applyIndexStreaks(userId, { whs_score_id: prev.id, delta_index: prevDelta });
-      }
+      // The two index-dependent streaks (no_up, cutting) are DERIVED now
+      // (ADDENDUM B), not incremented here. Backfilling prev.delta_index above
+      // is all this block still owes them: deriveStreaks re-walks the ladder
+      // afterwards, so the ordering this guard used to protect no longer matters.
+      void wasNull;
+
     } catch (e) {
       console.warn("[delta_index] prev_backfill", (e as Error).message);
     }
