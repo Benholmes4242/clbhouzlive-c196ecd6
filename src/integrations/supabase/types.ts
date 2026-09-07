@@ -19110,16 +19110,29 @@ export type Database = {
       }
       get_admin_audiences: { Args: never; Returns: Json }
       get_admin_dashboard_glance: { Args: { p_tz?: string }; Returns: Json }
-      get_admin_event_aggregates: {
-        Args: {
-          p_days?: number
-          p_limit?: number
-          p_offset?: number
-          p_search?: string
-          p_sort?: string
-        }
-        Returns: Json
-      }
+      get_admin_event_aggregates:
+        | {
+            Args: {
+              p_days?: number
+              p_limit?: number
+              p_offset?: number
+              p_search?: string
+              p_sort?: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_days?: number
+              p_limit?: number
+              p_offset?: number
+              p_search?: string
+              p_sort?: string
+              p_stopped_min_count?: number
+              p_stopped_min_users?: number
+            }
+            Returns: Json
+          }
       get_admin_event_daily: {
         Args: { p_days?: number; p_name: string; p_tz?: string }
         Returns: Json
