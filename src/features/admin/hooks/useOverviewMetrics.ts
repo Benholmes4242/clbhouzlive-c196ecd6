@@ -12,7 +12,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { assertNotTruncated, POSTGREST_ROW_CAP } from '../lib/rawReadGuard';
+import { assertNotTruncated, POSTGREST_PROBE_LIMIT } from '../lib/rawReadGuard';
 
 const DAY = 86_400_000;
 
