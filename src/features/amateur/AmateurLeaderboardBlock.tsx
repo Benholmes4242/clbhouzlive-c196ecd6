@@ -20,6 +20,7 @@ import { RailChips } from '@/components/ui/RailChips';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
+import { basisLine } from './basisLine';
 import type { AmateurBoardState } from './useAmateurBoardState';
 
 /**
@@ -73,7 +74,9 @@ export function AmateurLeaderboardBlock({
 
   return (
     <section style={{ paddingTop: 18, fontFamily: SANS, ...FIGS }}>
-      <DiscoverSectionHeading title={boardTitle} right={unit} />
+      {/* THE COUNT LINE STATES ITS SAMPLE: this block is filtered, news and
+          media are not, and that difference is the boundary marker. */}
+      <DiscoverSectionHeading title={boardTitle} right={basisLine(unit, filters, t as never)} />
 
       <RailChips
         options={MEMBER_BOARD_KEYS.map((key) => ({

@@ -11,6 +11,7 @@ import { AmateurFilterRail } from '@/features/amateur/AmateurFilterRail';
 import { AmateurCoursesBlock } from '@/features/amateur/AmateurCoursesBlock';
 import { AmateurHero } from '@/features/amateur/AmateurHero';
 import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBlock';
+import { AmateurNewsBlock } from '@/features/amateur/AmateurNewsBlock';
 import { useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -65,7 +66,8 @@ export default function AmateurPage() {
         <AmateurFilterRail filters={state.filters} onOpen={state.openPanel} />
         <AmateurLeaderboardBlock userId={user?.id} state={state} onRowPress={handleRow} />
         <AmateurCoursesBlock userId={user?.id} state={state} onCoursePress={handleCourse} />
-        {/* Blocks 3-4 land here, in order. */}
+        <AmateurNewsBlock />
+        {/* Block 4 (media) lands here. */}
       </main>
 
       <BoardFilterPanel
