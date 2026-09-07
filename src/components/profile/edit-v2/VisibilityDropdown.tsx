@@ -7,12 +7,16 @@ import { A, BIZ_LABEL } from '@/features/courses/components/holes/analytical/tok
 
 export type VisibilityValue = 'public' | 'followers' | 'friends' | 'private';
 
+/** Presentation order only. Never derive privacy ranking from this array. */
 const VISIBILITY_OPTIONS = [
   { value: 'public' as VisibilityValue, label: 'Everyone', icon: Globe },
   { value: 'followers' as VisibilityValue, label: 'Followers & Friends', icon: Users },
   { value: 'friends' as VisibilityValue, label: 'Friends only', icon: UserCheck },
   { value: 'private' as VisibilityValue, label: 'Only me', icon: Lock },
 ];
+
+/** Canonical privacy ranking, most public → most private. Used for safe fallbacks. */
+const PRIVACY_ORDER: VisibilityValue[] = ['public', 'followers', 'friends', 'private'];
 
 /** The sheet still names itself; the CONTROL no longer repeats its own label. */
 const SHEET_TITLE = 'Visible to';
@@ -49,8 +53,10 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
   // option available (display only — never written back).
   const effectiveValue = options.some(o => o.value === value)
     ? value
-    : options[options.length - 1].value;
-  const selectedOption = options.find(o => o.value === effectiveValue) || options[0];
+    : (options.length
+        ? PRIVACY_ORDER.slice().reverse().find(v => options.some(o => o.value === v)) || 'private'
+        : 'private');
+  const selectedOption = options.find(o => o.value === effectiveValue) || options[0] || VISIBILITY_OPTIONS[VISIBILITY_OPTIONS.length - 1];
   const Icon = selectedOption.icon;
 
   const handleSelect = (val: VisibilityValue) => {
