@@ -1364,7 +1364,24 @@ const STREAK_BADGE_MAP: Record<string, string> = {
 };
 
 async function applyStreaks(userId: string, stats: any) {
-  await updateRoundStreak(userId, stats, "counter", !!stats.is_counter);
+  // COUNTER STREAK IS UPSTREAM-DERIVED (ADDENDUM A §1). When counter status is
+  // unsettled, stats.is_counter is false because we do not know, not because
+  // England Golf said no. Passing false breaks a live streak permanently:
+  // updateRoundStreak's else branch only writes while is_active is true, so
+  // every later round becomes a silent no-op. Skip entirely — the round neither
+  // extends nor breaks `counter`, and the row is left byte-for-byte as it was.
+  if ((stats as any).counter_settled === false) {
+    console.log(
+      JSON.stringify({
+        evt: "gam_eval_streak_skipped_unsettled_counter",
+        whs_score_id: stats.whs_score_id,
+        streak_type: "counter",
+      }),
+    );
+  } else {
+    await updateRoundStreak(userId, stats, "counter", !!stats.is_counter);
+  }
+
   await updateRoundStreak(userId, stats, "sub_80", !!stats.sub_80);
   await updateRoundStreak(userId, stats, "sub_par", !!stats.beat_par);
 
