@@ -29,9 +29,22 @@ import { useEffect, useState } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AnalyticsPeriod, periodToDays } from './useAnalytics';
+import { retiredReason } from '../lib/retiredEvents';
 
 // The function clamps p_days to this too — the cap lives in Postgres, not the UI.
 export const EVENTS_MAX_DAYS = 180;
+
+/**
+ * THE ALARM FLOOR. "Fired last period, silent this one" flagged 37 of 207 names
+ * on the 30-day window — a banner right a third of the time is ignored inside a
+ * fortnight. Silence only means something when the prior period carried weight,
+ * so an alarm needs both a volume floor and a member floor. With 99 members,
+ * plenty of legitimate events (hole in one, level up, business verification)
+ * fire a handful of times a month by nature; those read SILENT, not STOPPED.
+ * Both floors are enforced in Postgres, not here.
+ */
+export const STOPPED_MIN_COUNT = 25;
+export const STOPPED_MIN_USERS = 2;
 
 export type EventSort = 'count' | 'users' | 'last_seen' | 'name';
 
@@ -44,30 +57,76 @@ export interface EventAggregate {
   /** null when the prior window was empty — a new event, not a rise from zero. */
   deltaCountPct: number | null;
   deltaUsersPct: number | null;
-  /** Fired in the prior window, silent in this one. A release broke tracking. */
+  /** Alarm: silent this period AND the prior period cleared both floors. */
   stopped: boolean;
+  /** Reported only: fired in the prior period, nothing since. No alarm. */
+  silent: boolean;
+  /** Suppressed permanently — emitting code is gone. Reason from RETIRED_EVENTS. */
+  retiredReason: string | null;
+  /** First sighting all-time; drives the rename heuristic. */
+  firstSeenAt: string | null;
   lastSeenAt: string | null;
+  /** Heuristic only: an event that first appeared as this one went quiet. */
+  probableRenameTo?: string;
 }
 
 export interface EventAggregatePage {
   windowDays: number;
   windowFrom: string;
   distinctNames: number;
+  /** Alarming stopped events AFTER the retired list is applied. */
   stoppedNames: number;
+  /** Quiet-but-unalarming: fired before, silent now, below the floors or retired. */
+  silentNames: number;
   windowEvents: number;
   windowMembers: number;
   rows: EventAggregate[];
 }
 
+/**
+ * RENAME PAIRING — a HEURISTIC, explicitly not a proof.
+ *
+ * An event that went silent in the same period another name first appeared is
+ * usually a rename, not a break. We pair them on shared name tokens: same first
+ * token, or two tokens in common. It will occasionally pair two unrelated
+ * events, which is why the UI labels it "probable rename" and never suppresses
+ * the alarm on the strength of it.
+ */
+function tokens(name: string): string[] {
+  return name.split('_').filter(Boolean);
+}
+
+function renameScore(stoppedName: string, newName: string): number {
+  const a = tokens(stoppedName);
+  const b = tokens(newName);
+  if (!a.length || !b.length) return 0;
+  const shared = a.filter(x => b.includes(x));
+  const sameHead = a[0] === b[0] ? 1 : 0;
+  if (!sameHead && shared.length < 2) return 0;
+  return shared.length + sameHead;
+}
+
+function pairRenames(rows: EventAggregate[], windowFrom: string): EventAggregate[] {
+  const from = Date.parse(windowFrom);
+  const newcomers = rows.filter(r =>
+    r.count > 0 && r.firstSeenAt && Number.isFinite(from) && Date.parse(r.firstSeenAt) >= from);
+  if (!newcomers.length) return rows;
+  return rows.map(r => {
+    if (!r.silent) return r;
+    let best: { name: string; score: number } | null = null;
+    for (const n of newcomers) {
+      const score = renameScore(r.name, n.name);
+      if (score > 0 && (!best || score > best.score)) best = { name: n.name, score };
+    }
+    return best ? { ...r, probableRenameTo: best.name } : r;
+  });
+}
+
 function mapAggregates(payload: any): EventAggregatePage {
-  return {
-    windowDays: Number(payload?.window_days ?? 0),
-    windowFrom: String(payload?.window_from ?? ''),
-    distinctNames: Number(payload?.distinct_names ?? 0),
-    stoppedNames: Number(payload?.stopped_names ?? 0),
-    windowEvents: Number(payload?.window_events ?? 0),
-    windowMembers: Number(payload?.window_members ?? 0),
-    rows: (payload?.rows ?? []).map((r: any): EventAggregate => ({
+  const windowFrom = String(payload?.window_from ?? '');
+  const raw: EventAggregate[] = (payload?.rows ?? []).map((r: any): EventAggregate => {
+    const reason = retiredReason(String(r.name));
+    return {
       name: String(r.name),
       count: Number(r.count ?? 0),
       users: Number(r.users ?? 0),
@@ -77,9 +136,27 @@ function mapAggregates(payload: any): EventAggregatePage {
         ? null : Number(r.delta_count_pct),
       deltaUsersPct: r.delta_users_pct === null || r.delta_users_pct === undefined
         ? null : Number(r.delta_users_pct),
-      stopped: !!r.stopped,
+      // The retired list wins over the server flag: emitting code is gone, so
+      // silence is the expected state and never an alarm.
+      stopped: !!r.stopped && !reason,
+      silent: !!r.silent,
+      retiredReason: reason,
+      firstSeenAt: r.first_seen_at ?? null,
       lastSeenAt: r.last_seen_at ?? null,
-    })),
+    };
+  });
+
+  const rows = pairRenames(raw, windowFrom);
+  return {
+    windowDays: Number(payload?.window_days ?? 0),
+    windowFrom,
+    distinctNames: Number(payload?.distinct_names ?? 0),
+    // Recount locally: the server does not know the retired list.
+    stoppedNames: rows.filter(r => r.stopped).length,
+    silentNames: rows.filter(r => r.silent && !r.stopped).length,
+    windowEvents: Number(payload?.window_events ?? 0),
+    windowMembers: Number(payload?.window_members ?? 0),
+    rows,
   };
 }
 
@@ -110,13 +187,17 @@ export function useEventAggregates(
         p_sort: sort,
         p_limit: limit,
         p_offset: 0,
-      });
+        p_stopped_min_count: STOPPED_MIN_COUNT,
+        p_stopped_min_users: STOPPED_MIN_USERS,
+      } as any);
       if (error) throw error;
       return mapAggregates(data);
     },
     staleTime: 5 * 60_000,
     refetchOnWindowFocus: false,
   });
+
+
 
   return { ...q, page: q.data ?? null, aggregates: q.data?.rows ?? [] };
 }
