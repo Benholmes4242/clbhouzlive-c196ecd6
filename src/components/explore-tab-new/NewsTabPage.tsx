@@ -11,7 +11,7 @@ import {
   FeatureStory,
   GUTTER,
   HeroStory,
-  KICKER,
+  
   LoadMoreRow,
   StoryChipRail,
   WireItem,
