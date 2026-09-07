@@ -11,6 +11,7 @@ import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { DISCOVER_HEADER_Z } from '@/lib/zLayers';
+import { getPageScrollTop, getPrimaryScrollElement } from '@/lib/getScrollParent';
 
 /**
  * AppHeader — THE header band. ONE component, ONE substitution.
@@ -58,6 +59,12 @@ export interface AppHeaderProps {
   overHero?: boolean;
   /** Scroll distance the cross-fade completes over. Default 180px. */
   overHeroRange?: number;
+  /**
+   * Scroll offset the cross-fade STARTS at, so it can be timed to land exactly
+   * as the hero leaves: pass (heroHeight - headerHeight - overHeroRange).
+   * Default 0 = fades from the very top.
+   */
+  overHeroStart?: number;
 }
 
 
@@ -102,6 +109,7 @@ export function AppHeader({
   heightVar = '--discover-header-h',
   overHero = false,
   overHeroRange = 180,
+  overHeroStart = 0,
 
 }: AppHeaderProps) {
   const navigate = useNavigate();
@@ -139,22 +147,30 @@ export function AppHeader({
   useLayoutEffect(() => {
     if (!overHero) return;
     let raf = 0;
+    /* THE PAGE SCROLLER IS NOT THE WINDOW. index.css puts overflow-y on html
+       AND body, so window.scrollY stays 0 and a window-only listener never
+       fired — the band sat transparent over the whole page. This reads the same
+       resolved scroller every other page-scroll consumer uses. */
     const read = () => {
       raf = 0;
-      const y = window.scrollY || document.documentElement.scrollTop || 0;
-      const next = Math.min(1, Math.max(0, y / Math.max(1, overHeroRange)));
+      const y = getPageScrollTop();
+      const span = Math.max(1, overHeroRange);
+      const next = Math.min(1, Math.max(0, (y - overHeroStart) / span));
       setFade((prev) => (Math.abs(prev - next) < 0.02 && next !== 0 && next !== 1 ? prev : next));
     };
     const onScroll = () => {
       if (raf === 0) raf = window.requestAnimationFrame(read);
     };
     read();
+    const scroller = getPrimaryScrollElement();
+    scroller?.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
+      scroller?.removeEventListener('scroll', onScroll);
       window.removeEventListener('scroll', onScroll);
       if (raf) window.cancelAnimationFrame(raf);
     };
-  }, [overHero, overHeroRange]);
+  }, [overHero, overHeroRange, overHeroStart]);
 
 
   return (
