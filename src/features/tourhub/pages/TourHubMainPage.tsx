@@ -267,7 +267,10 @@ export function TourHubMainPage() {
           pickerOpen={pickerOpen}
           setPickerOpen={setPickerOpen}
         />
-        <          <TourPageShell
+        {/* ONE header for every tab, overview included (S3): opaque 42px row,
+            back chevron except on the hub root, tour picker off the live board,
+            burger for the tour menu. */}
+        <TourPageShell
             title={tabTitle}
             showBack={!isHubRoot}
             onBack={() => handleSelectTab('overview')}
