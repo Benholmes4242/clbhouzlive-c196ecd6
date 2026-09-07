@@ -4,6 +4,7 @@ import { ChevronLeft } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { PAGE_BG } from '@/components/manage/ui';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { FixedPageHeader } from '@/components/chrome/FixedPageHeader';
 
 const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
