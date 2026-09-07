@@ -289,7 +289,9 @@ const CreateProfileRedirect = lazy(() => import("./components/redirects/CreatePr
 
 
 
-const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
+// AdminSetupPage removed: the admin-invitation redemption path never existed
+// (every admin_invitations policy requires is_admin()/is_panel_admin()), so the
+// route could not work. Re-introduce only with a real edge-function redemption.
 const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
 
