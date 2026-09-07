@@ -703,6 +703,18 @@ function ProfileTabBody({
         </ManageCard>
 
         <ManageCard>
+          {/* BRIEF_TOP_TEN_VISIBILITY §3 — the fifth visibility row, same
+              control and same four values as the clubs rows above. */}
+          <div>
+            <FieldLabel>Top 10 courses</FieldLabel>
+            <VisibilityRow
+              value={(form.topTenVisibility || 'public') as VisibilityValue}
+              onChange={(v) => setField('topTenVisibility', v)}
+            />
+          </div>
+        </ManageCard>
+
+        <ManageCard>
           <AdditionalClubsList
             clubs={form.additionalClubs}
             visibility={form.additionalClubsVisibility}
