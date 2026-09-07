@@ -93,6 +93,18 @@ async function fetchNorthStar(): Promise<NorthStarData> {
     ? Math.round((d7Cohort.filter(u => activeIds.has(u.id)).length / d7Cohort.length) * 100)
     : null;
 
+  const totalUsers = totalUsersRes.count ?? 0;
+
+  // ONE POPULATION. The Members tile and the Audiences grid count the same
+  // set: live profiles, service account excluded. These are arithmetic
+  // identities, not thresholds - a break means the tile has drifted off the
+  // population, so fail loudly rather than render a plausible number.
+  if (!(dauToday <= wau)) throw new Error(`North Star invariant broken: DAU ${dauToday} > WAU ${wau}`);
+  if (!(wau <= mau)) throw new Error(`North Star invariant broken: WAU ${wau} > MAU ${mau}`);
+  if (!(mau <= totalUsers)) throw new Error(`North Star invariant broken: MAU ${mau} > MEMBERS ${totalUsers}`);
+  if (!(signups7Res.count === null || (signups7Res.count ?? 0) <= totalUsers)) {
+    throw new Error(`North Star invariant broken: SIGNUPS 7D ${signups7Res.count} > MEMBERS ${totalUsers}`);
+  }
 
   return {
     dauToday,
@@ -104,9 +116,10 @@ async function fetchNorthStar(): Promise<NorthStarData> {
     signupsPrev7d: signupsPrev7Res.count ?? 0,
     d1Retention,
     d7Retention,
-    totalUsers: totalUsersRes.count ?? 0,
+    totalUsers,
   };
 }
+
 
 export function useNorthStar() {
   return useQuery({
