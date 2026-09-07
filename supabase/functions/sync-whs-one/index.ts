@@ -18,6 +18,8 @@ import {
   decryptVaultSecret,
   enrichScoresWithHoles,
 } from "../_shared/eg-api.ts";
+import { snapshotCounterFlags, requeueCounterFlips } from "../_shared/counter-requeue.ts";
+
 
 function adminClient(): SupabaseClient {
   return createClient(
