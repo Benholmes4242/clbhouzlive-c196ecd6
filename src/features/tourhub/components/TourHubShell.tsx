@@ -5,10 +5,10 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface TourHubShellProps {
   children: ReactNode;
-  /** Enable immersive full-bleed mode (hero behind status bar) — used by tournament detail pages */
+  /** @deprecated BRIEF_TOUR_FIXED_HEADER S4 — no Tour surface bleeds any more.
+   *  Accepted and ignored so the callers keep compiling. */
   immersive?: boolean;
-  /** When true, disables PageRoot's useMedianStatusBar re-applies so callers can
-   *  hold the shield/native bar transparent for a cinematic hero. */
+  /** @deprecated as above: the safe-area shield stays opaque on Tour. */
   immersiveStatusBar?: boolean;
   /** @deprecated Back button now lives in CompactHeader. Kept for caller compat. */
   showBack?: boolean;
@@ -16,7 +16,7 @@ interface TourHubShellProps {
   onBack?: () => void;
 }
 
-export function TourHubShell({ children, immersive = false, immersiveStatusBar = false }: TourHubShellProps) {
+export function TourHubShell({ children }: TourHubShellProps) {
   const { setVariant } = useHeader();
 
   useEffect(() => {
@@ -24,29 +24,11 @@ export function TourHubShell({ children, immersive = false, immersiveStatusBar =
     return () => setVariant('solid-light');
   }, [setVariant]);
 
-  // Tournament detail pages: immersive negative-margin + max-width container
-  if (immersive) {
-    return (
-      <PageRoot
-        className="min-h-screen w-full"
-        style={{ background: A.CANVAS }}
-        immersive
-        immersiveStatusBar
-      >
-        <div className="w-full max-w-5xl mx-auto">
-          {children}
-        </div>
-      </PageRoot>
-    );
-  }
-
-  // Dark-only baseline: Tour Hub follows the app canvas; its surfaces own their palette.
+  /* Dark-only baseline, and flatly NON-immersive: `.app-shell` pays the safe
+     area once and TourPageShell's opaque 42px row sits in normal flow beneath
+     the shield. No negative margins, no transparent status bar. */
   return (
-    <PageRoot
-      className="min-h-screen w-full"
-      style={{ background: A.CANVAS }}
-      immersiveStatusBar={immersiveStatusBar}
-    >
+    <PageRoot className="min-h-screen w-full" style={{ background: A.CANVAS }}>
       {children}
     </PageRoot>
   );

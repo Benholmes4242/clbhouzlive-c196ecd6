@@ -257,7 +257,7 @@ export function ComparePage() {
           <div
             style={{
               background: CHARCOAL,
-              paddingTop: 'calc(env(safe-area-inset-top, 0px) + 58px)',
+              paddingTop: 20,
               paddingBottom: 16,
               paddingLeft: 12,
               paddingRight: 12,

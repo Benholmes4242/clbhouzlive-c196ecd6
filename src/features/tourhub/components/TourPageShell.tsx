@@ -1,21 +1,25 @@
 /**
- * TourPageShell — the ONE header + safe-area owner for every Tour surface
- * except the Tour Overview.
+ * TourPageShell — the ONE header for EVERY Tour surface.
  *
- * Geometry is the Activity page's (ManagePageShell): opaque canvas band that
- * owns the safe-area inset, 32px circle back chevron, 18/600 title, 1px
- * hairline base. Two modes:
+ * BRIEF_TOUR_FIXED_HEADER S3. Same construction as the Discover header:
+ * background A.CANVAS, a 42px control row, a 1px A.BORDER base. The control row
+ * carries what the chrome island carried — the back control, the tour picker
+ * where it applies (leftAccessory) and the side menu (right). NO TAB STRIP:
+ * tabs belong to Discover.
  *
- *   default   — the header is `sticky top: 0` and sits in normal flow, so page
- *               content starts BELOW it (schedule / players / leaders /
- *               college hub / compare).
- *   immersive — hero pages (tournament, player, college profile). The header is
- *               `position: fixed`, transparent over the hero at rest, and picks
- *               up the opaque canvas + hairline the moment the member scrolls.
+ * WHO PAYS THE SAFE AREA (S3.5). Nobody here. Tour routes are no longer in
+ * IMMERSIVE_ROUTE_PREFIXES, so `.app-shell` pays var(--sat) once for the whole
+ * page. This header therefore adds NO inset of its own — it would double it.
+ * It is `position: sticky` in normal flow and locks at `top: var(--sat)`, i.e.
+ * directly beneath the opaque #safe-area-shield, so scrolled content never
+ * appears in the notch.
  *
- * The global ChromeIsland is suppressed for the shell's lifetime, so there is
- * exactly one top chrome on screen. Sticky rows inside `children` must lock to
- * `var(--tour-header-h)`, which this shell measures and publishes.
+ * The former `immersive` mode (fixed + transparent over a bleeding hero) is
+ * GONE: no photograph runs to physical y=0 on any Tour surface. The prop is
+ * accepted and ignored so existing callers keep compiling.
+ *
+ * Sticky rows inside `children` lock to `var(--tour-header-h)`, which this
+ * shell measures and publishes.
  */
 import { ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -47,7 +51,13 @@ interface Props {
   onBack?: () => void;
   /** safeGoBack fallback when there is no history to return to. */
   backFallback?: string;
-  /** Hero pages: header floats over the hero and solidifies on scroll. */
+  /**
+   * The Tour Hub overview is a bottom-nav destination, so it carries NO back
+   * control regardless of how the member arrived. Everything else does.
+   */
+  showBack?: boolean;
+  /** DEPRECATED (BRIEF_TOUR_FIXED_HEADER S4): there is no bleeding hero to
+   *  float over any more. Accepted and ignored. */
   immersive?: boolean;
   /** Page background. Defaults to the analytical canvas. */
   background?: string;
@@ -62,13 +72,13 @@ export function TourPageShell({
   belowTitle,
   onBack,
   backFallback = '/tourhub',
-  immersive = false,
+  showBack = true,
+  immersive: _immersiveIgnored = false,
   background = A.CANVAS,
 }: Props) {
   const navigate = useNavigate();
   const headerRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const [scrolled, setScrolled] = useState(false);
 
   // One chrome only: the global island stands down while this shell is mounted.
   useSetChromeSuppressed(true);
@@ -101,27 +111,6 @@ export function TourPageShell({
     };
   }, [belowTitle, subtitle]);
 
-  // Immersive pages only: transparent -> opaque on first scroll. Listening in
-  // the capture phase catches inner scroll containers too (college hub scrolls
-  // a div, not the window), otherwise the header would stay transparent and
-  // let rows show through the notch.
-  useEffect(() => {
-    if (!immersive) return;
-    const onScroll = (e?: Event) => {
-      const t = e?.target as (HTMLElement & { scrollTop?: number }) | Document | null;
-      const inner =
-        t && t !== document && t !== document.documentElement && typeof (t as HTMLElement).scrollTop === 'number'
-          ? (t as HTMLElement).scrollTop
-          : 0;
-      setScrolled(Math.max(window.scrollY, inner) > 8);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
-    return () => window.removeEventListener('scroll', onScroll, { capture: true } as any);
-  }, [immersive]);
-
-
-  const solid = !immersive || scrolled;
 
   return (
     <div
@@ -131,44 +120,49 @@ export function TourPageShell({
       <div
         ref={headerRef}
         style={{
-          position: immersive ? 'fixed' : 'sticky',
-          top: 0,
+          position: 'sticky',
+          /* Locks beneath the opaque safe-area shield, which is what covers the
+             notch on a non-immersive route. NOT a safe-area payment — the shell
+             already made that once (S3.5). */
+          top: 'var(--sat, env(safe-area-inset-top, 0px))',
           left: 0,
           right: 0,
           zIndex: 60,
-          background: solid ? background : 'transparent',
-          borderBottom: solid ? `1px solid ${A.BORDER}` : '1px solid transparent',
-          transition: 'background 160ms linear, border-color 160ms linear',
+          background,
+          borderBottom: `1px solid ${A.BORDER}`,
         }}
       >
         <div
-          className="flex items-center justify-between px-4"
+          className="flex items-center justify-between"
           style={{
-            paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 8px)',
-            paddingBottom: belowTitle ? 8 : 12,
-            minHeight: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 56px)',
+            /* Discover's control row: 42px tall, 12px gutter, no inset. */
+            height: 42,
+            paddingLeft: 12,
+            paddingRight: 12,
             boxSizing: 'border-box',
           }}
         >
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <button
-              onClick={handleBack}
-              aria-label="Back"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                background: solid ? A.PANEL : 'rgba(0,0,0,0.38)',
-                border: `1px solid ${A.BORDER}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                cursor: 'pointer',
-              }}
-            >
-              <ChevronLeft size={18} strokeWidth={2.5} style={{ color: A.INK }} />
-            </button>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {showBack && (
+              <button
+                onClick={handleBack}
+                aria-label="Back"
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: A.PANEL,
+                  border: `1px solid ${A.BORDER}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  cursor: 'pointer',
+                }}
+              >
+                <ChevronLeft size={18} strokeWidth={2.5} style={{ color: A.INK }} />
+              </button>
+            )}
             {/* Titles were removed platform-wide: the back chevron is the only
                 identity the tour headers carry. `title` / `subtitle` remain in
                 the props for a11y labelling only. */}

@@ -5,7 +5,7 @@
  * follow at the yearbook feed geometry.
  */
 import { Skeleton } from '@/components/ui/skeleton';
-import { HERO_MIN_H } from '@/features/tourhub/_shared/tokens';
+import { TOUR_HERO_BAND_H } from '@/features/tourhub/_shared/tokens';
 
 const CHARCOAL = '#14161c';
 
@@ -16,7 +16,7 @@ export const CollegeHubSkeleton = () => {
       <div
         style={{
           background: `linear-gradient(180deg, #262B33 0%, ${CHARCOAL} 100%)`,
-          minHeight: HERO_MIN_H,
+          minHeight: TOUR_HERO_BAND_H,
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 62px)',
           paddingLeft: 16,
           paddingRight: 16,

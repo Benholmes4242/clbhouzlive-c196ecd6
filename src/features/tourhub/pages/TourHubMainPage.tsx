@@ -206,8 +206,10 @@ export function TourHubMainPage() {
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, [setSearchParams]);
 
-  const heroIsCinematic = useHeroFullBleed();
-  const fullBleedHero = activeTab === 'news' || (activeTab === 'overview' && heroIsCinematic);
+  /* BRIEF_TOUR_FIXED_HEADER S4: nothing on the hub bleeds any more. The hero
+     signal is still read by the hero bands themselves; the SHELL is flatly
+     non-immersive on every tab. */
+  const fullBleedHero = false;
 
   // H4a: no longer suppress the global island on cinematic overview — the
   // ChromeIsland paints with a page-provided left capsule (see TourHubChromeBridge).
@@ -246,6 +248,8 @@ export function TourHubMainPage() {
   };
 
   const tabTitle = TAB_TITLES[activeTab] ?? 'Tour';
+  /* Overview IS the hub: no back control there (see TourPageShell.showBack). */
+  const isHubRoot = activeTab === 'overview';
 
   return (
     <TourSelectionProvider>
@@ -263,17 +267,12 @@ export function TourHubMainPage() {
           pickerOpen={pickerOpen}
           setPickerOpen={setPickerOpen}
         />
-        {activeTab === 'overview' || activeTab === 'news' ? (
-          <>
-            {/* Photo-led surfaces keep the overview island over a notch-bleeding hero. */}
-            <div>{renderTab()}</div>
-          </>
-        ) : (
-          /* Every other tab is an Activity-style opaque header page: one
-             sticky chrome that owns the safe area, back chevron to the
-             overview, and a burger for the tour menu. */
-          <TourPageShell
+        {/* ONE header for every tab, overview included (S3): opaque 42px row,
+            back chevron except on the hub root, tour picker off the live board,
+            burger for the tour menu. */}
+        <TourPageShell
             title={tabTitle}
+            showBack={!isHubRoot}
             onBack={() => handleSelectTab('overview')}
             backFallback="/tourhub"
             leftAccessory={
@@ -305,7 +304,6 @@ export function TourHubMainPage() {
           >
             {renderTab()}
           </TourPageShell>
-        )}
       </TourHubShell>
     </TourSelectionProvider>
 

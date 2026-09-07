@@ -244,3 +244,30 @@ export const BAR_NEUTRAL = 'rgba(255,255,255,0.18)';                        // l
  */
 export const HERO_MIN_H =
   'calc(244px + env(safe-area-inset-top, 0px))';
+
+/**
+ * TOUR hero band height — BRIEF_TOUR_FIXED_HEADER S4.
+ *
+ * Same 244px as HERO_MIN_H WITHOUT the safe-area inset. Tour surfaces are no
+ * longer immersive: the app shell pays var(--sat) and the fixed header sits in
+ * flow above the band, so a band that also added the inset would double it.
+ * HERO_MIN_H keeps the inset for the routes that ARE still immersive
+ * (/courses, /courses/:id, GolfClubView) and must not be changed.
+ */
+export const TOUR_HERO_BAND_H = '244px';
+
+/**
+ * TOUR_EYEBROW — BRIEF_TOUR_FIXED_HEADER S5.
+ *
+ * The Watch tab's eyebrow, verbatim: 9.5 / 700 / 0.13em caps in A.DIM, cased by
+ * `textTransform` so the source string stays sentence case and translations are
+ * not shouted at by `toUpperCase()`. This is the eyebrow ONLY — section
+ * headings stay on the 11px kicker.
+ */
+export const TOUR_EYEBROW = {
+  fontSize: 9.5,
+  fontWeight: 700,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase' as const,
+  color: 'rgba(248,250,252,0.42)',
+};
