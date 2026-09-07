@@ -96,7 +96,7 @@ export function CourseImageFallback({
     <div
       style={{
         position: 'relative',
-        background: gradientForCourse(courseId),
+        background: flatWhenEmpty && !showImage ? '#1B241C' : gradientForCourse(courseId),
         overflow: 'hidden',
         ...style,
       }}
