@@ -40,6 +40,7 @@ import { useLiveAlumni } from './data/useLiveAlumni';
 import { YearbookCard } from './YearbookCard';
 import { CollegeHeroMasthead } from '../_shared/CollegeHeroMasthead';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CatalogueSearchField } from '@/components/ui/CatalogueSearchField';
 
 
 export function CollegeHubPage() {
@@ -173,61 +174,31 @@ export function CollegeHubPage() {
    * searchExpanded: blur must restore the paint without collapsing the filtered
    * list, or a result tap dies before it lands.
    */
+  /**
+   * The Yearbook search field. It lives IN THE CONTENT, under the YEARBOOK
+   * headline row and above rank 1 — never in the fixed header control row,
+   * which carries chrome only (back / right cluster) and no page input. Shared
+   * treatment with the Discover Scores analytics search:
+   * components/ui/CatalogueSearchField.tsx.
+   *
+   * Paint state (searchPaintFocus) is deliberately SEPARATE from
+   * searchExpanded: blur must restore paint without collapsing the filtered
+   * list, or a result tap dies before it lands.
+   */
   const searchField = (
-    <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
-      <Search
-        size={13}
-        color={searchValue ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.62)'}
-        strokeWidth={2.5}
-        style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }}
-      />
-      <input
-        ref={searchInputRef}
-        type="text"
-        placeholder={t('college.hub.searchPlaceholder')}
+    <div style={{ padding: '10px 16px 2px', background: SURFACE }}>
+      <CatalogueSearchField
+        inputRef={searchInputRef}
         value={searchValue}
-        onChange={(e) => setSearchValue(e.target.value)}
+        onChange={setSearchValue}
+        placeholder={t('college.hub.searchPlaceholder')}
         onFocus={() => {
           setSearchExpanded(true);
           setSearchPaintFocus(true);
         }}
         onBlur={() => setSearchPaintFocus(false)}
-        className="placeholder:text-[rgba(255,255,255,0.38)]"
-        style={{
-          width: '100%',
-          height: 44,
-          paddingLeft: 30,
-          paddingRight: 30,
-          borderRadius: 14,
-          background: SURFACE,
-          border: `1px solid ${searchPaintFocus ? INK_MUTE : HAIRLINE_INK_10}`,
-          transition: 'background 140ms ease, border-color 140ms ease',
-          fontFamily: FONT,
-          fontSize: 13,
-          fontWeight: 600,
-          color: INK,
-          outline: 'none',
-        }}
+        clearAriaLabel={t('college.hub.clearSearchAria')}
       />
-      {searchValue && (
-        <button
-          type="button"
-          aria-label={t('college.hub.clearSearchAria')}
-          onClick={() => setSearchValue('')}
-          style={{
-            position: 'absolute',
-            right: 8,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            background: 'transparent',
-            border: 'none',
-            padding: 4,
-            cursor: 'pointer',
-          }}
-        >
-          <X size={12} color={INK_MUTE} />
-        </button>
-      )}
     </div>
   );
 
@@ -238,12 +209,12 @@ export function CollegeHubPage() {
         background={SLATE_50}
         title="College golf"
         backFallback="/tourhub"
-        leftAccessory={searchField}
       >
 
       <div
-        className="pb-22"
         style={{
+          /* Clears the floating bottom nav; `pb-22` was not a real utility and paid nothing. */
+          paddingBottom: 88,
           background: SLATE_50,
           minHeight: '100vh',
           fontFamily: FONT,
@@ -441,6 +412,8 @@ export function CollegeHubPage() {
             </button>
           </div>
         )}
+
+        {searchField}
 
         {/* Feed */}
         <div style={{ background: SURFACE }}>
