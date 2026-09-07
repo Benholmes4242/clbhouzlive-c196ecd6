@@ -47,6 +47,16 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   const { topTen, isLoading } = useUserTopTenCourses(userId);
   const [commentsOpen, setCommentsOpen] = React.useState(false);
 
+  // BRIEF_TOP_TEN_VISIBILITY §4/§5 — display gate. The owner always sees the
+  // section; a visitor sees it only when top_ten_visibility admits them.
+  const { user } = useSupabaseSession();
+  const viewerId = user?.id;
+  const {
+    canView,
+    visibility,
+    isLoading: visibilityLoading,
+  } = useTopTenVisibility(userId, viewerId);
+
   const didAutoOpen = React.useRef(false);
   React.useEffect(() => {
     if (didAutoOpen.current) return;
