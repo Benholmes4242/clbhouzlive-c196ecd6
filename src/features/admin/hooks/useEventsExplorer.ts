@@ -31,6 +31,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AnalyticsPeriod, periodToDays } from './useAnalytics';
 import { retiredReason } from '../lib/retiredEvents';
 import { gapReason } from '../lib/instrumentationGaps';
+import { adminEventReason } from '../lib/adminEvents';
 
 // The function clamps p_days to this too — the cap lives in Postgres, not the UI.
 export const EVENTS_MAX_DAYS = 180;
@@ -76,6 +77,12 @@ export interface EventAggregate {
   retiredReason: string | null;
   /** Live surface, lost emit. A defect, not a decision. From INSTRUMENTATION_GAPS. */
   gapReason: string | null;
+  /**
+   * Emitted only from the admin console / a dev route. Hidden unless "Admin
+   * events" is on, and can NEVER raise a stopped alarm: only two people can
+   * reach these surfaces, so their silence says nothing about the platform.
+   */
+  adminReason: string | null;
   /** First sighting all-time; drives the rename heuristic. */
   firstSeenAt: string | null;
   lastSeenAt: string | null;
@@ -91,6 +98,8 @@ export interface EventAggregatePage {
   stoppedNames: number;
   /** Quiet-but-unalarming: fired before, silent now, below the floors or retired. */
   silentNames: number;
+  /** Admin-only names present in the window, whether or not they are shown. */
+  adminNames: number;
   windowEvents: number;
   windowMembers: number;
   /** Whether staff events are inside windowEvents and the per-row counts. */
@@ -150,6 +159,7 @@ function mapAggregates(payload: any): EventAggregatePage {
   const raw: EventAggregate[] = (payload?.rows ?? []).map((r: any): EventAggregate => {
     const reason = retiredReason(String(r.name));
     const gap = gapReason(String(r.name));
+    const admin = adminEventReason(String(r.name));
     return {
       name: String(r.name),
       count: Number(r.count ?? 0),
@@ -163,10 +173,13 @@ function mapAggregates(payload: any): EventAggregatePage {
         ? null : Number(r.delta_users_pct),
       // The retired list wins over the server flag: emitting code is gone, so
       // silence is the expected state and never an alarm.
-      stopped: !!r.stopped && !reason,
+      // Retired OR admin-only wins over the server flag: in the first case the
+      // emitting code is gone, in the second no member can reach the surface.
+      stopped: !!r.stopped && !reason && !admin,
       silent: !!r.silent,
       retiredReason: reason,
       gapReason: gap,
+      adminReason: admin,
       firstSeenAt: r.first_seen_at ?? null,
       lastSeenAt: r.last_seen_at ?? null,
     };
@@ -180,6 +193,7 @@ function mapAggregates(payload: any): EventAggregatePage {
     // Recount locally: the server does not know the retired list.
     stoppedNames: rows.filter(r => r.stopped).length,
     silentNames: rows.filter(r => r.silent && !r.stopped).length,
+    adminNames: rows.filter(r => r.adminReason).length,
     windowEvents: Number(payload?.window_events ?? 0),
     windowMembers: Number(payload?.window_members ?? 0),
     includeStaff: !!payload?.include_staff,
@@ -201,7 +215,13 @@ export function useDebounced<T>(value: T, ms = 300): T {
 
 export function useEventAggregates(
   period: AnalyticsPeriod,
-  opts: { search?: string; sort?: EventSort; limit?: number; includeStaff?: boolean } = {},
+  opts: {
+    search?: string;
+    sort?: EventSort;
+    limit?: number;
+    includeStaff?: boolean;
+    includeAdmin?: boolean;
+  } = {},
 ) {
   const days = Math.min(periodToDays(period), EVENTS_MAX_DAYS);
   const search = (opts.search ?? '').trim();
@@ -209,6 +229,9 @@ export function useEventAggregates(
   const limit = opts.limit ?? 250;
   // Staff out by default: with them in, these figures describe us.
   const includeStaff = opts.includeStaff ?? false;
+  // Admin events out by default. Filtered here, not in Postgres: the registry
+  // is a codebase decision with reasons, and the server must not own it.
+  const includeAdmin = opts.includeAdmin ?? false;
 
   const q = useQuery({
     queryKey: ['admin-v2', 'analytics', 'event-aggregates', days, search, sort, limit, includeStaff],
@@ -232,7 +255,9 @@ export function useEventAggregates(
 
 
 
-  return { ...q, page: q.data ?? null, aggregates: q.data?.rows ?? [] };
+  const rows = q.data?.rows ?? [];
+  const aggregates = includeAdmin ? rows : rows.filter(r => !r.adminReason);
+  return { ...q, page: q.data ?? null, aggregates };
 }
 
 // ── Per-event daily history: count AND distinct members ──────────────────────

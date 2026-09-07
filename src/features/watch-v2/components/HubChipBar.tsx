@@ -1,4 +1,5 @@
 import { FilterChips } from '@/components/ui/FilterChips';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -16,7 +17,19 @@ interface Props {
   onChange: (id: string) => void;
 }
 
+/**
+ * A NEW NAME, DELIBERATELY. These chips ask about AUDIENCE (all / following /
+ * your courses / bucket list / trending). The retired
+ * community_media_filter_selected asked about MEDIA TYPE on a control that no
+ * longer exists, so it must never be inherited here — the two are not the same
+ * question and one history must not be read as the other's.
+ */
 export function HubChipBar({ active, onChange }: Props) {
+  const select = (id: string) => {
+    if (id !== active) analyticsEvents.track('watch_audience_filter_changed', { filter: id, from: active });
+    onChange(id);
+  };
+
   return (
     <div
       style={{
@@ -34,7 +47,7 @@ export function HubChipBar({ active, onChange }: Props) {
       <FilterChips
         options={CHIPS}
         value={active}
-        onChange={onChange}
+        onChange={select}
         ariaLabel="Watch hub filter"
       />
     </div>

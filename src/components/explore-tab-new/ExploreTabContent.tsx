@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
@@ -74,9 +74,37 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
     });
   }, [location.pathname, location.search, location.state, navigate]);
 
+  /**
+   * DISCOVER TAB MEASUREMENT (7 Sep 2026). The Scores/News/Watch switch is local
+   * state, never in the URL, so `page_view` on /explore collapsed all three tabs
+   * into one path and NEWS and WATCH were unmeasurable — the same fault fixed for
+   * the Handicap subtab. Two events, deliberately:
+   *  - `discover_tab_viewed` fires on arrival too, so the default tab and a
+   *    restored return-snapshot tab both carry a denominator.
+   *  - `discover_tab_changed` carries destination AND origin, so a switch is
+   *    never confused with an arrival.
+   * Do not fold these into one name: without the arrival event a tab change has
+   * nothing to be a ratio of.
+   */
+  const arrivalTracked = useRef(false);
+  useEffect(() => {
+    if (embedded || arrivalTracked.current) return;
+    arrivalTracked.current = true;
+    analyticsEvents.track('discover_tab_viewed', {
+      tab: activeTab,
+      source: initialReturn.current ? 'return' : 'arrival',
+    });
+  }, [activeTab, embedded]);
+
   const changeTab = useCallback((next: DiscoverTab) => {
+    setActiveTab((prev) => {
+      if (prev !== next) {
+        analyticsEvents.track('discover_tab_changed', { tab: next, from: prev });
+        analyticsEvents.track('discover_tab_viewed', { tab: next, source: 'switch' });
+      }
+      return next;
+    });
     initialReturn.current = null;
-    setActiveTab(next);
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, []);
 

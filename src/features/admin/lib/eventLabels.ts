@@ -123,6 +123,12 @@ export const EVENT_LABELS: Record<string, string> = {
   shorts_squircle_plus_click: 'Shorts plus clicked',
   shorts_squircle_empty: 'Shorts strip empty',
 
+  // ─── Discover tabs (Scores / News / Watch) ────────────────────
+  discover_tab_viewed: 'Discover tab viewed',
+  discover_tab_changed: 'Discover tab switched',
+  discover_course_board_category_change: 'Discover course board changed',
+  watch_audience_filter_changed: 'Watch audience filter changed',
+
   // ─── Videos tab ───────────────────────────────────────────────
   videos_tab_view: 'Videos tab viewed',
   videos_filter_change: 'Videos filter changed',

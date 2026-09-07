@@ -53,6 +53,13 @@ export const RETIRED_EVENTS: Record<string, string> = {
   discover_month_expanded: 'Discover month accordion removed in the rebuild (Aug 2026)',
   discover_rarest_tapped: 'Discover rarest tile removed in the rebuild (Aug 2026)',
 
+  // Media-type chips: MediaActBar.tsx was read line by line (Sep 2026) and had
+  // NO consumer anywhere in src/ — the file was deleted, as AmateurCircuitHero
+  // was. The live media surface carries the Watch AUDIENCE filter instead, which
+  // asks a different question and is instrumented under its own name
+  // (watch_audience_filter_changed). Never revive this name for those chips.
+  community_media_filter_selected: 'Control replaced by the Watch audience filter; MediaActBar deleted (Sep 2026)',
+
   // Discover rails rebuilt: neither name has an emitter anywhere in src/ any
   // more (grepped 7 Sep 2026). Ben's verdict: rails rebuilt, retire both.
   discover_creator_card_tapped: 'Discover rails rebuilt; no emitter remains in src/ (Sep 2026)',

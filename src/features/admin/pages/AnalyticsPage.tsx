@@ -1662,6 +1662,26 @@ function IncludeStaffToggle({ on, onChange }: { on: boolean; onChange: (v: boole
   );
 }
 
+/**
+ * Admin events are OFF by default. They fire only inside the console, so left in
+ * the table they read as features no member uses, forever.
+ */
+function IncludeAdminToggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      onClick={() => onChange(!on)}
+      style={{
+        padding: '6px 11px', borderRadius: 999, cursor: 'pointer',
+        border: `1px solid ${on ? t.ink : t.line}`,
+        background: on ? t.ink : 'transparent',
+        color: on ? t.canvas : t.inkMuted,
+        fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap',
+      }}
+      aria-pressed={on}
+    >Admin events</button>
+  );
+}
+
 const EVENT_SORTS: { id: EventSort; label: string }[] = [
   { id: 'count',     label: 'Count' },
   { id: 'users',     label: 'Members' },
@@ -1674,9 +1694,10 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
   const [sort, setSort] = useState<EventSort>('count');
   const [selected, setSelected] = useState<EventAggregate | null>(null);
   const [includeStaff, setIncludeStaff] = useState(false);
+  const [includeAdmin, setIncludeAdmin] = useState(false);
   const search = useDebounced(query, 300);
   const { aggregates, page, isLoading, isError, refetch } =
-    useEventAggregates(period, { search, sort, includeStaff });
+    useEventAggregates(period, { search, sort, includeStaff, includeAdmin });
 
   return (
     <>
@@ -1694,8 +1715,17 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
             across {fmtInt(page?.distinctNames ?? 0)} distinct events, {fmtInt(page?.windowMembers ?? 0)} members
           </div>
           <IncludeStaffToggle on={includeStaff} onChange={setIncludeStaff} />
+          <IncludeAdminToggle on={includeAdmin} onChange={setIncludeAdmin} />
         </div>
         <div style={{ color: t.inkFaint, fontSize: 11.5, lineHeight: 1.5 }}>
+          {!!page?.adminNames && (
+            <>
+              {includeAdmin
+                ? `${fmtInt(page.adminNames)} admin-only event${page.adminNames === 1 ? '' : 's'} shown; they fire inside the console only and never raise an alarm.`
+                : `${fmtInt(page.adminNames)} admin-only event${page.adminNames === 1 ? '' : 's'} hidden: console surfaces no member can reach.`}
+              {' '}
+            </>
+          )}
           {includeStaff
             ? `Staff included: ${fmtInt(page?.staffEvents ?? 0)} of these events are staff.`
             : `Staff excluded: ${fmtInt(page?.staffEvents ?? 0)} further events came from staff accounts in this period.`}
