@@ -14,6 +14,18 @@ import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 
 export type GlassBadgeCorner = 'bottom-right' | 'top-left';
 
+/**
+ * THE glass values, as style properties, for chrome that is not a badge —
+ * the Tour header's burger and tour picker (BRIEF_TOUR_HERO_FLUSH_AND_PICKER
+ * §2/§4 both name this file as the single source). Import these; never
+ * re-type the fill or the blur radius somewhere else.
+ */
+export const GLASS_CHROME = {
+  background: 'rgba(15,23,42,0.35)',
+  backdropFilter: 'blur(10px)',
+  WebkitBackdropFilter: 'blur(10px)',
+} as const;
+
 export function GlassBadge({
   children,
   corner = 'bottom-right',
