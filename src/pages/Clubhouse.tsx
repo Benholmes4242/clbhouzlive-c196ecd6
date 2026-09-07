@@ -151,8 +151,10 @@ const ClubhouseContent = () => {
   // Clear any previously registered Clubhouse island slot (the Suggested /
   // Friends toggle was the only occupant).
   useSetChromeLeftSlot(null);
-  // PGA "This Week" card takeover — suppress both island capsules while active.
-  useSetChromeSuppressed(isClubhouseRoute && isTournamentCardActive);
+  // The islands STAY on the feed. The PGA "This Week" card used to suppress
+  // them while it was the card in view, which meant the feed opened with no
+  // top chrome at all whenever a tournament was running. The card keeps its
+  // bottom-bar takeover; the top islands are permanent here.
 
 
 
