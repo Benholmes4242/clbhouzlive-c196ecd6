@@ -137,6 +137,17 @@ export default function ProfileSheetV2({
     return () => unlockBodyScroll();
   }, [open]);
 
+  // profile_hub_sheet_opened — instrumentation was lost in the v2 rewrite and
+  // re-added 7 Sep 2026. Fires once per open, matching the v1 sheet's contract.
+  useEffect(() => {
+    if (!open) return;
+    analyticsEvents.track('profile_hub_sheet_opened', {
+      actor_type: currentActor.type,
+      is_admin: isAdmin,
+    });
+  }, [open, currentActor.type, isAdmin]);
+
+
   // Overlay perf timing.
   useEffect(() => {
     if (open) {
