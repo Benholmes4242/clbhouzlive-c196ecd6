@@ -1401,26 +1401,9 @@ async function applyStreaks(userId: string, stats: any) {
     await updateRoundStreak(userId, stats, "counter", !!stats.is_counter);
   }
 
-  await updateRoundStreak(userId, stats, "sub_80", !!stats.sub_80);
-  await updateRoundStreak(userId, stats, "sub_par", !!stats.beat_par);
-
-  // BIRDIE STREAK IS HOLE-DERIVED. With no hole rows, stats.birdies is 0 because
-  // we do not know, not because the member made none. Passing false here breaks
-  // a live streak on a round that may well have contained birdies — that is the
-  // defect this guard closes. Skip entirely: the round neither extends nor
-  // breaks the streak, and the row is left byte-for-byte as it was. The
-  // re-enqueue on hole arrival is what eventually judges it.
-  if ((stats as any).hole_detail_present === false) {
-    console.log(
-      JSON.stringify({
-        evt: "gam_eval_streak_skipped_no_holes",
-        whs_score_id: stats.whs_score_id,
-        streak_type: "birdie_round",
-      }),
-    );
-  } else {
-    await updateRoundStreak(userId, stats, "birdie_round", stats.birdies > 0);
-  }
+  // sub_80, sub_par and birdie_round are RETIRED from this incremental path
+  // (ADDENDUM B §3): deriveStreaks owns them and is called once per evaluation,
+  // outside the version guard. no_up and cutting likewise.
 
   // Counter-derived: no hole dependency, but it reads is_counter, so unsettled
   // counter status must SKIP rather than return early as a break (ADDENDUM A §1).
@@ -1439,15 +1422,147 @@ async function applyStreaks(userId: string, stats: any) {
 }
 
 
-// The two INDEX-DEPENDENT streaks. Their input — delta_index — is only knowable
-// once the member's NEXT score exists, so they are applied against the PREVIOUS
-// round during the following round's evaluation. Same helper, same conditions,
-// same dedup: only the moment it runs differs. A null delta_index (guard
-// rejected an over-2.0 move) breaks both streaks, which is correct.
-async function applyIndexStreaks(userId: string, prevStats: any) {
-  const dIdx = prevStats.delta_index;
-  await updateRoundStreak(userId, prevStats, "no_up", dIdx != null && dIdx <= 0);
-  await updateRoundStreak(userId, prevStats, "cutting", dIdx != null && dIdx < 0);
+// ─────────────────────────────────────────────────────────────────────────────
+// derive_streaks (ADDENDUM B) — the five DERIVED streak types.
+//
+// Replaces incremental counting with a walk of stored gam_round_stats in
+// play_date ASC, whs_score_id ASC order. Idempotent by construction: the same
+// history yields the same row, so re-evaluating a round cannot double-count and
+// a late-arriving round with an older play_date lands in its true position.
+//
+// OWNED HERE: sub_80, sub_par, birdie_round, no_up, cutting.
+// NOT OWNED: counter and round_played keep their incremental writers untouched
+// (gam_round_stats.is_counter is known-stale on some rounds; adopting today's
+// upstream value is a product decision that has not been taken).
+//
+// EXCLUSION, never inferred from a zero:
+//   birdie_round  — hole_detail_present !== true (false or NULL) steps over the
+//                   round entirely: it neither extends nor breaks.
+//   no_up/cutting — delta_index is only knowable once a LATER round exists, so
+//                   the final round in the walk is stepped over while its
+//                   delta_index is null. An earlier round with a null
+//                   delta_index was judged null (movement guard rejected it) and
+//                   correctly breaks, matching the retired incremental rule.
+//
+// Freeze fields (freeze_credits, last_freeze_used_at, freeze_refill_at) are
+// never in the update payload. Streak-broken notifications are SUPPRESSED here:
+// stored state cannot distinguish a real break from a correction.
+// ─────────────────────────────────────────────────────────────────────────────
+const DERIVED_STREAK_TYPES = ["sub_80", "sub_par", "birdie_round", "no_up", "cutting"] as const;
+
+type DerivedRow = {
+  whs_score_id: string;
+  play_date: string;
+  sub_80: boolean | null;
+  beat_par: boolean | null;
+  birdies: number | null;
+  delta_index: number | null;
+  hole_detail_present: boolean | null;
+};
+
+function playTs(playDate: string): string {
+  return new Date(playDate + "T00:00:00Z").toISOString();
+}
+
+/** null = step over this round; true = extends; false = breaks. */
+function derivedCondition(
+  streakType: string,
+  r: DerivedRow,
+  isLastRound: boolean,
+): boolean | null {
+  switch (streakType) {
+    case "sub_80":
+      return !!r.sub_80;
+    case "sub_par":
+      return !!r.beat_par;
+    case "birdie_round":
+      if (r.hole_detail_present !== true) return null;
+      return (r.birdies ?? 0) > 0;
+    case "no_up":
+      if (r.delta_index == null && isLastRound) return null;
+      return r.delta_index != null && Number(r.delta_index) <= 0;
+    case "cutting":
+      if (r.delta_index == null && isLastRound) return null;
+      return r.delta_index != null && Number(r.delta_index) < 0;
+    default:
+      return null;
+  }
+}
+
+async function deriveStreaks(userId: string) {
+  const { data, error } = await supabase
+    .from("gam_round_stats")
+    .select(
+      "whs_score_id, play_date, sub_80, beat_par, birdies, delta_index, hole_detail_present",
+    )
+    .eq("user_id", userId)
+    .order("play_date", { ascending: true })
+    .order("whs_score_id", { ascending: true });
+  if (error) throw error;
+  const rows = (data ?? []) as DerivedRow[];
+  if (rows.length === 0) return;
+
+  for (const streakType of DERIVED_STREAK_TYPES) {
+    let current = 0;
+    let best = 0;
+    let currentStarted: string | null = null;
+    let currentEnded: string | null = null;
+    let bestStarted: string | null = null;
+    let bestEnded: string | null = null;
+    let lastJudgedRound: string | null = null;
+
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      const met = derivedCondition(streakType, r, i === rows.length - 1);
+      if (met === null) continue; // stepped over: neither extends nor breaks
+      lastJudgedRound = r.whs_score_id;
+      if (met) {
+        current += 1;
+        if (current === 1) currentStarted = playTs(r.play_date);
+        currentEnded = playTs(r.play_date);
+        if (current >= best) {
+          best = current;
+          bestStarted = currentStarted;
+          bestEnded = currentEnded;
+        }
+      } else {
+        current = 0;
+        currentStarted = null;
+        currentEnded = null;
+      }
+    }
+
+    const row = await ensureStreakRow(userId, streakType, "round");
+    const payload: Record<string, unknown> = {
+      current_count: current,
+      best_count: best,
+      is_active: current > 0,
+      current_started_at: currentStarted,
+      best_started_at: bestStarted,
+      // Only meaningful once the best run has finished; while the best run IS
+      // the live one, its last extending round's play date is the end so far.
+      best_ended_at: bestEnded,
+      last_updated_round_id: lastJudgedRound ?? row.last_updated_round_id ?? null,
+    };
+    // Write only when something actually differs, so untouched members keep
+    // their updated_at.
+    const changed = Object.keys(payload).some((k) => {
+      const a = (row as any)[k] ?? null;
+      const b = (payload as any)[k] ?? null;
+      return String(a) !== String(b);
+    });
+    if (!changed) continue;
+    payload.updated_at = new Date().toISOString();
+    const { error: wErr } = await supabase
+      .from("gam_streaks")
+      .update(payload)
+      .eq("user_id", userId)
+      .eq("streak_type", streakType);
+    if (wErr) throw wErr;
+    if (best > 0) await checkStreakBadges(userId, streakType, best);
+  }
+}
+
 }
 
 
