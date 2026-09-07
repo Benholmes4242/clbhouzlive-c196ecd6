@@ -30,6 +30,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AnalyticsPeriod, periodToDays } from './useAnalytics';
 import { retiredReason } from '../lib/retiredEvents';
+import { gapReason } from '../lib/instrumentationGaps';
 
 // The function clamps p_days to this too — the cap lives in Postgres, not the UI.
 export const EVENTS_MAX_DAYS = 180;
@@ -63,6 +64,8 @@ export interface EventAggregate {
   silent: boolean;
   /** Suppressed permanently — emitting code is gone. Reason from RETIRED_EVENTS. */
   retiredReason: string | null;
+  /** Live surface, lost emit. A defect, not a decision. From INSTRUMENTATION_GAPS. */
+  gapReason: string | null;
   /** First sighting all-time; drives the rename heuristic. */
   firstSeenAt: string | null;
   lastSeenAt: string | null;
@@ -112,7 +115,7 @@ function pairRenames(rows: EventAggregate[], windowFrom: string): EventAggregate
     r.count > 0 && r.firstSeenAt && Number.isFinite(from) && Date.parse(r.firstSeenAt) >= from);
   if (!newcomers.length) return rows;
   return rows.map(r => {
-    if (!r.silent) return r;
+    if (!r.silent || r.retiredReason) return r;
     let best: { name: string; score: number } | null = null;
     for (const n of newcomers) {
       const score = renameScore(r.name, n.name);
@@ -126,6 +129,7 @@ function mapAggregates(payload: any): EventAggregatePage {
   const windowFrom = String(payload?.window_from ?? '');
   const raw: EventAggregate[] = (payload?.rows ?? []).map((r: any): EventAggregate => {
     const reason = retiredReason(String(r.name));
+    const gap = gapReason(String(r.name));
     return {
       name: String(r.name),
       count: Number(r.count ?? 0),
@@ -141,6 +145,7 @@ function mapAggregates(payload: any): EventAggregatePage {
       stopped: !!r.stopped && !reason,
       silent: !!r.silent,
       retiredReason: reason,
+      gapReason: gap,
       firstSeenAt: r.first_seen_at ?? null,
       lastSeenAt: r.last_seen_at ?? null,
     };
