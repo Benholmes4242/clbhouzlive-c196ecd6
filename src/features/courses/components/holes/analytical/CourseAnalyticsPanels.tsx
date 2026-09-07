@@ -72,6 +72,10 @@ interface Props {
   minRounds?: number;
   embedded?: boolean;
   courseWideLabel?: boolean;
+  /** Render the worded reason when there is nothing to show (course page). */
+  explainEmpty?: boolean;
+  /** Named in the "no one has played" state. */
+  courseName?: string | null;
 }
 
 /**
