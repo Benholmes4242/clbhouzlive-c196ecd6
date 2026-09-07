@@ -1684,12 +1684,39 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
                           fontSize: 9.5, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
                         }}>Stopped</span>
                       )}
+                      {!a.stopped && a.retiredReason && (
+                        <span style={{
+                          flexShrink: 0, padding: '1px 6px', borderRadius: 999,
+                          border: `1px solid ${t.line}`, color: t.inkFaint,
+                          fontSize: 9.5, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
+                        }}>Retired</span>
+                      )}
+                      {!a.stopped && !a.retiredReason && a.silent && (
+                        <span style={{
+                          flexShrink: 0, padding: '1px 6px', borderRadius: 999,
+                          border: `1px solid ${t.line}`, color: t.inkMuted,
+                          fontSize: 9.5, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
+                        }}>Silent</span>
+                      )}
                     </div>
                     <div style={{
                       color: t.inkFaint, fontSize: 10.5,
                       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}>{a.name}{a.lastSeenAt ? ` · last ${relTimeShort(a.lastSeenAt)}` : ''}</div>
+                    {a.probableRenameTo && (
+                      <div style={{ color: t.inkMuted, fontSize: 10.5, marginTop: 2 }}>
+                        Probable rename → <span style={{
+                          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                        }}>{a.probableRenameTo}</span> (heuristic)
+                      </div>
+                    )}
+                    {a.retiredReason && (
+                      <div style={{ color: t.inkFaint, fontSize: 10.5, marginTop: 2 }}>
+                        Retired: {a.retiredReason}
+                      </div>
+                    )}
+
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                     <div style={{ textAlign: 'right' }}>
