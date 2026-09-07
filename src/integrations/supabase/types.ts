@@ -19104,8 +19104,36 @@ export type Database = {
         Args: { p_spark_days?: number }
         Returns: Json
       }
+      get_admin_app_errors: {
+        Args: { p_days?: number; p_limit?: number; p_offset?: number }
+        Returns: Json
+      }
       get_admin_audiences: { Args: never; Returns: Json }
       get_admin_dashboard_glance: { Args: { p_tz?: string }; Returns: Json }
+      get_admin_event_aggregates: {
+        Args: {
+          p_days?: number
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_sort?: string
+        }
+        Returns: Json
+      }
+      get_admin_event_daily: {
+        Args: { p_days?: number; p_name: string; p_tz?: string }
+        Returns: Json
+      }
+      get_admin_event_occurrences: {
+        Args: {
+          p_before_at?: string
+          p_before_id?: string
+          p_days?: number
+          p_limit?: number
+          p_name: string
+        }
+        Returns: Json
+      }
       get_admin_funnel_cohorts: { Args: { p_weeks?: number }; Returns: Json }
       get_admin_intraday: { Args: { p_tz?: string }; Returns: Json }
       get_admin_member_actions: { Args: { p_days?: number }; Returns: Json }
