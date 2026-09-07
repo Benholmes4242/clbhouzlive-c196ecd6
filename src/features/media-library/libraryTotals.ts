@@ -50,3 +50,22 @@ export function useMomentsLibraryTotal() {
     queryFn: countMomentsLibrary,
   });
 }
+
+/**
+ * THE MERGED LIBRARY TOTAL behind /media. The destination renders ONE TILE PER
+ * REVIEW (extra frames ride a +N badge) and ONE TILE PER MOMENT MEDIA ITEM, so
+ * the sum of the two existing count queries is exactly the number of tiles the
+ * page can render — which is what makes the See all figure honest.
+ */
+export async function countMergedLibrary(): Promise<number> {
+  const [reviews, moments] = await Promise.all([countReviewLibrary(), countMomentsLibrary()]);
+  return reviews + moments;
+}
+
+export function useMergedLibraryTotal() {
+  return useQuery({
+    queryKey: ['library-total', 'merged'],
+    staleTime: 10 * 60_000,
+    queryFn: countMergedLibrary,
+  });
+}
