@@ -1403,8 +1403,20 @@ async function applyStreaks(userId: string, stats: any) {
     await updateRoundStreak(userId, stats, "birdie_round", stats.birdies > 0);
   }
 
-  // Counter-derived: no hole dependency, behaviour unchanged.
-  await updateRoundPlayedStreak(userId, stats);
+  // Counter-derived: no hole dependency, but it reads is_counter, so unsettled
+  // counter status must SKIP rather than return early as a break (ADDENDUM A §1).
+  if ((stats as any).counter_settled === false) {
+    console.log(
+      JSON.stringify({
+        evt: "gam_eval_streak_skipped_unsettled_counter",
+        whs_score_id: stats.whs_score_id,
+        streak_type: "round_played",
+      }),
+    );
+  } else {
+    await updateRoundPlayedStreak(userId, stats);
+  }
+
 }
 
 
