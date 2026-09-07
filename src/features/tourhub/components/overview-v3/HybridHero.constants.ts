@@ -20,12 +20,14 @@
  */
 // Pass 9: the overview hero photo band matches the canonical tour hero height
 // (HERO_MIN_H, 244px). The 36px wire ticker makes the full carousel 280px.
-export const PHOTO_BAND_HEIGHT = 244;   // 360 → 306 → 260 → 286 → 244 (Pass 9, match HERO_MIN_H)
+// BRIEF_TOUR_HEADER_CORRECTION Correction 2: 340, matching the News lead story
+// — the hero and the lead story are now the same object at the same size.
+export const PHOTO_BAND_HEIGHT = 340;   // 360 → 306 → 260 → 286 → 244 → 340
 
 export const STRIP_HEIGHT = 62;
 export const ROW_HEIGHT_LEADER = 64;
 export const ROW_HEIGHT_CHASER = 40;
-export const TOTAL_HERO_HEIGHT_TARGET = 615;  // 731 → 677 → 631 → 657 → 615 (PHOTO_BAND_HEIGHT 286→244)
+export const TOTAL_HERO_HEIGHT_TARGET = 711;  // 731 → 677 → 631 → 657 → 615 (PHOTO_BAND_HEIGHT 286→244)
 
 // Colours — re-exported from _shared/tokens.ts for hero-internal use.
 // These re-exports preserve existing band-file imports (`import { INK, AMBER, ... } from '../HybridHero.constants'`)

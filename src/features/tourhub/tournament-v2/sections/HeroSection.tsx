@@ -29,7 +29,7 @@ import {
 } from '../../_shared/tokens';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
-import { TOUR_HERO_BAND_H } from '../../_shared/tokens';
+import { TOUR_HERO_PHOTO_H } from '../../_shared/tokens';
 import { heroCanonBackground } from '../../_shared/heroGradient';
 
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
@@ -425,13 +425,13 @@ export function HeroSection({ meta, state, imageUrl, tourCode, leaderboard }: Pr
       <div
         style={{
           position: 'relative',
-          minHeight: TOUR_HERO_BAND_H,
-          /* S4: no bleed. The fixed header is in flow above this band, so the
-             band pays a comfort pad only — never the safe-area inset. And the
-             photograph is INSET, not page-wide: 16px gutters, canonical 14pt
-             radius, clipped. */
-          margin: '12px 16px 0',
-          borderRadius: 14,
+          /* BRIEF_TOUR_HEADER_CORRECTION Correction 2: full width, radius 0,
+             340px — the same object as the News lead story. No top margin: the
+             band's top edge meets the header's 1px border. The header (not this
+             page) owns the safe area, so nothing is paid twice here. */
+          minHeight: TOUR_HERO_PHOTO_H,
+          margin: 0,
+          borderRadius: 0,
           overflow: 'hidden',
           paddingTop: 20,
           background,

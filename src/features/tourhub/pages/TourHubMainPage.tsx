@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronDown, Menu } from 'lucide-react';
 import { TourHubShell } from '../components/TourHubShell';
 import { TourPageShell } from '../components/TourPageShell';
 import type { TourHubTab } from '../components/types';
@@ -17,6 +16,8 @@ import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
 import { TourSideMenu } from '../components/TourSideMenu';
 import { TourIslandLeft } from '../components/TourIslandLeft';
 import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
+import { TourChipRail } from '../components/TourChipRail';
+import { AppHeaderBurger } from '@/components/chrome/AppHeader';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { safeGoBack } from '@/utils/navigation';
@@ -106,55 +107,6 @@ function TourHubChromeBridge({
     </>
   );
 }
-
-/**
- * TourPickerTrigger — the tour label + chevron beside the back chevron in
- * TourPageShell's header on the tour sub-pages. It mirrors TourIslandLeft's
- * picker language (divider, 12.5/700 label, small chevron) because it does the
- * same job: the shell suppresses the global ChromeIsland, so the island's own
- * left capsule is not on screen on these tabs.
- */
-function TourPickerTrigger({ onTap }: { onTap: () => void }) {
-  const label = useTourShortLabel();
-  return (
-    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-      <span
-        aria-hidden
-        style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.18)', flexShrink: 0 }}
-      />
-      <button
-        type="button"
-        aria-haspopup="dialog"
-        aria-label={`Switch tour \u2014 current ${label}`}
-        onClick={onTap}
-        style={{
-          background: 'none',
-          border: 'none',
-          padding: 0,
-          cursor: 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 5,
-        }}
-        className="active:scale-[0.96]"
-      >
-        <span
-          style={{
-            fontSize: 12.5,
-            fontWeight: 700,
-            letterSpacing: '0.02em',
-            color: '#FFFFFF',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {label}
-        </span>
-        <ChevronDown size={10} color="rgba(255,255,255,0.62)" strokeWidth={2.4} aria-hidden />
-      </button>
-    </div>
-  );
-}
-
 
 export function TourHubMainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -275,32 +227,8 @@ export function TourHubMainPage() {
             showBack={!isHubRoot}
             onBack={() => handleSelectTab('overview')}
             backFallback="/tourhub"
-            leftAccessory={
-              activeTab === 'live'
-                ? undefined
-                : <TourPickerTrigger onTap={() => setPickerOpen(true)} />
-            }
-            right={
-              <button
-                type="button"
-                aria-label="Tour menu"
-                onClick={() => setMenuOpen(true)}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.10)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  cursor: 'pointer',
-                }}
-              >
-                <Menu size={17} strokeWidth={2.2} color="#F8FAFC" />
-              </button>
-            }
+            leftSlot={<AppHeaderBurger onTap={() => setMenuOpen(true)} label="Tour menu" />}
+            belowTitle={activeTab === 'live' ? undefined : <TourChipRail />}
           >
             {renderTab()}
           </TourPageShell>

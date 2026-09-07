@@ -123,13 +123,14 @@ export function PhotoBand({
     <div
       style={{
         position: 'relative',
-        /* S4: the hero photograph is INSET, not page-wide — 16px gutters and the
-           canonical 14pt radius. Horizontal only: the band's height is a term in
-           OVERVIEW_HERO_TOTAL_HEIGHT and a vertical margin would overflow it. */
-        width: 'calc(100% - 32px)',
-        marginLeft: 16,
-        marginRight: 16,
-        borderRadius: 14,
+        /* BRIEF_TOUR_HEADER_CORRECTION, Correction 2: the hero is FULL WIDTH,
+           not a tile. It lost its IMMERSIVE behaviour (nothing runs behind the
+           status bar), never its width — edge to edge, radius 0, zero top
+           margin, meeting the header's 1px border with no gap. */
+        width: '100%',
+        marginLeft: 0,
+        marginRight: 0,
+        borderRadius: 0,
         // HARD height, not a floor. It ABSORBS the safe-area inset so the hero
         // column (photo + 36px ticker) exactly fills OVERVIEW_HERO_TOTAL_HEIGHT
         // — otherwise the inset showed as a white gap above the live board.
@@ -171,7 +172,7 @@ export function PhotoBand({
             color: 'white',
             fontFamily: FONT,
             fontSize: title.length > 30 ? 21 : 25,
-            fontWeight: 700,
+            fontWeight: 800,
             lineHeight: 0.96,
             letterSpacing: '-0.025em',
             textShadow: '0 2px 12px rgba(0,0,0,0.55)',
