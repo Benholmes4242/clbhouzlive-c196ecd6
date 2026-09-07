@@ -125,7 +125,11 @@ export default function ScreensTab({ days }: { days: number }) {
   }, [rows]);
 
   const summary = useMemo(() => {
-    const withTraffic = rows.filter(r => r.views > 0);
+    // Dev entries are marked, not removed: they stay listed below but they are
+    // excluded from both the live and the dead figure, so "dead screens" only
+    // ever counts real product screens.
+    const product = rows.filter(r => !r.is_dev);
+    const withTraffic = product.filter(r => r.views > 0);
     const dwells = rows
       .map(r => r.median_dwell_sec)
       .filter((v): v is number => v !== null);
@@ -137,7 +141,8 @@ export default function ScreensTab({ days }: { days: number }) {
       : null;
     return {
       live: withTraffic.length,
-      dead: rows.length - withTraffic.length,
+      dead: product.length - withTraffic.length,
+      dev: rows.length - product.length,
       totalViews: rows.reduce((s, r) => s + r.views, 0),
       medianDwell,
     };
@@ -146,7 +151,9 @@ export default function ScreensTab({ days }: { days: number }) {
   const visible = useMemo(() => {
     let out = rows.slice();
     if (area !== 'all') out = out.filter(r => r.area === area);
-    if (hideZero) out = out.filter(r => r.views > 0);
+    // Dev entries survive the zero-traffic filter: they are meant to stay
+    // visible so they can be removed deliberately.
+    if (hideZero) out = out.filter(r => r.views > 0 || r.is_dev);
     const dir = desc ? -1 : 1;
     out.sort((a, b) => {
       const av = a[sortKey];
@@ -178,6 +185,7 @@ export default function ScreensTab({ days }: { days: number }) {
       }}>
         <StatCard eyebrow="Screens with traffic" value={isLoading ? '-' : fmtInt(summary.live)} />
         <StatCard eyebrow="Dead screens" value={isLoading ? '-' : fmtInt(summary.dead)} tone="warn" />
+        <StatCard eyebrow="Dev entries" value={isLoading ? '-' : fmtInt(summary.dev)} />
         <StatCard eyebrow="Total views" value={isLoading ? '-' : fmtInt(summary.totalViews)} />
         <StatCard eyebrow="Median dwell" value={isLoading ? '-' : formatDwell(summary.medianDwell)} />
       </div>
@@ -213,7 +221,7 @@ export default function ScreensTab({ days }: { days: number }) {
 
       <ChartCard
         title="Screens"
-        subtitle={`Last ${days} days - every active route, dead screens included`}
+        subtitle={`Last ${days} days - every active route, dead screens included; Dev entries excluded from the dead count`}
         loading={isLoading}
         isEmpty={/* eslint-disable-line settled/no-not-loading-empty-check -- useScreenAnalytics is ungated (period only), so it is never disabled. */ !isLoading && rows.length === 0}
         emptyTitle="No screen data yet"
