@@ -30,6 +30,11 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
  *
  * THE FILTER GOVERNS THE FIRST TWO BLOCKS, so its state lives here and not
  * inside either of them.
+ *
+ * EVENT NAMES: the `amateur_*` prefix PREDATES the tab's rename to "Explore"
+ * and stays. Renaming it would break the comparison against the Discover
+ * baseline we are still collecting, and an event name is not a label. The route
+ * is likewise still '/amateur' — a deliberate, recorded mismatch.
  */
 export default function AmateurPage() {
   const { user } = useSupabaseSession();
