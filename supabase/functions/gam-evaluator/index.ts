@@ -396,7 +396,14 @@ async function processSingle(whsScoreId: string) {
       void wasNull;
 
     } catch (e) {
-      console.warn("[delta_index] prev_backfill", (e as Error).message);
+      // COUNTABLE FAILURE. A swallowed backfill leaves delta_index null forever
+      // with nothing to retry it, so name the round: greppable data gap.
+      console.warn(
+        "[delta_index] prev_backfill_failed",
+        "whs_score_id=" + (ladder[ladderIdx - 1]?.id ?? "unknown"),
+        (e as Error).message,
+      );
+
     }
   }
 
