@@ -16,6 +16,10 @@
  *  - One line, one reason, dated.
  *  - If the feature comes back, DELETE the line. Do not comment it out.
  *
+ * A live surface whose emit was lost in a rewrite is NOT retired — it belongs
+ * in instrumentationGaps.ts, which renders its own badge. Silenced and
+ * forgotten are different states and this file must only hold the first.
+ *
  * Seeded 7 Sep 2026 from the first full triage of the 37 events flagged stopped
  * over the 30-day window. Verified by grepping each name across src/.
  */
@@ -67,11 +71,6 @@ export const RETIRED_EVENTS: Record<string, string> = {
   comment_submitted: 'Superseded by the comments_v2 instrumentation (Jul 2026)',
   admin_username_changed: 'Admin username editor moved to admin-v2 audit log (Jul 2026)',
 
-  // NOT retired-by-choice, retired-by-accident, and kept here deliberately so
-  // it is not re-alarmed every period while the decision is open:
-  // the sheet still exists as ProfileSheetV2, but the v2 rewrite did not carry
-  // the open event across. Re-instrument the v2 sheet and delete this line.
-  profile_hub_sheet_opened: 'Instrumentation lost in the ProfileSheetV2 rewrite — re-add and delete this line (Jul 2026)',
 };
 
 export function retiredReason(name: string): string | null {

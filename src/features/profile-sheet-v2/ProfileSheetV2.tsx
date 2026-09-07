@@ -15,6 +15,7 @@ import { AnimatePresence, motion, useMotionValue, animate, useDragControls } fro
 import type { PanInfo } from 'framer-motion';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import ActorCards from './components/ActorCards';
 import HcpStrip from './components/HcpStrip';
 import QuickActionsRow from './components/QuickActionsRow';
