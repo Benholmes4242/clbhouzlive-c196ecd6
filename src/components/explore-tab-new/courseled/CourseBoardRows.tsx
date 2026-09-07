@@ -121,18 +121,17 @@ export function CourseBoardHeaderRow({ board }: { board: CourseBoardKey }) {
   );
 }
 
-export function CourseBoardRows({ rows, board, selectedId, onSelect }: CourseBoardRowsProps) {
+export function CourseBoardRows({ rows, board, onCoursePress }: CourseBoardRowsProps) {
   const { t } = useTranslation('courses');
   return (
     <>
       {rows.map((row, index) => {
-        const selected = row.course_id === selectedId;
         return (
           <button
             key={row.course_id}
             type="button"
-            onClick={() => onSelect(row.course_id)}
-            aria-pressed={selected}
+            onClick={() => onCoursePress?.(row.course_id)}
+            className="active:opacity-60"
             style={{
               width: '100%',
               minHeight: ROW_H,
