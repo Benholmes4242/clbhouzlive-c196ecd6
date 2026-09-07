@@ -342,7 +342,12 @@ export function ScoresTab({
           keys={COURSE_BOARD_KEYS}
           activeKey={courseBoard}
           labelFor={(key) => t(COURSE_BOARD_LABELS[key].i18n, COURSE_BOARD_LABELS[key].label)}
-          onSelect={(key: CourseBoardKey) => setCourseBoard(key)}
+          /* The courses half's chip had no emitter, so half the shared chip rail
+             was invisible while we were asking whether chips get pressed. */
+          onSelect={(key: CourseBoardKey) => {
+            analyticsEvents.track('discover_course_board_category_change', { board: key });
+            setCourseBoard(key);
+          }}
         />
 
         {courses.isPending ? (
