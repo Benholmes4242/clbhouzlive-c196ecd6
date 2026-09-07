@@ -11,12 +11,14 @@ import { SCOPE_PILL_RADIUS } from '@/components/explore-tab-new/courseled/tokens
  * containment is the caller's job — this component owns the scroll row +
  * pill styling only.
  *
- * MICRO_BRIEF_TABS_SHEETS_MAP §1.2 — GEOMETRY AND BOTH STATES NOW COME FROM
- * THE SHIPPED DISCOVER PILLS (PillFilterRow), not from a local pair. Radius is
- * SCOPE_PILL_RADIUS, padding 8/14, type 12.5/700, selected = INK fill with
- * PANEL ink, unselected = PANEL fill with a BORDER hairline and FULL INK text
- * (the old 0.62 unselected ink was the quiet tier and read as disabled).
- * Do not re-hardcode these; edit the Discover pill and both follow.
+ * SOURCE OF TRUTH FOR THE UNSELECTED FILL: RailChips.tsx (the shipped Discover
+ * chip). Exactly ONE filled pill at a time — selected = INK fill with PANEL
+ * ink; unselected = TRANSPARENT with a BORDER hairline and FULL INK text. A
+ * filled unselected pill competes with the selected one and must not return.
+ * Geometry here is its own tier (radius SCOPE_PILL_RADIUS, padding 8/14, type
+ * 12.5/700) and deliberately differs from RailChips' tighter 6/11 · 12px rail.
+ * If the fill rule changes in RailChips, change it here too — these two must
+ * not drift again.
  */
 
 const FONT_FAMILY =
@@ -26,9 +28,10 @@ const FONT_FAMILY =
 // fill on a dark canvas is an ACCENT, not an unconverted leftover.
 const ACTIVE_FILL = A.INK;
 const ACTIVE_INK = A.PANEL;
-const INACTIVE_FILL = A.PANEL;
+const INACTIVE_FILL = 'transparent';
 const INACTIVE_INK = A.INK;
 const INACTIVE_BORDER = `1px solid ${A.BORDER}`;
+
 
 export interface FilterChipsOption<T extends string> {
   id: T;
