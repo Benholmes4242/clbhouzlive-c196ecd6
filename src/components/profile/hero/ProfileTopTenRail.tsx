@@ -118,6 +118,9 @@ export const ProfileTopTenRail: React.FC<Props> = ({
       <div style={{ minWidth: 0 }}>
         <div
           style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 8,
             fontSize: 9.5,
             fontWeight: 700,
             letterSpacing: '0.16em',
@@ -125,9 +128,14 @@ export const ProfileTopTenRail: React.FC<Props> = ({
             color: A.INK,
           }}
         >
-          {isOwnProfile
-            ? t('topTen.kicker', 'Your top 10')
-            : t('topTen.kickerOther', 'Their top 10')}
+          <span>
+            {isOwnProfile
+              ? t('topTen.kicker', 'Your top 10')
+              : t('topTen.kickerOther', 'Their top 10')}
+          </span>
+          {audienceMarker && (
+            <span style={{ color: A.MUTE, letterSpacing: '0.16em' }}>{audienceMarker}</span>
+          )}
         </div>
         <div
           style={{
