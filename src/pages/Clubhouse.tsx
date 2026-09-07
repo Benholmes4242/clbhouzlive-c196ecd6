@@ -574,7 +574,7 @@ const ClubhouseContent = () => {
               onRoundTap={(post, round) =>
                 setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
               }
-              topPadding={'calc(env(safe-area-inset-top, 0px) + 70px)'}
+              topPadding={'var(--island-clearance, calc(env(safe-area-inset-top, 0px) + 70px))'}
               onNearEnd={handleNearEnd}
               hasNextPage={hasNextPage}
               fetchNextPage={activeFeed.fetchNextPage}
