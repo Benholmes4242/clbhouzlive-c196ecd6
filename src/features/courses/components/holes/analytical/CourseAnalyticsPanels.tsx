@@ -72,6 +72,10 @@ interface Props {
   minRounds?: number;
   embedded?: boolean;
   courseWideLabel?: boolean;
+  /** Render the worded reason when there is nothing to show (course page). */
+  explainEmpty?: boolean;
+  /** Named in the "no one has played" state. */
+  courseName?: string | null;
 }
 
 /**
@@ -403,6 +407,9 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
   minRounds = 0,
   embedded = false,
   courseWideLabel = false,
+  explainEmpty = false,
+  courseName = null,
+
 }) => {
   const { t } = useTranslation(['courses']);
   const { user } = useSupabaseSession();
@@ -502,7 +509,49 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
   };
 
   const sourceAvailable = activeView === 'pros' ? hasPro : Boolean(data?.available);
-  if (!courseId || !sourceAvailable || holes.length === 0 || !stats || totalRounds < minRounds) return null;
+  const nothingToShow =
+    !courseId || !sourceAvailable || holes.length === 0 || !stats || totalRounds < minRounds;
+
+  /* AN ABSENCE WITH A REASON IS INFORMATION (BRIEF_COURSE_PAGE_EMPTY_STATES).
+     The course page used to render nothing at all here, so a member with no
+     rounds - 77 of 99 of them - saw a blank space and no reason for it. The
+     wording is PORTED VERBATIM from the Discover panel; no new copy.
+     Discover keeps its own states and passes explainEmpty={false} (default). */
+  if (nothingToShow) {
+    if (!explainEmpty || !courseId) return null;
+    /* Still resolving: the analysis read has not answered yet. */
+    if (data == null && activeView === 'members') return null;
+    return (
+      <div style={{ padding: embedded ? 0 : '0 16px' }}>
+        <Panel kicker={t('courses:courseDetail.blocks.howItPlays')} headerGap={10}>
+          {courseRoundsTracked > 0 ? (
+            /* BELOW THE HOLE-DETAIL THRESHOLD: rounds exist here, but not enough
+               of them carry hole detail to draw a course picture. */
+            <div style={{ ...LABEL, textTransform: 'none', letterSpacing: 0, lineHeight: 1.5, color: A.BODY }}>
+              {t(
+                'courses:discover.coursesPlayed.notEnoughDetail',
+                '{{count}} rounds here carry hole detail — not enough for a course picture yet',
+                { count: totalRounds },
+              )}
+            </div>
+          ) : (
+            /* NO ROUNDS AT ALL. Said plainly, in the present tense. */
+            <>
+              <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: A.INK }}>
+                {t('courses:discover.scores.noOnePlayed', 'No one has played {{course}} yet.', {
+                  course: courseName ?? '\u2014',
+                })}
+              </p>
+              <p style={{ ...KICKER, margin: '6px 0 0', color: A.MUTE }}>
+                {t('courses:discover.scores.beTheFirst', 'Play it and you will be the first.')}
+              </p>
+            </>
+          )}
+        </Panel>
+      </div>
+    );
+  }
+
 
   /* HOLD UNTIL BOTH QUERIES SETTLE (acceptance §7): a connected member's own
      rows decide whether there IS a field, so render nothing rather than a
