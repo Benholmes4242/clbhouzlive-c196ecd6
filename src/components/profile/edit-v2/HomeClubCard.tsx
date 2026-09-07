@@ -37,7 +37,12 @@ export function HomeClubCard({
   const header = (
     <div>
       <FieldLabel>Home club</FieldLabel>
-      <VisibilityRow value={visibility as VisibilityValue} onChange={onVisibilityChange} />
+      {/* Home club has a binary gate (owner or public), so it offers two values. */}
+      <VisibilityRow
+        value={visibility as VisibilityValue}
+        onChange={onVisibilityChange}
+        allow={HOME_CLUB_VISIBILITY_OPTIONS}
+      />
     </div>
   );
 
