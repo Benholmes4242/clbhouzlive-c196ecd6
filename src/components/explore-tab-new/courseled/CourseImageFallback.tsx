@@ -74,12 +74,13 @@ export function CourseImageFallback({
   imageUrl,
   initialsSize = 22,
   pending = false,
+  flatWhenEmpty = false,
   style,
   children,
 }: Props) {
   const [broken, setBroken] = useState(false);
   const showImage = !!imageUrl && !broken;
-  const initials = initialsForCourse(courseName);
+  const initials = flatWhenEmpty ? '' : initialsForCourse(courseName);
 
   if (pending) {
     return (
