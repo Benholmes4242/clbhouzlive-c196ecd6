@@ -169,6 +169,6 @@ export const VisibilityRow: React.FC<{
     }}
   >
     <span style={BIZ_LABEL}>{SHEET_TITLE}</span>
-    <VisibilityDropdown value={value} onChange={onChange} disabled={disabled} />
+    <VisibilityDropdown value={value} onChange={onChange} disabled={disabled} allow={allow} />
   </div>
 );
