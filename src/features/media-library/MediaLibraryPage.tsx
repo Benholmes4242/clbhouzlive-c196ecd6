@@ -5,7 +5,7 @@ import type { Moment } from '@/components/explore-tab-new/courseled/hooks/useMom
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { LibraryChrome, LibraryHead, LoadMore, SortRail } from './LibraryChrome';
+import { LibraryHead, LoadMore, SortRail } from './LibraryChrome';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { useMergedLibraryTotal } from './libraryTotals';
 import {
@@ -68,8 +68,10 @@ export default function MediaLibraryPage() {
 
   return (
     <div style={{ background: A.CANVAS, minHeight: '100dvh', color: A.INK, fontFamily: SANS, ...FIGS }}>
-      <LibraryChrome label="Media" />
-      <main style={{ paddingTop: 'var(--library-header-h)' }}>
+      {/* No page-owned header: /media wears the shared chrome islands (registry
+          rule), the same object the course detail page wears. The island pays
+          the safe area and publishes --header-h; this page only pads below it. */}
+      <main style={{ paddingTop: 'var(--header-h, 70px)' }}>
         <div style={{ padding: `0 ${GUTTER}px ${NAV_CLEARANCE}` }}>
           <LibraryHead total={totalQuery.data ?? null} title="Media" />
           <SortRail
