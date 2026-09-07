@@ -594,7 +594,19 @@ const HandicapPage: React.FC = () => {
   return (
     <PageRoot dark={true} style={{ background: 'var(--hcp-bg-0)' }}>
       {/* H3: header rendered globally by ChromeIsland (dark, hideHcp, /profile fallback). */}
-      <main style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)' }}>
+      <main
+        style={{
+          /* Reserve the CHROME'S OWN computed height (--chrome-total-h composes
+             --header-h + --sat + --shell-extra-h) rather than a hand-written
+             safe-area + 56px guess, so the page and the fixed island cannot
+             disagree when the safe area changes. */
+          paddingTop: 'var(--chrome-total-h, calc(env(safe-area-inset-top, 0px) + 56px))',
+          /* S2.5 GUARD - added only after the shrink-blocking rows below were
+             fixed. Vertical scrolling only; nothing can pan sideways. */
+          maxWidth: '100%',
+          overflowX: 'clip',
+        }}
+      >
         <HandicapPageHeader
           ownerUserId={ownerUserId}
           displayName={displayName}

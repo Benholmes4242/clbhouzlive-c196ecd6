@@ -1,11 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { PAGE_BG } from '@/components/manage/ui';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { FixedPageHeader } from '@/components/chrome/FixedPageHeader';
 
-const SF_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 interface Props {
   title: string;
@@ -39,9 +38,6 @@ interface Props {
  */
 export function ManagePageShell({ title, children, right, onBack, belowTitle, fill = false }: Props) {
   const bg = PAGE_BG;
-  const ink = A.INK;
-  const rule = A.BORDER;
-  const backBg = A.PANEL;
   const navigate = useNavigate();
   const handleBack = () => (onBack ? onBack() : navigate(-1));
 
@@ -52,56 +48,19 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle, fi
         style={{
           background: bg,
           marginTop: 'calc(-1 * var(--sat, env(safe-area-inset-top, 0px)))',
+          maxWidth: '100%',
         }}
       >
-        {/* Header owns the safe-area band itself. It is opaque and remains in
-            normal flow, so page content starts after the full header instead
-            of sliding beneath the title/filter section. */}
-        <div
-          className="sticky"
-          style={{
-            top: 0,
-            background: bg,
-            borderBottom: `1px solid ${rule}`,
-            zIndex: 60,
-          }}
-        >
-
-          <div
-            className="flex items-center justify-between px-4"
-            style={{
-              paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 8px)',
-              paddingBottom: belowTitle ? 8 : 12,
-              minHeight: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 56px)',
-              boxSizing: 'border-box',
-            }}
-          >
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <button
-                onClick={handleBack}
-                style={{
-                  width: 32, height: 32, borderRadius: '50%',
-                  background: backBg, border: `1px solid ${rule}`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0, cursor: 'pointer',
-                }}
-                aria-label="Back"
-              >
-                <ChevronLeft size={18} strokeWidth={2.5} style={{ color: ink }} />
-              </button>
-              <h1
-                style={{
-                  fontFamily: SF_STACK, fontSize: 18, fontWeight: 600, color: ink,
-                  letterSpacing: '-0.01em', margin: 0,
-                }}
-              >
-                {title}
-              </h1>
-            </div>
-            {right}
-          </div>
-          {belowTitle}
-        </div>
+        {/* The Discover band: fixed, pays its own safe-area inset, 42px control
+            row, 1px A.BORDER edge. FixedPageHeader renders the reservation for
+            its own MEASURED height immediately after itself, so nothing can
+            render beneath it — on a cold launch or an in-app navigation. */}
+        <FixedPageHeader
+          title={title}
+          onBack={handleBack}
+          right={right}
+          below={belowTitle}
+        />
 
         <div
           className={fill ? 'flex-1 pb-0 flex flex-col' : 'flex-1 pb-0'}

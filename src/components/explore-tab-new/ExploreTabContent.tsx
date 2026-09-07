@@ -138,7 +138,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
       {!embedded && <DiscoverHeader active={activeTab} onChange={changeTab} />}
 
       {activeTab === 'scores' ? (
-        <main style={{ paddingTop: embedded ? 0 : 'var(--discover-header-h)' }}>
+        <main style={{ paddingTop: embedded ? 0 : 'var(--discover-header-h, calc(env(safe-area-inset-top, 0px) + 78px))' }}>
           <div style={{ padding: '0 14px 110px' }}>
             {/* BRIEF_SCORES_TWO_HALVES — one reference surface, two equal halves
                 under one filter. The hero and the duplicate course tiles are

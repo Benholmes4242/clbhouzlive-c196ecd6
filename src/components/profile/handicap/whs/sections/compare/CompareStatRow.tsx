@@ -84,7 +84,7 @@ export const CompareStatRow: React.FC<Props> = ({
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '58px 1fr 58px',
+          gridTemplateColumns: '58px minmax(0, 1fr) 58px',
           alignItems: 'center',
           gap: 8,
         }}
@@ -98,6 +98,7 @@ export const CompareStatRow: React.FC<Props> = ({
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: CHART.DIM,
+            minWidth: 0,
           }}
         >
           {label}

@@ -308,6 +308,13 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
             color: tokens.stateLabelColor,
+            /* Wide-tracked uppercase in a flex row: min-width defaults to auto
+               (min-content), so a long label pushes the row past the viewport.
+               S2.3(c). */
+            minWidth: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
           {tokens.stateLabel}
@@ -322,6 +329,10 @@ const StreakHeroCard: React.FC<StreakHeroCardProps> = ({ entry, row }) => {
               textTransform: 'uppercase',
               color: 'var(--hcp-t-40)',
               whiteSpace: 'nowrap',
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              flexShrink: 1,
             }}
           >
             {meta}

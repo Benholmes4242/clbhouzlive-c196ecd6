@@ -74,7 +74,7 @@ export function NewsTabPage({ onOpenStory }: { onOpenStory: (slug: string) => vo
   };
 
   return (
-    <main style={{ paddingTop: 'var(--discover-header-h)', minHeight: '100dvh', background: A.CANVAS, color: A.INK, fontFamily: SANS }}>
+    <main style={{ paddingTop: 'var(--discover-header-h, calc(env(safe-area-inset-top, 0px) + 78px))', minHeight: '100dvh', background: A.CANVAS, color: A.INK, fontFamily: SANS }}>
       {isPending ? (
         <div>
           <Skeleton style={{ height: 340, width: '100%', borderRadius: 0 }} />
