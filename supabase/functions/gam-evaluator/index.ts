@@ -407,6 +407,12 @@ async function processSingle(whsScoreId: string) {
   // SKIPPED rather than judged as not met.
   (stats as any).hole_detail_present = holeDetailPresent;
 
+  // Transient, same contract as hole_detail_present: false means "unresolved,
+  // not negative". gam_round_stats.is_counter remains a snapshot of the column;
+  // this only governs whether counter-derived streaks/badges may be judged.
+  (stats as any).counter_settled = counterSettled;
+
+
 
   let earned: string[] = [];
   if (!alreadyAtVersion) {
