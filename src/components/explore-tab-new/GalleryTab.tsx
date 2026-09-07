@@ -155,7 +155,7 @@ export function GalleryTab({ onOpenPost, onOpenReview, onSeeAll }: { onOpenPost:
   }, [courseMediaQuery.data, onOpenReview, pendingReview]);
 
   return (
-    <main style={{ paddingTop: 'var(--discover-header-h)', minHeight: '100dvh', background: A.CANVAS, color: A.INK, fontFamily: SANS }}>
+    <main style={{ paddingTop: 'var(--discover-header-h, calc(env(safe-area-inset-top, 0px) + 78px))', minHeight: '100dvh', background: A.CANVAS, color: A.INK, fontFamily: SANS }}>
       <div style={{ padding: `18px ${GUTTER}px 110px` }}>
         {clips.length > 0 && (
         <section style={{ marginBottom: SECTION_GAP }}><SectionHead title="Clips" total={hubCounts.data?.clip_count ?? null} onSeeAll={() => onSeeAll('/watch/clips')} />
