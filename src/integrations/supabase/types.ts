@@ -19105,6 +19105,7 @@ export type Database = {
         Returns: Json
       }
       get_admin_audiences: { Args: never; Returns: Json }
+      get_admin_dashboard_glance: { Args: { p_tz?: string }; Returns: Json }
       get_admin_funnel_cohorts: { Args: { p_weeks?: number }; Returns: Json }
       get_admin_intraday: { Args: { p_tz?: string }; Returns: Json }
       get_admin_member_actions: { Args: { p_days?: number }; Returns: Json }
@@ -19116,6 +19117,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_admin_north_star: { Args: never; Returns: Json }
       get_admin_ops_health: {
         Args: { p_build_id?: string; p_days?: number }
         Returns: Json

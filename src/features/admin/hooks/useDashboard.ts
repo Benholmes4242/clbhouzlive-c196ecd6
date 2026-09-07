@@ -1,18 +1,15 @@
 /**
  * ⚠️ POSTGREST RETURNS AT MOST 2000 ROWS — whatever `.limit()` says.
  *
- * Measured 7 Sep 2026: a request for 50,000 rows against a 23,295-row table
- * came back with exactly 2000. analytics_events holds ~20,100 rows per
- * fortnight and ~50,100 per 30 days, so ANY raw select over a window wider
- * than roughly a day is silently truncated — and with no ORDER BY the 2000
- * you get are physical order, i.e. the OLDEST slice of an append-only table.
+ * REMEDIATED (batch 2, pre-emptive). The glance card pulled a whole day of
+ * events to rank today's most active members: ~1,400 rows against the 2000
+ * cap, i.e. 70% of the ceiling. It would have broken on the busiest days only
+ * and looked correct again the following week. Both the hourly posts buckets
+ * and the top-three ranking are now counted by get_admin_dashboard_glance.
  *
- * Raising the limit does not help. Adding .order() only changes which slice
- * you lose. Distinct-user counts, totals and buckets computed in the browser
- * from a truncated pull are WRONG, not approximate.
- *
- * The fix is always the same: aggregate in Postgres behind an admin-gated RPC
- * (see get_admin_audiences / get_platform_activity) and return one row.
+ * STANDING RULE: no admin figure is computed by counting rows in the browser.
+ * Counting happens in Postgres. A new metric needs an RPC, not a select and a
+ * Set.
  */
 import { useQueries } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -63,46 +60,24 @@ export interface TodayGlance {
 // ─── Fetchers ─────────────────────────────────────────────────────────────────
 
 async function fetchTodayGlance(): Promise<TodayGlance> {
-  const startOfToday = new Date(); startOfToday.setHours(0, 0, 0, 0);
-  const since = startOfToday.toISOString();
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  const { data, error } = await supabase.rpc('get_admin_dashboard_glance' as never, { p_tz: tz } as never);
+  if (error) throw error;
+  const payload = data as unknown as {
+    posts_by_hour: { hour: number; count: number }[];
+    top_active_users: { user_id: string; display_name: string; avatar_url: string | null; event_count: number }[];
+  } | null;
+  if (!payload) throw new Error('get_admin_dashboard_glance returned no payload');
 
-  const [postsRes, eventsRes] = await Promise.all([
-    // FIX: read directly from posts (analytics_events 'post_published' is never written)
-    supabase.from('posts').select('created_at').gte('created_at', since).limit(2000),
-    supabase.from('analytics_events').select('user_id').gte('created_at', since).not('user_id', 'is', null).limit(5000),
-  ]);
+  const postsByHour: HourlyBucket[] = (payload.posts_by_hour ?? [])
+    .map(b => ({ hour: b.hour, count: b.count }));
 
-  const hourCounts: Record<number, number> = {};
-  for (let h = 0; h < 24; h++) hourCounts[h] = 0;
-  for (const r of postsRes.data ?? []) {
-    const h = new Date(r.created_at).getHours();
-    hourCounts[h]++;
-  }
-  const postsByHour: HourlyBucket[] = Object.entries(hourCounts).map(([h, count]) => ({ hour: parseInt(h), count }));
-
-  const userCounts: Record<string, number> = {};
-  for (const r of (eventsRes.data ?? []) as { user_id: string }[]) {
-    userCounts[r.user_id] = (userCounts[r.user_id] || 0) + 1;
-  }
-  const top3Ids = Object.entries(userCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
-    .map(([userId, eventCount]) => ({ userId, eventCount }));
-
-  let topActiveUsers: TopActiveUser[] = [];
-  if (top3Ids.length > 0) {
-    const { data: profiles } = await supabase
-      .from('user_profiles')
-      .select('id, display_name, username, profile_photo_url')
-      .in('id', top3Ids.map(t => t.userId));
-    const map = new Map((profiles ?? []).map(p => [p.id, p]));
-    topActiveUsers = top3Ids.map(t => ({
-      userId: t.userId,
-      displayName: map.get(t.userId)?.display_name ?? map.get(t.userId)?.username ?? t.userId.slice(0, 8),
-      avatarUrl: map.get(t.userId)?.profile_photo_url ?? null,
-      eventCount: t.eventCount,
-    }));
-  }
+  const topActiveUsers: TopActiveUser[] = (payload.top_active_users ?? []).map(u => ({
+    userId: u.user_id,
+    displayName: u.display_name,
+    avatarUrl: u.avatar_url,
+    eventCount: u.event_count,
+  }));
 
   return { postsByHour, topActiveUsers };
 }
