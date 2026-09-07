@@ -19,6 +19,8 @@ import { CourseImageFallback } from '@/components/explore-tab-new/courseled/Cour
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
 
 const GLASS = 'rgba(10,14,10,0.55)';
 const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.62), rgba(10,14,10,0) 55%)';
