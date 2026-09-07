@@ -171,8 +171,11 @@ export function AppHeader({
           zIndex: DISCOVER_HEADER_Z,
           // 'self' pays the notch; 'shell' must not — .app-shell already did.
           paddingTop: isSelf ? 'env(safe-area-inset-top, 0px)' : 0,
-          background: A.CANVAS,
-          borderBottom: `1px solid ${A.BORDER}`,
+          background: overHero
+            ? `color-mix(in srgb, ${A.CANVAS} ${Math.round(fade * 100)}%, transparent)`
+            : A.CANVAS,
+          borderBottom: overHero && fade < 0.98 ? '1px solid transparent' : `1px solid ${A.BORDER}`,
+
           fontFamily: SANS,
         }}
       >
