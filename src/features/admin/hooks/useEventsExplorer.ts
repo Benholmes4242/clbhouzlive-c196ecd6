@@ -45,6 +45,14 @@ export const EVENTS_MAX_DAYS = 180;
  * Both floors are enforced in Postgres, not here.
  */
 export const STOPPED_MIN_COUNT = 25;
+/**
+ * The member floor counts NON-STAFF members ONLY, regardless of the "Include
+ * staff" toggle, and that is enforced in Postgres. Two staff accounts are ~74%
+ * of all events: if one of an event's two prior members were staff, a single
+ * person going on holiday would raise an alarm on a perfectly healthy event.
+ * And an event only staff have ever fired is not an event the platform uses, so
+ * it must never be able to alarm at all.
+ */
 export const STOPPED_MIN_USERS = 2;
 
 export type EventSort = 'count' | 'users' | 'last_seen' | 'name';
@@ -55,6 +63,8 @@ export interface EventAggregate {
   users: number;
   priorCount: number;
   priorUsers: number;
+  /** Prior-window distinct NON-STAFF members — the figure the alarm floor uses. */
+  priorUsersNonStaff: number;
   /** null when the prior window was empty — a new event, not a rise from zero. */
   deltaCountPct: number | null;
   deltaUsersPct: number | null;
@@ -83,6 +93,16 @@ export interface EventAggregatePage {
   silentNames: number;
   windowEvents: number;
   windowMembers: number;
+  /** Whether staff events are inside windowEvents and the per-row counts. */
+  includeStaff: boolean;
+  /** Staff events in the window, shown so the toggle's effect is legible. */
+  staffEvents: number;
+  /**
+   * Logged-out browsing: events with no user_id. NOT loss. Bots are blocked at
+   * write time, so these are real visits from people with no session.
+   */
+  anonEvents: number;
+  anonSessions: number;
   rows: EventAggregate[];
 }
 
@@ -136,6 +156,7 @@ function mapAggregates(payload: any): EventAggregatePage {
       users: Number(r.users ?? 0),
       priorCount: Number(r.prior_count ?? 0),
       priorUsers: Number(r.prior_users ?? 0),
+      priorUsersNonStaff: Number(r.prior_users_non_staff ?? 0),
       deltaCountPct: r.delta_count_pct === null || r.delta_count_pct === undefined
         ? null : Number(r.delta_count_pct),
       deltaUsersPct: r.delta_users_pct === null || r.delta_users_pct === undefined
@@ -161,6 +182,10 @@ function mapAggregates(payload: any): EventAggregatePage {
     silentNames: rows.filter(r => r.silent && !r.stopped).length,
     windowEvents: Number(payload?.window_events ?? 0),
     windowMembers: Number(payload?.window_members ?? 0),
+    includeStaff: !!payload?.include_staff,
+    staffEvents: Number(payload?.staff_events ?? 0),
+    anonEvents: Number(payload?.anon_events ?? 0),
+    anonSessions: Number(payload?.anon_sessions ?? 0),
     rows,
   };
 }
@@ -176,15 +201,17 @@ export function useDebounced<T>(value: T, ms = 300): T {
 
 export function useEventAggregates(
   period: AnalyticsPeriod,
-  opts: { search?: string; sort?: EventSort; limit?: number } = {},
+  opts: { search?: string; sort?: EventSort; limit?: number; includeStaff?: boolean } = {},
 ) {
   const days = Math.min(periodToDays(period), EVENTS_MAX_DAYS);
   const search = (opts.search ?? '').trim();
   const sort = opts.sort ?? 'count';
   const limit = opts.limit ?? 250;
+  // Staff out by default: with them in, these figures describe us.
+  const includeStaff = opts.includeStaff ?? false;
 
   const q = useQuery({
-    queryKey: ['admin-v2', 'analytics', 'event-aggregates', days, search, sort, limit],
+    queryKey: ['admin-v2', 'analytics', 'event-aggregates', days, search, sort, limit, includeStaff],
     queryFn: async (): Promise<EventAggregatePage> => {
       const { data, error } = await supabase.rpc('get_admin_event_aggregates', {
         p_days: days,
@@ -194,6 +221,7 @@ export function useEventAggregates(
         p_offset: 0,
         p_stopped_min_count: STOPPED_MIN_COUNT,
         p_stopped_min_users: STOPPED_MIN_USERS,
+        p_include_staff: includeStaff,
       } as any);
       if (error) throw error;
       return mapAggregates(data);
