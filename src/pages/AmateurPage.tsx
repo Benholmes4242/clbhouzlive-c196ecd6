@@ -8,6 +8,7 @@ import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { AmateurFilterRail } from '@/features/amateur/AmateurFilterRail';
+import { AmateurCoursesBlock } from '@/features/amateur/AmateurCoursesBlock';
 import { AmateurHero } from '@/features/amateur/AmateurHero';
 import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBlock';
 import { useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
@@ -47,6 +48,14 @@ export default function AmateurPage() {
     [opener],
   );
 
+  /* A COURSE ROW IS A LINK: the whole row goes to that course's page. */
+  const handleCourse = useCallback(
+    (courseId: string) => {
+      navigate(`/courses/${courseId}`);
+    },
+    [navigate],
+  );
+
   return (
     <div style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, ...FIGS }}>
       <AppHeader inset="self" overHero heightVar="--amateur-header-h" />
@@ -55,7 +64,8 @@ export default function AmateurPage() {
       <main style={{ padding: '14px 14px 88px' }}>
         <AmateurFilterRail filters={state.filters} onOpen={state.openPanel} />
         <AmateurLeaderboardBlock userId={user?.id} state={state} onRowPress={handleRow} />
-        {/* Blocks 2-4 land here, in order. */}
+        <AmateurCoursesBlock userId={user?.id} state={state} onCoursePress={handleCourse} />
+        {/* Blocks 3-4 land here, in order. */}
       </main>
 
       <BoardFilterPanel
