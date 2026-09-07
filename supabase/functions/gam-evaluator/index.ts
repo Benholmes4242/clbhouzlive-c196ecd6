@@ -364,6 +364,13 @@ async function processSingle(whsScoreId: string) {
   // to gam_round_stats (no column). max_birdie_streak mirrors longest_birdie_run.
   (stats as any).max_birdie_streak = stats.longest_birdie_run ?? 0;
 
+  // Transient. Set AFTER the gam_round_stats upsert above so it is never
+  // written to a column that does not exist. Downstream, a false value means
+  // "unresolved, not absent": hole-derived streaks and badge conditions are
+  // SKIPPED rather than judged as not met.
+  (stats as any).hole_detail_present = holeDetailPresent;
+
+
   let earned: string[] = [];
   if (!alreadyAtVersion) {
     await applyMilestones(userId, stats);
