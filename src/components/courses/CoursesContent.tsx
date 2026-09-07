@@ -415,11 +415,14 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           const shellTabsNode = (
             <div
               style={{
-                 background: 'var(--glass-bg)',
-                 backdropFilter: 'blur(var(--glass-blur))',
-                 WebkitBackdropFilter: 'blur(var(--glass-blur))',
+                /* Opaque page canvas — this row sits in NORMAL FLOW, so nothing
+                 * ever scrolls beneath it. --glass-bg (the sticky-glass token)
+                 * only darkened the strip against the page. GlassHeaderPlate
+                 * owns the stuck-state veil; do not re-add backdrop-filter. */
+                background: 'hsl(var(--background))',
               }}
             >
+
               <CoursesShellTabs
                 activeTab={activeTab as 'explore' | 'top100'}
                 onTabChange={handleTabChange}
