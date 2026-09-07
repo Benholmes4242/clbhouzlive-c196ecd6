@@ -525,6 +525,37 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
     );
   }, [headerH]);
 
+  // THE ONE TOP CLEARANCE (src/lib/chromeClearance.ts). --header-h is 0 on
+  // bleed routes by design (content flows under the island once scrolling), so
+  // it cannot tell a page where its FIRST row belongs. This token can: the live
+  // island row measures itself here, so every immersive surface that consumes
+  // CHROME_CLEARANCE starts below the islands and moves on its own when they
+  // grow or the notch changes. Nobody types a number into a page.
+  const islandRowRef = useRef<HTMLDivElement | null>(null);
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    if (suppressed || spec.chrome === 'none') {
+      root.style.setProperty(CHROME_CLEARANCE_VAR, '0px');
+      return;
+    }
+    const publish = (h: number) => {
+      const measured = h > 0 ? h : CHROME_ISLAND_H_FALLBACK;
+      root.style.setProperty(CHROME_ISLAND_H_VAR, `${measured}px`);
+      root.style.setProperty(
+        CHROME_CLEARANCE_VAR,
+        `calc(var(--sat, 0px) + ${measured + CHROME_TOP_GAP + CHROME_BREATHING}px)`,
+      );
+    };
+    const el = islandRowRef.current;
+    publish(el?.getBoundingClientRect().height ?? 0);
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      publish(entries[0]?.contentRect?.height ?? 0);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [suppressed, spec.chrome, spec.left?.kind, leftSlot]);
+
 
   if (suppressed) return null;
 
