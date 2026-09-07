@@ -1586,6 +1586,216 @@ async function deriveStreaks(userId: string) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ONE-OFF DERIVED-STREAK REBUILD (BRIEF_STREAKS_ONE_OFF_REBUILD)
+//
+// deriveStreaks only writes when a round is evaluated, so members carry stale
+// derived streaks until they next play. This mode walks every member once.
+//
+// RE-RUNNABLE by construction: derivation is a pure function of stored
+// gam_round_stats, so a partial run followed by a full run is safe and there is
+// no completion marker.
+//
+// DRY RUN IS THE DEFAULT. deriveStreaks writes inline and must not be modified,
+// so the dry pass predicts with simulateDerivedStreaks, which reuses the SAME
+// row query, the SAME derivedCondition predicate and the SAME playTs stamping —
+// only the persistence tail is absent. (Reported: a byte-identical dry run of a
+// function whose write is inline needs either this or an edit to deriveStreaks.)
+// ─────────────────────────────────────────────────────────────────────────────
+type SimulatedStreak = {
+  before: { current_count: number; best_count: number } | null;
+  after: { current_count: number; best_count: number; current_started_at: string | null; best_started_at: string | null };
+  direction: "up" | "down" | "same";
+};
+
+async function simulateDerivedStreaks(userId: string): Promise<Record<string, SimulatedStreak>> {
+  const { data, error } = await supabase
+    .from("gam_round_stats")
+    .select(
+      "whs_score_id, play_date, sub_80, beat_par, birdies, delta_index, hole_detail_present",
+    )
+    .eq("user_id", userId)
+    .order("play_date", { ascending: true })
+    .order("whs_score_id", { ascending: true });
+  if (error) throw error;
+  const rows = (data ?? []) as DerivedRow[];
+
+  const { data: stored, error: sErr } = await supabase
+    .from("gam_streaks")
+    .select("streak_type, current_count, best_count")
+    .eq("user_id", userId);
+  if (sErr) throw sErr;
+  const storedBy = new Map<string, any>((stored ?? []).map((r: any) => [r.streak_type, r]));
+
+  const out: Record<string, SimulatedStreak> = {};
+  for (const streakType of DERIVED_STREAK_TYPES) {
+    let current = 0;
+    let best = 0;
+    let currentStarted: string | null = null;
+    let currentEnded: string | null = null;
+    let bestStarted: string | null = null;
+
+    for (const r of rows) {
+      const met = derivedCondition(streakType, r);
+      if (met === null) continue;
+      if (met) {
+        current += 1;
+        if (current === 1) currentStarted = playTs(r.play_date);
+        currentEnded = playTs(r.play_date);
+        if (current >= best) {
+          best = current;
+          bestStarted = currentStarted;
+        }
+      } else {
+        current = 0;
+        currentStarted = null;
+        currentEnded = null;
+      }
+    }
+    void currentEnded;
+
+    const prior = storedBy.get(streakType) ?? null;
+    const before = prior
+      ? { current_count: prior.current_count ?? 0, best_count: prior.best_count ?? 0 }
+      : null;
+    const direction: SimulatedStreak["direction"] = !before
+      ? (current > 0 || best > 0 ? "up" : "same")
+      : current > (before.current_count ?? 0) || best > (before.best_count ?? 0)
+        ? "up"
+        : current < (before.current_count ?? 0) || best < (before.best_count ?? 0)
+          ? "down"
+          : "same";
+
+    out[streakType] = {
+      before,
+      after: { current_count: current, best_count: best, current_started_at: currentStarted, best_started_at: bestStarted },
+      direction,
+    };
+  }
+  return out;
+}
+
+/** Every distinct member with stored round stats, in a stable order. */
+async function allStatsUserIds(): Promise<string[]> {
+  const seen = new Set<string>();
+  const page = 1000;
+  for (let from = 0; ; from += page) {
+    const { data, error } = await supabase
+      .from("gam_round_stats")
+      .select("user_id")
+      .order("user_id", { ascending: true })
+      .range(from, from + page - 1);
+    if (error) throw error;
+    const rows = data ?? [];
+    for (const r of rows as any[]) seen.add(r.user_id);
+    if (rows.length < page) break;
+  }
+  return [...seen].sort();
+}
+
+async function rebuildDerivedStreaks(opts: {
+  apply: boolean;
+  chainPosition: number;
+  authHeader: string | null;
+  totals?: any;
+}) {
+  const startedAt = Date.now();
+  REBUILD_SUPPRESS = true;
+  try {
+    const userIds = await allStatsUserIds();
+    const from = opts.chainPosition * REBUILD_MEMBER_BATCH_SIZE;
+    const batch = userIds.slice(from, from + REBUILD_MEMBER_BATCH_SIZE);
+
+    const tally: Record<string, { up: number; down: number; same: number }> = {};
+    for (const t of DERIVED_STREAK_TYPES) tally[t] = { up: 0, down: 0, same: 0 };
+    let membersChanged = 0;
+    const movedDown: any[] = [];
+    const perMember: any[] = [];
+
+    for (const userId of batch) {
+      const sim = await simulateDerivedStreaks(userId);
+      let changed = false;
+      for (const t of DERIVED_STREAK_TYPES) {
+        const d = sim[t].direction;
+        tally[t][d] += 1;
+        if (d !== "same") changed = true;
+        if (d === "down") movedDown.push({ user_id: userId, streak_type: t, ...sim[t] });
+      }
+      if (changed) membersChanged += 1;
+      perMember.push({ user_id: userId, streaks: sim });
+      if (opts.apply) await deriveStreaks(userId);
+    }
+
+    const totals = mergeRebuildTotals(opts.totals, {
+      members_processed: batch.length,
+      members_changed: membersChanged,
+      tally,
+    });
+
+    const processedThrough = from + batch.length;
+    const hasMore = processedThrough < userIds.length;
+    const willChain = hasMore && opts.chainPosition + 1 < REBUILD_MAX_CHAIN_LENGTH;
+    if (willChain && opts.authHeader) {
+      try {
+        void fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/gam-evaluator`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: opts.authHeader },
+          body: JSON.stringify({
+            action: "rebuild_derived_streaks",
+            apply: opts.apply,
+            chain_position: opts.chainPosition + 1,
+            totals,
+          }),
+        }).catch((e) => console.error("[rebuild] self-chain spawn failed (non-fatal):", e));
+      } catch (e) {
+        console.error("[rebuild] self-chain setup error (non-fatal):", e);
+      }
+    } else if (willChain) {
+      console.warn("[rebuild] cannot self-chain without auth header — re-invoke with chain_position", opts.chainPosition + 1);
+    }
+
+    const report = {
+      ok: true,
+      mode: opts.apply ? "apply" : "dry_run",
+      wrote_nothing: !opts.apply,
+      members_total: userIds.length,
+      batch_size: REBUILD_MEMBER_BATCH_SIZE,
+      chain_position: opts.chainPosition,
+      chain_spawned: willChain,
+      has_more: hasMore,
+      this_batch: { members_processed: batch.length, members_changed: membersChanged, tally },
+      cumulative: totals,
+      moved_down: movedDown,
+      members: perMember,
+      duration_ms: Date.now() - startedAt,
+    };
+    console.log("[rebuild] batch complete", {
+      mode: report.mode,
+      chain_position: opts.chainPosition,
+      processed: batch.length,
+      changed: membersChanged,
+      duration_ms: report.duration_ms,
+    });
+    return report;
+  } finally {
+    REBUILD_SUPPRESS = false;
+  }
+}
+
+function mergeRebuildTotals(prev: any, add: any) {
+  const tally: Record<string, { up: number; down: number; same: number }> = {};
+  for (const t of DERIVED_STREAK_TYPES) {
+    const p = prev?.tally?.[t] ?? { up: 0, down: 0, same: 0 };
+    const a = add.tally[t];
+    tally[t] = { up: p.up + a.up, down: p.down + a.down, same: p.same + a.same };
+  }
+  return {
+    members_processed: (prev?.members_processed ?? 0) + add.members_processed,
+    members_changed: (prev?.members_changed ?? 0) + add.members_changed,
+    tally,
+  };
+}
+
 
 
 
