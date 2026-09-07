@@ -525,7 +525,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
       )}
 
       {/* CR / SLOPE is deliberately NOT rendered here: get_course_meta resolves
-          one tee while CourseTeeCard resolves the member's own tee, so the two
+          one tee while CourseCardPanel resolves the member's own tee, so the two
           figures legitimately differ. The tee card, 300px below, owns and
           labels tee data. */}
 
