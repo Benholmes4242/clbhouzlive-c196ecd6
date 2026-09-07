@@ -66,12 +66,26 @@ export default function AudiencesSection() {
           audience: these accounts never confirmed, sit outside the member
           population, and must never be counted as members.
         */}
-        <div style={{ borderTop: `1px solid ${t.line}`, paddingTop: 12 }}>
-          <div style={{ maxWidth: 260 }}>
+        <div style={{ borderTop: `1px solid ${t.line}`, paddingTop: 12, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <div style={{ maxWidth: 260, flex: '1 1 200px' }}>
             <CardBody
               name="Incomplete signups"
               size={q.data ? q.data.incomplete_signups : null}
               definition="Started signing up, never confirmed"
+              clickable={false}
+              loading={q.isLoading}
+            />
+          </div>
+          {/*
+            Staff are MEMBERS and are counted in every figure above. This card
+            only says how many there are, because they are excluded from
+            event-volume figures (Events, Top content) by default.
+          */}
+          <div style={{ maxWidth: 260, flex: '1 1 200px' }}>
+            <CardBody
+              name="Staff accounts"
+              size={q.data ? q.data.staff_accounts : null}
+              definition="Counted as members; excluded from event volumes by default"
               clickable={false}
               loading={q.isLoading}
             />
