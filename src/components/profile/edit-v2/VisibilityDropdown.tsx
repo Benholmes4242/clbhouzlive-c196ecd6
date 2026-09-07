@@ -9,10 +9,10 @@ export type VisibilityValue = 'public' | 'followers' | 'friends' | 'private';
 
 /** Presentation order only. Never derive privacy ranking from this array. */
 const VISIBILITY_OPTIONS = [
-  { value: 'private' as VisibilityValue, label: 'Only me', icon: Lock },
-  { value: 'friends' as VisibilityValue, label: 'Friends only', icon: UserCheck },
-  { value: 'followers' as VisibilityValue, label: 'Followers & Friends', icon: Users },
   { value: 'public' as VisibilityValue, label: 'Everyone', icon: Globe },
+  { value: 'followers' as VisibilityValue, label: 'Followers & Friends', icon: Users },
+  { value: 'friends' as VisibilityValue, label: 'Friends only', icon: UserCheck },
+  { value: 'private' as VisibilityValue, label: 'Only me', icon: Lock },
 ];
 
 /** Canonical privacy ranking, most public → most private. Used for safe fallbacks. */
