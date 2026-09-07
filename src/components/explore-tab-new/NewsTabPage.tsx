@@ -11,7 +11,7 @@ import {
   FeatureStory,
   GUTTER,
   HeroStory,
-  KICKER,
+  
   LoadMoreRow,
   StoryChipRail,
   WireItem,
@@ -19,6 +19,7 @@ import {
 } from '@/features/tourhub/news/StoryShapes';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { r } from '@/lib/radius';
+import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 
 const WIRE_PAGE_SIZE = 10;
 
@@ -114,6 +115,7 @@ export function NewsTabPage({ onOpenStory }: { onOpenStory: (slug: string) => vo
                 heading="By competition"
                 chips={competitions.map(([name, count]) => ({ key: name, label: name, count }))}
                 selected={competition}
+                sentenceHeading
                 onSelect={(key) => {
                   setCompetition(key);
                   setWireLimit(WIRE_PAGE_SIZE);
@@ -124,7 +126,7 @@ export function NewsTabPage({ onOpenStory }: { onOpenStory: (slug: string) => vo
 
             {wire.length > 0 && (
               <section aria-labelledby="news-wire" style={{ marginTop: 26, borderRadius: r.md, overflow: 'hidden', background: A.PANEL, border: `1px solid ${A.BORDER}` }}>
-                <h2 id="news-wire" style={{ ...KICKER, margin: 0, padding: '13px 13px 9px', color: A.INK }}>The wire</h2>
+                <div style={{ padding: '13px 13px 0' }}><DiscoverSectionHeading id="news-wire" title="The wire" /></div>
                 {visibleWire.map((story) => (
                   <WireItem key={story.id} story={story} onOpen={() => open(story)} />
                 ))}
