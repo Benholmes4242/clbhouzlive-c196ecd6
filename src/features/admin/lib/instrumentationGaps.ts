@@ -20,10 +20,21 @@
  *    retiredEvents.ts with a reason — it does not stay here.
  */
 export const INSTRUMENTATION_GAPS: Record<string, string> = {
-  // Empty as of 7 Sep 2026: profile_hub_sheet_opened was the only entry and the
-  // emit has been restored in ProfileSheetV2 (see that file). Keep this file —
-  // the next rewrite will produce another one, and it must not land in the
-  // retired list.
+  // MEASURED, 7 Sep 2026, and NOT what it looked like. This event measured the
+  // media-TYPE chips (all / photos / clips / videos) on /explore. Those chips
+  // live in MediaActBar.tsx, which has NO consumer anywhere in src/ — the chip
+  // row a member sees on the media surface now is watch-v2's HubChipBar, whose
+  // ids are audience filters (all / following / your_courses / bucket_list /
+  // trending), a different question entirely. So this is neither a lost emit on
+  // a live control nor a clean retirement: the control was replaced by an
+  // unrelated one and the replacement was never instrumented.
+  //
+  // Held here rather than retired, deliberately, because retiring it would bury
+  // two open items: (1) is MediaActBar dead code, to be decided by reading the
+  // code as AmateurCircuitHero was, and (2) the Watch hub filter fires nothing.
+  // Awaiting Ben's call on both; do not move this line without one.
+  community_media_filter_selected:
+    'Media-type chips (MediaActBar) have no consumer; the live Watch hub chips ask a different question and emit nothing. Decide MediaActBar, then instrument the Watch chips.',
 };
 
 export function gapReason(name: string): string | null {

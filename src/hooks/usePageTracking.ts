@@ -2,7 +2,16 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-const VIEW_PARAMS = ['tab', 'view', 'type'] as const;
+/**
+ * `subtab` EARNS ITS PLACE (7 Sep 2026). Without it every arrival on Handicap
+ * collapsed to `/handicap`, so the Form and Circle tabs had no denominator at
+ * all: we could see 19 members open Handicap and 4 switch tab, and could not
+ * tell how many ever reached Form — which is exactly the number needed to read
+ * anything into the rounds archive being unopened. Deep links and the default
+ * tab were both invisible. Keep this list to view-selecting params only; it
+ * multiplies the distinct paths in analytics.
+ */
+const VIEW_PARAMS = ['tab', 'view', 'type', 'subtab'] as const;
 
 function trackedPath(pathname: string, search: string): string {
   const sp = new URLSearchParams(search);

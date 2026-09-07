@@ -53,6 +53,11 @@ export const RETIRED_EVENTS: Record<string, string> = {
   discover_month_expanded: 'Discover month accordion removed in the rebuild (Aug 2026)',
   discover_rarest_tapped: 'Discover rarest tile removed in the rebuild (Aug 2026)',
 
+  // Discover rails rebuilt: neither name has an emitter anywhere in src/ any
+  // more (grepped 7 Sep 2026). Ben's verdict: rails rebuilt, retire both.
+  discover_creator_card_tapped: 'Discover rails rebuilt; no emitter remains in src/ (Sep 2026)',
+  discover_most_played_row_tapped: 'Discover rails rebuilt; no emitter remains in src/ (Sep 2026)',
+
   // Morning moment: replaced by the community moments surface.
   morning_moment_viewed: 'Morning moment card retired; community moments took over (Aug 2026)',
   morning_moment_friends_tapped: 'Morning moment card retired (Aug 2026)',
