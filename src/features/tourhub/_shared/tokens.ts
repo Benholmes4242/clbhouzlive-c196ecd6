@@ -257,6 +257,14 @@ export const HERO_MIN_H =
 export const TOUR_HERO_BAND_H = '244px';
 
 /**
+ * BRIEF_TOUR_HEADER_CORRECTION Correction 2 — the PHOTOGRAPHIC hero height.
+ * 340px, matching the News lead story, because the two are now the same object
+ * at the same size. The gradient mastheads (player, college, duel) keep
+ * TOUR_HERO_BAND_H: they carry no photograph and are not that object.
+ */
+export const TOUR_HERO_PHOTO_H = '340px';
+
+/**
  * TOUR_EYEBROW — BRIEF_TOUR_FIXED_HEADER S5.
  *
  * The Watch tab's eyebrow, verbatim: 9.5 / 700 / 0.13em caps in A.DIM, cased by
