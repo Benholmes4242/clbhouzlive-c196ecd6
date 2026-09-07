@@ -1324,9 +1324,29 @@ async function applyStreaks(userId: string, stats: any) {
   await updateRoundStreak(userId, stats, "counter", !!stats.is_counter);
   await updateRoundStreak(userId, stats, "sub_80", !!stats.sub_80);
   await updateRoundStreak(userId, stats, "sub_par", !!stats.beat_par);
-  await updateRoundStreak(userId, stats, "birdie_round", stats.birdies > 0);
+
+  // BIRDIE STREAK IS HOLE-DERIVED. With no hole rows, stats.birdies is 0 because
+  // we do not know, not because the member made none. Passing false here breaks
+  // a live streak on a round that may well have contained birdies — that is the
+  // defect this guard closes. Skip entirely: the round neither extends nor
+  // breaks the streak, and the row is left byte-for-byte as it was. The
+  // re-enqueue on hole arrival is what eventually judges it.
+  if ((stats as any).hole_detail_present === false) {
+    console.log(
+      JSON.stringify({
+        evt: "gam_eval_streak_skipped_no_holes",
+        whs_score_id: stats.whs_score_id,
+        streak_type: "birdie_round",
+      }),
+    );
+  } else {
+    await updateRoundStreak(userId, stats, "birdie_round", stats.birdies > 0);
+  }
+
+  // Counter-derived: no hole dependency, behaviour unchanged.
   await updateRoundPlayedStreak(userId, stats);
 }
+
 
 // The two INDEX-DEPENDENT streaks. Their input — delta_index — is only knowable
 // once the member's NEXT score exists, so they are applied against the PREVIOUS
