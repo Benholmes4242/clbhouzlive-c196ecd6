@@ -40,6 +40,12 @@ export interface Moment {
    * tell "portrait" from "we do not know".
    */
   aspect: number | null;
+  /**
+   * Member rating out of 10, present ONLY when the tile is a review photograph.
+   * A moment has no rating, so the field is absent and the tile's chip does not
+   * render — absence, never a zero.
+   */
+  rating?: number | null;
 }
 
 const DAY = 86_400_000;
