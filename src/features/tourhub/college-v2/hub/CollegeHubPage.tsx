@@ -160,21 +160,6 @@ export function CollegeHubPage() {
   }, [debouncedSearch, filtered.length]);
 
   /**
-   * The yearbook search field. It rides in the header's own left group, beside
-   * the back chevron (TourPageShell `leftAccessory`) — the hub no longer spends
-   * a second sticky row on it.
-   *
-   * Shares construction and paint with compare/PickerSheet.tsx's field, but NO
-   * LONGER its height: this one sits in the header row, which already pays 44,
-   * so it returns to canon (radius 14 / height 44). The sheet's field keeps 34
-   * because it is constrained by the sheet's own control row. Change the
-   * construction in both; do not copy the height.
-   *
-   * Paint state (searchPaintFocus) is deliberately SEPARATE from
-   * searchExpanded: blur must restore the paint without collapsing the filtered
-   * list, or a result tap dies before it lands.
-   */
-  /**
    * The Yearbook search field. It lives IN THE CONTENT, under the YEARBOOK
    * headline row and above rank 1 — never in the fixed header control row,
    * which carries chrome only (back / right cluster) and no page input. Shared
