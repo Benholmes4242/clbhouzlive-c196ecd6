@@ -512,9 +512,19 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
     suppressed ? 0 : spec.bleed && spec.chrome === 'island' ? 0 : HEADER_H;
 
   // Publish --header-h just like CompactHeader does.
+  // SINGLE SAFE-AREA OWNER: the island pays env(safe-area-inset-top) (it sits
+  // at calc(var(--sat) + 10px)) and publishes ONE sat-inclusive clearance
+  // token. Pages under the island pad with --island-clearance and must never
+  // add env(safe-area-inset-top) themselves. (--header-h stays sat-EXCLUSIVE
+  // because ShellSlot/--chrome-total-h add --sat on top of it.)
   useLayoutEffect(() => {
     document.documentElement.style.setProperty('--header-h', `${headerH}px`);
+    document.documentElement.style.setProperty(
+      '--island-clearance',
+      headerH === 0 ? '0px' : `calc(var(--sat, 0px) + ${headerH}px)`,
+    );
   }, [headerH]);
+
 
   if (suppressed) return null;
 

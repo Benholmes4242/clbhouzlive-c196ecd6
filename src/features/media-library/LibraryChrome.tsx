@@ -73,17 +73,36 @@ export function LibraryChrome({ label }: { label: string }) {
   );
 }
 
-/** Shared page furniture: eyebrow with the real total + 20/800 headline. */
+/** Shared page furniture: title left, count right, ONE row — the platform
+ *  heading pattern (Amateur leaderboard and courses headings). A count on its
+ *  own line below a heading is not used anywhere. */
 export function LibraryHead({ total, title }: { total: number | null; title: string }) {
   return (
-    <div style={{ padding: '18px 0 14px' }}>
-      <div style={{ font: `700 11px/1 ${SANS}`, letterSpacing: 0.4, textTransform: 'uppercase', color: A.MUTE }}>
+    <div
+      style={{
+        padding: '18px 0 14px',
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'space-between',
+        gap: 12,
+      }}
+    >
+      <h1 style={{ margin: 0, font: `800 20px/1.1 ${SANS}`, color: A.INK }}>{title}</h1>
+      <div
+        style={{
+          font: `700 10px/1.1 ${SANS}`,
+          letterSpacing: '0.13em',
+          textTransform: 'uppercase',
+          color: A.MUTE,
+          whiteSpace: 'nowrap',
+        }}
+      >
         {total == null ? '\u00A0' : `${total} ${total === 1 ? 'item' : 'items'}`}
       </div>
-      <h1 style={{ margin: '8px 0 0', font: `800 20px/1.1 ${SANS}`, color: A.INK }}>{title}</h1>
     </div>
   );
 }
+
 
 /**
  * Ids stay plain strings: JSX type arguments break the dev tagger plugin.
