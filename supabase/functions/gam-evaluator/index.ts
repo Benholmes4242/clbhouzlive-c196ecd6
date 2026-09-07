@@ -1474,7 +1474,6 @@ function playTs(playDate: string): string {
 function derivedCondition(
   streakType: string,
   r: DerivedRow,
-  isLastRound: boolean,
 ): boolean | null {
   switch (streakType) {
     case "sub_80":
@@ -1485,15 +1484,16 @@ function derivedCondition(
       if (r.hole_detail_present !== true) return null;
       return (r.birdies ?? 0) > 0;
     case "no_up":
-      if (r.delta_index == null && isLastRound) return null;
-      return r.delta_index != null && Number(r.delta_index) <= 0;
+      if (r.delta_index == null) return null;
+      return Number(r.delta_index) <= 0;
     case "cutting":
-      if (r.delta_index == null && isLastRound) return null;
-      return r.delta_index != null && Number(r.delta_index) < 0;
+      if (r.delta_index == null) return null;
+      return Number(r.delta_index) < 0;
     default:
       return null;
   }
 }
+
 
 async function deriveStreaks(userId: string) {
   const { data, error } = await supabase
