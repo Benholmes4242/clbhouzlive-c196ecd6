@@ -1,9 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { MediaRailTile } from '@/components/explore-tab-new/courseled/MediaRailTile';
 import { MomentsGrid } from '@/components/explore-tab-new/courseled/MomentsGrid';
 import type { Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { useLatestReviews } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
+import { useDiscoverMediaPreview } from '@/components/explore-tab-new/courseled/hooks/useDiscoverMediaPreview';
+import type { CommunityLibraryItem } from '@/components/explore-tab-new/courseled/hooks/useCommunityLibrary';
+import { useWatchHubCounts } from '@/features/watch-v2/hooks/useWatchHubCounts';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { r } from '@/lib/radius';
 import { useGalleryCourseMedia } from '@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia';
 import { FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
@@ -30,10 +37,16 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
  * offset and coming back restores it (amateurScrollMemory). The viewer itself is
  * an overlay and never unmounts the page.
  *
- * NO SEPARATE CLIPS SECTION. A course-tagged vertical clip already IS a video
- * moment in this pool; a clips rail beside the mosaic would render the same post
- * twice, which the brief forbids. Long-form videos and media search stay on
- * Watch.
+ * THREE SECTIONS, THREE SHAPES: the clips rail, the merged mosaic, then LONGER
+ * WATCH - two rows of long-form video. The long-form rows are here and not
+ * behind a see-all because long-form is the only format the creator accounts
+ * publish in; burying it would be a decision about those creators rather than
+ * about layout. Media SEARCH still lives on Watch.
+ *
+ * THE RAILS ARE NOT COURSE-LED, and cannot be: 236 of 242 media posts carry no
+ * course tag. So the uniform course-set tap rule applies to the MOSAIC, whose
+ * tiles all carry a course. A clip or a video opens its own post in the
+ * fullscreen viewer, exactly as Watch opens it.
  *
  * TWO PLAYERS MAXIMUM. Tiles play through reviewVideoAutoplay's own group cap of
  * two, muted, looping, playsInline, poster-first, IntersectionObserver-elected,
@@ -45,7 +58,65 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
  */
 
 const MOSAIC_CAP = 9;
+const CLIPS_CAP = 8;
+/** Two rows, as ruled. Not a rail, not a see-all. */
+const VIDEO_ROWS = 2;
+/** ONE GROUP FOR THE WHOLE BLOCK, so two players is the page's budget and not
+    each section's. */
 const AUTOPLAY_GROUP = 'amateur-media';
+
+/**
+ * LONGER WATCH row: 116x66 poster left at r.sm, title 13/600 over two lines,
+ * creator beneath, the canonical glass duration badge, hairline between rows.
+ */
+function VideoRow({ item, first, onPress }: { item: CommunityLibraryItem; first: boolean; onPress: () => void }) {
+  const title = item.title?.trim() || item.courseName || item.displayName;
+  return (
+    <button
+      type="button"
+      onClick={onPress}
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 11,
+        width: '100%',
+        padding: first ? '11px 0' : '11px 0 0',
+        marginTop: first ? 0 : 11,
+        border: 0,
+        borderTop: first ? 'none' : `1px solid ${A.BORDER}`,
+        background: 'transparent',
+        color: A.INK,
+        textAlign: 'left',
+        cursor: 'pointer',
+      }}
+    >
+      <div style={{ position: 'relative', width: 116, height: 66, flex: '0 0 116px', overflow: 'hidden', borderRadius: r.sm, background: A.PANEL }}>
+        {item.thumbnail && (
+          <img src={item.thumbnail} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        )}
+        <GlassDurationBadge seconds={item.duration} />
+      </div>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            lineHeight: '17px',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
+        >
+          {title}
+        </div>
+        <div style={{ marginTop: 4, fontSize: 11, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {item.displayName}
+        </div>
+      </div>
+    </button>
+  );
+}
 
 /** The pending open: a course, and the media inside it that was tapped. */
 interface Pending {
@@ -75,6 +146,33 @@ export function AmateurMediaBlock({
   /* LIBRARY TOTALS, not rail lengths. */
   const reviewTotal = useReviewLibraryTotal();
   const momentsTotal = useMomentsLibraryTotal();
+  const hubCounts = useWatchHubCounts();
+
+  /* CLIPS AND LONG-FORM come from the whole library, newest first, from the same
+     read Watch uses - no second query and no new predicate. */
+  const railMedia = useDiscoverMediaPreview(true);
+  const clips = useMemo(() => (railMedia.data?.clips ?? []).slice(0, CLIPS_CAP), [railMedia.data]);
+  const videos = useMemo(() => (railMedia.data?.videos ?? []).slice(0, VIDEO_ROWS), [railMedia.data]);
+
+  const openPost = useCallback(
+    (pool: CommunityLibraryItem[], item: CommunityLibraryItem, source: 'clip' | 'video') => {
+      analyticsEvents.track('amateur_media_tile_tapped', { source, course_id: item.courseId, kind: item.kind });
+      onDepart();
+      const posts = pool.map((entry) => entry.post);
+      const index = Math.max(0, posts.findIndex((post) => post.id === item.postId));
+      openWithOrigin({
+        posts,
+        index,
+        originEl: null,
+        posterUrl: item.thumbnail,
+        mediaIndex: item.mediaIndex ?? 0,
+        mediaId: item.mediaId ?? null,
+        openedFrom: source === 'clip' ? 'amateur-clips' : 'amateur-videos',
+        forceStartAtZero: true,
+      });
+    },
+    [onDepart],
+  );
 
   const moments = useMemo(() => momentsQuery.data ?? [], [momentsQuery.data]);
 
@@ -160,6 +258,7 @@ export function AmateurMediaBlock({
 
   /* A held height while the two reads settle, so nothing below jumps. */
   if (pendingReads) return <div style={{ height: 320 }} aria-hidden />;
+  /* EMPTY RENDERS NOTHING - and the mosaic is the block. No mosaic, no block. */
   if (tiles.length === 0) return null;
 
   return (
@@ -173,6 +272,24 @@ export function AmateurMediaBlock({
           onSeeAll('/explore/moments');
         }}
       />
+
+      {clips.length > 0 && (
+        <div
+          className="scrollbar-hide"
+          style={{ display: 'flex', gap: 10, overflowX: 'auto', marginBottom: 12, marginRight: -14, paddingRight: 14, willChange: 'transform' }}
+        >
+          {clips.map((item, index) => (
+            <MediaRailTile
+              key={item.key}
+              item={item}
+              index={index}
+              width={176}
+              autoplayGroup={AUTOPLAY_GROUP}
+              onPress={() => openPost(clips, item, 'clip')}
+            />
+          ))}
+        </div>
+      )}
 
       <MomentsGrid
         moments={tiles}
@@ -197,6 +314,22 @@ export function AmateurMediaBlock({
           });
         }}
       />
+
+      {videos.length > 0 && (
+        <div style={{ marginTop: 22 }}>
+          <DiscoverSectionHeading
+            title="Longer watch"
+            right={(hubCounts.data?.video_count ?? 0) > videos.length ? `See all ${hubCounts.data?.video_count}` : null}
+            onRightPress={() => {
+              analyticsEvents.track('amateur_media_see_all_opened', { total: hubCounts.data?.video_count ?? 0, section: 'videos' });
+              onSeeAll('/watch/videos');
+            }}
+          />
+          {videos.map((item, index) => (
+            <VideoRow key={item.key} item={item} first={index === 0} onPress={() => openPost(videos, item, 'video')} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
