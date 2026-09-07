@@ -39,9 +39,18 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
   onChange,
   disabled = false,
   className,
+  allow,
 }) => {
   const [open, setOpen] = useState(false);
-  const selectedOption = VISIBILITY_OPTIONS.find(o => o.value === value) || VISIBILITY_OPTIONS[0];
+  const options = allow?.length
+    ? VISIBILITY_OPTIONS.filter(o => allow.includes(o.value))
+    : VISIBILITY_OPTIONS;
+  // A stored value the control no longer offers reads as the most private
+  // option available (display only — never written back).
+  const effectiveValue = options.some(o => o.value === value)
+    ? value
+    : options[options.length - 1].value;
+  const selectedOption = options.find(o => o.value === effectiveValue) || options[0];
   const Icon = selectedOption.icon;
 
   const handleSelect = (val: VisibilityValue) => {
