@@ -357,12 +357,8 @@ export function ScoresTab({
           />
         ) : (
           <>
-            <CourseBoardRows
-              rows={courseRows}
-              board={courseBoard}
-              selectedId={selectedRow?.course_id ?? null}
-              onSelect={setSelectedCourse}
-            />
+            {/* A course row is a link: the whole row goes to that course. */}
+            <CourseBoardRows rows={courseRows} board={courseBoard} onCoursePress={onCoursePress} />
             {courseTotal > courseRows.length && (
               <ListTerminalRow
                 label={t('discover.filterBoard.seeAll', 'See all {{unit}}', { unit: courseUnit })}
@@ -413,6 +409,8 @@ export function ScoresTab({
         userId={userId}
         filters={filters}
         appliedParts={appliedParts}
+        board={courseBoard}
+        onBoardChange={setCourseBoard}
         onCoursePress={onCoursePress}
         onMemberPress={onMemberPress}
       />

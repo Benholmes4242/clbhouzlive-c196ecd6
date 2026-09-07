@@ -172,6 +172,8 @@ export function CoursesPlayedSection({
         userId={userId}
         filters={filters}
         appliedParts={appliedParts}
+        board="played"
+        onBoardChange={() => {}}
         onCoursePress={onCoursePress}
         onMemberPress={onMemberPress}
       />

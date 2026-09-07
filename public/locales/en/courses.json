@@ -1810,7 +1810,11 @@
       "tickIsYou": "tick is you",
       "hardest": "Hardest",
       "easiest": "Easiest",
-      "notEnoughDetail": "{{count}} rounds here carry hole detail — not enough for a course picture yet"
+      "notEnoughDetail": "{{count}} rounds here carry hole detail — not enough for a course picture yet",
+      "nCourses_one": "{{count}} course",
+      "nCourses_other": "{{count}} courses",
+      "nMembers_one": "{{count}} member",
+      "nMembers_other": "{{count}} members"
     }
   },
   "statBrowse": {
