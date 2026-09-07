@@ -34,6 +34,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, HAIRLINE_INK_12, INK, INK_MUTE, INK_TINT_05, SLATE_50 } from '@/features/courses/_shared/tokens';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /* ─── Rate a Course bottom sheet ─── */
 function RateCourseSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -273,7 +274,41 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
     scrollPageToTop('instant');
   }, []);
 
+  /**
+   * COURSES HUB TAB MEASUREMENT (7 Sep 2026). Top-level navigation of a primary
+   * surface only: Explore / My courses / Top 100. `?tab=` is written with
+   * replace:true, so page_view never separates them and Top 100 — a large
+   * investment — had no denominator of its own.
+   *  - `courses_tab_viewed` fires once on arrival (default or deep link) AND on
+   *    every switch, so a switch always has an arrival to be a ratio of.
+   *  - `courses_tab_changed` carries destination and origin.
+   * Nothing beneath this level is instrumented: the Top 100 list picker and the
+   * region filters stay silent until this tab shows traffic worth splitting.
+   */
+  const coursesArrivalTracked = useRef(false);
+  useEffect(() => {
+    if (coursesArrivalTracked.current) return;
+    coursesArrivalTracked.current = true;
+    analyticsEvents.track('courses_tab_viewed', {
+      tab: activeTab,
+      source: searchParams.get('tab') ? 'deep_link' : 'arrival',
+      variant: username ? 'profile' : 'hub',
+    });
+  }, [activeTab, searchParams, username]);
+
   const handleTabChange = (value: string) => {
+    if (value !== activeTab) {
+      analyticsEvents.track('courses_tab_changed', {
+        tab: value,
+        from: activeTab,
+        variant: username ? 'profile' : 'hub',
+      });
+      analyticsEvents.track('courses_tab_viewed', {
+        tab: value,
+        source: 'switch',
+        variant: username ? 'profile' : 'hub',
+      });
+    }
     setActiveTab(value);
     // Persist tab to URL so it survives remount on back navigation
     const params = new URLSearchParams(searchParams);

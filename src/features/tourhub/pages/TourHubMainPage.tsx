@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { TourHubShell } from '../components/TourHubShell';
 import { TourPageShell } from '../components/TourPageShell';
 import type { TourHubTab } from '../components/types';
@@ -188,12 +189,39 @@ export function TourHubMainPage() {
   };
 
 
+  /**
+   * TOUR HUB TAB MEASUREMENT (7 Sep 2026). `?tab=` is written with replace:true,
+   * so every section collapsed into one /tourhub page_view and the six sections
+   * could not be ranked against each other. Same two-event shape as Discover:
+   *  - `tourhub_tab_viewed` on arrival (default or deep link) and on each switch.
+   *  - `tourhub_tab_changed` with destination and origin.
+   * Deliberately NOT instrumented beneath this: the Leaders tour lens, the
+   * Players lens and the live event switcher stay silent until we know these
+   * sections are opened at all.
+   */
+  const tourArrivalTracked = useRef(false);
+  useEffect(() => {
+    if (tourArrivalTracked.current) return;
+    tourArrivalTracked.current = true;
+    analyticsEvents.track('tourhub_tab_viewed', {
+      tab: activeTab,
+      source: tabParam ? 'deep_link' : 'arrival',
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSelectTab = (id: string) => {
     if (id === 'college') {
+      /* College is a route, not a tab: page_view on /tourhub/college-golf
+         already measures it, so no tab event here. */
       navigate('/tourhub/college-golf');
       return;
     }
     const tab = id as TourHubTab;
+    if (tab !== activeTab) {
+      analyticsEvents.track('tourhub_tab_changed', { tab, from: activeTab });
+      analyticsEvents.track('tourhub_tab_viewed', { tab, source: 'switch' });
+    }
     setActiveTab(tab);
     setSearchParams({ tab: id }, { replace: true });
     scrollPageToTop('auto');
