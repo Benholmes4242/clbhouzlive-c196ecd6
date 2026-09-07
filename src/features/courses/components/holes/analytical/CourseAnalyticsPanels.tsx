@@ -542,9 +542,25 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
                   course: courseName ?? '\u2014',
                 })}
               </p>
+              {/* THE SECOND LINE DEPENDS ON THE READER, NOT THE COURSE.
+                  "Play it and you will be the first" is only true for a member
+                  whose rounds actually arrive - i.e. one with a handicap
+                  connected. For everyone else it promises an outcome they
+                  cannot reach, so they get the connect line instead. Forward
+                  tense only: the line above has just said nobody has played
+                  here, so no history may be promised on this course.
+                  Phrasing reused from the existing connect grammar
+                  (common: "every round you play here counts automatically";
+                  courses: "...appears automatically"). */}
               <p style={{ ...KICKER, margin: '6px 0 0', color: A.MUTE }}>
-                {t('courses:discover.scores.beTheFirst', 'Play it and you will be the first.')}
+                {connection
+                  ? t('courses:discover.scores.beTheFirst', 'Play it and you will be the first.')
+                  : t(
+                      'courses:discover.scores.connectToAppear',
+                      'Connect your handicap and every round you play here appears automatically.',
+                    )}
               </p>
+
             </>
           )}
         </Panel>
