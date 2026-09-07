@@ -236,16 +236,34 @@ async function processSingle(whsScoreId: string) {
     }
   }
 
-  // Holes
-  let holes: any[] = [];
-  if (scoreRow.hole_by_hole_fetched) {
-    const { data: hRows } = await supabase
-      .from("whs_score_holes")
-      .select("*")
-      .eq("score_id", whsScoreId)
-      .order("hole_no", { ascending: true });
-    holes = hRows ?? [];
+  // HOLES — READ UNCONDITIONALLY (BRIEF_EVALUATOR_HOLE_RACE §1).
+  // hole_by_hole_fetched is written by the hole backfill, which races this
+  // evaluator. Gating this query on the flag meant a round whose hole rows had
+  // already landed was evaluated as if it had none: every hole-derived stat
+  // (birdies, pars, bogeys, clean_card, runs) was recorded as zero, silently.
+  // The rows are the truth; the flag is not consulted anywhere in this path.
+  const { data: hRows } = await supabase
+    .from("whs_score_holes")
+    .select("*")
+    .eq("score_id", whsScoreId)
+    .order("hole_no", { ascending: true });
+  const holes: any[] = hRows ?? [];
+
+  // Hole detail presence, derived from what the query RETURNED — never from
+  // hole_by_hole_fetched. When false, no hole-derived condition may be judged.
+  const holeDetailPresent = holes.length > 0;
+  if (!holeDetailPresent) {
+    console.log(
+      JSON.stringify({
+        evt: "gam_eval_no_hole_rows",
+        whs_score_id: whsScoreId,
+        hole_by_hole_fetched: scoreRow.hole_by_hole_fetched ?? null,
+        total_holes: scoreRow.total_holes ?? null,
+        note: "hole-derived stats stored as zero; hole-derived streaks and badges skipped",
+      }),
+    );
   }
+
 
   // COURSE PAR FALLBACK. hole_by_hole_fetched is written by the hole backfill,
   // which races this evaluator: when the evaluator wins the race the flag is
@@ -345,6 +363,13 @@ async function processSingle(whsScoreId: string) {
   // Transient per-round stats used by binary badge matchers but not persisted
   // to gam_round_stats (no column). max_birdie_streak mirrors longest_birdie_run.
   (stats as any).max_birdie_streak = stats.longest_birdie_run ?? 0;
+
+  // Transient. Set AFTER the gam_round_stats upsert above so it is never
+  // written to a column that does not exist. Downstream, a false value means
+  // "unresolved, not absent": hole-derived streaks and badge conditions are
+  // SKIPPED rather than judged as not met.
+  (stats as any).hole_detail_present = holeDetailPresent;
+
 
   let earned: string[] = [];
   if (!alreadyAtVersion) {
@@ -924,17 +949,40 @@ function compare(value: number, op: string, target: number): boolean {
   }
 }
 
+// Stats that only exist because hole rows were read. With no hole rows these
+// are all zero/false as an artefact of missing data, not as a fact about the
+// round, so no condition may be judged from them (BRIEF_EVALUATOR_HOLE_RACE §3).
+const HOLE_DERIVED_STAT_FIELDS = new Set([
+  "birdies", "eagles", "albatrosses", "holes_in_one",
+  "pars", "bogeys", "double_bogeys", "triple_plus",
+  "clean_card", "longest_birdie_run", "longest_par_or_better_run",
+  "max_birdie_streak",
+]);
+
+// Binary badge ids whose condition reads a hole-derived stat.
+const HOLE_DERIVED_BINARY_BADGES = new Set([
+  "first_birdie", "first_eagle", "first_albatross",
+  "five_birdie_round", "two_eagles", "birdie_train", "clean_card",
+]);
+
 function matchesBinary(badge: any, stats: any): boolean {
+  // Badges are earn-only (never revoked), so declining to judge is the same
+  // shape as skipping: the badge is simply not awarded on this pass, and the
+  // re-enqueue on hole arrival gives it another chance with real data.
+  const holesKnown = (stats as any).hole_detail_present !== false;
+
   if (badge.threshold_field && badge.threshold_op && badge.threshold_value != null) {
     // Gross-score badges (break_70/80/90/100) only fire on full 18-hole rounds.
     // Without this guard, a 9-hole 34 would trip all four break_X badges.
     if (badge.threshold_field === 'gross_score' && stats.holes_played !== 18) {
       return false;
     }
+    if (!holesKnown && HOLE_DERIVED_STAT_FIELDS.has(badge.threshold_field)) return false;
     const v = stats[badge.threshold_field];
     if (v == null) return false;
     return compare(Number(v), badge.threshold_op, Number(badge.threshold_value));
   }
+  if (!holesKnown && HOLE_DERIVED_BINARY_BADGES.has(badge.id)) return false;
   switch (badge.id) {
     case "first_birdie": return stats.birdies > 0;
     case "first_eagle": return stats.eagles > 0;
@@ -949,6 +997,7 @@ function matchesBinary(badge: any, stats: any): boolean {
     case "first_index": return stats.hcp_at_time != null;
     default: return false;
   }
+
 }
 
 
@@ -1275,9 +1324,29 @@ async function applyStreaks(userId: string, stats: any) {
   await updateRoundStreak(userId, stats, "counter", !!stats.is_counter);
   await updateRoundStreak(userId, stats, "sub_80", !!stats.sub_80);
   await updateRoundStreak(userId, stats, "sub_par", !!stats.beat_par);
-  await updateRoundStreak(userId, stats, "birdie_round", stats.birdies > 0);
+
+  // BIRDIE STREAK IS HOLE-DERIVED. With no hole rows, stats.birdies is 0 because
+  // we do not know, not because the member made none. Passing false here breaks
+  // a live streak on a round that may well have contained birdies — that is the
+  // defect this guard closes. Skip entirely: the round neither extends nor
+  // breaks the streak, and the row is left byte-for-byte as it was. The
+  // re-enqueue on hole arrival is what eventually judges it.
+  if ((stats as any).hole_detail_present === false) {
+    console.log(
+      JSON.stringify({
+        evt: "gam_eval_streak_skipped_no_holes",
+        whs_score_id: stats.whs_score_id,
+        streak_type: "birdie_round",
+      }),
+    );
+  } else {
+    await updateRoundStreak(userId, stats, "birdie_round", stats.birdies > 0);
+  }
+
+  // Counter-derived: no hole dependency, behaviour unchanged.
   await updateRoundPlayedStreak(userId, stats);
 }
+
 
 // The two INDEX-DEPENDENT streaks. Their input — delta_index — is only knowable
 // once the member's NEXT score exists, so they are applied against the PREVIOUS
