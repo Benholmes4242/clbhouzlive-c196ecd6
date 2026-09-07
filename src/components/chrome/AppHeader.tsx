@@ -58,6 +58,8 @@ export interface AppHeaderProps {
   overHero?: boolean;
   /** Scroll distance the cross-fade completes over. Default 180px. */
   overHeroRange?: number;
+}
+
 
 
 /** The Tour burger — glass values taken from GlassDurationBadge, not re-derived. */
