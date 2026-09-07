@@ -15,7 +15,20 @@ import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/use
 import { cn } from '@/lib/utils';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { r } from '@/lib/radius';
+import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
+import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
 import CreateSheetV2 from '@/features/post-v2/components/CreateSheetV2';
+
+/**
+ * Inactive live-green: the SAME 0.62 alpha the ink/dim pair uses, derived from
+ * the LIVE_INK token so all five tabs dim identically. Never a second green.
+ */
+const LIVE_DIM = (() => {
+  const h = LIVE_INK.replace('#', '');
+  const n = parseInt(h, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},0.62)`;
+})();
+
 
 // ---- Public token: total vertical space to reserve at the bottom of any
 // scrollable page so its last content clears the floating control.
@@ -116,6 +129,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const theme = useNavTheme();
   const tokens = theme === 'dark' ? DARK_TOKENS : LIGHT_TOKENS;
   const navState = useNavScrollState();
+  // Live state for the Tour tab. Fails closed (false) while loading or on error.
+  const tourLive = useAnyTourLive();
+
   const condensed = navState === 'condensed' && !REDUCED_MOTION;
 
   const navRef = useRef<HTMLDivElement | null>(null);
@@ -306,22 +322,25 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                   const Icon = tab.icon;
                   const badgeCount = badges[tab.id] ?? 0;
 
-                  // A6-deliberate exceptions: Post is the app's only amber
-                  // control (create action), Tour keeps its green identity.
-                  // Home, Amateur and Courses follow the ink/mute pair.
+                  // Post is the app's ONE sanctioned amber control (create
+                  // action). Every other tab — Tour included — is the ink/dim
+                  // pair, except that Tour swaps ink/dim for the live green
+                  // pair while play is genuinely in progress (state, not
+                  // identity). Same active/inactive relationship, same alpha.
                   const iconColor =
-                    tab.id === 'tourhub'
+                    tab.id === 'post'
                       ? isActive
-                        ? '#22C55E'
-                        : 'rgba(74,222,128,0.55)'
-                      : tab.id === 'post'
+                        ? '#F7931E'
+                        : 'rgba(247,147,30,0.72)'
+                      : tab.id === 'tourhub' && tourLive
                         ? isActive
-                          ? '#F7931E'
-                          : 'rgba(247,147,30,0.72)'
+                          ? LIVE_INK
+                          : LIVE_DIM
                         : isActive
                           ? tokens.ink
                           : tokens.dim;
                   const labelColor = iconColor;
+
 
                   return (
                     <li key={tab.id} style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
