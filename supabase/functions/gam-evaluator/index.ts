@@ -264,6 +264,43 @@ async function processSingle(whsScoreId: string) {
     );
   }
 
+  // COUNTER STATUS SETTLEDNESS (ADDENDUM A §1).
+  // is_counter is England Golf's flag and stays England Golf's flag — nothing
+  // here computes, derives or infers it. What we judge is only whether the
+  // value can be TRUSTED at this instant:
+  //   (a) ABSENT UPSTREAM. eg-api writes `IsCounter ?? false`, so an absent
+  //       flag is indistinguishable from a "no" in the column. We recover the
+  //       distinction from raw_payload, which stores the score verbatim.
+  //   (b) NOT YET CALCULATED. A round with no handicap_index_at_time has not
+  //       been through England Golf's handicap calculation, so its counter
+  //       status is provisional by construction.
+  // NO TIME THRESHOLD IS USED and none is hardcoded: the payload carries no
+  // field stating when England Golf considers a score's counter status final,
+  // so we do not invent one. Rounds whose status later FLIPS are handled by
+  // the sync-side re-enqueue instead (ADDENDUM A §2).
+  const rawPayload = (scoreRow as any).raw_payload;
+  const counterAbsentUpstream =
+    !rawPayload ||
+    typeof rawPayload !== "object" ||
+    !("IsCounter" in rawPayload) ||
+    (rawPayload as any).IsCounter == null;
+  const counterSettled =
+    !counterAbsentUpstream && scoreRow.handicap_index_at_time != null;
+  if (!counterSettled) {
+    console.log(
+      JSON.stringify({
+        evt: "gam_eval_counter_unsettled",
+        whs_score_id: whsScoreId,
+        absent_upstream: counterAbsentUpstream,
+        handicap_index_at_time: scoreRow.handicap_index_at_time ?? null,
+        is_counter_stored: scoreRow.is_counter ?? null,
+        note: "counter-derived streaks skipped; neither extended nor broken",
+      }),
+    );
+  }
+
+
+
 
   // COURSE PAR FALLBACK. hole_by_hole_fetched is written by the hole backfill,
   // which races this evaluator: when the evaluator wins the race the flag is
