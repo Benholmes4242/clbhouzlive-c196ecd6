@@ -1086,8 +1086,11 @@ const ProfilePageV2Content: React.FC = () => {
 
 
         {/* Personal Top 10 — editorial rail (BRIEF_PROFILE_HERO_AND_TOP10 §4) */}
+        {/* BRIEF_TOP_TEN_VISIBILITY §6 — the vertical rhythm that used to live
+            on this wrapper (mt-4 mb-2) now belongs to ProfileTopTenRail, so a
+            gated profile leaves no gap where the section would have been. */}
         {isPersonal && profile?.id && (
-          <div className="mt-4 mb-2">
+          <div>
             <ProfileTopTenRail
               userId={profile.id}
               isOwnProfile={isSelf}

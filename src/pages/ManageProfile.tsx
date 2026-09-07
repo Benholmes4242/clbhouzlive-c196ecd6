@@ -45,6 +45,7 @@ import { ProfilePhotoCard, type ProfilePhotoCardHandle } from '@/components/prof
 import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
 import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
 import { AdditionalClubsList } from '@/components/profile/edit-v2/AdditionalClubsList';
+import { VisibilityRow, type VisibilityValue } from '@/components/profile/edit-v2/VisibilityDropdown';
 
 import { HandicapInput } from '@/components/profile/edit-v2/HandicapInput';
 import { BioWebsitesSection } from '@/components/profile/edit-v2/BioWebsitesSection';
@@ -700,6 +701,18 @@ function ProfileTabBody({
               Your home club appears on your profile and leaderboards
             </Nudge>
           )}
+        </ManageCard>
+
+        <ManageCard>
+          {/* BRIEF_TOP_TEN_VISIBILITY §3 — the fifth visibility row, same
+              control and same four values as the clubs rows above. */}
+          <div>
+            <FieldLabel>Top 10 courses</FieldLabel>
+            <VisibilityRow
+              value={(form.topTenVisibility || 'public') as VisibilityValue}
+              onChange={(v) => setField('topTenVisibility', v)}
+            />
+          </div>
         </ManageCard>
 
         <ManageCard>

@@ -70,6 +70,7 @@ export function useProfileSave(userId: string) {
 
         home_club_visibility: form.homeClubVisibility,
         additional_clubs_visibility: form.additionalClubsVisibility,
+        top_ten_visibility: form.topTenVisibility,
         show_additional_home_clubs: form.additionalClubsVisibility !== 'private',
         websites: form.websites.map(w => w.url).filter(Boolean),
         instagram_handle: form.instagramHandle.replace('@', '').trim(),

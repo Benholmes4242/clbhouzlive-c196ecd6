@@ -19,6 +19,8 @@ import { CourseImageFallback } from '@/components/explore-tab-new/courseled/Cour
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
 
 const GLASS = 'rgba(10,14,10,0.55)';
 const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.62), rgba(10,14,10,0) 55%)';
@@ -44,6 +46,16 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   const navigate = useNavigate();
   const { topTen, isLoading } = useUserTopTenCourses(userId);
   const [commentsOpen, setCommentsOpen] = React.useState(false);
+
+  // BRIEF_TOP_TEN_VISIBILITY §4/§5 — display gate. The owner always sees the
+  // section; a visitor sees it only when top_ten_visibility admits them.
+  const { user } = useSupabaseSession();
+  const viewerId = user?.id;
+  const {
+    canView,
+    visibility,
+    isLoading: visibilityLoading,
+  } = useTopTenVisibility(userId, viewerId);
 
   const didAutoOpen = React.useRef(false);
   React.useEffect(() => {
@@ -78,6 +90,20 @@ export const ProfileTopTenRail: React.FC<Props> = ({
 
   if (isLoading) return null;
 
+  // Gate before anything renders: no header, no subtitle, no wrapper padding.
+  if (visibilityLoading && !isOwnProfile) return null;
+  if (!isOwnProfile && !canView) return null;
+
+  /** Uppercase audience marker beside the kicker, owner only, non-public only. */
+  const audienceMarker =
+    isOwnProfile && visibility !== 'public'
+      ? visibility === 'private'
+        ? 'Only me'
+        : visibility === 'friends'
+          ? 'Friends only'
+          : 'Followers & friends'
+      : null;
+
   const header = (
     <div
       style={{
@@ -92,6 +118,9 @@ export const ProfileTopTenRail: React.FC<Props> = ({
       <div style={{ minWidth: 0 }}>
         <div
           style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 8,
             fontSize: 9.5,
             fontWeight: 700,
             letterSpacing: '0.16em',
@@ -99,9 +128,14 @@ export const ProfileTopTenRail: React.FC<Props> = ({
             color: A.INK,
           }}
         >
-          {isOwnProfile
-            ? t('topTen.kicker', 'Your top 10')
-            : t('topTen.kickerOther', 'Their top 10')}
+          <span>
+            {isOwnProfile
+              ? t('topTen.kicker', 'Your top 10')
+              : t('topTen.kickerOther', 'Their top 10')}
+          </span>
+          {audienceMarker && (
+            <span style={{ color: A.MUTE, letterSpacing: '0.16em' }}>{audienceMarker}</span>
+          )}
         </div>
         <div
           style={{
@@ -143,7 +177,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
 
   if (topTen.length === 0) {
     return (
-      <section style={{ paddingBottom: 4 }}>
+      <section style={{ marginTop: 16, marginBottom: 8, paddingBottom: 4 }}>
         {header}
         <div
           style={{
@@ -157,14 +191,14 @@ export const ProfileTopTenRail: React.FC<Props> = ({
         >
           {isOwnProfile
             ? t('topTen.emptyOwn', 'Nothing here yet - add the courses you rate above all others.')
-            : t('topTen.emptyOther', "This golfer hasn't picked their top 10 yet.")}
+            : t('topTen.emptyOther', 'Their top 10 builds up as they rate the courses they play.')}
         </div>
       </section>
     );
   }
 
   return (
-    <section style={{ paddingBottom: 4 }}>
+    <section style={{ marginTop: 16, marginBottom: 8, paddingBottom: 4 }}>
       {header}
 
       <div
