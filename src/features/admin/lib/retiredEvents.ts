@@ -73,6 +73,13 @@ export const RETIRED_EVENTS: Record<string, string> = {
   tour_follow_prompt_skipped: 'Tour follow prompt removed (Aug 2026)',
   tour_players_this_week_shown: 'Players-this-week strip replaced by Live Right Now (Aug 2026)',
 
+  // Course tee card: CourseTeeCard.tsx was DELIBERATELY replaced by the
+  // analytical Course card (CourseCardPanel) on 6 Aug 2026 and DELETED in Sep
+  // 2026. Tee selection is alive there; the pick is now course_card_tee_changed.
+  tee_card_viewed: 'CourseTeeCard replaced by CourseCardPanel (6 Aug 2026), file deleted (Sep 2026)',
+  tee_card_expanded: 'CourseTeeCard replaced by CourseCardPanel; the new card has no collapse (Aug 2026)',
+  tee_card_tee_changed: 'Re-instrumented as course_card_tee_changed on CourseCardPanel (Sep 2026)',
+
   // Misc call sites deleted with their surfaces.
   header_handicap_chip_tapped: 'Handicap chip removed from the profile header (Jul 2026)',
   course_holes_expanded: 'Hole accordion replaced by the analytical hole rows (Aug 2026)',
