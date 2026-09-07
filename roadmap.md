@@ -42,7 +42,9 @@
 - [x] Verify first-session Most recent, restored choices, and 320pt fit
 
 ## BRIEF_TOP_TEN_VISIBILITY_ROUNDTRIP (7 Sep 2026)
-- [ ] useTopTenVisibility takes visibility as an argument; delete its user_profiles query
-- [ ] Resolve owner/public/private/no-viewer with zero queries; isLoading false when no query needed
-- [ ] ProfilePageV2 passes profile?.top_ten_visibility down to ProfileTopTenRail
-- [ ] Delete FavouritesCarousel + barrel line at src/components/profile/index.ts:9 (enumerate consumers first)
+- [x] useTopTenVisibility takes visibility as an argument; user_profiles query deleted
+- [x] Owner/public/private/no-viewer resolved with zero queries; isLoading false when no query needed
+- [x] ProfilePageV2 passes profile?.top_ten_visibility down to ProfileTopTenRail
+- [x] FavouritesCarousel + barrel line deleted (only consumer was the barrel)
+- OPEN: public_profiles view does not expose top_ten_visibility, so stranger/anon viewers
+  coerce to 'public' (same as before this brief). Needs its own decision.
