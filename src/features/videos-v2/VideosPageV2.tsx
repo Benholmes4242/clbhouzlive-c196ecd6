@@ -1,14 +1,9 @@
-import React, { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { GlassHeaderPlate } from '@/components/chrome/GlassHeaderPlate';
-import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
-import { RailChips } from '@/components/ui/RailChips';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { VideosSortId } from './types';
 import { VideosFeedV2 } from './components/VideosFeedV2';
-import { VIDEOS_V2_CATEGORY_IDS, type VideosV2CategoryId } from './categories';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -16,68 +11,33 @@ const FONT_FAMILY =
 const VALID_SORTS: readonly VideosSortId[] = ['latest', 'popular', 'following'];
 const DEFAULT_SORT: VideosSortId = 'latest';
 
-const SORT_OPTS: ReadonlyArray<{ id: VideosSortId; label: string }> = [
-  { id: 'latest', label: 'Latest' },
-  { id: 'popular', label: 'Popular' },
-  { id: 'following', label: 'Following' },
-];
-
-type CategoryFilterId = 'all' | VideosV2CategoryId;
-
-const CATEGORY_OPTS: ReadonlyArray<{ id: CategoryFilterId; label: string }> = [
-  { id: 'all', label: 'All' },
-  { id: 'course-vlog', label: 'Course vlogs' },
-  { id: 'tips-coaching', label: 'Coaching' },
-  { id: 'tournament', label: 'Tournaments' },
-];
-
-
 function parseSort(raw: string | null): VideosSortId {
   return raw && (VALID_SORTS as readonly string[]).includes(raw)
     ? (raw as VideosSortId)
     : DEFAULT_SORT;
 }
 
-function parseCategory(raw: string | null): CategoryFilterId {
-  return raw && (VIDEOS_V2_CATEGORY_IDS as readonly string[]).includes(raw)
-    ? (raw as VideosV2CategoryId)
-    : 'all';
-}
-
+/**
+ * BRIEF_VIDEOS_REFINE_REMOVAL: this page is header island + videos. Both chip
+ * rows (sort and category) and the page's own search circle are GONE:
+ *
+ *   - Zero of 28 members ever changed a refine chip on Discover. Members do not
+ *     narrow a view they are already looking at; they scroll it. At 28 videos
+ *     the whole library is one scroll, so there is nothing to narrow.
+ *   - ONE search per surface, and it is the header island's magnifier. The
+ *     circle at the end of the sort row was a second door to the same job.
+ *
+ * Revisit the CATEGORY row (not sort, not a second search) when the library
+ * passes roughly 120 videos — about four to five scroll-screens, the point at
+ * which a member can no longer hold the whole set in view. Put instrumentation
+ * on the chips from the first commit that reinstates them.
+ *
+ * `?sort=` is still honoured because inbound links carry it; there is simply no
+ * control to change it here.
+ */
 export default function VideosPageV2() {
-  const [params, setParams] = useSearchParams();
-  const [searchOpen, setSearchOpen] = React.useState(false);
-
+  const [params] = useSearchParams();
   const sort = useMemo(() => parseSort(params.get('sort')), [params]);
-  const category = useMemo<CategoryFilterId>(
-    () => parseCategory(params.get('cat')),
-    [params],
-  );
-
-  const setSort = useCallback(
-    (next: VideosSortId) => {
-      const p = new URLSearchParams(params);
-      if (next === DEFAULT_SORT) p.delete('sort');
-      else p.set('sort', next);
-      setParams(p, { replace: true });
-    },
-    [params, setParams],
-  );
-
-  const setCategory = useCallback(
-    (next: CategoryFilterId) => {
-      const p = new URLSearchParams(params);
-      if (next === 'all') p.delete('cat');
-      else p.set('cat', next);
-      setParams(p, { replace: true });
-    },
-    [params, setParams],
-  );
-
-  // VideosFeedV2 expects `null` for the "All" state (unfiltered).
-  const feedCategory: VideosV2CategoryId | null =
-    category === 'all' ? null : category;
-
 
   return (
     <PageRoot className="min-h-screen text-foreground bg-background">
@@ -91,73 +51,8 @@ export default function VideosPageV2() {
           fontFamily: FONT_FAMILY,
         }}
       >
-        {/* Sort tabs + search — scrolls away; only the category chips below are sticky. */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '0 14px',
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {/* Sort is the same object as the category rail below and as the
-                library pages' sort rails: one chip treatment, not underlines. */}
-            <RailChips
-              options={SORT_OPTS}
-              value={sort}
-              onChange={(next) => setSort(next as VideosSortId)}
-              ariaLabel="Sort videos"
-              style={{ margin: '0 -14px', padding: '0 14px' }}
-            />
-          </div>
-          <button
-            type="button"
-            aria-label="Search"
-            onClick={() => setSearchOpen(true)}
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 999,
-              border: `1px solid ${A.BORDER}`,
-              background: 'transparent',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 0,
-              cursor: 'pointer',
-              flexShrink: 0,
-              marginBottom: 6,
-            }}
-          >
-            <Search size={15} color={A.MUTE} />
-          </button>
-        </div>
-
-        {/* Sticky control block. Glass treatment matches Clips + Watch. */}
-        <div
-          style={{
-            position: 'sticky',
-            top: 'var(--sat, 0px)',
-            zIndex: 10,
-            background: A.CANVAS,
-            borderBottom: `1px solid ${A.BORDER}`,
-            padding: '8px 14px 10px',
-          }}
-        >
-          <RailChips
-            options={CATEGORY_OPTS}
-            value={category}
-            onChange={(next) => setCategory(next as CategoryFilterId)}
-            ariaLabel="Video category filter"
-            style={{ margin: '0 -14px', padding: '0 14px' }}
-          />
-        </div>
-
-        <VideosFeedV2 sort={sort} category={feedCategory} />
+        <VideosFeedV2 sort={sort} category={null} />
       </main>
-
-      <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </PageRoot>
   );
 }
