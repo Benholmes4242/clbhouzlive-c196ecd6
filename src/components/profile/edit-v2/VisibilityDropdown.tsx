@@ -111,9 +111,9 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
 
                 {/* Options */}
                 <div className="pb-4">
-                  {VISIBILITY_OPTIONS.map((option) => {
+                  {options.map((option) => {
                     const OptionIcon = option.icon;
-                    const isSelected = option.value === value;
+                    const isSelected = option.value === effectiveValue;
                     return (
                       <button
                         key={option.value}
