@@ -22,6 +22,7 @@ import type { VideosSortId } from '../types';
 import type { VideosV2CategoryId } from '../categories';
 import { useVideosFeedV2, type VideosFeedV2Row } from '../hooks/useVideosFeedV2';
 import { useInterruptClips } from '../hooks/useInterruptClips';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { VideoFeedCard } from './VideoFeedCard';
 import { ClipsInterruptShelf } from './ClipsInterruptShelf';
 
@@ -37,37 +38,37 @@ function SkeletonCard() {
   return (
     <div style={{ marginBottom: 16 }}>
       <div
-        className="clb-shimmer-light"
+        className="clb-shimmer-dark"
         style={{
           aspectRatio: '16 / 9',
           borderRadius: 4,
-          background: 'rgba(0,0,0,0.06)',
+          background: 'rgba(255,255,255,0.06)',
         }}
       />
       <div style={{ display: 'flex', gap: 9, marginTop: 8 }}>
         <div
-          className="clb-shimmer-light"
+          className="clb-shimmer-dark"
           style={{
             width: 30,
             height: 30,
             borderRadius: '34%',
-            background: 'rgba(0,0,0,0.06)',
+            background: 'rgba(255,255,255,0.06)',
             flexShrink: 0,
           }}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
-            className="clb-shimmer-light"
-            style={{ height: 12, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }}
+            className="clb-shimmer-dark"
+            style={{ height: 12, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }}
           />
           <div
-            className="clb-shimmer-light"
+            className="clb-shimmer-dark"
             style={{
               marginTop: 6,
               height: 10,
               width: '60%',
               borderRadius: 4,
-              background: 'rgba(0,0,0,0.06)',
+              background: 'rgba(255,255,255,0.06)',
             }}
           />
         </div>
@@ -169,10 +170,10 @@ export function VideosFeedV2({ sort, category }: Props) {
         </div>
       ) : isError ? (
         <div style={{ padding: '40px 16px', textAlign: 'center' }}>
-          <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: A.INK }}>
             Couldn't load videos
           </div>
-          <div style={{ marginTop: 6, fontWeight: 500, fontSize: 12, color: '#64748B' }}>
+          <div style={{ marginTop: 6, fontWeight: 500, fontSize: 12, color: A.MUTE }}>
             Check your connection and try again.
           </div>
           <button
@@ -183,8 +184,8 @@ export function VideosFeedV2({ sort, category }: Props) {
               padding: '8px 18px',
               borderRadius: 999,
               border: 'none',
-              background: '#0F172A',
-              color: '#fff',
+              background: A.AMBER,
+              color: A.CANVAS,
               fontWeight: 700,
               fontSize: 12.5,
               cursor: 'pointer',
@@ -195,7 +196,7 @@ export function VideosFeedV2({ sort, category }: Props) {
         </div>
       ) : isEmpty ? (
         <div style={{ padding: '40px 16px', textAlign: 'center' }}>
-          <div style={{ fontWeight: 700, fontSize: 14, color: '#0F172A' }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: A.INK }}>
             No videos yet
           </div>
           <div
@@ -203,7 +204,7 @@ export function VideosFeedV2({ sort, category }: Props) {
               marginTop: 6,
               fontWeight: 500,
               fontSize: 12,
-              color: '#64748B',
+              color: A.MUTE,
             }}
           >
             {nonDefault ? 'Try a different filter' : 'Check back soon'}

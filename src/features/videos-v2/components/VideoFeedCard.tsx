@@ -17,6 +17,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import { formatRelativeMonths as relativeTime } from '@/i18n/format';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { VideosFeedV2Row } from '../hooks/useVideosFeedV2';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { VideoCardMoreButton } from '@/features/watch-v2/components/VideoCardMoreButton';
 
 const FONT_FAMILY =
@@ -99,7 +100,7 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
         style={{
           aspectRatio: '16 / 9',
           borderRadius: 4,
-          background: '#e5e9ef',
+          background: A.PANEL,
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -150,8 +151,8 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
               width: 30,
               height: 30,
               borderRadius: '34%',
-              background: 'linear-gradient(135deg,#F7931E,#d97a10)',
-              color: '#fff',
+              background: A.PANEL,
+              color: A.INK,
               fontWeight: 700,
               fontSize: 12,
               display: 'flex',
@@ -169,7 +170,7 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
               fontWeight: 700,
               fontSize: 13.5,
               lineHeight: 1.28,
-              color: '#0F172A',
+              color: A.INK,
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
@@ -187,7 +188,7 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
                 style={{
                   fontWeight: 500,
                   fontSize: 11.5,
-                  color: '#64748B',
+                  color: A.MUTE,
                   marginTop: 3,
                 }}
               >
@@ -199,7 +200,7 @@ export function VideoFeedCard({ row, post, index, posts, isAutoplayActive }: Pro
                   )}
                   {likeCount > 0 && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-                      <Heart style={{ width: 12, height: 12, color: '#F7931E', fill: '#F7931E' }} strokeWidth={1.8} />
+                      <Heart style={{ width: 12, height: 12, color: A.AMBER, fill: A.AMBER }} strokeWidth={1.8} />
                       {formatCount(likeCount)}
                     </span>
                   )}
