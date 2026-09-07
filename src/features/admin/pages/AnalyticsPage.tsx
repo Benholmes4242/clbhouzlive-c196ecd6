@@ -1604,10 +1604,13 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
             </div>
           </div>
           <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 4 }}>
-            Fired in the previous {page.windowDays} days, silent since. Usually a release broke tracking. Sorted to the top of the list.
+            Fired at least {STOPPED_MIN_COUNT} times across {STOPPED_MIN_USERS}+ members in the previous {page.windowDays} days,
+            nothing since. Usually a release broke tracking. Sorted to the top.
+            {!!page.silentNames && ` ${fmtInt(page.silentNames)} further event${page.silentNames === 1 ? '' : 's'} quiet but below the alarm floor or retired.`}
           </div>
         </Card>
       )}
+
 
       <Card>
         <div style={{
