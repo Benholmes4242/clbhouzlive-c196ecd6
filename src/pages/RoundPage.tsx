@@ -133,7 +133,7 @@ const RoundPage: React.FC = () => {
   const hasHistory = location.key !== 'default';
   const goBack = () => {
     if (hasHistory) navigate(-1);
-    else navigate('/explore', { replace: true });
+    else navigate('/handicap', { replace: true });
   };
 
   const ownerQuery = useRoundOwner(whsScoreId);

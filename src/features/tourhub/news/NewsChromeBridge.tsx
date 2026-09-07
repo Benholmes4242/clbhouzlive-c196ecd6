@@ -13,7 +13,7 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { Z } from '@/config/zIndex';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLogout } from '@/hooks/useLogout';
-import { DISCOVER_NEWS_FALLBACK_STATE } from '@/components/explore-tab-new/discoverReturnState';
+
 import { TourSideMenu } from '../components/TourSideMenu';
 
 interface NewsChromeBridgeProps {
@@ -52,13 +52,12 @@ export function NewsChromeBridge({ label, mode, backFallback }: NewsChromeBridge
         navigate(-1);
         return;
       }
-      navigate(backFallback, {
-        replace: true,
-        state: backFallback === '/explore' ? DISCOVER_NEWS_FALLBACK_STATE : undefined,
-      });
+      // Plain navigation: the Amateur destination has no tab state to restore.
+      navigate(backFallback, { replace: true });
     },
     [backFallback, location.key, navigate],
   );
+
 
   return (
     <>

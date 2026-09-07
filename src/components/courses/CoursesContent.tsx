@@ -259,7 +259,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       return;
     }
     if (tabParam === 'discover') {
-      navigate('/explore', { replace: true });
+      navigate('/courses', { replace: true });
+
       return;
     }
     if (tabParam === 'explore' || tabParam === 'top100') {

@@ -18,6 +18,8 @@ import { r } from '@/lib/radius';
 import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
 import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
 import CreateSheetV2 from '@/features/post-v2/components/CreateSheetV2';
+import { NAV_CLEARANCE, NAV_PILL_H_FALLBACK, NAV_PILL_H_VAR } from '@/lib/navClearance';
+
 
 /**
  * Inactive live-green: the SAME 0.62 alpha the ink/dim pair uses, derived from
@@ -31,9 +33,10 @@ const LIVE_DIM = (() => {
 
 
 // ---- Public token: total vertical space to reserve at the bottom of any
-// scrollable page so its last content clears the floating control.
-// (~60 bar + 20 bottom gap + 16 breathing room = 96)
-export const NAV_CLEARANCE = '96px';
+// scrollable page so its last content clears the floating control. Owned by
+// src/lib/navClearance.ts and re-exported here for existing consumers.
+export { NAV_CLEARANCE } from '@/lib/navClearance';
+
 
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
@@ -177,15 +180,30 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     isOnboardingEditProfile;
   const showNavigation = isVisible && !shouldHideForRoute;
 
-  // Keep the global --bottom-nav-height CSS var mapped to NAV_CLEARANCE so
-  // existing page padding consumers stay correct regardless of pill state.
+  // The pill MEASURES ITSELF into --nav-pill-h, and --bottom-nav-height carries
+  // the full clearance expression (pill + 20px gap + 16px breathing + home
+  // indicator). When the pill grows, every page that pads by the token moves
+  // with it; nothing is re-tuned per page.
   useEffect(() => {
     if (!showNavigation) {
+      document.documentElement.style.setProperty(NAV_PILL_H_VAR, '0px');
       document.documentElement.style.setProperty('--bottom-nav-height', '0px');
       return;
     }
     document.documentElement.style.setProperty('--bottom-nav-height', NAV_CLEARANCE);
-  }, [showNavigation]);
+    const el = navRef.current;
+    if (!el) return;
+    const write = () =>
+      document.documentElement.style.setProperty(
+        NAV_PILL_H_VAR,
+        `${Math.round(el.getBoundingClientRect().height) || NAV_PILL_H_FALLBACK}px`,
+      );
+    write();
+    const ro = new ResizeObserver(write);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [showNavigation, condensed]);
+
 
   // Chrome hidden — reflect in a11y.
   useEffect(() => {

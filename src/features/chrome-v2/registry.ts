@@ -319,7 +319,12 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // Discover owns a fixed ESPN-style header and tabs. The global header stays
   // mounted, but resolves to no island on this route; immersive classification
   // remains unchanged in globalHeaderRules.ts.
-  { match: { exact: '/explore' },                 spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'Discover owns fixed header + tabs' } },
+  { match: { exact: '/explore' },                 spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'Discover owns fixed header + tabs (now a redirect shim to /amateur)' } },
+
+  // The Amateur destination (bottom-nav tab). Owns its own over-hero header, so
+  // the global island resolves to nothing here, same as /explore did.
+  { match: { exact: '/amateur' },                  spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'Amateur owns its over-hero header' } },
+
 
   // Courses landing (editorial geometry; cinematic hero → glass overlay).
   // bleed + scrollAway stay TRUE deliberately: hero page, same as the tour hero

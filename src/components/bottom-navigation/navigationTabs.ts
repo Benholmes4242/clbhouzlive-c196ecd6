@@ -6,8 +6,10 @@ import TrophyIcon from '@/components/icons/TrophyIcon';
 
 // NOTE: tab IDs are historical and do NOT match labels.
 //   id 'clubhouse' = the immersive swipe FEED at '/'   (label "Explore")
-//   id 'watch'     = NOW the Discover surface at '/explore' (label "Discover").
-//                    The standalone Watch hub is dormant behind WATCH_SURFACE.
+//   id 'watch'     = NOW the Amateur destination at '/amateur' (label "Amateur").
+//                    It absorbed Discover's boards, courses, news and media;
+//                    '/explore' is a redirect shim to '/amateur' and the
+//                    standalone Watch hub stays dormant behind WATCH_SURFACE.
 //                    The id stays 'watch' on purpose - scroll-to-top logic and
 //                    analytics key off it.
 // Change labels/icons freely; do NOT rename IDs (scroll-to-top logic + analytics depend on them).
@@ -16,10 +18,11 @@ import TrophyIcon from '@/components/icons/TrophyIcon';
 
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Home',      icon: HouseIcon,  path: '/' },
-  { id: 'watch',     label: 'Amateur',   icon: LeaderboardMarkIcon, path: '/explore' },
+  { id: 'watch',     label: 'Amateur',   icon: LeaderboardMarkIcon, path: '/amateur' },
   { id: 'post',      label: 'Post',      icon: PlusSquareIcon, path: null, isAction: true },
   { id: 'courses',   label: 'Courses',   icon: MapPinIcon, path: '/courses' },
   { id: 'tourhub',   label: 'Tour',      icon: TrophyIcon, path: '/tourhub' },
+
 ];
 
 // Per-tab optical size map (expanded). Keyed by the REAL tab ids above.

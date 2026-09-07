@@ -23,7 +23,7 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavi
 import { setNavigateRef, appNavigate } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
 import { WATCH_SURFACE } from '@/config/featureFlags';
-import { MomentsLibrarySkeleton, ReviewsLibrarySkeleton } from '@/components/skeletons/MediaLibrarySkeletons';
+import { MomentsLibrarySkeleton } from '@/components/skeletons/MediaLibrarySkeletons';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { clearAppBadge } from '@/utils/pushBadge';
 
@@ -83,7 +83,6 @@ import { HandicapPageSkeleton } from '@/components/skeletons/HandicapPageSkeleto
 import { RoundPageSkeleton } from '@/components/skeletons/RoundPageSkeleton';
 
 import { CoursesHubSkeleton } from '@/components/skeletons/CoursesHubSkeleton';
-import DiscoverCourseLedSkeleton from '@/components/explore-tab-new/courseled/DiscoverCourseLedSkeleton';
 
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
@@ -228,9 +227,7 @@ const HomeLanding = lazy(() => import("./pages/HomeLanding"));
 const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
 const VideosPageV2 = lazy(() => import("./features/videos-v2/VideosPageV2"));
 const ClipsPageV2 = lazy(() => import("./features/clips-v2/ClipsPageV2"));
-const ReviewsLibraryPage = lazy(() => import("./features/media-library/ReviewsLibraryPage"));
 const MomentsLibraryPage = lazy(() => import("./features/media-library/MomentsLibraryPage"));
-const ExplorePage = lazy(() => import("./pages/ExplorePage"));
 
 
 
@@ -331,11 +328,28 @@ const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
 // PR-5: /video/:videoId is a post-id deep link. Preserve old shared links via unified /post viewer.
 const VideoIdToPostRedirect: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
-  return <Navigate to={videoId ? `/post/${videoId}` : '/explore'} replace />;
+  return <Navigate to={videoId ? `/post/${videoId}` : '/media'} replace />;
 };
 
+/**
+ * CUTOVER SHIM. Every legacy Discover/library URL runs through here so we can
+ * see, in the first days, what the redirect is actually catching and where from.
+ */
+const Shim: React.FC<{ to: string }> = ({ to }) => {
+  const location = useLocation();
+  useEffect(() => {
+    analyticsEvents.track('explore_shim_hit', {
+      from: location.pathname + location.search,
+      to,
+      referrer: typeof document !== 'undefined' ? document.referrer || null : null,
+    });
+  }, [location.pathname, location.search, to]);
+  return <Navigate to={to} replace />;
+};
+
+
 // Watch surface hibernation gate. When WATCH_SURFACE is false the dormant
-// routes stay registered but bounce to /explore, and we record the attempt so
+// routes stay registered but bounce to /amateur, and we record the attempt so
 // we can tell whether anyone is still trying to reach them.
 const WatchGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
@@ -343,7 +357,7 @@ const WatchGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
     if (dormant) analyticsEvents.track('watch_redirect_hit', { path: location.pathname });
   }, [dormant, location.pathname]);
-  if (dormant) return <Navigate to="/explore" replace />;
+  if (dormant) return <Navigate to="/amateur" replace />;
   return <>{children}</>;
 };
 
@@ -453,6 +467,8 @@ function AppRoutes() {
     const page =
       p === '/' || p === '/clubhouse' ? 'clubhouse'
       : p.startsWith('/watch') ? 'watch'
+      : p === '/amateur' ? 'amateur'
+      : p === '/media' ? 'media'
       : p === '/explore' ? 'discover'
       : p.startsWith('/discover') ? 'discover'
 
@@ -570,11 +586,15 @@ function AppRoutes() {
         <Route path="/clips" element={<WatchGate><Navigate to="/watch/clips" replace /></WatchGate>} />
         <Route path="/watch/clips" element={<WatchGate><Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense></WatchGate>} />
         <Route path="/watch/videos" element={<WatchGate><Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense></WatchGate>} />
-        {/* BRIEF_WATCH_SEE_ALL S3 — the two destinations Watch's review and
-            moment sections never had. */}
-        <Route path="/explore/reviews" element={<Suspense fallback={<ReviewsLibrarySkeleton />}><ReviewsLibraryPage /></Suspense>} />
-        <Route path="/explore/moments" element={<Suspense fallback={<MomentsLibrarySkeleton />}><MomentsLibraryPage /></Suspense>} />
-        <Route path="/explore" element={<Suspense fallback={<DiscoverCourseLedSkeleton />}><ExplorePage /></Suspense>} />
+        {/* CUTOVER: /media is the one media destination. The whole course-tagged
+            member media pool, in the same mosaic the Amateur block shows. */}
+        <Route path="/media" element={<Suspense fallback={<MomentsLibrarySkeleton />}><MomentsLibraryPage /></Suspense>} />
+        {/* SHIM (cutover): the two legacy library URLs now land on /media. */}
+        <Route path="/explore/reviews" element={<Shim to="/media" />} />
+        <Route path="/explore/moments" element={<Shim to="/media" />} />
+        {/* SHIM (cutover): Discover is absorbed by the Amateur destination. */}
+        <Route path="/explore" element={<Shim to="/amateur" />} />
+
 
         {/* Amateur News. Declared BEFORE /discover/* so the index is not eaten by
             a broader discover route, and both are gate-exempt so a shared link

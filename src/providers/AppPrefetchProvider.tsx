@@ -226,7 +226,7 @@ const ROUTE_CONFIGS: RoutePrefetchConfig[] = [
   // themselves on reveal via useWatchAutoplay — do not compete here.
   {
     // /explore (Discover) grid: warm HLS for any short-form video cache hit.
-    path: '/explore',
+    path: '/amateur',
     queryKey: ['clubhouse-explore-shorts'],
     priority: 2,
     extractVideoUrls: (data) => extractVideoUrlsFromArray(data, 6),
