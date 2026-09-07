@@ -51,6 +51,11 @@ interface Props {
   onBack?: () => void;
   /** safeGoBack fallback when there is no history to return to. */
   backFallback?: string;
+  /**
+   * The Tour Hub overview is a bottom-nav destination, so it carries NO back
+   * control regardless of how the member arrived. Everything else does.
+   */
+  showBack?: boolean;
   /** DEPRECATED (BRIEF_TOUR_FIXED_HEADER S4): there is no bleeding hero to
    *  float over any more. Accepted and ignored. */
   immersive?: boolean;
@@ -67,6 +72,7 @@ export function TourPageShell({
   belowTitle,
   onBack,
   backFallback = '/tourhub',
+  showBack = true,
   immersive: _immersiveIgnored = false,
   background = A.CANVAS,
 }: Props) {
@@ -137,24 +143,26 @@ export function TourPageShell({
           }}
         >
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <button
-              onClick={handleBack}
-              aria-label="Back"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                background: A.PANEL,
-                border: `1px solid ${A.BORDER}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                cursor: 'pointer',
-              }}
-            >
-              <ChevronLeft size={18} strokeWidth={2.5} style={{ color: A.INK }} />
-            </button>
+            {showBack && (
+              <button
+                onClick={handleBack}
+                aria-label="Back"
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: A.PANEL,
+                  border: `1px solid ${A.BORDER}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  cursor: 'pointer',
+                }}
+              >
+                <ChevronLeft size={18} strokeWidth={2.5} style={{ color: A.INK }} />
+              </button>
+            )}
             {/* Titles were removed platform-wide: the back chevron is the only
                 identity the tour headers carry. `title` / `subtitle` remain in
                 the props for a11y labelling only. */}
