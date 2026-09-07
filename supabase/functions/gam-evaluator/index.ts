@@ -1563,7 +1563,7 @@ async function deriveStreaks(userId: string) {
   }
 }
 
-}
+
 
 
 async function ensureStreakRow(userId: string, streakType: string, unit: string, freezeCredits = 0) {
