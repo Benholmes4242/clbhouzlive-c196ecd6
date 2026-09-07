@@ -69,9 +69,12 @@ export default function MediaLibraryPage() {
   return (
     <div style={{ background: A.CANVAS, minHeight: '100dvh', color: A.INK, fontFamily: SANS, ...FIGS }}>
       {/* No page-owned header: /media wears the shared chrome islands (registry
-          rule), the same object the course detail page wears. The island pays
-          the safe area and publishes --header-h; this page only pads below it. */}
-      <main style={{ paddingTop: 'var(--header-h, 70px)' }}>
+          rule), the same object the course detail page wears. The ISLAND is the
+          single safe-area owner — it pays env(safe-area-inset-top) and publishes
+          --island-clearance (sat + island height + gap). This page pads with that
+          one token and never pays the inset again. */}
+      <main style={{ paddingTop: 'var(--island-clearance, calc(env(safe-area-inset-top, 0px) + 70px))' }}>
+
         <div style={{ padding: `0 ${GUTTER}px ${NAV_CLEARANCE}` }}>
           <LibraryHead total={totalQuery.data ?? null} title="Media" />
           <SortRail
