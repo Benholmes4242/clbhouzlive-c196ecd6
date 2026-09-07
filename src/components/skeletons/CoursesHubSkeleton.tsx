@@ -1,8 +1,7 @@
 /**
  * CoursesHubSkeleton — route-level Suspense fallback for /courses only.
- * Mirrors the real hub: full-bleed dark hero (AmateurCircuitHero holds the
- * same gradient while its own data loads, so the handoff is seamless),
- * tabs strip, ticker bar, chips row, two-column grid tiles.
+ * Mirrors the real hub: full-bleed dark hero hold, tabs strip, ticker bar,
+ * chips row, two-column grid tiles.
  * The other list-shaped course routes keep CoursesListSkeleton.
  */
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,8 +12,8 @@ const HERO_MIN_HEIGHT =
 export const CoursesHubSkeleton = () => {
   return (
     <div style={{ minHeight: '100vh', background: '#15171F' }}>
-      {/* Hero hold — same gradient AmateurCircuitHero uses for its own
-          isLoading state, so fallback -> hero-loading -> hero is one frame */}
+      {/* Hero hold — plain gradient placeholder for the hub hero. */}
+
       <div
         style={{
           minHeight: HERO_MIN_HEIGHT,
