@@ -5,7 +5,7 @@ import { BoardRowView, gapText } from '@/components/explore-tab-new/courseled/Bo
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
 import { ListTerminalRow } from '@/components/explore-tab-new/courseled/ListTerminalRow';
 import { describeFilterParts } from '@/components/explore-tab-new/courseled/GolfThisWeek';
-import { useBoardPage, type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
+import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import {
   BOARD_LABELS,
   FEAT_BOARD_KEYS,
@@ -37,8 +37,6 @@ import type { AmateurBoardState } from './useAmateurBoardState';
 
 /** Eight positions on the page; the see-all sheet holds the remainder. */
 const VISIBLE_POSITIONS = 8;
-/** One read serves the visible cut and the member's own pinned row. */
-const PAGE_FETCH = 200;
 
 const MEMBER_BOARD_KEYS: readonly BoardKey[] = [...RANKING_BOARD_KEYS, ...FEAT_BOARD_KEYS];
 
@@ -54,11 +52,11 @@ export function AmateurLeaderboardBlock({
   const { t } = useTranslation('courses');
   const [seeAll, setSeeAll] = useState(false);
 
-  const { board, filters, ready } = state;
-  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: ready });
+  /* THE READ IS THE PAGE'S, not this block's - the filter panel states the same
+     count, and two reads could disagree. */
+  const { board, filters, page, total } = state;
 
   const rows = page.data?.rows ?? [];
-  const total = page.data?.total ?? 0;
   const visible = useMemo(() => rows.filter((row) => row.pos <= VISIBLE_POSITIONS), [rows]);
   const leader = rows[0] ?? null;
   const mine = useMemo(

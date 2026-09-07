@@ -9,6 +9,7 @@ import {
 } from '@/components/explore-tab-new/courseled/boardFilters';
 import { useDiscoverEntryBoard } from '@/components/explore-tab-new/courseled/hooks/useDiscoverEntryBoard';
 import { useBoardFacets } from '@/components/explore-tab-new/courseled/hooks/useBoardFacets';
+import { useBoardPage } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /**
@@ -23,6 +24,9 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
  * facet read are the deployed Discover ones, in the RPC's own vocabulary -
  * get_board_page / get_board_facets / get_board_courses are untouched.
  */
+/** One read serves the visible cut, the pinned own row and the panel's count. */
+const PAGE_FETCH = 200;
+
 export function useAmateurBoardState(userId: string | undefined) {
   const entry = useDiscoverEntryBoard(userId);
 
@@ -44,6 +48,10 @@ export function useAmateurBoardState(userId: string | undefined) {
   const filters = pickedFilters ?? DEFAULT_FILTERS;
 
   const facets = useBoardFacets(userId, board, filters, { enabled: ready });
+  /* ONE READ, TWO READERS. The leaderboard block renders these rows and the
+     filter panel states their count; react-query serves both from the same key,
+     so the count in the panel can never disagree with the rows on the page. */
+  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: ready });
 
   const changeFilters = useCallback((next: BoardFilters) => {
     analyticsEvents.track('amateur_filter_changed', {
@@ -79,6 +87,8 @@ export function useAmateurBoardState(userId: string | undefined) {
       filters,
       courseBoard,
       facets,
+      page,
+      total: page.data?.total ?? 0,
       panelOpen,
       openPanel: () => {
         analyticsEvents.track('amateur_filter_opened', { board });
@@ -90,7 +100,7 @@ export function useAmateurBoardState(userId: string | undefined) {
       changeCourseBoard,
       resetFilters,
     }),
-    [ready, board, filters, courseBoard, facets, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters],
+    [ready, board, filters, courseBoard, facets, page, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters],
   );
 }
 

@@ -64,7 +64,7 @@ export default function AmateurPage() {
         userId={user?.id}
         board={state.board}
         onBoardChange={state.changeBoard}
-        resultCount={0}
+        resultCount={state.total}
         filters={state.filters}
         onChange={state.changeFilters}
         facets={state.facets}
