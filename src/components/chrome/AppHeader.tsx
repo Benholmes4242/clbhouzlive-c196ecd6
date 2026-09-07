@@ -100,6 +100,9 @@ export function AppHeader({
   tabsAriaLabel = 'Sections',
   inset = 'self',
   heightVar = '--discover-header-h',
+  overHero = false,
+  overHeroRange = 180,
+
 }: AppHeaderProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
