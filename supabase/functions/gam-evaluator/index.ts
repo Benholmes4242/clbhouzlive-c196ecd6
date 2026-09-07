@@ -264,6 +264,43 @@ async function processSingle(whsScoreId: string) {
     );
   }
 
+  // COUNTER STATUS SETTLEDNESS (ADDENDUM A §1).
+  // is_counter is England Golf's flag and stays England Golf's flag — nothing
+  // here computes, derives or infers it. What we judge is only whether the
+  // value can be TRUSTED at this instant:
+  //   (a) ABSENT UPSTREAM. eg-api writes `IsCounter ?? false`, so an absent
+  //       flag is indistinguishable from a "no" in the column. We recover the
+  //       distinction from raw_payload, which stores the score verbatim.
+  //   (b) NOT YET CALCULATED. A round with no handicap_index_at_time has not
+  //       been through England Golf's handicap calculation, so its counter
+  //       status is provisional by construction.
+  // NO TIME THRESHOLD IS USED and none is hardcoded: the payload carries no
+  // field stating when England Golf considers a score's counter status final,
+  // so we do not invent one. Rounds whose status later FLIPS are handled by
+  // the sync-side re-enqueue instead (ADDENDUM A §2).
+  const rawPayload = (scoreRow as any).raw_payload;
+  const counterAbsentUpstream =
+    !rawPayload ||
+    typeof rawPayload !== "object" ||
+    !("IsCounter" in rawPayload) ||
+    (rawPayload as any).IsCounter == null;
+  const counterSettled =
+    !counterAbsentUpstream && scoreRow.handicap_index_at_time != null;
+  if (!counterSettled) {
+    console.log(
+      JSON.stringify({
+        evt: "gam_eval_counter_unsettled",
+        whs_score_id: whsScoreId,
+        absent_upstream: counterAbsentUpstream,
+        handicap_index_at_time: scoreRow.handicap_index_at_time ?? null,
+        is_counter_stored: scoreRow.is_counter ?? null,
+        note: "counter-derived streaks skipped; neither extended nor broken",
+      }),
+    );
+  }
+
+
+
 
   // COURSE PAR FALLBACK. hole_by_hole_fetched is written by the hole backfill,
   // which races this evaluator: when the evaluator wins the race the flag is
@@ -369,6 +406,12 @@ async function processSingle(whsScoreId: string) {
   // "unresolved, not absent": hole-derived streaks and badge conditions are
   // SKIPPED rather than judged as not met.
   (stats as any).hole_detail_present = holeDetailPresent;
+
+  // Transient, same contract as hole_detail_present: false means "unresolved,
+  // not negative". gam_round_stats.is_counter remains a snapshot of the column;
+  // this only governs whether counter-derived streaks/badges may be judged.
+  (stats as any).counter_settled = counterSettled;
+
 
 
   let earned: string[] = [];
@@ -992,7 +1035,11 @@ function matchesBinary(badge: any, stats: any): boolean {
     case "birdie_train": return (stats.max_birdie_streak ?? 0) >= 3;
     case "four_seasons": return (stats.seasons_played ?? 0) >= 4;
     case "clean_card": return stats.clean_card;
-    case "spring_2026_active": return stats.is_counter;
+    // Badges are earn-only, so declining to judge an unsettled counter round is
+    // the same shape as skipping: the re-enqueue gives it another chance.
+    case "spring_2026_active":
+      return (stats as any).counter_settled === false ? false : stats.is_counter;
+
     case "beat_par": return stats.beat_par;
     case "first_index": return stats.hcp_at_time != null;
     default: return false;
@@ -1321,7 +1368,24 @@ const STREAK_BADGE_MAP: Record<string, string> = {
 };
 
 async function applyStreaks(userId: string, stats: any) {
-  await updateRoundStreak(userId, stats, "counter", !!stats.is_counter);
+  // COUNTER STREAK IS UPSTREAM-DERIVED (ADDENDUM A §1). When counter status is
+  // unsettled, stats.is_counter is false because we do not know, not because
+  // England Golf said no. Passing false breaks a live streak permanently:
+  // updateRoundStreak's else branch only writes while is_active is true, so
+  // every later round becomes a silent no-op. Skip entirely — the round neither
+  // extends nor breaks `counter`, and the row is left byte-for-byte as it was.
+  if ((stats as any).counter_settled === false) {
+    console.log(
+      JSON.stringify({
+        evt: "gam_eval_streak_skipped_unsettled_counter",
+        whs_score_id: stats.whs_score_id,
+        streak_type: "counter",
+      }),
+    );
+  } else {
+    await updateRoundStreak(userId, stats, "counter", !!stats.is_counter);
+  }
+
   await updateRoundStreak(userId, stats, "sub_80", !!stats.sub_80);
   await updateRoundStreak(userId, stats, "sub_par", !!stats.beat_par);
 
@@ -1343,8 +1407,20 @@ async function applyStreaks(userId: string, stats: any) {
     await updateRoundStreak(userId, stats, "birdie_round", stats.birdies > 0);
   }
 
-  // Counter-derived: no hole dependency, behaviour unchanged.
-  await updateRoundPlayedStreak(userId, stats);
+  // Counter-derived: no hole dependency, but it reads is_counter, so unsettled
+  // counter status must SKIP rather than return early as a break (ADDENDUM A §1).
+  if ((stats as any).counter_settled === false) {
+    console.log(
+      JSON.stringify({
+        evt: "gam_eval_streak_skipped_unsettled_counter",
+        whs_score_id: stats.whs_score_id,
+        streak_type: "round_played",
+      }),
+    );
+  } else {
+    await updateRoundPlayedStreak(userId, stats);
+  }
+
 }
 
 

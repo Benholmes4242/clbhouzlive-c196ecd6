@@ -18,6 +18,8 @@ import {
   decryptVaultSecret,
   enrichScoresWithHoles,
 } from "../_shared/eg-api.ts";
+import { snapshotCounterFlags, requeueCounterFlips } from "../_shared/counter-requeue.ts";
+
 
 function adminClient(): SupabaseClient {
   return createClient(
@@ -118,7 +120,12 @@ Deno.serve(async (req) => {
     // Unconditional: the sync is the ONLY writer of eg_handicap_index and must
     // write it on every successful sync, changed index or not.
     await syncProfileHandicapIndex(admin, conn.id, userDetails.HandicapIndex);
+    // Snapshot is_counter BEFORE the upsert so a flipped flag can be detected
+    // after it (ADDENDUM A §2). The upsert itself is unchanged.
+    const counterBefore = await snapshotCounterFlags(admin, conn.id);
     const scoreUpsert = await upsertScores(admin, conn.id, scoresPage.Scores);
+    await requeueCounterFlips(admin, conn.id, user.id, counterBefore);
+
     const scoresUpserted = scoreUpsert.written;
     const friendsUpserted = await upsertFriends(admin, conn.id, friendsPage.Friends);
 
