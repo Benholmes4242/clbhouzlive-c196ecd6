@@ -29,6 +29,8 @@ export interface ProfileFormData {
   handicapIndex: string;
   homeClubVisibility: string;
   additionalClubsVisibility: string;
+  /** BRIEF_TOP_TEN_VISIBILITY §3 — user_profiles.top_ten_visibility */
+  topTenVisibility: string;
   bio: string;
   websites: WebsiteEntry[];
   instagramHandle: string;

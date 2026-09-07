@@ -20,6 +20,7 @@ interface RawProfile {
   manual_handicap_index?: number | null;
   home_club_visibility?: string | null;
   additional_clubs_visibility?: string | null;
+  top_ten_visibility?: string | null;
   bio?: string | null;
   websites?: string[] | null;
   instagram_handle?: string | null;
@@ -72,6 +73,7 @@ function makeInitial(profile: RawProfile | null | undefined): ProfileFormData {
     handicapIndex: formHcpFromDb(profile?.manual_handicap_index),
     homeClubVisibility: profile?.home_club_visibility ?? 'public',
     additionalClubsVisibility: profile?.additional_clubs_visibility ?? 'public',
+    topTenVisibility: profile?.top_ten_visibility ?? 'public',
     bio: profile?.bio ?? '',
     websites: (profile?.websites ?? []).map((url: string) => ({ id: nanoid(), url })),
     instagramHandle: profile?.instagram_handle ?? social?.instagram ?? '',
