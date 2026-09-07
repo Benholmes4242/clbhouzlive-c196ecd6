@@ -15,7 +15,20 @@ import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/use
 import { cn } from '@/lib/utils';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { r } from '@/lib/radius';
+import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
+import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
 import CreateSheetV2 from '@/features/post-v2/components/CreateSheetV2';
+
+/**
+ * Inactive live-green: the SAME 0.62 alpha the ink/dim pair uses, derived from
+ * the LIVE_INK token so all five tabs dim identically. Never a second green.
+ */
+const LIVE_DIM = (() => {
+  const h = LIVE_INK.replace('#', '');
+  const n = parseInt(h, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},0.62)`;
+})();
+
 
 // ---- Public token: total vertical space to reserve at the bottom of any
 // scrollable page so its last content clears the floating control.
