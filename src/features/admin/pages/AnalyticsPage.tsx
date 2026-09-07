@@ -1690,7 +1690,13 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
                           fontSize: 9.5, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
                         }}>Stopped</span>
                       )}
-                      {!a.stopped && a.retiredReason && (
+                      {!a.stopped && a.gapReason && (
+                        <span style={{
+                          fontSize: 9, fontWeight: 800, letterSpacing: '0.1em',
+                          textTransform: 'uppercase', color: A.WARN ?? '#F7931E',
+                        }}>Gap</span>
+                      )}
+                      {!a.stopped && !a.gapReason && a.retiredReason && (
                         <span style={{
                           flexShrink: 0, padding: '1px 6px', borderRadius: 999,
                           border: `1px solid ${t.line}`, color: t.inkFaint,
@@ -1715,6 +1721,11 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
                         Probable rename → <span style={{
                           fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
                         }}>{a.probableRenameTo}</span> (heuristic)
+                      </div>
+                    )}
+                    {a.gapReason && (
+                      <div style={{ fontSize: 11, color: A.DIM, marginTop: 2 }}>
+                        Instrumentation gap: {a.gapReason}
                       </div>
                     )}
                     {a.retiredReason && (
