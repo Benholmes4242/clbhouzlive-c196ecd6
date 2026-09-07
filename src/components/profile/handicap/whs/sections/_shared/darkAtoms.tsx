@@ -64,6 +64,14 @@ export function verdictForDelta(
 
 // ── Section header (dark shim over canonical SectionHeader) ───────
 //
+// A FRONT DOOR, NOT A COMPONENT (BRIEF_SECTION_HEADING_UNTANGLE addendum A
+// fix 4). DarkSectionHeader owns no geometry of its own: it is a thin adapter
+// over components/ui/SectionHeader that maps eyebrow → kicker, right → meta,
+// and pins surface="dark". The ENTIRE handicap area consumes ui/SectionHeader
+// through this door rather than importing it directly, so ANY future migration
+// of ui/SectionHeader must cover BOTH doors or the handicap area is left
+// behind. No behaviour of its own to change.
+//
 // Path A (convergence): DarkSectionHeader is now a thin adapter that
 // renders SectionHeader with `surface="dark"`. Geometry is therefore
 // identical to light surfaces (11px/0.14em/800 eyebrow, 20px title,

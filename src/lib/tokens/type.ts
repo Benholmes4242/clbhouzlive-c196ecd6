@@ -20,7 +20,17 @@
  */
 import type { CSSProperties } from 'react';
 
-/** Section eyebrow. Uppercase, widest tracking in the scale. */
+/**
+ * Section eyebrow. Uppercase, widest tracking in the scale.
+ *
+ * THE CANON GAP (BRIEF_SECTION_HEADING_UNTANGLE addendum A fix 5): this token
+ * is CANONICAL at 9 / 700 / 0.19em, but only two heading files consume it and
+ * BOTH override its size locally. What the app actually runs on is the LEGACY
+ * kicker in src/features/courses/components/holes/analytical/tokens.tsx
+ * (11 / 700 / 0.16em), inherited by Tour Hub, Discover's courseled grammar,
+ * Business and club analytics. The two have NOT been reconciled. Neither value
+ * is being changed here.
+ */
 export const KICKER: CSSProperties = {
   fontSize: 9,
   fontWeight: 700,
