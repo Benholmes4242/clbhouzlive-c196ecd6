@@ -1,17 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 
-import { GlassBadge, GlassDurationBadge } from '@/components/media/GlassDurationBadge';
+import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 import { MediaRailTile } from './courseled/MediaRailTile';
 import { MomentsGrid } from './courseled/MomentsGrid';
-import { autoplayBlocked, registerReviewVideo } from './courseled/reviewVideoAutoplay';
-import { attachTileHls } from './courseled/tileHlsPlayer';
 import { useWatchHubCounts } from '@/features/watch-v2/hooks/useWatchHubCounts';
 import { useMomentsLibraryTotal, useReviewLibraryTotal } from '@/features/media-library/libraryTotals';
 import { useDiscoverMediaPreview } from './courseled/hooks/useDiscoverMediaPreview';
