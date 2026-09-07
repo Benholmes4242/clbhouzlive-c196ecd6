@@ -44,7 +44,7 @@ import FunnelCard from '../components/FunnelCard';
 import AudiencesSection from '../components/AudiencesSection';
 import PostInsightSheet from '../components/PostInsightSheet';
 import CourseInsightSheet from '../components/CourseInsightSheet';
-import { useTopContent } from '../hooks/useTopContent';
+import { MIN_RANKABLE_ROWS, useTopContent } from '../hooks/useTopContent';
 import ScreensTab from '../components/ScreensTab';
 
 
@@ -571,6 +571,47 @@ function EngagementTab({ period }: { period: AnalyticsPeriod }) {
 
 // ─── Top content ──────────────────────────────────────────────────────────────
 
+/**
+ * EARLY DATA. Same convention the app already uses under 10 rounds, reused
+ * rather than reinvented: a rank with a sample of three or four looks like
+ * knowledge and is not.
+ */
+function EarlyDataChip() {
+  return (
+    <span style={{
+      border: `1px solid ${t.line}`, borderRadius: 999, padding: '2px 7px',
+      color: t.inkFaint, fontSize: 10.5, fontWeight: 700, whiteSpace: 'nowrap',
+      letterSpacing: 0.2,
+    }}>Early data</span>
+  );
+}
+
+/**
+ * The refusal. Fewer than three rows over the floor means there is no ranking
+ * to show, so the card says the dull true thing instead of the interesting
+ * false one.
+ */
+function TooThinToRank({ total, unitLabel, itemNoun, overFloor, floor }: {
+  total: number; unitLabel: string; itemNoun: string; overFloor: number; floor: number;
+}) {
+  return (
+    <div style={{
+      border: `1px solid ${t.line}`, borderRadius: 14, padding: 12, background: t.canvas,
+    }}>
+      <div style={{ color: t.ink, fontSize: 13.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+        {fmtInt(total)} {unitLabel} in this period
+      </div>
+      <div style={{ color: t.inkMuted, fontSize: 12, marginTop: 4, lineHeight: 1.45 }}>
+        Too thin to rank. {overFloor === 0
+          ? `No ${itemNoun} reached ${floor}`
+          : `Only ${fmtInt(overFloor)} ${overFloor === 1 ? itemNoun.replace(/s$/, '') : itemNoun} reached ${floor}`}
+        , and a ranking needs at least {MIN_RANKABLE_ROWS}. Ordering threes and fours
+        would look like knowledge without being it.
+      </div>
+    </div>
+  );
+}
+
 function TopContentSection({ period }: { period: AnalyticsPeriod }) {
   const [includeStaff, setIncludeStaff] = useState(false);
   const { data, isLoading } = useTopContent(period, includeStaff);
@@ -601,6 +642,14 @@ function TopContentSection({ period }: { period: AnalyticsPeriod }) {
             }}>Posts</div>
             {!data || data.posts.length === 0 ? (
               <EmptyState title="No post engagement yet" />
+            ) : data.postsOverFloor < MIN_RANKABLE_ROWS ? (
+              <TooThinToRank
+                total={data.postEngagementsTotal}
+                unitLabel="post engagements"
+                itemNoun="posts"
+                overFloor={data.postsOverFloor}
+                floor={data.minSample}
+              />
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {data.posts.map((p, i) => (
@@ -628,6 +677,13 @@ function TopContentSection({ period }: { period: AnalyticsPeriod }) {
                       <div style={{ color: t.inkFaint, fontSize: 11.5, marginTop: 2 }}>
                         {p.authorName ?? 'A member'} - {p.likes} likes, {p.comments} comments, {p.shares} shares
                       </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                        {/* The sample never leaves the rank's side. */}
+                        <span style={{ color: t.inkFaint, fontSize: 11.5, fontVariantNumeric: 'tabular-nums' }}>
+                          {fmtInt(p.sample)} in period
+                        </span>
+                        {p.sample < data.minSample && <EarlyDataChip />}
+                      </div>
                     </div>
                     <span style={{
                       color: t.inkMuted, fontSize: 13, fontWeight: 700,
@@ -646,6 +702,14 @@ function TopContentSection({ period }: { period: AnalyticsPeriod }) {
             }}>Courses</div>
             {!data || data.courses.length === 0 ? (
               <EmptyState title="No course views yet" />
+            ) : data.coursesOverFloor < MIN_RANKABLE_ROWS ? (
+              <TooThinToRank
+                total={data.courseViewsTotal}
+                unitLabel="course views"
+                itemNoun="courses"
+                overFloor={data.coursesOverFloor}
+                floor={data.minSample}
+              />
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {data.courses.map((c, i) => (
@@ -668,6 +732,9 @@ function TopContentSection({ period }: { period: AnalyticsPeriod }) {
                         color: t.ink, fontSize: 13.5, fontWeight: 600,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>{c.name ?? 'Unnamed course'}</div>
+                      {c.views < data.minSample && (
+                        <div style={{ marginTop: 3 }}><EarlyDataChip /></div>
+                      )}
                     </div>
                     <span style={{
                       color: t.inkMuted, fontSize: 13, fontWeight: 700,
