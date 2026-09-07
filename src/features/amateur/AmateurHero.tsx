@@ -72,6 +72,24 @@ export function AmateurHero({ userId }: { userId: string | undefined }) {
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', borderRadius: 0 }}
       >
         <span aria-hidden style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
+        {/* THE LOCAL DEEPENING, THIS HERO ONLY (BRIEF_AMATEUR_PAGE).
+            SCRIM_STANDOUT reaches zero at 32% of the surface. On a 340px hero
+            that is 109px from the bottom - exactly where the round shape sits,
+            so the shape was drawn on the fade-out edge, effectively on raw
+            photograph. This second layer carries real tone up to ~48%, which
+            covers the whole caption stack (name row, shape, course name) and
+            leaves the top two thirds of the picture untouched. Local, so no
+            other surface that renders RoundShape moves. */}
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(0deg, rgba(10,14,10,0.72) 0%, rgba(10,14,10,0.58) 26%, rgba(10,14,10,0.34) 38%, rgba(10,14,10,0) 50%)',
+          }}
+        />
+
       </CourseImageFallback>
 
       {row && (
