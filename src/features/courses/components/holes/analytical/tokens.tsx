@@ -237,6 +237,14 @@ export const LABEL: React.CSSProperties = {
 };
 
 /** READ. Floor 11. Repointed 10 -> 11 by BRIEF_ANALYTICAL_SCALE_REPOINT (Part B). */
+/**
+ * THE CANON GAP (BRIEF_SECTION_HEADING_UNTANGLE addendum A fix 5). THIS is the
+ * kicker THE APP ACTUALLY RUNS ON today: Tour Hub, Discover's courseled
+ * grammar, Business and club analytics all inherit it at 11 / 700 / 0.16em.
+ * The CANONICAL kicker is src/lib/tokens/type.ts KICKER (9 / 700 / 0.19em),
+ * which only two heading files consume and both override its size locally.
+ * The two have NOT been reconciled. Neither value is being changed here.
+ */
 export const KICKER: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 700,
@@ -301,6 +309,13 @@ export function toParParts(v: number | null | undefined, digits = 1): ToParParts
 }
 
 
+/**
+ * BLAST RADIUS (BRIEF_SECTION_HEADING_UNTANGLE addendum A fix 3): this panel's
+ * `kicker` was built for the course Holes tab, but it is now the section-heading
+ * mechanism for FOUR areas: Holes, Business profile, business management and
+ * club analytics. Anyone changing its size, weight, tracking or ink moves all
+ * four. It has deliberately NOT been repointed or migrated.
+ */
 export const Panel: React.FC<{
   kicker?: string;
   /** Panel-level heading (13/700 INK). Used where a panel titles itself. */
