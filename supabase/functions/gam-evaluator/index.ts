@@ -1035,7 +1035,11 @@ function matchesBinary(badge: any, stats: any): boolean {
     case "birdie_train": return (stats.max_birdie_streak ?? 0) >= 3;
     case "four_seasons": return (stats.seasons_played ?? 0) >= 4;
     case "clean_card": return stats.clean_card;
-    case "spring_2026_active": return stats.is_counter;
+    // Badges are earn-only, so declining to judge an unsettled counter round is
+    // the same shape as skipping: the re-enqueue gives it another chance.
+    case "spring_2026_active":
+      return (stats as any).counter_settled === false ? false : stats.is_counter;
+
     case "beat_par": return stats.beat_par;
     case "first_index": return stats.hcp_at_time != null;
     default: return false;
