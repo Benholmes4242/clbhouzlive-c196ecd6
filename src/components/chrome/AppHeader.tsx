@@ -50,7 +50,15 @@ export interface AppHeaderProps {
   inset?: 'self' | 'shell';
   /** CSS custom property published with the measured band height. */
   heightVar?: string;
-}
+  /**
+   * OVER-HERO MODE (opt-in, Amateur page). The band starts transparent so a
+   * full-bleed hero runs under it, and cross-fades to the solid canvas as the
+   * hero leaves. Omitted = the solid band every other surface already has.
+   */
+  overHero?: boolean;
+  /** Scroll distance the cross-fade completes over. Default 180px. */
+  overHeroRange?: number;
+
 
 /** The Tour burger — glass values taken from GlassDurationBadge, not re-derived. */
 export function AppHeaderBurger({ onTap, label }: { onTap: () => void; label: string }) {
