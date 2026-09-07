@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, X } from 'lucide-react';
 
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { useCourseSearch } from '@/hooks/gam/useCourseSearch';
 import { r } from '@/lib/radius';
+import { CatalogueSearchField } from '@/components/ui/CatalogueSearchField';
 
 import { DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from './tokens';
 import { CourseAnalyticsCard } from './CoursesPlayedSection';
@@ -42,8 +42,6 @@ import type { BoardFilters } from './boardFilters';
  *
  * The searched course is COMPONENT STATE and resets on entry (S2.5).
  */
-
-const FIELD_H = 44;
 
 export interface HowTheyPlayedSectionProps {
   /** The top row of the selected course board — the default subject (S2.1). */
@@ -97,68 +95,25 @@ export function HowTheyPlayedSection({
   return (
     <div style={{ marginTop: 26, fontFamily: SANS, ...FIGS }}>
       <SectionHeadline title={t('discover.scores.courseAnalytics', 'Course analytics')} />
-      {/* S2.2 — the field, full width, above the card. */}
+      {/* S2.2 — the field, full width, above the card. Shared with the college Yearbook. */}
       <div style={{ position: 'relative', marginBottom: 10 }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            height: FIELD_H,
-            padding: '0 12px',
-            boxSizing: 'border-box',
-            background: A.PANEL,
-            border: `1px solid ${A.BORDER}`,
-            borderRadius: r.sm,
+        <CatalogueSearchField
+          value={query}
+          onChange={(next) => {
+            setQuery(next);
+            if (pickedId) setPickedId(null);
           }}
-        >
-          <Search size={15} color={A.MUTE} strokeWidth={2.2} aria-hidden />
-          <input
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              if (pickedId) setPickedId(null);
-            }}
-            placeholder={
-              narrowPlaceholder
-                ? t('discover.scores.searchCourseForAnalytics', 'Search a course for analytics')
-                : t('discover.scores.searchAnyCourse', 'Search any course for analytics')
-            }
-            aria-label={t('discover.scores.searchAnyCourse', 'Search any course for analytics')}
-            style={{
-              flex: 1,
-              minWidth: 0,
-              background: 'transparent',
-              border: 'none',
-              outline: 'none',
-              color: A.INK,
-              fontFamily: SANS,
-              fontSize: 14,
-              fontWeight: 600,
-            }}
-          />
-          {(pickedId || query.length > 0) && (
-            /* S2.5 — the clear action returns to the board's top course. */
-            <button
-              type="button"
-              onClick={clear}
-              aria-label={t('discover.scores.clearCourse', 'Back to the board')}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 24,
-                height: 24,
-                padding: 0,
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-              }}
-            >
-              <X size={15} color={A.MUTE} strokeWidth={2.2} aria-hidden />
-            </button>
-          )}
-        </div>
+          placeholder={
+            narrowPlaceholder
+              ? t('discover.scores.searchCourseForAnalytics', 'Search a course for analytics')
+              : t('discover.scores.searchAnyCourse', 'Search any course for analytics')
+          }
+          ariaLabel={t('discover.scores.searchAnyCourse', 'Search any course for analytics')}
+          showClear={Boolean(pickedId) || query.length > 0}
+          onClear={clear}
+          clearAriaLabel={t('discover.scores.clearCourse', 'Back to the board')}
+        />
+
 
         {searching && (
           <div
