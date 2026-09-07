@@ -264,58 +264,40 @@ export function AmateurMediaBlock({
   if (tiles.length === 0) return null;
 
   return (
+    /* THREE SECTIONS, THREE HEADINGS, THREE COUNTS. There is no covering
+       "Media" heading: one heading over three subjects is what made the block
+       read as one undifferentiated wall.
+       ORDER: tall picture tiles, then TEXT-LED rows, then the grid. The rows sit
+       between the two picture areas deliberately — clips beside the mosaic is
+       picture-on-picture and reads heavy. */
     <section style={{ paddingTop: 26, fontFamily: SANS, ...FIGS }}>
-      <DiscoverSectionHeading
-        title="Media"
-        right={total > 0 ? `See all ${total}` : null}
-        onRightPress={() => {
-          analyticsEvents.track('amateur_media_see_all_opened', { total });
-          /* /media carries the MERGED set this mosaic summarises. */
-          onSeeAll('/media');
-        }}
-      />
-
       {clips.length > 0 && (
-        <div
-          className="scrollbar-hide"
-          style={{ display: 'flex', gap: 10, overflowX: 'auto', marginBottom: 12, marginRight: -14, paddingRight: 14, willChange: 'transform' }}
-        >
-          {clips.map((item, index) => (
-            <MediaRailTile
-              key={item.key}
-              item={item}
-              index={index}
-              width={176}
-              autoplayGroup={AUTOPLAY_GROUP}
-              onPress={() => openPost(clips, item, 'clip')}
-            />
-          ))}
-        </div>
+        <>
+          <DiscoverSectionHeading
+            title="Clips"
+            right={(hubCounts.data?.clip_count ?? 0) > clips.length ? `See all ${hubCounts.data?.clip_count}` : null}
+            onRightPress={() => {
+              analyticsEvents.track('amateur_media_see_all_opened', { total: hubCounts.data?.clip_count ?? 0, section: 'clips' });
+              onSeeAll('/watch/clips');
+            }}
+          />
+          <div
+            className="scrollbar-hide"
+            style={{ display: 'flex', gap: 10, overflowX: 'auto', marginRight: -14, paddingRight: 14, willChange: 'transform' }}
+          >
+            {clips.map((item, index) => (
+              <MediaRailTile
+                key={item.key}
+                item={item}
+                index={index}
+                width={176}
+                autoplayGroup={AUTOPLAY_GROUP}
+                onPress={() => openPost(clips, item, 'clip')}
+              />
+            ))}
+          </div>
+        </>
       )}
-
-      <MomentsGrid
-        moments={tiles}
-        cap={MOSAIC_CAP}
-        gap={5}
-        tall={250}
-        radius={10}
-        autoplayGroup={AUTOPLAY_GROUP}
-        onTilePress={(tile) => {
-          const source = tile.key.startsWith('review:') ? 'review' : 'moment';
-          analyticsEvents.track('amateur_media_tile_tapped', {
-            source,
-            course_id: tile.courseId,
-            kind: tile.mediaType,
-          });
-          setPending({
-            courseId: tile.courseId,
-            mediaId: tile.mediaId ?? null,
-            mediaUrl: tile.thumbnail,
-            posterUrl: tile.thumbnail,
-            source,
-          });
-        }}
-      />
 
       {videos.length > 0 && (
         <div style={{ marginTop: 22 }}>
@@ -332,6 +314,43 @@ export function AmateurMediaBlock({
           ))}
         </div>
       )}
+
+      <div style={{ marginTop: 22 }}>
+        <DiscoverSectionHeading
+          title="From the community"
+          right={total > 0 ? `See all ${total}` : null}
+          onRightPress={() => {
+            analyticsEvents.track('amateur_media_see_all_opened', { total, section: 'mosaic' });
+            /* /media carries the MERGED set this mosaic summarises. */
+            onSeeAll('/media');
+          }}
+        />
+        {/* THE TIGHT TREATMENT established for Moments: 2px gutter, r.xs corners.
+            A wall, not a set of cards. */}
+        <MomentsGrid
+          moments={tiles}
+          cap={MOSAIC_CAP}
+          gap={2}
+          tall={250}
+          radius={6}
+          autoplayGroup={AUTOPLAY_GROUP}
+          onTilePress={(tile) => {
+            const source = tile.key.startsWith('review:') ? 'review' : 'moment';
+            analyticsEvents.track('amateur_media_tile_tapped', {
+              source,
+              course_id: tile.courseId,
+              kind: tile.mediaType,
+            });
+            setPending({
+              courseId: tile.courseId,
+              mediaId: tile.mediaId ?? null,
+              mediaUrl: tile.thumbnail,
+              posterUrl: tile.thumbnail,
+              source,
+            });
+          }}
+        />
+      </div>
     </section>
   );
 }
