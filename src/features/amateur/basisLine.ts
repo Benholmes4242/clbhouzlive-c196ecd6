@@ -7,17 +7,19 @@
  * unfiltered blocks state none. The presence or absence of a basis IS the
  * boundary; no divider, no sentence, no second filter.
  *
- * IT STAYS ONE LINE at 390pt, so the scope is only named when it narrows the
- * pool, and then in its shortest form: "circle", "club". "Everyone" is the
- * whole pool and says nothing worth a word.
+ * IT STAYS ONE LINE at 390pt. Measured: the widest case, "Bogey-free rounds"
+ * beside "1,234 members - your circle - this year", is 354px inside 362px of
+ * usable width, so the scope is named in the FILTER'S OWN WORDS ("your circle",
+ * "your club") rather than clipped to a system field. "Everyone" is the whole
+ * pool and says nothing worth a word.
  */
 import { WINDOW_SHORT, type BoardFilters } from '@/components/explore-tab-new/courseled/boardFilters';
 
 type T = (key: string, fallback?: string) => string;
 
 const SCOPE_SHORT: Partial<Record<BoardFilters['scope'], { i18n: string; label: string }>> = {
-  circle: { i18n: 'discover.filterBoard.scopeShort.circle', label: 'circle' },
-  club: { i18n: 'discover.filterBoard.scopeShort.club', label: 'club' },
+  circle: { i18n: 'discover.filterBoard.scope.circle', label: 'Your circle' },
+  club: { i18n: 'discover.filterBoard.scope.club', label: 'Your club' },
 };
 
 /** `unit` is the already-pluralised count ("19 members", "10 courses"). */
