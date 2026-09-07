@@ -19170,7 +19170,11 @@ export type Database = {
         Returns: Database["public"]["Enums"]["admin_role"]
       }
       get_admin_top_content: {
-        Args: { p_days?: number; p_include_staff?: boolean }
+        Args: {
+          p_days?: number
+          p_include_staff?: boolean
+          p_min_sample?: number
+        }
         Returns: Json
       }
       get_all_users_admin: {
