@@ -1271,7 +1271,9 @@
       "railDays_other": "DAYS",
       "col": {
         "rounds": "ROUNDS"
-      }
+      },
+      "nMembers_one": "{{count}} member",
+      "nMembers_other": "{{count}} members"
     },
     "scores": {
       "searchAnyCourse": "Search any course for analytics",
