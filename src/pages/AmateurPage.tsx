@@ -9,7 +9,7 @@ import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpe
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { AmateurFilterRail } from '@/features/amateur/AmateurFilterRail';
 import { AmateurCoursesBlock } from '@/features/amateur/AmateurCoursesBlock';
-import { AmateurHero } from '@/features/amateur/AmateurHero';
+import { AMATEUR_HERO_H, AmateurHero } from '@/features/amateur/AmateurHero';
 import { AmateurLeaderboardBlock } from '@/features/amateur/AmateurLeaderboardBlock';
 import { AmateurMediaBlock } from '@/features/amateur/AmateurMediaBlock';
 import { AmateurNewsBlock } from '@/features/amateur/AmateurNewsBlock';
