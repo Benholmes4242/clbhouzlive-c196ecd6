@@ -42,6 +42,13 @@ import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/wh
 import { safeGoBack } from '@/utils/navigation';
 import { r } from '@/lib/radius';
 import { subscribeIslandEdge, getIslandEdgeScrolled } from './islandEdge';
+import {
+  CHROME_BREATHING,
+  CHROME_CLEARANCE_VAR,
+  CHROME_ISLAND_H_FALLBACK,
+  CHROME_ISLAND_H_VAR,
+  CHROME_TOP_GAP,
+} from '@/lib/chromeClearance';
 
 const ISLAND_H = 44;
 const TOP_GAP = 10;
@@ -569,6 +576,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
 
       <div
         data-chrome="island"
+        ref={islandRowRef}
         style={{
           // scrollAway routes render the capsules in document flow (absolute),
           // so they ride away with the page and return on scroll-up. All

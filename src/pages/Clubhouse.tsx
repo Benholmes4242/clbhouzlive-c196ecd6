@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
@@ -517,7 +518,7 @@ const ClubhouseContent = () => {
       {!isOnline && !isTournamentCardActive && (
         <div style={{
           position: 'fixed',
-          top: 'var(--island-clearance, calc(env(safe-area-inset-top, 0px) + 70px))',
+          top: CHROME_CLEARANCE,
           left: 16,
           right: 16,
           zIndex: 200,
@@ -574,7 +575,7 @@ const ClubhouseContent = () => {
               onRoundTap={(post, round) =>
                 setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
               }
-              topPadding={'var(--island-clearance, calc(env(safe-area-inset-top, 0px) + 70px))'}
+              topPadding={CHROME_CLEARANCE}
               onNearEnd={handleNearEnd}
               hasNextPage={hasNextPage}
               fetchNextPage={activeFeed.fetchNextPage}
