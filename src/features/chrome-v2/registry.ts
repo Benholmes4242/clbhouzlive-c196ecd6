@@ -325,6 +325,12 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // the global island resolves to nothing here, same as /explore did.
   { match: { exact: '/amateur' },                  spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'Amateur owns its over-hero header' } },
 
+  // /media — the one media destination. Shared islands, exactly as the course
+  // detail page: back on the left (fallback /amateur, the surface its See all
+  // lives on), standard right capsule. bleed:false so --header-h is published
+  // and the wall pads itself below the island; the island pays the notch.
+  { match: { exact: '/media' },                    spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/amateur' }, tone: 'dark', bleed: false, note: 'media library — shared islands' } },
+
 
   // Courses landing (editorial geometry; cinematic hero → glass overlay).
   // bleed + scrollAway stay TRUE deliberately: hero page, same as the tour hero

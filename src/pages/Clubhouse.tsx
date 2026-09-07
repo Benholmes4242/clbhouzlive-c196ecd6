@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useSetChromeLeftSlot, useSetChromeSuppressed } from '@/features/chrome-v2/leftOverride';
+import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -151,8 +151,10 @@ const ClubhouseContent = () => {
   // Clear any previously registered Clubhouse island slot (the Suggested /
   // Friends toggle was the only occupant).
   useSetChromeLeftSlot(null);
-  // PGA "This Week" card takeover — suppress both island capsules while active.
-  useSetChromeSuppressed(isClubhouseRoute && isTournamentCardActive);
+  // The islands STAY on the feed. The PGA "This Week" card used to suppress
+  // them while it was the card in view, which meant the feed opened with no
+  // top chrome at all whenever a tournament was running. The card keeps its
+  // bottom-bar takeover; the top islands are permanent here.
 
 
 
