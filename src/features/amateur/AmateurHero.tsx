@@ -72,7 +72,9 @@ export function AmateurHero({ userId }: { userId: string | undefined }) {
       <CourseImageFallback
         courseId={row?.course_id ?? null}
         courseName={row?.course_name ?? null}
-        initialsSize={44}
+        imageUrl={heroImage.data ?? null}
+        /* NEVER A MONOGRAM AT HERO SCALE: no photograph = flat tone + scrim. */
+        flatWhenEmpty
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', borderRadius: 0 }}
       >
         <span aria-hidden style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
