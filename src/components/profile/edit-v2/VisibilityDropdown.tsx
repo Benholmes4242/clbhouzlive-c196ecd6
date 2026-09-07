@@ -22,6 +22,12 @@ interface VisibilityDropdownProps {
   onChange: (value: VisibilityValue) => void;
   disabled?: boolean;
   className?: string;
+  /**
+   * Which values this control offers. Omitted = all four, exactly as before.
+   * A stored value outside the set collapses to the most private offered
+   * option for display only — nothing is written back.
+   */
+  allow?: VisibilityValue[];
 }
 
 /**
@@ -33,9 +39,18 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
   onChange,
   disabled = false,
   className,
+  allow,
 }) => {
   const [open, setOpen] = useState(false);
-  const selectedOption = VISIBILITY_OPTIONS.find(o => o.value === value) || VISIBILITY_OPTIONS[0];
+  const options = allow?.length
+    ? VISIBILITY_OPTIONS.filter(o => allow.includes(o.value))
+    : VISIBILITY_OPTIONS;
+  // A stored value the control no longer offers reads as the most private
+  // option available (display only — never written back).
+  const effectiveValue = options.some(o => o.value === value)
+    ? value
+    : options[options.length - 1].value;
+  const selectedOption = options.find(o => o.value === effectiveValue) || options[0];
   const Icon = selectedOption.icon;
 
   const handleSelect = (val: VisibilityValue) => {
@@ -96,9 +111,9 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
 
                 {/* Options */}
                 <div className="pb-4">
-                  {VISIBILITY_OPTIONS.map((option) => {
+                  {options.map((option) => {
                     const OptionIcon = option.icon;
-                    const isSelected = option.value === value;
+                    const isSelected = option.value === effectiveValue;
                     return (
                       <button
                         key={option.value}
@@ -141,7 +156,9 @@ export const VisibilityRow: React.FC<{
   value: VisibilityValue;
   onChange: (v: VisibilityValue) => void;
   disabled?: boolean;
-}> = ({ value, onChange, disabled }) => (
+  /** Omitted = all four options, exactly as before. */
+  allow?: VisibilityValue[];
+}> = ({ value, onChange, disabled, allow }) => (
   <div
     style={{
       display: 'flex',
@@ -152,6 +169,6 @@ export const VisibilityRow: React.FC<{
     }}
   >
     <span style={BIZ_LABEL}>{SHEET_TITLE}</span>
-    <VisibilityDropdown value={value} onChange={onChange} disabled={disabled} />
+    <VisibilityDropdown value={value} onChange={onChange} disabled={disabled} allow={allow} />
   </div>
 );

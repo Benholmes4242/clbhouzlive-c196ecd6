@@ -14,6 +14,9 @@ interface Props {
   pendingName?: string | null;
 }
 
+/** Home club's gate is binary (owner or public), so only these two are offered. */
+const HOME_CLUB_VISIBILITY_OPTIONS: VisibilityValue[] = ['public', 'private'];
+
 const INK = A.INK;
 const GREEN = A.GREEN;
 
@@ -37,7 +40,12 @@ export function HomeClubCard({
   const header = (
     <div>
       <FieldLabel>Home club</FieldLabel>
-      <VisibilityRow value={visibility as VisibilityValue} onChange={onVisibilityChange} />
+      {/* Home club has a binary gate (owner or public), so it offers two values. */}
+      <VisibilityRow
+        value={visibility as VisibilityValue}
+        onChange={onVisibilityChange}
+        allow={HOME_CLUB_VISIBILITY_OPTIONS}
+      />
     </div>
   );
 
