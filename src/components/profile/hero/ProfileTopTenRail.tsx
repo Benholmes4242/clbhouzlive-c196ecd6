@@ -177,7 +177,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
 
   if (topTen.length === 0) {
     return (
-      <section style={{ paddingBottom: 4 }}>
+      <section style={{ marginTop: 16, marginBottom: 8, paddingBottom: 4 }}>
         {header}
         <div
           style={{
@@ -191,14 +191,14 @@ export const ProfileTopTenRail: React.FC<Props> = ({
         >
           {isOwnProfile
             ? t('topTen.emptyOwn', 'Nothing here yet - add the courses you rate above all others.')
-            : t('topTen.emptyOther', "This golfer hasn't picked their top 10 yet.")}
+            : t('topTen.emptyOther', 'Their top 10 builds up as they rate the courses they play.')}
         </div>
       </section>
     );
   }
 
   return (
-    <section style={{ paddingBottom: 4 }}>
+    <section style={{ marginTop: 16, marginBottom: 8, paddingBottom: 4 }}>
       {header}
 
       <div
