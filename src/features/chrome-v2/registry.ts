@@ -321,9 +321,10 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // remains unchanged in globalHeaderRules.ts.
   { match: { exact: '/explore' },                 spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'Discover owns fixed header + tabs (now a redirect shim to /amateur)' } },
 
-  // The Amateur destination (bottom-nav tab). Owns its own over-hero header, so
-  // the global island resolves to nothing here, same as /explore did.
-  { match: { exact: '/amateur' },                  spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'Amateur owns its over-hero header' } },
+  // The Amateur destination (bottom-nav tab). Wears the shared floating glass
+  // islands over its 340px hero, exactly as the feed and course detail do:
+  // logo left, standard right capsule, dark tone, hero bleeds beneath.
+  { match: { exact: '/amateur' },                  spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, note: 'amateur — shared islands over hero' } },
 
   // /media — the one media destination. Shared islands, exactly as the course
   // detail page: back on the left (fallback /amateur, the surface its See all
