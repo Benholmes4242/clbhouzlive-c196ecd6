@@ -48,3 +48,10 @@
 - [x] FavouritesCarousel + barrel line deleted (only consumer was the barrel)
 - OPEN: public_profiles view does not expose top_ten_visibility, so stranger/anon viewers
   coerce to 'public' (same as before this brief). Needs its own decision.
+
+## Amateur cutover (single change, blocked on device report)
+- All 16 call sites + nav switch + /media route + 2 legacy shims + /explore redirect shim land together.
+- Error escapes are NOT main-surface links: CoursesContent -> /courses, RoundPage -> /handicap.
+- NewsChromeBridge: rewrite fallback state to none (Amateur has no tabs; scroll owned by amateurScrollMemory).
+- Extra sites found: App.tsx VideoIdToPostRedirect malformed link -> /media; WatchGate dormant bounce -> /amateur.
+- Do not repoint chunkLoaders / AppPrefetchProvider before the nav switch.
