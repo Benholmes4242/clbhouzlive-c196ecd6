@@ -1098,6 +1098,7 @@ const ProfilePageV2Content: React.FC = () => {
               initialCourseId={deepLinkTopTen.current?.courseId ?? null}
               initialCommentId={deepLinkTopTen.current?.commentId ?? null}
               initialParentCommentId={deepLinkTopTen.current?.parentId ?? null}
+              topTenVisibility={profile?.top_ten_visibility}
             />
             {showTopTenModal && isSelf && (
               <AddCourseModal
