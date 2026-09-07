@@ -14,7 +14,7 @@ import { r } from '@/lib/radius';
 import { useGalleryCourseMedia } from '@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia';
 import { FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
-import { useMomentsLibraryTotal, useReviewLibraryTotal } from '@/features/media-library/libraryTotals';
+import { useMergedLibraryTotal } from '@/features/media-library/libraryTotals';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -144,8 +144,7 @@ export function AmateurMediaBlock({
   const courseMedia = useGalleryCourseMedia(pending?.courseId ?? null, userId);
 
   /* LIBRARY TOTALS, not rail lengths. */
-  const reviewTotal = useReviewLibraryTotal();
-  const momentsTotal = useMomentsLibraryTotal();
+  const mergedTotal = useMergedLibraryTotal();
   const hubCounts = useWatchHubCounts();
 
   /* CLIPS AND LONG-FORM come from the whole library, newest first, from the same
@@ -253,7 +252,7 @@ export function AmateurMediaBlock({
     setPending(null);
   }, [courseMedia.data, onDepart, pending]);
 
-  const total = (reviewTotal.data ?? 0) + (momentsTotal.data ?? 0);
+  const total = mergedTotal.data ?? 0;
   const pendingReads = momentsQuery.isPending || reviewsQuery.isPending;
 
   /* A held height while the two reads settle, so nothing below jumps. */
@@ -268,7 +267,7 @@ export function AmateurMediaBlock({
         right={total > 0 ? `See all ${total}` : null}
         onRightPress={() => {
           analyticsEvents.track('amateur_media_see_all_opened', { total });
-          /* THE EXISTING ROUTE until /explore/media exists at cutover. */
+          /* /media carries the MERGED set this mosaic summarises. */
           onSeeAll('/media');
         }}
       />

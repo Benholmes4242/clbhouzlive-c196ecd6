@@ -166,3 +166,22 @@ export function useReviewMediaLibrary(sort: ReviewLibrarySort) {
     getNextPageParam: (last) => (last.rawLength < REVIEW_LIBRARY_PAGE_SIZE ? undefined : last.page + 1),
   });
 }
+
+/**
+ * ONE-SHOT READ of the review-media library, for the MERGED /media destination
+ * which pages its combined list client-side. Same SELECT, same predicate and
+ * same mapper as the infinite hook above, so the two cannot drift.
+ */
+export async function fetchReviewLibraryTiles(limit = 600): Promise<ReviewLibraryTile[]> {
+  const { data, error } = await supabase
+    .from('course_ratings')
+    .select(SELECT)
+    .eq('is_mock', false)
+    .not('review', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return ((data ?? []) as unknown as Row[])
+    .map(mapRow)
+    .filter((tile): tile is ReviewLibraryTile => !!tile);
+}
