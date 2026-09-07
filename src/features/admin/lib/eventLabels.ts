@@ -124,6 +124,10 @@ export const EVENT_LABELS: Record<string, string> = {
   shorts_squircle_empty: 'Shorts strip empty',
 
   // ─── Discover tabs (Scores / News / Watch) ────────────────────
+  courses_tab_viewed: 'Courses tab viewed',
+  courses_tab_changed: 'Courses tab switched',
+  tourhub_tab_viewed: 'Tour Hub tab viewed',
+  tourhub_tab_changed: 'Tour Hub tab switched',
   discover_tab_viewed: 'Discover tab viewed',
   discover_tab_changed: 'Discover tab switched',
   discover_course_board_category_change: 'Discover course board changed',
