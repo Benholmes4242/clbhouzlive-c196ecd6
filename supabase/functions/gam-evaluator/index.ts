@@ -475,6 +475,18 @@ async function processSingle(whsScoreId: string) {
   // changes, so the women's course record updates promptly in both directions).
   await applyCourseLegends(stats);
 
+  // DERIVED STREAKS (ADDENDUM B). Runs OUTSIDE the version guard: it is a pure
+  // re-walk of stored gam_round_stats in play-date order, so running it twice on
+  // the same round produces the same rows. Owns sub_80, sub_par, birdie_round,
+  // no_up, cutting. Non-fatal.
+  try {
+    await deriveStreaks(userId);
+  } catch (e) {
+    console.warn("[derive_streaks]", (e as Error).message);
+  }
+
+
+
 
   // Mark whs_scores evaluated
   await supabase
