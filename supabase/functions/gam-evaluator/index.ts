@@ -396,7 +396,14 @@ async function processSingle(whsScoreId: string) {
       void wasNull;
 
     } catch (e) {
-      console.warn("[delta_index] prev_backfill", (e as Error).message);
+      // COUNTABLE FAILURE. A swallowed backfill leaves delta_index null forever
+      // with nothing to retry it, so name the round: greppable data gap.
+      console.warn(
+        "[delta_index] prev_backfill_failed",
+        "whs_score_id=" + (ladder[ladderIdx - 1]?.id ?? "unknown"),
+        (e as Error).message,
+      );
+
     }
   }
 
@@ -1438,11 +1445,17 @@ async function applyStreaks(userId: string, stats: any) {
 // EXCLUSION, never inferred from a zero:
 //   birdie_round  — hole_detail_present !== true (false or NULL) steps over the
 //                   round entirely: it neither extends nor breaks.
-//   no_up/cutting — delta_index is only knowable once a LATER round exists, so
-//                   the final round in the walk is stepped over while its
-//                   delta_index is null. An earlier round with a null
-//                   delta_index was judged null (movement guard rejected it) and
-//                   correctly breaks, matching the retired incremental rule.
+//   no_up/cutting — a null delta_index is AMBIGUOUS. The column cannot tell
+//                   "movement not yet knowable" (no later round has landed, or
+//                   the prev-round backfill failed and never retried) apart from
+//                   "movement rejected by the guard". Since the two are
+//                   indistinguishable, the derivation declines to judge either:
+//                   a null steps over the round wherever it appears, at any
+//                   position in the walk. The reasoning: no_up means "counter
+//                   rounds without an index increase", and a round whose movement
+//                   cannot be determined has not been shown to increase
+//                   anything — so breaking the streak on it was never correct.
+
 //
 // Freeze fields (freeze_credits, last_freeze_used_at, freeze_refill_at) are
 // never in the update payload. Streak-broken notifications are SUPPRESSED here:
@@ -1468,7 +1481,6 @@ function playTs(playDate: string): string {
 function derivedCondition(
   streakType: string,
   r: DerivedRow,
-  isLastRound: boolean,
 ): boolean | null {
   switch (streakType) {
     case "sub_80":
@@ -1479,15 +1491,16 @@ function derivedCondition(
       if (r.hole_detail_present !== true) return null;
       return (r.birdies ?? 0) > 0;
     case "no_up":
-      if (r.delta_index == null && isLastRound) return null;
-      return r.delta_index != null && Number(r.delta_index) <= 0;
+      if (r.delta_index == null) return null;
+      return Number(r.delta_index) <= 0;
     case "cutting":
-      if (r.delta_index == null && isLastRound) return null;
-      return r.delta_index != null && Number(r.delta_index) < 0;
+      if (r.delta_index == null) return null;
+      return Number(r.delta_index) < 0;
     default:
       return null;
   }
 }
+
 
 async function deriveStreaks(userId: string) {
   const { data, error } = await supabase
@@ -1513,7 +1526,7 @@ async function deriveStreaks(userId: string) {
 
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
-      const met = derivedCondition(streakType, r, i === rows.length - 1);
+      const met = derivedCondition(streakType, r);
       if (met === null) continue; // stepped over: neither extends nor breaks
       lastJudgedRound = r.whs_score_id;
       if (met) {
