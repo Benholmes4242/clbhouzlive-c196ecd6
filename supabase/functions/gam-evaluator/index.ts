@@ -1438,11 +1438,17 @@ async function applyStreaks(userId: string, stats: any) {
 // EXCLUSION, never inferred from a zero:
 //   birdie_round  — hole_detail_present !== true (false or NULL) steps over the
 //                   round entirely: it neither extends nor breaks.
-//   no_up/cutting — delta_index is only knowable once a LATER round exists, so
-//                   the final round in the walk is stepped over while its
-//                   delta_index is null. An earlier round with a null
-//                   delta_index was judged null (movement guard rejected it) and
-//                   correctly breaks, matching the retired incremental rule.
+//   no_up/cutting — a null delta_index is AMBIGUOUS. The column cannot tell
+//                   "movement not yet knowable" (no later round has landed, or
+//                   the prev-round backfill failed and never retried) apart from
+//                   "movement rejected by the guard". Since the two are
+//                   indistinguishable, the derivation declines to judge either:
+//                   a null steps over the round wherever it appears, at any
+//                   position in the walk. The reasoning: no_up means "counter
+//                   rounds without an index increase", and a round whose movement
+//                   cannot be determined has not been shown to increase
+//                   anything — so breaking the streak on it was never correct.
+
 //
 // Freeze fields (freeze_credits, last_freeze_used_at, freeze_refill_at) are
 // never in the update payload. Streak-broken notifications are SUPPRESSED here:
