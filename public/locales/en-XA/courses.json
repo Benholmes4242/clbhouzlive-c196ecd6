@@ -1112,6 +1112,9 @@
       "fieldLevel": "The field plays this course close to level par.",
       "fieldOver": "The field plays this course over par, at {{figure}}.",
       "fieldUnder": "The field plays this course under par, at {{figure}}."
+    },
+    "sections": {
+      "aboutThisPlace": "[[Àbóút thís plãçé]]"
     }
   },
   "network": {
