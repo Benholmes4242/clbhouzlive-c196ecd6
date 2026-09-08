@@ -13,7 +13,7 @@ import {
   type CourseBoardKey,
 } from '@/components/explore-tab-new/courseled/boardFilters';
 import { DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
+import { AboutSection } from '@/components/courses/course-detail/about/AboutSection';
 import { RailChips } from '@/components/ui/RailChips';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -73,8 +73,9 @@ export function AmateurCoursesBlock({
   if (filters.courses === 'one') return null;
 
   return (
-    <section style={{ paddingTop: 26, fontFamily: SANS, ...FIGS }}>
-      <DiscoverSectionHeading title={title} right={basisLine(unit, filters, t as never)} />
+    /* §7 — the shared section primitive: 20px gutter, 34px lead-in, shared
+       heading and meta. */
+    <AboutSection heading={title} meta={basisLine(unit, filters, t as never)}>
 
       <RailChips
         options={COURSE_BOARD_KEYS.map((key) => ({
@@ -84,15 +85,16 @@ export function AmateurCoursesBlock({
         value={courseBoard}
         onChange={(next) => state.changeCourseBoard(next as CourseBoardKey)}
         ariaLabel="Course board"
-        style={{ margin: '0 -14px 12px', padding: '0 14px' }}
+        style={{ margin: '0 -20px 12px', padding: '0 20px' }}
       />
 
       {courses.isPending ? (
         /* A held height, so the blocks below do not jump when rows arrive. */
         <div style={{ height: 200 }} aria-hidden />
       ) : rows.length === 0 ? (
-        <div style={{ padding: '18px 2px' }}>
-          <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: DISCOVER_FACT }}>
+        <div style={{ padding: '18px 0' }}>
+          {/* §7 BODY / PROSE — 13 MUTE, 1.55. */}
+          <p style={{ margin: 0, fontSize: 13, color: A.MUTE, lineHeight: 1.55 }}>
             {t('discover.coursesPlayed.emptyLine', 'No courses played for {{line}}.', {
               line: appliedParts.join(' \u00B7 '),
             })}
@@ -102,13 +104,14 @@ export function AmateurCoursesBlock({
               type="button"
               onClick={state.resetFilters}
               style={{
-                ...KICKER,
                 marginTop: 10,
                 padding: 0,
                 border: 'none',
                 background: 'transparent',
                 color: A.INK,
                 fontFamily: SANS,
+                fontSize: 13,
+                fontWeight: 600,
                 cursor: 'pointer',
               }}
             >
@@ -155,6 +158,6 @@ export function AmateurCoursesBlock({
           onCoursePress(courseId);
         }}
       />
-    </section>
+    </AboutSection>
   );
 }

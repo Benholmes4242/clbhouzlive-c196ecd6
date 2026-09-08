@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronRight } from 'lucide-react';
 
-import { A, KICKER, SANS } from './tokens';
+import { A, SANS } from './tokens';
 
 interface ListTerminalRowProps {
   label: string;
@@ -35,7 +35,18 @@ export function ListTerminalRow({ label, onPress, expanded, borderless }: ListTe
         color: A.BODY,
       }}
     >
-      <span style={{ ...KICKER, color: A.BODY }}>{label}</span>
+      {/* §7 SEE-ALL, FOOTER — 12 / 700 / 0.11em uppercase MUTE. */}
+      <span
+        style={{
+          fontSize: 12,
+          fontWeight: 700,
+          letterSpacing: '0.11em',
+          textTransform: 'uppercase',
+          color: A.MUTE,
+        }}
+      >
+        {label}
+      </span>
       {disclosure ? (
         <ChevronDown
           size={16}

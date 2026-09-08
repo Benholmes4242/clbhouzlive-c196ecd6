@@ -27,9 +27,10 @@ const THUMB = 42;
 const FIG_W = 58;
 
 const CAP: React.CSSProperties = {
-  fontSize: 9.5,
+  /* §7 KICKER — 9 / 700 / 0.19em uppercase. */
+  fontSize: 9,
   fontWeight: 700,
-  letterSpacing: '0.13em',
+  letterSpacing: '0.19em',
   textTransform: 'uppercase',
 };
 
@@ -44,12 +45,12 @@ export interface CourseBoardRowsProps {
 /** The board's own figure, per axis. Null renders an em dash, never a blank. */
 function BoardFigure({ row, board }: { row: BoardCourseRow; board: CourseBoardKey }) {
   if (board === 'hardest' || board === 'easiest') {
-    return <PlaysTo value={row.plays_to} width={FIG_W} fontSize={15} weight={700} />;
+    return <PlaysTo value={row.plays_to} width={FIG_W} fontSize={16} weight={700} />;
   }
   if (board === 'low') {
     return (
       <span style={{ width: FIG_W, flexShrink: 0, textAlign: 'right' }}>
-        <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, color: row.low_gross == null ? A.DIM : A.INK, lineHeight: 1 }}>
+        <span className="tabular-nums" style={{ fontSize: 16, fontWeight: 700, color: row.low_gross == null ? A.DIM : A.INK, lineHeight: 1 }}>
           {row.low_gross ?? '\u2014'}
         </span>
       </span>
@@ -58,7 +59,7 @@ function BoardFigure({ row, board }: { row: BoardCourseRow; board: CourseBoardKe
   if (board === 'rated') {
     return (
       <span style={{ width: FIG_W, flexShrink: 0, textAlign: 'right' }}>
-        <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, color: row.rating == null ? A.DIM : A.INK, lineHeight: 1 }}>
+        <span className="tabular-nums" style={{ fontSize: 16, fontWeight: 700, color: row.rating == null ? A.DIM : A.INK, lineHeight: 1 }}>
           {row.rating == null ? '\u2014' : row.rating.toFixed(1)}
         </span>
       </span>
@@ -66,7 +67,7 @@ function BoardFigure({ row, board }: { row: BoardCourseRow; board: CourseBoardKe
   }
   return (
     <span style={{ width: FIG_W, flexShrink: 0, textAlign: 'right' }}>
-      <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, color: A.INK, lineHeight: 1 }}>
+      <span className="tabular-nums" style={{ fontSize: 16, fontWeight: 700, color: A.INK, lineHeight: 1 }}>
         {row.rounds}
       </span>
     </span>
@@ -168,8 +169,9 @@ export function CourseBoardRows({ rows, board, onCoursePress }: CourseBoardRowsP
               <span
                 style={{
                   display: 'block',
-                  fontSize: 13,
-                  fontWeight: 700,
+                  /* §7 ROW NAME — 14 / 600. */
+                  fontSize: 14,
+                  fontWeight: 600,
                   color: A.INK,
                   lineHeight: 1.25,
                   overflow: 'hidden',

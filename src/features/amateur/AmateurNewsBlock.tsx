@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
+import { AboutSection } from '@/components/courses/course-detail/about/AboutSection';
 import { FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { LeadStory, StoryRow } from '@/features/tourhub/news/NewsTab';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
@@ -54,24 +54,27 @@ export function AmateurNewsBlock() {
   };
 
   return (
-    <section style={{ paddingTop: 26, fontFamily: SANS, ...FIGS }}>
-      <DiscoverSectionHeading
-        title={t('amateurNews.section', 'Amateur news')}
-        /* Same grammar as its neighbours: every heading-slot see-all on this
-           page states its count. */
-        right={t('amateurNews.seeAllCount', 'See all {{count}}', { count: stories.length })}
-        onRightPress={() => {
-          analyticsEvents.track('amateur_news_see_all_opened', { total: stories.length });
-          rememberAmateurScroll();
-          navigate('/discover/news');
-        }}
-      />
-
+    /* §7 — the shared section primitive. The lead photograph still bleeds: its
+       frame is written against a 14px gutter, so the one place it is wrapped
+       pays 14px inside a bleeding section rather than the shared LeadStory
+       being forked. */
+    <AboutSection
+      heading={t('amateurNews.section', 'Amateur news')}
+      meta={t('amateurNews.seeAllCount', 'See all {{count}}', { count: stories.length })}
+      onMetaPress={() => {
+        analyticsEvents.track('amateur_news_see_all_opened', { total: stories.length });
+        rememberAmateurScroll();
+        navigate('/discover/news');
+      }}
+      bleed
+    >
       {lead && (
-        <LeadStory story={lead} onOpen={() => open(lead.slug)} compact bleed engagement={engagementFor(lead.id)} />
+        <div style={{ paddingInline: 14 }}>
+          <LeadStory story={lead} onOpen={() => open(lead.slug)} compact bleed engagement={engagementFor(lead.id)} />
+        </div>
       )}
       {rows.length > 0 && (
-        <div style={{ marginTop: lead ? 8 : 0 }}>
+        <div style={{ marginTop: lead ? 8 : 0, padding: '0 20px' }}>
           {rows.map((story, index) => (
             <div
               key={story.id}
@@ -82,6 +85,6 @@ export function AmateurNewsBlock() {
           ))}
         </div>
       )}
-    </section>
+    </AboutSection>
   );
 }

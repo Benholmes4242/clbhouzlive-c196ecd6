@@ -10,7 +10,8 @@ import {
   type BoardFilters,
 } from '@/components/explore-tab-new/courseled/boardFilters';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { RailChips } from '@/components/ui/RailChips';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
  * THE ONE FILTER RAIL (BRIEF_AMATEUR_PAGE).
@@ -53,53 +54,34 @@ export function AmateurFilterRail({
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, fontFamily: SANS }}>
-      <div
-        className="scrollbar-hide"
-        style={{
-          display: 'flex',
-          gap: 6,
-          flex: 1,
-          minWidth: 0,
-          overflowX: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          willChange: 'transform',
-        }}
-      >
-        {chips.map((part, index) => (
-          <button
-            key={`${part}:${index}`}
-            type="button"
-            onClick={onOpen}
-            style={{
-              ...KICKER,
-              flexShrink: 0,
-              padding: '4px 9px',
-              border: 'none',
-              borderRadius: 9,
-              background: 'rgba(255,255,255,0.06)',
-              color: A.MUTE,
-              fontFamily: SANS,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {part}
-          </button>
-        ))}
+      {/* §7 — THE SHARED CHIP, not a local look-alike. Every chip states an
+          APPLIED value, so none is "selected": value is empty and the whole rail
+          opens the panel. Treatment, geometry and both states come from
+          RailChips and are not restated here. */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <RailChips
+          options={chips.map((part, index) => ({ id: `${index}:${part}`, label: part }))}
+          value=""
+          onChange={onOpen}
+          ariaLabel={t('discover.filterBoard.open', 'Filter the board')}
+        />
       </div>
       <button
         type="button"
         onClick={onOpen}
         aria-label={t('discover.filterBoard.open', 'Filter the board')}
+        /* The footer see-all treatment: 12/700/0.11em uppercase MUTE. */
         style={{
-          ...KICKER,
           flexShrink: 0,
-          padding: '4px 0 4px 6px',
+          padding: '4px 0 4px 8px',
           border: 'none',
           background: 'transparent',
-          color: A.INK,
+          color: A.MUTE,
           fontFamily: SANS,
-          fontSize: 10,
+          fontSize: 12,
+          fontWeight: 700,
+          letterSpacing: '0.11em',
+          textTransform: 'uppercase',
           cursor: 'pointer',
         }}
       >
