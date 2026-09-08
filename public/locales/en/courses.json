@@ -2070,9 +2070,10 @@
     "board": {
       "seeEveryone": "See everyone",
       "findGolfers": "Find golfers",
-      "noCircle": "You have not added any golfers yet.",
-      "circleQuiet": "Nobody in your circle has posted a round in the last fortnight.",
-      "thinCircle": "Only {{count}} rounds in your circle this fortnight."
+      "thinCircle": "Only {{count}} rounds in your circle this fortnight.",
+      "widenedToEveryone": "Nobody in your circle has posted a round in the last fortnight, so this is everyone.",
+      "orBeyond": "Or look beyond your circle.",
+      "noCircleYet": "Follow golfers you know and this becomes your circle."
     }
   }
 }

@@ -25,7 +25,6 @@ import { SuggestedGolfersRail } from '@/features/social-suggestions/SuggestedGol
 
 
 import { basisLine } from './basisLine';
-import { useCircleSize } from './useCircleSize';
 import type { AmateurBoardState } from './useAmateurBoardState';
 
 
