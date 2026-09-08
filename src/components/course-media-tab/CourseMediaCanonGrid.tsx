@@ -202,25 +202,36 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
   }
 
   if (posts.length === 0) {
+    /* §2 — a heading, one sentence, one action. The four "WHAT TO SHARE" rows
+       were a tutorial on photography attached to a page with no photographs;
+       they survive as the tail of the sentence. */
+    const courseLabel = courseName || t('courses:media.emptyCourseFallback');
     return (
-      <div style={{ padding: '20px 16px' }}>
-        <EmptyState
-          title={t('courses:media.emptyTitle')}
-          body={t('courses:media.emptyBody', {
-            courseName: courseName || t('courses:media.emptyCourseFallback'),
-          }).replace(/<\/?1>/g, '')}
-          primary={{
-            label: t('courses:media.shareExperience'),
-            onClick: () => courseId && navigate(`/courses/${courseId}/rate`),
+      <div style={{ padding: '24px 20px 40px' }}>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>
+          {t('courses:media.emptyFlatTitle')}
+        </h3>
+        <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.5, color: A.MUTE }}>
+          {t('courses:media.emptyFlatBody', { courseName: courseLabel })}
+        </p>
+        <button
+          type="button"
+          onClick={() => courseId && navigate(`/courses/${courseId}/rate`)}
+          style={{
+            marginTop: 20,
+            height: 44,
+            padding: '0 18px',
+            borderRadius: 14,
+            border: 'none',
+            background: A.INK,
+            color: A.CANVAS,
+            fontSize: 13.5,
+            fontWeight: 700,
+            cursor: 'pointer',
           }}
-          guidanceHeading={t('courses:media.guide.kicker')}
-          guidance={[
-            { title: t('courses:media.guide.signatureHoles'), body: t('courses:media.guide.signatureHolesSub') },
-            { title: t('courses:media.guide.shots'), body: t('courses:media.guide.shotsSub') },
-            { title: t('courses:media.guide.views'), body: t('courses:media.guide.viewsSub') },
-            { title: t('courses:media.guide.clubhouse'), body: t('courses:media.guide.clubhouseSub') },
-          ]}
-        />
+        >
+          {t('courses:media.emptyFlatAction')}
+        </button>
       </div>
     );
   }
