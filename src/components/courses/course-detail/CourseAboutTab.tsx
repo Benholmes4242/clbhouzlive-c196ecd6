@@ -23,6 +23,8 @@ import WhoPlaysHere from './about/WhoPlaysHere';
 import Photos from './about/Photos';
 import WhereItIs from './about/WhereItIs';
 import KeepExploring from './about/KeepExploring';
+import ClaimFooterRow from './about/ClaimFooterRow';
+
 
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseSheet from './ClaimCourseSheet';
