@@ -28,6 +28,7 @@ import CourseCommunityRating from '@/components/courses/CourseCommunityRating';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
 
 
 interface GolfClubViewProps {
