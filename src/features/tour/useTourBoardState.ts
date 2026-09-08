@@ -252,6 +252,9 @@ export function useTourBoardState(
     };
 
     const pickerLock: TourPickerLock = board === 'colleges' ? 'colleges' : null;
+    /* Champions out of tournament: no season race exists, so nothing is shown
+       rather than another tour's race under a "Champions" picker. */
+    const silent = !TOUR_RACE[tour] && !liveTournament && !(chosen && chosen.tour === tour);
     const raceTour = RACE_TOUR[board] as TourId | undefined;
     const basis =
       board === 'colleges'
@@ -292,6 +295,7 @@ export function useTourBoardState(
         rows,
         total: rows.length,
         figureLabel: 'SCORE',
+        silent,
         isPending: liveBoard.isPending,
         unavailable: !liveBoard.isPending && rows.length === 0,
       };
@@ -323,6 +327,7 @@ export function useTourBoardState(
         rows,
         total: rows.length,
         figureLabel: 'EARNINGS',
+        silent,
         isPending: colleges.isPending,
         unavailable: !colleges.isPending && rows.length === 0,
       };
@@ -353,9 +358,10 @@ export function useTourBoardState(
       rows,
       total: rows.length,
       figureLabel: result?.statLabel ?? null,
+      silent,
       isPending: ranking.isPending,
       /* A ranking of one is a data failure, and the hook already says so. */
       unavailable: !ranking.isPending && (!result?.synced || rows.length === 0),
     };
-  }, [board, chips, colleges.data, colleges.isPending, liveBoard.data, liveBoard.isPending, liveTournament, pointsTour, ranking.data, ranking.isPending, tour, onTourChange]);
+  }, [board, chips, chosen, colleges.data, colleges.isPending, liveBoard.data, liveBoard.isPending, liveTournament, pointsTour, ranking.data, ranking.isPending, tour, onTourChange]);
 }
