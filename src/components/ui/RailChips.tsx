@@ -70,7 +70,9 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
             type="button"
             role="tab"
             aria-selected={active}
-            onClick={() => onChange(option.id)}
+            aria-disabled={locked || undefined}
+            tabIndex={locked ? -1 : undefined}
+            onClick={() => { if (!locked) onChange(option.id); }}
             style={{
               flexShrink: 0,
               padding: '6px 11px',
