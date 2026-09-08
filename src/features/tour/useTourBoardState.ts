@@ -110,6 +110,14 @@ export interface TourBoardState {
   isPending: boolean;
   /** True when the board is genuinely unsynced rather than merely empty. */
   unavailable: boolean;
+  /**
+   * THE ONE COMBINATION WITH NO BOARD AT ALL. The Champions Tour carries no
+   * season ranking anywhere in the data, so out of tournament it has nothing to
+   * rank: the block renders NOTHING rather than falling into another tour's
+   * race under a picker that reads "Champions". When it is live the Leaderboard
+   * is the whole row.
+   */
+  silent: boolean;
 }
 
 function fmtPoints(n: number | null): string | null {
