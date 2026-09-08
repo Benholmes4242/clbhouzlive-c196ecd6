@@ -213,7 +213,6 @@ export function useTourBoardState(
 
   const pointsTour = RACE_TOUR[board];
   const ranking = usePlayersRanking(pointsTour ?? 'pga');
-  const colleges = useFranchiseStandings();
 
   const liveBoard = useQuery({
     queryKey: ['tour-board-live', liveTournament?.id ?? null],
