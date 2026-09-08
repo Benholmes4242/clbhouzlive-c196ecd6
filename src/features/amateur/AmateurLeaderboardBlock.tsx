@@ -89,14 +89,12 @@ export function AmateurLeaderboardBlock({
   );
   const minePinned = !!mine && !visible.some((row) => row.user_id === mine.user_id);
 
-  /* §2 — the three cases only apply to the circle: it is the only pool that can
-     be thin for a reason the member can act on. */
+  /* §3 B — a THIN result is a circle one, and only the circle can be thin for a
+     reason the member can act on. The head-count that separates state C from
+     state D lives on the page state, so both blocks read one answer. */
   const isCircle = filters.scope === 'circle';
   const thin = isCircle && total > 0 && total < THIN_FLOOR;
-  const circle = useCircleSize(userId, isCircle && !page.isPending && total === 0);
-  /* C2 — no circle at all. Until the head-count settles we assume C1, so the
-     harsher cold-start copy is never shown to a member who has a circle. */
-  const coldStart = circle.data === 0;
+
 
   const appliedParts = useMemo(() => describeFilterParts(filters, t as never), [filters, t]);
   const boardTitle = t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
