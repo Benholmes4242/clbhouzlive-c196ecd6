@@ -54,7 +54,7 @@ interface Target {
 const TARGETS: Record<string, Target> = {
   handicap: { route: '/handicap', headKey: 'handoff.head.handicap', head: 'Connect your handicap' },
   profile: { route: '/edit-profile', headKey: 'handoff.head.profile', head: 'Finish your profile' },
-  news: { route: '/news', headKey: 'handoff.head.news', head: 'Read the latest' },
+  news: { route: '/discover/news', headKey: 'handoff.head.news', head: 'Read the latest' },
 };
 
 const HandoffPage: React.FC = () => {
