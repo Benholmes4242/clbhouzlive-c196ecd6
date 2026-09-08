@@ -57,15 +57,30 @@ function byPurse(a: CachedTournament, b: CachedTournament) {
   return (b.purse ?? 0) - (a.purse ?? 0);
 }
 
+/**
+ * STATE INSPECTION ONLY: `?hero=live|finished|upcoming` forces the hero to the
+ * named state so all three can be reviewed on device on a day when only one of
+ * them is true. It changes NOTHING about precedence when the parameter is
+ * absent, and it cannot invent data — a forced state with an empty bucket falls
+ * through to the real one.
+ */
+function forcedKind(): TourHeroKind | null {
+  if (typeof window === 'undefined') return null;
+  const v = new URLSearchParams(window.location.search).get('hero');
+  return v === 'live' || v === 'finished' || v === 'upcoming' ? v : null;
+}
+
 export function useTourHeroState(): TourHeroState {
   const { data: cache, isLoading: cacheLoading } = useTournamentsCache();
+  const forced = forcedKind();
 
   const live = (cache?.live ?? []).filter((t) => t.status === 'inprogress').sort(byPurse);
-  const subjectLive = live[0] ?? null;
+  const subjectLive = forced && forced !== 'live' ? null : live[0] ?? null;
 
-  const finished = subjectLive
-    ? null
-    : (cache?.completed ?? [])
+  const finished =
+    subjectLive || (forced && forced !== 'finished')
+      ? null
+      : (cache?.completed ?? [])
         .filter((t) => {
           const d = daysSince(t.end_date);
           return d !== null && d <= JUST_FINISHED_DAYS;
