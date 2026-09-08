@@ -90,19 +90,13 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
     gcTime: 10 * 60 * 1000,
   });
 
+  /* ONE COUNT for the chips AND the Course tab's Photos heading (§1): the same
+     key, the same fetcher, one cache entry, one definition. */
   const countsQuery = useQuery({
-    queryKey: ['course-media-counts', courseId, userId],
+    queryKey: courseMediaCountsKey(courseId, userId),
     enabled: !!userId && !!courseId,
     staleTime: 2 * 60 * 1000,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_course_media_counts', {
-        p_user_id: userId,
-        p_course_id: courseId,
-      });
-      if (error) throw error;
-      const row = (data?.[0] ?? { photos: 0, videos: 0 }) as { photos: number; videos: number };
-      return { photos: Number(row.photos), videos: Number(row.videos), total: Number(row.photos) + Number(row.videos) };
-    },
+    queryFn: () => fetchCourseMediaCounts(courseId, userId),
   });
 
   // Dedup by media_id since the same post can have multiple media items.
