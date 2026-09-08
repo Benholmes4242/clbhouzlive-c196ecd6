@@ -884,7 +884,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             ...COURSE_BROWSE_KICKER,
           }}
         >
-          {`${t(`statBrowse.lens.${lens}.title`)} ${t('statBrowse.coursesSuffix')}`}
+          {`${t(`statBrowse.lens.${lens}.label`)} ${t('statBrowse.coursesSuffix', { defaultValue: 'courses' })}`}
         </div>
         <p style={{ ...COURSE_BROWSE_DESCRIPTION, marginTop: 5 }}>
           {description}

@@ -13,6 +13,7 @@ import { useHeroCourseFact, type HeroCourseFactRow } from '@/hooks/courses/useHe
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { heroCanonBackground } from '@/features/tourhub/_shared/heroGradient';
 import { TOUR_HERO_PHOTO_H } from '@/features/tourhub/_shared/tokens';
+import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { KICKER } from '@/lib/tokens/type';
 
 /**
@@ -195,7 +196,7 @@ function CoursesPageHeroInner() {
         width: '100%',
         height: TOUR_HERO_PHOTO_H,
         background,
-        backgroundColor: '#15171F',
+        backgroundColor: SLATE_50,
         display: 'flex',
         flexDirection: 'column',
       }}
