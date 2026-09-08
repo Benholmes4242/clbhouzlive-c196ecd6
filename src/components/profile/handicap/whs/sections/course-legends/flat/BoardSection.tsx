@@ -98,13 +98,16 @@ export const BoardSection: React.FC<Props> = ({
                 onClick={() => onWindowChange(w)}
                 aria-pressed={on}
                 style={{
+                  // Deliberately BELOW the chips in visual weight: the chips
+                  // choose what you look at, this only narrows when. Smaller,
+                  // lighter, muted — never a second row of equals.
                   padding: 0,
                   border: 0,
                   background: 'transparent',
                   fontFamily: SANS,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: on ? A.INK : A.DIM,
+                  fontSize: 10.5,
+                  fontWeight: on ? 600 : 500,
+                  color: on ? A.MUTE : A.DIM,
                   cursor: 'pointer',
                 }}
               >

@@ -505,6 +505,9 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
             otherHolderClaimedCount={crownStatement.otherHolderClaimedCount}
           />
 
+          {/* Deep-link anchor: the flat tab shows one board at a time, so the
+              notified category IS this section once activeBoardKey resolves. */}
+          <div data-category={activeBoardKey}>
           <BoardSection
             categories={boardDescriptors}
             grouped={grouped}
@@ -542,6 +545,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               navigate(`/profile/${row.username}`);
             }}
           />
+          </div>
+
 
           <UnclaimedSection
             names={unclaimedNames}
