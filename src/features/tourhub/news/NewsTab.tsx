@@ -88,6 +88,58 @@ export function LeadStory({ story, onOpen, compact = false, immersiveHero = true
   const bleedFrame: React.CSSProperties = bleed
     ? { marginInline: -14, width: 'calc(100% + 28px)', borderRadius: 0, border: 'none' }
     : {};
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="active:scale-[0.995]"
+      style={{
+        display: 'block', width: '100%', textAlign: 'left', background: 'none',
+        border: 'none', padding: 0, cursor: 'pointer', fontFamily: FONT,
+      }}
+    >
+      <div style={{ position: 'relative', height: compact ? COMPACT_LEAD_HEIGHT : immersiveHero ? OVERVIEW_HERO_HEIGHT : 232, width: '100%', overflow: 'hidden', background: SLATE_100, ...bleedFrame }}>
+        <img
+          src={story.image_url as string}
+          alt={story.headline}
+          loading="lazy"
+          style={{
+            width: '100%',
+            height: `calc(100% + ${HERO_SUBJECT_DROP * 2}px)`,
+            objectFit: 'cover',
+            objectPosition: '50% 50%',
+            display: 'block',
+          }}
+        />
+        <div
+          aria-hidden
+          style={{
+             position: 'absolute', left: 0, right: 0, bottom: 0, height: 260,
+             background: heroCanonScrimOn(SLATE_50),
+          }}
+        />
+        <div style={{ position: 'absolute', top: compact ? 14 : immersiveHero ? 'calc(env(safe-area-inset-top, 0px) + 68px)' : 12, left: sidePadding, right: sidePadding }}>
+          <KickerLine
+            kicker={story.kicker}
+            at={story.published_at}
+            compact={compact}
+            trailing={<StoryRowEngagement engagement={engagement} tone="glass" />}
+          />
+        </div>
+        <div style={{ position: 'absolute', bottom: bandPadding, left: sidePadding, right: sidePadding }}>
+          <StoryImageHeadline compact={compact}>{story.headline}</StoryImageHeadline>
+        </div>
+      </div>
+      {story.standfirst && (
+        <div style={{ padding: `${standfirstPad}px ${bleed ? 0 : 14}px 0`, fontSize: 13, lineHeight: 1.45, color: INK_MUTE }}>
+          {story.standfirst}
+        </div>
+      )}
+    </button>
+  );
+}
+
+
 
 export function StoryRow({ story, onOpen, compact = false, engagement }: { story: TourStory; onOpen: () => void; compact?: boolean; engagement?: StoryEngagement | null }) {
   return (
