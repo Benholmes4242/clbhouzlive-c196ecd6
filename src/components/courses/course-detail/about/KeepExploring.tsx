@@ -63,8 +63,7 @@ const Row: React.FC<{
   label: string;
   meta?: string;
   onClick: () => void;
-  hairline: boolean;
-}> = ({ label, meta, onClick, hairline }) => (
+}> = ({ label, meta, onClick }) => (
   <button
     type="button"
     onClick={onClick}
@@ -74,21 +73,21 @@ const Row: React.FC<{
       gap: 10,
       width: '100%',
       minHeight: 44,
-      padding: 0,
+      padding: '12px 0',
       border: 'none',
-      borderBottom: hairline ? `0.5px solid ${A.HAIRLINE}` : 'none',
+      borderBottom: `1px solid ${A.HAIRLINE}`,
       background: 'transparent',
       cursor: 'pointer',
       textAlign: 'left',
       fontFamily: SANS,
     }}
   >
-    <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: A.INK }}>
+    <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, color: A.INK }}>
       {label}
     </span>
-    {meta && <span style={{ fontSize: 11.5, color: A.MUTE }}>{meta}</span>}
+    {meta && <span style={{ fontSize: 13, color: A.DIM }}>{meta}</span>}
     {/* Navigation, so a right chevron is correct here. */}
-    <span style={{ fontSize: 13, color: A.DIM, fontWeight: 700 }} aria-hidden="true">
+    <span style={{ fontSize: 13, color: A.DIM }} aria-hidden="true">
       {'\u203A'}
     </span>
   </button>
@@ -156,17 +155,13 @@ const KeepExploring: React.FC<Props> = ({ course, onWebsiteClick }) => {
 
   if (rows.length === 0) return null;
 
+  /* No heading in the signed-off mock: a rule, then the rows. The section is
+     the last thing on the tab and every row names its own destination. */
   return (
-    <AboutSection heading={t('courseDetail.sections.keepExploring')}>
-      <div style={{ display: 'grid' }}>
-        {rows.map((r, i) => (
-          <Row
-            key={r.key}
-            label={r.label}
-            meta={r.meta}
-            onClick={r.onClick}
-            hairline={i < rows.length - 1}
-          />
+    <AboutSection>
+      <div style={{ display: 'grid', borderTop: `1px solid ${A.HAIRLINE}`, paddingTop: 4 }}>
+        {rows.map((r) => (
+          <Row key={r.key} label={r.label} meta={r.meta} onClick={r.onClick} />
         ))}
       </div>
     </AboutSection>

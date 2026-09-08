@@ -45,15 +45,16 @@ interface WhatPeopleSayProps {
   onSeeAllReviews?: () => void;
 }
 
-const Figure: React.FC<{ label: string; value: string; tone: string; tier?: string | null }> = ({
-  label,
-  value,
-  tone,
-  tier,
-}) => (
+const Figure: React.FC<{
+  label: string;
+  value: string;
+  tone: string;
+  size?: number;
+  tier?: string | null;
+}> = ({ label, value, tone, size = 34, tier }) => (
   <div style={{ minWidth: 0 }}>
-    <div style={ABOUT_KICKER}>{label}</div>
-    <div style={{ ...aboutFig(30, tone), marginTop: 4, lineHeight: 1, whiteSpace: 'nowrap' }}>{value}</div>
+    <div style={{ ...aboutFig(size, tone), lineHeight: 1, whiteSpace: 'nowrap' }}>{value}</div>
+    <div style={{ ...ABOUT_KICKER, marginTop: 6 }}>{label}</div>
     {tier ? (
       <div style={{ ...TIER_LABEL_STYLE, fontSize: 11, color: tone, marginTop: 4 }}>{tier}</div>
     ) : null}
@@ -117,7 +118,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
 
   return (
     <AboutSection heading={heading} meta={t('courseDetail.communityScore.basedOn', { count: total })}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 40 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20 }}>
         <Figure
           label={t('courseDetail.rating.overall')}
           value={score.toFixed(1)}
@@ -129,6 +130,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
             label={t('courseDetail.rating.yours')}
             value={yours.toFixed(1)}
             tone={A.AMBER_DEEP}
+            size={22}
           />
         ) : null}
       </div>

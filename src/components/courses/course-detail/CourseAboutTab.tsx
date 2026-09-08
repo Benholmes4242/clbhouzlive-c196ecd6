@@ -9,7 +9,7 @@ import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import CourseLocationPills from './CourseLocationPills';
+// CourseLocationPills is intentionally no longer rendered on this tab (untouched file).
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -135,13 +135,14 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       className="animate-in fade-in duration-200"
       style={{ paddingBottom: 8, background: SLATE_50 }}
     >
-      {/* ══ BLOCK 1 — THE CARD (what the course is) ══ */}
-      <CourseLocationPills course={course} />
+      {/* ══ BLOCK 1 — THE CARD (what the course is) ══
+          The location pills are NOT rendered here: the mock puts the place in
+          the hero, and a second row of light pills above the facts was the
+          foreign block on this tab. CourseLocationPills.tsx is untouched. */}
 
-      {/* One owner for the seams between blocks: grid gap, so a block that
-          renders nothing (no tee card, no hole analytics) leaves no gap
-          behind it. Fixed spacers used to strand 36px under the pills. */}
-      <div style={{ display: 'grid', gap: 24 }}>
+      {/* ONE OWNER FOR THE SEAMS: AboutSection's own 34px lead-in. The grid
+          gap that used to sit here added to it, so every seam measured 58. */}
+      <div style={{ display: 'grid', gap: 0 }}>
         {/* BRIEF_COURSE_TAB_REBUILD §3.1/§3.2 — flat facts row + tee control. */}
         <CourseFactsAndTees courseId={course.id} />
 

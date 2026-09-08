@@ -33,11 +33,11 @@ import { AboutSection, GUTTER, ABOUT_KICKER, aboutFig } from './AboutSection';
 const STANDARD_SLOPE = 113;
 
 const FactCell: React.FC<{ kicker: string; value: string }> = ({ kicker, value }) => (
-  <div style={{ minWidth: 0 }}>
+  <div style={{ flex: 1, minWidth: 0 }}>
     <div className="tabular-nums lining-nums" style={aboutFig(21)}>
       {value}
     </div>
-    <div style={{ ...ABOUT_KICKER, marginTop: 4 }}>{kicker}</div>
+    <div style={{ ...ABOUT_KICKER, marginTop: 5 }}>{kicker}</div>
   </div>
 );
 
@@ -119,7 +119,8 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
         <div
           style={{
             display: 'flex',
-            gap: 26,
+            gap: 14,
+            marginTop: 22,
             padding: `0 ${GUTTER}px`,
             fontFamily: SANS,
             ...FIGS,
@@ -132,7 +133,7 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
       )}
 
       {/* §3.2 — kicker only, no section heading. The tee list is a CONTROL. */}
-      <AboutSection kicker="Tees">
+      <AboutSection kicker="Tees" space={16}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {teeRows.map(({ tee, slope: teeSlope }) => {
             const on = tee.tee_label === active.tee_label;
