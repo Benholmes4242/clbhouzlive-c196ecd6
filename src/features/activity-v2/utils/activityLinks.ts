@@ -364,13 +364,13 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
 
   // --- tour digests (system-authored, NO actor, NO target) ------------
   // tour_preview (Thursday) and tour_roundup (Sunday) carry null entity_type,
-  // null entity_id and no ids in data, so there is nothing to deep-link to.
-  // FIXED ROUTE to the Tour Hub overview — the same path the bottom nav's
-  // Tour tab uses (see components/bottom-navigation/navigationTabs.ts).
-  // No ?tab and no tour slug: the overview's own picker rules decide the
-  // default tour.
+  // null entity_id and no ids in data, so there is no single story to deep-link
+  // to — each digest summarises several. They announce STORIES, so they land on
+  // the wire, not on a hub with a leaderboard at the top.
+  // If a digest ever starts carrying a lead story id, deep-link to that story
+  // instead and leave this as the fallback.
   if (type === 'tour_preview' || type === 'tour_roundup') {
-    return '/tourhub';
+    return '/tour/news';
   }
 
   // --- unknown ---------------------------------------------------------
