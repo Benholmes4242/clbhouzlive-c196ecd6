@@ -63,8 +63,15 @@ function byPurse(a: CachedTournament, b: CachedTournament) {
  * them is true. It changes NOTHING about precedence when the parameter is
  * absent, and it cannot invent data — a forced state with an empty bucket falls
  * through to the real one.
+ *
+ * GATED TO DEV BUILDS. In a production bundle the parameter is inert: a shared
+ * or bookmarked `?hero=live` link shows a normal member the real state, never a
+ * fabricated live tournament with a stand-in subject. Dev builds cover the
+ * preview, which is where the layout gets reviewed, so this stays past cutover
+ * rather than being stripped.
  */
 function forcedKind(): TourHeroKind | null {
+  if (!import.meta.env.DEV) return null;
   if (typeof window === 'undefined') return null;
   const v = new URLSearchParams(window.location.search).get('hero');
   return v === 'live' || v === 'finished' || v === 'upcoming' ? v : null;
