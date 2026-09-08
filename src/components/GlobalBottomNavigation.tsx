@@ -52,7 +52,6 @@ const HIDDEN_ROUTES = [
 ];
 
 const HIDDEN_ROUTE_PREFIXES = [
-  '/echo',
   '/admin-v2',
   '/verified',
   '/manage/',

@@ -1,19 +1,19 @@
 /**
  * ProfileSheetV2 · QuickActionsRow
  *
- * Three tiles: Echo / Messages / Alerts.
+ * Two tiles: Messages / Alerts. (Echo was retired as a member-facing surface —
+ * BRIEF_RETIRE_ECHO_SURFACE. This row was its only door.)
  * Badges: Messages sums per-conversation unread from useConversations (the
  * same RPC the inbox renders); Alerts reads useUnreadNotifications. These
  * are intentionally the same sources as the destination pages so tile
  * badges cannot drift from what those pages show.
- * Route strings copied verbatim from src/components/profile/ProfileHubSheet.tsx:
- *   Echo     -> '/echo'
+ * Route strings:
  *   Messages -> '/messages'
  *   Alerts   -> '/notificationmessages'
  */
 
 import React from 'react';
-import { Sparkles, Mail, Bell } from 'lucide-react';
+import { Mail, Bell } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 
@@ -103,11 +103,6 @@ export default function QuickActionsRow({ actorType, actorId, onNavigate }: Prop
 
   return (
     <div style={{ display: 'flex', gap: 8, padding: '12px 20px 0' }}>
-      <Tile
-        label="Echo"
-        icon={<Sparkles size={17} color={A.INK} />}
-        onClick={() => onNavigate('/echo')}
-      />
       <Tile
         label="Messages"
         icon={<Mail size={17} color={A.INK} />}

@@ -127,7 +127,6 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/messages/' },              spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/admin' },                  spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/hub' },                    spec: { chrome: 'none', tone: 'light', bleed: false } },
-  { match: { prefix: '/echo' },                   spec: { chrome: 'none', tone: 'light', bleed: false } },
   // Social lists (F3): /profile/:username/(followers|following) — ISLAND, padded (no bleed).
   // Declared BEFORE the /profile/ prefix rule so it wins.
   { match: { test: (p) => /^\/profile\/[^/]+\/(followers|following)$/.test(p) },
