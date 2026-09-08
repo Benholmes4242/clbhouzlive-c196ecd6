@@ -20,8 +20,12 @@ import { RailChips } from '@/components/ui/RailChips';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
+import { FindGolfersSheet } from '@/components/explore-tab-new/FindGolfersSheet';
+
 import { basisLine } from './basisLine';
+import { useCircleSize } from './useCircleSize';
 import type { AmateurBoardState } from './useAmateurBoardState';
+
 
 /**
  * BLOCK 1 - THE LEADERBOARD (BRIEF_AMATEUR_PAGE).
@@ -39,7 +43,23 @@ import type { AmateurBoardState } from './useAmateurBoardState';
 /** Eight positions on the page; the see-all sheet holds the remainder. */
 const VISIBLE_POSITIONS = 8;
 
+/** §2 — four ranked rows is a leaderboard; fewer is a stated thin result. */
+const THIN_FLOOR = 4;
+
+/** One quiet affordance shape for every widen/repair action on this block. */
+const QUIET_ACTION = {
+  padding: 0,
+  border: 'none',
+  background: 'transparent',
+  color: A.INK,
+  fontFamily: SANS,
+  fontSize: 12,
+  fontWeight: 600,
+  cursor: 'pointer',
+} as const;
+
 const MEMBER_BOARD_KEYS: readonly BoardKey[] = [...RANKING_BOARD_KEYS, ...FEAT_BOARD_KEYS];
+
 
 export function AmateurLeaderboardBlock({
   userId,
@@ -52,6 +72,7 @@ export function AmateurLeaderboardBlock({
 }) {
   const { t } = useTranslation('courses');
   const [seeAll, setSeeAll] = useState(false);
+  const [findGolfers, setFindGolfers] = useState(false);
 
   /* THE READ IS THE PAGE'S, not this block's - the filter panel states the same
      count, and two reads could disagree. */
@@ -66,11 +87,21 @@ export function AmateurLeaderboardBlock({
   );
   const minePinned = !!mine && !visible.some((row) => row.user_id === mine.user_id);
 
+  /* §2 — the three cases only apply to the circle: it is the only pool that can
+     be thin for a reason the member can act on. */
+  const isCircle = filters.scope === 'circle';
+  const thin = isCircle && total > 0 && total < THIN_FLOOR;
+  const circle = useCircleSize(userId, isCircle && !page.isPending && total === 0);
+  /* C2 — no circle at all. Until the head-count settles we assume C1, so the
+     harsher cold-start copy is never shown to a member who has a circle. */
+  const coldStart = circle.data === 0;
+
   const appliedParts = useMemo(() => describeFilterParts(filters, t as never), [filters, t]);
   const boardTitle = t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
   const unit = boardCountsRounds(board)
     ? t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })
     : t('discover.coursesPlayed.nMembers', '{{count}} members', { count: total });
+
 
   return (
     <section style={{ paddingTop: 18, fontFamily: SANS, ...FIGS }}>
@@ -95,29 +126,38 @@ export function AmateurLeaderboardBlock({
         <div style={{ height: 240 }} aria-hidden />
       ) : total === 0 ? (
         <div style={{ padding: '18px 2px' }}>
+          {/* §2 C — AN EXPLAINED ABSENCE, NEVER A HIDDEN BLOCK. On the circle
+              the cause decides the words: a quiet fortnight (C1) or no circle
+              at all (C2). Off the circle, the applied filter is the answer. */}
           <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: DISCOVER_FACT }}>
-            {t('discover.filterBoard.emptyLine', 'Nothing on this board for {{line}}.', {
-              line: appliedParts.join(' \u00B7 '),
-            })}
+            {!isCircle
+              ? t('discover.filterBoard.emptyLine', 'Nothing on this board for {{line}}.', {
+                  line: appliedParts.join(' \u00B7 '),
+                })
+              : coldStart
+                ? t('amateur.board.noCircle', 'You have not added any golfers yet.')
+                : t(
+                    'amateur.board.circleQuiet',
+                    'Nobody in your circle has posted a round in the last fortnight.',
+                  )}
           </p>
-          {!filtersAreDefault(filters) && (
-            <button
-              type="button"
-              onClick={state.resetFilters}
-              style={{
-                ...KICKER,
-                marginTop: 10,
-                padding: 0,
-                border: 'none',
-                background: 'transparent',
-                color: A.INK,
-                fontFamily: SANS,
-                cursor: 'pointer',
-              }}
-            >
-              {t('discover.filterBoard.reset', 'Clear the filter')}
-            </button>
-          )}
+          <div style={{ display: 'flex', gap: 16, marginTop: 12, flexWrap: 'wrap' }}>
+            {isCircle && (
+              <button type="button" onClick={state.seeEveryone} style={QUIET_ACTION}>
+                {t('amateur.board.seeEveryone', 'See everyone')} &rsaquo;
+              </button>
+            )}
+            {isCircle && coldStart && (
+              <button type="button" onClick={() => setFindGolfers(true)} style={QUIET_ACTION}>
+                {t('amateur.board.findGolfers', 'Find golfers')} &rsaquo;
+              </button>
+            )}
+            {!isCircle && !filtersAreDefault(filters) && (
+              <button type="button" onClick={state.resetFilters} style={QUIET_ACTION}>
+                {t('discover.filterBoard.reset', 'Clear the filter')}
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <>
@@ -141,17 +181,40 @@ export function AmateurLeaderboardBlock({
               />
             </div>
           )}
-          {total > visible.length && (
-            <ListTerminalRow
-              label={t('discover.filterBoard.seeAll', 'See all {{unit}}', { unit })}
-              onPress={() => {
-                analyticsEvents.track('amateur_board_see_all_opened', { board, total });
-                setSeeAll(true);
+          {/* §2 B — A THIN CIRCLE STAYS THIN AND SAYS SO. The see-all is
+              replaced by the count and the one way to widen the pool; the
+              filter rail moves with it, so the chips never claim a narrower
+              pool than the rows. */}
+          {thin ? (
+            <p
+              style={{
+                margin: '12px 2px 0',
+                fontSize: 12,
+                color: A.MUTE,
+                lineHeight: 1.45,
               }}
-            />
+            >
+              {t('amateur.board.thinCircle', 'Only {{count}} rounds in your circle this fortnight.', {
+                count: total,
+              })}{' '}
+              <button type="button" onClick={state.seeEveryone} style={{ ...QUIET_ACTION, fontSize: 12 }}>
+                {t('amateur.board.seeEveryone', 'See everyone')} &rsaquo;
+              </button>
+            </p>
+          ) : (
+            total > visible.length && (
+              <ListTerminalRow
+                label={t('discover.filterBoard.seeAll', 'See all {{unit}}', { unit })}
+                onPress={() => {
+                  analyticsEvents.track('amateur_board_see_all_opened', { board, total });
+                  setSeeAll(true);
+                }}
+              />
+            )
           )}
         </>
       )}
+
 
       <BoardSeeAllSheet
         open={seeAll}
@@ -163,6 +226,11 @@ export function AmateurLeaderboardBlock({
         title={boardTitle}
         onRowPress={onRowPress}
       />
+
+      {/* C2 — the repair action for the cold start, the same sheet the rest of
+          the app uses to add golfers. */}
+      <FindGolfersSheet open={findGolfers} onClose={() => setFindGolfers(false)} />
+
     </section>
   );
 }
