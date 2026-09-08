@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
  */
 
 import React, { useCallback, useState, useEffect, useLayoutEffect, useMemo } from 'react';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
 import { ChevronRight, Trophy, Activity } from 'lucide-react';
 import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
@@ -593,14 +594,13 @@ const HandicapPage: React.FC = () => {
 
   return (
     <PageRoot dark={true} style={{ background: 'var(--hcp-bg-0)' }}>
-      {/* H3: header rendered globally by ChromeIsland (dark, hideHcp, /profile fallback). */}
+      {/* H3: header rendered globally by ChromeIsland (dark, hideHcp, /profile fallback).
+           The chrome is the single owner of env(safe-area-inset-top); the page
+           consumes the published CHROME_CLEARANCE so the first row starts
+           below the islands and scrolls under them afterwards. */}
       <main
         style={{
-          /* Reserve the CHROME'S OWN computed height (--chrome-total-h composes
-             --header-h + --sat + --shell-extra-h) rather than a hand-written
-             safe-area + 56px guess, so the page and the fixed island cannot
-             disagree when the safe area changes. */
-          paddingTop: 'var(--chrome-total-h, calc(env(safe-area-inset-top, 0px) + 56px))',
+          paddingTop: CHROME_CLEARANCE,
           /* S2.5 GUARD - added only after the shrink-blocking rows below were
              fixed. Vertical scrolling only; nothing can pan sideways. */
           maxWidth: '100%',
