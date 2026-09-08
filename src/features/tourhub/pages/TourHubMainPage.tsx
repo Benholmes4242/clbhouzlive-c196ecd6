@@ -242,23 +242,28 @@ export function TourHubMainPage() {
             physical top and the shared left/right islands float over it. Legacy
             pushed tabs retain their solid in-flow AppHeader until retirement. */}
         {isHubRoot ? renderTab() : (
-          <TourPageShell
-            title={tabTitle}
-            showBack
-            onBack={() => handleSelectTab('overview')}
-            backFallback="/tourhub"
-            leftSlot={
-              /* The left slot is the variant slot: burger + tour picker as one
-                 left-aligned group. NOTHING renders between the header border
-                 and the hero — the chip rail that used to sit there is gone. */
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                <AppHeaderBurger onTap={() => setMenuOpen(true)} label="Tour menu" />
-                {activeTab !== 'live' && <TourPickerControl onTap={() => setPickerOpen(true)} />}
-              </div>
-            }
-          >
-            {renderTab()}
-          </TourPageShell>
+          /* Route immersion is path-based, so query-param tabs share the
+             overview's y=0 shell. Their own opaque header therefore becomes
+             the single safe-area owner while the overview remains full bleed. */
+          <div style={{ paddingTop: 'var(--sat, 0px)' }}>
+            <TourPageShell
+              title={tabTitle}
+              showBack
+              onBack={() => handleSelectTab('overview')}
+              backFallback="/tourhub"
+              leftSlot={
+                /* The left slot is the variant slot: burger + tour picker as one
+                   left-aligned group. NOTHING renders between the header border
+                   and the hero — the chip rail that used to sit there is gone. */
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                  <AppHeaderBurger onTap={() => setMenuOpen(true)} label="Tour menu" />
+                  {activeTab !== 'live' && <TourPickerControl onTap={() => setPickerOpen(true)} />}
+                </div>
+              }
+            >
+              {renderTab()}
+            </TourPageShell>
+          </div>
         )}
       </TourHubShell>
     </TourSelectionProvider>
