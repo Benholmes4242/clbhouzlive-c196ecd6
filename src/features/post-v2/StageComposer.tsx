@@ -292,7 +292,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
       void addFiles(files);
       setPage(1);
     }
-  }, [isEditMode, draftId, initialMedia, addFiles]);
+  }, [isEditMode, hydrated, draftId, initialMedia, addFiles]);
 
   // Page 1 with no media renders the designed empty state, which owns the two
   // pick paths - camera and library - and NOTHING ELSE. A wizard post requires
