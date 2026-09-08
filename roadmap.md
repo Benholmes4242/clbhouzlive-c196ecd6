@@ -1,5 +1,13 @@
 # Roadmap
 
+## Tour match-the-mock (8 Sep 2026)
+- [x] Match the app canvas, 20px gutter, hero states, and single tour selector sheet.
+- [ ] Match leaderboard heading, rows, counts, and terminal action.
+- [ ] Rebuild Our Picks as horizontal cards with concerns and quiet record prose.
+- [ ] Match the three-row Coming Up block.
+- [ ] Match the image-first Tour News block.
+- [ ] Verify the full page at mobile width and remove the stray Tour/Wire overlay.
+
 - [x] Remove centred labels and secondary controls from story headers.
 - [x] Preserve Discover News/Gallery tab and scroll across story/media round trips without URL or local storage.
 - [x] Keep every story origin intact and make cold amateur story links fall back to Discover News.

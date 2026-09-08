@@ -17,10 +17,12 @@
 import { useNavigate } from 'react-router-dom';
 
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
-import { DISCOVER_FACT, DISCOVER_QUIET, KICKER } from '@/components/explore-tab-new/courseled/tokens';
+import { DISCOVER_FACT, FIGS } from '@/components/explore-tab-new/courseled/tokens';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FIGS, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { useVenueImage } from '@/features/tourhub/hooks/useVenueImage';
-import { FONT, INK_MUTE } from '@/features/tourhub/_shared/tokens';
+import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
+import { FONT, INK, INK_ALPHA_60, INK_FAINT, LIVE_INK, WHITE_ALPHA_10 } from '@/features/tourhub/_shared/tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 import { useTourHeroState, type HeroPlayer, type TourHeroState } from './useTourHeroState';
@@ -47,7 +49,7 @@ function dateLine(iso: string | null): string | null {
   if (!iso) return null;
   const d = new Date(`${iso}T00:00:00`);
   if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
 }
 
 function venueLine(t: TourHeroState['tournament']): string | null {
@@ -59,7 +61,7 @@ function venueLine(t: TourHeroState['tournament']): string | null {
 
 function Kicker({ children }: { children: React.ReactNode }) {
   return (
-    <span style={{ ...KICKER, display: 'block', color: DISCOVER_QUIET, textShadow: SHADOW }}>
+    <span style={{ display: 'block', color: INK_ALPHA_60, fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', textShadow: SHADOW }}>
       {children}
     </span>
   );
@@ -71,11 +73,11 @@ function Title({ children }: { children: React.ReactNode }) {
       style={{
         display: 'block',
         marginTop: 6,
-        fontSize: 22,
-        lineHeight: 1.1,
-        fontWeight: 800,
-        letterSpacing: '-0.01em',
-        color: DISCOVER_FACT,
+        fontSize: 24,
+        lineHeight: 1.14,
+        fontWeight: 700,
+        letterSpacing: '-0.034em',
+        color: INK,
         textShadow: SHADOW,
       }}
     >
@@ -90,9 +92,9 @@ function Meta({ children }: { children: React.ReactNode }) {
       style={{
         display: 'block',
         marginTop: 6,
-        fontSize: 12,
-        fontWeight: 600,
-        color: INK_MUTE,
+        fontSize: 13,
+        fontWeight: 400,
+        color: INK_ALPHA_60,
         textShadow: SHADOW,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -111,23 +113,22 @@ function LiveRow({ p, i }: { p: HeroPlayer; i: number }) {
     <span
       style={{
         display: 'flex',
-        alignItems: 'baseline',
-        gap: 8,
-        marginTop: i === 0 ? 8 : 3,
-        fontSize: 13,
-        fontWeight: 700,
-        color: DISCOVER_FACT,
+        alignItems: 'center',
+        gap: 12,
+        padding: '4px 0',
+        fontSize: 14,
+        color: INK,
         textShadow: SHADOW,
       }}
     >
-      <span className="tabular-nums" style={{ width: 14, color: DISCOVER_QUIET, fontWeight: 700 }}>
+      <span className="tabular-nums" style={{ width: 22, flex: '0 0 22px', fontSize: 12, color: INK_ALPHA_60, fontWeight: 700 }}>
         {p.position ?? i + 1}
       </span>
-      <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span style={{ flex: 1, minWidth: 0, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {p.name}
       </span>
       {par && (
-        <span className="tabular-nums" style={{ marginLeft: 'auto', color: par.tone }}>
+        <span className="tabular-nums" style={{ marginLeft: 'auto', color: par.tone, fontWeight: 700 }}>
           {par.text}
         </span>
       )}
@@ -143,6 +144,9 @@ export function TourHero() {
 
   const champion = state.kind === 'finished' ? state.players[0] ?? null : null;
   const championPar = toPar(champion?.toPar ?? null);
+  const startIn = t?.start_date
+    ? Math.max(0, Math.ceil((Date.parse(`${t.start_date}T00:00:00Z`) - Date.now()) / 86_400_000))
+    : null;
 
   return (
     <section
@@ -171,9 +175,9 @@ export function TourHero() {
           onClick={() => navigate(`/tourhub/tournament/${t.id}`)}
           style={{
             position: 'absolute',
-            left: 16,
-            right: 16,
-            bottom: 16,
+            left: 20,
+            right: 20,
+            bottom: 20,
             zIndex: 1,
             display: 'block',
             width: 'auto',
@@ -188,16 +192,13 @@ export function TourHero() {
           {/* ---------------- LIVE ---------------- */}
           {state.kind === 'live' && (
             <>
-              <Kicker>
-                {[
-                  'Live',
-                  state.round ? `Round ${state.round}` : null,
-                  state.thru != null ? `Thru ${state.thru}` : null,
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </Kicker>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <span aria-hidden style={{ width: 7, height: 7, borderRadius: 999, background: LIVE_INK }} />
+                <span style={{ color: LIVE_INK, fontSize: 10, fontWeight: 700, letterSpacing: '0.16em' }}>LIVE</span>
+              </span>
               <Title>{t.name}</Title>
+              <Meta>{[t.venue_course_name || t.venue_name, state.round ? `Round ${state.round}` : null].filter(Boolean).join(' · ')}</Meta>
+              <span aria-hidden style={{ display: 'block', marginTop: 16, paddingTop: 12, borderTop: `1px solid ${WHITE_ALPHA_10}` }} />
               {state.players.map((p, i) => (
                 <LiveRow key={`${p.name}-${i}`} p={p} i={i} />
               ))}
@@ -208,15 +209,28 @@ export function TourHero() {
           {state.kind === 'finished' && (
             <>
               <Kicker>Champion</Kicker>
-              <span style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 6 }}>
-                <Title>{champion?.name ?? t.name}</Title>
+              <Title>{t.name}</Title>
+              {venueLine(state.tournament) && <Meta>{venueLine(state.tournament)}</Meta>}
+              <span style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16 }}>
+                {champion && (
+                  <SquircleAvatar
+                    size={38}
+                    srcCandidates={resolvePlayerAvatarCandidates({ name: champion.name, photoUrl: champion.photoUrl, tourSlug: t.season?.tour_name })}
+                    alt={champion.name}
+                    userId={champion.id ?? champion.name}
+                    hairlineRing
+                    className="tour-hero-round-avatar"
+                  />
+                )}
+                <span style={{ flex: 1, minWidth: 0, fontSize: 16, fontWeight: 600, color: INK }}>{champion?.name ?? 'Champion'}</span>
                 {championPar && (
                   <span
                     className="tabular-nums"
                     style={{
                       marginLeft: 'auto',
                       fontSize: 20,
-                      fontWeight: 800,
+                      fontSize: 22,
+                      fontWeight: 700,
                       color: championPar.tone,
                       textShadow: SHADOW,
                     }}
@@ -225,18 +239,27 @@ export function TourHero() {
                   </span>
                 )}
               </span>
-              <Meta>{t.name}</Meta>
-              {venueLine(state.tournament) && <Meta>{venueLine(state.tournament)}</Meta>}
             </>
           )}
 
           {/* ---------------- NOTHING LIVE ---------------- */}
           {state.kind === 'upcoming' && (
             <>
-              <Kicker>{['Next', dateLine(t.start_date)].filter(Boolean).join(' · ')}</Kicker>
+              <Kicker>Next up</Kicker>
               <Title>{t.name}</Title>
-              {venueLine(state.tournament) && <Meta>{venueLine(state.tournament)}</Meta>}
-              {state.defendingChampion && <Meta>Defending: {state.defendingChampion}</Meta>}
+              <Meta>{[t.venue_course_name || t.venue_name, dateLine(t.start_date)].filter(Boolean).join(' · ')}</Meta>
+              <span style={{ display: 'flex', gap: 26, marginTop: 16 }}>
+                <span>
+                  <Kicker>Defends</Kicker>
+                  <span style={{ display: 'block', marginTop: 5, color: INK, fontSize: 14, fontWeight: 600 }}>{state.defendingChampion ?? '—'}</span>
+                </span>
+                <span>
+                  <Kicker>Starts</Kicker>
+                  <span className="tabular-nums" style={{ display: 'block', marginTop: 5, color: INK, fontSize: 14, fontWeight: 600 }}>
+                    {startIn == null ? '—' : startIn === 0 ? 'Today' : `In ${startIn} day${startIn === 1 ? '' : 's'}`}
+                  </span>
+                </span>
+              </span>
             </>
           )}
         </button>
