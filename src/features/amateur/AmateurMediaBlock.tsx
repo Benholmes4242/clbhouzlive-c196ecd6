@@ -353,7 +353,7 @@ export function AmateurMediaBlock({
             });
           }}
         />
-      </div>
-    </section>
+      </AboutSection>
+    </div>
   );
 }

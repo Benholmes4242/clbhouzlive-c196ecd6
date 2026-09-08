@@ -377,8 +377,9 @@ export function BoardRowView({
         <span
           style={{
             display: 'block',
-            fontSize: 13.5,
-            fontWeight: 700,
+            /* §7 ROW NAME — 14 / 600. */
+            fontSize: 14,
+            fontWeight: 600,
             color: ink,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -393,9 +394,10 @@ export function BoardRowView({
           style={{
             display: 'block',
             marginTop: 1,
-            fontSize: 11.5,
+            /* §7 ROW SUB-LINE — 11 DIM. */
+            fontSize: 11,
             fontWeight: 600,
-            color: A.MUTE,
+            color: A.DIM,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -417,6 +419,7 @@ export function BoardRowView({
             textAlign: 'center',
             fontSize: 12.5,
             fontWeight: 700,
+            letterSpacing: '-0.04em',
             color: second.tone,
           }}
         >
@@ -432,8 +435,10 @@ export function BoardRowView({
             textAlign: 'center',
             /* B4.2 — WORDS at 12.5, FIGURES at 15. VALUE_W stays 58 either way
                (B4.5) so the right edge aligns across boards. */
-            fontSize: valueIsText ? 12.5 : 15,
+            /* §7 ROW FIGURE — 16 tabular, -0.04em. Words stay at 12.5. */
+            fontSize: valueIsText ? 12.5 : 16,
             fontWeight: 700,
+            letterSpacing: valueIsText ? undefined : '-0.04em',
             /* S1.3 — THE RANKED FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER:
                under par red, over par ink, level muted, on the member's own row
                as on any other. Amber marks the position and the name only. */
