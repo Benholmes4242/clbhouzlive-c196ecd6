@@ -179,22 +179,18 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           onSeeAll={() => onTabChange?.('legends')}
         />
 
-      {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
-      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
-
-
-        <CommunityScoreCard
+        {/* §3.6 — WHAT PEOPLE SAY, flat. The score and the viewer's own score
+            only; the five-bar histogram and the four category scores render on
+            the Reviews tab instead (nothing deleted). */}
+        <WhatPeopleSay
           courseId={course.id}
           courseName={course.name}
-          ratingAggregates={ratingAggregates}
-          isLoading={ratingAggregatesLoading}
-          userRating={userRating}
-          distribution={distribution}
-          friendsAvg={friendsAvg}
           onRateClick={handleRateClick}
           onSeeAllReviews={() => onTabChange?.('reviews')}
         />
 
+      {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
+      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </div>
 
