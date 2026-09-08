@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   DEFAULT_FILTERS,
@@ -11,21 +11,26 @@ import { useBoardFacets } from '@/components/explore-tab-new/courseled/hooks/use
 import { useBoardPage } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
+import { useCircleSize } from './useCircleSize';
+
 /**
- * THE AMATEUR PAGE'S ONE FILTER (BRIEF_AMATEUR_PAGE).
+ * THE EXPLORE LEADERBOARD'S STATE (BRIEF_EXPLORE_LEADERBOARD_STATES).
  *
- * ONE QUESTION GOVERNS TWO BLOCKS. The leaderboard and the courses block read
- * the SAME BoardFilters object; each keeps its own board axis. State lives at
- * the page so neither block can hold a filter the other does not, and so the
- * rail has one owner.
+ * §1 THE ENTRY STATE IS FIXED: MOST RECENT / YOUR CIRCLE / 14 DAYS / ALL
+ * COURSES, every entry. No rotation, no handicap default, no remembered
+ * selection. This state is page-local, so leaving and returning resets it.
  *
- * THE ENTRY STATE IS FIXED (BRIEF_EXPLORE_FIXED_ENTRY_STATE §1). Every entry
- * opens on MOST RECENT / YOUR CIRCLE / 14 DAYS / ALL COURSES. No rotation, no
- * handicap default, no remembered selection, and NO STEP-DOWN when the result is
- * thin: the page never widens the filter on the member's behalf. A thin result
- * stays thin and the leaderboard block says so. The member changes board and
- * filter freely; leaving and returning resets to the entry state, because this
- * state is page-local and the page unmounts on leaving.
+ * §2 THERE IS ALWAYS A LIST OF SCORES, and any pool wider than the member's
+ * circle is DECLARED — the chips, the count line and a stated sentence all move
+ * together. That is the whole difference from the step-down ladder this
+ * replaces: the widening is announced, never silent, and the two pools are
+ * never mixed in one ranked list.
+ *
+ * TWO WIDENINGS, BOTH DECLARED:
+ *   D  the member follows NOBODY   -> the entry filter IS Everyone. Nothing was
+ *      widened, because there was never a circle, so no sentence is owed.
+ *   C  the member HAS a circle but it is silent for the window -> the list
+ *      becomes Everyone and the block says why (`widened`).
  *
  * NOTHING NEW REACHES THE DATABASE — get_board_page / get_board_facets /
  * get_board_courses are untouched.
@@ -47,6 +52,16 @@ export function useAmateurBoardState(userId: string | undefined) {
   const [board, setBoard] = useState<BoardKey>(ENTRY_BOARD);
   const [courseBoard, setCourseBoard] = useState<CourseBoardKey>('played');
   const [panelOpen, setPanelOpen] = useState(false);
+  /* Set only when THIS hook widened the pool for the member (state C), so the
+     block knows it owes a sentence. Any hand on the filter clears it. */
+  const [widened, setWidened] = useState(false);
+  const touched = useRef(false);
+
+  /* HAS THIS MEMBER A CIRCLE AT ALL? The answer separates state D from state C
+     and it decides the entry filter, so it is asked for on mount, not on
+     failure. `null` while unknown: we never guess. */
+  const circle = useCircleSize(userId, !!userId);
+  const hasCircle = circle.data == null ? null : circle.data > 0;
 
   const facets = useBoardFacets(userId, board, filters, { enabled: true });
   /* ONE READ, TWO READERS. The leaderboard block renders these rows and the
@@ -54,7 +69,29 @@ export function useAmateurBoardState(userId: string | undefined) {
      so the count in the panel can never disagree with the rows on the page. */
   const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: true });
 
+  /* D — NO CIRCLE, NO CIRCLE FILTER. The entry state resolves to Everyone
+     before any board read lands on an empty circle, so a member who follows
+     nobody never sees a board flicker through empty. */
+  useEffect(() => {
+    if (touched.current || hasCircle !== false) return;
+    setFilters((prev) => (prev.scope === 'everyone' ? prev : normalizeFilters({ ...prev, scope: 'everyone' })));
+  }, [hasCircle]);
+
+  /* C — A CIRCLE THAT SAID NOTHING THIS FORTNIGHT. The list becomes Everyone
+     and `widened` makes the page say so. Once, and only while the member has
+     not touched the filter themselves. */
+  useEffect(() => {
+    if (touched.current || hasCircle !== true) return;
+    if (filters.scope !== 'circle' || !page.isSuccess) return;
+    if ((page.data?.total ?? 0) > 0) return;
+    analyticsEvents.track('amateur_board_widened_to_everyone', { board });
+    setWidened(true);
+    setFilters((prev) => normalizeFilters({ ...prev, scope: 'everyone' }));
+  }, [hasCircle, filters.scope, page.isSuccess, page.data?.total, board]);
+
   const changeFilters = useCallback((next: BoardFilters) => {
+    touched.current = true;
+    setWidened(false);
     analyticsEvents.track('amateur_filter_changed', {
       scope: next.scope,
       window: next.window,
@@ -77,14 +114,17 @@ export function useAmateurBoardState(userId: string | undefined) {
   }, []);
 
   const resetFilters = useCallback(() => {
+    touched.current = true;
+    setWidened(false);
     analyticsEvents.track('amateur_filter_reset', {});
     setFilters({ ...ENTRY_FILTERS });
   }, []);
 
-  /* §2 — THE MEMBER WIDENS THE POOL, NEVER THE PAGE. This is the one path from
-     a thin or empty circle to Everyone, and because it writes the same filter
-     object the rail reads, the chips move with it. */
+  /* §3 B — THE MEMBER WIDENS A THIN CIRCLE THEMSELVES. It writes the same
+     filter object the rail reads, so the chips and the count move with it. */
   const seeEveryone = useCallback(() => {
+    touched.current = true;
+    setWidened(false);
     analyticsEvents.track('amateur_see_everyone_tapped', {});
     setFilters((prev) => normalizeFilters({ ...prev, scope: 'everyone' }));
   }, []);
@@ -98,6 +138,10 @@ export function useAmateurBoardState(userId: string | undefined) {
       facets,
       page,
       total: page.data?.total ?? 0,
+      /** null while the head-count is in flight; the block waits rather than guess. */
+      hasCircle,
+      /** True only for state C: the page widened the pool and owes a sentence. */
+      widened,
       panelOpen,
       openPanel: () => {
         analyticsEvents.track('amateur_filter_opened', { board });
@@ -110,7 +154,7 @@ export function useAmateurBoardState(userId: string | undefined) {
       resetFilters,
       seeEveryone,
     }),
-    [board, filters, courseBoard, facets, page, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, seeEveryone],
+    [board, filters, courseBoard, facets, page, hasCircle, widened, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, seeEveryone],
   );
 }
 
