@@ -183,6 +183,21 @@ interface Props {
    */
   fillOverColor?: string;
   fillUnderColor?: string;
+  /**
+   * THE LEVEL-PAR RULE'S COLOUR (BRIEF_EXPLORE_HERO_MESSAGING §3a). Absent = the
+   * surface token, so every existing caller is byte-identical. The Explore hero
+   * draws over a PHOTOGRAPH, where the dark surface's 18% rule reads as a scratch
+   * on the picture; it passes 14% white.
+   */
+  baselineColor?: string;
+  /**
+   * THE HOLE NUMBER UNDER THE BEAD (§3b). Absent = FALSE and no caller moves. The
+   * hero opts in so the gold mark has a key: the kicker names the feat, the label
+   * names the hole, and the two agree. Never rendered without a bead — the label
+   * is drawn from the bead list itself, so "a dot with no number" and "a number
+   * with no dot" are both unreachable.
+   */
+  beadHoleLabels?: boolean;
 }
 
 
@@ -209,6 +224,8 @@ export const TrajectoryLine: React.FC<Props> = ({
   yDomain,
   fillOverColor,
   fillUnderColor,
+  baselineColor,
+  beadHoleLabels = false,
 }) => {
 
   const T = SURFACE_TOKENS[surface];
@@ -430,7 +447,7 @@ export const TrajectoryLine: React.FC<Props> = ({
         x2={w - padX}
         y1={zeroY}
         y2={zeroY}
-        stroke={T.baseline}
+        stroke={baselineColor ?? T.baseline}
         strokeWidth={1}
         strokeDasharray="3 4"
       />
@@ -467,6 +484,27 @@ export const TrajectoryLine: React.FC<Props> = ({
           strokeWidth={1.5}
         />
       ))}
+
+      {/* §3b THE HOLE NUMBER UNDER THE BEAD. Opt-in, and drawn off the SAME bead
+          list, so there is never a label without a mark. The number is the hole's
+          own number (holes[pos - 1].holeNo), not its plot position. */}
+      {beadHoleLabels &&
+        beads.map((b) => {
+          const holeNo = holes[b.pos - 1]?.holeNo;
+          if (holeNo == null) return null;
+          return (
+            <text
+              key={`bl-${b.pos}`}
+              x={x(b.pos)}
+              y={Math.min(height - 1, y(b.cum) + b.r + 8)}
+              textAnchor="middle"
+              fill={T.tickDim}
+              style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.02em' }}
+            >
+              {holeNo}
+            </text>
+          );
+        })}
 
       {/* THE SCRUB MARKER — rule plus a point on the curve, gone on release. */}
       {hover != null && (
