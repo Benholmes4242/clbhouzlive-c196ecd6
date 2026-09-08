@@ -67,10 +67,24 @@ export interface TourBoardRow {
   live: boolean;
 }
 
+/**
+ * WHAT THE PICKER MUST READ WHILE THIS BOARD IS ACTIVE.
+ *
+ * `null` means the picker is the member's own and governs as normal (live
+ * Leaderboard, Our Picks). A TourId means the board is fixed to that tour by
+ * definition and the picker is locked to it. 'colleges' means the board is not
+ * a tour at all — the picker reads "Colleges" and is locked.
+ */
+export type TourPickerLock = TourId | 'colleges' | null;
+
 export interface TourBoardState {
   board: TourBoardKey;
   chips: TourBoardKey[];
   changeBoard: (next: TourBoardKey) => void;
+  /** Locked picker value for the active board, or null when the member's own applies. */
+  pickerLock: TourPickerLock;
+  /** The basis the count line states — "PGA Tour season", "College golf". */
+  basis: string | null;
   /** The live tournament governing the Leaderboard chip, when there is one. */
   liveTournament: CachedTournament | null;
   rows: TourBoardRow[];
