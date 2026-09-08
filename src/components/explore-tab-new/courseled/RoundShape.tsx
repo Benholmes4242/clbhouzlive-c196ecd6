@@ -97,6 +97,11 @@ export function RoundShape({
   /** Curve stroke. 1.8 by default; the rail tile passes 1.6 — it draws the curve
    *  alone, with no hole grid beneath it. */
   strokeWidth?: number;
+  /** §3a The level-par rule's colour, passed straight through to TrajectoryLine.
+   *  Absent = that component's surface token, so no existing caller moves. */
+  baselineColor?: string;
+  /** §3b The hole number beneath each bead. Hero only; default FALSE. */
+  beadHoleLabels?: boolean;
 }) {
 
   const front = row.front_nine_to_par;
