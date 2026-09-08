@@ -78,7 +78,8 @@ export default function TourPage() {
         {/* COMING UP HAS NO TOUR DIMENSION, so the picker does not govern it: a
             member reading one tour still wants next week's whole calendar. */}
         <TourComingUpBlock />
-        {/* The wire lands beneath. */}
+        {/* NEITHER DOES THE WIRE, for the same reason. */}
+        <TourNewsBlock />
       </main>
     </div>
   );
