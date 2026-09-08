@@ -605,6 +605,7 @@ function AppRoutes() {
 
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
+        <Route path="/courses/:courseId/holes" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseHolesPage /></Suspense>} />
 
         <Route path="/courses/:courseId/rate" element={<ReviewComposerRoute />} />
         <Route path="/rate-course-v2/:courseId" element={<ReviewComposerRoute />} />
