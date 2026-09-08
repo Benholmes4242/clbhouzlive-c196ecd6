@@ -843,11 +843,10 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         style={{
           top: 'calc(var(--sat, 0px))',
           zIndex: 20,
-          // The bar now uses the canonical dark glass token. The light
-          // translucent equivalent existed only while Courses was a light page.
-          background: 'var(--glass-bg)',
-          backdropFilter: 'blur(var(--glass-blur))',
-          WebkitBackdropFilter: 'blur(var(--glass-blur))',
+          // The bar sits on the same page canvas as the hero and the post
+          // wizard step 1 surface. No glass treatment — a solid band reads as
+          // part of the page, not a floating darker banner.
+          background: SLATE_50,
         }}
       >
         {condensed ? (
