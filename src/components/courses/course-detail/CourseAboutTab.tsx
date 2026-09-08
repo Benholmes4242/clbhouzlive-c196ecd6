@@ -192,11 +192,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           footer={course.id ? <CourseTop100RankRow courseId={course.id} /> : null}
         />
 
-        {/* ══ BLOCK 2 — HOW IT PLAYS / HOLE BY HOLE (analytical panels) ══ */}
-        <CourseAnalyticsPanels courseId={course.id} courseName={course.name} explainEmpty />
-
-        {/* §4 — after the hole-by-hole content, before the reviews prompt. */}
-        <CourseSiLadder courseId={course.id} />
+        {/* §3.4 — HOW IT PLAYS, flat. The chart, four figures and the course-wide
+            distribution stay here; hole by hole, how each par plays and the SI
+            ladder move behind the one drill-down (§3.10, /courses/:id/holes).
+            Nothing is deleted — those components render on that page instead. */}
+        <HowItPlays courseId={course.id} courseName={course.name} />
 
       {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
       <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
