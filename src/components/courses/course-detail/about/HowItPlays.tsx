@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
+import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -33,7 +33,7 @@ const CHART_HEIGHT = 82;
 
 /** Eighteen independent field comparisons. This intentionally does not reuse ShapeChart. */
 const LocalHoleChart: React.FC<{
-  holes: ReturnType<typeof useCourseHoleAnalysis>['data'] extends infer _T ? Array<{ hole_no: number; avg_to_par: number }> : never;
+  holes: CourseHole[];
   myByHole: Map<number, MyHolePerformanceRow>;
   hasYou: boolean;
 }> = ({ holes, myByHole, hasYou }) => {
@@ -70,8 +70,11 @@ const LocalHoleChart: React.FC<{
                 width: '100%',
                 height: barHeight,
                 borderRadius: BAR_RADIUS,
-                background: overPar ? A.RED : A.MUTE,
-                opacity: overPar && !strong ? 0.55 : 1,
+                background: overPar && !strong
+                  ? `color-mix(in srgb, ${A.RED} 55%, transparent)`
+                  : overPar
+                    ? A.RED
+                    : A.MUTE,
                 overflow: 'hidden',
               }}
             >
@@ -85,7 +88,6 @@ const LocalHoleChart: React.FC<{
                     height: 2,
                     borderRadius: BAR_RADIUS,
                     background: A.AMBER,
-                    opacity: overPar && !strong ? 1 / 0.55 : 1,
                   }}
                 />
               ) : null}
