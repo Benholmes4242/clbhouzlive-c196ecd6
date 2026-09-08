@@ -24,9 +24,8 @@ import { useNavigate } from 'react-router-dom';
 
 import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 import { RailChips } from '@/components/ui/RailChips';
-import { DISCOVER_FACT, DISCOVER_QUIET, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { HAIRLINE_INK_7, INK, INK_MUTE, LIVE_INK } from '@/features/tourhub/_shared/tokens';
@@ -59,8 +58,8 @@ function SchoolMark({ src, name }: { src: string | null; name: string }) {
   return (
     <div
       style={{
-        width: 34,
-        height: 34,
+        width: 36,
+        height: 36,
         flexShrink: 0,
         borderRadius: 6,
         overflow: 'hidden',
@@ -107,12 +106,11 @@ export function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => v
     >
       <span
         style={{
-          width: 26,
-          flex: '0 0 26px',
-          textAlign: 'right',
-          fontSize: 15,
-          fontWeight: 200,
-          color: INK,
+          width: 22,
+          flex: '0 0 22px',
+          fontSize: 12,
+          fontWeight: 700,
+          color: INK_MUTE,
         }}
       >
         {row.pos}
@@ -122,7 +120,7 @@ export function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => v
         <SchoolMark src={row.photoUrl} name={row.name} />
       ) : (
         <SquircleAvatar
-          size={34}
+          size={36}
           srcCandidates={resolvePlayerAvatarCandidates({
             name: row.name,
             photoUrl: row.photoUrl,
@@ -131,39 +129,38 @@ export function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => v
           alt={row.name}
           userId={row.id}
           hairlineRing
+          className="[&>div]:!rounded-full"
         />
       )}
 
-      <span style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span
-          style={{
-            fontSize: 13.5,
-            fontWeight: 700,
-            color: INK,
-            letterSpacing: '-0.01em',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {row.name}
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: INK,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {row.name}
+          </span>
+          {row.country && <CountryFlag country={row.country} size="sm" />}
         </span>
-        {row.country && <CountryFlag country={row.country} size="sm" />}
+        <span style={{ display: 'block', marginTop: 2, color: INK_MUTE, opacity: 0.62, fontSize: 11, lineHeight: 1.2 }}>
+          {row.subline}
+        </span>
       </span>
-
-      {row.thru != null && (
-        <span style={{ ...KICKER, color: row.thru >= 18 ? INK_MUTE : LIVE_INK }}>
-          {row.thru >= 18 ? 'F' : `THRU ${row.thru}`}
-        </span>
-      )}
 
       <span
         style={{
           width: 62,
           flex: '0 0 62px',
           textAlign: 'right',
-          fontSize: 14,
-          fontWeight: 200,
+          fontSize: score ? 16 : 15,
+          fontWeight: 700,
           color: score ? score.tone : INK,
         }}
       >
@@ -176,15 +173,13 @@ export function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => v
 export function TourLeaderboardBlock({ state }: { state: TourBoardState }) {
   const navigate = useNavigate();
 
-  const { board, chips, rows, total, figureLabel, liveTournament, basis } = state;
+  const { board, chips, rows, total, liveTournament } = state;
   const visible = rows.slice(0, VISIBLE_POSITIONS);
 
   const title = board === 'live' ? liveTournament?.name ?? BOARD_LABEL.live : BOARD_LABEL[board];
   const subject = board === 'colleges' ? 'schools' : 'players';
   const countLine = total > 0
-    ? basis
-      ? `${total} ${subject} \u00b7 ${basis}`
-      : `${total} ${subject}`
+    ? `${total} ${subject}${board === 'live' && liveTournament?.current_round ? ` · round ${liveTournament.current_round}` : board === 'live' ? '' : ' · season'}`.toUpperCase()
     : null;
 
   /* NO BOARD, NO SECTION. Champions out of tournament has nothing to rank, and
@@ -199,7 +194,16 @@ export function TourLeaderboardBlock({ state }: { state: TourBoardState }) {
 
   return (
     <section style={{ paddingTop: 18, fontFamily: SANS, ...FIGS }}>
-      <DiscoverSectionHeading title={title} right={countLine ?? undefined} />
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, paddingBottom: 12 }}>
+        <h2 style={{ margin: 0, color: INK, fontSize: 20, lineHeight: 1.15, fontWeight: 700, letterSpacing: '-0.034em' }}>
+          {title}
+        </h2>
+        {countLine && (
+          <span style={{ ...KICKER, flexShrink: 0, color: INK_MUTE }}>
+            {countLine}
+          </span>
+        )}
+      </div>
 
       <RailChips
         options={chips.map((key) => ({ id: key, label: BOARD_LABEL[key] }))}
@@ -209,22 +213,8 @@ export function TourLeaderboardBlock({ state }: { state: TourBoardState }) {
           state.changeBoard(next as typeof board);
         }}
         ariaLabel="Board"
-        style={{ margin: '0 -14px 12px', padding: '0 14px' }}
+        style={{ margin: '0 -20px 14px', padding: '0 20px' }}
       />
-
-      {figureLabel && rows.length > 0 && (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            ...KICKER,
-            color: DISCOVER_QUIET,
-            paddingBottom: 6,
-          }}
-        >
-          {figureLabel}
-        </div>
-      )}
 
       {state.isPending ? (
         /* A HELD HEIGHT, not a spinner: the blocks below must not jump. */
@@ -249,20 +239,25 @@ export function TourLeaderboardBlock({ state }: { state: TourBoardState }) {
                 navigate(`/tourhub/rankings?board=${board}`);
               }}
               style={{
-                ...KICKER,
-                display: 'block',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
                 width: '100%',
-                marginTop: 12,
+                marginTop: 14,
                 padding: 0,
                 border: 'none',
                 background: 'transparent',
-                color: INK,
+                color: INK_MUTE,
                 fontFamily: SANS,
                 textAlign: 'left',
                 cursor: 'pointer',
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: '0.11em',
               }}
             >
-              See all {total}
+              <span>{board === 'live' ? 'FULL LEADERBOARD' : board === 'colleges' ? `ALL ${total} SCHOOLS` : 'FULL RANKINGS'}</span>
+              <span style={{ color: INK_MUTE, opacity: 0.62 }}>›</span>
             </button>
           )}
         </>

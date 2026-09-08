@@ -39,6 +39,7 @@ export interface RankedRow {
   stat: number | null;
   wins: number | null;
   top10s: number | null;
+  eventsPlayed: number | null;
 }
 
 
@@ -117,13 +118,14 @@ interface TourSeasonRankingRow {
   position: number | null;
   points: number | string | null;
   wins: number | null;
+  tournaments_played: number | null;
   country: string | null;
   tour_code: string | null;
 }
 
 const PLAYER_SELECT = 'id, full_name, country, country_code, photo_url, tour_codes';
 const SEASON_RANKING_SELECT =
-  'player_id, manual_player_id, player_name, position, points, wins, country, tour_code';
+  'player_id, manual_player_id, player_name, position, points, wins, tournaments_played, country, tour_code';
 
 export function usePlayersRanking(tour: PlayersTourId) {
   const { t, i18n } = useTranslation('tourhub');
@@ -186,6 +188,7 @@ export function usePlayersRanking(tour: PlayersTourId) {
             stat: s.fedex_points != null ? Number(s.fedex_points) : null,
             wins: s.wins ?? null,
             top10s: s.top_10s ?? null,
+            eventsPlayed: s.events_played ?? null,
           };
         });
 
@@ -259,6 +262,7 @@ export function usePlayersRanking(tour: PlayersTourId) {
           stat: r.points != null ? Number(r.points) : null,
           wins: r.wins ?? null,
           top10s: null,
+          eventsPlayed: r.tournaments_played ?? null,
         };
 
       });

@@ -18,26 +18,23 @@
 import { useEffect, useState } from 'react';
 
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
-import { RailChips } from '@/components/ui/RailChips';
+import { TourFilterControl } from '@/features/tour/TourFilterControl';
 import { TourHero } from '@/features/tour/TourHero';
-import { TourHeader } from '@/features/tour/TourHeader';
 import { TourLeaderboardBlock } from '@/features/tour/TourLeaderboardBlock';
 import { TourPicksBlock } from '@/features/tour/TourPicksBlock';
 import { TourComingUpBlock } from '@/features/tour/TourComingUpBlock';
 import { TourNewsBlock } from '@/features/tour/TourNewsBlock';
 import { useTourBoardState } from '@/features/tour/useTourBoardState';
-import { TOUR_CONFIG, type TourId } from '@/features/tourhub/hooks/useOverviewData';
+import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 import { FONT } from '@/features/tourhub/_shared/tokens';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-const CANVAS = '#0D0F14';
-
-/** The picker names the tour the whole page is reading. */
-const PICKER_TOURS: TourId[] = ['pga', 'euro', 'lpga', 'liv', 'pgad', 'champ'];
+const CANVAS = '#15171F';
 
 export default function TourPage() {
-  const [tour, setTour] = useState<TourId>('pga');
+  const [tour, setTour] = useState<TourId | null>(null);
+  const effectiveTour = tour ?? 'pga';
   const board = useTourBoardState(tour, setTour);
 
   useEffect(() => {
@@ -46,36 +43,21 @@ export default function TourPage() {
 
   return (
     <div style={{ background: CANVAS, minHeight: '100dvh', fontFamily: FONT, ...FIGS }}>
-      <TourHeader />
       <TourHero />
 
-      <main style={{ padding: `14px 14px ${NAV_CLEARANCE}` }}>
-        {/* THE PICKER IS THE PAGE'S SUBJECT. The page reads ONE TOUR AT A TIME:
-            the picker names it and every block with a tour dimension follows.
-            Tapping a tour moves the board to that tour's season race and sets Our
-            Picks; tapping a race chip sets the picker. Two views of one state,
-            which cannot disagree, so nothing is locked.
-            THE ONE EXCEPTION IS COLLEGES — not a tour, so while it is the active
-            board the picker is dimmed and reads "Colleges". Selecting any tour
-            from there returns to that tour's season race. */}
-        <RailChips
-          options={
-            board.pickerLock === 'colleges'
-              ? [{ id: 'colleges', label: 'Colleges' }, ...PICKER_TOURS.map((id) => ({ id, label: TOUR_CONFIG[id].name }))]
-              : PICKER_TOURS.map((id) => ({ id, label: TOUR_CONFIG[id].name }))
-          }
-          value={board.pickerLock ?? tour}
-          locked={board.pickerLock != null}
+      <main style={{ padding: `0 20px ${NAV_CLEARANCE}` }}>
+        {/* The picker governs the live leaderboard and Our Picks. Named season
+            races remain fixed to their own tours; Colleges remains its own board. */}
+        <TourFilterControl
+          value={tour}
           onChange={(next) => {
-            analyticsEvents.track('tour_picker_changed', { tour: next });
-            setTour(next as TourId);
+            analyticsEvents.track('tour_picker_changed', { tour: next ?? 'all' });
+            setTour(next);
           }}
-          ariaLabel="Tour"
-          style={{ margin: '0 -14px', padding: '0 14px' }}
         />
 
         <TourLeaderboardBlock state={board} />
-        <TourPicksBlock tour={tour} />
+        <TourPicksBlock tour={effectiveTour} />
         {/* COMING UP HAS NO TOUR DIMENSION, so the picker does not govern it: a
             member reading one tour still wants next week's whole calendar. */}
         <TourComingUpBlock />

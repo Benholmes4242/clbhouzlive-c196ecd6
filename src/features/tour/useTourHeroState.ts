@@ -27,7 +27,9 @@ export const JUST_FINISHED_DAYS = 3;
 export type TourHeroKind = 'live' | 'finished' | 'upcoming' | 'empty';
 
 export interface HeroPlayer {
+  id: string | null;
   name: string;
+  photoUrl: string | null;
   toPar: number | null;
   position: number | null;
 }
@@ -135,7 +137,7 @@ export function useTourHeroState(): TourHeroState {
       const { data, error } = await supabase
         .from('sr_leaderboards')
         .select(
-          'position, score, thru, player:sr_players!sr_leaderboards_player_id_fkey(full_name, first_name, last_name)',
+          'player_id, position, score, thru, player:sr_players!sr_leaderboards_player_id_fkey(full_name, first_name, last_name, photo_url)',
         )
         .eq('tournament_id', subject!.id)
         .not('position', 'is', null)
@@ -147,10 +149,12 @@ export function useTourHeroState(): TourHeroState {
       const rows = (data ?? []) as any[];
       const players: HeroPlayer[] = rows
         .map((r) => ({
+          id: r.player_id ?? null,
           name:
             r.player?.full_name ||
             [r.player?.first_name, r.player?.last_name].filter(Boolean).join(' ') ||
             '',
+          photoUrl: r.player?.photo_url ?? null,
           toPar: r.score ?? null,
           position: r.position ?? null,
         }))

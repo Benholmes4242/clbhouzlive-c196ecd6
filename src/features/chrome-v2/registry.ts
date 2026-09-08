@@ -278,7 +278,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // Overview tab keeps fixed islands over the cinematic hero; every other tab
   // gets scrollAway islands (chips lock at the notch on scroll).
   { match: { exact: '/tourhub' },                 spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.' } },
-  { match: { exact: '/tour' },                    spec: { chrome: 'none', tone: 'dark', bleed: true, note: 'BRIEF_TOUR_FIXED_HEADER S3: TourPageShell owns a fixed 42px header and suppresses the island. bleed:true keeps --header-h at 0 because that header is in normal flow.' } },
+  { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, note: 'Tour landing — shared fixed islands over the 340px hero; chrome owns the safe area.' } },
   // Wire index + stories are non-bleeding solid-bar pages. Their page-provided
   // slots add the fixed section label and deliberately suppress the tour picker.
   {
