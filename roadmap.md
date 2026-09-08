@@ -66,5 +66,5 @@
 - Do not repoint chunkLoaders / AppPrefetchProvider before the nav switch.
 
 ## Explore hero full-width round shape (8 Sep 2026)
-- [ ] Align the round shape and level-par rule to the hero content edges without moving surrounding content.
-- [ ] Verify the rendered shape spans the same left/right column as avatar/course and score.
+- [x] Align the round shape and level-par rule to the hero content edges without moving surrounding content.
+- [x] Verify the shape uses the measured full-width hero content column; signed-in data was unavailable for a populated screenshot.
