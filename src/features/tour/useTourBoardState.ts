@@ -31,13 +31,27 @@ import {
 } from '@/features/tourhub/players-v2/data/usePlayersRanking';
 import { TOUR_CONFIG, type TourId } from '@/features/tourhub/hooks/useOverviewData';
 
-export type TourBoardKey = 'live' | 'fedex' | 'rtd' | 'oom' | 'colleges';
+export type TourBoardKey = 'live' | 'fedex' | 'rtd' | 'oom' | 'cme' | 'livpts' | 'colleges';
 
-/** Which tour each points board reads. Fixed by definition, not by the picker. */
-const POINTS_TOUR: Partial<Record<TourBoardKey, PlayersTourId>> = {
+/**
+ * THE SEASON RACE OF EACH TOUR. This is the pair that makes the picker and the
+ * chip row TWO VIEWS OF ONE STATE: a race chip names its tour, and a tour names
+ * its race. They cannot disagree, so nothing has to be locked.
+ */
+const RACE_TOUR: Partial<Record<TourBoardKey, PlayersTourId>> = {
   fedex: 'pga',
   rtd: 'euro',
   oom: 'pgad',
+  cme: 'lpga',
+  livpts: 'liv',
+};
+
+const TOUR_RACE: Partial<Record<TourId, TourBoardKey>> = {
+  pga: 'fedex',
+  euro: 'rtd',
+  pgad: 'oom',
+  lpga: 'cme',
+  liv: 'livpts',
 };
 
 export const BOARD_LABEL: Record<TourBoardKey, string> = {
@@ -45,6 +59,8 @@ export const BOARD_LABEL: Record<TourBoardKey, string> = {
   fedex: 'FedEx Cup',
   rtd: 'Race to Dubai',
   oom: 'Order of Merit',
+  cme: 'Race to CME Globe',
+  livpts: 'LIV Standings',
   colleges: 'Colleges',
 };
 
@@ -68,14 +84,14 @@ export interface TourBoardRow {
 }
 
 /**
- * WHAT THE PICKER MUST READ WHILE THIS BOARD IS ACTIVE.
+ * THE ONE EXCEPTION, AND THE ONLY ONE.
  *
- * `null` means the picker is the member's own and governs as normal (live
- * Leaderboard, Our Picks). A TourId means the board is fixed to that tour by
- * definition and the picker is locked to it. 'colleges' means the board is not
- * a tour at all — the picker reads "Colleges" and is locked.
+ * Colleges is not a tour, so it cannot follow the picker. While Colleges is the
+ * active board the picker is dimmed and reads "Colleges"; selecting any tour
+ * from there returns to that tour's season race. Every other board follows the
+ * picker, and the picker follows every other board, so nothing else is locked.
  */
-export type TourPickerLock = TourId | 'colleges' | null;
+export type TourPickerLock = 'colleges' | null;
 
 export interface TourBoardState {
   board: TourBoardKey;
@@ -107,7 +123,10 @@ function fmtEarnings(n: number): string {
   return `$${Math.round(n)}`;
 }
 
-export function useTourBoardState(tour: TourId, initialBoard: TourBoardKey = 'live'): TourBoardState {
+export function useTourBoardState(
+  tour: TourId,
+  onTourChange: (next: TourId) => void,
+): TourBoardState {
   const { data: cache } = useTournamentsCache();
 
   /* THE PICKER GOVERNS THIS ONE: the live event of the tour being read, biggest
@@ -120,16 +139,19 @@ export function useTourBoardState(tour: TourId, initialBoard: TourBoardKey = 'li
   }, [cache, tour]);
 
   const chips: TourBoardKey[] = liveTournament
-    ? ['live', 'fedex', 'rtd', 'oom', 'colleges']
-    : ['fedex', 'rtd', 'oom', 'colleges'];
+    ? ['live', 'fedex', 'rtd', 'oom', 'cme', 'livpts', 'colleges']
+    : ['fedex', 'rtd', 'oom', 'cme', 'livpts', 'colleges'];
 
-  const [requested, setRequested] = useState<TourBoardKey>(initialBoard);
-  /* A board that has left the row cannot stay selected — when the last
-     tournament finishes mid-session the Leaderboard chip goes and the reader
-     lands on the first board that still exists. */
-  const board = chips.includes(requested) ? requested : chips[0];
+  /* THE MEMBER'S OWN CHOICE, HELD WITH THE TOUR IT WAS MADE FOR. When the tour
+     moves, the board moves with it to that tour's season race — one subject, two
+     views. Colleges is the exception and survives a tour change only until the
+     member picks a tour, which is what returns them to a race. */
+  const [chosen, setChosen] = useState<{ board: TourBoardKey; tour: TourId } | null>(null);
+  const fallback: TourBoardKey = TOUR_RACE[tour] ?? 'live';
+  const requested = chosen && chosen.tour === tour ? chosen.board : fallback;
+  const board = chips.includes(requested) ? requested : (chips.includes(fallback) ? fallback : chips[0]);
 
-  const pointsTour = POINTS_TOUR[board];
+  const pointsTour = RACE_TOUR[board];
   const ranking = usePlayersRanking(pointsTour ?? 'pga');
   const colleges = useFranchiseStandings();
 
@@ -154,18 +176,21 @@ export function useTourBoardState(tour: TourId, initialBoard: TourBoardKey = 'li
   });
 
   return useMemo<TourBoardState>(() => {
-    const changeBoard = (next: TourBoardKey) => setRequested(next);
+    /* SELECTING A RACE CHIP MOVES THE WHOLE PAGE TO THAT TOUR. That is the same
+       act as tapping the tour in the picker, so it goes through the same state. */
+    const changeBoard = (next: TourBoardKey) => {
+      const raceTour = RACE_TOUR[next] as TourId | undefined;
+      if (raceTour && raceTour !== tour) onTourChange(raceTour);
+      setChosen({ board: next, tour: raceTour ?? tour });
+    };
 
-    /* THE PICKER MUST NEVER CONTRADICT THE LIST. A fixed-tour board locks the
-       picker to its own tour; Colleges locks it to "Colleges", which is not a
-       tour at all; the live board and Our Picks leave the member's own alone. */
-    const pickerLock: TourPickerLock =
-      board === 'colleges' ? 'colleges' : ((POINTS_TOUR[board] as TourId | undefined) ?? null);
+    const pickerLock: TourPickerLock = board === 'colleges' ? 'colleges' : null;
+    const raceTour = RACE_TOUR[board] as TourId | undefined;
     const basis =
       board === 'colleges'
         ? 'College golf'
-        : pickerLock
-          ? `${TOUR_CONFIG[pickerLock as TourId].name} season`
+        : raceTour
+          ? `${TOUR_CONFIG[raceTour].name} season`
           : board === 'live'
             ? TOUR_CONFIG[tour].name
             : null;
@@ -265,5 +290,5 @@ export function useTourBoardState(tour: TourId, initialBoard: TourBoardKey = 'li
       /* A ranking of one is a data failure, and the hook already says so. */
       unavailable: !ranking.isPending && (!result?.synced || rows.length === 0),
     };
-  }, [board, chips, colleges.data, colleges.isPending, liveBoard.data, liveBoard.isPending, liveTournament, pointsTour, ranking.data, ranking.isPending, tour]);
+  }, [board, chips, colleges.data, colleges.isPending, liveBoard.data, liveBoard.isPending, liveTournament, pointsTour, ranking.data, ranking.isPending, tour, onTourChange]);
 }
