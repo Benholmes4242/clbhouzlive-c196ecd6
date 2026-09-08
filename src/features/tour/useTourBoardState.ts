@@ -146,12 +146,11 @@ export function useTourBoardState(
      failure, not a short board. Measured 8 Sep 2026: FedEx 219, Order of Merit
      227, Race to CME Globe 190, LIV Standings 60, Colleges 141, Race to Dubai 1
      (unsynced — its chip does not render). */
-  const availability = useQuery({
+  const colleges = useFranchiseStandings();
+  const availability = useQuery<Partial<Record<TourBoardKey, number>>>({
     queryKey: ['tour-board-availability'],
     staleTime: 10 * 60_000,
     queryFn: async () => {
-      const head = (table: 'tour_season_rankings' | 'sr_player_statistics') =>
-        supabase.from(table).select('id', { count: 'exact', head: true });
       const year = new Date().getMonth() >= 9 ? new Date().getFullYear() + 1 : new Date().getFullYear();
       const codes: Array<[TourBoardKey, string]> = [
         ['rtd', 'euro'],
@@ -162,13 +161,18 @@ export function useTourBoardState(
       const counts: Partial<Record<TourBoardKey, number>> = {};
       await Promise.all(
         codes.map(async ([key, code]) => {
-          const { count } = await head('tour_season_rankings')
+          const { count } = await supabase
+            .from('tour_season_rankings')
+            .select('id', { count: 'exact', head: true })
             .eq('tour_code', code)
             .eq('season_year', year);
           counts[key] = count ?? 0;
         }),
       );
-      const { count: fedex } = await head('sr_player_statistics').not('fedex_points', 'is', null);
+      const { count: fedex } = await supabase
+        .from('sr_player_statistics')
+        .select('id', { count: 'exact', head: true })
+        .not('fedex_points', 'is', null);
       counts.fedex = fedex ?? 0;
       return counts;
     },
