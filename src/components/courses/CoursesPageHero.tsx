@@ -12,7 +12,9 @@ import { formatNumber } from '@/i18n/format';
 import { useHeroCourseFact, type HeroCourseFactRow } from '@/hooks/courses/useHeroCourseFact';
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { heroCanonBackground } from '@/features/tourhub/_shared/heroGradient';
-import { HERO_MIN_H } from '@/features/tourhub/_shared/tokens';
+import { TOUR_HERO_PHOTO_H } from '@/features/tourhub/_shared/tokens';
+import { SLATE_50 } from '@/features/courses/_shared/tokens';
+import { KICKER } from '@/lib/tokens/type';
 
 /**
  * CoursesPageHero
@@ -25,8 +27,8 @@ import { HERO_MIN_H } from '@/features/tourhub/_shared/tokens';
  * Scrim treatment: the ONE canon hero scrim (heroCanonBackground) —
  * a single layer ending on the canvas. No top scrim, no radial ambient.
  *
- * The global CompactHeader floats over this hero in transparent overlay
- * mode; this component reserves that space via env(safe-area-inset-top).
+ * The shared chrome island floats over this hero and is the ONLY safe-area
+ * owner. The image itself starts at the physical top, exactly as on Explore.
  *
  * Copy surfaces: `why_ai` (course_mood_blurbs) from get_explore_hero, and
  * a single true data line from get_hero_course_fact. The old context line
@@ -192,16 +194,15 @@ function CoursesPageHeroInner() {
       className="relative overflow-hidden"
       style={{
         width: '100%',
-        minHeight: HERO_MIN_H,
+        height: TOUR_HERO_PHOTO_H,
         background,
-        backgroundColor: '#15171F',
+        backgroundColor: SLATE_50,
         display: 'flex',
         flexDirection: 'column',
-        paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
       {/* Bottom-anchored identity + CTA — absolute so copy never expands the
-          hero past HERO_MIN_H. Matches GolfClubView's CourseTitleOverlay. */}
+          fixed 340px hero. Matches GolfClubView's CourseTitleOverlay. */}
       <div
         style={{
           position: 'absolute',
@@ -229,24 +230,6 @@ function CoursesPageHeroInner() {
           </div>
         ) : (
           <>
-            {eyebrowParts.length > 0 && (
-              <div
-                style={{
-                  /* READ floor — the hero eyebrow. 10 -> 11. */
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.62)',
-                  marginBottom: 8,
-                  fontFeatureSettings: '"tnum" 1',
-                  fontVariantNumeric: 'tabular-nums lining-nums',
-                }}
-              >
-                {eyebrowParts.join(' · ')}
-              </div>
-            )}
-
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
               {hero.list_rank != null && (
                 <span
@@ -295,6 +278,23 @@ function CoursesPageHeroInner() {
                 )}
               </div>
             </div>
+
+            {eyebrowParts.length > 0 && (
+              <div
+                style={{
+                  ...KICKER,
+                  color: 'rgba(255,255,255,0.66)',
+                  marginTop: 7,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  fontFeatureSettings: '"tnum" 1',
+                  fontVariantNumeric: 'tabular-nums lining-nums',
+                }}
+              >
+                {eyebrowParts.join(' · ')}
+              </div>
+            )}
 
             {/* Blurb: absent for most moods, so the gap closes with it. */}
             {blurb && (

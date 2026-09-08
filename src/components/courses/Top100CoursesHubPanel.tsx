@@ -12,8 +12,9 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import VirtualizedCourseList from './VirtualizedCourseList';
-import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { AMBER, HAIRLINE_INK_7, HAIRLINE_INK_10, INK, INK_MUTE, SLATE_50, SURFACE } from '@/features/courses/_shared/tokens';
+import { COURSE_BROWSE_DESCRIPTION, COURSE_BROWSE_KICKER } from './courseBrowseTypography';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { useNavigate } from 'react-router-dom';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
@@ -332,19 +333,13 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           {rateNudge}
           {/* Eyebrow sits directly above the provenance line — the h2 title
               was removed, so the kicker owns the heading role here. */}
-          <div style={{ ...KICKER, fontSize: 12, marginBottom: 5 }}>TOP 100</div>
+          <div style={{ ...COURSE_BROWSE_KICKER, marginBottom: 5 }}>TOP 100</div>
           {/* Provenance subhead — masthead-line mock */}
           <p
             style={{
-              fontSize: 11.5,
-              fontWeight: 500,
-              color: INK_MUTE,
-              lineHeight: 1.45,
-              maxWidth: 330,
+              ...COURSE_BROWSE_DESCRIPTION,
               marginTop: 0,
               marginBottom: 12,
-              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-              letterSpacing: '-0.005em',
             }}
           >
             {t('top100.provenance', { defaultValue: "The top 100 courses in the world and in every region, as ranked by golf's leading publications." })}
