@@ -29,7 +29,7 @@ import {
   usePlayersRanking,
   type PlayersTourId,
 } from '@/features/tourhub/players-v2/data/usePlayersRanking';
-import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
+import { TOUR_CONFIG, type TourId } from '@/features/tourhub/hooks/useOverviewData';
 
 export type TourBoardKey = 'live' | 'fedex' | 'rtd' | 'oom' | 'colleges';
 
@@ -160,7 +160,7 @@ export function useTourBoardState(tour: TourId): TourBoardState {
        picker to its own tour; Colleges locks it to "Colleges", which is not a
        tour at all; the live board and Our Picks leave the member's own alone. */
     const pickerLock: TourPickerLock =
-      board === 'colleges' ? 'colleges' : (POINTS_TOUR_ID[board] ?? null);
+      board === 'colleges' ? 'colleges' : ((POINTS_TOUR[board] as TourId | undefined) ?? null);
     const basis =
       board === 'colleges'
         ? 'College golf'
@@ -194,6 +194,8 @@ export function useTourBoardState(tour: TourId): TourBoardState {
         board,
         chips,
         changeBoard,
+        pickerLock,
+        basis,
         liveTournament,
         rows,
         total: rows.length,
@@ -223,6 +225,8 @@ export function useTourBoardState(tour: TourId): TourBoardState {
         board,
         chips,
         changeBoard,
+        pickerLock,
+        basis,
         liveTournament,
         rows,
         total: rows.length,
@@ -251,6 +255,8 @@ export function useTourBoardState(tour: TourId): TourBoardState {
       board,
       chips,
       changeBoard,
+      pickerLock,
+      basis,
       liveTournament,
       rows,
       total: rows.length,
