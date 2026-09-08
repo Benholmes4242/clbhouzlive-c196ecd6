@@ -3,16 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseClaim, useCourseClaimStatus } from '@/hooks/useCourseClaim';
 import { supabase } from '@/integrations/supabase/client';
-import { Skeleton } from '@/components/ui/skeleton';
-import AboutMediaStrip from './AboutMediaStrip';
 import NearbySection from './NearbySection';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
-import { LocationMapCard } from '@/components/map';
 import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationPills from './CourseLocationPills';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -34,7 +30,6 @@ import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
 import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 /**
  * BRIEF_COURSE_TAB_REBUILD §3.10 — THE LADDER HAS MOVED, NOT GONE.
  *
