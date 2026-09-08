@@ -447,7 +447,7 @@ export const TrajectoryLine: React.FC<Props> = ({
         x2={w - padX}
         y1={zeroY}
         y2={zeroY}
-        stroke={T.baseline}
+        stroke={baselineColor ?? T.baseline}
         strokeWidth={1}
         strokeDasharray="3 4"
       />
