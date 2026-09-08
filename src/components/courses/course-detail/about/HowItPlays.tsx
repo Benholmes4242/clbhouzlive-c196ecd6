@@ -37,8 +37,8 @@ const Figure: React.FC<{ label: string; value: string; tone?: string }> = ({
   value,
   tone = A.INK,
 }) => (
-  <div style={{ minWidth: 0 }}>
-    <div style={{ ...aboutFig(19, tone), lineHeight: 1 }}>{value}</div>
+  <div style={{ flex: 1, minWidth: 0 }}>
+    <div style={{ ...aboutFig(21, tone), lineHeight: 1 }}>{value}</div>
     <div style={{ ...ABOUT_KICKER, marginTop: 5, whiteSpace: 'nowrap' }}>{label}</div>
   </div>
 );

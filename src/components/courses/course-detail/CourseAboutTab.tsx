@@ -9,7 +9,7 @@ import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import CourseLocationPills from './CourseLocationPills';
+// CourseLocationPills is intentionally no longer rendered on this tab (untouched file).
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
