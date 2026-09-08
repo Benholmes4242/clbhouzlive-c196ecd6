@@ -36,13 +36,20 @@ export interface RailChipsProps {
   /** Outer row style — margin/padding only. Never colours or type. */
   style?: CSSProperties;
   className?: string;
+  /**
+   * LOCKED: the rail still states the basis but cannot be changed — dimmed, not
+   * hidden, so the geometry never shifts and the reader can see why. Used when a
+   * block below is fixed to one value by definition (Tour's points boards).
+   */
+  locked?: boolean;
 }
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked }: RailChipsProps) {
   return (
     <div
       role="tablist"
       aria-label={ariaLabel}
+      aria-disabled={locked || undefined}
       className={`hide-scrollbar${className ? ` ${className}` : ''}`}
       style={{
         display: 'flex',
