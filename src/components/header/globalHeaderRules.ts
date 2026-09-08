@@ -10,9 +10,9 @@ export const IMMERSIVE_ROUTE_PREFIXES = [
   '/courses/',        // Course Detail pages
   '/profile',         // Own profile + /profile/:username
   '/profile/',
-  /* BRIEF_TOUR_FIXED_HEADER S2.1: '/tourhub' and '/tour' are GONE. Every Tour
-     surface now carries the fixed header in normal flow, so the app-shell pays
-     var(--sat) once and no Tour page may pay it again (S2.5). */
+  /* Tour pushed pages keep their in-flow header. The two landing heroes are
+     exact immersive routes below, so they can bleed without making every
+     /tourhub/* detail page immersive. */
   '/discover/explore/region/', // Region pages
 ] as const;
 
@@ -25,6 +25,8 @@ export const IMMERSIVE_EXACT_ROUTES = [
   '/watch',
   '/watch/clips',
   '/watch/videos',
+  '/tourhub',
+  '/tour',
 ] as const;
 
 export const LIGHT_IMMERSIVE_EXACT_ROUTES = [
@@ -93,8 +95,6 @@ export function isImmersiveRoute(pathname: string): boolean {
   // The review composer is a plain light page, not a hero page — it must
   // never mount immersive (the post-mount flip caused device paint bugs).
   if (/^\/courses\/[^/]+\/rate\/?$/.test(pathname)) return false;
-  /* S2.2: the /tour/news exception is gone with the '/tour' prefix that made
-     it necessary — with no immersive Tour prefix there is nothing to except. */
   // Connect flow only — the connected manage surface stays non-immersive.
   if (pathname === WHS_CONNECT_PATH) return whsConnectImmersive;
   if (isBusinessProfilePath(pathname)) return true;
