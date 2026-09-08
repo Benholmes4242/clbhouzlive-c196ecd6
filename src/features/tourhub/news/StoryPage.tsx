@@ -242,7 +242,7 @@ export function StoryPage() {
                 {t('news.more', 'MORE FROM THE WIRE')}
               </div>
               {(more ?? []).map((s, i) => (
-                <div key={s.id} style={{ borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
+                <div key={s.id} style={{ borderTop: `1px solid ${HAIRLINE_INK_10}`, padding: '0 14px' }}>
                   <WorkhorseRow story={s} onOpen={() => navigate(`/tour/news/${s.slug}`)} engagement={engagementFor(s.id)} />
                 </div>
               ))}
