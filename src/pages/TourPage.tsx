@@ -47,10 +47,19 @@ export default function TourPage() {
       <TourHero />
 
       <main style={{ padding: `14px 14px ${NAV_CLEARANCE}` }}>
-        {/* THE ONE PICKER, above the blocks it governs, saying so by sitting there. */}
+        {/* THE ONE PICKER, above the blocks it governs, saying so by sitting there.
+            WHEN A FIXED-TOUR BOARD IS ACTIVE IT LOCKS to that board's tour —
+            dimmed, never hidden, so nothing moves and the reader can see why it
+            has stopped applying. The member's own selection is held in state and
+            returns intact the moment the live board or Our Picks is active. */}
         <RailChips
-          options={PICKER_TOURS.map((id) => ({ id, label: TOUR_CONFIG[id].name }))}
-          value={tour}
+          options={
+            board.pickerLock === 'colleges'
+              ? [{ id: 'colleges', label: 'Colleges' }, ...PICKER_TOURS.map((id) => ({ id, label: TOUR_CONFIG[id].name }))]
+              : PICKER_TOURS.map((id) => ({ id, label: TOUR_CONFIG[id].name }))
+          }
+          value={board.pickerLock ?? tour}
+          locked={board.pickerLock != null}
           onChange={(next) => {
             analyticsEvents.track('tour_picker_changed', { tour: next });
             setTour(next as TourId);
