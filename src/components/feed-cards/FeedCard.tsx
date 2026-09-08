@@ -185,7 +185,7 @@ export function FeedCard({
         // Bare tiles live in mosaic grids where the column gap is 4px — match
         // vertical spacing to the horizontal gutter. Full cards (with caption
         // block) keep the roomier 12px stack rhythm.
-        marginBottom: bareTile ? 4 : 12,
+        marginBottom: bareTile ? tileGap : 12,
         cursor: 'pointer',
         fontFamily: FONT_FAMILY,
       }}
@@ -195,7 +195,7 @@ export function FeedCard({
           position: 'relative',
           width: '100%',
           aspectRatio: aspect,
-          borderRadius: 4,
+          borderRadius: tileRadius,
           background: '#e5e9ef',
           overflow: 'hidden',
         }}

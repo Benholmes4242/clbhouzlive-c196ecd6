@@ -90,9 +90,9 @@ export default function MediaLibraryPage() {
             <>
               <MomentsGrid
                 moments={moments}
-                gap={5}
+                gap={MOSAIC_GAP}
                 tall={250}
-                radius={10}
+                radius={MOSAIC_RADIUS}
                 onTilePress={openTile}
                 autoplayGroup="media-library"
               />
