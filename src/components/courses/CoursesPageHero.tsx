@@ -200,12 +200,15 @@ function CoursesPageHeroInner() {
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
-      {/* Bottom-anchored identity + CTA */}
+      {/* Bottom-anchored identity + CTA — absolute so copy never expands the
+          hero past HERO_MIN_H. Matches GolfClubView's CourseTitleOverlay. */}
       <div
         style={{
-          marginTop: 'auto',
-          padding: '0 16px 24px',
-          position: 'relative',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 24,
+          padding: '0 16px',
           zIndex: 1,
         }}
       >
