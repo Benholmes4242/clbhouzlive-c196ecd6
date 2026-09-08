@@ -97,58 +97,28 @@ const CategoryLine: React.FC<{ review: CourseReview }> = ({ review }) => {
   );
 };
 
-/** §4d — up to four equal-width tiles, 66px tall. Same viewer contract. */
+/** §4d — the SHARED strip, extended additively: four equal-width tiles, 66px. */
 const PhotoStrip: React.FC<{
   review: CourseReview;
   onMediaClick: (index: number, el: HTMLElement | null) => void;
 }> = ({ review, onMediaClick }) => {
-  const media = (review.media ?? []).slice(0, 4);
+  const media = review.media ?? [];
   if (media.length === 0) return null;
   return (
-    <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
-      {media.map((item, index) => {
-        const src = item.media_type === 'video' ? (item.poster_url || item.media_url) : item.media_url;
-        return (
-          <PhotoTile key={item.id} src={src} index={index} onMediaClick={onMediaClick} />
-        );
-      })}
+    <div style={{ marginTop: 12 }}>
+      <ReviewMediaStrip
+        media={media as any}
+        onMediaClick={onMediaClick}
+        tileMode="equal"
+        tileHeight={66}
+        tileRadius={8}
+        tileGap={6}
+        maxItems={4}
+      />
     </div>
   );
 };
 
-const PhotoTile: React.FC<{
-  src: string;
-  index: number;
-  onMediaClick: (index: number, el: HTMLElement | null) => void;
-}> = ({ src, index, onMediaClick }) => {
-  const ref = React.useRef<HTMLButtonElement>(null);
-  return (
-    <button
-      ref={ref}
-      type="button"
-      onClick={() => onMediaClick(index, ref.current)}
-      style={{
-        flex: 1,
-        minWidth: 0,
-        height: 66,
-        borderRadius: 8,
-        overflow: 'hidden',
-        border: 'none',
-        padding: 0,
-        background: A.TRACK,
-        cursor: 'pointer',
-      }}
-    >
-      <img
-        src={src}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-      />
-    </button>
-  );
-};
 
 export interface FlatReviewRowProps {
   review: CourseReview;
