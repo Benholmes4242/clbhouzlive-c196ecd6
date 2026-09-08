@@ -22,6 +22,7 @@ import WhatPeopleSay from './about/WhatPeopleSay';
 import WhoPlaysHere from './about/WhoPlaysHere';
 import Photos from './about/Photos';
 import WhereItIs from './about/WhereItIs';
+import KeepExploring from './about/KeepExploring';
 
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseSheet from './ClaimCourseSheet';
