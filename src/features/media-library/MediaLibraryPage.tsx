@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { MomentsGrid } from '@/components/explore-tab-new/courseled/MomentsGrid';
 import { MediaRailTile } from '@/components/explore-tab-new/courseled/MediaRailTile';
@@ -12,6 +13,7 @@ import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/to
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { LibraryHead, LoadMore, SortRail } from './LibraryChrome';
+import { RailChips } from '@/components/ui/RailChips';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { MOSAIC_GAP, MOSAIC_RADIUS } from '@/lib/mosaicGeometry';
 import { useMergedLibraryTotal } from './libraryTotals';
@@ -39,7 +41,22 @@ const AUTOPLAY_GROUP = 'media-library';
  * long-form row are the SAME components the Amateur media block renders, and
  * the mosaic is MomentsGrid in the one mosaic geometry (2px gutter, r.xs).
  */
+/** THE THREE KINDS /media can be scoped to (BRIEF_EXPLORE_REFINEMENT §1).
+ *  A see-all shows ALL OF ONE THING; the chips move between the three without
+ *  a trip back. No kind means community, the largest and the one tied to
+ *  members and courses. */
+const KINDS = ['clips', 'longer', 'community'] as const;
+type MediaKind = (typeof KINDS)[number];
+const KIND_LABELS: Record<MediaKind, string> = {
+  clips: 'Clips',
+  longer: 'Longer watch',
+  community: 'From the community',
+};
+
 export default function MediaLibraryPage() {
+  const [params, setParams] = useSearchParams();
+  const raw = params.get('kind');
+  const kind: MediaKind = (KINDS as ReadonlyArray<string>).includes(raw ?? '') ? (raw as MediaKind) : 'community';
   const [sort, setSort] = useState<MergedSort>('recent');
   const [shown, setShown] = useState(PAGE);
   const totalQuery = useMergedLibraryTotal();
@@ -109,6 +126,32 @@ export default function MediaLibraryPage() {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, []);
 
+  const changeKind = useCallback(
+    (next: string) => {
+      setParams(
+        (prev) => {
+          const out = new URLSearchParams(prev);
+          out.set('kind', next);
+          return out;
+        },
+        { replace: true },
+      );
+      analyticsEvents.track('media_library_kind_changed', { kind: next });
+    },
+    [setParams],
+  );
+
+  /* Entering with no kind states the default in the URL, so a share or a
+     refresh lands on the same wall. */
+  useEffect(() => {
+    if (!raw) changeKind('community');
+  }, [raw, changeKind]);
+
+  useEffect(() => {
+    setShown(PAGE);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [kind]);
+
   const clipTotal = hubCounts.data?.clip_count ?? null;
   const videoTotal = hubCounts.data?.video_count ?? null;
   const mergedTotal = totalQuery.data ?? null;
@@ -123,12 +166,33 @@ export default function MediaLibraryPage() {
       <main style={{ paddingTop: 'var(--island-clearance, calc(env(safe-area-inset-top, 0px) + 70px))' }}>
 
         <div style={{ padding: `0 ${GUTTER}px` }}>
-          <LibraryHead total={mergedTotal} title="Media" />
+          <LibraryHead
+            total={kind === 'clips' ? clipTotal : kind === 'longer' ? videoTotal : mergedTotal}
+            title="Media"
+          />
+        </div>
+
+        {/* THE KIND RAIL — the canonical chip, each carrying its count. One wall
+            or list at a time; the heading and meta below follow the active kind. */}
+        <div style={{ padding: `0 ${GUTTER}px 4px` }}>
+          <RailChips
+            options={KINDS.map((id) => ({
+              id,
+              label: `${KIND_LABELS[id]}${
+                (id === 'clips' ? clipTotal : id === 'longer' ? videoTotal : mergedTotal) == null
+                  ? ''
+                  : ` ${id === 'clips' ? clipTotal : id === 'longer' ? videoTotal : mergedTotal}`
+              }`,
+            }))}
+            value={kind}
+            onChange={changeKind}
+            ariaLabel="Media kind"
+          />
         </div>
 
         <div style={{ paddingBottom: NAV_CLEARANCE }}>
           {/* 1. CLIPS — the 9:16 rail, its own deployed tile size. */}
-          {clips.length > 0 && (
+          {kind === 'clips' && clips.length > 0 && (
             <AboutSection
               heading="Clips"
               meta={clipTotal == null ? null : String(clipTotal)}
@@ -154,8 +218,8 @@ export default function MediaLibraryPage() {
           )}
 
           {/* 2. LONGER WATCH — the shared long-form row, text-led. */}
-          {videos.length > 0 && (
-            <AboutSection heading="Longer watch" meta={videoTotal == null ? null : String(videoTotal)}>
+          {kind === 'longer' && videos.length > 0 && (
+            <AboutSection heading="Longer watch" meta={videoTotal == null ? null : String(videoTotal)} first>
               {videos.map((item, index) => (
                 <VideoRow
                   key={item.key}
@@ -168,9 +232,11 @@ export default function MediaLibraryPage() {
           )}
 
           {/* 3. FROM THE COMMUNITY — the merged mosaic, full bleed. */}
+          {kind === 'community' && (
           <AboutSection
             heading="From the community"
             meta={mergedTotal == null ? null : String(mergedTotal)}
+            first
             bleed
           >
             <div style={{ padding: '0 20px' }}>
@@ -202,6 +268,7 @@ export default function MediaLibraryPage() {
               </>
             )}
           </AboutSection>
+          )}
         </div>
       </main>
     </div>

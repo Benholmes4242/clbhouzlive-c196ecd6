@@ -280,7 +280,7 @@ export function AmateurMediaBlock({
             right={(hubCounts.data?.clip_count ?? 0) > clips.length ? `See all ${hubCounts.data?.clip_count}` : null}
             onRightPress={() => {
               analyticsEvents.track('amateur_media_see_all_opened', { total: hubCounts.data?.clip_count ?? 0, section: 'clips' });
-              onSeeAll('/watch/clips');
+              onSeeAll('/media?kind=clips');
             }}
           />
           <div
@@ -308,7 +308,7 @@ export function AmateurMediaBlock({
             right={(hubCounts.data?.video_count ?? 0) > videos.length ? `See all ${hubCounts.data?.video_count}` : null}
             onRightPress={() => {
               analyticsEvents.track('amateur_media_see_all_opened', { total: hubCounts.data?.video_count ?? 0, section: 'videos' });
-              onSeeAll('/watch/videos');
+              onSeeAll('/media?kind=longer');
             }}
           />
           {videos.map((item, index) => (
@@ -324,7 +324,7 @@ export function AmateurMediaBlock({
           onRightPress={() => {
             analyticsEvents.track('amateur_media_see_all_opened', { total, section: 'mosaic' });
             /* /media carries the MERGED set this mosaic summarises. */
-            onSeeAll('/media');
+            onSeeAll('/media?kind=community');
           }}
         />
         {/* THE TIGHT TREATMENT established for Moments: 2px gutter, r.xs corners.
