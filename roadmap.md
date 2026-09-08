@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Tour match-the-mock (8 Sep 2026)
+- [x] Restore `/tourhub` overview full-bleed notch hero with picker and controls islands; align hero event/location type with `/tour`.
 - [x] Match the app canvas, 20px gutter, hero states, and single tour selector sheet.
 - [ ] Match leaderboard heading, rows, counts, and terminal action.
 - [ ] Rebuild Our Picks as horizontal cards with concerns and quiet record prose.

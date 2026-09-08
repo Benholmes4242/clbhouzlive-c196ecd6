@@ -82,13 +82,6 @@ export interface PhotoBandProps {
   purse?: number | null;
 }
 
-function splitTitle(title: string): { main: string; sub: string } {
-  // NEVER-KEY: source-derived title tokens (English data fields).
-  const m = title.match(/^(.+?(?:CUP|OPEN|CHAMPIONSHIP|INVITATIONAL|CLASSIC))\s+(.+)$/i);
-  if (m) return { main: m[1], sub: m[2] };
-  return { main: title, sub: '' };
-}
-
 export function PhotoBand({
   title,
   venueName,
@@ -112,7 +105,6 @@ export function PhotoBand({
   const { t } = useTranslation('tourhub');
   const useDusk =
     state.kind === 'results' && (state.variant === 'declared' || state.variant === 'cancelled');
-  const titleSplit = splitTitle(title);
   const background = heroCanonBackground(
     venueImageUrl,
     useDusk ? COURSE_GRADIENT_DUSK : COURSE_GRADIENT,
@@ -171,10 +163,10 @@ export function PhotoBand({
             margin: 0,
             color: 'white',
             fontFamily: FONT,
-            fontSize: title.length > 30 ? 21 : 25,
-            fontWeight: 800,
-            lineHeight: 0.96,
-            letterSpacing: '-0.025em',
+            fontSize: 24,
+            fontWeight: 700,
+            lineHeight: 1.14,
+            letterSpacing: '-0.034em',
             textShadow: '0 2px 12px rgba(0,0,0,0.55)',
             textWrap: 'balance',
             display: '-webkit-box',
@@ -183,24 +175,18 @@ export function PhotoBand({
             overflow: 'hidden',
           }}
         >
-          <span>{titleSplit.main}</span>
-          {titleSplit.sub && (
-            <>
-              <br />
-              <span style={{ color: 'rgba(255,255,255,0.72)', fontWeight: 600 }}>{titleSplit.sub}</span>
-            </>
-          )}
+          {title}
         </h1>
 
         {/* Venue */}
         {venueName && (
           <div
             style={{
-              fontSize: 10.5,
-              fontWeight: 600,
+              fontSize: 13,
+              fontWeight: 400,
               color: 'rgba(255,255,255,0.75)',
               textShadow: '0 1px 3px rgba(0,0,0,0.45)',
-              letterSpacing: '0.01em',
+              letterSpacing: 0,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',

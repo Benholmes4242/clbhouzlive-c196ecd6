@@ -13,7 +13,6 @@ import { NewsTab } from '@/features/tourhub/news/NewsTab';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
-import { useHeroFullBleed } from '../_shared/heroFullBleedSignal';
 import { TourSideMenu } from '../components/TourSideMenu';
 import { TourIslandLeft } from '../components/TourIslandLeft';
 import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
@@ -159,14 +158,6 @@ export function TourHubMainPage() {
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, [setSearchParams]);
 
-  /* BRIEF_TOUR_FIXED_HEADER S4: nothing on the hub bleeds any more. The hero
-     signal is still read by the hero bands themselves; the SHELL is flatly
-     non-immersive on every tab. */
-  const fullBleedHero = false;
-
-  // H4a: no longer suppress the global island on cinematic overview — the
-  // ChromeIsland paints with a page-provided left capsule (see TourHubChromeBridge).
-
   const { logout } = useLogout();
 
   const renderTab = () => {
@@ -233,7 +224,7 @@ export function TourHubMainPage() {
 
   return (
     <TourSelectionProvider>
-      <TourHubShell showBack={false} immersiveStatusBar={fullBleedHero}>
+      <TourHubShell showBack={false} immersiveStatusBar={isHubRoot}>
         <TourHubChromeBridge
           activeTab={activeTab}
           onSelectTab={handleSelectTab}
@@ -247,26 +238,33 @@ export function TourHubMainPage() {
           pickerOpen={pickerOpen}
           setPickerOpen={setPickerOpen}
         />
-        {/* ONE header for every tab, overview included (S3): opaque 42px row,
-            back chevron except on the hub root, tour picker off the live board,
-            burger for the tour menu. */}
-        <TourPageShell
-            title={tabTitle}
-            showBack={!isHubRoot}
-            onBack={() => handleSelectTab('overview')}
-            backFallback="/tourhub"
-            leftSlot={
-              /* The left slot is the variant slot: burger + tour picker as one
-                 left-aligned group. NOTHING renders between the header border
-                 and the hero — the chip rail that used to sit there is gone. */
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                <AppHeaderBurger onTap={() => setMenuOpen(true)} label="Tour menu" />
-                {activeTab !== 'live' && <TourPickerControl onTap={() => setPickerOpen(true)} />}
-              </div>
-            }
-          >
-            {renderTab()}
-          </TourPageShell>
+        {/* The overview is the immersive exception: the hero starts at the
+            physical top and the shared left/right islands float over it. Legacy
+            pushed tabs retain their solid in-flow AppHeader until retirement. */}
+        {isHubRoot ? renderTab() : (
+          /* Route immersion is path-based, so query-param tabs share the
+             overview's y=0 shell. Their own opaque header therefore becomes
+             the single safe-area owner while the overview remains full bleed. */
+          <div style={{ paddingTop: 'var(--sat, 0px)' }}>
+            <TourPageShell
+              title={tabTitle}
+              showBack
+              onBack={() => handleSelectTab('overview')}
+              backFallback="/tourhub"
+              leftSlot={
+                /* The left slot is the variant slot: burger + tour picker as one
+                   left-aligned group. NOTHING renders between the header border
+                   and the hero — the chip rail that used to sit there is gone. */
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                  <AppHeaderBurger onTap={() => setMenuOpen(true)} label="Tour menu" />
+                  {activeTab !== 'live' && <TourPickerControl onTap={() => setPickerOpen(true)} />}
+                </div>
+              }
+            >
+              {renderTab()}
+            </TourPageShell>
+          </div>
+        )}
       </TourHubShell>
     </TourSelectionProvider>
 
