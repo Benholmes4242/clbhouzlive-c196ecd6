@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
  */
 
 import React, { useCallback, useState, useEffect, useLayoutEffect, useMemo } from 'react';
+import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
 import { ChevronRight, Trophy, Activity } from 'lucide-react';
 import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
