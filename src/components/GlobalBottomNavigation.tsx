@@ -17,7 +17,7 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 import { r } from '@/lib/radius';
 import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
 import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
-import CreateSheetV2 from '@/features/post-v2/components/CreateSheetV2';
+import CreateSheetV3 from '@/features/post-v2/components/CreateSheetV3';
 import { NAV_CLEARANCE, NAV_PILL_H_FALLBACK, NAV_PILL_H_VAR } from '@/lib/navClearance';
 
 
@@ -219,7 +219,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
       // The + only ever opens the chooser. The native picker is fired from
-      // the Post row inside CreateSheetV2 so the tap that opens the OS menu
+      // the action pill inside CreateSheetV3 so the tap that opens the OS menu
       // is its own user activation (iOS WKWebView requirement).
       setCreateOpen(true);
       return;
@@ -457,7 +457,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
           </motion.div>
         )}
       </AnimatePresence>
-      <CreateSheetV2
+      <CreateSheetV3
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         returnPath={location.pathname}
