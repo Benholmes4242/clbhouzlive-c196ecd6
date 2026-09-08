@@ -299,9 +299,7 @@ const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 // Hub lazy imports removed — Hub page decommissioned
 
 // Echo v2 full-page experience
-const EchoV2Page = lazy(() => import("./pages/EchoV2Page"));
 
-const EchoHistoryPage = lazy(() => import("./pages/EchoHistoryPage"));
 
 // Removed: DiscoverGamesPage lazy import — /games/discover now redirects to /clubhouse
 
@@ -361,10 +359,6 @@ const WatchGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>;
 };
 
-const EchoV2Redirect: React.FC = () => {
-  const { chatId } = useParams<{ chatId: string }>();
-  return <Navigate to={chatId ? `/echo/${chatId}` : '/echo'} replace />;
-};
 const ReviewComposerRoute: React.FC = () => (
   <Suspense fallback={<RateCoursePageSkeleton />}>
     <ReviewComposerV2 />
@@ -714,15 +708,10 @@ function AppRoutes() {
         {/* /create-moment removed — PostStudio is now the sole creation flow */}
         <Route path="/error-logs" element={<ErrorLogPage />} />
         
-        {/* Echo AI (v2) */}
-        <Route path="/echo" element={<Suspense fallback={<HubSkeleton />}><EchoV2Page /></Suspense>} />
-        <Route path="/echo/history" element={<Suspense fallback={<HubSkeleton />}><EchoHistoryPage /></Suspense>} />
-        <Route path="/echo/:chatId" element={<Suspense fallback={<HubSkeleton />}><EchoV2Page /></Suspense>} />
-
-        {/* Legacy /echo-v2 redirects */}
-        <Route path="/echo-v2" element={<Navigate to="/echo" replace />} />
-        <Route path="/echo-v2/history" element={<Navigate to="/echo/history" replace />} />
-        <Route path="/echo-v2/:chatId" element={<EchoV2Redirect />} />
+        {/* Echo retired as a member-facing surface (BRIEF_RETIRE_ECHO_SURFACE).
+            src/pages/EchoV2Page.tsx, src/pages/EchoHistoryPage.tsx and
+            src/features/echo-v2/ stay in the tree, unreferenced by the router.
+            Restoring the surface = putting these routes back. */
 
 
 

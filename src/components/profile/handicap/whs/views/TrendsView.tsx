@@ -23,7 +23,8 @@ interface Props {
   connectionId: string;
   userId: string;
   currentHandicap: number | null;
-  /** When true, hides personal-only sections (Echo Insights, Where You Stand). */
+  /** When true, renders the friend view: sections switch to name-prefixed copy
+   *  and owner-only framing is withheld (passed down as viewMode 'friend'). */
   readOnly?: boolean;
   /** First name of the profile owner — used to name-prefix friend-view copy. */
   ownerFirstName?: string | null;

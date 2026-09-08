@@ -1,7 +1,8 @@
 /**
  * ProfileSheetV2 · QuickActionsRow
  *
- * Three tiles: Echo / Messages / Alerts.
+ * Two tiles: Messages / Alerts. (Echo was retired as a member-facing surface —
+ * BRIEF_RETIRE_ECHO_SURFACE. This row was its only door.)
  * Badges: Messages sums per-conversation unread from useConversations (the
  * same RPC the inbox renders); Alerts reads useUnreadNotifications. These
  * are intentionally the same sources as the destination pages so tile
