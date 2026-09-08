@@ -23,7 +23,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100RankRow } from './CourseTop100RankRow';
-import { CourseCardPanel } from '@/features/courses/components/holes/analytical/CourseCardPanel';
+import CourseFactsAndTees from './about/CourseFactsAndTees';
 import { CourseAnalyticsPanels } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
 
 import CourseRecordBook from './CourseRecordBook';
@@ -194,7 +194,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           renders nothing (no tee card, no hole analytics) leaves no gap
           behind it. Fixed spacers used to strand 36px under the pills. */}
       <div style={{ display: 'grid', gap: 24 }}>
-        <CourseCardPanel courseId={course.id} courseName={course.name} />
+        {/* BRIEF_COURSE_TAB_REBUILD §3.1/§3.2 — flat facts row + tee control. */}
+        <CourseFactsAndTees courseId={course.id} />
 
         {/* ══ BLOCK 2 — HOW IT PLAYS / HOLE BY HOLE (analytical panels) ══ */}
         <CourseAnalyticsPanels courseId={course.id} courseName={course.name} explainEmpty />
