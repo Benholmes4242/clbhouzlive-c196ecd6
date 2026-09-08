@@ -156,6 +156,21 @@ export function useTourBoardState(tour: TourId): TourBoardState {
   return useMemo<TourBoardState>(() => {
     const changeBoard = (next: TourBoardKey) => setRequested(next);
 
+    /* THE PICKER MUST NEVER CONTRADICT THE LIST. A fixed-tour board locks the
+       picker to its own tour; Colleges locks it to "Colleges", which is not a
+       tour at all; the live board and Our Picks leave the member's own alone. */
+    const pickerLock: TourPickerLock =
+      board === 'colleges' ? 'colleges' : (POINTS_TOUR_ID[board] ?? null);
+    const basis =
+      board === 'colleges'
+        ? 'College golf'
+        : pickerLock
+          ? `${TOUR_CONFIG[pickerLock as TourId].name} season`
+          : board === 'live'
+            ? TOUR_CONFIG[tour].name
+            : null;
+
+
     if (board === 'live') {
       const rows: TourBoardRow[] = (liveBoard.data ?? []).map((r, i) => {
         const p = r.player ?? {};
