@@ -27,7 +27,7 @@ export interface NearbyPin {
   slug: string;
   lat: number;
   lng: number;
-  category?: string;
+  category: string;
 }
 
 interface WhereItIsProps {
