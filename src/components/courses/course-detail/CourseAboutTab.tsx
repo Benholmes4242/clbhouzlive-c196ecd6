@@ -114,17 +114,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   );
 
 
-  const { data: ratingAggregates, isLoading: ratingAggregatesLoading } = useCourseRatingAggregates(course.id);
-  const { data: distribution } = useCourseRatingDistribution(course.id);
-  const { data: userRating } = useUserCourseRating(course.id, user?.id);
-
-  // Friends' average rating - the same cached query CourseFriendsStrip uses.
-  const { data: friendsRated = [] } = useFriendsWhoPlayedCourse(user?.id, course.id);
-  const friendsAvg = React.useMemo(() => {
-    const scored = friendsRated.filter((f) => f.rating_value != null);
-    if (scored.length === 0) return null;
-    return scored.reduce((sum, f) => sum + (f.rating_value ?? 0), 0) / scored.length;
-  }, [friendsRated]);
+  /* §3.6 — the rating reads now live inside WhatPeopleSay, and the friends
+     average is not a figure on this tab at all: the friends strip below names
+     the people, which is the more useful form of the same fact. */
 
   const handleWebsiteClick = () => {
     if (course.website_url) {
