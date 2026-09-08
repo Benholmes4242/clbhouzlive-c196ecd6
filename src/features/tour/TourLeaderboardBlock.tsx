@@ -58,8 +58,8 @@ function SchoolMark({ src, name }: { src: string | null; name: string }) {
   return (
     <div
       style={{
-        width: 34,
-        height: 34,
+        width: 36,
+        height: 36,
         flexShrink: 0,
         borderRadius: 6,
         overflow: 'hidden',
@@ -106,12 +106,11 @@ export function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => v
     >
       <span
         style={{
-          width: 26,
-          flex: '0 0 26px',
-          textAlign: 'right',
-          fontSize: 15,
-          fontWeight: 200,
-          color: INK,
+          width: 22,
+          flex: '0 0 22px',
+          fontSize: 12,
+          fontWeight: 700,
+          color: INK_MUTE,
         }}
       >
         {row.pos}
@@ -121,7 +120,7 @@ export function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => v
         <SchoolMark src={row.photoUrl} name={row.name} />
       ) : (
         <SquircleAvatar
-          size={34}
+          size={36}
           srcCandidates={resolvePlayerAvatarCandidates({
             name: row.name,
             photoUrl: row.photoUrl,
@@ -130,6 +129,7 @@ export function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => v
           alt={row.name}
           userId={row.id}
           hairlineRing
+          className="[&>div]:!rounded-full"
         />
       )}
 

@@ -46,17 +46,9 @@ const RACE_TOUR: Partial<Record<TourBoardKey, PlayersTourId>> = {
   livpts: 'liv',
 };
 
-const TOUR_RACE: Partial<Record<TourId, TourBoardKey>> = {
-  pga: 'fedex',
-  euro: 'rtd',
-  pgad: 'oom',
-  lpga: 'cme',
-  liv: 'livpts',
-};
-
 export const BOARD_LABEL: Record<TourBoardKey, string> = {
   live: 'Leaderboard',
-  fedex: 'FedEx Cup',
+  fedex: 'FedEx',
   rtd: 'Race to Dubai',
   oom: 'Order of Merit',
   cme: 'Race to CME Globe',
@@ -134,8 +126,8 @@ function fmtEarnings(n: number): string {
 }
 
 export function useTourBoardState(
-  tour: TourId,
-  onTourChange: (next: TourId) => void,
+  tour: TourId | null,
+  _onTourChange: (next: TourId | null) => void,
   /** The pushed rankings page opens on the board it was sent to. */
   initialBoard?: TourBoardKey,
 ): TourBoardState {
@@ -145,7 +137,7 @@ export function useTourBoardState(
      purse first when a tour has two in play. */
   const liveTournament = useMemo(() => {
     const live = (cache?.live ?? [])
-      .filter((t) => t.status === 'inprogress' && t.season?.tour_name === tour)
+      .filter((t) => t.status === 'inprogress' && (!tour || t.season?.tour_name === tour))
       .sort((a, b) => (b.purse ?? 0) - (a.purse ?? 0));
     return live[0] ?? null;
   }, [cache, tour]);
@@ -204,8 +196,6 @@ export function useTourBoardState(
       'fedex',
       'rtd',
       'oom',
-      'cme',
-      'livpts',
       ...(colleges.isPending || collegeRows > 0 ? (['colleges'] as TourBoardKey[]) : []),
     ] as TourBoardKey[]
   ).filter(hasRows);
@@ -214,11 +204,9 @@ export function useTourBoardState(
      moves, the board moves with it to that tour's season race — one subject, two
      views. Colleges is the exception and survives a tour change only until the
      member picks a tour, which is what returns them to a race. */
-  const [chosen, setChosen] = useState<{ board: TourBoardKey; tour: TourId } | null>(
-    initialBoard ? { board: initialBoard, tour } : null,
-  );
-  const fallback: TourBoardKey = TOUR_RACE[tour] ?? 'live';
-  const requested = chosen && chosen.tour === tour ? chosen.board : fallback;
+  const [chosen, setChosen] = useState<TourBoardKey | null>(initialBoard ?? null);
+  const fallback: TourBoardKey = liveTournament ? 'live' : 'rtd';
+  const requested = chosen ?? fallback;
   const board = chips.includes(requested) ? requested : (chips.includes(fallback) ? fallback : chips[0]);
 
   const pointsTour = RACE_TOUR[board];
@@ -245,18 +233,14 @@ export function useTourBoardState(
   });
 
   return useMemo<TourBoardState>(() => {
-    /* SELECTING A RACE CHIP MOVES THE WHOLE PAGE TO THAT TOUR. That is the same
-       act as tapping the tour in the picker, so it goes through the same state. */
     const changeBoard = (next: TourBoardKey) => {
-      const raceTour = RACE_TOUR[next] as TourId | undefined;
-      if (raceTour && raceTour !== tour) onTourChange(raceTour);
-      setChosen({ board: next, tour: raceTour ?? tour });
+      setChosen(next);
     };
 
     const pickerLock: TourPickerLock = board === 'colleges' ? 'colleges' : null;
     /* Champions out of tournament: no season race exists, so nothing is shown
        rather than another tour's race under a "Champions" picker. */
-    const silent = !TOUR_RACE[tour] && !liveTournament && !(chosen && chosen.tour === tour);
+    const silent = false;
     const raceTour = RACE_TOUR[board] as TourId | undefined;
     const basis =
       board === 'colleges'
@@ -264,7 +248,7 @@ export function useTourBoardState(
         : raceTour
           ? `${TOUR_CONFIG[raceTour].name} season`
           : board === 'live'
-            ? TOUR_CONFIG[tour].name
+            ? tour ? TOUR_CONFIG[tour].name : 'All tours'
             : null;
 
 
@@ -279,7 +263,7 @@ export function useTourBoardState(
           country: p.country ?? null,
           countryCode: p.country_code ?? null,
           photoUrl: p.photo_url ?? null,
-          tourCode: tour,
+          tourCode: tour ?? liveTournament?.season?.tour_name ?? null,
           mark: 'round' as const,
           figure: null,
           subline: r.thru == null ? 'Round in progress' : Number(r.thru) >= 18 ? 'Finished' : `Thru ${r.thru}`,
@@ -372,5 +356,5 @@ export function useTourBoardState(
       /* A ranking of one is a data failure, and the hook already says so. */
       unavailable: !ranking.isPending && (!result?.synced || rows.length === 0),
     };
-  }, [board, chips, chosen, colleges.data, colleges.isPending, liveBoard.data, liveBoard.isPending, liveTournament, pointsTour, ranking.data, ranking.isPending, tour, onTourChange]);
+  }, [board, chips, colleges.data, colleges.isPending, liveBoard.data, liveBoard.isPending, liveTournament, pointsTour, ranking.data, ranking.isPending, tour]);
 }

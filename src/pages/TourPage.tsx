@@ -35,7 +35,7 @@ const CANVAS = '#15171F';
 export default function TourPage() {
   const [tour, setTour] = useState<TourId | null>(null);
   const effectiveTour = tour ?? 'pga';
-  const board = useTourBoardState(effectiveTour, setTour);
+  const board = useTourBoardState(tour, setTour);
 
   useEffect(() => {
     analyticsEvents.track('tour_page_viewed', {});
@@ -46,14 +46,8 @@ export default function TourPage() {
       <TourHero />
 
       <main style={{ padding: `0 20px ${NAV_CLEARANCE}` }}>
-        {/* THE PICKER IS THE PAGE'S SUBJECT. The page reads ONE TOUR AT A TIME:
-            the picker names it and every block with a tour dimension follows.
-            Tapping a tour moves the board to that tour's season race and sets Our
-            Picks; tapping a race chip sets the picker. Two views of one state,
-            which cannot disagree, so nothing is locked.
-            THE ONE EXCEPTION IS COLLEGES — not a tour, so while it is the active
-            board the picker is dimmed and reads "Colleges". Selecting any tour
-            from there returns to that tour's season race. */}
+        {/* The picker governs the live leaderboard and Our Picks. Named season
+            races remain fixed to their own tours; Colleges remains its own board. */}
         <TourFilterControl
           value={tour}
           onChange={(next) => {
