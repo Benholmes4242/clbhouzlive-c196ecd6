@@ -126,6 +126,8 @@ function fmtEarnings(n: number): string {
 export function useTourBoardState(
   tour: TourId,
   onTourChange: (next: TourId) => void,
+  /** The pushed rankings page opens on the board it was sent to. */
+  initialBoard?: TourBoardKey,
 ): TourBoardState {
   const { data: cache } = useTournamentsCache();
 
@@ -146,7 +148,9 @@ export function useTourBoardState(
      moves, the board moves with it to that tour's season race — one subject, two
      views. Colleges is the exception and survives a tour change only until the
      member picks a tour, which is what returns them to a race. */
-  const [chosen, setChosen] = useState<{ board: TourBoardKey; tour: TourId } | null>(null);
+  const [chosen, setChosen] = useState<{ board: TourBoardKey; tour: TourId } | null>(
+    initialBoard ? { board: initialBoard, tour } : null,
+  );
   const fallback: TourBoardKey = TOUR_RACE[tour] ?? 'live';
   const requested = chosen && chosen.tour === tour ? chosen.board : fallback;
   const board = chips.includes(requested) ? requested : (chips.includes(fallback) ? fallback : chips[0]);
