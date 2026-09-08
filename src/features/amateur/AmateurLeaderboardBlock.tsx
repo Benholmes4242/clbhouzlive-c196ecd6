@@ -95,29 +95,38 @@ export function AmateurLeaderboardBlock({
         <div style={{ height: 240 }} aria-hidden />
       ) : total === 0 ? (
         <div style={{ padding: '18px 2px' }}>
+          {/* §2 C — AN EXPLAINED ABSENCE, NEVER A HIDDEN BLOCK. On the circle
+              the cause decides the words: a quiet fortnight (C1) or no circle
+              at all (C2). Off the circle, the applied filter is the answer. */}
           <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: DISCOVER_FACT }}>
-            {t('discover.filterBoard.emptyLine', 'Nothing on this board for {{line}}.', {
-              line: appliedParts.join(' \u00B7 '),
-            })}
+            {!isCircle
+              ? t('discover.filterBoard.emptyLine', 'Nothing on this board for {{line}}.', {
+                  line: appliedParts.join(' \u00B7 '),
+                })
+              : coldStart
+                ? t('amateur.board.noCircle', 'You have not added any golfers yet.')
+                : t(
+                    'amateur.board.circleQuiet',
+                    'Nobody in your circle has posted a round in the last fortnight.',
+                  )}
           </p>
-          {!filtersAreDefault(filters) && (
-            <button
-              type="button"
-              onClick={state.resetFilters}
-              style={{
-                ...KICKER,
-                marginTop: 10,
-                padding: 0,
-                border: 'none',
-                background: 'transparent',
-                color: A.INK,
-                fontFamily: SANS,
-                cursor: 'pointer',
-              }}
-            >
-              {t('discover.filterBoard.reset', 'Clear the filter')}
-            </button>
-          )}
+          <div style={{ display: 'flex', gap: 16, marginTop: 12, flexWrap: 'wrap' }}>
+            {isCircle && (
+              <button type="button" onClick={state.seeEveryone} style={QUIET_ACTION}>
+                {t('amateur.board.seeEveryone', 'See everyone')} &rsaquo;
+              </button>
+            )}
+            {isCircle && coldStart && (
+              <button type="button" onClick={() => setFindGolfers(true)} style={QUIET_ACTION}>
+                {t('amateur.board.findGolfers', 'Find golfers')} &rsaquo;
+              </button>
+            )}
+            {!isCircle && !filtersAreDefault(filters) && (
+              <button type="button" onClick={state.resetFilters} style={QUIET_ACTION}>
+                {t('discover.filterBoard.reset', 'Clear the filter')}
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <>
@@ -141,17 +150,40 @@ export function AmateurLeaderboardBlock({
               />
             </div>
           )}
-          {total > visible.length && (
-            <ListTerminalRow
-              label={t('discover.filterBoard.seeAll', 'See all {{unit}}', { unit })}
-              onPress={() => {
-                analyticsEvents.track('amateur_board_see_all_opened', { board, total });
-                setSeeAll(true);
+          {/* §2 B — A THIN CIRCLE STAYS THIN AND SAYS SO. The see-all is
+              replaced by the count and the one way to widen the pool; the
+              filter rail moves with it, so the chips never claim a narrower
+              pool than the rows. */}
+          {thin ? (
+            <p
+              style={{
+                margin: '12px 2px 0',
+                fontSize: 12,
+                color: A.MUTE,
+                lineHeight: 1.45,
               }}
-            />
+            >
+              {t('amateur.board.thinCircle', 'Only {{count}} rounds in your circle this fortnight.', {
+                count: total,
+              })}{' '}
+              <button type="button" onClick={state.seeEveryone} style={{ ...QUIET_ACTION, fontSize: 12 }}>
+                {t('amateur.board.seeEveryone', 'See everyone')} &rsaquo;
+              </button>
+            </p>
+          ) : (
+            total > visible.length && (
+              <ListTerminalRow
+                label={t('discover.filterBoard.seeAll', 'See all {{unit}}', { unit })}
+                onPress={() => {
+                  analyticsEvents.track('amateur_board_see_all_opened', { board, total });
+                  setSeeAll(true);
+                }}
+              />
+            )
           )}
         </>
       )}
+
 
       <BoardSeeAllSheet
         open={seeAll}
