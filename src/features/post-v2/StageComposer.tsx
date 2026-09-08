@@ -276,9 +276,13 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   // Files chosen by the bottom-nav picker are injected whenever the store's
   // initialMedia array changes. The nav opens the composer immediately (even on
   // picker cancel) and then re-opens it with files once the user chooses them.
+  // In EDIT mode the same array carries the files the create sheet's "Add
+  // photos" picked for a bare round post — injected only once the existing post
+  // has hydrated, so hydrate() cannot wipe them.
   const lastInitialMediaRef = useRef<File[]>([]);
   useEffect(() => {
-    if (isEditMode || draftId) return;
+    if (draftId) return;
+    if (isEditMode && !hydrated) return;
     const files = initialMedia ?? [];
     const prev = lastInitialMediaRef.current;
     const isNew = files.length !== prev.length || files.some((f, i) => f !== prev[i]);
@@ -288,7 +292,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
       void addFiles(files);
       setPage(1);
     }
-  }, [isEditMode, draftId, initialMedia, addFiles]);
+  }, [isEditMode, hydrated, draftId, initialMedia, addFiles]);
 
   // Page 1 with no media renders the designed empty state, which owns the two
   // pick paths - camera and library - and NOTHING ELSE. A wizard post requires
