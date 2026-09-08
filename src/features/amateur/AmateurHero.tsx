@@ -256,6 +256,33 @@ export function AmateurHero({
             )}
           </span>
 
+          {/* §1 THE KICKER, BENEATH THE NAME. It NAMES THE FEAT, which is what
+              explains the gold dot on the shape below — the label keys the
+              graphic, so no legend is needed. Timing is not repeated here.
+              ALIGNED TO THE NAME, not the avatar: 30px avatar + 9px gap = 39px,
+              so name and caption read as one column with the avatar outside it.
+              WIDTH GUARD: capped clear of the score column above and truncated
+              with an ellipsis, so "HOLE IN ONE AT THE 17TH" never runs under it.
+              The JUST PLAYED fallback renders in this same place (§degradation). */}
+          <span
+            style={{
+              ...KICKER,
+              display: 'block',
+              marginLeft: 39,
+              marginTop: 7,
+              maxWidth: 'calc(100% - 39px - 76px)',
+              color: 'rgba(255,255,255,0.66)',
+              textShadow: '0 1px 2px rgba(0,0,0,0.72)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {kicker}
+          </span>
+
+
+
           {/* THE ROUND SHAPE, over the scrim, 34px.
               §3 TWO QUIET ADDITIONS, BOTH DEPENDENT ON THE HOLE SERIES: the
               level-par rule at 14% white and the hole number under the bead.
