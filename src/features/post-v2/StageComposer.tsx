@@ -261,8 +261,8 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
     isFreshCreate && (initialMedia.length > 0 || awaitingMedia) ? 1 : 2,
   );
 
-  // Both pages are dark canvases now (page 1 #0B0F14 stage, page 2 A.CANVAS
-  // #15171F write surface), so the status bar keeps light icons and the notch
+  // Both pages share one dark canvas now (A.CANVAS #15171F on page 1 and
+  // page 2), so the status bar keeps light icons and the notch
   // bleeds the page colour instead of the legacy light-mode white (FFF8FAFC).
   // On unmount, re-resolve chrome for the route underneath (Clubhouse dark,
   // Watch light, profile immersive, etc.) because overlay close is not a route change.
@@ -764,9 +764,11 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
   // ---- PAGE 1 — MEDIA, DARK -------------------------------------------------
   if (page === 1) {
     return (
-      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: CT_DARK.bg, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
+      {/* Canvas matches page 2 (PAGE2.canvas) — both steps sit on the same
+          surface so there is no colour step between them. */}
+      <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
         {/* Top bar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: CT_DARK.bg, flex: 'none' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: PAGE2.canvas, flex: 'none' }}>
           <button onClick={handleClose} aria-label="Close" style={closeButtonStyle}>
             {/* SVG GLYPH, NOT A TEXT GLYPH. A "\u00d7" character sits on the text
                 baseline inside its line box, so flex centring centres the LINE
@@ -805,7 +807,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
             style={{
               flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column',
               justifyContent: 'flex-end', padding: '0 28px 30px',
-              background: CT_DARK.bg, overflowY: 'auto',
+              background: PAGE2.canvas, overflowY: 'auto',
             }}
           >
             <div style={{ ...LABEL, color: CT_DARK.dim }}>
@@ -897,7 +899,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
             {/* Frame pills row (+ Add pill when there is exactly one slide) */}
             {active && !active.existingId && (
-              <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6, padding: '12px 16px 0', background: CT_DARK.bg }}>
+              <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6, padding: '12px 16px 0', background: PAGE2.canvas }}>
                 <FramePills value={active.frame} onChange={(f) => updateActive({ frame: f })} />
                 {state.media.length === 1 && (
                   <button
@@ -921,7 +923,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
             {/* Filmstrip — only when there is more than one slide, centred in the gap */}
             {state.media.length > 1 ? (
-              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 16px', background: CT_DARK.bg }}>
+              <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 16px', background: PAGE2.canvas }}>
                 <MediaTray
                   media={state.media}
                   activeIndex={state.activeIndex}
@@ -932,13 +934,13 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
                 />
               </div>
             ) : (
-              <div style={{ flex: 1, minHeight: 0, background: CT_DARK.bg }} />
+              <div style={{ flex: 1, minHeight: 0, background: PAGE2.canvas }} />
             )}
           </>
         )}
 
         {/* Next */}
-        <div style={{ flex: 'none', background: CT_DARK.bg, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
+        <div style={{ flex: 'none', background: PAGE2.canvas, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
           <button
             onClick={() => { setPage(2); focusCaption(); }}
             disabled={emptyStage}
