@@ -183,6 +183,24 @@ export function AmateurHero({
             cursor: row.course_id ? 'pointer' : 'default',
           }}
         >
+          {/* §1 THE KICKER. It NAMES THE FEAT, which is what explains the gold
+              dot on the shape below — the label keys the graphic, so no legend
+              is needed. Timing is not repeated here: the row beneath carries it. */}
+          <span
+            style={{
+              ...KICKER,
+              display: 'block',
+              marginBottom: 6,
+              color: 'rgba(255,255,255,0.66)',
+              textShadow: '0 1px 2px rgba(0,0,0,0.72)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {kicker}
+          </span>
+
           {/* WHO, on the photograph. */}
           <span style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
             <SquircleAvatar
@@ -207,23 +225,58 @@ export function AmateurHero({
             >
               {row.display_name}
             </span>
-            {par && (
+            {/* §2 GROSS OVER TO-PAR, right-aligned — the stacked shape and the
+                21 / 13 sizes are the Discover FriendRoundRow score column's, so
+                the hero states the score the way every round row already does
+                instead of inventing a size. GROSS ALWAYS EXISTS, so this block
+                survives a round with no hole detail (§4). */}
+            {row.gross != null && (
               <span
-                className="tabular-nums"
                 style={{
                   marginLeft: 'auto',
-                  fontSize: 17,
-                  fontWeight: 700,
-                  color: par.tone,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
                   textShadow: '0 1px 2px rgba(0,0,0,0.72)',
                 }}
               >
-                {par.text}
+                <span
+                  className="tabular-nums"
+                  style={{
+                    fontSize: 21,
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    letterSpacing: '-0.03em',
+                    color: A.INK,
+                  }}
+                >
+                  {row.gross}
+                </span>
+                {par && (
+                  <span
+                    className="tabular-nums"
+                    style={{
+                      marginTop: 2,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      letterSpacing: '-0.02em',
+                      color: par.tone,
+                    }}
+                  >
+                    {par.text}
+                  </span>
+                )}
               </span>
             )}
           </span>
 
-          {/* THE ROUND SHAPE, over the scrim, 34px. */}
+          {/* THE ROUND SHAPE, over the scrim, 34px.
+              §3 TWO QUIET ADDITIONS, BOTH DEPENDENT ON THE HOLE SERIES: the
+              level-par rule at 14% white and the hole number under the bead.
+              showBaseline stays FALSE so the three-point fallback (no hole
+              detail) draws NO rule — a rule under a curve that has no holes
+              behind it is a promise the drawing cannot keep (§4). */}
           <span style={{ display: 'block', marginTop: 8 }}>
             <RoundShape
               row={row}
@@ -231,7 +284,10 @@ export function AmateurHero({
               width={320}
               height={AMATEUR_HERO_SHAPE_H}
               showMeta={false}
+              showBaseline={false}
               strokeWidth={2}
+              baselineColor={HERO_BASELINE}
+              beadHoleLabels
             />
           </span>
 
