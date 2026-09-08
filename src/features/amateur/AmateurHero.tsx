@@ -310,7 +310,7 @@ export function AmateurHero({
               showBaseline stays FALSE so the three-point fallback (no hole
               detail) draws NO rule — a rule under a curve that has no holes
               behind it is a promise the drawing cannot keep (§4). */}
-          <span ref={shapeBandRef} style={{ display: 'block', width: '100%', marginTop: 8 }}>
+          <span ref={setShapeBand} style={{ display: 'block', width: '100%', marginTop: 8 }}>
             <RoundShape
               row={row}
               shape={shape}
