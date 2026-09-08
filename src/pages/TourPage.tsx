@@ -15,18 +15,28 @@
  * is complete and confirmed on device.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
+import { RailChips } from '@/components/ui/RailChips';
 import { TourHero } from '@/features/tour/TourHero';
 import { TourHeader } from '@/features/tour/TourHeader';
+import { TourLeaderboardBlock } from '@/features/tour/TourLeaderboardBlock';
+import { useTourBoardState } from '@/features/tour/useTourBoardState';
+import { TOUR_CONFIG, type TourId } from '@/features/tourhub/hooks/useOverviewData';
 import { FONT } from '@/features/tourhub/_shared/tokens';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const CANVAS = '#0D0F14';
 
+/** The picker governs the live Leaderboard and Our Picks. Nothing else. */
+const PICKER_TOURS: TourId[] = ['pga', 'euro', 'lpga', 'liv', 'pgad', 'champ'];
+
 export default function TourPage() {
+  const [tour, setTour] = useState<TourId>('pga');
+  const board = useTourBoardState(tour);
+
   useEffect(() => {
     analyticsEvents.track('tour_page_viewed', {});
   }, []);
@@ -37,7 +47,20 @@ export default function TourPage() {
       <TourHero />
 
       <main style={{ padding: `14px 14px ${NAV_CLEARANCE}` }}>
-        {/* Blocks 1-4 land here, in order: leaderboard, Our Picks, Coming Up, wire. */}
+        {/* THE ONE PICKER, above the blocks it governs, saying so by sitting there. */}
+        <RailChips
+          options={PICKER_TOURS.map((id) => ({ id, label: TOUR_CONFIG[id].name }))}
+          value={tour}
+          onChange={(next) => {
+            analyticsEvents.track('tour_picker_changed', { tour: next });
+            setTour(next as TourId);
+          }}
+          ariaLabel="Tour"
+          style={{ margin: '0 -14px', padding: '0 14px' }}
+        />
+
+        <TourLeaderboardBlock state={board} />
+        {/* Our Picks, Coming Up and the wire land beneath, in that order. */}
       </main>
     </div>
   );
