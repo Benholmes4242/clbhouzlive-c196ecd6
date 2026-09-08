@@ -6,10 +6,9 @@
  * course-wide distribution stay here, and hole-by-hole, how each par plays and
  * the SI ladder move behind ONE named link — "All 18 holes ›".
  *
- * THE CHART IS THE SHARED ONE. ShapeChart is imported from CourseAnalyticsPanels
- * rather than rewritten, so the tab and Discover can never disagree about how a
- * course's shape is drawn. Its bars keep the DIFFICULTY RAMP they already use —
- * amber remains the viewing member's line and nothing else (§6).
+ * THE CHART IS LOCAL TO THIS SECTION. Eighteen independent field bars carry an
+ * optional amber marker for the viewer on the same per-hole scale. There is no
+ * connecting curve: this is a comparison across holes, not a round sequence.
  *
  * STATE A (>= 20 pooled rounds) AND STATE B (1–19) ARE BUILT TOGETHER. Under the
  * threshold there is NO chart, no figures and no distribution: one round's
@@ -26,10 +25,117 @@ import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/use
 import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { A, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
-import { ShapeChart } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
-import { DistributionStrip, courseBucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
+import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { courseBucketShares, type BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
+
+const CHART_HEIGHT = 82;
+
+/** Eighteen independent field comparisons. This intentionally does not reuse ShapeChart. */
+const LocalHoleChart: React.FC<{
+  holes: ReturnType<typeof useCourseHoleAnalysis>['data'] extends infer _T ? Array<{ hole_no: number; avg_to_par: number }> : never;
+  myByHole: Map<number, MyHolePerformanceRow>;
+  hasYou: boolean;
+}> = ({ holes, myByHole, hasYou }) => {
+  const maxField = Math.max(0.01, ...holes.map((hole) => Math.max(0, hole.avg_to_par)));
+
+  return (
+    <div>
+      <div
+        aria-hidden="true"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${holes.length}, minmax(0, 1fr))`,
+          alignItems: 'end',
+          gap: 3,
+          height: CHART_HEIGHT,
+        }}
+      >
+        {holes.map((hole) => {
+          const fieldValue = Math.max(0, hole.avg_to_par);
+          const barHeight = Math.max(2, (fieldValue / maxField) * CHART_HEIGHT);
+          const mine = myByHole.get(hole.hole_no)?.avg_to_par;
+          const markerBottom = mine == null
+            ? null
+            : Math.max(0, Math.min(barHeight - 2, (Math.max(0, mine) / maxField) * CHART_HEIGHT));
+          const strong = hole.avg_to_par > 0.6;
+          const overPar = hole.avg_to_par > 0;
+
+          return (
+            <span
+              key={hole.hole_no}
+              style={{
+                position: 'relative',
+                display: 'block',
+                width: '100%',
+                height: barHeight,
+                borderRadius: BAR_RADIUS,
+                background: overPar ? A.RED : A.MUTE,
+                opacity: overPar && !strong ? 0.55 : 1,
+                overflow: 'hidden',
+              }}
+            >
+              {hasYou && markerBottom != null ? (
+                <i
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    bottom: markerBottom,
+                    height: 2,
+                    borderRadius: BAR_RADIUS,
+                    background: A.AMBER,
+                    opacity: overPar && !strong ? 1 / 0.55 : 1,
+                  }}
+                />
+              ) : null}
+            </span>
+          );
+        })}
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: 8,
+          color: A.DIM,
+          fontFamily: SANS,
+          fontSize: 10,
+          fontWeight: 700,
+          ...FIGS,
+        }}
+      >
+        <span>1</span>
+        <span>9</span>
+        <span>18</span>
+      </div>
+    </div>
+  );
+};
+
+const LocalDistribution: React.FC<{ shares: BucketShares }> = ({ shares }) => {
+  const { t } = useTranslation('courses');
+  const columns = [
+    { key: 'birdie' as const, color: RAMP_TOPAR.birdie, label: t('holes.preview.legendBirdie') },
+    { key: 'par' as const, color: RAMP_TOPAR.par, label: t('holes.preview.legendPar') },
+    { key: 'bogey' as const, color: RAMP_TOPAR.bogey, label: t('holes.preview.legendBogey') },
+    { key: 'double' as const, color: RAMP_TOPAR.double, label: t('holes.preview.legendDouble') },
+  ];
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8, marginTop: 18 }}>
+      {columns.map((column) => (
+        <div key={column.key} style={{ minWidth: 0 }}>
+          <div style={{ height: 4, width: '100%', borderRadius: BAR_RADIUS, background: column.color }} />
+          <div style={{ marginTop: 7, color: A.INK, fontFamily: SANS, fontSize: 13, fontWeight: 700, ...FIGS }}>
+            {Math.round(shares[column.key] * 100)}%
+          </div>
+          <div style={{ ...ABOUT_KICKER, marginTop: 3 }}>{column.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 /** §3.4 b — a labelled figure in the four-across row. */
 const Figure: React.FC<{ label: string; value: string; tone?: string }> = ({
@@ -197,27 +303,12 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
   const hasYou = myByHole.size > 0 && holes.some((h) => myByHole.has(h.hole_no));
   const field = toParParts(stats.fieldAvg);
   const you = toParParts(stats.yourAvg);
-  const hardestFig = toParParts(stats.hardest.avg_to_par);
-  const easiestFig = toParParts(stats.easiest.avg_to_par);
-  const flat = stats.hardest.avg_to_par === stats.easiest.avg_to_par;
   const shares = courseBucketShares(holes);
 
   /* ── STATE A — the course picture. ── */
   return (
     <AboutSection heading={heading} meta={meta}>
-      <ShapeChart
-        holes={holes}
-        myByHole={myByHole}
-        hardestHole={stats.hardest.hole_no}
-        hardestText={hardestFig ? hardestFig.text : ''}
-        hardestTone={hardestFig ? hardestFig.tone : A.INK}
-        easiestHole={stats.easiest.hole_no}
-        easiestText={easiestFig ? easiestFig.text : ''}
-        easiestTone={easiestFig ? easiestFig.tone : A.INK}
-        flat={flat}
-        hasYou={hasYou}
-        fieldIsOnlyYou={false}
-      />
+      <LocalHoleChart holes={holes} myByHole={myByHole} hasYou={hasYou} />
 
       {/* b) the figures the chart cannot state. YOUR AVG is amber and only
              appears for a member who has played here (§6). */}
@@ -251,7 +342,7 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
       </div>
 
       {/* c) the course-wide spread, in the four scoring tones the rows use. */}
-      {shares ? <DistributionStrip shares={shares} style={{ marginTop: 18, paddingBottom: 0 }} /> : null}
+      {shares ? <LocalDistribution shares={shares} /> : null}
 
       {/* d) the hairline and the one drill-down. */}
       <DrillDownRow holes={holes.length} onPress={openDrillDown} />
