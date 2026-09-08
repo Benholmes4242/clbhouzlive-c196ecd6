@@ -20,8 +20,12 @@ import { RailChips } from '@/components/ui/RailChips';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
+import { FindGolfersSheet } from '@/components/explore-tab-new/FindGolfersSheet';
+
 import { basisLine } from './basisLine';
+import { useCircleSize } from './useCircleSize';
 import type { AmateurBoardState } from './useAmateurBoardState';
+
 
 /**
  * BLOCK 1 - THE LEADERBOARD (BRIEF_AMATEUR_PAGE).
@@ -39,7 +43,23 @@ import type { AmateurBoardState } from './useAmateurBoardState';
 /** Eight positions on the page; the see-all sheet holds the remainder. */
 const VISIBLE_POSITIONS = 8;
 
+/** §2 — four ranked rows is a leaderboard; fewer is a stated thin result. */
+const THIN_FLOOR = 4;
+
+/** One quiet affordance shape for every widen/repair action on this block. */
+const QUIET_ACTION = {
+  padding: 0,
+  border: 'none',
+  background: 'transparent',
+  color: A.INK,
+  fontFamily: SANS,
+  fontSize: 12,
+  fontWeight: 600,
+  cursor: 'pointer',
+} as const;
+
 const MEMBER_BOARD_KEYS: readonly BoardKey[] = [...RANKING_BOARD_KEYS, ...FEAT_BOARD_KEYS];
+
 
 export function AmateurLeaderboardBlock({
   userId,
@@ -52,6 +72,7 @@ export function AmateurLeaderboardBlock({
 }) {
   const { t } = useTranslation('courses');
   const [seeAll, setSeeAll] = useState(false);
+  const [findGolfers, setFindGolfers] = useState(false);
 
   /* THE READ IS THE PAGE'S, not this block's - the filter panel states the same
      count, and two reads could disagree. */
@@ -66,11 +87,21 @@ export function AmateurLeaderboardBlock({
   );
   const minePinned = !!mine && !visible.some((row) => row.user_id === mine.user_id);
 
+  /* §2 — the three cases only apply to the circle: it is the only pool that can
+     be thin for a reason the member can act on. */
+  const isCircle = filters.scope === 'circle';
+  const thin = isCircle && total > 0 && total < THIN_FLOOR;
+  const circle = useCircleSize(userId, isCircle && !page.isPending && total === 0);
+  /* C2 — no circle at all. Until the head-count settles we assume C1, so the
+     harsher cold-start copy is never shown to a member who has a circle. */
+  const coldStart = circle.data === 0;
+
   const appliedParts = useMemo(() => describeFilterParts(filters, t as never), [filters, t]);
   const boardTitle = t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
   const unit = boardCountsRounds(board)
     ? t('discover.filterBoard.nRounds', '{{count}} rounds', { count: total })
     : t('discover.coursesPlayed.nMembers', '{{count}} members', { count: total });
+
 
   return (
     <section style={{ paddingTop: 18, fontFamily: SANS, ...FIGS }}>
