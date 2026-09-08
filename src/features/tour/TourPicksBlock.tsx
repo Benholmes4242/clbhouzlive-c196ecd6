@@ -63,8 +63,15 @@ export function TourPicksBlock({ tour }: { tour: TourId }) {
   const navigate = useNavigate();
   const { data: cache } = useTournamentsCache();
 
-  /* THE PICKER GOVERNS THE SUBJECT: the tour's live event, else its next one. */
-  const subject = useMemo(() => {
+  /* THE PICKER GOVERNS THE SUBJECT: the tour's live event, else its next one.
+     THE SETTLED EVENT IS THE HONEST FALLBACK. Sportradar publishes a field only
+     in the days before an event, and generate-predictions refuses to read a
+     field it does not have ("no confirmed field"). Between events there is
+     therefore nothing to predict — rather than an empty block for four days, the
+     block reads the tour's LAST SETTLED event, where the picks exist AND the
+     record line is true. The heading names the event either way, so the member
+     is never shown last week's reading as though it were next week's. */
+  const ahead = useMemo(() => {
     const live = (cache?.live ?? [])
       .filter((t) => t.status === 'inprogress' && t.season?.tour_name === tour)
       .sort((a, b) => (b.purse ?? 0) - (a.purse ?? 0))[0];
@@ -72,15 +79,24 @@ export function TourPicksBlock({ tour }: { tour: TourId }) {
     const next = (cache?.upcoming ?? [])
       .filter((t) => t.season?.tour_name === tour)
       .sort((a, b) => a.start_date.localeCompare(b.start_date))[0];
-    if (next) return { id: next.id, name: next.name, live: false, settled: false };
+    return next ? { id: next.id, name: next.name, live: false, settled: false } : null;
+  }, [cache, tour]);
+
+  const behind = useMemo(() => {
     const done = (cache?.completed ?? [])
       .filter((t) => t.season?.tour_name === tour)
       .sort((a, b) => b.end_date.localeCompare(a.end_date))[0];
     return done ? { id: done.id, name: done.name, live: false, settled: true } : null;
   }, [cache, tour]);
 
-  const { data, isLoading } = useAIPredictions(subject?.id ?? null);
-  const predictions: AIPredictionData | null = data ?? null;
+  const aheadQ = useAIPredictions(ahead?.id ?? null);
+  const behindQ = useAIPredictions(behind?.id ?? null);
+
+  const aheadPicks = aheadQ.data?.topContenders ?? [];
+  const useAhead = aheadPicks.length > 0 || aheadQ.isLoading;
+  const subject = useAhead ? ahead : behind ?? ahead;
+  const predictions: AIPredictionData | null = (useAhead ? aheadQ.data : behindQ.data) ?? null;
+  const isLoading = useAhead ? aheadQ.isLoading : behindQ.isLoading;
 
   const picks = (predictions?.topContenders ?? []).slice().sort((a, b) => a.rank - b.rank);
   const shown = picks.slice(0, VISIBLE_PICKS);
@@ -101,8 +117,28 @@ export function TourPicksBlock({ tour }: { tour: TourId }) {
     return `${inside} of ${picks.length} picks finished inside the top 20 at ${subject.name}`;
   }, [subject, picks, liveMap]);
 
+  /* THE SKELETON IS THE SIZE OF THE REAL CARD, NEVER LARGER: heading, then three
+     pick rows. Generation on a cache miss runs on the edge function, so the wait
+     can be tens of seconds — the held shape has to be honest about what lands. */
+  if (isLoading) {
+    return (
+      <section style={{ paddingTop: 32, fontFamily: SANS }} aria-hidden>
+        <div style={{ height: 18, width: 120, background: 'rgba(255,255,255,0.06)', borderRadius: 3 }} />
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            style={{
+              marginTop: 14,
+              height: 78,
+              borderBottom: `0.5px solid ${HAIRLINE_INK_7}`,
+              background: 'rgba(255,255,255,0.04)',
+            }}
+          />
+        ))}
+      </section>
+    );
+  }
   /* AN EMPTY SECTION RENDERS NOTHING — no heading over no content. */
-  if (isLoading) return <div style={{ height: 260 }} aria-hidden />;
   if (!subject || shown.length === 0) return null;
 
   return (
