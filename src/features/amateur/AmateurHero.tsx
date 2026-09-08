@@ -205,11 +205,10 @@ export function AmateurHero({
             cursor: row.course_id ? 'pointer' : 'default',
           }}
         >
-          {/* WHO, on the photograph. THE KICKER NOW FOLLOWS THIS ROW (§1), so
-              the block reads as a sentence about the member and sits nearer the
-              gold dot it exists to explain. */}
+          {/* WHO, on the photograph. Name and kicker form one column so the
+              avatar centres against the pair, not against the first line. The
+              score sits on the same row and shares the same vertical axis. */}
           <span style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-
             <SquircleAvatar
               size={30}
               src={row.profile_photo_url ?? undefined}
@@ -221,16 +220,41 @@ export function AmateurHero({
             <span
               style={{
                 minWidth: 0,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                fontSize: 14,
-                fontWeight: 700,
-                color: DISCOVER_FACT,
-                textShadow: '0 1px 2px rgba(0,0,0,0.72)',
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
-              {row.display_name}
+              <span
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: DISCOVER_FACT,
+                  textShadow: '0 1px 2px rgba(0,0,0,0.72)',
+                }}
+              >
+                {row.display_name}
+              </span>
+              {/* §1 THE KICKER, BENEATH THE NAME. It NAMES THE FEAT, which is what
+                  explains the gold dot on the shape below — the label keys the
+                  graphic, so no legend is needed. Timing is not repeated here.
+                  The column's own width truncates the kicker cleanly before the
+                  score block; no hard max-width is needed. */}
+              <span
+                style={{
+                  ...KICKER,
+                  marginTop: 7,
+                  color: 'rgba(255,255,255,0.66)',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.72)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {kicker}
+              </span>
             </span>
             {/* §2 GROSS OVER TO-PAR, right-aligned — the stacked shape and the
                 21 / 13 sizes are the Discover FriendRoundRow score column's, so
@@ -276,31 +300,6 @@ export function AmateurHero({
                 )}
               </span>
             )}
-          </span>
-
-          {/* §1 THE KICKER, BENEATH THE NAME. It NAMES THE FEAT, which is what
-              explains the gold dot on the shape below — the label keys the
-              graphic, so no legend is needed. Timing is not repeated here.
-              ALIGNED TO THE NAME, not the avatar: 30px avatar + 9px gap = 39px,
-              so name and caption read as one column with the avatar outside it.
-              WIDTH GUARD: capped clear of the score column above and truncated
-              with an ellipsis, so "HOLE IN ONE AT THE 17TH" never runs under it.
-              The JUST PLAYED fallback renders in this same place (§degradation). */}
-          <span
-            style={{
-              ...KICKER,
-              display: 'block',
-              marginLeft: 39,
-              marginTop: 7,
-              maxWidth: 'calc(100% - 39px - 76px)',
-              color: 'rgba(255,255,255,0.66)',
-              textShadow: '0 1px 2px rgba(0,0,0,0.72)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {kicker}
           </span>
 
 
