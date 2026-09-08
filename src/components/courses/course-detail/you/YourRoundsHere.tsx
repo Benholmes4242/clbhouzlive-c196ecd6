@@ -10,8 +10,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatNumber } from '@/i18n/format';
-import { formatMonthDayYearShort } from '@/i18n/format';
+import { formatNumber, formatMonthDayYearShort } from '@/i18n/format';
 import { A, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection, { ABOUT_KICKER, AboutHairline } from '../about/AboutSection';
 import { YouLinkRow } from './youBits';
