@@ -8,10 +8,8 @@ import { useCourseLegends } from '@/hooks/gam/useCourseLegends';
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { Skeleton, RetryStub } from '../../../gam/_shared/GamAtoms';
-import { ChampionsEmptyState, ChampionsWindowEmptyState } from './drilldown/ChampionsEmptyState';
 import {
   legendCategoryLabel,
-  legendCategoryIcon,
   formatLegendValueCompact,
 } from '@/lib/gam/visuals';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
@@ -55,26 +53,6 @@ const SHORT_LABELS: Record<LegendCategory, string> = {
   lowest_gross_women_all_time:  "Women's",
 };
 
-const UNITS: Record<LegendCategory, string> = {
-  best_score_diff_90d:      'vs HCP',
-  best_score_diff_all_time: 'vs HCP',
-  lowest_gross_90d:         '',
-  lowest_gross_all_time:    '',
-  most_birdies_90d:         '',
-  most_birdies_all_time:    '',
-  best_stableford_90d:      'pts',
-  best_stableford_all_time: 'pts',
-  most_eagles_90d:          '',
-  most_eagles_all_time:     '',
-  most_aces_90d:            '',
-  most_aces_all_time:       '',
-  most_albatrosses_90d:     '',
-  most_albatrosses_all_time:'',
-  most_rounds_90d:              '',
-  most_rounds_all_time:         '',
-  lowest_gross_women_90d:       '',
-  lowest_gross_women_all_time:  '',
-};
 
 
 
@@ -406,17 +384,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   }, [deepCat, isLoading, isError, visibleCategories]);
 
 
-  const sheetCategoryDescriptors = useMemo(
-    () =>
-      visibleCategories.map((cat) => ({
-        key: cat,
-        label: legendCategoryLabel[cat],
-        short: SHORT_LABELS[cat],
-        icon: legendCategoryIcon[cat],
-        unit: UNITS[cat],
-      })),
-    [visibleCategories],
-  );
+
 
   // Per-visit rotation counter — exactly ONE increment per drilldown mount.
   // Falls back to date-hash seed inside pickProBenchmark if localStorage is unavailable.
