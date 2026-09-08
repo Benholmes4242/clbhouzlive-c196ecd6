@@ -2,6 +2,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { courseMediaCountsKey, fetchCourseMediaCounts } from '@/hooks/useCourseMediaCounts';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 import type { RpcClient } from '@/features/watch-v2/hooks/useHubMixedGrid';
