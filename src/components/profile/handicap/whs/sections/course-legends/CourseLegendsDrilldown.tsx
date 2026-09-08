@@ -19,8 +19,9 @@ import type { CourseSelection } from './types';
 
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
 
-import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
-import { FullCourseLeaderboardSheetDispatch } from './drilldown/FullCourseLeaderboardSheetDispatch';
+import { FlatBoardSheet } from './flat/FlatBoardSheet';
+import { UnclaimedSection, WhatCounts, NobodyHasPlayed } from './flat/UnclaimedSection';
+import { useBoardMemberUsernames } from '@/hooks/gam/useBoardMemberUsernames';
 
 import { YourCrowns } from './flat/YourCrowns';
 import { BoardSection } from './flat/BoardSection';
@@ -77,6 +78,25 @@ const UNITS: Record<LegendCategory, string> = {
 
 
 
+/**
+ * §3.3 — the canonical seven all-time boards, so Unclaimed can name what is
+ * missing. best_score_diff is excluded from this tab, as in the grid order.
+ */
+const CANONICAL_BOARDS: LegendCategory[] = CHAMPIONS_ORDER_ALL_TIME.filter(
+  (c) => c !== 'best_score_diff_all_time',
+);
+
+/** Lower-case board words for the Unclaimed sentence. */
+const BOARD_WORD: Partial<Record<LegendCategory, string>> = {
+  lowest_gross_all_time: 'gross',
+  best_stableford_all_time: 'stableford',
+  most_aces_all_time: 'ace',
+  most_albatrosses_all_time: 'albatross',
+  most_eagles_all_time: 'eagle',
+  most_birdies_all_time: 'birdie',
+  most_rounds_all_time: 'rounds',
+};
+
 interface SectionRow {
   rank: number;
   name: string;
@@ -86,6 +106,7 @@ interface SectionRow {
   attained_at: string;
   isSelf: boolean;
   userId: string | null;
+  username?: string | null;
   rank30d: number | null;
   delta: number | null;
 }
@@ -216,6 +237,33 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     return m;
   }, [data]);
 
+  /**
+   * §2 (this message) — the row tap needs a destination. The board RPC joins
+   * user_profiles for names and faces but does not return the username, and its
+   * deployed signature is not ours to widen, so the ids are resolved here.
+   */
+  const boardUserIds = useMemo(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    () => (data ?? []).map((r: any) => r.user_id as string).filter(Boolean),
+    [data],
+  );
+  const { data: usernameMap } = useBoardMemberUsernames(boardUserIds);
+
+  const grouped = useMemo(() => {
+    if (!usernameMap) return groupedWithTotals;
+    const m = new Map<LegendCategory, { rows: SectionRow[]; total: number }>();
+    groupedWithTotals.forEach((entry, cat) => {
+      m.set(cat, {
+        total: entry.total,
+        rows: entry.rows.map((r) => ({
+          ...r,
+          username: r.userId ? usernameMap[r.userId] ?? null : null,
+        })),
+      });
+    });
+    return m;
+  }, [groupedWithTotals, usernameMap]);
+
   const yourRanks = useMemo(() => {
     const r: Partial<Record<LegendCategory, number | null>> = {};
     visibleCategories.forEach((cat) => {
@@ -289,6 +337,15 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     });
     return { totalBoards: cats.length, held, claimedCount, otherHolderName, otherHolderClaimedCount };
   }, [visibleCategoriesAllTime, groupedWithTotals]);
+
+  /** §3.3 — the boards nobody holds, all time, named in order. */
+  const unclaimedNames = useMemo(
+    () =>
+      CANONICAL_BOARDS.filter(
+        (cat) => (groupedWithTotals.get(cat)?.rows.length ?? 0) === 0,
+      ).map((cat) => BOARD_WORD[cat] ?? String(cat)),
+    [groupedWithTotals],
+  );
 
   /** §3.2 — descriptors for the flat board, in the active window. */
   const boardDescriptors = useMemo(
@@ -460,7 +517,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
       {!isLoading && !isError && (data ?? []).length === 0 && (
-        <ChampionsEmptyState courseName={ctx.courseName} />
+        <NobodyHasPlayed totalBoards={CANONICAL_BOARDS.length} />
       )}
 
       {/* BRIEF_CHAMPIONS_TAB_REBUILD §3.1 + §3.2 — a statement, then the board. */}
@@ -482,7 +539,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
           <BoardSection
             categories={boardDescriptors}
-            grouped={groupedWithTotals}
+            grouped={grouped}
             activeKey={activeBoardKey}
             onSelectCategory={(k) => {
               analyticsEvents.track('champions_board_chip_changed', {
@@ -504,45 +561,65 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
               analyticsEvents.track('champions_see_all', { course_id: ctx.courseId, category: cat });
               setFullLeaderboardCategory(cat);
             }}
-            onRowPress={(row) =>
+            onRowPress={(row) => {
+              // A row about a member navigates to that member. No username, no
+              // tap and no event — the row is not offered as interactive.
+              if (!row.username) return;
               analyticsEvents.track('champions_row_tapped', {
                 course_id: ctx.courseId,
                 category: activeBoardKey,
                 member_id: row.userId ?? null,
                 is_self: row.isSelf,
-              })
-            }
+              });
+              navigate(`/profile/${row.username}`);
+            }}
           />
+
+          <UnclaimedSection
+            names={unclaimedNames}
+            onAllBoards={() => {
+              analyticsEvents.track('champions_all_boards', { course_id: ctx.courseId });
+              setFullLeaderboardCategory(activeBoardKey);
+            }}
+          />
+
+          <WhatCounts />
         </div>
       )}
 
 
-      {theme === 'light' ? (
-        <FullCourseLeaderboardSheetDispatch
-          open={fullLeaderboardCategory !== null}
-          onClose={() => setFullLeaderboardCategory(null)}
-          courseName={ctx.courseName}
-          groupedRows={groupedWithTotals}
-          visibleCategories={sheetCategoryDescriptors}
-          initialCategory={fullLeaderboardCategory ?? visibleCategories[0]}
-          window={window}
-          yourRanks={yourRanks}
-          theme={theme}
-        />
-      ) : (
-        <FullCourseLeaderboardSheet
-          open={fullLeaderboardCategory !== null}
-          onClose={() => setFullLeaderboardCategory(null)}
-          courseName={ctx.courseName}
-          groupedRows={groupedWithTotals}
-          visibleCategories={sheetCategoryDescriptors}
-          initialCategory={fullLeaderboardCategory ?? visibleCategories[0]}
-          window={window}
-          yourRanks={yourRanks}
-          coursePar={meta?.course_par ?? null}
-          theme={theme}
-        />
-      )}
+      <FlatBoardSheet
+        open={fullLeaderboardCategory !== null}
+        onClose={() => {
+          analyticsEvents.track('champions_sheet_dismissed', { course_id: ctx.courseId });
+          setFullLeaderboardCategory(null);
+        }}
+        courseName={ctx.courseName}
+        categories={boardDescriptors}
+        grouped={grouped}
+        initialCategory={fullLeaderboardCategory ?? activeBoardKey}
+        legendWindow={window}
+        coursePar={meta?.course_par ?? null}
+        onCategoryChange={(from, to) =>
+          analyticsEvents.track('champions_sheet_board_changed', {
+            course_id: ctx.courseId,
+            from,
+            to,
+          })
+        }
+        onRowPress={(row) => {
+          if (!row.username) return;
+          analyticsEvents.track('champions_row_tapped', {
+            course_id: ctx.courseId,
+            category: fullLeaderboardCategory ?? activeBoardKey,
+            member_id: row.userId ?? null,
+            is_self: row.isSelf,
+            surface: 'sheet',
+          });
+          navigate(`/profile/${row.username}`);
+        }}
+      />
+
     </div>
   );
 };
