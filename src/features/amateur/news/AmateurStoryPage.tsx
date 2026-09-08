@@ -91,7 +91,7 @@ export function AmateurStoryPage() {
                 {t('amateurNews.more', 'MORE AMATEUR NEWS')}
               </div>
               {(more ?? []).map((s) => (
-                <div key={s.id} style={{ borderTop: `1px solid ${HAIRLINE_INK_10}` }}>
+                <div key={s.id} style={{ borderTop: `1px solid ${HAIRLINE_INK_10}`, padding: '0 14px' }}>
                   <WorkhorseRow story={s} onOpen={() => navigate(`/discover/news/${s.slug}`)} engagement={engagementFor(s.id)} />
                 </div>
               ))}

@@ -76,10 +76,18 @@ function KickerLine({ kicker, at, compact = false, trailing }: { kicker: string 
   );
 }
 
-export function LeadStory({ story, onOpen, compact = false, immersiveHero = true, engagement }: { story: TourStory; onOpen: () => void; compact?: boolean; immersiveHero?: boolean; engagement?: StoryEngagement | null }) {
+/**
+ * `bleed` (BRIEF_EXPLORE_NEWS_FULL_BLEED): the image runs edge to edge out of a
+ * 14px-gutter page, radius 0, no card border. Only the OVERLAID type keeps an
+ * inset (20 from the viewport edge); the standfirst returns to the page gutter.
+ */
+export function LeadStory({ story, onOpen, compact = false, immersiveHero = true, engagement, bleed = false }: { story: TourStory; onOpen: () => void; compact?: boolean; immersiveHero?: boolean; engagement?: StoryEngagement | null; bleed?: boolean }) {
   const bandPadding = compact ? 6 : 8;
-  const sidePadding = compact ? 17 : 14;
+  const sidePadding = bleed ? 20 : compact ? 17 : 14;
   const standfirstPad = compact ? 4 : 6;
+  const bleedFrame: React.CSSProperties = bleed
+    ? { marginInline: -14, width: 'calc(100% + 28px)', borderRadius: 0, border: 'none' }
+    : {};
   return (
     <button
       type="button"
@@ -90,7 +98,7 @@ export function LeadStory({ story, onOpen, compact = false, immersiveHero = true
         border: 'none', padding: 0, cursor: 'pointer', fontFamily: FONT,
       }}
     >
-      <div style={{ position: 'relative', height: compact ? COMPACT_LEAD_HEIGHT : immersiveHero ? OVERVIEW_HERO_HEIGHT : 232, width: '100%', overflow: 'hidden', background: SLATE_100 }}>
+      <div style={{ position: 'relative', height: compact ? COMPACT_LEAD_HEIGHT : immersiveHero ? OVERVIEW_HERO_HEIGHT : 232, width: '100%', overflow: 'hidden', background: SLATE_100, ...bleedFrame }}>
         <img
           src={story.image_url as string}
           alt={story.headline}
@@ -99,9 +107,6 @@ export function LeadStory({ story, onOpen, compact = false, immersiveHero = true
             width: '100%',
             height: `calc(100% + ${HERO_SUBJECT_DROP * 2}px)`,
             objectFit: 'cover',
-            // objectPosition is the default; it is written out to stop future
-            // edits trying to "tune" a focal point that has no vertical travel
-            // on this nearly-square hero (landscape photos crop at the sides).
             objectPosition: '50% 50%',
             display: 'block',
           }}
@@ -126,13 +131,15 @@ export function LeadStory({ story, onOpen, compact = false, immersiveHero = true
         </div>
       </div>
       {story.standfirst && (
-        <div style={{ padding: `${standfirstPad}px 14px 0`, fontSize: 13, lineHeight: 1.45, color: INK_MUTE }}>
+        <div style={{ padding: `${standfirstPad}px ${bleed ? 0 : 14}px 0`, fontSize: 13, lineHeight: 1.45, color: INK_MUTE }}>
           {story.standfirst}
         </div>
       )}
     </button>
   );
 }
+
+
 
 export function StoryRow({ story, onOpen, compact = false, engagement }: { story: TourStory; onOpen: () => void; compact?: boolean; engagement?: StoryEngagement | null }) {
   return (

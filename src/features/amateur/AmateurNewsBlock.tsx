@@ -66,14 +66,14 @@ export function AmateurNewsBlock() {
       />
 
       {lead && (
-        <LeadStory story={lead} onOpen={() => open(lead.slug)} compact engagement={engagementFor(lead.id)} />
+        <LeadStory story={lead} onOpen={() => open(lead.slug)} compact bleed engagement={engagementFor(lead.id)} />
       )}
       {rows.length > 0 && (
         <div style={{ marginTop: lead ? 8 : 0 }}>
           {rows.map((story, index) => (
             <div
               key={story.id}
-              style={{ borderTop: index === 0 && !lead ? 'none' : `1px solid ${HAIRLINE_INK_10}` }}
+              style={{ borderTop: index === 0 ? 'none' : `1px solid ${HAIRLINE_INK_10}` }}
             >
               <StoryRow story={story} onOpen={() => open(story.slug)} compact engagement={engagementFor(story.id)} />
             </div>
