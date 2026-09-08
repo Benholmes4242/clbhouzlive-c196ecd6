@@ -4,9 +4,13 @@
  * ONE RANKED LIST, five boards behind chips (four out of tournament — the live
  * Leaderboard chip is ABSENT, not greyed, when nothing is in progress).
  *
- * CAPPED WITH A SEE-ALL. Ten positions on the page, the rest revealed in place:
- * a page of four blocks cannot spend two screens on one of them, and revealing
- * in place avoids a nested scroll.
+ * CAPPED WITH A SEE-ALL TO A PUSHED PAGE. Ten positions here; the full ranking
+ * opens at /tourhub/rankings. A season board runs to 219 rows and revealing that
+ * in place would bury Our Picks, Coming Up and the wire beneath it — the four
+ * block shape has to survive a curious tap.
+ *
+ * THE COUNT LINE STATES THE BASIS. A block governed by a filter says what it is
+ * reading: "219 players / PGA Tour season".
  *
  * THE MARK CHANGES BY BOARD, THE ROW DOES NOT. Players carry the round player
  * mark; schools carry a SQUARE crest in the same grid. Figures are tabular and
@@ -16,7 +20,6 @@
  * ink. NO AMBER on this block — no viewing member appears on a tour board.
  */
 
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import CountryFlag from '@/components/ui/country-flag';
@@ -81,7 +84,7 @@ function SchoolMark({ src, name }: { src: string | null; name: string }) {
   );
 }
 
-function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => void }) {
+export function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => void }) {
   const score = scoreText(row.toPar);
   return (
     <button
@@ -172,16 +175,16 @@ function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => void }) 
 
 export function TourLeaderboardBlock({ state }: { state: TourBoardState }) {
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState(false);
 
-  const { board, chips, rows, total, figureLabel, liveTournament } = state;
-  const visible = expanded ? rows : rows.slice(0, VISIBLE_POSITIONS);
+  const { board, chips, rows, total, figureLabel, liveTournament, basis } = state;
+  const visible = rows.slice(0, VISIBLE_POSITIONS);
 
   const title = board === 'live' ? liveTournament?.name ?? BOARD_LABEL.live : BOARD_LABEL[board];
+  const subject = board === 'colleges' ? 'schools' : 'players';
   const countLine = total > 0
-    ? board === 'colleges'
-      ? `${total} schools`
-      : `${total} players`
+    ? basis
+      ? `${total} ${subject} \u00b7 ${basis}`
+      : `${total} ${subject}`
     : null;
 
   const press = (row: TourBoardRow) => {
@@ -232,12 +235,14 @@ export function TourLeaderboardBlock({ state }: { state: TourBoardState }) {
           {visible.map((row) => (
             <BoardRow key={`${board}:${row.id}:${row.pos}`} row={row} onPress={() => press(row)} />
           ))}
-          {rows.length > VISIBLE_POSITIONS && !expanded && (
+          {rows.length > VISIBLE_POSITIONS && (
             <button
               type="button"
               onClick={() => {
                 analyticsEvents.track('tour_board_see_all', { board, total });
-                setExpanded(true);
+                /* THE PUSHED PAGE, not a reveal: 219 rows in place would cost the
+                   member the three blocks below. */
+                navigate(`/tourhub/rankings?board=${board}`);
               }}
               style={{
                 ...KICKER,

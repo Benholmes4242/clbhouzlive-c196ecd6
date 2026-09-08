@@ -22,6 +22,7 @@ import { RailChips } from '@/components/ui/RailChips';
 import { TourHero } from '@/features/tour/TourHero';
 import { TourHeader } from '@/features/tour/TourHeader';
 import { TourLeaderboardBlock } from '@/features/tour/TourLeaderboardBlock';
+import { TourPicksBlock } from '@/features/tour/TourPicksBlock';
 import { useTourBoardState } from '@/features/tour/useTourBoardState';
 import { TOUR_CONFIG, type TourId } from '@/features/tourhub/hooks/useOverviewData';
 import { FONT } from '@/features/tourhub/_shared/tokens';
@@ -47,10 +48,19 @@ export default function TourPage() {
       <TourHero />
 
       <main style={{ padding: `14px 14px ${NAV_CLEARANCE}` }}>
-        {/* THE ONE PICKER, above the blocks it governs, saying so by sitting there. */}
+        {/* THE ONE PICKER, above the blocks it governs, saying so by sitting there.
+            WHEN A FIXED-TOUR BOARD IS ACTIVE IT LOCKS to that board's tour —
+            dimmed, never hidden, so nothing moves and the reader can see why it
+            has stopped applying. The member's own selection is held in state and
+            returns intact the moment the live board or Our Picks is active. */}
         <RailChips
-          options={PICKER_TOURS.map((id) => ({ id, label: TOUR_CONFIG[id].name }))}
-          value={tour}
+          options={
+            board.pickerLock === 'colleges'
+              ? [{ id: 'colleges', label: 'Colleges' }, ...PICKER_TOURS.map((id) => ({ id, label: TOUR_CONFIG[id].name }))]
+              : PICKER_TOURS.map((id) => ({ id, label: TOUR_CONFIG[id].name }))
+          }
+          value={board.pickerLock ?? tour}
+          locked={board.pickerLock != null}
           onChange={(next) => {
             analyticsEvents.track('tour_picker_changed', { tour: next });
             setTour(next as TourId);
@@ -60,7 +70,8 @@ export default function TourPage() {
         />
 
         <TourLeaderboardBlock state={board} />
-        {/* Our Picks, Coming Up and the wire land beneath, in that order. */}
+        <TourPicksBlock tour={tour} />
+        {/* Coming Up and the wire land beneath, in that order. */}
       </main>
     </div>
   );

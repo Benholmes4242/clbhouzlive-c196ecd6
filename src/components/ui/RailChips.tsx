@@ -36,13 +36,20 @@ export interface RailChipsProps {
   /** Outer row style — margin/padding only. Never colours or type. */
   style?: CSSProperties;
   className?: string;
+  /**
+   * LOCKED: the rail still states the basis but cannot be changed — dimmed, not
+   * hidden, so the geometry never shifts and the reader can see why. Used when a
+   * block below is fixed to one value by definition (Tour's points boards).
+   */
+  locked?: boolean;
 }
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className }: RailChipsProps) {
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked }: RailChipsProps) {
   return (
     <div
       role="tablist"
       aria-label={ariaLabel}
+      aria-disabled={locked || undefined}
       className={`hide-scrollbar${className ? ` ${className}` : ''}`}
       style={{
         display: 'flex',
@@ -51,6 +58,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
         overflowX: 'auto',
         scrollbarWidth: 'none',
         WebkitOverflowScrolling: 'touch',
+        ...(locked ? { opacity: 0.45, pointerEvents: 'none' as const } : null),
         ...style,
       }}
     >
@@ -62,7 +70,9 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
             type="button"
             role="tab"
             aria-selected={active}
-            onClick={() => onChange(option.id)}
+            aria-disabled={locked || undefined}
+            tabIndex={locked ? -1 : undefined}
+            onClick={() => { if (!locked) onChange(option.id); }}
             style={{
               flexShrink: 0,
               padding: '6px 11px',

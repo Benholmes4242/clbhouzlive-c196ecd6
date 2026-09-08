@@ -29,7 +29,7 @@ import {
   usePlayersRanking,
   type PlayersTourId,
 } from '@/features/tourhub/players-v2/data/usePlayersRanking';
-import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
+import { TOUR_CONFIG, type TourId } from '@/features/tourhub/hooks/useOverviewData';
 
 export type TourBoardKey = 'live' | 'fedex' | 'rtd' | 'oom' | 'colleges';
 
@@ -67,10 +67,24 @@ export interface TourBoardRow {
   live: boolean;
 }
 
+/**
+ * WHAT THE PICKER MUST READ WHILE THIS BOARD IS ACTIVE.
+ *
+ * `null` means the picker is the member's own and governs as normal (live
+ * Leaderboard, Our Picks). A TourId means the board is fixed to that tour by
+ * definition and the picker is locked to it. 'colleges' means the board is not
+ * a tour at all — the picker reads "Colleges" and is locked.
+ */
+export type TourPickerLock = TourId | 'colleges' | null;
+
 export interface TourBoardState {
   board: TourBoardKey;
   chips: TourBoardKey[];
   changeBoard: (next: TourBoardKey) => void;
+  /** Locked picker value for the active board, or null when the member's own applies. */
+  pickerLock: TourPickerLock;
+  /** The basis the count line states — "PGA Tour season", "College golf". */
+  basis: string | null;
   /** The live tournament governing the Leaderboard chip, when there is one. */
   liveTournament: CachedTournament | null;
   rows: TourBoardRow[];
@@ -93,7 +107,7 @@ function fmtEarnings(n: number): string {
   return `$${Math.round(n)}`;
 }
 
-export function useTourBoardState(tour: TourId): TourBoardState {
+export function useTourBoardState(tour: TourId, initialBoard: TourBoardKey = 'live'): TourBoardState {
   const { data: cache } = useTournamentsCache();
 
   /* THE PICKER GOVERNS THIS ONE: the live event of the tour being read, biggest
@@ -109,7 +123,7 @@ export function useTourBoardState(tour: TourId): TourBoardState {
     ? ['live', 'fedex', 'rtd', 'oom', 'colleges']
     : ['fedex', 'rtd', 'oom', 'colleges'];
 
-  const [requested, setRequested] = useState<TourBoardKey>('live');
+  const [requested, setRequested] = useState<TourBoardKey>(initialBoard);
   /* A board that has left the row cannot stay selected — when the last
      tournament finishes mid-session the Leaderboard chip goes and the reader
      lands on the first board that still exists. */
@@ -142,6 +156,21 @@ export function useTourBoardState(tour: TourId): TourBoardState {
   return useMemo<TourBoardState>(() => {
     const changeBoard = (next: TourBoardKey) => setRequested(next);
 
+    /* THE PICKER MUST NEVER CONTRADICT THE LIST. A fixed-tour board locks the
+       picker to its own tour; Colleges locks it to "Colleges", which is not a
+       tour at all; the live board and Our Picks leave the member's own alone. */
+    const pickerLock: TourPickerLock =
+      board === 'colleges' ? 'colleges' : ((POINTS_TOUR[board] as TourId | undefined) ?? null);
+    const basis =
+      board === 'colleges'
+        ? 'College golf'
+        : pickerLock
+          ? `${TOUR_CONFIG[pickerLock as TourId].name} season`
+          : board === 'live'
+            ? TOUR_CONFIG[tour].name
+            : null;
+
+
     if (board === 'live') {
       const rows: TourBoardRow[] = (liveBoard.data ?? []).map((r, i) => {
         const p = r.player ?? {};
@@ -165,6 +194,8 @@ export function useTourBoardState(tour: TourId): TourBoardState {
         board,
         chips,
         changeBoard,
+        pickerLock,
+        basis,
         liveTournament,
         rows,
         total: rows.length,
@@ -194,6 +225,8 @@ export function useTourBoardState(tour: TourId): TourBoardState {
         board,
         chips,
         changeBoard,
+        pickerLock,
+        basis,
         liveTournament,
         rows,
         total: rows.length,
@@ -222,6 +255,8 @@ export function useTourBoardState(tour: TourId): TourBoardState {
       board,
       chips,
       changeBoard,
+      pickerLock,
+      basis,
       liveTournament,
       rows,
       total: rows.length,
