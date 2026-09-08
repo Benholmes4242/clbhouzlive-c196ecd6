@@ -75,7 +75,7 @@ const WhoPlaysHere: React.FC<WhoPlaysHereProps> = ({ courseId }) => {
       heading={t('courseDetail.sections.whoPlaysHere')}
       meta={t('courseDetail.members.meta', { count: total })}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {faces.length > 0 && (
           <div style={{ display: 'flex', flexShrink: 0 }}>
             {faces.map((member, index) => {
@@ -87,36 +87,14 @@ const WhoPlaysHere: React.FC<WhoPlaysHereProps> = ({ courseId }) => {
                   src={member.profile?.profile_photo_url ?? undefined}
                   alt={displayName}
                   userId={member.user_id}
-                  size={22}
+                  size={34}
                   /* The pile sits on the flat canvas now, so the traced ring
                      traces the canvas rather than the retired panel fill. */
                   ringColor={A.CANVAS}
-                  className={index > 0 ? '-ml-1.5' : ''}
+                  style={index > 0 ? { marginLeft: -10 } : undefined}
                 />
               );
             })}
-            {overflow > 0 && (
-              <div
-                className="-ml-1.5 tabular-nums lining-nums"
-                style={{
-                  minWidth: 22,
-                  height: 22,
-                  borderRadius: '34%',
-                  background: A.TRACK,
-                  border: `2px solid ${A.CANVAS}`,
-                  color: A.MUTE,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  padding: '0 4px',
-                  flexShrink: 0,
-                }}
-              >
-                +{overflow}
-              </div>
-            )}
           </div>
         )}
         <div
@@ -125,9 +103,9 @@ const WhoPlaysHere: React.FC<WhoPlaysHereProps> = ({ courseId }) => {
             minWidth: 0,
             flex: 1,
             fontFamily: SANS,
-            fontSize: 12.5,
-            fontWeight: 600,
-            color: A.INK,
+            fontSize: 13,
+            fontWeight: 500,
+            color: A.MUTE,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
