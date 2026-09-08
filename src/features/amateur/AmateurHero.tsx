@@ -32,14 +32,69 @@ export const AMATEUR_HERO_H = 340;
 /** The trace band. Short on purpose: it is a shape, not a chart. */
 export const AMATEUR_HERO_SHAPE_H = 34;
 
-function toPar(row: CircleRoundRow): { text: string; tone: string } | null {
-  if (row.gross == null || row.course_par == null) return null;
-  const d = row.gross - row.course_par;
-  if (d === 0) return { text: 'E', tone: DISCOVER_FACT };
-  return { text: d > 0 ? `+${d}` : `${d}`, tone: d < 0 ? TOPAR_RED : DISCOVER_FACT };
+/** THE LEVEL-PAR RULE ON A PHOTOGRAPH (§3a). 14% white: present enough to give
+ *  the curve a floor, quiet enough not to read as a scratch on the picture. */
+const HERO_BASELINE = 'rgba(255,255,255,0.14)';
+
+/** 7 -> 7TH, 12 -> 12TH, 21 -> 21ST. */
+function ordinal(n: number): string {
+  const mod100 = n % 100;
+  const suffix =
+    mod100 >= 11 && mod100 <= 13
+      ? 'TH'
+      : n % 10 === 1
+        ? 'ST'
+        : n % 10 === 2
+          ? 'ND'
+          : n % 10 === 3
+            ? 'RD'
+            : 'TH';
+  return `${n}${suffix}`;
 }
 
-export function AmateurHero({ userId }: { userId: string | undefined }) {
+/**
+ * §1 THE KICKER NAMES WHAT IS NOTABLE. First rung that applies wins:
+ *
+ *   1 HOLE IN ONE AT THE 7TH   2 ALBATROSS AT THE 12TH   3 EAGLE AT THE 12TH
+ *   4 COURSE RECORD            5 PERSONAL BEST HERE      6 JUST PLAYED
+ *
+ * THE KICKER IS THE KEY TO THE GOLD DOT. Rungs 1-3 are read off the hole series
+ * the shape is already drawn from — no new query. Rungs 4 and 5 are NOT
+ * implemented: neither the course's record nor this member's history at this
+ * course is in the hero's data, and inventing either from one round would be a
+ * false claim. Until that read exists the ladder steps 3 -> 6.
+ *
+ * NO HOLE SERIES, NO FEAT (§4): the ladder falls to JUST PLAYED rather than
+ * showing a gap. A feat with an unknown hole takes the BARE form.
+ */
+function featKicker(shape: HoleShape | null): string {
+  if (!shape) return 'JUST PLAYED';
+
+  const scored = shape.holes.filter((h) => h.par != null && h.strokes != null);
+  const named = (label: string, holeNo: number | null | undefined) =>
+    holeNo != null ? `${label} AT THE ${ordinal(holeNo)}` : label;
+
+  const ace = scored.find((h) => h.strokes === 1);
+  if (ace) return named('HOLE IN ONE', ace.holeNo);
+
+  const albatross = scored.find((h) => (h.strokes as number) - (h.par as number) <= -3);
+  if (albatross) return named('ALBATROSS', albatross.holeNo);
+
+  const eagle = scored.find((h) => (h.strokes as number) - (h.par as number) === -2);
+  if (eagle) return named('EAGLE', eagle.holeNo);
+
+  return 'JUST PLAYED';
+}
+
+export function AmateurHero({
+  userId,
+  onOpenRound,
+}: {
+  userId: string | undefined;
+  /** §5 THE HERO IS A DOOR TO THE ROUND, not to the course: the feat the kicker
+   *  names must be visible on the scorecard one tap away. */
+  onOpenRound?: (scoreId: string, roundUserId: string) => void;
+}) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
 
