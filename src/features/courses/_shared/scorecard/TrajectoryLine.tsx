@@ -427,6 +427,22 @@ export const TrajectoryLine: React.FC<Props> = ({
         </linearGradient>
       </defs>
 
+      {/* §2 THE LEVEL-PAR RULE, FULL WIDTH AND FIRST. SVG has no z-index, so
+          document order IS the stacking: the rule is painted BEFORE the fill and
+          the curve, which then sit on top of it. Painted last it cut across the
+          fill and read as a divider rather than a baseline. Edge to edge, not
+          just under the curve. No label, no axis, no scale. */}
+      <line
+        x1={0}
+        x2={w}
+        y1={zeroY}
+        y2={zeroY}
+        stroke={baselineColor ?? T.baseline}
+        strokeWidth={1}
+        strokeDasharray="3 4"
+        vectorEffect="non-scaling-stroke"
+      />
+
       {/* THE FILL IS ONE SOLID OPAQUE TONE, to the level line. No gradient, no
           fillOpacity, no rgba. THE LEVEL-PAR SPLIT KEEPS ITS STRUCTURE: each
           side of zero takes its own solid tone through its own clip, and RED IS
@@ -440,17 +456,6 @@ export const TrajectoryLine: React.FC<Props> = ({
         </g>
       ))}
 
-      {/* level par — unconditional: the fill and the earned-red rule both
-          reference it. */}
-      <line
-        x1={padX}
-        x2={w - padX}
-        y1={zeroY}
-        y2={zeroY}
-        stroke={baselineColor ?? T.baseline}
-        strokeWidth={1}
-        strokeDasharray="3 4"
-      />
 
       {/* No halo. It existed so a 2.4px stroke read on top of a graduated fill.
           At 1.8px over a SOLID flat fill there is nothing to separate from, and
@@ -485,9 +490,10 @@ export const TrajectoryLine: React.FC<Props> = ({
         />
       ))}
 
-      {/* §3b THE HOLE NUMBER UNDER THE BEAD. Opt-in, and drawn off the SAME bead
-          list, so there is never a label without a mark. The number is the hole's
-          own number (holes[pos - 1].holeNo), not its plot position. */}
+      {/* §3 THE HOLE NUMBER UNDER THE DOT. Opt-in, drawn off the SAME bead list,
+          so there is never a label without a mark and never a placeholder. The
+          number is the hole's own number (holes[pos - 1].holeNo), not its plot
+          position. 11 / 600, and on a photograph white at 50%. */}
       {beadHoleLabels &&
         beads.map((b) => {
           const holeNo = holes[b.pos - 1]?.holeNo;
@@ -496,15 +502,16 @@ export const TrajectoryLine: React.FC<Props> = ({
             <text
               key={`bl-${b.pos}`}
               x={x(b.pos)}
-              y={Math.min(height - 1, y(b.cum) + b.r + 8)}
+              y={Math.min(height - 1, y(b.cum) + b.r + 10)}
               textAnchor="middle"
-              fill={T.tickDim}
-              style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.02em' }}
+              fill={surface === 'dark' ? 'rgba(255,255,255,0.50)' : T.tickDim}
+              style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.02em' }}
             >
               {holeNo}
             </text>
           );
         })}
+
 
       {/* THE SCRUB MARKER — rule plus a point on the curve, gone on release. */}
       {hover != null && (
