@@ -93,6 +93,8 @@ export interface FlatRow {
   attained_at: string;
   isSelf: boolean;
   userId?: string | null;
+  /** Resolved by useBoardMemberUsernames. Null = row is NOT tappable. */
+  username?: string | null;
 }
 
 /* ------------------------------------------------------------------ CHIPS */
