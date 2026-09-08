@@ -7,12 +7,12 @@
  * figure of 9.0+ takes the analytical GREEN — the one place that colour earns
  * its keep, marking the standout score in a line of eights.
  *
- * PHOTO STRIP: the shared `ReviewMediaStrip` is deliberately NOT used here and
- * NOT modified. It renders fixed 70px squares at radius 9 / 5px gap; the brief
- * asks for up to four equal-width tiles, 66px tall, radius 8, 6px gap. The
- * strip keeps its other consumers unchanged and the fullscreen viewer is
- * entered through the SAME `onMediaClick(index, el)` contract, so tapping a
- * tile still opens the canonical viewer.
+ * PHOTO STRIP: the shared `ReviewMediaStrip` IS used here, extended ADDITIVELY
+ * with optional tile props (equal-width mode, height, radius, gap, cap). Every
+ * existing consumer keeps its fixed 70/96px squares because the new props
+ * default to today's values. One strip in the codebase. The fullscreen viewer
+ * is entered through the SAME `onMediaClick(index, el)` contract.
+
  *
  * HELPFUL: a single affirmative. All 99 votes ever cast are `helpful` — there
  * has never been an unhelpful vote — so the thumbs-down is gone and the
@@ -25,6 +25,8 @@ import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 import { formatRatingValue } from '@/utils/formatters';
 import { MentionText } from '@/components/mentions/MentionText';
+import { ReviewMediaStrip } from '@/components/courses/review/ReviewMediaStrip';
+
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import type { CourseReview } from '@/hooks/useCourseReviews';
 
@@ -97,58 +99,28 @@ const CategoryLine: React.FC<{ review: CourseReview }> = ({ review }) => {
   );
 };
 
-/** §4d — up to four equal-width tiles, 66px tall. Same viewer contract. */
+/** §4d — the SHARED strip, extended additively: four equal-width tiles, 66px. */
 const PhotoStrip: React.FC<{
   review: CourseReview;
   onMediaClick: (index: number, el: HTMLElement | null) => void;
 }> = ({ review, onMediaClick }) => {
-  const media = (review.media ?? []).slice(0, 4);
+  const media = review.media ?? [];
   if (media.length === 0) return null;
   return (
-    <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
-      {media.map((item, index) => {
-        const src = item.media_type === 'video' ? (item.poster_url || item.media_url) : item.media_url;
-        return (
-          <PhotoTile key={item.id} src={src} index={index} onMediaClick={onMediaClick} />
-        );
-      })}
+    <div style={{ marginTop: 12 }}>
+      <ReviewMediaStrip
+        media={media as any}
+        onMediaClick={onMediaClick}
+        tileMode="equal"
+        tileHeight={66}
+        tileRadius={8}
+        tileGap={6}
+        maxItems={4}
+      />
     </div>
   );
 };
 
-const PhotoTile: React.FC<{
-  src: string;
-  index: number;
-  onMediaClick: (index: number, el: HTMLElement | null) => void;
-}> = ({ src, index, onMediaClick }) => {
-  const ref = React.useRef<HTMLButtonElement>(null);
-  return (
-    <button
-      ref={ref}
-      type="button"
-      onClick={() => onMediaClick(index, ref.current)}
-      style={{
-        flex: 1,
-        minWidth: 0,
-        height: 66,
-        borderRadius: 8,
-        overflow: 'hidden',
-        border: 'none',
-        padding: 0,
-        background: A.TRACK,
-        cursor: 'pointer',
-      }}
-    >
-      <img
-        src={src}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-      />
-    </button>
-  );
-};
 
 export interface FlatReviewRowProps {
   review: CourseReview;
