@@ -245,6 +245,6 @@ export function AmateurLeaderboardBlock({
           the app uses to add golfers. */}
       <FindGolfersSheet open={findGolfers} onClose={() => setFindGolfers(false)} />
 
-    </section>
+    </AboutSection>
   );
 }
