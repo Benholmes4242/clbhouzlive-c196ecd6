@@ -25,7 +25,6 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { groupMultiMedia } from '@/components/media-system/utils/feedMapper';
-import { EmptyState } from '@/features/courses/components/holes/analytical/tokens';
 import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
 import { packColumns } from '@/components/feed-cards/packColumns';
 import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
