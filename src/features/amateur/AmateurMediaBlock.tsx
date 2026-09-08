@@ -69,7 +69,9 @@ const AUTOPLAY_GROUP = 'amateur-media';
  * LONGER WATCH row: 116x66 poster left at r.sm, title 13/600 over two lines,
  * creator beneath, the canonical glass duration badge, hairline between rows.
  */
-function VideoRow({ item, first, onPress }: { item: CommunityLibraryItem; first: boolean; onPress: () => void }) {
+/** EXPORTED so /media's "Longer watch" section uses this row rather than
+    forking it: one implementation of the long-form row. */
+export function VideoRow({ item, first, onPress }: { item: CommunityLibraryItem; first: boolean; onPress: () => void }) {
   const title = item.title?.trim() || item.courseName || item.displayName;
   return (
     <button

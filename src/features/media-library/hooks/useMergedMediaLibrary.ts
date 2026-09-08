@@ -49,6 +49,11 @@ function reviewToMoment(tile: ReviewLibraryTile): Moment {
     mediaId: tile.post.mediaItems[0]?.id ?? undefined,
     isCourseLead: true,
     region: null,
+    /* THE RATING TRAVELS WITH THE PHOTOGRAPH (§2). MomentTile already renders
+       the chip — amber figure, /10 in white at 70% — whenever the field is
+       present; it was simply never mapped here, which is why review tiles on
+       /media carried no rating. A moment frame has no rating and gets none. */
+    rating: tile.rating,
     aspect: null,
   };
 }
