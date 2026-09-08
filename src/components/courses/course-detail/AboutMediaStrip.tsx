@@ -45,7 +45,7 @@ const Header: React.FC<{ photoCount: number; videoCount: number }> = ({
       alignItems: 'baseline',
       justifyContent: 'space-between',
       gap: 12,
-      padding: pad,
+      padding: '0 16px',
       marginBottom: 10,
     }}
   >
