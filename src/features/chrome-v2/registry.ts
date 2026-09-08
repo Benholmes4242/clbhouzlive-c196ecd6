@@ -294,7 +294,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
     match: { test: (p) => /^\/tour\/news\/[^/]+/.test(p) },
     spec: {
       chrome: 'island',
-      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub?tab=news' },
+      left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tour/news' },
       tone: 'dark',
       bleed: false,
       note: 'wire story — back + fixed section label + menu, no picker',

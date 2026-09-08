@@ -312,6 +312,9 @@ const AmateurPage = lazy(() => import("./pages/AmateurPage"));
 const AmateurStoryPage = lazy(() => import("./features/amateur/news/AmateurStoryPage"));
 
 const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubMainPage })));
+/* BRIEF_TOUR_REBUILD: the one-page Tour. Named to sit beside, not replace, the
+   tabbed hub while both are mounted. */
+const TourPageOnePage = lazy(() => import("./pages/TourPage"));
 
 const TournamentDetailPage = lazy(() => import("./features/tourhub/tournament-v2/TournamentPage").then(m => ({ default: m.TournamentPage })));
 const PlayerProfilePage = lazy(() => import("./features/tourhub/player-v2/PlayerPage").then(m => ({ default: m.PlayerPage })));
@@ -726,6 +729,9 @@ function AppRoutes() {
         <Route path="/nearby" element={<Navigate to="/clubhouse" replace />} />
         
         {/* Tour Hub routes */}
+        {/* BRIEF_TOUR_REBUILD: the one-page Tour lands at /tour while /tourhub
+            and its six tabs stay standing until the rebuild is confirmed. */}
+        <Route path="/tour" element={<Suspense fallback={<GenericPageSkeleton />}><TourPageOnePage /></Suspense>} />
         <Route path="/tour/news" element={<Suspense fallback={<GenericPageSkeleton />}><WireNewsPage /></Suspense>} />
         <Route path="/tour/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><TourNewsStoryPage /></Suspense>} />
         <Route path="/tourhub" element={<Suspense fallback={<TourHubOverviewSkeleton />}><TourHubMainPage /></Suspense>} />
