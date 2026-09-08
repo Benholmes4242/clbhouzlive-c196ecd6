@@ -1,0 +1,120 @@
+# Project Memory
+
+## Core
+- **Typography**: Geist font only. No serifs. Ratings use `tabular-nums` and `font-feature-settings: "kern" 1, "liga" 1`.
+- **Identity**: System account and branding `clbhouz` is strictly lowercase.
+- **Theme Tokens**: Light mode uses #F8FAFC surface. Brand Amber #F7931E, Slate #0F172A. Dark shell #0d0d0d.
+- **Aesthetic**: 'The Dispatch' editorial design uses white surfaces, 0.5px hairline dividers, and 3px rule markers.
+- **Avatars**: Standardize on squircle geometry (34% border-radius). Use `PlayerSilhouette` as fallback. Every avatar carries the canonical 1px traced hairline ring — see Canonical Avatar Borders.
+- **Notch Safety**: Clear headers with `paddingTop: max(env(safe-area-inset-top, 0px), 47px)`.
+- **Interactions**: True toggles (on/off switches) use solid slate #0F172A. Tab/filter rows are text-only — active = bold slate, inactive = muted #94A3B8 (no fill, no outline). Focus rings use brand amber.
+- **Performance**: Mobile scroll elements must use `will-change: transform`. Avoid static backdrop-filters.
+- **Spacing**: 8px scale (4/8/12/16/24/32/40). Tokens in `src/lib/spacing.ts`. Nav-visible pages pad the foot with `NAV_CLEARANCE` (`src/lib/navClearance.ts`), never a flat number; nav-hidden calc(sab+32). ONE owner per seam, mb-only in stacks. See Spacing Canon v2 + Nav Clearance Token.
+- **Amateur**: `/amateur` is the second nav tab (labelled EXPLORE); `/explore` and the legacy library URLs are instrumented redirect shims, `/media` is the one media destination.
+- **Echo**: retired member-facing surface — no routes, no entry point. Code/tables/echo-chat.css stay. `Z.echo` and `gam-course-mapping-echo` are NOT Echo.
+- **Data integrity**: Never read a denormalised copy with no writer — it can hold a different QUANTITY than it is displayed as. See Denormalised Columns With No Writer.
+- **Thin samples**: withhold derived labels (tiers, verdicts) when the sample cannot support them; state the sample size instead.
+- **Chevrons**: `›` means navigation only. Expand/toggle/sheet controls use a different affordance.
+
+## Memories
+- [Discover Course-Led](mem://features/discover/course-led-authority) — Two-tab Discover and featured Courses Played one-card rules
+- [Messaging System](mem://architecture/messaging/system-authority) — Styling for headers, bubbles, sheets, and DB rules
+- [Course Standards](mem://architecture/courses/core-standards) — GB&I standard, flag mappings, naming rules
+- [Comments Sheet](mem://features/clubhouse/comments-sheet-authority) — Light-mode forced z-index sheet, 36x4px handle
+- [Engagement & Sync](mem://features/clubhouse/engagement-and-social-sync-authority) — Optimistic UI and targeted feed invalidation
+- [Top 100 Journey](mem://features/courses/top-100-journey-design-system) — UI design, solid amber progress rings
+- [Mobile Performance](mem://constraints/mobile-performance-rendering) — Avoid static backdrop-filters; use solid bg-card
+- [System Authored Posts](mem://architecture/clubhouse/system-authored-posts-authority) — 'clbhouz' user, live tournament syncing
+- [Tab Navigation](mem://style/ui/tab-navigation-standards) — 3px amber gradient for hubs, 2px solid for reports
+- [Mention System](mem://features/shared/mention-system-authority) — Regex and token separation for user mentions
+- [Safe Area Shield](mem://architecture/layout/safe-area-shield-authority) — Top offset calculation logic
+- [Social Graph Integrity](mem://architecture/database/social-graph-integrity) — Cascading deletes and self-follow checks
+- [Denormalised Columns With No Writer](mem://constraints/database/denormalised-columns-with-no-writer) — Wrong-quantity risk, ranks case, one reader one source
+- [Course Tab Rebuild](mem://features/courses/course-tab-rebuild-authority) — Flat sections, what moved where, reversible calls, dead-file list
+- [Privacy Controls](mem://features/leaderboards/privacy-controls-authority) — Leaderboard opt-out rules and hook order
+- [Business Profiles](mem://features/business-profiles/system-authority) — Single-page editor, verification hub, 4-role model
+- [Media System Mutex](mem://architecture/media/system-authority) — Single audio source rule across platform
+- [Top Ten Curation](mem://features/profile/top-ten-curation-authority) — Reserved gaps, pinning, auto-fill overrides
+- [Pinch-to-Zoom](mem://architecture/media/pinch-to-zoom-strategy) — Disabling native scroll snaps on zoom
+- [Top Ten Social](mem://features/profile/top-ten-social-authority) — Reaction framing, emoji standards
+- [Echo AI Chat](mem://architecture/echo/system-authority) — Light-mode bubbles and prompt enrichment
+- [Echo Retired](mem://features/echo/retired-surface) — Echo unrouted and doorless; what stays and what is not Echo
+- [Unified Course Card](mem://features/courses/unified-course-card-authority) — Scrim gradients, rate chips, UI toggles
+- [Sportradar Stats](mem://constraints/tour-hub/sportradar-stats-coverage) — Stats strictly limited to PGA tour
+- [Editorial Content](mem://features/clubhouse/editorial-content-authority) — Live PGA card polling and UI scaling
+- [Private Profile Gating](mem://features/profile/private-profile-gating) — Search visibility vs gated content rules
+- [Profile Hub Sheet](mem://features/profile/profile-hub-sheet-authority) — Dispatch styling for profile actions
+- [Championship Leaderboard](mem://features/championship/leaderboard-visual-authority) — Sponsor UI and progress tracking
+- [Global Follow State](mem://architecture/social/global-follow-state-authority) — Zustand map for social graph caching
+- [Header Architecture](mem://style/navigation/header-architecture-standards) — Nav configurations for hubs vs sub-pages
+- [Notifications System](mem://features/notifications/system-authority) — DB trigger logic for social alerts
+- [Course Hub Layout](mem://features/courses/course-hub-layout-authority) — Tab reordering and ShellSlot chrome
+- [Post Engagement](mem://features/profile/post-engagement-authority) — 'Caddie Bag' layout and interaction rails
+- [Course History](mem://features/profile/course-history-authority) — Regional filters and Top 100 navigation
+- [Cache Invalidation](mem://architecture/courses/cache-invalidation-authority) — Update scope for course rating actions
+- [Watch Tab Hierarchy](mem://features/watch/watch-tab-hierarchy-and-subpages) — Long-press removal, unified chrome
+- [Avatar Standards](mem://style/ui/avatar-standards) — 34% radius squircles and sizing
+- [Gender Schema](mem://architecture/database/gender-schema-authority) — Demographics values and selection UI
+- [Media Viewer](mem://features/shared/media-viewer-authority) — Fullscreen styling and status bar restorer
+- [Analytics Architecture](mem://architecture/analytics/global-system-authority) — Event tracking pipeline and dashboards
+- [Post Studio Architecture](mem://features/post-studio/system-architecture-and-ux) — Media contrast and light-mode tokens
+- [Feed Interaction](mem://architecture/clubhouse/feed-and-interaction-authority) — Scroll snap persistence, audio handling
+- [Mapbox Visuals](mem://features/courses/mapbox-visual-standards) — Hex colors required for map markers
+- [Hole Strip Visuals](mem://features/tour-hub/hole-strip-visual-standards) — Eagle/Birdie/Par shape tokens
+- [Upcoming Hero](mem://features/tour-hub/upcoming-hero-cinematic-authority) — Cinematic layout and countdown typo
+- [Profile Tabs](mem://style/ui/profile-tab-standards) — Dark segmented tab active/inactive states
+- [Video Pipeline](mem://architecture/media/video-pipeline-authority) — Non-destructive webhooks and measurement
+- [Data Synchronization](mem://features/tour-hub/data-synchronization-constraints) — Deriving live scores from totals
+- [Feed Virtualization](mem://architecture/clubhouse/feed-virtualization-authority) — DOM footprint limits and window bounds
+- [Feed Algorithm](mem://architecture/clubhouse/feed-algorithm-authority) — Freshness scoring over social graph
+- [Autoplay Strategy](mem://architecture/media/autoplay-authority) — Viewport visibility thresholds for grids
+- [Launch Visual Stability](mem://style/theme/launch-visual-stability) — Reducing flickers during app initialization
+- [Nav Overlay Authority](mem://features/tour-hub/nav-overlay-authority) — Tour menu flat UI styling
+- [Course Detail](mem://features/courses/course-detail-authority) — Editorial layout and flat components
+- [Tournament Results](mem://features/tour-hub/tournament-results-card-authority) — Post-event summary dispatch card
+- [Sportradar System](mem://architecture/data/sportradar-system-authority) — Tour slug normalization and stats sync
+- [Interaction Gestures](mem://features/clubhouse/interaction-and-gesture-authority) — Collision prevention on multi-media
+- [Data Coverage Strategy](mem://architecture/tour-hub/data-coverage-strategy) — Season-agnostic fetching for majors
+- [Creator Capsule](mem://features/clubhouse/creator-capsule-visual-standards) — White constraints for overlaid metadata
+- [Admin System Authority](mem://architecture/admin-v2/system-authority) — Manual course record DB schemas
+- [Live Right Now](mem://features/tour-hub/live-right-now-authority) — Compact strip UI for live event scoring
+- [Global System Standards](mem://style/theme/global-system-standards) — Core color tokens and font prohibitions
+- [Global Bottom Nav](mem://architecture/navigation/global-bottom-nav-structure) — 5-tab layout and dynamic height
+- [Tour Hub Layout](mem://architecture/tour-hub/layout-authority) — Full-viewport hero height calculation
+- [Schedule Tab Authority](mem://features/tour-hub/schedule-tab-authority) — Newspaper aesthetic table rows
+- [Tournament Intelligence](mem://features/tour-hub/tournament-intelligence-authority) — AI prediction rows
+- [World Rankings](mem://features/tour-hub/world-rankings-authority) — Reporting layout for global player ranks
+- [What's Coming Up](mem://features/tour-hub/whats-coming-up-authority) — Flattened table rows for future events
+- [Players Report](mem://features/tour-hub/players-report-authority) — Immersive safe-area headers for lists
+- [Player Profile](mem://features/tour-hub/player-profile-authority) — Immersive hero stats and flat bars
+- [Tournament Detail](mem://features/tour-hub/tournament-detail-authority) — Scoring grid visuals and color tokens
+- [Performance Rankings](mem://features/tour-hub/performance-rankings-authority) — Proportional stat bar UI
+- [Hero Completed State](mem://features/tour-hub/hero-completed-state-authority) — Post-tournament dark-mode layout
+- [Dispatch Aesthetic](mem://style/theme/dispatch-newspaper-aesthetic) — High-density white surface UI rules
+- [College Franchise](mem://features/tour-hub/college-franchise-authority) — Head-to-head tracking visuals
+- [Dispatch Interactive](mem://style/theme/dispatch-interactive-standards) — Pills, chips, and focus ring spec
+- [Dispatch Skeletons](mem://style/theme/dispatch-skeleton-standards) — Flat row skeleton placeholders
+- [Dispatch Bottom Sheets](mem://features/tour-hub/dispatch-bottom-sheet-standards) — 36x4px handles and flat rows
+- [Review Wizard Dispatch](mem://features/courses/review-wizard-dispatch-authority) — High-density review entry states
+- [Dispatch Dark Theme](mem://features/clubhouse/dispatch-dark-theme-standards) — Contrast token mappings for dark mode
+- [Auth Redesign](mem://features/auth/dispatch-redesign-authority) — Login sheet typography and CTA styling
+- [Activity Redesign](mem://features/activity/dispatch-redesign-authority) — Notification feed and action token states
+- [Settings Redesign](mem://features/settings/dispatch-redesign-authority) — Admin section surfaces and borders
+- [Edit Profile Redesign](mem://features/profile/edit-profile-dispatch-authority) — Personal wizard editorial update
+- [Full Bleed Map Modal](mem://architecture/layout/full-bleed-map-modal-fix) — CSS overrides for viewport bypass
+- [Profile Page Dispatch](mem://features/profile/profile-page-dispatch-authority) — Personal profile tab dispatch adoption
+- [Leaderboard Standards](mem://features/leaderboards/dispatch-standards) — Ranking list newspaper UI
+- [User List Authority](mem://features/social/user-list-authority) — Follow/Following social directory UI
+- [Journey Redesign](mem://features/journey/dispatch-redesign-authority) — Achievements track UI
+- [Typography & Tabs](mem://style/theme/dispatch-typography-and-tab-alignment) — Platform-wide font scales and underlines
+- [Suggested Creator Cards](mem://style/ui/suggested-creator-cards-standards) — Social discovery UI and verified badges
+- [Numeric Rendering](mem://style/typography/numeric-rendering-standard) — Font-feature flags for accurate numbers
+- [Network Avatar Strip](mem://features/courses/network-avatar-strip) — Uncapped friend carousel rules
+- [Scorecard Sheet](mem://features/profile/handicap/scorecard-sheet-authority) — Dual-theme RoundDetailSheet standards
+- [Discovery Standards](mem://features/courses/discovery-standards) — Refresh logic and glass badge visuals
+- [iPad Conversion](mem://architecture/layout/ipad-conversion-authority) — Centering, gutters, and IdentitySelector
+- [Canonical Avatar Borders](mem://style/ui/canonical-avatar-borders) — 1px traced hairline rings, dark/light tokens, overlay pattern, facepile & amber-self-frame exceptions
+- [Spacing Canon v2](mem://architecture/layout/spacing-canon-v2) — 8px scale, token grammar, bottom models (pb 88 flat), exceptions ledger, process rules
+- [Saturation is a Currency](mem://style/theme/saturation-is-a-currency) — Dark-canvas colour law: one loud element, score-vs-quantity figure roles, motion budget
+- [Nav Clearance Token](mem://architecture/layout/nav-clearance-token) — NAV_CLEARANCE is the only bottom padding for nav-visible pages; measured pill + gap + home indicator
+- [Amateur Cutover](mem://features/amateur/cutover-authority) — /amateur tab, /explore and library shims, /media as the one media destination
