@@ -21,11 +21,11 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { formatCourseLocation } from '@/utils/courseLocation';
-import CommunityScoreCard from './CommunityScoreCard';
 import CourseFactsAndTees from './about/CourseFactsAndTees';
 import AboutThisPlace from './about/AboutThisPlace';
 import HowItPlays from './about/HowItPlays';
 import RecordBook from './about/RecordBook';
+import WhatPeopleSay from './about/WhatPeopleSay';
 
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseSheet from './ClaimCourseSheet';
