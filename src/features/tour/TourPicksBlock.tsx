@@ -219,10 +219,13 @@ export function TourPicksBlock({ tour }: { tour: TourId }) {
                   <span style={{ ...KICKER, color: DISCOVER_QUIET }}>World {pick.worldRanking}</span>
                 )}
               </span>
+              {/* BACKWARD CARRIES THE OUTCOME. A settled pick states where the
+                  player finished — "Finished T4", or MC/WD/DQ as the case was.
+                  Forward carries nothing here, because there is nothing yet. */}
               {verdict.label && (
                 <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexShrink: 0 }}>
                   <span style={{ ...KICKER, color: verdict.kind === 'mc' ? INK_MUTE : LIVE_INK }}>
-                    {verdict.label}
+                    {subject.settled && verdict.kind !== 'mc' ? `Finished ${verdict.label}` : verdict.label}
                   </span>
                   {score && (
                     <span style={{ fontSize: 14, fontWeight: 200, color: score.tone }}>{score.text}</span>
