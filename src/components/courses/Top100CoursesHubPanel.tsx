@@ -364,9 +364,10 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           style={{
             top: 'var(--sat, 0px)',
             zIndex: 10,
-            background: 'var(--glass-bg)',
-            backdropFilter: 'blur(var(--glass-blur))',
-            WebkitBackdropFilter: 'blur(var(--glass-blur))',
+            // Solid page canvas — the bar is part of the page, not a floating
+            // darker banner. Matches StatBrowse and the post-wizard/course-detail
+            // surface.
+            background: SLATE_50,
             padding: '6px 0 8px',
             marginTop: -1,
           }}
@@ -478,7 +479,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="space-y-3 rounded-2xl overflow-hidden" style={{ background: SURFACE, border: `1px solid ${HAIRLINE_INK_7}` }}>
+                <div key={i} className="space-y-3 rounded-2xl overflow-hidden" style={{ background: SLATE_50, border: `1px solid ${HAIRLINE_INK_7}` }}>
                   <Skeleton className="w-full aspect-[16/9.5] rounded-xl" />
                   <div className="space-y-2 px-4 pb-4">
                     <Skeleton className="h-5 w-3/4" />

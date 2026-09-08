@@ -10,6 +10,7 @@ import { useUserStatsRoundsForCourse } from '@/contexts/UserStatsCoursesContext'
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { SLATE_50 } from '@/features/courses/_shared/tokens';
 
 /**
  * UNIFIED COURSE CARD COMPONENT
@@ -123,7 +124,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
         type="button"
         onClick={handleClick}
         className={`group w-full rounded-sq-sm overflow-hidden text-left active:scale-[0.99] transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
-        style={{ background: '#1B1E27', border: '1px solid rgba(255,255,255,0.10)' }}
+        style={{ background: SLATE_50, border: '1px solid rgba(255,255,255,0.10)' }}
       >
         <div className="flex">
           {/* Thumbnail */}
@@ -180,7 +181,7 @@ const UnifiedCourseCardImpl: React.FC<UnifiedCourseCardProps> = ({
       onClick={handleClick}
       aria-label={`View ${course.name}`}
       className={`group w-full overflow-hidden text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
-      style={{ display: 'block', background: 'transparent' }}
+      style={{ display: 'block', background: SLATE_50 }}
     >
       {/* Full-bleed image — name/location/rating all overlaid inside */}
       <div className={`relative w-full ${IMAGE_ASPECT} overflow-hidden`}>
