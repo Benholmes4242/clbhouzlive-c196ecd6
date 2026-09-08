@@ -24,6 +24,7 @@ import { TourHeader } from '@/features/tour/TourHeader';
 import { TourLeaderboardBlock } from '@/features/tour/TourLeaderboardBlock';
 import { TourPicksBlock } from '@/features/tour/TourPicksBlock';
 import { TourComingUpBlock } from '@/features/tour/TourComingUpBlock';
+import { TourNewsBlock } from '@/features/tour/TourNewsBlock';
 import { useTourBoardState } from '@/features/tour/useTourBoardState';
 import { TOUR_CONFIG, type TourId } from '@/features/tourhub/hooks/useOverviewData';
 import { FONT } from '@/features/tourhub/_shared/tokens';
@@ -78,7 +79,8 @@ export default function TourPage() {
         {/* COMING UP HAS NO TOUR DIMENSION, so the picker does not govern it: a
             member reading one tour still wants next week's whole calendar. */}
         <TourComingUpBlock />
-        {/* The wire lands beneath. */}
+        {/* NEITHER DOES THE WIRE, for the same reason. */}
+        <TourNewsBlock />
       </main>
     </div>
   );
