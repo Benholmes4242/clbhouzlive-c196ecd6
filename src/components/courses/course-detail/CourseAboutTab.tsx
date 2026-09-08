@@ -9,10 +9,7 @@ import NearbySection from './NearbySection';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
 import { LocationMapCard } from '@/components/map';
 import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
-import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { useCourseRatingDistribution } from '@/hooks/useCourseRatingDistribution';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { toast } from '@/lib/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
@@ -35,7 +32,6 @@ import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { useFriendsWhoPlayedCourse } from '@/hooks/useFriendsWhoPlayedCourse';
 /**
  * BRIEF_COURSE_TAB_REBUILD §3.10 — THE LADDER HAS MOVED, NOT GONE.
  *
