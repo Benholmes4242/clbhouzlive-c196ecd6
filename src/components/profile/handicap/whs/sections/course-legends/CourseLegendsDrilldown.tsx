@@ -19,18 +19,15 @@ import type { CourseSelection } from './types';
 
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
 
-import { ChampionsYouCard } from './drilldown/ChampionsYouCard';
-import { ChampionsBoard } from './drilldown/ChampionsBoard';
-
-
-
 import { FullCourseLeaderboardSheet } from './drilldown/FullCourseLeaderboardSheet';
 import { FullCourseLeaderboardSheetDispatch } from './drilldown/FullCourseLeaderboardSheetDispatch';
-import { WindowToggle } from './_shared/WindowToggle';
 
-import { ChampionsCourseSearch } from './drilldown/ChampionsCourseSearch';
-import { ChampionsInfoCarousel } from './drilldown/ChampionsInfoCarousel';
-import { chaseCtaLine } from './drilldown/_shared/duelTension';
+import { YourCrowns } from './flat/YourCrowns';
+import { BoardSection } from './flat/BoardSection';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useNavigate } from 'react-router-dom';
+
 import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME, orderWithWomensRecord } from './_shared/championsOrder';
 import { useProBenchmarks } from '@/hooks/gam/useProBenchmarks';
 import { pickProBenchmark, filterProsForViewer, PRO_BAND_BASES, type ProBandBase } from './drilldown/_shared/proBenchmark';
