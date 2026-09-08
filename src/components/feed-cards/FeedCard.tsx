@@ -61,6 +61,8 @@ export function FeedCard({
   bareTile = false,
   readOnlyFullscreen = false,
   hideLikeCount = false,
+  tileRadius = 4,
+  tileGap = 4,
 }: {
 
   row: FeedCardRow;
@@ -106,6 +108,12 @@ export function FeedCard({
   /** Suppress the like-count overlay / meta figure on the tile. Opt-in;
    *  used by the course-details Media tab. Watch surfaces must NOT set it. */
   hideLikeCount?: boolean;
+  /** Tile corner radius. Defaults to today's 4px so every existing consumer
+   *  renders byte-identically; the mosaic walls pass r.xs. */
+  tileRadius?: number;
+  /** Vertical gap beneath a bare tile, matched to its grid's column gutter.
+   *  Defaults to today's 4px. Ignored for full cards. */
+  tileGap?: number;
 }) {
 
 
