@@ -22,6 +22,7 @@ import { RailChips } from '@/components/ui/RailChips';
 import { TourHero } from '@/features/tour/TourHero';
 import { TourHeader } from '@/features/tour/TourHeader';
 import { TourLeaderboardBlock } from '@/features/tour/TourLeaderboardBlock';
+import { TourPicksBlock } from '@/features/tour/TourPicksBlock';
 import { useTourBoardState } from '@/features/tour/useTourBoardState';
 import { TOUR_CONFIG, type TourId } from '@/features/tourhub/hooks/useOverviewData';
 import { FONT } from '@/features/tourhub/_shared/tokens';
@@ -69,7 +70,8 @@ export default function TourPage() {
         />
 
         <TourLeaderboardBlock state={board} />
-        {/* Our Picks, Coming Up and the wire land beneath, in that order. */}
+        <TourPicksBlock tour={tour} />
+        {/* Coming Up and the wire land beneath, in that order. */}
       </main>
     </div>
   );
