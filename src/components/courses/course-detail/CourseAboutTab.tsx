@@ -177,34 +177,26 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           onSeeAllReviews={() => onTabChange?.('reviews')}
         />
 
-      {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
-      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
-        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
-      </div>
+        {/* §3.7 — WHO PLAYS HERE, flat. The same facepile read, no Panel; the
+            circle average stays withheld (reversible, not retired). */}
+        <WhoPlaysHere courseId={course.id} />
 
-      {/* ══ BLOCK 4 — ABOUT THIS PLACE (everything that is not analytics) ══ */}
-      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
-        {/* Location */}
-        {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl" />}
-        {coords && (
-          <LocationMapCard
-            lat={coords.lat}
-            lng={coords.lng}
-            name={course.name}
-            locationText={formatCourseLocation(course)}
-            colorful
-            nearby={nearbyPins}
-          />
-        )}
-        {/* eslint-disable-next-line settled/no-not-loading-empty-check -- coordsLoading comes from a plain geocode hook, not a gated React Query. */}
-        {!coords && !coordsLoading && (
-          <p style={{ fontSize: 13, color: A.DIM, margin: 0 }}>
-            {t('courseDetail.about.locationUnavailable')}
-          </p>
-        )}
+        {/* §3.8 — PHOTOS. The mosaic is unchanged; only its heading is now the
+            shared section heading with localised counts. */}
+        <Photos courseId={course.id} onSeeAll={() => onTabChange?.('media')} />
 
-        {/* Media */}
-        <AboutMediaStrip clubId={course.id} onSeeAllClick={() => onTabChange?.('media')} />
+        {/* §3.9 — WHERE IT IS. Same map card, same cached nearby pins, now
+            under a heading with the place named beside it. */}
+        <WhereItIs
+          courseName={course.name}
+          locationText={formatCourseLocation(course)}
+          coords={coords ?? null}
+          coordsLoading={coordsLoading}
+          nearby={nearbyPins}
+        />
+
+      {/* ══ BLOCK 4 — the remaining rows (§3.11 still to come) ══ */}
+      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
 
         {/* Explore / website / claim — one collapsed panel of quiet rows */}
         <CourseActionRows
