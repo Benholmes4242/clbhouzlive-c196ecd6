@@ -22,7 +22,15 @@ export type GateState =
  * exactly why emails point at it instead of at /handicap. Signed-in surfaces
  * must never be added to this list.
  */
-const EXEMPT_PREFIXES = ['/post/', '/tour/news/', '/discover/news', '/privacy', '/terms', '/legal/', '/go/'];
+/**
+ * MATCHING RULE: each entry matches by EQUALITY or PREFIX
+ * (`pathname === p || pathname.startsWith(p)`). A TRAILING SLASH therefore
+ * EXCLUDES the bare path: '/tour/news/' matched '/tour/news/abc' but NOT
+ * '/tour/news'. Any entry meant to cover an index AND its children must be
+ * written WITHOUT a trailing slash. '/post/' and '/legal/' keep theirs
+ * deliberately — bare '/post' and '/legal' are not pages.
+ */
+const EXEMPT_PREFIXES = ['/post/', '/tour/news', '/discover/news', '/privacy', '/terms', '/legal/', '/go/'];
 
 export function isGateExemptPath(pathname: string): boolean {
   return EXEMPT_PREFIXES.some((p) => pathname === p || pathname.startsWith(p));
