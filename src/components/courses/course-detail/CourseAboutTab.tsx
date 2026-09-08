@@ -25,7 +25,7 @@ import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100RankRow } from './CourseTop100RankRow';
 import CourseFactsAndTees from './about/CourseFactsAndTees';
 import AboutThisPlace from './about/AboutThisPlace';
-import { CourseAnalyticsPanels } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
+import HowItPlays from './about/HowItPlays';
 
 import CourseRecordBook from './CourseRecordBook';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
@@ -37,39 +37,14 @@ import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useFriendsWhoPlayedCourse } from '@/hooks/useFriendsWhoPlayedCourse';
-import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
-import { SiLadder } from '@/features/courses/_shared/SiLadder';
-import { buildSiLadder } from '@/features/courses/_shared/siLadder';
-
 /**
- * BRIEF_SI_LADDER_SHARED §3/§4 — THE LADDER ON THE COURSE TAB.
+ * BRIEF_COURSE_TAB_REBUILD §3.10 — THE LADDER HAS MOVED, NOT GONE.
  *
- * SAME COMPONENT, SAME RULE AS THE CLUB PAGE. The only difference is the voice,
- * and the voice is a prop: a member reading this may not belong to this club, so
- * the copy is "the card indexes it", never "you index it". A member reading
- * their OWN club's course should not be told the card is theirs to fix either.
- *
- * It sits AFTER the hole-by-hole content and BEFORE the reviews prompt: it is a
- * companion to the hole list, not a replacement for it.
- *
- * `get_course_hole_analysis` is already fetched by CourseAnalyticsPanels above,
- * so this shares that cached query rather than adding a request. Under 100
- * rounds `buildSiLadder` returns null and this renders nothing at all — the
- * grid gap on the parent means an absent section leaves no hole behind it.
+ * The SI ladder (with its explainer paragraph), the par-type bars and the
+ * hole-by-hole rows now render on the drill-down at /courses/:courseId/holes.
+ * SiLadder, buildSiLadder and CourseAnalyticsPanels are all untouched; only the
+ * surface that calls them changed, so this tab no longer imports them.
  */
-const CourseSiLadder: React.FC<{ courseId: string }> = ({ courseId }) => {
-  const { data } = useCourseHoleAnalysis(courseId);
-  const ladder = React.useMemo(
-    () => buildSiLadder(data?.holes ?? [], data?.total_rounds),
-    [data?.holes, data?.total_rounds],
-  );
-  if (!ladder) return null;
-  return (
-    <div style={{ padding: '0 16px' }}>
-      <SiLadder ladder={ladder} voice="course" />
-    </div>
-  );
-};
 
 interface Course {
   id: string;
@@ -192,11 +167,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           footer={course.id ? <CourseTop100RankRow courseId={course.id} /> : null}
         />
 
-        {/* ══ BLOCK 2 — HOW IT PLAYS / HOLE BY HOLE (analytical panels) ══ */}
-        <CourseAnalyticsPanels courseId={course.id} courseName={course.name} explainEmpty />
-
-        {/* §4 — after the hole-by-hole content, before the reviews prompt. */}
-        <CourseSiLadder courseId={course.id} />
+        {/* §3.4 — HOW IT PLAYS, flat. The chart, four figures and the course-wide
+            distribution stay here; hole by hole, how each par plays and the SI
+            ladder move behind the one drill-down (§3.10, /courses/:id/holes).
+            Nothing is deleted — those components render on that page instead. */}
+        <HowItPlays courseId={course.id} courseName={course.name} />
 
       {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
       <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>

@@ -9,6 +9,7 @@
  * The existing i18n keys are reused rather than rewritten (§6).
  */
 import React from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -87,9 +88,16 @@ const AboutThisPlace: React.FC<AboutThisPlaceProps> = ({ courseId, description, 
             textTransform: 'uppercase',
             color: A.MUTE,
             cursor: 'pointer',
+            /* A CHEVRON MUST SAY WHERE IT GOES. This control toggles in place,
+               so it takes a DOWN chevron collapsed and an UP chevron expanded.
+               A right chevron on this tab means navigation and nothing else. */
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
           }}
         >
-          {expanded ? t('courseDetail.about.showLess') : t('courseDetail.about.readMore')} ›
+          {expanded ? t('courseDetail.about.showLess') : t('courseDetail.about.readMore')}
+          {expanded ? <ChevronUp size={13} strokeWidth={2.5} /> : <ChevronDown size={13} strokeWidth={2.5} />}
         </button>
       ) : null}
 

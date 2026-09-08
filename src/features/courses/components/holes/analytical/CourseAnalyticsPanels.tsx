@@ -100,7 +100,9 @@ const rampColor = difficultyRampColor;
  * per-hole average), the FIRST of any tie takes the label, and a FLAT chart
  * (max equals min) labels neither.
  */
-const ShapeChart: React.FC<{
+/* EXPORTED (additive only, no behaviour change) so the flat Course-tab section
+   renders THIS chart rather than a second copy of it. */
+export const ShapeChart: React.FC<{
   holes: CourseHole[];
   myByHole: Map<number, MyHolePerformanceRow>;
   hardestHole: number;
