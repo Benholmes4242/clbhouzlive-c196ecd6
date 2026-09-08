@@ -60,7 +60,7 @@ const BoardFigure: React.FC<{ category: LegendCategory; value: number; tone: str
   const { t } = useTranslation('courses');
   return (
     <div style={{ textAlign: 'right' }}>
-      <div style={{ ...aboutFig(15, tone), lineHeight: 1 }}>{formatLegendValueCompact(category, value)}</div>
+      <div style={{ ...aboutFig(16, tone), lineHeight: 1 }}>{formatLegendValueCompact(category, value)}</div>
       {UNIT_KEY[category] ? (
         <div style={{ ...ABOUT_KICKER, marginTop: 3 }}>{t(`courseDetail.records.units.${UNIT_KEY[category]}`)}</div>
       ) : null}
