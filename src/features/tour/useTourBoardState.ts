@@ -140,9 +140,61 @@ export function useTourBoardState(
     return live[0] ?? null;
   }, [cache, tour]);
 
-  const chips: TourBoardKey[] = liveTournament
-    ? ['live', 'fedex', 'rtd', 'oom', 'cme', 'livpts', 'colleges']
-    : ['fedex', 'rtd', 'oom', 'cme', 'livpts', 'colleges'];
+  /* A CHIP ONLY EXISTS IF ITS BOARD HAS ROWS BEHIND IT. A chip leading to an
+     empty list is worse than an absent chip: the member has to tap to find out.
+     The same floor as the ranking hook (5) applies — a ranking of one is a data
+     failure, not a short board. Measured 8 Sep 2026: FedEx 219, Order of Merit
+     227, Race to CME Globe 190, LIV Standings 60, Colleges 141, Race to Dubai 1
+     (unsynced — its chip does not render). */
+  const availability = useQuery({
+    queryKey: ['tour-board-availability'],
+    staleTime: 10 * 60_000,
+    queryFn: async () => {
+      const head = (table: 'tour_season_rankings' | 'sr_player_statistics') =>
+        supabase.from(table).select('id', { count: 'exact', head: true });
+      const year = new Date().getMonth() >= 9 ? new Date().getFullYear() + 1 : new Date().getFullYear();
+      const codes: Array<[TourBoardKey, string]> = [
+        ['rtd', 'euro'],
+        ['oom', 'pgad'],
+        ['cme', 'lpga'],
+        ['livpts', 'liv'],
+      ];
+      const counts: Partial<Record<TourBoardKey, number>> = {};
+      await Promise.all(
+        codes.map(async ([key, code]) => {
+          const { count } = await head('tour_season_rankings')
+            .eq('tour_code', code)
+            .eq('season_year', year);
+          counts[key] = count ?? 0;
+        }),
+      );
+      const { count: fedex } = await head('sr_player_statistics').not('fedex_points', 'is', null);
+      counts.fedex = fedex ?? 0;
+      return counts;
+    },
+  });
+
+  const MIN_BOARD_ROWS = 5;
+  const collegeRows = colleges.data?.standings?.length ?? 0;
+  const hasRows = (key: TourBoardKey): boolean => {
+    if (key === 'live' || key === 'colleges') return true;
+    /* Until the measurement lands, the chip row holds its shape rather than
+       flickering boards in and out under the member's thumb. */
+    if (availability.isPending || !availability.data) return true;
+    return (availability.data[key] ?? 0) >= MIN_BOARD_ROWS;
+  };
+
+  const chips: TourBoardKey[] = (
+    [
+      ...(liveTournament ? (['live'] as TourBoardKey[]) : []),
+      'fedex',
+      'rtd',
+      'oom',
+      'cme',
+      'livpts',
+      ...(colleges.isPending || collegeRows > 0 ? (['colleges'] as TourBoardKey[]) : []),
+    ] as TourBoardKey[]
+  ).filter(hasRows);
 
   /* THE MEMBER'S OWN CHOICE, HELD WITH THE TOUR IT WAS MADE FOR. When the tour
      moves, the board moves with it to that tour's season race — one subject, two
