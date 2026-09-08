@@ -82,7 +82,16 @@ export default function AmateurPage() {
       {/* No page-owned header: /amateur wears the shared floating glass
           islands (registry rule), the same object the feed and course detail
           wear. The island pays the notch; the hero bleeds beneath it. */}
-      <AmateurHero userId={user?.id} />
+      {/* THE HERO OPENS THE ROUND IT NAMES (BRIEF_EXPLORE_HERO_MESSAGING §5),
+          through the SAME scorecard opener the leaderboard rows use — so the
+          feat named in the kicker is one tap from being visible on the card. */}
+      <AmateurHero
+        userId={user?.id}
+        onOpenRound={(scoreId, roundUserId) => {
+          analyticsEvents.track('amateur_hero_round_opened', { has_score: true });
+          opener.openByScore(scoreId, null, roundUserId);
+        }}
+      />
 
       {/* THE SHARED CLEARANCE, never a page-local number: the floating pill's
           measured height + its 20px gap + 16px breathing + the home indicator.
