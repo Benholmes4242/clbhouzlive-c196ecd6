@@ -390,34 +390,6 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
 
-      <ChampionsInfoCarousel
-        window={window}
-        courseName={ctx.courseName}
-        courseHeaderImage={courseHeaderImage}
-        boardSettled={!isLoading && !isError}
-        crowns={honoursCrowns}
-        figures={{
-          rounds: null,
-          avgToPar: meta?.avg_over_par != null
-            ? `${meta.avg_over_par > 0 ? '+' : ''}${meta.avg_over_par.toFixed(1)}`
-            : null,
-          harderThanPct: null,
-        }}
-      />
-
-      {/* In-tab course search — always shown (synced + non-synced). Includes
-          a small connect-WHS cue beneath for non-synced users. */}
-      <ChampionsCourseSearch currentCourseId={ctx.courseId} />
-
-
-      {autoSwitchedToAllTime && window === 'all_time' && (
-        <div style={{ padding: '0 16px 12px' }}>
-          <span style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', fontSize: 11.5, fontWeight: 600, color: 'var(--hcp-t-60)', letterSpacing: '-0.005em' }}>
-            No rounds in the last 90 days — showing all-time crowns.
-          </span>
-        </div>
-      )}
-
       {isLoading && (
         <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[0, 1, 2].map((i) => (
@@ -436,57 +408,59 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         <ChampionsEmptyState courseName={ctx.courseName} />
       )}
 
-      {!isLoading && !isError && (data ?? []).length > 0 && !activeWindowHasData && (
-        <>
-          <div style={{ padding: '16px 16px 4px' }}>
-            <WindowToggle window={window} setWindow={handleWindowChange} variant={theme === 'light' ? 'light' : 'dark'} />
-          </div>
-          <ChampionsWindowEmptyState
-            window={window}
-            onSwitch={() => handleWindowChange(window === '90d' ? 'all_time' : '90d')}
-          />
-        </>
-      )}
-
-      {!isLoading && !isError && (data ?? []).length > 0 && activeWindowHasData && (
-        <>
-          {/* One card: you-at-this-club stats + crown cabinet, rivalry line as footer. */}
-          <ChampionsYouCard
-            userId={activeActor?.id}
-            courseId={ctx.courseId}
-            theme={theme}
-            slots={visibleCategories.map((cat) => ({
-              key: cat,
-              short: SHORT_LABELS[cat],
-              icon: legendCategoryIcon[cat],
-              held: yourRanks[cat] === 1,
-              attainedAt: yourAttainedAt[cat] ?? null,
-            }))}
-            heldCount={youOwnedCount}
-            window={window}
-            onWindowChange={handleWindowChange}
-            toggleVariant={theme === 'light' ? 'light' : 'dark'}
+      {/* BRIEF_CHAMPIONS_TAB_REBUILD §3.1 + §3.2 — a statement, then the board. */}
+      {!isLoading && !isError && (data ?? []).length > 0 && (
+        <div style={{ paddingTop: 18 }}>
+          <YourCrowns
+            signedOut={!activeActor?.id}
+            noHandicap={Boolean(activeActor?.id) && whsFetched && !whsConnection}
+            onConnect={() => {
+              analyticsEvents.track('champions_connect_handicap', { course_id: ctx.courseId });
+              navigate('/handicap');
+            }}
+            totalBoards={crownStatement.totalBoards}
+            held={crownStatement.held}
+            otherHolderName={crownStatement.otherHolderName}
+            claimedCount={crownStatement.claimedCount}
+            otherHolderClaimedCount={crownStatement.otherHolderClaimedCount}
           />
 
-
-          
-
-
-
-
-          {/* BRIEF_CHAMPIONS_BOARD — one category as a full ranked board, with
-              a pill picker above it that keeps the other records visible. */}
-          <ChampionsBoard
-            categories={sheetCategoryDescriptors}
+          <BoardSection
+            categories={boardDescriptors}
             grouped={groupedWithTotals}
-            window={window}
+            activeKey={activeBoardKey}
+            onSelectCategory={(k) => {
+              analyticsEvents.track('champions_board_chip_changed', {
+                course_id: ctx.courseId,
+                from: activeBoardKey,
+                to: k,
+              });
+              setSelectedCategory(k);
+            }}
+            legendWindow={window}
+            canSwitchWindow={has90d}
+            onWindowChange={(w) => {
+              analyticsEvents.track('champions_window_changed', { course_id: ctx.courseId, window: w });
+              handleWindowChange(w);
+              setSelectedCategory(null);
+            }}
             coursePar={meta?.course_par ?? null}
-            onOpenFull={(cat) => setFullLeaderboardCategory(cat)}
+            onOpenFull={(cat) => {
+              analyticsEvents.track('champions_see_all', { course_id: ctx.courseId, category: cat });
+              setFullLeaderboardCategory(cat);
+            }}
+            onRowPress={(row) =>
+              analyticsEvents.track('champions_row_tapped', {
+                course_id: ctx.courseId,
+                category: activeBoardKey,
+                member_id: row.userId ?? null,
+                is_self: row.isSelf,
+              })
+            }
           />
-
-
-        </>
+        </div>
       )}
+
 
       {theme === 'light' ? (
         <FullCourseLeaderboardSheetDispatch
