@@ -33,11 +33,11 @@ import { AboutSection, GUTTER, ABOUT_KICKER, aboutFig } from './AboutSection';
 const STANDARD_SLOPE = 113;
 
 const FactCell: React.FC<{ kicker: string; value: string }> = ({ kicker, value }) => (
-  <div style={{ minWidth: 0 }}>
+  <div style={{ flex: 1, minWidth: 0 }}>
     <div className="tabular-nums lining-nums" style={aboutFig(21)}>
       {value}
     </div>
-    <div style={{ ...ABOUT_KICKER, marginTop: 4 }}>{kicker}</div>
+    <div style={{ ...ABOUT_KICKER, marginTop: 5 }}>{kicker}</div>
   </div>
 );
 

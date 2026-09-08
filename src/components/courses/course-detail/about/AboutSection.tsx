@@ -66,6 +66,8 @@ interface AboutSectionProps {
   kicker?: string;
   /** First section on the tab takes no 34px lead-in. */
   first?: boolean;
+  /** Overrides the 34px lead-in (the tee control sits 16px under the facts). */
+  space?: number;
   /** Content bleeds past the gutter (map, mosaic). Heading keeps its gutter. */
   bleed?: boolean;
   id?: string;
@@ -78,13 +80,14 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
   onMetaPress,
   kicker,
   first = false,
+  space,
   bleed = false,
   id,
   children,
 }) => (
   <section
     style={{
-      marginTop: first ? 0 : SECTION_SPACE,
+      marginTop: first ? 0 : space ?? SECTION_SPACE,
       fontFamily: SANS,
     }}
   >
