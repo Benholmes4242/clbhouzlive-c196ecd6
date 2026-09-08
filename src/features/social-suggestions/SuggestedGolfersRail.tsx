@@ -66,7 +66,7 @@ export function SuggestedGolfersRail({ surface }: { surface: string }) {
                 width: CARD_W,
                 flex: `0 0 ${CARD_W}px`,
                 background: A.PANEL,
-                border: `1px solid ${A.HAIR}`,
+                border: `1px solid ${A.HAIRLINE}`,
                 borderRadius: 16,
                 padding: '16px 14px',
                 display: 'flex',
@@ -79,7 +79,7 @@ export function SuggestedGolfersRail({ surface }: { surface: string }) {
                 type="button"
                 onClick={() => {
                   analyticsEvents.track('suggested_golfer_opened', { surface });
-                  navigate(getProfilePathById(g.user_id, g.username));
+                  navigate(getProfilePathById(g.user_id, null, g.username));
                 }}
                 style={{
                   background: 'transparent',
