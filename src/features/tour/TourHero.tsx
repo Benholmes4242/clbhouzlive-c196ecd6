@@ -36,7 +36,11 @@ const DEEPEN =
 function toPar(score: number | null): { text: string; tone: string } | null {
   if (score == null) return null;
   if (score === 0) return { text: 'E', tone: DISCOVER_FACT };
-  return { text: score > 0 ? `+${score}` : `${score}`, tone: score < 0 ? TOPAR_RED : DISCOVER_FACT };
+  /* TRUE MINUS (U+2212), never the hyphen a template literal would give. */
+  return {
+    text: score > 0 ? `+${score}` : `\u2212${Math.abs(score)}`,
+    tone: score < 0 ? TOPAR_RED : DISCOVER_FACT,
+  };
 }
 
 function dateLine(iso: string | null): string | null {
