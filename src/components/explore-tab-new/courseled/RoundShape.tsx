@@ -76,6 +76,8 @@ export function RoundShape({
   showMeta = true,
   showBaseline = true,
   strokeWidth = 1.8,
+  baselineColor,
+  beadHoleLabels = false,
 }: {
   row: CircleRoundRow;
   shape: HoleShape | null;
