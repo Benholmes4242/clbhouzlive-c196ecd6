@@ -17,12 +17,12 @@
 import { useNavigate } from 'react-router-dom';
 
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
-import { DISCOVER_FACT, FIGS } from '@/components/explore-tab-new/courseled/tokens';
+import { DISCOVER_FACT } from '@/components/explore-tab-new/courseled/tokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FIGS, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import { useVenueImage } from '@/features/tourhub/hooks/useVenueImage';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
-import { FONT, INK, INK_ALPHA_60, INK_FAINT, LIVE_INK, WHITE_ALPHA_10 } from '@/features/tourhub/_shared/tokens';
+import { FONT, INK, INK_ALPHA_60, LIVE_INK, WHITE_ALPHA_10 } from '@/features/tourhub/_shared/tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 import { useTourHeroState, type HeroPlayer, type TourHeroState } from './useTourHeroState';
@@ -228,7 +228,6 @@ export function TourHero() {
                     className="tabular-nums"
                     style={{
                       marginLeft: 'auto',
-                      fontSize: 20,
                       fontSize: 22,
                       fontWeight: 700,
                       color: championPar.tone,
