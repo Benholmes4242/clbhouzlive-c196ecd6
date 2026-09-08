@@ -336,7 +336,7 @@ export function useTourBoardState(
         ? `${r.eventsPlayed} events`
         : r.wins
           ? `${r.wins} ${r.wins === 1 ? 'win' : 'wins'}`
-          : 'Season ranking',
+          : 'Season',
       toPar: null,
       thru: null,
       live: false,
