@@ -64,3 +64,7 @@
 - NewsChromeBridge: rewrite fallback state to none (Amateur has no tabs; scroll owned by amateurScrollMemory).
 - Extra sites found: App.tsx VideoIdToPostRedirect malformed link -> /media; WatchGate dormant bounce -> /amateur.
 - Do not repoint chunkLoaders / AppPrefetchProvider before the nav switch.
+
+## Explore hero full-width round shape (8 Sep 2026)
+- [ ] Align the round shape and level-par rule to the hero content edges without moving surrounding content.
+- [ ] Verify the rendered shape spans the same left/right column as avatar/course and score.
