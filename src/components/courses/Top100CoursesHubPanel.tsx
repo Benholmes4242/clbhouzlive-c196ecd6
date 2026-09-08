@@ -332,7 +332,7 @@ const Top100CoursesHubPanel: React.FC<Top100CoursesHubPanelProps> = ({ shellTabs
           {rateNudge}
           {/* Eyebrow sits directly above the provenance line — the h2 title
               was removed, so the kicker owns the heading role here. */}
-          <div style={{ ...KICKER, marginBottom: 5 }}>TOP 100</div>
+          <div style={{ ...KICKER, fontSize: 12, marginBottom: 5 }}>TOP 100</div>
           {/* Provenance subhead — masthead-line mock */}
           <p
             style={{
