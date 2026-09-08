@@ -187,6 +187,10 @@ export function TourLeaderboardBlock({ state }: { state: TourBoardState }) {
       : `${total} ${subject}`
     : null;
 
+  /* NO BOARD, NO SECTION. Champions out of tournament has nothing to rank, and
+     an empty section shows nothing rather than a heading over no content. */
+  if (state.silent || chips.length === 0) return null;
+
   const press = (row: TourBoardRow) => {
     analyticsEvents.track('tour_board_row_pressed', { board, pos: row.pos });
     if (row.mark === 'square') navigate(`/tourhub/college-golf/${row.id}`);

@@ -110,6 +110,14 @@ export interface TourBoardState {
   isPending: boolean;
   /** True when the board is genuinely unsynced rather than merely empty. */
   unavailable: boolean;
+  /**
+   * THE ONE COMBINATION WITH NO BOARD AT ALL. The Champions Tour carries no
+   * season ranking anywhere in the data, so out of tournament it has nothing to
+   * rank: the block renders NOTHING rather than falling into another tour's
+   * race under a picker that reads "Champions". When it is live the Leaderboard
+   * is the whole row.
+   */
+  silent: boolean;
 }
 
 function fmtPoints(n: number | null): string | null {
@@ -140,9 +148,65 @@ export function useTourBoardState(
     return live[0] ?? null;
   }, [cache, tour]);
 
-  const chips: TourBoardKey[] = liveTournament
-    ? ['live', 'fedex', 'rtd', 'oom', 'cme', 'livpts', 'colleges']
-    : ['fedex', 'rtd', 'oom', 'cme', 'livpts', 'colleges'];
+  /* A CHIP ONLY EXISTS IF ITS BOARD HAS ROWS BEHIND IT. A chip leading to an
+     empty list is worse than an absent chip: the member has to tap to find out.
+     The same floor as the ranking hook (5) applies — a ranking of one is a data
+     failure, not a short board. Measured 8 Sep 2026: FedEx 219, Order of Merit
+     227, Race to CME Globe 190, LIV Standings 60, Colleges 141, Race to Dubai 1
+     (unsynced — its chip does not render). */
+  const colleges = useFranchiseStandings();
+  const availability = useQuery<Partial<Record<TourBoardKey, number>>>({
+    queryKey: ['tour-board-availability'],
+    staleTime: 10 * 60_000,
+    queryFn: async () => {
+      const year = new Date().getMonth() >= 9 ? new Date().getFullYear() + 1 : new Date().getFullYear();
+      const codes: Array<[TourBoardKey, string]> = [
+        ['rtd', 'euro'],
+        ['oom', 'pgad'],
+        ['cme', 'lpga'],
+        ['livpts', 'liv'],
+      ];
+      const counts: Partial<Record<TourBoardKey, number>> = {};
+      await Promise.all(
+        codes.map(async ([key, code]) => {
+          const { count } = await supabase
+            .from('tour_season_rankings')
+            .select('id', { count: 'exact', head: true })
+            .eq('tour_code', code)
+            .eq('season_year', year);
+          counts[key] = count ?? 0;
+        }),
+      );
+      const { count: fedex } = await supabase
+        .from('sr_player_statistics')
+        .select('id', { count: 'exact', head: true })
+        .not('fedex_points', 'is', null);
+      counts.fedex = fedex ?? 0;
+      return counts;
+    },
+  });
+
+  const MIN_BOARD_ROWS = 5;
+  const collegeRows = colleges.data?.standings?.length ?? 0;
+  const hasRows = (key: TourBoardKey): boolean => {
+    if (key === 'live' || key === 'colleges') return true;
+    /* Until the measurement lands, the chip row holds its shape rather than
+       flickering boards in and out under the member's thumb. */
+    if (availability.isPending || !availability.data) return true;
+    return (availability.data[key] ?? 0) >= MIN_BOARD_ROWS;
+  };
+
+  const chips: TourBoardKey[] = (
+    [
+      ...(liveTournament ? (['live'] as TourBoardKey[]) : []),
+      'fedex',
+      'rtd',
+      'oom',
+      'cme',
+      'livpts',
+      ...(colleges.isPending || collegeRows > 0 ? (['colleges'] as TourBoardKey[]) : []),
+    ] as TourBoardKey[]
+  ).filter(hasRows);
 
   /* THE MEMBER'S OWN CHOICE, HELD WITH THE TOUR IT WAS MADE FOR. When the tour
      moves, the board moves with it to that tour's season race — one subject, two
@@ -157,7 +221,6 @@ export function useTourBoardState(
 
   const pointsTour = RACE_TOUR[board];
   const ranking = usePlayersRanking(pointsTour ?? 'pga');
-  const colleges = useFranchiseStandings();
 
   const liveBoard = useQuery({
     queryKey: ['tour-board-live', liveTournament?.id ?? null],
@@ -189,6 +252,9 @@ export function useTourBoardState(
     };
 
     const pickerLock: TourPickerLock = board === 'colleges' ? 'colleges' : null;
+    /* Champions out of tournament: no season race exists, so nothing is shown
+       rather than another tour's race under a "Champions" picker. */
+    const silent = !TOUR_RACE[tour] && !liveTournament && !(chosen && chosen.tour === tour);
     const raceTour = RACE_TOUR[board] as TourId | undefined;
     const basis =
       board === 'colleges'
@@ -229,6 +295,7 @@ export function useTourBoardState(
         rows,
         total: rows.length,
         figureLabel: 'SCORE',
+        silent,
         isPending: liveBoard.isPending,
         unavailable: !liveBoard.isPending && rows.length === 0,
       };
@@ -260,6 +327,7 @@ export function useTourBoardState(
         rows,
         total: rows.length,
         figureLabel: 'EARNINGS',
+        silent,
         isPending: colleges.isPending,
         unavailable: !colleges.isPending && rows.length === 0,
       };
@@ -290,9 +358,10 @@ export function useTourBoardState(
       rows,
       total: rows.length,
       figureLabel: result?.statLabel ?? null,
+      silent,
       isPending: ranking.isPending,
       /* A ranking of one is a data failure, and the hook already says so. */
       unavailable: !ranking.isPending && (!result?.synced || rows.length === 0),
     };
-  }, [board, chips, colleges.data, colleges.isPending, liveBoard.data, liveBoard.isPending, liveTournament, pointsTour, ranking.data, ranking.isPending, tour, onTourChange]);
+  }, [board, chips, chosen, colleges.data, colleges.isPending, liveBoard.data, liveBoard.isPending, liveTournament, pointsTour, ranking.data, ranking.isPending, tour, onTourChange]);
 }
