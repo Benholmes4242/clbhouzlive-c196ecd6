@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   DEFAULT_FILTERS,
@@ -7,7 +7,6 @@ import {
   type BoardKey,
   type CourseBoardKey,
 } from '@/components/explore-tab-new/courseled/boardFilters';
-import { useDiscoverEntryBoard } from '@/components/explore-tab-new/courseled/hooks/useDiscoverEntryBoard';
 import { useBoardFacets } from '@/components/explore-tab-new/courseled/hooks/useBoardFacets';
 import { useBoardPage } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -20,38 +19,40 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
  * the page so neither block can hold a filter the other does not, and so the
  * rail has one owner.
  *
- * NOTHING NEW REACHES THE DATABASE. The filter model, the entry ladder and the
- * facet read are the deployed Discover ones, in the RPC's own vocabulary -
- * get_board_page / get_board_facets / get_board_courses are untouched.
+ * THE ENTRY STATE IS FIXED (BRIEF_EXPLORE_FIXED_ENTRY_STATE §1). Every entry
+ * opens on MOST RECENT / YOUR CIRCLE / 14 DAYS / ALL COURSES. No rotation, no
+ * handicap default, no remembered selection, and NO STEP-DOWN when the result is
+ * thin: the page never widens the filter on the member's behalf. A thin result
+ * stays thin and the leaderboard block says so. The member changes board and
+ * filter freely; leaving and returning resets to the entry state, because this
+ * state is page-local and the page unmounts on leaving.
+ *
+ * NOTHING NEW REACHES THE DATABASE — get_board_page / get_board_facets /
+ * get_board_courses are untouched.
  */
 /** One read serves the visible cut, the pinned own row and the panel's count. */
 const PAGE_FETCH = 200;
 
-export function useAmateurBoardState(userId: string | undefined) {
-  const entry = useDiscoverEntryBoard(userId);
+/** §1 — the one entry state, always. */
+export const ENTRY_BOARD: BoardKey = 'recent';
+export const ENTRY_FILTERS: BoardFilters = normalizeFilters({
+  ...DEFAULT_FILTERS,
+  scope: 'circle',
+  window: '14',
+  courses: 'any',
+});
 
-  const [pickedFilters, setFilters] = useState<BoardFilters | null>(null);
-  const [pickedBoard, setBoard] = useState<BoardKey | null>(null);
+export function useAmateurBoardState(userId: string | undefined) {
+  const [filters, setFilters] = useState<BoardFilters>(ENTRY_FILTERS);
+  const [board, setBoard] = useState<BoardKey>(ENTRY_BOARD);
   const [courseBoard, setCourseBoard] = useState<CourseBoardKey>('played');
   const [panelOpen, setPanelOpen] = useState(false);
 
-  useEffect(() => {
-    if (pickedBoard || !entry.resolved || !entry.board) return;
-    setBoard(entry.board);
-    setFilters(normalizeFilters({ ...DEFAULT_FILTERS, window: entry.window, scope: entry.scope }));
-  }, [pickedBoard, entry.resolved, entry.board, entry.window, entry.scope]);
-
-  /* READS WAIT FOR THE ENTRY PICK. Firing on the fallback first would spend a
-     read on a board the member is about to be moved off. */
-  const ready = pickedBoard !== null && pickedFilters !== null;
-  const board = pickedBoard ?? entry.board ?? 'recent';
-  const filters = pickedFilters ?? DEFAULT_FILTERS;
-
-  const facets = useBoardFacets(userId, board, filters, { enabled: ready });
+  const facets = useBoardFacets(userId, board, filters, { enabled: true });
   /* ONE READ, TWO READERS. The leaderboard block renders these rows and the
      filter panel states their count; react-query serves both from the same key,
      so the count in the panel can never disagree with the rows on the page. */
-  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: ready });
+  const page = useBoardPage(userId, board, filters, { limit: PAGE_FETCH, enabled: true });
 
   const changeFilters = useCallback((next: BoardFilters) => {
     analyticsEvents.track('amateur_filter_changed', {
@@ -77,12 +78,20 @@ export function useAmateurBoardState(userId: string | undefined) {
 
   const resetFilters = useCallback(() => {
     analyticsEvents.track('amateur_filter_reset', {});
-    setFilters({ ...DEFAULT_FILTERS });
+    setFilters({ ...ENTRY_FILTERS });
+  }, []);
+
+  /* §2 — THE MEMBER WIDENS THE POOL, NEVER THE PAGE. This is the one path from
+     a thin or empty circle to Everyone, and because it writes the same filter
+     object the rail reads, the chips move with it. */
+  const seeEveryone = useCallback(() => {
+    analyticsEvents.track('amateur_see_everyone_tapped', {});
+    setFilters((prev) => normalizeFilters({ ...prev, scope: 'everyone' }));
   }, []);
 
   return useMemo(
     () => ({
-      ready,
+      ready: true,
       board,
       filters,
       courseBoard,
@@ -99,8 +108,9 @@ export function useAmateurBoardState(userId: string | undefined) {
       changeFilters,
       changeCourseBoard,
       resetFilters,
+      seeEveryone,
     }),
-    [ready, board, filters, courseBoard, facets, page, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters],
+    [board, filters, courseBoard, facets, page, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, seeEveryone],
   );
 }
 
