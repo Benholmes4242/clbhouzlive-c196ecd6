@@ -2065,5 +2065,14 @@
       "university": "University",
       "international": "International"
     }
+  },
+  "amateur": {
+    "board": {
+      "seeEveryone": "See everyone",
+      "findGolfers": "Find golfers",
+      "noCircle": "You have not added any golfers yet.",
+      "circleQuiet": "Nobody in your circle has posted a round in the last fortnight.",
+      "thinCircle": "Only {{count}} rounds in your circle this fortnight."
+    }
   }
 }
