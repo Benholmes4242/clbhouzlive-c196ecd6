@@ -203,15 +203,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           onWebsiteClick={course.website_url ? handleWebsiteClick : undefined}
         />
 
-        {/* Claim STATUS is not the claim offer: pending and claimed are facts
-            about this course, so they stay in the flow. Only the unclaimed
-            offer moved to the footer at the very foot of the tab. */}
-        {course.club_id && (claimStatus?.state === 'pending' || claimStatus?.state === 'claimed') && (
+        {/* RULED: only CLAIMED stays in the flow — "managed by X" is a fact
+            about the course, useful to every reader, and it sits with the
+            course's own information. Under review moved to the footer. */}
+        {course.club_id && claimStatus?.state === 'claimed' && claimStatus.business && (
           <div style={{ display: 'grid', gap: 12, padding: '0 20px' }}>
-            {claimStatus.state === 'pending' && <ClaimUnderReviewNotice />}
-            {claimStatus.state === 'claimed' && claimStatus.business && (
-              <ClaimedCourseProfileLink business={claimStatus.business} />
-            )}
+            <ClaimedCourseProfileLink business={claimStatus.business} />
           </div>
         )}
       </div>
@@ -219,10 +216,15 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <div style={{ height: 20 }} />
       <NearbySection lat={coords?.lat ?? course.latitude} lng={coords?.lng ?? course.longitude} />
 
-      {/* THE CLAIM ROW — ruled: option 1, a deliberate footer. Last thing on the
-          tab, beneath everything, above only the bottom clearance. */}
+      {/* THE FOOTER — the unclaimed offer, or "your claim is under review".
+          One audience, one place, last thing above the bottom clearance. */}
       {course.club_id && claimStatus?.state === 'unclaimed' && (
         <ClaimFooterRow onClaimClick={() => setShowClaimSheet(true)} />
+      )}
+      {course.club_id && claimStatus?.state === 'pending' && (
+        <ClaimFooterRow mode="pending" onClaimClick={() => setShowClaimSheet(true)}>
+          <ClaimUnderReviewNotice />
+        </ClaimFooterRow>
       )}
 
 
