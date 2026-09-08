@@ -183,6 +183,21 @@ interface Props {
    */
   fillOverColor?: string;
   fillUnderColor?: string;
+  /**
+   * THE LEVEL-PAR RULE'S COLOUR (BRIEF_EXPLORE_HERO_MESSAGING §3a). Absent = the
+   * surface token, so every existing caller is byte-identical. The Explore hero
+   * draws over a PHOTOGRAPH, where the dark surface's 18% rule reads as a scratch
+   * on the picture; it passes 14% white.
+   */
+  baselineColor?: string;
+  /**
+   * THE HOLE NUMBER UNDER THE BEAD (§3b). Absent = FALSE and no caller moves. The
+   * hero opts in so the gold mark has a key: the kicker names the feat, the label
+   * names the hole, and the two agree. Never rendered without a bead — the label
+   * is drawn from the bead list itself, so "a dot with no number" and "a number
+   * with no dot" are both unreachable.
+   */
+  beadHoleLabels?: boolean;
 }
 
 
