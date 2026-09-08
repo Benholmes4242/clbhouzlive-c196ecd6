@@ -52,10 +52,12 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
   if (!hasBothTypes) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 16px 12px' }}>
+        {/* ONE KIND, NO CHIPS (§3) — so this must not read as a lone chip
+            pretending not to be a filter. A quiet 11px DIM line, sentence
+            case, beside the add control. */}
         <span
           style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: '0.13em',
-            textTransform: 'uppercase', color: A.DIM,
+            fontSize: 11, fontWeight: 600, color: A.DIM,
             fontVariantNumeric: 'tabular-nums lining-nums',
           }}
         >
