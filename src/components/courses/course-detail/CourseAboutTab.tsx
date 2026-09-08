@@ -23,6 +23,9 @@ import AboutThisPlace from './about/AboutThisPlace';
 import HowItPlays from './about/HowItPlays';
 import RecordBook from './about/RecordBook';
 import WhatPeopleSay from './about/WhatPeopleSay';
+import WhoPlaysHere from './about/WhoPlaysHere';
+import Photos from './about/Photos';
+import WhereItIs from './about/WhereItIs';
 
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseSheet from './ClaimCourseSheet';
