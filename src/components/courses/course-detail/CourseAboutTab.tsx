@@ -158,13 +158,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <CourseFactsAndTees courseId={course.id} />
 
         {/* §3.3 — About moves UP: it is the one section that works with no data.
-            The Top 100 standing rides with it until §3.11 gives it a home in
-            Keep exploring. */}
-        <AboutThisPlace
-          courseId={course.id}
-          description={course.description}
-          footer={course.id ? <CourseTop100RankRow courseId={course.id} /> : null}
-        />
+            The Top 100 standing is NOT repeated here: the hero badge already
+            carries this course's rank, and the extra lists belong on the Top 100
+            destination rather than as a footnote to the prose. */}
+        <AboutThisPlace courseId={course.id} description={course.description} />
 
         {/* §3.4 — HOW IT PLAYS, flat. The chart, four figures and the course-wide
             distribution stay here; hole by hole, how each par plays and the SI
@@ -172,17 +169,19 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             Nothing is deleted — those components render on that page instead. */}
         <HowItPlays courseId={course.id} courseName={course.name} />
 
-      {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
-      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
-        <CourseRecordBook
+        {/* §3.5 — THE RECORD BOOK, flat. Same read as the Panel version
+            (useCourseRecordSummary over get_course_legends); CourseRecordBook.tsx
+            itself is untouched. It owns its own 20px gutter, so it sits OUTSIDE
+            the padded block below. */}
+        <RecordBook
           courseId={course.id}
           courseName={course.name}
-          courseRegion={course.region ?? null}
-          courseCountry={course.country ?? null}
-          courseType={(course as { course_type?: string | null }).course_type ?? null}
-          initialCategory={legendCategoryParam}
           onSeeAll={() => onTabChange?.('legends')}
         />
+
+      {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
+      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
+
 
         <CommunityScoreCard
           courseId={course.id}
