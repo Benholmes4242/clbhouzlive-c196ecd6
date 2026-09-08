@@ -21,9 +21,10 @@ import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { FindGolfersSheet } from '@/components/explore-tab-new/FindGolfersSheet';
+import { SuggestedGolfersRail } from '@/features/social-suggestions/SuggestedGolfersRail';
+
 
 import { basisLine } from './basisLine';
-import { useCircleSize } from './useCircleSize';
 import type { AmateurBoardState } from './useAmateurBoardState';
 
 
@@ -87,14 +88,12 @@ export function AmateurLeaderboardBlock({
   );
   const minePinned = !!mine && !visible.some((row) => row.user_id === mine.user_id);
 
-  /* §2 — the three cases only apply to the circle: it is the only pool that can
-     be thin for a reason the member can act on. */
+  /* §3 B — a THIN result is a circle one, and only the circle can be thin for a
+     reason the member can act on. The head-count that separates state C from
+     state D lives on the page state, so both blocks read one answer. */
   const isCircle = filters.scope === 'circle';
   const thin = isCircle && total > 0 && total < THIN_FLOOR;
-  const circle = useCircleSize(userId, isCircle && !page.isPending && total === 0);
-  /* C2 — no circle at all. Until the head-count settles we assume C1, so the
-     harsher cold-start copy is never shown to a member who has a circle. */
-  const coldStart = circle.data === 0;
+
 
   const appliedParts = useMemo(() => describeFilterParts(filters, t as never), [filters, t]);
   const boardTitle = t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label);
@@ -122,45 +121,37 @@ export function AmateurLeaderboardBlock({
 
       {page.isPending ? (
         /* A HELD HEIGHT, NOT A SPINNER: the blocks below must not jump when the
-           rows arrive. */
+           rows arrive, and no skeleton is ever left standing. */
         <div style={{ height: 240 }} aria-hidden />
       ) : total === 0 ? (
+        /* §6 — the only board that can still be empty is one the MEMBER filtered
+           to nothing. The circle can no longer land here: an empty circle is
+           widened to Everyone, declared, upstream. An absence is explained. */
         <div style={{ padding: '18px 2px' }}>
-          {/* §2 C — AN EXPLAINED ABSENCE, NEVER A HIDDEN BLOCK. On the circle
-              the cause decides the words: a quiet fortnight (C1) or no circle
-              at all (C2). Off the circle, the applied filter is the answer. */}
           <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: DISCOVER_FACT }}>
-            {!isCircle
-              ? t('discover.filterBoard.emptyLine', 'Nothing on this board for {{line}}.', {
-                  line: appliedParts.join(' \u00B7 '),
-                })
-              : coldStart
-                ? t('amateur.board.noCircle', 'You have not added any golfers yet.')
-                : t(
-                    'amateur.board.circleQuiet',
-                    'Nobody in your circle has posted a round in the last fortnight.',
-                  )}
+            {t('discover.filterBoard.emptyLine', 'Nothing on this board for {{line}}.', {
+              line: appliedParts.join(' \u00B7 '),
+            })}
           </p>
-          <div style={{ display: 'flex', gap: 16, marginTop: 12, flexWrap: 'wrap' }}>
-            {isCircle && (
-              <button type="button" onClick={state.seeEveryone} style={QUIET_ACTION}>
-                {t('amateur.board.seeEveryone', 'See everyone')} &rsaquo;
-              </button>
-            )}
-            {isCircle && coldStart && (
-              <button type="button" onClick={() => setFindGolfers(true)} style={QUIET_ACTION}>
-                {t('amateur.board.findGolfers', 'Find golfers')} &rsaquo;
-              </button>
-            )}
-            {!isCircle && !filtersAreDefault(filters) && (
-              <button type="button" onClick={state.resetFilters} style={QUIET_ACTION}>
-                {t('discover.filterBoard.reset', 'Clear the filter')}
-              </button>
-            )}
-          </div>
+          {!filtersAreDefault(filters) && (
+            <button type="button" onClick={state.resetFilters} style={{ ...QUIET_ACTION, marginTop: 12 }}>
+              {t('discover.filterBoard.reset', 'Clear the filter')}
+            </button>
+          )}
         </div>
       ) : (
         <>
+          {/* §3 C — THE DECLARED WIDENING. The chips and the count already read
+              Everyone; this sentence says who moved them and why. */}
+          {state.widened && (
+            <p style={{ margin: '0 2px 10px', fontSize: 12, color: A.MUTE, lineHeight: 1.45 }}>
+              {t(
+                'amateur.board.widenedToEveryone',
+                'Nobody in your circle has posted a round in the last fortnight, so this is everyone.',
+              )}
+            </p>
+          )}
+
           {visible.map((row) => (
             <BoardRowView
               key={`${row.pos}:${row.whs_score_id ?? row.user_id}`}
@@ -181,25 +172,15 @@ export function AmateurLeaderboardBlock({
               />
             </div>
           )}
-          {/* §2 B — A THIN CIRCLE STAYS THIN AND SAYS SO. The see-all is
-              replaced by the count and the one way to widen the pool; the
-              filter rail moves with it, so the chips never claim a narrower
-              pool than the rows. */}
+
+          {/* §3 B — A THIN CIRCLE STAYS THIN AND SAYS SO. The list is NOT topped
+              up from outside the circle: mixing pools would make the chips and
+              the count untrue. */}
           {thin ? (
-            <p
-              style={{
-                margin: '12px 2px 0',
-                fontSize: 12,
-                color: A.MUTE,
-                lineHeight: 1.45,
-              }}
-            >
+            <p style={{ margin: '12px 2px 0', fontSize: 12, color: A.MUTE, lineHeight: 1.45 }}>
               {t('amateur.board.thinCircle', 'Only {{count}} rounds in your circle this fortnight.', {
                 count: total,
-              })}{' '}
-              <button type="button" onClick={state.seeEveryone} style={{ ...QUIET_ACTION, fontSize: 12 }}>
-                {t('amateur.board.seeEveryone', 'See everyone')} &rsaquo;
-              </button>
+              })}
             </p>
           ) : (
             total > visible.length && (
@@ -212,8 +193,36 @@ export function AmateurLeaderboardBlock({
               />
             )
           )}
+
+          {/* §3 — THE SCORES COME FIRST AND THE REMEDY AFTER. States B and C get
+              the rail; state D gets the one line that explains what a circle is
+              for, because nothing was widened for them. */}
+          {(thin || state.widened) && <SuggestedGolfersRail surface="explore_board" />}
+
+          {thin && (
+            <p style={{ margin: '14px 2px 0', fontSize: 12, color: A.MUTE, lineHeight: 1.45 }}>
+              {t('amateur.board.orBeyond', 'Or look beyond your circle.')}{' '}
+              <button type="button" onClick={state.seeEveryone} style={{ ...QUIET_ACTION, fontSize: 12 }}>
+                {t('amateur.board.seeEveryone', 'See everyone')} &rsaquo;
+              </button>
+            </p>
+          )}
+
+          {state.hasCircle === false && !state.widened && (
+            <p style={{ margin: '14px 2px 0', fontSize: 12, color: A.MUTE, lineHeight: 1.45 }}>
+              {t('amateur.board.noCircleYet', 'Follow golfers you know and this becomes your circle.')}{' '}
+              <button
+                type="button"
+                onClick={() => setFindGolfers(true)}
+                style={{ ...QUIET_ACTION, fontSize: 12 }}
+              >
+                {t('amateur.board.findGolfers', 'Find golfers')} &rsaquo;
+              </button>
+            </p>
+          )}
         </>
       )}
+
 
 
       <BoardSeeAllSheet

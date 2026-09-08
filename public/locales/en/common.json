@@ -507,7 +507,6 @@
         "close": "Close",
         "gross": "Gross",
         "playedTo": "Played to",
-        
         "roundsTitle_one": "{{count}} round",
         "roundsTitle_other": "{{count}} rounds"
       }
@@ -732,7 +731,8 @@
       "title": "Nobody saw that round",
       "sub": "Follow a few golfers and your next one lands in their feed.",
       "notNow": "Not now"
-    }
+    },
+    "railKicker": "GOLFERS YOU MIGHT KNOW"
   },
   "story": {
     "likeAria": "Like this story",
