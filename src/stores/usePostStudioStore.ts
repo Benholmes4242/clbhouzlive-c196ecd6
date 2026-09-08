@@ -83,7 +83,7 @@ export const usePostStudioStore = create<PostStudioStoreState>((set) => ({
   openPostStudioForEdit: (opts) =>
     set({
       isOpen: true,
-      initialMedia: [],
+      initialMedia: opts.media ?? [],
       awaitingMedia: false,
       initialActorType: 'personal',
       initialActorId: null,
