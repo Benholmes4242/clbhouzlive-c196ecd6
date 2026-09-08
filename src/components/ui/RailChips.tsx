@@ -16,6 +16,14 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
  * amber belongs to the viewing member. Unselected is transparent with a 1px
  * A.BORDER and A.MUTE text. The row scrolls horizontally and never wraps.
  *
+ * TWO GROUNDS, ONE GEOMETRY (BRIEF_EXPLORE_REFINEMENT ruling 1). The default
+ * ground, `outline`, states A CHOICE: one chip selected by inversion, the rest
+ * transparent with a hairline. The `filled` ground states APPLIED STATE: a 6%
+ * white ground, no border, nothing selected, and tapping opens a panel rather
+ * than switching a list. The Explore filter rail is the one filled consumer.
+ * A control that looks like a choice must behave like one, so do not reach for
+ * `filled` on anything that actually switches the surface below it.
+ *
  * Do not restate these values at a call site. This drifted into two shapes
  * once (filled rectangles on the dormant Watch pages, underlined text on the
  * library pages) and that is what this component exists to prevent.
@@ -42,12 +50,21 @@ export interface RailChipsProps {
    * block below is fixed to one value by definition (Tour's points boards).
    */
   locked?: boolean;
+  /**
+   * ADDITIVE. Omitted or 'outline' renders exactly as every existing consumer
+   * always has. 'filled' is the applied-state ground described above.
+   */
+  ground?: 'outline' | 'filled';
 }
 
-export function RailChips({ options, value, onChange, ariaLabel, style, className, locked }: RailChipsProps) {
+/** The applied-state ground: 6% white, stated once. */
+const APPLIED_FILL = 'rgba(255,255,255,0.06)';
+
+export function RailChips({ options, value, onChange, ariaLabel, style, className, locked, ground = 'outline' }: RailChipsProps) {
+  const filled = ground === 'filled';
   return (
     <div
-      role="tablist"
+      role={filled ? 'group' : 'tablist'}
       aria-label={ariaLabel}
       aria-disabled={locked || undefined}
       className={`hide-scrollbar${className ? ` ${className}` : ''}`}
@@ -68,8 +85,8 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
           <button
             key={option.id}
             type="button"
-            role="tab"
-            aria-selected={active}
+            role={filled ? undefined : 'tab'}
+            aria-selected={filled ? undefined : active}
             aria-disabled={locked || undefined}
             tabIndex={locked ? -1 : undefined}
             onClick={() => { if (!locked) onChange(option.id); }}
@@ -77,9 +94,9 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
               flexShrink: 0,
               padding: '6px 11px',
               borderRadius: RAIL_CHIP_RADIUS,
-              border: `1px solid ${active ? 'transparent' : A.BORDER}`,
-              background: active ? A.INK : 'transparent',
-              color: active ? A.CANVAS : A.MUTE,
+              border: filled ? 'none' : `1px solid ${active ? 'transparent' : A.BORDER}`,
+              background: filled ? APPLIED_FILL : active ? A.INK : 'transparent',
+              color: filled ? A.INK : active ? A.CANVAS : A.MUTE,
               fontFamily: SANS,
               fontSize: 12,
               fontWeight: 700,

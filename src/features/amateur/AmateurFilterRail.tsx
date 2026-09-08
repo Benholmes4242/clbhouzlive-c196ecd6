@@ -64,6 +64,10 @@ export function AmateurFilterRail({
           value=""
           onChange={onOpen}
           ariaLabel={t('discover.filterBoard.open', 'Filter the board')}
+          /* APPLIED STATE, not a choice — the filled ground keeps this rail
+             visibly distinct from the board chips forty pixels below, which do
+             switch the list. Ruling 1 of BRIEF_EXPLORE_REFINEMENT. */
+          ground="filled"
         />
       </div>
       <button
