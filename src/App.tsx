@@ -312,6 +312,9 @@ const AmateurPage = lazy(() => import("./pages/AmateurPage"));
 const AmateurStoryPage = lazy(() => import("./features/amateur/news/AmateurStoryPage"));
 
 const TourHubMainPage = lazy(() => import("./features/tourhub/pages").then(m => ({ default: m.TourHubMainPage })));
+/* BRIEF_TOUR_REBUILD: the one-page Tour. Named to sit beside, not replace, the
+   tabbed hub while both are mounted. */
+const TourPageOnePage = lazy(() => import("./pages/TourPage"));
 
 const TournamentDetailPage = lazy(() => import("./features/tourhub/tournament-v2/TournamentPage").then(m => ({ default: m.TournamentPage })));
 const PlayerProfilePage = lazy(() => import("./features/tourhub/player-v2/PlayerPage").then(m => ({ default: m.PlayerPage })));
