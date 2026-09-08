@@ -84,7 +84,7 @@ function SchoolMark({ src, name }: { src: string | null; name: string }) {
   );
 }
 
-function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => void }) {
+export function BoardRow({ row, onPress }: { row: TourBoardRow; onPress: () => void }) {
   const score = scoreText(row.toPar);
   return (
     <button

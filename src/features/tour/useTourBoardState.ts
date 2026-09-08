@@ -107,7 +107,7 @@ function fmtEarnings(n: number): string {
   return `$${Math.round(n)}`;
 }
 
-export function useTourBoardState(tour: TourId): TourBoardState {
+export function useTourBoardState(tour: TourId, initialBoard: TourBoardKey = 'live'): TourBoardState {
   const { data: cache } = useTournamentsCache();
 
   /* THE PICKER GOVERNS THIS ONE: the live event of the tour being read, biggest
@@ -123,7 +123,7 @@ export function useTourBoardState(tour: TourId): TourBoardState {
     ? ['live', 'fedex', 'rtd', 'oom', 'colleges']
     : ['fedex', 'rtd', 'oom', 'colleges'];
 
-  const [requested, setRequested] = useState<TourBoardKey>('live');
+  const [requested, setRequested] = useState<TourBoardKey>(initialBoard);
   /* A board that has left the row cannot stay selected — when the last
      tournament finishes mid-session the Leaderboard chip goes and the reader
      lands on the first board that still exists. */
