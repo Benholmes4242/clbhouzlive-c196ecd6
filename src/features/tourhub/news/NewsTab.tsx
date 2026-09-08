@@ -114,7 +114,11 @@ export function LeadStory({ story, onOpen, compact = false, immersiveHero = true
         <div
           aria-hidden
           style={{
-             position: 'absolute', left: 0, right: 0, bottom: 0, height: 260,
+              /* Capped at the frame height so the gradient always resolves to
+                 the full canvas colour at the photo's bottom edge — otherwise a
+                 frame shorter than 260px cuts the scrim mid-gradient and leaves
+                 a visible seam. */
+              position: 'absolute', left: 0, right: 0, bottom: 0, height: 'min(260px, 100%)',
              background: heroCanonScrimOn(SLATE_50),
           }}
         />
