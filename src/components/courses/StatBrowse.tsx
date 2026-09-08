@@ -882,6 +882,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         <div
           style={{
             ...KICKER,
+            fontSize: 12,
           }}
         >
           {t('statBrowse.eyebrow')}
