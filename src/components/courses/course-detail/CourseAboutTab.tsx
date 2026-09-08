@@ -26,7 +26,6 @@ import KeepExploring from './about/KeepExploring';
 
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseSheet from './ClaimCourseSheet';
-import CourseActionRows from './CourseActionRows';
 import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
 import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 
