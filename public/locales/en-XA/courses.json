@@ -365,10 +365,15 @@
       "yours": "[~~ÝŐÚŘ ŘÁŢÍÑĜ~~]"
     },
     "records": {
+      "allBoards": "All boards",
+      "allBoardsSub": "Every board and window, and who is chasing them.",
       "empty": "[~~Ñő ƀőářđš ĉļáíɱéđ áţ {{courseName}} ýéţ. Éṽéřý řéĉőřđ ĥéřé íš úƥ ƒőř ĝřáƀš.~~]",
       "kicker": "[~~ŢĤÉ ŘÉĈŐŘĐ ƁŐŐǨ~~]",
       "seeAll": "[~~Šéé áļļ ƀőářđš~~]",
       "seeAllUnclaimed": "[~~Šéé áļļ ƀőářđš — {{count}} úñĉļáíɱéđ~~]",
+      "sweep": "{{name}} holds all {{count}} boards",
+      "sweepYou": "You hold all {{count}} boards",
+      "unclaimedMeta": "{{count}} unclaimed",
       "units": {
         "birdies": "[~~Ɓířđíéš~~]",
         "diff": "[~~Đíƒƒ~~]",
@@ -386,7 +391,8 @@
     },
     "sections": {
       "aboutThisPlace": "[[Àbóút thís plãçé]]",
-      "howItPlays": "[Ĥôŵ îţ þļåŷś]"
+      "howItPlays": "[Ĥôŵ îţ þļåŷś]",
+      "recordBook": "The record book"
     },
     "suggestEdit": {
       "cancel": "[~~Ĉáñĉéļ~~]",
