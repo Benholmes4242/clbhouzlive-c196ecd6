@@ -384,10 +384,15 @@
       "yours": "YOUR RATING"
     },
     "records": {
+      "allBoards": "All boards",
+      "allBoardsSub": "Every board and window, and who is chasing them.",
       "empty": "No boards claimed at {{courseName}} yet. Every record here is up for grabs.",
       "kicker": "THE RECORD BOOK",
       "seeAll": "See all boards",
       "seeAllUnclaimed": "See all boards — {{count}} unclaimed",
+      "sweep": "{{name}} holds all {{count}} boards",
+      "sweepYou": "You hold all {{count}} boards",
+      "unclaimedMeta": "{{count}} unclaimed",
       "units": {
         "birdies": "Birdies",
         "diff": "Diff",
@@ -405,7 +410,8 @@
     },
     "sections": {
       "aboutThisPlace": "About this place",
-      "howItPlays": "How it plays"
+      "howItPlays": "How it plays",
+      "recordBook": "The record book"
     },
     "suggestEdit": {
       "cancel": "Cancel",
