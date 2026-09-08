@@ -256,6 +256,8 @@ const UserReviewsRedirect: React.FC = () => {
 // Courses page now uses CoursesWrapped (imported above) which handles header/dim reset
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
+// BRIEF_COURSE_TAB_REBUILD §3.10 — the Course tab's one drill-down.
+const CourseHolesPage = lazy(() => import("./pages/CourseHolesPage"));
 const ReviewComposerV2 = lazy(() => import("./features/review-v2/ReviewComposerV2"));
 const PostV2Page = lazy(() => import("./features/post-v2/PostV2Page"));
 
