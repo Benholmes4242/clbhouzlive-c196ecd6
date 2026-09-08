@@ -277,7 +277,8 @@ export function AmateurHero({
                     fontSize: 21,
                     fontWeight: 700,
                     lineHeight: 1,
-                    letterSpacing: '-0.03em',
+                    /* §7 — the tabular treatment is uniform at -0.04em. */
+                    letterSpacing: '-0.04em',
                     color: A.INK,
                   }}
                 >
