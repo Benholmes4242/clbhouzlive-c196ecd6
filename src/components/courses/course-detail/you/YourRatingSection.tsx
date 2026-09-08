@@ -13,7 +13,7 @@ import type { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { MentionText } from '@/components/mentions/MentionText';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection from '../about/AboutSection';
-import { YouLinkRow, YouSentence } from './youBits';
+import { YouAction, YouSentence } from './youBits';
 
 interface Props {
   rating: UserCourseRating | null;
@@ -29,7 +29,7 @@ const YourRatingSection: React.FC<Props> = ({ rating, onEdit, onRate }) => {
     return (
       <AboutSection heading={heading}>
         <YouSentence quiet>{t('courseDetail.youTab.rating.notRated')}</YouSentence>
-        <YouLinkRow label={t('courseDetail.youTab.rating.rateIt')} hairline={false} onPress={onRate} />
+        <YouAction label={t('courseDetail.youTab.rating.rateIt')} tone="ink" onPress={onRate} />
       </AboutSection>
     );
   }
@@ -53,11 +53,7 @@ const YourRatingSection: React.FC<Props> = ({ rating, onEdit, onRate }) => {
           {'"'}
         </p>
       ) : null}
-      <YouLinkRow
-        label={t('courseDetail.you.editRating')}
-        hairline={Boolean(rating.review)}
-        onPress={onEdit}
-      />
+      <YouAction label={t('courseDetail.youTab.rating.edit')} onPress={onEdit} />
     </AboutSection>
   );
 };

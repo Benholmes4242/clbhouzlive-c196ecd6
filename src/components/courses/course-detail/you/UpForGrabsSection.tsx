@@ -12,7 +12,7 @@ import { formatNumber } from '@/i18n/format';
 import { formatLegendValueCompact } from '@/lib/gam/visuals';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection from '../about/AboutSection';
-import { YouLinkRow } from './youBits';
+import { YouAction } from './youBits';
 
 interface Props {
   /** The course record gross, when someone holds it. */
@@ -64,11 +64,7 @@ const UpForGrabsSection: React.FC<Props> = ({
       <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, fontWeight: 700, color: A.INK, fontFamily: SANS, ...FIGS }}>
         {body}
       </p>
-      <YouLinkRow
-        label={t('courseDetail.records.allBoards')}
-        hairline={false}
-        onPress={onAllBoards}
-      />
+      <YouAction label={t('courseDetail.youTab.grabs.allBoards')} onPress={onAllBoards} />
     </AboutSection>
   );
 };

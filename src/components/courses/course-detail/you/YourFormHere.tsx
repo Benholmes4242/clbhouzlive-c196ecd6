@@ -26,13 +26,14 @@ const TrendLine: React.FC<{ values: number[] }> = ({ values }) => {
   const min = Math.min(...values);
   const span = Math.max(1, max - min);
   /* A lower gross is a better round, so the scale is inverted: better is up. */
-  const points = values
-    .map((v, i) => {
-      const x = (i / (values.length - 1)) * 100;
-      const y = ((v - min) / span) * (LINE_HEIGHT - 4) + 2;
-      return `${x},${y}`;
-    })
-    .join(' ');
+  const coords = values.map((v, i) => ({
+    x: (i / (values.length - 1)) * 100,
+    y: ((v - min) / span) * (LINE_HEIGHT - 4) + 2,
+  }));
+  const points = coords.map((c) => `${c.x},${c.y}`).join(' ');
+  /* The member's best round here carries the one amber mark. */
+  const bestIndex = values.indexOf(min);
+  const best = coords[bestIndex] ?? null;
 
   return (
     <svg
@@ -44,12 +45,14 @@ const TrendLine: React.FC<{ values: number[] }> = ({ values }) => {
       <polyline
         points={points}
         fill="none"
-        stroke={A.AMBER}
-        strokeWidth={1.5}
+        stroke={A.INK}
+        strokeOpacity={0.8}
+        strokeWidth={2}
         vectorEffect="non-scaling-stroke"
         strokeLinejoin="round"
         strokeLinecap="round"
       />
+      {best ? <circle cx={best.x} cy={best.y} r={4} fill={A.AMBER} vectorEffect="non-scaling-stroke" /> : null}
     </svg>
   );
 };
@@ -103,12 +106,12 @@ const YourFormHere: React.FC<Props> = ({ rounds, total }) => {
               fontFamily: SANS,
               /* A lower gross is an improvement; the direction, not the sign,
                  carries the colour. */
-              color: better ? A.GREEN : A.INK,
+              color: better ? A.RED : A.INK,
               ...FIGS,
             }}
           >
-            {t('courseDetail.youTab.form.vsPrevious', {
-              delta: `${better ? '\u2212' : '+'}${Math.abs(delta).toFixed(1)}`,
+            {t(better ? 'courseDetail.youTab.form.better' : 'courseDetail.youTab.form.worse', {
+              delta: Math.abs(delta).toFixed(1),
             })}
           </span>
         ) : null}
@@ -116,12 +119,12 @@ const YourFormHere: React.FC<Props> = ({ rounds, total }) => {
 
       <TrendLine values={line} />
 
-      <div style={{ display: 'flex', gap: 18, marginTop: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
         <span style={ABOUT_KICKER}>
-          {t('courseDetail.youTab.form.best')} {best}
+          {t('courseDetail.youTab.form.best', { score: best })}
         </span>
         <span style={ABOUT_KICKER}>
-          {t('courseDetail.youTab.form.worst')} {worst}
+          {t('courseDetail.youTab.form.worst', { score: worst })}
         </span>
       </div>
     </AboutSection>

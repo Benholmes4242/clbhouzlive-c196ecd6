@@ -513,6 +513,87 @@
       "noneInCircle_other": "{{count}} members, none in your circle yet",
       "havePlayed_one": "1 member has played here",
       "havePlayed_other": "{{count}} members have played here"
+    },
+    "youTab": {
+      "sections": {
+        "record": "Your record here",
+        "yourRounds": "Your rounds here",
+        "shotsGo": "Where your shots go",
+        "form": "Your form here",
+        "withinReach": "Within reach",
+        "rating": "Your rating",
+        "moments": "Your moments",
+        "upForGrabs": "Up for grabs"
+      },
+      "rounds": "Rounds",
+      "best": "Best",
+      "yourAverage": "Your average",
+      "yourRound": "Your round",
+      "field": "Field",
+      "basisOne": "Your one round here, against {{field}} from everyone else.",
+      "basisMany": "From {{rounds}} rounds, against {{field}} from everyone else.",
+      "basisOneNoField": "Your one round here.",
+      "basisManyNoField": "From {{rounds}} rounds here.",
+      "bestKicker": "Best",
+      "allRounds": "All {{rounds}} rounds",
+      "shots": {
+        "one": "One round is a scorecard, not a pattern. Play here a few more times and your hole-by-hole record appears.",
+        "thin_one": "{{rounds}} round is not enough to show which holes cost you. It needs about five.",
+        "thin_other": "{{rounds}} rounds is not enough to show which holes cost you. It needs about five.",
+        "worstHole": "Worst hole",
+        "youLose": "You lose",
+        "fieldLoses": "Field loses",
+        "allHolesSub": "Every hole against the field, how each par plays for you, and where your round drifts."
+      },
+      "form": {
+        "meta": "Last 20 rounds",
+        "one": "One round is a starting point, not a trend. Play here ten times and your form appears.",
+        "thin_one": "{{rounds}} round is not enough to show a trend. It needs about ten.",
+        "thin_other": "{{rounds}} rounds is not enough to show a trend. It needs about ten.",
+        "better": "{{delta}} better than your ten before",
+        "worse": "{{delta}} worse than your ten before",
+        "best": "Best {{score}}",
+        "worst": "Worst {{score}}"
+      },
+      "reach": {
+        "label": "Holes birdied here",
+        "value": "{{done}} of {{total}}",
+        "oneLeft": "Only the {{hole}} has never given you a birdie.",
+        "allLeft": "Every hole here is still on the list.",
+        "some_one": "{{holes}} hole here has never given you a birdie.",
+        "some_other": "{{holes}} holes here have never given you a birdie.",
+        "none": "You have birdied every hole here."
+      },
+      "rating": {
+        "notRated": "You have not rated this course.",
+        "rateIt": "Rate it",
+        "edit": "Edit your rating"
+      },
+      "momentsMeta": "{{moments}}",
+      "roundsMeta": "{{rounds}}",
+      "grabs": {
+        "played": "No course record here yet. Your {{score}} would take it.",
+        "notPlayed": "No course record here yet. It is there for the taking.",
+        "held": "{{name}} holds the course record here with {{value}}.",
+        "yours": "You hold the course record here with {{value}}.",
+        "allBoards": "All boards"
+      },
+      "connect": {
+        "body": "Connect your handicap and every round you play here appears automatically, with your score against the field.",
+        "cta": "Connect handicap"
+      },
+      "notPlayed": {
+        "body": "You have not played here yet. The field averages {{field}} — post a round and this fills in on its own.",
+        "bodyNoField": "You have not played here yet. Post a round and this fills in on its own.",
+        "addToList": "Add to my list",
+        "adding": "Adding…"
+      },
+      "signedOut": {
+        "title": "Your record at this course",
+        "body": "Sign in to track your rounds, ratings and hole-by-hole scoring at {{courseName}}.",
+        "cta": "Sign in"
+      },
+      "allRoundsTitle": "Your rounds here"
     }
   },
   "courseHero": {

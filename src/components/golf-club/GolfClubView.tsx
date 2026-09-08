@@ -273,7 +273,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             value="you"
             className={`mt-0 transition-opacity duration-200 ${activeTab === 'you' ? 'opacity-100' : 'hidden'}`}
           >
-            <CourseYouTab courseId={course.id} courseName={course.name} />
+            <CourseYouTab courseId={course.id} courseName={course.name} onTabChange={handleTabChange} />
           </TabsContent>
         )}
 

@@ -12,8 +12,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatNumber, formatMonthDayYearShort } from '@/i18n/format';
 import { A, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
-import AboutSection, { ABOUT_KICKER, AboutHairline } from '../about/AboutSection';
-import { YouLinkRow } from './youBits';
+import AboutSection, { ABOUT_KICKER } from '../about/AboutSection';
+import { YouAction } from './youBits';
 
 export interface YouRound {
   whsScoreId: string;
@@ -45,74 +45,75 @@ const YourRoundsHere: React.FC<Props> = ({ rounds, total, bestGross, onOpenRound
   return (
     <AboutSection
       heading={t('courseDetail.youTab.sections.yourRounds')}
-      meta={t('courseDetail.youTab.roundsMeta', { count: total, rounds: formatNumber(total) })}
+      meta={formatNumber(total)}
     >
       <div style={{ display: 'grid' }}>
-        {shown.map((round, i) => {
+        {shown.map((round) => {
           const parts = toParParts(round.toPar, 0);
           const isBest = markBest && round.gross != null && round.gross === bestGross;
           return (
-            <React.Fragment key={round.whsScoreId}>
-              {i > 0 ? <AboutHairline /> : null}
-              <button
-                type="button"
-                onClick={() => onOpenRound(round)}
+            <button
+              key={round.whsScoreId}
+              type="button"
+              onClick={() => onOpenRound(round)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                width: '100%',
+                textAlign: 'left',
+                background: 'transparent',
+                border: 0,
+                borderBottom: `1px solid ${A.HAIRLINE}`,
+                padding: '11px 0',
+                cursor: 'pointer',
+                fontFamily: SANS,
+              }}
+            >
+              <span
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 12,
-                  width: '100%',
-                  textAlign: 'left',
-                  background: 'transparent',
-                  border: 0,
-                  padding: '12px 0',
-                  cursor: 'pointer',
-                  fontFamily: SANS,
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: A.INK,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                <span style={{ minWidth: 0 }}>
-                  <span
-                    style={{
-                      display: 'block',
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: A.INK,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {formatMonthDayYearShort(new Date(round.playDate))}
-                  </span>
-                  {isBest ? (
-                    <span style={{ ...ABOUT_KICKER, display: 'block', marginTop: 4, color: A.AMBER_DEEP }}>
-                      {t('courseDetail.youTab.bestKicker')}
-                    </span>
-                  ) : null}
+                {formatMonthDayYearShort(new Date(round.playDate))}
+              </span>
+              {isBest ? (
+                <span style={{ ...ABOUT_KICKER, color: A.AMBER_DEEP, flexShrink: 0 }}>
+                  {t('courseDetail.youTab.bestKicker')}
                 </span>
-                <span style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexShrink: 0 }}>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: A.INK, letterSpacing: '-0.02em', ...FIGS }}>
-                    {round.gross ?? '\u2014'}
-                  </span>
-                  {parts ? (
-                    <span style={{ fontSize: 13, fontWeight: 700, color: parts.tone, ...FIGS }}>{parts.text}</span>
-                  ) : null}
-                </span>
-              </button>
-            </React.Fragment>
+              ) : null}
+              <span
+                style={{ fontSize: 16, fontWeight: 700, color: A.INK, width: 34, textAlign: 'right', ...FIGS }}
+              >
+                {round.gross ?? '\u2014'}
+              </span>
+              <span
+                style={{ fontSize: 13, fontWeight: 700, width: 30, textAlign: 'right', color: parts?.tone ?? A.MUTE, ...FIGS }}
+              >
+                {parts?.text ?? '\u2014'}
+              </span>
+            </button>
           );
         })}
       </div>
 
       {total > MAX_ROWS ? (
-        <YouLinkRow
+        <YouAction
           label={t('courseDetail.youTab.allRounds', { count: total, rounds: formatNumber(total) })}
           onPress={onSeeAll}
+          space={14}
         />
       ) : null}
     </AboutSection>
   );
 };
+
 
 export default YourRoundsHere;

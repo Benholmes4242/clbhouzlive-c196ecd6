@@ -98,27 +98,61 @@ export const YouLinkRow: React.FC<{
   </>
 );
 
-/** A pill button, INK on the dark canvas. Used by the two invitations (§4 B/C). */
-export const YouButton: React.FC<{ label: string; onClick: () => void; disabled?: boolean }> = ({
-  label,
-  onClick,
-  disabled,
-}) => (
+/**
+ * The tab's action link: 12/700/0.11em uppercase with a chevron. MUTE where the
+ * action is secondary ("ALL BOARDS ›"), INK where it is the only thing to do
+ * ("RATE IT ›"). Exactly as the signed-off mock draws it.
+ */
+export const YouAction: React.FC<{
+  label: string;
+  onPress: () => void;
+  tone?: 'mute' | 'ink';
+  space?: number;
+}> = ({ label, onPress, tone = 'mute', space = 12 }) => (
+  <button
+    type="button"
+    onClick={onPress}
+    style={{
+      display: 'block',
+      marginTop: space,
+      padding: 0,
+      border: 0,
+      background: 'transparent',
+      textAlign: 'left',
+      cursor: 'pointer',
+      fontFamily: SANS,
+      fontSize: 12,
+      fontWeight: 700,
+      letterSpacing: '0.11em',
+      textTransform: 'uppercase',
+      color: tone === 'ink' ? A.INK : A.MUTE,
+    }}
+  >
+    {label} ›
+  </button>
+);
+
+/** A button, INK filled or hairline outlined. Used by the two invitations (§4 B/C). */
+export const YouButton: React.FC<{
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  variant?: 'solid' | 'outline';
+}> = ({ label, onClick, disabled, variant = 'solid' }) => (
   <button
     type="button"
     onClick={onClick}
     disabled={disabled}
     style={{
-      marginTop: 16,
-      border: 'none',
-      background: A.INK,
-      color: A.CANVAS,
-      borderRadius: 999,
-      padding: '12px 20px',
-      fontSize: 14,
-      fontWeight: 700,
-      letterSpacing: '-0.01em',
+      marginTop: 14,
+      borderRadius: 14,
+      padding: variant === 'solid' ? '11px 18px' : '10px 16px',
+      fontSize: variant === 'solid' ? 14 : 13,
+      fontWeight: 600,
       fontFamily: SANS,
+      border: variant === 'solid' ? 'none' : `1px solid ${A.HAIRLINE}`,
+      background: variant === 'solid' ? A.INK : 'transparent',
+      color: variant === 'solid' ? A.CANVAS : A.INK,
       cursor: disabled ? 'default' : 'pointer',
       opacity: disabled ? 0.6 : 1,
     }}
@@ -126,6 +160,7 @@ export const YouButton: React.FC<{ label: string; onClick: () => void; disabled?
     {label}
   </button>
 );
+
 
 /** "the 18th" — used by Within reach. */
 export function ordinal(n: number): string {

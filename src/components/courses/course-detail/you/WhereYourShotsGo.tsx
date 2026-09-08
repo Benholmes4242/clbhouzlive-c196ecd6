@@ -52,7 +52,7 @@ const MyHoleChart: React.FC<{ rows: MyHolePerformanceRow[] }> = ({ rows }) => {
                 height,
                 borderRadius: BAR_RADIUS,
                 background: overPar && !strong
-                  ? `color-mix(in srgb, ${A.AMBER} 55%, transparent)`
+                  ? `color-mix(in srgb, ${A.AMBER} 50%, transparent)`
                   : overPar
                     ? A.AMBER
                     : A.MUTE,
@@ -120,7 +120,7 @@ const WhereYourShotsGo: React.FC<Props> = ({ rounds, mine, field, onAllHoles }) 
     >
       <MyHoleChart rows={mine} />
 
-      <div style={{ display: 'flex', gap: 14, marginTop: 20 }}>
+      <div style={{ display: 'flex', gap: 14, marginTop: 18 }}>
         <YouFigure label={t('courseDetail.youTab.shots.worstHole')} value={String(worst.hole_no)} />
         <YouFigure
           label={t('courseDetail.youTab.shots.youLose')}
