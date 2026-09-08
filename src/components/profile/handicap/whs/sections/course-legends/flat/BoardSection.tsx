@@ -132,7 +132,7 @@ export const BoardSection: React.FC<Props> = ({
           category={active.key}
           coursePar={coursePar}
           rule={i > 0}
-          onPress={onRowPress ? () => onRowPress(row) : undefined}
+          onPress={onRowPress && row.username ? () => onRowPress(row) : undefined}
         />
       ))}
 
