@@ -416,11 +416,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           const shellTabsNode = (
             <div
               style={{
-                /* Opaque page canvas — this row sits in NORMAL FLOW, so nothing
-                 * ever scrolls beneath it. --glass-bg (the sticky-glass token)
-                 * only darkened the strip against the page. GlassHeaderPlate
-                 * owns the stuck-state veil; do not re-add backdrop-filter. */
-                background: 'hsl(var(--background))',
+                /* Opaque canonical page canvas — this row sits in NORMAL FLOW,
+                 * so nothing ever scrolls beneath it. Do not use --background
+                 * here: its HSL value resolves to #17181C, not the canonical
+                 * #15171F used by course detail and the filter rails. */
+                background: 'var(--bg-page)',
               }}
             >
 
