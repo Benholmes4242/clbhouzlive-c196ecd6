@@ -22,10 +22,10 @@ import WhatPeopleSay from './about/WhatPeopleSay';
 import WhoPlaysHere from './about/WhoPlaysHere';
 import Photos from './about/Photos';
 import WhereItIs from './about/WhereItIs';
+import KeepExploring from './about/KeepExploring';
 
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseSheet from './ClaimCourseSheet';
-import CourseActionRows from './CourseActionRows';
 import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
 import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 
@@ -193,19 +193,51 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           nearby={nearbyPins}
         />
 
-      {/* ══ BLOCK 4 — the remaining rows (§3.11 still to come) ══ */}
-      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
-
-        {/* Explore / website / claim — one collapsed panel of quiet rows */}
-        <CourseActionRows
+        {/* §3.11 — KEEP EXPLORING, flat. Nearby, the Top 100 list and the
+            official website; the same rows and the same routing, no Panel.
+            CourseActionRows.tsx is untouched and joins the dead-file list. */}
+        <KeepExploring
           course={course}
           onWebsiteClick={course.website_url ? handleWebsiteClick : undefined}
-          onClaimClick={
-            course.club_id && claimStatus?.state === 'unclaimed'
-              ? () => setShowClaimSheet(true)
-              : undefined
-          }
         />
+
+      {/* ══ THE CLAIM ROW — AWAITING A RULING ══
+          It is not a place to explore, so it did not follow the other rows into
+          §3.11. It stays exactly where it renders today, unmoved and unremoved,
+          until its home is decided. */}
+      <div style={{ display: 'grid', gap: 12, padding: '0 20px' }}>
+
+        {course.club_id && claimStatus?.state === 'unclaimed' && (
+          <button
+            type="button"
+            onClick={() => setShowClaimSheet(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              width: '100%',
+              minHeight: 44,
+              padding: 0,
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              textAlign: 'left',
+            }}
+          >
+            <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: SLATE_50 }}>
+              {t('courseDetail.claim.cta.title')}
+            </span>
+            <span style={{ fontSize: 11.5, color: 'rgba(248,250,252,0.62)' }}>
+              {t('courseDetail.claim.cta.action')}
+            </span>
+            <span
+              style={{ fontSize: 13, color: 'rgba(248,250,252,0.45)', fontWeight: 700 }}
+              aria-hidden="true"
+            >
+              {'\u203A'}
+            </span>
+          </button>
+        )}
 
         {/* Claim status — pending / claimed */}
         {course.club_id && claimStatus?.state === 'pending' && <ClaimUnderReviewNotice />}

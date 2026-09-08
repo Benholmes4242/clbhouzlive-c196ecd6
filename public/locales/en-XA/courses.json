@@ -405,7 +405,8 @@
       "whatPeopleSay": "[Ŵĥåţ рéöрļé şåý]",
       "whoPlaysHere": "[Ŵĥö рļåýş ĥéŕé]",
       "photos": "[Рĥöţöş]",
-      "whereItIs": "[Ŵĥéŕé îţ îş]"
+      "whereItIs": "[Ŵĥéŕé îţ îş]",
+      "keepExploring": "[Keep exploring"
     },
     "suggestEdit": {
       "cancel": "[~~Ĉáñĉéļ~~]",
@@ -483,6 +484,16 @@
       "yourBattle": "[~~Ýőúř ƀáţţļé · ĥőļé {{n}}~~]",
       "yourRating": "[~~Ýőúř řáţíñĝ~~]",
       "yours": "[~~Ýőúřš~~]"
+    },
+    "members": {
+      "meta_one": "[1 member",
+      "meta_other": "[{{count}} members",
+      "namesAndOthers_one": "[{{names}} and 1 other",
+      "namesAndOthers_other": "[{{names}} and {{count}} others",
+      "noneInCircle_one": "[1 member, none in your circle yet",
+      "noneInCircle_other": "[{{count}} members, none in your circle yet",
+      "havePlayed_one": "[1 member has played here",
+      "havePlayed_other": "[{{count}} members have played here"
     }
   },
   "courseHero": {

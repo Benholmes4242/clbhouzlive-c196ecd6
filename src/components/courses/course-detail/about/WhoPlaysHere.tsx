@@ -1,30 +1,32 @@
 /**
- * BRIEF_COURSE_TAB_REBUILD §3.7 — WHO PLAYS HERE, flat.
+ * BRIEF_COURSE_TAB_REBUILD §3.7 (widened) — WHO PLAYS HERE, flat.
  *
- * The people, named. Overlapping squircle avatars and a names line, on the flat
- * section rather than in a Panel — same read (useFriendsWhoPlayedCourse), same
- * 22px facepile, no bordered card. CourseFriendsStrip.tsx is left on disk and
- * added to the dead-file list rather than edited, so nothing shared moves.
+ * WIDENED FROM CIRCLE-ONLY TO ALL MEMBERS. As first built this section did not
+ * exist for the 52 of 99 members who follow nobody, and never existed for a
+ * signed-out visitor on a shared course link — the person most likely to be
+ * deciding whether the place is worth playing. "Thirteen people you could ask
+ * about this place" is useful to all of them; "four of your friends" is useful
+ * to thirty.
  *
- * NO AVERAGE HERE, and none above either (§3.6): with the network at its current
- * size a circle average is nearly always identical to the overall or absent, and
- * naming two people says more than their mean. Recorded as REVERSIBLE — at a few
- * hundred connected members what your circle thinks earns its place back.
+ * The circle is still called out when there is one: circle faces come first and
+ * circle members are the ones named. The figure is always the true total.
  *
- * Renders nothing when signed out or when nobody in the circle has played: an
- * empty facepile with a heading over it is a section about no one.
+ * NO AVERAGE, here or above (§3.6). Recorded as REVERSIBLE, not retired.
+ *
+ * Renders whenever at least one member has played. Absent only when nobody has,
+ * which the tab's no-data state already covers.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useFriendsWhoPlayedCourse } from '@/hooks/useFriendsWhoPlayedCourse';
+import { useMembersWhoPlayedCourse } from '@/hooks/useMembersWhoPlayedCourse';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import AboutSection from './AboutSection';
 
-/** Faces shown before the pile becomes a count. */
-const MAX_FACES = 5;
+/** Four faces maximum, per the brief. */
+const MAX_FACES = 4;
 
 interface WhoPlaysHereProps {
   courseId: string;
@@ -33,65 +35,90 @@ interface WhoPlaysHereProps {
 const WhoPlaysHere: React.FC<WhoPlaysHereProps> = ({ courseId }) => {
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
-  const { data: friends = [] } = useFriendsWhoPlayedCourse(user?.id, courseId);
+  const { data } = useMembersWhoPlayedCourse(courseId, user?.id);
 
-  if (!user || friends.length === 0) return null;
+  const total = data?.total ?? 0;
+  if (total === 0) return null;
 
-  const faces = friends.slice(0, MAX_FACES);
-  const overflow = Math.max(0, friends.length - faces.length);
+  const members = data?.members ?? [];
+  const hasCircle = data?.hasCircle ?? false;
+  const circleHere = members.filter((m) => m.in_circle);
 
-  const names = friends
+  /* Faces are already circle-first from the hook. Signed out, profiles are not
+     readable, so there are no faces to show and the sentence stands alone. */
+  const faces = members.filter((m) => m.profile).slice(0, MAX_FACES);
+  const overflow = Math.max(0, total - faces.length);
+
+  const named = circleHere
     .slice(0, 2)
-    .map((f) => f.profile.display_name || f.profile.username || '')
+    .map((m) => m.profile?.display_name || m.profile?.username || '')
     .filter(Boolean);
-  const rest = friends.length - names.length;
+
+  let sentence: string;
+  if (named.length > 0) {
+    // A circle, and some of it has played here: name them, count the rest.
+    const rest = total - named.length;
+    sentence =
+      rest > 0
+        ? t('courseDetail.members.namesAndOthers', { names: named.join(', '), count: rest })
+        : named.join(', ');
+  } else if (hasCircle) {
+    // A circle, but none of it here yet — say so rather than staying silent.
+    sentence = t('courseDetail.members.noneInCircle', { count: total });
+  } else {
+    // No circle at all, or signed out.
+    sentence = t('courseDetail.members.havePlayed', { count: total });
+  }
 
   return (
     <AboutSection
       heading={t('courseDetail.sections.whoPlaysHere')}
-      meta={t('courseDetail.friends.meta', { count: friends.length })}
+      meta={t('courseDetail.members.meta', { count: total })}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ display: 'flex', flexShrink: 0 }}>
-          {faces.map((friend, index) => {
-            const displayName = friend.profile.display_name || friend.profile.username || '?';
-            return (
-              <SquircleAvatar
-                key={friend.user_id}
-                src={friend.profile.profile_photo_url ?? undefined}
-                alt={displayName}
-                userId={friend.user_id}
-                size={22}
-                /* The pile sits on the flat canvas now, so the traced ring
-                   traces the canvas rather than the retired panel fill. */
-                ringColor={A.CANVAS}
-                className={index > 0 ? '-ml-1.5' : ''}
-              />
-            );
-          })}
-          {overflow > 0 && (
-            <div
-              className="-ml-1.5 tabular-nums lining-nums"
-              style={{
-                minWidth: 22,
-                height: 22,
-                borderRadius: '34%',
-                background: A.TRACK,
-                border: `2px solid ${A.CANVAS}`,
-                color: A.MUTE,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 11,
-                fontWeight: 700,
-                padding: '0 4px',
-                flexShrink: 0,
-              }}
-            >
-              +{overflow}
-            </div>
-          )}
-        </div>
+        {faces.length > 0 && (
+          <div style={{ display: 'flex', flexShrink: 0 }}>
+            {faces.map((member, index) => {
+              const displayName =
+                member.profile?.display_name || member.profile?.username || '?';
+              return (
+                <SquircleAvatar
+                  key={member.user_id}
+                  src={member.profile?.profile_photo_url ?? undefined}
+                  alt={displayName}
+                  userId={member.user_id}
+                  size={22}
+                  /* The pile sits on the flat canvas now, so the traced ring
+                     traces the canvas rather than the retired panel fill. */
+                  ringColor={A.CANVAS}
+                  className={index > 0 ? '-ml-1.5' : ''}
+                />
+              );
+            })}
+            {overflow > 0 && (
+              <div
+                className="-ml-1.5 tabular-nums lining-nums"
+                style={{
+                  minWidth: 22,
+                  height: 22,
+                  borderRadius: '34%',
+                  background: A.TRACK,
+                  border: `2px solid ${A.CANVAS}`,
+                  color: A.MUTE,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  padding: '0 4px',
+                  flexShrink: 0,
+                }}
+              >
+                +{overflow}
+              </div>
+            )}
+          </div>
+        )}
         <div
           className="tabular-nums lining-nums"
           style={{
@@ -106,9 +133,7 @@ const WhoPlaysHere: React.FC<WhoPlaysHereProps> = ({ courseId }) => {
             whiteSpace: 'nowrap',
           }}
         >
-          {rest > 0
-            ? t('courseDetail.friends.namesAndMore', { names: names.join(', '), count: rest })
-            : names.join(', ')}
+          {sentence}
         </div>
       </div>
     </AboutSection>

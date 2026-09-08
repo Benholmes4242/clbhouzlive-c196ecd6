@@ -424,7 +424,8 @@
       "whatPeopleSay": "What people say",
       "whoPlaysHere": "Who plays here",
       "photos": "Photos",
-      "whereItIs": "Where it is"
+      "whereItIs": "Where it is",
+      "keepExploring": "Keep exploring"
     },
     "suggestEdit": {
       "cancel": "Cancel",
@@ -502,6 +503,16 @@
       "yourBattle": "Your battle · hole {{n}}",
       "yourRating": "Your rating",
       "yours": "Yours"
+    },
+    "members": {
+      "meta_one": "1 member",
+      "meta_other": "{{count}} members",
+      "namesAndOthers_one": "{{names}} and 1 other",
+      "namesAndOthers_other": "{{names}} and {{count}} others",
+      "noneInCircle_one": "1 member, none in your circle yet",
+      "noneInCircle_other": "{{count}} members, none in your circle yet",
+      "havePlayed_one": "1 member has played here",
+      "havePlayed_other": "{{count}} members have played here"
     }
   },
   "courseHero": {
