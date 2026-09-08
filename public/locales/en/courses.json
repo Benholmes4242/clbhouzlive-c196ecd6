@@ -252,7 +252,9 @@
     },
     "friends": {
       "kicker": "FRIENDS WHO PLAYED HERE",
-      "namesAndMore": "{{names}} and {{count}} more"
+      "namesAndMore": "{{names}} and {{count}} more",
+      "meta_one": "1 in your circle",
+      "meta_other": "{{count}} in your circle"
     },
     "handicapCue": {
       "bannerAction": "Connect →",
@@ -321,7 +323,11 @@
     "mediaStrip": {
       "helpDiscover": "Help fellow golfers discover this course — share your experience.",
       "seeAll": "See all",
-      "share": "Share your experience"
+      "share": "Share your experience",
+      "photoCount_one": "1 photo",
+      "photoCount_other": "{{count}} photos",
+      "videoCount_one": "1 video",
+      "videoCount_other": "{{count}} videos"
     },
     "nearby": {
       "kicker": "NEARBY",
@@ -415,7 +421,10 @@
       "aboutThisPlace": "About this place",
       "howItPlays": "How it plays",
       "recordBook": "The record book",
-      "whatPeopleSay": "What people say"
+      "whatPeopleSay": "What people say",
+      "whoPlaysHere": "Who plays here",
+      "photos": "Photos",
+      "whereItIs": "Where it is"
     },
     "suggestEdit": {
       "cancel": "Cancel",
