@@ -19,12 +19,15 @@ export interface MyRoundAtCourse {
   teeMarker: string | null;
 }
 
-export function useMyRoundsAtCourse(courseId?: string | null) {
+export function useMyRoundsAtCourse(courseId?: string | null, options?: { limit?: number }) {
   const { profile } = useProfileData();
   const userId = profile?.id ?? null;
+  /* The tab's list is capped at 20; the all-rounds page asks for more. The cap
+     is part of the key so the two callers cannot share a truncated cache. */
+  const limit = options?.limit ?? 20;
 
   return useQuery({
-    queryKey: ['my-rounds-at-course', userId, courseId],
+    queryKey: ['my-rounds-at-course', userId, courseId, limit],
     enabled: !!userId && !!courseId,
     staleTime: 5 * 60 * 1000,
     queryFn: async (): Promise<MyRoundAtCourse[]> => {
@@ -35,7 +38,8 @@ export function useMyRoundsAtCourse(courseId?: string | null) {
         .eq('course_id', courseId as string)
         .eq('holes_played', 18)
         .order('play_date', { ascending: false })
-        .limit(20);
+        .limit(limit);
+
       if (error) throw error;
       return (data ?? []).map((r) => ({
         whsScoreId: r.whs_score_id as string,
