@@ -427,6 +427,22 @@ export const TrajectoryLine: React.FC<Props> = ({
         </linearGradient>
       </defs>
 
+      {/* §2 THE LEVEL-PAR RULE, FULL WIDTH AND FIRST. SVG has no z-index, so
+          document order IS the stacking: the rule is painted BEFORE the fill and
+          the curve, which then sit on top of it. Painted last it cut across the
+          fill and read as a divider rather than a baseline. Edge to edge, not
+          just under the curve. No label, no axis, no scale. */}
+      <line
+        x1={0}
+        x2={w}
+        y1={zeroY}
+        y2={zeroY}
+        stroke={baselineColor ?? T.baseline}
+        strokeWidth={1}
+        strokeDasharray="3 4"
+        vectorEffect="non-scaling-stroke"
+      />
+
       {/* THE FILL IS ONE SOLID OPAQUE TONE, to the level line. No gradient, no
           fillOpacity, no rgba. THE LEVEL-PAR SPLIT KEEPS ITS STRUCTURE: each
           side of zero takes its own solid tone through its own clip, and RED IS
@@ -440,17 +456,6 @@ export const TrajectoryLine: React.FC<Props> = ({
         </g>
       ))}
 
-      {/* level par — unconditional: the fill and the earned-red rule both
-          reference it. */}
-      <line
-        x1={padX}
-        x2={w - padX}
-        y1={zeroY}
-        y2={zeroY}
-        stroke={baselineColor ?? T.baseline}
-        strokeWidth={1}
-        strokeDasharray="3 4"
-      />
 
       {/* No halo. It existed so a 2.4px stroke read on top of a graduated fill.
           At 1.8px over a SOLID flat fill there is nothing to separate from, and
