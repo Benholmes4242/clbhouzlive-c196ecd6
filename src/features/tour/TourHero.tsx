@@ -219,7 +219,7 @@ export function TourHero() {
                     alt={champion.name}
                     userId={champion.id ?? champion.name}
                     hairlineRing
-                    className="tour-hero-round-avatar"
+                    className="[&>div]:!rounded-full"
                   />
                 )}
                 <span style={{ flex: 1, minWidth: 0, fontSize: 16, fontWeight: 600, color: INK }}>{champion?.name ?? 'Champion'}</span>
