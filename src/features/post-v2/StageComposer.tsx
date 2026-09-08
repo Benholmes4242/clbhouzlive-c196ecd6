@@ -763,9 +763,9 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], aw
 
   // ---- PAGE 1 — MEDIA, DARK -------------------------------------------------
   if (page === 1) {
+    // Canvas matches page 2 (PAGE2.canvas) — both steps sit on the same
+    // surface so there is no colour step between them.
     return (
-      {/* Canvas matches page 2 (PAGE2.canvas) — both steps sit on the same
-          surface so there is no colour step between them. */}
       <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
         {/* Top bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', paddingTop: 'max(env(safe-area-inset-top), 12px)', background: PAGE2.canvas, flex: 'none' }}>
