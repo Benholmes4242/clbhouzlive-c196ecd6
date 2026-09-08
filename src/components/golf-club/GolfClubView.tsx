@@ -552,9 +552,9 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
           }}
         >
           <CourseRankBadges
-            globalRank={course.global_rank ?? null}
-            regionalRank={course.regional_rank ?? null}
-            usaRank={course.usa_rank ?? null}
+            globalRank={standing?.globalRank ?? null}
+            regionalRank={standing?.regionalRank ?? null}
+            usaRank={standing?.usaRank ?? null}
             country={course.country}
             positioning="inline"
           />
