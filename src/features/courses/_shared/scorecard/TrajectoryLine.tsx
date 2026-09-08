@@ -485,6 +485,27 @@ export const TrajectoryLine: React.FC<Props> = ({
         />
       ))}
 
+      {/* §3b THE HOLE NUMBER UNDER THE BEAD. Opt-in, and drawn off the SAME bead
+          list, so there is never a label without a mark. The number is the hole's
+          own number (holes[pos - 1].holeNo), not its plot position. */}
+      {beadHoleLabels &&
+        beads.map((b) => {
+          const holeNo = holes[b.pos - 1]?.holeNo;
+          if (holeNo == null) return null;
+          return (
+            <text
+              key={`bl-${b.pos}`}
+              x={x(b.pos)}
+              y={Math.min(height - 1, y(b.cum) + b.r + 8)}
+              textAnchor="middle"
+              fill={T.tickDim}
+              style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.02em' }}
+            >
+              {holeNo}
+            </text>
+          );
+        })}
+
       {/* THE SCRUB MARKER — rule plus a point on the curve, gone on release. */}
       {hover != null && (
         <g>
