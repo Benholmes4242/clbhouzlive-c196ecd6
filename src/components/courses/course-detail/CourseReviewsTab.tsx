@@ -239,8 +239,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       return { prevReviews, prevVotes, votesKey };
     },
     onError: (e, _vars, ctx) => {
-      ctx?.prevReviews?.forEach(([key, data]) => queryClient.setQueryData(key, data));
-      if (ctx?.votesKey) queryClient.setQueryData(ctx.votesKey, ctx.prevVotes);
+      ctx?.prevReviews?.forEach(([key, data]) => queryClient.setQueryData<CourseReview[]>(key as string[], data as CourseReview[]));
+      if (ctx?.votesKey) queryClient.setQueryData(ctx.votesKey as unknown as string[], ctx.prevVotes);
       toast(t('review.toast.voteFailed', { defaultValue: "Couldn't save your vote" }), {
         description: e instanceof Error ? e.message : undefined,
       });
