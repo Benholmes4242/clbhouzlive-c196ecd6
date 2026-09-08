@@ -298,7 +298,7 @@ const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
 // Hub lazy imports removed — Hub page decommissioned
 
-// Echo v2 full-page experience
+// Echo v2 pages remain in src/pages/ but are no longer routed (retired surface).
 
 
 // Removed: DiscoverGamesPage lazy import — /games/discover now redirects to /clubhouse
@@ -711,7 +711,7 @@ function AppRoutes() {
         {/* Echo retired as a member-facing surface (BRIEF_RETIRE_ECHO_SURFACE).
             src/pages/EchoV2Page.tsx, src/pages/EchoHistoryPage.tsx and
             src/features/echo-v2/ stay in the tree, unreferenced by the router.
-            Restoring the surface = putting these routes back. */
+            Restoring the surface = putting these routes back. */}
 
 
 
