@@ -119,7 +119,8 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
         <div
           style={{
             display: 'flex',
-            gap: 26,
+            gap: 14,
+            marginTop: 22,
             padding: `0 ${GUTTER}px`,
             fontFamily: SANS,
             ...FIGS,
@@ -132,7 +133,7 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
       )}
 
       {/* §3.2 — kicker only, no section heading. The tee list is a CONTROL. */}
-      <AboutSection kicker="Tees">
+      <AboutSection kicker="Tees" space={16}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {teeRows.map(({ tee, slope: teeSlope }) => {
             const on = tee.tee_label === active.tee_label;
