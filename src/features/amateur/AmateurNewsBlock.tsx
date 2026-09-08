@@ -57,9 +57,11 @@ export function AmateurNewsBlock() {
     <section style={{ paddingTop: 26, fontFamily: SANS, ...FIGS }}>
       <DiscoverSectionHeading
         title={t('amateurNews.section', 'Amateur news')}
-        right={t('amateurNews.seeAllStories', 'All stories')}
+        /* Same grammar as its neighbours: every heading-slot see-all on this
+           page states its count. */
+        right={t('amateurNews.seeAllCount', 'See all {{count}}', { count: stories.length })}
         onRightPress={() => {
-          analyticsEvents.track('amateur_news_see_all_opened', {});
+          analyticsEvents.track('amateur_news_see_all_opened', { total: stories.length });
           rememberAmateurScroll();
           navigate('/discover/news');
         }}

@@ -336,9 +336,9 @@ export function BoardRowView({
         alignItems: 'center',
         gap: 10,
         padding: '6px 2px',
-        /* S1.2 — the member's own row carries the amber tint wherever it lands,
-           on the board and in the long sheet alike. */
-        background: isSelf ? 'rgba(247,147,30,0.08)' : 'transparent',
+        /* BRIEF_EXPLORE_REFINEMENT §3 — AMBER TEXT ONLY, matching Champions.
+           No tinted band, no highlight box: the amber is the statement. */
+        background: 'transparent',
         border: 'none',
         textAlign: 'left',
         fontFamily: SANS,
