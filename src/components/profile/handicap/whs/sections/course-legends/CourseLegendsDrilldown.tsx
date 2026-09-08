@@ -259,7 +259,65 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     [visibleCategories, groupedWithTotals],
   );
 
+  /* ===================== BRIEF_CHAMPIONS_TAB_REBUILD =====================
+   * §3.1 YOUR CROWNS is ALWAYS ALL TIME — the window toggle governs the board
+   * and the sheet only. A crown is a claim on the course record; "you hold it
+   * over 90 days" is a different and weaker claim, so it never appears here.
+   */
+  const crownStatement = useMemo(() => {
+    const cats = visibleCategoriesAllTime;
+    const held: Array<{ label: string; attainedAt: string | null }> = [];
+    const byHolder = new Map<string, number>();
+    let claimedCount = 0;
+    cats.forEach((cat) => {
+      const champion = groupedWithTotals.get(cat)?.rows.find((r) => r.rank === 1);
+      if (!champion) return;
+      claimedCount += 1;
+      if (champion.isSelf) {
+        held.push({ label: SHORT_LABELS[cat], attainedAt: champion.attained_at ?? null });
+      } else {
+        byHolder.set(champion.name, (byHolder.get(champion.name) ?? 0) + 1);
+      }
+    });
+    let otherHolderName: string | null = null;
+    let otherHolderClaimedCount = 0;
+    byHolder.forEach((n, name) => {
+      if (n > otherHolderClaimedCount) {
+        otherHolderClaimedCount = n;
+        otherHolderName = name;
+      }
+    });
+    return { totalBoards: cats.length, held, claimedCount, otherHolderName, otherHolderClaimedCount };
+  }, [visibleCategoriesAllTime, groupedWithTotals]);
+
+  /** §3.2 — descriptors for the flat board, in the active window. */
+  const boardDescriptors = useMemo(
+    () =>
+      visibleCategories.map((cat) => ({
+        key: cat,
+        label: legendCategoryLabel[cat],
+        short: SHORT_LABELS[cat],
+      })),
+    [visibleCategories],
+  );
+
+  const [selectedCategory, setSelectedCategory] = useState<LegendCategory | null>(
+    deepCat && CHAMPIONS_ORDER_90D.concat(CHAMPIONS_ORDER_ALL_TIME).includes(deepCat) ? deepCat : null,
+  );
+
+  /** The chosen board when it still has rows in this window, else the first claimed. */
+  const activeBoardKey = useMemo(() => {
+    const claimed = visibleCategories.filter((c) => (groupedWithTotals.get(c)?.rows.length ?? 0) > 0);
+    if (selectedCategory && claimed.includes(selectedCategory)) return selectedCategory;
+    const gross = claimed.find((c) => String(c).startsWith('lowest_gross'));
+    return gross ?? claimed[0] ?? visibleCategories[0];
+  }, [selectedCategory, visibleCategories, groupedWithTotals]);
+
+  const navigate = useNavigate();
+  const { data: whsConnection, isFetched: whsFetched } = useWhsConnection(activeActor?.id);
+
   const containerRef = useRef<HTMLDivElement>(null);
+
 
   // Deep-link autoscroll: once the crown sections are painted, bring the
   // notified category into view with a brief highlight. Runs once per link.
