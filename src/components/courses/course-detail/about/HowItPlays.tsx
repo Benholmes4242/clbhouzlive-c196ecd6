@@ -223,10 +223,9 @@ const HowItPlays: React.FC<HowItPlaysProps> = ({ courseId, courseName }) => {
              appears for a member who has played here (§6). */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${hasYou && you ? 4 : 3}, minmax(0, 1fr))`,
-          gap: 10,
-          marginTop: 16,
+          display: 'flex',
+          gap: 14,
+          marginTop: 20,
         }}
       >
         <Figure
