@@ -264,7 +264,6 @@ const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 
 
 
-const News = lazy(() => import("./pages/News"));
 
 
 
@@ -621,7 +620,10 @@ function AppRoutes() {
         <Route path="/journey" element={<Navigate to="/courses" replace />} />
         
         <Route path="/friends-activity" element={<Navigate to="/courses" replace />} />
-        <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
+        {/* BRIEF_RETIRE_LEGACY_NEWS_PAGE — the pre-pivot RSS reader is gone; the
+            amateur news index is the news we publish. NOT added to
+            EXEMPT_PREFIXES: on the web a /news bookmark still meets the wall. */}
+        <Route path="/news" element={<Navigate to="/discover/news" replace />} />
         
         {/* Post deep link for notifications */}
         {/* Round deep link (notifications, shares, link previews) */}
