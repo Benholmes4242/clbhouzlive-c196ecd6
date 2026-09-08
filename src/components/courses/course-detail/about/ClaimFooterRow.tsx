@@ -22,11 +22,26 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { GUTTER } from './AboutSection';
 
 interface Props {
+  /** 'offer' = unclaimed course. 'pending' = this viewer's claim is under review. */
+  mode?: 'offer' | 'pending';
   onClaimClick: () => void;
+  children?: React.ReactNode;
 }
 
-const ClaimFooterRow: React.FC<Props> = ({ onClaimClick }) => {
+const ClaimFooterRow: React.FC<Props> = ({ mode = 'offer', onClaimClick, children }) => {
   const { t } = useTranslation('courses');
+
+  if (mode === 'pending') {
+    // RULED: under review is a message to ONE person about a form they
+    // submitted, not a fact about the course. Same audience as the offer, so
+    // the same place — the footer, not the content flow.
+    return (
+      <div style={{ marginTop: 40, padding: `0 ${GUTTER}px`, fontFamily: SANS }}>
+        <div style={{ height: 1, background: A.HAIRLINE }} aria-hidden="true" />
+        <div style={{ marginTop: 8 }}>{children}</div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ marginTop: 40, padding: `0 ${GUTTER}px`, fontFamily: SANS }}>
