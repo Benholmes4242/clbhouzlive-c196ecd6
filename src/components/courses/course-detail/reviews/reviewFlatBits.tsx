@@ -7,12 +7,12 @@
  * figure of 9.0+ takes the analytical GREEN — the one place that colour earns
  * its keep, marking the standout score in a line of eights.
  *
- * PHOTO STRIP: the shared `ReviewMediaStrip` is deliberately NOT used here and
- * NOT modified. It renders fixed 70px squares at radius 9 / 5px gap; the brief
- * asks for up to four equal-width tiles, 66px tall, radius 8, 6px gap. The
- * strip keeps its other consumers unchanged and the fullscreen viewer is
- * entered through the SAME `onMediaClick(index, el)` contract, so tapping a
- * tile still opens the canonical viewer.
+ * PHOTO STRIP: the shared `ReviewMediaStrip` IS used here, extended ADDITIVELY
+ * with optional tile props (equal-width mode, height, radius, gap, cap). Every
+ * existing consumer keeps its fixed 70/96px squares because the new props
+ * default to today's values. One strip in the codebase. The fullscreen viewer
+ * is entered through the SAME `onMediaClick(index, el)` contract.
+
  *
  * HELPFUL: a single affirmative. All 99 votes ever cast are `helpful` — there
  * has never been an unhelpful vote — so the thumbs-down is gone and the
@@ -25,6 +25,8 @@ import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { bandColorOnDark } from '@/features/courses/_shared/scoreBands';
 import { formatRatingValue } from '@/utils/formatters';
 import { MentionText } from '@/components/mentions/MentionText';
+import { ReviewMediaStrip } from '@/components/courses/review/ReviewMediaStrip';
+
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import type { CourseReview } from '@/hooks/useCourseReviews';
 
