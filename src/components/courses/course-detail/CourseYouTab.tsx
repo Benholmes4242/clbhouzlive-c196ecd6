@@ -193,8 +193,8 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   if (!connection) {
     return wrap(
       <div>
-        <AboutSection first>
-          <YouSentence>{t('courseDetail.youTab.connect.body')}</YouSentence>
+        <AboutSection first heading={t('courseDetail.youTab.sections.record')}>
+          <YouSentence quiet>{t('courseDetail.youTab.connect.body')}</YouSentence>
           <YouButton
             label={t('courseDetail.youTab.connect.cta')}
             onClick={() => {
@@ -213,8 +213,8 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   if (!hasTrackedRounds) {
     return wrap(
       <div>
-        <AboutSection first>
-          <YouSentence>
+        <AboutSection first heading={t('courseDetail.youTab.sections.record')}>
+          <YouSentence quiet>
             {fieldGross
               ? t('courseDetail.youTab.notPlayed.body', { field: fieldGross })
               : t('courseDetail.youTab.notPlayed.bodyNoField')}
@@ -226,6 +226,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
           ) : (
             <YouButton
               label={isUpdating ? t('courseDetail.youTab.notPlayed.adding') : t('courseDetail.youTab.notPlayed.addToList')}
+              variant="outline"
               disabled={isUpdating}
               onClick={() => {
                 analyticsEvents.track('course_you_add_to_list', { course_id: courseId });
