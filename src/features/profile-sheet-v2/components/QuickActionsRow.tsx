@@ -7,8 +7,7 @@
  * same RPC the inbox renders); Alerts reads useUnreadNotifications. These
  * are intentionally the same sources as the destination pages so tile
  * badges cannot drift from what those pages show.
- * Route strings copied verbatim from src/components/profile/ProfileHubSheet.tsx:
- *   Echo     -> '/echo'
+ * Route strings:
  *   Messages -> '/messages'
  *   Alerts   -> '/notificationmessages'
  */
