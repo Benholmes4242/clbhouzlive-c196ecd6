@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -114,6 +114,28 @@ export function AmateurHero({
      uses: true minus U+2212, under par red, over par ink, level muted. */
   const par = row ? toParFor(row) : null;
   const kicker = featKicker(shape);
+  const shapeBandRef = useRef<HTMLSpanElement | null>(null);
+  const [shapeWidth, setShapeWidth] = useState(320);
+
+  /* THE HERO SHAPE OWNS THE WHOLE CONTENT COLUMN. RoundShape's numeric width is
+     also TrajectoryLine's viewBox width; leaving it at the old fixed 320px made
+     the SVG preserve that narrow aspect ratio inside wider phones. Measure the
+     existing column rather than moving its edges, so avatar/course on the left
+     and score on the right remain the alignment authority. */
+  useLayoutEffect(() => {
+    const band = shapeBandRef.current;
+    if (!band) return;
+
+    const measure = () => {
+      const next = Math.round(band.getBoundingClientRect().width);
+      if (next > 0) setShapeWidth((current) => (current === next ? current : next));
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(band);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section
@@ -289,11 +311,11 @@ export function AmateurHero({
               showBaseline stays FALSE so the three-point fallback (no hole
               detail) draws NO rule — a rule under a curve that has no holes
               behind it is a promise the drawing cannot keep (§4). */}
-          <span style={{ display: 'block', marginTop: 8 }}>
+          <span ref={shapeBandRef} style={{ display: 'block', width: '100%', marginTop: 8 }}>
             <RoundShape
               row={row}
               shape={shape}
-              width={320}
+              width={shapeWidth}
               height={AMATEUR_HERO_SHAPE_H}
               showMeta={false}
               showBaseline={false}
