@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -114,28 +114,28 @@ export function AmateurHero({
      uses: true minus U+2212, under par red, over par ink, level muted. */
   const par = row ? toParFor(row) : null;
   const kicker = featKicker(shape);
-  const shapeBandRef = useRef<HTMLSpanElement | null>(null);
+  /* THE HERO SHAPE OWNS THE WHOLE CONTENT COLUMN. RoundShape's numeric width is
+     also TrajectoryLine's viewBox width, and the svg meets its box, so a stale
+     320 drew the trace centred with dead margins either side. The band mounts
+     only AFTER the round lands, so the node is held in STATE — a ref plus an
+     empty-dep effect measured nothing on the first pass and never ran again. */
+  const [shapeBand, setShapeBand] = useState<HTMLSpanElement | null>(null);
   const [shapeWidth, setShapeWidth] = useState(320);
 
-  /* THE HERO SHAPE OWNS THE WHOLE CONTENT COLUMN. RoundShape's numeric width is
-     also TrajectoryLine's viewBox width; leaving it at the old fixed 320px made
-     the SVG preserve that narrow aspect ratio inside wider phones. Measure the
-     existing column rather than moving its edges, so avatar/course on the left
-     and score on the right remain the alignment authority. */
   useLayoutEffect(() => {
-    const band = shapeBandRef.current;
-    if (!band) return;
+    if (!shapeBand) return;
 
     const measure = () => {
-      const next = Math.round(band.getBoundingClientRect().width);
+      const next = Math.round(shapeBand.getBoundingClientRect().width);
       if (next > 0) setShapeWidth((current) => (current === next ? current : next));
     };
 
     measure();
     const observer = new ResizeObserver(measure);
-    observer.observe(band);
+    observer.observe(shapeBand);
     return () => observer.disconnect();
-  }, []);
+  }, [shapeBand]);
+
 
   return (
     <section
@@ -310,7 +310,7 @@ export function AmateurHero({
               showBaseline stays FALSE so the three-point fallback (no hole
               detail) draws NO rule — a rule under a curve that has no holes
               behind it is a promise the drawing cannot keep (§4). */}
-          <span ref={shapeBandRef} style={{ display: 'block', width: '100%', marginTop: 8 }}>
+          <span ref={setShapeBand} style={{ display: 'block', width: '100%', marginTop: 8 }}>
             <RoundShape
               row={row}
               shape={shape}
