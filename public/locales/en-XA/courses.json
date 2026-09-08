@@ -235,7 +235,9 @@
     },
     "friends": {
       "kicker": "[~~ƑŘÍÉÑĐŠ ŴĤŐ ƤĻÁÝÉĐ ĤÉŘÉ~~]",
-      "namesAndMore": "[~~{{names}} áñđ {{count}} ɱőřé~~]"
+      "namesAndMore": "[~~{{names}} áñđ {{count}} ɱőřé~~]",
+      "meta_one": "[1 îñ ýöûŕ çîŕçļé]",
+      "meta_other": "[{{count}} îñ ýöûŕ çîŕçļé]"
     },
     "handicapCue": {
       "bannerAction": "[~~Ĉőññéĉţ →~~]",
@@ -304,7 +306,11 @@
     "mediaStrip": {
       "helpDiscover": "[~~Ĥéļƥ ƒéļļőŵ ĝőļƒéřš đíšĉőṽéř ţĥíš ĉőúřšé — šĥářé ýőúř éẋƥéříéñĉé.~~]",
       "seeAll": "[~~Šéé áļļ~~]",
-      "share": "[~~Šĥářé ýőúř éẋƥéříéñĉé~~]"
+      "share": "[~~Šĥářé ýőúř éẋƥéříéñĉé~~]",
+      "photoCount_one": "[1 рĥöţö]",
+      "photoCount_other": "[{{count}} рĥöţöş]",
+      "videoCount_one": "[1 νîðéö]",
+      "videoCount_other": "[{{count}} νîðéöş]"
     },
     "nearby": {
       "kicker": "[~~ÑÉÁŘƁÝ~~]",
@@ -396,7 +402,10 @@
       "aboutThisPlace": "[[Àbóút thís plãçé]]",
       "howItPlays": "[Ĥôŵ îţ þļåŷś]",
       "recordBook": "The record book",
-      "whatPeopleSay": "[Ŵĥåţ рéöрļé şåý]"
+      "whatPeopleSay": "[Ŵĥåţ рéöрļé şåý]",
+      "whoPlaysHere": "[Ŵĥö рļåýş ĥéŕé]",
+      "photos": "[Рĥöţöş]",
+      "whereItIs": "[Ŵĥéŕé îţ îş]"
     },
     "suggestEdit": {
       "cancel": "[~~Ĉáñĉéļ~~]",

@@ -3,16 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseClaim, useCourseClaimStatus } from '@/hooks/useCourseClaim';
 import { supabase } from '@/integrations/supabase/client';
-import { Skeleton } from '@/components/ui/skeleton';
-import AboutMediaStrip from './AboutMediaStrip';
 import NearbySection from './NearbySection';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
-import { LocationMapCard } from '@/components/map';
 import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationPills from './CourseLocationPills';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -23,6 +19,9 @@ import AboutThisPlace from './about/AboutThisPlace';
 import HowItPlays from './about/HowItPlays';
 import RecordBook from './about/RecordBook';
 import WhatPeopleSay from './about/WhatPeopleSay';
+import WhoPlaysHere from './about/WhoPlaysHere';
+import Photos from './about/Photos';
+import WhereItIs from './about/WhereItIs';
 
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseSheet from './ClaimCourseSheet';
@@ -31,7 +30,6 @@ import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
 import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 /**
  * BRIEF_COURSE_TAB_REBUILD §3.10 — THE LADDER HAS MOVED, NOT GONE.
  *
@@ -177,34 +175,26 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           onSeeAllReviews={() => onTabChange?.('reviews')}
         />
 
-      {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
-      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
-        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
-      </div>
+        {/* §3.7 — WHO PLAYS HERE, flat. The same facepile read, no Panel; the
+            circle average stays withheld (reversible, not retired). */}
+        <WhoPlaysHere courseId={course.id} />
 
-      {/* ══ BLOCK 4 — ABOUT THIS PLACE (everything that is not analytics) ══ */}
-      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
-        {/* Location */}
-        {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl" />}
-        {coords && (
-          <LocationMapCard
-            lat={coords.lat}
-            lng={coords.lng}
-            name={course.name}
-            locationText={formatCourseLocation(course)}
-            colorful
-            nearby={nearbyPins}
-          />
-        )}
-        {/* eslint-disable-next-line settled/no-not-loading-empty-check -- coordsLoading comes from a plain geocode hook, not a gated React Query. */}
-        {!coords && !coordsLoading && (
-          <p style={{ fontSize: 13, color: A.DIM, margin: 0 }}>
-            {t('courseDetail.about.locationUnavailable')}
-          </p>
-        )}
+        {/* §3.8 — PHOTOS. The mosaic is unchanged; only its heading is now the
+            shared section heading with localised counts. */}
+        <Photos courseId={course.id} onSeeAll={() => onTabChange?.('media')} />
 
-        {/* Media */}
-        <AboutMediaStrip clubId={course.id} onSeeAllClick={() => onTabChange?.('media')} />
+        {/* §3.9 — WHERE IT IS. Same map card, same cached nearby pins, now
+            under a heading with the place named beside it. */}
+        <WhereItIs
+          courseName={course.name}
+          locationText={formatCourseLocation(course)}
+          coords={coords ?? null}
+          coordsLoading={coordsLoading}
+          nearby={nearbyPins}
+        />
+
+      {/* ══ BLOCK 4 — the remaining rows (§3.11 still to come) ══ */}
+      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
 
         {/* Explore / website / claim — one collapsed panel of quiet rows */}
         <CourseActionRows

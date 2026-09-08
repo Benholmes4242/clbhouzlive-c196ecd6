@@ -18,7 +18,17 @@ import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 interface AboutMediaStripProps {
   clubId: string;
   onSeeAllClick: () => void;
+  /** §3.8 — the section heading above supplies the title and the counts. */
+  headerless?: boolean;
+  /** Page gutter. 16 for the legacy callers, 20 on the rebuilt Course tab. */
+  gutter?: number;
 }
+
+/**
+ * The fetch limit, exported so the §3.8 heading can read the SAME query at the
+ * SAME limit and hit one cache entry rather than issuing a second request.
+ */
+export const mediaFetchLimit = (isMobile: boolean) => (isMobile ? 10 : 20);
 
 /**
  * Analytical header (BRIEF_COURSE_TAB_LOWER_BLOCKS, Block 4c): uppercase
@@ -47,14 +57,20 @@ const Header: React.FC<{ photoCount: number; videoCount: number }> = ({
 );
 
 
-const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
+const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({
+  clubId,
+  onSeeAllClick,
+  headerless = false,
+  gutter = 16,
+}) => {
   const { t } = useTranslation('courses');
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
 
   const maxItems = isMobile ? 3 : 9;
-  const fetchLimit = isMobile ? 10 : 20;
+  const fetchLimit = mediaFetchLimit(isMobile);
+  const pad = `0 ${gutter}px`;
 
   const { data: rawMediaRaw, isLoading: loading } = useClubMedia(clubId, fetchLimit);
 
@@ -212,12 +228,12 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   if (loading) {
     return (
       <div>
-        <Header photoCount={0} videoCount={0} />
+        {!headerless && <Header photoCount={0} videoCount={0} />}
         <div
           style={
             isMobile
-              ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gridAutoRows: 55, gap: 4, padding: '0 16px' }
-              : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }
+              ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gridAutoRows: 55, gap: 4, padding: pad }
+              : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: pad }
           }
         >
           {Array.from({ length: maxItems }).map((_, i) => (
@@ -239,14 +255,14 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   if (!hasMedia) {
     return (
       <div>
-        <Header photoCount={0} videoCount={0} />
+        {!headerless && <Header photoCount={0} videoCount={0} />}
 
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 4,
-            padding: '0 16px',
+            padding: pad,
             marginBottom: 10,
           }}
         >
@@ -268,11 +284,11 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
           ))}
         </div>
 
-        <p style={{ fontSize: 12, color: A.MUTE, margin: '0 16px', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 12, color: A.MUTE, margin: `0 ${gutter}px`, lineHeight: 1.5 }}>
           {t('courseDetail.mediaStrip.helpDiscover')}
         </p>
 
-        <div style={{ padding: '0 16px' }}>
+        <div style={{ padding: pad }}>
           <Action
             label={t('courseDetail.mediaStrip.share')}
             onClick={() => navigate(`/courses/${clubId}/rate`)}
@@ -287,13 +303,13 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   return (
     <div>
-      <Header photoCount={photoCount} videoCount={videoCount} />
+      {!headerless && <Header photoCount={photoCount} videoCount={videoCount} />}
 
       <div
         style={
           isMobile
-            ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gridAutoRows: 55, gap: 4, padding: '0 16px' }
-            : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: '0 16px' }
+            ? { display: 'grid', gridTemplateColumns: '2fr 1fr', gridAutoRows: 55, gap: 4, padding: pad }
+            : { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, padding: pad }
         }
       >
         {mediaTiles.map((media, index) => {
