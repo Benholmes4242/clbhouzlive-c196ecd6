@@ -135,6 +135,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
 
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
+  /** Same sub-score gate the Course tab used before the four scores moved here. */
+  const { subscoreMinRatings } = useTop100Config();
 
   // A deep link (?review=<id>) both highlights the row AND opens the review
   // sheet on it. The param is stripped straight away (so back/forward does not
