@@ -224,6 +224,8 @@ export const TrajectoryLine: React.FC<Props> = ({
   yDomain,
   fillOverColor,
   fillUnderColor,
+  baselineColor,
+  beadHoleLabels = false,
 }) => {
 
   const T = SURFACE_TOKENS[surface];
