@@ -18,7 +18,17 @@ import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 interface AboutMediaStripProps {
   clubId: string;
   onSeeAllClick: () => void;
+  /** §3.8 — the section heading above supplies the title and the counts. */
+  headerless?: boolean;
+  /** Page gutter. 16 for the legacy callers, 20 on the rebuilt Course tab. */
+  gutter?: number;
 }
+
+/**
+ * The fetch limit, exported so the §3.8 heading can read the SAME query at the
+ * SAME limit and hit one cache entry rather than issuing a second request.
+ */
+export const mediaFetchLimit = (isMobile: boolean) => (isMobile ? 10 : 20);
 
 /**
  * Analytical header (BRIEF_COURSE_TAB_LOWER_BLOCKS, Block 4c): uppercase
