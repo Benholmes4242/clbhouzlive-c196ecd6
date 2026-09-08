@@ -167,6 +167,8 @@ export function RoundShape({
            1:1 units mean the band is used in full and the beads stay round. */
         viewWidth={width}
         strokeWidth={strokeWidth}
+        baselineColor={baselineColor}
+        beadHoleLabels={beadHoleLabels}
       />,
     );
   }
