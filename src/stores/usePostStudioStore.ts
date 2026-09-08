@@ -29,9 +29,14 @@ interface PostStudioStoreState {
     returnPath?: string;
   }) => void;
 
-  /** Open the studio in edit mode for an existing post. */
+  /**
+   * Open the studio in edit mode for an existing post. `media` lets the create
+   * sheet's "Add photos" drop files onto an existing (bare) round post rather
+   * than creating a second post about the same round.
+   */
   openPostStudioForEdit: (opts: {
     postId: string;
+    media?: File[];
     returnPath?: string;
   }) => void;
 
