@@ -161,7 +161,12 @@ export function AmateurHero({
         <button
           type="button"
           onClick={() => {
-            if (row.course_id) navigate(`/courses/${row.course_id}`);
+            /* §5 THE ROUND FIRST. The hero names a feat, so the tap must land on
+               the scorecard that carries it. The course page is the FALLBACK for
+               a row with no score id (a suggested round with no card), never the
+               primary destination. */
+            if (row.score_id && onOpenRound) onOpenRound(row.score_id, row.user_id);
+            else if (row.course_id) navigate(`/courses/${row.course_id}`);
           }}
           style={{
             position: 'absolute',
