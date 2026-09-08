@@ -94,8 +94,20 @@ export function useTourHeroState(): TourHeroState {
           (a.start_date ?? '').localeCompare(b.start_date ?? ''),
         )[0] ?? null;
 
-  const subject = subjectLive ?? finished ?? upcoming;
-  const kind: TourHeroKind = subjectLive
+  /* STATE INSPECTION ONLY, and only when `?hero=` is present: when the forced
+     state has no real subject, the most recent completed event stands in so the
+     LAYOUT can be reviewed. Never reachable without the parameter. */
+  const standIn =
+    forced && !subjectLive && !finished
+      ? [...(cache?.completed ?? [])].sort((a, b) =>
+          (b.end_date ?? '').localeCompare(a.end_date ?? ''),
+        )[0] ?? null
+      : null;
+
+  const subject = subjectLive ?? finished ?? (forced && standIn ? standIn : upcoming);
+  const kind: TourHeroKind = forced && subject
+    ? forced
+    : subjectLive
     ? 'live'
     : finished
       ? 'finished'
