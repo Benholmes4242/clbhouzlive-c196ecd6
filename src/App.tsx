@@ -726,6 +726,9 @@ function AppRoutes() {
         <Route path="/nearby" element={<Navigate to="/clubhouse" replace />} />
         
         {/* Tour Hub routes */}
+        {/* BRIEF_TOUR_REBUILD: the one-page Tour lands at /tour while /tourhub
+            and its six tabs stay standing until the rebuild is confirmed. */}
+        <Route path="/tour" element={<Suspense fallback={<GenericPageSkeleton />}><TourPageOnePage /></Suspense>} />
         <Route path="/tour/news" element={<Suspense fallback={<GenericPageSkeleton />}><WireNewsPage /></Suspense>} />
         <Route path="/tour/news/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><TourNewsStoryPage /></Suspense>} />
         <Route path="/tourhub" element={<Suspense fallback={<TourHubOverviewSkeleton />}><TourHubMainPage /></Suspense>} />
