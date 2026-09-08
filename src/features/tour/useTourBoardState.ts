@@ -76,6 +76,8 @@ export interface TourBoardRow {
   mark: 'round' | 'square';
   /** The one figure this board ranks on, already formatted. */
   figure: string | null;
+  /** Quiet factual context beneath the row name. */
+  subline: string;
   /** LIVE only: numeric to-par, so the colour ramp is decided by the reader. */
   toPar: number | null;
   /** LIVE only. */
@@ -280,6 +282,7 @@ export function useTourBoardState(
           tourCode: tour,
           mark: 'round' as const,
           figure: null,
+          subline: r.thru == null ? 'Round in progress' : Number(r.thru) >= 18 ? 'Finished' : `Thru ${r.thru}`,
           toPar: Number.isFinite(score as number) ? (score as number) : null,
           thru: r.thru == null ? null : Number(r.thru),
           live: true,
@@ -313,6 +316,7 @@ export function useTourBoardState(
         tourCode: null,
         mark: 'square' as const,
         figure: fmtEarnings(s.earningsTotal),
+        subline: `${s.alumniCount} alumni · ${s.winsTotal} ${s.winsTotal === 1 ? 'win' : 'wins'}`,
         toPar: null,
         thru: null,
         live: false,
@@ -344,6 +348,11 @@ export function useTourBoardState(
       tourCode: r.tourCode ?? pointsTour ?? null,
       mark: 'round' as const,
       figure: fmtPoints(r.stat == null ? null : Number(r.stat)),
+      subline: r.eventsPlayed
+        ? `${r.eventsPlayed} events`
+        : r.wins
+          ? `${r.wins} ${r.wins === 1 ? 'win' : 'wins'}`
+          : 'Season ranking',
       toPar: null,
       thru: null,
       live: false,
