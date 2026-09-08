@@ -21,6 +21,8 @@ import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { FindGolfersSheet } from '@/components/explore-tab-new/FindGolfersSheet';
+import { SuggestedGolfersRail } from '@/features/social-suggestions/SuggestedGolfersRail';
+
 
 import { basisLine } from './basisLine';
 import { useCircleSize } from './useCircleSize';
