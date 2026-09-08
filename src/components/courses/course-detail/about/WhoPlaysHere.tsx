@@ -91,7 +91,7 @@ const WhoPlaysHere: React.FC<WhoPlaysHereProps> = ({ courseId }) => {
                   /* The pile sits on the flat canvas now, so the traced ring
                      traces the canvas rather than the retired panel fill. */
                   ringColor={A.CANVAS}
-                  style={index > 0 ? { marginLeft: -10 } : undefined}
+                  className={index > 0 ? '-ml-2.5' : ''}
                 />
               );
             })}
