@@ -216,36 +216,86 @@ Deno.serve(async (req) => {
 
     console.log(`Total unique articles: ${uniqueArticles.length}`)
 
-    if (uniqueArticles.length > 0) {
-      // Clear existing articles and insert new ones
-      const { error: deleteError } = await supabaseClient
-        .from('news_articles')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000')
-      
-      if (deleteError) {
-        console.error('Error deleting existing articles:', deleteError)
-      }
-      
-      const { error: insertError } = await supabaseClient
-        .from('news_articles')
-        .insert(uniqueArticles)
+    /* SWAP, NEVER WIPE-THEN-HOPE.
+       The old shape deleted every row the moment a scrape returned anything,
+       logged a delete failure and carried on, and threw on insert — so one bad
+       run left `news_articles` EMPTY, and the news blocks on Explore and Tour
+       would then correctly and silently render nothing.
+       The order is now: hold the replacement set, check it against a floor,
+       INSERT it, and only then delete the rows it replaces. A failure at any
+       step leaves the previous set intact. There is no window in which the
+       table is empty. */
+    const ABSOLUTE_FLOOR = 10
+    const RELATIVE_FLOOR = 0.5
 
-      if (insertError) {
-        console.error('Error inserting articles:', insertError)
-        throw insertError
-      }
+    const { data: existingRows, error: readError } = await supabaseClient
+      .from('news_articles')
+      .select('id')
+      .limit(5000)
 
-      console.log(`Successfully inserted ${uniqueArticles.length} articles`)
-      
-      // Log source breakdown
-      const sourceBreakdown = uniqueArticles.reduce((acc, article) => {
-        acc[article.source] = (acc[article.source] || 0) + 1
-        return acc
-      }, {} as Record<string, number>)
-      
-      console.log('Articles by source:', sourceBreakdown)
+    if (readError) {
+      console.error('Error reading existing articles — aborting before any write:', readError)
+      throw readError
     }
+
+    const previousIds = (existingRows ?? []).map((r: { id: string }) => r.id)
+    const floor = Math.max(ABSOLUTE_FLOOR, Math.floor(previousIds.length * RELATIVE_FLOOR))
+
+    if (uniqueArticles.length < floor) {
+      /* BELOW FLOOR: refuse, keep the existing set, and say so loudly. This is
+         the sentence a health surface should read: a run that "succeeded" while
+         bringing back almost nothing is a failure. */
+      const message = `fetch-news BELOW FLOOR: ${uniqueArticles.length} articles fetched, floor ${floor} (previous population ${previousIds.length}). Existing articles left untouched.`
+      console.error(message)
+      return new Response(
+        JSON.stringify({
+          success: false,
+          belowFloor: true,
+          articlesCount: uniqueArticles.length,
+          floor,
+          previousCount: previousIds.length,
+          message,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 },
+      )
+    }
+
+    const { error: insertError } = await supabaseClient
+      .from('news_articles')
+      .insert(uniqueArticles)
+
+    if (insertError) {
+      console.error('Error inserting articles — previous set left in place:', insertError)
+      throw insertError
+    }
+
+    if (previousIds.length > 0) {
+      /* Only the rows we measured before the insert are removed, so a
+         concurrent run cannot delete the set this one just wrote. Chunked
+         because an `in` list has a URL length limit. */
+      for (let i = 0; i < previousIds.length; i += 200) {
+        const chunk = previousIds.slice(i, i + 200)
+        const { error: deleteError } = await supabaseClient
+          .from('news_articles')
+          .delete()
+          .in('id', chunk)
+        if (deleteError) {
+          /* The new set is already live, so this is stale-row noise rather than
+             an outage: report it and stop sweeping. */
+          console.error('Error removing superseded articles (new set is live):', deleteError)
+          break
+        }
+      }
+    }
+
+    console.log(`Successfully swapped in ${uniqueArticles.length} articles (replaced ${previousIds.length})`)
+
+    const sourceBreakdown = uniqueArticles.reduce((acc, article) => {
+      acc[article.source] = (acc[article.source] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+
+    console.log('Articles by source:', sourceBreakdown)
 
     return new Response(
       JSON.stringify({ 
