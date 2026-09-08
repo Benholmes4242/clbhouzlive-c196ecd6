@@ -25,7 +25,7 @@ import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100RankRow } from './CourseTop100RankRow';
 import CourseFactsAndTees from './about/CourseFactsAndTees';
 import AboutThisPlace from './about/AboutThisPlace';
-import { CourseAnalyticsPanels } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
+import HowItPlays from './about/HowItPlays';
 
 import CourseRecordBook from './CourseRecordBook';
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
