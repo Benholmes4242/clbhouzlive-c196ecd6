@@ -76,7 +76,7 @@ const Row: React.FC<{
       minHeight: 44,
       padding: 0,
       border: 'none',
-      borderBottom: hairline ? `0.5px solid ${A.HAIR}` : 'none',
+      borderBottom: hairline ? `0.5px solid ${A.HAIRLINE}` : 'none',
       background: 'transparent',
       cursor: 'pointer',
       textAlign: 'left',
