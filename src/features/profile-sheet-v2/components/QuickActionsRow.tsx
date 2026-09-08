@@ -13,7 +13,7 @@
  */
 
 import React from 'react';
-import { Sparkles, Mail, Bell } from 'lucide-react';
+import { Mail, Bell } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 
@@ -103,11 +103,6 @@ export default function QuickActionsRow({ actorType, actorId, onNavigate }: Prop
 
   return (
     <div style={{ display: 'flex', gap: 8, padding: '12px 20px 0' }}>
-      <Tile
-        label="Echo"
-        icon={<Sparkles size={17} color={A.INK} />}
-        onClick={() => onNavigate('/echo')}
-      />
       <Tile
         label="Messages"
         icon={<Mail size={17} color={A.INK} />}
