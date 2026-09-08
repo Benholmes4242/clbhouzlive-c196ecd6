@@ -143,8 +143,14 @@ export function TourPicksBlock({ tour }: { tour: TourId }) {
 
   return (
     <section style={{ paddingTop: 32, fontFamily: SANS, ...FIGS }}>
+      {/* TWO STATES, TWO HEADINGS. "Our picks" reads forward, because that is
+          what a pick is — so a settled event cannot wear it. Naming the event is
+          not enough: the member would have to notice the event is past and work
+          it out. Backward is the STRONGER state, not a tolerated fallback: a
+          prediction that shows what actually happened is the most credible thing
+          this feature can do. */}
       <DiscoverSectionHeading
-        title="Our picks"
+        title={subject.settled ? 'How our picks did' : 'Our picks'}
         right={`${TOUR_CONFIG[tour].name} \u00b7 ${subject.name}`}
       />
 
