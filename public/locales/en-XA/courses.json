@@ -362,7 +362,10 @@
       "friends": "[~~ƑŘÍÉÑĐŠ ÁṼĜ~~]",
       "kicker": "[~~ĈŐṀṀÚÑÍŢÝ ŘÁŢÍÑĜ~~]",
       "overall": "[~~ŐṼÉŘÁĻĻ~~]",
-      "yours": "[~~ÝŐÚŘ ŘÁŢÍÑĜ~~]"
+      "yours": "[~~ÝŐÚŘ ŘÁŢÍÑĜ~~]",
+      "tooFew_one": "[Ƒŕöm 1 ŕåţîñĝ — ţöö ƒéŵ ţö ъé şéţţļéð.]",
+      "tooFew_other": "[Ƒŕöm {{count}} ŕåţîñĝş — ţöö ƒéŵ ţö ъé şéţţļéð.]",
+      "allReviewsSub": "[Éνéŕý ŕéνîéŵ, ţĥé şçöŕé şрŕéåð åñð ţĥé çåţéĝöŕý şçöŕéş.]"
     },
     "records": {
       "allBoards": "All boards",
@@ -392,7 +395,8 @@
     "sections": {
       "aboutThisPlace": "[[Àbóút thís plãçé]]",
       "howItPlays": "[Ĥôŵ îţ þļåŷś]",
-      "recordBook": "The record book"
+      "recordBook": "The record book",
+      "whatPeopleSay": "[Ŵĥåţ рéöрļé şåý]"
     },
     "suggestEdit": {
       "cancel": "[~~Ĉáñĉéļ~~]",

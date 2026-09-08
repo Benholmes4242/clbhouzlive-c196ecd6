@@ -9,10 +9,7 @@ import NearbySection from './NearbySection';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
 import { LocationMapCard } from '@/components/map';
 import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
-import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { useCourseRatingDistribution } from '@/hooks/useCourseRatingDistribution';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { toast } from '@/lib/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
@@ -21,11 +18,11 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { formatCourseLocation } from '@/utils/courseLocation';
-import CommunityScoreCard from './CommunityScoreCard';
 import CourseFactsAndTees from './about/CourseFactsAndTees';
 import AboutThisPlace from './about/AboutThisPlace';
 import HowItPlays from './about/HowItPlays';
 import RecordBook from './about/RecordBook';
+import WhatPeopleSay from './about/WhatPeopleSay';
 
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseSheet from './ClaimCourseSheet';
@@ -35,7 +32,6 @@ import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { useFriendsWhoPlayedCourse } from '@/hooks/useFriendsWhoPlayedCourse';
 /**
  * BRIEF_COURSE_TAB_REBUILD §3.10 — THE LADDER HAS MOVED, NOT GONE.
  *
@@ -114,17 +110,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   );
 
 
-  const { data: ratingAggregates, isLoading: ratingAggregatesLoading } = useCourseRatingAggregates(course.id);
-  const { data: distribution } = useCourseRatingDistribution(course.id);
-  const { data: userRating } = useUserCourseRating(course.id, user?.id);
-
-  // Friends' average rating - the same cached query CourseFriendsStrip uses.
-  const { data: friendsRated = [] } = useFriendsWhoPlayedCourse(user?.id, course.id);
-  const friendsAvg = React.useMemo(() => {
-    const scored = friendsRated.filter((f) => f.rating_value != null);
-    if (scored.length === 0) return null;
-    return scored.reduce((sum, f) => sum + (f.rating_value ?? 0), 0) / scored.length;
-  }, [friendsRated]);
+  /* §3.6 — the rating reads now live inside WhatPeopleSay, and the friends
+     average is not a figure on this tab at all: the friends strip below names
+     the people, which is the more useful form of the same fact. */
 
   const handleWebsiteClick = () => {
     if (course.website_url) {
@@ -179,22 +167,18 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           onSeeAll={() => onTabChange?.('legends')}
         />
 
-      {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
-      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
-
-
-        <CommunityScoreCard
+        {/* §3.6 — WHAT PEOPLE SAY, flat. The score and the viewer's own score
+            only; the five-bar histogram and the four category scores render on
+            the Reviews tab instead (nothing deleted). */}
+        <WhatPeopleSay
           courseId={course.id}
           courseName={course.name}
-          ratingAggregates={ratingAggregates}
-          isLoading={ratingAggregatesLoading}
-          userRating={userRating}
-          distribution={distribution}
-          friendsAvg={friendsAvg}
           onRateClick={handleRateClick}
           onSeeAllReviews={() => onTabChange?.('reviews')}
         />
 
+      {/* ══ BLOCK 3 — WHO PLAYS HERE (the people) ══ */}
+      <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </div>
 

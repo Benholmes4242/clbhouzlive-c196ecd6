@@ -381,7 +381,10 @@
       "friends": "FRIENDS AVG",
       "kicker": "COMMUNITY RATING",
       "overall": "OVERALL",
-      "yours": "YOUR RATING"
+      "yours": "YOUR RATING",
+      "tooFew_one": "From 1 rating — too few to be settled.",
+      "tooFew_other": "From {{count}} ratings — too few to be settled.",
+      "allReviewsSub": "Every review, the score spread and the category scores."
     },
     "records": {
       "allBoards": "All boards",
@@ -411,7 +414,8 @@
     "sections": {
       "aboutThisPlace": "About this place",
       "howItPlays": "How it plays",
-      "recordBook": "The record book"
+      "recordBook": "The record book",
+      "whatPeopleSay": "What people say"
     },
     "suggestEdit": {
       "cancel": "Cancel",

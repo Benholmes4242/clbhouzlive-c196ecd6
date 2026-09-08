@@ -39,7 +39,8 @@ import {
 } from '@/features/courses/config';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { HERO_NUMBER_STYLE, TIER_LABEL_STYLE } from '@/lib/ratingTier';
-import { bandColor } from '@/features/courses/_shared/scoreBands';
+import { bandColor, SubScoreBar } from '@/features/courses/_shared/scoreBands';
+import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import type { FeedPost, MediaItem as MediaItemType } from '@/components/media-system/types/media';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
@@ -134,6 +135,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
 
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
+  /** Same sub-score gate the Course tab used before the four scores moved here. */
+  const { subscoreMinRatings } = useTop100Config();
 
   // A deep link (?review=<id>) both highlights the row AND opens the review
   // sheet on it. The param is stripped straight away (so back/forward does not
@@ -696,6 +699,46 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                 })}
               </div>
             </div>
+
+            {/* §3.6 — THE FOUR CATEGORY SCORES, moved here from the Course tab.
+                They belong beside the reviews that produced them. Same gate as
+                before (t100_subscore_min_ratings) and the same shared bars. */}
+            {(() => {
+              const categories = [
+                { id: 'design', labelKey: 'review.subscore.design', score: ratingAggregates?.avg_design_score },
+                { id: 'condition', labelKey: 'review.subscore.condition', score: ratingAggregates?.avg_condition_score },
+                { id: 'facilities', labelKey: 'review.subscore.facilities', score: ratingAggregates?.avg_facilities_score },
+                { id: 'clubhouse', labelKey: 'review.subscore.clubhouse', score: ratingAggregates?.avg_clubhouse_score },
+              ].filter((c) => c.score !== null && c.score !== undefined);
+              if (ratingCount < subscoreMinRatings || categories.length === 0) return null;
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      letterSpacing: '0.19em',
+                      textTransform: 'uppercase',
+                      color: INK_FAINT,
+                    }}
+                  >
+                    {t('courseDetail.communityScore.categoryScores')}
+                  </div>
+                  <div style={{ display: 'flex', gap: 16 }}>
+                    {categories.slice(0, 2).map((c) => (
+                      <SubScoreBar key={c.id} label={t(c.labelKey)} score={c.score || 0} />
+                    ))}
+                  </div>
+                  {categories.length > 2 && (
+                    <div style={{ display: 'flex', gap: 16 }}>
+                      {categories.slice(2, 4).map((c) => (
+                        <SubScoreBar key={c.id} label={t(c.labelKey)} score={c.score || 0} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Control row / expanding search */}
             {searchOpen ? (

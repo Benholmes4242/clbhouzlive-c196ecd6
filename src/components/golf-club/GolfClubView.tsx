@@ -28,6 +28,7 @@ import CourseCommunityRating from '@/components/courses/CourseCommunityRating';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
 
 
 interface GolfClubViewProps {
@@ -435,9 +436,18 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   const { t } = useTranslation('courses');
   const rounds = typeof courseStats?.rounds_tracked === 'number' ? courseStats.rounds_tracked : 0;
   const showBand = rounds > 0;
-  const hasRank = Boolean(course.global_rank || course.regional_rank || course.usa_rank);
 
   const courseId = (course as { id?: string }).id ?? null;
+
+  /**
+   * The standing comes from course_top100_memberships — the lists are the one
+   * source. The legacy global_rank / regional_rank / usa_rank columns on the
+   * course record are deliberately NOT read here: nothing writes them, and on a
+   * US course regional_rank actually holds the USA rank.
+   */
+  const { data: standing } = useCourseTop100Standing(courseId);
+  const hasRank = Boolean(standing?.globalRank || standing?.regionalRank || standing?.usaRank);
+
   const shownRef = useRef<string | null>(null);
   useEffect(() => {
     if (!showBand || !courseId) return;
@@ -542,9 +552,9 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
           }}
         >
           <CourseRankBadges
-            globalRank={course.global_rank ?? null}
-            regionalRank={course.regional_rank ?? null}
-            usaRank={course.usa_rank ?? null}
+            globalRank={standing?.globalRank ?? null}
+            regionalRank={standing?.regionalRank ?? null}
+            usaRank={standing?.usaRank ?? null}
             country={course.country}
             positioning="inline"
           />
