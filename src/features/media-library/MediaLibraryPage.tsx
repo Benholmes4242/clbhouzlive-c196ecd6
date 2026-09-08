@@ -7,6 +7,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { LibraryHead, LoadMore, SortRail } from './LibraryChrome';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
+import { MOSAIC_GAP, MOSAIC_RADIUS } from '@/lib/mosaicGeometry';
 import { useMergedLibraryTotal } from './libraryTotals';
 import {
   MERGED_SORTS,
