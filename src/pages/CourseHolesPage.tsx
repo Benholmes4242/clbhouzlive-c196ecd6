@@ -10,25 +10,38 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { CourseAnalyticsPanels } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
+import { CourseHolesTab } from '@/features/courses/components/holes/CourseHolesTab';
 import { SiLadder } from '@/features/courses/_shared/SiLadder';
 import { buildSiLadder } from '@/features/courses/_shared/siLadder';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const CourseHolesPage: React.FC = () => {
   const { t } = useTranslation('courses');
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  /* BRIEF_YOU_TAB_REBUILD §5 — the SAME destination with a personal scope,
+     because it is the same eighteen holes seen from one side. */
+  const personal = params.get('scope') === 'you';
   const { data } = useCourseHoleAnalysis(courseId);
 
   const ladder = React.useMemo(
     () => buildSiLadder(data?.holes ?? [], data?.total_rounds),
     [data?.holes, data?.total_rounds],
   );
+
+  const viewFired = React.useRef(false);
+  React.useEffect(() => {
+    if (!courseId || viewFired.current) return;
+    viewFired.current = true;
+    analyticsEvents.track('course_holes_page_viewed', { course_id: courseId, scope: personal ? 'you' : 'course' });
+  }, [courseId, personal]);
 
   return (
     <div
@@ -58,13 +71,20 @@ const CourseHolesPage: React.FC = () => {
           <ChevronLeft size={20} />
         </button>
         <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>
-          {t('courseDetail.plays.allHolesTitle')}
+          {personal
+            ? t('courseDetail.youTab.holesTitle', { defaultValue: 'Your 18 holes here' })
+            : t('courseDetail.plays.allHolesTitle')}
         </h1>
       </div>
 
       {courseId ? (
         <>
           <CourseAnalyticsPanels courseId={courseId} explainEmpty />
+          {/* The personal scope carries what left the You tab: how each par plays
+              for you, how the round unfolds by thirds and the hole-ranked list. */}
+          {personal ? (
+            <CourseHolesTab courseId={courseId} section="you" showGhost={false} showEmptyState={false} suppressStatus />
+          ) : null}
           {ladder ? (
             <div style={{ padding: '12px 16px 0' }}>
               <SiLadder ladder={ladder} voice="course" />
@@ -75,5 +95,6 @@ const CourseHolesPage: React.FC = () => {
     </div>
   );
 };
+
 
 export default CourseHolesPage;
