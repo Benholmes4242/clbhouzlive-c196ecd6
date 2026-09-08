@@ -68,3 +68,11 @@
 ## Explore hero full-width round shape (8 Sep 2026)
 - [x] Align the round shape and level-par rule to the hero content edges without moving surrounding content.
 - [x] Verify the shape uses the measured full-width hero content column; signed-in data was unavailable for a populated screenshot.
+
+## Courses hero and kickers (8 Sep 2026)
+- [ ] Match the Courses hero to Explore's fixed 340px, full-bleed, hard-cut frame with chrome as the only safe-area owner.
+- [ ] Move and restyle the existing Courses hero kicker inside its bottom content block without changing the remaining content.
+- [ ] Replace the Courses board's slogan/title pair with a dynamic factual kicker and one supporting description.
+- [ ] Unify Courses and Top 100 supporting-description typography.
+- [ ] Audit visible slogan-style kickers and report any additional candidates without changing unrelated surfaces.
+- [ ] Verify both Courses tabs at mobile width.
