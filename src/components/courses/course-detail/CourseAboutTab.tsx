@@ -24,6 +24,7 @@ import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100RankRow } from './CourseTop100RankRow';
 import CourseFactsAndTees from './about/CourseFactsAndTees';
+import AboutThisPlace from './about/AboutThisPlace';
 import { CourseAnalyticsPanels } from '@/features/courses/components/holes/analytical/CourseAnalyticsPanels';
 
 import CourseRecordBook from './CourseRecordBook';
@@ -34,7 +35,7 @@ import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
 import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
 
 import { SLATE_50 } from '@/features/courses/_shared/tokens';
-import { A, Action, Panel } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useFriendsWhoPlayedCourse } from '@/hooks/useFriendsWhoPlayedCourse';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { SiLadder } from '@/features/courses/_shared/SiLadder';
@@ -95,21 +96,8 @@ interface CourseAboutTabProps {
   onTabChange?: (tab: string) => void;
 }
 
-const formatDescription = (description: string | null | undefined) => {
-  if (!description) return null;
-  return description
-    .split('\n')
-    .map((line, index, array) => (
-      <span key={index}>
-        {line}
-        {index < array.length - 1 && <br />}
-      </span>
-    ));
-};
-
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const { t } = useTranslation('courses');
-  const [showFullDescription, setShowFullDescription] = useState(false);
   const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
   const [showClaimSheet, setShowClaimSheet] = useState(false);
   const { user } = useSupabaseSession();
@@ -170,8 +158,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     }
   };
 
-  const shouldShowReadMore = course.description && course.description.split(' ').length > 50;
-
 
   const handleRateClick = () => {
     if (!user) {
@@ -196,6 +182,15 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <div style={{ display: 'grid', gap: 24 }}>
         {/* BRIEF_COURSE_TAB_REBUILD §3.1/§3.2 — flat facts row + tee control. */}
         <CourseFactsAndTees courseId={course.id} />
+
+        {/* §3.3 — About moves UP: it is the one section that works with no data.
+            The Top 100 standing rides with it until §3.11 gives it a home in
+            Keep exploring. */}
+        <AboutThisPlace
+          courseId={course.id}
+          description={course.description}
+          footer={course.id ? <CourseTop100RankRow courseId={course.id} /> : null}
+        />
 
         {/* ══ BLOCK 2 — HOW IT PLAYS / HOLE BY HOLE (analytical panels) ══ */}
         <CourseAnalyticsPanels courseId={course.id} courseName={course.name} explainEmpty />
@@ -232,38 +227,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* ══ BLOCK 4 — ABOUT THIS PLACE (everything that is not analytics) ══ */}
       <div style={{ display: 'grid', gap: 12, padding: '0 16px' }}>
-        {(course.description || course.id) && (
-          <Panel kicker={t('courseDetail.blocks.aboutThisPlace')}>
-            {course.description && (
-            <div
-              style={{
-                fontSize: 13.5,
-                color: A.MUTE,
-                lineHeight: 1.65,
-                ...(showFullDescription
-                  ? {}
-                  : {
-                      display: '-webkit-box',
-                      WebkitLineClamp: 4,
-                      WebkitBoxOrient: 'vertical' as const,
-                      overflow: 'hidden',
-                    }),
-              }}
-            >
-              {formatDescription(course.description)}
-            </div>
-            )}
-            {shouldShowReadMore && (
-              <Action
-                label={showFullDescription ? t('courseDetail.about.showLess') : t('courseDetail.about.readMore')}
-                onClick={() => setShowFullDescription(!showFullDescription)}
-                align="left"
-              />
-            )}
-            {course.id && <CourseTop100RankRow courseId={course.id} />}
-          </Panel>
-        )}
-
         {/* Location */}
         {coordsLoading && <Skeleton className="w-full h-[180px] rounded-xl" />}
         {coords && (
