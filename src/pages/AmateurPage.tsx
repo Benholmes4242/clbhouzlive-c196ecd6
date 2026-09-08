@@ -96,9 +96,14 @@ export default function AmateurPage() {
       {/* THE SHARED CLEARANCE, never a page-local number: the floating pill's
           measured height + its 20px gap + 16px breathing + the home indicator.
           When the pill grows, this page moves with it. */}
-      <main style={{ padding: `14px 14px ${NAV_CLEARANCE}` }}>
+      {/* §7 ONE TYPE SCALE — the page no longer owns a 14px gutter. Every
+          section owns the SHARED 20px gutter through AboutSection; the filter
+          rail, which has no heading, pads itself to the same figure. */}
+      <main style={{ padding: `18px 0 ${NAV_CLEARANCE}` }}>
 
-        <AmateurFilterRail filters={state.filters} onOpen={state.openPanel} />
+        <div style={{ padding: '0 20px' }}>
+          <AmateurFilterRail filters={state.filters} onOpen={state.openPanel} />
+        </div>
         <AmateurLeaderboardBlock userId={user?.id} state={state} onRowPress={handleRow} />
         <AmateurCoursesBlock userId={user?.id} state={state} onCoursePress={handleCourse} />
         <AmateurNewsBlock />
