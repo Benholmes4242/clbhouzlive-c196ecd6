@@ -183,26 +183,11 @@ export function AmateurHero({
             cursor: row.course_id ? 'pointer' : 'default',
           }}
         >
-          {/* §1 THE KICKER. It NAMES THE FEAT, which is what explains the gold
-              dot on the shape below — the label keys the graphic, so no legend
-              is needed. Timing is not repeated here: the row beneath carries it. */}
-          <span
-            style={{
-              ...KICKER,
-              display: 'block',
-              marginBottom: 6,
-              color: 'rgba(255,255,255,0.66)',
-              textShadow: '0 1px 2px rgba(0,0,0,0.72)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {kicker}
-          </span>
-
-          {/* WHO, on the photograph. */}
+          {/* WHO, on the photograph. THE KICKER NOW FOLLOWS THIS ROW (§1), so
+              the block reads as a sentence about the member and sits nearer the
+              gold dot it exists to explain. */}
           <span style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+
             <SquircleAvatar
               size={30}
               src={row.profile_photo_url ?? undefined}
