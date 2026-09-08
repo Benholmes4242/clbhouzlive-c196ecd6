@@ -27,7 +27,7 @@ import { BoardRow } from './TourLeaderboardBlock';
 import { BOARD_LABEL, useTourBoardState, type TourBoardKey } from './useTourBoardState';
 
 const CANVAS = '#0D0F14';
-const BOARD_KEYS: TourBoardKey[] = ['live', 'fedex', 'rtd', 'oom', 'colleges'];
+const BOARD_KEYS: TourBoardKey[] = ['live', 'fedex', 'rtd', 'oom', 'cme', 'livpts', 'colleges'];
 const TOUR_KEYS: TourId[] = ['pga', 'euro', 'lpga', 'liv', 'pgad', 'champ'];
 
 const KICKER: React.CSSProperties = {
@@ -46,7 +46,7 @@ export default function TourRankingsPage() {
   const board = askedBoard && BOARD_KEYS.includes(askedBoard) ? askedBoard : 'fedex';
   const tour = askedTour && TOUR_KEYS.includes(askedTour) ? askedTour : 'pga';
 
-  const state = useTourBoardState(tour, board);
+  const state = useTourBoardState(tour, () => {}, board);
   const { rows, total, basis, figureLabel, liveTournament } = state;
 
   useEffect(() => {

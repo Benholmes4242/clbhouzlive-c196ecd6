@@ -31,12 +31,12 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const CANVAS = '#0D0F14';
 
-/** The picker governs the live Leaderboard and Our Picks. Nothing else. */
+/** The picker names the tour the whole page is reading. */
 const PICKER_TOURS: TourId[] = ['pga', 'euro', 'lpga', 'liv', 'pgad', 'champ'];
 
 export default function TourPage() {
   const [tour, setTour] = useState<TourId>('pga');
-  const board = useTourBoardState(tour);
+  const board = useTourBoardState(tour, setTour);
 
   useEffect(() => {
     analyticsEvents.track('tour_page_viewed', {});
@@ -48,11 +48,14 @@ export default function TourPage() {
       <TourHero />
 
       <main style={{ padding: `14px 14px ${NAV_CLEARANCE}` }}>
-        {/* THE ONE PICKER, above the blocks it governs, saying so by sitting there.
-            WHEN A FIXED-TOUR BOARD IS ACTIVE IT LOCKS to that board's tour —
-            dimmed, never hidden, so nothing moves and the reader can see why it
-            has stopped applying. The member's own selection is held in state and
-            returns intact the moment the live board or Our Picks is active. */}
+        {/* THE PICKER IS THE PAGE'S SUBJECT. The page reads ONE TOUR AT A TIME:
+            the picker names it and every block with a tour dimension follows.
+            Tapping a tour moves the board to that tour's season race and sets Our
+            Picks; tapping a race chip sets the picker. Two views of one state,
+            which cannot disagree, so nothing is locked.
+            THE ONE EXCEPTION IS COLLEGES — not a tour, so while it is the active
+            board the picker is dimmed and reads "Colleges". Selecting any tour
+            from there returns to that tour's season race. */}
         <RailChips
           options={
             board.pickerLock === 'colleges'
