@@ -58,6 +58,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
         overflowX: 'auto',
         scrollbarWidth: 'none',
         WebkitOverflowScrolling: 'touch',
+        ...(locked ? { opacity: 0.45, pointerEvents: 'none' as const } : null),
         ...style,
       }}
     >
