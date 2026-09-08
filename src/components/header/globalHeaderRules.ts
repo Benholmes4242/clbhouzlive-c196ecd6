@@ -26,7 +26,6 @@ export const IMMERSIVE_EXACT_ROUTES = [
   '/watch/clips',
   '/watch/videos',
   '/tourhub',
-  '/tour',
 ] as const;
 
 export const LIGHT_IMMERSIVE_EXACT_ROUTES = [

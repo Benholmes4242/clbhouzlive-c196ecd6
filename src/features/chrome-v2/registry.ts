@@ -277,7 +277,6 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // Tour Hub overview: the page-provided left slot carries burger + tour picker;
   // the standard controls remain in the right island over the full-bleed hero.
   { match: { exact: '/tourhub' },                 spec: { chrome: 'island', tone: 'dark', bleed: true, note: 'Tour overview — shared fixed islands over the full-bleed hero; chrome owns the safe area.' } },
-  { match: { exact: '/tour' },                    spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark', bleed: true, note: 'Tour landing — shared fixed islands over the 340px hero; chrome owns the safe area.' } },
   // Wire index + stories are non-bleeding solid-bar pages. Their page-provided
   // slots add the fixed section label and deliberately suppress the tour picker.
   {
