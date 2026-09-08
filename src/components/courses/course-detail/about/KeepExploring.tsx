@@ -155,17 +155,13 @@ const KeepExploring: React.FC<Props> = ({ course, onWebsiteClick }) => {
 
   if (rows.length === 0) return null;
 
+  /* No heading in the signed-off mock: a rule, then the rows. The section is
+     the last thing on the tab and every row names its own destination. */
   return (
-    <AboutSection heading={t('courseDetail.sections.keepExploring')}>
-      <div style={{ display: 'grid' }}>
-        {rows.map((r, i) => (
-          <Row
-            key={r.key}
-            label={r.label}
-            meta={r.meta}
-            onClick={r.onClick}
-            hairline={i < rows.length - 1}
-          />
+    <AboutSection>
+      <div style={{ display: 'grid', borderTop: `1px solid ${A.HAIRLINE}`, paddingTop: 4 }}>
+        {rows.map((r) => (
+          <Row key={r.key} label={r.label} meta={r.meta} onClick={r.onClick} />
         ))}
       </div>
     </AboutSection>
