@@ -4,12 +4,13 @@ import { useNavigate } from 'react-router-dom';
 
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
-import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { useRoundHoleShapes, type HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { DISCOVER_FACT, DISCOVER_QUIET, KICKER, SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { toParFor } from '@/components/explore-tab-new/friendRoundParts';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
+import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
 import { useHeroCourseImage } from '@/features/amateur/useHeroCourseImage';
-import { FIGS, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 
 /**
