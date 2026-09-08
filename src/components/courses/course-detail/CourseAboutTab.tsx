@@ -23,6 +23,8 @@ import WhoPlaysHere from './about/WhoPlaysHere';
 import Photos from './about/Photos';
 import WhereItIs from './about/WhereItIs';
 import KeepExploring from './about/KeepExploring';
+import ClaimFooterRow from './about/ClaimFooterRow';
+
 
 import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
 import ClaimCourseSheet from './ClaimCourseSheet';
@@ -201,54 +203,28 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           onWebsiteClick={course.website_url ? handleWebsiteClick : undefined}
         />
 
-      {/* ══ THE CLAIM ROW — AWAITING A RULING ══
-          It is not a place to explore, so it did not follow the other rows into
-          §3.11. It stays exactly where it renders today, unmoved and unremoved,
-          until its home is decided. */}
-      <div style={{ display: 'grid', gap: 12, padding: '0 20px' }}>
-
-        {course.club_id && claimStatus?.state === 'unclaimed' && (
-          <button
-            type="button"
-            onClick={() => setShowClaimSheet(true)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              width: '100%',
-              minHeight: 44,
-              padding: 0,
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              textAlign: 'left',
-            }}
-          >
-            <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: SLATE_50 }}>
-              {t('courseDetail.claim.cta.title')}
-            </span>
-            <span style={{ fontSize: 11.5, color: 'rgba(248,250,252,0.62)' }}>
-              {t('courseDetail.claim.cta.action')}
-            </span>
-            <span
-              style={{ fontSize: 13, color: 'rgba(248,250,252,0.45)', fontWeight: 700 }}
-              aria-hidden="true"
-            >
-              {'\u203A'}
-            </span>
-          </button>
+        {/* Claim STATUS is not the claim offer: pending and claimed are facts
+            about this course, so they stay in the flow. Only the unclaimed
+            offer moved to the footer at the very foot of the tab. */}
+        {course.club_id && (claimStatus?.state === 'pending' || claimStatus?.state === 'claimed') && (
+          <div style={{ display: 'grid', gap: 12, padding: '0 20px' }}>
+            {claimStatus.state === 'pending' && <ClaimUnderReviewNotice />}
+            {claimStatus.state === 'claimed' && claimStatus.business && (
+              <ClaimedCourseProfileLink business={claimStatus.business} />
+            )}
+          </div>
         )}
-
-        {/* Claim status — pending / claimed */}
-        {course.club_id && claimStatus?.state === 'pending' && <ClaimUnderReviewNotice />}
-        {course.club_id && claimStatus?.state === 'claimed' && claimStatus.business && (
-          <ClaimedCourseProfileLink business={claimStatus.business} />
-        )}
-      </div>
       </div>
 
       <div style={{ height: 20 }} />
       <NearbySection lat={coords?.lat ?? course.latitude} lng={coords?.lng ?? course.longitude} />
+
+      {/* THE CLAIM ROW — ruled: option 1, a deliberate footer. Last thing on the
+          tab, beneath everything, above only the bottom clearance. */}
+      {course.club_id && claimStatus?.state === 'unclaimed' && (
+        <ClaimFooterRow onClaimClick={() => setShowClaimSheet(true)} />
+      )}
+
 
       {course.club_id && (
         <ClaimCourseSheet

@@ -17,6 +17,13 @@ BRIEF_COURSE_TAB_REBUILD. Twelve bordered cards became flat sections plus one na
 
 **Reversible, not retired:** the friends/circle average. Withheld today because at ~22 connected members it is almost always identical to the overall or absent, and naming two people beats their mean. At a few hundred connected members it earns its place back.
 
+**The claim row.** Ruled option 1: a deliberate FOOTER (`about/ClaimFooterRow.tsx`) — hairline above with generous space, DIM treatment (not navigation INK), "Own or manage this course?" left, "Claim" right with chevron, last thing on the tab beneath everything. Claim STATUS (pending / claimed) is a fact about the course and stays in the flow, not the footer. INTENDED DESTINATION: when a suggest-an-edit affordance exists, the claim offer moves into that one administrative door and the footer row goes — two administrative offers justify a door, one does not.
+
+**Scale is the design input.** 95 courses have at least one rater, mean 1.8, max 9. Nearly every course page in the app is a thin-data page: the thin states are the NORMAL case and the rich page is the exception. Report the typical-course figure for each section built, never the best course's.
+
+**Signed-out faces: never.** A signed-out visitor gets the count with no faces ("13 members have played here"). Loosening anonymous profile reads is a deliberate privacy decision with its own design, never a side effect of widening a section.
+
+
 **Dead file list (unused, left on disk, nothing deleted until the tab is finished and the whole list has had its outside-importer check):**
 - `src/components/courses/course-detail/CourseTop100RankRow.tsx`
 - `src/components/courses/course-detail/CommunityScoreCard.tsx`
