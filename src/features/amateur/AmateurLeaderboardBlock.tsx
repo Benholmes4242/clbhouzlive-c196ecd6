@@ -15,7 +15,7 @@ import {
   type BoardKey,
 } from '@/components/explore-tab-new/courseled/boardFilters';
 import { DISCOVER_FACT, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
+import { AboutSection } from '@/components/courses/course-detail/about/AboutSection';
 import { RailChips } from '@/components/ui/RailChips';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -54,10 +54,14 @@ const QUIET_ACTION = {
   background: 'transparent',
   color: A.INK,
   fontFamily: SANS,
-  fontSize: 12,
+  /* §7 — an action inside a sentence sets at the sentence's size. */
+  fontSize: 13,
   fontWeight: 600,
   cursor: 'pointer',
 } as const;
+
+/** §7 BODY / PROSE — 13 MUTE, line-height 1.55. */
+const PROSE = { margin: 0, fontSize: 13, color: A.MUTE, lineHeight: 1.55 } as const;
 
 const MEMBER_BOARD_KEYS: readonly BoardKey[] = [...RANKING_BOARD_KEYS, ...FEAT_BOARD_KEYS];
 
@@ -103,10 +107,11 @@ export function AmateurLeaderboardBlock({
 
 
   return (
-    <section style={{ paddingTop: 18, fontFamily: SANS, ...FIGS }}>
-      {/* THE COUNT LINE STATES ITS SAMPLE: this block is filtered, news and
-          media are not, and that difference is the boundary marker. */}
-      <DiscoverSectionHeading title={boardTitle} right={basisLine(unit, filters, t as never)} />
+    /* §7 — the SHARED section primitive: 20px gutter, 34px lead-in, 10px
+       heading gap, and the heading/meta treatment the five course tabs use. The
+       count line still states its sample: this block is filtered, news and media
+       are not, and that difference is the boundary marker. */
+    <AboutSection heading={boardTitle} meta={basisLine(unit, filters, t as never)}>
 
       <RailChips
         options={MEMBER_BOARD_KEYS.map((key) => ({
@@ -116,7 +121,7 @@ export function AmateurLeaderboardBlock({
         value={board}
         onChange={(next) => state.changeBoard(next as BoardKey)}
         ariaLabel="Board"
-        style={{ margin: '0 -14px 12px', padding: '0 14px' }}
+        style={{ margin: '0 -20px 12px', padding: '0 20px' }}
       />
 
       {page.isPending ? (
@@ -127,8 +132,8 @@ export function AmateurLeaderboardBlock({
         /* §6 — the only board that can still be empty is one the MEMBER filtered
            to nothing. The circle can no longer land here: an empty circle is
            widened to Everyone, declared, upstream. An absence is explained. */
-        <div style={{ padding: '18px 2px' }}>
-          <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: DISCOVER_FACT }}>
+        <div style={{ padding: '18px 0' }}>
+          <p style={PROSE}>
             {t('discover.filterBoard.emptyLine', 'Nothing on this board for {{line}}.', {
               line: appliedParts.join(' \u00B7 '),
             })}
@@ -144,7 +149,7 @@ export function AmateurLeaderboardBlock({
           {/* §3 C — THE DECLARED WIDENING. The chips and the count already read
               Everyone; this sentence says who moved them and why. */}
           {state.widened && (
-            <p style={{ margin: '0 2px 10px', fontSize: 12, color: A.MUTE, lineHeight: 1.45 }}>
+            <p style={{ ...PROSE, marginBottom: 10 }}>
               {t(
                 'amateur.board.widenedToEveryone',
                 'Nobody in your circle has posted a round in the last fortnight, so this is everyone.',
@@ -177,7 +182,7 @@ export function AmateurLeaderboardBlock({
               up from outside the circle: mixing pools would make the chips and
               the count untrue. */}
           {thin ? (
-            <p style={{ margin: '12px 2px 0', fontSize: 12, color: A.MUTE, lineHeight: 1.45 }}>
+            <p style={{ ...PROSE, marginTop: 12 }}>
               {t('amateur.board.thinCircle', 'Only {{count}} rounds in your circle this fortnight.', {
                 count: total,
               })}
@@ -200,21 +205,21 @@ export function AmateurLeaderboardBlock({
           {(thin || state.widened) && <SuggestedGolfersRail surface="explore_board" />}
 
           {thin && (
-            <p style={{ margin: '14px 2px 0', fontSize: 12, color: A.MUTE, lineHeight: 1.45 }}>
+            <p style={{ ...PROSE, marginTop: 14 }}>
               {t('amateur.board.orBeyond', 'Or look beyond your circle.')}{' '}
-              <button type="button" onClick={state.seeEveryone} style={{ ...QUIET_ACTION, fontSize: 12 }}>
+              <button type="button" onClick={state.seeEveryone} style={QUIET_ACTION}>
                 {t('amateur.board.seeEveryone', 'See everyone')} &rsaquo;
               </button>
             </p>
           )}
 
           {state.hasCircle === false && !state.widened && (
-            <p style={{ margin: '14px 2px 0', fontSize: 12, color: A.MUTE, lineHeight: 1.45 }}>
+            <p style={{ ...PROSE, marginTop: 14 }}>
               {t('amateur.board.noCircleYet', 'Follow golfers you know and this becomes your circle.')}{' '}
               <button
                 type="button"
                 onClick={() => setFindGolfers(true)}
-                style={{ ...QUIET_ACTION, fontSize: 12 }}
+                style={QUIET_ACTION}
               >
                 {t('amateur.board.findGolfers', 'Find golfers')} &rsaquo;
               </button>
