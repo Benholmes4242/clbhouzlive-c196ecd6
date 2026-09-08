@@ -110,7 +110,10 @@ export function AmateurHero({
      golf_courses.thumbnail_image — the same field block 2's course rows use. */
   const heroImage = useHeroCourseImage(row?.course_id);
 
-  const par = row ? toPar(row) : null;
+  /* §2 THE SCORE. toParFor is the SHARED rule the Discover friend round row
+     uses: true minus U+2212, under par red, over par ink, level muted. */
+  const par = row ? toParFor(row) : null;
+  const kicker = featKicker(shape);
 
   return (
     <section
