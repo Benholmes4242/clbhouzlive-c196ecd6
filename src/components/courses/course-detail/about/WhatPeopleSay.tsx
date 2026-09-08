@@ -45,15 +45,16 @@ interface WhatPeopleSayProps {
   onSeeAllReviews?: () => void;
 }
 
-const Figure: React.FC<{ label: string; value: string; tone: string; tier?: string | null }> = ({
-  label,
-  value,
-  tone,
-  tier,
-}) => (
+const Figure: React.FC<{
+  label: string;
+  value: string;
+  tone: string;
+  size?: number;
+  tier?: string | null;
+}> = ({ label, value, tone, size = 34, tier }) => (
   <div style={{ minWidth: 0 }}>
-    <div style={ABOUT_KICKER}>{label}</div>
-    <div style={{ ...aboutFig(30, tone), marginTop: 4, lineHeight: 1, whiteSpace: 'nowrap' }}>{value}</div>
+    <div style={{ ...aboutFig(size, tone), lineHeight: 1, whiteSpace: 'nowrap' }}>{value}</div>
+    <div style={{ ...ABOUT_KICKER, marginTop: 6 }}>{label}</div>
     {tier ? (
       <div style={{ ...TIER_LABEL_STYLE, fontSize: 11, color: tone, marginTop: 4 }}>{tier}</div>
     ) : null}

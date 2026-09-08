@@ -238,10 +238,10 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
     );
   }
 
-  // FULL STATE — one row per board.
+  // FULL STATE — one row per board, each on its own hairline.
   return (
     <AboutSection heading={heading} meta={meta}>
-      <div style={{ display: 'grid', gap: 14 }}>
+      <div style={{ display: 'grid' }}>
         {previewRows.map(({ category, row }) => {
           const isYou = !!user?.id && row.user_id === user.id;
           const tone = isYou ? A.AMBER_DEEP : A.INK;
@@ -252,14 +252,15 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
               onClick={openBoards}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '26px 1fr 74px',
+                gridTemplateColumns: '36px 1fr 74px',
                 alignItems: 'center',
                 gap: 12,
                 width: '100%',
                 textAlign: 'left',
                 background: 'transparent',
                 border: 0,
-                padding: 0,
+                borderBottom: `1px solid ${A.HAIRLINE}`,
+                padding: '11px 0',
                 cursor: 'pointer',
                 fontFamily: SANS,
               }}
@@ -268,17 +269,17 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
                 src={row.user_photo_url}
                 alt={row.user_display_name ?? 'Golfer'}
                 userId={row.user_id}
-                size={26}
+                size={36}
                 thinRing
               />
               <div style={{ minWidth: 0 }}>
                 <BoardLabel category={category} tone={isYou ? A.AMBER_DEEP : undefined} />
                 <div
                   style={{
-                    fontSize: 13,
-                    fontWeight: 700,
+                    fontSize: 14,
+                    fontWeight: 600,
                     color: tone,
-                    marginTop: 2,
+                    marginTop: 3,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
