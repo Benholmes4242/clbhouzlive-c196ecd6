@@ -24,7 +24,7 @@ import AboutSection from './AboutSection';
 export interface NearbyPin {
   id: string;
   name: string;
-  slug?: string;
+  slug: string;
   lat: number;
   lng: number;
   category?: string;
