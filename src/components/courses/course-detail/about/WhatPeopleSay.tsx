@@ -118,7 +118,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
 
   return (
     <AboutSection heading={heading} meta={t('courseDetail.communityScore.basedOn', { count: total })}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 40 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20 }}>
         <Figure
           label={t('courseDetail.rating.overall')}
           value={score.toFixed(1)}
@@ -130,6 +130,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
             label={t('courseDetail.rating.yours')}
             value={yours.toFixed(1)}
             tone={A.AMBER_DEEP}
+            size={22}
           />
         ) : null}
       </div>
