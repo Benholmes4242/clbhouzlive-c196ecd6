@@ -697,6 +697,46 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               </div>
             </div>
 
+            {/* §3.6 — THE FOUR CATEGORY SCORES, moved here from the Course tab.
+                They belong beside the reviews that produced them. Same gate as
+                before (t100_subscore_min_ratings) and the same shared bars. */}
+            {(() => {
+              const categories = [
+                { id: 'design', labelKey: 'review.subscore.design', score: ratingAggregates?.avg_design_score },
+                { id: 'condition', labelKey: 'review.subscore.condition', score: ratingAggregates?.avg_condition_score },
+                { id: 'facilities', labelKey: 'review.subscore.facilities', score: ratingAggregates?.avg_facilities_score },
+                { id: 'clubhouse', labelKey: 'review.subscore.clubhouse', score: ratingAggregates?.avg_clubhouse_score },
+              ].filter((c) => c.score !== null && c.score !== undefined);
+              if (ratingCount < subscoreMinRatings || categories.length === 0) return null;
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      letterSpacing: '0.19em',
+                      textTransform: 'uppercase',
+                      color: INK_FAINT,
+                    }}
+                  >
+                    {t('courseDetail.communityScore.categoryScores')}
+                  </div>
+                  <div style={{ display: 'flex', gap: 16 }}>
+                    {categories.slice(0, 2).map((c) => (
+                      <SubScoreBar key={c.id} label={t(c.labelKey)} score={c.score || 0} />
+                    ))}
+                  </div>
+                  {categories.length > 2 && (
+                    <div style={{ display: 'flex', gap: 16 }}>
+                      {categories.slice(2, 4).map((c) => (
+                        <SubScoreBar key={c.id} label={t(c.labelKey)} score={c.score || 0} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
             {/* Control row / expanding search */}
             {searchOpen ? (
               /* HEIGHT EXCEPTION, DELIBERATE - DO NOT "CORRECT" TO 44.
