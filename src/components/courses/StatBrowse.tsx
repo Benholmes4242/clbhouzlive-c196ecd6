@@ -56,7 +56,8 @@ import {
   type LensCounts,
 
 } from './useStatBrowse';
-import { A, KICKER, LABEL } from '@/features/courses/components/holes/analytical/tokens';
+import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
+import { COURSE_BROWSE_DESCRIPTION, COURSE_BROWSE_KICKER } from './courseBrowseTypography';
 import { ReviewRailSlot } from './ReviewRailSlot';
 import { ReviewFeaturedSlot } from './ReviewFeaturedSlot';
 import { allocateReviewSlots } from './reviewSlots';
@@ -878,25 +879,16 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
       {/* ── Headline ────────────────────────────────────────────── */}
       <div className="pt-4">
-
         <div
           style={{
-            ...KICKER,
-            fontSize: 12,
+            ...COURSE_BROWSE_KICKER,
           }}
         >
-          {t('statBrowse.eyebrow')}
+          {`${t(`statBrowse.lens.${lens}.title`)} ${t('statBrowse.coursesSuffix')}`}
         </div>
-        {/* LENS HEADLINE — the section-title treatment (§3): it must read as a
-            different KIND from the kicker above it, so it takes the title size
-            and tracking, not merely a larger number. 20 -> 22. */}
-        <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', color: INK, marginTop: 4 }}>
-          {t(`statBrowse.lens.${lens}.title`)}
-        </h2>
-        <p style={{ fontSize: 14, color: INK_MUTE, marginTop: 4, lineHeight: 1.45 }}>
+        <p style={{ ...COURSE_BROWSE_DESCRIPTION, marginTop: 5 }}>
           {description}
           {countSentence ? emphasiseFigures(countSentence) : null}
-
         </p>
       </div>
 

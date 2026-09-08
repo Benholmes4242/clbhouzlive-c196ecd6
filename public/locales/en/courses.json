@@ -1820,7 +1820,7 @@
     }
   },
   "statBrowse": {
-    "eyebrow": "Where this community plays",
+    "coursesSuffix": "courses",
     "allAreas": "All areas",
     "allRegions": "All regions",
     "allOf": "All of {{country}}",
