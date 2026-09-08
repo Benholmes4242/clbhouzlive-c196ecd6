@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Play, Plus } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useClubMedia } from '@/hooks/useClubMedia';
+import { useCourseMediaCounts } from '@/hooks/useCourseMediaCounts';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 // groupMultiMedia intentionally not imported: posts are built one-per-parent-id already grouped.
@@ -214,13 +215,15 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({
   });
 
 
-  const { photoCount, videoCount, totalCount } = useMemo(() => {
-    if (loading || !rawMedia) return { photoCount: 0, videoCount: 0, totalCount: 0 };
-    const photos = rawMedia.filter((m) => m.type === 'image').length;
-    const videos = rawMedia.filter((m) => m.type === 'video').length;
-    const total = rawMedia.length;
-    return { photoCount: photos, videoCount: videos, totalCount: total };
-  }, [loading, rawMedia]);
+  /* THE COUNTS COME FROM POSTGRES (§1), not from the length of this capped
+     fetch. The client-side filter counted a review photograph twice when it had
+     also been posted, and stopped at the 30-row limit. get_course_media_counts
+     is the one definition: distinct media on published posts at this course
+     plus review photographs not already posted, blocked authors excluded. */
+  const { data: serverCounts } = useCourseMediaCounts(clubId);
+  const photoCount = serverCounts?.photos ?? 0;
+  const videoCount = serverCounts?.videos ?? 0;
+  const totalCount = serverCounts?.total ?? 0;
 
   const hasMedia = mediaTiles.length > 0;
   const overflowCount = totalCount > maxItems ? totalCount - maxItems : 0;

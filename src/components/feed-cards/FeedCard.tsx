@@ -61,6 +61,8 @@ export function FeedCard({
   bareTile = false,
   readOnlyFullscreen = false,
   hideLikeCount = false,
+  tileRadius = 4,
+  tileGap = 4,
 }: {
 
   row: FeedCardRow;
@@ -106,6 +108,12 @@ export function FeedCard({
   /** Suppress the like-count overlay / meta figure on the tile. Opt-in;
    *  used by the course-details Media tab. Watch surfaces must NOT set it. */
   hideLikeCount?: boolean;
+  /** Tile corner radius. Defaults to today's 4px so every existing consumer
+   *  renders byte-identically; the mosaic walls pass r.xs. */
+  tileRadius?: number;
+  /** Vertical gap beneath a bare tile, matched to its grid's column gutter.
+   *  Defaults to today's 4px. Ignored for full cards. */
+  tileGap?: number;
 }) {
 
 
@@ -177,7 +185,7 @@ export function FeedCard({
         // Bare tiles live in mosaic grids where the column gap is 4px — match
         // vertical spacing to the horizontal gutter. Full cards (with caption
         // block) keep the roomier 12px stack rhythm.
-        marginBottom: bareTile ? 4 : 12,
+        marginBottom: bareTile ? tileGap : 12,
         cursor: 'pointer',
         fontFamily: FONT_FAMILY,
       }}
@@ -187,7 +195,7 @@ export function FeedCard({
           position: 'relative',
           width: '100%',
           aspectRatio: aspect,
-          borderRadius: 4,
+          borderRadius: tileRadius,
           background: '#e5e9ef',
           overflow: 'hidden',
         }}

@@ -1493,7 +1493,10 @@
     "signInBody": "See photos and videos from golfers who've played here.",
     "signInCta": "Sign in",
     "signInTitle": "Sign in to view media",
-    "uploadVideo": "Upload a video"
+    "uploadVideo": "Upload a video",
+    "emptyFlatTitle": "No photographs yet",
+    "emptyFlatBody": "Be the first to capture {{courseName}}. Signature holes, shots from your round, or just the view.",
+    "emptyFlatAction": "Add the first"
   },
   "network": {
     "badge": {

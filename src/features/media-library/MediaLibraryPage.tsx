@@ -7,6 +7,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { LibraryHead, LoadMore, SortRail } from './LibraryChrome';
 import { NAV_CLEARANCE } from '@/lib/navClearance';
+import { MOSAIC_GAP, MOSAIC_RADIUS } from '@/lib/mosaicGeometry';
 import { useMergedLibraryTotal } from './libraryTotals';
 import {
   MERGED_SORTS,
@@ -75,14 +76,19 @@ export default function MediaLibraryPage() {
           one token and never pays the inset again. */}
       <main style={{ paddingTop: 'var(--island-clearance, calc(env(safe-area-inset-top, 0px) + 70px))' }}>
 
-        <div style={{ padding: `0 ${GUTTER}px ${NAV_CLEARANCE}` }}>
+        {/* Head and control keep the page gutter; the WALL bleeds. A mosaic is
+            not content in a column, and it is the one thing on these pages
+            allowed to reach the viewport edges. */}
+        <div style={{ padding: `0 ${GUTTER}px` }}>
           <LibraryHead total={totalQuery.data ?? null} title="Media" />
           <SortRail
             options={MERGED_SORTS.map((id) => ({ id, label: MERGED_SORT_LABELS[id] }))}
             value={sort}
             onChange={(next) => changeSort(next as MergedSort)}
           />
+        </div>
 
+        <div style={{ paddingBottom: NAV_CLEARANCE }}>
           {/* A HELD HEIGHT while both reads settle, so the wall does not jump. */}
           {isPending ? (
             <div style={{ height: 520 }} aria-hidden />
@@ -90,14 +96,16 @@ export default function MediaLibraryPage() {
             <>
               <MomentsGrid
                 moments={moments}
-                gap={5}
+                gap={MOSAIC_GAP}
                 tall={250}
-                radius={10}
+                radius={MOSAIC_RADIUS}
                 onTilePress={openTile}
                 autoplayGroup="media-library"
               />
               {tiles.length > shown && (
-                <LoadMore busy={false} onPress={() => setShown((value) => value + PAGE)} />
+                <div style={{ padding: `0 ${GUTTER}px` }}>
+                  <LoadMore busy={false} onPress={() => setShown((value) => value + PAGE)} />
+                </div>
               )}
             </>
           )}

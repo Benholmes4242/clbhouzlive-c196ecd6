@@ -14,9 +14,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useClubMedia } from '@/hooks/useClubMedia';
-import AboutMediaStrip, { mediaFetchLimit } from '../AboutMediaStrip';
+import { useCourseMediaCounts } from '@/hooks/useCourseMediaCounts';
+import AboutMediaStrip from '../AboutMediaStrip';
 import AboutSection from './AboutSection';
 
 interface PhotosProps {
@@ -26,12 +25,14 @@ interface PhotosProps {
 
 const Photos: React.FC<PhotosProps> = ({ courseId, onSeeAll }) => {
   const { t } = useTranslation('courses');
-  const isMobile = useIsMobile();
-  const { data: media, isLoading } = useClubMedia(courseId, mediaFetchLimit(isMobile));
-
-  const items = (media ?? []) as Array<{ type: 'image' | 'video' }>;
-  const photos = items.filter((m) => m.type === 'image').length;
-  const videos = items.filter((m) => m.type === 'video').length;
+  /* ONE COUNT, SERVER-SIDE (§1). This used to take the LENGTH of the strip's
+     capped 30-row fetch, which counted review photographs a second time when
+     they had also been posted and truncated whatever was past 30 — "26 photos"
+     against the Media tab's honest 21 on Sundridge East. Both surfaces now read
+     get_course_media_counts, and share its cache entry. */
+  const { data: counts, isLoading } = useCourseMediaCounts(courseId);
+  const photos = counts?.photos ?? 0;
+  const videos = counts?.videos ?? 0;
 
   /* No count while the read is in flight, and no video half when there are
      none — "3 photos · 0 videos" states an absence nobody asked about. */
