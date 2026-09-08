@@ -23,6 +23,7 @@ import { TourHero } from '@/features/tour/TourHero';
 import { TourHeader } from '@/features/tour/TourHeader';
 import { TourLeaderboardBlock } from '@/features/tour/TourLeaderboardBlock';
 import { TourPicksBlock } from '@/features/tour/TourPicksBlock';
+import { TourComingUpBlock } from '@/features/tour/TourComingUpBlock';
 import { useTourBoardState } from '@/features/tour/useTourBoardState';
 import { TOUR_CONFIG, type TourId } from '@/features/tourhub/hooks/useOverviewData';
 import { FONT } from '@/features/tourhub/_shared/tokens';
@@ -74,7 +75,10 @@ export default function TourPage() {
 
         <TourLeaderboardBlock state={board} />
         <TourPicksBlock tour={tour} />
-        {/* Coming Up and the wire land beneath, in that order. */}
+        {/* COMING UP HAS NO TOUR DIMENSION, so the picker does not govern it: a
+            member reading one tour still wants next week's whole calendar. */}
+        <TourComingUpBlock />
+        {/* The wire lands beneath. */}
       </main>
     </div>
   );
