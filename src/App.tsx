@@ -258,6 +258,7 @@ const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
 // BRIEF_COURSE_TAB_REBUILD §3.10 — the Course tab's one drill-down.
 const CourseHolesPage = lazy(() => import("./pages/CourseHolesPage"));
+const CourseRoundsPage = lazy(() => import("./pages/CourseRoundsPage"));
 const ReviewComposerV2 = lazy(() => import("./features/review-v2/ReviewComposerV2"));
 const PostV2Page = lazy(() => import("./features/post-v2/PostV2Page"));
 
@@ -606,6 +607,7 @@ function AppRoutes() {
         <Route path="/courses" element={<Suspense fallback={<CoursesHubSkeleton />}><CoursesWrapped /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/courses/:courseId/holes" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseHolesPage /></Suspense>} />
+        <Route path="/courses/:courseId/rounds" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseRoundsPage /></Suspense>} />
 
         <Route path="/courses/:courseId/rate" element={<ReviewComposerRoute />} />
         <Route path="/rate-course-v2/:courseId" element={<ReviewComposerRoute />} />
