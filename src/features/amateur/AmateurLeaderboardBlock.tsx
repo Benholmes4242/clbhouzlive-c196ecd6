@@ -226,6 +226,11 @@ export function AmateurLeaderboardBlock({
         title={boardTitle}
         onRowPress={onRowPress}
       />
+
+      {/* C2 — the repair action for the cold start, the same sheet the rest of
+          the app uses to add golfers. */}
+      <FindGolfersSheet open={findGolfers} onClose={() => setFindGolfers(false)} />
+
     </section>
   );
 }
