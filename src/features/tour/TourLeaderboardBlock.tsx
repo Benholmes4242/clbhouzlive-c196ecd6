@@ -19,7 +19,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { CountryFlag } from '@/components/ui/country-flag';
+import CountryFlag from '@/components/ui/country-flag';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 import { RailChips } from '@/components/ui/RailChips';
