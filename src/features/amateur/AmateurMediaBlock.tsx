@@ -13,7 +13,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { r } from '@/lib/radius';
 import { useGalleryCourseMedia } from '@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia';
 import { FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
+import { AboutSection } from '@/components/courses/course-detail/about/AboutSection';
 import { useMergedLibraryTotal } from '@/features/media-library/libraryTotals';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { openWithOrigin } from '@/lib/openWithOrigin';
@@ -101,9 +101,10 @@ export function VideoRow({ item, first, onPress }: { item: CommunityLibraryItem;
       <div style={{ minWidth: 0, flex: 1 }}>
         <div
           style={{
-            fontSize: 13,
+            /* §7 ROW NAME — 14 / 600 INK. */
+            fontSize: 14,
             fontWeight: 600,
-            lineHeight: '17px',
+            lineHeight: '18px',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
@@ -112,7 +113,8 @@ export function VideoRow({ item, first, onPress }: { item: CommunityLibraryItem;
         >
           {title}
         </div>
-        <div style={{ marginTop: 4, fontSize: 11, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {/* §7 ROW SUB-LINE — 11 DIM. */}
+        <div style={{ marginTop: 4, fontSize: 11, fontWeight: 600, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {item.displayName}
         </div>
       </div>
@@ -272,20 +274,20 @@ export function AmateurMediaBlock({
        ORDER: tall picture tiles, then TEXT-LED rows, then the grid. The rows sit
        between the two picture areas deliberately — clips beside the mosaic is
        picture-on-picture and reads heavy. */
-    <section style={{ paddingTop: 26, fontFamily: SANS, ...FIGS }}>
+    <div style={{ fontFamily: SANS, ...FIGS }}>
       {clips.length > 0 && (
-        <>
-          <DiscoverSectionHeading
-            title="Clips"
-            right={(hubCounts.data?.clip_count ?? 0) > clips.length ? `See all ${hubCounts.data?.clip_count}` : null}
-            onRightPress={() => {
-              analyticsEvents.track('amateur_media_see_all_opened', { total: hubCounts.data?.clip_count ?? 0, section: 'clips' });
-              onSeeAll('/media?kind=clips');
-            }}
-          />
+        <AboutSection
+          heading="Clips"
+          meta={(hubCounts.data?.clip_count ?? 0) > clips.length ? `See all ${hubCounts.data?.clip_count}` : null}
+          onMetaPress={() => {
+            analyticsEvents.track('amateur_media_see_all_opened', { total: hubCounts.data?.clip_count ?? 0, section: 'clips' });
+            onSeeAll('/media?kind=clips');
+          }}
+          bleed
+        >
           <div
             className="scrollbar-hide"
-            style={{ display: 'flex', gap: 10, overflowX: 'auto', marginRight: -14, paddingRight: 14, willChange: 'transform' }}
+            style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '0 20px', willChange: 'transform' }}
           >
             {clips.map((item, index) => (
               <MediaRailTile
@@ -298,35 +300,34 @@ export function AmateurMediaBlock({
               />
             ))}
           </div>
-        </>
+        </AboutSection>
       )}
 
       {videos.length > 0 && (
-        <div style={{ marginTop: 32 }}>
-          <DiscoverSectionHeading
-            title="Longer watch"
-            right={(hubCounts.data?.video_count ?? 0) > videos.length ? `See all ${hubCounts.data?.video_count}` : null}
-            onRightPress={() => {
-              analyticsEvents.track('amateur_media_see_all_opened', { total: hubCounts.data?.video_count ?? 0, section: 'videos' });
-              onSeeAll('/media?kind=longer');
-            }}
-          />
+        <AboutSection
+          heading="Longer watch"
+          meta={(hubCounts.data?.video_count ?? 0) > videos.length ? `See all ${hubCounts.data?.video_count}` : null}
+          onMetaPress={() => {
+            analyticsEvents.track('amateur_media_see_all_opened', { total: hubCounts.data?.video_count ?? 0, section: 'videos' });
+            onSeeAll('/media?kind=longer');
+          }}
+        >
           {videos.map((item, index) => (
             <VideoRow key={item.key} item={item} first={index === 0} onPress={() => openPost(videos, item, 'video')} />
           ))}
-        </div>
+        </AboutSection>
       )}
 
-      <div style={{ marginTop: 32 }}>
-        <DiscoverSectionHeading
-          title="From the community"
-          right={total > 0 ? `See all ${total}` : null}
-          onRightPress={() => {
-            analyticsEvents.track('amateur_media_see_all_opened', { total, section: 'mosaic' });
-            /* /media carries the MERGED set this mosaic summarises. */
-            onSeeAll('/media?kind=community');
-          }}
-        />
+      <AboutSection
+        heading="From the community"
+        meta={total > 0 ? `See all ${total}` : null}
+        onMetaPress={() => {
+          analyticsEvents.track('amateur_media_see_all_opened', { total, section: 'mosaic' });
+          /* /media carries the MERGED set this mosaic summarises. */
+          onSeeAll('/media?kind=community');
+        }}
+        bleed
+      >
         {/* THE TIGHT TREATMENT established for Moments: 2px gutter, r.xs corners.
             A wall, not a set of cards. */}
         <MomentsGrid
