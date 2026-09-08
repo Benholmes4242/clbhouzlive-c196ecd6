@@ -1820,7 +1820,6 @@
     }
   },
   "statBrowse": {
-    "coursesSuffix": "courses",
     "allAreas": "All areas",
     "allRegions": "All regions",
     "allOf": "All of {{country}}",
@@ -1831,31 +1830,37 @@
     "lens": {
       "toughest": {
         "label": "Toughest",
+        "kicker": "Hardest courses",
         "title": "Toughest we've tracked",
         "description": "Ranked by average shots over par. Sample size on every course."
       },
       "scoreable": {
         "label": "Most scoreable",
+        "kicker": "Most scoreable courses",
         "title": "Most scoreable",
         "description": "Where the field goes lowest, relative to par."
       },
       "played": {
         "label": "Most played",
+        "kicker": "Most played courses",
         "title": "Most played",
         "description": "Where this community spends its golf."
       },
       "longest": {
         "label": "Longest",
+        "kicker": "Longest courses",
         "title": "Longest",
         "description": "By the tee our members actually play."
       },
       "rated": {
         "label": "Best rated",
+        "kicker": "Best rated courses",
         "title": "Best rated",
         "description": "By members who have played and reviewed them."
       },
       "chase": {
         "label": "Records to chase",
+        "kicker": "Records to chase courses",
         "title": "Records to chase",
         "description": "Courses with crowns nobody has claimed yet."
       }

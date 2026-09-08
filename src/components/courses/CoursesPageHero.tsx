@@ -202,7 +202,7 @@ function CoursesPageHeroInner() {
       }}
     >
       {/* Bottom-anchored identity + CTA — absolute so copy never expands the
-          hero past HERO_MIN_H. Matches GolfClubView's CourseTitleOverlay. */}
+          fixed 340px hero. Matches GolfClubView's CourseTitleOverlay. */}
       <div
         style={{
           position: 'absolute',
