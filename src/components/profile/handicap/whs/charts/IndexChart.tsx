@@ -40,6 +40,13 @@ interface Props {
   halo?: string;
   /** Hide the off best / mid / near best legend. */
   hideLegend?: boolean;
+  /**
+   * ADDITIVE (one-page handicap brief, Section B): draw a visible marker on
+   * EVERY point. Used by the withheld state (< 8 rounds), where the sparse
+   * series must read as individual rounds, not a shape. Default false, so
+   * every existing consumer renders byte-identically.
+   */
+  showPoints?: boolean;
 }
 
 const VIEW_W = 320;
