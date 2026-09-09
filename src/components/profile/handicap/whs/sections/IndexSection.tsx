@@ -179,17 +179,26 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
 
   const CHIP_LABEL: Record<WindowKey, string> = { '30d': '30D', '90d': '90D', '12m': '12M' };
 
+  /* The delta FIGURE sits on the index figure's baseline and its kicker hangs
+     BELOW that line (absolute, out of flow) — one row of figures with labels
+     beneath, the same grammar as Last round and Friends' rounds. Aligning the
+     block instead would put the kickers on the baseline and lift the figures
+     off it. */
   const deltaCell = (delta: number, label: string) => {
     const pts = label === t('common:handicap.index.delta90') ? model.slices['90d'] : model.slices['12m'];
     const color = toneColor(indexTone(pts[0].v, pts[pts.length - 1].v));
     return (
-      <div key={label}>
+      <div key={label} style={{ position: 'relative' }}>
         <div style={{ fontSize: 17, fontWeight: 700, color, lineHeight: 1.1, ...FIG }}>
           {formatDelta(delta)}
         </div>
         <div
           style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
             marginTop: 3,
+            whiteSpace: 'nowrap',
             fontSize: 9,
             fontWeight: 700,
             letterSpacing: '0.12em',
@@ -206,17 +215,17 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
   return (
     <HcpSection kicker={t('common:handicap.index.kicker')} first>
       {/* Figure + deltas */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ fontSize: 52, fontWeight: 700, color: CHART.INK, lineHeight: 1, ...FIG }}>
-          {handicap != null ? formatIndex(handicap) : '—'}
+          {handicap != null ? formatIndex(handicap) : '\u2014'}
         </div>
         {withheld ? null : show90 || show12 ? (
-          <div style={{ display: 'flex', gap: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 28 }}>
             {show90 && deltaCell(model.delta90 as number, t('common:handicap.index.delta90'))}
             {show12 && deltaCell(model.delta12 as number, t('common:handicap.index.delta12m'))}
           </div>
         ) : (
-          <div style={{ fontSize: 12, color: CHART.DIM, paddingBottom: 4, ...FIG }}>
+          <div style={{ fontSize: 12, color: CHART.DIM, ...FIG }}>
             {t('common:handicap.index.fromRounds', { count: model.total })}
           </div>
         )}
