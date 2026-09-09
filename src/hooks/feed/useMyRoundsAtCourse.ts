@@ -52,6 +52,68 @@ export function useMyRoundsAtCourse(courseId?: string | null, options?: { limit?
   });
 }
 
+export interface MyRoundsAtCourseResult {
+  rounds: MyRoundAtCourse[];
+  total: number;
+}
+
+/**
+ * The complete 18-hole history for the analytical Your rounds sheet.
+ *
+ * PostgREST responses are capped, so this reads deterministic 500-row pages.
+ * The first page also asks Postgres for an exact count; `total` is therefore
+ * the real matching total, never the number currently accumulated in memory.
+ */
+export function useAllMyRoundsAtCourse(courseId?: string | null, enabled = true) {
+  const { profile } = useProfileData();
+  const userId = profile?.id ?? null;
+
+  return useQuery({
+    queryKey: ['my-rounds-at-course', userId, courseId, 'all'],
+    enabled: Boolean(enabled && userId && courseId),
+    staleTime: 5 * 60 * 1000,
+    queryFn: async (): Promise<MyRoundsAtCourseResult> => {
+      const pageSize = 500;
+      const rows: Array<{
+        whs_score_id: string;
+        play_date: string;
+        gross_score: number | null;
+        course_par: number | null;
+        tee_marker: string | null;
+      }> = [];
+      let total = 0;
+
+      for (let from = 0; ; from += pageSize) {
+        const query = supabase
+          .from('gam_round_stats')
+          .select('whs_score_id, play_date, gross_score, course_par, tee_marker', from === 0 ? { count: 'exact' } : undefined)
+          .eq('user_id', userId as string)
+          .eq('course_id', courseId as string)
+          .eq('holes_played', 18)
+          .order('play_date', { ascending: false })
+          .order('whs_score_id', { ascending: false })
+          .range(from, from + pageSize - 1);
+        const { data, error, count } = await query;
+        if (error) throw error;
+        if (from === 0) total = count ?? 0;
+        rows.push(...((data ?? []) as typeof rows));
+        if ((data?.length ?? 0) < pageSize || rows.length >= total) break;
+      }
+
+      return {
+        total,
+        rounds: rows.map((r) => ({
+          whsScoreId: r.whs_score_id,
+          playDate: r.play_date,
+          grossScore: r.gross_score,
+          coursePar: r.course_par,
+          teeMarker: r.tee_marker,
+        })),
+      };
+    },
+  });
+}
+
 /** Local YYYY-MM-DD for a Date. */
 function localISODate(d: Date): string {
   const y = d.getFullYear();

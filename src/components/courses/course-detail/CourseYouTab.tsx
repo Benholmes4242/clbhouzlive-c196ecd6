@@ -275,7 +275,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         }}
         onSeeAll={() => {
           analyticsEvents.track('course_you_all_rounds', { course_id: courseId, rounds: roundTotal });
-          navigate(`/courses/${courseId}/rounds`);
+          navigate(`/courses/${courseId}?tab=you&sheet=rounds`);
         }}
       />
 
