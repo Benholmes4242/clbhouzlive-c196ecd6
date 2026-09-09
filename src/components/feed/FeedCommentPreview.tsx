@@ -64,13 +64,20 @@ interface Props {
   /** comment_count — the TALLY. Never decides whether the preview renders. */
   commentCount: number;
   onOpenComments: () => void;
-  /** Viewing member's avatar for the prompt row. */
+  /** Viewing member's avatar for the prompt row. DEAD after section C. */
   viewerAvatarUrl?: string | null;
   viewerName?: string | null;
   /** Viewing actor's id — keys the fallback hue. Never the display name. */
   viewerId?: string | null;
   /** Which card this block is sitting in. Decides the ink tiers, nothing else. */
   surface?: CommentPreviewSurface;
+  /**
+   * SECTION C: the block now lives INSIDE the card footer, which already owns
+   * the rule above it. Default true so any other consumer renders as before.
+   */
+  topRule?: boolean;
+  /** Container padding. Default is the pre-section-C value. */
+  padding?: string;
 }
 
 export const FeedCommentPreview: React.FC<Props> = ({
@@ -81,41 +88,49 @@ export const FeedCommentPreview: React.FC<Props> = ({
   viewerName,
   viewerId,
   surface = 'dark',
+  topRule = true,
+  padding = '9px 14px 11px',
 }) => {
-  const { ink: INK, mid: MID, dim: DIM, line: LINE } = TONES[surface];
-  const body = preview?.content?.trim() || '';
-  const hasComment = !!preview && (!!body || false);
-  // "View all n" only above TWO OR MORE. At exactly one, a line pointing at a
-  // comment already on screen is noise.
-  const total = Math.max(commentCount, preview?.thread_count ?? 0);
-  const showViewAll = hasComment && total > 1;
-  const emoji = isEmojiOnly(body);
+  const { ink: INK, mid: MID, line: LINE } = TONES[surface];
+
+  /**
+   * SECTION C — THE COMMENT ROW STOPS BEING PERMANENT.
+   * Zero comments renders NOTHING: no prompt, no reserved height. The footer's
+   * comment glyph is the single entry point on an uncommented card. The
+   * always-visible "Add a comment..." prompt and its viewer avatar are gone
+   * from the output; the viewer props stay on the interface (dead list).
+   */
+  const lines = (preview?.recent && preview.recent.length
+    ? preview.recent
+    : preview
+      ? [{
+          comment_id: preview.comment_id,
+          content: preview.content,
+          created_at: preview.created_at,
+          display_name: preview.display_name,
+        }]
+      : []
+  )
+    .filter(l => (l.content ?? '').trim().length > 0)
+    .slice(0, 2);
+
+  if (!lines.length) return null;
+
+  // The tally, not the list length: comment_count is the stored column.
+  const total = Math.max(commentCount, preview?.thread_count ?? 0, lines.length);
+  const showSeeAll = total > 2;
 
   return (
-    <div style={{ borderTop: `0.5px solid ${LINE}`, padding: '9px 14px 11px' }}>
-      {showViewAll && (
-        <button
-          type="button"
-          onClick={onOpenComments}
-          style={{
-            display: 'block',
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            marginBottom: 7,
-            color: MID,
-            fontSize: 12,
-            fontWeight: 600,
-            letterSpacing: 0.1,
-            textAlign: 'left',
-          }}
-        >
-          View all {total} comments
-        </button>
-      )}
-
-      {hasComment && (
+    <div
+      style={{
+        // 1px, matching every other hairline on this surface.
+        borderTop: topRule ? `1px solid ${LINE}` : undefined,
+        padding,
+      }}
+    >
+      {lines.map((l, i) => (
         <div
+          key={l.comment_id}
           role="button"
           tabIndex={0}
           onClick={onOpenComments}
@@ -126,77 +141,52 @@ export const FeedCommentPreview: React.FC<Props> = ({
             }
           }}
           style={{
-            display: 'flex',
+            display: 'block',
             width: '100%',
-            alignItems: 'flex-start',
-            gap: 8,
+            marginTop: i === 0 ? 0 : 5,
+            fontSize: 12,
+            lineHeight: 1.5,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
             background: 'transparent',
             border: 'none',
-            padding: 0,
             textAlign: 'left',
             cursor: 'pointer',
           }}
         >
-          <SquircleAvatar
-            src={preview!.avatar_url}
-            alt={preview!.display_name}
-            userId={preview!.actor_id}
-            size={24}
-            hairlineRing
-          />
-          <span style={{ flex: 1, minWidth: 0, display: 'block' }}>
-            <span
-              style={{
-                display: 'block',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                fontSize: 12.5,
-                lineHeight: '17px',
-              }}
-            >
-              <span style={{ color: INK, fontWeight: 700 }}>{preview!.display_name}</span>
-              {preview!.actor_type === 'business' && preview!.verified && (
-                <VerifiedBadge size="sm" className="inline-block align-[-2px] ml-[3px]" />
-              )}
-              <span
-                style={{
-                  color: MID,
-                  fontWeight: 500,
-                  marginLeft: 6,
-                  fontSize: emoji ? 16 : undefined,
-                }}
-              >
-                <MentionText text={body} />
-              </span>
-            </span>
-            <span style={{ display: 'block', color: DIM, fontSize: 10.5, fontWeight: 600, marginTop: 2 }}>
-              {timeAgo(preview!.created_at)}
-            </span>
+          <span style={{ color: INK, fontWeight: 600 }}>{l.display_name}</span>
+          <span style={{ color: MID, fontWeight: 500, marginLeft: 5 }}>
+            <MentionText text={(l.content ?? '').trim()} />
           </span>
         </div>
-      )}
+      ))}
 
-      <button
-        type="button"
-        onClick={onOpenComments}
-        style={{
-          display: 'flex',
-          width: '100%',
-          alignItems: 'center',
-          gap: 8,
-          background: 'transparent',
-          border: 'none',
-          padding: 0,
-          marginTop: hasComment ? 9 : 0,
-          textAlign: 'left',
-        }}
-      >
-        <SquircleAvatar src={viewerAvatarUrl ?? null} alt={viewerName ?? 'You'} userId={viewerId ?? null} size={22} hairlineRing />
-        <span style={{ color: DIM, fontSize: 12.5, fontWeight: 600 }}>Add a comment…</span>
-      </button>
+      {showSeeAll && (
+        <button
+          type="button"
+          onClick={onOpenComments}
+          style={{
+            display: 'block',
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            marginTop: 7,
+            color: MID,
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: '0.19em',
+            textTransform: 'uppercase',
+            textAlign: 'left',
+            fontVariantNumeric: 'tabular-nums lining-nums',
+          }}
+        >
+          {`See all ${total} comments`}
+        </button>
+      )}
     </div>
   );
 };
 
 export default FeedCommentPreview;
+
