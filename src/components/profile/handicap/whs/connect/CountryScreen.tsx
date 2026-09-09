@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, ChevronRight } from 'lucide-react';
 import { WHS_COUNTRIES, type WhsCountry } from '@/lib/whs/whsCountries';
+import { KICKER } from '@/lib/tokens/type';
 import { INK, MUTE, DIM, BORDER, PANEL, FONT, LABEL_LG, CAPTION } from './designTokens';
 import { Collapsible, Stage, StageHead } from './Primitives';
 
@@ -99,6 +100,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
                 border: `1px solid ${BORDER}`,
                 borderRadius: 16,
                 padding: '20px 18px',
+                 minHeight: 88,
                 marginBottom: 10,
                 cursor: 'pointer',
                 textAlign: 'left',
@@ -109,7 +111,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
                 <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: INK }}>
                   {c.name}
                 </div>
-                <div style={{ ...LABEL_LG, color: MUTE, marginTop: 8, whiteSpace: 'nowrap' }}>
+                <div style={{ ...KICKER, color: MUTE, marginTop: 8, whiteSpace: 'nowrap' }}>
                   {c.pickerBody ?? c.body}
                 </div>
               </div>
