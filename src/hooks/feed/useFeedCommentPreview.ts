@@ -46,7 +46,7 @@ export interface FeedCommentPreview {
    * two lines on the card are the two lines at the top of the sheet. Entry [0]
    * is the same comment the legacy single-preview fields describe.
    */
-  recent: FeedCommentLine[];
+  recent?: FeedCommentLine[];
 }
 
 export type FeedCommentPreviewMap = Map<string, FeedCommentPreview>;
