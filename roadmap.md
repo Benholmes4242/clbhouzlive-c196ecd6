@@ -2,10 +2,10 @@
 
 ## Courses browse rebuild (9 Sep 2026)
 - [x] Diagnose 217 vs 256 and audit the facet RPC callers before UI changes.
-- [ ] Rebuild browse cards as flat 196px photo-led rows with unique figures and 6-10 category bars.
-- [ ] Replace controls with one filled filter row and outline board chips; remove duplicate search.
-- [ ] Rebuild the 260px tracked-round hero and separate Latest Reviews slots by 32px.
-- [ ] Verify direct counts, tier thresholds, card states, spacing, and 390px fit.
+- [x] Rebuild browse cards as flat 196px photo-led rows with unique figures and 6-10 category bars.
+- [x] Replace controls with one filled filter row and outline board chips; remove duplicate search.
+- [x] Rebuild the 260px tracked-round hero and separate Latest Reviews slots by 32px.
+- [x] Verify direct counts, tier thresholds, card states, spacing, and 390px fit.
 
 ## Course detail snags 02 (9 Sep 2026)
 - [x] Detect the Course tab row's true sticky boundary with a safe-area-aware sentinel observer.

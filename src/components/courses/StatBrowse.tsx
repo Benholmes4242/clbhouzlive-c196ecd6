@@ -10,15 +10,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import {
   ChevronDown,
-  Crown,
   Globe,
-  Ruler,
-  Search,
-  Star,
-  TrendingDown,
-  TrendingUp,
-  Users,
-  type LucideIcon,
 } from 'lucide-react';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -32,20 +24,10 @@ import {
 
 } from '@/components/ui/select';
 import CountryFlag from '@/components/ui/country-flag';
-import UnifiedCourseCard, { getRegionalBadgeSlug } from './UnifiedCourseCard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useUserStatsCourseMap } from '@/contexts/UserStatsCoursesContext';
-import { useTop100Enrichment } from '@/hooks/top100/useTop100Enrichment';
-import { useTop100Config } from '@/hooks/top100/useTop100Config';
-import { computeVerdict, type Verdict } from '@/components/top100/verdict';
-import { Top100EnrichmentBlock } from '@/components/top100/Top100EnrichmentBlock';
-import { useCourseRatingStanding } from '@/hooks/top100/useCourseRatingStanding';
-import { Top100VerdictExplainerSheet } from '@/components/top100/sheets/Top100VerdictExplainerSheet';
-import { fromStatBrowseRow } from '@/lib/mappers/toCourseCardModel';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatNumber } from '@/i18n/format';
 import {
-  chipForLens,
   COURSE_BROWSE_LENSES,
   isStatLens,
   STAT_BROWSE_PAGE_SIZE,
@@ -53,7 +35,6 @@ import {
   useStatBrowseFacets,
   useStatBrowseList,
   useCourseBrowseTruth,
-  type StatBrowseRow,
   type StatLens,
   type LensCounts,
 
@@ -108,38 +89,8 @@ interface StatBrowseProps {
   onOpenDirectory: (country: string | null) => void;
 }
 
-/**
- * Scanning aid inside the dropdowns only - never in the headline copy.
- * Icons follow the MEANING of each lens: toughest / scoreable are opposites
- * and read as a pair, and `chase` reuses the Crown that marks a course record
- * everywhere else in the app.
- */
-const LENS_ICON: Record<StatLens, LucideIcon> = {
-  toughest: TrendingUp,
-  scoreable: TrendingDown,
-  played: Users,
-  longest: Ruler,
-  rated: Star,
-  chase: Crown,
-};
-
 /** Dropdown icon geometry — mirrors Discover's quiet Everywhere control. */
 const DD_ICON = { size: 12, strokeWidth: 2.4, 'aria-hidden': true } as const;
-
-function LensIcon({ lens }: { lens: StatLens }) {
-  const Icon = LENS_ICON[lens];
-  return <Icon {...DD_ICON} />;
-}
-
-
-
-/** Short list labels for the verdict explainer sheet. */
-const LIST_LABEL: Record<string, string> = {
-  global: 'Global',
-  'gb-i': 'GB&I',
-  usa: 'USA',
-  europe: 'Europe',
-};
 
 /**
  * SelectTrigger's base carries `[&>span]:line-clamp-1`, which sets
@@ -196,28 +147,6 @@ const menuStyle: React.CSSProperties = {
   color: INK,
 };
 
-
-/**
- * Wraps the enrichment block so the standing line can be fetched per course
- * WITHOUT calling a hook for every visible row: the query is enabled only when
- * the course already qualifies for the verdict band (ranked and rated).
- * p_list_slug is left NULL so the server picks the list by sort_order — a
- * course in both Global and GB&I resolves to Global and names it.
- */
-const RankedEnrichment: React.FC<
-  React.ComponentProps<typeof Top100EnrichmentBlock> & { hasVerdict: boolean }
-> = ({ hasVerdict, ...props }) => {
-  const { data: standing } = useCourseRatingStanding(props.courseId, null, hasVerdict);
-  return (
-    <Top100EnrichmentBlock
-      {...props}
-      ratingRank={
-        standing ? { position: standing.standing, poolSize: standing.poolSize } : null
-      }
-      listLabel={standing?.listLabel ?? undefined}
-    />
-  );
-};
 
 export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   const { t } = useTranslation('courses');
@@ -345,44 +274,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     [openReviewSheet],
   );
 
-
-  /* ── Top 100 enrichment (ranked rows only) ─────────────────────── */
-  /**
-   * Only rows carrying a published rank get the verdict band + COURSE STATS
-   * panel, so only those ids are fetched. The set grows a page at a time and
-   * the hook is keyed on the whole set, so each page refetches it — acceptable
-   * at the current ceiling (121 tracked courses, fewer ranked). Do not widen.
-   */
-  const rankedRows = useMemo(
-    () => rows.filter((r) => r.global_rank != null || r.regional_rank != null),
-    [rows],
-  );
-  const rankedIds = useMemo(() => rankedRows.map((r) => r.course_id), [rankedRows]);
-  const enrichment = useTop100Enrichment(rankedIds, user?.id);
-  const verdictConfig = useTop100Config();
-  /**
-   * Viewer status resolver — same shape as VirtualizedCourseList's, which is the
-   * reference. Enrichment answers for ranked courses; the user-stats map covers
-   * the unranked majority of this tab. Rated outranks played.
-   */
-  const yourRoundsMap = useUserStatsCourseMap();
-  const viewerStatusFor = useCallback(
-    (courseId: string): 'rated' | 'played' | null => {
-      const data = enrichment.get(courseId);
-      if (data?.ratedByYou) return 'rated';
-      if ((data?.yourRounds ?? 0) > 0) return 'played';
-      return (yourRoundsMap.get(courseId) ?? 0) > 0 ? 'played' : null;
-    },
-    [enrichment, yourRoundsMap],
-  );
-  const [verdictSheet, setVerdictSheet] = useState<{
-    courseId: string;
-    courseName: string;
-    verdict: Verdict;
-    canRate: boolean;
-    listLabel: string;
-    listCount: number;
-  } | null>(null);
 
 
 
@@ -1099,24 +990,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             {t('statBrowse.directory.cta')}
           </button>
         </div>
-      )}
-
-      {verdictSheet && (
-        <Top100VerdictExplainerSheet
-          open
-          onClose={() => setVerdictSheet(null)}
-          courseId={verdictSheet.courseId}
-          courseName={verdictSheet.courseName}
-          listLabel={verdictSheet.listLabel}
-          rank={verdictSheet.verdict.rank}
-          rating={verdictSheet.verdict.rating}
-          ratingCount={verdictSheet.verdict.ratingCount}
-          listCount={verdictSheet.listCount}
-          ratingRank={null}
-          ratingPoolSize={null}
-          canRate={verdictSheet.canRate}
-          onRate={() => navigate(`/courses/${verdictSheet.courseId}/rate`)}
-        />
       )}
 
       {/* The SHIPPED reviews sheet, reused from Discover unchanged. Opened by
