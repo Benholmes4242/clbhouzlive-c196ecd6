@@ -23,6 +23,12 @@ interface BottomSheetProps {
   surfaceColor?: string;
   /** Optional max-height override (default '85dvh'). Use e.g. '75dvh' for dvh-aware caps. */
   maxHeight?: string;
+  /** Optional analytical-sheet corner radius. Defaults to the existing 20px. */
+  topRadius?: number;
+  /** Optional grabber treatment. Defaults preserve every existing consumer. */
+  grabberColor?: string;
+  grabberRadius?: number;
+  grabberPadding?: string;
 }
 
 export function BottomSheet({
@@ -36,6 +42,10 @@ export function BottomSheet({
   variant = 'light',
   surfaceColor,
   maxHeight = '85dvh',
+  topRadius = 20,
+  grabberColor = 'rgba(255,255,255,0.18)',
+  grabberRadius = 2,
+  grabberPadding = '10px 0 4px',
 }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
@@ -127,7 +137,7 @@ export function BottomSheet({
       <div
         ref={sheetRef}
         className={cn(
-          "fixed bottom-0 left-0 right-0 rounded-t-[20px] transition-transform duration-300 ease-out",
+          "fixed bottom-0 left-0 right-0 transition-transform duration-300 ease-out",
           variant === 'light' && 'bg-background',
           isAnimating ? "translate-y-0" : "translate-y-full",
           className
@@ -136,6 +146,8 @@ export function BottomSheet({
           zIndex: zIndexBase + 1,
           maxHeight,
           minHeight: 0,
+          borderTopLeftRadius: topRadius,
+          borderTopRightRadius: topRadius,
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
           /* The sheet itself owns the entire rounded surface, including the
              strip behind its grabber. Apply explicit surfaces to both legacy
@@ -153,7 +165,8 @@ export function BottomSheet({
       >
         {/* Draggable grabber area - larger and more visible */}
         <div
-          className="w-full pt-2.5 pb-1 cursor-grab active:cursor-grabbing touch-none"
+          className="w-full cursor-grab active:cursor-grabbing touch-none"
+          style={{ padding: grabberPadding }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -162,10 +175,10 @@ export function BottomSheet({
             style={{
               width: 36,
               height: 4,
-              borderRadius: 2,
+              borderRadius: grabberRadius,
               /* Unconditional white grabber. Both variants paint a dark surface
                  now (see the variant note above), so there is no light case. */
-              background: 'rgba(255,255,255,0.18)',
+              background: grabberColor,
 
               margin: '0 auto',
             }}
